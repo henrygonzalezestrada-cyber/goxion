@@ -49,7 +49,7 @@
 
         .subtitle {
             color: var(--neon-blue);
-            font-size: 1.1rem;
+            font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 3px;
             font-weight: 600;
@@ -180,7 +180,7 @@
             transform: scale(1.02);
         }
 
-        /* Contenedor de Botones de Políticas */
+        /* Contenedor de Botones de Políticas y Cuentas */
         .policy-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -203,6 +203,7 @@
             align-items: center;
             gap: 15px;
             backdrop-filter: blur(10px);
+            text-decoration: none; /* Para cuando se usa como enlace <a> */
         }
 
         .btn-policy:hover {
@@ -301,6 +302,15 @@
             color: var(--neon-blue);
         }
 
+        .badge-neon {
+            background: rgba(157, 78, 221, 0.2);
+            color: var(--neon-blue);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            border: 1px solid var(--neon-purple);
+        }
+
         @media (max-width: 600px) {
             .policy-grid {
                 grid-template-columns: 1fr;
@@ -315,25 +325,47 @@
 
     <header>
         <img src="logo.png" alt="Goxion" class="main-logo">
-        <div class="subtitle">Todo conectado. Un solo acceso.</div>
+        <div class="subtitle">Portal de Soporte y Autogestión</div>
     </header>
 
     <div class="container">
         
+        <!-- SECCIÓN 1: Enlaces al Ecosistema -->
+        <h2 class="section-title">Mi Cuenta Goxion</h2>
+        <div class="policy-grid" style="margin-bottom: 40px;">
+            <!-- Este enlace lleva de regreso al index.html donde están los estados de cuenta -->
+            <a href="index.html" class="btn-policy">
+                <span>📊</span>
+                Mi Estado de Cuenta
+            </a>
+            <button class="btn-policy" onclick="openModal('modal-lealtad')">
+                <span>🎁</span>
+                Sistema de Lealtad
+            </button>
+        </div>
+
+        <!-- SECCIÓN 2: Soluciones Inmediatas -->
         <h2 class="section-title">Soluciones Inmediatas</h2>
         
         <button class="accordion">Inicio de sesión y códigos de verificación</button>
         <div class="panel">
-            <p>Si la plataforma solicita un código de acceso o PIN de verificación temporal, no es necesario esperar. Genera tu código de manera inmediata solicitándolo a nuestro sistema automatizado de WhatsApp.</p>
+            <p>Si la plataforma solicita un código de acceso o PIN de verificación temporal, no es necesario esperar. Genera tu código de manera inmediata solicitándolo a nuestro sistema automatizado.</p>
             <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20solicito%20código%20de%20acceso." class="btn-action">Solicitar Código Ahora</a>
         </div>
 
-        <button class="accordion">Actualización de Hogar (Netflix, Disney+, HBO Max) o Viaje</button>
+        <button class="accordion">Actualización de Hogar (Netflix, Disney, HBO) o Viaje</button>
         <div class="panel">
-            <p>Si te aparece el mensaje de "Tu TV no es parte del Hogar" o restricciones por ubicación geográfica, selecciona "Actualizar Hogar", "Estoy de viaje" o "Código de TV" en tu pantalla. Envíanos el enlace o captura que te arroje la plataforma y lo autorizaremos en minutos.</p>
+            <p>Si te aparece el mensaje de "Tu TV no es parte del Hogar" o restricciones por ubicación geográfica, selecciona "Actualizar Hogar", "Estoy de viaje" o "Código de TV" en tu pantalla. Envíanos el enlace o captura y lo autorizaremos en minutos.</p>
             <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20mi%20pantalla%20pide%20actualizar%20el%20hogar/viaje." class="btn-action">Autorizar Dispositivo</a>
         </div>
 
+        <button class="accordion">Reportar una falla de servicio</button>
+        <div class="panel">
+            <p>¿Perdiste acceso o la cuenta presenta errores? Repórtalo enviando una captura clara de la pantalla con el error. Tu caso será revisado bajo nuestra Política de Garantía para darte una solución rápida.</p>
+            <a href="https://wa.me/529613535659?text=REPORTE%20DE%20FALLA%20-%20Goxion%20Garantía.%0A%0AServicio:%20%0ACorreo:%20%0ADetalle%20del%20problema:%20" class="btn-action">Enviar Reporte</a>
+        </div>
+
+        <!-- SECCIÓN 3: Documentos -->
         <h2 class="section-title" style="margin-top: 60px;">Documentos Oficiales</h2>
         
         <div class="policy-grid">
@@ -347,6 +379,35 @@
             </button>
         </div>
 
+    </div>
+
+    <!-- MODAL: Sistema de Lealtad -->
+    <div id="modal-lealtad" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
+            <h3 class="modal-title">Programa de Lealtad Goxion</h3>
+            <p style="color: #e0e6ed; margin-bottom: 15px;">Tu puntualidad tiene recompensa. Cumple con tus pagos a tiempo y desbloquea descuentos permanentes en tu plan mensual activo.</p>
+            <table>
+                <tr>
+                    <th>Nivel</th>
+                    <th>Meta</th>
+                    <th>Beneficio</th>
+                </tr>
+                <tr>
+                    <td><span class="badge-neon">Nivel 1</span></td>
+                    <td>4 Pagos Puntuales Seguidos</td>
+                    <td><strong>3% de Descuento</strong></td>
+                </tr>
+                <tr>
+                    <td><span class="badge-neon">Nivel 2</span></td>
+                    <td>9 Pagos Puntuales Seguidos</td>
+                    <td><strong>6% de Descuento</strong></td>
+                </tr>
+            </table>
+            <p style="color: #8b949e; font-size: 0.9rem; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+                ⚠️ <strong>Nota importante:</strong> Un solo pago impuntual reinicia tu progreso. Mantén tu descuento mientras sigas pagando de forma puntual.
+            </p>
+        </div>
     </div>
 
     <!-- MODAL: Términos y Condiciones -->
