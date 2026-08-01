@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GOXION - Estado de Cuenta</title>
+  <title>GOXION - Estado de Cuenta Interactivo</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -15,6 +15,7 @@
       --accent-cyan: #00f2fe;
       --accent-blue: #4facfe;
       --success-green: #2ea043;
+      --whatsapp-green: #25d366;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -22,7 +23,7 @@
     .container { width: 100%; max-width: 440px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
     .header { text-align: center; margin-bottom: 20px; }
-    .logo-img { max-width: 200px; height: auto; display: block; margin: 0 auto; }
+    .logo-img { max-width: 180px; height: auto; display: block; margin: 0 auto; }
     .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
     
     .card-info { background: #0d1117; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
@@ -42,7 +43,16 @@
     .total-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
     .total-amount { font-size: 32px; font-weight: 700; color: var(--accent-cyan); margin-top: 4px; }
     .discount-line { font-size: 12px; color: var(--success-green); font-weight: 600; margin-top: 4px; }
-    
+
+    /* Botones de Acción Interactivos */
+    .actions-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+    .btn:active { transform: scale(0.98); }
+    .btn-copy { background: #21262d; color: var(--text-main); border: 1px solid var(--border-color); }
+    .btn-copy:hover { background: #30363d; }
+    .btn-wa { background: var(--whatsapp-green); color: #000; font-weight: 700; }
+    .btn-wa:hover { opacity: 0.9; }
+
     .loyalty-badge { background: #1f242d; border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 20px; }
     .loyalty-title { font-size: 11px; color: var(--success-green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
     .loyalty-desc { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; }
@@ -51,6 +61,8 @@
     .footer { text-align: center; font-size: 12px; color: var(--text-muted); line-height: 1.5; border-top: 1px solid var(--border-color); padding-top: 16px; }
     .error-msg { text-align: center; color: #f85149; padding: 20px 0; font-size: 14px; }
     .loading { text-align: center; color: var(--text-muted); padding: 40px 0; }
+    
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--success-green); color: white; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; }
   </style>
 </head>
 <body>
@@ -59,7 +71,13 @@
   <div class="loading">Cargando datos del cliente...</div>
 </div>
 
+<div class="toast" id="toast">¡Datos de pago copiados!</div>
+
 <script>
+  // Datos de contacto y transferencia integrados
+  const TELEFONO_GOXION = "528136836901"; 
+  const CLABE_PAGO = "638180000167909381";
+
   async function cargarEstadoCuenta() {
     const params = new URLSearchParams(window.location.search);
     const clienteKey = params.get('cliente')?.toLowerCase().trim();
@@ -82,35 +100,31 @@
         return;
       }
 
-      // Fechas
+      // Fechas dinámicas
       const hoy = new Date();
       const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
       const mesActual = meses[hoy.getMonth()];
       const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
       
-      // Cálculo del Sistema de Lealtad
+      // Cálculo de Fidelidad
       const racha = cliente.pagos_puntuales || 0;
-      let nivel = 0;
       let pctDescuento = 0;
       let mensajeLealtad = '';
 
       if (racha >= 9) {
-        nivel = 2;
-        pctDescuento = 0.06; // 6%
+        pctDescuento = 0.06;
         mensajeLealtad = `¡Felicidades! Tienes <span class="loyalty-highlight">Nivel 2</span> activo con un <span style="color:#2ea043; font-weight:700;">6% de descuento</span> conservado por tu puntualidad.`;
       } else if (racha >= 4) {
-        nivel = 1;
-        pctDescuento = 0.03; // 3%
+        pctDescuento = 0.03;
         const faltantes = 9 - racha;
         mensajeLealtad = `¡Súper! Tienes <span class="loyalty-highlight">Nivel 1 (3% OFF)</span>. Te faltan <span class="loyalty-highlight">${faltantes} pago(s) puntual(es)</span> para subir al Nivel 2 (6% OFF).`;
       } else {
-        nivel = 0;
         pctDescuento = 0;
         const faltantes = 4 - racha;
         mensajeLealtad = `Progreso actual: <span class="loyalty-highlight">${racha}/4 pagos</span>. Completa <span class="loyalty-highlight">${faltantes} pago(s) puntual(es) más</span> para desbloquear el Nivel 1 (3% OFF).`;
       }
 
-      // Procesar servicios y subtotales
+      // Procesar servicios
       let subtotal = 0;
       let serviciosHTML = '';
       
@@ -124,15 +138,16 @@
             </div>
           `;
         });
-      } else {
-        serviciosHTML = `<div class="service-item"><span class="service-name">Sin servicios activos</span></div>`;
       }
 
-      // Descuento final
       const ahorro = Math.round(subtotal * pctDescuento);
       const totalFinal = subtotal - ahorro;
 
-      // HTML Render
+      // Mensaje automático formateado para tu WhatsApp
+      const mensajeWA = encodeURIComponent(`Hola GOXION, adjunto pago de mi servicio:\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}\n💵 Total enviado: $${totalFinal} MXN`);
+      const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
+
+      // Renderizado
       app.innerHTML = `
         <div class="header">
           <img src="logo.png" alt="GOXION" class="logo-img">
@@ -157,6 +172,15 @@
           ${ahorro > 0 ? `<div class="discount-line">🎉 ¡Ahorras $${ahorro} MXN por lealtad (${pctDescuento * 100}%)!</div>` : ''}
         </div>
 
+        <div class="actions-group">
+          <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">
+            📋 Copiar CLABE y Monto
+          </button>
+          <a href="${urlWA}" target="_blank" class="btn btn-wa">
+            📲 Reportar pago por WhatsApp
+          </a>
+        </div>
+
         <div class="loyalty-badge">
           <div class="loyalty-title">⭐ PROGRAMA DE FIDELIDAD GOXION</div>
           <div class="loyalty-desc">${mensajeLealtad}</div>
@@ -169,8 +193,17 @@
       `;
 
     } catch (e) {
-      app.innerHTML = `<div class="error-msg">⚠️ Error de conexión al cargar la información.</div>`;
+      app.innerHTML = `<div class="error-msg">⚠️ Error al cargar el estado de cuenta.</div>`;
     }
+  }
+
+  function copiarDatos(monto) {
+    const texto = `GOXION - Datos de Pago\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
+    navigator.clipboard.writeText(texto).then(() => {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    });
   }
 
   cargarEstadoCuenta();
