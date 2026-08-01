@@ -15,7 +15,7 @@
       --accent-cyan: #00f2fe;
       --accent-blue: #4facfe;
       --success-green: #2ea043;
-      --whatsapp-green: #25d366;
+      --warning-amber: #ff9f0a; /* Nuevo color para reportar discrepancias */
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -23,7 +23,7 @@
     .container { width: 100%; max-width: 440px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
     .header { text-align: center; margin-bottom: 20px; }
-    .logo-img { max-width: 230px; height: auto; display: block; margin: 0 auto; }
+    .logo-img { max-width: 180px; height: auto; display: block; margin: 0 auto; }
     .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
     
     .card-info { background: #0d1117; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
@@ -50,7 +50,9 @@
     .btn:active { transform: scale(0.98); }
     .btn-copy { background: #21262d; color: var(--text-main); border: 1px solid var(--border-color); }
     .btn-copy:hover { background: #30363d; }
-    .btn-wa { background: var(--whatsapp-green); color: #000; font-weight: 700; }
+    
+    /* Botón de reporte ajustado a color ámbar */
+    .btn-wa { background: var(--warning-amber); color: #000; font-weight: 700; }
     .btn-wa:hover { opacity: 0.9; }
 
     .loyalty-badge { background: #1f242d; border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 20px; }
@@ -145,11 +147,11 @@
       const ahorro = Math.round(subtotal * pctDescuento);
       const totalFinal = subtotal - ahorro;
 
-      // Mensaje directo para aclaración de datos/servicios
+      // Mensaje de aclaración
       const mensajeWA = encodeURIComponent(`Hola GOXION, los datos de mi estado de cuenta no corresponden a lo que tengo contratado.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-      // Renderizado de la interfaz
+      // Renderizado
       app.innerHTML = `
         <div class="header">
           <img src="logo.png" alt="GOXION" class="logo-img">
