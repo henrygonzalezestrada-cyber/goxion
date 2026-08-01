@@ -2,7 +2,7 @@
   "perla": {
     "folio": "GX-2026-0001",
     "nombre": "Perla",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Max Standard", "monto": 79 },
       { "nombre": "Prime Video", "monto": 45 }
@@ -11,7 +11,7 @@
   "rodas": {
     "folio": "GX-2026-0002",
     "nombre": "Rodas",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "YouTube Premium", "monto": 89 },
       { "nombre": "Microsoft 365", "monto": 79 }
@@ -20,7 +20,7 @@
   "nayeli": {
     "folio": "GX-2026-0003",
     "nombre": "Nayeli",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Vix Premium (x2)", "monto": 98 }
     ]
@@ -28,16 +28,16 @@
   "laura": {
     "folio": "GX-2026-0004",
     "nombre": "Laura",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "YouTube Premium (x2)", "monto": 178 },
       { "nombre": "Microsoft 365", "monto": 79 }
     ]
   },
-  "david": {
+  "davis": {
     "folio": "GX-2026-0005",
     "nombre": "Davis",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Netflix Premium", "monto": 109 },
       { "nombre": "Disney+ Premium", "monto": 89 },
@@ -49,7 +49,7 @@
   "gabriel": {
     "folio": "GX-2026-0006",
     "nombre": "Gabriel",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Prime Video", "monto": 45 },
       { "nombre": "YouTube Premium", "monto": 89 }
@@ -58,7 +58,7 @@
   "jose": {
     "folio": "GX-2026-0007",
     "nombre": "José",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "YouTube Premium", "monto": 89 },
       { "nombre": "Vix Premium (x2)", "monto": 98 },
@@ -68,7 +68,7 @@
   "fabiola": {
     "folio": "GX-2026-0008",
     "nombre": "Fabiola",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Disney+ Premium", "monto": 89 },
       { "nombre": "Max Standard", "monto": 79 }
@@ -77,7 +77,7 @@
   "jorge": {
     "folio": "GX-2026-0009",
     "nombre": "Jorge Mobo",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Netflix Premium", "monto": 109 },
       { "nombre": "Disney+ Premium", "monto": 89 },
@@ -88,7 +88,7 @@
   "alondra": {
     "folio": "GX-2026-0010",
     "nombre": "Alondra",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Max Standard", "monto": 79 },
       { "nombre": "YouTube Premium", "monto": 89 },
@@ -99,7 +99,7 @@
   "luis": {
     "folio": "GX-2026-0011",
     "nombre": "Luis",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "YouTube Premium", "monto": 89 }
     ]
@@ -107,7 +107,7 @@
   "samuel": {
     "folio": "GX-2026-0012",
     "nombre": "Samuel",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Disney+ Premium", "monto": 89 },
       { "nombre": "YouTube Premium", "monto": 89 },
@@ -117,7 +117,7 @@
   "prima-fernanda": {
     "folio": "GX-2026-0013",
     "nombre": "Prima Fernanda",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Disney+ (Promocional)", "monto": 59 }
     ]
@@ -125,7 +125,7 @@
   "julian": {
     "folio": "GX-2026-0014",
     "nombre": "Julián",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Disney+ Premium", "monto": 89 },
       { "nombre": "Vix Premium", "monto": 49 }
@@ -134,7 +134,7 @@
   "gabriel2": {
     "folio": "GX-2026-0015",
     "nombre": "Gabriel 2",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "YouTube Premium", "monto": 89 },
       { "nombre": "Microsoft 365", "monto": 79 }
@@ -143,7 +143,7 @@
   "juan-de-dios": {
     "folio": "GX-2026-0016",
     "nombre": "Juan de Dios",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Netflix Premium", "monto": 109 },
       { "nombre": "Disney+ Premium", "monto": 89 },
@@ -153,7 +153,7 @@
   "rafael": {
     "folio": "GX-2026-0017",
     "nombre": "Rafael",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Netflix Premium", "monto": 99 },
       { "nombre": "Disney+ (Especial)", "monto": 69 }
@@ -162,7 +162,7 @@
   "jeynner": {
     "folio": "GX-2026-0018",
     "nombre": "Jeynner",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "YouTube Premium", "monto": 89 }
     ]
@@ -170,7 +170,7 @@
   "isamar": {
     "folio": "GX-2026-0019",
     "nombre": "Isamar",
-    "nivel": 1,
+    "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Disney+ Premium", "monto": 89 },
       { "nombre": "YouTube Premium", "monto": 89 }
