@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goxion - Centro de Ayuda y Autogestión</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --card-bg: #11131a;
+            --text-main: #e0e6ed;
+            --text-muted: #8b949e;
+            --neon-blue: #00d2ff;
+            --neon-purple: #9d4edd;
+            --border-color: #232736;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+        }
+
+        header {
+            text-align: center;
+            padding: 50px 20px;
+            background: radial-gradient(circle at top, #1a1525 0%, var(--bg-color) 70%);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        h1 span {
+            color: var(--neon-blue);
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .section-title {
+            color: var(--neon-purple);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+        }
+
+        /* Acordeón para Soluciones Rápidas */
+        .accordion {
+            background-color: var(--card-bg);
+            color: var(--neon-blue);
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: 0.3s;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion:hover, .active {
+            background-color: #1a1d27;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+        }
+
+        .panel {
+            padding: 0 18px;
+            background-color: var(--bg-color);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+            border-left: 2px solid var(--neon-blue);
+            margin-bottom: 15px;
+        }
+
+        .panel p {
+            padding: 15px 0;
+            color: var(--text-main);
+        }
+
+        .btn-action {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--neon-purple), var(--neon-blue));
+            color: #fff;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Tablas para Políticas */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #161922;
+            color: var(--neon-blue);
+        }
+
+        .terms-text {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .contact-box {
+            background-color: var(--card-bg);
+            border: 1px dashed var(--neon-purple);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .contact-box p {
+            margin: 5px 0;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GOX<span>ION</span></h1>
+        <div class="subtitle">Todo conectado. Un solo acceso[cite: 1].</div>
+    </header>
+
+    <div class="container">
+        
+        <h2 class="section-title">Soluciones Rápidas</h2>
+        
+        <button class="accordion">Inicio de sesión y códigos de verificación</button>
+        <div class="panel">
+            <p>Si la plataforma solicita un código de acceso o PIN de verificación temporal, no es necesario esperar. Genera tu código de manera inmediata solicitándolo a nuestro sistema automatizado de WhatsApp haciendo clic en el botón de abajo.</p>
+            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20solicito%20código%20de%20acceso." class="btn-action">Solicitar Código Ahora</a>
+        </div>
+
+        <button class="accordion">Actualización de Hogar (Netflix) o Modo Viaje</button>
+        <div class="panel">
+            <p>Si te aparece el mensaje de "Tu TV no es parte del Hogar", selecciona "Actualizar Hogar" o "Estoy de viaje" en tu pantalla. Envíanos el enlace o captura que te arroje la plataforma y lo autorizaremos en minutos.</p>
+            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20mi%20pantalla%20pide%20actualizar%20el%20hogar." class="btn-action">Autorizar Dispositivo</a>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 50px;">Términos y Condiciones Oficiales</h2>
+        
+        <p class="terms-text">GOXION es un ecosistema de servicios digitales diseñado para facilitar el acceso centralizado a plataformas de entretenimiento, herramientas de productividad, soluciones de almacenamiento e inteligencia artificial bajo una experiencia simple, segura y unificada[cite: 1].</p>
+
+        <p class="terms-text"><strong>1. Condiciones de Uso y Seguridad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles[cite: 1]. Queda prohibida su reventa o divulgación a terceros no autorizados[cite: 1]. Las cuentas deben utilizarse exclusivamente para los fines estipulados[cite: 1]. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema[cite: 1]. El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso[cite: 1].</p>
+
+        <p class="terms-text"><strong>2. Esquema de Pagos:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial[cite: 1]. Si prevés un retraso, notifícalo con antelación para pactar una prórroga sin aplicación de recargos[cite: 1].</p>
+
+        <h2 class="section-title" style="margin-top: 50px;">Garantía de Satisfacción y Trato Justo</h2>
+        <p class="terms-text">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales[cite: 1]:</p>
+
+        <table>
+            <tr>
+                <th>Concepto / Evento</th>
+                <th>Regla Aplicable</th>
+                <th>Límite Máximo</th>
+            </tr>
+            <tr>
+                <td>Inactividad por Falla Técnica</td>
+                <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario[cite: 1].</td>
+                <td>Hasta 50% de descuento (equivalente a 10 días)[cite: 1].</td>
+            </tr>
+            <tr>
+                <td>Mora sin Previo Aviso</td>
+                <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento[cite: 1]. Debe notificarse la fecha exacta de vencimiento[cite: 1].</td>
+                <td>Hasta 50% de interés acumulado[cite: 1].</td>
+            </tr>
+            <tr>
+                <td>Baja / Cancelación del Servicio</td>
+                <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado[cite: 1].</td>
+                <td>20% sobre saldo pendiente[cite: 1].</td>
+            </tr>
+        </table>
+
+        <div class="contact-box">
+            <h3 style="color: var(--neon-blue); margin-bottom: 10px;">Canales Oficiales de Soporte</h3>
+            <p><strong>WhatsApp:</strong> <a href="https://wa.me/529613535659" style="color: var(--text-main); text-decoration: none;">+52 961 353 5659</a>[cite: 1]</p>
+            <p><strong>Correo:</strong> <a href="mailto:hegoes2130@gmail.com" style="color: var(--text-main); text-decoration: none;">hegoes2130@gmail.com</a>[cite: 1]</p>
+        </div>
+
+    </div>
+
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+        var i;
+
+        for (i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                } 
+            });
+        }
+    </script>
+
+</body>
+</html>
