@@ -23,7 +23,7 @@
     .container { width: 100%; max-width: 440px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
     .header { text-align: center; margin-bottom: 20px; }
-    .logo-img { max-width: 180px; height: auto; display: block; margin: 0 auto; }
+    .logo-img { max-width: 230px; height: auto; display: block; margin: 0 auto; }
     .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
     
     .card-info { background: #0d1117; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
@@ -74,9 +74,11 @@
 <div class="toast" id="toast">¡Datos de pago copiados!</div>
 
 <script>
-  // Datos de contacto y transferencia integrados
+  // Configuración de Datos de Contacto y Cuenta
   const TELEFONO_GOXION = "528136836901"; 
   const CLABE_PAGO = "638180000167909381";
+  const BANCO_PAGO = "NU BANCO"; // Cambia por tu banco si es necesario
+  const TITULAR_PAGO = "Henry González"; // Cambia por tu nombre completo completo
 
   async function cargarEstadoCuenta() {
     const params = new URLSearchParams(window.location.search);
@@ -100,7 +102,7 @@
         return;
       }
 
-      // Fechas dinámicas
+      // Fechas
       const hoy = new Date();
       const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
       const mesActual = meses[hoy.getMonth()];
@@ -143,11 +145,11 @@
       const ahorro = Math.round(subtotal * pctDescuento);
       const totalFinal = subtotal - ahorro;
 
-      // Mensaje automático formateado para tu WhatsApp
+      // Mensaje formateado para WhatsApp
       const mensajeWA = encodeURIComponent(`Hola GOXION, adjunto pago de mi servicio:\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}\n💵 Total enviado: $${totalFinal} MXN`);
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-      // Renderizado
+      // Renderizado de la tarjeta
       app.innerHTML = `
         <div class="header">
           <img src="logo.png" alt="GOXION" class="logo-img">
@@ -174,7 +176,7 @@
 
         <div class="actions-group">
           <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">
-            📋 Copiar CLABE y Monto
+            📋 Copiar CLABE y datos
           </button>
           <a href="${urlWA}" target="_blank" class="btn btn-wa">
             📲 Reportar pago por WhatsApp
@@ -198,7 +200,7 @@
   }
 
   function copiarDatos(monto) {
-    const texto = `GOXION - Datos de Pago\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
+    const texto = `GOXION - Datos de Transferencia\n\nBanco: ${BANCO_PAGO}\nTitular: ${TITULAR_PAGO}\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
     navigator.clipboard.writeText(texto).then(() => {
       const toast = document.getElementById('toast');
       toast.style.display = 'block';
