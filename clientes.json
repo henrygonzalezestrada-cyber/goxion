@@ -28,7 +28,7 @@
   "laura": {
     "folio": "GX-2026-0004",
     "nombre": "Laura",
-    "pagos_puntuales": 0,
+    "pagos_puntuales": 4,
     "servicios": [
       { "nombre": "YouTube Premium (x2)", "monto": 178 },
       { "nombre": "Microsoft 365", "monto": 79 }
