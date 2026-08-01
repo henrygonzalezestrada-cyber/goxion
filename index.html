@@ -20,8 +20,8 @@
     body { background-color: var(--bg-color); color: var(--text-main); display: flex; justify-content: center; padding: 20px; }
     .container { width: 100%; max-width: 480px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     
-    .header { text-align: center; margin-bottom: 24px; }
-    .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 4px; }
+    .header { text-align: center; margin-bottom: 12px; }
+    .subtitle { color: var(--text-muted); font-size: 13px; margin-top: -8px; }
     
     .card-info { background: #0d1117; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 20px; }
     .info-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
@@ -52,7 +52,7 @@
 
 <div class="container" id="app">
   <div class="header">
-    <img src="logo.png" alt="GOXION" style="max-width: 240px; height: auto; display: block; margin: 0 auto 10px auto;">
+    <img src="logo.png" alt="GOXION" style="max-width: 250px; height: auto; display: block; margin: 0 auto -5px auto;">
     <div class="subtitle">Gestión Digital de Suscripciones</div>
   </div>
   <div class="error-msg">Cargando estado de cuenta...</div>
@@ -99,7 +99,7 @@
 
       app.innerHTML = `
         <div class="header">
-          <img src="logo.png" alt="GOXION" style="max-width: 260px; height: auto; display: block; margin: 0 auto 2px auto;">
+          <img src="logo.png" alt="GOXION" style="max-width: 250px; height: auto; display: block; margin: -10px auto -10px auto;">
           <div class="subtitle">Estado de Cuenta de Servicios</div>
         </div>
 
