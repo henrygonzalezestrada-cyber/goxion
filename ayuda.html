@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Goxion - Estado de Cuenta</title>
+    <title>Goxion - Centro de Ayuda Inteligente</title>
     <style>
         :root {
             --bg-dark: #030407;
             --neon-blue: #00d2ff;
             --neon-purple: #9d4edd;
-            --card-bg: rgba(17, 19, 26, 0.7);
+            --card-bg: rgba(17, 19, 26, 0.6);
             --glass-border: rgba(255, 255, 255, 0.08);
             --text-main: #e0e6ed;
             --text-muted: #8b949e;
@@ -25,351 +25,483 @@
         body {
             background-color: var(--bg-dark);
             background-image: 
-                radial-gradient(circle at 50% 0%, rgba(157, 78, 221, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 50% 100%, rgba(0, 210, 255, 0.1) 0%, transparent 50%);
+                radial-gradient(circle at 15% 50%, rgba(157, 78, 221, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(0, 210, 255, 0.08) 0%, transparent 50%);
             background-attachment: fixed;
             color: var(--text-main);
             line-height: 1.6;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
-        /* Header */
+        /* Header con Logo */
         header {
             text-align: center;
-            padding: 40px 20px 20px;
-            width: 100%;
+            padding: 50px 20px 30px;
+            border-bottom: 1px solid var(--glass-border);
+            background: linear-gradient(180deg, rgba(10, 12, 16, 0.9) 0%, rgba(3, 4, 7, 0) 100%);
         }
 
         .main-logo {
-            max-width: 220px;
+            max-width: 280px;
             height: auto;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             filter: drop-shadow(0px 0px 15px rgba(0, 210, 255, 0.3));
         }
 
         .subtitle {
-            color: var(--text-muted);
+            color: var(--neon-blue);
             font-size: 1rem;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            font-weight: 600;
         }
 
-        /* Contenedor Principal */
         .container {
-            max-width: 600px;
-            width: 90%;
-            margin: 20px auto 40px auto;
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 40px 20px;
         }
 
-        /* Tarjeta del Estado de Cuenta */
-        .statement-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
-            display: none; /* Se oculta hasta que cargan los datos */
-        }
-
-        .client-header {
-            border-bottom: 1px solid var(--glass-border);
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .client-name {
-            font-size: 1.8rem;
+        .section-title {
             color: #fff;
-            margin-bottom: 5px;
-        }
-
-        .client-folio {
-            color: var(--neon-blue);
-            font-family: monospace;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-        }
-
-        /* Nivel de Lealtad */
-        .loyalty-badge {
-            display: inline-block;
-            padding: 8px 15px;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-top: 15px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border);
-        }
-
-        .loyalty-1 {
-            border-color: var(--neon-purple);
-            color: var(--neon-purple);
-            box-shadow: 0 0 15px rgba(157, 78, 221, 0.2);
-        }
-
-        .loyalty-2 {
-            border-color: var(--neon-blue);
-            color: var(--neon-blue);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
-        }
-
-        /* Lista de Servicios */
-        .services-list {
+            font-size: 1.3rem;
             margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .service-item {
+        .section-title::before {
+            content: '';
+            width: 8px;
+            height: 25px;
+            background: linear-gradient(180deg, var(--neon-purple), var(--neon-blue));
+            border-radius: 4px;
+        }
+
+        /* Acordeones Glassmorphism */
+        .accordion {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #fff;
+            cursor: pointer;
+            padding: 20px;
+            width: 100%;
+            border: 1px solid var(--glass-border);
+            text-align: left;
+            outline: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.4s ease;
+            border-radius: 12px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
         }
 
-        .service-name {
-            color: #fff;
+        .accordion:hover {
+            border-color: rgba(0, 210, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.15);
+            transform: translateY(-2px);
         }
 
-        .service-price {
+        .accordion.active {
+            border-color: var(--neon-purple);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+
+        .panel {
+            padding: 0 20px;
+            background: rgba(10, 12, 16, 0.6);
+            backdrop-filter: blur(10px);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            border-left: 2px solid var(--neon-blue);
+            border-right: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+
+        .panel p {
+            padding: 20px 0;
             color: var(--text-muted);
         }
 
-        /* Totales */
-        .totals-section {
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 1rem;
-        }
-
-        .total-row.discount {
-            color: #00ff88;
-        }
-
-        .total-final {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid var(--glass-border);
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--neon-blue);
-        }
-
-        /* Botones */
+        /* Botones Neón */
         .btn-action {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            display: inline-block;
+            background: transparent;
             color: #fff;
-            padding: 15px;
+            padding: 12px 28px;
             text-decoration: none;
             border-radius: 30px;
             font-weight: bold;
-            font-size: 1.1rem;
-            border: none;
+            margin: 10px 0 20px 0;
+            border: 2px solid var(--neon-blue);
             cursor: pointer;
             transition: all 0.3s ease;
             text-transform: uppercase;
+            font-size: 0.9rem;
             letter-spacing: 1px;
-            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
+            z-index: -1;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .btn-action:hover::before {
+            opacity: 1;
         }
 
         .btn-action:hover {
             box-shadow: 0 0 25px rgba(0, 210, 255, 0.4);
+            border-color: transparent;
             transform: scale(1.02);
         }
 
-        .btn-secondary {
-            display: block;
-            width: 100%;
-            text-align: center;
-            background: transparent;
-            color: var(--text-muted);
-            padding: 15px;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: bold;
-            border: 1px solid var(--glass-border);
-            transition: all 0.3s ease;
+        /* Contenedor de Botones de Políticas y Cuentas */
+        .policy-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .btn-secondary:hover {
-            border-color: var(--neon-purple);
-            color: #fff;
-        }
-
-        /* Mensajes de Error */
-        .error-message {
-            text-align: center;
+        .btn-policy {
             background: var(--card-bg);
-            padding: 40px 20px;
-            border-radius: 20px;
-            border: 1px solid #ff4d4d;
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            padding: 25px 20px;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            backdrop-filter: blur(10px);
+            text-decoration: none; 
+        }
+
+        .btn-policy:hover {
+            border-color: var(--neon-purple);
+            box-shadow: 0 10px 30px rgba(157, 78, 221, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .btn-policy span {
+            font-size: 2.5rem;
+        }
+
+        /* Ventanas Modales (Pop-ups) */
+        .modal {
             display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(3, 4, 7, 0.85);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #11131a;
+            border: 1px solid rgba(157, 78, 221, 0.4);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.02);
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            color: var(--text-muted);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: var(--neon-blue);
+        }
+
+        .modal-title {
+            color: var(--neon-purple);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        th {
+            background-color: rgba(0, 210, 255, 0.1);
+            color: var(--neon-blue);
+        }
+
+        .badge-neon {
+            background: rgba(157, 78, 221, 0.2);
+            color: var(--neon-blue);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            border: 1px solid var(--neon-purple);
+        }
+
+        @media (max-width: 600px) {
+            .policy-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                padding: 25px;
+            }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <!-- Si tienes el logo, asegúrate de que se llame logo.png en tu repositorio -->
-        <img src="logo.png" alt="Goxion" class="main-logo" onerror="this.style.display='none'">
-        <div class="subtitle">Estado de Cuenta Inteligente</div>
+        <img src="logo.png" alt="Goxion" class="main-logo">
+        <div class="subtitle">Portal de Soporte y Autogestión</div>
     </header>
 
     <div class="container">
         
-        <!-- Estado de Cuenta (Se llena con JS) -->
-        <div class="statement-card" id="statement-card">
-            
-            <div class="client-header">
-                <div class="client-name" id="ui-nombre">Cargando...</div>
-                <div class="client-folio" id="ui-folio">Cargando...</div>
-                <div id="ui-lealtad"></div>
-            </div>
-
-            <h3 style="margin-bottom: 15px; color: var(--neon-purple); font-size: 1rem; text-transform: uppercase;">Tus Servicios</h3>
-            
-            <div class="services-list" id="ui-servicios">
-                <!-- Los servicios se inyectan aquí -->
-            </div>
-
-            <div class="totals-section">
-                <div class="total-row">
-                    <span>Subtotal</span>
-                    <span id="ui-subtotal">$0.00</span>
-                </div>
-                <div class="total-row discount" id="ui-descuento-row" style="display: none;">
-                    <span id="ui-descuento-texto">Descuento Lealtad</span>
-                    <span id="ui-descuento-monto">-$0.00</span>
-                </div>
-                <div class="total-final">
-                    <span>TOTAL A PAGAR</span>
-                    <span id="ui-total">$0.00</span>
-                </div>
-            </div>
-
-            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20quiero%20enviar%20mi%20comprobante%20de%20pago." class="btn-action" target="_blank">Reportar Pago</a>
-            <a href="ayuda.html" class="btn-secondary">Ir a Soporte y Ayuda</a>
-            
+        <h2 class="section-title">Mi Cuenta Goxion</h2>
+        <div class="policy-grid" style="margin-bottom: 40px;">
+            <button class="btn-policy" onclick="openModal('modal-login')">
+                <span>📊</span>
+                Mi Estado de Cuenta
+            </button>
+            <button class="btn-policy" onclick="openModal('modal-lealtad')">
+                <span>🎁</span>
+                Sistema de Lealtad
+            </button>
         </div>
 
-        <!-- Mensaje si no se encuentra el cliente -->
-        <div class="error-message" id="error-message">
-            <h3 style="color: #ff4d4d; margin-bottom: 15px;">Cuenta no encontrada</h3>
-            <p style="color: var(--text-muted); margin-bottom: 25px;">No pudimos cargar el estado de cuenta. Por favor, verifica que tu enlace sea correcto o ingresa tu ID manualmente en nuestro portal de ayuda.</p>
-            <a href="ayuda.html" class="btn-action" style="width: auto; display: inline-block; padding: 12px 30px;">Ir al Buscador</a>
+        <h2 class="section-title">Soluciones Inmediatas</h2>
+        
+        <button class="accordion">Inicio de sesión y códigos de verificación</button>
+        <div class="panel">
+            <p>Si la plataforma solicita un código de acceso o PIN de verificación temporal, no es necesario esperar. Genera tu código de manera inmediata solicitándolo a nuestro sistema automatizado.</p>
+            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20solicito%20código%20de%20acceso." class="btn-action">Solicitar Código Ahora</a>
+        </div>
+
+        <button class="accordion">Actualización de Hogar (Netflix, Disney, HBO) o Viaje</button>
+        <div class="panel">
+            <p>Si te aparece el mensaje de "Tu TV no es parte del Hogar" o restricciones por ubicación geográfica, selecciona "Actualizar Hogar", "Estoy de viaje" o "Código de TV" en tu pantalla. Envíanos el enlace o captura y lo autorizaremos en minutos.</p>
+            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20mi%20pantalla%20pide%20actualizar%20el%20hogar/viaje." class="btn-action">Autorizar Dispositivo</a>
+        </div>
+
+        <button class="accordion">Reportar una falla de servicio</button>
+        <div class="panel">
+            <p>¿Perdiste acceso o la cuenta presenta errores? Repórtalo enviando una captura clara de la pantalla con el error. Tu caso será revisado bajo nuestra Política de Garantía para darte una solución rápida.</p>
+            <a href="https://wa.me/529613535659?text=REPORTE%20DE%20FALLA%20-%20Goxion%20Garantía.%0A%0AServicio:%20%0ACorreo:%20%0ADetalle%20del%20problema:%20" class="btn-action">Enviar Reporte</a>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 60px;">Documentos Oficiales</h2>
+        
+        <div class="policy-grid">
+            <button class="btn-policy" onclick="openModal('modal-terminos')">
+                <span>📄</span>
+                Términos y Condiciones
+            </button>
+            <button class="btn-policy" onclick="openModal('modal-garantia')">
+                <span>🛡️</span>
+                Garantía y Trato Justo
+            </button>
         </div>
 
     </div>
 
-    <script>
-        // 1. Obtener el parámetro de la URL (Ej: ?cliente=perla)
-        const urlParams = new URLSearchParams(window.location.search);
-        let clienteId = urlParams.get('cliente') || urlParams.get('id');
-
-        const card = document.getElementById('statement-card');
-        const errorMsg = document.getElementById('error-message');
-
-        if (!clienteId) {
-            // Si no hay ID en la URL, mostramos el error para que vayan al buscador
-            errorMsg.style.display = 'block';
-        } else {
-            // Normalizar el ID: pasarlo a minúsculas y cambiar espacios por guiones
-            clienteId = clienteId.trim().toLowerCase().replace(/ /g, '-');
-            cargarDatosCliente(clienteId);
-        }
-
-        // 2. Función para cargar el JSON y buscar al cliente
-        function cargarDatosCliente(id) {
-            fetch('clientes.json')
-                .then(response => {
-                    if (!response.ok) throw new Error("Error al cargar la base de datos");
-                    return response.json();
-                })
-                .then(data => {
-                    const cliente = data[id];
-                    if (cliente) {
-                        mostrarEstadoCuenta(cliente);
-                    } else {
-                        errorMsg.style.display = 'block';
-                    }
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    errorMsg.style.display = 'block';
-                    errorMsg.querySelector('p').innerText = "Hubo un problema al conectar con el servidor. Intenta de nuevo más tarde.";
-                });
-        }
-
-        // 3. Función para pintar los datos en la pantalla
-        function mostrarEstadoCuenta(cliente) {
-            // Textos básicos
-            document.getElementById('ui-nombre').innerText = cliente.nombre;
-            document.getElementById('ui-folio').innerText = "Folio: " + cliente.folio;
-
-            // Procesar Servicios y Subtotal
-            let subtotal = 0;
-            let serviciosHTML = "";
+    <!-- MODAL: Buscador de Cuenta -->
+    <div id="modal-login" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
+            <h3 class="modal-title">Acceso a tu Cuenta</h3>
+            <p style="color: #8b949e; margin-bottom: 20px;">Ingresa tu ID de cliente o nombre registrado para consultar tu estado de cuenta.</p>
             
-            cliente.servicios.forEach(servicio => {
-                subtotal += servicio.monto;
-                serviciosHTML += `
-                    <div class="service-item">
-                        <span class="service-name">${servicio.nombre}</span>
-                        <span class="service-price">$${servicio.monto.toFixed(2)}</span>
-                    </div>
-                `;
+            <input type="text" id="input-cliente" placeholder="Ej: laura o juan de dios" style="width: 100%; padding: 15px; border-radius: 8px; border: 1px solid var(--neon-purple); background-color: rgba(0,0,0,0.5); color: #fff; font-size: 1.1rem; margin-bottom: 20px; outline: none; text-align: center;">
+            
+            <button class="btn-action" onclick="buscarCliente()" style="width: 100%; margin: 0;">Buscar mi cuenta</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Sistema de Lealtad -->
+    <div id="modal-lealtad" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
+            <h3 class="modal-title">Programa de Lealtad Goxion</h3>
+            <p style="color: #e0e6ed; margin-bottom: 15px;">Tu puntualidad tiene recompensa. Cumple con tus pagos a tiempo y desbloquea descuentos permanentes en tu plan mensual activo.</p>
+            <table>
+                <tr>
+                    <th>Nivel</th>
+                    <th>Meta</th>
+                    <th>Beneficio</th>
+                </tr>
+                <tr>
+                    <td><span class="badge-neon">Nivel 1</span></td>
+                    <td>4 Pagos Puntuales Seguidos</td>
+                    <td><strong>3% de Descuento</strong></td>
+                </tr>
+                <tr>
+                    <td><span class="badge-neon">Nivel 2</span></td>
+                    <td>9 Pagos Puntuales Seguidos</td>
+                    <td><strong>6% de Descuento</strong></td>
+                </tr>
+            </table>
+            <p style="color: #8b949e; font-size: 0.9rem; border-top: 1px solid var(--glass-border); padding-top: 15px;">
+                ⚠️ <strong>Nota importante:</strong> Un solo pago impuntual reinicia tu progreso. Mantén tu descuento mientras sigas pagando de forma puntual.
+            </p>
+        </div>
+    </div>
+
+    <!-- MODAL: Términos y Condiciones -->
+    <div id="modal-terminos" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
+            <h3 class="modal-title">Términos y Condiciones</h3>
+            <p style="color: #8b949e; margin-bottom: 15px;">GOXION es un ecosistema de servicios digitales diseñado para facilitar el acceso centralizado a plataformas de entretenimiento, herramientas de productividad, soluciones de almacenamiento e inteligencia artificial bajo una experiencia simple, segura y unificada.</p>
+            <p style="color: #e0e6ed; margin-bottom: 10px;"><strong>1. Condiciones de Uso y Seguridad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados. Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema. El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</p>
+            <p style="color: #e0e6ed;"><strong>2. Esquema de Pagos:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial. Si prevés un retraso, notifícalo con antelación para pactar una prórroga sin aplicación de recargos.</p>
+        </div>
+    </div>
+
+    <!-- MODAL: Garantía y Trato Justo -->
+    <div id="modal-garantia" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
+            <h3 class="modal-title">Política de Garantía y Trato Justo</h3>
+            <p style="color: #8b949e; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
+            <table>
+                <tr>
+                    <th>Concepto / Evento</th>
+                    <th>Regla Aplicable</th>
+                    <th>Límite Máximo</th>
+                </tr>
+                <tr>
+                    <td>Inactividad por Falla Técnica</td>
+                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td>
+                    <td>Hasta 50% de descuento (10 días).</td>
+                </tr>
+                <tr>
+                    <td>Mora sin Previo Aviso</td>
+                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento. Debe notificarse la fecha exacta de vencimiento.</td>
+                    <td>Hasta 50% de interés.</td>
+                </tr>
+                <tr>
+                    <td>Baja / Cancelación del Servicio</td>
+                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td>
+                    <td>20% sobre saldo pendiente.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                    panel.style.paddingTop = "0";
+                    panel.style.paddingBottom = "0";
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + 50 + "px";
+                    panel.style.paddingTop = "10px";
+                    panel.style.paddingBottom = "20px";
+                } 
             });
-            document.getElementById('ui-servicios').innerHTML = serviciosHTML;
-            document.getElementById('ui-subtotal').innerText = "$" + subtotal.toFixed(2);
+        }
 
-            // Calcular Descuento de Lealtad
-            let descuentoPorcentaje = 0;
-            let nivelLealtadHTML = "";
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('show');
+            document.body.style.overflow = 'hidden'; 
+        }
 
-            if (cliente.pagos_puntuales >= 9) {
-                descuentoPorcentaje = 0.06; // 6%
-                nivelLealtadHTML = `<div class="loyalty-badge loyalty-2">✨ Nivel 2: ${cliente.pagos_puntuales} Pagos Puntuales</div>`;
-            } else if (cliente.pagos_puntuales >= 4) {
-                descuentoPorcentaje = 0.03; // 3%
-                nivelLealtadHTML = `<div class="loyalty-badge loyalty-1">⭐ Nivel 1: ${cliente.pagos_puntuales} Pagos Puntuales</div>`;
-            } else {
-                nivelLealtadHTML = `<div class="loyalty-badge" style="color: var(--text-muted)">Iniciando nivel de lealtad (${cliente.pagos_puntuales}/4)</div>`;
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+                document.body.style.overflow = 'auto';
             }
+        }
 
-            document.getElementById('ui-lealtad').innerHTML = nivelLealtadHTML;
-
-            // Aplicar Descuento y Total
-            let descuentoMonto = subtotal * descuentoPorcentaje;
-            let totalFinal = subtotal - descuentoMonto;
-
-            if (descuentoMonto > 0) {
-                document.getElementById('ui-descuento-row').style.display = 'flex';
-                document.getElementById('ui-descuento-texto').innerText = `Descuento Lealtad (${(descuentoPorcentaje*100)}%)`;
-                document.getElementById('ui-descuento-monto').innerText = "-$" + descuentoMonto.toFixed(2);
+        function buscarCliente() {
+            var inputValor = document.getElementById('input-cliente').value.trim();
+            if (inputValor === "") {
+                alert("Por favor, ingresa tu identificador para continuar.");
+                return;
             }
-
-            document.getElementById('ui-total').innerText = "$" + totalFinal.toFixed(2);
-
-            // Mostrar la tarjeta y ocultar el error
-            card.style.display = 'block';
-            errorMsg.style.display = 'none';
+            window.location.href = 'index.html?cliente=' + encodeURIComponent(inputValor);
         }
     </script>
 
