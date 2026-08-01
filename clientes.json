@@ -4,8 +4,7 @@
     "nombre": "Perla",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Max Standard", "monto": 79 },
-      { "nombre": "Prime Video", "monto": 45 }
+      { "nombre": "HBO Max Platino + Prime video", "monto": 99 }
     ]
   },
   "rodas": {
@@ -34,15 +33,14 @@
       { "nombre": "Microsoft 365", "monto": 79 }
     ]
   },
-  "davis": {
+  "david": {
     "folio": "GX-2026-0005",
-    "nombre": "Davis",
+    "nombre": "David",
     "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Netflix Premium", "monto": 109 },
       { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "Max Standard", "monto": 79 },
-      { "nombre": "Prime Video", "monto": 45 },
+      { "nombre": "HBO Max Platino + Prime video", "monto": 99 },
       { "nombre": "YouTube Premium", "monto": 89 }
     ]
   },
@@ -62,7 +60,7 @@
     "servicios": [
       { "nombre": "YouTube Premium", "monto": 89 },
       { "nombre": "Vix Premium (x2)", "monto": 98 },
-      { "nombre": "Crunchyroll", "monto": 45 }
+      { "nombre": "Crunchyroll Cuenta completa", "monto": 100 }
     ]
   },
   "fabiola": {
@@ -71,7 +69,7 @@
     "pagos_puntuales": 0,
     "servicios": [
       { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "Max Standard", "monto": 79 }
+      { "nombre": "HBO Max Platino", "monto": 79 }
     ]
   },
   "jorge": {
@@ -147,7 +145,7 @@
     "servicios": [
       { "nombre": "Netflix Premium", "monto": 109 },
       { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "Max Standard", "monto": 79 }
+      { "nombre": "HBO Max Platino", "monto": 79 }
     ]
   },
   "rafael": {
