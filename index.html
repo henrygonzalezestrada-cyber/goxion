@@ -77,8 +77,8 @@
   // Configuración de Datos de Contacto y Cuenta
   const TELEFONO_GOXION = "528136836901"; 
   const CLABE_PAGO = "638180000167909381";
-  const BANCO_PAGO = "NU BANCO"; // Cambia por tu banco si es necesario
-  const TITULAR_PAGO = "Henry González"; // Cambia por tu nombre completo completo
+  const BANCO_PAGO = "NU BANCO";
+  const TITULAR_PAGO = "Henry González";
 
   async function cargarEstadoCuenta() {
     const params = new URLSearchParams(window.location.search);
@@ -145,11 +145,11 @@
       const ahorro = Math.round(subtotal * pctDescuento);
       const totalFinal = subtotal - ahorro;
 
-      // Mensaje formateado para WhatsApp
-      const mensajeWA = encodeURIComponent(`Hola GOXION, adjunto pago de mi servicio:\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}\n💵 Total enviado: $${totalFinal} MXN`);
+      // Mensaje directo para aclaración de datos/servicios
+      const mensajeWA = encodeURIComponent(`Hola GOXION, los datos de mi estado de cuenta no corresponden a lo que tengo contratado.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-      // Renderizado de la tarjeta
+      // Renderizado de la interfaz
       app.innerHTML = `
         <div class="header">
           <img src="logo.png" alt="GOXION" class="logo-img">
@@ -179,7 +179,7 @@
             📋 Copiar CLABE y datos
           </button>
           <a href="${urlWA}" target="_blank" class="btn btn-wa">
-            📲 Reportar pago por WhatsApp
+            ⚠️ ¿Los datos no coinciden? Escríbenos
           </a>
         </div>
 
