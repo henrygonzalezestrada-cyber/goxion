@@ -155,8 +155,8 @@
     "nombre": "Rafael",
     "nivel": 1,
     "servicios": [
-      { "nombre": "Netflix Premium", "monto": 109 },
-      { "nombre": "Disney+ (Especial)", "monto": 59 }
+      { "nombre": "Netflix Premium", "monto": 99 },
+      { "nombre": "Disney+ (Especial)", "monto": 69 }
     ]
   },
   "jeynner": {
