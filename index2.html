@@ -33,7 +33,7 @@
             overflow-x: hidden;
         }
 
-        /* Línea de neón curva oficial GOXION */
+        /* Líneas de neón curvas */
         .neon-line-bg {
             position: fixed;
             top: -10%;
@@ -68,35 +68,18 @@
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
 
-        /* Header Estilo Brand GOXION */
+        /* Header */
         .header { text-align: center; margin-bottom: 30px; padding-top: 10px; }
-        .logo-img { max-width: 190px; height: auto; display: block; margin: 0 auto 12px auto; }
+        .logo-img { max-width: 190px; height: auto; display: block; margin: 0 auto 15px auto; }
         
-        .brand-title {
-            font-size: 32px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            background: linear-gradient(90deg, #ffffff 30%, var(--neon-blue) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
         .subtitle { 
             color: var(--neon-blue); 
-            font-size: 11px; 
-            margin-top: 2px; 
+            font-size: 13px; 
+            margin-top: 4px; 
             text-transform: uppercase; 
             letter-spacing: 2px; 
-            font-weight: 600; 
+            font-weight: 700; 
         }
-
-        .slogan {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 6px;
-        }
-        .slogan span { color: var(--neon-purple); font-weight: 600; }
 
         /* Banner de Alerta */
         .alert-banner {
@@ -115,7 +98,7 @@
         .alert-text { font-size: 13px; color: #fff; }
         .alert-text strong { color: var(--warning-amber); }
 
-        /* Títulos de Sección */
+        /* Títulos de Sección (Sin líneas decorativas) */
         .section-title { 
             font-size: 11px; 
             text-transform: uppercase; 
@@ -123,19 +106,10 @@
             color: var(--text-muted); 
             margin-bottom: 14px; 
             font-weight: 700; 
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, var(--border-glow), transparent);
         }
 
         /* Menú Principal */
-        .policy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 30px; }
+        .policy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 30px; }
         .btn-menu {
             background: var(--card-bg);
             border: 1px solid var(--border-glow);
@@ -205,7 +179,7 @@
         }
         .panel p { padding: 16px 0; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
 
-        /* Botones Neón GOXION */
+        /* Botones Neón */
         .btn { 
             width: 100%; 
             padding: 13px; 
@@ -294,12 +268,12 @@
         
         .copyright { font-size: 12px; color: var(--text-muted); }
 
-        @media (max-width: 480px) { .policy-grid { grid-template-columns: 1fr; gap: 10px; } }
+        @media (max-width: 480px) { .policy-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
     </style>
 </head>
 <body>
 
-    <!-- Curvas de Neón Estilo GOXION -->
+    <!-- Curvas de Neón -->
     <div class="neon-line-bg"></div>
     <div class="neon-line-bg-2"></div>
 
@@ -307,9 +281,7 @@
         
         <header class="header">
             <img src="logo.png" alt="GOXION" class="logo-img" onerror="this.style.display='none'">
-            <div class="brand-title">GOXION</div>
             <div class="subtitle">Soporte y Autogestión</div>
-            <div class="slogan">Todo conectado. <span>Un solo acceso.</span></div>
         </header>
 
         <!-- AVISO DE ESTADO DE SERVICIO -->
@@ -381,23 +353,18 @@
     </div>
 
     <!-- MODALES -->
-    
-    <!-- Modal: Login -->
     <div id="modal-login" class="modal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
             <div class="modal-title">Consultar Estado de Cuenta</div>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Ingresa el nombre o ID con el que te registraste en GOXION.</p>
-            
             <div class="input-group">
                 <input type="text" id="input-cliente" class="input-box" placeholder="Ej: laura o jorge">
             </div>
-            
             <button class="btn btn-primary" onclick="buscarCliente()">Buscar mi cuenta →</button>
         </div>
     </div>
 
-    <!-- Modal: Lealtad -->
     <div id="modal-lealtad" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
@@ -426,7 +393,6 @@
         </div>
     </div>
 
-    <!-- Modal: Términos -->
     <div id="modal-terminos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
@@ -436,7 +402,6 @@
         </div>
     </div>
 
-    <!-- Modal: Garantía -->
     <div id="modal-garantia" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
@@ -460,7 +425,6 @@
     </div>
 
     <script>
-        // Lógica de Acordeones
         var acc = document.getElementsByClassName("accordion");
         for (var i = 0; i < acc.length; i++) {
             acc[i].addEventListener("click", function() {
@@ -478,7 +442,6 @@
             });
         }
 
-        // Lógica de Modales
         function openModal(modalId) {
             document.getElementById(modalId).classList.add('show');
             document.body.style.overflow = 'hidden'; 
@@ -496,7 +459,6 @@
             }
         }
 
-        // Lógica del Buscador
         function buscarCliente() {
             var inputValor = document.getElementById('input-cliente').value.trim();
             if (inputValor === "") {
