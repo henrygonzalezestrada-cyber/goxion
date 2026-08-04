@@ -77,11 +77,8 @@
         .loyalty-control { display: flex; align-items: center; gap: 4px; background: #1a1a24; padding: 3px 6px; border-radius: 4px; }
         .loyalty-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
 
-        select.status-dropdown { background: #111; color: var(--text-main); border: 1px solid #555; padding: 4px; border-radius: 4px; font-size: 0.8rem; flex: 1; }
-        .btn-copy { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; }
-
-        .date-input-group { display: flex; align-items: center; gap: 6px; background: #111; padding: 4px 8px; border: 1px solid rgba(188, 19, 254, 0.4); border-radius: 4px; margin-top: 2px; }
-        .date-input-group input { background: transparent; border: none; color: var(--text-main); font-size: 0.8rem; width: 100%; outline: none; }
+        .btn-copy { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; text-align: center; }
+        .btn-copy:hover { background: var(--neon-purple); color: #fff; }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(0, 255, 157, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); } }
     </style>
@@ -121,7 +118,7 @@
                     <span style="font-size: 0.85rem;">YouTube Prem.</span>
                     <div class="price-input-group">
                         <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
-                        <input type="number" id="price-yt" value="49">
+                        <input type="number" id="price-yt" value="89">
                     </div>
                 </div>
                 <div class="price-row">
@@ -137,7 +134,7 @@
         <!-- COLUMNA DERECHA: CLIENTES -->
         <div class="panel">
             <h2 class="section-title">Gestión de Cuentas</h2>
-            <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o ID..." oninput="filtrarClientes()">
+            <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o folio..." oninput="filtrarClientes()">
 
             <!-- Contenedor dinámico de clientes -->
             <div id="clients-container">
@@ -146,8 +143,8 @@
         </div>
     </div>
 
+    <!-- EL NUEVO SCRIPT CORRECTO -->
     <script>
-    // CONFIGURACIÓN DEL REPOSITORIO
     const CONFIG = {
         username: "henrygonzalezestrada-cyber",
         repo: "goxion",
@@ -157,164 +154,165 @@
 
     let currentToken = localStorage.getItem("GOXION_PAT") || "";
     let currentFileData = null; 
-    let clientesLista = []; // Copia local para manipulaciones rápidas
+    let clientesDict = {}; 
+    let configGlobal = { alertas: {}, precios: {} };
 
-    // --- 1. AUTENTICACIÓN Y LOGIN ---
     document.addEventListener("DOMContentLoaded", () => {
-        if (!currentToken) {
-            pedirToken();
-        } else {
-            inicializarPanel();
-        }
+        if (!currentToken) pedirToken();
+        else inicializarPanel();
     });
 
     function pedirToken() {
-        const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token de GitHub:");
+        const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token:");
         if (userToken && userToken.trim() !== "") {
             currentToken = userToken.trim();
             localStorage.setItem("GOXION_PAT", currentToken);
             inicializarPanel();
         } else {
-            alert("Acceso denegado. Se requiere Token para administrar la plataforma.");
+            alert("Acceso denegado.");
         }
     }
 
     function cerrarSesion() {
         localStorage.removeItem("GOXION_PAT");
-        currentToken = "";
-        alert("Sesión cerrada correctamente.");
         location.reload();
     }
 
-    // --- 2. CONEXIÓN API GITHUB (LEER) ---
     async function inicializarPanel() {
         const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
         
         try {
             const response = await fetch(url, {
-                headers: {
-                    "Authorization": `token ${currentToken}`,
-                    "Accept": "application/vnd.github.v3+json"
-                }
+                headers: { "Authorization": `token ${currentToken}`, "Accept": "application/vnd.github.v3+json" },
+                cache: "no-store"
             });
 
-            if (response.status === 401) {
-                alert("El Token ingresado no es válido o ha expirado.");
-                cerrarSesion();
-                return;
-            }
+            if (response.status === 401) return cerrarSesion();
 
             const data = await response.json();
             const contentDecoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
             const jsonCompleto = JSON.parse(contentDecoded);
             
-            currentFileData = {
-                sha: data.sha,
-                raw: jsonCompleto
-            };
+            currentFileData = { sha: data.sha };
 
-            // Extraer clientes si existe en el JSON o adaptar al formato
-            clientesLista = Array.isArray(jsonCompleto) ? jsonCompleto : (jsonCompleto.clientes || []);
+            if (jsonCompleto._goxion_config) {
+                configGlobal = jsonCompleto._goxion_config;
+                delete jsonCompleto._goxion_config; 
+            }
 
-            renderizarClientes(clientesLista);
+            clientesDict = jsonCompleto;
+
+            document.getElementById("alert-yt").checked = configGlobal.alertas?.youtube || false;
+            document.getElementById("alert-ntf").checked = configGlobal.alertas?.netflix || false;
+            document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
+            document.getElementById("price-yt").value = configGlobal.precios?.youtube || 89;
+            document.getElementById("price-ntf").value = configGlobal.precios?.netflix || 109;
+
+            renderizarClientes(clientesDict);
 
         } catch (error) {
-            console.error("Error al conectar con GitHub:", error);
-            alert("Ocurrió un error al cargar la base de datos de GitHub.");
+            console.error("Error GitHub:", error);
         }
     }
 
-    // --- 3. RENDERIZADO DINÁMICO ---
-    function renderizarClientes(lista) {
+    function renderizarClientes(diccionario) {
         const container = document.getElementById("clients-container");
         container.innerHTML = "";
 
-        if (lista.length === 0) {
+        const keys = Object.keys(diccionario);
+        if (keys.length === 0) {
             container.innerHTML = `<p style="color: var(--text-muted);">No se encontraron clientes.</p>`;
             return;
         }
 
-        lista.forEach((cliente, index) => {
+        keys.forEach(key => {
+            const cliente = diccionario[key];
+            
+            let subtotal = 0;
+            let nombresServicios = [];
+            if(cliente.servicios) {
+                cliente.servicios.forEach(s => {
+                    subtotal += s.monto;
+                    nombresServicios.push(s.nombre);
+                });
+            }
+
             const card = document.createElement("div");
             card.className = "client-card";
             card.innerHTML = `
                 <div class="card-header-row">
                     <div class="client-info">
-                        <h3>[${cliente.id || 'GX-' + (100 + index)}] ${cliente.nombre}</h3>
-                        <p>${cliente.servicio || 'Servicio Activo'}</p>
+                        <h3>[${cliente.folio}] ${cliente.nombre}</h3>
+                        <p style="font-size: 0.75rem;">${nombresServicios.join(', ')} ($${subtotal})</p>
                     </div>
                 </div>
 
-                <div class="date-input-group">
-                    <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap;">Día pago:</span>
-                    <input type="text" value="${cliente.dia_pago || ''}" onchange="actualizarCliente(${index}, 'dia_pago', this.value)">
-                </div>
-
-                <div class="card-actions-row">
-                    <div class="loyalty-control">
-                        <button class="loyalty-btn" onclick="updateMonths(${index}, -1)">-</button>
-                        <span id="months-${index}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.meses || 0}</span>
-                        <button class="loyalty-btn" onclick="updateMonths(${index}, 1)">+</button>
+                <div class="card-actions-row" style="margin-top: 10px;">
+                    <div class="loyalty-control" title="Pagos Puntuales">
+                        <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
+                        <span id="pagos-${key}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.pagos_puntuales || 0}</span>
+                        <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
                     </div>
 
-                    <select class="status-dropdown" onchange="actualizarCliente(${index}, 'estado', this.value)">
-                        <option value="activo" ${cliente.estado === 'activo' ? 'selected' : ''}>Al día</option>
-                        <option value="vencer" ${cliente.estado === 'vencer' ? 'selected' : ''}>Por vencer</option>
-                        <option value="inactivo" ${cliente.estado === 'inactivo' ? 'selected' : ''}>Suspendido</option>
-                    </select>
-
-                    <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${cliente.servicio}', '${cliente.dia_pago}')">Copiar</button>
+                    <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')" style="flex:1;">Copiar Link Cobro</button>
                 </div>
             `;
             container.appendChild(card);
         });
     }
 
-    // Modificar meses localmente
-    function updateMonths(index, delta) {
-        clientesLista[index].meses = Math.max(0, (clientesLista[index].meses || 0) + delta);
-        document.getElementById(`months-${index}`).innerText = clientesLista[index].meses;
+    function updatePagos(key, delta) {
+        clientesDict[key].pagos_puntuales = Math.max(0, (clientesDict[key].pagos_puntuales || 0) + delta);
+        document.getElementById(`pagos-${key}`).innerText = clientesDict[key].pagos_puntuales;
     }
 
-    // Actualizar campos localmente
-    function actualizarCliente(index, campo, valor) {
-        clientesLista[index][campo] = valor;
+    function copiarInfo(nombre, key) {
+        const link = `https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`;
+        navigator.clipboard.writeText(`Hola ${nombre}, aquí tienes tu estado de cuenta actualizado:\n${link}`);
+        alert("¡Link de cobro copiado al portapapeles!");
     }
 
-    // Copiar info del cliente al portapapeles
-    function copiarInfo(nombre, servicio, fecha) {
-        const texto = `👋 Hola ${nombre}, tu servicio de ${servicio} se vence el ${fecha}.`;
-        navigator.clipboard.writeText(texto);
-        alert("¡Mensaje copiado al portapapeles!");
-    }
-
-    // Buscador interactivo
     function filtrarClientes() {
         const query = document.getElementById("search-input").value.toLowerCase();
-        const filtrados = clientesLista.filter(c => 
-            c.nombre.toLowerCase().includes(query) || 
-            (c.id && c.id.toLowerCase().includes(query))
-        );
+        const filtrados = {};
+        
+        Object.keys(clientesDict).forEach(key => {
+            const c = clientesDict[key];
+            if (c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query)) {
+                filtrados[key] = c;
+            }
+        });
         renderizarClientes(filtrados);
     }
 
-    // --- 4. GUARDAR EN GITHUB ---
-    function prepararYGuardar() {
+    async function prepararYGuardar() {
         if (!currentFileData) return;
+        const btnSave = document.querySelector('.btn-save');
+        btnSave.innerText = "Guardando...";
 
-        // Estructura final a guardar
-        let dataToSave = Array.isArray(currentFileData.raw) ? clientesLista : { ...currentFileData.raw, clientes: clientesLista };
-        guardarCambiosEnGitHub(dataToSave);
-    }
+        configGlobal = {
+            alertas: {
+                youtube: document.getElementById("alert-yt").checked,
+                netflix: document.getElementById("alert-ntf").checked,
+                mensaje: document.getElementById("global-msg").value
+            },
+            precios: {
+                youtube: parseInt(document.getElementById("price-yt").value) || 89,
+                netflix: parseInt(document.getElementById("price-ntf").value) || 109
+            }
+        };
 
-    async function guardarCambiosEnGitHub(nuevosDatos) {
+        const dataToSave = { 
+            _goxion_config: configGlobal,
+            ...clientesDict 
+        };
+
         const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
-        
-        const jsonString = JSON.stringify(nuevosDatos, null, 2);
+        const jsonString = JSON.stringify(dataToSave, null, 2);
         const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
 
         const payload = {
-            message: "🤖 Admin Update: Estado de clientes actualizado",
+            message: "🤖 Admin Update: Plataforma y lealtad actualizados",
             content: contentEncoded,
             sha: currentFileData.sha,
             branch: CONFIG.branch
@@ -323,27 +321,22 @@
         try {
             const response = await fetch(url, {
                 method: "PUT",
-                headers: {
-                    "Authorization": `token ${currentToken}`,
-                    "Content-Type": "application/json"
-                },
+                headers: { "Authorization": `token ${currentToken}`, "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
 
             if (response.ok) {
                 const resData = await response.json();
-                currentFileData.sha = resData.content.sha; // Actualizamos SHA para siguientes ediciones
-                alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE EN GITHUB!");
+                currentFileData.sha = resData.content.sha;
+                alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE!");
             } else {
-                alert("❌ Error al guardar. Verifica la consola.");
+                alert("❌ Error al guardar.");
             }
         } catch (error) {
-            console.error("Error al guardar en GitHub:", error);
+            console.error(error);
         }
+        btnSave.innerText = "Guardar Cambios";
     }
-    </script>
-</body>
-</html>
     </script>
 </body>
 </html>
