@@ -80,9 +80,9 @@
             font-weight: 700; 
         }
 
-        /* --- BANNER ALERTA (MODIFICADO A NARANJA BLUR) --- */
+        /* --- BANNER ALERTA --- */
         .alert-banner {
-            background: rgba(255, 170, 0, 0.12); /* Fondo naranja semitransparente */
+            background: rgba(255, 170, 0, 0.12);
             border: 1px solid rgba(255, 170, 0, 0.4);
             border-radius: 14px;
             padding: 16px;
@@ -92,7 +92,7 @@
             gap: 12px;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 0 25px rgba(255, 170, 0, 0.2); /* Resplandor naranja */
+            box-shadow: 0 0 25px rgba(255, 170, 0, 0.2);
         }
         .alert-icon { font-size: 20px; line-height: 1; }
         .alert-text { font-size: 13px; color: #fff; }
@@ -108,7 +108,7 @@
             font-weight: 700; 
         }
 
-        /* --- NUEVO BUSCADOR DIRECTO --- */
+        /* --- BUSCADOR DIRECTO --- */
         .search-section { margin-bottom: 35px; }
         .search-bar-container {
             display: flex;
@@ -132,6 +132,7 @@
             font-size: 14px;
             padding: 10px 15px;
             outline: none;
+            width: 100%;
         }
         .search-input::placeholder { color: var(--text-muted); }
         .search-btn {
@@ -147,6 +148,7 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
         }
         .search-btn:hover {
             box-shadow: 0 0 20px rgba(0, 242, 254, 0.4);
@@ -173,6 +175,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 10px;
             backdrop-filter: blur(12px);
         }
@@ -181,10 +184,10 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
             transform: translateY(-4px);
         }
-        .btn-menu span { font-size: 28px; }
-        .btn-menu div { font-weight: 600; font-size: 13px; }
+        .btn-menu span { font-size: 28px; line-height: 1; }
+        .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.3; }
 
-        /* --- ACORDEONES SIN BORDES --- */
+        /* --- ACORDEONES --- */
         .accordion {
             background: var(--card-bg);
             color: var(--text-main);
@@ -278,6 +281,60 @@
         .schedule-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
         .schedule-time { font-size: 12px; color: var(--neon-blue); font-weight: 600; }
         .copyright { font-size: 12px; color: var(--text-muted); }
+
+        /* =======================================================
+           📱 OPTIMIZACIÓN RESPONSIVA PARA TELÉFONOS (MOBILE) 
+           ======================================================= */
+        @media (max-width: 480px) {
+            body {
+                padding: 15px 12px;
+            }
+            .header {
+                margin-bottom: 25px;
+            }
+            .logo-img {
+                max-width: 170px; /* Logo ligeramente más pequeño */
+            }
+            /* Ajustes del buscador para que no se vea desproporcionado */
+            .search-bar-container {
+                padding: 6px;
+            }
+            .search-input {
+                font-size: 13px;
+                padding: 8px 10px;
+            }
+            .search-btn {
+                padding: 8px 16px;
+                font-size: 12px;
+                border-radius: 10px;
+            }
+            /* Ajustes en los botones de "Accesos Rápidos" para evitar saltos de línea feos */
+            .policy-grid {
+                gap: 10px;
+            }
+            .btn-menu {
+                padding: 16px 8px; /* Menos relleno lateral para dar espacio al texto */
+                gap: 6px;
+            }
+            .btn-menu span {
+                font-size: 24px; /* Iconos un poquito más pequeños */
+            }
+            .btn-menu div {
+                font-size: 11px; /* Letra ideal para que cuadre en 1 sola línea o 2 bien centradas */
+            }
+            /* Ajustes de los acordeones */
+            .accordion {
+                padding: 15px;
+                font-size: 13px;
+            }
+            /* Alerta un poco más compacta */
+            .alert-banner {
+                padding: 12px 14px;
+            }
+            .alert-icon {
+                font-size: 18px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -305,7 +362,7 @@
             </div>
         </div>
 
-        <!-- NUEVO BUSCADOR DIRECTO -->
+        <!-- BUSCADOR DIRECTO -->
         <div class="search-section animate-on-scroll">
             <div class="section-title">Mi Estado de Cuenta</div>
             <div class="search-bar-container">
@@ -400,11 +457,11 @@
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
             <div class="modal-title">Términos y Condiciones</div>
             <ul class="terms-list">
-                <li><strong>1. Confidencialidad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
-                <li><strong>2. Uso Permitido:</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
-                <li><strong>3. Sanciones:</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
-                <li><strong>4. Fechas de Pago:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial.</li>
-                <li><strong>5. Prórrogas:</strong> Si prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos.</li>
+                <li><strong>1. Confidencialidad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados[cite: 6].</li>
+                <li><strong>2. Uso Permitido:</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema[cite: 6].</li>
+                <li><strong>3. Sanciones:</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso[cite: 6].</li>
+                <li><strong>4. Fechas de Pago:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial[cite: 6].</li>
+                <li><strong>5. Prórrogas:</strong> Si prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos[cite: 6].</li>
             </ul>
         </div>
     </div>
@@ -414,7 +471,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
             <div class="modal-title">Garantía y Trato Justo</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Reglas de compensación clara y penalizaciones proporcionales:</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Reglas de compensación clara y penalizaciones proporcionales[cite: 6]:</p>
             <table>
                 <tr>
                     <th>Concepto</th>
@@ -423,18 +480,18 @@
                 </tr>
                 <tr>
                     <td style="color: var(--text-main);"><strong>Falla Técnica</strong></td>
-                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td>
-                    <td>Hasta 50% de descuento (10 días).</td>
+                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario[cite: 6].</td>
+                    <td>Hasta 50% de descuento (10 días)[cite: 6].</td>
                 </tr>
                 <tr>
                     <td style="color: var(--warning-amber);"><strong>Mora sin Aviso</strong></td>
-                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento.</td>
-                    <td>Hasta 50% de interés acumulado.</td>
+                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento[cite: 6].</td>
+                    <td>Hasta 50% de interés acumulado[cite: 6].</td>
                 </tr>
                 <tr>
                     <td style="color: var(--danger-red);"><strong>Cancelación</strong></td>
-                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td>
-                    <td>20% sobre saldo pendiente.</td>
+                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado[cite: 6].</td>
+                    <td>20% sobre saldo pendiente[cite: 6].</td>
                 </tr>
             </table>
         </div>
@@ -445,13 +502,13 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
             <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en tu mensualidad por cada nuevo cliente que concrete una compra.</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en tu mensualidad por cada nuevo cliente que concrete una compra[cite: 5].</p>
             
             <ul class="terms-list">
-                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir un mínimo de dos (2) perfiles.</li>
-                <li><strong>2. Permanencia:</strong> Mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos.</li>
-                <li><strong>3. Aplicación:</strong> El descuento del 100% se aplicará en el cuarto mes, una vez validado el cumplimiento.</li>
-                <li><strong>4. Restricción:</strong> El referidor debe mantener su cuenta activa y al corriente durante el proceso de validación. Si el referido cancela antes de los 3 meses, el beneficio se anula.</li>
+                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir un mínimo de dos (2) perfiles[cite: 5].</li>
+                <li><strong>2. Permanencia:</strong> Mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos[cite: 5].</li>
+                <li><strong>3. Aplicación:</strong> El descuento del 100% se aplicará en el cuarto mes, una vez validado el cumplimiento[cite: 5].</li>
+                <li><strong>4. Restricción:</strong> El referidor debe mantener su cuenta activa y al corriente durante el proceso de validación[cite: 5]. Si el referido cancela antes de los 3 meses, el beneficio se anula[cite: 5].</li>
             </ul>
 
             <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank" style="margin-top: 10px;">Contactar Asesor →</a>
@@ -497,7 +554,7 @@
             }
         }
 
-        // NUEVO: Lógica de Búsqueda Directa
+        // Búsqueda Directa
         function buscarClienteDirecto() {
             var inputValor = document.getElementById('main-input-cliente').value.trim();
             if (inputValor === "") {
