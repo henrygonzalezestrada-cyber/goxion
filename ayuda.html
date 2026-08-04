@@ -15,6 +15,7 @@
             --neon-purple: #7c4dff;
             --neon-magenta: #e026de;
             --warning-amber: #ffaa00;
+            --danger-red: #ff3366;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
@@ -67,7 +68,7 @@
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
 
-        /* --- HEADER LIMPÍSIMO --- */
+        /* --- HEADER --- */
         .header { text-align: center; margin-bottom: 35px; padding-top: 15px; }
         .logo-img { max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto; }
         
@@ -143,7 +144,7 @@
             cursor: pointer;
             padding: 18px 20px;
             width: 100%;
-            border: none; /* Borde eliminado */
+            border: none;
             text-align: left;
             outline: none;
             font-size: 14px;
@@ -169,7 +170,7 @@
         .panel {
             padding: 0 20px;
             background: rgba(11, 15, 23, 0.6);
-            border: none; /* Borde eliminado */
+            border: none; 
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, padding 0.3s ease;
@@ -243,6 +244,10 @@
         th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
 
+        .terms-list { list-style-type: none; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
+        .terms-list li { margin-bottom: 12px; }
+        .terms-list strong { color: var(--text-main); }
+
         /* --- FOOTER --- */
         .footer-info { text-align: center; margin-top: 45px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
         .schedule { 
@@ -265,7 +270,7 @@
 
     <div class="container">
         
-        <!-- HEADER LIMPÍSIMO -->
+        <!-- HEADER -->
         <header class="header animate-on-scroll">
             <img src="logo.png" alt="GOXION" class="logo-img" onerror="this.style.display='none'">
             <div class="subtitle">Soporte y Autogestión</div>
@@ -317,11 +322,10 @@
             </div>
         </div>
 
-        <div class="animate-on-scroll">
-            <button class="accordion">🎁 Programa de Referidos (Mes Gratis)</button>
+        <div class="animate-on-scroll" onclick="openModal('modal-referidos')">
+            <button class="accordion" style="pointer-events: none;">🎁 Programa de Referidos (Mes Gratis)</button>
             <div class="panel">
-                <p><strong>¡Gana un mes completamente gratis!</strong> Recomienda GOXION con un amigo o familiar. Si ellos contratan uno de nuestros servicios y mencionan tu nombre o ID de cliente al momento de su compra, tu próximo mes será descontado al 100%. ¡No hay límite de referidos!</p>
-                <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank">Preguntar Detalles →</a>
+               <!-- Contenido movido al modal para dar más espacio a las reglas -->
             </div>
         </div>
 
@@ -337,7 +341,7 @@
         <div class="footer-info animate-on-scroll">
             <div class="schedule">
                 <div class="schedule-title">🕒 Horario de Atención en WhatsApp</div>
-                <div class="schedule-time">Lunes a Sábado • 10:00 AM - 8:00 PM</div>
+                <div class="schedule-time">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
             </div>
             <div class="copyright">
                 Para emergencias fuera de horario, deja tu mensaje y será el primero en atenderse al abrir sistema.<br><br>
@@ -347,7 +351,9 @@
 
     </div>
 
-    <!-- MODALES (Ocultos por defecto) -->
+    <!-- MODALES -->
+    
+    <!-- Modal Login -->
     <div id="modal-login" class="modal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
@@ -360,39 +366,84 @@
         </div>
     </div>
 
+    <!-- Modal Lealtad -->
     <div id="modal-lealtad" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
             <div class="modal-title">Programa de Fidelidad</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén descuentos permanentes.</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios.</p>
             <table>
                 <tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
                 <tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr>
                 <tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
             </table>
-            <p style="color: var(--warning-amber); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado reinicia tu racha a cero.</p>
+            <p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">
+                ⚠️ <strong>Importante:</strong> Los descuentos no son permanentes. Un pago atrasado o impuntual reinicia tu racha de pagos a cero, perdiendo el nivel alcanzado.
+            </p>
         </div>
     </div>
 
+    <!-- Modal Términos (Detallado) -->
     <div id="modal-terminos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
             <div class="modal-title">Términos y Condiciones</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;"><strong>1. Uso de Cuenta:</strong> Los accesos son estrictamente personales. Queda prohibida la reventa, alteración de perfiles o compartir contraseñas. El incumplimiento causará la baja inmediata sin reembolso.</p>
-            <p style="color: var(--text-muted); font-size: 13px;"><strong>2. Fechas de Pago:</strong> Tu fecha de corte es el mismo día en que contrataste. Si prevés un retraso, notifícanos antes de la fecha límite para evitar cortes del servicio o recargos.</p>
+            <ul class="terms-list">
+                <li><strong>1. Confidencialidad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados[cite: 6].</li>
+                <li><strong>2. Uso Permitido:</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema[cite: 6].</li>
+                <li><strong>3. Sanciones:</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso[cite: 6].</li>
+                <li><strong>4. Fechas de Pago:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial[cite: 6].</li>
+                <li><strong>5. Prórrogas:</strong> Si prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos[cite: 6].</li>
+            </ul>
         </div>
     </div>
 
+    <!-- Modal Garantía (Detallado) -->
     <div id="modal-garantia" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
-            <div class="modal-title">Política de Garantía y Trato Justo</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Compensaciones aplicables por fallas técnicas ajenas al usuario:</p>
+            <div class="modal-title">Garantía y Trato Justo</div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Reglas de compensación clara y penalizaciones proporcionales[cite: 6]:</p>
             <table>
-                <tr><th>Evento</th><th>Compensación / Penalización</th></tr>
-                <tr><td>Falla de Servicio</td><td>5% de descuento por cada día completo inactivo (hasta 50%).</td></tr>
-                <tr><td>Atraso en Pago</td><td>5% de recargo diario sin previo aviso.</td></tr>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Regla Aplicable</th>
+                    <th>Límite Máximo</th>
+                </tr>
+                <tr>
+                    <td style="color: var(--text-main);"><strong>Falla Técnica</strong></td>
+                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario[cite: 6].</td>
+                    <td>Hasta 50% de descuento (10 días)[cite: 6].</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--warning-amber);"><strong>Mora sin Aviso</strong></td>
+                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento[cite: 6].</td>
+                    <td>Hasta 50% de interés acumulado[cite: 6].</td>
+                </tr>
+                <tr>
+                    <td style="color: var(--danger-red);"><strong>Cancelación</strong></td>
+                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado[cite: 6].</td>
+                    <td>20% sobre saldo pendiente[cite: 6].</td>
+                </tr>
             </table>
+        </div>
+    </div>
+
+    <!-- Modal Promoción Referidos -->
+    <div id="modal-referidos" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
+            <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en tu mensualidad por cada nuevo cliente que concrete una compra[cite: 5].</p>
+            
+            <ul class="terms-list">
+                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir un mínimo de dos (2) perfiles[cite: 5].</li>
+                <li><strong>2. Permanencia:</strong> Mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos[cite: 5].</li>
+                <li><strong>3. Aplicación:</strong> El descuento del 100% se aplicará en el cuarto mes, una vez validado el cumplimiento[cite: 5].</li>
+                <li><strong>4. Restricción:</strong> El referidor debe mantener su cuenta activa y al corriente durante el proceso de validación. Si el referido cancela antes de los 3 meses, el beneficio se anula[cite: 5].</li>
+            </ul>
+
+            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank" style="margin-top: 10px;">Contactar Asesor →</a>
         </div>
     </div>
 
@@ -401,6 +452,9 @@
         var acc = document.getElementsByClassName("accordion");
         for (var i = 0; i < acc.length; i++) {
             acc[i].addEventListener("click", function() {
+                // Prevenir comportamiento default si se invoca desde un click que abre un modal
+                if(this.parentElement.getAttribute('onclick')) return;
+
                 this.classList.toggle("active");
                 var panel = this.nextElementSibling;
                 if (panel.style.maxHeight) {
@@ -449,7 +503,7 @@
             }
         });
 
-        // Animación de aparición al hacer scroll (Intersection Observer)
+        // Animación de aparición al hacer scroll
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if(entry.isIntersecting){
