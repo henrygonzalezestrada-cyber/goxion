@@ -4,220 +4,340 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GOXION - Soporte y Autogestión</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0d0f12;
-            --card-bg: #161b22;
-            --text-main: #f0f6fc;
-            --text-muted: #8b949e;
-            --border-color: #30363d;
-            --accent-cyan: #00f2fe;
-            --accent-blue: #4facfe;
-            --success-green: #2ea043;
-            --warning-amber: #ff9f0a;
-            --error-red: #f85149;
+            --bg-black: #070b14;
+            --card-bg: rgba(18, 24, 38, 0.62);
+            --text-main: #ffffff;
+            --text-muted: #95a4bd;
+            --neon-blue: #00f2fe;
+            --neon-purple: #7c4dff;
+            --neon-magenta: #e026de;
+            --warning-amber: #ffaa00;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
-        .container { width: 100%; max-width: 600px; }
+        body { 
+            background-color: var(--bg-black); 
+            color: var(--text-main); 
+            line-height: 1.6; 
+            padding: 25px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
 
-        /* Header */
-        .header { text-align: center; margin-bottom: 25px; padding-top: 20px; }
-        .logo-img { max-width: 230px; height: auto; display: block; margin: 0 auto; }
-        .subtitle { color: var(--text-muted); font-size: 13px; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        /* --- FONDO ANIMADO Y GRID --- */
+        .bg { position: fixed; inset: 0; z-index: -2; overflow: hidden; background: var(--bg-black); }
+        .blob {
+            position: absolute; border-radius: 50%;
+            filter: blur(120px); opacity: 0.35;
+            animation: float 14s ease-in-out infinite alternate;
+        }
+        .blob1 {
+            width: 420px; height: 420px;
+            background: var(--neon-blue);
+            top: -120px; right: -120px;
+        }
+        .blob2 {
+            width: 460px; height: 460px;
+            background: var(--neon-purple);
+            bottom: -180px; left: -120px;
+            animation-duration: 18s;
+        }
+        .grid {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,.8), transparent);
+        }
 
-        /* Banner de Alerta (Estado del Servicio) */
+        @keyframes float {
+            from { transform: translateY(0) translateX(0); }
+            to { transform: translateY(40px) translateX(-20px); }
+        }
+
+        .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
+
+        /* --- HEADER LIMPÍSIMO --- */
+        .header { text-align: center; margin-bottom: 35px; padding-top: 15px; }
+        .logo-img { max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto; }
+        
+        .subtitle { 
+            color: var(--neon-blue); 
+            font-size: 13px; 
+            text-transform: uppercase; 
+            letter-spacing: 2px; 
+            font-weight: 700; 
+        }
+
+        /* --- BANNER ALERTA --- */
         .alert-banner {
-            background: rgba(255, 159, 10, 0.1);
-            border: 1px solid var(--warning-amber);
-            border-radius: 12px;
+            background: rgba(14, 14, 20, 0.85);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 14px;
             padding: 16px;
             margin-bottom: 25px;
             display: flex;
             align-items: flex-start;
             gap: 12px;
+            backdrop-filter: blur(10px);
         }
         .alert-icon { font-size: 20px; line-height: 1; }
         .alert-text { font-size: 13px; color: #fff; }
         .alert-text strong { color: var(--warning-amber); }
 
-        /* Botones de Menú Principal */
-        .policy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        /* --- TÍTULOS DE SECCIÓN --- */
+        .section-title { 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            letter-spacing: 2.5px; 
+            color: var(--text-muted); 
+            margin-bottom: 14px; 
+            font-weight: 700; 
+        }
+
+        /* --- MENÚ PRINCIPAL 2x2 --- */
+        .policy-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, minmax(0, 1fr)); 
+            gap: 14px; 
+            margin-bottom: 35px; 
+        }
         .btn-menu {
             background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 16px;
             padding: 20px 15px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             color: var(--text-main);
             text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
+            backdrop-filter: blur(12px);
         }
-        .btn-menu:hover { border-color: var(--accent-blue); background: #21262d; }
+        .btn-menu:hover { 
+            border-color: rgba(0, 242, 254, 0.4); 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            transform: translateY(-4px);
+        }
         .btn-menu span { font-size: 28px; }
         .btn-menu div { font-weight: 600; font-size: 13px; }
 
-        /* Títulos de Sección */
-        .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-
-        /* Acordeones */
+        /* --- ACORDEONES SIN BORDES --- */
         .accordion {
             background: var(--card-bg);
             color: var(--text-main);
             cursor: pointer;
-            padding: 16px;
+            padding: 18px 20px;
             width: 100%;
-            border: 1px solid var(--border-color);
+            border: none; /* Borde eliminado */
             text-align: left;
             outline: none;
             font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            border-radius: 14px;
+            margin-bottom: 12px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            backdrop-filter: blur(12px);
         }
-        .accordion:hover { border-color: var(--text-muted); background: #21262d; }
-        .accordion.active { border-color: var(--accent-blue); border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; border-bottom: none; }
+        .accordion:hover { 
+            background: rgba(30, 38, 55, 0.7);
+            transform: translateY(-2px);
+        }
+        .accordion.active { 
+            border-bottom-left-radius: 0; 
+            border-bottom-right-radius: 0; 
+            margin-bottom: 0; 
+        }
         
         .panel {
-            padding: 0 16px;
-            background: #0d1117;
+            padding: 0 20px;
+            background: rgba(11, 15, 23, 0.6);
+            border: none; /* Borde eliminado */
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease-out, padding 0.3s ease;
-            border-left: 1px solid var(--accent-blue);
-            border-right: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            border-bottom-left-radius: 10px;
-            border-bottom-right-radius: 10px;
-            margin-bottom: 10px;
+            border-bottom-left-radius: 14px;
+            border-bottom-right-radius: 14px;
+            margin-bottom: 12px;
         }
-        .panel p { padding: 16px 0; color: var(--text-muted); font-size: 13px; line-height: 1.5; }
+        .panel p { padding: 16px 0; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
 
-        /* Botones de Acción */
-        .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: block; text-align: center; text-decoration: none; margin-bottom: 16px; }
-        .btn:active { transform: scale(0.98); }
-        .btn-primary { background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); color: #000; font-weight: 700; }
-        .btn-wa { background: var(--warning-amber); color: #000; font-weight: 700; }
-        .btn-wa:hover, .btn-primary:hover { opacity: 0.9; }
+        /* --- BOTONES DE ACCIÓN --- */
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            border-radius: 30px; 
+            border: none;
+            font-weight: 600; 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            display: block; 
+            text-align: center; 
+            text-decoration: none; 
+            margin-bottom: 16px; 
+            color: #000;
+        }
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--neon-blue), #4f8cff);
+            box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+        }
+        .btn-primary:hover { 
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.5); 
+            transform: translateY(-2px);
+        }
+        .btn-wa { 
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-magenta));
+            color: #fff;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+        }
+        .btn-wa:hover { 
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.5);
+            transform: translateY(-2px);
+        }
 
-        /* Modales */
+        /* --- MODALES --- */
         .modal {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(13, 15, 18, 0.9); backdrop-filter: blur(5px);
+            background-color: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px);
             align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; padding: 20px;
         }
         .modal.show { display: flex; opacity: 1; }
         .modal-content {
-            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
-            width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 24px; position: relative;
-            transform: translateY(20px); transition: transform 0.3s ease; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            background: #0d121c; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 20px;
+            width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
-        .modal.show .modal-content { transform: translateY(0); }
-        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
-        .close-btn:hover { color: var(--text-main); }
-        .modal-title { color: var(--text-main); margin-bottom: 20px; font-size: 16px; font-weight: 700; }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 26px; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .close-btn:hover { color: var(--neon-blue); }
+        .modal-title { color: #fff; margin-bottom: 18px; font-size: 16px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
 
-        /* Buscador / Input */
         .input-group { margin-bottom: 20px; }
-        .input-box { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid var(--border-color); background-color: #0d1117; color: var(--text-main); font-size: 14px; outline: none; transition: border 0.3s; }
-        .input-box:focus { border-color: var(--accent-cyan); }
+        .input-box { 
+            width: 100%; padding: 14px; border-radius: 12px; 
+            border: 1px solid rgba(255,255,255,0.1); background-color: #070b14; 
+            color: var(--text-main); font-size: 14px; outline: none; transition: all 0.3s; 
+        }
+        .input-box:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); }
 
-        /* Tablas en modales */
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 13px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { color: var(--accent-blue); font-weight: 600; }
+        th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
 
-        /* Footer / Horarios */
-        .footer-info { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border-color); }
-        .schedule { display: inline-block; background: #1f242d; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px 20px; margin-bottom: 20px; }
-        .schedule-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 4px; }
-        .schedule-time { font-size: 13px; color: var(--success-green); font-weight: 600; }
-        
+        /* --- FOOTER --- */
+        .footer-info { text-align: center; margin-top: 45px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        .schedule { 
+            display: inline-block; background: var(--card-bg); 
+            border-radius: 30px; padding: 10px 22px; margin-bottom: 18px; 
+        }
+        .schedule-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
+        .schedule-time { font-size: 12px; color: var(--neon-blue); font-weight: 600; }
         .copyright { font-size: 12px; color: var(--text-muted); }
-
-        @media (max-width: 480px) { .policy-grid { grid-template-columns: 1fr; gap: 10px; } }
     </style>
 </head>
 <body>
 
+    <!-- FONDO ANIMADO Y GRID -->
+    <div class="bg">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="grid"></div>
+    </div>
+
     <div class="container">
         
-        <header class="header">
+        <!-- HEADER LIMPÍSIMO -->
+        <header class="header animate-on-scroll">
             <img src="logo.png" alt="GOXION" class="logo-img" onerror="this.style.display='none'">
-            <div class="subtitle">Portal de Soporte y Autogestión</div>
+            <div class="subtitle">Soporte y Autogestión</div>
         </header>
 
-        <!-- AVISO DE ESTADO DE SERVICIO (Puedes ocultar este div entero cuando no haya fallas) -->
-        <div class="alert-banner">
+        <!-- AVISO DE ESTADO DE SERVICIO -->
+        <div class="alert-banner animate-on-scroll">
             <span class="alert-icon">⚠️</span>
             <div class="alert-text">
                 <strong>Aviso Técnico:</strong> El servicio de <strong>YouTube Premium</strong> está presentando intermitencias temporales. Las demás plataformas operan con normalidad. Estamos trabajando en ello.
             </div>
         </div>
 
-        <div class="section-title">Accesos Rápidos</div>
+        <div class="section-title animate-on-scroll">Accesos Rápidos</div>
         <div class="policy-grid">
-            <div class="btn-menu" onclick="openModal('modal-login')">
+            <div class="btn-menu animate-on-scroll" onclick="openModal('modal-login')">
                 <span>📊</span>
                 <div>Mi Estado de Cuenta</div>
             </div>
-            <div class="btn-menu" onclick="openModal('modal-lealtad')">
+            <div class="btn-menu animate-on-scroll" onclick="openModal('modal-lealtad')">
                 <span>⭐</span>
                 <div>Niveles de Lealtad</div>
             </div>
-            <div class="btn-menu" onclick="openModal('modal-terminos')">
+            <div class="btn-menu animate-on-scroll" onclick="openModal('modal-terminos')">
                 <span>📄</span>
                 <div>Términos de Uso</div>
             </div>
-            <div class="btn-menu" onclick="openModal('modal-garantia')">
+            <div class="btn-menu animate-on-scroll" onclick="openModal('modal-garantia')">
                 <span>🛡️</span>
                 <div>Garantías y Reglas</div>
             </div>
         </div>
 
-        <div class="section-title">Soluciones Frecuentes</div>
+        <div class="section-title animate-on-scroll">Soluciones Frecuentes</div>
         
-        <button class="accordion">Inicio de sesión y Códigos PIN</button>
-        <div class="panel">
-            <p>Si la plataforma te solicita un código de acceso o PIN de verificación para iniciar sesión, no tienes que esperar. Solicítalo de manera inmediata y automatizada a nuestro chat.</p>
-            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20solicito%20código%20de%20acceso." class="btn btn-primary" target="_blank">Solicitar Código Ahora</a>
+        <div class="animate-on-scroll">
+            <button class="accordion">Inicio de sesión y Códigos PIN</button>
+            <div class="panel">
+                <p>Si la plataforma te solicita un código de acceso o PIN de verificación para iniciar sesión, no tienes que esperar. Solicítalo de manera inmediata y automatizada a nuestro chat.</p>
+                <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20solicito%20código%20de%20acceso." class="btn btn-primary" target="_blank">Solicitar Código Ahora →</a>
+            </div>
         </div>
 
-        <button class="accordion">Restricciones de Hogar o Viaje</button>
-        <div class="panel">
-            <p>Si plataformas como Netflix o Disney te muestran el mensaje "Tu TV no es parte del Hogar", selecciona en tu pantalla la opción de "Actualizar Hogar", "Estoy de viaje" o solicita el código por correo. Envíanos captura y lo autorizamos al instante.</p>
-            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20mi%20pantalla%20pide%20actualizar%20el%20hogar/viaje." class="btn btn-primary" target="_blank">Autorizar Dispositivo</a>
+        <div class="animate-on-scroll">
+            <button class="accordion">Restricciones de Hogar o Viaje</button>
+            <div class="panel">
+                <p>Si plataformas como Netflix o Disney te muestran el mensaje "Tu TV no es parte del Hogar", selecciona en tu pantalla la opción de "Actualizar Hogar", "Estoy de viaje" o solicita el código por correo. Envíanos captura y lo autorizamos al instante.</p>
+                <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20mi%20pantalla%20pide%20actualizar%20el%20hogar/viaje." class="btn btn-primary" target="_blank">Autorizar Dispositivo →</a>
+            </div>
         </div>
 
-        <button class="accordion">🎁 Programa de Referidos (Mes Gratis)</button>
-        <div class="panel">
-            <p><strong>¡Gana un mes completamente gratis!</strong> Recomienda GOXION con un amigo o familiar. Si ellos contratan uno de nuestros servicios y mencionan tu nombre o ID de cliente al momento de su compra, tu próximo mes será descontado al 100%. ¡No hay límite de referidos!</p>
-            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank">Preguntar Detalles</a>
+        <div class="animate-on-scroll">
+            <button class="accordion">🎁 Programa de Referidos (Mes Gratis)</button>
+            <div class="panel">
+                <p><strong>¡Gana un mes completamente gratis!</strong> Recomienda GOXION con un amigo o familiar. Si ellos contratan uno de nuestros servicios y mencionan tu nombre o ID de cliente al momento de su compra, tu próximo mes será descontado al 100%. ¡No hay límite de referidos!</p>
+                <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank">Preguntar Detalles →</a>
+            </div>
         </div>
 
-        <button class="accordion">Reportar una falla técnica</button>
-        <div class="panel">
-            <p>¿Perdiste el acceso o la cuenta presenta un error inusual? Envíanos una captura clara del problema. Revisaremos tu caso aplicando nuestra Política de Garantía y Trato Justo.</p>
-            <a href="https://wa.me/529613535659?text=REPORTE%20DE%20FALLA%20-%20Goxion.%0A%0AServicio:%20%0ADetalle%20del%20problema:%20" class="btn btn-wa" target="_blank">⚠️ Reportar Problema</a>
+        <div class="animate-on-scroll">
+            <button class="accordion">Reportar una falla técnica</button>
+            <div class="panel">
+                <p>¿Perdiste el acceso o la cuenta presenta un error inusual? Envíanos una captura clara del problema. Revisaremos tu caso aplicando nuestra Política de Garantía y Trato Justo.</p>
+                <a href="https://wa.me/529613535659?text=REPORTE%20DE%20FALLA%20-%20Goxion.%0A%0AServicio:%20%0ADetalle%20del%20problema:%20" class="btn btn-wa" target="_blank">⚠️ Reportar Problema</a>
+            </div>
         </div>
 
-        <!-- Footer y Horarios -->
-        <div class="footer-info">
+        <!-- Footer -->
+        <div class="footer-info animate-on-scroll">
             <div class="schedule">
                 <div class="schedule-title">🕒 Horario de Atención en WhatsApp</div>
-                <div class="schedule-time">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
+                <div class="schedule-time">Lunes a Sábado • 10:00 AM - 8:00 PM</div>
             </div>
             <div class="copyright">
                 Para emergencias fuera de horario, deja tu mensaje y será el primero en atenderse al abrir sistema.<br><br>
@@ -227,53 +347,33 @@
 
     </div>
 
-    <!-- MODALES -->
-    
-    <!-- Modal: Login -->
+    <!-- MODALES (Ocultos por defecto) -->
     <div id="modal-login" class="modal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
             <div class="modal-title">Consultar Estado de Cuenta</div>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Ingresa el nombre o ID con el que te registraste en GOXION.</p>
-            
             <div class="input-group">
                 <input type="text" id="input-cliente" class="input-box" placeholder="Ej: laura o jorge">
             </div>
-            
-            <button class="btn btn-primary" onclick="buscarCliente()">Buscar mi cuenta</button>
+            <button class="btn btn-primary" onclick="buscarCliente()">Buscar mi cuenta →</button>
         </div>
     </div>
 
-    <!-- Modal: Lealtad -->
     <div id="modal-lealtad" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
             <div class="modal-title">Programa de Fidelidad</div>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén descuentos permanentes.</p>
             <table>
-                <tr>
-                    <th>Nivel</th>
-                    <th>Meta</th>
-                    <th>Beneficio</th>
-                </tr>
-                <tr>
-                    <td style="color: var(--success-green); font-weight: bold;">Nivel 1</td>
-                    <td>4 Pagos Seguidos</td>
-                    <td>3% OFF</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--accent-cyan); font-weight: bold;">Nivel 2</td>
-                    <td>9 Pagos Seguidos</td>
-                    <td>6% OFF</td>
-                </tr>
+                <tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
+                <tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr>
+                <tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
             </table>
-            <p style="color: var(--warning-amber); font-size: 12px; margin-top: 15px;">
-                ⚠️ <strong>Importante:</strong> Un pago atrasado reinicia tu racha a cero.
-            </p>
+            <p style="color: var(--warning-amber); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado reinicia tu racha a cero.</p>
         </div>
     </div>
 
-    <!-- Modal: Términos -->
     <div id="modal-terminos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
@@ -283,25 +383,15 @@
         </div>
     </div>
 
-    <!-- Modal: Garantía -->
     <div id="modal-garantia" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
             <div class="modal-title">Política de Garantía y Trato Justo</div>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Compensaciones aplicables por fallas técnicas ajenas al usuario:</p>
             <table>
-                <tr>
-                    <th>Evento</th>
-                    <th>Compensación / Penalización</th>
-                </tr>
-                <tr>
-                    <td>Falla de Servicio</td>
-                    <td>5% de descuento por cada día completo inactivo (hasta 50%).</td>
-                </tr>
-                <tr>
-                    <td>Atraso en Pago</td>
-                    <td>5% de recargo diario sin previo aviso.</td>
-                </tr>
+                <tr><th>Evento</th><th>Compensación / Penalización</th></tr>
+                <tr><td>Falla de Servicio</td><td>5% de descuento por cada día completo inactivo (hasta 50%).</td></tr>
+                <tr><td>Atraso en Pago</td><td>5% de recargo diario sin previo aviso.</td></tr>
             </table>
         </div>
     </div>
@@ -343,7 +433,7 @@
             }
         }
 
-        // Lógica del Buscador
+        // Lógica de Búsqueda
         function buscarCliente() {
             var inputValor = document.getElementById('input-cliente').value.trim();
             if (inputValor === "") {
@@ -353,11 +443,32 @@
             window.location.href = 'index.html?cliente=' + encodeURIComponent(inputValor);
         }
 
-        // Permitir buscar presionando la tecla "Enter"
         document.getElementById('input-cliente').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 buscarCliente();
             }
+        });
+
+        // Animación de aparición al hacer scroll (Intersection Observer)
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting){
+                    entry.target.animate([
+                        { opacity: 0, transform: "translateY(30px)" },
+                        { opacity: 1, transform: "translateY(0)" }
+                    ], {
+                        duration: 700,
+                        easing: "ease-out",
+                        fill: "forwards"
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll(".animate-on-scroll").forEach(el => {
+            el.style.opacity = 0;
+            observer.observe(el);
         });
     </script>
 
