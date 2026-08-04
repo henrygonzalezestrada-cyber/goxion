@@ -7,8 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            var(--bg-black): #030305; /* Negro profundo oficial */
-            --card-bg: rgba(14, 14, 20, 0.7);
+            --bg-black: #030305;
+            --card-bg: rgba(14, 14, 20, 0.65);
             --text-main: #ffffff;
             --text-muted: #95a4bd;
             --neon-blue: #00f2fe;
@@ -21,7 +21,7 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
         body { 
-            background-color: #030305; 
+            background-color: var(--bg-black); 
             color: var(--text-main); 
             line-height: 1.6; 
             padding: 25px 15px; 
@@ -33,69 +33,49 @@
             overflow-x: hidden;
         }
 
-        /* --- FONDO ANIMADO CORREGIDO (Estilo GOXION) --- */
+        /* --- FONDO ANIMADO: ENERGÍA NEÓN --- */
         .bg { 
-            position: fixed; 
-            inset: 0; 
-            z-index: -2; 
-            background-color: #030305; 
+            position: fixed; inset: 0; z-index: -2; 
+            background-color: var(--bg-black); 
             overflow: hidden; 
         }
         
-        /* Auras Neón Animadas */
-        .aura {
+        .neon-orbit {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px); /* Blur optimizado para móviles */
-            will-change: transform, opacity; /* Fuerza la animación en celulares */
-        }
-        
-        .aura-purple {
-            width: 350px; height: 350px;
-            background: rgba(124, 77, 255, 0.4);
-            top: -100px; left: -50px;
-            animation: floatAura1 12s ease-in-out infinite alternate;
-        }
-        
-        .aura-cyan {
-            width: 400px; height: 400px;
-            background: rgba(0, 242, 254, 0.3);
-            bottom: -150px; right: -100px;
-            animation: floatAura2 15s ease-in-out infinite alternate-reverse;
-        }
-
-        .aura-magenta {
-            width: 250px; height: 250px;
-            background: rgba(224, 38, 222, 0.25);
-            top: 40%; left: 50%;
-            margin-left: -125px;
-            animation: pulseAura 8s ease-in-out infinite alternate;
-        }
-
-        /* Cuadrícula sutil difuminada en los bordes */
-        .grid {
-            position: absolute; inset: 0;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
-            background-size: 35px 35px;
-            mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
-            -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
+            border: 2px solid transparent;
+            will-change: transform;
             pointer-events: none;
         }
 
-        /* Keyframes usando translate3d para fluidez en iOS/Android */
-        @keyframes floatAura1 {
-            0% { transform: translate3d(0, 0, 0) scale(1); }
-            100% { transform: translate3d(40px, 60px, 0) scale(1.1); }
+        .orbit-1 {
+            width: 900px; height: 900px;
+            top: -300px; right: -400px;
+            border-bottom: 3px solid var(--neon-purple);
+            border-left: 3px solid rgba(124, 77, 255, 0.2);
+            filter: drop-shadow(0 0 25px var(--neon-purple));
+            animation: spinOrbit 25s linear infinite;
         }
-        @keyframes floatAura2 {
-            0% { transform: translate3d(0, 0, 0) scale(1); }
-            100% { transform: translate3d(-50px, -40px, 0) scale(1.15); }
+
+        .orbit-2 {
+            width: 1200px; height: 1200px;
+            bottom: -500px; left: -500px;
+            border-top: 3px solid var(--neon-blue);
+            border-right: 3px solid rgba(0, 242, 254, 0.2);
+            filter: drop-shadow(0 0 30px var(--neon-blue));
+            animation: spinOrbitReverse 35s linear infinite;
         }
-        @keyframes pulseAura {
-            0% { transform: scale(0.8); opacity: 0.5; }
-            100% { transform: scale(1.3); opacity: 1; }
+
+        @keyframes spinOrbit {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.05); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        @keyframes spinOrbitReverse {
+            0% { transform: rotate(360deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.02); }
+            100% { transform: rotate(0deg) scale(1); }
         }
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
@@ -103,7 +83,6 @@
         /* --- HEADER --- */
         .header { text-align: center; margin-bottom: 35px; padding-top: 15px; }
         .logo-img { max-width: 200px; height: auto; display: block; margin: 0 auto 12px auto; }
-        
         .subtitle { 
             color: var(--neon-blue); font-size: 13px; text-transform: uppercase; 
             letter-spacing: 2px; font-weight: 700; 
@@ -114,13 +93,9 @@
             background: rgba(255, 170, 0, 0.12);
             border: 1px solid rgba(255, 170, 0, 0.4);
             border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            padding: 16px; margin-bottom: 30px;
+            display: flex; align-items: flex-start; gap: 12px;
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 0 25px rgba(255, 170, 0, 0.2);
         }
         .alert-icon { font-size: 20px; line-height: 1; }
@@ -137,12 +112,12 @@
         .search-section { margin-bottom: 35px; }
         .search-bar-container {
             display: flex; gap: 8px; background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 16px;
+            border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 16px;
             padding: 8px; backdrop-filter: blur(12px); transition: all 0.3s ease;
         }
         .search-bar-container:focus-within {
             border-color: var(--neon-blue);
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.2);
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.3), inset 0 0 10px rgba(0, 242, 254, 0.1);
         }
         .search-input {
             flex: 1; background: transparent; border: none; color: var(--text-main);
@@ -152,45 +127,64 @@
         .search-btn {
             background: linear-gradient(135deg, var(--neon-blue), #4f8cff);
             border: none; border-radius: 12px; padding: 10px 22px; color: #000;
-            font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.3s;
+            font-weight: 700; font-size: 13px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; align-items: center; gap: 6px; white-space: nowrap;
         }
-        .search-btn:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); transform: scale(1.02); }
+        .search-btn:hover, .search-btn:active { 
+            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6); transform: scale(1.05); color: #fff; 
+        }
 
-        /* --- MENÚ PRINCIPAL 2x2 --- */
+        /* --- MENÚ PRINCIPAL 2x2 (EFECTO RESPIRACIÓN Y ELÉCTRICO) --- */
         .policy-grid { 
             display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); 
             gap: 14px; margin-bottom: 35px; 
         }
         .btn-menu {
-            background: var(--card-bg); border: 1px solid rgba(255,255,255,0.05);
+            background: var(--card-bg); 
+            border: 1px solid rgba(124, 77, 255, 0.15);
             border-radius: 16px; padding: 20px 15px; text-align: center; cursor: pointer;
-            transition: all 0.3s ease; color: var(--text-main); text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); color: var(--text-main); 
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             gap: 10px; backdrop-filter: blur(12px);
+            animation: breathe-border 4s infinite alternate; /* Respiración */
         }
-        .btn-menu:hover { 
-            border-color: rgba(0, 242, 254, 0.4); 
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4); transform: translateY(-4px);
+        
+        @keyframes breathe-border {
+            0% { box-shadow: 0 0 5px rgba(124, 77, 255, 0.05); }
+            100% { box-shadow: 0 0 20px rgba(124, 77, 255, 0.2); border-color: rgba(124, 77, 255, 0.4); }
         }
-        .btn-menu span { font-size: 28px; line-height: 1; }
+
+        .btn-menu:hover, .btn-menu:active { 
+            animation: none; /* Pausa respiración al tocar */
+            border-color: var(--neon-blue); 
+            background: rgba(0, 242, 254, 0.05);
+            box-shadow: 0 0 30px rgba(0, 242, 254, 0.4), inset 0 0 15px rgba(0, 242, 254, 0.15); 
+            transform: translateY(-5px) scale(1.02);
+        }
+        .btn-menu span { font-size: 28px; line-height: 1; transition: 0.3s; }
+        .btn-menu:hover span { transform: scale(1.1); filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
         .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.3; }
 
         /* --- ACORDEONES --- */
         .accordion {
             background: var(--card-bg); color: var(--text-main); cursor: pointer;
-            padding: 18px 20px; width: 100%; border: none; text-align: left; outline: none;
+            padding: 18px 20px; width: 100%; border: 1px solid rgba(255,255,255,0.03); 
+            text-align: left; outline: none;
             font-size: 14px; font-weight: 600; transition: all 0.3s ease;
             border-radius: 14px; margin-bottom: 12px; display: flex; justify-content: space-between;
             align-items: center; backdrop-filter: blur(12px);
         }
-        .accordion:hover { background: rgba(30, 38, 55, 0.7); transform: translateY(-2px); }
-        .accordion.active { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; }
+        .accordion:hover { 
+            background: rgba(124, 77, 255, 0.1); border-color: rgba(124, 77, 255, 0.3);
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.15); transform: translateY(-2px); 
+        }
+        .accordion.active { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; border-color: var(--neon-blue); box-shadow: 0 -5px 15px rgba(0, 242, 254, 0.1); }
         
         .panel {
-            padding: 0 20px; background: rgba(11, 15, 23, 0.6); border: none; 
+            padding: 0 20px; background: rgba(8, 10, 15, 0.8); border: none; 
             max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out, padding 0.3s ease;
             border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; margin-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2);
         }
         .panel p { padding: 16px 0; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
 
@@ -204,13 +198,13 @@
             background: linear-gradient(135deg, var(--neon-blue), #4f8cff);
             box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
         }
-        .btn-primary:hover { box-shadow: 0 0 30px rgba(0, 242, 254, 0.5); transform: translateY(-2px); }
+        .btn-primary:hover { box-shadow: 0 0 30px rgba(0, 242, 254, 0.6); transform: translateY(-2px); color: #fff;}
         
         .btn-wa { 
             background: linear-gradient(135deg, var(--neon-purple), var(--neon-magenta));
             color: #fff; box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
         }
-        .btn-wa:hover { box-shadow: 0 0 30px rgba(138, 43, 226, 0.5); transform: translateY(-2px); }
+        .btn-wa:hover { box-shadow: 0 0 30px rgba(138, 43, 226, 0.6); transform: translateY(-2px); }
 
         /* --- MODALES --- */
         .modal {
@@ -220,9 +214,9 @@
         }
         .modal.show { display: flex; opacity: 1; }
         .modal-content {
-            background: #0d121c; border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+            background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px;
             width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 40px rgba(124, 77, 255, 0.2);
         }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 26px; font-weight: bold; cursor: pointer; transition: 0.2s;}
         .close-btn:hover { color: var(--neon-blue); }
@@ -241,10 +235,21 @@
         .schedule { 
             display: inline-block; background: var(--card-bg); 
             border-radius: 30px; padding: 10px 22px; margin-bottom: 18px; 
+            border: 1px solid rgba(0, 242, 254, 0.15); box-shadow: 0 0 15px rgba(0, 242, 254, 0.05);
         }
         .schedule-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
         .schedule-time { font-size: 12px; color: var(--neon-blue); font-weight: 600; }
         .copyright { font-size: 12px; color: var(--text-muted); }
+
+        /* --- ANIMACIÓN HOLOGRAMA / ENCENDIDO AL HACER SCROLL --- */
+        .animate-on-scroll { opacity: 0; }
+        @keyframes hologram-in {
+            0% { opacity: 0; transform: translateY(20px) scale(0.98); filter: brightness(2) hue-rotate(90deg); }
+            10% { opacity: 1; filter: brightness(1.5); }
+            15% { opacity: 0.3; }
+            20% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1) hue-rotate(0deg); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
 
         /* =======================================================
            📱 OPTIMIZACIÓN RESPONSIVA PARA TELÉFONOS
@@ -258,8 +263,8 @@
             .search-input { font-size: 13px; padding: 8px 10px; }
             .search-btn { padding: 8px 16px; font-size: 12px; border-radius: 10px; }
             
-            .policy-grid { gap: 10px; }
-            .btn-menu { padding: 16px 8px; gap: 6px; }
+            .policy-grid { gap: 12px; }
+            .btn-menu { padding: 18px 8px; gap: 6px; }
             .btn-menu span { font-size: 24px; }
             .btn-menu div { font-size: 11px; }
             
@@ -271,12 +276,10 @@
 </head>
 <body>
 
-    <!-- FONDO ANIMADO Y GRID (Corregido) -->
+    <!-- FONDO ANIMADO NEÓN (Órbitas) -->
     <div class="bg">
-        <div class="aura aura-purple"></div>
-        <div class="aura aura-cyan"></div>
-        <div class="aura aura-magenta"></div>
-        <div class="grid"></div>
+        <div class="neon-orbit orbit-1"></div>
+        <div class="neon-orbit orbit-2"></div>
     </div>
 
     <div class="container">
@@ -390,11 +393,11 @@
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
             <div class="modal-title">Términos y Condiciones</div>
             <ul class="terms-list">
-                <li><strong>1. Confidencialidad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados[cite: 6].</li>
-                <li><strong>2. Uso Permitido:</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema[cite: 6].</li>
-                <li><strong>3. Sanciones:</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso[cite: 6].</li>
-                <li><strong>4. Fechas de Pago:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial[cite: 6].</li>
-                <li><strong>5. Prórrogas:</strong> Si prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos[cite: 6].</li>
+                <li><strong>1. Confidencialidad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados[span_0](start_span)[span_0](end_span).</li>
+                <li><strong>2. Uso Permitido:</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema[span_1](start_span)[span_1](end_span).</li>
+                <li><strong>3. Sanciones:</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso[span_2](start_span)[span_2](end_span).</li>
+                <li><strong>4. Fechas de Pago:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial[span_3](start_span)[span_3](end_span).</li>
+                <li><strong>5. Prórrogas:</strong> Si prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos[span_4](start_span)[span_4](end_span).</li>
             </ul>
         </div>
     </div>
@@ -404,7 +407,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
             <div class="modal-title">Garantía y Trato Justo</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Reglas de compensación clara y penalizaciones proporcionales[cite: 6]:</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Reglas de compensación clara y penalizaciones proporcionales[span_5](start_span)[span_5](end_span):</p>
             <table>
                 <tr>
                     <th>Concepto</th>
@@ -413,18 +416,18 @@
                 </tr>
                 <tr>
                     <td style="color: var(--text-main);"><strong>Falla Técnica</strong></td>
-                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario[cite: 6].</td>
-                    <td>Hasta 50% de descuento (10 días)[cite: 6].</td>
+                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario[span_6](start_span)[span_6](end_span).</td>
+                    <td>Hasta 50% de descuento (10 días)[span_7](start_span)[span_7](end_span).</td>
                 </tr>
                 <tr>
                     <td style="color: var(--warning-amber);"><strong>Mora sin Aviso</strong></td>
-                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento[cite: 6].</td>
-                    <td>Hasta 50% de interés acumulado[cite: 6].</td>
+                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento[span_8](start_span)[span_8](end_span).</td>
+                    <td>Hasta 50% de interés acumulado[span_9](start_span)[span_9](end_span).</td>
                 </tr>
                 <tr>
                     <td style="color: var(--danger-red);"><strong>Cancelación</strong></td>
-                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado[cite: 6].</td>
-                    <td>20% sobre saldo pendiente[cite: 6].</td>
+                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado[span_10](start_span)[span_10](end_span).</td>
+                    <td>20% sobre saldo pendiente[span_11](start_span)[span_11](end_span).</td>
                 </tr>
             </table>
         </div>
@@ -435,13 +438,13 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
             <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en tu mensualidad por cada nuevo cliente que concrete una compra[cite: 5].</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en tu mensualidad por cada nuevo cliente que concrete una compra[span_12](start_span)[span_12](end_span).</p>
             
             <ul class="terms-list">
-                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir un mínimo de dos (2) perfiles[cite: 5].</li>
-                <li><strong>2. Permanencia:</strong> Mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos[cite: 5].</li>
-                <li><strong>3. Aplicación:</strong> El descuento del 100% se aplicará en el cuarto mes, una vez validado el cumplimiento[cite: 5].</li>
-                <li><strong>4. Restricción:</strong> El referidor debe mantener su cuenta activa y al corriente durante el proceso de validación[cite: 5]. Si el referido cancela antes de los 3 meses, el beneficio se anula[cite: 5].</li>
+                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir un mínimo de dos (2) perfiles[span_13](start_span)[span_13](end_span).</li>
+                <li><strong>2. Permanencia:</strong> Mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos[span_14](start_span)[span_14](end_span).</li>
+                <li><strong>3. Aplicación:</strong> El descuento del 100% se aplicará en el cuarto mes, una vez validado el cumplimiento[span_15](start_span)[span_15](end_span).</li>
+                <li><strong>4. Restricción:</strong> El referidor debe mantener su cuenta activa y al corriente durante el proceso de validación[span_16](start_span)[span_16](end_span). Si el referido cancela antes de los 3 meses, el beneficio se anula[span_17](start_span)[span_17](end_span).</li>
             </ul>
 
             <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank" style="margin-top: 10px;">Contactar Asesor →</a>
@@ -503,25 +506,20 @@
             }
         });
 
-        // Animación de aparición al hacer scroll
+        // Animación Eléctrica "Holograma" al hacer scroll
         const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
+            entries.forEach((entry) => {
                 if(entry.isIntersecting){
-                    entry.target.animate([
-                        { opacity: 0, transform: "translateY(30px)" },
-                        { opacity: 1, transform: "translateY(0)" }
-                    ], {
-                        duration: 700,
-                        easing: "ease-out",
-                        fill: "forwards"
-                    });
+                    // Dispara la animación de CSS definida en @keyframes hologram-in
+                    entry.target.style.animation = `hologram-in 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`;
                     observer.unobserve(entry.target);
                 }
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll(".animate-on-scroll").forEach(el => {
-            el.style.opacity = 0;
+        document.querySelectorAll(".animate-on-scroll").forEach((el, index) => {
+            // Un pequeño retraso en cascada para que se vea más tecnológico
+            el.style.animationDelay = `${index * 0.08}s`;
             observer.observe(el);
         });
     </script>
