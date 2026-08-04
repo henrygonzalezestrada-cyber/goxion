@@ -12,6 +12,7 @@
             --neon-green: #00ff9d;
             --neon-purple: #bc13fe;
             --neon-red: #ff003c;
+            --neon-blue: #00f2fe;
             --text-main: #ffffff;
             --text-muted: #8892b0;
         }
@@ -30,10 +31,10 @@
         .header-actions { display: flex; gap: 8px; align-items: center; }
         .status { color: var(--neon-green); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; animation: pulse 1.5s infinite; }
-        .btn-save { background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
-        .btn-save:hover { background: var(--neon-green); color: #000; }
+        
+        .btn-save { background: var(--neon-green); color: #000; border: none; padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
+        .btn-save:hover { box-shadow: 0 0 10px var(--neon-green); }
         .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
-        .btn-logout:hover { background: var(--neon-red); color: #fff; }
 
         @media (max-width: 600px) {
             header { flex-wrap: wrap; }
@@ -41,14 +42,14 @@
         }
 
         /* --- SECTIONS & PANELS --- */
-        .section-title { color: var(--neon-purple); font-size: 1.2rem; margin-bottom: 12px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 8px; }
+        .section-title { color: var(--neon-purple); font-size: 1.1rem; margin-bottom: 12px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 8px; }
         .grid-container { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; }
         @media (max-width: 900px) { .grid-container { grid-template-columns: 1fr; } }
         
         .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
         
-        /* Switches & Inputs */
-        .switch-row, .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
+        /* Switches & UI Elements */
+        .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
@@ -56,29 +57,31 @@
         input:checked + .slider { background-color: transparent; border: 1px solid var(--neon-red); }
         input:checked + .slider:before { transform: translateX(20px); background-color: var(--neon-red); }
 
-        .price-input-group { display: flex; align-items: center; gap: 3px; background: #111; padding: 3px 8px; border: 1px solid rgba(188, 19, 254, 0.5); border-radius: 4px; }
-        .price-input-group input { background: transparent; border: none; color: var(--neon-green); font-weight: bold; width: 40px; text-align: right; outline: none; }
+        .search-bar, .custom-select { width: 100%; background: #111; border: 1px solid var(--text-muted); color: var(--text-main); padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 0.85rem; outline: none; }
+        .search-bar:focus { border-color: var(--neon-green); }
 
-        .search-bar { width: 100%; background: #111; border: 1px solid var(--neon-green); color: var(--neon-green); padding: 8px; border-radius: 4px; margin-bottom: 12px; font-size: 0.9rem; }
+        /* Dynamic Services Global */
+        .service-row { display: flex; gap: 5px; align-items: center; margin-bottom: 6px; }
+        .service-row input[type="text"] { flex: 1; background: #111; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
+        .service-row input[type="number"] { width: 60px; background: #111; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-green); padding: 4px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-align: center; }
+        .btn-icon { background: transparent; border: none; color: var(--neon-red); cursor: pointer; font-size: 1rem; padding: 0 4px; }
+        .btn-add-service { background: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px dashed var(--neon-purple); width: 100%; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 5px; }
 
         /* --- CLIENT CARD --- */
-        .client-card {
-            background: linear-gradient(145deg, #0f0f16, #0a0a0f);
-            border-left: 3px solid var(--neon-green);
-            padding: 10px; border-radius: 6px; margin-bottom: 10px;
-            display: flex; flex-direction: column; gap: 8px;
-        }
-
+        .client-card { background: linear-gradient(145deg, #0f0f16, #0a0a0f); border-left: 3px solid var(--neon-green); padding: 10px; border-radius: 6px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
         .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-        .client-info h3 { color: var(--neon-green); font-size: 1rem; }
-        .client-info p { color: var(--text-muted); font-size: 0.8rem; }
-
-        .card-actions-row { display: flex; gap: 6px; align-items: center; width: 100%; }
+        .client-info h3 { color: var(--neon-green); font-size: 1.05rem; }
+        
+        .client-services-list { background: rgba(255,255,255,0.02); padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
+        .client-service-tag { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-main); margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .client-service-tag:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .client-service-add-row { display: flex; gap: 5px; margin-top: 6px; }
+        .client-service-add-row select { flex: 1; background: #111; border: 1px solid var(--neon-blue); color: #fff; font-size: 0.75rem; padding: 2px; border-radius: 3px; }
+        
+        .card-actions-row { display: flex; gap: 6px; align-items: center; width: 100%; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; }
         .loyalty-control { display: flex; align-items: center; gap: 4px; background: #1a1a24; padding: 3px 6px; border-radius: 4px; }
         .loyalty-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-
-        .btn-copy { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; text-align: center; }
-        .btn-copy:hover { background: var(--neon-purple); color: #fff; }
+        .btn-copy { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; flex: 1; text-align: center; font-weight: bold; }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(0, 255, 157, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); } }
     </style>
@@ -99,35 +102,35 @@
         <div>
             <!-- ALERTAS -->
             <div class="panel">
-                <h2 class="section-title">Alertas (Ayuda)</h2>
+                <h2 class="section-title">Alertas Globales</h2>
                 <div class="switch-row">
-                    <span style="font-size: 0.85rem;">Falla YouTube Prem.</span>
-                    <label class="switch"><input type="checkbox" id="alert-yt"><span class="slider"></span></label>
+                    <span style="font-size: 0.85rem; font-weight: bold;">Activar Alerta Técnica</span>
+                    <label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label>
                 </div>
-                <div class="switch-row">
-                    <span style="font-size: 0.85rem;">Falla Netflix</span>
-                    <label class="switch"><input type="checkbox" id="alert-ntf"><span class="slider"></span></label>
+                
+                <div id="alert-settings" style="opacity: 0.5; pointer-events: none;">
+                    <label style="font-size: 0.75rem; color: var(--text-muted);">Plataforma afectada:</label>
+                    <select id="alert-platform" class="custom-select"></select>
+
+                    <label style="font-size: 0.75rem; color: var(--text-muted);">Mensaje predeterminado:</label>
+                    <select id="alert-type" class="custom-select">
+                        <option value="presentando intermitencias temporales">Intermitencias temporales</option>
+                        <option value="en mantenimiento programado">Mantenimiento programado</option>
+                        <option value="experimentando una caída global">Caída global</option>
+                        <option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option>
+                    </select>
+
+                    <textarea id="global-msg" style="width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; margin-top: 4px; font-size: 0.8rem;" placeholder="Mensaje Global (Opcional)..."></textarea>
                 </div>
-                <textarea id="global-msg" style="width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; margin-top: 4px; font-size: 0.8rem;" placeholder="Mensaje Global..."></textarea>
             </div>
 
-            <!-- PRECIOS -->
+            <!-- PRECIOS Y SERVICIOS GLOBALES -->
             <div class="panel">
-                <h2 class="section-title">Precios Base ($)</h2>
-                <div class="price-row">
-                    <span style="font-size: 0.85rem;">YouTube Prem.</span>
-                    <div class="price-input-group">
-                        <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
-                        <input type="number" id="price-yt" value="89">
-                    </div>
+                <h2 class="section-title">Catálogo de Servicios</h2>
+                <div id="global-services-container">
+                    <!-- Los servicios globales se inyectan aquí -->
                 </div>
-                <div class="price-row">
-                    <span style="font-size: 0.85rem;">Netflix</span>
-                    <div class="price-input-group">
-                        <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
-                        <input type="number" id="price-ntf" value="109">
-                    </div>
-                </div>
+                <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio</button>
             </div>
         </div>
 
@@ -138,12 +141,11 @@
 
             <!-- Contenedor dinámico de clientes -->
             <div id="clients-container">
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando clientes desde GitHub...</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando sistema desde GitHub...</p>
             </div>
         </div>
     </div>
 
-    <!-- EL NUEVO SCRIPT CORRECTO -->
     <script>
     const CONFIG = {
         username: "henrygonzalezestrada-cyber",
@@ -155,7 +157,20 @@
     let currentToken = localStorage.getItem("GOXION_PAT") || "";
     let currentFileData = null; 
     let clientesDict = {}; 
-    let configGlobal = { alertas: {}, precios: {} };
+    let configGlobal = { alertas: {}, serviciosGlobales: [] };
+
+    // Lista inicial basada en tu tabla de Excel (por si la base de datos está vacía)
+    const DEFAULT_SERVICES = [
+        {nombre: "Netflix Premium", precio: 109},
+        {nombre: "Disney+ Premium", precio: 89},
+        {nombre: "Max Standard", precio: 79},
+        {nombre: "Prime Video", precio: 39},
+        {nombre: "YouTube Premium", precio: 89},
+        {nombre: "Vix Premium", precio: 49},
+        {nombre: "Crunchyroll Cuenta completa", precio: 45},
+        {nombre: "Microsoft 365", precio: 79},
+        {nombre: "Google One 2TB", precio: 29}
+    ];
 
     document.addEventListener("DOMContentLoaded", () => {
         if (!currentToken) pedirToken();
@@ -195,26 +210,99 @@
             
             currentFileData = { sha: data.sha };
 
+            // Cargar configuración global o usar defaults
             if (jsonCompleto._goxion_config) {
                 configGlobal = jsonCompleto._goxion_config;
+                // Si aún usa el formato viejo de "precios", migrar a array "serviciosGlobales"
+                if (!configGlobal.serviciosGlobales) {
+                    configGlobal.serviciosGlobales = DEFAULT_SERVICES;
+                }
                 delete jsonCompleto._goxion_config; 
+            } else {
+                configGlobal.serviciosGlobales = DEFAULT_SERVICES;
             }
 
             clientesDict = jsonCompleto;
 
-            document.getElementById("alert-yt").checked = configGlobal.alertas?.youtube || false;
-            document.getElementById("alert-ntf").checked = configGlobal.alertas?.netflix || false;
+            // Inicializar UI de Alertas
+            document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
+            document.getElementById("alert-type").value = configGlobal.alertas?.falla || "presentando intermitencias temporales";
             document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
-            document.getElementById("price-yt").value = configGlobal.precios?.youtube || 89;
-            document.getElementById("price-ntf").value = configGlobal.precios?.netflix || 109;
+            toggleAlertFields();
 
+            // Renderizar TODO
+            renderGlobalServicesUI();
             renderizarClientes(clientesDict);
 
         } catch (error) {
             console.error("Error GitHub:", error);
+            document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red);">Error al conectar con la base de datos.</p>`;
         }
     }
 
+    // --- LÓGICA DE SERVICIOS GLOBALES ---
+    function renderGlobalServicesUI() {
+        const container = document.getElementById("global-services-container");
+        const alertSelect = document.getElementById("alert-platform");
+        
+        container.innerHTML = "";
+        alertSelect.innerHTML = `<option value="Todos los servicios">Todos los servicios</option>`;
+
+        configGlobal.serviciosGlobales.forEach((srv, index) => {
+            // Llenar tabla de precios base
+            container.innerHTML += `
+                <div class="service-row">
+                    <input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)">
+                    <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
+                    <input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)">
+                    <button class="btn-icon" onclick="removeGlobalService(${index})" title="Eliminar servicio">✖</button>
+                </div>
+            `;
+            
+            // Llenar select de alertas
+            let selected = (configGlobal.alertas?.plataforma === srv.nombre) ? "selected" : "";
+            alertSelect.innerHTML += `<option value="${srv.nombre}" ${selected}>${srv.nombre}</option>`;
+        });
+    }
+
+    function updateGlobalService(index, field, value) {
+        if (field === 'precio') value = parseFloat(value) || 0;
+        configGlobal.serviciosGlobales[index][field] = value;
+        
+        if (field === 'nombre') {
+            renderGlobalServicesUI(); // Actualizar selects
+            renderizarClientes(clientesDict); // Actualizar selects de clientes
+        }
+    }
+
+    function addGlobalService() {
+        configGlobal.serviciosGlobales.push({nombre: "Nuevo Servicio", precio: 0});
+        renderGlobalServicesUI();
+        renderizarClientes(clientesDict);
+    }
+
+    function removeGlobalService(index) {
+        if(confirm("¿Seguro que deseas eliminar este servicio del catálogo base? (No se borrará de los clientes que ya lo tengan).")) {
+            configGlobal.serviciosGlobales.splice(index, 1);
+            renderGlobalServicesUI();
+            renderizarClientes(clientesDict);
+        }
+    }
+
+    // --- LÓGICA DE ALERTAS ---
+    function toggleAlertFields() {
+        const isActive = document.getElementById("alert-active").checked;
+        const settingsDiv = document.getElementById("alert-settings");
+        if (isActive) {
+            settingsDiv.style.opacity = "1";
+            settingsDiv.style.pointerEvents = "auto";
+        } else {
+            settingsDiv.style.opacity = "0.5";
+            settingsDiv.style.pointerEvents = "none";
+        }
+    }
+
+    // --- LÓGICA DE CLIENTES ---
     function renderizarClientes(diccionario) {
         const container = document.getElementById("clients-container");
         container.innerHTML = "";
@@ -225,40 +313,81 @@
             return;
         }
 
+        // Preparar opciones de servicios globales para el select de clientes
+        const globalOptions = configGlobal.serviciosGlobales.map(s => 
+            `<option value="${s.nombre}|${s.precio}">${s.nombre} ($${s.precio})</option>`
+        ).join("");
+
         keys.forEach(key => {
             const cliente = diccionario[key];
-            
             let subtotal = 0;
-            let nombresServicios = [];
-            if(cliente.servicios) {
-                cliente.servicios.forEach(s => {
+            
+            // Renderizar etiquetas de servicios del cliente
+            let clientServicesHTML = "";
+            if(cliente.servicios && cliente.servicios.length > 0) {
+                cliente.servicios.forEach((s, sIdx) => {
                     subtotal += s.monto;
-                    nombresServicios.push(s.nombre);
+                    clientServicesHTML += `
+                        <div class="client-service-tag">
+                            <span>${s.nombre}</span>
+                            <span>$${s.monto} <button class="btn-icon" style="font-size:0.7rem; margin-left:4px;" onclick="removeClientService('${key}', ${sIdx})">✖</button></span>
+                        </div>
+                    `;
                 });
+            } else {
+                clientServicesHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Sin servicios activos</div>`;
             }
 
             const card = document.createElement("div");
             card.className = "client-card";
             card.innerHTML = `
                 <div class="card-header-row">
-                    <div class="client-info">
-                        <h3>[${cliente.folio}] ${cliente.nombre}</h3>
-                        <p style="font-size: 0.75rem;">${nombresServicios.join(', ')} ($${subtotal})</p>
+                    <div class="client-info" style="width:100%;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <h3>[${cliente.folio}] ${cliente.nombre}</h3>
+                            <span style="color:var(--neon-blue); font-weight:bold; font-size:0.9rem;">Total: $${subtotal}</span>
+                        </div>
+                        
+                        <div class="client-services-list" style="margin-top: 8px;">
+                            ${clientServicesHTML}
+                            <div class="client-service-add-row">
+                                <select id="add-srv-sel-${key}">
+                                    ${globalOptions}
+                                </select>
+                                <button class="btn-save" style="padding:2px 8px;" onclick="addClientService('${key}')">+</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card-actions-row" style="margin-top: 10px;">
-                    <div class="loyalty-control" title="Pagos Puntuales">
+                <div class="card-actions-row">
+                    <span style="font-size:0.75rem; color:var(--text-muted);">Pagos Puntuales:</span>
+                    <div class="loyalty-control">
                         <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
                         <span id="pagos-${key}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.pagos_puntuales || 0}</span>
                         <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
                     </div>
 
-                    <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')" style="flex:1;">Copiar Link Cobro</button>
+                    <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">Copiar Link</button>
                 </div>
             `;
             container.appendChild(card);
         });
+    }
+
+    function addClientService(key) {
+        const selectData = document.getElementById(`add-srv-sel-${key}`).value;
+        const [nombre, precio] = selectData.split('|');
+        
+        if (!clientesDict[key].servicios) clientesDict[key].servicios = [];
+        clientesDict[key].servicios.push({ nombre: nombre, monto: parseFloat(precio) });
+        
+        renderizarClientes(clientesDict); // Re-renderiza para mostrar el nuevo total y lista
+    }
+
+    function removeClientService(key, serviceIndex) {
+        clientesDict[key].servicios.splice(serviceIndex, 1);
+        renderizarClientes(clientesDict);
     }
 
     function updatePagos(key, delta) {
@@ -290,16 +419,12 @@
         const btnSave = document.querySelector('.btn-save');
         btnSave.innerText = "Guardando...";
 
-        configGlobal = {
-            alertas: {
-                youtube: document.getElementById("alert-yt").checked,
-                netflix: document.getElementById("alert-ntf").checked,
-                mensaje: document.getElementById("global-msg").value
-            },
-            precios: {
-                youtube: parseInt(document.getElementById("price-yt").value) || 89,
-                netflix: parseInt(document.getElementById("price-ntf").value) || 109
-            }
+        // Empaquetar configuración global actualizada
+        configGlobal.alertas = {
+            activa: document.getElementById("alert-active").checked,
+            plataforma: document.getElementById("alert-platform").value,
+            falla: document.getElementById("alert-type").value,
+            mensaje: document.getElementById("global-msg").value
         };
 
         const dataToSave = { 
@@ -312,7 +437,7 @@
         const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
 
         const payload = {
-            message: "🤖 Admin Update: Plataforma y lealtad actualizados",
+            message: "🤖 Admin Update: Catálogo, clientes y alertas modificados",
             content: contentEncoded,
             sha: currentFileData.sha,
             branch: CONFIG.branch
@@ -330,7 +455,7 @@
                 currentFileData.sha = resData.content.sha;
                 alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE!");
             } else {
-                alert("❌ Error al guardar.");
+                alert("❌ Error al guardar en GitHub.");
             }
         } catch (error) {
             console.error(error);
