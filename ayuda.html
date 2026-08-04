@@ -94,7 +94,8 @@
             border: 1px solid rgba(255, 170, 0, 0.4);
             border-radius: 14px;
             padding: 16px; margin-bottom: 30px;
-            display: flex; align-items: flex-start; gap: 12px;
+            display: none; /* Oculto por defecto para que JS decida si mostrarlo */
+            align-items: flex-start; gap: 12px;
             backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 0 25px rgba(255, 170, 0, 0.2);
         }
@@ -290,11 +291,11 @@
             <div class="subtitle">Soporte y Autogestión</div>
         </header>
 
-        <!-- AVISO DE ESTADO DE SERVICIO (BLUR NARANJA) -->
-        <div class="alert-banner animate-on-scroll">
+        <!-- AVISO DE ESTADO DE SERVICIO DINÁMICO -->
+        <div class="alert-banner animate-on-scroll" id="dynamic-alert">
             <span class="alert-icon">⚠️</span>
-            <div class="alert-text">
-                <strong>Aviso Técnico:</strong> El servicio de <strong>YouTube Premium</strong> está presentando intermitencias temporales. Las demás plataformas operan con normalidad. Estamos trabajando en ello.
+            <div class="alert-text" id="alert-content">
+                <!-- Se llena mediante JS -->
             </div>
         </div>
 
@@ -393,11 +394,11 @@
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
             <div class="modal-title">Términos y Condiciones</div>
             <ul class="terms-list">
-                <li><strong>1. Confidencialidad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados[span_0](start_span)[span_0](end_span).</li>
-                <li><strong>2. Uso Permitido:</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema[span_1](start_span)[span_1](end_span).</li>
-                <li><strong>3. Sanciones:</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso[span_2](start_span)[span_2](end_span).</li>
-                <li><strong>4. Fechas de Pago:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial[span_3](start_span)[span_3](end_span).</li>
-                <li><strong>5. Prórrogas:</strong> Si prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos[span_4](start_span)[span_4](end_span).</li>
+                <li><strong>1. Confidencialidad:</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
+                <li><strong>2. Uso Permitido:</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
+                <li><strong>3. Sanciones:</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
+                <li><strong>4. Fechas de Pago:</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial.</li>
+                <li><strong>5. Prórrogas:</strong> Si prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos.</li>
             </ul>
         </div>
     </div>
@@ -407,7 +408,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
             <div class="modal-title">Garantía y Trato Justo</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Reglas de compensación clara y penalizaciones proporcionales[span_5](start_span)[span_5](end_span):</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Reglas de compensación clara y penalizaciones proporcionales:</p>
             <table>
                 <tr>
                     <th>Concepto</th>
@@ -416,18 +417,18 @@
                 </tr>
                 <tr>
                     <td style="color: var(--text-main);"><strong>Falla Técnica</strong></td>
-                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario[span_6](start_span)[span_6](end_span).</td>
-                    <td>Hasta 50% de descuento (10 días)[span_7](start_span)[span_7](end_span).</td>
+                    <td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td>
+                    <td>Hasta 50% de descuento (10 días).</td>
                 </tr>
                 <tr>
                     <td style="color: var(--warning-amber);"><strong>Mora sin Aviso</strong></td>
-                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento[span_8](start_span)[span_8](end_span).</td>
-                    <td>Hasta 50% de interés acumulado[span_9](start_span)[span_9](end_span).</td>
+                    <td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento.</td>
+                    <td>Hasta 50% de interés acumulado.</td>
                 </tr>
                 <tr>
                     <td style="color: var(--danger-red);"><strong>Cancelación</strong></td>
-                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado[span_10](start_span)[span_10](end_span).</td>
-                    <td>20% sobre saldo pendiente[span_11](start_span)[span_11](end_span).</td>
+                    <td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td>
+                    <td>20% sobre saldo pendiente.</td>
                 </tr>
             </table>
         </div>
@@ -438,13 +439,13 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
             <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en tu mensualidad por cada nuevo cliente que concrete una compra[span_12](start_span)[span_12](end_span).</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en tu mensualidad por cada nuevo cliente que concrete una compra.</p>
             
             <ul class="terms-list">
-                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir un mínimo de dos (2) perfiles[span_13](start_span)[span_13](end_span).</li>
-                <li><strong>2. Permanencia:</strong> Mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos[span_14](start_span)[span_14](end_span).</li>
-                <li><strong>3. Aplicación:</strong> El descuento del 100% se aplicará en el cuarto mes, una vez validado el cumplimiento[span_15](start_span)[span_15](end_span).</li>
-                <li><strong>4. Restricción:</strong> El referidor debe mantener su cuenta activa y al corriente durante el proceso de validación[span_16](start_span)[span_16](end_span). Si el referido cancela antes de los 3 meses, el beneficio se anula[span_17](start_span)[span_17](end_span).</li>
+                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir un mínimo de dos (2) perfiles.</li>
+                <li><strong>2. Permanencia:</strong> Mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos.</li>
+                <li><strong>3. Aplicación:</strong> El descuento del 100% se aplicará en el cuarto mes, una vez validado el cumplimiento.</li>
+                <li><strong>4. Restricción:</strong> El referidor debe mantener su cuenta activa y al corriente durante el proceso de validación. Si el referido cancela antes de los 3 meses, el beneficio se anula.</li>
             </ul>
 
             <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank" style="margin-top: 10px;">Contactar Asesor →</a>
@@ -452,6 +453,31 @@
     </div>
 
     <script>
+        // Cargar alertas dinámicas desde clientes.json
+        async function cargarAlertasGlobales() {
+            try {
+                const response = await fetch('clientes.json', { cache: 'no-store' });
+                if (!response.ok) return;
+                
+                const data = await response.json();
+                const config = data._goxion_config;
+
+                if (config && config.alertas && config.alertas.activa) {
+                    const banner = document.getElementById('dynamic-alert');
+                    const content = document.getElementById('alert-content');
+                    
+                    const plataforma = config.alertas.plataforma || "Servicios";
+                    const falla = config.alertas.falla || "presentando intermitencias";
+                    const mensajeExtra = config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : '';
+
+                    content.innerHTML = `<strong>Aviso Técnico:</strong> El servicio de <strong>${plataforma}</strong> está ${falla}. Las demás plataformas operan con normalidad.${mensajeExtra}`;
+                    banner.style.display = 'flex';
+                }
+            } catch (e) {
+                console.log("Sin alertas globales activas o error de conexión.");
+            }
+        }
+
         // Lógica de Acordeones
         var acc = document.getElementsByClassName("accordion");
         for (var i = 0; i < acc.length; i++) {
@@ -522,6 +548,9 @@
             el.style.animationDelay = `${index * 0.08}s`;
             observer.observe(el);
         });
+
+        // Llamada a la función de alertas al cargar la página
+        cargarAlertasGlobales();
     </script>
 
 </body>
