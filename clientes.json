@@ -1,10 +1,59 @@
 {
+  "_goxion_config": {
+    "alertas": {
+      "activa": true,
+      "plataforma": "YouTube Premium",
+      "falla": "presentando intermitencias temporales",
+      "mensaje": ""
+    },
+    "serviciosGlobales": [
+      {
+        "nombre": "Netflix Premium",
+        "precio": 109
+      },
+      {
+        "nombre": "Disney+ Premium",
+        "precio": 89
+      },
+      {
+        "nombre": "Max Standard",
+        "precio": 79
+      },
+      {
+        "nombre": "Prime Video",
+        "precio": 39
+      },
+      {
+        "nombre": "YouTube Premium",
+        "precio": 89
+      },
+      {
+        "nombre": "Vix Premium",
+        "precio": 49
+      },
+      {
+        "nombre": "Crunchyroll Cuenta completa",
+        "precio": 45
+      },
+      {
+        "nombre": "Microsoft 365",
+        "precio": 79
+      },
+      {
+        "nombre": "Google One 2TB",
+        "precio": 29
+      }
+    ]
+  },
   "perla": {
     "folio": "GX-2026-0001",
     "nombre": "Perla",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "HBO Max Platino + Prime video", "monto": 99 }
+      {
+        "nombre": "HBO Max Platino + Prime video",
+        "monto": 99
+      }
     ]
   },
   "rodas": {
@@ -12,8 +61,14 @@
     "nombre": "Rodas",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "YouTube Premium", "monto": 89 },
-      { "nombre": "Microsoft 365", "monto": 79 }
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "Microsoft 365",
+        "monto": 79
+      }
     ]
   },
   "nayeli": {
@@ -21,7 +76,10 @@
     "nombre": "Nayeli",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Vix Premium (x2)", "monto": 98 }
+      {
+        "nombre": "Vix Premium (x2)",
+        "monto": 98
+      }
     ]
   },
   "laura": {
@@ -29,8 +87,14 @@
     "nombre": "Laura",
     "pagos_puntuales": 4,
     "servicios": [
-      { "nombre": "YouTube Premium (x2)", "monto": 178 },
-      { "nombre": "Microsoft 365", "monto": 79 }
+      {
+        "nombre": "YouTube Premium (x2)",
+        "monto": 178
+      },
+      {
+        "nombre": "Microsoft 365",
+        "monto": 79
+      }
     ]
   },
   "david": {
@@ -38,10 +102,22 @@
     "nombre": "David",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Netflix Premium", "monto": 109 },
-      { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "HBO Max Platino + Prime video", "monto": 99 },
-      { "nombre": "YouTube Premium", "monto": 89 }
+      {
+        "nombre": "Netflix Premium",
+        "monto": 109
+      },
+      {
+        "nombre": "Disney+ Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "HBO Max Platino + Prime video",
+        "monto": 99
+      },
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      }
     ]
   },
   "gabriel": {
@@ -49,8 +125,14 @@
     "nombre": "Gabriel",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Prime Video", "monto": 45 },
-      { "nombre": "YouTube Premium", "monto": 89 }
+      {
+        "nombre": "Prime Video",
+        "monto": 45
+      },
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      }
     ]
   },
   "jose": {
@@ -58,9 +140,18 @@
     "nombre": "José",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "YouTube Premium", "monto": 89 },
-      { "nombre": "Vix Premium (x2)", "monto": 98 },
-      { "nombre": "Crunchyroll Cuenta completa", "monto": 100 }
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "Vix Premium (x2)",
+        "monto": 98
+      },
+      {
+        "nombre": "Crunchyroll Cuenta completa",
+        "monto": 100
+      }
     ]
   },
   "fabiola": {
@@ -68,8 +159,14 @@
     "nombre": "Fabiola",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "HBO Max Platino", "monto": 79 }
+      {
+        "nombre": "Disney+ Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "HBO Max Platino",
+        "monto": 79
+      }
     ]
   },
   "jorge": {
@@ -77,10 +174,22 @@
     "nombre": "Jorge Mobo",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Netflix Premium", "monto": 109 },
-      { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "YouTube Premium", "monto": 89 },
-      { "nombre": "Google One 2TB", "monto": 29 }
+      {
+        "nombre": "Netflix Premium",
+        "monto": 109
+      },
+      {
+        "nombre": "Disney+ Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "Google One 2TB",
+        "monto": 29
+      }
     ]
   },
   "alondra": {
@@ -88,10 +197,22 @@
     "nombre": "Alondra",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Max Standard", "monto": 79 },
-      { "nombre": "YouTube Premium", "monto": 89 },
-      { "nombre": "Microsoft 365", "monto": 79 },
-      { "nombre": "Google One", "monto": 29 }
+      {
+        "nombre": "Max Standard",
+        "monto": 79
+      },
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "Microsoft 365",
+        "monto": 79
+      },
+      {
+        "nombre": "Google One",
+        "monto": 29
+      }
     ]
   },
   "luis": {
@@ -99,7 +220,10 @@
     "nombre": "Luis",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "YouTube Premium", "monto": 89 }
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      }
     ]
   },
   "samuel": {
@@ -107,9 +231,18 @@
     "nombre": "Samuel",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "YouTube Premium", "monto": 89 },
-      { "nombre": "Vix Premium", "monto": 49 }
+      {
+        "nombre": "Disney+ Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "Vix Premium",
+        "monto": 49
+      }
     ]
   },
   "prima-fernanda": {
@@ -117,7 +250,10 @@
     "nombre": "Prima Fernanda",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Disney+ (Promocional)", "monto": 59 }
+      {
+        "nombre": "Disney+ (Promocional)",
+        "monto": 59
+      }
     ]
   },
   "julian": {
@@ -125,8 +261,14 @@
     "nombre": "Julián",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "Vix Premium", "monto": 49 }
+      {
+        "nombre": "Disney+ Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "Vix Premium",
+        "monto": 49
+      }
     ]
   },
   "gabriel2": {
@@ -134,8 +276,14 @@
     "nombre": "Gabriel 2",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "YouTube Premium", "monto": 89 },
-      { "nombre": "Microsoft 365", "monto": 79 }
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "Microsoft 365",
+        "monto": 79
+      }
     ]
   },
   "juan-de-dios": {
@@ -143,9 +291,18 @@
     "nombre": "Juan de Dios",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Netflix Premium", "monto": 109 },
-      { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "HBO Max Platino", "monto": 79 }
+      {
+        "nombre": "Netflix Premium",
+        "monto": 109
+      },
+      {
+        "nombre": "Disney+ Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "HBO Max Platino",
+        "monto": 79
+      }
     ]
   },
   "rafael": {
@@ -153,8 +310,14 @@
     "nombre": "Rafael",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Netflix Premium", "monto": 99 },
-      { "nombre": "Disney+ (Especial)", "monto": 69 }
+      {
+        "nombre": "Netflix Premium",
+        "monto": 99
+      },
+      {
+        "nombre": "Disney+ (Especial)",
+        "monto": 69
+      }
     ]
   },
   "jeynner": {
@@ -162,7 +325,10 @@
     "nombre": "Jeynner",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "YouTube Premium", "monto": 89 }
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      }
     ]
   },
   "isamar": {
@@ -170,8 +336,14 @@
     "nombre": "Isamar",
     "pagos_puntuales": 0,
     "servicios": [
-      { "nombre": "Disney+ Premium", "monto": 89 },
-      { "nombre": "YouTube Premium", "monto": 89 }
+      {
+        "nombre": "Disney+ Premium",
+        "monto": 89
+      },
+      {
+        "nombre": "YouTube Premium",
+        "monto": 89
+      }
     ]
   }
 }
