@@ -3,477 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOXION - Soporte y Autogestión</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>GOXION // ADMIN SYSTEM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-black: #030305;
-            --card-bg: rgba(14, 14, 20, 0.75);
+            --bg-color: #030305;
+            --card-bg: #0a0a0f;
+            --neon-green: #00ff9d;
+            --neon-purple: #bc13fe;
+            --neon-red: #ff003c;
             --text-main: #ffffff;
-            --text-muted: #8a8f99;
-            --neon-blue: #00f2fe;
-            --neon-purple: #8a2be2;
-            --neon-magenta: #e026de;
-            --border-glow: rgba(138, 43, 226, 0.25);
-            --warning-amber: #ffaa00;
+            --text-muted: #8892b0;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-        
-        body { 
-            background-color: var(--bg-black); 
-            color: var(--text-main); 
-            line-height: 1.6; 
-            padding: 25px 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh;
-            position: relative;
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 20px;
             overflow-x: hidden;
         }
 
-        /* Líneas de neón curvas */
-        .neon-line-bg {
-            position: fixed;
-            top: -10%;
-            right: -20%;
-            width: 700px;
-            height: 900px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-bottom-color: var(--neon-purple);
-            border-left-color: var(--neon-blue);
-            box-shadow: 0 0 35px rgba(0, 242, 254, 0.4), inset 0 0 35px rgba(138, 43, 226, 0.4);
-            filter: drop-shadow(0 0 15px var(--neon-purple));
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
-        .neon-line-bg-2 {
-            position: fixed;
-            bottom: -20%;
-            left: -30%;
-            width: 800px;
-            height: 800px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            border-top-color: var(--neon-purple);
-            box-shadow: 0 0 40px rgba(138, 43, 226, 0.5);
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0.5;
-        }
-
-        .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
-
-        /* Header */
-        .header { text-align: center; margin-bottom: 30px; padding-top: 10px; }
-        .logo-img { max-width: 230px; height: auto; display: block; margin: 0 auto 15px auto; }
-        
-        .subtitle { 
-            color: var(--neon-blue); 
-            font-size: 13px; 
-            margin-top: 4px; 
-            text-transform: uppercase; 
-            letter-spacing: 2px; 
-            font-weight: 700; 
-        }
-
-        /* Banner de Alerta */
-        .alert-banner {
-            background: rgba(14, 14, 20, 0.85);
-            border: 1px solid rgba(255, 170, 0, 0.4);
-            border-radius: 14px;
-            padding: 16px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 15px rgba(255, 170, 0, 0.1);
-        }
-        .alert-icon { font-size: 20px; line-height: 1; }
-        .alert-text { font-size: 13px; color: #fff; }
-        .alert-text strong { color: var(--warning-amber); }
-
-        /* Títulos de Sección (Sin líneas decorativas) */
-        .section-title { 
-            font-size: 11px; 
-            text-transform: uppercase; 
-            letter-spacing: 2.5px; 
-            color: var(--text-muted); 
-            margin-bottom: 14px; 
-            font-weight: 700; 
-        }
-
-        /* Menú Principal */
-        .policy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 30px; }
-        .btn-menu {
-            background: var(--card-bg);
-            border: 1px solid var(--border-glow);
-            border-radius: 16px;
-            padding: 20px 15px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-main);
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-menu:hover { 
-            border-color: var(--neon-blue); 
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
-            transform: translateY(-2px);
-        }
-        .btn-menu span { font-size: 26px; }
-        .btn-menu div { font-weight: 600; font-size: 13px; }
-
-        /* Acordeones */
-        .accordion {
-            background: var(--card-bg);
-            color: var(--text-main);
-            cursor: pointer;
-            padding: 16px 20px;
-            width: 100%;
-            border: 1px solid var(--border-glow);
-            text-align: left;
-            outline: none;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            border-radius: 14px;
-            margin-bottom: 12px;
+        /* --- HEADER --- */
+        header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-bottom: 1px solid var(--neon-purple);
+            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2);
+            margin-bottom: 30px;
+            border-radius: 8px;
+            background: rgba(10, 10, 15, 0.8);
         }
-        .accordion:hover { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 242, 254, 0.15); }
-        .accordion.active { 
-            border-color: var(--neon-blue); 
-            border-bottom-left-radius: 0; 
-            border-bottom-right-radius: 0; 
-            margin-bottom: 0; 
-            border-bottom: none; 
-        }
-        
-        .panel {
-            padding: 0 20px;
-            background: rgba(8, 8, 12, 0.95);
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease;
-            border: 1px solid var(--neon-blue);
-            border-top: none;
-            border-bottom-left-radius: 14px;
-            border-bottom-right-radius: 14px;
-            margin-bottom: 12px;
-        }
-        .panel p { padding: 16px 0; color: var(--text-muted); font-size: 13px; line-height: 1.6; }
 
-        /* Botones Neón */
-        .btn { 
-            width: 100%; 
-            padding: 13px; 
-            border-radius: 30px; 
-            border: 1px solid var(--neon-blue); 
-            font-weight: 600; 
-            font-size: 13px; 
-            cursor: pointer; 
-            transition: all 0.3s ease; 
-            display: block; 
-            text-align: center; 
-            text-decoration: none; 
-            margin-bottom: 16px; 
+        .logo-area h1 {
+            font-size: 1.8rem;
+            text-shadow: 0 0 10px var(--neon-purple);
+            letter-spacing: 2px;
+        }
+
+        .status {
+            color: var(--neon-green);
+            font-weight: 600;
+            text-shadow: 0 0 8px var(--neon-green);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-green);
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn-save {
             background: transparent;
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-save:hover {
+            background: var(--neon-green);
+            color: var(--bg-color);
+            box-shadow: 0 0 15px var(--neon-green);
+        }
+
+        /* --- SECTIONS --- */
+        .section-title {
+            color: var(--neon-purple);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid var(--neon-purple);
+            padding-left: 10px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* --- MODULE A: ALERTS --- */
+        .panel {
+            background-color: var(--card-bg);
+            border: 1px solid rgba(188, 19, 254, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .switch-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        /* Toggle Switch Cyberpunk */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 24px;
+            border: 1px solid #555;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px; width: 16px;
+            left: 4px; bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: transparent;
+            border-color: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red) inset;
+        }
+        input:checked + .slider:before {
+            transform: translateX(24px);
+            background-color: var(--neon-red);
+            box-shadow: 0 0 10px var(--neon-red);
+        }
+
+        .textarea-alert {
+            width: 100%;
+            background: #111;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 4px;
+            resize: vertical;
+            min-height: 80px;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .textarea-alert:focus {
+            outline: none;
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+        }
+
+        /* --- MODULE B: CLIENTS --- */
+        .search-bar {
+            width: 100%;
+            background: #111;
+            border: 1px solid var(--neon-green);
+            color: var(--neon-green);
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        .search-bar:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.3);
+        }
+
+        .client-card {
+            background: linear-gradient(145deg, #0f0f16, #0a0a0f);
+            border-left: 3px solid var(--neon-green);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .client-info h3 { color: var(--neon-green); margin-bottom: 5px; }
+        .client-info p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .client-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .loyalty-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1a1a24;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .loyalty-btn {
+            background: transparent;
+            border: 1px solid var(--text-muted);
+            color: var(--text-main);
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .loyalty-btn:hover { border-color: var(--neon-green); color: var(--neon-green); }
+
+        select.status-dropdown {
+            background: #111;
+            color: var(--text-main);
+            border: 1px solid #555;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-copy {
+            background: transparent;
+            border: 1px solid var(--neon-purple);
+            color: var(--neon-purple);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-copy:hover {
+            background: var(--neon-purple);
             color: #fff;
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2);
-        }
-        .btn-primary:hover { 
-            background: var(--neon-blue); 
-            color: #000; 
-            box-shadow: 0 0 25px rgba(0, 242, 254, 0.6); 
-            transform: translateY(-1px);
-        }
-        
-        .btn-wa { 
-            border-color: var(--neon-purple); 
-            box-shadow: 0 0 15px rgba(138, 43, 226, 0.25);
-            color: #fff;
-        }
-        .btn-wa:hover { 
-            background: var(--neon-purple); 
-            box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
-            transform: translateY(-1px);
+            box-shadow: 0 0 10px var(--neon-purple);
         }
 
-        /* Modales */
-        .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            background-color: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px);
-            align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; padding: 20px;
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 157, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); }
         }
-        .modal.show { display: flex; opacity: 1; }
-        .modal-content {
-            background: #0d0d14; 
-            border: 1px solid var(--neon-purple); 
-            border-radius: 20px;
-            width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative;
-            box-shadow: 0 0 35px rgba(138, 43, 226, 0.3);
-        }
-        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 22px; font-weight: bold; cursor: pointer; }
-        .close-btn:hover { color: var(--neon-blue); }
-        .modal-title { color: #fff; margin-bottom: 18px; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border-glow); padding-bottom: 8px; }
-
-        /* Input */
-        .input-group { margin-bottom: 20px; }
-        .input-box { 
-            width: 100%; 
-            padding: 14px; 
-            border-radius: 12px; 
-            border: 1px solid var(--border-glow); 
-            background-color: #050508; 
-            color: var(--text-main); 
-            font-size: 14px; 
-            outline: none; 
-            transition: all 0.3s; 
-        }
-        .input-box:focus { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
-
-        /* Tablas */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 13px; }
-        th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.08); }
-        th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-
-        /* Footer */
-        .footer-info { text-align: center; margin-top: 45px; padding-top: 20px; border-top: 1px solid var(--border-glow); }
-        .schedule { 
-            display: inline-block; 
-            background: var(--card-bg); 
-            border: 1px solid var(--border-glow); 
-            border-radius: 30px; 
-            padding: 10px 22px; 
-            margin-bottom: 18px; 
-        }
-        .schedule-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; }
-        .schedule-time { font-size: 12px; color: var(--neon-blue); font-weight: 600; }
-        
-        .copyright { font-size: 12px; color: var(--text-muted); }
-
-        @media (max-width: 480px) { .policy-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; } }
     </style>
 </head>
 <body>
 
-    <!-- Curvas de Neón -->
-    <div class="neon-line-bg"></div>
-    <div class="neon-line-bg-2"></div>
-
-    <div class="container">
-        
-        <header class="header">
-            <img src="logo.png" alt="GOXION" class="logo-img" onerror="this.style.display='none'">
-            <div class="subtitle">Soporte y Autogestión</div>
-        </header>
-
-        <!-- AVISO DE ESTADO DE SERVICIO -->
-        <div class="alert-banner">
-            <span class="alert-icon">⚠️</span>
-            <div class="alert-text">
-                <strong>Aviso Técnico:</strong> El servicio de <strong>YouTube Premium</strong> está presentando intermitencias temporales. Las demás plataformas operan con normalidad. Estamos trabajando en ello.
-            </div>
+    <header>
+        <div class="logo-area">
+            <h1>GOXION // ADMIN</h1>
         </div>
-
-        <div class="section-title">Accesos Rápidos</div>
-        <div class="policy-grid">
-            <div class="btn-menu" onclick="openModal('modal-login')">
-                <span>📊</span>
-                <div>Mi Estado de Cuenta</div>
-            </div>
-            <div class="btn-menu" onclick="openModal('modal-lealtad')">
-                <span>⭐</span>
-                <div>Niveles de Lealtad</div>
-            </div>
-            <div class="btn-menu" onclick="openModal('modal-terminos')">
-                <span>📄</span>
-                <div>Términos de Uso</div>
-            </div>
-            <div class="btn-menu" onclick="openModal('modal-garantia')">
-                <span>🛡️</span>
-                <div>Garantías y Reglas</div>
-            </div>
+        <div class="status">
+            <div class="status-dot"></div> ONLINE
         </div>
+        <button class="btn-save" onclick="alert('En la Fase 2, esto enviará los datos a tu GitHub.')">Guardar Cambios</button>
+    </header>
 
-        <div class="section-title">Soluciones Frecuentes</div>
-        
-        <button class="accordion">Inicio de sesión y Códigos PIN</button>
+    <div class="grid-container">
+        <!-- MODULE A: ALERTS -->
         <div class="panel">
-            <p>Si la plataforma te solicita un código de acceso o PIN de verificación para iniciar sesión, no tienes que esperar. Solicítalo de manera inmediata y automatizada a nuestro chat.</p>
-            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20solicito%20código%20de%20acceso." class="btn btn-primary" target="_blank">Solicitar Código Ahora →</a>
-        </div>
-
-        <button class="accordion">Restricciones de Hogar o Viaje</button>
-        <div class="panel">
-            <p>Si plataformas como Netflix o Disney te muestran el mensaje "Tu TV no es parte del Hogar", selecciona en tu pantalla la opción de "Actualizar Hogar", "Estoy de viaje" o solicita el código por correo. Envíanos captura y lo autorizamos al instante.</p>
-            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20mi%20pantalla%20pide%20actualizar%20el%20hogar/viaje." class="btn btn-primary" target="_blank">Autorizar Dispositivo →</a>
-        </div>
-
-        <button class="accordion">🎁 Programa de Referidos (Mes Gratis)</button>
-        <div class="panel">
-            <p><strong>¡Gana un mes completamente gratis!</strong> Recomienda GOXION con un amigo o familiar. Si ellos contratan uno de nuestros servicios y mencionan tu nombre o ID de cliente al momento de su compra, tu próximo mes será descontado al 100%. ¡No hay límite de referidos!</p>
-            <a href="https://wa.me/529613535659?text=Hola%20Goxion,%20tengo%20una%20duda%20sobre%20el%20programa%20de%20referidos." class="btn btn-primary" target="_blank">Preguntar Detalles →</a>
-        </div>
-
-        <button class="accordion">Reportar una falla técnica</button>
-        <div class="panel">
-            <p>¿Perdiste el acceso o la cuenta presenta un error inusual? Envíanos una captura clara del problema. Revisaremos tu caso aplicando nuestra Política de Garantía y Trato Justo.</p>
-            <a href="https://wa.me/529613535659?text=REPORTE%20DE%20FALLA%20-%20Goxion.%0A%0AServicio:%20%0ADetalle%20del%20problema:%20" class="btn btn-wa" target="_blank">⚠️ Reportar Problema</a>
-        </div>
-
-        <!-- Footer y Horarios -->
-        <div class="footer-info">
-            <div class="schedule">
-                <div class="schedule-title">🕒 Horario de Atención en WhatsApp</div>
-                <div class="schedule-time">Lunes a Sábado • 10:00 AM - 8:00 PM</div>
+            <h2 class="section-title">Alertas Globales (Ayuda)</h2>
+            
+            <div class="switch-row">
+                <span>Falla en YouTube Premium</span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <div class="copyright">
-                Para emergencias fuera de horario, deja tu mensaje y será el primero en atenderse al abrir sistema.<br><br>
-                © 2026 GOXION. Todos los derechos reservados.
+
+            <div class="switch-row">
+                <span>Falla en Netflix</span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider"></span>
+                </label>
             </div>
-        </div>
 
-    </div>
-
-    <!-- MODALES -->
-    <div id="modal-login" class="modal">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <span class="close-btn" onclick="closeModal('modal-login')">&times;</span>
-            <div class="modal-title">Consultar Estado de Cuenta</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">Ingresa el nombre o ID con el que te registraste en GOXION.</p>
-            <div class="input-group">
-                <input type="text" id="input-cliente" class="input-box" placeholder="Ej: laura o jorge">
+            <div class="switch-row">
+                <span>Mensaje / Nota Global</span>
             </div>
-            <button class="btn btn-primary" onclick="buscarCliente()">Buscar mi cuenta →</button>
+            <textarea class="textarea-alert" placeholder="Ej: Mantenimiento programado a las 2:00 AM..."></textarea>
         </div>
-    </div>
 
-    <div id="modal-lealtad" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
-            <div class="modal-title">Programa de Fidelidad</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén descuentos permanentes.</p>
-            <table>
-                <tr>
-                    <th>Nivel</th>
-                    <th>Meta</th>
-                    <th>Beneficio</th>
-                </tr>
-                <tr>
-                    <td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td>
-                    <td>4 Pagos Seguidos</td>
-                    <td>3% OFF</td>
-                </tr>
-                <tr>
-                    <td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td>
-                    <td>9 Pagos Seguidos</td>
-                    <td>6% OFF</td>
-                </tr>
-            </table>
-            <p style="color: var(--warning-amber); font-size: 12px; margin-top: 15px;">
-                ⚠️ <strong>Importante:</strong> Un pago atrasado reinicia tu racha a cero.
-            </p>
-        </div>
-    </div>
+        <!-- MODULE B: CLIENTS -->
+        <div class="panel">
+            <h2 class="section-title">Gestión de Cuentas (Index)</h2>
+            <input type="text" class="search-bar" placeholder="Buscar cliente por nombre o ID (Ej: GX-101)...">
 
-    <div id="modal-terminos" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
-            <div class="modal-title">Términos y Condiciones</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;"><strong>1. Uso de Cuenta:</strong> Los accesos son estrictamente personales. Queda prohibida la reventa, alteración de perfiles o compartir contraseñas. El incumplimiento causará la baja inmediata sin reembolso.</p>
-            <p style="color: var(--text-muted); font-size: 13px;"><strong>2. Fechas de Pago:</strong> Tu fecha de corte es el mismo día en que contrataste. Si prevés un retraso, notifícanos antes de la fecha límite para evitar cortes del servicio o recargos.</p>
-        </div>
-    </div>
+            <!-- Client Card 1 -->
+            <div class="client-card">
+                <div class="client-info">
+                    <h3>[GX-101] Carlos Pérez</h3>
+                    <p>Servicios: YouTube Premium</p>
+                    <p>WhatsApp: 529991234567</p>
+                </div>
+                
+                <div class="client-controls">
+                    <div class="loyalty-control">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Meses:</span>
+                        <button class="loyalty-btn" onclick="updateMonths('gx101', -1)">-</button>
+                        <span id="months-gx101" style="font-weight: bold; width: 20px; text-align: center;">4</span>
+                        <button class="loyalty-btn" onclick="updateMonths('gx101', 1)">+</button>
+                    </div>
 
-    <div id="modal-garantia" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
-            <div class="modal-title">Política de Garantía y Trato Justo</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Compensaciones aplicables por fallas técnicas ajenas al usuario:</p>
-            <table>
-                <tr>
-                    <th>Evento</th>
-                    <th>Compensación / Penalización</th>
-                </tr>
-                <tr>
-                    <td>Falla de Servicio</td>
-                    <td>5% de descuento por cada día completo inactivo (hasta 50%).</td>
-                </tr>
-                <tr>
-                    <td>Atraso en Pago</td>
-                    <td>5% de recargo diario sin previo aviso.</td>
-                </tr>
-            </table>
+                    <select class="status-dropdown">
+                        <option value="activo" selected>Al día</option>
+                        <option value="vencer">Por vencer</option>
+                        <option value="inactivo">Suspendido</option>
+                    </select>
+
+                    <button class="btn-copy" onclick="alert('Ficha copiada al portapapeles (Simulación)')">Copiar Ficha</button>
+                </div>
+            </div>
+
+            <!-- Client Card 2 -->
+            <div class="client-card">
+                <div class="client-info">
+                    <h3>[GX-102] Ana Gómez</h3>
+                    <p>Servicios: Netflix Premium</p>
+                    <p>WhatsApp: 529997654321</p>
+                </div>
+                
+                <div class="client-controls">
+                    <div class="loyalty-control">
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Meses:</span>
+                        <button class="loyalty-btn" onclick="updateMonths('gx102', -1)">-</button>
+                        <span id="months-gx102" style="font-weight: bold; width: 20px; text-align: center;">9</span>
+                        <button class="loyalty-btn" onclick="updateMonths('gx102', 1)">+</button>
+                    </div>
+
+                    <select class="status-dropdown">
+                        <option value="activo">Al día</option>
+                        <option value="vencer" selected>Por vencer</option>
+                        <option value="inactivo">Suspendido</option>
+                    </select>
+
+                    <button class="btn-copy" onclick="alert('Ficha copiada al portapapeles (Simulación)')">Copiar Ficha</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
     <script>
-        var acc = document.getElementsByClassName("accordion");
-        for (var i = 0; i < acc.length; i++) {
-            acc[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var panel = this.nextElementSibling;
-                if (panel.style.maxHeight) {
-                    panel.style.maxHeight = null;
-                    panel.style.paddingTop = "0";
-                    panel.style.paddingBottom = "0";
-                } else {
-                    panel.style.maxHeight = panel.scrollHeight + 50 + "px";
-                    panel.style.paddingTop = "10px";
-                    panel.style.paddingBottom = "16px";
-                } 
-            });
+        // Función rápida solo para probar visualmente el cambio de meses en la interfaz
+        function updateMonths(clientId, change) {
+            const monthElement = document.getElementById(`months-${clientId}`);
+            let currentMonths = parseInt(monthElement.innerText);
+            let newMonths = currentMonths + change;
+            
+            // Evitamos que baje de 0
+            if(newMonths < 0) newMonths = 0; 
+            
+            monthElement.innerText = newMonths;
         }
-
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('show');
-            document.body.style.overflow = 'hidden'; 
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
-            document.body.style.overflow = 'auto';
-        }
-
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.classList.remove('show');
-                document.body.style.overflow = 'auto';
-            }
-        }
-
-        function buscarCliente() {
-            var inputValor = document.getElementById('input-cliente').value.trim();
-            if (inputValor === "") {
-                alert("Por favor, ingresa tu identificador.");
-                return;
-            }
-            window.location.href = 'index.html?cliente=' + encodeURIComponent(inputValor);
-        }
-
-        document.getElementById('input-cliente').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                buscarCliente();
-            }
-        });
     </script>
-
 </body>
 </html>
