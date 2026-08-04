@@ -41,6 +41,8 @@
             margin-bottom: 30px;
             border-radius: 8px;
             background: rgba(10, 10, 15, 0.8);
+            flex-wrap: wrap; /* Permite que los elementos bajen si no caben */
+            gap: 15px;
         }
 
         .logo-area h1 {
@@ -86,6 +88,27 @@
             box-shadow: 0 0 15px var(--neon-green);
         }
 
+        /* --- RESPONSIVE MOBILE FIXES --- */
+        @media (max-width: 650px) {
+            header {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px;
+            }
+            .btn-save {
+                width: 100%;
+                padding: 15px;
+            }
+            .client-controls {
+                flex-direction: column;
+                width: 100%;
+                align-items: stretch;
+            }
+            .loyalty-control {
+                justify-content: space-between;
+            }
+        }
+
         /* --- SECTIONS --- */
         .section-title {
             color: var(--neon-purple);
@@ -109,16 +132,16 @@
             }
         }
 
-        /* --- MODULE A: ALERTS --- */
         .panel {
             background-color: var(--card-bg);
             border: 1px solid rgba(188, 19, 254, 0.3);
             border-radius: 8px;
             padding: 20px;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            margin-bottom: 30px;
         }
 
-        .switch-row {
+        .switch-row, .price-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -164,26 +187,39 @@
             box-shadow: 0 0 10px var(--neon-red);
         }
 
-        .textarea-alert {
-            width: 100%;
+        /* --- MODULE: PRICES --- */
+        .price-input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
             background: #111;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-main);
-            padding: 10px;
+            padding: 5px 10px;
+            border: 1px solid rgba(188, 19, 254, 0.5);
             border-radius: 4px;
-            resize: vertical;
-            min-height: 80px;
-            margin-top: 10px;
-            font-size: 1rem;
+            transition: 0.3s;
         }
-
-        .textarea-alert:focus {
-            outline: none;
+        .price-input-group:focus-within {
             border-color: var(--neon-purple);
-            box-shadow: 0 0 10px rgba(188, 19, 254, 0.3);
+            box-shadow: 0 0 10px rgba(188, 19, 254, 0.4);
+        }
+        .price-input {
+            background: transparent;
+            border: none;
+            color: var(--neon-green);
+            font-size: 1.1rem;
+            font-weight: bold;
+            width: 50px;
+            text-align: right;
+            outline: none;
+        }
+        /* Esconder las flechas de los números */
+        .price-input::-webkit-outer-spin-button,
+        .price-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
-        /* --- MODULE B: CLIENTS --- */
+        /* --- MODULE: CLIENTS --- */
         .search-bar {
             width: 100%;
             background: #111;
@@ -249,6 +285,7 @@
             padding: 8px;
             border-radius: 4px;
             cursor: pointer;
+            width: 100%;
         }
 
         .btn-copy {
@@ -259,6 +296,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: 0.3s;
+            width: 100%;
         }
         .btn-copy:hover {
             background: var(--neon-purple);
@@ -286,35 +324,59 @@
     </header>
 
     <div class="grid-container">
-        <!-- MODULE A: ALERTS -->
-        <div class="panel">
-            <h2 class="section-title">Alertas Globales (Ayuda)</h2>
-            
-            <div class="switch-row">
-                <span>Falla en YouTube Premium</span>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
+        <!-- COLUMNA IZQUIERDA: Alertas y Precios -->
+        <div>
+            <!-- MODULE A: ALERTS -->
+            <div class="panel">
+                <h2 class="section-title">Alertas (Ayuda)</h2>
+                
+                <div class="switch-row">
+                    <span>Falla en YouTube Premium</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="switch-row">
+                    <span>Falla en Netflix</span>
+                    <label class="switch">
+                        <input type="checkbox">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="switch-row" style="border:none; padding:0; margin:0;">
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">Mensaje / Nota Global</span>
+                </div>
+                <textarea class="textarea-alert" style="width: 100%; background: #111; border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-main); padding: 10px; border-radius: 4px; margin-top: 10px;" placeholder="Ej: Mantenimiento programado a las 2:00 AM..."></textarea>
             </div>
 
-            <div class="switch-row">
-                <span>Falla en Netflix</span>
-                <label class="switch">
-                    <input type="checkbox">
-                    <span class="slider"></span>
-                </label>
-            </div>
+            <!-- MODULE C: PRECIOS -->
+            <div class="panel">
+                <h2 class="section-title">Precios Base ($)</h2>
+                
+                <div class="price-row">
+                    <span>YouTube Premium</span>
+                    <div class="price-input-group">
+                        <span style="color:var(--neon-green)">$</span>
+                        <input type="number" value="49" class="price-input">
+                    </div>
+                </div>
 
-            <div class="switch-row">
-                <span>Mensaje / Nota Global</span>
+                <div class="price-row">
+                    <span>Netflix</span>
+                    <div class="price-input-group">
+                        <span style="color:var(--neon-green)">$</span>
+                        <input type="number" value="109" class="price-input">
+                    </div>
+                </div>
             </div>
-            <textarea class="textarea-alert" placeholder="Ej: Mantenimiento programado a las 2:00 AM..."></textarea>
         </div>
 
-        <!-- MODULE B: CLIENTS -->
+        <!-- COLUMNA DERECHA: MODULE B: CLIENTS -->
         <div class="panel">
-            <h2 class="section-title">Gestión de Cuentas (Index)</h2>
+            <h2 class="section-title">Gestión de Cuentas</h2>
             <input type="text" class="search-bar" placeholder="Buscar cliente por nombre o ID (Ej: GX-101)...">
 
             <!-- Client Card 1 -->
@@ -329,7 +391,7 @@
                     <div class="loyalty-control">
                         <span style="font-size: 0.8rem; color: var(--text-muted);">Meses:</span>
                         <button class="loyalty-btn" onclick="updateMonths('gx101', -1)">-</button>
-                        <span id="months-gx101" style="font-weight: bold; width: 20px; text-align: center;">4</span>
+                        <span id="months-gx101" style="font-weight: bold; width: 20px; text-align: center; color: var(--neon-green);">4</span>
                         <button class="loyalty-btn" onclick="updateMonths('gx101', 1)">+</button>
                     </div>
 
@@ -355,7 +417,7 @@
                     <div class="loyalty-control">
                         <span style="font-size: 0.8rem; color: var(--text-muted);">Meses:</span>
                         <button class="loyalty-btn" onclick="updateMonths('gx102', -1)">-</button>
-                        <span id="months-gx102" style="font-weight: bold; width: 20px; text-align: center;">9</span>
+                        <span id="months-gx102" style="font-weight: bold; width: 20px; text-align: center; color: var(--neon-green);">9</span>
                         <button class="loyalty-btn" onclick="updateMonths('gx102', 1)">+</button>
                     </div>
 
