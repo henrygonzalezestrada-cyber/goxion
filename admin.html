@@ -27,13 +27,17 @@
             border-radius: 8px; background: rgba(10, 10, 15, 0.8); gap: 10px;
         }
         .logo-area h1 { font-size: 1.4rem; text-shadow: 0 0 10px var(--neon-purple); letter-spacing: 2px; }
+        .header-actions { display: flex; gap: 8px; align-items: center; }
         .status { color: var(--neon-green); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
         .status-dot { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; animation: pulse 1.5s infinite; }
         .btn-save { background: transparent; color: var(--neon-green); border: 1px solid var(--neon-green); padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
+        .btn-save:hover { background: var(--neon-green); color: #000; }
+        .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
+        .btn-logout:hover { background: var(--neon-red); color: #fff; }
 
-        @media (max-width: 500px) {
+        @media (max-width: 600px) {
             header { flex-wrap: wrap; }
-            .btn-save { width: 100%; margin-top: 5px; }
+            .header-actions { width: 100%; justify-content: space-between; margin-top: 5px; }
         }
 
         /* --- SECTIONS & PANELS --- */
@@ -43,7 +47,7 @@
         
         .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
         
-        /* Swtiches & Inputs */
+        /* Switches & Inputs */
         .switch-row, .price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -57,7 +61,7 @@
 
         .search-bar { width: 100%; background: #111; border: 1px solid var(--neon-green); color: var(--neon-green); padding: 8px; border-radius: 4px; margin-bottom: 12px; font-size: 0.9rem; }
 
-        /* --- CLIENT CARD (OPTIMIZADO PARA MÓVIL) --- */
+        /* --- CLIENT CARD --- */
         .client-card {
             background: linear-gradient(145deg, #0f0f16, #0a0a0f);
             border-left: 3px solid var(--neon-green);
@@ -65,18 +69,11 @@
             display: flex; flex-direction: column; gap: 8px;
         }
 
-        .card-header-row {
-            display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
-        }
-
+        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
         .client-info h3 { color: var(--neon-green); font-size: 1rem; }
         .client-info p { color: var(--text-muted); font-size: 0.8rem; }
 
-        /* Controles horizontales compactos */
-        .card-actions-row {
-            display: flex; gap: 6px; align-items: center; width: 100%;
-        }
-
+        .card-actions-row { display: flex; gap: 6px; align-items: center; width: 100%; }
         .loyalty-control { display: flex; align-items: center; gap: 4px; background: #1a1a24; padding: 3px 6px; border-radius: 4px; }
         .loyalty-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
 
@@ -94,7 +91,10 @@
     <header>
         <div class="logo-area"><h1>GOXION // ADMIN</h1></div>
         <div class="status"><div class="status-dot"></div> ONLINE</div>
-        <button class="btn-save">Guardar Cambios</button>
+        <div class="header-actions">
+            <button class="btn-save" onclick="prepararYGuardar()">Guardar Cambios</button>
+            <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
+        </div>
     </header>
 
     <div class="grid-container">
@@ -105,13 +105,13 @@
                 <h2 class="section-title">Alertas (Ayuda)</h2>
                 <div class="switch-row">
                     <span style="font-size: 0.85rem;">Falla YouTube Prem.</span>
-                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                    <label class="switch"><input type="checkbox" id="alert-yt"><span class="slider"></span></label>
                 </div>
                 <div class="switch-row">
                     <span style="font-size: 0.85rem;">Falla Netflix</span>
-                    <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+                    <label class="switch"><input type="checkbox" id="alert-ntf"><span class="slider"></span></label>
                 </div>
-                <textarea style="width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; margin-top: 4px; font-size: 0.8rem;" placeholder="Mensaje Global..."></textarea>
+                <textarea id="global-msg" style="width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; margin-top: 4px; font-size: 0.8rem;" placeholder="Mensaje Global..."></textarea>
             </div>
 
             <!-- PRECIOS -->
@@ -120,13 +120,15 @@
                 <div class="price-row">
                     <span style="font-size: 0.85rem;">YouTube Prem.</span>
                     <div class="price-input-group">
-                        <span style="color:var(--neon-green); font-size:0.8rem;">$</span><input type="number" value="49">
+                        <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
+                        <input type="number" id="price-yt" value="49">
                     </div>
                 </div>
                 <div class="price-row">
                     <span style="font-size: 0.85rem;">Netflix</span>
                     <div class="price-input-group">
-                        <span style="color:var(--neon-green); font-size:0.8rem;">$</span><input type="number" value="109">
+                        <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
+                        <input type="number" id="price-ntf" value="109">
                     </div>
                 </div>
             </div>
@@ -135,84 +137,213 @@
         <!-- COLUMNA DERECHA: CLIENTES -->
         <div class="panel">
             <h2 class="section-title">Gestión de Cuentas</h2>
-            <input type="text" class="search-bar" placeholder="Buscar cliente...">
+            <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o ID..." oninput="filtrarClientes()">
 
-            <!-- Client Card 1 -->
-            <div class="client-card">
-                <div class="card-header-row">
-                    <div class="client-info">
-                        <h3>[GX-101] Carlos Pérez</h3>
-                        <p>YouTube Premium</p>
-                    </div>
-                </div>
-
-                <!-- Campo Día de Pago -->
-                <div class="date-input-group">
-                    <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap;">Día pago:</span>
-                    <input type="text" value="15 de cada mes" placeholder="Ej: 15 y 20">
-                </div>
-
-                <!-- Fila de Acciones/Botones organizada horizontalmente -->
-                <div class="card-actions-row">
-                    <div class="loyalty-control">
-                        <button class="loyalty-btn" onclick="updateMonths('gx101', -1)">-</button>
-                        <span id="months-gx101" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">4</span>
-                        <button class="loyalty-btn" onclick="updateMonths('gx101', 1)">+</button>
-                    </div>
-
-                    <select class="status-dropdown">
-                        <option value="activo" selected>Al día</option>
-                        <option value="vencer">Por vencer</option>
-                        <option value="inactivo">Suspendido</option>
-                    </select>
-
-                    <button class="btn-copy">Copiar</button>
-                </div>
+            <!-- Contenedor dinámico de clientes -->
+            <div id="clients-container">
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando clientes desde GitHub...</p>
             </div>
-
-            <!-- Client Card 2 -->
-            <div class="client-card">
-                <div class="card-header-row">
-                    <div class="client-info">
-                        <h3>[GX-102] Ana Gómez</h3>
-                        <p>Netflix Premium, Disney+</p>
-                    </div>
-                </div>
-
-                <!-- Campo Día de Pago -->
-                <div class="date-input-group">
-                    <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap;">Día pago:</span>
-                    <input type="text" value="Día 15 (NTF) y 22 (DSN)" placeholder="Ej: 15 y 20">
-                </div>
-
-                <!-- Fila de Acciones/Botones organizada horizontalmente -->
-                <div class="card-actions-row">
-                    <div class="loyalty-control">
-                        <button class="loyalty-btn" onclick="updateMonths('gx102', -1)">-</button>
-                        <span id="months-gx102" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">0</span>
-                        <button class="loyalty-btn" onclick="updateMonths('gx102', 1)">+</button>
-                    </div>
-
-                    <select class="status-dropdown">
-                        <option value="activo">Al día</option>
-                        <option value="vencer" selected>Por vencer</option>
-                        <option value="inactivo">Suspendido</option>
-                    </select>
-
-                    <button class="btn-copy">Copiar</button>
-                </div>
-            </div>
-
         </div>
     </div>
 
     <script>
-        function updateMonths(clientId, change) {
-            const monthElement = document.getElementById(`months-${clientId}`);
-            let newMonths = parseInt(monthElement.innerText) + change;
-            if(newMonths < 0) newMonths = 0; 
-            monthElement.innerText = newMonths;
+    // CONFIGURACIÓN DEL REPOSITORIO
+    const CONFIG = {
+        username: "henrygonzalezestrada-cyber",
+        repo: "goxion",
+        path: "clientes.json",
+        branch: "main"
+    };
+
+    let currentToken = localStorage.getItem("GOXION_PAT") || "";
+    let currentFileData = null; 
+    let clientesLista = []; // Copia local para manipulaciones rápidas
+
+    // --- 1. AUTENTICACIÓN Y LOGIN ---
+    document.addEventListener("DOMContentLoaded", () => {
+        if (!currentToken) {
+            pedirToken();
+        } else {
+            inicializarPanel();
         }
+    });
+
+    function pedirToken() {
+        const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token de GitHub:");
+        if (userToken && userToken.trim() !== "") {
+            currentToken = userToken.trim();
+            localStorage.setItem("GOXION_PAT", currentToken);
+            inicializarPanel();
+        } else {
+            alert("Acceso denegado. Se requiere Token para administrar la plataforma.");
+        }
+    }
+
+    function cerrarSesion() {
+        localStorage.removeItem("GOXION_PAT");
+        currentToken = "";
+        alert("Sesión cerrada correctamente.");
+        location.reload();
+    }
+
+    // --- 2. CONEXIÓN API GITHUB (LEER) ---
+    async function inicializarPanel() {
+        const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
+        
+        try {
+            const response = await fetch(url, {
+                headers: {
+                    "Authorization": `token ${currentToken}`,
+                    "Accept": "application/vnd.github.v3+json"
+                }
+            });
+
+            if (response.status === 401) {
+                alert("El Token ingresado no es válido o ha expirado.");
+                cerrarSesion();
+                return;
+            }
+
+            const data = await response.json();
+            const contentDecoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+            const jsonCompleto = JSON.parse(contentDecoded);
+            
+            currentFileData = {
+                sha: data.sha,
+                raw: jsonCompleto
+            };
+
+            // Extraer clientes si existe en el JSON o adaptar al formato
+            clientesLista = Array.isArray(jsonCompleto) ? jsonCompleto : (jsonCompleto.clientes || []);
+
+            renderizarClientes(clientesLista);
+
+        } catch (error) {
+            console.error("Error al conectar con GitHub:", error);
+            alert("Ocurrió un error al cargar la base de datos de GitHub.");
+        }
+    }
+
+    // --- 3. RENDERIZADO DINÁMICO ---
+    function renderizarClientes(lista) {
+        const container = document.getElementById("clients-container");
+        container.innerHTML = "";
+
+        if (lista.length === 0) {
+            container.innerHTML = `<p style="color: var(--text-muted);">No se encontraron clientes.</p>`;
+            return;
+        }
+
+        lista.forEach((cliente, index) => {
+            const card = document.createElement("div");
+            card.className = "client-card";
+            card.innerHTML = `
+                <div class="card-header-row">
+                    <div class="client-info">
+                        <h3>[${cliente.id || 'GX-' + (100 + index)}] ${cliente.nombre}</h3>
+                        <p>${cliente.servicio || 'Servicio Activo'}</p>
+                    </div>
+                </div>
+
+                <div class="date-input-group">
+                    <span style="color: var(--text-muted); font-size: 0.75rem; white-space: nowrap;">Día pago:</span>
+                    <input type="text" value="${cliente.dia_pago || ''}" onchange="actualizarCliente(${index}, 'dia_pago', this.value)">
+                </div>
+
+                <div class="card-actions-row">
+                    <div class="loyalty-control">
+                        <button class="loyalty-btn" onclick="updateMonths(${index}, -1)">-</button>
+                        <span id="months-${index}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.meses || 0}</span>
+                        <button class="loyalty-btn" onclick="updateMonths(${index}, 1)">+</button>
+                    </div>
+
+                    <select class="status-dropdown" onchange="actualizarCliente(${index}, 'estado', this.value)">
+                        <option value="activo" ${cliente.estado === 'activo' ? 'selected' : ''}>Al día</option>
+                        <option value="vencer" ${cliente.estado === 'vencer' ? 'selected' : ''}>Por vencer</option>
+                        <option value="inactivo" ${cliente.estado === 'inactivo' ? 'selected' : ''}>Suspendido</option>
+                    </select>
+
+                    <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${cliente.servicio}', '${cliente.dia_pago}')">Copiar</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // Modificar meses localmente
+    function updateMonths(index, delta) {
+        clientesLista[index].meses = Math.max(0, (clientesLista[index].meses || 0) + delta);
+        document.getElementById(`months-${index}`).innerText = clientesLista[index].meses;
+    }
+
+    // Actualizar campos localmente
+    function actualizarCliente(index, campo, valor) {
+        clientesLista[index][campo] = valor;
+    }
+
+    // Copiar info del cliente al portapapeles
+    function copiarInfo(nombre, servicio, fecha) {
+        const texto = `👋 Hola ${nombre}, tu servicio de ${servicio} se vence el ${fecha}.`;
+        navigator.clipboard.writeText(texto);
+        alert("¡Mensaje copiado al portapapeles!");
+    }
+
+    // Buscador interactivo
+    function filtrarClientes() {
+        const query = document.getElementById("search-input").value.toLowerCase();
+        const filtrados = clientesLista.filter(c => 
+            c.nombre.toLowerCase().includes(query) || 
+            (c.id && c.id.toLowerCase().includes(query))
+        );
+        renderizarClientes(filtrados);
+    }
+
+    // --- 4. GUARDAR EN GITHUB ---
+    function prepararYGuardar() {
+        if (!currentFileData) return;
+
+        // Estructura final a guardar
+        let dataToSave = Array.isArray(currentFileData.raw) ? clientesLista : { ...currentFileData.raw, clientes: clientesLista };
+        guardarCambiosEnGitHub(dataToSave);
+    }
+
+    async function guardarCambiosEnGitHub(nuevosDatos) {
+        const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
+        
+        const jsonString = JSON.stringify(nuevosDatos, null, 2);
+        const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
+
+        const payload = {
+            message: "🤖 Admin Update: Estado de clientes actualizado",
+            content: contentEncoded,
+            sha: currentFileData.sha,
+            branch: CONFIG.branch
+        };
+
+        try {
+            const response = await fetch(url, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${currentToken}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const resData = await response.json();
+                currentFileData.sha = resData.content.sha; // Actualizamos SHA para siguientes ediciones
+                alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE EN GITHUB!");
+            } else {
+                alert("❌ Error al guardar. Verifica la consola.");
+            }
+        } catch (error) {
+            console.error("Error al guardar en GitHub:", error);
+        }
+    }
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
