@@ -13,6 +13,7 @@
             --neon-purple: #bc13fe;
             --neon-red: #ff003c;
             --neon-blue: #00f2fe;
+            --neon-yellow: #f8e800;
             --text-main: #ffffff;
             --text-muted: #8892b0;
         }
@@ -36,19 +37,36 @@
         .btn-save:hover { box-shadow: 0 0 10px var(--neon-green); }
         .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
 
+        /* --- DASHBOARD FINANCIERO --- */
+        .dashboard-row {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;
+        }
+        .kpi-card {
+            background: linear-gradient(145deg, #0d0d14, #08080c);
+            border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 8px; padding: 15px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .kpi-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .kpi-value { font-size: 1.8rem; font-weight: bold; margin-top: 5px; }
+        .val-ingresos { color: var(--neon-blue); text-shadow: 0 0 8px rgba(0, 242, 254, 0.4); }
+        .val-costos { color: var(--neon-red); text-shadow: 0 0 8px rgba(255, 0, 60, 0.4); }
+        .val-ganancia { color: var(--neon-green); text-shadow: 0 0 8px rgba(0, 255, 157, 0.4); }
+
         @media (max-width: 600px) {
             header { flex-wrap: wrap; }
             .header-actions { width: 100%; justify-content: space-between; margin-top: 5px; }
+            .dashboard-row { grid-template-columns: 1fr; gap: 10px; }
         }
 
         /* --- SECTIONS & PANELS --- */
         .section-title { color: var(--neon-purple); font-size: 1.1rem; margin-bottom: 12px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 8px; }
-        .grid-container { display: grid; grid-template-columns: 1fr 2fr; gap: 15px; }
-        @media (max-width: 900px) { .grid-container { grid-template-columns: 1fr; } }
+        .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; }
+        @media (max-width: 1000px) { .grid-container { grid-template-columns: 1fr; } }
         
         .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
         
-        /* Switches & UI Elements */
+        /* Switches */
         .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -60,13 +78,20 @@
         .search-bar, .custom-select { width: 100%; background: #111; border: 1px solid var(--text-muted); color: var(--text-main); padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 0.85rem; outline: none; }
         .search-bar:focus { border-color: var(--neon-green); }
 
-        /* Dynamic Services Global */
-        .service-row { display: flex; gap: 5px; align-items: center; margin-bottom: 6px; }
-        .service-row input[type="text"] { flex: 1; background: #111; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
-        .service-row input[type="number"] { width: 60px; background: #111; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-green); padding: 4px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-align: center; }
+        /* Catálogo Compacto */
+        .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .catalog-table th { color: var(--text-muted); font-weight: normal; text-align: left; padding-bottom: 5px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
+        .catalog-table td { padding: 6px 2px; }
+        .catalog-table input[type="text"] { width: 100%; background: #111; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 4px; border-radius: 4px; }
+        .catalog-table input[type="number"] { width: 100%; max-width: 60px; background: #111; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 4px; border-radius: 4px; text-align: center; }
+        .inv-badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-align: center; display: inline-block; width: 100%; }
+        .inv-ok { color: var(--neon-green); border: 1px solid var(--neon-green); }
+        .inv-warn { color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
+        .inv-full { color: var(--neon-red); border: 1px solid var(--neon-red); }
+        
         .btn-icon { background: transparent; border: none; color: var(--neon-red); cursor: pointer; font-size: 1rem; padding: 0 4px; transition: 0.2s; }
         .btn-icon:hover { transform: scale(1.2); }
-        .btn-add-service { background: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px dashed var(--neon-purple); width: 100%; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 5px; }
+        .btn-add-service { background: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px dashed var(--neon-purple); width: 100%; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 10px; }
 
         /* --- CLIENT CARD --- */
         .client-card { background: linear-gradient(145deg, #0f0f16, #0a0a0f); border-left: 3px solid var(--neon-green); padding: 10px; border-radius: 6px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
@@ -98,6 +123,22 @@
         </div>
     </header>
 
+    <!-- NUEVO: DASHBOARD FINANCIERO SUPERIOR -->
+    <div class="dashboard-row">
+        <div class="kpi-card">
+            <div class="kpi-title">Ingresos Brutos</div>
+            <div class="kpi-value val-ingresos" id="kpi-ingresos">$0.00</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Inversión (Costos)</div>
+            <div class="kpi-value val-costos" id="kpi-costos">$0.00</div>
+        </div>
+        <div class="kpi-card">
+            <div class="kpi-title">Ganancia Neta</div>
+            <div class="kpi-value val-ganancia" id="kpi-ganancias">$0.00</div>
+        </div>
+    </div>
+
     <div class="grid-container">
         <!-- COLUMNA IZQUIERDA -->
         <div>
@@ -108,29 +149,36 @@
                     <span style="font-size: 0.85rem; font-weight: bold;">Activar Alerta Técnica</span>
                     <label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label>
                 </div>
-                
                 <div id="alert-settings" style="opacity: 0.5; pointer-events: none;">
-                    <label style="font-size: 0.75rem; color: var(--text-muted);">Plataforma afectada:</label>
                     <select id="alert-platform" class="custom-select"></select>
-
-                    <label style="font-size: 0.75rem; color: var(--text-muted);">Mensaje predeterminado:</label>
                     <select id="alert-type" class="custom-select">
                         <option value="presentando intermitencias temporales">Intermitencias temporales</option>
                         <option value="en mantenimiento programado">Mantenimiento programado</option>
                         <option value="experimentando una caída global">Caída global</option>
                         <option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option>
                     </select>
-
-                    <textarea id="global-msg" style="width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; margin-top: 4px; font-size: 0.8rem;" placeholder="Mensaje Global (Opcional)..."></textarea>
+                    <textarea id="global-msg" style="width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.8rem;" placeholder="Mensaje Global (Opcional)..."></textarea>
                 </div>
             </div>
 
-            <!-- PRECIOS Y SERVICIOS GLOBALES -->
+            <!-- PRECIOS Y SERVICIOS GLOBALES REDISEÑADO -->
             <div class="panel">
-                <h2 class="section-title">Catálogo de Servicios</h2>
-                <div id="global-services-container">
-                    <!-- Los servicios globales se inyectan aquí -->
-                </div>
+                <h2 class="section-title">Catálogo & Inventario</h2>
+                <table class="catalog-table">
+                    <thead>
+                        <tr>
+                            <th>Servicio</th>
+                            <th title="Precio de Venta">Venta</th>
+                            <th title="Tu Costo Mensual">Costo</th>
+                            <th title="Límite Máximo de Perfiles">Lím.</th>
+                            <th title="Perfiles Disponibles">Disp.</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="global-services-container">
+                        <!-- Servicios inyectados aquí -->
+                    </tbody>
+                </table>
                 <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio</button>
             </div>
         </div>
@@ -139,8 +187,6 @@
         <div class="panel">
             <h2 class="section-title">Gestión de Cuentas</h2>
             <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o folio..." oninput="filtrarClientes()">
-
-            <!-- Contenedor dinámico de clientes -->
             <div id="clients-container">
                 <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando sistema desde GitHub...</p>
             </div>
@@ -148,29 +194,26 @@
     </div>
 
     <script>
-    const CONFIG = {
-        username: "henrygonzalezestrada-cyber",
-        repo: "goxion",
-        path: "clientes.json",
-        branch: "main"
-    };
-
+    const CONFIG = { username: "henrygonzalezestrada-cyber", repo: "goxion", path: "clientes.json", branch: "main" };
     let currentToken = localStorage.getItem("GOXION_PAT") || "";
     let currentFileData = null; 
     let clientesDict = {}; 
     let configGlobal = { alertas: {}, serviciosGlobales: [] };
+    
+    // Objeto para llevar el conteo de perfiles activos por plataforma
+    let inventarioActivo = {};
 
-    // Lista inicial basada en tu tabla de Excel (por si la base de datos está vacía)
+    // Base de datos por defecto PRE-CARGADA con los datos de tu Excel
     const DEFAULT_SERVICES = [
-        {nombre: "Netflix Premium", precio: 109},
-        {nombre: "Disney+ Premium", precio: 89},
-        {nombre: "Max Standard", precio: 79},
-        {nombre: "Prime Video", precio: 39},
-        {nombre: "YouTube Premium", precio: 89},
-        {nombre: "Vix Premium", precio: 49},
-        {nombre: "Crunchyroll Cuenta completa", precio: 45},
-        {nombre: "Microsoft 365", precio: 79},
-        {nombre: "Google One 2TB", precio: 29}
+        {nombre: "Netflix Premium", precio: 109, costo: 369, limite: 4},
+        {nombre: "Disney+ Premium", precio: 89, costo: 340, limite: 10},
+        {nombre: "Max Standard", precio: 79, costo: 358, limite: 8},
+        {nombre: "Prime Video", precio: 39, costo: 7, limite: 5},
+        {nombre: "YouTube Premium", precio: 89, costo: 242, limite: 10},
+        {nombre: "Vix Premium", precio: 49, costo: 74.5, limite: 4},
+        {nombre: "Crunchyroll Cuenta completa", precio: 45, costo: 39, limite: 5},
+        {nombre: "Microsoft 365", precio: 79, costo: 119, limite: 5},
+        {nombre: "Google One 2TB", precio: 29, costo: 77, limite: 5}
     ];
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -181,43 +224,35 @@
     function pedirToken() {
         const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token:");
         if (userToken && userToken.trim() !== "") {
-            currentToken = userToken.trim();
-            localStorage.setItem("GOXION_PAT", currentToken);
-            inicializarPanel();
-        } else {
-            alert("Acceso denegado.");
-        }
+            currentToken = userToken.trim(); localStorage.setItem("GOXION_PAT", currentToken); inicializarPanel();
+        } else { alert("Acceso denegado."); }
     }
 
-    function cerrarSesion() {
-        localStorage.removeItem("GOXION_PAT");
-        location.reload();
-    }
+    function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
 
     async function inicializarPanel() {
         const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
-        
         try {
-            const response = await fetch(url, {
-                headers: { "Authorization": `token ${currentToken}`, "Accept": "application/vnd.github.v3+json" },
-                cache: "no-store"
-            });
-
+            const response = await fetch(url, { headers: { "Authorization": `token ${currentToken}`, "Accept": "application/vnd.github.v3+json" }, cache: "no-store" });
             if (response.status === 401) return cerrarSesion();
 
             const data = await response.json();
             const contentDecoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
             const jsonCompleto = JSON.parse(contentDecoded);
-            
             currentFileData = { sha: data.sha };
 
-            // Cargar configuración global o usar defaults
             if (jsonCompleto._goxion_config) {
                 configGlobal = jsonCompleto._goxion_config;
-                // Si aún usa el formato viejo de "precios", migrar a array "serviciosGlobales"
-                if (!configGlobal.serviciosGlobales) {
-                    configGlobal.serviciosGlobales = DEFAULT_SERVICES;
-                }
+                if (!configGlobal.serviciosGlobales) configGlobal.serviciosGlobales = DEFAULT_SERVICES;
+                
+                // MIGRACIÓN: Si el JSON de GitHub tiene plataformas sin costo/límite, los agregamos basándonos en el default
+                configGlobal.serviciosGlobales.forEach(sg => {
+                    if(sg.costo === undefined) {
+                        let defaultMatch = DEFAULT_SERVICES.find(d => d.nombre === sg.nombre);
+                        sg.costo = defaultMatch ? defaultMatch.costo : 0;
+                        sg.limite = defaultMatch ? defaultMatch.limite : 5;
+                    }
+                });
                 delete jsonCompleto._goxion_config; 
             } else {
                 configGlobal.serviciosGlobales = DEFAULT_SERVICES;
@@ -225,20 +260,51 @@
 
             clientesDict = jsonCompleto;
 
-            // Inicializar UI de Alertas
             document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
             document.getElementById("alert-type").value = configGlobal.alertas?.falla || "presentando intermitencias temporales";
             document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
             toggleAlertFields();
 
-            // Renderizar TODO
+            calcularInventarioYFinanzas(); // Nueva función central
             renderGlobalServicesUI();
             renderizarClientes(clientesDict);
-
         } catch (error) {
-            console.error("Error GitHub:", error);
             document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red);">Error al conectar con la base de datos.</p>`;
         }
+    }
+
+    // --- NUEVO: MATEMÁTICAS CENTRALES ---
+    function calcularInventarioYFinanzas() {
+        inventarioActivo = {};
+        let ingresosTotales = 0;
+        let costosTotales = 0;
+
+        // 1. Inicializar inventario
+        configGlobal.serviciosGlobales.forEach(s => { 
+            inventarioActivo[s.nombre] = 0; 
+            costosTotales += parseFloat(s.costo || 0);
+        });
+
+        // 2. Contar ventas
+        Object.values(clientesDict).forEach(cliente => {
+            if (cliente.servicios) {
+                cliente.servicios.forEach(s => {
+                    ingresosTotales += parseFloat(s.monto || 0);
+                    // Buscamos el nombre base (ignorando cosas como "(x2)")
+                    let baseNameMatch = configGlobal.serviciosGlobales.find(g => s.nombre.includes(g.nombre));
+                    if(baseNameMatch) {
+                        inventarioActivo[baseNameMatch.nombre]++;
+                    }
+                });
+            }
+        });
+
+        let gananciaNeta = ingresosTotales - costosTotales;
+
+        // 3. Actualizar Dashboard UI
+        document.getElementById("kpi-ingresos").innerText = `$${ingresosTotales.toFixed(2)}`;
+        document.getElementById("kpi-costos").innerText = `$${costosTotales.toFixed(2)}`;
+        document.getElementById("kpi-ganancias").innerText = `$${gananciaNeta.toFixed(2)}`;
     }
 
     // --- LÓGICA DE SERVICIOS GLOBALES ---
@@ -250,114 +316,102 @@
         alertSelect.innerHTML = `<option value="Todos los servicios">Todos los servicios</option>`;
 
         configGlobal.serviciosGlobales.forEach((srv, index) => {
-            // Llenar tabla de precios base con el nuevo botón de sincronización masiva
-            container.innerHTML += `
-                <div class="service-row">
-                    <input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)">
-                    <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
-                    <input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)">
-                    
-                    <button class="btn-icon" style="color: var(--neon-blue);" onclick="sincronizarPrecioMasivo(${index})" title="Sincronizar este precio a todos los clientes que tengan el servicio">📡</button>
-                    <button class="btn-icon" onclick="removeGlobalService(${index})" title="Eliminar servicio">✖</button>
-                </div>
-            `;
+            let vendidos = inventarioActivo[srv.nombre] || 0;
+            let disponibles = (srv.limite || 0) - vendidos;
             
-            // Llenar select de alertas
+            // Lógica visual del semáforo de inventario
+            let badgeClass = "inv-ok";
+            if (disponibles <= 1) badgeClass = "inv-warn";
+            if (disponibles <= 0) badgeClass = "inv-full";
+
+            container.innerHTML += `
+                <tr>
+                    <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)"></td>
+                    <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)" title="Precio Venta"></td>
+                    <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)" title="Tu Costo"></td>
+                    <td><input type="number" style="color:#fff;" value="${srv.limite || 0}" onchange="updateGlobalService(${index}, 'limite', this.value)" title="Límite Perfiles"></td>
+                    <td><span class="inv-badge ${badgeClass}">${disponibles}</span></td>
+                    <td style="display:flex; gap:2px; align-items:center;">
+                        <button class="btn-icon" style="color: var(--neon-blue);" onclick="sincronizarPrecioMasivo(${index})" title="Empujar precio a clientes">📡</button>
+                        <button class="btn-icon" onclick="removeGlobalService(${index})" title="Eliminar">✖</button>
+                    </td>
+                </tr>
+            `;
             let selected = (configGlobal.alertas?.plataforma === srv.nombre) ? "selected" : "";
             alertSelect.innerHTML += `<option value="${srv.nombre}" ${selected}>${srv.nombre}</option>`;
         });
     }
 
     function updateGlobalService(index, field, value) {
-        if (field === 'precio') value = parseFloat(value) || 0;
+        if (field !== 'nombre') value = parseFloat(value) || 0;
         configGlobal.serviciosGlobales[index][field] = value;
-        
-        if (field === 'nombre') {
-            renderGlobalServicesUI(); // Actualizar selects
-            renderizarClientes(clientesDict); // Actualizar selects de clientes
-        }
+        calcularInventarioYFinanzas();
+        renderGlobalServicesUI(); 
+        if (field === 'nombre') renderizarClientes(clientesDict); 
     }
 
     function addGlobalService() {
-        configGlobal.serviciosGlobales.push({nombre: "Nuevo Servicio", precio: 0});
+        configGlobal.serviciosGlobales.push({nombre: "Nuevo", precio: 0, costo: 0, limite: 5});
+        calcularInventarioYFinanzas();
         renderGlobalServicesUI();
         renderizarClientes(clientesDict);
     }
 
     function removeGlobalService(index) {
-        if(confirm("¿Seguro que deseas eliminar este servicio del catálogo base? (No se borrará de los clientes que ya lo tengan).")) {
+        if(confirm("¿Eliminar este servicio del catálogo base?")) {
             configGlobal.serviciosGlobales.splice(index, 1);
+            calcularInventarioYFinanzas();
             renderGlobalServicesUI();
             renderizarClientes(clientesDict);
         }
     }
 
-    // NUEVA FUNCIÓN: SINCRONIZAR PRECIOS MASIVAMENTE
     function sincronizarPrecioMasivo(index) {
-        const servicioGlobal = configGlobal.serviciosGlobales[index];
-        const nombreServicio = servicioGlobal.nombre;
-        const nuevoPrecio = servicioGlobal.precio;
+        const srv = configGlobal.serviciosGlobales[index];
+        if (!confirm(`¿Aplicar precio ($${srv.precio}) a TODOS los clientes con "${srv.nombre}"?`)) return;
 
-        if (!confirm(`¿Aplicar el nuevo precio ($${nuevoPrecio}) a TODOS los clientes que ya tengan contratado "${nombreServicio}"?`)) return;
-
-        let clientesActualizados = 0;
-
+        let actualizados = 0;
         Object.keys(clientesDict).forEach(key => {
-            let cliente = clientesDict[key];
-            if (cliente.servicios) {
-                cliente.servicios.forEach(srv => {
-                    // Si el cliente tiene el servicio, le actualizamos el monto
-                    if (srv.nombre === nombreServicio) {
-                        srv.monto = nuevoPrecio;
-                        clientesActualizados++;
-                    }
+            let c = clientesDict[key];
+            if (c.servicios) {
+                c.servicios.forEach(s => {
+                    if (s.nombre === srv.nombre) { s.monto = srv.precio; actualizados++; }
                 });
             }
         });
 
-        if (clientesActualizados > 0) {
+        if (actualizados > 0) {
+            calcularInventarioYFinanzas();
             renderizarClientes(clientesDict);
-            alert(`¡Éxito! Precio actualizado en ${clientesActualizados} servicios contratados.\n\n⚠️ RECUERDA PRESIONAR "GUARDAR CAMBIOS" PARA SUBIR ESTO A GITHUB.`);
-        } else {
-            alert(`Ningún cliente tiene el servicio "${nombreServicio}" asignado actualmente.`);
+            alert(`¡Éxito! Precio actualizado en ${actualizados} perfiles.\n⚠️ GUARDA LOS CAMBIOS EN GITHUB.`);
         }
     }
 
-    // --- LÓGICA DE ALERTAS ---
     function toggleAlertFields() {
         const isActive = document.getElementById("alert-active").checked;
         const settingsDiv = document.getElementById("alert-settings");
-        if (isActive) {
-            settingsDiv.style.opacity = "1";
-            settingsDiv.style.pointerEvents = "auto";
-        } else {
-            settingsDiv.style.opacity = "0.5";
-            settingsDiv.style.pointerEvents = "none";
-        }
+        settingsDiv.style.opacity = isActive ? "1" : "0.5";
+        settingsDiv.style.pointerEvents = isActive ? "auto" : "none";
     }
 
     // --- LÓGICA DE CLIENTES ---
     function renderizarClientes(diccionario) {
         const container = document.getElementById("clients-container");
         container.innerHTML = "";
-
         const keys = Object.keys(diccionario);
+
         if (keys.length === 0) {
             container.innerHTML = `<p style="color: var(--text-muted);">No se encontraron clientes.</p>`;
             return;
         }
 
-        // Preparar opciones de servicios globales para el select de clientes
-        const globalOptions = configGlobal.serviciosGlobales.map(s => 
-            `<option value="${s.nombre}|${s.precio}">${s.nombre} ($${s.precio})</option>`
-        ).join("");
+        const globalOptions = configGlobal.serviciosGlobales.map(s => `<option value="${s.nombre}|${s.precio}">${s.nombre} ($${s.precio})</option>`).join("");
 
         keys.forEach(key => {
             const cliente = diccionario[key];
             let subtotal = 0;
-            
-            // Renderizar etiquetas de servicios del cliente
             let clientServicesHTML = "";
+            
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s, sIdx) => {
                     subtotal += s.monto;
@@ -368,9 +422,7 @@
                         </div>
                     `;
                 });
-            } else {
-                clientServicesHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Sin servicios activos</div>`;
-            }
+            } else { clientServicesHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Sin servicios activos</div>`; }
 
             const card = document.createElement("div");
             card.className = "client-card";
@@ -381,30 +433,23 @@
                             <h3>[${cliente.folio}] ${cliente.nombre}</h3>
                             <span style="color:var(--neon-blue); font-weight:bold; font-size:0.9rem;">Total: $${subtotal}</span>
                         </div>
-                        
                         <div class="client-services-list" style="margin-top: 8px;">
                             ${clientServicesHTML}
                             <div class="client-service-add-row">
-                                <select id="add-srv-sel-${key}">
-                                    ${globalOptions}
-                                </select>
+                                <select id="add-srv-sel-${key}">${globalOptions}</select>
                                 <button class="btn-save" style="padding:2px 8px;" onclick="addClientService('${key}')">+</button>
                             </div>
                         </div>
                     </div>
                 </div>
-
                 <div class="card-actions-row">
                     <span style="font-size:0.75rem; color:var(--text-muted);">Pagos Puntuales:</span>
                     <div class="loyalty-control">
                         <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
                         <span id="pagos-${key}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.pagos_puntuales || 0}</span>
                         <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
-                        
-                        <!-- BOTÓN DE REINICIO DE LEALTAD -->
                         <button class="btn-icon" style="color: var(--neon-red); margin-left: 5px; font-size: 0.85rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha a 0">🔄</button>
                     </div>
-
                     <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">Copiar Link</button>
                 </div>
             `;
@@ -412,28 +457,26 @@
         });
     }
 
-    // NUEVA FUNCIÓN: REINICIAR LEALTAD
     function reiniciarLealtad(key) {
-        if(confirm('¿Estás seguro de reiniciar la racha de pagos de este cliente a 0?')) {
+        if(confirm('¿Reiniciar la racha a 0?')) {
             clientesDict[key].pagos_puntuales = 0;
-            renderizarClientes(clientesDict); // Redibuja la interfaz
-            // Un pequeño aviso de que aún se debe guardar
-            setTimeout(() => alert('Contador reiniciado a 0.\n\n⚠️ RECUERDA PRESIONAR "GUARDAR CAMBIOS" PARA SUBIR ESTO A GITHUB.'), 100);
+            renderizarClientes(clientesDict);
         }
     }
 
     function addClientService(key) {
-        const selectData = document.getElementById(`add-srv-sel-${key}`).value;
-        const [nombre, precio] = selectData.split('|');
-        
+        const [nombre, precio] = document.getElementById(`add-srv-sel-${key}`).value.split('|');
         if (!clientesDict[key].servicios) clientesDict[key].servicios = [];
         clientesDict[key].servicios.push({ nombre: nombre, monto: parseFloat(precio) });
-        
-        renderizarClientes(clientesDict); // Re-renderiza para mostrar el nuevo total y lista
+        calcularInventarioYFinanzas();
+        renderGlobalServicesUI(); // Para actualizar los semáforos
+        renderizarClientes(clientesDict); 
     }
 
     function removeClientService(key, serviceIndex) {
         clientesDict[key].servicios.splice(serviceIndex, 1);
+        calcularInventarioYFinanzas();
+        renderGlobalServicesUI(); // Para actualizar los semáforos
         renderizarClientes(clientesDict);
     }
 
@@ -445,18 +488,15 @@
     function copiarInfo(nombre, key) {
         const link = `https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`;
         navigator.clipboard.writeText(`Hola ${nombre}, aquí tienes tu estado de cuenta actualizado:\n${link}`);
-        alert("¡Link de cobro copiado al portapapeles!");
+        alert("¡Link copiado!");
     }
 
     function filtrarClientes() {
         const query = document.getElementById("search-input").value.toLowerCase();
         const filtrados = {};
-        
         Object.keys(clientesDict).forEach(key => {
             const c = clientesDict[key];
-            if (c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query)) {
-                filtrados[key] = c;
-            }
+            if (c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query)) filtrados[key] = c;
         });
         renderizarClientes(filtrados);
     }
@@ -466,7 +506,6 @@
         const btnSave = document.querySelector('.btn-save');
         btnSave.innerText = "Guardando...";
 
-        // Empaquetar configuración global actualizada
         configGlobal.alertas = {
             activa: document.getElementById("alert-active").checked,
             plataforma: document.getElementById("alert-platform").value,
@@ -474,39 +513,22 @@
             mensaje: document.getElementById("global-msg").value
         };
 
-        const dataToSave = { 
-            _goxion_config: configGlobal,
-            ...clientesDict 
-        };
-
-        const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
-        const jsonString = JSON.stringify(dataToSave, null, 2);
-        const contentEncoded = btoa(unescape(encodeURIComponent(jsonString)));
-
         const payload = {
-            message: "🤖 Admin Update: Catálogo, clientes y alertas modificados",
-            content: contentEncoded,
-            sha: currentFileData.sha,
-            branch: CONFIG.branch
+            message: "🤖 Admin Update: Dashboard Financiero y Catálogo",
+            content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
+            sha: currentFileData.sha, branch: CONFIG.branch
         };
 
         try {
-            const response = await fetch(url, {
-                method: "PUT",
-                headers: { "Authorization": `token ${currentToken}`, "Content-Type": "application/json" },
+            const response = await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`, {
+                method: "PUT", headers: { "Authorization": `token ${currentToken}`, "Content-Type": "application/json" },
                 body: JSON.stringify(payload)
             });
-
             if (response.ok) {
-                const resData = await response.json();
-                currentFileData.sha = resData.content.sha;
+                currentFileData.sha = (await response.json()).content.sha;
                 alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE!");
-            } else {
-                alert("❌ Error al guardar en GitHub.");
-            }
-        } catch (error) {
-            console.error(error);
-        }
+            } else alert("❌ Error al guardar en GitHub.");
+        } catch (e) {}
         btnSave.innerText = "Guardar Cambios";
     }
     </script>
