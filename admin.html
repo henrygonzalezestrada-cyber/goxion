@@ -64,7 +64,8 @@
         .service-row { display: flex; gap: 5px; align-items: center; margin-bottom: 6px; }
         .service-row input[type="text"] { flex: 1; background: #111; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
         .service-row input[type="number"] { width: 60px; background: #111; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-green); padding: 4px; border-radius: 4px; font-weight: bold; font-size: 0.8rem; text-align: center; }
-        .btn-icon { background: transparent; border: none; color: var(--neon-red); cursor: pointer; font-size: 1rem; padding: 0 4px; }
+        .btn-icon { background: transparent; border: none; color: var(--neon-red); cursor: pointer; font-size: 1rem; padding: 0 4px; transition: 0.2s; }
+        .btn-icon:hover { transform: scale(1.2); }
         .btn-add-service { background: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px dashed var(--neon-purple); width: 100%; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 5px; }
 
         /* --- CLIENT CARD --- */
@@ -249,12 +250,14 @@
         alertSelect.innerHTML = `<option value="Todos los servicios">Todos los servicios</option>`;
 
         configGlobal.serviciosGlobales.forEach((srv, index) => {
-            // Llenar tabla de precios base
+            // Llenar tabla de precios base con el nuevo botón de sincronización masiva
             container.innerHTML += `
                 <div class="service-row">
                     <input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)">
                     <span style="color:var(--neon-green); font-size:0.8rem;">$</span>
                     <input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)">
+                    
+                    <button class="btn-icon" style="color: var(--neon-blue);" onclick="sincronizarPrecioMasivo(${index})" title="Sincronizar este precio a todos los clientes que tengan el servicio">📡</button>
                     <button class="btn-icon" onclick="removeGlobalService(${index})" title="Eliminar servicio">✖</button>
                 </div>
             `;
@@ -286,6 +289,37 @@
             configGlobal.serviciosGlobales.splice(index, 1);
             renderGlobalServicesUI();
             renderizarClientes(clientesDict);
+        }
+    }
+
+    // NUEVA FUNCIÓN: SINCRONIZAR PRECIOS MASIVAMENTE
+    function sincronizarPrecioMasivo(index) {
+        const servicioGlobal = configGlobal.serviciosGlobales[index];
+        const nombreServicio = servicioGlobal.nombre;
+        const nuevoPrecio = servicioGlobal.precio;
+
+        if (!confirm(`¿Aplicar el nuevo precio ($${nuevoPrecio}) a TODOS los clientes que ya tengan contratado "${nombreServicio}"?`)) return;
+
+        let clientesActualizados = 0;
+
+        Object.keys(clientesDict).forEach(key => {
+            let cliente = clientesDict[key];
+            if (cliente.servicios) {
+                cliente.servicios.forEach(srv => {
+                    // Si el cliente tiene el servicio, le actualizamos el monto
+                    if (srv.nombre === nombreServicio) {
+                        srv.monto = nuevoPrecio;
+                        clientesActualizados++;
+                    }
+                });
+            }
+        });
+
+        if (clientesActualizados > 0) {
+            renderizarClientes(clientesDict);
+            alert(`¡Éxito! Precio actualizado en ${clientesActualizados} servicios contratados.\n\n⚠️ RECUERDA PRESIONAR "GUARDAR CAMBIOS" PARA SUBIR ESTO A GITHUB.`);
+        } else {
+            alert(`Ningún cliente tiene el servicio "${nombreServicio}" asignado actualmente.`);
         }
     }
 
@@ -366,6 +400,9 @@
                         <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
                         <span id="pagos-${key}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.pagos_puntuales || 0}</span>
                         <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
+                        
+                        <!-- BOTÓN DE REINICIO DE LEALTAD -->
+                        <button class="btn-icon" style="color: var(--neon-red); margin-left: 5px; font-size: 0.85rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha a 0">🔄</button>
                     </div>
 
                     <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">Copiar Link</button>
@@ -373,6 +410,16 @@
             `;
             container.appendChild(card);
         });
+    }
+
+    // NUEVA FUNCIÓN: REINICIAR LEALTAD
+    function reiniciarLealtad(key) {
+        if(confirm('¿Estás seguro de reiniciar la racha de pagos de este cliente a 0?')) {
+            clientesDict[key].pagos_puntuales = 0;
+            renderizarClientes(clientesDict); // Redibuja la interfaz
+            // Un pequeño aviso de que aún se debe guardar
+            setTimeout(() => alert('Contador reiniciado a 0.\n\n⚠️ RECUERDA PRESIONAR "GUARDAR CAMBIOS" PARA SUBIR ESTO A GITHUB.'), 100);
+        }
     }
 
     function addClientService(key) {
