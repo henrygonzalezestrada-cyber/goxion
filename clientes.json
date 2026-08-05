@@ -22,7 +22,7 @@
         "limite": 5
       },
       {
-        "nombre": "Max Standard",
+        "nombre": "HBO Max Platino",
         "precio": 79,
         "cuentas": 1,
         "costo": 0,
@@ -243,10 +243,6 @@
     "pagos_puntuales": 0,
     "servicios": [
       {
-        "nombre": "Max Standard",
-        "monto": 79
-      },
-      {
         "nombre": "YouTube Premium",
         "monto": 89
       },
@@ -257,6 +253,10 @@
       {
         "nombre": "Google One",
         "monto": 29
+      },
+      {
+        "nombre": "HBO Max Platino",
+        "monto": 79
       }
     ],
     "dia_pago": 15,
