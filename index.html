@@ -15,7 +15,8 @@
       --accent-cyan: #00f2fe;
       --accent-blue: #4facfe;
       --success-green: #2ea043;
-      --warning-amber: #ff9f0a; /* Nuevo color para reportar discrepancias */
+      --warning-amber: #ff9f0a;
+      --danger-red: #ff3366;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -51,7 +52,6 @@
     .btn-copy { background: #21262d; color: var(--text-main); border: 1px solid var(--border-color); }
     .btn-copy:hover { background: #30363d; }
     
-    /* Botón de reporte ajustado a color ámbar */
     .btn-wa { background: var(--warning-amber); color: #000; font-weight: 700; }
     .btn-wa:hover { opacity: 0.9; }
 
@@ -76,7 +76,6 @@
 <div class="toast" id="toast">¡Datos de pago copiados!</div>
 
 <script>
-  // Configuración de Datos de Contacto y Cuenta
   const TELEFONO_GOXION = "528136836901"; 
   const CLABE_PAGO = "638180000167909381";
   const BANCO_PAGO = "NU BANCO";
@@ -93,7 +92,7 @@
     }
 
     try {
-      const response = await fetch('clientes.json');
+      const response = await fetch('clientes.json', { cache: 'no-store' });
       if (!response.ok) throw new Error("No se pudo cargar clientes.json");
       
       const data = await response.json();
@@ -110,6 +109,17 @@
       const mesActual = meses[hoy.getMonth()];
       const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
       
+      // Rescatamos el día de pago exacto o ponemos 15 por default
+      const diaPago = cliente.dia_pago || 15; 
+      
+      // Verificar estado para mostrar alertas
+      let bannerEstado = "";
+      if (cliente.estado === 'suspendido') {
+          bannerEstado = `<div style="background: rgba(255, 51, 102, 0.15); border: 1px solid var(--danger-red); color: var(--danger-red); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 13px;">⛔ SERVICIO SUSPENDIDO POR FALTA DE PAGO</div>`;
+      } else if (cliente.estado === 'pagado') {
+          bannerEstado = `<div style="background: rgba(46, 160, 67, 0.15); border: 1px solid var(--success-green); color: var(--success-green); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 13px;">✅ MENSUALIDAD PAGADA ¡GRACIAS!</div>`;
+      }
+
       // Cálculo de Fidelidad
       const racha = cliente.pagos_puntuales || 0;
       let pctDescuento = 0;
@@ -158,11 +168,13 @@
           <div class="subtitle">Estado de Cuenta de Servicios</div>
         </div>
 
+        ${bannerEstado}
+
         <div class="card-info">
           <div class="info-row"><span class="label">Cliente:</span><span class="value">${cliente.nombre}</span></div>
           <div class="info-row"><span class="label">Folio:</span><span class="value">${cliente.folio}</span></div>
           <div class="info-row"><span class="label">Periodo:</span><span class="value">${periodoStr}</span></div>
-          <div class="info-row"><span class="label">Fecha límite:</span><span class="value" style="color:#00f2fe;">15 de ${mesActual}</span></div>
+          <div class="info-row"><span class="label">Fecha límite:</span><span class="value" style="color:var(--accent-cyan);">${diaPago} de ${mesActual}</span></div>
         </div>
 
         <div class="section-title">Servicios Activos</div>
