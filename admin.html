@@ -66,7 +66,6 @@
         
         .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
         
-        /* Switches */
         .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
         .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -78,12 +77,16 @@
         .search-bar, .custom-select { width: 100%; background: #111; border: 1px solid var(--text-muted); color: var(--text-main); padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 0.85rem; outline: none; }
         .search-bar:focus { border-color: var(--neon-green); }
 
+        /* Filtros Superiores */
+        .filters-row { display: flex; gap: 8px; margin-bottom: 10px; }
+        @media (max-width: 600px) { .filters-row { flex-direction: column; } }
+
         /* Catálogo Compacto */
         .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         .catalog-table th { color: var(--text-muted); font-weight: normal; text-align: left; padding-bottom: 5px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
         .catalog-table td { padding: 6px 2px; }
         .catalog-table input[type="text"] { width: 100%; background: #111; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 4px; border-radius: 4px; }
-        .catalog-table input[type="number"] { width: 100%; max-width: 60px; background: #111; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 4px; border-radius: 4px; text-align: center; }
+        .catalog-table input[type="number"] { width: 100%; max-width: 55px; background: #111; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 4px; border-radius: 4px; text-align: center; }
         .inv-badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-align: center; display: inline-block; width: 100%; }
         .inv-ok { color: var(--neon-green); border: 1px solid var(--neon-green); }
         .inv-warn { color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
@@ -104,10 +107,15 @@
         .client-service-add-row { display: flex; gap: 5px; margin-top: 6px; }
         .client-service-add-row select { flex: 1; background: #111; border: 1px solid var(--neon-blue); color: #fff; font-size: 0.75rem; padding: 2px; border-radius: 3px; }
         
-        .card-actions-row { display: flex; gap: 6px; align-items: center; width: 100%; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; }
+        .card-actions-row { display: flex; gap: 6px; align-items: center; width: 100%; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; flex-wrap: wrap; }
         .loyalty-control { display: flex; align-items: center; gap: 4px; background: #1a1a24; padding: 3px 6px; border-radius: 4px; }
         .loyalty-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
         .btn-copy { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; flex: 1; text-align: center; font-weight: bold; }
+        
+        .status-select { background:#111; color:#fff; border: 1px solid var(--text-muted); border-radius: 3px; font-size: 0.75rem; padding: 2px; }
+        .status-pagado { border-color: var(--neon-green); color: var(--neon-green); }
+        .status-suspendido { border-color: var(--neon-red); color: var(--neon-red); }
+        .status-pendiente { border-color: var(--neon-blue); color: var(--neon-blue); }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(0, 255, 157, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); } }
     </style>
@@ -123,7 +131,7 @@
         </div>
     </header>
 
-    <!-- NUEVO: DASHBOARD FINANCIERO SUPERIOR -->
+    <!-- DASHBOARD FINANCIERO SUPERIOR -->
     <div class="dashboard-row">
         <div class="kpi-card">
             <div class="kpi-title">Ingresos Brutos</div>
@@ -168,6 +176,7 @@
                     <thead>
                         <tr>
                             <th>Servicio</th>
+                            <th title="Cuentas Activas Contratadas">Ctas</th>
                             <th title="Precio de Venta">Venta</th>
                             <th title="Tu Costo Mensual">Costo</th>
                             <th title="Límite Máximo de Perfiles">Lím.</th>
@@ -186,7 +195,24 @@
         <!-- COLUMNA DERECHA: CLIENTES -->
         <div class="panel">
             <h2 class="section-title">Gestión de Cuentas</h2>
+            
+            <!-- FILTROS -->
+            <div class="filters-row">
+                <select id="filter-status" class="custom-select" onchange="filtrarClientes()">
+                    <option value="all">Todos los estados</option>
+                    <option value="pendiente">Pendientes</option>
+                    <option value="pagado">Pagados</option>
+                    <option value="suspendido">Suspendidos</option>
+                </select>
+                <select id="sort-by" class="custom-select" onchange="filtrarClientes()">
+                    <option value="name">Ordenar por Nombre (A-Z)</option>
+                    <option value="date">Ordenar por Día de Cobro</option>
+                    <option value="loyalty">Los más leales primero</option>
+                </select>
+            </div>
+            
             <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o folio..." oninput="filtrarClientes()">
+            
             <div id="clients-container">
                 <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando sistema desde GitHub...</p>
             </div>
@@ -199,21 +225,18 @@
     let currentFileData = null; 
     let clientesDict = {}; 
     let configGlobal = { alertas: {}, serviciosGlobales: [] };
-    
-    // Objeto para llevar el conteo de perfiles activos por plataforma
     let inventarioActivo = {};
 
-    // Base de datos por defecto PRE-CARGADA con los datos de tu Excel
     const DEFAULT_SERVICES = [
-        {nombre: "Netflix Premium", precio: 109, costo: 369, limite: 4},
-        {nombre: "Disney+ Premium", precio: 89, costo: 340, limite: 10},
-        {nombre: "Max Standard", precio: 79, costo: 358, limite: 8},
-        {nombre: "Prime Video", precio: 39, costo: 7, limite: 5},
-        {nombre: "YouTube Premium", precio: 89, costo: 242, limite: 10},
-        {nombre: "Vix Premium", precio: 49, costo: 74.5, limite: 4},
-        {nombre: "Crunchyroll Cuenta completa", precio: 45, costo: 39, limite: 5},
-        {nombre: "Microsoft 365", precio: 79, costo: 119, limite: 5},
-        {nombre: "Google One 2TB", precio: 29, costo: 77, limite: 5}
+        {nombre: "Netflix Premium", cuentas: 1, precio: 109, costo: 369, limite: 4},
+        {nombre: "Disney+ Premium", cuentas: 2, precio: 89, costo: 340, limite: 10},
+        {nombre: "Max Standard", cuentas: 2, precio: 79, costo: 358, limite: 8},
+        {nombre: "Prime Video", cuentas: 1, precio: 39, costo: 7, limite: 5},
+        {nombre: "YouTube Premium", cuentas: 2, precio: 89, costo: 242, limite: 10},
+        {nombre: "Vix Premium", cuentas: 1, precio: 49, costo: 74.5, limite: 4},
+        {nombre: "Crunchyroll", cuentas: 1, precio: 45, costo: 39, limite: 5},
+        {nombre: "Microsoft 365", cuentas: 1, precio: 79, costo: 119, limite: 5},
+        {nombre: "Google One 2TB", cuentas: 1, precio: 29, costo: 77, limite: 5}
     ];
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -245,13 +268,11 @@
                 configGlobal = jsonCompleto._goxion_config;
                 if (!configGlobal.serviciosGlobales) configGlobal.serviciosGlobales = DEFAULT_SERVICES;
                 
-                // MIGRACIÓN: Si el JSON de GitHub tiene plataformas sin costo/límite, los agregamos basándonos en el default
+                // Migración 1: Agregar variables de cuentas, costo y límite si no existen
                 configGlobal.serviciosGlobales.forEach(sg => {
-                    if(sg.costo === undefined) {
-                        let defaultMatch = DEFAULT_SERVICES.find(d => d.nombre === sg.nombre);
-                        sg.costo = defaultMatch ? defaultMatch.costo : 0;
-                        sg.limite = defaultMatch ? defaultMatch.limite : 5;
-                    }
+                    if(sg.cuentas === undefined) sg.cuentas = 1;
+                    if(sg.costo === undefined) sg.costo = 0;
+                    if(sg.limite === undefined) sg.limite = 5;
                 });
                 delete jsonCompleto._goxion_config; 
             } else {
@@ -260,54 +281,52 @@
 
             clientesDict = jsonCompleto;
 
+            // Migración 2: Asegurar que todos los clientes tengan día de cobro y estado
+            Object.keys(clientesDict).forEach(k => {
+                if(!clientesDict[k].dia_pago) clientesDict[k].dia_pago = 15;
+                if(!clientesDict[k].estado) clientesDict[k].estado = "pendiente";
+            });
+
             document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
             document.getElementById("alert-type").value = configGlobal.alertas?.falla || "presentando intermitencias temporales";
             document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
             toggleAlertFields();
 
-            calcularInventarioYFinanzas(); // Nueva función central
+            calcularInventarioYFinanzas();
             renderGlobalServicesUI();
-            renderizarClientes(clientesDict);
+            filtrarClientes(); // Renderiza usando los filtros actuales por defecto
         } catch (error) {
             document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red);">Error al conectar con la base de datos.</p>`;
         }
     }
 
-    // --- NUEVO: MATEMÁTICAS CENTRALES ---
     function calcularInventarioYFinanzas() {
         inventarioActivo = {};
         let ingresosTotales = 0;
         let costosTotales = 0;
 
-        // 1. Inicializar inventario
+        // Costo = Costo Unitario * Cuentas Activas
         configGlobal.serviciosGlobales.forEach(s => { 
             inventarioActivo[s.nombre] = 0; 
-            costosTotales += parseFloat(s.costo || 0);
+            costosTotales += parseFloat(s.costo || 0) * parseInt(s.cuentas || 1);
         });
 
-        // 2. Contar ventas
         Object.values(clientesDict).forEach(cliente => {
-            if (cliente.servicios) {
+            if (cliente.estado !== 'suspendido' && cliente.servicios) { // Opcional: ignorar ingresos de suspendidos
                 cliente.servicios.forEach(s => {
                     ingresosTotales += parseFloat(s.monto || 0);
-                    // Buscamos el nombre base (ignorando cosas como "(x2)")
                     let baseNameMatch = configGlobal.serviciosGlobales.find(g => s.nombre.includes(g.nombre));
-                    if(baseNameMatch) {
-                        inventarioActivo[baseNameMatch.nombre]++;
-                    }
+                    if(baseNameMatch) inventarioActivo[baseNameMatch.nombre]++;
                 });
             }
         });
 
         let gananciaNeta = ingresosTotales - costosTotales;
-
-        // 3. Actualizar Dashboard UI
         document.getElementById("kpi-ingresos").innerText = `$${ingresosTotales.toFixed(2)}`;
         document.getElementById("kpi-costos").innerText = `$${costosTotales.toFixed(2)}`;
         document.getElementById("kpi-ganancias").innerText = `$${gananciaNeta.toFixed(2)}`;
     }
 
-    // --- LÓGICA DE SERVICIOS GLOBALES ---
     function renderGlobalServicesUI() {
         const container = document.getElementById("global-services-container");
         const alertSelect = document.getElementById("alert-platform");
@@ -317,9 +336,13 @@
 
         configGlobal.serviciosGlobales.forEach((srv, index) => {
             let vendidos = inventarioActivo[srv.nombre] || 0;
-            let disponibles = (srv.limite || 0) - vendidos;
+            let cuentasMultiplicador = parseInt(srv.cuentas || 1);
+            let limiteIndividual = parseInt(srv.limite || 0);
             
-            // Lógica visual del semáforo de inventario
+            // Fórmula real: Cuentas x Limite - Vendidos
+            let capacidadTotal = cuentasMultiplicador * limiteIndividual;
+            let disponibles = capacidadTotal - vendidos;
+            
             let badgeClass = "inv-ok";
             if (disponibles <= 1) badgeClass = "inv-warn";
             if (disponibles <= 0) badgeClass = "inv-full";
@@ -327,9 +350,10 @@
             container.innerHTML += `
                 <tr>
                     <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)"></td>
-                    <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)" title="Precio Venta"></td>
-                    <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)" title="Tu Costo"></td>
-                    <td><input type="number" style="color:#fff;" value="${srv.limite || 0}" onchange="updateGlobalService(${index}, 'limite', this.value)" title="Límite Perfiles"></td>
+                    <td><input type="number" style="color:var(--neon-green);" value="${cuentasMultiplicador}" onchange="updateGlobalService(${index}, 'cuentas', this.value)" title="Cuentas Madres Activas"></td>
+                    <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)"></td>
+                    <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)"></td>
+                    <td><input type="number" style="color:#fff;" value="${limiteIndividual}" onchange="updateGlobalService(${index}, 'limite', this.value)"></td>
                     <td><span class="inv-badge ${badgeClass}">${disponibles}</span></td>
                     <td style="display:flex; gap:2px; align-items:center;">
                         <button class="btn-icon" style="color: var(--neon-blue);" onclick="sincronizarPrecioMasivo(${index})" title="Empujar precio a clientes">📡</button>
@@ -351,10 +375,10 @@
     }
 
     function addGlobalService() {
-        configGlobal.serviciosGlobales.push({nombre: "Nuevo", precio: 0, costo: 0, limite: 5});
+        configGlobal.serviciosGlobales.push({nombre: "Nuevo", cuentas: 1, precio: 0, costo: 0, limite: 5});
         calcularInventarioYFinanzas();
         renderGlobalServicesUI();
-        renderizarClientes(clientesDict);
+        filtrarClientes();
     }
 
     function removeGlobalService(index) {
@@ -362,29 +386,21 @@
             configGlobal.serviciosGlobales.splice(index, 1);
             calcularInventarioYFinanzas();
             renderGlobalServicesUI();
-            renderizarClientes(clientesDict);
+            filtrarClientes();
         }
     }
 
     function sincronizarPrecioMasivo(index) {
         const srv = configGlobal.serviciosGlobales[index];
         if (!confirm(`¿Aplicar precio ($${srv.precio}) a TODOS los clientes con "${srv.nombre}"?`)) return;
-
         let actualizados = 0;
         Object.keys(clientesDict).forEach(key => {
             let c = clientesDict[key];
             if (c.servicios) {
-                c.servicios.forEach(s => {
-                    if (s.nombre === srv.nombre) { s.monto = srv.precio; actualizados++; }
-                });
+                c.servicios.forEach(s => { if (s.nombre === srv.nombre) { s.monto = srv.precio; actualizados++; } });
             }
         });
-
-        if (actualizados > 0) {
-            calcularInventarioYFinanzas();
-            renderizarClientes(clientesDict);
-            alert(`¡Éxito! Precio actualizado en ${actualizados} perfiles.\n⚠️ GUARDA LOS CAMBIOS EN GITHUB.`);
-        }
+        if (actualizados > 0) { calcularInventarioYFinanzas(); filtrarClientes(); alert(`¡Éxito! Precio actualizado.`); }
     }
 
     function toggleAlertFields() {
@@ -394,14 +410,48 @@
         settingsDiv.style.pointerEvents = isActive ? "auto" : "none";
     }
 
-    // --- LÓGICA DE CLIENTES ---
+    // --- LÓGICA DE CLIENTES CON FILTROS ---
+    function filtrarClientes() {
+        const query = document.getElementById("search-input").value.toLowerCase();
+        const statusFilter = document.getElementById("filter-status").value;
+        const sortBy = document.getElementById("sort-by").value;
+
+        // Convertir a Array para filtrar y ordenar
+        let filtradosArr = Object.keys(clientesDict).map(key => ({ key, ...clientesDict[key] }));
+
+        // 1. Filtrar por texto y estado
+        filtradosArr = filtradosArr.filter(c => {
+            const matchText = c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query);
+            const matchStatus = statusFilter === 'all' || c.estado === statusFilter;
+            return matchText && matchStatus;
+        });
+
+        // 2. Ordenar
+        if (sortBy === 'name') {
+            filtradosArr.sort((a, b) => a.nombre.localeCompare(b.nombre));
+        } else if (sortBy === 'date') {
+            filtradosArr.sort((a, b) => (a.dia_pago || 15) - (b.dia_pago || 15));
+        } else if (sortBy === 'loyalty') {
+            filtradosArr.sort((a, b) => (b.pagos_puntuales || 0) - (a.pagos_puntuales || 0));
+        }
+
+        // 3. Reconstruir a diccionario
+        const filtradosDict = {};
+        filtradosArr.forEach(c => {
+            const { key, ...rest } = c;
+            filtradosDict[key] = rest;
+        });
+        
+        renderizarClientes(filtradosDict);
+    }
+
     function renderizarClientes(diccionario) {
         const container = document.getElementById("clients-container");
         container.innerHTML = "";
         const keys = Object.keys(diccionario);
 
         if (keys.length === 0) {
-            container.innerHTML = `<p style="color: var(--text-muted);">No se encontraron clientes.</p>`;
+            container.innerHTML = `<p style="color: var(--text-muted);">No se encontraron clientes que coincidan.</p>`;
             return;
         }
 
@@ -424,16 +474,37 @@
                 });
             } else { clientServicesHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Sin servicios activos</div>`; }
 
+            // Definir clase de color para el select de estado
+            let statusColorClass = `status-${cliente.estado}`;
+            let borderColor = cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)');
+
             const card = document.createElement("div");
             card.className = "client-card";
+            card.style.borderLeftColor = borderColor;
+            
             card.innerHTML = `
                 <div class="card-header-row">
                     <div class="client-info" style="width:100%;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h3>[${cliente.folio}] ${cliente.nombre}</h3>
-                            <span style="color:var(--neon-blue); font-weight:bold; font-size:0.9rem;">Total: $${subtotal}</span>
+                            <h3 style="color: ${borderColor};">[${cliente.folio}] ${cliente.nombre}</h3>
+                            <span style="color:var(--text-main); font-weight:bold; font-size:0.9rem;">Total: $${subtotal}</span>
                         </div>
-                        <div class="client-services-list" style="margin-top: 8px;">
+
+                        <!-- Nuevos Controles de Estado y Fecha -->
+                        <div style="display:flex; gap: 15px; margin-top: 8px; font-size: 0.8rem; align-items: center;">
+                            <div style="color: var(--text-muted);">Día Cobro: 
+                                <input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" style="width: 45px; background:#111; color:#fff; border: 1px solid var(--text-muted); border-radius:3px; text-align:center; padding:2px;" onchange="updateClientData('${key}', 'dia_pago', this.value)">
+                            </div>
+                            <div style="color: var(--text-muted);">Estado: 
+                                <select class="status-select ${statusColorClass}" onchange="updateClientData('${key}', 'estado', this.value)">
+                                    <option value="pendiente" ${cliente.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
+                                    <option value="pagado" ${cliente.estado === 'pagado' ? 'selected' : ''}>Pagado</option>
+                                    <option value="suspendido" ${cliente.estado === 'suspendido' ? 'selected' : ''}>Suspendido</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="client-services-list" style="margin-top: 10px;">
                             ${clientServicesHTML}
                             <div class="client-service-add-row">
                                 <select id="add-srv-sel-${key}">${globalOptions}</select>
@@ -443,7 +514,7 @@
                     </div>
                 </div>
                 <div class="card-actions-row">
-                    <span style="font-size:0.75rem; color:var(--text-muted);">Pagos Puntuales:</span>
+                    <span style="font-size:0.75rem; color:var(--text-muted);">Lealtad:</span>
                     <div class="loyalty-control">
                         <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
                         <span id="pagos-${key}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.pagos_puntuales || 0}</span>
@@ -457,10 +528,17 @@
         });
     }
 
+    function updateClientData(key, field, value) {
+        if (field === 'dia_pago') value = parseInt(value) || 15;
+        clientesDict[key][field] = value;
+        calcularInventarioYFinanzas(); // Por si se suspende a un cliente
+        filtrarClientes(); 
+    }
+
     function reiniciarLealtad(key) {
         if(confirm('¿Reiniciar la racha a 0?')) {
             clientesDict[key].pagos_puntuales = 0;
-            renderizarClientes(clientesDict);
+            filtrarClientes();
         }
     }
 
@@ -469,15 +547,15 @@
         if (!clientesDict[key].servicios) clientesDict[key].servicios = [];
         clientesDict[key].servicios.push({ nombre: nombre, monto: parseFloat(precio) });
         calcularInventarioYFinanzas();
-        renderGlobalServicesUI(); // Para actualizar los semáforos
-        renderizarClientes(clientesDict); 
+        renderGlobalServicesUI(); 
+        filtrarClientes(); 
     }
 
     function removeClientService(key, serviceIndex) {
         clientesDict[key].servicios.splice(serviceIndex, 1);
         calcularInventarioYFinanzas();
-        renderGlobalServicesUI(); // Para actualizar los semáforos
-        renderizarClientes(clientesDict);
+        renderGlobalServicesUI(); 
+        filtrarClientes();
     }
 
     function updatePagos(key, delta) {
@@ -489,16 +567,6 @@
         const link = `https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`;
         navigator.clipboard.writeText(`Hola ${nombre}, aquí tienes tu estado de cuenta actualizado:\n${link}`);
         alert("¡Link copiado!");
-    }
-
-    function filtrarClientes() {
-        const query = document.getElementById("search-input").value.toLowerCase();
-        const filtrados = {};
-        Object.keys(clientesDict).forEach(key => {
-            const c = clientesDict[key];
-            if (c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query)) filtrados[key] = c;
-        });
-        renderizarClientes(filtrados);
     }
 
     async function prepararYGuardar() {
@@ -514,7 +582,7 @@
         };
 
         const payload = {
-            message: "🤖 Admin Update: Dashboard Financiero y Catálogo",
+            message: "🤖 Admin Update: Filtros, Cuentas, Estados y Fechas",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
