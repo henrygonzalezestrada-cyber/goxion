@@ -9,39 +9,66 @@
     "serviciosGlobales": [
       {
         "nombre": "Netflix Premium",
-        "precio": 109
+        "precio": 109,
+        "cuentas": 1,
+        "costo": 329,
+        "limite": 5
       },
       {
         "nombre": "Disney+ Premium",
-        "precio": 89
+        "precio": 89,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       },
       {
         "nombre": "Max Standard",
-        "precio": 79
+        "precio": 79,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       },
       {
         "nombre": "Prime Video",
-        "precio": 39
+        "precio": 39,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       },
       {
         "nombre": "YouTube Premium",
-        "precio": 89
+        "precio": 89,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       },
       {
         "nombre": "Vix Premium",
-        "precio": 49
+        "precio": 49,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       },
       {
         "nombre": "Crunchyroll Cuenta completa",
-        "precio": 45
+        "precio": 45,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       },
       {
         "nombre": "Microsoft 365",
-        "precio": 79
+        "precio": 79,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       },
       {
         "nombre": "Google One 2TB",
-        "precio": 29
+        "precio": 29,
+        "cuentas": 1,
+        "costo": 0,
+        "limite": 5
       }
     ]
   },
@@ -54,7 +81,9 @@
         "nombre": "HBO Max Platino + Prime video",
         "monto": 99
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "rodas": {
     "folio": "GX-2026-0002",
@@ -69,7 +98,9 @@
         "nombre": "Microsoft 365",
         "monto": 79
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "nayeli": {
     "folio": "GX-2026-0003",
@@ -80,7 +111,9 @@
         "nombre": "Vix Premium (x2)",
         "monto": 98
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "laura": {
     "folio": "GX-2026-0004",
@@ -95,7 +128,9 @@
         "nombre": "Microsoft 365",
         "monto": 79
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "david": {
     "folio": "GX-2026-0005",
@@ -118,7 +153,9 @@
         "nombre": "YouTube Premium",
         "monto": 89
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "gabriel": {
     "folio": "GX-2026-0006",
@@ -133,7 +170,9 @@
         "nombre": "YouTube Premium",
         "monto": 89
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "jose": {
     "folio": "GX-2026-0007",
@@ -152,7 +191,9 @@
         "nombre": "Crunchyroll Cuenta completa",
         "monto": 100
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "fabiola": {
     "folio": "GX-2026-0008",
@@ -167,7 +208,9 @@
         "nombre": "HBO Max Platino",
         "monto": 79
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "jorge": {
     "folio": "GX-2026-0009",
@@ -190,7 +233,9 @@
         "nombre": "Google One 2TB",
         "monto": 29
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "alondra": {
     "folio": "GX-2026-0010",
@@ -213,7 +258,9 @@
         "nombre": "Google One",
         "monto": 29
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pagado"
   },
   "luis": {
     "folio": "GX-2026-0011",
@@ -224,7 +271,9 @@
         "nombre": "YouTube Premium",
         "monto": 89
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "samuel": {
     "folio": "GX-2026-0012",
@@ -243,7 +292,9 @@
         "nombre": "Vix Premium",
         "monto": 49
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "prima-fernanda": {
     "folio": "GX-2026-0013",
@@ -254,7 +305,9 @@
         "nombre": "Disney+ (Promocional)",
         "monto": 59
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "julian": {
     "folio": "GX-2026-0014",
@@ -269,7 +322,9 @@
         "nombre": "Vix Premium",
         "monto": 49
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "gabriel2": {
     "folio": "GX-2026-0015",
@@ -284,7 +339,9 @@
         "nombre": "Microsoft 365",
         "monto": 79
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "juan-de-dios": {
     "folio": "GX-2026-0016",
@@ -303,7 +360,9 @@
         "nombre": "HBO Max Platino",
         "monto": 79
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "rafael": {
     "folio": "GX-2026-0017",
@@ -318,7 +377,9 @@
         "nombre": "Disney+ (Especial)",
         "monto": 69
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "jeynner": {
     "folio": "GX-2026-0018",
@@ -329,7 +390,9 @@
         "nombre": "YouTube Premium",
         "monto": 89
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   },
   "isamar": {
     "folio": "GX-2026-0019",
@@ -344,6 +407,8 @@
         "nombre": "YouTube Premium",
         "monto": 89
       }
-    ]
+    ],
+    "dia_pago": 15,
+    "estado": "pendiente"
   }
 }
