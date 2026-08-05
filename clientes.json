@@ -260,7 +260,7 @@
       }
     ],
     "dia_pago": 15,
-    "estado": "pagado"
+    "estado": "pendiente"
   },
   "luis": {
     "folio": "GX-2026-0011",
