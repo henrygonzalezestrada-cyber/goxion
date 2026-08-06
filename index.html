@@ -51,13 +51,14 @@
     .total-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
     .total-amount { font-size: 32px; font-weight: 700; color: var(--accent-cyan); margin-top: 4px; }
     
-    .breakdown-line { font-size: 12px; font-weight: 600; margin-top: 6px; display: flex; justify-content: space-between; padding: 0 10px; }
+    .breakdown-box { background: #0d1117; border-radius: 12px; padding: 12px 16px; border: 1px dashed var(--border-color); margin-bottom: 20px; }
+    .breakdown-line { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; }
+    .breakdown-line:last-child { margin-bottom: 0; }
     .discount-line { color: var(--success-green); }
     .surcharge-line { color: var(--danger-red); }
 
     .actions-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
     
-    /* BOTONES REDISEÑADOS (DISEÑO PREMIUM) */
     .btn { width: 100%; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .btn:active { transform: scale(0.98); }
     
@@ -133,7 +134,7 @@
       const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
       
       const diaPago = cliente.dia_pago || 15;
-      const difDias = diaPago - diaHoy; // Positivo = faltan días, Negativo = días de atraso
+      const difDias = diaPago - diaHoy; 
       
       let rachaOriginal = cliente.pagos_puntuales || 0;
       let racha = rachaOriginal;
@@ -160,7 +161,7 @@
         });
       }
 
-      // 3. Reglas de Mora, Recargos y Banderas según Términos y Condiciones
+      // 3. Reglas de Mora, Recargos y Banderas
       let pctMoraDiaria = 0;
       let montoMora = 0;
       let montoBajaAdmin = 0;
@@ -171,27 +172,25 @@
       if (cliente.estado === 'pagado') {
           badgeHTML = `<div class="time-badge badge-ok">✨ Pago al corriente este mes</div>`;
       } else if (difDias > 0) {
-          badgeHTML = `<div class="time-badge badge-ok">⏳ Quedan ${difDias} día(s) para tu fecha límite</div>`;
+          // SOLO MOSTRAR SI FALTAN 6 DÍAS O MENOS
+          if (difDias <= 6) {
+              badgeHTML = `<div class="time-badge badge-ok">⏳ Quedan ${difDias} día(s) para tu fecha límite</div>`;
+          }
       } else if (difDias === 0) {
           badgeHTML = `<div class="time-badge badge-today">⚠️ Tu pago vence HOY</div>`;
       } else {
-          // Atrasado (difDias < 0)
           diasAtraso = Math.abs(difDias);
           badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago vencido hace ${diasAtraso} día(s)</div>`;
 
-          // CALCULO DE RECARGO DE MORA (5% diario sobre el subtotal, máximo 50%)
           let pctMoraCalculado = diasAtraso * 0.05;
-          pctMoraDiaria = Math.min(pctMoraCalculado, 0.50); // Tope de 50%
+          pctMoraDiaria = Math.min(pctMoraCalculado, 0.50);
           montoMora = Math.round(subtotal * pctMoraDiaria);
-
           let acumMoraTotal = subtotal + montoMora;
 
-          // CARGO EXTREMO: Más de 15 días (+20% sobre todo el total acumulado)
           if (diasAtraso > 15) {
               montoBajaAdmin = Math.round(acumMoraTotal * 0.20);
           }
 
-          // Mensaje de alerta para el cliente
           mensajeAtrasoHTML = `
             <div class="overdue-incentive-box">
               🚨 <strong>Mora activa por falta de pago sin previo aviso.</strong><br>
@@ -210,7 +209,7 @@
           bannerEstado = `<div style="background: rgba(46, 160, 67, 0.15); border: 1px solid var(--success-green); color: var(--success-green); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 13px;">✅ MENSUALIDAD PAGADA ¡GRACIAS!</div>`;
       }
 
-      // 5. Cálculo del Descuento por Fidelidad (Con mensaje ajustado)
+      // 5. Cálculo del Descuento por Fidelidad
       let pctDescuento = 0;
       let mensajeLealtad = '';
 
@@ -224,7 +223,6 @@
       } else {
         pctDescuento = 0;
         const faltantes = 4 - racha;
-        // AQUÍ ESTÁ EL AJUSTE DEL CORAZÓN ROTO
         mensajeLealtad = perdioRacha 
           ? `Progreso: <span class="loyalty-highlight">0/4</span>. <span style="color:var(--danger-red); font-weight: 600;">💔 Racha perdida por atraso.</span>` 
           : `Progreso: <span class="loyalty-highlight">${racha}/4 pagos</span>. Falta(n) <span class="loyalty-highlight">${faltantes} pago(s)</span> para Nivel 1.`;
@@ -234,11 +232,23 @@
       const ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
       const totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
 
-      // Mensaje de soporte WhatsApp
+      // 7. Generar Caja de Desglose (Ticket)
+      let breakdownHTML = '';
+      if (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0) {
+          breakdownHTML = `
+            <div class="breakdown-box">
+              <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Servicios:</span><span>$${subtotal} MXN</span></div>
+              ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento Lealtad:</span><span>-$${ahorro} MXN</span></div>` : ''}
+              ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Recargo Mora (+${Math.round(pctMoraDiaria * 100)}%):</span><span>+$${montoMora} MXN</span></div>` : ''}
+              ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Admón (+15 días):</span><span>+$${montoBajaAdmin} MXN</span></div>` : ''}
+            </div>
+          `;
+      }
+
       const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi estado de cuenta.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-      // Renderizado final (Con botones ajustados)
+      // Renderizado final
       app.innerHTML = `
         <div class="header">
           <img src="logo.png" alt="GOXION" class="logo-img">
@@ -258,19 +268,15 @@
         ${mensajeAtrasoHTML}
 
         <div class="section-title">Servicios Activos</div>
-        <div style="background: #0d1117; border-radius: 12px; padding: 0 16px; border: 1px solid var(--border-color);">
+        <div style="background: #0d1117; border-radius: 12px; padding: 0 16px; border: 1px solid var(--border-color); margin-bottom: ${breakdownHTML ? '10px' : '20px'};">
           ${serviciosHTML}
         </div>
+
+        ${breakdownHTML}
 
         <div class="total-box">
           <div class="total-label">Total a Pagar</div>
           <div class="total-amount">$${totalFinal} MXN</div>
-          
-          <div style="margin-top: 10px; border-top: 1px dashed var(--border-color); padding-top: 8px;">
-            ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento lealtad:</span><span>-$${ahorro} MXN</span></div>` : ''}
-            ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Recargo Mora (+${Math.round(pctMoraDiaria * 100)}%):</span><span>+$${montoMora} MXN</span></div>` : ''}
-            ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Admón (+15 días):</span><span>+$${montoBajaAdmin} MXN</span></div>` : ''}
-          </div>
         </div>
 
         <div class="actions-group">
