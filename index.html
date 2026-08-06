@@ -121,9 +121,18 @@
       const diaPago = cliente.dia_pago || 15;
       const difDias = diaPago - diaHoy;
       
+      let rachaOriginal = cliente.pagos_puntuales || 0;
+      let racha = rachaOriginal;
+      let perdioRacha = false;
+
+      // REGLA MAESTRA: Si está vencido y NO ha pagado, pierde la racha visualmente
+      if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) {
+          racha = 0;
+          perdioRacha = true;
+      }
+
       let badgeHTML = "";
       let mensajeAtrasoHTML = "";
-      const racha = cliente.pagos_puntuales || 0;
 
       if (cliente.estado === 'pagado') {
           badgeHTML = `<div class="time-badge badge-ok">✨ Pago al corriente este mes</div>`;
@@ -135,11 +144,11 @@
           const diasPasados = Math.abs(difDias);
           badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago vencido hace ${diasPasados} día(s)</div>`;
 
-          // Generar mensaje persuasivo según racha
-          if (racha > 0) {
+          // Generar mensaje persuasivo según si acaba de perder la racha o no
+          if (perdioRacha) {
               mensajeAtrasoHTML = `
                 <div class="overdue-incentive-box">
-                  ⚠️ <strong>¡Atención con tu racha!</strong> Tienes acumulados <strong>${racha} pago(s) puntual(es)</strong>. Realiza tu pago hoy para evitar perder tu avance y conservar tus descuentos de lealtad.
+                  💔 <strong>Has perdido tus beneficios.</strong> Al no cubrir tu cuota a tiempo, tu racha y descuentos se han reiniciado. Ponte al corriente para comenzar a acumular meses nuevamente.
                 </div>
               `;
           } else {
@@ -159,7 +168,7 @@
           bannerEstado = `<div style="background: rgba(46, 160, 67, 0.15); border: 1px solid var(--success-green); color: var(--success-green); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 13px;">✅ MENSUALIDAD PAGADA ¡GRACIAS!</div>`;
       }
 
-      // 3. Cálculo de Fidelidad
+      // 3. Cálculo de Fidelidad (Basado en la racha recalculada)
       let pctDescuento = 0;
       let mensajeLealtad = '';
 
@@ -173,7 +182,11 @@
       } else {
         pctDescuento = 0;
         const faltantes = 4 - racha;
-        mensajeLealtad = `Progreso actual: <span class="loyalty-highlight">${racha}/4 pagos</span>. Completa <span class="loyalty-highlight">${faltantes} pago(s) puntual(es) más</span> para desbloquear el Nivel 1 (3% OFF).`;
+        if (perdioRacha) {
+            mensajeLealtad = `Progreso actual: <span class="loyalty-highlight">0/4 pagos</span>. <span style="color:var(--danger-red);">Racha reiniciada por atraso.</span> Paga puntual <span class="loyalty-highlight">4 veces seguidas</span> para volver al Nivel 1.`;
+        } else {
+            mensajeLealtad = `Progreso actual: <span class="loyalty-highlight">${racha}/4 pagos</span>. Completa <span class="loyalty-highlight">${faltantes} pago(s) puntual(es) más</span> para desbloquear el Nivel 1 (3% OFF).`;
+        }
       }
 
       // 4. Procesar servicios
