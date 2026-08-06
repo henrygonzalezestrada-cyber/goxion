@@ -56,13 +56,26 @@
     .surcharge-line { color: var(--danger-red); }
 
     .actions-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
-    .btn { width: 100%; padding: 12px; border-radius: 10px; border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
-    .btn:active { transform: scale(0.98); }
-    .btn-copy { background: #21262d; color: var(--text-main); border: 1px solid var(--border-color); }
-    .btn-copy:hover { background: #30363d; }
     
-    .btn-wa { background: var(--warning-amber); color: #000; font-weight: 700; }
-    .btn-wa:hover { opacity: 0.9; }
+    /* BOTONES REDISEÑADOS (DISEÑO PREMIUM) */
+    .btn { width: 100%; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+    .btn:active { transform: scale(0.98); }
+    
+    .btn-copy { 
+      background: var(--accent-blue);
+      color: #ffffff; 
+      border: none; 
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.2);
+    }
+    .btn-copy:hover { opacity: 0.9; }
+
+    .btn-wa { 
+      background: transparent; 
+      color: var(--warning-amber); 
+      border: 1px solid var(--warning-amber); 
+      font-weight: 600; 
+    }
+    .btn-wa:hover { background: rgba(255, 159, 10, 0.1); }
 
     .loyalty-badge { background: #1f242d; border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 20px; }
     .loyalty-title { font-size: 11px; color: var(--success-green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -197,7 +210,7 @@
           bannerEstado = `<div style="background: rgba(46, 160, 67, 0.15); border: 1px solid var(--success-green); color: var(--success-green); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 13px;">✅ MENSUALIDAD PAGADA ¡GRACIAS!</div>`;
       }
 
-      // 5. Cálculo del Descuento por Fidelidad
+      // 5. Cálculo del Descuento por Fidelidad (Con mensaje ajustado)
       let pctDescuento = 0;
       let mensajeLealtad = '';
 
@@ -211,8 +224,9 @@
       } else {
         pctDescuento = 0;
         const faltantes = 4 - racha;
+        // AQUÍ ESTÁ EL AJUSTE DEL CORAZÓN ROTO
         mensajeLealtad = perdioRacha 
-          ? `Progreso: <span class="loyalty-highlight">0/4 pagos</span>. <span style="color:var(--danger-red);">Racha reiniciada por mora.</span>` 
+          ? `Progreso: <span class="loyalty-highlight">0/4</span>. <span style="color:var(--danger-red); font-weight: 600;">💔 Racha perdida por atraso.</span>` 
           : `Progreso: <span class="loyalty-highlight">${racha}/4 pagos</span>. Falta(n) <span class="loyalty-highlight">${faltantes} pago(s)</span> para Nivel 1.`;
       }
 
@@ -224,7 +238,7 @@
       const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi estado de cuenta.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-      // Renderizado final
+      // Renderizado final (Con botones ajustados)
       app.innerHTML = `
         <div class="header">
           <img src="logo.png" alt="GOXION" class="logo-img">
@@ -261,10 +275,10 @@
 
         <div class="actions-group">
           <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">
-            📋 Copiar CLABE y datos de pago
+            📋 Copiar datos para pago
           </button>
           <a href="${urlWA}" target="_blank" class="btn btn-wa">
-            ⚠️ ¿Dudas o reportes? Contactar Soporte
+            💬 Contactar Soporte
           </a>
         </div>
 
