@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOXION - Ecosistema Central</title>
+    <title>GOXION - Centro de Autogestión</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -13,46 +13,56 @@
             --text-muted: #95a4bd;
             --neon-blue: #00f2fe;
             --neon-purple: #7c4dff;
-            --success-green: #2ea043;
-            --danger-red: #ff3366;
+            --neon-magenta: #e026de;
             --warning-amber: #ffaa00;
+            --danger-red: #ff3366;
+            --success-green: #2ea043;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
-        body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
+        body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; overflow-x: hidden; }
         body.no-scroll { overflow: hidden; height: 100vh; }
 
-        /* SPLASH SCREEN */
+        /* --- PANTALLA DE BIENVENIDA MINIMALISTA (SPLASH SCREEN) --- */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-black); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
         }
-        .splash-content { animation: floatUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .splash-logo { max-width: 140px; filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.4)); }
+        .splash-content { text-align: center; animation: floatUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .splash-logo { max-width: 140px; height: auto; filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.4)); }
         @keyframes floatUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
         /* FONDO ANIMADO */
-        .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); }
-        .neon-orbit { position: absolute; border-radius: 50%; border: 2px solid transparent; pointer-events: none; }
-        .orbit-1 { width: 900px; height: 900px; top: -300px; right: -400px; border-bottom: 3px solid var(--neon-purple); border-left: 3px solid rgba(124, 77, 255, 0.1); filter: drop-shadow(0 0 25px var(--neon-purple)); animation: spinOrbit 25s linear infinite; }
-        .orbit-2 { width: 1200px; height: 1200px; bottom: -500px; left: -500px; border-top: 3px solid var(--neon-blue); border-right: 3px solid rgba(0, 242, 254, 0.1); filter: drop-shadow(0 0 30px var(--neon-blue)); animation: spinOrbitReverse 35s linear infinite; }
+        .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); overflow: hidden; }
+        .neon-orbit { position: absolute; border-radius: 50%; border: 2px solid transparent; will-change: transform; pointer-events: none; }
+        .orbit-1 { width: 900px; height: 900px; top: -300px; right: -400px; border-bottom: 3px solid var(--neon-purple); border-left: 3px solid rgba(124, 77, 255, 0.2); filter: drop-shadow(0 0 25px var(--neon-purple)); animation: spinOrbit 25s linear infinite; }
+        .orbit-2 { width: 1200px; height: 1200px; bottom: -500px; left: -500px; border-top: 3px solid var(--neon-blue); border-right: 3px solid rgba(0, 242, 254, 0.2); filter: drop-shadow(0 0 30px var(--neon-blue)); animation: spinOrbitReverse 35s linear infinite; }
         @keyframes spinOrbit { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes spinOrbitReverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
 
-        /* HEADER APP */
-        .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 25px; padding: 5px 0; }
-        .app-logo { max-height: 32px; width: auto; object-fit: contain; }
-        .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; }
+        /* HEADER TIPO APP */
+        .app-header {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; margin-bottom: 25px; padding: 5px 0;
+        }
+        .app-logo { max-height: 32px; width: auto; display: block; object-fit: contain; }
+        .header-action-btn {
+            background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3);
+            color: var(--neon-blue); padding: 8px 16px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; text-decoration: none; transition: 0.3s;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
 
         .alert-banner { background: rgba(255, 170, 0, 0.12); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(12px); }
 
-        /* PESTAÑAS */
-        .tab-container { display: flex; background: rgba(255,255,255,0.03); border-radius: 20px; padding: 6px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); position: relative; z-index: 110; }
-        .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; border-radius: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.3s; }
+        /* NAVEGACIÓN POR PESTAÑAS (CORREGIDO PROPORCIONES) */
+        .tab-container { display: flex; background: rgba(255,255,255,0.03); border-radius: 20px; padding: 6px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); }
+        .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; border-radius: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; }
         .tab-btn span { font-size: 20px; }
         .tab-btn.active { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15); }
         
@@ -61,76 +71,50 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
 
-        /* BOTONES GLOBALES Y INPUTS */
-        .input-smart { width: 100%; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 14px; border-radius: 12px; font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .input-smart:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 242, 254, 0.1); }
-        .btn-primary { width: 100%; padding: 14px; border-radius: 30px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; transition: 0.3s; }
-        .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
+        /* BUSCADOR (CORREGIDO PROPORCIONES) */
+        .search-bar-container { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; width: 100%; background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 8px; backdrop-filter: blur(12px); transition: 0.3s; margin-bottom: 30px; box-sizing: border-box; }
+        .search-bar-container:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
+        .search-input { flex: 1; min-width: 0; background: transparent; border: none; color: var(--text-main); font-size: 14px; padding: 8px 12px; outline: none; }
+        .search-btn { flex-shrink: 0; white-space: nowrap; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); border: none; border-radius: 14px; padding: 10px 20px; color: #000; font-weight: 700; font-size: 14px; cursor: pointer; }
 
-        /* --- DASHBOARD PERSONAL (UI AVANZADA) --- */
-        .login-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 25px; backdrop-filter: blur(12px); text-align: center; margin-bottom: 30px; }
-        
-        .dash-sticky-header {
-            position: sticky; top: 10px; z-index: 100;
-            padding: 30px 10px 15px 10px; text-align: center;
-            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            border-radius: 20px; margin-bottom: 20px;
-        }
-        .dash-sticky-header.scrolled {
-            background: rgba(14, 14, 20, 0.9); backdrop-filter: blur(15px);
-            padding: 15px 20px; border: 1px solid rgba(0, 242, 254, 0.3);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); top: 10px;
-        }
-        .dash-greeting {
-            font-size: 38px; font-weight: 800; color: var(--text-main);
-            line-height: 1.1; transition: all 0.4s ease;
-        }
-        .dash-sticky-header.scrolled .dash-greeting { font-size: 20px; }
-        .hola-text { display: inline-block; transition: all 0.4s ease; }
-        .dash-sticky-header.scrolled .hola-text { opacity: 0; font-size: 0; visibility: hidden; }
-        .dash-name { color: var(--neon-blue); }
-
-        .dash-card { background: var(--card-bg); border: 1px dashed rgba(255,255,255,0.15); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 25px; backdrop-filter: blur(12px); }
-        .dash-date { font-size: 24px; font-weight: 800; color: var(--text-main); margin: 5px 0 10px 0; }
-        .time-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-        .badge-ok { background: rgba(0, 242, 254, 0.1); color: var(--neon-blue); border: 1px solid rgba(0, 242, 254, 0.3); }
-        .badge-today { background: rgba(255, 170, 0, 0.15); color: var(--warning-amber); border: 1px solid var(--warning-amber); }
-        .badge-overdue { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
-
-        .service-pill { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px; }
-        .service-pill-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
-        .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 4px 8px; border-radius: 10px; font-weight: 700; }
-
-        /* REGLAS, CATÁLOGO Y SOPORTE */
+        /* ACCESOS RÁPIDOS Y REGLAS (CORREGIDO PROPORCIONES) */
         .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .btn-menu { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15); border-radius: 20px; padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; backdrop-filter: blur(12px); transition: 0.3s; }
         .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); }
         .btn-menu span { font-size: 38px; margin-bottom: 4px; }
-        .btn-menu div { font-weight: 600; font-size: 13px; }
+        .btn-menu div { font-weight: 600; font-size: 13px; letter-spacing: 0.3px; }
 
+        /* CATÁLOGO DINÁMICO */
         .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .catalog-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
+        .catalog-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 20px; padding: 18px; text-align: center; backdrop-filter: blur(12px); display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
+        .catalog-card:hover { border-color: var(--neon-blue); box-shadow: 0 8px 20px rgba(0,242,254,0.15); transform: translateY(-3px); }
         .cat-icon { font-size: 36px; margin-bottom: 10px; }
-        .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+        .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; line-height: 1.2; }
         .cat-price { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
         .cat-badge { font-size: 11px; padding: 6px 10px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; }
         .cat-badge.ok { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid var(--success-green); }
         .cat-badge.out { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
-        .cat-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; }
+        .cat-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; }
         .cat-btn.active { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
+        .cat-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-        .smart-support-card { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3); border-radius: 20px; padding: 22px; backdrop-filter: blur(12px); }
+        /* MÓDULO INTELIGENTE */
+        .smart-support-card { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3); border-radius: 20px; padding: 22px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
         .platform-btn span { font-size: 22px; }
-        .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); }
+        .platform-btn:hover, .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); transform: translateY(-2px); }
         .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
         .step-box.active { display: block; }
         .custom-select-smart { width: 100%; background: #0d121c; border: 1px solid var(--neon-purple); color: var(--text-main); padding: 14px; border-radius: 12px; font-size: 14px; outline: none; margin-bottom: 12px; }
-        .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 14px; border-radius: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; }
+        .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 14px; border-radius: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
+        .input-smart { width: 100%; box-sizing: border-box; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 14px; margin-bottom: 15px; outline: none; }
+        .input-smart:focus { border-color: var(--neon-blue); }
+        .btn-primary { width: 100%; box-sizing: border-box; padding: 14px; border-radius: 30px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; text-align: center; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; }
+        .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
 
         /* MODALES */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
         .modal-content { background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
@@ -142,19 +126,24 @@
         .terms-list li { margin-bottom: 12px; }
         .terms-list strong { color: var(--neon-blue); display: block; margin-bottom: 2px;}
 
+        /* FOOTER */
         .footer-info { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px dashed rgba(255,255,255,0.05); }
+        .schedule { display: inline-block; background: var(--card-bg); border-radius: 30px; padding: 10px 24px; margin-bottom: 15px; border: 1px solid rgba(0, 242, 254, 0.15); }
+        .schedule-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .schedule-time { font-size: 13px; color: var(--neon-blue); font-weight: 600; }
+        .copyright { font-size: 12px; color: var(--text-muted); padding-bottom: 20px; }
     </style>
 </head>
 <body class="no-scroll">
 
-    <!-- SPLASH SCREEN -->
+    <!-- TRANSICIÓN DE BIENVENIDA MINIMALISTA -->
     <div id="splash-screen" onclick="hideSplash()">
         <div class="splash-content">
             <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
         </div>
     </div>
 
-    <!-- FONDO -->
+    <!-- FONDO ANIMADO -->
     <div class="bg">
         <div class="neon-orbit orbit-1"></div>
         <div class="neon-orbit orbit-2"></div>
@@ -162,74 +151,48 @@
 
     <div class="container">
         
+        <!-- HEADER HEADER TIPO APP (IZQ: LOGO, DER: BOTÓN AYUDA) -->
         <header class="app-header">
             <img src="logo2.PNG" alt="GOXION" class="app-logo">
-            <a href="https://wa.me/528136836901" target="_blank" class="header-action-btn">💬 Contacto</a>
+            <a href="https://wa.me/528136836901" target="_blank" class="header-action-btn">
+                💬 Contacto
+            </a>
         </header>
 
         <div class="alert-banner" id="dynamic-alert">
-            <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
+            <span style="font-size: 20px;">⚠️</span>
+            <div style="font-size: 13px; color: #fff;" id="alert-content"></div>
         </div>
 
+        <!-- PESTAÑAS NATIVAS -->
         <div class="tab-container">
-            <button class="tab-btn active" id="btn-tab-cuenta" onclick="switchTab('cuenta')"><span>👤</span>Mi Espacio</button>
+            <button class="tab-btn active" id="btn-tab-cuenta" onclick="switchTab('cuenta')"><span>🔍</span>Mi Cuenta</button>
             <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')"><span>🛒</span>Catálogo</button>
             <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
         </div>
 
-        <!-- VISTA 1: MI ESPACIO (LOGIN O DASHBOARD) -->
+        <!-- VISTA 1: MI ESTADO DE CUENTA Y REGLAS -->
         <div id="view-cuenta" class="view-section active">
-            
-            <!-- A. ESTADO NO LOGUEADO (LOGIN) -->
-            <div id="auth-view">
-                <div class="login-card">
-                    <img src="Logo individual.png" style="width: 40px; margin-bottom: 15px;" onerror="this.style.display='none'">
-                    <div class="section-title" style="margin-bottom: 4px; font-size: 14px; color: var(--text-main);">Vincular Dispositivo</div>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Ingresa tus datos para acceder a tu panel personal.</p>
-                    
-                    <input type="text" id="login-id" class="input-smart" placeholder="Tu Nombre o ID (Ej. Juan Perez)">
-                    <input type="password" id="login-pin" class="input-smart" placeholder="Código de Acceso (PIN)">
-                    
-                    <button class="btn-primary" onclick="iniciarSesion()">Entrar a mi Panel</button>
-                    <p id="login-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
-                </div>
-
-                <div class="section-title">Información Importante</div>
-                <div class="policy-grid">
-                    <div class="btn-menu" onclick="openModal('modal-terminos')"><span>📄</span><div>Términos de Uso</div></div>
-                    <div class="btn-menu" onclick="openModal('modal-garantia')"><span>🛡️</span><div>Garantía y Sanciones</div></div>
-                    <div class="btn-menu" onclick="openModal('modal-lealtad')"><span>⭐</span><div>Programa Lealtad</div></div>
-                    <div class="btn-menu" onclick="openModal('modal-referidos')"><span>🎁</span><div>Invita y Gana</div></div>
-                </div>
+            <div class="section-title">Buscar Estado de Cuenta</div>
+            <div class="search-bar-container">
+                <input type="text" id="main-input-cliente" class="search-input" placeholder="Ingresa tu ID o Nombre...">
+                <button class="search-btn" onclick="buscarClienteDirecto()">🔍 Buscar</button>
             </div>
 
-            <!-- B. ESTADO LOGUEADO (DASHBOARD PERSONAL) -->
-            <div id="dashboard-view" style="display: none;">
-                
-                <!-- HEADER SHINKING -->
-                <div id="dash-header" class="dash-sticky-header">
-                    <div class="dash-greeting">
-                        <span class="hola-text">Hola, </span><span id="dash-name" class="dash-name">Cliente</span>
-                    </div>
+            <div class="section-title">Información Importante (Reglamento)</div>
+            <div class="policy-grid">
+                <div class="btn-menu" onclick="openModal('modal-terminos')">
+                    <span>📄</span><div>Términos de Uso</div>
                 </div>
-
-                <!-- CONTENIDO DEL PANEL -->
-                <div class="dash-card">
-                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);">Tu próxima fecha de corte</div>
-                    <div class="dash-date" id="dash-date">Cargando...</div>
-                    <div id="dash-badge"></div>
+                <div class="btn-menu" onclick="openModal('modal-garantia')">
+                    <span>🛡️</span><div>Garantía y Sanciones</div>
                 </div>
-
-                <div class="section-title" style="margin-top: 30px;">Tus Servicios Activos</div>
-                <div id="dash-services" style="margin-bottom: 25px;"></div>
-
-                <button class="btn-primary" onclick="irAlTicket()" style="padding: 16px; font-size: 15px; border-radius: 16px; margin-bottom: 15px;">
-                    💳 Ver Estado de Cuenta y Pagar
-                </button>
-
-                <button onclick="cerrarSesion()" style="background: transparent; border: none; color: var(--text-muted); font-size: 12px; width: 100%; text-decoration: underline; cursor: pointer; padding: 10px;">
-                    Cerrar Sesión de este dispositivo
-                </button>
+                <div class="btn-menu" onclick="openModal('modal-lealtad')">
+                    <span>⭐</span><div>Programa Lealtad</div>
+                </div>
+                <div class="btn-menu" onclick="openModal('modal-referidos')">
+                    <span>🎁</span><div>Invita y Gana</div>
+                </div>
             </div>
         </div>
 
@@ -267,7 +230,7 @@
                         <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
                     </div>
                     <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()">
-                        📲 Generar Solicitud
+                        📲 Generar Solicitud por WhatsApp →
                     </button>
                 </div>
             </div>
@@ -275,32 +238,83 @@
 
         <div class="footer-info">
             <div class="schedule">
-                <div class="schedule-title">🕒 Atención Asistida</div>
+                <div class="schedule-title">🕒 Horario de Atención Asistida</div>
                 <div class="schedule-time">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
             </div>
+            <div class="copyright">
+                Para emergencias fuera de horario, deja tu mensaje y será el primero en atenderse al abrir sistema.<br><br>
+                © 2026 GOXION. Todos los derechos reservados.
+            </div>
+        </div>
+
+    </div>
+
+    <!-- MODALES LEGALES -->
+    <div id="modal-terminos" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
+            <div class="modal-title">Términos y Condiciones Oficiales</div>
+            <ul class="terms-list">
+                <li><strong>1. Confidencialidad de Credenciales</strong>Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
+                <li><strong>2. Uso Permitido</strong>Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
+                <li><strong>3. Sanciones</strong>El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
+                <li><strong>4. Esquema de Pagos y Notificaciones</strong>La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial. Métodos aceptados: Transferencias bancarias electrónicas y depósitos.</li>
+                <li><strong>5. Aviso Previo por Imposibilidad de Pago</strong>Si el usuario prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos.</li>
+            </ul>
+        </div>
+    </div>
+    <div id="modal-garantia" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
+            <div class="modal-title">Garantía, Satisfacción y Sanciones</div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
+            <table>
+                <tr><th>Concepto</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
+                <tr><td style="color: var(--text-main);"><strong>Falla Técnica</strong></td><td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td><td>Hasta 50% de descuento (equivalente a 10 días).</td></tr>
+                <tr><td style="color: var(--warning-amber);"><strong>Mora sin Previo Aviso</strong></td><td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento.</td><td>Hasta 50% de interés acumulado.</td></tr>
+                <tr><td style="color: var(--danger-red);"><strong>Baja / Cancelación del Servicio</strong></td><td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td><td>20% sobre saldo pendiente.</td></tr>
+            </table>
+        </div>
+    </div>
+    <div id="modal-lealtad" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
+            <div class="modal-title">Programa de Fidelidad</div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
+            <table><tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr><tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr><tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr></table>
+            <p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
+        </div>
+    </div>
+    <div id="modal-referidos" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
+            <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en una mensualidad de tu servicio actual por cada nuevo cliente que concrete una compra.</p>
+            <ul class="terms-list">
+                <li><strong>1. Requisitos para el Referido</strong>Debe ser cliente nuevo. Adquirir un mínimo de dos (2) perfiles y mantenerlos activos/pagados durante 3 meses consecutivos.</li>
+                <li><strong>2. Condiciones de Aplicación</strong>El descuento del 100% se aplicará en tu cuarto mes. Debes mantener tu cuenta activa y al corriente durante la validación.</li>
+                <li><strong>3. Restricciones</strong>Si el Referido cancela antes de los 3 meses, el beneficio se anula. No es acumulable con otros descuentos. Aplica sobre tu tarifa base mensual. Sin límite de referidos (un mes gratis por cada ciclo cumplido).</li>
+            </ul>
         </div>
     </div>
 
-    <!-- MODALES LEGALES (Ocultos) -->
-    <div id="modal-terminos" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span><div class="modal-title">Términos y Condiciones</div><ul class="terms-list"><li><strong>1. Confidencialidad</strong> Credenciales estrictamente personales.</li><li><strong>2. Uso Permitido</strong> Prohibido modificar datos ajenos.</li><li><strong>3. Sanciones</strong> Suspensión sin reembolso por incumplimiento.</li><li><strong>4. Pagos</strong> La fecha límite es el día de contratación.</li></ul></div></div>
-    <div id="modal-garantia" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span><div class="modal-title">Garantía y Sanciones</div><table><tr><th>Concepto</th><th>Regla</th></tr><tr><td style="color:var(--text-main);"><strong>Falla Técnica</strong></td><td>5% desc. diario por día inactivo.</td></tr><tr><td style="color:var(--warning-amber);"><strong>Mora</strong></td><td>5% recargo diario acumulable.</td></tr><tr><td style="color:var(--danger-red);"><strong>Cancelación</strong></td><td>20% cargo tras 15 días inactivo.</td></tr></table></div></div>
-    <div id="modal-lealtad" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span><div class="modal-title">Programa de Fidelidad</div><table><tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr><tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr><tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr></table></div></div>
-    <div id="modal-referidos" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span><div class="modal-title">🎁 Invita y Gana</div><ul class="terms-list"><li><strong>1. Requisito</strong> El referido debe adquirir mínimo 2 perfiles.</li><li><strong>2. Permanencia</strong> Mantener perfiles pagados por 3 meses.</li><li><strong>3. Aplicación</strong> Descuento del 100% en tu 4to mes.</li></ul></div></div>
-
     <script>
         const NUMERO_GOXION = "528136836901"; 
-        let globalClientesData = null;
 
-        // 1. SPLASH SCREEN
+        // LÓGICA DE PANTALLA DE ENTRADA (SPLASH SCREEN)
         function hideSplash() {
             const splash = document.getElementById('splash-screen');
             if (splash.style.opacity === '0') return;
+            
             splash.style.opacity = '0';
-            setTimeout(() => { splash.style.visibility = 'hidden'; document.body.classList.remove('no-scroll'); }, 600);
+            setTimeout(() => {
+                splash.style.visibility = 'hidden';
+                document.body.classList.remove('no-scroll');
+            }, 600);
         }
-        window.addEventListener('load', () => { setTimeout(hideSplash, 1800); cargarDatosYVerificarSesion(); });
+        window.addEventListener('load', () => { setTimeout(hideSplash, 1800); });
 
-        // 2. TABS Y MODALES
+        // NAVEGACIÓN
         function switchTab(tabName) {
             ['cuenta', 'catalogo', 'soporte'].forEach(name => {
                 document.getElementById(`btn-tab-${name}`).classList.remove('active');
@@ -308,209 +322,207 @@
             });
             document.getElementById(`btn-tab-${tabName}`).classList.add('active');
             document.getElementById(`view-${tabName}`).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
+
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
-
-        // 3. EFECTO SCROLL HEADER (SHRINKING)
-        window.addEventListener('scroll', () => {
-            const header = document.getElementById('dash-header');
-            if(header && document.getElementById('dashboard-view').style.display !== 'none') {
-                if(window.scrollY > 30) header.classList.add('scrolled');
-                else header.classList.remove('scrolled');
-            }
+        
+        function buscarClienteDirecto() {
+            var val = document.getElementById('main-input-cliente').value.trim();
+            if (!val) return alert("Ingresa tu identificador.");
+            window.location.href = 'index.html?cliente=' + encodeURIComponent(val);
+        }
+        document.getElementById('main-input-cliente').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') buscarClienteDirecto();
         });
 
-        // 4. LÓGICA DE SESIÓN Y BUSCADOR INTELIGENTE
-        function normalizeString(str) {
-            return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
-        }
-
-        async function cargarDatosYVerificarSesion() {
-            try {
-                const response = await fetch('clientes.json', { cache: 'no-store' });
-                globalClientesData = await response.json();
-                
-                cargarCatalogo(globalClientesData);
-                
-                const savedKey = localStorage.getItem('goxion_user_key');
-                if(savedKey && globalClientesData[savedKey]) {
-                    renderDashboard(savedKey);
-                }
-            } catch(e) { console.error("Error cargando base de datos"); }
-        }
-
-        function iniciarSesion() {
-            const inputId = document.getElementById('login-id').value;
-            const inputPin = document.getElementById('login-pin').value.trim();
-            const errorMsg = document.getElementById('login-error');
-            
-            if(!inputId || !inputPin) {
-                errorMsg.innerText = "Por favor ingresa tu Nombre y PIN.";
-                errorMsg.style.display = 'block'; return;
-            }
-
-            const searchStr = normalizeString(inputId);
-            let foundKey = null;
-
-            for(let key in globalClientesData) {
-                if(key === '_goxion_config') continue;
-                let cli = globalClientesData[key];
-                
-                if(normalizeString(key) === searchStr || normalizeString(cli.nombre) === searchStr || normalizeString(cli.folio) === searchStr) {
-                    if(cli.codigo === inputPin || cli.pin === inputPin || cli.codigo_acceso === inputPin) {
-                        foundKey = key; break;
-                    }
-                }
-            }
-
-            if(foundKey) {
-                localStorage.setItem('goxion_user_key', foundKey);
-                errorMsg.style.display = 'none';
-                renderDashboard(foundKey);
-            } else {
-                errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código.";
-                errorMsg.style.display = 'block';
-            }
-        }
-
-        function cerrarSesion() {
-            localStorage.removeItem('goxion_user_key');
-            document.getElementById('dashboard-view').style.display = 'none';
-            document.getElementById('auth-view').style.display = 'block';
-            document.getElementById('login-id').value = '';
-            document.getElementById('login-pin').value = '';
-        }
-
-        function irAlTicket() {
-            const key = localStorage.getItem('goxion_user_key');
-            if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
-        }
-
-        // 5. RENDERIZADO DEL DASHBOARD
-        function renderDashboard(key) {
-            const cliente = globalClientesData[key];
-            document.getElementById('auth-view').style.display = 'none';
-            document.getElementById('dashboard-view').style.display = 'block';
-
-            // Extraer solo el primer nombre
-            const primerNombre = cliente.nombre.split(' ')[0];
-            document.getElementById('dash-name').innerText = primerNombre;
-
-            // Fechas
-            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const hoy = new Date();
-            const mesActual = meses[hoy.getMonth()];
-            const diaPago = cliente.dia_pago || 15;
-            const difDias = diaPago - hoy.getDate();
-            
-            document.getElementById('dash-date').innerText = `${diaPago} de ${mesActual}`;
-            
-            let badgeHTML = "";
-            if (cliente.estado === 'pagado') badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
-            else if (difDias > 0) badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
-            else if (difDias === 0) badgeHTML = `<div class="time-badge badge-today">⚠️ Vence HOY</div>`;
-            else badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
-            
-            document.getElementById('dash-badge').innerHTML = badgeHTML;
-
-            // Servicios (Iconos)
-            const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻" };
-            let srvHTML = '';
-            
-            if(cliente.servicios && cliente.servicios.length > 0) {
-                cliente.servicios.forEach(s => {
-                    let icon = "📺";
-                    for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
-                    srvHTML += `<div class="service-pill"><div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div><div class="service-status">Activo</div></div>`;
-                });
-            } else {
-                srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`;
-            }
-            document.getElementById('dash-services').innerHTML = srvHTML;
-        }
-
-        // 6. CATÁLOGO EN VIVO (INTELIGENTE)
-        function cargarCatalogo(data) {
-            const config = data._goxion_config;
-            const catalogContainer = document.getElementById('catalog-container');
-            if (!config || !config.serviciosGlobales) return;
-
-            let ocupados = {};
-            for (let key in config.serviciosGlobales) ocupados[config.serviciosGlobales[key].nombre] = 0;
-
-            for (let key in data) {
-                if (key === '_goxion_config') continue;
-                let cliente = data[key];
-                if (cliente.servicios) {
-                    cliente.servicios.forEach(s => {
-                        let nombreCliente = s.nombre.toLowerCase();
-                        let multiplier = 1;
-                        let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
-                        if (matchQuant) multiplier = parseInt(matchQuant[1]);
-                        
-                        for (let catKey in config.serviciosGlobales) {
-                            let nombreCatalogo = config.serviciosGlobales[catKey].nombre;
-                            let nombreCatLow = nombreCatalogo.toLowerCase();
-                            
-                            let isCatCompleta = nombreCatLow.includes('completa');
-                            let isCliCompleta = nombreCliente.includes('completa');
-                            if (isCatCompleta !== isCliCompleta) continue; 
-                            
-                            let keyword = nombreCatLow.replace(' premium','').replace(' video','').replace(' cuenta completa','').replace(' (cuenta completa)','').trim();
-                            if (nombreCliente.includes(keyword)) ocupados[nombreCatalogo] += multiplier;
-                        }
-                    });
-                }
-            }
-
-            let htmlCatalogo = '';
-            const iconos = { "Netflix": "🍿", "Disney": "🏰", "Max": "🎥", "Prime": "📦", "YouTube": "▶️", "ViX": "⚽", "Crunchyroll": "🍥", "Paramount": "⛰️", "Spotify": "🎧", "Microsoft": "💻", "Google": "☁️" };
-
-            for (let key in config.serviciosGlobales) {
-                let srv = config.serviciosGlobales[key];
-                let limiteTotal = (srv.cuentas || 0) * (srv.limite || 1);
-                let disponibles = limiteTotal - (ocupados[srv.nombre] || 0);
-                
-                let icon = "📺";
-                for (let i in iconos) { if (srv.nombre.toLowerCase().includes(i.toLowerCase())) icon = iconos[i]; }
-
-                let badgeHtml = disponibles > 0 ? `<div class="cat-badge ok">🟢 ${disponibles} disp.</div>` : `<div class="cat-badge out">🔴 Agotado</div>`;
-                let btnHtml = disponibles > 0 ? `<button class="cat-btn active" onclick="contratarServicio('${srv.nombre}', ${srv.precio})">Contratar</button>` : `<button class="cat-btn" disabled>Sin existencias</button>`;
-
-                htmlCatalogo += `<div class="catalog-card"><div><div class="cat-icon">${icon}</div><div class="cat-name">${srv.nombre}</div><div class="cat-price">$${srv.precio} MXN</div>${badgeHtml}</div>${btnHtml}</div>`;
-            }
-            if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
-        }
-
-        // 7. ASISTENTE SOPORTE (Omitido lógica repetitiva, mantenida estructura previa)
-        let selectedPlat = ""; let currentIssues = {};
-        const DATABASE_ISSUES = { /* Misma DB */
-            "Netflix": [{ issue: "🔑 Solicitar PIN", instructions: "1. Selecciona 'Iniciar Sesión'.<br>2. Revisa el correo asignado.<br>3. Haz clic abajo.", labelInput: "Correo:", templateWA: "Hola GOXION, solicito CÓDIGO para NETFLIX.\n\n👤 Correo: " }],
-            "Disney+": [{ issue: "🔑 Código Verificación", instructions: "1. Ingresa el correo en tu app.<br>2. Pedirá un código.<br>3. Solicítalo abajo.", labelInput: "Correo:", templateWA: "Hola GOXION, solicito CÓDIGO DISNEY+.\n\n📧 Correo: " }]
+        // ASISTENTE INTELIGENTE
+        let selectedPlat = "";
+        let currentIssues = {};
+        const DATABASE_ISSUES = {
+            "Netflix": [
+                { issue: "🔑 Solicitar Código PIN", instructions: "1. Selecciona 'Iniciar Sesión con Código'.<br>2. Revisa el correo asignado.<br>3. Haz clic abajo.", labelInput: "Correo asignado:", templateWA: "Hola GOXION, solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo: " },
+                { issue: "📺 TV fuera del Hogar / Viaje", instructions: "1. Selecciona 'Actualizar Hogar' en tu TV.<br>2. La pantalla enviará un correo.<br>3. Ingresa tu correo abajo.", labelInput: "Correo asignado:", templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX.\n\n📧 Correo: " },
+                { issue: "⚠️ Pantalla Ocupada", instructions: "Asegúrate de que nadie más esté usando tu perfil, o cierra la app y vuelve a entrar.", labelInput: "Nombre del Perfil:", templateWA: "Hola GOXION, tengo problemas de pantalla ocupada en NETFLIX.\n\n👤 Perfil: " }
+            ],
+            "Disney+": [
+                { issue: "🔑 Código de Verificación", instructions: "1. Ingresa el correo en tu app.<br>2. Pedirá un código de 6 dígitos.<br>3. Solicítalo abajo.", labelInput: "Correo asignado:", templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " },
+                { issue: "🏠 Mensaje de 'Hogar'", instructions: "Selecciona 'Actualizar Hogar' y solicita autorización aquí.", labelInput: "Correo asignado:", templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo: " }
+            ],
+            "Max": [
+                { issue: "🔑 Iniciar Sesión con Código", instructions: "Selecciona 'Iniciar Sesión con un Código' en tu TV y escribe las 6 letras abajo.", labelInput: "Código en tu TV:", templateWA: "Hola GOXION, solicito vincular mi TV a MAX.\n\n🔤 Código TV: " },
+                { issue: "❌ Contraseña Incorrecta", instructions: "Asegúrate de no dejar espacios al copiar. Si persiste, notificaremos la actualización.", labelInput: "Correo asignado:", templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: " }
+            ],
+            "Prime Video": [
+                { issue: "📺 Registrar Dispositivo / TV", instructions: "Abre Prime Video, presiona 'Identifícate' y escribe el código abajo.", labelInput: "Código en Pantalla:", templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " }
+            ],
+            "YouTube Premium": [
+                { issue: "📩 No me llegó la invitación", instructions: "Revisa tu SPAM. Si es familiar, no debes estar en otro grupo activo (últimos 12 meses).", labelInput: "Tu correo Gmail:", templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Gmail: " },
+                { issue: "⚠️ Mi cuenta tiene anuncios", instructions: "Escríbenos para renovar el enlace de invitación de tu perfil.", labelInput: "Tu correo Gmail:", templateWA: "Hola GOXION, mi YOUTUBE se pasó a modo gratuito.\n\n📧 Gmail: " }
+            ],
+            "ViX Premium": [
+                { issue: "🔑 Vincular TV o Código", instructions: "Ingresa tus credenciales o envíanos el código de pantalla.", labelInput: "Correo o Código de TV:", templateWA: "Hola GOXION, necesito ayuda para ingresar a VIX PREMIUM.\n\n📱 Dato: " }
+            ],
+            "Crunchyroll": [
+                { issue: "🔑 Vincular Consola o TV", instructions: "Ingresa a 'activar dispositivo' e indícanos el código de 6 letras.", labelInput: "Código de 6 letras:", templateWA: "Hola GOXION, solicito vincular dispositivo a CRUNCHYROLL.\n\n🎮 Código: " }
+            ],
+            "Microsoft 365": [
+                { issue: "💻 Reenviar Invitación", instructions: "Indícanos tu correo personal para verificar el estado de tu suscripción.", labelInput: "Tu Outlook/Hotmail:", templateWA: "Hola GOXION, asistencia con MICROSOFT 365.\n\n📧 Correo: " }
+            ],
+            "Google One": [
+                { issue: "☁️ Espacio no reflejado", instructions: "Confirma que hayas aceptado la invitación enviada a tu Gmail.", labelInput: "Tu Gmail:", templateWA: "Hola GOXION, requiero verificar mi espacio de GOOGLE ONE.\n\n📧 Gmail: " }
+            ]
         };
-        function selectPlatform(p, el) { 
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); 
-            const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona el problema --</option>`;
-            currentIssues = DATABASE_ISSUES[p] || []; currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
-            document.getElementById('step-2').classList.add('active'); document.getElementById('step-3').classList.remove('active');
+
+        function selectPlatform(platform, element) {
+            selectedPlat = platform;
+            document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            const step2 = document.getElementById('step-2');
+            const step3 = document.getElementById('step-3');
+            const selector = document.getElementById('issue-selector');
+            selector.innerHTML = `<option value="">-- Selecciona el problema --</option>`;
+            currentIssues = DATABASE_ISSUES[platform] || [];
+            currentIssues.forEach((item, index) => { selector.innerHTML += `<option value="${index}">${item.issue}</option>`; });
+            step2.classList.add('active');
+            step3.classList.remove('active');
         }
+
         function showSolution() {
-            const idx = document.getElementById('issue-selector').value;
-            if (idx === "") { document.getElementById('step-3').classList.remove('active'); return; }
-            const data = currentIssues[idx];
+            const index = document.getElementById('issue-selector').value;
+            const step3 = document.getElementById('step-3');
+            if (index === "") { step3.classList.remove('active'); return; }
+            const data = currentIssues[index];
             document.getElementById('solution-text').innerHTML = `<strong>💡 ¿Qué debes hacer?</strong><br>${data.instructions}`;
             document.getElementById('input-label').innerText = data.labelInput;
-            document.getElementById('step-3').classList.add('active');
+            document.getElementById('smart-extra-input').value = "";
+            let placeholderTxt = "Ej: cuenta@correo.com";
+            if (data.labelInput.toLowerCase().includes("código")) placeholderTxt = "Ej: X7Y9Z2";
+            if (data.labelInput.toLowerCase().includes("perfil")) placeholderTxt = "Ej: Perfil 3 - Juan";
+            document.getElementById('smart-extra-input').placeholder = placeholderTxt;
+            step3.classList.add('active');
         }
+
         function sendSmartWA() {
-            const idx = document.getElementById('issue-selector').value; if(idx === "") return;
-            const val = document.getElementById('smart-extra-input').value.trim(); if(!val) return alert("Completa el dato requerido.");
-            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA+val)}`, '_blank');
+            const index = document.getElementById('issue-selector').value;
+            if (index === "") return;
+            const data = currentIssues[index];
+            const extraVal = document.getElementById('smart-extra-input').value.trim();
+            if (extraVal === "") return alert("Por favor completa el campo de texto requerido.");
+            const mensajeFinal = encodeURIComponent(`${data.templateWA}${extraVal}`);
+            window.open(`https://wa.me/${NUMERO_GOXION}?text=${mensajeFinal}`, '_blank');
         }
-        function contratarServicio(nombre, precio) { window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(`Hola GOXION, me interesa contratar 1 perfil de *${nombre}* por $${precio} MXN. ¿Aún hay disponibilidad?`)}`, '_blank'); }
+
+        function contratarServicio(nombre, precio) {
+            const mensaje = encodeURIComponent(`Hola GOXION, me interesa contratar 1 perfil de *${nombre}* por $${precio} MXN. ¿Aún hay disponibilidad?`);
+            window.open(`https://wa.me/${NUMERO_GOXION}?text=${mensaje}`, '_blank');
+        }
+
+        // CARGA GLOBAL
+        async function cargarDatosGlobales() {
+            try {
+                const response = await fetch('clientes.json', { cache: 'no-store' });
+                if (!response.ok) return;
+                const data = await response.json();
+                const config = data._goxion_config;
+
+                // ALERTAS
+                if (config && config.alertas && config.alertas.activa) {
+                    const banner = document.getElementById('dynamic-alert');
+                    const content = document.getElementById('alert-content');
+                    content.innerHTML = `<strong>Aviso Técnico:</strong> El servicio de <strong>${config.alertas.plataforma || "Servicios"}</strong> está ${config.alertas.falla || "presentando intermitencias"}. Las demás plataformas operan con normalidad.${config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : ''}`;
+                    banner.style.display = 'flex';
+                }
+
+                // CATÁLOGO E INVENTARIO
+                const catalogContainer = document.getElementById('catalog-container');
+                if (!config || !config.serviciosGlobales) {
+                    catalogContainer.innerHTML = `<p style="font-size: 13px; color: var(--text-muted); text-align: center; grid-column: span 2;">Catálogo no disponible por el momento.</p>`;
+                    return;
+                }
+
+                let ocupados = {};
+                for (let key in config.serviciosGlobales) {
+                    ocupados[config.serviciosGlobales[key].nombre] = 0;
+                }
+
+                for (let key in data) {
+                    if (key === '_goxion_config') continue;
+                    let cliente = data[key];
+                    
+                    if (cliente.servicios) {
+                        cliente.servicios.forEach(s => {
+                            let nombreCliente = s.nombre.toLowerCase();
+                            let multiplier = 1;
+                            let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
+                            if (matchQuant) { multiplier = parseInt(matchQuant[1]); }
+                            
+                            for (let catKey in config.serviciosGlobales) {
+                                let nombreCatalogo = config.serviciosGlobales[catKey].nombre;
+                                let nombreCatLow = nombreCatalogo.toLowerCase();
+                                
+                                let isCatCompleta = nombreCatLow.includes('completa');
+                                let isCliCompleta = nombreCliente.includes('completa');
+                                if (isCatCompleta !== isCliCompleta) continue; 
+                                
+                                let keyword = nombreCatLow.replace(' premium','').replace(' video','').replace(' cuenta completa','').replace(' (cuenta completa)','').trim();
+                                
+                                if (nombreCliente.includes(keyword)) {
+                                    ocupados[nombreCatalogo] += multiplier;
+                                }
+                            }
+                        });
+                    }
+                }
+
+                let htmlCatalogo = '';
+                const iconos = {
+                    "Netflix": "🍿", "Disney": "🏰", "Max": "🎥", "Prime": "📦",
+                    "YouTube": "▶️", "ViX": "⚽", "Crunchyroll": "🍥",
+                    "Paramount": "⛰️", "Spotify": "🎧", "Apple": "🍎",
+                    "Microsoft": "💻", "Google": "☁️", "Universal": "🌍",
+                    "Vix": "⚽"
+                };
+
+                for (let key in config.serviciosGlobales) {
+                    let srv = config.serviciosGlobales[key];
+                    let limiteTotal = (srv.cuentas || 0) * (srv.limite || 1);
+                    let ocupadosCount = ocupados[srv.nombre] || 0;
+                    let disponibles = limiteTotal - ocupadosCount;
+                    
+                    let icon = "📺";
+                    for (let i in iconos) { if (srv.nombre.toLowerCase().includes(i.toLowerCase())) icon = iconos[i]; }
+
+                    let badgeHtml = disponibles > 0 
+                        ? `<div class="cat-badge ok">🟢 ${disponibles} perfil(es) disp.</div>` 
+                        : `<div class="cat-badge out">🔴 Agotado / Próximamente</div>`;
+                    
+                    let btnHtml = disponibles > 0
+                        ? `<button class="cat-btn active" onclick="contratarServicio('${srv.nombre}', ${srv.precio})">Contratar</button>`
+                        : `<button class="cat-btn" disabled>Sin existencias</button>`;
+
+                    htmlCatalogo += `
+                        <div class="catalog-card">
+                            <div>
+                                <div class="cat-icon">${icon}</div>
+                                <div class="cat-name">${srv.nombre}</div>
+                                <div class="cat-price">$${srv.precio} MXN</div>
+                                ${badgeHtml}
+                            </div>
+                            ${btnHtml}
+                        </div>
+                    `;
+                }
+                
+                if(htmlCatalogo !== '') { catalogContainer.innerHTML = htmlCatalogo; }
+
+            } catch (e) {
+                document.getElementById('catalog-container').innerHTML = `<p style="color: var(--danger-red); font-size: 13px; grid-column: span 2; text-align: center;">Error al cargar el inventario. Intenta recargar la página.</p>`;
+            }
+        }
+
+        cargarDatosGlobales();
     </script>
 </body>
 </html>
