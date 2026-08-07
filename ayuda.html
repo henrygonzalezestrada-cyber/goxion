@@ -24,7 +24,7 @@
         body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; overflow-x: hidden; }
         body.no-scroll { overflow: hidden; height: 100vh; }
 
-        /* --- PANTALLA DE BIENVENIDA MÍNIMALISTA (SPLASH SCREEN) --- */
+        /* --- PANTALLA DE BIENVENIDA MINIMALISTA (SPLASH SCREEN) --- */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-black); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -44,26 +44,26 @@
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
 
-        /* HEADER TIPO APP (LOGO IZQUIERDA + BOTÓN DERECHA) */
+        /* HEADER TIPO APP */
         .app-header {
             display: flex; align-items: center; justify-content: space-between;
-            width: 100%; margin-bottom: 20px; padding: 5px 0;
+            width: 100%; margin-bottom: 25px; padding: 5px 0;
         }
-        .app-logo { max-height: 38px; width: auto; display: block; object-fit: contain; }
+        .app-logo { max-height: 32px; width: auto; display: block; object-fit: contain; }
         .header-action-btn {
             background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3);
-            color: var(--neon-blue); padding: 7px 14px; border-radius: 20px;
-            font-size: 11px; font-weight: 700; text-decoration: none; transition: 0.3s;
+            color: var(--neon-blue); padding: 8px 16px; border-radius: 20px;
+            font-size: 12px; font-weight: 700; text-decoration: none; transition: 0.3s;
             display: flex; align-items: center; gap: 6px;
         }
         .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
 
         .alert-banner { background: rgba(255, 170, 0, 0.12); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(12px); }
 
-        /* NAVEGACIÓN POR PESTAÑAS (3 TABS) */
-        .tab-container { display: flex; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 5px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); }
-        .tab-btn { flex: 1; padding: 10px 4px; background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 4px; }
-        .tab-btn span { font-size: 16px; }
+        /* NAVEGACIÓN POR PESTAÑAS (CORREGIDO PROPORCIONES) */
+        .tab-container { display: flex; background: rgba(255,255,255,0.03); border-radius: 20px; padding: 6px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); }
+        .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; border-radius: 14px; cursor: pointer; transition: all 0.3s ease; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .tab-btn span { font-size: 20px; }
         .tab-btn.active { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15); }
         
         .view-section { display: none; animation: fadeIn 0.4s ease; }
@@ -71,45 +71,46 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
 
-        /* BUSCADOR */
-        .search-bar-container { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; width: 100%; background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 16px; padding: 6px 8px; backdrop-filter: blur(12px); transition: 0.3s; margin-bottom: 25px; box-sizing: border-box; }
+        /* BUSCADOR (CORREGIDO PROPORCIONES) */
+        .search-bar-container { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; width: 100%; background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 8px; backdrop-filter: blur(12px); transition: 0.3s; margin-bottom: 30px; box-sizing: border-box; }
         .search-bar-container:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
         .search-input { flex: 1; min-width: 0; background: transparent; border: none; color: var(--text-main); font-size: 14px; padding: 8px 12px; outline: none; }
-        .search-btn { flex-shrink: 0; white-space: nowrap; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); border: none; border-radius: 12px; padding: 8px 18px; color: #000; font-weight: 700; font-size: 13px; cursor: pointer; }
+        .search-btn { flex-shrink: 0; white-space: nowrap; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); border: none; border-radius: 14px; padding: 10px 20px; color: #000; font-weight: 700; font-size: 14px; cursor: pointer; }
 
-        /* ACCESOS RÁPIDOS */
-        .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .btn-menu { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15); border-radius: 16px; padding: 16px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(12px); transition: 0.3s; }
+        /* ACCESOS RÁPIDOS Y REGLAS (CORREGIDO PROPORCIONES) */
+        .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .btn-menu { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15); border-radius: 20px; padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; backdrop-filter: blur(12px); transition: 0.3s; }
         .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); }
-        .btn-menu span { font-size: 24px; }
-        .btn-menu div { font-weight: 600; font-size: 12px; }
+        .btn-menu span { font-size: 38px; margin-bottom: 4px; }
+        .btn-menu div { font-weight: 600; font-size: 13px; letter-spacing: 0.3px; }
 
         /* CATÁLOGO DINÁMICO */
-        .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .catalog-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 16px; padding: 16px; text-align: center; backdrop-filter: blur(12px); display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
+        .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .catalog-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 20px; padding: 18px; text-align: center; backdrop-filter: blur(12px); display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
         .catalog-card:hover { border-color: var(--neon-blue); box-shadow: 0 8px 20px rgba(0,242,254,0.15); transform: translateY(-3px); }
-        .cat-icon { font-size: 32px; margin-bottom: 8px; }
-        .cat-name { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
-        .cat-price { font-size: 18px; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
-        .cat-badge { font-size: 10px; padding: 6px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 12px; }
+        .cat-icon { font-size: 36px; margin-bottom: 10px; }
+        .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; line-height: 1.2; }
+        .cat-price { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
+        .cat-badge { font-size: 11px; padding: 6px 10px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; }
         .cat-badge.ok { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid var(--success-green); }
         .cat-badge.out { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
-        .cat-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; }
+        .cat-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; width: 100%; }
         .cat-btn.active { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
         .cat-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* MÓDULO INTELIGENTE */
-        .smart-support-card { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3); border-radius: 20px; padding: 20px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .smart-support-card { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3); border-radius: 20px; padding: 22px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .platform-btn span { font-size: 22px; }
         .platform-btn:hover, .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); transform: translateY(-2px); }
         .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
         .step-box.active { display: block; }
-        .custom-select-smart { width: 100%; background: #0d121c; border: 1px solid var(--neon-purple); color: var(--text-main); padding: 12px; border-radius: 12px; font-size: 13px; outline: none; margin-bottom: 12px; }
-        .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
-        .input-smart { width: 100%; box-sizing: border-box; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; outline: none; }
+        .custom-select-smart { width: 100%; background: #0d121c; border: 1px solid var(--neon-purple); color: var(--text-main); padding: 14px; border-radius: 12px; font-size: 14px; outline: none; margin-bottom: 12px; }
+        .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 14px; border-radius: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
+        .input-smart { width: 100%; box-sizing: border-box; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 12px 14px; border-radius: 10px; font-size: 14px; margin-bottom: 15px; outline: none; }
         .input-smart:focus { border-color: var(--neon-blue); }
-        .btn-primary { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 30px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s; text-align: center; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; }
+        .btn-primary { width: 100%; box-sizing: border-box; padding: 14px; border-radius: 30px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; text-align: center; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; }
         .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
 
         /* MODALES */
@@ -117,20 +118,20 @@
         .modal.show { display: flex; opacity: 1; }
         .modal-content { background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
-        .modal-title { color: #fff; margin-bottom: 15px; font-size: 15px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; }
-        th, td { padding: 10px 6px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 10px; }
-        .terms-list { list-style: none; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; text-align: justify; }
+        .modal-title { color: #fff; margin-bottom: 15px; font-size: 16px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 13px; }
+        th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 11px; }
+        .terms-list { list-style: none; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: justify; }
         .terms-list li { margin-bottom: 12px; }
         .terms-list strong { color: var(--neon-blue); display: block; margin-bottom: 2px;}
 
         /* FOOTER */
-        .footer-info { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.05); }
-        .schedule { display: inline-block; background: var(--card-bg); border-radius: 30px; padding: 8px 20px; margin-bottom: 15px; border: 1px solid rgba(0, 242, 254, 0.15); }
-        .schedule-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-        .schedule-time { font-size: 12px; color: var(--neon-blue); font-weight: 600; }
-        .copyright { font-size: 11px; color: var(--text-muted); }
+        .footer-info { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px dashed rgba(255,255,255,0.05); }
+        .schedule { display: inline-block; background: var(--card-bg); border-radius: 30px; padding: 10px 24px; margin-bottom: 15px; border: 1px solid rgba(0, 242, 254, 0.15); }
+        .schedule-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .schedule-time { font-size: 13px; color: var(--neon-blue); font-weight: 600; }
+        .copyright { font-size: 12px; color: var(--text-muted); padding-bottom: 20px; }
     </style>
 </head>
 <body class="no-scroll">
@@ -160,7 +161,7 @@
 
         <div class="alert-banner" id="dynamic-alert">
             <span style="font-size: 20px;">⚠️</span>
-            <div style="font-size: 12px; color: #fff;" id="alert-content"></div>
+            <div style="font-size: 13px; color: #fff;" id="alert-content"></div>
         </div>
 
         <!-- PESTAÑAS NATIVAS -->
@@ -199,14 +200,14 @@
         <div id="view-catalogo" class="view-section">
             <div class="section-title">Nuestros Servicios y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
-                <p style="font-size: 12px; color: var(--text-muted); text-align: center; grid-column: span 2;">Cargando catálogo en vivo...</p>
+                <p style="font-size: 13px; color: var(--text-muted); text-align: center; grid-column: span 2;">Cargando catálogo en vivo...</p>
             </div>
         </div>
 
         <!-- VISTA 3: ASISTENTE TÉCNICO INTELIGENTE -->
         <div id="view-soporte" class="view-section">
             <div class="smart-support-card">
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 <div class="platform-grid">
                     <div class="platform-btn" onclick="selectPlatform('Netflix', this)"><span>🍿</span> Netflix</div>
                     <div class="platform-btn" onclick="selectPlatform('Disney+', this)"><span>🏰</span> Disney+</div>
@@ -219,13 +220,13 @@
                     <div class="platform-btn" onclick="selectPlatform('Google One', this)"><span>☁️</span> Google One</div>
                 </div>
                 <div id="step-2" class="step-box">
-                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;"><strong>Paso 2:</strong> ¿Cuál es el inconveniente?</p>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Cuál es el inconveniente?</p>
                     <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
                 </div>
                 <div id="step-3" class="step-box">
                     <div class="solution-instructions" id="solution-text"></div>
                     <div id="extra-inputs-container">
-                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;" id="input-label">Dato requerido:</p>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;" id="input-label">Dato requerido:</p>
                         <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
                     </div>
                     <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()">
@@ -254,7 +255,7 @@
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
             <div class="modal-title">Términos y Condiciones Oficiales</div>
             <ul class="terms-list">
-                <li><strong>1. Confidencialidad de Credenciales</strong>Las contraseñas y enlaces de acceso son strictly personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
+                <li><strong>1. Confidencialidad de Credenciales</strong>Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
                 <li><strong>2. Uso Permitido</strong>Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
                 <li><strong>3. Sanciones</strong>El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
                 <li><strong>4. Esquema de Pagos y Notificaciones</strong>La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial. Métodos aceptados: Transferencias bancarias electrónicas y depósitos.</li>
@@ -266,7 +267,7 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
             <div class="modal-title">Garantía, Satisfacción y Sanciones</div>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
             <table>
                 <tr><th>Concepto</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
                 <tr><td style="color: var(--text-main);"><strong>Falla Técnica</strong></td><td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td><td>Hasta 50% de descuento (equivalente a 10 días).</td></tr>
@@ -279,16 +280,16 @@
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
             <div class="modal-title">Programa de Fidelidad</div>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
             <table><tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr><tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr><tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr></table>
-            <p style="color: var(--danger-red); font-size: 11px; margin-top: 12px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
+            <p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
         </div>
     </div>
     <div id="modal-referidos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
             <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Obtén un descuento del 100% en una mensualidad de tu servicio actual por cada nuevo cliente que concrete una compra.</p>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">Obtén un descuento del 100% en una mensualidad de tu servicio actual por cada nuevo cliente que concrete una compra.</p>
             <ul class="terms-list">
                 <li><strong>1. Requisitos para el Referido</strong>Debe ser cliente nuevo. Adquirir un mínimo de dos (2) perfiles y mantenerlos activos/pagados durante 3 meses consecutivos.</li>
                 <li><strong>2. Condiciones de Aplicación</strong>El descuento del 100% se aplicará en tu cuarto mes. Debes mantener tu cuenta activa y al corriente durante la validación.</li>
@@ -437,7 +438,7 @@
                 // CATÁLOGO E INVENTARIO
                 const catalogContainer = document.getElementById('catalog-container');
                 if (!config || !config.serviciosGlobales) {
-                    catalogContainer.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); text-align: center; grid-column: span 2;">Catálogo no disponible por el momento.</p>`;
+                    catalogContainer.innerHTML = `<p style="font-size: 13px; color: var(--text-muted); text-align: center; grid-column: span 2;">Catálogo no disponible por el momento.</p>`;
                     return;
                 }
 
@@ -517,7 +518,7 @@
                 if(htmlCatalogo !== '') { catalogContainer.innerHTML = htmlCatalogo; }
 
             } catch (e) {
-                document.getElementById('catalog-container').innerHTML = `<p style="color: var(--danger-red); font-size: 12px; grid-column: span 2; text-align: center;">Error al cargar el inventario. Intenta recargar la página.</p>`;
+                document.getElementById('catalog-container').innerHTML = `<p style="color: var(--danger-red); font-size: 13px; grid-column: span 2; text-align: center;">Error al cargar el inventario. Intenta recargar la página.</p>`;
             }
         }
 
