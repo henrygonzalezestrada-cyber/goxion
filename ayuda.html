@@ -81,7 +81,7 @@
         .catalog-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 16px; padding: 16px; text-align: center; backdrop-filter: blur(12px); display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
         .catalog-card:hover { border-color: var(--neon-blue); box-shadow: 0 8px 20px rgba(0,242,254,0.15); transform: translateY(-3px); }
         .cat-icon { font-size: 32px; margin-bottom: 8px; }
-        .cat-name { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; }
+        .cat-name { font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; line-height: 1.2; }
         .cat-price { font-size: 18px; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
         .cat-badge { font-size: 10px; padding: 6px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 12px; }
         .cat-badge.ok { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid var(--success-green); }
@@ -408,7 +408,7 @@
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${mensaje}`, '_blank');
         }
 
-        // LÓGICA DE CARGA GLOBAL: ALERTAS Y CATÁLOGO
+        // LÓGICA DE CARGA GLOBAL: ALERTAS E INVENTARIO INTELIGENTE
         async function cargarDatosGlobales() {
             try {
                 const response = await fetch('clientes.json', { cache: 'no-store' });
@@ -424,7 +424,7 @@
                     banner.style.display = 'flex';
                 }
 
-                // 2. CARGAR CATÁLOGO Y CALCULAR INVENTARIO
+                // 2. CARGAR CATÁLOGO Y CALCULAR INVENTARIO INTELIGENTE
                 const catalogContainer = document.getElementById('catalog-container');
                 if (!config || !config.serviciosGlobales) {
                     catalogContainer.innerHTML = `<p style="font-size: 12px; color: var(--text-muted); text-align: center; grid-column: span 2;">Catálogo no disponible por el momento.</p>`;
@@ -432,12 +432,42 @@
                 }
 
                 let ocupados = {};
+                // Inicializar contadores a 0
+                for (let key in config.serviciosGlobales) {
+                    ocupados[config.serviciosGlobales[key].nombre] = 0;
+                }
+
+                // MOTOR ANALÍTICO: Procesar todos los clientes
                 for (let key in data) {
                     if (key === '_goxion_config') continue;
                     let cliente = data[key];
+                    
                     if (cliente.servicios) {
                         cliente.servicios.forEach(s => {
-                            ocupados[s.nombre] = (ocupados[s.nombre] || 0) + 1;
+                            let nombreCliente = s.nombre.toLowerCase();
+                            
+                            // Multiplicador (Ej. si dice "Netflix (x2)")
+                            let multiplier = 1;
+                            let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
+                            if (matchQuant) { multiplier = parseInt(matchQuant[1]); }
+                            
+                            // Analizar contra el Catálogo Global
+                            for (let catKey in config.serviciosGlobales) {
+                                let nombreCatalogo = config.serviciosGlobales[catKey].nombre;
+                                let nombreCatLow = nombreCatalogo.toLowerCase();
+                                
+                                // REGLA 1: Separar Perfiles de Cuentas Completas
+                                let isCatCompleta = nombreCatLow.includes('completa');
+                                let isCliCompleta = nombreCliente.includes('completa');
+                                if (isCatCompleta !== isCliCompleta) continue; 
+                                
+                                // REGLA 2: Detector de Combos por Palabras Clave
+                                let keyword = nombreCatLow.replace(' premium','').replace(' video','').replace(' cuenta completa','').replace(' (cuenta completa)','').trim();
+                                
+                                if (nombreCliente.includes(keyword)) {
+                                    ocupados[nombreCatalogo] += multiplier;
+                                }
+                            }
                         });
                     }
                 }
@@ -447,7 +477,8 @@
                     "Netflix": "🍿", "Disney": "🏰", "Max": "🎥", "Prime": "📦",
                     "YouTube": "▶️", "ViX": "⚽", "Crunchyroll": "🍥",
                     "Paramount": "⛰️", "Spotify": "🎧", "Apple": "🍎",
-                    "Microsoft": "💻", "Google": "☁️", "Universal": "🌍"
+                    "Microsoft": "💻", "Google": "☁️", "Universal": "🌍",
+                    "Vix": "⚽"
                 };
 
                 for (let key in config.serviciosGlobales) {
@@ -461,7 +492,7 @@
 
                     let badgeHtml = disponibles > 0 
                         ? `<div class="cat-badge ok">🟢 ${disponibles} perfil(es) disp.</div>` 
-                        : `<div class="cat-badge out">🔴 Agotado temporalmente</div>`;
+                        : `<div class="cat-badge out">🔴 Agotado / Próximamente</div>`;
                     
                     let btnHtml = disponibles > 0
                         ? `<button class="cat-btn active" onclick="contratarServicio('${srv.nombre}', ${srv.precio})">Contratar</button>`
@@ -480,9 +511,7 @@
                     `;
                 }
                 
-                if(htmlCatalogo !== '') {
-                    catalogContainer.innerHTML = htmlCatalogo;
-                }
+                if(htmlCatalogo !== '') { catalogContainer.innerHTML = htmlCatalogo; }
 
             } catch (e) {
                 document.getElementById('catalog-container').innerHTML = `<p style="color: var(--danger-red); font-size: 12px; grid-column: span 2; text-align: center;">Error al cargar el inventario. Intenta recargar la página.</p>`;
