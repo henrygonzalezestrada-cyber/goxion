@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOXION - Centro de Autogestión y Soporte</title>
+    <title>GOXION - Centro de Autogestión</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -25,7 +25,7 @@
             background-color: var(--bg-black); 
             color: var(--text-main); 
             line-height: 1.6; 
-            padding: 25px 15px; 
+            padding: 20px 15px; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
@@ -34,152 +34,97 @@
             overflow-x: hidden;
         }
 
-        .bg { 
-            position: fixed; inset: 0; z-index: -2; 
-            background-color: var(--bg-black); 
-            overflow: hidden; 
-        }
-        
-        .neon-orbit {
-            position: absolute; border-radius: 50%; border: 2px solid transparent;
-            will-change: transform; pointer-events: none;
-        }
-
-        .orbit-1 {
-            width: 900px; height: 900px; top: -300px; right: -400px;
-            border-bottom: 3px solid var(--neon-purple); border-left: 3px solid rgba(124, 77, 255, 0.2);
-            filter: drop-shadow(0 0 25px var(--neon-purple)); animation: spinOrbit 25s linear infinite;
-        }
-
-        .orbit-2 {
-            width: 1200px; height: 1200px; bottom: -500px; left: -500px;
-            border-top: 3px solid var(--neon-blue); border-right: 3px solid rgba(0, 242, 254, 0.2);
-            filter: drop-shadow(0 0 30px var(--neon-blue)); animation: spinOrbitReverse 35s linear infinite;
-        }
-
+        /* FONDO ANIMADO */
+        .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); overflow: hidden; }
+        .neon-orbit { position: absolute; border-radius: 50%; border: 2px solid transparent; will-change: transform; pointer-events: none; }
+        .orbit-1 { width: 900px; height: 900px; top: -300px; right: -400px; border-bottom: 3px solid var(--neon-purple); border-left: 3px solid rgba(124, 77, 255, 0.2); filter: drop-shadow(0 0 25px var(--neon-purple)); animation: spinOrbit 25s linear infinite; }
+        .orbit-2 { width: 1200px; height: 1200px; bottom: -500px; left: -500px; border-top: 3px solid var(--neon-blue); border-right: 3px solid rgba(0, 242, 254, 0.2); filter: drop-shadow(0 0 30px var(--neon-blue)); animation: spinOrbitReverse 35s linear infinite; }
         @keyframes spinOrbit { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes spinOrbitReverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
 
-        .header { text-align: center; margin-bottom: 30px; padding-top: 10px; }
-        .logo-img { max-width: 210px; height: auto; display: block; margin: 0 auto 10px auto; }
-        .subtitle { color: var(--neon-blue); font-size: 12px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
+        /* HEADER */
+        .header { text-align: center; margin-bottom: 25px; }
+        .logo-img { max-width: 190px; height: auto; display: block; margin: 0 auto 8px auto; }
+        .subtitle { color: var(--neon-blue); font-size: 11px; text-transform: uppercase; letter-spacing: 2px; font-weight: 700; }
 
         /* BANNER ALERTA */
-        .alert-banner {
-            background: rgba(255, 170, 0, 0.12); border: 1px solid rgba(255, 170, 0, 0.4);
-            border-radius: 14px; padding: 14px; margin-bottom: 25px; display: none;
-            align-items: flex-start; gap: 12px; backdrop-filter: blur(12px);
+        .alert-banner { background: rgba(255, 170, 0, 0.12); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 25px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(12px); }
+
+        /* NAVEGACIÓN POR PESTAÑAS (TABS) - EL NUEVO TOQUE APP */
+        .tab-container { 
+            display: flex; background: rgba(255,255,255,0.03); border-radius: 16px; 
+            padding: 5px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); 
+            backdrop-filter: blur(12px);
         }
+        .tab-btn { 
+            flex: 1; padding: 12px; background: transparent; border: none; 
+            color: var(--text-muted); font-size: 13px; font-weight: 600; 
+            border-radius: 12px; cursor: pointer; transition: all 0.3s ease; 
+        }
+        .tab-btn.active { 
+            background: var(--card-bg); color: var(--text-main); 
+            border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15); 
+        }
+        
+        /* VISTAS */
+        .view-section { display: none; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
 
-        /* BUSCADOR CLIENTE */
-        .search-section { margin-bottom: 30px; }
-        .search-bar-container {
-            display: flex; gap: 8px; background: var(--card-bg);
-            border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 16px; padding: 6px 8px;
-            backdrop-filter: blur(12px); transition: 0.3s;
-        }
+        /* BUSCADOR CLIENTE (VISTA 1) */
+        .search-bar-container { display: flex; gap: 8px; background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 16px; padding: 6px 8px; backdrop-filter: blur(12px); transition: 0.3s; margin-bottom: 30px;}
         .search-bar-container:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
         .search-input { flex: 1; background: transparent; border: none; color: var(--text-main); font-size: 14px; padding: 8px 12px; outline: none; }
         .search-btn { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); border: none; border-radius: 12px; padding: 8px 18px; color: #000; font-weight: 700; font-size: 13px; cursor: pointer; }
 
-        /* MÓDULO INTELIGENTE DE AUTOGESTIÓN */
-        .smart-support-card {
-            background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3);
-            border-radius: 20px; padding: 20px; margin-bottom: 30px; backdrop-filter: blur(12px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-        }
-        
-        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
-        .platform-btn {
-            background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer;
-            font-size: 12px; font-weight: 600; color: var(--text-main); transition: 0.2s;
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-        }
-        .platform-btn:hover, .platform-btn.selected {
-            border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1);
-            box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); transform: translateY(-2px);
-        }
-
-        .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
-        .step-box.active { display: block; }
-
-        .custom-select-smart {
-            width: 100%; background: #0d121c; border: 1px solid var(--neon-purple);
-            color: var(--text-main); padding: 12px; border-radius: 12px; font-size: 13px;
-            outline: none; margin-bottom: 12px;
-        }
-
-        .solution-instructions {
-            background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue);
-            padding: 12px; border-radius: 8px; font-size: 12px; color: var(--text-muted);
-            margin-bottom: 15px; line-height: 1.5;
-        }
-
-        .input-smart {
-            width: 100%; background: #0d121c; border: 1px solid rgba(255,255,255,0.1);
-            color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px;
-            margin-bottom: 12px; outline: none;
-        }
-        .input-smart:focus { border-color: var(--neon-blue); }
-
-        /* ACCESOS RÁPIDOS (PAGOS, DUDAS) */
-        .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 30px; }
-        .btn-menu {
-            background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15);
-            border-radius: 16px; padding: 16px 12px; text-align: center; cursor: pointer;
-            color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px;
-            backdrop-filter: blur(12px); transition: 0.3s;
-        }
+        /* ACCESOS RÁPIDOS Y REGLAS (VISTA 1) */
+        .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .btn-menu { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15); border-radius: 16px; padding: 16px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(12px); transition: 0.3s; }
         .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); }
         .btn-menu span { font-size: 24px; }
         .btn-menu div { font-weight: 600; font-size: 12px; }
 
-        /* BOTONES */
-        .btn { 
-            width: 100%; padding: 12px; border-radius: 30px; border: none; font-weight: 700; font-size: 13px; 
-            cursor: pointer; transition: 0.3s; text-align: center; text-decoration: none; display: flex;
-            align-items: center; justify-content: center; gap: 8px; color: #000;
-        }
-        .btn-primary { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+        /* MÓDULO INTELIGENTE (VISTA 2) */
+        .smart-support-card { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3); border-radius: 20px; padding: 20px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
+        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
+        .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .platform-btn:hover, .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); transform: translateY(-2px); }
+
+        .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
+        .step-box.active { display: block; }
+
+        .custom-select-smart { width: 100%; background: #0d121c; border: 1px solid var(--neon-purple); color: var(--text-main); padding: 12px; border-radius: 12px; font-size: 13px; outline: none; margin-bottom: 12px; }
+        .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
+        .input-smart { width: 100%; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; outline: none; }
+        .input-smart:focus { border-color: var(--neon-blue); }
+
+        /* BOTONES GLOBALES */
+        .btn-primary { width: 100%; padding: 12px; border-radius: 30px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s; text-align: center; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; }
         .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
 
         /* MODALES */
-        .modal {
-            display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%;
-            background: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px);
-            align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px;
-        }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
-        .modal-content {
-            background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px;
-            width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; padding: 22px; position: relative;
-        }
+        .modal-content { background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; padding: 22px; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
         .modal-title { color: #fff; margin-bottom: 15px; font-size: 15px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
-
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; }
         th, td { padding: 10px 6px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 10px; }
-
         .terms-list { list-style: none; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
         .terms-list li { margin-bottom: 10px; }
         .terms-list strong { color: var(--text-main); }
 
-        .footer-info { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); }
+        /* FOOTER */
+        .footer-info { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.05); }
         .schedule { display: inline-block; background: var(--card-bg); border-radius: 30px; padding: 8px 20px; margin-bottom: 15px; border: 1px solid rgba(0, 242, 254, 0.15); }
         .schedule-title { font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
         .schedule-time { font-size: 12px; color: var(--neon-blue); font-weight: 600; }
         .copyright { font-size: 11px; color: var(--text-muted); }
-
-        @media (max-width: 480px) {
-            .platform-grid { grid-template-columns: repeat(3, 1fr); }
-            .platform-btn { font-size: 11px; padding: 10px 4px; }
-        }
     </style>
 </head>
 <body>
@@ -202,73 +147,75 @@
             <div style="font-size: 12px; color: #fff;" id="alert-content"></div>
         </div>
 
-        <!-- BUSCADOR CLIENTE -->
-        <div class="search-section">
-            <div class="section-title">Mi Estado de Cuenta</div>
+        <!-- MENU DE PESTAÑAS TIPO APP -->
+        <div class="tab-container">
+            <button class="tab-btn active" id="btn-tab-cuenta" onclick="switchTab('cuenta')">🔍 Mi Cuenta</button>
+            <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')">🛠️ Soporte Técnico</button>
+        </div>
+
+        <!-- VISTA 1: MI ESTADO DE CUENTA Y REGLAS -->
+        <div id="view-cuenta" class="view-section active">
+            <div class="section-title">Buscar Estado de Cuenta</div>
             <div class="search-bar-container">
                 <input type="text" id="main-input-cliente" class="search-input" placeholder="Ingresa tu ID o Nombre...">
                 <button class="search-btn" onclick="buscarClienteDirecto()">🔍 Buscar</button>
             </div>
+
+            <div class="section-title">Información Importante</div>
+            <div class="policy-grid">
+                <div class="btn-menu" onclick="openModal('modal-lealtad')">
+                    <span>⭐</span>
+                    <div>Programa Lealtad</div>
+                </div>
+                <div class="btn-menu" onclick="openModal('modal-terminos')">
+                    <span>📄</span>
+                    <div>Términos de Uso</div>
+                </div>
+                <div class="btn-menu" onclick="openModal('modal-garantia')">
+                    <span>🛡️</span>
+                    <div>Garantía y Reglas</div>
+                </div>
+                <div class="btn-menu" onclick="openModal('modal-referidos')">
+                    <span>🎁</span>
+                    <div>Invita y Gana</div>
+                </div>
+            </div>
         </div>
 
-        <!-- ASISTENTE INTELIGENTE DE SOLUCIONES -->
-        <div class="section-title">Asistente de Diagnóstico Rápido</div>
-        <div class="smart-support-card">
-            
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma donde tienes la duda o falla:</p>
-            
-            <div class="platform-grid">
-                <div class="platform-btn" onclick="selectPlatform('Netflix', this)"><span>🍿</span> Netflix</div>
-                <div class="platform-btn" onclick="selectPlatform('Disney+', this)"><span>🏰</span> Disney+</div>
-                <div class="platform-btn" onclick="selectPlatform('Max', this)"><span>🎥</span> Max</div>
-                <div class="platform-btn" onclick="selectPlatform('Prime Video', this)"><span>📦</span> Prime Video</div>
-                <div class="platform-btn" onclick="selectPlatform('YouTube Premium', this)"><span>▶️</span> YouTube</div>
-                <div class="platform-btn" onclick="selectPlatform('ViX Premium', this)"><span>⚽</span> ViX</div>
-                <div class="platform-btn" onclick="selectPlatform('Crunchyroll', this)"><span>🍥</span> Crunchyroll</div>
-                <div class="platform-btn" onclick="selectPlatform('Microsoft 365', this)"><span>💻</span> Office 365</div>
-                <div class="platform-btn" onclick="selectPlatform('Google One', this)"><span>☁️</span> Google One</div>
-            </div>
-
-            <!-- PASO 2: PROBLEMAS DINÁMICOS -->
-            <div id="step-2" class="step-box">
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;"><strong>Paso 2:</strong> ¿Cuál es el inconveniente?</p>
-                <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
-            </div>
-
-            <!-- PASO 3: INSTRUCCIONES DE AUTOGESTIÓN + ACCIÓN -->
-            <div id="step-3" class="step-box">
-                <div class="solution-instructions" id="solution-text"></div>
-
-                <div id="extra-inputs-container">
-                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;" id="input-label">Ingresa el correo o dato de la pantalla:</p>
-                    <input type="text" id="smart-extra-input" class="input-smart" placeholder="Ej: cuenta@correo.com">
+        <!-- VISTA 2: ASISTENTE TÉCNICO INTELIGENTE -->
+        <div id="view-soporte" class="view-section">
+            <div class="smart-support-card">
+                
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
+                
+                <div class="platform-grid">
+                    <div class="platform-btn" onclick="selectPlatform('Netflix', this)"><span>🍿</span> Netflix</div>
+                    <div class="platform-btn" onclick="selectPlatform('Disney+', this)"><span>🏰</span> Disney+</div>
+                    <div class="platform-btn" onclick="selectPlatform('Max', this)"><span>🎥</span> Max</div>
+                    <div class="platform-btn" onclick="selectPlatform('Prime Video', this)"><span>📦</span> Prime Video</div>
+                    <div class="platform-btn" onclick="selectPlatform('YouTube Premium', this)"><span>▶️</span> YouTube</div>
+                    <div class="platform-btn" onclick="selectPlatform('ViX Premium', this)"><span>⚽</span> ViX</div>
+                    <div class="platform-btn" onclick="selectPlatform('Crunchyroll', this)"><span>🍥</span> Crunchyroll</div>
+                    <div class="platform-btn" onclick="selectPlatform('Microsoft 365', this)"><span>💻</span> Office 365</div>
+                    <div class="platform-btn" onclick="selectPlatform('Google One', this)"><span>☁️</span> Google One</div>
                 </div>
 
-                <button class="btn btn-primary" id="smart-action-btn" onclick="sendSmartWA()">
-                    📲 Generar Solicitud por WhatsApp →
-                </button>
-            </div>
+                <div id="step-2" class="step-box">
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;"><strong>Paso 2:</strong> ¿Cuál es el inconveniente?</p>
+                    <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
+                </div>
 
-        </div>
+                <div id="step-3" class="step-box">
+                    <div class="solution-instructions" id="solution-text"></div>
+                    <div id="extra-inputs-container">
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;" id="input-label">Dato requerido:</p>
+                        <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
+                    </div>
+                    <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()">
+                        📲 Generar Solicitud por WhatsApp →
+                    </button>
+                </div>
 
-        <!-- ACCESOS RÁPIDOS Y REGLAS -->
-        <div class="section-title">Información Importante</div>
-        <div class="policy-grid">
-            <div class="btn-menu" onclick="openModal('modal-lealtad')">
-                <span>⭐</span>
-                <div>Programa Lealtad</div>
-            </div>
-            <div class="btn-menu" onclick="openModal('modal-terminos')">
-                <span>📄</span>
-                <div>Términos de Uso</div>
-            </div>
-            <div class="btn-menu" onclick="openModal('modal-garantia')">
-                <span>🛡️</span>
-                <div>Garantía y Reglas</div>
-            </div>
-            <div class="btn-menu" onclick="openModal('modal-referidos')">
-                <span>🎁</span>
-                <div>Invita y Gana</div>
             </div>
         </div>
 
@@ -286,26 +233,16 @@
 
     </div>
 
-    <!-- MODALES -->
-
-    <!-- Modal Lealtad -->
+    <!-- MODALES DE INFO (Iguales, ocultos por defecto) -->
     <div id="modal-lealtad" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
             <div class="modal-title">Programa de Fidelidad</div>
             <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
-            <table>
-                <tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
-                <tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr>
-                <tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
-            </table>
-            <p style="color: var(--danger-red); font-size: 11px; margin-top: 12px;">
-                ⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.
-            </p>
+            <table><tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr><tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr><tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr></table>
+            <p style="color: var(--danger-red); font-size: 11px; margin-top: 12px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
         </div>
     </div>
-
-    <!-- Modal Términos -->
     <div id="modal-terminos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
@@ -319,32 +256,19 @@
             </ul>
         </div>
     </div>
-
-    <!-- Modal Garantía -->
     <div id="modal-garantia" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
             <div class="modal-title">Garantía y Trato Justo</div>
-            <table>
-                <tr><th>Concepto</th><th>Regla</th><th>Límite</th></tr>
-                <tr><td><strong>Falla Técnica</strong></td><td>5% desc. diario por día completo inactivo.</td><td>Hasta 50% desc.</td></tr>
-                <tr><td><strong>Mora sin Aviso</strong></td><td>5% recargo diario acumulable tras vencimiento.</td><td>Hasta 50% recargo.</td></tr>
-                <tr><td><strong>Cancelación</strong></td><td>Tras 15 días inactivo sin reporte, 20% cargo admin.</td><td>20% sobre saldo.</td></tr>
-            </table>
+            <table><tr><th>Concepto</th><th>Regla</th><th>Límite</th></tr><tr><td><strong>Falla Técnica</strong></td><td>5% desc. diario por día inactivo.</td><td>Hasta 50% desc.</td></tr><tr><td><strong>Mora sin Aviso</strong></td><td>5% recargo diario acumulable.</td><td>Hasta 50% recargo.</td></tr><tr><td><strong>Cancelación</strong></td><td>Tras 15 días inactivo, 20% cargo admin.</td><td>20% sobre saldo.</td></tr></table>
         </div>
     </div>
-
-    <!-- Modal Referidos -->
     <div id="modal-referidos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
             <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
             <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Gana el 100% de tu mensualidad por cada amigo recomendado que cumpla su permanencia.</p>
-            <ul class="terms-list">
-                <li><strong>1. Compra Inicial:</strong> El referido debe adquirir al menos 2 perfiles.</li>
-                <li><strong>2. Permanencia:</strong> Mantener perfiles activos durante 3 meses consecutivos.</li>
-                <li><strong>3. Aplicación:</strong> El mes gratis se aplica en el 4to mes.</li>
-            </ul>
+            <ul class="terms-list"><li><strong>1. Compra Inicial:</strong> El referido debe adquirir al menos 2 perfiles.</li><li><strong>2. Permanencia:</strong> Mantener perfiles activos durante 3 meses.</li><li><strong>3. Aplicación:</strong> El mes gratis se aplica en el 4to mes.</li></ul>
         </div>
     </div>
 
@@ -352,42 +276,53 @@
         // VARIABLE PARA TU NÚMERO PERSONAL DE GOXION
         const NUMERO_GOXION = "528136836901"; 
 
+        // NAVEGACIÓN POR PESTAÑAS (SPA)
+        function switchTab(tabName) {
+            document.getElementById('btn-tab-cuenta').classList.remove('active');
+            document.getElementById('btn-tab-soporte').classList.remove('active');
+            document.getElementById('view-cuenta').classList.remove('active');
+            document.getElementById('view-soporte').classList.remove('active');
+
+            document.getElementById(`btn-tab-${tabName}`).classList.add('active');
+            document.getElementById(`view-${tabName}`).classList.add('active');
+        }
+
         let selectedPlat = "";
         let currentIssues = {};
 
-        // BASE DE DATOS DE PROBLEMAS COMUNES Y AUTOGESTIÓN
+        // BASE DE DATOS DE PROBLEMAS CON TEXTOS CLAROS
         const DATABASE_ISSUES = {
             "Netflix": [
                 {
                     issue: "🔑 Solicitar Código PIN / Acceso de Sesión",
                     instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código' o 'Ingresar Contraseña'.<br>2. Revisa el correo que te asignamos en pantalla.<br>3. Haz clic abajo para enviarnos la solicitud inmediata y te mandamos el código.",
-                    labelInput: "Correo asignado o Nombre del Cliente:",
-                    templateWA: "Hola GOXION, solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Cliente/Correo en pantalla: "
+                    labelInput: "Correo de la cuenta que te dimos en GOXION:",
+                    templateWA: "Hola GOXION, solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: "
                 },
                 {
                     issue: "📺 Tu TV no forma parte del Hogar / Viaje",
-                    instructions: "1. En la pantalla selecciona la opción <strong>'Estoy de Viaje'</strong> o <strong>'Actualizar Hogar Netflix'</strong>.<br>2. La pantalla te dirá que envió un correo de confirmación.<br>3. Presiona el botón de abajo para autorizar tu dispositivo al instante.",
-                    labelInput: "Correo que aparece en tu pantalla de TV:",
+                    instructions: "1. Selecciona <strong>'Estoy de Viaje'</strong> o <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación.<br>3. Ingresa tu correo abajo y autorizaremos tu dispositivo.",
+                    labelInput: "Correo con el que entras a la cuenta:",
                     templateWA: "Hola GOXION, mi pantalla de NETFLIX pide actualizar HOGAR/VIAJE.\n\n📧 Correo en pantalla: "
                 },
                 {
                     issue: "⚠️ Pantalla Ocupada / Límite de dispositivos",
-                    instructions: "Recuerda que cada perfil contratado equivale a 1 pantalla simultánea. Si te marca límite, asegúrate de que ningún familiar esté usando el perfil al mismo tiempo o cierra la app y vuelve a ingresar.",
-                    labelInput: "Nombre de tu Perfil asignado:",
+                    instructions: "Recuerda que cada perfil equivale a 1 pantalla simultánea. Si marca límite, asegúrate de que ningún familiar tuyo esté usando tu perfil, o cierra la app y vuelve a entrar.",
+                    labelInput: "Nombre del Perfil que usas:",
                     templateWA: "Hola GOXION, tengo problemas de pantalla ocupada en NETFLIX.\n\n👤 Mi Perfil es: "
                 }
             ],
             "Disney+": [
                 {
                     issue: "🔑 Código de Verificación / Iniciar Sesión",
-                    instructions: "1. Ingresa el correo en tu app de Disney+ y presiona 'Continuar'.<br>2. La pantalla te pedirá un código de 6 dígitos enviado por correo.<br>3. Solicítalo abajo e indícanos el correo que pusiste.",
-                    labelInput: "Correo ingresado en Disney+:",
+                    instructions: "1. Ingresa el correo en tu app de Disney+ y presiona 'Continuar'.<br>2. La pantalla te pedirá un código de 6 dígitos enviado por correo.<br>3. Solicítalo abajo.",
+                    labelInput: "Correo con el que entras a la cuenta:",
                     templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: "
                 },
                 {
                     issue: "🏠 Mensaje de 'Hogar / Hogar Principal'",
                     instructions: "Selecciona 'Actualizar Hogar' en la pantalla y solicita la autorización inmediata aquí.",
-                    labelInput: "Correo asignado en la cuenta:",
+                    labelInput: "Correo de la cuenta GOXION:",
                     templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo: "
                 }
             ],
@@ -401,13 +336,13 @@
                 {
                     issue: "❌ Contraseña Incorrecta / Error de inicio",
                     instructions: "Asegúrate de no dejar espacios al copiar el correo y la contraseña. Si persiste, notificaremos la actualización.",
-                    labelInput: "Correo asignado:",
+                    labelInput: "Correo con el que entras a la cuenta:",
                     templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: "
                 }
             ],
             "Prime Video": [
                 {
-                    issue: "📺 Registrar Dispositivo / Código de TV (primevideo.com/mytv)",
+                    issue: "📺 Registrar Dispositivo / Código de TV",
                     instructions: "1. En tu TV o dispositivo abre Prime Video y presiona 'Identifícate'.<br>2. Te mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para darte acceso al instante.",
                     labelInput: "Código de Registro en Pantalla:",
                     templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código en pantalla: "
@@ -415,9 +350,9 @@
             ],
             "YouTube Premium": [
                 {
-                    issue: "📩 No me llegó la invitación al correo / Unirme al grupo",
+                    issue: "📩 No me llegó la invitación / Unirme al grupo",
                     instructions: "1. Revisa tu bandeja de Entrada y de SPAM en Gmail.<br>2. Si la cuenta es familiar, debes asegurarte de no estar en otro grupo familiar activo en los últimos 12 meses.",
-                    labelInput: "Tu correo Gmail personal:",
+                    labelInput: "Tu correo Gmail personal (para la invitación):",
                     templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail es: "
                 },
                 {
@@ -431,21 +366,21 @@
                 {
                     issue: "🔑 Código de Acceso o Vincular TV",
                     instructions: "Selecciona 'Iniciar Sesión' en tu app, ingresa tus credenciales asignadas o envíanos el código de pantalla.",
-                    labelInput: "Correo asignado o Código de TV:",
+                    labelInput: "Correo de la cuenta o Código de TV:",
                     templateWA: "Hola GOXION, necesito ayuda para ingresar a VIX PREMIUM.\n\n📱 Dato/Correo: "
                 }
             ],
             "Crunchyroll": [
                 {
-                    issue: "🔑 Código de Vinculación / Iniciar Sesión en Consola o TV",
-                    instructions: "Ingresa a la sección de activar dispositivo en tu consola o TV e indícanos el código de 6 dígitos que aparece.",
-                    labelInput: "Código de Activación:",
+                    issue: "🔑 Código de Vinculación en Consola o TV",
+                    instructions: "Ingresa a la sección de activar dispositivo en tu consola o TV e indícanos el código de 6 letras que aparece.",
+                    labelInput: "Código de Activación de 6 letras:",
                     templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: "
                 }
             ],
             "Microsoft 365": [
                 {
-                    issue: "💻 Estado de Licencia / Reenviar Invitación de Familia",
+                    issue: "💻 Estado de Licencia / Reenviar Invitación",
                     instructions: "Indícanos tu correo personal de Outlook/Hotmail para verificar el estado de tu suscripción a Microsoft 365.",
                     labelInput: "Tu correo de Outlook/Hotmail:",
                     templateWA: "Hola GOXION, necesito asistencia con mi membresía de MICROSOFT 365.\n\n📧 Correo: "
@@ -455,16 +390,14 @@
                 {
                     issue: "☁️ Espacio de Almacenamiento no reflejado",
                     instructions: "Confirma que hayas aceptado la invitación enviada a tu Gmail para activar los 2TB compartidos.",
-                    labelInput: "Tu correo Gmail:",
+                    labelInput: "Tu correo Gmail personal:",
                     templateWA: "Hola GOXION, requiero verificar mi espacio de GOOGLE ONE.\n\n📧 Gmail: "
                 }
             ]
         };
 
-        // SELECCIÓN DE PLATAFORMA
         function selectPlatform(platform, element) {
             selectedPlat = platform;
-            
             document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('selected'));
             element.classList.add('selected');
 
@@ -473,7 +406,6 @@
             const selector = document.getElementById('issue-selector');
 
             selector.innerHTML = `<option value="">-- Selecciona el problema o consulta --</option>`;
-            
             currentIssues = DATABASE_ISSUES[platform] || [];
             currentIssues.forEach((item, index) => {
                 selector.innerHTML += `<option value="${index}">${item.issue}</option>`;
@@ -483,25 +415,26 @@
             step3.classList.remove('active');
         }
 
-        // MOSTRAR SOLUCIÓN Y FORMULARIO DINÁMICO
         function showSolution() {
             const index = document.getElementById('issue-selector').value;
             const step3 = document.getElementById('step-3');
             
-            if (index === "") {
-                step3.classList.remove('active');
-                return;
-            }
+            if (index === "") { step3.classList.remove('active'); return; }
 
             const data = currentIssues[index];
             document.getElementById('solution-text').innerHTML = `<strong>💡 ¿Qué debes hacer?</strong><br>${data.instructions}`;
             document.getElementById('input-label').innerText = data.labelInput;
             document.getElementById('smart-extra-input').value = "";
+            
+            // Cambiar placeholder dinámicamente según lo que se pida
+            let placeholderTxt = "Ej: cuenta@correo.com";
+            if (data.labelInput.toLowerCase().includes("código")) placeholderTxt = "Ej: X7Y9Z2";
+            if (data.labelInput.toLowerCase().includes("perfil")) placeholderTxt = "Ej: Perfil 3 - Juan";
+            document.getElementById('smart-extra-input').placeholder = placeholderTxt;
 
             step3.classList.add('active');
         }
 
-        // ENVIAR MENSAJE A WHATSAPP
         function sendSmartWA() {
             const index = document.getElementById('issue-selector').value;
             if (index === "") return;
@@ -509,51 +442,41 @@
             const data = currentIssues[index];
             const extraVal = document.getElementById('smart-extra-input').value.trim();
 
-            if (extraVal === "") {
-                alert("Por favor completa el campo de texto requerido (correo, código o nombre).");
-                return;
-            }
+            if (extraVal === "") return alert("Por favor completa el campo de texto requerido.");
 
             const mensajeFinal = encodeURIComponent(`${data.templateWA}${extraVal}`);
-            const url = `https://wa.me/${NUMERO_GOXION}?text=${mensajeFinal}`;
-            window.open(url, '_blank');
+            window.open(`https://wa.me/${NUMERO_GOXION}?text=${mensajeFinal}`, '_blank');
         }
 
-        // Cargar alertas dinámicas desde clientes.json
+        // Alertas Globales
         async function cargarAlertasGlobales() {
             try {
                 const response = await fetch('clientes.json', { cache: 'no-store' });
                 if (!response.ok) return;
-                
                 const data = await response.json();
                 const config = data._goxion_config;
-
                 if (config && config.alertas && config.alertas.activa) {
                     const banner = document.getElementById('dynamic-alert');
                     const content = document.getElementById('alert-content');
-                    
                     const plataforma = config.alertas.plataforma || "Servicios";
                     const falla = config.alertas.falla || "presentando intermitencias";
                     const mensajeExtra = config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : '';
-
                     content.innerHTML = `<strong>Aviso Técnico:</strong> El servicio de <strong>${plataforma}</strong> está ${falla}. Las demás plataformas operan con normalidad.${mensajeExtra}`;
                     banner.style.display = 'flex';
                 }
             } catch (e) {}
         }
 
-        // Modales
+        // Modales y Buscador
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
-
-        // Buscador directo
+        
         function buscarClienteDirecto() {
             var val = document.getElementById('main-input-cliente').value.trim();
             if (!val) return alert("Ingresa tu identificador.");
             window.location.href = 'index.html?cliente=' + encodeURIComponent(val);
         }
-
         document.getElementById('main-input-cliente').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') buscarClienteDirecto();
         });
