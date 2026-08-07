@@ -21,18 +21,7 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
-        body { 
-            background-color: var(--bg-black); 
-            color: var(--text-main); 
-            line-height: 1.6; 
-            padding: 20px 15px; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
+        body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; overflow-x: hidden; }
 
         /* FONDO ANIMADO */
         .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); overflow: hidden; }
@@ -52,21 +41,10 @@
         /* BANNER ALERTA */
         .alert-banner { background: rgba(255, 170, 0, 0.12); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 25px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(12px); }
 
-        /* NAVEGACIÓN POR PESTAÑAS (TABS) - EL NUEVO TOQUE APP */
-        .tab-container { 
-            display: flex; background: rgba(255,255,255,0.03); border-radius: 16px; 
-            padding: 5px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); 
-            backdrop-filter: blur(12px);
-        }
-        .tab-btn { 
-            flex: 1; padding: 12px; background: transparent; border: none; 
-            color: var(--text-muted); font-size: 13px; font-weight: 600; 
-            border-radius: 12px; cursor: pointer; transition: all 0.3s ease; 
-        }
-        .tab-btn.active { 
-            background: var(--card-bg); color: var(--text-main); 
-            border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15); 
-        }
+        /* NAVEGACIÓN POR PESTAÑAS (TABS) */
+        .tab-container { display: flex; background: rgba(255,255,255,0.03); border-radius: 16px; padding: 5px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); }
+        .tab-btn { flex: 1; padding: 12px; background: transparent; border: none; color: var(--text-muted); font-size: 13px; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; }
+        .tab-btn.active { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15); }
         
         /* VISTAS */
         .view-section { display: none; animation: fadeIn 0.4s ease; }
@@ -75,11 +53,23 @@
 
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
 
-        /* BUSCADOR CLIENTE (VISTA 1) */
-        .search-bar-container { display: flex; gap: 8px; background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 16px; padding: 6px 8px; backdrop-filter: blur(12px); transition: 0.3s; margin-bottom: 30px;}
+        /* BUSCADOR CLIENTE - CORREGIDO PARA MÓVILES */
+        .search-bar-container { 
+            display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; 
+            width: 100%; background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); 
+            border-radius: 16px; padding: 6px 8px; backdrop-filter: blur(12px); 
+            transition: 0.3s; margin-bottom: 30px; box-sizing: border-box;
+        }
         .search-bar-container:focus-within { border-color: var(--neon-blue); box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
-        .search-input { flex: 1; background: transparent; border: none; color: var(--text-main); font-size: 14px; padding: 8px 12px; outline: none; }
-        .search-btn { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); border: none; border-radius: 12px; padding: 8px 18px; color: #000; font-weight: 700; font-size: 13px; cursor: pointer; }
+        .search-input { 
+            flex: 1; min-width: 0; background: transparent; border: none; 
+            color: var(--text-main); font-size: 14px; padding: 8px 12px; outline: none; 
+        }
+        .search-btn { 
+            flex-shrink: 0; white-space: nowrap; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); 
+            border: none; border-radius: 12px; padding: 8px 18px; color: #000; 
+            font-weight: 700; font-size: 13px; cursor: pointer; 
+        }
 
         /* ACCESOS RÁPIDOS Y REGLAS (VISTA 1) */
         .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
@@ -99,25 +89,27 @@
 
         .custom-select-smart { width: 100%; background: #0d121c; border: 1px solid var(--neon-purple); color: var(--text-main); padding: 12px; border-radius: 12px; font-size: 13px; outline: none; margin-bottom: 12px; }
         .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 12px; border-radius: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
-        .input-smart { width: 100%; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; outline: none; }
+        .input-smart { width: 100%; box-sizing: border-box; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; outline: none; }
         .input-smart:focus { border-color: var(--neon-blue); }
 
         /* BOTONES GLOBALES */
-        .btn-primary { width: 100%; padding: 12px; border-radius: 30px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s; text-align: center; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; }
+        .btn-primary { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 30px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s; text-align: center; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; }
         .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
 
-        /* MODALES */
+        /* MODALES (AMPLIADOS PARA TEXTO LEGAL) */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
-        .modal-content { background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 460px; max-height: 85vh; overflow-y: auto; padding: 22px; position: relative; }
+        .modal-content { background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
         .modal-title { color: #fff; margin-bottom: 15px; font-size: 15px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; }
+        
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 12px; }
         th, td { padding: 10px 6px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
         th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 10px; }
-        .terms-list { list-style: none; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; }
-        .terms-list li { margin-bottom: 10px; }
-        .terms-list strong { color: var(--text-main); }
+        
+        .terms-list { list-style: none; font-size: 12px; color: var(--text-muted); margin-bottom: 15px; text-align: justify; }
+        .terms-list li { margin-bottom: 12px; }
+        .terms-list strong { color: var(--neon-blue); display: block; margin-bottom: 2px;}
 
         /* FOOTER */
         .footer-info { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.05); }
@@ -141,13 +133,11 @@
             <div class="subtitle">Centro de Autogestión Asistida</div>
         </header>
 
-        <!-- BANNER ALERTA DINÁMICA DE ADMIN -->
         <div class="alert-banner" id="dynamic-alert">
             <span style="font-size: 20px;">⚠️</span>
             <div style="font-size: 12px; color: #fff;" id="alert-content"></div>
         </div>
 
-        <!-- MENU DE PESTAÑAS TIPO APP -->
         <div class="tab-container">
             <button class="tab-btn active" id="btn-tab-cuenta" onclick="switchTab('cuenta')">🔍 Mi Cuenta</button>
             <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')">🛠️ Soporte Técnico</button>
@@ -161,19 +151,19 @@
                 <button class="search-btn" onclick="buscarClienteDirecto()">🔍 Buscar</button>
             </div>
 
-            <div class="section-title">Información Importante</div>
+            <div class="section-title">Información Importante (Reglamento)</div>
             <div class="policy-grid">
-                <div class="btn-menu" onclick="openModal('modal-lealtad')">
-                    <span>⭐</span>
-                    <div>Programa Lealtad</div>
-                </div>
                 <div class="btn-menu" onclick="openModal('modal-terminos')">
                     <span>📄</span>
                     <div>Términos de Uso</div>
                 </div>
                 <div class="btn-menu" onclick="openModal('modal-garantia')">
                     <span>🛡️</span>
-                    <div>Garantía y Reglas</div>
+                    <div>Garantía y Sanciones</div>
+                </div>
+                <div class="btn-menu" onclick="openModal('modal-lealtad')">
+                    <span>⭐</span>
+                    <div>Programa Lealtad</div>
                 </div>
                 <div class="btn-menu" onclick="openModal('modal-referidos')">
                     <span>🎁</span>
@@ -219,7 +209,6 @@
             </div>
         </div>
 
-        <!-- FOOTER -->
         <div class="footer-info">
             <div class="schedule">
                 <div class="schedule-title">🕒 Horario de Atención Asistida</div>
@@ -233,7 +222,35 @@
 
     </div>
 
-    <!-- MODALES DE INFO (Iguales, ocultos por defecto) -->
+    <!-- MODALES LEGALES ACTUALIZADOS -->
+    <div id="modal-terminos" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
+            <div class="modal-title">Términos y Condiciones Oficiales</div>
+            <ul class="terms-list">
+                <li><strong>1. Confidencialidad de Credenciales</strong>Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
+                <li><strong>2. Uso Permitido</strong>Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
+                <li><strong>3. Sanciones</strong>El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
+                <li><strong>4. Esquema de Pagos y Notificaciones</strong>La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial. Métodos aceptados: Transferencias bancarias electrónicas y depósitos.</li>
+                <li><strong>5. Aviso Previo por Imposibilidad de Pago</strong>Si el usuario prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="modal-garantia" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
+            <div class="modal-title">Garantía, Satisfacción y Sanciones</div>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
+            <table>
+                <tr><th>Concepto</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
+                <tr><td style="color: var(--text-main);"><strong>Falla Técnica</strong></td><td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td><td>Hasta 50% de descuento (equivalente a 10 días).</td></tr>
+                <tr><td style="color: var(--warning-amber);"><strong>Mora sin Previo Aviso</strong></td><td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento.</td><td>Hasta 50% de interés acumulado.</td></tr>
+                <tr><td style="color: var(--danger-red);"><strong>Baja / Cancelación del Servicio</strong></td><td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td><td>20% sobre saldo pendiente.</td></tr>
+            </table>
+        </div>
+    </div>
+
     <div id="modal-lealtad" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
@@ -243,40 +260,23 @@
             <p style="color: var(--danger-red); font-size: 11px; margin-top: 12px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
         </div>
     </div>
-    <div id="modal-terminos" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
-            <div class="modal-title">Términos y Condiciones</div>
-            <ul class="terms-list">
-                <li><strong>1. Confidencialidad:</strong> Credenciales estrictamente personales. Prohibida su reventa o divulgación.</li>
-                <li><strong>2. Uso Permitido:</strong> Prohibido modificar contraseñas o datos de perfiles ajenos.</li>
-                <li><strong>3. Sanciones:</strong> Incumplimiento conlleva suspensión inmediata sin reembolso.</li>
-                <li><strong>4. Fechas de Pago:</strong> La fecha límite corresponde al día de contratación mensual.</li>
-                <li><strong>5. Prórrogas:</strong> Notifica con anticipación si prevés un retraso para evitar recargos.</li>
-            </ul>
-        </div>
-    </div>
-    <div id="modal-garantia" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
-            <div class="modal-title">Garantía y Trato Justo</div>
-            <table><tr><th>Concepto</th><th>Regla</th><th>Límite</th></tr><tr><td><strong>Falla Técnica</strong></td><td>5% desc. diario por día inactivo.</td><td>Hasta 50% desc.</td></tr><tr><td><strong>Mora sin Aviso</strong></td><td>5% recargo diario acumulable.</td><td>Hasta 50% recargo.</td></tr><tr><td><strong>Cancelación</strong></td><td>Tras 15 días inactivo, 20% cargo admin.</td><td>20% sobre saldo.</td></tr></table>
-        </div>
-    </div>
+
     <div id="modal-referidos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
             <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Gana el 100% de tu mensualidad por cada amigo recomendado que cumpla su permanencia.</p>
-            <ul class="terms-list"><li><strong>1. Compra Inicial:</strong> El referido debe adquirir al menos 2 perfiles.</li><li><strong>2. Permanencia:</strong> Mantener perfiles activos durante 3 meses.</li><li><strong>3. Aplicación:</strong> El mes gratis se aplica en el 4to mes.</li></ul>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 12px;">Obtén un descuento del 100% en una mensualidad de tu servicio actual por cada nuevo cliente que concrete una compra.</p>
+            <ul class="terms-list">
+                <li><strong>1. Requisitos para el Referido</strong>Debe ser cliente nuevo. Adquirir un mínimo de dos (2) perfiles y mantenerlos activos/pagados durante 3 meses consecutivos.</li>
+                <li><strong>2. Condiciones de Aplicación</strong>El descuento del 100% se aplicará en tu cuarto mes. Debes mantener tu cuenta activa y al corriente durante la validación.</li>
+                <li><strong>3. Restricciones</strong>Si el Referido cancela antes de los 3 meses, el beneficio se anula. No es acumulable con otros descuentos. Aplica sobre tu tarifa base mensual. Sin límite de referidos (un mes gratis por cada ciclo cumplido).</li>
+            </ul>
         </div>
     </div>
 
     <script>
-        // VARIABLE PARA TU NÚMERO PERSONAL DE GOXION
         const NUMERO_GOXION = "528136836901"; 
 
-        // NAVEGACIÓN POR PESTAÑAS (SPA)
         function switchTab(tabName) {
             document.getElementById('btn-tab-cuenta').classList.remove('active');
             document.getElementById('btn-tab-soporte').classList.remove('active');
@@ -290,109 +290,38 @@
         let selectedPlat = "";
         let currentIssues = {};
 
-        // BASE DE DATOS DE PROBLEMAS CON TEXTOS CLAROS
         const DATABASE_ISSUES = {
             "Netflix": [
-                {
-                    issue: "🔑 Solicitar Código PIN / Acceso de Sesión",
-                    instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código' o 'Ingresar Contraseña'.<br>2. Revisa el correo que te asignamos en pantalla.<br>3. Haz clic abajo para enviarnos la solicitud inmediata y te mandamos el código.",
-                    labelInput: "Correo de la cuenta que te dimos en GOXION:",
-                    templateWA: "Hola GOXION, solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: "
-                },
-                {
-                    issue: "📺 Tu TV no forma parte del Hogar / Viaje",
-                    instructions: "1. Selecciona <strong>'Estoy de Viaje'</strong> o <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación.<br>3. Ingresa tu correo abajo y autorizaremos tu dispositivo.",
-                    labelInput: "Correo con el que entras a la cuenta:",
-                    templateWA: "Hola GOXION, mi pantalla de NETFLIX pide actualizar HOGAR/VIAJE.\n\n📧 Correo en pantalla: "
-                },
-                {
-                    issue: "⚠️ Pantalla Ocupada / Límite de dispositivos",
-                    instructions: "Recuerda que cada perfil equivale a 1 pantalla simultánea. Si marca límite, asegúrate de que ningún familiar tuyo esté usando tu perfil, o cierra la app y vuelve a entrar.",
-                    labelInput: "Nombre del Perfil que usas:",
-                    templateWA: "Hola GOXION, tengo problemas de pantalla ocupada en NETFLIX.\n\n👤 Mi Perfil es: "
-                }
+                { issue: "🔑 Solicitar Código PIN / Acceso de Sesión", instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código' o 'Ingresar Contraseña'.<br>2. Revisa el correo que te asignamos en pantalla.<br>3. Haz clic abajo para enviarnos la solicitud inmediata y te mandamos el código.", labelInput: "Correo de la cuenta que te dimos en GOXION:", templateWA: "Hola GOXION, solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " },
+                { issue: "📺 Tu TV no forma parte del Hogar / Viaje", instructions: "1. Selecciona <strong>'Estoy de Viaje'</strong> o <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación.<br>3. Ingresa tu correo abajo y autorizaremos tu dispositivo.", labelInput: "Correo con el que entras a la cuenta:", templateWA: "Hola GOXION, mi pantalla de NETFLIX pide actualizar HOGAR/VIAJE.\n\n📧 Correo en pantalla: " },
+                { issue: "⚠️ Pantalla Ocupada / Límite de dispositivos", instructions: "Recuerda que cada perfil equivale a 1 pantalla simultánea. Si marca límite, asegúrate de que ningún familiar tuyo esté usando tu perfil, o cierra la app y vuelve a entrar.", labelInput: "Nombre del Perfil que usas:", templateWA: "Hola GOXION, tengo problemas de pantalla ocupada en NETFLIX.\n\n👤 Mi Perfil es: " }
             ],
             "Disney+": [
-                {
-                    issue: "🔑 Código de Verificación / Iniciar Sesión",
-                    instructions: "1. Ingresa el correo en tu app de Disney+ y presiona 'Continuar'.<br>2. La pantalla te pedirá un código de 6 dígitos enviado por correo.<br>3. Solicítalo abajo.",
-                    labelInput: "Correo con el que entras a la cuenta:",
-                    templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: "
-                },
-                {
-                    issue: "🏠 Mensaje de 'Hogar / Hogar Principal'",
-                    instructions: "Selecciona 'Actualizar Hogar' en la pantalla y solicita la autorización inmediata aquí.",
-                    labelInput: "Correo de la cuenta GOXION:",
-                    templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo: "
-                }
+                { issue: "🔑 Código de Verificación / Iniciar Sesión", instructions: "1. Ingresa el correo en tu app de Disney+ y presiona 'Continuar'.<br>2. La pantalla te pedirá un código de 6 dígitos enviado por correo.<br>3. Solicítalo abajo.", labelInput: "Correo con el que entras a la cuenta:", templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " },
+                { issue: "🏠 Mensaje de 'Hogar / Hogar Principal'", instructions: "Selecciona 'Actualizar Hogar' en la pantalla y solicita la autorización inmediata aquí.", labelInput: "Correo de la cuenta GOXION:", templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo: " }
             ],
             "Max": [
-                {
-                    issue: "🔑 Solicitud de Código de Acceso / Iniciar Sesión",
-                    instructions: "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.<br>2. Aparecerán 6 letras/números en tu pantalla (Ej: X7Y9Z2).<br>3. Escribe el código de tu pantalla aquí abajo para vincularlo.",
-                    labelInput: "Código de 6 letras que sale en tu TV:",
-                    templateWA: "Hola GOXION, solicito vincular mi TV a MAX.\n\n🔤 Código de pantalla TV: "
-                },
-                {
-                    issue: "❌ Contraseña Incorrecta / Error de inicio",
-                    instructions: "Asegúrate de no dejar espacios al copiar el correo y la contraseña. Si persiste, notificaremos la actualización.",
-                    labelInput: "Correo con el que entras a la cuenta:",
-                    templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: "
-                }
+                { issue: "🔑 Solicitud de Código de Acceso / Iniciar Sesión", instructions: "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.<br>2. Aparecerán 6 letras/números en tu pantalla (Ej: X7Y9Z2).<br>3. Escribe el código de tu pantalla aquí abajo para vincularlo.", labelInput: "Código de 6 letras que sale en tu TV:", templateWA: "Hola GOXION, solicito vincular mi TV a MAX.\n\n🔤 Código de pantalla TV: " },
+                { issue: "❌ Contraseña Incorrecta / Error de inicio", instructions: "Asegúrate de no dejar espacios al copiar el correo y la contraseña. Si persiste, notificaremos la actualización.", labelInput: "Correo con el que entras a la cuenta:", templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: " }
             ],
             "Prime Video": [
-                {
-                    issue: "📺 Registrar Dispositivo / Código de TV",
-                    instructions: "1. En tu TV o dispositivo abre Prime Video y presiona 'Identifícate'.<br>2. Te mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para darte acceso al instante.",
-                    labelInput: "Código de Registro en Pantalla:",
-                    templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código en pantalla: "
-                }
+                { issue: "📺 Registrar Dispositivo / Código de TV", instructions: "1. En tu TV o dispositivo abre Prime Video y presiona 'Identifícate'.<br>2. Te mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para darte acceso al instante.", labelInput: "Código de Registro en Pantalla:", templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código en pantalla: " }
             ],
             "YouTube Premium": [
-                {
-                    issue: "📩 No me llegó la invitación / Unirme al grupo",
-                    instructions: "1. Revisa tu bandeja de Entrada y de SPAM en Gmail.<br>2. Si la cuenta es familiar, debes asegurarte de no estar en otro grupo familiar activo en los últimos 12 meses.",
-                    labelInput: "Tu correo Gmail personal (para la invitación):",
-                    templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail es: "
-                },
-                {
-                    issue: "⚠️ Mi cuenta volvió a tener anuncios (Gratuita)",
-                    instructions: "Escríbenos con tu nombre o correo para renovar el enlace de invitación de tu perfil.",
-                    labelInput: "Tu correo Gmail registrado:",
-                    templateWA: "Hola GOXION, mi perfil de YOUTUBE se pasó a modo gratuito.\n\n📧 Mi Gmail: "
-                }
+                { issue: "📩 No me llegó la invitación / Unirme al grupo", instructions: "1. Revisa tu bandeja de Entrada y de SPAM en Gmail.<br>2. Si la cuenta es familiar, debes asegurarte de no estar en otro grupo familiar activo en los últimos 12 meses.", labelInput: "Tu correo Gmail personal (para la invitación):", templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail es: " },
+                { issue: "⚠️ Mi cuenta volvió a tener anuncios (Gratuita)", instructions: "Escríbenos con tu nombre o correo para renovar el enlace de invitación de tu perfil.", labelInput: "Tu correo Gmail registrado:", templateWA: "Hola GOXION, mi perfil de YOUTUBE se pasó a modo gratuito.\n\n📧 Mi Gmail: " }
             ],
             "ViX Premium": [
-                {
-                    issue: "🔑 Código de Acceso o Vincular TV",
-                    instructions: "Selecciona 'Iniciar Sesión' en tu app, ingresa tus credenciales asignadas o envíanos el código de pantalla.",
-                    labelInput: "Correo de la cuenta o Código de TV:",
-                    templateWA: "Hola GOXION, necesito ayuda para ingresar a VIX PREMIUM.\n\n📱 Dato/Correo: "
-                }
+                { issue: "🔑 Código de Acceso o Vincular TV", instructions: "Selecciona 'Iniciar Sesión' en tu app, ingresa tus credenciales asignadas o envíanos el código de pantalla.", labelInput: "Correo de la cuenta o Código de TV:", templateWA: "Hola GOXION, necesito ayuda para ingresar a VIX PREMIUM.\n\n📱 Dato/Correo: " }
             ],
             "Crunchyroll": [
-                {
-                    issue: "🔑 Código de Vinculación en Consola o TV",
-                    instructions: "Ingresa a la sección de activar dispositivo en tu consola o TV e indícanos el código de 6 letras que aparece.",
-                    labelInput: "Código de Activación de 6 letras:",
-                    templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: "
-                }
+                { issue: "🔑 Código de Vinculación en Consola o TV", instructions: "Ingresa a la sección de activar dispositivo en tu consola o TV e indícanos el código de 6 letras que aparece.", labelInput: "Código de Activación de 6 letras:", templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: " }
             ],
             "Microsoft 365": [
-                {
-                    issue: "💻 Estado de Licencia / Reenviar Invitación",
-                    instructions: "Indícanos tu correo personal de Outlook/Hotmail para verificar el estado de tu suscripción a Microsoft 365.",
-                    labelInput: "Tu correo de Outlook/Hotmail:",
-                    templateWA: "Hola GOXION, necesito asistencia con mi membresía de MICROSOFT 365.\n\n📧 Correo: "
-                }
+                { issue: "💻 Estado de Licencia / Reenviar Invitación", instructions: "Indícanos tu correo personal de Outlook/Hotmail para verificar el estado de tu suscripción a Microsoft 365.", labelInput: "Tu correo de Outlook/Hotmail:", templateWA: "Hola GOXION, necesito asistencia con mi membresía de MICROSOFT 365.\n\n📧 Correo: " }
             ],
             "Google One": [
-                {
-                    issue: "☁️ Espacio de Almacenamiento no reflejado",
-                    instructions: "Confirma que hayas aceptado la invitación enviada a tu Gmail para activar los 2TB compartidos.",
-                    labelInput: "Tu correo Gmail personal:",
-                    templateWA: "Hola GOXION, requiero verificar mi espacio de GOOGLE ONE.\n\n📧 Gmail: "
-                }
+                { issue: "☁️ Espacio de Almacenamiento no reflejado", instructions: "Confirma que hayas aceptado la invitación enviada a tu Gmail para activar los 2TB compartidos.", labelInput: "Tu correo Gmail personal:", templateWA: "Hola GOXION, requiero verificar mi espacio de GOOGLE ONE.\n\n📧 Gmail: " }
             ]
         };
 
@@ -400,17 +329,12 @@
             selectedPlat = platform;
             document.querySelectorAll('.platform-btn').forEach(btn => btn.classList.remove('selected'));
             element.classList.add('selected');
-
             const step2 = document.getElementById('step-2');
             const step3 = document.getElementById('step-3');
             const selector = document.getElementById('issue-selector');
-
             selector.innerHTML = `<option value="">-- Selecciona el problema o consulta --</option>`;
             currentIssues = DATABASE_ISSUES[platform] || [];
-            currentIssues.forEach((item, index) => {
-                selector.innerHTML += `<option value="${index}">${item.issue}</option>`;
-            });
-
+            currentIssues.forEach((item, index) => { selector.innerHTML += `<option value="${index}">${item.issue}</option>`; });
             step2.classList.add('active');
             step3.classList.remove('active');
         }
@@ -418,37 +342,28 @@
         function showSolution() {
             const index = document.getElementById('issue-selector').value;
             const step3 = document.getElementById('step-3');
-            
             if (index === "") { step3.classList.remove('active'); return; }
-
             const data = currentIssues[index];
             document.getElementById('solution-text').innerHTML = `<strong>💡 ¿Qué debes hacer?</strong><br>${data.instructions}`;
             document.getElementById('input-label').innerText = data.labelInput;
             document.getElementById('smart-extra-input').value = "";
-            
-            // Cambiar placeholder dinámicamente según lo que se pida
             let placeholderTxt = "Ej: cuenta@correo.com";
             if (data.labelInput.toLowerCase().includes("código")) placeholderTxt = "Ej: X7Y9Z2";
             if (data.labelInput.toLowerCase().includes("perfil")) placeholderTxt = "Ej: Perfil 3 - Juan";
             document.getElementById('smart-extra-input').placeholder = placeholderTxt;
-
             step3.classList.add('active');
         }
 
         function sendSmartWA() {
             const index = document.getElementById('issue-selector').value;
             if (index === "") return;
-
             const data = currentIssues[index];
             const extraVal = document.getElementById('smart-extra-input').value.trim();
-
             if (extraVal === "") return alert("Por favor completa el campo de texto requerido.");
-
             const mensajeFinal = encodeURIComponent(`${data.templateWA}${extraVal}`);
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${mensajeFinal}`, '_blank');
         }
 
-        // Alertas Globales
         async function cargarAlertasGlobales() {
             try {
                 const response = await fetch('clientes.json', { cache: 'no-store' });
@@ -458,16 +373,12 @@
                 if (config && config.alertas && config.alertas.activa) {
                     const banner = document.getElementById('dynamic-alert');
                     const content = document.getElementById('alert-content');
-                    const plataforma = config.alertas.plataforma || "Servicios";
-                    const falla = config.alertas.falla || "presentando intermitencias";
-                    const mensajeExtra = config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : '';
-                    content.innerHTML = `<strong>Aviso Técnico:</strong> El servicio de <strong>${plataforma}</strong> está ${falla}. Las demás plataformas operan con normalidad.${mensajeExtra}`;
+                    content.innerHTML = `<strong>Aviso Técnico:</strong> El servicio de <strong>${config.alertas.plataforma || "Servicios"}</strong> está ${config.alertas.falla || "presentando intermitencias"}. Las demás plataformas operan con normalidad.${config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : ''}`;
                     banner.style.display = 'flex';
                 }
             } catch (e) {}
         }
 
-        // Modales y Buscador
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
