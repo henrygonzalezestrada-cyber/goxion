@@ -22,6 +22,38 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
         
         body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 20px 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; position: relative; overflow-x: hidden; }
+        
+        /* Evitar scroll mientras está la pantalla de carga */
+        body.no-scroll { overflow: hidden; height: 100vh; }
+
+        /* --- PANTALLA DE BIENVENIDA (SPLASH SCREEN) --- */
+        #splash-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg-black); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+        .splash-content {
+            text-align: center;
+            animation: floatUp 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .splash-logo {
+            max-width: 220px; margin-bottom: 25px;
+            filter: drop-shadow(0 0 20px rgba(0, 242, 254, 0.3));
+        }
+        .splash-greeting {
+            color: var(--text-main); font-size: 15px; font-weight: 300; letter-spacing: 0.5px;
+            opacity: 0; animation: fadeInText 1s 0.6s forwards;
+        }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeInText {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
 
         /* FONDO ANIMADO */
         .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); overflow: hidden; }
@@ -53,7 +85,7 @@
 
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
 
-        /* BUSCADOR CLIENTE - CORREGIDO PARA MÓVILES */
+        /* BUSCADOR CLIENTE */
         .search-bar-container { 
             display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; 
             width: 100%; background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); 
@@ -71,14 +103,14 @@
             font-weight: 700; font-size: 13px; cursor: pointer; 
         }
 
-        /* ACCESOS RÁPIDOS Y REGLAS (VISTA 1) */
+        /* ACCESOS RÁPIDOS Y REGLAS */
         .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
         .btn-menu { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15); border-radius: 16px; padding: 16px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; backdrop-filter: blur(12px); transition: 0.3s; }
         .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); }
         .btn-menu span { font-size: 24px; }
         .btn-menu div { font-weight: 600; font-size: 12px; }
 
-        /* MÓDULO INTELIGENTE (VISTA 2) */
+        /* MÓDULO INTELIGENTE */
         .smart-support-card { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3); border-radius: 20px; padding: 20px; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 15px; }
         .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer; font-size: 11px; font-weight: 600; color: var(--text-main); transition: 0.2s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
@@ -96,7 +128,7 @@
         .btn-primary { width: 100%; box-sizing: border-box; padding: 12px; border-radius: 30px; border: none; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.3s; text-align: center; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; }
         .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
 
-        /* MODALES (AMPLIADOS PARA TEXTO LEGAL) */
+        /* MODALES */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
         .modal-content { background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; }
@@ -119,8 +151,17 @@
         .copyright { font-size: 11px; color: var(--text-muted); }
     </style>
 </head>
-<body>
+<body class="no-scroll">
 
+    <!-- TRANSICIÓN DE BIENVENIDA -->
+    <div id="splash-screen" onclick="hideSplash()">
+        <div class="splash-content">
+            <img src="logo.png" alt="GOXION" class="splash-logo" onerror="this.style.display='none'">
+            <div class="splash-greeting">Hola, ¿cómo te podemos ayudar el día de hoy?</div>
+        </div>
+    </div>
+
+    <!-- FONDO -->
     <div class="bg">
         <div class="neon-orbit orbit-1"></div>
         <div class="neon-orbit orbit-2"></div>
@@ -236,7 +277,6 @@
             </ul>
         </div>
     </div>
-
     <div id="modal-garantia" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
@@ -250,7 +290,6 @@
             </table>
         </div>
     </div>
-
     <div id="modal-lealtad" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
@@ -260,7 +299,6 @@
             <p style="color: var(--danger-red); font-size: 11px; margin-top: 12px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
         </div>
     </div>
-
     <div id="modal-referidos" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
@@ -277,6 +315,24 @@
     <script>
         const NUMERO_GOXION = "528136836901"; 
 
+        // LÓGICA DE LA TRANSICIÓN DE BIENVENIDA (SPLASH SCREEN)
+        function hideSplash() {
+            const splash = document.getElementById('splash-screen');
+            if (splash.style.opacity === '0') return; // Evitar doble ejecución
+            
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.visibility = 'hidden';
+                document.body.classList.remove('no-scroll');
+            }, 800);
+        }
+
+        // Ocultar automáticamente al cargar
+        window.addEventListener('load', () => {
+            setTimeout(hideSplash, 2500); 
+        });
+
+        // NAVEGACIÓN
         function switchTab(tabName) {
             document.getElementById('btn-tab-cuenta').classList.remove('active');
             document.getElementById('btn-tab-soporte').classList.remove('active');
