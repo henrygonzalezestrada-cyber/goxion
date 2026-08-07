@@ -43,8 +43,21 @@
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
 
-        /* HEADER APP */
-        .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: 5px 0; }
+        /* NUEVA BARRA CRISTAL SUPERIOR (DE EXTREMO A EXTREMO) */
+        .glass-top-bar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(14, 14, 20, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.15);
+            padding: 15px 20px; z-index: 1000;
+            display: flex; align-items: center; justify-content: flex-start;
+            opacity: 0; transform: translateY(-100%); transition: all 0.4s ease; pointer-events: none;
+        }
+        .glass-top-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .glass-top-name { font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .glass-top-name span { color: var(--neon-blue); }
+
+        /* HEADER APP (LOGO) */
+        .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: 5px 0; position: relative; z-index: 10; }
         .app-logo { max-height: 32px; width: auto; object-fit: contain; }
         .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s;}
         .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
@@ -68,39 +81,36 @@
         .btn-primary { width: 100%; padding: 14px; border-radius: 30px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; transition: 0.3s; }
         .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
 
-        /* --- DASHBOARD PERSONAL --- */
+        /* --- DASHBOARD PERSONAL (NUEVO) --- */
         .login-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 25px; backdrop-filter: blur(12px); text-align: center; margin-bottom: 30px; }
         
-        /* HEADER SHINKING (CORREGIDO SIN RECUADRO Y HACIA LA IZQUIERDA) */
-        .dash-sticky-header {
-            position: sticky; top: -1px; z-index: 100;
-            padding: 25px 0 15px 0; margin-bottom: 20px;
-            display: flex; flex-direction: column; align-items: center; /* Inicia centrado */
-            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            background: transparent; /* Sin fondo inicial */
-        }
-        .dash-sticky-header.scrolled {
-            align-items: flex-start; /* Se va a la esquina izquierda al scrollear */
-            padding: 15px 5px;
-            backdrop-filter: blur(8px); /* Solo difuminado para lectura, sin recuadro visible */
-            -webkit-backdrop-filter: blur(8px);
-        }
-        .dash-greeting { font-size: 34px; font-weight: 800; color: var(--text-main); line-height: 1.1; transition: all 0.4s ease; }
-        .dash-sticky-header.scrolled .dash-greeting { font-size: 22px; }
-        
-        /* Oculta los saludos y signos suavemente al scrollear */
-        .hola-text, .emoji-text { display: inline-block; transition: all 0.3s ease; }
-        .dash-sticky-header.scrolled .hola-text,
-        .dash-sticky-header.scrolled .emoji-text { opacity: 0; font-size: 0; visibility: hidden; margin: 0; padding: 0; }
-        
-        .dash-name { color: var(--neon-blue); }
+        /* SALUDO GRANDE NORMAL */
+        .dash-greeting-box { text-align: center; margin: 10px 0 25px 0; }
+        .dash-greeting-box h1 { font-size: 34px; font-weight: 800; color: var(--text-main); line-height: 1.1; margin: 0; }
+        .dash-greeting-box h1 span { color: var(--neon-blue); }
 
-        .dash-card { background: var(--card-bg); border: 1px dashed rgba(255,255,255,0.15); border-radius: 20px; padding: 20px; text-align: center; margin-bottom: 25px; backdrop-filter: blur(12px); }
-        .dash-date { font-size: 24px; font-weight: 800; color: var(--text-main); margin: 5px 0 10px 0; }
+        .dash-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(12px); }
+        .dash-date { font-size: 26px; font-weight: 800; color: var(--text-main); margin: 5px 0 10px 0; text-align: center; }
+        
         .time-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .badge-ok { background: rgba(0, 242, 254, 0.1); color: var(--neon-blue); border: 1px solid rgba(0, 242, 254, 0.3); }
         .badge-today { background: rgba(255, 170, 0, 0.15); color: var(--warning-amber); border: 1px solid var(--warning-amber); }
         .badge-overdue { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
+
+        /* NUEVOS WIDGETS DEL DASHBOARD */
+        .loyalty-progress-bg { width: 100%; background: rgba(255,255,255,0.05); border-radius: 10px; height: 8px; margin: 12px 0; overflow: hidden; position: relative; }
+        .loyalty-progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        
+        .promo-banner { background: linear-gradient(45deg, rgba(124, 77, 255, 0.15), rgba(224, 38, 222, 0.15)); border: 1px solid var(--neon-purple); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.3s; margin-bottom: 25px; }
+        .promo-banner:hover { box-shadow: 0 0 20px rgba(124, 77, 255, 0.3); transform: translateY(-2px); }
+        .promo-banner .icon { font-size: 30px; }
+        .promo-banner .text strong { display: block; font-size: 14px; color: var(--text-main); margin-bottom: 2px;}
+        .promo-banner .text span { font-size: 11px; color: var(--text-muted); }
+
+        .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
+        .quick-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 15px 5px; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .quick-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .quick-btn span { font-size: 20px; }
 
         .service-pill { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px; }
         .service-pill-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
@@ -162,6 +172,11 @@
         </div>
     </div>
 
+    <!-- NUEVA BARRA CRISTALINA FIJA (Solo aparece al hacer scroll) -->
+    <div id="glass-header" class="glass-top-bar">
+        <div class="glass-top-name">Tu Espacio, <span id="glass-name-text">Cliente</span></div>
+    </div>
+
     <!-- FONDO -->
     <div class="bg">
         <div class="neon-orbit orbit-1"></div>
@@ -215,25 +230,57 @@
             <!-- B. ESTADO LOGUEADO (DASHBOARD PERSONAL) -->
             <div id="dashboard-view" style="display: none;">
                 
-                <!-- HEADER SHINKING (SIN RECUADRO, ANIMADO A LA IZQUIERDA) -->
-                <div id="dash-header" class="dash-sticky-header">
-                    <div class="dash-greeting">
-                        <span class="hola-text">¡Hola, </span><span id="dash-name" class="dash-name">Cliente</span><span class="emoji-text">! 👋</span>
+                <!-- SALUDO INICIAL (Se oculta al bajar y aparece la barra de cristal) -->
+                <div id="dash-greeting-container" class="dash-greeting-box">
+                    <h1>¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
+                </div>
+
+                <!-- PROMOCIÓN EXCLUSIVA -->
+                <div class="promo-banner" onclick="openModal('modal-referidos')">
+                    <div class="icon">🎁</div>
+                    <div class="text">
+                        <strong>Invita y Gana 1 Mes GRATIS</strong>
+                        <span>Toca aquí para conocer el programa de referidos.</span>
                     </div>
                 </div>
 
-                <!-- CONTENIDO DEL PANEL -->
+                <!-- RESUMEN DE CORTE Y LEALTAD -->
                 <div class="dash-card">
                     <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);">Tu próxima fecha de corte</div>
                     <div class="dash-date" id="dash-date">Cargando...</div>
-                    <div id="dash-badge"></div>
+                    <div style="text-align: center;" id="dash-badge"></div>
+                    
+                    <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;">
+                    
+                    <!-- WIDGET DE LEALTAD -->
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
+                        <div style="font-size: 11px; color: var(--neon-blue); font-weight: 700;" id="loyalty-count">0 Pagos</div>
+                    </div>
+                    <div class="loyalty-progress-bg">
+                        <div class="loyalty-progress-fill" id="loyalty-bar"></div>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
                 </div>
 
-                <div class="section-title" style="margin-top: 30px;">Tus Servicios Activos</div>
+                <!-- ACCIONES RÁPIDAS -->
+                <div class="quick-actions">
+                    <div class="quick-btn" onclick="switchTab('soporte')">
+                        <span>🛠️</span> Reportar Falla
+                    </div>
+                    <div class="quick-btn" onclick="switchTab('catalogo')">
+                        <span>🛒</span> Agregar App
+                    </div>
+                    <div class="quick-btn" onclick="irAlTicket()">
+                        <span>💳</span> Renovar Mes
+                    </div>
+                </div>
+
+                <div class="section-title">Tus Servicios Activos</div>
                 <div id="dash-services" style="margin-bottom: 25px;"></div>
 
                 <button class="btn-primary" onclick="irAlTicket()" style="padding: 16px; font-size: 15px; border-radius: 16px; margin-bottom: 15px;">
-                    💳 Ver Estado de Cuenta y Pagar
+                    💳 Ver Estado de Cuenta Completo
                 </button>
 
                 <button onclick="cerrarSesion()" style="background: transparent; border: none; color: var(--text-muted); font-size: 12px; width: 100%; text-decoration: underline; cursor: pointer; padding: 10px;">
@@ -250,7 +297,7 @@
             </div>
         </div>
 
-        <!-- VISTA 3: ASISTENTE TÉCNICO INTELIGENTE -->
+        <!-- VISTA 3: ASISTENTE TÉCNICO INTELIGENTE (REDACTADO A CORREO CONTROLADO POR GOXION) -->
         <div id="view-soporte" class="view-section">
             <div class="smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
@@ -266,17 +313,17 @@
                     <div class="platform-btn" onclick="selectPlatform('Google One', this)"><span>☁️</span> Google One</div>
                 </div>
                 <div id="step-2" class="step-box">
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Cuál es el inconveniente?</p>
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
                     <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
                 </div>
                 <div id="step-3" class="step-box">
                     <div class="solution-instructions" id="solution-text"></div>
                     <div id="extra-inputs-container">
-                        <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;" id="input-label">Dato requerido:</p>
+                        <p style="font-size: 12px; color: var(--text-main); font-weight: 600; margin-bottom: 8px;" id="input-label">Dato requerido:</p>
                         <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
                     </div>
                     <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()">
-                        📲 Generar Solicitud
+                        📲 Enviar Solicitud a Soporte
                     </button>
                 </div>
             </div>
@@ -377,12 +424,18 @@
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
 
-        // 3. EFECTO SCROLL HEADER (SHRINKING HACIA LA IZQUIERDA)
+        // 3. EFECTO SCROLL HEADER (NUEVA BARRA CRISTAL PERFECTA)
         window.addEventListener('scroll', () => {
-            const header = document.getElementById('dash-header');
-            if(header && document.getElementById('dashboard-view').style.display !== 'none') {
-                if(window.scrollY > 30) header.classList.add('scrolled');
-                else header.classList.remove('scrolled');
+            const glassBar = document.getElementById('glass-header');
+            const bigHeader = document.getElementById('dash-greeting-container');
+            if(glassBar && document.getElementById('dashboard-view').style.display !== 'none' && bigHeader) {
+                // Si el usuario scrollea más allá del título grande, bajamos la barra cristal
+                const scrollPos = window.scrollY;
+                if(scrollPos > 60) {
+                    glassBar.classList.add('show');
+                } else {
+                    glassBar.classList.remove('show');
+                }
             }
         });
 
@@ -445,6 +498,7 @@
             document.getElementById('auth-view').style.display = 'block';
             document.getElementById('login-id').value = '';
             document.getElementById('login-pin').value = '';
+            document.getElementById('glass-header').classList.remove('show');
         }
 
         function irAlTicket() {
@@ -452,15 +506,15 @@
             if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
         }
 
-        // 5. RENDERIZADO DEL DASHBOARD
+        // 5. RENDERIZADO DEL DASHBOARD (AHORA CON LEALTAD)
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
             document.getElementById('auth-view').style.display = 'none';
             document.getElementById('dashboard-view').style.display = 'block';
 
-            // Extraer solo el primer nombre para mayor cercanía
             const primerNombre = cliente.nombre.split(' ')[0];
             document.getElementById('dash-name').innerText = primerNombre;
+            document.getElementById('glass-name-text').innerText = primerNombre;
 
             // Fechas
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -479,6 +533,28 @@
             
             document.getElementById('dash-badge').innerHTML = badgeHTML;
 
+            // Widget de Lealtad (Cálculos dinámicos)
+            let pagos = cliente.pagos_puntuales || 0;
+            let meta = 4;
+            let beneficio = "3% OFF";
+            
+            if (pagos >= 4 && pagos < 9) { meta = 9; beneficio = "6% OFF"; }
+            else if (pagos >= 9) { meta = pagos; beneficio = "Nivel Máximo (6% OFF)"; }
+
+            let porcentaje = Math.min((pagos / meta) * 100, 100);
+            
+            document.getElementById('loyalty-count').innerText = `${pagos}/${meta} Pagos`;
+            
+            setTimeout(() => {
+                document.getElementById('loyalty-bar').style.width = `${porcentaje}%`;
+            }, 300); // Pequeño delay para que se vea la animación de carga
+
+            if (pagos >= 9) {
+                document.getElementById('loyalty-msg').innerText = "¡Felicidades! Disfrutas de tu Nivel 2.";
+            } else {
+                document.getElementById('loyalty-msg').innerText = `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
+            }
+
             // Servicios (Iconos)
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
@@ -495,13 +571,12 @@
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
 
-        // 6. CATÁLOGO EN VIVO (INTELIGENTE A PARTIR DE ARRAY)
+        // 6. CATÁLOGO EN VIVO
         function cargarCatalogo(data) {
             const config = data._goxion_config;
             const catalogContainer = document.getElementById('catalog-container');
             if (!config || !config.serviciosGlobales || !Array.isArray(config.serviciosGlobales)) return;
 
-            // Cargar Alertas Dinámicas
             if (config.alertas && config.alertas.activa) {
                 const banner = document.getElementById('dynamic-alert');
                 const content = document.getElementById('alert-content');
@@ -512,7 +587,6 @@
             let ocupados = {};
             config.serviciosGlobales.forEach(catSrv => { ocupados[catSrv.nombre] = 0; });
 
-            // Analizar clientes para calcular inventario
             for (let key in data) {
                 if (key === '_goxion_config') continue;
                 let cliente = data[key];
@@ -525,12 +599,10 @@
                         
                         config.serviciosGlobales.forEach(catSrv => {
                             let nombreCatLow = catSrv.nombre.toLowerCase();
-                            
                             let isCatCompleta = nombreCatLow.includes('completa');
                             let isCliCompleta = nombreCliente.includes('completa');
                             if (isCatCompleta !== isCliCompleta) return; 
                             
-                            // Limpiar palabras clave para detectar combos como "HBO Max Platino + Prime video"
                             let keyword = nombreCatLow.replace(' premium','').replace(' video','').replace(' platino','').replace(' cuenta completa','').trim();
                             if (nombreCliente.includes(keyword)) ocupados[catSrv.nombre] += multiplier;
                         });
@@ -557,46 +629,45 @@
             if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
         }
 
-        // 7. ASISTENTE INTELIGENTE SOPORTE (RESTAURADO CON INSTRUCCIONES DETALLADAS)
+        // 7. ASISTENTE DE SOPORTE (AJUSTADO A LA REALIDAD DONDE EL ADMIN RECIBE EL CORREO)
         let selectedPlat = ""; let currentIssues = {};
         const DATABASE_ISSUES = { 
             "Netflix": [
-                { issue: "🔑 Solicitar Código PIN / Acceso", instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código' o 'Ingresar Contraseña'.<br>2. Revisa el correo que te asignamos en pantalla.<br>3. Haz clic abajo para enviarnos la solicitud inmediata y te mandamos el código.", labelInput: "Correo asignado en pantalla:", templateWA: "Hola GOXION, solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " }, 
-                { issue: "📺 Tu TV no forma parte del Hogar / Viaje", instructions: "1. Selecciona <strong>'Estoy de Viaje'</strong> o <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación.<br>3. Ingresa tu correo abajo y autorizaremos tu dispositivo al instante.", labelInput: "Correo asignado de la cuenta:", templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX.\n\n📧 Correo: " },
-                { issue: "⚠️ Pantalla Ocupada / Límite", instructions: "Recuerda que cada perfil equivale a 1 pantalla simultánea. Si te marca límite, asegúrate de que ningún familiar tuyo esté usando tu perfil al mismo tiempo, o cierra la app y vuelve a entrar.", labelInput: "Nombre de tu Perfil asignado:", templateWA: "Hola GOXION, tengo problemas de pantalla ocupada en NETFLIX.\n\n👤 Mi Perfil es: " }
+                { issue: "🔑 Solicitar Código de Acceso", instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, acabo de enviar un código al correo asignado. Solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " }, 
+                { issue: "📺 Tu TV pide Actualizar Hogar", instructions: "1. Selecciona <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación <strong>a nuestra bandeja</strong>.<br>3. Ingresa abajo el correo que aparece en pantalla y envíanos tu solicitud para autorizar tu TV.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX. Ya envié el correo de autorización.\n\n📧 Correo en pantalla: " },
+                { issue: "⚠️ Límite de Pantallas", instructions: "Recuerda que cada perfil equivale a 1 pantalla. Si te marca límite, revisa que no tengas otra TV usándolo al mismo tiempo. Si el problema persiste, indícanos el nombre de tu perfil para revisarlo.", labelInput: "Nombre de tu Perfil:", templateWA: "Hola GOXION, tengo problemas de límite de pantallas en NETFLIX.\n\n👤 Mi Perfil es: " }
             ],
             "Disney+": [
-                { issue: "🔑 Código de Verificación / Sesión", instructions: "1. Ingresa el correo en tu app de Disney+ y presiona 'Continuar'.<br>2. La pantalla te pedirá un código de 6 dígitos enviado por correo.<br>3. Escribe tu correo asignado abajo para solicitarlo.", labelInput: "Correo asignado:", templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " }, 
-                { issue: "🏠 Mensaje de 'Hogar Principal'", instructions: "Selecciona 'Actualizar Hogar' en la pantalla y solicita la autorización inmediata aquí para que tu TV quede registrada.", labelInput: "Correo asignado:", templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo: " }
+                { issue: "🔑 Código de Verificación", instructions: "1. Ingresa a la app y presiona 'Continuar' con el correo asignado.<br>2. La plataforma enviará un código de 6 dígitos <strong>a nuestra bandeja de entrada</strong>.<br>3. Escribe el correo aquí abajo para indicarnos que ya lo solicitaste y te lo enviaremos.", labelInput: "El correo que acabas de ingresar:", templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " }, 
+                { issue: "🏠 Mensaje de 'Hogar Principal'", instructions: "Selecciona 'Actualizar Hogar' en tu dispositivo. Eso nos enviará una solicitud de autorización al correo maestro. Escríbelo abajo para proceder.", labelInput: "Correo de tu cuenta Disney+:", templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo asignado: " }
             ],
             "Max": [
-                { issue: "🔑 Iniciar Sesión con Código", instructions: "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.<br>2. Aparecerán 6 letras/números en tu pantalla (Ej: X7Y9Z2).<br>3. Escribe el código exacto de tu pantalla aquí abajo para vincularlo.", labelInput: "Código en tu pantalla de TV:", templateWA: "Hola GOXION, solicito vincular mi TV a MAX.\n\n🔤 Código TV: " },
-                { issue: "❌ Contraseña Incorrecta", instructions: "Asegúrate de no dejar espacios al copiar el correo y la contraseña. Si el problema persiste, notificaremos la actualización de las credenciales.", labelInput: "Correo asignado de la cuenta:", templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: " }
+                { issue: "🔑 Iniciar Sesión con Código", instructions: "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.<br>2. Aparecerán 6 letras/números en tu pantalla.<br>3. Como nosotros manejamos la plataforma, escribe ese código abajo para que nosotros lo vinculemos manualmente.", labelInput: "Código en tu pantalla de TV:", templateWA: "Hola GOXION, solicito que vinculen mi TV a MAX.\n\n🔤 Código TV: " },
+                { issue: "❌ Contraseña Incorrecta", instructions: "Asegúrate de no haber dejado espacios al copiar los datos. Si no te deja entrar, indícanos el correo de la cuenta para enviarte la contraseña actualizada.", labelInput: "Correo de la cuenta MAX:", templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: " }
             ],
             "Prime Video": [
-                { issue: "📺 Registrar Dispositivo / Código TV", instructions: "1. En tu TV o dispositivo abre Prime Video y presiona 'Identifícate'.<br>2. Te mostrará un código de registro de 5 a 6 letras en pantalla.<br>3. Escríbelo abajo para darte acceso al instante.", labelInput: "Código en Pantalla de TV:", templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " }
+                { issue: "📺 Registrar Dispositivo", instructions: "1. Abre Prime Video y presiona 'Identifícate'.<br>2. Mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.", labelInput: "Código en Pantalla de TV:", templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " }
             ],
             "YouTube Premium": [
-                { issue: "📩 No me llegó la invitación / Unirme", instructions: "1. Revisa tu bandeja de Entrada y la carpeta de SPAM en Gmail.<br>2. Si es cuenta familiar, recuerda que Google no permite estar en otro grupo activo en los últimos 12 meses.", labelInput: "Tu correo personal de Gmail:", templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail: " },
-                { issue: "⚠️ Mi cuenta volvió a tener anuncios", instructions: "Si tu cuenta volvió a la versión gratuita, escríbenos con tu correo para generar y enviarte un nuevo enlace de invitación para tu perfil.", labelInput: "Tu correo de Gmail registrado:", templateWA: "Hola GOXION, mi perfil de YOUTUBE se pasó a modo gratuito.\n\n📧 Mi Gmail: " }
+                { issue: "📩 No me llegó la invitación", instructions: "Verifica tu carpeta de SPAM en Gmail. Recuerda que no debes estar en otro grupo familiar activo. Si no está, compártenos tu correo para reenviarla.", labelInput: "Tu correo personal de Gmail:", templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail: " }
             ],
             "ViX Premium": [
-                { issue: "🔑 Vincular TV o Iniciar Sesión", instructions: "Selecciona 'Iniciar Sesión' en tu app. Puedes ingresar con el correo y contraseña proporcionados o enviarnos el código alfanumérico que aparece en tu pantalla de TV.", labelInput: "Correo o Código de Pantalla:", templateWA: "Hola GOXION, necesito ayuda para ingresar a VIX PREMIUM.\n\n📱 Dato/Código: " }
+                { issue: "🔑 Vincular TV o Iniciar Sesión", instructions: "Selecciona 'Iniciar Sesión'. Envíanos el código alfanumérico que aparece en tu pantalla de TV para enlazarlo desde nuestra base de datos.", labelInput: "Código en pantalla:", templateWA: "Hola GOXION, necesito ayuda para vincular VIX PREMIUM.\n\n📱 Código TV: " }
             ],
             "Crunchyroll": [
-                { issue: "🔑 Vincular Consola o TV", instructions: "Dirígete a la sección de 'Activar dispositivo' en el menú de tu consola o TV. Aparecerá un código de 6 letras, escríbelo aquí para enlazar la cuenta.", labelInput: "Código de activación de 6 letras:", templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: " }
+                { issue: "🔑 Vincular Consola o TV", instructions: "Dirígete a 'Activar dispositivo' en tu consola o TV. Aparecerá un código, escríbelo aquí para que nosotros autoricemos la cuenta.", labelInput: "Código de activación de pantalla:", templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: " }
             ],
             "Microsoft 365": [
-                { issue: "💻 Estado de Licencia / Invitación", instructions: "Indícanos tu correo personal de Outlook o Hotmail para verificar el estado de tu suscripción familiar y reenviar la invitación si es necesario.", labelInput: "Tu correo Outlook/Hotmail:", templateWA: "Hola GOXION, necesito asistencia con mi membresía de MICROSOFT 365.\n\n📧 Correo: " }
+                { issue: "💻 Reenviar Invitación familiar", instructions: "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar y enviarte el enlace nuevamente.", labelInput: "Tu correo Outlook/Hotmail:", templateWA: "Hola GOXION, necesito que me reenvíen la invitación de MICROSOFT 365.\n\n📧 Correo: " }
             ],
             "Google One": [
-                { issue: "☁️ Espacio de Almacenamiento no reflejado", instructions: "Asegúrate de haber aceptado la invitación de Google One enviada a tu correo de Gmail. A veces tarda unos minutos en reflejar los beneficios de almacenamiento.", labelInput: "Tu correo Gmail personal:", templateWA: "Hola GOXION, requiero verificar mi espacio de GOOGLE ONE.\n\n📧 Mi Gmail: " }
+                { issue: "☁️ Espacio no reflejado", instructions: "Asegúrate de haber aceptado la invitación de familia en tu Gmail. Indícanos tu correo si sigues sin ver los beneficios.", labelInput: "Tu correo Gmail personal:", templateWA: "Hola GOXION, sigo sin ver reflejado mi almacenamiento de GOOGLE ONE.\n\n📧 Mi Gmail: " }
             ]
         };
 
         function selectPlatform(p, el) { 
             document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); 
-            const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona el problema o consulta --</option>`;
+            const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
             currentIssues = DATABASE_ISSUES[p] || []; currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
             document.getElementById('step-2').classList.add('active'); document.getElementById('step-3').classList.remove('active');
         }
@@ -604,7 +675,7 @@
             const idx = document.getElementById('issue-selector').value;
             if (idx === "") { document.getElementById('step-3').classList.remove('active'); return; }
             const data = currentIssues[idx];
-            document.getElementById('solution-text').innerHTML = `<strong>💡 ¿Qué debes hacer?</strong><br>${data.instructions}`;
+            document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`;
             document.getElementById('input-label').innerText = data.labelInput;
             document.getElementById('smart-extra-input').value = "";
             document.getElementById('step-3').classList.add('active');
