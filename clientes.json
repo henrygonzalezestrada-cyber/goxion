@@ -1,7 +1,7 @@
 {
   "_goxion_config": {
     "alertas": {
-      "activa": true,
+      "activa": false,
       "plataforma": "YouTube Premium",
       "falla": "presentando intermitencias temporales",
       "mensaje": ""
@@ -12,34 +12,34 @@
         "precio": 109,
         "cuentas": 1,
         "costo": 329,
-        "limite": 5
+        "limite": 4
       },
       {
         "nombre": "Disney+ Premium",
         "precio": 89,
         "cuentas": 1,
-        "costo": 0,
-        "limite": 5
+        "costo": 319,
+        "limite": 6
       },
       {
         "nombre": "HBO Max Platino",
         "precio": 79,
-        "cuentas": 1,
-        "costo": 0,
-        "limite": 5
+        "cuentas": 2,
+        "costo": 299,
+        "limite": 4
       },
       {
         "nombre": "Prime Video",
-        "precio": 39,
+        "precio": 45,
         "cuentas": 1,
-        "costo": 0,
+        "costo": 99,
         "limite": 5
       },
       {
         "nombre": "YouTube Premium",
         "precio": 89,
-        "cuentas": 1,
-        "costo": 0,
+        "cuentas": 3,
+        "costo": 279,
         "limite": 5
       },
       {
@@ -51,16 +51,16 @@
       },
       {
         "nombre": "Crunchyroll Cuenta completa",
-        "precio": 45,
+        "precio": 100,
         "cuentas": 1,
-        "costo": 0,
-        "limite": 5
+        "costo": 149,
+        "limite": 1
       },
       {
         "nombre": "Microsoft 365",
         "precio": 79,
         "cuentas": 1,
-        "costo": 0,
+        "costo": 370,
         "limite": 5
       },
       {
@@ -251,12 +251,12 @@
         "monto": 79
       },
       {
-        "nombre": "Google One",
-        "monto": 29
-      },
-      {
         "nombre": "HBO Max Platino",
         "monto": 79
+      },
+      {
+        "nombre": "Google One 2TB",
+        "monto": 29
       }
     ],
     "dia_pago": 15,
