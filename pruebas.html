@@ -8,7 +8,7 @@
     <style>
         :root {
             --bg-black: #030305;
-            --card-glass: rgba(18, 18, 25, 0.45); /* Más transparente para que el blur destaque */
+            --card-glass: rgba(8, 8, 12, 0.45);
             --text-main: #ffffff;
             --text-muted: #95a4bd;
             --neon-blue: #00f2fe;
@@ -23,7 +23,6 @@
         body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         body.no-scroll { overflow: hidden; height: 100vh; }
 
-        /* SPLASH SCREEN */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-black); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -33,208 +32,112 @@
         .splash-logo { max-width: 140px; filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.4)); }
         @keyframes floatUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-    /* FONDO ANIMADO NEÓN - MAYOR COBERTURA */
-    .bg { 
-        position: fixed; 
-        inset: 0; 
-        z-index: -2; 
-        background-color: var(--bg-black); 
-        overflow: hidden; /* Fundamental para que las órbitas no generen scroll al salir de la pantalla */
-    }
-    
-    .neon-orbit { 
-        position: absolute; 
-        border-radius: 50%; 
-        pointer-events: none; 
-        opacity: 0.9; 
-    }
-    
-    /* Órbita 1: Nace en la esquina superior izquierda */
-    .orbit-1 { 
-        width: 450px; 
-        height: 450px; 
-        top: -150px; 
-        left: -150px; 
-        border-bottom: 3px solid #b026ff; 
-        border-left: 3px solid rgba(176, 38, 255, 0.2); 
-        filter: drop-shadow(0 0 15px #b026ff) drop-shadow(0 0 30px #b026ff); 
-        animation: floatOrbit1 70s ease-in-out infinite; 
-    }
-    
-    /* Órbita 2: Nace en la esquina inferior derecha */
-    .orbit-2 { 
-        width: 550px; 
-        height: 550px; 
-        bottom: -200px; 
-        right: -200px; 
-        border-top: 3px solid #00f2fe; 
-        border-right: 3px solid rgba(0, 242, 254, 0.2); 
-        filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); 
-        animation: floatOrbit2 85s ease-in-out infinite; 
-    }
-    
-    /* Órbita 3: Nace en la mitad inferior izquierda */
-    .orbit-3 { 
-        width: 380px; 
-        height: 380px; 
-        top: 60%; 
-        left: -100px; 
-        border-right: 2px solid #7c4dff; 
-        border-bottom: 2px solid rgba(124, 77, 255, 0.2); 
-        filter: drop-shadow(0 0 12px #7c4dff) drop-shadow(0 0 25px #7c4dff); 
-        animation: floatOrbit3 95s ease-in-out infinite; 
-        opacity: 0.6; /* Ligeramente más transparente para dar profundidad */
-    }
-    
-/* =========================================================
-   ANIMACIONES DE ÓRBITAS
-   Cada órbita permanece en su propia zona.
-   La Órbita 1 es la única que puede acercarse al centro.
-   ========================================================= */
-
-
-/* =========================================================
-   ÓRBITA 1
-   Nace en la esquina superior izquierda.
-   Es la que tiene mayor recorrido y ocasionalmente
-   puede abarcar parte del centro.
-   ========================================================= */
-
-@keyframes floatOrbit1 {
-
-    0% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
-
-    25% {
-        transform: translate(80px, 40px) rotate(90deg) scale(1.03);
-    }
-
-    50% {
-        transform: translate(220px, 130px) rotate(180deg) scale(1.06);
-    }
-
-    75% {
-        transform: translate(140px, 190px) rotate(270deg) scale(1.02);
-    }
-
-    100% {
-        transform: translate(20px, 80px) rotate(360deg) scale(0.98);
-    }
-}
-
-
-/* =========================================================
-   ÓRBITA 2
-   Nace en la esquina inferior derecha.
-   Se mueve principalmente hacia los bordes.
-   NO cruza hacia el centro.
-   ========================================================= */
-
-@keyframes floatOrbit2 {
-
-    0% {
-        transform: translate(0, 0) rotate(360deg) scale(0.96);
-    }
-
-    25% {
-        transform: translate(40px, 60px) rotate(270deg) scale(1);
-    }
-
-    50% {
-        transform: translate(100px, 120px) rotate(180deg) scale(1.04);
-    }
-
-    75% {
-        transform: translate(140px, 50px) rotate(90deg) scale(1);
-    }
-
-    100% {
-        transform: translate(60px, 20px) rotate(0deg) scale(0.96);
-    }
-}
-
-
-/* =========================================================
-   ÓRBITA 3
-   Nace en la zona inferior izquierda.
-   Se mantiene abajo y hacia la izquierda.
-   NO atraviesa el centro.
-   ========================================================= */
-
-@keyframes floatOrbit3 {
-
-    0% {
-        transform: translate(0, 0) rotate(0deg) scale(0.92);
-    }
-
-    25% {
-        transform: translate(-50px, 60px) rotate(90deg) scale(0.97);
-    }
-
-    50% {
-        transform: translate(-100px, 120px) rotate(180deg) scale(1.04);
-    }
-
-    75% {
-        transform: translate(-40px, 170px) rotate(270deg) scale(1);
-    }
-
-    100% {
-        transform: translate(20px, 90px) rotate(360deg) scale(0.96);
-    }
-}
-
-        /* CLASE UNIVERSAL PARA EFECTO CRISTAL (BLUR) INTENSO */
-        .glass-panel {
-            background: var(--card-glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        /* FONDO ANIMADO NEÓN (TU DISEÑO OPTIMIZADO) */
+        .bg { 
+            position: fixed; 
+            inset: 0; 
+            z-index: -2; 
+            background-color: var(--bg-black); 
+            overflow: hidden; 
+        }
+        
+        .neon-orbit { 
+            position: absolute; 
+            border-radius: 50%; 
+            pointer-events: none; 
+            opacity: 0.9; 
+        }
+        
+        .orbit-1 { 
+            width: 450px; height: 450px; top: -150px; left: -150px; 
+            border-bottom: 3px solid #b026ff; border-left: 3px solid rgba(176, 38, 255, 0.2); 
+            filter: drop-shadow(0 0 15px #b026ff) drop-shadow(0 0 30px #b026ff); 
+            animation: floatOrbit1 70s linear infinite; 
+        }
+        
+        .orbit-2 { 
+            width: 550px; height: 550px; bottom: -200px; right: -200px; 
+            border-top: 3px solid #00f2fe; border-right: 3px solid rgba(0, 242, 254, 0.2); 
+            filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); 
+            animation: floatOrbit2 85s linear infinite; 
+        }
+        
+        .orbit-3 { 
+            width: 380px; height: 380px; top: 60%; left: -100px; 
+            border-right: 2px solid #7c4dff; border-bottom: 2px solid rgba(124, 77, 255, 0.2); 
+            filter: drop-shadow(0 0 12px #7c4dff) drop-shadow(0 0 25px #7c4dff); 
+            animation: floatOrbit3 95s linear infinite; opacity: 0.6; 
         }
 
-        /* BARRA CRISTALINA FIJA SUPERIOR */
+        /* ANIMACIONES DE ÓRBITAS SIN TRABONES (Uso de translate3d y ciclos perfectos) */
+        @keyframes floatOrbit1 {
+            0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+            25%  { transform: translate3d(80px, 40px, 0) rotate(90deg) scale(1.03); }
+            50%  { transform: translate3d(220px, 130px, 0) rotate(180deg) scale(1.06); }
+            75%  { transform: translate3d(140px, 190px, 0) rotate(270deg) scale(1.02); }
+            100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(1); }
+        }
+
+        @keyframes floatOrbit2 {
+            0%   { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.96); }
+            25%  { transform: translate3d(40px, 60px, 0) rotate(270deg) scale(1); }
+            50%  { transform: translate3d(100px, 120px, 0) rotate(180deg) scale(1.04); }
+            75%  { transform: translate3d(140px, 50px, 0) rotate(90deg) scale(1); }
+            100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.96); }
+        }
+
+        @keyframes floatOrbit3 {
+            0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.92); }
+            25%  { transform: translate3d(-50px, 60px, 0) rotate(90deg) scale(0.97); }
+            50%  { transform: translate3d(-100px, 120px, 0) rotate(180deg) scale(1.04); }
+            75%  { transform: translate3d(-40px, 170px, 0) rotate(270deg) scale(1); }
+            100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.92); }
+        }
+
+        .container { width: 100%; max-width: 580px; position: relative; z-index: 1; padding-bottom: 80px; }
+
         .glass-top-bar {
             position: fixed; top: 0; left: 0; width: 100%;
-            padding: 15px 20px; z-index: 1000;
+            background: rgba(8, 8, 12, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.3); padding: 15px 20px; z-index: 1000;
             display: flex; align-items: center; justify-content: flex-start;
             opacity: 0; transform: translateY(-100%); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
-            border-bottom: 1px solid rgba(0, 242, 254, 0.2);
-            border-radius: 0 0 20px 20px;
         }
         .glass-top-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .glass-top-name { font-size: 18px; font-weight: 700; color: var(--text-main); }
         .glass-top-name span { color: var(--neon-blue); }
 
-        /* HEADER APP */
         .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: 5px 0; position: relative; z-index: 10; }
         .app-logo { max-height: 32px; width: auto; object-fit: contain; }
-        .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s;}
+        .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s; backdrop-filter: blur(10px); }
         .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
 
-        .alert-banner { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; }
+        .alert-banner { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(15px); }
 
-        /* PESTAÑAS CON EFECTO BLUR MEJORADO */
-        .tab-container { display: flex; background: rgba(14, 14, 20, 0.6); border-radius: 20px; padding: 6px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); position: relative; z-index: 110; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+        /* ESTILO UNIFICADO DE CRISTAL (BLUR) PARA TARJETAS */
+        .glass-card, .tab-container, .btn-menu, .catalog-card, .smart-support-card, .modal-content, .floating-cart {
+            background: var(--card-glass);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+        }
+
+        .tab-container { display: flex; padding: 6px; margin-bottom: 25px; position: relative; z-index: 110; }
         .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; border-radius: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.3s; }
         .tab-btn span { font-size: 20px; }
-        .tab-btn.active { background: rgba(255, 255, 255, 0.07); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 20px rgba(0, 242, 254, 0.2); backdrop-filter: blur(20px); }
-    
+        .tab-btn.active { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 20px rgba(0, 242, 254, 0.2); }
+        
         .view-section { display: none; animation: fadeIn 0.4s ease; }
         .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
-    
-        /* INPUTS Y BOTONES GLOBALES */
+
         .input-smart { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 14px; border-radius: 12px; font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.3s; }
         .input-smart:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 242, 254, 0.1); }
         .btn-primary { width: 100%; padding: 16px; border-radius: 20px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); color: #000; transition: 0.3s; }
         .btn-primary:hover { box-shadow: 0 0 30px rgba(0, 242, 254, 0.6); color: #fff; transform: translateY(-2px); }
 
-        /* TARJETAS CON EFECTO CRISTAL */
-        .glass-card { border-radius: 20px; padding: 20px; margin-bottom: 25px; }
-        
+        .glass-card { padding: 20px; margin-bottom: 25px; }
         .login-card { text-align: center; border-color: rgba(0, 242, 254, 0.2); }
         
         .dash-greeting-box { text-align: center; margin: 10px 0 25px 0; min-height: 45px; }
@@ -247,34 +150,30 @@
         .badge-today { background: rgba(255, 170, 0, 0.15); color: var(--warning-amber); border: 1px solid var(--warning-amber); }
         .badge-overdue { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
 
-        /* LEALTAD */
-        .loyalty-progress-bg { width: 100%; background: rgba(0,0,0,0.4); border-radius: 10px; height: 8px; margin: 12px 0; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05);}
+        .loyalty-progress-bg { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 8px; margin: 12px 0; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05); }
         .loyalty-progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
         
-        /* REFERIDOS INTERACTIVOS */
         .referral-card { border-color: rgba(124, 77, 255, 0.3); }
         .referral-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .referral-title { font-size: 13px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
         .referral-status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700; background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border: 1px solid rgba(124, 77, 255, 0.4); }
-        .referral-stats { display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05);}
+        .referral-stats { display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .stat-box { text-align: center; flex: 1; }
         .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
         .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 
-        .service-pill { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px; }
+        .service-pill { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px; }
         .service-pill-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
         .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 4px 8px; border-radius: 10px; font-weight: 700; }
 
-        /* REGLAS */
         .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .btn-menu { border-radius: 20px; padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; border-color: rgba(124, 77, 255, 0.15); }
+        .btn-menu { padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; border-color: rgba(124, 77, 255, 0.15); }
         .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,242,254,0.15); }
         .btn-menu span { font-size: 38px; margin-bottom: 4px; }
         .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.2; }
 
-        /* CATÁLOGO DINÁMICO + CARRITO FLOTANTE */
         .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .catalog-card { border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; border-color: rgba(0, 242, 254, 0.15); }
+        .catalog-card { padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; border-color: rgba(0, 242, 254, 0.15); }
         .catalog-card:hover { border-color: var(--neon-blue); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,242,254,0.15); }
         .cat-icon { font-size: 36px; margin-bottom: 10px; }
         .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
@@ -288,18 +187,27 @@
         .qty-btn:hover:not(:disabled) { background: var(--neon-blue); color: #000; }
         .qty-val { font-weight: 700; font-size: 16px; min-width: 20px; text-align: center; }
 
-        .floating-cart { position: fixed; bottom: -120px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; transition: bottom 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 1000; border-color: var(--neon-blue); border-radius: 20px; padding: 15px 20px; }
-        .floating-cart.show { bottom: 20px; }
+        /* CARRITO FLOTANTE (CON VISIBILITY PARA OCULTARLO POR COMPLETO SI NO ESTÁS EN CATÁLOGO) */
+        .floating-cart { 
+            position: fixed; bottom: 20px; left: 50%; width: 92%; max-width: 500px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 1000; border-color: var(--neon-blue); padding: 15px 20px;
+            opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 120px);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .floating-cart.show { 
+            opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); 
+        }
+        
         .cart-info { display: flex; flex-direction: column; }
         .cart-total { font-size: 18px; font-weight: 800; color: var(--neon-blue); }
         .cart-items { font-size: 12px; color: var(--text-muted); }
         .cart-btn { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; padding: 10px 20px; border-radius: 15px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
         .cart-btn:hover { box-shadow: 0 0 25px rgba(0,242,254,0.6); color: #fff; }
 
-        /* SOPORTE INTELIGENTE */
         .smart-support-card { border-color: rgba(124, 77, 255, 0.3); }
         .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .platform-btn { background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.2s; }
+        .platform-btn { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.2s; }
         .platform-btn span { font-size: 22px; }
         .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); box-shadow: 0 0 15px rgba(0,242,254,0.2); }
         .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
@@ -307,10 +215,9 @@
         .custom-select-smart { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-purple); color: var(--text-main); padding: 14px; border-radius: 12px; font-size: 14px; outline: none; margin-bottom: 12px; }
         .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 14px; border-radius: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;}
 
-        /* MODALES */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.6); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
-        .modal-content { background: var(--card-glass); border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .modal-content { border: 1px solid var(--neon-purple); width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
         .modal-title { color: #fff; margin-bottom: 15px; font-size: 18px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 13px; }
@@ -325,19 +232,16 @@
 </head>
 <body class="no-scroll">
 
-    <!-- SPLASH SCREEN -->
     <div id="splash-screen" onclick="hideSplash()">
         <div class="splash-content">
             <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
         </div>
     </div>
 
-    <!-- BARRA CRISTALINA FIJA SUPERIOR -->
-    <div id="glass-header" class="glass-panel glass-top-bar">
+    <div id="glass-header" class="glass-card glass-top-bar">
         <div class="glass-top-name">Tu Espacio, <span id="glass-name-text">Cliente</span></div>
     </div>
 
-    <!-- FONDO ANIMADO NEÓN (3 ÓRBITAS FLOTANTES) -->
     <div class="bg">
         <div class="neon-orbit orbit-1"></div>
         <div class="neon-orbit orbit-2"></div>
@@ -346,28 +250,25 @@
 
     <div class="container">
         
-        <!-- HEADER APP -->
         <header class="app-header">
             <img src="logo2.PNG" alt="GOXION" class="app-logo">
-            <a href="https://wa.me/528136836901" target="_blank" class="glass-panel header-action-btn">💬 Contacto</a>
+            <a href="https://wa.me/528136836901" target="_blank" class="header-action-btn">💬 Contacto</a>
         </header>
 
-        <div class="glass-panel alert-banner" id="dynamic-alert">
+        <div class="glass-card alert-banner" id="dynamic-alert">
             <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
         </div>
 
-        <div class="glass-panel tab-container">
+        <div class="glass-card tab-container">
             <button class="tab-btn active" id="btn-tab-cuenta" onclick="switchTab('cuenta')"><span>👤</span>Mi Espacio</button>
             <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')"><span>🛒</span>Catálogo</button>
             <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
         </div>
 
-        <!-- VISTA 1: MI ESPACIO -->
         <div id="view-cuenta" class="view-section active">
             
-            <!-- A. ESTADO NO LOGUEADO -->
             <div id="auth-view">
-                <div class="glass-panel glass-card login-card">
+                <div class="glass-card login-card">
                     <img src="Logo individual.png" style="width: 40px; margin-bottom: 15px;" onerror="this.style.display='none'">
                     <div class="section-title" style="margin-bottom: 4px; font-size: 14px; color: var(--text-main);">Vincular Dispositivo</div>
                     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Ingresa tus datos para acceder a tu panel personal.</p>
@@ -381,35 +282,28 @@
 
                 <div class="section-title">Información Importante (Reglamentos)</div>
                 <div class="policy-grid">
-                    <div class="glass-panel btn-menu" onclick="openModal('modal-terminos')"><span>📄</span><div>Términos de Uso</div></div>
-                    <div class="glass-panel btn-menu" onclick="openModal('modal-garantia')"><span>🛡️</span><div>Garantía y Sanciones</div></div>
-                    <div class="glass-panel btn-menu" onclick="openModal('modal-lealtad')"><span>⭐</span><div>Programa Lealtad</div></div>
-                    <div class="glass-panel btn-menu" onclick="openModal('modal-referidos')"><span>🎁</span><div>Invita y Gana</div></div>
+                    <div class="glass-card btn-menu" onclick="openModal('modal-terminos')"><span>📄</span><div>Términos de Uso</div></div>
+                    <div class="glass-card btn-menu" onclick="openModal('modal-garantia')"><span>🛡️</span><div>Garantía y Sanciones</div></div>
+                    <div class="glass-card btn-menu" onclick="openModal('modal-lealtad')"><span>⭐</span><div>Programa Lealtad</div></div>
+                    <div class="glass-card btn-menu" onclick="openModal('modal-referidos')"><span>🎁</span><div>Invita y Gana</div></div>
                 </div>
             </div>
 
-            <!-- B. ESTADO LOGUEADO (DASHBOARD PERSONALIZADO) -->
             <div id="dashboard-view" style="display: none;">
                 
-                <!-- SALUDO DINÁMICO ROTATIVO -->
                 <div id="dash-greeting-container" class="dash-greeting-box">
                     <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
                 </div>
 
-                <!-- SECCIÓN DINÁMICA DE REFERIDOS -->
-                <div id="referral-section-container">
-                    <!-- Se llena dinámicamente desde JS -->
-                </div>
+                <div id="referral-section-container"></div>
 
-                <!-- RESUMEN DE CORTE Y LEALTAD -->
-                <div class="glass-panel glass-card dash-card">
+                <div class="glass-card dash-card">
                     <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);">Tu próxima fecha de corte</div>
                     <div class="dash-date" id="dash-date">Cargando...</div>
                     <div style="text-align: center;" id="dash-badge"></div>
                     
                     <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;">
                     
-                    <!-- WIDGET DE LEALTAD -->
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
                         <div style="font-size: 11px; color: var(--neon-blue); font-weight: 700;" id="loyalty-count">0 Pagos</div>
@@ -423,7 +317,6 @@
                 <div class="section-title">Tus Servicios Activos</div>
                 <div id="dash-services" style="margin-bottom: 25px;"></div>
 
-                <!-- BOTÓN PRINCIPAL DE PAGO Y COBRANZA -->
                 <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">
                     💳 Ver Estado de Cuenta y Pagar
                 </button>
@@ -434,7 +327,6 @@
             </div>
         </div>
 
-        <!-- VISTA 2: CATÁLOGO EN VIVO -->
         <div id="view-catalogo" class="view-section">
             <div class="section-title">Nuestros Servicios y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
@@ -442,9 +334,8 @@
             </div>
         </div>
 
-        <!-- VISTA 3: ASISTENTE TÉCNICO INTELIGENTE -->
         <div id="view-soporte" class="view-section">
-            <div class="glass-panel glass-card smart-support-card">
+            <div class="glass-card smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 <div class="platform-grid">
                     <div class="platform-btn" onclick="selectPlatform('Netflix', this)"><span>🍿</span> Netflix</div>
@@ -485,8 +376,7 @@
         </div>
     </div>
 
-    <!-- CARRITO FLOTANTE -->
-    <div id="floating-cart" class="glass-panel floating-cart">
+    <div id="floating-cart" class="glass-card floating-cart">
         <div class="cart-info">
             <span class="cart-total" id="cart-total-price">$0 MXN</span>
             <span class="cart-items" id="cart-items-count">0 perfiles</span>
@@ -494,9 +384,8 @@
         <button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
     </div>
 
-    <!-- MODALES LEGALES (TEXTOS ÍNTEGROS RESTAURADOS) -->
     <div id="modal-terminos" class="modal">
-        <div class="modal-content">
+        <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
             <div class="modal-title">GOXION - Términos y Condiciones</div>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Al hacer uso de cualquiera de los servicios ofrecidos, el usuario acepta de manera íntegra las condiciones establecidas en este instrumento.</p>
@@ -511,7 +400,7 @@
     </div>
     
     <div id="modal-garantia" class="modal">
-        <div class="modal-content">
+        <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
             <div class="modal-title">Garantía, Satisfacción y Trato Justo</div>
             <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
@@ -525,7 +414,7 @@
     </div>
 
     <div id="modal-lealtad" class="modal">
-        <div class="modal-content">
+        <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
             <div class="modal-title">Programa de Fidelidad</div>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
@@ -539,7 +428,7 @@
     </div>
 
     <div id="modal-referidos" class="modal">
-        <div class="modal-content">
+        <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
             <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">El cliente actual podrá obtener un descuento del 100% en una mensualidad de su servicio actual por cada nuevo cliente que concrete una compra bajo estas bases:</p>
@@ -557,7 +446,6 @@
         let greetingInterval = null;
         let carritoPedidos = {};
 
-        // 1. SPLASH SCREEN
         function hideSplash() {
             const splash = document.getElementById('splash-screen');
             if (splash.style.opacity === '0') return;
@@ -566,7 +454,6 @@
         }
         window.addEventListener('load', () => { setTimeout(hideSplash, 1800); cargarDatosYVerificarSesion(); });
 
-        // 2. TABS Y MODALES
         function switchTab(tabName) {
             ['cuenta', 'catalogo', 'soporte'].forEach(name => {
                 document.getElementById(`btn-tab-${name}`).classList.remove('active');
@@ -576,7 +463,6 @@
             document.getElementById(`view-${tabName}`).classList.add('active');
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
-            // Ocultar carrito si no estamos en catálogo
             if(tabName !== 'catalogo') {
                 document.getElementById('floating-cart').classList.remove('show');
             } else {
@@ -587,7 +473,6 @@
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
 
-        // 3. SCROLL HEADER GLASS BLUR
         window.addEventListener('scroll', () => {
             const glassBar = document.getElementById('glass-header');
             const bigHeader = document.getElementById('dash-greeting-container');
@@ -597,7 +482,6 @@
             }
         });
 
-        // 4. SALUDO DINÁMICO ROTATIVO
         function iniciarSaludoDinamico(nombreCompleto) {
             const primerNombre = nombreCompleto.split(' ')[0];
             const frases = [
@@ -626,7 +510,6 @@
             }, 6000);
         }
 
-        // 5. SESIÓN Y BUSCADOR TOLERANTE
         function normalizeString(str) {
             return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
         }
@@ -694,7 +577,6 @@
             if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
         }
 
-        // 6. RENDERIZADO DEL DASHBOARD Y SECCIÓN DE REFERIDOS VISUAL
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
             document.getElementById('auth-view').style.display = 'none';
@@ -706,7 +588,6 @@
 
             iniciarSaludoDinamico(cliente.nombre);
 
-            // RENDERIZAR SECCIÓN DE REFERIDOS
             const refContainer = document.getElementById('referral-section-container');
             if(cliente.referido_activo) {
                 let mesesActivos = cliente.referido_activo.meses || 1;
@@ -715,7 +596,7 @@
                 let porcentajeRef = Math.min((mesesActivos / 3) * 100, 100);
 
                 refContainer.innerHTML = `
-                    <div class="glass-panel glass-card referral-card">
+                    <div class="glass-card referral-card">
                         <div class="referral-header">
                             <div class="referral-title"><span>🎁</span> Tu Referido Activo</div>
                             <div class="referral-status-badge">En Validación</div>
@@ -744,7 +625,7 @@
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
                 
                 refContainer.innerHTML = `
-                    <div class="glass-panel glass-card referral-card">
+                    <div class="glass-card referral-card">
                         <div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div>
                         <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
                         
@@ -762,7 +643,6 @@
                 `;
             }
 
-            // Fechas de corte
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             const hoy = new Date();
             const mesActual = meses[hoy.getMonth()];
@@ -779,7 +659,6 @@
             
             document.getElementById('dash-badge').innerHTML = badgeHTML;
 
-            // Lealtad
             let pagos = cliente.pagos_puntuales || 0;
             let meta = 4;
             let beneficio = "3% OFF";
@@ -796,7 +675,6 @@
                 document.getElementById('loyalty-msg').innerText = `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
             }
 
-            // Servicios Activos
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
             
@@ -820,7 +698,6 @@
             alert("¡Enlace copiado al portapapeles!");
         }
 
-        // 7. CATÁLOGO EN VIVO CON SISTEMA DE CARRITO (+ / -) Y BOTONES DESACTIVADOS SI NO HAY STOCK
         function cargarCatalogo(data) {
             const config = data._goxion_config;
             const catalogContainer = document.getElementById('catalog-container');
@@ -884,13 +761,12 @@
                            <button class="qty-btn" style="pointer-events: none;" disabled>+</button>
                        </div>`;
 
-                htmlCatalogo += `<div class="glass-panel glass-card catalog-card"><div><div class="cat-icon">${icon}</div><div class="cat-name">${srv.nombre}</div><div class="cat-price">$${srv.precio} MXN</div>${badgeHtml}</div>${btnHtml}</div>`;
+                htmlCatalogo += `<div class="glass-card catalog-card"><div><div class="cat-icon">${icon}</div><div class="cat-name">${srv.nombre}</div><div class="cat-price">$${srv.precio} MXN</div>${badgeHtml}</div>${btnHtml}</div>`;
             });
             
             if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
         }
 
-        // LÓGICA DEL CARRITO
         function actualizarCarrito(nombre, precio, cambio, safeId) {
             if (!carritoPedidos[nombre]) carritoPedidos[nombre] = { precio: precio, qty: 0 };
             
@@ -934,7 +810,6 @@
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        // 8. ASISTENTE SOPORTE TÉCNICO
         let selectedPlat = ""; let currentIssues = {};
         const DATABASE_ISSUES = { 
             "Netflix": [
