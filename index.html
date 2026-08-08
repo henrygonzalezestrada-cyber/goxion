@@ -48,8 +48,11 @@
     .service-price { font-weight: 600; color: var(--accent-blue); }
     
     .total-box { background: rgba(79, 172, 254, 0.08); border: 1px solid var(--accent-blue); border-radius: 12px; padding: 16px; text-align: center; margin: 20px 0; }
+    .total-box.paid { background: rgba(46, 160, 67, 0.08); border-color: var(--success-green); }
+    
     .total-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
     .total-amount { font-size: 32px; font-weight: 700; color: var(--accent-cyan); margin-top: 4px; }
+    .total-box.paid .total-amount { color: var(--success-green); }
     
     .breakdown-box { background: #0d1117; border-radius: 12px; padding: 12px 16px; border: 1px dashed var(--border-color); margin-bottom: 20px; }
     .breakdown-line { font-size: 12px; font-weight: 600; margin-bottom: 6px; display: flex; justify-content: space-between; }
@@ -62,20 +65,13 @@
     .btn { width: 100%; padding: 12px; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
     .btn:active { transform: scale(0.98); }
     
-    .btn-copy { 
-      background: var(--accent-blue);
-      color: #ffffff; 
-      border: none; 
-      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.2);
-    }
+    .btn-copy { background: var(--accent-blue); color: #ffffff; border: none; box-shadow: 0 4px 15px rgba(79, 172, 254, 0.2); }
     .btn-copy:hover { opacity: 0.9; }
 
-    .btn-wa { 
-      background: transparent; 
-      color: var(--warning-amber); 
-      border: 1px solid var(--warning-amber); 
-      font-weight: 600; 
-    }
+    .btn-paid { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid var(--success-green); cursor: default; }
+    .btn-paid:active { transform: none; }
+
+    .btn-wa { background: transparent; color: var(--warning-amber); border: 1px solid var(--warning-amber); font-weight: 600; }
     .btn-wa:hover { background: rgba(255, 159, 10, 0.1); }
 
     .loyalty-badge { background: #1f242d; border-radius: 10px; padding: 14px; text-align: center; border: 1px solid var(--border-color); margin-bottom: 20px; }
@@ -99,7 +95,7 @@
 <div class="toast" id="toast">¡Datos de pago copiados!</div>
 
 <script>
-  const TELEFONO_GOXION = "529613535659"; 
+  const TELEFONO_GOXION = "528136836901"; 
   const CLABE_PAGO = "638180000167909381";
   const BANCO_PAGO = "NU BANCO";
   const TITULAR_PAGO = "Henry González";
@@ -172,7 +168,6 @@
       if (cliente.estado === 'pagado') {
           badgeHTML = `<div class="time-badge badge-ok">✨ Pago al corriente este mes</div>`;
       } else if (difDias > 0) {
-          // SOLO MOSTRAR SI FALTAN 6 DÍAS O MENOS
           if (difDias <= 6) {
               badgeHTML = `<div class="time-badge badge-ok">⏳ Quedan ${difDias} día(s) para tu fecha límite</div>`;
           }
@@ -187,7 +182,7 @@
           montoMora = Math.round(subtotal * pctMoraDiaria);
           let acumMoraTotal = subtotal + montoMora;
 
-          if (diasAtraso > 15) {
+          if (diasAtraso > 15 || cliente.estado === 'suspendido') {
               montoBajaAdmin = Math.round(acumMoraTotal * 0.20);
           }
 
@@ -195,13 +190,13 @@
             <div class="overdue-incentive-box">
               🚨 <strong>Mora activa por falta de pago sin previo aviso.</strong><br>
               Se aplica recargo del 5% diario (+${Math.round(pctMoraDiaria * 100)}% acum.). 
-              ${diasAtraso > 15 ? `<br><strong style="color:var(--danger-red);">⚠️ Se incluyó un 20% de recargo por inactividad superior a 15 días.</strong>` : ''}
+              ${(diasAtraso > 15 || cliente.estado === 'suspendido') ? `<br><strong style="color:var(--danger-red);">⚠️ Se incluyó un 20% de recargo por inactividad/suspensión.</strong>` : ''}
               <br><small style="opacity:0.8;">Recuerda que si prevés un retraso, notificándonos con antelación evitas recargos.</small>
             </div>
           `;
       }
 
-      // 4. Banner de Estado Global (Admin override)
+      // 4. Banner de Estado Global
       let bannerEstado = "";
       if (cliente.estado === 'suspendido') {
           bannerEstado = `<div style="background: rgba(255, 51, 102, 0.15); border: 1px solid var(--danger-red); color: var(--danger-red); padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 20px; font-weight: bold; font-size: 13px;">⛔ SERVICIO SUSPENDIDO POR FALTA DE PAGO</div>`;
@@ -228,19 +223,31 @@
           : `Progreso: <span class="loyalty-highlight">${racha}/4 pagos</span>. Falta(n) <span class="loyalty-highlight">${faltantes} pago(s)</span> para Nivel 1.`;
       }
 
-      // 6. Gran Total Final
-      const ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
-      const totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
+      // 6. Gran Total Final y Botones Dinámicos
+      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
+      let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
+      
+      let labelTotal = "Total a Pagar";
+      let btnAccionHTML = `<button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">📋 Copiar datos para pago</button>`;
+      let claseTotalBox = "total-box";
+
+      // Si el Admin marcó como pagado, neutralizamos la deuda visualmente
+      if (cliente.estado === 'pagado') {
+          totalFinal = 0;
+          labelTotal = "Saldo Pendiente";
+          claseTotalBox = "total-box paid";
+          btnAccionHTML = `<button class="btn btn-paid" onclick="return false;">✅ Mensualidad Cubierta</button>`;
+      }
 
       // 7. Generar Caja de Desglose (Ticket)
       let breakdownHTML = '';
-      if (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0) {
+      if (cliente.estado !== 'pagado' && (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
             <div class="breakdown-box">
-              <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Servicios:</span><span>$${subtotal} MXN</span></div>
+              <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual:</span><span>$${subtotal} MXN</span></div>
               ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento Lealtad:</span><span>-$${ahorro} MXN</span></div>` : ''}
               ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Recargo Mora (+${Math.round(pctMoraDiaria * 100)}%):</span><span>+$${montoMora} MXN</span></div>` : ''}
-              ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Admón (+15 días):</span><span>+$${montoBajaAdmin} MXN</span></div>` : ''}
+              ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Reactivación (+15 días):</span><span>+$${montoBajaAdmin} MXN</span></div>` : ''}
             </div>
           `;
       }
@@ -265,7 +272,7 @@
           ${badgeHTML}
         </div>
 
-        ${mensajeAtrasoHTML}
+        ${cliente.estado === 'pagado' ? '' : mensajeAtrasoHTML}
 
         <div class="section-title">Servicios Activos</div>
         <div style="background: #0d1117; border-radius: 12px; padding: 0 16px; border: 1px solid var(--border-color); margin-bottom: ${breakdownHTML ? '10px' : '20px'};">
@@ -274,15 +281,13 @@
 
         ${breakdownHTML}
 
-        <div class="total-box">
-          <div class="total-label">Total a Pagar</div>
+        <div class="${claseTotalBox}">
+          <div class="total-label">${labelTotal}</div>
           <div class="total-amount">$${totalFinal} MXN</div>
         </div>
 
         <div class="actions-group">
-          <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">
-            📋 Copiar datos para pago
-          </button>
+          ${btnAccionHTML}
           <a href="${urlWA}" target="_blank" class="btn btn-wa">
             💬 Contactar Soporte
           </a>
