@@ -846,25 +846,67 @@
         };
 
         function selectPlatform(p, el) { 
+            selectedPlat = p; // Guardamos la plataforma seleccionada globalmente
             document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); 
             const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
             currentIssues = DATABASE_ISSUES[p] || []; currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
             document.getElementById('step-2').classList.add('active'); document.getElementById('step-3').classList.remove('active');
         }
+
         function showSolution() {
             const idx = document.getElementById('issue-selector').value;
             if (idx === "") { document.getElementById('step-3').classList.remove('active'); return; }
             const data = currentIssues[idx];
             document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`;
             document.getElementById('input-label').innerText = data.labelInput;
-            document.getElementById('smart-extra-input').value = "";
+            
+            // LÓGICA DE AUTO-LLENADO INTELIGENTE
+            let autoData = "";
+            const key = localStorage.getItem('goxion_user_key');
+            if (key && globalClientesData && globalClientesData[key]) {
+                const cliente = globalClientesData[key];
+                if (cliente.servicios) {
+                    // Busca si el cliente tiene contratada la plataforma que seleccionó
+                    let platKeyword = selectedPlat.replace('+', '').toLowerCase();
+                    const srv = cliente.servicios.find(s => s.nombre.toLowerCase().includes(platKeyword));
+                    if (srv) {
+                        // Dependiendo del dato que pida el label, extraemos el correo, perfil o pin
+                        let labelLow = data.labelInput.toLowerCase();
+                        if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login;
+                        else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre;
+                        else if (labelLow.includes("pin") && srv.perfil_pin) autoData = srv.perfil_pin;
+                    }
+                }
+            }
+            
+            document.getElementById('smart-extra-input').value = autoData;
             document.getElementById('step-3').classList.add('active');
         }
+
         function sendSmartWA() {
             const idx = document.getElementById('issue-selector').value; if(idx === "") return;
             const val = document.getElementById('smart-extra-input').value.trim(); if(!val) return alert("Por favor completa el dato requerido en el campo de texto.");
-            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA+val)}`, '_blank');
+            
+            // CONSTRUIR EL MENSAJE CON EXPEDIENTE OCULTO PARA EL ADMIN
+            let extraContext = "";
+            const key = localStorage.getItem('goxion_user_key');
+            if (key && globalClientesData && globalClientesData[key]) {
+                const cliente = globalClientesData[key];
+                let platKeyword = selectedPlat.replace('+', '').toLowerCase();
+                const srv = cliente.servicios?.find(s => s.nombre.toLowerCase().includes(platKeyword));
+                
+                extraContext = `\n\n------------------------\n*EXPEDIENTE DE SOPORTE:*\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`;
+                if (srv) {
+                    extraContext += `\n📺 Plataforma: ${srv.nombre}`;
+                    if (srv.correo_login) extraContext += `\n📧 Cta: ${srv.correo_login}`;
+                    if (srv.perfil_nombre) extraContext += `\n👤 Perfil: ${srv.perfil_nombre}`;
+                    if (srv.perfil_pin) extraContext += `\n🔢 PIN: ${srv.perfil_pin}`;
+                }
+            }
+
+            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA + val + extraContext)}`, '_blank');
         }
+
     </script>
 </body>
 </html>
