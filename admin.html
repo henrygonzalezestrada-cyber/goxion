@@ -19,103 +19,140 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding: 12px; overflow-x: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 15px; overflow-x: hidden; max-width: 1400px; margin: 0 auto; }
 
         /* --- HEADER --- */
         header {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 12px 15px; border-bottom: 1px solid var(--neon-purple);
-            box-shadow: 0 0 15px rgba(188, 19, 254, 0.2); margin-bottom: 15px;
-            border-radius: 8px; background: rgba(10, 10, 15, 0.8); gap: 10px;
+            padding: 15px 20px; border-bottom: 1px solid rgba(188, 19, 254, 0.4);
+            box-shadow: 0 4px 20px rgba(188, 19, 254, 0.15); margin-bottom: 25px;
+            border-radius: 12px; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(10px);
         }
-        .logo-area h1 { font-size: 1.4rem; text-shadow: 0 0 10px var(--neon-purple); letter-spacing: 2px; }
-        .header-actions { display: flex; gap: 8px; align-items: center; }
-        .status { color: var(--neon-green); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+        .logo-area h1 { font-size: 1.6rem; text-shadow: 0 0 10px rgba(188, 19, 254, 0.6); letter-spacing: 2px; margin: 0;}
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .status { color: var(--neon-green); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(0, 255, 157, 0.2); padding: 4px 10px; border-radius: 20px; background: rgba(0, 255, 157, 0.05);}
         .status-dot { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; animation: pulse 1.5s infinite; }
         
-        .btn-save { background: var(--neon-green); color: #000; border: none; padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
-        .btn-save:hover { box-shadow: 0 0 10px var(--neon-green); }
-        .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 6px 12px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.3s; font-size: 0.85rem; }
+        .btn-save { background: linear-gradient(135deg, var(--neon-green), #00cc7d); color: #000; border: none; padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
+        .btn-save:hover { box-shadow: 0 0 15px rgba(0, 255, 157, 0.4); transform: translateY(-1px); }
+        .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
+        .btn-logout:hover { background: rgba(255, 0, 60, 0.1); }
 
         /* --- DASHBOARD FINANCIERO --- */
         .dashboard-row {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 15px;
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;
         }
         .kpi-card {
-            background: linear-gradient(145deg, #0d0d14, #08080c);
-            border: 1px solid rgba(0, 242, 254, 0.3); border-radius: 8px; padding: 15px;
+            background: linear-gradient(145deg, #12121a, #08080c);
+            border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 12px; padding: 20px;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: transform 0.2s;
         }
-        .kpi-title { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
-        .kpi-value { font-size: 1.8rem; font-weight: bold; margin-top: 5px; }
-        .val-ingresos { color: var(--neon-blue); text-shadow: 0 0 8px rgba(0, 242, 254, 0.4); }
-        .val-costos { color: var(--neon-red); text-shadow: 0 0 8px rgba(255, 0, 60, 0.4); }
-        .val-ganancia { color: var(--neon-green); text-shadow: 0 0 8px rgba(0, 255, 157, 0.4); }
+        .kpi-card:hover { transform: translateY(-3px); border-color: rgba(0, 242, 254, 0.4); }
+        .kpi-title { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .kpi-value { font-size: 2.2rem; font-weight: bold; margin-top: 8px; }
+        .val-ingresos { color: var(--neon-blue); text-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
+        .val-costos { color: var(--neon-red); text-shadow: 0 0 10px rgba(255, 0, 60, 0.3); }
+        .val-ganancia { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 157, 0.3); }
 
-        @media (max-width: 600px) {
-            header { flex-wrap: wrap; }
-            .header-actions { width: 100%; justify-content: space-between; margin-top: 5px; }
-            .dashboard-row { grid-template-columns: 1fr; gap: 10px; }
-        }
+        /* --- TABS NAVIGATION --- */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px; }
+        .tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: 700; font-size: 1rem; transition: 0.3s; }
+        .tab-btn:hover { color: var(--text-main); }
+        .tab-btn.active { color: var(--neon-purple); border: 1px solid var(--neon-purple); background: rgba(188, 19, 254, 0.08); box-shadow: 0 0 10px rgba(188, 19, 254, 0.2); }
+        
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* --- SECTIONS & PANELS --- */
-        .section-title { color: var(--neon-purple); font-size: 1.1rem; margin-bottom: 12px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 8px; }
-        .grid-container { display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; }
-        @media (max-width: 1000px) { .grid-container { grid-template-columns: 1fr; } }
+        .section-title { color: var(--neon-purple); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 10px; }
+        .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
-        .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 15px; }
-        
-        .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
-        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #333; transition: .4s; border-radius: 20px; }
-        .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: transparent; border: 1px solid var(--neon-red); }
-        input:checked + .slider:before { transform: translateX(20px); background-color: var(--neon-red); }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); }
+        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: rgba(255, 0, 60, 0.2); border-color: var(--neon-red); }
+        input:checked + .slider:before { transform: translateX(20px); background-color: var(--neon-red); box-shadow: 0 0 8px var(--neon-red); }
 
-        .search-bar, .custom-select { width: 100%; background: #111; border: 1px solid var(--text-muted); color: var(--text-main); padding: 8px; border-radius: 4px; margin-bottom: 8px; font-size: 0.85rem; outline: none; }
-        .search-bar:focus { border-color: var(--neon-green); }
+        .search-bar, .custom-select { width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.95rem; outline: none; transition: 0.3s; }
+        .search-bar:focus, .custom-select:focus { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(188, 19, 254, 0.3); }
 
         /* Filtros Superiores */
-        .filters-row { display: flex; gap: 8px; margin-bottom: 10px; }
-        @media (max-width: 600px) { .filters-row { flex-direction: column; } }
+        .filters-row { display: flex; gap: 12px; margin-bottom: 15px; }
 
         /* Catálogo Compacto */
-        .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
-        .catalog-table th { color: var(--text-muted); font-weight: normal; text-align: left; padding-bottom: 5px; border-bottom: 1px dashed rgba(255,255,255,0.1); }
-        .catalog-table td { padding: 6px 2px; }
-        .catalog-table input[type="text"] { width: 100%; background: #111; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 4px; border-radius: 4px; }
-        .catalog-table input[type="number"] { width: 100%; max-width: 55px; background: #111; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 4px; border-radius: 4px; text-align: center; }
-        .inv-badge { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-align: center; display: inline-block; width: 100%; }
-        .inv-ok { color: var(--neon-green); border: 1px solid var(--neon-green); }
-        .inv-warn { color: var(--neon-yellow); border: 1px solid var(--neon-yellow); }
-        .inv-full { color: var(--neon-red); border: 1px solid var(--neon-red); }
+        .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        .catalog-table th { color: var(--text-muted); font-weight: 600; text-align: left; padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .catalog-table td { padding: 8px 5px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .catalog-table input[type="text"] { width: 100%; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 6px; border-radius: 4px; outline:none; }
+        .catalog-table input[type="text"]:focus { border-color: var(--neon-purple); }
+        .catalog-table input[type="number"] { width: 100%; max-width: 65px; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 6px; border-radius: 4px; text-align: center; outline:none; }
+        .inv-badge { background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; text-align: center; display: inline-block; width: 100%; }
+        .inv-ok { color: var(--neon-green); border: 1px solid rgba(0, 255, 157, 0.3); }
+        .inv-warn { color: var(--neon-yellow); border: 1px solid rgba(248, 232, 0, 0.3); }
+        .inv-full { color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
         
-        .btn-icon { background: transparent; border: none; color: var(--neon-red); cursor: pointer; font-size: 1rem; padding: 0 4px; transition: 0.2s; }
-        .btn-icon:hover { transform: scale(1.2); }
-        .btn-add-service { background: rgba(188, 19, 254, 0.1); color: var(--neon-purple); border: 1px dashed var(--neon-purple); width: 100%; padding: 6px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 10px; }
+        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: 0.2s; border-radius: 4px; }
+        .btn-icon:hover { color: var(--text-main); background: rgba(255,255,255,0.1); transform: scale(1.1); }
+        .btn-icon.danger:hover { color: var(--neon-red); background: rgba(255,0,60,0.1); }
+        .btn-icon.info:hover { color: var(--neon-blue); background: rgba(0,242,254,0.1); }
+        
+        .btn-add-service { background: rgba(188, 19, 254, 0.05); color: var(--neon-purple); border: 1px dashed rgba(188, 19, 254, 0.5); width: 100%; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: bold; margin-top: 15px; transition: 0.3s; }
+        .btn-add-service:hover { background: rgba(188, 19, 254, 0.15); border-style: solid; }
 
-        /* --- CLIENT CARD --- */
-        .client-card { background: linear-gradient(145deg, #0f0f16, #0a0a0f); border-left: 3px solid var(--neon-green); padding: 10px; border-radius: 6px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 8px; }
-        .card-header-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-        .client-info h3 { color: var(--neon-green); font-size: 1.05rem; }
+        /* --- CLIENT CARD (ACORDEÓN) --- */
+        .client-card { background: linear-gradient(145deg, #12121a, #0a0a0f); border-left: 4px solid var(--neon-green); padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; }
+        .client-card:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
         
-        .client-services-list { background: rgba(255,255,255,0.02); padding: 6px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); }
-        .client-service-tag { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-main); margin-bottom: 4px; padding-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .card-header-main { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
+        .client-info-basic h3 { color: inherit; font-size: 1.1rem; margin-bottom: 2px; }
+        .client-status-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; text-transform: uppercase; border: 1px solid; }
+        
+        .client-details-toggle { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 15px; }
+        
+        /* Contenedor colapsable */
+        .client-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); animation: fadeIn 0.3s ease; }
+
+        .client-services-list { background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .client-service-tag { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--text-main); margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .client-service-tag:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .client-service-add-row { display: flex; gap: 5px; margin-top: 6px; }
-        .client-service-add-row select { flex: 1; background: #111; border: 1px solid var(--neon-blue); color: #fff; font-size: 0.75rem; padding: 2px; border-radius: 3px; }
         
-        .card-actions-row { display: flex; gap: 6px; align-items: center; width: 100%; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px; flex-wrap: wrap; }
-        .loyalty-control { display: flex; align-items: center; gap: 4px; background: #1a1a24; padding: 3px 6px; border-radius: 4px; }
-        .loyalty-btn { background: transparent; border: 1px solid var(--text-muted); color: var(--text-main); width: 20px; height: 20px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
-        .btn-copy { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; white-space: nowrap; flex: 1; text-align: center; font-weight: bold; }
+        /* Inputs de Credenciales */
+        .cred-inputs { display: flex; gap: 8px; width: 100%; }
+        .cred-inputs input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; outline: none; transition: 0.3s; min-width: 0; }
+        .cred-inputs input:focus { border-color: var(--neon-blue); }
+        .cred-inputs input:disabled { background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.3); border-color: transparent; cursor: not-allowed; }
+
+        .client-service-add-row { display: flex; gap: 8px; margin-top: 10px; }
+        .client-service-add-row select { flex: 1; background: #12121a; border: 1px solid rgba(0,242,254,0.4); color: #fff; font-size: 0.85rem; padding: 6px; border-radius: 4px; outline:none;}
         
-        .status-select { background:#111; color:#fff; border: 1px solid var(--text-muted); border-radius: 3px; font-size: 0.75rem; padding: 2px; }
+        .card-actions-row { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 15px; flex-wrap: wrap; gap: 10px; }
+        
+        .loyalty-control { display: flex; align-items: center; gap: 8px; background: #1a1a24; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .loyalty-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); width: 24px; height: 24px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition:0.2s; }
+        .loyalty-btn:hover { background: rgba(255,255,255,0.15); }
+        
+        .btn-copy { background: rgba(188, 19, 254, 0.1); border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.3s; }
+        .btn-copy:hover { background: rgba(188, 19, 254, 0.2); box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
+        
+        .status-select { background:#12121a; color:#fff; border: 1px solid var(--text-muted); border-radius: 4px; font-size: 0.85rem; padding: 6px; outline:none; }
         .status-pagado { border-color: var(--neon-green); color: var(--neon-green); }
         .status-suspendido { border-color: var(--neon-red); color: var(--neon-red); }
         .status-pendiente { border-color: var(--neon-blue); color: var(--neon-blue); }
+
+        @media (max-width: 768px) {
+            header { flex-wrap: wrap; flex-direction: column; gap: 15px; align-items: flex-start; }
+            .header-actions { width: 100%; justify-content: space-between; }
+            .dashboard-row { grid-template-columns: 1fr; gap: 15px; }
+            .filters-row { flex-direction: column; }
+            .catalog-table th, .catalog-table td { font-size: 0.75rem; padding: 5px 2px; }
+            .client-card { padding: 12px; }
+            .cred-inputs { flex-direction: column; gap: 4px; }
+        }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(0, 255, 157, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); } }
     </style>
@@ -147,54 +184,16 @@
         </div>
     </div>
 
-    <div class="grid-container">
-        <!-- COLUMNA IZQUIERDA -->
-        <div>
-            <!-- ALERTAS -->
-            <div class="panel">
-                <h2 class="section-title">Alertas Globales</h2>
-                <div class="switch-row">
-                    <span style="font-size: 0.85rem; font-weight: bold;">Activar Alerta Técnica</span>
-                    <label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label>
-                </div>
-                <div id="alert-settings" style="opacity: 0.5; pointer-events: none;">
-                    <select id="alert-platform" class="custom-select"></select>
-                    <select id="alert-type" class="custom-select">
-                        <option value="presentando intermitencias temporales">Intermitencias temporales</option>
-                        <option value="en mantenimiento programado">Mantenimiento programado</option>
-                        <option value="experimentando una caída global">Caída global</option>
-                        <option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option>
-                    </select>
-                    <textarea id="global-msg" style="width: 100%; background: #111; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 6px; border-radius: 4px; font-size: 0.8rem;" placeholder="Mensaje Global (Opcional)..."></textarea>
-                </div>
-            </div>
+    <!-- TABS DE NAVEGACIÓN -->
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab-clientes', this)">Gestión de Clientes</button>
+        <button class="tab-btn" onclick="switchTab('tab-inventario', this)">Catálogo & Alertas</button>
+    </div>
 
-            <!-- PRECIOS Y SERVICIOS GLOBALES REDISEÑADO -->
-            <div class="panel">
-                <h2 class="section-title">Catálogo & Inventario</h2>
-                <table class="catalog-table">
-                    <thead>
-                        <tr>
-                            <th>Servicio</th>
-                            <th title="Cuentas Activas Contratadas">Ctas</th>
-                            <th title="Precio de Venta">Venta</th>
-                            <th title="Tu Costo Mensual">Costo</th>
-                            <th title="Límite Máximo de Perfiles">Lím.</th>
-                            <th title="Perfiles Disponibles">Disp.</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="global-services-container">
-                        <!-- Servicios inyectados aquí -->
-                    </tbody>
-                </table>
-                <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio</button>
-            </div>
-        </div>
-
-        <!-- COLUMNA DERECHA: CLIENTES -->
+    <!-- CONTENIDO TABS -->
+    <div id="tab-clientes" class="tab-content active">
         <div class="panel">
-            <h2 class="section-title">Gestión de Cuentas</h2>
+            <h2 class="section-title">Cuentas Activas</h2>
             
             <!-- FILTROS -->
             <div class="filters-row">
@@ -214,8 +213,53 @@
             <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o folio..." oninput="filtrarClientes()">
             
             <div id="clients-container">
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Cargando sistema desde GitHub...</p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con la base de datos...</p>
             </div>
+        </div>
+    </div>
+
+    <div id="tab-inventario" class="tab-content">
+        <!-- ALERTAS -->
+        <div class="panel">
+            <h2 class="section-title">Alertas Globales</h2>
+            <div class="switch-row">
+                <span style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">Activar Alerta Técnica en Portal de Clientes</span>
+                <label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label>
+            </div>
+            <div id="alert-settings" style="opacity: 0.5; pointer-events: none; transition: 0.3s;">
+                <select id="alert-platform" class="custom-select"></select>
+                <select id="alert-type" class="custom-select">
+                    <option value="presentando intermitencias temporales">Intermitencias temporales</option>
+                    <option value="en mantenimiento programado">Mantenimiento programado</option>
+                    <option value="experimentando una caída global">Caída global</option>
+                    <option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option>
+                </select>
+                <textarea id="global-msg" style="width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.9rem; outline:none; resize: vertical; min-height: 80px;" placeholder="Mensaje adicional para los clientes (Opcional)..."></textarea>
+            </div>
+        </div>
+
+        <!-- PRECIOS Y SERVICIOS GLOBALES -->
+        <div class="panel">
+            <h2 class="section-title">Catálogo & Inventario</h2>
+            <div style="overflow-x: auto;">
+                <table class="catalog-table">
+                    <thead>
+                        <tr>
+                            <th>Servicio</th>
+                            <th title="Cuentas Activas Contratadas">Ctas</th>
+                            <th title="Precio de Venta">Venta</th>
+                            <th title="Tu Costo Mensual">Costo</th>
+                            <th title="Límite Máximo de Perfiles por Cuenta">Lím.</th>
+                            <th title="Perfiles Disponibles">Disp.</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="global-services-container">
+                        <!-- Servicios inyectados aquí -->
+                    </tbody>
+                </table>
+            </div>
+            <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio al Catálogo</button>
         </div>
     </div>
 
@@ -244,6 +288,27 @@
         else inicializarPanel();
     });
 
+    // Control de Tabs
+    function switchTab(tabId, btn) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // Toggle Acordeón de Cliente
+    function toggleClientDetails(key) {
+        const details = document.getElementById(`details-${key}`);
+        const text = document.getElementById(`toggle-text-${key}`);
+        if (details.style.display === "none" || !details.style.display) {
+            details.style.display = "block";
+            text.innerHTML = "Ocultar detalles ▴";
+        } else {
+            details.style.display = "none";
+            text.innerHTML = "Ver detalles ▾";
+        }
+    }
+
     function pedirToken() {
         const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token:");
         if (userToken && userToken.trim() !== "") {
@@ -268,7 +333,6 @@
                 configGlobal = jsonCompleto._goxion_config;
                 if (!configGlobal.serviciosGlobales) configGlobal.serviciosGlobales = DEFAULT_SERVICES;
                 
-                // Migración 1: Agregar variables de cuentas, costo y límite si no existen
                 configGlobal.serviciosGlobales.forEach(sg => {
                     if(sg.cuentas === undefined) sg.cuentas = 1;
                     if(sg.costo === undefined) sg.costo = 0;
@@ -281,7 +345,6 @@
 
             clientesDict = jsonCompleto;
 
-            // Migración 2: Asegurar que todos los clientes tengan día de cobro y estado
             Object.keys(clientesDict).forEach(k => {
                 if(!clientesDict[k].dia_pago) clientesDict[k].dia_pago = 15;
                 if(!clientesDict[k].estado) clientesDict[k].estado = "pendiente";
@@ -294,7 +357,7 @@
 
             calcularInventarioYFinanzas();
             renderGlobalServicesUI();
-            filtrarClientes(); // Renderiza usando los filtros actuales por defecto
+            filtrarClientes();
         } catch (error) {
             document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red);">Error al conectar con la base de datos.</p>`;
         }
@@ -305,14 +368,13 @@
         let ingresosTotales = 0;
         let costosTotales = 0;
 
-        // Costo = Costo Unitario * Cuentas Activas
         configGlobal.serviciosGlobales.forEach(s => { 
             inventarioActivo[s.nombre] = 0; 
             costosTotales += parseFloat(s.costo || 0) * parseInt(s.cuentas || 1);
         });
 
         Object.values(clientesDict).forEach(cliente => {
-            if (cliente.estado !== 'suspendido' && cliente.servicios) { // Opcional: ignorar ingresos de suspendidos
+            if (cliente.estado !== 'suspendido' && cliente.servicios) {
                 cliente.servicios.forEach(s => {
                     ingresosTotales += parseFloat(s.monto || 0);
                     let baseNameMatch = configGlobal.serviciosGlobales.find(g => s.nombre.includes(g.nombre));
@@ -339,7 +401,6 @@
             let cuentasMultiplicador = parseInt(srv.cuentas || 1);
             let limiteIndividual = parseInt(srv.limite || 0);
             
-            // Fórmula real: Cuentas x Limite - Vendidos
             let capacidadTotal = cuentasMultiplicador * limiteIndividual;
             let disponibles = capacidadTotal - vendidos;
             
@@ -355,9 +416,9 @@
                     <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)"></td>
                     <td><input type="number" style="color:#fff;" value="${limiteIndividual}" onchange="updateGlobalService(${index}, 'limite', this.value)"></td>
                     <td><span class="inv-badge ${badgeClass}">${disponibles}</span></td>
-                    <td style="display:flex; gap:2px; align-items:center;">
-                        <button class="btn-icon" style="color: var(--neon-blue);" onclick="sincronizarPrecioMasivo(${index})" title="Empujar precio a clientes">📡</button>
-                        <button class="btn-icon" onclick="removeGlobalService(${index})" title="Eliminar">✖</button>
+                    <td style="display:flex; gap:8px; align-items:center; justify-content: center; padding-top:10px;">
+                        <button class="btn-icon info" onclick="sincronizarPrecioMasivo(${index})" title="Empujar precio a clientes">📡</button>
+                        <button class="btn-icon danger" onclick="removeGlobalService(${index})" title="Eliminar">✖</button>
                     </td>
                 </tr>
             `;
@@ -410,23 +471,19 @@
         settingsDiv.style.pointerEvents = isActive ? "auto" : "none";
     }
 
-    // --- LÓGICA DE CLIENTES CON FILTROS ---
     function filtrarClientes() {
         const query = document.getElementById("search-input").value.toLowerCase();
         const statusFilter = document.getElementById("filter-status").value;
         const sortBy = document.getElementById("sort-by").value;
 
-        // Convertir a Array para filtrar y ordenar
         let filtradosArr = Object.keys(clientesDict).map(key => ({ key, ...clientesDict[key] }));
 
-        // 1. Filtrar por texto y estado
         filtradosArr = filtradosArr.filter(c => {
             const matchText = c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query);
             const matchStatus = statusFilter === 'all' || c.estado === statusFilter;
             return matchText && matchStatus;
         });
 
-        // 2. Ordenar
         if (sortBy === 'name') {
             filtradosArr.sort((a, b) => a.nombre.localeCompare(b.nombre));
         } else if (sortBy === 'date') {
@@ -435,7 +492,6 @@
             filtradosArr.sort((a, b) => (b.pagos_puntuales || 0) - (a.pagos_puntuales || 0));
         }
 
-        // 3. Reconstruir a diccionario
         const filtradosDict = {};
         filtradosArr.forEach(c => {
             const { key, ...rest } = c;
@@ -445,13 +501,20 @@
         renderizarClientes(filtradosDict);
     }
 
+    // --- LÓGICA DE DETECCIÓN INTELIGENTE DE CREDENCIALES ---
+    function esServicioPorInvitacion(nombreServicio) {
+        const plataformasInvitacion = ['youtube', 'microsoft', 'google', 'apple', 'spotify', 'one 2tb', '365'];
+        const nombreMin = nombreServicio.toLowerCase();
+        return plataformasInvitacion.some(plat => nombreMin.includes(plat));
+    }
+
     function renderizarClientes(diccionario) {
         const container = document.getElementById("clients-container");
         container.innerHTML = "";
         const keys = Object.keys(diccionario);
 
         if (keys.length === 0) {
-            container.innerHTML = `<p style="color: var(--text-muted);">No se encontraron clientes que coincidan.</p>`;
+            container.innerHTML = `<p style="color: var(--text-muted); text-align: center; margin-top: 20px;">No se encontraron clientes que coincidan con la búsqueda.</p>`;
             return;
         }
 
@@ -465,63 +528,91 @@
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s, sIdx) => {
                     subtotal += s.monto;
+                    
+                    // Comprobación Inteligente
+                    const esInvitacion = esServicioPorInvitacion(s.nombre);
+                    const lockStatus = esInvitacion ? 'disabled title="No aplica para este servicio"' : '';
+                    
                     clientServicesHTML += `
                         <div class="client-service-tag">
-                            <span>${s.nombre}</span>
-                            <span>$${s.monto} <button class="btn-icon" style="font-size:0.7rem; margin-left:4px;" onclick="removeClientService('${key}', ${sIdx})">✖</button></span>
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
+                                <span style="font-weight: 600;">${s.nombre}</span>
+                                <span style="display:flex; align-items:center;">
+                                    <strong style="color:var(--neon-blue); margin-right: 8px;">$${s.monto}</strong>
+                                    <button class="btn-icon danger" style="font-size:0.8rem;" onclick="removeClientService('${key}', ${sIdx})" title="Quitar servicio">✖</button>
+                                </span>
+                            </div>
+                            <div class="cred-inputs">
+                                <input type="text" placeholder="${esInvitacion ? 'Correo Personal (Invitación)' : 'Correo de Ingreso'}" value="${s.correo_login || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'correo_login', this.value)">
+                                <input type="text" placeholder="Perfil" value="${s.perfil_nombre || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_nombre', this.value)" ${lockStatus}>
+                                <input type="text" placeholder="PIN" value="${s.perfil_pin || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_pin', this.value)" ${lockStatus}>
+                            </div>
                         </div>
                     `;
                 });
-            } else { clientServicesHTML = `<div style="font-size:0.75rem; color:var(--text-muted); text-align:center;">Sin servicios activos</div>`; }
+            } else { clientServicesHTML = `<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 10px 0;">Sin servicios activos asignados</div>`; }
 
-            // Definir clase de color para el select de estado
-            let statusColorClass = `status-${cliente.estado}`;
-            let borderColor = cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)');
+            let statusColor = cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)');
+            let statusBadge = cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE');
 
             const card = document.createElement("div");
             card.className = "client-card";
-            card.style.borderLeftColor = borderColor;
+            card.style.borderLeftColor = statusColor;
             
             card.innerHTML = `
-                <div class="card-header-row">
-                    <div class="client-info" style="width:100%;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <h3 style="color: ${borderColor};">[${cliente.folio}] ${cliente.nombre}</h3>
-                            <span style="color:var(--text-main); font-weight:bold; font-size:0.9rem;">Total: $${subtotal}</span>
+                <!-- Cabecera Siempre Visible -->
+                <div class="card-header-main" onclick="toggleClientDetails('${key}')">
+                    <div class="client-info-basic">
+                        <h3 style="color: ${statusColor};">[${cliente.folio}] ${cliente.nombre}</h3>
+                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
+                            <span class="client-status-badge" style="color: ${statusColor}; border-color: ${statusColor}40; background: ${statusColor}10;">${statusBadge}</span>
+                            <span style="color: var(--text-muted); font-size: 0.85rem;">Día: ${cliente.dia_pago || 15}</span>
                         </div>
-
-                        <!-- Nuevos Controles de Estado y Fecha -->
-                        <div style="display:flex; gap: 15px; margin-top: 8px; font-size: 0.8rem; align-items: center;">
-                            <div style="color: var(--text-muted);">Día Cobro: 
-                                <input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" style="width: 45px; background:#111; color:#fff; border: 1px solid var(--text-muted); border-radius:3px; text-align:center; padding:2px;" onchange="updateClientData('${key}', 'dia_pago', this.value)">
-                            </div>
-                            <div style="color: var(--text-muted);">Estado: 
-                                <select class="status-select ${statusColorClass}" onchange="updateClientData('${key}', 'estado', this.value)">
-                                    <option value="pendiente" ${cliente.estado === 'pendiente' ? 'selected' : ''}>Pendiente</option>
-                                    <option value="pagado" ${cliente.estado === 'pagado' ? 'selected' : ''}>Pagado</option>
-                                    <option value="suspendido" ${cliente.estado === 'suspendido' ? 'selected' : ''}>Suspendido</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="client-services-list" style="margin-top: 10px;">
-                            ${clientServicesHTML}
-                            <div class="client-service-add-row">
-                                <select id="add-srv-sel-${key}">${globalOptions}</select>
-                                <button class="btn-save" style="padding:2px 8px;" onclick="addClientService('${key}')">+</button>
-                            </div>
-                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color:var(--text-main); font-weight:bold; font-size:1.1rem; margin-bottom: 4px;">$${subtotal}</div>
+                        <div class="client-details-toggle"><span id="toggle-text-${key}">Ver detalles ▾</span></div>
                     </div>
                 </div>
-                <div class="card-actions-row">
-                    <span style="font-size:0.75rem; color:var(--text-muted);">Lealtad:</span>
-                    <div class="loyalty-control">
-                        <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
-                        <span id="pagos-${key}" style="font-weight: bold; width: 14px; text-align: center; color: var(--neon-green); font-size: 0.8rem;">${cliente.pagos_puntuales || 0}</span>
-                        <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
-                        <button class="btn-icon" style="color: var(--neon-red); margin-left: 5px; font-size: 0.85rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha a 0">🔄</button>
+
+                <!-- Detalles Colapsables -->
+                <div class="client-details" id="details-${key}">
+                    
+                    <div style="display:flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <div style="flex: 1; min-width: 120px;">
+                            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Día de Cobro</label>
+                            <input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" style="width: 100%; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:4px; padding:6px; outline:none;" onchange="updateClientData('${key}', 'dia_pago', this.value)">
+                        </div>
+                        <div style="flex: 2; min-width: 150px;">
+                            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Estado de la Cuenta</label>
+                            <select class="status-select status-${cliente.estado}" style="width: 100%;" onchange="updateClientData('${key}', 'estado', this.value)">
+                                <option value="pendiente" ${cliente.estado === 'pendiente' ? 'selected' : ''}>Pendiente (Deuda)</option>
+                                <option value="pagado" ${cliente.estado === 'pagado' ? 'selected' : ''}>Pagado (Al corriente)</option>
+                                <option value="suspendido" ${cliente.estado === 'suspendido' ? 'selected' : ''}>Suspendido (Corte)</option>
+                            </select>
+                        </div>
                     </div>
-                    <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">Copiar Link</button>
+                    
+                    <div class="client-services-list">
+                        ${clientServicesHTML}
+                        <div class="client-service-add-row">
+                            <select id="add-srv-sel-${key}">${globalOptions}</select>
+                            <button class="btn-save" style="padding:6px 12px; font-size: 1.1rem; line-height: 1;" onclick="addClientService('${key}')" title="Añadir">+</button>
+                        </div>
+                    </div>
+
+                    <div class="card-actions-row">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
+                            <span style="font-size:0.75rem; color:var(--text-muted); text-transform: uppercase;">Nivel de Lealtad (Pagos)</span>
+                            <div class="loyalty-control">
+                                <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
+                                <span id="pagos-${key}" style="font-weight: bold; width: 20px; text-align: center; color: var(--neon-green); font-size: 1rem;">${cliente.pagos_puntuales || 0}</span>
+                                <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
+                                <button class="btn-icon danger" style="margin-left: 8px; font-size: 1rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha a 0">🔄</button>
+                            </div>
+                        </div>
+                        <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Copiar Link del Cliente</button>
+                    </div>
                 </div>
             `;
             container.appendChild(card);
@@ -531,12 +622,17 @@
     function updateClientData(key, field, value) {
         if (field === 'dia_pago') value = parseInt(value) || 15;
         clientesDict[key][field] = value;
-        calcularInventarioYFinanzas(); // Por si se suspende a un cliente
+        calcularInventarioYFinanzas(); 
         filtrarClientes(); 
     }
 
+    function updateServiceCreds(key, serviceIndex, field, value) {
+        if (!clientesDict[key].servicios || !clientesDict[key].servicios[serviceIndex]) return;
+        clientesDict[key].servicios[serviceIndex][field] = value.trim();
+    }
+
     function reiniciarLealtad(key) {
-        if(confirm('¿Reiniciar la racha a 0?')) {
+        if(confirm('¿Reiniciar la racha de pagos puntuales a 0?')) {
             clientesDict[key].pagos_puntuales = 0;
             filtrarClientes();
         }
@@ -545,10 +641,22 @@
     function addClientService(key) {
         const [nombre, precio] = document.getElementById(`add-srv-sel-${key}`).value.split('|');
         if (!clientesDict[key].servicios) clientesDict[key].servicios = [];
-        clientesDict[key].servicios.push({ nombre: nombre, monto: parseFloat(precio) });
+        clientesDict[key].servicios.push({ 
+            nombre: nombre, 
+            monto: parseFloat(precio),
+            correo_login: "",
+            perfil_nombre: "",
+            perfil_pin: ""
+        });
         calcularInventarioYFinanzas();
         renderGlobalServicesUI(); 
         filtrarClientes(); 
+        // Abrimos automáticamente el detalle para que vea el nuevo servicio
+        const details = document.getElementById(`details-${key}`);
+        if(details) {
+            details.style.display = "block";
+            document.getElementById(`toggle-text-${key}`).innerHTML = "Ocultar detalles ▴";
+        }
     }
 
     function removeClientService(key, serviceIndex) {
@@ -572,6 +680,7 @@
     async function prepararYGuardar() {
         if (!currentFileData) return;
         const btnSave = document.querySelector('.btn-save');
+        const originalText = btnSave.innerText;
         btnSave.innerText = "Guardando...";
 
         configGlobal.alertas = {
@@ -582,7 +691,7 @@
         };
 
         const payload = {
-            message: "🤖 Admin Update: Filtros, Cuentas, Estados y Fechas",
+            message: "🤖 Admin Update: Credenciales guardadas",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
@@ -596,8 +705,10 @@
                 currentFileData.sha = (await response.json()).content.sha;
                 alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE!");
             } else alert("❌ Error al guardar en GitHub.");
-        } catch (e) {}
-        btnSave.innerText = "Guardar Cambios";
+        } catch (e) {
+            console.error(e);
+        }
+        btnSave.innerText = originalText;
     }
     </script>
 </body>
