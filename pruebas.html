@@ -33,32 +33,84 @@
         .splash-logo { max-width: 140px; filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.4)); }
         @keyframes floatUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* FONDO ANIMADO NEÓN (3 ÓRBITAS FLOTANTES) */
-        .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); }
-        .neon-orbit { position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.8; }
-        
-        .orbit-1 { width: 900px; height: 900px; top: -200px; right: -300px; border-bottom: 3px solid var(--neon-purple); border-left: 3px solid rgba(124, 77, 255, 0.1); filter: drop-shadow(0 0 30px var(--neon-purple)); animation: floatOrbit1 25s ease-in-out infinite alternate; }
-        .orbit-2 { width: 1200px; height: 1200px; bottom: -400px; left: -400px; border-top: 3px solid var(--neon-blue); border-right: 3px solid rgba(0, 242, 254, 0.1); filter: drop-shadow(0 0 35px var(--neon-blue)); animation: floatOrbit2 35s ease-in-out infinite alternate; }
-        .orbit-3 { width: 800px; height: 800px; top: 20%; left: 10%; border-right: 2px solid var(--danger-red); border-bottom: 2px solid rgba(255, 51, 102, 0.1); filter: drop-shadow(0 0 25px var(--danger-red)); animation: floatOrbit3 30s ease-in-out infinite alternate; opacity: 0.5; }
-
-        @keyframes floatOrbit1 { 
-            0% { transform: translate(0, 0) rotate(0deg) scale(1); } 
-            50% { transform: translate(-150px, 100px) rotate(180deg) scale(1.05); } 
-            100% { transform: translate(50px, 200px) rotate(360deg) scale(0.95); } 
-        }
-        @keyframes floatOrbit2 { 
-            0% { transform: translate(0, 0) rotate(360deg) scale(1); } 
-            50% { transform: translate(200px, -150px) rotate(180deg) scale(0.95); } 
-            100% { transform: translate(-100px, -250px) rotate(0deg) scale(1.05); } 
-        }
-        @keyframes floatOrbit3 { 
-            0% { transform: translate(0, 0) rotate(0deg) scale(0.9); } 
-            50% { transform: translate(250px, 150px) rotate(180deg) scale(1.1); } 
-            100% { transform: translate(-150px, -100px) rotate(360deg) scale(1); } 
-        }
-
-        .container { width: 100%; max-width: 580px; position: relative; z-index: 1; padding-bottom: 80px; }
-
+    /* FONDO ANIMADO NEÓN OPTIMIZADO PARA MÓVIL */
+    .bg { 
+        position: fixed; 
+        inset: 0; 
+        z-index: -2; 
+        background-color: var(--bg-black); 
+        overflow: hidden; /* Evita barras de desplazamiento laterales no deseadas */
+    }
+    
+    .neon-orbit { 
+        position: absolute; 
+        border-radius: 50%; 
+        pointer-events: none; 
+        opacity: 0.9; 
+    }
+    
+    /* Órbitas redimensionadas para móviles, con colores del logo y mayor brillo neón */
+    .orbit-1 { 
+        width: 450px; 
+        height: 450px; 
+        top: -100px; 
+        right: -150px; 
+        border-bottom: 3px solid #b026ff; /* Morado neón intenso */
+        border-left: 3px solid rgba(176, 38, 255, 0.2); 
+        filter: drop-shadow(0 0 15px #b026ff) drop-shadow(0 0 30px #b026ff); 
+        animation: floatOrbit1 12s ease-in-out infinite alternate; 
+    }
+    
+    .orbit-2 { 
+        width: 550px; 
+        height: 550px; 
+        bottom: -150px; 
+        left: -150px; 
+        border-top: 3px solid #00f2fe; /* Azul cian brillante del logo */
+        border-right: 3px solid rgba(0, 242, 254, 0.2); 
+        filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); 
+        animation: floatOrbit2 15s ease-in-out infinite alternate; 
+    }
+    
+    .orbit-3 { 
+        width: 380px; 
+        height: 380px; 
+        top: 35%; 
+        left: 20%; 
+        border-right: 2px solid #7c4dff; /* Morado azulado secundario */
+        border-bottom: 2px solid rgba(124, 77, 255, 0.2); 
+        filter: drop-shadow(0 0 12px #7c4dff) drop-shadow(0 0 25px #7c4dff); 
+        animation: floatOrbit3 10s ease-in-out infinite alternate; 
+        opacity: 0.7; 
+    }
+    
+    /* Animaciones más fluidas, dinámicas y con desplazamientos seguros para pantalla chica */
+    @keyframes floatOrbit1 { 
+        0% { transform: translate(0, 0) rotate(0deg) scale(1); } 
+        50% { transform: translate(-40px, 50px) rotate(180deg) scale(1.05); } 
+        100% { transform: translate(20px, 80px) rotate(360deg) scale(0.95); } 
+    }
+    
+    @keyframes floatOrbit2 { 
+        0% { transform: translate(0, 0) rotate(360deg) scale(1); } 
+        50% { transform: translate(50px, -40px) rotate(180deg) scale(0.95); } 
+        100% { transform: translate(-40px, -80px) rotate(0deg) scale(1.05); } 
+    }
+    
+    @keyframes floatOrbit3 { 
+        0% { transform: translate(0, 0) rotate(0deg) scale(0.9); } 
+        50% { transform: translate(60px, 40px) rotate(180deg) scale(1.08); } 
+        100% { transform: translate(-50px, -40px) rotate(360deg) scale(1); } 
+    }
+    
+    .container { 
+        width: 100%; 
+        max-width: 580px; 
+        position: relative; 
+        z-index: 1; 
+        padding-bottom: 80px; 
+    }
+    
         /* CLASE UNIVERSAL PARA EFECTO CRISTAL (BLUR) INTENSO */
         .glass-panel {
             background: var(--card-glass);
