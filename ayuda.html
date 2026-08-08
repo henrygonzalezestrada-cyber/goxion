@@ -8,7 +8,7 @@
     <style>
         :root {
             --bg-black: #030305;
-            --card-bg: rgba(14, 14, 20, 0.75);
+            --card-bg: rgba(14, 14, 20, 0.65); /* Más transparente para resaltar el blur */
             --text-main: #ffffff;
             --text-muted: #95a4bd;
             --neon-blue: #00f2fe;
@@ -23,7 +23,7 @@
         body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
         body.no-scroll { overflow: hidden; height: 100vh; }
 
-        /* SPLASH SCREEN MINIMALISTA */
+        /* SPLASH SCREEN */
         #splash-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-black); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
@@ -43,32 +43,33 @@
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; }
 
-        /* NUEVA BARRA CRISTAL SUPERIOR (DE EXTREMO A EXTREMO) */
+        /* BARRA CRISTALINA FIJA SUPERIOR */
         .glass-top-bar {
             position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(14, 14, 20, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0, 242, 254, 0.15);
+            background: rgba(14, 14, 20, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             padding: 15px 20px; z-index: 1000;
             display: flex; align-items: center; justify-content: flex-start;
-            opacity: 0; transform: translateY(-100%); transition: all 0.4s ease; pointer-events: none;
+            opacity: 0; transform: translateY(-100%); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
         }
         .glass-top-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
         .glass-top-name { font-size: 18px; font-weight: 700; color: var(--text-main); }
         .glass-top-name span { color: var(--neon-blue); }
 
-        /* HEADER APP (LOGO) */
+        /* HEADER APP */
         .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: 5px 0; position: relative; z-index: 10; }
         .app-logo { max-height: 32px; width: auto; object-fit: contain; }
         .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s;}
         .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
 
-        .alert-banner { background: rgba(255, 170, 0, 0.12); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(12px); }
+        .alert-banner { background: rgba(255, 170, 0, 0.12); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
 
-        /* PESTAÑAS (TABS) */
-        .tab-container { display: flex; background: rgba(255,255,255,0.03); border-radius: 20px; padding: 6px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px); position: relative; z-index: 110; }
+        /* PESTAÑAS (EFECTO CRISTAL) */
+        .tab-container { display: flex; background: rgba(14, 14, 20, 0.5); border-radius: 20px; padding: 6px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); position: relative; z-index: 110; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
         .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; border-radius: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.3s; }
         .tab-btn span { font-size: 20px; }
-        .tab-btn.active { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15); }
+        .tab-btn.active { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 20px rgba(0, 242, 254, 0.2); }
         
         .view-section { display: none; animation: fadeIn 0.4s ease; }
         .view-section.active { display: block; }
@@ -78,18 +79,19 @@
         /* INPUTS Y BOTONES GLOBALES */
         .input-smart { width: 100%; background: #0d121c; border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 14px; border-radius: 12px; font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.3s; }
         .input-smart:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 242, 254, 0.1); }
-        .btn-primary { width: 100%; padding: 14px; border-radius: 30px; border: none; font-weight: 700; font-size: 14px; cursor: pointer; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); color: #000; transition: 0.3s; }
-        .btn-primary:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); color: #fff; }
+        .btn-primary { width: 100%; padding: 16px; border-radius: 20px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); color: #000; transition: 0.3s; }
+        .btn-primary:hover { box-shadow: 0 0 30px rgba(0, 242, 254, 0.6); color: #fff; transform: translateY(-2px); }
 
-        /* --- DASHBOARD PERSONAL (NUEVO) --- */
-        .login-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 20px; padding: 25px; backdrop-filter: blur(12px); text-align: center; margin-bottom: 30px; }
+        /* --- CLASES DE EFECTO CRISTAL (BLUR) PARA TARJETAS --- */
+        .glass-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); margin-bottom: 25px; }
         
-        /* SALUDO GRANDE NORMAL */
-        .dash-greeting-box { text-align: center; margin: 10px 0 25px 0; }
-        .dash-greeting-box h1 { font-size: 34px; font-weight: 800; color: var(--text-main); line-height: 1.1; margin: 0; }
+        /* LOGIN Y DASHBOARD */
+        .login-card { text-align: center; border-color: rgba(0, 242, 254, 0.2); }
+        
+        .dash-greeting-box { text-align: center; margin: 10px 0 25px 0; min-height: 45px; }
+        .dash-greeting-box h1 { font-size: 30px; font-weight: 800; color: var(--text-main); line-height: 1.2; margin: 0; transition: opacity 0.5s ease; }
         .dash-greeting-box h1 span { color: var(--neon-blue); }
 
-        .dash-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; margin-bottom: 20px; backdrop-filter: blur(12px); }
         .dash-date { font-size: 26px; font-weight: 800; color: var(--text-main); margin: 5px 0 10px 0; text-align: center; }
         
         .time-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
@@ -97,36 +99,37 @@
         .badge-today { background: rgba(255, 170, 0, 0.15); color: var(--warning-amber); border: 1px solid var(--warning-amber); }
         .badge-overdue { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
 
-        /* NUEVOS WIDGETS DEL DASHBOARD */
+        /* WIDGET DE LEALTAD */
         .loyalty-progress-bg { width: 100%; background: rgba(255,255,255,0.05); border-radius: 10px; height: 8px; margin: 12px 0; overflow: hidden; position: relative; }
         .loyalty-progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
         
-        .promo-banner { background: linear-gradient(45deg, rgba(124, 77, 255, 0.15), rgba(224, 38, 222, 0.15)); border: 1px solid var(--neon-purple); border-radius: 16px; padding: 15px; display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.3s; margin-bottom: 25px; }
-        .promo-banner:hover { box-shadow: 0 0 20px rgba(124, 77, 255, 0.3); transform: translateY(-2px); }
-        .promo-banner .icon { font-size: 30px; }
-        .promo-banner .text strong { display: block; font-size: 14px; color: var(--text-main); margin-bottom: 2px;}
-        .promo-banner .text span { font-size: 11px; color: var(--text-muted); }
+        /* SECCIÓN DINÁMICA DE REFERIDOS */
+        .referral-card { border-color: rgba(124, 77, 255, 0.3); }
+        .referral-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .referral-title { font-size: 13px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .referral-status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700; background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border: 1px solid rgba(124, 77, 255, 0.4); }
+        .referral-stats { display: flex; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 12px; margin-bottom: 12px; }
+        .stat-box { text-align: center; flex: 1; }
+        .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
+        .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+        .promo-invite { display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.3s; }
+        .promo-invite:hover { transform: translateY(-2px); }
 
-        .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 25px; }
-        .quick-btn { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; padding: 15px 5px; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .quick-btn:hover { background: rgba(255,255,255,0.08); color: #fff; }
-        .quick-btn span { font-size: 20px; }
-
-        .service-pill { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px; }
+        .service-pill { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
         .service-pill-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
         .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 4px 8px; border-radius: 10px; font-weight: 700; }
 
-        /* BOTONES DE REGLAS Y ARCHIVOS (COMPLETOS) */
+        /* BOTONES DE REGLAS (COMPLETOS) */
         .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .btn-menu { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15); border-radius: 20px; padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; backdrop-filter: blur(12px); transition: 0.3s; }
-        .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); }
+        .btn-menu { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.15); border-radius: 20px; padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: 0.3s; box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+        .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,242,254,0.15); }
         .btn-menu span { font-size: 38px; margin-bottom: 4px; }
         .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.2; }
 
         /* CATÁLOGO DINÁMICO */
         .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .catalog-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; }
-        .catalog-card:hover { border-color: var(--neon-blue); box-shadow: 0 8px 20px rgba(0,242,254,0.15); transform: translateY(-3px); }
+        .catalog-card { background: var(--card-bg); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .catalog-card:hover { border-color: var(--neon-blue); box-shadow: 0 12px 35px rgba(0,242,254,0.2); transform: translateY(-3px); }
         .cat-icon { font-size: 36px; margin-bottom: 10px; }
         .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
         .cat-price { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
@@ -134,23 +137,23 @@
         .cat-badge.ok { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid var(--success-green); }
         .cat-badge.out { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
         .cat-btn { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; }
-        .cat-btn.active { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; box-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
+        .cat-btn.active { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
 
-        /* MÓDULO INTELIGENTE DE SOPORTE */
-        .smart-support-card { background: var(--card-bg); border: 1px solid rgba(124, 77, 255, 0.3); border-radius: 20px; padding: 22px; backdrop-filter: blur(12px); }
+        /* SOPORTE INTELIGENTE */
+        .smart-support-card { border-color: rgba(124, 77, 255, 0.3); }
         .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .platform-btn { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.2s; }
         .platform-btn span { font-size: 22px; }
-        .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); }
+        .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); box-shadow: 0 0 15px rgba(0,242,254,0.2); }
         .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
         .step-box.active { display: block; }
         .custom-select-smart { width: 100%; background: #0d121c; border: 1px solid var(--neon-purple); color: var(--text-main); padding: 14px; border-radius: 12px; font-size: 14px; outline: none; margin-bottom: 12px; }
         .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 14px; border-radius: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;}
 
-        /* MODALES (AMPLIOS PARA LECTURA COMPLETA) */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.85); backdrop-filter: blur(8px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
+        /* MODALES CON EFECTO BLUR */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
         .modal.show { display: flex; opacity: 1; }
-        .modal-content { background: #0d121c; border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; }
+        .modal-content { background: rgba(13, 18, 28, 0.9); border: 1px solid var(--neon-purple); border-radius: 20px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
         .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
         .modal-title { color: #fff; margin-bottom: 15px; font-size: 18px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 13px; }
@@ -172,7 +175,7 @@
         </div>
     </div>
 
-    <!-- NUEVA BARRA CRISTALINA FIJA (Solo aparece al hacer scroll) -->
+    <!-- BARRA CRISTALINA FIJA SUPERIOR -->
     <div id="glass-header" class="glass-top-bar">
         <div class="glass-top-name">Tu Espacio, <span id="glass-name-text">Cliente</span></div>
     </div>
@@ -201,12 +204,12 @@
             <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
         </div>
 
-        <!-- VISTA 1: MI ESPACIO (LOGIN O DASHBOARD) -->
+        <!-- VISTA 1: MI ESPACIO -->
         <div id="view-cuenta" class="view-section active">
             
-            <!-- A. ESTADO NO LOGUEADO (LOGIN) -->
+            <!-- A. ESTADO NO LOGUEADO -->
             <div id="auth-view">
-                <div class="login-card">
+                <div class="glass-card login-card">
                     <img src="Logo individual.png" style="width: 40px; margin-bottom: 15px;" onerror="this.style.display='none'">
                     <div class="section-title" style="margin-bottom: 4px; font-size: 14px; color: var(--text-main);">Vincular Dispositivo</div>
                     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Ingresa tus datos para acceder a tu panel personal.</p>
@@ -227,25 +230,21 @@
                 </div>
             </div>
 
-            <!-- B. ESTADO LOGUEADO (DASHBOARD PERSONAL) -->
+            <!-- B. ESTADO LOGUEADO (DASHBOARD PERSONALIZADO) -->
             <div id="dashboard-view" style="display: none;">
                 
-                <!-- SALUDO INICIAL (Se oculta al bajar y aparece la barra de cristal) -->
+                <!-- SALUDO DINÁMICO ROTATIVO -->
                 <div id="dash-greeting-container" class="dash-greeting-box">
-                    <h1>¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
+                    <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
                 </div>
 
-                <!-- PROMOCIÓN EXCLUSIVA -->
-                <div class="promo-banner" onclick="openModal('modal-referidos')">
-                    <div class="icon">🎁</div>
-                    <div class="text">
-                        <strong>Invita y Gana 1 Mes GRATIS</strong>
-                        <span>Toca aquí para conocer el programa de referidos.</span>
-                    </div>
+                <!-- SECCIÓN DINÁMICA DE REFERIDOS -->
+                <div id="referral-section-container">
+                    <!-- Se llena dinámicamente desde JS -->
                 </div>
 
                 <!-- RESUMEN DE CORTE Y LEALTAD -->
-                <div class="dash-card">
+                <div class="glass-card dash-card">
                     <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted);">Tu próxima fecha de corte</div>
                     <div class="dash-date" id="dash-date">Cargando...</div>
                     <div style="text-align: center;" id="dash-badge"></div>
@@ -263,24 +262,12 @@
                     <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
                 </div>
 
-                <!-- ACCIONES RÁPIDAS -->
-                <div class="quick-actions">
-                    <div class="quick-btn" onclick="switchTab('soporte')">
-                        <span>🛠️</span> Reportar Falla
-                    </div>
-                    <div class="quick-btn" onclick="switchTab('catalogo')">
-                        <span>🛒</span> Agregar App
-                    </div>
-                    <div class="quick-btn" onclick="irAlTicket()">
-                        <span>💳</span> Renovar Mes
-                    </div>
-                </div>
-
                 <div class="section-title">Tus Servicios Activos</div>
                 <div id="dash-services" style="margin-bottom: 25px;"></div>
 
-                <button class="btn-primary" onclick="irAlTicket()" style="padding: 16px; font-size: 15px; border-radius: 16px; margin-bottom: 15px;">
-                    💳 Ver Estado de Cuenta Completo
+                <!-- BOTÓN PRINCIPAL DE PAGO Y COBRANZA -->
+                <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">
+                    💳 Ver Estado de Cuenta y Pagar
                 </button>
 
                 <button onclick="cerrarSesion()" style="background: transparent; border: none; color: var(--text-muted); font-size: 12px; width: 100%; text-decoration: underline; cursor: pointer; padding: 10px;">
@@ -297,9 +284,9 @@
             </div>
         </div>
 
-        <!-- VISTA 3: ASISTENTE TÉCNICO INTELIGENTE (REDACTADO A CORREO CONTROLADO POR GOXION) -->
+        <!-- VISTA 3: ASISTENTE TÉCNICO INTELIGENTE -->
         <div id="view-soporte" class="view-section">
-            <div class="smart-support-card">
+            <div class="glass-card smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 <div class="platform-grid">
                     <div class="platform-btn" onclick="selectPlatform('Netflix', this)"><span>🍿</span> Netflix</div>
@@ -322,7 +309,7 @@
                         <p style="font-size: 12px; color: var(--text-main); font-weight: 600; margin-bottom: 8px;" id="input-label">Dato requerido:</p>
                         <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
                     </div>
-                    <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()">
+                    <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()" style="padding: 14px; font-size: 14px; border-radius: 30px;">
                         📲 Enviar Solicitud a Soporte
                     </button>
                 </div>
@@ -400,6 +387,7 @@
     <script>
         const NUMERO_GOXION = "528136836901"; 
         let globalClientesData = null;
+        let greetingInterval = null;
 
         // 1. SPLASH SCREEN
         function hideSplash() {
@@ -424,22 +412,47 @@
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
 
-        // 3. EFECTO SCROLL HEADER (NUEVA BARRA CRISTAL PERFECTA)
+        // 3. SCROLL HEADER GLASS BLUR
         window.addEventListener('scroll', () => {
             const glassBar = document.getElementById('glass-header');
             const bigHeader = document.getElementById('dash-greeting-container');
             if(glassBar && document.getElementById('dashboard-view').style.display !== 'none' && bigHeader) {
-                // Si el usuario scrollea más allá del título grande, bajamos la barra cristal
-                const scrollPos = window.scrollY;
-                if(scrollPos > 60) {
-                    glassBar.classList.add('show');
-                } else {
-                    glassBar.classList.remove('show');
-                }
+                if(window.scrollY > 40) glassBar.classList.add('show');
+                else glassBar.classList.remove('show');
             }
         });
 
-        // 4. LÓGICA DE SESIÓN Y BUSCADOR INTELIGENTE (TOLERANTE)
+        // 4. SALUDO DINÁMICO ROTATIVO
+        function iniciarSaludoDinamico(nombreCompleto) {
+            const primerNombre = nombreCompleto.split(' ')[0];
+            const frases = [
+                `¡Hola, <span>${primerNombre}</span>! 👋`,
+                `¡Qué gusto verte, <span>${primerNombre}</span>! ✨`,
+                `¡Bienvenido a tu espacio, <span>${primerNombre}</span>! 🚀`,
+                `Todo en orden por aquí, <span>${primerNombre}</span> 💎`
+            ];
+            
+            let index = 0;
+            const el = document.getElementById('dynamic-greeting-text');
+            if(!el) return;
+
+            if(greetingInterval) clearInterval(greetingInterval);
+            
+            // Set first greeting immediately
+            el.innerHTML = frases[0];
+            el.style.opacity = 1;
+
+            greetingInterval = setInterval(() => {
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    index = (index + 1) % frases.length;
+                    el.innerHTML = frases[index];
+                    el.style.opacity = 1;
+                }, 500); // 500ms para desvanecerse
+            }, 6000); // Cambia cada 6 segundos
+        }
+
+        // 5. SESIÓN Y BUSCADOR TOLERANTE
         function normalizeString(str) {
             return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
         }
@@ -494,6 +507,7 @@
 
         function cerrarSesion() {
             localStorage.removeItem('goxion_user_key');
+            if(greetingInterval) clearInterval(greetingInterval);
             document.getElementById('dashboard-view').style.display = 'none';
             document.getElementById('auth-view').style.display = 'block';
             document.getElementById('login-id').value = '';
@@ -506,7 +520,7 @@
             if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
         }
 
-        // 5. RENDERIZADO DEL DASHBOARD (AHORA CON LEALTAD)
+        // 6. RENDERIZADO DEL DASHBOARD Y SECCIÓN DE REFERIDOS
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
             document.getElementById('auth-view').style.display = 'none';
@@ -516,7 +530,56 @@
             document.getElementById('dash-name').innerText = primerNombre;
             document.getElementById('glass-name-text').innerText = primerNombre;
 
-            // Fechas
+            iniciarSaludoDinamico(cliente.nombre);
+
+            // RENDERIZAR SECCIÓN DE REFERIDOS (Leyendo del JSON o mostrando botón de invitar)
+            const refContainer = document.getElementById('referral-section-container');
+            if(cliente.referido_activo) {
+                // Lógica temporal para leer datos del referido si existen en clientes.json
+                let mesesActivos = cliente.referido_activo.meses || 1;
+                let numPlataformas = cliente.referido_activo.plataformas || 2;
+                let nombreRef = cliente.referido_activo.nombre || "Referido";
+                let porcentajeRef = Math.min((mesesActivos / 3) * 100, 100);
+
+                refContainer.innerHTML = `
+                    <div class="glass-card referral-card">
+                        <div class="referral-header">
+                            <div class="referral-title"><span>🎁</span> Tu Referido Activo</div>
+                            <div class="referral-status-badge">En Validación</div>
+                        </div>
+                        <p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${nombreRef}</p>
+                        
+                        <div class="referral-stats">
+                            <div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);">
+                                <div class="stat-val">${numPlataformas}</div>
+                                <div class="stat-label">Plataformas</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val">${mesesActivos}/3</div>
+                                <div class="stat-label">Meses</div>
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Progreso a tu mes gratis:</div>
+                        <div class="loyalty-progress-bg" style="height: 6px;">
+                            <div class="loyalty-progress-fill" style="width: ${porcentajeRef}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div>
+                        </div>
+                        <div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
+                    </div>
+                `;
+            } else {
+                refContainer.innerHTML = `
+                    <div class="glass-card referral-card promo-invite" onclick="openModal('modal-referidos')">
+                        <div>
+                            <div class="referral-title" style="margin-bottom: 4px; font-size: 15px;">🎁 Invita y Gana 1 Mes Gratis</div>
+                            <div style="font-size: 11px; color: var(--text-muted);">Sin referidos activos. Comparte GOXION y obtén tu mensualidad al 100%.</div>
+                        </div>
+                        <div style="font-size: 28px; color: var(--neon-blue); margin-left: 10px;">→</div>
+                    </div>
+                `;
+            }
+
+            // Fechas de corte
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             const hoy = new Date();
             const mesActual = meses[hoy.getMonth()];
@@ -533,21 +596,16 @@
             
             document.getElementById('dash-badge').innerHTML = badgeHTML;
 
-            // Widget de Lealtad (Cálculos dinámicos)
+            // Lealtad
             let pagos = cliente.pagos_puntuales || 0;
             let meta = 4;
             let beneficio = "3% OFF";
-            
             if (pagos >= 4 && pagos < 9) { meta = 9; beneficio = "6% OFF"; }
             else if (pagos >= 9) { meta = pagos; beneficio = "Nivel Máximo (6% OFF)"; }
 
             let porcentaje = Math.min((pagos / meta) * 100, 100);
-            
             document.getElementById('loyalty-count').innerText = `${pagos}/${meta} Pagos`;
-            
-            setTimeout(() => {
-                document.getElementById('loyalty-bar').style.width = `${porcentaje}%`;
-            }, 300); // Pequeño delay para que se vea la animación de carga
+            setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${porcentaje}%`; }, 300);
 
             if (pagos >= 9) {
                 document.getElementById('loyalty-msg').innerText = "¡Felicidades! Disfrutas de tu Nivel 2.";
@@ -555,7 +613,7 @@
                 document.getElementById('loyalty-msg').innerText = `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
             }
 
-            // Servicios (Iconos)
+            // Servicios Activos
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
             
@@ -571,7 +629,7 @@
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
 
-        // 6. CATÁLOGO EN VIVO
+        // 7. CATÁLOGO EN VIVO
         function cargarCatalogo(data) {
             const config = data._goxion_config;
             const catalogContainer = document.getElementById('catalog-container');
@@ -629,7 +687,7 @@
             if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
         }
 
-        // 7. ASISTENTE DE SOPORTE (AJUSTADO A LA REALIDAD DONDE EL ADMIN RECIBE EL CORREO)
+        // 8. ASISTENTE SOPORTE TÉCNICO (TEXTOS ÍNTEGROS)
         let selectedPlat = ""; let currentIssues = {};
         const DATABASE_ISSUES = { 
             "Netflix": [
