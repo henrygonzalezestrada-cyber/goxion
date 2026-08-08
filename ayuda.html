@@ -122,10 +122,23 @@
             border-radius: 20px;
         }
 
-        .tab-container { display: flex; padding: 6px; margin-bottom: 25px; position: relative; z-index: 110; }
-        .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: var(--text-muted); font-size: 12px; font-weight: 600; border-radius: 14px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.3s; }
-        .tab-btn span { font-size: 20px; }
-        .tab-btn.active { background: rgba(255, 255, 255, 0.1); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 20px rgba(0, 242, 254, 0.2); }
+        /* BANNER PESTAÑAS - REDUCIDO Y CON ANIMACIÓN LIQUID GLASS */
+        .tab-container { display: flex; padding: 4px; margin-bottom: 20px; position: relative; z-index: 110; border-radius: 16px; }
+        .tab-btn { 
+            flex: 1; padding: 8px 4px; background: transparent; border: none; color: var(--text-muted); 
+            font-size: 11px; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; 
+            flex-direction: column; align-items: center; gap: 3px; transition: all 0.3s ease; position: relative; overflow: hidden; 
+        }
+        .tab-btn span { font-size: 16px; }
+        .tab-btn.active { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25); }
+
+        /* Animación Liquid Glass al presionar */
+        .tab-btn::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(124, 77, 255, 0) 70%);
+            border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out; opacity: 0; pointer-events: none;
+        }
+        .tab-btn:active::after { width: 180px; height: 180px; opacity: 1; transition: 0s; }
         
         .view-section { display: none; animation: fadeIn 0.4s ease; }
         .view-section.active { display: block; }
@@ -162,9 +175,16 @@
         .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
         .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 
-        .service-pill { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); padding: 12px 16px; border-radius: 14px; margin-bottom: 10px; }
-        .service-pill-left { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; }
-        .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 4px 8px; border-radius: 10px; font-weight: 700; }
+        /* INTERACTIVIDAD EN MI ESPACIO: SERVICIO CON BARRAS DE CREDENCIALES */
+        .service-pill-container { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; margin-bottom: 10px; padding: 12px; }
+        .service-pill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .service-pill-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
+        .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 3px 8px; border-radius: 10px; font-weight: 700; }
+        
+        .cred-box { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.08); }
+        .cred-tag { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+        .cred-tag:hover { border-color: var(--neon-blue); color: #fff; background: rgba(0, 242, 254, 0.1); }
+        .cred-tag strong { color: var(--text-main); }
 
         .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .btn-menu { padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; border-color: rgba(124, 77, 255, 0.15); }
@@ -337,16 +357,9 @@
         <div id="view-soporte" class="view-section">
             <div class="glass-card smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
-                <div class="platform-grid">
-                    <div class="platform-btn" onclick="selectPlatform('Netflix', this)"><span>🍿</span> Netflix</div>
-                    <div class="platform-btn" onclick="selectPlatform('Disney+', this)"><span>🏰</span> Disney+</div>
-                    <div class="platform-btn" onclick="selectPlatform('Max', this)"><span>🎥</span> Max</div>
-                    <div class="platform-btn" onclick="selectPlatform('Prime Video', this)"><span>📦</span> Prime Video</div>
-                    <div class="platform-btn" onclick="selectPlatform('YouTube Premium', this)"><span>▶️</span> YouTube</div>
-                    <div class="platform-btn" onclick="selectPlatform('ViX Premium', this)"><span>⚽</span> ViX</div>
-                    <div class="platform-btn" onclick="selectPlatform('Crunchyroll', this)"><span>🍥</span> Crunchyroll</div>
-                    <div class="platform-btn" onclick="selectPlatform('Microsoft 365', this)"><span>💻</span> Office 365</div>
-                    <div class="platform-btn" onclick="selectPlatform('Google One', this)"><span>☁️</span> Google One</div>
+                <div class="platform-grid" id="support-platforms-grid">
+                    <!-- SE LLENARÁ DINÁMICAMENTE -->
+                    <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
                 </div>
                 <div id="step-2" class="step-box">
                     <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
@@ -520,6 +533,7 @@
                 globalClientesData = await response.json();
                 
                 cargarCatalogo(globalClientesData);
+                renderizarSoporteDinamico(globalClientesData);
                 
                 const savedKey = localStorage.getItem('goxion_user_key');
                 if(savedKey && globalClientesData[savedKey]) {
@@ -575,6 +589,11 @@
         function irAlTicket() {
             const key = localStorage.getItem('goxion_user_key');
             if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
+        }
+        
+        function copiarDatoRapido(texto, tipo) {
+            navigator.clipboard.writeText(texto);
+            alert(`¡${tipo} copiado al portapapeles!`);
         }
 
         function renderDashboard(key) {
@@ -682,7 +701,21 @@
                 cliente.servicios.forEach(s => {
                     let icon = "📺";
                     for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
-                    srvHTML += `<div class="service-pill"><div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div><div class="service-status">Activo</div></div>`;
+                    
+                    let credsBtns = '';
+                    if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
+                    if(s.perfil_nombre) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_nombre}', 'Perfil')">👤 <strong>${s.perfil_nombre}</strong></div>`;
+                    if(s.perfil_pin) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_pin}', 'PIN')">🔢 PIN: <strong>${s.perfil_pin}</strong></div>`;
+
+                    srvHTML += `
+                        <div class="service-pill-container">
+                            <div class="service-pill-header">
+                                <div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div>
+                                <div class="service-status">Activo</div>
+                            </div>
+                            ${credsBtns ? `<div class="cred-box">${credsBtns}</div>` : ''}
+                        </div>
+                    `;
                 });
             } else {
                 srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`;
@@ -737,7 +770,7 @@
             }
 
             let htmlCatalogo = '';
-            const iconos = { "Netflix": "🍿", "Disney": "🏰", "Max": "🎥", "Prime": "📦", "YouTube": "▶️", "ViX": "⚽", "Crunchyroll": "🍥", "Paramount": "⛰️", "Spotify": "🎧", "Microsoft": "💻", "Google": "☁️" };
+            const iconos = { "Netflix": "🍿", "Disney": "🏰", "Max": "🎥", "Prime": "📦", "YouTube": "▶️", "ViX": "⚽", "Crunchyroll": "🍥", "Paramount": "⛰️", "Spotify": "🎧", "Microsoft": "💻", "Google": "☁️", "Apple": "🍎" };
 
             config.serviciosGlobales.forEach(srv => {
                 let limiteTotal = (srv.cuentas || 0) * (srv.limite || 1);
@@ -810,7 +843,9 @@
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        let selectedPlat = ""; let currentIssues = {};
+        let selectedPlat = ""; 
+        let currentIssues = {};
+        
         const DATABASE_ISSUES = { 
             "Netflix": [
                 { issue: "🔑 Solicitar Código de Acceso", instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, acabo de enviar un código al correo asignado. Solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " }, 
@@ -828,28 +863,63 @@
             "Prime Video": [
                 { issue: "📺 Registrar Dispositivo", instructions: "1. Abre Prime Video y presiona 'Identifícate'.<br>2. Mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.", labelInput: "Código en Pantalla de TV:", templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " }
             ],
-            "YouTube Premium": [
+            "YouTube": [
                 { issue: "📩 No me llegó la invitación", instructions: "Verifica tu carpeta de SPAM en Gmail. Recuerda que no debes estar en otro grupo familiar activo. Si no está, compártenos tu correo para reenviarla.", labelInput: "Tu correo personal de Gmail:", templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail: " }
             ],
-            "ViX Premium": [
+            "ViX": [
                 { issue: "🔑 Vincular TV o Iniciar Sesión", instructions: "Selecciona 'Iniciar Sesión'. Envíanos el código alfanumérico que aparece en tu pantalla de TV para enlazarlo desde nuestra base de datos.", labelInput: "Código en pantalla:", templateWA: "Hola GOXION, necesito ayuda para vincular VIX PREMIUM.\n\n📱 Código TV: " }
             ],
             "Crunchyroll": [
                 { issue: "🔑 Vincular Consola o TV", instructions: "Dirígete a 'Activar dispositivo' en tu consola o TV. Aparecerá un código, escríbelo aquí para que nosotros autoricemos la cuenta.", labelInput: "Código de activación de pantalla:", templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: " }
             ],
-            "Microsoft 365": [
+            "Microsoft": [
                 { issue: "💻 Reenviar Invitación familiar", instructions: "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar y enviarte el enlace nuevamente.", labelInput: "Tu correo Outlook/Hotmail:", templateWA: "Hola GOXION, necesito que me reenvíen la invitación de MICROSOFT 365.\n\n📧 Correo: " }
             ],
             "Google One": [
                 { issue: "☁️ Espacio no reflejado", instructions: "Asegúrate de haber aceptado la invitación de familia en tu Gmail. Indícanos tu correo si sigues sin ver los beneficios.", labelInput: "Tu correo Gmail personal:", templateWA: "Hola GOXION, sigo sin ver reflejado mi almacenamiento de GOOGLE ONE.\n\n📧 Mi Gmail: " }
+            ],
+            "Default": [
+                { issue: "🔑 Solicitar Código / Asistencia", instructions: "Inicia sesión en tu dispositivo. Si te solicita un código o confirmación por correo, presiona 'Enviar' e indícanos tu correo o código en pantalla para proceder.", labelInput: "Dato en pantalla / Correo:", templateWA: "Hola GOXION, requiero asistencia/código para la plataforma seleccionada.\n\n📱 Dato: " }
             ]
         };
 
+        function srvCleanName(n) { 
+            return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa",""); 
+        }
+
+        function renderizarSoporteDinamico(data) {
+            const config = data._goxion_config;
+            const container = document.getElementById('support-platforms-grid');
+            if(!config || !config.serviciosGlobales) return;
+
+            const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "microsoft": "💻", "google": "☁️", "apple": "🍎", "paramount": "⛰️" };
+            
+            let html = "";
+            config.serviciosGlobales.forEach(s => {
+                let icon = "📺";
+                for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
+                html += `<div class="platform-btn" onclick="selectPlatform('${s.nombre}', this)"><span>${icon}</span> ${srvCleanName(s.nombre)}</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
         function selectPlatform(p, el) { 
-            selectedPlat = p; // Guardamos la plataforma seleccionada globalmente
+            selectedPlat = p; 
             document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); 
             const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
-            currentIssues = DATABASE_ISSUES[p] || []; currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
+            
+            let issues = DATABASE_ISSUES["Default"];
+            for(let key in DATABASE_ISSUES) {
+                if(p.toLowerCase().includes(key.toLowerCase())) {
+                    issues = DATABASE_ISSUES[key];
+                    break;
+                }
+            }
+            
+            currentIssues = issues; 
+            currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
+            
             document.getElementById('step-2').classList.add('active'); document.getElementById('step-3').classList.remove('active');
         }
 
@@ -866,11 +936,9 @@
             if (key && globalClientesData && globalClientesData[key]) {
                 const cliente = globalClientesData[key];
                 if (cliente.servicios) {
-                    // Busca si el cliente tiene contratada la plataforma que seleccionó
-                    let platKeyword = selectedPlat.replace('+', '').toLowerCase();
+                    let platKeyword = srvCleanName(selectedPlat).toLowerCase();
                     const srv = cliente.servicios.find(s => s.nombre.toLowerCase().includes(platKeyword));
                     if (srv) {
-                        // Dependiendo del dato que pida el label, extraemos el correo, perfil o pin
                         let labelLow = data.labelInput.toLowerCase();
                         if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login;
                         else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre;
@@ -892,7 +960,7 @@
             const key = localStorage.getItem('goxion_user_key');
             if (key && globalClientesData && globalClientesData[key]) {
                 const cliente = globalClientesData[key];
-                let platKeyword = selectedPlat.replace('+', '').toLowerCase();
+                let platKeyword = srvCleanName(selectedPlat).toLowerCase();
                 const srv = cliente.servicios?.find(s => s.nombre.toLowerCase().includes(platKeyword));
                 
                 extraContext = `\n\n------------------------\n*EXPEDIENTE DE SOPORTE:*\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`;
