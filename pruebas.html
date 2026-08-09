@@ -1,715 +1,376 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOXION // ADMIN SYSTEM</title>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #030305;
-            --card-bg: #0a0a0f;
-            --neon-green: #00ff9d;
-            --neon-purple: #bc13fe;
-            --neon-red: #ff003c;
-            --neon-blue: #00f2fe;
-            --neon-yellow: #f8e800;
-            --text-main: #ffffff;
-            --text-muted: #8892b0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOXION // Resumen de Cuenta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #030305;
+      --card-bg: #0a0a0f;
+      --neon-green: #00ff9d;
+      --neon-purple: #bc13fe;
+      --neon-red: #ff003c;
+      --neon-blue: #00f2fe;
+      --neon-yellow: #f8e800;
+      --text-main: #ffffff;
+      --text-muted: #8892b0;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); padding: 15px; overflow-x: hidden; max-width: 1400px; margin: 0 auto; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
+    
+    body { 
+        background-color: var(--bg-color); 
+        color: var(--text-main); 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        min-height: 100vh; 
+        padding: 20px; 
+        background-image: radial-gradient(circle at 50% 0%, rgba(188, 19, 254, 0.05) 0%, transparent 50%);
+    }
 
-        /* --- HEADER --- */
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 20px; border-bottom: 1px solid rgba(188, 19, 254, 0.4);
-            box-shadow: 0 4px 20px rgba(188, 19, 254, 0.15); margin-bottom: 25px;
-            border-radius: 12px; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(10px);
-        }
-        .logo-area h1 { font-size: 1.6rem; text-shadow: 0 0 10px rgba(188, 19, 254, 0.6); letter-spacing: 2px; margin: 0;}
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .status { color: var(--neon-green); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(0, 255, 157, 0.2); padding: 4px 10px; border-radius: 20px; background: rgba(0, 255, 157, 0.05);}
-        .status-dot { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; animation: pulse 1.5s infinite; }
-        
-        .btn-save { background: linear-gradient(135deg, var(--neon-green), #00cc7d); color: #000; border: none; padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
-        .btn-save:hover { box-shadow: 0 0 15px rgba(0, 255, 157, 0.4); transform: translateY(-1px); }
-        .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
-        .btn-logout:hover { background: rgba(255, 0, 60, 0.1); }
+    .container { 
+        width: 100%; 
+        max-width: 420px; 
+        background: linear-gradient(145deg, #12121a, #08080c);
+        border: 1px solid rgba(188, 19, 254, 0.2); 
+        border-radius: 12px; 
+        padding: 25px; 
+        box-shadow: 0 10px 40px rgba(0,0,0,0.6); 
+        position: relative;
+        overflow: hidden;
+    }
 
-        /* --- DASHBOARD FINANCIERO --- */
-        .dashboard-row {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 25px;
-        }
-        .kpi-card {
-            background: linear-gradient(145deg, #12121a, #08080c);
-            border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 12px; padding: 20px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: transform 0.2s;
-        }
-        .kpi-card:hover { transform: translateY(-3px); border-color: rgba(0, 242, 254, 0.4); }
-        .kpi-title { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
-        .kpi-value { font-size: 2.2rem; font-weight: bold; margin-top: 8px; }
-        .val-ingresos { color: var(--neon-blue); text-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
-        .val-costos { color: var(--neon-red); text-shadow: 0 0 10px rgba(255, 0, 60, 0.3); }
-        .val-ganancia { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 157, 0.3); }
+    /* Borde superior dinámico */
+    .top-glow {
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 3px;
+        background: var(--neon-blue);
+        box-shadow: 0 0 15px var(--neon-blue);
+    }
+    
+    /* --- HEADER --- */
+    .header { text-align: center; margin-bottom: 25px; }
+    .logo-text { font-size: 1.8rem; font-weight: 700; color: var(--text-main); letter-spacing: 3px; text-shadow: 0 0 10px rgba(188, 19, 254, 0.5); margin-bottom: 2px; }
+    .subtitle { color: var(--text-muted); font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- TABS NAVIGATION --- */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 10px; }
-        .tab-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 10px 20px; cursor: pointer; border-radius: 6px; font-weight: 700; font-size: 1rem; transition: 0.3s; }
-        .tab-btn:hover { color: var(--text-main); }
-        .tab-btn.active { color: var(--neon-purple); border: 1px solid var(--neon-purple); background: rgba(188, 19, 254, 0.08); box-shadow: 0 0 10px rgba(188, 19, 254, 0.2); }
-        
-        .tab-content { display: none; animation: fadeIn 0.4s ease; }
-        .tab-content.active { display: block; }
+    /* --- BALANCE PRINCIPAL (5 Seconds Rule) --- */
+    .balance-section { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
+    .balance-label { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 4px; }
+    .balance-amount { font-size: 3.5rem; font-weight: 700; line-height: 1; margin-bottom: 8px; transition: 0.3s; }
+    .balance-date { font-size: 1.05rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
+    
+    /* --- CLIENTE INFO --- */
+    .client-identity { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 12px 15px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+    .client-identity div { display: flex; flex-direction: column; }
+    .identity-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+    .identity-value { font-size: 1rem; font-weight: 700; color: var(--text-main); }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    /* --- SERVICIOS ACTIVOS --- */
+    .section-title { font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; color: var(--neon-purple); margin-bottom: 12px; font-weight: 700; border-left: 3px solid var(--neon-purple); padding-left: 8px; }
+    .service-list { margin-bottom: 20px; }
+    .service-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px dashed rgba(255, 255, 255, 0.05); font-size: 1.05rem; }
+    .service-item:last-child { border-bottom: none; }
+    .service-name { font-weight: 600; color: var(--text-main); }
+    .service-price { font-weight: 700; color: var(--text-muted); }
 
-        /* --- SECTIONS & PANELS --- */
-        .section-title { color: var(--neon-purple); font-size: 1.2rem; margin-bottom: 15px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 10px; }
-        .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        
-        .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #222; transition: .4s; border-radius: 24px; border: 1px solid rgba(255,255,255,0.2); }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: rgba(255, 0, 60, 0.2); border-color: var(--neon-red); }
-        input:checked + .slider:before { transform: translateX(20px); background-color: var(--neon-red); box-shadow: 0 0 8px var(--neon-red); }
+    /* --- DESGLOSE --- */
+    .breakdown-box { background: rgba(0,0,0,0.3); border-radius: 8px; padding: 15px; margin-bottom: 20px; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.05); }
+    .breakdown-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; }
+    .breakdown-line:last-child { margin-bottom: 0; }
+    .line-discount { color: var(--neon-green); }
+    .line-fee { color: var(--neon-red); }
 
-        .search-bar, .custom-select { width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.95rem; outline: none; transition: 0.3s; }
-        .search-bar:focus, .custom-select:focus { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(188, 19, 254, 0.3); }
+    /* --- MENSAJES Y ALERTAS --- */
+    .alert-box { border-radius: 8px; padding: 12px; font-size: 0.9rem; font-weight: 600; line-height: 1.4; margin-bottom: 20px; text-align: center; border: 1px solid; }
+    .alert-overdue { background: rgba(255, 0, 60, 0.1); border-color: rgba(255, 0, 60, 0.3); color: var(--neon-red); }
+    .alert-suspended { background: rgba(255, 0, 60, 0.15); border-color: var(--neon-red); color: var(--neon-red); font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 0 15px rgba(255, 0, 60, 0.2); }
+    
+    /* --- PROGRAMA LEALTAD --- */
+    .loyalty-box { background: #12121a; border-radius: 8px; padding: 15px; border: 1px solid rgba(0, 255, 157, 0.2); margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
+    .loyalty-icon { font-size: 1.8rem; line-height: 1; color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 157, 0.4); }
+    .loyalty-content { flex: 1; }
+    .loyalty-title { font-size: 0.85rem; color: var(--neon-green); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .loyalty-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.3; }
+    .loyalty-highlight { color: var(--text-main); font-weight: 700; }
 
-        /* Filtros Superiores */
-        .filters-row { display: flex; gap: 12px; margin-bottom: 15px; }
+    /* --- BOTONES --- */
+    .actions-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .btn { width: 100%; padding: 12px; border-radius: 6px; font-weight: 700; font-size: 1.05rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border: none; outline: none; text-transform: uppercase; letter-spacing: 1px; }
+    .btn:active { transform: translateY(2px); }
+    
+    .btn-primary { background: linear-gradient(135deg, var(--neon-green), #00cc7d); color: #000; }
+    .btn-primary:hover { box-shadow: 0 0 15px rgba(0, 255, 157, 0.4); }
 
-        /* Catálogo Compacto */
-        .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        .catalog-table th { color: var(--text-muted); font-weight: 600; text-align: left; padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .catalog-table td { padding: 8px 5px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
-        .catalog-table input[type="text"] { width: 100%; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 6px; border-radius: 4px; outline:none; }
-        .catalog-table input[type="text"]:focus { border-color: var(--neon-purple); }
-        .catalog-table input[type="number"] { width: 100%; max-width: 65px; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 6px; border-radius: 4px; text-align: center; outline:none; }
-        .inv-badge { background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; text-align: center; display: inline-block; width: 100%; }
-        .inv-ok { color: var(--neon-green); border: 1px solid rgba(0, 255, 157, 0.3); }
-        .inv-warn { color: var(--neon-yellow); border: 1px solid rgba(248, 232, 0, 0.3); }
-        .inv-full { color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
-        
-        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: 0.2s; border-radius: 4px; }
-        .btn-icon:hover { color: var(--text-main); background: rgba(255,255,255,0.1); transform: scale(1.1); }
-        .btn-icon.danger:hover { color: var(--neon-red); background: rgba(255,0,60,0.1); }
-        .btn-icon.info:hover { color: var(--neon-blue); background: rgba(0,242,254,0.1); }
-        
-        .btn-add-service { background: rgba(188, 19, 254, 0.05); color: var(--neon-purple); border: 1px dashed rgba(188, 19, 254, 0.5); width: 100%; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: bold; margin-top: 15px; transition: 0.3s; }
-        .btn-add-service:hover { background: rgba(188, 19, 254, 0.15); border-style: solid; }
+    .btn-secondary { background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-secondary:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
 
-        /* --- CLIENT CARD (ACORDEÓN) --- */
-        .client-card { background: linear-gradient(145deg, #12121a, #0a0a0f); border-left: 4px solid var(--neon-green); padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; }
-        .client-card:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
-        
-        .card-header-main { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-        .client-info-basic h3 { color: inherit; font-size: 1.1rem; margin-bottom: 2px; }
-        .client-status-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; text-transform: uppercase; border: 1px solid; }
-        
-        .client-details-toggle { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 15px; }
-        
-        /* Contenedor colapsable */
-        .client-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); animation: fadeIn 0.3s ease; }
+    .btn-paid { background: rgba(0, 255, 157, 0.05); color: var(--neon-green); border: 1px dashed var(--neon-green); cursor: default; }
+    .btn-paid:active { transform: none; }
 
-        .client-services-list { background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
-        .client-service-tag { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--text-main); margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .client-service-tag:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        
-        /* Inputs de Credenciales */
-        .cred-inputs { display: flex; gap: 8px; width: 100%; }
-        .cred-inputs input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; outline: none; transition: 0.3s; min-width: 0; }
-        .cred-inputs input:focus { border-color: var(--neon-blue); }
-        .cred-inputs input:disabled { background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.3); border-color: transparent; cursor: not-allowed; }
+    .footer { text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
 
-        .client-service-add-row { display: flex; gap: 8px; margin-top: 10px; }
-        .client-service-add-row select { flex: 1; background: #12121a; border: 1px solid rgba(0,242,254,0.4); color: #fff; font-size: 0.85rem; padding: 6px; border-radius: 4px; outline:none;}
-        
-        .card-actions-row { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 15px; flex-wrap: wrap; gap: 10px; }
-        
-        .loyalty-control { display: flex; align-items: center; gap: 8px; background: #1a1a24; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
-        .loyalty-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); width: 24px; height: 24px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition:0.2s; }
-        .loyalty-btn:hover { background: rgba(255,255,255,0.15); }
-        
-        .btn-copy { background: rgba(188, 19, 254, 0.1); border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; transition: 0.3s; }
-        .btn-copy:hover { background: rgba(188, 19, 254, 0.2); box-shadow: 0 0 10px rgba(188, 19, 254, 0.3); }
-        
-        .status-select { background:#12121a; color:#fff; border: 1px solid var(--text-muted); border-radius: 4px; font-size: 0.85rem; padding: 6px; outline:none; }
-        .status-pagado { border-color: var(--neon-green); color: var(--neon-green); }
-        .status-suspendido { border-color: var(--neon-red); color: var(--neon-red); }
-        .status-pendiente { border-color: var(--neon-blue); color: var(--neon-blue); }
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--neon-purple); color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 0.95rem; font-weight: 700; display: none; box-shadow: 0 0 15px rgba(188, 19, 254, 0.5); z-index: 1000; animation: fadeIn 0.3s ease; }
 
-        @media (max-width: 768px) {
-            header { flex-wrap: wrap; flex-direction: column; gap: 15px; align-items: flex-start; }
-            .header-actions { width: 100%; justify-content: space-between; }
-            .dashboard-row { grid-template-columns: 1fr; gap: 15px; }
-            .filters-row { flex-direction: column; }
-            .catalog-table th, .catalog-table td { font-size: 0.75rem; padding: 5px 2px; }
-            .client-card { padding: 12px; }
-            .cred-inputs { flex-direction: column; gap: 4px; }
-        }
+    @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+    @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.6); } 70% { box-shadow: 0 0 0 6px rgba(0, 242, 254, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); } }
 
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(0, 255, 157, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 157, 0); } }
-    </style>
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  </style>
 </head>
 <body>
 
-    <header>
-        <div class="logo-area"><h1>GOXION // ADMIN</h1></div>
-        <div class="status"><div class="status-dot"></div> ONLINE</div>
-        <div class="header-actions">
-            <button class="btn-save" onclick="prepararYGuardar()">Guardar Cambios</button>
-            <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
-        </div>
-    </header>
+<div class="container" id="app">
+  <div style="text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 1.1rem; font-weight: 600;">
+    Sincronizando con Goxion...
+  </div>
+</div>
 
-    <!-- DASHBOARD FINANCIERO SUPERIOR -->
-    <div class="dashboard-row">
-        <div class="kpi-card">
-            <div class="kpi-title">Ingresos Brutos</div>
-            <div class="kpi-value val-ingresos" id="kpi-ingresos">$0.00</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Inversión (Costos)</div>
-            <div class="kpi-value val-costos" id="kpi-costos">$0.00</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Ganancia Neta</div>
-            <div class="kpi-value val-ganancia" id="kpi-ganancias">$0.00</div>
-        </div>
-    </div>
+<div class="toast" id="toast">📋 ¡Datos copiados al portapapeles!</div>
 
-    <!-- TABS DE NAVEGACIÓN -->
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tab-clientes', this)">Gestión de Clientes</button>
-        <button class="tab-btn" onclick="switchTab('tab-inventario', this)">Catálogo & Alertas</button>
-    </div>
+<script>
+  const TELEFONO_GOXION = "528136836901"; 
+  const CLABE_PAGO = "638180000167909381";
+  const BANCO_PAGO = "NU BANCO";
+  const TITULAR_PAGO = "Henry González";
 
-    <!-- CONTENIDO TABS -->
-    <div id="tab-clientes" class="tab-content active">
-        <div class="panel">
-            <h2 class="section-title">Cuentas Activas</h2>
-            
-            <!-- FILTROS -->
-            <div class="filters-row">
-                <select id="filter-status" class="custom-select" onchange="filtrarClientes()">
-                    <option value="all">Todos los estados</option>
-                    <option value="pendiente">Pendientes</option>
-                    <option value="pagado">Pagados</option>
-                    <option value="suspendido">Suspendidos</option>
-                </select>
-                <select id="sort-by" class="custom-select" onchange="filtrarClientes()">
-                    <option value="name">Ordenar por Nombre (A-Z)</option>
-                    <option value="date">Ordenar por Día de Cobro</option>
-                    <option value="loyalty">Los más leales primero</option>
-                </select>
+  async function cargarEstadoCuenta() {
+    const params = new URLSearchParams(window.location.search);
+    const clienteKey = params.get('cliente')?.toLowerCase().trim();
+    const app = document.getElementById('app');
+
+    if (!clienteKey) {
+      app.innerHTML = `<div style="text-align:center; color: var(--neon-red); font-weight:700;">⚠️ ENLACE INCOMPLETO. FALTAN DATOS DEL CLIENTE.</div>`;
+      return;
+    }
+
+    try {
+      const response = await fetch('clientes.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error("No se pudo conectar");
+      
+      const data = await response.json();
+      const cliente = data[clienteKey];
+
+      if (!cliente) {
+        app.innerHTML = `<div style="text-align:center; color: var(--neon-red); font-weight:700;">❌ EL CLIENTE "${clienteKey}" NO EXISTE EN LA BASE DE DATOS.</div>`;
+        return;
+      }
+
+      // 1. Fechas y Periodo
+      const hoy = new Date();
+      const diaHoy = hoy.getDate();
+      const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const mesActual = meses[hoy.getMonth()];
+      
+      const diaPago = cliente.dia_pago || 15;
+      const difDias = diaPago - diaHoy; 
+      
+      let rachaOriginal = cliente.pagos_puntuales || 0;
+      let racha = rachaOriginal;
+      let perdioRacha = false;
+
+      if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) {
+          racha = 0;
+          perdioRacha = true;
+      }
+
+      // 2. Subtotal de Servicios
+      let subtotal = 0;
+      let serviciosHTML = '';
+      if (cliente.servicios && cliente.servicios.length > 0) {
+        cliente.servicios.forEach(s => {
+          subtotal += s.monto;
+          serviciosHTML += `
+            <div class="service-item">
+              <span class="service-name">${s.nombre}</span>
+              <span class="service-price">$${s.monto}</span>
             </div>
-            
-            <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o folio..." oninput="filtrarClientes()">
-            
-            <div id="clients-container">
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con la base de datos...</p>
+          `;
+        });
+      }
+
+      // 3. Variables de Estado Visual (La regla de 5 segundos)
+      let uiColor = "var(--neon-blue)";
+      let shadowColor = "rgba(0, 242, 254, 0.4)";
+      let dateText = `${diaPago} de ${mesActual}`;
+      let statusDotColor = "var(--neon-blue)";
+      
+      let pctMoraDiaria = 0, montoMora = 0, montoBajaAdmin = 0, diasAtraso = 0;
+      let alertaHTML = "";
+
+      if (cliente.estado === 'pagado') {
+          uiColor = "var(--neon-green)";
+          shadowColor = "rgba(0, 255, 157, 0.4)";
+          statusDotColor = "var(--neon-green)";
+          dateText = `Al corriente este mes`;
+      } else if (cliente.estado === 'suspendido') {
+          uiColor = "var(--neon-red)";
+          shadowColor = "rgba(255, 0, 60, 0.4)";
+          statusDotColor = "var(--neon-red)";
+          dateText = `Servicio Suspendido`;
+          alertaHTML = `<div class="alert-box alert-suspended">⛔ CUENTA SUSPENDIDA</div>`;
+          diasAtraso = Math.abs(difDias); // Asumimos cálculo de mora si sigue suspendido
+      } else if (difDias < 0) {
+          uiColor = "var(--neon-red)";
+          shadowColor = "rgba(255, 0, 60, 0.4)";
+          statusDotColor = "var(--neon-red)";
+          diasAtraso = Math.abs(difDias);
+          dateText = `Vencido hace ${diasAtraso} día(s)`;
+      } else if (difDias === 0) {
+          uiColor = "var(--neon-yellow)";
+          shadowColor = "rgba(248, 232, 0, 0.4)";
+          statusDotColor = "var(--neon-yellow)";
+          dateText = `Vence HOY`;
+      } else {
+          // Pendiente normal
+          dateText = `Vence el ${diaPago} de ${mesActual}`;
+      }
+
+      // Lógica de Mora
+      if (cliente.estado !== 'pagado' && diasAtraso > 0) {
+          let pctMoraCalculado = diasAtraso * 0.05;
+          pctMoraDiaria = Math.min(pctMoraCalculado, 0.50);
+          montoMora = Math.round(subtotal * pctMoraDiaria);
+          let acumMoraTotal = subtotal + montoMora;
+
+          if (diasAtraso > 15 || cliente.estado === 'suspendido') {
+              montoBajaAdmin = Math.round(acumMoraTotal * 0.20);
+          }
+
+          if (cliente.estado !== 'suspendido') {
+              alertaHTML = `
+                <div class="alert-box alert-overdue">
+                  ⚠️ <strong>Pago Atrasado.</strong><br>
+                  Se aplica recargo automático del 5% diario (+${Math.round(pctMoraDiaria * 100)}% acum.).
+                  ${diasAtraso > 15 ? `<br><span style="color:var(--text-main);">Se sumó cargo de reactivación.</span>` : ''}
+                </div>
+              `;
+          }
+      }
+
+      // 4. Fidelidad
+      let pctDescuento = 0;
+      let mensajeLealtad = '';
+
+      if (racha >= 9) {
+        pctDescuento = 0.06;
+        mensajeLealtad = `Nivel 2 activo: <span class="loyalty-highlight">6% de descuento</span> aplicado.`;
+      } else if (racha >= 4) {
+        pctDescuento = 0.03;
+        mensajeLealtad = `Nivel 1 activo: <span class="loyalty-highlight">3% OFF</span>. Faltan ${9 - racha} pagos para Nivel 2.`;
+      } else {
+        pctDescuento = 0;
+        mensajeLealtad = perdioRacha 
+          ? `<span style="color:var(--neon-red);">💔 Racha reiniciada por atraso.</span>` 
+          : `Progreso: <span class="loyalty-highlight">${racha}/4 pagos</span> para Nivel 1.`;
+      }
+
+      // 5. Totales
+      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
+      let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
+      
+      let labelTotal = "Total a Pagar";
+      let btnAccionHTML = `<button class="btn btn-primary" onclick="copiarDatos('${totalFinal}')">Copiar Datos de Pago</button>`;
+      
+      if (cliente.estado === 'pagado') {
+          totalFinal = 0;
+          labelTotal = "Saldo Pendiente";
+          btnAccionHTML = `<button class="btn btn-paid" onclick="return false;">✅ MENSUALIDAD PAGADA</button>`;
+      }
+
+      // Desglose si hay cambios
+      let breakdownHTML = '';
+      if (cliente.estado !== 'pagado' && (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+          breakdownHTML = `
+            <div class="breakdown-box">
+              <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
+              ${ahorro > 0 ? `<div class="breakdown-line line-discount"><span>Descuento Lealtad</span><span>-$${ahorro}</span></div>` : ''}
+              ${montoMora > 0 ? `<div class="breakdown-line line-fee"><span>Recargo Mora</span><span>+$${montoMora}</span></div>` : ''}
+              ${montoBajaAdmin > 0 ? `<div class="breakdown-line line-fee"><span>Reactivación</span><span>+$${montoBajaAdmin}</span></div>` : ''}
+            </div>
+          `;
+      }
+
+      const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi cuenta.\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
+      const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
+
+      // Inyección de UI
+      app.innerHTML = `
+        <div class="top-glow" style="background: ${uiColor}; box-shadow: 0 0 15px ${shadowColor};"></div>
+        
+        <div class="header">
+          <div class="logo-text">GOXION</div>
+          <div class="subtitle">Resumen de Cuenta</div>
+        </div>
+
+        <div class="balance-section">
+          <div class="balance-label">${labelTotal}</div>
+          <div class="balance-amount" style="color: ${uiColor}; text-shadow: 0 0 15px ${shadowColor};">
+            $${totalFinal.toFixed(2)}
+          </div>
+          <div class="balance-date" style="color: ${uiColor}; border-color: ${uiColor}40;">
+            <div class="status-dot" style="background: ${statusDotColor}; box-shadow: 0 0 0 0 ${statusDotColor}80; animation: pulse-dot 1.5s infinite;"></div>
+            ${dateText}
+          </div>
+        </div>
+
+        ${alertaHTML}
+
+        <div class="client-identity">
+            <div>
+                <span class="identity-label">Cliente</span>
+                <span class="identity-value">${cliente.nombre}</span>
+            </div>
+            <div style="text-align: right;">
+                <span class="identity-label">Folio</span>
+                <span class="identity-value" style="color: var(--neon-purple);">${cliente.folio}</span>
             </div>
         </div>
-    </div>
 
-    <div id="tab-inventario" class="tab-content">
-        <!-- ALERTAS -->
-        <div class="panel">
-            <h2 class="section-title">Alertas Globales</h2>
-            <div class="switch-row">
-                <span style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">Activar Alerta Técnica en Portal de Clientes</span>
-                <label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label>
-            </div>
-            <div id="alert-settings" style="opacity: 0.5; pointer-events: none; transition: 0.3s;">
-                <select id="alert-platform" class="custom-select"></select>
-                <select id="alert-type" class="custom-select">
-                    <option value="presentando intermitencias temporales">Intermitencias temporales</option>
-                    <option value="en mantenimiento programado">Mantenimiento programado</option>
-                    <option value="experimentando una caída global">Caída global</option>
-                    <option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option>
-                </select>
-                <textarea id="global-msg" style="width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.9rem; outline:none; resize: vertical; min-height: 80px;" placeholder="Mensaje adicional para los clientes (Opcional)..."></textarea>
-            </div>
+        <div class="section-title">Servicios Activos</div>
+        <div class="service-list">
+          ${serviciosHTML}
         </div>
 
-        <!-- PRECIOS Y SERVICIOS GLOBALES -->
-        <div class="panel">
-            <h2 class="section-title">Catálogo & Inventario</h2>
-            <div style="overflow-x: auto;">
-                <table class="catalog-table">
-                    <thead>
-                        <tr>
-                            <th>Servicio</th>
-                            <th title="Cuentas Activas Contratadas">Ctas</th>
-                            <th title="Precio de Venta">Venta</th>
-                            <th title="Tu Costo Mensual">Costo</th>
-                            <th title="Límite Máximo de Perfiles por Cuenta">Lím.</th>
-                            <th title="Perfiles Disponibles">Disp.</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="global-services-container">
-                        <!-- Servicios inyectados aquí -->
-                    </tbody>
-                </table>
-            </div>
-            <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio al Catálogo</button>
+        ${breakdownHTML}
+
+        <div class="loyalty-box">
+          <div class="loyalty-icon">⭐</div>
+          <div class="loyalty-content">
+            <div class="loyalty-title">Programa Goxion</div>
+            <div class="loyalty-desc">${mensajeLealtad}</div>
+          </div>
         </div>
-    </div>
 
-    <script>
-    const CONFIG = { username: "henrygonzalezestrada-cyber", repo: "goxion", path: "clientes.json", branch: "main" };
-    let currentToken = localStorage.getItem("GOXION_PAT") || "";
-    let currentFileData = null; 
-    let clientesDict = {}; 
-    let configGlobal = { alertas: {}, serviciosGlobales: [] };
-    let inventarioActivo = {};
+        <div class="actions-group">
+          ${btnAccionHTML}
+          <a href="${urlWA}" target="_blank" class="btn btn-secondary">Contactar Soporte</a>
+        </div>
 
-    const DEFAULT_SERVICES = [
-        {nombre: "Netflix Premium", cuentas: 1, precio: 109, costo: 369, limite: 4},
-        {nombre: "Disney+ Premium", cuentas: 2, precio: 89, costo: 340, limite: 10},
-        {nombre: "Max Standard", cuentas: 2, precio: 79, costo: 358, limite: 8},
-        {nombre: "Prime Video", cuentas: 1, precio: 39, costo: 7, limite: 5},
-        {nombre: "YouTube Premium", cuentas: 2, precio: 89, costo: 242, limite: 10},
-        {nombre: "Vix Premium", cuentas: 1, precio: 49, costo: 74.5, limite: 4},
-        {nombre: "Crunchyroll", cuentas: 1, precio: 45, costo: 39, limite: 5},
-        {nombre: "Microsoft 365", cuentas: 1, precio: 79, costo: 119, limite: 5},
-        {nombre: "Google One 2TB", cuentas: 1, precio: 29, costo: 77, limite: 5}
-    ];
+        <div class="footer">
+          Conectando tu entretenimiento.<br>
+          <span style="color: var(--neon-purple);">Goxion © ${hoy.getFullYear()}</span>
+        </div>
+      `;
 
-    document.addEventListener("DOMContentLoaded", () => {
-        if (!currentToken) pedirToken();
-        else inicializarPanel();
+    } catch (e) {
+      app.innerHTML = `<div style="text-align:center; color: var(--neon-red); font-weight:700;">⚠️ ERROR AL CARGAR EL ESTADO DE CUENTA.</div>`;
+    }
+  }
+
+  function copiarDatos(monto) {
+    const texto = `GOXION - Datos de Transferencia\n\nBanco: ${BANCO_PAGO}\nTitular: ${TITULAR_PAGO}\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
+    navigator.clipboard.writeText(texto).then(() => {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
     });
+  }
 
-    // Control de Tabs
-    function switchTab(tabId, btn) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        btn.classList.add('active');
-    }
+  cargarEstadoCuenta();
+</script>
 
-    // Toggle Acordeón de Cliente
-    function toggleClientDetails(key) {
-        const details = document.getElementById(`details-${key}`);
-        const text = document.getElementById(`toggle-text-${key}`);
-        if (details.style.display === "none" || !details.style.display) {
-            details.style.display = "block";
-            text.innerHTML = "Ocultar detalles ▴";
-        } else {
-            details.style.display = "none";
-            text.innerHTML = "Ver detalles ▾";
-        }
-    }
-
-    function pedirToken() {
-        const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token:");
-        if (userToken && userToken.trim() !== "") {
-            currentToken = userToken.trim(); localStorage.setItem("GOXION_PAT", currentToken); inicializarPanel();
-        } else { alert("Acceso denegado."); }
-    }
-
-    function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
-
-    async function inicializarPanel() {
-        const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
-        try {
-            const response = await fetch(url, { headers: { "Authorization": `token ${currentToken}`, "Accept": "application/vnd.github.v3+json" }, cache: "no-store" });
-            if (response.status === 401) return cerrarSesion();
-
-            const data = await response.json();
-            const contentDecoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
-            const jsonCompleto = JSON.parse(contentDecoded);
-            currentFileData = { sha: data.sha };
-
-            if (jsonCompleto._goxion_config) {
-                configGlobal = jsonCompleto._goxion_config;
-                if (!configGlobal.serviciosGlobales) configGlobal.serviciosGlobales = DEFAULT_SERVICES;
-                
-                configGlobal.serviciosGlobales.forEach(sg => {
-                    if(sg.cuentas === undefined) sg.cuentas = 1;
-                    if(sg.costo === undefined) sg.costo = 0;
-                    if(sg.limite === undefined) sg.limite = 5;
-                });
-                delete jsonCompleto._goxion_config; 
-            } else {
-                configGlobal.serviciosGlobales = DEFAULT_SERVICES;
-            }
-
-            clientesDict = jsonCompleto;
-
-            Object.keys(clientesDict).forEach(k => {
-                if(!clientesDict[k].dia_pago) clientesDict[k].dia_pago = 15;
-                if(!clientesDict[k].estado) clientesDict[k].estado = "pendiente";
-            });
-
-            document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
-            document.getElementById("alert-type").value = configGlobal.alertas?.falla || "presentando intermitencias temporales";
-            document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
-            toggleAlertFields();
-
-            calcularInventarioYFinanzas();
-            renderGlobalServicesUI();
-            filtrarClientes();
-        } catch (error) {
-            document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red);">Error al conectar con la base de datos.</p>`;
-        }
-    }
-
-    function calcularInventarioYFinanzas() {
-        inventarioActivo = {};
-        let ingresosTotales = 0;
-        let costosTotales = 0;
-
-        configGlobal.serviciosGlobales.forEach(s => { 
-            inventarioActivo[s.nombre] = 0; 
-            costosTotales += parseFloat(s.costo || 0) * parseInt(s.cuentas || 1);
-        });
-
-        Object.values(clientesDict).forEach(cliente => {
-            if (cliente.estado !== 'suspendido' && cliente.servicios) {
-                cliente.servicios.forEach(s => {
-                    ingresosTotales += parseFloat(s.monto || 0);
-                    let baseNameMatch = configGlobal.serviciosGlobales.find(g => s.nombre.includes(g.nombre));
-                    if(baseNameMatch) inventarioActivo[baseNameMatch.nombre]++;
-                });
-            }
-        });
-
-        let gananciaNeta = ingresosTotales - costosTotales;
-        document.getElementById("kpi-ingresos").innerText = `$${ingresosTotales.toFixed(2)}`;
-        document.getElementById("kpi-costos").innerText = `$${costosTotales.toFixed(2)}`;
-        document.getElementById("kpi-ganancias").innerText = `$${gananciaNeta.toFixed(2)}`;
-    }
-
-    function renderGlobalServicesUI() {
-        const container = document.getElementById("global-services-container");
-        const alertSelect = document.getElementById("alert-platform");
-        
-        container.innerHTML = "";
-        alertSelect.innerHTML = `<option value="Todos los servicios">Todos los servicios</option>`;
-
-        configGlobal.serviciosGlobales.forEach((srv, index) => {
-            let vendidos = inventarioActivo[srv.nombre] || 0;
-            let cuentasMultiplicador = parseInt(srv.cuentas || 1);
-            let limiteIndividual = parseInt(srv.limite || 0);
-            
-            let capacidadTotal = cuentasMultiplicador * limiteIndividual;
-            let disponibles = capacidadTotal - vendidos;
-            
-            let badgeClass = "inv-ok";
-            if (disponibles <= 1) badgeClass = "inv-warn";
-            if (disponibles <= 0) badgeClass = "inv-full";
-
-            container.innerHTML += `
-                <tr>
-                    <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)"></td>
-                    <td><input type="number" style="color:var(--neon-green);" value="${cuentasMultiplicador}" onchange="updateGlobalService(${index}, 'cuentas', this.value)" title="Cuentas Madres Activas"></td>
-                    <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)"></td>
-                    <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)"></td>
-                    <td><input type="number" style="color:#fff;" value="${limiteIndividual}" onchange="updateGlobalService(${index}, 'limite', this.value)"></td>
-                    <td><span class="inv-badge ${badgeClass}">${disponibles}</span></td>
-                    <td style="display:flex; gap:8px; align-items:center; justify-content: center; padding-top:10px;">
-                        <button class="btn-icon info" onclick="sincronizarPrecioMasivo(${index})" title="Empujar precio a clientes">📡</button>
-                        <button class="btn-icon danger" onclick="removeGlobalService(${index})" title="Eliminar">✖</button>
-                    </td>
-                </tr>
-            `;
-            let selected = (configGlobal.alertas?.plataforma === srv.nombre) ? "selected" : "";
-            alertSelect.innerHTML += `<option value="${srv.nombre}" ${selected}>${srv.nombre}</option>`;
-        });
-    }
-
-    function updateGlobalService(index, field, value) {
-        if (field !== 'nombre') value = parseFloat(value) || 0;
-        configGlobal.serviciosGlobales[index][field] = value;
-        calcularInventarioYFinanzas();
-        renderGlobalServicesUI(); 
-        if (field === 'nombre') renderizarClientes(clientesDict); 
-    }
-
-    function addGlobalService() {
-        configGlobal.serviciosGlobales.push({nombre: "Nuevo", cuentas: 1, precio: 0, costo: 0, limite: 5});
-        calcularInventarioYFinanzas();
-        renderGlobalServicesUI();
-        filtrarClientes();
-    }
-
-    function removeGlobalService(index) {
-        if(confirm("¿Eliminar este servicio del catálogo base?")) {
-            configGlobal.serviciosGlobales.splice(index, 1);
-            calcularInventarioYFinanzas();
-            renderGlobalServicesUI();
-            filtrarClientes();
-        }
-    }
-
-    function sincronizarPrecioMasivo(index) {
-        const srv = configGlobal.serviciosGlobales[index];
-        if (!confirm(`¿Aplicar precio ($${srv.precio}) a TODOS los clientes con "${srv.nombre}"?`)) return;
-        let actualizados = 0;
-        Object.keys(clientesDict).forEach(key => {
-            let c = clientesDict[key];
-            if (c.servicios) {
-                c.servicios.forEach(s => { if (s.nombre === srv.nombre) { s.monto = srv.precio; actualizados++; } });
-            }
-        });
-        if (actualizados > 0) { calcularInventarioYFinanzas(); filtrarClientes(); alert(`¡Éxito! Precio actualizado.`); }
-    }
-
-    function toggleAlertFields() {
-        const isActive = document.getElementById("alert-active").checked;
-        const settingsDiv = document.getElementById("alert-settings");
-        settingsDiv.style.opacity = isActive ? "1" : "0.5";
-        settingsDiv.style.pointerEvents = isActive ? "auto" : "none";
-    }
-
-    function filtrarClientes() {
-        const query = document.getElementById("search-input").value.toLowerCase();
-        const statusFilter = document.getElementById("filter-status").value;
-        const sortBy = document.getElementById("sort-by").value;
-
-        let filtradosArr = Object.keys(clientesDict).map(key => ({ key, ...clientesDict[key] }));
-
-        filtradosArr = filtradosArr.filter(c => {
-            const matchText = c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query);
-            const matchStatus = statusFilter === 'all' || c.estado === statusFilter;
-            return matchText && matchStatus;
-        });
-
-        if (sortBy === 'name') {
-            filtradosArr.sort((a, b) => a.nombre.localeCompare(b.nombre));
-        } else if (sortBy === 'date') {
-            filtradosArr.sort((a, b) => (a.dia_pago || 15) - (b.dia_pago || 15));
-        } else if (sortBy === 'loyalty') {
-            filtradosArr.sort((a, b) => (b.pagos_puntuales || 0) - (a.pagos_puntuales || 0));
-        }
-
-        const filtradosDict = {};
-        filtradosArr.forEach(c => {
-            const { key, ...rest } = c;
-            filtradosDict[key] = rest;
-        });
-        
-        renderizarClientes(filtradosDict);
-    }
-
-    // --- LÓGICA DE DETECCIÓN INTELIGENTE DE CREDENCIALES ---
-    function esServicioPorInvitacion(nombreServicio) {
-        const plataformasInvitacion = ['youtube', 'microsoft', 'google', 'apple', 'spotify', 'one 2tb', '365'];
-        const nombreMin = nombreServicio.toLowerCase();
-        return plataformasInvitacion.some(plat => nombreMin.includes(plat));
-    }
-
-    function renderizarClientes(diccionario) {
-        const container = document.getElementById("clients-container");
-        container.innerHTML = "";
-        const keys = Object.keys(diccionario);
-
-        if (keys.length === 0) {
-            container.innerHTML = `<p style="color: var(--text-muted); text-align: center; margin-top: 20px;">No se encontraron clientes que coincidan con la búsqueda.</p>`;
-            return;
-        }
-
-        const globalOptions = configGlobal.serviciosGlobales.map(s => `<option value="${s.nombre}|${s.precio}">${s.nombre} ($${s.precio})</option>`).join("");
-
-        keys.forEach(key => {
-            const cliente = diccionario[key];
-            let subtotal = 0;
-            let clientServicesHTML = "";
-            
-            if(cliente.servicios && cliente.servicios.length > 0) {
-                cliente.servicios.forEach((s, sIdx) => {
-                    subtotal += s.monto;
-                    
-                    // Comprobación Inteligente
-                    const esInvitacion = esServicioPorInvitacion(s.nombre);
-                    const lockStatus = esInvitacion ? 'disabled title="No aplica para este servicio"' : '';
-                    
-                    clientServicesHTML += `
-                        <div class="client-service-tag">
-                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
-                                <span style="font-weight: 600;">${s.nombre}</span>
-                                <span style="display:flex; align-items:center;">
-                                    <strong style="color:var(--neon-blue); margin-right: 8px;">$${s.monto}</strong>
-                                    <button class="btn-icon danger" style="font-size:0.8rem;" onclick="removeClientService('${key}', ${sIdx})" title="Quitar servicio">✖</button>
-                                </span>
-                            </div>
-                            <div class="cred-inputs">
-                                <input type="text" placeholder="${esInvitacion ? 'Correo Personal (Invitación)' : 'Correo de Ingreso'}" value="${s.correo_login || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'correo_login', this.value)">
-                                <input type="text" placeholder="Perfil" value="${s.perfil_nombre || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_nombre', this.value)" ${lockStatus}>
-                                <input type="text" placeholder="PIN" value="${s.perfil_pin || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_pin', this.value)" ${lockStatus}>
-                            </div>
-                        </div>
-                    `;
-                });
-            } else { clientServicesHTML = `<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 10px 0;">Sin servicios activos asignados</div>`; }
-
-            let statusColor = cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)');
-            let statusBadge = cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE');
-
-            const card = document.createElement("div");
-            card.className = "client-card";
-            card.style.borderLeftColor = statusColor;
-            
-            card.innerHTML = `
-                <!-- Cabecera Siempre Visible -->
-                <div class="card-header-main" onclick="toggleClientDetails('${key}')">
-                    <div class="client-info-basic">
-                        <h3 style="color: ${statusColor};">[${cliente.folio}] ${cliente.nombre}</h3>
-                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
-                            <span class="client-status-badge" style="color: ${statusColor}; border-color: ${statusColor}40; background: ${statusColor}10;">${statusBadge}</span>
-                            <span style="color: var(--text-muted); font-size: 0.85rem;">Día: ${cliente.dia_pago || 15}</span>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color:var(--text-main); font-weight:bold; font-size:1.1rem; margin-bottom: 4px;">$${subtotal}</div>
-                        <div class="client-details-toggle"><span id="toggle-text-${key}">Ver detalles ▾</span></div>
-                    </div>
-                </div>
-
-                <!-- Detalles Colapsables -->
-                <div class="client-details" id="details-${key}">
-                    
-                    <div style="display:flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 120px;">
-                            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Día de Cobro</label>
-                            <input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" style="width: 100%; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:4px; padding:6px; outline:none;" onchange="updateClientData('${key}', 'dia_pago', this.value)">
-                        </div>
-                        <div style="flex: 2; min-width: 150px;">
-                            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Estado de la Cuenta</label>
-                            <select class="status-select status-${cliente.estado}" style="width: 100%;" onchange="updateClientData('${key}', 'estado', this.value)">
-                                <option value="pendiente" ${cliente.estado === 'pendiente' ? 'selected' : ''}>Pendiente (Deuda)</option>
-                                <option value="pagado" ${cliente.estado === 'pagado' ? 'selected' : ''}>Pagado (Al corriente)</option>
-                                <option value="suspendido" ${cliente.estado === 'suspendido' ? 'selected' : ''}>Suspendido (Corte)</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="client-services-list">
-                        ${clientServicesHTML}
-                        <div class="client-service-add-row">
-                            <select id="add-srv-sel-${key}">${globalOptions}</select>
-                            <button class="btn-save" style="padding:6px 12px; font-size: 1.1rem; line-height: 1;" onclick="addClientService('${key}')" title="Añadir">+</button>
-                        </div>
-                    </div>
-
-                    <div class="card-actions-row">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size:0.75rem; color:var(--text-muted); text-transform: uppercase;">Nivel de Lealtad (Pagos)</span>
-                            <div class="loyalty-control">
-                                <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
-                                <span id="pagos-${key}" style="font-weight: bold; width: 20px; text-align: center; color: var(--neon-green); font-size: 1rem;">${cliente.pagos_puntuales || 0}</span>
-                                <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
-                                <button class="btn-icon danger" style="margin-left: 8px; font-size: 1rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha a 0">🔄</button>
-                            </div>
-                        </div>
-                        <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Copiar Link del Cliente</button>
-                    </div>
-                </div>
-            `;
-            container.appendChild(card);
-        });
-    }
-
-    function updateClientData(key, field, value) {
-        if (field === 'dia_pago') value = parseInt(value) || 15;
-        clientesDict[key][field] = value;
-        calcularInventarioYFinanzas(); 
-        filtrarClientes(); 
-    }
-
-    function updateServiceCreds(key, serviceIndex, field, value) {
-        if (!clientesDict[key].servicios || !clientesDict[key].servicios[serviceIndex]) return;
-        clientesDict[key].servicios[serviceIndex][field] = value.trim();
-    }
-
-    function reiniciarLealtad(key) {
-        if(confirm('¿Reiniciar la racha de pagos puntuales a 0?')) {
-            clientesDict[key].pagos_puntuales = 0;
-            filtrarClientes();
-        }
-    }
-
-    function addClientService(key) {
-        const [nombre, precio] = document.getElementById(`add-srv-sel-${key}`).value.split('|');
-        if (!clientesDict[key].servicios) clientesDict[key].servicios = [];
-        clientesDict[key].servicios.push({ 
-            nombre: nombre, 
-            monto: parseFloat(precio),
-            correo_login: "",
-            perfil_nombre: "",
-            perfil_pin: ""
-        });
-        calcularInventarioYFinanzas();
-        renderGlobalServicesUI(); 
-        filtrarClientes(); 
-        // Abrimos automáticamente el detalle para que vea el nuevo servicio
-        const details = document.getElementById(`details-${key}`);
-        if(details) {
-            details.style.display = "block";
-            document.getElementById(`toggle-text-${key}`).innerHTML = "Ocultar detalles ▴";
-        }
-    }
-
-    function removeClientService(key, serviceIndex) {
-        clientesDict[key].servicios.splice(serviceIndex, 1);
-        calcularInventarioYFinanzas();
-        renderGlobalServicesUI(); 
-        filtrarClientes();
-    }
-
-    function updatePagos(key, delta) {
-        clientesDict[key].pagos_puntuales = Math.max(0, (clientesDict[key].pagos_puntuales || 0) + delta);
-        document.getElementById(`pagos-${key}`).innerText = clientesDict[key].pagos_puntuales;
-    }
-
-    function copiarInfo(nombre, key) {
-        const link = `https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`;
-        navigator.clipboard.writeText(`Hola ${nombre}, aquí tienes tu estado de cuenta actualizado:\n${link}`);
-        alert("¡Link copiado!");
-    }
-
-    async function prepararYGuardar() {
-        if (!currentFileData) return;
-        const btnSave = document.querySelector('.btn-save');
-        const originalText = btnSave.innerText;
-        btnSave.innerText = "Guardando...";
-
-        configGlobal.alertas = {
-            activa: document.getElementById("alert-active").checked,
-            plataforma: document.getElementById("alert-platform").value,
-            falla: document.getElementById("alert-type").value,
-            mensaje: document.getElementById("global-msg").value
-        };
-
-        const payload = {
-            message: "🤖 Admin Update: Credenciales guardadas",
-            content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
-            sha: currentFileData.sha, branch: CONFIG.branch
-        };
-
-        try {
-            const response = await fetch(`https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`, {
-                method: "PUT", headers: { "Authorization": `token ${currentToken}`, "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-            if (response.ok) {
-                currentFileData.sha = (await response.json()).content.sha;
-                alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE!");
-            } else alert("❌ Error al guardar en GitHub.");
-        } catch (e) {
-            console.error(e);
-        }
-        btnSave.innerText = originalText;
-    }
-    </script>
 </body>
 </html>
