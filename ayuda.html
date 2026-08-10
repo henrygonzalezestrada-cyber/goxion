@@ -536,7 +536,17 @@
 
         async function cargarDatosYVerificarSesion() {
             try {
-                const response = await fetch('clientes.json', { cache: 'no-store' });
+                // AQUÍ SE APLICA EL CACHE BUSTING
+                const version = new Date().getTime(); 
+                const response = await fetch(`clientes.json?v=${version}`, { 
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
                 globalClientesData = await response.json();
                 
                 cargarCatalogo(globalClientesData);
