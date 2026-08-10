@@ -1,832 +1,381 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GOXION // Ecosistema Central</title>
-    <!-- Tipografía unificada con el ecosistema Admin -->
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-black: #030305;
-            --card-glass: linear-gradient(145deg, #12121a, #08080c);
-            --text-main: #ffffff;
-            --text-muted: #8892b0;
-            --neon-blue: #00f2fe;
-            --neon-purple: #bc13fe;
-            --success-green: #00ff9d;
-            --danger-red: #ff003c;
-            --warning-amber: #f8e800;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOXION // Estado de Cuenta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #030305;
+      --card-bg: linear-gradient(145deg, #12121a, #08080c);
+      --text-main: #ffffff;
+      --text-muted: #8892b0;
+      --neon-blue: #00f2fe;
+      --neon-purple: #bc13fe;
+      --success-green: #00ff9d;
+      --warning-amber: #f8e800;
+      --danger-red: #ff003c;
+    }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
-        
-        body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow-x: hidden; }
-        body.no-scroll { overflow: hidden; height: 100vh; }
-
-        /* SPLASH SCREEN */
-        #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-black); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
-        }
-        .splash-content { animation: floatUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .splash-logo { max-width: 140px; filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.4)); }
-        @keyframes floatUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-        /* FONDO ANIMADO NEÓN (ÓRBITAS OPTIMIZADAS) */
-        .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); overflow: hidden; }
-        .neon-orbit { position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.9; }
-        .orbit-1 { width: 450px; height: 450px; top: -150px; left: -150px; border-bottom: 3px solid #b026ff; border-left: 3px solid rgba(176, 38, 255, 0.2); filter: drop-shadow(0 0 15px #b026ff) drop-shadow(0 0 30px #b026ff); animation: floatOrbit1 70s linear infinite; }
-        .orbit-2 { width: 550px; height: 550px; bottom: -200px; right: -200px; border-top: 3px solid #00f2fe; border-right: 3px solid rgba(0, 242, 254, 0.2); filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); animation: floatOrbit2 85s linear infinite; }
-        .orbit-3 { width: 380px; height: 380px; top: 60%; left: -100px; border-right: 2px solid #7c4dff; border-bottom: 2px solid rgba(124, 77, 255, 0.2); filter: drop-shadow(0 0 12px #7c4dff) drop-shadow(0 0 25px #7c4dff); animation: floatOrbit3 95s linear infinite; opacity: 0.6; }
-
-        @keyframes floatOrbit1 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); } 25% { transform: translate3d(80px, 40px, 0) rotate(90deg) scale(1.03); } 50% { transform: translate3d(220px, 130px, 0) rotate(180deg) scale(1.06); } 75% { transform: translate3d(140px, 190px, 0) rotate(270deg) scale(1.02); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(1); } }
-        @keyframes floatOrbit2 { 0% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.96); } 25% { transform: translate3d(40px, 60px, 0) rotate(270deg) scale(1); } 50% { transform: translate3d(100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(140px, 50px, 0) rotate(90deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.96); } }
-        @keyframes floatOrbit3 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.92); } 25% { transform: translate3d(-50px, 60px, 0) rotate(90deg) scale(0.97); } 50% { transform: translate3d(-100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(-40px, 170px, 0) rotate(270deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.92); } }
-
-        .container { width: 100%; max-width: 500px; position: relative; z-index: 1; padding-bottom: 80px; }
-
-        /* TOP BAR */
-        .glass-top-bar { position: fixed; top: 0; left: 0; width: 100%; background: rgba(8, 8, 12, 0.9); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-bottom: 1px solid rgba(0, 242, 254, 0.3); padding: 15px 20px; z-index: 1000; display: flex; align-items: center; justify-content: flex-start; opacity: 0; transform: translateY(-100%); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none; }
-        .glass-top-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .glass-top-name { font-size: 1.1rem; font-weight: 700; color: var(--text-main); letter-spacing: 1px;}
-        .glass-top-name span { color: var(--neon-blue); }
-
-        .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: 5px 0; position: relative; z-index: 10; }
-        .app-logo { max-height: 28px; width: auto; object-fit: contain; }
-        .header-action-btn { background: rgba(0, 242, 254, 0.05); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s; }
-        .header-action-btn:hover { background: rgba(0, 242, 254, 0.15); box-shadow: 0 0 15px rgba(0,242,254,0.3); }
-
-        .alert-banner { background: rgba(248, 232, 0, 0.1); border: 1px solid rgba(248, 232, 0, 0.4); border-radius: 12px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; }
-
-        /* ESTILO UNIFICADO DE TARJETAS (Más sobrio, menos "ruido") */
-        .glass-card, .tab-container, .btn-menu, .catalog-card, .smart-support-card, .modal-content, .floating-cart {
-            background: var(--card-glass);
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border-radius: 16px;
-        }
-
-        /* BANNER PESTAÑAS */
-        .tab-container { display: flex; padding: 4px; margin-bottom: 20px; position: relative; z-index: 110; }
-        .tab-btn { flex: 1; padding: 10px 4px; background: transparent; border: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; transition: all 0.3s ease; position: relative; overflow: hidden; letter-spacing: 0.5px; text-transform: uppercase;}
-        .tab-btn span { font-size: 1.2rem; }
-        .tab-btn.active { background: rgba(255, 255, 255, 0.05); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.15); }
-        .tab-btn::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: radial-gradient(circle, rgba(0, 242, 254, 0.3) 0%, rgba(124, 77, 255, 0) 70%); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out; opacity: 0; pointer-events: none; }
-        .tab-btn:active::after { width: 180px; height: 180px; opacity: 1; transition: 0s; }
-        
-        .view-section { display: none; animation: fadeIn 0.4s ease; }
-        .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .section-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--neon-purple); margin-bottom: 12px; font-weight: 700; border-left: 3px solid var(--neon-purple); padding-left: 8px; }
-
-        .input-smart { width: 100%; background: #030305; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 14px; border-radius: 8px; font-size: 0.95rem; margin-bottom: 15px; outline: none; transition: 0.3s; }
-        .input-smart:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
-        
-        .btn-primary { width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: 700; font-size: 1rem; cursor: pointer; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; transition: 0.3s; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-primary:hover { box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); transform: translateY(-2px); }
-
-        .glass-card { padding: 20px; margin-bottom: 25px; }
-        .login-card { text-align: center; border-color: rgba(0, 242, 254, 0.2); }
-        
-        /* DASHBOARD - REGLA DE LOS 5 SEGUNDOS */
-        .dash-greeting-box { text-align: center; margin: 10px 0 20px 0; }
-        .dash-greeting-box h1 { font-size: 1.8rem; font-weight: 800; color: var(--text-main); margin: 0; transition: opacity 0.5s ease; }
-        .dash-greeting-box h1 span { color: var(--neon-blue); }
-
-        .balance-section { text-align: center; margin-bottom: 25px; padding: 20px; background: rgba(0,0,0,0.4); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
-        .balance-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
-        .balance-amount { font-size: 3.2rem; font-weight: 800; line-height: 1; margin-bottom: 10px; transition: 0.3s; color: var(--neon-blue); text-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
-        .balance-date { font-size: 0.95rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 20px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; animation: pulse-dot 1.5s infinite; }
-
-        @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.6); } 70% { box-shadow: 0 0 0 6px rgba(0, 242, 254, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); } }
-
-        .loyalty-progress-bg { width: 100%; background: rgba(0,0,0,0.6); border-radius: 10px; height: 8px; margin: 12px 0; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05); }
-        .loyalty-progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        
-        .referral-card { border-color: rgba(124, 77, 255, 0.3); padding: 15px; }
-        .referral-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .referral-title { font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; text-transform: uppercase; letter-spacing: 1px;}
-        .referral-status-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 12px; font-weight: 700; background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border: 1px solid rgba(124, 77, 255, 0.4); }
-        
-        /* SERVICIOS ESTILO PILL LIMPIO */
-        .service-pill-container { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 12px; padding: 15px; transition: 0.2s; }
-        .service-pill-container:hover { border-color: rgba(0, 242, 254, 0.3); }
-        .service-pill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-        .service-pill-left { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1rem; }
-        .service-price { font-size: 0.95rem; color: var(--neon-blue); font-weight: 700; }
-        
-        .cred-box { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; padding-top: 10px; border-top: 1px dashed rgba(255,255,255,0.05); }
-        .cred-tag { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 6px 10px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; font-family: monospace;}
-        .cred-tag:hover { border-color: var(--neon-blue); color: #fff; background: rgba(0, 242, 254, 0.05); }
-        .cred-tag strong { color: var(--text-main); }
-
-        .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .btn-menu { padding: 15px 10px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.3s; border-color: rgba(124, 77, 255, 0.15); }
-        .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,242,254,0.15); }
-        .btn-menu span { font-size: 1.8rem; margin-bottom: 2px; }
-        .btn-menu div { font-weight: 600; font-size: 0.85rem; line-height: 1.2; text-transform: uppercase; letter-spacing: 0.5px;}
-
-        /* CATÁLOGO */
-        .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .catalog-card { padding: 18px 12px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s; border-color: rgba(0, 242, 254, 0.15); }
-        .catalog-card:hover { border-color: var(--neon-blue); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,242,254,0.15); }
-        .cat-icon { font-size: 2.2rem; margin-bottom: 8px; }
-        .cat-name { font-size: 1rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px; line-height: 1.1;}
-        .cat-price { font-size: 1.4rem; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
-        .cat-badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 8px; font-weight: 700; margin-bottom: 15px; }
-        .cat-badge.ok { background: rgba(0, 255, 157, 0.1); color: var(--success-green); border: 1px solid rgba(0, 255, 157, 0.3); }
-        .cat-badge.out { background: rgba(255, 0, 60, 0.1); color: var(--danger-red); border: 1px solid rgba(255, 0, 60, 0.3); }
-        
-        .qty-controls { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 6px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
-        .qty-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; width: 28px; height: 28px; border-radius: 6px; font-size: 1.2rem; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        .qty-btn:hover:not(:disabled) { background: var(--neon-blue); color: #000; }
-        .qty-val { font-weight: 700; font-size: 1.1rem; min-width: 20px; text-align: center; }
-
-        /* CARRITO FLOTANTE */
-        .floating-cart { position: fixed; bottom: 20px; left: 50%; width: 92%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-color: var(--neon-blue); padding: 15px 20px; opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 120px); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        .floating-cart.show { opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); }
-        .cart-info { display: flex; flex-direction: column; }
-        .cart-total { font-size: 1.2rem; font-weight: 800; color: var(--neon-blue); }
-        .cart-items { font-size: 0.85rem; color: var(--text-muted); font-weight: 600;}
-        .cart-btn { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(0,242,254,0.4); text-transform: uppercase; letter-spacing: 1px;}
-        .cart-btn:hover { box-shadow: 0 0 25px rgba(0,242,254,0.6); transform: translateY(-2px); }
-
-        /* SOPORTE */
-        .smart-support-card { border-color: rgba(124, 77, 255, 0.3); }
-        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .platform-btn { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 8px; padding: 12px 4px; text-align: center; cursor: pointer; font-size: 0.85rem; font-weight: 700; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 6px; transition: 0.2s; }
-        .platform-btn span { font-size: 1.6rem; }
-        .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.05); box-shadow: 0 0 15px rgba(0,242,254,0.15); }
-        .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
-        .step-box.active { display: block; }
-        .custom-select-smart { width: 100%; background: #030305; border: 1px solid var(--neon-purple); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; outline: none; margin-bottom: 12px; }
-        .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 14px; border-radius: 0 8px 8px 0; font-size: 0.9rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;}
-
-        /* MODALES */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
-        .modal.show { display: flex; opacity: 1; }
-        .modal-content { border: 1px solid var(--neon-purple); width: 100%; max-width: 450px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
-        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 1.5rem; font-weight: bold; cursor: pointer; transition: 0.2s;}
-        .close-btn:hover { color: var(--neon-red); }
-        .modal-title { color: #fff; margin-bottom: 15px; font-size: 1.2rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;}
-        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.85rem; }
-        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-        th { color: var(--neon-blue); font-weight: 700; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;}
-        .terms-list { list-style: none; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px; text-align: justify; line-height: 1.6; }
-        .terms-list li { margin-bottom: 16px; }
-        .terms-list strong { color: var(--neon-blue); display: block; margin-bottom: 2px; font-size: 0.9rem;}
-
-        .footer-info { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px dashed rgba(255,255,255,0.05); }
-    </style>
-</head>
-<body class="no-scroll">
-
-    <div id="splash-screen" onclick="hideSplash()">
-        <div class="splash-content">
-            <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
-        </div>
-    </div>
-
-    <div id="glass-header" class="glass-card glass-top-bar">
-        <div class="glass-top-name">Tu Espacio, <span id="glass-name-text">Cliente</span></div>
-    </div>
-
-    <div class="bg">
-        <div class="neon-orbit orbit-1"></div>
-        <div class="neon-orbit orbit-2"></div>
-        <div class="neon-orbit orbit-3"></div>
-    </div>
-
-    <div class="container">
-        
-        <header class="app-header">
-            <img src="logo2.PNG" alt="GOXION" class="app-logo">
-            <a href="https://wa.me/528136836901" target="_blank" class="header-action-btn">💬 Soporte Directo</a>
-        </header>
-
-        <div class="glass-card alert-banner" id="dynamic-alert">
-            <span style="font-size: 1.2rem;">⚠️</span><div style="font-size: 0.85rem; color: #fff; font-weight: 600;" id="alert-content"></div>
-        </div>
-
-        <div class="glass-card tab-container">
-            <button class="tab-btn active" id="btn-tab-cuenta" onclick="switchTab('cuenta')"><span>👤</span>Mi Espacio</button>
-            <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')"><span>🛒</span>Catálogo</button>
-            <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
-        </div>
-
-        <div id="view-cuenta" class="view-section active">
-            
-            <!-- VISTA DE LOGIN -->
-            <div id="auth-view">
-                <div class="glass-card login-card">
-                    <img src="Logo individual.png" style="width: 45px; margin-bottom: 15px;" onerror="this.style.display='none'">
-                    <div class="section-title" style="margin-bottom: 4px; font-size: 1rem; color: var(--text-main); border: none; padding:0;">Acceso a tu Panel</div>
-                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px; font-weight: 600;">Ingresa tus datos para ver tu estado de cuenta.</p>
-                    
-                    <input type="text" id="login-id" class="input-smart" placeholder="Tu Nombre o Folio (Ej. Juan Pérez)">
-                    <input type="password" id="login-pin" class="input-smart" placeholder="Código de Acceso (PIN)">
-                    
-                    <button class="btn-primary" onclick="iniciarSesion()">Ingresar</button>
-                    <p id="login-error" style="color: var(--danger-red); font-size: 0.85rem; font-weight: 700; margin-top: 15px; display: none;"></p>
-                </div>
-
-                <div class="section-title">Políticas y Beneficios</div>
-                <div class="policy-grid">
-                    <div class="glass-card btn-menu" onclick="openModal('modal-terminos')"><span>📄</span><div>Términos de Uso</div></div>
-                    <div class="glass-card btn-menu" onclick="openModal('modal-garantia')"><span>🛡️</span><div>Garantías</div></div>
-                    <div class="glass-card btn-menu" onclick="openModal('modal-lealtad')"><span>⭐</span><div>Lealtad</div></div>
-                    <div class="glass-card btn-menu" onclick="openModal('modal-referidos')"><span>🎁</span><div>Referidos</div></div>
-                </div>
-            </div>
-
-            <!-- VISTA DEL DASHBOARD (EL ESTADO DE CUENTA) -->
-            <div id="dashboard-view" style="display: none;">
-                
-                <div id="dash-greeting-container" class="dash-greeting-box">
-                    <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
-                </div>
-
-                <!-- SECCIÓN DE BALANCE GIGANTE (Regla de 5 segundos) -->
-                <div class="balance-section" id="balance-container">
-                    <div class="balance-label" id="balance-label">Total a Pagar</div>
-                    <div class="balance-amount" id="balance-amount">$0.00</div>
-                    <div class="balance-date" id="balance-date">
-                        <div class="status-dot" id="status-dot"></div>
-                        <span id="date-text">Cargando...</span>
-                    </div>
-                </div>
-
-                <div id="referral-section-container"></div>
-
-                <div class="glass-card dash-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-main);">⭐ Tu Progreso de Lealtad</div>
-                        <div style="font-size: 0.85rem; color: var(--neon-blue); font-weight: 700;" id="loyalty-count">0 Pagos</div>
-                    </div>
-                    <div class="loyalty-progress-bg">
-                        <div class="loyalty-progress-fill" id="loyalty-bar"></div>
-                    </div>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600; text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
-                </div>
-
-                <div class="section-title">Mis Servicios Activos</div>
-                <div id="dash-services" style="margin-bottom: 25px;"></div>
-
-                <button onclick="cerrarSesion()" style="background: transparent; border: none; color: var(--text-muted); font-size: 0.85rem; font-weight: 700; width: 100%; text-decoration: underline; cursor: pointer; padding: 10px; margin-top: 10px;">
-                    Cerrar Sesión de este dispositivo
-                </button>
-            </div>
-        </div>
-
-        <div id="view-catalogo" class="view-section">
-            <div class="section-title">Catálogo y Disponibilidad</div>
-            <div id="catalog-container" class="catalog-grid">
-                <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); text-align: center; grid-column: span 2;">Sincronizando inventario en vivo...</p>
-            </div>
-        </div>
-
-        <div id="view-soporte" class="view-section">
-            <div class="glass-card smart-support-card">
-                <div class="section-title" style="border:none; padding:0; margin-bottom: 15px;">Asistente de Soluciones</div>
-                <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma que presenta el problema:</p>
-                <div class="platform-grid" id="support-platforms-grid">
-                    <!-- SE LLENARÁ DINÁMICAMENTE -->
-                    <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando plataformas...</p>
-                </div>
-                <div id="step-2" class="step-box">
-                    <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
-                    <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
-                </div>
-                <div id="step-3" class="step-box">
-                    <div class="solution-instructions" id="solution-text"></div>
-                    <div id="extra-inputs-container">
-                        <p style="font-size: 0.85rem; color: var(--text-main); font-weight: 700; margin-bottom: 8px;" id="input-label">Dato requerido:</p>
-                        <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
-                    </div>
-                    <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()">
-                        📲 Enviar a Soporte
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-info">
-            <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🕒 Horario de Atención</div>
-            <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
-            <div style="font-size: 0.75rem; font-weight: 600; color: var(--neon-purple); margin-top: 15px; letter-spacing: 1px;">
-                © 2026 GOXION ENTERTAINMENT
-            </div>
-        </div>
-    </div>
-
-    <!-- CARRITO FLOTANTE -->
-    <div id="floating-cart" class="glass-card floating-cart">
-        <div class="cart-info">
-            <span class="cart-total" id="cart-total-price">$0</span>
-            <span class="cart-items" id="cart-items-count">0 perfiles</span>
-        </div>
-        <button class="cart-btn" onclick="enviarPedido()">Hacer Pedido 📲</button>
-    </div>
-
-    <!-- MODALES -->
-    <div id="modal-terminos" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
-            <div class="modal-title">Términos y Condiciones</div>
-            <p style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 15px;">Al hacer uso de nuestros servicios, aceptas íntegramente estas condiciones.</p>
-            <ul class="terms-list">
-                <li><strong>1. Confidencialidad de Credenciales</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación.</li>
-                <li><strong>2. Uso Permitido</strong> Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad.</li>
-                <li><strong>3. Sanciones</strong> El incumplimiento faculta a GOXION para suspender temporal o definitivamente el servicio sin derecho a reembolso.</li>
-                <li><strong>4. Esquema de Pagos</strong> La fecha límite corresponde al día del mes de tu contratación inicial. Métodos aceptados: Transferencias y depósitos.</li>
-                <li><strong>5. Aviso de Prórroga</strong> Si prevés un retraso, notifícalo con antelación para pactar una prórroga sin aplicación de recargos automáticos.</li>
-            </ul>
-        </div>
-    </div>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; }
     
-    <div id="modal-garantia" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
-            <div class="modal-title">Garantía y Penalizaciones</div>
-            <p style="color: var(--text-muted); font-weight: 600; font-size: 0.85rem; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma con reglas claras y justas:</p>
-            <table>
-                <tr><th>Situación</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
-                <tr><td style="color:var(--text-main); font-weight: 600;">Falla Técnica</td><td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio.</td><td>Hasta 50% (10 días).</td></tr>
-                <tr><td style="color:var(--warning-amber); font-weight: 600;">Mora sin Aviso</td><td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al corte.</td><td>Hasta 50% de interés.</td></tr>
-                <tr><td style="color:var(--danger-red); font-weight: 600;">Suspensión</td><td>A los 15 días de inactividad, se aplicará un 20% de cargo administrativo de reactivación.</td><td>20% sobre saldo.</td></tr>
-            </table>
-        </div>
-    </div>
+    body { 
+      background-color: var(--bg-color); 
+      color: var(--text-main); 
+      display: flex; justify-content: center; align-items: center; 
+      min-height: 100vh; padding: 20px; 
+      background-image: radial-gradient(circle at 50% 0%, rgba(0, 242, 254, 0.05) 0%, transparent 50%);
+    }
+    
+    .container { 
+      width: 100%; max-width: 440px; 
+      background: var(--card-bg); 
+      border-radius: 16px; 
+      border: 1px solid rgba(255, 255, 255, 0.08); 
+      padding: 25px; 
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+      position: relative;
+      overflow: hidden;
+    }
 
-    <div id="modal-lealtad" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
-            <div class="modal-title">Programa de Fidelidad</div>
-            <p style="color: var(--text-muted); font-weight: 600; font-size: 0.85rem; margin-bottom: 15px;">La puntualidad tiene recompensas. Mantén tus pagos al día y obtén beneficios automáticos.</p>
-            <table>
-                <tr><th>Nivel</th><th>Meta de Pagos</th><th>Beneficio</th></tr>
-                <tr><td style="color: var(--neon-blue); font-weight: 700;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF en el total</td></tr>
-                <tr><td style="color: var(--neon-purple); font-weight: 700;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF en el total</td></tr>
-            </table>
-            <p style="color: var(--danger-red); font-size: 0.8rem; font-weight: 700; margin-top: 15px;">⚠️ Importante: Un pago atrasado o sin reporte previo reinicia tu racha a cero.</p>
-        </div>
-    </div>
+    /* Brillo superior dinámico */
+    .top-glow { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--neon-blue); box-shadow: 0 0 15px var(--neon-blue); }
 
-    <div id="modal-referidos" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
-            <div class="modal-title">🎁 Invita y Gana</div>
-            <p style="color: var(--text-muted); font-weight: 600; font-size: 0.85rem; margin-bottom: 15px;">Obtén un mes gratis del 100% por cada amigo que invites bajo estas reglas:</p>
-            <ul class="terms-list">
-                <li><strong>1. Requisitos del Referido</strong> Debe ser cliente nuevo. Adquirir mínimo 2 perfiles y mantenerlos activos/pagados durante 3 meses consecutivos.</li>
-                <li><strong>2. Aplicación</strong> El descuento se te aplicará en el cuarto mes. Debes mantener tu cuenta activa y al corriente durante el proceso de validación.</li>
-                <li><strong>3. Restricciones</strong> Si el referido cancela antes de los 3 meses, el beneficio se anula. No acumulable. Sin límite de invitaciones.</li>
-            </ul>
-        </div>
-    </div>
+    .header { text-align: center; margin-bottom: 25px; }
+    .logo-img { max-height: 45px; width: auto; display: block; margin: 0 auto; filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.3)); }
+    .subtitle { color: var(--text-muted); font-size: 0.95rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
+    
+    /* --- LA REGLA DE LOS 5 SEGUNDOS (HERO BALANCE) --- */
+    .balance-hero { text-align: center; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
+    .total-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 4px; }
+    .total-amount { font-size: 3.5rem; font-weight: 800; line-height: 1; margin-bottom: 12px; color: var(--neon-blue); text-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+    
+    .time-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 700; padding: 6px 14px; border-radius: 20px; border: 1px solid; }
+    .badge-ok { background: rgba(0, 242, 254, 0.05); color: var(--neon-blue); border-color: rgba(0, 242, 254, 0.3); }
+    .badge-today { background: rgba(248, 232, 0, 0.05); color: var(--warning-amber); border-color: rgba(248, 232, 0, 0.4); box-shadow: 0 0 10px rgba(248, 232, 0, 0.2); }
+    .badge-overdue { background: rgba(255, 0, 60, 0.05); color: var(--danger-red); border-color: rgba(255, 0, 60, 0.4); box-shadow: 0 0 10px rgba(255, 0, 60, 0.2); }
+    .badge-paid { background: rgba(0, 255, 157, 0.05); color: var(--success-green); border-color: rgba(0, 255, 157, 0.4); box-shadow: 0 0 10px rgba(0, 255, 157, 0.2); }
 
-    <script>
-        const NUMERO_GOXION = "528136836901"; 
-        let globalClientesData = null;
-        let greetingInterval = null;
-        let carritoPedidos = {};
+    /* --- INFO CLIENTE --- */
+    .card-info { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .info-block { display: flex; flex-direction: column; }
+    .info-block .label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 0.5px; }
+    .info-block .value { font-size: 1rem; font-weight: 700; color: var(--text-main); }
+    .info-block.full { grid-column: span 2; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px; margin-top: -2px; }
 
-        function hideSplash() {
-            const splash = document.getElementById('splash-screen');
-            if (splash.style.opacity === '0') return;
-            splash.style.opacity = '0';
-            setTimeout(() => { splash.style.visibility = 'hidden'; document.body.classList.remove('no-scroll'); }, 600);
-        }
-        
-        window.addEventListener('load', () => { 
-            setTimeout(hideSplash, 1800); 
-            cargarDatosYVerificarSesion(); 
+    /* --- ALERTAS --- */
+    .alert-banner { padding: 12px; border-radius: 8px; text-align: center; margin-bottom: 20px; font-weight: 700; font-size: 0.95rem; border: 1px solid; text-transform: uppercase; letter-spacing: 1px; }
+    .overdue-incentive-box { background: rgba(255, 0, 60, 0.1); border: 1px dashed rgba(255, 0, 60, 0.4); border-radius: 12px; padding: 15px; font-size: 0.9rem; line-height: 1.4; color: #ffb3c1; margin-bottom: 20px; text-align: center; font-weight: 600; }
+    
+    /* --- SERVICIOS --- */
+    .section-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--neon-purple); margin-bottom: 12px; font-weight: 700; border-left: 3px solid var(--neon-purple); padding-left: 8px; }
+    
+    .services-container { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 0 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+    .service-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.1); font-size: 1.05rem; }
+    .service-item:last-child { border-bottom: none; }
+    .service-name { font-weight: 700; color: var(--text-main); }
+    .service-price { font-weight: 800; color: var(--text-muted); }
+    
+    /* --- DESGLOSE --- */
+    .breakdown-box { background: rgba(0,0,0,0.5); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; }
+    .breakdown-line { font-size: 0.95rem; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; }
+    .breakdown-line:last-child { margin-bottom: 0; }
+    .discount-line { color: var(--success-green); }
+    .surcharge-line { color: var(--danger-red); }
+
+    /* --- PROGRAMA LEALTAD --- */
+    .loyalty-badge { background: #12121a; border-radius: 12px; padding: 15px; border: 1px solid rgba(124, 77, 255, 0.3); margin-bottom: 25px; display: flex; align-items: center; gap: 15px; }
+    .loyalty-icon { font-size: 2rem; line-height: 1; text-shadow: 0 0 15px rgba(188, 19, 254, 0.4); }
+    .loyalty-content { flex: 1; }
+    .loyalty-title { font-size: 0.85rem; color: var(--neon-purple); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+    .loyalty-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.3; font-weight: 600; }
+    .loyalty-highlight { color: var(--text-main); font-weight: 700; }
+
+    /* --- BOTONES --- */
+    .actions-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+    .btn { width: 100%; padding: 14px; border-radius: 8px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border: none; outline: none; text-transform: uppercase; letter-spacing: 1px; }
+    .btn:active { transform: translateY(2px); }
+    
+    .btn-copy { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; box-shadow: 0 0 15px rgba(0, 242, 254, 0.2); }
+    .btn-copy:hover { box-shadow: 0 0 25px rgba(0, 242, 254, 0.5); }
+
+    .btn-paid { background: rgba(0, 255, 157, 0.05); color: var(--success-green); border: 1px dashed var(--success-green); cursor: default; }
+    .btn-paid:active { transform: none; }
+
+    .btn-wa { background: transparent; color: var(--text-muted); border: 1px solid rgba(255,255,255,0.2); }
+    .btn-wa:hover { color: var(--text-main); background: rgba(255,255,255,0.05); }
+
+    .footer { text-align: center; font-size: 0.85rem; color: var(--text-muted); font-weight: 600; line-height: 1.5; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px; }
+    .error-msg { text-align: center; color: var(--danger-red); padding: 20px 0; font-size: 1.1rem; font-weight: 700; }
+    .loading { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 1.1rem; font-weight: 600; }
+    
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: var(--neon-purple); color: white; padding: 10px 20px; border-radius: 30px; font-size: 0.95rem; font-weight: 700; display: none; box-shadow: 0 0 15px rgba(188, 19, 254, 0.5); z-index: 1000; animation: fadeIn 0.3s ease;}
+    @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  </style>
+</head>
+<body>
+
+<div class="container" id="app">
+  <div class="loading">Sincronizando con Goxion...</div>
+</div>
+
+<div class="toast" id="toast">📋 ¡Datos copiados al portapapeles!</div>
+
+<script>
+  const TELEFONO_GOXION = "528136836901"; 
+  const CLABE_PAGO = "638180000167909381";
+  const BANCO_PAGO = "NU BANCO";
+  const TITULAR_PAGO = "Henry González";
+
+  async function cargarEstadoCuenta() {
+    const params = new URLSearchParams(window.location.search);
+    const clienteKey = params.get('cliente')?.toLowerCase().trim();
+    const app = document.getElementById('app');
+
+    if (!clienteKey) {
+      app.innerHTML = `<div class="error-msg">⚠️ ENLACE INCOMPLETO.<br><span style="font-size:0.9rem; color:var(--text-muted);">Falta el identificador del cliente en la URL.</span></div>`;
+      return;
+    }
+
+    try {
+      const response = await fetch('clientes.json', { cache: 'no-store' });
+      if (!response.ok) throw new Error("No se pudo cargar clientes.json");
+      
+      const data = await response.json();
+      const cliente = data[clienteKey];
+
+      if (!cliente) {
+        app.innerHTML = `<div class="error-msg">❌ CLIENTE NO ENCONTRADO.<br><span style="font-size:0.9rem; color:var(--text-muted);">El registro "${clienteKey}" no existe en el sistema.</span></div>`;
+        return;
+      }
+
+      // 1. Cálculos de Fechas
+      const hoy = new Date();
+      const diaHoy = hoy.getDate();
+      const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const mesActual = meses[hoy.getMonth()];
+      const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
+      
+      const diaPago = cliente.dia_pago || 15;
+      const difDias = diaPago - diaHoy; 
+      
+      let rachaOriginal = cliente.pagos_puntuales || 0;
+      let racha = rachaOriginal;
+      let perdioRacha = false;
+
+      // REGLA: Si está vencido o suspendido, pierde racha visualmente
+      if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) {
+          racha = 0;
+          perdioRacha = true;
+      }
+
+      // 2. Cálculo de Subtotal de Servicios
+      let subtotal = 0;
+      let serviciosHTML = '';
+      if (cliente.servicios && cliente.servicios.length > 0) {
+        cliente.servicios.forEach(s => {
+          subtotal += s.monto;
+          serviciosHTML += `
+            <div class="service-item">
+              <span class="service-name">${s.nombre}</span>
+              <span class="service-price">$${s.monto}</span>
+            </div>
+          `;
         });
+      } else {
+        serviciosHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.9rem; padding: 15px 0;">No tienes servicios activos asignados.</div>`;
+      }
 
-        function switchTab(tabName) {
-            ['cuenta', 'catalogo', 'soporte'].forEach(name => {
-                document.getElementById(`btn-tab-${name}`).classList.remove('active');
-                document.getElementById(`view-${name}`).classList.remove('active');
-            });
-            document.getElementById(`btn-tab-${tabName}`).classList.add('active');
-            document.getElementById(`view-${tabName}`).classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            if(tabName !== 'catalogo') document.getElementById('floating-cart').classList.remove('show');
-            else renderCartFloating();
-        }
+      // 3. Reglas de Mora, Recargos y Banderas
+      let pctMoraDiaria = 0;
+      let montoMora = 0;
+      let montoBajaAdmin = 0;
+      let diasAtraso = 0;
+      
+      let badgeClass = "";
+      let badgeText = "";
+      let uiColor = "var(--neon-blue)";
+      
+      let mensajeAtrasoHTML = "";
 
-        function openModal(id) { document.getElementById(id).classList.add('show'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-        window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
+      if (cliente.estado === 'pagado') {
+          badgeClass = "badge-paid";
+          badgeText = "✅ Al corriente este mes";
+          uiColor = "var(--success-green)";
+      } else if (difDias > 0) {
+          badgeClass = "badge-ok";
+          badgeText = `⏳ Vence en ${difDias} día(s)`;
+      } else if (difDias === 0) {
+          badgeClass = "badge-today";
+          badgeText = `⚠️ Tu corte es HOY`;
+          uiColor = "var(--warning-amber)";
+      } else {
+          diasAtraso = Math.abs(difDias);
+          badgeClass = "badge-overdue";
+          badgeText = `🚨 Vencido hace ${diasAtraso} día(s)`;
+          uiColor = "var(--danger-red)";
 
-        window.addEventListener('scroll', () => {
-            const glassBar = document.getElementById('glass-header');
-            const bigHeader = document.getElementById('dash-greeting-container');
-            if(glassBar && document.getElementById('dashboard-view').style.display !== 'none' && bigHeader) {
-                if(window.scrollY > 40) glassBar.classList.add('show');
-                else glassBar.classList.remove('show');
-            }
-        });
+          let pctMoraCalculado = diasAtraso * 0.05;
+          pctMoraDiaria = Math.min(pctMoraCalculado, 0.50);
+          montoMora = Math.round(subtotal * pctMoraDiaria);
+          let acumMoraTotal = subtotal + montoMora;
 
-        function iniciarSaludoDinamico(nombreCompleto) {
-            const primerNombre = nombreCompleto.split(' ')[0];
-            const frases = [
-                `¡Hola, <span>${primerNombre}</span>! 👋`,
-                `Tu Espacio, <span>${primerNombre}</span> ✨`,
-                `Todo listo, <span>${primerNombre}</span> 🚀`
-            ];
-            let index = 0;
-            const el = document.getElementById('dynamic-greeting-text');
-            if(!el) return;
-            if(greetingInterval) clearInterval(greetingInterval);
-            
-            el.innerHTML = frases[0]; el.style.opacity = 1;
-            greetingInterval = setInterval(() => {
-                el.style.opacity = 0;
-                setTimeout(() => { index = (index + 1) % frases.length; el.innerHTML = frases[index]; el.style.opacity = 1; }, 500);
-            }, 5000);
-        }
+          if (diasAtraso > 15 || cliente.estado === 'suspendido') {
+              montoBajaAdmin = Math.round(acumMoraTotal * 0.20);
+          }
 
-        function normalizeString(str) { return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : ""; }
+          mensajeAtrasoHTML = `
+            <div class="overdue-incentive-box">
+              🚨 <strong>Mora activa por falta de pago.</strong><br>
+              Se aplica recargo automático del 5% diario (+${Math.round(pctMoraDiaria * 100)}% acum.). 
+              ${(diasAtraso > 15 || cliente.estado === 'suspendido') ? `<br><strong style="color:var(--danger-red);">⚠️ Se incluyó un 20% de recargo por reactivación.</strong>` : ''}
+              <br><small style="color:var(--text-muted); display:block; margin-top:6px;">Si prevés un retraso, notifícalo con antelación para evitar recargos.</small>
+            </div>
+          `;
+      }
 
-        async function cargarDatosYVerificarSesion() {
-            try {
-                const response = await fetch('clientes.json', { cache: 'no-store' });
-                globalClientesData = await response.json();
-                
-                cargarCatalogo(globalClientesData);
-                renderizarSoporteDinamico(globalClientesData);
-                
-                // MEJORA: AUTO-LOGIN por URL
-                const params = new URLSearchParams(window.location.search);
-                const urlKey = params.get('cliente');
-                
-                if (urlKey && globalClientesData[urlKey]) {
-                    localStorage.setItem('goxion_user_key', urlKey);
-                    renderDashboard(urlKey);
-                    return;
-                }
+      // 4. Banner de Estado Global (Cancelaciones/Pagos)
+      let bannerEstado = "";
+      if (cliente.estado === 'suspendido') {
+          bannerEstado = `<div class="alert-banner" style="background: rgba(255, 0, 60, 0.15); border-color: var(--danger-red); color: var(--danger-red); box-shadow: 0 0 15px rgba(255, 0, 60, 0.2);">⛔ Servicio Suspendido</div>`;
+          uiColor = "var(--danger-red)";
+      } else if (cliente.estado === 'pagado') {
+          bannerEstado = `<div class="alert-banner" style="background: rgba(0, 255, 157, 0.15); border-color: var(--success-green); color: var(--success-green); box-shadow: 0 0 15px rgba(0, 255, 157, 0.2);">✅ Mensualidad Pagada</div>`;
+      }
 
-                const savedKey = localStorage.getItem('goxion_user_key');
-                if(savedKey && globalClientesData[savedKey]) {
-                    renderDashboard(savedKey);
-                }
-            } catch(e) { console.error("Error cargando base de datos"); }
-        }
+      // 5. Cálculo del Descuento por Fidelidad
+      let pctDescuento = 0;
+      let mensajeLealtad = '';
 
-        function iniciarSesion() {
-            const inputId = document.getElementById('login-id').value;
-            const inputPin = document.getElementById('login-pin').value.trim();
-            const errorMsg = document.getElementById('login-error');
-            
-            if(!inputId || !inputPin) { errorMsg.innerText = "Ingresa tu Nombre y PIN."; errorMsg.style.display = 'block'; return; }
+      if (racha >= 9) {
+        pctDescuento = 0.06;
+        mensajeLealtad = `Nivel 2 Activo: <span class="loyalty-highlight" style="color:var(--neon-purple);">6% de descuento</span> aplicado en tu total.`;
+      } else if (racha >= 4) {
+        pctDescuento = 0.03;
+        const faltantes = 9 - racha;
+        mensajeLealtad = `Nivel 1 Activo: <span class="loyalty-highlight" style="color:var(--neon-blue);">3% OFF</span>. Te faltan ${faltantes} pago(s) para subir a Nivel 2.`;
+      } else {
+        pctDescuento = 0;
+        const faltantes = 4 - racha;
+        mensajeLealtad = perdioRacha 
+          ? `<span style="color:var(--danger-red);">💔 Racha reiniciada a 0 por atraso en el pago.</span>` 
+          : `Progreso: <span class="loyalty-highlight">${racha}/4 pagos</span>. Faltan ${faltantes} pago(s) para alcanzar Nivel 1.`;
+      }
 
-            const searchStr = normalizeString(inputId);
-            let foundKey = null;
+      // 6. Gran Total Final y Botones Dinámicos
+      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
+      let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
+      
+      let labelTotal = "Total a Pagar";
+      let btnAccionHTML = `<button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">📋 Copiar Datos de Pago</button>`;
 
-            for(let key in globalClientesData) {
-                if(key === '_goxion_config') continue;
-                let cli = globalClientesData[key];
-                if(normalizeString(key) === searchStr || normalizeString(cli.nombre) === searchStr || normalizeString(cli.folio) === searchStr) {
-                    if(cli.codigo === inputPin || cli.pin === inputPin || cli.codigo_acceso === inputPin) { foundKey = key; break; }
-                }
-            }
+      // Si el Admin marcó como pagado, neutralizamos la deuda visualmente
+      if (cliente.estado === 'pagado') {
+          totalFinal = 0;
+          labelTotal = "Saldo Pendiente";
+          btnAccionHTML = `<button class="btn btn-paid" onclick="return false;">✅ Mensualidad Cubierta</button>`;
+      }
 
-            if(foundKey) {
-                localStorage.setItem('goxion_user_key', foundKey);
-                errorMsg.style.display = 'none';
-                renderDashboard(foundKey);
-            } else {
-                errorMsg.innerText = "Datos incorrectos. Verifica tu acceso.";
-                errorMsg.style.display = 'block';
-            }
-        }
+      // 7. Generar Caja de Desglose (Ticket)
+      let breakdownHTML = '';
+      if (cliente.estado !== 'pagado' && (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+          breakdownHTML = `
+            <div class="breakdown-box">
+              <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
+              ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento Lealtad</span><span>-$${ahorro}</span></div>` : ''}
+              ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Mora (+${Math.round(pctMoraDiaria * 100)}%)</span><span>+$${montoMora}</span></div>` : ''}
+              ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Reactivación</span><span>+$${montoBajaAdmin}</span></div>` : ''}
+            </div>
+          `;
+      }
 
-        function cerrarSesion() {
-            localStorage.removeItem('goxion_user_key');
-            if(greetingInterval) clearInterval(greetingInterval);
-            document.getElementById('dashboard-view').style.display = 'none';
-            document.getElementById('auth-view').style.display = 'block';
-            document.getElementById('login-id').value = ''; document.getElementById('login-pin').value = '';
-            document.getElementById('glass-header').classList.remove('show');
-            
-            // Limpiar URL si hay parámetro
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
+      const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi cuenta.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
+      const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-        function copiarDatoRapido(texto, tipo) {
-            navigator.clipboard.writeText(texto);
-            alert(`¡${tipo} copiado al portapapeles!`);
-        }
+      // Renderizado Final con Jerarquía Visual (La Regla de 5 segundos al frente)
+      app.innerHTML = `
+        <div class="top-glow" style="background: ${uiColor}; box-shadow: 0 0 15px ${uiColor}80;"></div>
 
-        // EL CORAZÓN DEL DASHBOARD: CÁLCULO DEL ESTADO DE CUENTA (La regla de 5 segundos)
-        function renderDashboard(key) {
-            const cliente = globalClientesData[key];
-            document.getElementById('auth-view').style.display = 'none';
-            document.getElementById('dashboard-view').style.display = 'block';
+        <div class="header">
+          <img src="logo2.PNG" alt="GOXION" class="logo-img" onerror="this.src='Logo individual.png'">
+          <div class="subtitle">Resumen de Cuenta</div>
+        </div>
 
-            const primerNombre = cliente.nombre.split(' ')[0];
-            document.getElementById('dash-name').innerText = primerNombre;
-            document.getElementById('glass-name-text').innerText = primerNombre;
-            iniciarSaludoDinamico(cliente.nombre);
+        ${bannerEstado}
 
-            // --- LÓGICA FINANCIERA Y DE ESTADO ---
-            const hoy = new Date();
-            const diaHoy = hoy.getDate();
-            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const mesActual = meses[hoy.getMonth()];
-            const diaPago = cliente.dia_pago || 15;
-            const difDias = diaPago - diaHoy;
-            
-            let rachaOriginal = cliente.pagos_puntuales || 0;
-            let racha = rachaOriginal;
-            
-            if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) { racha = 0; }
+        <!-- LA REGLA DE 5 SEGUNDOS (HERO SECTION) -->
+        <div class="balance-hero">
+            <div class="total-label">${labelTotal}</div>
+            <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 20px ${uiColor}60;">$${totalFinal.toFixed(2)}</div>
+            <div class="time-badge ${badgeClass}">${badgeText}</div>
+        </div>
 
-            let subtotal = 0;
-            let srvHTML = '';
-            const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
+        ${cliente.estado === 'pagado' ? '' : mensajeAtrasoHTML}
 
-            if(cliente.servicios && cliente.servicios.length > 0) {
-                cliente.servicios.forEach(s => {
-                    subtotal += s.monto;
-                    let icon = "📺";
-                    for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
-                    
-                    let credsBtns = '';
-                    if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
-                    if(s.perfil_nombre) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_nombre}', 'Perfil')">👤 <strong>${s.perfil_nombre}</strong></div>`;
-                    if(s.perfil_pin) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_pin}', 'PIN')">🔢 <strong>${s.perfil_pin}</strong></div>`;
+        <!-- DATOS DEL CLIENTE REDISEÑADOS -->
+        <div class="card-info">
+          <div class="info-block">
+            <span class="label">Titular</span>
+            <span class="value">${cliente.nombre.split(' ')[0]}</span>
+          </div>
+          <div class="info-block" style="text-align: right;">
+            <span class="label">Folio</span>
+            <span class="value" style="color:var(--neon-purple);">${cliente.folio}</span>
+          </div>
+          <div class="info-block full">
+            <span class="label">Periodo Facturado</span>
+            <span class="value" style="display:flex; justify-content:space-between;">
+                ${periodoStr} 
+                <span style="color:var(--text-muted); font-size:0.9rem;">Corte: ${diaPago} de ${mesActual}</span>
+            </span>
+          </div>
+        </div>
 
-                    srvHTML += `
-                        <div class="service-pill-container">
-                            <div class="service-pill-header">
-                                <div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div>
-                                <div class="service-price">$${s.monto}</div>
-                            </div>
-                            ${credsBtns ? `<div class="cred-box">${credsBtns}</div>` : ''}
-                        </div>
-                    `;
-                });
-            } else {
-                srvHTML = `<p style="font-size:0.85rem; color:var(--text-muted); text-align:center; font-weight:600;">Sin servicios activos.</p>`;
-            }
-            document.getElementById('dash-services').innerHTML = srvHTML;
+        <div class="section-title">Servicios Activos</div>
+        <div class="services-container" style="margin-bottom: ${breakdownHTML ? '10px' : '20px'};">
+          ${serviciosHTML}
+        </div>
 
-            // Variables Visuales del Balance
-            let uiColor = "var(--neon-blue)"; let shadowColor = "rgba(0, 242, 254, 0.3)";
-            let statusDotColor = "var(--neon-blue)"; let dateText = `${diaPago} de ${mesActual}`;
-            let pctMoraDiaria = 0, montoMora = 0, montoBajaAdmin = 0, diasAtraso = 0;
+        ${breakdownHTML}
 
-            if (cliente.estado === 'pagado') {
-                uiColor = "var(--success-green)"; shadowColor = "rgba(0, 255, 157, 0.3)";
-                statusDotColor = "var(--success-green)"; dateText = `Al corriente este mes`;
-            } else if (cliente.estado === 'suspendido') {
-                uiColor = "var(--danger-red)"; shadowColor = "rgba(255, 0, 60, 0.3)";
-                statusDotColor = "var(--danger-red)"; dateText = `Servicio Suspendido`;
-                diasAtraso = Math.abs(difDias);
-            } else if (difDias < 0) {
-                uiColor = "var(--danger-red)"; shadowColor = "rgba(255, 0, 60, 0.3)";
-                statusDotColor = "var(--danger-red)"; diasAtraso = Math.abs(difDias);
-                dateText = `Vencido hace ${diasAtraso} día(s)`;
-            } else if (difDias === 0) {
-                uiColor = "var(--warning-amber)"; shadowColor = "rgba(248, 232, 0, 0.3)";
-                statusDotColor = "var(--warning-amber)"; dateText = `Corte el día de HOY`;
-            } else {
-                dateText = `Próximo corte: ${diaPago} de ${mesActual}`;
-            }
+        <div class="loyalty-badge">
+          <div class="loyalty-icon">⭐</div>
+          <div class="loyalty-content">
+            <div class="loyalty-title">Programa Goxion</div>
+            <div class="loyalty-desc">${mensajeLealtad}</div>
+          </div>
+        </div>
 
-            // Mora y Descuentos
-            if (cliente.estado !== 'pagado' && diasAtraso > 0) {
-                let pctMoraCalculado = diasAtraso * 0.05;
-                pctMoraDiaria = Math.min(pctMoraCalculado, 0.50);
-                montoMora = Math.round(subtotal * pctMoraDiaria);
-                if (diasAtraso > 15 || cliente.estado === 'suspendido') { montoBajaAdmin = Math.round((subtotal + montoMora) * 0.20); }
-            }
+        <div class="actions-group">
+          ${btnAccionHTML}
+          <a href="${urlWA}" target="_blank" class="btn btn-wa">
+            💬 Contactar a Soporte
+          </a>
+        </div>
 
-            let pctDescuento = (racha >= 9) ? 0.06 : (racha >= 4) ? 0.03 : 0;
-            let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
-            let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
-            
-            // Inyectar en el Balance Gigante
-            const balContainer = document.getElementById('balance-container');
-            balContainer.style.borderColor = uiColor;
-            
-            document.getElementById('balance-label').innerText = (cliente.estado === 'pagado') ? "Saldo Pendiente" : "Total a Pagar";
-            document.getElementById('balance-amount').innerText = (cliente.estado === 'pagado') ? "$0.00" : `$${totalFinal}`;
-            document.getElementById('balance-amount').style.color = uiColor;
-            document.getElementById('balance-amount').style.textShadow = `0 0 15px ${shadowColor}`;
-            
-            document.getElementById('date-text').innerText = dateText;
-            document.getElementById('status-dot').style.background = statusDotColor;
-            document.getElementById('status-dot').style.boxShadow = `0 0 8px ${statusDotColor}`;
+        <div class="footer">
+          <span style="color:var(--text-main);">🎁 <strong>¡Gana un mes gratis!</strong></span><br>
+          Recomienda GOXION a un amigo y al contratar obtén un mes de descuento.
+        </div>
+      `;
 
-            // Progreso de Lealtad
-            let meta = 4; let beneficio = "3% OFF";
-            if (racha >= 4 && racha < 9) { meta = 9; beneficio = "6% OFF"; }
-            else if (racha >= 9) { meta = racha; beneficio = "Nivel Máximo (6% OFF)"; }
+    } catch (e) {
+      app.innerHTML = `<div class="error-msg">⚠️ Error al cargar la base de datos.<br><span style="font-size:0.9rem; color:var(--text-muted);">Revisa tu conexión o contacta a soporte.</span></div>`;
+    }
+  }
 
-            let porcentaje = Math.min((racha / meta) * 100, 100);
-            document.getElementById('loyalty-count').innerText = `${racha}/${meta} Pagos`;
-            setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${porcentaje}%`; }, 300);
+  function copiarDatos(monto) {
+    const texto = `GOXION - Datos de Transferencia\n\nBanco: ${BANCO_PAGO}\nTitular: ${TITULAR_PAGO}\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
+    navigator.clipboard.writeText(texto).then(() => {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    });
+  }
 
-            if (racha >= 9) document.getElementById('loyalty-msg').innerText = "¡Felicidades! Disfrutas de tu Nivel 2 activo.";
-            else document.getElementById('loyalty-msg').innerText = `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
+  cargarEstadoCuenta();
+</script>
 
-            // Sección de Referidos
-            const refContainer = document.getElementById('referral-section-container');
-            if(cliente.referido_activo) {
-                let m = cliente.referido_activo.meses || 1; let pRef = Math.min((m / 3) * 100, 100);
-                refContainer.innerHTML = `
-                    <div class="glass-card referral-card" style="margin-bottom: 25px;">
-                        <div class="referral-header">
-                            <div class="referral-title"><span>🎁</span> Referido Activo</div>
-                            <div class="referral-status-badge">Validando</div>
-                        </div>
-                        <p style="font-size: 0.95rem; font-weight: 700; text-align: center;">${cliente.referido_activo.nombre || "Amigo"}</p>
-                        <div style="font-size: 0.75rem; color: var(--text-muted); margin: 8px 0 4px 0; font-weight:600;">Progreso al mes gratis:</div>
-                        <div class="loyalty-progress-bg" style="height: 6px;"><div class="loyalty-progress-fill" style="width: ${pRef}%; background: linear-gradient(90deg, var(--warning-amber), var(--danger-red));"></div></div>
-                    </div>`;
-            } else {
-                let msgWhatsApp = `Hola, me interesa unirme a GOXION. Vengo invitado por ${cliente.nombre} (${cliente.folio}).`;
-                refContainer.innerHTML = `
-                    <div class="glass-card referral-card" style="margin-bottom: 25px;">
-                        <div class="referral-title" style="margin-bottom: 8px; font-size: 1rem;">🎁 Gana 1 Mes Gratis</div>
-                        <div style="font-size: 0.85rem; color: var(--text-muted); font-weight:600; margin-bottom: 15px; line-height: 1.4;">Invita a un amigo y cuando cumpla 3 meses, tu próxima mensualidad es 100% gratis.</div>
-                        <button class="btn-primary" style="padding: 12px; font-size: 0.85rem;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">
-                            📲 Enviar invitación por WhatsApp
-                        </button>
-                    </div>`;
-            }
-        }
-
-        // LÓGICA DE CATÁLOGO Y SOPORTE (Idéntica, solo reestilizada a la base CSS actual)
-        function cargarCatalogo(data) {
-            const config = data._goxion_config;
-            const catalogContainer = document.getElementById('catalog-container');
-            if (!config || !config.serviciosGlobales) return;
-
-            if (config.alertas && config.alertas.activa) {
-                document.getElementById('alert-content').innerHTML = `<strong>Aviso:</strong> ${config.alertas.plataforma || "La plataforma"} está ${config.alertas.falla || "presentando intermitencias"}. ${config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : ''}`;
-                document.getElementById('dynamic-alert').style.display = 'flex';
-            }
-
-            let ocupados = {};
-            config.serviciosGlobales.forEach(catSrv => { ocupados[catSrv.nombre] = 0; });
-
-            for (let key in data) {
-                if (key === '_goxion_config') continue;
-                let cliente = data[key];
-                if (cliente.servicios) {
-                    cliente.servicios.forEach(s => {
-                        let nombreCliente = s.nombre.toLowerCase();
-                        let multiplier = 1; let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
-                        if (matchQuant) multiplier = parseInt(matchQuant[1]);
-                        config.serviciosGlobales.forEach(catSrv => {
-                            let nc = catSrv.nombre.toLowerCase();
-                            if (nc.includes('completa') !== nombreCliente.includes('completa')) return;
-                            let keyword = nc.replace(' premium','').replace(' video','').replace(' platino','').replace(' cuenta completa','').trim();
-                            if (nombreCliente.includes(keyword)) ocupados[catSrv.nombre] += multiplier;
-                        });
-                    });
-                }
-            }
-
-            let htmlCatalogo = '';
-            const iconos = { "Netflix": "🍿", "Disney": "🏰", "Max": "🎥", "Prime": "📦", "YouTube": "▶️", "ViX": "⚽", "Crunchyroll": "🍥", "Paramount": "⛰️", "Spotify": "🎧", "Microsoft": "💻", "Google": "☁️", "Apple": "🍎" };
-
-            config.serviciosGlobales.forEach(srv => {
-                let limiteTotal = (srv.cuentas || 0) * (srv.limite || 1);
-                let disponibles = limiteTotal - (ocupados[srv.nombre] || 0);
-                let safeId = srv.nombre.replace(/[^a-zA-Z0-9]/g, '-');
-                let icon = "📺"; for (let i in iconos) { if (srv.nombre.toLowerCase().includes(i.toLowerCase())) icon = iconos[i]; }
-
-                let badgeHtml = disponibles > 0 ? `<div class="cat-badge ok">🟢 ${disponibles} disp.</div>` : `<div class="cat-badge out">🔴 Agotado</div>`;
-                let btnHtml = disponibles > 0 
-                    ? `<div class="qty-controls"><button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, -1, '${safeId}')">-</button><span class="qty-val" id="qty-${safeId}">0</span><button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, 1, '${safeId}')">+</button></div>` 
-                    : `<div class="qty-controls" style="opacity: 0.3; cursor: not-allowed;"><button class="qty-btn" disabled>-</button><span class="qty-val">0</span><button class="qty-btn" disabled>+</button></div>`;
-
-                htmlCatalogo += `<div class="glass-card catalog-card"><div><div class="cat-icon">${icon}</div><div class="cat-name">${srv.nombre}</div><div class="cat-price">$${srv.precio}</div>${badgeHtml}</div>${btnHtml}</div>`;
-            });
-            if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
-        }
-
-        function actualizarCarrito(nombre, precio, cambio, safeId) {
-            if (!carritoPedidos[nombre]) carritoPedidos[nombre] = { precio: precio, qty: 0 };
-            carritoPedidos[nombre].qty += cambio;
-            if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
-            document.getElementById('qty-' + safeId).innerText = carritoPedidos[nombre].qty;
-            renderCartFloating();
-        }
-
-        function renderCartFloating() {
-            let tItems = 0, tPrecio = 0;
-            for (let item in carritoPedidos) { tItems += carritoPedidos[item].qty; tPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio); }
-            const fc = document.getElementById('floating-cart');
-            if (tItems > 0 && document.getElementById('view-catalogo').classList.contains('active')) {
-                document.getElementById('cart-items-count').innerText = tItems + (tItems === 1 ? " perfil" : " perfiles");
-                document.getElementById('cart-total-price').innerText = "$" + tPrecio;
-                fc.classList.add('show');
-            } else { fc.classList.remove('show'); }
-        }
-
-        function enviarPedido() {
-            let msg = "Hola GOXION, me interesa contratar:\n\n"; let t = 0;
-            for (let i in carritoPedidos) { if (carritoPedidos[i].qty > 0) { msg += `✅ ${carritoPedidos[i].qty}x ${i} ($${carritoPedidos[i].precio * carritoPedidos[i].qty})\n`; t += (carritoPedidos[i].qty * carritoPedidos[i].precio); } }
-            msg += `\n*Total estimado: $${t} MXN*\n¿Aún hay disponibilidad?`;
-            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msg)}`, '_blank');
-        }
-
-        // LÓGICA SMART SUPPORT
-        let selectedPlat = ""; let currentIssues = {};
-        const DATABASE_ISSUES = { 
-            "Netflix": [
-                { issue: "🔑 Solicitar Código", instructions: "1. Selecciona 'Iniciar Sesión con Código'.<br>2. Se enviará un correo a nuestra bandeja.<br>3. Indícanos el correo que aparece en tu pantalla para darte el código.", labelInput: "Correo en tu TV:", templateWA: "Hola GOXION, solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " }, 
-                { issue: "📺 Actualizar Hogar", instructions: "1. Selecciona 'Actualizar Hogar'.<br>2. Se enviará un correo a nuestra bandeja.<br>3. Ingresa abajo el correo en pantalla para autorizar tu TV.", labelInput: "Correo en tu TV:", templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX.\n\n📧 Correo en pantalla: " },
-                { issue: "⚠️ Límite de Pantallas", instructions: "Revisa que no tengas otra TV usándolo. Si persiste, indícanos el nombre de tu perfil.", labelInput: "Tu Perfil:", templateWA: "Hola GOXION, tengo problemas de límite de pantallas en NETFLIX.\n\n👤 Perfil: " }
-            ],
-            "Disney+": [
-                { issue: "🔑 Código de Verificación", instructions: "1. Presiona 'Continuar' con tu correo.<br>2. Se enviará un código a nuestra bandeja.<br>3. Escribe el correo aquí abajo para enviarte el código.", labelInput: "Correo de ingreso:", templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " }
-            ],
-            "Default": [
-                { issue: "🔑 Solicitar Asistencia", instructions: "Inicia sesión. Si te pide código o confirmación, indícanos el dato en pantalla.", labelInput: "Dato en pantalla / Correo:", templateWA: "Hola GOXION, requiero asistencia.\n\n📱 Dato: " }
-            ]
-        };
-
-        function srvCleanName(n) { return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa",""); }
-
-        function renderizarSoporteDinamico(data) {
-            const config = data._goxion_config;
-            const container = document.getElementById('support-platforms-grid');
-            if(!config || !config.serviciosGlobales) return;
-            const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "microsoft": "💻", "google": "☁️", "apple": "🍎", "paramount": "⛰️" };
-            let html = "";
-            config.serviciosGlobales.forEach(s => {
-                let icon = "📺"; for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
-                html += `<div class="platform-btn" onclick="selectPlatform('${s.nombre}', this)"><span>${icon}</span> ${srvCleanName(s.nombre)}</div>`;
-            });
-            container.innerHTML = html;
-        }
-
-        function selectPlatform(p, el) { 
-            selectedPlat = p; 
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); 
-            const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona el problema --</option>`;
-            let issues = DATABASE_ISSUES["Default"];
-            for(let key in DATABASE_ISSUES) { if(p.toLowerCase().includes(key.toLowerCase())) { issues = DATABASE_ISSUES[key]; break; } }
-            currentIssues = issues; 
-            currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
-            document.getElementById('step-2').classList.add('active'); document.getElementById('step-3').classList.remove('active');
-        }
-
-        function showSolution() {
-            const idx = document.getElementById('issue-selector').value;
-            if (idx === "") { document.getElementById('step-3').classList.remove('active'); return; }
-            const data = currentIssues[idx];
-            document.getElementById('solution-text').innerHTML = `<strong>💡 Qué hacer:</strong><br>${data.instructions}`;
-            document.getElementById('input-label').innerText = data.labelInput;
-            
-            let autoData = ""; const key = localStorage.getItem('goxion_user_key');
-            if (key && globalClientesData && globalClientesData[key]) {
-                const cliente = globalClientesData[key];
-                if (cliente.servicios) {
-                    let platKeyword = srvCleanName(selectedPlat).toLowerCase();
-                    const srv = cliente.servicios.find(s => s.nombre.toLowerCase().includes(platKeyword));
-                    if (srv) {
-                        let labelLow = data.labelInput.toLowerCase();
-                        if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login;
-                        else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre;
-                    }
-                }
-            }
-            document.getElementById('smart-extra-input').value = autoData;
-            document.getElementById('step-3').classList.add('active');
-        }
-
-        function sendSmartWA() {
-            const idx = document.getElementById('issue-selector').value; if(idx === "") return;
-            const val = document.getElementById('smart-extra-input').value.trim(); if(!val) return alert("Completa el dato requerido.");
-            
-            let extraContext = ""; const key = localStorage.getItem('goxion_user_key');
-            if (key && globalClientesData && globalClientesData[key]) {
-                const cliente = globalClientesData[key];
-                let platKeyword = srvCleanName(selectedPlat).toLowerCase();
-                const srv = cliente.servicios?.find(s => s.nombre.toLowerCase().includes(platKeyword));
-                extraContext = `\n\n------------------------\n*EXPEDIENTE:*\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`;
-                if (srv) {
-                    extraContext += `\n📺 Plat: ${srv.nombre}`;
-                    if (srv.correo_login) extraContext += `\n📧 Cta: ${srv.correo_login}`;
-                    if (srv.perfil_nombre) extraContext += `\n👤 Perfil: ${srv.perfil_nombre}`;
-                    if (srv.perfil_pin) extraContext += `\n🔢 PIN: ${srv.perfil_pin}`;
-                }
-            }
-            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA + val + extraContext)}`, '_blank');
-        }
-    </script>
 </body>
 </html>
