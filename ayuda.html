@@ -69,7 +69,7 @@
             animation: floatOrbit3 95s linear infinite; opacity: 0.6; 
         }
 
-        /* ANIMACIONES DE ÓRBITAS SIN TRABONES (Uso de translate3d y ciclos perfectos) */
+        /* ANIMACIONES DE ÓRBITAS SIN TRABONES */
         @keyframes floatOrbit1 {
             0%   { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
             25%  { transform: translate3d(80px, 40px, 0) rotate(90deg) scale(1.03); }
@@ -96,11 +96,19 @@
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; padding-bottom: 80px; }
 
+        /* DEGRADADO DE CRISTAL (FADE/MASK EFECTO APP) */
         .glass-top-bar {
             position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(8, 8, 12, 0.8); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 242, 254, 0.3); padding: 15px 20px; z-index: 1000;
-            display: flex; align-items: center; justify-content: flex-start;
+            /* Degradado de negro a transparente */
+            background: linear-gradient(to bottom, rgba(3, 3, 5, 0.95) 40%, rgba(3, 3, 5, 0) 100%);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            /* Máscara para que el desenfoque desaparezca suavemente hacia abajo */
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
+            border: none; 
+            padding: 25px 20px 45px 20px; /* Padding extra abajo para la zona invisible */
+            z-index: 1000;
+            display: flex; align-items: flex-start; justify-content: flex-start;
             opacity: 0; transform: translateY(-100%); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
         }
         .glass-top-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
@@ -175,7 +183,6 @@
         .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
         .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 
-        /* INTERACTIVIDAD EN MI ESPACIO: SERVICIO CON BARRAS DE CREDENCIALES */
         .service-pill-container { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; margin-bottom: 10px; padding: 12px; }
         .service-pill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
         .service-pill-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
@@ -207,7 +214,6 @@
         .qty-btn:hover:not(:disabled) { background: var(--neon-blue); color: #000; }
         .qty-val { font-weight: 700; font-size: 16px; min-width: 20px; text-align: center; }
 
-        /* CARRITO FLOTANTE (CON VISIBILITY PARA OCULTARLO POR COMPLETO SI NO ESTÁS EN CATÁLOGO) */
         .floating-cart { 
             position: fixed; bottom: 20px; left: 50%; width: 92%; max-width: 500px; 
             display: flex; justify-content: space-between; align-items: center; 
@@ -258,7 +264,8 @@
         </div>
     </div>
 
-    <div id="glass-header" class="glass-card glass-top-bar">
+    <!-- ELIMINADA LA CLASE glass-card AQUÍ PARA QUITAR EL BORDE Y LA SOMBRA -->
+    <div id="glass-header" class="glass-top-bar">
         <div class="glass-top-name">Tu Espacio, <span id="glass-name-text">Cliente</span></div>
     </div>
 
