@@ -175,7 +175,7 @@
     /* --- BOTONES --- */
     .actions-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
     
-    .btn { width: 100%; padding: 16px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border: none; outline: none; }
+    .btn { width: 100%; padding: 16px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border: none; outline: none; text-align: center; }
     .btn:active { transform: translateY(2px); }
     
     .btn-copy { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
@@ -225,7 +225,17 @@
     }
 
     try {
-      const response = await fetch('clientes.json', { cache: 'no-store' });
+      // AQUÍ SE APLICA EL CACHE BUSTING
+      const version = new Date().getTime();
+      const response = await fetch(`clientes.json?v=${version}`, {
+          cache: 'no-store',
+          headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+              'Expires': '0'
+          }
+      });
+      
       if (!response.ok) throw new Error("No se pudo cargar clientes.json");
       
       const data = await response.json();
@@ -352,7 +362,17 @@
       let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
       
       let labelTotal = "Total a Pagar";
-      let btnAccionHTML = `<button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>`;
+      
+      // AQUÍ SE AGREGA EL NUEVO BOTÓN DE NOTIFICAR PAGO
+      const msgPagoWA = encodeURIComponent(`Hola GOXION, adjunto mi comprobante de pago por $${totalFinal.toFixed(2)} MXN para el Folio ${cliente.folio} (${cliente.nombre}).`);
+      const urlPagoWA = `https://wa.me/${TELEFONO_GOXION}?text=${msgPagoWA}`;
+
+      let btnAccionHTML = `
+        <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>
+        <a href="${urlPagoWA}" target="_blank" class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);">
+          📤 Ya realicé mi depósito
+        </a>
+      `;
 
       if (cliente.estado === 'pagado') {
           totalFinal = 0;
