@@ -384,7 +384,53 @@
         transform: scale(0.4);
     }
 }
+/* =========================================================
+   CONTENEDOR Y ENCABEZADO
+   ========================================================= */
 
+.container { 
+    width: 100%; 
+    max-width: 460px; 
+    position: relative; 
+    z-index: 1; 
+    padding-bottom: 20px;
+}
+
+.header { 
+    text-align: center; 
+    margin-bottom: 30px; 
+}
+
+.logo-img { 
+    max-height: 40px; 
+    width: auto; 
+    display: block; 
+    margin: 0 auto; 
+    filter: drop-shadow(
+        0 0 15px rgba(0, 242, 254, 0.2)
+    );
+}
+
+.subtitle { 
+    color: var(--text-muted); 
+    font-size: 12px; 
+    font-weight: 600; 
+    text-transform: uppercase; 
+    letter-spacing: 2px; 
+    margin-top: 15px; 
+}
+@media (max-width: 600px) {
+    .container {
+        max-width: 460px;
+        width: 100%;
+    }
+
+    .logo-img {
+        max-width: 85%;
+        height: auto;
+        max-height: 40px;
+    }
+}
 
 /* =========================================================
    TELÉFONOS
