@@ -44,63 +44,22 @@
 
     .lava {
         position: absolute; border-radius: 50%;
-        filter: blur(65px); /* Desenfoque alto para efecto líquido */
+        filter: blur(65px); 
         opacity: 0.55;
-        mix-blend-mode: screen; /* Mezcla de colores al interceptarse */
+        mix-blend-mode: screen; 
         will-change: transform;
     }
 
-    .lava-1 {
-        width: 380px; height: 380px; top: -100px; left: -100px;
-        background: radial-gradient(circle, rgba(176, 38, 255, 0.6), transparent 70%);
-        animation: lavaFluid1 18s ease-in-out infinite alternate;
-    }
+    .lava-1 { width: 380px; height: 380px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(176, 38, 255, 0.6), transparent 70%); animation: lavaFluid1 18s ease-in-out infinite alternate; }
+    .lava-2 { width: 420px; height: 420px; top: 15%; right: -150px; background: radial-gradient(circle, rgba(0, 242, 254, 0.55), transparent 70%); animation: lavaFluid2 22s ease-in-out infinite alternate; }
+    .lava-3 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(124, 77, 255, 0.5), transparent 70%); animation: lavaFluid3 25s ease-in-out infinite alternate; }
+    .lava-4 { width: 250px; height: 250px; top: 50%; left: -80px; background: radial-gradient(circle, rgba(0, 242, 254, 0.4), transparent 70%); animation: lavaFluid4 19s ease-in-out infinite alternate; }
 
-    .lava-2 {
-        width: 420px; height: 420px; top: 15%; right: -150px;
-        background: radial-gradient(circle, rgba(0, 242, 254, 0.55), transparent 70%);
-        animation: lavaFluid2 22s ease-in-out infinite alternate;
-    }
-
-    .lava-3 {
-        width: 350px; height: 350px; bottom: -120px; left: 10%;
-        background: radial-gradient(circle, rgba(124, 77, 255, 0.5), transparent 70%);
-        animation: lavaFluid3 25s ease-in-out infinite alternate;
-    }
-
-    .lava-4 {
-        width: 250px; height: 250px; top: 50%; left: -80px;
-        background: radial-gradient(circle, rgba(0, 242, 254, 0.4), transparent 70%);
-        animation: lavaFluid4 19s ease-in-out infinite alternate;
-    }
-
-    @keyframes ambientMove {
-        0% { transform: translate3d(-20px, -10px, 0) scale(1); }
-        100% { transform: translate3d(20px, 30px, 0) scale(1.1); }
-    }
-
-    @keyframes lavaFluid1 {
-        0% { transform: translate3d(0, 0, 0) scale(1); }
-        50% { transform: translate3d(80px, 90px, 0) scale(1.1); }
-        100% { transform: translate3d(30px, 160px, 0) scale(0.95); }
-    }
-
-    @keyframes lavaFluid2 {
-        0% { transform: translate3d(0, 0, 0) scale(1); }
-        50% { transform: translate3d(-90px, 60px, 0) scale(1.15); }
-        100% { transform: translate3d(-40px, -80px, 0) scale(0.9); }
-    }
-
-    @keyframes lavaFluid3 {
-        0% { transform: translate3d(0, 0, 0) scale(1); }
-        50% { transform: translate3d(100px, -60px, 0) scale(1.05); }
-        100% { transform: translate3d(-50px, -30px, 0) scale(0.95); }
-    }
-
-    @keyframes lavaFluid4 {
-        0% { transform: translate3d(0, 0, 0) scale(1); }
-        100% { transform: translate3d(70px, 70px, 0) scale(1.1); }
-    }
+    @keyframes ambientMove { 0% { transform: translate3d(-20px, -10px, 0) scale(1); } 100% { transform: translate3d(20px, 30px, 0) scale(1.1); } }
+    @keyframes lavaFluid1 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(80px, 90px, 0) scale(1.1); } 100% { transform: translate3d(30px, 160px, 0) scale(0.95); } }
+    @keyframes lavaFluid2 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-90px, 60px, 0) scale(1.15); } 100% { transform: translate3d(-40px, -80px, 0) scale(0.9); } }
+    @keyframes lavaFluid3 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(100px, -60px, 0) scale(1.05); } 100% { transform: translate3d(-50px, -30px, 0) scale(0.95); } }
+    @keyframes lavaFluid4 { 0% { transform: translate3d(0, 0, 0) scale(1); } 100% { transform: translate3d(70px, 70px, 0) scale(1.1); } }
 
     @media (max-width: 600px) {
         .lava { filter: blur(50px); }
@@ -110,12 +69,29 @@
         .lava-4 { width: 200px; height: 200px; }
     }
 
-    /* --- CONTENEDOR PRINCIPAL --- */
     .container { width: 100%; max-width: 460px; position: relative; z-index: 1; padding-bottom: 20px; }
     
-    .header { text-align: center; margin-bottom: 30px; }
-    .logo-img { max-height: 40px; width: auto; max-width: 85%; display: block; margin: 0 auto; filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.2)); }
-    .subtitle { color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 15px; }
+    /* --- NUEVO ENCABEZADO ARMONIZADO --- */
+    .header { 
+        display: flex; align-items: center; justify-content: center; gap: 15px; 
+        margin-bottom: 30px; 
+    }
+    .logo-img { 
+        max-height: 55px; width: auto; 
+        filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4)); 
+    }
+    .header-text { 
+        display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
+    }
+    .brand-title { 
+        font-size: 26px; font-weight: 800; line-height: 1; 
+        letter-spacing: 2px; color: var(--text-main); 
+        text-shadow: 0 0 10px rgba(0, 242, 254, 0.3); 
+    }
+    .subtitle { 
+        color: var(--neon-purple); font-size: 11px; font-weight: 700; 
+        text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; 
+    }
     
     /* --- GLASSMORPHISM --- */
     .glass-card {
@@ -126,7 +102,6 @@
         border-radius: 20px; padding: 20px;
     }
 
-    /* --- HERO BALANCE --- */
     .balance-hero { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
     .total-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
     .total-amount { font-size: 56px; font-weight: 800; line-height: 1; margin-bottom: 15px; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
@@ -136,19 +111,17 @@
     .badge-today { background: rgba(255, 170, 0, 0.1); color: var(--warning-amber); border-color: rgba(255, 170, 0, 0.4); box-shadow: 0 0 15px rgba(255, 170, 0, 0.2); }
     .badge-overdue { background: rgba(255, 51, 102, 0.1); color: var(--danger-red); border-color: rgba(255, 51, 102, 0.4); box-shadow: 0 0 15px rgba(255, 51, 102, 0.2); }
     .badge-paid { background: rgba(0, 255, 157, 0.05); color: var(--success-neon); border-color: rgba(0, 255, 157, 0.4); box-shadow: 0 0 15px rgba(0, 255, 157, 0.15); }
+    .badge-review { background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border-color: rgba(124, 77, 255, 0.4); box-shadow: 0 0 15px rgba(124, 77, 255, 0.2); }
 
-    /* --- INFO CLIENTE --- */
     .card-info { margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
     .info-block { display: flex; flex-direction: column; }
     .info-block .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 2px;}
     .info-block .value { font-size: 16px; font-weight: 700; color: var(--text-main); }
     .info-block.full { grid-column: span 2; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 12px; margin-top: -5px; }
 
-    /* --- ALERTAS --- */
     .alert-banner { padding: 14px; border-radius: 14px; text-align: center; margin-bottom: 20px; font-weight: 700; font-size: 13px; border: 1px solid; text-transform: uppercase; letter-spacing: 1px; }
     .overdue-incentive-box { background: rgba(255, 51, 102, 0.08); border: 1px dashed rgba(255, 51, 102, 0.4); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.5; color: #ffb3c1; margin-bottom: 25px; text-align: center; font-weight: 500; }
     
-    /* --- SERVICIOS --- */
     .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--neon-purple); margin-bottom: 12px; font-weight: 700; }
     
     .services-container { margin-bottom: 25px; padding: 10px 20px;}
@@ -157,14 +130,12 @@
     .service-name { font-weight: 600; color: var(--text-main); }
     .service-price { font-weight: 700; color: var(--text-muted); }
     
-    /* --- DESGLOSE --- */
     .breakdown-box { margin-bottom: 25px; }
     .breakdown-line { font-size: 13px; font-weight: 500; margin-bottom: 10px; display: flex; justify-content: space-between; }
     .breakdown-line:last-child { margin-bottom: 0; }
     .discount-line { color: var(--success-neon); }
     .surcharge-line { color: var(--danger-red); }
 
-    /* --- PROGRAMA LEALTAD --- */
     .loyalty-badge { margin-bottom: 25px; display: flex; align-items: center; gap: 15px; border-color: rgba(124, 77, 255, 0.3); }
     .loyalty-icon { font-size: 32px; line-height: 1; filter: drop-shadow(0 0 10px rgba(176, 38, 255, 0.4)); }
     .loyalty-content { flex: 1; }
@@ -172,7 +143,6 @@
     .loyalty-desc { font-size: 13px; color: var(--text-muted); line-height: 1.4; font-weight: 500; }
     .loyalty-highlight { color: var(--neon-blue); font-weight: 700; }
 
-    /* --- BOTONES --- */
     .actions-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
     
     .btn { width: 100%; padding: 16px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border: none; outline: none; text-align: center; }
@@ -183,6 +153,9 @@
 
     .btn-wa { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
     .btn-wa:hover { background: rgba(255,255,255,0.1); border-color: var(--text-muted); }
+
+    .btn-review-state { background: rgba(124, 77, 255, 0.1); border: 1px solid rgba(124, 77, 255, 0.3); color: var(--text-main); font-size: 13px; padding: 16px; border-radius: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .btn-review-state strong { color: var(--neon-purple); }
 
     .footer { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; line-height: 1.6; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 20px; }
     
@@ -225,15 +198,10 @@
     }
 
     try {
-      // AQUÍ SE APLICA EL CACHE BUSTING
       const version = new Date().getTime();
       const response = await fetch(`clientes.json?v=${version}`, {
           cache: 'no-store',
-          headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-              'Expires': '0'
-          }
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
       });
       
       if (!response.ok) throw new Error("No se pudo cargar clientes.json");
@@ -246,7 +214,6 @@
         return;
       }
 
-      // 1. Cálculos de Fechas
       const hoy = new Date();
       const diaHoy = hoy.getDate();
       const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -260,13 +227,11 @@
       let racha = rachaOriginal;
       let perdioRacha = false;
 
-      // Si está vencido o suspendido, pierde racha visualmente
       if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) {
           racha = 0;
           perdioRacha = true;
       }
 
-      // 2. Cálculo de Subtotal de Servicios
       let subtotal = 0;
       let serviciosHTML = '';
       if (cliente.servicios && cliente.servicios.length > 0) {
@@ -283,7 +248,6 @@
         serviciosHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding: 15px 0;">No tienes servicios activos asignados.</div>`;
       }
 
-      // 3. Reglas de Mora, Recargos y Banderas
       let pctMoraDiaria = 0;
       let montoMora = 0;
       let montoBajaAdmin = 0;
@@ -292,13 +256,22 @@
       let badgeClass = "";
       let badgeText = "";
       let uiColor = "var(--neon-blue)";
-      
       let mensajeAtrasoHTML = "";
+
+      // VERIFICACIÓN INTELIGENTE DE PAGO EN REVISIÓN (DB + LocalStorage)
+      const isReviewLocal = localStorage.getItem(`revision_pago_${clienteKey}`) === periodoStr;
+      const enRevision = cliente.pago_en_revision === true || isReviewLocal;
 
       if (cliente.estado === 'pagado') {
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
           uiColor = "var(--success-neon)";
+          // Si está pagado, borramos cualquier flag de revisión local para resetear el ciclo
+          localStorage.removeItem(`revision_pago_${clienteKey}`);
+      } else if (enRevision) {
+          badgeClass = "badge-review";
+          badgeText = `⏳ Validando Pago`;
+          uiColor = "var(--neon-purple)";
       } else if (difDias > 0) {
           badgeClass = "badge-ok";
           badgeText = `⏳ Vence en ${difDias} día(s)`;
@@ -331,17 +304,14 @@
           `;
       }
 
-      // 4. Banner de Estado Global
       let bannerEstado = "";
-      if (cliente.estado === 'suspendido') {
+      if (cliente.estado === 'suspendido' && !enRevision) {
           bannerEstado = `<div class="alert-banner" style="background: rgba(255, 51, 102, 0.1); border-color: var(--danger-red); color: var(--danger-red); box-shadow: 0 0 15px rgba(255, 51, 102, 0.15);">⛔ Servicio Suspendido</div>`;
           uiColor = "var(--danger-red)";
       }
 
-      // 5. Cálculo del Descuento por Fidelidad
       let pctDescuento = 0;
       let mensajeLealtad = '';
-
       if (racha >= 9) {
         pctDescuento = 0.06;
         mensajeLealtad = `Nivel 2 Activo: <span class="loyalty-highlight">6% de descuento</span> aplicado en tu total.`;
@@ -357,30 +327,36 @@
           : `Progreso: <span class="loyalty-highlight" style="color:var(--text-main);">${racha}/4 pagos</span>. Faltan ${faltantes} pago(s) para subir a Nivel 1.`;
       }
 
-      // 6. Gran Total Final y Botones Dinámicos
       let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
       let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
-      
       let labelTotal = "Total a Pagar";
       
-      // AQUÍ SE AGREGA EL NUEVO BOTÓN DE NOTIFICAR PAGO
       const msgPagoWA = encodeURIComponent(`Hola GOXION, adjunto mi comprobante de pago por $${totalFinal.toFixed(2)} MXN para el Folio ${cliente.folio} (${cliente.nombre}).`);
       const urlPagoWA = `https://wa.me/${TELEFONO_GOXION}?text=${msgPagoWA}`;
 
-      let btnAccionHTML = `
-        <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>
-        <a href="${urlPagoWA}" target="_blank" class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);">
-          📤 Ya realicé mi depósito
-        </a>
-      `;
-
+      let btnAccionHTML = "";
+      
       if (cliente.estado === 'pagado') {
           totalFinal = 0;
           labelTotal = "Saldo Pendiente";
-          btnAccionHTML = "";
+      } else if (enRevision) {
+          // INTERFAZ DE VALIDACIÓN
+          btnAccionHTML = `
+            <div class="btn-review-state">
+              <span>⏳ <strong>Tu comprobante está en revisión</strong></span>
+              <span style="font-size: 11px; color: var(--text-muted);">El equipo de Goxion actualizará tu estado en breve.</span>
+            </div>
+          `;
+      } else {
+          // BOTONES NORMALES
+          btnAccionHTML = `
+            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>
+            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="notificarPago('${clienteKey}', '${periodoStr}', '${urlPagoWA}')">
+              📤 Ya realicé mi depósito
+            </button>
+          `;
       }
 
-      // 7. Generar Caja de Desglose (Ticket)
       let breakdownHTML = '';
       if (cliente.estado !== 'pagado' && (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
@@ -396,11 +372,13 @@
       const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi cuenta.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-      // Renderizado Final
       app.innerHTML = `
         <div class="header">
-          <img src="logo2.PNG" alt="GOXION" class="logo-img" onerror="this.src='Logo individual.png'">
-          <div class="subtitle">Resumen de Cuenta</div>
+          <img src="Logo individual.png" alt="GOXION" class="logo-img" onerror="this.src='logo2.PNG'">
+          <div class="header-text">
+            <div class="brand-title">GOXION</div>
+            <div class="subtitle">Resumen de Cuenta</div>
+          </div>
         </div>
 
         ${bannerEstado}
@@ -411,7 +389,7 @@
             <div class="time-badge ${badgeClass}">${badgeText}</div>
         </div>
 
-        ${cliente.estado === 'pagado' ? '' : mensajeAtrasoHTML}
+        ${(cliente.estado === 'pagado' || enRevision) ? '' : mensajeAtrasoHTML}
 
         <div class="glass-card card-info">
           <div class="info-block">
@@ -471,6 +449,17 @@
       toast.style.display = 'block';
       setTimeout(() => { toast.style.display = 'none'; }, 2500);
     });
+  }
+
+  // FUNCIÓN PARA REGISTRAR EL PAGO LOCALMENTE Y ABRIR WHATSAPP
+  function notificarPago(clienteKey, periodo, urlWA) {
+    localStorage.setItem(`revision_pago_${clienteKey}`, periodo);
+    window.open(urlWA, '_blank');
+    
+    // Recarga la página un segundo después para que el cliente vea el estado azul "En Validación"
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
   }
 
   cargarEstadoCuenta();
