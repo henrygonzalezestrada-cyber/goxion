@@ -99,14 +99,12 @@
         /* DEGRADADO DE CRISTAL (FADE/MASK EFECTO APP) */
         .glass-top-bar {
             position: fixed; top: 0; left: 0; width: 100%;
-            /* Degradado de negro a transparente */
             background: linear-gradient(to bottom, rgba(3, 3, 5, 0.95) 40%, rgba(3, 3, 5, 0) 100%);
             backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            /* Máscara para que el desenfoque desaparezca suavemente hacia abajo */
             -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
             mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
             border: none; 
-            padding: 25px 20px 45px 20px; /* Padding extra abajo para la zona invisible */
+            padding: 25px 20px 45px 20px; 
             z-index: 1000;
             display: flex; align-items: flex-start; justify-content: flex-start;
             opacity: 0; transform: translateY(-100%); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
@@ -140,7 +138,6 @@
         .tab-btn span { font-size: 16px; }
         .tab-btn.active { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25); }
 
-        /* Animación Liquid Glass al presionar */
         .tab-btn::after {
             content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0;
             background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(124, 77, 255, 0) 70%);
@@ -183,13 +180,32 @@
         .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
         .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 
+        /* NUEVOS ESTILOS PARA HISTORIAL Y UPSELLING */
+        .promo-card { background: linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 242, 254, 0.05)); border: 1px dashed rgba(124, 77, 255, 0.5); box-shadow: 0 0 25px rgba(124, 77, 255, 0.15); margin-bottom: 25px; padding: 20px; border-radius: 20px; }
+        .promo-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .promo-title span { font-size: 18px; filter: drop-shadow(0 0 10px var(--neon-purple)); }
+        .promo-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
+        .btn-promo { width: 100%; padding: 12px; border-radius: 15px; border: 1px solid var(--neon-purple); background: rgba(124, 77, 255, 0.2); color: var(--text-main); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-promo:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); }
+
+        .history-item { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .history-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .history-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--success-green); box-shadow: 0 0 10px var(--success-green); }
+        .history-info { flex: 1; }
+        .history-month { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+        .history-status { font-size: 11px; color: var(--text-muted); }
+        .history-amount { font-size: 14px; color: var(--neon-blue); font-weight: 700; }
+
         .service-pill-container { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; margin-bottom: 10px; padding: 12px; }
         .service-pill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
         .service-pill-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
         .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 3px 8px; border-radius: 10px; font-weight: 700; }
         
-        .cred-box { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; padding-top: 8px; border-top: 1px dashed rgba(255,255,255,0.08); }
-        .cred-tag { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 4px 8px; font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+        .btn-creds-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+        .btn-creds-toggle:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+
+        .cred-box { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.08); animation: fadeIn 0.3s ease; }
+        .cred-tag { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
         .cred-tag:hover { border-color: var(--neon-blue); color: #fff; background: rgba(0, 242, 254, 0.1); }
         .cred-tag strong { color: var(--text-main); }
 
@@ -264,7 +280,6 @@
         </div>
     </div>
 
-    <!-- ELIMINADA LA CLASE glass-card AQUÍ PARA QUITAR EL BORDE Y LA SOMBRA -->
     <div id="glass-header" class="glass-top-bar">
         <div class="glass-top-name">Tu Espacio, <span id="glass-name-text">Cliente</span></div>
     </div>
@@ -322,6 +337,9 @@
                     <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
                 </div>
 
+                <!-- CONTENEDOR DE UPSELLING (MOTOR DE PROMOCIONES) -->
+                <div id="dash-upsell"></div>
+
                 <div id="referral-section-container"></div>
 
                 <div class="glass-card dash-card">
@@ -340,6 +358,9 @@
                     </div>
                     <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
                 </div>
+
+                <!-- HISTORIAL DE PAGOS -->
+                <div id="dash-history"></div>
 
                 <div class="section-title">Tus Servicios Activos</div>
                 <div id="dash-services" style="margin-bottom: 25px;"></div>
@@ -365,7 +386,6 @@
             <div class="glass-card smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 <div class="platform-grid" id="support-platforms-grid">
-                    <!-- SE LLENARÁ DINÁMICAMENTE -->
                     <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
                 </div>
                 <div id="step-2" class="step-box">
@@ -404,6 +424,7 @@
         <button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
     </div>
 
+    <!-- MODALES EXISTENTES INTACTOS -->
     <div id="modal-terminos" class="modal">
         <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
@@ -536,7 +557,6 @@
 
         async function cargarDatosYVerificarSesion() {
             try {
-                // AQUÍ SE APLICA EL CACHE BUSTING
                 const version = new Date().getTime(); 
                 const response = await fetch(`clientes.json?v=${version}`, { 
                     cache: 'no-store',
@@ -613,6 +633,15 @@
             alert(`¡${tipo} copiado al portapapeles!`);
         }
 
+        function toggleCreds(id) {
+            const box = document.getElementById(id);
+            if(box.style.display === 'none') {
+                box.style.display = 'flex';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
             document.getElementById('auth-view').style.display = 'none';
@@ -623,6 +652,49 @@
             document.getElementById('glass-name-text').innerText = primerNombre;
 
             iniciarSaludoDinamico(cliente.nombre);
+
+            // 1. MOTOR DE UPSELLING (Promociones Automáticas)
+            let hasPrime = false;
+            let hasHBO = false;
+            let hasCombo = false;
+
+            if(cliente.servicios && cliente.servicios.length > 0) {
+                cliente.servicios.forEach(s => {
+                    let n = s.nombre.toLowerCase();
+                    if(n.includes("prime") && !n.includes("hbo") && !n.includes("max")) hasPrime = true;
+                    if(n.includes("hbo") || n.includes("max")) {
+                        if(n.includes("prime")) hasCombo = true;
+                        else hasHBO = true;
+                    }
+                });
+            }
+
+            let upsellHTML = '';
+            let msgPromoWA = '';
+            if(hasCombo) {
+                upsellHTML = `
+                    <div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);">
+                        <div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div>
+                        <div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div>
+                    </div>`;
+            } else if(hasPrime) {
+                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
+                upsellHTML = `
+                    <div class="promo-card">
+                        <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
+                        <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
+                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button>
+                    </div>`;
+            } else if(hasHBO) {
+                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
+                upsellHTML = `
+                    <div class="promo-card">
+                        <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
+                        <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
+                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button>
+                    </div>`;
+            }
+            document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
             if(cliente.referido_activo) {
@@ -711,26 +783,56 @@
                 document.getElementById('loyalty-msg').innerText = `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
             }
 
+            // 2. HISTORIAL DE PAGOS 
+            let historyHTML = '';
+            if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
+                historyHTML = `<div class="glass-card"><div class="section-title">Historial de Transacciones</div>`;
+                // Invertir para mostrar el más reciente arriba
+                const historialInverso = [...cliente.historial_pagos].reverse(); 
+                
+                historialInverso.forEach(p => {
+                    historyHTML += `
+                        <div class="history-item">
+                            <div class="history-dot"></div>
+                            <div class="history-info">
+                                <div class="history-month">${p.fecha}</div>
+                                <div class="history-status">✅ Acreditado a tiempo (+1 Racha)</div>
+                            </div>
+                            <div class="history-amount">$${p.monto.toFixed(2)}</div>
+                        </div>`;
+                });
+                historyHTML += `</div>`;
+            }
+            document.getElementById('dash-history').innerHTML = historyHTML;
+
+            // 3. SERVICIOS Y VISUALIZADOR DE CREDENCIALES
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
             
             if(cliente.servicios && cliente.servicios.length > 0) {
-                cliente.servicios.forEach(s => {
+                cliente.servicios.forEach((s, idx) => {
                     let icon = "📺";
                     for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
                     
                     let credsBtns = '';
-                    if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
-                    if(s.perfil_nombre) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_nombre}', 'Perfil')">👤 <strong>${s.perfil_nombre}</strong></div>`;
-                    if(s.perfil_pin) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_pin}', 'PIN')">🔢 PIN: <strong>${s.perfil_pin}</strong></div>`;
+                    if(s.correo_login || s.perfil_nombre || s.perfil_pin) {
+                        if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
+                        if(s.perfil_nombre) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_nombre}', 'Perfil')">👤 <strong>${s.perfil_nombre}</strong></div>`;
+                        if(s.perfil_pin) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_pin}', 'PIN')">🔢 PIN: <strong>${s.perfil_pin}</strong></div>`;
+                    } else {
+                        credsBtns = `<div style="font-size:11px; color:var(--text-muted); width:100%;">Tus accesos llegarán a tu correo o WhatsApp pronto.</div>`;
+                    }
 
                     srvHTML += `
                         <div class="service-pill-container">
                             <div class="service-pill-header">
                                 <div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div>
-                                <div class="service-status">Activo</div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <div class="service-status">Activo</div>
+                                    <button class="btn-creds-toggle" onclick="toggleCreds('creds-${idx}')">👁️ Ver Accesos</button>
+                                </div>
                             </div>
-                            ${credsBtns ? `<div class="cred-box">${credsBtns}</div>` : ''}
+                            <div class="cred-box" id="creds-${idx}" style="display:none;">${credsBtns}</div>
                         </div>
                     `;
                 });
@@ -947,7 +1049,6 @@
             document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`;
             document.getElementById('input-label').innerText = data.labelInput;
             
-            // LÓGICA DE AUTO-LLENADO INTELIGENTE
             let autoData = "";
             const key = localStorage.getItem('goxion_user_key');
             if (key && globalClientesData && globalClientesData[key]) {
@@ -972,7 +1073,6 @@
             const idx = document.getElementById('issue-selector').value; if(idx === "") return;
             const val = document.getElementById('smart-extra-input').value.trim(); if(!val) return alert("Por favor completa el dato requerido en el campo de texto.");
             
-            // CONSTRUIR EL MENSAJE CON EXPEDIENTE OCULTO PARA EL ADMIN
             let extraContext = "";
             const key = localStorage.getItem('goxion_user_key');
             if (key && globalClientesData && globalClientesData[key]) {
