@@ -319,9 +319,20 @@
     function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
 
     async function inicializarPanel() {
-        const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}`;
+        // --- AQUÍ APLICAMOS EL PARCHE ANTI-CACHÉ (Y MANTUVIMOS EL RESTO IGUAL) ---
+        const version = new Date().getTime();
+        const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}?v=${version}`;
         try {
-            const response = await fetch(url, { headers: { "Authorization": `token ${currentToken}`, "Accept": "application/vnd.github.v3+json" }, cache: "no-store" });
+            const response = await fetch(url, { 
+                headers: { 
+                    "Authorization": `token ${currentToken}`, 
+                    "Accept": "application/vnd.github.v3+json",
+                    "Cache-Control": "no-cache, no-store, must-revalidate",
+                    "Pragma": "no-cache",
+                    "Expires": "0"
+                }, 
+                cache: "no-store" 
+            });
             if (response.status === 401) return cerrarSesion();
 
             const data = await response.json();
