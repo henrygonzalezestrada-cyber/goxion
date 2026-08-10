@@ -29,27 +29,407 @@
       overflow-x: hidden;
     }
 
-    /* FONDO ANIMADO NEÓN (MISMO QUE LA PÁGINA PRINCIPAL) */
-    .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); overflow: hidden; }
-    .neon-orbit { position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.9; }
-    .orbit-1 { width: 450px; height: 450px; top: -150px; left: -150px; border-bottom: 3px solid #b026ff; border-left: 3px solid rgba(176, 38, 255, 0.2); filter: drop-shadow(0 0 15px #b026ff) drop-shadow(0 0 30px #b026ff); animation: floatOrbit1 70s linear infinite; }
-    .orbit-2 { width: 550px; height: 550px; bottom: -200px; right: -200px; border-top: 3px solid #00f2fe; border-right: 3px solid rgba(0, 242, 254, 0.2); filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); animation: floatOrbit2 85s linear infinite; }
-    .orbit-3 { width: 380px; height: 380px; top: 60%; left: -100px; border-right: 2px solid #7c4dff; border-bottom: 2px solid rgba(124, 77, 255, 0.2); filter: drop-shadow(0 0 12px #7c4dff) drop-shadow(0 0 25px #7c4dff); animation: floatOrbit3 95s linear infinite; opacity: 0.6; }
+    /* =========================================================
+   FONDO GOXION — LAVA DIGITAL
+   ========================================================= */
 
-    @keyframes floatOrbit1 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); } 25% { transform: translate3d(80px, 40px, 0) rotate(90deg) scale(1.03); } 50% { transform: translate3d(220px, 130px, 0) rotate(180deg) scale(1.06); } 75% { transform: translate3d(140px, 190px, 0) rotate(270deg) scale(1.02); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(1); } }
-    @keyframes floatOrbit2 { 0% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.96); } 25% { transform: translate3d(40px, 60px, 0) rotate(270deg) scale(1); } 50% { transform: translate3d(100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(140px, 50px, 0) rotate(90deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.96); } }
-    @keyframes floatOrbit3 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.92); } 25% { transform: translate3d(-50px, 60px, 0) rotate(90deg) scale(0.97); } 50% { transform: translate3d(-100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(-40px, 170px, 0) rotate(270deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.92); } }
+.bg {
+    position: fixed;
+    inset: 0;
+    z-index: -2;
+    background: #030305;
+    overflow: hidden;
+    pointer-events: none;
+}
 
-    .container { 
-      width: 100%; max-width: 460px; 
-      position: relative; z-index: 1; 
-      padding-bottom: 20px;
+/* Capa general de luz */
+
+.bg::before {
+    content: "";
+    position: absolute;
+    inset: -20%;
+    background:
+        radial-gradient(
+            circle at 20% 20%,
+            rgba(124, 77, 255, 0.10),
+            transparent 28%
+        ),
+        radial-gradient(
+            circle at 80% 75%,
+            rgba(0, 242, 254, 0.09),
+            transparent 30%
+        );
+
+    filter: blur(60px);
+
+    animation: ambientMove 25s ease-in-out infinite alternate;
+}
+
+
+/* =========================================================
+   FORMAS DE LAVA
+   ========================================================= */
+
+.lava {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(35px);
+    opacity: 0.65;
+    will-change: transform;
+}
+
+
+/* LAVA MORADA — SUPERIOR IZQUIERDA */
+
+.lava-1 {
+    width: 330px;
+    height: 430px;
+
+    top: -180px;
+    left: -120px;
+
+    background:
+        radial-gradient(
+            ellipse at 40% 50%,
+            rgba(176, 38, 255, 0.75),
+            rgba(124, 77, 255, 0.25) 45%,
+            transparent 72%
+        );
+
+    transform: rotate(25deg);
+
+    animation:
+        lavaOne 18s ease-in-out infinite alternate;
+}
+
+
+/* LAVA CIAN — DERECHA */
+
+.lava-2 {
+    width: 360px;
+    height: 460px;
+
+    top: 20%;
+    right: -190px;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 45%,
+            rgba(0, 242, 254, 0.70),
+            rgba(0, 180, 255, 0.22) 45%,
+            transparent 72%
+        );
+
+    transform: rotate(-20deg);
+
+    animation:
+        lavaTwo 22s ease-in-out infinite alternate;
+}
+
+
+/* LAVA MORADA — PARTE INFERIOR */
+
+.lava-3 {
+    width: 380px;
+    height: 420px;
+
+    bottom: -190px;
+    left: 15%;
+
+    background:
+        radial-gradient(
+            ellipse at 50% 40%,
+            rgba(124, 77, 255, 0.65),
+            rgba(176, 38, 255, 0.18) 48%,
+            transparent 75%
+        );
+
+    transform: rotate(15deg);
+
+    animation:
+        lavaThree 26s ease-in-out infinite alternate;
+}
+
+
+/* PEQUEÑA LAVA CIAN */
+
+.lava-4 {
+    width: 220px;
+    height: 280px;
+
+    top: 48%;
+    left: -120px;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(0, 242, 254, 0.50),
+            rgba(0, 242, 254, 0.12) 50%,
+            transparent 75%
+        );
+
+    animation:
+        lavaFour 20s ease-in-out infinite alternate;
+}
+
+
+/* =========================================================
+   DESTELLOS
+   ========================================================= */
+
+.spark {
+    position: absolute;
+
+    width: 4px;
+    height: 4px;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 6px #ffffff,
+        0 0 14px #00f2fe,
+        0 0 28px rgba(0, 242, 254, 0.8);
+
+    opacity: 0;
+
+    animation:
+        sparkle 5s ease-in-out infinite;
+}
+
+
+/* Posiciones de los destellos */
+
+.spark-1 {
+    top: 18%;
+    left: 24%;
+    animation-delay: 1s;
+}
+
+.spark-2 {
+    top: 34%;
+    right: 22%;
+    animation-delay: 3s;
+}
+
+.spark-3 {
+    top: 58%;
+    left: 18%;
+    animation-delay: 0.5s;
+}
+
+.spark-4 {
+    top: 72%;
+    right: 25%;
+    animation-delay: 2.2s;
+}
+
+.spark-5 {
+    top: 44%;
+    left: 65%;
+    animation-delay: 4s;
+}
+
+.spark-6 {
+    top: 82%;
+    left: 48%;
+    animation-delay: 1.8s;
+}
+
+
+/* =========================================================
+   ANIMACIONES
+   ========================================================= */
+
+@keyframes ambientMove {
+
+    0% {
+        transform: translate3d(-20px, -10px, 0) scale(1);
     }
 
-    .header { text-align: center; margin-bottom: 30px; }
-    .logo-img { max-height: 40px; width: auto; display: block; margin: 0 auto; filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.2)); }
-    .subtitle { color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 15px; }
-    
+    50% {
+        transform: translate3d(30px, 20px, 0) scale(1.05);
+    }
+
+    100% {
+        transform: translate3d(-10px, 40px, 0) scale(1.1);
+    }
+}
+
+
+@keyframes lavaOne {
+
+    0% {
+        transform:
+            translate3d(0, 0, 0)
+            rotate(20deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(60px, 80px, 0)
+            rotate(35deg)
+            scale(1.12);
+    }
+
+    100% {
+        transform:
+            translate3d(20px, 150px, 0)
+            rotate(15deg)
+            scale(0.95);
+    }
+}
+
+
+@keyframes lavaTwo {
+
+    0% {
+        transform:
+            translate3d(0, 0, 0)
+            rotate(-20deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(-70px, 40px, 0)
+            rotate(-5deg)
+            scale(1.15);
+    }
+
+    100% {
+        transform:
+            translate3d(-30px, -70px, 0)
+            rotate(-30deg)
+            scale(0.92);
+    }
+}
+
+
+@keyframes lavaThree {
+
+    0% {
+        transform:
+            translate3d(0, 0, 0)
+            rotate(15deg)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(80px, -50px, 0)
+            rotate(-5deg)
+            scale(1.1);
+    }
+
+    100% {
+        transform:
+            translate3d(-60px, -20px, 0)
+            rotate(25deg)
+            scale(0.94);
+    }
+}
+
+
+@keyframes lavaFour {
+
+    0% {
+        transform:
+            translate3d(0, 0, 0)
+            scale(1);
+    }
+
+    50% {
+        transform:
+            translate3d(60px, -40px, 0)
+            scale(1.15);
+    }
+
+    100% {
+        transform:
+            translate3d(20px, 50px, 0)
+            scale(0.9);
+    }
+}
+
+
+/* Destellos: aparecen, brillan y desaparecen */
+
+@keyframes sparkle {
+
+    0% {
+        opacity: 0;
+        transform: scale(0.4);
+    }
+
+    25% {
+        opacity: 0.3;
+        transform: scale(0.7);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+
+    65% {
+        opacity: 0.5;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(0.4);
+    }
+}
+
+
+/* =========================================================
+   TELÉFONOS
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .bg::before {
+        filter: blur(50px);
+    }
+
+    .lava {
+        filter: blur(30px);
+    }
+
+    .lava-1 {
+        width: 260px;
+        height: 350px;
+        top: -140px;
+        left: -130px;
+    }
+
+    .lava-2 {
+        width: 280px;
+        height: 360px;
+        right: -160px;
+    }
+
+    .lava-3 {
+        width: 300px;
+        height: 340px;
+        bottom: -150px;
+    }
+
+    .lava-4 {
+        width: 180px;
+        height: 230px;
+        left: -100px;
+    }
+
+    .spark {
+        width: 3px;
+        height: 3px;
+    }
+}
     /* --- GLASSMORPHISM GENERAL (MISMO QUE LA APP) --- */
     .glass-card {
         background: var(--card-glass);
@@ -130,9 +510,19 @@
 <body>
 
 <div class="bg">
-    <div class="neon-orbit orbit-1"></div>
-    <div class="neon-orbit orbit-2"></div>
-    <div class="neon-orbit orbit-3"></div>
+
+    <div class="lava lava-1"></div>
+    <div class="lava lava-2"></div>
+    <div class="lava lava-3"></div>
+    <div class="lava lava-4"></div>
+
+    <div class="spark spark-1"></div>
+    <div class="spark spark-2"></div>
+    <div class="spark spark-3"></div>
+    <div class="spark spark-4"></div>
+    <div class="spark spark-5"></div>
+    <div class="spark spark-6"></div>
+
 </div>
 
 <div class="container" id="app">
