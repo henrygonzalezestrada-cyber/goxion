@@ -29,464 +29,104 @@
       overflow-x: hidden;
     }
 
-    /* =========================================================
-   FONDO GOXION — LAVA DIGITAL
-   ========================================================= */
-
-.bg {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    background: #030305;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-/* Capa general de luz */
-
-.bg::before {
-    content: "";
-    position: absolute;
-    inset: -20%;
-    background:
-        radial-gradient(
-            circle at 20% 20%,
-            rgba(124, 77, 255, 0.10),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 80% 75%,
-            rgba(0, 242, 254, 0.09),
-            transparent 30%
-        );
-
-    filter: blur(60px);
-
-    animation: ambientMove 25s ease-in-out infinite alternate;
-}
-
-
-/* =========================================================
-   FORMAS DE LAVA
-   ========================================================= */
-
-.lava {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(35px);
-    opacity: 0.65;
-    will-change: transform;
-}
-
-
-/* LAVA MORADA — SUPERIOR IZQUIERDA */
-
-.lava-1 {
-    width: 330px;
-    height: 430px;
-
-    top: -180px;
-    left: -120px;
-
-    background:
-        radial-gradient(
-            ellipse at 40% 50%,
-            rgba(176, 38, 255, 0.75),
-            rgba(124, 77, 255, 0.25) 45%,
-            transparent 72%
-        );
-
-    transform: rotate(25deg);
-
-    animation:
-        lavaOne 18s ease-in-out infinite alternate;
-}
-
-
-/* LAVA CIAN — DERECHA */
-
-.lava-2 {
-    width: 360px;
-    height: 460px;
-
-    top: 20%;
-    right: -190px;
-
-    background:
-        radial-gradient(
-            ellipse at 50% 45%,
-            rgba(0, 242, 254, 0.70),
-            rgba(0, 180, 255, 0.22) 45%,
-            transparent 72%
-        );
-
-    transform: rotate(-20deg);
-
-    animation:
-        lavaTwo 22s ease-in-out infinite alternate;
-}
-
-
-/* LAVA MORADA — PARTE INFERIOR */
-
-.lava-3 {
-    width: 380px;
-    height: 420px;
-
-    bottom: -190px;
-    left: 15%;
-
-    background:
-        radial-gradient(
-            ellipse at 50% 40%,
-            rgba(124, 77, 255, 0.65),
-            rgba(176, 38, 255, 0.18) 48%,
-            transparent 75%
-        );
-
-    transform: rotate(15deg);
-
-    animation:
-        lavaThree 26s ease-in-out infinite alternate;
-}
-
-
-/* PEQUEÑA LAVA CIAN */
-
-.lava-4 {
-    width: 220px;
-    height: 280px;
-
-    top: 48%;
-    left: -120px;
-
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(0, 242, 254, 0.50),
-            rgba(0, 242, 254, 0.12) 50%,
-            transparent 75%
-        );
-
-    animation:
-        lavaFour 20s ease-in-out infinite alternate;
-}
-
-
-/* =========================================================
-   DESTELLOS
-   ========================================================= */
-
-.spark {
-    position: absolute;
-
-    width: 4px;
-    height: 4px;
-
-    border-radius: 50%;
-
-    background: #ffffff;
-
-    box-shadow:
-        0 0 6px #ffffff,
-        0 0 14px #00f2fe,
-        0 0 28px rgba(0, 242, 254, 0.8);
-
-    opacity: 0;
-
-    animation:
-        sparkle 5s ease-in-out infinite;
-}
-
-
-/* Posiciones de los destellos */
-
-.spark-1 {
-    top: 18%;
-    left: 24%;
-    animation-delay: 1s;
-}
-
-.spark-2 {
-    top: 34%;
-    right: 22%;
-    animation-delay: 3s;
-}
-
-.spark-3 {
-    top: 58%;
-    left: 18%;
-    animation-delay: 0.5s;
-}
-
-.spark-4 {
-    top: 72%;
-    right: 25%;
-    animation-delay: 2.2s;
-}
-
-.spark-5 {
-    top: 44%;
-    left: 65%;
-    animation-delay: 4s;
-}
-
-.spark-6 {
-    top: 82%;
-    left: 48%;
-    animation-delay: 1.8s;
-}
-
-
-/* =========================================================
-   ANIMACIONES
-   ========================================================= */
-
-@keyframes ambientMove {
-
-    0% {
-        transform: translate3d(-20px, -10px, 0) scale(1);
+    /* --- FONDO Y LÁMPARA DE LAVA --- */
+    .bg {
+        position: fixed; inset: 0; z-index: -2; background: var(--bg-black); overflow: hidden; pointer-events: none;
     }
-
-    50% {
-        transform: translate3d(30px, 20px, 0) scale(1.05);
-    }
-
-    100% {
-        transform: translate3d(-10px, 40px, 0) scale(1.1);
-    }
-}
-
-
-@keyframes lavaOne {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            rotate(20deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(60px, 80px, 0)
-            rotate(35deg)
-            scale(1.12);
-    }
-
-    100% {
-        transform:
-            translate3d(20px, 150px, 0)
-            rotate(15deg)
-            scale(0.95);
-    }
-}
-
-
-@keyframes lavaTwo {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            rotate(-20deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(-70px, 40px, 0)
-            rotate(-5deg)
-            scale(1.15);
-    }
-
-    100% {
-        transform:
-            translate3d(-30px, -70px, 0)
-            rotate(-30deg)
-            scale(0.92);
-    }
-}
-
-
-@keyframes lavaThree {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            rotate(15deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(80px, -50px, 0)
-            rotate(-5deg)
-            scale(1.1);
-    }
-
-    100% {
-        transform:
-            translate3d(-60px, -20px, 0)
-            rotate(25deg)
-            scale(0.94);
-    }
-}
-
-
-@keyframes lavaFour {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(60px, -40px, 0)
-            scale(1.15);
-    }
-
-    100% {
-        transform:
-            translate3d(20px, 50px, 0)
-            scale(0.9);
-    }
-}
-
-
-/* Destellos: aparecen, brillan y desaparecen */
-
-@keyframes sparkle {
-
-    0% {
-        opacity: 0;
-        transform: scale(0.4);
-    }
-
-    25% {
-        opacity: 0.3;
-        transform: scale(0.7);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.5);
-    }
-
-    65% {
-        opacity: 0.5;
-        transform: scale(1);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(0.4);
-    }
-}
-/* =========================================================
-   CONTENEDOR Y ENCABEZADO
-   ========================================================= */
-
-.container { 
-    width: 100%; 
-    max-width: 460px; 
-    position: relative; 
-    z-index: 1; 
-    padding-bottom: 20px;
-}
-
-.header { 
-    text-align: center; 
-    margin-bottom: 30px; 
-}
-
-.logo-img { 
-    max-height: 40px; 
-    width: auto; 
-    display: block; 
-    margin: 0 auto; 
-    filter: drop-shadow(
-        0 0 15px rgba(0, 242, 254, 0.2)
-    );
-}
-
-.subtitle { 
-    color: var(--text-muted); 
-    font-size: 12px; 
-    font-weight: 600; 
-    text-transform: uppercase; 
-    letter-spacing: 2px; 
-    margin-top: 15px; 
-}
-@media (max-width: 600px) {
-    .container {
-        max-width: 460px;
-        width: 100%;
-    }
-
-    .logo-img {
-        max-width: 85%;
-        height: auto;
-        max-height: 40px;
-    }
-}
-
-/* =========================================================
-   TELÉFONOS
-   ========================================================= */
-
-@media (max-width: 600px) {
 
     .bg::before {
-        filter: blur(50px);
+        content: ""; position: absolute; inset: -20%;
+        background: radial-gradient(circle at 20% 20%, rgba(124, 77, 255, 0.08), transparent 30%),
+                    radial-gradient(circle at 80% 75%, rgba(0, 242, 254, 0.08), transparent 30%);
+        filter: blur(60px);
+        animation: ambientMove 20s ease-in-out infinite alternate;
     }
 
     .lava {
-        filter: blur(30px);
+        position: absolute; border-radius: 50%;
+        filter: blur(65px); /* Desenfoque alto para efecto líquido */
+        opacity: 0.55;
+        mix-blend-mode: screen; /* Mezcla de colores al interceptarse */
+        will-change: transform;
     }
 
     .lava-1 {
-        width: 260px;
-        height: 350px;
-        top: -140px;
-        left: -130px;
+        width: 380px; height: 380px; top: -100px; left: -100px;
+        background: radial-gradient(circle, rgba(176, 38, 255, 0.6), transparent 70%);
+        animation: lavaFluid1 18s ease-in-out infinite alternate;
     }
 
     .lava-2 {
-        width: 280px;
-        height: 360px;
-        right: -160px;
+        width: 420px; height: 420px; top: 15%; right: -150px;
+        background: radial-gradient(circle, rgba(0, 242, 254, 0.55), transparent 70%);
+        animation: lavaFluid2 22s ease-in-out infinite alternate;
     }
 
     .lava-3 {
-        width: 300px;
-        height: 340px;
-        bottom: -150px;
+        width: 350px; height: 350px; bottom: -120px; left: 10%;
+        background: radial-gradient(circle, rgba(124, 77, 255, 0.5), transparent 70%);
+        animation: lavaFluid3 25s ease-in-out infinite alternate;
     }
 
     .lava-4 {
-        width: 180px;
-        height: 230px;
-        left: -100px;
+        width: 250px; height: 250px; top: 50%; left: -80px;
+        background: radial-gradient(circle, rgba(0, 242, 254, 0.4), transparent 70%);
+        animation: lavaFluid4 19s ease-in-out infinite alternate;
     }
 
-    .spark {
-        width: 3px;
-        height: 3px;
+    @keyframes ambientMove {
+        0% { transform: translate3d(-20px, -10px, 0) scale(1); }
+        100% { transform: translate3d(20px, 30px, 0) scale(1.1); }
     }
-}
-    /* --- GLASSMORPHISM GENERAL (MISMO QUE LA APP) --- */
+
+    @keyframes lavaFluid1 {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(80px, 90px, 0) scale(1.1); }
+        100% { transform: translate3d(30px, 160px, 0) scale(0.95); }
+    }
+
+    @keyframes lavaFluid2 {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(-90px, 60px, 0) scale(1.15); }
+        100% { transform: translate3d(-40px, -80px, 0) scale(0.9); }
+    }
+
+    @keyframes lavaFluid3 {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        50% { transform: translate3d(100px, -60px, 0) scale(1.05); }
+        100% { transform: translate3d(-50px, -30px, 0) scale(0.95); }
+    }
+
+    @keyframes lavaFluid4 {
+        0% { transform: translate3d(0, 0, 0) scale(1); }
+        100% { transform: translate3d(70px, 70px, 0) scale(1.1); }
+    }
+
+    @media (max-width: 600px) {
+        .lava { filter: blur(50px); }
+        .lava-1 { width: 280px; height: 280px; }
+        .lava-2 { width: 300px; height: 300px; }
+        .lava-3 { width: 260px; height: 260px; }
+        .lava-4 { width: 200px; height: 200px; }
+    }
+
+    /* --- CONTENEDOR PRINCIPAL --- */
+    .container { width: 100%; max-width: 460px; position: relative; z-index: 1; padding-bottom: 20px; }
+    
+    .header { text-align: center; margin-bottom: 30px; }
+    .logo-img { max-height: 40px; width: auto; max-width: 85%; display: block; margin: 0 auto; filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.2)); }
+    .subtitle { color: var(--text-muted); font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 2px; margin-top: 15px; }
+    
+    /* --- GLASSMORPHISM --- */
     .glass-card {
         background: var(--card-glass);
         backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
         border: 1px solid rgba(255, 255, 255, 0.08); 
         box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        border-radius: 20px;
-        padding: 20px;
+        border-radius: 20px; padding: 20px;
     }
 
-    /* --- HERO BALANCE (LOS 5 SEGUNDOS) --- */
+    /* --- HERO BALANCE --- */
     .balance-hero { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
     .total-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
     .total-amount { font-size: 56px; font-weight: 800; line-height: 1; margin-bottom: 15px; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
@@ -556,19 +196,10 @@
 <body>
 
 <div class="bg">
-
     <div class="lava lava-1"></div>
     <div class="lava lava-2"></div>
     <div class="lava lava-3"></div>
     <div class="lava lava-4"></div>
-
-    <div class="spark spark-1"></div>
-    <div class="spark spark-2"></div>
-    <div class="spark spark-3"></div>
-    <div class="spark spark-4"></div>
-    <div class="spark spark-5"></div>
-    <div class="spark spark-6"></div>
-
 </div>
 
 <div class="container" id="app">
@@ -690,7 +321,7 @@
           `;
       }
 
-      // 4. Banner de Estado Global (Solo si está suspendido, ELIMINAMOS el banner redundante de pagado)
+      // 4. Banner de Estado Global
       let bannerEstado = "";
       if (cliente.estado === 'suspendido') {
           bannerEstado = `<div class="alert-banner" style="background: rgba(255, 51, 102, 0.1); border-color: var(--danger-red); color: var(--danger-red); box-shadow: 0 0 15px rgba(255, 51, 102, 0.15);">⛔ Servicio Suspendido</div>`;
@@ -721,14 +352,12 @@
       let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
       
       let labelTotal = "Total a Pagar";
-      
-      // ELIMINAMOS el botón redundante de "Mensualidad Cubierta"
       let btnAccionHTML = `<button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>`;
 
       if (cliente.estado === 'pagado') {
           totalFinal = 0;
           labelTotal = "Saldo Pendiente";
-          btnAccionHTML = ""; // Ya no se muestra un segundo botón confirmando el pago.
+          btnAccionHTML = "";
       }
 
       // 7. Generar Caja de Desglose (Ticket)
@@ -747,7 +376,7 @@
       const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi cuenta.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
-      // Renderizado Final con la tipografía y estilo Ecosistema
+      // Renderizado Final
       app.innerHTML = `
         <div class="header">
           <img src="logo2.PNG" alt="GOXION" class="logo-img" onerror="this.src='Logo individual.png'">
@@ -756,7 +385,6 @@
 
         ${bannerEstado}
 
-        <!-- LA REGLA DE 5 SEGUNDOS (HERO SECTION) -->
         <div class="balance-hero">
             <div class="total-label">${labelTotal}</div>
             <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">$${totalFinal.toFixed(2)}</div>
@@ -765,7 +393,6 @@
 
         ${cliente.estado === 'pagado' ? '' : mensajeAtrasoHTML}
 
-        <!-- DATOS DEL CLIENTE -->
         <div class="glass-card card-info">
           <div class="info-block">
             <span class="label">Titular</span>
