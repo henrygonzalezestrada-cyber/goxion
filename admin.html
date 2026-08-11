@@ -81,10 +81,8 @@
         .search-bar, .custom-select { width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.95rem; outline: none; transition: 0.3s; }
         .search-bar:focus, .custom-select:focus { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(188, 19, 254, 0.3); }
 
-        /* Filtros Superiores */
         .filters-row { display: flex; gap: 12px; margin-bottom: 15px; }
 
-        /* Catálogo Compacto */
         .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
         .catalog-table th { color: var(--text-muted); font-weight: 600; text-align: left; padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .catalog-table td { padding: 8px 5px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
@@ -104,7 +102,6 @@
         .btn-add-service { background: rgba(188, 19, 254, 0.05); color: var(--neon-purple); border: 1px dashed rgba(188, 19, 254, 0.5); width: 100%; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: bold; margin-top: 15px; transition: 0.3s; }
         .btn-add-service:hover { background: rgba(188, 19, 254, 0.15); border-style: solid; }
 
-        /* --- CLIENT CARD (ACORDEÓN) --- */
         .client-card { background: linear-gradient(145deg, #12121a, #0a0a0f); border-left: 4px solid var(--neon-green); padding: 15px; border-radius: 8px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; }
         .client-card:hover { box-shadow: 0 6px 15px rgba(0,0,0,0.4); }
         
@@ -308,19 +305,18 @@
     function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
 
     async function inicializarPanel() {
+        // AQUÍ SE ARREGLÓ EL ERROR (Se quitaron las cabeceras que bloqueaban la conexión con GitHub)
         const version = new Date().getTime();
         const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}?v=${version}`;
         try {
             const response = await fetch(url, { 
                 headers: { 
                     "Authorization": `token ${currentToken}`, 
-                    "Accept": "application/vnd.github.v3+json",
-                    "Cache-Control": "no-cache, no-store, must-revalidate",
-                    "Pragma": "no-cache",
-                    "Expires": "0"
+                    "Accept": "application/vnd.github.v3+json"
                 }, 
                 cache: "no-store" 
             });
+            
             if (response.status === 401) return cerrarSesion();
 
             const data = await response.json();
@@ -560,7 +556,6 @@
             let statusColor = enRevision ? 'var(--neon-purple)' : (cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)'));
             let statusBadge = enRevision ? 'EN REVISIÓN 🔔' : (cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE'));
             
-            // Animación de pulso si está en revisión
             let pulseAnim = enRevision ? 'animation: pulse 1.5s infinite;' : '';
 
             const card = document.createElement("div");
@@ -641,7 +636,6 @@
         cli.pago_en_revision = false;
         cli.pagos_puntuales = (cli.pagos_puntuales || 0) + 1;
         
-        // Agregar al historial
         if(!cli.historial_pagos) cli.historial_pagos = [];
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
         const hoy = new Date();
@@ -649,7 +643,6 @@
         
         cli.historial_pagos.push({ fecha: fechaStr, monto: monto, estado: "pagado" });
 
-        // Mantener solo los últimos 6 meses para no saturar
         if(cli.historial_pagos.length > 6) { cli.historial_pagos.shift(); }
 
         calcularInventarioYFinanzas();
