@@ -25,7 +25,7 @@
       background-color: var(--bg-black); 
       color: var(--text-main); 
       display: flex; justify-content: center; 
-      align-items: flex-start; /* Cambiado para permitir el scroll natural */
+      align-items: flex-start;
       min-height: 100vh; padding: 0; 
       overflow-x: hidden;
     }
@@ -76,41 +76,40 @@
         padding: 0 20px 30px 20px; 
     }
     
-    /* --- ENCABEZADO ESTÁTICO (STICKY GLASSMORPHISM) --- */
+    /* --- ENCABEZADO ESTÁTICO COMPACTADO --- */
     .sticky-area {
         position: sticky;
         top: 0;
         z-index: 50;
-        background: rgba(3, 3, 5, 0.65); /* Cristal Oscuro Transparente */
+        background: rgba(3, 3, 5, 0.75); 
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        margin: 0 -20px 25px -20px;
-        padding: 30px 20px 20px 20px;
+        margin: 0 -20px 20px -20px;
+        padding: 15px 20px 20px 20px; /* Reducción de padding superior */
         border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
         box-shadow: 0 15px 30px -15px rgba(0,0,0,0.8);
     }
     
-    /* Efecto de degradado suave debajo de la línea punteada */
     .sticky-area::after {
         content: "";
         position: absolute;
-        bottom: -20px;
+        bottom: -15px;
         left: 0; right: 0;
-        height: 20px;
-        background: linear-gradient(to bottom, rgba(3,3,5,0.7) 0%, transparent 100%);
+        height: 15px;
+        background: linear-gradient(to bottom, rgba(3,3,5,0.75) 0%, transparent 100%);
         pointer-events: none;
     }
 
     .header { 
-        display: flex; align-items: center; justify-content: center; gap: 15px; 
-        margin-bottom: 25px; 
+        display: flex; align-items: center; justify-content: flex-start; gap: 10px; 
+        margin-bottom: 12px; /* Margen más compacto */
     }
     .logo-img { 
-        max-height: 48px; width: auto; 
-        filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4)); 
+        max-height: 26px; width: auto; /* Logo más pequeño tipo icono */
+        filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4)); 
     }
-    .subtitle { 
-        color: var(--text-main); font-size: 17px; font-weight: 700; 
+    .header-title { 
+        color: var(--text-main); font-size: 13px; font-weight: 700; 
         text-transform: uppercase; letter-spacing: 2px; margin: 0; 
         text-shadow: 0 0 10px rgba(255,255,255,0.2);
     }
@@ -124,11 +123,11 @@
         border-radius: 20px; padding: 20px;
     }
 
-    .balance-hero { text-align: center; } /* Se quitaron los paddings/bordes de aquí porque ahora los controla el sticky-area */
-    .total-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
-    .total-amount { font-size: 56px; font-weight: 800; line-height: 1; margin-bottom: 15px; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
+    .balance-hero { text-align: center; } 
+    .total-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 2px; }
+    .total-amount { font-size: 52px; font-weight: 800; line-height: 1; margin-bottom: 12px; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
     
-    .time-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border: 1px solid; }
+    .time-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; border: 1px solid; }
     .badge-ok { background: rgba(0, 242, 254, 0.05); color: var(--neon-blue); border-color: rgba(0, 242, 254, 0.3); }
     .badge-today { background: rgba(255, 170, 0, 0.1); color: var(--warning-amber); border-color: rgba(255, 170, 0, 0.4); box-shadow: 0 0 15px rgba(255, 170, 0, 0.2); }
     .badge-overdue { background: rgba(255, 51, 102, 0.1); color: var(--danger-red); border-color: rgba(255, 51, 102, 0.4); box-shadow: 0 0 15px rgba(255, 51, 102, 0.2); }
@@ -141,7 +140,7 @@
     .info-block .value { font-size: 16px; font-weight: 700; color: var(--text-main); }
     .info-block.full { grid-column: span 2; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 12px; margin-top: -5px; }
 
-    .alert-banner { padding: 14px; border-radius: 14px; text-align: center; margin-bottom: 20px; font-weight: 700; font-size: 13px; border: 1px solid; text-transform: uppercase; letter-spacing: 1px; }
+    .alert-banner { padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 15px; font-weight: 700; font-size: 12px; border: 1px solid; text-transform: uppercase; letter-spacing: 1px; }
     .overdue-incentive-box { background: rgba(255, 51, 102, 0.08); border: 1px dashed rgba(255, 51, 102, 0.4); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.5; color: #ffb3c1; margin-bottom: 25px; text-align: center; font-weight: 500; }
     
     .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--neon-purple); margin-bottom: 12px; font-weight: 700; }
@@ -393,8 +392,8 @@
       app.innerHTML = `
         <div class="sticky-area">
           <div class="header">
-            <img src="Logo individual.png" alt="GOXION Logo" class="logo-img" onerror="this.src='logo2.PNG'">
-            <div class="subtitle">Estado de Cuenta</div>
+            <img src="Logo individual.png" alt="Logo" class="logo-img" onerror="this.src='logo2.PNG'">
+            <div class="header-title">Estado de Cuenta</div>
           </div>
 
           ${bannerEstado}
