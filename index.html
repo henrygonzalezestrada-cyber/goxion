@@ -2,7 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <!-- Esta etiqueta tiñe la barra de estado del iPhone del color de tu app -->
+  <meta name="theme-color" content="#030305">
   <title>GOXION - Resumen de Cuenta</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
@@ -26,13 +28,15 @@
       color: var(--text-main); 
       display: flex; justify-content: center; 
       align-items: flex-start;
-      min-height: 100vh; padding: 0; 
+      min-height: 100dvh; /* dvh asegura que cubra dinámicamente todo el alto en iOS */
+      padding: 0; 
       overflow-x: hidden;
     }
 
     /* --- FONDO Y LÁMPARA DE LAVA --- */
     .bg {
-        position: fixed; inset: 0; z-index: -2; background: var(--bg-black); overflow: hidden; pointer-events: none;
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
+        z-index: -2; background: var(--bg-black); overflow: hidden; pointer-events: none;
     }
 
     .bg::before {
@@ -43,7 +47,6 @@
         animation: ambientMove 20s ease-in-out infinite alternate;
     }
 
-    /* Lava más brillante e intensa */
     .lava {
         position: absolute; border-radius: 50%;
         filter: blur(55px); 
@@ -73,37 +76,44 @@
     .container { 
         width: 100%; max-width: 500px; 
         position: relative; z-index: 1; 
-        padding: 0 20px 30px 20px; 
+        /* Usamos padding bottom para evitar que el logo final choque abajo */
+        padding: 0 20px 40px 20px; 
     }
     
-    /* --- ENCABEZADO ESTÁTICO (CRISTAL PURO) --- */
+    /* --- ENCABEZADO ESTÁTICO (FUNDIDO INVISIBLE) --- */
     .sticky-area {
         position: sticky;
         top: 0;
         z-index: 50;
-        /* Cristal mucho más transparente y desenfocado */
-        background: rgba(8, 8, 12, 0.25); 
+        /* Cristal con un tono un poco más sólido para ocultar bien el texto al hacer scroll */
+        background: rgba(3, 3, 5, 0.7); 
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
         margin: 0 -20px 20px -20px;
-        /* Padding dinámico para que se integre perfecto con la hora del iPhone */
         padding: max(15px, env(safe-area-inset-top)) 20px 15px 20px; 
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-        box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
+        /* Se eliminó el border-bottom y el box-shadow para que se fusione limpiamente */
+    }
+
+    /* El efecto mágico de desvanecimiento hacia abajo */
+    .sticky-area::after {
+        content: "";
+        position: absolute;
+        bottom: -35px; /* Altura del difuminado */
+        left: 0; right: 0;
+        height: 35px;
+        background: linear-gradient(to bottom, rgba(3, 3, 5, 0.7) 0%, rgba(3, 3, 5, 0) 100%);
+        pointer-events: none;
     }
 
     .header { 
-        display: flex; align-items: center; justify-content: flex-start; gap: 8px; 
+        display: flex; align-items: center; justify-content: center; /* Centrado absoluto */
         margin-bottom: 15px; 
     }
-    .logo-img { 
-        height: 24px; width: auto; /* Tamaño idéntico al de ayuda.html */
-        filter: drop-shadow(0 0 12px rgba(0, 242, 254, 0.6)); 
-    }
+    
     .header-title { 
-        color: var(--text-main); font-size: 15px; font-weight: 700; 
-        text-transform: uppercase; letter-spacing: 1.5px; margin: 0; 
-        text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        color: var(--text-main); font-size: 14px; font-weight: 700; 
+        text-transform: uppercase; letter-spacing: 2.5px; margin: 0; 
+        text-shadow: 0 0 15px rgba(255,255,255,0.25);
     }
     
     /* --- GLASSMORPHISM CARDS --- */
@@ -170,7 +180,10 @@
     .btn-review-state { background: rgba(124, 77, 255, 0.1); border: 1px solid rgba(124, 77, 255, 0.3); color: var(--text-main); font-size: 13px; padding: 16px; border-radius: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
     .btn-review-state strong { color: var(--neon-purple); }
 
-    .footer { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; line-height: 1.6; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 20px; }
+    .footer { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; line-height: 1.6; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 20px; margin-bottom: 20px; }
+    
+    .footer-logo-container { margin-top: 35px; display: flex; justify-content: center; }
+    .footer-logo { max-width: 130px; opacity: 0.65; transition: 0.3s; filter: drop-shadow(0 0 8px rgba(0,0,0,0.5)); }
     
     .error-msg { text-align: center; color: var(--danger-red); padding: 40px 0; font-size: 15px; font-weight: 700; }
     .loading { text-align: center; color: var(--text-muted); padding: 60px 0; font-size: 15px; font-weight: 600; }
@@ -384,7 +397,6 @@
       app.innerHTML = `
         <div class="sticky-area">
           <div class="header">
-            <img src="Logo individual.png" alt="Logo" class="logo-img" onerror="this.src='logo2.PNG'">
             <div class="header-title">Estado de Cuenta</div>
           </div>
 
@@ -443,6 +455,11 @@
           <div class="footer">
             <span style="color:var(--text-main); font-weight:600;">🎁 ¡Gana un mes gratis!</span><br>
             Invita a un amigo, cuando cumpla 3 meses de servicio, tu próxima mensualidad será sin costo.
+            
+            <!-- Logo sello inferior -->
+            <div class="footer-logo-container">
+              <img src="logo2.PNG" alt="Goxion - Todo conectado" class="footer-logo" onerror="this.style.display='none'">
+            </div>
           </div>
         </div>
       `;
