@@ -145,9 +145,21 @@
     "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [
-      { "fecha": "Mayo 2026", "monto": 257, "estado": "pagado" },
-      { "fecha": "Junio 2026", "monto": 257, "estado": "pagado" },
-      { "fecha": "Julio 2026", "monto": 257, "estado": "pagado" }
+      {
+        "fecha": "Mayo 2026",
+        "monto": 257,
+        "estado": "pagado"
+      },
+      {
+        "fecha": "Junio 2026",
+        "monto": 257,
+        "estado": "pagado"
+      },
+      {
+        "fecha": "Julio 2026",
+        "monto": 257,
+        "estado": "pagado"
+      }
     ],
     "servicios": [
       {
