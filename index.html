@@ -24,8 +24,9 @@
     body { 
       background-color: var(--bg-black); 
       color: var(--text-main); 
-      display: flex; justify-content: center; align-items: center; 
-      min-height: 100vh; padding: 20px; 
+      display: flex; justify-content: center; 
+      align-items: flex-start; /* Cambiado para permitir el scroll natural */
+      min-height: 100vh; padding: 0; 
       overflow-x: hidden;
     }
 
@@ -69,31 +70,52 @@
         .lava-4 { width: 200px; height: 200px; }
     }
 
-    .container { width: 100%; max-width: 460px; position: relative; z-index: 1; padding-bottom: 20px; }
+    .container { 
+        width: 100%; max-width: 500px; 
+        position: relative; z-index: 1; 
+        padding: 0 20px 30px 20px; 
+    }
     
-    /* --- NUEVO ENCABEZADO ARMONIZADO --- */
+    /* --- ENCABEZADO ESTÁTICO (STICKY GLASSMORPHISM) --- */
+    .sticky-area {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(3, 3, 5, 0.65); /* Cristal Oscuro Transparente */
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        margin: 0 -20px 25px -20px;
+        padding: 30px 20px 20px 20px;
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.15);
+        box-shadow: 0 15px 30px -15px rgba(0,0,0,0.8);
+    }
+    
+    /* Efecto de degradado suave debajo de la línea punteada */
+    .sticky-area::after {
+        content: "";
+        position: absolute;
+        bottom: -20px;
+        left: 0; right: 0;
+        height: 20px;
+        background: linear-gradient(to bottom, rgba(3,3,5,0.7) 0%, transparent 100%);
+        pointer-events: none;
+    }
+
     .header { 
         display: flex; align-items: center; justify-content: center; gap: 15px; 
-        margin-bottom: 30px; 
+        margin-bottom: 25px; 
     }
     .logo-img { 
-        max-height: 55px; width: auto; 
+        max-height: 48px; width: auto; 
         filter: drop-shadow(0 0 15px rgba(0, 242, 254, 0.4)); 
     }
-    .header-text { 
-        display: flex; flex-direction: column; align-items: flex-start; justify-content: center;
-    }
-    .brand-title { 
-        font-size: 26px; font-weight: 800; line-height: 1; 
-        letter-spacing: 2px; color: var(--text-main); 
-        text-shadow: 0 0 10px rgba(0, 242, 254, 0.3); 
-    }
     .subtitle { 
-        color: var(--neon-purple); font-size: 11px; font-weight: 700; 
-        text-transform: uppercase; letter-spacing: 2px; margin-top: 4px; 
+        color: var(--text-main); font-size: 17px; font-weight: 700; 
+        text-transform: uppercase; letter-spacing: 2px; margin: 0; 
+        text-shadow: 0 0 10px rgba(255,255,255,0.2);
     }
     
-    /* --- GLASSMORPHISM --- */
+    /* --- GLASSMORPHISM CARDS --- */
     .glass-card {
         background: var(--card-glass);
         backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
@@ -102,7 +124,7 @@
         border-radius: 20px; padding: 20px;
     }
 
-    .balance-hero { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
+    .balance-hero { text-align: center; } /* Se quitaron los paddings/bordes de aquí porque ahora los controla el sticky-area */
     .total-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
     .total-amount { font-size: 56px; font-weight: 800; line-height: 1; margin-bottom: 15px; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
     
@@ -159,8 +181,8 @@
 
     .footer { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; line-height: 1.6; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 20px; }
     
-    .error-msg { text-align: center; color: var(--danger-red); padding: 20px 0; font-size: 15px; font-weight: 700; }
-    .loading { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 15px; font-weight: 600; }
+    .error-msg { text-align: center; color: var(--danger-red); padding: 40px 0; font-size: 15px; font-weight: 700; }
+    .loading { text-align: center; color: var(--text-muted); padding: 60px 0; font-size: 15px; font-weight: 600; }
     
     .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 700; display: none; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); z-index: 1000; animation: fadeIn 0.3s ease;}
     @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
@@ -258,7 +280,6 @@
       let uiColor = "var(--neon-blue)";
       let mensajeAtrasoHTML = "";
 
-      // VERIFICACIÓN INTELIGENTE DE PAGO EN REVISIÓN (DB + LocalStorage)
       const isReviewLocal = localStorage.getItem(`revision_pago_${clienteKey}`) === periodoStr;
       const enRevision = cliente.pago_en_revision === true || isReviewLocal;
 
@@ -266,7 +287,6 @@
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
           uiColor = "var(--success-neon)";
-          // Si está pagado, borramos cualquier flag de revisión local para resetear el ciclo
           localStorage.removeItem(`revision_pago_${clienteKey}`);
       } else if (enRevision) {
           badgeClass = "badge-review";
@@ -340,7 +360,6 @@
           totalFinal = 0;
           labelTotal = "Saldo Pendiente";
       } else if (enRevision) {
-          // INTERFAZ DE VALIDACIÓN
           btnAccionHTML = `
             <div class="btn-review-state">
               <span>⏳ <strong>Tu comprobante está en revisión</strong></span>
@@ -348,7 +367,6 @@
             </div>
           `;
       } else {
-          // BOTONES NORMALES
           btnAccionHTML = `
             <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>
             <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="notificarPago('${clienteKey}', '${periodoStr}', '${urlPagoWA}')">
@@ -373,67 +391,68 @@
       const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
 
       app.innerHTML = `
-        <div class="header">
-          <img src="Logo individual.png" alt="GOXION" class="logo-img" onerror="this.src='logo2.PNG'">
-          <div class="header-text">
-            <div class="brand-title">GOXION</div>
-            <div class="subtitle">Resumen de Cuenta</div>
+        <div class="sticky-area">
+          <div class="header">
+            <img src="Logo individual.png" alt="GOXION Logo" class="logo-img" onerror="this.src='logo2.PNG'">
+            <div class="subtitle">Estado de Cuenta</div>
+          </div>
+
+          ${bannerEstado}
+
+          <div class="balance-hero">
+              <div class="total-label">${labelTotal}</div>
+              <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">$${totalFinal.toFixed(2)}</div>
+              <div class="time-badge ${badgeClass}">${badgeText}</div>
           </div>
         </div>
 
-        ${bannerEstado}
+        <div class="scrollable-content">
+          ${(cliente.estado === 'pagado' || enRevision) ? '' : mensajeAtrasoHTML}
 
-        <div class="balance-hero">
-            <div class="total-label">${labelTotal}</div>
-            <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">$${totalFinal.toFixed(2)}</div>
-            <div class="time-badge ${badgeClass}">${badgeText}</div>
-        </div>
-
-        ${(cliente.estado === 'pagado' || enRevision) ? '' : mensajeAtrasoHTML}
-
-        <div class="glass-card card-info">
-          <div class="info-block">
-            <span class="label">Titular</span>
-            <span class="value">${cliente.nombre.split(' ')[0]}</span>
+          <div class="glass-card card-info">
+            <div class="info-block">
+              <span class="label">Titular</span>
+              <span class="value">${cliente.nombre.split(' ')[0]}</span>
+            </div>
+            <div class="info-block" style="text-align: right;">
+              <span class="label">Folio</span>
+              <span class="value" style="color:var(--neon-purple);">${cliente.folio}</span>
+            </div>
+            <div class="info-block full">
+              <span class="label">Periodo Facturado</span>
+              <span class="value" style="display:flex; justify-content:space-between; align-items:center;">
+                  ${periodoStr} 
+                  <span style="color:var(--text-muted); font-size:12px; font-weight:500;">Corte: ${diaPago} de ${mesActual}</span>
+              </span>
+            </div>
           </div>
-          <div class="info-block" style="text-align: right;">
-            <span class="label">Folio</span>
-            <span class="value" style="color:var(--neon-purple);">${cliente.folio}</span>
+
+          <div class="section-title">Servicios Activos</div>
+          <div class="glass-card services-container">
+            ${serviciosHTML}
           </div>
-          <div class="info-block full">
-            <span class="label">Periodo Facturado</span>
-            <span class="value" style="display:flex; justify-content:space-between; align-items:center;">
-                ${periodoStr} 
-                <span style="color:var(--text-muted); font-size:12px; font-weight:500;">Corte: ${diaPago} de ${mesActual}</span>
-            </span>
+
+          ${breakdownHTML}
+
+          <div class="glass-card loyalty-badge">
+            <div class="loyalty-icon">⭐</div>
+            <div class="loyalty-content">
+              <div class="loyalty-title">Programa Goxion</div>
+              <div class="loyalty-desc">${mensajeLealtad}</div>
+            </div>
           </div>
-        </div>
 
-        <div class="section-title">Servicios Activos</div>
-        <div class="glass-card services-container">
-          ${serviciosHTML}
-        </div>
-
-        ${breakdownHTML}
-
-        <div class="glass-card loyalty-badge">
-          <div class="loyalty-icon">⭐</div>
-          <div class="loyalty-content">
-            <div class="loyalty-title">Programa Goxion</div>
-            <div class="loyalty-desc">${mensajeLealtad}</div>
+          <div class="actions-group">
+            ${btnAccionHTML}
+            <a href="${urlWA}" target="_blank" class="btn btn-wa">
+              💬 Contactar a Soporte
+            </a>
           </div>
-        </div>
 
-        <div class="actions-group">
-          ${btnAccionHTML}
-          <a href="${urlWA}" target="_blank" class="btn btn-wa">
-            💬 Contactar a Soporte
-          </a>
-        </div>
-
-        <div class="footer">
-          <span style="color:var(--text-main); font-weight:600;">🎁 ¡Gana un mes gratis!</span><br>
-          Invita a un amigo, cuando cumpla 3 meses de servicio, tu próxima mensualidad será sin costo.
+          <div class="footer">
+            <span style="color:var(--text-main); font-weight:600;">🎁 ¡Gana un mes gratis!</span><br>
+            Invita a un amigo, cuando cumpla 3 meses de servicio, tu próxima mensualidad será sin costo.
+          </div>
         </div>
       `;
 
@@ -451,12 +470,10 @@
     });
   }
 
-  // FUNCIÓN PARA REGISTRAR EL PAGO LOCALMENTE Y ABRIR WHATSAPP
   function notificarPago(clienteKey, periodo, urlWA) {
     localStorage.setItem(`revision_pago_${clienteKey}`, periodo);
     window.open(urlWA, '_blank');
     
-    // Recarga la página un segundo después para que el cliente vea el estado azul "En Validación"
     setTimeout(() => {
         location.reload();
     }, 1000);
