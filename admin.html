@@ -114,14 +114,12 @@
         
         .client-details-toggle { font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 5px; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 15px; }
         
-        /* Contenedor colapsable */
         .client-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); animation: fadeIn 0.3s ease; }
 
         .client-services-list { background: rgba(255,255,255,0.02); padding: 10px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
         .client-service-tag { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; color: var(--text-main); margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .client-service-tag:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         
-        /* Inputs de Credenciales */
         .cred-inputs { display: flex; gap: 8px; width: 100%; }
         .cred-inputs input { flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; outline: none; transition: 0.3s; min-width: 0; }
         .cred-inputs input:focus { border-color: var(--neon-blue); }
@@ -168,7 +166,6 @@
         </div>
     </header>
 
-    <!-- DASHBOARD FINANCIERO SUPERIOR -->
     <div class="dashboard-row">
         <div class="kpi-card">
             <div class="kpi-title">Ingresos Brutos</div>
@@ -184,21 +181,19 @@
         </div>
     </div>
 
-    <!-- TABS DE NAVEGACIÓN -->
     <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('tab-clientes', this)">Gestión de Clientes</button>
         <button class="tab-btn" onclick="switchTab('tab-inventario', this)">Catálogo & Alertas</button>
     </div>
 
-    <!-- CONTENIDO TABS -->
     <div id="tab-clientes" class="tab-content active">
         <div class="panel">
             <h2 class="section-title">Cuentas Activas</h2>
             
-            <!-- FILTROS -->
             <div class="filters-row">
                 <select id="filter-status" class="custom-select" onchange="filtrarClientes()">
                     <option value="all">Todos los estados</option>
+                    <option value="revision">🔔 Pagos Por Validar</option>
                     <option value="pendiente">Pendientes</option>
                     <option value="pagado">Pagados</option>
                     <option value="suspendido">Suspendidos</option>
@@ -219,7 +214,6 @@
     </div>
 
     <div id="tab-inventario" class="tab-content">
-        <!-- ALERTAS -->
         <div class="panel">
             <h2 class="section-title">Alertas Globales</h2>
             <div class="switch-row">
@@ -238,7 +232,6 @@
             </div>
         </div>
 
-        <!-- PRECIOS Y SERVICIOS GLOBALES -->
         <div class="panel">
             <h2 class="section-title">Catálogo & Inventario</h2>
             <div style="overflow-x: auto;">
@@ -254,9 +247,7 @@
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody id="global-services-container">
-                        <!-- Servicios inyectados aquí -->
-                    </tbody>
+                    <tbody id="global-services-container"></tbody>
                 </table>
             </div>
             <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio al Catálogo</button>
@@ -288,7 +279,6 @@
         else inicializarPanel();
     });
 
-    // Control de Tabs
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -296,7 +286,6 @@
         btn.classList.add('active');
     }
 
-    // Toggle Acordeón de Cliente
     function toggleClientDetails(key) {
         const details = document.getElementById(`details-${key}`);
         const text = document.getElementById(`toggle-text-${key}`);
@@ -319,7 +308,6 @@
     function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
 
     async function inicializarPanel() {
-        // --- AQUÍ APLICAMOS EL PARCHE ANTI-CACHÉ (Y MANTUVIMOS EL RESTO IGUAL) ---
         const version = new Date().getTime();
         const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}?v=${version}`;
         try {
@@ -369,8 +357,14 @@
             calcularInventarioYFinanzas();
             renderGlobalServicesUI();
             filtrarClientes();
+            
         } catch (error) {
-            document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red);">Error al conectar con la base de datos.</p>`;
+            console.error("Detalle del error:", error);
+            let msg = "Error al conectar con la base de datos.";
+            if (error instanceof SyntaxError) {
+                msg = "⚠️ Error de formato en tu base de datos (clientes.json). Probablemente se borró una coma (,) o una llave (}) sin querer al pegarlo en GitHub.";
+            }
+            document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red); background: rgba(255,0,60,0.1); padding: 15px; border-radius: 8px;">${msg}</p>`;
         }
     }
 
@@ -491,7 +485,9 @@
 
         filtradosArr = filtradosArr.filter(c => {
             const matchText = c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query);
-            const matchStatus = statusFilter === 'all' || c.estado === statusFilter;
+            const matchStatus = statusFilter === 'all' 
+                ? true 
+                : (statusFilter === 'revision' ? c.pago_en_revision === true : c.estado === statusFilter);
             return matchText && matchStatus;
         });
 
@@ -512,7 +508,6 @@
         renderizarClientes(filtradosDict);
     }
 
-    // --- LÓGICA DE DETECCIÓN INTELIGENTE DE CREDENCIALES ---
     function esServicioPorInvitacion(nombreServicio) {
         const plataformasInvitacion = ['youtube', 'microsoft', 'google', 'apple', 'spotify', 'one 2tb', '365'];
         const nombreMin = nombreServicio.toLowerCase();
@@ -539,8 +534,6 @@
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s, sIdx) => {
                     subtotal += s.monto;
-                    
-                    // Comprobación Inteligente
                     const esInvitacion = esServicioPorInvitacion(s.nombre);
                     const lockStatus = esInvitacion ? 'disabled title="No aplica para este servicio"' : '';
                     
@@ -563,20 +556,24 @@
                 });
             } else { clientServicesHTML = `<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 10px 0;">Sin servicios activos asignados</div>`; }
 
-            let statusColor = cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)');
-            let statusBadge = cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE');
+            let enRevision = cliente.pago_en_revision === true;
+            let statusColor = enRevision ? 'var(--neon-purple)' : (cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)'));
+            let statusBadge = enRevision ? 'EN REVISIÓN 🔔' : (cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE'));
+            
+            // Animación de pulso si está en revisión
+            let pulseAnim = enRevision ? 'animation: pulse 1.5s infinite;' : '';
 
             const card = document.createElement("div");
             card.className = "client-card";
             card.style.borderLeftColor = statusColor;
+            if(enRevision) card.style.boxShadow = "0 0 15px rgba(188, 19, 254, 0.3)";
             
             card.innerHTML = `
-                <!-- Cabecera Siempre Visible -->
                 <div class="card-header-main" onclick="toggleClientDetails('${key}')">
                     <div class="client-info-basic">
                         <h3 style="color: ${statusColor};">[${cliente.folio}] ${cliente.nombre}</h3>
                         <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
-                            <span class="client-status-badge" style="color: ${statusColor}; border-color: ${statusColor}40; background: ${statusColor}10;">${statusBadge}</span>
+                            <span class="client-status-badge" style="color: ${statusColor}; border-color: ${statusColor}40; background: ${statusColor}10; ${pulseAnim}">${statusBadge}</span>
                             <span style="color: var(--text-muted); font-size: 0.85rem;">Día: ${cliente.dia_pago || 15}</span>
                         </div>
                     </div>
@@ -586,9 +583,7 @@
                     </div>
                 </div>
 
-                <!-- Detalles Colapsables -->
                 <div class="client-details" id="details-${key}">
-                    
                     <div style="display:flex; gap: 15px; margin-bottom: 12px; flex-wrap: wrap;">
                         <div style="flex: 1; min-width: 120px;">
                             <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Día de Cobro</label>
@@ -624,10 +619,43 @@
                         </div>
                         <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Copiar Link del Cliente</button>
                     </div>
+
+                    ${enRevision ? `
+                    <div style="width: 100%; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(188, 19, 254, 0.3);">
+                        <button class="btn-save" style="background: linear-gradient(135deg, #bc13fe, #7c4dff); width: 100%; font-size: 1rem; padding: 12px; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4);" onclick="aprobarPago('${key}', ${subtotal})">
+                            ✅ APROBAR PAGO Y SUMAR RACHA
+                        </button>
+                    </div>
+                    ` : ''}
                 </div>
             `;
             container.appendChild(card);
         });
+    }
+
+    function aprobarPago(key, monto) {
+        if(!confirm("¿Confirmas que verificaste el comprobante de pago de este cliente?")) return;
+        
+        let cli = clientesDict[key];
+        cli.estado = "pagado";
+        cli.pago_en_revision = false;
+        cli.pagos_puntuales = (cli.pagos_puntuales || 0) + 1;
+        
+        // Agregar al historial
+        if(!cli.historial_pagos) cli.historial_pagos = [];
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        const hoy = new Date();
+        const fechaStr = `${meses[hoy.getMonth()]} ${hoy.getFullYear()}`;
+        
+        cli.historial_pagos.push({ fecha: fechaStr, monto: monto, estado: "pagado" });
+
+        // Mantener solo los últimos 6 meses para no saturar
+        if(cli.historial_pagos.length > 6) { cli.historial_pagos.shift(); }
+
+        calcularInventarioYFinanzas();
+        filtrarClientes();
+        
+        alert("✅ Pago validado correctamente. El estado cambió a PAGADO y se sumó a su racha.\n\n⚠️ IMPORTANTE: No olvides dar clic en 'Guardar Cambios' allá arriba para subirlo a la base de datos.");
     }
 
     function updateClientData(key, field, value) {
@@ -662,7 +690,6 @@
         calcularInventarioYFinanzas();
         renderGlobalServicesUI(); 
         filtrarClientes(); 
-        // Abrimos automáticamente el detalle para que vea el nuevo servicio
         const details = document.getElementById(`details-${key}`);
         if(details) {
             details.style.display = "block";
@@ -702,7 +729,7 @@
         };
 
         const payload = {
-            message: "🤖 Admin Update: Credenciales guardadas",
+            message: "🤖 Admin Update: Cambios guardados",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
@@ -715,7 +742,7 @@
             if (response.ok) {
                 currentFileData.sha = (await response.json()).content.sha;
                 alert("⚡ ¡CAMBIOS GUARDADOS EXITOSAMENTE!");
-            } else alert("❌ Error al guardar en GitHub.");
+            } else alert("❌ Error al guardar en GitHub. Es posible que el token haya expirado.");
         } catch (e) {
             console.error(e);
         }
