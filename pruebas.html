@@ -1,787 +1,1186 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GOXION - Resumen de Cuenta</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-        --bg-black: #030305;
-        --card-glass: rgba(8, 8, 12, 0.45);
-        --text-main: #ffffff;
-        --text-muted: #95a4bd;
-        --neon-blue: #00f2fe;
-        --neon-purple: #7c4dff;
-        --success-green: #2ea043;
-        --success-neon: #00ff9d;
-        --danger-red: #ff3366;
-        --warning-amber: #ffaa00;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
-    
-    body { 
-      background-color: var(--bg-black); 
-      color: var(--text-main); 
-      display: flex; justify-content: center; align-items: center; 
-      min-height: 100vh; padding: 20px; 
-      overflow-x: hidden;
-    }
-
-    /* =========================================================
-   FONDO GOXION — LAVA DIGITAL
-   ========================================================= */
-
-.bg {
-    position: fixed;
-    inset: 0;
-    z-index: -2;
-    background: #030305;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-/* Capa general de luz */
-
-.bg::before {
-    content: "";
-    position: absolute;
-    inset: -20%;
-    background:
-        radial-gradient(
-            circle at 20% 20%,
-            rgba(124, 77, 255, 0.10),
-            transparent 28%
-        ),
-        radial-gradient(
-            circle at 80% 75%,
-            rgba(0, 242, 254, 0.09),
-            transparent 30%
-        );
-
-    filter: blur(60px);
-
-    animation: ambientMove 25s ease-in-out infinite alternate;
-}
-
-
-/* =========================================================
-   FORMAS DE LAVA
-   ========================================================= */
-
-.lava {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(35px);
-    opacity: 0.65;
-    will-change: transform;
-}
-
-
-/* LAVA MORADA — SUPERIOR IZQUIERDA */
-
-.lava-1 {
-    width: 330px;
-    height: 430px;
-
-    top: -180px;
-    left: -120px;
-
-    background:
-        radial-gradient(
-            ellipse at 40% 50%,
-            rgba(176, 38, 255, 0.75),
-            rgba(124, 77, 255, 0.25) 45%,
-            transparent 72%
-        );
-
-    transform: rotate(25deg);
-
-    animation:
-        lavaOne 18s ease-in-out infinite alternate;
-}
-
-
-/* LAVA CIAN — DERECHA */
-
-.lava-2 {
-    width: 360px;
-    height: 460px;
-
-    top: 20%;
-    right: -190px;
-
-    background:
-        radial-gradient(
-            ellipse at 50% 45%,
-            rgba(0, 242, 254, 0.70),
-            rgba(0, 180, 255, 0.22) 45%,
-            transparent 72%
-        );
-
-    transform: rotate(-20deg);
-
-    animation:
-        lavaTwo 22s ease-in-out infinite alternate;
-}
-
-
-/* LAVA MORADA — PARTE INFERIOR */
-
-.lava-3 {
-    width: 380px;
-    height: 420px;
-
-    bottom: -190px;
-    left: 15%;
-
-    background:
-        radial-gradient(
-            ellipse at 50% 40%,
-            rgba(124, 77, 255, 0.65),
-            rgba(176, 38, 255, 0.18) 48%,
-            transparent 75%
-        );
-
-    transform: rotate(15deg);
-
-    animation:
-        lavaThree 26s ease-in-out infinite alternate;
-}
-
-
-/* PEQUEÑA LAVA CIAN */
-
-.lava-4 {
-    width: 220px;
-    height: 280px;
-
-    top: 48%;
-    left: -120px;
-
-    background:
-        radial-gradient(
-            ellipse,
-            rgba(0, 242, 254, 0.50),
-            rgba(0, 242, 254, 0.12) 50%,
-            transparent 75%
-        );
-
-    animation:
-        lavaFour 20s ease-in-out infinite alternate;
-}
-
-
-/* =========================================================
-   DESTELLOS
-   ========================================================= */
-
-.spark {
-    position: absolute;
-
-    width: 4px;
-    height: 4px;
-
-    border-radius: 50%;
-
-    background: #ffffff;
-
-    box-shadow:
-        0 0 6px #ffffff,
-        0 0 14px #00f2fe,
-        0 0 28px rgba(0, 242, 254, 0.8);
-
-    opacity: 0;
-
-    animation:
-        sparkle 5s ease-in-out infinite;
-}
-
-
-/* Posiciones de los destellos */
-
-.spark-1 {
-    top: 18%;
-    left: 24%;
-    animation-delay: 1s;
-}
-
-.spark-2 {
-    top: 34%;
-    right: 22%;
-    animation-delay: 3s;
-}
-
-.spark-3 {
-    top: 58%;
-    left: 18%;
-    animation-delay: 0.5s;
-}
-
-.spark-4 {
-    top: 72%;
-    right: 25%;
-    animation-delay: 2.2s;
-}
-
-.spark-5 {
-    top: 44%;
-    left: 65%;
-    animation-delay: 4s;
-}
-
-.spark-6 {
-    top: 82%;
-    left: 48%;
-    animation-delay: 1.8s;
-}
-
-
-/* =========================================================
-   ANIMACIONES
-   ========================================================= */
-
-@keyframes ambientMove {
-
-    0% {
-        transform: translate3d(-20px, -10px, 0) scale(1);
-    }
-
-    50% {
-        transform: translate3d(30px, 20px, 0) scale(1.05);
-    }
-
-    100% {
-        transform: translate3d(-10px, 40px, 0) scale(1.1);
-    }
-}
-
-
-@keyframes lavaOne {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            rotate(20deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(60px, 80px, 0)
-            rotate(35deg)
-            scale(1.12);
-    }
-
-    100% {
-        transform:
-            translate3d(20px, 150px, 0)
-            rotate(15deg)
-            scale(0.95);
-    }
-}
-
-
-@keyframes lavaTwo {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            rotate(-20deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(-70px, 40px, 0)
-            rotate(-5deg)
-            scale(1.15);
-    }
-
-    100% {
-        transform:
-            translate3d(-30px, -70px, 0)
-            rotate(-30deg)
-            scale(0.92);
-    }
-}
-
-
-@keyframes lavaThree {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            rotate(15deg)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(80px, -50px, 0)
-            rotate(-5deg)
-            scale(1.1);
-    }
-
-    100% {
-        transform:
-            translate3d(-60px, -20px, 0)
-            rotate(25deg)
-            scale(0.94);
-    }
-}
-
-
-@keyframes lavaFour {
-
-    0% {
-        transform:
-            translate3d(0, 0, 0)
-            scale(1);
-    }
-
-    50% {
-        transform:
-            translate3d(60px, -40px, 0)
-            scale(1.15);
-    }
-
-    100% {
-        transform:
-            translate3d(20px, 50px, 0)
-            scale(0.9);
-    }
-}
-
-
-/* Destellos: aparecen, brillan y desaparecen */
-
-@keyframes sparkle {
-
-    0% {
-        opacity: 0;
-        transform: scale(0.4);
-    }
-
-    25% {
-        opacity: 0.3;
-        transform: scale(0.7);
-    }
-
-    50% {
-        opacity: 1;
-        transform: scale(1.5);
-    }
-
-    65% {
-        opacity: 0.5;
-        transform: scale(1);
-    }
-
-    100% {
-        opacity: 0;
-        transform: scale(0.4);
-    }
-}
-
-
-/* =========================================================
-   TELÉFONOS
-   ========================================================= */
-
-@media (max-width: 600px) {
-
-    .bg::before {
-        filter: blur(50px);
-    }
-
-    .lava {
-        filter: blur(30px);
-    }
-
-    .lava-1 {
-        width: 260px;
-        height: 350px;
-        top: -140px;
-        left: -130px;
-    }
-
-    .lava-2 {
-        width: 280px;
-        height: 360px;
-        right: -160px;
-    }
-
-    .lava-3 {
-        width: 300px;
-        height: 340px;
-        bottom: -150px;
-    }
-
-    .lava-4 {
-        width: 180px;
-        height: 230px;
-        left: -100px;
-    }
-
-    .spark {
-        width: 3px;
-        height: 3px;
-    }
-}
-    /* --- GLASSMORPHISM GENERAL (MISMO QUE LA APP) --- */
-    .glass-card {
-        background: var(--card-glass);
-        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-        border: 1px solid rgba(255, 255, 255, 0.08); 
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        border-radius: 20px;
-        padding: 20px;
-    }
-
-    /* --- HERO BALANCE (LOS 5 SEGUNDOS) --- */
-    .balance-hero { text-align: center; margin-bottom: 25px; padding-bottom: 20px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
-    .total-label { font-size: 13px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 5px; }
-    .total-amount { font-size: 56px; font-weight: 800; line-height: 1; margin-bottom: 15px; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
-    
-    .time-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border: 1px solid; }
-    .badge-ok { background: rgba(0, 242, 254, 0.05); color: var(--neon-blue); border-color: rgba(0, 242, 254, 0.3); }
-    .badge-today { background: rgba(255, 170, 0, 0.1); color: var(--warning-amber); border-color: rgba(255, 170, 0, 0.4); box-shadow: 0 0 15px rgba(255, 170, 0, 0.2); }
-    .badge-overdue { background: rgba(255, 51, 102, 0.1); color: var(--danger-red); border-color: rgba(255, 51, 102, 0.4); box-shadow: 0 0 15px rgba(255, 51, 102, 0.2); }
-    .badge-paid { background: rgba(0, 255, 157, 0.05); color: var(--success-neon); border-color: rgba(0, 255, 157, 0.4); box-shadow: 0 0 15px rgba(0, 255, 157, 0.15); }
-
-    /* --- INFO CLIENTE --- */
-    .card-info { margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-    .info-block { display: flex; flex-direction: column; }
-    .info-block .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 2px;}
-    .info-block .value { font-size: 16px; font-weight: 700; color: var(--text-main); }
-    .info-block.full { grid-column: span 2; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 12px; margin-top: -5px; }
-
-    /* --- ALERTAS --- */
-    .alert-banner { padding: 14px; border-radius: 14px; text-align: center; margin-bottom: 20px; font-weight: 700; font-size: 13px; border: 1px solid; text-transform: uppercase; letter-spacing: 1px; }
-    .overdue-incentive-box { background: rgba(255, 51, 102, 0.08); border: 1px dashed rgba(255, 51, 102, 0.4); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.5; color: #ffb3c1; margin-bottom: 25px; text-align: center; font-weight: 500; }
-    
-    /* --- SERVICIOS --- */
-    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--neon-purple); margin-bottom: 12px; font-weight: 700; }
-    
-    .services-container { margin-bottom: 25px; padding: 10px 20px;}
-    .service-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); font-size: 15px; }
-    .service-item:last-child { border-bottom: none; }
-    .service-name { font-weight: 600; color: var(--text-main); }
-    .service-price { font-weight: 700; color: var(--text-muted); }
-    
-    /* --- DESGLOSE --- */
-    .breakdown-box { margin-bottom: 25px; }
-    .breakdown-line { font-size: 13px; font-weight: 500; margin-bottom: 10px; display: flex; justify-content: space-between; }
-    .breakdown-line:last-child { margin-bottom: 0; }
-    .discount-line { color: var(--success-neon); }
-    .surcharge-line { color: var(--danger-red); }
-
-    /* --- PROGRAMA LEALTAD --- */
-    .loyalty-badge { margin-bottom: 25px; display: flex; align-items: center; gap: 15px; border-color: rgba(124, 77, 255, 0.3); }
-    .loyalty-icon { font-size: 32px; line-height: 1; filter: drop-shadow(0 0 10px rgba(176, 38, 255, 0.4)); }
-    .loyalty-content { flex: 1; }
-    .loyalty-title { font-size: 11px; color: var(--neon-purple); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-    .loyalty-desc { font-size: 13px; color: var(--text-muted); line-height: 1.4; font-weight: 500; }
-    .loyalty-highlight { color: var(--neon-blue); font-weight: 700; }
-
-    /* --- BOTONES --- */
-    .actions-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
-    
-    .btn { width: 100%; padding: 16px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border: none; outline: none; }
-    .btn:active { transform: translateY(2px); }
-    
-    .btn-copy { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
-    .btn-copy:hover { box-shadow: 0 0 30px rgba(0, 242, 254, 0.5); color: #fff;}
-
-    .btn-wa { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
-    .btn-wa:hover { background: rgba(255,255,255,0.1); border-color: var(--text-muted); }
-
-    .footer { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; line-height: 1.6; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 20px; }
-    
-    .error-msg { text-align: center; color: var(--danger-red); padding: 20px 0; font-size: 15px; font-weight: 700; }
-    .loading { text-align: center; color: var(--text-muted); padding: 40px 0; font-size: 15px; font-weight: 600; }
-    
-    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 700; display: none; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); z-index: 1000; animation: fadeIn 0.3s ease;}
-    @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#030305">
+    <title>GOXION - Ecosistema Central</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-black: #030305;
+            --card-glass: rgba(8, 8, 12, 0.45);
+            --text-main: #ffffff;
+            --text-muted: #95a4bd;
+            --neon-blue: #00f2fe;
+            --neon-purple: #7c4dff;
+            --success-green: #2ea043;
+            --danger-red: #ff3366;
+            --warning-amber: #ffaa00;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        
+        body { background-color: var(--bg-black); color: var(--text-main); line-height: 1.6; padding: 15px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; min-height: 100dvh; overflow-x: hidden; }
+        body.no-scroll { overflow: hidden; height: 100vh; }
+
+        #splash-screen {
+            position: fixed; inset: 0; background: var(--bg-black); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.6s ease-out, visibility 0.6s ease-out;
+        }
+        .splash-content { animation: floatUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .splash-logo { max-width: 140px; filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.4)); }
+        @keyframes floatUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* FONDO ANIMADO NEÓN (TU DISEÑO OPTIMIZADO) */
+        .bg { 
+            position: fixed; 
+            inset: 0; 
+            z-index: -2; 
+            background-color: var(--bg-black); 
+            overflow: hidden; 
+        }
+        
+        .neon-orbit { position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.9; }
+        .orbit-1 { width: 450px; height: 450px; top: -150px; left: -150px; border-bottom: 3px solid #b026ff; border-left: 3px solid rgba(176, 38, 255, 0.2); filter: drop-shadow(0 0 15px #b026ff) drop-shadow(0 0 30px #b026ff); animation: floatOrbit1 70s linear infinite; }
+        .orbit-2 { width: 550px; height: 550px; bottom: -200px; right: -200px; border-top: 3px solid #00f2fe; border-right: 3px solid rgba(0, 242, 254, 0.2); filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); animation: floatOrbit2 85s linear infinite; }
+        .orbit-3 { width: 380px; height: 380px; top: 60%; left: -100px; border-right: 2px solid #7c4dff; border-bottom: 2px solid rgba(124, 77, 255, 0.2); filter: drop-shadow(0 0 12px #7c4dff) drop-shadow(0 0 25px #7c4dff); animation: floatOrbit3 95s linear infinite; opacity: 0.6; }
+
+        @keyframes floatOrbit1 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); } 25% { transform: translate3d(80px, 40px, 0) rotate(90deg) scale(1.03); } 50% { transform: translate3d(220px, 130px, 0) rotate(180deg) scale(1.06); } 75% { transform: translate3d(140px, 190px, 0) rotate(270deg) scale(1.02); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(1); } }
+        @keyframes floatOrbit2 { 0% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.96); } 25% { transform: translate3d(40px, 60px, 0) rotate(270deg) scale(1); } 50% { transform: translate3d(100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(140px, 50px, 0) rotate(90deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.96); } }
+        @keyframes floatOrbit3 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.92); } 25% { transform: translate3d(-50px, 60px, 0) rotate(90deg) scale(0.97); } 50% { transform: translate3d(-100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(-40px, 170px, 0) rotate(270deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.92); } }
+
+        .container { width: 100%; max-width: 580px; position: relative; z-index: 1; padding-bottom: 80px; }
+
+        /* DEGRADADO DE CRISTAL (FADE/MASK EFECTO APP) */
+        .glass-top-bar {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: linear-gradient(to bottom, rgba(3, 3, 5, 0.95) 40%, rgba(3, 3, 5, 0) 100%);
+            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
+            border: none; 
+            padding: max(25px, env(safe-area-inset-top)) 20px 45px 20px; 
+            z-index: 1000;
+            display: flex; align-items: flex-start; justify-content: flex-start;
+            opacity: 0; transform: translateY(-100%); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
+        }
+        .glass-top-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .glass-top-name { font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .glass-top-name span { color: var(--neon-blue); }
+
+        .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: max(15px, env(safe-area-inset-top)) 0 5px 0; position: relative; z-index: 10; }
+        .app-logo { max-height: 28px; width: auto; object-fit: contain; }
+        .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s; backdrop-filter: blur(10px); cursor: pointer; }
+        .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
+
+        .alert-banner { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(15px); }
+
+        /* ESTILO UNIFICADO DE CRISTAL (BLUR) PARA TARJETAS */
+        .glass-card, .tab-container, .btn-menu, .catalog-card, .smart-support-card, .modal-content, .floating-cart {
+            background: var(--card-glass);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-radius: 20px;
+        }
+
+        /* BANNER PESTAÑAS */
+        .tab-container { display: flex; padding: 4px; margin-bottom: 20px; position: relative; z-index: 110; border-radius: 16px; }
+        .tab-btn { 
+            flex: 1; padding: 8px 4px; background: transparent; border: none; color: var(--text-muted); 
+            font-size: 11px; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; 
+            flex-direction: column; align-items: center; gap: 3px; transition: all 0.3s ease; position: relative; overflow: hidden; 
+        }
+        .tab-btn span { font-size: 16px; }
+        .tab-btn.active { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25); }
+        .tab-btn::after {
+            content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0;
+            background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(124, 77, 255, 0) 70%);
+            border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out; opacity: 0; pointer-events: none;
+        }
+        .tab-btn:active::after { width: 180px; height: 180px; opacity: 1; transition: 0s; }
+        
+        .view-section { display: none; animation: fadeIn 0.4s ease; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
+
+        /* ESTILOS DE INICIO (LANDING) */
+        .hero-title { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; color: var(--text-main); text-align: center; }
+        .hero-title span { color: var(--neon-purple); filter: drop-shadow(0 0 15px rgba(124, 77, 255, 0.4)); }
+        
+        .rotator-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 8px 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px; font-size: 13px; font-weight: 600; color: var(--text-main); }
+        .rotator-text { animation: fadeRotate 3s infinite; }
+        @keyframes fadeRotate { 0%, 100% { opacity: 0; transform: translateY(5px); } 15%, 85% { opacity: 1; transform: translateY(0); } }
+
+        /* BOTÓN SHIMMER ANIMADO */
+        .btn-shimmer {
+            position: relative; overflow: hidden; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 700; font-size: 14px; cursor: pointer;
+            background: linear-gradient(135deg, var(--neon-purple), #ff3366); box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); color: #fff; transition: 0.3s;
+        }
+        .btn-shimmer::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
+            transform: skewX(-20deg); animation: shimmer 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+        }
+        .btn-shimmer:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(124, 77, 255, 0.6); }
+        @keyframes shimmer { 0% { left: -100%; } 20%, 100% { left: 200%; } }
+
+        /* TARJETAS DE CONFIANZA (CON BLUR) */
+        .trust-badges-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; margin-bottom: 30px;}
+        .trust-badge { 
+            background: var(--card-glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 10px;
+        }
+        .trust-icon { font-size: 20px; }
+        .trust-title { font-size: 12px; font-weight: 700; color: var(--text-main); line-height: 1.2; margin-bottom: 2px;}
+        .trust-subtitle { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
+
+        /* BOTTOM SHEET (OVERLAY DE LOGIN/DASHBOARD) */
+        .auth-overlay {
+            position: fixed; inset: 0; z-index: 3000; background: rgba(3, 3, 5, 0.7);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            display: flex; flex-direction: column; justify-content: flex-end;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .auth-overlay.show { opacity: 1; pointer-events: auto; }
+        .auth-sheet {
+            background: var(--card-glass); border-top: 1px solid rgba(255,255,255,0.1);
+            border-radius: 30px 30px 0 0; padding: 25px 20px 40px 20px; width: 100%; max-width: 580px; margin: 0 auto;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; position: relative;
+        }
+        .auth-overlay.show .auth-sheet { transform: translateY(0); }
+        .sheet-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: 0 auto 20px auto; }
+        .close-sheet-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; width: 30px; height: 30px; border-radius: 50%; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .input-smart { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 14px; border-radius: 12px; font-size: 14px; margin-bottom: 15px; outline: none; transition: 0.3s; }
+        .input-smart:focus { border-color: var(--neon-blue); box-shadow: 0 0 10px rgba(0, 242, 254, 0.1); }
+        .btn-primary { width: 100%; padding: 16px; border-radius: 20px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; background: linear-gradient(135deg, var(--neon-blue), #4f8cff); box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); color: #000; transition: 0.3s; }
+        .btn-primary:hover { box-shadow: 0 0 30px rgba(0, 242, 254, 0.6); color: #fff; transform: translateY(-2px); }
+
+        .glass-card { padding: 20px; margin-bottom: 25px; }
+        .login-card { text-align: center; border-color: rgba(0, 242, 254, 0.2); }
+        
+        .dash-greeting-box { text-align: center; margin: 10px 0 25px 0; min-height: 45px; }
+        .dash-greeting-box h1 { font-size: 30px; font-weight: 800; color: var(--text-main); line-height: 1.2; margin: 0; transition: opacity 0.5s ease; }
+        .dash-greeting-box h1 span { color: var(--neon-blue); }
+        .dash-date { font-size: 26px; font-weight: 800; color: var(--text-main); margin: 5px 0 10px 0; text-align: center; }
+        
+        .time-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+        .badge-ok { background: rgba(0, 242, 254, 0.1); color: var(--neon-blue); border: 1px solid rgba(0, 242, 254, 0.3); }
+        .badge-today { background: rgba(255, 170, 0, 0.15); color: var(--warning-amber); border: 1px solid var(--warning-amber); }
+        .badge-overdue { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
+
+        .loyalty-progress-bg { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 8px; margin: 12px 0; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05); }
+        .loyalty-progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        
+        .referral-card { border-color: rgba(124, 77, 255, 0.3); }
+        .referral-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .referral-title { font-size: 13px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        .referral-status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700; background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border: 1px solid rgba(124, 77, 255, 0.4); }
+        .referral-stats { display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-box { text-align: center; flex: 1; }
+        .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
+        .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+        .promo-card { background: linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 242, 254, 0.05)); border: 1px dashed rgba(124, 77, 255, 0.5); box-shadow: 0 0 25px rgba(124, 77, 255, 0.15); margin-bottom: 25px; padding: 20px; border-radius: 20px; }
+        .promo-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .promo-title span { font-size: 18px; filter: drop-shadow(0 0 10px var(--neon-purple)); }
+        .promo-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
+        .btn-promo { width: 100%; padding: 12px; border-radius: 15px; border: 1px solid var(--neon-purple); background: rgba(124, 77, 255, 0.2); color: var(--text-main); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-promo:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); }
+
+        .history-item { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .history-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .history-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--success-green); box-shadow: 0 0 10px var(--success-green); }
+        .history-info { flex: 1; }
+        .history-month { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
+        .history-status { font-size: 11px; color: var(--text-muted); }
+        .history-amount { font-size: 14px; color: var(--neon-blue); font-weight: 700; }
+
+        .service-pill-container { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; margin-bottom: 10px; padding: 12px; }
+        .service-pill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+        .service-pill-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
+        .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 3px 8px; border-radius: 10px; font-weight: 700; }
+        
+        .btn-creds-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+        .btn-creds-toggle:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
+
+        .cred-box { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.08); animation: fadeIn 0.3s ease; }
+        .cred-tag { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
+        .cred-tag:hover { border-color: var(--neon-blue); color: #fff; background: rgba(0, 242, 254, 0.1); }
+        .cred-tag strong { color: var(--text-main); }
+
+        .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .btn-menu { padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; border-color: rgba(124, 77, 255, 0.15); }
+        .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,242,254,0.15); }
+        .btn-menu span { font-size: 38px; margin-bottom: 4px; }
+        .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.2; }
+
+        /* CATALOGO REFINADO */
+        .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .catalog-card {
+            background: var(--card-glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-top: 2px solid rgba(0, 242, 254, 0.4); 
+            box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.1), 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .catalog-card:hover { transform: translateY(-3px); box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.2), 0 15px 30px rgba(0,0,0,0.4); }
+        .cat-logo-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; margin: 0 auto 10px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.4); background: rgba(0,0,0,0.5); }
+        .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
+        .cat-price { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
+        .cat-badge { font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; }
+        .cat-badge.ok { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid rgba(46, 160, 67, 0.4); }
+        .cat-badge.out { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid rgba(255, 51, 102, 0.4); }
+        
+        .qty-controls { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); }
+        .qty-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .qty-btn:hover:not(:disabled) { background: var(--neon-blue); color: #000; }
+        .qty-val { font-weight: 700; font-size: 16px; min-width: 20px; text-align: center; }
+
+        .floating-cart { 
+            position: fixed; bottom: 20px; left: 50%; width: 92%; max-width: 500px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 1000; border-color: var(--neon-blue); padding: 15px 20px;
+            opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 120px);
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .floating-cart.show { 
+            opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); 
+        }
+        
+        .cart-info { display: flex; flex-direction: column; }
+        .cart-total { font-size: 18px; font-weight: 800; color: var(--neon-blue); }
+        .cart-items { font-size: 12px; color: var(--text-muted); }
+        .cart-btn { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; padding: 10px 20px; border-radius: 15px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
+        .cart-btn:hover { box-shadow: 0 0 25px rgba(0,242,254,0.6); color: #fff; }
+
+        .smart-support-card { border-color: rgba(124, 77, 255, 0.3); }
+        .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+        .platform-btn { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.2s; }
+        .platform-btn span { font-size: 22px; }
+        .platform-btn.selected { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.1); box-shadow: 0 0 15px rgba(0,242,254,0.2); }
+        .step-box { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); }
+        .step-box.active { display: block; }
+        .custom-select-smart { width: 100%; background: rgba(0,0,0,0.5); border: 1px solid var(--neon-purple); color: var(--text-main); padding: 14px; border-radius: 12px; font-size: 14px; outline: none; margin-bottom: 12px; }
+        .solution-instructions { background: rgba(0, 242, 254, 0.05); border-left: 3px solid var(--neon-blue); padding: 14px; border-radius: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5;}
+
+        .modal { display: none; position: fixed; z-index: 4000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(3, 3, 5, 0.7); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px); align-items: center; justify-content: center; opacity: 0; transition: 0.3s; padding: 20px; }
+        .modal.show { display: flex; opacity: 1; }
+        .modal-content { border: 1px solid var(--neon-purple); width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; padding: 25px; position: relative; box-shadow: 0 20px 50px rgba(0,0,0,0.7); }
+        .close-btn { position: absolute; top: 15px; right: 20px; color: var(--text-muted); font-size: 24px; font-weight: bold; cursor: pointer; }
+        .modal-title { color: #fff; margin-bottom: 15px; font-size: 18px; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 13px; }
+        th, td { padding: 12px 8px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        th { color: var(--neon-blue); font-weight: 600; text-transform: uppercase; font-size: 11px; }
+        .terms-list { list-style: none; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: justify; line-height: 1.6; }
+        .terms-list li { margin-bottom: 16px; }
+        .terms-list strong { color: var(--neon-blue); display: block; margin-bottom: 4px; font-size: 14px;}
+
+        .footer-info { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px dashed rgba(255,255,255,0.05); }
+    </style>
 </head>
-<body>
+<body class="no-scroll">
 
-<div class="bg">
+    <div id="splash-screen" onclick="hideSplash()">
+        <div class="splash-content">
+            <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
+        </div>
+    </div>
 
-    <div class="lava lava-1"></div>
-    <div class="lava lava-2"></div>
-    <div class="lava lava-3"></div>
-    <div class="lava lava-4"></div>
+    <!-- EL HEADER FIJO CON EL BOTON DE ESPACIO A LA DERECHA -->
+    <header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
+        <img src="logo2.PNG" alt="GOXION" class="app-logo">
+        <button class="header-action-btn" onclick="openAuthSheet()">👤 <span id="header-btn-text">Mi Espacio</span></button>
+    </header>
 
-    <div class="spark spark-1"></div>
-    <div class="spark spark-2"></div>
-    <div class="spark spark-3"></div>
-    <div class="spark spark-4"></div>
-    <div class="spark spark-5"></div>
-    <div class="spark spark-6"></div>
+    <div class="bg">
+        <div class="neon-orbit orbit-1"></div>
+        <div class="neon-orbit orbit-2"></div>
+        <div class="neon-orbit orbit-3"></div>
+    </div>
 
-</div>
+    <div class="container">
 
-<div class="container" id="app">
-  <div class="loading">Sincronizando con Goxion...</div>
-</div>
+        <div class="glass-card alert-banner" id="dynamic-alert">
+            <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
+        </div>
 
-<div class="toast" id="toast">📋 ¡Datos copiados al portapapeles!</div>
+        <!-- LAS NUEVAS PESTAÑAS (INICIO, CATÁLOGO, SOPORTE) -->
+        <div class="glass-card tab-container">
+            <button class="tab-btn active" id="btn-tab-inicio" onclick="switchTab('inicio')"><span>🏠</span>Inicio</button>
+            <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')"><span>🛒</span>Catálogo</button>
+            <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
+        </div>
 
-<script>
-  const TELEFONO_GOXION = "528136836901"; 
-  const CLABE_PAGO = "638180000167909381";
-  const BANCO_PAGO = "NU BANCO";
-  const TITULAR_PAGO = "Henry González";
+        <!-- VISTA DE INICIO (LANDING PREMIUM) -->
+        <div id="view-inicio" class="view-section active">
+            <div style="text-align: center; margin-top: 10px;">
+                <h2 class="hero-title">Tus apps premium<br><span>al mejor precio</span></h2>
+                
+                <div class="rotator-box">
+                    <span class="rotator-text" id="dynamic-rotator">✓ Cuentas verificadas y estables</span>
+                </div>
 
-  async function cargarEstadoCuenta() {
-    const params = new URLSearchParams(window.location.search);
-    const clienteKey = params.get('cliente')?.toLowerCase().trim();
-    const app = document.getElementById('app');
+                <!-- EL BOTÓN SHIMMER -->
+                <button class="btn-shimmer" onclick="window.open('https://wa.me/528136836901?text=Hola,%20quiero%20registrararme%20y%20obtener%20el%20descuento', '_blank')">
+                    🎁 Contrata hoy y obtén en tu primer mes -10%
+                </button>
 
-    if (!clienteKey) {
-      app.innerHTML = `<div class="error-msg">⚠️ ENLACE INCOMPLETO.<br><span style="font-size:12px; color:var(--text-muted); font-weight: 400;">Falta el identificador del cliente en la URL.</span></div>`;
-      return;
-    }
+                <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px; margin-bottom: 25px; padding: 0 10px;">
+                    Disfruta de grandes ahorros con nosotros en comparación a contratar cada plataforma por separado.
+                </p>
 
-    try {
-      const response = await fetch('clientes.json', { cache: 'no-store' });
-      if (!response.ok) throw new Error("No se pudo cargar clientes.json");
-      
-      const data = await response.json();
-      const cliente = data[clienteKey];
-
-      if (!cliente) {
-        app.innerHTML = `<div class="error-msg">❌ CLIENTE NO ENCONTRADO.<br><span style="font-size:12px; color:var(--text-muted); font-weight: 400;">El registro "${clienteKey}" no existe en el sistema.</span></div>`;
-        return;
-      }
-
-      // 1. Cálculos de Fechas
-      const hoy = new Date();
-      const diaHoy = hoy.getDate();
-      const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-      const mesActual = meses[hoy.getMonth()];
-      const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
-      
-      const diaPago = cliente.dia_pago || 15;
-      const difDias = diaPago - diaHoy; 
-      
-      let rachaOriginal = cliente.pagos_puntuales || 0;
-      let racha = rachaOriginal;
-      let perdioRacha = false;
-
-      // Si está vencido o suspendido, pierde racha visualmente
-      if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) {
-          racha = 0;
-          perdioRacha = true;
-      }
-
-      // 2. Cálculo de Subtotal de Servicios
-      let subtotal = 0;
-      let serviciosHTML = '';
-      if (cliente.servicios && cliente.servicios.length > 0) {
-        cliente.servicios.forEach(s => {
-          subtotal += s.monto;
-          serviciosHTML += `
-            <div class="service-item">
-              <span class="service-name">${s.nombre}</span>
-              <span class="service-price">$${s.monto}</span>
+                <!-- PÍLDORAS DE CONFIANZA (Informativas) -->
+                <div class="trust-badges-container">
+                    <div class="trust-badge">
+                        <div class="trust-icon">⚡</div>
+                        <div style="text-align: left;">
+                            <div class="trust-title">Activación</div>
+                            <div class="trust-subtitle">Inmediata</div>
+                        </div>
+                    </div>
+                    <div class="trust-badge">
+                        <div class="trust-icon">🛡️</div>
+                        <div style="text-align: left;">
+                            <div class="trust-title">Garantía</div>
+                            <div class="trust-subtitle">Trato justo o cambio</div>
+                        </div>
+                    </div>
+                    <div class="trust-badge">
+                        <div class="trust-icon">💬</div>
+                        <div style="text-align: left;">
+                            <div class="trust-title">Soporte</div>
+                            <div class="trust-subtitle">Atención 24/7</div>
+                        </div>
+                    </div>
+                    <div class="trust-badge">
+                        <div class="trust-icon">🔒</div>
+                        <div style="text-align: left;">
+                            <div class="trust-title">Seguridad</div>
+                            <div class="trust-subtitle">100% garantizada</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          `;
-        });
-      } else {
-        serviciosHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding: 15px 0;">No tienes servicios activos asignados.</div>`;
-      }
 
-      // 3. Reglas de Mora, Recargos y Banderas
-      let pctMoraDiaria = 0;
-      let montoMora = 0;
-      let montoBajaAdmin = 0;
-      let diasAtraso = 0;
-      
-      let badgeClass = "";
-      let badgeText = "";
-      let uiColor = "var(--neon-blue)";
-      
-      let mensajeAtrasoHTML = "";
-
-      if (cliente.estado === 'pagado') {
-          badgeClass = "badge-paid";
-          badgeText = "✅ Al corriente este mes";
-          uiColor = "var(--success-neon)";
-      } else if (difDias > 0) {
-          badgeClass = "badge-ok";
-          badgeText = `⏳ Vence en ${difDias} día(s)`;
-      } else if (difDias === 0) {
-          badgeClass = "badge-today";
-          badgeText = `⚠️ Tu corte es HOY`;
-          uiColor = "var(--warning-amber)";
-      } else {
-          diasAtraso = Math.abs(difDias);
-          badgeClass = "badge-overdue";
-          badgeText = `🚨 Vencido hace ${diasAtraso} día(s)`;
-          uiColor = "var(--danger-red)";
-
-          let pctMoraCalculado = diasAtraso * 0.05;
-          pctMoraDiaria = Math.min(pctMoraCalculado, 0.50);
-          montoMora = Math.round(subtotal * pctMoraDiaria);
-          let acumMoraTotal = subtotal + montoMora;
-
-          if (diasAtraso > 15 || cliente.estado === 'suspendido') {
-              montoBajaAdmin = Math.round(acumMoraTotal * 0.20);
-          }
-
-          mensajeAtrasoHTML = `
-            <div class="overdue-incentive-box">
-              🚨 <strong style="color:var(--text-main);">Mora activa por falta de pago.</strong><br>
-              Se aplica recargo automático del 5% diario (+${Math.round(pctMoraDiaria * 100)}% acum.). 
-              ${(diasAtraso > 15 || cliente.estado === 'suspendido') ? `<br><strong style="color:var(--danger-red);">⚠️ Se incluyó un 20% de recargo por reactivación.</strong>` : ''}
-              <br><small style="color:var(--text-muted); display:block; margin-top:8px;">Si prevés un retraso, notifícalo con antelación para evitar recargos.</small>
+            <div class="section-title">Información y Reglas de la Comunidad</div>
+            <div class="policy-grid">
+                <div class="glass-card btn-menu" onclick="openModal('modal-terminos')"><span>📄</span><div>Términos de Uso</div></div>
+                <div class="glass-card btn-menu" onclick="openModal('modal-garantia')"><span>🛡️</span><div>Garantía y Sanciones</div></div>
+                <div class="glass-card btn-menu" onclick="openModal('modal-lealtad')"><span>⭐</span><div>Programa Lealtad</div></div>
+                <div class="glass-card btn-menu" onclick="openModal('modal-referidos')"><span>🎁</span><div>Invita y Gana</div></div>
             </div>
-          `;
-      }
+        </div>
 
-      // 4. Banner de Estado Global (Solo si está suspendido, ELIMINAMOS el banner redundante de pagado)
-      let bannerEstado = "";
-      if (cliente.estado === 'suspendido') {
-          bannerEstado = `<div class="alert-banner" style="background: rgba(255, 51, 102, 0.1); border-color: var(--danger-red); color: var(--danger-red); box-shadow: 0 0 15px rgba(255, 51, 102, 0.15);">⛔ Servicio Suspendido</div>`;
-          uiColor = "var(--danger-red)";
-      }
-
-      // 5. Cálculo del Descuento por Fidelidad
-      let pctDescuento = 0;
-      let mensajeLealtad = '';
-
-      if (racha >= 9) {
-        pctDescuento = 0.06;
-        mensajeLealtad = `Nivel 2 Activo: <span class="loyalty-highlight">6% de descuento</span> aplicado en tu total.`;
-      } else if (racha >= 4) {
-        pctDescuento = 0.03;
-        const faltantes = 9 - racha;
-        mensajeLealtad = `Nivel 1 Activo: <span class="loyalty-highlight">3% OFF</span>. Te faltan ${faltantes} pago(s) para subir a Nivel 2.`;
-      } else {
-        pctDescuento = 0;
-        const faltantes = 4 - racha;
-        mensajeLealtad = perdioRacha 
-          ? `<span style="color:var(--danger-red); font-weight:600;">💔 Racha reiniciada a 0 por atraso en el pago.</span>` 
-          : `Progreso: <span class="loyalty-highlight" style="color:var(--text-main);">${racha}/4 pagos</span>. Faltan ${faltantes} pago(s) para subir a Nivel 1.`;
-      }
-
-      // 6. Gran Total Final y Botones Dinámicos
-      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
-      let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
-      
-      let labelTotal = "Total a Pagar";
-      
-      // ELIMINAMOS el botón redundante de "Mensualidad Cubierta"
-      let btnAccionHTML = `<button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>`;
-
-      if (cliente.estado === 'pagado') {
-          totalFinal = 0;
-          labelTotal = "Saldo Pendiente";
-          btnAccionHTML = ""; // Ya no se muestra un segundo botón confirmando el pago.
-      }
-
-      // 7. Generar Caja de Desglose (Ticket)
-      let breakdownHTML = '';
-      if (cliente.estado !== 'pagado' && (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
-          breakdownHTML = `
-            <div class="glass-card breakdown-box">
-              <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
-              ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento Lealtad</span><span>-$${ahorro}</span></div>` : ''}
-              ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Mora (+${Math.round(pctMoraDiaria * 100)}%)</span><span>+$${montoMora}</span></div>` : ''}
-              ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Reactivación</span><span>+$${montoBajaAdmin}</span></div>` : ''}
+        <div id="view-catalogo" class="view-section">
+            <div class="section-title">Nuestros Servicios y Promociones</div>
+            <div id="catalog-container" class="catalog-grid">
+                <p style="font-size: 13px; color: var(--text-muted); text-align: center; grid-column: span 2;">Cargando catálogo en vivo...</p>
             </div>
-          `;
-      }
-
-      const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi cuenta.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
-      const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
-
-      // Renderizado Final con la tipografía y estilo Ecosistema
-      app.innerHTML = `
-        <div class="header">
-          <img src="logo2.PNG" alt="GOXION" class="logo-img" onerror="this.src='Logo individual.png'">
-          <div class="subtitle">Resumen de Cuenta</div>
         </div>
 
-        ${bannerEstado}
-
-        <!-- LA REGLA DE 5 SEGUNDOS (HERO SECTION) -->
-        <div class="balance-hero">
-            <div class="total-label">${labelTotal}</div>
-            <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">$${totalFinal.toFixed(2)}</div>
-            <div class="time-badge ${badgeClass}">${badgeText}</div>
+        <div id="view-soporte" class="view-section">
+            <div class="glass-card smart-support-card">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
+                <div class="platform-grid" id="support-platforms-grid">
+                    <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
+                </div>
+                <div id="step-2" class="step-box">
+                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
+                    <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
+                </div>
+                <div id="step-3" class="step-box">
+                    <div class="solution-instructions" id="solution-text"></div>
+                    <div id="extra-inputs-container">
+                        <p style="font-size: 12px; color: var(--text-main); font-weight: 600; margin-bottom: 8px;" id="input-label">Dato requerido:</p>
+                        <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
+                    </div>
+                    <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()" style="padding: 14px; font-size: 14px; border-radius: 30px;">
+                        📲 Enviar Solicitud a Soporte
+                    </button>
+                </div>
+            </div>
         </div>
 
-        ${cliente.estado === 'pagado' ? '' : mensajeAtrasoHTML}
-
-        <!-- DATOS DEL CLIENTE -->
-        <div class="glass-card card-info">
-          <div class="info-block">
-            <span class="label">Titular</span>
-            <span class="value">${cliente.nombre.split(' ')[0]}</span>
-          </div>
-          <div class="info-block" style="text-align: right;">
-            <span class="label">Folio</span>
-            <span class="value" style="color:var(--neon-purple);">${cliente.folio}</span>
-          </div>
-          <div class="info-block full">
-            <span class="label">Periodo Facturado</span>
-            <span class="value" style="display:flex; justify-content:space-between; align-items:center;">
-                ${periodoStr} 
-                <span style="color:var(--text-muted); font-size:12px; font-weight:500;">Corte: ${diaPago} de ${mesActual}</span>
-            </span>
-          </div>
+        <div class="footer-info">
+            <div class="schedule">
+                <div class="schedule-title" style="font-weight: 700; color: var(--neon-purple); margin-bottom: 5px;">🕒 Atención Asistida</div>
+                <div class="schedule-time" style="font-size: 13px; color: var(--text-muted);">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
+            </div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">
+                © 2026 GOXION. Todos los derechos reservados.
+            </div>
         </div>
+    </div>
 
-        <div class="section-title">Servicios Activos</div>
-        <div class="glass-card services-container">
-          ${serviciosHTML}
+    <!-- EL NUEVO OVERLAY TIPO BOTTOM SHEET PARA EL LOGIN / DASHBOARD -->
+    <div id="auth-overlay" class="auth-overlay" onclick="closeAuthSheetEvent(event)">
+        <div class="auth-sheet" id="auth-sheet">
+            <div class="sheet-handle"></div>
+            <button class="close-sheet-btn" onclick="closeAuthSheet()">✕</button>
+
+            <!-- VISTA DE LOGIN (DENTRO DEL SHEET) -->
+            <div id="auth-view">
+                <div class="login-card" style="text-align: center; margin-top: 10px;">
+                    <img src="Logo individual.png" style="width: 40px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--neon-blue));" onerror="this.style.display='none'">
+                    <div class="section-title" style="margin-bottom: 4px; font-size: 14px; color: var(--text-main);">Vincular Dispositivo</div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Ingresa tus datos para acceder a tu panel personal.</p>
+                    
+                    <input type="text" id="login-id" class="input-smart" placeholder="Tu Nombre o ID (Ej. Juan de Dios)">
+                    <input type="password" id="login-pin" class="input-smart" placeholder="Código de Acceso (PIN)">
+                    
+                    <button class="btn-primary" onclick="iniciarSesion()">Entrar a mi Panel</button>
+                    <p id="login-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
+                </div>
+            </div>
+
+            <!-- VISTA DEL DASHBOARD (DENTRO DEL SHEET) -->
+            <div id="dashboard-view" style="display: none;">
+                <div id="dash-greeting-container" class="dash-greeting-box">
+                    <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
+                </div>
+
+                <div id="dash-upsell"></div>
+                <div id="referral-section-container"></div>
+
+                <div class="glass-card dash-card" style="background: rgba(0,0,0,0.3);">
+                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
+                    <div class="dash-date" id="dash-date">Cargando...</div>
+                    <div style="text-align: center;" id="dash-badge"></div>
+                    <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
+                        <div style="font-size: 11px; color: var(--neon-blue); font-weight: 700;" id="loyalty-count">0 Pagos</div>
+                    </div>
+                    <div class="loyalty-progress-bg">
+                        <div class="loyalty-progress-fill" id="loyalty-bar"></div>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
+                </div>
+
+                <div id="dash-history"></div>
+
+                <div class="section-title">Tus Servicios Activos</div>
+                <div id="dash-services" style="margin-bottom: 25px;"></div>
+
+                <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">💳 Ver Estado de Cuenta y Pagar</button>
+                <button onclick="cerrarSesion()" style="background: transparent; border: none; color: var(--text-muted); font-size: 12px; width: 100%; text-decoration: underline; cursor: pointer; padding: 10px;">Cerrar Sesión de este dispositivo</button>
+            </div>
         </div>
+    </div>
 
-        ${breakdownHTML}
-
-        <div class="glass-card loyalty-badge">
-          <div class="loyalty-icon">⭐</div>
-          <div class="loyalty-content">
-            <div class="loyalty-title">Programa Goxion</div>
-            <div class="loyalty-desc">${mensajeLealtad}</div>
-          </div>
+    <!-- EL CARRITO FLOTANTE -->
+    <div id="floating-cart" class="glass-card floating-cart">
+        <div class="cart-info">
+            <span class="cart-total" id="cart-total-price">$0 MXN</span>
+            <span class="cart-items" id="cart-items-count">0 perfiles</span>
         </div>
+        <button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
+    </div>
 
-        <div class="actions-group">
-          ${btnAccionHTML}
-          <a href="${urlWA}" target="_blank" class="btn btn-wa">
-            💬 Contactar a Soporte
-          </a>
+    <!-- MODALES EXISTENTES INTACTOS -->
+    <div id="modal-terminos" class="modal">
+        <div class="glass-card modal-content">
+            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
+            <div class="modal-title">GOXION - Términos y Condiciones</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Al hacer uso de cualquiera de los servicios ofrecidos, el usuario acepta de manera íntegra las condiciones establecidas en este instrumento.</p>
+            <ul class="terms-list">
+                <li><strong>1. Confidencialidad de Credenciales</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
+                <li><strong>2. Uso Permitido</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
+                <li><strong>3. Sanciones</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
+                <li><strong>4. Esquema de Pagos y Notificaciones</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial. Métodos aceptados: Transferencias bancarias electrónicas y depósitos.</li>
+                <li><strong>5. Aviso Previo por Imposibilidad de Pago</strong> Si el usuario prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos.</li>
+            </ul>
         </div>
-
-        <div class="footer">
-          <span style="color:var(--text-main); font-weight:600;">🎁 ¡Gana un mes gratis!</span><br>
-          Invita a un amigo, cuando cumpla 3 meses de servicio, tu próxima mensualidad será sin costo.
+    </div>
+    
+    <div id="modal-garantia" class="modal">
+        <div class="glass-card modal-content">
+            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
+            <div class="modal-title">Garantía, Satisfacción y Trato Justo</div>
+            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
+            <table>
+                <tr><th>Concepto</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
+                <tr><td style="color:var(--text-main);"><strong>Falla Técnica</strong></td><td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td><td>Hasta 50% de descuento (equivalente a 10 días).</td></tr>
+                <tr><td style="color:var(--warning-amber);"><strong>Mora sin Previo Aviso</strong></td><td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento.</td><td>Hasta 50% de interés acumulado.</td></tr>
+                <tr><td style="color:var(--danger-red);"><strong>Baja / Cancelación del Servicio</strong></td><td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td><td>20% sobre saldo pendiente.</td></tr>
+            </table>
         </div>
-      `;
+    </div>
 
-    } catch (e) {
-      app.innerHTML = `<div class="error-msg">⚠️ Error al cargar la base de datos.<br><span style="font-size:13px; color:var(--text-muted); font-weight: 400;">Revisa tu conexión a internet o contacta a soporte.</span></div>`;
-    }
-  }
+    <div id="modal-lealtad" class="modal">
+        <div class="glass-card modal-content">
+            <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
+            <div class="modal-title">Programa de Fidelidad</div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
+            <table>
+                <tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
+                <tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr>
+                <tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
+            </table>
+            <p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
+        </div>
+    </div>
 
-  function copiarDatos(monto) {
-    const texto = `GOXION - Datos de Transferencia\n\nBanco: ${BANCO_PAGO}\nTitular: ${TITULAR_PAGO}\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
-    navigator.clipboard.writeText(texto).then(() => {
-      const toast = document.getElementById('toast');
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 2500);
-    });
-  }
+    <div id="modal-referidos" class="modal">
+        <div class="glass-card modal-content">
+            <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
+            <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">El cliente actual podrá obtener un descuento del 100% en una mensualidad de su servicio actual por cada nuevo cliente que concrete una compra bajo estas bases:</p>
+            <ul class="terms-list">
+                <li><strong>1. Requisitos para el Referido</strong> Debe ser un cliente nuevo. Adquirir un mínimo de dos (2) perfiles y mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos.</li>
+                <li><strong>2. Condiciones de Aplicación</strong> El descuento del 100% se aplicará en el cuarto mes. El Referidor debe mantener su cuenta activa y al corriente durante el tiempo que dure la validación.</li>
+                <li><strong>3. Restricciones</strong> Si el Referido cancela antes de los 3 meses, el beneficio se anula. No es acumulable con otros descuentos. El descuento aplica sobre la tarifa base mensual. Sin límite de referidos (un mes gratis por cada ciclo cumplido).</li>
+            </ul>
+        </div>
+    </div>
 
-  cargarEstadoCuenta();
-</script>
+    <script>
+        const NUMERO_GOXION = "528136836901"; 
+        let globalClientesData = null;
+        let greetingInterval = null;
+        let carritoPedidos = {};
 
+        // CONTROL DEL ROTADOR DE TEXTO EN INICIO
+        const rotatorTexts = ["✓ Cuentas verificadas y estables", "✓ Sin geo-bloqueos", "✓ Soporte Premium 24/7", "✓ Entrega inmediata"];
+        let rotatorIdx = 0;
+        setInterval(() => {
+            const el = document.getElementById('dynamic-rotator');
+            if(el) {
+                rotatorIdx = (rotatorIdx + 1) % rotatorTexts.length;
+                el.innerText = rotatorTexts[rotatorIdx];
+            }
+        }, 3000);
+
+        function hideSplash() {
+            const splash = document.getElementById('splash-screen');
+            if (splash.style.opacity === '0') return;
+            splash.style.opacity = '0';
+            setTimeout(() => { splash.style.visibility = 'hidden'; document.body.classList.remove('no-scroll'); }, 600);
+        }
+        window.addEventListener('load', () => { setTimeout(hideSplash, 1800); cargarDatosYVerificarSesion(); });
+
+        function switchTab(tabName) {
+            ['inicio', 'catalogo', 'soporte'].forEach(name => {
+                const btn = document.getElementById(`btn-tab-${name}`);
+                const view = document.getElementById(`view-${name}`);
+                if(btn) btn.classList.remove('active');
+                if(view) view.classList.remove('active');
+            });
+            const activeBtn = document.getElementById(`btn-tab-${tabName}`);
+            const activeView = document.getElementById(`view-${tabName}`);
+            if(activeBtn) activeBtn.classList.add('active');
+            if(activeView) activeView.classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            if(tabName !== 'catalogo') {
+                document.getElementById('floating-cart').classList.remove('show');
+            } else {
+                renderCartFloating();
+            }
+        }
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
+
+        // CONTROL DEL BOTTOM SHEET (OVERLAY)
+        function openAuthSheet() {
+            document.getElementById('auth-overlay').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeAuthSheet() {
+            document.getElementById('auth-overlay').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+        function closeAuthSheetEvent(e) {
+            if (e.target.classList.contains('auth-overlay')) closeAuthSheet();
+        }
+
+        function iniciarSaludoDinamico(nombreCompleto) {
+            const primerNombre = nombreCompleto.split(' ')[0];
+            const frases = [
+                `¡Hola, <span>${primerNombre}</span>! 👋`,
+                `¡Qué gusto verte, <span>${primerNombre}</span>! ✨`,
+                `¡Bienvenido a tu espacio, <span>${primerNombre}</span>! 🚀`,
+                `Todo en orden por aquí, <span>${primerNombre}</span> 💎`
+            ];
+            
+            let index = 0;
+            const el = document.getElementById('dynamic-greeting-text');
+            if(!el) return;
+
+            if(greetingInterval) clearInterval(greetingInterval);
+            
+            el.innerHTML = frases[0];
+            el.style.opacity = 1;
+
+            greetingInterval = setInterval(() => {
+                el.style.opacity = 0;
+                setTimeout(() => {
+                    index = (index + 1) % frases.length;
+                    el.innerHTML = frases[index];
+                    el.style.opacity = 1;
+                }, 500);
+            }, 6000);
+        }
+
+        function normalizeString(str) {
+            return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
+        }
+
+        async function cargarDatosYVerificarSesion() {
+            try {
+                const version = new Date().getTime(); 
+                const response = await fetch(`clientes.json?v=${version}`, { 
+                    cache: 'no-store',
+                    headers: {
+                        'Cache-Control': 'no-cache, no-store, must-revalidate',
+                        'Pragma': 'no-cache',
+                        'Expires': '0'
+                    }
+                });
+                
+                globalClientesData = await response.json();
+                
+                cargarCatalogo(globalClientesData);
+                renderizarSoporteDinamico(globalClientesData);
+                
+                const savedKey = localStorage.getItem('goxion_user_key');
+                if(savedKey && globalClientesData[savedKey]) {
+                    renderDashboard(savedKey);
+                }
+            } catch(e) { console.error("Error cargando base de datos"); }
+        }
+
+        function iniciarSesion() {
+            const inputId = document.getElementById('login-id').value;
+            const inputPin = document.getElementById('login-pin').value.trim();
+            const errorMsg = document.getElementById('login-error');
+            
+            if(!inputId || !inputPin) {
+                errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso.";
+                errorMsg.style.display = 'block'; return;
+            }
+
+            const searchStr = normalizeString(inputId);
+            let foundKey = null;
+
+            for(let key in globalClientesData) {
+                if(key === '_goxion_config') continue;
+                let cli = globalClientesData[key];
+                
+                if(normalizeString(key) === searchStr || normalizeString(cli.nombre) === searchStr || normalizeString(cli.folio) === searchStr) {
+                    if(cli.codigo === inputPin || cli.pin === inputPin || cli.codigo_acceso === inputPin) {
+                        foundKey = key; break;
+                    }
+                }
+            }
+
+            if(foundKey) {
+                localStorage.setItem('goxion_user_key', foundKey);
+                errorMsg.style.display = 'none';
+                renderDashboard(foundKey);
+            } else {
+                errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código.";
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('goxion_user_key');
+            if(greetingInterval) clearInterval(greetingInterval);
+            document.getElementById('dashboard-view').style.display = 'none';
+            document.getElementById('auth-view').style.display = 'block';
+            document.getElementById('header-btn-text').innerText = 'Mi Espacio';
+            document.getElementById('login-id').value = '';
+            document.getElementById('login-pin').value = '';
+            closeAuthSheet();
+        }
+
+        function irAlTicket() {
+            const key = localStorage.getItem('goxion_user_key');
+            if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
+        }
+        
+        function copiarDatoRapido(texto, tipo) {
+            navigator.clipboard.writeText(texto);
+            alert(`¡${tipo} copiado al portapapeles!`);
+        }
+
+        function toggleCreds(id) {
+            const box = document.getElementById(id);
+            if(box.style.display === 'none') {
+                box.style.display = 'flex';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        function renderDashboard(key) {
+            const cliente = globalClientesData[key];
+            document.getElementById('auth-view').style.display = 'none';
+            document.getElementById('dashboard-view').style.display = 'block';
+
+            const primerNombre = cliente.nombre.split(' ')[0];
+            document.getElementById('dash-name').innerText = primerNombre;
+            document.getElementById('header-btn-text').innerText = 'Perfil';
+
+            iniciarSaludoDinamico(cliente.nombre);
+
+            // 1. MOTOR DE UPSELLING (Promociones Automáticas)
+            let hasPrime = false;
+            let hasHBO = false;
+            let hasCombo = false;
+
+            if(cliente.servicios && cliente.servicios.length > 0) {
+                cliente.servicios.forEach(s => {
+                    let n = s.nombre.toLowerCase();
+                    if(n.includes("prime") && !n.includes("hbo") && !n.includes("max")) hasPrime = true;
+                    if(n.includes("hbo") || n.includes("max")) {
+                        if(n.includes("prime")) hasCombo = true;
+                        else hasHBO = true;
+                    }
+                });
+            }
+
+            let upsellHTML = '';
+            let msgPromoWA = '';
+            if(hasCombo) {
+                upsellHTML = `
+                    <div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);">
+                        <div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div>
+                        <div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div>
+                    </div>`;
+            } else if(hasPrime) {
+                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
+                upsellHTML = `
+                    <div class="promo-card">
+                        <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
+                        <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
+                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button>
+                    </div>`;
+            } else if(hasHBO) {
+                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
+                upsellHTML = `
+                    <div class="promo-card">
+                        <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
+                        <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
+                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button>
+                    </div>`;
+            }
+            document.getElementById('dash-upsell').innerHTML = upsellHTML;
+
+            const refContainer = document.getElementById('referral-section-container');
+            if(cliente.referido_activo) {
+                let mesesActivos = cliente.referido_activo.meses || 1;
+                let numPlataformas = cliente.referido_activo.plataformas || 2;
+                let nombreRef = cliente.referido_activo.nombre || "Referido";
+                let porcentajeRef = Math.min((mesesActivos / 3) * 100, 100);
+
+                refContainer.innerHTML = `
+                    <div class="glass-card referral-card">
+                        <div class="referral-header">
+                            <div class="referral-title"><span>🎁</span> Tu Referido Activo</div>
+                            <div class="referral-status-badge">En Validación</div>
+                        </div>
+                        <p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${nombreRef}</p>
+                        
+                        <div class="referral-stats">
+                            <div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);">
+                                <div class="stat-val">${numPlataformas}</div>
+                                <div class="stat-label">Plataformas</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-val">${mesesActivos}/3</div>
+                                <div class="stat-label">Meses</div>
+                            </div>
+                        </div>
+                        
+                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Progreso a tu mes gratis:</div>
+                        <div class="loyalty-progress-bg" style="height: 6px;">
+                            <div class="loyalty-progress-fill" style="width: ${porcentajeRef}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div>
+                        </div>
+                        <div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
+                    </div>
+                `;
+            } else {
+                let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
+                
+                refContainer.innerHTML = `
+                    <div class="glass-card referral-card">
+                        <div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
+                        
+                        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                            <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input">
+                            <button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button>
+                        </div>
+                        
+                        <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">
+                            📲 Compartir por WhatsApp
+                        </button>
+                        
+                        <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
+                    </div>
+                `;
+            }
+
+            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const hoy = new Date();
+            const mesActual = meses[hoy.getMonth()];
+            const diaPago = cliente.dia_pago || 15;
+            const difDias = diaPago - hoy.getDate();
+            
+            document.getElementById('dash-date').innerText = `${diaPago} de ${mesActual}`;
+            
+            let badgeHTML = "";
+            if (cliente.estado === 'pagado') badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
+            else if (difDias > 0) badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
+            else if (difDias === 0) badgeHTML = `<div class="time-badge badge-today">⚠️ Vence HOY</div>`;
+            else badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
+            
+            document.getElementById('dash-badge').innerHTML = badgeHTML;
+
+            let pagos = cliente.pagos_puntuales || 0;
+            let meta = 4;
+            let beneficio = "3% OFF";
+            if (pagos >= 4 && pagos < 9) { meta = 9; beneficio = "6% OFF"; }
+            else if (pagos >= 9) { meta = pagos; beneficio = "Nivel Máximo (6% OFF)"; }
+
+            let porcentaje = Math.min((pagos / meta) * 100, 100);
+            document.getElementById('loyalty-count').innerText = `${pagos}/${meta} Pagos`;
+            setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${porcentaje}%`; }, 300);
+
+            if (pagos >= 9) {
+                document.getElementById('loyalty-msg').innerText = "¡Felicidades! Disfrutas de tu Nivel 2.";
+            } else {
+                document.getElementById('loyalty-msg').innerText = `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
+            }
+
+            // 2. HISTORIAL DE PAGOS 
+            let historyHTML = '';
+            if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
+                historyHTML = `<div class="glass-card"><div class="section-title">Historial de Transacciones</div>`;
+                // Invertir para mostrar el más reciente arriba
+                const historialInverso = [...cliente.historial_pagos].reverse(); 
+                
+                historialInverso.forEach(p => {
+                    historyHTML += `
+                        <div class="history-item">
+                            <div class="history-dot"></div>
+                            <div class="history-info">
+                                <div class="history-month">${p.fecha}</div>
+                                <div class="history-status">✅ Acreditado a tiempo (+1 Racha)</div>
+                            </div>
+                            <div class="history-amount">$${p.monto.toFixed(2)}</div>
+                        </div>`;
+                });
+                historyHTML += `</div>`;
+            }
+            document.getElementById('dash-history').innerHTML = historyHTML;
+
+            // 3. SERVICIOS Y VISUALIZADOR DE CREDENCIALES
+            const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
+            let srvHTML = '';
+            
+            if(cliente.servicios && cliente.servicios.length > 0) {
+                cliente.servicios.forEach((s, idx) => {
+                    let icon = "📺";
+                    for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
+                    
+                    let credsBtns = '';
+                    if(s.correo_login || s.perfil_nombre || s.perfil_pin) {
+                        if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
+                        if(s.perfil_nombre) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_nombre}', 'Perfil')">👤 <strong>${s.perfil_nombre}</strong></div>`;
+                        if(s.perfil_pin) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_pin}', 'PIN')">🔢 PIN: <strong>${s.perfil_pin}</strong></div>`;
+                    } else {
+                        credsBtns = `<div style="font-size:11px; color:var(--text-muted); width:100%;">Tus accesos llegarán a tu correo o WhatsApp pronto.</div>`;
+                    }
+
+                    srvHTML += `
+                        <div class="service-pill-container">
+                            <div class="service-pill-header">
+                                <div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div>
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <div class="service-status">Activo</div>
+                                    <button class="btn-creds-toggle" onclick="toggleCreds('creds-${idx}')">👁️ Ver Accesos</button>
+                                </div>
+                            </div>
+                            <div class="cred-box" id="creds-${idx}" style="display:none;">${credsBtns}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`;
+            }
+            document.getElementById('dash-services').innerHTML = srvHTML;
+        }
+
+        function cargarCatalogo(data) {
+            const config = data._goxion_config;
+            const catalogContainer = document.getElementById('catalog-container');
+            if (!config || !config.serviciosGlobales || !Array.isArray(config.serviciosGlobales)) return;
+
+            if (config.alertas && config.alertas.activa) {
+                const banner = document.getElementById('dynamic-alert');
+                const content = document.getElementById('alert-content');
+                content.innerHTML = `<strong>Aviso Técnico:</strong> El servicio de <strong>${config.alertas.plataforma || "Servicios"}</strong> está ${config.alertas.falla || "presentando intermitencias"}. Las demás plataformas operan con normalidad.${config.alertas.mensaje ? `<br><small>${config.alertas.mensaje}</small>` : ''}`;
+                banner.style.display = 'flex';
+            }
+
+            let ocupados = {};
+            config.serviciosGlobales.forEach(catSrv => { ocupados[catSrv.nombre] = 0; });
+
+            for (let key in data) {
+                if (key === '_goxion_config') continue;
+                let cliente = data[key];
+                if (cliente.servicios) {
+                    cliente.servicios.forEach(s => {
+                        let nombreCliente = s.nombre.toLowerCase();
+                        let multiplier = 1;
+                        let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
+                        if (matchQuant) multiplier = parseInt(matchQuant[1]);
+                        
+                        config.serviciosGlobales.forEach(catSrv => {
+                            let nombreCatLow = catSrv.nombre.toLowerCase();
+                            let isCatCompleta = nombreCatLow.includes('completa');
+                            let isCliCompleta = nombreCliente.includes('completa');
+                            if (isCatCompleta !== isCliCompleta) return; 
+                            
+                            let keyword = nombreCatLow.replace(' premium','').replace(' video','').replace(' platino','').replace(' cuenta completa','').trim();
+                            if (nombreCliente.includes(keyword)) ocupados[catSrv.nombre] += multiplier;
+                        });
+                    });
+                }
+            }
+
+            // MAPA DE IMÁGENES A LA CARPETA logos/
+            const mapImagenes = {
+                "netflix": "netflix", "disney": "disney", "max": "hbo-max", "prime": "prime-video", 
+                "youtube": "youtube", "vix": "vix", "crunchyroll": "crunchyroll", 
+                "google": "google-one", "microsoft": "microsoft"
+            };
+
+            let htmlCatalogo = '';
+            config.serviciosGlobales.forEach(srv => {
+                let limiteTotal = (srv.cuentas || 0) * (srv.limite || 1);
+                let disponibles = limiteTotal - (ocupados[srv.nombre] || 0);
+                let safeId = srv.nombre.replace(/[^a-zA-Z0-9]/g, '-');
+                
+                let imgSrc = "logo2.PNG";
+                let srvLower = srv.nombre.toLowerCase();
+                for (let key in mapImagenes) {
+                    if (srvLower.includes(key)) imgSrc = `logos/${mapImagenes[key]}.PNG`;
+                }
+
+                let badgeHtml = disponibles > 0 ? `<div class="cat-badge ok">🟢 ${disponibles} disp.</div>` : `<div class="cat-badge out">🔴 Agotado</div>`;
+                
+                let btnHtml = disponibles > 0 
+                    ? `<div class="qty-controls">
+                           <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, -1, '${safeId}')">-</button>
+                           <span class="qty-val" id="qty-${safeId}">0</span>
+                           <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, 1, '${safeId}')">+</button>
+                       </div>` 
+                    : `<div class="qty-controls" style="opacity: 0.3; cursor: not-allowed;">
+                           <button class="qty-btn" style="pointer-events: none;" disabled>-</button>
+                           <span class="qty-val">0</span>
+                           <button class="qty-btn" style="pointer-events: none;" disabled>+</button>
+                       </div>`;
+
+                htmlCatalogo += `
+                <div class="catalog-card">
+                    <div>
+                        <img src="${imgSrc}" class="cat-logo-img" onerror="this.src='logo2.PNG'">
+                        <div class="cat-name">${srv.nombre}</div>
+                        <div class="cat-price">$${srv.precio} MXN</div>
+                        ${badgeHtml}
+                    </div>
+                    ${btnHtml}
+                </div>`;
+            });
+            
+            if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
+        }
+
+        function actualizarCarrito(nombre, precio, cambio, safeId) {
+            if (!carritoPedidos[nombre]) carritoPedidos[nombre] = { precio: precio, qty: 0 };
+            
+            carritoPedidos[nombre].qty += cambio;
+            if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
+            
+            document.getElementById('qty-' + safeId).innerText = carritoPedidos[nombre].qty;
+            renderCartFloating();
+        }
+
+        function renderCartFloating() {
+            let totalItems = 0;
+            let totalPrecio = 0;
+            
+            for (let item in carritoPedidos) {
+                totalItems += carritoPedidos[item].qty;
+                totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio);
+            }
+            
+            const fc = document.getElementById('floating-cart');
+            if (totalItems > 0 && document.getElementById('view-catalogo').classList.contains('active')) {
+                document.getElementById('cart-items-count').innerText = totalItems + (totalItems === 1 ? " perfil" : " perfiles");
+                document.getElementById('cart-total-price').innerText = "$" + totalPrecio + " MXN";
+                fc.classList.add('show');
+            } else {
+                fc.classList.remove('show');
+            }
+        }
+
+        function enviarPedido() {
+            let msg = "Hola GOXION, me interesa contratar:\n\n";
+            let totalPrecio = 0;
+            for (let item in carritoPedidos) {
+                if (carritoPedidos[item].qty > 0) {
+                    msg += `✅ ${carritoPedidos[item].qty}x ${item} ($${carritoPedidos[item].precio * carritoPedidos[item].qty} MXN)\n`;
+                    totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio);
+                }
+            }
+            msg += `\n*Total estimado: $${totalPrecio} MXN*\n¿Aún hay disponibilidad?`;
+            
+            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        let selectedPlat = ""; 
+        let currentIssues = {};
+        
+        // * BASE DE DATOS DE SOPORTE MANTENIDA EXACTAMENTE IGUAL *
+        const DATABASE_ISSUES = { 
+            "Netflix": [
+                { issue: "🔑 Solicitar Código de Acceso", instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, acabo de enviar un código al correo asignado. Solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " }, 
+                { issue: "📺 Tu TV pide Actualizar Hogar", instructions: "1. Selecciona <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación <strong>a nuestra bandeja</strong>.<br>3. Ingresa abajo el correo que aparece en pantalla y envíanos tu solicitud para autorizar tu TV.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX. Ya envié el correo de autorización.\n\n📧 Correo en pantalla: " },
+                { issue: "⚠️ Límite de Pantallas", instructions: "Recuerda que cada perfil equivale a 1 pantalla. Si te marca límite, revisa que no tengas otra TV usándolo al mismo tiempo. Si el problema persiste, indícanos el nombre de tu perfil para revisarlo.", labelInput: "Nombre de tu Perfil:", templateWA: "Hola GOXION, tengo problemas de límite de pantallas en NETFLIX.\n\n👤 Mi Perfil es: " }
+            ],
+            "Disney+": [
+                { issue: "🔑 Código de Verificación", instructions: "1. Ingresa a la app y presiona 'Continuar' con el correo asignado.<br>2. La plataforma enviará un código de 6 dígitos <strong>a nuestra bandeja de entrada</strong>.<br>3. Escribe el correo aquí abajo para indicarnos que ya lo solicitaste y te lo enviaremos.", labelInput: "El correo que acabas de ingresar:", templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " }, 
+                { issue: "🏠 Mensaje de 'Hogar Principal'", instructions: "Selecciona 'Actualizar Hogar' en tu dispositivo. Eso nos enviará una solicitud de autorización al correo maestro. Escríbelo abajo para proceder.", labelInput: "Correo de tu cuenta Disney+:", templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo asignado: " }
+            ],
+            "Max": [
+                { issue: "🔑 Iniciar Sesión con Código", instructions: "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.<br>2. Aparecerán 6 letras/números en tu pantalla.<br>3. Como nosotros manejamos la plataforma, escribe ese código abajo para que nosotros lo vinculemos manually.", labelInput: "Código en tu pantalla de TV:", templateWA: "Hola GOXION, solicito que vinculen mi TV a MAX.\n\n🔤 Código TV: " },
+                { issue: "❌ Contraseña Incorrecta", instructions: "Asegúrate de no haber dejado espacios al copiar los datos. Si no te deja entrar, indícanos el correo de la cuenta para enviarte la contraseña actualizada.", labelInput: "Correo de la cuenta MAX:", templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: " }
+            ],
+            "Prime Video": [
+                { issue: "📺 Registrar Dispositivo", instructions: "1. Abre Prime Video y presiona 'Identifícate'.<br>2. Mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.", labelInput: "Código en Pantalla de TV:", templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " }
+            ],
+            "YouTube": [
+                { issue: "📩 No me llegó la invitación", instructions: "Verifica tu carpeta de SPAM en Gmail. Recuerda que no debes estar en otro grupo familiar activo. Si no está, compártenos tu correo para reenviarla.", labelInput: "Tu correo personal de Gmail:", templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail: " }
+            ],
+            "ViX": [
+                { issue: "🔑 Vincular TV o Iniciar Sesión", instructions: "Selecciona 'Iniciar Sesión'. Envíanos el código alfanumérico que aparece en tu pantalla de TV para enlazarlo desde nuestra base de datos.", labelInput: "Código en pantalla:", templateWA: "Hola GOXION, necesito ayuda para vincular VIX PREMIUM.\n\n📱 Código TV: " }
+            ],
+            "Crunchyroll": [
+                { issue: "🔑 Vincular Consola o TV", instructions: "Dirígete a 'Activar dispositivo' en tu consola o TV. Aparecerá un código, escríbelo aquí para que nosotros autoricemos la cuenta.", labelInput: "Código de activación de pantalla:", templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: " }
+            ],
+            "Microsoft": [
+                { issue: "💻 Reenviar Invitación familiar", instructions: "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar y enviarte el enlace nuevamente.", labelInput: "Tu correo Outlook/Hotmail:", templateWA: "Hola GOXION, necesito que me reenvíen la invitación de MICROSOFT 365.\n\n📧 Correo: " }
+            ],
+            "Google One": [
+                { issue: "☁️ Espacio no reflejado", instructions: "Asegúrate de haber aceptado la invitación de familia en tu Gmail. Indícanos tu correo si sigues sin ver los beneficios.", labelInput: "Tu correo Gmail personal:", templateWA: "Hola GOXION, sigo sin ver reflejado mi almacenamiento de GOOGLE ONE.\n\n📧 Mi Gmail: " }
+            ],
+            "Default": [
+                { issue: "🔑 Solicitar Código / Asistencia", instructions: "Inicia sesión en tu dispositivo. Si te solicita un código o confirmación por correo, presiona 'Enviar' e indícanos tu correo o código en pantalla para proceder.", labelInput: "Dato en pantalla / Correo:", templateWA: "Hola GOXION, requiero asistencia/código para la plataforma seleccionada.\n\n📱 Dato: " }
+            ]
+        };
+
+        function srvCleanName(n) { 
+            return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa",""); 
+        }
+
+        function renderizarSoporteDinamico(data) {
+            const config = data._goxion_config;
+            const container = document.getElementById('support-platforms-grid');
+            if(!config || !config.serviciosGlobales) return;
+
+            const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "microsoft": "💻", "google": "☁️", "apple": "🍎", "paramount": "⛰️" };
+            
+            let html = "";
+            config.serviciosGlobales.forEach(s => {
+                let icon = "📺";
+                for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
+                html += `<div class="platform-btn" onclick="selectPlatform('${s.nombre}', this)"><span>${icon}</span> ${srvCleanName(s.nombre)}</div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function selectPlatform(p, el) { 
+            selectedPlat = p; 
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); 
+            const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
+            
+            let issues = DATABASE_ISSUES["Default"];
+            for(let key in DATABASE_ISSUES) {
+                if(p.toLowerCase().includes(key.toLowerCase())) {
+                    issues = DATABASE_ISSUES[key];
+                    break;
+                }
+            }
+            
+            currentIssues = issues; 
+            currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
+            
+            document.getElementById('step-2').classList.add('active'); document.getElementById('step-3').classList.remove('active');
+        }
+
+        function showSolution() {
+            const idx = document.getElementById('issue-selector').value;
+            if (idx === "") { document.getElementById('step-3').classList.remove('active'); return; }
+            const data = currentIssues[idx];
+            document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`;
+            document.getElementById('input-label').innerText = data.labelInput;
+            
+            let autoData = "";
+            const key = localStorage.getItem('goxion_user_key');
+            if (key && globalClientesData && globalClientesData[key]) {
+                const cliente = globalClientesData[key];
+                if (cliente.servicios) {
+                    let platKeyword = srvCleanName(selectedPlat).toLowerCase();
+                    const srv = cliente.servicios.find(s => s.nombre.toLowerCase().includes(platKeyword));
+                    if (srv) {
+                        let labelLow = data.labelInput.toLowerCase();
+                        if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login;
+                        else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre;
+                        else if (labelLow.includes("pin") && srv.perfil_pin) autoData = srv.perfil_pin;
+                    }
+                }
+            }
+            
+            document.getElementById('smart-extra-input').value = autoData;
+            document.getElementById('step-3').classList.add('active');
+        }
+
+        function sendSmartWA() {
+            const idx = document.getElementById('issue-selector').value; if(idx === "") return;
+            const val = document.getElementById('smart-extra-input').value.trim(); if(!val) return alert("Por favor completa el dato requerido en el campo de texto.");
+            
+            let extraContext = "";
+            const key = localStorage.getItem('goxion_user_key');
+            if (key && globalClientesData && globalClientesData[key]) {
+                const cliente = globalClientesData[key];
+                let platKeyword = srvCleanName(selectedPlat).toLowerCase();
+                const srv = cliente.servicios?.find(s => s.nombre.toLowerCase().includes(platKeyword));
+                
+                extraContext = `\n\n------------------------\n*EXPEDIENTE DE SOPORTE:*\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`;
+                if (srv) {
+                    extraContext += `\n📺 Plataforma: ${srv.nombre}`;
+                    if (srv.correo_login) extraContext += `\n📧 Cta: ${srv.correo_login}`;
+                    if (srv.perfil_nombre) extraContext += `\n👤 Perfil: ${srv.perfil_nombre}`;
+                    if (srv.perfil_pin) extraContext += `\n🔢 PIN: ${srv.perfil_pin}`;
+                }
+            }
+
+            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA + val + extraContext)}`, '_blank');
+        }
+
+    </script>
 </body>
 </html>
