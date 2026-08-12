@@ -33,15 +33,7 @@
         .splash-logo { max-width: 140px; filter: drop-shadow(0 0 30px rgba(0, 242, 254, 0.4)); }
         @keyframes floatUp { 0% { transform: scale(0.9); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
 
-        /* FONDO ANIMADO NEÓN (TU DISEÑO OPTIMIZADO) */
-        .bg { 
-            position: fixed; 
-            inset: 0; 
-            z-index: -2; 
-            background-color: var(--bg-black); 
-            overflow: hidden; 
-        }
-        
+        .bg { position: fixed; inset: 0; z-index: -2; background-color: var(--bg-black); overflow: hidden; }
         .neon-orbit { position: absolute; border-radius: 50%; pointer-events: none; opacity: 0.9; }
         .orbit-1 { width: 450px; height: 450px; top: -150px; left: -150px; border-bottom: 3px solid #b026ff; border-left: 3px solid rgba(176, 38, 255, 0.2); filter: drop-shadow(0 0 15px #b026ff) drop-shadow(0 0 30px #b026ff); animation: floatOrbit1 70s linear infinite; }
         .orbit-2 { width: 550px; height: 550px; bottom: -200px; right: -200px; border-top: 3px solid #00f2fe; border-right: 3px solid rgba(0, 242, 254, 0.2); filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); animation: floatOrbit2 85s linear infinite; }
@@ -53,23 +45,6 @@
 
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; padding-bottom: 80px; }
 
-        /* DEGRADADO DE CRISTAL (FADE/MASK EFECTO APP) */
-        .glass-top-bar {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: linear-gradient(to bottom, rgba(3, 3, 5, 0.95) 40%, rgba(3, 3, 5, 0) 100%);
-            backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
-            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 55%, rgba(0,0,0,0) 100%);
-            border: none; 
-            padding: max(25px, env(safe-area-inset-top)) 20px 45px 20px; 
-            z-index: 1000;
-            display: flex; align-items: flex-start; justify-content: flex-start;
-            opacity: 0; transform: translateY(-100%); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); pointer-events: none;
-        }
-        .glass-top-bar.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
-        .glass-top-name { font-size: 18px; font-weight: 700; color: var(--text-main); }
-        .glass-top-name span { color: var(--neon-blue); }
-
         .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: max(15px, env(safe-area-inset-top)) 0 5px 0; position: relative; z-index: 10; }
         .app-logo { max-height: 28px; width: auto; object-fit: contain; }
         .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s; backdrop-filter: blur(10px); cursor: pointer; }
@@ -77,7 +52,6 @@
 
         .alert-banner { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(15px); }
 
-        /* ESTILO UNIFICADO DE CRISTAL (BLUR) PARA TARJETAS */
         .glass-card, .tab-container, .btn-menu, .catalog-card, .smart-support-card, .modal-content, .floating-cart {
             background: var(--card-glass);
             backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
@@ -85,20 +59,11 @@
             border-radius: 20px;
         }
 
-        /* BANNER PESTAÑAS */
         .tab-container { display: flex; padding: 4px; margin-bottom: 20px; position: relative; z-index: 110; border-radius: 16px; }
-        .tab-btn { 
-            flex: 1; padding: 8px 4px; background: transparent; border: none; color: var(--text-muted); 
-            font-size: 11px; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; 
-            flex-direction: column; align-items: center; gap: 3px; transition: all 0.3s ease; position: relative; overflow: hidden; 
-        }
+        .tab-btn { flex: 1; padding: 8px 4px; background: transparent; border: none; color: var(--text-muted); font-size: 11px; font-weight: 600; border-radius: 12px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 3px; transition: all 0.3s ease; position: relative; overflow: hidden; }
         .tab-btn span { font-size: 16px; }
         .tab-btn.active { background: rgba(255, 255, 255, 0.08); color: var(--text-main); border: 1px solid var(--neon-blue); box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25); }
-        .tab-btn::after {
-            content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0;
-            background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(124, 77, 255, 0) 70%);
-            border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out; opacity: 0; pointer-events: none;
-        }
+        .tab-btn::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(124, 77, 255, 0) 70%); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out; opacity: 0; pointer-events: none; }
         .tab-btn:active::after { width: 180px; height: 180px; opacity: 1; transition: 0s; }
         
         .view-section { display: none; animation: fadeIn 0.4s ease; }
@@ -106,52 +71,36 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; }
 
-        /* ESTILOS DE INICIO (LANDING) */
         .hero-title { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; color: var(--text-main); text-align: center; }
         .hero-title span { color: var(--neon-purple); filter: drop-shadow(0 0 15px rgba(124, 77, 255, 0.4)); }
         
-        .rotator-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 8px 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px; font-size: 13px; font-weight: 600; color: var(--text-main); }
-        .rotator-text { animation: fadeRotate 3s infinite; }
-        @keyframes fadeRotate { 0%, 100% { opacity: 0; transform: translateY(5px); } 15%, 85% { opacity: 1; transform: translateY(0); } }
+        /* ROTADOR CORREGIDO (Sin brincos) */
+        .rotator-box { 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 20px; padding: 8px 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 25px; 
+            font-size: 13px; font-weight: 600; color: var(--text-main); 
+            min-height: 38px; min-width: 250px; 
+        }
+        .rotator-text { animation: simpleFade 3s ease-in-out infinite; }
+        @keyframes simpleFade { 0%, 100% { opacity: 0; } 20%, 80% { opacity: 1; } }
 
-        /* BOTÓN SHIMMER ANIMADO */
         .btn-shimmer {
-            position: relative; overflow: hidden; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 700; font-size: 14px; cursor: pointer;
+            position: relative; overflow: hidden; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 700; font-size: 15px; cursor: pointer;
             background: linear-gradient(135deg, var(--neon-purple), #ff3366); box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); color: #fff; transition: 0.3s;
         }
-        .btn-shimmer::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent);
-            transform: skewX(-20deg); animation: shimmer 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-        }
+        .btn-shimmer::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent); transform: skewX(-20deg); animation: shimmer 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
         .btn-shimmer:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(124, 77, 255, 0.6); }
         @keyframes shimmer { 0% { left: -100%; } 20%, 100% { left: 200%; } }
 
-        /* TARJETAS DE CONFIANZA (CON BLUR) */
         .trust-badges-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; margin-bottom: 30px;}
-        .trust-badge { 
-            background: var(--card-glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-            border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 10px;
-        }
+        .trust-badge { background: var(--card-glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 10px; }
         .trust-icon { font-size: 20px; }
         .trust-title { font-size: 12px; font-weight: 700; color: var(--text-main); line-height: 1.2; margin-bottom: 2px;}
         .trust-subtitle { font-size: 9px; color: var(--text-muted); text-transform: uppercase; }
 
-        /* BOTTOM SHEET (OVERLAY DE LOGIN/DASHBOARD) */
-        .auth-overlay {
-            position: fixed; inset: 0; z-index: 3000; background: rgba(3, 3, 5, 0.7);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            display: flex; flex-direction: column; justify-content: flex-end;
-            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
-        }
+        .auth-overlay { position: fixed; inset: 0; z-index: 3000; background: rgba(3, 3, 5, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.4s ease; }
         .auth-overlay.show { opacity: 1; pointer-events: auto; }
-        .auth-sheet {
-            background: var(--card-glass); border-top: 1px solid rgba(255,255,255,0.1);
-            border-radius: 30px 30px 0 0; padding: 25px 20px 40px 20px; width: 100%; max-width: 580px; margin: 0 auto;
-            transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; position: relative;
-        }
+        .auth-sheet { background: var(--card-glass); border-top: 1px solid rgba(255,255,255,0.1); border-radius: 30px 30px 0 0; padding: 25px 20px 40px 20px; width: 100%; max-width: 580px; margin: 0 auto; transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; position: relative; }
         .auth-overlay.show .auth-sheet { transform: translateY(0); }
         .sheet-handle { width: 40px; height: 5px; background: rgba(255,255,255,0.2); border-radius: 10px; margin: 0 auto 20px auto; }
         .close-sheet-btn { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; width: 30px; height: 30px; border-radius: 50%; color: #fff; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -163,20 +112,16 @@
 
         .glass-card { padding: 20px; margin-bottom: 25px; }
         .login-card { text-align: center; border-color: rgba(0, 242, 254, 0.2); }
-        
         .dash-greeting-box { text-align: center; margin: 10px 0 25px 0; min-height: 45px; }
         .dash-greeting-box h1 { font-size: 30px; font-weight: 800; color: var(--text-main); line-height: 1.2; margin: 0; transition: opacity 0.5s ease; }
         .dash-greeting-box h1 span { color: var(--neon-blue); }
         .dash-date { font-size: 26px; font-weight: 800; color: var(--text-main); margin: 5px 0 10px 0; text-align: center; }
-        
         .time-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
         .badge-ok { background: rgba(0, 242, 254, 0.1); color: var(--neon-blue); border: 1px solid rgba(0, 242, 254, 0.3); }
         .badge-today { background: rgba(255, 170, 0, 0.15); color: var(--warning-amber); border: 1px solid var(--warning-amber); }
         .badge-overdue { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid var(--danger-red); }
-
         .loyalty-progress-bg { width: 100%; background: rgba(0,0,0,0.5); border-radius: 10px; height: 8px; margin: 12px 0; overflow: hidden; position: relative; border: 1px solid rgba(255,255,255,0.05); }
         .loyalty-progress-fill { height: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple)); border-radius: 10px; width: 0%; transition: width 1.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
-        
         .referral-card { border-color: rgba(124, 77, 255, 0.3); }
         .referral-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .referral-title { font-size: 13px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
@@ -185,14 +130,10 @@
         .stat-box { text-align: center; flex: 1; }
         .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
         .stat-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
-
         .promo-card { background: linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 242, 254, 0.05)); border: 1px dashed rgba(124, 77, 255, 0.5); box-shadow: 0 0 25px rgba(124, 77, 255, 0.15); margin-bottom: 25px; padding: 20px; border-radius: 20px; }
         .promo-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .promo-title span { font-size: 18px; filter: drop-shadow(0 0 10px var(--neon-purple)); }
         .promo-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
         .btn-promo { width: 100%; padding: 12px; border-radius: 15px; border: 1px solid var(--neon-purple); background: rgba(124, 77, 255, 0.2); color: var(--text-main); font-size: 13px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .btn-promo:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); }
-
         .history-item { display: flex; align-items: center; gap: 15px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
         .history-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .history-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--success-green); box-shadow: 0 0 10px var(--success-green); }
@@ -200,65 +141,57 @@
         .history-month { font-size: 14px; font-weight: 700; color: var(--text-main); line-height: 1.2; }
         .history-status { font-size: 11px; color: var(--text-muted); }
         .history-amount { font-size: 14px; color: var(--neon-blue); font-weight: 700; }
-
         .service-pill-container { background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; margin-bottom: 10px; padding: 12px; }
         .service-pill-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
         .service-pill-left { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
         .service-status { font-size: 10px; color: var(--success-green); background: rgba(46, 160, 67, 0.15); padding: 3px 8px; border-radius: 10px; font-weight: 700; }
-        
         .btn-creds-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
-        .btn-creds-toggle:hover { border-color: var(--neon-blue); color: var(--neon-blue); }
-
         .cred-box { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.08); animation: fadeIn 0.3s ease; }
         .cred-tag { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 6px 10px; font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; cursor: pointer; transition: 0.2s; }
-        .cred-tag:hover { border-color: var(--neon-blue); color: #fff; background: rgba(0, 242, 254, 0.1); }
-        .cred-tag strong { color: var(--text-main); }
-
         .policy-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .btn-menu { padding: 22px 12px; text-align: center; cursor: pointer; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 10px; transition: 0.3s; border-color: rgba(124, 77, 255, 0.15); }
-        .btn-menu:hover { border-color: var(--neon-blue); transform: translateY(-3px); box-shadow: 0 12px 30px rgba(0,242,254,0.15); }
         .btn-menu span { font-size: 38px; margin-bottom: 4px; }
         .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.2; }
 
-        /* CATALOGO REFINADO */
+        /* CATALOGO REFINADO (Sin borde neón, solo resplandor interno) */
         .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .catalog-card {
             background: var(--card-glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
             border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; transition: 0.3s;
             border: 1px solid rgba(255,255,255,0.05);
-            border-top: 2px solid rgba(0, 242, 254, 0.4); 
-            box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.1), 0 10px 20px rgba(0,0,0,0.3);
+            /* Borde superior eliminado para limpieza */
+            box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.15), 0 10px 20px rgba(0,0,0,0.3);
+            position: relative; /* Para las etiquetas flotantes */
         }
         .catalog-card:hover { transform: translateY(-3px); box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.2), 0 15px 30px rgba(0,0,0,0.4); }
+        
+        /* ETIQUETA ADMIN PERSONALIZABLE */
+        .admin-badge {
+            position: absolute; top: -10px; right: 10px; background: linear-gradient(135deg, var(--neon-purple), #ff3366);
+            color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 800;
+            box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4); z-index: 10; border: 1px solid rgba(255,255,255,0.2);
+        }
+
         .cat-logo-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; margin: 0 auto 10px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.4); background: rgba(0,0,0,0.5); }
         .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
-        .cat-price { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 12px; }
-        .cat-badge { font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; }
+        .cat-price { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 4px; }
+        .btn-info-srv { background: transparent; border: none; color: var(--text-muted); font-size: 11px; text-decoration: underline; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-info-srv:hover { color: #fff; }
+        .cat-badge { font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; display: inline-block; }
         .cat-badge.ok { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid rgba(46, 160, 67, 0.4); }
         .cat-badge.out { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid rgba(255, 51, 102, 0.4); }
         
         .qty-controls { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); }
         .qty-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
-        .qty-btn:hover:not(:disabled) { background: var(--neon-blue); color: #000; }
         .qty-val { font-weight: 700; font-size: 16px; min-width: 20px; text-align: center; }
 
-        .floating-cart { 
-            position: fixed; bottom: 20px; left: 50%; width: 92%; max-width: 500px; 
-            display: flex; justify-content: space-between; align-items: center; 
-            z-index: 1000; border-color: var(--neon-blue); padding: 15px 20px;
-            opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 120px);
-            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .floating-cart.show { 
-            opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); 
-        }
-        
+        .floating-cart { position: fixed; bottom: 20px; left: 50%; width: 92%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-color: var(--neon-blue); padding: 15px 20px; opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 120px); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .floating-cart.show { opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); }
         .cart-info { display: flex; flex-direction: column; }
         .cart-total { font-size: 18px; font-weight: 800; color: var(--neon-blue); }
         .cart-items { font-size: 12px; color: var(--text-muted); }
         .cart-btn { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; border: none; padding: 10px 20px; border-radius: 15px; font-weight: 700; font-size: 13px; cursor: pointer; transition: 0.2s; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
-        .cart-btn:hover { box-shadow: 0 0 25px rgba(0,242,254,0.6); color: #fff; }
-
+        
         .smart-support-card { border-color: rgba(124, 77, 255, 0.3); }
         .platform-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
         .platform-btn { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 14px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: 600; color: var(--text-main); display: flex; flex-direction: column; align-items: center; gap: 8px; transition: 0.2s; }
@@ -280,7 +213,6 @@
         .terms-list { list-style: none; font-size: 13px; color: var(--text-muted); margin-bottom: 15px; text-align: justify; line-height: 1.6; }
         .terms-list li { margin-bottom: 16px; }
         .terms-list strong { color: var(--neon-blue); display: block; margin-bottom: 4px; font-size: 14px;}
-
         .footer-info { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px dashed rgba(255,255,255,0.05); }
     </style>
 </head>
@@ -310,7 +242,6 @@
             <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
         </div>
 
-        <!-- LAS NUEVAS PESTAÑAS (INICIO, CATÁLOGO, SOPORTE) -->
         <div class="glass-card tab-container">
             <button class="tab-btn active" id="btn-tab-inicio" onclick="switchTab('inicio')"><span>🏠</span>Inicio</button>
             <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')"><span>🛒</span>Catálogo</button>
@@ -326,16 +257,15 @@
                     <span class="rotator-text" id="dynamic-rotator">✓ Cuentas verificadas y estables</span>
                 </div>
 
-                <!-- EL BOTÓN SHIMMER -->
+                <!-- EL BOTÓN SHIMMER AJUSTADO (Un línea) -->
                 <button class="btn-shimmer" onclick="window.open('https://wa.me/528136836901?text=Hola,%20quiero%20registrararme%20y%20obtener%20el%20descuento', '_blank')">
-                    🎁 Contrata hoy y obtén en tu primer mes -10%
+                    🎁 Únete hoy y obtén -10% OFF
                 </button>
 
                 <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-top: 15px; margin-bottom: 25px; padding: 0 10px;">
                     Disfruta de grandes ahorros con nosotros en comparación a contratar cada plataforma por separado.
                 </p>
 
-                <!-- PÍLDORAS DE CONFIANZA (Informativas) -->
                 <div class="trust-badges-container">
                     <div class="trust-badge">
                         <div class="trust-icon">⚡</div>
@@ -424,7 +354,6 @@
             <div class="sheet-handle"></div>
             <button class="close-sheet-btn" onclick="closeAuthSheet()">✕</button>
 
-            <!-- VISTA DE LOGIN (DENTRO DEL SHEET) -->
             <div id="auth-view">
                 <div class="login-card" style="text-align: center; margin-top: 10px;">
                     <img src="Logo individual.png" style="width: 40px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--neon-blue));" onerror="this.style.display='none'">
@@ -439,7 +368,6 @@
                 </div>
             </div>
 
-            <!-- VISTA DEL DASHBOARD (DENTRO DEL SHEET) -->
             <div id="dashboard-view" style="display: none;">
                 <div id="dash-greeting-container" class="dash-greeting-box">
                     <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
@@ -474,7 +402,6 @@
         </div>
     </div>
 
-    <!-- EL CARRITO FLOTANTE -->
     <div id="floating-cart" class="glass-card floating-cart">
         <div class="cart-info">
             <span class="cart-total" id="cart-total-price">$0 MXN</span>
@@ -483,7 +410,25 @@
         <button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
     </div>
 
-    <!-- MODALES EXISTENTES INTACTOS -->
+    <!-- MODAL MÁS INFORMACIÓN (Servicios del Catálogo) -->
+    <div id="modal-detalles" class="modal">
+        <div class="glass-card modal-content" style="max-width: 400px; padding: 25px; text-align: left;">
+            <span class="close-btn" onclick="closeModal('modal-detalles')">&times;</span>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;">
+                <img id="detalles-img" src="" style="width: 60px; height: 60px; border-radius: 14px; object-fit: cover; background: rgba(0,0,0,0.5); box-shadow: 0 5px 15px rgba(0,0,0,0.4);">
+                <div>
+                    <div id="detalles-titulo" style="font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1.2;"></div>
+                    <div id="detalles-precio" style="font-size: 16px; color: var(--neon-blue); font-weight: 700; margin-top: 4px;"></div>
+                </div>
+            </div>
+            
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Descripción y Beneficios:</div>
+            <div id="detalles-desc" style="font-size: 13px; color: var(--text-muted); line-height: 1.6; text-align: justify; margin-bottom: 15px;"></div>
+        </div>
+    </div>
+
+    <!-- MODALES DE TÉRMINOS INTACTOS -->
     <div id="modal-terminos" class="modal">
         <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
@@ -557,6 +502,21 @@
             }
         }, 3000);
 
+        // TEXTOS INTELIGENTES PARA EL MODAL DE MÁS INFORMACIÓN
+        const INFO_SERVICIOS = {
+            "netflix": "Vive una experiencia superior con tu perfil totalmente individual y personalizable con PIN. Disfruta películas y estrenos en calidad 4K Ultra HD y sonido Dolby Atmos. Tu historial, lista de favoritos y recomendaciones se mantienen completamente privados.",
+            "disney": "Acceso ilimitado al catálogo de Disney, Pixar, Marvel, Star Wars y National Geographic en calidad 4K UHD. Disfruta de un perfil individual para descargas offline y visualización cómoda sin interrupciones.",
+            "max": "Suscripción Platino con calidad de video 4K UHD. Disfruta del universo de HBO, Warner Bros, DC Comics y Cartoon Network. Tu perfil privado garantiza que siempre reanudes donde te quedaste.",
+            "prime": "Accede al catálogo completo de Prime Video. Perfil personalizado, reproducción en calidad superior 4K y descargas habilitadas para disfrutar contenido sin conexión a internet.",
+            "youtube": "¡Doble beneficio! Incluye YouTube Premium (videos sin anuncios) y acceso total a YouTube Music Premium. Reproducción en segundo plano y descargas offline para todos tus dispositivos móviles o TV.",
+            "vix": "Todos los partidos de la Liga MX, contenido de TV exclusivo, telenovelas y los mejores estrenos premium en español sin una sola interrupción publicitaria.",
+            "crunchyroll": "Membresía Mega Fan. Disfruta del anime sin publicidad, episodios de estreno simulcast (disponibles poco después de Japón) y visualización offline. Pregúntanos por la opción Individual o Cuenta Completa.",
+            "spotify": "Música infinita sin anuncios, opción para descargas y calidad de sonido superior. Podemos asignarte un perfil individual o hacer el Upgrade a tu propia cuenta personal.",
+            "microsoft": "Membresía Microsoft 365 Family. Incluye 1TB de almacenamiento seguro en nube (OneDrive) y acceso completo a las aplicaciones premium (Word, Excel, PowerPoint) para tus dispositivos.",
+            "google": "Expande rápidamente tu almacenamiento en la nube para Google Drive, Gmail y Google Fotos. Además, desbloquea las funciones de edición avanzadas en la aplicación de Fotos.",
+            "default": "Perfil individual, seguro y estable. Garantizamos protección total, reposición inmediata en caso de caídas y soporte técnico dedicado durante todo tu periodo de suscripción."
+        };
+
         function hideSplash() {
             const splash = document.getElementById('splash-screen');
             if (splash.style.opacity === '0') return;
@@ -584,6 +544,7 @@
                 renderCartFloating();
             }
         }
+
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
@@ -638,11 +599,7 @@
                 const version = new Date().getTime(); 
                 const response = await fetch(`clientes.json?v=${version}`, { 
                     cache: 'no-store',
-                    headers: {
-                        'Cache-Control': 'no-cache, no-store, must-revalidate',
-                        'Pragma': 'no-cache',
-                        'Expires': '0'
-                    }
+                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
                 });
                 
                 globalClientesData = await response.json();
@@ -707,184 +664,79 @@
             if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
         }
         
-        function copiarDatoRapido(texto, tipo) {
-            navigator.clipboard.writeText(texto);
-            alert(`¡${tipo} copiado al portapapeles!`);
-        }
-
-        function toggleCreds(id) {
-            const box = document.getElementById(id);
-            if(box.style.display === 'none') {
-                box.style.display = 'flex';
-            } else {
-                box.style.display = 'none';
-            }
-        }
+        function copiarDatoRapido(texto, tipo) { navigator.clipboard.writeText(texto); alert(`¡${tipo} copiado al portapapeles!`); }
+        function toggleCreds(id) { const box = document.getElementById(id); box.style.display = (box.style.display === 'none') ? 'flex' : 'none'; }
 
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
             document.getElementById('auth-view').style.display = 'none';
             document.getElementById('dashboard-view').style.display = 'block';
-
             const primerNombre = cliente.nombre.split(' ')[0];
             document.getElementById('dash-name').innerText = primerNombre;
             document.getElementById('header-btn-text').innerText = 'Perfil';
-
             iniciarSaludoDinamico(cliente.nombre);
 
-            // 1. MOTOR DE UPSELLING (Promociones Automáticas)
-            let hasPrime = false;
-            let hasHBO = false;
-            let hasCombo = false;
-
+            let hasPrime = false, hasHBO = false, hasCombo = false;
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach(s => {
                     let n = s.nombre.toLowerCase();
                     if(n.includes("prime") && !n.includes("hbo") && !n.includes("max")) hasPrime = true;
-                    if(n.includes("hbo") || n.includes("max")) {
-                        if(n.includes("prime")) hasCombo = true;
-                        else hasHBO = true;
-                    }
+                    if(n.includes("hbo") || n.includes("max")) { if(n.includes("prime")) hasCombo = true; else hasHBO = true; }
                 });
             }
 
-            let upsellHTML = '';
-            let msgPromoWA = '';
+            let upsellHTML = '', msgPromoWA = '';
             if(hasCombo) {
-                upsellHTML = `
-                    <div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);">
-                        <div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div>
-                        <div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div>
-                    </div>`;
+                upsellHTML = `<div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);"><div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div><div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div></div>`;
             } else if(hasPrime) {
                 msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
-                upsellHTML = `
-                    <div class="promo-card">
-                        <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
-                        <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
-                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button>
-                    </div>`;
+                upsellHTML = `<div class="promo-card"><div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div><div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div><button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button></div>`;
             } else if(hasHBO) {
                 msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
-                upsellHTML = `
-                    <div class="promo-card">
-                        <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
-                        <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
-                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button>
-                    </div>`;
+                upsellHTML = `<div class="promo-card"><div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div><div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div><button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button></div>`;
             }
             document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
             if(cliente.referido_activo) {
-                let mesesActivos = cliente.referido_activo.meses || 1;
-                let numPlataformas = cliente.referido_activo.plataformas || 2;
-                let nombreRef = cliente.referido_activo.nombre || "Referido";
-                let porcentajeRef = Math.min((mesesActivos / 3) * 100, 100);
-
-                refContainer.innerHTML = `
-                    <div class="glass-card referral-card">
-                        <div class="referral-header">
-                            <div class="referral-title"><span>🎁</span> Tu Referido Activo</div>
-                            <div class="referral-status-badge">En Validación</div>
-                        </div>
-                        <p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${nombreRef}</p>
-                        
-                        <div class="referral-stats">
-                            <div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);">
-                                <div class="stat-val">${numPlataformas}</div>
-                                <div class="stat-label">Plataformas</div>
-                            </div>
-                            <div class="stat-box">
-                                <div class="stat-val">${mesesActivos}/3</div>
-                                <div class="stat-label">Meses</div>
-                            </div>
-                        </div>
-                        
-                        <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Progreso a tu mes gratis:</div>
-                        <div class="loyalty-progress-bg" style="height: 6px;">
-                            <div class="loyalty-progress-fill" style="width: ${porcentajeRef}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div>
-                        </div>
-                        <div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
-                    </div>
-                `;
+                let meses = cliente.referido_activo.meses || 1;
+                refContainer.innerHTML = `<div class="glass-card referral-card"><div class="referral-header"><div class="referral-title"><span>🎁</span> Tu Referido Activo</div><div class="referral-status-badge">En Validación</div></div><p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${cliente.referido_activo.nombre || "Referido"}</p><div class="referral-stats"><div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);"><div class="stat-val">${cliente.referido_activo.plataformas || 2}</div><div class="stat-label">Plataformas</div></div><div class="stat-box"><div class="stat-val">${meses}/3</div><div class="stat-label">Meses</div></div></div><div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Progreso a tu mes gratis:</div><div class="loyalty-progress-bg" style="height: 6px;"><div class="loyalty-progress-fill" style="width: ${Math.min((meses / 3) * 100, 100)}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div></div><div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div></div>`;
             } else {
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
-                
-                refContainer.innerHTML = `
-                    <div class="glass-card referral-card">
-                        <div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div>
-                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
-                        
-                        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                            <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input">
-                            <button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button>
-                        </div>
-                        
-                        <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">
-                            📲 Compartir por WhatsApp
-                        </button>
-                        
-                        <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
-                    </div>
-                `;
+                refContainer.innerHTML = `<div class="glass-card referral-card"><div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div><div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div><div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input"><button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button></div><button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">📲 Compartir por WhatsApp</button><div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div></div>`;
             }
 
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             const hoy = new Date();
-            const mesActual = meses[hoy.getMonth()];
             const diaPago = cliente.dia_pago || 15;
             const difDias = diaPago - hoy.getDate();
-            
-            document.getElementById('dash-date').innerText = `${diaPago} de ${mesActual}`;
+            document.getElementById('dash-date').innerText = `${diaPago} de ${meses[hoy.getMonth()]}`;
             
             let badgeHTML = "";
             if (cliente.estado === 'pagado') badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
             else if (difDias > 0) badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
             else if (difDias === 0) badgeHTML = `<div class="time-badge badge-today">⚠️ Vence HOY</div>`;
             else badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
-            
             document.getElementById('dash-badge').innerHTML = badgeHTML;
 
             let pagos = cliente.pagos_puntuales || 0;
-            let meta = 4;
-            let beneficio = "3% OFF";
+            let meta = 4, beneficio = "3% OFF";
             if (pagos >= 4 && pagos < 9) { meta = 9; beneficio = "6% OFF"; }
             else if (pagos >= 9) { meta = pagos; beneficio = "Nivel Máximo (6% OFF)"; }
-
-            let porcentaje = Math.min((pagos / meta) * 100, 100);
             document.getElementById('loyalty-count').innerText = `${pagos}/${meta} Pagos`;
-            setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${porcentaje}%`; }, 300);
+            setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${Math.min((pagos / meta) * 100, 100)}%`; }, 300);
+            document.getElementById('loyalty-msg').innerText = pagos >= 9 ? "¡Felicidades! Disfrutas de tu Nivel 2." : `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
 
-            if (pagos >= 9) {
-                document.getElementById('loyalty-msg').innerText = "¡Felicidades! Disfrutas de tu Nivel 2.";
-            } else {
-                document.getElementById('loyalty-msg').innerText = `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
-            }
-
-            // 2. HISTORIAL DE PAGOS 
             let historyHTML = '';
             if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
                 historyHTML = `<div class="glass-card"><div class="section-title">Historial de Transacciones</div>`;
-                // Invertir para mostrar el más reciente arriba
-                const historialInverso = [...cliente.historial_pagos].reverse(); 
-                
-                historialInverso.forEach(p => {
-                    historyHTML += `
-                        <div class="history-item">
-                            <div class="history-dot"></div>
-                            <div class="history-info">
-                                <div class="history-month">${p.fecha}</div>
-                                <div class="history-status">✅ Acreditado a tiempo (+1 Racha)</div>
-                            </div>
-                            <div class="history-amount">$${p.monto.toFixed(2)}</div>
-                        </div>`;
+                [...cliente.historial_pagos].reverse().forEach(p => {
+                    historyHTML += `<div class="history-item"><div class="history-dot"></div><div class="history-info"><div class="history-month">${p.fecha}</div><div class="history-status">✅ Acreditado a tiempo</div></div><div class="history-amount">$${p.monto.toFixed(2)}</div></div>`;
                 });
                 historyHTML += `</div>`;
             }
             document.getElementById('dash-history').innerHTML = historyHTML;
 
-            // 3. SERVICIOS Y VISUALIZADOR DE CREDENCIALES
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
             
@@ -892,7 +744,6 @@
                 cliente.servicios.forEach((s, idx) => {
                     let icon = "📺";
                     for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
-                    
                     let credsBtns = '';
                     if(s.correo_login || s.perfil_nombre || s.perfil_pin) {
                         if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
@@ -901,24 +752,16 @@
                     } else {
                         credsBtns = `<div style="font-size:11px; color:var(--text-muted); width:100%;">Tus accesos llegarán a tu correo o WhatsApp pronto.</div>`;
                     }
-
-                    srvHTML += `
-                        <div class="service-pill-container">
-                            <div class="service-pill-header">
-                                <div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div>
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                    <div class="service-status">Activo</div>
-                                    <button class="btn-creds-toggle" onclick="toggleCreds('creds-${idx}')">👁️ Ver Accesos</button>
-                                </div>
-                            </div>
-                            <div class="cred-box" id="creds-${idx}" style="display:none;">${credsBtns}</div>
-                        </div>
-                    `;
+                    srvHTML += `<div class="service-pill-container"><div class="service-pill-header"><div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div><div style="display:flex; align-items:center; gap:8px;"><div class="service-status">Activo</div><button class="btn-creds-toggle" onclick="toggleCreds('creds-${idx}')">👁️ Ver Accesos</button></div></div><div class="cred-box" id="creds-${idx}" style="display:none;">${credsBtns}</div></div>`;
                 });
-            } else {
-                srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`;
-            }
+            } else { srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`; }
             document.getElementById('dash-services').innerHTML = srvHTML;
+        }
+
+        function copiarEnlace() {
+            var input = document.getElementById("ref-link-input");
+            input.select(); input.setSelectionRange(0, 99999);
+            document.execCommand("copy"); alert("¡Enlace copiado al portapapeles!");
         }
 
         function cargarCatalogo(data) {
@@ -948,18 +791,14 @@
                         
                         config.serviciosGlobales.forEach(catSrv => {
                             let nombreCatLow = catSrv.nombre.toLowerCase();
-                            let isCatCompleta = nombreCatLow.includes('completa');
-                            let isCliCompleta = nombreCliente.includes('completa');
-                            if (isCatCompleta !== isCliCompleta) return; 
-                            
-                            let keyword = nombreCatLow.replace(' premium','').replace(' video','').replace(' platino','').replace(' cuenta completa','').trim();
+                            if (nombreCatLow.includes('completa') !== nombreCliente.includes('completa')) return; 
+                            let keyword = nombreCatLow.replace(/ premium| video| platino| cuenta completa/g,'').trim();
                             if (nombreCliente.includes(keyword)) ocupados[catSrv.nombre] += multiplier;
                         });
                     });
                 }
             }
 
-            // MAPA DE IMÁGENES A LA CARPETA logos/
             const mapImagenes = {
                 "netflix": "netflix", "disney": "disney", "max": "hbo-max", "prime": "prime-video", 
                 "youtube": "youtube", "vix": "vix", "crunchyroll": "crunchyroll", 
@@ -978,8 +817,13 @@
                     if (srvLower.includes(key)) imgSrc = `logos/${mapImagenes[key]}.PNG`;
                 }
 
-                let badgeHtml = disponibles > 0 ? `<div class="cat-badge ok">🟢 ${disponibles} disp.</div>` : `<div class="cat-badge out">🔴 Agotado</div>`;
+                // INYECCIÓN DE LA ETIQUETA ADMIN SI EXISTE EN EL JSON
+                let adminBadge = srv.etiqueta ? `<div class="admin-badge">${srv.etiqueta}</div>` : '';
+                let badgeHtml = disponibles > 0 ? `<div class="cat-badge ok">🟢 ${disponibles} disp.</div>` : `<div class="cat-badge out">🔴 Agotado / Próximamente</div>`;
                 
+                // BOTÓN DE "MÁS INFORMACIÓN"
+                let infoBtn = `<button onclick="verDetallesServicio('${srv.nombre}', ${srv.precio}, '${imgSrc}')" class="btn-info-srv">ⓘ Ver más detalles</button>`;
+
                 let btnHtml = disponibles > 0 
                     ? `<div class="qty-controls">
                            <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, -1, '${safeId}')">-</button>
@@ -994,10 +838,12 @@
 
                 htmlCatalogo += `
                 <div class="catalog-card">
+                    ${adminBadge}
                     <div>
                         <img src="${imgSrc}" class="cat-logo-img" onerror="this.src='logo2.PNG'">
                         <div class="cat-name">${srv.nombre}</div>
                         <div class="cat-price">$${srv.precio} MXN</div>
+                        ${infoBtn}<br>
                         ${badgeHtml}
                     </div>
                     ${btnHtml}
@@ -1007,38 +853,46 @@
             if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
         }
 
+        // FUNCIÓN QUE ABRE EL MODAL DE DETALLES
+        function verDetallesServicio(nombre, precio, img) {
+            document.getElementById('detalles-titulo').innerText = nombre;
+            document.getElementById('detalles-precio').innerText = "$" + precio + " MXN";
+            document.getElementById('detalles-img').src = img;
+            
+            let desc = INFO_SERVICIOS["default"];
+            let nameLower = nombre.toLowerCase();
+            for(let key in INFO_SERVICIOS) {
+                if(nameLower.includes(key)) { desc = INFO_SERVICIOS[key]; break; }
+            }
+            
+            document.getElementById('detalles-desc').innerHTML = desc;
+            openModal('modal-detalles');
+        }
+
         function actualizarCarrito(nombre, precio, cambio, safeId) {
             if (!carritoPedidos[nombre]) carritoPedidos[nombre] = { precio: precio, qty: 0 };
-            
             carritoPedidos[nombre].qty += cambio;
             if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
-            
             document.getElementById('qty-' + safeId).innerText = carritoPedidos[nombre].qty;
             renderCartFloating();
         }
 
         function renderCartFloating() {
-            let totalItems = 0;
-            let totalPrecio = 0;
-            
+            let totalItems = 0, totalPrecio = 0;
             for (let item in carritoPedidos) {
                 totalItems += carritoPedidos[item].qty;
                 totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio);
             }
-            
             const fc = document.getElementById('floating-cart');
             if (totalItems > 0 && document.getElementById('view-catalogo').classList.contains('active')) {
                 document.getElementById('cart-items-count').innerText = totalItems + (totalItems === 1 ? " perfil" : " perfiles");
                 document.getElementById('cart-total-price').innerText = "$" + totalPrecio + " MXN";
                 fc.classList.add('show');
-            } else {
-                fc.classList.remove('show');
-            }
+            } else { fc.classList.remove('show'); }
         }
 
         function enviarPedido() {
-            let msg = "Hola GOXION, me interesa contratar:\n\n";
-            let totalPrecio = 0;
+            let msg = "Hola GOXION, me interesa contratar:\n\n", totalPrecio = 0;
             for (let item in carritoPedidos) {
                 if (carritoPedidos[item].qty > 0) {
                     msg += `✅ ${carritoPedidos[item].qty}x ${item} ($${carritoPedidos[item].precio * carritoPedidos[item].qty} MXN)\n`;
@@ -1046,14 +900,11 @@
                 }
             }
             msg += `\n*Total estimado: $${totalPrecio} MXN*\n¿Aún hay disponibilidad?`;
-            
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
-        let selectedPlat = ""; 
-        let currentIssues = {};
+        let selectedPlat = "", currentIssues = {};
         
-        // * BASE DE DATOS DE SOPORTE MANTENIDA EXACTAMENTE IGUAL *
         const DATABASE_ISSUES = { 
             "Netflix": [
                 { issue: "🔑 Solicitar Código de Acceso", instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, acabo de enviar un código al correo asignado. Solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " }, 
