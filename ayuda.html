@@ -9,7 +9,7 @@
     <style>
         :root {
             --bg-black: #030305;
-            --card-glass: rgba(8, 8, 12, 0.45);
+            --card-glass: rgba(8, 8, 12, 0.25);
             --text-main: #ffffff;
             --text-muted: #95a4bd;
             --neon-blue: #00f2fe;
@@ -50,11 +50,11 @@
         .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s; backdrop-filter: blur(10px); cursor: pointer; }
         .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
 
-        .alert-banner { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(15px); }
+        .alert-banner { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(10px); }
 
         .glass-card, .tab-container, .btn-menu, .catalog-card, .smart-support-card, .modal-content, .floating-cart {
             background: var(--card-glass);
-            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
             border-radius: 20px;
         }
@@ -74,33 +74,17 @@
         .hero-title { font-size: 32px; font-weight: 800; line-height: 1.1; margin-bottom: 25px; color: var(--text-main); text-align: center; }
         .hero-title span { color: var(--neon-purple); filter: drop-shadow(0 0 15px rgba(124, 77, 255, 0.4)); }
         
-        /* PÍLDORA ROTADORA ORGÁNICA */
         .rotator-container { display: flex; justify-content: center; width: 100%; margin-bottom: 30px; height: 38px; }
-        .rotator-box { 
-            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
-            border-radius: 20px; padding: 8px 16px; display: inline-flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 600; color: var(--text-main); 
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            white-space: nowrap; overflow: hidden;
-        }
+        .rotator-box { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 8px 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: var(--text-main); transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); white-space: nowrap; overflow: hidden; }
         .rotator-text { transition: opacity 0.4s ease; }
 
-        .btn-shimmer {
-            position: relative; overflow: hidden; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 700; font-size: 15px; cursor: pointer;
-            background: linear-gradient(135deg, var(--neon-purple), #ff3366); box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); color: #fff; transition: 0.3s;
-        }
+        .btn-shimmer { position: relative; overflow: hidden; width: 100%; padding: 18px; border-radius: 20px; border: none; font-weight: 700; font-size: 15px; cursor: pointer; background: linear-gradient(135deg, var(--neon-purple), #ff3366); box-shadow: 0 0 20px rgba(124, 77, 255, 0.4); color: #fff; transition: 0.3s; }
         .btn-shimmer::before { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(to right, transparent, rgba(255,255,255,0.5), transparent); transform: skewX(-20deg); animation: shimmer 4s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
         .btn-shimmer:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(124, 77, 255, 0.6); }
         @keyframes shimmer { 0% { left: -100%; } 20%, 100% { left: 200%; } }
 
-        /* BADGES FLOTANTES (Sin cajas de cristal) */
-        .trust-badges-container { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 20px; 
-            margin-top: 20px; margin-bottom: 35px; padding: 0 10px;
-        }
-        .trust-badge { 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; 
-        }
+        .trust-badges-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; margin-bottom: 35px; padding: 0 10px; }
+        .trust-badge { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .trust-icon { font-size: 26px; margin-bottom: 6px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));}
         .trust-title { font-size: 13px; font-weight: 700; color: var(--text-main); line-height: 1.2;}
         .trust-subtitle { font-size: 10px; color: var(--text-muted); text-transform: uppercase; margin-top: 2px;}
@@ -160,45 +144,73 @@
         .btn-menu span { font-size: 38px; margin-bottom: 4px; }
         .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.2; }
 
-        /* CATALOGO ANIMADO (Acordeón sin deformar la cuadrícula) */
-        .catalog-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; align-items: start; }
+        /* ==========================================================
+           CATÁLOGO ANIMADO (EXPANSIÓN DE IZQUIERDA Y DERECHA)
+           ========================================================== */
+        .catalog-grid { 
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; justify-content: space-between;
+        }
+        
         .catalog-card {
-            background: var(--card-glass); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-            border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; transition: 0.3s;
+            width: calc(50% - 7.5px);
+            background: var(--card-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 18px; text-align: center; display: flex; flex-direction: column; 
+            transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s, box-shadow 0.3s;
             border: 1px solid rgba(255,255,255,0.05);
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.15), 0 10px 20px rgba(0,0,0,0.3);
-            position: relative;
+            position: relative; overflow: hidden;
         }
-        .catalog-card:hover { transform: translateY(-3px); box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.2), 0 15px 30px rgba(0,0,0,0.4); }
         
+        /* Magia para expandir de derecha a izquierda si está en la 2da columna */
+        .catalog-card:nth-child(even) { margin-left: auto; }
+        
+        .catalog-card:hover { transform: translateY(-3px); box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.2), 0 15px 30px rgba(0,0,0,0.4); }
+        .catalog-card.expanded { width: 100%; text-align: left; }
+
         .admin-badge {
             position: absolute; top: -10px; right: 10px; background: linear-gradient(135deg, var(--neon-purple), #ff3366);
             color: #fff; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 800;
             box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4); z-index: 10; border: 1px solid rgba(255,255,255,0.2);
         }
 
-        .cat-logo-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; margin: 0 auto 10px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.4); background: rgba(0,0,0,0.5); }
-        .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 6px; }
-        .cat-price { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 4px; }
-        .btn-info-srv { background: transparent; border: none; color: var(--text-muted); font-size: 11px; text-decoration: underline; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
-        .btn-info-srv:hover { color: #fff; }
-        .cat-badge { font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 15px; display: inline-block; }
-        .cat-badge.ok { background: rgba(46, 160, 67, 0.15); color: var(--success-green); border: 1px solid rgba(46, 160, 67, 0.4); }
-        .cat-badge.out { background: rgba(255, 51, 102, 0.15); color: var(--danger-red); border: 1px solid rgba(255, 51, 102, 0.4); }
-        
-        /* Contenido que se expande */
-        .card-details-content {
-            max-height: 0; overflow: hidden; opacity: 0; 
-            font-size: 11px; color: var(--text-muted); text-align: left; line-height: 1.5;
-            transition: max-height 0.4s ease, opacity 0.4s ease, margin 0.4s ease;
-        }
-        .card-details-content.open {
-            max-height: 500px; opacity: 1; margin-bottom: 15px;
-        }
+        .card-top { display: flex; flex-direction: column; align-items: center; transition: 0.4s; width: 100%; }
+        .catalog-card.expanded .card-top { flex-direction: row; align-items: center; justify-content: flex-start; gap: 15px; margin-bottom: 5px; }
 
-        .qty-controls { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); margin-top: auto; }
+        .cat-logo-img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; margin: 0 auto 10px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.4); background: rgba(0,0,0,0.5); transition: 0.4s;}
+        .catalog-card.expanded .cat-logo-img { margin: 0; width: 60px; height: 60px; }
+
+        .card-titles { display: flex; flex-direction: column; align-items: center; transition: 0.4s; }
+        .catalog-card.expanded .card-titles { align-items: flex-start; }
+
+        .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; transition: 0.4s;}
+        .catalog-card.expanded .cat-name { font-size: 18px; margin-bottom: 2px; }
+
+        /* Píldoras de Disponibilidad Clásicas */
+        .cat-badge { font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 12px; display: inline-block; transition: 0.4s;}
+        .cat-badge.ok { background: rgba(46, 160, 67, 0.25); color: var(--success-green); border: 1px solid rgba(46, 160, 67, 0.6); }
+        .cat-badge.out { background: rgba(255, 51, 102, 0.25); color: var(--danger-red); border: 1px solid rgba(255, 51, 102, 0.6); }
+        .catalog-card.expanded .cat-badge { margin-bottom: 0; }
+
+        .cat-price-normal { font-size: 20px; font-weight: 800; color: var(--neon-blue); margin-bottom: 8px; transition: 0.3s; }
+        .catalog-card.expanded .cat-price-normal { display: none; }
+        
+        .cat-price-expanded { display: none; font-size: 26px; font-weight: 800; color: var(--neon-blue); line-height: 1; }
+        .catalog-card.expanded .cat-price-expanded { display: block; }
+
+        .btn-info-srv { background: transparent; border: none; color: var(--text-muted); font-size: 11px; text-decoration: none; font-weight: 600; margin-bottom: 12px; cursor: pointer; transition: 0.2s; }
+        .btn-info-srv:hover { color: #fff; }
+        .catalog-card.expanded .btn-info-srv { align-self: flex-start; margin-bottom: 15px; margin-left: 75px; }
+
+        .card-details-content { max-height: 0; opacity: 0; font-size: 12.5px; color: var(--text-muted); text-align: left; line-height: 1.5; transition: max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease; overflow: hidden;}
+        .catalog-card.expanded .card-details-content { max-height: 600px; opacity: 1; margin-bottom: 20px; }
+
+        .card-bottom { display: flex; justify-content: center; align-items: center; width: 100%; margin-top: auto; transition: 0.4s; }
+        .catalog-card.expanded .card-bottom { justify-content: flex-end; gap: 20px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 15px;}
+
+        .qty-controls { display: flex; align-items: center; justify-content: center; gap: 15px; background: rgba(0,0,0,0.5); padding: 8px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); }
         .qty-btn { background: rgba(255,255,255,0.1); color: #fff; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
         .qty-val { font-weight: 700; font-size: 16px; min-width: 20px; text-align: center; }
+        /* ========================================================== */
 
         .floating-cart { position: fixed; bottom: 20px; left: 50%; width: 92%; max-width: 500px; display: flex; justify-content: space-between; align-items: center; z-index: 1000; border-color: var(--neon-blue); padding: 15px 20px; opacity: 0; visibility: hidden; pointer-events: none; transform: translate(-50%, 120px); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .floating-cart.show { opacity: 1; visibility: visible; pointer-events: auto; transform: translate(-50%, 0); }
@@ -239,10 +251,10 @@
         </div>
     </div>
 
-    <!-- EL HEADER FIJO CON EL BOTON DE ESPACIO A LA DERECHA -->
+    <!-- EL HEADER FIJO CON EL BOTON QUE CAMBIA DINÁMICAMENTE -->
     <header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
         <img src="logo2.PNG" alt="GOXION" class="app-logo">
-        <button class="header-action-btn" onclick="openAuthSheet()">👤 <span id="header-btn-text">Mi Espacio</span></button>
+        <button class="header-action-btn" id="header-action-btn" onclick="toggleAuth()">👤 <span id="header-btn-text">Mi Espacio</span></button>
     </header>
 
     <div class="bg">
@@ -258,7 +270,7 @@
         </div>
 
         <div class="glass-card tab-container">
-            <button class="tab-btn active" id="btn-tab-inicio" onclick="switchTab('inicio')"><span>🏠</span>Inicio</button>
+            <button class="tab-btn active" id="btn-tab-inicio" onclick="switchTab('inicio')"><span id="tab-inicio-icon">🏠</span><div id="tab-inicio-text">Inicio</div></button>
             <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')"><span>🛒</span>Catálogo</button>
             <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
         </div>
@@ -316,6 +328,38 @@
             </div>
         </div>
 
+        <!-- DASHBOARD (Ahora es parte de la vista principal y reemplaza al inicio cuando inicias sesión) -->
+        <div id="view-dashboard" class="view-section">
+            <div id="dash-greeting-container" class="dash-greeting-box">
+                <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
+            </div>
+
+            <div id="dash-upsell"></div>
+            <div id="referral-section-container"></div>
+
+            <div class="glass-card dash-card" style="background: rgba(0,0,0,0.3);">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
+                <div class="dash-date" id="dash-date">Cargando...</div>
+                <div style="text-align: center;" id="dash-badge"></div>
+                <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
+                    <div style="font-size: 11px; color: var(--neon-blue); font-weight: 700;" id="loyalty-count">0 Pagos</div>
+                </div>
+                <div class="loyalty-progress-bg">
+                    <div class="loyalty-progress-fill" id="loyalty-bar"></div>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
+            </div>
+
+            <div id="dash-history"></div>
+
+            <div class="section-title">Tus Servicios Activos</div>
+            <div id="dash-services" style="margin-bottom: 25px;"></div>
+
+            <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">💳 Ver Estado de Cuenta y Pagar</button>
+        </div>
+
         <div id="view-catalogo" class="view-section">
             <div class="section-title">Nuestros Servicios y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
@@ -357,7 +401,7 @@
         </div>
     </div>
 
-    <!-- EL NUEVO OVERLAY TIPO BOTTOM SHEET PARA EL LOGIN / DASHBOARD -->
+    <!-- EL BOTTOM SHEET AHORA SOLO SIRVE PARA EL FORMULARIO DE LOGIN -->
     <div id="auth-overlay" class="auth-overlay" onclick="closeAuthSheetEvent(event)">
         <div class="auth-sheet" id="auth-sheet">
             <div class="sheet-handle"></div>
@@ -375,38 +419,6 @@
                     <button class="btn-primary" onclick="iniciarSesion()">Entrar a mi Panel</button>
                     <p id="login-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
                 </div>
-            </div>
-
-            <div id="dashboard-view" style="display: none;">
-                <div id="dash-greeting-container" class="dash-greeting-box">
-                    <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
-                </div>
-
-                <div id="dash-upsell"></div>
-                <div id="referral-section-container"></div>
-
-                <div class="glass-card dash-card" style="background: rgba(0,0,0,0.3);">
-                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
-                    <div class="dash-date" id="dash-date">Cargando...</div>
-                    <div style="text-align: center;" id="dash-badge"></div>
-                    <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
-                        <div style="font-size: 11px; color: var(--neon-blue); font-weight: 700;" id="loyalty-count">0 Pagos</div>
-                    </div>
-                    <div class="loyalty-progress-bg">
-                        <div class="loyalty-progress-fill" id="loyalty-bar"></div>
-                    </div>
-                    <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
-                </div>
-
-                <div id="dash-history"></div>
-
-                <div class="section-title">Tus Servicios Activos</div>
-                <div id="dash-services" style="margin-bottom: 25px;"></div>
-
-                <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">💳 Ver Estado de Cuenta y Pagar</button>
-                <button onclick="cerrarSesion()" style="background: transparent; border: none; color: var(--text-muted); font-size: 12px; width: 100%; text-decoration: underline; cursor: pointer; padding: 10px;">Cerrar Sesión de este dispositivo</button>
             </div>
         </div>
     </div>
@@ -482,8 +494,13 @@
         let greetingInterval = null;
         let carritoPedidos = {};
 
-        // CONTROL DEL ROTADOR DE TEXTO (Orgánico y sin brincos)
-        const rotatorTexts = ["✓ Calidad 4K Ultra HD", "✓ Perfiles 100% privados", "✓ Renovación sin perder historial", "✓ Compatibles con cualquier TV"];
+        const rotatorTexts = [
+            "✓ Calidad 4K Ultra HD", 
+            "✓ Perfiles 100% privados", 
+            "✓ Renovación sin perder historial", 
+            "✓ Compatibles con cualquier TV"
+        ];
+        
         let rotatorIdx = 0;
         setInterval(() => {
             const textEl = document.getElementById('dynamic-rotator');
@@ -494,19 +511,19 @@
                     rotatorIdx = (rotatorIdx + 1) % rotatorTexts.length;
                     textEl.innerText = rotatorTexts[rotatorIdx];
                     textEl.style.opacity = '1';
-                }, 400); // Espera a que desvanezca para cambiar texto
+                }, 400); 
             }
         }, 4000);
 
-        // TEXTOS INTELIGENTES PARA EL ACORDEÓN DE MÁS INFORMACIÓN
+        // TEXTOS DE SOPORTE E INFORMACIÓN DESPLEGADOS
         const INFO_SERVICIOS = {
-            "netflix": "Vive una experiencia superior con tu perfil totalmente individual y personalizable con PIN. Disfruta películas y estrenos en calidad 4K Ultra HD y sonido Dolby Atmos. Tu historial, lista de favoritos y recomendaciones se mantienen privados.",
+            "netflix": "Vive una experiencia superior con tu perfil totalmente individual y personalizable con PIN. Disfruta películas y estrenos en calidad 4K Ultra HD y sonido Dolby Atmos. Tu historial, lista de favoritos y recomendaciones se mantienen completamente privados.",
             "disney": "Acceso ilimitado al catálogo de Disney, Pixar, Marvel, Star Wars y National Geographic en calidad 4K UHD. Disfruta de un perfil individual para descargas offline y visualización cómoda sin interrupciones.",
             "max": "Suscripción Platino con calidad de video 4K UHD. Disfruta del universo de HBO, Warner Bros, DC Comics y Cartoon Network. Tu perfil privado garantiza que siempre reanudes donde te quedaste.",
             "prime": "Accede al catálogo completo de Prime Video. Perfil personalizado, reproducción en calidad superior 4K y descargas habilitadas para disfrutar contenido sin conexión a internet.",
             "youtube": "¡Doble beneficio! Incluye YouTube Premium (videos sin anuncios) y acceso total a YouTube Music Premium. Reproducción en segundo plano y descargas offline para todos tus dispositivos móviles o TV.",
             "vix": "Todos los partidos de la Liga MX, contenido de TV exclusivo, telenovelas y los mejores estrenos premium en español sin una sola interrupción publicitaria.",
-            "crunchyroll": "Membresía Mega Fan. Disfruta del anime sin publicidad, episodios de estreno simulcast (disponibles poco después de Japón) y visualización offline. Pregúntanos por la opción Individual o Cuenta Completa.",
+            "crunchyroll": "Membresía Mega Fan. Disfruta del anime sin publicidad, episodios de estreno simulcast y visualización offline.<br><br><span style='color:var(--neon-blue); font-weight:bold;'>🔹 Perfil Individual:</span> $45 MXN<br><span style='color:var(--neon-blue); font-weight:bold;'>👑 Cuenta Completa (4 Perfiles):</span> $100 MXN<br><br><em>(Usa los botones de abajo para elegir la cantidad de perfiles, o escríbenos directo si deseas la cuenta completa)</em>.",
             "spotify": "Música infinita sin anuncios, opción para descargas y calidad de sonido superior. Podemos asignarte un perfil individual o hacer el Upgrade a tu propia cuenta personal.",
             "microsoft": "Membresía Microsoft 365 Family. Incluye 1TB de almacenamiento seguro en nube (OneDrive) y acceso completo a las aplicaciones premium (Word, Excel, PowerPoint) para tus dispositivos.",
             "google": "Expande rápidamente tu almacenamiento en la nube para Google Drive, Gmail y Google Fotos. Además, desbloquea las funciones de edición avanzadas en la aplicación de Fotos.",
@@ -529,9 +546,23 @@
                 if(view) view.classList.remove('active');
             });
             const activeBtn = document.getElementById(`btn-tab-${tabName}`);
-            const activeView = document.getElementById(`view-${tabName}`);
             if(activeBtn) activeBtn.classList.add('active');
-            if(activeView) activeView.classList.add('active');
+
+            if (tabName === 'inicio') {
+                const key = localStorage.getItem('goxion_user_key');
+                if(key) {
+                    document.getElementById('view-inicio').classList.remove('active');
+                    document.getElementById('view-dashboard').classList.add('active');
+                } else {
+                    document.getElementById('view-inicio').classList.add('active');
+                    document.getElementById('view-dashboard').classList.remove('active');
+                }
+            } else {
+                document.getElementById('view-dashboard').classList.remove('active');
+                const activeView = document.getElementById(`view-${tabName}`);
+                if(activeView) activeView.classList.add('active');
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
             if(tabName !== 'catalogo') {
@@ -545,68 +576,52 @@
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
 
-        // CONTROL DEL BOTTOM SHEET (OVERLAY)
-        function openAuthSheet() {
-            document.getElementById('auth-overlay').classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-        function closeAuthSheet() {
-            document.getElementById('auth-overlay').classList.remove('show');
-            document.body.style.overflow = 'auto';
-        }
-        function closeAuthSheetEvent(e) {
-            if (e.target.classList.contains('auth-overlay')) closeAuthSheet();
+        function openAuthSheet() { document.getElementById('auth-overlay').classList.add('show'); document.body.style.overflow = 'hidden'; }
+        function closeAuthSheet() { document.getElementById('auth-overlay').classList.remove('show'); document.body.style.overflow = 'auto'; }
+        function closeAuthSheetEvent(e) { if (e.target.classList.contains('auth-overlay')) closeAuthSheet(); }
+
+        function toggleAuth() {
+            if(localStorage.getItem('goxion_user_key')) {
+                cerrarSesion();
+            } else {
+                openAuthSheet();
+            }
         }
 
         function iniciarSaludoDinamico(nombreCompleto) {
             const primerNombre = nombreCompleto.split(' ')[0];
             const frases = [
-                `¡Hola, <span>${primerNombre}</span>! 👋`,
-                `¡Qué gusto verte, <span>${primerNombre}</span>! ✨`,
-                `¡Bienvenido a tu espacio, <span>${primerNombre}</span>! 🚀`,
+                `¡Hola, <span>${primerNombre}</span>! 👋`, 
+                `¡Qué gusto verte, <span>${primerNombre}</span>! ✨`, 
+                `¡Bienvenido a tu espacio, <span>${primerNombre}</span>! 🚀`, 
                 `Todo en orden por aquí, <span>${primerNombre}</span> 💎`
             ];
-            
             let index = 0;
             const el = document.getElementById('dynamic-greeting-text');
             if(!el) return;
-
             if(greetingInterval) clearInterval(greetingInterval);
-            
-            el.innerHTML = frases[0];
-            el.style.opacity = 1;
-
+            el.innerHTML = frases[0]; el.style.opacity = 1;
             greetingInterval = setInterval(() => {
                 el.style.opacity = 0;
-                setTimeout(() => {
-                    index = (index + 1) % frases.length;
-                    el.innerHTML = frases[index];
-                    el.style.opacity = 1;
+                setTimeout(() => { 
+                    index = (index + 1) % frases.length; 
+                    el.innerHTML = frases[index]; 
+                    el.style.opacity = 1; 
                 }, 500);
             }, 6000);
         }
 
-        function normalizeString(str) {
-            return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
-        }
+        function normalizeString(str) { return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : ""; }
 
         async function cargarDatosYVerificarSesion() {
             try {
                 const version = new Date().getTime(); 
-                const response = await fetch(`clientes.json?v=${version}`, { 
-                    cache: 'no-store',
-                    headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
-                });
-                
+                const response = await fetch(`clientes.json?v=${version}`, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' } });
                 globalClientesData = await response.json();
-                
                 cargarCatalogo(globalClientesData);
                 renderizarSoporteDinamico(globalClientesData);
-                
                 const savedKey = localStorage.getItem('goxion_user_key');
-                if(savedKey && globalClientesData[savedKey]) {
-                    renderDashboard(savedKey);
-                }
+                if(savedKey && globalClientesData[savedKey]) { renderDashboard(savedKey); }
             } catch(e) { console.error("Error cargando base de datos"); }
         }
 
@@ -614,62 +629,50 @@
             const inputId = document.getElementById('login-id').value;
             const inputPin = document.getElementById('login-pin').value.trim();
             const errorMsg = document.getElementById('login-error');
-            
-            if(!inputId || !inputPin) {
-                errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso.";
-                errorMsg.style.display = 'block'; return;
-            }
-
+            if(!inputId || !inputPin) { errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso."; errorMsg.style.display = 'block'; return; }
             const searchStr = normalizeString(inputId);
             let foundKey = null;
-
             for(let key in globalClientesData) {
                 if(key === '_goxion_config') continue;
                 let cli = globalClientesData[key];
-                
                 if(normalizeString(key) === searchStr || normalizeString(cli.nombre) === searchStr || normalizeString(cli.folio) === searchStr) {
-                    if(cli.codigo === inputPin || cli.pin === inputPin || cli.codigo_acceso === inputPin) {
-                        foundKey = key; break;
-                    }
+                    if(cli.codigo === inputPin || cli.pin === inputPin || cli.codigo_acceso === inputPin) { foundKey = key; break; }
                 }
             }
-
-            if(foundKey) {
-                localStorage.setItem('goxion_user_key', foundKey);
-                errorMsg.style.display = 'none';
-                renderDashboard(foundKey);
-            } else {
-                errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código.";
-                errorMsg.style.display = 'block';
-            }
+            if(foundKey) { 
+                localStorage.setItem('goxion_user_key', foundKey); 
+                errorMsg.style.display = 'none'; 
+                closeAuthSheet();
+                renderDashboard(foundKey); 
+                switchTab('inicio');
+            } 
+            else { errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código."; errorMsg.style.display = 'block'; }
         }
 
         function cerrarSesion() {
             localStorage.removeItem('goxion_user_key');
             if(greetingInterval) clearInterval(greetingInterval);
-            document.getElementById('dashboard-view').style.display = 'none';
-            document.getElementById('auth-view').style.display = 'block';
-            document.getElementById('header-btn-text').innerText = 'Mi Espacio';
-            document.getElementById('login-id').value = '';
+            document.getElementById('header-btn-text').innerText = 'Mi Espacio'; 
+            document.getElementById('tab-inicio-icon').innerText = '🏠';
+            document.getElementById('tab-inicio-text').innerText = 'Inicio';
+            document.getElementById('login-id').value = ''; 
             document.getElementById('login-pin').value = '';
-            closeAuthSheet();
+            switchTab('inicio');
         }
 
-        function irAlTicket() {
-            const key = localStorage.getItem('goxion_user_key');
-            if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`;
-        }
-        
+        function irAlTicket() { const key = localStorage.getItem('goxion_user_key'); if(key) window.location.href = `index.html?cliente=${encodeURIComponent(key)}`; }
         function copiarDatoRapido(texto, tipo) { navigator.clipboard.writeText(texto); alert(`¡${tipo} copiado al portapapeles!`); }
         function toggleCreds(id) { const box = document.getElementById(id); box.style.display = (box.style.display === 'none') ? 'flex' : 'none'; }
 
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
-            document.getElementById('auth-view').style.display = 'none';
-            document.getElementById('dashboard-view').style.display = 'block';
             const primerNombre = cliente.nombre.split(' ')[0];
-            document.getElementById('dash-name').innerText = primerNombre;
-            document.getElementById('header-btn-text').innerText = 'Perfil';
+            document.getElementById('dash-name').innerText = primerNombre; 
+            
+            document.getElementById('header-btn-text').innerText = 'Cerrar Sesión';
+            document.getElementById('tab-inicio-icon').innerText = '👤';
+            document.getElementById('tab-inicio-text').innerText = 'Mi Espacio';
+
             iniciarSaludoDinamico(cliente.nombre);
 
             let hasPrime = false, hasHBO = false, hasCombo = false;
@@ -682,30 +685,74 @@
             }
 
             let upsellHTML = '', msgPromoWA = '';
-            if(hasCombo) {
-                upsellHTML = `<div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);"><div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div><div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div></div>`;
-            } else if(hasPrime) {
-                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
-                upsellHTML = `<div class="promo-card"><div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div><div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div><button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button></div>`;
-            } else if(hasHBO) {
-                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`);
-                upsellHTML = `<div class="promo-card"><div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div><div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div><button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button></div>`;
+            if(hasCombo) { 
+                upsellHTML = `
+                <div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);">
+                    <div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div>
+                    <div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div>
+                </div>`; 
+            } else if(hasPrime) { 
+                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
+                upsellHTML = `
+                <div class="promo-card">
+                    <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
+                    <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
+                    <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button>
+                </div>`; 
+            } else if(hasHBO) { 
+                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
+                upsellHTML = `
+                <div class="promo-card">
+                    <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
+                    <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
+                    <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button>
+                </div>`; 
             }
             document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
             if(cliente.referido_activo) {
                 let meses = cliente.referido_activo.meses || 1;
-                refContainer.innerHTML = `<div class="glass-card referral-card"><div class="referral-header"><div class="referral-title"><span>🎁</span> Tu Referido Activo</div><div class="referral-status-badge">En Validación</div></div><p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${cliente.referido_activo.nombre || "Referido"}</p><div class="referral-stats"><div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);"><div class="stat-val">${cliente.referido_activo.plataformas || 2}</div><div class="stat-label">Plataformas</div></div><div class="stat-box"><div class="stat-val">${meses}/3</div><div class="stat-label">Meses</div></div></div><div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Progreso a tu mes gratis:</div><div class="loyalty-progress-bg" style="height: 6px;"><div class="loyalty-progress-fill" style="width: ${Math.min((meses / 3) * 100, 100)}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div></div><div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div></div>`;
+                refContainer.innerHTML = `
+                <div class="glass-card referral-card">
+                    <div class="referral-header">
+                        <div class="referral-title"><span>🎁</span> Tu Referido Activo</div>
+                        <div class="referral-status-badge">En Validación</div>
+                    </div>
+                    <p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${cliente.referido_activo.nombre || "Referido"}</p>
+                    <div class="referral-stats">
+                        <div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);">
+                            <div class="stat-val">${cliente.referido_activo.plataformas || 2}</div>
+                            <div class="stat-label">Plataformas</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-val">${meses}/3</div>
+                            <div class="stat-label">Meses</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Progreso a tu mes gratis:</div>
+                    <div class="loyalty-progress-bg" style="height: 6px;">
+                        <div class="loyalty-progress-fill" style="width: ${Math.min((meses / 3) * 100, 100)}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div>
+                    </div>
+                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
+                </div>`;
             } else {
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
-                refContainer.innerHTML = `<div class="glass-card referral-card"><div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div><div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div><div style="display: flex; gap: 8px; margin-bottom: 12px;"><input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input"><button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button></div><button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">📲 Compartir por WhatsApp</button><div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div></div>`;
+                refContainer.innerHTML = `
+                <div class="glass-card referral-card">
+                    <div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
+                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                        <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input">
+                        <button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button>
+                    </div>
+                    <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">📲 Compartir por WhatsApp</button>
+                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
+                </div>`;
             }
 
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const hoy = new Date();
-            const diaPago = cliente.dia_pago || 15;
-            const difDias = diaPago - hoy.getDate();
+            const hoy = new Date(); const diaPago = cliente.dia_pago || 15; const difDias = diaPago - hoy.getDate();
             document.getElementById('dash-date').innerText = `${diaPago} de ${meses[hoy.getMonth()]}`;
             
             let badgeHTML = "";
@@ -715,10 +762,8 @@
             else badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
             document.getElementById('dash-badge').innerHTML = badgeHTML;
 
-            let pagos = cliente.pagos_puntuales || 0;
-            let meta = 4, beneficio = "3% OFF";
-            if (pagos >= 4 && pagos < 9) { meta = 9; beneficio = "6% OFF"; }
-            else if (pagos >= 9) { meta = pagos; beneficio = "Nivel Máximo (6% OFF)"; }
+            let pagos = cliente.pagos_puntuales || 0; let meta = 4, beneficio = "3% OFF";
+            if (pagos >= 4 && pagos < 9) { meta = 9; beneficio = "6% OFF"; } else if (pagos >= 9) { meta = pagos; beneficio = "Nivel Máximo (6% OFF)"; }
             document.getElementById('loyalty-count').innerText = `${pagos}/${meta} Pagos`;
             setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${Math.min((pagos / meta) * 100, 100)}%`; }, 300);
             document.getElementById('loyalty-msg').innerText = pagos >= 9 ? "¡Felicidades! Disfrutas de tu Nivel 2." : `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
@@ -726,8 +771,16 @@
             let historyHTML = '';
             if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
                 historyHTML = `<div class="glass-card"><div class="section-title">Historial de Transacciones</div>`;
-                [...cliente.historial_pagos].reverse().forEach(p => {
-                    historyHTML += `<div class="history-item"><div class="history-dot"></div><div class="history-info"><div class="history-month">${p.fecha}</div><div class="history-status">✅ Acreditado a tiempo</div></div><div class="history-amount">$${p.monto.toFixed(2)}</div></div>`;
+                [...cliente.historial_pagos].reverse().forEach(p => { 
+                    historyHTML += `
+                    <div class="history-item">
+                        <div class="history-dot"></div>
+                        <div class="history-info">
+                            <div class="history-month">${p.fecha}</div>
+                            <div class="history-status">✅ Acreditado a tiempo</div>
+                        </div>
+                        <div class="history-amount">$${p.monto.toFixed(2)}</div>
+                    </div>`; 
                 });
                 historyHTML += `</div>`;
             }
@@ -735,40 +788,58 @@
 
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
-            
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s, idx) => {
-                    let icon = "📺";
-                    for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
+                    let icon = "📺"; 
+                    for(let i in iconosMap) { 
+                        if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; 
+                    }
+                    
                     let credsBtns = '';
                     if(s.correo_login || s.perfil_nombre || s.perfil_pin) {
                         if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
                         if(s.perfil_nombre) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_nombre}', 'Perfil')">👤 <strong>${s.perfil_nombre}</strong></div>`;
                         if(s.perfil_pin) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_pin}', 'PIN')">🔢 PIN: <strong>${s.perfil_pin}</strong></div>`;
-                    } else {
-                        credsBtns = `<div style="font-size:11px; color:var(--text-muted); width:100%;">Tus accesos llegarán a tu correo o WhatsApp pronto.</div>`;
+                    } else { 
+                        credsBtns = `<div style="font-size:11px; color:var(--text-muted); width:100%;">Tus accesos llegarán a tu correo o WhatsApp pronto.</div>`; 
                     }
-                    srvHTML += `<div class="service-pill-container"><div class="service-pill-header"><div class="service-pill-left"><span>${icon}</span> <span>${s.nombre}</span></div><div style="display:flex; align-items:center; gap:8px;"><div class="service-status">Activo</div><button class="btn-creds-toggle" onclick="toggleCreds('creds-${idx}')">👁️ Ver Accesos</button></div></div><div class="cred-box" id="creds-${idx}" style="display:none;">${credsBtns}</div></div>`;
+                    
+                    srvHTML += `
+                    <div class="service-pill-container">
+                        <div class="service-pill-header">
+                            <div class="service-pill-left">
+                                <span>${icon}</span> <span>${s.nombre}</span>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <div class="service-status">Activo</div>
+                                <button class="btn-creds-toggle" onclick="toggleCreds('creds-${idx}')">👁️ Ver Accesos</button>
+                            </div>
+                        </div>
+                        <div class="cred-box" id="creds-${idx}" style="display:none;">${credsBtns}</div>
+                    </div>`;
                 });
-            } else { srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`; }
+            } else { 
+                srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`; 
+            }
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
 
-        function copiarEnlace() {
-            var input = document.getElementById("ref-link-input");
-            input.select(); input.setSelectionRange(0, 99999);
-            document.execCommand("copy"); alert("¡Enlace copiado al portapapeles!");
-        }
+        function copiarEnlace() { var input = document.getElementById("ref-link-input"); input.select(); input.setSelectionRange(0, 99999); document.execCommand("copy"); alert("¡Enlace copiado al portapapeles!"); }
 
-        // FUNCION PARA EXPANDIR LA TARJETA ACORDEON (Reemplaza al Modal)
         function toggleDetallesSrv(idSeguro, btn) {
-            const descDiv = document.getElementById('desc-' + idSeguro);
-            if(descDiv.classList.contains('open')) {
-                descDiv.classList.remove('open');
-                btn.innerText = "ⓘ Ver más detalles";
+            const card = document.getElementById('card-' + idSeguro);
+            if(card.classList.contains('expanded')) {
+                card.classList.remove('expanded');
+                btn.innerText = "ⓘ Ver detalles ⏷";
             } else {
-                descDiv.classList.add('open');
+                document.querySelectorAll('.catalog-card').forEach(c => {
+                    c.classList.remove('expanded');
+                    const btnInside = c.querySelector('.btn-info-srv');
+                    if(btnInside) btnInside.innerText = "ⓘ Ver detalles ⏷";
+                });
+                card.classList.add('expanded');
                 btn.innerText = "⬆️ Ocultar detalles";
+                setTimeout(() => { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300);
             }
         }
 
@@ -793,8 +864,7 @@
                 if (cliente.servicios) {
                     cliente.servicios.forEach(s => {
                         let nombreCliente = s.nombre.toLowerCase();
-                        let multiplier = 1;
-                        let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
+                        let multiplier = 1; let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
                         if (matchQuant) multiplier = parseInt(matchQuant[1]);
                         
                         config.serviciosGlobales.forEach(catSrv => {
@@ -807,11 +877,7 @@
                 }
             }
 
-            const mapImagenes = {
-                "netflix": "netflix", "disney": "disney", "max": "hbo-max", "prime": "prime-video", 
-                "youtube": "youtube", "vix": "vix", "crunchyroll": "crunchyroll", 
-                "google": "google-one", "microsoft": "microsoft"
-            };
+            const mapImagenes = { "netflix": "netflix", "disney": "disney", "max": "hbo-max", "prime": "prime-video", "youtube": "youtube", "vix": "vix", "crunchyroll": "crunchyroll", "google": "google-one", "microsoft": "microsoft" };
 
             let htmlCatalogo = '';
             config.serviciosGlobales.forEach(srv => {
@@ -821,51 +887,55 @@
                 
                 let imgSrc = "logo2.PNG";
                 let srvLower = srv.nombre.toLowerCase();
-                for (let key in mapImagenes) {
-                    if (srvLower.includes(key)) imgSrc = `logos/${mapImagenes[key]}.PNG`;
-                }
+                for (let key in mapImagenes) { if (srvLower.includes(key)) imgSrc = `logos/${mapImagenes[key]}.PNG`; }
 
-                // IDENTIFICAR LA DESCRIPCIÓN INTELIGENTE
                 let textoDesc = INFO_SERVICIOS["default"];
-                for(let key in INFO_SERVICIOS) {
-                    if(srvLower.includes(key)) { textoDesc = INFO_SERVICIOS[key]; break; }
-                }
+                for(let key in INFO_SERVICIOS) { if(srvLower.includes(key)) { textoDesc = INFO_SERVICIOS[key]; break; } }
 
                 let adminBadge = srv.etiqueta ? `<div class="admin-badge">${srv.etiqueta}</div>` : '';
                 let badgeHtml = disponibles > 0 ? `<div class="cat-badge ok">🟢 ${disponibles} disp.</div>` : `<div class="cat-badge out">🔴 Agotado / Próximamente</div>`;
                 
-                // BOTÓN ACORDEÓN
-                let infoBtn = `<button onclick="toggleDetallesSrv('${safeId}', this)" class="btn-info-srv">ⓘ Ver más detalles</button>`;
+                let prefixPrecio = srvLower.includes("crunchyroll") ? "Desde " : "";
+                let infoBtn = `<button onclick="toggleDetallesSrv('${safeId}', this)" class="btn-info-srv">ⓘ Ver detalles ⏷</button>`;
 
                 let btnHtml = disponibles > 0 
-                    ? `<div class="qty-controls">
-                           <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, -1, '${safeId}')">-</button>
-                           <span class="qty-val" id="qty-${safeId}">0</span>
-                           <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, 1, '${safeId}')">+</button>
-                       </div>` 
-                    : `<div class="qty-controls" style="opacity: 0.3; cursor: not-allowed;">
-                           <button class="qty-btn" style="pointer-events: none;" disabled>-</button>
-                           <span class="qty-val">0</span>
-                           <button class="qty-btn" style="pointer-events: none;" disabled>+</button>
-                       </div>`;
+                    ? `
+                    <div class="qty-controls">
+                        <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, -1, '${safeId}')">-</button>
+                        <span class="qty-val" id="qty-${safeId}">0</span>
+                        <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, 1, '${safeId}')">+</button>
+                    </div>` 
+                    : `
+                    <div class="qty-controls" style="opacity: 0.3; cursor: not-allowed;">
+                        <button class="qty-btn" style="pointer-events: none;" disabled>-</button>
+                        <span class="qty-val">0</span>
+                        <button class="qty-btn" style="pointer-events: none;" disabled>+</button>
+                    </div>`;
 
                 htmlCatalogo += `
-                <div class="catalog-card">
+                <div class="catalog-card" id="card-${safeId}">
                     ${adminBadge}
-                    <div>
+                    
+                    <div class="card-top">
                         <img src="${imgSrc}" class="cat-logo-img" onerror="this.src='logo2.PNG'">
-                        <div class="cat-name">${srv.nombre}</div>
-                        <div class="cat-price">$${srv.precio} MXN</div>
-                        ${infoBtn}<br>
-                        ${badgeHtml}
+                        <div class="card-titles">
+                            <div class="cat-name">${srv.nombre}</div>
+                            ${badgeHtml}
+                        </div>
                     </div>
                     
+                    <div class="cat-price-normal">${prefixPrecio}$${srv.precio}</div>
+                    ${infoBtn}
+                    
                     <div id="desc-${safeId}" class="card-details-content">
-                        <strong>Lo que incluye:</strong><br>
+                        <strong style="color:var(--text-main); display:block; margin-bottom:5px;">Opciones y Beneficios:</strong>
                         ${textoDesc}
                     </div>
 
-                    ${btnHtml}
+                    <div class="card-bottom">
+                        <div class="cat-price-expanded">${prefixPrecio}$${srv.precio}</div>
+                        ${btnHtml}
+                    </div>
                 </div>`;
             });
             
@@ -874,32 +944,26 @@
 
         function actualizarCarrito(nombre, precio, cambio, safeId) {
             if (!carritoPedidos[nombre]) carritoPedidos[nombre] = { precio: precio, qty: 0 };
-            carritoPedidos[nombre].qty += cambio;
-            if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
-            document.getElementById('qty-' + safeId).innerText = carritoPedidos[nombre].qty;
-            renderCartFloating();
+            carritoPedidos[nombre].qty += cambio; if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
+            document.getElementById('qty-' + safeId).innerText = carritoPedidos[nombre].qty; renderCartFloating();
         }
 
         function renderCartFloating() {
             let totalItems = 0, totalPrecio = 0;
-            for (let item in carritoPedidos) {
-                totalItems += carritoPedidos[item].qty;
-                totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio);
-            }
+            for (let item in carritoPedidos) { totalItems += carritoPedidos[item].qty; totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio); }
             const fc = document.getElementById('floating-cart');
             if (totalItems > 0 && document.getElementById('view-catalogo').classList.contains('active')) {
                 document.getElementById('cart-items-count').innerText = totalItems + (totalItems === 1 ? " perfil" : " perfiles");
-                document.getElementById('cart-total-price').innerText = "$" + totalPrecio + " MXN";
-                fc.classList.add('show');
+                document.getElementById('cart-total-price').innerText = "$" + totalPrecio + " MXN"; fc.classList.add('show');
             } else { fc.classList.remove('show'); }
         }
 
         function enviarPedido() {
             let msg = "Hola GOXION, me interesa contratar:\n\n", totalPrecio = 0;
             for (let item in carritoPedidos) {
-                if (carritoPedidos[item].qty > 0) {
-                    msg += `✅ ${carritoPedidos[item].qty}x ${item} ($${carritoPedidos[item].precio * carritoPedidos[item].qty} MXN)\n`;
-                    totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio);
+                if (carritoPedidos[item].qty > 0) { 
+                    msg += `✅ ${carritoPedidos[item].qty}x ${item} ($${carritoPedidos[item].precio * carritoPedidos[item].qty} MXN)\n`; 
+                    totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio); 
                 }
             }
             msg += `\n*Total estimado: $${totalPrecio} MXN*\n¿Aún hay disponibilidad?`;
@@ -908,130 +972,203 @@
 
         let selectedPlat = "", currentIssues = {};
         
+        // BASE DE DATOS DE SOPORTE DESPLEGADA
         const DATABASE_ISSUES = { 
-            "Netflix": [
-                { issue: "🔑 Solicitar Código de Acceso", instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, acabo de enviar un código al correo asignado. Solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " }, 
-                { issue: "📺 Tu TV pide Actualizar Hogar", instructions: "1. Selecciona <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación <strong>a nuestra bandeja</strong>.<br>3. Ingresa abajo el correo que aparece en pantalla y envíanos tu solicitud para autorizar tu TV.", labelInput: "Correo que aparece en tu TV:", templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX. Ya envié el correo de autorización.\n\n📧 Correo en pantalla: " },
-                { issue: "⚠️ Límite de Pantallas", instructions: "Recuerda que cada perfil equivale a 1 pantalla. Si te marca límite, revisa que no tengas otra TV usándolo al mismo tiempo. Si el problema persiste, indícanos el nombre de tu perfil para revisarlo.", labelInput: "Nombre de tu Perfil:", templateWA: "Hola GOXION, tengo problemas de límite de pantallas en NETFLIX.\n\n👤 Mi Perfil es: " }
+            "Netflix": [ 
+                { 
+                    issue: "🔑 Solicitar Código de Acceso", 
+                    instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.", 
+                    labelInput: "Correo que aparece en tu TV:", 
+                    templateWA: "Hola GOXION, acabo de enviar un código al correo asignado. Solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " 
+                }, 
+                { 
+                    issue: "📺 Tu TV pide Actualizar Hogar", 
+                    instructions: "1. Selecciona <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación <strong>a nuestra bandeja</strong>.<br>3. Ingresa abajo el correo que aparece en pantalla y envíanos tu solicitud para autorizar tu TV.", 
+                    labelInput: "Correo que aparece en tu TV:", 
+                    templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX. Ya envié el correo de autorización.\n\n📧 Correo en pantalla: " 
+                }, 
+                { 
+                    issue: "⚠️ Límite de Pantallas", 
+                    instructions: "Recuerda que cada perfil equivale a 1 pantalla. Si te marca límite, revisa que no tengas otra TV usándolo al mismo tiempo. Si el problema persiste, indícanos el nombre de tu perfil para revisarlo.", 
+                    labelInput: "Nombre de tu Perfil:", 
+                    templateWA: "Hola GOXION, tengo problemas de límite de pantallas en NETFLIX.\n\n👤 Mi Perfil es: " 
+                } 
             ],
-            "Disney+": [
-                { issue: "🔑 Código de Verificación", instructions: "1. Ingresa a la app y presiona 'Continuar' con el correo asignado.<br>2. La plataforma enviará un código de 6 dígitos <strong>a nuestra bandeja de entrada</strong>.<br>3. Escribe el correo aquí abajo para indicarnos que ya lo solicitaste y te lo enviaremos.", labelInput: "El correo que acabas de ingresar:", templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " }, 
-                { issue: "🏠 Mensaje de 'Hogar Principal'", instructions: "Selecciona 'Actualizar Hogar' en tu dispositivo. Eso nos enviará una solicitud de autorización al correo maestro. Escríbelo abajo para proceder.", labelInput: "Correo de tu cuenta Disney+:", templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo asignado: " }
+            "Disney+": [ 
+                { 
+                    issue: "🔑 Código de Verificación", 
+                    instructions: "1. Ingresa a la app y presiona 'Continuar' con el correo asignado.<br>2. La plataforma enviará un código de 6 dígitos <strong>a nuestra bandeja de entrada</strong>.<br>3. Escribe el correo aquí abajo para indicarnos que ya lo solicitaste y te lo enviaremos.", 
+                    labelInput: "El correo que acabas de ingresar:", 
+                    templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " 
+                }, 
+                { 
+                    issue: "🏠 Mensaje de 'Hogar Principal'", 
+                    instructions: "Selecciona 'Actualizar Hogar' en tu dispositivo. Eso nos enviará una solicitud de autorización al correo maestro. Escríbelo abajo para proceder.", 
+                    labelInput: "Correo de tu cuenta Disney+:", 
+                    templateWA: "Hola GOXION, Disney+ me pide autorización de Hogar.\n\n📧 Correo asignado: " 
+                } 
             ],
-            "Max": [
-                { issue: "🔑 Iniciar Sesión con Código", instructions: "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.<br>2. Aparecerán 6 letras/números en tu pantalla.<br>3. Como nosotros manejamos la plataforma, escribe ese código abajo para que nosotros lo vinculemos manually.", labelInput: "Código en tu pantalla de TV:", templateWA: "Hola GOXION, solicito que vinculen mi TV a MAX.\n\n🔤 Código TV: " },
-                { issue: "❌ Contraseña Incorrecta", instructions: "Asegúrate de no haber dejado espacios al copiar los datos. Si no te deja entrar, indícanos el correo de la cuenta para enviarte la contraseña actualizada.", labelInput: "Correo de la cuenta MAX:", templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: " }
+            "Max": [ 
+                { 
+                    issue: "🔑 Iniciar Sesión con Código", 
+                    instructions: "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.<br>2. Aparecerán 6 letras/números en tu pantalla.<br>3. Como nosotros manejamos la plataforma, escribe ese código abajo para que nosotros lo vinculemos manually.", 
+                    labelInput: "Código en tu pantalla de TV:", 
+                    templateWA: "Hola GOXION, solicito que vinculen mi TV a MAX.\n\n🔤 Código TV: " 
+                }, 
+                { 
+                    issue: "❌ Contraseña Incorrecta", 
+                    instructions: "Asegúrate de no haber dejado espacios al copiar los datos. Si no te deja entrar, indícanos el correo de la cuenta para enviarte la contraseña actualizada.", 
+                    labelInput: "Correo de la cuenta MAX:", 
+                    templateWA: "Hola GOXION, me marca contraseña incorrecta en MAX.\n\n📧 Correo: " 
+                } 
             ],
-            "Prime Video": [
-                { issue: "📺 Registrar Dispositivo", instructions: "1. Abre Prime Video y presiona 'Identifícate'.<br>2. Mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.", labelInput: "Código en Pantalla de TV:", templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " }
+            "Prime Video": [ 
+                { 
+                    issue: "📺 Registrar Dispositivo", 
+                    instructions: "1. Abre Prime Video y presiona 'Identifícate'.<br>2. Mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.", 
+                    labelInput: "Código en Pantalla de TV:", 
+                    templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " 
+                } 
             ],
-            "YouTube": [
-                { issue: "📩 No me llegó la invitación", instructions: "Verifica tu carpeta de SPAM en Gmail. Recuerda que no debes estar en otro grupo familiar activo. Si no está, compártenos tu correo para reenviarla.", labelInput: "Tu correo personal de Gmail:", templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail: " }
+            "YouTube": [ 
+                { 
+                    issue: "📩 No me llegó la invitación", 
+                    instructions: "Verifica tu carpeta de SPAM en Gmail. Recuerda que no debes estar en otro grupo familiar activo. Si no está, compártenos tu correo para reenviarla.", 
+                    labelInput: "Tu correo personal de Gmail:", 
+                    templateWA: "Hola GOXION, requiero reenviar la INVITACIÓN a YOUTUBE PREMIUM.\n\n📧 Mi Gmail: " 
+                } 
             ],
-            "ViX": [
-                { issue: "🔑 Vincular TV o Iniciar Sesión", instructions: "Selecciona 'Iniciar Sesión'. Envíanos el código alfanumérico que aparece en tu pantalla de TV para enlazarlo desde nuestra base de datos.", labelInput: "Código en pantalla:", templateWA: "Hola GOXION, necesito ayuda para vincular VIX PREMIUM.\n\n📱 Código TV: " }
+            "ViX": [ 
+                { 
+                    issue: "🔑 Vincular TV o Iniciar Sesión", 
+                    instructions: "Selecciona 'Iniciar Sesión'. Envíanos el código alfanumérico que aparece en tu pantalla de TV para enlazarlo desde nuestra base de datos.", 
+                    labelInput: "Código en pantalla:", 
+                    templateWA: "Hola GOXION, necesito ayuda para vincular VIX PREMIUM.\n\n📱 Código TV: " 
+                } 
             ],
-            "Crunchyroll": [
-                { issue: "🔑 Vincular Consola o TV", instructions: "Dirígete a 'Activar dispositivo' en tu consola o TV. Aparecerá un código, escríbelo aquí para que nosotros autoricemos la cuenta.", labelInput: "Código de activación de pantalla:", templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: " }
+            "Crunchyroll": [ 
+                { 
+                    issue: "🔑 Vincular Consola o TV", 
+                    instructions: "Dirígete a 'Activar dispositivo' en tu consola o TV. Aparecerá un código, escríbelo aquí para que nosotros autoricemos la cuenta.", 
+                    labelInput: "Código de activación de pantalla:", 
+                    templateWA: "Hola GOXION, solicito vincular mi dispositivo a CRUNCHYROLL.\n\n🎮 Código: " 
+                } 
             ],
-            "Microsoft": [
-                { issue: "💻 Reenviar Invitación familiar", instructions: "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar y enviarte el enlace nuevamente.", labelInput: "Tu correo Outlook/Hotmail:", templateWA: "Hola GOXION, necesito que me reenvíen la invitación de MICROSOFT 365.\n\n📧 Correo: " }
+            "Microsoft": [ 
+                { 
+                    issue: "💻 Reenviar Invitación familiar", 
+                    instructions: "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar y enviarte el enlace nuevamente.", 
+                    labelInput: "Tu correo Outlook/Hotmail:", 
+                    templateWA: "Hola GOXION, necesito que me reenvíen la invitación de MICROSOFT 365.\n\n📧 Correo: " 
+                } 
             ],
-            "Google One": [
-                { issue: "☁️ Espacio no reflejado", instructions: "Asegúrate de haber aceptado la invitación de familia en tu Gmail. Indícanos tu correo si sigues sin ver los beneficios.", labelInput: "Tu correo Gmail personal:", templateWA: "Hola GOXION, sigo sin ver reflejado mi almacenamiento de GOOGLE ONE.\n\n📧 Mi Gmail: " }
+            "Google One": [ 
+                { 
+                    issue: "☁️ Espacio no reflejado", 
+                    instructions: "Asegúrate de haber aceptado la invitación de familia en tu Gmail. Indícanos tu correo si sigues sin ver los beneficios.", 
+                    labelInput: "Tu correo Gmail personal:", 
+                    templateWA: "Hola GOXION, sigo sin ver reflejado mi almacenamiento de GOOGLE ONE.\n\n📧 Mi Gmail: " 
+                } 
             ],
-            "Default": [
-                { issue: "🔑 Solicitar Código / Asistencia", instructions: "Inicia sesión en tu dispositivo. Si te solicita un código o confirmación por correo, presiona 'Enviar' e indícanos tu correo o código en pantalla para proceder.", labelInput: "Dato en pantalla / Correo:", templateWA: "Hola GOXION, requiero asistencia/código para la plataforma seleccionada.\n\n📱 Dato: " }
+            "Default": [ 
+                { 
+                    issue: "🔑 Solicitar Código / Asistencia", 
+                    instructions: "Inicia sesión en tu dispositivo. Si te solicita un código o confirmación por correo, presiona 'Enviar' e indícanos tu correo o código en pantalla para proceder.", 
+                    labelInput: "Dato en pantalla / Correo:", 
+                    templateWA: "Hola GOXION, requiero asistencia/código para la plataforma seleccionada.\n\n📱 Dato: " 
+                } 
             ]
         };
 
-        function srvCleanName(n) { 
-            return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa",""); 
-        }
+        function srvCleanName(n) { return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa",""); }
 
         function renderizarSoporteDinamico(data) {
-            const config = data._goxion_config;
-            const container = document.getElementById('support-platforms-grid');
-            if(!config || !config.serviciosGlobales) return;
-
+            const config = data._goxion_config; const container = document.getElementById('support-platforms-grid'); if(!config || !config.serviciosGlobales) return;
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "microsoft": "💻", "google": "☁️", "apple": "🍎", "paramount": "⛰️" };
-            
             let html = "";
-            config.serviciosGlobales.forEach(s => {
-                let icon = "📺";
-                for(let i in iconosMap) { if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; }
-                html += `<div class="platform-btn" onclick="selectPlatform('${s.nombre}', this)"><span>${icon}</span> ${srvCleanName(s.nombre)}</div>`;
+            config.serviciosGlobales.forEach(s => { 
+                let icon = "📺"; 
+                for(let i in iconosMap) { 
+                    if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; 
+                } 
+                html += `<div class="platform-btn" onclick="selectPlatform('${s.nombre}', this)"><span>${icon}</span> ${srvCleanName(s.nombre)}</div>`; 
             });
-
             container.innerHTML = html;
         }
 
         function selectPlatform(p, el) { 
             selectedPlat = p; 
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); el.classList.add('selected'); 
-            const sel = document.getElementById('issue-selector'); sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); 
+            el.classList.add('selected'); 
+            const sel = document.getElementById('issue-selector'); 
+            sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
             
-            let issues = DATABASE_ISSUES["Default"];
-            for(let key in DATABASE_ISSUES) {
-                if(p.toLowerCase().includes(key.toLowerCase())) {
-                    issues = DATABASE_ISSUES[key];
-                    break;
-                }
+            let issues = DATABASE_ISSUES["Default"]; 
+            for(let key in DATABASE_ISSUES) { 
+                if(p.toLowerCase().includes(key.toLowerCase())) { 
+                    issues = DATABASE_ISSUES[key]; break; 
+                } 
             }
             
             currentIssues = issues; 
-            currentIssues.forEach((i, idx) => { sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; });
+            currentIssues.forEach((i, idx) => { 
+                sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; 
+            });
             
-            document.getElementById('step-2').classList.add('active'); document.getElementById('step-3').classList.remove('active');
+            document.getElementById('step-2').classList.add('active'); 
+            document.getElementById('step-3').classList.remove('active');
         }
 
         function showSolution() {
-            const idx = document.getElementById('issue-selector').value;
+            const idx = document.getElementById('issue-selector').value; 
             if (idx === "") { document.getElementById('step-3').classList.remove('active'); return; }
+            
             const data = currentIssues[idx];
-            document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`;
+            document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`; 
             document.getElementById('input-label').innerText = data.labelInput;
             
-            let autoData = "";
+            let autoData = ""; 
             const key = localStorage.getItem('goxion_user_key');
             if (key && globalClientesData && globalClientesData[key]) {
                 const cliente = globalClientesData[key];
                 if (cliente.servicios) {
-                    let platKeyword = srvCleanName(selectedPlat).toLowerCase();
+                    let platKeyword = srvCleanName(selectedPlat).toLowerCase(); 
                     const srv = cliente.servicios.find(s => s.nombre.toLowerCase().includes(platKeyword));
-                    if (srv) {
-                        let labelLow = data.labelInput.toLowerCase();
-                        if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login;
-                        else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre;
-                        else if (labelLow.includes("pin") && srv.perfil_pin) autoData = srv.perfil_pin;
+                    if (srv) { 
+                        let labelLow = data.labelInput.toLowerCase(); 
+                        if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login; 
+                        else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre; 
+                        else if (labelLow.includes("pin") && srv.perfil_pin) autoData = srv.perfil_pin; 
                     }
                 }
             }
-            
-            document.getElementById('smart-extra-input').value = autoData;
+            document.getElementById('smart-extra-input').value = autoData; 
             document.getElementById('step-3').classList.add('active');
         }
 
         function sendSmartWA() {
-            const idx = document.getElementById('issue-selector').value; if(idx === "") return;
-            const val = document.getElementById('smart-extra-input').value.trim(); if(!val) return alert("Por favor completa el dato requerido en el campo de texto.");
+            const idx = document.getElementById('issue-selector').value; 
+            if(idx === "") return;
+            const val = document.getElementById('smart-extra-input').value.trim(); 
+            if(!val) return alert("Por favor completa el dato requerido en el campo de texto.");
             
-            let extraContext = "";
+            let extraContext = ""; 
             const key = localStorage.getItem('goxion_user_key');
+            
             if (key && globalClientesData && globalClientesData[key]) {
-                const cliente = globalClientesData[key];
-                let platKeyword = srvCleanName(selectedPlat).toLowerCase();
+                const cliente = globalClientesData[key]; 
+                let platKeyword = srvCleanName(selectedPlat).toLowerCase(); 
                 const srv = cliente.servicios?.find(s => s.nombre.toLowerCase().includes(platKeyword));
                 
                 extraContext = `\n\n------------------------\n*EXPEDIENTE DE SOPORTE:*\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`;
-                if (srv) {
-                    extraContext += `\n📺 Plataforma: ${srv.nombre}`;
-                    if (srv.correo_login) extraContext += `\n📧 Cta: ${srv.correo_login}`;
-                    if (srv.perfil_nombre) extraContext += `\n👤 Perfil: ${srv.perfil_nombre}`;
-                    if (srv.perfil_pin) extraContext += `\n🔢 PIN: ${srv.perfil_pin}`;
+                
+                if (srv) { 
+                    extraContext += `\n📺 Plataforma: ${srv.nombre}`; 
+                    if (srv.correo_login) extraContext += `\n📧 Cta: ${srv.correo_login}`; 
+                    if (srv.perfil_nombre) extraContext += `\n👤 Perfil: ${srv.perfil_nombre}`; 
+                    if (srv.perfil_pin) extraContext += `\n🔢 PIN: ${srv.perfil_pin}`; 
                 }
             }
-
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA + val + extraContext)}`, '_blank');
         }
 
