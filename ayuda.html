@@ -39,16 +39,28 @@
         .orbit-2 { width: 550px; height: 550px; bottom: -200px; right: -200px; border-top: 3px solid #00f2fe; border-right: 3px solid rgba(0, 242, 254, 0.2); filter: drop-shadow(0 0 15px #00f2fe) drop-shadow(0 0 30px #00f2fe); animation: floatOrbit2 85s linear infinite; }
         .orbit-3 { width: 380px; height: 380px; top: 60%; left: -100px; border-right: 2px solid #7c4dff; border-bottom: 2px solid rgba(124, 77, 255, 0.2); filter: drop-shadow(0 0 12px #7c4dff) drop-shadow(0 0 25px #7c4dff); animation: floatOrbit3 95s linear infinite; opacity: 0.6; }
 
-        @keyframes floatOrbit1 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(1); } 25% { transform: translate3d(80px, 40px, 0) rotate(90deg) scale(1.03); } 50% { transform: translate3d(220px, 130px, 0) rotate(180deg) scale(1.06); } 75% { transform: translate3d(140px, 190px, 0) rotate(270deg) scale(1.02); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(1); } }
-        @keyframes floatOrbit2 { 0% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.96); } 25% { transform: translate3d(40px, 60px, 0) rotate(270deg) scale(1); } 50% { transform: translate3d(100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(140px, 50px, 0) rotate(90deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.96); } }
-        @keyframes floatOrbit3 { 0% { transform: translate3d(0, 0, 0) rotate(0deg) scale(0.92); } 25% { transform: translate3d(-50px, 60px, 0) rotate(90deg) scale(0.97); } 50% { transform: translate3d(-100px, 120px, 0) rotate(180deg) scale(1.04); } 75% { transform: translate3d(-40px, 170px, 0) rotate(270deg) scale(1); } 100% { transform: translate3d(0, 0, 0) rotate(360deg) scale(0.92); } }
-
         .container { width: 100%; max-width: 580px; position: relative; z-index: 1; padding-bottom: 80px; }
 
         .app-header { display: flex; align-items: center; justify-content: space-between; width: 100%; margin-bottom: 20px; padding: max(15px, env(safe-area-inset-top)) 0 5px 0; position: relative; z-index: 10; }
         .app-logo { max-height: 28px; width: auto; object-fit: contain; }
         .header-action-btn { background: rgba(0, 242, 254, 0.1); border: 1px solid rgba(0, 242, 254, 0.3); color: var(--neon-blue); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: 0.3s; backdrop-filter: blur(10px); cursor: pointer; }
         .header-action-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 15px rgba(0,242,254,0.4); }
+
+        /* BARRA FLOTANTE ESTILO iPHONE PARA "MI ESPACIO" */
+        .sticky-client-bar {
+            position: fixed; top: 0; left: 0; right: 0; width: 100%;
+            padding: max(15px, env(safe-area-inset-top)) 20px 35px 20px;
+            background: rgba(3, 3, 5, 0.7);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            -webkit-mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 65%, transparent 100%);
+            z-index: 2000; display: flex; align-items: center; justify-content: center;
+            transform: translateY(-100%); transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: none; border: none;
+        }
+        .sticky-client-bar.show { transform: translateY(0); pointer-events: auto; }
+        .sticky-client-title { font-size: 20px; font-weight: 800; color: #fff; width: 100%; max-width: 580px; text-align: left; }
+        .sticky-client-title span { color: var(--neon-blue); }
 
         .alert-banner { background: rgba(255, 170, 0, 0.15); border: 1px solid rgba(255, 170, 0, 0.4); border-radius: 14px; padding: 14px; margin-bottom: 20px; display: none; align-items: flex-start; gap: 12px; backdrop-filter: blur(10px); }
 
@@ -249,6 +261,11 @@
         <div class="splash-content">
             <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
         </div>
+    </div>
+
+    <!-- BARRA ESTILO iPHONE PARA "MI ESPACIO" -->
+    <div id="sticky-client-bar" class="sticky-client-bar">
+        <div class="sticky-client-title">Tu Espacio, <span id="sticky-client-name"></span></div>
     </div>
 
     <!-- EL HEADER FIJO CON EL BOTON QUE CAMBIA DINÁMICAMENTE -->
@@ -495,9 +512,18 @@
         let greetingInterval = null;
         let carritoPedidos = {};
 
-        // =========================================================================
-        // FIX SÍNCRONO: Evita parpadeos al recargar comprobando la sesión INMEDIATAMENTE
-        // =========================================================================
+        // SCRIPT PARA MOSTRAR LA BARRA IPHONE AL HACER SCROLL
+        window.addEventListener('scroll', () => {
+            const bar = document.getElementById('sticky-client-bar');
+            const dashActive = document.getElementById('view-dashboard').classList.contains('active');
+            
+            if (dashActive && window.scrollY > 120) {
+                bar.classList.add('show');
+            } else if (bar) {
+                bar.classList.remove('show');
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', () => {
             const initialKey = localStorage.getItem('goxion_user_key');
             if(initialKey) {
@@ -532,7 +558,6 @@
             }
         }, 4000);
 
-        // TEXTOS DE SOPORTE E INFORMACIÓN DESPLEGADOS
         const INFO_SERVICIOS = {
             "netflix": "Vive una experiencia superior con tu perfil totalmente individual y personalizable con PIN. Disfruta películas y estrenos en calidad 4K Ultra HD y sonido Dolby Atmos. Tu historial, lista de favoritos y recomendaciones se mantienen completamente privados.",
             "disney": "Acceso ilimitado al catálogo de Disney, Pixar, Marvel, Star Wars y National Geographic en calidad 4K UHD. Disfruta de un perfil individual para descargas offline y visualización cómoda sin interrupciones.",
@@ -586,6 +611,10 @@
                 const activeView = document.getElementById(`view-${tabName}`);
                 if(activeView) activeView.classList.add('active');
             }
+
+            // Ocultamos la barra al cambiar de pestaña para evitar desfases visuales
+            const bar = document.getElementById('sticky-client-bar');
+            if(bar) bar.classList.remove('show');
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
             
@@ -693,6 +722,13 @@
             document.getElementById('tab-inicio-text').innerText = 'Inicio';
             document.getElementById('login-id').value = ''; 
             document.getElementById('login-pin').value = '';
+            
+            // Limpiamos la barra difuminada
+            const stickyName = document.getElementById('sticky-client-name');
+            if(stickyName) stickyName.innerText = '';
+            const bar = document.getElementById('sticky-client-bar');
+            if(bar) bar.classList.remove('show');
+
             switchTab('inicio');
         }
 
@@ -704,6 +740,10 @@
             const cliente = globalClientesData[key];
             const primerNombre = cliente.nombre.split(' ')[0];
             document.getElementById('dash-name').innerText = primerNombre; 
+            
+            // Asignar el nombre a la barra difuminada superior
+            const stickyName = document.getElementById('sticky-client-name');
+            if (stickyName) stickyName.innerText = primerNombre;
             
             document.getElementById('header-btn-text').innerText = 'Cerrar Sesión';
             document.getElementById('tab-inicio-icon').innerText = '👤';
@@ -875,7 +915,7 @@
                 });
                 card.classList.add('expanded');
                 btn.innerText = "⬆️ Ocultar detalles";
-                setTimeout(() => { card.scrollIntoView({ behavior: "smooth", block: "center" }); }, 300);
+                // ELIMINADA LA FUNCIÓN scrollIntoView A PETICIÓN TUYA (Evita que pegue el salto hacia abajo)
             }
         }
 
