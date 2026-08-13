@@ -78,7 +78,7 @@
         input:checked + .slider { background-color: rgba(255, 0, 60, 0.2); border-color: var(--neon-red); }
         input:checked + .slider:before { transform: translateX(20px); background-color: var(--neon-red); box-shadow: 0 0 8px var(--neon-red); }
 
-        .search-bar, .custom-select { width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.95rem; outline: none; transition: 0.3s; }
+        .search-bar, .custom-select { width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 10px 12px; border-radius: 6px; font-size: 0.95rem; outline: none; transition: 0.3s; }
         .search-bar:focus, .custom-select:focus { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(188, 19, 254, 0.3); }
 
         .filters-row { display: flex; gap: 12px; margin-bottom: 15px; }
@@ -189,21 +189,24 @@
             <h2 class="section-title">Cuentas Activas</h2>
             
             <div class="filters-row">
-                <select id="filter-status" class="custom-select" onchange="filtrarClientes()">
+                <select id="filter-status" class="custom-select" onchange="filtrarClientes()" style="margin-bottom: 0;">
                     <option value="all">Todos los estados</option>
                     <option value="revision">🔔 Pagos Por Validar</option>
                     <option value="pendiente">Pendientes</option>
                     <option value="pagado">Pagados</option>
                     <option value="suspendido">Suspendidos</option>
                 </select>
-                <select id="sort-by" class="custom-select" onchange="filtrarClientes()">
+                <select id="sort-by" class="custom-select" onchange="filtrarClientes()" style="margin-bottom: 0;">
                     <option value="name">Ordenar por Nombre (A-Z)</option>
                     <option value="date">Ordenar por Día de Cobro</option>
                     <option value="loyalty">Los más leales primero</option>
                 </select>
             </div>
             
-            <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o folio..." oninput="filtrarClientes()">
+            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                <input type="text" class="search-bar" id="search-input" placeholder="Buscar cliente por nombre o folio..." oninput="filtrarClientes()" style="margin-bottom: 0;">
+                <button class="btn-save" style="white-space: nowrap; padding: 10px 15px;" onclick="agregarNuevoCliente()">+ Nuevo Cliente</button>
+            </div>
             
             <div id="clients-container">
                 <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con la base de datos...</p>
@@ -376,6 +379,52 @@
             document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red); background: rgba(255,0,60,0.1); padding: 15px; border-radius: 8px;">${msg}</p>`;
         }
     }
+    
+    // --- NUEVO: FUNCIÓN PARA AGREGAR CLIENTES DESDE EL PANEL ---
+    function agregarNuevoCliente() {
+        let nombre = prompt("Nombre del nuevo cliente:");
+        if(!nombre) return;
+        
+        let folioNum = Object.keys(clientesDict).length + 1;
+        let folioSugerido = "GX-2026-" + String(folioNum).padStart(4, '0');
+        let folio = prompt("Folio:", folioSugerido);
+        if(!folio) return;
+        
+        // Crear ID seguro (minúsculas, sin espacios, sin acentos)
+        let key = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
+        
+        if(clientesDict[key]) {
+            alert("⚠️ Ya existe un cliente con este identificador: " + key);
+            return;
+        }
+        
+        clientesDict[key] = {
+            folio: folio,
+            nombre: nombre,
+            codigo: "1234",
+            pagos_puntuales: 0,
+            dia_pago: 15,
+            estado: "pendiente",
+            pago_en_revision: false,
+            historial_pagos: [],
+            servicios: [],
+            descuentos_especiales: [],
+            descuento_fallas: 0
+        };
+        
+        calcularInventarioYFinanzas();
+        filtrarClientes();
+        
+        // Desplegar automáticamente los detalles del nuevo cliente
+        setTimeout(() => {
+            const details = document.getElementById(`details-${key}`);
+            if(details) {
+                details.style.display = "block";
+                document.getElementById(`toggle-text-${key}`).innerHTML = "Ocultar detalles ▴";
+                details.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }, 100);
+    }
 
     function calcularInventarioYFinanzas() {
         inventarioActivo = {};
@@ -392,16 +441,33 @@
                 cliente.servicios.forEach(s => {
                     ingresosTotales += parseFloat(s.monto || 0);
                     
-                    // LÓGICA INTELIGENTE DE COMBOS (Busca palabras clave en el nombre del servicio)
+                    // --- NUEVO: LÓGICA INTELIGENTE DE COMBOS ---
                     let nombreCliente = s.nombre.toLowerCase();
                     let multiplier = 1; 
                     let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
                     if (matchQuant) multiplier = parseInt(matchQuant[1]);
                     
                     configGlobal.serviciosGlobales.forEach(g => {
-                        // Limpiamos palabras que puedan confundir (como premium, platino)
-                        let keyword = g.nombre.replace(/ Premium| Standard| Platino| Cuenta completa| 2TB| 365/gi, '').trim().toLowerCase();
-                        if (nombreCliente.includes(keyword)) {
+                        let nombreCatalogo = g.nombre.toLowerCase();
+                        let matched = false;
+                        
+                        // Mapeo inteligente (Si el nombre del cliente y el del catalogo comparten la familia)
+                        if (nombreCatalogo.includes('netflix') && nombreCliente.includes('netflix')) matched = true;
+                        else if (nombreCatalogo.includes('disney') && (nombreCliente.includes('disney') || nombreCliente.includes('disney+'))) matched = true;
+                        else if ((nombreCatalogo.includes('max') || nombreCatalogo.includes('hbo')) && (nombreCliente.includes('max') || nombreCliente.includes('hbo'))) matched = true;
+                        else if (nombreCatalogo.includes('prime') && (nombreCliente.includes('prime') || nombreCliente.includes('amazon'))) matched = true;
+                        else if (nombreCatalogo.includes('youtube') && nombreCliente.includes('youtube')) matched = true;
+                        else if (nombreCatalogo.includes('vix') && nombreCliente.includes('vix')) matched = true;
+                        else if (nombreCatalogo.includes('crunchy') && nombreCliente.includes('crunchy')) matched = true;
+                        else if (nombreCatalogo.includes('microsoft') && (nombreCliente.includes('microsoft') || nombreCliente.includes('365'))) matched = true;
+                        else if (nombreCatalogo.includes('google') && (nombreCliente.includes('google') || nombreCliente.includes('one'))) matched = true;
+                        else {
+                            // Fallback para servicios raros
+                            let keyword = g.nombre.replace(/ premium| standard| platino| cuenta completa| 2tb| 365/gi, '').trim().toLowerCase();
+                            if (nombreCliente.includes(keyword)) matched = true;
+                        }
+
+                        if (matched) {
                             inventarioActivo[g.nombre] += multiplier;
                         }
                     });
@@ -560,12 +626,27 @@
         clientesDict[key].referido_activo[field] = value;
     }
 
-    // FUNCIONES DE DESCUENTOS Y TRATO JUSTO
+    // --- NUEVO: FUNCIONES DE DESCUENTOS MÚLTIPLES Y LÍMITE DE TRATO JUSTO ---
     function aplicarTratoJusto(key, montoServicio) {
-        if(!confirm("¿Aplicar descuento de Trato Justo (5% del valor de este servicio) al cliente?")) return;
-        let descuento = montoServicio * 0.05;
         if(!clientesDict[key].descuento_fallas) clientesDict[key].descuento_fallas = 0;
+        
+        let maxPermitido = montoServicio * 0.50; // Maximo del 50% equivalente a 10 dias de falla
+        
+        if (clientesDict[key].descuento_fallas >= maxPermitido) {
+            alert("⚠️ LÍMITE ALCANZADO: Ya has aplicado el máximo de 10 días (-50%) de Trato Justo para esta plataforma.");
+            return;
+        }
+        
+        if(!confirm("¿Aplicar descuento de Trato Justo (5% del valor de este servicio) al cliente?")) return;
+        
+        let descuento = montoServicio * 0.05;
         clientesDict[key].descuento_fallas += descuento;
+        
+        // Bloqueo de seguridad para no pasar del 50%
+        if (clientesDict[key].descuento_fallas > maxPermitido) {
+            clientesDict[key].descuento_fallas = maxPermitido;
+        }
+        
         calcularInventarioYFinanzas();
         filtrarClientes();
     }
@@ -582,13 +663,27 @@
         let monto = prompt("Cantidad a descontar en $ (Ej. 50):");
         if(!monto || isNaN(monto)) return;
         
-        clientesDict[key].descuento_especial = { concepto: concepto, monto: parseFloat(monto) };
+        // Migrar el formato antiguo si el cliente aun lo tiene
+        if (clientesDict[key].descuento_especial) {
+            if (!clientesDict[key].descuentos_especiales) clientesDict[key].descuentos_especiales = [];
+            clientesDict[key].descuentos_especiales.push(clientesDict[key].descuento_especial);
+            delete clientesDict[key].descuento_especial;
+        }
+        
+        if (!clientesDict[key].descuentos_especiales) clientesDict[key].descuentos_especiales = [];
+        
+        clientesDict[key].descuentos_especiales.push({ concepto: concepto, monto: parseFloat(monto) });
         calcularInventarioYFinanzas();
         filtrarClientes();
     }
 
-    function eliminarDescuentoEspecial(key) {
-        delete clientesDict[key].descuento_especial;
+    function eliminarDescuentoEspecial(key, index) {
+        if(clientesDict[key].descuentos_especiales) {
+            clientesDict[key].descuentos_especiales.splice(index, 1);
+        } else if (clientesDict[key].descuento_especial && index === -1) {
+            // Compatibilidad para borrar el formato antiguo
+            delete clientesDict[key].descuento_especial;
+        }
         calcularInventarioYFinanzas();
         filtrarClientes();
     }
@@ -636,13 +731,15 @@
                 });
             } else { clientServicesHTML = `<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 10px 0;">Sin servicios activos asignados</div>`; }
 
-            // SECCIÓN DE DESCUENTOS EXTRA INYECTADA
+            // --- NUEVA SECCIÓN DE RENDERIZADO DE MÚLTIPLES DESCUENTOS ---
             let descuentosHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
                     <span style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase;">Descuentos Extra y Trato Justo</span>
                     <button class="btn-save" style="padding: 4px 8px; font-size: 0.8rem; background:rgba(0, 242, 254, 0.2); color:var(--neon-blue);" onclick="agregarDescuentoEspecial('${key}')">+ Añadir Descuento</button>
                 </div>
             `;
+            
+            // Compatibilidad por si el cliente tiene el descuento viejo
             if (cliente.descuento_especial) {
                 descuentosHTML += `
                 <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between; align-items:center;">
@@ -650,15 +747,30 @@
                         <div style="font-size:0.75rem; color:var(--neon-blue); font-weight:bold;">${cliente.descuento_especial.concepto}</div>
                         <div style="font-size:0.85rem; color:#fff;">-$${cliente.descuento_especial.monto}</div>
                     </div>
-                    <button class="btn-icon danger" onclick="eliminarDescuentoEspecial('${key}')">✖</button>
+                    <button class="btn-icon danger" onclick="eliminarDescuentoEspecial('${key}', -1)">✖</button>
                 </div>`;
             }
+            
+            // Render del array de multiples descuentos
+            if (cliente.descuentos_especiales && cliente.descuentos_especiales.length > 0) {
+                cliente.descuentos_especiales.forEach((desc, idx) => {
+                    descuentosHTML += `
+                    <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <div style="font-size:0.75rem; color:var(--neon-blue); font-weight:bold;">${desc.concepto}</div>
+                            <div style="font-size:0.85rem; color:#fff;">-$${desc.monto}</div>
+                        </div>
+                        <button class="btn-icon danger" onclick="eliminarDescuentoEspecial('${key}', ${idx})">✖</button>
+                    </div>`;
+                });
+            }
+
             if (cliente.descuento_fallas) {
                 descuentosHTML += `
                 <div style="background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning-amber); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
-                        <div style="font-size:0.75rem; color:var(--warning-amber); font-weight:bold;">Garantía Trato Justo (-5% aplicados)</div>
-                        <div style="font-size:0.85rem; color:#fff;">-$${cliente.descuento_fallas.toFixed(2)}</div>
+                        <div style="font-size:0.75rem; color:var(--warning-amber); font-weight:bold;">Garantía Trato Justo</div>
+                        <div style="font-size:0.85rem; color:#fff;">-$${cliente.descuento_fallas.toFixed(2)} acumulado</div>
                     </div>
                     <button class="btn-icon danger" onclick="resetearDescuentoFallas('${key}')" title="Resetear a 0">✖</button>
                 </div>`;
@@ -767,7 +879,7 @@
         cli.pago_en_revision = false;
         cli.pagos_puntuales = (cli.pagos_puntuales || 0) + 1;
         
-        // Al pagar, se resetean los descuentos por fallas (trato justo), el especial lo dejas si quieres que sea fijo, o lo borras si era una sola vez. Aquí reseteamos los de fallas por mes.
+        // Al aprobar el pago del mes, el historial de fallas (Trato Justo) se resetea a cero para el nuevo mes
         cli.descuento_fallas = 0;
         
         if(!cli.historial_pagos) cli.historial_pagos = [];
@@ -857,7 +969,7 @@
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: Combos, Webhooks y Descuentos aplicados",
+            message: "🤖 Admin Update: Combos, Multi-descuentos y Nuevos Clientes",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
