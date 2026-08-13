@@ -211,6 +211,15 @@
     </div>
 
     <div id="tab-inventario" class="tab-content">
+        <!-- NUEVO PANEL: CONFIGURACIONES DE APP (COMBO UPSPELL) -->
+        <div class="panel">
+            <h2 class="section-title">Configuraciones de App</h2>
+            <div class="switch-row">
+                <span style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">Mostrar Promoción Upsell (Combo GOXION) a Clientes</span>
+                <label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label>
+            </div>
+        </div>
+
         <div class="panel">
             <h2 class="section-title">Alertas Globales</h2>
             <div class="switch-row">
@@ -236,6 +245,8 @@
                     <thead>
                         <tr>
                             <th>Servicio</th>
+                            <!-- NUEVA COLUMNA DE ETIQUETA -->
+                            <th title="Etiqueta visible para el cliente (Ej: Promo, Nuevo)">Etiqueta</th>
                             <th title="Cuentas Activas Contratadas">Ctas</th>
                             <th title="Precio de Venta">Venta</th>
                             <th title="Tu Costo Mensual">Costo</th>
@@ -256,7 +267,7 @@
     let currentToken = localStorage.getItem("GOXION_PAT") || "";
     let currentFileData = null; 
     let clientesDict = {}; 
-    let configGlobal = { alertas: {}, serviciosGlobales: [] };
+    let configGlobal = { alertas: {}, serviciosGlobales: [], combo_upsell: true };
     let inventarioActivo = {};
 
     const DEFAULT_SERVICES = [
@@ -305,7 +316,6 @@
     function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
 
     async function inicializarPanel() {
-        // AQUÍ SE ARREGLÓ EL ERROR (Se quitaron las cabeceras que bloqueaban la conexión con GitHub)
         const version = new Date().getTime();
         const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}?v=${version}`;
         try {
@@ -333,9 +343,13 @@
                     if(sg.costo === undefined) sg.costo = 0;
                     if(sg.limite === undefined) sg.limite = 5;
                 });
+                // Configurar Combo Upsell por defecto a true si no existe
+                if (configGlobal.combo_upsell === undefined) configGlobal.combo_upsell = true;
+                
                 delete jsonCompleto._goxion_config; 
             } else {
                 configGlobal.serviciosGlobales = DEFAULT_SERVICES;
+                configGlobal.combo_upsell = true;
             }
 
             clientesDict = jsonCompleto;
@@ -345,6 +359,8 @@
                 if(!clientesDict[k].estado) clientesDict[k].estado = "pendiente";
             });
 
+            // Seteo de los switches en la UI
+            document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
             document.getElementById("alert-type").value = configGlobal.alertas?.falla || "presentando intermitencias temporales";
             document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
@@ -412,6 +428,8 @@
             container.innerHTML += `
                 <tr>
                     <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)"></td>
+                    <!-- CAMPO ETIQUETA -->
+                    <td><input type="text" placeholder="Ej: Promo" value="${srv.etiqueta || ''}" onchange="updateGlobalService(${index}, 'etiqueta', this.value)"></td>
                     <td><input type="number" style="color:var(--neon-green);" value="${cuentasMultiplicador}" onchange="updateGlobalService(${index}, 'cuentas', this.value)" title="Cuentas Madres Activas"></td>
                     <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)"></td>
                     <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)"></td>
@@ -429,7 +447,7 @@
     }
 
     function updateGlobalService(index, field, value) {
-        if (field !== 'nombre') value = parseFloat(value) || 0;
+        if (field !== 'nombre' && field !== 'etiqueta') value = parseFloat(value) || 0;
         configGlobal.serviciosGlobales[index][field] = value;
         calcularInventarioYFinanzas();
         renderGlobalServicesUI(); 
@@ -437,7 +455,7 @@
     }
 
     function addGlobalService() {
-        configGlobal.serviciosGlobales.push({nombre: "Nuevo", cuentas: 1, precio: 0, costo: 0, limite: 5});
+        configGlobal.serviciosGlobales.push({nombre: "Nuevo", etiqueta: "", cuentas: 1, precio: 0, costo: 0, limite: 5});
         calcularInventarioYFinanzas();
         renderGlobalServicesUI();
         filtrarClientes();
@@ -470,6 +488,11 @@
         const settingsDiv = document.getElementById("alert-settings");
         settingsDiv.style.opacity = isActive ? "1" : "0.5";
         settingsDiv.style.pointerEvents = isActive ? "auto" : "none";
+    }
+    
+    // Función para el switch del Upsell (Combo GOXION)
+    function toggleComboUpsell() {
+        configGlobal.combo_upsell = document.getElementById("combo-active").checked;
     }
 
     function filtrarClientes() {
@@ -508,6 +531,29 @@
         const plataformasInvitacion = ['youtube', 'microsoft', 'google', 'apple', 'spotify', 'one 2tb', '365'];
         const nombreMin = nombreServicio.toLowerCase();
         return plataformasInvitacion.some(plat => nombreMin.includes(plat));
+    }
+
+    // Funciones para manejar Referidos
+    function toggleReferido(key, isChecked) {
+        if (isChecked) {
+            clientesDict[key].referido_activo = { nombre: "", plataformas: 2, meses: 1 };
+        } else {
+            delete clientesDict[key].referido_activo;
+        }
+        filtrarClientes(); // Refresca la vista
+        
+        // Mantener los detalles abiertos después de renderizar
+        const details = document.getElementById(`details-${key}`);
+        if(details) {
+            details.style.display = "block";
+            document.getElementById(`toggle-text-${key}`).innerHTML = "Ocultar detalles ▴";
+        }
+    }
+
+    function updateReferido(key, field, value) {
+        if (!clientesDict[key].referido_activo) return;
+        if (field !== 'nombre') value = parseInt(value) || 1;
+        clientesDict[key].referido_activo[field] = value;
     }
 
     function renderizarClientes(diccionario) {
@@ -557,6 +603,24 @@
             let statusBadge = enRevision ? 'EN REVISIÓN 🔔' : (cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE'));
             
             let pulseAnim = enRevision ? 'animation: pulse 1.5s infinite;' : '';
+
+            // GENERACIÓN DE BLOQUE DE REFERIDOS
+            let refActivo = cliente.referido_activo;
+            let refHTML = `
+                <div style="margin-top: 15px; padding: 10px; background: rgba(188, 19, 254, 0.05); border: 1px dashed rgba(188, 19, 254, 0.3); border-radius: 8px;">
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px;">
+                        <strong style="color: var(--neon-purple); font-size: 0.85rem;">🎁 Referido Activo (Mes Gratis)</strong>
+                        <label class="switch" style="transform: scale(0.7); margin:0;"><input type="checkbox" ${refActivo ? 'checked' : ''} onchange="toggleReferido('${key}', this.checked)"><span class="slider"></span></label>
+                    </div>
+                    ${refActivo ? `
+                    <div style="display:flex; gap: 8px; flex-wrap: wrap;">
+                        <input type="text" placeholder="Nombre Invitado" style="flex:2; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:4px;" value="${refActivo.nombre || ''}" onchange="updateReferido('${key}', 'nombre', this.value)">
+                        <input type="number" placeholder="Plataformas" title="Plataformas Contratadas" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:4px;" value="${refActivo.plataformas || 2}" onchange="updateReferido('${key}', 'plataformas', this.value)">
+                        <input type="number" placeholder="Mes" title="Meses Activos (1 a 3)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-green); border-radius:4px; padding:4px; font-weight:bold;" value="${refActivo.meses || 1}" min="1" max="3" onchange="updateReferido('${key}', 'meses', this.value)">
+                    </div>
+                    ` : `<div style="font-size: 0.75rem; color: var(--text-muted);">El cliente no tiene referidos en validación actualmente.</div>`}
+                </div>
+            `;
 
             const card = document.createElement("div");
             card.className = "client-card";
@@ -614,6 +678,8 @@
                         </div>
                         <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Copiar Link del Cliente</button>
                     </div>
+
+                    ${refHTML}
 
                     ${enRevision ? `
                     <div style="width: 100%; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(188, 19, 254, 0.3);">
@@ -720,9 +786,11 @@
             falla: document.getElementById("alert-type").value,
             mensaje: document.getElementById("global-msg").value
         };
+        // Nos aseguramos de guardar la variable global del Combo Upsell
+        configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: Cambios guardados",
+            message: "🤖 Admin Update: Cambios guardados (Referidos, Etiquetas, Combo)",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
