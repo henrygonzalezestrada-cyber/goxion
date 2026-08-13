@@ -351,10 +351,16 @@
         "perfil_pin": ""
       }
     ],
-    "descuento_especial": {
-      "concepto": "Abono",
-      "monto": 150
-    }
+    "descuentos_especiales": [
+      {
+        "concepto": "Abono",
+        "monto": 150
+      },
+      {
+        "concepto": "Caída YouTube",
+        "monto": 69
+      }
+    ]
   },
   "alondra": {
     "folio": "GX-2026-0010",
@@ -630,5 +636,26 @@
       "concepto": "Caída YouTube",
       "monto": 69
     }
+  },
+  "quetzaly": {
+    "folio": "GX-2026-0020",
+    "nombre": "Quetzaly",
+    "codigo": "1234",
+    "pagos_puntuales": 0,
+    "dia_pago": 9,
+    "estado": "pagado",
+    "pago_en_revision": false,
+    "historial_pagos": [],
+    "servicios": [
+      {
+        "nombre": "Prime Video",
+        "monto": 45,
+        "correo_login": "",
+        "perfil_nombre": "",
+        "perfil_pin": ""
+      }
+    ],
+    "descuentos_especiales": [],
+    "descuento_fallas": 0
   }
 }
