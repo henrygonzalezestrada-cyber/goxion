@@ -350,7 +350,11 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "descuento_especial": {
+      "concepto": "Abono",
+      "monto": 150
+    }
   },
   "alondra": {
     "folio": "GX-2026-0010",
@@ -390,7 +394,11 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "descuento_especial": {
+      "concepto": "Caída YouTube ",
+      "monto": 69
+    }
   },
   "luis": {
     "folio": "GX-2026-0011",
@@ -617,6 +625,10 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "descuento_especial": {
+      "concepto": "Caída YouTube",
+      "monto": 69
+    }
   }
 }
