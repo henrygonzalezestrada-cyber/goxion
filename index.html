@@ -352,7 +352,22 @@
       }
 
       let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
-      let totalFinal = (subtotal - ahorro) + montoMora + montoBajaAdmin;
+      
+      // =========================================================
+      // INYECCIÓN: Lectura de Descuentos Especiales y Trato Justo
+      // =========================================================
+      let descuentoEspecial = cliente.descuento_especial ? (parseFloat(cliente.descuento_especial.monto) || 0) : 0;
+      let conceptoEspecial = cliente.descuento_especial ? (cliente.descuento_especial.concepto || "Descuento Especial") : "";
+
+      let descuentoTratoJusto = cliente.trato_justo ? (parseFloat(cliente.trato_justo.monto) || 0) : 0;
+      let conceptoTratoJusto = cliente.trato_justo ? (cliente.trato_justo.concepto || "Garantía Trato Justo") : "";
+      
+      let ahorroTotal = ahorro + descuentoEspecial + descuentoTratoJusto;
+      // =========================================================
+
+      let totalFinal = (subtotal - ahorroTotal) + montoMora + montoBajaAdmin;
+      if (totalFinal < 0) totalFinal = 0; // Evitamos totales negativos
+
       let labelTotal = "Total a Pagar";
       
       const msgPagoWA = encodeURIComponent(`Hola GOXION, adjunto mi comprobante de pago por $${totalFinal.toFixed(2)} MXN para el Folio ${cliente.folio} (${cliente.nombre}).`);
@@ -380,11 +395,13 @@
       }
 
       let breakdownHTML = '';
-      if (cliente.estado !== 'pagado' && (ahorro > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+      if (cliente.estado !== 'pagado' && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
             <div class="glass-card breakdown-box">
               <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
               ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento Lealtad</span><span>-$${ahorro}</span></div>` : ''}
+              ${descuentoEspecial > 0 ? `<div class="breakdown-line discount-line"><span>${conceptoEspecial}</span><span>-$${descuentoEspecial}</span></div>` : ''}
+              ${descuentoTratoJusto > 0 ? `<div class="breakdown-line discount-line"><span>${conceptoTratoJusto}</span><span>-$${descuentoTratoJusto}</span></div>` : ''}
               ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Mora (+${Math.round(pctMoraDiaria * 100)}%)</span><span>+$${montoMora}</span></div>` : ''}
               ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Reactivación</span><span>+$${montoBajaAdmin}</span></div>` : ''}
             </div>
