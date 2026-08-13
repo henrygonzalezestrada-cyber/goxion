@@ -157,7 +157,7 @@
         .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.2; }
 
         /* ==========================================================
-           CATÁLOGO ANIMADO (EXPANSIÓN DE IZQUIERDA Y DERECHA)
+           CATÁLOGO ANIMADO (EXPANSIÓN FIX)
            ========================================================== */
         .catalog-grid { 
             display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; justify-content: flex-start;
@@ -194,7 +194,6 @@
         .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; transition: 0.4s;}
         .catalog-card.expanded .cat-name { font-size: 18px; margin-bottom: 2px; }
 
-        /* Píldoras de Disponibilidad Clásicas */
         .cat-badge { font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 12px; display: inline-block; transition: 0.4s;}
         .cat-badge.ok { background: rgba(46, 160, 67, 0.25); color: var(--success-green); border: 1px solid rgba(46, 160, 67, 0.6); }
         .cat-badge.out { background: rgba(255, 51, 102, 0.25); color: var(--danger-red); border: 1px solid rgba(255, 51, 102, 0.6); }
@@ -254,7 +253,7 @@
 </head>
 <body class="no-scroll">
 
-    <div id="splash-screen">
+    <div id="splash-screen" onclick="hideSplash()">
         <div class="splash-content">
             <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
         </div>
@@ -343,7 +342,7 @@
             </div>
         </div>
 
-        <!-- DASHBOARD (Ahora es parte de la vista principal y reemplaza al inicio cuando inicias sesión) -->
+        <!-- DASHBOARD -->
         <div id="view-dashboard" class="view-section">
             <div id="dash-greeting-container" class="dash-greeting-box">
                 <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
@@ -532,9 +531,6 @@
             } else {
                 document.getElementById('view-inicio').classList.add('active');
             }
-            // COMBINED LOADING LOGIC
-            setTimeout(hideSplash, 1800); 
-            cargarDatosYVerificarSesion(); 
         });
 
         const rotatorTexts = [
@@ -560,16 +556,16 @@
 
         const INFO_SERVICIOS = {
             "netflix": "Vive una experiencia superior con tu perfil totalmente individual y personalizable con PIN. Disfruta películas y estrenos en calidad 4K Ultra HD y sonido Dolby Atmos. Tu historial, lista de favoritos y recomendaciones se mantienen completamente privados.",
-            "disney": "Acceso ilimitado al catálogo de Disney, Pixar, Marvel, Star Wars and National Geographic en calidad 4K UHD. Disfruta de un perfil individual para descargas offline and visualización cómoda sin interrupciones.",
-            "max": "Suscripción Platino con calidad de video 4K UHD. Disfruta del universo de HBO, Warner Bros, DC Comics and Cartoon Network. Tu perfil privado garantiza que siempre reanudes donde te quedaste.",
-            "prime": "Accede al catálogo completo de Prime Video. Perfil personalizado, reproducción en calidad superior 4K and descargas habilitadas para disfrutar contenido sin conexión a internet.",
-            "youtube": "¡Doble beneficio! Incluye YouTube Premium (videos sin anuncios) and acceso total a YouTube Music Premium. Reproducción en segundo plano and descargas offline para todos tus dispositivos móviles o TV.",
-            "vix": "Todos los partidos de la Liga MX, contenido de TV exclusivo, telenovelas and los mejores estrenos premium en español sin una sola interrupción publicitaria.",
-            "crunchyroll": "Membresía Mega Fan. Disfruta del anime sin publicidad, episodios de estreno simulcast and visualización offline.<br><br><span style='color:var(--neon-blue); font-weight:bold;'>🔹 Perfil Individual:</span> $45 MXN<br><span style='color:var(--neon-blue); font-weight:bold;'>👑 Cuenta Completa (4 Perfiles):</span> $100 MXN<br><br><em>(Usa los botones de abajo para elegir la cantidad de perfiles, o escríbenos directo si deseas la cuenta completa)</em>.",
-            "spotify": "Música infinita sin anuncios, opción para descargas and calidad de sonido superior. Podemos asignarte un perfil individual o hacer el Upgrade a tu propia cuenta personal.",
-            "microsoft": "Membresía Microsoft 36 Family. Incluye 1TB de almacenamiento seguro en nube (OneDrive) and acceso completo a las aplicaciones premium (Word, Excel, PowerPoint) para tus dispositivos.",
-            "google": "Expande rápidamente tu almacenamiento en la nube para Google Drive, Gmail and Google Fotos. Además, desbloquea las funciones de edición avanzadas en la aplicación de Fotos.",
-            "default": "Perfil individual, seguro and estable. Garantizamos protección total, reposición inmediata en caso de caídas and soporte técnico dedicado durante todo tu periodo de suscripción."
+            "disney": "Acceso ilimitado al catálogo de Disney, Pixar, Marvel, Star Wars y National Geographic en calidad 4K UHD. Disfruta de un perfil individual para descargas offline y visualización cómoda sin interrupciones.",
+            "max": "Suscripción Platino con calidad de video 4K UHD. Disfruta del universo de HBO, Warner Bros, DC Comics y Cartoon Network. Tu perfil privado garantiza que siempre reanudes donde te quedaste.",
+            "prime": "Accede al catálogo completo de Prime Video. Perfil personalizado, reproducción en calidad superior 4K y descargas habilitadas para disfrutar contenido sin conexión a internet.",
+            "youtube": "¡Doble beneficio! Incluye YouTube Premium (videos sin anuncios) y acceso total a YouTube Music Premium. Reproducción en segundo plano y descargas offline para todos tus dispositivos móviles o TV.",
+            "vix": "Todos los partidos de la Liga MX, contenido de TV exclusivo, telenovelas y los mejores estrenos premium en español sin una sola interrupción publicitaria.",
+            "crunchyroll": "Membresía Mega Fan. Disfruta del anime sin publicidad, episodios de estreno simulcast y visualización offline.<br><br><span style='color:var(--neon-blue); font-weight:bold;'>🔹 Perfil Individual:</span> $45 MXN<br><span style='color:var(--neon-blue); font-weight:bold;'>👑 Cuenta Completa (4 Perfiles):</span> $100 MXN<br><br><em>(Usa los botones de abajo para elegir la cantidad de perfiles, o escríbenos directo si deseas la cuenta completa)</em>.",
+            "spotify": "Música infinita sin anuncios, opción para descargas y calidad de sonido superior. Podemos asignarte un perfil individual o hacer el Upgrade a tu propia cuenta personal.",
+            "microsoft": "Membresía Microsoft 365 Family. Incluye 1TB de almacenamiento seguro en nube (OneDrive) y acceso completo a las aplicaciones premium (Word, Excel, PowerPoint) para tus dispositivos.",
+            "google": "Expande rápidamente tu almacenamiento en la nube para Google Drive, Gmail y Google Fotos. Además, desbloquea las funciones de edición avanzadas en la aplicación de Fotos.",
+            "default": "Perfil individual, seguro y estable. Garantizamos protección total, reposición inmediata en caso de caídas y soporte técnico dedicado durante todo tu periodo de suscripción."
         };
 
         function hideSplash() {
@@ -581,6 +577,11 @@
                 document.body.classList.remove('no-scroll'); 
             }, 600);
         }
+
+        window.addEventListener('load', () => { 
+            setTimeout(hideSplash, 1800); 
+            cargarDatosYVerificarSesion(); 
+        });
 
         function switchTab(tabName) {
             ['inicio', 'catalogo', 'soporte'].forEach(name => {
@@ -704,7 +705,7 @@
                 switchTab('inicio');
             } 
             else { 
-                errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre and Código."; 
+                errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código."; 
                 errorMsg.style.display = 'block'; 
             }
         }
@@ -812,12 +813,12 @@
                 refContainer.innerHTML = `
                 <div class="glass-card referral-card">
                     <div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div>
-                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate and cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
+                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
                     <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                         <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input">
                         <button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button>
                     </div>
-                    <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos and decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">📲 Compartir por WhatsApp</button>
+                    <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">📲 Compartir por WhatsApp</button>
                     <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
                 </div>`;
             }
@@ -910,8 +911,6 @@
                 });
                 card.classList.add('expanded');
                 btn.innerText = "⬆️ Ocultar detalles";
-                
-                // removed scrollIntoView per user request to form single-column continuous flow
             }
         }
 
@@ -1049,13 +1048,13 @@
             "Netflix": [ 
                 { 
                     issue: "🔑 Solicitar Código de Acceso", 
-                    instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla and envíanos la solicitud. Te responderemos con el código al instante.", 
+                    instructions: "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.<br>2. Al hacerlo, el sistema enviará un código <strong>al correo que nosotros administramos</strong>.<br>3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.", 
                     labelInput: "Correo que aparece en tu TV:", 
                     templateWA: "Hola GOXION, acabo de enviar un código al correo asignado. Solicito CÓDIGO DE ACCESO para NETFLIX.\n\n👤 Correo en pantalla: " 
                 }, 
                 { 
                     issue: "📺 Tu TV pide Actualizar Hogar", 
-                    instructions: "1. Selecciona <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación <strong>a nuestra bandeja</strong>.<br>3. Ingresa abajo el correo que aparece en pantalla and envíanos tu solicitud para autorizar tu TV.", 
+                    instructions: "1. Selecciona <strong>'Actualizar Hogar'</strong> en tu TV.<br>2. La pantalla enviará un correo de confirmación <strong>a nuestra bandeja</strong>.<br>3. Ingresa abajo el correo que aparece en pantalla y envíanos tu solicitud para autorizar tu TV.", 
                     labelInput: "Correo que aparece en tu TV:", 
                     templateWA: "Hola GOXION, mi TV pide actualizar HOGAR en NETFLIX. Ya envié el correo de autorización.\n\n📧 Correo en pantalla: " 
                 }, 
@@ -1069,7 +1068,7 @@
             "Disney+": [ 
                 { 
                     issue: "🔑 Código de Verificación", 
-                    instructions: "1. Ingresa a la app and presiona 'Continuar' con el correo asignado.<br>2. La plataforma enviará un código de 6 dígitos <strong>a nuestra bandeja de entrada</strong>.<br>3. Escribe el correo aquí abajo para indícanos que ya lo solicitaste and te lo enviaremos.", 
+                    instructions: "1. Ingresa a la app y presiona 'Continuar' con el correo asignado.<br>2. La plataforma enviará un código de 6 dígitos <strong>a nuestra bandeja de entrada</strong>.<br>3. Escribe el correo aquí abajo para indicarnos que ya lo solicitaste y te lo enviaremos.", 
                     labelInput: "El correo que acabas de ingresar:", 
                     templateWA: "Hola GOXION, solicito CÓDIGO DE VERIFICACIÓN para DISNEY+.\n\n📧 Correo: " 
                 }, 
@@ -1097,7 +1096,7 @@
             "Prime Video": [ 
                 { 
                     issue: "📺 Registrar Dispositivo", 
-                    instructions: "1. Abre Prime Video and presiona 'Identifícate'.<br>2. Mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.", 
+                    instructions: "1. Abre Prime Video y presiona 'Identifícate'.<br>2. Mostrará un código de registro en pantalla.<br>3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.", 
                     labelInput: "Código en Pantalla de TV:", 
                     templateWA: "Hola GOXION, solicito vincular mi TV a PRIME VIDEO.\n\n📺 Código TV: " 
                 } 
@@ -1129,7 +1128,7 @@
             "Microsoft": [ 
                 { 
                     issue: "💻 Reenviar Invitación familiar", 
-                    instructions: "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar and enviarte el enlace nuevamente.", 
+                    instructions: "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar y enviarte el enlace nuevamente.", 
                     labelInput: "Tu correo Outlook/Hotmail:", 
                     templateWA: "Hola GOXION, necesito que me reenvíen la invitación de MICROSOFT 365.\n\n📧 Correo: " 
                 } 
@@ -1145,7 +1144,7 @@
             "Default": [ 
                 { 
                     issue: "🔑 Solicitar Código / Asistencia", 
-                    instructions: "Inicia sesión en tu dispositivo. Si te solicita un código o confirmación por correo, presiona 'Enviar' and indícanos tu correo o código en pantalla para proceder.", 
+                    instructions: "Inicia sesión en tu dispositivo. Si te solicita un código o confirmación por correo, presiona 'Enviar' e indícanos tu correo o código en pantalla para proceder.", 
                     labelInput: "Dato en pantalla / Correo:", 
                     templateWA: "Hola GOXION, requiero asistencia/código para la plataforma seleccionada.\n\n📱 Dato: " 
                 } 
