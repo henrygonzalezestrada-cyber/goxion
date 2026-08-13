@@ -128,7 +128,7 @@
         .referral-card { border-color: rgba(124, 77, 255, 0.3); }
         .referral-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
         .referral-title { font-size: 13px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
-        .referral-status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700; background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border: 1px solid rgba(124, 77, 255, 0.4); loosened; }
+        .referral-status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 700; background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border: 1px solid rgba(124, 77, 255, 0.4); }
         .referral-stats { display: flex; justify-content: space-between; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 12px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.05); }
         .stat-box { text-align: center; flex: 1; }
         .stat-val { font-size: 16px; font-weight: 700; color: var(--neon-blue); }
@@ -157,10 +157,10 @@
         .btn-menu div { font-weight: 600; font-size: 13px; line-height: 1.2; }
 
         /* ==========================================================
-           CATÁLOGO ANIMADO (EXPANSIÓN FIX)
+           CATÁLOGO ANIMADO (EXPANSIÓN DE IZQUIERDA Y DERECHA)
            ========================================================== */
         .catalog-grid { 
-            display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; justify-content: flex-start;
+            display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; justify-content: space-between;
         }
         
         .catalog-card {
@@ -172,6 +172,9 @@
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.15), 0 10px 20px rgba(0,0,0,0.3);
             position: relative; overflow: hidden;
         }
+        
+        /* Magia para expandir de derecha a izquierda si está en la 2da columna */
+        .catalog-card:nth-child(even) { margin-left: auto; }
         
         .catalog-card:hover { transform: translateY(-3px); box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.2), 0 15px 30px rgba(0,0,0,0.4); }
         .catalog-card.expanded { width: 100%; text-align: left; }
@@ -194,6 +197,7 @@
         .cat-name { font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; transition: 0.4s;}
         .catalog-card.expanded .cat-name { font-size: 18px; margin-bottom: 2px; }
 
+        /* Píldoras de Disponibilidad Clásicas */
         .cat-badge { font-size: 10px; padding: 4px 8px; border-radius: 12px; font-weight: 700; margin-bottom: 12px; display: inline-block; transition: 0.4s;}
         .cat-badge.ok { background: rgba(46, 160, 67, 0.25); color: var(--success-green); border: 1px solid rgba(46, 160, 67, 0.6); }
         .cat-badge.out { background: rgba(255, 51, 102, 0.25); color: var(--danger-red); border: 1px solid rgba(255, 51, 102, 0.6); }
@@ -342,7 +346,7 @@
             </div>
         </div>
 
-        <!-- DASHBOARD -->
+        <!-- DASHBOARD (Ahora es parte de la vista principal y reemplaza al inicio cuando inicias sesión) -->
         <div id="view-dashboard" class="view-section">
             <div id="dash-greeting-container" class="dash-greeting-box">
                 <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
@@ -911,6 +915,7 @@
                 });
                 card.classList.add('expanded');
                 btn.innerText = "⬆️ Ocultar detalles";
+                // ELIMINADA LA FUNCIÓN scrollIntoView A PETICIÓN TUYA (Evita que pegue el salto hacia abajo)
             }
         }
 
@@ -1153,6 +1158,9 @@
 
         function srvCleanName(n) { return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa",""); }
 
+        // =========================================================================
+        // NUEVO SISTEMA DE IMÁGENES PARA SOPORTE (Reemplaza los emojis)
+        // =========================================================================
         function renderizarSoporteDinamico(data) {
             const config = data._goxion_config; 
             const container = document.getElementById('support-platforms-grid'); 
