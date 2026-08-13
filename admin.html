@@ -98,6 +98,7 @@
         .btn-icon:hover { color: var(--text-main); background: rgba(255,255,255,0.1); transform: scale(1.1); }
         .btn-icon.danger:hover { color: var(--neon-red); background: rgba(255,0,60,0.1); }
         .btn-icon.info:hover { color: var(--neon-blue); background: rgba(0,242,254,0.1); }
+        .btn-icon.warning:hover { color: var(--neon-yellow); background: rgba(248,232,0,0.1); }
         
         .btn-add-service { background: rgba(188, 19, 254, 0.05); color: var(--neon-purple); border: 1px dashed rgba(188, 19, 254, 0.5); width: 100%; padding: 10px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: bold; margin-top: 15px; transition: 0.3s; }
         .btn-add-service:hover { background: rgba(188, 19, 254, 0.15); border-style: solid; }
@@ -211,7 +212,6 @@
     </div>
 
     <div id="tab-inventario" class="tab-content">
-        <!-- NUEVO PANEL: CONFIGURACIONES DE APP (COMBO UPSPELL) -->
         <div class="panel">
             <h2 class="section-title">Configuraciones de App</h2>
             <div class="switch-row">
@@ -245,7 +245,6 @@
                     <thead>
                         <tr>
                             <th>Servicio</th>
-                            <!-- NUEVA COLUMNA DE ETIQUETA -->
                             <th title="Etiqueta visible para el cliente (Ej: Promo, Nuevo)">Etiqueta</th>
                             <th title="Cuentas Activas Contratadas">Ctas</th>
                             <th title="Precio de Venta">Venta</th>
@@ -343,7 +342,6 @@
                     if(sg.costo === undefined) sg.costo = 0;
                     if(sg.limite === undefined) sg.limite = 5;
                 });
-                // Configurar Combo Upsell por defecto a true si no existe
                 if (configGlobal.combo_upsell === undefined) configGlobal.combo_upsell = true;
                 
                 delete jsonCompleto._goxion_config; 
@@ -359,7 +357,6 @@
                 if(!clientesDict[k].estado) clientesDict[k].estado = "pendiente";
             });
 
-            // Seteo de los switches en la UI
             document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
             document.getElementById("alert-type").value = configGlobal.alertas?.falla || "presentando intermitencias temporales";
@@ -394,8 +391,20 @@
             if (cliente.estado !== 'suspendido' && cliente.servicios) {
                 cliente.servicios.forEach(s => {
                     ingresosTotales += parseFloat(s.monto || 0);
-                    let baseNameMatch = configGlobal.serviciosGlobales.find(g => s.nombre.includes(g.nombre));
-                    if(baseNameMatch) inventarioActivo[baseNameMatch.nombre]++;
+                    
+                    // LÓGICA INTELIGENTE DE COMBOS (Busca palabras clave en el nombre del servicio)
+                    let nombreCliente = s.nombre.toLowerCase();
+                    let multiplier = 1; 
+                    let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
+                    if (matchQuant) multiplier = parseInt(matchQuant[1]);
+                    
+                    configGlobal.serviciosGlobales.forEach(g => {
+                        // Limpiamos palabras que puedan confundir (como premium, platino)
+                        let keyword = g.nombre.replace(/ Premium| Standard| Platino| Cuenta completa| 2TB| 365/gi, '').trim().toLowerCase();
+                        if (nombreCliente.includes(keyword)) {
+                            inventarioActivo[g.nombre] += multiplier;
+                        }
+                    });
                 });
             }
         });
@@ -428,7 +437,6 @@
             container.innerHTML += `
                 <tr>
                     <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)"></td>
-                    <!-- CAMPO ETIQUETA -->
                     <td><input type="text" placeholder="Ej: Promo" value="${srv.etiqueta || ''}" onchange="updateGlobalService(${index}, 'etiqueta', this.value)"></td>
                     <td><input type="number" style="color:var(--neon-green);" value="${cuentasMultiplicador}" onchange="updateGlobalService(${index}, 'cuentas', this.value)" title="Cuentas Madres Activas"></td>
                     <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)"></td>
@@ -490,7 +498,6 @@
         settingsDiv.style.pointerEvents = isActive ? "auto" : "none";
     }
     
-    // Función para el switch del Upsell (Combo GOXION)
     function toggleComboUpsell() {
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
     }
@@ -533,16 +540,13 @@
         return plataformasInvitacion.some(plat => nombreMin.includes(plat));
     }
 
-    // Funciones para manejar Referidos
     function toggleReferido(key, isChecked) {
         if (isChecked) {
             clientesDict[key].referido_activo = { nombre: "", plataformas: 2, meses: 1 };
         } else {
             delete clientesDict[key].referido_activo;
         }
-        filtrarClientes(); // Refresca la vista
-        
-        // Mantener los detalles abiertos después de renderizar
+        filtrarClientes();
         const details = document.getElementById(`details-${key}`);
         if(details) {
             details.style.display = "block";
@@ -554,6 +558,39 @@
         if (!clientesDict[key].referido_activo) return;
         if (field !== 'nombre') value = parseInt(value) || 1;
         clientesDict[key].referido_activo[field] = value;
+    }
+
+    // FUNCIONES DE DESCUENTOS Y TRATO JUSTO
+    function aplicarTratoJusto(key, montoServicio) {
+        if(!confirm("¿Aplicar descuento de Trato Justo (5% del valor de este servicio) al cliente?")) return;
+        let descuento = montoServicio * 0.05;
+        if(!clientesDict[key].descuento_fallas) clientesDict[key].descuento_fallas = 0;
+        clientesDict[key].descuento_fallas += descuento;
+        calcularInventarioYFinanzas();
+        filtrarClientes();
+    }
+
+    function resetearDescuentoFallas(key) {
+        clientesDict[key].descuento_fallas = 0;
+        calcularInventarioYFinanzas();
+        filtrarClientes();
+    }
+
+    function agregarDescuentoEspecial(key) {
+        let concepto = prompt("Concepto del descuento (Ej. Promo Especial o Compensación):");
+        if(!concepto) return;
+        let monto = prompt("Cantidad a descontar en $ (Ej. 50):");
+        if(!monto || isNaN(monto)) return;
+        
+        clientesDict[key].descuento_especial = { concepto: concepto, monto: parseFloat(monto) };
+        calcularInventarioYFinanzas();
+        filtrarClientes();
+    }
+
+    function eliminarDescuentoEspecial(key) {
+        delete clientesDict[key].descuento_especial;
+        calcularInventarioYFinanzas();
+        filtrarClientes();
     }
 
     function renderizarClientes(diccionario) {
@@ -585,6 +622,7 @@
                                 <span style="font-weight: 600;">${s.nombre}</span>
                                 <span style="display:flex; align-items:center;">
                                     <strong style="color:var(--neon-blue); margin-right: 8px;">$${s.monto}</strong>
+                                    <button class="btn-icon warning" style="font-size:0.8rem; margin-right:4px;" onclick="aplicarTratoJusto('${key}', ${s.monto})" title="Aplicar Descuento Trato Justo🚨">🚨</button>
                                     <button class="btn-icon danger" style="font-size:0.8rem;" onclick="removeClientService('${key}', ${sIdx})" title="Quitar servicio">✖</button>
                                 </span>
                             </div>
@@ -598,13 +636,39 @@
                 });
             } else { clientServicesHTML = `<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 10px 0;">Sin servicios activos asignados</div>`; }
 
+            // SECCIÓN DE DESCUENTOS EXTRA INYECTADA
+            let descuentosHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+                    <span style="font-size:0.8rem; color:var(--text-muted); text-transform:uppercase;">Descuentos Extra y Trato Justo</span>
+                    <button class="btn-save" style="padding: 4px 8px; font-size: 0.8rem; background:rgba(0, 242, 254, 0.2); color:var(--neon-blue);" onclick="agregarDescuentoEspecial('${key}')">+ Añadir Descuento</button>
+                </div>
+            `;
+            if (cliente.descuento_especial) {
+                descuentosHTML += `
+                <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--neon-blue); font-weight:bold;">${cliente.descuento_especial.concepto}</div>
+                        <div style="font-size:0.85rem; color:#fff;">-$${cliente.descuento_especial.monto}</div>
+                    </div>
+                    <button class="btn-icon danger" onclick="eliminarDescuentoEspecial('${key}')">✖</button>
+                </div>`;
+            }
+            if (cliente.descuento_fallas) {
+                descuentosHTML += `
+                <div style="background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning-amber); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-size:0.75rem; color:var(--warning-amber); font-weight:bold;">Garantía Trato Justo (-5% aplicados)</div>
+                        <div style="font-size:0.85rem; color:#fff;">-$${cliente.descuento_fallas.toFixed(2)}</div>
+                    </div>
+                    <button class="btn-icon danger" onclick="resetearDescuentoFallas('${key}')" title="Resetear a 0">✖</button>
+                </div>`;
+            }
+
             let enRevision = cliente.pago_en_revision === true;
             let statusColor = enRevision ? 'var(--neon-purple)' : (cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)'));
             let statusBadge = enRevision ? 'EN REVISIÓN 🔔' : (cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE'));
-            
             let pulseAnim = enRevision ? 'animation: pulse 1.5s infinite;' : '';
 
-            // GENERACIÓN DE BLOQUE DE REFERIDOS
             let refActivo = cliente.referido_activo;
             let refHTML = `
                 <div style="margin-top: 15px; padding: 10px; background: rgba(188, 19, 254, 0.05); border: 1px dashed rgba(188, 19, 254, 0.3); border-radius: 8px;">
@@ -664,6 +728,7 @@
                             <select id="add-srv-sel-${key}">${globalOptions}</select>
                             <button class="btn-save" style="padding:6px 12px; font-size: 1.1rem; line-height: 1;" onclick="addClientService('${key}')" title="Añadir">+</button>
                         </div>
+                        ${descuentosHTML}
                     </div>
 
                     <div class="card-actions-row">
@@ -676,7 +741,7 @@
                                 <button class="btn-icon danger" style="margin-left: 8px; font-size: 1rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha a 0">🔄</button>
                             </div>
                         </div>
-                        <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Copiar Link del Cliente</button>
+                        <button class="btn-copy" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Copiar Link</button>
                     </div>
 
                     ${refHTML}
@@ -701,6 +766,9 @@
         cli.estado = "pagado";
         cli.pago_en_revision = false;
         cli.pagos_puntuales = (cli.pagos_puntuales || 0) + 1;
+        
+        // Al pagar, se resetean los descuentos por fallas (trato justo), el especial lo dejas si quieres que sea fijo, o lo borras si era una sola vez. Aquí reseteamos los de fallas por mes.
+        cli.descuento_fallas = 0;
         
         if(!cli.historial_pagos) cli.historial_pagos = [];
         const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
@@ -786,11 +854,10 @@
             falla: document.getElementById("alert-type").value,
             mensaje: document.getElementById("global-msg").value
         };
-        // Nos aseguramos de guardar la variable global del Combo Upsell
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: Cambios guardados (Referidos, Etiquetas, Combo)",
+            message: "🤖 Admin Update: Combos, Webhooks y Descuentos aplicados",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
