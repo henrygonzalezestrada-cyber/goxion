@@ -12,14 +12,16 @@
         "precio": 109,
         "cuentas": 1,
         "costo": 329,
-        "limite": 4
+        "limite": 4,
+        "etiqueta": "Popular 🔥"
       },
       {
         "nombre": "Disney+ Premium",
         "precio": 89,
         "cuentas": 1,
         "costo": 319,
-        "limite": 6
+        "limite": 6,
+        "etiqueta": "Popular 🔥"
       },
       {
         "nombre": "HBO Max Platino",
@@ -40,7 +42,8 @@
         "precio": 89,
         "cuentas": 3,
         "costo": 279,
-        "limite": 5
+        "limite": 5,
+        "etiqueta": "Incluye Music 💿"
       },
       {
         "nombre": "Vix Premium",
@@ -70,7 +73,8 @@
         "costo": 0,
         "limite": 5
       }
-    ]
+    ],
+    "combo_upsell": true
   },
   "perla": {
     "folio": "GX-2026-0001",
@@ -89,7 +93,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "referido_activo": {
+      "nombre": "Quetzaly",
+      "plataformas": 1,
+      "meses": 1
+    }
   },
   "rodas": {
     "folio": "GX-2026-0002",
@@ -142,7 +151,7 @@
     "codigo": "1234",
     "pagos_puntuales": 4,
     "dia_pago": 15,
-    "estado": "pagado",
+    "estado": "pendiente",
     "pago_en_revision": false,
     "historial_pagos": [
       {
@@ -348,7 +357,7 @@
     "nombre": "Alondra",
     "codigo": "1234",
     "pagos_puntuales": 0,
-    "dia_pago": 2,
+    "dia_pago": 15,
     "estado": "pendiente",
     "pago_en_revision": false,
     "historial_pagos": [],
