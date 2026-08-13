@@ -119,9 +119,6 @@
             opacity: 0.6; 
         }
 
-        /* =======================================================
-           ANIMACIONES DE LOS CÍRCULOS DE FONDO (RESTAURADAS)
-           ======================================================= */
         @keyframes floatOrbit1 { 
             0% { transform: rotate(0deg); } 
             100% { transform: rotate(360deg); } 
@@ -134,7 +131,6 @@
             0% { transform: rotate(0deg); } 
             100% { transform: rotate(360deg); } 
         }
-        /* ======================================================= */
 
         .container { 
             width: 100%; 
@@ -184,7 +180,6 @@
             box-shadow: 0 0 15px rgba(0,242,254,0.4); 
         }
 
-        /* BARRA FLOTANTE ESTILO iPHONE PARA "MI ESPACIO" */
         .sticky-client-bar {
             position: fixed; 
             top: 0; 
@@ -409,11 +404,6 @@
         .btn-shimmer:hover { 
             transform: translateY(-2px); 
             box-shadow: 0 0 30px rgba(124, 77, 255, 0.6); 
-        }
-
-        @keyframes shimmer { 
-            0% { left: -100%; } 
-            20%, 100% { left: 200%; } 
         }
 
         .trust-badges-container { 
@@ -1362,7 +1352,6 @@
         </div>
     </div>
 
-    <!-- BARRA ESTILO iPHONE PARA "MI ESPACIO" -->
     <div id="sticky-client-bar" class="sticky-client-bar">
         <div class="sticky-client-title">Tu Espacio, <span id="sticky-client-name"></span></div>
     </div>
@@ -1604,9 +1593,22 @@
 
     <script>
         const NUMERO_GOXION = "528136836901"; 
+        
+        // 🚨 AQUÍ PEGA TU URL DE WEBHOOK DE DISCORD PARA ALERTAS EN TIEMPO REAL 🚨
+        const WEBHOOK_DISCORD = ""; 
+
         let globalClientesData = null;
         let greetingInterval = null;
         let carritoPedidos = {};
+
+        function notificarAdmin(titulo, mensaje) {
+            if(!WEBHOOK_DISCORD) return;
+            fetch(WEBHOOK_DISCORD, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ content: `**${titulo}**\n${mensaje}` })
+            }).catch(e => console.log("Webhook no enviado", e));
+        }
 
         window.addEventListener('scroll', () => {
             const bar = document.getElementById('sticky-client-bar');
@@ -1814,6 +1816,7 @@
             
             const searchStr = normalizeString(inputId);
             let foundKey = null;
+            let clientName = "";
             
             for(let key in globalClientesData) {
                 if(key === '_goxion_config') continue;
@@ -1821,6 +1824,7 @@
                 if(normalizeString(key) === searchStr || normalizeString(cli.nombre) === searchStr || normalizeString(cli.folio) === searchStr) {
                     if(cli.codigo === inputPin || cli.pin === inputPin || cli.codigo_acceso === inputPin) { 
                         foundKey = key; 
+                        clientName = cli.nombre;
                         break; 
                     }
                 }
@@ -1832,6 +1836,7 @@
                 closeAuthSheet();
                 renderDashboard(foundKey); 
                 switchTab('inicio');
+                notificarAdmin("🟢 Nuevo Inicio de Sesión", `El cliente **${clientName}** acaba de entrar a su app.`);
             } else { 
                 errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código."; 
                 errorMsg.style.display = 'block'; 
@@ -1885,6 +1890,10 @@
 
             iniciarSaludoDinamico(cliente.nombre);
 
+            // CONTROL DEL UPSELL (COMBO)
+            let configGlobal = globalClientesData._goxion_config || {};
+            let isComboUpsellActive = configGlobal.combo_upsell !== false; 
+
             let hasPrime = false, hasHBO = false, hasCombo = false;
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach(s => {
@@ -1904,38 +1913,44 @@
                     <div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div>
                     <div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div>
                 </div>`; 
-            } else if(hasPrime) { 
-                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
-                upsellHTML = `
-                <div class="promo-card">
-                    <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
-                    <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
-                    <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button>
-                </div>`; 
-            } else if(hasHBO) { 
-                msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
-                upsellHTML = `
-                <div class="promo-card">
-                    <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
-                    <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
-                    <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button>
-                </div>`; 
+            } else if (isComboUpsellActive) {
+                if(hasPrime) { 
+                    msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
+                    upsellHTML = `
+                    <div class="promo-card">
+                        <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
+                        <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
+                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button>
+                    </div>`; 
+                } else if(hasHBO) { 
+                    msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
+                    upsellHTML = `
+                    <div class="promo-card">
+                        <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
+                        <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
+                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button>
+                    </div>`; 
+                }
             }
             document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
             if(cliente.referido_activo) {
                 let meses = cliente.referido_activo.meses || 1;
+                let plats = cliente.referido_activo.plataformas || 1;
+                let warningHTML = plats < 2 ? `<div style="background: rgba(255, 170, 0, 0.15); border: 1px dashed var(--warning-amber); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; color: var(--warning-amber);">⚠️ Casi lo logras. Tu referido solo contrató 1 plataforma. ¡Anímalo a sumar una más para desbloquear tu mes gratis!</div>` : '';
+                let borderStyle = plats < 2 ? 'border-color: var(--warning-amber);' : 'border-color: rgba(124, 77, 255, 0.3);';
+                
                 refContainer.innerHTML = `
-                <div class="glass-card referral-card">
+                <div class="glass-card referral-card" style="${borderStyle}">
                     <div class="referral-header">
                         <div class="referral-title"><span>🎁</span> Tu Referido Activo</div>
-                        <div class="referral-status-badge">En Validación</div>
+                        <div class="referral-status-badge" style="${plats < 2 ? 'background:rgba(255, 170, 0, 0.15); color:var(--warning-amber); border-color:var(--warning-amber);' : ''}">En Validación</div>
                     </div>
                     <p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${cliente.referido_activo.nombre || "Referido"}</p>
                     <div class="referral-stats">
                         <div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);">
-                            <div class="stat-val">${cliente.referido_activo.plataformas || 2}</div>
+                            <div class="stat-val" style="${plats < 2 ? 'color:var(--warning-amber);' : ''}">${plats}</div>
                             <div class="stat-label">Plataformas</div>
                         </div>
                         <div class="stat-box">
@@ -1947,6 +1962,7 @@
                     <div class="loyalty-progress-bg" style="height: 6px;">
                         <div class="loyalty-progress-fill" style="width: ${Math.min((meses / 3) * 100, 100)}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div>
                     </div>
+                    ${warningHTML}
                     <div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
                 </div>`;
             } else {
@@ -2104,9 +2120,7 @@
                         if (matchQuant) multiplier = parseInt(matchQuant[1]);
                         
                         config.serviciosGlobales.forEach(catSrv => {
-                            let nombreCatLow = catSrv.nombre.toLowerCase();
-                            if (nombreCatLow.includes('completa') !== nombreCliente.includes('completa')) return; 
-                            let keyword = nombreCatLow.replace(/ premium| video| platino| cuenta completa/g,'').trim();
+                            let keyword = catSrv.nombre.replace(/ Premium| Standard| Platino| Cuenta completa| 2TB| 365/gi, '').trim().toLowerCase();
                             if (nombreCliente.includes(keyword)) ocupados[catSrv.nombre] += multiplier;
                         });
                     });
@@ -2210,6 +2224,8 @@
                 }
             }
             msg += `\n*Total estimado: $${totalPrecio} MXN*\n¿Aún hay disponibilidad?`;
+            
+            notificarAdmin("🛒 Nuevo Intento de Pedido", `Un usuario está cotizando un pedido por **$${totalPrecio} MXN** desde la app.`);
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
@@ -2443,6 +2459,7 @@
                     if (srv.perfil_nombre) extraContext += `\n👤 Perfil: ${srv.perfil_nombre}`; 
                     if (srv.perfil_pin) extraContext += `\n🔢 PIN: ${srv.perfil_pin}`; 
                 }
+                notificarAdmin("🛠️ Nueva Petición de Soporte", `El cliente **${cliente.nombre}** solicitó ayuda para ${selectedPlat}.`);
             }
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA + val + extraContext)}`, '_blank');
         }
