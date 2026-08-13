@@ -119,6 +119,23 @@
             opacity: 0.6; 
         }
 
+        /* =======================================================
+           ANIMACIONES DE LOS CÍRCULOS DE FONDO (RESTAURADAS)
+           ======================================================= */
+        @keyframes floatOrbit1 { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        @keyframes floatOrbit2 { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(-360deg); } 
+        }
+        @keyframes floatOrbit3 { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+        /* ======================================================= */
+
         .container { 
             width: 100%; 
             max-width: 580px; 
@@ -167,9 +184,7 @@
             box-shadow: 0 0 15px rgba(0,242,254,0.4); 
         }
 
-        /* =======================================================
-           AQUÍ ESTÁ TU BARRA FLOTANTE ESTILO iPHONE PARA "MI ESPACIO" 
-           ======================================================= */
+        /* BARRA FLOTANTE ESTILO iPHONE PARA "MI ESPACIO" */
         .sticky-client-bar {
             position: fixed; 
             top: 0; 
@@ -209,7 +224,6 @@
         .sticky-client-title span { 
             color: var(--neon-blue); 
         }
-        /* ======================================================= */
 
         .alert-banner { 
             background: rgba(255, 170, 0, 0.15); 
@@ -866,15 +880,12 @@
             line-height: 1.2; 
         }
 
-        /* ==========================================================
-           CATÁLOGO ANIMADO (EXPANSIÓN FIX - Sin Huecos)
-           ========================================================== */
+        /* CATÁLOGO ANIMADO */
         .catalog-grid { 
             display: flex; 
             flex-wrap: wrap; 
             gap: 15px; 
             align-items: flex-start; 
-            /* Importante para que no haya huecos, se alinean a la izquierda */
             justify-content: flex-start; 
         }
         
@@ -894,8 +905,6 @@
             position: relative; 
             overflow: hidden;
         }
-        
-        /* Eliminamos el margin-left: auto para evitar inestabilidad y huecos */
         
         .catalog-card:hover { 
             transform: translateY(-3px); 
@@ -1116,7 +1125,6 @@
             min-width: 20px; 
             text-align: center; 
         }
-        /* ========================================================== */
 
         .floating-cart { 
             position: fixed; 
@@ -1354,12 +1362,11 @@
         </div>
     </div>
 
-    <!-- BARRA ESTILO iPHONE PARA "MI ESPACIO" (SÍ ESTÁ AQUÍ Y FUNCIONANDO) -->
+    <!-- BARRA ESTILO iPHONE PARA "MI ESPACIO" -->
     <div id="sticky-client-bar" class="sticky-client-bar">
         <div class="sticky-client-title">Tu Espacio, <span id="sticky-client-name"></span></div>
     </div>
 
-    <!-- EL HEADER FIJO CON EL BOTON QUE CAMBIA DINÁMICAMENTE -->
     <header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
         <img src="logo2.PNG" alt="GOXION" class="app-logo">
         <button class="header-action-btn" id="header-action-btn" onclick="toggleAuth()">👤 <span id="header-btn-text">Mi Espacio</span></button>
@@ -1394,7 +1401,6 @@
                     </div>
                 </div>
 
-                <!-- EL BOTÓN SHIMMER -->
                 <button class="btn-shimmer" onclick="window.open('https://wa.me/528136836901?text=Hola,%20quiero%20registrararme%20y%20obtener%20el%20descuento', '_blank')">
                     🎁 Únete hoy y obtén -10% OFF
                 </button>
@@ -1509,7 +1515,7 @@
         </div>
     </div>
 
-    <!-- EL BOTTOM SHEET AHORA SOLO SIRVE PARA EL FORMULARIO DE LOGIN -->
+    <!-- EL BOTTOM SHEET PARA EL FORMULARIO DE LOGIN -->
     <div id="auth-overlay" class="auth-overlay" onclick="closeAuthSheetEvent(event)">
         <div class="auth-sheet" id="auth-sheet">
             <div class="sheet-handle"></div>
@@ -1539,7 +1545,7 @@
         <button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
     </div>
 
-    <!-- MODALES DE TÉRMINOS INTACTOS -->
+    <!-- MODALES DE TÉRMINOS -->
     <div id="modal-terminos" class="modal">
         <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
@@ -1602,9 +1608,6 @@
         let greetingInterval = null;
         let carritoPedidos = {};
 
-        // =======================================================
-        // ESTA ES LA FUNCIÓN QUE MUESTRA/OCULTA LA BARRA AL BAJAR
-        // =======================================================
         window.addEventListener('scroll', () => {
             const bar = document.getElementById('sticky-client-bar');
             const dashActive = document.getElementById('view-dashboard').classList.contains('active');
@@ -1844,9 +1847,6 @@
             document.getElementById('login-id').value = ''; 
             document.getElementById('login-pin').value = '';
             
-            // =======================================================
-            // AQUÍ SE LIMPIA LA BARRA DE "TU ESPACIO" AL CERRAR SESIÓN
-            // =======================================================
             const stickyName = document.getElementById('sticky-client-name');
             if(stickyName) stickyName.innerText = '';
             const bar = document.getElementById('sticky-client-bar');
@@ -1876,9 +1876,6 @@
             
             document.getElementById('dash-name').innerText = primerNombre; 
             
-            // =======================================================
-            // AQUÍ SE INYECTA EL NOMBRE EN LA BARRA FLOTANTE
-            // =======================================================
             const stickyName = document.getElementById('sticky-client-name');
             if (stickyName) stickyName.innerText = primerNombre;
             
