@@ -13,7 +13,8 @@
         "cuentas": 1,
         "costo": 329,
         "limite": 4,
-        "etiqueta": "Popular 🔥"
+        "etiqueta": "",
+        "beneficios": ""
       },
       {
         "nombre": "Disney+ Premium",
@@ -21,21 +22,24 @@
         "cuentas": 1,
         "costo": 319,
         "limite": 6,
-        "etiqueta": "Popular 🔥"
+        "etiqueta": "",
+        "beneficios": ""
       },
       {
         "nombre": "HBO Max Platino",
         "precio": 79,
         "cuentas": 2,
         "costo": 299,
-        "limite": 4
+        "limite": 4,
+        "beneficios": ""
       },
       {
         "nombre": "Prime Video",
         "precio": 45,
         "cuentas": 1,
         "costo": 99,
-        "limite": 5
+        "limite": 5,
+        "beneficios": ""
       },
       {
         "nombre": "YouTube Premium",
@@ -43,35 +47,40 @@
         "cuentas": 3,
         "costo": 279,
         "limite": 5,
-        "etiqueta": "Incluye Music 💿"
+        "etiqueta": "",
+        "beneficios": ""
       },
       {
         "nombre": "Vix Premium",
         "precio": 49,
         "cuentas": 1,
         "costo": 0,
-        "limite": 5
+        "limite": 5,
+        "beneficios": ""
       },
       {
         "nombre": "Crunchyroll Cuenta completa",
         "precio": 100,
         "cuentas": 1,
         "costo": 149,
-        "limite": 1
+        "limite": 1,
+        "beneficios": ""
       },
       {
         "nombre": "Microsoft 365",
         "precio": 79,
         "cuentas": 1,
         "costo": 370,
-        "limite": 5
+        "limite": 5,
+        "beneficios": ""
       },
       {
         "nombre": "Google One 2TB",
         "precio": 29,
         "cuentas": 1,
         "costo": 0,
-        "limite": 5
+        "limite": 5,
+        "beneficios": ""
       }
     ],
     "combo_upsell": true
