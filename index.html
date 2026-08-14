@@ -354,15 +354,39 @@
       let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
       
       // =========================================================
-      // INYECCIÓN: Lectura de Descuentos Especiales y Trato Justo
+      // INYECCIÓN: Lectura de Descuentos Especiales (Array) y Trato Justo
       // =========================================================
-      let descuentoEspecial = cliente.descuento_especial ? (parseFloat(cliente.descuento_especial.monto) || 0) : 0;
-      let conceptoEspecial = cliente.descuento_especial ? (cliente.descuento_especial.concepto || "Descuento Especial") : "";
+      let totalDescuentosEspeciales = 0;
+      let desgloseDescuentosHTML = '';
 
-      let descuentoTratoJusto = cliente.trato_justo ? (parseFloat(cliente.trato_justo.monto) || 0) : 0;
-      let conceptoTratoJusto = cliente.trato_justo ? (cliente.trato_justo.concepto || "Garantía Trato Justo") : "";
+      // 1. Compatibilidad con descuento viejo (si aún existe en la BD)
+      if (cliente.descuento_especial && parseFloat(cliente.descuento_especial.monto) > 0) {
+          let m = parseFloat(cliente.descuento_especial.monto);
+          let c = cliente.descuento_especial.concepto || "Descuento Especial";
+          totalDescuentosEspeciales += m;
+          desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${c}</span><span>-$${m}</span></div>`;
+      }
+
+      // 2. Nuevo Array de múltiples descuentos
+      if (cliente.descuentos_especiales && cliente.descuentos_especiales.length > 0) {
+          cliente.descuentos_especiales.forEach(desc => {
+              let m = parseFloat(desc.monto) || 0;
+              let c = desc.concepto || "Descuento Especial";
+              if (m > 0) {
+                  totalDescuentosEspeciales += m;
+                  desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${c}</span><span>-$${m}</span></div>`;
+              }
+          });
+      }
+
+      // 3. Trato Justo (ahora usa descuento_fallas de admin.html)
+      let descuentoTratoJusto = cliente.descuento_fallas ? (parseFloat(cliente.descuento_fallas) || 0) : 0;
+      let conceptoTratoJusto = "Garantía Trato Justo";
+      if (descuentoTratoJusto > 0) {
+          desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${conceptoTratoJusto}</span><span>-$${descuentoTratoJusto.toFixed(2)}</span></div>`;
+      }
       
-      let ahorroTotal = ahorro + descuentoEspecial + descuentoTratoJusto;
+      let ahorroTotal = ahorro + totalDescuentosEspeciales + descuentoTratoJusto;
       // =========================================================
 
       let totalFinal = (subtotal - ahorroTotal) + montoMora + montoBajaAdmin;
@@ -400,8 +424,7 @@
             <div class="glass-card breakdown-box">
               <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
               ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento Lealtad</span><span>-$${ahorro}</span></div>` : ''}
-              ${descuentoEspecial > 0 ? `<div class="breakdown-line discount-line"><span>${conceptoEspecial}</span><span>-$${descuentoEspecial}</span></div>` : ''}
-              ${descuentoTratoJusto > 0 ? `<div class="breakdown-line discount-line"><span>${conceptoTratoJusto}</span><span>-$${descuentoTratoJusto}</span></div>` : ''}
+              ${desgloseDescuentosHTML}
               ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Mora (+${Math.round(pctMoraDiaria * 100)}%)</span><span>+$${montoMora}</span></div>` : ''}
               ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Reactivación</span><span>+$${montoBajaAdmin}</span></div>` : ''}
             </div>
