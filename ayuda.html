@@ -2065,14 +2065,20 @@
                 priceEl.innerText = `$${plan.precio}`;
                 
                 // Buscar Descripción específica
+                // Buscar Descripción específica (Priorizando el texto del Admin)
                 let textoDesc = INFO_SERVICIOS["default"];
-                for(let key in INFO_SERVICIOS) { 
-                    if(plan.nombre.toLowerCase().includes(key)) { 
-                        textoDesc = INFO_SERVICIOS[key]; 
-                        break; 
-                    } 
+                if (plan.beneficios && plan.beneficios.trim() !== "") {
+                    textoDesc = plan.beneficios;
+                } else {
+                    for(let key in INFO_SERVICIOS) { 
+                        if(plan.nombre.toLowerCase().includes(key)) { 
+                            textoDesc = INFO_SERVICIOS[key]; 
+                            break; 
+                        } 
+                    }
                 }
                 descEl.innerHTML = textoDesc;
+
                 
                 // Stock Badge
                 const stockEl = document.getElementById('stock-' + brandId);
