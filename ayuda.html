@@ -235,7 +235,7 @@
         .glass-card, 
         .tab-container, 
         .btn-menu, 
-        .catalog-card, 
+        .brand-card, 
         .smart-support-card, 
         .modal-content, 
         .floating-cart {
@@ -870,219 +870,190 @@
             line-height: 1.2; 
         }
 
-        /* CATÁLOGO ANIMADO */
+        /* --- NUEVO CATÁLOGO AGRUPADO --- */
         .catalog-grid { 
             display: flex; 
-            flex-wrap: wrap; 
+            flex-direction: column; 
             gap: 15px; 
-            align-items: flex-start; 
-            justify-content: flex-start; 
+            width: 100%;
         }
         
-        .catalog-card {
-            width: calc(50% - 7.5px);
+        .brand-card {
             background: var(--card-glass); 
             backdrop-filter: blur(10px); 
             -webkit-backdrop-filter: blur(10px);
             border-radius: 20px; 
             padding: 18px; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.3s, box-shadow 0.3s;
+            transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
             border: 1px solid rgba(255,255,255,0.05);
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.15), 0 10px 20px rgba(0,0,0,0.3);
-            position: relative; 
             overflow: hidden;
+            width: 100%;
         }
         
-        .catalog-card:hover { 
-            transform: translateY(-3px); 
-            box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.2), 0 15px 30px rgba(0,0,0,0.4); 
+        .brand-card:hover { 
+            box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.25), 0 15px 30px rgba(0,0,0,0.4); 
         }
 
-        .catalog-card.expanded { 
-            width: 100%; 
-            text-align: left; 
+        .brand-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            width: 100%;
         }
 
-        .admin-badge {
-            position: absolute; 
-            top: -10px; 
-            right: 10px; 
-            background: linear-gradient(135deg, var(--neon-purple), #ff3366);
-            color: #fff; 
-            padding: 4px 10px; 
-            border-radius: 12px; 
-            font-size: 10px; 
+        .brand-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .brand-logo-img {
+            width: 55px;
+            height: 55px;
+            border-radius: 14px;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .brand-card.expanded .brand-logo-img {
+            transform: scale(1.05);
+        }
+
+        .brand-titles {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-size: 17px;
             font-weight: 800;
-            box-shadow: 0 5px 15px rgba(124, 77, 255, 0.4); 
-            z-index: 10; 
-            border: 1px solid rgba(255,255,255,0.2);
+            color: var(--text-main);
+            line-height: 1.2;
+            margin-bottom: 2px;
         }
 
-        .card-top { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            transition: 0.4s; 
-            width: 100%; 
+        .brand-price-start {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
         }
 
-        .catalog-card.expanded .card-top { 
-            flex-direction: row; 
-            align-items: center; 
-            justify-content: flex-start; 
-            gap: 15px; 
-            margin-bottom: 5px; 
+        .brand-expand-icon {
+            font-size: 12px;
+            color: var(--neon-blue);
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            padding: 8px 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            transition: 0.3s;
         }
 
-        .cat-logo-img { 
-            width: 50px; 
-            height: 50px; 
-            border-radius: 12px; 
-            object-fit: cover; 
-            margin: 0 auto 10px auto; 
-            box-shadow: 0 5px 15px rgba(0,0,0,0.4); 
-            background: rgba(0,0,0,0.5); 
-            transition: 0.4s;
+        .brand-card.expanded .brand-expand-icon {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
         }
 
-        .catalog-card.expanded .cat-logo-img { 
-            margin: 0; 
-            width: 60px; 
-            height: 60px; 
-        }
-
-        .card-titles { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            transition: 0.4s; 
-        }
-
-        .catalog-card.expanded .card-titles { 
-            align-items: flex-start; 
-        }
-
-        .cat-name { 
-            font-size: 14px; 
-            font-weight: 700; 
-            color: var(--text-main); 
-            margin-bottom: 4px; 
-            transition: 0.4s;
-        }
-
-        .catalog-card.expanded .cat-name { 
-            font-size: 18px; 
-            margin-bottom: 2px; 
-        }
-
-        .cat-badge { 
-            font-size: 10px; 
-            padding: 4px 8px; 
-            border-radius: 12px; 
-            font-weight: 700; 
-            margin-bottom: 12px; 
-            display: inline-block; 
-            transition: 0.4s;
-        }
-
-        .cat-badge.ok { 
-            background: rgba(46, 160, 67, 0.25); 
-            color: var(--success-green); 
-            border: 1px solid rgba(46, 160, 67, 0.6); 
-        }
-
-        .cat-badge.out { 
-            background: rgba(255, 51, 102, 0.25); 
-            color: var(--danger-red); 
-            border: 1px solid rgba(255, 51, 102, 0.6); 
-        }
-
-        .catalog-card.expanded .cat-badge { 
-            margin-bottom: 0; 
-        }
-
-        .cat-price-normal { 
-            font-size: 20px; 
-            font-weight: 800; 
-            color: var(--neon-blue); 
-            margin-bottom: 8px; 
-            transition: 0.3s; 
-        }
-
-        .catalog-card.expanded .cat-price-normal { 
-            display: none; 
-        }
-        
-        .cat-price-expanded { 
-            display: none; 
-            font-size: 26px; 
-            font-weight: 800; 
-            color: var(--neon-blue); 
-            line-height: 1; 
-        }
-
-        .catalog-card.expanded .cat-price-expanded { 
-            display: block; 
-        }
-
-        .btn-info-srv { 
-            background: transparent; 
-            border: none; 
-            color: var(--text-muted); 
-            font-size: 11px; 
-            text-decoration: none; 
-            font-weight: 600; 
-            margin-bottom: 12px; 
-            cursor: pointer; 
-            transition: 0.2s; 
-        }
-
-        .btn-info-srv:hover { 
-            color: #fff; 
-        }
-
-        .catalog-card.expanded .btn-info-srv { 
-            align-self: flex-start; 
-            margin-bottom: 15px; 
-            margin-left: 75px; 
-        }
-
-        .card-details-content { 
-            max-height: 0; 
-            opacity: 0; 
-            font-size: 12.5px; 
-            color: var(--text-muted); 
-            text-align: left; 
-            line-height: 1.5; 
-            transition: max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease; 
+        .brand-expanded-content {
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.5s ease, opacity 0.4s ease, margin 0.4s ease;
             overflow: hidden;
         }
 
-        .catalog-card.expanded .card-details-content { 
-            max-height: 600px; 
-            opacity: 1; 
-            margin-bottom: 20px; 
+        .brand-card.expanded .brand-expanded-content {
+            max-height: 800px; /* Suficiente espacio para expandir */
+            opacity: 1;
+            margin-top: 20px;
         }
 
-        .card-bottom { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            width: 100%; 
-            margin-top: auto; 
-            transition: 0.4s; 
+        .plan-pills-container {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .plan-pills-container::-webkit-scrollbar { 
+            display: none; /* Safari/Chrome */
         }
 
-        .catalog-card.expanded .card-bottom { 
-            justify-content: flex-end; 
-            gap: 20px; 
-            border-top: 1px dashed rgba(255,255,255,0.1); 
-            padding-top: 15px;
+        .plan-pill {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-muted);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
+        .plan-pill:hover:not(:disabled) {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+
+        .plan-pill.active {
+            background: rgba(124, 77, 255, 0.15);
+            border-color: var(--neon-purple);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
+        }
+
+        .plan-details-box {
+            background: rgba(0,0,0,0.2);
+            border-radius: 14px;
+            padding: 15px;
+            border: 1px dashed rgba(255,255,255,0.05);
+            margin-bottom: 15px;
+        }
+
+        .plan-price-large {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--neon-blue);
+            line-height: 1;
+            margin-bottom: 5px;
+            transition: opacity 0.2s;
+        }
+
+        .plan-stock-badge {
+            font-size: 10px;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .plan-stock-badge.ok {
+            background: rgba(46, 160, 67, 0.15);
+            color: var(--success-green);
+        }
+
+        .plan-stock-badge.out {
+            background: rgba(255, 51, 102, 0.15);
+            color: var(--danger-red);
+        }
+
+        .plan-desc-text {
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            transition: opacity 0.2s;
+        }
+
+        /* Reutilizamos los botones del carrito para la nueva UI */
         .qty-controls { 
             display: flex; 
             align-items: center; 
@@ -1463,10 +1434,11 @@
             <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">💳 Ver Estado de Cuenta y Pagar</button>
         </div>
 
+        <!-- VISTA CATÁLOGO REIMAGINADO -->
         <div id="view-catalogo" class="view-section">
-            <div class="section-title">Nuestros Servicios y Promociones</div>
+            <div class="section-title">Nuestros Ecosistemas y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
-                <p style="font-size: 13px; color: var(--text-muted); text-align: center; grid-column: span 2;">Cargando catálogo en vivo...</p>
+                <p style="font-size: 13px; color: var(--text-muted); text-align: center; width: 100%;">Cargando catálogo en vivo...</p>
             </div>
         </div>
 
@@ -1593,13 +1565,14 @@
 
     <script>
         const NUMERO_GOXION = "528136836901"; 
-        
-        // 🚨 AQUÍ PEGA TU URL DE WEBHOOK DE DISCORD PARA ALERTAS EN TIEMPO REAL 🚨
         const WEBHOOK_DISCORD = ""; 
 
         let globalClientesData = null;
         let greetingInterval = null;
         let carritoPedidos = {};
+        
+        // --- NUEVA VARIABLE GLOBAL PARA EL CATÁLOGO AGRUPADO ---
+        window.catalogGroups = {}; 
 
         function notificarAdmin(titulo, mensaje) {
             if(!WEBHOOK_DISCORD) return;
@@ -1662,11 +1635,11 @@
             "prime": "Accede al catálogo completo de Prime Video. Perfil personalizado, reproducción en calidad superior 4K y descargas habilitadas para disfrutar contenido sin conexión a internet.",
             "youtube": "¡Doble beneficio! Incluye YouTube Premium (videos sin anuncios) y acceso total a YouTube Music Premium. Reproducción en segundo plano y descargas offline para todos tus dispositivos móviles o TV.",
             "vix": "Todos los partidos de la Liga MX, contenido de TV exclusivo, telenovelas y los mejores estrenos premium en español sin una sola interrupción publicitaria.",
-            "crunchyroll": "Membresía Mega Fan. Disfruta del anime sin publicidad, episodios de estreno simulcast y visualización offline.<br><br><span style='color:var(--neon-blue); font-weight:bold;'>🔹 Perfil Individual:</span> $45 MXN<br><span style='color:var(--neon-blue); font-weight:bold;'>👑 Cuenta Completa (4 Perfiles):</span> $100 MXN<br><br><em>(Usa los botones de abajo para elegir la cantidad de perfiles, o escríbenos directo si deseas la cuenta completa)</em>.",
+            "crunchyroll": "Membresía Mega Fan. Disfruta del anime sin publicidad, episodios de estreno simulcast y visualización offline.",
             "spotify": "Música infinita sin anuncios, opción para descargas y calidad de sonido superior. Podemos asignarte un perfil individual o hacer el Upgrade a tu propia cuenta personal.",
             "microsoft": "Membresía Microsoft 365 Family. Incluye 1TB de almacenamiento seguro en nube (OneDrive) y acceso completo a las aplicaciones premium (Word, Excel, PowerPoint) para tus dispositivos.",
             "google": "Expande rápidamente tu almacenamiento en la nube para Google Drive, Gmail y Google Fotos. Además, desbloquea las funciones de edición avanzadas en la aplicación de Fotos.",
-            "default": "Perfil individual, seguro y estable. Garantizamos protección total, reposición inmediata en caso de caídas y soporte técnico dedicado durante todo tu periodo de suscripción."
+            "default": "Perfil seguro y estable. Garantizamos protección total, reposición inmediata en caso de caídas y soporte técnico dedicado durante todo tu periodo de suscripción."
         };
 
         function hideSplash() {
@@ -1721,31 +1694,13 @@
             }
         }
 
-        function openModal(id) { 
-            document.getElementById(id).classList.add('show'); 
-        }
-        
-        function closeModal(id) { 
-            document.getElementById(id).classList.remove('show'); 
-        }
-        
-        window.onclick = function(e) { 
-            if (e.target.classList.contains('modal')) e.target.classList.remove('show'); 
-        }
+        function openModal(id) { document.getElementById(id).classList.add('show'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+        window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
 
-        function openAuthSheet() { 
-            document.getElementById('auth-overlay').classList.add('show'); 
-            document.body.style.overflow = 'hidden'; 
-        }
-        
-        function closeAuthSheet() { 
-            document.getElementById('auth-overlay').classList.remove('show'); 
-            document.body.style.overflow = 'auto'; 
-        }
-        
-        function closeAuthSheetEvent(e) { 
-            if (e.target.classList.contains('auth-overlay')) closeAuthSheet(); 
-        }
+        function openAuthSheet() { document.getElementById('auth-overlay').classList.add('show'); document.body.style.overflow = 'hidden'; }
+        function closeAuthSheet() { document.getElementById('auth-overlay').classList.remove('show'); document.body.style.overflow = 'auto'; }
+        function closeAuthSheetEvent(e) { if (e.target.classList.contains('auth-overlay')) closeAuthSheet(); }
 
         function toggleAuth() {
             if(localStorage.getItem('goxion_user_key')) {
@@ -1781,9 +1736,7 @@
             }, 6000);
         }
 
-        function normalizeString(str) { 
-            return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : ""; 
-        }
+        function normalizeString(str) { return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : ""; }
 
         async function cargarDatosYVerificarSesion() {
             try {
@@ -1890,7 +1843,6 @@
 
             iniciarSaludoDinamico(cliente.nombre);
 
-            // CONTROL DEL UPSELL (COMBO)
             let configGlobal = globalClientesData._goxion_config || {};
             let isComboUpsellActive = configGlobal.combo_upsell !== false; 
 
@@ -2071,30 +2023,93 @@
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
 
-        function copiarEnlace() { 
-            var input = document.getElementById("ref-link-input"); 
-            input.select(); 
-            input.setSelectionRange(0, 99999); 
-            document.execCommand("copy"); 
-            alert("¡Enlace copiado al portapapeles!"); 
+        function srvCleanName(n) { 
+            return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa","").trim(); 
         }
 
-        function toggleDetallesSrv(idSeguro, btn) {
-            const card = document.getElementById('card-' + idSeguro);
-            if(card.classList.contains('expanded')) {
-                card.classList.remove('expanded');
-                btn.innerText = "ⓘ Ver detalles ⏷";
-            } else {
-                document.querySelectorAll('.catalog-card').forEach(c => {
+        function toggleBrandCard(brandId) {
+            const card = document.getElementById('brand-card-' + brandId);
+            
+            // Cerrar las demás
+            document.querySelectorAll('.brand-card').forEach(c => {
+                if(c.id !== 'brand-card-' + brandId) {
                     c.classList.remove('expanded');
-                    const btnInside = c.querySelector('.btn-info-srv');
-                    if(btnInside) btnInside.innerText = "ⓘ Ver detalles ⏷";
-                });
-                card.classList.add('expanded');
-                btn.innerText = "⬆️ Ocultar detalles";
+                }
+            });
+
+            card.classList.toggle('expanded');
+        }
+
+        function selectSubPlan(brandId, planIndex, btnElement, isInit = false) {
+            const brand = window.catalogGroups[brandId];
+            const plan = brand.plans[planIndex];
+            
+            // Actualizar Píldoras activas
+            if(btnElement) {
+                const parent = btnElement.parentElement;
+                parent.querySelectorAll('.plan-pill').forEach(b => b.classList.remove('active'));
+                btnElement.classList.add('active');
+            } else if (isInit) {
+                // If it's the initial render, find the first button and set it active (handled in HTML generation mostly, but good practice)
+            }
+            
+            // Animaciones sutiles de opacidad
+            const priceEl = document.getElementById('price-' + brandId);
+            const descEl = document.getElementById('desc-' + brandId);
+            
+            priceEl.style.opacity = '0';
+            descEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                // Info
+                priceEl.innerText = `$${plan.precio}`;
+                
+                // Buscar Descripción específica
+                let textoDesc = INFO_SERVICIOS["default"];
+                for(let key in INFO_SERVICIOS) { 
+                    if(plan.nombre.toLowerCase().includes(key)) { 
+                        textoDesc = INFO_SERVICIOS[key]; 
+                        break; 
+                    } 
+                }
+                descEl.innerHTML = textoDesc;
+                
+                // Stock Badge
+                const stockEl = document.getElementById('stock-' + brandId);
+                if(plan.disponibles > 0) {
+                    stockEl.className = 'plan-stock-badge ok';
+                    stockEl.innerHTML = `🟢 ${plan.disponibles} disp.`;
+                } else {
+                    stockEl.className = 'plan-stock-badge out';
+                    stockEl.innerHTML = `🔴 Agotado`;
+                }
+                
+                priceEl.style.opacity = '1';
+                descEl.style.opacity = '1';
+            }, 200);
+
+            // Actualizar botones de carrito
+            const cartContainer = document.getElementById('cart-controls-' + brandId);
+            if(plan.disponibles > 0) {
+                // Obtener valor actual del carrito para no perderlo al cambiar de tab
+                let currentQty = (carritoPedidos[plan.nombre] && carritoPedidos[plan.nombre].qty) ? carritoPedidos[plan.nombre].qty : 0;
+                cartContainer.innerHTML = `
+                <div class="qty-controls">
+                    <button class="qty-btn" onclick="actualizarCarrito('${plan.nombre}', ${plan.precio}, -1, '${plan.safeId}')">-</button>
+                    <span class="qty-val" id="qty-${plan.safeId}">${currentQty}</span>
+                    <button class="qty-btn" onclick="actualizarCarrito('${plan.nombre}', ${plan.precio}, 1, '${plan.safeId}')">+</button>
+                </div>`;
+            } else {
+                cartContainer.innerHTML = `
+                <div class="qty-controls" style="opacity: 0.3; cursor: not-allowed;">
+                    <button class="qty-btn" style="pointer-events: none;" disabled>-</button>
+                    <span class="qty-val">0</span>
+                    <button class="qty-btn" style="pointer-events: none;" disabled>+</button>
+                </div>`;
             }
         }
 
+        // --- MOTOR REIMAGINADO DEL CATÁLOGO ---
         function cargarCatalogo(data) {
             const config = data._goxion_config;
             const catalogContainer = document.getElementById('catalog-container');
@@ -2127,76 +2142,124 @@
                 }
             }
 
-            const mapImagenes = { "netflix": "netflix", "disney": "disney", "max": "hbo-max", "prime": "prime-video", "youtube": "youtube", "vix": "vix", "crunchyroll": "crunchyroll", "google": "google-one", "microsoft": "microsoft" };
+            const mapMarcas = { 
+                "netflix": { name: "Netflix", img: "logos/netflix.PNG" }, 
+                "disney": { name: "Disney+", img: "logos/disney.PNG" }, 
+                "max": { name: "Max", img: "logos/hbo-max.PNG" },
+                "hbo": { name: "HBO", img: "logos/hbo-max.PNG" }, 
+                "prime": { name: "Prime Video", img: "logos/prime-video.PNG" }, 
+                "youtube": { name: "YouTube", img: "logos/youtube.PNG" }, 
+                "vix": { name: "ViX Premium", img: "logos/vix.PNG" }, 
+                "crunchyroll": { name: "Crunchyroll", img: "logos/crunchyroll.PNG" }, 
+                "spotify": { name: "Spotify", img: "logos/spotify.PNG" },
+                "google": { name: "Google One", img: "logos/google-one.PNG" }, 
+                "microsoft": { name: "Microsoft 365", img: "logos/microsoft.PNG" }
+            };
 
-            let htmlCatalogo = '';
+            window.catalogGroups = {};
+
+            // Agrupar los servicios del admin
             config.serviciosGlobales.forEach(srv => {
+                let srvLower = srv.nombre.toLowerCase();
+                let brandKey = "otros_" + srv.nombre.replace(/[^a-zA-Z0-9]/g, '');
+                let foundImg = "logo2.PNG";
+                let foundName = srv.nombre;
+                
+                for (let key in mapMarcas) { 
+                    if (srvLower.includes(key)) { 
+                        brandKey = key; 
+                        foundName = mapMarcas[key].name;
+                        foundImg = mapMarcas[key].img;
+                        break; 
+                    } 
+                }
+
+                if(!window.catalogGroups[brandKey]) {
+                    window.catalogGroups[brandKey] = {
+                        id: brandKey,
+                        name: foundName,
+                        img: foundImg,
+                        plans: []
+                    };
+                }
+
                 let limiteTotal = (srv.cuentas || 0) * (srv.limite || 1);
                 let disponibles = limiteTotal - (ocupados[srv.nombre] || 0);
-                let safeId = srv.nombre.replace(/[^a-zA-Z0-9]/g, '-');
                 
-                let imgSrc = "logo2.PNG";
-                let srvLower = srv.nombre.toLowerCase();
-                for (let key in mapImagenes) { if (srvLower.includes(key)) imgSrc = `logos/${mapImagenes[key]}.PNG`; }
+                window.catalogGroups[brandKey].plans.push({
+                    ...srv,
+                    disponibles: disponibles,
+                    safeId: srv.nombre.replace(/[^a-zA-Z0-9]/g, '-')
+                });
+            });
 
-                let textoDesc = INFO_SERVICIOS["default"];
-                for(let key in INFO_SERVICIOS) { if(srvLower.includes(key)) { textoDesc = INFO_SERVICIOS[key]; break; } }
-
-                let adminBadge = srv.etiqueta ? `<div class="admin-badge">${srv.etiqueta}</div>` : '';
-                let badgeHtml = disponibles > 0 ? `<div class="cat-badge ok">🟢 ${disponibles} disp.</div>` : `<div class="cat-badge out">🔴 Agotado / Próximamente</div>`;
+            let htmlCatalogo = '';
+            
+            for (let bKey in window.catalogGroups) {
+                let brand = window.catalogGroups[bKey];
                 
-                let prefixPrecio = srvLower.includes("crunchyroll") ? "Desde " : "";
-                let infoBtn = `<button onclick="toggleDetallesSrv('${safeId}', this)" class="btn-info-srv">ⓘ Ver detalles ⏷</button>`;
-
-                let btnHtml = disponibles > 0 
-                    ? `
-                    <div class="qty-controls">
-                        <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, -1, '${safeId}')">-</button>
-                        <span class="qty-val" id="qty-${safeId}">0</span>
-                        <button class="qty-btn" onclick="actualizarCarrito('${srv.nombre}', ${srv.precio}, 1, '${safeId}')">+</button>
-                    </div>` 
-                    : `
-                    <div class="qty-controls" style="opacity: 0.3; cursor: not-allowed;">
-                        <button class="qty-btn" style="pointer-events: none;" disabled>-</button>
-                        <span class="qty-val">0</span>
-                        <button class="qty-btn" style="pointer-events: none;" disabled>+</button>
-                    </div>`;
-
-                htmlCatalogo += `
-                <div class="catalog-card" id="card-${safeId}">
-                    ${adminBadge}
+                // Obtener el precio más bajo para el "Desde $XX"
+                let minPrice = Math.min(...brand.plans.map(p => p.precio));
+                
+                let pillsHtml = '';
+                brand.plans.forEach((plan, idx) => {
+                    let planName = srvCleanName(plan.nombre);
+                    let badge = plan.etiqueta ? ` <span style="color:var(--neon-yellow); margin-left:4px;">${plan.etiqueta}</span>` : '';
+                    let agotado = plan.disponibles <= 0 ? ' (Agotado)' : '';
+                    let opacity = plan.disponibles <= 0 ? '0.5' : '1';
                     
-                    <div class="card-top">
-                        <img src="${imgSrc}" class="cat-logo-img" onerror="this.src='logo2.PNG'">
-                        <div class="card-titles">
-                            <div class="cat-name">${srv.nombre}</div>
-                            ${badgeHtml}
+                    pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}${badge}${agotado}</button>`;
+                });
+
+                // Tarjeta Madre Render
+                htmlCatalogo += `
+                <div class="brand-card" id="brand-card-${bKey}">
+                    <div class="brand-header" onclick="toggleBrandCard('${bKey}')">
+                        <div class="brand-header-left">
+                            <img src="${brand.img}" class="brand-logo-img" onerror="this.src='logo2.PNG'">
+                            <div class="brand-titles">
+                                <div class="brand-name">${brand.name}</div>
+                                <div class="brand-price-start">Desde $${minPrice}</div>
+                            </div>
+                        </div>
+                        <div class="brand-expand-icon">⏷</div>
+                    </div>
+                    
+                    <div class="brand-expanded-content">
+                        <div class="plan-pills-container">
+                            ${pillsHtml}
+                        </div>
+                        
+                        <div class="plan-details-box">
+                            <div class="plan-price-large" id="price-${bKey}">$0</div>
+                            <div class="plan-stock-badge" id="stock-${bKey}">Cargando...</div>
+                            <div class="plan-desc-text" id="desc-${bKey}"></div>
+                        </div>
+                        
+                        <div class="card-bottom" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 15px;">
+                            <div id="cart-controls-${bKey}"></div>
                         </div>
                     </div>
-                    
-                    <div class="cat-price-normal">${prefixPrecio}$${srv.precio}</div>
-                    ${infoBtn}
-                    
-                    <div id="desc-${safeId}" class="card-details-content">
-                        <strong style="color:var(--text-main); display:block; margin-bottom:5px;">Opciones y Beneficios:</strong>
-                        ${textoDesc}
-                    </div>
-
-                    <div class="card-bottom">
-                        <div class="cat-price-expanded">${prefixPrecio}$${srv.precio}</div>
-                        ${btnHtml}
-                    </div>
                 </div>`;
-            });
+            }
             
             if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
+
+            // Inicializar la vista interior de las tarjetas con el primer plan
+            for (let bKey in window.catalogGroups) {
+                selectSubPlan(bKey, 0, null, true);
+            }
         }
 
         function actualizarCarrito(nombre, precio, cambio, safeId) {
             if (!carritoPedidos[nombre]) carritoPedidos[nombre] = { precio: precio, qty: 0 };
             carritoPedidos[nombre].qty += cambio; 
             if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
-            document.getElementById('qty-' + safeId).innerText = carritoPedidos[nombre].qty; 
+            
+            // Actualizar texto si la tarjeta está expandida
+            const qtyEl = document.getElementById('qty-' + safeId);
+            if (qtyEl) qtyEl.innerText = carritoPedidos[nombre].qty; 
+            
             renderCartFloating();
         }
 
@@ -2337,10 +2400,6 @@
                 } 
             ]
         };
-
-        function srvCleanName(n) { 
-            return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa",""); 
-        }
 
         function renderizarSoporteDinamico(data) {
             const config = data._goxion_config; 
