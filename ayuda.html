@@ -406,7 +406,6 @@
             box-shadow: 0 0 30px rgba(124, 77, 255, 0.6); 
         }
 
-        /* --- RESTAURACIÓN KEYFRAME SHIMMER --- */
         @keyframes shimmer {
             0% { left: -100%; }
             100% { left: 200%; }
@@ -901,6 +900,38 @@
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.25), 0 15px 30px rgba(0,0,0,0.4); 
         }
 
+        /* --- ESTILO PARA TARJETA EXTERIOR CON ETIQUETA --- */
+        .brand-card.has-promo {
+            border: none;
+            position: relative;
+            z-index: 1;
+            background: transparent; 
+        }
+        .brand-card.has-promo::before {
+            content: '';
+            position: absolute;
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent);
+            animation: rotateLight 3.5s linear infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+        .brand-card.has-promo::after {
+            content: '';
+            position: absolute;
+            inset: 1.5px;
+            background: #08080c; 
+            border-radius: 19px;
+            z-index: -1;
+            box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.15);
+            pointer-events: none;
+        }
+        .brand-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
         .brand-header {
             display: flex;
             align-items: center;
@@ -1019,7 +1050,7 @@
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
         }
 
-        /* --- ANIMACIÓN ETIQUETA --- */
+        /* --- ETIQUETA ANIMADA --- */
         .animated-etiqueta {
             position: relative;
             display: inline-flex;
@@ -1071,7 +1102,6 @@
             font-size: 11px;
             color: var(--text-muted);
             margin-top: 12px;
-            margin-bottom: 12px;
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.1);
         }
         .smart-combo-banner span {
@@ -1090,22 +1120,12 @@
             margin-bottom: 15px;
         }
 
-        .plan-price-large {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--neon-blue);
-            line-height: 1;
-            margin-bottom: 5px;
-            transition: opacity 0.2s;
-        }
-
         .plan-stock-badge {
             font-size: 10px;
             padding: 4px 8px;
             border-radius: 10px;
             font-weight: 700;
             display: inline-block;
-            margin-bottom: 12px;
         }
 
         .plan-stock-badge.ok {
@@ -1122,40 +1142,70 @@
             font-size: 12px;
             color: var(--text-muted);
             line-height: 1.6;
-            transition: opacity 0.2s;
         }
 
-        .qty-controls { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 15px; 
-            background: rgba(0,0,0,0.5); 
-            padding: 8px; 
-            border-radius: 14px; 
-            border: 1px solid rgba(255,255,255,0.05); 
+        /* --- NUEVO CONTENEDOR DE ACCIÓN Y PRECIO SIMÉTRICO --- */
+        .price-action-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 12px 20px;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.2);
+            margin-top: 15px;
         }
 
-        .qty-btn { 
-            background: rgba(255,255,255,0.1); 
-            color: #fff; 
-            border: none; 
-            width: 32px; 
-            height: 32px; 
-            border-radius: 10px; 
-            font-size: 18px; 
-            cursor: pointer; 
-            transition: 0.2s; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
+        .price-display {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--neon-blue);
+            line-height: 1;
+            display: flex;
+            align-items: flex-start;
         }
 
-        .qty-val { 
-            font-weight: 700; 
-            font-size: 16px; 
-            min-width: 20px; 
-            text-align: center; 
+        .price-currency {
+            font-size: 16px;
+            margin-right: 4px;
+            margin-top: 2px;
+            color: var(--text-muted);
+        }
+
+        .qty-controls-large {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .qty-btn-large {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+            border: none;
+            width: 40px; 
+            height: 40px; 
+            border-radius: 12px;
+            font-size: 22px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qty-btn-large:hover:not(:disabled) {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px rgba(0,242,254,0.4);
+        }
+
+        .qty-val-large {
+            font-weight: 800;
+            font-size: 20px;
+            min-width: 24px;
+            text-align: center;
         }
 
         .floating-cart { 
@@ -2093,15 +2143,13 @@
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
 
-        // --- SOLUCIÓN A NOMBRES RECORTADOS ---
         function srvCleanName(n) { 
-            return n.trim(); // Se remueve el recorte. Ahora respetará el nombre exacto de tu Admin.
+            return n.trim(); 
         }
 
         function toggleBrandCard(brandId) {
             const card = document.getElementById('brand-card-' + brandId);
             
-            // Cerrar las demás
             document.querySelectorAll('.brand-card').forEach(c => {
                 if(c.id !== 'brand-card-' + brandId) {
                     c.classList.remove('expanded');
@@ -2111,13 +2159,11 @@
             card.classList.toggle('expanded');
         }
 
-        // --- SISTEMA INTELIGENTE DE COMBOS ---
         function findComboSuggestion(planName) {
             if(!globalClientesData || !globalClientesData._goxion_config) return null;
             const cat = globalClientesData._goxion_config.serviciosGlobales;
             let currentName = planName.toLowerCase();
             
-            // Buscar si hay un combo creado en el admin
             for(let s of cat) {
                 let sName = s.nombre.toLowerCase();
                 if(sName !== currentName && (sName.includes('+') || sName.includes(' combo '))) {
@@ -2133,7 +2179,6 @@
                 }
             }
             
-            // Recomendaciones orgánicas por defecto
             if(currentName.includes('hbo') || currentName.includes('max')) return { msg: `💡 <strong>Tip Inteligente:</strong> ¡Combínalo con Prime Video y llévatelos por <strong>$99</strong> todo integrado! Pregunta en soporte.` };
             if(currentName.includes('prime')) return { msg: `💡 <strong>Tip Inteligente:</strong> ¡Suma HBO Max y llévatelos por <strong>$99</strong> todo integrado! Pregunta en soporte.` };
             
@@ -2150,16 +2195,14 @@
                 btnElement.classList.add('active');
             }
             
-            const priceEl = document.getElementById('price-' + brandId);
             const descEl = document.getElementById('desc-' + brandId);
             const comboEl = document.getElementById('smart-combo-' + brandId);
+            const cartContainer = document.getElementById('cart-controls-' + brandId);
             
-            priceEl.style.opacity = '0';
             descEl.style.opacity = '0';
+            cartContainer.style.opacity = '0';
             
             setTimeout(() => {
-                priceEl.innerText = `$${plan.precio}`;
-                
                 let textoDesc = INFO_SERVICIOS["default"];
                 if (plan.beneficios && plan.beneficios.trim() !== "") {
                     textoDesc = plan.beneficios;
@@ -2182,7 +2225,6 @@
                     stockEl.innerHTML = `🔴 Agotado`;
                 }
 
-                // Inyectar el Banner de Combo Inteligente
                 if(comboEl) {
                     let combo = findComboSuggestion(plan.nombre);
                     if(combo && plan.disponibles > 0) {
@@ -2195,27 +2237,36 @@
                     }
                 }
                 
-                priceEl.style.opacity = '1';
-                descEl.style.opacity = '1';
-            }, 200);
+                if(plan.disponibles > 0) {
+                    let currentQty = (carritoPedidos[plan.nombre] && carritoPedidos[plan.nombre].qty) ? carritoPedidos[plan.nombre].qty : 0;
+                    cartContainer.innerHTML = `
+                    <div class="price-action-box">
+                        <div class="price-display">
+                            <span class="price-currency">$</span>${plan.precio}
+                        </div>
+                        <div class="qty-controls-large">
+                            <button class="qty-btn-large" onclick="actualizarCarrito('${plan.nombre}', ${plan.precio}, -1, '${plan.safeId}')">-</button>
+                            <span class="qty-val-large" id="qty-${plan.safeId}">${currentQty}</span>
+                            <button class="qty-btn-large" onclick="actualizarCarrito('${plan.nombre}', ${plan.precio}, 1, '${plan.safeId}')">+</button>
+                        </div>
+                    </div>`;
+                } else {
+                    cartContainer.innerHTML = `
+                    <div class="price-action-box" style="opacity: 0.4;">
+                        <div class="price-display">
+                            <span class="price-currency">$</span>${plan.precio}
+                        </div>
+                        <div class="qty-controls-large" style="cursor: not-allowed;">
+                            <button class="qty-btn-large" disabled>-</button>
+                            <span class="qty-val-large">0</span>
+                            <button class="qty-btn-large" disabled>+</button>
+                        </div>
+                    </div>`;
+                }
 
-            const cartContainer = document.getElementById('cart-controls-' + brandId);
-            if(plan.disponibles > 0) {
-                let currentQty = (carritoPedidos[plan.nombre] && carritoPedidos[plan.nombre].qty) ? carritoPedidos[plan.nombre].qty : 0;
-                cartContainer.innerHTML = `
-                <div class="qty-controls">
-                    <button class="qty-btn" onclick="actualizarCarrito('${plan.nombre}', ${plan.precio}, -1, '${plan.safeId}')">-</button>
-                    <span class="qty-val" id="qty-${plan.safeId}">${currentQty}</span>
-                    <button class="qty-btn" onclick="actualizarCarrito('${plan.nombre}', ${plan.precio}, 1, '${plan.safeId}')">+</button>
-                </div>`;
-            } else {
-                cartContainer.innerHTML = `
-                <div class="qty-controls" style="opacity: 0.3; cursor: not-allowed;">
-                    <button class="qty-btn" style="pointer-events: none;" disabled>-</button>
-                    <span class="qty-val">0</span>
-                    <button class="qty-btn" style="pointer-events: none;" disabled>+</button>
-                </div>`;
-            }
+                descEl.style.opacity = '1';
+                cartContainer.style.opacity = '1';
+            }, 200);
         }
 
         function cargarCatalogo(data) {
@@ -2307,23 +2358,34 @@
                 let minPrice = Math.min(...brand.plans.map(p => p.precio));
                 
                 let pillsHtml = '';
+                let brandTag = "";
+
                 brand.plans.forEach((plan, idx) => {
                     let planName = srvCleanName(plan.nombre);
-                    // SOLUCIÓN: Incorporamos la etiqueta animada
-                    let badge = plan.etiqueta ? `<span class="animated-etiqueta">${plan.etiqueta}</span>` : '';
                     let opacity = plan.disponibles <= 0 ? '0.5' : '1';
                     
-                    // SOLUCIÓN: Eliminamos " (Agotado)" del texto del botón.
-                    pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}${badge}</button>`;
+                    // Extraemos la primera etiqueta para ponerla afuera
+                    if(!brandTag && plan.etiqueta) {
+                        brandTag = plan.etiqueta;
+                    }
+                    
+                    pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}</button>`;
                 });
 
+                // Si hay etiqueta, la tarjeta entera brilla
+                let animatedClass = brandTag ? 'has-promo' : '';
+                let badgeHtml = brandTag ? `<span class="animated-etiqueta" style="font-size: 9px; padding: 2px 8px; transform: scale(0.9); margin-top: 2px;">${brandTag}</span>` : '';
+
                 htmlCatalogo += `
-                <div class="brand-card" id="brand-card-${bKey}">
+                <div class="brand-card ${animatedClass}" id="brand-card-${bKey}">
                     <div class="brand-header" onclick="toggleBrandCard('${bKey}')">
                         <div class="brand-header-left">
                             <img src="${brand.img}" class="brand-logo-img" onerror="this.src='logo2.PNG'">
                             <div class="brand-titles">
-                                <div class="brand-name">${brand.name}</div>
+                                <div style="display:flex; align-items:center; gap:6px; flex-wrap: wrap;">
+                                    <div class="brand-name">${brand.name}</div>
+                                    ${badgeHtml}
+                                </div>
                                 <div class="brand-price-start">Desde $${minPrice}</div>
                             </div>
                         </div>
@@ -2336,16 +2398,15 @@
                         </div>
                         
                         <div class="plan-details-box">
-                            <div class="plan-price-large" id="price-${bKey}">$0</div>
-                            <div class="plan-stock-badge" id="stock-${bKey}">Cargando...</div>
-                            <div class="plan-desc-text" id="desc-${bKey}"></div>
-                            <!-- CONTENEDOR SMART COMBO -->
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; letter-spacing: 1px;">Beneficios</div>
+                                <div class="plan-stock-badge" id="stock-${bKey}" style="margin: 0;">Cargando...</div>
+                            </div>
+                            <div class="plan-desc-text" id="desc-${bKey}" style="transition: opacity 0.2s;"></div>
                             <div id="smart-combo-${bKey}" class="smart-combo-banner" style="display:none;"></div>
                         </div>
                         
-                        <div class="card-bottom" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 15px;">
-                            <div id="cart-controls-${bKey}"></div>
-                        </div>
+                        <div id="cart-controls-${bKey}" style="transition: opacity 0.2s;"></div>
                     </div>
                 </div>`;
             }
