@@ -406,6 +406,12 @@
             box-shadow: 0 0 30px rgba(124, 77, 255, 0.6); 
         }
 
+        /* --- RESTAURACIÓN KEYFRAME SHIMMER --- */
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+
         .trust-badges-container { 
             display: grid; 
             grid-template-columns: 1fr 1fr; 
@@ -967,7 +973,7 @@
         }
 
         .brand-card.expanded .brand-expanded-content {
-            max-height: 800px; /* Suficiente espacio para expandir */
+            max-height: 800px; 
             opacity: 1;
             margin-top: 20px;
         }
@@ -978,14 +984,17 @@
             overflow-x: auto;
             padding-bottom: 10px;
             margin-bottom: 10px;
-            scrollbar-width: none; /* Firefox */
+            scrollbar-width: none; 
         }
         
         .plan-pills-container::-webkit-scrollbar { 
-            display: none; /* Safari/Chrome */
+            display: none; 
         }
 
         .plan-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             background: rgba(0,0,0,0.4);
             border: 1px solid rgba(255,255,255,0.1);
             color: var(--text-muted);
@@ -1008,6 +1017,69 @@
             border-color: var(--neon-purple);
             color: #fff;
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
+        }
+
+        /* --- ANIMACIÓN ETIQUETA --- */
+        .animated-etiqueta {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: #030305;
+            font-size: 10px;
+            font-weight: 800;
+            color: #fff;
+            overflow: hidden;
+            z-index: 1;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 0 10px rgba(124, 77, 255, 0.4);
+        }
+        
+        .animated-etiqueta::before {
+            content: '';
+            position: absolute;
+            width: 300%;
+            height: 300%;
+            background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent);
+            animation: rotateLight 2.5s linear infinite;
+            z-index: -2;
+        }
+        
+        .animated-etiqueta::after {
+            content: '';
+            position: absolute;
+            inset: 1.5px;
+            background: #1a1a24;
+            border-radius: 10px;
+            z-index: -1;
+        }
+        
+        @keyframes rotateLight {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- SMART COMBO BANNER --- */
+        .smart-combo-banner {
+            background: linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 242, 254, 0.05));
+            border: 1px dashed var(--neon-purple);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.1);
+        }
+        .smart-combo-banner span {
+            color: var(--text-main);
+            font-weight: 800;
+        }
+        .smart-combo-banner strong {
+            color: var(--neon-blue);
         }
 
         .plan-details-box {
@@ -1053,7 +1125,6 @@
             transition: opacity 0.2s;
         }
 
-        /* Reutilizamos los botones del carrito para la nueva UI */
         .qty-controls { 
             display: flex; 
             align-items: center; 
@@ -1571,7 +1642,6 @@
         let greetingInterval = null;
         let carritoPedidos = {};
         
-        // --- NUEVA VARIABLE GLOBAL PARA EL CATÁLOGO AGRUPADO ---
         window.catalogGroups = {}; 
 
         function notificarAdmin(titulo, mensaje) {
@@ -2023,8 +2093,9 @@
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
 
+        // --- SOLUCIÓN A NOMBRES RECORTADOS ---
         function srvCleanName(n) { 
-            return n.replace(" Premium","").replace(" Standard","").replace(" Platino","").replace(" Cuenta completa","").trim(); 
+            return n.trim(); // Se remueve el recorte. Ahora respetará el nombre exacto de tu Admin.
         }
 
         function toggleBrandCard(brandId) {
@@ -2040,32 +2111,55 @@
             card.classList.toggle('expanded');
         }
 
+        // --- SISTEMA INTELIGENTE DE COMBOS ---
+        function findComboSuggestion(planName) {
+            if(!globalClientesData || !globalClientesData._goxion_config) return null;
+            const cat = globalClientesData._goxion_config.serviciosGlobales;
+            let currentName = planName.toLowerCase();
+            
+            // Buscar si hay un combo creado en el admin
+            for(let s of cat) {
+                let sName = s.nombre.toLowerCase();
+                if(sName !== currentName && (sName.includes('+') || sName.includes(' combo '))) {
+                    let hasCurrent = false;
+                    if((sName.includes('hbo') || sName.includes('max')) && (currentName.includes('hbo') || currentName.includes('max'))) hasCurrent = true;
+                    if(sName.includes('prime') && currentName.includes('prime')) hasCurrent = true;
+                    if(sName.includes('netflix') && currentName.includes('netflix')) hasCurrent = true;
+                    if(sName.includes('disney') && currentName.includes('disney')) hasCurrent = true;
+                    
+                    if(hasCurrent) {
+                        return { msg: `💡 <strong>Tip Inteligente:</strong> Combínalo y llévate <span>${s.nombre}</span> por <strong>$${s.precio}</strong> todo integrado.` };
+                    }
+                }
+            }
+            
+            // Recomendaciones orgánicas por defecto
+            if(currentName.includes('hbo') || currentName.includes('max')) return { msg: `💡 <strong>Tip Inteligente:</strong> ¡Combínalo con Prime Video y llévatelos por <strong>$99</strong> todo integrado! Pregunta en soporte.` };
+            if(currentName.includes('prime')) return { msg: `💡 <strong>Tip Inteligente:</strong> ¡Suma HBO Max y llévatelos por <strong>$99</strong> todo integrado! Pregunta en soporte.` };
+            
+            return null;
+        }
+
         function selectSubPlan(brandId, planIndex, btnElement, isInit = false) {
             const brand = window.catalogGroups[brandId];
             const plan = brand.plans[planIndex];
             
-            // Actualizar Píldoras activas
             if(btnElement) {
                 const parent = btnElement.parentElement;
                 parent.querySelectorAll('.plan-pill').forEach(b => b.classList.remove('active'));
                 btnElement.classList.add('active');
-            } else if (isInit) {
-                // If it's the initial render, find the first button and set it active (handled in HTML generation mostly, but good practice)
             }
             
-            // Animaciones sutiles de opacidad
             const priceEl = document.getElementById('price-' + brandId);
             const descEl = document.getElementById('desc-' + brandId);
+            const comboEl = document.getElementById('smart-combo-' + brandId);
             
             priceEl.style.opacity = '0';
             descEl.style.opacity = '0';
             
             setTimeout(() => {
-                // Info
                 priceEl.innerText = `$${plan.precio}`;
                 
-                // Buscar Descripción específica
-                // Buscar Descripción específica (Priorizando el texto del Admin)
                 let textoDesc = INFO_SERVICIOS["default"];
                 if (plan.beneficios && plan.beneficios.trim() !== "") {
                     textoDesc = plan.beneficios;
@@ -2079,8 +2173,6 @@
                 }
                 descEl.innerHTML = textoDesc;
 
-                
-                // Stock Badge
                 const stockEl = document.getElementById('stock-' + brandId);
                 if(plan.disponibles > 0) {
                     stockEl.className = 'plan-stock-badge ok';
@@ -2089,15 +2181,26 @@
                     stockEl.className = 'plan-stock-badge out';
                     stockEl.innerHTML = `🔴 Agotado`;
                 }
+
+                // Inyectar el Banner de Combo Inteligente
+                if(comboEl) {
+                    let combo = findComboSuggestion(plan.nombre);
+                    if(combo && plan.disponibles > 0) {
+                        comboEl.innerHTML = combo.msg;
+                        comboEl.style.display = 'block';
+                        comboEl.style.animation = 'none';
+                        setTimeout(() => comboEl.style.animation = 'fadeIn 0.5s ease forwards', 10);
+                    } else {
+                        comboEl.style.display = 'none';
+                    }
+                }
                 
                 priceEl.style.opacity = '1';
                 descEl.style.opacity = '1';
             }, 200);
 
-            // Actualizar botones de carrito
             const cartContainer = document.getElementById('cart-controls-' + brandId);
             if(plan.disponibles > 0) {
-                // Obtener valor actual del carrito para no perderlo al cambiar de tab
                 let currentQty = (carritoPedidos[plan.nombre] && carritoPedidos[plan.nombre].qty) ? carritoPedidos[plan.nombre].qty : 0;
                 cartContainer.innerHTML = `
                 <div class="qty-controls">
@@ -2115,7 +2218,6 @@
             }
         }
 
-        // --- MOTOR REIMAGINADO DEL CATÁLOGO ---
         function cargarCatalogo(data) {
             const config = data._goxion_config;
             const catalogContainer = document.getElementById('catalog-container');
@@ -2164,7 +2266,6 @@
 
             window.catalogGroups = {};
 
-            // Agrupar los servicios del admin
             config.serviciosGlobales.forEach(srv => {
                 let srvLower = srv.nombre.toLowerCase();
                 let brandKey = "otros_" + srv.nombre.replace(/[^a-zA-Z0-9]/g, '');
@@ -2203,21 +2304,19 @@
             
             for (let bKey in window.catalogGroups) {
                 let brand = window.catalogGroups[bKey];
-                
-                // Obtener el precio más bajo para el "Desde $XX"
                 let minPrice = Math.min(...brand.plans.map(p => p.precio));
                 
                 let pillsHtml = '';
                 brand.plans.forEach((plan, idx) => {
                     let planName = srvCleanName(plan.nombre);
-                    let badge = plan.etiqueta ? ` <span style="color:var(--neon-yellow); margin-left:4px;">${plan.etiqueta}</span>` : '';
-                    let agotado = plan.disponibles <= 0 ? ' (Agotado)' : '';
+                    // SOLUCIÓN: Incorporamos la etiqueta animada
+                    let badge = plan.etiqueta ? `<span class="animated-etiqueta">${plan.etiqueta}</span>` : '';
                     let opacity = plan.disponibles <= 0 ? '0.5' : '1';
                     
-                    pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}${badge}${agotado}</button>`;
+                    // SOLUCIÓN: Eliminamos " (Agotado)" del texto del botón.
+                    pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}${badge}</button>`;
                 });
 
-                // Tarjeta Madre Render
                 htmlCatalogo += `
                 <div class="brand-card" id="brand-card-${bKey}">
                     <div class="brand-header" onclick="toggleBrandCard('${bKey}')">
@@ -2240,6 +2339,8 @@
                             <div class="plan-price-large" id="price-${bKey}">$0</div>
                             <div class="plan-stock-badge" id="stock-${bKey}">Cargando...</div>
                             <div class="plan-desc-text" id="desc-${bKey}"></div>
+                            <!-- CONTENEDOR SMART COMBO -->
+                            <div id="smart-combo-${bKey}" class="smart-combo-banner" style="display:none;"></div>
                         </div>
                         
                         <div class="card-bottom" style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 15px;">
@@ -2251,7 +2352,6 @@
             
             if(htmlCatalogo !== '') catalogContainer.innerHTML = htmlCatalogo;
 
-            // Inicializar la vista interior de las tarjetas con el primer plan
             for (let bKey in window.catalogGroups) {
                 selectSubPlan(bKey, 0, null, true);
             }
@@ -2262,7 +2362,6 @@
             carritoPedidos[nombre].qty += cambio; 
             if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
             
-            // Actualizar texto si la tarjeta está expandida
             const qtyEl = document.getElementById('qty-' + safeId);
             if (qtyEl) qtyEl.innerText = carritoPedidos[nombre].qty; 
             
