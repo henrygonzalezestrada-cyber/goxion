@@ -90,7 +90,7 @@
         "cuentas": 1,
         "precio": 99,
         "costo": 149,
-        "limite": 1
+        "limite": 2
       }
     ],
     "combo_upsell": true
