@@ -59,11 +59,11 @@
         "beneficios": ""
       },
       {
-        "nombre": "Crunchyroll Cuenta completa",
-        "precio": 100,
+        "nombre": "Crunchyroll Mega fan",
+        "precio": 45,
         "cuentas": 1,
         "costo": 149,
-        "limite": 1,
+        "limite": 0,
         "beneficios": ""
       },
       {
@@ -81,6 +81,15 @@
         "costo": 0,
         "limite": 5,
         "beneficios": ""
+      },
+      {
+        "nombre": "Crunchyroll cuenta completa",
+        "etiqueta": "",
+        "beneficios": "",
+        "cuentas": 1,
+        "precio": 99,
+        "costo": 149,
+        "limite": 1
       }
     ],
     "combo_upsell": true
