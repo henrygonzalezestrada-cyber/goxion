@@ -630,7 +630,7 @@
 
     function toggleMisiones(key, isChecked) {
         if (!clientesDict[key].gamificacion) {
-            clientesDict[key].gamificacion = { misiones_activas: false, descuento: 5, tareas: "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia." };
+            clientesDict[key].gamificacion = { misiones_activas: false, descuento: 5, tareas: "" };
         }
         clientesDict[key].gamificacion.misiones_activas = isChecked;
         filtrarClientes();
@@ -812,8 +812,8 @@
                 </div>
             `;
 
-            // NUEVO MÓDULO DE GAMIFICACIÓN / CUPONES
-            let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 5, tareas: "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia." };
+            // NUEVO MÓDULO DE GAMIFICACIÓN / CUPONES (Con Textarea actualizado)
+            let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 5, tareas: "" };
             
             let gamifHTML = `
                 <div style="margin-top: 15px; padding: 10px; background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 8px;">
@@ -825,7 +825,8 @@
                     <div style="display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
                         <input type="number" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:4px; font-weight:bold;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)">
                     </div>
-                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; resize: vertical; min-height: 45px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Ej: Consulta tu estado de cuenta...">${gamifConfig.tareas}</textarea>
+                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; resize: vertical; min-height: 65px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Escribe una misión por línea. Ej:\nSíguenos en Instagram\nDeja un comentario">${gamifConfig.tareas}</textarea>
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">* Escribe <strong>una tarea por línea</strong>. El cliente podrá ir marcándolas una por una.</div>
                     ` : `<div style="font-size: 0.75rem; color: var(--text-muted);">Sin misiones asignadas. Actívalo para enviarle un reto.</div>`}
                 </div>
             `;
@@ -1000,7 +1001,7 @@
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: Inyección Gamificación, Misiones y Combo centrado",
+            message: "🤖 Admin Update: Gamificación por líneas y Checklist de Misiones",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
