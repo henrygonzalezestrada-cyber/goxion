@@ -379,7 +379,12 @@
         "concepto": "Caída YouTube",
         "monto": 69
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia."
+    }
   },
   "alondra": {
     "folio": "GX-2026-0010",
@@ -423,6 +428,11 @@
     "descuento_especial": {
       "concepto": "Caída YouTube ",
       "monto": 69
+    },
+    "gamificacion": {
+      "misiones_activas": false,
+      "descuento": 5,
+      "tareas": "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia."
     }
   },
   "luis": {
