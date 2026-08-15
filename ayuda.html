@@ -697,6 +697,7 @@
             margin-bottom: 25px; 
             padding: 20px; 
             border-radius: 20px; 
+            text-align: center; /* Nuevo: Texto centrado */
         }
 
         .promo-title { 
@@ -706,6 +707,7 @@
             margin-bottom: 8px; 
             display: flex; 
             align-items: center; 
+            justify-content: center; /* Nuevo: Icono y texto centrados */
             gap: 8px; 
         }
 
@@ -1503,6 +1505,112 @@
             padding-top: 25px; 
             border-top: 1px dashed rgba(255,255,255,0.05); 
         }
+
+        /* --- GAMIFICACIÓN: BOTONES 1x2 --- */
+        .gamification-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .gamif-btn {
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 20px;
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s;
+        }
+
+        .gamif-btn:hover {
+            transform: translateY(-3px);
+            border-color: rgba(0, 242, 254, 0.3);
+        }
+
+        .gamif-icon {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .shake-anim {
+            animation: shakeGift 2s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        }
+
+        @keyframes shakeGift {
+            0%, 100% { transform: rotate(0deg); }
+            10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
+            20%, 40%, 60%, 80% { transform: rotate(10deg); }
+        }
+
+        .gamif-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .gamif-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .gamif-expanded-container {
+            display: none;
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            animation: slideInExpand 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes slideInExpand {
+            from { opacity: 0; transform: scale(0.95) translateX(20px); }
+            to { opacity: 1; transform: scale(1) translateX(0); }
+        }
+
+        @keyframes slideInExpandLeft {
+            from { opacity: 0; transform: scale(0.95) translateX(-20px); }
+            to { opacity: 1; transform: scale(1) translateX(0); }
+        }
+
+        .gamif-expanded-container.slide-left {
+            animation: slideInExpandLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .btn-gamif-close {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: 0.2s;
+        }
+
+        .btn-gamif-close:hover {
+            background: rgba(255,255,255,0.2);
+        }
     </style>
 </head>
 <body class="no-scroll">
@@ -2063,6 +2171,31 @@
             navigator.clipboard.writeText(texto); 
             alert(`¡${tipo} copiado al portapapeles!`); 
         }
+
+        window.openGamif = function(type) {
+            document.getElementById('gamif-grid').style.display = 'none';
+            if(type === 'referral') {
+                document.getElementById('gamif-expanded-referral').style.display = 'block';
+                document.getElementById('gamif-expanded-coupon').style.display = 'none';
+            } else {
+                document.getElementById('gamif-expanded-coupon').style.display = 'block';
+                document.getElementById('gamif-expanded-referral').style.display = 'none';
+            }
+        };
+
+        window.closeGamif = function() {
+            document.getElementById('gamif-expanded-referral').style.display = 'none';
+            document.getElementById('gamif-expanded-coupon').style.display = 'none';
+            document.getElementById('gamif-grid').style.display = 'grid';
+        };
+        
+        window.copiarEnlace = function() {
+            const input = document.getElementById('ref-link-input');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            navigator.clipboard.writeText(input.value);
+            alert("¡Enlace copiado al portapapeles!");
+        };
         
         function toggleCreds(id) { 
             const box = document.getElementById(id); 
@@ -2128,19 +2261,36 @@
             document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
-            if(cliente.referido_activo) {
+            
+            // --- NUEVA LÓGICA DE GAMIFICACIÓN 1x2 (REFERIDOS Y CUPONES) ---
+            let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 0, tareas: "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario." };
+            let hasMissions = gamifConfig.misiones_activas;
+            
+            let refNombre = cliente.referido_activo ? cliente.referido_activo.nombre : "";
+            let hasReferral = !!cliente.referido_activo;
+            
+            let btnRefHtml = ''; let expandedRefHtml = '';
+            let btnCupHtml = ''; let expandedCupHtml = '';
+
+            // 1. BOTÓN DE REFERIDOS
+            if(hasReferral) {
                 let meses = cliente.referido_activo.meses || 1;
                 let plats = cliente.referido_activo.plataformas || 1;
-                let warningHTML = plats < 2 ? `<div style="background: rgba(255, 170, 0, 0.15); border: 1px dashed var(--warning-amber); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; color: var(--warning-amber);">⚠️ Casi lo logras. Tu referido solo contrató 1 plataforma. ¡Anímalo a sumar una más para desbloquear tu mes gratis!</div>` : '';
-                let borderStyle = plats < 2 ? 'border-color: var(--warning-amber);' : 'border-color: rgba(124, 77, 255, 0.3);';
+                let warningHTML = plats < 2 ? `<div style="background: rgba(255, 170, 0, 0.15); border: 1px dashed var(--warning-amber); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; color: var(--warning-amber);">⚠️ Tu referido solo contrató 1 plataforma. ¡Anímalo a sumar una más para tu mes gratis!</div>` : '';
                 
-                refContainer.innerHTML = `
-                <div class="glass-card referral-card" style="${borderStyle}">
-                    <div class="referral-header">
-                        <div class="referral-title"><span>🎁</span> Tu Referido Activo</div>
-                        <div class="referral-status-badge" style="${plats < 2 ? 'background:rgba(255, 170, 0, 0.15); color:var(--warning-amber); border-color:var(--warning-amber);' : ''}">En Validación</div>
+                btnRefHtml = `
+                    <div class="gamif-btn" onclick="openGamif('referral')">
+                        <div class="gamif-icon shake-anim">🎁</div>
+                        <div class="gamif-title">${refNombre.split(' ')[0]}</div>
+                        <div class="gamif-subtitle" style="color: var(--neon-purple); font-weight: bold;">En Validación</div>
+                    </div>`;
+                
+                expandedRefHtml = `
+                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div class="shake-anim" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">🎁</div>
+                        <div style="font-size: 16px; font-weight: 800;">¡Gracias por invitar a ${refNombre}!</div>
                     </div>
-                    <p style="font-size: 15px; color: var(--text-main); font-weight: 700; margin-bottom: 12px; text-align: center;">${cliente.referido_activo.nombre || "Referido"}</p>
                     <div class="referral-stats">
                         <div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);">
                             <div class="stat-val" style="${plats < 2 ? 'color:var(--warning-amber);' : ''}">${plats}</div>
@@ -2156,22 +2306,78 @@
                         <div class="loyalty-progress-fill" style="width: ${Math.min((meses / 3) * 100, 100)}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div>
                     </div>
                     ${warningHTML}
-                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 10px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
-                </div>`;
+                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
             } else {
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
-                refContainer.innerHTML = `
-                <div class="glass-card referral-card">
-                    <div class="referral-title" style="margin-bottom: 8px; font-size: 15px;">🎁 Gana 1 Mes Gratis</div>
-                    <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.4;">Invita a un amigo usando tu enlace especial. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
+                btnRefHtml = `
+                    <div class="gamif-btn" onclick="openGamif('referral')">
+                        <div class="gamif-icon">🫂</div>
+                        <div class="gamif-title">Invita y Gana</div>
+                        <div class="gamif-subtitle">Empieza a referir</div>
+                    </div>`;
+                
+                expandedRefHtml = `
+                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 38px; margin-bottom: 5px;">🫂</div>
+                        <div style="font-size: 16px; font-weight: 800;">Gana 1 Mes Gratis</div>
+                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Invita a un amigo. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
+                    </div>
                     <div style="display: flex; gap: 8px; margin-bottom: 12px;">
                         <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input">
                         <button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button>
                     </div>
                     <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">📲 Compartir por WhatsApp</button>
-                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>
-                </div>`;
+                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
             }
+
+            // 2. BOTÓN DE CUPONES / MISIONES
+            let cupShake = hasMissions ? 'shake-anim' : '';
+            let cupSubtitle = hasMissions ? `<span style="color: var(--neon-blue); font-weight: bold;">¡Nuevas misiones!</span>` : `Sin tareas`;
+            
+            btnCupHtml = `
+                <div class="gamif-btn" onclick="openGamif('coupon')">
+                    <div class="gamif-icon ${cupShake}">🎟️</div>
+                    <div class="gamif-title">Cupones</div>
+                    <div class="gamif-subtitle">${cupSubtitle}</div>
+                </div>`;
+
+            if(hasMissions) {
+                let encodedWaCoupon = encodeURIComponent(`Hola GOXION, ya completé mis misiones. Mi folio es ${cliente.folio}. Reclamo mi ${gamifConfig.descuento}% de descuento para mi siguiente renovación.`);
+                expandedCupHtml = `
+                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div class="shake-anim" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">🎟️</div>
+                        <div style="font-size: 16px; font-weight: 800; color: var(--neon-blue);">¡Desbloquea ${gamifConfig.descuento}% OFF!</div>
+                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Completa las siguientes misiones para reclamar tu descuento especial:</div>
+                    </div>
+                    <div style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(0, 242, 254, 0.3); padding: 15px; border-radius: 12px; font-size: 13px; color: var(--text-main); margin-bottom: 15px;">
+                        ${gamifConfig.tareas}
+                    </div>
+                    <button class="btn-primary" style="padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${encodedWaCoupon}', '_blank')">✅ Ya lo hice, reclamar cupón</button>`;
+            } else {
+                expandedCupHtml = `
+                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <div style="font-size: 38px; margin-bottom: 5px; opacity: 0.5;">🎟️</div>
+                        <div style="font-size: 16px; font-weight: 800;">Sin misiones activas</div>
+                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Vuelve pronto. Constantemente lanzamos dinámicas para que interactúes y ahorres más.</div>
+                    </div>`;
+            }
+
+            // INYECCIÓN AL CONTENEDOR
+            refContainer.innerHTML = `
+                <div id="gamif-grid" class="gamification-grid">
+                    ${btnRefHtml}
+                    ${btnCupHtml}
+                </div>
+                <div id="gamif-expanded-referral" class="gamif-expanded-container slide-left">
+                    ${expandedRefHtml}
+                </div>
+                <div id="gamif-expanded-coupon" class="gamif-expanded-container">
+                    ${expandedCupHtml}
+                </div>
+            `;
 
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
             const hoy = new Date(); 
