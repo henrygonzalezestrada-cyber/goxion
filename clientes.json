@@ -117,6 +117,11 @@
       "nombre": "Quetzaly",
       "plataformas": 1,
       "meses": 1
+    },
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
     }
   },
   "rodas": {
@@ -143,7 +148,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "nayeli": {
     "folio": "GX-2026-0003",
@@ -162,7 +172,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "laura": {
     "folio": "GX-2026-0004",
@@ -204,7 +219,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "david": {
     "folio": "GX-2026-0005",
@@ -244,7 +264,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "gabriel": {
     "folio": "GX-2026-0006",
@@ -270,7 +295,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "jose": {
     "folio": "GX-2026-0007",
@@ -303,7 +333,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "fabiola": {
     "folio": "GX-2026-0008",
@@ -329,7 +364,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "jorge": {
     "folio": "GX-2026-0009",
@@ -383,7 +423,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia."
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
     }
   },
   "alondra": {
@@ -430,9 +470,9 @@
       "monto": 69
     },
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia."
+      "tareas": "Mira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario) mejorar tu experiencia."
     }
   },
   "luis": {
@@ -452,7 +492,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "samuel": {
     "folio": "GX-2026-0012",
@@ -485,7 +530,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "prima-fernanda": {
     "folio": "GX-2026-0013",
@@ -530,7 +580,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "gabriel2": {
     "folio": "GX-2026-0015",
@@ -556,7 +611,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "juan-de-dios": {
     "folio": "GX-2026-0016",
@@ -589,7 +649,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "rafael": {
     "folio": "GX-2026-0017",
@@ -615,7 +680,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "jeynner": {
     "folio": "GX-2026-0018",
@@ -634,7 +704,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   },
   "isamar": {
     "folio": "GX-2026-0019",
@@ -664,6 +739,11 @@
     "descuento_especial": {
       "concepto": "Caída YouTube",
       "monto": 69
+    },
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
     }
   },
   "quetzaly": {
@@ -685,6 +765,11 @@
       }
     ],
     "descuentos_especiales": [],
-    "descuento_fallas": 0
+    "descuento_fallas": 0,
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+    }
   }
 }
