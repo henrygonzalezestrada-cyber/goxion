@@ -697,18 +697,19 @@
             margin-bottom: 25px; 
             padding: 20px; 
             border-radius: 20px; 
-            text-align: center; /* Nuevo: Texto centrado */
+            text-align: center;
         }
 
         .promo-title { 
-            font-size: 15px; 
+            font-size: 13.5px;
             font-weight: 800; 
             color: #fff; 
             margin-bottom: 8px; 
             display: flex; 
             align-items: center; 
-            justify-content: center; /* Nuevo: Icono y texto centrados */
-            gap: 8px; 
+            justify-content: center;
+            gap: 6px; 
+            white-space: nowrap;
         }
 
         .promo-desc { 
@@ -1506,7 +1507,7 @@
             border-top: 1px dashed rgba(255,255,255,0.05); 
         }
 
-        /* --- GAMIFICACIÓN: BOTONES 1x2 --- */
+        /* --- GAMIFICACIÓN: BOTONES Y EFECTOS --- */
         .gamification-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1530,40 +1531,36 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.3s;
+            transition: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        .gamif-btn:hover {
-            transform: translateY(-3px);
-            border-color: rgba(0, 242, 254, 0.3);
+        .gamif-btn:hover { transform: translateY(-3px); }
+
+        .gamif-icon { font-size: 32px; margin-bottom: 5px; }
+
+        /* Temblor con pausas (cada 3 segundos) */
+        .shake-anim { animation: shakePause 3s infinite; display: inline-block; }
+        @keyframes shakePause {
+            0%, 80%, 100% { transform: rotate(0deg); }
+            82%, 86%, 90%, 94%, 98% { transform: rotate(-10deg); }
+            84%, 88%, 92%, 96% { transform: rotate(10deg); }
         }
 
-        .gamif-icon {
-            font-size: 32px;
-            margin-bottom: 5px;
+        /* Latido / Respiración de Atención */
+        .pulse-mission { animation: pulseMission 2s infinite; border-color: rgba(0, 242, 254, 0.6); }
+        @keyframes pulseMission {
+            0%, 100% { box-shadow: 0 0 10px rgba(0,242,254,0.1); }
+            50% { box-shadow: 0 0 25px rgba(0,242,254,0.5); border-color: var(--neon-blue); }
         }
 
-        .shake-anim {
-            animation: shakeGift 2s infinite cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+        .pulse-referral { animation: pulseRef 2s infinite; border-color: rgba(124, 77, 255, 0.6); }
+        @keyframes pulseRef {
+            0%, 100% { box-shadow: 0 0 10px rgba(124,77,255,0.1); }
+            50% { box-shadow: 0 0 25px rgba(124,77,255,0.5); border-color: var(--neon-purple); }
         }
 
-        @keyframes shakeGift {
-            0%, 100% { transform: rotate(0deg); }
-            10%, 30%, 50%, 70%, 90% { transform: rotate(-10deg); }
-            20%, 40%, 60%, 80% { transform: rotate(10deg); }
-        }
-
-        .gamif-title {
-            font-size: 14px;
-            font-weight: 800;
-            color: var(--text-main);
-            line-height: 1.1;
-        }
-
-        .gamif-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+        .gamif-title { font-size: 14px; font-weight: 800; color: var(--text-main); line-height: 1.1; }
+        .gamif-subtitle { font-size: 11px; color: var(--text-muted); }
 
         .gamif-expanded-container {
             display: none;
@@ -1572,45 +1569,32 @@
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(0, 242, 254, 0.3);
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px; /* Reducido para quitar aire */
             margin-bottom: 25px;
             animation: slideInExpand 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        @keyframes slideInExpand {
-            from { opacity: 0; transform: scale(0.95) translateX(20px); }
-            to { opacity: 1; transform: scale(1) translateX(0); }
-        }
-
-        @keyframes slideInExpandLeft {
-            from { opacity: 0; transform: scale(0.95) translateX(-20px); }
-            to { opacity: 1; transform: scale(1) translateX(0); }
-        }
-
-        .gamif-expanded-container.slide-left {
-            animation: slideInExpandLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
+        @keyframes slideInExpand { from { opacity: 0; transform: scale(0.95) translateX(20px); } to { opacity: 1; transform: scale(1) translateX(0); } }
+        @keyframes slideInExpandLeft { from { opacity: 0; transform: scale(0.95) translateX(-20px); } to { opacity: 1; transform: scale(1) translateX(0); } }
+        
+        .gamif-expanded-container.slide-left { animation: slideInExpandLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
 
         .btn-gamif-close {
-            background: rgba(255,255,255,0.1);
-            border: none;
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 15px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            transition: 0.2s;
+            background: rgba(255,255,255,0.1); border: none; color: var(--text-main);
+            padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;
+            cursor: pointer; margin-bottom: 5px; /* Reducido drásticamente para quitar aire */
+            display: inline-flex; align-items: center; gap: 4px; transition: 0.2s;
         }
+        .btn-gamif-close:hover { background: rgba(255,255,255,0.2); }
 
-        .btn-gamif-close:hover {
-            background: rgba(255,255,255,0.2);
-        }
+        /* UI de Misiones (Checkboxes) */
+        .mission-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; text-align: left; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s; font-size: 12px; }
+        .mission-item:hover { border-color: rgba(0, 242, 254, 0.3); }
+        .mission-item.done { opacity: 0.6; text-decoration: line-through; border-color: var(--success-green); background: rgba(46, 160, 67, 0.1); }
+        .mission-checkbox { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--neon-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: 0.3s; }
+        .mission-item.done .mission-checkbox { background: var(--success-green); border-color: var(--success-green); }
+        .mission-item.done .mission-checkbox::after { content: '✓'; color: #fff; font-size: 12px; font-weight: bold; }
     </style>
 </head>
 <body class="no-scroll">
@@ -2188,6 +2172,63 @@
             document.getElementById('gamif-expanded-coupon').style.display = 'none';
             document.getElementById('gamif-grid').style.display = 'grid';
         };
+
+        window.lanzarConfeti = function() {
+            for(let i=0; i<40; i++) {
+                let conf = document.createElement('div');
+                conf.style.position = 'fixed';
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.top = '-10px';
+                conf.style.width = Math.random() * 8 + 4 + 'px';
+                conf.style.height = Math.random() * 8 + 4 + 'px';
+                conf.style.backgroundColor = ['#00f2fe', '#7c4dff', '#ff3366', '#ffaa00', '#2ea043'][Math.floor(Math.random()*5)];
+                conf.style.zIndex = '9999';
+                conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                conf.style.transition = 'transform 2.5s cubic-bezier(0.2, 0.8, 0.2, 1), top 2.5s ease-in, opacity 2.5s';
+                document.body.appendChild(conf);
+                
+                setTimeout(() => {
+                    conf.style.top = '100vh';
+                    conf.style.transform = `rotate(${Math.random() * 720}deg) translateX(${Math.random() * 150 - 75}px)`;
+                    conf.style.opacity = '0';
+                }, 50);
+                setTimeout(() => conf.remove(), 2600);
+            }
+        };
+
+        window.toggleMission = function(index, btnId, folio) {
+            let item = document.getElementById('mission-' + index);
+            let isDone = item.classList.contains('done');
+            
+            if(!isDone) {
+                item.classList.add('done');
+                lanzarConfeti();
+            } else {
+                item.classList.remove('done');
+            }
+            
+            let allMissions = document.querySelectorAll('.mission-item');
+            let allDone = true;
+            let doneIndexes = [];
+            
+            allMissions.forEach((m, idx) => { 
+                if(!m.classList.contains('done')) allDone = false; 
+                else doneIndexes.push(idx);
+            });
+            
+            let claimBtn = document.getElementById(btnId);
+            if(allDone) {
+                claimBtn.style.display = 'block';
+                setTimeout(() => claimBtn.style.opacity = '1', 50);
+                setTimeout(lanzarConfeti, 300);
+                setTimeout(lanzarConfeti, 800);
+            } else {
+                claimBtn.style.display = 'none';
+                claimBtn.style.opacity = '0';
+            }
+            
+            localStorage.setItem('goxion_missions_' + folio, JSON.stringify(doneIndexes));
+        };
         
         window.copiarEnlace = function() {
             const input = document.getElementById('ref-link-input');
@@ -2263,7 +2304,7 @@
             const refContainer = document.getElementById('referral-section-container');
             
             // --- NUEVA LÓGICA DE GAMIFICACIÓN 1x2 (REFERIDOS Y CUPONES) ---
-            let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 0, tareas: "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario." };
+            let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 0, tareas: "" };
             let hasMissions = gamifConfig.misiones_activas;
             
             let refNombre = cliente.referido_activo ? cliente.referido_activo.nombre : "";
@@ -2272,14 +2313,21 @@
             let btnRefHtml = ''; let expandedRefHtml = '';
             let btnCupHtml = ''; let expandedCupHtml = '';
 
+            // Cargar progreso local de misiones
+            let savedMissions = [];
+            try { savedMissions = JSON.parse(localStorage.getItem('goxion_missions_' + cliente.folio)) || []; } catch(e){}
+
             // 1. BOTÓN DE REFERIDOS
             if(hasReferral) {
                 let meses = cliente.referido_activo.meses || 1;
                 let plats = cliente.referido_activo.plataformas || 1;
                 let warningHTML = plats < 2 ? `<div style="background: rgba(255, 170, 0, 0.15); border: 1px dashed var(--warning-amber); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; color: var(--warning-amber);">⚠️ Tu referido solo contrató 1 plataforma. ¡Anímalo a sumar una más para tu mes gratis!</div>` : '';
                 
+                // Efecto de latido si está a punto de ganar o hay avance
+                let pulseClass = (meses > 0 && meses < 3) ? 'pulse-referral' : (meses >= 3 ? 'pulse-mission' : '');
+
                 btnRefHtml = `
-                    <div class="gamif-btn" onclick="openGamif('referral')">
+                    <div class="gamif-btn ${pulseClass}" onclick="openGamif('referral')">
                         <div class="gamif-icon shake-anim">🎁</div>
                         <div class="gamif-title">${refNombre.split(' ')[0]}</div>
                         <div class="gamif-subtitle" style="color: var(--neon-purple); font-weight: bold;">En Validación</div>
@@ -2287,7 +2335,7 @@
                 
                 expandedRefHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
                         <div class="shake-anim" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">🎁</div>
                         <div style="font-size: 16px; font-weight: 800;">¡Gracias por invitar a ${refNombre}!</div>
                     </div>
@@ -2318,7 +2366,7 @@
                 
                 expandedRefHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
                         <div style="font-size: 38px; margin-bottom: 5px;">🫂</div>
                         <div style="font-size: 16px; font-weight: 800;">Gana 1 Mes Gratis</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Invita a un amigo. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
@@ -2332,33 +2380,49 @@
             }
 
             // 2. BOTÓN DE CUPONES / MISIONES
-            let cupShake = hasMissions ? 'shake-anim' : '';
-            let cupSubtitle = hasMissions ? `<span style="color: var(--neon-blue); font-weight: bold;">¡Nuevas misiones!</span>` : `Sin tareas`;
+            let tareasArr = gamifConfig.tareas ? gamifConfig.tareas.split('\n').filter(t => t.trim() !== '') : [];
+            let allDoneInitial = tareasArr.length > 0 && savedMissions.length === tareasArr.length;
+            
+            // Si hay misiones y NO están todas hechas, tiembla y palpita azul
+            let cupShake = (hasMissions && !allDoneInitial) ? 'shake-anim' : '';
+            let cupPulse = (hasMissions && !allDoneInitial) ? 'pulse-mission' : '';
+            let cupSubtitle = hasMissions ? `<span style="color: var(--neon-blue); font-weight: bold;">¡Misiones activas!</span>` : `Sin tareas`;
             
             btnCupHtml = `
-                <div class="gamif-btn" onclick="openGamif('coupon')">
+                <div class="gamif-btn ${cupPulse}" onclick="openGamif('coupon')">
                     <div class="gamif-icon ${cupShake}">🎟️</div>
                     <div class="gamif-title">Cupones</div>
                     <div class="gamif-subtitle">${cupSubtitle}</div>
                 </div>`;
 
-            if(hasMissions) {
-                let encodedWaCoupon = encodeURIComponent(`Hola GOXION, ya completé mis misiones. Mi folio es ${cliente.folio}. Reclamo mi ${gamifConfig.descuento}% de descuento para mi siguiente renovación.`);
+            if(hasMissions && tareasArr.length > 0) {
+                let encodedWaCoupon = encodeURIComponent(`Hola GOXION, ya completé mis misiones al 100%. Mi folio es ${cliente.folio}. Reclamo mi ${gamifConfig.descuento}% de descuento para mi siguiente renovación.`);
+                
+                let missionsHTML = '';
+                tareasArr.forEach((tarea, idx) => {
+                    let isDone = savedMissions.includes(idx);
+                    missionsHTML += `
+                        <div class="mission-item ${isDone ? 'done' : ''}" id="mission-${idx}" onclick="toggleMission(${idx}, 'btn-claim-coupon', '${cliente.folio}')">
+                            <div class="mission-checkbox"></div>
+                            <div>${tarea}</div>
+                        </div>`;
+                });
+
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
                         <div class="shake-anim" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">🎟️</div>
                         <div style="font-size: 16px; font-weight: 800; color: var(--neon-blue);">¡Desbloquea ${gamifConfig.descuento}% OFF!</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Completa las siguientes misiones para reclamar tu descuento especial:</div>
                     </div>
-                    <div style="background: rgba(0,0,0,0.3); border: 1px dashed rgba(0, 242, 254, 0.3); padding: 15px; border-radius: 12px; font-size: 13px; color: var(--text-main); margin-bottom: 15px;">
-                        ${gamifConfig.tareas}
+                    <div style="margin-bottom: 15px;">
+                        ${missionsHTML}
                     </div>
-                    <button class="btn-primary" style="padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${encodedWaCoupon}', '_blank')">✅ Ya lo hice, reclamar cupón</button>`;
+                    <button id="btn-claim-coupon" class="btn-primary" style="padding: 14px; font-size: 13px; display: ${allDoneInitial ? 'block' : 'none'}; opacity: ${allDoneInitial ? '1' : '0'}; transition: 0.3s;" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${encodedWaCoupon}', '_blank')">✅ Reclamar Cupón del ${gamifConfig.descuento}%</button>`;
             } else {
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align: center; margin-bottom: 15px;">
+                    <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
                         <div style="font-size: 38px; margin-bottom: 5px; opacity: 0.5;">🎟️</div>
                         <div style="font-size: 16px; font-weight: 800;">Sin misiones activas</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Vuelve pronto. Constantemente lanzamos dinámicas para que interactúes y ahorres más.</div>
