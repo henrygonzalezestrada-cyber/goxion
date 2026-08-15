@@ -1050,42 +1050,43 @@
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
         }
 
-        /* --- ETIQUETA ANIMADA --- */
+        /* --- ETIQUETA ANIMADA (NUEVO ESTILO POPULAR/PROMO) --- */
         .animated-etiqueta {
             position: relative;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 3px 10px;
-            border-radius: 12px;
-            background: #030305;
-            font-size: 10px;
+            padding: 4px 10px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--danger-red), var(--warning-amber));
+            font-size: 9px;
             font-weight: 800;
             color: #fff;
             overflow: hidden;
             z-index: 1;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 0 10px rgba(124, 77, 255, 0.4);
+            box-shadow: 0 0 12px rgba(255, 51, 102, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
         
         .animated-etiqueta::before {
             content: '';
             position: absolute;
-            width: 300%;
-            height: 300%;
-            background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent);
-            animation: rotateLight 2.5s linear infinite;
-            z-index: -2;
+            top: 0;
+            left: -150%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.7), transparent);
+            transform: skewX(-25deg);
+            animation: tagShimmerSweep 3s ease-in-out infinite;
         }
         
-        .animated-etiqueta::after {
-            content: '';
-            position: absolute;
-            inset: 1.5px;
-            background: #1a1a24;
-            border-radius: 10px;
-            z-index: -1;
+        @keyframes tagShimmerSweep {
+            0% { left: -150%; }
+            25% { left: 150%; }
+            100% { left: 150%; }
         }
         
         @keyframes rotateLight {
@@ -2364,7 +2365,6 @@
                     let planName = srvCleanName(plan.nombre);
                     let opacity = plan.disponibles <= 0 ? '0.5' : '1';
                     
-                    // Extraemos la primera etiqueta para ponerla afuera
                     if(!brandTag && plan.etiqueta) {
                         brandTag = plan.etiqueta;
                     }
@@ -2372,9 +2372,8 @@
                     pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}</button>`;
                 });
 
-                // Si hay etiqueta, la tarjeta entera brilla
                 let animatedClass = brandTag ? 'has-promo' : '';
-                let badgeHtml = brandTag ? `<span class="animated-etiqueta" style="font-size: 9px; padding: 2px 8px; transform: scale(0.9); margin-top: 2px;">${brandTag}</span>` : '';
+                let badgeHtml = brandTag ? `<span class="animated-etiqueta" style="margin-top: 2px;">${brandTag}</span>` : '';
 
                 htmlCatalogo += `
                 <div class="brand-card ${animatedClass}" id="brand-card-${bKey}">
