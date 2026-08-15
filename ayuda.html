@@ -1336,6 +1336,68 @@
             line-height: 1.5;
         }
 
+        /* --- NUEVO: PREGUNTAS FRECUENTES (ACCORDEÓN) --- */
+        .faq-container {
+            margin-top: 25px;
+        }
+        
+        .faq-item {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            transition: 0.3s;
+        }
+
+        .faq-header {
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .faq-header .icon {
+            transition: transform 0.3s ease;
+            color: var(--neon-blue);
+            font-size: 10px;
+        }
+
+        .faq-item.open .faq-header .icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-body {
+            padding: 0 15px;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, opacity 0.3s ease, padding 0.3s ease;
+            font-size: 12px;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .faq-item.open .faq-body {
+            padding: 0 15px 15px 15px;
+            max-height: 500px;
+            opacity: 1;
+        }
+
+        /* --- NUEVO: BOTÓN DE CONTACTO DIRECTO (ESCALAMIENTO) --- */
+        .direct-contact-box {
+            background: linear-gradient(135deg, rgba(255, 51, 102, 0.1), rgba(124, 77, 255, 0.05));
+            border: 1px dashed rgba(255, 51, 102, 0.4);
+            border-radius: 16px;
+            padding: 15px;
+            margin-top: 25px;
+            text-align: center;
+        }
+
         .modal { 
             display: none; 
             position: fixed; 
@@ -1564,16 +1626,21 @@
             </div>
         </div>
 
+        <!-- VISTA DE SOPORTE -->
         <div id="view-soporte" class="view-section">
             <div class="glass-card smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
+                
+                <!-- GRID DE PLATAFORMAS (AHORA AGRUPADAS POR MARCA) -->
                 <div class="platform-grid" id="support-platforms-grid">
                     <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
                 </div>
+                
                 <div id="step-2" class="step-box">
                     <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
                     <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
                 </div>
+                
                 <div id="step-3" class="step-box">
                     <div class="solution-instructions" id="solution-text"></div>
                     <div id="extra-inputs-container">
@@ -1583,6 +1650,53 @@
                     <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()" style="padding: 14px; font-size: 14px; border-radius: 30px;">
                         📲 Enviar Solicitud a Soporte
                     </button>
+                </div>
+            </div>
+
+            <!-- NUEVA CAJA DE CONTACTO DIRECTO -->
+            <div class="direct-contact-box">
+                <div style="font-size: 20px; margin-bottom: 5px;">💬</div>
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tu problema es distinto?</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Si presentas una situación especial o no encuentras tu falla en la lista superior, contáctanos directamente.</div>
+                <button class="btn-primary" style="background: transparent; border: 1px solid rgba(255, 51, 102, 0.5); color: #fff; box-shadow: none; padding: 10px;" onclick="window.open(`https://wa.me/${NUMERO_GOXION}?text=Hola,%20requiero%20asistencia%20especial%20con%20mi%20cuenta.%20Mi%20ID%20de%20cliente%20es:%20`, '_blank')">
+                    Hablar con Asesor Humano
+                </button>
+            </div>
+
+            <!-- ACORDEÓN DE PREGUNTAS FRECUENTES -->
+            <div class="faq-container">
+                <div class="section-title">Preguntas Frecuentes (FAQ)</div>
+                
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFAQ(this)">
+                        <span>¿Cuáles son los métodos de pago?</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="faq-body">Aceptamos transferencias bancarias interbancarias (SPEI) y depósitos en efectivo mediante tiendas OXXO. Los datos de la cuenta te serán proporcionados por soporte cuando vayas a renovar.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFAQ(this)">
+                        <span>¿Qué pasa si me atraso un día en mi pago?</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="faq-body">Si te atrasas sin dar aviso, se genera un recargo del 5% diario. Si tienes un imprevisto, ¡no te preocupes! Solo envíanos un mensaje antes de tu fecha de corte y te otorgaremos una prórroga sin penalización.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFAQ(this)">
+                        <span>¿Puedo cambiar la contraseña de mi perfil?</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="faq-body">Si tu servicio incluye un perfil privado (ej. Netflix, Disney+), sí puedes y te recomendamos ponerle un PIN. Sin embargo, <strong>NUNCA</strong> debes cambiar la contraseña general o correo de la cuenta principal, ya que perderías tu garantía.</div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-header" onclick="toggleFAQ(this)">
+                        <span>¿Cómo reclamo mi mes gratis por referido?</span>
+                        <span class="icon">▼</span>
+                    </div>
+                    <div class="faq-body">Al invitar a alguien con tu enlace, asegúrate de que nos mencione tu nombre al contratar. Cuando tu referido cumpla 3 meses activos pagando, el sistema automáticamente te bonificará el 100% de descuento en tu cuarta mensualidad.</div>
                 </div>
             </div>
         </div>
@@ -2572,37 +2686,48 @@
             
             if(!config || !config.serviciosGlobales) return;
             
-            const mapImagenes = { 
-                "netflix": "netflix", 
-                "disney": "disney", 
-                "max": "hbo-max", 
-                "prime": "prime-video", 
-                "youtube": "youtube", 
-                "vix": "vix", 
-                "crunchyroll": "crunchyroll", 
-                "spotify": "spotify", 
-                "microsoft": "microsoft", 
-                "google": "google-one", 
-                "apple": "apple", 
-                "paramount": "paramount" 
+            const mapImagenes = {
+                "netflix": { nombre: "Netflix", img: "netflix" },
+                "disney": { nombre: "Disney+", img: "disney" },
+                "max": { nombre: "Max", img: "hbo-max" },
+                "hbo": { nombre: "HBO", img: "hbo-max" },
+                "prime": { nombre: "Prime Video", img: "prime-video" },
+                "youtube": { nombre: "YouTube", img: "youtube" },
+                "vix": { nombre: "ViX", img: "vix" },
+                "crunchyroll": { nombre: "Crunchyroll", img: "crunchyroll" },
+                "spotify": { nombre: "Spotify", img: "spotify" },
+                "microsoft": { nombre: "Microsoft", img: "microsoft" },
+                "google": { nombre: "Google One", img: "google-one" },
+                "apple": { nombre: "Apple", img: "apple" },
+                "paramount": { nombre: "Paramount+", img: "paramount" }
             };
             
             let html = "";
+            let addedBrands = new Set(); 
+            
             config.serviciosGlobales.forEach(s => { 
                 let imgSrc = "logo2.PNG"; 
                 let srvLower = s.nombre.toLowerCase();
+                let brandName = srvCleanName(s.nombre);
+                let brandKeyId = s.nombre; 
                 
                 for (let key in mapImagenes) { 
                     if (srvLower.includes(key)) {
-                        imgSrc = `logos/${mapImagenes[key]}.PNG`; 
+                        imgSrc = `logos/${mapImagenes[key].img}.PNG`; 
+                        brandName = mapImagenes[key].nombre;
+                        brandKeyId = key;
+                        break;
                     }
                 }
                 
-                html += `
-                <div class="platform-btn" onclick="selectPlatform('${s.nombre}', this)">
-                    <img src="${imgSrc}" style="width: 35px; height: 35px; border-radius: 10px; object-fit: cover; margin-bottom: 3px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);" onerror="this.src='logo2.PNG'">
-                    <div style="line-height:1.2;">${srvCleanName(s.nombre)}</div>
-                </div>`; 
+                if (!addedBrands.has(brandKeyId)) {
+                    addedBrands.add(brandKeyId);
+                    html += `
+                    <div class="platform-btn" onclick="selectPlatform('${brandName}', this)">
+                        <img src="${imgSrc}" style="width: 35px; height: 35px; border-radius: 10px; object-fit: cover; margin-bottom: 3px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);" onerror="this.src='logo2.PNG'">
+                        <div style="line-height:1.2;">${brandName}</div>
+                    </div>`; 
+                }
             });
             
             container.innerHTML = html;
@@ -2686,6 +2811,11 @@
                 notificarAdmin("🛠️ Nueva Petición de Soporte", `El cliente **${cliente.nombre}** solicitó ayuda para ${selectedPlat}.`);
             }
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA + val + extraContext)}`, '_blank');
+        }
+
+        function toggleFAQ(el) {
+            const item = el.parentElement;
+            item.classList.toggle('open');
         }
 
     </script>
