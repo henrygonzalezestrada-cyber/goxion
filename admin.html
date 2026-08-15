@@ -628,6 +628,25 @@
         clientesDict[key].referido_activo[field] = value;
     }
 
+    function toggleMisiones(key, isChecked) {
+        if (!clientesDict[key].gamificacion) {
+            clientesDict[key].gamificacion = { misiones_activas: false, descuento: 5, tareas: "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia." };
+        }
+        clientesDict[key].gamificacion.misiones_activas = isChecked;
+        filtrarClientes();
+        const details = document.getElementById(`details-${key}`);
+        if(details) {
+            details.style.display = "block";
+            document.getElementById(`toggle-text-${key}`).innerHTML = "Ocultar detalles ▴";
+        }
+    }
+    
+    function updateMisiones(key, field, value) {
+        if (!clientesDict[key].gamificacion) return;
+        if (field === 'descuento') value = parseFloat(value) || 0;
+        clientesDict[key].gamificacion[field] = value;
+    }
+
     function aplicarTratoJusto(key, montoServicio) {
         if(!clientesDict[key].descuento_fallas) clientesDict[key].descuento_fallas = 0;
         
@@ -793,6 +812,24 @@
                 </div>
             `;
 
+            // NUEVO MÓDULO DE GAMIFICACIÓN / CUPONES
+            let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 5, tareas: "Consulta tu estado de cuenta, revisa nuestro catálogo, deja un comentario para mejorar tu experiencia." };
+            
+            let gamifHTML = `
+                <div style="margin-top: 15px; padding: 10px; background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 8px;">
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px;">
+                        <strong style="color: var(--neon-blue); font-size: 0.85rem;">🎟️ Asignar Misiones (Cupón)</strong>
+                        <label class="switch" style="transform: scale(0.7); margin:0;"><input type="checkbox" ${gamifConfig.misiones_activas ? 'checked' : ''} onchange="toggleMisiones('${key}', this.checked)"><span class="slider"></span></label>
+                    </div>
+                    ${gamifConfig.misiones_activas ? `
+                    <div style="display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
+                        <input type="number" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:4px; font-weight:bold;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)">
+                    </div>
+                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; resize: vertical; min-height: 45px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Ej: Consulta tu estado de cuenta...">${gamifConfig.tareas}</textarea>
+                    ` : `<div style="font-size: 0.75rem; color: var(--text-muted);">Sin misiones asignadas. Actívalo para enviarle un reto.</div>`}
+                </div>
+            `;
+
             const card = document.createElement("div");
             card.className = "client-card";
             card.style.borderLeftColor = statusColor;
@@ -852,6 +889,7 @@
                     </div>
 
                     ${refHTML}
+                    ${gamifHTML}
 
                     ${enRevision ? `
                     <div style="width: 100%; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(188, 19, 254, 0.3);">
@@ -962,7 +1000,7 @@
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: Inyección de campo Beneficios en Catálogo",
+            message: "🤖 Admin Update: Inyección Gamificación, Misiones y Combo centrado",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
