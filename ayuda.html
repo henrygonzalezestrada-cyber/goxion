@@ -1531,14 +1531,50 @@
         .reveal.active { opacity: 1; transform: translateY(0); }
 
         .teaser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
-        .teaser-card { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .teaser-card:hover { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.05); }
-        .teaser-icon { font-size: 28px; margin-bottom: 5px; filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));}
+        .teaser-card { background: var(--card-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .teaser-card:hover { border-color: var(--neon-blue); box-shadow: 0 5px 20px rgba(0, 242, 254, 0.15); }
         .teaser-title { font-size: 13px; font-weight: 700; color: #fff; }
         .teaser-price { font-size: 11px; color: var(--neon-blue); font-weight: 600; margin-top: 3px;}
 
+        /* --- ANIMACIONES DE TEASER CARDS --- */
+        .dynamic-popular { position: relative; width: 100%; height: 45px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
+        .pop-logo { position: absolute; width: 35px; height: 35px; border-radius: 8px; object-fit: cover; opacity: 0; transform: scale(0.5); transition: 0.5s ease; box-shadow: 0 0 15px rgba(255, 51, 102, 0.8); }
+        .pop-logo.active { opacity: 1; transform: scale(1.1); z-index: 2; animation: floatPop 3s infinite ease-in-out; }
+        .fire-fx { position: absolute; bottom: -5px; right: 25%; font-size: 16px; z-index: 3; animation: flicker 1.5s infinite alternate; filter: drop-shadow(0 0 5px #ffaa00); }
+        @keyframes floatPop { 0%, 100% { transform: scale(1.1) translateY(0); } 50% { transform: scale(1.1) translateY(-3px); } }
+        @keyframes flicker { 0% { opacity: 0.7; transform: scale(0.9); } 100% { opacity: 1; transform: scale(1.1); } }
+
+        .dynamic-combo { position: relative; width: 100%; height: 45px; display: flex; justify-content: center; align-items: center; overflow: visible; margin-bottom: 10px; }
+        .combo-logo { position: absolute; width: 30px; height: 30px; border-radius: 8px; object-fit: cover; box-shadow: 0 0 10px rgba(0, 242, 254, 0.6); opacity: 0; }
+        .combo-logo.left { animation: crashLeft 4s infinite cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 2; }
+        .combo-logo.right { animation: crashRight 4s infinite cubic-bezier(0.2, 0.8, 0.2, 1); z-index: 1; }
+        .impact-fx { position: absolute; font-size: 24px; opacity: 0; animation: impactFlash 4s infinite; z-index: 3; filter: drop-shadow(0 0 10px #fff); }
+        
+        @keyframes crashLeft {
+            0% { transform: translateX(-40px) translateY(-15px) rotate(-30deg) scale(0.5); opacity: 0; }
+            15% { transform: translateX(-3px) translateY(0) rotate(-10deg) scale(1.1); opacity: 1; }
+            20% { transform: translateX(-5px) rotate(-15deg) scale(1); opacity: 1; }
+            80% { transform: translateX(-5px) rotate(-15deg) scale(1); opacity: 1; }
+            90% { transform: translateX(-20px) translateY(10px) rotate(-30deg) scale(0.8); opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes crashRight {
+            0% { transform: translateX(40px) translateY(15px) rotate(30deg) scale(0.5); opacity: 0; }
+            15% { transform: translateX(3px) translateY(0) rotate(10deg) scale(1.1); opacity: 1; }
+            20% { transform: translateX(5px) rotate(15deg) scale(1); opacity: 1; }
+            80% { transform: translateX(5px) rotate(15deg) scale(1); opacity: 1; }
+            90% { transform: translateX(20px) translateY(-10px) rotate(30deg) scale(0.8); opacity: 0; }
+            100% { opacity: 0; }
+        }
+        @keyframes impactFlash {
+            0%, 14% { opacity: 0; transform: scale(0.5); }
+            15% { opacity: 1; transform: scale(1.5); }
+            25% { opacity: 0; transform: scale(1); }
+            100% { opacity: 0; }
+        }
+
         .hiw-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 30px; }
-        .hiw-step { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); padding: 18px; border-radius: 16px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center;}
+        .hiw-step { background: var(--card-glass); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); padding: 18px; border-radius: 16px; position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: center;}
         .hiw-num { position: absolute; right: -5px; top: 50%; transform: translateY(-50%); font-size: 80px; font-weight: 800; color: rgba(255,255,255,0.03); line-height: 1; }
         .hiw-title { font-size: 15px; font-weight: 700; color: var(--neon-blue); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; position: relative; z-index: 1;}
         .hiw-desc { font-size: 12px; color: var(--text-muted); position: relative; z-index: 1;}
@@ -1556,8 +1592,16 @@
         .timeline-text { font-size: 11px; font-weight: 600; color: #fff; }
 
         .feature-card { padding: 25px 20px; margin-bottom: 25px; position: relative; overflow: hidden; background: var(--card-glass); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);}
-        .feature-badge { position: absolute; top: 15px; right: 15px; background: rgba(124, 77, 255, 0.2); color: var(--neon-purple); padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; border: 1px solid rgba(124, 77, 255, 0.4);}
-        .feature-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; }
+        
+        .feature-badge { position: absolute; top: -12px; right: 20px; background: linear-gradient(135deg, #ff3366, #b026ff); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 10px; font-weight: 800; border: 1px solid rgba(255,255,255,0.3); z-index: 10; box-shadow: 0 5px 15px rgba(255, 51, 102, 0.4); letter-spacing: 1px;}
+        
+        /* ESTILO CATALOGO PARA GUEST ACTION CARD */
+        .feature-card.has-promo-card { border: none; position: relative; z-index: 1; background: transparent; overflow: visible; margin-top: 35px;}
+        .feature-card.has-promo-card::before { content: ''; position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent); animation: rotateLight 4s linear infinite; z-index: -2; pointer-events: none; }
+        .feature-card.has-promo-card::after { content: ''; position: absolute; inset: 1.5px; background: rgba(8, 8, 12, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 19px; z-index: -1; box-shadow: inset 0 20px 40px -20px rgba(124,77,255,0.15); pointer-events: none; }
+        .feature-card.has-promo-card > * { position: relative; z-index: 1; }
+
+        .feature-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px; margin-top: 5px;}
         .feature-desc { font-size: 12.5px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
         
         .list-check { list-style: none; padding: 0; margin-bottom: 20px; }
@@ -1628,13 +1672,24 @@
 
             <div class="section-title reveal">🔥 Servicios Populares</div>
             <div class="teaser-grid reveal">
+                <!-- Tarjeta 1: Populares Animados -->
                 <div class="teaser-card" onclick="switchTab('catalogo')">
-                    <div class="teaser-icon">🍿</div>
+                    <div class="dynamic-popular">
+                        <img src="logos/netflix.PNG" class="pop-logo active" onerror="this.src='logo2.PNG'">
+                        <img src="logos/disney.PNG" class="pop-logo" onerror="this.src='logo2.PNG'">
+                        <img src="logos/hbo-max.PNG" class="pop-logo" onerror="this.src='logo2.PNG'">
+                        <div class="fire-fx">🔥</div>
+                    </div>
                     <div class="teaser-title">Netflix & Más</div>
                     <div class="teaser-price">Desde $49 MXN</div>
                 </div>
+                <!-- Tarjeta 2: Combos Animados -->
                 <div class="teaser-card" onclick="switchTab('catalogo')">
-                    <div class="teaser-icon">✨</div>
+                    <div class="dynamic-combo">
+                        <img src="logos/hbo-max.PNG" id="combo-img-left" class="combo-logo left" onerror="this.src='logo2.PNG'">
+                        <img src="logos/prime-video.PNG" id="combo-img-right" class="combo-logo right" onerror="this.src='logo2.PNG'">
+                        <div class="impact-fx">💥</div>
+                    </div>
                     <div class="teaser-title">Combos Premium</div>
                     <div class="teaser-price">Ahorro Mensual</div>
                 </div>
@@ -1709,7 +1764,8 @@
                 </div>
             </div>
 
-            <div class="feature-card reveal" id="guest-action-card" style="border-color: rgba(124, 77, 255, 0.4);">
+            <!-- TARJETA INVITADOS: Píldora ajustada y Animación Estilo Catálogo -->
+            <div class="feature-card reveal has-promo-card" id="guest-action-card">
                 <div class="feature-badge">EXCLUSIVO</div>
                 <div class="feature-title">Todo bajo control en tu Espacio</div>
                 <div class="feature-desc">Registra tu dispositivo gratis y lleva la administración de tu entretenimiento a otro nivel.</div>
@@ -2036,6 +2092,35 @@
                 document.getElementById('view-inicio').classList.add('active');
             }
             setTimeout(revealOnScroll, 100);
+
+            // LOGICA PARA ANIMACIONES DE LOGOS POPULARES
+            const popLogosEls = document.querySelectorAll('.pop-logo');
+            let popIdx = 0;
+            if(popLogosEls.length > 0) {
+                setInterval(() => {
+                    popLogosEls.forEach(el => el.classList.remove('active'));
+                    popIdx = (popIdx + 1) % popLogosEls.length;
+                    popLogosEls[popIdx].classList.add('active');
+                }, 3000);
+            }
+
+            // LOGICA PARA ANIMACIONES DE COMBOS IMPACTANDO
+            const comboPairs = [
+                ["logos/hbo-max.PNG", "logos/prime-video.PNG"],
+                ["logos/netflix.PNG", "logos/spotify.PNG"],
+                ["logos/disney.PNG", "logos/youtube.PNG"]
+            ];
+            let comboIdx = 0;
+            const leftEl = document.getElementById('combo-img-left');
+            const rightEl = document.getElementById('combo-img-right');
+            
+            if(leftEl && rightEl) {
+                setInterval(() => {
+                    comboIdx = (comboIdx + 1) % comboPairs.length;
+                    leftEl.src = comboPairs[comboIdx][0];
+                    rightEl.src = comboPairs[comboIdx][1];
+                }, 4000); 
+            }
         });
 
         const rotatorTexts = [
