@@ -391,7 +391,6 @@
         let folio = prompt("Folio:", folioSugerido);
         if(!folio) return;
         
-        // Crear ID seguro (minúsculas, sin espacios, sin acentos)
         let key = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
         
         if(clientesDict[key]) {
@@ -416,7 +415,6 @@
         calcularInventarioYFinanzas();
         filtrarClientes();
         
-        // Desplegar automáticamente los detalles del nuevo cliente
         setTimeout(() => {
             const details = document.getElementById(`details-${key}`);
             if(details) {
@@ -442,7 +440,6 @@
                 cliente.servicios.forEach(s => {
                     ingresosTotales += parseFloat(s.monto || 0);
                     
-                    // --- NUEVO: LÓGICA INTELIGENTE DE COMBOS ---
                     let nombreCliente = s.nombre.toLowerCase();
                     let multiplier = 1; 
                     let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
@@ -452,7 +449,6 @@
                         let nombreCatalogo = g.nombre.toLowerCase();
                         let matched = false;
                         
-                        // Mapeo inteligente (Si el nombre del cliente y el del catalogo comparten la familia)
                         if (nombreCatalogo.includes('netflix') && nombreCliente.includes('netflix')) matched = true;
                         else if (nombreCatalogo.includes('disney') && (nombreCliente.includes('disney') || nombreCliente.includes('disney+'))) matched = true;
                         else if ((nombreCatalogo.includes('max') || nombreCatalogo.includes('hbo')) && (nombreCliente.includes('max') || nombreCliente.includes('hbo'))) matched = true;
@@ -463,7 +459,6 @@
                         else if (nombreCatalogo.includes('microsoft') && (nombreCliente.includes('microsoft') || nombreCliente.includes('365'))) matched = true;
                         else if (nombreCatalogo.includes('google') && (nombreCliente.includes('google') || nombreCliente.includes('one'))) matched = true;
                         else {
-                            // Fallback para servicios raros
                             let keyword = g.nombre.replace(/ premium| standard| platino| cuenta completa| 2tb| 365/gi, '').trim().toLowerCase();
                             if (nombreCliente.includes(keyword)) matched = true;
                         }
@@ -812,7 +807,6 @@
                 </div>
             `;
 
-            // NUEVO MÓDULO DE GAMIFICACIÓN / CUPONES (Con Textarea actualizado)
             let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 5, tareas: "" };
             
             let gamifHTML = `
@@ -825,8 +819,16 @@
                     <div style="display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
                         <input type="number" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:4px; font-weight:bold;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)">
                     </div>
-                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; resize: vertical; min-height: 65px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Escribe una misión por línea. Ej:\nSíguenos en Instagram\nDeja un comentario">${gamifConfig.tareas}</textarea>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 4px;">* Escribe <strong>una tarea por línea</strong>. El cliente podrá ir marcándolas una por una.</div>
+                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; resize: vertical; min-height: 65px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Visita nuestro catálogo [CATALOGO]\nPaga tu cuenta [PAGO]\nSíguenos en [LINK:https://instagram.com]">${gamifConfig.tareas}</textarea>
+                    
+                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                        <strong>💡 CREADOR DE MISIONES AUTOMÁTICAS:</strong><br>
+                        Escribe una tarea por línea. Si deseas que se cumpla de forma automática con candado, añade una de estas etiquetas al final de la línea:<br>
+                        <span style="color:var(--neon-blue)">[CATALOGO]</span> = Se desbloquea cuando el cliente navega a "Catálogo".<br>
+                        <span style="color:var(--neon-blue)">[PAGO]</span> = Se desbloquea cuando presiona "Pagar Estado de Cuenta".<br>
+                        <span style="color:var(--neon-blue)">[LINK:https://...]</span> = Abre el link que pongas y se desbloquea solo.<br>
+                        <span style="color:var(--neon-purple)">Sin etiqueta</span> = Tarea normal (el usuario puede marcarla con el dedo).
+                    </div>
                     ` : `<div style="font-size: 0.75rem; color: var(--text-muted);">Sin misiones asignadas. Actívalo para enviarle un reto.</div>`}
                 </div>
             `;
@@ -1001,7 +1003,7 @@
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: Gamificación por líneas y Checklist de Misiones",
+            message: "🤖 Admin Update: Sistema de Etiquetas (Tags) para Misiones",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
