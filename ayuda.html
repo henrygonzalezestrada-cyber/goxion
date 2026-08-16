@@ -854,7 +854,6 @@
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.25), 0 15px 30px rgba(0,0,0,0.4); 
         }
 
-        /* --- ESTILO PARA TARJETA EXTERIOR CON ETIQUETA --- */
         .brand-card.has-promo {
             border: none;
             position: relative;
@@ -1004,7 +1003,6 @@
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
         }
 
-        /* --- ETIQUETA ANIMADA (NUEVO ESTILO POPULAR/PROMO) --- */
         .animated-etiqueta {
             position: relative;
             display: inline-flex;
@@ -1048,7 +1046,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* --- SMART COMBO BANNER --- */
         .smart-combo-banner {
             background: linear-gradient(135deg, rgba(124, 77, 255, 0.15), rgba(0, 242, 254, 0.05));
             border: 1px dashed var(--neon-purple);
@@ -1099,7 +1096,6 @@
             line-height: 1.6;
         }
 
-        /* --- NUEVO CONTENEDOR DE ACCIÓN Y PRECIO SIMÉTRICO --- */
         .price-action-box {
             display: flex;
             align-items: center;
@@ -1290,7 +1286,6 @@
             line-height: 1.5;
         }
 
-        /* --- PREGUNTAS FRECUENTES (ACCORDEÓN) --- */
         .faq-container {
             margin-top: 25px;
         }
@@ -1517,6 +1512,7 @@
             border-radius: 20px;
             padding: 15px; 
             margin-bottom: 25px;
+            /* 👇 ESTA LÍNEA FUE CORREGIDA (SE AÑADIÓ EL PARÉNTESIS FALTANTE) 👇 */
             animation: slideInExpand 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
@@ -1534,7 +1530,6 @@
         }
         .btn-gamif-close:hover { background: rgba(255,255,255,0.2); }
 
-        /* UI de Misiones (Checkboxes) */
         .mission-item { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; text-align: left; background: rgba(0,0,0,0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: 0.3s; font-size: 12px; }
         .mission-item:hover { border-color: rgba(0, 242, 254, 0.3); }
         .mission-item.done { opacity: 0.6; text-decoration: line-through; border-color: var(--success-green); background: rgba(46, 160, 67, 0.1); }
@@ -1542,7 +1537,6 @@
         .mission-item.done .mission-checkbox { background: var(--success-green); border-color: var(--success-green); }
         .mission-item.done .mission-checkbox::after { content: '✓'; color: #fff; font-size: 12px; font-weight: bold; }
         
-        /* --- CLASES INYECTADAS EXCLUSIVAS PARA LA LANDING PAGE Y MISIONES --- */
         .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
@@ -1552,7 +1546,6 @@
         .teaser-title { font-size: 13px; font-weight: 700; color: #fff; }
         .teaser-price { font-size: 11px; color: var(--neon-blue); font-weight: 600; margin-top: 3px;}
 
-        /* --- ANIMACIONES DE TEASER CARDS --- */
         .dynamic-popular { position: relative; width: 100%; height: 45px; display: flex; justify-content: center; align-items: center; margin-bottom: 10px; }
         .pop-logo { position: absolute; width: 35px; height: 35px; border-radius: 8px; object-fit: cover; opacity: 0; transform: scale(0.5); transition: 0.5s ease; box-shadow: 0 0 15px rgba(255, 51, 102, 0.8); }
         .pop-logo.active { opacity: 1; transform: scale(1.1); z-index: 2; animation: floatPop 3s infinite ease-in-out; }
@@ -1609,7 +1602,6 @@
 
         .feature-card { padding: 25px 20px; margin-bottom: 25px; position: relative; overflow: hidden; background: var(--card-glass); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);}
         
-        /* ESTILO CATALOGO PARA GUEST ACTION CARD (GLASS NEÓN MODERNO - LÍNEA ROTATORIA) */
         .feature-card.has-promo-card { 
             background: transparent; 
             border: none; 
@@ -1636,7 +1628,7 @@
             content: '';
             position: absolute;
             inset: 2px;
-            background: #08080c; /* Color sólido para ocultar el resplandor interno de la línea animada */
+            background: #08080c; 
             border-radius: 18px;
             z-index: -1;
             pointer-events: none;
@@ -1665,7 +1657,6 @@
         .feature-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px;}
         .feature-desc { font-size: 12.5px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
         
-        /* ESTILOS PARA LAS TARJETAS ROTATIVAS (APILABLES) */
         .rotating-benefits-container {
             position: relative;
             height: 75px;
@@ -1751,9 +1742,6 @@
             <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
         </div>
 
-        <!-- ========================================== -->
-        <!-- VISTA DE INICIO (LANDING PREMIUM INYECTADA) -->
-        <!-- ========================================== -->
         <div id="view-inicio" class="view-section">
             <div style="text-align: center; margin-top: 10px;" class="reveal">
                 <h2 class="hero-title">Tus apps premium<br><span>al mejor precio</span></h2>
@@ -1764,14 +1752,13 @@
                     </div>
                 </div>
 
-                <button class="btn-shimmer" onclick="window.open('https://wa.me/528136836901?text=Hola,%20quiero%20registrararme%20y%20obtener%20el%20descuento', '_blank')" style="margin-bottom: 25px;">
+                <button class="btn-shimmer" onclick="solicitarCuenta()" style="margin-bottom: 25px;">
                     🎁 Únete hoy y obtén -10% OFF
                 </button>
             </div>
 
             <div class="section-title reveal">🔥 Servicios Populares</div>
             <div class="teaser-grid reveal">
-                <!-- Tarjeta 1: Populares Animados -->
                 <div class="teaser-card" onclick="switchTab('catalogo')">
                     <div class="dynamic-popular">
                         <img src="logos/netflix.PNG" class="pop-logo active" onerror="this.src='logo2.PNG'">
@@ -1782,7 +1769,6 @@
                     <div class="teaser-title">Netflix & Más</div>
                     <div class="teaser-price">Desde $49 MXN</div>
                 </div>
-                <!-- Tarjeta 2: Combos Animados -->
                 <div class="teaser-card" onclick="switchTab('catalogo')">
                     <div class="dynamic-combo">
                         <img src="logos/hbo-max.PNG" id="combo-img-left" class="combo-logo left" onerror="this.src='logo2.PNG'">
@@ -1863,7 +1849,6 @@
                 </div>
             </div>
 
-            <!-- TARJETA INVITADOS: Nuevo estilo Glass Neón -->
             <div class="feature-card reveal has-promo-card" id="guest-action-card">
                 <div class="feature-badge">EXCLUSIVO</div>
                 <div class="feature-title" style="margin-top: 0;">Todo bajo control en tu Espacio</div>
@@ -1889,7 +1874,7 @@
                 </div>
                 
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn-primary" style="flex: 1; padding: 14px; font-size: 14px;" onclick="window.open('https://wa.me/528136836901?text=Hola,%20quiero%20crear%20mi%20cuenta', '_blank')">Crear cuenta</button>
+                    <button class="btn-primary" style="flex: 1; padding: 14px; font-size: 14px;" onclick="solicitarCuenta()">Crear cuenta</button>
                     <button class="btn-primary" style="flex: 1; padding: 14px; font-size: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none; color: #fff;" onclick="openAuthSheet()">Iniciar sesión</button>
                 </div>
             </div>
@@ -1929,7 +1914,6 @@
                 <button class="btn-primary" style="background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); box-shadow: none; padding: 12px;" onclick="switchTab('soporte')">Hablar con soporte</button>
             </div>
         </div>
-        <!-- ========================================== -->
 
         <!-- DASHBOARD -->
         <div id="view-dashboard" class="view-section">
@@ -1963,7 +1947,6 @@
             <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">💳 Ver Estado de Cuenta y Pagar</button>
         </div>
 
-        <!-- VISTA CATÁLOGO REIMAGINADO -->
         <div id="view-catalogo" class="view-section">
             <div class="section-title">Nuestros Ecosistemas y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
@@ -1971,12 +1954,10 @@
             </div>
         </div>
 
-        <!-- VISTA DE SOPORTE -->
         <div id="view-soporte" class="view-section">
             <div class="glass-card smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 
-                <!-- GRID DE PLATAFORMAS (AHORA AGRUPADAS POR MARCA) -->
                 <div class="platform-grid" id="support-platforms-grid">
                     <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
                 </div>
@@ -1998,7 +1979,6 @@
                 </div>
             </div>
 
-            <!-- NUEVA CAJA DE CONTACTO DIRECTO -->
             <div class="direct-contact-box">
                 <div style="font-size: 20px; margin-bottom: 5px;">💬</div>
                 <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tu problema es distinto?</div>
@@ -2008,7 +1988,6 @@
                 </button>
             </div>
 
-            <!-- CAJA DE FEEDBACK -->
             <div class="glass-card" style="margin-top: 15px; text-align: center; padding: 15px;">
                 <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tienes alguna sugerencia?</div>
                 <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ayúdanos a mejorar nuestro servicio dejándonos un comentario o califica tu experiencia.</div>
@@ -2017,7 +1996,6 @@
                 </button>
             </div>
 
-            <!-- ACORDEÓN DE PREGUNTAS FRECUENTES -->
             <div class="faq-container">
                 <div class="section-title">Preguntas Frecuentes (FAQ)</div>
                 
@@ -2066,7 +2044,6 @@
         </div>
     </div>
 
-    <!-- EL BOTTOM SHEET PARA EL FORMULARIO DE LOGIN -->
     <div id="auth-overlay" class="auth-overlay" onclick="closeAuthSheetEvent(event)">
         <div class="auth-sheet" id="auth-sheet">
             <img src="Logo individual.png" class="auth-bg-logo" onerror="this.src='logo2.PNG'">
@@ -2097,7 +2074,6 @@
         <button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
     </div>
 
-    <!-- MODALES DE TÉRMINOS -->
     <div id="modal-terminos" class="modal">
         <div class="glass-card modal-content">
             <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
@@ -2154,7 +2130,6 @@
         </div>
     </div>
 
-    <!-- MODAL DE FEEDBACK -->
     <div id="modal-feedback" class="modal">
         <div class="glass-card modal-content" style="text-align: center;">
             <span class="close-btn" onclick="closeModal('modal-feedback')">&times;</span>
@@ -2177,16 +2152,66 @@
         
         window.catalogGroups = {}; 
 
-        function notificarAdmin(titulo, mensaje) {
+        // NUEVA VERSIÓN "SUPER NOTIFICACIONES" (EMBEDS)
+        function notificarAdmin(titulo, mensaje, colorHex = "00f2fe") {
             if(!WEBHOOK_DISCORD) return;
+            
+            const colorDec = parseInt(colorHex.replace("#",""), 16);
+
+            const payload = {
+                embeds: [{
+                    title: titulo,
+                    description: mensaje,
+                    color: colorDec,
+                    timestamp: new Date().toISOString(),
+                    footer: { text: "GOXION System" }
+                }]
+            };
+
             fetch(WEBHOOK_DISCORD, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ content: `**${titulo}**\n${mensaje}` })
+                body: JSON.stringify(payload)
             }).catch(e => console.log("Webhook no enviado", e));
         }
 
-        // --- NUEVA ANIMACIÓN SCROLL (REVEAL) ---
+        // NUEVA FUNCIÓN PARA REGISTRAR PROSPECTOS DESDE LA APP
+        function solicitarCuenta() {
+            let nombre = prompt("¿Cómo te llamas?");
+            if(!nombre) return;
+            let contacto = prompt("Déjanos tu número de WhatsApp para contactarte y crear tu perfil:");
+            if(!contacto) return;
+
+            notificarAdmin("🆕 NUEVO PROSPECTO", `**Nombre:** ${nombre}\n**WhatsApp:** ${contacto}\n\n*Este cliente quiere crear una cuenta nueva.*`, "00f2fe");
+            
+            alert(`¡Gracias ${nombre}! Hemos recibido tus datos. Te enviaremos un mensaje por WhatsApp en breve para activar tu espacio.`);
+        }
+
+        // NUEVA FUNCIÓN PARA RECLAMAR CUPONES EN SILENCIO
+        function reclamarCuponSilencioso(nombre, folio, descuento) {
+            notificarAdmin("🏆 CUPÓN RECLAMADO", `El cliente **${nombre}** (Folio: ${folio}) completó sus misiones y reclamó su **${descuento}% de descuento** para su próxima factura.`, "7c4dff");
+            
+            const btn = document.getElementById('btn-claim-coupon');
+            if(btn) {
+                btn.innerHTML = "🎉 ¡Cupón aplicado para tu próxima factura!";
+                btn.style.background = "rgba(46, 160, 67, 0.2)";
+                btn.style.border = "1px solid var(--success-green)";
+                btn.style.color = "var(--success-green)";
+                btn.onclick = null; 
+            }
+        }
+
+        // NUEVA FUNCIÓN PARA UPSELLS (MEJORAS AL COMBO) EN SILENCIO
+        window.solicitarMejoraSilenciosa = function(mejoraStr) {
+            const key = localStorage.getItem('goxion_user_key');
+            if(!key || !globalClientesData[key]) return;
+            
+            let cliente = globalClientesData[key];
+            notificarAdmin("🔥 SOLICITUD DE UPGRADE", `El cliente **${cliente.nombre}** (Folio: ${cliente.folio}) quiere agregar: **${mejoraStr}** para armar su Combo GOXION.`, "ffaa00");
+            
+            alert("¡Excelente decisión! Hemos notificado a nuestro equipo para aplicar la mejora a tu cuenta. Te contactaremos en breve para confirmar la activación.");
+        };
+
         function revealOnScroll() {
             var reveals = document.querySelectorAll(".reveal");
             for (var i = 0; i < reveals.length; i++) {
@@ -2227,7 +2252,6 @@
             }
             setTimeout(revealOnScroll, 100);
 
-            // LOGICA PARA ANIMACIONES DE LOGOS POPULARES
             const popLogosEls = document.querySelectorAll('.pop-logo');
             let popIdx = 0;
             if(popLogosEls.length > 0) {
@@ -2238,7 +2262,6 @@
                 }, 3000);
             }
 
-            // LOGICA PARA ANIMACIONES DE COMBOS IMPACTANDO
             const comboPairs = [
                 ["logos/hbo-max.PNG", "logos/prime-video.PNG"],
                 ["logos/netflix.PNG", "logos/spotify.PNG"],
@@ -2256,7 +2279,6 @@
                 }, 4000); 
             }
 
-            // LOGICA PARA BENEFICIOS ROTATIVOS
             const benefitsEls = document.querySelectorAll('.rotating-benefit-item');
             let benIdx = 0;
             if(benefitsEls.length > 0) {
@@ -2462,7 +2484,7 @@
 
                 renderDashboard(foundKey); 
                 switchTab('inicio');
-                notificarAdmin("🟢 Nuevo Inicio de Sesión", `El cliente **${clientName}** acaba de entrar a su app.`);
+                notificarAdmin("🟢 Nuevo Inicio de Sesión", `El cliente **${clientName}** acaba de entrar a su app.`, "2ea043");
             } else { 
                 errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código."; 
                 errorMsg.style.display = 'block'; 
@@ -2548,7 +2570,7 @@
             let item = document.getElementById('mission-' + index);
             let isDone = item.classList.contains('done');
             
-            if(isDone) return; // Evita quitar el check una vez puesto
+            if(isDone) return; 
             
             item.classList.add('done');
             lanzarConfeti();
@@ -2576,7 +2598,6 @@
             localStorage.setItem('goxion_missions_' + folio, JSON.stringify(doneIndexes));
         };
 
-        // --- LÓGICA DE FEEDBACK ---
         let activeFeedbackMissionIdx = null;
         let activeFeedbackFolio = null;
 
@@ -2598,16 +2619,14 @@
             let clienteNombre = key && globalClientesData[key] ? globalClientesData[key].nombre : "Usuario Anónimo";
             let clienteFolio = activeFeedbackFolio || (key && globalClientesData[key] ? globalClientesData[key].folio : "N/A");
             
-            notificarAdmin("💬 Nuevo Feedback Recibido", `**Cliente:** ${clienteNombre} (Folio: ${clienteFolio})\n**Comentario:**\n"${text}"`);
+            notificarAdmin("💬 Nuevo Feedback Recibido", `**Cliente:** ${clienteNombre} (Folio: ${clienteFolio})\n**Comentario:**\n"${text}"`, "ffaa00");
             
             document.getElementById('btn-send-feedback').style.display = 'none';
             document.getElementById('feedback-success').style.display = 'block';
             
-            // Si la misión fue clickeada desde los cupones
             if(activeFeedbackMissionIdx !== null) {
                 toggleMission(activeFeedbackMissionIdx, 'btn-claim-coupon', activeFeedbackFolio);
             } else {
-                // Si entró desde la pestaña general de soporte, validamos si la misión estaba pendiente
                 completarMisionInteligente('feedback');
             }
             
@@ -2616,7 +2635,6 @@
             }, 2000);
         };
 
-        // --- MOTOR DE DETECCIÓN INTELIGENTE ---
         window.completarMisionInteligente = function(tipo) {
             const key = localStorage.getItem('goxion_user_key');
             if(!key || !globalClientesData[key]) return;
@@ -2691,7 +2709,7 @@
                 });
             }
 
-            let upsellHTML = '', msgPromoWA = '';
+            let upsellHTML = '';
             if(hasCombo) { 
                 upsellHTML = `
                 <div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);">
@@ -2700,20 +2718,18 @@
                 </div>`; 
             } else if (isComboUpsellActive) {
                 if(hasPrime) { 
-                    msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar HBO Max a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
                     upsellHTML = `
                     <div class="promo-card">
                         <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
                         <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
-                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir HBO Max al mejor precio</button>
+                        <button class="btn-promo" onclick="solicitarMejoraSilenciosa('HBO Max')">Añadir HBO Max al mejor precio</button>
                     </div>`; 
                 } else if(hasHBO) { 
-                    msgPromoWA = encodeURIComponent(`Hola GOXION, quiero aprovechar la promo para sumar Prime Video a mi cuenta y armar el Combo GOXION. Mi folio es ${cliente.folio}.`); 
                     upsellHTML = `
                     <div class="promo-card">
                         <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
                         <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
-                        <button class="btn-promo" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${msgPromoWA}', '_blank')">Añadir Prime Video con descuento</button>
+                        <button class="btn-promo" onclick="solicitarMejoraSilenciosa('Prime Video')">Añadir Prime Video con descuento</button>
                     </div>`; 
                 }
             }
@@ -2808,8 +2824,6 @@
                 </div>`;
 
             if(hasMissions && tareasArr.length > 0) {
-                let encodedWaCoupon = encodeURIComponent(`Hola GOXION, ya completé mis misiones al 100%. Mi folio es ${cliente.folio}. Reclamo mi ${gamifConfig.descuento}% de descuento para mi siguiente renovación.`);
-                
                 let missionsHTML = '';
                 tareasArr.forEach((tareaLine, idx) => {
                     let isDone = savedMissions.includes(idx);
@@ -2865,7 +2879,7 @@
                     <div style="margin-bottom: 15px;">
                         ${missionsHTML}
                     </div>
-                    <button id="btn-claim-coupon" class="btn-primary" style="padding: 14px; font-size: 13px; display: ${allDoneInitial ? 'block' : 'none'}; opacity: ${allDoneInitial ? '1' : '0'}; transition: 0.3s;" onclick="window.open('https://wa.me/${NUMERO_GOXION}?text=${encodedWaCoupon}', '_blank')">✅ Reclamar Cupón del ${gamifConfig.descuento}%</button>`;
+                    <button id="btn-claim-coupon" class="btn-primary" style="padding: 14px; font-size: 13px; display: ${allDoneInitial ? 'block' : 'none'}; opacity: ${allDoneInitial ? '1' : '0'}; transition: 0.3s;" onclick="reclamarCuponSilencioso('${cliente.nombre}', '${cliente.folio}', '${gamifConfig.descuento}')">✅ Aplicar Cupón del ${gamifConfig.descuento}%</button>`;
             } else {
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
@@ -3279,18 +3293,40 @@
             }
         }
 
+        // NUEVA VERSIÓN DE ENVIAR PEDIDO SILENCIOSO A DISCORD
         function enviarPedido() {
-            let msg = "Hola GOXION, me interesa contratar:\n\n", totalPrecio = 0;
+            let msgDiscord = ""; 
+            let totalPrecio = 0;
+            
             for (let item in carritoPedidos) {
                 if (carritoPedidos[item].qty > 0) { 
-                    msg += `✅ ${carritoPedidos[item].qty}x ${item} ($${carritoPedidos[item].precio * carritoPedidos[item].qty} MXN)\n`; 
+                    msgDiscord += `🛒 **${carritoPedidos[item].qty}x** ${item} ($${carritoPedidos[item].precio * carritoPedidos[item].qty} MXN)\n`; 
                     totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio); 
                 }
             }
-            msg += `\n*Total estimado: $${totalPrecio} MXN*\n¿Aún hay disponibilidad?`;
+            msgDiscord += `\n💰 **Total estimado:** $${totalPrecio} MXN`;
+
+            const key = localStorage.getItem('goxion_user_key');
+            let clienteInfo = "👤 **Cliente:** INVITADO (Aún no inicia sesión)";
+            if (key && globalClientesData[key]) {
+                clienteInfo = `👤 **Cliente:** ${globalClientesData[key].nombre}\n📄 **Folio:** ${globalClientesData[key].folio}`;
+            }
+
+            notificarAdmin("🚀 NUEVO PEDIDO RECIBIDO", `${clienteInfo}\n\n${msgDiscord}`, "2ea043");
+
+            const alertContent = document.getElementById('alert-content');
+            const dynamicAlert = document.getElementById('dynamic-alert');
             
-            notificarAdmin("🛒 Nuevo Intento de Pedido", `Un usuario está cotizando un pedido por **$${totalPrecio} MXN** desde la app.`);
-            window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msg)}`, '_blank');
+            alertContent.innerHTML = "<strong>¡Pedido recibido con éxito!</strong><br>Hemos registrado tu solicitud. Te contactaremos en breve o verás los accesos reflejados en tu panel pronto.";
+            dynamicAlert.style.display = 'flex';
+            dynamicAlert.style.background = 'rgba(46, 160, 67, 0.15)'; 
+            dynamicAlert.style.borderColor = 'var(--success-green)';
+            
+            carritoPedidos = {};
+            renderCartFloating();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            setTimeout(() => { dynamicAlert.style.display = 'none'; }, 8000);
         }
 
         let selectedPlat = "", currentIssues = {};
