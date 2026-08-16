@@ -1593,27 +1593,42 @@
 
         .feature-card { padding: 25px 20px; margin-bottom: 25px; position: relative; overflow: hidden; background: var(--card-glass); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);}
         
-        /* ESTILO CATALOGO PARA GUEST ACTION CARD (GLASS NEÓN MODERNO) */
+        /* ESTILO CATALOGO PARA GUEST ACTION CARD (GLASS NEÓN MODERNO - LÍNEA ROTATORIA) */
         .feature-card.has-promo-card { 
-            background: linear-gradient(180deg, rgba(30, 30, 40, 0.6) 0%, rgba(10, 10, 15, 0.8) 100%);
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.05); 
-            border-top: 1px solid rgba(255, 255, 255, 0.15); 
-            border-bottom: 2px solid var(--neon-purple); 
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 15px 35px -5px rgba(124, 77, 255, 0.4); 
+            background: transparent; 
+            border: none; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(124, 77, 255, 0.2); 
             border-radius: 20px; 
             position: relative; 
             z-index: 1; 
             margin-top: 15px; 
             overflow: hidden; 
-            transition: box-shadow 0.4s ease, border-bottom-color 0.4s ease;
-            animation: neonPulseCard 4s infinite alternate;
         }
 
-        @keyframes neonPulseCard {
-            0% { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 15px 35px -5px rgba(124, 77, 255, 0.3); border-bottom-color: var(--neon-purple); }
-            100% { box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 15px 35px -5px rgba(0, 242, 254, 0.4); border-bottom-color: var(--neon-blue); }
+        .feature-card.has-promo-card::before {
+            content: '';
+            position: absolute;
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            background: conic-gradient(from 0deg, transparent 70%, var(--neon-purple) 85%, var(--neon-blue) 100%);
+            animation: rotateLight 3.5s linear infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        .feature-card.has-promo-card::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: linear-gradient(180deg, rgba(30, 30, 40, 0.95) 0%, rgba(10, 10, 15, 0.98) 100%);
+            border-radius: 18px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .feature-card.has-promo-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .feature-badge { 
@@ -1818,11 +1833,11 @@
                 <div class="feature-desc">La puntualidad tiene recompensas. Compra, renueva y sube de nivel automáticamente dentro de Goxion.</div>
                 
                 <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="font-size: 13px; font-weight: 700;">Nivel 1 (4 pagos)</div>
+                    <div style="font-size: 13px; font-weight: 700;">Nivel 1 (4 pagos puntuales)</div>
                     <div style="color: var(--neon-blue); font-weight: 800;">3% OFF</div>
                 </div>
                 <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="font-size: 13px; font-weight: 700;">Nivel 2 (9 pagos)</div>
+                    <div style="font-size: 13px; font-weight: 700;">Nivel 2 (9 pagos puntuales)</div>
                     <div style="color: var(--neon-purple); font-weight: 800;">6% OFF</div>
                 </div>
                 
