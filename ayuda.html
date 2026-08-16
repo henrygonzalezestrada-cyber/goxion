@@ -1386,6 +1386,7 @@
             padding: 25px; 
             position: relative; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.7); 
+            border-radius: 20px;
         }
 
         .close-btn { 
@@ -1516,7 +1517,7 @@
             border-radius: 20px;
             padding: 15px; 
             margin-bottom: 25px;
-            animation: slideInExpand 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            animation: slideInExpand 0.4s cubic-bezier(0.2, 0.8, 0.2, 1 forwards;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
@@ -2007,6 +2008,15 @@
                 </button>
             </div>
 
+            <!-- CAJA DE FEEDBACK -->
+            <div class="glass-card" style="margin-top: 15px; text-align: center; padding: 15px;">
+                <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tienes alguna sugerencia?</div>
+                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ayúdanos a mejorar nuestro servicio dejándonos un comentario o califica tu experiencia.</div>
+                <button class="btn-primary" style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none; padding: 10px;" onclick="openFeedbackModal()">
+                    Dejar Comentario
+                </button>
+            </div>
+
             <!-- ACORDEÓN DE PREGUNTAS FRECUENTES -->
             <div class="faq-container">
                 <div class="section-title">Preguntas Frecuentes (FAQ)</div>
@@ -2141,6 +2151,19 @@
                 <li><strong>2. Condiciones de Aplicación</strong> El descuento del 100% se aplicará en el cuarto mes. El Referidor debe mantener su cuenta activa y al corriente durante el tiempo que dure la validación.</li>
                 <li><strong>3. Restricciones</strong> Si el Referido cancela antes de los 3 meses, el beneficio se anula. No es acumulable con otros descuentos. El descuento aplica sobre la tarifa base mensual. Sin límite de referidos (un mes gratis por cada ciclo cumplido).</li>
             </ul>
+        </div>
+    </div>
+
+    <!-- MODAL DE FEEDBACK -->
+    <div id="modal-feedback" class="modal">
+        <div class="glass-card modal-content" style="text-align: center;">
+            <span class="close-btn" onclick="closeModal('modal-feedback')">&times;</span>
+            <div style="font-size: 38px; margin-bottom: 10px;">💬</div>
+            <div class="modal-title">Déjanos tu comentario</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Tu opinión nos ayuda a mejorar. ¿Qué te gustaría decirnos?</p>
+            <textarea id="feedback-text" class="input-smart" rows="4" placeholder="Escribe aquí tu comentario, sugerencia o experiencia..." style="resize: none;"></textarea>
+            <button class="btn-primary" onclick="enviarFeedback()" id="btn-send-feedback">Enviar Comentario</button>
+            <p id="feedback-success" style="color: var(--success-green); font-size: 13px; font-weight: 700; margin-top: 15px; display: none;">¡Feedback enviado con éxito! Gracias.</p>
         </div>
     </div>
 
@@ -2525,12 +2548,10 @@
             let item = document.getElementById('mission-' + index);
             let isDone = item.classList.contains('done');
             
-            if(!isDone) {
-                item.classList.add('done');
-                lanzarConfeti();
-            } else {
-                item.classList.remove('done');
-            }
+            if(isDone) return; // Evita quitar el check una vez puesto
+            
+            item.classList.add('done');
+            lanzarConfeti();
             
             let allMissions = document.querySelectorAll('.mission-item');
             let allDone = true;
@@ -2553,6 +2574,46 @@
             }
             
             localStorage.setItem('goxion_missions_' + folio, JSON.stringify(doneIndexes));
+        };
+
+        // --- LÓGICA DE FEEDBACK ---
+        let activeFeedbackMissionIdx = null;
+        let activeFeedbackFolio = null;
+
+        window.openFeedbackModal = function(idx = null, folio = null) {
+            activeFeedbackMissionIdx = idx;
+            const key = localStorage.getItem('goxion_user_key');
+            activeFeedbackFolio = folio || (key && globalClientesData[key] ? globalClientesData[key].folio : null);
+            document.getElementById('feedback-text').value = '';
+            document.getElementById('feedback-success').style.display = 'none';
+            document.getElementById('btn-send-feedback').style.display = 'block';
+            openModal('modal-feedback');
+        };
+
+        window.enviarFeedback = function() {
+            let text = document.getElementById('feedback-text').value.trim();
+            if(!text) return alert("Por favor, escribe un comentario antes de enviar.");
+            
+            const key = localStorage.getItem('goxion_user_key');
+            let clienteNombre = key && globalClientesData[key] ? globalClientesData[key].nombre : "Usuario Anónimo";
+            let clienteFolio = activeFeedbackFolio || (key && globalClientesData[key] ? globalClientesData[key].folio : "N/A");
+            
+            notificarAdmin("💬 Nuevo Feedback Recibido", `**Cliente:** ${clienteNombre} (Folio: ${clienteFolio})\n**Comentario:**\n"${text}"`);
+            
+            document.getElementById('btn-send-feedback').style.display = 'none';
+            document.getElementById('feedback-success').style.display = 'block';
+            
+            // Si la misión fue clickeada desde los cupones
+            if(activeFeedbackMissionIdx !== null) {
+                toggleMission(activeFeedbackMissionIdx, 'btn-claim-coupon', activeFeedbackFolio);
+            } else {
+                // Si entró desde la pestaña general de soporte, validamos si la misión estaba pendiente
+                completarMisionInteligente('feedback');
+            }
+            
+            setTimeout(() => {
+                closeModal('modal-feedback');
+            }, 2000);
         };
 
         // --- MOTOR DE DETECCIÓN INTELIGENTE ---
@@ -2778,6 +2839,9 @@
                     } else if (smartType === 'catalogo') {
                         extraIcon = '🛒';
                         clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nDebes visitar nuestra pestaña de \\'Catálogo\\' en la app para completarlo.')"`;
+                    } else if (smartType === 'feedback') {
+                        extraIcon = '💬';
+                        clickAction = isDone ? '' : `onclick="openFeedbackModal(${idx}, '${cliente.folio}')"`;
                     } else if (smartType === 'link') {
                         extraIcon = '🔗';
                         clickAction = isDone ? '' : `onclick="abrirRedSocial(${idx}, '${cliente.folio}', '${param}')"`;
