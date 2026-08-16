@@ -451,12 +451,26 @@
             transform: translateY(0); 
         }
 
+        .auth-bg-logo {
+            position: absolute;
+            bottom: -30px;
+            left: -30px;
+            height: 250px;
+            width: auto;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+            transform: rotate(-10deg);
+        }
+
         .sheet-handle { 
             width: 40px; 
             height: 5px; 
             background: rgba(255,255,255,0.2); 
             border-radius: 10px; 
             margin: 0 auto 20px auto; 
+            position: relative;
+            z-index: 2;
         }
 
         .close-sheet-btn { 
@@ -474,6 +488,7 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
+            z-index: 2;
         }
 
         .input-smart { 
@@ -1620,7 +1635,7 @@
             content: '';
             position: absolute;
             inset: 2px;
-            background: linear-gradient(180deg, rgba(30, 30, 40, 0.95) 0%, rgba(10, 10, 15, 0.98) 100%);
+            background: #08080c; /* Color sólido para ocultar el resplandor interno de la línea animada */
             border-radius: 18px;
             z-index: -1;
             pointer-events: none;
@@ -1649,9 +1664,47 @@
         .feature-title { font-size: 18px; font-weight: 800; color: #fff; margin-bottom: 8px;}
         .feature-desc { font-size: 12.5px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.5; }
         
-        .list-check { list-style: none; padding: 0; margin-bottom: 20px; }
-        .list-check li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-main); margin-bottom: 10px; font-weight: 500;}
-        .list-check li span { color: var(--neon-blue); font-size: 16px; }
+        /* ESTILOS PARA LAS TARJETAS ROTATIVAS (APILABLES) */
+        .rotating-benefits-container {
+            position: relative;
+            height: 75px;
+            margin: 20px 0;
+        }
+
+        .rotating-benefit-item {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            padding: 15px 20px;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: none;
+        }
+
+        .rotating-benefit-item.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            border-color: rgba(0, 242, 254, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 242, 254, 0.1);
+        }
+
+        .rotating-benefit-item span {
+            font-size: 28px;
+        }
+
+        .rotating-benefit-text {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
 
         .link-discreto { font-size: 11px; color: var(--text-muted); text-decoration: underline; cursor: pointer; text-align: center; display: block; margin-top: 15px; transition: 0.2s;}
         .link-discreto:hover { color: #fff; }
@@ -1815,12 +1868,24 @@
                 <div class="feature-title" style="margin-top: 0;">Todo bajo control en tu Espacio</div>
                 <div class="feature-desc">Registra tu dispositivo gratis y lleva la administración de tu entretenimiento a otro nivel.</div>
                 
-                <ul class="list-check">
-                    <li><span>🧾</span> Consulta tus compras y recibos</li>
-                    <li><span>🔄</span> Administra tus renovaciones fácilmente</li>
-                    <li><span>🎁</span> Desbloquea cupones y beneficios</li>
-                    <li><span>💬</span> Solicita soporte técnico priorizado</li>
-                </ul>
+                <div class="rotating-benefits-container">
+                    <div class="rotating-benefit-item active">
+                        <span>🧾</span>
+                        <div class="rotating-benefit-text">Consulta tus compras y recibos al instante</div>
+                    </div>
+                    <div class="rotating-benefit-item">
+                        <span>🔄</span>
+                        <div class="rotating-benefit-text">Administra tus renovaciones fácilmente</div>
+                    </div>
+                    <div class="rotating-benefit-item">
+                        <span>🎁</span>
+                        <div class="rotating-benefit-text">Desbloquea cupones y beneficios exclusivos</div>
+                    </div>
+                    <div class="rotating-benefit-item">
+                        <span>💬</span>
+                        <div class="rotating-benefit-text">Solicita soporte técnico priorizado</div>
+                    </div>
+                </div>
                 
                 <div style="display: flex; gap: 10px; margin-top: 20px;">
                     <button class="btn-primary" style="flex: 1; padding: 14px; font-size: 14px;" onclick="window.open('https://wa.me/528136836901?text=Hola,%20quiero%20crear%20mi%20cuenta', '_blank')">Crear cuenta</button>
@@ -1994,12 +2059,13 @@
     <!-- EL BOTTOM SHEET PARA EL FORMULARIO DE LOGIN -->
     <div id="auth-overlay" class="auth-overlay" onclick="closeAuthSheetEvent(event)">
         <div class="auth-sheet" id="auth-sheet">
+            <img src="Logo individual.png" class="auth-bg-logo" onerror="this.src='logo2.PNG'">
+            
             <div class="sheet-handle"></div>
             <button class="close-sheet-btn" onclick="closeAuthSheet()">✕</button>
 
-            <div id="auth-view">
+            <div id="auth-view" style="position: relative; z-index: 1;">
                 <div class="login-card" style="text-align: center; margin-top: 10px;">
-                    <img src="Logo individual.png" style="width: 40px; margin-bottom: 15px; filter: drop-shadow(0 0 10px var(--neon-blue));" onerror="this.style.display='none'">
                     <div class="section-title" style="margin-bottom: 4px; font-size: 14px; color: var(--text-main);">Vincular Dispositivo</div>
                     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Ingresa tus datos para acceder a tu panel personal.</p>
                     
@@ -2165,6 +2231,17 @@
                     leftEl.src = comboPairs[comboIdx][0];
                     rightEl.src = comboPairs[comboIdx][1];
                 }, 4000); 
+            }
+
+            // LOGICA PARA BENEFICIOS ROTATIVOS
+            const benefitsEls = document.querySelectorAll('.rotating-benefit-item');
+            let benIdx = 0;
+            if(benefitsEls.length > 0) {
+                setInterval(() => {
+                    benefitsEls.forEach(el => el.classList.remove('active'));
+                    benIdx = (benIdx + 1) % benefitsEls.length;
+                    benefitsEls[benIdx].classList.add('active');
+                }, 3500);
             }
         });
 
@@ -2669,7 +2746,6 @@
                     <div class="gamif-subtitle">${cupSubtitle}</div>
                 </div>`;
 
-            // --- AQUÍ ESTÁ LA LÓGICA DE DETECCIÓN INTELIGENTE RESTAURADA ---
             if(hasMissions && tareasArr.length > 0) {
                 let encodedWaCoupon = encodeURIComponent(`Hola GOXION, ya completé mis misiones al 100%. Mi folio es ${cliente.folio}. Reclamo mi ${gamifConfig.descuento}% de descuento para mi siguiente renovación.`);
                 
