@@ -653,7 +653,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo [CATALOGO]\nNotifica tu pago en el estado de cuenta [PAGO]\nAyúdanos a mejorar (Deja un comentario)"
     }
   },
   "rafael": {
