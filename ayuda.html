@@ -1512,7 +1512,6 @@
             border-radius: 20px;
             padding: 15px; 
             margin-bottom: 25px;
-            /* 👇 ESTA LÍNEA FUE CORREGIDA (SE AÑADIÓ EL PARÉNTESIS FALTANTE) 👇 */
             animation: slideInExpand 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
@@ -2371,6 +2370,8 @@
 
             if (tabName === 'catalogo') {
                 setTimeout(() => completarMisionInteligente('catalogo'), 800);
+            } else if (tabName === 'soporte') {
+                setTimeout(() => completarMisionInteligente('soporte'), 800);
             }
 
             const bar = document.getElementById('sticky-client-bar');
@@ -2531,6 +2532,7 @@
             if(type === 'referral') {
                 document.getElementById('gamif-expanded-referral').style.display = 'block';
                 document.getElementById('gamif-expanded-coupon').style.display = 'none';
+                setTimeout(() => completarMisionInteligente('referidos'), 500);
             } else {
                 document.getElementById('gamif-expanded-coupon').style.display = 'block';
                 document.getElementById('gamif-expanded-referral').style.display = 'none';
@@ -2664,6 +2666,12 @@
                     toggleMission(idx, 'btn-claim-coupon', folio);
                 }
             }, 2000);
+        };
+
+        window.compartirAppGoxion = function(msgWhatsApp) {
+            let text = '¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp);
+            window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+            setTimeout(() => completarMisionInteligente('compartir'), 2000);
         };
         
         window.copiarEnlace = function() {
@@ -2805,7 +2813,7 @@
                         <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input">
                         <button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button>
                     </div>
-                    <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="window.open('https://wa.me/?text=${encodeURIComponent('¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp))}', '_blank')">📲 Compartir por WhatsApp</button>
+                    <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="compartirAppGoxion('${msgWhatsApp}')">📲 Compartir por WhatsApp</button>
                     <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
             }
 
@@ -2859,6 +2867,15 @@
                     } else if (smartType === 'link') {
                         extraIcon = '🔗';
                         clickAction = isDone ? '' : `onclick="abrirRedSocial(${idx}, '${cliente.folio}', '${param}')"`;
+                    } else if (smartType === 'soporte') {
+                        extraIcon = '🛠️';
+                        clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nVisita la sección de \\'Soporte\\' para completarlo.'); switchTab('soporte');"`;
+                    } else if (smartType === 'referidos') {
+                        extraIcon = '🫂';
+                        clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nRevisa tu panel de Referidos para completarlo.'); openGamif('referral');"`;
+                    } else if (smartType === 'compartir') {
+                        extraIcon = '📲';
+                        clickAction = isDone ? '' : `onclick="compartirAppGoxion('Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).')"`;
                     }
 
                     missionsHTML += `
