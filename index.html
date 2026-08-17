@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <!-- Esta etiqueta tiñe la barra de estado del iPhone del color de tu app -->
   <meta name="theme-color" content="#030305">
   <title>GOXION - Resumen de Cuenta</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,12 +27,12 @@
       color: var(--text-main); 
       display: flex; justify-content: center; 
       align-items: flex-start;
-      min-height: 100dvh; /* dvh asegura que cubra dinámicamente todo el alto en iOS */
+      min-height: 100dvh; 
       padding: 0; 
       overflow-x: hidden;
     }
 
-    /* --- FONDO Y LÁMPARA DE LAVA --- */
+    /* --- FONDO Y LÁMPARA DE LAVA (PULIDO) --- */
     .bg {
         position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
         z-index: -2; background: var(--bg-black); overflow: hidden; pointer-events: none;
@@ -41,32 +40,33 @@
 
     .bg::before {
         content: ""; position: absolute; inset: -20%;
-        background: radial-gradient(circle at 20% 20%, rgba(124, 77, 255, 0.1), transparent 30%),
-                    radial-gradient(circle at 80% 75%, rgba(0, 242, 254, 0.1), transparent 30%);
-        filter: blur(60px);
-        animation: ambientMove 20s ease-in-out infinite alternate;
+        background: radial-gradient(circle at 20% 20%, rgba(124, 77, 255, 0.05), transparent 30%),
+                    radial-gradient(circle at 80% 75%, rgba(0, 242, 254, 0.05), transparent 30%);
+        filter: blur(80px);
+        animation: ambientMove 15s ease-in-out infinite alternate;
     }
 
     .lava {
         position: absolute; border-radius: 50%;
-        filter: blur(55px); 
-        mix-blend-mode: screen; 
+        filter: blur(75px); /* Desenfoque alto para mayor suavidad */
         will-change: transform;
     }
 
-    .lava-1 { width: 380px; height: 380px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(176, 38, 255, 0.85), transparent 70%); animation: lavaFluid1 14s ease-in-out infinite alternate; }
-    .lava-2 { width: 420px; height: 420px; top: 15%; right: -150px; background: radial-gradient(circle, rgba(0, 242, 254, 0.8), transparent 70%); animation: lavaFluid2 16s ease-in-out infinite alternate; }
-    .lava-3 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(124, 77, 255, 0.75), transparent 70%); animation: lavaFluid3 18s ease-in-out infinite alternate; }
-    .lava-4 { width: 250px; height: 250px; top: 50%; left: -80px; background: radial-gradient(circle, rgba(0, 242, 254, 0.7), transparent 70%); animation: lavaFluid4 15s ease-in-out infinite alternate; }
+    /* Opacidades reducidas al 25% - 35% para no deslumbrar */
+    .lava-1 { width: 380px; height: 380px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(176, 38, 255, 0.35), transparent 70%); animation: lavaFluid1 10s ease-in-out infinite alternate; }
+    .lava-2 { width: 420px; height: 420px; top: 15%; right: -150px; background: radial-gradient(circle, rgba(0, 242, 254, 0.30), transparent 70%); animation: lavaFluid2 12s ease-in-out infinite alternate; }
+    .lava-3 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(124, 77, 255, 0.25), transparent 70%); animation: lavaFluid3 14s ease-in-out infinite alternate; }
+    .lava-4 { width: 250px; height: 250px; top: 50%; left: -80px; background: radial-gradient(circle, rgba(0, 242, 254, 0.25), transparent 70%); animation: lavaFluid4 11s ease-in-out infinite alternate; }
 
-    @keyframes ambientMove { 0% { transform: translate3d(-20px, -10px, 0) scale(1); } 100% { transform: translate3d(20px, 30px, 0) scale(1.1); } }
-    @keyframes lavaFluid1 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(120px, 100px, 0) scale(1.15); } 100% { transform: translate3d(40px, 180px, 0) scale(0.95); } }
-    @keyframes lavaFluid2 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-110px, 80px, 0) scale(1.2); } 100% { transform: translate3d(-50px, -100px, 0) scale(0.9); } }
-    @keyframes lavaFluid3 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(120px, -80px, 0) scale(1.1); } 100% { transform: translate3d(-60px, -40px, 0) scale(0.95); } }
-    @keyframes lavaFluid4 { 0% { transform: translate3d(0, 0, 0) scale(1); } 100% { transform: translate3d(90px, 90px, 0) scale(1.15); } }
+    /* Movimientos más amplios y dinámicos */
+    @keyframes ambientMove { 0% { transform: translate3d(-30px, -20px, 0) scale(1); } 100% { transform: translate3d(30px, 40px, 0) scale(1.1); } }
+    @keyframes lavaFluid1 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(150px, 150px, 0) scale(1.2); } 100% { transform: translate3d(60px, 250px, 0) scale(0.9); } }
+    @keyframes lavaFluid2 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-160px, 100px, 0) scale(1.3); } 100% { transform: translate3d(-80px, -150px, 0) scale(0.85); } }
+    @keyframes lavaFluid3 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(180px, -120px, 0) scale(1.15); } 100% { transform: translate3d(-100px, -60px, 0) scale(0.95); } }
+    @keyframes lavaFluid4 { 0% { transform: translate3d(0, 0, 0) scale(1); } 100% { transform: translate3d(140px, 140px, 0) scale(1.25); } }
 
     @media (max-width: 600px) {
-        .lava { filter: blur(45px); }
+        .lava { filter: blur(55px); }
         .lava-1 { width: 280px; height: 280px; }
         .lava-2 { width: 300px; height: 300px; }
         .lava-3 { width: 260px; height: 260px; }
@@ -76,7 +76,6 @@
     .container { 
         width: 100%; max-width: 500px; 
         position: relative; z-index: 1; 
-        /* Usamos padding bottom para evitar que el logo final choque abajo */
         padding: 0 20px 40px 20px; 
     }
     
@@ -85,20 +84,17 @@
         position: sticky;
         top: 0;
         z-index: 50;
-        /* Cristal con un tono un poco más sólido para ocultar bien el texto al hacer scroll */
         background: rgba(3, 3, 5, 0.7); 
         backdrop-filter: blur(28px);
         -webkit-backdrop-filter: blur(28px);
         margin: 0 -20px 20px -20px;
         padding: max(15px, env(safe-area-inset-top)) 20px 15px 20px; 
-        /* Se eliminó el border-bottom y el box-shadow para que se fusione limpiamente */
     }
 
-    /* El efecto mágico de desvanecimiento hacia abajo */
     .sticky-area::after {
         content: "";
         position: absolute;
-        bottom: -35px; /* Altura del difuminado */
+        bottom: -35px;
         left: 0; right: 0;
         height: 35px;
         background: linear-gradient(to bottom, rgba(3, 3, 5, 0.7) 0%, rgba(3, 3, 5, 0) 100%);
@@ -106,7 +102,7 @@
     }
 
     .header { 
-        display: flex; align-items: center; justify-content: center; /* Centrado absoluto */
+        display: flex; align-items: center; justify-content: center;
         margin-bottom: 15px; 
     }
     
@@ -212,6 +208,31 @@
   const CLABE_PAGO = "638180000167909381";
   const BANCO_PAGO = "NU BANCO";
   const TITULAR_PAGO = "Henry González";
+  
+  // WEBHOOK DE DISCORD AÑADIDO
+  const WEBHOOK_DISCORD = "https://discord.com/api/webhooks/1538661968381223024/08aQbkgtejze_ueHbUrX0IrvSgaWI7o6AtiPmncnllzJ7UW9m0CbbceGC7XyZZMiIQmX"; 
+
+  function notificarAdminDiscord(titulo, mensaje, colorHex) {
+      if(!WEBHOOK_DISCORD) return;
+      
+      const colorDec = parseInt(colorHex.replace("#",""), 16);
+
+      const payload = {
+          embeds: [{
+              title: titulo,
+              description: mensaje,
+              color: colorDec,
+              timestamp: new Date().toISOString(),
+              footer: { text: "GOXION Pay System" }
+          }]
+      };
+
+      fetch(WEBHOOK_DISCORD, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+      }).catch(e => console.log("Webhook no enviado", e));
+  }
 
   async function cargarEstadoCuenta() {
     const params = new URLSearchParams(window.location.search);
@@ -353,13 +374,9 @@
 
       let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
       
-      // =========================================================
-      // INYECCIÓN: Lectura de Descuentos Especiales (Array) y Trato Justo
-      // =========================================================
       let totalDescuentosEspeciales = 0;
       let desgloseDescuentosHTML = '';
 
-      // 1. Compatibilidad con descuento viejo (si aún existe en la BD)
       if (cliente.descuento_especial && parseFloat(cliente.descuento_especial.monto) > 0) {
           let m = parseFloat(cliente.descuento_especial.monto);
           let c = cliente.descuento_especial.concepto || "Descuento Especial";
@@ -367,7 +384,6 @@
           desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${c}</span><span>-$${m}</span></div>`;
       }
 
-      // 2. Nuevo Array de múltiples descuentos
       if (cliente.descuentos_especiales && cliente.descuentos_especiales.length > 0) {
           cliente.descuentos_especiales.forEach(desc => {
               let m = parseFloat(desc.monto) || 0;
@@ -379,7 +395,6 @@
           });
       }
 
-      // 3. Trato Justo (ahora usa descuento_fallas de admin.html)
       let descuentoTratoJusto = cliente.descuento_fallas ? (parseFloat(cliente.descuento_fallas) || 0) : 0;
       let conceptoTratoJusto = "Garantía Trato Justo";
       if (descuentoTratoJusto > 0) {
@@ -387,16 +402,12 @@
       }
       
       let ahorroTotal = ahorro + totalDescuentosEspeciales + descuentoTratoJusto;
-      // =========================================================
 
       let totalFinal = (subtotal - ahorroTotal) + montoMora + montoBajaAdmin;
-      if (totalFinal < 0) totalFinal = 0; // Evitamos totales negativos
+      if (totalFinal < 0) totalFinal = 0; 
 
       let labelTotal = "Total a Pagar";
       
-      const msgPagoWA = encodeURIComponent(`Hola GOXION, adjunto mi comprobante de pago por $${totalFinal.toFixed(2)} MXN para el Folio ${cliente.folio} (${cliente.nombre}).`);
-      const urlPagoWA = `https://wa.me/${TELEFONO_GOXION}?text=${msgPagoWA}`;
-
       let btnAccionHTML = "";
       
       if (cliente.estado === 'pagado') {
@@ -410,9 +421,10 @@
             </div>
           `;
       } else {
+          // AHORA LLAMA A NOTIFICAR PAGO PASANDO LOS DATOS PARA DISCORD
           btnAccionHTML = `
-            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal}')">💳 Copiar Datos de Pago</button>
-            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="notificarPago('${clienteKey}', '${periodoStr}', '${urlPagoWA}')">
+            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
+            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="notificarPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
               📤 Ya realicé mi depósito
             </button>
           `;
@@ -496,7 +508,6 @@
             <span style="color:var(--text-main); font-weight:600;">🎁 ¡Gana un mes gratis!</span><br>
             Invita a un amigo, cuando cumpla 3 meses de servicio, tu próxima mensualidad será sin costo.
             
-            <!-- Logo sello inferior -->
             <div class="footer-logo-container">
               <img src="logo2.PNG" alt="Goxion - Todo conectado" class="footer-logo" onerror="this.style.display='none'">
             </div>
@@ -518,13 +529,20 @@
     });
   }
 
-  function notificarPago(clienteKey, periodo, urlWA) {
+  // NUEVA FUNCIÓN QUE CONECTA DIRECTO A DISCORD EN VEZ DE WHATSAPP
+  function notificarPago(clienteKey, periodo, monto, folio, nombre) {
+    // 1. Guardamos localmente el estado de revisión
     localStorage.setItem(`revision_pago_${clienteKey}`, periodo);
-    window.open(urlWA, '_blank');
     
+    // 2. Enviamos el Embed a Discord con un color Verde Neón (00ff9d) para que resalte
+    const mensajeDiscord = `**Cliente:** ${nombre}\n**Folio:** ${folio}\n**Monto a pagar:** $${monto} MXN\n**Periodo:** ${periodo}\n\n*El cliente ha presionado el botón indicando que ya realizó su depósito. Por favor, revisa la cuenta bancaria para validar y acreditar el pago en el admin.*`;
+    
+    notificarAdminDiscord("💰 NUEVO PAGO REPORTADO", mensajeDiscord, "00ff9d");
+    
+    // 3. Recargamos la página para que la UI cambie al botón morado de "Validando Pago"
     setTimeout(() => {
         location.reload();
-    }, 1000);
+    }, 800);
   }
 
   cargarEstadoCuenta();
