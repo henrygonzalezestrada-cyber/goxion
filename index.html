@@ -530,9 +530,12 @@
   }
 
   // NUEVA FUNCIÓN QUE CONECTA DIRECTO A DISCORD EN VEZ DE WHATSAPP
-  function notificarPago(clienteKey, periodo, monto, folio, nombre) {
+    function notificarPago(clienteKey, periodo, monto, folio, nombre) {
     // 1. Guardamos localmente el estado de revisión
     localStorage.setItem(`revision_pago_${clienteKey}`, periodo);
+    
+    // NUEVO: Le avisamos a ayuda.html que la misión de [PAGO] se ha completado
+    localStorage.setItem(`goxion_mission_pago_completed_${folio}`, 'true');
     
     // 2. Enviamos el Embed a Discord con un color Verde Neón (00ff9d) para que resalte
     const mensajeDiscord = `**Cliente:** ${nombre}\n**Folio:** ${folio}\n**Monto a pagar:** $${monto} MXN\n**Periodo:** ${periodo}\n\n*El cliente ha presionado el botón indicando que ya realizó su depósito. Por favor, revisa la cuenta bancaria para validar y acreditar el pago en el admin.*`;
