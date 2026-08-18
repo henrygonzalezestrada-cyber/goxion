@@ -470,9 +470,9 @@
       "monto": 69
     },
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDéjanos un comentario"
     }
   },
   "luis": {
