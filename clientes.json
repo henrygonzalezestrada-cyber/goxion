@@ -119,9 +119,9 @@
       "meses": 1
     },
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "rodas": {
@@ -150,9 +150,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "nayeli": {
@@ -174,9 +174,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "laura": {
@@ -221,9 +221,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "david": {
@@ -266,9 +266,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "gabriel": {
@@ -297,9 +297,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "jose": {
@@ -335,9 +335,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "fabiola": {
@@ -366,9 +366,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "jorge": {
@@ -421,9 +421,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "alondra": {
@@ -472,8 +472,9 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDéjanos un comentario"
-    }
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+    },
+    "descuento_fallas": 0
   },
   "luis": {
     "folio": "GX-2026-0011",
@@ -494,9 +495,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "samuel": {
@@ -532,9 +533,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "prima-fernanda": {
@@ -554,7 +555,12 @@
         "perfil_nombre": "",
         "perfil_pin": ""
       }
-    ]
+    ],
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+    }
   },
   "julian": {
     "folio": "GX-2026-0014",
@@ -582,9 +588,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "gabriel2": {
@@ -613,9 +619,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "juan-de-dios": {
@@ -651,9 +657,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "rafael": {
@@ -682,9 +688,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "jeynner": {
@@ -706,9 +712,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "isamar": {
@@ -741,9 +747,9 @@
       "monto": 69
     },
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   },
   "quetzaly": {
@@ -767,9 +773,9 @@
     "descuentos_especiales": [],
     "descuento_fallas": 0,
     "gamificacion": {
-      "misiones_activas": false,
+      "misiones_activas": true,
       "descuento": 5,
-      "tareas": ""
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
     }
   }
 }
