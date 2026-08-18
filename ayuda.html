@@ -2513,7 +2513,6 @@
         }
 
         function irAlTicket() { 
-            completarMisionInteligente('pago');
             const key = localStorage.getItem('goxion_user_key'); 
             if(key) {
                 setTimeout(() => {
@@ -2521,7 +2520,7 @@
                 }, 800);
             }
         }
-        
+
         function copiarDatoRapido(texto, tipo) { 
             navigator.clipboard.writeText(texto); 
             alert(`¡${tipo} copiado al portapapeles!`); 
@@ -2532,7 +2531,6 @@
             if(type === 'referral') {
                 document.getElementById('gamif-expanded-referral').style.display = 'block';
                 document.getElementById('gamif-expanded-coupon').style.display = 'none';
-                setTimeout(() => completarMisionInteligente('referidos'), 500);
             } else {
                 document.getElementById('gamif-expanded-coupon').style.display = 'block';
                 document.getElementById('gamif-expanded-referral').style.display = 'none';
@@ -2671,7 +2669,10 @@
         window.compartirAppGoxion = function(msgWhatsApp) {
             let text = '¡Te invito a unirte a GOXION para tener los mejores servicios de streaming! Usa este enlace para contactarlos y decirles que vas de mi parte: https://wa.me/' + NUMERO_GOXION + '?text=' + encodeURIComponent(msgWhatsApp);
             window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
-            setTimeout(() => completarMisionInteligente('compartir'), 2000);
+            setTimeout(() => {
+                completarMisionInteligente('compartir');
+                completarMisionInteligente('referidos');
+            }, 2000);
         };
         
         window.copiarEnlace = function() {
@@ -2680,8 +2681,10 @@
             input.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(input.value);
             alert("¡Enlace copiado al portapapeles!");
+            completarMisionInteligente('compartir');
+            completarMisionInteligente('referidos');
         };
-        
+
         function toggleCreds(id) { 
             const box = document.getElementById(id); 
             box.style.display = (box.style.display === 'none') ? 'flex' : 'none'; 
@@ -2873,7 +2876,7 @@
                     } else if (smartType === 'referidos') {
                         extraIcon = '🫂';
                         clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nRevisa tu panel de Referidos para completarlo.'); openGamif('referral');"`;
-                    } else if (smartType === 'compartir') {
+                     } else if (smartType === 'compartir') {
                         extraIcon = '📲';
                         clickAction = isDone ? '' : `onclick="compartirAppGoxion('Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).')"`;
                     }
@@ -3008,8 +3011,16 @@
             } else { 
                 srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`; 
             }
-            document.getElementById('dash-services').innerHTML = srvHTML;
-        }
+            document.getElementById('dash-services').innerHTML = srvHTML; // Esta línea ya existe, es tu referencia
+
+            // NUEVO: Escuchar si el cliente reportó su pago en index.html
+            if(localStorage.getItem('goxion_mission_pago_completed_' + cliente.folio)) {
+                setTimeout(() => {
+                    completarMisionInteligente('pago');
+                    localStorage.removeItem('goxion_mission_pago_completed_' + cliente.folio);
+                }, 1500);
+            }
+        } // Fin de la función renderDashboard(key)
 
         function srvCleanName(n) { 
             return n.trim(); 
