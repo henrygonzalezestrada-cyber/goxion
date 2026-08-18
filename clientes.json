@@ -119,9 +119,9 @@
       "meses": 1
     },
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "rodas": {
@@ -150,9 +150,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "nayeli": {
@@ -174,9 +174,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "laura": {
@@ -221,9 +221,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "david": {
@@ -266,9 +266,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "gabriel": {
@@ -297,9 +297,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "jose": {
@@ -335,9 +335,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "fabiola": {
@@ -366,9 +366,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "jorge": {
@@ -421,9 +421,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "alondra": {
@@ -470,9 +470,9 @@
       "monto": 69
     },
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Mira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario) mejorar tu experiencia."
+      "tareas": ""
     }
   },
   "luis": {
@@ -494,9 +494,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "samuel": {
@@ -532,9 +532,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "prima-fernanda": {
@@ -582,9 +582,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "gabriel2": {
@@ -613,9 +613,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "juan-de-dios": {
@@ -651,9 +651,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo [CATALOGO]\nNotifica tu pago en el estado de cuenta [PAGO]\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "rafael": {
@@ -682,9 +682,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "jeynner": {
@@ -706,9 +706,9 @@
       }
     ],
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "isamar": {
@@ -741,9 +741,9 @@
       "monto": 69
     },
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   },
   "quetzaly": {
@@ -767,9 +767,9 @@
     "descuentos_especiales": [],
     "descuento_fallas": 0,
     "gamificacion": {
-      "misiones_activas": true,
+      "misiones_activas": false,
       "descuento": 5,
-      "tareas": "Revisa tu estado cuenta\nMira nuestro catálogo\nInteractúa con nuestra área de soporte\nAyúdanos a mejorar (Deja un comentario)"
+      "tareas": ""
     }
   }
 }
