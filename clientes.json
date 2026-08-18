@@ -101,7 +101,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -121,7 +121,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "rodas": {
@@ -152,7 +152,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "nayeli": {
@@ -176,7 +176,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "laura": {
@@ -185,7 +185,7 @@
     "codigo": "1234",
     "pagos_puntuales": 4,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [
       {
@@ -223,7 +223,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "david": {
@@ -232,7 +232,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -268,7 +268,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "gabriel": {
@@ -277,7 +277,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -299,7 +299,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "jose": {
@@ -337,7 +337,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "fabiola": {
@@ -346,7 +346,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -368,7 +368,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "jorge": {
@@ -377,7 +377,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -410,20 +410,11 @@
         "perfil_pin": ""
       }
     ],
-    "descuentos_especiales": [
-      {
-        "concepto": "Abono",
-        "monto": 150
-      },
-      {
-        "concepto": "Caída YouTube",
-        "monto": 69
-      }
-    ],
+    "descuentos_especiales": [],
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "alondra": {
@@ -472,7 +463,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     },
     "descuento_fallas": 0
   },
@@ -482,7 +473,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -497,7 +488,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "samuel": {
@@ -535,7 +526,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "prima-fernanda": {
@@ -544,22 +535,14 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "suspendido",
     "pago_en_revision": false,
     "historial_pagos": [],
-    "servicios": [
-      {
-        "nombre": "Disney+ (Promocional)",
-        "monto": 59,
-        "correo_login": "",
-        "perfil_nombre": "",
-        "perfil_pin": ""
-      }
-    ],
+    "servicios": [],
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "julian": {
@@ -590,7 +573,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "gabriel2": {
@@ -599,7 +582,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -621,7 +604,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "juan-de-dios": {
@@ -630,7 +613,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -659,7 +642,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "rafael": {
@@ -668,7 +651,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -690,7 +673,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "jeynner": {
@@ -698,8 +681,8 @@
     "nombre": "Jeynner",
     "codigo": "1234",
     "pagos_puntuales": 0,
-    "dia_pago": 15,
-    "estado": "pendiente",
+    "dia_pago": 30,
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -714,7 +697,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "isamar": {
@@ -723,17 +706,10 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
-      {
-        "nombre": "Disney+ Premium",
-        "monto": 89,
-        "correo_login": "",
-        "perfil_nombre": "",
-        "perfil_pin": ""
-      },
       {
         "nombre": "YouTube Premium",
         "monto": 89,
@@ -749,7 +725,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   },
   "quetzaly": {
@@ -775,7 +751,7 @@
     "gamificacion": {
       "misiones_activas": true,
       "descuento": 5,
-      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\n[FEEDBACK]"
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     }
   }
 }
