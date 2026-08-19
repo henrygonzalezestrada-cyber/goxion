@@ -22,7 +22,7 @@
         "cuentas": 1,
         "costo": 319,
         "limite": 6,
-        "etiqueta": "",
+        "etiqueta": "Popular 🔥",
         "beneficios": ""
       },
       {
@@ -47,7 +47,7 @@
         "cuentas": 3,
         "costo": 279,
         "limite": 5,
-        "etiqueta": "",
+        "etiqueta": "Mas ahorro",
         "beneficios": ""
       },
       {
@@ -73,7 +73,7 @@
         "costo": 370,
         "limite": 5,
         "beneficios": "",
-        "etiqueta": "Popular 🔥"
+        "etiqueta": ""
       },
       {
         "nombre": "Google One 2TB",
@@ -308,7 +308,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -551,7 +551,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -760,7 +760,7 @@
     "codigo": "0809",
     "pagos_puntuales": 99,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
