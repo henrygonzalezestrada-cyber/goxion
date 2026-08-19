@@ -284,6 +284,7 @@ Revisa las guías [SOPORTE]"></textarea>
                             <th title="Precio de Venta">Venta</th>
                             <th title="Tu Costo Mensual">Costo</th>
                             <th title="Límite Máximo de Perfiles por Cuenta">Lím.</th>
+                            <th title="Fijar cantidad exacta manualmente (Deja en blanco para automático)">Fijo</th>
                             <th title="Perfiles Disponibles">Disp.</th>
                             <th></th>
                         </tr>
@@ -535,11 +536,22 @@ Revisa las guías [SOPORTE]"></textarea>
             let limiteIndividual = parseInt(srv.limite || 0);
             
             let capacidadTotal = cuentasMultiplicador * limiteIndividual;
-            let disponibles = capacidadTotal - vendidos;
+            
+            // --- LÓGICA DE STOCK HÍBRIDO ---
+            let disponibles = 0;
+            let esManual = false;
+            if (srv.stock_manual !== undefined && srv.stock_manual !== null && srv.stock_manual !== "") {
+                disponibles = parseInt(srv.stock_manual);
+                esManual = true;
+            } else {
+                disponibles = capacidadTotal - vendidos;
+            }
             
             let badgeClass = "inv-ok";
             if (disponibles <= 1) badgeClass = "inv-warn";
             if (disponibles <= 0) badgeClass = "inv-full";
+            
+            let manualIndicator = esManual ? '🛠️ ' : '';
 
             container.innerHTML += `
                 <tr>
@@ -550,7 +562,8 @@ Revisa las guías [SOPORTE]"></textarea>
                     <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)"></td>
                     <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)"></td>
                     <td><input type="number" style="color:#fff;" value="${limiteIndividual}" onchange="updateGlobalService(${index}, 'limite', this.value)"></td>
-                    <td><span class="inv-badge ${badgeClass}">${disponibles}</span></td>
+                    <td><input type="number" placeholder="Auto" style="color:var(--neon-yellow);" value="${esManual ? srv.stock_manual : ''}" onchange="updateGlobalService(${index}, 'stock_manual', this.value)" title="Fijar disponibilidad (vacío = Automático)"></td>
+                    <td><span class="inv-badge ${badgeClass}" title="${esManual ? 'Stock Forzado Manualmente' : 'Stock Calculado Automáticamente'}">${manualIndicator}${disponibles}</span></td>
                     <td style="display:flex; gap:8px; align-items:center; justify-content: center; padding-top:10px;">
                         <button class="btn-icon info" onclick="sincronizarPrecioMasivo(${index})" title="Empujar precio a clientes">📡</button>
                         <button class="btn-icon danger" onclick="removeGlobalService(${index})" title="Eliminar">✖</button>
@@ -563,8 +576,19 @@ Revisa las guías [SOPORTE]"></textarea>
     }
 
     function updateGlobalService(index, field, value) {
-        if (field !== 'nombre' && field !== 'etiqueta' && field !== 'beneficios') value = parseFloat(value) || 0;
-        configGlobal.serviciosGlobales[index][field] = value;
+        if (field === 'stock_manual') {
+            if (value.trim() === "") {
+                delete configGlobal.serviciosGlobales[index].stock_manual;
+            } else {
+                configGlobal.serviciosGlobales[index].stock_manual = parseInt(value) || 0;
+            }
+        } else if (field !== 'nombre' && field !== 'etiqueta' && field !== 'beneficios') {
+            value = parseFloat(value) || 0;
+            configGlobal.serviciosGlobales[index][field] = value;
+        } else {
+            configGlobal.serviciosGlobales[index][field] = value;
+        }
+        
         calcularInventarioYFinanzas();
         renderGlobalServicesUI(); 
         if (field === 'nombre') renderizarClientes(clientesDict); 
@@ -1134,7 +1158,7 @@ Revisa las guías [SOPORTE]"></textarea>
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: Sistema de Etiquetas (Tags) para Misiones Masivas",
+            message: "🤖 Admin Update: Sistema Híbrido de Stock (Auto/Manual)",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
