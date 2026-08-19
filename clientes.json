@@ -130,7 +130,7 @@
     "codigo": "1234",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -752,6 +752,42 @@
       "misiones_activas": true,
       "descuento": 5,
       "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
+    }
+  },
+  "casone": {
+    "folio": "GX-2026-0021",
+    "nombre": "Casone",
+    "codigo": "1234",
+    "pagos_puntuales": 0,
+    "dia_pago": 15,
+    "estado": "pendiente",
+    "pago_en_revision": false,
+    "historial_pagos": [],
+    "servicios": [
+      {
+        "nombre": "YouTube Premium",
+        "monto": 79,
+        "correo_login": "",
+        "perfil_nombre": "",
+        "perfil_pin": ""
+      }
+    ],
+    "descuentos_especiales": [
+      {
+        "concepto": "Por ser el amor de mi alma 💖",
+        "monto": 79
+      }
+    ],
+    "descuento_fallas": 0,
+    "gamificacion": {
+      "misiones_activas": true,
+      "descuento": 5,
+      "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
+    },
+    "referido_activo": {
+      "nombre": "Mi corazón",
+      "plataformas": 2,
+      "meses": 1
     }
   }
 }
