@@ -757,8 +757,8 @@
   "casone": {
     "folio": "GX-2026-0021",
     "nombre": "Casone",
-    "codigo": "1234",
-    "pagos_puntuales": 0,
+    "codigo": "0809",
+    "pagos_puntuales": 99,
     "dia_pago": 15,
     "estado": "pendiente",
     "pago_en_revision": false,
