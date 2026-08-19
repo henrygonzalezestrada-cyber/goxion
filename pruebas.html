@@ -7,13 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #000000; /* True black for OLED screens */
+            --bg-color: #000000;
             --card-bg: #0a0a0f;
             --neon-green: #00ff9d;
             --neon-purple: #bc13fe;
             --neon-red: #ff003c;
             --neon-blue: #00f2fe;
             --neon-yellow: #f8e800;
+            --warning-amber: #ffaa00;
             --text-main: #ffffff;
             --text-muted: #8892b0;
         }
@@ -21,23 +22,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding: 15px; padding-bottom: 85px; overflow-x: hidden; max-width: 1400px; margin: 0 auto; }
 
-        /* --- HEADER --- */
-        header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 15px 20px; border-bottom: 1px solid rgba(188, 19, 254, 0.4);
-            box-shadow: 0 4px 20px rgba(188, 19, 254, 0.15); margin-bottom: 20px;
-            border-radius: 12px; background: rgba(10, 10, 15, 0.85); backdrop-filter: blur(10px);
-        }
-        .logo-area h1 { font-size: 1.6rem; text-shadow: 0 0 10px rgba(188, 19, 254, 0.6); letter-spacing: 2px; margin: 0;}
-        .header-actions { display: flex; gap: 12px; align-items: center; }
-        .status { color: var(--neon-green); font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; gap: 6px; border: 1px solid rgba(0, 255, 157, 0.2); padding: 4px 10px; border-radius: 20px; background: rgba(0, 255, 157, 0.05);}
-        .status-dot { width: 8px; height: 8px; background: var(--neon-green); border-radius: 50%; animation: pulse 1.5s infinite; }
+        /* --- HEADER & BOTTOM BAR --- */
+        header { display: none; } /* Oculto en móvil */
         
-        .btn-save { background: linear-gradient(135deg, var(--neon-green), #00cc7d); color: #000; border: none; padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
-        .btn-save:hover { box-shadow: 0 0 15px rgba(0, 255, 157, 0.4); transform: translateY(-1px); }
-        .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
-        
-        /* --- BOTTOM BAR (MOBILE FIRST) --- */
         .bottom-bar {
             position: fixed; bottom: 0; left: 0; right: 0; 
             background: rgba(5, 5, 8, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
@@ -50,22 +37,17 @@
         .bottom-btn.active { color: var(--neon-blue); }
         .bottom-btn.main-action { background: linear-gradient(135deg, var(--neon-purple), #7c4dff); color: #fff; padding: 10px 18px; border-radius: 20px; box-shadow: 0 0 15px rgba(188, 19, 254, 0.4); flex-direction: row; font-size: 0.9rem; gap: 6px; }
 
-        /* --- DASHBOARD FINANCIERO --- */
+        /* --- DASHBOARD SCROLLABLE --- */
         .dashboard-scroll { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; margin-bottom: 15px; scrollbar-width: none; }
         .dashboard-scroll::-webkit-scrollbar { display: none; }
-        .kpi-card {
-            background: linear-gradient(145deg, #12121a, #08080c); min-width: 200px; flex: 1;
-            border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 12px; padding: 15px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-        }
+        .kpi-card { background: linear-gradient(145deg, #12121a, #08080c); min-width: 150px; flex: 1; border: 1px solid rgba(0, 242, 254, 0.2); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
         .kpi-title { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
         .kpi-value { font-size: 1.8rem; font-weight: bold; margin-top: 4px; }
         .val-ingresos { color: var(--neon-blue); text-shadow: 0 0 10px rgba(0, 242, 254, 0.3); }
         .val-costos { color: var(--neon-red); text-shadow: 0 0 10px rgba(255, 0, 60, 0.3); }
         .val-ganancia { color: var(--neon-green); text-shadow: 0 0 10px rgba(0, 255, 157, 0.3); }
 
-        /* --- FILTER PILLS --- */
+        /* --- PILLS & UI ELEMENTS --- */
         .filter-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 10px; margin-bottom: 10px; scrollbar-width: none; }
         .filter-scroll::-webkit-scrollbar { display: none; }
         .filter-pill { background: #12121a; border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; cursor: pointer; transition: 0.3s; }
@@ -73,16 +55,23 @@
         .filter-pill.revision { border-color: var(--neon-purple); color: var(--neon-purple); }
         .filter-pill.revision.active { background: rgba(188, 19, 254, 0.2); box-shadow: 0 0 10px rgba(188, 19, 254, 0.4); }
 
-        /* --- TABS NAVIGATION --- */
-        .tabs { display: none; } /* Oculto en móvil, usaremos el bottom bar */
+        .search-bar, .custom-select { width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 0.95rem; outline: none; transition: 0.3s; margin-bottom: 10px; }
+        .search-bar:focus, .custom-select:focus { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(188, 19, 254, 0.3); }
+
+        .btn-save { background: linear-gradient(135deg, var(--neon-green), #00cc7d); color: #000; border: none; padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
+        .btn-logout { background: transparent; color: var(--neon-red); border: 1px solid var(--neon-red); padding: 8px 16px; font-weight: 700; cursor: pointer; border-radius: 6px; transition: 0.3s; font-size: 0.9rem; }
+        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: 0.2s; border-radius: 4px; }
+        .btn-icon.danger { color: var(--neon-red); }
+        .btn-icon.warning { color: var(--neon-yellow); }
+
+        .tabs { display: none; }
         .tab-content { display: none; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- SECTIONS & PANELS --- */
-        .section-title { color: var(--neon-purple); font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 10px; }
         .panel { background-color: var(--card-bg); border: 1px solid rgba(188, 19, 254, 0.2); border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        
+        .section-title { color: var(--neon-purple); font-size: 1.1rem; margin-bottom: 15px; text-transform: uppercase; border-left: 3px solid var(--neon-purple); padding-left: 10px; }
+
         .switch-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed rgba(255, 255, 255, 0.1); }
         .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
         .switch input { opacity: 0; width: 0; height: 0; }
@@ -91,30 +80,11 @@
         input:checked + .slider { background-color: rgba(255, 0, 60, 0.2); border-color: var(--neon-red); }
         input:checked + .slider:before { transform: translateX(20px); background-color: var(--neon-red); box-shadow: 0 0 8px var(--neon-red); }
 
-        .search-bar, .custom-select { width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: var(--text-main); padding: 12px; border-radius: 8px; font-size: 0.95rem; outline: none; transition: 0.3s; margin-bottom: 10px; }
-        .search-bar:focus, .custom-select:focus { border-color: var(--neon-purple); box-shadow: 0 0 8px rgba(188, 19, 254, 0.3); }
-
-        .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .catalog-table th { color: var(--text-muted); font-weight: 600; text-align: left; padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .catalog-table td { padding: 8px 5px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
-        .catalog-table input[type="text"] { width: 100%; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 6px; border-radius: 4px; outline:none; }
-        .catalog-table input[type="number"] { width: 100%; max-width: 60px; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 6px; border-radius: 4px; text-align: center; outline:none; }
-        
-        .inv-badge { background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; text-align: center; display: inline-block; width: 100%; }
-        .inv-ok { color: var(--neon-green); border: 1px solid rgba(0, 255, 157, 0.3); }
-        .inv-warn { color: var(--neon-yellow); border: 1px solid rgba(248, 232, 0, 0.3); }
-        .inv-full { color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
-        
-        .btn-icon { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.1rem; padding: 4px; transition: 0.2s; border-radius: 4px; }
-        .btn-add-service { background: rgba(188, 19, 254, 0.05); color: var(--neon-purple); border: 1px dashed rgba(188, 19, 254, 0.5); width: 100%; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 0.9rem; font-weight: bold; margin-top: 15px; }
-
-        /* --- CLIENT CARD (MOBILE OPTIMIZED) --- */
-        .client-card { background: linear-gradient(145deg, #12121a, #0a0a0f); border-left: 4px solid var(--neon-green); padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        /* --- CLIENT CARD MOBILE --- */
+        .client-card { background: linear-gradient(145deg, #12121a, #0a0a0f); border-left: 4px solid var(--neon-green); padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s; }
         .card-header-main { display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-        .client-info-basic h3 { color: inherit; font-size: 1.15rem; margin-bottom: 4px; }
         .client-status-badge { font-size: 0.75rem; padding: 2px 8px; border-radius: 12px; font-weight: bold; text-transform: uppercase; border: 1px solid; }
         
-        /* QUICK ACTIONS BAR (ALWAYS VISIBLE) */
         .quick-actions-bar { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1); }
         .quick-btn { flex: 1; padding: 10px 5px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; text-align: center; border: 1px solid transparent; cursor: pointer; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 5px; }
         .qb-link { background: rgba(188, 19, 254, 0.1); border-color: rgba(188, 19, 254, 0.3); color: var(--neon-purple); }
@@ -124,23 +94,35 @@
         .client-details { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); animation: fadeIn 0.3s ease; }
         .client-services-list { background: rgba(255,255,255,0.02); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
         .client-service-tag { display: flex; flex-direction: column; gap: 8px; font-size: 0.85rem; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .client-service-tag:last-child { border-bottom: none; padding-bottom: 0; margin-bottom: 0;}
         
         .cred-inputs { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .cred-inputs-row { display: flex; gap: 6px; }
         .cred-inputs input { flex: 1; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.85rem; outline: none; }
-        .cred-inputs input:focus { border-color: var(--neon-blue); }
+        .cred-inputs input:disabled { background: rgba(255,255,255,0.02); color: rgba(255,255,255,0.3); cursor: not-allowed; }
+
+        .loyalty-control { display: flex; align-items: center; gap: 8px; background: #1a1a24; padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05); }
+        .loyalty-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; width: 24px; height: 24px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
         .status-select { background:#12121a; color:#fff; border: 1px solid var(--text-muted); border-radius: 6px; font-size: 0.9rem; padding: 10px; outline:none; }
         .status-pagado { border-color: var(--neon-green); color: var(--neon-green); }
         .status-suspendido { border-color: var(--neon-red); color: var(--neon-red); }
         .status-pendiente { border-color: var(--neon-blue); color: var(--neon-blue); }
 
+        /* --- CATALOG TABLE --- */
+        .catalog-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        .catalog-table th { color: var(--text-muted); font-weight: 600; text-align: left; padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .catalog-table td { padding: 8px 5px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
+        .catalog-table input[type="text"] { width: 100%; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 6px; border-radius: 4px; outline:none; }
+        .catalog-table input[type="number"] { width: 100%; max-width: 60px; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: var(--neon-blue); padding: 6px; border-radius: 4px; text-align: center; outline:none; }
+        .inv-badge { background: rgba(255,255,255,0.05); padding: 4px 8px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; text-align: center; display: inline-block; width: 100%; }
+        .inv-ok { color: var(--neon-green); border: 1px solid rgba(0, 255, 157, 0.3); }
+        .inv-warn { color: var(--neon-yellow); border: 1px solid rgba(248, 232, 0, 0.3); }
+        .inv-full { color: var(--neon-red); border: 1px solid rgba(255, 0, 60, 0.3); }
+
         @media (max-width: 768px) {
-            header { display: none; } /* Ocultar header viejo en móvil, reemplazado por bottom bar y search bar */
             body { padding-top: 20px; }
             .catalog-table th, .catalog-table td { font-size: 0.75rem; padding: 8px 2px; }
-            .kpi-card { min-width: 150px; padding: 12px; }
+            .cred-inputs-row { flex-direction: column; }
         }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(188, 19, 254, 0.5); } 70% { box-shadow: 0 0 0 8px rgba(188, 19, 254, 0); } 100% { box-shadow: 0 0 0 0 rgba(188, 19, 254, 0); } }
@@ -160,16 +142,16 @@
     <!-- DASHBOARD FINANCIERO SCROLLABLE -->
     <div class="dashboard-scroll">
         <div class="kpi-card">
-            <div class="kpi-title">Ingresos</div>
-            <div class="kpi-value val-ingresos" id="kpi-ingresos">$0</div>
+            <div class="kpi-title">Ingresos Brutos</div>
+            <div class="kpi-value val-ingresos" id="kpi-ingresos">$0.00</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-title">Ganancia</div>
-            <div class="kpi-value val-ganancia" id="kpi-ganancias">$0</div>
+            <div class="kpi-title">Ganancia Neta</div>
+            <div class="kpi-value val-ganancia" id="kpi-ganancias">$0.00</div>
         </div>
         <div class="kpi-card">
-            <div class="kpi-title">Costos</div>
-            <div class="kpi-value val-costos" id="kpi-costos">$0</div>
+            <div class="kpi-title">Inversión (Costos)</div>
+            <div class="kpi-value val-costos" id="kpi-costos">$0.00</div>
         </div>
     </div>
 
@@ -187,8 +169,8 @@
         </div>
         
         <select id="sort-by" class="custom-select" onchange="filtrarClientes()">
-            <option value="date">Ordenar por Día de Cobro (Próximos)</option>
             <option value="name">Ordenar por Nombre (A-Z)</option>
+            <option value="date">Ordenar por Día de Cobro</option>
             <option value="loyalty">Los más leales primero</option>
         </select>
             
@@ -198,20 +180,28 @@
     </div>
 
     <div id="tab-inventario" class="tab-content">
-        <!-- PANEL DE ASIGNACIÓN MASIVA -->
+        <!-- PANEL DE ASIGNACIÓN MASIVA DE MISIONES (COMPLETO) -->
         <div class="panel">
             <h2 class="section-title">Asignación Masiva de Misiones</h2>
             <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
-                <input type="number" id="global-misiones-desc" placeholder="% Desc" title="% de Descuento" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:8px; padding:10px; font-weight:bold;" value="5">
+                <input type="number" id="global-misiones-desc" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:10px; font-weight:bold;" value="5">
             </div>
-            <textarea id="global-misiones-tareas" style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:8px; padding:12px; font-size: 0.9rem; resize: vertical; min-height: 80px;" placeholder="Ejemplo:
+            <textarea id="global-misiones-tareas" style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:10px; font-size: 0.85rem; resize: vertical; min-height: 80px;" placeholder="Ejemplo:
 Visita nuestro catálogo [CATALOGO]
 Renueva a tiempo [PAGO]
-Comparte con un amigo [COMPARTIR]"></textarea>
+Comparte con un amigo [COMPARTIR]
+Conoce el plan de referidos [REFERIDOS]
+Revisa las guías [SOPORTE]"></textarea>
             
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
+                <strong>💡 ETIQUETAS AUTOMÁTICAS DISPONIBLES:</strong><br>
+                <span style="color:var(--neon-blue)">[CATALOGO]</span> | <span style="color:var(--neon-blue)">[PAGO]</span> | <span style="color:var(--neon-blue)">[SOPORTE]</span> | <span style="color:var(--neon-blue)">[COMPARTIR]</span> | <span style="color:var(--neon-blue)">[REFERIDOS]</span> | <span style="color:var(--neon-blue)">[LINK:https://...]</span>
+            </div>
+
             <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn-save" style="background: linear-gradient(135deg, var(--neon-purple), #7c4dff); flex: 1; padding: 12px; font-size:0.95rem;" onclick="aplicarMisionesMasivas('todos')">✅ Aplicar a TODOS</button>
-                <button class="btn-logout" style="flex: 1; padding: 12px; font-size:0.95rem;" onclick="borrarMisionesMasivas()">🗑️ Borrar Misiones</button>
+                <button class="btn-save" style="background: linear-gradient(135deg, var(--neon-purple), #7c4dff); flex: 1;" onclick="aplicarMisionesMasivas('todos')">✅ a TODOS</button>
+                <button class="btn-save" style="background: rgba(0, 242, 254, 0.2); color: var(--neon-blue); border: 1px solid var(--neon-blue); flex: 1;" onclick="abrirModalSeleccionClientes()">☑️ a Selectos</button>
+                <button class="btn-logout" style="flex: 1;" onclick="borrarMisionesMasivas()">🗑️ Borrar</button>
             </div>
         </div>
 
@@ -244,9 +234,11 @@ Comparte con un amigo [COMPARTIR]"></textarea>
                     <thead>
                         <tr>
                             <th>Servicio</th>
+                            <th>Etiqueta</th>
+                            <th>Beneficios</th>
+                            <th>Ctas</th>
                             <th>Venta</th>
                             <th>Costo</th>
-                            <th>Ctas</th>
                             <th>Lím.</th>
                             <th title="Fijar cantidad exacta manualmente">Fijo</th>
                             <th>Disp.</th>
@@ -256,7 +248,20 @@ Comparte con un amigo [COMPARTIR]"></textarea>
                     <tbody id="global-services-container"></tbody>
                 </table>
             </div>
-            <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Servicio</button>
+            <button class="btn-save" style="width:100%; margin-top: 15px; padding: 12px; font-size:1rem;" onclick="addGlobalService()">+ Añadir Servicio al Catálogo</button>
+        </div>
+    </div>
+
+    <!-- MODAL SELECCION CLIENTES (COMPLETO) -->
+    <div id="modal-seleccionar-clientes" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center;">
+        <div style="background: var(--card-bg); border: 1px solid var(--neon-blue); width: 90%; max-width: 500px; border-radius: 12px; padding: 20px; max-height: 80vh; display:flex; flex-direction:column;">
+            <h3 style="color: var(--neon-blue); margin-bottom: 10px;">Seleccionar Clientes</h3>
+            <input type="text" id="search-modal-clientes" placeholder="Buscar cliente por nombre..." oninput="filtrarModalClientes()" style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; padding:8px; border-radius:4px; margin-bottom: 10px; outline:none;">
+            <div id="lista-clientes-modal" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:8px; margin-bottom:15px; padding-right:5px;"></div>
+            <div style="display:flex; justify-content:space-between; gap:10px;">
+                <button class="btn-logout" onclick="cerrarModalSeleccion()">Cancelar</button>
+                <button class="btn-save" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar</button>
+            </div>
         </div>
     </div>
 
@@ -270,10 +275,15 @@ Comparte con un amigo [COMPARTIR]"></textarea>
     let currentStatusFilter = 'all';
 
     const DEFAULT_SERVICES = [
-        {nombre: "Netflix Premium", cuentas: 1, precio: 109, costo: 369, limite: 4},
-        {nombre: "Disney+ Premium", cuentas: 2, precio: 89, costo: 340, limite: 10},
-        {nombre: "Max Standard", cuentas: 2, precio: 79, costo: 358, limite: 8},
-        {nombre: "Prime Video", cuentas: 1, precio: 39, costo: 7, limite: 5}
+        {nombre: "Netflix Premium", cuentas: 1, precio: 109, costo: 369, limite: 4, beneficios: "Resolución 4K Ultra HD, Audio Espacial"},
+        {nombre: "Disney+ Premium", cuentas: 2, precio: 89, costo: 340, limite: 10, beneficios: "Descargas Offline, Calidad 4K"},
+        {nombre: "Max Standard", cuentas: 2, precio: 79, costo: 358, limite: 8, beneficios: "HBO, Warner Bros y DC Comics"},
+        {nombre: "Prime Video", cuentas: 1, precio: 39, costo: 7, limite: 5, beneficios: "4K y envíos gratuitos"},
+        {nombre: "YouTube Premium", cuentas: 2, precio: 89, costo: 242, limite: 10, beneficios: "Cero Anuncios + YT Music"},
+        {nombre: "Vix Premium", cuentas: 1, precio: 49, costo: 74.5, limite: 4, beneficios: "Liga MX y Novelas"},
+        {nombre: "Crunchyroll", cuentas: 1, precio: 45, costo: 39, limite: 5, beneficios: "Anime sin anuncios"},
+        {nombre: "Microsoft 365", cuentas: 1, precio: 79, costo: 119, limite: 5, beneficios: "1TB OneDrive + Office"},
+        {nombre: "Google One 2TB", cuentas: 1, precio: 29, costo: 77, limite: 5, beneficios: "Almacenamiento expandido"}
     ];
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -315,12 +325,14 @@ Comparte con un amigo [COMPARTIR]"></textarea>
         } else { alert("Acceso denegado."); }
     }
 
+    function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
+
     async function inicializarPanel() {
         const version = new Date().getTime();
         const url = `https://api.github.com/repos/${CONFIG.username}/${CONFIG.repo}/contents/${CONFIG.path}?v=${version}`;
         try {
             const response = await fetch(url, { headers: { "Authorization": `token ${currentToken}`, "Accept": "application/vnd.github.v3+json" }, cache: "no-store" });
-            if (response.status === 401) { localStorage.removeItem("GOXION_PAT"); location.reload(); return; }
+            if (response.status === 401) return cerrarSesion();
 
             const data = await response.json();
             const contentDecoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
@@ -330,6 +342,13 @@ Comparte con un amigo [COMPARTIR]"></textarea>
             if (jsonCompleto._goxion_config) {
                 configGlobal = jsonCompleto._goxion_config;
                 if (!configGlobal.serviciosGlobales) configGlobal.serviciosGlobales = DEFAULT_SERVICES;
+                configGlobal.serviciosGlobales.forEach(sg => {
+                    if(sg.cuentas === undefined) sg.cuentas = 1;
+                    if(sg.costo === undefined) sg.costo = 0;
+                    if(sg.limite === undefined) sg.limite = 5;
+                    if(sg.beneficios === undefined) sg.beneficios = "";
+                });
+                if (configGlobal.combo_upsell === undefined) configGlobal.combo_upsell = true;
                 delete jsonCompleto._goxion_config; 
             } else {
                 configGlobal.serviciosGlobales = DEFAULT_SERVICES;
@@ -337,8 +356,12 @@ Comparte con un amigo [COMPARTIR]"></textarea>
             }
 
             clientesDict = jsonCompleto;
+            Object.keys(clientesDict).forEach(k => {
+                if(!clientesDict[k].dia_pago) clientesDict[k].dia_pago = 15;
+                if(!clientesDict[k].estado) clientesDict[k].estado = "pendiente";
+            });
 
-            document.getElementById("combo-active").checked = configGlobal.combo_upsell !== false;
+            document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
             if(configGlobal.alertas?.falla) document.getElementById("alert-type").value = configGlobal.alertas.falla;
             document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
@@ -349,7 +372,7 @@ Comparte con un amigo [COMPARTIR]"></textarea>
             filtrarClientes();
             
         } catch (error) {
-            document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red); text-align:center;">⚠️ Error al cargar datos. Verifica tu conexión.</p>`;
+            document.getElementById("clients-container").innerHTML = `<p style="color: var(--neon-red); background: rgba(255,0,60,0.1); padding: 15px; border-radius: 8px;">Error al conectar. Revisa tu token o formato JSON.</p>`;
         }
     }
     
@@ -360,9 +383,14 @@ Comparte con un amigo [COMPARTIR]"></textarea>
         let folio = prompt("Folio:", "GX-2026-" + String(folioNum).padStart(4, '0'));
         if(!folio) return;
         let key = nombre.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/\s+/g, '-');
-        if(clientesDict[key]) { alert("⚠️ Ya existe este identificador."); return; }
         
-        clientesDict[key] = { folio: folio, nombre: nombre, codigo: "1234", dia_pago: 15, estado: "pendiente", servicios: [] };
+        if(clientesDict[key]) { alert("⚠️ Ya existe un cliente con este identificador: " + key); return; }
+        
+        clientesDict[key] = {
+            folio: folio, nombre: nombre, codigo: "1234", pagos_puntuales: 0, dia_pago: 15, estado: "pendiente",
+            pago_en_revision: false, historial_pagos: [], servicios: [], descuentos_especiales: [], descuento_fallas: 0
+        };
+        
         calcularInventarioYFinanzas();
         filtrarClientes();
     }
@@ -370,69 +398,114 @@ Comparte con un amigo [COMPARTIR]"></textarea>
     function calcularInventarioYFinanzas() {
         inventarioActivo = {};
         let ingresosTotales = 0; let costosTotales = 0;
-        configGlobal.serviciosGlobales.forEach(s => { inventarioActivo[s.nombre] = 0; costosTotales += parseFloat(s.costo || 0) * parseInt(s.cuentas || 1); });
 
-        Object.values(clientesDict).forEach(c => {
-            if (c.estado !== 'suspendido' && c.servicios) {
-                c.servicios.forEach(s => {
+        configGlobal.serviciosGlobales.forEach(s => { 
+            inventarioActivo[s.nombre] = 0; 
+            costosTotales += parseFloat(s.costo || 0) * parseInt(s.cuentas || 1);
+        });
+
+        Object.values(clientesDict).forEach(cliente => {
+            if (cliente.estado !== 'suspendido' && cliente.servicios) {
+                cliente.servicios.forEach(s => {
                     ingresosTotales += parseFloat(s.monto || 0);
                     let nombreCliente = s.nombre.toLowerCase();
+                    let multiplier = 1; 
+                    let matchQuant = nombreCliente.match(/\(x(\d+)\)/);
+                    if (matchQuant) multiplier = parseInt(matchQuant[1]);
+                    
                     configGlobal.serviciosGlobales.forEach(g => {
-                        let keyword = g.nombre.split(' ')[0].toLowerCase();
-                        if (nombreCliente.includes(keyword)) inventarioActivo[g.nombre] += 1;
+                        let nombreCatalogo = g.nombre.toLowerCase();
+                        let matched = false;
+                        
+                        if (nombreCatalogo.includes('netflix') && nombreCliente.includes('netflix')) matched = true;
+                        else if (nombreCatalogo.includes('disney') && (nombreCliente.includes('disney') || nombreCliente.includes('disney+'))) matched = true;
+                        else if ((nombreCatalogo.includes('max') || nombreCatalogo.includes('hbo')) && (nombreCliente.includes('max') || nombreCliente.includes('hbo'))) matched = true;
+                        else if (nombreCatalogo.includes('prime') && (nombreCliente.includes('prime') || nombreCliente.includes('amazon'))) matched = true;
+                        else if (nombreCatalogo.includes('youtube') && nombreCliente.includes('youtube')) matched = true;
+                        else if (nombreCatalogo.includes('vix') && nombreCliente.includes('vix')) matched = true;
+                        else if (nombreCatalogo.includes('crunchy') && nombreCliente.includes('crunchy')) matched = true;
+                        else if (nombreCatalogo.includes('microsoft') && (nombreCliente.includes('microsoft') || nombreCliente.includes('365'))) matched = true;
+                        else if (nombreCatalogo.includes('google') && (nombreCliente.includes('google') || nombreCliente.includes('one'))) matched = true;
+                        else {
+                            let keyword = g.nombre.replace(/ premium| standard| platino| cuenta completa| 2tb| 365/gi, '').trim().toLowerCase();
+                            if (nombreCliente.includes(keyword)) matched = true;
+                        }
+
+                        if (matched) { inventarioActivo[g.nombre] += multiplier; }
                     });
                 });
             }
         });
 
-        document.getElementById("kpi-ingresos").innerText = `$${ingresosTotales.toFixed(0)}`;
-        document.getElementById("kpi-costos").innerText = `$${costosTotales.toFixed(0)}`;
-        document.getElementById("kpi-ganancias").innerText = `$${(ingresosTotales - costosTotales).toFixed(0)}`;
+        let gananciaNeta = ingresosTotales - costosTotales;
+        document.getElementById("kpi-ingresos").innerText = `$${ingresosTotales.toFixed(2)}`;
+        document.getElementById("kpi-costos").innerText = `$${costosTotales.toFixed(2)}`;
+        document.getElementById("kpi-ganancias").innerText = `$${gananciaNeta.toFixed(2)}`;
     }
 
     function renderGlobalServicesUI() {
         const container = document.getElementById("global-services-container");
         const alertSelect = document.getElementById("alert-platform");
+        
         container.innerHTML = ""; alertSelect.innerHTML = `<option value="Todos los servicios">Todos los servicios</option>`;
 
         configGlobal.serviciosGlobales.forEach((srv, index) => {
-            let cap = parseInt(srv.cuentas || 1) * parseInt(srv.limite || 0);
-            let disp = srv.stock_manual !== undefined ? parseInt(srv.stock_manual) : (cap - (inventarioActivo[srv.nombre] || 0));
-            let badge = disp <= 0 ? "inv-full" : (disp <= 1 ? "inv-warn" : "inv-ok");
+            let vendidos = inventarioActivo[srv.nombre] || 0;
+            let cuentasMultiplicador = parseInt(srv.cuentas || 1);
+            let limiteIndividual = parseInt(srv.limite || 0);
+            let capacidadTotal = cuentasMultiplicador * limiteIndividual;
             
+            let disponibles = 0; let esManual = false;
+            if (srv.stock_manual !== undefined && srv.stock_manual !== null && srv.stock_manual !== "") {
+                disponibles = parseInt(srv.stock_manual); esManual = true;
+            } else { disponibles = capacidadTotal - vendidos; }
+            
+            let badgeClass = disponibles <= 0 ? "inv-full" : (disponibles <= 1 ? "inv-warn" : "inv-ok");
+            let manualIndicator = esManual ? '🛠️ ' : '';
+
             container.innerHTML += `
                 <tr>
-                    <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)" style="min-width:90px;"></td>
+                    <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)" style="min-width:100px;"></td>
+                    <td><input type="text" placeholder="Ej: Promo" value="${srv.etiqueta || ''}" onchange="updateGlobalService(${index}, 'etiqueta', this.value)"></td>
+                    <td><input type="text" placeholder="Beneficios" value="${srv.beneficios || ''}" onchange="updateGlobalService(${index}, 'beneficios', this.value)"></td>
+                    <td><input type="number" style="color:var(--neon-green);" value="${cuentasMultiplicador}" onchange="updateGlobalService(${index}, 'cuentas', this.value)"></td>
                     <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)"></td>
                     <td><input type="number" style="color:var(--neon-red);" value="${srv.costo || 0}" onchange="updateGlobalService(${index}, 'costo', this.value)"></td>
-                    <td><input type="number" style="color:var(--neon-green);" value="${srv.cuentas || 1}" onchange="updateGlobalService(${index}, 'cuentas', this.value)"></td>
-                    <td><input type="number" value="${srv.limite || 5}" onchange="updateGlobalService(${index}, 'limite', this.value)"></td>
-                    <td><input type="number" placeholder="Auto" style="color:var(--neon-yellow);" value="${srv.stock_manual !== undefined ? srv.stock_manual : ''}" onchange="updateGlobalService(${index}, 'stock_manual', this.value)"></td>
-                    <td><span class="inv-badge ${badge}">${disp}</span></td>
-                    <td><button class="btn-icon danger" onclick="removeGlobalService(${index})">✖</button></td>
+                    <td><input type="number" style="color:#fff;" value="${limiteIndividual}" onchange="updateGlobalService(${index}, 'limite', this.value)"></td>
+                    <td><input type="number" placeholder="Auto" style="color:var(--neon-yellow);" value="${esManual ? srv.stock_manual : ''}" onchange="updateGlobalService(${index}, 'stock_manual', this.value)"></td>
+                    <td><span class="inv-badge ${badgeClass}">${manualIndicator}${disponibles}</span></td>
+                    <td style="display:flex; gap:4px; padding-top:8px;">
+                        <button class="btn-icon danger" onclick="removeGlobalService(${index})">✖</button>
+                    </td>
                 </tr>
             `;
-            alertSelect.innerHTML += `<option value="${srv.nombre}">${srv.nombre}</option>`;
+            let selected = (configGlobal.alertas?.plataforma === srv.nombre) ? "selected" : "";
+            alertSelect.innerHTML += `<option value="${srv.nombre}" ${selected}>${srv.nombre}</option>`;
         });
     }
 
     function updateGlobalService(index, field, value) {
         if (field === 'stock_manual') {
             if (value.trim() === "") delete configGlobal.serviciosGlobales[index].stock_manual;
-            else configGlobal.serviciosGlobales[index].stock_manual = parseInt(value);
-        } else {
-            configGlobal.serviciosGlobales[index][field] = field === 'nombre' ? value : parseFloat(value) || 0;
-        }
-        calcularInventarioYFinanzas(); renderGlobalServicesUI(); if (field === 'nombre') renderizarClientes(clientesDict);
+            else configGlobal.serviciosGlobales[index].stock_manual = parseInt(value) || 0;
+        } else if (field !== 'nombre' && field !== 'etiqueta' && field !== 'beneficios') {
+            configGlobal.serviciosGlobales[index][field] = parseFloat(value) || 0;
+        } else { configGlobal.serviciosGlobales[index][field] = value; }
+        
+        calcularInventarioYFinanzas(); renderGlobalServicesUI(); 
+        if (field === 'nombre') renderizarClientes(clientesDict); 
     }
 
     function addGlobalService() {
-        configGlobal.serviciosGlobales.push({nombre: "Nuevo", precio: 0, costo: 0, cuentas: 1, limite: 5});
-        calcularInventarioYFinanzas(); renderGlobalServicesUI();
+        configGlobal.serviciosGlobales.push({nombre: "Nuevo", etiqueta: "", beneficios: "", cuentas: 1, precio: 0, costo: 0, limite: 5});
+        calcularInventarioYFinanzas(); renderGlobalServicesUI(); filtrarClientes();
     }
-    
+
     function removeGlobalService(index) {
-        if(confirm("¿Eliminar?")) { configGlobal.serviciosGlobales.splice(index, 1); calcularInventarioYFinanzas(); renderGlobalServicesUI(); }
+        if(confirm("¿Eliminar este servicio del catálogo?")) {
+            configGlobal.serviciosGlobales.splice(index, 1);
+            calcularInventarioYFinanzas(); renderGlobalServicesUI(); filtrarClientes();
+        }
     }
 
     function toggleAlertFields() {
@@ -462,11 +535,113 @@ Comparte con un amigo [COMPARTIR]"></textarea>
         renderizarClientes(dict);
     }
 
+    function esServicioPorInvitacion(nombreServicio) {
+        const plataformasInvitacion = ['youtube', 'microsoft', 'google', 'apple', 'spotify', 'one 2tb', '365'];
+        return plataformasInvitacion.some(plat => nombreServicio.toLowerCase().includes(plat));
+    }
+
+    function toggleReferido(key, isChecked) {
+        if (isChecked) clientesDict[key].referido_activo = { nombre: "", plataformas: 2, meses: 1 };
+        else delete clientesDict[key].referido_activo;
+        filtrarClientes();
+    }
+    function updateReferido(key, field, value) {
+        if (!clientesDict[key].referido_activo) return;
+        clientesDict[key].referido_activo[field] = field !== 'nombre' ? parseInt(value) || 1 : value;
+    }
+
+    function toggleMisiones(key, isChecked) {
+        if (!clientesDict[key].gamificacion) clientesDict[key].gamificacion = { misiones_activas: false, descuento: 5, tareas: "" };
+        clientesDict[key].gamificacion.misiones_activas = isChecked;
+        filtrarClientes();
+    }
+    function updateMisiones(key, field, value) {
+        if (!clientesDict[key].gamificacion) return;
+        clientesDict[key].gamificacion[field] = field === 'descuento' ? parseFloat(value) || 0 : value;
+    }
+
+    /* --- LOGICA MASIVA MISIONES --- */
+    function aplicarMisionesMasivas(modo) {
+        const tareas = document.getElementById('global-misiones-tareas').value;
+        const descuento = parseFloat(document.getElementById('global-misiones-desc').value) || 0;
+        
+        if(!tareas && modo !== 'borrar') { alert("Debes escribir al menos una tarea."); return; }
+        let affected = 0;
+
+        if(modo === 'todos') {
+            if(!confirm("¿Aplicar a TODOS los clientes activos?")) return;
+            Object.keys(clientesDict).forEach(key => { clientesDict[key].gamificacion = { misiones_activas: true, descuento: descuento, tareas: tareas }; affected++; });
+        } else if (modo === 'seleccionados') {
+            const checkboxes = document.querySelectorAll('.chk-modal-cliente:checked');
+            if(checkboxes.length === 0) { alert("Ningún cliente seleccionado."); return; }
+            checkboxes.forEach(chk => { if(clientesDict[chk.value]) { clientesDict[chk.value].gamificacion = { misiones_activas: true, descuento: descuento, tareas: tareas }; affected++; } });
+            cerrarModalSeleccion();
+        }
+
+        if(affected > 0) { alert(`✅ Aplicadas a ${affected} clientes.`); filtrarClientes(); }
+    }
+
+    function borrarMisionesMasivas() {
+        if(!confirm("¿BORRAR misiones de TODOS?")) return;
+        let affected = 0;
+        Object.keys(clientesDict).forEach(k => { if(clientesDict[k].gamificacion) { clientesDict[k].gamificacion.misiones_activas = false; clientesDict[k].gamificacion.tareas = ""; affected++; } });
+        alert(`🗑️ Borradas en ${affected} clientes.`); filtrarClientes();
+    }
+
+    function abrirModalSeleccionClientes() {
+        const modal = document.getElementById('modal-seleccionar-clientes');
+        const lista = document.getElementById('lista-clientes-modal');
+        lista.innerHTML = '';
+        let sortedKeys = Object.keys(clientesDict).sort((a,b) => clientesDict[a].nombre.localeCompare(clientesDict[b].nombre));
+        sortedKeys.forEach(k => {
+            const c = clientesDict[k];
+            lista.innerHTML += `<label style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.05); padding:8px; border-radius:6px; cursor:pointer;"><input type="checkbox" value="${k}" class="chk-modal-cliente" style="width:16px; height:16px;"><span style="color:#fff; font-size:0.9rem;">${c.nombre}</span></label>`;
+        });
+        modal.style.display = 'flex';
+    }
+    function cerrarModalSeleccion() { document.getElementById('modal-seleccionar-clientes').style.display = 'none'; }
+    function filtrarModalClientes() {
+        const q = document.getElementById('search-modal-clientes').value.toLowerCase();
+        document.querySelectorAll('#lista-clientes-modal label').forEach(lbl => {
+            lbl.style.display = lbl.innerText.toLowerCase().includes(q) ? 'flex' : 'none';
+        });
+    }
+
+    /* --- TRATO JUSTO & DESCUENTOS --- */
+    function aplicarTratoJusto(key, montoServicio) {
+        if(!clientesDict[key].descuento_fallas) clientesDict[key].descuento_fallas = 0;
+        let maxPermitido = montoServicio * 0.50; 
+        if (clientesDict[key].descuento_fallas >= maxPermitido) { alert("⚠️ LÍMITE: Máximo de 10 días (-50%) ya aplicado."); return; }
+        if(!confirm("¿Aplicar Trato Justo (5% del servicio)?")) return;
+        clientesDict[key].descuento_fallas = Math.min(clientesDict[key].descuento_fallas + (montoServicio * 0.05), maxPermitido);
+        calcularInventarioYFinanzas(); filtrarClientes();
+    }
+    function resetearDescuentoFallas(key) { clientesDict[key].descuento_fallas = 0; calcularInventarioYFinanzas(); filtrarClientes(); }
+    
+    function agregarDescuentoEspecial(key) {
+        let concepto = prompt("Concepto (Ej. Promo Especial):"); if(!concepto) return;
+        let monto = prompt("Monto en $:"); if(!monto || isNaN(monto)) return;
+        
+        if (clientesDict[key].descuento_especial) {
+            if (!clientesDict[key].descuentos_especiales) clientesDict[key].descuentos_especiales = [];
+            clientesDict[key].descuentos_especiales.push(clientesDict[key].descuento_especial);
+            delete clientesDict[key].descuento_especial;
+        }
+        if (!clientesDict[key].descuentos_especiales) clientesDict[key].descuentos_especiales = [];
+        clientesDict[key].descuentos_especiales.push({ concepto: concepto, monto: parseFloat(monto) });
+        calcularInventarioYFinanzas(); filtrarClientes();
+    }
+    function eliminarDescuentoEspecial(key, index) {
+        if(clientesDict[key].descuentos_especiales) clientesDict[key].descuentos_especiales.splice(index, 1);
+        else if (clientesDict[key].descuento_especial && index === -1) delete clientesDict[key].descuento_especial;
+        calcularInventarioYFinanzas(); filtrarClientes();
+    }
+
+    /* --- RENDER PRINCIPAL DE TARJETAS MÓVILES --- */
     function renderizarClientes(diccionario) {
         const container = document.getElementById("clients-container");
         container.innerHTML = "";
         const keys = Object.keys(diccionario);
-
         if (keys.length === 0) { container.innerHTML = `<p style="text-align: center;">No hay resultados.</p>`; return; }
 
         const globalOptions = configGlobal.serviciosGlobales.map(s => `<option value="${s.nombre}|${s.precio}">${s.nombre} ($${s.precio})</option>`).join("");
@@ -475,27 +650,77 @@ Comparte con un amigo [COMPARTIR]"></textarea>
             const cliente = diccionario[key];
             let subtotal = 0; let sHTML = "";
             
-            if(cliente.servicios) {
+            if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s, idx) => {
                     subtotal += s.monto;
+                    const esInvi = esServicioPorInvitacion(s.nombre);
+                    const lock = esInvi ? 'disabled' : '';
                     sHTML += `
                         <div class="client-service-tag">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                                 <strong>${s.nombre}</strong>
-                                <div><strong style="color:var(--neon-blue); margin-right:8px;">$${s.monto}</strong>
-                                <button class="btn-icon danger" onclick="removeClientService('${key}', ${idx})">✖</button></div>
+                                <div>
+                                    <strong style="color:var(--neon-blue); margin-right:8px;">$${s.monto}</strong>
+                                    <button class="btn-icon warning" onclick="aplicarTratoJusto('${key}', ${s.monto})" title="Trato Justo">🚨</button>
+                                    <button class="btn-icon danger" onclick="removeClientService('${key}', ${idx})">✖</button>
+                                </div>
                             </div>
                             <div class="cred-inputs">
-                                <input type="text" placeholder="Correo" value="${s.correo_login || ''}" onchange="updateServiceCreds('${key}', ${idx}, 'correo_login', this.value)">
+                                <input type="text" placeholder="Correo Login" value="${s.correo_login || ''}" onchange="updateServiceCreds('${key}', ${idx}, 'correo_login', this.value)">
                                 <div class="cred-inputs-row">
-                                    <input type="text" placeholder="Perfil" value="${s.perfil_nombre || ''}" onchange="updateServiceCreds('${key}', ${idx}, 'perfil_nombre', this.value)">
-                                    <input type="text" placeholder="PIN" value="${s.perfil_pin || ''}" onchange="updateServiceCreds('${key}', ${idx}, 'perfil_pin', this.value)">
+                                    <input type="text" placeholder="Perfil" value="${s.perfil_nombre || ''}" onchange="updateServiceCreds('${key}', ${idx}, 'perfil_nombre', this.value)" ${lock}>
+                                    <input type="text" placeholder="PIN" value="${s.perfil_pin || ''}" onchange="updateServiceCreds('${key}', ${idx}, 'perfil_pin', this.value)" ${lock}>
                                 </div>
                             </div>
                         </div>
                     `;
                 });
+            } else { sHTML = `<div style="text-align:center; color:var(--text-muted); font-size:0.85rem;">Sin servicios asignados</div>`; }
+
+            let descHTML = `<div style="display:flex; justify-content:space-between; margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;"><span style="font-size:0.8rem; color:var(--text-muted);">Descuentos Extra</span><button class="btn-save" style="padding:4px 8px; font-size:0.8rem; background:rgba(0,242,254,0.2); color:var(--neon-blue);" onclick="agregarDescuentoEspecial('${key}')">+ Añadir</button></div>`;
+            
+            if (cliente.descuento_especial) {
+                descHTML += `<div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between;"><div><div style="font-size:0.75rem; color:var(--neon-blue);">${cliente.descuento_especial.concepto}</div><div>-$${cliente.descuento_especial.monto}</div></div><button class="btn-icon danger" onclick="eliminarDescuentoEspecial('${key}', -1)">✖</button></div>`;
             }
+            if (cliente.descuentos_especiales && cliente.descuentos_especiales.length > 0) {
+                cliente.descuentos_especiales.forEach((desc, idx) => {
+                    descHTML += `<div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between;"><div><div style="font-size:0.75rem; color:var(--neon-blue);">${desc.concepto}</div><div>-$${desc.monto}</div></div><button class="btn-icon danger" onclick="eliminarDescuentoEspecial('${key}', ${idx})">✖</button></div>`;
+                });
+            }
+            if (cliente.descuento_fallas) {
+                descHTML += `<div style="background: rgba(255, 170, 0, 0.1); border: 1px solid var(--warning-amber); padding: 8px; border-radius: 6px; margin-top: 8px; display:flex; justify-content:space-between;"><div><div style="font-size:0.75rem; color:var(--warning-amber);">Garantía Trato Justo</div><div>-$${cliente.descuento_fallas.toFixed(2)}</div></div><button class="btn-icon danger" onclick="resetearDescuentoFallas('${key}')">✖</button></div>`;
+            }
+
+            let refActivo = cliente.referido_activo;
+            let refHTML = `
+                <div style="margin-top: 15px; padding: 10px; background: rgba(188, 19, 254, 0.05); border: 1px dashed rgba(188, 19, 254, 0.3); border-radius: 8px;">
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px;">
+                        <strong style="color: var(--neon-purple); font-size: 0.85rem;">🎁 Referido Activo (Mes Gratis)</strong>
+                        <label class="switch" style="transform: scale(0.7); margin:0;"><input type="checkbox" ${refActivo ? 'checked' : ''} onchange="toggleReferido('${key}', this.checked)"><span class="slider"></span></label>
+                    </div>
+                    ${refActivo ? `
+                    <div style="display:flex; gap: 6px; flex-wrap: wrap;">
+                        <input type="text" placeholder="Nombre" style="flex:2; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px;" value="${refActivo.nombre || ''}" onchange="updateReferido('${key}', 'nombre', this.value)">
+                        <input type="number" placeholder="Plat." title="Plataformas" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px;" value="${refActivo.plataformas || 2}" onchange="updateReferido('${key}', 'plataformas', this.value)">
+                        <input type="number" placeholder="Mes" title="Meses (1 a 3)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-green); border-radius:4px; padding:6px; font-weight:bold;" value="${refActivo.meses || 1}" min="1" max="3" onchange="updateReferido('${key}', 'meses', this.value)">
+                    </div>
+                    ` : `<div style="font-size: 0.75rem; color: var(--text-muted);">Sin referidos activos.</div>`}
+                </div>
+            `;
+
+            let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 5, tareas: "" };
+            let gamifHTML = `
+                <div style="margin-top: 15px; padding: 10px; background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 8px;">
+                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 8px;">
+                        <strong style="color: var(--neon-blue); font-size: 0.85rem;">🎟️ Misiones (Cupón)</strong>
+                        <label class="switch" style="transform: scale(0.7); margin:0;"><input type="checkbox" ${gamifConfig.misiones_activas ? 'checked' : ''} onchange="toggleMisiones('${key}', this.checked)"><span class="slider"></span></label>
+                    </div>
+                    ${gamifConfig.misiones_activas ? `
+                    <div style="display:flex; gap: 8px; margin-bottom: 8px;"><input type="number" placeholder="% Desc" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:6px; font-weight:bold;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)"></div>
+                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; min-height: 60px;" onchange="updateMisiones('${key}', 'tareas', this.value)">${gamifConfig.tareas}</textarea>
+                    ` : `<div style="font-size: 0.75rem; color: var(--text-muted);">Sin misiones.</div>`}
+                </div>
+            `;
 
             let enRev = cliente.pago_en_revision === true;
             let sColor = enRev ? 'var(--neon-purple)' : (cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)'));
@@ -503,7 +728,7 @@ Comparte con un amigo [COMPARTIR]"></textarea>
             let pulse = enRev ? 'animation: pulse 1.5s infinite;' : '';
 
             let linkPago = `https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`;
-            let waText = enRev ? `Hola ${cliente.nombre}, estoy revisando tu comprobante de pago de Goxion.` : (cliente.estado === 'pendiente' ? `Hola ${cliente.nombre}, te recuerdo que tu pago de Goxion por $${subtotal} está próximo a vencer. Estado de cuenta: ${linkPago}` : `Hola ${cliente.nombre}, te comparto tu estado de cuenta: ${linkPago}`);
+            let waText = enRev ? `Hola ${cliente.nombre}, estoy revisando tu comprobante de pago.` : (cliente.estado === 'pendiente' ? `Hola ${cliente.nombre}, te recuerdo tu pago de Goxion por $${subtotal}. Link: ${linkPago}` : `Hola ${cliente.nombre}, tu estado de cuenta: ${linkPago}`);
             let waUrl = `https://wa.me/?text=${encodeURIComponent(waText)}`;
 
             const card = document.createElement("div");
@@ -522,7 +747,7 @@ Comparte con un amigo [COMPARTIR]"></textarea>
                     </div>
                 </div>
 
-                <!-- 1-TAP QUICK ACTIONS -->
+                <!-- QUICK ACTIONS -->
                 <div class="quick-actions-bar" onclick="event.stopPropagation()">
                     <button class="quick-btn qb-link" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Link</button>
                     <a class="quick-btn qb-wa" href="${waUrl}" target="_blank">💬 Mensaje</a>
@@ -530,18 +755,20 @@ Comparte con un amigo [COMPARTIR]"></textarea>
                 </div>
 
                 <div class="client-details" id="details-${key}">
-                    <!-- EDICIÓN DE NOMBRE Y PIN (APP) -->
+                    
+                    <!-- EDIT NOMBRE / PIN -->
                     <div style="display:flex; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.1);">
                         <div style="flex: 2;">
                             <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Nombre del Cliente</label>
                             <input type="text" value="${cliente.nombre}" style="width: 100%; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:8px; padding:10px; outline:none;" onchange="updateClientData('${key}', 'nombre', this.value)">
                         </div>
                         <div style="flex: 1;">
-                            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">PIN Acceso (App)</label>
+                            <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">PIN (App)</label>
                             <input type="text" value="${cliente.codigo || '1234'}" style="width: 100%; background:#12121a; color:var(--neon-green); border: 1px solid rgba(0,255,157,0.3); border-radius:8px; padding:10px; outline:none; font-weight:bold; text-align:center;" onchange="updateClientData('${key}', 'codigo', this.value)">
                         </div>
                     </div>
 
+                    <!-- ESTADO Y DIA -->
                     <div style="display:flex; gap: 10px; margin-bottom: 15px;">
                         <div style="flex: 1;">
                             <label style="font-size: 0.75rem; color: var(--text-muted); display: block;">Día Cobro</label>
@@ -557,13 +784,29 @@ Comparte con un amigo [COMPARTIR]"></textarea>
                         </div>
                     </div>
                     
+                    <!-- SERVICIOS -->
                     <div class="client-services-list">
                         ${sHTML}
                         <div style="display:flex; gap:8px; margin-top:10px;">
                             <select id="add-srv-sel-${key}" style="flex:1; background:#12121a; color:#fff; border:1px solid var(--neon-blue); border-radius:8px; padding:10px;">${globalOptions}</select>
                             <button class="btn-save" style="padding:10px 15px;" onclick="addClientService('${key}')">➕</button>
                         </div>
+                        ${descHTML}
                     </div>
+
+                    <!-- LEALTAD -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+                        <span style="font-size:0.8rem; color:var(--text-muted); text-transform: uppercase;">Lealtad (Pagos)</span>
+                        <div class="loyalty-control">
+                            <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
+                            <span id="pagos-${key}" style="font-weight: bold; width: 20px; text-align: center; color: var(--neon-green); font-size: 1rem;">${cliente.pagos_puntuales || 0}</span>
+                            <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
+                            <button class="btn-icon danger" style="margin-left: 8px;" onclick="reiniciarLealtad('${key}')">🔄</button>
+                        </div>
+                    </div>
+
+                    ${refHTML}
+                    ${gamifHTML}
                 </div>
             `;
             container.appendChild(card);
@@ -573,8 +816,14 @@ Comparte con un amigo [COMPARTIR]"></textarea>
     function aprobarPago(key, monto) {
         if(!confirm("¿Confirmas el pago?")) return;
         let cli = clientesDict[key];
-        cli.estado = "pagado"; cli.pago_en_revision = false; cli.pagos_puntuales = (cli.pagos_puntuales || 0) + 1;
-        calcularInventarioYFinanzas(); filtrarClientes();
+        cli.estado = "pagado"; cli.pago_en_revision = false; cli.pagos_puntuales = (cli.pagos_puntuales || 0) + 1; cli.descuento_fallas = 0;
+        
+        if(!cli.historial_pagos) cli.historial_pagos = [];
+        const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+        cli.historial_pagos.push({ fecha: `${meses[new Date().getMonth()]} ${new Date().getFullYear()}`, monto: monto, estado: "pagado" });
+        if(cli.historial_pagos.length > 6) cli.historial_pagos.shift();
+
+        calcularInventarioYFinanzas(); filtrarClientes(); alert("¡Pago validado!");
     }
 
     function updateClientData(key, field, value) {
@@ -585,6 +834,14 @@ Comparte con un amigo [COMPARTIR]"></textarea>
 
     function updateServiceCreds(key, idx, field, value) { clientesDict[key].servicios[idx][field] = value.trim(); }
 
+    function reiniciarLealtad(key) {
+        if(confirm('¿Reiniciar racha a 0?')) { clientesDict[key].pagos_puntuales = 0; filtrarClientes(); }
+    }
+    function updatePagos(key, delta) {
+        clientesDict[key].pagos_puntuales = Math.max(0, (clientesDict[key].pagos_puntuales || 0) + delta);
+        document.getElementById(`pagos-${key}`).innerText = clientesDict[key].pagos_puntuales;
+    }
+
     function addClientService(key) {
         const [n, p] = document.getElementById(`add-srv-sel-${key}`).value.split('|');
         if (!clientesDict[key].servicios) clientesDict[key].servicios = [];
@@ -594,8 +851,7 @@ Comparte con un amigo [COMPARTIR]"></textarea>
     function removeClientService(key, idx) { clientesDict[key].servicios.splice(idx, 1); calcularInventarioYFinanzas(); renderGlobalServicesUI(); filtrarClientes(); }
 
     function copiarInfo(nombre, key) {
-        const link = `https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`;
-        navigator.clipboard.writeText(`Hola ${nombre}, tu estado de cuenta: ${link}`);
+        navigator.clipboard.writeText(`Hola ${nombre}, tu estado de cuenta: https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`);
         alert("¡Copiado!");
     }
 
@@ -609,7 +865,7 @@ Comparte con un amigo [COMPARTIR]"></textarea>
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Mobile Update: Quick Actions & PIN Edit",
+            message: "🤖 Admin Mobile Update: Diseño Móvil + Funciones Completas Restauradas",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
@@ -623,9 +879,6 @@ Comparte con un amigo [COMPARTIR]"></textarea>
         } catch (e) { console.error(e); }
         btn.innerHTML = originalHTML;
     }
-    
-    function aplicarMisionesMasivas() {} // Se mantiene el shell para no romper el html si se expande a futuro
-    function borrarMisionesMasivas() {}
     </script>
 </body>
 </html>
