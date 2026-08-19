@@ -21,9 +21,9 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-color); color: var(--text-main); padding: 15px; overflow-x: hidden; max-width: 1400px; margin: 0 auto; }
 
-        /* --- MENÚ FLOTANTE MÓVIL --- */
+        /* --- MENÚ INFERIOR MÓVIL (Como en tu imagen) --- */
         .bottom-bar {
-            display: none;
+            display: none; /* Se oculta en PC, se muestra en móvil */
             position: fixed; bottom: 0; left: 0; right: 0;
             background: rgba(10, 10, 15, 0.95); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border-top: 1px solid rgba(188, 19, 254, 0.3);
@@ -103,7 +103,7 @@
         /* --- TABLA DE CATÁLOGO RESPONSIVA --- */
         .table-scroll-wrapper { overflow-x: auto; width: 100%; border-radius: 8px; scrollbar-width: none; border: 1px solid rgba(255,255,255,0.05); }
         .table-scroll-wrapper::-webkit-scrollbar { display: none; }
-        .catalog-table { width: 100%; min-width: 950px; border-collapse: collapse; font-size: 0.85rem; }
+        .catalog-table { width: 100%; min-width: 950px; /* EVITA QUE SE APLASTE EN MÓVIL */ border-collapse: collapse; font-size: 0.85rem; }
         .catalog-table th { color: var(--text-muted); font-weight: 600; text-align: left; padding: 10px 5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .catalog-table td { padding: 8px 5px; border-bottom: 1px dashed rgba(255,255,255,0.05); }
         .catalog-table input[type="text"] { width: 100%; background: #12121a; border: 1px solid rgba(188,19,254,0.3); color: #fff; padding: 6px; border-radius: 4px; outline:none; }
@@ -128,6 +128,7 @@
         .client-service-tag { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .client-service-tag:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
         
+        /* NUEVO: ESPACIOS DE ESCRITURA COMPACTOS Y EN LÍNEA */
         .cred-inputs { display: flex; flex-direction: column; gap: 6px; width: 100%; }
         .cred-row-split { display: flex; gap: 6px; width: 100%; }
         .cred-inputs input, .cred-row-split input { 
@@ -146,10 +147,11 @@
         .btn-copy { background: rgba(188, 19, 254, 0.1); border: 1px solid var(--neon-purple); color: var(--neon-purple); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; }
         .status-select { background:#12121a; color:#fff; border: 1px solid var(--text-muted); border-radius: 4px; font-size: 0.85rem; padding: 6px; outline:none; }
 
+        /* --- ADAPTACIÓN ESTRICTA A MÓVIL --- */
         @media (max-width: 768px) {
-            header { display: none; }
-            .tabs { display: none; }
-            body { padding-top: 15px; padding-bottom: 85px; }
+            header { display: none; } /* Oculta cabecera en móvil para dar espacio */
+            .tabs { display: none; } /* Oculta pestañas de texto en móvil (usamos el menú abajo) */
+            body { padding-top: 15px; padding-bottom: 85px; } /* Espacio para el bottom bar */
             .bottom-bar { display: flex; }
             .dashboard-row { display: flex; overflow-x: auto; scrollbar-width: none; }
             .dashboard-row::-webkit-scrollbar { display: none; }
@@ -290,6 +292,7 @@ Revisa las guías [SOPORTE]"></textarea>
 
         <div class="panel">
             <h2 class="section-title">Catálogo & Inventario</h2>
+            <!-- ENVOLTURA PARA EVITAR COMPRESIÓN EN MÓVIL -->
             <div class="table-scroll-wrapper">
                 <table class="catalog-table">
                     <thead>
@@ -353,7 +356,10 @@ Revisa las guías [SOPORTE]"></textarea>
 
     function switchTab(tabId, btn) {
         document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        
+        // Limpia activos en Tabs PC
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        // Limpia activos en Menú Inferior Móvil (excepto el botón de guardar)
         document.querySelectorAll('.bottom-btn:not(.main-action)').forEach(b => b.classList.remove('active'));
 
         document.getElementById(tabId).classList.add('active');
@@ -425,7 +431,6 @@ Revisa las guías [SOPORTE]"></textarea>
             Object.keys(clientesDict).forEach(k => {
                 if(!clientesDict[k].dia_pago) clientesDict[k].dia_pago = 15;
                 if(!clientesDict[k].estado) clientesDict[k].estado = "pendiente";
-                if(!clientesDict[k].codigo) clientesDict[k].codigo = "1234";
             });
 
             document.getElementById("combo-active").checked = configGlobal.combo_upsell;
@@ -557,6 +562,7 @@ Revisa las guías [SOPORTE]"></textarea>
             
             let capacidadTotal = cuentasMultiplicador * limiteIndividual;
             
+            // --- LÓGICA DE STOCK HÍBRIDO ---
             let disponibles = 0;
             let esManual = false;
             if (srv.stock_manual !== undefined && srv.stock_manual !== null && srv.stock_manual !== "") {
@@ -572,6 +578,7 @@ Revisa las guías [SOPORTE]"></textarea>
             
             let manualIndicator = esManual ? '🛠️ ' : '';
 
+            // Se agregan min-width directos a los inputs para forzar que la tabla se expanda en móvil
             container.innerHTML += `
                 <tr>
                     <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)" style="min-width: 140px;"></td>
@@ -730,6 +737,9 @@ Revisa las guías [SOPORTE]"></textarea>
         clientesDict[key].gamificacion[field] = value;
     }
 
+    // ==========================================
+    // LOGICA DE ASIGNACIÓN MASIVA DE MISIONES
+    // ==========================================
     function aplicarMisionesMasivas(modo) {
         const tareas = document.getElementById('global-misiones-tareas').value;
         const descuento = parseFloat(document.getElementById('global-misiones-desc').value) || 0;
@@ -813,8 +823,11 @@ Revisa las guías [SOPORTE]"></textarea>
         });
     }
 
+    // ==========================================
+
     function aplicarTratoJusto(key, montoServicio) {
         if(!clientesDict[key].descuento_fallas) clientesDict[key].descuento_fallas = 0;
+        
         let maxPermitido = montoServicio * 0.50; 
         
         if (clientesDict[key].descuento_fallas >= maxPermitido) {
@@ -893,6 +906,7 @@ Revisa las guías [SOPORTE]"></textarea>
                     const esInvitacion = esServicioPorInvitacion(s.nombre);
                     const lockStatus = esInvitacion ? 'disabled title="No aplica para este servicio"' : '';
                     
+                    // REESTRUCTURACIÓN COMPACTA DE INPUTS (Correo arriba, Perfil+PIN abajo)
                     clientServicesHTML += `
                         <div class="client-service-tag">
                             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 6px;">
@@ -1017,18 +1031,6 @@ Revisa las guías [SOPORTE]"></textarea>
                 </div>
 
                 <div class="client-details" id="details-${key}">
-                    <!-- CAMPOS EDITABLES DE ACCESO: NOMBRE, USUARIO/CORREO Y PIN -->
-                    <div style="background: rgba(0, 242, 254, 0.03); border: 1px solid rgba(0, 242, 254, 0.15); border-radius: 8px; padding: 10px; margin-bottom: 12px;">
-                        <div style="font-size: 0.75rem; color: var(--neon-blue); font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">🔑 Credenciales de Acceso General (App)</div>
-                        <div style="display:flex; gap: 8px; margin-bottom: 6px;">
-                            <input type="text" placeholder="Nombre del Cliente" value="${cliente.nombre}" style="flex:2; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:4px; padding:6px; font-size: 0.85rem; outline:none;" onchange="updateClientData('${key}', 'nombre', this.value)">
-                        </div>
-                        <div style="display:flex; gap: 8px;">
-                            <input type="text" placeholder="Usuario / Correo de Acceso" value="${cliente.usuario_acceso || ''}" style="flex:2; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:4px; padding:6px; font-size: 0.85rem; outline:none;" onchange="updateClientData('${key}', 'usuario_acceso', this.value)" title="Usuario con el que ingresa a su portal">
-                            <input type="text" placeholder="PIN" value="${cliente.codigo || '1234'}" style="flex:1; background:#12121a; color:var(--neon-green); border: 1px solid rgba(0,255,157,0.3); border-radius:4px; padding:6px; font-size: 0.85rem; font-weight:bold; text-align:center; outline:none;" onchange="updateClientData('${key}', 'codigo', this.value)" title="PIN de 4 dígitos">
-                        </div>
-                    </div>
-
                     <div style="display:flex; gap: 10px; margin-bottom: 12px;">
                         <div style="flex: 1;">
                             <label style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-bottom: 4px;">Día</label>
@@ -1166,6 +1168,7 @@ Revisa las guías [SOPORTE]"></textarea>
     async function prepararYGuardar() {
         if (!currentFileData) return;
         
+        // Manejo tanto del botón en PC como en Móvil
         const btnSavePC = document.querySelector('.btn-save');
         const btnSaveMobile = document.getElementById('btn-save-mobile');
         
@@ -1184,7 +1187,7 @@ Revisa las guías [SOPORTE]"></textarea>
         configGlobal.combo_upsell = document.getElementById("combo-active").checked;
 
         const payload = {
-            message: "🤖 Admin Update: UI Móvil Compacta y Edición de Usuario/PIN",
+            message: "🤖 Admin Update: UI Móvil Compacta y Tabla Fix",
             content: btoa(unescape(encodeURIComponent(JSON.stringify({ _goxion_config: configGlobal, ...clientesDict }, null, 2)))),
             sha: currentFileData.sha, branch: CONFIG.branch
         };
