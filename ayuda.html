@@ -2143,7 +2143,13 @@
 
     <script>
         const NUMERO_GOXION = "528136836901"; 
-        const WEBHOOK_DISCORD = "https://discord.com/api/webhooks/1538661968381223024/08aQbkgtejze_ueHbUrX0IrvSgaWI7o6AtiPmncnllzJ7UW9m0CbbceGC7XyZZMiIQmX"; 
+        
+        // WEBHOOKS DE DISCORD SECCIONADOS
+        const WEBHOOKS_DISCORD = {
+            pedidos: "https://discord.com/api/webhooks/1539426774893465722/K7Sb4Kvvz59eSTDD64OWsyYCtUaIN1ZQQA3BWfo7ErXrzaB4jMPFkoTmfLa2BYma-VAH",
+            soporte: "https://discord.com/api/webhooks/1539426965939953675/NcqsJjsvqXqlrsylYj00HE1pQEEDfbp1yC2zoSB4LuwuZ7BrJF9cmrAmbhTs9m4RZIa0",
+            logins: "https://discord.com/api/webhooks/1539427102179201208/8C_uissf8BjGbJej0rZp1oRIex2V8bNN6e_zZ8C04oG7u2fk4azQFscrw_skWmu8peqE"
+        }; 
 
         let globalClientesData = null;
         let greetingInterval = null;
@@ -2151,9 +2157,10 @@
         
         window.catalogGroups = {}; 
 
-        // NUEVA VERSIÓN "SUPER NOTIFICACIONES" (EMBEDS)
-        function notificarAdmin(titulo, mensaje, colorHex = "00f2fe") {
-            if(!WEBHOOK_DISCORD) return;
+        // NUEVA VERSIÓN "SUPER NOTIFICACIONES" CATEGORIZADA
+        function notificarAdmin(categoria, titulo, mensaje, colorHex = "00f2fe") {
+            const url = WEBHOOKS_DISCORD[categoria];
+            if(!url) return;
             
             const colorDec = parseInt(colorHex.replace("#",""), 16);
 
@@ -2163,11 +2170,11 @@
                     description: mensaje,
                     color: colorDec,
                     timestamp: new Date().toISOString(),
-                    footer: { text: "GOXION System" }
+                    footer: { text: "GOXION System - " + categoria.toUpperCase() }
                 }]
             };
 
-            fetch(WEBHOOK_DISCORD, {
+            fetch(url, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(payload)
@@ -2181,14 +2188,14 @@
             let contacto = prompt("Déjanos tu número de WhatsApp para contactarte y crear tu perfil:");
             if(!contacto) return;
 
-            notificarAdmin("🆕 NUEVO PROSPECTO", `**Nombre:** ${nombre}\n**WhatsApp:** ${contacto}\n\n*Este cliente quiere crear una cuenta nueva.*`, "00f2fe");
+            notificarAdmin("logins", "🆕 NUEVO PROSPECTO", `**Nombre:** ${nombre}\n**WhatsApp:** ${contacto}\n\n*Este cliente quiere crear una cuenta nueva.*`, "00f2fe");
             
             alert(`¡Gracias ${nombre}! Hemos recibido tus datos. Te enviaremos un mensaje por WhatsApp en breve para activar tu espacio.`);
         }
 
         // NUEVA FUNCIÓN PARA RECLAMAR CUPONES EN SILENCIO
         function reclamarCuponSilencioso(nombre, folio, descuento) {
-            notificarAdmin("🏆 CUPÓN RECLAMADO", `El cliente **${nombre}** (Folio: ${folio}) completó sus misiones y reclamó su **${descuento}% de descuento** para su próxima factura.`, "7c4dff");
+            notificarAdmin("logins", "🏆 CUPÓN RECLAMADO", `El cliente **${nombre}** (Folio: ${folio}) completó sus misiones y reclamó su **${descuento}% de descuento** para su próxima factura.`, "7c4dff");
             
             const btn = document.getElementById('btn-claim-coupon');
             if(btn) {
@@ -2206,7 +2213,7 @@
             if(!key || !globalClientesData[key]) return;
             
             let cliente = globalClientesData[key];
-            notificarAdmin("🔥 SOLICITUD DE UPGRADE", `El cliente **${cliente.nombre}** (Folio: ${cliente.folio}) quiere agregar: **${mejoraStr}** para armar su Combo GOXION.`, "ffaa00");
+            notificarAdmin("pedidos", "🔥 SOLICITUD DE UPGRADE", `El cliente **${cliente.nombre}** (Folio: ${cliente.folio}) quiere agregar: **${mejoraStr}** para armar su Combo GOXION.`, "ffaa00");
             
             alert("¡Excelente decisión! Hemos notificado a nuestro equipo para aplicar la mejora a tu cuenta. Te contactaremos en breve para confirmar la activación.");
         };
@@ -2485,7 +2492,7 @@
 
                 renderDashboard(foundKey); 
                 switchTab('inicio');
-                notificarAdmin("🟢 Nuevo Inicio de Sesión", `El cliente **${clientName}** acaba de entrar a su app.`, "2ea043");
+                notificarAdmin("logins", "🟢 Nuevo Inicio de Sesión", `El cliente **${clientName}** acaba de entrar a su app.`, "2ea043");
             } else { 
                 errorMsg.innerText = "Datos incorrectos. Verifica tu Nombre y Código."; 
                 errorMsg.style.display = 'block'; 
@@ -2619,7 +2626,7 @@
             let clienteNombre = key && globalClientesData[key] ? globalClientesData[key].nombre : "Usuario Anónimo";
             let clienteFolio = activeFeedbackFolio || (key && globalClientesData[key] ? globalClientesData[key].folio : "N/A");
             
-            notificarAdmin("💬 Nuevo Feedback Recibido", `**Cliente:** ${clienteNombre} (Folio: ${clienteFolio})\n**Comentario:**\n"${text}"`, "ffaa00");
+            notificarAdmin("soporte", "💬 Nuevo Feedback Recibido", `**Cliente:** ${clienteNombre} (Folio: ${clienteFolio})\n**Comentario:**\n"${text}"`, "ffaa00");
             
             document.getElementById('btn-send-feedback').style.display = 'none';
             document.getElementById('feedback-success').style.display = 'block';
@@ -3340,7 +3347,7 @@
                 clienteInfo = `👤 **Cliente:** ${globalClientesData[key].nombre}\n📄 **Folio:** ${globalClientesData[key].folio}`;
             }
 
-            notificarAdmin("🚀 NUEVO PEDIDO RECIBIDO", `${clienteInfo}\n\n${msgDiscord}`, "2ea043");
+            notificarAdmin("pedidos", "🚀 NUEVO PEDIDO RECIBIDO", `${clienteInfo}\n\n${msgDiscord}`, "2ea043");
 
             const alertContent = document.getElementById('alert-content');
             const dynamicAlert = document.getElementById('dynamic-alert');
@@ -3594,7 +3601,7 @@
                     if (srv.perfil_nombre) extraContext += `\n👤 Perfil: ${srv.perfil_nombre}`; 
                     if (srv.perfil_pin) extraContext += `\n🔢 PIN: ${srv.perfil_pin}`; 
                 }
-                notificarAdmin("🛠️ Nueva Petición de Soporte", `El cliente **${cliente.nombre}** solicitó ayuda para ${selectedPlat}.`);
+                notificarAdmin("soporte", "🛠️ Nueva Petición de Soporte", `El cliente **${cliente.nombre}** solicitó ayuda para ${selectedPlat}.`);
             }
             window.open(`https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(currentIssues[idx].templateWA + val + extraContext)}`, '_blank');
         }
