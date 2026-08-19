@@ -854,21 +854,12 @@
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.25), 0 15px 30px rgba(0,0,0,0.4); 
         }
 
+        /* --- BASE PARA TARJETAS CON ANIMACIÓN DE BORDE --- */
         .brand-card.has-promo {
             border: none;
             position: relative;
             z-index: 1;
             background: transparent; 
-        }
-        .brand-card.has-promo::before {
-            content: '';
-            position: absolute;
-            width: 200%; height: 200%;
-            top: -50%; left: -50%;
-            background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent);
-            animation: rotateLight 3.5s linear infinite;
-            z-index: -2;
-            pointer-events: none;
         }
         .brand-card.has-promo::after {
             content: '';
@@ -880,9 +871,56 @@
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.15);
             pointer-events: none;
         }
-        .brand-card > * {
+        .brand-card.has-promo > * {
             position: relative;
             z-index: 1;
+        }
+
+        /* 1. TARJETA POPULAR (Línea que rodea) */
+        .brand-card.has-promo-popular::before {
+            content: '';
+            position: absolute;
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent);
+            animation: rotateLight 3.5s linear infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* 2. TARJETA MÁS AHORRO (Borde brillante fluyendo - Energía verde/cyan) */
+        .brand-card.has-promo-ahorro::before {
+            content: '';
+            position: absolute;
+            inset: -2px; 
+            background: linear-gradient(135deg, #00ff9d, #2ea043, #00f2fe, #00ff9d);
+            background-size: 300% 300%;
+            border-radius: 20px;
+            animation: liquidEnergyCard 4s ease infinite;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        @keyframes liquidEnergyCard {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 3. TARJETA NUEVO (Latido resplandeciente - Deep Breath neón) */
+        .brand-card.has-promo-nuevo::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 20px;
+            animation: deepBreathCard 3s ease-in-out infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+        @keyframes deepBreathCard {
+            0%, 100% { opacity: 0.3; box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
+            50% { opacity: 1; box-shadow: 0 0 25px rgba(0, 242, 254, 0.6), 0 0 15px rgba(124, 77, 255, 0.4); }
         }
 
         .brand-header {
@@ -1003,7 +1041,7 @@
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
         }
 
-        /* --- SISTEMA DE ETIQUETAS Y NUEVAS ANIMACIONES EXCLUSIVAS --- */
+        /* --- SISTEMA DE ETIQUETAS INDIVIDUALES --- */
         .animated-etiqueta {
             position: relative;
             display: inline-flex;
@@ -1024,7 +1062,7 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
         
-        /* 1. ANIMACIÓN ORIGINAL: POPULAR (Shimmer Sweep) */
+        /* 1. ETIQUETA ORIGINAL: POPULAR (Shimmer Sweep) */
         .animated-etiqueta::before {
             content: '';
             position: absolute;
@@ -1043,28 +1081,20 @@
             100% { left: 150%; }
         }
 
-        /* 2. NUEVA ANIMACIÓN: NUEVO (Respiración Profunda / Deep Breath) */
+        /* 2. ETIQUETA NUEVA: NUEVO (Respiración Profunda / Deep Breath) */
         .animated-etiqueta.is-nuevo {
             background: linear-gradient(135deg, #00f2fe, #7c4dff);
             animation: deepBreath 3s ease-in-out infinite;
             border-color: rgba(0, 242, 254, 0.6);
         }
-        .animated-etiqueta.is-nuevo::before {
-            display: none; /* Desactivamos el brillo lateral para dejar lugar al pulso de respiración */
-        }
+        .animated-etiqueta.is-nuevo::before { display: none; }
 
         @keyframes deepBreath {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 5px rgba(0, 242, 254, 0.3), inset 0 0 5px rgba(124, 77, 255, 0.2);
-            }
-            50% {
-                transform: scale(1.06);
-                box-shadow: 0 0 18px rgba(0, 242, 254, 0.8), 0 0 30px rgba(124, 77, 255, 0.5);
-            }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(0, 242, 254, 0.3), inset 0 0 5px rgba(124, 77, 255, 0.2); }
+            50% { transform: scale(1.06); box-shadow: 0 0 18px rgba(0, 242, 254, 0.8), 0 0 30px rgba(124, 77, 255, 0.5); }
         }
 
-        /* 3. NUEVA ANIMACIÓN: AHORRO / PROMOCIÓN (Energía Líquida Fluida) */
+        /* 3. ETIQUETA NUEVA: AHORRO / PROMOCIÓN (Energía Líquida Fluida) */
         .animated-etiqueta.is-ahorro {
             background: linear-gradient(135deg, #00ff9d, #2ea043, #00f2fe);
             background-size: 200% 200%;
@@ -1072,9 +1102,7 @@
             border-color: rgba(0, 255, 157, 0.6);
             box-shadow: 0 0 12px rgba(0, 255, 157, 0.4);
         }
-        .animated-etiqueta.is-ahorro::before {
-            display: none;
-        }
+        .animated-etiqueta.is-ahorro::before { display: none; }
 
         @keyframes liquidEnergy {
             0% { background-position: 0% 50%; }
@@ -3297,23 +3325,28 @@
                     pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}</button>`;
                 });
 
-                let animatedClass = brandTag ? 'has-promo' : '';
-                
-                // ASIGNACIÓN INTELIGENTE DE CLASES SEGÚN EL TEXTO DE LA ETIQUETA
+                // ASIGNACIÓN INTELIGENTE DE CLASES PARA TARJETAS Y ETIQUETAS
                 let badgeClass = "animated-etiqueta";
+                let cardPromoClass = "";
+                
                 if (brandTag) {
                     let tLow = brandTag.toLowerCase();
                     if (tLow.includes("nuevo") || tLow.includes("estreno")) {
                         badgeClass += " is-nuevo";
+                        cardPromoClass = "has-promo has-promo-nuevo";
                     } else if (tLow.includes("ahorro") || tLow.includes("promo") || tLow.includes("descuento") || tLow.includes("oferta")) {
                         badgeClass += " is-ahorro";
+                        cardPromoClass = "has-promo has-promo-ahorro";
+                    } else {
+                        // Animación rotatoria (Por defecto o Popular)
+                        cardPromoClass = "has-promo has-promo-popular";
                     }
                 }
                 
                 let badgeHtml = brandTag ? `<span class="${badgeClass}" style="margin-top: 2px;">${brandTag}</span>` : '';
 
                 htmlCatalogo += `
-                <div class="brand-card ${animatedClass}" id="brand-card-${bKey}">
+                <div class="brand-card ${cardPromoClass}" id="brand-card-${bKey}">
                     <div class="brand-header" onclick="toggleBrandCard('${bKey}')">
                         <div class="brand-header-left">
                             <img src="${brand.img}" class="brand-logo-img" onerror="this.src='logo2.PNG'">
