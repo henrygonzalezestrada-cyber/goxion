@@ -854,21 +854,12 @@
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.25), 0 15px 30px rgba(0,0,0,0.4); 
         }
 
+        /* --- BASE PARA TARJETAS CON ANIMACIÓN DE BORDE --- */
         .brand-card.has-promo {
             border: none;
             position: relative;
             z-index: 1;
             background: transparent; 
-        }
-        .brand-card.has-promo::before {
-            content: '';
-            position: absolute;
-            width: 200%; height: 200%;
-            top: -50%; left: -50%;
-            background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent);
-            animation: rotateLight 3.5s linear infinite;
-            z-index: -2;
-            pointer-events: none;
         }
         .brand-card.has-promo::after {
             content: '';
@@ -880,9 +871,56 @@
             box-shadow: inset 0 20px 40px -20px rgba(0,242,254,0.15);
             pointer-events: none;
         }
-        .brand-card > * {
+        .brand-card.has-promo > * {
             position: relative;
             z-index: 1;
+        }
+
+        /* 1. TARJETA POPULAR (Línea que rodea) */
+        .brand-card.has-promo-popular::before {
+            content: '';
+            position: absolute;
+            width: 200%; height: 200%;
+            top: -50%; left: -50%;
+            background: conic-gradient(transparent, transparent, var(--neon-purple), var(--neon-blue), transparent);
+            animation: rotateLight 3.5s linear infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+
+        /* 2. TARJETA MÁS AHORRO (Borde brillante fluyendo - Energía verde/cyan) */
+        .brand-card.has-promo-ahorro::before {
+            content: '';
+            position: absolute;
+            inset: -2px; 
+            background: linear-gradient(135deg, #00ff9d, #2ea043, #00f2fe, #00ff9d);
+            background-size: 300% 300%;
+            border-radius: 20px;
+            animation: liquidEnergyCard 4s ease infinite;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        @keyframes liquidEnergyCard {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* 3. TARJETA NUEVO (Latido resplandeciente - Deep Breath neón) */
+        .brand-card.has-promo-nuevo::before {
+            content: '';
+            position: absolute;
+            inset: -1.5px;
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
+            border-radius: 20px;
+            animation: deepBreathCard 3s ease-in-out infinite;
+            z-index: -2;
+            pointer-events: none;
+        }
+        @keyframes deepBreathCard {
+            0%, 100% { opacity: 0.3; box-shadow: 0 0 10px rgba(0, 242, 254, 0.2); }
+            50% { opacity: 1; box-shadow: 0 0 25px rgba(0, 242, 254, 0.6), 0 0 15px rgba(124, 77, 255, 0.4); }
         }
 
         .brand-header {
@@ -1003,6 +1041,7 @@
             box-shadow: 0 0 15px rgba(124, 77, 255, 0.2);
         }
 
+        /* --- SISTEMA DE ETIQUETAS INDIVIDUALES --- */
         .animated-etiqueta {
             position: relative;
             display: inline-flex;
@@ -1023,6 +1062,7 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
         
+        /* 1. ETIQUETA ORIGINAL: POPULAR (Shimmer Sweep) */
         .animated-etiqueta::before {
             content: '';
             position: absolute;
@@ -1039,6 +1079,40 @@
             0% { left: -150%; }
             25% { left: 150%; }
             100% { left: 150%; }
+        }
+
+        /* 2. ETIQUETA NUEVA: NUEVO (Respiración Profunda / Deep Breath) */
+        .animated-etiqueta.is-nuevo {
+            background: linear-gradient(135deg, #00f2fe, #7c4dff);
+            animation: deepBreath 3s ease-in-out infinite;
+            border-color: rgba(0, 242, 254, 0.6);
+        }
+        .animated-etiqueta.is-nuevo::before { display: none; }
+
+        @keyframes deepBreath {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 5px rgba(0, 242, 254, 0.3), inset 0 0 5px rgba(124, 77, 255, 0.2); }
+            50% { transform: scale(1.06); box-shadow: 0 0 18px rgba(0, 242, 254, 0.8), 0 0 30px rgba(124, 77, 255, 0.5); }
+        }
+
+        /* 3. ETIQUETA NUEVA: AHORRO / PROMOCIÓN (Energía Líquida Fluida) */
+        .animated-etiqueta.is-ahorro {
+            background: linear-gradient(135deg, #00ff9d, #2ea043, #00f2fe);
+            background-size: 200% 200%;
+            animation: liquidEnergy 4s ease infinite, floatTag 2.5s ease-in-out infinite;
+            border-color: rgba(0, 255, 157, 0.6);
+            box-shadow: 0 0 12px rgba(0, 255, 157, 0.4);
+        }
+        .animated-etiqueta.is-ahorro::before { display: none; }
+
+        @keyframes liquidEnergy {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes floatTag {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-2px); }
         }
         
         @keyframes rotateLight {
@@ -2110,7 +2184,7 @@
             <table>
                 <tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
                 <tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr>
-                <tr><td style="color: var(--neon-magenta); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
+                <tr><td style="color: var(--neon-purple); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
             </table>
             <p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
         </div>
@@ -2144,7 +2218,6 @@
     <script>
         const NUMERO_GOXION = "528136836901"; 
         
-        // WEBHOOKS DE DISCORD SECCIONADOS
         const WEBHOOKS_DISCORD = {
             pedidos: "https://discord.com/api/webhooks/1539426774893465722/K7Sb4Kvvz59eSTDD64OWsyYCtUaIN1ZQQA3BWfo7ErXrzaB4jMPFkoTmfLa2BYma-VAH",
             soporte: "https://discord.com/api/webhooks/1539426965939953675/NcqsJjsvqXqlrsylYj00HE1pQEEDfbp1yC2zoSB4LuwuZ7BrJF9cmrAmbhTs9m4RZIa0",
@@ -2157,7 +2230,6 @@
         
         window.catalogGroups = {}; 
 
-        // NUEVA VERSIÓN "SUPER NOTIFICACIONES" CATEGORIZADA
         function notificarAdmin(categoria, titulo, mensaje, colorHex = "00f2fe") {
             const url = WEBHOOKS_DISCORD[categoria];
             if(!url) return;
@@ -2181,7 +2253,6 @@
             }).catch(e => console.log("Webhook no enviado", e));
         }
 
-        // NUEVA FUNCIÓN PARA REGISTRAR PROSPECTOS DESDE LA APP
         function solicitarCuenta() {
             let nombre = prompt("¿Cómo te llamas?");
             if(!nombre) return;
@@ -2193,7 +2264,6 @@
             alert(`¡Gracias ${nombre}! Hemos recibido tus datos. Te enviaremos un mensaje por WhatsApp en breve para activar tu espacio.`);
         }
 
-        // NUEVA FUNCIÓN PARA RECLAMAR CUPONES EN SILENCIO
         function reclamarCuponSilencioso(nombre, folio, descuento) {
             notificarAdmin("logins", "🏆 CUPÓN RECLAMADO", `El cliente **${nombre}** (Folio: ${folio}) completó sus misiones y reclamó su **${descuento}% de descuento** para su próxima factura.`, "7c4dff");
             
@@ -2207,7 +2277,6 @@
             }
         }
 
-        // NUEVA FUNCIÓN PARA UPSELLS (MEJORAS AL COMBO) EN SILENCIO
         window.solicitarMejoraSilenciosa = function(mejoraStr) {
             const key = localStorage.getItem('goxion_user_key');
             if(!key || !globalClientesData[key]) return;
@@ -3018,16 +3087,15 @@
             } else { 
                 srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`; 
             }
-            document.getElementById('dash-services').innerHTML = srvHTML; // Esta línea ya existe, es tu referencia
+            document.getElementById('dash-services').innerHTML = srvHTML;
 
-            // NUEVO: Escuchar si el cliente reportó su pago en index.html
             if(localStorage.getItem('goxion_mission_pago_completed_' + cliente.folio)) {
                 setTimeout(() => {
                     completarMisionInteligente('pago');
                     localStorage.removeItem('goxion_mission_pago_completed_' + cliente.folio);
                 }, 1500);
             }
-        } // Fin de la función renderDashboard(key)
+        }
 
         function srvCleanName(n) { 
             return n.trim(); 
@@ -3257,11 +3325,28 @@
                     pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}</button>`;
                 });
 
-                let animatedClass = brandTag ? 'has-promo' : '';
-                let badgeHtml = brandTag ? `<span class="animated-etiqueta" style="margin-top: 2px;">${brandTag}</span>` : '';
+                // ASIGNACIÓN INTELIGENTE DE CLASES PARA TARJETAS Y ETIQUETAS
+                let badgeClass = "animated-etiqueta";
+                let cardPromoClass = "";
+                
+                if (brandTag) {
+                    let tLow = brandTag.toLowerCase();
+                    if (tLow.includes("nuevo") || tLow.includes("estreno")) {
+                        badgeClass += " is-nuevo";
+                        cardPromoClass = "has-promo has-promo-nuevo";
+                    } else if (tLow.includes("ahorro") || tLow.includes("promo") || tLow.includes("descuento") || tLow.includes("oferta")) {
+                        badgeClass += " is-ahorro";
+                        cardPromoClass = "has-promo has-promo-ahorro";
+                    } else {
+                        // Animación rotatoria (Por defecto o Popular)
+                        cardPromoClass = "has-promo has-promo-popular";
+                    }
+                }
+                
+                let badgeHtml = brandTag ? `<span class="${badgeClass}" style="margin-top: 2px;">${brandTag}</span>` : '';
 
                 htmlCatalogo += `
-                <div class="brand-card ${animatedClass}" id="brand-card-${bKey}">
+                <div class="brand-card ${cardPromoClass}" id="brand-card-${bKey}">
                     <div class="brand-header" onclick="toggleBrandCard('${bKey}')">
                         <div class="brand-header-left">
                             <img src="${brand.img}" class="brand-logo-img" onerror="this.src='logo2.PNG'">
@@ -3328,7 +3413,6 @@
             }
         }
 
-        // NUEVA VERSIÓN DE ENVIAR PEDIDO SILENCIOSO A DISCORD
         function enviarPedido() {
             let msgDiscord = ""; 
             let totalPrecio = 0;
