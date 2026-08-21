@@ -606,7 +606,7 @@
       "descuento": 5,
       "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
     },
-    "usuario_acceso": "Gabriel"
+    "usuario_acceso": ""
   },
   "juan-de-dios": {
     "folio": "GX-2026-0016",
@@ -680,7 +680,7 @@
   "jeynner": {
     "folio": "GX-2026-0018",
     "nombre": "Jeynner",
-    "codigo": "1234",
+    "codigo": "8567",
     "pagos_puntuales": 0,
     "dia_pago": 30,
     "estado": "pagado",
@@ -704,7 +704,7 @@
   "isamar": {
     "folio": "GX-2026-0019",
     "nombre": "Isamar",
-    "codigo": "1234",
+    "codigo": "1994",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
