@@ -548,7 +548,7 @@
   "julian": {
     "folio": "GX-2026-0014",
     "nombre": "Julián",
-    "codigo": "1234",
+    "codigo": "0001",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
