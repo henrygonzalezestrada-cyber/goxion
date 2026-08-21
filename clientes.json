@@ -98,7 +98,7 @@
   "perla": {
     "folio": "GX-2026-0001",
     "nombre": "Perla",
-    "codigo": "1234",
+    "codigo": "6717",
     "pagos_puntuales": 0,
     "dia_pago": 21,
     "estado": "pagado",
@@ -158,10 +158,10 @@
   "nayeli": {
     "folio": "GX-2026-0003",
     "nombre": "Nayeli",
-    "codigo": "1234",
+    "codigo": "2473",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -732,7 +732,7 @@
   "quetzaly": {
     "folio": "GX-2026-0020",
     "nombre": "Quetzaly",
-    "codigo": "1234",
+    "codigo": "8631",
     "pagos_puntuales": 0,
     "dia_pago": 9,
     "estado": "pagado",
