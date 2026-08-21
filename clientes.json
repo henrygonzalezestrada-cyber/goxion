@@ -229,7 +229,7 @@
   "david": {
     "folio": "GX-2026-0005",
     "nombre": "David",
-    "codigo": "1234",
+    "codigo": "1999",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
@@ -343,7 +343,7 @@
   "fabiola": {
     "folio": "GX-2026-0008",
     "nombre": "Fabiola",
-    "codigo": "1234",
+    "codigo": "6061",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
