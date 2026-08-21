@@ -274,7 +274,7 @@
   "gabriel": {
     "folio": "GX-2026-0006",
     "nombre": "Gabriel",
-    "codigo": "1234",
+    "codigo": "9812",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
@@ -423,7 +423,7 @@
     "codigo": "1097",
     "pagos_puntuales": 0,
     "dia_pago": 15,
-    "estado": "pendiente",
+    "estado": "pagado",
     "pago_en_revision": false,
     "historial_pagos": [],
     "servicios": [
@@ -579,7 +579,7 @@
   "gabriel2": {
     "folio": "GX-2026-0015",
     "nombre": "Gabriel 2",
-    "codigo": "1234",
+    "codigo": "2001",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
@@ -605,7 +605,8 @@
       "misiones_activas": true,
       "descuento": 5,
       "tareas": "Reporta tu pago [PAGO]\nNavega por nuestro catálogo [CATALOGO]\nExplora la opciones de soporte [SOPORTE]\nDeja un comentario y ayúdanos a mejorar [FEEDBACK]"
-    }
+    },
+    "usuario_acceso": "Gabriel"
   },
   "juan-de-dios": {
     "folio": "GX-2026-0016",
