@@ -127,7 +127,7 @@
   "rodas": {
     "folio": "GX-2026-0002",
     "nombre": "Rodas",
-    "codigo": "1234",
+    "codigo": "2105",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
@@ -494,7 +494,7 @@
   "samuel": {
     "folio": "GX-2026-0012",
     "nombre": "Samuel",
-    "codigo": "1234",
+    "codigo": "3355",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pendiente",
@@ -649,7 +649,7 @@
   "rafael": {
     "folio": "GX-2026-0017",
     "nombre": "Rafael",
-    "codigo": "1234",
+    "codigo": "1122",
     "pagos_puntuales": 0,
     "dia_pago": 15,
     "estado": "pagado",
