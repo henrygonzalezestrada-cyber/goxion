@@ -1,7 +1,7 @@
 {
   "_goxion_config": {
     "alertas": {
-      "activa": true,
+      "activa": false,
       "plataforma": "YouTube Premium",
       "falla": "presentando intermitencias temporales",
       "mensaje": ""
