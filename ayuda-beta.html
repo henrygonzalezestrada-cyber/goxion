@@ -2219,9 +2219,9 @@
         const NUMERO_GOXION = "528136836901"; 
         
         const WEBHOOKS_DISCORD = {
-            pedidos: "https://discord.com/api/webhooks/1539426774893465722/K7Sb4Kvvz59eSTDD64OWsyYCtUaIN1ZQQA3BWfo7ErXrzaB4jMPFkoTmfLa2BYma-VAH",
-            soporte: "https://discord.com/api/webhooks/1539426965939953675/NcqsJjsvqXqlrsylYj00HE1pQEEDfbp1yC2zoSB4LuwuZ7BrJF9cmrAmbhTs9m4RZIa0",
-            logins: "https://discord.com/api/webhooks/1539427102179201208/8C_uissf8BjGbJej0rZp1oRIex2V8bNN6e_zZ8C04oG7u2fk4azQFscrw_skWmu8peqE"
+            pedidos: "goxion-beta://pedidos",
+            soporte: "goxion-beta://soporte",
+            logins: "goxion-beta://logins"
         }; 
 
         let globalClientesData = null;
@@ -3696,5 +3696,202 @@
         }
 
     </script>
+
+    <!-- GOXION BETA // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
+    <script id="goxion-beta-client-layer">
+    (() => {
+        const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion-beta";
+        const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta";
+        const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion-beta";
+        const TOKEN_KEY = "goxion_client_token";
+
+        
+function goxionBetaLegacy(data) {
+    const legacy = {
+        _goxion_config: {
+            alertas: data?.alertas || {},
+            serviciosGlobales: Array.isArray(data?.catalogo) ? data.catalogo : [],
+            combo_upsell: data?.configuracion?.combo_upsell !== false
+        }
+    };
+
+    if (data?.cliente) {
+        const c = data.cliente;
+        const key = c.clave || "";
+        legacy[key] = {
+            id: c.id,
+            clave: c.clave,
+            folio: c.folio || "",
+            nombre: c.nombre || "",
+            usuario_acceso: c.usuario_acceso || "",
+            dia_pago: Number(c.dia_pago || 15),
+            estado: c.estado || "pendiente",
+            pago_en_revision: c.pago_en_revision === true,
+            pagos_puntuales: Number(c.pagos_puntuales || 0),
+            descuento_fallas: Number(c.descuento_fallas || 0),
+            servicios: (data.servicios || []).map(s => ({
+                id: s.id,
+                nombre: s.nombre,
+                monto: Number(s.monto || 0),
+                correo_login: s.correo_login || "",
+                perfil_nombre: s.perfil_nombre || "",
+                perfil_pin: s.perfil_pin || ""
+            })),
+            historial_pagos: (data.pagos || []).map(p => ({
+                id: p.id,
+                fecha: p.periodo || p.fecha || "",
+                monto: Number(p.monto || 0),
+                estado: p.estado || "pagado",
+                notas: p.notas || ""
+            })),
+            gamificacion: data.gamificacion || null,
+            referido_activo: Array.isArray(data.referidos) && data.referidos.length ? data.referidos[0] : undefined,
+            descuentos_especiales: (data.descuentos || []).map(d => ({
+                id: d.id,
+                concepto: d.descripcion || "Descuento",
+                monto: Number(d.monto || 0)
+            }))
+        };
+    }
+
+    return legacy;
+}
+
+
+        async function parseJSON(r) {
+            const t = await r.text();
+            let j = {};
+            try { j = t ? JSON.parse(t) : {}; } catch {}
+            return { text:t, json:j };
+        }
+
+        async function cargarPublicoOCliente() {
+            const token = localStorage.getItem(TOKEN_KEY) || "";
+
+            if (token) {
+                try {
+                    const r = await fetch(MI_BETA, {
+                        method:"POST",
+                        headers:{"Content-Type":"application/json","X-Client-Token":token},
+                        body:JSON.stringify({})
+                    });
+                    const {json} = await parseJSON(r);
+                    if (r.ok && json?.ok === true) return goxionBetaLegacy(json);
+                    if (r.status === 401) {
+                        localStorage.removeItem(TOKEN_KEY);
+                        localStorage.removeItem("goxion_user_key");
+                    }
+                } catch (e) {
+                    console.error("Mi Espacio Beta:", e);
+                }
+            }
+
+            const r = await fetch(MI_BETA, {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({modo:"publico"})
+            });
+            const {text,json} = await parseJSON(r);
+            if (!r.ok || json?.ok !== true) throw new Error(json?.error || text || "No fue posible cargar el catálogo beta.");
+            return goxionBetaLegacy(json);
+        }
+
+        cargarDatosYVerificarSesion = async function() {
+            try {
+                globalClientesData = await cargarPublicoOCliente();
+                cargarCatalogo(globalClientesData);
+                renderizarSoporteDinamico(globalClientesData);
+
+                const savedKey = localStorage.getItem("goxion_user_key");
+                if (savedKey && globalClientesData[savedKey]) {
+                    renderDashboard(savedKey);
+                }
+            } catch (e) {
+                console.error("Error cargando GOXION Beta", e);
+                const dynamicAlert = document.getElementById("dynamic-alert");
+                const alertContent = document.getElementById("alert-content");
+                if (dynamicAlert && alertContent) {
+                    alertContent.innerHTML = "<strong>No fue posible sincronizar con GOXION Beta.</strong><br>Intenta recargar la página.";
+                    dynamicAlert.style.display = "flex";
+                }
+            }
+        };
+
+        iniciarSesion = async function() {
+            const inputId = document.getElementById("login-id").value.trim();
+            const inputPin = document.getElementById("login-pin").value.trim();
+            const errorMsg = document.getElementById("login-error");
+
+            if (!inputId || !inputPin) {
+                errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso.";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            errorMsg.innerText = "Validando acceso...";
+            errorMsg.style.display = "block";
+
+            try {
+                const lr = await fetch(LOGIN_BETA, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({nombre:inputId, pin:inputPin})
+                });
+                const {text:lt,json:login} = await parseJSON(lr);
+
+                if (!lr.ok || login?.ok !== true || !login?.session_token) {
+                    throw new Error(login?.error || lt || "Datos incorrectos.");
+                }
+
+                localStorage.setItem(TOKEN_KEY, login.session_token);
+                localStorage.setItem("goxion_user_key", login.cliente.clave);
+
+                const dr = await fetch(MI_BETA, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","X-Client-Token":login.session_token},
+                    body:"{}"
+                });
+                const {text:dt,json:data} = await parseJSON(dr);
+                if (!dr.ok || data?.ok !== true) throw new Error(data?.error || dt || "No fue posible abrir Mi Espacio.");
+
+                globalClientesData = goxionBetaLegacy(data);
+                cargarCatalogo(globalClientesData);
+                renderizarSoporteDinamico(globalClientesData);
+
+                errorMsg.style.display = "none";
+                closeAuthSheet();
+
+                const guestCard = document.getElementById("guest-action-card");
+                if (guestCard) guestCard.style.display = "none";
+
+                renderDashboard(login.cliente.clave);
+                switchTab("inicio");
+                notificarAdmin("logins", "🟢 Nuevo Inicio de Sesión Beta", `El cliente **${login.cliente.nombre}** acaba de entrar a su app beta.`, "2ea043");
+            } catch (e) {
+                console.error(e);
+                errorMsg.innerText = e?.message || "Datos incorrectos. Verifica tu Nombre y Código.";
+                errorMsg.style.display = "block";
+            }
+        };
+
+        const cerrarSesionOriginal = cerrarSesion;
+        cerrarSesion = function() {
+            localStorage.removeItem(TOKEN_KEY);
+            localStorage.removeItem("goxion_user_key");
+            cerrarSesionOriginal();
+        };
+
+        notificarAdmin = function(categoria, titulo, mensaje, colorHex = "00f2fe") {
+            fetch(NOTIFY_BETA, {
+                method:"POST",
+                headers:{"Content-Type":"application/json"},
+                body:JSON.stringify({categoria,titulo,mensaje,colorHex})
+            }).catch(e => console.log("Notificación beta no enviada", e));
+        };
+
+        console.info("GOXION ayuda-beta conectado a Supabase Beta.");
+    })();
+    </script>
+
 </body>
 </html>
