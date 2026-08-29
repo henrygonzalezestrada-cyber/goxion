@@ -1834,13 +1834,91 @@
 
         .mission-item.locked { border-color: rgba(255, 170, 0, 0.4); background: rgba(255, 170, 0, 0.05); }
         .mission-item.locked .mission-checkbox { border-color: var(--warning-amber); background: rgba(255, 170, 0, 0.1); font-size: 10px; }
-    </style>
+    
+    /* --- GOXION LOADER / PRUEBA VISUAL --- */
+    .goxion-loader {
+        --loader-cyan: #00f2fe;
+        --loader-purple: #7c4dff;
+        --loader-size: 1px;
+        position: relative;
+        display: inline-block;
+        width: calc(48 * var(--loader-size));
+        height: calc(48 * var(--loader-size));
+        border-radius: 50%;
+        color: var(--loader-cyan);
+        transform: rotateZ(45deg);
+        perspective: calc(1000 * var(--loader-size));
+        filter:
+            drop-shadow(0 0 7px rgba(0, 242, 254, 0.58))
+            drop-shadow(0 0 13px rgba(124, 77, 255, 0.38));
+    }
+
+    .goxion-loader::before,
+    .goxion-loader::after {
+        content: '';
+        display: block;
+        position: absolute;
+        inset: 0;
+        width: inherit;
+        height: inherit;
+        border-radius: 50%;
+        transform: rotateX(70deg);
+        animation: goxionLoaderSpin 1s linear infinite;
+    }
+
+    .goxion-loader::after {
+        color: var(--loader-purple);
+        transform: rotateY(70deg);
+        animation-delay: .4s;
+    }
+
+    .goxion-loader-wrap {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .goxion-loader-text {
+        color: var(--text-muted, #95a4bd);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .35px;
+    }
+
+    .goxion-loader.small {
+        --loader-size: .72px;
+    }
+
+    @keyframes goxionLoaderSpin {
+        0%, 100% { box-shadow: .2em 0 0 0 currentColor; }
+        12% { box-shadow: .2em .2em 0 0 currentColor; }
+        25% { box-shadow: 0 .2em 0 0 currentColor; }
+        37% { box-shadow: -.2em .2em 0 0 currentColor; }
+        50% { box-shadow: -.2em 0 0 0 currentColor; }
+        62% { box-shadow: -.2em -.2em 0 0 currentColor; }
+        75% { box-shadow: 0 -.2em 0 0 currentColor; }
+        87% { box-shadow: .2em -.2em 0 0 currentColor; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .goxion-loader::before,
+        .goxion-loader::after {
+            animation-duration: 2s;
+        }
+    }
+
+</style>
 </head>
 <body class="no-scroll">
 
     <div id="splash-screen" onclick="hideSplash()">
-        <div class="splash-content">
+        <div class="splash-content" style="display:flex; flex-direction:column; align-items:center; gap:22px;">
             <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
+            <span class="goxion-loader small" aria-hidden="true"></span>
         </div>
     </div>
 
@@ -2079,7 +2157,10 @@
         <div id="view-catalogo" class="view-section">
             <div class="section-title">Nuestros Ecosistemas y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
-                <p style="font-size: 13px; color: var(--text-muted); text-align: center; width: 100%;">Cargando catálogo en vivo...</p>
+                <div class="goxion-loader-wrap" style="grid-column: 1 / -1; padding: 28px 0;">
+                    <span class="goxion-loader small" aria-hidden="true"></span>
+                    <span class="goxion-loader-text">Cargando catálogo en vivo...</span>
+                </div>
             </div>
         </div>
 
@@ -2095,7 +2176,10 @@
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 
                 <div class="platform-grid" id="support-platforms-grid">
-                    <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
+                    <div class="goxion-loader-wrap" style="grid-column: 1 / -1; padding: 18px 0;">
+                        <span class="goxion-loader small" aria-hidden="true"></span>
+                        <span class="goxion-loader-text">Cargando opciones...</span>
+                    </div>
                 </div>
                 
                 <div id="step-2" class="step-box">
@@ -2282,9 +2366,9 @@
         const NUMERO_GOXION = "528136836901"; 
         
         const WEBHOOKS_DISCORD = {
-            pedidos: "goxion-beta://pedidos",
-            soporte: "goxion-beta://soporte",
-            logins: "goxion-beta://logins"
+            pedidos: "goxion://pedidos",
+            soporte: "goxion://soporte",
+            logins: "goxion://logins"
         }; 
 
         let globalClientesData = null;
@@ -2670,7 +2754,7 @@
             const key = localStorage.getItem('goxion_user_key'); 
             if(key) {
                 setTimeout(() => {
-                    window.location.href = `index-beta.html?cliente=${encodeURIComponent(key)}`; 
+                    window.location.href = `index.html?cliente=${encodeURIComponent(key)}`; 
                 }, 800);
             }
         }
@@ -3780,10 +3864,10 @@
     <!-- GOXION BETA // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
     <script id="goxion-beta-client-layer">
     (() => {
-        const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion-beta";
-        const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta";
-        const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion-beta";
-        const INVENTARIO_PUBLICO_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico-beta";
+        const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion";
+        const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
+        const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
+        const INVENTARIO_PUBLICO_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico";
         const TOKEN_KEY = "goxion_client_token";
 
         
@@ -3900,7 +3984,7 @@ function goxionBetaLegacy(data) {
                         localStorage.removeItem("goxion_user_key");
                     }
                 } catch (e) {
-                    console.error("Mi Espacio Beta:", e);
+                    console.error("Mi Espacio:", e);
                 }
             }
 
@@ -3925,11 +4009,11 @@ function goxionBetaLegacy(data) {
                     renderDashboard(savedKey);
                 }
             } catch (e) {
-                console.error("Error cargando GOXION Beta", e);
+                console.error("Error cargando GOXION", e);
                 const dynamicAlert = document.getElementById("dynamic-alert");
                 const alertContent = document.getElementById("alert-content");
                 if (dynamicAlert && alertContent) {
-                    alertContent.innerHTML = "<strong>No fue posible sincronizar con GOXION Beta.</strong><br>Intenta recargar la página.";
+                    alertContent.innerHTML = "<strong>No fue posible sincronizar con GOXION.</strong><br>Intenta recargar la página.";
                     dynamicAlert.style.display = "flex";
                 }
             }
@@ -3985,7 +4069,7 @@ function goxionBetaLegacy(data) {
 
                 renderDashboard(login.cliente.clave);
                 switchTab("inicio");
-                notificarAdmin("logins", "🟢 Nuevo Inicio de Sesión Beta", `El cliente **${login.cliente.nombre}** acaba de entrar a su app beta.`, "2ea043");
+                notificarAdmin("logins", "🟢 Nuevo Inicio de Sesión", `El cliente **${login.cliente.nombre}** acaba de entrar a su app.`, "2ea043");
             } catch (e) {
                 console.error(e);
                 errorMsg.innerText = e?.message || "Datos incorrectos. Verifica tu Nombre y Código.";
@@ -4022,7 +4106,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION ayuda-beta conectado a Supabase Beta.");
+        console.info("GOXION ayuda conectado a Supabase.");
     })();
     </script>
 
