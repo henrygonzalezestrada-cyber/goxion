@@ -512,10 +512,18 @@ function goxionBetaLegacy(data) {
 
       // Estado mensual real: un pago solo cubre el periodo al que pertenece.
       const pagosCliente = Array.isArray(cliente.historial_pagos) ? cliente.historial_pagos : [];
+      const normalizarPeriodo = (valor) => String(valor || "")
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/\bde\b/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+
       const pagoPeriodoActual = pagosCliente.find(p => {
-          const periodo = String(p.periodo || p.fecha || "").trim().toLowerCase();
+          const periodo = normalizarPeriodo(p.periodo || p.fecha || "");
           const estadoPago = String(p.estado || "pagado").trim().toLowerCase();
-          return periodo === periodoStr.toLowerCase() && estadoPago === "pagado";
+          return periodo === normalizarPeriodo(periodoStr) && estadoPago === "pagado";
       });
 
       const tieneHistorialConPeriodo = pagosCliente.some(
@@ -568,8 +576,15 @@ function goxionBetaLegacy(data) {
       let mensajeAtrasoHTML = "";
 
       const isReviewLocal = localStorage.getItem(`revision_pago_${clienteKey}`) === periodoStr;
-      const enRevision = cliente.pago_en_revision === true || (
-          isReviewLocal && cliente.estado !== "pendiente" && cliente.estado !== "suspendido"
+
+      // Si el periodo actual ya está pagado, cualquier bandera local de revisión quedó obsoleta.
+      if (estaPagadoPeriodo) {
+          localStorage.removeItem(`revision_pago_${clienteKey}`);
+      }
+
+      const enRevision = !estaPagadoPeriodo && (
+          cliente.pago_en_revision === true ||
+          (isReviewLocal && cliente.estado !== "pendiente" && cliente.estado !== "suspendido")
       );
 
       if (estaPagadoPeriodo) {
