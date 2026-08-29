@@ -1835,79 +1835,117 @@
         .mission-item.locked { border-color: rgba(255, 170, 0, 0.4); background: rgba(255, 170, 0, 0.05); }
         .mission-item.locked .mission-checkbox { border-color: var(--warning-amber); background: rgba(255, 170, 0, 0.1); font-size: 10px; }
     
-    /* --- GOXION LOADER / PRUEBA VISUAL --- */
-    .goxion-loader {
-        --loader-cyan: #00f2fe;
-        --loader-purple: #7c4dff;
-        --loader-size: 1px;
+    /* --- GOXION LOGO LOADER / TEST --- */
+    .goxion-logo-loader {
+        --loader-size: 64px;
+        width: var(--loader-size);
+        height: var(--loader-size);
         position: relative;
-        display: inline-block;
-        width: calc(48 * var(--loader-size));
-        height: calc(48 * var(--loader-size));
-        border-radius: 50%;
-        color: var(--loader-cyan);
-        transform: rotateZ(45deg);
-        perspective: calc(1000 * var(--loader-size));
-        filter:
-            drop-shadow(0 0 7px rgba(0, 242, 254, 0.58))
-            drop-shadow(0 0 13px rgba(124, 77, 255, 0.38));
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transform: scale(.96);
+        transition: opacity .22s ease, transform .22s ease;
+        isolation: isolate;
     }
 
-    .goxion-loader::before,
-    .goxion-loader::after {
-        content: '';
-        display: block;
+    .goxion-logo-loader.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .goxion-logo-loader.small {
+        --loader-size: 52px;
+    }
+
+    .goxion-logo-loader .orbit {
         position: absolute;
-        inset: 0;
-        width: inherit;
-        height: inherit;
+        width: 78%;
+        height: 38%;
         border-radius: 50%;
-        transform: rotateX(70deg);
-        animation: goxionLoaderSpin 1s linear infinite;
+        border: 1.4px solid transparent;
+        box-sizing: border-box;
+        opacity: .95;
+        will-change: transform;
     }
 
-    .goxion-loader::after {
-        color: var(--loader-purple);
-        transform: rotateY(70deg);
-        animation-delay: .4s;
+    .goxion-logo-loader .orbit.cyan {
+        border-top-color: #00f2fe;
+        border-bottom-color: rgba(0, 242, 254, .14);
+        transform: rotate(32deg);
+        filter: drop-shadow(0 0 4px rgba(0, 242, 254, .55));
+        animation: goxionOrbitA 1.85s linear infinite;
+    }
+
+    .goxion-logo-loader .orbit.purple {
+        border-top-color: #7c4dff;
+        border-bottom-color: rgba(124, 77, 255, .14);
+        transform: rotate(-32deg);
+        filter: drop-shadow(0 0 4px rgba(124, 77, 255, .5));
+        animation: goxionOrbitB 2.15s linear infinite reverse;
+    }
+
+    .goxion-logo-loader .orbit.soft {
+        width: 70%;
+        height: 30%;
+        border-top-color: rgba(255,255,255,.28);
+        border-bottom-color: rgba(255,255,255,.04);
+        transform: rotate(90deg);
+        opacity: .45;
+        animation: goxionOrbitC 2.6s linear infinite;
+    }
+
+    .goxion-logo-loader .core {
+        position: relative;
+        z-index: 2;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%,
+            rgba(255,255,255,.95) 0 10%,
+            #00f2fe 30%,
+            #7c4dff 72%,
+            rgba(124,77,255,.18) 100%);
+        box-shadow:
+            0 0 8px rgba(0,242,254,.5),
+            0 0 14px rgba(124,77,255,.25);
+        animation: goxionCorePulse 1.8s ease-in-out infinite;
     }
 
     .goxion-loader-wrap {
         width: 100%;
+        min-height: 78px;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 15px;
-        text-align: center;
     }
 
-    .goxion-loader-text {
-        color: var(--text-muted, #95a4bd);
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: .35px;
+    @keyframes goxionOrbitA {
+        0%   { transform: rotate(32deg) rotateZ(0deg) scaleX(1); }
+        50%  { transform: rotate(32deg) rotateZ(180deg) scaleX(.98); }
+        100% { transform: rotate(32deg) rotateZ(360deg) scaleX(1); }
     }
 
-    .goxion-loader.small {
-        --loader-size: .72px;
+    @keyframes goxionOrbitB {
+        0%   { transform: rotate(-32deg) rotateZ(0deg) scaleX(1); }
+        50%  { transform: rotate(-32deg) rotateZ(180deg) scaleX(.98); }
+        100% { transform: rotate(-32deg) rotateZ(360deg) scaleX(1); }
     }
 
-    @keyframes goxionLoaderSpin {
-        0%, 100% { box-shadow: .2em 0 0 0 currentColor; }
-        12% { box-shadow: .2em .2em 0 0 currentColor; }
-        25% { box-shadow: 0 .2em 0 0 currentColor; }
-        37% { box-shadow: -.2em .2em 0 0 currentColor; }
-        50% { box-shadow: -.2em 0 0 0 currentColor; }
-        62% { box-shadow: -.2em -.2em 0 0 currentColor; }
-        75% { box-shadow: 0 -.2em 0 0 currentColor; }
-        87% { box-shadow: .2em -.2em 0 0 currentColor; }
+    @keyframes goxionOrbitC {
+        to { transform: rotate(450deg); }
+    }
+
+    @keyframes goxionCorePulse {
+        0%, 100% { transform: scale(.92); opacity: .9; }
+        50% { transform: scale(1.08); opacity: 1; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-        .goxion-loader::before,
-        .goxion-loader::after {
-            animation-duration: 2s;
+        .goxion-logo-loader .orbit,
+        .goxion-logo-loader .core {
+            animation-duration: 3.5s;
         }
     }
 
@@ -1916,9 +1954,14 @@
 <body class="no-scroll">
 
     <div id="splash-screen" onclick="hideSplash()">
-        <div class="splash-content" style="display:flex; flex-direction:column; align-items:center; gap:22px;">
+        <div class="splash-content" style="display:flex; flex-direction:column; align-items:center; gap:16px;">
             <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
-            <span class="goxion-loader small" aria-hidden="true"></span>
+            <span class="goxion-logo-loader small" aria-hidden="true">
+        <span class="orbit cyan"></span>
+        <span class="orbit purple"></span>
+        <span class="orbit soft"></span>
+        <span class="core"></span>
+    </span>
         </div>
     </div>
 
@@ -2157,9 +2200,13 @@
         <div id="view-catalogo" class="view-section">
             <div class="section-title">Nuestros Ecosistemas y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
-                <div class="goxion-loader-wrap" style="grid-column: 1 / -1; padding: 28px 0;">
-                    <span class="goxion-loader small" aria-hidden="true"></span>
-                    <span class="goxion-loader-text">Cargando catálogo en vivo...</span>
+                <div class="goxion-loader-wrap" style="grid-column:1 / -1;">
+                    <span class="goxion-logo-loader small" aria-hidden="true">
+        <span class="orbit cyan"></span>
+        <span class="orbit purple"></span>
+        <span class="orbit soft"></span>
+        <span class="core"></span>
+    </span>
                 </div>
             </div>
         </div>
@@ -2176,9 +2223,13 @@
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 
                 <div class="platform-grid" id="support-platforms-grid">
-                    <div class="goxion-loader-wrap" style="grid-column: 1 / -1; padding: 18px 0;">
-                        <span class="goxion-loader small" aria-hidden="true"></span>
-                        <span class="goxion-loader-text">Cargando opciones...</span>
+                    <div class="goxion-loader-wrap" style="grid-column:1 / -1; min-height:66px;">
+                        <span class="goxion-logo-loader small" aria-hidden="true">
+        <span class="orbit cyan"></span>
+        <span class="orbit purple"></span>
+        <span class="orbit soft"></span>
+        <span class="core"></span>
+    </span>
                     </div>
                 </div>
                 
@@ -4109,6 +4160,19 @@ function goxionBetaLegacy(data) {
         console.info("GOXION ayuda conectado a Supabase.");
     })();
     </script>
+
+
+<script id="goxion-logo-loader-delay">
+document.addEventListener("DOMContentLoaded", () => {
+    setTimeout(() => {
+        document.querySelectorAll(".goxion-logo-loader").forEach(loader => {
+            if (loader.isConnected && loader.offsetParent !== null) {
+                loader.classList.add("visible");
+            }
+        });
+    }, 320);
+});
+</script>
 
 </body>
 </html>
