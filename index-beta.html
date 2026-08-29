@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#030305">
+  <title>GOXION - Resumen de Cuenta</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+        --bg-black: #030305;
+        --card-glass: rgba(8, 8, 12, 0.45);
+        --text-main: #ffffff;
+        --text-muted: #95a4bd;
+        --neon-blue: #00f2fe;
+        --neon-purple: #7c4dff;
+        --success-green: #2ea043;
+        --success-neon: #00ff9d;
+        --danger-red: #ff3366;
+        --warning-amber: #ffaa00;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+    
+    body { 
+      background-color: var(--bg-black); 
+      color: var(--text-main); 
+      display: flex; justify-content: center; 
+      align-items: flex-start;
+      min-height: 100dvh; 
+      padding: 0; 
+      overflow-x: hidden;
+    }
+
+    /* --- FONDO Y LÁMPARA DE LAVA (PULIDO) --- */
+    .bg {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh; 
+        z-index: -2; background: var(--bg-black); overflow: hidden; pointer-events: none;
+    }
+
+    .bg::before {
+        content: ""; position: absolute; inset: -20%;
+        background: radial-gradient(circle at 20% 20%, rgba(124, 77, 255, 0.05), transparent 30%),
+                    radial-gradient(circle at 80% 75%, rgba(0, 242, 254, 0.05), transparent 30%);
+        filter: blur(80px);
+        animation: ambientMove 15s ease-in-out infinite alternate;
+    }
+
+    .lava {
+        position: absolute; border-radius: 50%;
+        filter: blur(75px); /* Desenfoque alto para mayor suavidad */
+        will-change: transform;
+    }
+
+    /* Opacidades reducidas al 25% - 35% para no deslumbrar */
+    .lava-1 { width: 380px; height: 380px; top: -100px; left: -100px; background: radial-gradient(circle, rgba(176, 38, 255, 0.35), transparent 70%); animation: lavaFluid1 10s ease-in-out infinite alternate; }
+    .lava-2 { width: 420px; height: 420px; top: 15%; right: -150px; background: radial-gradient(circle, rgba(0, 242, 254, 0.30), transparent 70%); animation: lavaFluid2 12s ease-in-out infinite alternate; }
+    .lava-3 { width: 350px; height: 350px; bottom: -120px; left: 10%; background: radial-gradient(circle, rgba(124, 77, 255, 0.25), transparent 70%); animation: lavaFluid3 14s ease-in-out infinite alternate; }
+    .lava-4 { width: 250px; height: 250px; top: 50%; left: -80px; background: radial-gradient(circle, rgba(0, 242, 254, 0.25), transparent 70%); animation: lavaFluid4 11s ease-in-out infinite alternate; }
+
+    /* Movimientos más amplios y dinámicos */
+    @keyframes ambientMove { 0% { transform: translate3d(-30px, -20px, 0) scale(1); } 100% { transform: translate3d(30px, 40px, 0) scale(1.1); } }
+    @keyframes lavaFluid1 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(150px, 150px, 0) scale(1.2); } 100% { transform: translate3d(60px, 250px, 0) scale(0.9); } }
+    @keyframes lavaFluid2 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-160px, 100px, 0) scale(1.3); } 100% { transform: translate3d(-80px, -150px, 0) scale(0.85); } }
+    @keyframes lavaFluid3 { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(180px, -120px, 0) scale(1.15); } 100% { transform: translate3d(-100px, -60px, 0) scale(0.95); } }
+    @keyframes lavaFluid4 { 0% { transform: translate3d(0, 0, 0) scale(1); } 100% { transform: translate3d(140px, 140px, 0) scale(1.25); } }
+
+    @media (max-width: 600px) {
+        .lava { filter: blur(55px); }
+        .lava-1 { width: 280px; height: 280px; }
+        .lava-2 { width: 300px; height: 300px; }
+        .lava-3 { width: 260px; height: 260px; }
+        .lava-4 { width: 200px; height: 200px; }
+    }
+
+    .container { 
+        width: 100%; max-width: 500px; 
+        position: relative; z-index: 1; 
+        padding: 0 20px 40px 20px; 
+    }
+    
+    /* --- ENCABEZADO ESTÁTICO (FUNDIDO INVISIBLE) --- */
+    .sticky-area {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(3, 3, 5, 0.7); 
+        backdrop-filter: blur(28px);
+        -webkit-backdrop-filter: blur(28px);
+        margin: 0 -20px 20px -20px;
+        padding: max(15px, env(safe-area-inset-top)) 20px 15px 20px; 
+    }
+
+    .sticky-area::after {
+        content: "";
+        position: absolute;
+        bottom: -35px;
+        left: 0; right: 0;
+        height: 35px;
+        background: linear-gradient(to bottom, rgba(3, 3, 5, 0.7) 0%, rgba(3, 3, 5, 0) 100%);
+        pointer-events: none;
+    }
+
+    .header { 
+        display: flex; align-items: center; justify-content: center;
+        margin-bottom: 15px; 
+    }
+    
+    .header-title { 
+        color: var(--text-main); font-size: 14px; font-weight: 700; 
+        text-transform: uppercase; letter-spacing: 2.5px; margin: 0; 
+        text-shadow: 0 0 15px rgba(255,255,255,0.25);
+    }
+    
+    /* --- GLASSMORPHISM CARDS --- */
+    .glass-card {
+        background: var(--card-glass);
+        backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.08); 
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        border-radius: 20px; padding: 20px;
+    }
+
+    .balance-hero { text-align: center; } 
+    .total-label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 2px; }
+    .total-amount { font-size: 52px; font-weight: 800; line-height: 1; margin-bottom: 12px; color: var(--neon-blue); text-shadow: 0 0 20px rgba(0, 242, 254, 0.4); }
+    
+    .time-badge { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; border: 1px solid; }
+    .badge-ok { background: rgba(0, 242, 254, 0.05); color: var(--neon-blue); border-color: rgba(0, 242, 254, 0.3); }
+    .badge-today { background: rgba(255, 170, 0, 0.1); color: var(--warning-amber); border-color: rgba(255, 170, 0, 0.4); box-shadow: 0 0 15px rgba(255, 170, 0, 0.2); }
+    .badge-overdue { background: rgba(255, 51, 102, 0.1); color: var(--danger-red); border-color: rgba(255, 51, 102, 0.4); box-shadow: 0 0 15px rgba(255, 51, 102, 0.2); }
+    .badge-paid { background: rgba(0, 255, 157, 0.05); color: var(--success-neon); border-color: rgba(0, 255, 157, 0.4); box-shadow: 0 0 15px rgba(0, 255, 157, 0.15); }
+    .badge-review { background: rgba(124, 77, 255, 0.15); color: var(--neon-purple); border-color: rgba(124, 77, 255, 0.4); box-shadow: 0 0 15px rgba(124, 77, 255, 0.2); }
+
+    .card-info { margin-bottom: 25px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    .info-block { display: flex; flex-direction: column; }
+    .info-block .label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; letter-spacing: 1px; margin-bottom: 2px;}
+    .info-block .value { font-size: 16px; font-weight: 700; color: var(--text-main); }
+    .info-block.full { grid-column: span 2; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 12px; margin-top: -5px; }
+
+    .alert-banner { padding: 12px; border-radius: 12px; text-align: center; margin-bottom: 15px; font-weight: 700; font-size: 12px; border: 1px solid; text-transform: uppercase; letter-spacing: 1px; }
+    .overdue-incentive-box { background: rgba(255, 51, 102, 0.08); border: 1px dashed rgba(255, 51, 102, 0.4); border-radius: 16px; padding: 16px; font-size: 13px; line-height: 1.5; color: #ffb3c1; margin-bottom: 25px; text-align: center; font-weight: 500; }
+    
+    .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--neon-purple); margin-bottom: 12px; font-weight: 700; }
+    
+    .services-container { margin-bottom: 25px; padding: 10px 20px;}
+    .service-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); font-size: 15px; }
+    .service-item:last-child { border-bottom: none; }
+    .service-name { font-weight: 600; color: var(--text-main); }
+    .service-price { font-weight: 700; color: var(--text-muted); }
+    
+    .breakdown-box { margin-bottom: 25px; }
+    .breakdown-line { font-size: 13px; font-weight: 500; margin-bottom: 10px; display: flex; justify-content: space-between; }
+    .breakdown-line:last-child { margin-bottom: 0; }
+    .discount-line { color: var(--success-neon); }
+    .surcharge-line { color: var(--danger-red); }
+
+    .loyalty-badge { margin-bottom: 25px; display: flex; align-items: center; gap: 15px; border-color: rgba(124, 77, 255, 0.3); }
+    .loyalty-icon { font-size: 32px; line-height: 1; filter: drop-shadow(0 0 10px rgba(176, 38, 255, 0.4)); }
+    .loyalty-content { flex: 1; }
+    .loyalty-title { font-size: 11px; color: var(--neon-purple); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+    .loyalty-desc { font-size: 13px; color: var(--text-muted); line-height: 1.4; font-weight: 500; }
+    .loyalty-highlight { color: var(--neon-blue); font-weight: 700; }
+
+    .actions-group { display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; }
+    
+    .btn { width: 100%; padding: 16px; border-radius: 20px; font-weight: 700; font-size: 14px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; border: none; outline: none; text-align: center; }
+    .btn:active { transform: translateY(2px); }
+    
+    .btn-copy { background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; box-shadow: 0 0 20px rgba(0, 242, 254, 0.3); }
+    .btn-copy:hover { box-shadow: 0 0 30px rgba(0, 242, 254, 0.5); color: #fff;}
+
+    .btn-wa { background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.1); }
+    .btn-wa:hover { background: rgba(255,255,255,0.1); border-color: var(--text-muted); }
+
+    .btn-review-state { background: rgba(124, 77, 255, 0.1); border: 1px solid rgba(124, 77, 255, 0.3); color: var(--text-main); font-size: 13px; padding: 16px; border-radius: 20px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .btn-review-state strong { color: var(--neon-purple); }
+
+    .footer { text-align: center; font-size: 12px; color: var(--text-muted); font-weight: 500; line-height: 1.6; border-top: 1px dashed rgba(255,255,255,0.08); padding-top: 20px; margin-bottom: 20px; }
+    
+    .footer-logo-container { margin-top: 35px; display: flex; justify-content: center; }
+    .footer-logo { max-width: 130px; opacity: 0.65; transition: 0.3s; filter: drop-shadow(0 0 8px rgba(0,0,0,0.5)); }
+    
+    .error-msg { text-align: center; color: var(--danger-red); padding: 40px 0; font-size: 15px; font-weight: 700; }
+    .loading { text-align: center; color: var(--text-muted); padding: 60px 0; font-size: 15px; font-weight: 600; }
+    
+    .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, var(--neon-blue), #4f8cff); color: #000; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 700; display: none; box-shadow: 0 0 20px rgba(0, 242, 254, 0.4); z-index: 1000; animation: fadeIn 0.3s ease;}
+    @keyframes fadeIn { from { opacity: 0; transform: translate(-50%, 10px); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+    /* --- MODAL DE SUBIDA DE COMPROBANTE --- */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100dvh;
+        background: rgba(3, 3, 5, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+        z-index: 3000; display: none; align-items: center; justify-content: center;
+        opacity: 0; transition: opacity 0.3s ease; padding: 20px;
+    }
+    .modal-overlay.show { display: flex; opacity: 1; }
+    
+    .modal-content {
+        background: var(--card-glass); border: 1px solid rgba(0, 242, 254, 0.3);
+        border-radius: 20px; padding: 25px; width: 100%; max-width: 420px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.7); position: relative;
+        transform: translateY(20px); transition: transform 0.3s ease;
+        text-align: center;
+    }
+    .modal-overlay.show .modal-content { transform: translateY(0); }
+    
+    .close-modal {
+        position: absolute; top: 15px; right: 20px; background: transparent; border: none;
+        color: var(--text-muted); font-size: 24px; cursor: pointer; transition: 0.2s; font-weight: bold;
+    }
+    .close-modal:hover { color: var(--danger-red); }
+    
+    .upload-area {
+        border: 2px dashed rgba(0, 242, 254, 0.4); border-radius: 16px; padding: 30px 20px;
+        margin: 20px 0; background: rgba(0, 0, 0, 0.3); cursor: pointer; transition: 0.3s;
+        position: relative; overflow: hidden;
+    }
+    .upload-area:hover { border-color: var(--neon-blue); background: rgba(0, 242, 254, 0.05); }
+    
+    .upload-icon { font-size: 40px; margin-bottom: 10px; filter: drop-shadow(0 0 10px rgba(0, 242, 254, 0.4)); }
+    .upload-text { font-size: 12px; color: var(--text-muted); }
+    .upload-text strong { color: var(--text-main); display: block; margin-bottom: 5px; font-size: 14px;}
+    
+    #file-input { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    
+    #preview-container { display: none; margin: 15px 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); position: relative;}
+    #preview-img { width: 100%; max-height: 250px; object-fit: contain; display: block; background: #000; }
+    .btn-change-img { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; border: 1px solid rgba(255,255,255,0.2); padding: 6px 12px; border-radius: 10px; font-size: 11px; cursor: pointer; backdrop-filter: blur(5px);}
+    
+    .btn-submit-payment {
+        background: linear-gradient(135deg, var(--success-green), #38c153); color: #fff;
+        border: none; padding: 16px; border-radius: 16px; width: 100%; font-weight: 700;
+        font-size: 14px; cursor: pointer; transition: 0.3s; box-shadow: 0 0 20px rgba(46, 160, 67, 0.4);
+        display: none;
+    }
+    .btn-submit-payment:hover { box-shadow: 0 0 30px rgba(46, 160, 67, 0.6); transform: translateY(-2px); }
+    .btn-submit-payment:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  </style>
+</head>
+<body>
+
+<div class="bg">
+    <div class="lava lava-1"></div>
+    <div class="lava lava-2"></div>
+    <div class="lava lava-3"></div>
+    <div class="lava lava-4"></div>
+</div>
+
+<div class="container" id="app">
+  <div class="loading">Sincronizando con Goxion...</div>
+</div>
+
+<div class="toast" id="toast">📋 ¡Datos copiados al portapapeles!</div>
+
+<!-- MODAL DE PAGO PARA SUBIR COMPROBANTE -->
+<div class="modal-overlay" id="payment-modal" onclick="cerrarModalPago(event)">
+    <div class="modal-content">
+        <button class="close-modal" onclick="cerrarModalPago(event, true)">×</button>
+        <div style="font-size: 38px; margin-bottom: 5px;">🧾</div>
+        <h3 style="color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 5px;">Validar Pago</h3>
+        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">Para procesar tu pago rápidamente, por favor adjunta la captura de pantalla de tu transferencia o depósito.</p>
+        
+        <div class="upload-area" id="upload-area">
+            <input type="file" id="file-input" accept="image/*" onchange="mostrarPreview(this)">
+            <div class="upload-icon">📸</div>
+            <div class="upload-text">
+                <strong>Toca aquí para subir la imagen</strong>
+                <span style="font-size: 11px;">Busca en tu galería de fotos.</span>
+            </div>
+        </div>
+
+        <div id="preview-container">
+            <img id="preview-img" src="" alt="Vista previa del comprobante">
+            <button class="btn-change-img" onclick="reiniciarSubida()">Cambiar imagen</button>
+        </div>
+
+        <button class="btn-submit-payment" id="btn-enviar-comprobante" onclick="enviarComprobanteDiscord()">📤 Enviar Comprobante Seguro</button>
+    </div>
+</div>
+
+<script>
+  const TELEFONO_GOXION = "528136836901"; 
+  const CLABE_PAGO = "638180000167909381";
+  const BANCO_PAGO = "NU BANCO";
+  const TITULAR_PAGO = "Henry González";
+  
+  // WEBHOOK DE DISCORD AÑADIDO Y ACTUALIZADO
+  const WEBHOOK_DISCORD = "https://discord.com/api/webhooks/1539425805015326910/gVORo2-kt3K6op_4k3TqVS_vEy5JKdmXA2LljiadEQxoJTC3xaLbZCcPkQKoHsZRzOUO"; 
+
+  function notificarAdminDiscord(titulo, mensaje, colorHex) {
+      if(!WEBHOOK_DISCORD) return;
+      
+      const colorDec = parseInt(colorHex.replace("#",""), 16);
+
+      const payload = {
+          embeds: [{
+              title: titulo,
+              description: mensaje,
+              color: colorDec,
+              timestamp: new Date().toISOString(),
+              footer: { text: "GOXION Pay System" }
+          }]
+      };
+
+      fetch(WEBHOOK_DISCORD, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+      }).catch(e => console.log("Webhook no enviado", e));
+  }
+
+  async function cargarEstadoCuenta() {
+    const params = new URLSearchParams(window.location.search);
+    const clienteKey = params.get('cliente')?.toLowerCase().trim();
+    const app = document.getElementById('app');
+
+    if (!clienteKey) {
+      app.innerHTML = `<div class="error-msg">⚠️ ENLACE INCOMPLETO.<br><span style="font-size:12px; color:var(--text-muted); font-weight: 400;">Falta el identificador del cliente en la URL.</span></div>`;
+      return;
+    }
+
+    try {
+      const version = new Date().getTime();
+      const response = await fetch(`clientes.json?v=${version}`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache', 'Expires': '0' }
+      });
+      
+      if (!response.ok) throw new Error("No se pudo cargar clientes.json");
+      
+      const data = await response.json();
+      const cliente = data[clienteKey];
+
+      if (!cliente) {
+        app.innerHTML = `<div class="error-msg">❌ CLIENTE NO ENCONTRADO.<br><span style="font-size:12px; color:var(--text-muted); font-weight: 400;">El registro "${clienteKey}" no existe en el sistema.</span></div>`;
+        return;
+      }
+
+      const hoy = new Date();
+      const diaHoy = hoy.getDate();
+      const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const mesActual = meses[hoy.getMonth()];
+      const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
+      
+      const diaPago = cliente.dia_pago || 15;
+      const difDias = diaPago - diaHoy; 
+      
+      let rachaOriginal = cliente.pagos_puntuales || 0;
+      let racha = rachaOriginal;
+      let perdioRacha = false;
+
+      if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) {
+          racha = 0;
+          perdioRacha = true;
+      }
+
+      let subtotal = 0;
+      let serviciosHTML = '';
+      if (cliente.servicios && cliente.servicios.length > 0) {
+        cliente.servicios.forEach(s => {
+          subtotal += s.monto;
+          serviciosHTML += `
+            <div class="service-item">
+              <span class="service-name">${s.nombre}</span>
+              <span class="service-price">$${s.monto}</span>
+            </div>
+          `;
+        });
+      } else {
+        serviciosHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding: 15px 0;">No tienes servicios activos asignados.</div>`;
+      }
+
+      let pctMoraDiaria = 0;
+      let montoMora = 0;
+      let montoBajaAdmin = 0;
+      let diasAtraso = 0;
+      
+      let badgeClass = "";
+      let badgeText = "";
+      let uiColor = "var(--neon-blue)";
+      let mensajeAtrasoHTML = "";
+
+      const isReviewLocal = localStorage.getItem(`revision_pago_${clienteKey}`) === periodoStr;
+      const enRevision = cliente.pago_en_revision === true || isReviewLocal;
+
+      if (cliente.estado === 'pagado') {
+          badgeClass = "badge-paid";
+          badgeText = "✅ Al corriente este mes";
+          uiColor = "var(--success-neon)";
+          localStorage.removeItem(`revision_pago_${clienteKey}`);
+      } else if (enRevision) {
+          badgeClass = "badge-review";
+          badgeText = `⏳ Validando Pago`;
+          uiColor = "var(--neon-purple)";
+      } else if (difDias > 0) {
+          badgeClass = "badge-ok";
+          badgeText = `⏳ Vence en ${difDias} día(s)`;
+      } else if (difDias === 0) {
+          badgeClass = "badge-today";
+          badgeText = `⚠️ Tu corte es HOY`;
+          uiColor = "var(--warning-amber)";
+      } else {
+          diasAtraso = Math.abs(difDias);
+          badgeClass = "badge-overdue";
+          badgeText = `🚨 Vencido hace ${diasAtraso} día(s)`;
+          uiColor = "var(--danger-red)";
+
+          let pctMoraCalculado = diasAtraso * 0.05;
+          pctMoraDiaria = Math.min(pctMoraCalculado, 0.50);
+          montoMora = Math.round(subtotal * pctMoraDiaria);
+          let acumMoraTotal = subtotal + montoMora;
+
+          if (diasAtraso > 15 || cliente.estado === 'suspendido') {
+              montoBajaAdmin = Math.round(acumMoraTotal * 0.20);
+          }
+
+          mensajeAtrasoHTML = `
+            <div class="overdue-incentive-box">
+              🚨 <strong style="color:var(--text-main);">Mora activa por falta de pago.</strong><br>
+              Se aplica recargo automático del 5% diario (+${Math.round(pctMoraDiaria * 100)}% acum.). 
+              ${(diasAtraso > 15 || cliente.estado === 'suspendido') ? `<br><strong style="color:var(--danger-red);">⚠️ Se incluyó un 20% de recargo por reactivación.</strong>` : ''}
+              <br><small style="color:var(--text-muted); display:block; margin-top:8px;">Si prevés un retraso, notifícalo con antelación para evitar recargos.</small>
+            </div>
+          `;
+      }
+
+      let bannerEstado = "";
+      if (cliente.estado === 'suspendido' && !enRevision) {
+          bannerEstado = `<div class="alert-banner" style="background: rgba(255, 51, 102, 0.1); border-color: var(--danger-red); color: var(--danger-red); box-shadow: 0 0 15px rgba(255, 51, 102, 0.15);">⛔ Servicio Suspendido</div>`;
+          uiColor = "var(--danger-red)";
+      }
+
+      let pctDescuento = 0;
+      let mensajeLealtad = '';
+      if (racha >= 9) {
+        pctDescuento = 0.06;
+        mensajeLealtad = `Nivel 2 Activo: <span class="loyalty-highlight">6% de descuento</span> aplicado en tu total.`;
+      } else if (racha >= 4) {
+        pctDescuento = 0.03;
+        const faltantes = 9 - racha;
+        mensajeLealtad = `Nivel 1 Activo: <span class="loyalty-highlight">3% OFF</span>. Te faltan ${faltantes} pago(s) para subir a Nivel 2.`;
+      } else {
+        pctDescuento = 0;
+        const faltantes = 4 - racha;
+        mensajeLealtad = perdioRacha 
+          ? `<span style="color:var(--danger-red); font-weight:600;">💔 Racha reiniciada a 0 por atraso en el pago.</span>` 
+          : `Progreso: <span class="loyalty-highlight" style="color:var(--text-main);">${racha}/4 pagos</span>. Faltan ${faltantes} pago(s) para subir a Nivel 1.`;
+      }
+
+      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
+      
+      let totalDescuentosEspeciales = 0;
+      let desgloseDescuentosHTML = '';
+
+      if (cliente.descuento_especial && parseFloat(cliente.descuento_especial.monto) > 0) {
+          let m = parseFloat(cliente.descuento_especial.monto);
+          let c = cliente.descuento_especial.concepto || "Descuento Especial";
+          totalDescuentosEspeciales += m;
+          desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${c}</span><span>-$${m}</span></div>`;
+      }
+
+      if (cliente.descuentos_especiales && cliente.descuentos_especiales.length > 0) {
+          cliente.descuentos_especiales.forEach(desc => {
+              let m = parseFloat(desc.monto) || 0;
+              let c = desc.concepto || "Descuento Especial";
+              if (m > 0) {
+                  totalDescuentosEspeciales += m;
+                  desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${c}</span><span>-$${m}</span></div>`;
+              }
+          });
+      }
+
+      let descuentoTratoJusto = cliente.descuento_fallas ? (parseFloat(cliente.descuento_fallas) || 0) : 0;
+      let conceptoTratoJusto = "Garantía Trato Justo";
+      if (descuentoTratoJusto > 0) {
+          desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${conceptoTratoJusto}</span><span>-$${descuentoTratoJusto.toFixed(2)}</span></div>`;
+      }
+      
+      let ahorroTotal = ahorro + totalDescuentosEspeciales + descuentoTratoJusto;
+
+      let totalFinal = (subtotal - ahorroTotal) + montoMora + montoBajaAdmin;
+      if (totalFinal < 0) totalFinal = 0; 
+
+      let labelTotal = "Total a Pagar";
+      
+      let btnAccionHTML = "";
+      
+      if (cliente.estado === 'pagado') {
+          totalFinal = 0;
+          labelTotal = "Saldo Pendiente";
+      } else if (enRevision) {
+          btnAccionHTML = `
+            <div class="btn-review-state">
+              <span>⏳ <strong>Tu comprobante está en revisión</strong></span>
+              <span style="font-size: 11px; color: var(--text-muted);">El equipo de Goxion actualizará tu estado en breve.</span>
+            </div>
+          `;
+      } else {
+          // SE MODIFICÓ PARA ABRIR EL MODAL EN LUGAR DE ENVIAR DIRECTO
+          btnAccionHTML = `
+            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
+            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
+              📤 Ya realicé mi depósito
+            </button>
+          `;
+      }
+
+      let breakdownHTML = '';
+      if (cliente.estado !== 'pagado' && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+          breakdownHTML = `
+            <div class="glass-card breakdown-box">
+              <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
+              ${ahorro > 0 ? `<div class="breakdown-line discount-line"><span>Descuento Lealtad</span><span>-$${ahorro}</span></div>` : ''}
+              ${desgloseDescuentosHTML}
+              ${montoMora > 0 ? `<div class="breakdown-line surcharge-line"><span>Mora (+${Math.round(pctMoraDiaria * 100)}%)</span><span>+$${montoMora}</span></div>` : ''}
+              ${montoBajaAdmin > 0 ? `<div class="breakdown-line surcharge-line"><span>Cargo Reactivación</span><span>+$${montoBajaAdmin}</span></div>` : ''}
+            </div>
+          `;
+      }
+
+      const mensajeWA = encodeURIComponent(`Hola GOXION, requiero asistencia con mi cuenta.\n\n👤 Cliente: ${cliente.nombre}\n📄 Folio: ${cliente.folio}`);
+      const urlWA = `https://wa.me/${TELEFONO_GOXION}?text=${mensajeWA}`;
+
+      app.innerHTML = `
+        <div class="sticky-area">
+          <div class="header">
+            <div class="header-title">Estado de Cuenta</div>
+          </div>
+
+          ${bannerEstado}
+
+          <div class="balance-hero">
+              <div class="total-label">${labelTotal}</div>
+              <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">$${totalFinal.toFixed(2)}</div>
+              <div class="time-badge ${badgeClass}">${badgeText}</div>
+          </div>
+        </div>
+
+        <div class="scrollable-content">
+          ${(cliente.estado === 'pagado' || enRevision) ? '' : mensajeAtrasoHTML}
+
+          <div class="glass-card card-info">
+            <div class="info-block">
+              <span class="label">Titular</span>
+              <span class="value">${cliente.nombre.split(' ')[0]}</span>
+            </div>
+            <div class="info-block" style="text-align: right;">
+              <span class="label">Folio</span>
+              <span class="value" style="color:var(--neon-purple);">${cliente.folio}</span>
+            </div>
+            <div class="info-block full">
+              <span class="label">Periodo Facturado</span>
+              <span class="value" style="display:flex; justify-content:space-between; align-items:center;">
+                  ${periodoStr} 
+                  <span style="color:var(--text-muted); font-size:12px; font-weight:500;">Corte: ${diaPago} de ${mesActual}</span>
+              </span>
+            </div>
+          </div>
+
+          <div class="section-title">Servicios Activos</div>
+          <div class="glass-card services-container">
+            ${serviciosHTML}
+          </div>
+
+          ${breakdownHTML}
+
+          <div class="glass-card loyalty-badge">
+            <div class="loyalty-icon">⭐</div>
+            <div class="loyalty-content">
+              <div class="loyalty-title">Programa Goxion</div>
+              <div class="loyalty-desc">${mensajeLealtad}</div>
+            </div>
+          </div>
+
+          <div class="actions-group">
+            ${btnAccionHTML}
+            <a href="${urlWA}" target="_blank" class="btn btn-wa">
+              💬 Contactar a Soporte
+            </a>
+          </div>
+
+          <div class="footer">
+            <span style="color:var(--text-main); font-weight:600;">🎁 ¡Gana un mes gratis!</span><br>
+            Invita a un amigo, cuando cumpla 3 meses de servicio, tu próxima mensualidad será sin costo.
+            
+            <div class="footer-logo-container">
+              <img src="logo2.PNG" alt="Goxion - Todo conectado" class="footer-logo" onerror="this.style.display='none'">
+            </div>
+          </div>
+        </div>
+      `;
+
+    } catch (e) {
+      app.innerHTML = `<div class="error-msg">⚠️ Error al cargar la base de datos.<br><span style="font-size:13px; color:var(--text-muted); font-weight: 400;">Revisa tu conexión a internet o contacta a soporte.</span></div>`;
+    }
+  }
+
+  function copiarDatos(monto) {
+    const texto = `GOXION - Datos de Transferencia\n\nBanco: ${BANCO_PAGO}\nTitular: ${TITULAR_PAGO}\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
+    navigator.clipboard.writeText(texto).then(() => {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 2500);
+    });
+  }
+
+  // --- NUEVA LÓGICA DE SUBIDA DE COMPROBANTES --- //
+  let pagoActualInfo = {};
+
+  function abrirModalPago(clienteKey, periodo, monto, folio, nombre) {
+      pagoActualInfo = { clienteKey, periodo, monto, folio, nombre };
+      document.getElementById('payment-modal').classList.add('show');
+      document.body.style.overflow = 'hidden'; 
+  }
+
+  function cerrarModalPago(e, force = false) {
+      if (force || e.target.classList.contains('modal-overlay')) {
+          document.getElementById('payment-modal').classList.remove('show');
+          document.body.style.overflow = 'auto';
+          reiniciarSubida(); // Limpia los inputs si el usuario cierra la ventana
+      }
+  }
+
+  function reiniciarSubida() {
+      document.getElementById('file-input').value = "";
+      document.getElementById('preview-container').style.display = 'none';
+      document.getElementById('upload-area').style.display = 'block';
+      document.getElementById('btn-enviar-comprobante').style.display = 'none';
+  }
+
+  function mostrarPreview(input) {
+      if (input.files && input.files[0]) {
+          const file = input.files[0];
+          
+          if (!file.type.startsWith('image/')) {
+              alert("Por favor, selecciona un archivo de imagen válido (Captura de pantalla o foto).");
+              input.value = "";
+              return;
+          }
+
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              document.getElementById('preview-img').src = e.target.result;
+              document.getElementById('preview-container').style.display = 'block';
+              document.getElementById('upload-area').style.display = 'none'; 
+              document.getElementById('btn-enviar-comprobante').style.display = 'block';
+          }
+          reader.readAsDataURL(file);
+      }
+  }
+
+  async function enviarComprobanteDiscord() {
+      const input = document.getElementById('file-input');
+      if (!input.files || !input.files[0]) {
+          alert("Debes adjuntar una captura de pantalla antes de enviar.");
+          return;
+      }
+
+      const file = input.files[0];
+      const btn = document.getElementById('btn-enviar-comprobante');
+      
+      btn.disabled = true;
+      btn.innerText = "⏳ Encriptando y subiendo comprobante...";
+
+      const { clienteKey, periodo, monto, folio, nombre } = pagoActualInfo;
+
+      // 1. Guardamos localmente el estado de revisión y completamos la misión de la app
+      localStorage.setItem(`revision_pago_${clienteKey}`, periodo);
+      localStorage.setItem(`goxion_mission_pago_completed_${folio}`, 'true');
+
+      // 2. Preparamos el "sobre" con el archivo y la información
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+
+      const colorDec = parseInt("00ff9d", 16);
+      const payload = {
+          embeds: [{
+              title: "💰 COMPROBANTE SUBIDO DESDE LA APP WEB",
+              description: `**Cliente:** ${nombre}\n**Folio:** ${folio}\n**Monto Esperado:** $${monto} MXN\n**Periodo:** ${periodo}\n\n*El cliente acaba de subir su captura de pantalla. Verifica el adjunto para acreditar su mes.*`,
+              color: colorDec,
+              timestamp: new Date().toISOString(),
+              footer: { text: "GOXION Pay System" },
+              image: { url: `attachment://${file.name}` } // Esta línea asegura que la foto se muestre bonito dentro del mensaje
+          }]
+      };
+
+      formData.append('payload_json', JSON.stringify(payload));
+
+      try {
+          // 3. Enviamos a Discord
+          await fetch(WEBHOOK_DISCORD, {
+              method: 'POST',
+              body: formData
+          });
+
+          btn.innerText = "✅ ¡Validación solicitada con éxito!";
+          btn.style.background = "linear-gradient(135deg, var(--neon-blue), #4f8cff)";
+          btn.style.boxShadow = "0 0 20px rgba(0, 242, 254, 0.4)";
+          
+          setTimeout(() => {
+              location.reload();
+          }, 1500);
+
+      } catch (error) {
+          console.error("Error al enviar el archivo:", error);
+          alert("Ocurrió un pequeño error de red al subir la imagen. Por favor, intenta de nuevo o avísanos por WhatsApp.");
+          btn.disabled = false;
+          btn.innerText = "📤 Enviar Comprobante Seguro";
+      }
+  }
+
+  cargarEstadoCuenta();
+</script>
+
+</body>
+</html>
