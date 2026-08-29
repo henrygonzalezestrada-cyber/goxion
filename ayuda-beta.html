@@ -3922,10 +3922,23 @@ function goxionBetaLegacy(data) {
         };
 
         notificarAdmin = function(categoria, titulo, mensaje, colorHex = "00f2fe") {
+            const headers = {"Content-Type":"application/json"};
+            const token = localStorage.getItem(TOKEN_KEY) || "";
+
+            if (categoria !== "pedidos" && token) {
+                headers["X-Client-Token"] = token;
+            }
+
             fetch(NOTIFY_BETA, {
                 method:"POST",
-                headers:{"Content-Type":"application/json"},
-                body:JSON.stringify({categoria,titulo,mensaje,colorHex})
+                headers,
+                body:JSON.stringify({
+                    categoria,
+                    titulo,
+                    mensaje,
+                    colorHex,
+                    session_token: token
+                })
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
