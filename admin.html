@@ -1069,7 +1069,7 @@ Revisa las guías [SOPORTE]"></textarea>
                         </div>
                         <div style="display:flex; gap: 6px;">
                             <input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" style="flex:2;" onchange="updateClientData('${key}', 'usuario_acceso', this.value)">
-                            <input type="text" placeholder="PIN" value="${cliente.codigo || '1234'}" class="cred-input pin" style="flex:1;" onchange="updateClientData('${key}', 'codigo', this.value)">
+                            <input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" style="flex:1;" onchange="updateClientData('${key}', 'codigo', this.value)">
                         </div>
                     </div>
 
@@ -1260,5 +1260,1196 @@ Revisa las guías [SOPORTE]"></textarea>
         if (btnSaveMobile) btnSaveMobile.innerHTML = originalHTMLMobile;
     }
     </script>
+
+    <!-- GOXION ADMIN BETA // CAPA SUPABASE V2
+         Mantiene intacta la interfaz y añade diagnóstico visible. -->
+    <script id="goxion-supabase-beta">
+    (() => {
+        const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
+        const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
+        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos`;
+        const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
+
+        localStorage.removeItem("GOXION_PAT");
+        currentToken = localStorage.getItem(ADMIN_TOKEN_KEY) || "";
+        currentFileData = { source: "supabase" };
+
+        const n = (v, fallback = 0) => {
+            const x = Number(v);
+            return Number.isFinite(x) ? x : fallback;
+        };
+
+        const slug = (v = "") => String(v)
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .trim()
+            .replace(/\s+/g, "-")
+            .replace(/[^a-z0-9-_]/g, "");
+
+        const firstArray = (...vals) => vals.find(Array.isArray) || [];
+
+        function showFatal(title, detail = "") {
+            const container = document.getElementById("clients-container");
+            if (!container) return;
+            container.innerHTML = `
+                <div style="color:#ff6b8a;background:rgba(255,0,60,.08);border:1px solid rgba(255,0,60,.35);padding:14px;border-radius:8px;line-height:1.45;">
+                    <strong style="display:block;color:var(--neon-red);margin-bottom:6px;">${title}</strong>
+                    <div style="white-space:pre-wrap;font-family:monospace;font-size:.78rem;color:#ffd6df;">${detail || "Sin detalle adicional."}</div>
+                </div>`;
+        }
+
+        async function parseResponse(response) {
+            const text = await response.text();
+            let json = null;
+            try { json = text ? JSON.parse(text) : {}; } catch {}
+            return { text, json };
+        }
+
+        async function loginAdminInteractivo() {
+            const usuario = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nUsuario:");
+            if (!usuario) return false;
+            const password = prompt("Contraseña:");
+            if (!password) return false;
+
+            let response;
+            try {
+                response = await fetch(LOGIN_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ usuario: usuario.trim(), password })
+                });
+            } catch (e) {
+                showFatal("No fue posible contactar login-admin.", String(e));
+                return false;
+            }
+
+            const { text, json } = await parseResponse(response);
+            const token = json?.token || json?.access_token || json?.session_token || "";
+
+            if (!response.ok || json?.ok !== true || !token) {
+                showFatal(`login-admin respondió HTTP ${response.status}.`, text || "Respuesta vacía.");
+                alert(json?.error || "❌ No fue posible iniciar sesión.");
+                return false;
+            }
+
+            currentToken = token;
+            localStorage.setItem(ADMIN_TOKEN_KEY, token);
+            return true;
+        }
+
+        async function callAdminDatos() {
+            let response;
+            try {
+                response = await fetch(DATOS_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": currentToken
+                    },
+                    body: "{}"
+                });
+            } catch (e) {
+                throw new Error(`Fallo de red/CORS al llamar admin-datos:\n${e}`);
+            }
+
+            const { text, json } = await parseResponse(response);
+
+            if (response.status === 401) {
+                localStorage.removeItem(ADMIN_TOKEN_KEY);
+                currentToken = "";
+                const err = new Error("SESION_EXPIRADA");
+                err.raw = text;
+                throw err;
+            }
+
+            if (!response.ok) {
+                throw new Error(`admin-datos devolvió HTTP ${response.status}\n${text || "Respuesta vacía."}`);
+            }
+
+            if (!json) {
+                throw new Error(`admin-datos no devolvió JSON válido.\nRespuesta recibida:\n${text.slice(0, 2000)}`);
+            }
+
+            console.log("admin-datos RAW:", json);
+            return json;
+        }
+
+        function unwrapRoot(data) {
+            if (!data || typeof data !== "object") return {};
+            if (data.data && typeof data.data === "object" && !Array.isArray(data.data)) return data.data;
+            if (data.result && typeof data.result === "object" && !Array.isArray(data.result)) return data.result;
+            return data;
+        }
+
+        function getArray(root, ...names) {
+            for (const name of names) {
+                if (Array.isArray(root?.[name])) return root[name];
+            }
+            return [];
+        }
+
+        function belongsToCliente(item, clienteId) {
+            return String(item?.cliente_id ?? item?.id_cliente ?? item?.clienteId ?? item?.cliente?.id ?? "") === String(clienteId);
+        }
+
+        function adaptarServicioCliente(s = {}) {
+            return {
+                _id: s.id || "",
+                id: s.id || "",
+                servicio_id: s.servicio_id ?? s.catalogo_id ?? s.servicio?.id ?? null,
+                nombre: s.nombre || s.servicio_nombre || s.nombre_servicio || s.servicio?.nombre || "Servicio",
+                monto: n(s.monto ?? s.precio ?? s.precio_cliente, 0),
+                correo_login: s.correo_login || s.correo || s.email || "",
+                perfil_nombre: s.perfil_nombre || s.perfil || "",
+                perfil_pin: s.perfil_pin || s.pin_perfil || ""
+            };
+        }
+
+        function adaptarPago(p = {}) {
+            return {
+                _id: p.id || "",
+                id: p.id || "",
+                fecha: p.fecha || p.fecha_pago || p.created_at || "",
+                monto: n(p.monto, 0),
+                estado: p.estado || "pagado"
+            };
+        }
+
+        function adaptarDescuento(d = {}) {
+            return {
+                _id: d.id || "",
+                id: d.id || "",
+                concepto: d.concepto || d.descripcion || d.nombre || "Descuento",
+                monto: n(d.monto, 0)
+            };
+        }
+
+        function adaptarReferido(r = {}) {
+            return {
+                _id: r.id || "",
+                id: r.id || "",
+                nombre: r.nombre || "",
+                plataformas: n(r.plataformas, 2),
+                meses: n(r.meses, 1),
+                activo: r.activo !== false
+            };
+        }
+
+        function adaptarGamificacion(g = {}) {
+            return {
+                _id: g.id || "",
+                id: g.id || "",
+                misiones_activas: g.misiones_activas === true,
+                descuento: n(g.descuento, 5),
+                tareas: g.tareas || ""
+            };
+        }
+
+        function adaptarCatalogo(s = {}) {
+            const item = {
+                _id: s.id || "",
+                id: s.id || "",
+                nombre: s.nombre || "Servicio",
+                etiqueta: s.etiqueta || "",
+                beneficios: s.beneficios || "",
+                cuentas: n(s.cuentas, 1),
+                precio: n(s.precio, 0),
+                costo: n(s.costo, 0),
+                limite: n(s.limite, 5)
+            };
+            if (s.stock_manual !== undefined && s.stock_manual !== null && s.stock_manual !== "") {
+                item.stock_manual = n(s.stock_manual, 0);
+            }
+            return item;
+        }
+
+        function adaptarRespuestaAdmin(data) {
+            const root = unwrapRoot(data);
+
+            const clientes = firstArray(
+                root.clientes,
+                root.clients,
+                root.usuarios,
+                data.clientes,
+                data.data?.clientes
+            );
+
+            const catalogo = firstArray(
+                root.serviciosGlobales,
+                root.servicios_globales,
+                root.servicios_catalogo,
+                root.catalogo,
+                root.catalogo_servicios,
+                data.serviciosGlobales,
+                data.servicios_globales
+            );
+
+            const serviciosGlobal = getArray(root, "cliente_servicios", "servicios_clientes", "clientes_servicios", "suscripciones");
+            const pagosGlobal = getArray(root, "pagos", "historial_pagos", "pagos_clientes");
+            const referidosGlobal = getArray(root, "referidos", "clientes_referidos");
+            const gamifGlobal = getArray(root, "gamificacion", "gamificaciones", "clientes_gamificacion");
+            const descuentosGlobal = getArray(root, "descuentos", "descuentos_especiales", "clientes_descuentos");
+
+            if (!clientes.length) {
+                const keys = Object.keys(root || {});
+                throw new Error("La respuesta de admin-datos llegó, pero no encontré el arreglo de clientes.\nClaves recibidas: " + keys.join(", "));
+            }
+
+            const nuevoDict = {};
+
+            clientes.forEach((c, idx) => {
+                const id = c.id || c.cliente_id || c.uuid || "";
+
+                const servicios = firstArray(
+                    c.servicios,
+                    c.cliente_servicios,
+                    c.suscripciones,
+                    serviciosGlobal.filter(x => belongsToCliente(x, id))
+                );
+                const pagos = firstArray(
+                    c.historial_pagos,
+                    c.pagos,
+                    pagosGlobal.filter(x => belongsToCliente(x, id))
+                );
+                const referidos = firstArray(
+                    c.referidos,
+                    referidosGlobal.filter(x => belongsToCliente(x, id))
+                );
+                const descuentos = firstArray(
+                    c.descuentos_especiales,
+                    c.descuentos,
+                    descuentosGlobal.filter(x => belongsToCliente(x, id))
+                );
+
+                let gamificacion = c.gamificacion;
+                if (Array.isArray(gamificacion)) gamificacion = gamificacion[0];
+                if (!gamificacion) gamificacion = gamifGlobal.find(x => belongsToCliente(x, id));
+
+                const refActivo = referidos.find(r => r?.activo !== false) || null;
+
+                let key = c.clave || c.key || c.slug || c.identificador || slug(c.nombre || c.folio || id || `cliente-${idx + 1}`);
+                if (!key) key = `cliente-${idx + 1}`;
+                if (nuevoDict[key]) key = `${key}-${String(id || idx).slice(0, 6)}`;
+
+                nuevoDict[key] = {
+                    _id: id,
+                    id,
+                    _key: key,
+                    folio: c.folio || "",
+                    nombre: c.nombre || key,
+                    usuario_acceso: c.usuario_acceso || c.usuario || c.correo_acceso || "",
+                    codigo: "",
+                    pagos_puntuales: n(c.pagos_puntuales, 0),
+                    dia_pago: n(c.dia_pago, 15),
+                    estado: c.estado || "pendiente",
+                    pago_en_revision: c.pago_en_revision === true,
+                    historial_pagos: pagos.map(adaptarPago),
+                    servicios: servicios.map(adaptarServicioCliente),
+                    descuentos_especiales: descuentos.map(adaptarDescuento),
+                    descuento_fallas: n(c.descuento_fallas, 0),
+                    referido_activo: refActivo ? adaptarReferido(refActivo) : undefined,
+                    gamificacion: gamificacion ? adaptarGamificacion(gamificacion) : undefined
+                };
+            });
+
+            const cfg = root.config || root.configuracion || root._goxion_config || data.config || data.configuracion || {};
+            const alertas = root.alertas || data.alertas || cfg.alertas || {};
+            const catalogoCfg = firstArray(cfg.serviciosGlobales, cfg.servicios_globales);
+
+            configGlobal = {
+                alertas: {
+                    activa: alertas.activa === true,
+                    plataforma: alertas.plataforma || "Todos los servicios",
+                    falla: alertas.falla || "presentando intermitencias temporales",
+                    mensaje: alertas.mensaje || ""
+                },
+                serviciosGlobales: (catalogo.length ? catalogo : catalogoCfg).map(adaptarCatalogo),
+                combo_upsell: (root.combo_upsell ?? data.combo_upsell ?? cfg.combo_upsell) !== false
+            };
+
+            if (!configGlobal.serviciosGlobales.length) {
+                configGlobal.serviciosGlobales = DEFAULT_SERVICES.map(x => ({...x}));
+            }
+
+            clientesDict = nuevoDict;
+        }
+
+        async function cargarAdminDatos() {
+            const data = await callAdminDatos();
+            adaptarRespuestaAdmin(data);
+            currentFileData = { source: "supabase" };
+
+            document.getElementById("combo-active").checked = configGlobal.combo_upsell;
+            document.getElementById("alert-active").checked = configGlobal.alertas?.activa || false;
+            document.getElementById("alert-type").value = configGlobal.alertas?.falla || "presentando intermitencias temporales";
+            document.getElementById("global-msg").value = configGlobal.alertas?.mensaje || "";
+
+            calcularInventarioYFinanzas();
+            renderGlobalServicesUI();
+
+            const alertPlatform = document.getElementById("alert-platform");
+            if (alertPlatform && configGlobal.alertas?.plataforma) {
+                alertPlatform.value = configGlobal.alertas.plataforma;
+            }
+
+            toggleAlertFields();
+            filtrarClientes();
+        }
+
+        pedirToken = async function() {
+            const ok = await loginAdminInteractivo();
+            if (ok) await inicializarPanel();
+        };
+
+        cerrarSesion = function() {
+            localStorage.removeItem(ADMIN_TOKEN_KEY);
+            localStorage.removeItem("GOXION_PAT");
+            currentToken = "";
+            location.reload();
+        };
+
+        inicializarPanel = async function() {
+            currentToken = localStorage.getItem(ADMIN_TOKEN_KEY) || "";
+
+            if (!currentToken) {
+                const ok = await loginAdminInteractivo();
+                if (!ok) return;
+            }
+
+            try {
+                await cargarAdminDatos();
+            } catch (e) {
+                if (e?.message === "SESION_EXPIRADA") {
+                    const ok = await loginAdminInteractivo();
+                    if (ok) {
+                        try {
+                            await cargarAdminDatos();
+                            return;
+                        } catch (e2) {
+                            console.error(e2);
+                            showFatal("No fue posible cargar admin-datos después de renovar sesión.", e2?.stack || e2?.message || String(e2));
+                            return;
+                        }
+                    }
+                    return;
+                }
+                console.error(e);
+                showFatal("No fue posible cargar admin-datos.", e?.stack || e?.message || String(e));
+            }
+        };
+
+        console.info("GOXION Admin cargado.");
+    })();
+    </script>
+
+
+    <!-- GOXION ADMIN BETA V3 // ESCRITURA INMEDIATA SUPABASE -->
+    <script id="goxion-supabase-v3-writes">
+    (() => {
+        const SB = "https://hmpevcwodcgbkviarfic.supabase.co";
+        const ACCIONES = `${SB}/functions/v1/admin-acciones`;
+        const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
+
+        async function accion(accion, datos = {}) {
+            const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
+            if (!token) throw new Error("Sesión administrativa no disponible.");
+
+            const r = await fetch(ACCIONES, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Token": token
+                },
+                body: JSON.stringify({ accion, datos })
+            });
+
+            const text = await r.text();
+            let body = {};
+            try { body = text ? JSON.parse(text) : {}; } catch {}
+
+            if (!r.ok || body?.ok !== true) {
+                throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+            }
+            return body;
+        }
+
+        function cli(key) { return clientesDict[key]; }
+        function num(v, d=0) {
+            const x = Number(v);
+            return Number.isFinite(x) ? x : d;
+        }
+
+        function errorUI(titulo, e) {
+            console.error(titulo, e);
+            alert(`❌ ${titulo}\n\n${e?.message || e}`);
+        }
+
+        async function recargar(abrirKey = null) {
+            if (typeof inicializarPanel === "function") {
+                await inicializarPanel();
+                if (abrirKey) {
+                    setTimeout(() => {
+                        const d = document.getElementById(`details-${abrirKey}`);
+                        const t = document.getElementById(`toggle-text-${abrirKey}`);
+                        if (d) d.style.display = "block";
+                        if (t) t.innerHTML = "Ocultar detalles ▴";
+                    }, 60);
+                }
+            }
+        }
+
+        // ---------- LEALTAD: GUARDA AL TOCAR + / - ----------
+        updatePagos = async function(key, delta) {
+            const c = cli(key);
+            if (!c?._id) return alert("❌ Cliente sin ID de Supabase.");
+            try {
+                const r = await accion("ajustar_lealtad", {
+                    cliente_id: c._id,
+                    delta
+                });
+                c.pagos_puntuales = num(r.pagos_puntuales, Math.max(0, num(c.pagos_puntuales) + delta));
+                const el = document.getElementById(`pagos-${key}`);
+                if (el) el.innerText = c.pagos_puntuales;
+            } catch (e) { errorUI("No se pudo guardar la lealtad.", e); }
+        };
+
+        reiniciarLealtad = async function(key) {
+            if (!confirm("¿Reiniciar la racha de pagos puntuales a 0?")) return;
+            const c = cli(key);
+            if (!c?._id) return;
+            try {
+                await accion("reiniciar_lealtad", { cliente_id: c._id });
+                c.pagos_puntuales = 0;
+                filtrarClientes();
+            } catch (e) { errorUI("No se pudo reiniciar la lealtad.", e); }
+        };
+
+        // ---------- CLIENTE ----------
+        updateClientData = async function(key, field, value) {
+            const c = cli(key);
+            if (!c?._id) return alert("❌ Cliente sin ID de Supabase.");
+
+            try {
+                if (field === "codigo") {
+                    const pin = String(value || "").trim();
+                    if (!pin) return;
+                    await accion("cambiar_pin", { cliente_id: c._id, pin });
+                    c.codigo = "";
+                    alert("✅ PIN actualizado.");
+                    return;
+                }
+
+                let v = value;
+                if (field === "dia_pago") v = parseInt(value) || 15;
+
+                // usuario_acceso se mantiene visualmente; el backend principal
+                // se ampliará para persistirlo. Evitamos mentir con un guardado falso.
+                if (field === "usuario_acceso") {
+                    c.usuario_acceso = String(v || "");
+                    alert("ℹ️ Usuario/Correo actualizado en pantalla. Este campo se activará en persistencia al cerrar la compatibilidad del backend.");
+                    return;
+                }
+
+                await accion("editar_cliente", {
+                    cliente_id: c._id,
+                    [field]: v
+                });
+
+                c[field] = v;
+                calcularInventarioYFinanzas();
+                filtrarClientes();
+            } catch (e) { errorUI("No se pudo actualizar el cliente.", e); }
+        };
+
+        agregarNuevoCliente = async function() {
+            const nombre = prompt("Nombre del nuevo cliente:");
+            if (!nombre) return;
+
+            const folioNum = Object.keys(clientesDict).length + 1;
+            const folio = prompt("Folio:", "GX-2026-" + String(folioNum).padStart(4, "0"));
+            if (!folio) return;
+
+            const pin = prompt("PIN inicial de 4 dígitos:", "1234");
+            if (!pin) return;
+
+            try {
+                await accion("crear_cliente", {
+                    nombre: nombre.trim(),
+                    folio: folio.trim(),
+                    pin: pin.trim(),
+                    dia_pago: 15,
+                    estado: "pendiente"
+                });
+                await recargar();
+                alert("✅ Cliente creado en Supabase.");
+            } catch (e) { errorUI("No se pudo crear el cliente.", e); }
+        };
+
+        // ---------- SERVICIOS CLIENTE ----------
+        addClientService = async function(key) {
+            const c = cli(key);
+            if (!c?._id) return;
+
+            const sel = document.getElementById(`add-srv-sel-${key}`);
+            if (!sel?.value) return;
+            const [nombre, precio] = sel.value.split("|");
+            const cat = configGlobal.serviciosGlobales.find(s => s.nombre === nombre);
+
+            try {
+                await accion("agregar_servicio_cliente", {
+                    cliente_id: c._id,
+                    servicio_id: cat?.id || cat?._id || null,
+                    nombre,
+                    monto: num(precio),
+                    correo_login: "",
+                    perfil_nombre: "",
+                    perfil_pin: ""
+                });
+                await recargar(key);
+            } catch (e) { errorUI("No se pudo agregar el servicio.", e); }
+        };
+
+        removeClientService = async function(key, serviceIndex) {
+            const c = cli(key);
+            const s = c?.servicios?.[serviceIndex];
+            if (!s) return;
+            if (!confirm(`¿Quitar "${s.nombre}" de este cliente?`)) return;
+
+            try {
+                await accion("quitar_servicio_cliente", { id: s.id || s._id });
+                await recargar(key);
+            } catch (e) { errorUI("No se pudo quitar el servicio.", e); }
+        };
+
+        updateServiceCreds = async function(key, serviceIndex, field, value) {
+            const c = cli(key);
+            const s = c?.servicios?.[serviceIndex];
+            if (!s) return;
+
+            try {
+                await accion("editar_servicio_cliente", {
+                    id: s.id || s._id,
+                    [field]: String(value || "").trim()
+                });
+                s[field] = String(value || "").trim();
+            } catch (e) { errorUI("No se pudieron guardar las credenciales.", e); }
+        };
+
+        // ---------- PAGO ----------
+        aprobarPago = async function(key, monto) {
+            if (!confirm("¿Confirmas que verificaste el comprobante de pago de este cliente?")) return;
+            const c = cli(key);
+            if (!c?._id) return;
+
+            try {
+                await accion("aprobar_pago", {
+                    cliente_id: c._id,
+                    monto: num(monto),
+                    notas: "Aprobado desde Admin"
+                });
+                await recargar(key);
+                alert("✅ Pago aprobado y guardado en Supabase.");
+            } catch (e) { errorUI("No se pudo aprobar el pago.", e); }
+        };
+
+        // ---------- REFERIDOS ----------
+        toggleReferido = async function(key, checked) {
+            const c = cli(key);
+            if (!c?._id) return;
+            try {
+                if (checked) {
+                    await accion("guardar_referido", {
+                        cliente_id: c._id,
+                        nombre: c.referido_activo?.nombre || "",
+                        plataformas: num(c.referido_activo?.plataformas, 2),
+                        meses: num(c.referido_activo?.meses, 1),
+                        activo: true
+                    });
+                } else {
+                    await accion("desactivar_referido", { cliente_id: c._id });
+                }
+                await recargar(key);
+            } catch (e) { errorUI("No se pudo actualizar el referido.", e); }
+        };
+
+        updateReferido = async function(key, field, value) {
+            const c = cli(key);
+            if (!c?._id) return;
+            const r = c.referido_activo || { nombre:"", plataformas:2, meses:1 };
+            if (field === "nombre") r.nombre = value;
+            else r[field] = parseInt(value) || 1;
+            c.referido_activo = r;
+
+            try {
+                await accion("guardar_referido", {
+                    cliente_id: c._id,
+                    nombre: r.nombre || "",
+                    plataformas: num(r.plataformas, 2),
+                    meses: num(r.meses, 1),
+                    activo: true
+                });
+            } catch (e) { errorUI("No se pudo guardar el referido.", e); }
+        };
+
+        // ---------- GAMIFICACIÓN ----------
+        toggleMisiones = async function(key, checked) {
+            const c = cli(key);
+            if (!c?._id) return;
+            const g = c.gamificacion || { misiones_activas:false, descuento:5, tareas:"" };
+            g.misiones_activas = checked;
+            c.gamificacion = g;
+
+            try {
+                await accion("guardar_gamificacion", {
+                    cliente_id: c._id,
+                    misiones_activas: checked,
+                    descuento: num(g.descuento, 5),
+                    tareas: g.tareas || ""
+                });
+                filtrarClientes();
+            } catch (e) { errorUI("No se pudo guardar la gamificación.", e); }
+        };
+
+        updateMisiones = async function(key, field, value) {
+            const c = cli(key);
+            if (!c?._id) return;
+            const g = c.gamificacion || { misiones_activas:true, descuento:5, tareas:"" };
+            g[field] = field === "descuento" ? num(value) : value;
+            c.gamificacion = g;
+            try {
+                await accion("guardar_gamificacion", {
+                    cliente_id: c._id,
+                    misiones_activas: g.misiones_activas === true,
+                    descuento: num(g.descuento, 5),
+                    tareas: g.tareas || ""
+                });
+            } catch (e) { errorUI("No se pudieron guardar las misiones.", e); }
+        };
+
+        aplicarMisionesMasivas = async function(modo) {
+            const tareas = document.getElementById("global-misiones-tareas").value;
+            const descuento = num(document.getElementById("global-misiones-desc").value);
+            if (!tareas) return alert("Debes escribir al menos una tarea.");
+
+            let ids = [];
+            if (modo === "todos") {
+                if (!confirm("¿Aplicar estas misiones a TODOS los clientes?")) return;
+                ids = Object.values(clientesDict).map(c => c._id).filter(Boolean);
+            } else {
+                const checks = [...document.querySelectorAll(".chk-modal-cliente:checked")];
+                if (!checks.length) return alert("No has seleccionado clientes.");
+                ids = checks.map(ch => clientesDict[ch.value]?._id).filter(Boolean);
+                cerrarModalSeleccion();
+            }
+
+            try {
+                await accion("misiones_masivas", { clientes: ids, descuento, tareas });
+                await recargar();
+                alert(`✅ Misiones guardadas en ${ids.length} cliente(s).`);
+            } catch (e) { errorUI("No se pudieron aplicar las misiones masivas.", e); }
+        };
+
+        borrarMisionesMasivas = async function() {
+            if (!confirm("¿Seguro que quieres BORRAR las misiones de TODOS los clientes?")) return;
+            try {
+                await accion("borrar_misiones_masivas", {});
+                await recargar();
+                alert("✅ Misiones desactivadas.");
+            } catch (e) { errorUI("No se pudieron borrar las misiones.", e); }
+        };
+
+        // ---------- DESCUENTOS / TRATO JUSTO ----------
+        agregarDescuentoEspecial = async function(key) {
+            const c = cli(key);
+            if (!c?._id) return;
+            const concepto = prompt("Concepto del descuento:");
+            if (!concepto) return;
+            const monto = prompt("Cantidad a descontar en $:");
+            if (!monto || isNaN(monto)) return;
+
+            try {
+                await accion("agregar_descuento", {
+                    cliente_id: c._id,
+                    descripcion: concepto,
+                    monto: num(monto)
+                });
+                await recargar(key);
+            } catch (e) { errorUI("No se pudo agregar el descuento.", e); }
+        };
+
+        eliminarDescuentoEspecial = async function(key, index) {
+            const c = cli(key);
+            const d = index >= 0 ? c?.descuentos_especiales?.[index] : c?.descuento_especial;
+            if (!d) return;
+            try {
+                await accion("eliminar_descuento", { id: d.id || d._id });
+                await recargar(key);
+            } catch (e) { errorUI("No se pudo eliminar el descuento.", e); }
+        };
+
+        aplicarTratoJusto = async function(key, montoServicio) {
+            const c = cli(key);
+            if (!c?._id) return;
+            if (!confirm("¿Aplicar descuento de Trato Justo (5% del servicio)?")) return;
+            try {
+                await accion("aplicar_trato_justo", {
+                    cliente_id: c._id,
+                    monto_servicio: num(montoServicio)
+                });
+                await recargar(key);
+            } catch (e) { errorUI("No se pudo aplicar Trato Justo.", e); }
+        };
+
+        resetearDescuentoFallas = async function(key) {
+            const c = cli(key);
+            if (!c?._id) return;
+            if (!confirm("¿Resetear Trato Justo a $0?")) return;
+            try {
+                await accion("resetear_trato_justo", { cliente_id: c._id });
+                await recargar(key);
+            } catch (e) { errorUI("No se pudo resetear Trato Justo.", e); }
+        };
+
+        // ---------- CATÁLOGO ----------
+        addGlobalService = async function() {
+            const nombre = prompt("Nombre del nuevo servicio:");
+            if (!nombre) return;
+            const precio = prompt("Precio de venta:", "0");
+            if (precio === null) return;
+
+            try {
+                await accion("crear_servicio_catalogo", {
+                    nombre: nombre.trim(),
+                    etiqueta: "",
+                    beneficios: "",
+                    cuentas: 1,
+                    precio: num(precio),
+                    costo: 0,
+                    limite: 5
+                });
+                await recargar();
+            } catch (e) { errorUI("No se pudo crear el servicio.", e); }
+        };
+
+        updateGlobalService = async function(index, field, value) {
+            const s = configGlobal.serviciosGlobales[index];
+            if (!s) return;
+
+            let v = value;
+            if (field === "stock_manual") {
+                // Campo ya existe en Supabase; persistencia de esta acción
+                // se habilitará al ampliar admin-acciones.
+                v = String(value).trim() === "" ? null : (parseInt(value) || 0);
+                if (v === null) delete s.stock_manual;
+                else s.stock_manual = v;
+                calcularInventarioYFinanzas();
+                renderGlobalServicesUI();
+                alert("ℹ️ Stock manual actualizado en pantalla. Falta activar su escritura en admin-acciones.");
+                return;
+            }
+
+            if (!["nombre","etiqueta","beneficios"].includes(field)) v = num(value);
+
+            try {
+                await accion("editar_servicio_catalogo", {
+                    id: s.id || s._id,
+                    [field]: v
+                });
+                s[field] = v;
+                calcularInventarioYFinanzas();
+                renderGlobalServicesUI();
+                if (field === "nombre") renderizarClientes(clientesDict);
+            } catch (e) { errorUI("No se pudo actualizar el catálogo.", e); }
+        };
+
+        removeGlobalService = async function(index) {
+            const s = configGlobal.serviciosGlobales[index];
+            if (!s) return;
+            if (!confirm(`¿Eliminar "${s.nombre}" del catálogo?`)) return;
+            try {
+                await accion("eliminar_servicio_catalogo", { id: s.id || s._id });
+                await recargar();
+            } catch (e) { errorUI("No se pudo eliminar el servicio.", e); }
+        };
+
+        sincronizarPrecioMasivo = async function(index) {
+            const s = configGlobal.serviciosGlobales[index];
+            if (!s) return;
+            if (!confirm(`¿Aplicar $${s.precio} a TODOS los clientes con "${s.nombre}"?`)) return;
+            try {
+                const r = await accion("sincronizar_precio", { nombre:s.nombre, precio:num(s.precio) });
+                await recargar();
+                alert(`✅ Precio sincronizado en ${num(r.actualizados)} registro(s).`);
+            } catch (e) { errorUI("No se pudo sincronizar el precio.", e); }
+        };
+
+        // ---------- BOTÓN GUARDAR: SOLO CONFIGURACIÓN GLOBAL ----------
+        prepararYGuardar = async function() {
+            const pc = document.querySelector("header .btn-save");
+            const mob = document.getElementById("btn-save-mobile");
+            const pcTxt = pc?.innerText || "";
+            const mobHtml = mob?.innerHTML || "";
+
+            if (pc) pc.innerText = "Guardando...";
+            if (mob) mob.innerHTML = `<i>⏳</i><span>Guardando</span>`;
+
+            try {
+                const alerta = {
+                    activa: document.getElementById("alert-active").checked,
+                    plataforma: document.getElementById("alert-platform").value,
+                    falla: document.getElementById("alert-type").value,
+                    mensaje: document.getElementById("global-msg").value
+                };
+                const combo = document.getElementById("combo-active").checked;
+
+                await accion("guardar_alerta", alerta);
+                await accion("guardar_configuracion", { combo_upsell: combo });
+
+                configGlobal.alertas = alerta;
+                configGlobal.combo_upsell = combo;
+                alert("⚡ Configuración global guardada en Supabase.");
+            } catch (e) {
+                errorUI("No se pudo guardar la configuración global.", e);
+            } finally {
+                if (pc) pc.innerText = pcTxt;
+                if (mob) mob.innerHTML = mobHtml;
+            }
+        };
+
+        console.info("GOXION Admin: escrituras inmediatas activadas.");
+    })();
+    </script>
+
+
+    <!-- GOXION ADMIN BETA V4 // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
+    <script id="goxion-admin-v4-fixes">
+    (() => {
+        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
+        const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
+
+        async function ajusteBeta(accion, datos = {}) {
+            const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
+            if (!token) throw new Error("Sesión administrativa no disponible.");
+
+            const r = await fetch(AJUSTES_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Token": token
+                },
+                body: JSON.stringify({ accion, datos })
+            });
+
+            const text = await r.text();
+            let body = {};
+            try { body = text ? JSON.parse(text) : {}; } catch {}
+
+            if (!r.ok || body?.ok !== true) {
+                throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+            }
+            return body;
+        }
+
+        async function cargarStockManual() {
+            try {
+                const r = await ajusteBeta("obtener_stock_manual");
+                const mapa = new Map((r.stock || []).map(x => [String(x.id), x.stock_manual]));
+
+                configGlobal.serviciosGlobales.forEach(s => {
+                    const id = String(s.id || s._id || "");
+                    if (!id || !mapa.has(id)) return;
+
+                    const valor = mapa.get(id);
+                    if (valor === null || valor === undefined || valor === "") {
+                        delete s.stock_manual;
+                    } else {
+                        s.stock_manual = Number(valor);
+                    }
+                });
+
+                calcularInventarioYFinanzas();
+                renderGlobalServicesUI();
+            } catch (e) {
+                console.error("No se pudo cargar stock manual:", e);
+            }
+        }
+
+        const inicializarAnterior = inicializarPanel;
+        inicializarPanel = async function() {
+            await inicializarAnterior();
+            await cargarStockManual();
+        };
+
+        const updateGlobalServiceAnterior = updateGlobalService;
+        updateGlobalService = async function(index, field, value) {
+            if (field !== "stock_manual") {
+                return updateGlobalServiceAnterior(index, field, value);
+            }
+
+            const s = configGlobal.serviciosGlobales[index];
+            if (!s) return;
+
+            const limpio = String(value ?? "").trim();
+            const stockManual = limpio === "" ? null : Math.max(0, parseInt(limpio) || 0);
+
+            try {
+                const r = await ajusteBeta("guardar_stock_manual", {
+                    id: s.id || s._id,
+                    stock_manual: stockManual
+                });
+
+                const guardado = r?.servicio?.stock_manual;
+                if (guardado === null || guardado === undefined || guardado === "") {
+                    delete s.stock_manual;
+                } else {
+                    s.stock_manual = Number(guardado);
+                }
+
+                calcularInventarioYFinanzas();
+                renderGlobalServicesUI();
+            } catch (e) {
+                console.error(e);
+                alert(`❌ No se pudo guardar la disponibilidad manual.\n\n${e?.message || e}`);
+            }
+        };
+
+        toggleReferido = async function(key, isChecked) {
+            const c = clientesDict[key];
+            if (!c?._id) return;
+
+            try {
+                if (isChecked) {
+                    const actual = c.referido_activo || {};
+                    await ajusteBeta("guardar_referido", {
+                        cliente_id: c._id,
+                        nombre: actual.nombre || "",
+                        plataformas: Number(actual.plataformas || 2),
+                        meses: Number(actual.meses || 1),
+                        activo: true
+                    });
+                } else {
+                    // La desactivación existente ya funciona y permanece en admin-acciones.
+                    const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
+                    const r = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-acciones", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-Admin-Token": token
+                        },
+                        body: JSON.stringify({
+                            accion: "desactivar_referido",
+                            datos: { cliente_id: c._id }
+                        })
+                    });
+
+                    const text = await r.text();
+                    let body = {};
+                    try { body = text ? JSON.parse(text) : {}; } catch {}
+                    if (!r.ok || body?.ok !== true) {
+                        throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+                    }
+                }
+
+                await inicializarPanel();
+
+                setTimeout(() => {
+                    const details = document.getElementById(`details-${key}`);
+                    const toggle = document.getElementById(`toggle-text-${key}`);
+                    if (details) details.style.display = "block";
+                    if (toggle) toggle.innerHTML = "Ocultar detalles ▴";
+                }, 60);
+            } catch (e) {
+                console.error(e);
+                alert(`❌ No se pudo ${isChecked ? "activar" : "desactivar"} el referido.\n\n${e?.message || e}`);
+                filtrarClientes();
+            }
+        };
+
+        updateReferido = async function(key, field, value) {
+            const c = clientesDict[key];
+            if (!c?._id) return;
+
+            const actual = c.referido_activo || {
+                nombre: "",
+                plataformas: 2,
+                meses: 1
+            };
+
+            if (field === "nombre") actual.nombre = String(value || "");
+            else actual[field] = parseInt(value) || 1;
+
+            c.referido_activo = actual;
+
+            try {
+                const r = await ajusteBeta("guardar_referido", {
+                    cliente_id: c._id,
+                    nombre: actual.nombre || "",
+                    plataformas: Number(actual.plataformas || 2),
+                    meses: Number(actual.meses || 1),
+                    activo: true
+                });
+
+                if (r?.referido) {
+                    c.referido_activo = {
+                        ...actual,
+                        ...r.referido
+                    };
+                }
+            } catch (e) {
+                console.error(e);
+                alert(`❌ No se pudo guardar el referido.\n\n${e?.message || e}`);
+            }
+        };
+
+        console.info("GOXION Admin: stock manual persistente y reactivación de referidos activados.");
+    })();
+    </script>
+
+
+    <!-- GOXION ADMIN BETA V5 // INVENTARIO INTELIGENTE DESDE SUPABASE -->
+    <script id="goxion-admin-v5-inventory">
+    (() => {
+        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario";
+        const TOKEN_KEY_INV = "GOXION_ADMIN_TOKEN";
+        let inventarioServidor = null;
+
+        async function pedirInventarioServidor() {
+            const token = localStorage.getItem(TOKEN_KEY_INV) || currentToken || "";
+            if (!token) throw new Error("Sesión administrativa no disponible.");
+
+            const r = await fetch(INVENTARIO_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Token": token
+                },
+                body: "{}"
+            });
+
+            const text = await r.text();
+            let body = {};
+            try { body = text ? JSON.parse(text) : {}; } catch {}
+
+            if (!r.ok || body?.ok !== true) {
+                throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+            }
+
+            inventarioServidor = new Map(
+                (body.inventario || []).map(x => [String(x.id), x])
+            );
+
+            // Mantiene el objeto que ya usa la interfaz original.
+            inventarioActivo = {};
+            configGlobal.serviciosGlobales.forEach(s => {
+                const info = inventarioServidor.get(String(s.id || s._id || ""));
+                if (info) {
+                    inventarioActivo[s.nombre] = Number(info.asignados || 0);
+                    s._inventario_auto = info;
+                }
+            });
+
+            calcularInventarioYFinanzas();
+            renderGlobalServicesUI();
+
+            console.table((body.inventario || []).map(x => ({
+                servicio: x.nombre,
+                capacidad: x.capacidad,
+                asignados: x.asignados,
+                disponibles: x.disponibles,
+                modo: x.modo,
+                sobrecupo: x.sobrecupo
+            })));
+
+            return body.inventario || [];
+        }
+
+        // Reemplaza únicamente el conteo de inventario; conserva los KPI financieros.
+        const calcularAnteriorV5 = calcularInventarioYFinanzas;
+        calcularInventarioYFinanzas = function() {
+            if (!inventarioServidor) {
+                return calcularAnteriorV5();
+            }
+
+            let ingresosTotales = 0;
+            let costosTotales = 0;
+
+            configGlobal.serviciosGlobales.forEach(s => {
+                costosTotales += parseFloat(s.costo || 0) * parseInt(s.cuentas || 1);
+
+                const info = inventarioServidor.get(String(s.id || s._id || ""));
+                inventarioActivo[s.nombre] = info ? Number(info.asignados || 0) : 0;
+            });
+
+            Object.values(clientesDict).forEach(cliente => {
+                if (cliente.estado !== "suspendido" && Array.isArray(cliente.servicios)) {
+                    cliente.servicios.forEach(s => {
+                        ingresosTotales += parseFloat(s.monto || 0);
+                    });
+                }
+            });
+
+            const gananciaNeta = ingresosTotales - costosTotales;
+            document.getElementById("kpi-ingresos").innerText = `$${ingresosTotales.toFixed(2)}`;
+            document.getElementById("kpi-costos").innerText = `$${costosTotales.toFixed(2)}`;
+            document.getElementById("kpi-ganancias").innerText = `$${gananciaNeta.toFixed(2)}`;
+        };
+
+        // Añade al tooltip el origen real del cálculo, sin cambiar el diseño.
+        const renderAnteriorV5 = renderGlobalServicesUI;
+        renderGlobalServicesUI = function() {
+            renderAnteriorV5();
+
+            const rows = document.querySelectorAll("#global-services-container tr");
+            rows.forEach((row, index) => {
+                const srv = configGlobal.serviciosGlobales[index];
+                if (!srv) return;
+                const info = inventarioServidor?.get(String(srv.id || srv._id || ""));
+                if (!info) return;
+
+                const badge = row.querySelector(".inv-badge");
+                if (badge) {
+                    const manual = srv.stock_manual !== undefined && srv.stock_manual !== null && srv.stock_manual !== "";
+                    const disponibles = manual ? Number(srv.stock_manual) : Number(info.disponibles_auto || 0);
+                    badge.innerText = `${manual ? "🛠️ " : ""}${Math.max(0, disponibles)}`;
+
+                    let detalle = `Capacidad: ${info.capacidad} | Asignados: ${info.asignados} | Disponibles: ${Math.max(0, disponibles)}`;
+                    if (info.sobrecupo > 0) detalle += ` | ⚠ Sobrecupo: ${info.sobrecupo}`;
+                    detalle += manual ? " | Modo: Manual" : " | Modo: Automático Supabase";
+                    badge.title = detalle;
+                }
+            });
+        };
+
+        // Cada carga del panel vuelve a consultar contratos reales en Supabase.
+        const inicializarAnteriorV5 = inicializarPanel;
+        inicializarPanel = async function() {
+            await inicializarAnteriorV5();
+            try {
+                await pedirInventarioServidor();
+            } catch (e) {
+                console.error("Inventario inteligente:", e);
+                // No bloquea el panel: queda el cálculo anterior como respaldo.
+            }
+        };
+
+        // Tras operaciones que pueden cambiar capacidad/nombre, refresca inventario.
+        const updateGlobalAnteriorV5 = updateGlobalService;
+        updateGlobalService = async function(index, field, value) {
+            await updateGlobalAnteriorV5(index, field, value);
+
+            if (["nombre", "cuentas", "limite", "stock_manual"].includes(field)) {
+                try { await pedirInventarioServidor(); }
+                catch (e) { console.error("No se pudo refrescar inventario:", e); }
+            }
+        };
+
+        // Tras agregar/quitar servicios a un cliente, las funciones anteriores recargan
+        // el panel y por tanto este inventario también se recalcula automáticamente.
+
+        console.info("GOXION Admin: inventario automático calculado desde contratos reales de Supabase.");
+    })();
+    </script>
+
 </body>
 </html>
