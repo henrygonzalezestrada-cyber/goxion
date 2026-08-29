@@ -192,7 +192,84 @@
             .quick-actions { width: 100%; justify-content: space-between; }
             .btn-qaction { flex: 1; justify-content: center; }
         }
-    </style>
+    
+    /* --- GOXION LOADER / PRUEBA VISUAL --- */
+    .goxion-loader {
+        --loader-cyan: #00f2fe;
+        --loader-purple: #7c4dff;
+        --loader-size: 1px;
+        position: relative;
+        display: inline-block;
+        width: calc(48 * var(--loader-size));
+        height: calc(48 * var(--loader-size));
+        border-radius: 50%;
+        color: var(--loader-cyan);
+        transform: rotateZ(45deg);
+        perspective: calc(1000 * var(--loader-size));
+        filter:
+            drop-shadow(0 0 7px rgba(0, 242, 254, 0.58))
+            drop-shadow(0 0 13px rgba(124, 77, 255, 0.38));
+    }
+
+    .goxion-loader::before,
+    .goxion-loader::after {
+        content: '';
+        display: block;
+        position: absolute;
+        inset: 0;
+        width: inherit;
+        height: inherit;
+        border-radius: 50%;
+        transform: rotateX(70deg);
+        animation: goxionLoaderSpin 1s linear infinite;
+    }
+
+    .goxion-loader::after {
+        color: var(--loader-purple);
+        transform: rotateY(70deg);
+        animation-delay: .4s;
+    }
+
+    .goxion-loader-wrap {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .goxion-loader-text {
+        color: var(--text-muted, #95a4bd);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .35px;
+    }
+
+    .goxion-loader.small {
+        --loader-size: .72px;
+    }
+
+    @keyframes goxionLoaderSpin {
+        0%, 100% { box-shadow: .2em 0 0 0 currentColor; }
+        12% { box-shadow: .2em .2em 0 0 currentColor; }
+        25% { box-shadow: 0 .2em 0 0 currentColor; }
+        37% { box-shadow: -.2em .2em 0 0 currentColor; }
+        50% { box-shadow: -.2em 0 0 0 currentColor; }
+        62% { box-shadow: -.2em -.2em 0 0 currentColor; }
+        75% { box-shadow: 0 -.2em 0 0 currentColor; }
+        87% { box-shadow: .2em -.2em 0 0 currentColor; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .goxion-loader::before,
+        .goxion-loader::after {
+            animation-duration: 2s;
+        }
+    }
+
+</style>
 </head>
 <body>
 
@@ -260,7 +337,10 @@
             </div>
             
             <div id="clients-container" style="margin-top: 15px;">
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con la base de datos...</p>
+                <div class="goxion-loader-wrap" style="padding: 38px 0;">
+                    <span class="goxion-loader" aria-hidden="true"></span>
+                    <span class="goxion-loader-text">Conectando con la base de datos...</span>
+                </div>
             </div>
         </div>
     </div>
@@ -1639,7 +1719,7 @@ Revisa las guías [SOPORTE]"></textarea>
             }
         };
 
-        console.info("GOXION Admin Beta V2 cargado.");
+        console.info("GOXION Admin cargado.");
     })();
     </script>
 
@@ -1846,7 +1926,7 @@ Revisa las guías [SOPORTE]"></textarea>
                 await accion("aprobar_pago", {
                     cliente_id: c._id,
                     monto: num(monto),
-                    notas: "Aprobado desde Admin Beta"
+                    notas: "Aprobado desde Admin"
                 });
                 await recargar(key);
                 alert("✅ Pago aprobado y guardado en Supabase.");
@@ -2117,7 +2197,7 @@ Revisa las guías [SOPORTE]"></textarea>
             }
         };
 
-        console.info("GOXION Admin Beta V3: escrituras inmediatas activadas.");
+        console.info("GOXION Admin: escrituras inmediatas activadas.");
     })();
     </script>
 
@@ -2125,7 +2205,7 @@ Revisa las guías [SOPORTE]"></textarea>
     <!-- GOXION ADMIN BETA V4 // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
     <script id="goxion-admin-v4-fixes">
     (() => {
-        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes-beta";
+        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function ajusteBeta(accion, datos = {}) {
@@ -2302,7 +2382,7 @@ Revisa las guías [SOPORTE]"></textarea>
             }
         };
 
-        console.info("GOXION Admin Beta V4: stock manual persistente y reactivación de referidos activados.");
+        console.info("GOXION Admin: stock manual persistente y reactivación de referidos activados.");
     })();
     </script>
 
@@ -2310,7 +2390,7 @@ Revisa las guías [SOPORTE]"></textarea>
     <!-- GOXION ADMIN BETA V5 // INVENTARIO INTELIGENTE DESDE SUPABASE -->
     <script id="goxion-admin-v5-inventory">
     (() => {
-        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-beta";
+        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario";
         const TOKEN_KEY_INV = "GOXION_ADMIN_TOKEN";
         let inventarioServidor = null;
 
@@ -2447,7 +2527,7 @@ Revisa las guías [SOPORTE]"></textarea>
         // Tras agregar/quitar servicios a un cliente, las funciones anteriores recargan
         // el panel y por tanto este inventario también se recalcula automáticamente.
 
-        console.info("GOXION Admin Beta V5: inventario automático calculado desde contratos reales de Supabase.");
+        console.info("GOXION Admin: inventario automático calculado desde contratos reales de Supabase.");
     })();
     </script>
 
