@@ -2483,7 +2483,7 @@
             const overlay = document.getElementById("support-lock-overlay");
             if (!overlay) return;
 
-            const token = localStorage.getItem("goxion_beta_session_token") || "";
+            const token = localStorage.getItem("goxion_client_token") || "";
             const key = localStorage.getItem("goxion_user_key") || "";
             const autenticado = Boolean(token && key);
 
