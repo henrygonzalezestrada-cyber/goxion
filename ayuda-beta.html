@@ -431,6 +431,62 @@
             pointer-events: auto; 
         }
 
+        /* --- SOPORTE BLOQUEADO HASTA INICIAR SESIÓN --- */
+        #view-soporte {
+            position: relative;
+        }
+
+        .support-lock-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 2600;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 90px 18px 30px;
+            border-radius: 20px;
+            background: rgba(3, 3, 5, 0.38);
+            backdrop-filter: blur(13px);
+            -webkit-backdrop-filter: blur(13px);
+            pointer-events: auto;
+        }
+
+        .support-lock-overlay.show {
+            display: flex;
+        }
+
+        .support-lock-card {
+            position: sticky;
+            top: 110px;
+            width: min(100%, 380px);
+            padding: 24px 20px;
+            border-radius: 22px;
+            text-align: center;
+            background: rgba(8, 8, 12, 0.86);
+            border: 1px solid rgba(0, 242, 254, 0.22);
+            box-shadow: 0 18px 60px rgba(0,0,0,0.5), 0 0 28px rgba(0,242,254,0.08);
+        }
+
+        .support-lock-icon {
+            font-size: 38px;
+            line-height: 1;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 0 14px rgba(0,242,254,0.35));
+        }
+
+        .support-lock-title {
+            color: var(--text-main);
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .support-lock-text {
+            color: var(--text-muted);
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
         .auth-sheet { 
             background: var(--card-glass); 
             border-top: 1px solid rgba(255,255,255,0.1); 
@@ -2028,6 +2084,13 @@
         </div>
 
         <div id="view-soporte" class="view-section">
+            <div id="support-lock-overlay" class="support-lock-overlay" aria-hidden="true">
+                <div class="support-lock-card">
+                    <div class="support-lock-icon">🔒</div>
+                    <div class="support-lock-title">Inicia sesión para acceder a Soporte</div>
+                    <div class="support-lock-text">Por seguridad, las herramientas de soporte están disponibles únicamente para clientes con una sesión activa. Usa <strong>Mi Espacio</strong> en la parte superior para iniciar sesión.</div>
+                </div>
+            </div>
             <div class="glass-card smart-support-card">
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 
@@ -2259,7 +2322,7 @@
             let contacto = prompt("Déjanos tu número de WhatsApp para contactarte y crear tu perfil:");
             if(!contacto) return;
 
-            notificarAdmin("logins", "🆕 NUEVO PROSPECTO", `**Nombre:** ${nombre}\n**WhatsApp:** ${contacto}\n\n*Este cliente quiere crear una cuenta nueva.*`, "00f2fe");
+            notificarAdmin("pedidos", "🎁 REGISTRO -10% OFF", `**Nombre:** ${nombre}\n**WhatsApp:** ${contacto}\n\n*Prospecto interesado en crear una cuenta y aprovechar el beneficio de -10% OFF.*`, "7c4dff");
             
             alert(`¡Gracias ${nombre}! Hemos recibido tus datos. Te enviaremos un mensaje por WhatsApp en breve para activar tu espacio.`);
         }
@@ -2412,8 +2475,21 @@
 
         window.addEventListener('load', () => { 
             setTimeout(hideSplash, 1800); 
-            cargarDatosYVerificarSesion(); 
+            cargarDatosYVerificarSesion();
+            actualizarBloqueoSoporte();
         });
+
+        function actualizarBloqueoSoporte() {
+            const overlay = document.getElementById("support-lock-overlay");
+            if (!overlay) return;
+
+            const token = localStorage.getItem("goxion_beta_session_token") || "";
+            const key = localStorage.getItem("goxion_user_key") || "";
+            const autenticado = Boolean(token && key);
+
+            overlay.classList.toggle("show", !autenticado);
+            overlay.setAttribute("aria-hidden", autenticado ? "true" : "false");
+        }
 
         function switchTab(tabName) {
             ['inicio', 'catalogo', 'soporte'].forEach(name => {
@@ -2460,6 +2536,8 @@
             } else {
                 renderCartFloating();
             }
+
+            actualizarBloqueoSoporte();
         }
 
         function openModal(id) { document.getElementById(id).classList.add('show'); }
@@ -3885,6 +3963,7 @@ function goxionBetaLegacy(data) {
 
                 localStorage.setItem(TOKEN_KEY, login.session_token);
                 localStorage.setItem("goxion_user_key", login.cliente.clave);
+                actualizarBloqueoSoporte();
 
                 const dr = await fetch(MI_BETA, {
                     method:"POST",
@@ -3918,6 +3997,7 @@ function goxionBetaLegacy(data) {
         cerrarSesion = function() {
             localStorage.removeItem(TOKEN_KEY);
             localStorage.removeItem("goxion_user_key");
+            actualizarBloqueoSoporte();
             cerrarSesionOriginal();
         };
 
