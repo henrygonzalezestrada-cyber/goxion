@@ -399,7 +399,11 @@ function goxionBetaLegacy(data) {
 
                 const fd = init.body;
                 fd.set("categoria", "pagos");
-                return nativeFetch(NOTIFY_BETA, {method:"POST", body:fd});
+                return nativeFetch(NOTIFY_BETA, {
+                    method:"POST",
+                    headers:{"X-Client-Token":token},
+                    body:fd
+                });
             }
 
             let payload = {};
