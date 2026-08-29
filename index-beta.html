@@ -508,13 +508,35 @@ function goxionBetaLegacy(data) {
       const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
       
       const diaPago = cliente.dia_pago || 15;
-      const difDias = diaPago - diaHoy; 
-      
+      const difDias = diaPago - diaHoy;
+
+      // Estado mensual real: un pago solo cubre el periodo al que pertenece.
+      const pagosCliente = Array.isArray(cliente.historial_pagos) ? cliente.historial_pagos : [];
+      const pagoPeriodoActual = pagosCliente.find(p => {
+          const periodo = String(p.periodo || p.fecha || "").trim().toLowerCase();
+          const estadoPago = String(p.estado || "pagado").trim().toLowerCase();
+          return periodo === periodoStr.toLowerCase() && estadoPago === "pagado";
+      });
+
+      const tieneHistorialConPeriodo = pagosCliente.some(
+          p => String(p.periodo || p.fecha || "").trim() !== ""
+      );
+
+      let estaPagadoPeriodo = Boolean(
+          pagoPeriodoActual ||
+          (!tieneHistorialConPeriodo && cliente.estado === "pagado")
+      );
+
+      // El cambio manual desde Admin Beta manda sobre el periodo activo.
+      if (cliente.estado === "pendiente" || cliente.estado === "suspendido") {
+          estaPagadoPeriodo = false;
+      }
+
       let rachaOriginal = cliente.pagos_puntuales || 0;
       let racha = rachaOriginal;
       let perdioRacha = false;
 
-      if (cliente.estado !== 'pagado' && difDias < 0 && rachaOriginal > 0) {
+      if (!estaPagadoPeriodo && difDias < 0 && rachaOriginal > 0) {
           racha = 0;
           perdioRacha = true;
       }
@@ -546,9 +568,11 @@ function goxionBetaLegacy(data) {
       let mensajeAtrasoHTML = "";
 
       const isReviewLocal = localStorage.getItem(`revision_pago_${clienteKey}`) === periodoStr;
-      const enRevision = cliente.pago_en_revision === true || isReviewLocal;
+      const enRevision = cliente.pago_en_revision === true || (
+          isReviewLocal && cliente.estado !== "pendiente" && cliente.estado !== "suspendido"
+      );
 
-      if (cliente.estado === 'pagado') {
+      if (estaPagadoPeriodo) {
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
           uiColor = "var(--success-neon)";
@@ -612,7 +636,7 @@ function goxionBetaLegacy(data) {
           : `Progreso: <span class="loyalty-highlight" style="color:var(--text-main);">${racha}/4 pagos</span>. Faltan ${faltantes} pago(s) para subir a Nivel 1.`;
       }
 
-      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido') ? Math.round(subtotal * pctDescuento) : 0;
+      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido' && !estaPagadoPeriodo) ? Math.round(subtotal * pctDescuento) : 0;
       
       let totalDescuentosEspeciales = 0;
       let desgloseDescuentosHTML = '';
@@ -650,7 +674,7 @@ function goxionBetaLegacy(data) {
       
       let btnAccionHTML = "";
       
-      if (cliente.estado === 'pagado') {
+      if (estaPagadoPeriodo) {
           totalFinal = 0;
           labelTotal = "Saldo Pendiente";
       } else if (enRevision) {
@@ -671,7 +695,7 @@ function goxionBetaLegacy(data) {
       }
 
       let breakdownHTML = '';
-      if (cliente.estado !== 'pagado' && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+      if (!estaPagadoPeriodo && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
             <div class="glass-card breakdown-box">
               <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
