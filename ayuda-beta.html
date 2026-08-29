@@ -3296,7 +3296,9 @@
                 }
 
                 let limiteTotal = (srv.cuentas || 0) * (srv.limite || 1);
-                let disponibles = limiteTotal - (ocupados[srv.nombre] || 0);
+                let disponibles = (srv.disponibles_servidor !== undefined && srv.disponibles_servidor !== null)
+                    ? Number(srv.disponibles_servidor)
+                    : (limiteTotal - (ocupados[srv.nombre] || 0));
                 
                 window.catalogGroups[brandKey].plans.push({
                     ...srv,
@@ -3703,6 +3705,7 @@
         const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion-beta";
         const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta";
         const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion-beta";
+        const INVENTARIO_PUBLICO_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico-beta";
         const TOKEN_KEY = "goxion_client_token";
 
         
@@ -3765,6 +3768,43 @@ function goxionBetaLegacy(data) {
             return { text:t, json:j };
         }
 
+        async function aplicarInventarioPublico(legacy) {
+            try {
+                const r = await fetch(INVENTARIO_PUBLICO_BETA, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: "{}"
+                });
+
+                const { text, json } = await parseJSON(r);
+                if (!r.ok || json?.ok !== true) {
+                    throw new Error(json?.error || text || "Inventario no disponible");
+                }
+
+                const porId = new Map((json.inventario || []).map(x => [String(x.id), x]));
+                const porNombre = new Map((json.inventario || []).map(x => [String(x.nombre).toLowerCase(), x]));
+
+                const catalogo = legacy?._goxion_config?.serviciosGlobales;
+                if (Array.isArray(catalogo)) {
+                    catalogo.forEach(s => {
+                        const info =
+                            porId.get(String(s.id || s._id || "")) ||
+                            porNombre.get(String(s.nombre || "").toLowerCase());
+
+                        if (info) {
+                            s.disponibles_servidor = Number(info.disponibles || 0);
+                            s.modo_inventario = info.modo || "automatico";
+                        }
+                    });
+                }
+
+                return legacy;
+            } catch (e) {
+                console.error("Inventario público beta:", e);
+                return legacy;
+            }
+        }
+
         async function cargarPublicoOCliente() {
             const token = localStorage.getItem(TOKEN_KEY) || "";
 
@@ -3776,7 +3816,7 @@ function goxionBetaLegacy(data) {
                         body:JSON.stringify({})
                     });
                     const {json} = await parseJSON(r);
-                    if (r.ok && json?.ok === true) return goxionBetaLegacy(json);
+                    if (r.ok && json?.ok === true) return await aplicarInventarioPublico(goxionBetaLegacy(json));
                     if (r.status === 401) {
                         localStorage.removeItem(TOKEN_KEY);
                         localStorage.removeItem("goxion_user_key");
@@ -3793,7 +3833,7 @@ function goxionBetaLegacy(data) {
             });
             const {text,json} = await parseJSON(r);
             if (!r.ok || json?.ok !== true) throw new Error(json?.error || text || "No fue posible cargar el catálogo beta.");
-            return goxionBetaLegacy(json);
+            return await aplicarInventarioPublico(goxionBetaLegacy(json));
         }
 
         cargarDatosYVerificarSesion = async function() {
@@ -3854,7 +3894,7 @@ function goxionBetaLegacy(data) {
                 const {text:dt,json:data} = await parseJSON(dr);
                 if (!dr.ok || data?.ok !== true) throw new Error(data?.error || dt || "No fue posible abrir Mi Espacio.");
 
-                globalClientesData = goxionBetaLegacy(data);
+                globalClientesData = await aplicarInventarioPublico(goxionBetaLegacy(data));
                 cargarCatalogo(globalClientesData);
                 renderizarSoporteDinamico(globalClientesData);
 
