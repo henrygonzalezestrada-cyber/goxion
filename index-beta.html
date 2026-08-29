@@ -236,7 +236,84 @@
     }
     .btn-submit-payment:hover { box-shadow: 0 0 30px rgba(46, 160, 67, 0.6); transform: translateY(-2px); }
     .btn-submit-payment:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  </style>
+  
+    /* --- GOXION LOADER / PRUEBA VISUAL --- */
+    .goxion-loader {
+        --loader-cyan: #00f2fe;
+        --loader-purple: #7c4dff;
+        --loader-size: 1px;
+        position: relative;
+        display: inline-block;
+        width: calc(48 * var(--loader-size));
+        height: calc(48 * var(--loader-size));
+        border-radius: 50%;
+        color: var(--loader-cyan);
+        transform: rotateZ(45deg);
+        perspective: calc(1000 * var(--loader-size));
+        filter:
+            drop-shadow(0 0 7px rgba(0, 242, 254, 0.58))
+            drop-shadow(0 0 13px rgba(124, 77, 255, 0.38));
+    }
+
+    .goxion-loader::before,
+    .goxion-loader::after {
+        content: '';
+        display: block;
+        position: absolute;
+        inset: 0;
+        width: inherit;
+        height: inherit;
+        border-radius: 50%;
+        transform: rotateX(70deg);
+        animation: goxionLoaderSpin 1s linear infinite;
+    }
+
+    .goxion-loader::after {
+        color: var(--loader-purple);
+        transform: rotateY(70deg);
+        animation-delay: .4s;
+    }
+
+    .goxion-loader-wrap {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        text-align: center;
+    }
+
+    .goxion-loader-text {
+        color: var(--text-muted, #95a4bd);
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: .35px;
+    }
+
+    .goxion-loader.small {
+        --loader-size: .72px;
+    }
+
+    @keyframes goxionLoaderSpin {
+        0%, 100% { box-shadow: .2em 0 0 0 currentColor; }
+        12% { box-shadow: .2em .2em 0 0 currentColor; }
+        25% { box-shadow: 0 .2em 0 0 currentColor; }
+        37% { box-shadow: -.2em .2em 0 0 currentColor; }
+        50% { box-shadow: -.2em 0 0 0 currentColor; }
+        62% { box-shadow: -.2em -.2em 0 0 currentColor; }
+        75% { box-shadow: 0 -.2em 0 0 currentColor; }
+        87% { box-shadow: .2em -.2em 0 0 currentColor; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .goxion-loader::before,
+        .goxion-loader::after {
+            animation-duration: 2s;
+        }
+    }
+
+</style>
 </head>
 <body>
 
@@ -248,7 +325,12 @@
 </div>
 
 <div class="container" id="app">
-  <div class="loading">Sincronizando con Goxion...</div>
+  <div class="loading">
+    <div class="goxion-loader-wrap">
+        <span class="goxion-loader" aria-hidden="true"></span>
+        <span class="goxion-loader-text">Sincronizando con GOXION...</span>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast">📋 ¡Datos copiados al portapapeles!</div>
@@ -282,8 +364,8 @@
 
 <script id="goxion-beta-index-prelude">
 (() => {
-    const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta";
-    const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion-beta";
+    const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
+    const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
     const TOKEN_KEY = "goxion_client_token";
     const nativeFetch = window.fetch.bind(window);
 
@@ -383,7 +465,7 @@ function goxionBetaLegacy(data) {
             });
         }
 
-        if (url === "goxion-beta://pagos") {
+        if (url === "goxion://pagos") {
             const token = localStorage.getItem(TOKEN_KEY) || "";
 
             if (init?.body instanceof FormData) {
@@ -414,7 +496,7 @@ function goxionBetaLegacy(data) {
                 headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({
                     categoria:"pagos",
-                    titulo:emb.title || "GOXION Beta",
+                    titulo:emb.title || "GOXION",
                     mensaje:emb.description || "",
                     colorHex:Number(emb.color || 65437).toString(16)
                 })
@@ -434,15 +516,15 @@ function goxionBetaLegacy(data) {
                     <div class="glass-card" style="margin-top:40px;text-align:center;">
                         <div style="font-size:38px;margin-bottom:10px;">🔐</div>
                         <div style="font-weight:800;margin-bottom:8px;">Inicia sesión primero</div>
-                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:18px;">Este Estado de Cuenta Beta ahora está protegido por tu sesión de GOXION.</div>
-                        <a class="btn btn-copy" href="ayuda-beta.html">Ir a Mi Espacio Beta</a>
+                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:18px;">Este Estado de Cuenta está protegido por tu sesión de GOXION.</div>
+                        <a class="btn btn-copy" href="ayuda.html">Ir a Mi Espacio</a>
                     </div>`;
                 }
             }, 700);
         }
     });
 
-    console.info("GOXION index-beta protegido por sesión Supabase Beta.");
+    console.info("GOXION index protegido por sesión Supabase.");
 })();
 </script>
 
@@ -454,7 +536,7 @@ function goxionBetaLegacy(data) {
   const TITULAR_PAGO = "Henry González";
   
   // WEBHOOK DE DISCORD AÑADIDO Y ACTUALIZADO
-  const WEBHOOK_DISCORD = "goxion-beta://pagos"; 
+  const WEBHOOK_DISCORD = "goxion://pagos"; 
 
   function notificarAdminDiscord(titulo, mensaje, colorHex) {
       if(!WEBHOOK_DISCORD) return;
@@ -539,7 +621,7 @@ function goxionBetaLegacy(data) {
           (!tieneHistorialConPeriodo && cliente.estado === "pagado")
       );
 
-      // El cambio manual desde Admin Beta manda sobre el periodo activo.
+      // El cambio manual desde Admin manda sobre el periodo activo.
       if (cliente.estado === "pendiente" || cliente.estado === "suspendido") {
           estaPagadoPeriodo = false;
       }
