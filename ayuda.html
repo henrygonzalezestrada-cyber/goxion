@@ -3402,7 +3402,7 @@
         }
 
         function iniciarSaludoDinamico(nombreCompleto) {
-            const primerNombre = nombreCompleto.split(' ')[0];
+            const primerNombre = String(nombreCompleto || "Cliente").trim().split(/\s+/)[0] || "Cliente";
             const frases = [
                 `¡Hola, <span>${primerNombre}</span>! 👋`, 
                 `¡Qué gusto verte, <span>${primerNombre}</span>! ✨`, 
@@ -3791,9 +3791,15 @@
 
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
-            const primerNombre = cliente.nombre.split(' ')[0];
+
+            if(!cliente) {
+                console.error("GOXION: No se encontró el cliente para renderizar el dashboard.", key);
+                return;
+            }
+            const primerNombre = String(cliente.nombre || "Cliente").trim().split(/\s+/)[0] || "Cliente";
             
-            document.getElementById('dash-name').innerText = primerNombre; 
+            const dashName = document.getElementById('dash-name');
+            if(dashName) dashName.innerText = primerNombre;
             
             const stickyName = document.getElementById('sticky-client-name');
             if (stickyName) stickyName.innerText = primerNombre;
