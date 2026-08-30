@@ -1836,19 +1836,18 @@
         .mission-item.locked .mission-checkbox { border-color: var(--warning-amber); background: rgba(255, 170, 0, 0.1); font-size: 10px; }
     
         /* =========================================================
-           GOXION MOTION SYSTEM V3
-           Solo movimiento y estados. No altera el diseño oficial.
+           GOXION ORBITAL MORPH / TEST
+           Navegación morphing premium optimizada para móvil.
            ========================================================= */
 
         :root {
-            --gx-motion-fast: 150ms;
-            --gx-motion-base: 230ms;
-            --gx-motion-slow: 330ms;
-            --gx-ease: cubic-bezier(.22,.8,.24,1);
-            --gx-spring: cubic-bezier(.2,1.18,.32,1);
+            --gx-morph-duration: 560ms;
+            --gx-morph-ease: cubic-bezier(.16, 1, .3, 1);
+            --gx-touch-ease: cubic-bezier(.22,.8,.24,1);
+            --gx-spring: cubic-bezier(.2,1.16,.32,1);
         }
 
-        /* Respuesta táctil */
+        /* ---------- RESPUESTA TÁCTIL LIGERA ---------- */
         button,
         .tab-btn,
         .teaser-card,
@@ -1862,154 +1861,193 @@
         }
 
         .gx-press {
-            transform: scale(.965) !important;
-            transition: transform var(--gx-motion-fast) var(--gx-ease) !important;
+            transform: scale(.968) !important;
+            transition: transform 145ms var(--gx-touch-ease) !important;
         }
 
         .brand-card.gx-press,
         .teaser-card.gx-press {
-            transform: scale(.985) !important;
+            transform: scale(.988) !important;
         }
 
-        /* Navegación: mantiene el recuadro oficial; agrega un trazo viajero */
-        .tab-container {
-            overflow: hidden;
+        /* =========================================================
+           MORPH DEL MENÚ
+           Un único elemento físico se comprime, viaja y se expande.
+           ========================================================= */
+
+        .tab-container.gx-morph-ready {
             isolation: isolate;
+            overflow: hidden;
         }
 
-        .gx-tab-traveler {
+        /* El indicador original se sustituye visualmente por el mismo
+           estilo, pero ahora es una sola "materia" compartida. */
+        .tab-container.gx-morph-ready .tab-btn.active {
+            background: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+        }
+
+        .tab-container.gx-morph-ready .tab-btn {
+            position: relative;
+            z-index: 3;
+        }
+
+        .gx-morph-indicator {
             position: absolute;
-            top: 4px;
-            bottom: 4px;
-            left: 4px;
-            width: 0;
-            border-radius: 12px;
-            border: 1px solid rgba(0,242,254,.88);
-            box-shadow:
-                0 0 14px rgba(0,242,254,.24),
-                0 0 24px rgba(124,77,255,.10);
-            pointer-events: none;
-            opacity: 0;
-            z-index: 0;
-            transition:
-                left 300ms var(--gx-ease),
-                width 300ms var(--gx-ease),
-                opacity 170ms ease;
-        }
-
-        .gx-tab-traveler.show {
-            opacity: 1;
-        }
-
-        .tab-btn {
             z-index: 1;
+            pointer-events: none;
+            box-sizing: border-box;
+            border-radius: 12px;
+            background:
+                linear-gradient(135deg,
+                    rgba(255,255,255,.075),
+                    rgba(0,242,254,.035) 55%,
+                    rgba(124,77,255,.035));
+            border: 1px solid var(--neon-blue);
+            box-shadow:
+                0 4px 15px rgba(0,242,254,.25),
+                inset 0 0 18px rgba(124,77,255,.025);
+            transform-origin: center;
+            will-change: transform, opacity, border-radius;
+            contain: paint;
         }
 
+        .gx-morph-indicator::before {
+            content: "";
+            position: absolute;
+            inset: 16%;
+            border-radius: inherit;
+            opacity: 0;
+            background:
+                radial-gradient(circle at center,
+                    rgba(255,255,255,.22) 0%,
+                    rgba(0,242,254,.13) 28%,
+                    rgba(124,77,255,.08) 48%,
+                    transparent 72%);
+            pointer-events: none;
+            transition: opacity 120ms ease;
+        }
+
+        .gx-morph-indicator.gx-travelling::before {
+            opacity: .95;
+        }
+
+        /* Estela detrás de la forma. Nunca queda encima del texto. */
+        .gx-morph-trail {
+            position: absolute;
+            z-index: 0;
+            pointer-events: none;
+            height: 28px;
+            border-radius: 999px;
+            opacity: 0;
+            transform-origin: left center;
+            will-change: transform, opacity;
+            contain: paint;
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(124,77,255,.045) 18%,
+                    rgba(0,242,254,.16) 58%,
+                    rgba(124,77,255,.11) 76%,
+                    transparent 100%);
+        }
+
+        /* Icono: el crecimiento sí forma parte de la transformación. */
         .tab-btn > span {
             display: inline-block;
+            position: relative;
+            z-index: 4;
+            transform-origin: center;
             transition:
-                transform 280ms var(--gx-spring),
-                filter 220ms ease;
+                transform 260ms var(--gx-spring),
+                text-shadow 220ms ease;
         }
 
         .tab-btn.active > span {
-            transform: scale(1.22);
-            filter:
-                drop-shadow(0 0 6px rgba(0,242,254,.42))
-                drop-shadow(0 0 9px rgba(124,77,255,.20));
+            transform: translateY(-1px) scale(1.20);
+            text-shadow:
+                0 0 8px rgba(0,242,254,.28),
+                0 0 12px rgba(124,77,255,.12);
         }
 
         .tab-btn.active {
             font-weight: 800 !important;
         }
 
-        .tab-btn.active div,
-        .tab-btn.active {
-            letter-spacing: .05px;
-        }
-
-        /* Entrada del contenido: rápida y limpia, sin deformar tarjetas */
+        /* ---------- TRANSICIÓN DEL CONTENIDO ---------- */
         .gx-view-enter-right {
-            animation: gxViewRight 260ms var(--gx-ease) both !important;
+            animation: gxViewEnterRight 225ms var(--gx-touch-ease) both !important;
         }
 
         .gx-view-enter-left {
-            animation: gxViewLeft 260ms var(--gx-ease) both !important;
+            animation: gxViewEnterLeft 225ms var(--gx-touch-ease) both !important;
         }
 
         .gx-view-enter-soft {
-            animation: gxViewSoft 220ms var(--gx-ease) both !important;
+            animation: gxViewEnterSoft 205ms var(--gx-touch-ease) both !important;
         }
 
-        @keyframes gxViewRight {
-            from { opacity: .35; transform: translate3d(14px, 3px, 0); }
-            to   { opacity: 1; transform: translate3d(0, 0, 0); }
+        @keyframes gxViewEnterRight {
+            from { opacity: .38; transform: translate3d(9px,2px,0); }
+            to   { opacity: 1; transform: translate3d(0,0,0); }
         }
 
-        @keyframes gxViewLeft {
-            from { opacity: .35; transform: translate3d(-14px, 3px, 0); }
-            to   { opacity: 1; transform: translate3d(0, 0, 0); }
+        @keyframes gxViewEnterLeft {
+            from { opacity: .38; transform: translate3d(-9px,2px,0); }
+            to   { opacity: 1; transform: translate3d(0,0,0); }
         }
 
-        @keyframes gxViewSoft {
-            from { opacity: .48; transform: translateY(5px); }
-            to   { opacity: 1; transform: translateY(0); }
+        @keyframes gxViewEnterSoft {
+            from { opacity: .55; transform: translate3d(0,4px,0); }
+            to   { opacity: 1; transform: translate3d(0,0,0); }
         }
 
-        /* Entrada secundaria muy sutil */
-        .gx-reveal-item {
-            animation: gxRevealItem 260ms var(--gx-ease) both;
-            animation-delay: calc(var(--gx-order, 0) * 22ms);
-        }
-
-        @keyframes gxRevealItem {
-            from { opacity: .72; transform: translateY(5px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        /* FAQ y despliegues */
+        /* ---------- ACORDEONES / EXPANSIONES ---------- */
         .faq-header .icon,
         .brand-expand-icon {
             transition:
                 transform 280ms var(--gx-spring),
-                background var(--gx-motion-base) ease,
-                color var(--gx-motion-base) ease,
-                box-shadow var(--gx-motion-base) ease;
+                background 220ms ease,
+                color 220ms ease,
+                box-shadow 220ms ease;
         }
 
         .brand-card.expanded .brand-expand-icon {
             transform: rotate(180deg) scale(1.03);
         }
 
-        /* Modales / hoja de login */
+        /* ---------- SHEETS Y MODALES ---------- */
         .auth-overlay.show .auth-sheet {
-            animation: gxSheetIn 340ms var(--gx-spring) both;
+            animation: gxSheetIn 300ms var(--gx-spring) both;
         }
 
         .modal.show .modal-content {
-            animation: gxModalIn 300ms var(--gx-spring) both;
+            animation: gxModalIn 275ms var(--gx-spring) both;
         }
 
         @keyframes gxSheetIn {
-            from { opacity: .3; transform: translateY(22px) scale(.985); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: .35; transform: translate3d(0,18px,0) scale(.988); }
+            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); }
         }
 
         @keyframes gxModalIn {
-            from { opacity: .25; transform: translateY(14px) scale(.975); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
+            from { opacity: .3; transform: translate3d(0,11px,0) scale(.982); }
+            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); }
         }
 
-        /* Login: estados visuales del mismo botón */
+        /* =========================================================
+           LOGIN: mismo botón, tres estados
+           ========================================================= */
         #btn-login-submit {
             position: relative;
             overflow: hidden;
             min-height: 52px;
             transition:
-                transform 170ms var(--gx-ease),
-                background 280ms ease,
-                color 240ms ease,
-                box-shadow 280ms ease;
+                transform 170ms var(--gx-touch-ease),
+                background 260ms ease,
+                color 220ms ease,
+                box-shadow 260ms ease;
         }
 
         #btn-login-submit.gx-validating {
@@ -2026,9 +2064,9 @@
             bottom: 0;
             left: -42%;
             width: 34%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,.30), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
             transform: skewX(-18deg);
-            animation: gxLoginSweep 850ms linear infinite;
+            animation: gxLoginSweep 820ms linear infinite;
         }
 
         @keyframes gxLoginSweep {
@@ -2040,20 +2078,20 @@
             color: #03140e !important;
             box-shadow: 0 0 24px rgba(0,255,157,.28) !important;
             pointer-events: none;
-            animation: gxSuccessPop 390ms var(--gx-spring);
-        }
-
-        @keyframes gxSuccessPop {
-            0% { transform: scale(.975); }
-            60% { transform: scale(1.025); }
-            100% { transform: scale(1); }
+            animation: gxSuccessPop 380ms var(--gx-spring);
         }
 
         #btn-login-submit.gx-error {
             background: linear-gradient(135deg, #ff3366, #d81b60) !important;
             color: #fff !important;
             box-shadow: 0 0 22px rgba(255,51,102,.25) !important;
-            animation: gxLoginError 340ms cubic-bezier(.36,.07,.19,.97);
+            animation: gxLoginError 330ms cubic-bezier(.36,.07,.19,.97);
+        }
+
+        @keyframes gxSuccessPop {
+            0% { transform: scale(.976); }
+            60% { transform: scale(1.024); }
+            100% { transform: scale(1); }
         }
 
         @keyframes gxLoginError {
@@ -2063,17 +2101,19 @@
             75% { transform: translateX(-2px); }
         }
 
-        /* Feedback: el botón se transforma en lugar de desaparecer */
+        /* =========================================================
+           FEEDBACK: transformación del mismo botón
+           ========================================================= */
         #btn-send-feedback {
             min-height: 52px;
             position: relative;
             overflow: hidden;
             transition:
-                transform 170ms var(--gx-ease),
-                background 280ms ease,
-                color 240ms ease,
-                box-shadow 280ms ease,
-                border-color 280ms ease;
+                transform 170ms var(--gx-touch-ease),
+                background 260ms ease,
+                color 220ms ease,
+                box-shadow 260ms ease,
+                border-color 260ms ease;
         }
 
         #btn-send-feedback.gx-feedback-sending {
@@ -2087,22 +2127,23 @@
             border: 1px solid rgba(0,255,157,.55) !important;
             color: #baffdf !important;
             box-shadow: 0 0 22px rgba(0,255,157,.16) !important;
-            animation: gxSuccessPop 390ms var(--gx-spring);
+            animation: gxSuccessPop 380ms var(--gx-spring);
         }
 
         #feedback-success.gx-feedback-message {
             display: block !important;
-            animation: gxFeedbackMessage 260ms var(--gx-ease) both;
+            animation: gxFeedbackMessage 250ms var(--gx-touch-ease) both;
         }
 
         @keyframes gxFeedbackMessage {
-            from { opacity: 0; transform: translateY(5px); }
+            from { opacity: 0; transform: translateY(4px); }
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* Respeta accesibilidad del teléfono */
+        /* ---------- ACCESIBILIDAD ---------- */
         @media (prefers-reduced-motion: reduce) {
-            .gx-tab-traveler,
+            .gx-morph-indicator,
+            .gx-morph-trail,
             .tab-btn > span,
             #btn-login-submit,
             #btn-send-feedback,
@@ -2110,8 +2151,7 @@
             .modal.show .modal-content,
             .gx-view-enter-right,
             .gx-view-enter-left,
-            .gx-view-enter-soft,
-            .gx-reveal-item {
+            .gx-view-enter-soft {
                 animation: none !important;
                 transition-duration: .01ms !important;
             }
@@ -3076,7 +3116,7 @@
                 feedbackBtn.classList.add('gx-feedback-success');
                 feedbackBtn.innerHTML = '✓ Comentario enviado';
                 feedbackSuccess.classList.add('gx-feedback-message');
-            }, 170);
+            }, 160);
             
             if(activeFeedbackMissionIdx !== null) {
                 toggleMission(activeFeedbackMissionIdx, 'btn-claim-coupon', activeFeedbackFolio);
@@ -4252,7 +4292,7 @@ function goxionBetaLegacy(data) {
                 setLoginState("gx-error", "✕ Datos incompletos");
                 errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso.";
                 errorMsg.style.display = "block";
-                setTimeout(() => setLoginState("", "Entrar a mi Panel"), 1100);
+                setTimeout(() => setLoginState("", "Entrar a mi Panel"), 1050);
                 return;
             }
 
@@ -4302,7 +4342,7 @@ function goxionBetaLegacy(data) {
                     switchTab("inicio");
                     loginBtn.disabled = false;
                     setTimeout(() => setLoginState("", "Entrar a mi Panel"), 220);
-                }, 480);
+                }, 470);
 
             } catch (e) {
                 console.error(e);
@@ -4313,7 +4353,7 @@ function goxionBetaLegacy(data) {
 
                 setTimeout(() => {
                     setLoginState("", "Entrar a mi Panel");
-                }, 1350);
+                }, 1300);
             }
         };
 
@@ -4351,129 +4391,383 @@ function goxionBetaLegacy(data) {
     </script>
 
 
-<script id="goxion-motion-v3">
+<script id="goxion-orbital-morph">
 (() => {
-    const order = { inicio: 0, catalogo: 1, soporte: 2 };
+    const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const TAB_ORDER = { inicio: 0, catalogo: 1, soporte: 2 };
+
     let currentTab = "inicio";
+    let morphBusy = false;
+    let queuedTab = null;
+    let pressed = null;
 
-    const pressSelector = [
-        'button',
-        '.tab-btn',
-        '.teaser-card',
-        '.brand-card',
-        '.platform-btn',
-        '.btn-menu',
-        '.header-action-btn'
-    ].join(',');
+    let container = null;
+    let morph = null;
+    let trail = null;
 
-    function bindPress(root = document) {
-        root.querySelectorAll(pressSelector).forEach(el => {
-            if (el.dataset.gxPressBound === "1") return;
-            el.dataset.gxPressBound = "1";
+    const interactiveSelector =
+        'button, .tab-btn, .teaser-card, .brand-card, .platform-btn, .btn-menu, .header-action-btn';
 
-            const down = () => el.classList.add("gx-press");
-            const up = () => el.classList.remove("gx-press");
-
-            el.addEventListener("pointerdown", down, { passive:true });
-            el.addEventListener("pointerup", up, { passive:true });
-            el.addEventListener("pointercancel", up, { passive:true });
-            el.addEventListener("pointerleave", up, { passive:true });
-        });
+    function getButton(tabName) {
+        return document.getElementById(`btn-tab-${tabName}`);
     }
 
-    function ensureTraveler() {
-        const container = document.querySelector(".tab-container");
-        if (!container) return null;
-
-        let traveler = container.querySelector(".gx-tab-traveler");
-        if (!traveler) {
-            traveler = document.createElement("div");
-            traveler.className = "gx-tab-traveler";
-            container.prepend(traveler);
-        }
-        return traveler;
-    }
-
-    function moveTraveler(tabName, animate = true) {
-        const traveler = ensureTraveler();
-        const container = document.querySelector(".tab-container");
-        const btn = document.getElementById(`btn-tab-${tabName}`);
-        if (!traveler || !container || !btn) return;
-
-        const c = container.getBoundingClientRect();
-        const b = btn.getBoundingClientRect();
-
-        if (!animate) traveler.style.transition = "none";
-        traveler.style.left = `${b.left - c.left}px`;
-        traveler.style.width = `${b.width}px`;
-        traveler.classList.add("show");
-
-        if (!animate) {
-            void traveler.offsetWidth;
-            traveler.style.transition = "";
-        }
-
-        clearTimeout(traveler._gxHideTimer);
-        traveler._gxHideTimer = setTimeout(() => traveler.classList.remove("show"), 360);
-    }
-
-    function activeViewFor(tabName) {
+    function getView(tabName) {
         if (tabName === "inicio") {
-            const key = localStorage.getItem("goxion_user_key");
-            return document.getElementById(key ? "view-dashboard" : "view-inicio");
+            return document.getElementById(
+                localStorage.getItem("goxion_user_key") ? "view-dashboard" : "view-inicio"
+            );
         }
         return document.getElementById(`view-${tabName}`);
     }
 
-    function animateView(tabName, previousTab) {
-        const view = activeViewFor(tabName);
+    function ensureMorph() {
+        if (container && morph && trail) return true;
+
+        container = document.querySelector(".tab-container");
+        if (!container) return false;
+
+        container.classList.add("gx-morph-ready");
+
+        morph = document.createElement("div");
+        morph.className = "gx-morph-indicator";
+        morph.setAttribute("aria-hidden", "true");
+
+        trail = document.createElement("div");
+        trail.className = "gx-morph-trail";
+        trail.setAttribute("aria-hidden", "true");
+
+        container.prepend(trail);
+        container.prepend(morph);
+
+        return true;
+    }
+
+    function buttonBox(btn) {
+        const c = container.getBoundingClientRect();
+        const b = btn.getBoundingClientRect();
+
+        return {
+            left: b.left - c.left,
+            top: b.top - c.top,
+            width: b.width,
+            height: b.height,
+            centerX: (b.left - c.left) + b.width / 2,
+            centerY: (b.top - c.top) + b.height / 2
+        };
+    }
+
+    function snapMorphTo(tabName) {
+        if (!ensureMorph()) return;
+
+        const btn = getButton(tabName);
+        if (!btn) return;
+
+        const box = buttonBox(btn);
+        morph.getAnimations().forEach(a => a.cancel());
+        trail.getAnimations().forEach(a => a.cancel());
+
+        Object.assign(morph.style, {
+            left: `${box.left}px`,
+            top: `${box.top}px`,
+            width: `${box.width}px`,
+            height: `${box.height}px`,
+            transform: "translate3d(0,0,0) scale(1,1)",
+            borderRadius: "12px",
+            opacity: "1"
+        });
+
+        trail.style.opacity = "0";
+    }
+
+    function animateNewView(tabName, previousTab) {
+        const view = getView(tabName);
         if (!view) return;
 
         view.classList.remove("gx-view-enter-right", "gx-view-enter-left", "gx-view-enter-soft");
         void view.offsetWidth;
 
-        const a = order[previousTab] ?? 0;
-        const b = order[tabName] ?? 0;
-        const cls = b > a ? "gx-view-enter-right" : b < a ? "gx-view-enter-left" : "gx-view-enter-soft";
+        const from = TAB_ORDER[previousTab] ?? 0;
+        const to = TAB_ORDER[tabName] ?? 0;
+
+        const cls =
+            to > from ? "gx-view-enter-right" :
+            to < from ? "gx-view-enter-left" :
+            "gx-view-enter-soft";
+
         view.classList.add(cls);
-
-        const items = view.querySelectorAll(
-            '.section-title, .glass-card, .teaser-card, .brand-card, .smart-support-card, .faq-item'
-        );
-
-        items.forEach((el, index) => {
-            el.classList.remove("gx-reveal-item");
-            el.style.setProperty("--gx-order", Math.min(index, 8));
-            void el.offsetWidth;
-            el.classList.add("gx-reveal-item");
-        });
+        view.style.willChange = "transform, opacity";
 
         setTimeout(() => {
-            view.classList.remove("gx-view-enter-right", "gx-view-enter-left", "gx-view-enter-soft");
-            items.forEach(el => el.classList.remove("gx-reveal-item"));
-        }, 560);
+            view.classList.remove(cls);
+            view.style.willChange = "";
+        }, 260);
+    }
+
+    function animateIcon(sourceBtn, targetBtn) {
+        const sourceIcon = sourceBtn?.querySelector("span");
+        const targetIcon = targetBtn?.querySelector("span");
+
+        if (sourceIcon?.animate) {
+            sourceIcon.animate([
+                { transform: "translateY(-1px) scale(1.20)", offset: 0 },
+                { transform: "translateY(-2px) scale(1.34)", offset: .42 },
+                { transform: "translateY(0) scale(1.00)", offset: 1 }
+            ], {
+                duration: 250,
+                easing: "cubic-bezier(.16,1,.3,1)",
+                fill: "none"
+            });
+        }
+
+        if (targetIcon?.animate) {
+            targetIcon.animate([
+                { transform: "scale(.94)", offset: 0 },
+                { transform: "translateY(-2px) scale(1.38)", offset: .62 },
+                { transform: "translateY(-1px) scale(1.20)", offset: 1 }
+            ], {
+                duration: 360,
+                delay: 205,
+                easing: "cubic-bezier(.16,1,.3,1)",
+                fill: "none"
+            });
+        }
+    }
+
+    function animateTrail(fromBox, toBox) {
+        const start = fromBox.centerX;
+        const end = toBox.centerX;
+        const left = Math.min(start, end);
+        const distance = Math.max(12, Math.abs(end - start));
+
+        Object.assign(trail.style, {
+            left: `${left}px`,
+            top: `${fromBox.centerY - 14}px`,
+            width: `${distance}px`,
+            height: "28px",
+            opacity: "0"
+        });
+
+        const directionRight = end >= start;
+        trail.style.transformOrigin = directionRight ? "left center" : "right center";
+
+        if (!trail.animate) return;
+
+        trail.animate([
+            { opacity: 0, transform: "scaleX(.06)", offset: 0 },
+            { opacity: .58, transform: "scaleX(.38)", offset: .24 },
+            { opacity: .46, transform: "scaleX(.88)", offset: .62 },
+            { opacity: 0, transform: "scaleX(1)", offset: 1 }
+        ], {
+            duration: 455,
+            delay: 70,
+            easing: "cubic-bezier(.16,1,.3,1)",
+            fill: "none"
+        });
+    }
+
+    function performMorph(tabName, originalSwitchTab) {
+        if (!ensureMorph()) {
+            originalSwitchTab(tabName);
+            currentTab = tabName;
+            return;
+        }
+
+        const sourceBtn = getButton(currentTab);
+        const targetBtn = getButton(tabName);
+
+        if (!sourceBtn || !targetBtn || currentTab === tabName) {
+            originalSwitchTab(tabName);
+            currentTab = tabName;
+            snapMorphTo(tabName);
+
+            const icon = targetBtn?.querySelector("span");
+            if (icon?.animate && !REDUCED.matches) {
+                icon.animate([
+                    { transform: "translateY(-1px) scale(1.20)" },
+                    { transform: "translateY(-2px) scale(1.34)" },
+                    { transform: "translateY(-1px) scale(1.20)" }
+                ], {
+                    duration: 330,
+                    easing: "cubic-bezier(.16,1,.3,1)"
+                });
+            }
+            return;
+        }
+
+        if (REDUCED.matches || !morph.animate) {
+            originalSwitchTab(tabName);
+            currentTab = tabName;
+            snapMorphTo(tabName);
+            return;
+        }
+
+        if (morphBusy) {
+            queuedTab = tabName;
+            return;
+        }
+
+        morphBusy = true;
+
+        const previousTab = currentTab;
+        const fromBox = buttonBox(sourceBtn);
+        const toBox = buttonBox(targetBtn);
+        const dx = toBox.centerX - fromBox.centerX;
+        const dy = toBox.centerY - fromBox.centerY;
+
+        snapMorphTo(previousTab);
+
+        const compactSize = Math.min(38, fromBox.height * .56);
+        const compactX = Math.max(.24, compactSize / fromBox.width);
+        const compactY = Math.max(.34, compactSize / fromBox.height);
+        const capsuleX = Math.min(.78, compactX * 1.65);
+        const capsuleY = Math.max(.26, compactY * .72);
+
+        morph.classList.add("gx-travelling");
+        morph.style.willChange = "transform, border-radius, opacity";
+
+        animateTrail(fromBox, toBox);
+        animateIcon(sourceBtn, targetBtn);
+
+        /* La vista vieja comienza a ceder mientras la materia se comprime. */
+        const oldView = getView(previousTab);
+        if (oldView?.animate) {
+            const dir = dx >= 0 ? -1 : 1;
+            oldView.animate([
+                { opacity: 1, transform: "translate3d(0,0,0)" },
+                { opacity: .58, transform: `translate3d(${dir * 6}px,0,0)` }
+            ], {
+                duration: 155,
+                delay: 105,
+                easing: "cubic-bezier(.22,.8,.24,1)",
+                fill: "none"
+            });
+        }
+
+        /* El cambio real de contenido ocurre durante el trayecto,
+           no al final, para que la interfaz siga sintiéndose rápida. */
+        const switchDelay = 220;
+        const switchTimer = setTimeout(() => {
+            originalSwitchTab(tabName);
+            currentTab = tabName;
+            requestAnimationFrame(() => animateNewView(tabName, previousTab));
+        }, switchDelay);
+
+        const animation = morph.animate([
+            {
+                transform: "translate3d(0,0,0) scale(1,1)",
+                borderRadius: "12px",
+                opacity: 1,
+                offset: 0,
+                easing: "cubic-bezier(.2,.7,.2,1)"
+            },
+            {
+                transform: `translate3d(0,0,0) scale(${compactX},${compactY})`,
+                borderRadius: "999px",
+                opacity: 1,
+                offset: .20,
+                easing: "cubic-bezier(.16,1,.3,1)"
+            },
+            {
+                transform: `translate3d(${dx * .20}px,${dy * .20}px,0) scale(${capsuleX},${capsuleY})`,
+                borderRadius: "999px",
+                opacity: .98,
+                offset: .36,
+                easing: "cubic-bezier(.22,.8,.24,1)"
+            },
+            {
+                transform: `translate3d(${dx * .68}px,${dy * .68}px,0) scale(${Math.min(.84, capsuleX * 1.10)},${Math.max(.24, capsuleY * .92)})`,
+                borderRadius: "999px",
+                opacity: .96,
+                offset: .60,
+                easing: "cubic-bezier(.22,.8,.24,1)"
+            },
+            {
+                transform: `translate3d(${dx}px,${dy}px,0) scale(${compactX},${compactY})`,
+                borderRadius: "999px",
+                opacity: 1,
+                offset: .79,
+                easing: "cubic-bezier(.16,1,.3,1)"
+            },
+            {
+                transform: `translate3d(${dx}px,${dy}px,0) scale(1,1)`,
+                borderRadius: "12px",
+                opacity: 1,
+                offset: 1
+            }
+        ], {
+            duration: 560,
+            easing: "linear",
+            fill: "forwards"
+        });
+
+        animation.onfinish = () => {
+            clearTimeout(switchTimer);
+
+            /* Por seguridad, si el timer no corrió por alguna razón. */
+            if (currentTab !== tabName) {
+                originalSwitchTab(tabName);
+                currentTab = tabName;
+                animateNewView(tabName, previousTab);
+            }
+
+            morph.classList.remove("gx-travelling");
+            morph.style.willChange = "";
+            snapMorphTo(tabName);
+            morphBusy = false;
+
+            if (queuedTab && queuedTab !== currentTab) {
+                const next = queuedTab;
+                queuedTab = null;
+                requestAnimationFrame(() => performMorph(next, originalSwitchTab));
+            } else {
+                queuedTab = null;
+            }
+        };
+
+        animation.oncancel = () => {
+            clearTimeout(switchTimer);
+            morph.classList.remove("gx-travelling");
+            morph.style.willChange = "";
+            morphBusy = false;
+        };
     }
 
     const originalSwitchTab = window.switchTab;
     if (typeof originalSwitchTab === "function") {
         window.switchTab = function(tabName) {
-            const previous = currentTab;
-            originalSwitchTab(tabName);
-            moveTraveler(tabName, true);
-            requestAnimationFrame(() => requestAnimationFrame(() => animateView(tabName, previous)));
-            currentTab = tabName;
-            bindPress(document);
+            performMorph(tabName, originalSwitchTab);
         };
     }
 
-    const observer = new MutationObserver(() => bindPress(document));
-    observer.observe(document.body, { childList:true, subtree:true });
+    /* Respuesta táctil mediante delegación: un solo listener. */
+    document.addEventListener("pointerdown", (event) => {
+        const el = event.target.closest(interactiveSelector);
+        if (!el) return;
+        pressed = el;
+        el.classList.add("gx-press");
+    }, { passive:true });
 
-    window.addEventListener("resize", () => moveTraveler(currentTab, false));
+    const releasePress = () => {
+        if (!pressed) return;
+        pressed.classList.remove("gx-press");
+        pressed = null;
+    };
+
+    document.addEventListener("pointerup", releasePress, { passive:true });
+    document.addEventListener("pointercancel", releasePress, { passive:true });
+
+    let resizeFrame = null;
+    window.addEventListener("resize", () => {
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(() => {
+            if (!morphBusy) snapMorphTo(currentTab);
+        });
+    }, { passive:true });
 
     document.addEventListener("DOMContentLoaded", () => {
-        bindPress(document);
-        setTimeout(() => moveTraveler("inicio", false), 80);
+        if (!ensureMorph()) return;
+        requestAnimationFrame(() => snapMorphTo("inicio"));
     });
 })();
 </script>
