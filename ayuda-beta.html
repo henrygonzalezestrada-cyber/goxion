@@ -1836,390 +1836,285 @@
         .mission-item.locked .mission-checkbox { border-color: var(--warning-amber); background: rgba(255, 170, 0, 0.1); font-size: 10px; }
     
         /* =========================================================
-           GOXION MOTION SYSTEM / MOBILE EXPERIENCE TEST
+           GOXION MOTION SYSTEM V3
+           Solo movimiento y estados. No altera el diseño oficial.
            ========================================================= */
+
         :root {
-            --motion-fast: 160ms;
-            --motion-base: 240ms;
-            --motion-slow: 360ms;
-            --motion-ease: cubic-bezier(.22,.8,.24,1);
-            --motion-spring: cubic-bezier(.2,1.25,.35,1);
+            --gx-motion-fast: 150ms;
+            --gx-motion-base: 230ms;
+            --gx-motion-slow: 330ms;
+            --gx-ease: cubic-bezier(.22,.8,.24,1);
+            --gx-spring: cubic-bezier(.2,1.18,.32,1);
         }
 
-        button, .btn-primary, .btn-shimmer, .tab-btn, .teaser-card,
-        .btn-menu, .brand-card, .faq-header, .link-discreto {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        button, .btn-primary, .btn-shimmer, .teaser-card, .btn-menu,
-        .brand-card, .link-discreto {
-            transform: translateZ(0);
-            transition:
-                transform var(--motion-fast) var(--motion-ease),
-                box-shadow var(--motion-base) ease,
-                border-color var(--motion-base) ease,
-                background var(--motion-base) ease,
-                opacity var(--motion-base) ease;
-            will-change: transform;
-        }
-
-        .goxion-press { transform: scale(.965) !important; }
-
-        .goxion-action-success {
-            animation: goxionActionSuccess 520ms var(--motion-spring);
-        }
-
-        @keyframes goxionActionSuccess {
-            0% { transform: scale(1); }
-            35% { transform: scale(.96); }
-            65% { transform: scale(1.035); box-shadow: 0 0 22px rgba(0,242,254,.22); }
-            100% { transform: scale(1); }
-        }
-
-        .view-section.goxion-view-enter,
-        #view-dashboard.goxion-view-enter {
-            animation: goxionViewEnter 300ms var(--motion-ease) both;
-        }
-
-        @keyframes goxionViewEnter {
-            from { opacity: 0; transform: translate3d(0,12px,0) scale(.992); filter: blur(3px); }
-            to { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
-        }
-
-        .goxion-stagger-item {
-            opacity: 0;
-            transform: translate3d(0,10px,0);
-            animation: goxionStaggerIn 360ms var(--motion-ease) forwards;
-            animation-delay: calc(var(--goxion-order, 0) * 34ms);
-        }
-
-        @keyframes goxionStaggerIn {
-            to { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        .tab-btn {
-            transition:
-                color var(--motion-base) ease,
-                background var(--motion-base) ease,
-                border-color var(--motion-base) ease,
-                box-shadow var(--motion-base) ease,
-                transform var(--motion-fast) var(--motion-ease);
-        }
-
-        .tab-btn.goxion-press { transform: scale(.94) !important; }
-
-        .tab-btn.active > span { animation: goxionTabIcon 360ms var(--motion-spring); }
-
-        @keyframes goxionTabIcon {
-            0% { transform: scale(.82) translateY(1px); }
-            65% { transform: scale(1.16) translateY(-1px); }
-            100% { transform: scale(1); }
-        }
-
-        .glass-card, .teaser-card, .brand-card, .smart-support-card {
-            transition:
-                transform var(--motion-base) var(--motion-ease),
-                border-color var(--motion-base) ease,
-                box-shadow var(--motion-base) ease;
-        }
-
-        @media (hover:hover) {
-            .teaser-card:hover, .brand-card:hover { transform: translateY(-3px); }
-        }
-
-        .faq-header .icon {
-            transition: transform 320ms var(--motion-spring), color 220ms ease;
-        }
-
-        .faq-item.open .faq-header .icon {
-            transform: rotate(45deg) scale(1.08);
-        }
-
-        .modal.show .modal-content {
-            animation: goxionModalIn 320ms var(--motion-spring) both;
-        }
-
-        @keyframes goxionModalIn {
-            from { opacity: 0; transform: translate3d(0,18px,0) scale(.965); filter: blur(3px); }
-            to { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
-        }
-
-        #btn-send-feedback {
-            position: relative;
-            overflow: hidden;
-            min-height: 52px;
-        }
-
-        #btn-send-feedback.feedback-sending {
-            pointer-events: none;
-            transform: scale(.985) !important;
-            opacity: .9;
-        }
-
-        #btn-send-feedback.feedback-success-state {
-            background: rgba(0,255,157,.12) !important;
-            border: 1px solid rgba(0,255,157,.55) !important;
-            color: #b9ffe2 !important;
-            box-shadow: 0 0 24px rgba(0,255,157,.16) !important;
-            transform: scale(1) !important;
-        }
-
-        #btn-send-feedback .feedback-check {
-            display: inline-block;
-            margin-right: 7px;
-            animation: goxionCheckIn 420ms var(--motion-spring);
-        }
-
-        @keyframes goxionCheckIn {
-            from { opacity: 0; transform: scale(.3) rotate(-28deg); }
-            to { opacity: 1; transform: scale(1) rotate(0); }
-        }
-
-        #feedback-success.goxion-feedback-message {
-            display: block !important;
-            animation: goxionFeedbackMessage 300ms var(--motion-ease) both;
-        }
-
-        @keyframes goxionFeedbackMessage {
-            from { opacity: 0; transform: translateY(7px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .input-smart {
-            transition:
-                border-color var(--motion-base) ease,
-                box-shadow var(--motion-base) ease,
-                transform var(--motion-base) var(--motion-ease),
-                background var(--motion-base) ease;
-        }
-
-        .input-smart:focus { transform: translateY(-1px); }
-
-        .floating-cart.show {
-            animation: goxionFloatingIn 360ms var(--motion-spring) both;
-        }
-
-        @keyframes goxionFloatingIn {
-            from { opacity: 0; transform: translate(-50%,16px) scale(.96); }
-            to { opacity: 1; transform: translate(-50%,0) scale(1); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: .01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: .01ms !important;
-                scroll-behavior: auto !important;
-            }
-        }
-
-
-        /* =========================================================
-           GOXION MOTION SYSTEM V2
-           Cristal + navegación viva + estados del login
-           ========================================================= */
-
-        /* Recupera profundidad y calidad del cristal */
-        .glass-card,
-        .tab-container,
-        .btn-menu,
+        /* Respuesta táctil */
+        button,
+        .tab-btn,
+        .teaser-card,
         .brand-card,
-        .smart-support-card,
-        .modal-content,
-        .floating-cart {
-            background: rgba(8, 8, 12, .42) !important;
-            backdrop-filter: blur(20px) saturate(135%) !important;
-            -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
-            border-color: rgba(255, 255, 255, .10) !important;
-            box-shadow:
-                0 12px 32px rgba(0,0,0,.42),
-                inset 0 1px 0 rgba(255,255,255,.025);
+        .platform-btn,
+        .faq-header,
+        .btn-menu,
+        .header-action-btn {
+            -webkit-tap-highlight-color: transparent;
+            transform-origin: center;
         }
 
-        /* En soporte elevamos un poco más el cristal */
-        #view-soporte .glass-card,
-        #view-soporte .smart-support-card {
-            background: rgba(8, 8, 12, .50) !important;
-            backdrop-filter: blur(24px) saturate(140%) !important;
-            -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+        .gx-press {
+            transform: scale(.965) !important;
+            transition: transform var(--gx-motion-fast) var(--gx-ease) !important;
         }
 
-        /* Navegación con indicador que viaja entre pestañas */
+        .brand-card.gx-press,
+        .teaser-card.gx-press {
+            transform: scale(.985) !important;
+        }
+
+        /* Navegación: mantiene el recuadro oficial; agrega un trazo viajero */
         .tab-container {
             overflow: hidden;
             isolation: isolate;
         }
 
-        .goxion-tab-indicator {
+        .gx-tab-traveler {
             position: absolute;
-            z-index: 0;
             top: 4px;
             bottom: 4px;
             left: 4px;
-            width: calc((100% - 8px) / 3);
+            width: 0;
             border-radius: 12px;
-            background:
-                linear-gradient(135deg,
-                    rgba(0,242,254,.12),
-                    rgba(124,77,255,.10));
-            border: 1px solid rgba(0,242,254,.72);
+            border: 1px solid rgba(0,242,254,.88);
             box-shadow:
-                0 0 18px rgba(0,242,254,.18),
-                inset 0 0 18px rgba(124,77,255,.035);
-            transform: translateX(0%);
-            transition:
-                transform 330ms cubic-bezier(.2,.9,.25,1),
-                border-color 260ms ease,
-                box-shadow 260ms ease;
+                0 0 14px rgba(0,242,254,.24),
+                0 0 24px rgba(124,77,255,.10);
             pointer-events: none;
+            opacity: 0;
+            z-index: 0;
+            transition:
+                left 300ms var(--gx-ease),
+                width 300ms var(--gx-ease),
+                opacity 170ms ease;
+        }
+
+        .gx-tab-traveler.show {
+            opacity: 1;
         }
 
         .tab-btn {
             z-index: 1;
-            overflow: visible !important;
-            font-weight: 600;
-        }
-
-        .tab-btn.active {
-            background: transparent !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
-            color: #fff !important;
-            font-weight: 800 !important;
-        }
-
-        .tab-btn.active > span {
-            transform: scale(1.18);
-            filter:
-                drop-shadow(0 0 7px rgba(0,242,254,.45))
-                drop-shadow(0 0 10px rgba(124,77,255,.22));
         }
 
         .tab-btn > span {
+            display: inline-block;
             transition:
-                transform 300ms cubic-bezier(.2,1.25,.35,1),
-                filter 240ms ease;
+                transform 280ms var(--gx-spring),
+                filter 220ms ease;
+        }
+
+        .tab-btn.active > span {
+            transform: scale(1.22);
+            filter:
+                drop-shadow(0 0 6px rgba(0,242,254,.42))
+                drop-shadow(0 0 9px rgba(124,77,255,.20));
         }
 
         .tab-btn.active {
-            letter-spacing: .08px;
+            font-weight: 800 !important;
         }
 
-        /* Entrada refinada: dirección según la pestaña */
-        .view-section.goxion-view-enter,
-        #view-dashboard.goxion-view-enter {
-            animation: none !important;
+        .tab-btn.active div,
+        .tab-btn.active {
+            letter-spacing: .05px;
         }
 
-        .view-section.goxion-view-enter.goxion-from-right,
-        #view-dashboard.goxion-view-enter.goxion-from-right {
-            animation: goxionViewFromRight 280ms cubic-bezier(.22,.8,.24,1) both !important;
+        /* Entrada del contenido: rápida y limpia, sin deformar tarjetas */
+        .gx-view-enter-right {
+            animation: gxViewRight 260ms var(--gx-ease) both !important;
         }
 
-        .view-section.goxion-view-enter.goxion-from-left,
-        #view-dashboard.goxion-view-enter.goxion-from-left {
-            animation: goxionViewFromLeft 280ms cubic-bezier(.22,.8,.24,1) both !important;
+        .gx-view-enter-left {
+            animation: gxViewLeft 260ms var(--gx-ease) both !important;
         }
 
-        .view-section.goxion-view-enter.goxion-same-view,
-        #view-dashboard.goxion-view-enter.goxion-same-view {
-            animation: goxionViewSame 240ms cubic-bezier(.22,.8,.24,1) both !important;
+        .gx-view-enter-soft {
+            animation: gxViewSoft 220ms var(--gx-ease) both !important;
         }
 
-        @keyframes goxionViewFromRight {
-            from { opacity: 0; transform: translate3d(18px,5px,0) scale(.994); filter: blur(1.5px); }
-            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+        @keyframes gxViewRight {
+            from { opacity: .35; transform: translate3d(14px, 3px, 0); }
+            to   { opacity: 1; transform: translate3d(0, 0, 0); }
         }
 
-        @keyframes goxionViewFromLeft {
-            from { opacity: 0; transform: translate3d(-18px,5px,0) scale(.994); filter: blur(1.5px); }
-            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+        @keyframes gxViewLeft {
+            from { opacity: .35; transform: translate3d(-14px, 3px, 0); }
+            to   { opacity: 1; transform: translate3d(0, 0, 0); }
         }
 
-        @keyframes goxionViewSame {
-            from { opacity: .45; transform: translateY(5px) scale(.997); }
+        @keyframes gxViewSoft {
+            from { opacity: .48; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Entrada secundaria muy sutil */
+        .gx-reveal-item {
+            animation: gxRevealItem 260ms var(--gx-ease) both;
+            animation-delay: calc(var(--gx-order, 0) * 22ms);
+        }
+
+        @keyframes gxRevealItem {
+            from { opacity: .72; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* FAQ y despliegues */
+        .faq-header .icon,
+        .brand-expand-icon {
+            transition:
+                transform 280ms var(--gx-spring),
+                background var(--gx-motion-base) ease,
+                color var(--gx-motion-base) ease,
+                box-shadow var(--gx-motion-base) ease;
+        }
+
+        .brand-card.expanded .brand-expand-icon {
+            transform: rotate(180deg) scale(1.03);
+        }
+
+        /* Modales / hoja de login */
+        .auth-overlay.show .auth-sheet {
+            animation: gxSheetIn 340ms var(--gx-spring) both;
+        }
+
+        .modal.show .modal-content {
+            animation: gxModalIn 300ms var(--gx-spring) both;
+        }
+
+        @keyframes gxSheetIn {
+            from { opacity: .3; transform: translateY(22px) scale(.985); }
             to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .goxion-stagger-item {
-            animation-duration: 300ms !important;
-            animation-delay: calc(var(--goxion-order, 0) * 24ms) !important;
+        @keyframes gxModalIn {
+            from { opacity: .25; transform: translateY(14px) scale(.975); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* Estado visual del botón de acceso */
+        /* Login: estados visuales del mismo botón */
         #btn-login-submit {
-            min-height: 52px;
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
+            min-height: 52px;
             transition:
-                transform 180ms cubic-bezier(.22,.8,.24,1),
+                transform 170ms var(--gx-ease),
                 background 280ms ease,
                 color 240ms ease,
-                box-shadow 280ms ease,
-                border-color 280ms ease;
+                box-shadow 280ms ease;
         }
 
-        #btn-login-submit.login-validating {
+        #btn-login-submit.gx-validating {
             background: linear-gradient(135deg, #7c4dff, #4f8cff) !important;
             color: #fff !important;
-            box-shadow: 0 0 24px rgba(124,77,255,.32) !important;
+            box-shadow: 0 0 22px rgba(124,77,255,.28) !important;
             pointer-events: none;
         }
 
-        #btn-login-submit.login-validating::after {
+        #btn-login-submit.gx-validating::after {
             content: "";
             position: absolute;
             top: 0;
             bottom: 0;
-            width: 38%;
-            left: -45%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+            left: -42%;
+            width: 34%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.30), transparent);
             transform: skewX(-18deg);
-            animation: goxionLoginSweep 900ms linear infinite;
+            animation: gxLoginSweep 850ms linear infinite;
         }
 
-        @keyframes goxionLoginSweep {
-            to { left: 115%; }
+        @keyframes gxLoginSweep {
+            to { left: 118%; }
         }
 
-        #btn-login-submit.login-success {
-            background: linear-gradient(135deg, #00d990, #00ff9d) !important;
-            color: #02140e !important;
-            box-shadow:
-                0 0 26px rgba(0,255,157,.30),
-                inset 0 1px 0 rgba(255,255,255,.28) !important;
+        #btn-login-submit.gx-success {
+            background: linear-gradient(135deg, #00d98f, #00ff9d) !important;
+            color: #03140e !important;
+            box-shadow: 0 0 24px rgba(0,255,157,.28) !important;
             pointer-events: none;
-            animation: goxionLoginSuccess 420ms cubic-bezier(.2,1.25,.35,1);
+            animation: gxSuccessPop 390ms var(--gx-spring);
         }
 
-        @keyframes goxionLoginSuccess {
+        @keyframes gxSuccessPop {
             0% { transform: scale(.975); }
-            65% { transform: scale(1.025); }
+            60% { transform: scale(1.025); }
             100% { transform: scale(1); }
         }
 
-        #btn-login-submit.login-error {
+        #btn-login-submit.gx-error {
             background: linear-gradient(135deg, #ff3366, #d81b60) !important;
             color: #fff !important;
-            box-shadow: 0 0 22px rgba(255,51,102,.28) !important;
-            animation: goxionLoginError 360ms cubic-bezier(.36,.07,.19,.97);
+            box-shadow: 0 0 22px rgba(255,51,102,.25) !important;
+            animation: gxLoginError 340ms cubic-bezier(.36,.07,.19,.97);
         }
 
-        @keyframes goxionLoginError {
+        @keyframes gxLoginError {
             0%,100% { transform: translateX(0); }
             25% { transform: translateX(-4px); }
             50% { transform: translateX(4px); }
             75% { transform: translateX(-2px); }
         }
 
-        #login-error.login-error-soft {
-            color: #ff8ca8 !important;
-            animation: goxionErrorText 240ms ease both;
+        /* Feedback: el botón se transforma en lugar de desaparecer */
+        #btn-send-feedback {
+            min-height: 52px;
+            position: relative;
+            overflow: hidden;
+            transition:
+                transform 170ms var(--gx-ease),
+                background 280ms ease,
+                color 240ms ease,
+                box-shadow 280ms ease,
+                border-color 280ms ease;
         }
 
-        @keyframes goxionErrorText {
-            from { opacity: 0; transform: translateY(-3px); }
-            to { opacity: 1; transform: translateY(0); }
+        #btn-send-feedback.gx-feedback-sending {
+            background: linear-gradient(135deg, #7c4dff, #4f8cff) !important;
+            color: #fff !important;
+            pointer-events: none;
+        }
+
+        #btn-send-feedback.gx-feedback-success {
+            background: rgba(0,255,157,.13) !important;
+            border: 1px solid rgba(0,255,157,.55) !important;
+            color: #baffdf !important;
+            box-shadow: 0 0 22px rgba(0,255,157,.16) !important;
+            animation: gxSuccessPop 390ms var(--gx-spring);
+        }
+
+        #feedback-success.gx-feedback-message {
+            display: block !important;
+            animation: gxFeedbackMessage 260ms var(--gx-ease) both;
+        }
+
+        @keyframes gxFeedbackMessage {
+            from { opacity: 0; transform: translateY(5px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Respeta accesibilidad del teléfono */
+        @media (prefers-reduced-motion: reduce) {
+            .gx-tab-traveler,
+            .tab-btn > span,
+            #btn-login-submit,
+            #btn-send-feedback,
+            .auth-overlay.show .auth-sheet,
+            .modal.show .modal-content,
+            .gx-view-enter-right,
+            .gx-view-enter-left,
+            .gx-view-enter-soft,
+            .gx-reveal-item {
+                animation: none !important;
+                transition-duration: .01ms !important;
+            }
         }
 
 </style>
@@ -3148,13 +3043,13 @@
             const key = localStorage.getItem('goxion_user_key');
             activeFeedbackFolio = folio || (key && globalClientesData[key] ? globalClientesData[key].folio : null);
             document.getElementById('feedback-text').value = '';
-            const successMsg = document.getElementById('feedback-success');
+            const feedbackSuccess = document.getElementById('feedback-success');
             const feedbackBtn = document.getElementById('btn-send-feedback');
-            successMsg.style.display = 'none';
-            successMsg.classList.remove('goxion-feedback-message');
+            feedbackSuccess.style.display = 'none';
+            feedbackSuccess.classList.remove('gx-feedback-message');
             feedbackBtn.style.display = 'block';
-            feedbackBtn.classList.remove('feedback-sending', 'feedback-success-state', 'goxion-action-success');
             feedbackBtn.disabled = false;
+            feedbackBtn.classList.remove('gx-feedback-sending', 'gx-feedback-success');
             feedbackBtn.innerHTML = 'Enviar Comentario';
             openModal('modal-feedback');
         };
@@ -3169,20 +3064,19 @@
             
             notificarAdmin("soporte", "💬 Nuevo Feedback Recibido", `**Cliente:** ${clienteNombre} (Folio: ${clienteFolio})\n**Comentario:**\n"${text}"`, "ffaa00");
             
-            
             const feedbackBtn = document.getElementById('btn-send-feedback');
-            const successMsg = document.getElementById('feedback-success');
+            const feedbackSuccess = document.getElementById('feedback-success');
 
-            feedbackBtn.classList.add('feedback-sending');
             feedbackBtn.disabled = true;
+            feedbackBtn.classList.add('gx-feedback-sending');
             feedbackBtn.textContent = 'Enviando…';
 
             setTimeout(() => {
-                feedbackBtn.classList.remove('feedback-sending');
-                feedbackBtn.classList.add('feedback-success-state', 'goxion-action-success');
-                feedbackBtn.innerHTML = '<span class="feedback-check">✓</span> Comentario enviado';
-                successMsg.classList.add('goxion-feedback-message');
-            }, 180);
+                feedbackBtn.classList.remove('gx-feedback-sending');
+                feedbackBtn.classList.add('gx-feedback-success');
+                feedbackBtn.innerHTML = '✓ Comentario enviado';
+                feedbackSuccess.classList.add('gx-feedback-message');
+            }, 170);
             
             if(activeFeedbackMissionIdx !== null) {
                 toggleMission(activeFeedbackMissionIdx, 'btn-claim-coupon', activeFeedbackFolio);
@@ -4349,25 +4243,21 @@ function goxionBetaLegacy(data) {
 
             const setLoginState = (state, text) => {
                 if (!loginBtn) return;
-                loginBtn.classList.remove("login-validating", "login-success", "login-error");
+                loginBtn.classList.remove("gx-validating", "gx-success", "gx-error");
                 if (state) loginBtn.classList.add(state);
                 loginBtn.innerHTML = text;
             };
 
             if (!inputId || !inputPin) {
-                setLoginState("login-error", "✕ Datos incompletos");
+                setLoginState("gx-error", "✕ Datos incompletos");
                 errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso.";
-                errorMsg.classList.add("login-error-soft");
                 errorMsg.style.display = "block";
-                setTimeout(() => {
-                    setLoginState("", "Entrar a mi Panel");
-                }, 1100);
+                setTimeout(() => setLoginState("", "Entrar a mi Panel"), 1100);
                 return;
             }
 
-            setLoginState("login-validating", "Validando información…");
+            setLoginState("gx-validating", "Validando información…");
             loginBtn.disabled = true;
-            errorMsg.classList.remove("login-error-soft");
             errorMsg.style.display = "none";
 
             try {
@@ -4398,8 +4288,8 @@ function goxionBetaLegacy(data) {
                 cargarCatalogo(globalClientesData);
                 renderizarSoporteDinamico(globalClientesData);
 
-                setLoginState("login-success", "✓ Validación exitosa");
                 errorMsg.style.display = "none";
+                setLoginState("gx-success", "✓ Validación exitosa");
 
                 const guestCard = document.getElementById("guest-action-card");
                 if (guestCard) guestCard.style.display = "none";
@@ -4411,14 +4301,13 @@ function goxionBetaLegacy(data) {
                     closeAuthSheet();
                     switchTab("inicio");
                     loginBtn.disabled = false;
-                    setTimeout(() => setLoginState("", "Entrar a mi Panel"), 250);
-                }, 520);
+                    setTimeout(() => setLoginState("", "Entrar a mi Panel"), 220);
+                }, 480);
 
             } catch (e) {
                 console.error(e);
-                setLoginState("login-error", "✕ Datos incorrectos");
+                setLoginState("gx-error", "✕ Datos incorrectos");
                 errorMsg.innerText = e?.message || "Datos incorrectos. Verifica tu Nombre y Código.";
-                errorMsg.classList.add("login-error-soft");
                 errorMsg.style.display = "block";
                 loginBtn.disabled = false;
 
@@ -4462,112 +4351,132 @@ function goxionBetaLegacy(data) {
     </script>
 
 
-
-<script id="goxion-motion-system">
+<script id="goxion-motion-v3">
 (() => {
-    const TAB_ORDER = { inicio: 0, catalogo: 1, soporte: 2 };
-    let lastTabIndex = 0;
+    const order = { inicio: 0, catalogo: 1, soporte: 2 };
+    let currentTab = "inicio";
 
-    const PRESS_SELECTOR = [
-        'button', '.btn-primary', '.btn-shimmer', '.teaser-card',
-        '.btn-menu', '.brand-card', '.link-discreto', '.platform-btn'
+    const pressSelector = [
+        'button',
+        '.tab-btn',
+        '.teaser-card',
+        '.brand-card',
+        '.platform-btn',
+        '.btn-menu',
+        '.header-action-btn'
     ].join(',');
 
-    function addPressFeedback(root = document) {
-        root.querySelectorAll(PRESS_SELECTOR).forEach(el => {
-            if (el.dataset.goxionMotionBound === '1') return;
-            el.dataset.goxionMotionBound = '1';
+    function bindPress(root = document) {
+        root.querySelectorAll(pressSelector).forEach(el => {
+            if (el.dataset.gxPressBound === "1") return;
+            el.dataset.gxPressBound = "1";
 
-            const press = () => el.classList.add('goxion-press');
-            const release = () => el.classList.remove('goxion-press');
+            const down = () => el.classList.add("gx-press");
+            const up = () => el.classList.remove("gx-press");
 
-            el.addEventListener('pointerdown', press, { passive: true });
-            el.addEventListener('pointerup', release, { passive: true });
-            el.addEventListener('pointercancel', release, { passive: true });
-            el.addEventListener('pointerleave', release, { passive: true });
+            el.addEventListener("pointerdown", down, { passive:true });
+            el.addEventListener("pointerup", up, { passive:true });
+            el.addEventListener("pointercancel", up, { passive:true });
+            el.addEventListener("pointerleave", up, { passive:true });
         });
     }
 
-    function ensureTabIndicator() {
-        const tabs = document.querySelector('.tab-container');
-        if (!tabs || tabs.querySelector('.goxion-tab-indicator')) return;
-        const indicator = document.createElement('div');
-        indicator.className = 'goxion-tab-indicator';
-        tabs.prepend(indicator);
+    function ensureTraveler() {
+        const container = document.querySelector(".tab-container");
+        if (!container) return null;
+
+        let traveler = container.querySelector(".gx-tab-traveler");
+        if (!traveler) {
+            traveler = document.createElement("div");
+            traveler.className = "gx-tab-traveler";
+            container.prepend(traveler);
+        }
+        return traveler;
     }
 
-    function moveTabIndicator(tabName) {
-        ensureTabIndicator();
-        const indicator = document.querySelector('.goxion-tab-indicator');
-        const idx = TAB_ORDER[tabName] ?? 0;
-        if (indicator) indicator.style.transform = `translateX(${idx * 100}%)`;
+    function moveTraveler(tabName, animate = true) {
+        const traveler = ensureTraveler();
+        const container = document.querySelector(".tab-container");
+        const btn = document.getElementById(`btn-tab-${tabName}`);
+        if (!traveler || !container || !btn) return;
+
+        const c = container.getBoundingClientRect();
+        const b = btn.getBoundingClientRect();
+
+        if (!animate) traveler.style.transition = "none";
+        traveler.style.left = `${b.left - c.left}px`;
+        traveler.style.width = `${b.width}px`;
+        traveler.classList.add("show");
+
+        if (!animate) {
+            void traveler.offsetWidth;
+            traveler.style.transition = "";
+        }
+
+        clearTimeout(traveler._gxHideTimer);
+        traveler._gxHideTimer = setTimeout(() => traveler.classList.remove("show"), 360);
     }
 
-    function animateCurrentView(tabName = 'inicio') {
-        const currentIndex = TAB_ORDER[tabName] ?? 0;
-        const directionClass =
-            currentIndex > lastTabIndex ? 'goxion-from-right' :
-            currentIndex < lastTabIndex ? 'goxion-from-left' :
-            'goxion-same-view';
+    function activeViewFor(tabName) {
+        if (tabName === "inicio") {
+            const key = localStorage.getItem("goxion_user_key");
+            return document.getElementById(key ? "view-dashboard" : "view-inicio");
+        }
+        return document.getElementById(`view-${tabName}`);
+    }
 
-        const activeViews = [...document.querySelectorAll('.view-section.active, #view-dashboard.active')];
+    function animateView(tabName, previousTab) {
+        const view = activeViewFor(tabName);
+        if (!view) return;
 
-        activeViews.forEach(view => {
-            view.classList.remove(
-                'goxion-view-enter',
-                'goxion-from-right',
-                'goxion-from-left',
-                'goxion-same-view'
-            );
-            void view.offsetWidth;
-            view.classList.add('goxion-view-enter', directionClass);
+        view.classList.remove("gx-view-enter-right", "gx-view-enter-left", "gx-view-enter-soft");
+        void view.offsetWidth;
 
-            const items = view.querySelectorAll(
-                '.glass-card, .teaser-card, .brand-card, .smart-support-card, .section-title, .btn-primary, .faq-item'
-            );
+        const a = order[previousTab] ?? 0;
+        const b = order[tabName] ?? 0;
+        const cls = b > a ? "gx-view-enter-right" : b < a ? "gx-view-enter-left" : "gx-view-enter-soft";
+        view.classList.add(cls);
 
-            items.forEach((item, index) => {
-                item.classList.remove('goxion-stagger-item');
-                item.style.setProperty('--goxion-order', Math.min(index, 9));
-                void item.offsetWidth;
-                item.classList.add('goxion-stagger-item');
-            });
+        const items = view.querySelectorAll(
+            '.section-title, .glass-card, .teaser-card, .brand-card, .smart-support-card, .faq-item'
+        );
 
-            setTimeout(() => items.forEach(item => item.classList.remove('goxion-stagger-item')), 650);
+        items.forEach((el, index) => {
+            el.classList.remove("gx-reveal-item");
+            el.style.setProperty("--gx-order", Math.min(index, 8));
+            void el.offsetWidth;
+            el.classList.add("gx-reveal-item");
         });
 
-        lastTabIndex = currentIndex;
-        addPressFeedback(document);
+        setTimeout(() => {
+            view.classList.remove("gx-view-enter-right", "gx-view-enter-left", "gx-view-enter-soft");
+            items.forEach(el => el.classList.remove("gx-reveal-item"));
+        }, 560);
     }
 
     const originalSwitchTab = window.switchTab;
-    if (typeof originalSwitchTab === 'function') {
+    if (typeof originalSwitchTab === "function") {
         window.switchTab = function(tabName) {
-            const previousIndex = lastTabIndex;
+            const previous = currentTab;
             originalSwitchTab(tabName);
-            moveTabIndicator(tabName);
-
-            requestAnimationFrame(() => {
-                const desiredIndex = TAB_ORDER[tabName] ?? 0;
-                lastTabIndex = previousIndex;
-                requestAnimationFrame(() => animateCurrentView(tabName));
-                lastTabIndex = desiredIndex;
-            });
+            moveTraveler(tabName, true);
+            requestAnimationFrame(() => requestAnimationFrame(() => animateView(tabName, previous)));
+            currentTab = tabName;
+            bindPress(document);
         };
     }
 
-    const observer = new MutationObserver(() => addPressFeedback(document));
-    observer.observe(document.body, { childList: true, subtree: true });
+    const observer = new MutationObserver(() => bindPress(document));
+    observer.observe(document.body, { childList:true, subtree:true });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        ensureTabIndicator();
-        moveTabIndicator('inicio');
-        addPressFeedback(document);
-        setTimeout(() => animateCurrentView('inicio'), 120);
+    window.addEventListener("resize", () => moveTraveler(currentTab, false));
+
+    document.addEventListener("DOMContentLoaded", () => {
+        bindPress(document);
+        setTimeout(() => moveTraveler("inicio", false), 80);
     });
 })();
 </script>
-
 
 </body>
 </html>
