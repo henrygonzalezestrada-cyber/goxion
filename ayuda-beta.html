@@ -2406,6 +2406,66 @@
             }
         }
 
+
+        /* --- AJUSTE FINAL TARJETAS: SIMETRÍA + COMPACTACIÓN --- */
+        .gamif-btn {
+            min-height: 166px;
+            padding: 18px 12px 16px;
+            row-gap: 0;
+            justify-content: flex-start;
+        }
+
+        .gamif-btn .gamif-icon {
+            height: 43px;
+            min-height: 43px;
+            margin: 0 0 1px;
+            font-size: 35px !important;
+            line-height: 1;
+        }
+
+        .gamif-btn .gamif-title {
+            min-height: 29px;
+            margin: 0;
+            padding: 0 4px;
+            line-height: 1.08;
+            align-items: center;
+        }
+
+        .gamif-btn .gamif-subtitle {
+            min-height: 25px;
+            margin: 1px 0 0;
+            padding: 0 5px;
+            line-height: 1.12;
+            align-items: flex-start;
+        }
+
+        .gx-referral-card-title {
+            min-height: 29px !important;
+            line-height: 1.08 !important;
+        }
+
+        @media (max-width: 390px) {
+            .gamif-btn {
+                min-height: 160px;
+                padding: 17px 9px 14px;
+            }
+
+            .gamif-btn .gamif-icon {
+                height: 41px;
+                min-height: 41px;
+                font-size: 33px !important;
+            }
+
+            .gamif-btn .gamif-title,
+            .gx-referral-card-title {
+                min-height: 28px !important;
+            }
+
+            .gamif-btn .gamif-subtitle {
+                min-height: 24px;
+            }
+        }
+
 </style>
 </head>
 <body class="no-scroll">
