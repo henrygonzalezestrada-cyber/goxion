@@ -1047,6 +1047,15 @@ Revisa las guías [SOPORTE]"></textarea>
                     <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${gamifConfig.cupon_reclamado ? 'var(--neon-green)' : 'var(--text-muted)'};">
                         ${gamifConfig.cupon_reclamado ? '✅ Cupón ya reclamado por el cliente' : '⏳ Cupón todavía no reclamado'}
                     </div>
+                    <button
+                        type="button"
+                        style="margin-top:8px;width:100%;padding:8px 10px;border-radius:7px;border:1px solid rgba(255,170,0,.48);background:rgba(255,170,0,.08);color:var(--warning-amber);font-size:.72rem;font-weight:800;cursor:pointer;"
+                        onclick="reiniciarMisionesClienteBeta('${key}')">
+                        ↻ Reiniciar progreso de misiones
+                    </button>
+                    <div style="margin-top:5px;font-size:.65rem;color:var(--text-muted);line-height:1.35;">
+                        Borra el progreso del cliente la próxima vez que cargue Mi Espacio. No vuelve a habilitar un cupón que ya fue reclamado.
+                    </div>
                     ` : `<div style="font-size: 0.7rem; color: var(--text-muted);">Sin misiones asignadas.</div>`}
                 </div>
             `;
@@ -2141,7 +2150,7 @@ Revisa las guías [SOPORTE]"></textarea>
     <!-- GOXION ADMIN BETA V4 // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
     <script id="goxion-admin-v4-fixes">
     (() => {
-        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
+        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes-beta";
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function ajusteBeta(accion, datos = {}) {
@@ -2318,6 +2327,32 @@ Revisa las guías [SOPORTE]"></textarea>
             }
         };
 
+
+        window.reiniciarMisionesClienteBeta = async function(key) {
+            const c = clientesDict[key];
+            if(!c?._id) {
+                alert("No encontré el cliente en memoria.");
+                return;
+            }
+
+            const nombre = c.nombre || c.folio || "este cliente";
+
+            if(!confirm(`¿Reiniciar el progreso de misiones de ${nombre}?\n\nEl cliente tendrá que completar nuevamente todas las misiones actuales. Si ya reclamó el cupón, ese reclamo NO se reiniciará.`)) {
+                return;
+            }
+
+            try {
+                const result = await ajusteBeta("reiniciar_misiones_cliente", {
+                    cliente_id: c._id
+                });
+
+                alert(`✅ Progreso reiniciado.\n\nNueva versión de misiones: ${result.misiones_version}\n\nAl volver a cargar Mi Espacio, el cliente verá todas las misiones pendientes otra vez.`);
+            } catch(e) {
+                console.error(e);
+                alert(`❌ No se pudo reiniciar el progreso.\n\n${e?.message || e}`);
+            }
+        };
+
         console.info("GOXION Admin: stock manual persistente y reactivación de referidos activados.");
     })();
     </script>
@@ -2326,7 +2361,7 @@ Revisa las guías [SOPORTE]"></textarea>
     <!-- GOXION ADMIN BETA V5 // INVENTARIO INTELIGENTE DESDE SUPABASE -->
     <script id="goxion-admin-v5-inventory">
     (() => {
-        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario";
+        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-beta";
         const TOKEN_KEY_INV = "GOXION_ADMIN_TOKEN";
         let inventarioServidor = null;
 
