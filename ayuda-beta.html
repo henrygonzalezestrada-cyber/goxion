@@ -2268,6 +2268,26 @@
             }
         }
 
+
+        /* --- REFERIDO: NOMBRE COMPLETO EN TARJETA --- */
+        .gx-referral-card-title {
+            width: 100%;
+            max-width: 100%;
+            padding: 0 7px;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: clip !important;
+            overflow-wrap: anywhere;
+            word-break: normal;
+            line-height: 1.15;
+            font-size: clamp(15px, 4.15vw, 18px) !important;
+            min-height: 2.3em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
 </style>
 </head>
 <body class="no-scroll">
@@ -2788,7 +2808,7 @@
             }
 
             try {
-                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio", {
+                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta", {
                     method:"POST",
                     headers:{
                         "Content-Type":"application/json",
@@ -2857,7 +2877,7 @@
             }
 
             try {
-                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio", {
+                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta", {
                     method:"POST",
                     headers:{
                         "Content-Type":"application/json",
@@ -3564,6 +3584,16 @@
             let btnRefHtml = ''; let expandedRefHtml = '';
             let btnCupHtml = ''; let expandedCupHtml = '';
 
+            const missionVersion = Math.max(1, Number(gamifConfig.misiones_version || 1));
+            const missionVersionKey = 'goxion_missions_version_' + cliente.folio;
+            const localMissionVersion = Number(localStorage.getItem(missionVersionKey) || 0);
+
+            if(localMissionVersion !== missionVersion) {
+                localStorage.removeItem('goxion_missions_' + cliente.folio);
+                localStorage.removeItem('goxion_recent_mission_' + cliente.folio);
+                localStorage.setItem(missionVersionKey, String(missionVersion));
+            }
+
             let savedMissions = [];
             try { savedMissions = JSON.parse(localStorage.getItem('goxion_missions_' + cliente.folio)) || []; } catch(e){}
 
@@ -3607,7 +3637,7 @@
                 btnRefHtml = `
                     <div class="gamif-btn ${refCardClass}" onclick="openGamif('referral')">
                         <div class="gamif-icon">🎁</div>
-                        <div class="gamif-title">${refNombre.split(' ')[0]}</div>
+                        <div class="gamif-title gx-referral-card-title">${refNombre}</div>
                         <div id="gx-referral-status" class="gamif-subtitle" style="color:${refSubtitleColor};font-weight:bold;">${refSubtitle}</div>
                     </div>`;
 
@@ -4470,10 +4500,10 @@
     <!-- GOXION BETA // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
     <script id="goxion-beta-client-layer">
     (() => {
-        const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion";
-        const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
-        const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
-        const INVENTARIO_PUBLICO_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico";
+        const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion-beta";
+        const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta";
+        const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion-beta";
+        const INVENTARIO_PUBLICO_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico-beta";
         const TOKEN_KEY = "goxion_client_token";
 
         
