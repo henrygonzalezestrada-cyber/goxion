@@ -2248,11 +2248,11 @@
             opacity:0;
             transform:translate3d(-50%,34px,0) scale(.94);
         }
-        .gx-mission-toast.show { animation:gxMissionToast 2.25s cubic-bezier(.16,1,.3,1) both; }
+        .gx-mission-toast.show { animation:gxMissionToast 3.6s cubic-bezier(.16,1,.3,1) both; }
         @keyframes gxMissionToast {
             0% { opacity:0; transform:translate3d(-50%,34px,0) scale(.94); }
             12% { opacity:1; transform:translate3d(-50%,0,0) scale(1.025); }
-            22%,76% { opacity:1; transform:translate3d(-50%,0,0) scale(1); }
+            16%,84% { opacity:1; transform:translate3d(-50%,0,0) scale(1); }
             100% { opacity:0; transform:translate3d(-50%,38px,0) scale(.96); }
         }
 
@@ -2825,6 +2825,7 @@
                 if(globalClientesData?.[key]?.gamificacion) {
                     globalClientesData[key].gamificacion.cupon_reclamado = true;
                     globalClientesData[key].gamificacion.cupon_reclamado_at = data.reclamado_at || new Date().toISOString();
+                    globalClientesData[key].gamificacion.cupon_reclamado_ciclo = Number(data.ciclo || globalClientesData[key].gamificacion.cupon_ciclo || 1);
                 }
 
                 if(btn) {
@@ -2839,6 +2840,12 @@
                 const cupSubtitle = document.getElementById("gx-coupon-subtitle");
                 if(cupSubtitle) {
                     cupSubtitle.innerHTML = '<span style="color:var(--success-green);font-weight:800;">Cupón reclamado ✓</span>';
+                    const card = cupSubtitle.closest(".gamif-btn");
+                    if(card) {
+                        card.classList.remove("gx-referral-ready");
+                        const icon = card.querySelector(".gamif-icon");
+                        if(icon) icon.textContent = "🥇";
+                    }
                 }
 
                 if(!data.ya_reclamado) {
@@ -2907,6 +2914,12 @@
                 if(refStatus) {
                     refStatus.textContent = "Mes gratis reclamado ✓";
                     refStatus.style.color = "var(--success-green)";
+                    const card = refStatus.closest(".gamif-btn");
+                    if(card) {
+                        card.classList.remove("gx-referral-ready", "pulse-referral", "pulse-mission");
+                        const icon = card.querySelector(".gamif-icon");
+                        if(icon) icon.textContent = "💝";
+                    }
                 }
 
                 if(!data.ya_reclamado) {
@@ -3354,7 +3367,7 @@
             toast.classList.add("show");
 
             clearTimeout(toast._gxTimer);
-            toast._gxTimer = setTimeout(() => toast.classList.remove("show"), 2300);
+            toast._gxTimer = setTimeout(() => toast.classList.remove("show"), 3650);
         }
 
         window.toggleMission = function(index, btnId, folio) {
@@ -3636,7 +3649,7 @@
 
                 btnRefHtml = `
                     <div class="gamif-btn ${refCardClass}" onclick="openGamif('referral')">
-                        <div class="gamif-icon">🎁</div>
+                        <div class="gamif-icon">${beneficioReclamado ? '💝' : '🎁'}</div>
                         <div class="gamif-title gx-referral-card-title">${refNombre}</div>
                         <div id="gx-referral-status" class="gamif-subtitle" style="color:${refSubtitleColor};font-weight:bold;">${refSubtitle}</div>
                     </div>`;
@@ -3644,7 +3657,7 @@
                 expandedRefHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
                     <div style="text-align:center;margin-bottom:15px;margin-top:-5px;">
-                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:38px;margin-bottom:5px;display:inline-block;">🎁</div>
+                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:38px;margin-bottom:5px;display:inline-block;">${beneficioReclamado ? '💝' : '🎁'}</div>
                         <div class="gx-referral-name" style="font-size:16px;font-weight:800;">¡Gracias por invitar a ${refNombre}!</div>
                     </div>
                     <div class="referral-stats">
@@ -3690,17 +3703,22 @@
 
             let tareasArr = gamifConfig.tareas ? gamifConfig.tareas.split('\n').filter(t => t.trim() !== '') : [];
             let allDoneInitial = tareasArr.length > 0 && tareasArr.every((_, idx) => savedMissions.includes(idx));
-            let couponClaimed = gamifConfig.cupon_reclamado === true;
+            const couponCycle = Math.max(1, Number(gamifConfig.cupon_ciclo || 1));
+            const couponClaimedCycle = Math.max(0, Number(gamifConfig.cupon_reclamado_ciclo || 0));
+            let couponClaimed = couponClaimedCycle >= couponCycle;
 
-            let cupShake = (hasMissions && !allDoneInitial && !couponClaimed) ? 'shake-anim' : '';
-            let cupPulse = (hasMissions && !allDoneInitial && !couponClaimed) ? 'pulse-mission' : '';
+            /* Misma animación premium de Referidos mientras exista una ronda activa
+               y todavía no se haya reclamado su beneficio. */
+            let cupPulse = (hasMissions && !couponClaimed) ? 'gx-referral-ready' : '';
             let cupSubtitle = couponClaimed
                 ? `<span style="color:var(--success-green);font-weight:800;">Cupón reclamado ✓</span>`
-                : (hasMissions ? `<span style="color:var(--neon-blue);font-weight:bold;">¡Misiones activas!</span>` : `Sin tareas`);
+                : (allDoneInitial
+                    ? `<span style="color:var(--neon-blue);font-weight:800;">¡Listo para reclamar!</span>`
+                    : (hasMissions ? `<span style="color:var(--neon-blue);font-weight:bold;">¡Misiones activas!</span>` : `Sin tareas`));
 
             btnCupHtml = `
                 <div class="gamif-btn ${cupPulse}" onclick="openGamif('coupon')">
-                    <div class="gamif-icon ${cupShake}">🎟️</div>
+                    <div class="gamif-icon">${couponClaimed ? '🥇' : '🎟️'}</div>
                     <div class="gamif-title">Cupones</div>
                     <div id="gx-coupon-subtitle" class="gamif-subtitle">${cupSubtitle}</div>
                 </div>`;
@@ -3763,7 +3781,7 @@
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
                     <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
-                        <div class="shake-anim" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">🎟️</div>
+                        <div class="${couponClaimed ? '' : 'shake-anim'}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${couponClaimed ? '🥇' : '🎟️'}</div>
                         <div style="font-size: 16px; font-weight: 800; color: var(--neon-blue);">¡Desbloquea ${gamifConfig.descuento}% OFF!</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Completa las siguientes misiones para reclamar tu descuento especial:</div>
                     </div>
