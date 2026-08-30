@@ -247,68 +247,194 @@
             border-radius: 20px;
         }
 
-        .tab-container { 
-            display: flex; 
-            padding: 4px; 
-            margin-bottom: 20px; 
-            position: relative; 
-            z-index: 110; 
-            border-radius: 16px; 
-        }
-
-        .tab-btn { 
-            flex: 1; 
-            padding: 8px 4px; 
-            background: transparent; 
-            border: none; 
-            color: var(--text-muted); 
-            font-size: 11px; 
-            font-weight: 600; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 3px; 
-            transition: all 0.3s ease; 
-            position: relative; 
-            overflow: hidden; 
-        }
-
-        .tab-btn span { 
-            font-size: 16px; 
-        }
-
-        .tab-btn.active { 
-            background: rgba(255, 255, 255, 0.08); 
-            color: var(--text-main); 
-            border: 1px solid var(--neon-blue); 
-            box-shadow: 0 4px 15px rgba(0, 242, 254, 0.25); 
-        }
-
-        .tab-btn::after { 
-            content: ''; 
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            width: 0; 
-            height: 0; 
-            background: radial-gradient(circle, rgba(0, 242, 254, 0.4) 0%, rgba(124, 77, 255, 0) 70%); 
-            border-radius: 50%; 
-            transform: translate(-50%, -50%); 
-            transition: width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out; 
-            opacity: 0; 
-            pointer-events: none; 
-        }
-
-        .tab-btn:active::after { 
-            width: 180px; 
-            height: 180px; 
-            opacity: 1; 
-            transition: 0s; 
-        }
         
-        .view-section { 
+        /* --- NAVEGACIÓN GOXION: ACTIVO PROTAGONISTA + MORPH FLIP --- */
+        .tab-container {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 72px;
+            padding: 6px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 110;
+            border-radius: 18px;
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .tab-btn {
+            height: 58px;
+            min-width: 0;
+            background: rgba(255,255,255,0.025);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 50px;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            transform-origin: center;
+            transition:
+                background 220ms ease,
+                border-color 220ms ease,
+                box-shadow 220ms ease,
+                color 220ms ease;
+        }
+
+        .tab-btn.active {
+            flex: 1 1 auto;
+            justify-content: flex-start;
+            border-radius: 16px;
+            background:
+                linear-gradient(135deg,
+                    rgba(255,255,255,0.075),
+                    rgba(0,242,254,0.035) 58%,
+                    rgba(124,77,255,0.04));
+            color: var(--text-main);
+            border-color: rgba(0,242,254,0.82);
+            box-shadow:
+                0 5px 18px rgba(0,242,254,0.20),
+                inset 0 0 22px rgba(124,77,255,0.025);
+        }
+
+        .gx-nav-icon {
+            width: 48px;
+            min-width: 48px;
+            height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            line-height: 1;
+            position: relative;
+            z-index: 3;
+            transform: translateZ(0) scale(1);
+            transform-origin: center;
+            transition:
+                transform 300ms cubic-bezier(.2,1.14,.32,1),
+                filter 220ms ease;
+        }
+
+        .tab-btn.active .gx-nav-icon {
+            transform: translateZ(0) scale(1.46);
+            filter:
+                drop-shadow(0 0 7px rgba(0,242,254,0.34))
+                drop-shadow(0 0 11px rgba(124,77,255,0.16));
+        }
+
+        .gx-nav-label {
+            position: absolute;
+            left: 57px;
+            right: 12px;
+            top: 50%;
+            transform: translate3d(-8px,-50%,0);
+            opacity: 0;
+            pointer-events: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #fff;
+            font-size: 20px;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -0.25px;
+        }
+
+        .tab-btn.active .gx-nav-label {
+            opacity: 1;
+            transform: translate3d(0,-50%,0);
+        }
+
+        /* Estela de energía: siempre detrás de botones y texto */
+        .gx-nav-trail {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            height: 16px;
+            width: 1px;
+            border-radius: 999px;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            transform-origin: left center;
+            transform: translate3d(0,-50%,0) scaleX(.05);
+            background:
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(124,77,255,0.06) 18%,
+                    rgba(0,242,254,0.28) 55%,
+                    rgba(124,77,255,0.14) 78%,
+                    transparent 100%);
+            filter: blur(7px);
+            will-change: transform, opacity;
+        }
+
+        .gx-nav-glint {
+            position: absolute;
+            inset: 5px;
+            border-radius: inherit;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0;
+            background:
+                radial-gradient(circle at 24% 50%,
+                    rgba(255,255,255,0.20),
+                    rgba(0,242,254,0.10) 28%,
+                    rgba(124,77,255,0.045) 50%,
+                    transparent 72%);
+        }
+
+        .tab-btn.gx-arriving .gx-nav-glint {
+            animation: gxNavGlint 430ms cubic-bezier(.16,1,.3,1) both;
+        }
+
+        @keyframes gxNavGlint {
+            0%   { opacity: 0; transform: translateX(-18%) scale(.75); }
+            42%  { opacity: .9; }
+            100% { opacity: 0; transform: translateX(34%) scale(1.18); }
+        }
+
+        /* Transición de contenido: corta y ligera */
+        .gx-view-in-right {
+            animation: gxViewInRight 210ms cubic-bezier(.22,.8,.24,1) both !important;
+        }
+
+        .gx-view-in-left {
+            animation: gxViewInLeft 210ms cubic-bezier(.22,.8,.24,1) both !important;
+        }
+
+        .gx-view-in-soft {
+            animation: gxViewInSoft 190ms cubic-bezier(.22,.8,.24,1) both !important;
+        }
+
+        @keyframes gxViewInRight {
+            from { opacity: .42; transform: translate3d(8px,2px,0); }
+            to   { opacity: 1; transform: translate3d(0,0,0); }
+        }
+
+        @keyframes gxViewInLeft {
+            from { opacity: .42; transform: translate3d(-8px,2px,0); }
+            to   { opacity: 1; transform: translate3d(0,0,0); }
+        }
+
+        @keyframes gxViewInSoft {
+            from { opacity: .58; transform: translate3d(0,4px,0); }
+            to   { opacity: 1; transform: translate3d(0,0,0); }
+        }
+
+        @media (max-width: 360px) {
+            .tab-container { gap: 5px; }
+            .tab-btn { flex-basis: 46px; height: 56px; }
+            .gx-nav-icon { width: 44px; min-width: 44px; height: 44px; }
+            .gx-nav-label { left: 53px; font-size: 18px; }
+        }
+.view-section { 
             display: none; 
             animation: fadeIn 0.4s ease; 
         }
@@ -1835,219 +1961,23 @@
         .mission-item.locked { border-color: rgba(255, 170, 0, 0.4); background: rgba(255, 170, 0, 0.05); }
         .mission-item.locked .mission-checkbox { border-color: var(--warning-amber); background: rgba(255, 170, 0, 0.1); font-size: 10px; }
     
-        /* =========================================================
-           GOXION ORBITAL MORPH / TEST
-           Navegación morphing premium optimizada para móvil.
-           ========================================================= */
-
-        :root {
-            --gx-morph-duration: 560ms;
-            --gx-morph-ease: cubic-bezier(.16, 1, .3, 1);
-            --gx-touch-ease: cubic-bezier(.22,.8,.24,1);
-            --gx-spring: cubic-bezier(.2,1.16,.32,1);
-        }
-
-        /* ---------- RESPUESTA TÁCTIL LIGERA ---------- */
-        button,
-        .tab-btn,
-        .teaser-card,
-        .brand-card,
-        .platform-btn,
-        .faq-header,
-        .btn-menu,
-        .header-action-btn {
-            -webkit-tap-highlight-color: transparent;
-            transform-origin: center;
-        }
-
-        .gx-press {
+        /* --- MICROINTERACCIONES APROBADAS: LOGIN + FEEDBACK + TACTO --- */
+        .gx-touch-down {
             transform: scale(.968) !important;
-            transition: transform 145ms var(--gx-touch-ease) !important;
+            transition: transform 145ms cubic-bezier(.22,.8,.24,1) !important;
         }
 
-        .brand-card.gx-press,
-        .teaser-card.gx-press {
-            transform: scale(.988) !important;
-        }
-
-        /* =========================================================
-           MORPH DEL MENÚ
-           Un único elemento físico se comprime, viaja y se expande.
-           ========================================================= */
-
-        .tab-container.gx-morph-ready {
-            isolation: isolate;
-            overflow: hidden;
-        }
-
-        /* El indicador original se sustituye visualmente por el mismo
-           estilo, pero ahora es una sola "materia" compartida. */
-        .tab-container.gx-morph-ready .tab-btn.active {
-            background: transparent !important;
-            border-color: transparent !important;
-            box-shadow: none !important;
-        }
-
-        .tab-container.gx-morph-ready .tab-btn {
-            position: relative;
-            z-index: 3;
-        }
-
-        .gx-morph-indicator {
-            position: absolute;
-            z-index: 1;
-            pointer-events: none;
-            box-sizing: border-box;
-            border-radius: 12px;
-            background:
-                linear-gradient(135deg,
-                    rgba(255,255,255,.075),
-                    rgba(0,242,254,.035) 55%,
-                    rgba(124,77,255,.035));
-            border: 1px solid var(--neon-blue);
-            box-shadow:
-                0 4px 15px rgba(0,242,254,.25),
-                inset 0 0 18px rgba(124,77,255,.025);
-            transform-origin: center;
-            will-change: transform, opacity, border-radius;
-            contain: paint;
-        }
-
-        .gx-morph-indicator::before {
-            content: "";
-            position: absolute;
-            inset: 16%;
-            border-radius: inherit;
-            opacity: 0;
-            background:
-                radial-gradient(circle at center,
-                    rgba(255,255,255,.22) 0%,
-                    rgba(0,242,254,.13) 28%,
-                    rgba(124,77,255,.08) 48%,
-                    transparent 72%);
-            pointer-events: none;
-            transition: opacity 120ms ease;
-        }
-
-        .gx-morph-indicator.gx-travelling::before {
-            opacity: .95;
-        }
-
-        /* Estela detrás de la forma. Nunca queda encima del texto. */
-        .gx-morph-trail {
-            position: absolute;
-            z-index: 0;
-            pointer-events: none;
-            height: 28px;
-            border-radius: 999px;
-            opacity: 0;
-            transform-origin: left center;
-            will-change: transform, opacity;
-            contain: paint;
-            background:
-                linear-gradient(90deg,
-                    transparent 0%,
-                    rgba(124,77,255,.045) 18%,
-                    rgba(0,242,254,.16) 58%,
-                    rgba(124,77,255,.11) 76%,
-                    transparent 100%);
-        }
-
-        /* Icono: el crecimiento sí forma parte de la transformación. */
-        .tab-btn > span {
-            display: inline-block;
-            position: relative;
-            z-index: 4;
-            transform-origin: center;
-            transition:
-                transform 260ms var(--gx-spring),
-                text-shadow 220ms ease;
-        }
-
-        .tab-btn.active > span {
-            transform: translateY(-1px) scale(1.20);
-            text-shadow:
-                0 0 8px rgba(0,242,254,.28),
-                0 0 12px rgba(124,77,255,.12);
-        }
-
-        .tab-btn.active {
-            font-weight: 800 !important;
-        }
-
-        /* ---------- TRANSICIÓN DEL CONTENIDO ---------- */
-        .gx-view-enter-right {
-            animation: gxViewEnterRight 225ms var(--gx-touch-ease) both !important;
-        }
-
-        .gx-view-enter-left {
-            animation: gxViewEnterLeft 225ms var(--gx-touch-ease) both !important;
-        }
-
-        .gx-view-enter-soft {
-            animation: gxViewEnterSoft 205ms var(--gx-touch-ease) both !important;
-        }
-
-        @keyframes gxViewEnterRight {
-            from { opacity: .38; transform: translate3d(9px,2px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        @keyframes gxViewEnterLeft {
-            from { opacity: .38; transform: translate3d(-9px,2px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        @keyframes gxViewEnterSoft {
-            from { opacity: .55; transform: translate3d(0,4px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        /* ---------- ACORDEONES / EXPANSIONES ---------- */
-        .faq-header .icon,
-        .brand-expand-icon {
-            transition:
-                transform 280ms var(--gx-spring),
-                background 220ms ease,
-                color 220ms ease,
-                box-shadow 220ms ease;
-        }
-
-        .brand-card.expanded .brand-expand-icon {
-            transform: rotate(180deg) scale(1.03);
-        }
-
-        /* ---------- SHEETS Y MODALES ---------- */
-        .auth-overlay.show .auth-sheet {
-            animation: gxSheetIn 300ms var(--gx-spring) both;
-        }
-
-        .modal.show .modal-content {
-            animation: gxModalIn 275ms var(--gx-spring) both;
-        }
-
-        @keyframes gxSheetIn {
-            from { opacity: .35; transform: translate3d(0,18px,0) scale(.988); }
-            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); }
-        }
-
-        @keyframes gxModalIn {
-            from { opacity: .3; transform: translate3d(0,11px,0) scale(.982); }
-            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); }
-        }
-
-        /* =========================================================
-           LOGIN: mismo botón, tres estados
-           ========================================================= */
-        #btn-login-submit {
+        #btn-login-submit,
+        #btn-send-feedback {
             position: relative;
             overflow: hidden;
             min-height: 52px;
             transition:
-                transform 170ms var(--gx-touch-ease),
+                transform 170ms cubic-bezier(.22,.8,.24,1),
                 background 260ms ease,
                 color 220ms ease,
-                box-shadow 260ms ease;
+                box-shadow 260ms ease,
+                border-color 260ms ease;
         }
 
         #btn-login-submit.gx-validating {
@@ -2069,16 +1999,13 @@
             animation: gxLoginSweep 820ms linear infinite;
         }
 
-        @keyframes gxLoginSweep {
-            to { left: 118%; }
-        }
+        @keyframes gxLoginSweep { to { left: 118%; } }
 
         #btn-login-submit.gx-success {
             background: linear-gradient(135deg, #00d98f, #00ff9d) !important;
             color: #03140e !important;
             box-shadow: 0 0 24px rgba(0,255,157,.28) !important;
-            pointer-events: none;
-            animation: gxSuccessPop 380ms var(--gx-spring);
+            animation: gxSuccessPop 380ms cubic-bezier(.2,1.16,.32,1);
         }
 
         #btn-login-submit.gx-error {
@@ -2101,21 +2028,6 @@
             75% { transform: translateX(-2px); }
         }
 
-        /* =========================================================
-           FEEDBACK: transformación del mismo botón
-           ========================================================= */
-        #btn-send-feedback {
-            min-height: 52px;
-            position: relative;
-            overflow: hidden;
-            transition:
-                transform 170ms var(--gx-touch-ease),
-                background 260ms ease,
-                color 220ms ease,
-                box-shadow 260ms ease,
-                border-color 260ms ease;
-        }
-
         #btn-send-feedback.gx-feedback-sending {
             background: linear-gradient(135deg, #7c4dff, #4f8cff) !important;
             color: #fff !important;
@@ -2127,12 +2039,12 @@
             border: 1px solid rgba(0,255,157,.55) !important;
             color: #baffdf !important;
             box-shadow: 0 0 22px rgba(0,255,157,.16) !important;
-            animation: gxSuccessPop 380ms var(--gx-spring);
+            animation: gxSuccessPop 380ms cubic-bezier(.2,1.16,.32,1);
         }
 
         #feedback-success.gx-feedback-message {
             display: block !important;
-            animation: gxFeedbackMessage 250ms var(--gx-touch-ease) both;
+            animation: gxFeedbackMessage 250ms cubic-bezier(.22,.8,.24,1) both;
         }
 
         @keyframes gxFeedbackMessage {
@@ -2140,18 +2052,17 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ---------- ACCESIBILIDAD ---------- */
         @media (prefers-reduced-motion: reduce) {
-            .gx-morph-indicator,
-            .gx-morph-trail,
-            .tab-btn > span,
+            .tab-btn,
+            .gx-nav-icon,
+            .gx-nav-label,
+            .gx-nav-trail,
+            .gx-nav-glint,
             #btn-login-submit,
             #btn-send-feedback,
-            .auth-overlay.show .auth-sheet,
-            .modal.show .modal-content,
-            .gx-view-enter-right,
-            .gx-view-enter-left,
-            .gx-view-enter-soft {
+            .gx-view-in-right,
+            .gx-view-in-left,
+            .gx-view-in-soft {
                 animation: none !important;
                 transition-duration: .01ms !important;
             }
@@ -2188,10 +2099,26 @@
             <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
         </div>
 
-        <div class="glass-card tab-container">
-            <button class="tab-btn active" id="btn-tab-inicio" onclick="switchTab('inicio')"><span id="tab-inicio-icon">🏠</span><div id="tab-inicio-text">Inicio</div></button>
-            <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')"><span>🛒</span>Catálogo</button>
-            <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')"><span>🛠️</span>Soporte</button>
+        <div class="glass-card tab-container" id="goxion-main-nav">
+            <div class="gx-nav-trail" id="gx-nav-trail" aria-hidden="true"></div>
+
+            <button class="tab-btn active" id="btn-tab-inicio" data-nav-tab="inicio" onclick="switchTab('inicio')">
+                <span class="gx-nav-glint" aria-hidden="true"></span>
+                <span class="gx-nav-icon" id="tab-inicio-icon">🏠</span>
+                <span class="gx-nav-label" id="tab-inicio-text">Inicio</span>
+            </button>
+
+            <button class="tab-btn" id="btn-tab-catalogo" data-nav-tab="catalogo" onclick="switchTab('catalogo')">
+                <span class="gx-nav-glint" aria-hidden="true"></span>
+                <span class="gx-nav-icon">🛒</span>
+                <span class="gx-nav-label">Catálogo</span>
+            </button>
+
+            <button class="tab-btn" id="btn-tab-soporte" data-nav-tab="soporte" onclick="switchTab('soporte')">
+                <span class="gx-nav-glint" aria-hidden="true"></span>
+                <span class="gx-nav-icon">🛠️</span>
+                <span class="gx-nav-label">Soporte</span>
+            </button>
         </div>
 
         <div id="view-inicio" class="view-section">
@@ -4391,109 +4318,105 @@ function goxionBetaLegacy(data) {
     </script>
 
 
-<script id="goxion-orbital-morph">
+<script id="goxion-nav-morph">
 (() => {
-    const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const TAB_ORDER = { inicio: 0, catalogo: 1, soporte: 2 };
-
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const names = ["inicio", "catalogo", "soporte"];
     let currentTab = "inicio";
-    let morphBusy = false;
-    let queuedTab = null;
     let pressed = null;
+    let animating = false;
+    let queued = null;
 
-    let container = null;
-    let morph = null;
-    let trail = null;
+    const nav = document.getElementById("goxion-main-nav");
+    const trail = document.getElementById("gx-nav-trail");
+    const originalSwitchTab = window.switchTab;
 
-    const interactiveSelector =
-        'button, .tab-btn, .teaser-card, .brand-card, .platform-btn, .btn-menu, .header-action-btn';
+    if (!nav || !trail || typeof originalSwitchTab !== "function") return;
 
-    function getButton(tabName) {
-        return document.getElementById(`btn-tab-${tabName}`);
+    function button(name) {
+        return document.getElementById(`btn-tab-${name}`);
     }
 
-    function getView(tabName) {
-        if (tabName === "inicio") {
+    function activeView(name) {
+        if (name === "inicio") {
             return document.getElementById(
                 localStorage.getItem("goxion_user_key") ? "view-dashboard" : "view-inicio"
             );
         }
-        return document.getElementById(`view-${tabName}`);
+        return document.getElementById(`view-${name}`);
     }
 
-    function ensureMorph() {
-        if (container && morph && trail) return true;
-
-        container = document.querySelector(".tab-container");
-        if (!container) return false;
-
-        container.classList.add("gx-morph-ready");
-
-        morph = document.createElement("div");
-        morph.className = "gx-morph-indicator";
-        morph.setAttribute("aria-hidden", "true");
-
-        trail = document.createElement("div");
-        trail.className = "gx-morph-trail";
-        trail.setAttribute("aria-hidden", "true");
-
-        container.prepend(trail);
-        container.prepend(morph);
-
-        return true;
-    }
-
-    function buttonBox(btn) {
-        const c = container.getBoundingClientRect();
-        const b = btn.getBoundingClientRect();
-
-        return {
-            left: b.left - c.left,
-            top: b.top - c.top,
-            width: b.width,
-            height: b.height,
-            centerX: (b.left - c.left) + b.width / 2,
-            centerY: (b.top - c.top) + b.height / 2
-        };
-    }
-
-    function snapMorphTo(tabName) {
-        if (!ensureMorph()) return;
-
-        const btn = getButton(tabName);
-        if (!btn) return;
-
-        const box = buttonBox(btn);
-        morph.getAnimations().forEach(a => a.cancel());
-        trail.getAnimations().forEach(a => a.cancel());
-
-        Object.assign(morph.style, {
-            left: `${box.left}px`,
-            top: `${box.top}px`,
-            width: `${box.width}px`,
-            height: `${box.height}px`,
-            transform: "translate3d(0,0,0) scale(1,1)",
-            borderRadius: "12px",
-            opacity: "1"
+    function applyOrder(activeName) {
+        button(activeName).style.order = "0";
+        names.filter(n => n !== activeName).forEach((name, index) => {
+            button(name).style.order = String(index + 1);
         });
-
-        trail.style.opacity = "0";
     }
 
-    function animateNewView(tabName, previousTab) {
-        const view = getView(tabName);
-        if (!view) return;
+    function snapshot() {
+        const map = {};
+        names.forEach(name => {
+            const el = button(name);
+            const r = el.getBoundingClientRect();
+            map[name] = {
+                left: r.left,
+                top: r.top,
+                width: r.width,
+                height: r.height,
+                radius: getComputedStyle(el).borderRadius
+            };
+        });
+        return map;
+    }
 
-        view.classList.remove("gx-view-enter-right", "gx-view-enter-left", "gx-view-enter-soft");
+    function iconSnapshot() {
+        const map = {};
+        names.forEach(name => {
+            const icon = button(name).querySelector(".gx-nav-icon");
+            const r = icon.getBoundingClientRect();
+            map[name] = { left:r.left, top:r.top, width:r.width, height:r.height };
+        });
+        return map;
+    }
+
+    function animateTrail(fromRect, toRect) {
+        if (reducedMotion.matches || !trail.animate) return;
+
+        const navRect = nav.getBoundingClientRect();
+        const fromX = fromRect.left - navRect.left + fromRect.width / 2;
+        const toX = toRect.left - navRect.left + toRect.width / 2;
+        const left = Math.min(fromX, toX);
+        const distance = Math.max(18, Math.abs(toX - fromX));
+
+        trail.style.left = `${left}px`;
+        trail.style.width = `${distance}px`;
+        trail.style.transformOrigin = toX < fromX ? "right center" : "left center";
+
+        trail.animate([
+            { opacity:0, transform:"translate3d(0,-50%,0) scaleX(.05)", offset:0 },
+            { opacity:.68, transform:"translate3d(0,-50%,0) scaleX(.34)", offset:.25 },
+            { opacity:.48, transform:"translate3d(0,-50%,0) scaleX(.90)", offset:.68 },
+            { opacity:0, transform:"translate3d(0,-50%,0) scaleX(1)", offset:1 }
+        ], {
+            duration: 470,
+            easing: "cubic-bezier(.16,1,.3,1)"
+        });
+    }
+
+    function animateView(newTab, oldTab) {
+        const view = activeView(newTab);
+        if (!view || reducedMotion.matches) return;
+
+        view.classList.remove("gx-view-in-right","gx-view-in-left","gx-view-in-soft");
         void view.offsetWidth;
 
-        const from = TAB_ORDER[previousTab] ?? 0;
-        const to = TAB_ORDER[tabName] ?? 0;
-
-        const cls =
-            to > from ? "gx-view-enter-right" :
-            to < from ? "gx-view-enter-left" :
-            "gx-view-enter-soft";
+        const oldIndex = names.indexOf(oldTab);
+        const newIndex = names.indexOf(newTab);
+        const cls = newIndex > oldIndex
+            ? "gx-view-in-right"
+            : newIndex < oldIndex
+                ? "gx-view-in-left"
+                : "gx-view-in-soft";
 
         view.classList.add(cls);
         view.style.willChange = "transform, opacity";
@@ -4501,274 +4424,213 @@ function goxionBetaLegacy(data) {
         setTimeout(() => {
             view.classList.remove(cls);
             view.style.willChange = "";
-        }, 260);
+        }, 250);
     }
 
-    function animateIcon(sourceBtn, targetBtn) {
-        const sourceIcon = sourceBtn?.querySelector("span");
-        const targetIcon = targetBtn?.querySelector("span");
+    function animateLabelStates(oldTab, newTab) {
+        const oldLabel = button(oldTab)?.querySelector(".gx-nav-label");
+        const newLabel = button(newTab)?.querySelector(".gx-nav-label");
 
-        if (sourceIcon?.animate) {
-            sourceIcon.animate([
-                { transform: "translateY(-1px) scale(1.20)", offset: 0 },
-                { transform: "translateY(-2px) scale(1.34)", offset: .42 },
-                { transform: "translateY(0) scale(1.00)", offset: 1 }
+        if (oldLabel?.animate) {
+            oldLabel.animate([
+                { opacity:1, transform:"translate3d(0,-50%,0)" },
+                { opacity:0, transform:"translate3d(-10px,-50%,0)" }
+            ], {
+                duration: 150,
+                easing:"cubic-bezier(.22,.8,.24,1)"
+            });
+        }
+
+        if (newLabel?.animate) {
+            newLabel.animate([
+                { opacity:0, transform:"translate3d(-10px,-50%,0)" },
+                { opacity:1, transform:"translate3d(0,-50%,0)" }
             ], {
                 duration: 250,
-                easing: "cubic-bezier(.16,1,.3,1)",
-                fill: "none"
+                delay: 150,
+                easing:"cubic-bezier(.16,1,.3,1)"
             });
         }
+    }
 
-        if (targetIcon?.animate) {
-            targetIcon.animate([
-                { transform: "scale(.94)", offset: 0 },
-                { transform: "translateY(-2px) scale(1.38)", offset: .62 },
-                { transform: "translateY(-1px) scale(1.20)", offset: 1 }
+    function animateFlip(before, after, iconBefore, iconAfter, oldTab, newTab) {
+        const animations = [];
+
+        names.forEach(name => {
+            const el = button(name);
+            const b = before[name];
+            const a = after[name];
+            if (!el || !b || !a || reducedMotion.matches || !el.animate) return;
+
+            const dx = b.left - a.left;
+            const dy = b.top - a.top;
+            const sx = b.width / a.width;
+            const sy = b.height / a.height;
+
+            const isIncoming = name === newTab;
+            const isOutgoing = name === oldTab;
+
+            const keyframes = [
+                {
+                    transform:`translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})`,
+                    borderRadius:b.radius,
+                    offset:0
+                },
+                {
+                    transform:`translate3d(${dx * .42}px,${dy * .42}px,0) scale(${isIncoming ? sx * .93 : sx * 1.035},${isIncoming ? sy * .96 : sy * 1.02})`,
+                    borderRadius:isIncoming ? "24px" : "22px",
+                    offset:.48
+                },
+                {
+                    transform:"translate3d(0,0,0) scale(1,1)",
+                    borderRadius:a.radius,
+                    offset:1
+                }
+            ];
+
+            const anim = el.animate(keyframes, {
+                duration: 520,
+                easing:"cubic-bezier(.16,1,.3,1)",
+                fill:"both"
+            });
+            animations.push(anim);
+
+            el.style.willChange = "transform";
+            anim.onfinish = () => { el.style.willChange = ""; };
+        });
+
+        /* El icono entrante tiene su propio overshoot para que se perciba
+           claramente que "toma protagonismo". */
+        const incomingIcon = button(newTab)?.querySelector(".gx-nav-icon");
+        if (incomingIcon?.animate && !reducedMotion.matches) {
+            incomingIcon.animate([
+                { transform:"scale(1)", offset:0 },
+                { transform:"scale(1.62)", offset:.62 },
+                { transform:"scale(1.46)", offset:1 }
             ], {
-                duration: 360,
-                delay: 205,
-                easing: "cubic-bezier(.16,1,.3,1)",
-                fill: "none"
+                duration: 500,
+                easing:"cubic-bezier(.16,1,.3,1)"
             });
         }
+
+        const outgoingIcon = button(oldTab)?.querySelector(".gx-nav-icon");
+        if (outgoingIcon?.animate && !reducedMotion.matches) {
+            outgoingIcon.animate([
+                { transform:"scale(1.46)", offset:0 },
+                { transform:"scale(.92)", offset:.68 },
+                { transform:"scale(1)", offset:1 }
+            ], {
+                duration: 410,
+                easing:"cubic-bezier(.16,1,.3,1)"
+            });
+        }
+
+        return animations;
     }
 
-    function animateTrail(fromBox, toBox) {
-        const start = fromBox.centerX;
-        const end = toBox.centerX;
-        const left = Math.min(start, end);
-        const distance = Math.max(12, Math.abs(end - start));
-
-        Object.assign(trail.style, {
-            left: `${left}px`,
-            top: `${fromBox.centerY - 14}px`,
-            width: `${distance}px`,
-            height: "28px",
-            opacity: "0"
-        });
-
-        const directionRight = end >= start;
-        trail.style.transformOrigin = directionRight ? "left center" : "right center";
-
-        if (!trail.animate) return;
-
-        trail.animate([
-            { opacity: 0, transform: "scaleX(.06)", offset: 0 },
-            { opacity: .58, transform: "scaleX(.38)", offset: .24 },
-            { opacity: .46, transform: "scaleX(.88)", offset: .62 },
-            { opacity: 0, transform: "scaleX(1)", offset: 1 }
-        ], {
-            duration: 455,
-            delay: 70,
-            easing: "cubic-bezier(.16,1,.3,1)",
-            fill: "none"
-        });
+    function runGlint(name) {
+        const el = button(name);
+        if (!el) return;
+        el.classList.remove("gx-arriving");
+        void el.offsetWidth;
+        el.classList.add("gx-arriving");
+        clearTimeout(el._gxGlint);
+        el._gxGlint = setTimeout(() => el.classList.remove("gx-arriving"), 470);
     }
 
-    function performMorph(tabName, originalSwitchTab) {
-        if (!ensureMorph()) {
-            originalSwitchTab(tabName);
-            currentTab = tabName;
+    function transitionTo(newTab) {
+        if (!names.includes(newTab)) {
+            originalSwitchTab(newTab);
             return;
         }
 
-        const sourceBtn = getButton(currentTab);
-        const targetBtn = getButton(tabName);
-
-        if (!sourceBtn || !targetBtn || currentTab === tabName) {
-            originalSwitchTab(tabName);
-            currentTab = tabName;
-            snapMorphTo(tabName);
-
-            const icon = targetBtn?.querySelector("span");
-            if (icon?.animate && !REDUCED.matches) {
+        if (newTab === currentTab) {
+            originalSwitchTab(newTab);
+            const icon = button(newTab)?.querySelector(".gx-nav-icon");
+            if (icon?.animate && !reducedMotion.matches) {
                 icon.animate([
-                    { transform: "translateY(-1px) scale(1.20)" },
-                    { transform: "translateY(-2px) scale(1.34)" },
-                    { transform: "translateY(-1px) scale(1.20)" }
+                    { transform:"scale(1.46)" },
+                    { transform:"scale(1.62)" },
+                    { transform:"scale(1.46)" }
                 ], {
-                    duration: 330,
-                    easing: "cubic-bezier(.16,1,.3,1)"
+                    duration:300,
+                    easing:"cubic-bezier(.16,1,.3,1)"
                 });
             }
+            runGlint(newTab);
             return;
         }
 
-        if (REDUCED.matches || !morph.animate) {
-            originalSwitchTab(tabName);
-            currentTab = tabName;
-            snapMorphTo(tabName);
+        if (animating) {
+            queued = newTab;
             return;
         }
 
-        if (morphBusy) {
-            queuedTab = tabName;
-            return;
-        }
+        animating = true;
+        const oldTab = currentTab;
 
-        morphBusy = true;
+        const before = snapshot();
+        const iconBefore = iconSnapshot();
+        const oldTargetRect = before[newTab];
 
-        const previousTab = currentTab;
-        const fromBox = buttonBox(sourceBtn);
-        const toBox = buttonBox(targetBtn);
-        const dx = toBox.centerX - fromBox.centerX;
-        const dy = toBox.centerY - fromBox.centerY;
+        /* Se cambia el estado real inmediatamente.
+           La animación FLIP hace que visualmente continúe desde la posición anterior. */
+        originalSwitchTab(newTab);
+        applyOrder(newTab);
 
-        snapMorphTo(previousTab);
+        const after = snapshot();
+        const iconAfter = iconSnapshot();
 
-        const compactSize = Math.min(38, fromBox.height * .56);
-        const compactX = Math.max(.24, compactSize / fromBox.width);
-        const compactY = Math.max(.34, compactSize / fromBox.height);
-        const capsuleX = Math.min(.78, compactX * 1.65);
-        const capsuleY = Math.max(.26, compactY * .72);
+        animateTrail(oldTargetRect, after[newTab]);
+        animateLabelStates(oldTab, newTab);
+        animateFlip(before, after, iconBefore, iconAfter, oldTab, newTab);
+        runGlint(newTab);
 
-        morph.classList.add("gx-travelling");
-        morph.style.willChange = "transform, border-radius, opacity";
+        requestAnimationFrame(() => animateView(newTab, oldTab));
+        currentTab = newTab;
 
-        animateTrail(fromBox, toBox);
-        animateIcon(sourceBtn, targetBtn);
-
-        /* La vista vieja comienza a ceder mientras la materia se comprime. */
-        const oldView = getView(previousTab);
-        if (oldView?.animate) {
-            const dir = dx >= 0 ? -1 : 1;
-            oldView.animate([
-                { opacity: 1, transform: "translate3d(0,0,0)" },
-                { opacity: .58, transform: `translate3d(${dir * 6}px,0,0)` }
-            ], {
-                duration: 155,
-                delay: 105,
-                easing: "cubic-bezier(.22,.8,.24,1)",
-                fill: "none"
-            });
-        }
-
-        /* El cambio real de contenido ocurre durante el trayecto,
-           no al final, para que la interfaz siga sintiéndose rápida. */
-        const switchDelay = 220;
-        const switchTimer = setTimeout(() => {
-            originalSwitchTab(tabName);
-            currentTab = tabName;
-            requestAnimationFrame(() => animateNewView(tabName, previousTab));
-        }, switchDelay);
-
-        const animation = morph.animate([
-            {
-                transform: "translate3d(0,0,0) scale(1,1)",
-                borderRadius: "12px",
-                opacity: 1,
-                offset: 0,
-                easing: "cubic-bezier(.2,.7,.2,1)"
-            },
-            {
-                transform: `translate3d(0,0,0) scale(${compactX},${compactY})`,
-                borderRadius: "999px",
-                opacity: 1,
-                offset: .20,
-                easing: "cubic-bezier(.16,1,.3,1)"
-            },
-            {
-                transform: `translate3d(${dx * .20}px,${dy * .20}px,0) scale(${capsuleX},${capsuleY})`,
-                borderRadius: "999px",
-                opacity: .98,
-                offset: .36,
-                easing: "cubic-bezier(.22,.8,.24,1)"
-            },
-            {
-                transform: `translate3d(${dx * .68}px,${dy * .68}px,0) scale(${Math.min(.84, capsuleX * 1.10)},${Math.max(.24, capsuleY * .92)})`,
-                borderRadius: "999px",
-                opacity: .96,
-                offset: .60,
-                easing: "cubic-bezier(.22,.8,.24,1)"
-            },
-            {
-                transform: `translate3d(${dx}px,${dy}px,0) scale(${compactX},${compactY})`,
-                borderRadius: "999px",
-                opacity: 1,
-                offset: .79,
-                easing: "cubic-bezier(.16,1,.3,1)"
-            },
-            {
-                transform: `translate3d(${dx}px,${dy}px,0) scale(1,1)`,
-                borderRadius: "12px",
-                opacity: 1,
-                offset: 1
-            }
-        ], {
-            duration: 560,
-            easing: "linear",
-            fill: "forwards"
-        });
-
-        animation.onfinish = () => {
-            clearTimeout(switchTimer);
-
-            /* Por seguridad, si el timer no corrió por alguna razón. */
-            if (currentTab !== tabName) {
-                originalSwitchTab(tabName);
-                currentTab = tabName;
-                animateNewView(tabName, previousTab);
-            }
-
-            morph.classList.remove("gx-travelling");
-            morph.style.willChange = "";
-            snapMorphTo(tabName);
-            morphBusy = false;
-
-            if (queuedTab && queuedTab !== currentTab) {
-                const next = queuedTab;
-                queuedTab = null;
-                requestAnimationFrame(() => performMorph(next, originalSwitchTab));
+        setTimeout(() => {
+            animating = false;
+            if (queued && queued !== currentTab) {
+                const next = queued;
+                queued = null;
+                transitionTo(next);
             } else {
-                queuedTab = null;
+                queued = null;
             }
-        };
-
-        animation.oncancel = () => {
-            clearTimeout(switchTimer);
-            morph.classList.remove("gx-travelling");
-            morph.style.willChange = "";
-            morphBusy = false;
-        };
+        }, 540);
     }
 
-    const originalSwitchTab = window.switchTab;
-    if (typeof originalSwitchTab === "function") {
-        window.switchTab = function(tabName) {
-            performMorph(tabName, originalSwitchTab);
-        };
-    }
+    window.switchTab = transitionTo;
 
-    /* Respuesta táctil mediante delegación: un solo listener. */
-    document.addEventListener("pointerdown", (event) => {
-        const el = event.target.closest(interactiveSelector);
+    /* Un solo sistema de feedback táctil para toda la interfaz. */
+    const touchSelector =
+        "button, .teaser-card, .brand-card, .platform-btn, .btn-menu, .header-action-btn";
+
+    document.addEventListener("pointerdown", event => {
+        const el = event.target.closest(touchSelector);
         if (!el) return;
         pressed = el;
-        el.classList.add("gx-press");
-    }, { passive:true });
+        el.classList.add("gx-touch-down");
+    }, {passive:true});
 
-    const releasePress = () => {
+    const release = () => {
         if (!pressed) return;
-        pressed.classList.remove("gx-press");
+        pressed.classList.remove("gx-touch-down");
         pressed = null;
     };
 
-    document.addEventListener("pointerup", releasePress, { passive:true });
-    document.addEventListener("pointercancel", releasePress, { passive:true });
+    document.addEventListener("pointerup", release, {passive:true});
+    document.addEventListener("pointercancel", release, {passive:true});
 
     let resizeFrame = null;
     window.addEventListener("resize", () => {
         cancelAnimationFrame(resizeFrame);
-        resizeFrame = requestAnimationFrame(() => {
-            if (!morphBusy) snapMorphTo(currentTab);
-        });
-    }, { passive:true });
+        resizeFrame = requestAnimationFrame(() => applyOrder(currentTab));
+    }, {passive:true});
 
-    document.addEventListener("DOMContentLoaded", () => {
-        if (!ensureMorph()) return;
-        requestAnimationFrame(() => snapMorphTo("inicio"));
-    });
+    /* Estado inicial: Inicio grande, Catálogo + Soporte compactos. */
+    applyOrder("inicio");
 })();
 </script>
 
