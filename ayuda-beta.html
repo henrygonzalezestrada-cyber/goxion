@@ -2288,6 +2288,124 @@
             text-align: center;
         }
 
+
+        /* --- AJUSTE DE ALINEACIÓN: REFERIDOS / CUPONES --- */
+        .gamif-btn {
+            min-height: 176px;
+            justify-content: flex-start;
+            padding: 22px 12px 18px;
+        }
+
+        .gamif-btn .gamif-icon {
+            height: 46px;
+            min-height: 46px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+
+        .gamif-btn .gamif-title {
+            min-height: 38px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .gamif-btn .gamif-subtitle {
+            min-height: 30px;
+            width: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            text-align: center;
+            line-height: 1.22;
+        }
+
+        .gx-referral-card-title {
+            min-height: 38px !important;
+            font-size: clamp(14px, 3.9vw, 17px) !important;
+        }
+
+        /* --- SECUENCIA ELEGANTE AL ABRIR MISIONES COMPLETADAS --- */
+        .mission-item.gx-seq-hidden.done {
+            opacity: 1 !important;
+            text-decoration: none !important;
+            border-color: rgba(255,255,255,.06) !important;
+            background: rgba(0,0,0,.40) !important;
+        }
+
+        .mission-item.gx-seq-hidden.done .mission-checkbox {
+            background: transparent !important;
+            border-color: var(--neon-blue) !important;
+            transform: scale(.82);
+        }
+
+        .mission-item.gx-seq-hidden.done .mission-checkbox::after {
+            opacity: 0;
+        }
+
+        .mission-item.gx-seq-hidden.done .gx-mission-text {
+            opacity: 1 !important;
+            text-decoration: none !important;
+        }
+
+        .mission-item.gx-sequence-reveal {
+            animation: gxMissionSequenceCard 720ms cubic-bezier(.16,1,.3,1) both !important;
+        }
+
+        .mission-item.gx-sequence-reveal .mission-checkbox {
+            animation: gxMissionSequenceCheck 620ms cubic-bezier(.34,1.56,.64,1) both !important;
+        }
+
+        .mission-item.gx-sequence-reveal .gx-mission-text {
+            animation: gxMissionSequenceStrike 700ms cubic-bezier(.16,1,.3,1) both !important;
+        }
+
+        @keyframes gxMissionSequenceCard {
+            0% {
+                border-color: rgba(0,242,254,.30);
+                background: rgba(0,242,254,.06);
+                transform: translate3d(0,5px,0) scale(.988);
+            }
+            52% {
+                border-color: rgba(46,160,67,.88);
+                background: rgba(46,160,67,.16);
+                transform: translate3d(0,0,0) scale(1.012);
+            }
+            100% {
+                border-color: var(--success-green);
+                background: rgba(46,160,67,.10);
+                transform: translate3d(0,0,0) scale(1);
+            }
+        }
+
+        @keyframes gxMissionSequenceCheck {
+            0% { transform: scale(.30) rotate(-20deg); }
+            62% { transform: scale(1.24) rotate(5deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes gxMissionSequenceStrike {
+            0%,35% {
+                opacity: 1;
+                text-decoration-color: transparent;
+            }
+            100% {
+                opacity: .65;
+                text-decoration-color: currentColor;
+            }
+        }
+
+        @media (max-width: 390px) {
+            .gamif-btn {
+                min-height: 168px;
+                padding: 20px 10px 16px;
+            }
+        }
+
 </style>
 </head>
 <body class="no-scroll">
@@ -3293,6 +3411,31 @@
             alert(`¡${tipo} copiado al portapapeles!`); 
         }
 
+        function animarMisionesCompletadasEnSecuencia() {
+            const items = Array.from(document.querySelectorAll('#gamif-expanded-coupon .mission-item.done'));
+            const total = document.querySelectorAll('#gamif-expanded-coupon .mission-item').length;
+
+            if(!items.length || items.length !== total) return;
+
+            items.forEach(item => {
+                item.classList.remove('gx-sequence-reveal', 'gx-seq-hidden');
+                item.classList.add('gx-seq-hidden');
+            });
+
+            items.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.remove('gx-seq-hidden');
+                    item.classList.remove('gx-sequence-reveal');
+                    void item.offsetWidth;
+                    item.classList.add('gx-sequence-reveal');
+
+                    setTimeout(() => {
+                        item.classList.remove('gx-sequence-reveal');
+                    }, 760);
+                }, 180 + (index * 360));
+            });
+        }
+
         window.openGamif = function(type) {
             document.getElementById('gamif-grid').style.display = 'none';
 
@@ -3319,6 +3462,8 @@
                         }
                         localStorage.removeItem(pendingKey);
                     }, 130);
+                } else {
+                    setTimeout(animarMisionesCompletadasEnSecuencia, 170);
                 }
             }
         };
