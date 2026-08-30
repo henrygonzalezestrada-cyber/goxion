@@ -2013,6 +2013,215 @@
             }
         }
 
+
+        /* =========================================================
+           GOXION MOTION SYSTEM V2
+           Cristal + navegación viva + estados del login
+           ========================================================= */
+
+        /* Recupera profundidad y calidad del cristal */
+        .glass-card,
+        .tab-container,
+        .btn-menu,
+        .brand-card,
+        .smart-support-card,
+        .modal-content,
+        .floating-cart {
+            background: rgba(8, 8, 12, .42) !important;
+            backdrop-filter: blur(20px) saturate(135%) !important;
+            -webkit-backdrop-filter: blur(20px) saturate(135%) !important;
+            border-color: rgba(255, 255, 255, .10) !important;
+            box-shadow:
+                0 12px 32px rgba(0,0,0,.42),
+                inset 0 1px 0 rgba(255,255,255,.025);
+        }
+
+        /* En soporte elevamos un poco más el cristal */
+        #view-soporte .glass-card,
+        #view-soporte .smart-support-card {
+            background: rgba(8, 8, 12, .50) !important;
+            backdrop-filter: blur(24px) saturate(140%) !important;
+            -webkit-backdrop-filter: blur(24px) saturate(140%) !important;
+        }
+
+        /* Navegación con indicador que viaja entre pestañas */
+        .tab-container {
+            overflow: hidden;
+            isolation: isolate;
+        }
+
+        .goxion-tab-indicator {
+            position: absolute;
+            z-index: 0;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: calc((100% - 8px) / 3);
+            border-radius: 12px;
+            background:
+                linear-gradient(135deg,
+                    rgba(0,242,254,.12),
+                    rgba(124,77,255,.10));
+            border: 1px solid rgba(0,242,254,.72);
+            box-shadow:
+                0 0 18px rgba(0,242,254,.18),
+                inset 0 0 18px rgba(124,77,255,.035);
+            transform: translateX(0%);
+            transition:
+                transform 330ms cubic-bezier(.2,.9,.25,1),
+                border-color 260ms ease,
+                box-shadow 260ms ease;
+            pointer-events: none;
+        }
+
+        .tab-btn {
+            z-index: 1;
+            overflow: visible !important;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: transparent !important;
+            border-color: transparent !important;
+            box-shadow: none !important;
+            color: #fff !important;
+            font-weight: 800 !important;
+        }
+
+        .tab-btn.active > span {
+            transform: scale(1.18);
+            filter:
+                drop-shadow(0 0 7px rgba(0,242,254,.45))
+                drop-shadow(0 0 10px rgba(124,77,255,.22));
+        }
+
+        .tab-btn > span {
+            transition:
+                transform 300ms cubic-bezier(.2,1.25,.35,1),
+                filter 240ms ease;
+        }
+
+        .tab-btn.active {
+            letter-spacing: .08px;
+        }
+
+        /* Entrada refinada: dirección según la pestaña */
+        .view-section.goxion-view-enter,
+        #view-dashboard.goxion-view-enter {
+            animation: none !important;
+        }
+
+        .view-section.goxion-view-enter.goxion-from-right,
+        #view-dashboard.goxion-view-enter.goxion-from-right {
+            animation: goxionViewFromRight 280ms cubic-bezier(.22,.8,.24,1) both !important;
+        }
+
+        .view-section.goxion-view-enter.goxion-from-left,
+        #view-dashboard.goxion-view-enter.goxion-from-left {
+            animation: goxionViewFromLeft 280ms cubic-bezier(.22,.8,.24,1) both !important;
+        }
+
+        .view-section.goxion-view-enter.goxion-same-view,
+        #view-dashboard.goxion-view-enter.goxion-same-view {
+            animation: goxionViewSame 240ms cubic-bezier(.22,.8,.24,1) both !important;
+        }
+
+        @keyframes goxionViewFromRight {
+            from { opacity: 0; transform: translate3d(18px,5px,0) scale(.994); filter: blur(1.5px); }
+            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes goxionViewFromLeft {
+            from { opacity: 0; transform: translate3d(-18px,5px,0) scale(.994); filter: blur(1.5px); }
+            to   { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+        }
+
+        @keyframes goxionViewSame {
+            from { opacity: .45; transform: translateY(5px) scale(.997); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .goxion-stagger-item {
+            animation-duration: 300ms !important;
+            animation-delay: calc(var(--goxion-order, 0) * 24ms) !important;
+        }
+
+        /* Estado visual del botón de acceso */
+        #btn-login-submit {
+            min-height: 52px;
+            overflow: hidden;
+            position: relative;
+            transition:
+                transform 180ms cubic-bezier(.22,.8,.24,1),
+                background 280ms ease,
+                color 240ms ease,
+                box-shadow 280ms ease,
+                border-color 280ms ease;
+        }
+
+        #btn-login-submit.login-validating {
+            background: linear-gradient(135deg, #7c4dff, #4f8cff) !important;
+            color: #fff !important;
+            box-shadow: 0 0 24px rgba(124,77,255,.32) !important;
+            pointer-events: none;
+        }
+
+        #btn-login-submit.login-validating::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 38%;
+            left: -45%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+            transform: skewX(-18deg);
+            animation: goxionLoginSweep 900ms linear infinite;
+        }
+
+        @keyframes goxionLoginSweep {
+            to { left: 115%; }
+        }
+
+        #btn-login-submit.login-success {
+            background: linear-gradient(135deg, #00d990, #00ff9d) !important;
+            color: #02140e !important;
+            box-shadow:
+                0 0 26px rgba(0,255,157,.30),
+                inset 0 1px 0 rgba(255,255,255,.28) !important;
+            pointer-events: none;
+            animation: goxionLoginSuccess 420ms cubic-bezier(.2,1.25,.35,1);
+        }
+
+        @keyframes goxionLoginSuccess {
+            0% { transform: scale(.975); }
+            65% { transform: scale(1.025); }
+            100% { transform: scale(1); }
+        }
+
+        #btn-login-submit.login-error {
+            background: linear-gradient(135deg, #ff3366, #d81b60) !important;
+            color: #fff !important;
+            box-shadow: 0 0 22px rgba(255,51,102,.28) !important;
+            animation: goxionLoginError 360ms cubic-bezier(.36,.07,.19,.97);
+        }
+
+        @keyframes goxionLoginError {
+            0%,100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            50% { transform: translateX(4px); }
+            75% { transform: translateX(-2px); }
+        }
+
+        #login-error.login-error-soft {
+            color: #ff8ca8 !important;
+            animation: goxionErrorText 240ms ease both;
+        }
+
+        @keyframes goxionErrorText {
+            from { opacity: 0; transform: translateY(-3px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
 </style>
 </head>
 <body class="no-scroll">
@@ -2374,7 +2583,7 @@
                     <input type="text" id="login-id" class="input-smart" placeholder="Tu Nombre o ID (Ej. Juan de Dios)">
                     <input type="password" id="login-pin" class="input-smart" placeholder="Código de Acceso (PIN)">
                     
-                    <button class="btn-primary" onclick="iniciarSesion()">Entrar a mi Panel</button>
+                    <button id="btn-login-submit" class="btn-primary" onclick="iniciarSesion()">Entrar a mi Panel</button>
                     <p id="login-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
                 </div>
             </div>
@@ -4136,15 +4345,30 @@ function goxionBetaLegacy(data) {
             const inputId = document.getElementById("login-id").value.trim();
             const inputPin = document.getElementById("login-pin").value.trim();
             const errorMsg = document.getElementById("login-error");
+            const loginBtn = document.getElementById("btn-login-submit");
+
+            const setLoginState = (state, text) => {
+                if (!loginBtn) return;
+                loginBtn.classList.remove("login-validating", "login-success", "login-error");
+                if (state) loginBtn.classList.add(state);
+                loginBtn.innerHTML = text;
+            };
 
             if (!inputId || !inputPin) {
+                setLoginState("login-error", "✕ Datos incompletos");
                 errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso.";
+                errorMsg.classList.add("login-error-soft");
                 errorMsg.style.display = "block";
+                setTimeout(() => {
+                    setLoginState("", "Entrar a mi Panel");
+                }, 1100);
                 return;
             }
 
-            errorMsg.innerText = "Validando acceso...";
-            errorMsg.style.display = "block";
+            setLoginState("login-validating", "Validando información…");
+            loginBtn.disabled = true;
+            errorMsg.classList.remove("login-error-soft");
+            errorMsg.style.display = "none";
 
             try {
                 const lr = await fetch(LOGIN_BETA, {
@@ -4174,19 +4398,33 @@ function goxionBetaLegacy(data) {
                 cargarCatalogo(globalClientesData);
                 renderizarSoporteDinamico(globalClientesData);
 
+                setLoginState("login-success", "✓ Validación exitosa");
                 errorMsg.style.display = "none";
-                closeAuthSheet();
 
                 const guestCard = document.getElementById("guest-action-card");
                 if (guestCard) guestCard.style.display = "none";
 
                 renderDashboard(login.cliente.clave);
-                switchTab("inicio");
                 notificarAdmin("logins", "🟢 Nuevo Inicio de Sesión", `El cliente **${login.cliente.nombre}** acaba de entrar a su app.`, "2ea043");
+
+                setTimeout(() => {
+                    closeAuthSheet();
+                    switchTab("inicio");
+                    loginBtn.disabled = false;
+                    setTimeout(() => setLoginState("", "Entrar a mi Panel"), 250);
+                }, 520);
+
             } catch (e) {
                 console.error(e);
+                setLoginState("login-error", "✕ Datos incorrectos");
                 errorMsg.innerText = e?.message || "Datos incorrectos. Verifica tu Nombre y Código.";
+                errorMsg.classList.add("login-error-soft");
                 errorMsg.style.display = "block";
+                loginBtn.disabled = false;
+
+                setTimeout(() => {
+                    setLoginState("", "Entrar a mi Panel");
+                }, 1350);
             }
         };
 
@@ -4224,11 +4462,15 @@ function goxionBetaLegacy(data) {
     </script>
 
 
+
 <script id="goxion-motion-system">
 (() => {
+    const TAB_ORDER = { inicio: 0, catalogo: 1, soporte: 2 };
+    let lastTabIndex = 0;
+
     const PRESS_SELECTOR = [
         'button', '.btn-primary', '.btn-shimmer', '.teaser-card',
-        '.btn-menu', '.brand-card', '.link-discreto'
+        '.btn-menu', '.brand-card', '.link-discreto', '.platform-btn'
     ].join(',');
 
     function addPressFeedback(root = document) {
@@ -4246,13 +4488,39 @@ function goxionBetaLegacy(data) {
         });
     }
 
-    function animateCurrentView() {
+    function ensureTabIndicator() {
+        const tabs = document.querySelector('.tab-container');
+        if (!tabs || tabs.querySelector('.goxion-tab-indicator')) return;
+        const indicator = document.createElement('div');
+        indicator.className = 'goxion-tab-indicator';
+        tabs.prepend(indicator);
+    }
+
+    function moveTabIndicator(tabName) {
+        ensureTabIndicator();
+        const indicator = document.querySelector('.goxion-tab-indicator');
+        const idx = TAB_ORDER[tabName] ?? 0;
+        if (indicator) indicator.style.transform = `translateX(${idx * 100}%)`;
+    }
+
+    function animateCurrentView(tabName = 'inicio') {
+        const currentIndex = TAB_ORDER[tabName] ?? 0;
+        const directionClass =
+            currentIndex > lastTabIndex ? 'goxion-from-right' :
+            currentIndex < lastTabIndex ? 'goxion-from-left' :
+            'goxion-same-view';
+
         const activeViews = [...document.querySelectorAll('.view-section.active, #view-dashboard.active')];
 
         activeViews.forEach(view => {
-            view.classList.remove('goxion-view-enter');
+            view.classList.remove(
+                'goxion-view-enter',
+                'goxion-from-right',
+                'goxion-from-left',
+                'goxion-same-view'
+            );
             void view.offsetWidth;
-            view.classList.add('goxion-view-enter');
+            view.classList.add('goxion-view-enter', directionClass);
 
             const items = view.querySelectorAll(
                 '.glass-card, .teaser-card, .brand-card, .smart-support-card, .section-title, .btn-primary, .faq-item'
@@ -4260,22 +4528,31 @@ function goxionBetaLegacy(data) {
 
             items.forEach((item, index) => {
                 item.classList.remove('goxion-stagger-item');
-                item.style.setProperty('--goxion-order', Math.min(index, 10));
+                item.style.setProperty('--goxion-order', Math.min(index, 9));
                 void item.offsetWidth;
                 item.classList.add('goxion-stagger-item');
             });
 
-            setTimeout(() => items.forEach(item => item.classList.remove('goxion-stagger-item')), 850);
+            setTimeout(() => items.forEach(item => item.classList.remove('goxion-stagger-item')), 650);
         });
 
+        lastTabIndex = currentIndex;
         addPressFeedback(document);
     }
 
     const originalSwitchTab = window.switchTab;
     if (typeof originalSwitchTab === 'function') {
         window.switchTab = function(tabName) {
+            const previousIndex = lastTabIndex;
             originalSwitchTab(tabName);
-            requestAnimationFrame(() => requestAnimationFrame(animateCurrentView));
+            moveTabIndicator(tabName);
+
+            requestAnimationFrame(() => {
+                const desiredIndex = TAB_ORDER[tabName] ?? 0;
+                lastTabIndex = previousIndex;
+                requestAnimationFrame(() => animateCurrentView(tabName));
+                lastTabIndex = desiredIndex;
+            });
         };
     }
 
@@ -4283,11 +4560,14 @@ function goxionBetaLegacy(data) {
     observer.observe(document.body, { childList: true, subtree: true });
 
     document.addEventListener('DOMContentLoaded', () => {
+        ensureTabIndicator();
+        moveTabIndicator('inicio');
         addPressFeedback(document);
-        setTimeout(animateCurrentView, 120);
+        setTimeout(() => animateCurrentView('inicio'), 120);
     });
 })();
 </script>
+
 
 </body>
 </html>
