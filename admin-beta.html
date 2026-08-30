@@ -1044,8 +1044,16 @@ Revisa las guías [SOPORTE]"></textarea>
                         <input type="number" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:6px; font-weight:bold; outline:none; font-size: 0.85rem;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)">
                     </div>
                     <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; outline:none; resize: vertical; min-height: 55px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Visita nuestro catálogo [CATALOGO]\nPaga tu cuenta [PAGO]">${gamifConfig.tareas}</textarea>
-                    <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${gamifConfig.cupon_reclamado ? 'var(--neon-green)' : 'var(--text-muted)'};">
-                        ${gamifConfig.cupon_reclamado ? '✅ Cupón ya reclamado por el cliente' : '⏳ Cupón todavía no reclamado'}
+                    <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${
+                        Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1)
+                            ? 'var(--neon-green)'
+                            : 'var(--text-muted)'
+                    };">
+                        ${
+                            Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1)
+                                ? `✅ Cupón de la ronda ${gamifConfig.cupon_ciclo || 1} ya reclamado`
+                                : `🎟️ Ronda ${gamifConfig.cupon_ciclo || 1}: cupón disponible al completar misiones`
+                        }
                     </div>
                     <button
                         type="button"
@@ -1054,7 +1062,17 @@ Revisa las guías [SOPORTE]"></textarea>
                         ↻ Reiniciar progreso de misiones
                     </button>
                     <div style="margin-top:5px;font-size:.65rem;color:var(--text-muted);line-height:1.35;">
-                        Borra el progreso del cliente la próxima vez que cargue Mi Espacio. No vuelve a habilitar un cupón que ya fue reclamado.
+                        Borra el progreso del cliente la próxima vez que cargue Mi Espacio, pero mantiene la misma ronda de premio.
+                    </div>
+
+                    <button
+                        type="button"
+                        style="margin-top:8px;width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(0,242,254,.48);background:rgba(0,242,254,.08);color:var(--neon-blue);font-size:.72rem;font-weight:800;cursor:pointer;"
+                        onclick="nuevaRondaCuponBeta('${key}')">
+                        🎟️ Nueva ronda + habilitar otro cupón
+                    </button>
+                    <div style="margin-top:5px;font-size:.65rem;color:var(--text-muted);line-height:1.35;">
+                        Reinicia las misiones y crea una nueva ronda de recompensa. El cliente podrá ganar y reclamar otro cupón sin borrar el historial del anterior.
                     </div>
                     ` : `<div style="font-size: 0.7rem; color: var(--text-muted);">Sin misiones asignadas.</div>`}
                 </div>
@@ -1288,7 +1306,7 @@ Revisa las guías [SOPORTE]"></textarea>
     (() => {
         const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
-        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos`;
+        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos-beta`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         localStorage.removeItem("GOXION_PAT");
@@ -1467,7 +1485,10 @@ Revisa las guías [SOPORTE]"></textarea>
                 descuento: n(g.descuento, 5),
                 tareas: g.tareas || "",
                 cupon_reclamado: g.cupon_reclamado === true,
-                cupon_reclamado_at: g.cupon_reclamado_at || null
+                cupon_reclamado_at: g.cupon_reclamado_at || null,
+                misiones_version: n(g.misiones_version, 1),
+                cupon_ciclo: n(g.cupon_ciclo, 1),
+                cupon_reclamado_ciclo: n(g.cupon_reclamado_ciclo, 0)
             };
         }
 
@@ -2347,9 +2368,37 @@ Revisa las guías [SOPORTE]"></textarea>
                 });
 
                 alert(`✅ Progreso reiniciado.\n\nNueva versión de misiones: ${result.misiones_version}\n\nAl volver a cargar Mi Espacio, el cliente verá todas las misiones pendientes otra vez.`);
+                await cargarDatosSupabase(true);
             } catch(e) {
                 console.error(e);
                 alert(`❌ No se pudo reiniciar el progreso.\n\n${e?.message || e}`);
+            }
+        };
+
+
+        window.nuevaRondaCuponBeta = async function(key) {
+            const c = clientesDict[key];
+            if(!c?._id) {
+                alert("No encontré el cliente en memoria.");
+                return;
+            }
+
+            const nombre = c.nombre || c.folio || "este cliente";
+
+            if(!confirm(`¿Crear una NUEVA RONDA de cupón para ${nombre}?\n\nEsto reiniciará el progreso actual de misiones y permitirá que el cliente gane y reclame OTRO cupón al completarlas. El cupón anterior seguirá registrado.`)) {
+                return;
+            }
+
+            try {
+                const result = await ajusteBeta("nueva_ronda_cupon", {
+                    cliente_id: c._id
+                });
+
+                alert(`✅ Nueva ronda creada.\n\nRonda de cupón: ${result.cupon_ciclo}\nVersión de misiones: ${result.misiones_version}\n\nEl cliente podrá completar nuevamente las misiones y reclamar otro cupón.`);
+                await cargarDatosSupabase(true);
+            } catch(e) {
+                console.error(e);
+                alert(`❌ No se pudo crear la nueva ronda.\n\n${e?.message || e}`);
             }
         };
 
