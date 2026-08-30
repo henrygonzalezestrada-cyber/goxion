@@ -236,84 +236,7 @@
     }
     .btn-submit-payment:hover { box-shadow: 0 0 30px rgba(46, 160, 67, 0.6); transform: translateY(-2px); }
     .btn-submit-payment:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  
-    /* --- GOXION LOADER / PRUEBA VISUAL --- */
-    .goxion-loader {
-        --loader-cyan: #00f2fe;
-        --loader-purple: #7c4dff;
-        --loader-size: 1px;
-        position: relative;
-        display: inline-block;
-        width: calc(48 * var(--loader-size));
-        height: calc(48 * var(--loader-size));
-        border-radius: 50%;
-        color: var(--loader-cyan);
-        transform: rotateZ(45deg);
-        perspective: calc(1000 * var(--loader-size));
-        filter:
-            drop-shadow(0 0 7px rgba(0, 242, 254, 0.58))
-            drop-shadow(0 0 13px rgba(124, 77, 255, 0.38));
-    }
-
-    .goxion-loader::before,
-    .goxion-loader::after {
-        content: '';
-        display: block;
-        position: absolute;
-        inset: 0;
-        width: inherit;
-        height: inherit;
-        border-radius: 50%;
-        transform: rotateX(70deg);
-        animation: goxionLoaderSpin 1s linear infinite;
-    }
-
-    .goxion-loader::after {
-        color: var(--loader-purple);
-        transform: rotateY(70deg);
-        animation-delay: .4s;
-    }
-
-    .goxion-loader-wrap {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        text-align: center;
-    }
-
-    .goxion-loader-text {
-        color: var(--text-muted, #95a4bd);
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: .35px;
-    }
-
-    .goxion-loader.small {
-        --loader-size: .72px;
-    }
-
-    @keyframes goxionLoaderSpin {
-        0%, 100% { box-shadow: .2em 0 0 0 currentColor; }
-        12% { box-shadow: .2em .2em 0 0 currentColor; }
-        25% { box-shadow: 0 .2em 0 0 currentColor; }
-        37% { box-shadow: -.2em .2em 0 0 currentColor; }
-        50% { box-shadow: -.2em 0 0 0 currentColor; }
-        62% { box-shadow: -.2em -.2em 0 0 currentColor; }
-        75% { box-shadow: 0 -.2em 0 0 currentColor; }
-        87% { box-shadow: .2em -.2em 0 0 currentColor; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .goxion-loader::before,
-        .goxion-loader::after {
-            animation-duration: 2s;
-        }
-    }
-
-</style>
+  </style>
 </head>
 <body>
 
@@ -325,12 +248,7 @@
 </div>
 
 <div class="container" id="app">
-  <div class="loading">
-    <div class="goxion-loader-wrap">
-        <span class="goxion-loader" aria-hidden="true"></span>
-        <span class="goxion-loader-text">Sincronizando con GOXION...</span>
-    </div>
-  </div>
+  <div class="loading">Sincronizando con Goxion...</div>
 </div>
 
 <div class="toast" id="toast">📋 ¡Datos copiados al portapapeles!</div>
