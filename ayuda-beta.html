@@ -247,28 +247,32 @@
             border-radius: 20px;
         }
 
-        /* --- NAVEGACIÓN GOXION: CÁPSULA Y CÍRCULOS MORPHING 2.0 --- */
+        /* --- NAVEGACIÓN GOXION: CÁPSULA Y CÍRCULOS MORPHING 2.1 --- */
         .tab-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            background: rgba(8, 8, 12, 0.4);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 40px;
             padding: 10px;
             margin-bottom: 20px;
             position: relative;
             z-index: 110;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             overflow: hidden;
             isolation: isolate;
         }
 
-        /* Estado inactivo: círculo perfecto.
-           flex-grow es animable, así evitamos JS complejo y posibles bloqueos. */
+        .gx-nav-trail,
+        .gx-nav-glint {
+            display: none !important;
+        }
+
+        /* Estado inactivo: círculo perfecto */
         .tab-btn {
             display: flex;
             align-items: center;
@@ -292,27 +296,22 @@
                 flex-grow 500ms cubic-bezier(.34,1.56,.64,1),
                 flex-basis 500ms cubic-bezier(.34,1.56,.64,1),
                 padding 500ms cubic-bezier(.34,1.56,.64,1),
-                background 320ms ease,
-                border-color 320ms ease,
-                box-shadow 320ms ease,
+                background 300ms ease,
+                border-color 300ms ease,
+                box-shadow 300ms ease,
                 color 260ms ease,
                 transform 160ms cubic-bezier(.22,.8,.24,1);
         }
 
-        /* Estado activo: absorbe el espacio restante de forma fluida. */
+        /* Estado activo: interior sutil y luz hacia afuera */
         .tab-btn.active {
             flex-grow: 1;
             flex-basis: 60px;
             padding: 0 25px;
-            background:
-                linear-gradient(135deg,
-                    rgba(0,242,254,0.15),
-                    rgba(124,77,255,0.15));
-            border-color: rgba(0,242,254,0.60);
+            background: rgba(255,255,255,0.04);
+            border-color: rgba(0,242,254,0.80);
             color: var(--text-main);
-            box-shadow:
-                0 0 20px rgba(0,242,254,0.30),
-                inset 0 0 15px rgba(124,77,255,0.20);
+            box-shadow: 0 0 25px rgba(0,242,254,0.35);
         }
 
         .gx-nav-icon {
@@ -333,13 +332,14 @@
                 font-size 500ms cubic-bezier(.34,1.56,.64,1);
         }
 
+        /* El icono conserva un brillo más intenso */
         .tab-btn.active .gx-nav-icon {
             font-size: 26px;
             transform: translateZ(0) scale(1.12);
-            filter: drop-shadow(0 0 8px rgba(0,242,254,0.60));
+            filter: drop-shadow(0 0 10px rgba(0,242,254,0.60));
         }
 
-        /* Texto colapsado, pero sigue siendo parte de la misma cápsula. */
+        /* Texto colapsado por defecto */
         .gx-nav-label {
             display: block;
             max-width: 0;
@@ -360,30 +360,15 @@
         }
 
         .tab-btn.active .gx-nav-label {
+            opacity: 1;
             max-width: 120px;
             margin-left: 10px;
-            opacity: 1;
             transform: translate3d(0,0,0);
         }
 
-        /* Halo interior discreto; no invade el texto. */
+        /* Sin halo interior extra: dejamos respirar el cristal */
         .tab-btn.active::after {
-            content: "";
-            position: absolute;
-            inset: 5px;
-            border-radius: inherit;
-            pointer-events: none;
-            background:
-                radial-gradient(circle at 28% 50%,
-                    rgba(255,255,255,0.07),
-                    rgba(0,242,254,0.035) 34%,
-                    transparent 67%);
-            opacity: .75;
-        }
-
-        .tab-btn > * {
-            position: relative;
-            z-index: 1;
+            content: none;
         }
 
         .tab-btn:active {
@@ -436,6 +421,7 @@
                 animation: none !important;
             }
         }
+}
 .view-section { 
             display: none; 
             animation: fadeIn 0.4s ease; 
