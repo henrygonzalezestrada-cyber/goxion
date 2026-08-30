@@ -247,42 +247,38 @@
             border-radius: 20px;
         }
 
-        
-        /* --- NAVEGACIÓN GOXION: CÁPSULA + CÍRCULOS MORPHING --- */
+        /* --- NAVEGACIÓN GOXION: CÁPSULA Y CÍRCULOS MORPHING 2.0 --- */
         .tab-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 8px;
-            background: rgba(8, 8, 12, 0.40);
+            gap: 12px;
+            background: rgba(8, 8, 12, 0.4);
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 40px;
-            padding: 8px;
+            padding: 10px;
             margin-bottom: 20px;
             position: relative;
             z-index: 110;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.50);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             overflow: hidden;
             isolation: isolate;
         }
 
-        /* Restos de pruebas anteriores, por seguridad */
-        .gx-nav-trail,
-        .gx-nav-glint {
-            display: none !important;
-        }
-
-        /* Estado base: círculo */
+        /* Estado inactivo: círculo perfecto.
+           flex-grow es animable, así evitamos JS complejo y posibles bloqueos. */
         .tab-btn {
             display: flex;
             align-items: center;
-            justify-content: flex-start;
-            flex: 0 0 60px;
-            width: 60px;
+            justify-content: center;
+            flex-grow: 0;
+            flex-shrink: 1;
+            flex-basis: 60px;
+            min-width: 60px;
             height: 60px;
-            min-width: 0;
+            padding: 0;
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.05);
             border-radius: 35px;
@@ -293,151 +289,133 @@
             -webkit-tap-highlight-color: transparent;
             transform-origin: center;
             transition:
-                background 300ms ease,
-                border-color 300ms ease,
-                box-shadow 300ms ease,
-                color 300ms ease;
-            will-change: transform;
+                flex-grow 500ms cubic-bezier(.34,1.56,.64,1),
+                flex-basis 500ms cubic-bezier(.34,1.56,.64,1),
+                padding 500ms cubic-bezier(.34,1.56,.64,1),
+                background 320ms ease,
+                border-color 320ms ease,
+                box-shadow 320ms ease,
+                color 260ms ease,
+                transform 160ms cubic-bezier(.22,.8,.24,1);
         }
 
-        /* Estado activo: píldora.
-           min() evita desbordes en iPhone pequeños. */
+        /* Estado activo: absorbe el espacio restante de forma fluida. */
         .tab-btn.active {
-            flex-basis: min(165px, calc(100% - 136px));
-            width: min(165px, calc(100% - 136px));
+            flex-grow: 1;
+            flex-basis: 60px;
+            padding: 0 25px;
             background:
                 linear-gradient(135deg,
                     rgba(0,242,254,0.15),
                     rgba(124,77,255,0.15));
             border-color: rgba(0,242,254,0.60);
+            color: var(--text-main);
             box-shadow:
                 0 0 20px rgba(0,242,254,0.30),
                 inset 0 0 15px rgba(124,77,255,0.20);
         }
 
-        /* Icono grande y centrado cuando es círculo */
         .gx-nav-icon {
-            font-size: 26px;
-            width: 60px;
-            min-width: 60px;
-            height: 60px;
+            font-size: 24px;
+            width: 32px;
+            min-width: 32px;
+            height: 32px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
             line-height: 1;
             transform: translateZ(0) scale(1);
             transform-origin: center;
             transition:
-                transform 360ms cubic-bezier(.16,1,.3,1),
-                filter 300ms ease;
+                transform 500ms cubic-bezier(.34,1.56,.64,1),
+                filter 300ms ease,
+                font-size 500ms cubic-bezier(.34,1.56,.64,1);
         }
 
         .tab-btn.active .gx-nav-icon {
-            width: 55px;
-            min-width: 55px;
-            font-size: 28px;
-            transform: translateZ(0) scale(1.10);
+            font-size: 26px;
+            transform: translateZ(0) scale(1.12);
             filter: drop-shadow(0 0 8px rgba(0,242,254,0.60));
         }
 
-        /* Texto colapsado en inactivos */
+        /* Texto colapsado, pero sigue siendo parte de la misma cápsula. */
         .gx-nav-label {
-            display: inline-block;
+            display: block;
             max-width: 0;
             opacity: 0;
             overflow: hidden;
             white-space: nowrap;
+            margin-left: 0;
             font-size: 16px;
             font-weight: 800;
             line-height: 1;
             color: #fff;
-            transform: translate3d(-10px,0,0);
-            margin-right: 0;
+            transform: translate3d(-15px,0,0);
             transition:
-                max-width 330ms cubic-bezier(.25,1,.3,1),
+                max-width 400ms cubic-bezier(.34,1.56,.64,1),
+                margin-left 400ms cubic-bezier(.34,1.56,.64,1),
                 opacity 220ms ease,
-                transform 330ms cubic-bezier(.25,1,.3,1),
-                margin-right 330ms cubic-bezier(.25,1,.3,1);
+                transform 400ms cubic-bezier(.34,1.56,.64,1);
         }
 
         .tab-btn.active .gx-nav-label {
-            max-width: 100px;
+            max-width: 120px;
+            margin-left: 10px;
             opacity: 1;
             transform: translate3d(0,0,0);
-            margin-right: 15px;
         }
 
-        /* Halo interior muy discreto al llegar el activo */
+        /* Halo interior discreto; no invade el texto. */
         .tab-btn.active::after {
             content: "";
             position: absolute;
             inset: 5px;
             border-radius: inherit;
             pointer-events: none;
-            opacity: .70;
             background:
-                radial-gradient(circle at 32% 50%,
+                radial-gradient(circle at 28% 50%,
                     rgba(255,255,255,0.07),
-                    rgba(0,242,254,0.035) 35%,
-                    transparent 68%);
+                    rgba(0,242,254,0.035) 34%,
+                    transparent 67%);
+            opacity: .75;
         }
 
-        /* Transición de contenido: ligera, sin blur animado */
-        .gx-view-in-right {
-            animation: gxViewInRight 210ms cubic-bezier(.22,.8,.24,1) both !important;
+        .tab-btn > * {
+            position: relative;
+            z-index: 1;
         }
 
-        .gx-view-in-left {
-            animation: gxViewInLeft 210ms cubic-bezier(.22,.8,.24,1) both !important;
+        .tab-btn:active {
+            transform: scale(.965);
         }
 
-        .gx-view-in-soft {
-            animation: gxViewInSoft 190ms cubic-bezier(.22,.8,.24,1) both !important;
-        }
-
-        @keyframes gxViewInRight {
-            from { opacity: .42; transform: translate3d(8px,2px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        @keyframes gxViewInLeft {
-            from { opacity: .42; transform: translate3d(-8px,2px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        @keyframes gxViewInSoft {
-            from { opacity: .58; transform: translate3d(0,4px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        @media (max-width: 360px) {
+        @media (max-width: 390px) {
             .tab-container {
-                gap: 6px;
-                padding: 7px;
+                gap: 8px;
+                padding: 8px;
             }
 
             .tab-btn {
-                flex-basis: 56px;
-                width: 56px;
-                height: 56px;
+                min-width: 54px;
+                flex-basis: 54px;
+                height: 54px;
             }
 
             .tab-btn.active {
-                flex-basis: min(148px, calc(100% - 124px));
-                width: min(148px, calc(100% - 124px));
+                flex-basis: 54px;
+                padding: 0 17px;
             }
 
             .gx-nav-icon {
-                width: 56px;
-                min-width: 56px;
-                height: 56px;
-                font-size: 24px;
+                font-size: 22px;
+                width: 29px;
+                min-width: 29px;
+                height: 29px;
             }
 
             .tab-btn.active .gx-nav-icon {
-                width: 51px;
-                min-width: 51px;
-                font-size: 26px;
+                font-size: 24px;
             }
 
             .gx-nav-label {
@@ -445,15 +423,18 @@
             }
 
             .tab-btn.active .gx-nav-label {
-                margin-right: 9px;
+                margin-left: 8px;
+                max-width: 105px;
             }
         }
-.gx-nav-icon { font-size: 22px; }
-            .gx-nav-label { font-size: 15px; }
-        }
-.tab-btn { flex-basis: 46px; height: 56px; }
-            .gx-nav-icon { width: 44px; min-width: 44px; height: 44px; }
-            .gx-nav-label { left: 53px; font-size: 18px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            .tab-btn,
+            .gx-nav-icon,
+            .gx-nav-label {
+                transition-duration: .01ms !important;
+                animation: none !important;
+            }
         }
 .view-section { 
             display: none; 
@@ -1982,12 +1963,7 @@
         .mission-item.locked { border-color: rgba(255, 170, 0, 0.4); background: rgba(255, 170, 0, 0.05); }
         .mission-item.locked .mission-checkbox { border-color: var(--warning-amber); background: rgba(255, 170, 0, 0.1); font-size: 10px; }
     
-        /* --- MICROINTERACCIONES APROBADAS: LOGIN + FEEDBACK + TACTO --- */
-        .gx-touch-down {
-            transform: scale(.968) !important;
-            transition: transform 145ms cubic-bezier(.22,.8,.24,1) !important;
-        }
-
+        /* --- ESTADOS APROBADOS: LOGIN + FEEDBACK --- */
         #btn-login-submit,
         #btn-send-feedback {
             position: relative;
@@ -2002,7 +1978,7 @@
         }
 
         #btn-login-submit.gx-validating {
-            background: linear-gradient(135deg, #7c4dff, #4f8cff) !important;
+            background: linear-gradient(135deg,#7c4dff,#4f8cff) !important;
             color: #fff !important;
             box-shadow: 0 0 22px rgba(124,77,255,.28) !important;
             pointer-events: none;
@@ -2015,7 +1991,7 @@
             bottom: 0;
             left: -42%;
             width: 34%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,.28), transparent);
+            background: linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
             transform: skewX(-18deg);
             animation: gxLoginSweep 820ms linear infinite;
         }
@@ -2023,14 +1999,14 @@
         @keyframes gxLoginSweep { to { left: 118%; } }
 
         #btn-login-submit.gx-success {
-            background: linear-gradient(135deg, #00d98f, #00ff9d) !important;
+            background: linear-gradient(135deg,#00d98f,#00ff9d) !important;
             color: #03140e !important;
             box-shadow: 0 0 24px rgba(0,255,157,.28) !important;
             animation: gxSuccessPop 380ms cubic-bezier(.2,1.16,.32,1);
         }
 
         #btn-login-submit.gx-error {
-            background: linear-gradient(135deg, #ff3366, #d81b60) !important;
+            background: linear-gradient(135deg,#ff3366,#d81b60) !important;
             color: #fff !important;
             box-shadow: 0 0 22px rgba(255,51,102,.25) !important;
             animation: gxLoginError 330ms cubic-bezier(.36,.07,.19,.97);
@@ -2050,7 +2026,7 @@
         }
 
         #btn-send-feedback.gx-feedback-sending {
-            background: linear-gradient(135deg, #7c4dff, #4f8cff) !important;
+            background: linear-gradient(135deg,#7c4dff,#4f8cff) !important;
             color: #fff !important;
             pointer-events: none;
         }
@@ -2071,22 +2047,6 @@
         @keyframes gxFeedbackMessage {
             from { opacity: 0; transform: translateY(4px); }
             to   { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .tab-btn,
-            .gx-nav-icon,
-            .gx-nav-label,
-            .gx-nav-trail,
-            .gx-nav-glint,
-            #btn-login-submit,
-            #btn-send-feedback,
-            .gx-view-in-right,
-            .gx-view-in-left,
-            .gx-view-in-soft {
-                animation: none !important;
-                transition-duration: .01ms !important;
-            }
         }
 
 </style>
@@ -2120,18 +2080,18 @@
             <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
         </div>
 
-        <div class="glass-card tab-container" id="goxion-main-nav">
-            <button class="tab-btn active" id="btn-tab-inicio" data-nav-tab="inicio" onclick="switchTab('inicio')">
+        <div class="glass-card tab-container">
+            <button class="tab-btn active" id="btn-tab-inicio" onclick="switchTab('inicio')">
                 <span class="gx-nav-icon" id="tab-inicio-icon">🏠</span>
                 <span class="gx-nav-label" id="tab-inicio-text">Inicio</span>
             </button>
 
-            <button class="tab-btn" id="btn-tab-catalogo" data-nav-tab="catalogo" onclick="switchTab('catalogo')">
+            <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')">
                 <span class="gx-nav-icon">🛒</span>
                 <span class="gx-nav-label">Catálogo</span>
             </button>
 
-            <button class="tab-btn" id="btn-tab-soporte" data-nav-tab="soporte" onclick="switchTab('soporte')">
+            <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')">
                 <span class="gx-nav-icon">🛠️</span>
                 <span class="gx-nav-label">Soporte</span>
             </button>
@@ -4332,231 +4292,6 @@ function goxionBetaLegacy(data) {
         console.info("GOXION ayuda conectado a Supabase.");
     })();
     </script>
-
-
-<script id="goxion-nav-capsule">
-(() => {
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const names = ["inicio", "catalogo", "soporte"];
-    let currentTab = "inicio";
-    let pressed = null;
-    let animating = false;
-    let queued = null;
-
-    const originalSwitchTab = window.switchTab;
-    if (typeof originalSwitchTab !== "function") return;
-
-    function button(name) {
-        return document.getElementById(`btn-tab-${name}`);
-    }
-
-    function activeView(name) {
-        if (name === "inicio") {
-            return document.getElementById(
-                localStorage.getItem("goxion_user_key") ? "view-dashboard" : "view-inicio"
-            );
-        }
-        return document.getElementById(`view-${name}`);
-    }
-
-    function applyOrder(activeName) {
-        const active = button(activeName);
-        if (active) active.style.order = "0";
-
-        names.filter(name => name !== activeName).forEach((name, index) => {
-            const el = button(name);
-            if (el) el.style.order = String(index + 1);
-        });
-    }
-
-    function snapshot() {
-        const result = {};
-        names.forEach(name => {
-            const el = button(name);
-            if (!el) return;
-            const r = el.getBoundingClientRect();
-            result[name] = {
-                left:r.left,
-                top:r.top,
-                width:r.width,
-                height:r.height
-            };
-        });
-        return result;
-    }
-
-    function animateView(newTab, oldTab) {
-        const view = activeView(newTab);
-        if (!view || reducedMotion.matches) return;
-
-        view.classList.remove("gx-view-in-right","gx-view-in-left","gx-view-in-soft");
-        void view.offsetWidth;
-
-        const oldIndex = names.indexOf(oldTab);
-        const newIndex = names.indexOf(newTab);
-        const cls = newIndex > oldIndex
-            ? "gx-view-in-right"
-            : newIndex < oldIndex
-                ? "gx-view-in-left"
-                : "gx-view-in-soft";
-
-        view.classList.add(cls);
-        view.style.willChange = "transform, opacity";
-
-        setTimeout(() => {
-            view.classList.remove(cls);
-            view.style.willChange = "";
-        }, 240);
-    }
-
-    function animateFlip(before, after, oldTab, newTab) {
-        if (reducedMotion.matches) return;
-
-        names.forEach(name => {
-            const el = button(name);
-            const b = before[name];
-            const a = after[name];
-            if (!el || !b || !a || !el.animate) return;
-
-            const dx = b.left - a.left;
-            const dy = b.top - a.top;
-            const sx = b.width / Math.max(a.width, 1);
-            const sy = b.height / Math.max(a.height, 1);
-
-            el.style.willChange = "transform";
-
-            const animation = el.animate([
-                {
-                    transform:`translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})`,
-                    borderRadius:"35px",
-                    offset:0
-                },
-                {
-                    transform:`translate3d(${dx * .38}px,${dy * .38}px,0) scale(${1 + (sx - 1) * .18},1)`,
-                    borderRadius:"35px",
-                    offset:.62
-                },
-                {
-                    transform:"translate3d(0,0,0) scale(1,1)",
-                    borderRadius:"35px",
-                    offset:1
-                }
-            ], {
-                duration:430,
-                easing:"cubic-bezier(.16,1,.3,1)",
-                fill:"both"
-            });
-
-            animation.onfinish = () => {
-                el.style.willChange = "";
-            };
-        });
-
-        const incomingIcon = button(newTab)?.querySelector(".gx-nav-icon");
-        if (incomingIcon?.animate) {
-            incomingIcon.animate([
-                { transform:"scale(.94)", offset:0 },
-                { transform:"scale(1.20)", offset:.70 },
-                { transform:"scale(1.10)", offset:1 }
-            ], {
-                duration:420,
-                easing:"cubic-bezier(.16,1,.3,1)"
-            });
-        }
-
-        const outgoingIcon = button(oldTab)?.querySelector(".gx-nav-icon");
-        if (outgoingIcon?.animate) {
-            outgoingIcon.animate([
-                { transform:"scale(1.10)", offset:0 },
-                { transform:"scale(.92)", offset:.68 },
-                { transform:"scale(1)", offset:1 }
-            ], {
-                duration:360,
-                easing:"cubic-bezier(.16,1,.3,1)"
-            });
-        }
-    }
-
-    function transitionTo(newTab) {
-        if (!names.includes(newTab)) {
-            originalSwitchTab(newTab);
-            return;
-        }
-
-        if (newTab === currentTab) {
-            originalSwitchTab(newTab);
-
-            const icon = button(newTab)?.querySelector(".gx-nav-icon");
-            if (icon?.animate && !reducedMotion.matches) {
-                icon.animate([
-                    { transform:"scale(1.10)" },
-                    { transform:"scale(1.20)" },
-                    { transform:"scale(1.10)" }
-                ], {
-                    duration:270,
-                    easing:"cubic-bezier(.16,1,.3,1)"
-                });
-            }
-            return;
-        }
-
-        if (animating) {
-            queued = newTab;
-            return;
-        }
-
-        animating = true;
-        const oldTab = currentTab;
-        const before = snapshot();
-
-        /* El estado lógico cambia aquí; FLIP preserva visualmente la continuidad. */
-        originalSwitchTab(newTab);
-        applyOrder(newTab);
-
-        const after = snapshot();
-        animateFlip(before, after, oldTab, newTab);
-        animateView(newTab, oldTab);
-
-        currentTab = newTab;
-
-        setTimeout(() => {
-            animating = false;
-
-            if (queued && queued !== currentTab) {
-                const next = queued;
-                queued = null;
-                transitionTo(next);
-            } else {
-                queued = null;
-            }
-        }, 450);
-    }
-
-    window.switchTab = transitionTo;
-
-    /* Feedback táctil global: un solo listener */
-    const selector =
-        "button, .teaser-card, .brand-card, .platform-btn, .btn-menu, .header-action-btn";
-
-    document.addEventListener("pointerdown", event => {
-        const el = event.target.closest(selector);
-        if (!el) return;
-        pressed = el;
-        el.classList.add("gx-touch-down");
-    }, { passive:true });
-
-    const release = () => {
-        if (!pressed) return;
-        pressed.classList.remove("gx-touch-down");
-        pressed = null;
-    };
-
-    document.addEventListener("pointerup", release, { passive:true });
-    document.addEventListener("pointercancel", release, { passive:true });
-
-    applyOrder("inicio");
-})();
-</script>
 
 </body>
 </html>
