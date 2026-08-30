@@ -2368,7 +2368,12 @@ Revisa las guías [SOPORTE]"></textarea>
                 });
 
                 alert(`✅ Progreso reiniciado.\n\nNueva versión de misiones: ${result.misiones_version}\n\nAl volver a cargar Mi Espacio, el cliente verá todas las misiones pendientes otra vez.`);
-                await cargarDatosSupabase(true);
+
+                try {
+                    await cargarAdminDatos();
+                } catch(refreshError) {
+                    console.warn("El progreso sí se reinició; solo falló el refresco visual del Admin:", refreshError);
+                }
             } catch(e) {
                 console.error(e);
                 alert(`❌ No se pudo reiniciar el progreso.\n\n${e?.message || e}`);
@@ -2395,7 +2400,12 @@ Revisa las guías [SOPORTE]"></textarea>
                 });
 
                 alert(`✅ Nueva ronda creada.\n\nRonda de cupón: ${result.cupon_ciclo}\nVersión de misiones: ${result.misiones_version}\n\nEl cliente podrá completar nuevamente las misiones y reclamar otro cupón.`);
-                await cargarDatosSupabase(true);
+
+                try {
+                    await cargarAdminDatos();
+                } catch(refreshError) {
+                    console.warn("La nueva ronda sí se creó; solo falló el refresco visual del Admin:", refreshError);
+                }
             } catch(e) {
                 console.error(e);
                 alert(`❌ No se pudo crear la nueva ronda.\n\n${e?.message || e}`);
