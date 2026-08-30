@@ -1835,133 +1835,191 @@
         .mission-item.locked { border-color: rgba(255, 170, 0, 0.4); background: rgba(255, 170, 0, 0.05); }
         .mission-item.locked .mission-checkbox { border-color: var(--warning-amber); background: rgba(255, 170, 0, 0.1); font-size: 10px; }
     
-    /* --- GOXION LOGO LOADER / TEST --- */
-    .goxion-logo-loader {
-        --loader-size: 64px;
-        width: var(--loader-size);
-        height: var(--loader-size);
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transform: scale(.96);
-        transition: opacity .22s ease, transform .22s ease;
-        isolation: isolate;
-    }
-
-    .goxion-logo-loader.visible {
-        opacity: 1;
-        transform: scale(1);
-    }
-
-    .goxion-logo-loader.small {
-        --loader-size: 52px;
-    }
-
-    .goxion-logo-loader .orbit {
-        position: absolute;
-        width: 78%;
-        height: 38%;
-        border-radius: 50%;
-        border: 1.4px solid transparent;
-        box-sizing: border-box;
-        opacity: .95;
-        will-change: transform;
-    }
-
-    .goxion-logo-loader .orbit.cyan {
-        border-top-color: #00f2fe;
-        border-bottom-color: rgba(0, 242, 254, .14);
-        transform: rotate(32deg);
-        filter: drop-shadow(0 0 4px rgba(0, 242, 254, .55));
-        animation: goxionOrbitA 1.85s linear infinite;
-    }
-
-    .goxion-logo-loader .orbit.purple {
-        border-top-color: #7c4dff;
-        border-bottom-color: rgba(124, 77, 255, .14);
-        transform: rotate(-32deg);
-        filter: drop-shadow(0 0 4px rgba(124, 77, 255, .5));
-        animation: goxionOrbitB 2.15s linear infinite reverse;
-    }
-
-    .goxion-logo-loader .orbit.soft {
-        width: 70%;
-        height: 30%;
-        border-top-color: rgba(255,255,255,.28);
-        border-bottom-color: rgba(255,255,255,.04);
-        transform: rotate(90deg);
-        opacity: .45;
-        animation: goxionOrbitC 2.6s linear infinite;
-    }
-
-    .goxion-logo-loader .core {
-        position: relative;
-        z-index: 2;
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        background: radial-gradient(circle at 35% 30%,
-            rgba(255,255,255,.95) 0 10%,
-            #00f2fe 30%,
-            #7c4dff 72%,
-            rgba(124,77,255,.18) 100%);
-        box-shadow:
-            0 0 8px rgba(0,242,254,.5),
-            0 0 14px rgba(124,77,255,.25);
-        animation: goxionCorePulse 1.8s ease-in-out infinite;
-    }
-
-    .goxion-loader-wrap {
-        width: 100%;
-        min-height: 78px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    @keyframes goxionOrbitA {
-        0%   { transform: rotate(32deg) rotateZ(0deg) scaleX(1); }
-        50%  { transform: rotate(32deg) rotateZ(180deg) scaleX(.98); }
-        100% { transform: rotate(32deg) rotateZ(360deg) scaleX(1); }
-    }
-
-    @keyframes goxionOrbitB {
-        0%   { transform: rotate(-32deg) rotateZ(0deg) scaleX(1); }
-        50%  { transform: rotate(-32deg) rotateZ(180deg) scaleX(.98); }
-        100% { transform: rotate(-32deg) rotateZ(360deg) scaleX(1); }
-    }
-
-    @keyframes goxionOrbitC {
-        to { transform: rotate(450deg); }
-    }
-
-    @keyframes goxionCorePulse {
-        0%, 100% { transform: scale(.92); opacity: .9; }
-        50% { transform: scale(1.08); opacity: 1; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .goxion-logo-loader .orbit,
-        .goxion-logo-loader .core {
-            animation-duration: 3.5s;
+        /* =========================================================
+           GOXION MOTION SYSTEM / MOBILE EXPERIENCE TEST
+           ========================================================= */
+        :root {
+            --motion-fast: 160ms;
+            --motion-base: 240ms;
+            --motion-slow: 360ms;
+            --motion-ease: cubic-bezier(.22,.8,.24,1);
+            --motion-spring: cubic-bezier(.2,1.25,.35,1);
         }
-    }
+
+        button, .btn-primary, .btn-shimmer, .tab-btn, .teaser-card,
+        .btn-menu, .brand-card, .faq-header, .link-discreto {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        button, .btn-primary, .btn-shimmer, .teaser-card, .btn-menu,
+        .brand-card, .link-discreto {
+            transform: translateZ(0);
+            transition:
+                transform var(--motion-fast) var(--motion-ease),
+                box-shadow var(--motion-base) ease,
+                border-color var(--motion-base) ease,
+                background var(--motion-base) ease,
+                opacity var(--motion-base) ease;
+            will-change: transform;
+        }
+
+        .goxion-press { transform: scale(.965) !important; }
+
+        .goxion-action-success {
+            animation: goxionActionSuccess 520ms var(--motion-spring);
+        }
+
+        @keyframes goxionActionSuccess {
+            0% { transform: scale(1); }
+            35% { transform: scale(.96); }
+            65% { transform: scale(1.035); box-shadow: 0 0 22px rgba(0,242,254,.22); }
+            100% { transform: scale(1); }
+        }
+
+        .view-section.goxion-view-enter,
+        #view-dashboard.goxion-view-enter {
+            animation: goxionViewEnter 300ms var(--motion-ease) both;
+        }
+
+        @keyframes goxionViewEnter {
+            from { opacity: 0; transform: translate3d(0,12px,0) scale(.992); filter: blur(3px); }
+            to { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+        }
+
+        .goxion-stagger-item {
+            opacity: 0;
+            transform: translate3d(0,10px,0);
+            animation: goxionStaggerIn 360ms var(--motion-ease) forwards;
+            animation-delay: calc(var(--goxion-order, 0) * 34ms);
+        }
+
+        @keyframes goxionStaggerIn {
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+
+        .tab-btn {
+            transition:
+                color var(--motion-base) ease,
+                background var(--motion-base) ease,
+                border-color var(--motion-base) ease,
+                box-shadow var(--motion-base) ease,
+                transform var(--motion-fast) var(--motion-ease);
+        }
+
+        .tab-btn.goxion-press { transform: scale(.94) !important; }
+
+        .tab-btn.active > span { animation: goxionTabIcon 360ms var(--motion-spring); }
+
+        @keyframes goxionTabIcon {
+            0% { transform: scale(.82) translateY(1px); }
+            65% { transform: scale(1.16) translateY(-1px); }
+            100% { transform: scale(1); }
+        }
+
+        .glass-card, .teaser-card, .brand-card, .smart-support-card {
+            transition:
+                transform var(--motion-base) var(--motion-ease),
+                border-color var(--motion-base) ease,
+                box-shadow var(--motion-base) ease;
+        }
+
+        @media (hover:hover) {
+            .teaser-card:hover, .brand-card:hover { transform: translateY(-3px); }
+        }
+
+        .faq-header .icon {
+            transition: transform 320ms var(--motion-spring), color 220ms ease;
+        }
+
+        .faq-item.open .faq-header .icon {
+            transform: rotate(45deg) scale(1.08);
+        }
+
+        .modal.show .modal-content {
+            animation: goxionModalIn 320ms var(--motion-spring) both;
+        }
+
+        @keyframes goxionModalIn {
+            from { opacity: 0; transform: translate3d(0,18px,0) scale(.965); filter: blur(3px); }
+            to { opacity: 1; transform: translate3d(0,0,0) scale(1); filter: blur(0); }
+        }
+
+        #btn-send-feedback {
+            position: relative;
+            overflow: hidden;
+            min-height: 52px;
+        }
+
+        #btn-send-feedback.feedback-sending {
+            pointer-events: none;
+            transform: scale(.985) !important;
+            opacity: .9;
+        }
+
+        #btn-send-feedback.feedback-success-state {
+            background: rgba(0,255,157,.12) !important;
+            border: 1px solid rgba(0,255,157,.55) !important;
+            color: #b9ffe2 !important;
+            box-shadow: 0 0 24px rgba(0,255,157,.16) !important;
+            transform: scale(1) !important;
+        }
+
+        #btn-send-feedback .feedback-check {
+            display: inline-block;
+            margin-right: 7px;
+            animation: goxionCheckIn 420ms var(--motion-spring);
+        }
+
+        @keyframes goxionCheckIn {
+            from { opacity: 0; transform: scale(.3) rotate(-28deg); }
+            to { opacity: 1; transform: scale(1) rotate(0); }
+        }
+
+        #feedback-success.goxion-feedback-message {
+            display: block !important;
+            animation: goxionFeedbackMessage 300ms var(--motion-ease) both;
+        }
+
+        @keyframes goxionFeedbackMessage {
+            from { opacity: 0; transform: translateY(7px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-smart {
+            transition:
+                border-color var(--motion-base) ease,
+                box-shadow var(--motion-base) ease,
+                transform var(--motion-base) var(--motion-ease),
+                background var(--motion-base) ease;
+        }
+
+        .input-smart:focus { transform: translateY(-1px); }
+
+        .floating-cart.show {
+            animation: goxionFloatingIn 360ms var(--motion-spring) both;
+        }
+
+        @keyframes goxionFloatingIn {
+            from { opacity: 0; transform: translate(-50%,16px) scale(.96); }
+            to { opacity: 1; transform: translate(-50%,0) scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
 
 </style>
 </head>
 <body class="no-scroll">
 
     <div id="splash-screen" onclick="hideSplash()">
-        <div class="splash-content" style="display:flex; flex-direction:column; align-items:center; gap:16px;">
+        <div class="splash-content">
             <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
-            <span class="goxion-logo-loader small" aria-hidden="true">
-        <span class="orbit cyan"></span>
-        <span class="orbit purple"></span>
-        <span class="orbit soft"></span>
-        <span class="core"></span>
-    </span>
         </div>
     </div>
 
@@ -2200,14 +2258,7 @@
         <div id="view-catalogo" class="view-section">
             <div class="section-title">Nuestros Ecosistemas y Promociones</div>
             <div id="catalog-container" class="catalog-grid">
-                <div class="goxion-loader-wrap" style="grid-column:1 / -1;">
-                    <span class="goxion-logo-loader small" aria-hidden="true">
-        <span class="orbit cyan"></span>
-        <span class="orbit purple"></span>
-        <span class="orbit soft"></span>
-        <span class="core"></span>
-    </span>
-                </div>
+                <p style="font-size: 13px; color: var(--text-muted); text-align: center; width: 100%;">Cargando catálogo en vivo...</p>
             </div>
         </div>
 
@@ -2223,14 +2274,7 @@
                 <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
                 
                 <div class="platform-grid" id="support-platforms-grid">
-                    <div class="goxion-loader-wrap" style="grid-column:1 / -1; min-height:66px;">
-                        <span class="goxion-logo-loader small" aria-hidden="true">
-        <span class="orbit cyan"></span>
-        <span class="orbit purple"></span>
-        <span class="orbit soft"></span>
-        <span class="core"></span>
-    </span>
-                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
                 </div>
                 
                 <div id="step-2" class="step-box">
@@ -2895,8 +2939,14 @@
             const key = localStorage.getItem('goxion_user_key');
             activeFeedbackFolio = folio || (key && globalClientesData[key] ? globalClientesData[key].folio : null);
             document.getElementById('feedback-text').value = '';
-            document.getElementById('feedback-success').style.display = 'none';
-            document.getElementById('btn-send-feedback').style.display = 'block';
+            const successMsg = document.getElementById('feedback-success');
+            const feedbackBtn = document.getElementById('btn-send-feedback');
+            successMsg.style.display = 'none';
+            successMsg.classList.remove('goxion-feedback-message');
+            feedbackBtn.style.display = 'block';
+            feedbackBtn.classList.remove('feedback-sending', 'feedback-success-state', 'goxion-action-success');
+            feedbackBtn.disabled = false;
+            feedbackBtn.innerHTML = 'Enviar Comentario';
             openModal('modal-feedback');
         };
 
@@ -2910,8 +2960,20 @@
             
             notificarAdmin("soporte", "💬 Nuevo Feedback Recibido", `**Cliente:** ${clienteNombre} (Folio: ${clienteFolio})\n**Comentario:**\n"${text}"`, "ffaa00");
             
-            document.getElementById('btn-send-feedback').style.display = 'none';
-            document.getElementById('feedback-success').style.display = 'block';
+            
+            const feedbackBtn = document.getElementById('btn-send-feedback');
+            const successMsg = document.getElementById('feedback-success');
+
+            feedbackBtn.classList.add('feedback-sending');
+            feedbackBtn.disabled = true;
+            feedbackBtn.textContent = 'Enviando…';
+
+            setTimeout(() => {
+                feedbackBtn.classList.remove('feedback-sending');
+                feedbackBtn.classList.add('feedback-success-state', 'goxion-action-success');
+                feedbackBtn.innerHTML = '<span class="feedback-check">✓</span> Comentario enviado';
+                successMsg.classList.add('goxion-feedback-message');
+            }, 180);
             
             if(activeFeedbackMissionIdx !== null) {
                 toggleMission(activeFeedbackMissionIdx, 'btn-claim-coupon', activeFeedbackFolio);
@@ -2921,7 +2983,7 @@
             
             setTimeout(() => {
                 closeModal('modal-feedback');
-            }, 2000);
+            }, 1650);
         };
 
         window.completarMisionInteligente = function(tipo) {
@@ -4162,16 +4224,69 @@ function goxionBetaLegacy(data) {
     </script>
 
 
-<script id="goxion-logo-loader-delay">
-document.addEventListener("DOMContentLoaded", () => {
-    setTimeout(() => {
-        document.querySelectorAll(".goxion-logo-loader").forEach(loader => {
-            if (loader.isConnected && loader.offsetParent !== null) {
-                loader.classList.add("visible");
-            }
+<script id="goxion-motion-system">
+(() => {
+    const PRESS_SELECTOR = [
+        'button', '.btn-primary', '.btn-shimmer', '.teaser-card',
+        '.btn-menu', '.brand-card', '.link-discreto'
+    ].join(',');
+
+    function addPressFeedback(root = document) {
+        root.querySelectorAll(PRESS_SELECTOR).forEach(el => {
+            if (el.dataset.goxionMotionBound === '1') return;
+            el.dataset.goxionMotionBound = '1';
+
+            const press = () => el.classList.add('goxion-press');
+            const release = () => el.classList.remove('goxion-press');
+
+            el.addEventListener('pointerdown', press, { passive: true });
+            el.addEventListener('pointerup', release, { passive: true });
+            el.addEventListener('pointercancel', release, { passive: true });
+            el.addEventListener('pointerleave', release, { passive: true });
         });
-    }, 320);
-});
+    }
+
+    function animateCurrentView() {
+        const activeViews = [...document.querySelectorAll('.view-section.active, #view-dashboard.active')];
+
+        activeViews.forEach(view => {
+            view.classList.remove('goxion-view-enter');
+            void view.offsetWidth;
+            view.classList.add('goxion-view-enter');
+
+            const items = view.querySelectorAll(
+                '.glass-card, .teaser-card, .brand-card, .smart-support-card, .section-title, .btn-primary, .faq-item'
+            );
+
+            items.forEach((item, index) => {
+                item.classList.remove('goxion-stagger-item');
+                item.style.setProperty('--goxion-order', Math.min(index, 10));
+                void item.offsetWidth;
+                item.classList.add('goxion-stagger-item');
+            });
+
+            setTimeout(() => items.forEach(item => item.classList.remove('goxion-stagger-item')), 850);
+        });
+
+        addPressFeedback(document);
+    }
+
+    const originalSwitchTab = window.switchTab;
+    if (typeof originalSwitchTab === 'function') {
+        window.switchTab = function(tabName) {
+            originalSwitchTab(tabName);
+            requestAnimationFrame(() => requestAnimationFrame(animateCurrentView));
+        };
+    }
+
+    const observer = new MutationObserver(() => addPressFeedback(document));
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        addPressFeedback(document);
+        setTimeout(animateCurrentView, 120);
+    });
+})();
 </script>
 
 </body>
