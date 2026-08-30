@@ -192,84 +192,7 @@
             .quick-actions { width: 100%; justify-content: space-between; }
             .btn-qaction { flex: 1; justify-content: center; }
         }
-    
-    /* --- GOXION LOADER / PRUEBA VISUAL --- */
-    .goxion-loader {
-        --loader-cyan: #00f2fe;
-        --loader-purple: #7c4dff;
-        --loader-size: 1px;
-        position: relative;
-        display: inline-block;
-        width: calc(48 * var(--loader-size));
-        height: calc(48 * var(--loader-size));
-        border-radius: 50%;
-        color: var(--loader-cyan);
-        transform: rotateZ(45deg);
-        perspective: calc(1000 * var(--loader-size));
-        filter:
-            drop-shadow(0 0 7px rgba(0, 242, 254, 0.58))
-            drop-shadow(0 0 13px rgba(124, 77, 255, 0.38));
-    }
-
-    .goxion-loader::before,
-    .goxion-loader::after {
-        content: '';
-        display: block;
-        position: absolute;
-        inset: 0;
-        width: inherit;
-        height: inherit;
-        border-radius: 50%;
-        transform: rotateX(70deg);
-        animation: goxionLoaderSpin 1s linear infinite;
-    }
-
-    .goxion-loader::after {
-        color: var(--loader-purple);
-        transform: rotateY(70deg);
-        animation-delay: .4s;
-    }
-
-    .goxion-loader-wrap {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        text-align: center;
-    }
-
-    .goxion-loader-text {
-        color: var(--text-muted, #95a4bd);
-        font-size: 12px;
-        font-weight: 600;
-        letter-spacing: .35px;
-    }
-
-    .goxion-loader.small {
-        --loader-size: .72px;
-    }
-
-    @keyframes goxionLoaderSpin {
-        0%, 100% { box-shadow: .2em 0 0 0 currentColor; }
-        12% { box-shadow: .2em .2em 0 0 currentColor; }
-        25% { box-shadow: 0 .2em 0 0 currentColor; }
-        37% { box-shadow: -.2em .2em 0 0 currentColor; }
-        50% { box-shadow: -.2em 0 0 0 currentColor; }
-        62% { box-shadow: -.2em -.2em 0 0 currentColor; }
-        75% { box-shadow: 0 -.2em 0 0 currentColor; }
-        87% { box-shadow: .2em -.2em 0 0 currentColor; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .goxion-loader::before,
-        .goxion-loader::after {
-            animation-duration: 2s;
-        }
-    }
-
-</style>
+    </style>
 </head>
 <body>
 
@@ -337,10 +260,7 @@
             </div>
             
             <div id="clients-container" style="margin-top: 15px;">
-                <div class="goxion-loader-wrap" style="padding: 38px 0;">
-                    <span class="goxion-loader" aria-hidden="true"></span>
-                    <span class="goxion-loader-text">Conectando con la base de datos...</span>
-                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con la base de datos...</p>
             </div>
         </div>
     </div>
@@ -1096,8 +1016,17 @@ Revisa las guías [SOPORTE]"></textarea>
                     <div style="display:flex; gap: 6px; flex-wrap: wrap;">
                         <input type="text" placeholder="Nombre Invitado" style="flex:2; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; outline:none; font-size:0.8rem;" value="${refActivo.nombre || ''}" onchange="updateReferido('${key}', 'nombre', this.value)">
                         <input type="number" placeholder="Plat." title="Plataformas Contratadas" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; outline:none; font-size:0.8rem;" value="${refActivo.plataformas || 2}" onchange="updateReferido('${key}', 'plataformas', this.value)">
-                        <input type="number" placeholder="Mes" title="Meses Activos (1 a 3)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-green); border-radius:4px; padding:6px; font-weight:bold; outline:none; font-size:0.8rem;" value="${refActivo.meses || 1}" min="1" max="3" onchange="updateReferido('${key}', 'meses', this.value)">
+                        <input type="number" placeholder="Mes" title="Meses Activos (0 a 3)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-green); border-radius:4px; padding:6px; font-weight:bold; outline:none; font-size:0.8rem;" value="${refActivo.meses ?? 0}" min="0" max="3" onchange="updateReferido('${key}', 'meses', this.value)">
                     </div>
+                    <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${
+                        refActivo.beneficio_reclamado
+                            ? 'var(--neon-green)'
+                            : ((Number(refActivo.plataformas||0)>=2 && Number(refActivo.meses||0)>=3) ? 'var(--neon-blue)' : 'var(--text-muted)')
+                    };">${
+                        refActivo.beneficio_reclamado
+                            ? '✅ Mes gratis reclamado por el cliente'
+                            : ((Number(refActivo.plataformas||0)>=2 && Number(refActivo.meses||0)>=3) ? '🎁 Beneficio listo para reclamar' : '⏳ Beneficio incompleto')
+                    }</div>
                     ` : `<div style="font-size: 0.7rem; color: var(--text-muted);">Sin referidos activos.</div>`}
                 </div>
             `;
@@ -1115,6 +1044,9 @@ Revisa las guías [SOPORTE]"></textarea>
                         <input type="number" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:6px; font-weight:bold; outline:none; font-size: 0.85rem;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)">
                     </div>
                     <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; outline:none; resize: vertical; min-height: 55px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Visita nuestro catálogo [CATALOGO]\nPaga tu cuenta [PAGO]">${gamifConfig.tareas}</textarea>
+                    <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${gamifConfig.cupon_reclamado ? 'var(--neon-green)' : 'var(--text-muted)'};">
+                        ${gamifConfig.cupon_reclamado ? '✅ Cupón ya reclamado por el cliente' : '⏳ Cupón todavía no reclamado'}
+                    </div>
                     ` : `<div style="font-size: 0.7rem; color: var(--text-muted);">Sin misiones asignadas.</div>`}
                 </div>
             `;
@@ -1512,7 +1444,9 @@ Revisa las guías [SOPORTE]"></textarea>
                 nombre: r.nombre || "",
                 plataformas: n(r.plataformas, 2),
                 meses: n(r.meses, 1),
-                activo: r.activo !== false
+                activo: r.activo !== false,
+                beneficio_reclamado: r.beneficio_reclamado === true,
+                beneficio_reclamado_at: r.beneficio_reclamado_at || null
             };
         }
 
@@ -1522,7 +1456,9 @@ Revisa las guías [SOPORTE]"></textarea>
                 id: g.id || "",
                 misiones_activas: g.misiones_activas === true,
                 descuento: n(g.descuento, 5),
-                tareas: g.tareas || ""
+                tareas: g.tareas || "",
+                cupon_reclamado: g.cupon_reclamado === true,
+                cupon_reclamado_at: g.cupon_reclamado_at || null
             };
         }
 
