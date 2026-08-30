@@ -2466,6 +2466,60 @@
             }
         }
 
+
+        /* --- AJUSTE FINAL: CENTRADO VERTICAL REAL DE TARJETAS --- */
+        .gamif-btn {
+            min-height: 166px;
+            padding: 14px 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center !important;
+            gap: 2px;
+        }
+
+        .gamif-btn .gamif-icon {
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 0 3px !important;
+            font-size: 35px !important;
+            line-height: 1 !important;
+            flex: 0 0 auto;
+        }
+
+        .gamif-btn .gamif-title {
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 4px !important;
+            line-height: 1.06 !important;
+            flex: 0 0 auto;
+        }
+
+        .gamif-btn .gamif-subtitle {
+            min-height: 0 !important;
+            margin: 2px 0 0 !important;
+            padding: 0 5px !important;
+            line-height: 1.10 !important;
+            flex: 0 0 auto;
+        }
+
+        .gx-referral-card-title {
+            min-height: 0 !important;
+            line-height: 1.06 !important;
+        }
+
+        @media (max-width: 390px) {
+            .gamif-btn {
+                min-height: 160px;
+                padding: 13px 9px;
+            }
+
+            .gamif-btn .gamif-icon {
+                font-size: 33px !important;
+                margin-bottom: 3px !important;
+            }
+        }
+
 </style>
 </head>
 <body class="no-scroll">
