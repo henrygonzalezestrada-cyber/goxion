@@ -2147,6 +2147,127 @@
             }
         }
 
+
+        /* --- GAMIFICACIÓN FINAL: REFERIDOS, CUPONES Y MISIONES --- */
+        .gx-referral-name {
+            display:block;
+            width:100%;
+            max-width:100%;
+            padding:0 8px;
+            overflow-wrap:anywhere;
+            white-space:normal;
+            line-height:1.32;
+            text-align:center;
+        }
+
+        .gx-referral-ready {
+            border-color:rgba(0,242,254,.62)!important;
+            animation:gxReferralReady 1.75s ease-in-out infinite!important;
+        }
+        .gx-referral-ready .gamif-icon {
+            animation:gxGiftInvite 1.75s cubic-bezier(.34,1.56,.64,1) infinite!important;
+        }
+        @keyframes gxReferralReady {
+            0%,100% { box-shadow:0 0 0 rgba(0,242,254,0); transform:translateZ(0) scale(1); }
+            50% { box-shadow:0 0 22px rgba(0,242,254,.20); transform:translateZ(0) scale(1.018); }
+        }
+        @keyframes gxGiftInvite {
+            0%,100% { transform:translateY(0) rotate(0deg) scale(1); }
+            32% { transform:translateY(-4px) rotate(-4deg) scale(1.08); }
+            52% { transform:translateY(-2px) rotate(4deg) scale(1.11); }
+            72% { transform:translateY(0) rotate(-2deg) scale(1.04); }
+        }
+
+        .gx-benefit-ready-note {
+            margin:12px 0;
+            padding:10px 12px;
+            border-radius:12px;
+            border:1px solid rgba(0,242,254,.38);
+            background:rgba(0,242,254,.075);
+            color:#d9fdff;
+            font-size:12px;
+            font-weight:700;
+            text-align:center;
+            line-height:1.4;
+        }
+
+        .gx-claim-done {
+            background:rgba(46,160,67,.14)!important;
+            border:1px solid rgba(46,160,67,.55)!important;
+            color:#8fffc0!important;
+            box-shadow:0 0 18px rgba(46,160,67,.12)!important;
+            pointer-events:none;
+        }
+
+        .gx-mission-just-completed {
+            animation:gxMissionReveal 780ms cubic-bezier(.16,1,.3,1) both;
+        }
+        .gx-mission-just-completed .mission-checkbox {
+            animation:gxMissionCheck 620ms cubic-bezier(.34,1.56,.64,1) both;
+        }
+        .gx-mission-just-completed .gx-mission-text {
+            animation:gxMissionStrike 650ms cubic-bezier(.16,1,.3,1) both;
+        }
+
+        @keyframes gxMissionReveal {
+            0% { background:rgba(0,242,254,.08); border-color:rgba(0,242,254,.52); transform:translate3d(0,4px,0) scale(.985); }
+            55% { background:rgba(46,160,67,.15); border-color:rgba(46,160,67,.82); transform:translate3d(0,0,0) scale(1.012); }
+            100% { background:rgba(46,160,67,.10); border-color:var(--success-green); transform:translate3d(0,0,0) scale(1); }
+        }
+        @keyframes gxMissionCheck {
+            0% { transform:scale(.35) rotate(-18deg); background:transparent; }
+            62% { transform:scale(1.22) rotate(4deg); background:var(--success-green); }
+            100% { transform:scale(1) rotate(0deg); background:var(--success-green); }
+        }
+        @keyframes gxMissionStrike {
+            0%,35% { opacity:1; text-decoration-color:transparent; }
+            100% { opacity:.72; text-decoration-color:currentColor; }
+        }
+
+        .gx-mission-toast {
+            position:fixed;
+            left:50%;
+            bottom:max(26px,calc(env(safe-area-inset-bottom) + 16px));
+            z-index:10050;
+            display:inline-flex;
+            align-items:center;
+            gap:8px;
+            max-width:calc(100vw - 32px);
+            padding:11px 17px;
+            border-radius:999px;
+            background:rgba(10,18,20,.93);
+            backdrop-filter:blur(12px);
+            -webkit-backdrop-filter:blur(12px);
+            border:1px solid rgba(0,255,157,.52);
+            box-shadow:0 12px 34px rgba(0,0,0,.46),0 0 20px rgba(0,255,157,.15);
+            color:#dfffee;
+            font-size:13px;
+            font-weight:800;
+            white-space:nowrap;
+            pointer-events:none;
+            opacity:0;
+            transform:translate3d(-50%,34px,0) scale(.94);
+        }
+        .gx-mission-toast.show { animation:gxMissionToast 2.25s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes gxMissionToast {
+            0% { opacity:0; transform:translate3d(-50%,34px,0) scale(.94); }
+            12% { opacity:1; transform:translate3d(-50%,0,0) scale(1.025); }
+            22%,76% { opacity:1; transform:translate3d(-50%,0,0) scale(1); }
+            100% { opacity:0; transform:translate3d(-50%,38px,0) scale(.96); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gx-referral-ready,
+            .gx-referral-ready .gamif-icon,
+            .gx-mission-just-completed,
+            .gx-mission-just-completed .mission-checkbox,
+            .gx-mission-just-completed .gx-mission-text,
+            .gx-mission-toast.show {
+                animation-duration:.01ms!important;
+                animation-iteration-count:1!important;
+            }
+        }
+
 </style>
 </head>
 <body class="no-scroll">
@@ -2651,16 +2772,140 @@
             alert(`¡Gracias ${nombre}! Hemos recibido tus datos. Te enviaremos un mensaje por WhatsApp en breve para activar tu espacio.`);
         }
 
-        function reclamarCuponSilencioso(nombre, folio, descuento) {
-            notificarAdmin("logins", "🏆 CUPÓN RECLAMADO", `El cliente **${nombre}** (Folio: ${folio}) completó sus misiones y reclamó su **${descuento}% de descuento** para su próxima factura.`, "7c4dff");
-            
+        async function reclamarCuponSilencioso(nombre, folio, descuento) {
             const btn = document.getElementById('btn-claim-coupon');
+            const token = localStorage.getItem('goxion_client_token') || "";
+            const key = localStorage.getItem('goxion_user_key') || "";
+
+            if(!token || !key) {
+                alert("Tu sesión expiró. Inicia sesión nuevamente.");
+                return;
+            }
+
             if(btn) {
-                btn.innerHTML = "🎉 ¡Cupón aplicado para tu próxima factura!";
-                btn.style.background = "rgba(46, 160, 67, 0.2)";
-                btn.style.border = "1px solid var(--success-green)";
-                btn.style.color = "var(--success-green)";
-                btn.onclick = null; 
+                btn.disabled = true;
+                btn.innerHTML = "⏳ Registrando tu cupón…";
+            }
+
+            try {
+                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio", {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json",
+                        "X-Client-Token":token
+                    },
+                    body:JSON.stringify({modo:"reclamar_cupon"})
+                });
+                const data = await response.json().catch(() => ({}));
+
+                if(!response.ok || data?.ok !== true) {
+                    throw new Error(data?.error || "No fue posible registrar el cupón.");
+                }
+
+                if(globalClientesData?.[key]?.gamificacion) {
+                    globalClientesData[key].gamificacion.cupon_reclamado = true;
+                    globalClientesData[key].gamificacion.cupon_reclamado_at = data.reclamado_at || new Date().toISOString();
+                }
+
+                if(btn) {
+                    btn.classList.add("gx-claim-done");
+                    btn.innerHTML = "✅ Ya has reclamado tu cupón";
+                    btn.onclick = null;
+                    btn.disabled = true;
+                    btn.style.display = "block";
+                    btn.style.opacity = "1";
+                }
+
+                const cupSubtitle = document.getElementById("gx-coupon-subtitle");
+                if(cupSubtitle) {
+                    cupSubtitle.innerHTML = '<span style="color:var(--success-green);font-weight:800;">Cupón reclamado ✓</span>';
+                }
+
+                if(!data.ya_reclamado) {
+                    notificarAdmin(
+                        "logins",
+                        "🏆 CUPÓN RECLAMADO",
+                        `El cliente **${nombre}** (Folio: ${folio}) completó sus misiones y reclamó su **${descuento}% de descuento**.`,
+                        "2ea043"
+                    );
+                }
+
+                lanzarConfeti();
+            } catch(error) {
+                console.error(error);
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = `✅ Aplicar Cupón del ${descuento}%`;
+                }
+                alert(error?.message || "No fue posible registrar el cupón.");
+            }
+        }
+
+        async function reclamarMesGratis(nombre, folio, referidoNombre) {
+            const btn = document.getElementById("btn-claim-free-month");
+            const token = localStorage.getItem("goxion_client_token") || "";
+            const key = localStorage.getItem("goxion_user_key") || "";
+
+            if(!token || !key) {
+                alert("Tu sesión expiró. Inicia sesión nuevamente.");
+                return;
+            }
+
+            if(btn) {
+                btn.disabled = true;
+                btn.innerHTML = "⏳ Registrando beneficio…";
+            }
+
+            try {
+                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio", {
+                    method:"POST",
+                    headers:{
+                        "Content-Type":"application/json",
+                        "X-Client-Token":token
+                    },
+                    body:JSON.stringify({modo:"reclamar_mes_referido"})
+                });
+                const data = await response.json().catch(() => ({}));
+
+                if(!response.ok || data?.ok !== true) {
+                    throw new Error(data?.error || "No fue posible registrar tu mes gratis.");
+                }
+
+                if(globalClientesData?.[key]?.referido_activo) {
+                    globalClientesData[key].referido_activo.beneficio_reclamado = true;
+                    globalClientesData[key].referido_activo.beneficio_reclamado_at = data.reclamado_at || new Date().toISOString();
+                }
+
+                if(btn) {
+                    btn.classList.add("gx-claim-done");
+                    btn.innerHTML = "✅ Mes gratis reclamado";
+                    btn.onclick = null;
+                    btn.disabled = true;
+                }
+
+                const refStatus = document.getElementById("gx-referral-status");
+                if(refStatus) {
+                    refStatus.textContent = "Mes gratis reclamado ✓";
+                    refStatus.style.color = "var(--success-green)";
+                }
+
+                if(!data.ya_reclamado) {
+                    notificarAdmin(
+                        "logins",
+                        "🎁 MES GRATIS RECLAMADO",
+                        `El cliente **${nombre}** (Folio: ${folio}) reclamó su **mes gratis** por el referido **${referidoNombre}**.`,
+                        "00ff9d"
+                    );
+                }
+
+                lanzarConfeti();
+            } catch(error) {
+                console.error(error);
+                if(btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = "🎁 Reclama tu mes gratis";
+                }
+                alert(error?.message || "No fue posible registrar tu mes gratis.");
             }
         }
 
@@ -3017,12 +3262,31 @@
 
         window.openGamif = function(type) {
             document.getElementById('gamif-grid').style.display = 'none';
+
             if(type === 'referral') {
                 document.getElementById('gamif-expanded-referral').style.display = 'block';
                 document.getElementById('gamif-expanded-coupon').style.display = 'none';
             } else {
                 document.getElementById('gamif-expanded-coupon').style.display = 'block';
                 document.getElementById('gamif-expanded-referral').style.display = 'none';
+
+                const key = localStorage.getItem('goxion_user_key');
+                const folio = key && globalClientesData?.[key] ? globalClientesData[key].folio : "";
+                const pendingKey = folio ? 'goxion_recent_mission_' + folio : "";
+                const pending = pendingKey ? localStorage.getItem(pendingKey) : null;
+
+                if(pending !== null) {
+                    setTimeout(() => {
+                        const item = document.getElementById('mission-' + pending);
+                        if(item) {
+                            item.classList.remove('gx-mission-just-completed');
+                            void item.offsetWidth;
+                            item.classList.add('gx-mission-just-completed');
+                            setTimeout(() => item.classList.remove('gx-mission-just-completed'), 900);
+                        }
+                        localStorage.removeItem(pendingKey);
+                    }, 130);
+                }
             }
         };
 
@@ -3055,35 +3319,72 @@
             }
         };
 
+        function mostrarMisionCompletada() {
+            let toast = document.getElementById("gx-mission-toast");
+            if(!toast) {
+                toast = document.createElement("div");
+                toast.id = "gx-mission-toast";
+                toast.className = "gx-mission-toast";
+                toast.innerHTML = "<span>✅</span><span>Misión completada</span>";
+                document.body.appendChild(toast);
+            }
+
+            toast.classList.remove("show");
+            void toast.offsetWidth;
+            toast.classList.add("show");
+
+            clearTimeout(toast._gxTimer);
+            toast._gxTimer = setTimeout(() => toast.classList.remove("show"), 2300);
+        }
+
         window.toggleMission = function(index, btnId, folio) {
             let item = document.getElementById('mission-' + index);
-            let isDone = item.classList.contains('done');
-            
-            if(isDone) return; 
-            
+            if(!item || item.classList.contains('done')) return;
+
             item.classList.add('done');
+            item.classList.remove('locked');
+
+            const checkbox = item.querySelector('.mission-checkbox');
+            if(checkbox) checkbox.innerHTML = '';
+
+            localStorage.setItem('goxion_recent_mission_' + folio, String(index));
+
+            const couponPanel = document.getElementById('gamif-expanded-coupon');
+            const panelVisible = couponPanel && couponPanel.style.display === 'block';
+
+            if(panelVisible) {
+                item.classList.remove('gx-mission-just-completed');
+                void item.offsetWidth;
+                item.classList.add('gx-mission-just-completed');
+                setTimeout(() => item.classList.remove('gx-mission-just-completed'), 900);
+                localStorage.removeItem('goxion_recent_mission_' + folio);
+            }
+
+            mostrarMisionCompletada();
             lanzarConfeti();
-            
+
             let allMissions = document.querySelectorAll('.mission-item');
             let allDone = true;
             let doneIndexes = [];
-            
-            allMissions.forEach((m, idx) => { 
-                if(!m.classList.contains('done')) allDone = false; 
+
+            allMissions.forEach((m, idx) => {
+                if(!m.classList.contains('done')) allDone = false;
                 else doneIndexes.push(idx);
             });
-            
+
             let claimBtn = document.getElementById(btnId);
-            if(allDone) {
-                claimBtn.style.display = 'block';
-                setTimeout(() => claimBtn.style.opacity = '1', 50);
-                setTimeout(lanzarConfeti, 300);
-                setTimeout(lanzarConfeti, 800);
-            } else {
-                claimBtn.style.display = 'none';
-                claimBtn.style.opacity = '0';
+            if(claimBtn && !claimBtn.classList.contains('gx-claim-done')) {
+                if(allDone) {
+                    claimBtn.style.display = 'block';
+                    setTimeout(() => claimBtn.style.opacity = '1', 50);
+                    setTimeout(lanzarConfeti, 300);
+                    setTimeout(lanzarConfeti, 800);
+                } else {
+                    claimBtn.style.display = 'none';
+                    claimBtn.style.opacity = '0';
+                }
             }
-            
+
             localStorage.setItem('goxion_missions_' + folio, JSON.stringify(doneIndexes));
         };
 
@@ -3267,41 +3568,72 @@
             try { savedMissions = JSON.parse(localStorage.getItem('goxion_missions_' + cliente.folio)) || []; } catch(e){}
 
             if(hasReferral) {
-                let meses = cliente.referido_activo.meses || 1;
-                let plats = cliente.referido_activo.plataformas || 1;
-                let warningHTML = plats < 2 ? `<div style="background: rgba(255, 170, 0, 0.15); border: 1px dashed var(--warning-amber); border-radius: 8px; padding: 10px; margin-top: 10px; font-size: 11px; color: var(--warning-amber);">⚠️ Tu referido solo contrató 1 plataforma. ¡Anímalo a sumar una más para tu mes gratis!</div>` : '';
-                
-                let pulseClass = (meses > 0 && meses < 3) ? 'pulse-referral' : (meses >= 3 ? 'pulse-mission' : '');
+                let mesesRaw = Number(cliente.referido_activo.meses || 0);
+                let meses = Math.max(0, Math.min(mesesRaw, 3));
+                let plats = Number(cliente.referido_activo.plataformas || 0);
+                let beneficioReclamado = cliente.referido_activo.beneficio_reclamado === true;
+                let beneficioListo = plats >= 2 && meses >= 3;
+
+                let warningHTML = plats < 2
+                    ? `<div style="background:rgba(255,170,0,.15);border:1px dashed var(--warning-amber);border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--warning-amber);">⚠️ Tu referido necesita al menos 2 plataformas activas para que el beneficio sea válido.</div>`
+                    : '';
+
+                let refSubtitle = "";
+                let refSubtitleColor = "var(--neon-purple)";
+                let refCardClass = "";
+
+                if(beneficioReclamado) {
+                    refSubtitle = "Mes gratis reclamado ✓";
+                    refSubtitleColor = "var(--success-green)";
+                } else if(plats < 2 || meses < 1) {
+                    refSubtitle = "Incompleto";
+                    refSubtitleColor = "var(--warning-amber)";
+                } else {
+                    refSubtitle = `${meses}/3 meses`;
+                    refSubtitleColor = beneficioListo ? "var(--neon-blue)" : "var(--neon-purple)";
+                    refCardClass = beneficioListo ? "gx-referral-ready" : "pulse-referral";
+                }
+
+                let claimMonthHTML = "";
+                if(beneficioListo) {
+                    claimMonthHTML = beneficioReclamado
+                        ? `<button id="btn-claim-free-month" class="btn-primary gx-claim-done" disabled style="margin-top:14px;padding:14px;font-size:13px;">✅ Mes gratis reclamado</button>`
+                        : `
+                            <div class="gx-benefit-ready-note">🎉 ¡Tu referido ya cumplió el ciclo! Toca el botón para registrar tu beneficio.</div>
+                            <button id="btn-claim-free-month" class="btn-primary" style="margin-top:4px;padding:14px;font-size:13px;" onclick="reclamarMesGratis('${cliente.nombre}', '${cliente.folio}', '${refNombre.replace(/'/g, "\\'")}')">🎁 Reclama tu mes gratis</button>
+                          `;
+                }
 
                 btnRefHtml = `
-                    <div class="gamif-btn ${pulseClass}" onclick="openGamif('referral')">
-                        <div class="gamif-icon shake-anim">🎁</div>
+                    <div class="gamif-btn ${refCardClass}" onclick="openGamif('referral')">
+                        <div class="gamif-icon">🎁</div>
                         <div class="gamif-title">${refNombre.split(' ')[0]}</div>
-                        <div class="gamif-subtitle" style="color: var(--neon-purple); font-weight: bold;">En Validación</div>
+                        <div id="gx-referral-status" class="gamif-subtitle" style="color:${refSubtitleColor};font-weight:bold;">${refSubtitle}</div>
                     </div>`;
-                
+
                 expandedRefHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
-                        <div class="shake-anim" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">🎁</div>
-                        <div style="font-size: 16px; font-weight: 800;">¡Gracias por invitar a ${refNombre}!</div>
+                    <div style="text-align:center;margin-bottom:15px;margin-top:-5px;">
+                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:38px;margin-bottom:5px;display:inline-block;">🎁</div>
+                        <div class="gx-referral-name" style="font-size:16px;font-weight:800;">¡Gracias por invitar a ${refNombre}!</div>
                     </div>
                     <div class="referral-stats">
-                        <div class="stat-box" style="border-right: 1px solid rgba(255,255,255,0.05);">
+                        <div class="stat-box" style="border-right:1px solid rgba(255,255,255,.05);">
                             <div class="stat-val" style="${plats < 2 ? 'color:var(--warning-amber);' : ''}">${plats}</div>
                             <div class="stat-label">Plataformas</div>
                         </div>
                         <div class="stat-box">
-                            <div class="stat-val">${meses}/3</div>
+                            <div class="stat-val" style="${beneficioListo ? 'color:var(--success-green);' : ''}">${meses}/3</div>
                             <div class="stat-label">Meses</div>
                         </div>
                     </div>
-                    <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 5px;">Progreso a tu mes gratis:</div>
-                    <div class="loyalty-progress-bg" style="height: 6px;">
-                        <div class="loyalty-progress-fill" style="width: ${Math.min((meses / 3) * 100, 100)}%; background: linear-gradient(90deg, #ffaa00, #ff3366);"></div>
+                    <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">Progreso a tu mes gratis:</div>
+                    <div class="loyalty-progress-bg" style="height:6px;">
+                        <div class="loyalty-progress-fill" style="width:${Math.min((meses / 3) * 100,100)}%;background:${beneficioListo ? 'linear-gradient(90deg,#00f2fe,#00ff9d)' : 'linear-gradient(90deg,#ffaa00,#ff3366)'};"></div>
                     </div>
                     ${warningHTML}
-                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
+                    ${claimMonthHTML}
+                    <div style="font-size:11px;color:var(--neon-blue);margin-top:15px;text-align:center;cursor:pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
             } else {
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
                 btnRefHtml = `
@@ -3310,34 +3642,37 @@
                         <div class="gamif-title">Invita y Gana</div>
                         <div class="gamif-subtitle">Empieza a referir</div>
                     </div>`;
-                
+
                 expandedRefHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
-                        <div style="font-size: 38px; margin-bottom: 5px;">🫂</div>
-                        <div style="font-size: 16px; font-weight: 800;">Gana 1 Mes Gratis</div>
-                        <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Invita a un amigo. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
+                    <div style="text-align:center;margin-bottom:15px;margin-top:-5px;">
+                        <div style="font-size:38px;margin-bottom:5px;">🫂</div>
+                        <div style="font-size:16px;font-weight:800;">Gana 1 Mes Gratis</div>
+                        <div style="font-size:12px;color:var(--text-muted);line-height:1.4;margin-top:5px;">Invita a un amigo. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
                     </div>
-                    <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-                        <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0; padding: 10px; font-size: 10px; flex: 1; color: var(--text-muted);" id="ref-link-input">
-                        <button class="btn-primary" style="width: auto; padding: 10px 15px; border-radius: 12px; font-size: 12px;" onclick="copiarEnlace()">📋 Copiar</button>
+                    <div style="display:flex;gap:8px;margin-bottom:12px;">
+                        <input type="text" readonly value="https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(msgWhatsApp)}" class="input-smart" style="margin:0;padding:10px;font-size:10px;flex:1;color:var(--text-muted);" id="ref-link-input">
+                        <button class="btn-primary" style="width:auto;padding:10px 15px;border-radius:12px;font-size:12px;" onclick="copiarEnlace()">📋 Copiar</button>
                     </div>
-                    <button class="btn-primary" style="background: linear-gradient(135deg, #25D366, #128C7E); color: white; box-shadow: 0 0 15px rgba(37, 211, 102, 0.4); padding: 14px; font-size: 13px;" onclick="compartirAppGoxion('${msgWhatsApp}')">📲 Compartir por WhatsApp</button>
-                    <div style="font-size: 11px; color: var(--neon-blue); margin-top: 15px; text-align: center; cursor: pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
+                    <button class="btn-primary" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;box-shadow:0 0 15px rgba(37,211,102,.4);padding:14px;font-size:13px;" onclick="compartirAppGoxion('${msgWhatsApp}')">📲 Compartir por WhatsApp</button>
+                    <div style="font-size:11px;color:var(--neon-blue);margin-top:15px;text-align:center;cursor:pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
             }
 
             let tareasArr = gamifConfig.tareas ? gamifConfig.tareas.split('\n').filter(t => t.trim() !== '') : [];
-            let allDoneInitial = tareasArr.length > 0 && savedMissions.length === tareasArr.length;
-            
-            let cupShake = (hasMissions && !allDoneInitial) ? 'shake-anim' : '';
-            let cupPulse = (hasMissions && !allDoneInitial) ? 'pulse-mission' : '';
-            let cupSubtitle = hasMissions ? `<span style="color: var(--neon-blue); font-weight: bold;">¡Misiones activas!</span>` : `Sin tareas`;
-            
+            let allDoneInitial = tareasArr.length > 0 && tareasArr.every((_, idx) => savedMissions.includes(idx));
+            let couponClaimed = gamifConfig.cupon_reclamado === true;
+
+            let cupShake = (hasMissions && !allDoneInitial && !couponClaimed) ? 'shake-anim' : '';
+            let cupPulse = (hasMissions && !allDoneInitial && !couponClaimed) ? 'pulse-mission' : '';
+            let cupSubtitle = couponClaimed
+                ? `<span style="color:var(--success-green);font-weight:800;">Cupón reclamado ✓</span>`
+                : (hasMissions ? `<span style="color:var(--neon-blue);font-weight:bold;">¡Misiones activas!</span>` : `Sin tareas`);
+
             btnCupHtml = `
                 <div class="gamif-btn ${cupPulse}" onclick="openGamif('coupon')">
                     <div class="gamif-icon ${cupShake}">🎟️</div>
                     <div class="gamif-title">Cupones</div>
-                    <div class="gamif-subtitle">${cupSubtitle}</div>
+                    <div id="gx-coupon-subtitle" class="gamif-subtitle">${cupSubtitle}</div>
                 </div>`;
 
             if(hasMissions && tareasArr.length > 0) {
@@ -3390,7 +3725,7 @@
                     missionsHTML += `
                         <div class="mission-item ${isDone ? 'done' : ''} ${isSmart && !isDone ? 'locked' : ''}" id="mission-${idx}" data-type="${smartType}" ${clickAction}>
                             <div class="mission-checkbox">${isSmart && !isDone ? '🔒' : ''}</div>
-                            <div style="flex:1;">${cleanTarea}</div>
+                            <div class="gx-mission-text" style="flex:1;">${cleanTarea}</div>
                             ${extraIcon ? `<div style="font-size:16px; margin-left: 5px;">${extraIcon}</div>` : ''}
                         </div>`;
                 });
@@ -3405,7 +3740,10 @@
                     <div style="margin-bottom: 15px;">
                         ${missionsHTML}
                     </div>
-                    <button id="btn-claim-coupon" class="btn-primary" style="padding: 14px; font-size: 13px; display: ${allDoneInitial ? 'block' : 'none'}; opacity: ${allDoneInitial ? '1' : '0'}; transition: 0.3s;" onclick="reclamarCuponSilencioso('${cliente.nombre}', '${cliente.folio}', '${gamifConfig.descuento}')">✅ Aplicar Cupón del ${gamifConfig.descuento}%</button>`;
+                    ${couponClaimed
+                        ? `<button id="btn-claim-coupon" class="btn-primary gx-claim-done" disabled style="padding:14px;font-size:13px;display:block;opacity:1;">✅ Ya has reclamado tu cupón</button>`
+                        : `<button id="btn-claim-coupon" class="btn-primary" style="padding:14px;font-size:13px;display:${allDoneInitial ? 'block' : 'none'};opacity:${allDoneInitial ? '1' : '0'};transition:.3s;" onclick="reclamarCuponSilencioso('${cliente.nombre}', '${cliente.folio}', '${gamifConfig.descuento}')">✅ Aplicar Cupón del ${gamifConfig.descuento}%</button>`
+                    }`;
             } else {
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
