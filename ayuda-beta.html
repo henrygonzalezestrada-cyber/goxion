@@ -421,8 +421,8 @@
                 animation: none !important;
             }
         }
-}
-.view-section { 
+
+        .view-section { 
             display: none; 
             animation: fadeIn 0.4s ease; 
         }
@@ -2066,18 +2066,18 @@
             <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
         </div>
 
-        <div class="glass-card tab-container">
-            <button class="tab-btn active" id="btn-tab-inicio" onclick="switchTab('inicio')">
+        <div class="glass-card tab-container" id="goxion-main-nav">
+            <button type="button" class="tab-btn active" id="btn-tab-inicio" data-goxion-tab="inicio">
                 <span class="gx-nav-icon" id="tab-inicio-icon">🏠</span>
                 <span class="gx-nav-label" id="tab-inicio-text">Inicio</span>
             </button>
 
-            <button class="tab-btn" id="btn-tab-catalogo" onclick="switchTab('catalogo')">
+            <button type="button" class="tab-btn" id="btn-tab-catalogo" data-goxion-tab="catalogo">
                 <span class="gx-nav-icon">🛒</span>
                 <span class="gx-nav-label">Catálogo</span>
             </button>
 
-            <button class="tab-btn" id="btn-tab-soporte" onclick="switchTab('soporte')">
+            <button type="button" class="tab-btn" id="btn-tab-soporte" data-goxion-tab="soporte">
                 <span class="gx-nav-icon">🛠️</span>
                 <span class="gx-nav-label">Soporte</span>
             </button>
@@ -2751,6 +2751,8 @@
 
             actualizarBloqueoSoporte();
         }
+
+        window.switchTab = switchTab;
 
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
@@ -4278,6 +4280,28 @@ function goxionBetaLegacy(data) {
         console.info("GOXION ayuda conectado a Supabase.");
     })();
     </script>
+
+
+<script id="goxion-nav-controller">
+(() => {
+    const nav = document.getElementById("goxion-main-nav");
+    if (!nav) return;
+
+    nav.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-goxion-tab]");
+        if (!button || !nav.contains(button)) return;
+
+        const tabName = button.dataset.goxionTab;
+        if (!["inicio", "catalogo", "soporte"].includes(tabName)) return;
+
+        event.preventDefault();
+
+        if (typeof window.switchTab === "function") {
+            window.switchTab(tabName);
+        }
+    });
+})();
+</script>
 
 </body>
 </html>
