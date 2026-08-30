@@ -247,191 +247,121 @@
             border-radius: 20px;
         }
 
-        /* --- NAVEGACIÓN GOXION: ACTIVO PROTAGONISTA + MORPH FLIP --- */
+        
+        /* --- NAVEGACIÓN GOXION: MINIMALISMO FLOTANTE --- */
         .tab-container {
             display: flex;
             align-items: center;
-            gap: 8px; 
-            min-height: 72px;
-            padding: 8px; 
+            justify-content: space-around;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 10px 0;
             margin-bottom: 20px;
             position: relative;
             z-index: 110;
-            border-radius: 22px; 
-            overflow: hidden;
+            overflow: visible;
             isolation: isolate;
         }
 
         .tab-btn {
-            height: 56px;
-            min-width: 0;
-            background: rgba(255,255,255,0.025);
-            border: 1px solid rgba(255,255,255,0.06);
-            color: var(--text-muted);
-            border-radius: 28px; 
-            cursor: pointer;
-            position: relative;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: flex-start; 
-            flex: 0 0 56px; 
-            overflow: hidden;
-            -webkit-tap-highlight-color: transparent;
-            transform-origin: center;
-            transition:
-                background 220ms ease,
-                border-color 220ms ease,
-                box-shadow 220ms ease,
-                color 220ms ease;
-        }
-
-        .tab-btn.active {
-            flex: 1 1 auto;
-            border-radius: 18px;
-            background:
-                linear-gradient(135deg,
-                    rgba(255,255,255,0.075),
-                    rgba(0,242,254,0.035) 58%,
-                    rgba(124,77,255,0.04));
-            color: var(--text-main);
-            border-color: rgba(0,242,254,0.82);
-            box-shadow:
-                0 5px 18px rgba(0,242,254,0.20),
-                inset 0 0 22px rgba(124,77,255,0.025);
-        }
-
-        .gx-nav-icon {
-            width: 56px; 
-            min-width: 56px;
-            height: 56px;
+            background: transparent;
+            border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px; 
+            gap: 8px;
+            color: var(--text-muted);
+            cursor: pointer;
             position: relative;
-            z-index: 3;
-            transform: translateZ(0) scale(1);
-            transform-origin: center;
+            padding: 10px 15px;
+            border-radius: 16px;
             transition:
-                transform 300ms cubic-bezier(.2,1.14,.32,1),
-                filter 220ms ease;
+                color 300ms cubic-bezier(.2,.8,.2,1),
+                transform 300ms cubic-bezier(.2,.8,.2,1),
+                opacity 220ms ease;
+            -webkit-tap-highlight-color: transparent;
+            transform-origin: center;
+            will-change: transform;
         }
 
-        .tab-btn.active .gx-nav-icon {
-            transform: translateZ(0) scale(1.35); 
-            filter:
-                drop-shadow(0 0 7px rgba(0,242,254,0.34))
-                drop-shadow(0 0 11px rgba(124,77,255,0.16));
+        .gx-nav-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            line-height: 1;
+            transform-origin: center;
+            transition:
+                transform 300ms cubic-bezier(.2,1.12,.32,1),
+                filter 300ms ease;
         }
 
         .gx-nav-label {
-            position: absolute;
-            left: 54px; 
-            right: 12px;
-            top: 50%;
-            transform: translate3d(-8px,-50%,0);
-            opacity: 0;
-            pointer-events: none;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            color: #fff;
-            font-size: 15px; 
-            line-height: 1;
+            font-size: 16px;
             font-weight: 700;
-            letter-spacing: 0.2px;
+            line-height: 1;
+            color: var(--text-main);
+            display: none;
+            white-space: nowrap;
+        }
+
+        /* Estado activo */
+        .tab-btn.active {
+            color: var(--neon-blue);
+        }
+
+        .tab-btn.active .gx-nav-icon {
+            transform: scale(1.16);
+            filter: drop-shadow(0 0 8px rgba(0,242,254,.40));
         }
 
         .tab-btn.active .gx-nav-label {
-            opacity: 1;
-            transform: translate3d(0,-50%,0);
+            display: block;
+            color: var(--neon-blue);
+            animation: fadeInLabel 300ms cubic-bezier(.2,.8,.2,1) forwards;
         }
 
-        /* Estela de energía: siempre detrás de botones y texto */
-        .gx-nav-trail {
+        /* Indicador inferior elegante */
+        .tab-btn.active::after {
+            content: '';
             position: absolute;
-            left: 0;
-            top: 50%;
-            height: 16px;
-            width: 1px;
-            border-radius: 999px;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0;
-            transform-origin: left center;
-            transform: translate3d(0,-50%,0) scaleX(.05);
-            background:
-                linear-gradient(90deg,
-                    transparent 0%,
-                    rgba(124,77,255,0.06) 18%,
-                    rgba(0,242,254,0.28) 55%,
-                    rgba(124,77,255,0.14) 78%,
-                    transparent 100%);
-            filter: blur(7px);
-            will-change: transform, opacity;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 25px;
+            height: 3px;
+            border-radius: 4px;
+            background: var(--neon-blue);
+            box-shadow: 0 0 12px var(--neon-blue);
+            animation: popLine 300ms cubic-bezier(.2,.8,.2,1) forwards;
         }
 
+        @keyframes fadeInLabel {
+            from { opacity: 0; transform: translate3d(-5px,0,0); }
+            to { opacity: 1; transform: translate3d(0,0,0); }
+        }
+
+        @keyframes popLine {
+            from { width: 0; opacity: 0; }
+            to { width: 25px; opacity: 1; }
+        }
+
+        /* La estela/glint de la prueba anterior ya no se usa en este diseño. */
+        .gx-nav-trail,
         .gx-nav-glint {
-            position: absolute;
-            inset: 5px;
-            border-radius: inherit;
-            z-index: 0;
-            pointer-events: none;
-            opacity: 0;
-            background:
-                radial-gradient(circle at 24% 50%,
-                    rgba(255,255,255,0.20),
-                    rgba(0,242,254,0.10) 28%,
-                    rgba(124,77,255,0.045) 50%,
-                    transparent 72%);
-        }
-
-        .tab-btn.gx-arriving .gx-nav-glint {
-            animation: gxNavGlint 430ms cubic-bezier(.16,1,.3,1) both;
-        }
-
-        @keyframes gxNavGlint {
-            0%   { opacity: 0; transform: translateX(-18%) scale(.75); }
-            42%  { opacity: .9; }
-            100% { opacity: 0; transform: translateX(34%) scale(1.18); }
-        }
-
-        /* Transición de contenido: corta y ligera */
-        .gx-view-in-right {
-            animation: gxViewInRight 210ms cubic-bezier(.22,.8,.24,1) both !important;
-        }
-
-        .gx-view-in-left {
-            animation: gxViewInLeft 210ms cubic-bezier(.22,.8,.24,1) both !important;
-        }
-
-        .gx-view-in-soft {
-            animation: gxViewInSoft 190ms cubic-bezier(.22,.8,.24,1) both !important;
-        }
-
-        @keyframes gxViewInRight {
-            from { opacity: .42; transform: translate3d(8px,2px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        @keyframes gxViewInLeft {
-            from { opacity: .42; transform: translate3d(-8px,2px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
-        }
-
-        @keyframes gxViewInSoft {
-            from { opacity: .58; transform: translate3d(0,4px,0); }
-            to   { opacity: 1; transform: translate3d(0,0,0); }
+            display: none !important;
         }
 
         @media (max-width: 360px) {
-            .tab-container { gap: 6px; padding: 6px; }
-            .tab-btn { flex-basis: 50px; height: 50px; border-radius: 25px; }
-            .gx-nav-icon { width: 50px; min-width: 50px; height: 50px; font-size: 18px; }
-            .gx-nav-label { left: 48px; font-size: 14px; }
+            .tab-btn { padding: 9px 11px; gap: 6px; }
+            .gx-nav-icon { font-size: 22px; }
+            .gx-nav-label { font-size: 15px; }
         }
-        
+.tab-btn { flex-basis: 46px; height: 56px; }
+            .gx-nav-icon { width: 44px; min-width: 44px; height: 44px; }
+            .gx-nav-label { left: 53px; font-size: 18px; }
+        }
 .view-section { 
             display: none; 
             animation: fadeIn 0.4s ease; 
@@ -2098,22 +2028,17 @@
         </div>
 
         <div class="glass-card tab-container" id="goxion-main-nav">
-            <div class="gx-nav-trail" id="gx-nav-trail" aria-hidden="true"></div>
-
             <button class="tab-btn active" id="btn-tab-inicio" data-nav-tab="inicio" onclick="switchTab('inicio')">
-                <span class="gx-nav-glint" aria-hidden="true"></span>
                 <span class="gx-nav-icon" id="tab-inicio-icon">🏠</span>
                 <span class="gx-nav-label" id="tab-inicio-text">Inicio</span>
             </button>
 
             <button class="tab-btn" id="btn-tab-catalogo" data-nav-tab="catalogo" onclick="switchTab('catalogo')">
-                <span class="gx-nav-glint" aria-hidden="true"></span>
                 <span class="gx-nav-icon">🛒</span>
                 <span class="gx-nav-label">Catálogo</span>
             </button>
 
             <button class="tab-btn" id="btn-tab-soporte" data-nav-tab="soporte" onclick="switchTab('soporte')">
-                <span class="gx-nav-glint" aria-hidden="true"></span>
                 <span class="gx-nav-icon">🛠️</span>
                 <span class="gx-nav-label">Soporte</span>
             </button>
@@ -4316,7 +4241,7 @@ function goxionBetaLegacy(data) {
     </script>
 
 
-<script id="goxion-nav-morph">
+<script id="goxion-nav-minimal">
 (() => {
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const names = ["inicio", "catalogo", "soporte"];
@@ -4325,11 +4250,8 @@ function goxionBetaLegacy(data) {
     let animating = false;
     let queued = null;
 
-    const nav = document.getElementById("goxion-main-nav");
-    const trail = document.getElementById("gx-nav-trail");
     const originalSwitchTab = window.switchTab;
-
-    if (!nav || !trail || typeof originalSwitchTab !== "function") return;
+    if (typeof originalSwitchTab !== "function") return;
 
     function button(name) {
         return document.getElementById(`btn-tab-${name}`);
@@ -4345,60 +4267,24 @@ function goxionBetaLegacy(data) {
     }
 
     function applyOrder(activeName) {
-        button(activeName).style.order = "0";
-        names.filter(n => n !== activeName).forEach((name, index) => {
-            button(name).style.order = String(index + 1);
+        const active = button(activeName);
+        if (active) active.style.order = "0";
+
+        names.filter(name => name !== activeName).forEach((name, index) => {
+            const el = button(name);
+            if (el) el.style.order = String(index + 1);
         });
     }
 
     function snapshot() {
-        const map = {};
+        const result = {};
         names.forEach(name => {
             const el = button(name);
+            if (!el) return;
             const r = el.getBoundingClientRect();
-            map[name] = {
-                left: r.left,
-                top: r.top,
-                width: r.width,
-                height: r.height,
-                radius: getComputedStyle(el).borderRadius
-            };
+            result[name] = { left:r.left, top:r.top, width:r.width, height:r.height };
         });
-        return map;
-    }
-
-    function iconSnapshot() {
-        const map = {};
-        names.forEach(name => {
-            const icon = button(name).querySelector(".gx-nav-icon");
-            const r = icon.getBoundingClientRect();
-            map[name] = { left:r.left, top:r.top, width:r.width, height:r.height };
-        });
-        return map;
-    }
-
-    function animateTrail(fromRect, toRect) {
-        if (reducedMotion.matches || !trail.animate) return;
-
-        const navRect = nav.getBoundingClientRect();
-        const fromX = fromRect.left - navRect.left + fromRect.width / 2;
-        const toX = toRect.left - navRect.left + toRect.width / 2;
-        const left = Math.min(fromX, toX);
-        const distance = Math.max(18, Math.abs(toX - fromX));
-
-        trail.style.left = `${left}px`;
-        trail.style.width = `${distance}px`;
-        trail.style.transformOrigin = toX < fromX ? "right center" : "left center";
-
-        trail.animate([
-            { opacity:0, transform:"translate3d(0,-50%,0) scaleX(.05)", offset:0 },
-            { opacity:.68, transform:"translate3d(0,-50%,0) scaleX(.34)", offset:.25 },
-            { opacity:.48, transform:"translate3d(0,-50%,0) scaleX(.90)", offset:.68 },
-            { opacity:0, transform:"translate3d(0,-50%,0) scaleX(1)", offset:1 }
-        ], {
-            duration: 470,
-            easing: "cubic-bezier(.16,1,.3,1)"
-        });
+        return result;
     }
 
     function animateView(newTab, oldTab) {
@@ -4422,118 +4308,37 @@ function goxionBetaLegacy(data) {
         setTimeout(() => {
             view.classList.remove(cls);
             view.style.willChange = "";
-        }, 250);
+        }, 240);
     }
 
-    function animateLabelStates(oldTab, newTab) {
-        const oldLabel = button(oldTab)?.querySelector(".gx-nav-label");
-        const newLabel = button(newTab)?.querySelector(".gx-nav-label");
-
-        if (oldLabel?.animate) {
-            oldLabel.animate([
-                { opacity:1, transform:"translate3d(0,-50%,0)" },
-                { opacity:0, transform:"translate3d(-10px,-50%,0)" }
-            ], {
-                duration: 150,
-                easing:"cubic-bezier(.22,.8,.24,1)"
-            });
-        }
-
-        if (newLabel?.animate) {
-            newLabel.animate([
-                { opacity:0, transform:"translate3d(-10px,-50%,0)" },
-                { opacity:1, transform:"translate3d(0,-50%,0)" }
-            ], {
-                duration: 250,
-                delay: 150,
-                easing:"cubic-bezier(.16,1,.3,1)"
-            });
-        }
-    }
-
-    function animateFlip(before, after, iconBefore, iconAfter, oldTab, newTab) {
-        const animations = [];
+    function runFlip(before, after) {
+        if (reducedMotion.matches) return;
 
         names.forEach(name => {
             const el = button(name);
             const b = before[name];
             const a = after[name];
-            if (!el || !b || !a || reducedMotion.matches || !el.animate) return;
+            if (!el || !b || !a || !el.animate) return;
 
             const dx = b.left - a.left;
             const dy = b.top - a.top;
-            const sx = b.width / a.width;
-            const sy = b.height / a.height;
+            const sx = b.width / Math.max(a.width, 1);
 
-            const isIncoming = name === newTab;
-            const isOutgoing = name === oldTab;
-
-            const keyframes = [
-                {
-                    transform:`translate3d(${dx}px,${dy}px,0) scale(${sx},${sy})`,
-                    borderRadius:b.radius,
-                    offset:0
-                },
-                {
-                    transform:`translate3d(${dx * .42}px,${dy * .42}px,0) scale(${isIncoming ? sx * .93 : sx * 1.035},${isIncoming ? sy * .96 : sy * 1.02})`,
-                    borderRadius:isIncoming ? "24px" : "22px",
-                    offset:.48
-                },
-                {
-                    transform:"translate3d(0,0,0) scale(1,1)",
-                    borderRadius:a.radius,
-                    offset:1
-                }
-            ];
-
-            const anim = el.animate(keyframes, {
-                duration: 520,
+            el.style.willChange = "transform";
+            const anim = el.animate([
+                { transform:`translate3d(${dx}px,${dy}px,0) scaleX(${sx})`, offset:0 },
+                { transform:`translate3d(${dx * .25}px,${dy * .25}px,0) scaleX(1.02)`, offset:.72 },
+                { transform:"translate3d(0,0,0) scaleX(1)", offset:1 }
+            ], {
+                duration: 390,
                 easing:"cubic-bezier(.16,1,.3,1)",
                 fill:"both"
             });
-            animations.push(anim);
 
-            el.style.willChange = "transform";
-            anim.onfinish = () => { el.style.willChange = ""; };
+            anim.onfinish = () => {
+                el.style.willChange = "";
+            };
         });
-
-        /* El icono entrante tiene su propio overshoot para que se perciba
-           claramente que "toma protagonismo". */
-        const incomingIcon = button(newTab)?.querySelector(".gx-nav-icon");
-        if (incomingIcon?.animate && !reducedMotion.matches) {
-            incomingIcon.animate([
-                { transform:"scale(1)", offset:0 },
-                { transform:"scale(1.62)", offset:.62 },
-                { transform:"scale(1.46)", offset:1 }
-            ], {
-                duration: 500,
-                easing:"cubic-bezier(.16,1,.3,1)"
-            });
-        }
-
-        const outgoingIcon = button(oldTab)?.querySelector(".gx-nav-icon");
-        if (outgoingIcon?.animate && !reducedMotion.matches) {
-            outgoingIcon.animate([
-                { transform:"scale(1.46)", offset:0 },
-                { transform:"scale(.92)", offset:.68 },
-                { transform:"scale(1)", offset:1 }
-            ], {
-                duration: 410,
-                easing:"cubic-bezier(.16,1,.3,1)"
-            });
-        }
-
-        return animations;
-    }
-
-    function runGlint(name) {
-        const el = button(name);
-        if (!el) return;
-        el.classList.remove("gx-arriving");
-        void el.offsetWidth;
-        el.classList.add("gx-arriving");
-        clearTimeout(el._gxGlint);
-        el._gxGlint = setTimeout(() => el.classList.remove("gx-arriving"), 470);
     }
 
     function transitionTo(newTab) {
@@ -4547,15 +4352,14 @@ function goxionBetaLegacy(data) {
             const icon = button(newTab)?.querySelector(".gx-nav-icon");
             if (icon?.animate && !reducedMotion.matches) {
                 icon.animate([
-                    { transform:"scale(1.46)" },
-                    { transform:"scale(1.62)" },
-                    { transform:"scale(1.46)" }
+                    { transform:"scale(1.16)" },
+                    { transform:"scale(1.28)" },
+                    { transform:"scale(1.16)" }
                 ], {
-                    duration:300,
+                    duration:280,
                     easing:"cubic-bezier(.16,1,.3,1)"
                 });
             }
-            runGlint(newTab);
             return;
         }
 
@@ -4566,25 +4370,15 @@ function goxionBetaLegacy(data) {
 
         animating = true;
         const oldTab = currentTab;
-
         const before = snapshot();
-        const iconBefore = iconSnapshot();
-        const oldTargetRect = before[newTab];
 
-        /* Se cambia el estado real inmediatamente.
-           La animación FLIP hace que visualmente continúe desde la posición anterior. */
         originalSwitchTab(newTab);
         applyOrder(newTab);
 
         const after = snapshot();
-        const iconAfter = iconSnapshot();
+        runFlip(before, after);
+        animateView(newTab, oldTab);
 
-        animateTrail(oldTargetRect, after[newTab]);
-        animateLabelStates(oldTab, newTab);
-        animateFlip(before, after, iconBefore, iconAfter, oldTab, newTab);
-        runGlint(newTab);
-
-        requestAnimationFrame(() => animateView(newTab, oldTab));
         currentTab = newTab;
 
         setTimeout(() => {
@@ -4596,21 +4390,21 @@ function goxionBetaLegacy(data) {
             } else {
                 queued = null;
             }
-        }, 540);
+        }, 410);
     }
 
     window.switchTab = transitionTo;
 
-    /* Un solo sistema de feedback táctil para toda la interfaz. */
-    const touchSelector =
+    /* Feedback táctil global, un solo listener */
+    const selector =
         "button, .teaser-card, .brand-card, .platform-btn, .btn-menu, .header-action-btn";
 
     document.addEventListener("pointerdown", event => {
-        const el = event.target.closest(touchSelector);
+        const el = event.target.closest(selector);
         if (!el) return;
         pressed = el;
         el.classList.add("gx-touch-down");
-    }, {passive:true});
+    }, { passive:true });
 
     const release = () => {
         if (!pressed) return;
@@ -4618,16 +4412,9 @@ function goxionBetaLegacy(data) {
         pressed = null;
     };
 
-    document.addEventListener("pointerup", release, {passive:true});
-    document.addEventListener("pointercancel", release, {passive:true});
+    document.addEventListener("pointerup", release, { passive:true });
+    document.addEventListener("pointercancel", release, { passive:true });
 
-    let resizeFrame = null;
-    window.addEventListener("resize", () => {
-        cancelAnimationFrame(resizeFrame);
-        resizeFrame = requestAnimationFrame(() => applyOrder(currentTab));
-    }, {passive:true});
-
-    /* Estado inicial: Inicio grande, Catálogo + Soporte compactos. */
     applyOrder("inicio");
 })();
 </script>
