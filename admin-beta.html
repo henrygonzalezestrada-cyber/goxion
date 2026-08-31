@@ -192,177 +192,98 @@
             .quick-actions { width: 100%; justify-content: space-between; }
             .btn-qaction { flex: 1; justify-content: center; }
         }
-    </style>
+    
+/* === GOXION ADMIN OPERATIONS REDESIGN === */
+:root{--gx-line:rgba(255,255,255,.075);--gx-radius:20px;--gx-shadow:0 18px 60px rgba(0,0,0,.3)}
+body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,242,254,.07),transparent 28rem),radial-gradient(circle at 90% 20%,rgba(188,19,254,.06),transparent 30rem),#030305}
+.gx-admin-shell{min-height:100vh;padding:18px 20px 40px;max-width:1440px;margin:auto}.gx-topbar{position:sticky;top:10px;z-index:6000;display:flex;justify-content:space-between;align-items:center;padding:11px 13px;margin-bottom:14px;border:1px solid var(--gx-line);border-radius:18px;background:rgba(5,5,9,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.gx-brand-block,.gx-top-actions{display:flex;align-items:center;gap:9px}.gx-brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));color:#030305;font-weight:800;font-size:1.2rem}.gx-brand-name{font-weight:800;letter-spacing:1.5px}.gx-brand-sub{font-size:.62rem;color:var(--text-muted);font-weight:800;letter-spacing:1.2px;margin-top:3px}.gx-save-state{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--gx-line);border-radius:999px;color:var(--text-muted);font-size:.7rem;font-weight:800}.gx-save-dot{width:7px;height:7px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 8px var(--neon-green)}.gx-icon-action{width:36px;height:36px;border-radius:11px;border:1px solid var(--gx-line);background:rgba(255,255,255,.04);color:#ff6685;cursor:pointer}
+.gx-desktop-nav{display:flex;gap:6px;margin-bottom:17px;padding:5px;width:max-content;border:1px solid var(--gx-line);border-radius:15px;background:rgba(10,10,15,.55)}.gx-nav-chip{border:0;background:transparent;color:var(--text-muted);padding:9px 13px;border-radius:10px;font-weight:800;cursor:pointer}.gx-nav-chip.active{color:white;background:rgba(0,242,254,.09);box-shadow:inset 0 0 0 1px rgba(0,242,254,.2)}
+.gx-page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:22px 2px 15px}.gx-page-heading h1{font-size:clamp(1.75rem,3vw,2.45rem);margin:2px 0 3px;letter-spacing:-.5px}.gx-page-heading p{color:var(--text-muted);font-size:.86rem}.gx-eyebrow{color:var(--neon-blue);text-transform:uppercase;font-size:.65rem;font-weight:800;letter-spacing:1.4px}.gx-primary-action,.gx-secondary-action{padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}.gx-primary-action{border:0;background:linear-gradient(135deg,var(--neon-blue),#4b95ff);color:#031014;box-shadow:0 8px 24px rgba(0,242,254,.15)}.gx-secondary-action{border:1px solid var(--gx-line);background:rgba(255,255,255,.04);color:white}.gx-full-action{width:100%;margin-top:12px}
+.gx-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.gx-kpi-card{padding:15px;border-radius:18px;border:1px solid var(--gx-line);background:linear-gradient(145deg,rgba(18,18,26,.92),rgba(7,7,11,.94));color:white;text-align:left;box-shadow:var(--gx-shadow)}button.gx-kpi-card{cursor:pointer}.gx-kpi-card strong{display:block;font-size:clamp(1.35rem,3vw,1.95rem);margin:5px 0 2px}.gx-kpi-card small,.gx-kpi-label{color:var(--text-muted)}.gx-kpi-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px}.gx-kpi-blue strong{color:var(--neon-blue)}.gx-kpi-red strong{color:#ff5275}.gx-kpi-green strong{color:var(--neon-green)}.gx-kpi-purple strong{color:#d674ff}
+.gx-section-head{display:flex;align-items:end;justify-content:space-between;margin:24px 2px 10px}.gx-section-head h2{font-size:1.2rem;margin-top:2px}.gx-section-space{margin-top:28px}.gx-text-action{border:0;background:none;color:var(--neon-blue);font-weight:800;cursor:pointer}.gx-ops-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.gx-op-card{display:flex;align-items:center;gap:9px;padding:13px;border:1px solid var(--gx-line);border-radius:16px;background:rgba(12,12,18,.78);color:white;text-align:left;cursor:pointer}.gx-op-icon{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05)}.gx-op-copy{display:flex;flex:1;flex-direction:column}.gx-op-copy strong{font-size:1.18rem}.gx-op-copy small{color:var(--text-muted);font-weight:700}.gx-op-arrow{color:var(--text-muted);font-size:1.35rem}.gx-client-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--gx-line);background:var(--gx-line);border-radius:17px;overflow:hidden}.gx-client-stats div{padding:15px;background:rgba(9,9,14,.95);display:flex;flex-direction:column;align-items:center}.gx-client-stats strong{font-size:1.45rem}.gx-client-stats span{color:var(--text-muted);font-size:.72rem;font-weight:800}
+.gx-command-panel{position:sticky;top:80px;z-index:4000;margin-bottom:13px;padding:9px;border:1px solid var(--gx-line);border-radius:17px;background:rgba(6,6,10,.84);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.gx-search-wrap{display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.035)}.gx-search-wrap .search-bar{border:0!important;background:transparent!important;box-shadow:none!important;margin:0!important;padding:10px 0}.gx-status-pills{margin:8px 0 2px;padding:0}.gx-status-pills .filter-pill{display:flex;align-items:center;gap:5px}.gx-status-pills b{opacity:.7}.gx-filter-tools{display:flex;gap:8px;margin-top:7px}.gx-filter-tools .custom-select{flex:1;margin:0}.gx-clients-list{display:grid;gap:9px}
+.client-card{border:1px solid var(--gx-line)!important;border-left:1px solid var(--gx-line)!important;border-radius:17px!important;padding:0!important;gap:0!important;overflow:hidden;background:linear-gradient(145deg,rgba(15,15,22,.94),rgba(7,7,11,.96))!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important}.gx-client-card-header{padding:13px 13px 7px}.gx-client-name-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.gx-client-name-line h3{font-size:1.04rem!important;margin:0!important}.gx-client-folio{padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:.62rem;font-weight:800}.gx-client-status-line{display:flex;align-items:center;gap:5px;margin-top:5px;color:var(--text-muted);font-size:.7rem;font-weight:700}.gx-client-money{text-align:right}.gx-client-money strong{display:block;font-size:1.15rem}.gx-client-money span{font-size:.63rem;color:var(--text-muted);font-weight:800}.gx-client-brief{padding:2px 13px 11px;cursor:pointer}.gx-service-brief{font-size:.74rem;color:#cbd3e2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gx-benefit-brief{display:flex;gap:5px;align-items:center;margin-top:8px;flex-wrap:wrap}.gx-benefit-brief>span:not(.gx-open-client){padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:.62rem;font-weight:800}.gx-open-client{margin-left:auto;color:var(--neon-blue);font-size:.7rem;font-weight:800}.client-details{display:none!important}
+.gx-client-focus{position:fixed;inset:0;z-index:20000;display:none;align-items:flex-end;justify-content:center}.gx-client-focus.show{display:flex}.gx-focus-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.gx-focus-sheet{position:relative;z-index:1;width:min(760px,100%);height:min(92vh,980px);display:flex;flex-direction:column;border-radius:28px 28px 0 0;border:1px solid rgba(0,242,254,.16);border-bottom:0;background:linear-gradient(180deg,#0d0d13,#060609);box-shadow:0 -24px 80px rgba(0,0,0,.62);overflow:hidden;animation:gxSheetIn .34s cubic-bezier(.16,1,.3,1)}@keyframes gxSheetIn{from{transform:translateY(100%)}to{transform:translateY(0)}}.gx-focus-handle{width:46px;height:5px;border-radius:999px;background:rgba(255,255,255,.18);margin:9px auto 2px}.gx-focus-header{display:flex;align-items:center;gap:9px;padding:9px 13px 8px;border-bottom:1px solid var(--gx-line)}.gx-focus-back,.gx-focus-close{width:36px;height:36px;border:1px solid var(--gx-line);border-radius:11px;background:rgba(255,255,255,.04);color:white;font-size:1.4rem}.gx-focus-identity{display:flex;flex:1;flex-direction:column}.gx-focus-identity span{color:var(--text-muted);font-size:.64rem;font-weight:800;letter-spacing:1px}.gx-focus-identity strong{font-size:1.1rem}.gx-focus-summary{display:flex;gap:6px;overflow-x:auto;padding:8px 13px;border-bottom:1px solid var(--gx-line);scrollbar-width:none}.gx-focus-summary span{white-space:nowrap;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:.65rem;font-weight:800}.gx-focus-body{flex:1;overflow-y:auto;padding:11px 13px 28px;overscroll-behavior:contain}.gx-focus-body>.gx-focus-details{display:block!important;margin:0!important;padding:0!important;border:0!important}
+.gx-accordion{border:1px solid var(--gx-line);border-radius:14px;background:rgba(255,255,255,.022);margin-bottom:8px;overflow:hidden}.gx-accordion-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px;border:0;background:transparent;color:white;text-align:left}.gx-accordion-trigger>span{display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:8px;flex:1}.gx-accordion-trigger i{grid-row:1/3;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(255,255,255,.045);font-style:normal}.gx-accordion-trigger b{font-size:.88rem}.gx-accordion-trigger small{color:var(--text-muted);font-size:.66rem}.gx-accordion-trigger em{font-style:normal;color:var(--text-muted);transition:.2s}.gx-accordion.open .gx-accordion-trigger em{transform:rotate(180deg);color:var(--neon-blue)}.gx-accordion-content{display:none;padding:0 10px 10px}.gx-accordion.open .gx-accordion-content{display:block;animation:fadeIn .2s ease}.gx-mini-heading{color:var(--text-muted);font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.gx-two-fields{display:grid;grid-template-columns:1fr 1.2fr;gap:7px}.gx-two-fields label>span{display:block;color:var(--text-muted);font-size:.64rem;font-weight:800;text-transform:uppercase;margin-bottom:4px}.gx-two-fields input,.gx-two-fields select{width:100%;background:#12121a;color:white;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px}.gx-focused-actions{border:0!important;padding-top:0!important;margin-top:0!important}.gx-loyalty-value{font-weight:800;color:var(--neon-green);min-width:18px;text-align:center}.gx-embedded-block>div{margin-top:7px!important;border-style:solid!important;border-color:var(--gx-line)!important;background:rgba(255,255,255,.02)!important}
+.gx-panel-modern{border-color:var(--gx-line)!important;background:rgba(9,9,14,.82)!important;border-radius:19px!important;padding:15px!important}.gx-panel-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}.gx-panel-title-row h2{font-size:1.2rem;margin-top:2px}.gx-catalog-scroll{overflow-x:auto;border:1px solid var(--gx-line);border-radius:13px}.gx-settings-tabs{display:flex;gap:6px;padding:5px;margin-bottom:11px;width:max-content;max-width:100%;overflow-x:auto;border:1px solid var(--gx-line);border-radius:14px;background:rgba(10,10,15,.56)}.gx-settings-tabs button{border:0;background:transparent;color:var(--text-muted);padding:8px 11px;border-radius:9px;font-weight:800;white-space:nowrap}.gx-settings-tabs button.active{background:rgba(0,242,254,.09);color:white}.gx-settings-view{display:none}.gx-settings-view.active{display:block}.gx-discount-badge{display:flex;align-items:center;border:1px solid rgba(0,242,254,.22);border-radius:10px;overflow:hidden}.gx-discount-badge input{width:50px;border:0;background:transparent;color:var(--neon-blue);padding:8px;text-align:center;font-weight:800}.gx-discount-badge span{padding-right:8px;color:var(--text-muted);font-size:.68rem;font-weight:800}.gx-large-textarea{width:100%;min-height:110px;background:#111118;border:1px solid var(--gx-line);color:white;padding:11px;border-radius:11px;resize:vertical}.gx-help-details{margin-top:8px;padding:9px 10px;border:1px solid var(--gx-line);border-radius:10px;background:rgba(255,255,255,.02);color:var(--text-muted);font-size:.7rem}.gx-help-details span{color:var(--neon-blue)}.gx-action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px}.gx-action-card{display:flex;align-items:center;gap:7px;padding:11px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.03);color:white;font-weight:800}.gx-action-card.primary{border-color:rgba(188,19,254,.28)}.gx-action-card.danger{color:#ff7891}.gx-setting-row{display:flex;align-items:center;justify-content:space-between;padding:11px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.025)}.gx-setting-row small{display:block;color:var(--text-muted);margin-top:2px}.gx-alert-settings{display:grid;gap:7px}.gx-selection-modal{width:min(520px,100%);max-height:82vh;display:flex;flex-direction:column;background:#0b0b11;border:1px solid rgba(0,242,254,.25);border-radius:17px;padding:15px}.gx-selection-modal #lista-clientes-modal{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:7px;margin:9px 0}.gx-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.gx-mobile-nav{display:none}
+@media(max-width:840px){.gx-admin-shell{padding:10px 10px 94px}.gx-topbar{top:7px;padding:9px 10px}.gx-brand-sub,.gx-save-state{display:none}.gx-topbar .status{font-size:.68rem}.gx-desktop-nav,.desktop-only{display:none!important}.gx-page-heading{margin:17px 2px 11px}.gx-page-heading h1{font-size:1.65rem}.gx-page-heading p{font-size:.76rem}.gx-kpi-strip{grid-template-columns:1fr 1fr}.gx-kpi-card{padding:12px}.gx-ops-grid{grid-template-columns:1fr 1fr}.gx-client-stats{grid-template-columns:1fr 1fr}.gx-command-panel{top:66px}.gx-filter-tools{display:grid;grid-template-columns:1fr auto}.gx-mobile-nav{display:grid;grid-template-columns:1fr 1fr 70px 1fr 1fr;align-items:end;position:fixed;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));z-index:10000;padding:7px;border:1px solid var(--gx-line);border-radius:21px;background:rgba(7,7,11,.91);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 14px 50px rgba(0,0,0,.55)}.gx-mobile-nav-btn{height:48px;border:0;background:transparent;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.6rem;font-weight:800}.gx-mobile-nav-btn i{font-style:normal;font-size:1.1rem}.gx-mobile-nav-btn.active{color:var(--neon-blue)}.gx-mobile-fab{width:56px;height:56px;margin:-21px auto 0;border-radius:17px;background:linear-gradient(135deg,var(--neon-blue),#4b95ff);color:#031014!important;box-shadow:0 8px 28px rgba(0,242,254,.24)}.gx-mobile-fab i{font-size:1.7rem}.gx-focus-sheet{height:94vh}.gx-action-grid{grid-template-columns:1fr}.gx-catalog-scroll{border:0;overflow:visible}.catalog-table{min-width:0!important;display:block}.catalog-table thead{display:none}.catalog-table tbody{display:grid;gap:8px}.catalog-table tr{display:grid!important;grid-template-columns:1fr 1fr;gap:6px;padding:10px;border:1px solid var(--gx-line);border-radius:14px;background:rgba(255,255,255,.025)}.catalog-table td{display:flex!important;flex-direction:column;gap:2px;border:0!important;padding:0!important}.catalog-table td:nth-child(-n+3){grid-column:1/-1}.catalog-table td:nth-child(1)::before{content:'Servicio'}.catalog-table td:nth-child(2)::before{content:'Etiqueta'}.catalog-table td:nth-child(3)::before{content:'Beneficios'}.catalog-table td:nth-child(4)::before{content:'Cuentas'}.catalog-table td:nth-child(5)::before{content:'Venta'}.catalog-table td:nth-child(6)::before{content:'Costo'}.catalog-table td:nth-child(7)::before{content:'Límite'}.catalog-table td:nth-child(8)::before{content:'Stock fijo'}.catalog-table td:nth-child(9)::before{content:'Disponible'}.catalog-table td::before{color:var(--text-muted);font-size:.56rem;font-weight:800;text-transform:uppercase}.catalog-table td:last-child{grid-column:1/-1;flex-direction:row;justify-content:flex-end}.catalog-table input[type=text],.catalog-table input[type=number]{max-width:none!important;width:100%!important}}
+@media(max-width:390px){.gx-ops-grid{grid-template-columns:1fr}.gx-two-fields{grid-template-columns:1fr}}
+
+</style>
 </head>
 <body>
+    <div class="gx-admin-shell">
+        <header class="gx-topbar">
+            <div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION</div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
+            <div class="gx-top-actions"><div class="gx-save-state" id="gx-save-state"><span class="gx-save-dot"></span><span>Sincronizado</span></div><div class="status"><div class="status-dot"></div> LIVE</div><button class="gx-icon-action danger" onclick="cerrarSesion()">⏻</button></div>
+        </header>
 
-    <!-- MENÚ FLOTANTE MÓVIL -->
-    <div class="bottom-bar">
-        <button class="bottom-btn active" onclick="switchTab('tab-clientes', this)"><i>👥</i><span>Clientes</span></button>
-        <button class="bottom-btn" onclick="agregarNuevoCliente()"><i>➕</i><span>Nuevo</span></button>
-        <button class="bottom-btn main-action" id="btn-save-mobile" onclick="prepararYGuardar()"><i>💾</i><span>Guardar</span></button>
-        <button class="bottom-btn" onclick="switchTab('tab-inventario', this)"><i>📦</i><span>Catálogo</span></button>
-        <button class="bottom-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})"><i>⬆️</i><span>Subir</span></button>
+        <nav class="gx-desktop-nav">
+            <button class="gx-nav-chip active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)">⌂ Resumen</button>
+            <button class="gx-nav-chip" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)">👥 Clientes</button>
+            <button class="gx-nav-chip" data-admin-target="tab-catalogo" onclick="goAdminTab('tab-catalogo',this)">📦 Catálogo</button>
+            <button class="gx-nav-chip" data-admin-target="tab-ajustes" onclick="goAdminTab('tab-ajustes',this)">⚙️ Ajustes</button>
+        </nav>
+
+        <main class="gx-main">
+            <section id="tab-resumen" class="tab-content active">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">Panel administrativo</div><h1>Resumen operativo</h1><p>Lo importante de GOXION, sin buscar entre tarjetas.</p></div><button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
+                <div class="gx-kpi-strip">
+                    <button class="gx-kpi-card gx-kpi-blue" onclick="goAdminTab('tab-clientes')"><span class="gx-kpi-label">Ingresos</span><strong id="kpi-ingresos">$0.00</strong><small>Brutos mensuales</small></button>
+                    <div class="gx-kpi-card gx-kpi-red"><span class="gx-kpi-label">Costos</span><strong id="kpi-costos">$0.00</strong><small>Inversión mensual</small></div>
+                    <div class="gx-kpi-card gx-kpi-green"><span class="gx-kpi-label">Ganancia</span><strong id="kpi-ganancias">$0.00</strong><small>Neta estimada</small></div>
+                    <div class="gx-kpi-card gx-kpi-purple"><span class="gx-kpi-label">Margen</span><strong id="kpi-margen">0%</strong><small>Rentabilidad</small></div>
+                </div>
+                <div class="gx-section-head"><div><span class="gx-eyebrow">Prioridad</span><h2>Necesita tu atención</h2></div></div>
+                <div class="gx-ops-grid">
+                    <button class="gx-op-card" onclick="gxFilterFromSummary('revision')"><span class="gx-op-icon">🔔</span><span class="gx-op-copy"><strong id="gx-count-review">0</strong><small>En revisión</small></span><span class="gx-op-arrow">›</span></button>
+                    <button class="gx-op-card" onclick="gxFilterFromSummary('pendiente')"><span class="gx-op-icon">◷</span><span class="gx-op-copy"><strong id="gx-count-pending">0</strong><small>Pagos pendientes</small></span><span class="gx-op-arrow">›</span></button>
+                    <button class="gx-op-card" onclick="gxShowBenefitReady()"><span class="gx-op-icon">🎁</span><span class="gx-op-copy"><strong id="gx-count-benefits">0</strong><small>Beneficios listos</small></span><span class="gx-op-arrow">›</span></button>
+                    <button class="gx-op-card" onclick="goAdminTab('tab-catalogo')"><span class="gx-op-icon">📦</span><span class="gx-op-copy"><strong id="gx-count-stock">0</strong><small>Stock bajo / lleno</small></span><span class="gx-op-arrow">›</span></button>
+                </div>
+                <div class="gx-section-head gx-section-space"><div><span class="gx-eyebrow">Panorama</span><h2>Estado de clientes</h2></div><button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button></div>
+                <div class="gx-client-stats"><div><strong id="gx-count-total">0</strong><span>Total</span></div><div><strong id="gx-count-paid">0</strong><span>Pagados</span></div><div><strong id="gx-count-suspended">0</strong><span>Suspendidos</span></div><div><strong id="gx-count-missions">0</strong><span>Con misiones</span></div></div>
+            </section>
+
+            <section id="tab-clientes" class="tab-content">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">CRM operativo</div><h1>Clientes</h1><p id="gx-client-page-subtitle">Busca, filtra y entra directo a lo que necesitas.</p></div><button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
+                <div class="gx-command-panel">
+                    <div class="gx-search-wrap"><span>⌕</span><input type="text" class="search-bar" id="search-input" placeholder="Buscar nombre, folio..." oninput="filtrarClientes()"></div>
+                    <div class="filter-pills-container gx-status-pills">
+                        <button class="filter-pill active" data-status-filter="all" onclick="setStatusFilter('all',this)">Todos <b id="pill-all">0</b></button>
+                        <button class="filter-pill" data-status-filter="revision" onclick="setStatusFilter('revision',this)">🔔 Revisión <b id="pill-review">0</b></button>
+                        <button class="filter-pill" data-status-filter="pendiente" onclick="setStatusFilter('pendiente',this)">Pendientes <b id="pill-pending">0</b></button>
+                        <button class="filter-pill" data-status-filter="pagado" onclick="setStatusFilter('pagado',this)">Pagados <b id="pill-paid">0</b></button>
+                        <button class="filter-pill" data-status-filter="suspendido" onclick="setStatusFilter('suspendido',this)">Suspendidos <b id="pill-suspended">0</b></button>
+                    </div>
+                    <div class="gx-filter-tools"><select id="sort-by" class="custom-select" onchange="filtrarClientes()"><option value="name">Nombre A–Z</option><option value="date">Día de cobro</option><option value="loyalty">Lealtad</option></select><button class="gx-secondary-action" onclick="gxClearClientFilters()">↺ Limpiar</button></div>
+                </div>
+                <div id="clients-container" class="gx-clients-list"><p style="color:var(--text-muted)">Conectando con la base de datos...</p></div>
+            </section>
+
+            <section id="tab-catalogo" class="tab-content">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">Inventario</div><h1>Catálogo</h1><p>Precios, capacidad, ocupación y disponibilidad.</p></div><button class="gx-primary-action desktop-only" onclick="addGlobalService()">＋ Servicio</button></div>
+                <div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Servicios</span><h2>Catálogo & inventario</h2></div><button class="gx-secondary-action" onclick="addGlobalService()">＋ Añadir servicio</button></div><div class="gx-catalog-scroll"><table class="catalog-table"><thead><tr><th>Servicio</th><th>Etiqueta</th><th>Beneficios</th><th>Ctas</th><th>Venta</th><th>Costo</th><th>Lím.</th><th>Fijo</th><th>Disp.</th><th></th></tr></thead><tbody id="global-services-container"></tbody></table></div></div>
+            </section>
+
+            <section id="tab-ajustes" class="tab-content">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">Configuración</div><h1>Ajustes & automatizaciones</h1><p>Misiones, experiencia del cliente y alertas globales.</p></div><button class="gx-primary-action desktop-only" onclick="gxSaveSettings()">Guardar ajustes</button></div>
+                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
+                <div class="gx-settings-view active" data-settings-view="missions"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Automatización</span><h2>Centro de misiones</h2></div><div class="gx-discount-badge"><input type="number" id="global-misiones-desc" value="5"><span>% OFF</span></div></div><textarea id="global-misiones-tareas" class="gx-large-textarea" placeholder="Visita nuestro catálogo [CATALOGO]&#10;Renueva a tiempo [PAGO]&#10;Comparte con un amigo [COMPARTIR]&#10;Conoce el plan de referidos [REFERIDOS]&#10;Revisa las guías [SOPORTE]"></textarea><details class="gx-help-details"><summary>Ver etiquetas automáticas</summary><div><span>[CATALOGO]</span> Catálogo · <span>[PAGO]</span> Pago · <span>[SOPORTE]</span> Soporte · <span>[COMPARTIR]</span> Compartir · <span>[REFERIDOS]</span> Referidos · <span>[LINK:https://...]</span> Link</div></details><div class="gx-action-grid"><button class="gx-action-card primary" onclick="aplicarMisionesMasivas('todos')"><b>✓</b><span>Aplicar a todos</span></button><button class="gx-action-card" onclick="abrirModalSeleccionClientes()"><b>☑</b><span>Seleccionar clientes</span></button><button class="gx-action-card danger" onclick="borrarMisionesMasivas()"><b>⌫</b><span>Borrar de todos</span></button></div></div></div>
+                <div class="gx-settings-view" data-settings-view="app"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Experiencia</span><h2>Configuración de App</h2></div></div><div class="gx-setting-row"><div><strong>Promoción Upsell</strong><small>Mostrar Combo GOXION a clientes.</small></div><label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar configuración</button></div></div>
+                <div class="gx-settings-view" data-settings-view="alerts"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Comunicación</span><h2>Alertas globales</h2></div><label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label></div><div id="alert-settings" class="gx-alert-settings" style="opacity:.5;pointer-events:none;transition:.3s"><select id="alert-platform" class="custom-select"></select><select id="alert-type" class="custom-select"><option value="presentando intermitencias temporales">Intermitencias temporales</option><option value="en mantenimiento programado">Mantenimiento programado</option><option value="experimentando una caída global">Caída global</option><option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option></select><textarea id="global-msg" class="gx-large-textarea" placeholder="Mensaje adicional para clientes (opcional)..."></textarea></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar alerta</button></div></div>
+            </section>
+        </main>
+
+        <nav class="gx-mobile-nav"><button class="gx-mobile-nav-btn active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)"><i>⌂</i><span>Resumen</span></button><button class="gx-mobile-nav-btn" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)"><i>👥</i><span>Clientes</span></button><button class="gx-mobile-nav-btn gx-mobile-fab" onclick="agregarNuevoCliente()"><i>＋</i></button><button class="gx-mobile-nav-btn" data-admin-target="tab-catalogo" onclick="goAdminTab('tab-catalogo',this)"><i>📦</i><span>Catálogo</span></button><button class="gx-mobile-nav-btn" data-admin-target="tab-ajustes" onclick="goAdminTab('tab-ajustes',this)"><i>⚙</i><span>Ajustes</span></button></nav>
     </div>
 
-    <header>
-        <div class="logo-area"><h1>GOXION // ADMIN</h1></div>
-        <div class="status"><div class="status-dot"></div> ONLINE</div>
-        <div class="header-actions">
-            <button class="btn-save" onclick="prepararYGuardar()">Guardar Cambios</button>
-            <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
-        </div>
-    </header>
+    <div class="gx-client-focus" id="gx-client-focus" aria-hidden="true"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
 
-    <div class="dashboard-row">
-        <div class="kpi-card">
-            <div class="kpi-title">Ingresos Brutos</div>
-            <div class="kpi-value val-ingresos" id="kpi-ingresos">$0.00</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Inversión (Costos)</div>
-            <div class="kpi-value val-costos" id="kpi-costos">$0.00</div>
-        </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Ganancia Neta</div>
-            <div class="kpi-value val-ganancia" id="kpi-ganancias">$0.00</div>
-        </div>
-    </div>
+    <div id="modal-seleccionar-clientes" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:15px"><div class="gx-selection-modal"><h3>Seleccionar clientes</h3><input type="text" id="search-modal-clientes" placeholder="Buscar cliente por nombre..." oninput="filtrarModalClientes()" class="search-bar"><div id="lista-clientes-modal"></div><div class="gx-modal-actions"><button class="gx-secondary-action" onclick="cerrarModalSeleccion()">Cancelar</button><button class="gx-primary-action" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar misiones</button></div></div></div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tab-clientes', this)">Gestión de Clientes</button>
-        <button class="tab-btn" onclick="switchTab('tab-inventario', this)">Catálogo & Alertas</button>
-    </div>
-
-    <div id="tab-clientes" class="tab-content active">
-        <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
-                <h2 class="section-title" style="margin-bottom: 0;">Cuentas Activas</h2>
-                <button class="btn-save" style="padding: 6px 12px; font-size: 0.85rem;" onclick="agregarNuevoCliente()">+ Nuevo Cliente</button>
-            </div>
-
-            <!-- CÁPSULAS DE FILTRO VISUALES -->
-            <div class="filter-pills-container">
-                <button class="filter-pill active" onclick="setStatusFilter('all', this)">Todos</button>
-                <button class="filter-pill" onclick="setStatusFilter('revision', this)">🔔 Revisión</button>
-                <button class="filter-pill" onclick="setStatusFilter('pendiente', this)">Pendientes</button>
-                <button class="filter-pill" onclick="setStatusFilter('pagado', this)">Pagados</button>
-                <button class="filter-pill" onclick="setStatusFilter('suspendido', this)">Suspendidos</button>
-            </div>
-            
-            <div class="filters-row">
-                <input type="text" class="search-bar" id="search-input" placeholder="Buscar por nombre o folio..." oninput="filtrarClientes()" style="margin-bottom: 0; flex: 2;">
-                <select id="sort-by" class="custom-select" onchange="filtrarClientes()" style="margin-bottom: 0; flex: 1; min-width: 150px;">
-                    <option value="name">Por Nombre (A-Z)</option>
-                    <option value="date">Por Día de Cobro</option>
-                    <option value="loyalty">Por Lealtad</option>
-                </select>
-            </div>
-            
-            <div id="clients-container" style="margin-top: 15px;">
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con la base de datos...</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab-inventario" class="tab-content">
-        <!-- PANEL DE ASIGNACIÓN MASIVA DE MISIONES -->
-        <div class="panel">
-            <h2 class="section-title">Asignación Masiva de Misiones</h2>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
-                <input type="number" id="global-misiones-desc" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:8px; font-weight:bold;" value="5">
-            </div>
-            <textarea id="global-misiones-tareas" style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:10px; font-size: 0.85rem; resize: vertical; min-height: 80px;" placeholder="Ejemplo:
-Visita nuestro catálogo [CATALOGO]
-Renueva a tiempo [PAGO]
-Comparte con un amigo [COMPARTIR]
-Conoce el plan de referidos [REFERIDOS]
-Revisa las guías [SOPORTE]"></textarea>
-            
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
-                <strong>💡 ETIQUETAS AUTOMÁTICAS DISPONIBLES:</strong><br>
-                <span style="color:var(--neon-blue)">[CATALOGO]</span> Navegar a Catálogo | 
-                <span style="color:var(--neon-blue)">[PAGO]</span> Tocar Pagar Cuenta | 
-                <span style="color:var(--neon-blue)">[SOPORTE]</span> Ir a Soporte | 
-                <span style="color:var(--neon-blue)">[COMPARTIR]</span> Compartir App | 
-                <span style="color:var(--neon-blue)">[REFERIDOS]</span> Ver Referidos | 
-                <span style="color:var(--neon-blue)">[LINK:https://...]</span> Abrir link custom.
-            </div>
-
-            <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn-save" style="background: linear-gradient(135deg, var(--neon-purple), #7c4dff); flex: 1;" onclick="aplicarMisionesMasivas('todos')">✅ Aplicar a TODOS</button>
-                <button class="btn-save" style="background: rgba(0, 242, 254, 0.2); color: var(--neon-blue); border: 1px solid var(--neon-blue); flex: 1;" onclick="abrirModalSeleccionClientes()">☑️ Aplicar a Seleccionados</button>
-                <button class="btn-logout" style="flex: 1;" onclick="borrarMisionesMasivas()">🗑️ Borrar de TODOS</button>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2 class="section-title">Configuraciones de App</h2>
-            <div class="switch-row">
-                <span style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">Mostrar Promoción Upsell (Combo GOXION) a Clientes</span>
-                <label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2 class="section-title">Alertas Globales</h2>
-            <div class="switch-row">
-                <span style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">Activar Alerta Técnica en Portal de Clientes</span>
-                <label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label>
-            </div>
-            <div id="alert-settings" style="opacity: 0.5; pointer-events: none; transition: 0.3s;">
-                <select id="alert-platform" class="custom-select"></select>
-                <select id="alert-type" class="custom-select">
-                    <option value="presentando intermitencias temporales">Intermitencias temporales</option>
-                    <option value="en mantenimiento programado">Mantenimiento programado</option>
-                    <option value="experimentando una caída global">Caída global</option>
-                    <option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option>
-                </select>
-                <textarea id="global-msg" style="width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.9rem; outline:none; resize: vertical; min-height: 80px;" placeholder="Mensaje adicional para los clientes (Opcional)..."></textarea>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2 class="section-title">Catálogo & Inventario</h2>
-            <div style="overflow-x: auto;">
-                <table class="catalog-table">
-                    <thead>
-                        <tr>
-                            <th>Servicio</th>
-                            <th title="Etiqueta visible para el cliente (Ej: Promo, Nuevo)">Etiqueta</th>
-                            <th title="Beneficios que se muestran en la App (Ej: 4K, Sin anuncios)">Beneficios</th>
-                            <th title="Cuentas Activas Contratadas">Ctas</th>
-                            <th title="Precio de Venta">Venta</th>
-                            <th title="Tu Costo Mensual">Costo</th>
-                            <th title="Límite Máximo de Perfiles por Cuenta">Lím.</th>
-                            <th title="Fijar cantidad exacta manualmente (Deja en blanco para automático)">Fijo</th>
-                            <th title="Perfiles Disponibles">Disp.</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="global-services-container"></tbody>
-                </table>
-            </div>
-            <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio al Catálogo</button>
-        </div>
-    </div>
-
-    <!-- MODAL DE SELECCIÓN DE CLIENTES -->
-    <div id="modal-seleccionar-clientes" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center; padding: 15px;">
-        <div style="background: var(--card-bg); border: 1px solid var(--neon-blue); width: 100%; max-width: 500px; border-radius: 12px; padding: 20px; max-height: 80vh; display:flex; flex-direction:column;">
-            <h3 style="color: var(--neon-blue); margin-bottom: 10px;">Seleccionar Clientes</h3>
-            <input type="text" id="search-modal-clientes" placeholder="Buscar cliente por nombre..." oninput="filtrarModalClientes()" style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; padding:10px; border-radius:6px; margin-bottom: 15px; outline:none;">
-            <div id="lista-clientes-modal" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:8px; margin-bottom:15px; padding-right:5px; scrollbar-width: thin; scrollbar-color: var(--neon-blue) transparent;">
-                <!-- checkboxes generados dinámicamente -->
-            </div>
-            <div style="display:flex; justify-content:space-between; gap:10px;">
-                <button class="btn-logout" style="flex:1;" onclick="cerrarModalSeleccion()">Cancelar</button>
-                <button class="btn-save" style="flex:1;" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar Misiones</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
     const CONFIG = { username: "henrygonzalezestrada-cyber", repo: "goxion", path: "clientes.json", branch: "main" };
     let currentToken = localStorage.getItem("GOXION_PAT") || "";
     let currentFileData = null; 
@@ -1083,86 +1004,26 @@ Revisa las guías [SOPORTE]"></textarea>
             card.style.borderLeftColor = statusColor;
             if(enRevision) card.style.boxShadow = "0 0 20px rgba(188, 19, 254, 0.25)";
             
+            card.dataset.clientKey = key;
+            const serviceNames = (cliente.servicios || []).map(s => String(s.nombre || "").replace(/\s*\(x\d+\)\s*/gi, "").trim()).filter(Boolean);
+            const servicesBrief = serviceNames.length ? serviceNames.slice(0,3).join(" · ") + (serviceNames.length > 3 ? ` +${serviceNames.length-3}` : "") : "Sin servicios activos";
+            const refBrief = refActivo ? (refActivo.beneficio_reclamado ? "💝 Reclamado" : ((Number(refActivo.plataformas||0)>=2 && Number(refActivo.meses||0)>=3) ? "🎁 Beneficio listo" : `🎁 ${Number(refActivo.meses||0)}/3`)) : "🎁 Sin referido";
+            const couponCycle = Number(gamifConfig.cupon_ciclo || 1);
+            const couponClaimed = Number(gamifConfig.cupon_reclamado_ciclo || 0) >= couponCycle;
+            const missionBrief = gamifConfig.misiones_activas ? (couponClaimed ? `🥇 Ronda ${couponCycle}` : `🎟️ Ronda ${couponCycle}`) : "🎟️ Sin misiones";
+
             card.innerHTML = `
-                <div class="card-header-main" onclick="toggleClientDetails('${key}')">
-                    <div class="client-info-basic">
-                        <h3 style="color: ${statusColor};">[${cliente.folio}] ${cliente.nombre}</h3>
-                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
-                            <span class="client-status-badge" style="color: ${statusColor}; border-color: ${statusColor}40; background: ${statusColor}10; ${pulseAnim}">${statusBadge}</span>
-                            <span style="color: var(--text-muted); font-size: 0.8rem; font-weight:600;">Día: ${cliente.dia_pago || 15}</span>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color:var(--text-main); font-weight:bold; font-size:1.15rem; margin-bottom: 4px;">$${subtotal}</div>
-                        <div class="client-details-toggle"><span id="toggle-text-${key}">Ver detalles ▾</span></div>
-                    </div>
+                <div class="card-header-main gx-client-card-header" onclick="toggleClientDetails('${key}')">
+                    <div class="client-info-basic"><div class="gx-client-name-line"><h3 style="color:${statusColor};">${cliente.nombre}</h3><span class="gx-client-folio">${cliente.folio}</span></div><div class="gx-client-status-line"><span class="client-status-badge" style="color:${statusColor};border-color:${statusColor}40;background:${statusColor}10;${pulseAnim}">${statusBadge}</span><span>· Día ${cliente.dia_pago || 15}</span></div></div>
+                    <div class="gx-client-money"><strong>$${subtotal}</strong><span>mensual</span></div>
                 </div>
-
-                <div class="client-details" id="details-${key}">
-                    
-                    <!-- CREDENCIALES DE ACCESO GENERAL (NUEVO BLOQUE COMPACTO) -->
-                    <div class="access-portal-box">
-                        <div style="font-size: 0.7rem; color: var(--neon-blue); font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">🔑 Acceso al Portal del Cliente</div>
-                        <div style="display:flex; gap: 6px; margin-bottom: 6px;">
-                            <input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" style="flex:2;" onchange="updateClientData('${key}', 'nombre', this.value)">
-                        </div>
-                        <div style="display:flex; gap: 6px;">
-                            <input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" style="flex:2;" onchange="updateClientData('${key}', 'usuario_acceso', this.value)">
-                            <input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" style="flex:1;" onchange="updateClientData('${key}', 'codigo', this.value)">
-                        </div>
-                    </div>
-
-                    <div style="display:flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 100px;">
-                            <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Día de Cobro</label>
-                            <input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" style="width: 100%; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:6px; padding:6px; outline:none; font-size:0.85rem;" onchange="updateClientData('${key}', 'dia_pago', this.value)">
-                        </div>
-                        <div style="flex: 2; min-width: 130px;">
-                            <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Estado Cuenta</label>
-                            <select class="status-select status-${cliente.estado}" style="width: 100%;" onchange="updateClientData('${key}', 'estado', this.value)">
-                                <option value="pendiente" ${cliente.estado === 'pendiente' ? 'selected' : ''}>Pendiente (Deuda)</option>
-                                <option value="pagado" ${cliente.estado === 'pagado' ? 'selected' : ''}>Pagado</option>
-                                <option value="suspendido" ${cliente.estado === 'suspendido' ? 'selected' : ''}>Suspendido</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="client-services-list">
-                        ${clientServicesHTML}
-                        <div class="client-service-add-row">
-                            <select id="add-srv-sel-${key}">${globalOptions}</select>
-                            <button class="btn-save" style="padding:6px 12px; font-size: 1.1rem; line-height: 1; border-radius: 6px;" onclick="addClientService('${key}')" title="Añadir">+</button>
-                        </div>
-                        ${descuentosHTML}
-                    </div>
-
-                    <div class="card-actions-row">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size:0.7rem; color:var(--text-muted); text-transform: uppercase; font-weight: bold;">Lealtad</span>
-                            <div class="loyalty-control">
-                                <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
-                                <span id="pagos-${key}" style="font-weight: bold; width: 16px; text-align: center; color: var(--neon-green); font-size: 1rem;">${cliente.pagos_puntuales || 0}</span>
-                                <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
-                                <button class="btn-icon danger" style="margin-left: 4px; font-size: 1rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha">🔄</button>
-                            </div>
-                        </div>
-                        
-                        <div class="quick-actions">
-                            <button class="btn-qaction msg" onclick="enviarMensaje('${cliente.nombre}', '${key}')">💬 Msj</button>
-                            <button class="btn-qaction link" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Link</button>
-                        </div>
-                    </div>
-
-                    ${refHTML}
-                    ${gamifHTML}
-
-                    ${enRevision ? `
-                    <div style="width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(188, 19, 254, 0.3);">
-                        <button class="btn-save" style="background: linear-gradient(135deg, #bc13fe, #7c4dff); width: 100%; font-size: 0.95rem; padding: 10px; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); text-transform: uppercase; letter-spacing: 1px;" onclick="aprobarPago('${key}', ${subtotal})">
-                            ✅ Aprobar Pago
-                        </button>
-                    </div>
-                    ` : ''}
+                <div class="gx-client-brief" onclick="toggleClientDetails('${key}')"><div class="gx-service-brief">${servicesBrief}</div><div class="gx-benefit-brief"><span>${refBrief}</span><span>${missionBrief}</span><span class="gx-open-client">Abrir ›</span></div></div>
+                <div class="client-details gx-focus-details" id="details-${key}">
+                    <div class="gx-accordion open"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>👤</i><b>Cuenta</b><small>Acceso, cobro y estado</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="access-portal-box"><div class="gx-mini-heading">🔑 Acceso al portal</div><input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)"><div class="cred-row-split"><input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)"><input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)"></div></div><div class="gx-two-fields"><label><span>Día de cobro</span><input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" onchange="updateClientData('${key}','dia_pago',this.value)"></label><label><span>Estado cuenta</span><select class="status-select status-${cliente.estado}" onchange="updateClientData('${key}','estado',this.value)"><option value="pendiente" ${cliente.estado==='pendiente'?'selected':''}>Pendiente (Deuda)</option><option value="pagado" ${cliente.estado==='pagado'?'selected':''}>Pagado</option><option value="suspendido" ${cliente.estado==='suspendido'?'selected':''}>Suspendido</option></select></label></div></div></div>
+                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>📺</i><b>Servicios</b><small>${serviceNames.length} activo${serviceNames.length===1?'':'s'} · $${subtotal}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="client-services-list">${clientServicesHTML}<div class="client-service-add-row"><select id="add-srv-sel-${key}">${globalOptions}</select><button class="btn-save" onclick="addClientService('${key}')">＋</button></div>${descuentosHTML}</div></div></div>
+                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>💳</i><b>Pagos & beneficios</b><small>Lealtad, mensajes y referidos</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="card-actions-row gx-focused-actions"><div><span class="gx-mini-heading">Lealtad</span><div class="loyalty-control"><button class="loyalty-btn" onclick="updatePagos('${key}',-1)">−</button><span id="pagos-${key}" class="gx-loyalty-value">${cliente.pagos_puntuales || 0}</span><button class="loyalty-btn" onclick="updatePagos('${key}',1)">＋</button><button class="btn-icon danger" onclick="reiniciarLealtad('${key}')">↻</button></div></div><div class="quick-actions"><button class="btn-qaction msg" onclick="enviarMensaje('${cliente.nombre}','${key}')">💬 Mensaje</button><button class="btn-qaction link" onclick="copiarInfo('${cliente.nombre}','${key}')">🔗 Link</button></div></div><div class="gx-embedded-block">${refHTML}</div></div></div>
+                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎯</i><b>Misiones & cupón</b><small>${gamifConfig.misiones_activas ? missionBrief : 'Sin automatización activa'}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${gamifHTML}</div></div></div>
+                    ${enRevision ? `<div class="gx-review-action"><button class="gx-primary-action gx-full-action" onclick="aprobarPago('${key}',${subtotal})">✓ Aprobar pago · $${subtotal}</button></div>` : ''}
                 </div>
             `;
             container.appendChild(card);
@@ -1306,7 +1167,7 @@ Revisa las guías [SOPORTE]"></textarea>
     (() => {
         const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
-        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos-beta`;
+        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         localStorage.removeItem("GOXION_PAT");
@@ -2171,7 +2032,7 @@ Revisa las guías [SOPORTE]"></textarea>
     <!-- GOXION ADMIN BETA V4 // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
     <script id="goxion-admin-v4-fixes">
     (() => {
-        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes-beta";
+        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function ajusteBeta(accion, datos = {}) {
@@ -2420,7 +2281,7 @@ Revisa las guías [SOPORTE]"></textarea>
     <!-- GOXION ADMIN BETA V5 // INVENTARIO INTELIGENTE DESDE SUPABASE -->
     <script id="goxion-admin-v5-inventory">
     (() => {
-        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-beta";
+        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario";
         const TOKEN_KEY_INV = "GOXION_ADMIN_TOKEN";
         let inventarioServidor = null;
 
@@ -2560,6 +2421,30 @@ Revisa las guías [SOPORTE]"></textarea>
         console.info("GOXION Admin: inventario automático calculado desde contratos reales de Supabase.");
     })();
     </script>
+
+
+<script id="goxion-admin-operations-ui">
+(()=>{
+ let focusHome=null;
+ window.goAdminTab=(id)=>{document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.getElementById(id)?.classList.add('active');document.querySelectorAll('[data-admin-target]').forEach(x=>x.classList.toggle('active',x.dataset.adminTarget===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='tab-resumen')setTimeout(gxUpdateOperationsSummary,30)};
+ window.gxSettingsView=(view,btn)=>{document.querySelectorAll('.gx-settings-view').forEach(x=>x.classList.toggle('active',x.dataset.settingsView===view));document.querySelectorAll('.gx-settings-tabs button').forEach(x=>x.classList.remove('active'));btn?.classList.add('active')};
+ window.gxSaveSettings=async()=>{const label=document.querySelector('#gx-save-state span:last-child');if(label)label.textContent='Guardando…';try{await prepararYGuardar()}finally{if(label)label.textContent='Sincronizado'}};
+ window.gxClearClientFilters=()=>{document.getElementById('search-input').value='';document.getElementById('sort-by').value='name';const p=document.querySelector('[data-status-filter="all"]');if(p)setStatusFilter('all',p)};
+ window.gxFilterFromSummary=s=>{goAdminTab('tab-clientes');const p=document.querySelector(`[data-status-filter="${s}"]`);if(p)setStatusFilter(s,p)};
+ window.gxShowBenefitReady=()=>{goAdminTab('tab-clientes');const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{const r=c.referido_activo;if(r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3)filtered[k]=c});renderizarClientes(filtered)};
+ window.gxToggleAccordion=b=>{const a=b.closest('.gx-accordion');const p=a?.parentElement;if(!a||!p)return;p.querySelectorAll(':scope > .gx-accordion').forEach(x=>{if(x!==a)x.classList.remove('open')});a.classList.toggle('open')};
+ function restore(){if(!focusHome)return;const{details,parent,next}=focusHome;details.style.display='';details.classList.add('client-details');next&&next.parentNode===parent?parent.insertBefore(details,next):parent.appendChild(details);focusHome=null}
+ window.gxOpenClientFocus=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',r=c.referido_activo,ref=r?(r.beneficio_reclamado?'💝 Mes reclamado':`🎁 ${Number(r.meses||0)}/3 meses`):'🎁 Sin referido',g=c.gamificacion||{},mission=g.misiones_activas?`🎟️ Ronda ${Number(g.cupon_ciclo||1)}`:'🎟️ Sin misiones';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>Día ${c.dia_pago||15}</span><span>$${monthly}/mes</span><span>${ref}</span><span>${mission}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
+ window.gxCloseClientFocus=()=>{const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;restore();f.classList.remove('show');document.body.style.overflow=''};
+ window.toggleClientDetails=key=>gxOpenClientFocus(key);
+ function stockLow(){let n=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>{const a=s?._inventario_auto;if(a){const v=s.stock_manual!==undefined&&s.stock_manual!==null&&s.stock_manual!==''?Number(s.stock_manual):Number(a.disponibles_auto??a.disponibles??0);if(v<=1||Number(a.sobrecupo||0)>0)n++}})}catch{}return n}
+ window.gxUpdateOperationsSummary=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>c.pago_en_revision===true).length,pending=v.filter(c=>!c.pago_en_revision&&c.estado==='pendiente').length,paid=v.filter(c=>c.estado==='pagado').length,susp=v.filter(c=>c.estado==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
+ const add=window.agregarNuevoCliente;if(typeof add==='function')window.agregarNuevoCliente=function(...a){const before=new Set(Object.keys(clientesDict||{})),r=add.apply(this,a);setTimeout(()=>{const k=Object.keys(clientesDict||{}).find(x=>!before.has(x));if(k){goAdminTab('tab-clientes');gxOpenClientFocus(k)}gxUpdateOperationsSummary()},180);return r};
+ const render=window.renderizarClientes;if(typeof render==='function')window.renderizarClientes=function(...a){const r=render.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
+ const calc=window.calcularInventarioYFinanzas;if(typeof calc==='function')window.calcularInventarioYFinanzas=function(...a){const r=calc.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')gxCloseClientFocus()});setTimeout(gxUpdateOperationsSummary,400);
+})();
+</script>
 
 </body>
 </html>
