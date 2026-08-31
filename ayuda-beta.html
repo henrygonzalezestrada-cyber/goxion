@@ -2520,6 +2520,27 @@
             }
         }
 
+
+    /* --- BETA: REFERIDOS INTELIGENTES + ESTADO DE PAGO --- */
+    .gx-client-payment-alert{
+        display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;padding:12px 13px;
+        border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(8,8,12,.68)
+    }
+    .gx-client-payment-alert>span{font-size:1.15rem;line-height:1}
+    .gx-client-payment-alert strong{display:block;font-size:12px}
+    .gx-client-payment-alert small{display:block;color:var(--text-muted);font-size:10.5px;line-height:1.45;margin-top:3px}
+    .gx-client-payment-alert.warning{border-color:rgba(255,170,0,.27);background:rgba(255,170,0,.06)}
+    .gx-client-payment-alert.warning strong{color:var(--warning-amber)}
+    .gx-client-payment-alert.danger{border-color:rgba(255,51,102,.28);background:rgba(255,51,102,.055)}
+    .gx-client-payment-alert.danger strong{color:var(--danger-red)}
+    .gx-client-payment-alert.review{border-color:rgba(124,77,255,.28);background:rgba(124,77,255,.055)}
+    .gx-client-payment-alert.review strong{color:#b59cff}
+
+    .gx-ref-services-client{margin:10px 0 12px;padding:10px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+    .gx-ref-services-title{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:800;margin-bottom:7px}
+    .gx-ref-service-chips{display:flex;flex-wrap:wrap;gap:5px}
+    .gx-ref-service-chips span{padding:5px 7px;border-radius:999px;background:rgba(0,242,254,.07);border:1px solid rgba(0,242,254,.13);color:#cceff3;font-size:9.5px;font-weight:700}
+
 </style>
 </head>
 <body class="no-scroll">
@@ -2747,6 +2768,7 @@
                 <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
             </div>
 
+            <div id="dash-payment-review-alert"></div>
             <div id="dash-upsell"></div>
             <div id="referral-section-container"></div>
 
@@ -3402,7 +3424,7 @@
         }
 
         function iniciarSaludoDinamico(nombreCompleto) {
-            const primerNombre = nombreCompleto.split(' ')[0];
+            const primerNombre = String(nombreCompleto || "Cliente").trim().split(/\s+/)[0] || "Cliente";
             const frases = [
                 `¡Hola, <span>${primerNombre}</span>! 👋`, 
                 `¡Qué gusto verte, <span>${primerNombre}</span>! ✨`, 
@@ -3791,9 +3813,15 @@
 
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
-            const primerNombre = cliente.nombre.split(' ')[0];
+
+            if(!cliente) {
+                console.error("GOXION: No se encontró el cliente para renderizar el dashboard.", key);
+                return;
+            }
+            const primerNombre = String(cliente.nombre || "Cliente").trim().split(/\s+/)[0] || "Cliente";
             
-            document.getElementById('dash-name').innerText = primerNombre; 
+            const dashName = document.getElementById('dash-name');
+            if(dashName) dashName.innerText = primerNombre;
             
             const stickyName = document.getElementById('sticky-client-name');
             if (stickyName) stickyName.innerText = primerNombre;
@@ -3843,6 +3871,23 @@
                     </div>`; 
                 }
             }
+
+            const payAlert = document.getElementById('dash-payment-review-alert');
+            if(payAlert) {
+                const reviewState = String(cliente.pago_revision_estado || '').toLowerCase();
+                const reviewMsg = cliente.pago_revision_mensaje || '';
+                const missing = Number(cliente.pago_revision_monto_faltante || 0);
+                if(reviewState === 'incompleto') {
+                    payAlert.innerHTML = `<div class="gx-client-payment-alert warning"><span>⚠️</span><div><strong>Tu pago requiere corrección</strong><small>${reviewMsg || 'Detectamos un pago incompleto.'}${missing > 0 ? ` <b>Faltante: $${missing}</b>` : ''}</small></div></div>`;
+                } else if(reviewState === 'rechazado') {
+                    payAlert.innerHTML = `<div class="gx-client-payment-alert danger"><span>✕</span><div><strong>No pudimos validar tu comprobante</strong><small>${reviewMsg || 'Verifica los datos y vuelve a enviar tu comprobante.'}</small></div></div>`;
+                } else if(cliente.pago_en_revision === true || reviewState === 'revision') {
+                    payAlert.innerHTML = `<div class="gx-client-payment-alert review"><span>⏳</span><div><strong>Comprobante en revisión</strong><small>Ya recibimos tu pago. Te avisaremos cuando quede validado.</small></div></div>`;
+                } else {
+                    payAlert.innerHTML = '';
+                }
+            }
+
             document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
@@ -3870,14 +3915,15 @@
             try { savedMissions = JSON.parse(localStorage.getItem('goxion_missions_' + cliente.folio)) || []; } catch(e){}
 
             if(hasReferral) {
-                let mesesRaw = Number(cliente.referido_activo.meses || 0);
+                let serviciosRef = Array.isArray(cliente.referido_activo.servicios) ? cliente.referido_activo.servicios : [];
+                let mesesRaw = Number(cliente.referido_activo.meses_efectivos ?? cliente.referido_activo.meses_override ?? cliente.referido_activo.meses ?? 0);
                 let meses = Math.max(0, Math.min(mesesRaw, 3));
-                let plats = Number(cliente.referido_activo.plataformas || 0);
+                let plats = serviciosRef.length || Number(cliente.referido_activo.plataformas || 0);
                 let beneficioReclamado = cliente.referido_activo.beneficio_reclamado === true;
                 let beneficioListo = plats >= 2 && meses >= 3;
 
                 let warningHTML = plats < 2
-                    ? `<div style="background:rgba(255,170,0,.15);border:1px dashed var(--warning-amber);border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--warning-amber);">⚠️ Tu referido necesita al menos 2 plataformas activas para que el beneficio sea válido.</div>`
+                    ? `<div style="background:rgba(255,170,0,.15);border:1px dashed var(--warning-amber);border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--warning-amber);">⚠️ Tu referido necesita al menos 2 servicios activos. Le falta ${Math.max(0, 2 - plats)} para continuar con el beneficio.</div>`
                     : '';
 
                 let refSubtitle = "";
@@ -3922,13 +3968,19 @@
                     <div class="referral-stats">
                         <div class="stat-box" style="border-right:1px solid rgba(255,255,255,.05);">
                             <div class="stat-val" style="${plats < 2 ? 'color:var(--warning-amber);' : ''}">${plats}</div>
-                            <div class="stat-label">Plataformas</div>
+                            <div class="stat-label">Servicios</div>
                         </div>
                         <div class="stat-box">
                             <div class="stat-val" style="${beneficioListo ? 'color:var(--success-green);' : ''}">${meses}/3</div>
                             <div class="stat-label">Meses</div>
                         </div>
                     </div>
+
+                    ${serviciosRef.length ? `
+                    <div class="gx-ref-services-client">
+                        <div class="gx-ref-services-title">Servicios activos del referido</div>
+                        <div class="gx-ref-service-chips">${serviciosRef.map(s => `<span>✓ ${s}</span>`).join('')}</div>
+                    </div>` : ''}
                     <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">Progreso a tu mes gratis:</div>
                     <div class="loyalty-progress-bg" style="height:6px;">
                         <div class="loyalty-progress-fill" style="width:${Math.min((meses / 3) * 100,100)}%;background:${beneficioListo ? 'linear-gradient(90deg,#00f2fe,#00ff9d)' : 'linear-gradient(90deg,#ffaa00,#ff3366)'};"></div>
@@ -4805,6 +4857,10 @@ function goxionBetaLegacy(data) {
             dia_pago: Number(c.dia_pago || 15),
             estado: c.estado || "pendiente",
             pago_en_revision: c.pago_en_revision === true,
+            pago_revision_estado: c.pago_revision_estado || "",
+            pago_revision_mensaje: c.pago_revision_mensaje || "",
+            pago_revision_monto_faltante: Number(c.pago_revision_monto_faltante || 0),
+            pago_revision_updated_at: c.pago_revision_updated_at || null,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
             servicios: (data.servicios || []).map(s => ({
