@@ -270,6 +270,27 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     @media(max-width:840px){.gx-tag-library-grid{grid-template-columns:1fr 1fr}.gx-mission-row{grid-template-columns:1fr 125px 34px}.gx-payment-actions{grid-template-columns:1fr}.gx-notification-drawer{width:100%}}
     @media(max-width:390px){.gx-tag-library-grid{grid-template-columns:1fr}.gx-mission-row{grid-template-columns:1fr}.gx-mission-row button{height:34px}.gx-review-modern{align-items:flex-start;flex-direction:column}.gx-review-modern .gx-primary-action{width:100%}}
 
+
+    .gx-confirm-incomplete{display:none;width:100%;border:1px solid rgba(255,170,0,.28);background:rgba(255,170,0,.08);color:#ffd36c;border-radius:11px;padding:10px;font-weight:800;cursor:pointer}.gx-confirm-incomplete.show{display:block}
+    .gx-ref-management-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+    .gx-ref-management-actions button{border-radius:9px;padding:8px;border:1px solid var(--gx-line);font-size:.68rem;font-weight:800;cursor:pointer}
+    .gx-ref-management-actions .reset{background:rgba(255,170,0,.06);color:#ffd36c;border-color:rgba(255,170,0,.18)}
+    .gx-ref-management-actions .delete{background:rgba(255,77,112,.06);color:#ff8ca0;border-color:rgba(255,77,112,.18)}
+    .gx-ref-management-help{color:var(--text-muted);font-size:.6rem;line-height:1.35;margin-top:6px}
+
+    .gx-client-mission-admin{border:1px solid rgba(0,242,254,.14);border-radius:14px;background:rgba(0,242,254,.025);overflow:hidden}
+    .gx-client-mission-summary{display:flex;align-items:center;gap:9px;padding:11px}
+    .gx-client-mission-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(0,242,254,.07)}
+    .gx-client-mission-copy{flex:1;min-width:0}.gx-client-mission-copy strong{display:block;font-size:.8rem}.gx-client-mission-copy small{display:block;color:var(--text-muted);font-size:.64rem;line-height:1.35;margin-top:2px}
+    .gx-client-mission-switch{transform:scale(.75);margin:0}
+    .gx-client-mission-config{border-top:1px solid var(--gx-line)}.gx-client-mission-config summary{padding:9px 11px;cursor:pointer;color:#cfd8e5;font-size:.7rem;font-weight:800}
+    .gx-client-mission-config-body{display:grid;gap:9px;padding:0 11px 11px}.gx-client-mission-config-body>label{color:var(--text-muted);font-size:.65rem;font-weight:800}
+    .gx-client-mission-config textarea{width:100%;min-height:72px;margin-top:4px;background:#111118;border:1px solid var(--gx-line);color:#fff;border-radius:9px;padding:8px;resize:vertical}
+    .gx-inline-percent{display:flex;margin-top:4px;border:1px solid var(--gx-line);border-radius:9px;overflow:hidden;background:#111118}.gx-inline-percent input{width:70px;border:0;background:transparent;color:var(--neon-blue);padding:8px;text-align:center;font-weight:800}.gx-inline-percent span{display:flex;align-items:center;color:var(--text-muted);font-size:.65rem}
+    .gx-client-round-status{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid var(--gx-line)}.gx-client-round-status>span{font-size:1.1rem}.gx-client-round-status strong{display:block;font-size:.72rem}.gx-client-round-status small{display:block;color:var(--text-muted);font-size:.6rem;margin-top:2px}
+    .gx-client-mission-admin-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.gx-client-mission-admin-actions button{border-radius:9px;padding:8px;border:1px solid var(--gx-line);font-size:.67rem;font-weight:800;cursor:pointer}.gx-client-mission-admin-actions .reset{color:#ffd36c;background:rgba(255,170,0,.06);border-color:rgba(255,170,0,.18)}.gx-client-mission-admin-actions .round{color:var(--neon-blue);background:rgba(0,242,254,.05);border-color:rgba(0,242,254,.18)}
+    .gx-client-mission-tip{padding:8px 11px;border-top:1px solid var(--gx-line);color:var(--text-muted);font-size:.6rem;line-height:1.4}
+
 </style>
 </head>
 <body>
@@ -382,7 +403,53 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
     <div class="gx-client-focus" id="gx-client-focus" aria-hidden="true"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
 
-    <div id="modal-seleccionar-clientes" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:15px"><div class="gx-selection-modal"><h3>Seleccionar clientes</h3><input type="text" id="search-modal-clientes" placeholder="Buscar cliente por nombre..." oninput="filtrarModalClientes()" class="search-bar"><div id="lista-clientes-modal"></div><div class="gx-modal-actions"><button class="gx-secondary-action" onclick="cerrarModalSeleccion()">Cancelar</button><button class="gx-primary-action" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar misiones</button></div></div></div>
+    
+    <!-- CENTRO DE NOTIFICACIONES / ACTIVIDAD -->
+    <aside class="gx-notification-drawer" id="gx-notification-drawer" aria-hidden="true">
+        <div class="gx-notification-drawer-head">
+            <div><span class="gx-eyebrow">Actividad</span><h3>Notificaciones</h3></div>
+            <button class="gx-focus-close" type="button" onclick="gxToggleNotifications(false)">×</button>
+        </div>
+        <div class="gx-notification-toolbar">
+            <button type="button" onclick="gxMarkAllNotificationsRead()">✓ Marcar leídas</button>
+            <button type="button" onclick="gxRefreshNotifications()">↻ Actualizar</button>
+        </div>
+        <div id="gx-notification-list" class="gx-notification-list"></div>
+    </aside>
+    <div class="gx-notification-overlay" id="gx-notification-overlay" onclick="gxToggleNotifications(false)"></div>
+
+    <!-- REVISIÓN DE PAGO -->
+    <div class="gx-payment-modal" id="gx-payment-modal" aria-hidden="true">
+        <div class="gx-payment-backdrop" onclick="gxClosePaymentModal()"></div>
+        <section class="gx-payment-sheet">
+            <div class="gx-focus-handle"></div>
+            <header>
+                <div>
+                    <span class="gx-eyebrow">Validación de pago</span>
+                    <h3 id="gx-payment-client-name">Cliente</h3>
+                    <small id="gx-payment-client-meta"></small>
+                </div>
+                <button class="gx-focus-close" type="button" onclick="gxClosePaymentModal()">×</button>
+            </header>
+            <div class="gx-payment-review-card" id="gx-payment-review-card"></div>
+            <div class="gx-payment-actions">
+                <button type="button" class="gx-payment-action approve" onclick="gxPaymentApprove()">✓ Aprobar</button>
+                <button type="button" class="gx-payment-action incomplete" onclick="gxPreparePaymentIncomplete()">⚠ Pago incompleto</button>
+                <button type="button" class="gx-payment-action reject" onclick="gxPaymentReject()">✕ Rechazar</button>
+            </div>
+            <div class="gx-payment-extra">
+                <label class="gx-inline-check"><input type="checkbox" id="gx-payment-punctual" checked><span>Contar como pago puntual para Lealtad</span></label>
+                <textarea id="gx-payment-note" placeholder="Nota opcional / motivo para el cliente..."></textarea>
+                <div class="gx-missing-amount" id="gx-missing-amount-wrap">
+                    <span>Monto faltante</span>
+                    <input type="number" id="gx-missing-amount" min="0" step="1" placeholder="$0">
+                </div>
+                <button type="button" class="gx-confirm-incomplete" id="gx-confirm-incomplete" onclick="gxPaymentIncomplete()">Confirmar pago incompleto</button>
+            </div>
+        </section>
+    </div>
+
+<div id="modal-seleccionar-clientes" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:15px"><div class="gx-selection-modal"><h3>Seleccionar clientes</h3><input type="text" id="search-modal-clientes" placeholder="Buscar cliente por nombre..." oninput="filtrarModalClientes()" class="search-bar"><div id="lista-clientes-modal"></div><div class="gx-modal-actions"><button class="gx-secondary-action" onclick="cerrarModalSeleccion()">Cancelar</button><button class="gx-primary-action" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar misiones</button></div></div></div>
 
 <script>
     const CONFIG = { username: "henrygonzalezestrada-cyber", repo: "goxion", path: "clientes.json", branch: "main" };
@@ -1066,6 +1133,11 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                                     ? `⚠️ Falta ${2-refSelectedServices.length} servicio${2-refSelectedServices.length === 1 ? '' : 's'} para continuar acumulando meses`
                                     : (refSmartMonths >= 3 ? '🎁 3/3 · Beneficio listo para reclamar' : `✓ Progreso automático: ${refSmartMonths}/3 meses`))}
                         </div>
+                        <div class="gx-ref-management-actions">
+                            <button type="button" class="reset" onclick="gxResetReferral('${key}')">↻ Reiniciar progreso</button>
+                            <button type="button" class="delete" onclick="gxDeleteReferral('${key}')">🗑 Eliminar referido</button>
+                        </div>
+                        <div class="gx-ref-management-help">Reiniciar conserva el referido y sus servicios, pero vuelve el contador a 0/3 desde hoy. Eliminar borra el registro activo.</div>
                     ` : `<div class="gx-empty-inline">Activa el referido para comenzar el seguimiento automático.</div>`}
                 </div>
             `;
@@ -1073,47 +1145,40 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 5, tareas: "" };
             
             let gamifHTML = `
-                <div style="margin-top: 10px; padding: 10px; background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 8px;">
-                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 6px;">
-                        <strong style="color: var(--neon-blue); font-size: 0.8rem;">🎟️ Asignar Misiones (Cupón)</strong>
-                        <label class="switch" style="transform: scale(0.65); margin:0;"><input type="checkbox" ${gamifConfig.misiones_activas ? 'checked' : ''} onchange="toggleMisiones('${key}', this.checked)"><span class="slider"></span></label>
-                    </div>
-                    ${gamifConfig.misiones_activas ? `
-                    <div style="display:flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;">
-                        <input type="number" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:6px; font-weight:bold; outline:none; font-size: 0.85rem;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)">
-                    </div>
-                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; outline:none; resize: vertical; min-height: 55px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Visita nuestro catálogo [CATALOGO]\nPaga tu cuenta [PAGO]">${gamifConfig.tareas}</textarea>
-                    <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${
-                        Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1)
-                            ? 'var(--neon-green)'
-                            : 'var(--text-muted)'
-                    };">
-                        ${
-                            Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1)
-                                ? `✅ Cupón de la ronda ${gamifConfig.cupon_ciclo || 1} ya reclamado`
-                                : `🎟️ Ronda ${gamifConfig.cupon_ciclo || 1}: cupón disponible al completar misiones`
-                        }
-                    </div>
-                    <button
-                        type="button"
-                        style="margin-top:8px;width:100%;padding:8px 10px;border-radius:7px;border:1px solid rgba(255,170,0,.48);background:rgba(255,170,0,.08);color:var(--warning-amber);font-size:.72rem;font-weight:800;cursor:pointer;"
-                        onclick="reiniciarMisionesClienteBeta('${key}')">
-                        ↻ Reiniciar progreso de misiones
-                    </button>
-                    <div style="margin-top:5px;font-size:.65rem;color:var(--text-muted);line-height:1.35;">
-                        Borra el progreso del cliente la próxima vez que cargue Mi Espacio, pero mantiene la misma ronda de premio.
+                <div class="gx-client-mission-admin">
+                    <div class="gx-client-mission-summary">
+                        <div class="gx-client-mission-icon">${gamifConfig.misiones_activas ? '🎯' : '○'}</div>
+                        <div class="gx-client-mission-copy">
+                            <strong>${gamifConfig.misiones_activas ? 'Misiones activas' : 'Sin misiones activas'}</strong>
+                            <small>${gamifConfig.misiones_activas
+                                ? `${gamifConfig.descuento || 0}% OFF · Ronda ${gamifConfig.cupon_ciclo || 1}${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? ' · Cupón reclamado' : ''}`
+                                : 'Actívalas únicamente cuando este cliente necesite una misión individual.'}</small>
+                        </div>
+                        <label class="switch gx-client-mission-switch"><input type="checkbox" ${gamifConfig.misiones_activas ? 'checked' : ''} onchange="toggleMisiones('${key}', this.checked)"><span class="slider"></span></label>
                     </div>
 
-                    <button
-                        type="button"
-                        style="margin-top:8px;width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(0,242,254,.48);background:rgba(0,242,254,.08);color:var(--neon-blue);font-size:.72rem;font-weight:800;cursor:pointer;"
-                        onclick="nuevaRondaCuponBeta('${key}')">
-                        🎟️ Nueva ronda + habilitar otro cupón
-                    </button>
-                    <div style="margin-top:5px;font-size:.65rem;color:var(--text-muted);line-height:1.35;">
-                        Reinicia las misiones y crea una nueva ronda de recompensa. El cliente podrá ganar y reclamar otro cupón sin borrar el historial del anterior.
-                    </div>
-                    ` : `<div style="font-size: 0.7rem; color: var(--text-muted);">Sin misiones asignadas.</div>`}
+                    ${gamifConfig.misiones_activas ? `
+                    <details class="gx-client-mission-config">
+                        <summary>⚙️ Configuración individual</summary>
+                        <div class="gx-client-mission-config-body">
+                            <label>Descuento del cupón
+                                <div class="gx-inline-percent"><input type="number" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}','descuento',this.value)"><span>% OFF</span></div>
+                            </label>
+                            <label>Misiones asignadas
+                                <textarea onchange="updateMisiones('${key}','tareas',this.value)" placeholder="Las misiones masivas se administran mejor desde Ajustes → Misiones.">${gamifConfig.tareas || ''}</textarea>
+                            </label>
+                            <div class="gx-client-round-status">
+                                <span>${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? '🥇' : '🎟️'}</span>
+                                <div><strong>Ronda ${gamifConfig.cupon_ciclo || 1}</strong><small>${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? 'Cupón reclamado' : 'Cupón pendiente de completar'}</small></div>
+                            </div>
+                            <div class="gx-client-mission-admin-actions">
+                                <button type="button" class="reset" onclick="reiniciarMisionesClienteBeta('${key}')">↻ Reiniciar progreso</button>
+                                <button type="button" class="round" onclick="nuevaRondaCuponBeta('${key}')">🎟️ Nueva ronda</button>
+                            </div>
+                        </div>
+                    </details>
+                    ` : ''}
+                    <div class="gx-client-mission-tip">Para crear o asignar etiquetas nuevas usa <strong>Ajustes → Misiones</strong>. Aquí queda solo la configuración específica de este cliente.</div>
                 </div>
             `;
 
@@ -2807,6 +2872,105 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         window.inicializarPanel=async function(...args){const r=await oldInit.apply(this,args);setTimeout(()=>{loadBuilder();renderNotifications();gxUpdateOperationsSummary()},120);return r};
     }
     document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{loadBuilder();renderNotifications()},500));
+})();
+</script>
+
+
+<script id="goxion-admin-ops-v3-fixes">
+(() => {
+    // Hard guard: if modal/drawer ever disappear from the DOM, explain it instead of failing silently.
+    const oldToggle = window.gxToggleNotifications;
+    window.gxToggleNotifications = function(force) {
+        const drawer = document.getElementById("gx-notification-drawer");
+        const overlay = document.getElementById("gx-notification-overlay");
+        if(!drawer || !overlay) return alert("No se pudo abrir el Centro de Notificaciones. Recarga esta versión del Admin.");
+        return oldToggle ? oldToggle(force) : undefined;
+    };
+
+    const oldOpenPayment = window.gxOpenPaymentModal;
+    window.gxOpenPaymentModal = function(key, monto) {
+        const modal = document.getElementById("gx-payment-modal");
+        if(!modal) return alert("No se pudo abrir la revisión de pago. Recarga esta versión del Admin.");
+        return oldOpenPayment ? oldOpenPayment(key, monto) : undefined;
+    };
+
+    window.gxPreparePaymentIncomplete = function() {
+        const wrap = document.getElementById("gx-missing-amount-wrap");
+        const confirmBtn = document.getElementById("gx-confirm-incomplete");
+        const note = document.getElementById("gx-payment-note");
+        wrap?.classList.add("show");
+        confirmBtn?.classList.add("show");
+        if(note && !note.value) note.value = "Tu pago está incompleto. Por favor revisa el monto faltante y vuelve a enviar tu comprobante.";
+    };
+
+    // Override prior one-click confirm: now the user can enter missing amount first.
+    window.gxPaymentIncomplete = async function() {
+        if(!window.paymentCtx && typeof paymentCtx === "undefined") {
+            // paymentAction closes over its own context, so call the original only after UI preparation.
+        }
+        const wrap = document.getElementById("gx-missing-amount-wrap");
+        if(!wrap?.classList.contains("show")) return gxPreparePaymentIncomplete();
+        if(!confirm("¿Confirmar este pago como INCOMPLETO y registrar el aviso?")) return;
+
+        // Call the existing beta action directly using public helper.
+        const key = document.getElementById("gx-payment-client-meta")?.dataset?.key;
+        // Existing V2 closure doesn't expose context; infer active client from focus name/folio.
+        let foundKey = null;
+        const name = document.getElementById("gx-payment-client-name")?.textContent || "";
+        Object.entries(clientesDict || {}).some(([k,c]) => {
+            if(c.nombre === name && c.pago_en_revision) { foundKey = k; return true; }
+            return false;
+        });
+        if(!foundKey) return alert("No pude identificar al cliente en revisión. Cierra y vuelve a abrir la revisión.");
+
+        const c = clientesDict[foundKey];
+        const amount = Number(document.getElementById("gx-missing-amount")?.value || 0);
+        const msg = document.getElementById("gx-payment-note")?.value.trim() || `Detectamos un pago incompleto${amount>0?` por $${amount}`:""}.`;
+        try {
+            await gxOpsBeta("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+            c.estado="pendiente"; c.pago_en_revision=false; c.pago_revision_estado="incompleto"; c.pago_revision_mensaje=msg; c.pago_revision_monto_faltante=amount;
+            gxClosePaymentModal(); gxCloseClientFocus(); filtrarClientes(); gxUpdateOperationsSummary();
+            alert("⚠️ Pago marcado como incompleto.");
+        } catch(e) { alert("No se pudo procesar el pago.\n\n"+e.message); }
+    };
+
+    window.gxResetReferral = async function(key) {
+        const c = clientesDict?.[key], r = c?.referido_activo;
+        if(!c?._id || !r) return;
+        if(!confirm(`¿Reiniciar el progreso de ${r.nombre || "este referido"} a 0/3 desde hoy?\n\nSe conservarán el referido y los servicios seleccionados.`)) return;
+        try {
+            const x = await gxOpsBeta("reiniciar_referido_inteligente",{cliente_id:c._id});
+            c.referido_activo = {...r,...x.referido, meses:0, meses_override:null, beneficio_reclamado:false, beneficio_reclamado_at:null};
+            gxCloseClientFocus();
+            if(typeof inicializarPanel === "function") await inicializarPanel();
+            setTimeout(()=>{filtrarClientes();gxOpenClientFocus(key)},100);
+        } catch(e) { alert("No se pudo reiniciar el referido.\n\n"+e.message); }
+    };
+
+    window.gxDeleteReferral = async function(key) {
+        const c = clientesDict?.[key], r = c?.referido_activo;
+        if(!c?._id || !r) return;
+        if(!confirm(`¿Eliminar el referido "${r.nombre || "activo"}"?\n\nEsta acción quitará el registro activo de este cliente.`)) return;
+        try {
+            await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+            c.referido_activo = null;
+            gxCloseClientFocus();
+            if(typeof inicializarPanel === "function") await inicializarPanel();
+            setTimeout(()=>filtrarClientes(),100);
+        } catch(e) { alert("No se pudo eliminar el referido.\n\n"+e.message); }
+    };
+
+    // Date-based smart progress should obey a reset date, not a stale legacy month value.
+    window.gxReferralSmartMonths = function(r) {
+        if(!r) return 0;
+        if(r.meses_override !== null && r.meses_override !== undefined) return Math.min(3,Math.max(0,Number(r.meses_override)||0));
+        const start = new Date(r.fecha_inicio || Date.now());
+        if(Number.isNaN(start.getTime())) return Math.min(3,Math.max(0,Number(r.meses)||0));
+        const now = new Date();
+        let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());
+        if(now.getDate()<start.getDate()) months--;
+        return Math.min(3,Math.max(0,months));
+    };
 })();
 </script>
 
