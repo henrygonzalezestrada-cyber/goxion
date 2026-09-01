@@ -2988,6 +2988,240 @@
     }
 }
 </style>
+
+<style id="goxion-ayuda-v6-4-card-polish">
+/* ==========================================================
+   TARJETAS DE GAMIFICACIÓN — GLASS LIMPIO / SIN DESTELLOS
+   ========================================================== */
+#gamif-grid{
+    gap:10px!important;
+    align-items:stretch!important;
+}
+
+.gx-gamif-card{
+    position:relative!important;
+    isolation:isolate;
+    overflow:hidden!important;
+    min-height:172px!important;
+    padding:18px 16px 15px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:0!important;
+    text-align:left!important;
+    border-radius:22px!important;
+    background:rgba(9,9,14,.48)!important;
+    backdrop-filter:blur(18px)!important;
+    -webkit-backdrop-filter:blur(18px)!important;
+    border:1px solid rgba(255,255,255,.09)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.26)!important;
+    animation:none!important;
+}
+
+/* Anula los pulsos morado/cian heredados de estados listos/activos. */
+.gx-gamif-card.pulse-referral,
+.gx-gamif-card.pulse-mission,
+.gx-gamif-card.gx-referral-ready{
+    animation:none!important;
+    border-color:rgba(255,255,255,.09)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.26)!important;
+    transform:none!important;
+}
+
+/* Elimina los destellos/glows decorativos antiguos. */
+.gx-gamif-card::after{
+    content:none!important;
+    display:none!important;
+}
+
+/* Emoji convertido en marca de agua de fondo. */
+.gx-gamif-card::before{
+    content:attr(data-watermark);
+    position:absolute;
+    z-index:-1;
+    right:-12px;
+    top:52%;
+    transform:translateY(-50%) rotate(-16deg) scale(1.04);
+    -webkit-transform:translateY(-50%) rotate(-16deg) scale(1.04);
+    font-size:6.4rem;
+    line-height:1;
+    opacity:.055;
+    filter:grayscale(1) saturate(0) blur(.15px);
+    -webkit-filter:grayscale(1) saturate(0) blur(.15px);
+    pointer-events:none;
+    user-select:none;
+}
+
+.gx-gamif-card > *{
+    position:relative;
+    z-index:2;
+}
+
+/* Encabezado: sólo texto, una sola línea. */
+.gx-gamif-card-top{
+    display:block!important;
+    margin:0 0 15px!important;
+    min-width:0;
+}
+.gx-gamif-card .gamif-icon{
+    display:none!important;
+}
+.gx-gamif-card-kicker{
+    display:block;
+    max-width:100%;
+    margin:0!important;
+    color:rgba(192,202,222,.82)!important;
+    font-size:clamp(.62rem,2.65vw,.72rem)!important;
+    font-weight:850!important;
+    letter-spacing:1.15px!important;
+    line-height:1.05!important;
+    text-transform:uppercase;
+    white-space:nowrap!important;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* Nombre del referido / Tu progreso: protagonista, máximo 2 líneas. */
+.gx-gamif-card .gamif-title{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
+    max-width:88%;
+    margin:0!important;
+    color:#fff!important;
+    font-size:clamp(1.08rem,4.5vw,1.28rem)!important;
+    line-height:1.08!important;
+    font-weight:850!important;
+    letter-spacing:-.25px!important;
+    overflow-wrap:anywhere;
+}
+
+.gx-gamif-card-status{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
+    max-width:91%;
+    margin-top:10px!important;
+    font-size:clamp(.74rem,3.15vw,.83rem)!important;
+    line-height:1.22!important;
+    font-weight:800!important;
+}
+
+.gx-gamif-card-meta{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
+    max-width:94%;
+    margin-top:7px!important;
+    color:rgba(167,180,203,.88)!important;
+    font-size:clamp(.64rem,2.8vw,.72rem)!important;
+    line-height:1.32!important;
+}
+
+/* ==========================================================
+   PROGRESO: EL EFECTO EXISTE SÓLO DENTRO DEL % COMPLETADO
+   ========================================================== */
+.gx-gamif-progress{
+    position:relative!important;
+    width:100%!important;
+    height:6px!important;
+    box-sizing:content-box!important;
+    margin-top:auto!important;
+    padding-top:16px!important;
+    overflow:visible!important;
+    background:transparent!important;
+}
+
+/* Riel vacío completamente estático. */
+.gx-gamif-progress::before{
+    content:none!important;
+    display:none!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+}
+.gx-gamif-progress::after{
+    content:""!important;
+    position:absolute!important;
+    z-index:1!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    height:6px!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.075)!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)!important;
+}
+
+/* El ancho inline sigue siendo la fuente de verdad. */
+.gx-gamif-progress > span{
+    position:absolute!important;
+    z-index:2!important;
+    left:0!important;
+    bottom:0!important;
+    height:6px!important;
+    min-width:0!important;
+    max-width:100%!important;
+    border-radius:999px!important;
+    overflow:hidden!important;
+    background:linear-gradient(90deg,#7c4dff 0%,#00f2fe 100%)!important;
+    background-size:100% 100%!important;
+    box-shadow:0 0 11px rgba(0,242,254,.14)!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+    transition:width .4s ease!important;
+}
+
+/* Barrido únicamente dentro de la porción completada. En width:0 no se ve. */
+.gx-gamif-progress > span::after{
+    content:""!important;
+    position:absolute!important;
+    inset:0!important;
+    width:52%!important;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.68),transparent)!important;
+    transform:translateX(-130%)!important;
+    -webkit-transform:translateX(-130%)!important;
+    animation:gxRealProgressSweep 2.05s cubic-bezier(.4,0,.2,1) infinite!important;
+    -webkit-animation:gxRealProgressSweep 2.05s cubic-bezier(.4,0,.2,1) infinite!important;
+    pointer-events:none!important;
+}
+
+@keyframes gxRealProgressSweep{
+    0%{transform:translateX(-130%);opacity:0}
+    18%{opacity:.9}
+    82%{opacity:.72}
+    100%{transform:translateX(260%);opacity:0}
+}
+@-webkit-keyframes gxRealProgressSweep{
+    0%{-webkit-transform:translateX(-130%);opacity:0}
+    18%{opacity:.9}
+    82%{opacity:.72}
+    100%{-webkit-transform:translateX(260%);opacity:0}
+}
+
+@media(max-width:520px){
+    #gamif-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
+    .gx-gamif-card{min-height:170px!important;padding:16px 14px 14px!important}
+    .gx-gamif-card::before{right:-17px;font-size:5.65rem;opacity:.052}
+    .gx-gamif-card-top{margin-bottom:14px!important}
+    .gx-gamif-card .gamif-title{max-width:90%;font-size:clamp(1.02rem,4.7vw,1.2rem)!important}
+    .gx-gamif-card-status{max-width:94%}
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-gamif-progress > span::after{
+        animation:none!important;
+        -webkit-animation:none!important;
+        opacity:.16!important;
+        transform:none!important;
+        -webkit-transform:none!important;
+    }
+}
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -4407,9 +4641,8 @@
                         : (plats < 2 ? "Progreso pausado" : "En progreso");
 
                 btnRefHtml = `
-                    <div class="gamif-btn gx-gamif-card gx-gamif-card-ref ${refCardClass}" onclick="openGamif('referral')">
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-ref ${refCardClass}" data-watermark="${beneficioReclamado ? '💝' : '🎁'}" onclick="openGamif('referral')">
                         <div class="gx-gamif-card-top">
-                            <div class="gamif-icon">${beneficioReclamado ? '💝' : '🎁'}</div>
                             <span class="gx-gamif-card-kicker">REFERIDOS</span>
                         </div>
                         <div class="gamif-title gx-referral-card-title">${refNombre || 'Tu referido'}</div>
@@ -4461,10 +4694,12 @@
             } else {
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
                 btnRefHtml = `
-                    <div class="gamif-btn" onclick="openGamif('referral')">
-                        <div class="gamif-icon">🫂</div>
-                        <div class="gamif-title">Invita y Gana</div>
-                        <div class="gamif-subtitle">Empieza a referir</div>
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-ref" data-watermark="🫂" onclick="openGamif('referral')">
+                        <div class="gx-gamif-card-top"><span class="gx-gamif-card-kicker">REFERIDOS</span></div>
+                        <div class="gamif-title">Invita y gana</div>
+                        <div class="gx-gamif-card-status">Empieza a referir</div>
+                        <div class="gx-gamif-card-meta">Comparte GOXION y desbloquea beneficios</div>
+                        <div class="gx-gamif-progress" data-progress="0" aria-label="Progreso de referidos: 0%"><span style="width:0%"></span></div>
                     </div>`;
 
                 expandedRefHtml = `
@@ -4513,9 +4748,8 @@
                         : (missionTotal > 0 ? `${missionDone} de ${missionTotal} completadas` : 'Sin tareas activas');
 
                 btnCupHtml = `
-                    <div class="gamif-btn gx-gamif-card gx-gamif-card-mission ${missionReady && !missionClaimed ? 'pulse-mission' : ''}" onclick="openGamif('coupon')">
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-mission ${missionReady && !missionClaimed ? 'pulse-mission' : ''}" data-watermark="${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}" onclick="openGamif('coupon')">
                         <div class="gx-gamif-card-top">
-                            <div class="gamif-icon">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
                             <span class="gx-gamif-card-kicker">MISIONES GOXION</span>
                         </div>
                         <div class="gamif-title">Tu progreso</div>
@@ -5591,7 +5825,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V6.3.2: referido minimalista flotante.");
+        console.info("GOXION Ayuda Beta V6.4.2: referido minimalista flotante.");
     })();
     </script>
 
