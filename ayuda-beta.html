@@ -2717,7 +2717,39 @@
 </style>
 
 <style id="goxion-user-morph-css">
-/* --- MORPHING PREMIUM PARA GAMIFICACIÓN --- */
+/* --- 1. DISTRIBUCIÓN PREMIUM: TARJETAS PEQUEÑAS --- */
+.gx-gamif-card {
+    justify-content: space-between !important;
+    padding: 18px 16px 16px !important;
+    gap: 8px;
+}
+.gx-gamif-card .gamif-title {
+    font-size: 1.05rem !important;
+    margin-top: auto !important;
+}
+
+/* --- 2. ENERGÍA VIVA: BARRA DE PROGRESO --- */
+/* Conservamos absolute para que el ancho dinámico siga representando el porcentaje real. */
+.gx-gamif-progress span {
+    position: absolute;
+    overflow: hidden;
+}
+.gx-gamif-progress span::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
+    animation: energyPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes energyPulse {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}
+
+/* --- 3. VERDADERO MORPHING (CRECIMIENTO GEOMÉTRICO) --- */
 .gamif-expanded-container {
     display: none;
     background: var(--card-glass);
@@ -2725,51 +2757,58 @@
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(0, 242, 254, 0.3);
     border-radius: 24px;
-    padding: 20px; 
+    padding: 20px;
     margin-bottom: 25px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 242, 254, 0.1);
-    transform-origin: center top;
-    will-change: transform, opacity;
+    will-change: transform, opacity, clip-path;
 }
 
-/* Animación de Entrada Fluid Morph */
+/* Animación de Expansión desde el Centro */
 .gamif-expanded-container.gx-morph-in {
     display: block !important;
-    animation: morphExpand 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    animation: trueMorphExpand 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
 }
 
-/* Animación de Salida Fluid Morph */
+/* Animación de Retracción */
 .gamif-expanded-container.gx-morph-out {
     display: block !important;
-    animation: morphCollapse 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: trueMorphCollapse 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-@keyframes morphExpand {
+@keyframes trueMorphExpand {
     0% {
         opacity: 0;
-        transform: scale(0.85) translateY(-20px);
-        filter: blur(8px);
-    }
-    70% {
-        transform: scale(1.02) translateY(2px);
+        clip-path: inset(30% 20% 30% 20% round 24px);
+        transform: translateY(15px);
     }
     100% {
         opacity: 1;
-        transform: scale(1) translateY(0);
-        filter: blur(0);
+        clip-path: inset(0% 0% 0% 0% round 24px);
+        transform: translateY(0);
     }
 }
 
-@keyframes morphCollapse {
+@keyframes trueMorphCollapse {
     0% {
         opacity: 1;
-        transform: scale(1) translateY(0);
-        filter: blur(0);
+        clip-path: inset(0% 0% 0% 0% round 24px);
+        transform: translateY(0);
     }
     100% {
         opacity: 0;
-        transform: scale(0.9) translateY(-15px);
-        filter: blur(6px);
+        clip-path: inset(30% 20% 30% 20% round 24px);
+        transform: translateY(-10px);
+    }
+}
+
+/* Accesibilidad: si el usuario reduce movimiento, evitamos animaciones continuas. */
+@media (prefers-reduced-motion: reduce) {
+    .gx-gamif-progress span::after {
+        animation: none;
+    }
+    .gamif-expanded-container.gx-morph-in,
+    .gamif-expanded-container.gx-morph-out {
+        animation-duration: 0.01ms;
     }
 }
 </style>
@@ -5374,7 +5413,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V6.1: referido minimalista flotante.");
+        console.info("GOXION Ayuda Beta V6.2.2: referido minimalista flotante.");
     })();
     </script>
 
