@@ -2542,6 +2542,18 @@
     .gx-ref-service-chips span{padding:5px 7px;border-radius:999px;background:rgba(0,242,254,.07);border:1px solid rgba(0,242,254,.13);color:#cceff3;font-size:9.5px;font-weight:700}
 
 </style>
+
+<style id="goxion-ayuda-v4-referral-ui">
+    .gx-ref-sync-note{
+        margin:9px 0 0;padding:8px 10px;border-radius:10px;background:rgba(0,242,254,.045);
+        border:1px solid rgba(0,242,254,.11);color:#b9c9dc;font-size:10px;line-height:1.45
+    }
+    .gx-ref-services-empty{
+        padding:8px;border-radius:9px;background:rgba(255,170,0,.06);
+        border:1px dashed rgba(255,170,0,.18);color:var(--warning-amber);font-size:10px
+    }
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -3931,13 +3943,13 @@
                 let refCardClass = "";
 
                 if(beneficioReclamado) {
-                    refSubtitle = "Mes gratis reclamado ✓";
+                    refSubtitle = `Mes gratis reclamado ✓ · ${plats} servicio${plats===1?'':'s'}`;
                     refSubtitleColor = "var(--success-green)";
                 } else if(plats < 2 || meses < 1) {
-                    refSubtitle = "Incompleto";
+                    refSubtitle = `${meses}/3 meses · ${plats} servicio${plats===1?'':'s'}`;
                     refSubtitleColor = "var(--warning-amber)";
                 } else {
-                    refSubtitle = `${meses}/3 meses`;
+                    refSubtitle = `${meses}/3 meses · ${plats} servicios`;
                     refSubtitleColor = beneficioListo ? "var(--neon-blue)" : "var(--neon-purple)";
                     refCardClass = beneficioListo ? "gx-referral-ready" : "pulse-referral";
                 }
@@ -3976,11 +3988,13 @@
                         </div>
                     </div>
 
-                    ${serviciosRef.length ? `
                     <div class="gx-ref-services-client">
-                        <div class="gx-ref-services-title">Servicios activos del referido</div>
-                        <div class="gx-ref-service-chips">${serviciosRef.map(s => `<span>✓ ${s}</span>`).join('')}</div>
-                    </div>` : ''}
+                        <div class="gx-ref-services-title">Servicios activos de ${refNombre}</div>
+                        ${serviciosRef.length
+                            ? `<div class="gx-ref-service-chips">${serviciosRef.map(s => `<span>✓ ${s}</span>`).join('')}</div>`
+                            : `<div class="gx-ref-services-empty">Aún no hay servicios activos vinculados a este referido.</div>`}
+                        <div class="gx-ref-sync-note">Este progreso se sincroniza con los servicios que se registran para el referido desde GOXION.</div>
+                    </div>
                     <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">Progreso a tu mes gratis:</div>
                     <div class="loyalty-progress-bg" style="height:6px;">
                         <div class="loyalty-progress-fill" style="width:${Math.min((meses / 3) * 100,100)}%;background:${beneficioListo ? 'linear-gradient(90deg,#00f2fe,#00ff9d)' : 'linear-gradient(90deg,#ffaa00,#ff3366)'};"></div>
@@ -5099,7 +5113,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION ayuda conectado a Supabase.");
+        console.info("GOXION Ayuda Beta V4: referido sincronizado y visible.");
     })();
     </script>
 
