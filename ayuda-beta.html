@@ -3222,6 +3222,65 @@
 }
 </style>
 
+
+<style id="goxion-ayuda-v6-5-balance">
+/* ==========================================================
+   AJUSTE V6.5 — WATERMARK MÁS VISIBLE + BALANCE VERTICAL
+   ========================================================== */
+
+/* Emoji ambiental: más perceptible, conservando transparencia. */
+.gx-gamif-card::before{
+    right:-8px !important;
+    top:52% !important;
+    font-size:6.9rem !important;
+    opacity:.105 !important;
+    filter:grayscale(.15) saturate(.8) !important;
+    -webkit-filter:grayscale(.15) saturate(.8) !important;
+    transform:translateY(-50%) rotate(-15deg) scale(1.05) !important;
+    -webkit-transform:translateY(-50%) rotate(-15deg) scale(1.05) !important;
+}
+
+/* Más aire entre el encabezado y el contenido principal. */
+.gx-gamif-card-top{
+    margin-bottom:0 !important;
+}
+
+.gx-gamif-card .gamif-title{
+    margin-top:18px !important;
+}
+
+/* Conservamos una progresión vertical uniforme. */
+.gx-gamif-card-status{
+    margin-top:9px !important;
+}
+
+.gx-gamif-card-meta{
+    margin-top:7px !important;
+}
+
+/* El espacio antes de la barra replica visualmente el espacio superior. */
+.gx-gamif-progress{
+    padding-top:18px !important;
+}
+
+/* En móvil se mantiene el balance sin comprimir demasiado la tarjeta. */
+@media(max-width:520px){
+    .gx-gamif-card::before{
+        right:-12px !important;
+        font-size:6.05rem !important;
+        opacity:.095 !important;
+    }
+
+    .gx-gamif-card .gamif-title{
+        margin-top:16px !important;
+    }
+
+    .gx-gamif-progress{
+        padding-top:16px !important;
+    }
+}
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -5825,7 +5884,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V6.4.2: referido minimalista flotante.");
+        console.info("GOXION Ayuda Beta V6.5.2: referido minimalista flotante.");
     })();
     </script>
 
