@@ -421,6 +421,16 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     }
 </style>
 
+
+<style id="goxion-admin-v8-periodo-ui">
+    .gx-account-period-fields{display:grid;grid-template-columns:.72fr 1.15fr 1.25fr;gap:7px;align-items:end}
+    .gx-account-period-fields label>span{display:block;color:var(--text-muted);font-size:.64rem;font-weight:800;text-transform:uppercase;margin-bottom:4px}
+    .gx-account-period-fields input,.gx-account-period-fields select{width:100%;background:#12121a;color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px;min-height:38px}
+    .gx-account-period-fields .gx-period-field>span{color:var(--neon-blue)}
+    .gx-account-period-fields .gx-period-field input{border-color:rgba(0,242,254,.28);box-shadow:0 0 12px rgba(0,242,254,.035)}
+    .gx-period-help{margin:7px 1px 1px;color:var(--text-muted);font-size:.61rem;line-height:1.4}
+    @media(max-width:520px){.gx-account-period-fields{grid-template-columns:.72fr 1.28fr}.gx-account-period-fields label:last-child{grid-column:1/-1}}
+</style>
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -1404,7 +1414,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                         <button type="button" class="gx-dock-action link" onclick="copiarInfo('${cliente.nombre}','${key}')"><span>🔗</span><div><small>Acceso</small><strong>Copiar link</strong></div></button>
                     </div>
 
-                    <div class="gx-accordion open"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>👤</i><b>Cuenta</b><small>Acceso, cobro y estado</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="access-portal-box"><div class="gx-mini-heading">🔑 Acceso al portal</div><input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)"><div class="cred-row-split"><input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)"><input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)"></div></div><div class="gx-two-fields"><label><span>Día de cobro</span><input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" onchange="updateClientData('${key}','dia_pago',this.value)"></label><label><span>Estado cuenta</span><select class="status-select status-${cliente.estado}" onchange="updateClientData('${key}','estado',this.value)"><option value="pendiente" ${cliente.estado==='pendiente'?'selected':''}>Pendiente (Deuda)</option><option value="pagado" ${cliente.estado==='pagado'?'selected':''}>Pagado</option><option value="suspendido" ${cliente.estado==='suspendido'?'selected':''}>Suspendido</option></select></label></div></div></div>
+                    <div class="gx-accordion open"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>👤</i><b>Cuenta</b><small>Acceso, periodo, cobro y estado</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="access-portal-box"><div class="gx-mini-heading">🔑 Acceso al portal</div><input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)"><div class="cred-row-split"><input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)"><input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)"></div></div><div class="gx-account-period-fields"><label><span>Día de cobro</span><input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" onchange="updateClientData('${key}','dia_pago',this.value)"></label><label class="gx-period-field"><span>Periodo a cobrar</span><input type="month" value="${String(cliente.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7)}" onchange="updateClientData('${key}','periodo_pendiente',this.value)"></label><label><span>Estado cuenta</span><select class="status-select status-${cliente.estado}" onchange="updateClientData('${key}','estado',this.value)"><option value="pendiente" ${cliente.estado==='pendiente'?'selected':''}>Pendiente (Deuda)</option><option value="pagado" ${cliente.estado==='pagado'?'selected':''}>Pagado</option><option value="suspendido" ${cliente.estado==='suspendido'?'selected':''}>Suspendido</option></select></label></div><div class="gx-period-help">El periodo permanece pendiente aunque cambie el mes. Al aprobar el pago avanza al siguiente periodo.</div></div></div>
                     <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>📺</i><b>Servicios</b><small>${serviceNames.length} activo${serviceNames.length===1?'':'s'} · $${subtotal}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="client-services-list">${clientServicesHTML}<div class="client-service-add-row"><select id="add-srv-sel-${key}">${globalOptions}</select><button class="btn-save" onclick="addClientService('${key}')">＋</button></div>${descuentosHTML}</div></div></div>
                     <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎁</i><b>Referidos & beneficios</b><small>Progreso, servicios y recompensa</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${refHTML}</div></div></div>
                     <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎯</i><b>Misiones & cupón</b><small>${gamifConfig.misiones_activas ? missionBrief : 'Sin automatización activa'}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${gamifHTML}</div></div></div>
@@ -1553,6 +1563,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
         const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos-beta`;
+        const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         localStorage.removeItem("GOXION_PAT");
@@ -1654,6 +1665,33 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
             if (!json) {
                 throw new Error(`admin-datos no devolvió JSON válido.\nRespuesta recibida:\n${text.slice(0, 2000)}`);
+            }
+
+            try {
+                const pr = await fetch(PERIODOS_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": currentToken
+                    },
+                    body: JSON.stringify({ accion: "listar_periodos", datos: {} })
+                });
+                const parsed = await parseResponse(pr);
+                if (pr.status === 401) {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    currentToken = "";
+                    const err = new Error("SESION_EXPIRADA");
+                    err.raw = parsed.text;
+                    throw err;
+                }
+                if (pr.ok && parsed.json?.ok === true) {
+                    json.periodos_cobro = parsed.json.periodos || [];
+                } else {
+                    console.warn("No se pudieron cargar periodos de cobro:", parsed.text);
+                }
+            } catch (e) {
+                if (e?.message === "SESION_EXPIRADA") throw e;
+                console.warn("Periodo de cobro no disponible temporalmente:", e);
             }
 
             console.log("admin-datos RAW:", json);
@@ -1794,6 +1832,10 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             const referidosGlobal = getArray(root, "referidos", "clientes_referidos");
             const gamifGlobal = getArray(root, "gamificacion", "gamificaciones", "clientes_gamificacion");
             const descuentosGlobal = getArray(root, "descuentos", "descuentos_especiales", "clientes_descuentos");
+            const periodosCobro = getArray(root, "periodos_cobro");
+            const periodoPorCliente = new Map(
+                periodosCobro.map(x => [String(x?.id || x?.cliente_id || ""), x?.periodo_pendiente || ""])
+            );
 
             if (!clientes.length) {
                 const keys = Object.keys(root || {});
@@ -1846,6 +1888,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                     codigo: "",
                     pagos_puntuales: n(c.pagos_puntuales, 0),
                     dia_pago: n(c.dia_pago, 15),
+                    periodo_pendiente: c.periodo_pendiente || periodoPorCliente.get(String(id)) || new Date().toISOString().slice(0,7) + "-01",
                     estado: c.estado || "pendiente",
                     pago_en_revision: c.pago_en_revision === true,
                     pago_revision_estado: c.pago_revision_estado || "",
@@ -1948,7 +1991,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
         };
 
-        console.info("GOXION Admin cargado.");
+        console.info("GOXION Admin Beta: periodo de cobro persistente cargado.");
     })();
     </script>
 
@@ -1958,6 +2001,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     (() => {
         const SB = "https://hmpevcwodcgbkviarfic.supabase.co";
         const ACCIONES = `${SB}/functions/v1/admin-acciones`;
+        const PERIODOS = `${SB}/functions/v1/periodo-cobro`;
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function accion(accion, datos = {}) {
@@ -1982,6 +2026,32 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
             return body;
         }
+
+        async function accionPeriodo(accionNombre, datos = {}) {
+            const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
+            if (!token) throw new Error("Sesión administrativa no disponible.");
+
+            const r = await fetch(PERIODOS, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Token": token
+                },
+                body: JSON.stringify({ accion: accionNombre, datos })
+            });
+
+            const text = await r.text();
+            let body = {};
+            try { body = text ? JSON.parse(text) : {}; } catch {}
+
+            if (!r.ok || body?.ok !== true) {
+                throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+            }
+            return body;
+        }
+
+        window.gxPeriodAction = accionPeriodo;
+        window.gxCoreAdminAction = accion;
 
         function cli(key) { return clientesDict[key]; }
         function num(v, d=0) {
@@ -2066,6 +2136,20 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
                 let v = value;
                 if (field === "dia_pago") v = parseInt(value) || 15;
+
+                if (field === "periodo_pendiente") {
+                    const mes = String(value || "").trim();
+                    if (!/^\d{4}-\d{2}$/.test(mes)) return alert("❌ Selecciona un periodo válido.");
+                    const periodo = `${mes}-01`;
+                    const r = await accionPeriodo("guardar_periodo", {
+                        cliente_id: c._id,
+                        periodo_pendiente: periodo
+                    });
+                    c.periodo_pendiente = r.periodo_pendiente || periodo;
+                    filtrarClientes();
+                    alert("✅ Periodo de cobro actualizado.");
+                    return;
+                }
 
                 // usuario_acceso se mantiene visualmente; el backend principal
                 // se ampliará para persistirlo. Evitamos mentir con un guardado falso.
@@ -2189,18 +2273,24 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
         // ---------- PAGO ----------
         aprobarPago = async function(key, monto) {
-            if (!confirm("¿Confirmas que verificaste el comprobante de pago de este cliente?")) return;
             const c = cli(key);
             if (!c?._id) return;
+            const periodoVisible = String(c.periodo_pendiente || "").slice(0,7);
+            if (!confirm(`¿Confirmas que verificaste el comprobante?\n\nEste pago se aplicará al periodo: ${periodoVisible || "actual"}.`)) return;
 
             try {
-                await accion("aprobar_pago", {
+                const timing = typeof gxPaymentTiming === "function" ? gxPaymentTiming({...c,estado:"pendiente",pago_en_revision:false}) : {type:"none"};
+                const puntual = timing.type !== "overdue";
+                const alreadyPaid = typeof gxPeriodAlreadyPaid === "function" ? gxPeriodAlreadyPaid(c) : false;
+                const r = await accionPeriodo("aprobar_pago_periodo", {
                     cliente_id: c._id,
                     monto: num(monto),
-                    notas: "Aprobado desde Admin"
+                    notas: "Aprobado desde Admin Beta",
+                    puntual
                 });
+                if (!puntual && !alreadyPaid) await accion("reiniciar_lealtad", { cliente_id: c._id });
                 await recargar(key);
-                alert("✅ Pago aprobado y guardado en Supabase.");
+                alert(`✅ Pago aplicado a ${r.periodo_pagado || "el periodo pendiente"}.\n\nSiguiente periodo: ${String(r.periodo_pendiente || "").slice(0,7)}.`);
             } catch (e) { errorUI("No se pudo aprobar el pago.", e); }
         };
 
@@ -2878,7 +2968,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
  window.gxShowBenefitReady=()=>{goAdminTab('tab-clientes');const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{const r=c.referido_activo;if(r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3)filtered[k]=c});renderizarClientes(filtered)};
  window.gxToggleAccordion=b=>{const a=b.closest('.gx-accordion');const p=a?.parentElement;if(!a||!p)return;p.querySelectorAll(':scope > .gx-accordion').forEach(x=>{if(x!==a)x.classList.remove('open')});a.classList.toggle('open')};
  function restore(){if(!focusHome)return;const{details,parent,next}=focusHome;details.style.display='';details.classList.add('client-details');next&&next.parentNode===parent?parent.insertBefore(details,next):parent.appendChild(details);focusHome=null}
- window.gxOpenClientFocus=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',r=c.referido_activo,ref=r?(r.beneficio_reclamado?'💝 Mes reclamado':`🎁 ${Number(r.meses||0)}/3 meses`):'🎁 Sin referido',g=c.gamificacion||{},mission=g.misiones_activas?`🎟️ Ronda ${Number(g.cupon_ciclo||1)}`:'🎟️ Sin misiones';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>Día ${c.dia_pago||15}</span><span>$${monthly}/mes</span><span>${ref}</span><span>${mission}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
+ window.gxOpenClientFocus=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',r=c.referido_activo,ref=r?(r.beneficio_reclamado?'💝 Mes reclamado':`🎁 ${Number(r.meses||0)}/3 meses`):'🎁 Sin referido',g=c.gamificacion||{},mission=g.misiones_activas?`🎟️ Ronda ${Number(g.cupon_ciclo||1)}`:'🎟️ Sin misiones';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>${typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7)}</span><span>Día ${c.dia_pago||15}</span><span>$${monthly}/mes</span><span>${ref}</span><span>${mission}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
  window.gxCloseClientFocus=()=>{const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;restore();f.classList.remove('show');document.body.style.overflow=''};
  window.toggleClientDetails=key=>gxOpenClientFocus(key);
  function stockLow(){let n=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>{const a=s?._inventario_auto;if(a){const v=s.stock_manual!==undefined&&s.stock_manual!==null&&s.stock_manual!==''?Number(s.stock_manual):Number(a.disponibles_auto??a.disponibles??0);if(v<=1||Number(a.sobrecupo||0)>0)n++}})}catch{}return n}
@@ -3032,7 +3122,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 overdue.push({
                     id:`od-${key}`,tipo:"pago_vencido",categoria:"overdue",
                     titulo:"⚠️ Pago vencido",
-                    mensaje:`${c.nombre} lleva ${timing.days} día${timing.days===1?'':'s'} de atraso. Fecha de pago: día ${c.dia_pago||15}.`,
+                    mensaje:`${c.nombre} lleva ${timing.days} día${timing.days===1?'':'s'} de atraso en ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)}. Fecha de pago: día ${c.dia_pago||15}.`,
                     cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key
                 });
             }else if(timing.type==="upcoming"){
@@ -3040,8 +3130,8 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                     id:`up-${key}`,tipo:"cobro_proximo",categoria:"upcoming",
                     titulo:timing.days===0?"⏰ Pago vence hoy":"⏳ Pago próximo",
                     mensaje:timing.days===0
-                        ? `${c.nombre} tiene fecha de pago hoy (día ${c.dia_pago||15}).`
-                        : `${c.nombre} vence en ${timing.days} día${timing.days===1?'':'s'} (día ${c.dia_pago||15}).`,
+                        ? `${c.nombre} tiene fecha de pago hoy para ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)} (día ${c.dia_pago||15}).`
+                        : `${c.nombre} vence en ${timing.days} día${timing.days===1?'':'s'} para ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)} (día ${c.dia_pago||15}).`,
                     cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key
                 });
             }
@@ -3143,14 +3233,30 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     window.gxRefreshNotifications=async()=>{if(typeof inicializarPanel==="function"){await inicializarPanel();setTimeout(renderNotifications,80)}};
 
     // ---------- Payment alerts ----------
+    window.gxPeriodLabel=function(periodo){
+        const meses=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+        const m=String(periodo||"").match(/^(\d{4})-(\d{2})/);
+        if(!m)return "Periodo actual";
+        return `${meses[Math.max(0,Math.min(11,Number(m[2])-1))]} ${m[1]}`;
+    };
+    window.gxNormalizePeriod=function(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\bde\b/g," ").replace(/\s+/g," ").trim()};
+    window.gxPeriodAlreadyPaid=function(c){
+        const wanted=gxNormalizePeriod(gxPeriodLabel(c?.periodo_pendiente));
+        return (c?.historial_pagos||[]).some(p=>gxNormalizePeriod(p?.periodo||p?.fecha)===wanted && String(p?.estado||"pagado").toLowerCase()==="pagado");
+    };
     window.gxPaymentTiming=function(c){
-        if(!c || c.estado==="pagado" || c.estado==="suspendido" || c.pago_en_revision)return {type:"none",days:0};
-        const now=new Date(), y=now.getFullYear(),m=now.getMonth(),day=Math.min(28,Math.max(1,Number(c.dia_pago||15)));
+        if(!c || c.estado==="suspendido" || c.pago_en_revision || gxPeriodAlreadyPaid(c))return {type:"none",days:0};
+        const now=new Date();
+        const pm=String(c.periodo_pendiente||"").match(/^(\d{4})-(\d{2})/);
+        const y=pm?Number(pm[1]):now.getFullYear();
+        const m=pm?Math.max(0,Math.min(11,Number(pm[2])-1)):now.getMonth();
+        const lastDay=new Date(y,m+1,0).getDate();
+        const day=Math.min(lastDay,Math.max(1,Number(c.dia_pago||15)));
         const due=new Date(y,m,day,23,59,59);
-        const ms=due-now, diff=Math.ceil(ms/86400000);
-        if(diff>=0 && diff<=3)return {type:"upcoming",days:diff};
-        if(diff<0)return {type:"overdue",days:Math.abs(diff)};
-        return {type:"none",days:diff};
+        const diff=Math.ceil((due-now)/86400000);
+        if(diff>=0 && diff<=3)return {type:"upcoming",days:diff,due,periodo:gxPeriodLabel(c.periodo_pendiente)};
+        if(diff<0)return {type:"overdue",days:Math.abs(diff),due,periodo:gxPeriodLabel(c.periodo_pendiente)};
+        return {type:"none",days:diff,due,periodo:gxPeriodLabel(c.periodo_pendiente)};
     };
     window.gxShowPaymentAlert=function(type){
         goAdminTab("tab-clientes");
@@ -3164,7 +3270,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const c=clientesDict?.[key];if(!c)return;
         paymentCtx={key,monto:Number(monto||((c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)))};
         document.getElementById("gx-payment-client-name").textContent=c.nombre;
-        document.getElementById("gx-payment-client-meta").textContent=`${c.folio} · Esperado $${paymentCtx.monto} · Día ${c.dia_pago||15}`;
+        document.getElementById("gx-payment-client-meta").textContent=`${c.folio} · ${gxPeriodLabel(c.periodo_pendiente)} · Esperado $${paymentCtx.monto} · Día ${c.dia_pago||15}`;
         const timing=gxPaymentTiming({...c,estado:"pendiente",pago_en_revision:false});
         document.getElementById("gx-payment-review-card").innerHTML=
             `<strong>Estado actual:</strong> ${c.pago_en_revision?'Comprobante recibido y pendiente de validar':'Sin comprobante en revisión'}<br>`+
@@ -3186,12 +3292,19 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             if(type==="approve"){
                 const puntual=document.getElementById("gx-payment-punctual").checked;
                 const before=Number(c.pagos_puntuales||0);
-                const r=await ops("aprobar_pago",{cliente_id:c._id,monto:paymentCtx.monto,puntual,notas:note});
-                const after=Number(r.pagos_puntuales||0);
-                c.estado="pagado";c.pago_en_revision=false;c.pagos_puntuales=after;c.pago_revision_estado="aprobado";
-                if(puntual && after>before) successMessage=`✅ Pago aprobado.\n\nLealtad: ${before} → ${after} pagos.`;
-                else if(puntual && after===before) successMessage=`✅ Pago aprobado.\n\nLealtad se mantiene en ${after}. Este periodo ya estaba contabilizado o no requería un nuevo incremento.`;
-                else successMessage=`✅ Pago aprobado fuera de fecha.\n\nLealtad actual: ${after} pagos.`;
+                const alreadyPaid=gxPeriodAlreadyPaid(c);
+                const r=await gxPeriodAction("aprobar_pago_periodo",{cliente_id:c._id,monto:paymentCtx.monto,puntual,notas:note||"Aprobado desde Admin Beta"});
+                let after=Number(r.pagos_puntuales||before);
+                if(!puntual && !alreadyPaid){
+                    await gxCoreAdminAction("reiniciar_lealtad",{cliente_id:c._id});
+                    after=0;
+                }
+                c.estado="pagado";c.pago_en_revision=false;c.pagos_puntuales=after;c.pago_revision_estado="aprobado";c.periodo_pendiente=r.periodo_pendiente||c.periodo_pendiente;
+                const periodoPagado=r.periodo_pagado||"el periodo pendiente";
+                const siguiente=gxPeriodLabel(r.periodo_pendiente);
+                if(puntual && after>before) successMessage=`✅ Pago aprobado · ${periodoPagado}.\n\nLealtad: ${before} → ${after} pagos.\nSiguiente periodo: ${siguiente}.`;
+                else if(puntual && after===before) successMessage=`✅ Pago aprobado · ${periodoPagado}.\n\nLealtad se mantiene en ${after}. Este periodo ya estaba contabilizado.\nSiguiente periodo: ${siguiente}.`;
+                else successMessage=`✅ Pago aprobado fuera de fecha · ${periodoPagado}.\n\nLealtad actual: ${after} pagos.\nSiguiente periodo: ${siguiente}.`;
             } else if(type==="incomplete"){
                 const amount=Number(document.getElementById("gx-missing-amount").value||0);
                 const msg=note||`Detectamos un pago incompleto${amount>0?` por $${amount}`:""}. Revisa el monto y vuelve a enviar tu comprobante.`;
