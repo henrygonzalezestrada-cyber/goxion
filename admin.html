@@ -1117,7 +1117,11 @@ Revisa las guías [SOPORTE]"></textarea>
                             <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Día de Cobro</label>
                             <input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" style="width: 100%; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:6px; padding:6px; outline:none; font-size:0.85rem;" onchange="updateClientData('${key}', 'dia_pago', this.value)">
                         </div>
-                        <div style="flex: 2; min-width: 130px;">
+                        <div style="flex: 1.35; min-width: 135px;">
+                            <label style="font-size: 0.7rem; color: var(--neon-blue); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Periodo a Cobrar</label>
+                            <input type="month" value="${String(cliente.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7)}" style="width:100%; background:#12121a; color:#fff; border:1px solid rgba(0,242,254,.28); border-radius:6px; padding:6px; outline:none; font-size:.82rem;" onchange="updateClientData('${key}', 'periodo_pendiente', this.value)">
+                        </div>
+                        <div style="flex: 1.6; min-width: 130px;">
                             <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Estado Cuenta</label>
                             <select class="status-select status-${cliente.estado}" style="width: 100%;" onchange="updateClientData('${key}', 'estado', this.value)">
                                 <option value="pendiente" ${cliente.estado === 'pendiente' ? 'selected' : ''}>Pendiente (Deuda)</option>
@@ -1125,6 +1129,9 @@ Revisa las guías [SOPORTE]"></textarea>
                                 <option value="suspendido" ${cliente.estado === 'suspendido' ? 'selected' : ''}>Suspendido</option>
                             </select>
                         </div>
+                    </div>
+                    <div style="font-size:.66rem;color:var(--text-muted);margin:-3px 0 12px;line-height:1.4;">
+                        El periodo no cambia automáticamente al iniciar un mes nuevo. Avanza cuando apruebas el pago correspondiente.
                     </div>
                     
                     <div class="client-services-list">
@@ -1307,6 +1314,7 @@ Revisa las guías [SOPORTE]"></textarea>
         const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
         const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos`;
+        const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         localStorage.removeItem("GOXION_PAT");
@@ -1408,6 +1416,31 @@ Revisa las guías [SOPORTE]"></textarea>
 
             if (!json) {
                 throw new Error(`admin-datos no devolvió JSON válido.\nRespuesta recibida:\n${text.slice(0, 2000)}`);
+            }
+
+            try {
+                const pr = await fetch(PERIODOS_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": currentToken
+                    },
+                    body: JSON.stringify({ accion: "listar_periodos", datos: {} })
+                });
+                const parsed = await parseResponse(pr);
+                if (pr.status === 401) {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    currentToken = "";
+                    const err = new Error("SESION_EXPIRADA");
+                    err.raw = parsed.text;
+                    throw err;
+                }
+                if (pr.ok && parsed.json?.ok === true) {
+                    json.periodos_cobro = parsed.json.periodos || [];
+                }
+            } catch (e) {
+                if (e?.message === "SESION_EXPIRADA") throw e;
+                console.warn("Periodo de cobro no disponible temporalmente:", e);
             }
 
             console.log("admin-datos RAW:", json);
@@ -1536,6 +1569,10 @@ Revisa las guías [SOPORTE]"></textarea>
             const referidosGlobal = getArray(root, "referidos", "clientes_referidos");
             const gamifGlobal = getArray(root, "gamificacion", "gamificaciones", "clientes_gamificacion");
             const descuentosGlobal = getArray(root, "descuentos", "descuentos_especiales", "clientes_descuentos");
+            const periodosCobro = getArray(root, "periodos_cobro");
+            const periodoPorCliente = new Map(
+                periodosCobro.map(x => [String(x?.id || x?.cliente_id || ""), x?.periodo_pendiente || ""])
+            );
 
             if (!clientes.length) {
                 const keys = Object.keys(root || {});
@@ -1588,6 +1625,7 @@ Revisa las guías [SOPORTE]"></textarea>
                     codigo: "",
                     pagos_puntuales: n(c.pagos_puntuales, 0),
                     dia_pago: n(c.dia_pago, 15),
+                    periodo_pendiente: c.periodo_pendiente || periodoPorCliente.get(String(id)) || new Date().toISOString().slice(0,7) + "-01",
                     estado: c.estado || "pendiente",
                     pago_en_revision: c.pago_en_revision === true,
                     historial_pagos: pagos.map(adaptarPago),
@@ -1685,7 +1723,7 @@ Revisa las guías [SOPORTE]"></textarea>
             }
         };
 
-        console.info("GOXION Admin cargado.");
+        console.info("GOXION Admin oficial: periodo persistente activo.");
     })();
     </script>
 
@@ -1695,6 +1733,7 @@ Revisa las guías [SOPORTE]"></textarea>
     (() => {
         const SB = "https://hmpevcwodcgbkviarfic.supabase.co";
         const ACCIONES = `${SB}/functions/v1/admin-acciones`;
+        const PERIODOS = `${SB}/functions/v1/periodo-cobro`;
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function accion(accion, datos = {}) {
@@ -1708,6 +1747,28 @@ Revisa las guías [SOPORTE]"></textarea>
                     "X-Admin-Token": token
                 },
                 body: JSON.stringify({ accion, datos })
+            });
+
+            const text = await r.text();
+            let body = {};
+            try { body = text ? JSON.parse(text) : {}; } catch {}
+
+            if (!r.ok || body?.ok !== true) {
+                throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+            }
+            return body;
+        }
+        async function accionPeriodo(accionNombre, datos = {}) {
+            const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
+            if (!token) throw new Error("Sesión administrativa no disponible.");
+
+            const r = await fetch(PERIODOS, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Admin-Token": token
+                },
+                body: JSON.stringify({ accion: accionNombre, datos })
             });
 
             const text = await r.text();
@@ -1788,6 +1849,20 @@ Revisa las guías [SOPORTE]"></textarea>
 
                 let v = value;
                 if (field === "dia_pago") v = parseInt(value) || 15;
+
+                if (field === "periodo_pendiente") {
+                    const mes = String(value || "").trim();
+                    if (!/^\d{4}-\d{2}$/.test(mes)) return alert("❌ Selecciona un periodo válido.");
+                    const periodo = `${mes}-01`;
+                    const r = await accionPeriodo("guardar_periodo", {
+                        cliente_id: c._id,
+                        periodo_pendiente: periodo
+                    });
+                    c.periodo_pendiente = r.periodo_pendiente || periodo;
+                    filtrarClientes();
+                    alert("✅ Periodo de cobro actualizado.");
+                    return;
+                }
 
                 // usuario_acceso se mantiene visualmente; el backend principal
                 // se ampliará para persistirlo. Evitamos mentir con un guardado falso.
@@ -1884,18 +1959,19 @@ Revisa las guías [SOPORTE]"></textarea>
 
         // ---------- PAGO ----------
         aprobarPago = async function(key, monto) {
-            if (!confirm("¿Confirmas que verificaste el comprobante de pago de este cliente?")) return;
             const c = cli(key);
             if (!c?._id) return;
+            const periodoVisible = String(c.periodo_pendiente || "").slice(0,7);
+            if (!confirm(`¿Confirmas que verificaste el comprobante?\n\nEste pago se aplicará al periodo: ${periodoVisible || "actual"}.`)) return;
 
             try {
-                await accion("aprobar_pago", {
+                const r = await accionPeriodo("aprobar_pago_periodo", {
                     cliente_id: c._id,
                     monto: num(monto),
                     notas: "Aprobado desde Admin"
                 });
                 await recargar(key);
-                alert("✅ Pago aprobado y guardado en Supabase.");
+                alert(`✅ Pago aplicado a ${r.periodo_pagado || "el periodo pendiente"}.\n\nSiguiente periodo: ${String(r.periodo_pendiente || "").slice(0,7)}.`);
             } catch (e) { errorUI("No se pudo aprobar el pago.", e); }
         };
 
