@@ -343,6 +343,84 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     }
 
 </style>
+
+<style id="goxion-admin-v6-ui">
+    /* Centro de notificaciones: solo pagos y vencimientos */
+    .gx-notification-filter-row{
+        display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none
+    }
+    .gx-notification-filter-row::-webkit-scrollbar{display:none}
+    .gx-notif-filter{
+        flex:0 0 auto;border:1px solid var(--gx-line);background:rgba(255,255,255,.025);
+        color:var(--text-muted);border-radius:999px;padding:7px 10px;font-size:.65rem;
+        font-weight:900;cursor:pointer;white-space:nowrap
+    }
+    .gx-notif-filter.active{
+        color:#fff;border-color:rgba(0,242,254,.35);background:rgba(0,242,254,.08);
+        box-shadow:0 0 14px rgba(0,242,254,.08)
+    }
+    .gx-notif-filter b{
+        display:inline-grid;place-items:center;min-width:19px;height:19px;margin-left:4px;padding:0 5px;
+        border-radius:999px;background:rgba(255,255,255,.07);font-size:.58rem
+    }
+    .gx-notif-item.review{border-color:rgba(188,19,254,.25);background:rgba(188,19,254,.045)}
+    .gx-notif-item.overdue{border-color:rgba(255,77,112,.26);background:rgba(255,77,112,.04)}
+    .gx-notif-item.upcoming{border-color:rgba(255,170,0,.22);background:rgba(255,170,0,.035)}
+    .gx-notif-kind{
+        display:inline-flex;align-items:center;gap:4px;margin-bottom:5px;padding:3px 6px;border-radius:999px;
+        font-size:.56rem;font-weight:900;letter-spacing:.4px;text-transform:uppercase
+    }
+    .gx-notif-kind.review{color:#e5a7ff;background:rgba(188,19,254,.09)}
+    .gx-notif-kind.overdue{color:#ff9db0;background:rgba(255,77,112,.08)}
+    .gx-notif-kind.upcoming{color:#ffd36c;background:rgba(255,170,0,.08)}
+    .gx-notification-toolbar{align-items:center}
+    .gx-notification-toolbar .gx-notif-summary{
+        flex:1;color:var(--text-muted);font-size:.65rem;font-weight:800;line-height:1.25
+    }
+    .gx-notification-toolbar .gx-notif-refresh{
+        flex:0 0 auto;width:38px;height:36px;padding:0;border-radius:10px
+    }
+
+    /* Referidos: vinculación con cliente real */
+    .gx-ref-link-select{display:grid;gap:5px;margin-bottom:9px}
+    .gx-ref-link-select select{
+        width:100%;background:#111118;border:1px solid rgba(0,242,254,.18);color:#fff;
+        border-radius:11px;padding:10px;outline:none;font-size:.74rem;font-weight:700
+    }
+    .gx-ref-link-select select:focus{border-color:rgba(0,242,254,.55);box-shadow:0 0 0 3px rgba(0,242,254,.05)}
+    .gx-ref-linked-card{
+        display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:8px 0 10px;
+        padding:10px;border:1px solid rgba(0,242,254,.12);border-radius:12px;background:rgba(0,242,254,.025)
+    }
+    .gx-ref-linked-card strong{display:block;font-size:.76rem}
+    .gx-ref-linked-card small{display:block;color:var(--text-muted);font-size:.62rem;margin-top:2px}
+    .gx-ref-linked-badge{
+        padding:5px 7px;border-radius:999px;border:1px solid rgba(0,242,254,.14);
+        color:var(--neon-blue);font-size:.58rem;font-weight:900;white-space:nowrap
+    }
+    .gx-ref-auto-services{
+        margin:9px 0;padding:9px;border-radius:12px;border:1px solid var(--gx-line);
+        background:rgba(255,255,255,.02)
+    }
+    .gx-ref-auto-services-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .gx-ref-auto-services-head span{font-size:.66rem;color:var(--text-muted);font-weight:800}
+    .gx-ref-auto-services-head strong{font-size:.68rem;color:var(--neon-blue)}
+    .gx-ref-detected-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+    .gx-ref-detected-chips span{
+        padding:5px 7px;border-radius:999px;background:rgba(0,242,254,.07);
+        border:1px solid rgba(0,242,254,.13);color:#cceff3;font-size:.58rem;font-weight:800
+    }
+    .gx-ref-detected-empty{margin-top:8px;color:#ffbf66;font-size:.63rem;line-height:1.35}
+    .gx-ref-resync{
+        margin-top:8px;border:0;background:none;color:var(--neon-blue);font-size:.62rem;
+        font-weight:900;cursor:pointer;padding:0
+    }
+    .gx-ref-link-legacy{
+        margin:7px 0 10px;padding:8px;border-radius:10px;background:rgba(255,170,0,.06);
+        border:1px solid rgba(255,170,0,.14);color:#ffd36c;font-size:.62rem;line-height:1.35
+    }
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -462,8 +540,14 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             <button class="gx-focus-close" type="button" onclick="gxToggleNotifications(false)">×</button>
         </div>
         <div class="gx-notification-toolbar">
-            <button type="button" onclick="gxMarkAllNotificationsRead()">✓ Marcar leídas</button>
-            <button type="button" onclick="gxRefreshNotifications()">↻ Actualizar</button>
+            <div class="gx-notif-summary" id="gx-notification-summary">Pagos que requieren atención y fechas de vencimiento.</div>
+            <button class="gx-notif-refresh" type="button" onclick="gxRefreshNotifications()" title="Actualizar">↻</button>
+        </div>
+        <div class="gx-notification-filter-row" id="gx-notification-filters">
+            <button type="button" class="gx-notif-filter active" data-gx-notif-filter="all" onclick="gxSetNotificationFilter('all',this)">Todos <b id="gx-notif-count-all">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="review" onclick="gxSetNotificationFilter('review',this)">Por revisar <b id="gx-notif-count-review">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="overdue" onclick="gxSetNotificationFilter('overdue',this)">Vencidos <b id="gx-notif-count-overdue">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="upcoming" onclick="gxSetNotificationFilter('upcoming',this)">Próximos <b id="gx-notif-count-upcoming">0</b></button>
         </div>
         <div id="gx-notification-list" class="gx-notification-list"></div>
     </aside>
@@ -1150,19 +1234,50 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             let refSelectedServices = Array.isArray(refActivo?.servicios) ? refActivo.servicios : [];
             let refStart = refActivo?.fecha_inicio || new Date().toISOString().slice(0,10);
             let refSmartMonths = gxReferralSmartMonths(refActivo);
+            let refCandidates = Object.entries(clientesDict || {})
+                .filter(([candidateKey]) => candidateKey !== key)
+                .sort((a,b) => String(a[1]?.nombre || "").localeCompare(String(b[1]?.nombre || ""), "es"));
+            let refSelectedKey = refActivo
+                ? (refCandidates.find(([,candidate]) => String(candidate?.nombre || "").trim().toLowerCase() === String(refActivo?.nombre || "").trim().toLowerCase())?.[0] || "")
+                : "";
+            let refLinkedClient = refSelectedKey ? clientesDict[refSelectedKey] : null;
+            let refLinkedServices = refLinkedClient
+                ? [...new Set((refLinkedClient.servicios || []).filter(s => s?.activo !== false).map(s => s?.nombre).filter(Boolean))]
+                : refSelectedServices;
             let refHTML = `
                 <div class="gx-ref-admin">
                     <div class="gx-ref-admin-head">
                         <div>
                             <strong>🎁 Referido inteligente</strong>
-                            <small id="gx-ref-head-${key}">${refActivo ? `${refSmartMonths}/3 meses · ${refSelectedServices.length} servicios` : 'Sin referido activo'}</small>
+                            <small id="gx-ref-head-${key}">${refActivo ? `${refSmartMonths}/3 meses · ${refLinkedServices.length} servicios` : 'Sin referido activo'}</small>
                         </div>
                         <label class="switch" style="transform:scale(.72);margin:0;"><input type="checkbox" ${refActivo ? 'checked' : ''} onchange="toggleReferido('${key}', this.checked)"><span class="slider"></span></label>
                     </div>
                     ${refActivo ? `
-                        <label class="gx-field-label">Nombre del referido
-                            <input type="text" value="${refActivo.nombre || ''}" onchange="gxSaveReferralSmart('${key}', {nombre:this.value})">
-                        </label>
+                        <div class="gx-ref-link-select">
+                            <span class="gx-field-label">Cliente referido</span>
+                            <select id="gx-ref-client-select-${key}" onchange="gxSelectReferralClient('${key}', this.value)">
+                                <option value="">Seleccionar cliente registrado…</option>
+                                ${refCandidates.map(([candidateKey,candidate]) => `
+                                    <option value="${candidateKey}" ${candidateKey === refSelectedKey ? 'selected' : ''}>
+                                        ${candidate.nombre || 'Cliente'}${candidate.folio ? ` · ${candidate.folio}` : ''}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+
+                        ${refLinkedClient ? `
+                            <div class="gx-ref-linked-card" id="gx-ref-linked-${key}">
+                                <div>
+                                    <strong>${refLinkedClient.nombre || 'Cliente'}</strong>
+                                    <small>${refLinkedClient.folio || 'Sin folio'} · ${refLinkedClient.estado || 'pendiente'}</small>
+                                </div>
+                                <span class="gx-ref-linked-badge">${refLinkedServices.length} servicio${refLinkedServices.length===1?'':'s'}</span>
+                            </div>
+                        ` : (refActivo.nombre ? `
+                            <div class="gx-ref-link-legacy">El referido actual “${refActivo.nombre}” todavía no está vinculado a un cliente del Admin. Selecciona arriba el cliente correcto para detectar sus servicios automáticamente.</div>
+                        ` : '')}
+
                         <div class="gx-ref-progress-row">
                             <label class="gx-field-label gx-ref-date-compact">Inicio
                                 <input type="date" value="${refStart}" onchange="gxSaveReferralSmart('${key}', {fecha_inicio:this.value})">
@@ -1177,22 +1292,24 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                                 </div>
                             </div>
                         </div>
-                        <div class="gx-field-label">
-                            <span>Servicios activos del referido</span>
-                            <details class="gx-ref-service-picker">
-                                <summary id="gx-ref-service-summary-${key}">${refSelectedServices.length ? `${refSelectedServices.length} seleccionados` : 'Seleccionar servicios'}</summary>
-                                <div class="gx-ref-service-options">
-                                    ${refServiceOptions.map((name, refIdx) => `
-                                        <label><input type="checkbox" ${refSelectedServices.includes(name) ? 'checked' : ''} onchange="gxToggleReferralServiceIndex('${key}', ${refIdx}, this.checked)"> <span>${name}</span></label>
-                                    `).join('')}
-                                </div>
-                            </details>
+
+                        <div class="gx-ref-auto-services">
+                            <div class="gx-ref-auto-services-head">
+                                <span>Servicios detectados automáticamente</span>
+                                <strong id="gx-ref-service-summary-${key}">${refLinkedServices.length}</strong>
+                            </div>
+                            <div class="gx-ref-detected-chips" id="gx-ref-service-chips-${key}">
+                                ${refLinkedServices.length
+                                    ? refLinkedServices.map(name => `<span>✓ ${name}</span>`).join('')
+                                    : `<div class="gx-ref-detected-empty">${refSelectedKey ? 'El cliente seleccionado no tiene servicios activos.' : 'Selecciona un cliente para detectar sus servicios activos.'}</div>`}
+                            </div>
+                            ${refSelectedKey ? `<button type="button" class="gx-ref-resync" onclick="gxResyncReferralClient('${key}')">↻ Volver a detectar servicios</button>` : ''}
                         </div>
-                        <div id="gx-ref-status-${key}" class="gx-ref-smart-status ${refSelectedServices.length >= 2 ? 'ok' : 'warn'}">
+                        <div id="gx-ref-status-${key}" class="gx-ref-smart-status ${refLinkedServices.length >= 2 ? 'ok' : 'warn'}">
                             ${refActivo.beneficio_reclamado
                                 ? '💝 Beneficio ya reclamado'
-                                : (refSelectedServices.length < 2
-                                    ? `⚠️ Falta ${2-refSelectedServices.length} servicio${2-refSelectedServices.length === 1 ? '' : 's'} para continuar acumulando meses`
+                                : (refLinkedServices.length < 2
+                                    ? `⚠️ Falta ${2-refLinkedServices.length} servicio${2-refLinkedServices.length === 1 ? '' : 's'} para continuar acumulando meses`
                                     : (refSmartMonths >= 3 ? '🎁 3/3 · Beneficio listo para reclamar' : `✓ Progreso automático: ${refSmartMonths}/3 meses`))}
                         </div>
                         <div class="gx-ref-management-actions">
@@ -1570,7 +1687,8 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 monto: n(s.monto ?? s.precio ?? s.precio_cliente, 0),
                 correo_login: s.correo_login || s.correo || s.email || "",
                 perfil_nombre: s.perfil_nombre || s.perfil || "",
-                perfil_pin: s.perfil_pin || s.pin_perfil || ""
+                perfil_pin: s.perfil_pin || s.pin_perfil || "",
+                activo: s.activo !== false
             };
         }
 
@@ -2830,50 +2948,156 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(s<60)return "ahora"; if(s<3600)return `hace ${Math.floor(s/60)} min`; if(s<86400)return `hace ${Math.floor(s/3600)} h`; return `hace ${Math.floor(s/86400)} d`;
     }
     function clientKeyById(id){return Object.entries(clientesDict||{}).find(([,c])=>c._id===id)?.[0]||null}
-    function syntheticPaymentAlerts(){
-        const out=[];
+
+    window.gxNotificationFilter = window.gxNotificationFilter || "all";
+
+    function paymentNotificationModel(){
+        const persisted=Array.isArray(window.gxAdminNotifications)?window.gxAdminNotifications:[];
+        const latestReviewByClient=new Map();
+
+        persisted
+            .filter(n=>String(n?.tipo||"").toLowerCase()==="pago_revision")
+            .forEach(n=>{
+                const id=String(n?.cliente_id||"");
+                const prev=latestReviewByClient.get(id);
+                if(!prev || new Date(n.created_at||0)>new Date(prev.created_at||0)) latestReviewByClient.set(id,n);
+            });
+
+        const reviews=[], overdue=[], upcoming=[];
+
         Object.entries(clientesDict||{}).forEach(([key,c])=>{
-            const a=gxPaymentTiming(c);
-            if(a.type==="upcoming")out.push({id:`up-${key}`,tipo:"cobro_proximo",titulo:"⏳ Pago próximo",mensaje:`${c.nombre} vence en ${a.days} día${a.days===1?'':'s'} (día ${c.dia_pago||15}).`,cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key});
-            if(a.type==="overdue")out.push({id:`od-${key}`,tipo:"pago_vencido",titulo:"⚠️ Pago vencido",mensaje:`${c.nombre} lleva ${a.days} día${a.days===1?'':'s'} vencido.`,cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key});
+            if(c.pago_en_revision===true){
+                const persistedReview=latestReviewByClient.get(String(c._id||""));
+                reviews.push({
+                    ...(persistedReview||{}),
+                    id:persistedReview?.id||`review-${key}`,
+                    tipo:"pago_revision",
+                    categoria:"review",
+                    titulo:persistedReview?.titulo||"💳 Pago pendiente de revisión",
+                    mensaje:persistedReview?.mensaje||`${c.nombre} tiene un comprobante pendiente de validar.`,
+                    cliente_id:c._id,
+                    cliente_nombre:c.nombre,
+                    leida:persistedReview?.leida===true,
+                    created_at:persistedReview?.created_at||new Date().toISOString(),
+                    synthetic:!persistedReview,
+                    key
+                });
+                return;
+            }
+
+            const timing=gxPaymentTiming(c);
+            if(timing.type==="overdue"){
+                overdue.push({
+                    id:`od-${key}`,tipo:"pago_vencido",categoria:"overdue",
+                    titulo:"⚠️ Pago vencido",
+                    mensaje:`${c.nombre} lleva ${timing.days} día${timing.days===1?'':'s'} de atraso. Fecha de pago: día ${c.dia_pago||15}.`,
+                    cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key
+                });
+            }else if(timing.type==="upcoming"){
+                upcoming.push({
+                    id:`up-${key}`,tipo:"cobro_proximo",categoria:"upcoming",
+                    titulo:timing.days===0?"⏰ Pago vence hoy":"⏳ Pago próximo",
+                    mensaje:timing.days===0
+                        ? `${c.nombre} tiene fecha de pago hoy (día ${c.dia_pago||15}).`
+                        : `${c.nombre} vence en ${timing.days} día${timing.days===1?'':'s'} (día ${c.dia_pago||15}).`,
+                    cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key
+                });
+            }
         });
-        return out;
+
+        return {reviews,overdue,upcoming,all:[...reviews,...overdue,...upcoming]};
     }
+
+    function updateNotificationCounts(model){
+        const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+        set("gx-notif-count-all",model.all.length);
+        set("gx-notif-count-review",model.reviews.length);
+        set("gx-notif-count-overdue",model.overdue.length);
+        set("gx-notif-count-upcoming",model.upcoming.length);
+
+        const urgent=model.reviews.length+model.overdue.length;
+        const bell=document.getElementById("gx-notification-bell");
+        bell?.classList.toggle("has-new",urgent>0);
+        const badge=document.getElementById("gx-notification-badge");
+        if(badge)badge.title=urgent?`${urgent} requieren atención`:"Sin pagos urgentes";
+
+        const summary=document.getElementById("gx-notification-summary");
+        if(summary){
+            if(model.reviews.length) summary.textContent=`${model.reviews.length} pago${model.reviews.length===1?'':'s'} por revisar · ${model.overdue.length} vencido${model.overdue.length===1?'':'s'}`;
+            else if(model.overdue.length) summary.textContent=`${model.overdue.length} pago${model.overdue.length===1?'':'s'} vencido${model.overdue.length===1?'':'s'} requieren seguimiento.`;
+            else summary.textContent="Sin pagos urgentes. Revisa los próximos vencimientos.";
+        }
+    }
+
     function renderNotifications(){
         const list=document.getElementById("gx-notification-list");
         if(!list)return;
-        const persisted=Array.isArray(window.gxAdminNotifications)?window.gxAdminNotifications:[];
-        const all=[...persisted,...syntheticPaymentAlerts()].sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-        const unread=persisted.filter(x=>!x.leida).length;
-        const bell=document.getElementById("gx-notification-bell");
-        bell?.classList.toggle("has-new",unread>0);
-        const badge=document.getElementById("gx-notification-badge");
-        if(badge)badge.title=`${unread} nuevas`;
-        list.innerHTML=all.length?all.map(n=>{
+
+        const model=paymentNotificationModel();
+        updateNotificationCounts(model);
+
+        let items=window.gxNotificationFilter==="review" ? model.reviews
+            : window.gxNotificationFilter==="overdue" ? model.overdue
+            : window.gxNotificationFilter==="upcoming" ? model.upcoming
+            : model.all;
+
+        const priority={review:0,overdue:1,upcoming:2};
+        items=[...items].sort((a,b)=>{
+            const pa=priority[a.categoria]??9,pb=priority[b.categoria]??9;
+            if(pa!==pb)return pa-pb;
+            return new Date(b.created_at||0)-new Date(a.created_at||0);
+        });
+
+        const labels={review:"Por revisar",overdue:"Vencido",upcoming:"Próximo"};
+        list.innerHTML=items.length?items.map(n=>{
             const key=n.key||clientKeyById(n.cliente_id);
-            return `<div class="gx-notif-item ${!n.leida?'unread':''}">
+            const cls=n.categoria||"";
+            const action=n.categoria==="review"?"Revisar pago →":"Abrir cliente →";
+            return `<div class="gx-notif-item ${cls} ${n.categoria==="review"&&!n.leida?'unread':''}">
+                <span class="gx-notif-kind ${cls}">${labels[cls]||"Pago"}</span>
                 <strong>${n.titulo||"Actividad"}</strong>
                 <p>${n.mensaje||""}</p>
                 <small>${n.cliente_nombre?`${n.cliente_nombre} · `:""}${relativeTime(n.created_at)}</small>
-                ${key?`<button class="gx-notif-action" onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}')">Abrir cliente →</button>`:""}
+                ${key?`<button class="gx-notif-action" onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}')">${action}</button>`:""}
             </div>`;
-        }).join(""):`<div class="gx-empty-inline">No hay actividad nueva.</div>`;
+        }).join(""):`<div class="gx-empty-inline">No hay avisos en esta categoría.</div>`;
     }
+
+    window.gxSetNotificationFilter=function(filter,btn){
+        window.gxNotificationFilter=filter||"all";
+        document.querySelectorAll("[data-gx-notif-filter]").forEach(x=>x.classList.toggle("active",x===btn));
+        renderNotifications();
+    };
+
     window.gxToggleNotifications=function(force){
         const drawer=document.getElementById("gx-notification-drawer"),overlay=document.getElementById("gx-notification-overlay");
         const show=force===undefined?!drawer.classList.contains("show"):Boolean(force);
         drawer.classList.toggle("show",show);overlay.classList.toggle("show",show);drawer.setAttribute("aria-hidden",show?"false":"true");
         if(show)renderNotifications();
     };
+
     window.gxOpenNotificationClient=(key,tipo)=>{
         gxToggleNotifications(false);
         goAdminTab("tab-clientes");
         setTimeout(()=>{
             gxOpenClientFocus(key);
-            if(tipo==="pagos" || tipo==="pago_revision") setTimeout(()=>gxOpenPaymentModal(key),150);
+            if(tipo==="pago_revision") setTimeout(()=>gxOpenPaymentModal(key),150);
         },80);
     };
-    window.gxMarkAllNotificationsRead=async()=>{try{await ops("marcar_notificaciones_leidas",{});(window.gxAdminNotifications||[]).forEach(n=>n.leida=true);renderNotifications()}catch(e){alert("No se pudieron marcar como leídas.\n\n"+e.message)}};
+
+    // Se conservan en Supabase los eventos existentes, pero el Centro de Operaciones
+    // solo muestra pagos/fechas. Logins, soporte y pedidos continúan por Discord.
+    window.gxMarkAllNotificationsRead=async()=>{
+        const ids=(window.gxAdminNotifications||[])
+            .filter(n=>String(n?.tipo||"").toLowerCase()==="pago_revision" && !n.leida)
+            .map(n=>n.id).filter(Boolean);
+        if(!ids.length)return;
+        try{
+            await ops("marcar_notificaciones_leidas",{ids});
+            (window.gxAdminNotifications||[]).forEach(n=>{if(ids.includes(n.id))n.leida=true});
+            renderNotifications();
+        }catch(e){console.warn("No se pudieron marcar avisos de pago como leídos",e)}
+    };
     window.gxRefreshNotifications=async()=>{if(typeof inicializarPanel==="function"){await inicializarPanel();setTimeout(renderNotifications,80)}};
 
     // ---------- Payment alerts ----------
@@ -3185,6 +3409,154 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         setTimeout(()=>updateRefUI(key),40);
         return r;
     };
+})();
+</script>
+
+
+<script id="goxion-admin-v6-referral-linking">
+(() => {
+    function gxRefObj(key){ return clientesDict?.[key]?.referido_activo || null; }
+    function gxActiveServiceNames(client){
+        return [...new Set((client?.servicios || [])
+            .filter(s => s?.activo !== false)
+            .map(s => String(s?.nombre || "").trim())
+            .filter(Boolean))];
+    }
+    function gxFindLinkedKey(referrerKey, r){
+        if(!r?.nombre) return "";
+        const wanted=String(r.nombre).trim().toLowerCase();
+        return Object.entries(clientesDict || {}).find(([k,c]) =>
+            k !== referrerKey && String(c?.nombre || "").trim().toLowerCase() === wanted
+        )?.[0] || "";
+    }
+    function gxEffectiveMonthsV6(r){
+        if(!r) return 0;
+        if(r.meses_override !== null && r.meses_override !== undefined) return Math.max(0,Math.min(3,Number(r.meses_override)||0));
+        if(r.meses_efectivos !== undefined && r.meses_efectivos !== null) return Math.max(0,Math.min(3,Number(r.meses_efectivos)||0));
+        if(typeof gxReferralSmartMonths === "function") return gxReferralSmartMonths(r);
+        return Math.max(0,Math.min(3,Number(r.meses)||0));
+    }
+    function gxUpdateLinkedReferralUI(key){
+        const r=gxRefObj(key); if(!r)return;
+        const selectedKey=document.getElementById(`gx-ref-client-select-${key}`)?.value || gxFindLinkedKey(key,r);
+        const target=selectedKey ? clientesDict?.[selectedKey] : null;
+        const services=target ? gxActiveServiceNames(target) : (Array.isArray(r.servicios)?r.servicios:[]);
+        const months=gxEffectiveMonthsV6(r);
+
+        const head=document.getElementById(`gx-ref-head-${key}`);
+        const month=document.getElementById(`gx-ref-month-${key}`);
+        const count=document.getElementById(`gx-ref-service-summary-${key}`);
+        const chips=document.getElementById(`gx-ref-service-chips-${key}`);
+        const status=document.getElementById(`gx-ref-status-${key}`);
+        const auto=document.getElementById(`gx-ref-auto-${key}`);
+
+        if(head) head.textContent=`${months}/3 meses · ${services.length} servicio${services.length===1?'':'s'}`;
+        if(month) month.textContent=`${months}/3`;
+        if(count) count.textContent=String(services.length);
+        if(auto) auto.classList.toggle("active",r.meses_override===null||r.meses_override===undefined);
+
+        if(chips){
+            chips.innerHTML=services.length
+                ? services.map(name=>`<span>✓ ${name}</span>`).join("")
+                : `<div class="gx-ref-detected-empty">${target?'El cliente seleccionado no tiene servicios activos.':'Selecciona un cliente para detectar sus servicios activos.'}</div>`;
+        }
+
+        if(status){
+            status.classList.toggle("ok",services.length>=2);
+            status.classList.toggle("warn",services.length<2);
+            if(r.beneficio_reclamado) status.textContent="💝 Beneficio ya reclamado";
+            else if(services.length<2) status.textContent=`⚠️ Falta ${2-services.length} servicio${2-services.length===1?'':'s'} para cumplir el requisito`;
+            else if(months>=3) status.textContent="🎁 3/3 · Beneficio listo para reclamar";
+            else status.textContent=`✓ Progreso ${r.meses_override == null ? 'automático' : 'manual'}: ${months}/3 meses`;
+        }
+    }
+
+    window.gxSelectReferralClient = async function(referrerKey,targetKey){
+        const referrer=clientesDict?.[referrerKey];
+        const target=clientesDict?.[targetKey];
+        const r=gxRefObj(referrerKey);
+        if(!referrer?._id || !r) return;
+        if(!targetKey || !target) return;
+
+        const previous={
+            nombre:r.nombre,
+            servicios:[...(r.servicios||[])],
+            plataformas:r.plataformas,
+            fecha_inicio:r.fecha_inicio
+        };
+        const services=gxActiveServiceNames(target);
+
+        r.nombre=target.nombre||"";
+        r.servicios=services;
+        r.plataformas=services.length;
+        r.fecha_inicio=r.fecha_inicio||new Date().toISOString().slice(0,10);
+        gxUpdateLinkedReferralUI(referrerKey);
+
+        try{
+            const x=await gxOpsBeta("guardar_referido_inteligente",{
+                cliente_id:referrer._id,
+                nombre:r.nombre,
+                servicios:r.servicios,
+                fecha_inicio:r.fecha_inicio
+            });
+            Object.assign(r,x.referido||{});
+            r.servicios=Array.isArray(x.referido?.servicios)?x.referido.servicios:services;
+            r.plataformas=r.servicios.length;
+            gxUpdateLinkedReferralUI(referrerKey);
+
+            // Refrescamos la ficha para mostrar folio/estado del cliente vinculado.
+            if(typeof gxCloseClientFocus==="function") gxCloseClientFocus();
+            if(typeof filtrarClientes==="function") filtrarClientes();
+            setTimeout(()=>{ if(typeof gxOpenClientFocus==="function") gxOpenClientFocus(referrerKey); },90);
+        }catch(e){
+            r.nombre=previous.nombre;
+            r.servicios=previous.servicios;
+            r.plataformas=previous.plataformas;
+            r.fecha_inicio=previous.fecha_inicio;
+            gxUpdateLinkedReferralUI(referrerKey);
+            alert("No se pudo vincular el cliente referido.\n\n"+(e?.message||e));
+        }
+    };
+
+    window.gxResyncReferralClient = function(referrerKey){
+        const select=document.getElementById(`gx-ref-client-select-${referrerKey}`);
+        const targetKey=select?.value || gxFindLinkedKey(referrerKey,gxRefObj(referrerKey));
+        if(!targetKey) return alert("Selecciona primero el cliente referido.");
+        return window.gxSelectReferralClient(referrerKey,targetKey);
+    };
+
+    // El switch de Referido ahora crea un registro vacío e inteligente.
+    window.toggleReferido = async function(key,isChecked){
+        const c=clientesDict?.[key];
+        if(!c?._id) return;
+        try{
+            if(isChecked){
+                const today=new Date().toISOString().slice(0,10);
+                await gxOpsBeta("guardar_referido_inteligente",{
+                    cliente_id:c._id,
+                    nombre:"",
+                    servicios:[],
+                    fecha_inicio:today
+                });
+            }else{
+                await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+            }
+
+            if(typeof gxCloseClientFocus==="function") gxCloseClientFocus();
+            if(typeof inicializarPanel==="function") await inicializarPanel();
+            setTimeout(()=>{
+                if(typeof filtrarClientes==="function") filtrarClientes();
+                if(isChecked && typeof gxOpenClientFocus==="function") gxOpenClientFocus(key);
+            },100);
+        }catch(e){
+            alert(`No se pudo ${isChecked?'activar':'desactivar'} el referido.\n\n${e?.message||e}`);
+            if(typeof filtrarClientes==="function") filtrarClientes();
+        }
+    };
+
+    // Los antiguos checkboxes manuales quedan sin uso, pero mantenemos las funciones
+    // para compatibilidad con cualquier ficha abierta antes de actualizar.
+    window.gxRefreshReferralLinkedUI = gxUpdateLinkedReferralUI;
 })();
 </script>
 
