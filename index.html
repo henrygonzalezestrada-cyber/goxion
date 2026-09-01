@@ -284,7 +284,7 @@
 (() => {
     const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
     const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
-    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro";
+    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro-beta";
     const TOKEN_KEY = "goxion_client_token";
     const nativeFetch = window.fetch.bind(window);
 
@@ -309,6 +309,8 @@ function goxionBetaLegacy(data) {
             usuario_acceso: c.usuario_acceso || "",
             dia_pago: Number(c.dia_pago || 15),
             periodo_pendiente: c.periodo_pendiente || data?.periodo_pendiente || "",
+            ciclo_cobro_manual: c.ciclo_cobro_manual === true,
+            corte_virtual: c.corte_virtual === true,
             estado: c.estado || "pendiente",
             pago_en_revision: c.pago_en_revision === true,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
@@ -380,7 +382,12 @@ function goxionBetaLegacy(data) {
                     const periodoData = await periodoR.json();
                     if (periodoData?.ok === true) {
                         json.periodo_pendiente = periodoData.periodo_pendiente || "";
-                        if (json.cliente) json.cliente.periodo_pendiente = periodoData.periodo_pendiente || "";
+                        if (json.cliente) {
+                            json.cliente.periodo_pendiente = periodoData.periodo_pendiente || "";
+                            if (periodoData.estado) json.cliente.estado = periodoData.estado;
+                            json.cliente.ciclo_cobro_manual = periodoData.ciclo_cobro_manual === true;
+                            json.cliente.corte_virtual = periodoData.corte_aplicado === true;
+                        }
                     }
                 } catch {}
             }
@@ -949,5 +956,6 @@ function goxionBetaLegacy(data) {
   cargarEstadoCuenta();
 </script>
 
+<script>console.info("GOXION Index Beta V5: ciclo mensual automático en prueba.");</script>
 </body>
 </html>
