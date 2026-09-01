@@ -447,6 +447,20 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     @media(max-width:520px){.gx-billing-overview{grid-template-columns:1fr 1fr}.gx-cycle-badge{grid-column:1/-1;width:max-content}.gx-cycle-mode-row{align-items:flex-start;flex-direction:column}.gx-cycle-segment{width:100%}.gx-cycle-segment button{flex:1}.gx-service-actions-pop{position:fixed;left:16px;right:16px;bottom:92px;top:auto;width:auto}}
 </style>
 
+
+<style id="goxion-admin-v10-trato-justo">
+.gx-trato-badge{width:100%;margin-top:6px;padding:7px 9px;border:1px solid rgba(0,255,157,.18);border-radius:9px;background:rgba(0,255,157,.045);color:#72ffd4;text-align:left;font-size:.6rem;font-weight:850;cursor:pointer}
+.gx-tj-overlay{position:fixed;inset:0;z-index:50000;display:none;align-items:flex-end;justify-content:center}.gx-tj-overlay.show{display:flex}.gx-tj-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.gx-tj-modal{position:relative;z-index:1;width:min(520px,100%);max-height:90vh;overflow:auto;border:1px solid rgba(0,242,254,.18);border-bottom:0;border-radius:24px 24px 0 0;background:linear-gradient(180deg,#0e0e15,#07070b);box-shadow:0 -24px 70px rgba(0,0,0,.6)}
+.gx-tj-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--gx-line)}.gx-tj-head>div{display:flex;flex-direction:column}.gx-tj-head span{color:var(--neon-blue);font-size:.56rem;font-weight:900;letter-spacing:1.2px}.gx-tj-head strong{margin-top:2px;font-size:1.05rem}.gx-tj-head button{width:34px;height:34px;border:1px solid var(--gx-line);border-radius:10px;background:rgba(255,255,255,.04);color:#fff;font-size:1.25rem}
+.gx-tj-body{padding:13px 15px}.gx-tj-service{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 11px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.025);margin-bottom:10px}.gx-tj-service small,.gx-tj-result small{display:block;color:var(--text-muted);font-size:.56rem;font-weight:800;text-transform:uppercase}.gx-tj-service strong{display:block;margin-top:2px;font-size:.76rem}.gx-tj-service>div:last-child{text-align:right}
+.gx-tj-field{display:block;margin-top:9px}.gx-tj-field>span,.gx-tj-days-block>div:first-child>span{display:block;color:var(--text-muted);font-size:.59rem;font-weight:850;text-transform:uppercase;margin-bottom:4px}.gx-tj-field input,.gx-tj-field select{width:100%;min-height:40px;padding:9px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:#12121a;color:#fff}
+.gx-tj-days-block{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px;border:1px solid var(--gx-line);border-radius:12px}.gx-tj-days-block small{display:block;color:var(--text-muted);font-size:.57rem}.gx-tj-stepper{display:grid;grid-template-columns:34px 38px 34px;align-items:center}.gx-tj-stepper button{height:34px;border:1px solid var(--gx-line);background:#111118;color:#fff;font-size:1rem}.gx-tj-stepper button:first-child{border-radius:9px 0 0 9px}.gx-tj-stepper button:last-child{border-radius:0 9px 9px 0}.gx-tj-stepper strong{text-align:center;font-size:.82rem}
+.gx-tj-result{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.gx-tj-result>div{padding:10px;border:1px solid rgba(0,255,157,.15);border-radius:11px;background:rgba(0,255,157,.035)}.gx-tj-result>div:last-child{text-align:right}.gx-tj-result strong{display:block;margin-top:2px;color:#72ffd4;font-size:.9rem}.gx-tj-policy{margin-top:9px;color:var(--text-muted);font-size:.57rem;line-height:1.45}
+.gx-tj-actions{display:grid;grid-template-columns:auto 1fr 1.4fr;gap:7px;padding:11px 15px max(13px,env(safe-area-inset-bottom));border-top:1px solid var(--gx-line)}.gx-tj-actions button{min-height:40px;border-radius:10px;font-weight:850}.gx-tj-delete{border:1px solid rgba(255,68,102,.2);background:rgba(255,68,102,.06);color:#ff7891}.gx-tj-cancel{border:1px solid var(--gx-line);background:rgba(255,255,255,.03);color:#fff}.gx-tj-save{border:0;background:linear-gradient(135deg,var(--neon-blue),#4b95ff);color:#031014}
+@media(min-width:700px){.gx-tj-overlay{align-items:center}.gx-tj-modal{border-bottom:1px solid rgba(0,242,254,.18);border-radius:22px}}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -1197,11 +1211,15 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                                 <details class="gx-service-actions-menu">
                                     <summary title="Más acciones">•••</summary>
                                     <div class="gx-service-actions-pop">
-                                        <button type="button" onclick="aplicarTratoJusto('${key}', ${s.monto});this.closest('details').removeAttribute('open')">🚨 Aplicar Trato Justo</button>
+                                        <button type="button" onclick="gxOpenTratoJusto('${key}', ${sIdx});this.closest('details').removeAttribute('open')">🛡 Gestionar Trato Justo</button>
                                         <button type="button" class="danger" onclick="removeClientService('${key}', ${sIdx});this.closest('details').removeAttribute('open')">✖ Eliminar servicio</button>
                                     </div>
                                 </details>
                             </div>
+                            ${(() => {
+                                const comp = (cliente.trato_justo_compensaciones || []).find(t => String(t.cliente_servicio_id||"") === String(s._id||s.id||"") && t.activo !== false && String(t.periodo||"").slice(0,7) === String(cliente.periodo_pendiente||"").slice(0,7));
+                                return comp ? `<button type="button" class="gx-trato-badge" onclick="gxOpenTratoJusto('${key}', ${sIdx})">🛡 Trato Justo · ${Number(comp.dias_falla||0)} día${Number(comp.dias_falla||0)===1?'':'s'} · -$${Number(comp.monto||0).toFixed(2)}</button>` : '';
+                            })()}
                             <details class="gx-service-access-details">
                                 <summary><span>🔑 Editar acceso</span><em>${(s.perfil_nombre || s.perfil_pin) ? 'Configurado' : 'Abrir'}</em></summary>
                                 <div class="cred-box gx-service-cred-collapsed">
@@ -1608,6 +1626,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
         const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos-beta`;
         const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro-beta`;
+        const TRATO_URL = `${SUPABASE_URL}/functions/v1/trato-justo-beta`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         localStorage.removeItem("GOXION_PAT");
@@ -1736,6 +1755,33 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             } catch (e) {
                 if (e?.message === "SESION_EXPIRADA") throw e;
                 console.warn("Periodo de cobro no disponible temporalmente:", e);
+            }
+
+            try {
+                const tr = await fetch(TRATO_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": currentToken
+                    },
+                    body: JSON.stringify({ accion: "listar_todas", datos: {} })
+                });
+                const parsed = await parseResponse(tr);
+                if (tr.status === 401) {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    currentToken = "";
+                    const err = new Error("SESION_EXPIRADA");
+                    err.raw = parsed.text;
+                    throw err;
+                }
+                if (tr.ok && parsed.json?.ok === true) {
+                    json.trato_justo_compensaciones = parsed.json.compensaciones || [];
+                } else {
+                    console.warn("Trato Justo no disponible:", parsed.text);
+                }
+            } catch (e) {
+                if (e?.message === "SESION_EXPIRADA") throw e;
+                console.warn("No se pudieron cargar compensaciones Trato Justo:", e);
             }
 
             console.log("admin-datos RAW:", json);
@@ -1876,6 +1922,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             const referidosGlobal = getArray(root, "referidos", "clientes_referidos");
             const gamifGlobal = getArray(root, "gamificacion", "gamificaciones", "clientes_gamificacion");
             const descuentosGlobal = getArray(root, "descuentos", "descuentos_especiales", "clientes_descuentos");
+            const tratoJustoGlobal = getArray(root, "trato_justo_compensaciones");
             const periodosCobro = getArray(root, "periodos_cobro");
             const periodoPorCliente = new Map(
                 periodosCobro.map(x => [String(x?.id || x?.cliente_id || ""), x])
@@ -1917,6 +1964,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 if (!gamificacion) gamificacion = gamifGlobal.find(x => belongsToCliente(x, id));
 
                 const refActivo = referidos.find(r => r?.activo !== false) || null;
+                const tratoJusto = tratoJustoGlobal.filter(x => String(x?.cliente_id || "") === String(id));
 
                 let key = c.clave || c.key || c.slug || c.identificador || slug(c.nombre || c.folio || id || `cliente-${idx + 1}`);
                 if (!key) key = `cliente-${idx + 1}`;
@@ -1947,7 +1995,8 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                     historial_pagos: pagos.map(adaptarPago),
                     servicios: servicios.map(adaptarServicioCliente),
                     descuentos_especiales: descuentos.map(adaptarDescuento),
-                    descuento_fallas: n(c.descuento_fallas, 0),
+                    trato_justo_compensaciones: tratoJusto,
+                    descuento_fallas: tratoJusto.filter(x => x.activo !== false && String(x.periodo || "").slice(0,7) === String(c.periodo_pendiente || periodoMeta.periodo_pendiente || "").slice(0,7)).reduce((s,x)=>s+n(x.monto,0), n(c.descuento_fallas,0)),
                     referido_activo: refActivo ? adaptarReferido(refActivo) : undefined,
                     gamificacion: gamificacion ? adaptarGamificacion(gamificacion) : undefined
                 };
@@ -2051,6 +2100,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const SB = "https://hmpevcwodcgbkviarfic.supabase.co";
         const ACCIONES = `${SB}/functions/v1/admin-acciones`;
         const PERIODOS = `${SB}/functions/v1/periodo-cobro-beta`;
+        const TRATO_JUSTO = `${SB}/functions/v1/trato-justo-beta`;
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function accion(accion, datos = {}) {
@@ -2099,7 +2149,23 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             return body;
         }
 
+        async function accionTratoJusto(accionNombre, datos = {}) {
+            const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
+            if (!token) throw new Error("Sesión administrativa no disponible.");
+            const r = await fetch(TRATO_JUSTO, {
+                method: "POST",
+                headers: {"Content-Type":"application/json","X-Admin-Token":token},
+                body: JSON.stringify({accion:accionNombre,datos})
+            });
+            const text = await r.text();
+            let body = {};
+            try { body = text ? JSON.parse(text) : {}; } catch {}
+            if (!r.ok || body?.ok !== true) throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+            return body;
+        }
+
         window.gxPeriodAction = accionPeriodo;
+        window.gxTratoJustoAction = accionTratoJusto;
         window.gxCoreAdminAction = accion;
 
         function cli(key) { return clientesDict[key]; }
@@ -2480,27 +2546,15 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             } catch (e) { errorUI("No se pudo eliminar el descuento.", e); }
         };
 
-        aplicarTratoJusto = async function(key, montoServicio) {
+        aplicarTratoJusto = function(key) {
             const c = cli(key);
-            if (!c?._id) return;
-            if (!confirm("¿Aplicar descuento de Trato Justo (5% del servicio)?")) return;
-            try {
-                await accion("aplicar_trato_justo", {
-                    cliente_id: c._id,
-                    monto_servicio: num(montoServicio)
-                });
-                await recargar(key);
-            } catch (e) { errorUI("No se pudo aplicar Trato Justo.", e); }
+            if (!c) return;
+            const idx = Math.max(0, (c.servicios || []).findIndex(Boolean));
+            gxOpenTratoJusto(key, idx);
         };
 
-        resetearDescuentoFallas = async function(key) {
-            const c = cli(key);
-            if (!c?._id) return;
-            if (!confirm("¿Resetear Trato Justo a $0?")) return;
-            try {
-                await accion("resetear_trato_justo", { cliente_id: c._id });
-                await recargar(key);
-            } catch (e) { errorUI("No se pudo resetear Trato Justo.", e); }
+        resetearDescuentoFallas = function(key) {
+            alert("Trato Justo ahora se administra por servicio y periodo desde el menú ••• de cada servicio.");
         };
 
         // ---------- CATÁLOGO ----------
@@ -3788,6 +3842,142 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             console.error(e);
             alert('❌ No se pudo cambiar el ciclo de cobro.\n\n'+(e?.message||e));
         }
+    };
+})();
+</script>
+
+
+<div class="gx-tj-overlay" id="gx-tj-overlay" aria-hidden="true">
+    <div class="gx-tj-backdrop" onclick="gxCloseTratoJusto()"></div>
+    <section class="gx-tj-modal" role="dialog" aria-modal="true">
+        <header class="gx-tj-head">
+            <div><span>GARANTÍA GOXION</span><strong>🛡 Trato Justo</strong></div>
+            <button type="button" onclick="gxCloseTratoJusto()">×</button>
+        </header>
+        <div class="gx-tj-body">
+            <div class="gx-tj-service">
+                <div><small>Servicio afectado</small><strong id="gx-tj-service-name">—</strong></div>
+                <div><small>Mensualidad</small><strong id="gx-tj-service-price">$0.00</strong></div>
+            </div>
+
+            <label class="gx-tj-field">
+                <span>Periodo al que aplica</span>
+                <input type="month" id="gx-tj-period">
+            </label>
+
+            <div class="gx-tj-days-block">
+                <div><span>Días completos sin servicio</span><small>5% por cada día · máximo 10 días</small></div>
+                <div class="gx-tj-stepper">
+                    <button type="button" onclick="gxTJStep(-1)">−</button>
+                    <strong id="gx-tj-days">1</strong>
+                    <button type="button" onclick="gxTJStep(1)">+</button>
+                </div>
+            </div>
+
+            <label class="gx-tj-field">
+                <span>Motivo</span>
+                <select id="gx-tj-reason">
+                    <option value="Falla técnica">Falla técnica</option>
+                    <option value="Intermitencia prolongada">Intermitencia prolongada</option>
+                    <option value="Acceso no disponible">Acceso no disponible</option>
+                    <option value="Mantenimiento / incidencia de plataforma">Mantenimiento / incidencia de plataforma</option>
+                    <option value="Compensación autorizada">Compensación autorizada</option>
+                </select>
+            </label>
+
+            <div class="gx-tj-result">
+                <div><small>Compensación</small><strong id="gx-tj-percent">5%</strong></div>
+                <div><small>Descuento</small><strong id="gx-tj-amount">-$0.00</strong></div>
+            </div>
+
+            <div class="gx-tj-policy">La compensación se calcula sobre la cuota del servicio afectado y queda ligada al periodo seleccionado. Límite: 50% por servicio y periodo.</div>
+        </div>
+        <footer class="gx-tj-actions">
+            <button type="button" class="gx-tj-delete" id="gx-tj-delete" onclick="gxDeleteTratoJusto()" style="display:none">Eliminar</button>
+            <button type="button" class="gx-tj-cancel" onclick="gxCloseTratoJusto()">Cancelar</button>
+            <button type="button" class="gx-tj-save" onclick="gxSaveTratoJusto()">Aplicar compensación</button>
+        </footer>
+    </section>
+</div>
+
+
+<script id="goxion-admin-v10-trato-justo-controller">
+(() => {
+    let tj = {key:null, serviceIndex:-1, days:1, record:null};
+
+    function money(v){ return Number(v||0).toFixed(2); }
+    function currentService(){
+        const c = clientesDict?.[tj.key];
+        return c?.servicios?.[tj.serviceIndex] || null;
+    }
+    function refresh(){
+        const s = currentService(); if(!s) return;
+        tj.days = Math.max(1, Math.min(10, Number(tj.days||1)));
+        const pct = tj.days * 5;
+        const amount = Number(s.monto||0) * pct / 100;
+        document.getElementById('gx-tj-days').textContent = tj.days;
+        document.getElementById('gx-tj-percent').textContent = pct + '%';
+        document.getElementById('gx-tj-amount').textContent = '-$' + money(amount);
+    }
+
+    window.gxOpenTratoJusto = function(key, serviceIndex){
+        const c=clientesDict?.[key], s=c?.servicios?.[serviceIndex];
+        if(!c || !s || !(s._id||s.id)) return alert('❌ Este servicio todavía no tiene un ID válido en Supabase.');
+        const period = String(c.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7);
+        const rec = (c.trato_justo_compensaciones || []).find(x =>
+            String(x.cliente_servicio_id||'') === String(s._id||s.id||'') &&
+            String(x.periodo||'').slice(0,7) === period &&
+            x.activo !== false
+        ) || null;
+        tj={key,serviceIndex,days:Number(rec?.dias_falla||1),record:rec};
+        document.getElementById('gx-tj-service-name').textContent=s.nombre||'Servicio';
+        document.getElementById('gx-tj-service-price').textContent='$'+money(s.monto);
+        document.getElementById('gx-tj-period').value=period;
+        document.getElementById('gx-tj-reason').value=rec?.motivo || 'Falla técnica';
+        document.getElementById('gx-tj-delete').style.display=rec?.id?'block':'none';
+        document.getElementById('gx-tj-overlay').classList.add('show');
+        document.getElementById('gx-tj-overlay').setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        refresh();
+    };
+    window.gxCloseTratoJusto=function(){
+        const el=document.getElementById('gx-tj-overlay');
+        if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}
+        document.body.style.overflow='';
+    };
+    window.gxTJStep=function(delta){tj.days=Math.max(1,Math.min(10,tj.days+Number(delta||0)));refresh()};
+
+    window.gxSaveTratoJusto=async function(){
+        const c=clientesDict?.[tj.key],s=currentService();
+        if(!c||!s||typeof gxTratoJustoAction!=='function')return;
+        const period=document.getElementById('gx-tj-period').value;
+        const reason=document.getElementById('gx-tj-reason').value;
+        if(!/^\d{4}-\d{2}$/.test(period)) return alert('❌ Selecciona un periodo válido.');
+        try{
+            const r=await gxTratoJustoAction('guardar_compensacion',{
+                cliente_id:c._id,
+                cliente_servicio_id:s._id||s.id,
+                periodo:period+'-01',
+                dias_falla:tj.days,
+                motivo:reason
+            });
+            gxCloseTratoJusto();
+            if(typeof gxReloadAdminClient==='function') await gxReloadAdminClient(tj.key);
+            alert(`✅ Trato Justo aplicado.\n\n${s.nombre}\n${tj.days} día${tj.days===1?'':'s'} · ${tj.days*5}%\nDescuento: -$${money(r.compensacion?.monto)}`);
+        }catch(e){
+            console.error(e);alert('❌ No se pudo guardar Trato Justo.\n\n'+(e?.message||e));
+        }
+    };
+
+    window.gxDeleteTratoJusto=async function(){
+        if(!tj.record?.id || typeof gxTratoJustoAction!=='function')return;
+        if(!confirm('¿Eliminar esta compensación de Trato Justo?'))return;
+        try{
+            await gxTratoJustoAction('eliminar_compensacion',{id:tj.record.id});
+            gxCloseTratoJusto();
+            if(typeof gxReloadAdminClient==='function') await gxReloadAdminClient(tj.key);
+            alert('✅ Compensación eliminada.');
+        }catch(e){console.error(e);alert('❌ No se pudo eliminar la compensación.\n\n'+(e?.message||e))}
     };
 })();
 </script>
