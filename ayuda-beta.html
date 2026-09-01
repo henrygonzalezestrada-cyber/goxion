@@ -2716,40 +2716,214 @@
     }
 </style>
 
-<style id="goxion-user-morph-css">
-/* --- 1. DISTRIBUCIÓN PREMIUM: TARJETAS PEQUEÑAS --- */
-.gx-gamif-card {
-    justify-content: space-between !important;
-    padding: 18px 16px 16px !important;
-    gap: 8px;
+<style id="goxion-user-card-tuning">
+#gamif-grid {
+        gap: 12px !important;
+        align-items: stretch;
+    }
+    
+    .gx-gamif-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 168px;
+        padding: 18px 16px !important;
+        border-radius: 22px !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch !important;
+        text-align: left !important;
+        background: radial-gradient(circle at 85% 10%, rgba(124,77,255,.14), transparent 34%), linear-gradient(180deg, rgba(12,12,18,.82), rgba(7,7,11,.72)) !important;
+        border: 1px solid rgba(255,255,255,.08) !important;
+        box-shadow: 0 14px 34px rgba(0,0,0,.28) !important;
+    }
+
+    .gx-gamif-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -28px -52px auto;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(0,242,254,.05);
+        filter: blur(10px);
+        pointer-events: none;
+    }
+
+    /* --- ALINEACIÓN PERFECTA DEL HEADER --- */
+    .gx-gamif-card-top {
+        display: flex;
+        align-items: center; /* Alinea verticalmente el icono y el texto */
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .gx-gamif-card .gamif-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 !important;
+        border-radius: 10px;
+        background: rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.1);
+        font-size: 16px !important; /* Tamaño exacto para no desbordar la caja */
+    }
+
+    .gx-gamif-card-kicker {
+        color: var(--text-muted);
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        line-height: 1; /* Remueve espacios fantasma arriba o abajo del texto */
+        margin-top: 2px;
+    }
+
+    .gx-gamif-card .gamif-title {
+        margin: 0 !important;
+        font-size: 1rem !important;
+        line-height: 1.2;
+        font-weight: 800 !important;
+    }
+
+    .gx-gamif-card-status {
+        margin-top: 6px;
+        font-size: .75rem;
+        font-weight: 700;
+        color: var(--neon-blue);
+    }
+
+    .gx-gamif-card-meta {
+        margin-top: 4px;
+        color: var(--text-muted);
+        font-size: .65rem;
+    }
+
+/* Mantiene la barra al fondo de ambas tarjetas después de la nueva distribución. */
+.gx-gamif-card .gx-gamif-progress {
+    margin-top: auto;
 }
-.gx-gamif-card .gamif-title {
-    font-size: 1.05rem !important;
-    margin-top: auto !important;
+</style>
+
+<style id="goxion-user-morph-css">
+
+/* --- PROGRESO VIVO: compatible con Safari/iPhone --- */
+.gx-gamif-progress {
+    width: 100%;
+    height: 6px;
+    padding-top: 14px;
+    box-sizing: content-box;
+    position: relative;
+    background: transparent;
 }
 
-/* --- 2. ENERGÍA VIVA: BARRA DE PROGRESO --- */
-/* Conservamos absolute para que el ancho dinámico siga representando el porcentaje real. */
-.gx-gamif-progress span {
-    position: absolute;
-    overflow: hidden;
-}
-.gx-gamif-progress span::after {
+/* Riel base */
+.gx-gamif-progress::after {
     content: "";
     position: absolute;
-    top: 0;
     left: 0;
+    right: 0;
     bottom: 0;
-    width: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.85), transparent);
-    animation: energyPulse 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-}
-@keyframes energyPulse {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.075);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
 }
 
-/* --- 3. VERDADERO MORPHING (CRECIMIENTO GEOMÉTRICO) --- */
+/* Energía tenue sobre TODO el riel: sigue siendo visible incluso en 0%. */
+.gx-gamif-progress::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: -34%;
+    width: 34%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(0,242,254,.28), rgba(255,255,255,.48), transparent);
+    filter: blur(.15px);
+    animation: gxTrackEnergy 2.4s ease-in-out infinite;
+    -webkit-animation: gxTrackEnergy 2.4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Porcentaje real. Se anima el propio gradiente, más fiable en Safari que depender solo de ::after. */
+.gx-gamif-progress > span {
+    position: absolute !important;
+    z-index: 2;
+    left: 0;
+    bottom: 0;
+    height: 6px;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: linear-gradient(
+        90deg,
+        var(--neon-purple) 0%,
+        var(--neon-blue) 35%,
+        rgba(255,255,255,.92) 50%,
+        var(--neon-blue) 65%,
+        var(--neon-purple) 100%
+    );
+    background-size: 220% 100%;
+    box-shadow: 0 0 15px rgba(0,242,254,.23);
+    animation: gxFilledEnergy 2s linear infinite;
+    -webkit-animation: gxFilledEnergy 2s linear infinite;
+    transition: width .4s ease;
+}
+
+/* Brillo adicional dentro de la porción completada */
+.gx-gamif-progress > span::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.05) 35%, rgba(255,255,255,.58) 50%, transparent 70%);
+    transform: translateX(-120%);
+    -webkit-transform: translateX(-120%);
+    animation: gxFillSweep 1.8s ease-in-out infinite;
+    -webkit-animation: gxFillSweep 1.8s ease-in-out infinite;
+}
+
+@keyframes gxTrackEnergy {
+    0%   { transform: translateX(0); opacity: .25; }
+    45%  { opacity: .9; }
+    100% { transform: translateX(395%); opacity: .25; }
+}
+@-webkit-keyframes gxTrackEnergy {
+    0%   { -webkit-transform: translateX(0); opacity: .25; }
+    45%  { opacity: .9; }
+    100% { -webkit-transform: translateX(395%); opacity: .25; }
+}
+
+@keyframes gxFilledEnergy {
+    0%   { background-position: 100% 0; }
+    100% { background-position: -120% 0; }
+}
+@-webkit-keyframes gxFilledEnergy {
+    0%   { background-position: 100% 0; }
+    100% { background-position: -120% 0; }
+}
+
+@keyframes gxFillSweep {
+    0%   { transform: translateX(-120%); opacity: 0; }
+    20%  { opacity: .85; }
+    70%  { opacity: .65; }
+    100% { transform: translateX(120%); opacity: 0; }
+}
+@-webkit-keyframes gxFillSweep {
+    0%   { -webkit-transform: translateX(-120%); opacity: 0; }
+    20%  { opacity: .85; }
+    70%  { opacity: .65; }
+    100% { -webkit-transform: translateX(120%); opacity: 0; }
+}
+
+/* El morph nuevo del usuario queda por encima de las animaciones antiguas. */
+
+
 .gamif-expanded-container {
     display: none;
     background: var(--card-glass);
@@ -2757,34 +2931,37 @@
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(0, 242, 254, 0.3);
     border-radius: 24px;
-    padding: 20px;
+    padding: 20px; 
     margin-bottom: 25px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 242, 254, 0.1);
+    transform-origin: top center;
     will-change: transform, opacity, clip-path;
 }
 
-/* Animación de Expansión desde el Centro */
+/* Animación: Crece desde las dimensiones de la tarjeta pequeña */
 .gamif-expanded-container.gx-morph-in {
     display: block !important;
-    animation: trueMorphExpand 0.5s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+    animation: trueMorphExpand 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
 }
 
-/* Animación de Retracción */
+/* Animación: Se encoge de vuelta a la tarjeta original */
 .gamif-expanded-container.gx-morph-out {
     display: block !important;
-    animation: trueMorphCollapse 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    animation: trueMorphCollapse 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 @keyframes trueMorphExpand {
     0% {
-        opacity: 0;
-        clip-path: inset(30% 20% 30% 20% round 24px);
-        transform: translateY(15px);
+        opacity: 0.5;
+        /* El recorte inicial simula el tamaño de la tarjeta pequeña */
+        clip-path: inset(0% 25% 65% 25% round 22px);
+        transform: translateY(-10px) scale(0.95);
     }
     100% {
         opacity: 1;
+        /* Se desdobla revelando el contenido completo */
         clip-path: inset(0% 0% 0% 0% round 24px);
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
 }
 
@@ -2792,23 +2969,22 @@
     0% {
         opacity: 1;
         clip-path: inset(0% 0% 0% 0% round 24px);
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
     }
     100% {
         opacity: 0;
-        clip-path: inset(30% 20% 30% 20% round 24px);
-        transform: translateY(-10px);
+        clip-path: inset(0% 25% 65% 25% round 22px);
+        transform: translateY(-15px) scale(0.95);
     }
 }
 
-/* Accesibilidad: si el usuario reduce movimiento, evitamos animaciones continuas. */
+/* En Reduce Motion conservamos el porcentaje y un pulso estático, sin eliminar visualmente la barra. */
 @media (prefers-reduced-motion: reduce) {
-    .gx-gamif-progress span::after {
-        animation: none;
-    }
-    .gamif-expanded-container.gx-morph-in,
-    .gamif-expanded-container.gx-morph-out {
-        animation-duration: 0.01ms;
+    .gx-gamif-progress::before,
+    .gx-gamif-progress > span,
+    .gx-gamif-progress > span::after {
+        animation-duration: 5s;
+        -webkit-animation-duration: 5s;
     }
 }
 </style>
@@ -4239,7 +4415,7 @@
                         <div class="gamif-title gx-referral-card-title">${refNombre || 'Tu referido'}</div>
                         <div id="gx-referral-status" class="gx-gamif-card-status" style="color:${refSubtitleColor};">${refStateText}</div>
                         <div class="gx-gamif-card-meta">${plats} servicio${plats===1?'':'s'} activo${plats===1?'':'s'} · ${meses}/3 meses</div>
-                        <div class="gx-gamif-progress" aria-label="Progreso de referidos">
+                        <div class="gx-gamif-progress" data-progress="${refProgressPct}" aria-label="Progreso de referidos: ${refProgressPct}%">
                             <span style="width:${refProgressPct}%"></span>
                         </div>
                     </div>`;
@@ -4321,18 +4497,20 @@
                     ? `<span style="color:var(--neon-blue);font-weight:800;">¡Listo para reclamar!</span>`
                     : (hasMissions ? `<span style="color:var(--neon-blue);font-weight:bold;">¡Misiones activas!</span>` : `Sin tareas`));
 
-            const missionTotal = (typeof totalTareas !== 'undefined' && Number.isFinite(Number(totalTareas)))
-                    ? Number(totalTareas)
-                    : ((typeof tareasArray !== 'undefined' && Array.isArray(tareasArray)) ? tareasArray.length : 0);
-                const missionDone = (typeof tareasCompletadas !== 'undefined' && Number.isFinite(Number(tareasCompletadas)))
-                    ? Number(tareasCompletadas)
-                    : ((typeof tareasArray !== 'undefined' && Array.isArray(tareasArray))
-                        ? tareasArray.filter(t => t && (t.completada === true || t.done === true)).length
-                        : 0);
-                const missionPct = missionTotal > 0 ? Math.min(100, Math.round((missionDone / missionTotal) * 100)) : 0;
-                const missionClaimed = (typeof cuponReclamado !== 'undefined') ? Boolean(cuponReclamado) : false;
+            const missionTotal = Array.isArray(tareasArr) ? tareasArr.length : 0;
+                const missionDone = Array.isArray(savedMissions)
+                    ? tareasArr.reduce((total, _, idx) => total + (savedMissions.includes(idx) ? 1 : 0), 0)
+                    : 0;
+                const missionPct = missionTotal > 0
+                    ? Math.min(100, Math.round((missionDone / missionTotal) * 100))
+                    : 0;
+                const missionClaimed = Boolean(couponClaimed);
                 const missionReady = missionTotal > 0 && missionDone >= missionTotal;
-                const missionState = missionClaimed ? 'Beneficio aplicado' : missionReady ? 'Recompensa lista' : `${missionDone} de ${missionTotal} completadas`;
+                const missionState = missionClaimed
+                    ? 'Beneficio aplicado'
+                    : missionReady
+                        ? 'Recompensa lista'
+                        : (missionTotal > 0 ? `${missionDone} de ${missionTotal} completadas` : 'Sin tareas activas');
 
                 btnCupHtml = `
                     <div class="gamif-btn gx-gamif-card gx-gamif-card-mission ${missionReady && !missionClaimed ? 'pulse-mission' : ''}" onclick="openGamif('coupon')">
@@ -4342,8 +4520,8 @@
                         </div>
                         <div class="gamif-title">Tu progreso</div>
                         <div class="gx-gamif-card-status">${missionState}</div>
-                        <div class="gx-gamif-card-meta">Recompensa: ${Number((typeof descuento !== "undefined" ? descuento : 0) || 0)}% OFF</div>
-                        <div class="gx-gamif-progress" aria-label="Progreso de misiones">
+                        <div class="gx-gamif-card-meta">Recompensa: ${Number(gamifConfig.descuento || 0)}% OFF</div>
+                        <div class="gx-gamif-progress" data-progress="${missionPct}" aria-label="Progreso de misiones: ${missionPct}%">
                             <span style="width:${missionPct}%"></span>
                         </div>
                     </div>`;
@@ -5413,7 +5591,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V6.2.2: referido minimalista flotante.");
+        console.info("GOXION Ayuda Beta V6.3.2: referido minimalista flotante.");
     })();
     </script>
 
