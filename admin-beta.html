@@ -1995,16 +1995,31 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         }
 
         async function recargar(abrirKey = null) {
-            if (typeof inicializarPanel === "function") {
-                await inicializarPanel();
-                if (abrirKey) {
-                    setTimeout(() => {
-                        const d = document.getElementById(`details-${abrirKey}`);
-                        const t = document.getElementById(`toggle-text-${abrirKey}`);
-                        if (d) d.style.display = "block";
-                        if (t) t.innerHTML = "Ocultar detalles ▴";
-                    }, 60);
-                }
+            if (typeof inicializarPanel !== "function") return;
+
+            // El Centro de Operaciones mueve físicamente los detalles del cliente
+            // al panel de enfoque. Si recargamos datos sin cerrar ese panel, queda
+            // visible el nodo antiguo aunque Supabase ya haya guardado el cambio.
+            // Cerramos primero y luego reabrimos la ficha recién renderizada.
+            const focusVisible = document.getElementById("gx-client-focus")?.classList.contains("show");
+            if (focusVisible && typeof gxCloseClientFocus === "function") {
+                gxCloseClientFocus();
+            }
+
+            await inicializarPanel();
+
+            if (abrirKey) {
+                setTimeout(() => {
+                    if (typeof gxOpenClientFocus === "function") {
+                        gxOpenClientFocus(abrirKey);
+                        return;
+                    }
+                    // Respaldo para la interfaz anterior.
+                    const d = document.getElementById(`details-${abrirKey}`);
+                    const t = document.getElementById(`toggle-text-${abrirKey}`);
+                    if (d) d.style.display = "block";
+                    if (t) t.innerHTML = "Ocultar detalles ▴";
+                }, 110);
             }
         }
 
@@ -2105,6 +2120,16 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             const [nombre, precio] = sel.value.split("|");
             const cat = configGlobal.serviciosGlobales.find(s => s.nombre === nombre);
 
+            // Evita enviar dos veces el mismo servicio cuando la ficha visible
+            // todavía corresponde a un render anterior.
+            const yaExiste = (c.servicios || []).some(s =>
+                String(s?.nombre || "").trim().toLowerCase() === String(nombre || "").trim().toLowerCase()
+            );
+            if (yaExiste) {
+                await recargar(key);
+                return alert(`ℹ️ ${nombre} ya está asignado a este cliente. La ficha se actualizó con los datos de Supabase.`);
+            }
+
             try {
                 await accion("agregar_servicio_cliente", {
                     cliente_id: c._id,
@@ -2116,7 +2141,16 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                     perfil_pin: ""
                 });
                 await recargar(key);
-            } catch (e) { errorUI("No se pudo agregar el servicio.", e); }
+            } catch (e) {
+                // Si el backend rechaza por duplicado, refrescamos para mostrar
+                // lo que ya existe realmente en Supabase en vez de dejar la ficha vieja.
+                const msg = String(e?.message || e || "");
+                if (/duplicate|duplicad|unique|uq_cliente_servicio_nombre/i.test(msg)) {
+                    await recargar(key);
+                    return alert(`ℹ️ ${nombre} ya estaba asignado. Actualicé la ficha con los datos reales.`);
+                }
+                errorUI("No se pudo agregar el servicio.", e);
+            }
         };
 
         removeClientService = async function(key, serviceIndex) {
@@ -2125,10 +2159,18 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             if (!s) return;
             if (!confirm(`¿Quitar "${s.nombre}" de este cliente?`)) return;
 
+            const serviceId = s.id || s._id;
+            if (!serviceId) return alert("❌ Este servicio no tiene ID de Supabase. Recarga el Admin antes de eliminarlo.");
+
             try {
-                await accion("quitar_servicio_cliente", { id: s.id || s._id });
+                await accion("quitar_servicio_cliente", { id: serviceId });
                 await recargar(key);
-            } catch (e) { errorUI("No se pudo quitar el servicio.", e); }
+            } catch (e) {
+                // No ocultamos el error; primero re-sincronizamos la ficha para
+                // evitar que un nodo viejo haga parecer que el servicio sigue ahí.
+                try { await recargar(key); } catch {}
+                errorUI("No se pudo quitar el servicio.", e);
+            }
         };
 
         updateServiceCreds = async function(key, serviceIndex, field, value) {
