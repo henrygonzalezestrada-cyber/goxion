@@ -284,6 +284,7 @@
 (() => {
     const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
     const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
+    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro";
     const TOKEN_KEY = "goxion_client_token";
     const nativeFetch = window.fetch.bind(window);
 
@@ -307,6 +308,7 @@ function goxionBetaLegacy(data) {
             nombre: c.nombre || "",
             usuario_acceso: c.usuario_acceso || "",
             dia_pago: Number(c.dia_pago || 15),
+            periodo_pendiente: c.periodo_pendiente || data?.periodo_pendiente || "",
             estado: c.estado || "pendiente",
             pago_en_revision: c.pago_en_revision === true,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
@@ -359,12 +361,29 @@ function goxionBetaLegacy(data) {
                 });
             }
 
-            const r = await nativeFetch(MI_BETA, {
-                method:"POST",
-                headers:{"Content-Type":"application/json","X-Client-Token":token},
-                body:"{}"
-            });
+            const [r, periodoR] = await Promise.all([
+                nativeFetch(MI_BETA, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","X-Client-Token":token},
+                    body:"{}"
+                }),
+                nativeFetch(PERIODO_URL, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","X-Client-Token":token},
+                    body:JSON.stringify({accion:"obtener_periodo",datos:{}})
+                }).catch(() => null)
+            ]);
             const {json} = await parseJSON(r);
+
+            if (periodoR?.ok) {
+                try {
+                    const periodoData = await periodoR.json();
+                    if (periodoData?.ok === true) {
+                        json.periodo_pendiente = periodoData.periodo_pendiente || "";
+                        if (json.cliente) json.cliente.periodo_pendiente = periodoData.periodo_pendiente || "";
+                    }
+                } catch {}
+            }
 
             if (!r.ok || json?.ok !== true) {
                 if (r.status === 401) {
@@ -506,13 +525,23 @@ function goxionBetaLegacy(data) {
       }
 
       const hoy = new Date();
-      const diaHoy = hoy.getDate();
       const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-      const mesActual = meses[hoy.getMonth()];
-      const periodoStr = `${mesActual} ${hoy.getFullYear()}`;
-      
+
+      // Periodo persistente: no cambia solo porque inició un mes nuevo.
+      const rawPeriodo = String(cliente.periodo_pendiente || "");
+      const matchPeriodo = rawPeriodo.match(/^(\d{4})-(\d{2})/);
+      const periodoYear = matchPeriodo ? Number(matchPeriodo[1]) : hoy.getFullYear();
+      const periodoMonth = matchPeriodo ? Math.max(0, Math.min(11, Number(matchPeriodo[2]) - 1)) : hoy.getMonth();
+      const mesPeriodo = meses[periodoMonth];
+      const periodoStr = `${mesPeriodo} ${periodoYear}`;
+
       const diaPago = cliente.dia_pago || 15;
-      const difDias = diaPago - diaHoy;
+      const ultimoDiaPeriodo = new Date(periodoYear, periodoMonth + 1, 0).getDate();
+      const diaCorteReal = Math.min(Math.max(1, Number(diaPago) || 15), ultimoDiaPeriodo);
+      const hoyUTC = Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+      const corteUTC = Date.UTC(periodoYear, periodoMonth, diaCorteReal);
+      const difDias = Math.round((corteUTC - hoyUTC) / 86400000);
+      const etiquetaCorte = difDias < 0 ? "Venció" : "Corte";
 
       // Estado mensual real: un pago solo cubre el periodo al que pertenece.
       const pagosCliente = Array.isArray(cliente.historial_pagos) ? cliente.historial_pagos : [];
@@ -760,7 +789,7 @@ function goxionBetaLegacy(data) {
               <span class="label">Periodo Facturado</span>
               <span class="value" style="display:flex; justify-content:space-between; align-items:center;">
                   ${periodoStr} 
-                  <span style="color:var(--text-muted); font-size:12px; font-weight:500;">Corte: ${diaPago} de ${mesActual}</span>
+                  <span style="color:var(--text-muted); font-size:12px; font-weight:500;">${etiquetaCorte}: ${diaCorteReal} de ${mesPeriodo}</span>
               </span>
             </div>
           </div>
@@ -920,5 +949,6 @@ function goxionBetaLegacy(data) {
   cargarEstadoCuenta();
 </script>
 
+<script>console.info("GOXION Index Beta V4: periodo persistente activo.");</script>
 </body>
 </html>
