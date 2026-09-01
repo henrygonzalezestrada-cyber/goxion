@@ -4282,10 +4282,16 @@
                     ? `<span style="color:var(--neon-blue);font-weight:800;">¡Listo para reclamar!</span>`
                     : (hasMissions ? `<span style="color:var(--neon-blue);font-weight:bold;">¡Misiones activas!</span>` : `Sin tareas`));
 
-            const missionTotal = Array.isArray(tareas) ? tareas.length : (typeof totalTareas !== 'undefined' ? totalTareas : 0);
-                const missionDone = Array.isArray(tareas) ? tareas.filter(t => t && t.completada === true).length : (typeof tareasCompletadas !== 'undefined' ? tareasCompletadas : 0);
+            const missionTotal = (typeof totalTareas !== 'undefined' && Number.isFinite(Number(totalTareas)))
+                    ? Number(totalTareas)
+                    : ((typeof tareasArray !== 'undefined' && Array.isArray(tareasArray)) ? tareasArray.length : 0);
+                const missionDone = (typeof tareasCompletadas !== 'undefined' && Number.isFinite(Number(tareasCompletadas)))
+                    ? Number(tareasCompletadas)
+                    : ((typeof tareasArray !== 'undefined' && Array.isArray(tareasArray))
+                        ? tareasArray.filter(t => t && (t.completada === true || t.done === true)).length
+                        : 0);
                 const missionPct = missionTotal > 0 ? Math.min(100, Math.round((missionDone / missionTotal) * 100)) : 0;
-                const missionClaimed = typeof cuponReclamado !== 'undefined' ? cuponReclamado : false;
+                const missionClaimed = (typeof cuponReclamado !== 'undefined') ? Boolean(cuponReclamado) : false;
                 const missionReady = missionTotal > 0 && missionDone >= missionTotal;
                 const missionState = missionClaimed ? 'Beneficio aplicado' : missionReady ? 'Recompensa lista' : `${missionDone} de ${missionTotal} completadas`;
 
@@ -4297,7 +4303,7 @@
                         </div>
                         <div class="gamif-title">Tu progreso</div>
                         <div class="gx-gamif-card-status">${missionState}</div>
-                        <div class="gx-gamif-card-meta">Recompensa: ${Number(descuento || 0)}% OFF</div>
+                        <div class="gx-gamif-card-meta">Recompensa: ${Number((typeof descuento !== "undefined" ? descuento : 0) || 0)}% OFF</div>
                         <div class="gx-gamif-progress" aria-label="Progreso de misiones">
                             <span style="width:${missionPct}%"></span>
                         </div>
@@ -5368,7 +5374,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V6: referido minimalista flotante.");
+        console.info("GOXION Ayuda Beta V6.1: referido minimalista flotante.");
     })();
     </script>
 
