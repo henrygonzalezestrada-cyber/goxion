@@ -3281,6 +3281,139 @@
 }
 </style>
 
+
+<style id="goxion-ayuda-v6-6-contextual-motion">
+/* ==========================================================
+   V6.6 — WATERMARK MÁS PRESENTE + MOVIMIENTO CON SIGNIFICADO
+   ========================================================== */
+
+/* El emoji se reconoce mejor, pero sigue siendo ambiental. */
+.gx-gamif-card::before{
+    right:-7px !important;
+    top:51% !important;
+    font-size:7.25rem !important;
+    opacity:.145 !important;
+    filter:grayscale(0) saturate(.92) contrast(.95) !important;
+    -webkit-filter:grayscale(0) saturate(.92) contrast(.95) !important;
+    transform:translateY(-50%) rotate(-14deg) scale(1.04) !important;
+    -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04) !important;
+    transform-origin:center !important;
+    -webkit-transform-origin:center !important;
+}
+
+/* Estado normal: completamente tranquilo. */
+.gx-gamif-card.pulse-referral{
+    animation:none !important;
+    border-color:rgba(255,255,255,.09) !important;
+    box-shadow:0 14px 34px rgba(0,0,0,.26) !important;
+}
+
+/* ==========================================================
+   RECOMPENSA LISTA:
+   sólo aquí recuperamos un pulso breve y elegante.
+   ========================================================== */
+.gx-gamif-card.gx-referral-ready,
+.gx-gamif-card.pulse-mission{
+    animation:gxRewardBreath 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+    border-color:rgba(0,242,254,.20) !important;
+}
+
+/* El watermark también "respira" suavemente cuando hay premio. */
+.gx-gamif-card.gx-referral-ready::before,
+.gx-gamif-card.pulse-mission::before{
+    animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+    -webkit-animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+}
+
+/* Después de las 2 respiraciones, la tarjeta vuelve a estar calmada. */
+@keyframes gxRewardBreath{
+    0%,100%{
+        box-shadow:0 14px 34px rgba(0,0,0,.26), 0 0 0 rgba(0,242,254,0);
+        transform:translateY(0);
+    }
+    50%{
+        box-shadow:0 16px 38px rgba(0,0,0,.30), 0 0 22px rgba(0,242,254,.105);
+        transform:translateY(-1px);
+    }
+}
+
+@keyframes gxWatermarkCelebrate{
+    0%,100%{
+        opacity:.145;
+        transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.215;
+        transform:translateY(-50%) rotate(-11deg) scale(1.085);
+    }
+}
+@-webkit-keyframes gxWatermarkCelebrate{
+    0%,100%{
+        opacity:.145;
+        -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.215;
+        -webkit-transform:translateY(-50%) rotate(-11deg) scale(1.085);
+    }
+}
+
+/* Cuando el beneficio ya fue reclamado, vuelve al estado sereno. */
+.gx-gamif-card[data-watermark="💝"]::before,
+.gx-gamif-card[data-watermark="✅"]::before{
+    opacity:.13 !important;
+    animation:none !important;
+    -webkit-animation:none !important;
+}
+
+/* En móvil aumentamos presencia sin invadir el texto. */
+@media(max-width:520px){
+    .gx-gamif-card::before{
+        right:-10px !important;
+        font-size:6.45rem !important;
+        opacity:.135 !important;
+    }
+
+    .gx-gamif-card.gx-referral-ready::before,
+    .gx-gamif-card.pulse-mission::before{
+        animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+        -webkit-animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+    }
+}
+
+@keyframes gxWatermarkCelebrateMobile{
+    0%,100%{
+        opacity:.135;
+        transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.20;
+        transform:translateY(-50%) rotate(-11deg) scale(1.075);
+    }
+}
+@-webkit-keyframes gxWatermarkCelebrateMobile{
+    0%,100%{
+        opacity:.135;
+        -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.20;
+        -webkit-transform:translateY(-50%) rotate(-11deg) scale(1.075);
+    }
+}
+
+/* Respeta preferencia del sistema sin ocultar el emoji. */
+@media(prefers-reduced-motion:reduce){
+    .gx-gamif-card.gx-referral-ready,
+    .gx-gamif-card.pulse-mission,
+    .gx-gamif-card.gx-referral-ready::before,
+    .gx-gamif-card.pulse-mission::before{
+        animation:none !important;
+        -webkit-animation:none !important;
+    }
+}
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -5884,7 +6017,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V6.5.2: referido minimalista flotante.");
+        console.info("GOXION Ayuda Beta V6.6.2: referido minimalista flotante.");
     })();
     </script>
 
