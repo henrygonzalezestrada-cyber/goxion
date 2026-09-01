@@ -2554,6 +2554,225 @@
     }
 </style>
 
+
+<style id="goxion-ayuda-v6-gamif-unified">
+    #gamif-grid{
+        gap:12px!important;
+        align-items:stretch;
+    }
+    .gx-gamif-card{
+        position:relative;
+        overflow:hidden;
+        min-height:168px;
+        padding:16px!important;
+        border-radius:22px!important;
+        display:flex!important;
+        flex-direction:column;
+        justify-content:flex-start;
+        align-items:stretch!important;
+        text-align:left!important;
+        background:
+            radial-gradient(circle at 85% 10%, rgba(124,77,255,.14), transparent 34%),
+            linear-gradient(180deg, rgba(12,12,18,.82), rgba(7,7,11,.72))!important;
+        border:1px solid rgba(255,255,255,.08)!important;
+        box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
+    }
+    .gx-gamif-card::after{
+        content:"";
+        position:absolute;
+        inset:auto -28px -52px auto;
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        background:rgba(0,242,254,.05);
+        filter:blur(10px);
+        pointer-events:none;
+    }
+    .gx-gamif-card-top{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin-bottom:13px;
+    }
+    .gx-gamif-card .gamif-icon{
+        width:40px;
+        height:40px;
+        display:grid;
+        place-items:center;
+        margin:0!important;
+        border-radius:14px;
+        background:rgba(255,255,255,.045);
+        border:1px solid rgba(255,255,255,.08);
+        font-size:1.25rem!important;
+    }
+    .gx-gamif-card-kicker{
+        color:var(--text-muted);
+        font-size:.58rem;
+        font-weight:900;
+        letter-spacing:1.15px;
+    }
+    .gx-gamif-card .gamif-title{
+        margin:0!important;
+        font-size:.96rem!important;
+        line-height:1.15;
+        font-weight:850!important;
+        letter-spacing:.1px;
+    }
+    .gx-gamif-card-status{
+        margin-top:5px;
+        font-size:.7rem;
+        font-weight:850;
+        color:var(--neon-blue);
+    }
+    .gx-gamif-card-meta{
+        margin-top:4px;
+        color:var(--text-muted);
+        font-size:.63rem;
+        line-height:1.35;
+    }
+    .gx-gamif-progress{
+        width:100%;
+        height:6px;
+        margin-top:auto;
+        padding-top:14px;
+        box-sizing:content-box;
+    }
+    .gx-gamif-progress::before{
+        content:"";
+        position:absolute;
+    }
+    .gx-gamif-progress{
+        background:transparent;
+        position:relative;
+    }
+    .gx-gamif-progress::after{
+        content:"";
+        position:absolute;
+        left:0;right:0;bottom:0;
+        height:6px;
+        border-radius:999px;
+        background:rgba(255,255,255,.07);
+    }
+    .gx-gamif-progress span{
+        position:absolute;
+        left:0;
+        bottom:0;
+        z-index:2;
+        height:6px;
+        border-radius:999px;
+        background:linear-gradient(90deg,var(--neon-purple),var(--neon-blue));
+        box-shadow:0 0 14px rgba(0,242,254,.18);
+        transition:width .35s ease;
+    }
+    .gx-gamif-card-ref.gx-referral-ready .gx-gamif-card-status,
+    .gx-gamif-card-ref .gx-gamif-card-status[style*="success"]{
+        color:var(--success-green)!important;
+    }
+
+    .gamif-expanded-container{
+        border-radius:24px!important;
+        padding:18px!important;
+    }
+    .gx-gamif-expanded-head{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin-bottom:14px;
+    }
+    .gx-gamif-expanded-head .btn-gamif-close{
+        margin:0!important;
+    }
+    .gx-gamif-expanded-kicker{
+        color:var(--text-muted);
+        font-size:.56rem;
+        font-weight:900;
+        letter-spacing:1px;
+    }
+    #gamif-expanded-referral,
+    #gamif-expanded-coupon{
+        overflow:hidden;
+    }
+    #gamif-expanded-referral .gamif-title,
+    #gamif-expanded-coupon .gamif-title{
+        font-size:1.05rem;
+    }
+    #gamif-expanded-referral .mission-item,
+    #gamif-expanded-coupon .mission-item{
+        border-radius:13px!important;
+        border:1px solid rgba(255,255,255,.07)!important;
+        background:rgba(255,255,255,.025)!important;
+    }
+
+    @media(max-width:520px){
+        #gamif-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
+        .gx-gamif-card{min-height:156px;padding:13px!important}
+        .gx-gamif-card .gamif-icon{width:36px;height:36px;border-radius:12px}
+        .gx-gamif-card .gamif-title{font-size:.86rem!important}
+        .gx-gamif-card-status{font-size:.66rem}
+        .gx-gamif-card-meta{font-size:.59rem}
+        .gamif-expanded-container{padding:15px!important}
+    }
+</style>
+
+<style id="goxion-user-morph-css">
+/* --- MORPHING PREMIUM PARA GAMIFICACIÓN --- */
+.gamif-expanded-container {
+    display: none;
+    background: var(--card-glass);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 24px;
+    padding: 20px; 
+    margin-bottom: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 242, 254, 0.1);
+    transform-origin: center top;
+    will-change: transform, opacity;
+}
+
+/* Animación de Entrada Fluid Morph */
+.gamif-expanded-container.gx-morph-in {
+    display: block !important;
+    animation: morphExpand 0.45s cubic-bezier(0.34, 1.4, 0.64, 1) forwards;
+}
+
+/* Animación de Salida Fluid Morph */
+.gamif-expanded-container.gx-morph-out {
+    display: block !important;
+    animation: morphCollapse 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes morphExpand {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(-20px);
+        filter: blur(8px);
+    }
+    70% {
+        transform: scale(1.02) translateY(2px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+}
+
+@keyframes morphCollapse {
+    0% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(0.9) translateY(-15px);
+        filter: blur(6px);
+    }
+}
+</style>
 </head>
 <body class="no-scroll">
 
@@ -3965,15 +4184,29 @@
                           `;
                 }
 
+                const refProgressPct = beneficioReclamado ? 100 : Math.min(100, Math.round((Math.min(3, meses) / 3) * 100));
+                const refStateText = beneficioReclamado
+                    ? "Beneficio reclamado"
+                    : beneficioListo
+                        ? "Mes gratis disponible"
+                        : (plats < 2 ? "Progreso pausado" : "En progreso");
+
                 btnRefHtml = `
-                    <div class="gamif-btn ${refCardClass}" onclick="openGamif('referral')">
-                        <div class="gamif-icon">${beneficioReclamado ? '💝' : '🎁'}</div>
-                        <div class="gamif-title gx-referral-card-title">${refNombre}</div>
-                        <div id="gx-referral-status" class="gamif-subtitle" style="color:${refSubtitleColor};font-weight:bold;">${refSubtitle}</div>
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-ref ${refCardClass}" onclick="openGamif('referral')">
+                        <div class="gx-gamif-card-top">
+                            <div class="gamif-icon">${beneficioReclamado ? '💝' : '🎁'}</div>
+                            <span class="gx-gamif-card-kicker">REFERIDOS</span>
+                        </div>
+                        <div class="gamif-title gx-referral-card-title">${refNombre || 'Tu referido'}</div>
+                        <div id="gx-referral-status" class="gx-gamif-card-status" style="color:${refSubtitleColor};">${refStateText}</div>
+                        <div class="gx-gamif-card-meta">${plats} servicio${plats===1?'':'s'} activo${plats===1?'':'s'} · ${meses}/3 meses</div>
+                        <div class="gx-gamif-progress" aria-label="Progreso de referidos">
+                            <span style="width:${refProgressPct}%"></span>
+                        </div>
                     </div>`;
 
                 expandedRefHtml = `
-                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <div class="gx-gamif-expanded-head"><button class="btn-gamif-close" onclick="closeGamif()">← Volver</button><span class="gx-gamif-expanded-kicker">GOXION REWARDS</span></div>
 
                     <div style="text-align:center; margin-bottom:25px; margin-top:5px;">
                         <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:42px; margin-bottom:8px; display:inline-block; filter: drop-shadow(0 0 15px rgba(0,242,254,0.3));">${beneficioReclamado ? '💝' : '🎁'}</div>
@@ -4049,12 +4282,26 @@
                     ? `<span style="color:var(--neon-blue);font-weight:800;">¡Listo para reclamar!</span>`
                     : (hasMissions ? `<span style="color:var(--neon-blue);font-weight:bold;">¡Misiones activas!</span>` : `Sin tareas`));
 
-            btnCupHtml = `
-                <div class="gamif-btn ${cupPulse}" onclick="openGamif('coupon')">
-                    <div class="gamif-icon">${couponClaimed ? '🥇' : '🎟️'}</div>
-                    <div class="gamif-title">Cupones</div>
-                    <div id="gx-coupon-subtitle" class="gamif-subtitle">${cupSubtitle}</div>
-                </div>`;
+            const missionTotal = Array.isArray(tareas) ? tareas.length : (typeof totalTareas !== 'undefined' ? totalTareas : 0);
+                const missionDone = Array.isArray(tareas) ? tareas.filter(t => t && t.completada === true).length : (typeof tareasCompletadas !== 'undefined' ? tareasCompletadas : 0);
+                const missionPct = missionTotal > 0 ? Math.min(100, Math.round((missionDone / missionTotal) * 100)) : 0;
+                const missionClaimed = typeof cuponReclamado !== 'undefined' ? cuponReclamado : false;
+                const missionReady = missionTotal > 0 && missionDone >= missionTotal;
+                const missionState = missionClaimed ? 'Beneficio aplicado' : missionReady ? 'Recompensa lista' : `${missionDone} de ${missionTotal} completadas`;
+
+                btnCupHtml = `
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-mission ${missionReady && !missionClaimed ? 'pulse-mission' : ''}" onclick="openGamif('coupon')">
+                        <div class="gx-gamif-card-top">
+                            <div class="gamif-icon">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
+                            <span class="gx-gamif-card-kicker">MISIONES GOXION</span>
+                        </div>
+                        <div class="gamif-title">Tu progreso</div>
+                        <div class="gx-gamif-card-status">${missionState}</div>
+                        <div class="gx-gamif-card-meta">Recompensa: ${Number(descuento || 0)}% OFF</div>
+                        <div class="gx-gamif-progress" aria-label="Progreso de misiones">
+                            <span style="width:${missionPct}%"></span>
+                        </div>
+                    </div>`;
 
             if(hasMissions && tareasArr.length > 0) {
                 let missionsHTML = '';
@@ -5121,7 +5368,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V5: referido minimalista flotante.");
+        console.info("GOXION Ayuda Beta V6: referido minimalista flotante.");
     })();
     </script>
 
@@ -5186,5 +5433,79 @@ function goxionBetaLegacy(data) {
 })();
 </script>
 
+<script>
+window.openGamif = function(type) {
+    const grid = document.getElementById('gamif-grid');
+    const refPanel = document.getElementById('gamif-expanded-referral');
+    const cupPanel = document.getElementById('gamif-expanded-coupon');
+    
+    // Ocultamos la cuadrícula suavemente
+    grid.style.transition = 'all 0.2s ease';
+    grid.style.opacity = '0';
+    grid.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        grid.style.display = 'none';
+
+        if(type === 'referral') {
+            cupPanel.style.display = 'none';
+            cupPanel.classList.remove('gx-morph-in', 'gx-morph-out');
+            
+            refPanel.classList.remove('gx-morph-out');
+            refPanel.classList.add('gx-morph-in');
+        } else {
+            refPanel.style.display = 'none';
+            refPanel.classList.remove('gx-morph-in', 'gx-morph-out');
+            
+            cupPanel.classList.remove('gx-morph-out');
+            cupPanel.classList.add('gx-morph-in');
+
+            // Lógica de misiones al desplegar
+            const key = localStorage.getItem('goxion_user_key');
+            const folio = key && globalClientesData?.[key] ? globalClientesData[key].folio : "";
+            const pendingKey = folio ? 'goxion_recent_mission_' + folio : "";
+            const pending = pendingKey ? localStorage.getItem(pendingKey) : null;
+
+            if(pending !== null) {
+                setTimeout(() => {
+                    const item = document.getElementById('mission-' + pending);
+                    if(item) {
+                        item.classList.remove('gx-mission-just-completed');
+                        void item.offsetWidth;
+                        item.classList.add('gx-mission-just-completed');
+                        setTimeout(() => item.classList.remove('gx-mission-just-completed'), 900);
+                    }
+                    localStorage.removeItem(pendingKey);
+                }, 130);
+            } else {
+                setTimeout(animarMisionesCompletadasEnSecuencia, 170);
+            }
+        }
+    }, 200);
+};
+
+window.closeGamif = function() {
+    const grid = document.getElementById('gamif-grid');
+    const refPanel = document.getElementById('gamif-expanded-referral');
+    const cupPanel = document.getElementById('gamif-expanded-coupon');
+    
+    // Determinamos qué panel está abierto y lanzamos la animación de salida
+    const activePanel = (refPanel.classList.contains('gx-morph-in')) ? refPanel : cupPanel;
+    
+    activePanel.classList.remove('gx-morph-in');
+    activePanel.classList.add('gx-morph-out');
+    
+    setTimeout(() => {
+        activePanel.style.display = 'none';
+        activePanel.classList.remove('gx-morph-out');
+        
+        // Regresamos la cuadrícula de botones con fluidez
+        grid.style.display = 'grid';
+        void grid.offsetWidth; // Force reflow
+        grid.style.opacity = '1';
+        grid.style.transform = 'scale(1)';
+    }, 280);
+};
+</script>
 </body>
 </html>
