@@ -3934,8 +3934,9 @@
                 let beneficioReclamado = cliente.referido_activo.beneficio_reclamado === true;
                 let beneficioListo = plats >= 2 && meses >= 3;
 
+                // --- NUEVO DISEÑO: MINIMALISMO FLOTANTE EN REFERIDOS ---
                 let warningHTML = plats < 2
-                    ? `<div style="background:rgba(255,170,0,.15);border:1px dashed var(--warning-amber);border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--warning-amber);">⚠️ Tu referido necesita al menos 2 servicios activos. Le falta ${Math.max(0, 2 - plats)} para continuar con el beneficio.</div>`
+                    ? `<div style="color:var(--warning-amber); font-size:11px; text-align:center; margin-top:12px;">⚠️ Tu referido necesita al menos 2 servicios activos. Le falta ${Math.max(0, 2 - plats)}.</div>`
                     : '';
 
                 let refSubtitle = "";
@@ -3957,10 +3958,10 @@
                 let claimMonthHTML = "";
                 if(beneficioListo) {
                     claimMonthHTML = beneficioReclamado
-                        ? `<button id="btn-claim-free-month" class="btn-primary gx-claim-done" disabled style="margin-top:14px;padding:14px;font-size:13px;">✅ Mes gratis reclamado</button>`
+                        ? `<button id="btn-claim-free-month" class="btn-primary gx-claim-done" disabled style="margin-top:20px;padding:14px;font-size:13px;">✅ Mes gratis reclamado</button>`
                         : `
-                            <div class="gx-benefit-ready-note">🎉 ¡Tu referido ya cumplió el ciclo! Toca el botón para registrar tu beneficio.</div>
-                            <button id="btn-claim-free-month" class="btn-primary" style="margin-top:4px;padding:14px;font-size:13px;" onclick="reclamarMesGratis('${cliente.nombre}', '${cliente.folio}', '${refNombre.replace(/'/g, "\\'")}')">🎁 Reclama tu mes gratis</button>
+                            <div style="text-align:center; color:var(--success-green); font-size:13px; font-weight:800; margin-top:20px; margin-bottom:10px;">🎉 ¡Ciclo cumplido!</div>
+                            <button id="btn-claim-free-month" class="btn-primary" style="padding:14px;font-size:13px;" onclick="reclamarMesGratis('${cliente.nombre}', '${cliente.folio}', '${refNombre.replace(/'/g, "\\'")}')">🎁 Reclama tu mes gratis</button>
                           `;
                 }
 
@@ -3973,35 +3974,42 @@
 
                 expandedRefHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align:center;margin-bottom:15px;margin-top:-5px;">
-                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:38px;margin-bottom:5px;display:inline-block;">${beneficioReclamado ? '💝' : '🎁'}</div>
-                        <div class="gx-referral-name" style="font-size:16px;font-weight:800;">¡Gracias por invitar a ${refNombre}!</div>
+
+                    <div style="text-align:center; margin-bottom:25px; margin-top:5px;">
+                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:42px; margin-bottom:8px; display:inline-block; filter: drop-shadow(0 0 15px rgba(0,242,254,0.3));">${beneficioReclamado ? '💝' : '🎁'}</div>
+                        <div class="gx-referral-name" style="font-size:18px; font-weight:800; color:#fff;">Tus Recompensas</div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Progreso de tu invitado: <span style="color:var(--text-main); font-weight:700;">${refNombre}</span></div>
                     </div>
-                    <div class="referral-stats">
-                        <div class="stat-box" style="border-right:1px solid rgba(255,255,255,.05);">
-                            <div class="stat-val" style="${plats < 2 ? 'color:var(--warning-amber);' : ''}">${plats}</div>
-                            <div class="stat-label">Servicios</div>
+
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 25px;">
+                        <div style="text-align:center;">
+                            <div style="font-size:22px; font-weight:800; color:${plats < 2 ? 'var(--warning-amber)' : 'var(--neon-blue)'}; line-height:1;">${plats}</div>
+                            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Servicios</div>
                         </div>
-                        <div class="stat-box">
-                            <div class="stat-val" style="${beneficioListo ? 'color:var(--success-green);' : ''}">${meses}/3</div>
-                            <div class="stat-label">Meses</div>
+                        <div style="text-align:center;">
+                            <div style="font-size:22px; font-weight:800; color:${beneficioListo ? 'var(--success-green)' : 'var(--neon-blue)'}; line-height:1;">${meses}/3</div>
+                            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Meses</div>
                         </div>
                     </div>
 
-                    <div class="gx-ref-services-client">
-                        <div class="gx-ref-services-title">Servicios activos de ${refNombre}</div>
+                    <div style="margin-bottom: 30px;">
+                        <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:12px; text-align:center;">Servicios Activos</div>
                         ${serviciosRef.length
-                            ? `<div class="gx-ref-service-chips">${serviciosRef.map(s => `<span>✓ ${s}</span>`).join('')}</div>`
-                            : `<div class="gx-ref-services-empty">Aún no hay servicios activos vinculados a este referido.</div>`}
-                        <div class="gx-ref-sync-note">Este progreso se sincroniza con los servicios que se registran para el referido desde GOXION.</div>
+                            ? `<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">${serviciosRef.map(s => `<span style="padding:6px 14px; border-radius:20px; background:rgba(0,242,254,0.05); border:1px solid rgba(0,242,254,0.2); color:var(--neon-blue); font-size:11px; font-weight:700;">✓ ${s}</span>`).join('')}</div>`
+                            : `<div style="text-align:center; color:var(--warning-amber); font-size:11px;">Aún no hay servicios vinculados.</div>`}
+                        <div style="font-size:10px; color:var(--text-muted); text-align:center; margin-top:14px; opacity:0.6;">Sincronizado desde GOXION</div>
                     </div>
-                    <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">Progreso a tu mes gratis:</div>
-                    <div class="loyalty-progress-bg" style="height:6px;">
-                        <div class="loyalty-progress-fill" style="width:${Math.min((meses / 3) * 100,100)}%;background:${beneficioListo ? 'linear-gradient(90deg,#00f2fe,#00ff9d)' : 'linear-gradient(90deg,#ffaa00,#ff3366)'};"></div>
+
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px; text-align:center;">Progreso al mes gratis</div>
+                    <div class="loyalty-progress-bg" style="height:6px; background:rgba(255,255,255,0.05); border:none;">
+                        <div class="loyalty-progress-fill" style="width:${Math.min((meses / 3) * 100,100)}%; background:${beneficioListo ? 'linear-gradient(90deg,#00f2fe,#00ff9d)' : 'linear-gradient(90deg,#7c4dff,#00f2fe)'}; box-shadow: 0 0 10px ${beneficioListo ? 'rgba(0,255,157,0.4)' : 'rgba(0,242,254,0.4)'};"></div>
                     </div>
+
                     ${warningHTML}
                     ${claimMonthHTML}
-                    <div style="font-size:11px;color:var(--neon-blue);margin-top:15px;text-align:center;cursor:pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
+
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:20px; text-align:center; cursor:pointer; text-decoration:underline;" onclick="openModal('modal-referidos')">Ver reglas del beneficio</div>`;
+                // --- FIN DE NUEVO DISEÑO ---
             } else {
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
                 btnRefHtml = `
@@ -5113,7 +5121,7 @@ function goxionBetaLegacy(data) {
             }).catch(e => console.log("Notificación beta no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta V4: referido sincronizado y visible.");
+        console.info("GOXION Ayuda Beta V5: referido minimalista flotante.");
     })();
     </script>
 
