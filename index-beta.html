@@ -238,54 +238,13 @@
     .btn-submit-payment:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   </style>
 
-<style id="goxion-index-beta-v7-incomplete-payment">
+
+<style id="goxion-index-beta-v7-1-incomplete-badge">
 .badge-incomplete{
     color:var(--warning-amber)!important;
     border-color:rgba(255,170,0,.34)!important;
     background:rgba(255,170,0,.10)!important;
     box-shadow:0 0 16px rgba(255,170,0,.08);
-}
-.gx-incomplete-payment-box{
-    border-color:rgba(255,170,0,.24)!important;
-    background:linear-gradient(180deg,rgba(255,170,0,.065),rgba(8,8,12,.42))!important;
-}
-.gx-incomplete-payment-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    color:var(--warning-amber);
-    font-size:13px;
-    font-weight:800;
-}
-.gx-incomplete-payment-head strong{
-    color:var(--text-main);
-    white-space:nowrap;
-}
-.gx-incomplete-payment-message{
-    margin-top:10px;
-    color:var(--text-main);
-    font-size:12px;
-    line-height:1.5;
-}
-.gx-incomplete-payment-help{
-    margin-top:8px;
-    color:var(--text-muted);
-    font-size:11px;
-    line-height:1.45;
-}
-.gx-btn-complete-difference{
-    background:rgba(255,170,0,.10)!important;
-    border-color:rgba(255,170,0,.38)!important;
-    color:var(--warning-amber)!important;
-    text-shadow:0 0 10px rgba(255,170,0,.16)!important;
-}
-@media(max-width:420px){
-    .gx-incomplete-payment-head{
-        align-items:flex-start;
-        flex-direction:column;
-        gap:4px;
-    }
 }
 </style>
 
@@ -842,8 +801,8 @@ function goxionBetaLegacy(data) {
           labelTotal = "Saldo Pendiente";
           btnAccionHTML = `
             <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
-            <button class="btn btn-wa gx-btn-complete-difference" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
-              📤 Ya pagué la diferencia
+            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
+              📤 Ya realicé mi depósito
             </button>
           `;
       } else {
@@ -855,32 +814,8 @@ function goxionBetaLegacy(data) {
           `;
       }
 
-      const mensajePagoIncompletoSeguro = String(
-          cliente.pago_revision_mensaje ||
-          "Tu pago anterior fue recibido, pero quedó una diferencia pendiente."
-      ).replace(/[&<>"']/g, ch => ({
-          "&":"&amp;",
-          "<":"&lt;",
-          ">":"&gt;",
-          '"':"&quot;",
-          "'":"&#039;"
-      })[ch]);
-
       let breakdownHTML = '';
-      if (pagoIncompleto) {
-          breakdownHTML = `
-            <div class="glass-card gx-incomplete-payment-box">
-              <div class="gx-incomplete-payment-head">
-                <span>⚠️ Pago incompleto</span>
-                ${tieneDiferenciaPendiente ? `<strong>$${montoFaltanteRevision.toFixed(2)} pendiente</strong>` : ''}
-              </div>
-              <div class="gx-incomplete-payment-message">${mensajePagoIncompletoSeguro}</div>
-              <div class="gx-incomplete-payment-help">
-                Realiza únicamente el saldo pendiente mostrado arriba y vuelve a enviar tu comprobante.
-              </div>
-            </div>
-          `;
-      } else if (!estaPagadoPeriodo && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+      if (!estaPagadoPeriodo && !pagoIncompleto && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
             <div class="glass-card breakdown-box">
               <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
