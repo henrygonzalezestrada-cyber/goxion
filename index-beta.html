@@ -237,6 +237,58 @@
     .btn-submit-payment:hover { box-shadow: 0 0 30px rgba(46, 160, 67, 0.6); transform: translateY(-2px); }
     .btn-submit-payment:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   </style>
+
+<style id="goxion-index-beta-v7-incomplete-payment">
+.badge-incomplete{
+    color:var(--warning-amber)!important;
+    border-color:rgba(255,170,0,.34)!important;
+    background:rgba(255,170,0,.10)!important;
+    box-shadow:0 0 16px rgba(255,170,0,.08);
+}
+.gx-incomplete-payment-box{
+    border-color:rgba(255,170,0,.24)!important;
+    background:linear-gradient(180deg,rgba(255,170,0,.065),rgba(8,8,12,.42))!important;
+}
+.gx-incomplete-payment-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    color:var(--warning-amber);
+    font-size:13px;
+    font-weight:800;
+}
+.gx-incomplete-payment-head strong{
+    color:var(--text-main);
+    white-space:nowrap;
+}
+.gx-incomplete-payment-message{
+    margin-top:10px;
+    color:var(--text-main);
+    font-size:12px;
+    line-height:1.5;
+}
+.gx-incomplete-payment-help{
+    margin-top:8px;
+    color:var(--text-muted);
+    font-size:11px;
+    line-height:1.45;
+}
+.gx-btn-complete-difference{
+    background:rgba(255,170,0,.10)!important;
+    border-color:rgba(255,170,0,.38)!important;
+    color:var(--warning-amber)!important;
+    text-shadow:0 0 10px rgba(255,170,0,.16)!important;
+}
+@media(max-width:420px){
+    .gx-incomplete-payment-head{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:4px;
+    }
+}
+</style>
+
 </head>
 <body>
 
@@ -314,6 +366,10 @@ function goxionBetaLegacy(data) {
             corte_virtual: c.corte_virtual === true,
             estado: c.estado || "pendiente",
             pago_en_revision: c.pago_en_revision === true,
+            pago_revision_estado: String(c.pago_revision_estado || ""),
+            pago_revision_mensaje: c.pago_revision_mensaje || "",
+            pago_revision_monto_faltante: Number(c.pago_revision_monto_faltante || 0),
+            pago_revision_updated_at: c.pago_revision_updated_at || "",
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
             trato_justo_compensaciones: Array.isArray(data.trato_justo_compensaciones) ? data.trato_justo_compensaciones : [],
@@ -645,6 +701,12 @@ function goxionBetaLegacy(data) {
           (isReviewLocal && cliente.estado !== "pendiente" && cliente.estado !== "suspendido")
       );
 
+      const montoFaltanteRevision = Math.max(0, Number(cliente.pago_revision_monto_faltante || 0));
+      const pagoIncompleto = !estaPagadoPeriodo
+          && !enRevision
+          && String(cliente.pago_revision_estado || "").toLowerCase() === "incompleto";
+      const tieneDiferenciaPendiente = pagoIncompleto && montoFaltanteRevision > 0;
+
       if (estaPagadoPeriodo) {
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
@@ -654,6 +716,12 @@ function goxionBetaLegacy(data) {
           badgeClass = "badge-review";
           badgeText = `⏳ Validando Pago`;
           uiColor = "var(--neon-purple)";
+      } else if (pagoIncompleto) {
+          badgeClass = "badge-incomplete";
+          badgeText = tieneDiferenciaPendiente
+              ? `⚠️ Pago incompleto · resta $${montoFaltanteRevision.toFixed(2)}`
+              : `⚠️ Pago incompleto`;
+          uiColor = "var(--warning-amber)";
       } else if (difDias > 0) {
           badgeClass = "badge-ok";
           badgeText = `⏳ Vence en ${difDias} día(s)`;
@@ -754,9 +822,9 @@ function goxionBetaLegacy(data) {
       if (totalFinal < 0) totalFinal = 0; 
 
       let labelTotal = "Total a Pagar";
-      
+
       let btnAccionHTML = "";
-      
+
       if (estaPagadoPeriodo) {
           totalFinal = 0;
           labelTotal = "Saldo Pendiente";
@@ -767,8 +835,18 @@ function goxionBetaLegacy(data) {
               <span style="font-size: 11px; color: var(--text-muted);">El equipo de Goxion actualizará tu estado en breve.</span>
             </div>
           `;
+      } else if (pagoIncompleto) {
+          // Administración ya validó el pago anterior y registró la diferencia.
+          // Ese monto pasa a ser el saldo mostrado y el monto del siguiente comprobante.
+          if (tieneDiferenciaPendiente) totalFinal = montoFaltanteRevision;
+          labelTotal = "Saldo Pendiente";
+          btnAccionHTML = `
+            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
+            <button class="btn btn-wa gx-btn-complete-difference" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
+              📤 Ya pagué la diferencia
+            </button>
+          `;
       } else {
-          // SE MODIFICÓ PARA ABRIR EL MODAL EN LUGAR DE ENVIAR DIRECTO
           btnAccionHTML = `
             <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
             <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
@@ -777,8 +855,32 @@ function goxionBetaLegacy(data) {
           `;
       }
 
+      const mensajePagoIncompletoSeguro = String(
+          cliente.pago_revision_mensaje ||
+          "Tu pago anterior fue recibido, pero quedó una diferencia pendiente."
+      ).replace(/[&<>"']/g, ch => ({
+          "&":"&amp;",
+          "<":"&lt;",
+          ">":"&gt;",
+          '"':"&quot;",
+          "'":"&#039;"
+      })[ch]);
+
       let breakdownHTML = '';
-      if (!estaPagadoPeriodo && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+      if (pagoIncompleto) {
+          breakdownHTML = `
+            <div class="glass-card gx-incomplete-payment-box">
+              <div class="gx-incomplete-payment-head">
+                <span>⚠️ Pago incompleto</span>
+                ${tieneDiferenciaPendiente ? `<strong>$${montoFaltanteRevision.toFixed(2)} pendiente</strong>` : ''}
+              </div>
+              <div class="gx-incomplete-payment-message">${mensajePagoIncompletoSeguro}</div>
+              <div class="gx-incomplete-payment-help">
+                Realiza únicamente el saldo pendiente mostrado arriba y vuelve a enviar tu comprobante.
+              </div>
+            </div>
+          `;
+      } else if (!estaPagadoPeriodo && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
             <div class="glass-card breakdown-box">
               <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
@@ -809,7 +911,7 @@ function goxionBetaLegacy(data) {
         </div>
 
         <div class="scrollable-content">
-          ${(cliente.estado === 'pagado' || enRevision) ? '' : mensajeAtrasoHTML}
+          ${(cliente.estado === 'pagado' || enRevision || pagoIncompleto) ? '' : mensajeAtrasoHTML}
 
           <div class="glass-card card-info">
             <div class="info-block">
