@@ -2521,7 +2521,7 @@
         }
 
 
-    /* --- BETA: REFERIDOS INTELIGENTES + ESTADO DE PAGO --- */
+    /* Referidos inteligentes + estado de pago */
     .gx-client-payment-alert{
         display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;padding:12px 13px;
         border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(8,8,12,.68)
@@ -2543,7 +2543,7 @@
 
 </style>
 
-<style id="goxion-ayuda-v4-referral-ui">
+<style id="goxion-referral-ui">
     .gx-ref-sync-note{
         margin:9px 0 0;padding:8px 10px;border-radius:10px;background:rgba(0,242,254,.045);
         border:1px solid rgba(0,242,254,.11);color:#b9c9dc;font-size:10px;line-height:1.45
@@ -2555,7 +2555,7 @@
 </style>
 
 
-<style id="goxion-ayuda-v6-gamif-unified">
+<style id="goxion-gamification-base">
     #gamif-grid{
         gap:12px!important;
         align-items:stretch;
@@ -2989,15 +2989,12 @@
 }
 </style>
 
-<style id="goxion-ayuda-v6-4-card-polish">
-/* ==========================================================
-   TARJETAS DE GAMIFICACIÓN — GLASS LIMPIO / SIN DESTELLOS
-   ========================================================== */
+<style id="goxion-gamification-cards-final">
+/* Tarjetas finales de Referidos / Misiones */
 #gamif-grid{
     gap:10px!important;
     align-items:stretch!important;
 }
-
 .gx-gamif-card{
     position:relative!important;
     isolation:isolate;
@@ -3018,50 +3015,57 @@
     box-shadow:0 14px 34px rgba(0,0,0,.26)!important;
     animation:none!important;
 }
-
-/* Anula los pulsos morado/cian heredados de estados listos/activos. */
-.gx-gamif-card.pulse-referral,
-.gx-gamif-card.pulse-mission,
-.gx-gamif-card.gx-referral-ready{
+.gx-gamif-card.pulse-referral{
     animation:none!important;
     border-color:rgba(255,255,255,.09)!important;
     box-shadow:0 14px 34px rgba(0,0,0,.26)!important;
     transform:none!important;
 }
-
-/* Elimina los destellos/glows decorativos antiguos. */
+.gx-gamif-card.gx-referral-ready,
+.gx-gamif-card.pulse-mission{
+    animation:gxRewardBreath 2.35s cubic-bezier(.4,0,.2,1) 2!important;
+    border-color:rgba(0,242,254,.20)!important;
+}
 .gx-gamif-card::after{
     content:none!important;
     display:none!important;
 }
-
-/* Emoji convertido en marca de agua de fondo. */
 .gx-gamif-card::before{
     content:attr(data-watermark);
     position:absolute;
     z-index:-1;
-    right:-12px;
-    top:52%;
-    transform:translateY(-50%) rotate(-16deg) scale(1.04);
-    -webkit-transform:translateY(-50%) rotate(-16deg) scale(1.04);
-    font-size:6.4rem;
+    right:-7px!important;
+    top:51%!important;
+    transform:translateY(-50%) rotate(-14deg) scale(1.04)!important;
+    -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04)!important;
+    transform-origin:center!important;
+    -webkit-transform-origin:center!important;
+    font-size:7.25rem!important;
     line-height:1;
-    opacity:.055;
-    filter:grayscale(1) saturate(0) blur(.15px);
-    -webkit-filter:grayscale(1) saturate(0) blur(.15px);
+    opacity:.145!important;
+    filter:grayscale(0) saturate(.92) contrast(.95)!important;
+    -webkit-filter:grayscale(0) saturate(.92) contrast(.95)!important;
     pointer-events:none;
     user-select:none;
 }
-
+.gx-gamif-card.gx-referral-ready::before,
+.gx-gamif-card.pulse-mission::before{
+    animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2!important;
+    -webkit-animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2!important;
+}
+.gx-gamif-card[data-watermark="💝"]::before,
+.gx-gamif-card[data-watermark="✅"]::before{
+    opacity:.13!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+}
 .gx-gamif-card > *{
     position:relative;
     z-index:2;
 }
-
-/* Encabezado: sólo texto, una sola línea. */
 .gx-gamif-card-top{
     display:block!important;
-    margin:0 0 15px!important;
+    margin:0!important;
     min-width:0;
 }
 .gx-gamif-card .gamif-icon{
@@ -3081,15 +3085,13 @@
     overflow:hidden;
     text-overflow:ellipsis;
 }
-
-/* Nombre del referido / Tu progreso: protagonista, máximo 2 líneas. */
 .gx-gamif-card .gamif-title{
     display:-webkit-box!important;
     -webkit-box-orient:vertical;
     -webkit-line-clamp:2;
     overflow:hidden;
     max-width:88%;
-    margin:0!important;
+    margin:18px 0 0!important;
     color:#fff!important;
     font-size:clamp(1.08rem,4.5vw,1.28rem)!important;
     line-height:1.08!important;
@@ -3097,19 +3099,17 @@
     letter-spacing:-.25px!important;
     overflow-wrap:anywhere;
 }
-
 .gx-gamif-card-status{
     display:-webkit-box;
     -webkit-box-orient:vertical;
     -webkit-line-clamp:2;
     overflow:hidden;
     max-width:91%;
-    margin-top:10px!important;
+    margin-top:9px!important;
     font-size:clamp(.74rem,3.15vw,.83rem)!important;
     line-height:1.22!important;
     font-weight:800!important;
 }
-
 .gx-gamif-card-meta{
     display:-webkit-box;
     -webkit-box-orient:vertical;
@@ -3121,22 +3121,16 @@
     font-size:clamp(.64rem,2.8vw,.72rem)!important;
     line-height:1.32!important;
 }
-
-/* ==========================================================
-   PROGRESO: EL EFECTO EXISTE SÓLO DENTRO DEL % COMPLETADO
-   ========================================================== */
 .gx-gamif-progress{
     position:relative!important;
     width:100%!important;
     height:6px!important;
     box-sizing:content-box!important;
     margin-top:auto!important;
-    padding-top:16px!important;
+    padding-top:18px!important;
     overflow:visible!important;
     background:transparent!important;
 }
-
-/* Riel vacío completamente estático. */
 .gx-gamif-progress::before{
     content:none!important;
     display:none!important;
@@ -3155,8 +3149,6 @@
     background:rgba(255,255,255,.075)!important;
     box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)!important;
 }
-
-/* El ancho inline sigue siendo la fuente de verdad. */
 .gx-gamif-progress > span{
     position:absolute!important;
     z-index:2!important;
@@ -3174,8 +3166,6 @@
     -webkit-animation:none!important;
     transition:width .4s ease!important;
 }
-
-/* Barrido únicamente dentro de la porción completada. En width:0 no se ve. */
 .gx-gamif-progress > span::after{
     content:""!important;
     position:absolute!important;
@@ -3188,7 +3178,6 @@
     -webkit-animation:gxRealProgressSweep 2.05s cubic-bezier(.4,0,.2,1) infinite!important;
     pointer-events:none!important;
 }
-
 @keyframes gxRealProgressSweep{
     0%{transform:translateX(-130%);opacity:0}
     18%{opacity:.9}
@@ -3201,219 +3190,69 @@
     82%{opacity:.72}
     100%{-webkit-transform:translateX(260%);opacity:0}
 }
-
+@keyframes gxRewardBreath{
+    0%,100%{
+        box-shadow:0 14px 34px rgba(0,0,0,.26),0 0 0 rgba(0,242,254,0);
+        transform:translateY(0);
+    }
+    50%{
+        box-shadow:0 16px 38px rgba(0,0,0,.30),0 0 22px rgba(0,242,254,.105);
+        transform:translateY(-1px);
+    }
+}
+@keyframes gxWatermarkCelebrate{
+    0%,100%{opacity:.145;transform:translateY(-50%) rotate(-14deg) scale(1.04)}
+    50%{opacity:.215;transform:translateY(-50%) rotate(-11deg) scale(1.085)}
+}
+@-webkit-keyframes gxWatermarkCelebrate{
+    0%,100%{opacity:.145;-webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04)}
+    50%{opacity:.215;-webkit-transform:translateY(-50%) rotate(-11deg) scale(1.085)}
+}
 @media(max-width:520px){
     #gamif-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
     .gx-gamif-card{min-height:170px!important;padding:16px 14px 14px!important}
-    .gx-gamif-card::before{right:-17px;font-size:5.65rem;opacity:.052}
-    .gx-gamif-card-top{margin-bottom:14px!important}
-    .gx-gamif-card .gamif-title{max-width:90%;font-size:clamp(1.02rem,4.7vw,1.2rem)!important}
+    .gx-gamif-card::before{
+        right:-10px!important;
+        font-size:6.45rem!important;
+        opacity:.135!important;
+    }
+    .gx-gamif-card .gamif-title{
+        max-width:90%;
+        margin-top:16px!important;
+        font-size:clamp(1.02rem,4.7vw,1.2rem)!important;
+    }
     .gx-gamif-card-status{max-width:94%}
+    .gx-gamif-progress{padding-top:16px!important}
+    .gx-gamif-card.gx-referral-ready::before,
+    .gx-gamif-card.pulse-mission::before{
+        animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2!important;
+        -webkit-animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2!important;
+    }
 }
-
+@keyframes gxWatermarkCelebrateMobile{
+    0%,100%{opacity:.135;transform:translateY(-50%) rotate(-14deg) scale(1.04)}
+    50%{opacity:.20;transform:translateY(-50%) rotate(-11deg) scale(1.075)}
+}
+@-webkit-keyframes gxWatermarkCelebrateMobile{
+    0%,100%{opacity:.135;-webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04)}
+    50%{opacity:.20;-webkit-transform:translateY(-50%) rotate(-11deg) scale(1.075)}
+}
 @media(prefers-reduced-motion:reduce){
-    .gx-gamif-progress > span::after{
+    .gx-gamif-progress > span::after,
+    .gx-gamif-card.gx-referral-ready,
+    .gx-gamif-card.pulse-mission,
+    .gx-gamif-card.gx-referral-ready::before,
+    .gx-gamif-card.pulse-mission::before{
         animation:none!important;
         -webkit-animation:none!important;
+    }
+    .gx-gamif-progress > span::after{
         opacity:.16!important;
         transform:none!important;
         -webkit-transform:none!important;
     }
 }
 </style>
-
-
-<style id="goxion-ayuda-v6-5-balance">
-/* ==========================================================
-   AJUSTE V6.5 — WATERMARK MÁS VISIBLE + BALANCE VERTICAL
-   ========================================================== */
-
-/* Emoji ambiental: más perceptible, conservando transparencia. */
-.gx-gamif-card::before{
-    right:-8px !important;
-    top:52% !important;
-    font-size:6.9rem !important;
-    opacity:.105 !important;
-    filter:grayscale(.15) saturate(.8) !important;
-    -webkit-filter:grayscale(.15) saturate(.8) !important;
-    transform:translateY(-50%) rotate(-15deg) scale(1.05) !important;
-    -webkit-transform:translateY(-50%) rotate(-15deg) scale(1.05) !important;
-}
-
-/* Más aire entre el encabezado y el contenido principal. */
-.gx-gamif-card-top{
-    margin-bottom:0 !important;
-}
-
-.gx-gamif-card .gamif-title{
-    margin-top:18px !important;
-}
-
-/* Conservamos una progresión vertical uniforme. */
-.gx-gamif-card-status{
-    margin-top:9px !important;
-}
-
-.gx-gamif-card-meta{
-    margin-top:7px !important;
-}
-
-/* El espacio antes de la barra replica visualmente el espacio superior. */
-.gx-gamif-progress{
-    padding-top:18px !important;
-}
-
-/* En móvil se mantiene el balance sin comprimir demasiado la tarjeta. */
-@media(max-width:520px){
-    .gx-gamif-card::before{
-        right:-12px !important;
-        font-size:6.05rem !important;
-        opacity:.095 !important;
-    }
-
-    .gx-gamif-card .gamif-title{
-        margin-top:16px !important;
-    }
-
-    .gx-gamif-progress{
-        padding-top:16px !important;
-    }
-}
-</style>
-
-
-<style id="goxion-ayuda-v6-6-contextual-motion">
-/* ==========================================================
-   V6.6 — WATERMARK MÁS PRESENTE + MOVIMIENTO CON SIGNIFICADO
-   ========================================================== */
-
-/* El emoji se reconoce mejor, pero sigue siendo ambiental. */
-.gx-gamif-card::before{
-    right:-7px !important;
-    top:51% !important;
-    font-size:7.25rem !important;
-    opacity:.145 !important;
-    filter:grayscale(0) saturate(.92) contrast(.95) !important;
-    -webkit-filter:grayscale(0) saturate(.92) contrast(.95) !important;
-    transform:translateY(-50%) rotate(-14deg) scale(1.04) !important;
-    -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04) !important;
-    transform-origin:center !important;
-    -webkit-transform-origin:center !important;
-}
-
-/* Estado normal: completamente tranquilo. */
-.gx-gamif-card.pulse-referral{
-    animation:none !important;
-    border-color:rgba(255,255,255,.09) !important;
-    box-shadow:0 14px 34px rgba(0,0,0,.26) !important;
-}
-
-/* ==========================================================
-   RECOMPENSA LISTA:
-   sólo aquí recuperamos un pulso breve y elegante.
-   ========================================================== */
-.gx-gamif-card.gx-referral-ready,
-.gx-gamif-card.pulse-mission{
-    animation:gxRewardBreath 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
-    border-color:rgba(0,242,254,.20) !important;
-}
-
-/* El watermark también "respira" suavemente cuando hay premio. */
-.gx-gamif-card.gx-referral-ready::before,
-.gx-gamif-card.pulse-mission::before{
-    animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
-    -webkit-animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
-}
-
-/* Después de las 2 respiraciones, la tarjeta vuelve a estar calmada. */
-@keyframes gxRewardBreath{
-    0%,100%{
-        box-shadow:0 14px 34px rgba(0,0,0,.26), 0 0 0 rgba(0,242,254,0);
-        transform:translateY(0);
-    }
-    50%{
-        box-shadow:0 16px 38px rgba(0,0,0,.30), 0 0 22px rgba(0,242,254,.105);
-        transform:translateY(-1px);
-    }
-}
-
-@keyframes gxWatermarkCelebrate{
-    0%,100%{
-        opacity:.145;
-        transform:translateY(-50%) rotate(-14deg) scale(1.04);
-    }
-    50%{
-        opacity:.215;
-        transform:translateY(-50%) rotate(-11deg) scale(1.085);
-    }
-}
-@-webkit-keyframes gxWatermarkCelebrate{
-    0%,100%{
-        opacity:.145;
-        -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04);
-    }
-    50%{
-        opacity:.215;
-        -webkit-transform:translateY(-50%) rotate(-11deg) scale(1.085);
-    }
-}
-
-/* Cuando el beneficio ya fue reclamado, vuelve al estado sereno. */
-.gx-gamif-card[data-watermark="💝"]::before,
-.gx-gamif-card[data-watermark="✅"]::before{
-    opacity:.13 !important;
-    animation:none !important;
-    -webkit-animation:none !important;
-}
-
-/* En móvil aumentamos presencia sin invadir el texto. */
-@media(max-width:520px){
-    .gx-gamif-card::before{
-        right:-10px !important;
-        font-size:6.45rem !important;
-        opacity:.135 !important;
-    }
-
-    .gx-gamif-card.gx-referral-ready::before,
-    .gx-gamif-card.pulse-mission::before{
-        animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
-        -webkit-animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
-    }
-}
-
-@keyframes gxWatermarkCelebrateMobile{
-    0%,100%{
-        opacity:.135;
-        transform:translateY(-50%) rotate(-14deg) scale(1.04);
-    }
-    50%{
-        opacity:.20;
-        transform:translateY(-50%) rotate(-11deg) scale(1.075);
-    }
-}
-@-webkit-keyframes gxWatermarkCelebrateMobile{
-    0%,100%{
-        opacity:.135;
-        -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04);
-    }
-    50%{
-        opacity:.20;
-        -webkit-transform:translateY(-50%) rotate(-11deg) scale(1.075);
-    }
-}
-
-/* Respeta preferencia del sistema sin ocultar el emoji. */
-@media(prefers-reduced-motion:reduce){
-    .gx-gamif-card.gx-referral-ready,
-    .gx-gamif-card.pulse-mission,
-    .gx-gamif-card.gx-referral-ready::before,
-    .gx-gamif-card.pulse-mission::before{
-        animation:none !important;
-        -webkit-animation:none !important;
-    }
-}
-</style>
-
 
 <style id="goxion-release-version-style">
 .goxion-release-version {
@@ -4462,44 +4301,6 @@
                 }, 180 + (index * 360));
             });
         }
-
-        window.openGamif = function(type) {
-            document.getElementById('gamif-grid').style.display = 'none';
-
-            if(type === 'referral') {
-                document.getElementById('gamif-expanded-referral').style.display = 'block';
-                document.getElementById('gamif-expanded-coupon').style.display = 'none';
-            } else {
-                document.getElementById('gamif-expanded-coupon').style.display = 'block';
-                document.getElementById('gamif-expanded-referral').style.display = 'none';
-
-                const key = localStorage.getItem('goxion_user_key');
-                const folio = key && globalClientesData?.[key] ? globalClientesData[key].folio : "";
-                const pendingKey = folio ? 'goxion_recent_mission_' + folio : "";
-                const pending = pendingKey ? localStorage.getItem(pendingKey) : null;
-
-                if(pending !== null) {
-                    setTimeout(() => {
-                        const item = document.getElementById('mission-' + pending);
-                        if(item) {
-                            item.classList.remove('gx-mission-just-completed');
-                            void item.offsetWidth;
-                            item.classList.add('gx-mission-just-completed');
-                            setTimeout(() => item.classList.remove('gx-mission-just-completed'), 900);
-                        }
-                        localStorage.removeItem(pendingKey);
-                    }, 130);
-                } else {
-                    setTimeout(animarMisionesCompletadasEnSecuencia, 170);
-                }
-            }
-        };
-
-        window.closeGamif = function() {
-            document.getElementById('gamif-expanded-referral').style.display = 'none';
-            document.getElementById('gamif-expanded-coupon').style.display = 'none';
-            document.getElementById('gamif-grid').style.display = 'grid';
-        };
 
         window.lanzarConfeti = function() {
             for(let i=0; i<40; i++) {
@@ -5764,16 +5565,16 @@
     </script>
 
     <!-- GOXION // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
-    <script id="goxion-beta-client-layer">
+    <script id="goxion-client-supabase-layer">
     (() => {
-        const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion";
-        const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
-        const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
-        const INVENTARIO_PUBLICO_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico";
+        const LOGIN_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion";
+        const MI_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
+        const NOTIFY_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
+        const INVENTARIO_PUBLICO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico";
         const TOKEN_KEY = "goxion_client_token";
 
         
-function goxionBetaLegacy(data) {
+function goxionLegacyAdapter(data) {
     const legacy = {
         _goxion_config: {
             alertas: data?.alertas || {},
@@ -5838,7 +5639,7 @@ function goxionBetaLegacy(data) {
 
         async function aplicarInventarioPublico(legacy) {
             try {
-                const r = await fetch(INVENTARIO_PUBLICO_BETA, {
+                const r = await fetch(INVENTARIO_PUBLICO_URL, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: "{}"
@@ -5878,13 +5679,13 @@ function goxionBetaLegacy(data) {
 
             if (token) {
                 try {
-                    const r = await fetch(MI_BETA, {
+                    const r = await fetch(MI_URL, {
                         method:"POST",
                         headers:{"Content-Type":"application/json","X-Client-Token":token},
                         body:JSON.stringify({})
                     });
                     const {json} = await parseJSON(r);
-                    if (r.ok && json?.ok === true) return await aplicarInventarioPublico(goxionBetaLegacy(json));
+                    if (r.ok && json?.ok === true) return await aplicarInventarioPublico(goxionLegacyAdapter(json));
                     if (r.status === 401) {
                         localStorage.removeItem(TOKEN_KEY);
                         localStorage.removeItem("goxion_user_key");
@@ -5894,14 +5695,14 @@ function goxionBetaLegacy(data) {
                 }
             }
 
-            const r = await fetch(MI_BETA, {
+            const r = await fetch(MI_URL, {
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({modo:"publico"})
             });
             const {text,json} = await parseJSON(r);
             if (!r.ok || json?.ok !== true) throw new Error(json?.error || text || "No fue posible cargar el catálogo.");
-            return await aplicarInventarioPublico(goxionBetaLegacy(json));
+            return await aplicarInventarioPublico(goxionLegacyAdapter(json));
         }
 
         cargarDatosYVerificarSesion = async function() {
@@ -5951,7 +5752,7 @@ function goxionBetaLegacy(data) {
             errorMsg.style.display = "none";
 
             try {
-                const lr = await fetch(LOGIN_BETA, {
+                const lr = await fetch(LOGIN_URL, {
                     method:"POST",
                     headers:{"Content-Type":"application/json"},
                     body:JSON.stringify({nombre:inputId, pin:inputPin})
@@ -5966,7 +5767,7 @@ function goxionBetaLegacy(data) {
                 localStorage.setItem("goxion_user_key", login.cliente.clave);
                 actualizarBloqueoSoporte();
 
-                const dr = await fetch(MI_BETA, {
+                const dr = await fetch(MI_URL, {
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":login.session_token},
                     body:"{}"
@@ -5974,7 +5775,7 @@ function goxionBetaLegacy(data) {
                 const {text:dt,json:data} = await parseJSON(dr);
                 if (!dr.ok || data?.ok !== true) throw new Error(data?.error || dt || "No fue posible abrir Mi Espacio.");
 
-                globalClientesData = await aplicarInventarioPublico(goxionBetaLegacy(data));
+                globalClientesData = await aplicarInventarioPublico(goxionLegacyAdapter(data));
                 cargarCatalogo(globalClientesData);
                 renderizarSoporteDinamico(globalClientesData);
 
@@ -6023,7 +5824,7 @@ function goxionBetaLegacy(data) {
                 headers["X-Client-Token"] = token;
             }
 
-            fetch(NOTIFY_BETA, {
+            fetch(NOTIFY_URL, {
                 method:"POST",
                 headers,
                 body:JSON.stringify({
