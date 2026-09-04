@@ -3970,18 +3970,27 @@
         });
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Tras una recarga, la identidad vive otra vez sólo en memoria.
+            // Si existe token, esperamos a Supabase antes de decidir la vista final.
+            const hasSessionToken = Boolean(localStorage.getItem('goxion_client_token'));
             const initialKey = getCurrentClientKey();
-            if(initialKey) {
+            const restoringSession = hasSessionToken && !initialKey;
+
+            if(initialKey || restoringSession) {
                 document.getElementById('view-inicio').classList.remove('active');
                 document.getElementById('view-dashboard').classList.add('active');
-                document.getElementById('header-btn-text').innerText = 'Cerrar Sesión';
                 document.getElementById('tab-inicio-icon').innerText = '👤';
                 document.getElementById('tab-inicio-text').innerText = 'Mi Espacio';
-                
+
                 const guestCard = document.getElementById('guest-action-card');
                 if(guestCard) guestCard.style.display = 'none';
+
+                // No mostramos "Cerrar Sesión" hasta confirmar qué cliente corresponde al token.
+                document.getElementById('header-btn-text').innerText =
+                    initialKey ? 'Cerrar Sesión' : 'Mi Espacio';
             } else {
                 document.getElementById('view-inicio').classList.add('active');
+                document.getElementById('view-dashboard').classList.remove('active');
             }
             setTimeout(revealOnScroll, 100);
 
@@ -4068,10 +4077,16 @@
             }, 600);
         }
 
-        window.addEventListener('load', () => { 
-            setTimeout(hideSplash, 1800); 
-            cargarDatosYVerificarSesion();
-            actualizarBloqueoSoporte();
+        window.addEventListener('load', async () => {
+            // Evita mostrar fugazmente el Inicio público antes de restaurar Mi Espacio.
+            const splashFallback = setTimeout(hideSplash, 4500);
+            try {
+                await cargarDatosYVerificarSesion();
+            } finally {
+                clearTimeout(splashFallback);
+                actualizarBloqueoSoporte();
+                setTimeout(hideSplash, 250);
+            }
         });
 
         function actualizarBloqueoSoporte() {
@@ -5760,7 +5775,22 @@ function goxionLegacyAdapter(data) {
 
                 const savedKey = getCurrentClientKey();
                 if (savedKey && globalClientesData[savedKey]) {
+                    // Sesión válida: reconstruimos y reactivamos Mi Espacio.
                     renderDashboard(savedKey);
+                    switchTab("inicio");
+                } else {
+                    // Token inexistente/expirado: volvemos limpiamente a la vista pública.
+                    const headerText = document.getElementById("header-btn-text");
+                    const tabIcon = document.getElementById("tab-inicio-icon");
+                    const tabText = document.getElementById("tab-inicio-text");
+                    const guestCard = document.getElementById("guest-action-card");
+
+                    if (headerText) headerText.innerText = "Mi Espacio";
+                    if (tabIcon) tabIcon.innerText = "🏠";
+                    if (tabText) tabText.innerText = "Inicio";
+                    if (guestCard) guestCard.style.display = "block";
+
+                    switchTab("inicio");
                 }
             } catch (e) {
                 console.error("Error cargando GOXION", e);
@@ -6007,6 +6037,6 @@ window.closeGamif = function() {
     }, 280);
 };
 </script>
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.2</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.3</div>
 </body>
 </html>
