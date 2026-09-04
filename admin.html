@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.0">
+<html lang="es" data-goxion-version="1.0.1">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -647,7 +647,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
 <script>
     const CONFIG = { username: "henrygonzalezestrada-cyber", repo: "goxion", path: "clientes.json", branch: "main" };
-    let currentToken = localStorage.getItem("GOXION_PAT") || "";
+    let currentToken = "";
     let currentFileData = null; 
     let clientesDict = {}; 
     let configGlobal = { alertas: {}, serviciosGlobales: [], combo_upsell: true };
@@ -703,11 +703,11 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     function pedirToken() {
         const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token:");
         if (userToken && userToken.trim() !== "") {
-            currentToken = userToken.trim(); localStorage.setItem("GOXION_PAT", currentToken); inicializarPanel();
+            currentToken = userToken.trim(); inicializarPanel();
         } else { alert("Acceso denegado."); }
     }
 
-    function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
+    function cerrarSesion() { currentToken = ""; location.reload(); }
 
     async function inicializarPanel() {
         const version = new Date().getTime();
@@ -1647,8 +1647,6 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro`;
         const TRATO_URL = `${SUPABASE_URL}/functions/v1/trato-justo`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
-
-        localStorage.removeItem("GOXION_PAT");
         currentToken = localStorage.getItem(ADMIN_TOKEN_KEY) || "";
         currentFileData = { source: "supabase" };
 
@@ -2073,7 +2071,6 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
         cerrarSesion = function() {
             localStorage.removeItem(ADMIN_TOKEN_KEY);
-            localStorage.removeItem("GOXION_PAT");
             currentToken = "";
             location.reload();
         };
@@ -3092,11 +3089,11 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
  window.gxShowBenefitReady=()=>{goAdminTab('tab-clientes');const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{const r=c.referido_activo;if(r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3)filtered[k]=c});renderizarClientes(filtered)};
  window.gxToggleAccordion=b=>{const a=b.closest('.gx-accordion');const p=a?.parentElement;if(!a||!p)return;p.querySelectorAll(':scope > .gx-accordion').forEach(x=>{if(x!==a)x.classList.remove('open')});a.classList.toggle('open')};
  function restore(){if(!focusHome)return;const{details,parent,next}=focusHome;details.style.display='';details.classList.add('client-details');next&&next.parentNode===parent?parent.insertBefore(details,next):parent.appendChild(details);focusHome=null}
- window.gxOpenClientFocus=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>${periodChip}</span><span>$${monthly}/mes</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
+ window.gxOpenClientFocusBase=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>${periodChip}</span><span>$${monthly}/mes</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
  window.gxCloseClientFocus=()=>{const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;restore();f.classList.remove('show');document.body.style.overflow=''};
  window.toggleClientDetails=key=>gxOpenClientFocus(key);
  function stockLow(){let n=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>{const a=s?._inventario_auto;if(a){const v=s.stock_manual!==undefined&&s.stock_manual!==null&&s.stock_manual!==''?Number(s.stock_manual):Number(a.disponibles_auto??a.disponibles??0);if(v<=1||Number(a.sobrecupo||0)>0)n++}})}catch{}return n}
- window.gxUpdateOperationsSummary=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>c.pago_en_revision===true).length,pending=v.filter(c=>!c.pago_en_revision&&c.estado==='pendiente').length,paid=v.filter(c=>c.estado==='pagado').length,susp=v.filter(c=>c.estado==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
+ window.gxUpdateOperationsSummaryBase=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>c.pago_en_revision===true).length,pending=v.filter(c=>!c.pago_en_revision&&c.estado==='pendiente').length,paid=v.filter(c=>c.estado==='pagado').length,susp=v.filter(c=>c.estado==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
  const add=window.agregarNuevoCliente;if(typeof add==='function')window.agregarNuevoCliente=function(...a){const before=new Set(Object.keys(clientesDict||{})),r=add.apply(this,a);setTimeout(()=>{const k=Object.keys(clientesDict||{}).find(x=>!before.has(x));if(k){goAdminTab('tab-clientes');gxOpenClientFocus(k)}gxUpdateOperationsSummary()},180);return r};
  const render=window.renderizarClientes;if(typeof render==='function')window.renderizarClientes=function(...a){const r=render.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
  const calc=window.calcularInventarioYFinanzas;if(typeof calc==='function')window.calcularInventarioYFinanzas=function(...a){const r=calc.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
@@ -3325,7 +3322,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         renderNotifications();
     };
 
-    window.gxToggleNotifications=function(force){
+    window.gxToggleNotificationsBase=function(force){
         const drawer=document.getElementById("gx-notification-drawer"),overlay=document.getElementById("gx-notification-overlay");
         const show=force===undefined?!drawer.classList.contains("show"):Boolean(force);
         drawer.classList.toggle("show",show);overlay.classList.toggle("show",show);drawer.setAttribute("aria-hidden",show?"false":"true");
@@ -3390,7 +3387,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     };
 
     // ---------- Payment review ----------
-    window.gxOpenPaymentModal=function(key,monto){
+    window.gxOpenPaymentModalBase=function(key,monto){
         const c=clientesDict?.[key];if(!c)return;
         paymentCtx={key,monto:Number(monto||((c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)))};
         document.getElementById("gx-payment-client-name").textContent=c.nombre;
@@ -3450,7 +3447,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
 
     // ---------- Summary enrichment ----------
-    const originalSummary=window.gxUpdateOperationsSummary;
+    const originalSummary=window.gxUpdateOperationsSummaryBase;
     window.gxUpdateOperationsSummary=function(){
         originalSummary?.();
         const vals=Object.values(clientesDict||{});
@@ -3472,7 +3469,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 <script id="goxion-admin-payment-referral-guards">
 (() => {
     // Hard guard: if modal/drawer ever disappear from the DOM, explain it instead of failing silently.
-    const oldToggle = window.gxToggleNotifications;
+    const oldToggle = window.gxToggleNotificationsBase;
     window.gxToggleNotifications = function(force) {
         const drawer = document.getElementById("gx-notification-drawer");
         const overlay = document.getElementById("gx-notification-overlay");
@@ -3480,7 +3477,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         return oldToggle ? oldToggle(force) : undefined;
     };
 
-    const oldOpenPayment = window.gxOpenPaymentModal;
+    const oldOpenPayment = window.gxOpenPaymentModalBase;
     window.gxOpenPaymentModal = function(key, monto) {
         const modal = document.getElementById("gx-payment-modal");
         if(!modal) return alert("No se pudo abrir la revisión de pago. Recarga esta versión del Admin.");
@@ -3661,7 +3658,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     };
 
     // Keep focus summary current after any render.
-    const openBase=window.gxOpenClientFocus;
+    const openBase=window.gxOpenClientFocusBase;
     window.gxOpenClientFocus=function(key){
         const r=openBase?.(key);
         setTimeout(()=>updateRefUI(key),40);
@@ -3980,6 +3977,6 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.0</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.1</div>
 </body>
 </html>
