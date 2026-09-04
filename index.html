@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.0">
+<html lang="es" data-goxion-version="1.0.1">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -450,7 +450,6 @@ function goxionLegacyAdapter(data) {
             if (!r.ok || json?.ok !== true) {
                 if (r.status === 401) {
                     localStorage.removeItem(TOKEN_KEY);
-                    localStorage.removeItem("goxion_user_key");
                 }
                 return new Response(JSON.stringify({}), {
                     status:200,
@@ -670,17 +669,8 @@ function goxionLegacyAdapter(data) {
       let uiColor = "var(--neon-blue)";
       let mensajeAtrasoHTML = "";
 
-      const isReviewLocal = localStorage.getItem(`revision_pago_${clienteKey}`) === periodoStr;
-
-      // Si el periodo actual ya está pagado, cualquier bandera local de revisión quedó obsoleta.
-      if (estaPagadoPeriodo) {
-          localStorage.removeItem(`revision_pago_${clienteKey}`);
-      }
-
-      const enRevision = !estaPagadoPeriodo && (
-          cliente.pago_en_revision === true ||
-          (isReviewLocal && cliente.estado !== "pendiente" && cliente.estado !== "suspendido")
-      );
+      // Supabase es la única fuente de verdad del estado de revisión.
+      const enRevision = !estaPagadoPeriodo && cliente.pago_en_revision === true;
 
       const montoFaltanteRevision = Math.max(0, Number(cliente.pago_revision_monto_faltante || 0));
       const pagoIncompleto = !estaPagadoPeriodo
@@ -692,7 +682,6 @@ function goxionLegacyAdapter(data) {
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
           uiColor = "var(--success-neon)";
-          localStorage.removeItem(`revision_pago_${clienteKey}`);
       } else if (enRevision) {
           badgeClass = "badge-review";
           badgeText = `⏳ Validando Pago`;
@@ -917,7 +906,7 @@ function goxionLegacyAdapter(data) {
             <div class="footer-logo-container">
               <img src="logo2.PNG" alt="Goxion - Todo conectado" class="footer-logo" onerror="this.style.display='none'">
             </div>
-            <div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.0</div>
+            <div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.1</div>
           </div>
         </div>
       `;
@@ -997,8 +986,6 @@ function goxionLegacyAdapter(data) {
       const { clienteKey, periodo, monto, folio, nombre } = pagoActualInfo;
 
       // 1. Guardamos localmente el estado de revisión y completamos la misión de la app
-      localStorage.setItem(`revision_pago_${clienteKey}`, periodo);
-      localStorage.setItem(`goxion_mission_pago_completed_${folio}`, 'true');
 
       // 2. Preparamos el "sobre" con el archivo y la información
       const formData = new FormData();
@@ -1044,6 +1031,6 @@ function goxionLegacyAdapter(data) {
   cargarEstadoCuenta();
 </script>
 
-<script>console.info("GOXION Index v1.0.0: producción.");</script>
+<script>console.info("GOXION Index v1.0.1: estado centralizado en Supabase.");</script>
 </body>
 </html>
