@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-goxion-version="1.0.0">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -237,6 +237,36 @@
     .btn-submit-payment:hover { box-shadow: 0 0 30px rgba(46, 160, 67, 0.6); transform: translateY(-2px); }
     .btn-submit-payment:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   </style>
+
+
+<style id="goxion-index-beta-v7-1-incomplete-badge">
+.badge-incomplete{
+    color:var(--warning-amber)!important;
+    border-color:rgba(255,170,0,.34)!important;
+    background:rgba(255,170,0,.10)!important;
+    box-shadow:0 0 16px rgba(255,170,0,.08);
+}
+</style>
+
+
+<style id="goxion-release-version-style">
+.goxion-release-version {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 16px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+    color: rgba(149, 164, 189, 0.38);
+    font-size: 8px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.85px;
+    text-transform: uppercase;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+}
+</style>
+
 </head>
 <body>
 
@@ -284,7 +314,8 @@
 (() => {
     const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
     const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
-    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro-beta";
+    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro";
+    const TRATO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/trato-justo";
     const TOKEN_KEY = "goxion_client_token";
     const nativeFetch = window.fetch.bind(window);
 
@@ -313,8 +344,13 @@ function goxionBetaLegacy(data) {
             corte_virtual: c.corte_virtual === true,
             estado: c.estado || "pendiente",
             pago_en_revision: c.pago_en_revision === true,
+            pago_revision_estado: String(c.pago_revision_estado || ""),
+            pago_revision_mensaje: c.pago_revision_mensaje || "",
+            pago_revision_monto_faltante: Number(c.pago_revision_monto_faltante || 0),
+            pago_revision_updated_at: c.pago_revision_updated_at || "",
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
+            trato_justo_compensaciones: Array.isArray(data.trato_justo_compensaciones) ? data.trato_justo_compensaciones : [],
             servicios: (data.servicios || []).map(s => ({
                 id: s.id,
                 nombre: s.nombre,
@@ -363,7 +399,7 @@ function goxionBetaLegacy(data) {
                 });
             }
 
-            const [r, periodoR] = await Promise.all([
+            const [r, periodoR, tratoR] = await Promise.all([
                 nativeFetch(MI_BETA, {
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
@@ -373,6 +409,11 @@ function goxionBetaLegacy(data) {
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
                     body:JSON.stringify({accion:"obtener_periodo",datos:{}})
+                }).catch(() => null),
+                nativeFetch(TRATO_URL, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","X-Client-Token":token},
+                    body:JSON.stringify({accion:"listar_cliente",datos:{}})
                 }).catch(() => null)
             ]);
             const {json} = await parseJSON(r);
@@ -388,6 +429,17 @@ function goxionBetaLegacy(data) {
                             json.cliente.ciclo_cobro_manual = periodoData.ciclo_cobro_manual === true;
                             json.cliente.corte_virtual = periodoData.corte_aplicado === true;
                         }
+                    }
+                } catch {}
+            }
+
+            if (tratoR?.ok) {
+                try {
+                    const tratoData = await tratoR.json();
+                    if (tratoData?.ok === true) {
+                        json.trato_justo_compensaciones = tratoData.compensaciones || [];
+                        const total = (json.trato_justo_compensaciones || []).reduce((s,x)=>s+Number(x.monto||0),0);
+                        if (json.cliente) json.cliente.descuento_fallas = total;
                     }
                 } catch {}
             }
@@ -627,6 +679,12 @@ function goxionBetaLegacy(data) {
           (isReviewLocal && cliente.estado !== "pendiente" && cliente.estado !== "suspendido")
       );
 
+      const montoFaltanteRevision = Math.max(0, Number(cliente.pago_revision_monto_faltante || 0));
+      const pagoIncompleto = !estaPagadoPeriodo
+          && !enRevision
+          && String(cliente.pago_revision_estado || "").toLowerCase() === "incompleto";
+      const tieneDiferenciaPendiente = pagoIncompleto && montoFaltanteRevision > 0;
+
       if (estaPagadoPeriodo) {
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
@@ -636,6 +694,12 @@ function goxionBetaLegacy(data) {
           badgeClass = "badge-review";
           badgeText = `⏳ Validando Pago`;
           uiColor = "var(--neon-purple)";
+      } else if (pagoIncompleto) {
+          badgeClass = "badge-incomplete";
+          badgeText = tieneDiferenciaPendiente
+              ? `⚠️ Pago incompleto · resta $${montoFaltanteRevision.toFixed(2)}`
+              : `⚠️ Pago incompleto`;
+          uiColor = "var(--warning-amber)";
       } else if (difDias > 0) {
           badgeClass = "badge-ok";
           badgeText = `⏳ Vence en ${difDias} día(s)`;
@@ -714,10 +778,20 @@ function goxionBetaLegacy(data) {
           });
       }
 
-      let descuentoTratoJusto = cliente.descuento_fallas ? (parseFloat(cliente.descuento_fallas) || 0) : 0;
-      let conceptoTratoJusto = "Garantía Trato Justo";
-      if (descuentoTratoJusto > 0) {
-          desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>${conceptoTratoJusto}</span><span>-$${descuentoTratoJusto.toFixed(2)}</span></div>`;
+      const tratoJustoDetalle = Array.isArray(cliente.trato_justo_compensaciones) ? cliente.trato_justo_compensaciones : [];
+      let descuentoTratoJusto = tratoJustoDetalle.length
+          ? tratoJustoDetalle.reduce((s,x)=>s+(parseFloat(x.monto)||0),0)
+          : (cliente.descuento_fallas ? (parseFloat(cliente.descuento_fallas) || 0) : 0);
+
+      if (tratoJustoDetalle.length) {
+          tratoJustoDetalle.forEach(comp => {
+              const nombreServicio = comp?.cliente_servicios?.nombre || "Servicio";
+              const dias = Number(comp.dias_falla || 0);
+              const monto = parseFloat(comp.monto) || 0;
+              desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>🛡 Trato Justo · ${nombreServicio} (${dias} día${dias===1?'':'s'})</span><span>-$${monto.toFixed(2)}</span></div>`;
+          });
+      } else if (descuentoTratoJusto > 0) {
+          desgloseDescuentosHTML += `<div class="breakdown-line discount-line"><span>Garantía Trato Justo</span><span>-$${descuentoTratoJusto.toFixed(2)}</span></div>`;
       }
       
       let ahorroTotal = ahorro + totalDescuentosEspeciales + descuentoTratoJusto;
@@ -726,9 +800,9 @@ function goxionBetaLegacy(data) {
       if (totalFinal < 0) totalFinal = 0; 
 
       let labelTotal = "Total a Pagar";
-      
+
       let btnAccionHTML = "";
-      
+
       if (estaPagadoPeriodo) {
           totalFinal = 0;
           labelTotal = "Saldo Pendiente";
@@ -739,8 +813,18 @@ function goxionBetaLegacy(data) {
               <span style="font-size: 11px; color: var(--text-muted);">El equipo de Goxion actualizará tu estado en breve.</span>
             </div>
           `;
+      } else if (pagoIncompleto) {
+          // Administración ya validó el pago anterior y registró la diferencia.
+          // Ese monto pasa a ser el saldo mostrado y el monto del siguiente comprobante.
+          if (tieneDiferenciaPendiente) totalFinal = montoFaltanteRevision;
+          labelTotal = "Saldo Pendiente";
+          btnAccionHTML = `
+            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
+            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
+              📤 Ya realicé mi depósito
+            </button>
+          `;
       } else {
-          // SE MODIFICÓ PARA ABRIR EL MODAL EN LUGAR DE ENVIAR DIRECTO
           btnAccionHTML = `
             <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
             <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
@@ -750,7 +834,7 @@ function goxionBetaLegacy(data) {
       }
 
       let breakdownHTML = '';
-      if (!estaPagadoPeriodo && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+      if (!estaPagadoPeriodo && !pagoIncompleto && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
             <div class="glass-card breakdown-box">
               <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
@@ -781,7 +865,7 @@ function goxionBetaLegacy(data) {
         </div>
 
         <div class="scrollable-content">
-          ${(cliente.estado === 'pagado' || enRevision) ? '' : mensajeAtrasoHTML}
+          ${(cliente.estado === 'pagado' || enRevision || pagoIncompleto) ? '' : mensajeAtrasoHTML}
 
           <div class="glass-card card-info">
             <div class="info-block">
@@ -956,6 +1040,7 @@ function goxionBetaLegacy(data) {
   cargarEstadoCuenta();
 </script>
 
-<script>console.info("GOXION Index Beta V5: ciclo mensual automático en prueba.");</script>
+<script>console.info("GOXION Index v1.0.0: producción.");</script>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.0</div>
 </body>
 </html>
