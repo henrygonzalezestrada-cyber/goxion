@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-goxion-version="1.0.0">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -2520,7 +2520,919 @@
             }
         }
 
+
+    /* --- BETA: REFERIDOS INTELIGENTES + ESTADO DE PAGO --- */
+    .gx-client-payment-alert{
+        display:flex;align-items:flex-start;gap:10px;margin:0 0 12px;padding:12px 13px;
+        border-radius:14px;border:1px solid rgba(255,255,255,.08);background:rgba(8,8,12,.68)
+    }
+    .gx-client-payment-alert>span{font-size:1.15rem;line-height:1}
+    .gx-client-payment-alert strong{display:block;font-size:12px}
+    .gx-client-payment-alert small{display:block;color:var(--text-muted);font-size:10.5px;line-height:1.45;margin-top:3px}
+    .gx-client-payment-alert.warning{border-color:rgba(255,170,0,.27);background:rgba(255,170,0,.06)}
+    .gx-client-payment-alert.warning strong{color:var(--warning-amber)}
+    .gx-client-payment-alert.danger{border-color:rgba(255,51,102,.28);background:rgba(255,51,102,.055)}
+    .gx-client-payment-alert.danger strong{color:var(--danger-red)}
+    .gx-client-payment-alert.review{border-color:rgba(124,77,255,.28);background:rgba(124,77,255,.055)}
+    .gx-client-payment-alert.review strong{color:#b59cff}
+
+    .gx-ref-services-client{margin:10px 0 12px;padding:10px;border-radius:12px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+    .gx-ref-services-title{font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:800;margin-bottom:7px}
+    .gx-ref-service-chips{display:flex;flex-wrap:wrap;gap:5px}
+    .gx-ref-service-chips span{padding:5px 7px;border-radius:999px;background:rgba(0,242,254,.07);border:1px solid rgba(0,242,254,.13);color:#cceff3;font-size:9.5px;font-weight:700}
+
 </style>
+
+<style id="goxion-ayuda-v4-referral-ui">
+    .gx-ref-sync-note{
+        margin:9px 0 0;padding:8px 10px;border-radius:10px;background:rgba(0,242,254,.045);
+        border:1px solid rgba(0,242,254,.11);color:#b9c9dc;font-size:10px;line-height:1.45
+    }
+    .gx-ref-services-empty{
+        padding:8px;border-radius:9px;background:rgba(255,170,0,.06);
+        border:1px dashed rgba(255,170,0,.18);color:var(--warning-amber);font-size:10px
+    }
+</style>
+
+
+<style id="goxion-ayuda-v6-gamif-unified">
+    #gamif-grid{
+        gap:12px!important;
+        align-items:stretch;
+    }
+    .gx-gamif-card{
+        position:relative;
+        overflow:hidden;
+        min-height:168px;
+        padding:16px!important;
+        border-radius:22px!important;
+        display:flex!important;
+        flex-direction:column;
+        justify-content:flex-start;
+        align-items:stretch!important;
+        text-align:left!important;
+        background:
+            radial-gradient(circle at 85% 10%, rgba(124,77,255,.14), transparent 34%),
+            linear-gradient(180deg, rgba(12,12,18,.82), rgba(7,7,11,.72))!important;
+        border:1px solid rgba(255,255,255,.08)!important;
+        box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
+    }
+    .gx-gamif-card::after{
+        content:"";
+        position:absolute;
+        inset:auto -28px -52px auto;
+        width:120px;
+        height:120px;
+        border-radius:50%;
+        background:rgba(0,242,254,.05);
+        filter:blur(10px);
+        pointer-events:none;
+    }
+    .gx-gamif-card-top{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin-bottom:13px;
+    }
+    .gx-gamif-card .gamif-icon{
+        width:40px;
+        height:40px;
+        display:grid;
+        place-items:center;
+        margin:0!important;
+        border-radius:14px;
+        background:rgba(255,255,255,.045);
+        border:1px solid rgba(255,255,255,.08);
+        font-size:1.25rem!important;
+    }
+    .gx-gamif-card-kicker{
+        color:var(--text-muted);
+        font-size:.58rem;
+        font-weight:900;
+        letter-spacing:1.15px;
+    }
+    .gx-gamif-card .gamif-title{
+        margin:0!important;
+        font-size:.96rem!important;
+        line-height:1.15;
+        font-weight:850!important;
+        letter-spacing:.1px;
+    }
+    .gx-gamif-card-status{
+        margin-top:5px;
+        font-size:.7rem;
+        font-weight:850;
+        color:var(--neon-blue);
+    }
+    .gx-gamif-card-meta{
+        margin-top:4px;
+        color:var(--text-muted);
+        font-size:.63rem;
+        line-height:1.35;
+    }
+    .gx-gamif-progress{
+        width:100%;
+        height:6px;
+        margin-top:auto;
+        padding-top:14px;
+        box-sizing:content-box;
+    }
+    .gx-gamif-progress::before{
+        content:"";
+        position:absolute;
+    }
+    .gx-gamif-progress{
+        background:transparent;
+        position:relative;
+    }
+    .gx-gamif-progress::after{
+        content:"";
+        position:absolute;
+        left:0;right:0;bottom:0;
+        height:6px;
+        border-radius:999px;
+        background:rgba(255,255,255,.07);
+    }
+    .gx-gamif-progress span{
+        position:absolute;
+        left:0;
+        bottom:0;
+        z-index:2;
+        height:6px;
+        border-radius:999px;
+        background:linear-gradient(90deg,var(--neon-purple),var(--neon-blue));
+        box-shadow:0 0 14px rgba(0,242,254,.18);
+        transition:width .35s ease;
+    }
+    .gx-gamif-card-ref.gx-referral-ready .gx-gamif-card-status,
+    .gx-gamif-card-ref .gx-gamif-card-status[style*="success"]{
+        color:var(--success-green)!important;
+    }
+
+    .gamif-expanded-container{
+        border-radius:24px!important;
+        padding:18px!important;
+    }
+    .gx-gamif-expanded-head{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin-bottom:14px;
+    }
+    .gx-gamif-expanded-head .btn-gamif-close{
+        margin:0!important;
+    }
+    .gx-gamif-expanded-kicker{
+        color:var(--text-muted);
+        font-size:.56rem;
+        font-weight:900;
+        letter-spacing:1px;
+    }
+    #gamif-expanded-referral,
+    #gamif-expanded-coupon{
+        overflow:hidden;
+    }
+    #gamif-expanded-referral .gamif-title,
+    #gamif-expanded-coupon .gamif-title{
+        font-size:1.05rem;
+    }
+    #gamif-expanded-referral .mission-item,
+    #gamif-expanded-coupon .mission-item{
+        border-radius:13px!important;
+        border:1px solid rgba(255,255,255,.07)!important;
+        background:rgba(255,255,255,.025)!important;
+    }
+
+    @media(max-width:520px){
+        #gamif-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
+        .gx-gamif-card{min-height:156px;padding:13px!important}
+        .gx-gamif-card .gamif-icon{width:36px;height:36px;border-radius:12px}
+        .gx-gamif-card .gamif-title{font-size:.86rem!important}
+        .gx-gamif-card-status{font-size:.66rem}
+        .gx-gamif-card-meta{font-size:.59rem}
+        .gamif-expanded-container{padding:15px!important}
+    }
+</style>
+
+<style id="goxion-user-card-tuning">
+#gamif-grid {
+        gap: 12px !important;
+        align-items: stretch;
+    }
+    
+    .gx-gamif-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 168px;
+        padding: 18px 16px !important;
+        border-radius: 22px !important;
+        display: flex !important;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch !important;
+        text-align: left !important;
+        background: radial-gradient(circle at 85% 10%, rgba(124,77,255,.14), transparent 34%), linear-gradient(180deg, rgba(12,12,18,.82), rgba(7,7,11,.72)) !important;
+        border: 1px solid rgba(255,255,255,.08) !important;
+        box-shadow: 0 14px 34px rgba(0,0,0,.28) !important;
+    }
+
+    .gx-gamif-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -28px -52px auto;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: rgba(0,242,254,.05);
+        filter: blur(10px);
+        pointer-events: none;
+    }
+
+    /* --- ALINEACIÓN PERFECTA DEL HEADER --- */
+    .gx-gamif-card-top {
+        display: flex;
+        align-items: center; /* Alinea verticalmente el icono y el texto */
+        justify-content: flex-start;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .gx-gamif-card .gamif-icon {
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 !important;
+        border-radius: 10px;
+        background: rgba(255,255,255,.05);
+        border: 1px solid rgba(255,255,255,.1);
+        font-size: 16px !important; /* Tamaño exacto para no desbordar la caja */
+    }
+
+    .gx-gamif-card-kicker {
+        color: var(--text-muted);
+        font-size: 0.65rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        line-height: 1; /* Remueve espacios fantasma arriba o abajo del texto */
+        margin-top: 2px;
+    }
+
+    .gx-gamif-card .gamif-title {
+        margin: 0 !important;
+        font-size: 1rem !important;
+        line-height: 1.2;
+        font-weight: 800 !important;
+    }
+
+    .gx-gamif-card-status {
+        margin-top: 6px;
+        font-size: .75rem;
+        font-weight: 700;
+        color: var(--neon-blue);
+    }
+
+    .gx-gamif-card-meta {
+        margin-top: 4px;
+        color: var(--text-muted);
+        font-size: .65rem;
+    }
+
+/* Mantiene la barra al fondo de ambas tarjetas después de la nueva distribución. */
+.gx-gamif-card .gx-gamif-progress {
+    margin-top: auto;
+}
+</style>
+
+<style id="goxion-user-morph-css">
+
+/* --- PROGRESO VIVO: compatible con Safari/iPhone --- */
+.gx-gamif-progress {
+    width: 100%;
+    height: 6px;
+    padding-top: 14px;
+    box-sizing: content-box;
+    position: relative;
+    background: transparent;
+}
+
+/* Riel base */
+.gx-gamif-progress::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.075);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+}
+
+/* Energía tenue sobre TODO el riel: sigue siendo visible incluso en 0%. */
+.gx-gamif-progress::before {
+    content: "";
+    position: absolute;
+    z-index: 1;
+    bottom: 0;
+    left: -34%;
+    width: 34%;
+    height: 6px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(0,242,254,.28), rgba(255,255,255,.48), transparent);
+    filter: blur(.15px);
+    animation: gxTrackEnergy 2.4s ease-in-out infinite;
+    -webkit-animation: gxTrackEnergy 2.4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Porcentaje real. Se anima el propio gradiente, más fiable en Safari que depender solo de ::after. */
+.gx-gamif-progress > span {
+    position: absolute !important;
+    z-index: 2;
+    left: 0;
+    bottom: 0;
+    height: 6px;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: 999px;
+    background: linear-gradient(
+        90deg,
+        var(--neon-purple) 0%,
+        var(--neon-blue) 35%,
+        rgba(255,255,255,.92) 50%,
+        var(--neon-blue) 65%,
+        var(--neon-purple) 100%
+    );
+    background-size: 220% 100%;
+    box-shadow: 0 0 15px rgba(0,242,254,.23);
+    animation: gxFilledEnergy 2s linear infinite;
+    -webkit-animation: gxFilledEnergy 2s linear infinite;
+    transition: width .4s ease;
+}
+
+/* Brillo adicional dentro de la porción completada */
+.gx-gamif-progress > span::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.05) 35%, rgba(255,255,255,.58) 50%, transparent 70%);
+    transform: translateX(-120%);
+    -webkit-transform: translateX(-120%);
+    animation: gxFillSweep 1.8s ease-in-out infinite;
+    -webkit-animation: gxFillSweep 1.8s ease-in-out infinite;
+}
+
+@keyframes gxTrackEnergy {
+    0%   { transform: translateX(0); opacity: .25; }
+    45%  { opacity: .9; }
+    100% { transform: translateX(395%); opacity: .25; }
+}
+@-webkit-keyframes gxTrackEnergy {
+    0%   { -webkit-transform: translateX(0); opacity: .25; }
+    45%  { opacity: .9; }
+    100% { -webkit-transform: translateX(395%); opacity: .25; }
+}
+
+@keyframes gxFilledEnergy {
+    0%   { background-position: 100% 0; }
+    100% { background-position: -120% 0; }
+}
+@-webkit-keyframes gxFilledEnergy {
+    0%   { background-position: 100% 0; }
+    100% { background-position: -120% 0; }
+}
+
+@keyframes gxFillSweep {
+    0%   { transform: translateX(-120%); opacity: 0; }
+    20%  { opacity: .85; }
+    70%  { opacity: .65; }
+    100% { transform: translateX(120%); opacity: 0; }
+}
+@-webkit-keyframes gxFillSweep {
+    0%   { -webkit-transform: translateX(-120%); opacity: 0; }
+    20%  { opacity: .85; }
+    70%  { opacity: .65; }
+    100% { -webkit-transform: translateX(120%); opacity: 0; }
+}
+
+/* El morph nuevo del usuario queda por encima de las animaciones antiguas. */
+
+
+.gamif-expanded-container {
+    display: none;
+    background: var(--card-glass);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 24px;
+    padding: 20px; 
+    margin-bottom: 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 242, 254, 0.1);
+    transform-origin: top center;
+    will-change: transform, opacity, clip-path;
+}
+
+/* Animación: Crece desde las dimensiones de la tarjeta pequeña */
+.gamif-expanded-container.gx-morph-in {
+    display: block !important;
+    animation: trueMorphExpand 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+
+/* Animación: Se encoge de vuelta a la tarjeta original */
+.gamif-expanded-container.gx-morph-out {
+    display: block !important;
+    animation: trueMorphCollapse 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes trueMorphExpand {
+    0% {
+        opacity: 0.5;
+        /* El recorte inicial simula el tamaño de la tarjeta pequeña */
+        clip-path: inset(0% 25% 65% 25% round 22px);
+        transform: translateY(-10px) scale(0.95);
+    }
+    100% {
+        opacity: 1;
+        /* Se desdobla revelando el contenido completo */
+        clip-path: inset(0% 0% 0% 0% round 24px);
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes trueMorphCollapse {
+    0% {
+        opacity: 1;
+        clip-path: inset(0% 0% 0% 0% round 24px);
+        transform: translateY(0) scale(1);
+    }
+    100% {
+        opacity: 0;
+        clip-path: inset(0% 25% 65% 25% round 22px);
+        transform: translateY(-15px) scale(0.95);
+    }
+}
+
+/* En Reduce Motion conservamos el porcentaje y un pulso estático, sin eliminar visualmente la barra. */
+@media (prefers-reduced-motion: reduce) {
+    .gx-gamif-progress::before,
+    .gx-gamif-progress > span,
+    .gx-gamif-progress > span::after {
+        animation-duration: 5s;
+        -webkit-animation-duration: 5s;
+    }
+}
+</style>
+
+<style id="goxion-ayuda-v6-4-card-polish">
+/* ==========================================================
+   TARJETAS DE GAMIFICACIÓN — GLASS LIMPIO / SIN DESTELLOS
+   ========================================================== */
+#gamif-grid{
+    gap:10px!important;
+    align-items:stretch!important;
+}
+
+.gx-gamif-card{
+    position:relative!important;
+    isolation:isolate;
+    overflow:hidden!important;
+    min-height:172px!important;
+    padding:18px 16px 15px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:stretch!important;
+    justify-content:flex-start!important;
+    gap:0!important;
+    text-align:left!important;
+    border-radius:22px!important;
+    background:rgba(9,9,14,.48)!important;
+    backdrop-filter:blur(18px)!important;
+    -webkit-backdrop-filter:blur(18px)!important;
+    border:1px solid rgba(255,255,255,.09)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.26)!important;
+    animation:none!important;
+}
+
+/* Anula los pulsos morado/cian heredados de estados listos/activos. */
+.gx-gamif-card.pulse-referral,
+.gx-gamif-card.pulse-mission,
+.gx-gamif-card.gx-referral-ready{
+    animation:none!important;
+    border-color:rgba(255,255,255,.09)!important;
+    box-shadow:0 14px 34px rgba(0,0,0,.26)!important;
+    transform:none!important;
+}
+
+/* Elimina los destellos/glows decorativos antiguos. */
+.gx-gamif-card::after{
+    content:none!important;
+    display:none!important;
+}
+
+/* Emoji convertido en marca de agua de fondo. */
+.gx-gamif-card::before{
+    content:attr(data-watermark);
+    position:absolute;
+    z-index:-1;
+    right:-12px;
+    top:52%;
+    transform:translateY(-50%) rotate(-16deg) scale(1.04);
+    -webkit-transform:translateY(-50%) rotate(-16deg) scale(1.04);
+    font-size:6.4rem;
+    line-height:1;
+    opacity:.055;
+    filter:grayscale(1) saturate(0) blur(.15px);
+    -webkit-filter:grayscale(1) saturate(0) blur(.15px);
+    pointer-events:none;
+    user-select:none;
+}
+
+.gx-gamif-card > *{
+    position:relative;
+    z-index:2;
+}
+
+/* Encabezado: sólo texto, una sola línea. */
+.gx-gamif-card-top{
+    display:block!important;
+    margin:0 0 15px!important;
+    min-width:0;
+}
+.gx-gamif-card .gamif-icon{
+    display:none!important;
+}
+.gx-gamif-card-kicker{
+    display:block;
+    max-width:100%;
+    margin:0!important;
+    color:rgba(192,202,222,.82)!important;
+    font-size:clamp(.62rem,2.65vw,.72rem)!important;
+    font-weight:850!important;
+    letter-spacing:1.15px!important;
+    line-height:1.05!important;
+    text-transform:uppercase;
+    white-space:nowrap!important;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* Nombre del referido / Tu progreso: protagonista, máximo 2 líneas. */
+.gx-gamif-card .gamif-title{
+    display:-webkit-box!important;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
+    max-width:88%;
+    margin:0!important;
+    color:#fff!important;
+    font-size:clamp(1.08rem,4.5vw,1.28rem)!important;
+    line-height:1.08!important;
+    font-weight:850!important;
+    letter-spacing:-.25px!important;
+    overflow-wrap:anywhere;
+}
+
+.gx-gamif-card-status{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
+    max-width:91%;
+    margin-top:10px!important;
+    font-size:clamp(.74rem,3.15vw,.83rem)!important;
+    line-height:1.22!important;
+    font-weight:800!important;
+}
+
+.gx-gamif-card-meta{
+    display:-webkit-box;
+    -webkit-box-orient:vertical;
+    -webkit-line-clamp:2;
+    overflow:hidden;
+    max-width:94%;
+    margin-top:7px!important;
+    color:rgba(167,180,203,.88)!important;
+    font-size:clamp(.64rem,2.8vw,.72rem)!important;
+    line-height:1.32!important;
+}
+
+/* ==========================================================
+   PROGRESO: EL EFECTO EXISTE SÓLO DENTRO DEL % COMPLETADO
+   ========================================================== */
+.gx-gamif-progress{
+    position:relative!important;
+    width:100%!important;
+    height:6px!important;
+    box-sizing:content-box!important;
+    margin-top:auto!important;
+    padding-top:16px!important;
+    overflow:visible!important;
+    background:transparent!important;
+}
+
+/* Riel vacío completamente estático. */
+.gx-gamif-progress::before{
+    content:none!important;
+    display:none!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+}
+.gx-gamif-progress::after{
+    content:""!important;
+    position:absolute!important;
+    z-index:1!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    height:6px!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.075)!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.025)!important;
+}
+
+/* El ancho inline sigue siendo la fuente de verdad. */
+.gx-gamif-progress > span{
+    position:absolute!important;
+    z-index:2!important;
+    left:0!important;
+    bottom:0!important;
+    height:6px!important;
+    min-width:0!important;
+    max-width:100%!important;
+    border-radius:999px!important;
+    overflow:hidden!important;
+    background:linear-gradient(90deg,#7c4dff 0%,#00f2fe 100%)!important;
+    background-size:100% 100%!important;
+    box-shadow:0 0 11px rgba(0,242,254,.14)!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+    transition:width .4s ease!important;
+}
+
+/* Barrido únicamente dentro de la porción completada. En width:0 no se ve. */
+.gx-gamif-progress > span::after{
+    content:""!important;
+    position:absolute!important;
+    inset:0!important;
+    width:52%!important;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.68),transparent)!important;
+    transform:translateX(-130%)!important;
+    -webkit-transform:translateX(-130%)!important;
+    animation:gxRealProgressSweep 2.05s cubic-bezier(.4,0,.2,1) infinite!important;
+    -webkit-animation:gxRealProgressSweep 2.05s cubic-bezier(.4,0,.2,1) infinite!important;
+    pointer-events:none!important;
+}
+
+@keyframes gxRealProgressSweep{
+    0%{transform:translateX(-130%);opacity:0}
+    18%{opacity:.9}
+    82%{opacity:.72}
+    100%{transform:translateX(260%);opacity:0}
+}
+@-webkit-keyframes gxRealProgressSweep{
+    0%{-webkit-transform:translateX(-130%);opacity:0}
+    18%{opacity:.9}
+    82%{opacity:.72}
+    100%{-webkit-transform:translateX(260%);opacity:0}
+}
+
+@media(max-width:520px){
+    #gamif-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
+    .gx-gamif-card{min-height:170px!important;padding:16px 14px 14px!important}
+    .gx-gamif-card::before{right:-17px;font-size:5.65rem;opacity:.052}
+    .gx-gamif-card-top{margin-bottom:14px!important}
+    .gx-gamif-card .gamif-title{max-width:90%;font-size:clamp(1.02rem,4.7vw,1.2rem)!important}
+    .gx-gamif-card-status{max-width:94%}
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-gamif-progress > span::after{
+        animation:none!important;
+        -webkit-animation:none!important;
+        opacity:.16!important;
+        transform:none!important;
+        -webkit-transform:none!important;
+    }
+}
+</style>
+
+
+<style id="goxion-ayuda-v6-5-balance">
+/* ==========================================================
+   AJUSTE V6.5 — WATERMARK MÁS VISIBLE + BALANCE VERTICAL
+   ========================================================== */
+
+/* Emoji ambiental: más perceptible, conservando transparencia. */
+.gx-gamif-card::before{
+    right:-8px !important;
+    top:52% !important;
+    font-size:6.9rem !important;
+    opacity:.105 !important;
+    filter:grayscale(.15) saturate(.8) !important;
+    -webkit-filter:grayscale(.15) saturate(.8) !important;
+    transform:translateY(-50%) rotate(-15deg) scale(1.05) !important;
+    -webkit-transform:translateY(-50%) rotate(-15deg) scale(1.05) !important;
+}
+
+/* Más aire entre el encabezado y el contenido principal. */
+.gx-gamif-card-top{
+    margin-bottom:0 !important;
+}
+
+.gx-gamif-card .gamif-title{
+    margin-top:18px !important;
+}
+
+/* Conservamos una progresión vertical uniforme. */
+.gx-gamif-card-status{
+    margin-top:9px !important;
+}
+
+.gx-gamif-card-meta{
+    margin-top:7px !important;
+}
+
+/* El espacio antes de la barra replica visualmente el espacio superior. */
+.gx-gamif-progress{
+    padding-top:18px !important;
+}
+
+/* En móvil se mantiene el balance sin comprimir demasiado la tarjeta. */
+@media(max-width:520px){
+    .gx-gamif-card::before{
+        right:-12px !important;
+        font-size:6.05rem !important;
+        opacity:.095 !important;
+    }
+
+    .gx-gamif-card .gamif-title{
+        margin-top:16px !important;
+    }
+
+    .gx-gamif-progress{
+        padding-top:16px !important;
+    }
+}
+</style>
+
+
+<style id="goxion-ayuda-v6-6-contextual-motion">
+/* ==========================================================
+   V6.6 — WATERMARK MÁS PRESENTE + MOVIMIENTO CON SIGNIFICADO
+   ========================================================== */
+
+/* El emoji se reconoce mejor, pero sigue siendo ambiental. */
+.gx-gamif-card::before{
+    right:-7px !important;
+    top:51% !important;
+    font-size:7.25rem !important;
+    opacity:.145 !important;
+    filter:grayscale(0) saturate(.92) contrast(.95) !important;
+    -webkit-filter:grayscale(0) saturate(.92) contrast(.95) !important;
+    transform:translateY(-50%) rotate(-14deg) scale(1.04) !important;
+    -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04) !important;
+    transform-origin:center !important;
+    -webkit-transform-origin:center !important;
+}
+
+/* Estado normal: completamente tranquilo. */
+.gx-gamif-card.pulse-referral{
+    animation:none !important;
+    border-color:rgba(255,255,255,.09) !important;
+    box-shadow:0 14px 34px rgba(0,0,0,.26) !important;
+}
+
+/* ==========================================================
+   RECOMPENSA LISTA:
+   sólo aquí recuperamos un pulso breve y elegante.
+   ========================================================== */
+.gx-gamif-card.gx-referral-ready,
+.gx-gamif-card.pulse-mission{
+    animation:gxRewardBreath 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+    border-color:rgba(0,242,254,.20) !important;
+}
+
+/* El watermark también "respira" suavemente cuando hay premio. */
+.gx-gamif-card.gx-referral-ready::before,
+.gx-gamif-card.pulse-mission::before{
+    animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+    -webkit-animation:gxWatermarkCelebrate 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+}
+
+/* Después de las 2 respiraciones, la tarjeta vuelve a estar calmada. */
+@keyframes gxRewardBreath{
+    0%,100%{
+        box-shadow:0 14px 34px rgba(0,0,0,.26), 0 0 0 rgba(0,242,254,0);
+        transform:translateY(0);
+    }
+    50%{
+        box-shadow:0 16px 38px rgba(0,0,0,.30), 0 0 22px rgba(0,242,254,.105);
+        transform:translateY(-1px);
+    }
+}
+
+@keyframes gxWatermarkCelebrate{
+    0%,100%{
+        opacity:.145;
+        transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.215;
+        transform:translateY(-50%) rotate(-11deg) scale(1.085);
+    }
+}
+@-webkit-keyframes gxWatermarkCelebrate{
+    0%,100%{
+        opacity:.145;
+        -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.215;
+        -webkit-transform:translateY(-50%) rotate(-11deg) scale(1.085);
+    }
+}
+
+/* Cuando el beneficio ya fue reclamado, vuelve al estado sereno. */
+.gx-gamif-card[data-watermark="💝"]::before,
+.gx-gamif-card[data-watermark="✅"]::before{
+    opacity:.13 !important;
+    animation:none !important;
+    -webkit-animation:none !important;
+}
+
+/* En móvil aumentamos presencia sin invadir el texto. */
+@media(max-width:520px){
+    .gx-gamif-card::before{
+        right:-10px !important;
+        font-size:6.45rem !important;
+        opacity:.135 !important;
+    }
+
+    .gx-gamif-card.gx-referral-ready::before,
+    .gx-gamif-card.pulse-mission::before{
+        animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+        -webkit-animation:gxWatermarkCelebrateMobile 2.35s cubic-bezier(.4,0,.2,1) 2 !important;
+    }
+}
+
+@keyframes gxWatermarkCelebrateMobile{
+    0%,100%{
+        opacity:.135;
+        transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.20;
+        transform:translateY(-50%) rotate(-11deg) scale(1.075);
+    }
+}
+@-webkit-keyframes gxWatermarkCelebrateMobile{
+    0%,100%{
+        opacity:.135;
+        -webkit-transform:translateY(-50%) rotate(-14deg) scale(1.04);
+    }
+    50%{
+        opacity:.20;
+        -webkit-transform:translateY(-50%) rotate(-11deg) scale(1.075);
+    }
+}
+
+/* Respeta preferencia del sistema sin ocultar el emoji. */
+@media(prefers-reduced-motion:reduce){
+    .gx-gamif-card.gx-referral-ready,
+    .gx-gamif-card.pulse-mission,
+    .gx-gamif-card.gx-referral-ready::before,
+    .gx-gamif-card.pulse-mission::before{
+        animation:none !important;
+        -webkit-animation:none !important;
+    }
+}
+</style>
+
+
+<style id="goxion-release-version-style">
+.goxion-release-version {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 16px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+    color: rgba(149, 164, 189, 0.38);
+    font-size: 8px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.85px;
+    text-transform: uppercase;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+}
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -2747,6 +3659,7 @@
                 <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
             </div>
 
+            <div id="dash-payment-review-alert"></div>
             <div id="dash-upsell"></div>
             <div id="referral-section-container"></div>
 
@@ -3849,6 +4762,23 @@
                     </div>`; 
                 }
             }
+
+            const payAlert = document.getElementById('dash-payment-review-alert');
+            if(payAlert) {
+                const reviewState = String(cliente.pago_revision_estado || '').toLowerCase();
+                const reviewMsg = cliente.pago_revision_mensaje || '';
+                const missing = Number(cliente.pago_revision_monto_faltante || 0);
+                if(reviewState === 'incompleto') {
+                    payAlert.innerHTML = `<div class="gx-client-payment-alert warning"><span>⚠️</span><div><strong>Tu pago requiere corrección</strong><small>${reviewMsg || 'Detectamos un pago incompleto.'}${missing > 0 ? ` <b>Faltante: $${missing}</b>` : ''}</small></div></div>`;
+                } else if(reviewState === 'rechazado') {
+                    payAlert.innerHTML = `<div class="gx-client-payment-alert danger"><span>✕</span><div><strong>No pudimos validar tu comprobante</strong><small>${reviewMsg || 'Verifica los datos y vuelve a enviar tu comprobante.'}</small></div></div>`;
+                } else if(cliente.pago_en_revision === true || reviewState === 'revision') {
+                    payAlert.innerHTML = `<div class="gx-client-payment-alert review"><span>⏳</span><div><strong>Comprobante en revisión</strong><small>Ya recibimos tu pago. Te avisaremos cuando quede validado.</small></div></div>`;
+                } else {
+                    payAlert.innerHTML = '';
+                }
+            }
+
             document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
@@ -3876,14 +4806,16 @@
             try { savedMissions = JSON.parse(localStorage.getItem('goxion_missions_' + cliente.folio)) || []; } catch(e){}
 
             if(hasReferral) {
-                let mesesRaw = Number(cliente.referido_activo.meses || 0);
+                let serviciosRef = Array.isArray(cliente.referido_activo.servicios) ? cliente.referido_activo.servicios : [];
+                let mesesRaw = Number(cliente.referido_activo.meses_efectivos ?? cliente.referido_activo.meses_override ?? cliente.referido_activo.meses ?? 0);
                 let meses = Math.max(0, Math.min(mesesRaw, 3));
-                let plats = Number(cliente.referido_activo.plataformas || 0);
+                let plats = serviciosRef.length || Number(cliente.referido_activo.plataformas || 0);
                 let beneficioReclamado = cliente.referido_activo.beneficio_reclamado === true;
                 let beneficioListo = plats >= 2 && meses >= 3;
 
+                // --- NUEVO DISEÑO: MINIMALISMO FLOTANTE EN REFERIDOS ---
                 let warningHTML = plats < 2
-                    ? `<div style="background:rgba(255,170,0,.15);border:1px dashed var(--warning-amber);border-radius:8px;padding:10px;margin-top:10px;font-size:11px;color:var(--warning-amber);">⚠️ Tu referido necesita al menos 2 plataformas activas para que el beneficio sea válido.</div>`
+                    ? `<div style="color:var(--warning-amber); font-size:11px; text-align:center; margin-top:12px;">⚠️ Tu referido necesita al menos 2 servicios activos. Le falta ${Math.max(0, 2 - plats)}.</div>`
                     : '';
 
                 let refSubtitle = "";
@@ -3891,13 +4823,13 @@
                 let refCardClass = "";
 
                 if(beneficioReclamado) {
-                    refSubtitle = "Mes gratis reclamado ✓";
+                    refSubtitle = `Mes gratis reclamado ✓ · ${plats} servicio${plats===1?'':'s'}`;
                     refSubtitleColor = "var(--success-green)";
                 } else if(plats < 2 || meses < 1) {
-                    refSubtitle = "Incompleto";
+                    refSubtitle = `${meses}/3 meses · ${plats} servicio${plats===1?'':'s'}`;
                     refSubtitleColor = "var(--warning-amber)";
                 } else {
-                    refSubtitle = `${meses}/3 meses`;
+                    refSubtitle = `${meses}/3 meses · ${plats} servicios`;
                     refSubtitleColor = beneficioListo ? "var(--neon-blue)" : "var(--neon-purple)";
                     refCardClass = beneficioListo ? "gx-referral-ready" : "pulse-referral";
                 }
@@ -3905,50 +4837,80 @@
                 let claimMonthHTML = "";
                 if(beneficioListo) {
                     claimMonthHTML = beneficioReclamado
-                        ? `<button id="btn-claim-free-month" class="btn-primary gx-claim-done" disabled style="margin-top:14px;padding:14px;font-size:13px;">✅ Mes gratis reclamado</button>`
+                        ? `<button id="btn-claim-free-month" class="btn-primary gx-claim-done" disabled style="margin-top:20px;padding:14px;font-size:13px;">✅ Mes gratis reclamado</button>`
                         : `
-                            <div class="gx-benefit-ready-note">🎉 ¡Tu referido ya cumplió el ciclo! Toca el botón para registrar tu beneficio.</div>
-                            <button id="btn-claim-free-month" class="btn-primary" style="margin-top:4px;padding:14px;font-size:13px;" onclick="reclamarMesGratis('${cliente.nombre}', '${cliente.folio}', '${refNombre.replace(/'/g, "\\'")}')">🎁 Reclama tu mes gratis</button>
+                            <div style="text-align:center; color:var(--success-green); font-size:13px; font-weight:800; margin-top:20px; margin-bottom:10px;">🎉 ¡Ciclo cumplido!</div>
+                            <button id="btn-claim-free-month" class="btn-primary" style="padding:14px;font-size:13px;" onclick="reclamarMesGratis('${cliente.nombre}', '${cliente.folio}', '${refNombre.replace(/'/g, "\\'")}')">🎁 Reclama tu mes gratis</button>
                           `;
                 }
 
+                const refProgressPct = beneficioReclamado ? 100 : Math.min(100, Math.round((Math.min(3, meses) / 3) * 100));
+                const refStateText = beneficioReclamado
+                    ? "Beneficio reclamado"
+                    : beneficioListo
+                        ? "Mes gratis disponible"
+                        : (plats < 2 ? "Progreso pausado" : "En progreso");
+
                 btnRefHtml = `
-                    <div class="gamif-btn ${refCardClass}" onclick="openGamif('referral')">
-                        <div class="gamif-icon">${beneficioReclamado ? '💝' : '🎁'}</div>
-                        <div class="gamif-title gx-referral-card-title">${refNombre}</div>
-                        <div id="gx-referral-status" class="gamif-subtitle" style="color:${refSubtitleColor};font-weight:bold;">${refSubtitle}</div>
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-ref ${refCardClass}" data-watermark="${beneficioReclamado ? '💝' : '🎁'}" onclick="openGamif('referral')">
+                        <div class="gx-gamif-card-top">
+                            <span class="gx-gamif-card-kicker">REFERIDOS</span>
+                        </div>
+                        <div class="gamif-title gx-referral-card-title">${refNombre || 'Tu referido'}</div>
+                        <div id="gx-referral-status" class="gx-gamif-card-status" style="color:${refSubtitleColor};">${refStateText}</div>
+                        <div class="gx-gamif-card-meta">${plats} servicio${plats===1?'':'s'} activo${plats===1?'':'s'} · ${meses}/3 meses</div>
+                        <div class="gx-gamif-progress" data-progress="${refProgressPct}" aria-label="Progreso de referidos: ${refProgressPct}%">
+                            <span style="width:${refProgressPct}%"></span>
+                        </div>
                     </div>`;
 
                 expandedRefHtml = `
-                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
-                    <div style="text-align:center;margin-bottom:15px;margin-top:-5px;">
-                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:38px;margin-bottom:5px;display:inline-block;">${beneficioReclamado ? '💝' : '🎁'}</div>
-                        <div class="gx-referral-name" style="font-size:16px;font-weight:800;">¡Gracias por invitar a ${refNombre}!</div>
+                    <div class="gx-gamif-expanded-head"><button class="btn-gamif-close" onclick="closeGamif()">← Volver</button><span class="gx-gamif-expanded-kicker">GOXION REWARDS</span></div>
+
+                    <div style="text-align:center; margin-bottom:25px; margin-top:5px;">
+                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:42px; margin-bottom:8px; display:inline-block; filter: drop-shadow(0 0 15px rgba(0,242,254,0.3));">${beneficioReclamado ? '💝' : '🎁'}</div>
+                        <div class="gx-referral-name" style="font-size:18px; font-weight:800; color:#fff;">Tus Recompensas</div>
+                        <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Progreso de tu invitado: <span style="color:var(--text-main); font-weight:700;">${refNombre}</span></div>
                     </div>
-                    <div class="referral-stats">
-                        <div class="stat-box" style="border-right:1px solid rgba(255,255,255,.05);">
-                            <div class="stat-val" style="${plats < 2 ? 'color:var(--warning-amber);' : ''}">${plats}</div>
-                            <div class="stat-label">Plataformas</div>
+
+                    <div style="display: flex; justify-content: space-around; margin-bottom: 25px;">
+                        <div style="text-align:center;">
+                            <div style="font-size:22px; font-weight:800; color:${plats < 2 ? 'var(--warning-amber)' : 'var(--neon-blue)'}; line-height:1;">${plats}</div>
+                            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Servicios</div>
                         </div>
-                        <div class="stat-box">
-                            <div class="stat-val" style="${beneficioListo ? 'color:var(--success-green);' : ''}">${meses}/3</div>
-                            <div class="stat-label">Meses</div>
+                        <div style="text-align:center;">
+                            <div style="font-size:22px; font-weight:800; color:${beneficioListo ? 'var(--success-green)' : 'var(--neon-blue)'}; line-height:1;">${meses}/3</div>
+                            <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-top:4px;">Meses</div>
                         </div>
                     </div>
-                    <div style="font-size:11px;color:var(--text-muted);margin-bottom:5px;">Progreso a tu mes gratis:</div>
-                    <div class="loyalty-progress-bg" style="height:6px;">
-                        <div class="loyalty-progress-fill" style="width:${Math.min((meses / 3) * 100,100)}%;background:${beneficioListo ? 'linear-gradient(90deg,#00f2fe,#00ff9d)' : 'linear-gradient(90deg,#ffaa00,#ff3366)'};"></div>
+
+                    <div style="margin-bottom: 30px;">
+                        <div style="font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; font-weight:700; margin-bottom:12px; text-align:center;">Servicios Activos</div>
+                        ${serviciosRef.length
+                            ? `<div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:center;">${serviciosRef.map(s => `<span style="padding:6px 14px; border-radius:20px; background:rgba(0,242,254,0.05); border:1px solid rgba(0,242,254,0.2); color:var(--neon-blue); font-size:11px; font-weight:700;">✓ ${s}</span>`).join('')}</div>`
+                            : `<div style="text-align:center; color:var(--warning-amber); font-size:11px;">Aún no hay servicios vinculados.</div>`}
+                        <div style="font-size:10px; color:var(--text-muted); text-align:center; margin-top:14px; opacity:0.6;">Sincronizado desde GOXION</div>
                     </div>
+
+                    <div style="font-size:11px; color:var(--text-muted); margin-bottom:10px; text-align:center;">Progreso al mes gratis</div>
+                    <div class="loyalty-progress-bg" style="height:6px; background:rgba(255,255,255,0.05); border:none;">
+                        <div class="loyalty-progress-fill" style="width:${Math.min((meses / 3) * 100,100)}%; background:${beneficioListo ? 'linear-gradient(90deg,#00f2fe,#00ff9d)' : 'linear-gradient(90deg,#7c4dff,#00f2fe)'}; box-shadow: 0 0 10px ${beneficioListo ? 'rgba(0,255,157,0.4)' : 'rgba(0,242,254,0.4)'};"></div>
+                    </div>
+
                     ${warningHTML}
                     ${claimMonthHTML}
-                    <div style="font-size:11px;color:var(--neon-blue);margin-top:15px;text-align:center;cursor:pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
+
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:20px; text-align:center; cursor:pointer; text-decoration:underline;" onclick="openModal('modal-referidos')">Ver reglas del beneficio</div>`;
+                // --- FIN DE NUEVO DISEÑO ---
             } else {
                 let msgWhatsApp = `Hola, quiero unirme a GOXION. Vengo invitado por el cliente ${cliente.nombre} (${cliente.folio}).`;
                 btnRefHtml = `
-                    <div class="gamif-btn" onclick="openGamif('referral')">
-                        <div class="gamif-icon">🫂</div>
-                        <div class="gamif-title">Invita y Gana</div>
-                        <div class="gamif-subtitle">Empieza a referir</div>
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-ref" data-watermark="🫂" onclick="openGamif('referral')">
+                        <div class="gx-gamif-card-top"><span class="gx-gamif-card-kicker">REFERIDOS</span></div>
+                        <div class="gamif-title">Invita y gana</div>
+                        <div class="gx-gamif-card-status">Empieza a referir</div>
+                        <div class="gx-gamif-card-meta">Comparte GOXION y desbloquea beneficios</div>
+                        <div class="gx-gamif-progress" data-progress="0" aria-label="Progreso de referidos: 0%"><span style="width:0%"></span></div>
                     </div>`;
 
                 expandedRefHtml = `
@@ -3981,12 +4943,33 @@
                     ? `<span style="color:var(--neon-blue);font-weight:800;">¡Listo para reclamar!</span>`
                     : (hasMissions ? `<span style="color:var(--neon-blue);font-weight:bold;">¡Misiones activas!</span>` : `Sin tareas`));
 
-            btnCupHtml = `
-                <div class="gamif-btn ${cupPulse}" onclick="openGamif('coupon')">
-                    <div class="gamif-icon">${couponClaimed ? '🥇' : '🎟️'}</div>
-                    <div class="gamif-title">Cupones</div>
-                    <div id="gx-coupon-subtitle" class="gamif-subtitle">${cupSubtitle}</div>
-                </div>`;
+            const missionTotal = Array.isArray(tareasArr) ? tareasArr.length : 0;
+                const missionDone = Array.isArray(savedMissions)
+                    ? tareasArr.reduce((total, _, idx) => total + (savedMissions.includes(idx) ? 1 : 0), 0)
+                    : 0;
+                const missionPct = missionTotal > 0
+                    ? Math.min(100, Math.round((missionDone / missionTotal) * 100))
+                    : 0;
+                const missionClaimed = Boolean(couponClaimed);
+                const missionReady = missionTotal > 0 && missionDone >= missionTotal;
+                const missionState = missionClaimed
+                    ? 'Beneficio aplicado'
+                    : missionReady
+                        ? 'Recompensa lista'
+                        : (missionTotal > 0 ? `${missionDone} de ${missionTotal} completadas` : 'Sin tareas activas');
+
+                btnCupHtml = `
+                    <div class="gamif-btn gx-gamif-card gx-gamif-card-mission ${missionReady && !missionClaimed ? 'pulse-mission' : ''}" data-watermark="${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}" onclick="openGamif('coupon')">
+                        <div class="gx-gamif-card-top">
+                            <span class="gx-gamif-card-kicker">MISIONES GOXION</span>
+                        </div>
+                        <div class="gamif-title">Tu progreso</div>
+                        <div class="gx-gamif-card-status">${missionState}</div>
+                        <div class="gx-gamif-card-meta">Recompensa: ${Number(gamifConfig.descuento || 0)}% OFF</div>
+                        <div class="gx-gamif-progress" data-progress="${missionPct}" aria-label="Progreso de misiones: ${missionPct}%">
+                            <span style="width:${missionPct}%"></span>
+                        </div>
+                    </div>`;
 
             if(hasMissions && tareasArr.length > 0) {
                 let missionsHTML = '';
@@ -4780,7 +5763,7 @@
 
     </script>
 
-    <!-- GOXION BETA // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
+    <!-- GOXION // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
     <script id="goxion-beta-client-layer">
     (() => {
         const LOGIN_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion";
@@ -4811,6 +5794,10 @@ function goxionBetaLegacy(data) {
             dia_pago: Number(c.dia_pago || 15),
             estado: c.estado || "pendiente",
             pago_en_revision: c.pago_en_revision === true,
+            pago_revision_estado: c.pago_revision_estado || "",
+            pago_revision_mensaje: c.pago_revision_mensaje || "",
+            pago_revision_monto_faltante: Number(c.pago_revision_monto_faltante || 0),
+            pago_revision_updated_at: c.pago_revision_updated_at || null,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
             servicios: (data.servicios || []).map(s => ({
@@ -4881,7 +5868,7 @@ function goxionBetaLegacy(data) {
 
                 return legacy;
             } catch (e) {
-                console.error("Inventario público beta:", e);
+                console.error("Inventario público:", e);
                 return legacy;
             }
         }
@@ -4913,7 +5900,7 @@ function goxionBetaLegacy(data) {
                 body:JSON.stringify({modo:"publico"})
             });
             const {text,json} = await parseJSON(r);
-            if (!r.ok || json?.ok !== true) throw new Error(json?.error || text || "No fue posible cargar el catálogo beta.");
+            if (!r.ok || json?.ok !== true) throw new Error(json?.error || text || "No fue posible cargar el catálogo.");
             return await aplicarInventarioPublico(goxionBetaLegacy(json));
         }
 
@@ -5046,10 +6033,10 @@ function goxionBetaLegacy(data) {
                     colorHex,
                     session_token: token
                 })
-            }).catch(e => console.log("Notificación beta no enviada", e));
+            }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION ayuda conectado a Supabase.");
+        console.info("GOXION Ayuda v1.0.0: producción.");
     })();
     </script>
 
@@ -5114,5 +6101,80 @@ function goxionBetaLegacy(data) {
 })();
 </script>
 
+<script>
+window.openGamif = function(type) {
+    const grid = document.getElementById('gamif-grid');
+    const refPanel = document.getElementById('gamif-expanded-referral');
+    const cupPanel = document.getElementById('gamif-expanded-coupon');
+    
+    // Ocultamos la cuadrícula suavemente
+    grid.style.transition = 'all 0.2s ease';
+    grid.style.opacity = '0';
+    grid.style.transform = 'scale(0.95)';
+    
+    setTimeout(() => {
+        grid.style.display = 'none';
+
+        if(type === 'referral') {
+            cupPanel.style.display = 'none';
+            cupPanel.classList.remove('gx-morph-in', 'gx-morph-out');
+            
+            refPanel.classList.remove('gx-morph-out');
+            refPanel.classList.add('gx-morph-in');
+        } else {
+            refPanel.style.display = 'none';
+            refPanel.classList.remove('gx-morph-in', 'gx-morph-out');
+            
+            cupPanel.classList.remove('gx-morph-out');
+            cupPanel.classList.add('gx-morph-in');
+
+            // Lógica de misiones al desplegar
+            const key = localStorage.getItem('goxion_user_key');
+            const folio = key && globalClientesData?.[key] ? globalClientesData[key].folio : "";
+            const pendingKey = folio ? 'goxion_recent_mission_' + folio : "";
+            const pending = pendingKey ? localStorage.getItem(pendingKey) : null;
+
+            if(pending !== null) {
+                setTimeout(() => {
+                    const item = document.getElementById('mission-' + pending);
+                    if(item) {
+                        item.classList.remove('gx-mission-just-completed');
+                        void item.offsetWidth;
+                        item.classList.add('gx-mission-just-completed');
+                        setTimeout(() => item.classList.remove('gx-mission-just-completed'), 900);
+                    }
+                    localStorage.removeItem(pendingKey);
+                }, 130);
+            } else {
+                setTimeout(animarMisionesCompletadasEnSecuencia, 170);
+            }
+        }
+    }, 200);
+};
+
+window.closeGamif = function() {
+    const grid = document.getElementById('gamif-grid');
+    const refPanel = document.getElementById('gamif-expanded-referral');
+    const cupPanel = document.getElementById('gamif-expanded-coupon');
+    
+    // Determinamos qué panel está abierto y lanzamos la animación de salida
+    const activePanel = (refPanel.classList.contains('gx-morph-in')) ? refPanel : cupPanel;
+    
+    activePanel.classList.remove('gx-morph-in');
+    activePanel.classList.add('gx-morph-out');
+    
+    setTimeout(() => {
+        activePanel.style.display = 'none';
+        activePanel.classList.remove('gx-morph-out');
+        
+        // Regresamos la cuadrícula de botones con fluidez
+        grid.style.display = 'grid';
+        void grid.offsetWidth; // Force reflow
+        grid.style.opacity = '1';
+        grid.style.transform = 'scale(1)';
+    }, 280);
+};
+</script>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.0</div>
 </body>
 </html>
