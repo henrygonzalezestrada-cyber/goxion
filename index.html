@@ -629,8 +629,14 @@ function goxionLegacyAdapter(data) {
           (!tieneHistorialConPeriodo && cliente.estado === "pagado")
       );
 
+      // Un comprobante en revisión siempre tiene prioridad visual sobre "pagado".
+      // El estado verde sólo vuelve cuando Administración aprueba y Supabase
+      // limpia pago_en_revision / marca pago_revision_estado como aprobado.
+      const reviewState = String(cliente.pago_revision_estado || "").toLowerCase();
+      const enRevision = cliente.pago_en_revision === true || reviewState === "revision";
+
       // El cambio manual desde Admin manda sobre el periodo activo.
-      if (cliente.estado === "pendiente" || cliente.estado === "suspendido") {
+      if (cliente.estado === "pendiente" || cliente.estado === "suspendido" || enRevision) {
           estaPagadoPeriodo = false;
       }
 
@@ -670,22 +676,20 @@ function goxionLegacyAdapter(data) {
       let mensajeAtrasoHTML = "";
 
       // Supabase es la única fuente de verdad del estado de revisión.
-      const enRevision = !estaPagadoPeriodo && cliente.pago_en_revision === true;
-
       const montoFaltanteRevision = Math.max(0, Number(cliente.pago_revision_monto_faltante || 0));
       const pagoIncompleto = !estaPagadoPeriodo
           && !enRevision
           && String(cliente.pago_revision_estado || "").toLowerCase() === "incompleto";
       const tieneDiferenciaPendiente = pagoIncompleto && montoFaltanteRevision > 0;
 
-      if (estaPagadoPeriodo) {
+      if (enRevision) {
+          badgeClass = "badge-review";
+          badgeText = `⏳ Pago en revisión`;
+          uiColor = "var(--neon-purple)";
+      } else if (estaPagadoPeriodo) {
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
           uiColor = "var(--success-neon)";
-      } else if (enRevision) {
-          badgeClass = "badge-review";
-          badgeText = `⏳ Validando Pago`;
-          uiColor = "var(--neon-purple)";
       } else if (pagoIncompleto) {
           badgeClass = "badge-incomplete";
           badgeText = tieneDiferenciaPendiente
@@ -795,16 +799,16 @@ function goxionLegacyAdapter(data) {
 
       let btnAccionHTML = "";
 
-      if (estaPagadoPeriodo) {
-          totalFinal = 0;
-          labelTotal = "Saldo Pendiente";
-      } else if (enRevision) {
+      if (enRevision) {
           btnAccionHTML = `
             <div class="btn-review-state">
               <span>⏳ <strong>Tu comprobante está en revisión</strong></span>
               <span style="font-size: 11px; color: var(--text-muted);">El equipo de Goxion actualizará tu estado en breve.</span>
             </div>
           `;
+      } else if (estaPagadoPeriodo) {
+          totalFinal = 0;
+          labelTotal = "Saldo Pendiente";
       } else if (pagoIncompleto) {
           // Administración ya validó el pago anterior y registró la diferencia.
           // Ese monto pasa a ser el saldo mostrado y el monto del siguiente comprobante.
@@ -906,7 +910,7 @@ function goxionLegacyAdapter(data) {
             <div class="footer-logo-container">
               <img src="logo2.PNG" alt="Goxion - Todo conectado" class="footer-logo" onerror="this.style.display='none'">
             </div>
-            <div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.1</div>
+            <div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.2</div>
           </div>
         </div>
       `;
@@ -1031,6 +1035,6 @@ function goxionLegacyAdapter(data) {
   cargarEstadoCuenta();
 </script>
 
-<script>console.info("GOXION Index v1.0.1: estado centralizado en Supabase.");</script>
+<script>console.info("GOXION Index v1.0.2: revisión de pago con prioridad sobre estado pagado.");</script>
 </body>
 </html>
