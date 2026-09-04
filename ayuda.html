@@ -750,6 +750,13 @@
             border: 1px solid rgba(0, 242, 254, 0.3); 
         }
 
+        .badge-review {
+            background: rgba(124, 77, 255, 0.15);
+            color: var(--neon-purple);
+            border: 1px solid rgba(124, 77, 255, 0.4);
+            box-shadow: 0 0 15px rgba(124, 77, 255, 0.18);
+        }
+
         .badge-today { 
             background: rgba(255, 170, 0, 0.15); 
             color: var(--warning-amber); 
@@ -4862,7 +4869,12 @@
             document.getElementById('dash-date').innerText = `${diaPago} de ${meses[hoy.getMonth()]}`;
             
             let badgeHTML = "";
-            if (cliente.estado === 'pagado') {
+            const dashboardReviewState = String(cliente.pago_revision_estado || '').toLowerCase();
+            const dashboardEnRevision = cliente.pago_en_revision === true || dashboardReviewState === 'revision';
+
+            if (dashboardEnRevision) {
+                badgeHTML = `<div class="time-badge badge-review">⏳ Pago en revisión</div>`;
+            } else if (cliente.estado === 'pagado') {
                 badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
             } else if (difDias > 0) {
                 badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
@@ -5995,6 +6007,6 @@ window.closeGamif = function() {
     }, 280);
 };
 </script>
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.1</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.2</div>
 </body>
 </html>
