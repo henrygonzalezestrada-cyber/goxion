@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-goxion-version="1.0.0">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -192,177 +192,460 @@
             .quick-actions { width: 100%; justify-content: space-between; }
             .btn-qaction { flex: 1; justify-content: center; }
         }
-    </style>
+    
+/* === GOXION ADMIN OPERATIONS REDESIGN === */
+:root{--gx-line:rgba(255,255,255,.075);--gx-radius:20px;--gx-shadow:0 18px 60px rgba(0,0,0,.3)}
+body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,242,254,.07),transparent 28rem),radial-gradient(circle at 90% 20%,rgba(188,19,254,.06),transparent 30rem),#030305}
+.gx-admin-shell{min-height:100vh;padding:18px 20px 40px;max-width:1440px;margin:auto}.gx-topbar{position:sticky;top:10px;z-index:6000;display:flex;justify-content:space-between;align-items:center;padding:11px 13px;margin-bottom:14px;border:1px solid var(--gx-line);border-radius:18px;background:rgba(5,5,9,.78);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.gx-brand-block,.gx-top-actions{display:flex;align-items:center;gap:9px}.gx-brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--neon-blue),var(--neon-purple));color:#030305;font-weight:800;font-size:1.2rem}.gx-brand-name{font-weight:800;letter-spacing:1.5px}.gx-brand-sub{font-size:.62rem;color:var(--text-muted);font-weight:800;letter-spacing:1.2px;margin-top:3px}.gx-save-state{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid var(--gx-line);border-radius:999px;color:var(--text-muted);font-size:.7rem;font-weight:800}.gx-save-dot{width:7px;height:7px;border-radius:50%;background:var(--neon-green);box-shadow:0 0 8px var(--neon-green)}.gx-icon-action{width:36px;height:36px;border-radius:11px;border:1px solid var(--gx-line);background:rgba(255,255,255,.04);color:#ff6685;cursor:pointer}
+.gx-desktop-nav{display:flex;gap:6px;margin-bottom:17px;padding:5px;width:max-content;border:1px solid var(--gx-line);border-radius:15px;background:rgba(10,10,15,.55)}.gx-nav-chip{border:0;background:transparent;color:var(--text-muted);padding:9px 13px;border-radius:10px;font-weight:800;cursor:pointer}.gx-nav-chip.active{color:white;background:rgba(0,242,254,.09);box-shadow:inset 0 0 0 1px rgba(0,242,254,.2)}
+.gx-page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin:22px 2px 15px}.gx-page-heading h1{font-size:clamp(1.75rem,3vw,2.45rem);margin:2px 0 3px;letter-spacing:-.5px}.gx-page-heading p{color:var(--text-muted);font-size:.86rem}.gx-eyebrow{color:var(--neon-blue);text-transform:uppercase;font-size:.65rem;font-weight:800;letter-spacing:1.4px}.gx-primary-action,.gx-secondary-action{padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}.gx-primary-action{border:0;background:linear-gradient(135deg,var(--neon-blue),#4b95ff);color:#031014;box-shadow:0 8px 24px rgba(0,242,254,.15)}.gx-secondary-action{border:1px solid var(--gx-line);background:rgba(255,255,255,.04);color:white}.gx-full-action{width:100%;margin-top:12px}
+.gx-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.gx-kpi-card{padding:15px;border-radius:18px;border:1px solid var(--gx-line);background:linear-gradient(145deg,rgba(18,18,26,.92),rgba(7,7,11,.94));color:white;text-align:left;box-shadow:var(--gx-shadow)}button.gx-kpi-card{cursor:pointer}.gx-kpi-card strong{display:block;font-size:clamp(1.35rem,3vw,1.95rem);margin:5px 0 2px}.gx-kpi-card small,.gx-kpi-label{color:var(--text-muted)}.gx-kpi-label{font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:1px}.gx-kpi-blue strong{color:var(--neon-blue)}.gx-kpi-red strong{color:#ff5275}.gx-kpi-green strong{color:var(--neon-green)}.gx-kpi-purple strong{color:#d674ff}
+.gx-section-head{display:flex;align-items:end;justify-content:space-between;margin:24px 2px 10px}.gx-section-head h2{font-size:1.2rem;margin-top:2px}.gx-section-space{margin-top:28px}.gx-text-action{border:0;background:none;color:var(--neon-blue);font-weight:800;cursor:pointer}.gx-ops-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}.gx-op-card{display:flex;align-items:center;gap:9px;padding:13px;border:1px solid var(--gx-line);border-radius:16px;background:rgba(12,12,18,.78);color:white;text-align:left;cursor:pointer}.gx-op-icon{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:rgba(255,255,255,.05)}.gx-op-copy{display:flex;flex:1;flex-direction:column}.gx-op-copy strong{font-size:1.18rem}.gx-op-copy small{color:var(--text-muted);font-weight:700}.gx-op-arrow{color:var(--text-muted);font-size:1.35rem}.gx-client-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;border:1px solid var(--gx-line);background:var(--gx-line);border-radius:17px;overflow:hidden}.gx-client-stats div{padding:15px;background:rgba(9,9,14,.95);display:flex;flex-direction:column;align-items:center}.gx-client-stats strong{font-size:1.45rem}.gx-client-stats span{color:var(--text-muted);font-size:.72rem;font-weight:800}
+.gx-command-panel{position:sticky;top:80px;z-index:4000;margin-bottom:13px;padding:9px;border:1px solid var(--gx-line);border-radius:17px;background:rgba(6,6,10,.84);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}.gx-search-wrap{display:flex;align-items:center;gap:8px;padding:0 10px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.035)}.gx-search-wrap .search-bar{border:0!important;background:transparent!important;box-shadow:none!important;margin:0!important;padding:10px 0}.gx-status-pills{margin:8px 0 2px;padding:0}.gx-status-pills .filter-pill{display:flex;align-items:center;gap:5px}.gx-status-pills b{opacity:.7}.gx-filter-tools{display:flex;gap:8px;margin-top:7px}.gx-filter-tools .custom-select{flex:1;margin:0}.gx-clients-list{display:grid;gap:9px}
+.client-card{border:1px solid var(--gx-line)!important;border-left:1px solid var(--gx-line)!important;border-radius:17px!important;padding:0!important;gap:0!important;overflow:hidden;background:linear-gradient(145deg,rgba(15,15,22,.94),rgba(7,7,11,.96))!important;box-shadow:0 8px 24px rgba(0,0,0,.22)!important}.gx-client-card-header{padding:13px 13px 7px}.gx-client-name-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.gx-client-name-line h3{font-size:1.04rem!important;margin:0!important}.gx-client-folio{padding:2px 6px;border-radius:999px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:.62rem;font-weight:800}.gx-client-status-line{display:flex;align-items:center;gap:5px;margin-top:5px;color:var(--text-muted);font-size:.7rem;font-weight:700}.gx-client-money{text-align:right}.gx-client-money strong{display:block;font-size:1.15rem}.gx-client-money span{font-size:.63rem;color:var(--text-muted);font-weight:800}.gx-client-brief{padding:2px 13px 11px;cursor:pointer}.gx-service-brief{font-size:.74rem;color:#cbd3e2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gx-benefit-brief{display:flex;gap:5px;align-items:center;margin-top:8px;flex-wrap:wrap}.gx-benefit-brief>span:not(.gx-open-client){padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:.62rem;font-weight:800}.gx-open-client{margin-left:auto;color:var(--neon-blue);font-size:.7rem;font-weight:800}.client-details{display:none!important}
+.gx-client-focus{position:fixed;inset:0;z-index:20000;display:none;align-items:flex-end;justify-content:center}.gx-client-focus.show{display:flex}.gx-focus-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.gx-focus-sheet{position:relative;z-index:1;width:min(760px,100%);height:min(92vh,980px);display:flex;flex-direction:column;border-radius:28px 28px 0 0;border:1px solid rgba(0,242,254,.16);border-bottom:0;background:linear-gradient(180deg,#0d0d13,#060609);box-shadow:0 -24px 80px rgba(0,0,0,.62);overflow:hidden;animation:gxSheetIn .34s cubic-bezier(.16,1,.3,1)}@keyframes gxSheetIn{from{transform:translateY(100%)}to{transform:translateY(0)}}.gx-focus-handle{width:46px;height:5px;border-radius:999px;background:rgba(255,255,255,.18);margin:9px auto 2px}.gx-focus-header{display:flex;align-items:center;gap:9px;padding:9px 13px 8px;border-bottom:1px solid var(--gx-line)}.gx-focus-back,.gx-focus-close{width:36px;height:36px;border:1px solid var(--gx-line);border-radius:11px;background:rgba(255,255,255,.04);color:white;font-size:1.4rem}.gx-focus-identity{display:flex;flex:1;flex-direction:column}.gx-focus-identity span{color:var(--text-muted);font-size:.64rem;font-weight:800;letter-spacing:1px}.gx-focus-identity strong{font-size:1.1rem}.gx-focus-summary{display:flex;gap:6px;overflow-x:auto;padding:8px 13px;border-bottom:1px solid var(--gx-line);scrollbar-width:none}.gx-focus-summary span{white-space:nowrap;padding:5px 8px;border-radius:999px;background:rgba(255,255,255,.045);color:var(--text-muted);font-size:.65rem;font-weight:800}.gx-focus-body{flex:1;overflow-y:auto;padding:11px 13px 28px;overscroll-behavior:contain}.gx-focus-body>.gx-focus-details{display:block!important;margin:0!important;padding:0!important;border:0!important}
+.gx-accordion{border:1px solid var(--gx-line);border-radius:14px;background:rgba(255,255,255,.022);margin-bottom:8px;overflow:hidden}.gx-accordion-trigger{width:100%;display:flex;align-items:center;justify-content:space-between;padding:11px;border:0;background:transparent;color:white;text-align:left}.gx-accordion-trigger>span{display:grid;grid-template-columns:30px 1fr;grid-template-rows:auto auto;column-gap:8px;flex:1}.gx-accordion-trigger i{grid-row:1/3;width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(255,255,255,.045);font-style:normal}.gx-accordion-trigger b{font-size:.88rem}.gx-accordion-trigger small{color:var(--text-muted);font-size:.66rem}.gx-accordion-trigger em{font-style:normal;color:var(--text-muted);transition:.2s}.gx-accordion.open .gx-accordion-trigger em{transform:rotate(180deg);color:var(--neon-blue)}.gx-accordion-content{display:none;padding:0 10px 10px}.gx-accordion.open .gx-accordion-content{display:block;animation:fadeIn .2s ease}.gx-mini-heading{color:var(--text-muted);font-size:.64rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}.gx-two-fields{display:grid;grid-template-columns:1fr 1.2fr;gap:7px}.gx-two-fields label>span{display:block;color:var(--text-muted);font-size:.64rem;font-weight:800;text-transform:uppercase;margin-bottom:4px}.gx-two-fields input,.gx-two-fields select{width:100%;background:#12121a;color:white;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px}.gx-focused-actions{border:0!important;padding-top:0!important;margin-top:0!important}.gx-loyalty-value{font-weight:800;color:var(--neon-green);min-width:18px;text-align:center}.gx-embedded-block>div{margin-top:7px!important;border-style:solid!important;border-color:var(--gx-line)!important;background:rgba(255,255,255,.02)!important}
+.gx-panel-modern{border-color:var(--gx-line)!important;background:rgba(9,9,14,.82)!important;border-radius:19px!important;padding:15px!important}.gx-panel-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}.gx-panel-title-row h2{font-size:1.2rem;margin-top:2px}.gx-catalog-scroll{overflow-x:auto;border:1px solid var(--gx-line);border-radius:13px}.gx-settings-tabs{display:flex;gap:6px;padding:5px;margin-bottom:11px;width:max-content;max-width:100%;overflow-x:auto;border:1px solid var(--gx-line);border-radius:14px;background:rgba(10,10,15,.56)}.gx-settings-tabs button{border:0;background:transparent;color:var(--text-muted);padding:8px 11px;border-radius:9px;font-weight:800;white-space:nowrap}.gx-settings-tabs button.active{background:rgba(0,242,254,.09);color:white}.gx-settings-view{display:none}.gx-settings-view.active{display:block}.gx-discount-badge{display:flex;align-items:center;border:1px solid rgba(0,242,254,.22);border-radius:10px;overflow:hidden}.gx-discount-badge input{width:50px;border:0;background:transparent;color:var(--neon-blue);padding:8px;text-align:center;font-weight:800}.gx-discount-badge span{padding-right:8px;color:var(--text-muted);font-size:.68rem;font-weight:800}.gx-large-textarea{width:100%;min-height:110px;background:#111118;border:1px solid var(--gx-line);color:white;padding:11px;border-radius:11px;resize:vertical}.gx-help-details{margin-top:8px;padding:9px 10px;border:1px solid var(--gx-line);border-radius:10px;background:rgba(255,255,255,.02);color:var(--text-muted);font-size:.7rem}.gx-help-details span{color:var(--neon-blue)}.gx-action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:11px}.gx-action-card{display:flex;align-items:center;gap:7px;padding:11px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.03);color:white;font-weight:800}.gx-action-card.primary{border-color:rgba(188,19,254,.28)}.gx-action-card.danger{color:#ff7891}.gx-setting-row{display:flex;align-items:center;justify-content:space-between;padding:11px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.025)}.gx-setting-row small{display:block;color:var(--text-muted);margin-top:2px}.gx-alert-settings{display:grid;gap:7px}.gx-selection-modal{width:min(520px,100%);max-height:82vh;display:flex;flex-direction:column;background:#0b0b11;border:1px solid rgba(0,242,254,.25);border-radius:17px;padding:15px}.gx-selection-modal #lista-clientes-modal{overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:7px;margin:9px 0}.gx-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.gx-mobile-nav{display:none}
+@media(max-width:840px){.gx-admin-shell{padding:10px 10px 94px}.gx-topbar{top:7px;padding:9px 10px}.gx-brand-sub,.gx-save-state{display:none}.gx-topbar .status{font-size:.68rem}.gx-desktop-nav,.desktop-only{display:none!important}.gx-page-heading{margin:17px 2px 11px}.gx-page-heading h1{font-size:1.65rem}.gx-page-heading p{font-size:.76rem}.gx-kpi-strip{grid-template-columns:1fr 1fr}.gx-kpi-card{padding:12px}.gx-ops-grid{grid-template-columns:1fr 1fr}.gx-client-stats{grid-template-columns:1fr 1fr}.gx-command-panel{top:66px}.gx-filter-tools{display:grid;grid-template-columns:1fr auto}.gx-mobile-nav{display:grid;grid-template-columns:1fr 1fr 70px 1fr 1fr;align-items:end;position:fixed;left:8px;right:8px;bottom:max(8px,env(safe-area-inset-bottom));z-index:10000;padding:7px;border:1px solid var(--gx-line);border-radius:21px;background:rgba(7,7,11,.91);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 14px 50px rgba(0,0,0,.55)}.gx-mobile-nav-btn{height:48px;border:0;background:transparent;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.6rem;font-weight:800}.gx-mobile-nav-btn i{font-style:normal;font-size:1.1rem}.gx-mobile-nav-btn.active{color:var(--neon-blue)}.gx-mobile-fab{width:56px;height:56px;margin:-21px auto 0;border-radius:17px;background:linear-gradient(135deg,var(--neon-blue),#4b95ff);color:#031014!important;box-shadow:0 8px 28px rgba(0,242,254,.24)}.gx-mobile-fab i{font-size:1.7rem}.gx-focus-sheet{height:94vh}.gx-action-grid{grid-template-columns:1fr}.gx-catalog-scroll{border:0;overflow:visible}.catalog-table{min-width:0!important;display:block}.catalog-table thead{display:none}.catalog-table tbody{display:grid;gap:8px}.catalog-table tr{display:grid!important;grid-template-columns:1fr 1fr;gap:6px;padding:10px;border:1px solid var(--gx-line);border-radius:14px;background:rgba(255,255,255,.025)}.catalog-table td{display:flex!important;flex-direction:column;gap:2px;border:0!important;padding:0!important}.catalog-table td:nth-child(-n+3){grid-column:1/-1}.catalog-table td:nth-child(1)::before{content:'Servicio'}.catalog-table td:nth-child(2)::before{content:'Etiqueta'}.catalog-table td:nth-child(3)::before{content:'Beneficios'}.catalog-table td:nth-child(4)::before{content:'Cuentas'}.catalog-table td:nth-child(5)::before{content:'Venta'}.catalog-table td:nth-child(6)::before{content:'Costo'}.catalog-table td:nth-child(7)::before{content:'Límite'}.catalog-table td:nth-child(8)::before{content:'Stock fijo'}.catalog-table td:nth-child(9)::before{content:'Disponible'}.catalog-table td::before{color:var(--text-muted);font-size:.56rem;font-weight:800;text-transform:uppercase}.catalog-table td:last-child{grid-column:1/-1;flex-direction:row;justify-content:flex-end}.catalog-table input[type=text],.catalog-table input[type=number]{max-width:none!important;width:100%!important}}
+@media(max-width:390px){.gx-ops-grid{grid-template-columns:1fr}.gx-two-fields{grid-template-columns:1fr}}
+
+
+    /* ===========================
+       OPS V2 // INTELIGENCIA UI
+       =========================== */
+    .gx-notification-bell{position:relative;width:38px;height:38px;border-radius:12px;border:1px solid var(--gx-line);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;font-size:1rem}
+    .gx-notification-bell i{display:none;position:absolute;right:4px;top:4px;width:9px;height:9px;border-radius:50%;background:#ff4d70;box-shadow:0 0 0 0 rgba(255,77,112,.6);animation:gxNotifPulse 1.35s infinite}
+    .gx-notification-bell.has-new i{display:block}
+    @keyframes gxNotifPulse{70%{box-shadow:0 0 0 8px rgba(255,77,112,0)}100%{box-shadow:0 0 0 0 rgba(255,77,112,0)}}
+
+    .gx-op-upcoming{border-color:rgba(255,170,0,.16)} .gx-op-overdue{border-color:rgba(255,77,112,.18)}
+    .gx-panel-desc{margin-top:5px;color:var(--text-muted);font-size:.76rem}
+    .gx-hidden-mission-source{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+
+    .gx-mission-builder,.gx-tag-library{border:1px solid var(--gx-line);border-radius:16px;background:rgba(255,255,255,.02);padding:12px}
+    .gx-tag-library{margin-top:10px}
+    .gx-mission-builder-head,.gx-library-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .gx-mission-builder-head strong,.gx-library-title strong{display:block}
+    .gx-mission-builder-head small,.gx-library-title small{display:block;color:var(--text-muted);font-size:.68rem;margin-top:3px}
+    .gx-mission-builder-list{display:grid;gap:8px;margin-top:11px}
+    .gx-mission-row{display:grid;grid-template-columns:1fr 170px 34px;gap:7px;align-items:center}
+    .gx-mission-row input,.gx-mission-row select{width:100%;background:#111118;border:1px solid var(--gx-line);color:#fff;border-radius:10px;padding:10px;outline:none}
+    .gx-mission-row button{height:38px;border-radius:10px;border:1px solid rgba(255,77,112,.18);background:rgba(255,77,112,.06);color:#ff7990;cursor:pointer}
+    .gx-tag-library-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+    .gx-tag-chip{display:flex;align-items:center;gap:7px;border:1px solid var(--gx-line);border-radius:11px;padding:8px;background:rgba(255,255,255,.025)}
+    .gx-tag-chip .emoji{font-size:1.05rem}.gx-tag-chip .copy{flex:1;min-width:0}.gx-tag-chip strong{display:block;font-size:.72rem}.gx-tag-chip small{color:var(--text-muted);font-size:.6rem}
+    .gx-tag-chip button{width:26px;height:26px;border:0;border-radius:8px;background:rgba(0,242,254,.08);color:var(--neon-blue);cursor:pointer;font-weight:900}
+
+    .gx-notification-drawer{position:fixed;z-index:26000;top:0;right:0;width:min(430px,100%);height:100dvh;background:#09090e;border-left:1px solid rgba(0,242,254,.14);box-shadow:-20px 0 70px rgba(0,0,0,.55);transform:translateX(105%);transition:transform .32s cubic-bezier(.16,1,.3,1);padding:14px;display:flex;flex-direction:column}
+    .gx-notification-drawer.show{transform:translateX(0)}
+    .gx-notification-overlay{position:fixed;z-index:25000;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);display:none}.gx-notification-overlay.show{display:block}
+    .gx-notification-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:4px 0 10px;border-bottom:1px solid var(--gx-line)}
+    .gx-notification-drawer-head h3{margin-top:2px}
+    .gx-notification-toolbar{display:flex;gap:7px;padding:10px 0}.gx-notification-toolbar button{flex:1;border:1px solid var(--gx-line);background:rgba(255,255,255,.03);color:var(--text-muted);border-radius:10px;padding:8px;font-weight:800;cursor:pointer}
+    .gx-notification-list{overflow:auto;display:grid;gap:8px;padding-bottom:20px}
+    .gx-notif-item{position:relative;padding:11px 11px 11px 14px;border:1px solid var(--gx-line);border-radius:13px;background:rgba(255,255,255,.025)}
+    .gx-notif-item.unread{border-color:rgba(0,242,254,.22);background:rgba(0,242,254,.035)}
+    .gx-notif-item.unread:before{content:"";position:absolute;left:-4px;top:18px;width:8px;height:8px;border-radius:50%;background:var(--neon-blue);box-shadow:0 0 12px rgba(0,242,254,.7)}
+    .gx-notif-item strong{display:block;font-size:.8rem}.gx-notif-item p{color:#c7ceda;font-size:.71rem;line-height:1.4;margin:4px 0}.gx-notif-item small{color:var(--text-muted);font-size:.62rem}
+    .gx-notif-action{margin-top:8px;border:0;background:rgba(0,242,254,.08);color:var(--neon-blue);border-radius:8px;padding:6px 9px;font-weight:800;cursor:pointer}
+
+    .gx-payment-modal{position:fixed;inset:0;z-index:27000;display:none;align-items:flex-end;justify-content:center}.gx-payment-modal.show{display:flex}
+    .gx-payment-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px)}
+    .gx-payment-sheet{position:relative;z-index:1;width:min(620px,100%);border-radius:26px 26px 0 0;background:#0b0b11;border:1px solid rgba(188,19,254,.22);padding:11px 14px max(18px,env(safe-area-inset-bottom));box-shadow:0 -22px 70px rgba(0,0,0,.58)}
+    .gx-payment-sheet header{display:flex;justify-content:space-between;align-items:center;margin:4px 0 10px}.gx-payment-sheet header small{color:var(--text-muted)}
+    .gx-payment-review-card{border:1px solid var(--gx-line);border-radius:14px;padding:11px;background:rgba(255,255,255,.025);color:#dce3ee;font-size:.77rem;line-height:1.5}
+    .gx-payment-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:10px}
+    .gx-payment-action{border-radius:11px;padding:11px 7px;border:1px solid var(--gx-line);font-weight:800;cursor:pointer}
+    .gx-payment-action.approve{background:rgba(0,255,157,.1);color:#7fffc2;border-color:rgba(0,255,157,.3)}.gx-payment-action.incomplete{background:rgba(255,170,0,.08);color:#ffd36c;border-color:rgba(255,170,0,.28)}.gx-payment-action.reject{background:rgba(255,77,112,.08);color:#ff8ca0;border-color:rgba(255,77,112,.28)}
+    .gx-payment-extra{display:grid;gap:8px;margin-top:10px}.gx-inline-check{display:flex;gap:8px;align-items:center;color:#cdd5e2;font-size:.74rem}.gx-payment-extra textarea{width:100%;min-height:72px;background:#111118;border:1px solid var(--gx-line);color:#fff;border-radius:11px;padding:10px;resize:vertical}.gx-missing-amount{display:none;grid-template-columns:1fr 120px;align-items:center;color:var(--text-muted);font-size:.72rem}.gx-missing-amount.show{display:grid}.gx-missing-amount input{background:#111118;border:1px solid var(--gx-line);color:#fff;border-radius:9px;padding:8px}
+
+    .gx-review-modern{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid rgba(188,19,254,.2);padding:11px;border-radius:13px;background:rgba(188,19,254,.045);margin-top:10px}.gx-review-modern strong{display:block;font-size:.78rem}.gx-review-modern small{display:block;color:var(--text-muted);font-size:.65rem;margin-top:3px}
+
+    .gx-ref-admin{border:1px solid rgba(188,19,254,.16);background:rgba(188,19,254,.035);border-radius:13px;padding:10px}.gx-ref-admin-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}.gx-ref-admin-head strong{display:block;color:#d674ff;font-size:.78rem}.gx-ref-admin-head small{display:block;color:var(--text-muted);font-size:.64rem;margin-top:2px}
+    .gx-field-label{display:block;color:var(--text-muted);font-size:.65rem;font-weight:800;margin-top:8px}.gx-field-label>input{width:100%;margin-top:4px;background:#111118;border:1px solid var(--gx-line);border-radius:9px;color:#fff;padding:8px}
+    .gx-ref-service-picker{margin-top:4px;border:1px solid var(--gx-line);border-radius:9px;background:#111118}.gx-ref-service-picker summary{padding:8px;color:#fff;cursor:pointer}.gx-ref-service-options{max-height:170px;overflow:auto;padding:6px;border-top:1px solid var(--gx-line);display:grid;gap:5px}.gx-ref-service-options label{display:flex;gap:7px;align-items:center;color:#d7deea;font-size:.7rem;padding:4px}
+    .gx-ref-smart-status{margin-top:8px;border-radius:9px;padding:8px;font-size:.68rem;font-weight:800}.gx-ref-smart-status.ok{background:rgba(0,255,157,.07);color:#8fffc9}.gx-ref-smart-status.warn{background:rgba(255,170,0,.07);color:#ffd36c}.gx-empty-inline{color:var(--text-muted);font-size:.7rem;padding:5px 0}
+
+    @media(max-width:840px){.gx-tag-library-grid{grid-template-columns:1fr 1fr}.gx-mission-row{grid-template-columns:1fr 125px 34px}.gx-payment-actions{grid-template-columns:1fr}.gx-notification-drawer{width:100%}}
+    @media(max-width:390px){.gx-tag-library-grid{grid-template-columns:1fr}.gx-mission-row{grid-template-columns:1fr}.gx-mission-row button{height:34px}.gx-review-modern{align-items:flex-start;flex-direction:column}.gx-review-modern .gx-primary-action{width:100%}}
+
+
+    .gx-confirm-incomplete{display:none;width:100%;border:1px solid rgba(255,170,0,.28);background:rgba(255,170,0,.08);color:#ffd36c;border-radius:11px;padding:10px;font-weight:800;cursor:pointer}.gx-confirm-incomplete.show{display:block}
+    .gx-ref-management-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+    .gx-ref-management-actions button{border-radius:9px;padding:8px;border:1px solid var(--gx-line);font-size:.68rem;font-weight:800;cursor:pointer}
+    .gx-ref-management-actions .reset{background:rgba(255,170,0,.06);color:#ffd36c;border-color:rgba(255,170,0,.18)}
+    .gx-ref-management-actions .delete{background:rgba(255,77,112,.06);color:#ff8ca0;border-color:rgba(255,77,112,.18)}
+    .gx-ref-management-help{color:var(--text-muted);font-size:.6rem;line-height:1.35;margin-top:6px}
+
+    .gx-client-mission-admin{border:1px solid rgba(0,242,254,.14);border-radius:14px;background:rgba(0,242,254,.025);overflow:hidden}
+    .gx-client-mission-summary{display:flex;align-items:center;gap:9px;padding:11px}
+    .gx-client-mission-icon{width:34px;height:34px;display:grid;place-items:center;border-radius:10px;background:rgba(0,242,254,.07)}
+    .gx-client-mission-copy{flex:1;min-width:0}.gx-client-mission-copy strong{display:block;font-size:.8rem}.gx-client-mission-copy small{display:block;color:var(--text-muted);font-size:.64rem;line-height:1.35;margin-top:2px}
+    .gx-client-mission-switch{transform:scale(.75);margin:0}
+    .gx-client-mission-config{border-top:1px solid var(--gx-line)}.gx-client-mission-config summary{padding:9px 11px;cursor:pointer;color:#cfd8e5;font-size:.7rem;font-weight:800}
+    .gx-client-mission-config-body{display:grid;gap:9px;padding:0 11px 11px}.gx-client-mission-config-body>label{color:var(--text-muted);font-size:.65rem;font-weight:800}
+    .gx-client-mission-config textarea{width:100%;min-height:72px;margin-top:4px;background:#111118;border:1px solid var(--gx-line);color:#fff;border-radius:9px;padding:8px;resize:vertical}
+    .gx-inline-percent{display:flex;margin-top:4px;border:1px solid var(--gx-line);border-radius:9px;overflow:hidden;background:#111118}.gx-inline-percent input{width:70px;border:0;background:transparent;color:var(--neon-blue);padding:8px;text-align:center;font-weight:800}.gx-inline-percent span{display:flex;align-items:center;color:var(--text-muted);font-size:.65rem}
+    .gx-client-round-status{display:flex;align-items:center;gap:8px;padding:8px;border-radius:10px;background:rgba(255,255,255,.025);border:1px solid var(--gx-line)}.gx-client-round-status>span{font-size:1.1rem}.gx-client-round-status strong{display:block;font-size:.72rem}.gx-client-round-status small{display:block;color:var(--text-muted);font-size:.6rem;margin-top:2px}
+    .gx-client-mission-admin-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}.gx-client-mission-admin-actions button{border-radius:9px;padding:8px;border:1px solid var(--gx-line);font-size:.67rem;font-weight:800;cursor:pointer}.gx-client-mission-admin-actions .reset{color:#ffd36c;background:rgba(255,170,0,.06);border-color:rgba(255,170,0,.18)}.gx-client-mission-admin-actions .round{color:var(--neon-blue);background:rgba(0,242,254,.05);border-color:rgba(0,242,254,.18)}
+    .gx-client-mission-tip{padding:8px 11px;border-top:1px solid var(--gx-line);color:var(--text-muted);font-size:.6rem;line-height:1.4}
+
+
+    /* === V4: PRIORIDAD DE PAGO + DOCK OPERATIVO + REFERIDO COMPACTO === */
+    .gx-payment-priority{
+        display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;
+        margin-bottom:10px;padding:11px;border-radius:15px;
+        border:1px solid rgba(188,19,254,.34);
+        background:linear-gradient(135deg,rgba(188,19,254,.10),rgba(0,242,254,.045));
+        box-shadow:0 0 24px rgba(188,19,254,.08)
+    }
+    .gx-payment-priority-icon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:rgba(188,19,254,.12);font-size:1.15rem}
+    .gx-payment-priority-copy strong{display:block;font-size:.82rem;color:#fff}
+    .gx-payment-priority-copy small{display:block;color:var(--text-muted);font-size:.64rem;margin-top:3px;line-height:1.35}
+    .gx-payment-priority button{border:0;border-radius:10px;background:linear-gradient(135deg,#bc13fe,#7c4dff);color:#fff;padding:9px 11px;font-weight:800;cursor:pointer;white-space:nowrap}
+
+    .gx-operations-dock{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:7px;margin-bottom:10px}
+    .gx-dock-loyalty,.gx-dock-action{min-height:66px;border:1px solid var(--gx-line);border-radius:14px;background:rgba(255,255,255,.025);color:#fff}
+    .gx-dock-loyalty{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:8px;padding:9px}
+    .gx-dock-icon{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(0,255,157,.07)}
+    .gx-dock-copy small,.gx-dock-action small{display:block;color:var(--text-muted);font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.7px}
+    .gx-dock-copy strong,.gx-dock-action strong{display:block;font-size:.74rem;margin-top:2px}
+    .gx-dock-stepper{display:flex;gap:4px}
+    .gx-dock-stepper button{width:28px;height:30px;border:1px solid var(--gx-line);border-radius:8px;background:#13131b;color:#fff;font-weight:900;cursor:pointer}
+    .gx-dock-stepper .reset{color:var(--text-muted)}
+    .gx-dock-action{display:flex;align-items:center;gap:8px;padding:9px;text-align:left;cursor:pointer}
+    .gx-dock-action>span{font-size:1.05rem}.gx-dock-action.message{border-color:rgba(0,255,157,.16)}.gx-dock-action.link{border-color:rgba(188,19,254,.18)}
+
+    .gx-ref-progress-row{display:grid;grid-template-columns:1.15fr 1fr;gap:8px;margin-top:8px;align-items:end}
+    .gx-ref-date-compact,.gx-ref-month-control{margin-top:0!important}
+    .gx-ref-date-compact input{min-height:40px!important;padding:7px 9px!important}
+    .gx-ref-counter{display:grid;grid-template-columns:34px 44px 34px 48px;gap:4px;align-items:center;margin-top:4px}
+    .gx-ref-counter button{height:40px;border:1px solid var(--gx-line);border-radius:9px;background:#111118;color:#fff;font-weight:900;cursor:pointer}
+    .gx-ref-counter strong{height:40px;border:1px solid var(--gx-line);border-radius:9px;background:#111118;display:grid;place-items:center;color:var(--neon-blue);font-size:.75rem}
+    .gx-ref-counter .auto{font-size:.55rem;color:var(--text-muted)}
+    .gx-ref-counter .auto.active{color:#081014;background:var(--neon-blue);border-color:var(--neon-blue)}
+    .gx-ref-service-picker summary{display:flex;justify-content:space-between;align-items:center}
+    .gx-ref-service-picker summary::after{content:"⌄";color:var(--text-muted)}
+
+    @media(max-width:620px){
+        .gx-operations-dock{grid-template-columns:1fr 1fr}
+        .gx-dock-loyalty{grid-column:1/-1}
+        .gx-payment-priority{grid-template-columns:36px 1fr}
+        .gx-payment-priority-icon{width:36px;height:36px}
+        .gx-payment-priority button{grid-column:1/-1;width:100%}
+    }
+    @media(max-width:390px){
+        .gx-ref-progress-row{grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:6px}
+        .gx-ref-date-compact input{padding:7px 6px!important;font-size:.7rem}
+        .gx-ref-counter{grid-template-columns:28px 38px 28px 44px;gap:3px}
+        .gx-ref-counter button,.gx-ref-counter strong{height:38px}
+    }
+
+</style>
+
+<style id="goxion-admin-v6-ui">
+    /* Centro de notificaciones: solo pagos y vencimientos */
+    .gx-notification-filter-row{
+        display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none
+    }
+    .gx-notification-filter-row::-webkit-scrollbar{display:none}
+    .gx-notif-filter{
+        flex:0 0 auto;border:1px solid var(--gx-line);background:rgba(255,255,255,.025);
+        color:var(--text-muted);border-radius:999px;padding:7px 10px;font-size:.65rem;
+        font-weight:900;cursor:pointer;white-space:nowrap
+    }
+    .gx-notif-filter.active{
+        color:#fff;border-color:rgba(0,242,254,.35);background:rgba(0,242,254,.08);
+        box-shadow:0 0 14px rgba(0,242,254,.08)
+    }
+    .gx-notif-filter b{
+        display:inline-grid;place-items:center;min-width:19px;height:19px;margin-left:4px;padding:0 5px;
+        border-radius:999px;background:rgba(255,255,255,.07);font-size:.58rem
+    }
+    .gx-notif-item.review{border-color:rgba(188,19,254,.25);background:rgba(188,19,254,.045)}
+    .gx-notif-item.overdue{border-color:rgba(255,77,112,.26);background:rgba(255,77,112,.04)}
+    .gx-notif-item.upcoming{border-color:rgba(255,170,0,.22);background:rgba(255,170,0,.035)}
+    .gx-notif-kind{
+        display:inline-flex;align-items:center;gap:4px;margin-bottom:5px;padding:3px 6px;border-radius:999px;
+        font-size:.56rem;font-weight:900;letter-spacing:.4px;text-transform:uppercase
+    }
+    .gx-notif-kind.review{color:#e5a7ff;background:rgba(188,19,254,.09)}
+    .gx-notif-kind.overdue{color:#ff9db0;background:rgba(255,77,112,.08)}
+    .gx-notif-kind.upcoming{color:#ffd36c;background:rgba(255,170,0,.08)}
+    .gx-notification-toolbar{align-items:center}
+    .gx-notification-toolbar .gx-notif-summary{
+        flex:1;color:var(--text-muted);font-size:.65rem;font-weight:800;line-height:1.25
+    }
+    .gx-notification-toolbar .gx-notif-refresh{
+        flex:0 0 auto;width:38px;height:36px;padding:0;border-radius:10px
+    }
+
+    /* Referidos: vinculación con cliente real */
+    .gx-ref-link-select{display:grid;gap:5px;margin-bottom:9px}
+    .gx-ref-link-select select{
+        width:100%;background:#111118;border:1px solid rgba(0,242,254,.18);color:#fff;
+        border-radius:11px;padding:10px;outline:none;font-size:.74rem;font-weight:700
+    }
+    .gx-ref-link-select select:focus{border-color:rgba(0,242,254,.55);box-shadow:0 0 0 3px rgba(0,242,254,.05)}
+    .gx-ref-linked-card{
+        display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin:8px 0 10px;
+        padding:10px;border:1px solid rgba(0,242,254,.12);border-radius:12px;background:rgba(0,242,254,.025)
+    }
+    .gx-ref-linked-card strong{display:block;font-size:.76rem}
+    .gx-ref-linked-card small{display:block;color:var(--text-muted);font-size:.62rem;margin-top:2px}
+    .gx-ref-linked-badge{
+        padding:5px 7px;border-radius:999px;border:1px solid rgba(0,242,254,.14);
+        color:var(--neon-blue);font-size:.58rem;font-weight:900;white-space:nowrap
+    }
+    .gx-ref-auto-services{
+        margin:9px 0;padding:9px;border-radius:12px;border:1px solid var(--gx-line);
+        background:rgba(255,255,255,.02)
+    }
+    .gx-ref-auto-services-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+    .gx-ref-auto-services-head span{font-size:.66rem;color:var(--text-muted);font-weight:800}
+    .gx-ref-auto-services-head strong{font-size:.68rem;color:var(--neon-blue)}
+    .gx-ref-detected-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+    .gx-ref-detected-chips span{
+        padding:5px 7px;border-radius:999px;background:rgba(0,242,254,.07);
+        border:1px solid rgba(0,242,254,.13);color:#cceff3;font-size:.58rem;font-weight:800
+    }
+    .gx-ref-detected-empty{margin-top:8px;color:#ffbf66;font-size:.63rem;line-height:1.35}
+    .gx-ref-resync{
+        margin-top:8px;border:0;background:none;color:var(--neon-blue);font-size:.62rem;
+        font-weight:900;cursor:pointer;padding:0
+    }
+    .gx-ref-link-legacy{
+        margin:7px 0 10px;padding:8px;border-radius:10px;background:rgba(255,170,0,.06);
+        border:1px solid rgba(255,170,0,.14);color:#ffd36c;font-size:.62rem;line-height:1.35
+    }
+</style>
+
+
+<style id="goxion-admin-v8-periodo-ui">
+    .gx-account-period-fields{display:grid;grid-template-columns:.72fr 1.15fr 1.25fr;gap:7px;align-items:end}
+    .gx-account-period-fields label>span{display:block;color:var(--text-muted);font-size:.64rem;font-weight:800;text-transform:uppercase;margin-bottom:4px}
+    .gx-account-period-fields input,.gx-account-period-fields select{width:100%;background:#12121a;color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:8px;min-height:38px}
+    .gx-account-period-fields .gx-period-field>span{color:var(--neon-blue)}
+    .gx-account-period-fields .gx-period-field input{border-color:rgba(0,242,254,.28);box-shadow:0 0 12px rgba(0,242,254,.035)}
+    .gx-period-help{margin:7px 1px 1px;color:var(--text-muted);font-size:.61rem;line-height:1.4}
+    @media(max-width:520px){.gx-account-period-fields{grid-template-columns:.72fr 1.28fr}.gx-account-period-fields label:last-child{grid-column:1/-1}}
+</style>
+
+<style id="goxion-admin-v9-ergonomia">
+    .gx-billing-overview{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;padding:10px 11px;margin-bottom:9px;border:1px solid rgba(0,242,254,.14);border-radius:13px;background:rgba(0,242,254,.025)}
+    .gx-billing-overview.manual{border-color:rgba(255,170,0,.2);background:rgba(255,170,0,.035)}
+    .gx-billing-overview small{display:block;color:var(--text-muted);font-size:.57rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px}.gx-billing-overview strong{display:block;margin-top:2px;font-size:.76rem}
+    .gx-cycle-badge{padding:5px 7px;border-radius:999px;font-size:.56rem;font-weight:900;white-space:nowrap}.gx-cycle-badge.auto{color:#66ffd0;border:1px solid rgba(0,255,157,.18);background:rgba(0,255,157,.06)}.gx-cycle-badge.manual{color:#ffd36c;border:1px solid rgba(255,170,0,.2);background:rgba(255,170,0,.07)}
+    .gx-billing-fields{display:grid;grid-template-columns:1.25fr .75fr;gap:7px}.gx-billing-fields label>span,.gx-manual-status>span{display:block;color:var(--text-muted);font-size:.61rem;font-weight:800;text-transform:uppercase;margin-bottom:4px}.gx-billing-fields input,.gx-manual-status select{width:100%;min-height:38px;padding:8px;border:1px solid rgba(255,255,255,.14);border-radius:9px;background:#12121a;color:#fff}.gx-billing-fields .gx-period-field>span{color:var(--neon-blue)}.gx-billing-fields .gx-period-field input{border-color:rgba(0,242,254,.25)}
+    .gx-cycle-mode-row{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:9px;padding:9px 10px;border:1px solid var(--gx-line);border-radius:11px;background:rgba(255,255,255,.018)}.gx-cycle-mode-row>div:first-child{min-width:0}.gx-cycle-mode-row strong{display:block;font-size:.7rem}.gx-cycle-mode-row small{display:block;margin-top:2px;color:var(--text-muted);font-size:.58rem;line-height:1.35}
+    .gx-cycle-segment{display:flex;flex:0 0 auto;padding:3px;border:1px solid var(--gx-line);border-radius:10px;background:#0c0c12}.gx-cycle-segment button{border:0;border-radius:7px;background:transparent;color:var(--text-muted);padding:6px 8px;font-size:.58rem;font-weight:900}.gx-cycle-segment button.active{background:rgba(0,242,254,.11);color:var(--neon-blue)}.gx-cycle-segment button.active.manual{background:rgba(255,170,0,.1);color:#ffd36c}
+    .gx-manual-status{display:block;margin-top:9px}.gx-auto-note{margin-top:8px;color:var(--text-muted);font-size:.58rem;line-height:1.4}.gx-access-compact{margin:0!important}.gx-manual-mini{padding:2px 5px;border-radius:999px;color:#ffd36c;background:rgba(255,170,0,.07);border:1px solid rgba(255,170,0,.14);font-size:.56rem;font-weight:900}
+    .gx-service-compact{position:relative;margin-bottom:7px;padding:9px 9px 7px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.018)}.gx-service-compact-head{display:grid;grid-template-columns:1fr auto 34px;gap:7px;align-items:center}.gx-service-identity{min-width:0}.gx-service-identity strong{display:block;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gx-service-identity small{display:block;margin-top:2px;color:var(--text-muted);font-size:.57rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gx-service-price{color:var(--neon-blue);font-size:.8rem}
+    .gx-service-actions-menu{position:relative}.gx-service-actions-menu summary{list-style:none;width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--gx-line);border-radius:9px;background:#111118;color:var(--text-muted);cursor:pointer;font-weight:900}.gx-service-actions-menu summary::-webkit-details-marker{display:none}.gx-service-actions-pop{position:absolute;right:0;top:37px;z-index:30;width:180px;padding:5px;border:1px solid var(--gx-line);border-radius:11px;background:#111118;box-shadow:0 14px 36px rgba(0,0,0,.45)}.gx-service-actions-pop button{width:100%;border:0;border-radius:8px;background:transparent;color:#fff;padding:8px;text-align:left;font-size:.65rem;font-weight:800}.gx-service-actions-pop button:hover{background:rgba(255,255,255,.05)}.gx-service-actions-pop button.danger{color:#ff7891}
+    .gx-service-access-details{margin-top:6px;border-top:1px solid rgba(255,255,255,.055);padding-top:5px}.gx-service-access-details summary{list-style:none;display:flex;align-items:center;justify-content:space-between;color:var(--text-muted);font-size:.61rem;font-weight:800;cursor:pointer;padding:4px 2px}.gx-service-access-details summary::-webkit-details-marker{display:none}.gx-service-access-details summary em{font-style:normal;color:var(--neon-blue);font-size:.55rem}.gx-service-cred-collapsed{margin-top:6px!important}
+    @media(max-width:520px){.gx-billing-overview{grid-template-columns:1fr 1fr}.gx-cycle-badge{grid-column:1/-1;width:max-content}.gx-cycle-mode-row{align-items:flex-start;flex-direction:column}.gx-cycle-segment{width:100%}.gx-cycle-segment button{flex:1}.gx-service-actions-pop{position:fixed;left:16px;right:16px;bottom:92px;top:auto;width:auto}}
+</style>
+
+
+<style id="goxion-admin-v10-trato-justo">
+.gx-trato-badge{width:100%;margin-top:6px;padding:7px 9px;border:1px solid rgba(0,255,157,.18);border-radius:9px;background:rgba(0,255,157,.045);color:#72ffd4;text-align:left;font-size:.6rem;font-weight:850;cursor:pointer}
+.gx-tj-overlay{position:fixed;inset:0;z-index:50000;display:none;align-items:flex-end;justify-content:center}.gx-tj-overlay.show{display:flex}.gx-tj-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.gx-tj-modal{position:relative;z-index:1;width:min(520px,100%);max-height:90vh;overflow:auto;border:1px solid rgba(0,242,254,.18);border-bottom:0;border-radius:24px 24px 0 0;background:linear-gradient(180deg,#0e0e15,#07070b);box-shadow:0 -24px 70px rgba(0,0,0,.6)}
+.gx-tj-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--gx-line)}.gx-tj-head>div{display:flex;flex-direction:column}.gx-tj-head span{color:var(--neon-blue);font-size:.56rem;font-weight:900;letter-spacing:1.2px}.gx-tj-head strong{margin-top:2px;font-size:1.05rem}.gx-tj-head button{width:34px;height:34px;border:1px solid var(--gx-line);border-radius:10px;background:rgba(255,255,255,.04);color:#fff;font-size:1.25rem}
+.gx-tj-body{padding:13px 15px}.gx-tj-service{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px 11px;border:1px solid var(--gx-line);border-radius:12px;background:rgba(255,255,255,.025);margin-bottom:10px}.gx-tj-service small,.gx-tj-result small{display:block;color:var(--text-muted);font-size:.56rem;font-weight:800;text-transform:uppercase}.gx-tj-service strong{display:block;margin-top:2px;font-size:.76rem}.gx-tj-service>div:last-child{text-align:right}
+.gx-tj-field{display:block;margin-top:9px}.gx-tj-field>span,.gx-tj-days-block>div:first-child>span{display:block;color:var(--text-muted);font-size:.59rem;font-weight:850;text-transform:uppercase;margin-bottom:4px}.gx-tj-field input,.gx-tj-field select{width:100%;min-height:40px;padding:9px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:#12121a;color:#fff}
+.gx-tj-days-block{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;padding:10px;border:1px solid var(--gx-line);border-radius:12px}.gx-tj-days-block small{display:block;color:var(--text-muted);font-size:.57rem}.gx-tj-stepper{display:grid;grid-template-columns:34px 38px 34px;align-items:center}.gx-tj-stepper button{height:34px;border:1px solid var(--gx-line);background:#111118;color:#fff;font-size:1rem}.gx-tj-stepper button:first-child{border-radius:9px 0 0 9px}.gx-tj-stepper button:last-child{border-radius:0 9px 9px 0}.gx-tj-stepper strong{text-align:center;font-size:.82rem}
+.gx-tj-result{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:10px}.gx-tj-result>div{padding:10px;border:1px solid rgba(0,255,157,.15);border-radius:11px;background:rgba(0,255,157,.035)}.gx-tj-result>div:last-child{text-align:right}.gx-tj-result strong{display:block;margin-top:2px;color:#72ffd4;font-size:.9rem}.gx-tj-policy{margin-top:9px;color:var(--text-muted);font-size:.57rem;line-height:1.45}
+.gx-tj-actions{display:grid;grid-template-columns:auto 1fr 1.4fr;gap:7px;padding:11px 15px max(13px,env(safe-area-inset-bottom));border-top:1px solid var(--gx-line)}.gx-tj-actions button{min-height:40px;border-radius:10px;font-weight:850}.gx-tj-delete{border:1px solid rgba(255,68,102,.2);background:rgba(255,68,102,.06);color:#ff7891}.gx-tj-cancel{border:1px solid var(--gx-line);background:rgba(255,255,255,.03);color:#fff}.gx-tj-save{border:0;background:linear-gradient(135deg,var(--neon-blue),#4b95ff);color:#031014}
+@media(min-width:700px){.gx-tj-overlay{align-items:center}.gx-tj-modal{border-bottom:1px solid rgba(0,242,254,.18);border-radius:22px}}
+</style>
+
+
+<style id="goxion-release-version-style">
+.goxion-release-version {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 16px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+    color: rgba(149, 164, 189, 0.38);
+    font-size: 8px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.85px;
+    text-transform: uppercase;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+}
+</style>
+
 </head>
 <body>
+    <div class="gx-admin-shell">
+        <header class="gx-topbar">
+            <div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION</div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
+            <div class="gx-top-actions">
+                <button class="gx-notification-bell" id="gx-notification-bell" onclick="gxToggleNotifications()" aria-label="Notificaciones">
+                    <span>🔔</span><i id="gx-notification-badge"></i>
+                </button><div class="gx-save-state" id="gx-save-state"><span class="gx-save-dot"></span><span>Sincronizado</span></div><div class="status"><div class="status-dot"></div> LIVE</div><button class="gx-icon-action danger" onclick="cerrarSesion()">⏻</button></div>
+        </header>
 
-    <!-- MENÚ FLOTANTE MÓVIL -->
-    <div class="bottom-bar">
-        <button class="bottom-btn active" onclick="switchTab('tab-clientes', this)"><i>👥</i><span>Clientes</span></button>
-        <button class="bottom-btn" onclick="agregarNuevoCliente()"><i>➕</i><span>Nuevo</span></button>
-        <button class="bottom-btn main-action" id="btn-save-mobile" onclick="prepararYGuardar()"><i>💾</i><span>Guardar</span></button>
-        <button class="bottom-btn" onclick="switchTab('tab-inventario', this)"><i>📦</i><span>Catálogo</span></button>
-        <button class="bottom-btn" onclick="window.scrollTo({top:0, behavior:'smooth'})"><i>⬆️</i><span>Subir</span></button>
+        <nav class="gx-desktop-nav">
+            <button class="gx-nav-chip active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)">⌂ Resumen</button>
+            <button class="gx-nav-chip" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)">👥 Clientes</button>
+            <button class="gx-nav-chip" data-admin-target="tab-catalogo" onclick="goAdminTab('tab-catalogo',this)">📦 Catálogo</button>
+            <button class="gx-nav-chip" data-admin-target="tab-ajustes" onclick="goAdminTab('tab-ajustes',this)">⚙️ Ajustes</button>
+        </nav>
+
+        <main class="gx-main">
+            <section id="tab-resumen" class="tab-content active">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">Panel administrativo</div><h1>Resumen operativo</h1><p>Lo importante de GOXION, sin buscar entre tarjetas.</p></div><button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
+                <div class="gx-kpi-strip">
+                    <button class="gx-kpi-card gx-kpi-blue" onclick="goAdminTab('tab-clientes')"><span class="gx-kpi-label">Ingresos</span><strong id="kpi-ingresos">$0.00</strong><small>Brutos mensuales</small></button>
+                    <div class="gx-kpi-card gx-kpi-red"><span class="gx-kpi-label">Costos</span><strong id="kpi-costos">$0.00</strong><small>Inversión mensual</small></div>
+                    <div class="gx-kpi-card gx-kpi-green"><span class="gx-kpi-label">Ganancia</span><strong id="kpi-ganancias">$0.00</strong><small>Neta estimada</small></div>
+                    <div class="gx-kpi-card gx-kpi-purple"><span class="gx-kpi-label">Margen</span><strong id="kpi-margen">0%</strong><small>Rentabilidad</small></div>
+                </div>
+                <div class="gx-section-head"><div><span class="gx-eyebrow">Prioridad</span><h2>Necesita tu atención</h2></div></div>
+                <div class="gx-ops-grid">
+                    <button class="gx-op-card" onclick="gxFilterFromSummary('revision')"><span class="gx-op-icon">🔔</span><span class="gx-op-copy"><strong id="gx-count-review">0</strong><small>En revisión</small></span><span class="gx-op-arrow">›</span></button>
+                    <button class="gx-op-card" onclick="gxFilterFromSummary('pendiente')"><span class="gx-op-icon">◷</span><span class="gx-op-copy"><strong id="gx-count-pending">0</strong><small>Pagos pendientes</small></span><span class="gx-op-arrow">›</span></button>
+                    <button class="gx-op-card" onclick="gxShowBenefitReady()"><span class="gx-op-icon">🎁</span><span class="gx-op-copy"><strong id="gx-count-benefits">0</strong><small>Beneficios listos</small></span><span class="gx-op-arrow">›</span></button>
+                    <button class="gx-op-card" onclick="goAdminTab('tab-catalogo')"><span class="gx-op-icon">📦</span><span class="gx-op-copy"><strong id="gx-count-stock">0</strong><small>Stock bajo / lleno</small></span><span class="gx-op-arrow">›</span></button>
+                </div>
+                <div class="gx-section-head gx-section-space"><div><span class="gx-eyebrow">Panorama</span><h2>Estado de clientes</h2></div><button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button></div>
+                <div class="gx-client-stats"><div><strong id="gx-count-total">0</strong><span>Total</span></div><div><strong id="gx-count-paid">0</strong><span>Pagados</span></div><div><strong id="gx-count-suspended">0</strong><span>Suspendidos</span></div><div><strong id="gx-count-missions">0</strong><span>Con misiones</span></div></div>
+            </section>
+
+            <section id="tab-clientes" class="tab-content">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">CRM operativo</div><h1>Clientes</h1><p id="gx-client-page-subtitle">Busca, filtra y entra directo a lo que necesitas.</p></div><button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
+                <div class="gx-command-panel">
+                    <div class="gx-search-wrap"><span>⌕</span><input type="text" class="search-bar" id="search-input" placeholder="Buscar nombre, folio..." oninput="filtrarClientes()"></div>
+                    <div class="filter-pills-container gx-status-pills">
+                        <button class="filter-pill active" data-status-filter="all" onclick="setStatusFilter('all',this)">Todos <b id="pill-all">0</b></button>
+                        <button class="filter-pill" data-status-filter="revision" onclick="setStatusFilter('revision',this)">🔔 Revisión <b id="pill-review">0</b></button>
+                        <button class="filter-pill" data-status-filter="pendiente" onclick="setStatusFilter('pendiente',this)">Pendientes <b id="pill-pending">0</b></button>
+                        <button class="filter-pill" data-status-filter="pagado" onclick="setStatusFilter('pagado',this)">Pagados <b id="pill-paid">0</b></button>
+                        <button class="filter-pill" data-status-filter="suspendido" onclick="setStatusFilter('suspendido',this)">Suspendidos <b id="pill-suspended">0</b></button>
+                    </div>
+                    <div class="gx-filter-tools"><select id="sort-by" class="custom-select" onchange="filtrarClientes()"><option value="name">Nombre A–Z</option><option value="date">Día de cobro</option><option value="loyalty">Lealtad</option></select><button class="gx-secondary-action" onclick="gxClearClientFilters()">↺ Limpiar</button></div>
+                </div>
+                <div id="clients-container" class="gx-clients-list"><p style="color:var(--text-muted)">Conectando con la base de datos...</p></div>
+            </section>
+
+            <section id="tab-catalogo" class="tab-content">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">Inventario</div><h1>Catálogo</h1><p>Precios, capacidad, ocupación y disponibilidad.</p></div><button class="gx-primary-action desktop-only" onclick="addGlobalService()">＋ Servicio</button></div>
+                <div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Servicios</span><h2>Catálogo & inventario</h2></div><button class="gx-secondary-action" onclick="addGlobalService()">＋ Añadir servicio</button></div><div class="gx-catalog-scroll"><table class="catalog-table"><thead><tr><th>Servicio</th><th>Etiqueta</th><th>Beneficios</th><th>Ctas</th><th>Venta</th><th>Costo</th><th>Lím.</th><th>Fijo</th><th>Disp.</th><th></th></tr></thead><tbody id="global-services-container"></tbody></table></div></div>
+            </section>
+
+            <section id="tab-ajustes" class="tab-content">
+                <div class="gx-page-heading"><div><div class="gx-eyebrow">Configuración</div><h1>Ajustes & automatizaciones</h1><p>Misiones, experiencia del cliente y alertas globales.</p></div><button class="gx-primary-action desktop-only" onclick="gxSaveSettings()">Guardar ajustes</button></div>
+                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
+                <div class="gx-settings-view active" data-settings-view="missions">
+                    <div class="panel gx-panel-modern">
+                        <div class="gx-panel-title-row">
+                            <div>
+                                <span class="gx-eyebrow">Automatización</span>
+                                <h2>Constructor de misiones</h2>
+                                <p class="gx-panel-desc">Crea misiones sin memorizar etiquetas. El sistema sigue guardando el formato compatible con GOXION.</p>
+                            </div>
+                            <div class="gx-discount-badge"><input type="number" id="global-misiones-desc" value="5"><span>% OFF</span></div>
+                        </div>
+
+                        <textarea id="global-misiones-tareas" class="gx-hidden-mission-source" aria-hidden="true"></textarea>
+
+                        <div class="gx-mission-builder">
+                            <div class="gx-mission-builder-head">
+                                <div>
+                                    <strong>Misiones de la plantilla</strong>
+                                    <small>Arrastra no hace falta: usa + y elimina las que no necesites.</small>
+                                </div>
+                                <button class="gx-secondary-action" type="button" onclick="gxAddMissionRow()">＋ Crear misión</button>
+                            </div>
+                            <div id="gx-mission-builder-list" class="gx-mission-builder-list"></div>
+                        </div>
+
+                        <div class="gx-tag-library">
+                            <div class="gx-library-title">
+                                <div><strong>Biblioteca de etiquetas</strong><small>ⓘ toca la información para saber qué hace cada misión.</small></div>
+                            </div>
+                            <div id="gx-tag-library-grid" class="gx-tag-library-grid"></div>
+                        </div>
+
+                        <div class="gx-action-grid">
+                            <button class="gx-action-card primary" onclick="gxMissionBuilderApply('todos')"><b>✓</b><span>Aplicar a todos</span></button>
+                            <button class="gx-action-card" onclick="gxMissionBuilderSelectClients()"><b>☑</b><span>Seleccionar clientes</span></button>
+                            <button class="gx-action-card danger" onclick="borrarMisionesMasivas()"><b>⌫</b><span>Borrar de todos</span></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="gx-settings-view" data-settings-view="app"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Experiencia</span><h2>Configuración de App</h2></div></div><div class="gx-setting-row"><div><strong>Promoción Upsell</strong><small>Mostrar Combo GOXION a clientes.</small></div><label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar configuración</button></div></div>
+                <div class="gx-settings-view" data-settings-view="alerts"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Comunicación</span><h2>Alertas globales</h2></div><label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label></div><div id="alert-settings" class="gx-alert-settings" style="opacity:.5;pointer-events:none;transition:.3s"><select id="alert-platform" class="custom-select"></select><select id="alert-type" class="custom-select"><option value="presentando intermitencias temporales">Intermitencias temporales</option><option value="en mantenimiento programado">Mantenimiento programado</option><option value="experimentando una caída global">Caída global</option><option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option></select><textarea id="global-msg" class="gx-large-textarea" placeholder="Mensaje adicional para clientes (opcional)..."></textarea></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar alerta</button></div></div>
+            </section>
+        </main>
+
+        <nav class="gx-mobile-nav"><button class="gx-mobile-nav-btn active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)"><i>⌂</i><span>Resumen</span></button><button class="gx-mobile-nav-btn" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)"><i>👥</i><span>Clientes</span></button><button class="gx-mobile-nav-btn gx-mobile-fab" onclick="agregarNuevoCliente()"><i>＋</i></button><button class="gx-mobile-nav-btn" data-admin-target="tab-catalogo" onclick="goAdminTab('tab-catalogo',this)"><i>📦</i><span>Catálogo</span></button><button class="gx-mobile-nav-btn" data-admin-target="tab-ajustes" onclick="goAdminTab('tab-ajustes',this)"><i>⚙</i><span>Ajustes</span></button></nav>
     </div>
 
-    <header>
-        <div class="logo-area"><h1>GOXION // ADMIN</h1></div>
-        <div class="status"><div class="status-dot"></div> ONLINE</div>
-        <div class="header-actions">
-            <button class="btn-save" onclick="prepararYGuardar()">Guardar Cambios</button>
-            <button class="btn-logout" onclick="cerrarSesion()">Salir</button>
-        </div>
-    </header>
+    <div class="gx-client-focus" id="gx-client-focus" aria-hidden="true"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
 
-    <div class="dashboard-row">
-        <div class="kpi-card">
-            <div class="kpi-title">Ingresos Brutos</div>
-            <div class="kpi-value val-ingresos" id="kpi-ingresos">$0.00</div>
+    
+    <!-- CENTRO DE NOTIFICACIONES / ACTIVIDAD -->
+    <aside class="gx-notification-drawer" id="gx-notification-drawer" aria-hidden="true">
+        <div class="gx-notification-drawer-head">
+            <div><span class="gx-eyebrow">Actividad</span><h3>Notificaciones</h3></div>
+            <button class="gx-focus-close" type="button" onclick="gxToggleNotifications(false)">×</button>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Inversión (Costos)</div>
-            <div class="kpi-value val-costos" id="kpi-costos">$0.00</div>
+        <div class="gx-notification-toolbar">
+            <div class="gx-notif-summary" id="gx-notification-summary">Pagos que requieren atención y fechas de vencimiento.</div>
+            <button class="gx-notif-refresh" type="button" onclick="gxRefreshNotifications()" title="Actualizar">↻</button>
         </div>
-        <div class="kpi-card">
-            <div class="kpi-title">Ganancia Neta</div>
-            <div class="kpi-value val-ganancia" id="kpi-ganancias">$0.00</div>
+        <div class="gx-notification-filter-row" id="gx-notification-filters">
+            <button type="button" class="gx-notif-filter active" data-gx-notif-filter="all" onclick="gxSetNotificationFilter('all',this)">Todos <b id="gx-notif-count-all">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="review" onclick="gxSetNotificationFilter('review',this)">Por revisar <b id="gx-notif-count-review">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="overdue" onclick="gxSetNotificationFilter('overdue',this)">Vencidos <b id="gx-notif-count-overdue">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="upcoming" onclick="gxSetNotificationFilter('upcoming',this)">Próximos <b id="gx-notif-count-upcoming">0</b></button>
         </div>
+        <div id="gx-notification-list" class="gx-notification-list"></div>
+    </aside>
+    <div class="gx-notification-overlay" id="gx-notification-overlay" onclick="gxToggleNotifications(false)"></div>
+
+    <!-- REVISIÓN DE PAGO -->
+    <div class="gx-payment-modal" id="gx-payment-modal" aria-hidden="true">
+        <div class="gx-payment-backdrop" onclick="gxClosePaymentModal()"></div>
+        <section class="gx-payment-sheet">
+            <div class="gx-focus-handle"></div>
+            <header>
+                <div>
+                    <span class="gx-eyebrow">Validación de pago</span>
+                    <h3 id="gx-payment-client-name">Cliente</h3>
+                    <small id="gx-payment-client-meta"></small>
+                </div>
+                <button class="gx-focus-close" type="button" onclick="gxClosePaymentModal()">×</button>
+            </header>
+            <div class="gx-payment-review-card" id="gx-payment-review-card"></div>
+            <div class="gx-payment-actions">
+                <button type="button" class="gx-payment-action approve" onclick="gxPaymentApprove()">✓ Aprobar</button>
+                <button type="button" class="gx-payment-action incomplete" onclick="gxPreparePaymentIncomplete()">⚠ Pago incompleto</button>
+                <button type="button" class="gx-payment-action reject" onclick="gxPaymentReject()">✕ Rechazar</button>
+            </div>
+            <div class="gx-payment-extra">
+                <label class="gx-inline-check"><input type="checkbox" id="gx-payment-punctual" checked><span>Contar como pago puntual para Lealtad</span></label>
+                <textarea id="gx-payment-note" placeholder="Nota opcional / motivo para el cliente..."></textarea>
+                <div class="gx-missing-amount" id="gx-missing-amount-wrap">
+                    <span>Monto faltante</span>
+                    <input type="number" id="gx-missing-amount" min="0" step="1" placeholder="$0">
+                </div>
+                <button type="button" class="gx-confirm-incomplete" id="gx-confirm-incomplete" onclick="gxPaymentIncomplete()">Confirmar pago incompleto</button>
+            </div>
+        </section>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('tab-clientes', this)">Gestión de Clientes</button>
-        <button class="tab-btn" onclick="switchTab('tab-inventario', this)">Catálogo & Alertas</button>
-    </div>
+<div id="modal-seleccionar-clientes" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:15px"><div class="gx-selection-modal"><h3>Seleccionar clientes</h3><input type="text" id="search-modal-clientes" placeholder="Buscar cliente por nombre..." oninput="filtrarModalClientes()" class="search-bar"><div id="lista-clientes-modal"></div><div class="gx-modal-actions"><button class="gx-secondary-action" onclick="cerrarModalSeleccion()">Cancelar</button><button class="gx-primary-action" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar misiones</button></div></div></div>
 
-    <div id="tab-clientes" class="tab-content active">
-        <div class="panel">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
-                <h2 class="section-title" style="margin-bottom: 0;">Cuentas Activas</h2>
-                <button class="btn-save" style="padding: 6px 12px; font-size: 0.85rem;" onclick="agregarNuevoCliente()">+ Nuevo Cliente</button>
-            </div>
-
-            <!-- CÁPSULAS DE FILTRO VISUALES -->
-            <div class="filter-pills-container">
-                <button class="filter-pill active" onclick="setStatusFilter('all', this)">Todos</button>
-                <button class="filter-pill" onclick="setStatusFilter('revision', this)">🔔 Revisión</button>
-                <button class="filter-pill" onclick="setStatusFilter('pendiente', this)">Pendientes</button>
-                <button class="filter-pill" onclick="setStatusFilter('pagado', this)">Pagados</button>
-                <button class="filter-pill" onclick="setStatusFilter('suspendido', this)">Suspendidos</button>
-            </div>
-            
-            <div class="filters-row">
-                <input type="text" class="search-bar" id="search-input" placeholder="Buscar por nombre o folio..." oninput="filtrarClientes()" style="margin-bottom: 0; flex: 2;">
-                <select id="sort-by" class="custom-select" onchange="filtrarClientes()" style="margin-bottom: 0; flex: 1; min-width: 150px;">
-                    <option value="name">Por Nombre (A-Z)</option>
-                    <option value="date">Por Día de Cobro</option>
-                    <option value="loyalty">Por Lealtad</option>
-                </select>
-            </div>
-            
-            <div id="clients-container" style="margin-top: 15px;">
-                <p style="color: var(--text-muted); font-size: 0.9rem;">Conectando con la base de datos...</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab-inventario" class="tab-content">
-        <!-- PANEL DE ASIGNACIÓN MASIVA DE MISIONES -->
-        <div class="panel">
-            <h2 class="section-title">Asignación Masiva de Misiones</h2>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;">
-                <input type="number" id="global-misiones-desc" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:8px; font-weight:bold;" value="5">
-            </div>
-            <textarea id="global-misiones-tareas" style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:10px; font-size: 0.85rem; resize: vertical; min-height: 80px;" placeholder="Ejemplo:
-Visita nuestro catálogo [CATALOGO]
-Renueva a tiempo [PAGO]
-Comparte con un amigo [COMPARTIR]
-Conoce el plan de referidos [REFERIDOS]
-Revisa las guías [SOPORTE]"></textarea>
-            
-            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 8px; line-height: 1.4; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.05);">
-                <strong>💡 ETIQUETAS AUTOMÁTICAS DISPONIBLES:</strong><br>
-                <span style="color:var(--neon-blue)">[CATALOGO]</span> Navegar a Catálogo | 
-                <span style="color:var(--neon-blue)">[PAGO]</span> Tocar Pagar Cuenta | 
-                <span style="color:var(--neon-blue)">[SOPORTE]</span> Ir a Soporte | 
-                <span style="color:var(--neon-blue)">[COMPARTIR]</span> Compartir App | 
-                <span style="color:var(--neon-blue)">[REFERIDOS]</span> Ver Referidos | 
-                <span style="color:var(--neon-blue)">[LINK:https://...]</span> Abrir link custom.
-            </div>
-
-            <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn-save" style="background: linear-gradient(135deg, var(--neon-purple), #7c4dff); flex: 1;" onclick="aplicarMisionesMasivas('todos')">✅ Aplicar a TODOS</button>
-                <button class="btn-save" style="background: rgba(0, 242, 254, 0.2); color: var(--neon-blue); border: 1px solid var(--neon-blue); flex: 1;" onclick="abrirModalSeleccionClientes()">☑️ Aplicar a Seleccionados</button>
-                <button class="btn-logout" style="flex: 1;" onclick="borrarMisionesMasivas()">🗑️ Borrar de TODOS</button>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2 class="section-title">Configuraciones de App</h2>
-            <div class="switch-row">
-                <span style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">Mostrar Promoción Upsell (Combo GOXION) a Clientes</span>
-                <label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2 class="section-title">Alertas Globales</h2>
-            <div class="switch-row">
-                <span style="font-size: 0.95rem; font-weight: bold; color: var(--text-main);">Activar Alerta Técnica en Portal de Clientes</span>
-                <label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label>
-            </div>
-            <div id="alert-settings" style="opacity: 0.5; pointer-events: none; transition: 0.3s;">
-                <select id="alert-platform" class="custom-select"></select>
-                <select id="alert-type" class="custom-select">
-                    <option value="presentando intermitencias temporales">Intermitencias temporales</option>
-                    <option value="en mantenimiento programado">Mantenimiento programado</option>
-                    <option value="experimentando una caída global">Caída global</option>
-                    <option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option>
-                </select>
-                <textarea id="global-msg" style="width: 100%; background: #12121a; border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 10px; border-radius: 6px; font-size: 0.9rem; outline:none; resize: vertical; min-height: 80px;" placeholder="Mensaje adicional para los clientes (Opcional)..."></textarea>
-            </div>
-        </div>
-
-        <div class="panel">
-            <h2 class="section-title">Catálogo & Inventario</h2>
-            <div style="overflow-x: auto;">
-                <table class="catalog-table">
-                    <thead>
-                        <tr>
-                            <th>Servicio</th>
-                            <th title="Etiqueta visible para el cliente (Ej: Promo, Nuevo)">Etiqueta</th>
-                            <th title="Beneficios que se muestran en la App (Ej: 4K, Sin anuncios)">Beneficios</th>
-                            <th title="Cuentas Activas Contratadas">Ctas</th>
-                            <th title="Precio de Venta">Venta</th>
-                            <th title="Tu Costo Mensual">Costo</th>
-                            <th title="Límite Máximo de Perfiles por Cuenta">Lím.</th>
-                            <th title="Fijar cantidad exacta manualmente (Deja en blanco para automático)">Fijo</th>
-                            <th title="Perfiles Disponibles">Disp.</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody id="global-services-container"></tbody>
-                </table>
-            </div>
-            <button class="btn-add-service" onclick="addGlobalService()">+ Añadir Nuevo Servicio al Catálogo</button>
-        </div>
-    </div>
-
-    <!-- MODAL DE SELECCIÓN DE CLIENTES -->
-    <div id="modal-seleccionar-clientes" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); z-index:99999; align-items:center; justify-content:center; padding: 15px;">
-        <div style="background: var(--card-bg); border: 1px solid var(--neon-blue); width: 100%; max-width: 500px; border-radius: 12px; padding: 20px; max-height: 80vh; display:flex; flex-direction:column;">
-            <h3 style="color: var(--neon-blue); margin-bottom: 10px;">Seleccionar Clientes</h3>
-            <input type="text" id="search-modal-clientes" placeholder="Buscar cliente por nombre..." oninput="filtrarModalClientes()" style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; padding:10px; border-radius:6px; margin-bottom: 15px; outline:none;">
-            <div id="lista-clientes-modal" style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:8px; margin-bottom:15px; padding-right:5px; scrollbar-width: thin; scrollbar-color: var(--neon-blue) transparent;">
-                <!-- checkboxes generados dinámicamente -->
-            </div>
-            <div style="display:flex; justify-content:space-between; gap:10px;">
-                <button class="btn-logout" style="flex:1;" onclick="cerrarModalSeleccion()">Cancelar</button>
-                <button class="btn-save" style="flex:1;" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar Misiones</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
     const CONFIG = { username: "henrygonzalezestrada-cyber", repo: "goxion", path: "clientes.json", branch: "main" };
     let currentToken = localStorage.getItem("GOXION_PAT") || "";
     let currentFileData = null; 
@@ -937,22 +1220,35 @@ Revisa las guías [SOPORTE]"></textarea>
                     const lockStatus = esInvitacion ? 'disabled title="No aplica para este servicio"' : '';
                     
                     clientServicesHTML += `
-                        <div class="client-service-tag">
-                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 4px;">
-                                <span style="font-weight: 700; font-size: 0.95rem; letter-spacing: 0.5px;">${s.nombre}</span>
-                                <span style="display:flex; align-items:center;">
-                                    <strong style="color:var(--neon-blue); margin-right: 12px; font-size: 1rem;">$${s.monto}</strong>
-                                    <button class="btn-icon warning" style="font-size:0.9rem; margin-right:6px;" onclick="aplicarTratoJusto('${key}', ${s.monto})" title="Aplicar Descuento Trato Justo🚨">🚨</button>
-                                    <button class="btn-icon danger" style="font-size:0.9rem;" onclick="removeClientService('${key}', ${sIdx})" title="Quitar servicio">✖</button>
-                                </span>
-                            </div>
-                            <div class="cred-box">
-                                <input type="text" placeholder="${esInvitacion ? 'Correo Personal (Invitación)' : 'Correo de Ingreso'}" value="${s.correo_login || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'correo_login', this.value)" class="cred-input">
-                                <div class="cred-row-split">
-                                    <input type="text" placeholder="Perfil" value="${s.perfil_nombre || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_nombre', this.value)" ${lockStatus} class="cred-input" style="flex: 2;">
-                                    <input type="text" placeholder="PIN" value="${s.perfil_pin || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_pin', this.value)" ${lockStatus} class="cred-input pin" style="flex: 1;">
+                        <div class="gx-service-compact">
+                            <div class="gx-service-compact-head">
+                                <div class="gx-service-identity">
+                                    <strong>${s.nombre}</strong>
+                                    <small>${s.correo_login ? s.correo_login : 'Acceso sin configurar'}</small>
                                 </div>
+                                <strong class="gx-service-price">$${s.monto}</strong>
+                                <details class="gx-service-actions-menu">
+                                    <summary title="Más acciones">•••</summary>
+                                    <div class="gx-service-actions-pop">
+                                        <button type="button" onclick="gxOpenTratoJusto('${key}', ${sIdx});this.closest('details').removeAttribute('open')">🛡 Gestionar Trato Justo</button>
+                                        <button type="button" class="danger" onclick="removeClientService('${key}', ${sIdx});this.closest('details').removeAttribute('open')">✖ Eliminar servicio</button>
+                                    </div>
+                                </details>
                             </div>
+                            ${(() => {
+                                const comp = (cliente.trato_justo_compensaciones || []).find(t => String(t.cliente_servicio_id||"") === String(s._id||s.id||"") && t.activo !== false && String(t.periodo||"").slice(0,7) === String(cliente.periodo_pendiente||"").slice(0,7));
+                                return comp ? `<button type="button" class="gx-trato-badge" onclick="gxOpenTratoJusto('${key}', ${sIdx})">🛡 Trato Justo · ${Number(comp.dias_falla||0)} día${Number(comp.dias_falla||0)===1?'':'s'} · -$${Number(comp.monto||0).toFixed(2)}</button>` : '';
+                            })()}
+                            <details class="gx-service-access-details">
+                                <summary><span>🔑 Editar acceso</span><em>${(s.perfil_nombre || s.perfil_pin) ? 'Configurado' : 'Abrir'}</em></summary>
+                                <div class="cred-box gx-service-cred-collapsed">
+                                    <input type="text" placeholder="${esInvitacion ? 'Correo Personal (Invitación)' : 'Correo de Ingreso'}" value="${s.correo_login || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'correo_login', this.value)" class="cred-input">
+                                    <div class="cred-row-split">
+                                        <input type="text" placeholder="Perfil" value="${s.perfil_nombre || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_nombre', this.value)" ${lockStatus} class="cred-input" style="flex: 2;">
+                                        <input type="text" placeholder="PIN" value="${s.perfil_pin || ''}" onchange="updateServiceCreds('${key}', ${sIdx}, 'perfil_pin', this.value)" ${lockStatus} class="cred-input pin" style="flex: 1;">
+                                    </div>
+                                </div>
+                            </details>
                         </div>
                     `;
                 });
@@ -1001,80 +1297,139 @@ Revisa las guías [SOPORTE]"></textarea>
             }
 
             let enRevision = cliente.pago_en_revision === true;
-            let statusColor = enRevision ? 'var(--neon-purple)' : (cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)'));
-            let statusBadge = enRevision ? 'EN REVISIÓN 🔔' : (cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE'));
+            let statusColor = enRevision ? 'var(--neon-yellow)' : (cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)'));
+            let statusBadge = enRevision ? '💳 REVISAR PAGO' : (cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE'));
             let pulseAnim = enRevision ? 'animation: pulse 1.5s infinite;' : '';
 
             let refActivo = cliente.referido_activo;
+            let refServiceOptions = (configGlobal?.serviciosGlobales || []).map(s => s.nombre).filter(Boolean);
+            let refSelectedServices = Array.isArray(refActivo?.servicios) ? refActivo.servicios : [];
+            let refStart = refActivo?.fecha_inicio || new Date().toISOString().slice(0,10);
+            let refSmartMonths = gxReferralSmartMonths(refActivo);
+            let refCandidates = Object.entries(clientesDict || {})
+                .filter(([candidateKey]) => candidateKey !== key)
+                .sort((a,b) => String(a[1]?.nombre || "").localeCompare(String(b[1]?.nombre || ""), "es"));
+            let refSelectedKey = refActivo
+                ? (refCandidates.find(([,candidate]) => String(candidate?.nombre || "").trim().toLowerCase() === String(refActivo?.nombre || "").trim().toLowerCase())?.[0] || "")
+                : "";
+            let refLinkedClient = refSelectedKey ? clientesDict[refSelectedKey] : null;
+            let refLinkedServices = refLinkedClient
+                ? [...new Set((refLinkedClient.servicios || []).filter(s => s?.activo !== false).map(s => s?.nombre).filter(Boolean))]
+                : refSelectedServices;
             let refHTML = `
-                <div style="margin-top: 10px; padding: 10px; background: rgba(188, 19, 254, 0.05); border: 1px dashed rgba(188, 19, 254, 0.3); border-radius: 8px;">
-                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 6px;">
-                        <strong style="color: var(--neon-purple); font-size: 0.8rem;">🎁 Referido Activo (Mes Gratis)</strong>
-                        <label class="switch" style="transform: scale(0.65); margin:0;"><input type="checkbox" ${refActivo ? 'checked' : ''} onchange="toggleReferido('${key}', this.checked)"><span class="slider"></span></label>
+                <div class="gx-ref-admin">
+                    <div class="gx-ref-admin-head">
+                        <div>
+                            <strong>🎁 Referido inteligente</strong>
+                            <small id="gx-ref-head-${key}">${refActivo ? `${refSmartMonths}/3 meses · ${refLinkedServices.length} servicios` : 'Sin referido activo'}</small>
+                        </div>
+                        <label class="switch" style="transform:scale(.72);margin:0;"><input type="checkbox" ${refActivo ? 'checked' : ''} onchange="toggleReferido('${key}', this.checked)"><span class="slider"></span></label>
                     </div>
                     ${refActivo ? `
-                    <div style="display:flex; gap: 6px; flex-wrap: wrap;">
-                        <input type="text" placeholder="Nombre Invitado" style="flex:2; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; outline:none; font-size:0.8rem;" value="${refActivo.nombre || ''}" onchange="updateReferido('${key}', 'nombre', this.value)">
-                        <input type="number" placeholder="Plat." title="Plataformas Contratadas" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; outline:none; font-size:0.8rem;" value="${refActivo.plataformas || 2}" onchange="updateReferido('${key}', 'plataformas', this.value)">
-                        <input type="number" placeholder="Mes" title="Meses Activos (0 a 3)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-green); border-radius:4px; padding:6px; font-weight:bold; outline:none; font-size:0.8rem;" value="${refActivo.meses ?? 0}" min="0" max="3" onchange="updateReferido('${key}', 'meses', this.value)">
-                    </div>
-                    <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${
-                        refActivo.beneficio_reclamado
-                            ? 'var(--neon-green)'
-                            : ((Number(refActivo.plataformas||0)>=2 && Number(refActivo.meses||0)>=3) ? 'var(--neon-blue)' : 'var(--text-muted)')
-                    };">${
-                        refActivo.beneficio_reclamado
-                            ? '✅ Mes gratis reclamado por el cliente'
-                            : ((Number(refActivo.plataformas||0)>=2 && Number(refActivo.meses||0)>=3) ? '🎁 Beneficio listo para reclamar' : '⏳ Beneficio incompleto')
-                    }</div>
-                    ` : `<div style="font-size: 0.7rem; color: var(--text-muted);">Sin referidos activos.</div>`}
+                        <div class="gx-ref-link-select">
+                            <span class="gx-field-label">Cliente referido</span>
+                            <select id="gx-ref-client-select-${key}" onchange="gxSelectReferralClient('${key}', this.value)">
+                                <option value="">Seleccionar cliente registrado…</option>
+                                ${refCandidates.map(([candidateKey,candidate]) => `
+                                    <option value="${candidateKey}" ${candidateKey === refSelectedKey ? 'selected' : ''}>
+                                        ${candidate.nombre || 'Cliente'}${candidate.folio ? ` · ${candidate.folio}` : ''}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
+
+                        ${refLinkedClient ? `
+                            <div class="gx-ref-linked-card" id="gx-ref-linked-${key}">
+                                <div>
+                                    <strong>${refLinkedClient.nombre || 'Cliente'}</strong>
+                                    <small>${refLinkedClient.folio || 'Sin folio'} · ${refLinkedClient.estado || 'pendiente'}</small>
+                                </div>
+                                <span class="gx-ref-linked-badge">${refLinkedServices.length} servicio${refLinkedServices.length===1?'':'s'}</span>
+                            </div>
+                        ` : (refActivo.nombre ? `
+                            <div class="gx-ref-link-legacy">El referido actual “${refActivo.nombre}” todavía no está vinculado a un cliente del Admin. Selecciona arriba el cliente correcto para detectar sus servicios automáticamente.</div>
+                        ` : '')}
+
+                        <div class="gx-ref-progress-row">
+                            <label class="gx-field-label gx-ref-date-compact">Inicio
+                                <input type="date" value="${refStart}" onchange="gxSaveReferralSmart('${key}', {fecha_inicio:this.value})">
+                            </label>
+                            <div class="gx-field-label gx-ref-month-control">
+                                <span>Progreso</span>
+                                <div class="gx-ref-counter">
+                                    <button type="button" onclick="gxAdjustReferralMonth('${key}', -1)">−</button>
+                                    <strong id="gx-ref-month-${key}">${refSmartMonths}/3</strong>
+                                    <button type="button" onclick="gxAdjustReferralMonth('${key}', 1)">＋</button>
+                                    <button type="button" class="auto ${refActivo?.meses_override == null ? 'active' : ''}" id="gx-ref-auto-${key}" onclick="gxReferralAutoMode('${key}')">AUTO</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="gx-ref-auto-services">
+                            <div class="gx-ref-auto-services-head">
+                                <span>Servicios detectados automáticamente</span>
+                                <strong id="gx-ref-service-summary-${key}">${refLinkedServices.length}</strong>
+                            </div>
+                            <div class="gx-ref-detected-chips" id="gx-ref-service-chips-${key}">
+                                ${refLinkedServices.length
+                                    ? refLinkedServices.map(name => `<span>✓ ${name}</span>`).join('')
+                                    : `<div class="gx-ref-detected-empty">${refSelectedKey ? 'El cliente seleccionado no tiene servicios activos.' : 'Selecciona un cliente para detectar sus servicios activos.'}</div>`}
+                            </div>
+                            ${refSelectedKey ? `<button type="button" class="gx-ref-resync" onclick="gxResyncReferralClient('${key}')">↻ Volver a detectar servicios</button>` : ''}
+                        </div>
+                        <div id="gx-ref-status-${key}" class="gx-ref-smart-status ${refLinkedServices.length >= 2 ? 'ok' : 'warn'}">
+                            ${refActivo.beneficio_reclamado
+                                ? '💝 Beneficio ya reclamado'
+                                : (refLinkedServices.length < 2
+                                    ? `⚠️ Falta ${2-refLinkedServices.length} servicio${2-refLinkedServices.length === 1 ? '' : 's'} para continuar acumulando meses`
+                                    : (refSmartMonths >= 3 ? '🎁 3/3 · Beneficio listo para reclamar' : `✓ Progreso automático: ${refSmartMonths}/3 meses`))}
+                        </div>
+                        <div class="gx-ref-management-actions">
+                            <button type="button" class="reset" onclick="gxResetReferral('${key}')">↻ Reiniciar progreso</button>
+                            <button type="button" class="delete" onclick="gxDeleteReferral('${key}')">🗑 Eliminar referido</button>
+                        </div>
+                        <div class="gx-ref-management-help">Reiniciar conserva el referido y sus servicios, pero vuelve el contador a 0/3 desde hoy. Eliminar borra el registro activo.</div>
+                    ` : `<div class="gx-empty-inline">Activa el referido para comenzar el seguimiento automático.</div>`}
                 </div>
             `;
 
             let gamifConfig = cliente.gamificacion || { misiones_activas: false, descuento: 5, tareas: "" };
             
             let gamifHTML = `
-                <div style="margin-top: 10px; padding: 10px; background: rgba(0, 242, 254, 0.05); border: 1px dashed rgba(0, 242, 254, 0.3); border-radius: 8px;">
-                    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 6px;">
-                        <strong style="color: var(--neon-blue); font-size: 0.8rem;">🎟️ Asignar Misiones (Cupón)</strong>
-                        <label class="switch" style="transform: scale(0.65); margin:0;"><input type="checkbox" ${gamifConfig.misiones_activas ? 'checked' : ''} onchange="toggleMisiones('${key}', this.checked)"><span class="slider"></span></label>
-                    </div>
-                    ${gamifConfig.misiones_activas ? `
-                    <div style="display:flex; gap: 6px; flex-wrap: wrap; margin-bottom: 6px;">
-                        <input type="number" placeholder="% Desc" title="% de Descuento (Ej: 10)" style="flex:1; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:var(--neon-blue); border-radius:4px; padding:6px; font-weight:bold; outline:none; font-size: 0.85rem;" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}', 'descuento', this.value)">
-                    </div>
-                    <textarea style="width:100%; background:#12121a; border: 1px solid rgba(255,255,255,0.2); color:#fff; border-radius:4px; padding:6px; font-size: 0.8rem; outline:none; resize: vertical; min-height: 55px;" onchange="updateMisiones('${key}', 'tareas', this.value)" placeholder="Visita nuestro catálogo [CATALOGO]\nPaga tu cuenta [PAGO]">${gamifConfig.tareas}</textarea>
-                    <div style="margin-top:7px;font-size:.7rem;font-weight:700;color:${
-                        Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1)
-                            ? 'var(--neon-green)'
-                            : 'var(--text-muted)'
-                    };">
-                        ${
-                            Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1)
-                                ? `✅ Cupón de la ronda ${gamifConfig.cupon_ciclo || 1} ya reclamado`
-                                : `🎟️ Ronda ${gamifConfig.cupon_ciclo || 1}: cupón disponible al completar misiones`
-                        }
-                    </div>
-                    <button
-                        type="button"
-                        style="margin-top:8px;width:100%;padding:8px 10px;border-radius:7px;border:1px solid rgba(255,170,0,.48);background:rgba(255,170,0,.08);color:var(--warning-amber);font-size:.72rem;font-weight:800;cursor:pointer;"
-                        onclick="reiniciarMisionesClienteBeta('${key}')">
-                        ↻ Reiniciar progreso de misiones
-                    </button>
-                    <div style="margin-top:5px;font-size:.65rem;color:var(--text-muted);line-height:1.35;">
-                        Borra el progreso del cliente la próxima vez que cargue Mi Espacio, pero mantiene la misma ronda de premio.
+                <div class="gx-client-mission-admin">
+                    <div class="gx-client-mission-summary">
+                        <div class="gx-client-mission-icon">${gamifConfig.misiones_activas ? '🎯' : '○'}</div>
+                        <div class="gx-client-mission-copy">
+                            <strong>${gamifConfig.misiones_activas ? 'Misiones activas' : 'Sin misiones activas'}</strong>
+                            <small>${gamifConfig.misiones_activas
+                                ? `${gamifConfig.descuento || 0}% OFF · Ronda ${gamifConfig.cupon_ciclo || 1}${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? ' · Cupón reclamado' : ''}`
+                                : 'Actívalas únicamente cuando este cliente necesite una misión individual.'}</small>
+                        </div>
+                        <label class="switch gx-client-mission-switch"><input type="checkbox" ${gamifConfig.misiones_activas ? 'checked' : ''} onchange="toggleMisiones('${key}', this.checked)"><span class="slider"></span></label>
                     </div>
 
-                    <button
-                        type="button"
-                        style="margin-top:8px;width:100%;padding:9px 10px;border-radius:7px;border:1px solid rgba(0,242,254,.48);background:rgba(0,242,254,.08);color:var(--neon-blue);font-size:.72rem;font-weight:800;cursor:pointer;"
-                        onclick="nuevaRondaCuponBeta('${key}')">
-                        🎟️ Nueva ronda + habilitar otro cupón
-                    </button>
-                    <div style="margin-top:5px;font-size:.65rem;color:var(--text-muted);line-height:1.35;">
-                        Reinicia las misiones y crea una nueva ronda de recompensa. El cliente podrá ganar y reclamar otro cupón sin borrar el historial del anterior.
-                    </div>
-                    ` : `<div style="font-size: 0.7rem; color: var(--text-muted);">Sin misiones asignadas.</div>`}
+                    ${gamifConfig.misiones_activas ? `
+                    <details class="gx-client-mission-config">
+                        <summary>⚙️ Configuración individual</summary>
+                        <div class="gx-client-mission-config-body">
+                            <label>Descuento del cupón
+                                <div class="gx-inline-percent"><input type="number" value="${gamifConfig.descuento || 0}" onchange="updateMisiones('${key}','descuento',this.value)"><span>% OFF</span></div>
+                            </label>
+                            <label>Misiones asignadas
+                                <textarea onchange="updateMisiones('${key}','tareas',this.value)" placeholder="Las misiones masivas se administran mejor desde Ajustes → Misiones.">${gamifConfig.tareas || ''}</textarea>
+                            </label>
+                            <div class="gx-client-round-status">
+                                <span>${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? '🥇' : '🎟️'}</span>
+                                <div><strong>Ronda ${gamifConfig.cupon_ciclo || 1}</strong><small>${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? 'Cupón reclamado' : 'Cupón pendiente de completar'}</small></div>
+                            </div>
+                            <div class="gx-client-mission-admin-actions">
+                                <button type="button" class="reset" onclick="reiniciarMisionesClienteBeta('${key}')">↻ Reiniciar progreso</button>
+                                <button type="button" class="round" onclick="nuevaRondaCuponBeta('${key}')">🎟️ Nueva ronda</button>
+                            </div>
+                        </div>
+                    </details>
+                    ` : ''}
+                    <div class="gx-client-mission-tip">Para crear o asignar etiquetas nuevas usa <strong>Ajustes → Misiones</strong>. Aquí queda solo la configuración específica de este cliente.</div>
                 </div>
             `;
 
@@ -1083,93 +1438,68 @@ Revisa las guías [SOPORTE]"></textarea>
             card.style.borderLeftColor = statusColor;
             if(enRevision) card.style.boxShadow = "0 0 20px rgba(188, 19, 254, 0.25)";
             
+            card.dataset.clientKey = key;
+            const serviceNames = (cliente.servicios || []).map(s => String(s.nombre || "").replace(/\s*\(x\d+\)\s*/gi, "").trim()).filter(Boolean);
+            const servicesBrief = serviceNames.length ? serviceNames.slice(0,3).join(" · ") + (serviceNames.length > 3 ? ` +${serviceNames.length-3}` : "") : "Sin servicios activos";
+            const refBrief = refActivo ? (refActivo.beneficio_reclamado ? "💝 Reclamado" : ((Number(refActivo.plataformas||0)>=2 && Number(refActivo.meses||0)>=3) ? "🎁 Beneficio listo" : `🎁 ${Number(refActivo.meses||0)}/3`)) : "🎁 Sin referido";
+            const couponCycle = Number(gamifConfig.cupon_ciclo || 1);
+            const couponClaimed = Number(gamifConfig.cupon_reclamado_ciclo || 0) >= couponCycle;
+            const missionBrief = gamifConfig.misiones_activas ? (couponClaimed ? `🥇 Ronda ${couponCycle}` : `🎟️ Ronda ${couponCycle}`) : "🎟️ Sin misiones";
+
             card.innerHTML = `
-                <div class="card-header-main" onclick="toggleClientDetails('${key}')">
-                    <div class="client-info-basic">
-                        <h3 style="color: ${statusColor};">[${cliente.folio}] ${cliente.nombre}</h3>
-                        <div style="display: flex; gap: 10px; align-items: center; margin-top: 4px;">
-                            <span class="client-status-badge" style="color: ${statusColor}; border-color: ${statusColor}40; background: ${statusColor}10; ${pulseAnim}">${statusBadge}</span>
-                            <span style="color: var(--text-muted); font-size: 0.8rem; font-weight:600;">Día: ${cliente.dia_pago || 15}</span>
-                        </div>
-                    </div>
-                    <div style="text-align: right;">
-                        <div style="color:var(--text-main); font-weight:bold; font-size:1.15rem; margin-bottom: 4px;">$${subtotal}</div>
-                        <div class="client-details-toggle"><span id="toggle-text-${key}">Ver detalles ▾</span></div>
-                    </div>
+                <div class="card-header-main gx-client-card-header" onclick="toggleClientDetails('${key}')">
+                    <div class="client-info-basic"><div class="gx-client-name-line"><h3 style="color:${statusColor};">${cliente.nombre}</h3><span class="gx-client-folio">${cliente.folio}</span></div><div class="gx-client-status-line"><span class="client-status-badge" style="color:${statusColor};border-color:${statusColor}40;background:${statusColor}10;${pulseAnim}">${statusBadge}</span><span>· Día ${cliente.dia_pago || 15}</span></div></div>
+                    <div class="gx-client-money"><strong>$${subtotal}</strong><span>mensual</span></div>
                 </div>
+                <div class="gx-client-brief" onclick="toggleClientDetails('${key}')"><div class="gx-service-brief">${servicesBrief}</div><div class="gx-benefit-brief"><span>${refBrief}</span><span>${missionBrief}</span><span class="gx-open-client">Abrir ›</span></div></div>
+                <div class="client-details gx-focus-details" id="details-${key}">
+                    ${enRevision ? `<div class="gx-payment-priority">
+                        <div class="gx-payment-priority-icon">💳</div>
+                        <div class="gx-payment-priority-copy">
+                            <strong>Pago pendiente de revisión</strong>
+                            <small>Hay un comprobante esperando tu decisión · $${subtotal}</small>
+                        </div>
+                        <button type="button" onclick="gxOpenPaymentModal('${key}', ${subtotal})">Revisar ahora</button>
+                    </div>` : ''}
 
-                <div class="client-details" id="details-${key}">
-                    
-                    <!-- CREDENCIALES DE ACCESO GENERAL (NUEVO BLOQUE COMPACTO) -->
-                    <div class="access-portal-box">
-                        <div style="font-size: 0.7rem; color: var(--neon-blue); font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">🔑 Acceso al Portal del Cliente</div>
-                        <div style="display:flex; gap: 6px; margin-bottom: 6px;">
-                            <input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" style="flex:2;" onchange="updateClientData('${key}', 'nombre', this.value)">
-                        </div>
-                        <div style="display:flex; gap: 6px;">
-                            <input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" style="flex:2;" onchange="updateClientData('${key}', 'usuario_acceso', this.value)">
-                            <input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" style="flex:1;" onchange="updateClientData('${key}', 'codigo', this.value)">
-                        </div>
-                    </div>
-
-                    <div style="display:flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 100px;">
-                            <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Día de Cobro</label>
-                            <input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" style="width: 100%; background:#12121a; color:#fff; border: 1px solid rgba(255,255,255,0.2); border-radius:6px; padding:6px; outline:none; font-size:0.85rem;" onchange="updateClientData('${key}', 'dia_pago', this.value)">
-                        </div>
-                        <div style="flex: 1.35; min-width: 135px;">
-                            <label style="font-size: 0.7rem; color: var(--neon-blue); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Periodo a Cobrar</label>
-                            <input type="month" value="${String(cliente.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7)}" style="width:100%; background:#12121a; color:#fff; border:1px solid rgba(0,242,254,.28); border-radius:6px; padding:6px; outline:none; font-size:.82rem;" onchange="updateClientData('${key}', 'periodo_pendiente', this.value)">
-                        </div>
-                        <div style="flex: 1.6; min-width: 130px;">
-                            <label style="font-size: 0.7rem; color: var(--text-muted); display: block; margin-bottom: 4px; text-transform: uppercase; font-weight: bold;">Estado Cuenta</label>
-                            <select class="status-select status-${cliente.estado}" style="width: 100%;" onchange="updateClientData('${key}', 'estado', this.value)">
-                                <option value="pendiente" ${cliente.estado === 'pendiente' ? 'selected' : ''}>Pendiente (Deuda)</option>
-                                <option value="pagado" ${cliente.estado === 'pagado' ? 'selected' : ''}>Pagado</option>
-                                <option value="suspendido" ${cliente.estado === 'suspendido' ? 'selected' : ''}>Suspendido</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div style="font-size:.66rem;color:var(--text-muted);margin:-3px 0 12px;line-height:1.4;">
-                        El periodo no cambia automáticamente al iniciar un mes nuevo. Avanza cuando apruebas el pago correspondiente.
-                    </div>
-                    
-                    <div class="client-services-list">
-                        ${clientServicesHTML}
-                        <div class="client-service-add-row">
-                            <select id="add-srv-sel-${key}">${globalOptions}</select>
-                            <button class="btn-save" style="padding:6px 12px; font-size: 1.1rem; line-height: 1; border-radius: 6px;" onclick="addClientService('${key}')" title="Añadir">+</button>
-                        </div>
-                        ${descuentosHTML}
-                    </div>
-
-                    <div class="card-actions-row">
-                        <div style="display: flex; flex-direction: column; gap: 4px;">
-                            <span style="font-size:0.7rem; color:var(--text-muted); text-transform: uppercase; font-weight: bold;">Lealtad</span>
-                            <div class="loyalty-control">
-                                <button class="loyalty-btn" onclick="updatePagos('${key}', -1)">-</button>
-                                <span id="pagos-${key}" style="font-weight: bold; width: 16px; text-align: center; color: var(--neon-green); font-size: 1rem;">${cliente.pagos_puntuales || 0}</span>
-                                <button class="loyalty-btn" onclick="updatePagos('${key}', 1)">+</button>
-                                <button class="btn-icon danger" style="margin-left: 4px; font-size: 1rem;" onclick="reiniciarLealtad('${key}')" title="Reiniciar racha">🔄</button>
+                    <div class="gx-operations-dock">
+                        <div class="gx-dock-loyalty">
+                            <div class="gx-dock-icon">⭐</div>
+                            <div class="gx-dock-copy"><small>Lealtad</small><strong><span id="pagos-${key}">${cliente.pagos_puntuales || 0}</span> pagos</strong></div>
+                            <div class="gx-dock-stepper">
+                                <button type="button" onclick="updatePagos('${key}',-1)">−</button>
+                                <button type="button" onclick="updatePagos('${key}',1)">＋</button>
+                                <button type="button" class="reset" onclick="reiniciarLealtad('${key}')" title="Reiniciar">↻</button>
                             </div>
                         </div>
-                        
-                        <div class="quick-actions">
-                            <button class="btn-qaction msg" onclick="enviarMensaje('${cliente.nombre}', '${key}')">💬 Msj</button>
-                            <button class="btn-qaction link" onclick="copiarInfo('${cliente.nombre}', '${key}')">🔗 Link</button>
+                        <button type="button" class="gx-dock-action message" onclick="enviarMensaje('${cliente.nombre}','${key}')"><span>💬</span><div><small>Contacto</small><strong>Mensaje</strong></div></button>
+                        <button type="button" class="gx-dock-action link" onclick="copiarInfo('${cliente.nombre}','${key}')"><span>🔗</span><div><small>Acceso</small><strong>Copiar link</strong></div></button>
+                    </div>
+
+                    <div class="gx-accordion open gx-billing-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>💳</i><b>Cobro y estado</b><small>${cliente.ciclo_cobro_manual ? '🧪 Excepción manual' : 'Ciclo automático'} · ${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}</small></span><em>⌄</em></button><div class="gx-accordion-content">
+                        <div class="gx-billing-overview ${cliente.ciclo_cobro_manual ? 'manual' : ''}">
+                            <div><small>Periodo pendiente</small><strong>${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}</strong></div>
+                            <div><small>Estado operativo</small><strong>${cliente.pago_en_revision?'🔔 En revisión':cliente.estado==='pagado'?'✓ Pagado':cliente.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente'}</strong></div>
+                            <span class="gx-cycle-badge ${cliente.ciclo_cobro_manual?'manual':'auto'}">${cliente.ciclo_cobro_manual?'🧪 MANUAL':'● AUTO'}</span>
                         </div>
-                    </div>
+                        <div class="gx-billing-fields">
+                            <label class="gx-period-field"><span>Periodo a cobrar</span><input type="month" value="${String(cliente.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7)}" onchange="updateClientData('${key}','periodo_pendiente',this.value)"></label>
+                            <label><span>Día de cobro</span><input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" onchange="updateClientData('${key}','dia_pago',this.value)"></label>
+                        </div>
+                        <div class="gx-cycle-mode-row">
+                            <div><strong>Ciclo de cobro</strong><small>${cliente.ciclo_cobro_manual?'El corte mensual no modificará esta cuenta.':'Al iniciar el mes, el periodo pendiente se presenta como nuevo cobro.'}</small></div>
+                            <div class="gx-cycle-segment">
+                                <button type="button" class="${!cliente.ciclo_cobro_manual?'active':''}" onclick="gxSetBillingCycleMode('${key}',false)">Automático</button>
+                                <button type="button" class="${cliente.ciclo_cobro_manual?'active manual':''}" onclick="gxSetBillingCycleMode('${key}',true)">Manual</button>
+                            </div>
+                        </div>
+                        ${cliente.ciclo_cobro_manual ? `<label class="gx-manual-status"><span>Estado manual</span><select class="status-select status-${cliente.estado}" onchange="updateClientData('${key}','estado',this.value)"><option value="pendiente" ${cliente.estado==='pendiente'?'selected':''}>Pendiente (Deuda)</option><option value="pagado" ${cliente.estado==='pagado'?'selected':''}>Pagado</option><option value="suspendido" ${cliente.estado==='suspendido'?'selected':''}>Suspendido</option></select></label>` : `<div class="gx-auto-note">El estado se calcula con el periodo pendiente. Usa Manual únicamente para pruebas, acuerdos o excepciones.</div>`}
+                    </div></div>
+                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🔑</i><b>Acceso al portal</b><small>Nombre, usuario y PIN</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="access-portal-box gx-access-compact"><input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)"><div class="cred-row-split"><input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)"><input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)"></div></div></div></div>
+                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>📺</i><b>Servicios</b><small>${serviceNames.length} activo${serviceNames.length===1?'':'s'} · $${subtotal}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="client-services-list">${clientServicesHTML}<div class="client-service-add-row"><select id="add-srv-sel-${key}">${globalOptions}</select><button class="btn-save" onclick="addClientService('${key}')">＋</button></div>${descuentosHTML}</div></div></div>
+                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎁</i><b>Referidos & beneficios</b><small>Progreso, servicios y recompensa</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${refHTML}</div></div></div>
+                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎯</i><b>Misiones & cupón</b><small>${gamifConfig.misiones_activas ? missionBrief : 'Sin automatización activa'}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${gamifHTML}</div></div></div>
 
-                    ${refHTML}
-                    ${gamifHTML}
-
-                    ${enRevision ? `
-                    <div style="width: 100%; margin-top: 10px; padding-top: 10px; border-top: 1px dashed rgba(188, 19, 254, 0.3);">
-                        <button class="btn-save" style="background: linear-gradient(135deg, #bc13fe, #7c4dff); width: 100%; font-size: 0.95rem; padding: 10px; box-shadow: 0 0 20px rgba(188, 19, 254, 0.4); text-transform: uppercase; letter-spacing: 1px;" onclick="aprobarPago('${key}', ${subtotal})">
-                            ✅ Aprobar Pago
-                        </button>
-                    </div>
-                    ` : ''}
                 </div>
             `;
             container.appendChild(card);
@@ -1307,7 +1637,7 @@ Revisa las guías [SOPORTE]"></textarea>
     }
     </script>
 
-    <!-- GOXION ADMIN BETA // CAPA SUPABASE V2
+    <!-- GOXION ADMIN // CAPA SUPABASE V2
          Mantiene intacta la interfaz y añade diagnóstico visible. -->
     <script id="goxion-supabase-beta">
     (() => {
@@ -1315,6 +1645,7 @@ Revisa las guías [SOPORTE]"></textarea>
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
         const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos`;
         const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro`;
+        const TRATO_URL = `${SUPABASE_URL}/functions/v1/trato-justo`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         localStorage.removeItem("GOXION_PAT");
@@ -1437,10 +1768,39 @@ Revisa las guías [SOPORTE]"></textarea>
                 }
                 if (pr.ok && parsed.json?.ok === true) {
                     json.periodos_cobro = parsed.json.periodos || [];
+                } else {
+                    console.warn("No se pudieron cargar periodos de cobro:", parsed.text);
                 }
             } catch (e) {
                 if (e?.message === "SESION_EXPIRADA") throw e;
                 console.warn("Periodo de cobro no disponible temporalmente:", e);
+            }
+
+            try {
+                const tr = await fetch(TRATO_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": currentToken
+                    },
+                    body: JSON.stringify({ accion: "listar_todas", datos: {} })
+                });
+                const parsed = await parseResponse(tr);
+                if (tr.status === 401) {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    currentToken = "";
+                    const err = new Error("SESION_EXPIRADA");
+                    err.raw = parsed.text;
+                    throw err;
+                }
+                if (tr.ok && parsed.json?.ok === true) {
+                    json.trato_justo_compensaciones = parsed.json.compensaciones || [];
+                } else {
+                    console.warn("Trato Justo no disponible:", parsed.text);
+                }
+            } catch (e) {
+                if (e?.message === "SESION_EXPIRADA") throw e;
+                console.warn("No se pudieron cargar compensaciones Trato Justo:", e);
             }
 
             console.log("admin-datos RAW:", json);
@@ -1474,7 +1834,8 @@ Revisa las guías [SOPORTE]"></textarea>
                 monto: n(s.monto ?? s.precio ?? s.precio_cliente, 0),
                 correo_login: s.correo_login || s.correo || s.email || "",
                 perfil_nombre: s.perfil_nombre || s.perfil || "",
-                perfil_pin: s.perfil_pin || s.pin_perfil || ""
+                perfil_pin: s.perfil_pin || s.pin_perfil || "",
+                activo: s.activo !== false
             };
         }
 
@@ -1506,7 +1867,11 @@ Revisa las guías [SOPORTE]"></textarea>
                 meses: n(r.meses, 1),
                 activo: r.activo !== false,
                 beneficio_reclamado: r.beneficio_reclamado === true,
-                beneficio_reclamado_at: r.beneficio_reclamado_at || null
+                beneficio_reclamado_at: r.beneficio_reclamado_at || null,
+                servicios: Array.isArray(r.servicios) ? r.servicios : [],
+                fecha_inicio: r.fecha_inicio || r.created_at?.slice?.(0,10) || "",
+                progreso_pausado: r.progreso_pausado === true,
+                meses_override: r.meses_override ?? null
             };
         }
 
@@ -1546,6 +1911,13 @@ Revisa las guías [SOPORTE]"></textarea>
         function adaptarRespuestaAdmin(data) {
             const root = unwrapRoot(data);
 
+            // admin-datos-beta ya entrega las notificaciones administrativas.
+            // Las conservamos en memoria para que la campana, el punto rojo y
+            // "Marcar leídas" trabajen con datos reales y no solo con alertas sintéticas.
+            window.gxAdminNotifications = Array.isArray(root.notificaciones)
+                ? root.notificaciones
+                : (Array.isArray(data?.notificaciones) ? data.notificaciones : []);
+
             const clientes = firstArray(
                 root.clientes,
                 root.clients,
@@ -1569,9 +1941,10 @@ Revisa las guías [SOPORTE]"></textarea>
             const referidosGlobal = getArray(root, "referidos", "clientes_referidos");
             const gamifGlobal = getArray(root, "gamificacion", "gamificaciones", "clientes_gamificacion");
             const descuentosGlobal = getArray(root, "descuentos", "descuentos_especiales", "clientes_descuentos");
+            const tratoJustoGlobal = getArray(root, "trato_justo_compensaciones");
             const periodosCobro = getArray(root, "periodos_cobro");
             const periodoPorCliente = new Map(
-                periodosCobro.map(x => [String(x?.id || x?.cliente_id || ""), x?.periodo_pendiente || ""])
+                periodosCobro.map(x => [String(x?.id || x?.cliente_id || ""), x])
             );
 
             if (!clientes.length) {
@@ -1610,10 +1983,13 @@ Revisa las guías [SOPORTE]"></textarea>
                 if (!gamificacion) gamificacion = gamifGlobal.find(x => belongsToCliente(x, id));
 
                 const refActivo = referidos.find(r => r?.activo !== false) || null;
+                const tratoJusto = tratoJustoGlobal.filter(x => String(x?.cliente_id || "") === String(id));
 
                 let key = c.clave || c.key || c.slug || c.identificador || slug(c.nombre || c.folio || id || `cliente-${idx + 1}`);
                 if (!key) key = `cliente-${idx + 1}`;
                 if (nuevoDict[key]) key = `${key}-${String(id || idx).slice(0, 6)}`;
+
+                const periodoMeta = periodoPorCliente.get(String(id)) || {};
 
                 nuevoDict[key] = {
                     _id: id,
@@ -1625,20 +2001,29 @@ Revisa las guías [SOPORTE]"></textarea>
                     codigo: "",
                     pagos_puntuales: n(c.pagos_puntuales, 0),
                     dia_pago: n(c.dia_pago, 15),
-                    periodo_pendiente: c.periodo_pendiente || periodoPorCliente.get(String(id)) || new Date().toISOString().slice(0,7) + "-01",
-                    estado: c.estado || "pendiente",
+                    periodo_pendiente: c.periodo_pendiente || periodoMeta.periodo_pendiente || new Date().toISOString().slice(0,7) + "-01",
+                    ciclo_cobro_manual: periodoMeta.ciclo_cobro_manual === true,
+                    corte_virtual: periodoMeta.corte_aplicado === true,
+                    estado_guardado: periodoMeta.estado_guardado || c.estado || "pendiente",
+                    estado: periodoMeta.estado || c.estado || "pendiente",
                     pago_en_revision: c.pago_en_revision === true,
+                    pago_revision_estado: c.pago_revision_estado || "",
+                    pago_revision_mensaje: c.pago_revision_mensaje || "",
+                    pago_revision_monto_faltante: n(c.pago_revision_monto_faltante, 0),
+                    pago_revision_updated_at: c.pago_revision_updated_at || null,
                     historial_pagos: pagos.map(adaptarPago),
                     servicios: servicios.map(adaptarServicioCliente),
                     descuentos_especiales: descuentos.map(adaptarDescuento),
-                    descuento_fallas: n(c.descuento_fallas, 0),
+                    trato_justo_compensaciones: tratoJusto,
+                    descuento_fallas: tratoJusto.filter(x => x.activo !== false && String(x.periodo || "").slice(0,7) === String(c.periodo_pendiente || periodoMeta.periodo_pendiente || "").slice(0,7)).reduce((s,x)=>s+n(x.monto,0), n(c.descuento_fallas,0)),
                     referido_activo: refActivo ? adaptarReferido(refActivo) : undefined,
                     gamificacion: gamificacion ? adaptarGamificacion(gamificacion) : undefined
                 };
             });
 
             const cfg = root.config || root.configuracion || root._goxion_config || data.config || data.configuracion || {};
-            const alertas = root.alertas || data.alertas || cfg.alertas || {};
+            const alertasRaw = root.alertas ?? data.alertas ?? cfg.alertas ?? {};
+            const alertas = Array.isArray(alertasRaw) ? (alertasRaw[0] || {}) : alertasRaw;
             const catalogoCfg = firstArray(cfg.serviciosGlobales, cfg.servicios_globales);
 
             configGlobal = {
@@ -1723,17 +2108,18 @@ Revisa las guías [SOPORTE]"></textarea>
             }
         };
 
-        console.info("GOXION Admin oficial: periodo persistente activo.");
+        console.info("GOXION Admin: periodo de cobro persistente cargado.");
     })();
     </script>
 
 
-    <!-- GOXION ADMIN BETA V3 // ESCRITURA INMEDIATA SUPABASE -->
+    <!-- GOXION ADMIN // ESCRITURA INMEDIATA SUPABASE -->
     <script id="goxion-supabase-v3-writes">
     (() => {
         const SB = "https://hmpevcwodcgbkviarfic.supabase.co";
         const ACCIONES = `${SB}/functions/v1/admin-acciones`;
         const PERIODOS = `${SB}/functions/v1/periodo-cobro`;
+        const TRATO_JUSTO = `${SB}/functions/v1/trato-justo`;
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function accion(accion, datos = {}) {
@@ -1758,6 +2144,7 @@ Revisa las guías [SOPORTE]"></textarea>
             }
             return body;
         }
+
         async function accionPeriodo(accionNombre, datos = {}) {
             const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
             if (!token) throw new Error("Sesión administrativa no disponible.");
@@ -1781,6 +2168,25 @@ Revisa las guías [SOPORTE]"></textarea>
             return body;
         }
 
+        async function accionTratoJusto(accionNombre, datos = {}) {
+            const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
+            if (!token) throw new Error("Sesión administrativa no disponible.");
+            const r = await fetch(TRATO_JUSTO, {
+                method: "POST",
+                headers: {"Content-Type":"application/json","X-Admin-Token":token},
+                body: JSON.stringify({accion:accionNombre,datos})
+            });
+            const text = await r.text();
+            let body = {};
+            try { body = text ? JSON.parse(text) : {}; } catch {}
+            if (!r.ok || body?.ok !== true) throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+            return body;
+        }
+
+        window.gxPeriodAction = accionPeriodo;
+        window.gxTratoJustoAction = accionTratoJusto;
+        window.gxCoreAdminAction = accion;
+
         function cli(key) { return clientesDict[key]; }
         function num(v, d=0) {
             const x = Number(v);
@@ -1793,18 +2199,35 @@ Revisa las guías [SOPORTE]"></textarea>
         }
 
         async function recargar(abrirKey = null) {
-            if (typeof inicializarPanel === "function") {
-                await inicializarPanel();
-                if (abrirKey) {
-                    setTimeout(() => {
-                        const d = document.getElementById(`details-${abrirKey}`);
-                        const t = document.getElementById(`toggle-text-${abrirKey}`);
-                        if (d) d.style.display = "block";
-                        if (t) t.innerHTML = "Ocultar detalles ▴";
-                    }, 60);
-                }
+            if (typeof inicializarPanel !== "function") return;
+
+            // El Centro de Operaciones mueve físicamente los detalles del cliente
+            // al panel de enfoque. Si recargamos datos sin cerrar ese panel, queda
+            // visible el nodo antiguo aunque Supabase ya haya guardado el cambio.
+            // Cerramos primero y luego reabrimos la ficha recién renderizada.
+            const focusVisible = document.getElementById("gx-client-focus")?.classList.contains("show");
+            if (focusVisible && typeof gxCloseClientFocus === "function") {
+                gxCloseClientFocus();
+            }
+
+            await inicializarPanel();
+
+            if (abrirKey) {
+                setTimeout(() => {
+                    if (typeof gxOpenClientFocus === "function") {
+                        gxOpenClientFocus(abrirKey);
+                        return;
+                    }
+                    // Respaldo para la interfaz anterior.
+                    const d = document.getElementById(`details-${abrirKey}`);
+                    const t = document.getElementById(`toggle-text-${abrirKey}`);
+                    if (d) d.style.display = "block";
+                    if (t) t.innerHTML = "Ocultar detalles ▴";
+                }, 110);
             }
         }
+
+        window.gxReloadAdminClient = recargar;
 
         // ---------- LEALTAD: GUARDA AL TOCAR + / - ----------
         updatePagos = async function(key, delta) {
@@ -1917,6 +2340,16 @@ Revisa las guías [SOPORTE]"></textarea>
             const [nombre, precio] = sel.value.split("|");
             const cat = configGlobal.serviciosGlobales.find(s => s.nombre === nombre);
 
+            // Evita enviar dos veces el mismo servicio cuando la ficha visible
+            // todavía corresponde a un render anterior.
+            const yaExiste = (c.servicios || []).some(s =>
+                String(s?.nombre || "").trim().toLowerCase() === String(nombre || "").trim().toLowerCase()
+            );
+            if (yaExiste) {
+                await recargar(key);
+                return alert(`ℹ️ ${nombre} ya está asignado a este cliente. La ficha se actualizó con los datos de Supabase.`);
+            }
+
             try {
                 await accion("agregar_servicio_cliente", {
                     cliente_id: c._id,
@@ -1928,7 +2361,16 @@ Revisa las guías [SOPORTE]"></textarea>
                     perfil_pin: ""
                 });
                 await recargar(key);
-            } catch (e) { errorUI("No se pudo agregar el servicio.", e); }
+            } catch (e) {
+                // Si el backend rechaza por duplicado, refrescamos para mostrar
+                // lo que ya existe realmente en Supabase en vez de dejar la ficha vieja.
+                const msg = String(e?.message || e || "");
+                if (/duplicate|duplicad|unique|uq_cliente_servicio_nombre/i.test(msg)) {
+                    await recargar(key);
+                    return alert(`ℹ️ ${nombre} ya estaba asignado. Actualicé la ficha con los datos reales.`);
+                }
+                errorUI("No se pudo agregar el servicio.", e);
+            }
         };
 
         removeClientService = async function(key, serviceIndex) {
@@ -1937,10 +2379,18 @@ Revisa las guías [SOPORTE]"></textarea>
             if (!s) return;
             if (!confirm(`¿Quitar "${s.nombre}" de este cliente?`)) return;
 
+            const serviceId = s.id || s._id;
+            if (!serviceId) return alert("❌ Este servicio no tiene ID de Supabase. Recarga el Admin antes de eliminarlo.");
+
             try {
-                await accion("quitar_servicio_cliente", { id: s.id || s._id });
+                await accion("quitar_servicio_cliente", { id: serviceId });
                 await recargar(key);
-            } catch (e) { errorUI("No se pudo quitar el servicio.", e); }
+            } catch (e) {
+                // No ocultamos el error; primero re-sincronizamos la ficha para
+                // evitar que un nodo viejo haga parecer que el servicio sigue ahí.
+                try { await recargar(key); } catch {}
+                errorUI("No se pudo quitar el servicio.", e);
+            }
         };
 
         updateServiceCreds = async function(key, serviceIndex, field, value) {
@@ -1965,11 +2415,16 @@ Revisa las guías [SOPORTE]"></textarea>
             if (!confirm(`¿Confirmas que verificaste el comprobante?\n\nEste pago se aplicará al periodo: ${periodoVisible || "actual"}.`)) return;
 
             try {
+                const timing = typeof gxPaymentTiming === "function" ? gxPaymentTiming({...c,estado:"pendiente",pago_en_revision:false}) : {type:"none"};
+                const puntual = timing.type !== "overdue";
+                const alreadyPaid = typeof gxPeriodAlreadyPaid === "function" ? gxPeriodAlreadyPaid(c) : false;
                 const r = await accionPeriodo("aprobar_pago_periodo", {
                     cliente_id: c._id,
                     monto: num(monto),
-                    notas: "Aprobado desde Admin"
+                    notas: "Aprobado desde Admin",
+                    puntual
                 });
+                if (!puntual && !alreadyPaid) await accion("reiniciar_lealtad", { cliente_id: c._id });
                 await recargar(key);
                 alert(`✅ Pago aplicado a ${r.periodo_pagado || "el periodo pendiente"}.\n\nSiguiente periodo: ${String(r.periodo_pendiente || "").slice(0,7)}.`);
             } catch (e) { errorUI("No se pudo aprobar el pago.", e); }
@@ -2110,27 +2565,15 @@ Revisa las guías [SOPORTE]"></textarea>
             } catch (e) { errorUI("No se pudo eliminar el descuento.", e); }
         };
 
-        aplicarTratoJusto = async function(key, montoServicio) {
+        aplicarTratoJusto = function(key) {
             const c = cli(key);
-            if (!c?._id) return;
-            if (!confirm("¿Aplicar descuento de Trato Justo (5% del servicio)?")) return;
-            try {
-                await accion("aplicar_trato_justo", {
-                    cliente_id: c._id,
-                    monto_servicio: num(montoServicio)
-                });
-                await recargar(key);
-            } catch (e) { errorUI("No se pudo aplicar Trato Justo.", e); }
+            if (!c) return;
+            const idx = Math.max(0, (c.servicios || []).findIndex(Boolean));
+            gxOpenTratoJusto(key, idx);
         };
 
-        resetearDescuentoFallas = async function(key) {
-            const c = cli(key);
-            if (!c?._id) return;
-            if (!confirm("¿Resetear Trato Justo a $0?")) return;
-            try {
-                await accion("resetear_trato_justo", { cliente_id: c._id });
-                await recargar(key);
-            } catch (e) { errorUI("No se pudo resetear Trato Justo.", e); }
+        resetearDescuentoFallas = function(key) {
+            alert("Trato Justo ahora se administra por servicio y periodo desde el menú ••• de cada servicio.");
         };
 
         // ---------- CATÁLOGO ----------
@@ -2244,7 +2687,7 @@ Revisa las guías [SOPORTE]"></textarea>
     </script>
 
 
-    <!-- GOXION ADMIN BETA V4 // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
+    <!-- GOXION ADMIN // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
     <script id="goxion-admin-v4-fixes">
     (() => {
         const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
@@ -2493,7 +2936,7 @@ Revisa las guías [SOPORTE]"></textarea>
     </script>
 
 
-    <!-- GOXION ADMIN BETA V5 // INVENTARIO INTELIGENTE DESDE SUPABASE -->
+    <!-- GOXION ADMIN // INVENTARIO INTELIGENTE DESDE SUPABASE -->
     <script id="goxion-admin-v5-inventory">
     (() => {
         const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario";
@@ -2637,5 +3080,927 @@ Revisa las guías [SOPORTE]"></textarea>
     })();
     </script>
 
+
+<script id="goxion-admin-operations-ui">
+(()=>{
+ let focusHome=null;
+ window.goAdminTab=(id)=>{document.querySelectorAll('.tab-content').forEach(x=>x.classList.remove('active'));document.getElementById(id)?.classList.add('active');document.querySelectorAll('[data-admin-target]').forEach(x=>x.classList.toggle('active',x.dataset.adminTarget===id));window.scrollTo({top:0,behavior:'smooth'});if(id==='tab-resumen')setTimeout(gxUpdateOperationsSummary,30)};
+ window.gxSettingsView=(view,btn)=>{document.querySelectorAll('.gx-settings-view').forEach(x=>x.classList.toggle('active',x.dataset.settingsView===view));document.querySelectorAll('.gx-settings-tabs button').forEach(x=>x.classList.remove('active'));btn?.classList.add('active')};
+ window.gxSaveSettings=async()=>{const label=document.querySelector('#gx-save-state span:last-child');if(label)label.textContent='Guardando…';try{await prepararYGuardar()}finally{if(label)label.textContent='Sincronizado'}};
+ window.gxClearClientFilters=()=>{document.getElementById('search-input').value='';document.getElementById('sort-by').value='name';const p=document.querySelector('[data-status-filter="all"]');if(p)setStatusFilter('all',p)};
+ window.gxFilterFromSummary=s=>{goAdminTab('tab-clientes');const p=document.querySelector(`[data-status-filter="${s}"]`);if(p)setStatusFilter(s,p)};
+ window.gxShowBenefitReady=()=>{goAdminTab('tab-clientes');const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{const r=c.referido_activo;if(r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3)filtered[k]=c});renderizarClientes(filtered)};
+ window.gxToggleAccordion=b=>{const a=b.closest('.gx-accordion');const p=a?.parentElement;if(!a||!p)return;p.querySelectorAll(':scope > .gx-accordion').forEach(x=>{if(x!==a)x.classList.remove('open')});a.classList.toggle('open')};
+ function restore(){if(!focusHome)return;const{details,parent,next}=focusHome;details.style.display='';details.classList.add('client-details');next&&next.parentNode===parent?parent.insertBefore(details,next):parent.appendChild(details);focusHome=null}
+ window.gxOpenClientFocus=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>${periodChip}</span><span>$${monthly}/mes</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
+ window.gxCloseClientFocus=()=>{const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;restore();f.classList.remove('show');document.body.style.overflow=''};
+ window.toggleClientDetails=key=>gxOpenClientFocus(key);
+ function stockLow(){let n=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>{const a=s?._inventario_auto;if(a){const v=s.stock_manual!==undefined&&s.stock_manual!==null&&s.stock_manual!==''?Number(s.stock_manual):Number(a.disponibles_auto??a.disponibles??0);if(v<=1||Number(a.sobrecupo||0)>0)n++}})}catch{}return n}
+ window.gxUpdateOperationsSummary=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>c.pago_en_revision===true).length,pending=v.filter(c=>!c.pago_en_revision&&c.estado==='pendiente').length,paid=v.filter(c=>c.estado==='pagado').length,susp=v.filter(c=>c.estado==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
+ const add=window.agregarNuevoCliente;if(typeof add==='function')window.agregarNuevoCliente=function(...a){const before=new Set(Object.keys(clientesDict||{})),r=add.apply(this,a);setTimeout(()=>{const k=Object.keys(clientesDict||{}).find(x=>!before.has(x));if(k){goAdminTab('tab-clientes');gxOpenClientFocus(k)}gxUpdateOperationsSummary()},180);return r};
+ const render=window.renderizarClientes;if(typeof render==='function')window.renderizarClientes=function(...a){const r=render.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
+ const calc=window.calcularInventarioYFinanzas;if(typeof calc==='function')window.calcularInventarioYFinanzas=function(...a){const r=calc.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')gxCloseClientFocus()});setTimeout(gxUpdateOperationsSummary,400);
+})();
+</script>
+
+
+<script id="goxion-admin-ops-v2">
+(() => {
+    const OPS_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-operaciones";
+    const TAGS = [
+        {tag:"CATALOGO", emoji:"🛒", name:"Catálogo", mode:"Automática", info:"Se completa cuando el cliente visita la pestaña Catálogo."},
+        {tag:"PAGO", emoji:"💳", name:"Pago", mode:"Automática", info:"Se completa cuando el cliente reporta su comprobante de pago."},
+        {tag:"SOPORTE", emoji:"🛠️", name:"Soporte", mode:"Automática", info:"Lleva al cliente a Soporte y se completa al interactuar con esa sección."},
+        {tag:"FEEDBACK", emoji:"💬", name:"Feedback", mode:"Automática", info:"Abre el formulario de comentarios; se completa al enviar feedback."},
+        {tag:"REFERIDOS", emoji:"🫂", name:"Referidos", mode:"Automática", info:"Dirige al panel de Referidos y registra la interacción."},
+        {tag:"COMPARTIR", emoji:"📲", name:"Compartir", mode:"Automática", info:"Invita al cliente a compartir GOXION."},
+        {tag:"LINK", emoji:"🔗", name:"Enlace", mode:"Automática", info:"Abre una URL personalizada. Al elegirla agrega LINK: y pide la URL."},
+        {tag:"MI_ESPACIO", emoji:"👤", name:"Mi Espacio", mode:"Manual", info:"Misión informativa relacionada con entrar o revisar Mi Espacio. Hoy se confirma manualmente."},
+        {tag:"ESTADO", emoji:"📄", name:"Estado de cuenta", mode:"Manual", info:"Pide consultar su estado de cuenta. Compatible como misión manual."},
+        {tag:"LEALTAD", emoji:"⭐", name:"Lealtad", mode:"Manual", info:"Pide revisar su progreso de fidelidad. Compatible como misión manual."},
+        {tag:"BENEFICIOS", emoji:"🎁", name:"Beneficios", mode:"Manual", info:"Pide revisar beneficios, referidos o cupones. Compatible como misión manual."},
+        {tag:"MANUAL", emoji:"✅", name:"Manual", mode:"Manual", info:"La misión se completa al tocarla. Útil para tareas especiales sin automatización."}
+    ];
+    let paymentCtx = null;
+
+    async function ops(accion, datos={}) {
+        const token = localStorage.getItem("GOXION_ADMIN_TOKEN") || "";
+        const r = await fetch(OPS_BETA, {
+            method:"POST",
+            headers:{"Content-Type":"application/json","X-Admin-Token":token},
+            body:JSON.stringify({accion,datos})
+        });
+        const j = await r.json().catch(()=>({}));
+        if(!r.ok || j?.ok !== true) throw new Error(j?.error || `HTTP ${r.status}`);
+        return j;
+    }
+    window.gxOpsBeta = ops;
+
+    // ---------- Mission Builder ----------
+    function tagOption(tag) {
+        const t = TAGS.find(x=>x.tag===tag) || TAGS[0];
+        return `${t.emoji} ${t.name}`;
+    }
+    function parseMission(line) {
+        line = String(line||"").trim();
+        const m = line.match(/\[([^\]]+)\]\s*$/);
+        if(!m) return {text:line,tag:"MANUAL",param:""};
+        const full=m[1], text=line.replace(m[0],"").trim();
+        if(full.toUpperCase().startsWith("LINK:")) return {text,tag:"LINK",param:full.slice(5).trim()};
+        return {text,tag:full.toUpperCase(),param:""};
+    }
+    function missionLine(row) {
+        const text = row.querySelector(".gx-mission-text")?.value.trim() || "";
+        const tag = row.querySelector(".gx-mission-tag")?.value || "MANUAL";
+        const param = row.querySelector(".gx-mission-param")?.value.trim() || "";
+        const suffix = tag==="LINK" ? `[LINK:${param}]` : `[${tag}]`;
+        return text ? `${text} ${suffix}` : "";
+    }
+    function syncBuilder() {
+        const src=document.getElementById("global-misiones-tareas");
+        if(!src) return;
+        src.value = [...document.querySelectorAll(".gx-mission-row")].map(missionLine).filter(Boolean).join("\n");
+    }
+    function rowHtml(data={text:"",tag:"CATALOGO",param:""}) {
+        const row=document.createElement("div");
+        row.className="gx-mission-row";
+        row.innerHTML=`<input class="gx-mission-text" type="text" placeholder="Escribe la misión..." value="${String(data.text||"").replace(/"/g,"&quot;")}">
+            <select class="gx-mission-tag">${TAGS.map(t=>`<option value="${t.tag}" ${t.tag===data.tag?'selected':''}>${t.emoji} ${t.name}</option>`).join("")}</select>
+            <button type="button" title="Eliminar">×</button>
+            <input class="gx-mission-param" type="url" placeholder="https://..." value="${String(data.param||"").replace(/"/g,"&quot;")}" style="grid-column:1/-1;display:${data.tag==='LINK'?'block':'none'}">`;
+        const text=row.querySelector(".gx-mission-text"), select=row.querySelector(".gx-mission-tag"), param=row.querySelector(".gx-mission-param");
+        text.addEventListener("input",syncBuilder);
+        param.addEventListener("input",syncBuilder);
+        select.addEventListener("change",()=>{param.style.display=select.value==="LINK"?"block":"none";syncBuilder()});
+        row.querySelector("button").onclick=()=>{row.remove();syncBuilder()};
+        return row;
+    }
+    window.gxAddMissionRow = function(data) {
+        document.getElementById("gx-mission-builder-list")?.appendChild(rowHtml(data));
+        syncBuilder();
+    };
+    function loadBuilder() {
+        const src=document.getElementById("global-misiones-tareas");
+        const list=document.getElementById("gx-mission-builder-list");
+        if(!src||!list) return;
+        list.innerHTML="";
+        const lines=String(src.value||"").split("\n").map(x=>x.trim()).filter(Boolean);
+        (lines.length?lines:["Visita nuestro catálogo [CATALOGO]","Reporta tu pago [PAGO]"]).forEach(line=>list.appendChild(rowHtml(parseMission(line))));
+        syncBuilder();
+        const grid=document.getElementById("gx-tag-library-grid");
+        if(grid) grid.innerHTML=TAGS.map(t=>`<div class="gx-tag-chip"><span class="emoji">${t.emoji}</span><span class="copy"><strong>${t.name}</strong><small>${t.mode}</small></span><button onclick='gxTagInfo(${JSON.stringify(t.tag)})'>i</button></div>`).join("");
+    }
+    window.gxTagInfo = tag => {
+        const t=TAGS.find(x=>x.tag===tag);
+        if(t) alert(`${t.emoji} ${t.name}\n\n${t.info}\n\nTipo: ${t.mode}`);
+    };
+    window.gxMissionBuilderApply = function(mode){syncBuilder();aplicarMisionesMasivas(mode)};
+    window.gxMissionBuilderSelectClients = function(){syncBuilder();abrirModalSeleccionClientes()};
+
+    // ---------- Notifications ----------
+    function relativeTime(iso){
+        const d=new Date(iso), s=Math.max(0,(Date.now()-d.getTime())/1000);
+        if(s<60)return "ahora"; if(s<3600)return `hace ${Math.floor(s/60)} min`; if(s<86400)return `hace ${Math.floor(s/3600)} h`; return `hace ${Math.floor(s/86400)} d`;
+    }
+    function clientKeyById(id){return Object.entries(clientesDict||{}).find(([,c])=>c._id===id)?.[0]||null}
+
+    window.gxNotificationFilter = window.gxNotificationFilter || "all";
+
+    function paymentNotificationModel(){
+        const persisted=Array.isArray(window.gxAdminNotifications)?window.gxAdminNotifications:[];
+        const latestReviewByClient=new Map();
+
+        persisted
+            .filter(n=>String(n?.tipo||"").toLowerCase()==="pago_revision")
+            .forEach(n=>{
+                const id=String(n?.cliente_id||"");
+                const prev=latestReviewByClient.get(id);
+                if(!prev || new Date(n.created_at||0)>new Date(prev.created_at||0)) latestReviewByClient.set(id,n);
+            });
+
+        const reviews=[], overdue=[], upcoming=[];
+
+        Object.entries(clientesDict||{}).forEach(([key,c])=>{
+            if(c.pago_en_revision===true){
+                const persistedReview=latestReviewByClient.get(String(c._id||""));
+                reviews.push({
+                    ...(persistedReview||{}),
+                    id:persistedReview?.id||`review-${key}`,
+                    tipo:"pago_revision",
+                    categoria:"review",
+                    titulo:persistedReview?.titulo||"💳 Pago pendiente de revisión",
+                    mensaje:persistedReview?.mensaje||`${c.nombre} tiene un comprobante pendiente de validar.`,
+                    cliente_id:c._id,
+                    cliente_nombre:c.nombre,
+                    leida:persistedReview?.leida===true,
+                    created_at:persistedReview?.created_at||new Date().toISOString(),
+                    synthetic:!persistedReview,
+                    key
+                });
+                return;
+            }
+
+            const timing=gxPaymentTiming(c);
+            if(timing.type==="overdue"){
+                overdue.push({
+                    id:`od-${key}`,tipo:"pago_vencido",categoria:"overdue",
+                    titulo:"⚠️ Pago vencido",
+                    mensaje:`${c.nombre} lleva ${timing.days} día${timing.days===1?'':'s'} de atraso en ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)}. Fecha de pago: día ${c.dia_pago||15}.`,
+                    cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key
+                });
+            }else if(timing.type==="upcoming"){
+                upcoming.push({
+                    id:`up-${key}`,tipo:"cobro_proximo",categoria:"upcoming",
+                    titulo:timing.days===0?"⏰ Pago vence hoy":"⏳ Pago próximo",
+                    mensaje:timing.days===0
+                        ? `${c.nombre} tiene fecha de pago hoy para ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)} (día ${c.dia_pago||15}).`
+                        : `${c.nombre} vence en ${timing.days} día${timing.days===1?'':'s'} para ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)} (día ${c.dia_pago||15}).`,
+                    cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key
+                });
+            }
+        });
+
+        return {reviews,overdue,upcoming,all:[...reviews,...overdue,...upcoming]};
+    }
+
+    function updateNotificationCounts(model){
+        const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+        set("gx-notif-count-all",model.all.length);
+        set("gx-notif-count-review",model.reviews.length);
+        set("gx-notif-count-overdue",model.overdue.length);
+        set("gx-notif-count-upcoming",model.upcoming.length);
+
+        const urgent=model.reviews.length+model.overdue.length;
+        const bell=document.getElementById("gx-notification-bell");
+        bell?.classList.toggle("has-new",urgent>0);
+        const badge=document.getElementById("gx-notification-badge");
+        if(badge)badge.title=urgent?`${urgent} requieren atención`:"Sin pagos urgentes";
+
+        const summary=document.getElementById("gx-notification-summary");
+        if(summary){
+            if(model.reviews.length) summary.textContent=`${model.reviews.length} pago${model.reviews.length===1?'':'s'} por revisar · ${model.overdue.length} vencido${model.overdue.length===1?'':'s'}`;
+            else if(model.overdue.length) summary.textContent=`${model.overdue.length} pago${model.overdue.length===1?'':'s'} vencido${model.overdue.length===1?'':'s'} requieren seguimiento.`;
+            else summary.textContent="Sin pagos urgentes. Revisa los próximos vencimientos.";
+        }
+    }
+
+    function renderNotifications(){
+        const list=document.getElementById("gx-notification-list");
+        if(!list)return;
+
+        const model=paymentNotificationModel();
+        updateNotificationCounts(model);
+
+        let items=window.gxNotificationFilter==="review" ? model.reviews
+            : window.gxNotificationFilter==="overdue" ? model.overdue
+            : window.gxNotificationFilter==="upcoming" ? model.upcoming
+            : model.all;
+
+        const priority={review:0,overdue:1,upcoming:2};
+        items=[...items].sort((a,b)=>{
+            const pa=priority[a.categoria]??9,pb=priority[b.categoria]??9;
+            if(pa!==pb)return pa-pb;
+            return new Date(b.created_at||0)-new Date(a.created_at||0);
+        });
+
+        const labels={review:"Por revisar",overdue:"Vencido",upcoming:"Próximo"};
+        list.innerHTML=items.length?items.map(n=>{
+            const key=n.key||clientKeyById(n.cliente_id);
+            const cls=n.categoria||"";
+            const action=n.categoria==="review"?"Revisar pago →":"Abrir cliente →";
+            return `<div class="gx-notif-item ${cls} ${n.categoria==="review"&&!n.leida?'unread':''}">
+                <span class="gx-notif-kind ${cls}">${labels[cls]||"Pago"}</span>
+                <strong>${n.titulo||"Actividad"}</strong>
+                <p>${n.mensaje||""}</p>
+                <small>${n.cliente_nombre?`${n.cliente_nombre} · `:""}${relativeTime(n.created_at)}</small>
+                ${key?`<button class="gx-notif-action" onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}')">${action}</button>`:""}
+            </div>`;
+        }).join(""):`<div class="gx-empty-inline">No hay avisos en esta categoría.</div>`;
+    }
+
+    window.gxSetNotificationFilter=function(filter,btn){
+        window.gxNotificationFilter=filter||"all";
+        document.querySelectorAll("[data-gx-notif-filter]").forEach(x=>x.classList.toggle("active",x===btn));
+        renderNotifications();
+    };
+
+    window.gxToggleNotifications=function(force){
+        const drawer=document.getElementById("gx-notification-drawer"),overlay=document.getElementById("gx-notification-overlay");
+        const show=force===undefined?!drawer.classList.contains("show"):Boolean(force);
+        drawer.classList.toggle("show",show);overlay.classList.toggle("show",show);drawer.setAttribute("aria-hidden",show?"false":"true");
+        if(show)renderNotifications();
+    };
+
+    window.gxOpenNotificationClient=(key,tipo)=>{
+        gxToggleNotifications(false);
+        goAdminTab("tab-clientes");
+        setTimeout(()=>{
+            gxOpenClientFocus(key);
+            if(tipo==="pago_revision") setTimeout(()=>gxOpenPaymentModal(key),150);
+        },80);
+    };
+
+    // Se conservan en Supabase los eventos existentes, pero el Centro de Operaciones
+    // solo muestra pagos/fechas. Logins, soporte y pedidos continúan por Discord.
+    window.gxMarkAllNotificationsRead=async()=>{
+        const ids=(window.gxAdminNotifications||[])
+            .filter(n=>String(n?.tipo||"").toLowerCase()==="pago_revision" && !n.leida)
+            .map(n=>n.id).filter(Boolean);
+        if(!ids.length)return;
+        try{
+            await ops("marcar_notificaciones_leidas",{ids});
+            (window.gxAdminNotifications||[]).forEach(n=>{if(ids.includes(n.id))n.leida=true});
+            renderNotifications();
+        }catch(e){console.warn("No se pudieron marcar avisos de pago como leídos",e)}
+    };
+    window.gxRefreshNotifications=async()=>{if(typeof inicializarPanel==="function"){await inicializarPanel();setTimeout(renderNotifications,80)}};
+
+    // ---------- Payment alerts ----------
+    window.gxPeriodLabel=function(periodo){
+        const meses=["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+        const m=String(periodo||"").match(/^(\d{4})-(\d{2})/);
+        if(!m)return "Periodo actual";
+        return `${meses[Math.max(0,Math.min(11,Number(m[2])-1))]} ${m[1]}`;
+    };
+    window.gxNormalizePeriod=function(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\bde\b/g," ").replace(/\s+/g," ").trim()};
+    window.gxPeriodAlreadyPaid=function(c){
+        const wanted=gxNormalizePeriod(gxPeriodLabel(c?.periodo_pendiente));
+        return (c?.historial_pagos||[]).some(p=>gxNormalizePeriod(p?.periodo||p?.fecha)===wanted && String(p?.estado||"pagado").toLowerCase()==="pagado");
+    };
+    window.gxPaymentTiming=function(c){
+        if(!c || c.estado==="suspendido" || c.pago_en_revision || gxPeriodAlreadyPaid(c))return {type:"none",days:0};
+        const now=new Date();
+        const pm=String(c.periodo_pendiente||"").match(/^(\d{4})-(\d{2})/);
+        const y=pm?Number(pm[1]):now.getFullYear();
+        const m=pm?Math.max(0,Math.min(11,Number(pm[2])-1)):now.getMonth();
+        const lastDay=new Date(y,m+1,0).getDate();
+        const day=Math.min(lastDay,Math.max(1,Number(c.dia_pago||15)));
+        const due=new Date(y,m,day,23,59,59);
+        const diff=Math.ceil((due-now)/86400000);
+        if(diff>=0 && diff<=3)return {type:"upcoming",days:diff,due,periodo:gxPeriodLabel(c.periodo_pendiente)};
+        if(diff<0)return {type:"overdue",days:Math.abs(diff),due,periodo:gxPeriodLabel(c.periodo_pendiente)};
+        return {type:"none",days:diff,due,periodo:gxPeriodLabel(c.periodo_pendiente)};
+    };
+    window.gxShowPaymentAlert=function(type){
+        goAdminTab("tab-clientes");
+        const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{if(gxPaymentTiming(c).type===type)filtered[k]=c});
+        renderizarClientes(filtered);
+        const sub=document.getElementById("gx-client-page-subtitle");if(sub)sub.textContent=type==="upcoming"?"Clientes cuyo pago vence en los próximos 3 días":"Clientes con pago vencido";
+    };
+
+    // ---------- Payment review ----------
+    window.gxOpenPaymentModal=function(key,monto){
+        const c=clientesDict?.[key];if(!c)return;
+        paymentCtx={key,monto:Number(monto||((c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)))};
+        document.getElementById("gx-payment-client-name").textContent=c.nombre;
+        document.getElementById("gx-payment-client-meta").textContent=`${c.folio} · ${gxPeriodLabel(c.periodo_pendiente)} · Esperado $${paymentCtx.monto} · Día ${c.dia_pago||15}`;
+        const timing=gxPaymentTiming({...c,estado:"pendiente",pago_en_revision:false});
+        document.getElementById("gx-payment-review-card").innerHTML=
+            `<strong>Estado actual:</strong> ${c.pago_en_revision?'Comprobante recibido y pendiente de validar':'Sin comprobante en revisión'}<br>`+
+            `<strong>Lealtad:</strong> ${c.pagos_puntuales||0} pagos consecutivos.`+
+            (timing.type==="overdue"
+                ? `<div style="margin-top:8px;padding:8px;border-radius:9px;background:rgba(255,170,0,.07);border:1px solid rgba(255,170,0,.18);color:#ffd36c;"><strong>Pago fuera de fecha.</strong> Por defecto no sumará Lealtad. Marca la casilla de pago puntual solo si deseas conservar/sumar la racha manualmente.</div>`
+                : "");
+        document.getElementById("gx-payment-note").value="";
+        document.getElementById("gx-missing-amount").value="";
+        document.getElementById("gx-missing-amount-wrap").classList.remove("show");
+        const punctual=document.getElementById("gx-payment-punctual");if(punctual)punctual.checked=timing.type!=="overdue";
+        const modal=document.getElementById("gx-payment-modal");modal.classList.add("show");modal.setAttribute("aria-hidden","false");
+    };
+    window.gxClosePaymentModal=()=>{document.getElementById("gx-payment-modal")?.classList.remove("show");paymentCtx=null};
+    async function paymentAction(type){
+        if(!paymentCtx)return;const c=clientesDict[paymentCtx.key],note=document.getElementById("gx-payment-note").value.trim();
+        let successMessage="";
+        try{
+            if(type==="approve"){
+                const puntual=document.getElementById("gx-payment-punctual").checked;
+                const before=Number(c.pagos_puntuales||0);
+                const alreadyPaid=gxPeriodAlreadyPaid(c);
+                const r=await gxPeriodAction("aprobar_pago_periodo",{cliente_id:c._id,monto:paymentCtx.monto,puntual,notas:note||"Aprobado desde Admin"});
+                let after=Number(r.pagos_puntuales||before);
+                if(!puntual && !alreadyPaid){
+                    await gxCoreAdminAction("reiniciar_lealtad",{cliente_id:c._id});
+                    after=0;
+                }
+                c.estado="pagado";c.pago_en_revision=false;c.pagos_puntuales=after;c.pago_revision_estado="aprobado";c.periodo_pendiente=r.periodo_pendiente||c.periodo_pendiente;
+                const periodoPagado=r.periodo_pagado||"el periodo pendiente";
+                const siguiente=gxPeriodLabel(r.periodo_pendiente);
+                if(puntual && after>before) successMessage=`✅ Pago aprobado · ${periodoPagado}.\n\nLealtad: ${before} → ${after} pagos.\nSiguiente periodo: ${siguiente}.`;
+                else if(puntual && after===before) successMessage=`✅ Pago aprobado · ${periodoPagado}.\n\nLealtad se mantiene en ${after}. Este periodo ya estaba contabilizado.\nSiguiente periodo: ${siguiente}.`;
+                else successMessage=`✅ Pago aprobado fuera de fecha · ${periodoPagado}.\n\nLealtad actual: ${after} pagos.\nSiguiente periodo: ${siguiente}.`;
+            } else if(type==="incomplete"){
+                const amount=Number(document.getElementById("gx-missing-amount").value||0);
+                const msg=note||`Detectamos un pago incompleto${amount>0?` por $${amount}`:""}. Revisa el monto y vuelve a enviar tu comprobante.`;
+                await ops("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+                c.estado="pendiente";c.pago_en_revision=false;c.pago_revision_estado="incompleto";c.pago_revision_mensaje=msg;c.pago_revision_monto_faltante=amount;
+                successMessage="⚠️ Pago marcado como incompleto.";
+            } else {
+                const msg=note||"No pudimos validar tu comprobante. Verifica los datos y vuelve a enviarlo.";
+                await ops("rechazar_pago",{cliente_id:c._id,mensaje:msg});
+                c.estado="pendiente";c.pago_en_revision=false;c.pago_revision_estado="rechazado";c.pago_revision_mensaje=msg;
+                successMessage="✕ Comprobante rechazado.";
+            }
+            gxClosePaymentModal();gxCloseClientFocus();filtrarClientes();gxUpdateOperationsSummary();alert(successMessage);
+        }catch(e){alert("No se pudo procesar el pago.\n\n"+e.message)}
+    }
+    window.gxPaymentApprove=()=>paymentAction("approve");
+    window.gxPaymentIncomplete=()=>{document.getElementById("gx-missing-amount-wrap").classList.add("show");const note=document.getElementById("gx-payment-note");if(!note.value)note.value="Tu pago está incompleto. Por favor revisa el monto faltante y vuelve a enviar el comprobante."; if(confirm("¿Marcar este pago como INCOMPLETO y registrar el aviso?"))paymentAction("incomplete")};
+    window.gxPaymentReject=()=>{if(confirm("¿Rechazar este comprobante? La lealtad no aumentará."))paymentAction("reject")};
+
+    // ---------- Smart referrals ----------
+    window.gxReferralSmartMonths=function(r){
+        if(!r)return 0;
+        if(r.meses_override!==null && r.meses_override!==undefined)return Math.min(3,Math.max(0,Number(r.meses_override)||0));
+        if((r.servicios||[]).length<2)return Math.min(3,Math.max(0,Number(r.meses)||0));
+        const start=new Date(r.fecha_inicio||Date.now()); if(Number.isNaN(start.getTime()))return Number(r.meses||0);
+        const now=new Date();let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());if(now.getDate()<start.getDate())months--;return Math.min(3,Math.max(0,months));
+    };
+    window.gxSaveReferralSmart=async function(key,patch={}){
+        const c=clientesDict?.[key],r=c?.referido_activo;if(!c?._id||!r)return;
+        Object.assign(r,patch);
+        try{
+            const x=await ops("guardar_referido_inteligente",{cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios||[],fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)});
+            c.referido_activo={...r,...x.referido};
+            setTimeout(()=>{filtrarClientes();gxOpenClientFocus(key)},80);
+        }catch(e){alert("No se pudo guardar el referido.\n\n"+e.message)}
+    };
+    window.gxToggleReferralService=function(key,name,checked){
+        const r=clientesDict?.[key]?.referido_activo;if(!r)return;
+        const set=new Set(r.servicios||[]);checked?set.add(name):set.delete(name);r.servicios=[...set];gxSaveReferralSmart(key,{servicios:r.servicios});
+    };
+
+    // ---------- Summary enrichment ----------
+    const originalSummary=window.gxUpdateOperationsSummary;
+    window.gxUpdateOperationsSummary=function(){
+        originalSummary?.();
+        const vals=Object.values(clientesDict||{});
+        let upcoming=0,overdue=0;vals.forEach(c=>{const t=gxPaymentTiming(c).type;if(t==="upcoming")upcoming++;if(t==="overdue")overdue++});
+        const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};set("gx-count-upcoming",upcoming);set("gx-count-overdue",overdue);
+        renderNotifications();
+    };
+
+    // Hook admin response loading: initialize mission builder after settings are populated.
+    const oldInit=window.inicializarPanel;
+    if(typeof oldInit==="function"){
+        window.inicializarPanel=async function(...args){const r=await oldInit.apply(this,args);setTimeout(()=>{loadBuilder();renderNotifications();gxUpdateOperationsSummary()},120);return r};
+    }
+    document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{loadBuilder();renderNotifications()},500));
+})();
+</script>
+
+
+<script id="goxion-admin-ops-v3-fixes">
+(() => {
+    // Hard guard: if modal/drawer ever disappear from the DOM, explain it instead of failing silently.
+    const oldToggle = window.gxToggleNotifications;
+    window.gxToggleNotifications = function(force) {
+        const drawer = document.getElementById("gx-notification-drawer");
+        const overlay = document.getElementById("gx-notification-overlay");
+        if(!drawer || !overlay) return alert("No se pudo abrir el Centro de Notificaciones. Recarga esta versión del Admin.");
+        return oldToggle ? oldToggle(force) : undefined;
+    };
+
+    const oldOpenPayment = window.gxOpenPaymentModal;
+    window.gxOpenPaymentModal = function(key, monto) {
+        const modal = document.getElementById("gx-payment-modal");
+        if(!modal) return alert("No se pudo abrir la revisión de pago. Recarga esta versión del Admin.");
+        return oldOpenPayment ? oldOpenPayment(key, monto) : undefined;
+    };
+
+    window.gxPreparePaymentIncomplete = function() {
+        const wrap = document.getElementById("gx-missing-amount-wrap");
+        const confirmBtn = document.getElementById("gx-confirm-incomplete");
+        const note = document.getElementById("gx-payment-note");
+        wrap?.classList.add("show");
+        confirmBtn?.classList.add("show");
+        if(note && !note.value) note.value = "Tu pago está incompleto. Por favor revisa el monto faltante y vuelve a enviar tu comprobante.";
+    };
+
+    // Override prior one-click confirm: now the user can enter missing amount first.
+    window.gxPaymentIncomplete = async function() {
+        if(!window.paymentCtx && typeof paymentCtx === "undefined") {
+            // paymentAction closes over its own context, so call the original only after UI preparation.
+        }
+        const wrap = document.getElementById("gx-missing-amount-wrap");
+        if(!wrap?.classList.contains("show")) return gxPreparePaymentIncomplete();
+        if(!confirm("¿Confirmar este pago como INCOMPLETO y registrar el aviso?")) return;
+
+        // Call the existing beta action directly using public helper.
+        const key = document.getElementById("gx-payment-client-meta")?.dataset?.key;
+        // Existing V2 closure doesn't expose context; infer active client from focus name/folio.
+        let foundKey = null;
+        const name = document.getElementById("gx-payment-client-name")?.textContent || "";
+        Object.entries(clientesDict || {}).some(([k,c]) => {
+            if(c.nombre === name && c.pago_en_revision) { foundKey = k; return true; }
+            return false;
+        });
+        if(!foundKey) return alert("No pude identificar al cliente en revisión. Cierra y vuelve a abrir la revisión.");
+
+        const c = clientesDict[foundKey];
+        const amount = Number(document.getElementById("gx-missing-amount")?.value || 0);
+        const msg = document.getElementById("gx-payment-note")?.value.trim() || `Detectamos un pago incompleto${amount>0?` por $${amount}`:""}.`;
+        try {
+            await gxOpsBeta("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+            c.estado="pendiente"; c.pago_en_revision=false; c.pago_revision_estado="incompleto"; c.pago_revision_mensaje=msg; c.pago_revision_monto_faltante=amount;
+            gxClosePaymentModal(); gxCloseClientFocus(); filtrarClientes(); gxUpdateOperationsSummary();
+            alert("⚠️ Pago marcado como incompleto.");
+        } catch(e) { alert("No se pudo procesar el pago.\n\n"+e.message); }
+    };
+
+    window.gxResetReferral = async function(key) {
+        const c = clientesDict?.[key], r = c?.referido_activo;
+        if(!c?._id || !r) return;
+        if(!confirm(`¿Reiniciar el progreso de ${r.nombre || "este referido"} a 0/3 desde hoy?\n\nSe conservarán el referido y los servicios seleccionados.`)) return;
+        try {
+            const x = await gxOpsBeta("reiniciar_referido_inteligente",{cliente_id:c._id});
+            c.referido_activo = {...r,...x.referido, meses:0, meses_override:null, beneficio_reclamado:false, beneficio_reclamado_at:null};
+            gxCloseClientFocus();
+            if(typeof inicializarPanel === "function") await inicializarPanel();
+            setTimeout(()=>{filtrarClientes();gxOpenClientFocus(key)},100);
+        } catch(e) { alert("No se pudo reiniciar el referido.\n\n"+e.message); }
+    };
+
+    window.gxDeleteReferral = async function(key) {
+        const c = clientesDict?.[key], r = c?.referido_activo;
+        if(!c?._id || !r) return;
+        if(!confirm(`¿Eliminar el referido "${r.nombre || "activo"}"?\n\nEsta acción quitará el registro activo de este cliente.`)) return;
+        try {
+            await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+            c.referido_activo = null;
+            gxCloseClientFocus();
+            if(typeof inicializarPanel === "function") await inicializarPanel();
+            setTimeout(()=>filtrarClientes(),100);
+        } catch(e) { alert("No se pudo eliminar el referido.\n\n"+e.message); }
+    };
+
+    // Date-based smart progress should obey a reset date, not a stale legacy month value.
+    window.gxReferralSmartMonths = function(r) {
+        if(!r) return 0;
+        if(r.meses_override !== null && r.meses_override !== undefined) return Math.min(3,Math.max(0,Number(r.meses_override)||0));
+        const start = new Date(r.fecha_inicio || Date.now());
+        if(Number.isNaN(start.getTime())) return Math.min(3,Math.max(0,Number(r.meses)||0));
+        const now = new Date();
+        let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());
+        if(now.getDate()<start.getDate()) months--;
+        return Math.min(3,Math.max(0,months));
+    };
+})();
+</script>
+
+
+<script id="goxion-admin-v4-ergonomics">
+(() => {
+    function refObj(key){ return clientesDict?.[key]?.referido_activo || null; }
+    function effectiveMonths(r){
+        if(!r) return 0;
+        if(r.meses_override !== null && r.meses_override !== undefined) return Math.max(0,Math.min(3,Number(r.meses_override)||0));
+        if(r.meses_efectivos !== undefined && r.meses_efectivos !== null) return Math.max(0,Math.min(3,Number(r.meses_efectivos)||0));
+        if(typeof gxReferralSmartMonths === "function") return gxReferralSmartMonths(r);
+        return Math.max(0,Math.min(3,Number(r.meses)||0));
+    }
+    function updateRefUI(key){
+        const r=refObj(key); if(!r) return;
+        const services=Array.isArray(r.servicios)?r.servicios:[];
+        const months=effectiveMonths(r);
+        const head=document.getElementById(`gx-ref-head-${key}`);
+        const month=document.getElementById(`gx-ref-month-${key}`);
+        const sum=document.getElementById(`gx-ref-service-summary-${key}`);
+        const auto=document.getElementById(`gx-ref-auto-${key}`);
+        const status=document.getElementById(`gx-ref-status-${key}`);
+        if(head) head.textContent=`${months}/3 meses · ${services.length} servicio${services.length===1?'':'s'}`;
+        if(month) month.textContent=`${months}/3`;
+        if(sum) sum.textContent=services.length?`${services.length} seleccionado${services.length===1?'':'s'}`:"Seleccionar servicios";
+        if(auto) auto.classList.toggle("active", r.meses_override === null || r.meses_override === undefined);
+        if(status){
+            status.classList.toggle("ok",services.length>=2); status.classList.toggle("warn",services.length<2);
+            if(r.beneficio_reclamado) status.textContent="💝 Beneficio ya reclamado";
+            else if(services.length<2) status.textContent=`⚠️ Falta ${2-services.length} servicio${2-services.length===1?'':'s'} para cumplir el requisito`;
+            else if(months>=3) status.textContent="🎁 3/3 · Beneficio listo para reclamar";
+            else status.textContent=`✓ Progreso ${r.meses_override == null ? 'automático' : 'manual'}: ${months}/3 meses`;
+        }
+    }
+
+    window.gxToggleReferralService = async function(key,name,checked){
+        const r=refObj(key); if(!r) return;
+        const before=[...(r.servicios||[])];
+        const set=new Set(before); checked?set.add(name):set.delete(name); r.servicios=[...set];
+        r.plataformas=r.servicios.length;
+        updateRefUI(key);
+        try{
+            const c=clientesDict[key];
+            const x=await gxOpsBeta("guardar_referido_inteligente",{
+                cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios,fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)
+            });
+            Object.assign(r,x.referido||{});
+            if(x.referido?.meses_override !== undefined) r.meses_override=x.referido.meses_override;
+            updateRefUI(key);
+        }catch(e){
+            r.servicios=before; r.plataformas=before.length; updateRefUI(key);
+            alert("No se pudo guardar la selección de servicios.\n\n"+e.message);
+        }
+    };
+
+    window.gxToggleReferralServiceIndex = function(key,index,checked){
+        const options=(configGlobal?.serviciosGlobales||[]).map(s=>s.nombre).filter(Boolean);
+        const name=options[Number(index)];
+        if(!name) return alert("No pude identificar el servicio seleccionado. Recarga el Admin e inténtalo nuevamente.");
+        return window.gxToggleReferralService(key,name,checked);
+    };
+
+    const saveRefBase=window.gxSaveReferralSmart;
+    window.gxSaveReferralSmart = async function(key,patch={}){
+        const r=refObj(key); if(!r) return;
+        Object.assign(r,patch); updateRefUI(key);
+        try{
+            const c=clientesDict[key];
+            const x=await gxOpsBeta("guardar_referido_inteligente",{
+                cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios||[],fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)
+            });
+            Object.assign(r,x.referido||{});
+            if(patch.fecha_inicio !== undefined && r.meses_override == null) r.meses_efectivos = 0;
+            updateRefUI(key);
+        }catch(e){ alert("No se pudo guardar el referido.\n\n"+e.message); }
+    };
+
+    window.gxAdjustReferralMonth = async function(key,delta){
+        const c=clientesDict?.[key],r=refObj(key); if(!c?._id||!r)return;
+        try{
+            const x=await gxOpsBeta("ajustar_meses_referido",{cliente_id:c._id,delta});
+            Object.assign(r,x.referido||{}); r.meses_override=x.meses_efectivos; r.meses_efectivos=x.meses_efectivos;
+            updateRefUI(key);
+        }catch(e){ alert("No se pudo ajustar el progreso.\n\n"+e.message); }
+    };
+
+    window.gxReferralAutoMode = async function(key){
+        const c=clientesDict?.[key],r=refObj(key); if(!c?._id||!r)return;
+        try{
+            const x=await gxOpsBeta("modo_automatico_referido",{cliente_id:c._id});
+            Object.assign(r,x.referido||{}); r.meses_override=null; r.meses_efectivos=x.meses_efectivos;
+            updateRefUI(key);
+        }catch(e){ alert("No se pudo volver al modo automático.\n\n"+e.message); }
+    };
+
+    // Keep focus summary current after any render.
+    const openBase=window.gxOpenClientFocus;
+    window.gxOpenClientFocus=function(key){
+        const r=openBase?.(key);
+        setTimeout(()=>updateRefUI(key),40);
+        return r;
+    };
+})();
+</script>
+
+
+<script id="goxion-admin-v6-referral-linking">
+(() => {
+    function gxRefObj(key){ return clientesDict?.[key]?.referido_activo || null; }
+    function gxActiveServiceNames(client){
+        return [...new Set((client?.servicios || [])
+            .filter(s => s?.activo !== false)
+            .map(s => String(s?.nombre || "").trim())
+            .filter(Boolean))];
+    }
+    function gxFindLinkedKey(referrerKey, r){
+        if(!r?.nombre) return "";
+        const wanted=String(r.nombre).trim().toLowerCase();
+        return Object.entries(clientesDict || {}).find(([k,c]) =>
+            k !== referrerKey && String(c?.nombre || "").trim().toLowerCase() === wanted
+        )?.[0] || "";
+    }
+    function gxEffectiveMonthsV6(r){
+        if(!r) return 0;
+        if(r.meses_override !== null && r.meses_override !== undefined) return Math.max(0,Math.min(3,Number(r.meses_override)||0));
+        if(r.meses_efectivos !== undefined && r.meses_efectivos !== null) return Math.max(0,Math.min(3,Number(r.meses_efectivos)||0));
+        if(typeof gxReferralSmartMonths === "function") return gxReferralSmartMonths(r);
+        return Math.max(0,Math.min(3,Number(r.meses)||0));
+    }
+    function gxUpdateLinkedReferralUI(key){
+        const r=gxRefObj(key); if(!r)return;
+        const selectedKey=document.getElementById(`gx-ref-client-select-${key}`)?.value || gxFindLinkedKey(key,r);
+        const target=selectedKey ? clientesDict?.[selectedKey] : null;
+        const services=target ? gxActiveServiceNames(target) : (Array.isArray(r.servicios)?r.servicios:[]);
+        const months=gxEffectiveMonthsV6(r);
+
+        const head=document.getElementById(`gx-ref-head-${key}`);
+        const month=document.getElementById(`gx-ref-month-${key}`);
+        const count=document.getElementById(`gx-ref-service-summary-${key}`);
+        const chips=document.getElementById(`gx-ref-service-chips-${key}`);
+        const status=document.getElementById(`gx-ref-status-${key}`);
+        const auto=document.getElementById(`gx-ref-auto-${key}`);
+
+        if(head) head.textContent=`${months}/3 meses · ${services.length} servicio${services.length===1?'':'s'}`;
+        if(month) month.textContent=`${months}/3`;
+        if(count) count.textContent=String(services.length);
+        if(auto) auto.classList.toggle("active",r.meses_override===null||r.meses_override===undefined);
+
+        if(chips){
+            chips.innerHTML=services.length
+                ? services.map(name=>`<span>✓ ${name}</span>`).join("")
+                : `<div class="gx-ref-detected-empty">${target?'El cliente seleccionado no tiene servicios activos.':'Selecciona un cliente para detectar sus servicios activos.'}</div>`;
+        }
+
+        if(status){
+            status.classList.toggle("ok",services.length>=2);
+            status.classList.toggle("warn",services.length<2);
+            if(r.beneficio_reclamado) status.textContent="💝 Beneficio ya reclamado";
+            else if(services.length<2) status.textContent=`⚠️ Falta ${2-services.length} servicio${2-services.length===1?'':'s'} para cumplir el requisito`;
+            else if(months>=3) status.textContent="🎁 3/3 · Beneficio listo para reclamar";
+            else status.textContent=`✓ Progreso ${r.meses_override == null ? 'automático' : 'manual'}: ${months}/3 meses`;
+        }
+    }
+
+    window.gxSelectReferralClient = async function(referrerKey,targetKey){
+        const referrer=clientesDict?.[referrerKey];
+        const target=clientesDict?.[targetKey];
+        const r=gxRefObj(referrerKey);
+        if(!referrer?._id || !r) return;
+        if(!targetKey || !target) return;
+
+        const previous={
+            nombre:r.nombre,
+            servicios:[...(r.servicios||[])],
+            plataformas:r.plataformas,
+            fecha_inicio:r.fecha_inicio
+        };
+        const services=gxActiveServiceNames(target);
+
+        r.nombre=target.nombre||"";
+        r.servicios=services;
+        r.plataformas=services.length;
+        r.fecha_inicio=r.fecha_inicio||new Date().toISOString().slice(0,10);
+        gxUpdateLinkedReferralUI(referrerKey);
+
+        try{
+            const x=await gxOpsBeta("guardar_referido_inteligente",{
+                cliente_id:referrer._id,
+                nombre:r.nombre,
+                servicios:r.servicios,
+                fecha_inicio:r.fecha_inicio
+            });
+            Object.assign(r,x.referido||{});
+            r.servicios=Array.isArray(x.referido?.servicios)?x.referido.servicios:services;
+            r.plataformas=r.servicios.length;
+            gxUpdateLinkedReferralUI(referrerKey);
+
+            // Refrescamos la ficha para mostrar folio/estado del cliente vinculado.
+            if(typeof gxCloseClientFocus==="function") gxCloseClientFocus();
+            if(typeof filtrarClientes==="function") filtrarClientes();
+            setTimeout(()=>{ if(typeof gxOpenClientFocus==="function") gxOpenClientFocus(referrerKey); },90);
+        }catch(e){
+            r.nombre=previous.nombre;
+            r.servicios=previous.servicios;
+            r.plataformas=previous.plataformas;
+            r.fecha_inicio=previous.fecha_inicio;
+            gxUpdateLinkedReferralUI(referrerKey);
+            alert("No se pudo vincular el cliente referido.\n\n"+(e?.message||e));
+        }
+    };
+
+    window.gxResyncReferralClient = function(referrerKey){
+        const select=document.getElementById(`gx-ref-client-select-${referrerKey}`);
+        const targetKey=select?.value || gxFindLinkedKey(referrerKey,gxRefObj(referrerKey));
+        if(!targetKey) return alert("Selecciona primero el cliente referido.");
+        return window.gxSelectReferralClient(referrerKey,targetKey);
+    };
+
+    // El switch de Referido ahora crea un registro vacío e inteligente.
+    window.toggleReferido = async function(key,isChecked){
+        const c=clientesDict?.[key];
+        if(!c?._id) return;
+        try{
+            if(isChecked){
+                const today=new Date().toISOString().slice(0,10);
+                await gxOpsBeta("guardar_referido_inteligente",{
+                    cliente_id:c._id,
+                    nombre:"",
+                    servicios:[],
+                    fecha_inicio:today
+                });
+            }else{
+                await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+            }
+
+            if(typeof gxCloseClientFocus==="function") gxCloseClientFocus();
+            if(typeof inicializarPanel==="function") await inicializarPanel();
+            setTimeout(()=>{
+                if(typeof filtrarClientes==="function") filtrarClientes();
+                if(isChecked && typeof gxOpenClientFocus==="function") gxOpenClientFocus(key);
+            },100);
+        }catch(e){
+            alert(`No se pudo ${isChecked?'activar':'desactivar'} el referido.\n\n${e?.message||e}`);
+            if(typeof filtrarClientes==="function") filtrarClientes();
+        }
+    };
+
+    // Los antiguos checkboxes manuales quedan sin uso, pero mantenemos las funciones
+    // para compatibilidad con cualquier ficha abierta antes de actualizar.
+    window.gxRefreshReferralLinkedUI = gxUpdateLinkedReferralUI;
+})();
+</script>
+
+
+<script id="goxion-admin-v9-cycle-ui">
+(() => {
+    window.gxSetBillingCycleMode = async function(key, manual){
+        const c = clientesDict?.[key];
+        if(!c?._id || typeof gxPeriodAction !== 'function') return;
+        if(manual && !confirm('¿Activar modo MANUAL para este cliente?\n\nEl corte mensual automático dejará de cambiar su estado. Úsalo para pruebas, acuerdos o excepciones.')) return;
+        try{
+            const r = await gxPeriodAction('guardar_ciclo_manual',{
+                cliente_id:c._id,
+                ciclo_cobro_manual:Boolean(manual)
+            });
+            c.ciclo_cobro_manual = Boolean(r.ciclo_cobro_manual);
+            if(r.estado) c.estado = r.estado;
+            if(r.estado_guardado) c.estado_guardado = r.estado_guardado;
+            if(typeof gxReloadAdminClient==='function') await gxReloadAdminClient(key);
+            if(manual) alert('🧪 Ciclo manual activado. Esta cuenta queda protegida del corte mensual automático.');
+            else alert('✅ Ciclo automático activado. El sistema volverá a determinar el estado según el periodo pendiente.');
+        }catch(e){
+            console.error(e);
+            alert('❌ No se pudo cambiar el ciclo de cobro.\n\n'+(e?.message||e));
+        }
+    };
+})();
+</script>
+
+
+<div class="gx-tj-overlay" id="gx-tj-overlay" aria-hidden="true">
+    <div class="gx-tj-backdrop" onclick="gxCloseTratoJusto()"></div>
+    <section class="gx-tj-modal" role="dialog" aria-modal="true">
+        <header class="gx-tj-head">
+            <div><span>GARANTÍA GOXION</span><strong>🛡 Trato Justo</strong></div>
+            <button type="button" onclick="gxCloseTratoJusto()">×</button>
+        </header>
+        <div class="gx-tj-body">
+            <div class="gx-tj-service">
+                <div><small>Servicio afectado</small><strong id="gx-tj-service-name">—</strong></div>
+                <div><small>Mensualidad</small><strong id="gx-tj-service-price">$0.00</strong></div>
+            </div>
+
+            <label class="gx-tj-field">
+                <span>Periodo al que aplica</span>
+                <input type="month" id="gx-tj-period">
+            </label>
+
+            <div class="gx-tj-days-block">
+                <div><span>Días completos sin servicio</span><small>5% por cada día · máximo 10 días</small></div>
+                <div class="gx-tj-stepper">
+                    <button type="button" onclick="gxTJStep(-1)">−</button>
+                    <strong id="gx-tj-days">1</strong>
+                    <button type="button" onclick="gxTJStep(1)">+</button>
+                </div>
+            </div>
+
+            <label class="gx-tj-field">
+                <span>Motivo</span>
+                <select id="gx-tj-reason">
+                    <option value="Falla técnica">Falla técnica</option>
+                    <option value="Intermitencia prolongada">Intermitencia prolongada</option>
+                    <option value="Acceso no disponible">Acceso no disponible</option>
+                    <option value="Mantenimiento / incidencia de plataforma">Mantenimiento / incidencia de plataforma</option>
+                    <option value="Compensación autorizada">Compensación autorizada</option>
+                </select>
+            </label>
+
+            <div class="gx-tj-result">
+                <div><small>Compensación</small><strong id="gx-tj-percent">5%</strong></div>
+                <div><small>Descuento</small><strong id="gx-tj-amount">-$0.00</strong></div>
+            </div>
+
+            <div class="gx-tj-policy">La compensación se calcula sobre la cuota del servicio afectado y queda ligada al periodo seleccionado. Límite: 50% por servicio y periodo.</div>
+        </div>
+        <footer class="gx-tj-actions">
+            <button type="button" class="gx-tj-delete" id="gx-tj-delete" onclick="gxDeleteTratoJusto()" style="display:none">Eliminar</button>
+            <button type="button" class="gx-tj-cancel" onclick="gxCloseTratoJusto()">Cancelar</button>
+            <button type="button" class="gx-tj-save" onclick="gxSaveTratoJusto()">Aplicar compensación</button>
+        </footer>
+    </section>
+</div>
+
+
+<script id="goxion-admin-v10-trato-justo-controller">
+(() => {
+    let tj = {key:null, serviceIndex:-1, days:1, record:null};
+
+    function money(v){ return Number(v||0).toFixed(2); }
+    function currentService(){
+        const c = clientesDict?.[tj.key];
+        return c?.servicios?.[tj.serviceIndex] || null;
+    }
+    function refresh(){
+        const s = currentService(); if(!s) return;
+        tj.days = Math.max(1, Math.min(10, Number(tj.days||1)));
+        const pct = tj.days * 5;
+        const amount = Number(s.monto||0) * pct / 100;
+        document.getElementById('gx-tj-days').textContent = tj.days;
+        document.getElementById('gx-tj-percent').textContent = pct + '%';
+        document.getElementById('gx-tj-amount').textContent = '-$' + money(amount);
+    }
+
+    window.gxOpenTratoJusto = function(key, serviceIndex){
+        const c=clientesDict?.[key], s=c?.servicios?.[serviceIndex];
+        if(!c || !s || !(s._id||s.id)) return alert('❌ Este servicio todavía no tiene un ID válido en Supabase.');
+        const period = String(c.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7);
+        const rec = (c.trato_justo_compensaciones || []).find(x =>
+            String(x.cliente_servicio_id||'') === String(s._id||s.id||'') &&
+            String(x.periodo||'').slice(0,7) === period &&
+            x.activo !== false
+        ) || null;
+        tj={key,serviceIndex,days:Number(rec?.dias_falla||1),record:rec};
+        document.getElementById('gx-tj-service-name').textContent=s.nombre||'Servicio';
+        document.getElementById('gx-tj-service-price').textContent='$'+money(s.monto);
+        document.getElementById('gx-tj-period').value=period;
+        document.getElementById('gx-tj-reason').value=rec?.motivo || 'Falla técnica';
+        document.getElementById('gx-tj-delete').style.display=rec?.id?'block':'none';
+        document.getElementById('gx-tj-overlay').classList.add('show');
+        document.getElementById('gx-tj-overlay').setAttribute('aria-hidden','false');
+        document.body.style.overflow='hidden';
+        refresh();
+    };
+    window.gxCloseTratoJusto=function(){
+        const el=document.getElementById('gx-tj-overlay');
+        if(el){el.classList.remove('show');el.setAttribute('aria-hidden','true')}
+        document.body.style.overflow='';
+    };
+    window.gxTJStep=function(delta){tj.days=Math.max(1,Math.min(10,tj.days+Number(delta||0)));refresh()};
+
+    window.gxSaveTratoJusto=async function(){
+        const c=clientesDict?.[tj.key],s=currentService();
+        if(!c||!s||typeof gxTratoJustoAction!=='function')return;
+        const period=document.getElementById('gx-tj-period').value;
+        const reason=document.getElementById('gx-tj-reason').value;
+        if(!/^\d{4}-\d{2}$/.test(period)) return alert('❌ Selecciona un periodo válido.');
+        try{
+            const r=await gxTratoJustoAction('guardar_compensacion',{
+                cliente_id:c._id,
+                cliente_servicio_id:s._id||s.id,
+                periodo:period+'-01',
+                dias_falla:tj.days,
+                motivo:reason
+            });
+            gxCloseTratoJusto();
+            if(typeof gxReloadAdminClient==='function') await gxReloadAdminClient(tj.key);
+            alert(`✅ Trato Justo aplicado.\n\n${s.nombre}\n${tj.days} día${tj.days===1?'':'s'} · ${tj.days*5}%\nDescuento: -$${money(r.compensacion?.monto)}`);
+        }catch(e){
+            console.error(e);alert('❌ No se pudo guardar Trato Justo.\n\n'+(e?.message||e));
+        }
+    };
+
+    window.gxDeleteTratoJusto=async function(){
+        if(!tj.record?.id || typeof gxTratoJustoAction!=='function')return;
+        if(!confirm('¿Eliminar esta compensación de Trato Justo?'))return;
+        try{
+            await gxTratoJustoAction('eliminar_compensacion',{id:tj.record.id});
+            gxCloseTratoJusto();
+            if(typeof gxReloadAdminClient==='function') await gxReloadAdminClient(tj.key);
+            alert('✅ Compensación eliminada.');
+        }catch(e){console.error(e);alert('❌ No se pudo eliminar la compensación.\n\n'+(e?.message||e))}
+    };
+})();
+</script>
+
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · v1.0.0</div>
 </body>
 </html>
