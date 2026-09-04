@@ -1423,8 +1423,8 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                                 <div><strong>Ronda ${gamifConfig.cupon_ciclo || 1}</strong><small>${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? 'Cupón reclamado' : 'Cupón pendiente de completar'}</small></div>
                             </div>
                             <div class="gx-client-mission-admin-actions">
-                                <button type="button" class="reset" onclick="reiniciarMisionesClienteBeta('${key}')">↻ Reiniciar progreso</button>
-                                <button type="button" class="round" onclick="nuevaRondaCuponBeta('${key}')">🎟️ Nueva ronda</button>
+                                <button type="button" class="reset" onclick="reiniciarMisionesCliente('${key}')">↻ Reiniciar progreso</button>
+                                <button type="button" class="round" onclick="nuevaRondaCupon('${key}')">🎟️ Nueva ronda</button>
                             </div>
                         </div>
                     </details>
@@ -1639,7 +1639,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
     <!-- GOXION ADMIN // CAPA SUPABASE V2
          Mantiene intacta la interfaz y añade diagnóstico visible. -->
-    <script id="goxion-supabase-beta">
+    <script id="goxion-admin-supabase-layer">
     (() => {
         const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
@@ -1911,7 +1911,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         function adaptarRespuestaAdmin(data) {
             const root = unwrapRoot(data);
 
-            // admin-datos-beta ya entrega las notificaciones administrativas.
+            // admin-datos entrega las notificaciones administrativas.
             // Las conservamos en memoria para que la campana, el punto rojo y
             // "Marcar leídas" trabajen con datos reales y no solo con alertas sintéticas.
             window.gxAdminNotifications = Array.isArray(root.notificaciones)
@@ -2693,7 +2693,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
-        async function ajusteBeta(accion, datos = {}) {
+        async function ajusteAdmin(accion, datos = {}) {
             const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
             if (!token) throw new Error("Sesión administrativa no disponible.");
 
@@ -2718,7 +2718,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
         async function cargarStockManual() {
             try {
-                const r = await ajusteBeta("obtener_stock_manual");
+                const r = await ajusteAdmin("obtener_stock_manual");
                 const mapa = new Map((r.stock || []).map(x => [String(x.id), x.stock_manual]));
 
                 configGlobal.serviciosGlobales.forEach(s => {
@@ -2759,7 +2759,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             const stockManual = limpio === "" ? null : Math.max(0, parseInt(limpio) || 0);
 
             try {
-                const r = await ajusteBeta("guardar_stock_manual", {
+                const r = await ajusteAdmin("guardar_stock_manual", {
                     id: s.id || s._id,
                     stock_manual: stockManual
                 });
@@ -2786,7 +2786,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             try {
                 if (isChecked) {
                     const actual = c.referido_activo || {};
-                    await ajusteBeta("guardar_referido", {
+                    await ajusteAdmin("guardar_referido", {
                         cliente_id: c._id,
                         nombre: actual.nombre || "",
                         plataformas: Number(actual.plataformas || 2),
@@ -2847,7 +2847,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             c.referido_activo = actual;
 
             try {
-                const r = await ajusteBeta("guardar_referido", {
+                const r = await ajusteAdmin("guardar_referido", {
                     cliente_id: c._id,
                     nombre: actual.nombre || "",
                     plataformas: Number(actual.plataformas || 2),
@@ -2868,7 +2868,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         };
 
 
-        window.reiniciarMisionesClienteBeta = async function(key) {
+        window.reiniciarMisionesCliente = async function(key) {
             const c = clientesDict[key];
             if(!c?._id) {
                 alert("No encontré el cliente en memoria.");
@@ -2882,7 +2882,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
 
             try {
-                const result = await ajusteBeta("reiniciar_misiones_cliente", {
+                const result = await ajusteAdmin("reiniciar_misiones_cliente", {
                     cliente_id: c._id
                 });
 
@@ -2900,7 +2900,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         };
 
 
-        window.nuevaRondaCuponBeta = async function(key) {
+        window.nuevaRondaCupon = async function(key) {
             const c = clientesDict[key];
             if(!c?._id) {
                 alert("No encontré el cliente en memoria.");
@@ -2914,7 +2914,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
 
             try {
-                const result = await ajusteBeta("nueva_ronda_cupon", {
+                const result = await ajusteAdmin("nueva_ronda_cupon", {
                     cliente_id: c._id
                 });
 
@@ -3135,7 +3135,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!r.ok || j?.ok !== true) throw new Error(j?.error || `HTTP ${r.status}`);
         return j;
     }
-    window.gxOpsBeta = ops;
+    window.gxOps = ops;
 
     // ---------- Mission Builder ----------
     function tagOption(tag) {
@@ -3445,30 +3445,9 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         }catch(e){alert("No se pudo procesar el pago.\n\n"+e.message)}
     }
     window.gxPaymentApprove=()=>paymentAction("approve");
-    window.gxPaymentIncomplete=()=>{document.getElementById("gx-missing-amount-wrap").classList.add("show");const note=document.getElementById("gx-payment-note");if(!note.value)note.value="Tu pago está incompleto. Por favor revisa el monto faltante y vuelve a enviar el comprobante."; if(confirm("¿Marcar este pago como INCOMPLETO y registrar el aviso?"))paymentAction("incomplete")};
+    
     window.gxPaymentReject=()=>{if(confirm("¿Rechazar este comprobante? La lealtad no aumentará."))paymentAction("reject")};
 
-    // ---------- Smart referrals ----------
-    window.gxReferralSmartMonths=function(r){
-        if(!r)return 0;
-        if(r.meses_override!==null && r.meses_override!==undefined)return Math.min(3,Math.max(0,Number(r.meses_override)||0));
-        if((r.servicios||[]).length<2)return Math.min(3,Math.max(0,Number(r.meses)||0));
-        const start=new Date(r.fecha_inicio||Date.now()); if(Number.isNaN(start.getTime()))return Number(r.meses||0);
-        const now=new Date();let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());if(now.getDate()<start.getDate())months--;return Math.min(3,Math.max(0,months));
-    };
-    window.gxSaveReferralSmart=async function(key,patch={}){
-        const c=clientesDict?.[key],r=c?.referido_activo;if(!c?._id||!r)return;
-        Object.assign(r,patch);
-        try{
-            const x=await ops("guardar_referido_inteligente",{cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios||[],fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)});
-            c.referido_activo={...r,...x.referido};
-            setTimeout(()=>{filtrarClientes();gxOpenClientFocus(key)},80);
-        }catch(e){alert("No se pudo guardar el referido.\n\n"+e.message)}
-    };
-    window.gxToggleReferralService=function(key,name,checked){
-        const r=clientesDict?.[key]?.referido_activo;if(!r)return;
-        const set=new Set(r.servicios||[]);checked?set.add(name):set.delete(name);r.servicios=[...set];gxSaveReferralSmart(key,{servicios:r.servicios});
-    };
 
     // ---------- Summary enrichment ----------
     const originalSummary=window.gxUpdateOperationsSummary;
@@ -3490,7 +3469,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 </script>
 
 
-<script id="goxion-admin-ops-v3-fixes">
+<script id="goxion-admin-payment-referral-guards">
 (() => {
     // Hard guard: if modal/drawer ever disappear from the DOM, explain it instead of failing silently.
     const oldToggle = window.gxToggleNotifications;
@@ -3526,7 +3505,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!wrap?.classList.contains("show")) return gxPreparePaymentIncomplete();
         if(!confirm("¿Confirmar este pago como INCOMPLETO y registrar el aviso?")) return;
 
-        // Call the existing beta action directly using public helper.
+        // Ejecuta la operación administrativa usando el helper público.
         const key = document.getElementById("gx-payment-client-meta")?.dataset?.key;
         // Existing V2 closure doesn't expose context; infer active client from focus name/folio.
         let foundKey = null;
@@ -3541,7 +3520,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const amount = Number(document.getElementById("gx-missing-amount")?.value || 0);
         const msg = document.getElementById("gx-payment-note")?.value.trim() || `Detectamos un pago incompleto${amount>0?` por $${amount}`:""}.`;
         try {
-            await gxOpsBeta("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+            await gxOps("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
             c.estado="pendiente"; c.pago_en_revision=false; c.pago_revision_estado="incompleto"; c.pago_revision_mensaje=msg; c.pago_revision_monto_faltante=amount;
             gxClosePaymentModal(); gxCloseClientFocus(); filtrarClientes(); gxUpdateOperationsSummary();
             alert("⚠️ Pago marcado como incompleto.");
@@ -3553,7 +3532,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!c?._id || !r) return;
         if(!confirm(`¿Reiniciar el progreso de ${r.nombre || "este referido"} a 0/3 desde hoy?\n\nSe conservarán el referido y los servicios seleccionados.`)) return;
         try {
-            const x = await gxOpsBeta("reiniciar_referido_inteligente",{cliente_id:c._id});
+            const x = await gxOps("reiniciar_referido_inteligente",{cliente_id:c._id});
             c.referido_activo = {...r,...x.referido, meses:0, meses_override:null, beneficio_reclamado:false, beneficio_reclamado_at:null};
             gxCloseClientFocus();
             if(typeof inicializarPanel === "function") await inicializarPanel();
@@ -3566,7 +3545,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!c?._id || !r) return;
         if(!confirm(`¿Eliminar el referido "${r.nombre || "activo"}"?\n\nEsta acción quitará el registro activo de este cliente.`)) return;
         try {
-            await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+            await gxOps("eliminar_referido_inteligente",{cliente_id:c._id});
             c.referido_activo = null;
             gxCloseClientFocus();
             if(typeof inicializarPanel === "function") await inicializarPanel();
@@ -3629,7 +3608,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         updateRefUI(key);
         try{
             const c=clientesDict[key];
-            const x=await gxOpsBeta("guardar_referido_inteligente",{
+            const x=await gxOps("guardar_referido_inteligente",{
                 cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios,fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)
             });
             Object.assign(r,x.referido||{});
@@ -3654,7 +3633,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         Object.assign(r,patch); updateRefUI(key);
         try{
             const c=clientesDict[key];
-            const x=await gxOpsBeta("guardar_referido_inteligente",{
+            const x=await gxOps("guardar_referido_inteligente",{
                 cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios||[],fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)
             });
             Object.assign(r,x.referido||{});
@@ -3666,7 +3645,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     window.gxAdjustReferralMonth = async function(key,delta){
         const c=clientesDict?.[key],r=refObj(key); if(!c?._id||!r)return;
         try{
-            const x=await gxOpsBeta("ajustar_meses_referido",{cliente_id:c._id,delta});
+            const x=await gxOps("ajustar_meses_referido",{cliente_id:c._id,delta});
             Object.assign(r,x.referido||{}); r.meses_override=x.meses_efectivos; r.meses_efectivos=x.meses_efectivos;
             updateRefUI(key);
         }catch(e){ alert("No se pudo ajustar el progreso.\n\n"+e.message); }
@@ -3675,7 +3654,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     window.gxReferralAutoMode = async function(key){
         const c=clientesDict?.[key],r=refObj(key); if(!c?._id||!r)return;
         try{
-            const x=await gxOpsBeta("modo_automatico_referido",{cliente_id:c._id});
+            const x=await gxOps("modo_automatico_referido",{cliente_id:c._id});
             Object.assign(r,x.referido||{}); r.meses_override=null; r.meses_efectivos=x.meses_efectivos;
             updateRefUI(key);
         }catch(e){ alert("No se pudo volver al modo automático.\n\n"+e.message); }
@@ -3772,7 +3751,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         gxUpdateLinkedReferralUI(referrerKey);
 
         try{
-            const x=await gxOpsBeta("guardar_referido_inteligente",{
+            const x=await gxOps("guardar_referido_inteligente",{
                 cliente_id:referrer._id,
                 nombre:r.nombre,
                 servicios:r.servicios,
@@ -3811,14 +3790,14 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         try{
             if(isChecked){
                 const today=new Date().toISOString().slice(0,10);
-                await gxOpsBeta("guardar_referido_inteligente",{
+                await gxOps("guardar_referido_inteligente",{
                     cliente_id:c._id,
                     nombre:"",
                     servicios:[],
                     fecha_inicio:today
                 });
             }else{
-                await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+                await gxOps("eliminar_referido_inteligente",{cliente_id:c._id});
             }
 
             if(typeof gxCloseClientFocus==="function") gxCloseClientFocus();
