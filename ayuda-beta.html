@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.4-beta-wave-01">
+<html lang="es" data-goxion-version="1.0.5-beta-wave-02">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -70,7 +70,7 @@
             100% { transform: scale(1); opacity: 1; } 
         }
 
-        /* === GOXION BETA BACKGROUND // WAVE LAB 01 === */
+        /* === GOXION BETA BACKGROUND // WAVE LAB 02 · DUAL INVERSE RIBBONS === */
         .bg {
             position: fixed;
             inset: 0;
@@ -78,8 +78,8 @@
             overflow: hidden;
             pointer-events: none;
             background:
-                radial-gradient(circle at 18% 12%, rgba(124, 77, 255, .055), transparent 34rem),
-                radial-gradient(circle at 88% 78%, rgba(0, 242, 254, .045), transparent 36rem),
+                radial-gradient(circle at 18% 10%, rgba(124, 77, 255, .045), transparent 34rem),
+                radial-gradient(circle at 86% 82%, rgba(0, 242, 254, .040), transparent 36rem),
                 #030305;
         }
 
@@ -89,8 +89,8 @@
             width: 100%;
             height: 100%;
             display: block;
-            opacity: .96;
-            filter: saturate(1.08);
+            opacity: .94;
+            filter: saturate(1.10);
             transform: translateZ(0);
         }
 
@@ -5967,8 +5967,6 @@ window.closeGamif = function() {
         uniform float u_time;
         uniform float u_motion;
 
-        #define PI 3.14159265359
-
         float hash21(vec2 p) {
             p = fract(p * vec2(123.34, 456.21));
             p += dot(p, p + 45.32);
@@ -5986,14 +5984,81 @@ window.closeGamif = function() {
             );
         }
 
-        vec3 palette(float t) {
+        vec3 goxionPalette(float t) {
             vec3 purple = vec3(0.47, 0.15, 1.00);
+            vec3 violet = vec3(0.35, 0.20, 1.00);
             vec3 blue   = vec3(0.05, 0.42, 1.00);
             vec3 cyan   = vec3(0.00, 0.95, 1.00);
-            vec3 white  = vec3(0.96, 0.99, 1.00);
-            if (t < 0.35) return mix(purple, blue, smoothstep(0.0, 0.35, t));
-            if (t < 0.72) return mix(blue, cyan, smoothstep(0.35, 0.72, t));
-            return mix(cyan, white, smoothstep(0.72, 1.0, t));
+            vec3 ice    = vec3(0.84, 0.98, 1.00);
+
+            t = fract(t);
+            if (t < 0.24) return mix(purple, violet, smoothstep(0.00, 0.24, t));
+            if (t < 0.53) return mix(violet, blue, smoothstep(0.24, 0.53, t));
+            if (t < 0.82) return mix(blue, cyan, smoothstep(0.53, 0.82, t));
+            return mix(cyan, ice, smoothstep(0.82, 1.00, t));
+        }
+
+        vec3 ribbonLayer(
+            vec2 p,
+            vec2 uv,
+            float t,
+            float inverse,
+            float strength,
+            float phase,
+            float widthBase
+        ) {
+            // Curva vertical tipo S, inspirada en la referencia, con movimiento opuesto.
+            float y = p.y;
+            float dir = inverse;
+            float drift = 0.12 * sin(t * 0.15 * dir + phase);
+            float bend =
+                0.42 * sin(y * 1.28 + t * 0.19 * dir + phase) +
+                0.12 * sin(y * 2.72 - t * 0.11 * dir + phase * 0.70) +
+                0.035 * sin(y * 5.10 + t * 0.08 * dir);
+
+            // Separa los dos ribbons sin hacerlos simétricos perfectos.
+            float lane = inverse > 0.0 ? 0.10 : -0.16;
+            float xCenter = bend + drift + lane;
+            xCenter += (noise(vec2(y * 1.35 + phase, t * 0.032 + phase)) - 0.5) * 0.045;
+
+            float d = abs(p.x - xCenter);
+
+            // Cuerpo ancho con variación suave: no debe parecer una simple línea de neón.
+            float breathe = widthBase * (0.90 + 0.13 * sin(y * 1.8 - t * 0.16 * dir + phase));
+            float body  = smoothstep(breathe, 0.0, d);
+            float inner = smoothstep(breathe * 0.56, 0.0, d);
+            float hot   = smoothstep(breathe * 0.16, 0.0, d);
+
+            // Halo de varias capas para dar profundidad tipo ribbon.
+            float glowNear = exp(-d * 7.4) * 0.56;
+            float glowFar  = exp(-d * 3.0) * 0.20;
+            float haze     = exp(-d * 1.28) * 0.050;
+
+            // Color viaja en sentido contrario entre ambas bandas.
+            float flow = fract(
+                uv.y * (inverse > 0.0 ? 0.82 : -0.76) +
+                t * 0.055 * dir +
+                phase +
+                0.055 * sin(p.x * 1.6)
+            );
+            vec3 base = goxionPalette(flow);
+
+            // El brillo no es uniforme: aparecen zonas más intensas y otras más discretas.
+            float pulse = 0.76 + 0.24 * sin(y * 1.18 - t * 0.24 * dir + phase * 3.0);
+            pulse = 0.62 + 0.38 * smoothstep(-0.55, 0.90, pulse);
+
+            vec3 col = vec3(0.0);
+            col += base * glowFar * 0.82;
+            col += base * glowNear * 0.90;
+            col += base * body * 0.74;
+            col += mix(base, vec3(0.78, 0.96, 1.0), 0.50) * inner * 0.42;
+            col += vec3(0.96, 0.995, 1.0) * hot * 0.72;
+            col += base * haze;
+
+            // Afinado de los extremos para que parezca que entra y sale del viewport.
+            float edgeTaper = smoothstep(-1.62, -1.28, y) * (1.0 - smoothstep(1.28, 1.62, y));
+            col *= strength * pulse * edgeTaper;
+            return col;
         }
 
         void main() {
@@ -6004,57 +6069,27 @@ window.closeGamif = function() {
 
             float t = u_time * u_motion;
 
-            // Trayectoria principal: diagonal amplia y viva.
-            float x = p.x;
-            float travel = sin(t * 0.17) * 0.11;
-            float yCenter =
-                0.28 * sin(x * 1.55 + t * 0.42) +
-                0.10 * sin(x * 3.10 - t * 0.24) +
-                0.035 * sin(x * 6.20 + t * 0.14) +
-                (x * 0.24) + travel - 0.02;
+            // Ribbon principal: morado -> azul -> cian, mayor presencia.
+            vec3 ribbonA = ribbonLayer(p, uv, t, 1.0, 1.00, 0.25, 0.100);
 
-            float micro = (noise(vec2(x * 1.6 + t * 0.09, t * 0.035)) - 0.5) * 0.055;
-            yCenter += micro;
+            // Ribbon secundario: recorrido inverso, más fino y tenue.
+            // Está desfasado para que no compita ni forme una X rígida constantemente.
+            vec3 ribbonB = ribbonLayer(p, uv, t, -1.0, 0.46, 2.55, 0.072);
 
-            float d = abs(p.y - yCenter);
+            vec3 col = ribbonA + ribbonB;
 
-            // Respiración de grosor para evitar una cinta rígida.
-            float breathe = 0.105 + 0.020 * sin(x * 2.2 - t * 0.31);
-            float core = smoothstep(breathe, 0.0, d);
-            float inner = smoothstep(breathe * 0.62, 0.0, d);
-            float hot = smoothstep(breathe * 0.20, 0.0, d);
+            // Ambiente mínimo siguiendo la identidad de GOXION.
+            float ambientA = exp(-length((uv - vec2(0.16, 0.18)) * vec2(1.15, 0.82)) * 5.0);
+            float ambientB = exp(-length((uv - vec2(0.88, 0.80)) * vec2(1.10, 0.86)) * 5.2);
+            col += vec3(0.25, 0.08, 0.62) * ambientA * 0.030;
+            col += vec3(0.00, 0.46, 0.58) * ambientB * 0.026;
 
-            // Glow por capas.
-            float glow1 = exp(-d * 8.0) * 0.50;
-            float glow2 = exp(-d * 3.6) * 0.20;
-            float haze  = exp(-d * 1.55) * 0.055;
+            // Mantiene negro profundo alrededor y reduce competencia con las tarjetas.
+            float vignette = smoothstep(1.46, 0.18, length((uv - 0.5) * vec2(1.02, 0.72)));
+            col *= mix(0.78, 1.0, vignette);
 
-            // Color fluye a lo largo de la cinta.
-            float flow = fract(uv.x * 0.78 + 0.12 * sin(t * 0.18) + 0.07 * sin(p.y * 1.4));
-            vec3 waveColor = palette(flow);
-            vec3 col = vec3(0.0);
-
-            col += waveColor * glow2;
-            col += waveColor * glow1;
-            col += waveColor * core * 0.72;
-            col += mix(waveColor, vec3(0.88, 0.98, 1.0), 0.55) * inner * 0.34;
-            col += vec3(1.0, 1.0, 1.0) * hot * 0.82;
-
-            // Segunda reflexión muy tenue, no una segunda onda real.
-            float dEcho = abs(p.y - (yCenter - 0.22 - 0.025 * sin(x * 2.7 + t * 0.2)));
-            col += palette(fract(flow + 0.18)) * exp(-dEcho * 5.5) * 0.035;
-
-            // Luz ambiental alrededor del recorrido.
-            col += palette(fract(flow + 0.08)) * haze;
-
-            // Atenuación hacia bordes y parte inferior para no competir con UI.
-            float vignette = smoothstep(1.50, 0.18, length(p * vec2(0.70, 0.48)));
-            float topBias = mix(0.72, 1.0, smoothstep(0.0, 0.78, uv.y));
-            col *= mix(0.72, 1.0, vignette) * topBias;
-
-            // Alpha dependiente de luminancia mantiene el negro real de fondo.
             float lum = max(col.r, max(col.g, col.b));
-            float alpha = clamp(lum * 0.96, 0.0, 0.92);
+            float alpha = clamp(lum * 0.93, 0.0, 0.90);
             gl_FragColor = vec4(col, alpha);
         }
     `;
@@ -6064,7 +6099,7 @@ window.closeGamif = function() {
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            console.warn('GOXION Wave shader:', gl.getShaderInfoLog(shader));
+            console.warn('GOXION Wave 02 shader:', gl.getShaderInfoLog(shader));
             gl.deleteShader(shader);
             return null;
         }
@@ -6080,7 +6115,7 @@ window.closeGamif = function() {
     gl.attachShader(program, fs);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.warn('GOXION Wave program:', gl.getProgramInfoLog(program));
+        console.warn('GOXION Wave 02 program:', gl.getProgramInfoLog(program));
         canvas.style.display = 'none';
         return;
     }
@@ -6133,10 +6168,10 @@ window.closeGamif = function() {
     window.addEventListener('resize', resize, {passive:true});
     resize();
     raf = requestAnimationFrame(frame);
-    console.info('GOXION Beta Background: Wave Lab 01 activo.');
+    console.info('GOXION Beta Background: Wave Lab 02 · dual inverse ribbons activo.');
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.4 · BETA WAVE 01</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.5 · BETA WAVE 02</div>
 </body>
 </html>
