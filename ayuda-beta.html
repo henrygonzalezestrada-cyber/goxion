@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.8-beta-wave-02-3">
+<html lang="es" data-goxion-version="1.0.9-beta-wave-02-4">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -5968,12 +5968,34 @@ window.closeGamif = function() {
             return u*u*u*a + 3.0*u*u*t*b + 3.0*u*t*t*c + t*t*t*d;
         }
 
-        vec3 goxionPalette(float t) {
+        float gauss(float x, float s) {
+            return exp(-(x*x) / max(0.0001, 2.0*s*s));
+        }
+
+        vec3 fluidPalette(float along, float time, float bulge) {
             vec3 purple = vec3(0.48, 0.16, 1.00);
-            vec3 blue   = vec3(0.08, 0.30, 0.86);
-            vec3 cyan   = vec3(0.00, 0.82, 0.96);
-            if (t < 0.48) return mix(purple, blue, smoothstep(0.0, 0.48, t));
-            return mix(blue, cyan, smoothstep(0.48, 1.0, t));
+            vec3 blue   = vec3(0.08, 0.28, 0.92);
+            vec3 cyan   = vec3(0.00, 0.88, 1.00);
+
+            // No fract(), no hard palette thresholds: all three colors overlap continuously.
+            float globalMood = 0.5 + 0.5 * sin(time * 0.43);
+            float local = along * 5.0 - time * 0.72 + 0.35 * sin(time * 0.27);
+
+            float wp = 0.22 + 0.78 * pow(0.5 + 0.5 * cos(local + 0.10), 2.0);
+            float wb = 0.25 + 0.75 * pow(0.5 + 0.5 * cos(local - 2.05), 2.0);
+            float wc = 0.22 + 0.78 * pow(0.5 + 0.5 * cos(local + 2.12), 2.0);
+
+            // The whole ribbon slowly changes "mood" like the Revolut reference.
+            wp *= mix(1.15, 0.72, globalMood);
+            wc *= mix(0.72, 1.18, globalMood);
+            wb *= 0.95 + 0.16 * sin(time * 0.31 + along * 2.3);
+
+            // The swollen luminous section receives slightly more blue/cyan energy.
+            wc *= 1.0 + 0.28 * bulge;
+            wb *= 1.0 + 0.16 * bulge;
+
+            float sum = max(wp + wb + wc, 0.001);
+            return (purple * wp + blue * wb + cyan * wc) / sum;
         }
 
         void main() {
@@ -5984,39 +6006,34 @@ window.closeGamif = function() {
 
             float t = u_time * u_motion;
 
-            // WAVE 02.3 // Revolut-style living ribbon:
-            // the path travels, flexes and changes silhouette continuously.
-            float travel = t * 0.34;
-            float driftX = 0.24 * sin(travel * 0.71)
-                         + 0.07 * sin(travel * 1.37 + 1.6);
-            float driftY = 0.11 * sin(travel * 0.53 + 0.9)
-                         + 0.035 * sin(travel * 1.21);
+            // WAVE 02.4 // fluid ribbon rebuilt from the visual behavior in the reference.
+            // It is one deformable luminous surface, not a colored line.
+            float slow = t * 0.46;
+            float side = 0.16 * sin(slow * 0.42) + 0.055 * sin(slow * 0.91 + 1.4);
+            float lift = 0.075 * sin(slow * 0.53 + 0.8);
+            float open = 0.10 * sin(slow * 0.37 + 2.1);
 
-            float bendA = 0.17 * sin(travel * 0.83 + 0.4);
-            float bendB = 0.13 * sin(travel * 0.61 + 2.2);
-            float sway  = 0.10 * sin(travel * 0.39 + 1.1);
+            // Large sweeping arc: enters high, bows to the right, exits low/left.
+            // Each control point moves independently so the silhouette constantly morphs.
+            vec2 a = vec2(-0.30 + side,  0.68 + lift);
+            vec2 b = vec2( 0.72 + side*0.30 + open,  0.48 + 0.10*sin(slow*0.71));
+            vec2 c = vec2( 0.72 - side*0.25 - open, -0.24 + 0.12*sin(slow*0.61 + 1.7));
+            vec2 d = vec2(-0.58 - side*0.50, -0.60 + lift*0.45);
 
-            vec2 a = vec2(-0.94 + driftX + sway,       -0.45 + driftY);
-            vec2 b = vec2(-0.44 + driftX - bendB,       0.01 + bendA + driftY);
-            vec2 c = vec2( 0.20 + driftX + bendA*0.55,  0.30 - bendB + driftY);
-            vec2 d = vec2( 0.90 + driftX - sway*0.65,   0.65 + driftY);
-
-            // Independent control-point motion prevents the ribbon from looking
-            // like one rigid line sliding across the screen.
-            b.x += 0.075 * sin(t * 0.29 + 0.3);
-            b.y += 0.060 * sin(t * 0.41 + 1.8);
-            c.x += 0.085 * sin(t * 0.33 + 2.4);
-            c.y += 0.070 * sin(t * 0.37 + 0.7);
+            a.x += 0.08 * sin(t * 0.22 + 0.5);
+            b.y += 0.08 * sin(t * 0.29 + 2.0);
+            c.x += 0.10 * sin(t * 0.25 + 1.2);
+            d.y += 0.07 * sin(t * 0.31 + 2.7);
 
             float minD = 10.0;
             float along = 0.0;
             vec2 nearest = vec2(0.0);
+            vec2 tangent = vec2(1.0, 0.0);
 
-            // Continuous distance to connected Bezier segments.
-            // This avoids the visible "beads/caterpillar" produced by point sampling.
+            // Dense connected-segment distance: smooth on iPhone, no bead/oruga effect.
             vec2 prev = bezier(a, b, c, d, 0.0);
-            for (int i = 1; i < 72; i++) {
-                float q = float(i) / 71.0;
+            for (int i = 1; i < 96; i++) {
+                float q = float(i) / 95.0;
                 vec2 curr = bezier(a, b, c, d, q);
                 vec2 seg = curr - prev;
                 float seg2 = max(dot(seg, seg), 0.000001);
@@ -6025,64 +6042,76 @@ window.closeGamif = function() {
                 float dd = length(p - proj);
                 if (dd < minD) {
                     minD = dd;
-                    float q0 = float(i - 1) / 71.0;
+                    float q0 = float(i - 1) / 95.0;
                     along = mix(q0, q, h);
                     nearest = proj;
+                    tangent = normalize(seg + vec2(0.00001, 0.0));
                 }
                 prev = curr;
             }
 
-            // Organic thickness is animated in both space and time.
-            // The ribbon visibly expands/contracts instead of keeping one static width.
-            float widthWave = 0.5
-                            + 0.5 * sin(along * 8.4 - t * 1.10
-                                      + 0.55 * sin(t * 0.43));
-            float breathing = 0.5 + 0.5 * sin(t * 0.72 + along * 3.1);
-            float width = 0.038
-                        + 0.023 * widthWave
-                        + 0.010 * breathing;
+            vec2 normal = vec2(-tangent.y, tangent.x);
+            float signedSide = dot(p - nearest, normal);
 
-            float core  = 1.0 - smoothstep(width * 0.16, width * 0.62, minD);
-            float body  = 1.0 - smoothstep(width * 0.58, width * 1.15, minD);
-            float glow1 = exp(-pow(minD * 13.5, 1.35));
-            float glow2 = exp(-pow(minD * 6.5, 1.25));
+            // Revolut-like width behavior: a broad "body" travels and breathes while tails stay fine.
+            // Positions oscillate instead of wrapping, so there is never a visible seam.
+            float bulgePos = 0.50 + 0.24 * sin(t * 0.34 + 0.35*sin(t*0.17));
+            float bulge2Pos = 0.28 + 0.17 * sin(t * 0.23 + 2.0);
+            float bulge  = gauss(along - bulgePos, 0.15);
+            float bulge2 = gauss(along - bulge2Pos, 0.12);
+            float breath = 0.5 + 0.5 * sin(t * 0.57 + along * 4.2);
 
-            // A bright pulse travels along the ribbon instead of rocking slowly in place.
-            float pulsePos = fract(t * 0.095);
-            float pulseDelta = abs(along - pulsePos);
-            pulseDelta = min(pulseDelta, 1.0 - pulseDelta);
-            float pulse = exp(-pow(pulseDelta * 5.5, 2.0));
+            float endTaper = smoothstep(0.00, 0.08, along) * smoothstep(1.00, 0.90, along);
+            float width = (0.013
+                         + 0.058 * bulge
+                         + 0.027 * bulge2
+                         + 0.010 * breath) * endTaper;
 
-            // Faster color circulation: purple -> blue -> cyan keeps flowing
-            // while the geometry moves independently.
-            float colorFlow = fract(along * 0.72 - t * 0.085
-                                  + 0.055 * sin(t * 0.63 + along * 5.0));
-            vec3 wave = goxionPalette(colorFlow);
-            vec3 hot = mix(wave, vec3(0.90, 0.97, 1.0), 0.28 + 0.26 * pulse);
+            // Slight asymmetric expansion makes it feel like a ribbon/surface rather than a tube.
+            width *= 1.0 + 0.18 * sin(t * 0.41 + along * 5.5);
+            float sideWarp = signedSide * (1.0 + 0.26 * sin(t*0.33 + along*6.0));
+            float d = abs(sideWarp);
 
-            // True black base eliminates the old gray polygon/alpha artifact.
-            vec3 col = vec3(0.012, 0.012, 0.020);
+            float core = 1.0 - smoothstep(width * 0.10, width * 0.42, d);
+            float body = 1.0 - smoothstep(width * 0.40, width * 1.02, d);
+            float edge = 1.0 - smoothstep(width * 0.88, width * 1.28, d);
 
-            // Subtle colored atmosphere close to the curve only.
-            col += wave * glow2 * 0.075;
-            col += wave * glow1 * 0.24;
-            col += wave * body  * (0.31 + 0.08 * breathing);
-            col += hot  * core  * (0.30 + 0.30 * pulse);
+            // Very broad atmosphere, but tied to the continuous curve so no gray polygons/seams.
+            float haloNear = exp(-pow(d * 12.0, 1.30));
+            float haloFar  = exp(-pow(d * 5.6, 1.20));
 
-            // Soft light on the inside of the bend; this is NOT another line.
-            float inside = smoothstep(0.23, -0.02, p.x - nearest.x) * glow2;
-            col += wave * inside * 0.028;
+            vec3 wave = fluidPalette(along, t, bulge);
 
-            // Keep UI readable and corners black.
+            // A luminous hotspot glides through the ribbon and changes its apparent thickness.
+            float hotPos = 0.50 + 0.34 * sin(t * 0.47 + 0.65*sin(t*0.19));
+            float hotspot = gauss(along - hotPos, 0.10);
+            vec3 hotColor = mix(wave, vec3(0.91, 0.97, 1.0), 0.38 + 0.32*hotspot);
+
+            vec3 col = vec3(0.006, 0.007, 0.014);
+
+            // Layered light = soft volumetric ribbon, not a flat stroke.
+            col += wave * haloFar  * (0.025 + 0.055*bulge);
+            col += wave * haloNear * (0.12  + 0.12*bulge + 0.05*breath);
+            col += wave * edge     * (0.17  + 0.10*bulge);
+            col += wave * body     * (0.28  + 0.16*bulge + 0.06*breath);
+            col += hotColor * core * (0.26  + 0.42*hotspot);
+
+            // One-sided soft bloom reinforces the sense of a curved luminous sheet.
+            float innerBloom = smoothstep(width*2.8, -width*0.2, signedSide) * haloFar * bulge;
+            col += wave * innerBloom * 0.055;
+
+            // Fade ribbon endpoints naturally into black.
+            col *= 0.72 + 0.28 * endTaper;
+
+            // UI protection: dark corners and lower page remain readable.
             vec2 v = uv - 0.5;
-            float vignette = smoothstep(0.78, 0.24, length(v * vec2(0.86, 1.05)));
-            col *= 0.84 + 0.16 * vignette;
+            float vignette = smoothstep(0.82, 0.24, length(v * vec2(0.86, 1.04)));
+            col *= 0.82 + 0.18 * vignette;
 
-            // Never output transparency: fixes iOS/Safari compositing seams/gray triangles.
+            // Opaque black framebuffer avoids Safari/iOS compositing artifacts.
             gl_FragColor = vec4(col, 1.0);
         }
     `;
-
     function compile(type, source) {
         const shader = gl.createShader(type);
         gl.shaderSource(shader, source);
@@ -6162,6 +6191,6 @@ window.closeGamif = function() {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.4 · BETA WAVE 01</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.9 · BETA WAVE 02.4</div>
 </body>
 </html>
