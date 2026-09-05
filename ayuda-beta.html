@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.9-beta-wave-02-4">
+<html lang="es" data-goxion-version="1.0.11-beta-wave-02-5">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -70,14 +70,17 @@
             100% { transform: scale(1); opacity: 1; } 
         }
 
-        /* === GOXION BETA BACKGROUND // WAVE 02 · REVOLUT FLOW === */
+        /* === GOXION BETA BACKGROUND // WAVE LAB 01 === */
         .bg {
             position: fixed;
             inset: 0;
             z-index: -2;
             overflow: hidden;
             pointer-events: none;
-            background: #030305;
+            background:
+                radial-gradient(circle at 18% 12%, rgba(124, 77, 255, .055), transparent 34rem),
+                radial-gradient(circle at 88% 78%, rgba(0, 242, 254, .045), transparent 36rem),
+                #030305;
         }
 
         .gx-wave-canvas {
@@ -86,7 +89,8 @@
             width: 100%;
             height: 100%;
             display: block;
-            opacity: 1;
+            opacity: .96;
+            filter: saturate(1.08);
             transform: translateZ(0);
         }
 
@@ -94,12 +98,14 @@
             content: "";
             position: absolute;
             inset: 0;
+            background:
+                linear-gradient(to bottom, rgba(3,3,5,.08), rgba(3,3,5,.22) 46%, rgba(3,3,5,.42)),
+                radial-gradient(circle at center, transparent 20%, rgba(3,3,5,.18) 82%, rgba(3,3,5,.42) 100%);
             pointer-events: none;
-            background: radial-gradient(circle at center, transparent 38%, rgba(3,3,5,.10) 78%, rgba(3,3,5,.28) 100%);
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .gx-wave-canvas { opacity: .92; }
+            .gx-wave-canvas { opacity: .78; }
         }
 
         .container { 
@@ -5933,14 +5939,12 @@ window.closeGamif = function() {
     const canvas = document.getElementById('gx-wave-canvas');
     if (!canvas) return;
 
-    // OPAQUE canvas intentionally: prevents Safari/iOS transparent-WebGL triangle/compositing artifacts.
     const gl = canvas.getContext('webgl', {
-        alpha: false,
+        alpha: true,
         antialias: false,
         depth: false,
         stencil: false,
-        premultipliedAlpha: true,
-        preserveDrawingBuffer: false,
+        premultipliedAlpha: false,
         powerPreference: 'high-performance'
     });
 
@@ -5958,160 +5962,100 @@ window.closeGamif = function() {
     `;
 
     const fragmentSource = `
-        precision highp float;
+        precision mediump float;
         uniform vec2 u_resolution;
         uniform float u_time;
         uniform float u_motion;
 
-        vec2 bezier(vec2 a, vec2 b, vec2 c, vec2 d, float t) {
-            float u = 1.0 - t;
-            return u*u*u*a + 3.0*u*u*t*b + 3.0*u*t*t*c + t*t*t*d;
-        }
+        vec3 paletteFluid(float x, float t) {
+            vec3 purple = vec3(0.46, 0.13, 1.00);
+            vec3 blue   = vec3(0.05, 0.34, 0.96);
+            vec3 cyan   = vec3(0.00, 0.90, 1.00);
 
-        float gauss(float x, float s) {
-            return exp(-(x*x) / max(0.0001, 2.0*s*s));
-        }
+            // Three broad overlapping waves = continuous color, never hard cuts.
+            float a = 0.5 + 0.5 * sin(x * 2.20 - t * 0.78);
+            float b = 0.5 + 0.5 * sin(x * 2.20 - t * 0.78 + 2.094);
+            float c = 0.5 + 0.5 * sin(x * 2.20 - t * 0.78 + 4.188);
 
-        vec3 fluidPalette(float along, float time, float bulge) {
-            vec3 purple = vec3(0.48, 0.16, 1.00);
-            vec3 blue   = vec3(0.08, 0.28, 0.92);
-            vec3 cyan   = vec3(0.00, 0.88, 1.00);
+            a = 0.18 + 0.82 * a * a;
+            b = 0.18 + 0.82 * b * b;
+            c = 0.18 + 0.82 * c * c;
 
-            // No fract(), no hard palette thresholds: all three colors overlap continuously.
-            float globalMood = 0.5 + 0.5 * sin(time * 0.43);
-            float local = along * 5.0 - time * 0.72 + 0.35 * sin(time * 0.27);
-
-            float wp = 0.22 + 0.78 * pow(0.5 + 0.5 * cos(local + 0.10), 2.0);
-            float wb = 0.25 + 0.75 * pow(0.5 + 0.5 * cos(local - 2.05), 2.0);
-            float wc = 0.22 + 0.78 * pow(0.5 + 0.5 * cos(local + 2.12), 2.0);
-
-            // The whole ribbon slowly changes "mood" like the Revolut reference.
-            wp *= mix(1.15, 0.72, globalMood);
-            wc *= mix(0.72, 1.18, globalMood);
-            wb *= 0.95 + 0.16 * sin(time * 0.31 + along * 2.3);
-
-            // The swollen luminous section receives slightly more blue/cyan energy.
-            wc *= 1.0 + 0.28 * bulge;
-            wb *= 1.0 + 0.16 * bulge;
-
-            float sum = max(wp + wb + wc, 0.001);
-            return (purple * wp + blue * wb + cyan * wc) / sum;
+            float s = max(a + b + c, 0.001);
+            return (purple * a + blue * b + cyan * c) / s;
         }
 
         void main() {
             vec2 res = max(u_resolution, vec2(1.0));
             vec2 uv = gl_FragCoord.xy / res;
-            float aspect = res.x / res.y;
-            vec2 p = vec2((uv.x - 0.5) * aspect, uv.y - 0.5);
+            vec2 p = (gl_FragCoord.xy * 2.0 - res) / min(res.x, res.y);
 
             float t = u_time * u_motion;
+            float x = p.x;
 
-            // WAVE 02.4 // fluid ribbon rebuilt from the visual behavior in the reference.
-            // It is one deformable luminous surface, not a colored line.
-            float slow = t * 0.46;
-            float side = 0.16 * sin(slow * 0.42) + 0.055 * sin(slow * 0.91 + 1.4);
-            float lift = 0.075 * sin(slow * 0.53 + 0.8);
-            float open = 0.10 * sin(slow * 0.37 + 2.1);
+            // Living path: multiple frequencies move independently.
+            float travel = 0.16 * sin(t * 0.31);
+            float yCenter =
+                  0.30 * sin(x * 1.18 + t * 0.36)
+                + 0.11 * sin(x * 2.55 - t * 0.23 + 1.4)
+                + 0.045 * sin(x * 4.90 + t * 0.17)
+                + x * 0.18
+                + travel - 0.04;
 
-            // Large sweeping arc: enters high, bows to the right, exits low/left.
-            // Each control point moves independently so the silhouette constantly morphs.
-            vec2 a = vec2(-0.30 + side,  0.68 + lift);
-            vec2 b = vec2( 0.72 + side*0.30 + open,  0.48 + 0.10*sin(slow*0.71));
-            vec2 c = vec2( 0.72 - side*0.25 - open, -0.24 + 0.12*sin(slow*0.61 + 1.7));
-            vec2 d = vec2(-0.58 - side*0.50, -0.60 + lift*0.45);
+            // The ribbon itself bends asymmetrically over time.
+            yCenter += 0.06 * sin(t * 0.21 + x * 0.72);
 
-            a.x += 0.08 * sin(t * 0.22 + 0.5);
-            b.y += 0.08 * sin(t * 0.29 + 2.0);
-            c.x += 0.10 * sin(t * 0.25 + 1.2);
-            d.y += 0.07 * sin(t * 0.31 + 2.7);
+            float d = abs(p.y - yCenter);
 
-            float minD = 10.0;
-            float along = 0.0;
-            vec2 nearest = vec2(0.0);
-            vec2 tangent = vec2(1.0, 0.0);
+            // Moving bulges: the apparent surface swells and thins continuously.
+            float bulge1 = 0.5 + 0.5 * sin(x * 2.00 - t * 0.62);
+            float bulge2 = 0.5 + 0.5 * sin(x * 3.70 + t * 0.41 + 1.7);
+            float breathe = 0.5 + 0.5 * sin(t * 0.55 + x * 1.35);
 
-            // Dense connected-segment distance: smooth on iPhone, no bead/oruga effect.
-            vec2 prev = bezier(a, b, c, d, 0.0);
-            for (int i = 1; i < 96; i++) {
-                float q = float(i) / 95.0;
-                vec2 curr = bezier(a, b, c, d, q);
-                vec2 seg = curr - prev;
-                float seg2 = max(dot(seg, seg), 0.000001);
-                float h = clamp(dot(p - prev, seg) / seg2, 0.0, 1.0);
-                vec2 proj = prev + seg * h;
-                float dd = length(p - proj);
-                if (dd < minD) {
-                    minD = dd;
-                    float q0 = float(i - 1) / 95.0;
-                    along = mix(q0, q, h);
-                    nearest = proj;
-                    tangent = normalize(seg + vec2(0.00001, 0.0));
-                }
-                prev = curr;
-            }
+            float width = 0.055
+                        + 0.042 * bulge1 * bulge1
+                        + 0.018 * bulge2
+                        + 0.012 * breathe;
 
-            vec2 normal = vec2(-tangent.y, tangent.x);
-            float signedSide = dot(p - nearest, normal);
+            // Make one traveling thick luminous section, Revolut-style.
+            float hotWave = 0.5 + 0.5 * sin(x * 1.55 - t * 0.88);
+            width += 0.035 * hotWave * hotWave;
 
-            // Revolut-like width behavior: a broad "body" travels and breathes while tails stay fine.
-            // Positions oscillate instead of wrapping, so there is never a visible seam.
-            float bulgePos = 0.50 + 0.24 * sin(t * 0.34 + 0.35*sin(t*0.17));
-            float bulge2Pos = 0.28 + 0.17 * sin(t * 0.23 + 2.0);
-            float bulge  = gauss(along - bulgePos, 0.15);
-            float bulge2 = gauss(along - bulge2Pos, 0.12);
-            float breath = 0.5 + 0.5 * sin(t * 0.57 + along * 4.2);
+            float core  = 1.0 - smoothstep(width * 0.10, width * 0.43, d);
+            float body  = 1.0 - smoothstep(width * 0.44, width * 1.00, d);
+            float edge  = 1.0 - smoothstep(width * 0.92, width * 1.35, d);
 
-            float endTaper = smoothstep(0.00, 0.08, along) * smoothstep(1.00, 0.90, along);
-            float width = (0.013
-                         + 0.058 * bulge
-                         + 0.027 * bulge2
-                         + 0.010 * breath) * endTaper;
+            float glowNear = exp(-d * 7.6);
+            float glowFar  = exp(-d * 2.9);
 
-            // Slight asymmetric expansion makes it feel like a ribbon/surface rather than a tube.
-            width *= 1.0 + 0.18 * sin(t * 0.41 + along * 5.5);
-            float sideWarp = signedSide * (1.0 + 0.26 * sin(t*0.33 + along*6.0));
-            float d = abs(sideWarp);
+            // Fluid color travels independently of geometry.
+            vec3 wave = paletteFluid(x + 0.24 * sin(p.y * 1.4), t);
 
-            float core = 1.0 - smoothstep(width * 0.10, width * 0.42, d);
-            float body = 1.0 - smoothstep(width * 0.40, width * 1.02, d);
-            float edge = 1.0 - smoothstep(width * 0.88, width * 1.28, d);
+            // White/cyan energy hotspot moves inside the surface.
+            float hotspot = pow(0.5 + 0.5 * sin(x * 1.72 - t * 0.96 + 0.8), 5.0);
+            vec3 hot = mix(wave, vec3(0.88, 0.98, 1.0), 0.28 + 0.40 * hotspot);
 
-            // Very broad atmosphere, but tied to the continuous curve so no gray polygons/seams.
-            float haloNear = exp(-pow(d * 12.0, 1.30));
-            float haloFar  = exp(-pow(d * 5.6, 1.20));
+            vec3 col = vec3(0.0);
+            col += wave * glowFar  * (0.055 + 0.045 * bulge1);
+            col += wave * glowNear * (0.14  + 0.08  * breathe);
+            col += wave * edge     * 0.12;
+            col += wave * body     * (0.34 + 0.12 * bulge1);
+            col += hot  * core     * (0.28 + 0.36 * hotspot);
 
-            vec3 wave = fluidPalette(along, t, bulge);
+            // Subtle color cloud around the thickest area, not a second ribbon.
+            float haze = exp(-d * 1.7) * hotWave * 0.050;
+            col += wave * haze;
 
-            // A luminous hotspot glides through the ribbon and changes its apparent thickness.
-            float hotPos = 0.50 + 0.34 * sin(t * 0.47 + 0.65*sin(t*0.19));
-            float hotspot = gauss(along - hotPos, 0.10);
-            vec3 hotColor = mix(wave, vec3(0.91, 0.97, 1.0), 0.38 + 0.32*hotspot);
+            // Keep UI readable and black background truly black.
+            float vignette = smoothstep(1.55, 0.22, length(p * vec2(0.64, 0.46)));
+            col *= 0.76 + 0.24 * vignette;
 
-            vec3 col = vec3(0.006, 0.007, 0.014);
-
-            // Layered light = soft volumetric ribbon, not a flat stroke.
-            col += wave * haloFar  * (0.025 + 0.055*bulge);
-            col += wave * haloNear * (0.12  + 0.12*bulge + 0.05*breath);
-            col += wave * edge     * (0.17  + 0.10*bulge);
-            col += wave * body     * (0.28  + 0.16*bulge + 0.06*breath);
-            col += hotColor * core * (0.26  + 0.42*hotspot);
-
-            // One-sided soft bloom reinforces the sense of a curved luminous sheet.
-            float innerBloom = smoothstep(width*2.8, -width*0.2, signedSide) * haloFar * bulge;
-            col += wave * innerBloom * 0.055;
-
-            // Fade ribbon endpoints naturally into black.
-            col *= 0.72 + 0.28 * endTaper;
-
-            // UI protection: dark corners and lower page remain readable.
-            vec2 v = uv - 0.5;
-            float vignette = smoothstep(0.82, 0.24, length(v * vec2(0.86, 1.04)));
-            col *= 0.82 + 0.18 * vignette;
-
-            // Opaque black framebuffer avoids Safari/iOS compositing artifacts.
-            gl_FragColor = vec4(col, 1.0);
+            float lum = max(col.r, max(col.g, col.b));
+            float alpha = clamp(lum * 0.94, 0.0, 0.92);
+            gl_FragColor = vec4(col, alpha);
         }
     `;
+
     function compile(type, source) {
         const shader = gl.createShader(type);
         gl.shaderSource(shader, source);
@@ -6157,7 +6101,7 @@ window.closeGamif = function() {
 
     function resize() {
         const mobile = Math.min(window.innerWidth, window.innerHeight) < 760;
-        const maxDpr = mobile ? 1.20 : 1.50;
+        const maxDpr = mobile ? 1.35 : 1.65;
         const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
         const w = Math.max(1, Math.round(window.innerWidth * dpr));
         const h = Math.max(1, Math.round(window.innerHeight * dpr));
@@ -6171,26 +6115,25 @@ window.closeGamif = function() {
     function frame(now) {
         if (!visible) return;
         resize();
-        gl.useProgram(program);
-        gl.uniform1f(uTime, (now - start) * 0.001);
-        gl.uniform1f(uMotion, reduced.matches ? 0.20 : 1.0);
+        gl.uniform1f(uTime, (now - start) / 1000);
+        gl.uniform1f(uMotion, reduced.matches ? 0.0 : 1.0);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         raf = requestAnimationFrame(frame);
     }
 
     document.addEventListener('visibilitychange', () => {
         visible = !document.hidden;
-        if (visible && !raf) raf = requestAnimationFrame(frame);
-        if (!visible && raf) { cancelAnimationFrame(raf); raf = 0; }
+        if (visible) { cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); }
+        else cancelAnimationFrame(raf);
     });
-    window.addEventListener('resize', resize, { passive: true });
-    reduced.addEventListener?.('change', () => {});
 
+    window.addEventListener('resize', resize, {passive:true});
     resize();
     raf = requestAnimationFrame(frame);
+    console.info('GOXION Beta Background: Wave 02.5 Compatible activo.');
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.9 · BETA WAVE 02.4</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.11 · BETA WAVE 02.5</div>
 </body>
 </html>
