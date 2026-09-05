@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.5-beta-wave-02-revolut">
+<html lang="es" data-goxion-version="1.0.7-beta-wave-02-2">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -5970,8 +5970,8 @@ window.closeGamif = function() {
 
         vec3 goxionPalette(float t) {
             vec3 purple = vec3(0.48, 0.16, 1.00);
-            vec3 blue   = vec3(0.06, 0.38, 1.00);
-            vec3 cyan   = vec3(0.00, 0.90, 1.00);
+            vec3 blue   = vec3(0.08, 0.30, 0.86);
+            vec3 cyan   = vec3(0.00, 0.82, 0.96);
             if (t < 0.48) return mix(purple, blue, smoothstep(0.0, 0.48, t));
             return mix(blue, cyan, smoothstep(0.48, 1.0, t));
         }
@@ -6004,24 +6004,32 @@ window.closeGamif = function() {
             float along = 0.0;
             vec2 nearest = vec2(0.0);
 
-            // Distance to sampled cubic Bezier; stable on mobile and visually much closer to Revolut's ribbon.
-            for (int i = 0; i < 44; i++) {
-                float q = float(i) / 43.0;
-                vec2 bp = bezier(a, b, c, d, q);
-                float dd = length(p - bp);
+            // Continuous distance to connected Bezier segments.
+            // This avoids the visible "beads/caterpillar" produced by point sampling.
+            vec2 prev = bezier(a, b, c, d, 0.0);
+            for (int i = 1; i < 72; i++) {
+                float q = float(i) / 71.0;
+                vec2 curr = bezier(a, b, c, d, q);
+                vec2 seg = curr - prev;
+                float seg2 = max(dot(seg, seg), 0.000001);
+                float h = clamp(dot(p - prev, seg) / seg2, 0.0, 1.0);
+                vec2 proj = prev + seg * h;
+                float dd = length(p - proj);
                 if (dd < minD) {
                     minD = dd;
-                    along = q;
-                    nearest = bp;
+                    float q0 = float(i - 1) / 71.0;
+                    along = mix(q0, q, h);
+                    nearest = proj;
                 }
+                prev = curr;
             }
 
-            // Ribbon body is broad, but the luminous edge is sharper than the haze.
-            float width = 0.055 + 0.013 * sin(along * 9.0 + cycle * 1.8);
-            float core  = 1.0 - smoothstep(width * 0.30, width * 0.95, minD);
-            float body  = 1.0 - smoothstep(width * 0.85, width * 1.55, minD);
-            float glow1 = exp(-minD * 12.0);
-            float glow2 = exp(-minD * 5.0);
+            // Smooth organic width: broad ribbon, clean continuous core, no node-like circles.
+            float width = 0.050 + 0.008 * sin(along * 6.28318 + cycle * 0.75);
+            float core  = 1.0 - smoothstep(width * 0.18, width * 0.68, minD);
+            float body  = 1.0 - smoothstep(width * 0.62, width * 1.18, minD);
+            float glow1 = exp(-pow(minD * 13.0, 1.35));
+            float glow2 = exp(-pow(minD * 6.2, 1.25));
 
             // Local highlight runs slowly along the ribbon, like Revolut's brighter pulse.
             float pulsePos = 0.50 + 0.34 * sin(cycle * 0.62);
@@ -6029,16 +6037,16 @@ window.closeGamif = function() {
 
             float colorFlow = fract(along * 0.95 + cycle * 0.035);
             vec3 wave = goxionPalette(colorFlow);
-            vec3 hot = mix(wave, vec3(0.92, 0.98, 1.0), 0.52 + 0.28 * pulse);
+            vec3 hot = mix(wave, vec3(0.88, 0.96, 1.0), 0.40 + 0.22 * pulse);
 
             // True black base eliminates the old gray polygon/alpha artifact.
             vec3 col = vec3(0.012, 0.012, 0.020);
 
             // Subtle colored atmosphere close to the curve only.
-            col += wave * glow2 * 0.10;
-            col += wave * glow1 * 0.30;
-            col += wave * body  * 0.42;
-            col += hot  * core  * (0.42 + 0.30 * pulse);
+            col += wave * glow2 * 0.075;
+            col += wave * glow1 * 0.24;
+            col += wave * body  * 0.36;
+            col += hot  * core  * (0.34 + 0.22 * pulse);
 
             // Soft light on the inside of the bend; this is NOT another line.
             float inside = smoothstep(0.23, -0.02, p.x - nearest.x) * glow2;
