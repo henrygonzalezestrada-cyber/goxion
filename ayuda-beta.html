@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.6-beta-wave-02-1">
+<html lang="es" data-goxion-version="1.0.5-beta-wave-02-revolut">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -70,17 +70,14 @@
             100% { transform: scale(1); opacity: 1; } 
         }
 
-        /* === GOXION BETA BACKGROUND // WAVE LAB 02.1 · REVOLUT FLOW === */
+        /* === GOXION BETA BACKGROUND // WAVE 02 · REVOLUT FLOW === */
         .bg {
             position: fixed;
             inset: 0;
             z-index: -2;
             overflow: hidden;
             pointer-events: none;
-            background:
-                radial-gradient(circle at 18% 10%, rgba(124, 77, 255, .045), transparent 34rem),
-                radial-gradient(circle at 86% 82%, rgba(0, 242, 254, .040), transparent 36rem),
-                #030305;
+            background: #030305;
         }
 
         .gx-wave-canvas {
@@ -89,8 +86,7 @@
             width: 100%;
             height: 100%;
             display: block;
-            opacity: .94;
-            filter: saturate(1.10);
+            opacity: 1;
             transform: translateZ(0);
         }
 
@@ -98,14 +94,12 @@
             content: "";
             position: absolute;
             inset: 0;
-            background:
-                linear-gradient(to bottom, rgba(3,3,5,.08), rgba(3,3,5,.22) 46%, rgba(3,3,5,.42)),
-                radial-gradient(circle at center, transparent 20%, rgba(3,3,5,.18) 82%, rgba(3,3,5,.42) 100%);
             pointer-events: none;
+            background: radial-gradient(circle at center, transparent 38%, rgba(3,3,5,.10) 78%, rgba(3,3,5,.28) 100%);
         }
 
         @media (prefers-reduced-motion: reduce) {
-            .gx-wave-canvas { opacity: .78; }
+            .gx-wave-canvas { opacity: .92; }
         }
 
         .container { 
@@ -5939,12 +5933,14 @@ window.closeGamif = function() {
     const canvas = document.getElementById('gx-wave-canvas');
     if (!canvas) return;
 
+    // OPAQUE canvas intentionally: prevents Safari/iOS transparent-WebGL triangle/compositing artifacts.
     const gl = canvas.getContext('webgl', {
-        alpha: true,
+        alpha: false,
         antialias: false,
         depth: false,
         stencil: false,
-        premultipliedAlpha: false,
+        premultipliedAlpha: true,
+        preserveDrawingBuffer: false,
         powerPreference: 'high-performance'
     });
 
@@ -5967,126 +5963,94 @@ window.closeGamif = function() {
         uniform float u_time;
         uniform float u_motion;
 
-        float hash21(vec2 p) {
-            p = fract(p * vec2(123.34, 456.21));
-            p += dot(p, p + 45.32);
-            return fract(p.x * p.y);
-        }
-
-        float noise(vec2 p) {
-            vec2 i = floor(p);
-            vec2 f = fract(p);
-            f = f * f * (3.0 - 2.0 * f);
-            return mix(
-                mix(hash21(i), hash21(i + vec2(1.0, 0.0)), f.x),
-                mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), f.x),
-                f.y
-            );
+        vec2 bezier(vec2 a, vec2 b, vec2 c, vec2 d, float t) {
+            float u = 1.0 - t;
+            return u*u*u*a + 3.0*u*u*t*b + 3.0*u*t*t*c + t*t*t*d;
         }
 
         vec3 goxionPalette(float t) {
             vec3 purple = vec3(0.48, 0.16, 1.00);
-            vec3 violet = vec3(0.38, 0.20, 1.00);
-            vec3 blue   = vec3(0.06, 0.44, 1.00);
-            vec3 cyan   = vec3(0.00, 0.94, 1.00);
-            vec3 ice    = vec3(0.76, 0.98, 1.00);
-            t = fract(t);
-            if (t < 0.26) return mix(purple, violet, smoothstep(0.00, 0.26, t));
-            if (t < 0.56) return mix(violet, blue, smoothstep(0.26, 0.56, t));
-            if (t < 0.84) return mix(blue, cyan, smoothstep(0.56, 0.84, t));
-            return mix(cyan, ice, smoothstep(0.84, 1.00, t));
-        }
-
-        float movingWindow(float y, float t, float offset, float speed, float size) {
-            // Segmento largo que entra y sale del viewport, en lugar de una línea infinita.
-            float travel = fract(t * speed + offset);
-            float center = mix(-1.85, 1.85, travel);
-            float d = abs(y - center);
-            return 1.0 - smoothstep(size * 0.62, size, d);
-        }
-
-        vec3 ribbonLayer(
-            vec2 p,
-            vec2 uv,
-            float t,
-            float direction,
-            float strength,
-            float phase,
-            float widthBase,
-            float lane,
-            float windowOffset
-        ) {
-            float y = p.y;
-
-            // Curva amplia, diagonal y lateral: más cercana al comportamiento Revolut.
-            float drift = 0.10 * sin(t * 0.10 * direction + phase);
-            float bend =
-                0.31 * sin(y * 0.92 + t * 0.13 * direction + phase) +
-                0.10 * sin(y * 2.05 - t * 0.075 * direction + phase * 0.55);
-
-            float xCenter = lane + bend + drift;
-            xCenter += (noise(vec2(y * 0.92 + phase, t * 0.018 + phase)) - 0.5) * 0.025;
-
-            float d = abs(p.x - xCenter);
-            float breathe = widthBase * (0.92 + 0.10 * sin(y * 1.35 - t * 0.11 * direction + phase));
-
-            // Núcleo y halo controlados. Se elimina el haze ancho que generaba zonas grises.
-            float body     = 1.0 - smoothstep(breathe * 0.58, breathe, d);
-            float inner    = 1.0 - smoothstep(breathe * 0.24, breathe * 0.58, d);
-            float hot      = 1.0 - smoothstep(0.0, breathe * 0.13, d);
-            float glowNear = exp(-pow(d / (breathe * 1.75), 2.0)) * 0.42;
-            float glowFar  = exp(-pow(d / (breathe * 3.20), 2.0)) * 0.11;
-
-            float flow = fract(
-                uv.y * (direction > 0.0 ? 0.72 : -0.68) +
-                t * 0.040 * direction + phase
-            );
-            vec3 base = goxionPalette(flow);
-
-            float packet = movingWindow(y, t, windowOffset, direction > 0.0 ? 0.030 : 0.026, 1.15);
-            float edgeTaper = smoothstep(-1.70, -1.36, y) * (1.0 - smoothstep(1.36, 1.70, y));
-            float pulse = 0.78 + 0.22 * sin(y * 0.90 - t * 0.18 * direction + phase * 2.2);
-
-            vec3 col = vec3(0.0);
-            col += base * glowFar * 0.72;
-            col += base * glowNear * 0.95;
-            col += base * body * 0.72;
-            col += mix(base, vec3(0.74, 0.97, 1.0), 0.48) * inner * 0.38;
-            col += vec3(0.93, 0.995, 1.0) * hot * 0.48;
-
-            col *= strength * packet * edgeTaper * pulse;
-            return col;
+            vec3 blue   = vec3(0.06, 0.38, 1.00);
+            vec3 cyan   = vec3(0.00, 0.90, 1.00);
+            if (t < 0.48) return mix(purple, blue, smoothstep(0.0, 0.48, t));
+            return mix(blue, cyan, smoothstep(0.48, 1.0, t));
         }
 
         void main() {
-            vec2 frag = gl_FragCoord.xy;
             vec2 res = max(u_resolution, vec2(1.0));
-            vec2 uv = frag / res;
-            vec2 p = (frag * 2.0 - res) / min(res.x, res.y);
+            vec2 uv = gl_FragCoord.xy / res;
+            float aspect = res.x / res.y;
+            vec2 p = vec2((uv.x - 0.5) * aspect, uv.y - 0.5);
+
             float t = u_time * u_motion;
 
-            // Principal: entra por una zona lateral y recorre una S amplia.
-            vec3 ribbonA = ribbonLayer(p, uv, t, 1.0, 1.00, 0.20, 0.090, -0.26, 0.04);
+            // Revolut-like behavior: ONE large ribbon travels through the viewport.
+            // The curve itself drifts; it is not anchored to the center.
+            float cycle = t * 0.105;
+            float driftX = 0.18 * sin(cycle * 0.73);
+            float driftY = 0.08 * sin(cycle * 0.51 + 1.2);
+            float bend   = 0.10 * sin(cycle * 0.42);
 
-            // Secundario: más discreto, en sentido contrario y en otro carril.
-            // Su presencia sube y baja para que no parezca una segunda línea fija.
-            float secondaryPresence = 0.22 + 0.24 * (0.5 + 0.5 * sin(t * 0.075 + 1.8));
-            vec3 ribbonB = ribbonLayer(p, uv, t, -1.0, secondaryPresence, 2.65, 0.066, 0.40, 0.56);
+            vec2 a = vec2(-0.88 + driftX, -0.40 + driftY);
+            vec2 b = vec2(-0.38 + driftX,  0.03 + bend + driftY);
+            vec2 c = vec2( 0.22 + driftX,  0.26 - bend + driftY);
+            vec2 d = vec2( 0.82 + driftX,  0.62 + driftY);
 
-            // Nunca sumamos los dos ribbons: evitamos el blanqueo/placa gris cuando se aproximan.
-            vec3 col = max(ribbonA, ribbonB);
+            // Occasionally the whole path leans to the opposite side, without creating a second ribbon.
+            float lean = 0.12 * sin(cycle * 0.31 + 0.8);
+            a.x += lean; b.x += lean * 0.45; c.x -= lean * 0.25; d.x -= lean * 0.55;
 
-            float ambientA = exp(-length((uv - vec2(0.12, 0.20)) * vec2(1.25, 0.88)) * 5.8);
-            float ambientB = exp(-length((uv - vec2(0.90, 0.78)) * vec2(1.18, 0.90)) * 6.0);
-            col += vec3(0.22, 0.07, 0.58) * ambientA * 0.018;
-            col += vec3(0.00, 0.38, 0.50) * ambientB * 0.016;
+            float minD = 10.0;
+            float along = 0.0;
+            vec2 nearest = vec2(0.0);
 
-            float vignette = smoothstep(1.50, 0.20, length((uv - 0.5) * vec2(1.04, 0.74)));
-            col *= mix(0.82, 1.0, vignette);
+            // Distance to sampled cubic Bezier; stable on mobile and visually much closer to Revolut's ribbon.
+            for (int i = 0; i < 44; i++) {
+                float q = float(i) / 43.0;
+                vec2 bp = bezier(a, b, c, d, q);
+                float dd = length(p - bp);
+                if (dd < minD) {
+                    minD = dd;
+                    along = q;
+                    nearest = bp;
+                }
+            }
 
-            float lum = max(col.r, max(col.g, col.b));
-            float alpha = smoothstep(0.020, 0.22, lum) * clamp(lum * 0.88, 0.0, 0.84);
-            gl_FragColor = vec4(col, alpha);
+            // Ribbon body is broad, but the luminous edge is sharper than the haze.
+            float width = 0.055 + 0.013 * sin(along * 9.0 + cycle * 1.8);
+            float core  = 1.0 - smoothstep(width * 0.30, width * 0.95, minD);
+            float body  = 1.0 - smoothstep(width * 0.85, width * 1.55, minD);
+            float glow1 = exp(-minD * 12.0);
+            float glow2 = exp(-minD * 5.0);
+
+            // Local highlight runs slowly along the ribbon, like Revolut's brighter pulse.
+            float pulsePos = 0.50 + 0.34 * sin(cycle * 0.62);
+            float pulse = exp(-pow((along - pulsePos) * 4.0, 2.0));
+
+            float colorFlow = fract(along * 0.95 + cycle * 0.035);
+            vec3 wave = goxionPalette(colorFlow);
+            vec3 hot = mix(wave, vec3(0.92, 0.98, 1.0), 0.52 + 0.28 * pulse);
+
+            // True black base eliminates the old gray polygon/alpha artifact.
+            vec3 col = vec3(0.012, 0.012, 0.020);
+
+            // Subtle colored atmosphere close to the curve only.
+            col += wave * glow2 * 0.10;
+            col += wave * glow1 * 0.30;
+            col += wave * body  * 0.42;
+            col += hot  * core  * (0.42 + 0.30 * pulse);
+
+            // Soft light on the inside of the bend; this is NOT another line.
+            float inside = smoothstep(0.23, -0.02, p.x - nearest.x) * glow2;
+            col += wave * inside * 0.028;
+
+            // Keep UI readable and corners black.
+            vec2 v = uv - 0.5;
+            float vignette = smoothstep(0.78, 0.24, length(v * vec2(0.86, 1.05)));
+            col *= 0.84 + 0.16 * vignette;
+
+            // Never output transparency: fixes iOS/Safari compositing seams/gray triangles.
+            gl_FragColor = vec4(col, 1.0);
         }
     `;
 
@@ -6095,7 +6059,7 @@ window.closeGamif = function() {
         gl.shaderSource(shader, source);
         gl.compileShader(shader);
         if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            console.warn('GOXION Wave 02.1 shader:', gl.getShaderInfoLog(shader));
+            console.warn('GOXION Wave shader:', gl.getShaderInfoLog(shader));
             gl.deleteShader(shader);
             return null;
         }
@@ -6111,7 +6075,7 @@ window.closeGamif = function() {
     gl.attachShader(program, fs);
     gl.linkProgram(program);
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.warn('GOXION Wave 02.1 program:', gl.getProgramInfoLog(program));
+        console.warn('GOXION Wave program:', gl.getProgramInfoLog(program));
         canvas.style.display = 'none';
         return;
     }
@@ -6135,7 +6099,7 @@ window.closeGamif = function() {
 
     function resize() {
         const mobile = Math.min(window.innerWidth, window.innerHeight) < 760;
-        const maxDpr = mobile ? 1.35 : 1.65;
+        const maxDpr = mobile ? 1.20 : 1.50;
         const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
         const w = Math.max(1, Math.round(window.innerWidth * dpr));
         const h = Math.max(1, Math.round(window.innerHeight * dpr));
@@ -6149,25 +6113,26 @@ window.closeGamif = function() {
     function frame(now) {
         if (!visible) return;
         resize();
-        gl.uniform1f(uTime, (now - start) / 1000);
-        gl.uniform1f(uMotion, reduced.matches ? 0.0 : 1.0);
+        gl.useProgram(program);
+        gl.uniform1f(uTime, (now - start) * 0.001);
+        gl.uniform1f(uMotion, reduced.matches ? 0.20 : 1.0);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
         raf = requestAnimationFrame(frame);
     }
 
     document.addEventListener('visibilitychange', () => {
         visible = !document.hidden;
-        if (visible) { cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); }
-        else cancelAnimationFrame(raf);
+        if (visible && !raf) raf = requestAnimationFrame(frame);
+        if (!visible && raf) { cancelAnimationFrame(raf); raf = 0; }
     });
+    window.addEventListener('resize', resize, { passive: true });
+    reduced.addEventListener?.('change', () => {});
 
-    window.addEventListener('resize', resize, {passive:true});
     resize();
     raf = requestAnimationFrame(frame);
-    console.info('GOXION Beta Background: Wave Lab 02.1 · Revolut Flow activo.');
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.6 · BETA WAVE 02.1</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.4 · BETA WAVE 01</div>
 </body>
 </html>
