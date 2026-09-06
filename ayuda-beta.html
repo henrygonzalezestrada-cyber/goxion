@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.15-beta-wave-02-9">
+<html lang="es" data-goxion-version="1.0.16-beta-wave-02-10">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3296,6 +3296,75 @@
         -webkit-transform:none!important;
     }
 }
+
+</style>
+
+<style id="goxion-gamification-shared-morph">
+/* =========================================================
+   GOXION // GAMIFICATION SHARED ELEMENT MORPH
+   Mantiene intactos los parámetros glass originales.
+   El clon temporal hereda exactamente la tarjeta de origen.
+   ========================================================= */
+
+.gx-gamif-morph-ghost{
+    position:fixed!important;
+    z-index:2450!important;
+    margin:0!important;
+    box-sizing:border-box!important;
+    pointer-events:none!important;
+    user-select:none!important;
+    -webkit-user-select:none!important;
+    transition:none!important;
+    animation:none!important;
+    will-change:left, top, width, height, opacity, border-radius;
+    transform:none!important;
+    -webkit-transform:none!important;
+}
+
+.gx-gamif-morph-ghost.gx-referral-ready,
+.gx-gamif-morph-ghost.pulse-mission,
+.gx-gamif-morph-ghost.pulse-referral{
+    animation:none!important;
+    transform:none!important;
+    -webkit-transform:none!important;
+}
+
+/* Durante el viaje detenemos únicamente las animaciones del clon.
+   Las tarjetas reales conservan sus pulsos, watermarks y progreso. */
+.gx-gamif-morph-ghost::before,
+.gx-gamif-morph-ghost .gx-gamif-progress > span::after{
+    animation:none!important;
+    -webkit-animation:none!important;
+}
+
+.gamif-expanded-container.gx-shared-panel{
+    display:block!important;
+    transform:none!important;
+    clip-path:none!important;
+    animation:none!important;
+    will-change:opacity;
+}
+
+.gamif-expanded-container.gx-shared-panel > *{
+    will-change:opacity, transform, filter;
+}
+
+/* La tarjeta hermana reaparece después del morph, no durante él. */
+#gamif-grid.gx-shared-grid-return .gx-gamif-card{
+    animation:gxGamifSiblingReturn .30s cubic-bezier(.2,.8,.2,1) both!important;
+}
+
+@keyframes gxGamifSiblingReturn{
+    from{opacity:0;transform:translateY(7px) scale(.985)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-gamif-morph-ghost{display:none!important}
+    #gamif-grid.gx-shared-grid-return .gx-gamif-card{
+        animation:none!important;
+    }
+}
 </style>
 
 <style id="goxion-release-version-style">
@@ -6079,61 +6148,299 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<script>
-window.openGamif = function(type) {
-    const grid = document.getElementById('gamif-grid');
-    const refPanel = document.getElementById('gamif-expanded-referral');
-    const cupPanel = document.getElementById('gamif-expanded-coupon');
-    
-    // Ocultamos la cuadrícula suavemente
-    grid.style.transition = 'all 0.2s ease';
-    grid.style.opacity = '0';
-    grid.style.transform = 'scale(0.95)';
-    
-    setTimeout(() => {
-        grid.style.display = 'none';
+<script id="goxion-gamification-shared-morph-js">
+(() => {
+    let gxGamifMorphing = false;
+    let gxActiveGamifType = null;
+    const gxReduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        if(type === 'referral') {
-            cupPanel.style.display = 'none';
-            cupPanel.classList.remove('gx-morph-in', 'gx-morph-out');
-            
-            refPanel.classList.remove('gx-morph-out');
-            refPanel.classList.add('gx-morph-in');
-        } else {
-            refPanel.style.display = 'none';
-            refPanel.classList.remove('gx-morph-in', 'gx-morph-out');
-            
-            cupPanel.classList.remove('gx-morph-out');
-            cupPanel.classList.add('gx-morph-in');
+    function gxGetParts(type) {
+        const grid = document.getElementById('gamif-grid');
+        const refPanel = document.getElementById('gamif-expanded-referral');
+        const cupPanel = document.getElementById('gamif-expanded-coupon');
+        const panel = type === 'referral' ? refPanel : cupPanel;
+        const otherPanel = type === 'referral' ? cupPanel : refPanel;
+        const source = grid?.querySelector(type === 'referral' ? '.gx-gamif-card-ref' : '.gx-gamif-card-mission');
+        return { grid, refPanel, cupPanel, panel, otherPanel, source };
+    }
 
-            // El progreso ya viene de Supabase; aquí sólo animamos el estado renderizado.
-            setTimeout(animarMisionesCompletadasEnSecuencia, 170);
+    function gxRectStyles(el, rect) {
+        el.style.left = `${rect.left}px`;
+        el.style.top = `${rect.top}px`;
+        el.style.width = `${rect.width}px`;
+        el.style.height = `${rect.height}px`;
+    }
+
+    function gxCreateGhost(source, rect) {
+        const ghost = source.cloneNode(true);
+        ghost.removeAttribute('onclick');
+        ghost.removeAttribute('id');
+        ghost.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+        ghost.classList.add('gx-gamif-morph-ghost');
+        ghost.setAttribute('aria-hidden', 'true');
+        gxRectStyles(ghost, rect);
+        ghost.style.opacity = '1';
+        document.body.appendChild(ghost);
+        return ghost;
+    }
+
+    function gxAnimateChildren(panel, entering) {
+        const children = Array.from(panel.children);
+        if (!children.length || gxReduceMotion() || !Element.prototype.animate) return [];
+
+        return children.map((child, index) => {
+            const delay = entering ? 85 + Math.min(index, 7) * 24 : Math.min(index, 5) * 8;
+            const frames = entering
+                ? [
+                    { opacity: 0, transform: 'translateY(9px)', filter: 'blur(3px)' },
+                    { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' }
+                  ]
+                : [
+                    { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' },
+                    { opacity: 0, transform: 'translateY(-5px)', filter: 'blur(2px)' }
+                  ];
+
+            return child.animate(frames, {
+                duration: entering ? 300 : 150,
+                delay,
+                easing: entering ? 'cubic-bezier(.16,1,.3,1)' : 'cubic-bezier(.4,0,1,1)',
+                fill: 'both'
+            });
+        });
+    }
+
+    function gxSetPanelReady(panel, visible) {
+        panel.classList.remove('gx-morph-in', 'gx-morph-out', 'slide-left');
+        panel.classList.toggle('gx-shared-panel', visible);
+        panel.style.display = visible ? 'block' : 'none';
+        panel.style.opacity = visible ? '1' : '';
+        panel.style.visibility = visible ? 'visible' : '';
+    }
+
+    async function gxOpenShared(type) {
+        if (gxGamifMorphing) return;
+
+        const { grid, panel, otherPanel, source } = gxGetParts(type);
+        if (!grid || !panel || !source) return;
+
+        gxGamifMorphing = true;
+        gxActiveGamifType = type;
+
+        if (gxReduceMotion() || !Element.prototype.animate) {
+            grid.style.display = 'none';
+            grid.style.opacity = '';
+            grid.style.transform = '';
+            gxSetPanelReady(otherPanel, false);
+            gxSetPanelReady(panel, true);
+            if (type === 'coupon') setTimeout(animarMisionesCompletadasEnSecuencia, 80);
+            gxGamifMorphing = false;
+            return;
         }
-    }, 200);
-};
 
-window.closeGamif = function() {
-    const grid = document.getElementById('gamif-grid');
-    const refPanel = document.getElementById('gamif-expanded-referral');
-    const cupPanel = document.getElementById('gamif-expanded-coupon');
-    
-    // Determinamos qué panel está abierto y lanzamos la animación de salida
-    const activePanel = (refPanel.classList.contains('gx-morph-in')) ? refPanel : cupPanel;
-    
-    activePanel.classList.remove('gx-morph-in');
-    activePanel.classList.add('gx-morph-out');
-    
-    setTimeout(() => {
-        activePanel.style.display = 'none';
-        activePanel.classList.remove('gx-morph-out');
-        
-        // Regresamos la cuadrícula de botones con fluidez
+        const sourceRect = source.getBoundingClientRect();
+        const ghost = gxCreateGhost(source, sourceRect);
+
+        // Congelamos visualmente la tarjeta real; sus clases y animaciones siguen intactas.
+        source.style.visibility = 'hidden';
+
+        // Quitamos la cuadrícula del flujo y medimos el panel en su posición definitiva.
+        grid.style.display = 'none';
+        grid.style.opacity = '';
+        grid.style.transform = '';
+
+        gxSetPanelReady(otherPanel, false);
+        panel.classList.remove('gx-morph-in', 'gx-morph-out', 'slide-left');
+        panel.classList.add('gx-shared-panel');
+        panel.style.display = 'block';
+        panel.style.visibility = 'hidden';
+        panel.style.opacity = '0';
+
+        const targetRect = panel.getBoundingClientRect();
+
+        panel.style.visibility = 'visible';
+
+        const ghostChildren = Array.from(ghost.children);
+        ghostChildren.forEach((child, index) => {
+            child.animate([
+                { opacity: 1, transform: 'translateY(0) scale(1)' },
+                { opacity: index === ghostChildren.length - 1 ? 0.18 : 0.06, transform: 'translateY(-3px) scale(.985)' }
+            ], {
+                duration: 260,
+                delay: 55,
+                easing: 'cubic-bezier(.4,0,.2,1)',
+                fill: 'forwards'
+            });
+        });
+
+        const ghostAnim = ghost.animate([
+            {
+                left: `${sourceRect.left}px`,
+                top: `${sourceRect.top}px`,
+                width: `${sourceRect.width}px`,
+                height: `${sourceRect.height}px`,
+                borderRadius: '22px',
+                opacity: 1
+            },
+            {
+                left: `${targetRect.left}px`,
+                top: `${targetRect.top}px`,
+                width: `${targetRect.width}px`,
+                height: `${targetRect.height}px`,
+                borderRadius: '24px',
+                opacity: 1
+            }
+        ], {
+            duration: 430,
+            easing: 'cubic-bezier(.18,.86,.22,1)',
+            fill: 'forwards'
+        });
+
+        // El contenido nuevo nace dentro de la superficie ya expandida.
+        setTimeout(() => {
+            panel.animate([
+                { opacity: 0 },
+                { opacity: 1 }
+            ], {
+                duration: 150,
+                easing: 'ease-out',
+                fill: 'forwards'
+            });
+            gxAnimateChildren(panel, true);
+        }, 265);
+
+        await ghostAnim.finished.catch(() => {});
+
+        ghost.animate([
+            { opacity: 1 },
+            { opacity: 0 }
+        ], {
+            duration: 95,
+            easing: 'ease-out',
+            fill: 'forwards'
+        });
+
+        setTimeout(() => {
+            ghost.remove();
+            source.style.visibility = '';
+            panel.style.opacity = '1';
+            gxGamifMorphing = false;
+
+            if (type === 'coupon') {
+                setTimeout(animarMisionesCompletadasEnSecuencia, 90);
+            }
+        }, 100);
+    }
+
+    async function gxCloseShared() {
+        if (gxGamifMorphing) return;
+
+        const type = gxActiveGamifType ||
+            (document.getElementById('gamif-expanded-referral')?.style.display !== 'none' ? 'referral' : 'coupon');
+
+        const { grid, panel, source } = gxGetParts(type);
+        if (!grid || !panel || !source) return;
+
+        gxGamifMorphing = true;
+
+        if (gxReduceMotion() || !Element.prototype.animate) {
+            gxSetPanelReady(panel, false);
+            grid.style.display = 'grid';
+            grid.style.visibility = 'visible';
+            source.style.visibility = '';
+            gxActiveGamifType = null;
+            gxGamifMorphing = false;
+            return;
+        }
+
+        const panelRect = panel.getBoundingClientRect();
+
+        // Medimos dónde quedará exactamente la tarjeta cuando el panel desaparezca.
+        panel.style.visibility = 'hidden';
+        panel.style.display = 'none';
         grid.style.display = 'grid';
-        void grid.offsetWidth; // Force reflow
-        grid.style.opacity = '1';
-        grid.style.transform = 'scale(1)';
-    }, 280);
-};
+        grid.style.visibility = 'hidden';
+        source.style.visibility = 'hidden';
+        const destinationRect = source.getBoundingClientRect();
+
+        // Restauramos el estado visual actual sin permitir que el navegador lo pinte entre medias.
+        grid.style.display = 'none';
+        grid.style.visibility = '';
+        panel.style.display = 'block';
+        panel.style.visibility = 'visible';
+        panel.style.opacity = '1';
+
+        const ghost = gxCreateGhost(source, panelRect);
+        ghost.style.opacity = '0';
+
+        gxAnimateChildren(panel, false);
+
+        const ghostFadeIn = ghost.animate([
+            { opacity: 0 },
+            { opacity: 1 }
+        ], {
+            duration: 100,
+            easing: 'ease-out',
+            fill: 'forwards'
+        });
+
+        panel.animate([
+            { opacity: 1 },
+            { opacity: 0 }
+        ], {
+            duration: 135,
+            easing: 'ease-in',
+            fill: 'forwards'
+        });
+
+        await ghostFadeIn.finished.catch(() => {});
+
+        const shrinkAnim = ghost.animate([
+            {
+                left: `${panelRect.left}px`,
+                top: `${panelRect.top}px`,
+                width: `${panelRect.width}px`,
+                height: `${panelRect.height}px`,
+                borderRadius: '24px',
+                opacity: 1
+            },
+            {
+                left: `${destinationRect.left}px`,
+                top: `${destinationRect.top}px`,
+                width: `${destinationRect.width}px`,
+                height: `${destinationRect.height}px`,
+                borderRadius: '22px',
+                opacity: 1
+            }
+        ], {
+            duration: 390,
+            easing: 'cubic-bezier(.2,.78,.2,1)',
+            fill: 'forwards'
+        });
+
+        await shrinkAnim.finished.catch(() => {});
+
+        panel.style.display = 'none';
+        panel.style.opacity = '';
+        panel.style.visibility = '';
+        panel.classList.remove('gx-shared-panel');
+
+        grid.style.display = 'grid';
+        grid.style.visibility = 'visible';
+        grid.classList.add('gx-shared-grid-return');
+        source.style.visibility = '';
+
+        // La geometría final del ghost coincide ya con la tarjeta real.
+        ghost.remove();
+
+        setTimeout(() => grid.classList.remove('gx-shared-grid-return'), 330);
+
+        gxActiveGamifType = null;
+        gxGamifMorphing = false;
+    }
+
+    window.openGamif = gxOpenShared;
+    window.closeGamif = gxCloseShared;
+})();
 </script>
 
 <script id="goxion-wave-background-beta">
@@ -6364,6 +6671,6 @@ window.closeGamif = function() {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.15 · BETA WAVE 02.9</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.16 · BETA WAVE 02.10</div>
 </body>
 </html>
