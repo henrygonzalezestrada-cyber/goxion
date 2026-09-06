@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.14-beta-wave-02-8">
+<html lang="es" data-goxion-version="1.0.15-beta-wave-02-9">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -2524,6 +2524,67 @@
     .gx-ref-service-chips{display:flex;flex-wrap:wrap;gap:5px}
     .gx-ref-service-chips span{padding:5px 7px;border-radius:999px;background:rgba(0,242,254,.07);border:1px solid rgba(0,242,254,.13);color:#cceff3;font-size:9.5px;font-weight:700}
 
+
+
+        /* === GOXION CATALOG // CONTAINER MORPH 01 ===
+           Motion-only layer. Deliberately does NOT redefine glass backgrounds,
+           blur, borders, promo connections or animated tag styling. */
+        .brand-card.gx-catalog-morphing {
+            will-change: height;
+        }
+
+        .brand-header {
+            position: relative;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .brand-header:active {
+            transform: scale(0.995);
+        }
+
+        .brand-expand-icon {
+            min-width: 40px;
+            text-align: center;
+            line-height: 1;
+            transform-origin: center;
+            will-change: transform;
+        }
+
+        /* The body no longer drives the container animation with max-height.
+           JS measures the real first/last card geometry and morphs between them. */
+        .brand-expanded-content {
+            max-height: 0;
+            margin-top: 0;
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+            overflow: hidden;
+            transition: opacity .24s ease, transform .36s cubic-bezier(.2,.8,.2,1);
+        }
+
+        .brand-card.expanded .brand-expanded-content {
+            max-height: none;
+            margin-top: 20px;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .brand-expanded-content > * {
+            transform-origin: 50% 0%;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .brand-header,
+            .brand-expanded-content,
+            .brand-expanded-content > *,
+            .brand-logo-img,
+            .brand-expand-icon {
+                animation: none !important;
+                transition-duration: .01ms !important;
+            }
+        }
 </style>
 
 <style id="goxion-referral-ui">
@@ -4873,16 +4934,157 @@
             return n.trim(); 
         }
 
-        function toggleBrandCard(brandId) {
-            const card = document.getElementById('brand-card-' + brandId);
-            
-            document.querySelectorAll('.brand-card').forEach(c => {
-                if(c.id !== 'brand-card-' + brandId) {
-                    c.classList.remove('expanded');
-                }
+        function gxCatalogReducedMotion() {
+            return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        }
+
+        function gxSetBrandCardState(card, open) {
+            const header = card.querySelector('.brand-header');
+            const content = card.querySelector('.brand-expanded-content');
+            const icon = card.querySelector('.brand-expand-icon');
+
+            card.classList.toggle('expanded', open);
+            if (header) header.setAttribute('aria-expanded', open ? 'true' : 'false');
+            if (content) content.setAttribute('aria-hidden', open ? 'false' : 'true');
+            if (icon) icon.textContent = open ? '×' : '⏷';
+        }
+
+        function gxMorphBrandCard(card, open) {
+            if (!card || card.dataset.gxCatalogMorphing === '1') return;
+
+            const content = card.querySelector('.brand-expanded-content');
+            const header = card.querySelector('.brand-header');
+            const icon = card.querySelector('.brand-expand-icon');
+            const logo = card.querySelector('.brand-logo-img');
+            if (!content || !header) {
+                gxSetBrandCardState(card, open);
+                return;
+            }
+
+            if (gxCatalogReducedMotion() || typeof card.animate !== 'function') {
+                gxSetBrandCardState(card, open);
+                return;
+            }
+
+            card.dataset.gxCatalogMorphing = '1';
+            card.classList.add('gx-catalog-morphing');
+
+            const startHeight = card.getBoundingClientRect().height;
+            const previousCardTransition = card.style.transition;
+            const previousContentTransition = content.style.transition;
+
+            // Measure the real destination in the same task, so nothing flashes on screen.
+            card.style.transition = 'none';
+            content.style.transition = 'none';
+            card.style.height = 'auto';
+            gxSetBrandCardState(card, open);
+            const endHeight = card.getBoundingClientRect().height;
+
+            // Return visually to the first frame, then animate the container to the last one.
+            card.style.height = startHeight + 'px';
+            card.style.overflow = 'hidden';
+            void card.offsetHeight;
+
+            const duration = open ? 540 : 430;
+            const easing = 'cubic-bezier(0.2, 0.82, 0.2, 1)';
+
+            const containerAnim = card.animate([
+                { height: startHeight + 'px' },
+                { height: endHeight + 'px' }
+            ], {
+                duration,
+                easing,
+                fill: 'forwards'
             });
 
-            card.classList.toggle('expanded');
+            // The information is born from inside the same container.
+            const bodyAnim = content.animate(open ? [
+                { opacity: 0, transform: 'translateY(-10px) scale(0.985)', filter: 'blur(3px)' },
+                { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)' }
+            ] : [
+                { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)' },
+                { opacity: 0, transform: 'translateY(-7px) scale(0.992)', filter: 'blur(2px)' }
+            ], {
+                duration: open ? 390 : 260,
+                delay: open ? 95 : 0,
+                easing,
+                fill: 'both'
+            });
+
+            // Preserve tag animations: only logo/icon are shared-motion accents.
+            if (logo) {
+                logo.animate(open ? [
+                    { transform: 'translateY(0) scale(1)' },
+                    { transform: 'translateY(-2px) scale(1.05)' }
+                ] : [
+                    { transform: 'translateY(-2px) scale(1.05)' },
+                    { transform: 'translateY(0) scale(1)' }
+                ], { duration: open ? 460 : 360, easing, fill: 'both' });
+            }
+
+            if (icon) {
+                icon.animate(open ? [
+                    { transform: 'scale(0.88) rotate(-25deg)' },
+                    { transform: 'scale(1.08) rotate(8deg)', offset: .58 },
+                    { transform: 'scale(1) rotate(0deg)' }
+                ] : [
+                    { transform: 'scale(0.90) rotate(22deg)' },
+                    { transform: 'scale(1) rotate(0deg)' }
+                ], { duration: open ? 420 : 300, easing });
+            }
+
+            // Stagger only expanded body blocks; the promotional badge and its
+            // animated border/connection remain completely untouched.
+            if (open) {
+                Array.from(content.children).forEach((child, index) => {
+                    child.animate([
+                        { opacity: 0, transform: 'translateY(8px)' },
+                        { opacity: 1, transform: 'translateY(0)' }
+                    ], {
+                        duration: 320,
+                        delay: 145 + index * 48,
+                        easing,
+                        fill: 'both'
+                    });
+                });
+            }
+
+            containerAnim.onfinish = () => {
+                card.style.height = '';
+                card.style.overflow = '';
+                card.style.transition = previousCardTransition;
+                content.style.transition = previousContentTransition;
+                card.classList.remove('gx-catalog-morphing');
+                delete card.dataset.gxCatalogMorphing;
+
+                // Clear WAAPI fill so CSS owns the stable final state.
+                try { containerAnim.cancel(); } catch (_) {}
+                try { bodyAnim.cancel(); } catch (_) {}
+            };
+
+            containerAnim.oncancel = () => {
+                card.style.height = '';
+                card.style.overflow = '';
+                card.style.transition = previousCardTransition;
+                content.style.transition = previousContentTransition;
+                card.classList.remove('gx-catalog-morphing');
+                delete card.dataset.gxCatalogMorphing;
+            };
+        }
+
+        function toggleBrandCard(brandId) {
+            const card = document.getElementById('brand-card-' + brandId);
+            if (!card || card.dataset.gxCatalogMorphing === '1') return;
+
+            const opening = !card.classList.contains('expanded');
+
+            // One open container at a time. Other cards collapse through the
+            // same morph instead of disappearing abruptly.
+            document.querySelectorAll('.brand-card.expanded').forEach(other => {
+                if (other !== card) gxMorphBrandCard(other, false);
+            });
+
+            gxMorphBrandCard(card, opening);
         }
 
         function findComboSuggestion(planName) {
@@ -5121,7 +5323,7 @@
 
                 htmlCatalogo += `
                 <div class="brand-card ${cardPromoClass}" id="brand-card-${bKey}">
-                    <div class="brand-header" onclick="toggleBrandCard('${bKey}')">
+                    <div class="brand-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleBrandCard('${bKey}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrandCard('${bKey}');}">
                         <div class="brand-header-left">
                             <img src="${brand.img}" class="brand-logo-img" onerror="this.src='logo2.PNG'">
                             <div class="brand-titles">
@@ -5135,7 +5337,7 @@
                         <div class="brand-expand-icon">⏷</div>
                     </div>
                     
-                    <div class="brand-expanded-content">
+                    <div class="brand-expanded-content" aria-hidden="true">
                         <div class="plan-pills-container">
                             ${pillsHtml}
                         </div>
@@ -6158,10 +6360,10 @@ window.closeGamif = function() {
     window.addEventListener('resize', resize, {passive:true});
     resize();
     raf = requestAnimationFrame(frame);
-    console.info('GOXION Beta Background: Wave 02.8 Polished Neon activo.');
+    console.info('GOXION Beta Background: Wave 02.9 Catalog Morph activo.');
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.14 · BETA WAVE 02.8</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.15 · BETA WAVE 02.9</div>
 </body>
 </html>
