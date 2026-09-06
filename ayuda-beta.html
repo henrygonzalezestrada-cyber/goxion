@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.11-beta-wave-02-5">
+<html lang="es" data-goxion-version="1.0.12-beta-wave-02-6">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -5967,91 +5967,83 @@ window.closeGamif = function() {
         uniform float u_time;
         uniform float u_motion;
 
-        vec3 paletteFluid(float x, float t) {
-            vec3 purple = vec3(0.46, 0.13, 1.00);
-            vec3 blue   = vec3(0.05, 0.34, 0.96);
-            vec3 cyan   = vec3(0.00, 0.90, 1.00);
+        vec3 goxionFlow(float x, float y, float t) {
+            vec3 purple = vec3(0.52, 0.12, 1.00);
+            vec3 blue   = vec3(0.04, 0.28, 1.00);
+            vec3 cyan   = vec3(0.00, 0.88, 1.00);
 
-            // Three broad overlapping waves = continuous color, never hard cuts.
-            float a = 0.5 + 0.5 * sin(x * 2.20 - t * 0.78);
-            float b = 0.5 + 0.5 * sin(x * 2.20 - t * 0.78 + 2.094);
-            float c = 0.5 + 0.5 * sin(x * 2.20 - t * 0.78 + 4.188);
+            float wp = 0.55 + 0.45 * sin(x * 1.55 - t * 0.72 + 0.35 * sin(y * 1.1));
+            float wb = 0.55 + 0.45 * sin(x * 1.95 + t * 0.54 + 2.10);
+            float wc = 0.45 + 0.45 * sin(x * 2.45 - t * 0.88 + 4.15 + y * 0.40);
 
-            a = 0.18 + 0.82 * a * a;
-            b = 0.18 + 0.82 * b * b;
-            c = 0.18 + 0.82 * c * c;
+            wp = pow(max(wp, 0.0), 2.2);
+            wb = pow(max(wb, 0.0), 2.0);
+            wc = pow(max(wc, 0.0), 3.0) * 0.62;
 
-            float s = max(a + b + c, 0.001);
-            return (purple * a + blue * b + cyan * c) / s;
+            float sumW = max(wp + wb + wc, 0.001);
+            return (purple * wp + blue * wb + cyan * wc) / sumW;
         }
 
         void main() {
             vec2 res = max(u_resolution, vec2(1.0));
-            vec2 uv = gl_FragCoord.xy / res;
             vec2 p = (gl_FragCoord.xy * 2.0 - res) / min(res.x, res.y);
 
             float t = u_time * u_motion;
             float x = p.x;
 
-            // Living path: multiple frequencies move independently.
-            float travel = 0.16 * sin(t * 0.31);
             float yCenter =
-                  0.30 * sin(x * 1.18 + t * 0.36)
-                + 0.11 * sin(x * 2.55 - t * 0.23 + 1.4)
-                + 0.045 * sin(x * 4.90 + t * 0.17)
-                + x * 0.18
-                + travel - 0.04;
+                  1.12 * x
+                + 0.12 * sin(x * 1.55 - t * 0.42)
+                + 0.055 * sin(x * 3.25 + t * 0.31 + 1.15)
+                + 0.030 * sin(x * 5.60 - t * 0.22)
+                + 0.07 * sin(t * 0.24)
+                - 0.02;
 
-            // The ribbon itself bends asymmetrically over time.
-            yCenter += 0.06 * sin(t * 0.21 + x * 0.72);
+            yCenter += 0.035 * sin(t * 0.37 + x * 0.90);
 
             float d = abs(p.y - yCenter);
 
-            // Moving bulges: the apparent surface swells and thins continuously.
-            float bulge1 = 0.5 + 0.5 * sin(x * 2.00 - t * 0.62);
-            float bulge2 = 0.5 + 0.5 * sin(x * 3.70 + t * 0.41 + 1.7);
-            float breathe = 0.5 + 0.5 * sin(t * 0.55 + x * 1.35);
+            float thickA = 0.5 + 0.5 * sin(x * 2.15 - t * 0.74);
+            float thickB = 0.5 + 0.5 * sin(x * 4.10 + t * 0.46 + 1.7);
+            float breathe = 0.5 + 0.5 * sin(t * 0.58 + x * 1.25);
 
-            float width = 0.055
-                        + 0.042 * bulge1 * bulge1
-                        + 0.018 * bulge2
-                        + 0.012 * breathe;
+            float width = 0.042
+                        + 0.030 * thickA * thickA
+                        + 0.013 * thickB
+                        + 0.010 * breathe;
 
-            // Make one traveling thick luminous section, Revolut-style.
-            float hotWave = 0.5 + 0.5 * sin(x * 1.55 - t * 0.88);
-            width += 0.035 * hotWave * hotWave;
+            float bulge = 0.5 + 0.5 * sin(x * 1.42 - t * 0.92 + 0.6);
+            width += 0.032 * pow(bulge, 4.0);
 
-            float core  = 1.0 - smoothstep(width * 0.10, width * 0.43, d);
-            float body  = 1.0 - smoothstep(width * 0.44, width * 1.00, d);
-            float edge  = 1.0 - smoothstep(width * 0.92, width * 1.35, d);
+            float coreWhite = 1.0 - smoothstep(width * 0.055, width * 0.22, d);
+            float coreTint  = 1.0 - smoothstep(width * 0.18,  width * 0.46, d);
+            float body      = 1.0 - smoothstep(width * 0.42,  width * 1.02, d);
+            float edge      = 1.0 - smoothstep(width * 0.92,  width * 1.38, d);
 
-            float glowNear = exp(-d * 7.6);
-            float glowFar  = exp(-d * 2.9);
+            float glowNear = exp(-d * 8.8);
+            float glowMid  = exp(-d * 4.5);
+            float glowFar  = exp(-d * 2.2);
 
-            // Fluid color travels independently of geometry.
-            vec3 wave = paletteFluid(x + 0.24 * sin(p.y * 1.4), t);
+            vec3 wave = goxionFlow(x, p.y, t);
 
-            // White/cyan energy hotspot moves inside the surface.
-            float hotspot = pow(0.5 + 0.5 * sin(x * 1.72 - t * 0.96 + 0.8), 5.0);
-            vec3 hot = mix(wave, vec3(0.88, 0.98, 1.0), 0.28 + 0.40 * hotspot);
+            float energy = pow(0.5 + 0.5 * sin(x * 1.72 - t * 1.05 + 0.9), 5.0);
+            vec3 whiteHot = mix(vec3(1.0), vec3(0.78, 0.94, 1.0), 0.20 + 0.28 * energy);
 
             vec3 col = vec3(0.0);
-            col += wave * glowFar  * (0.055 + 0.045 * bulge1);
-            col += wave * glowNear * (0.14  + 0.08  * breathe);
-            col += wave * edge     * 0.12;
-            col += wave * body     * (0.34 + 0.12 * bulge1);
-            col += hot  * core     * (0.28 + 0.36 * hotspot);
+            col += wave * glowFar  * (0.035 + 0.028 * thickA);
+            col += wave * glowMid  * (0.080 + 0.050 * breathe);
+            col += wave * glowNear * (0.140 + 0.070 * bulge);
+            col += wave * edge * 0.10;
+            col += wave * body * (0.26 + 0.12 * thickA);
+            col += wave * coreTint * (0.18 + 0.16 * energy);
+            col += whiteHot * coreWhite * (0.72 + 0.26 * energy);
+            col += wave * glowMid * pow(bulge, 5.0) * 0.075;
 
-            // Subtle color cloud around the thickest area, not a second ribbon.
-            float haze = exp(-d * 1.7) * hotWave * 0.050;
-            col += wave * haze;
-
-            // Keep UI readable and black background truly black.
-            float vignette = smoothstep(1.55, 0.22, length(p * vec2(0.64, 0.46)));
-            col *= 0.76 + 0.24 * vignette;
+            float vignette = smoothstep(1.70, 0.25, length(p * vec2(0.58, 0.42)));
+            col *= 0.78 + 0.22 * vignette;
 
             float lum = max(col.r, max(col.g, col.b));
-            float alpha = clamp(lum * 0.94, 0.0, 0.92);
+            float alpha = clamp(lum * 0.96, 0.0, 0.93);
             gl_FragColor = vec4(col, alpha);
         }
     `;
@@ -6130,10 +6122,10 @@ window.closeGamif = function() {
     window.addEventListener('resize', resize, {passive:true});
     resize();
     raf = requestAnimationFrame(frame);
-    console.info('GOXION Beta Background: Wave 02.5 Compatible activo.');
+    console.info('GOXION Beta Background: Wave 02.6 Diagonal Neon activo.');
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.11 · BETA WAVE 02.5</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.12 · BETA WAVE 02.6</div>
 </body>
 </html>
