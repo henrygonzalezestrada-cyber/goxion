@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.23-beta-wave-02-17">
+<html lang="es" data-goxion-version="1.0.24-beta-wave-02-18">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3629,6 +3629,113 @@
     user-select: none;
     -webkit-user-select: none;
     pointer-events: none;
+}
+</style>
+
+
+<style id="goxion-motion-system-02-18">
+/* =========================================================
+   GOXION MOTION SYSTEM // COMBINED PASS
+   1) Spatial tab transitions
+   2) Action-button state morphs
+   3) Mi Espacio -> Auth Sheet shared container morph
+
+   No modifica los parámetros glass existentes.
+   No anima filter/blur para evitar residuos en Safari/iOS.
+   ========================================================= */
+
+/* ---------- Spatial navigation ---------- */
+.view-section.gx-view-motion {
+    will-change: transform, opacity;
+}
+
+body.gx-tab-transitioning {
+    overflow-x: hidden;
+}
+
+/* ---------- Reusable action-state morph ---------- */
+.gx-action-morph {
+    position: relative;
+    overflow: hidden;
+    transform-origin: center center;
+    will-change: transform, opacity;
+}
+
+.gx-action-morph.gx-action-busy {
+    transform: scale(.985);
+}
+
+.gx-action-morph.gx-action-success {
+    transform: scale(1);
+}
+
+.gx-action-morph .gx-action-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+}
+
+/* ---------- Mi Espacio shared-container morph ---------- */
+.gx-auth-morph-ghost {
+    position: fixed !important;
+    z-index: 3200 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    will-change: left, top, width, height, border-radius, opacity, background-color, border-color;
+}
+
+.gx-auth-morph-ghost-content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-weight: 700;
+    white-space: nowrap;
+    will-change: opacity, transform;
+}
+
+.auth-overlay.gx-auth-measure {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+.auth-overlay.gx-auth-measure .auth-sheet {
+    transform: translateY(0) !important;
+    transition: none !important;
+}
+
+.auth-overlay.gx-auth-shared-open .auth-sheet {
+    transform: translateY(0) !important;
+    transition: none !important;
+}
+
+.auth-sheet.gx-auth-content-hidden > * {
+    visibility: hidden !important;
+}
+
+.auth-sheet.gx-auth-content-fade {
+    will-change: opacity, transform;
+}
+
+/* Keep the header source stable while its temporary twin travels. */
+#header-action-btn.gx-auth-source-hidden {
+    visibility: hidden !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gx-auth-morph-ghost {
+        display: none !important;
+    }
+
+    .view-section.gx-view-motion {
+        transform: none !important;
+        opacity: 1 !important;
+    }
 }
 </style>
 
@@ -7618,6 +7725,475 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.23 · BETA WAVE 02.17</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.24 · BETA WAVE 02.18</div>
+
+<script id="goxion-motion-system-02-18-js">
+(() => {
+    const reduceMotion = () =>
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    /* =========================================================
+       1) SPATIAL NAVIGATION
+       ========================================================= */
+    let gxTabBusy = false;
+    let gxPendingTab = null;
+    const gxTabOrder = { inicio: 0, catalogo: 1, soporte: 2 };
+
+    function gxCurrentTabName() {
+        const active = document.querySelector('#goxion-main-nav [data-goxion-tab].active');
+        return active?.dataset?.goxionTab || 'inicio';
+    }
+
+    function gxTargetView(tabName) {
+        if (tabName === 'inicio') {
+            const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : '';
+            return document.getElementById(key ? 'view-dashboard' : 'view-inicio');
+        }
+        return document.getElementById(`view-${tabName}`);
+    }
+
+    function gxPrepareTabState(tabName) {
+        ['inicio', 'catalogo', 'soporte'].forEach(name => {
+            const btn = document.getElementById(`btn-tab-${name}`);
+            if (btn) btn.classList.toggle('active', name === tabName);
+        });
+
+        if (tabName === 'inicio') {
+            const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : '';
+            const guestCard = document.getElementById('guest-action-card');
+            if (guestCard) guestCard.style.display = key ? 'none' : 'block';
+        }
+
+        const bar = document.getElementById('sticky-client-bar');
+        if (bar) bar.classList.remove('show');
+
+        if (tabName !== 'catalogo') {
+            document.getElementById('floating-cart')?.classList.remove('show');
+        }
+    }
+
+    function gxPostTabState(tabName) {
+        if (tabName === 'catalogo') {
+            setTimeout(() => completarMisionInteligente?.('catalogo'), 800);
+            renderCartFloating?.();
+        } else if (tabName === 'soporte') {
+            setTimeout(() => completarMisionInteligente?.('soporte'), 800);
+        }
+
+        actualizarBloqueoSoporte?.();
+
+        if (tabName === 'inicio') setTimeout(() => revealOnScroll?.(), 100);
+    }
+
+    window.switchTab = async function(tabName) {
+        if (!['inicio', 'catalogo', 'soporte'].includes(tabName)) return;
+
+        if (gxTabBusy) {
+            gxPendingTab = tabName;
+            return;
+        }
+
+        const oldTab = gxCurrentTabName();
+        const currentView = document.querySelector('.view-section.active');
+        const targetView = gxTargetView(tabName);
+
+        gxPrepareTabState(tabName);
+
+        if (!targetView) return;
+
+        if (currentView === targetView) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            gxPostTabState(tabName);
+            return;
+        }
+
+        gxTabBusy = true;
+        document.body.classList.add('gx-tab-transitioning');
+
+        const direction = (gxTabOrder[tabName] ?? 0) >= (gxTabOrder[oldTab] ?? 0) ? 1 : -1;
+        const canAnimate = !reduceMotion() && Element.prototype.animate;
+
+        try {
+            if (canAnimate && currentView) {
+                currentView.classList.add('gx-view-motion');
+
+                const outAnim = currentView.animate([
+                    { opacity: 1, transform: 'translateX(0) scale(1)' },
+                    { opacity: 0, transform: `translateX(${-18 * direction}px) scale(.995)` }
+                ], {
+                    duration: 155,
+                    easing: 'cubic-bezier(.4,0,.2,1)'
+                });
+
+                await outAnim.finished.catch(() => {});
+            }
+
+            document.querySelectorAll('.view-section.active').forEach(view => view.classList.remove('active'));
+            targetView.classList.add('active', 'gx-view-motion');
+
+            window.scrollTo({ top: 0, behavior: 'auto' });
+
+            if (canAnimate) {
+                const inAnim = targetView.animate([
+                    { opacity: 0, transform: `translateX(${22 * direction}px) scale(.992)` },
+                    { opacity: 1, transform: 'translateX(0) scale(1)' }
+                ], {
+                    duration: 285,
+                    easing: 'cubic-bezier(.16,1,.3,1)'
+                });
+
+                await inAnim.finished.catch(() => {});
+            }
+
+            targetView.classList.remove('gx-view-motion');
+            currentView?.classList.remove('gx-view-motion');
+            gxPostTabState(tabName);
+        } finally {
+            document.body.classList.remove('gx-tab-transitioning');
+            gxTabBusy = false;
+
+            if (gxPendingTab && gxPendingTab !== tabName) {
+                const next = gxPendingTab;
+                gxPendingTab = null;
+                window.switchTab(next);
+            } else {
+                gxPendingTab = null;
+            }
+        }
+    };
+
+    /* =========================================================
+       2) ACTION BUTTON STATE MORPHS
+       ========================================================= */
+    function gxMorphActionButton(btn, text, state = 'busy', duration = 220) {
+        if (!btn) return Promise.resolve();
+
+        btn.classList.add('gx-action-morph');
+        btn.classList.toggle('gx-action-busy', state === 'busy');
+        btn.classList.toggle('gx-action-success', state === 'success');
+
+        if (reduceMotion() || !Element.prototype.animate) {
+            btn.innerHTML = `<span class="gx-action-label">${text}</span>`;
+            return Promise.resolve();
+        }
+
+        const oldContent = btn.innerHTML;
+
+        const out = btn.animate([
+            { opacity: 1, transform: 'scale(1)' },
+            { opacity: .15, transform: 'scale(.94)' }
+        ], {
+            duration: Math.round(duration * .42),
+            easing: 'ease-in'
+        });
+
+        return out.finished.catch(() => {}).then(() => {
+            btn.innerHTML = `<span class="gx-action-label">${text}</span>`;
+
+            const incoming = btn.animate([
+                { opacity: .15, transform: 'scale(.94)' },
+                { opacity: 1, transform: 'scale(1)' }
+            ], {
+                duration: Math.round(duration * .58),
+                easing: 'cubic-bezier(.16,1,.3,1)'
+            });
+
+            return incoming.finished.catch(() => {}).then(() => oldContent);
+        });
+    }
+
+    const originalEnviarPedido = window.enviarPedido;
+    if (typeof originalEnviarPedido === 'function') {
+        window.enviarPedido = function(...args) {
+            const btn = document.querySelector('#floating-cart .cart-btn');
+
+            gxMorphActionButton(btn, '••• Procesando', 'busy', 180).then(() => {
+                originalEnviarPedido.apply(this, args);
+
+                const cart = document.getElementById('floating-cart');
+                if (cart && btn) {
+                    cart.classList.add('show');
+                    gxMorphActionButton(btn, '✓ Pedido enviado', 'success', 220);
+
+                    setTimeout(() => {
+                        cart.classList.remove('show');
+                        btn.classList.remove('gx-action-busy', 'gx-action-success');
+                        btn.innerHTML = 'Enviar Pedido 📲';
+                    }, 780);
+                }
+            });
+        };
+    }
+
+    const originalSendSmartWA = window.sendSmartWA;
+    if (typeof originalSendSmartWA === 'function') {
+        window.sendSmartWA = function(...args) {
+            const selector = document.getElementById('issue-selector');
+            const input = document.getElementById('smart-extra-input');
+            const valid = selector?.value !== '' && Boolean(input?.value?.trim());
+
+            if (!valid) return originalSendSmartWA.apply(this, args);
+
+            const btn = document.getElementById('smart-action-btn');
+
+            // Keep window.open synchronous so iOS never treats it as a blocked popup.
+            const result = originalSendSmartWA.apply(this, args);
+
+            gxMorphActionButton(btn, '✓ Solicitud preparada', 'success', 220);
+
+            setTimeout(() => {
+                if (btn) {
+                    btn.classList.remove('gx-action-busy', 'gx-action-success');
+                    btn.innerHTML = '📲 Enviar Solicitud a Soporte';
+                }
+            }, 1200);
+
+            return result;
+        };
+    }
+
+    /* =========================================================
+       3) MI ESPACIO -> AUTH SHEET SHARED CONTAINER
+       ========================================================= */
+    let gxAuthBusy = false;
+
+    function gxComputedSurface(el) {
+        const cs = getComputedStyle(el);
+        return {
+            backgroundColor: cs.backgroundColor,
+            borderColor: cs.borderColor,
+            borderWidth: cs.borderWidth,
+            borderStyle: cs.borderStyle,
+            borderRadius: cs.borderRadius,
+            boxShadow: cs.boxShadow
+        };
+    }
+
+    function gxCreateAuthGhost(source, rect) {
+        const surface = gxComputedSurface(source);
+        const ghost = document.createElement('div');
+        ghost.className = 'gx-auth-morph-ghost';
+
+        Object.assign(ghost.style, {
+            left: `${rect.left}px`,
+            top: `${rect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            backgroundColor: surface.backgroundColor,
+            borderColor: surface.borderColor,
+            borderWidth: surface.borderWidth,
+            borderStyle: surface.borderStyle,
+            borderRadius: surface.borderRadius,
+            boxShadow: surface.boxShadow
+        });
+
+        const content = document.createElement('div');
+        content.className = 'gx-auth-morph-ghost-content';
+        content.innerHTML = source.innerHTML;
+        ghost.appendChild(content);
+
+        document.body.appendChild(ghost);
+        return { ghost, content };
+    }
+
+    function gxMeasureAuthTarget(overlay, sheet) {
+        overlay.classList.add('gx-auth-measure');
+        const rect = sheet.getBoundingClientRect();
+        overlay.classList.remove('gx-auth-measure');
+        return rect;
+    }
+
+    window.openAuthSheet = async function() {
+        if (gxAuthBusy) return;
+
+        const overlay = document.getElementById('auth-overlay');
+        const sheet = document.getElementById('auth-sheet');
+        const source = document.getElementById('header-action-btn');
+
+        if (!overlay || !sheet || !source) return;
+
+        if (reduceMotion() || !Element.prototype.animate) {
+            overlay.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            return;
+        }
+
+        gxAuthBusy = true;
+
+        const sourceRect = source.getBoundingClientRect();
+        const targetRect = gxMeasureAuthTarget(overlay, sheet);
+        const targetSurface = gxComputedSurface(sheet);
+        const { ghost, content } = gxCreateAuthGhost(source, sourceRect);
+
+        source.classList.add('gx-auth-source-hidden');
+
+        overlay.classList.add('show', 'gx-auth-shared-open');
+        sheet.classList.add('gx-auth-content-hidden', 'gx-auth-content-fade');
+        document.body.style.overflow = 'hidden';
+
+        const ghostAnim = ghost.animate([
+            {
+                left: `${sourceRect.left}px`,
+                top: `${sourceRect.top}px`,
+                width: `${sourceRect.width}px`,
+                height: `${sourceRect.height}px`,
+                borderRadius: getComputedStyle(source).borderRadius,
+                backgroundColor: getComputedStyle(source).backgroundColor,
+                borderColor: getComputedStyle(source).borderColor
+            },
+            {
+                left: `${targetRect.left}px`,
+                top: `${targetRect.top}px`,
+                width: `${targetRect.width}px`,
+                height: `${targetRect.height}px`,
+                borderRadius: targetSurface.borderRadius,
+                backgroundColor: targetSurface.backgroundColor,
+                borderColor: targetSurface.borderColor
+            }
+        ], {
+            duration: 460,
+            easing: 'cubic-bezier(.18,.86,.22,1)',
+            fill: 'forwards'
+        });
+
+        content.animate([
+            { opacity: 1, transform: 'scale(1)' },
+            { opacity: 0, transform: 'scale(.90)' }
+        ], {
+            duration: 230,
+            easing: 'ease-in',
+            fill: 'forwards'
+        });
+
+        await wait(275);
+
+        sheet.classList.remove('gx-auth-content-hidden');
+        sheet.animate([
+            { opacity: 0, transform: 'translateY(8px) scale(.995)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+        ], {
+            duration: 250,
+            easing: 'cubic-bezier(.16,1,.3,1)'
+        });
+
+        await ghostAnim.finished.catch(() => {});
+        ghost.remove();
+
+        sheet.classList.remove('gx-auth-content-fade');
+        source.classList.remove('gx-auth-source-hidden');
+        gxAuthBusy = false;
+    };
+
+    window.closeAuthSheet = async function() {
+        if (gxAuthBusy) return;
+
+        const overlay = document.getElementById('auth-overlay');
+        const sheet = document.getElementById('auth-sheet');
+        const target = document.getElementById('header-action-btn');
+
+        if (!overlay || !sheet || !target || !overlay.classList.contains('show')) return;
+
+        if (reduceMotion() || !Element.prototype.animate) {
+            overlay.classList.remove('show', 'gx-auth-shared-open');
+            document.body.style.overflow = 'auto';
+            return;
+        }
+
+        gxAuthBusy = true;
+
+        const sourceRect = sheet.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+
+        // Build a neutral sheet-colored surface and let it collapse back into Mi Espacio.
+        const ghost = document.createElement('div');
+        ghost.className = 'gx-auth-morph-ghost';
+
+        const sourceSurface = gxComputedSurface(sheet);
+        const targetSurface = gxComputedSurface(target);
+
+        Object.assign(ghost.style, {
+            left: `${sourceRect.left}px`,
+            top: `${sourceRect.top}px`,
+            width: `${sourceRect.width}px`,
+            height: `${sourceRect.height}px`,
+            backgroundColor: sourceSurface.backgroundColor,
+            borderColor: sourceSurface.borderColor,
+            borderWidth: sourceSurface.borderWidth,
+            borderStyle: sourceSurface.borderStyle,
+            borderRadius: sourceSurface.borderRadius,
+            boxShadow: sourceSurface.boxShadow
+        });
+
+        document.body.appendChild(ghost);
+        target.classList.add('gx-auth-source-hidden');
+
+        const sheetFade = sheet.animate([
+            { opacity: 1, transform: 'translateY(0) scale(1)' },
+            { opacity: 0, transform: 'translateY(6px) scale(.992)' }
+        ], {
+            duration: 150,
+            easing: 'ease-in',
+            fill: 'forwards'
+        });
+
+        await wait(95);
+
+        const ghostAnim = ghost.animate([
+            {
+                left: `${sourceRect.left}px`,
+                top: `${sourceRect.top}px`,
+                width: `${sourceRect.width}px`,
+                height: `${sourceRect.height}px`,
+                borderRadius: sourceSurface.borderRadius,
+                backgroundColor: sourceSurface.backgroundColor,
+                borderColor: sourceSurface.borderColor
+            },
+            {
+                left: `${targetRect.left}px`,
+                top: `${targetRect.top}px`,
+                width: `${targetRect.width}px`,
+                height: `${targetRect.height}px`,
+                borderRadius: targetSurface.borderRadius,
+                backgroundColor: targetSurface.backgroundColor,
+                borderColor: targetSurface.borderColor
+            }
+        ], {
+            duration: 420,
+            easing: 'cubic-bezier(.22,.72,.18,1)',
+            fill: 'forwards'
+        });
+
+        await ghostAnim.finished.catch(() => {});
+
+        overlay.classList.remove('show', 'gx-auth-shared-open');
+        document.body.style.overflow = 'auto';
+
+        try { sheetFade.cancel(); } catch (_) {}
+        sheet.style.opacity = '';
+        sheet.style.transform = '';
+
+        ghost.remove();
+        target.classList.remove('gx-auth-source-hidden');
+        gxAuthBusy = false;
+    };
+
+    window.closeAuthSheetEvent = function(event) {
+        if (event.target?.classList?.contains('auth-overlay')) {
+            window.closeAuthSheet();
+        }
+    };
+
+    window.toggleAuth = function() {
+        if (typeof getCurrentClientKey === 'function' && getCurrentClientKey()) {
+            cerrarSesion?.();
+        } else {
+            window.openAuthSheet();
+        }
+    };
+})();
+</script>
+
 </body>
 </html>
