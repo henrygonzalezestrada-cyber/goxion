@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.22-beta-wave-02-16">
+<html lang="es" data-goxion-version="1.0.23-beta-wave-02-17">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -1613,7 +1613,6 @@
         }
 
         .gx-support-back {
-            display: none;
             position: absolute;
             top: 12px;
             right: 12px;
@@ -1621,28 +1620,36 @@
             height: 34px;
             appearance: none;
             -webkit-appearance: none;
-            border: 1px solid rgba(255,255,255,0.10);
-            background: rgba(0,0,0,0.22);
-            color: var(--text-main);
+            border: 1px solid rgba(0,242,254,0.88);
+            background: var(--neon-blue);
+            color: #030305;
             border-radius: 50%;
             padding: 0;
             margin: 0;
             font-size: 23px;
-            font-weight: 400;
+            font-weight: 600;
             line-height: 1;
             cursor: pointer;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            z-index: 4;
-            transition: transform .22s cubic-bezier(.2,.8,.2,1), background .22s ease, border-color .22s ease;
+            z-index: 8;
+            box-shadow: 0 0 12px rgba(0,242,254,0.18);
+            transform: scale(.82);
+            opacity: 0;
+            will-change: transform, opacity;
         }
 
-        .gx-support-flow-shell.gx-inside-platform .gx-support-back {
-            display: inline-flex;
+        .gx-support-back.gx-support-x-visible {
+            transform: scale(1);
+            opacity: 1;
+            transition:
+                transform .22s cubic-bezier(.16,1,.3,1),
+                opacity .18s ease-out;
         }
 
         .gx-support-back:active {
-            transform: scale(.92);
+            transform: scale(.90);
         }
 
         .gx-support-issue-options {
@@ -3900,8 +3907,6 @@
 
                 <div id="support-flow-home">
                     <div id="support-flow-shell" class="gx-support-flow-shell">
-                        <button type="button" class="gx-support-back" aria-label="Cerrar asistente y cambiar plataforma" onclick="closeSupportMorph(event)">×</button>
-
                         <div id="step-2" class="step-box">
                             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
                             <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
@@ -5980,6 +5985,57 @@
             `).join('');
         }
 
+        function gxMountSupportClose(el) {
+            if (!el) return null;
+
+            const old = el.querySelector(':scope > .gx-support-back');
+            if (old) old.remove();
+
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'gx-support-back';
+            btn.setAttribute('aria-label', 'Cerrar asistente y cambiar plataforma');
+            btn.textContent = '×';
+
+            btn.addEventListener('click', (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                closeSupportMorph(event);
+            });
+
+            el.appendChild(btn);
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => btn.classList.add('gx-support-x-visible'));
+            });
+
+            return btn;
+        }
+
+        async function gxUnmountSupportClose(el) {
+            const btn = el?.querySelector(':scope > .gx-support-back');
+            if (!btn) return;
+
+            btn.classList.remove('gx-support-x-visible');
+
+            if (!Element.prototype.animate) {
+                btn.remove();
+                return;
+            }
+
+            const anim = btn.animate([
+                { opacity: 1, transform: 'scale(1)' },
+                { opacity: 0, transform: 'scale(.82)' }
+            ], {
+                duration: 110,
+                easing: 'ease-in',
+                fill: 'forwards'
+            });
+
+            await anim.finished.catch(() => {});
+            btn.remove();
+        }
+
         async function gxOpenSupportMorph(el) {
             if (!el || gxSupportMorphBusy || gxSupportExpandedEl === el) return;
 
@@ -6038,6 +6094,11 @@
 
             setTimeout(() => {
                 flow.classList.remove('gx-support-step-enter');
+
+                // The X is mounted only after the morph lands, so it never
+                // scales or flies with the expanding platform card.
+                gxMountSupportClose(el);
+
                 gxSupportMorphBusy = false;
             }, reduceMotion ? 0 : 450);
         }
@@ -6062,6 +6123,11 @@
 
             const firstRect = el.getBoundingClientRect();
             const firstCardHeight = card.getBoundingClientRect().height;
+
+            // Remove the X before any FLIP/height transformation starts.
+            // This prevents the control from jumping, scaling or changing
+            // coordinate systems during contraction.
+            await gxUnmountSupportClose(el);
 
             if (!reduceMotion && Element.prototype.animate) {
                 const fadeFlow = flow.animate([
@@ -7552,6 +7618,6 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.22 · BETA WAVE 02.16</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.23 · BETA WAVE 02.17</div>
 </body>
 </html>
