@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.32-beta-wave-02-26">
+<html lang="es" data-goxion-version="1.0.33-beta-wave-02-27">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,11 +3676,11 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // SINGLE COMPONENT MORPH 02.26 ---------- */
+/* ---------- Mi Espacio // FLIP OPTIMIZED 02.27 ---------- */
 /*
-   One DOM object from start to finish:
-   pill + title + fields + button all live inside #header-action-btn.
-   No ghost, no clone, no auth-sheet, no visual handoff.
+   Same real component, but the expensive geometry animation is gone.
+   The card receives its final geometry once, then only transform is animated.
+   The real Mi Espacio label is temporarily lifted as a shared element.
 */
 
 .auth-overlay.gx-auth-backdrop-only {
@@ -3690,12 +3690,13 @@ body.gx-tab-transitioning {
     display: block !important;
     opacity: 0;
     pointer-events: none;
-    background: rgba(3,3,5,.30) !important;
-    backdrop-filter: blur(14px) saturate(1.04);
-    -webkit-backdrop-filter: blur(14px) saturate(1.04);
-    transition: opacity .26s cubic-bezier(.2,.8,.2,1) !important;
+    background: rgba(3,3,5,.26) !important;
+    backdrop-filter: blur(10px) saturate(1.03);
+    -webkit-backdrop-filter: blur(10px) saturate(1.03);
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
+    will-change: opacity;
+    transition: opacity .24s cubic-bezier(.2,.8,.2,1) !important;
 }
 
 .auth-overlay.gx-auth-backdrop-only.show {
@@ -3710,13 +3711,12 @@ body.gx-tab-transitioning {
     pointer-events: none;
 }
 
-/* Closed pill state remains the existing GOXION header style. */
 .gx-auth-root {
     position: relative;
     isolation: isolate;
 }
 
-.gx-auth-root .gx-auth-pill-label {
+.gx-auth-pill-label {
     position: relative;
     z-index: 3;
     display: inline-flex;
@@ -3724,18 +3724,43 @@ body.gx-tab-transitioning {
     justify-content: center;
     gap: 6px;
     white-space: nowrap;
-    transform-origin: center;
 }
 
-/* Content lives inside the pill from the beginning, but is visually dormant. */
+.gx-auth-title-extra {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 5px);
+    opacity: 0;
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .15px;
+    transform: translate(-50%, 4px);
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+/* Real label temporarily becomes its own shared element.
+   Still the exact same DOM node; never cloned. */
+.gx-auth-pill-label.gx-auth-label-floating {
+    position: fixed !important;
+    z-index: 3205 !important;
+    margin: 0 !important;
+    pointer-events: none !important;
+    transform-origin: center center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+}
+
+/* Inline login content already belongs to the real Mi Espacio component. */
 .gx-auth-inline-content {
     position: absolute;
     z-index: 2;
     left: 22px;
     right: 22px;
-    top: 66px;
-    bottom: 22px;
-
+    top: 94px;
+    bottom: auto;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -3760,7 +3785,7 @@ body.gx-tab-transitioning {
     padding: 15px 16px;
     font-size: 16px;
     border-radius: 17px;
-    background: rgba(5,7,13,.58);
+    background: rgba(5,7,13,.62);
     border: 1px solid rgba(255,255,255,.11);
     box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
 }
@@ -3773,19 +3798,20 @@ body.gx-tab-transitioning {
 .gx-auth-submit {
     min-height: 54px;
     margin-top: 4px;
+    margin-bottom: 2px;
     border-radius: 17px !important;
+    flex: 0 0 auto;
 }
 
 .gx-auth-inline-close {
     position: absolute;
-    top: -52px;
+    top: -80px;
     right: -10px;
     width: 34px;
     height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
-
     border-radius: 50%;
     border: 1px solid rgba(0,242,254,.34);
     background: rgba(0,242,254,.10);
@@ -3799,8 +3825,9 @@ body.gx-tab-transitioning {
     text-align: center;
 }
 
-/* The REAL component while it has left the header and is morphing. */
-#header-action-btn.gx-auth-morphing {
+/* REAL root at its final card geometry.
+   No backdrop-filter here while moving; only the static page backdrop is blurred. */
+#header-action-btn.gx-auth-flip-card {
     position: fixed !important;
     z-index: 3100 !important;
     margin: 0 !important;
@@ -3812,58 +3839,28 @@ body.gx-tab-transitioning {
     cursor: default !important;
     pointer-events: auto !important;
 
-    /* Important Safari/iPhone simplification:
-       no backdrop-filter on the object while geometry is moving. */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
 
     transition: none !important;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    transform-origin: 0 0 !important;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-
-    background: rgba(8,8,12,.76) !important;
-    border: 1px solid rgba(0,242,254,.20) !important;
-    box-shadow:
-        0 22px 64px rgba(0,0,0,.46),
-        0 0 28px rgba(0,242,254,.06) !important;
-
-    will-change: left, top, width, height, border-radius;
+    will-change: transform, border-radius, background-color;
 }
 
-#header-action-btn.gx-auth-morphing:hover {
-    background: rgba(8,8,12,.76) !important;
+#header-action-btn.gx-auth-flip-card:hover {
     color: var(--neon-blue) !important;
-    box-shadow:
-        0 22px 64px rgba(0,0,0,.46),
-        0 0 28px rgba(0,242,254,.06) !important;
 }
 
-/* Same label, now physically moving inside the same component. */
-#header-action-btn.gx-auth-morphing .gx-auth-pill-label {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 3;
-    transform: translate(-50%, -50%);
-    will-change: transform, color;
-}
-
-#header-action-btn.gx-auth-open .gx-auth-inline-content {
+#header-action-btn.gx-auth-card-open .gx-auth-inline-content {
     visibility: visible;
     pointer-events: auto;
 }
 
-/* Content is revealed progressively by WAAPI, not by swapping a second panel. */
-#header-action-btn.gx-auth-open .gx-auth-inline-content {
-    opacity: 1;
-}
-
-@media (max-height: 670px) {
+@media (max-height: 690px) {
     .gx-auth-inline-content {
-        top: 58px;
-        bottom: 16px;
+        top: 84px;
     }
 
     .gx-auth-login-subtitle {
@@ -3871,12 +3868,12 @@ body.gx-tab-transitioning {
     }
 
     .gx-auth-inline-content .input-smart {
-        min-height: 48px;
+        min-height: 49px;
         margin-bottom: 9px;
     }
 
     .gx-auth-submit {
-        min-height: 49px;
+        min-height: 50px;
     }
 }
 
@@ -3915,6 +3912,7 @@ body.gx-tab-transitioning {
             <span class="gx-auth-pill-label">
                 <span class="gx-auth-pill-icon">👤</span>
                 <span id="header-btn-text">Mi Espacio</span>
+                <span class="gx-auth-title-extra">Accede a tu espacio</span>
             </span>
 
             <div class="gx-auth-inline-content" onclick="event.stopPropagation()">
@@ -7840,7 +7838,7 @@ function goxionLegacyAdapter(data) {
     const uMotion = gl.getUniformLocation(program, 'u_motion');
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let width = 0, height = 0, raf = 0, visible = true;
+    let width = 0, height = 0, raf = 0, visible = true, paused = false;
     const start = performance.now();
 
     function resize() {
@@ -7857,7 +7855,7 @@ function goxionLegacyAdapter(data) {
     }
 
     function frame(now) {
-        if (!visible) return;
+        if (!visible || paused) return;
         resize();
         gl.uniform1f(uTime, (now - start) / 1000);
         gl.uniform1f(uMotion, reduced.matches ? 0.0 : 1.0);
@@ -7867,9 +7865,21 @@ function goxionLegacyAdapter(data) {
 
     document.addEventListener('visibilitychange', () => {
         visible = !document.hidden;
-        if (visible) { cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); }
-        else cancelAnimationFrame(raf);
+        if (visible && !paused) {
+            cancelAnimationFrame(raf);
+            raf = requestAnimationFrame(frame);
+        } else {
+            cancelAnimationFrame(raf);
+        }
     });
+
+    window.gxWaveSetPaused = function(value) {
+        paused = !!value;
+        cancelAnimationFrame(raf);
+        if (!paused && visible) {
+            raf = requestAnimationFrame(frame);
+        }
+    };
 
     window.addEventListener('resize', resize, {passive:true});
     resize();
@@ -7878,7 +7888,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.26</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.27</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8108,172 +8118,203 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> SINGLE COMPONENT MORPH
-       One real component. Container + title + fields animate together.
+       3) MI ESPACIO -> FLIP OPTIMIZED
+       Same DOM component. No clone. No layout animation per frame.
        ========================================================= */
     let gxAuthBusy = false;
     let gxAuthOpen = false;
     let gxAuthPlaceholder = null;
     let gxAuthOriginalParent = null;
     let gxAuthOriginalNextSibling = null;
-    let gxAuthAnimations = [];
+    let gxAuthSourceRect = null;
+    let gxAuthSourceStyle = null;
+    let gxAuthLabelSourceRect = null;
 
     const gxAuthWait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    function gxAuthCancelAnimations() {
-        gxAuthAnimations.forEach(anim => {
-            try { anim.cancel(); } catch (_) {}
-        });
-        gxAuthAnimations = [];
+    function gxAuthCardStyle() {
+        return {
+            backgroundColor: 'rgba(8,8,12,.84)',
+            borderColor: 'rgba(0,242,254,.20)',
+            borderRadius: '26px',
+            boxShadow: '0 22px 64px rgba(0,0,0,.46), 0 0 28px rgba(0,242,254,.06)'
+        };
     }
 
-    function gxAuthCardGeometry() {
-        const width = Math.min(390, Math.max(300, window.innerWidth - 40));
-        const height = Math.min(306, Math.max(278, window.innerHeight - 250));
+    function gxAuthReadSourceStyle(root) {
+        const cs = getComputedStyle(root);
+        return {
+            backgroundColor: cs.backgroundColor,
+            borderColor: cs.borderColor,
+            borderRadius: cs.borderRadius,
+            boxShadow: cs.boxShadow,
+            color: cs.color
+        };
+    }
+
+    function gxAuthMeasureContentHeight(root, cardWidth) {
+        const content = root.querySelector('.gx-auth-inline-content');
+        if (!content) return 232;
+
+        const snapshot = {
+            position: content.style.position,
+            left: content.style.left,
+            right: content.style.right,
+            top: content.style.top,
+            bottom: content.style.bottom,
+            width: content.style.width,
+            visibility: content.style.visibility,
+            opacity: content.style.opacity,
+            pointerEvents: content.style.pointerEvents
+        };
+
+        Object.assign(content.style, {
+            position: 'fixed',
+            left: '-10000px',
+            right: 'auto',
+            top: '0',
+            bottom: 'auto',
+            width: `${Math.max(240, cardWidth - 44)}px`,
+            visibility: 'hidden',
+            opacity: '0',
+            pointerEvents: 'none'
+        });
+
+        const height = Math.ceil(content.scrollHeight || content.getBoundingClientRect().height || 232);
+
+        Object.assign(content.style, snapshot);
+        return height;
+    }
+
+    function gxAuthCardGeometry(root) {
+        const width = Math.min(390, Math.max(310, window.innerWidth - 40));
+        const contentHeight = gxAuthMeasureContentHeight(root, width);
+
+        // Title area + real form height + comfortable bottom breathing room.
+        const naturalHeight = 94 + contentHeight + 26;
+        const maxHeight = Math.max(350, window.innerHeight - 118);
+        const height = Math.min(maxHeight, Math.max(350, naturalHeight));
+
         const left = Math.round((window.innerWidth - width) / 2);
         const top = Math.round(Math.max(
-            76,
-            (window.innerHeight - height) / 2 - 10
+            66,
+            (window.innerHeight - height) / 2 - 5
         ));
 
         return { left, top, width, height };
     }
 
-    function gxAuthRectStyles(rect, radius) {
-        return {
-            left: `${rect.left}px`,
-            top: `${rect.top}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`,
-            borderRadius: radius
-        };
-    }
-
-    function gxAuthCreatePlaceholder(source, rect) {
+    function gxAuthCreatePlaceholder(root, rect) {
         const placeholder = document.createElement('span');
         placeholder.className = 'gx-auth-pill-placeholder';
         placeholder.style.width = `${rect.width}px`;
         placeholder.style.height = `${rect.height}px`;
 
-        gxAuthOriginalParent = source.parentNode;
-        gxAuthOriginalNextSibling = source.nextSibling;
-        gxAuthOriginalParent.insertBefore(placeholder, source);
+        gxAuthOriginalParent = root.parentNode;
+        gxAuthOriginalNextSibling = root.nextSibling;
+        gxAuthOriginalParent.insertBefore(placeholder, root);
 
         return placeholder;
     }
 
-    function gxAuthContentItems(root) {
-        return [
-            root.querySelector('.gx-auth-login-subtitle'),
-            root.querySelector('#login-id'),
-            root.querySelector('#login-pin'),
-            root.querySelector('#btn-login-submit'),
-            root.querySelector('.gx-auth-inline-close'),
-            root.querySelector('#login-error')
-        ].filter(Boolean);
+    function gxAuthFlipData(sourceRect, cardRect) {
+        return {
+            sx: sourceRect.width / cardRect.width,
+            sy: sourceRect.height / cardRect.height,
+            dx: sourceRect.left - cardRect.left,
+            dy: sourceRect.top - cardRect.top
+        };
+    }
+
+    function gxAuthFlipMatrix(flip) {
+        return `matrix(${flip.sx},0,0,${flip.sy},${flip.dx},${flip.dy})`;
+    }
+
+    function gxAuthInitialRadius(sourceStyle, flip) {
+        const sourceRadius = parseFloat(sourceStyle.borderRadius) || 20;
+        const rx = Math.max(1, sourceRadius / Math.max(flip.sx, .01));
+        const ry = Math.max(1, sourceRadius / Math.max(flip.sy, .01));
+        return `${rx}px / ${ry}px`;
+    }
+
+    function gxAuthContent(root) {
+        return root.querySelector('.gx-auth-inline-content');
     }
 
     function gxAuthPrimeContent(root) {
-        const content = root.querySelector('.gx-auth-inline-content');
-        if (content) {
-            content.style.visibility = 'visible';
-            content.style.opacity = '1';
-            content.style.pointerEvents = 'auto';
-        }
+        const content = gxAuthContent(root);
+        if (!content) return;
 
-        gxAuthContentItems(root).forEach(item => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(8px) scale(.99)';
-        });
+        content.style.visibility = 'visible';
+        content.style.pointerEvents = 'auto';
+        content.style.opacity = '0';
+        content.style.transform = 'translateY(10px) scale(.992)';
     }
 
     function gxAuthResetContent(root) {
-        const content = root.querySelector('.gx-auth-inline-content');
-        if (content) {
-            content.style.visibility = '';
-            content.style.opacity = '';
-            content.style.pointerEvents = '';
-        }
+        const content = gxAuthContent(root);
+        if (!content) return;
 
-        gxAuthContentItems(root).forEach(item => {
-            item.style.opacity = '';
-            item.style.transform = '';
-        });
+        content.style.visibility = '';
+        content.style.pointerEvents = '';
+        content.style.opacity = '';
+        content.style.transform = '';
     }
 
-    function gxAuthRevealWhileGrowing(root) {
-        const items = gxAuthContentItems(root);
-        const delays = [75, 125, 165, 205, 245, 245];
+    function gxAuthMoveLabelToFloating(label, rect) {
+        label.classList.add('gx-auth-label-floating');
+        Object.assign(label.style, {
+            left: `${rect.left}px`,
+            top: `${rect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            color: gxAuthSourceStyle.color
+        });
+        document.body.appendChild(label);
+    }
 
-        return items.map((item, index) => {
-            const anim = item.animate([
-                { opacity: 0, transform: 'translateY(8px) scale(.99)' },
-                { opacity: 1, transform: 'translateY(0) scale(1)' }
-            ], {
-                duration: 225,
-                delay: delays[index] ?? 180,
-                easing: 'cubic-bezier(.16,1,.3,1)',
+    function gxAuthLabelTarget(cardRect, labelRect) {
+        const startCx = labelRect.left + labelRect.width / 2;
+        const startCy = labelRect.top + labelRect.height / 2;
+
+        const targetCx = cardRect.left + cardRect.width / 2;
+        const targetCy = cardRect.top + 34;
+
+        return {
+            dx: targetCx - startCx,
+            dy: targetCy - startCy
+        };
+    }
+
+    function gxAuthAnimateExtra(label, opening) {
+        const extra = label.querySelector('.gx-auth-title-extra');
+        if (!extra || !Element.prototype.animate) return null;
+
+        return extra.animate(
+            opening
+                ? [
+                    { opacity: 0, transform: 'translate(-50%, 5px)' },
+                    { opacity: 1, transform: 'translate(-50%, 0)' }
+                  ]
+                : [
+                    { opacity: 1, transform: 'translate(-50%, 0)' },
+                    { opacity: 0, transform: 'translate(-50%, 5px)' }
+                  ],
+            {
+                duration: opening ? 185 : 125,
+                delay: opening ? 190 : 0,
+                easing: opening ? 'cubic-bezier(.16,1,.3,1)' : 'ease-in',
                 fill: 'forwards'
-            });
-
-            gxAuthAnimations.push(anim);
-            return anim;
-        });
+            }
+        );
     }
 
-    function gxAuthHideWhileShrinking(root) {
-        const items = gxAuthContentItems(root);
-
-        return items.map((item, index) => {
-            const anim = item.animate([
-                { opacity: 1, transform: 'translateY(0) scale(1)' },
-                { opacity: 0, transform: 'translateY(5px) scale(.992)' }
-            ], {
-                duration: 125,
-                delay: Math.min(index, 4) * 5,
-                easing: 'cubic-bezier(.4,0,.2,1)',
-                fill: 'forwards'
-            });
-
-            gxAuthAnimations.push(anim);
-            return anim;
-        });
-    }
-
-    function gxAuthLabelAnimation(label, cardRect, opening) {
-        const targetY = -(cardRect.height / 2) + 31;
-
-        const frames = opening
-            ? [
-                { transform: 'translate(-50%, -50%) translateY(0) scale(1)', color: getComputedStyle(label).color },
-                { transform: 'translate(-50%, -50%) translateY(-18px) scale(1.02)', offset: .44 },
-                { transform: `translate(-50%, -50%) translateY(${targetY}px) scale(1.08)`, color: 'var(--text-main)' }
-              ]
-            : [
-                { transform: `translate(-50%, -50%) translateY(${targetY}px) scale(1.08)`, color: 'var(--text-main)' },
-                { transform: 'translate(-50%, -50%) translateY(-18px) scale(1.02)', offset: .50 },
-                { transform: 'translate(-50%, -50%) translateY(0) scale(1)', color: 'var(--neon-blue)' }
-              ];
-
-        const anim = label.animate(frames, {
-            duration: opening ? 410 : 385,
-            easing: opening
-                ? 'cubic-bezier(.18,.86,.22,1)'
-                : 'cubic-bezier(.22,.72,.18,1)',
-            fill: 'forwards'
-        });
-
-        gxAuthAnimations.push(anim);
-        return anim;
-    }
-
-    async function gxAuthChangeText(opening) {
-        const textEl = document.getElementById('header-btn-text');
-        if (!textEl) return;
-
-        // Same DOM text node; no duplicate label and no second title.
-        await gxAuthWait(opening ? 135 : 105);
-        textEl.textContent = opening ? 'Accede a tu espacio' : 'Mi Espacio';
+    function gxAuthPauseWave(paused) {
+        try {
+            if (typeof window.gxWaveSetPaused === 'function') {
+                window.gxWaveSetPaused(paused);
+            }
+        } catch (_) {}
     }
 
     window.gxAuthRootClick = function(event) {
@@ -8299,55 +8340,133 @@ function goxionLegacyAdapter(data) {
         }
 
         gxAuthBusy = true;
-        gxAuthCancelAnimations();
 
-        const fromRect = root.getBoundingClientRect();
-        const toRect = gxAuthCardGeometry();
-        const startRadius = getComputedStyle(root).borderRadius || '20px';
+        gxAuthSourceRect = root.getBoundingClientRect();
+        gxAuthSourceStyle = gxAuthReadSourceStyle(root);
+        gxAuthLabelSourceRect = label.getBoundingClientRect();
 
-        gxAuthPlaceholder = gxAuthCreatePlaceholder(root, fromRect);
+        const cardRect = gxAuthCardGeometry(root);
+        const cardStyle = gxAuthCardStyle();
+        const flip = gxAuthFlipData(gxAuthSourceRect, cardRect);
+        const inverse = gxAuthFlipMatrix(flip);
+        const startRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
 
-        // Freeze the real component at the exact source pixels BEFORE reparenting.
-        root.classList.add('gx-auth-morphing');
-        Object.assign(root.style, gxAuthRectStyles(fromRect, startRadius));
+        gxAuthPlaceholder = gxAuthCreatePlaceholder(root, gxAuthSourceRect);
 
-        // Move the SAME component to body. No visual replacement exists.
+        // Freeze the REAL root before changing parent.
+        root.classList.add('gx-auth-flip-card');
+        Object.assign(root.style, {
+            left: `${gxAuthSourceRect.left}px`,
+            top: `${gxAuthSourceRect.top}px`,
+            width: `${gxAuthSourceRect.width}px`,
+            height: `${gxAuthSourceRect.height}px`,
+            backgroundColor: gxAuthSourceStyle.backgroundColor,
+            borderColor: gxAuthSourceStyle.borderColor,
+            borderRadius: gxAuthSourceStyle.borderRadius,
+            boxShadow: 'none',
+            transform: 'none'
+        });
+
         document.body.appendChild(root);
 
-        root.setAttribute('aria-expanded', 'true');
-        gxAuthPrimeContent(root);
+        // Lift THE REAL label out before the root receives the FLIP scale.
+        gxAuthMoveLabelToFloating(label, gxAuthLabelSourceRect);
 
-        // Backdrop comes in behind the already-existing component.
+        // One layout jump only: put root at final card geometry.
+        Object.assign(root.style, {
+            left: `${cardRect.left}px`,
+            top: `${cardRect.top}px`,
+            width: `${cardRect.width}px`,
+            height: `${cardRect.height}px`,
+            transformOrigin: '0 0',
+            transform: inverse,
+            borderRadius: startRadius
+        });
+
+        gxAuthPrimeContent(root);
+        root.classList.add('gx-auth-card-open');
+        root.setAttribute('aria-expanded', 'true');
+
+        // Freeze the moving WebGL wave before applying a full-screen blur.
+        gxAuthPauseWave(true);
         overlay.classList.add('show');
         document.body.style.overflow = 'hidden';
 
-        // Force exact starting layout.
         void root.offsetWidth;
 
         const shape = root.animate([
-            gxAuthRectStyles(fromRect, startRadius),
-            gxAuthRectStyles(toRect, '26px')
+            {
+                transform: inverse,
+                borderRadius: startRadius,
+                backgroundColor: gxAuthSourceStyle.backgroundColor,
+                borderColor: gxAuthSourceStyle.borderColor
+            },
+            {
+                transform: 'matrix(1,0,0,1,0,0)',
+                borderRadius: cardStyle.borderRadius,
+                backgroundColor: cardStyle.backgroundColor,
+                borderColor: cardStyle.borderColor
+            }
         ], {
-            duration: 410,
+            duration: 430,
             easing: 'cubic-bezier(.18,.86,.22,1)',
             fill: 'forwards'
         });
-        gxAuthAnimations.push(shape);
 
-        const labelAnim = gxAuthLabelAnimation(label, toRect, true);
-        const contentAnims = gxAuthRevealWhileGrowing(root);
-        const textChange = gxAuthChangeText(true);
+        const labelTarget = gxAuthLabelTarget(cardRect, gxAuthLabelSourceRect);
+        const labelMove = label.animate([
+            { transform: 'translate3d(0,0,0) scale(1)' },
+            { transform: `translate3d(${labelTarget.dx}px,${labelTarget.dy}px,0) scale(1.06)` }
+        ], {
+            duration: 430,
+            easing: 'cubic-bezier(.18,.86,.22,1)',
+            fill: 'forwards'
+        });
 
-        // The component is considered open while the SAME movement is still finishing.
-        await gxAuthWait(150);
-        root.classList.add('gx-auth-open');
+        const extraIn = gxAuthAnimateExtra(label, true);
+
+        // One compositor animation for the WHOLE form instead of six animations.
+        const content = gxAuthContent(root);
+        const contentIn = content.animate([
+            { opacity: 0, transform: 'translateY(10px) scale(.992)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+        ], {
+            duration: 235,
+            delay: 235,
+            easing: 'cubic-bezier(.16,1,.3,1)',
+            fill: 'forwards'
+        });
 
         await Promise.allSettled([
             shape.finished,
-            labelAnim.finished,
-            textChange,
-            ...contentAnims.map(a => a.finished)
+            labelMove.finished,
+            extraIn?.finished || Promise.resolve(),
+            contentIn.finished
         ]);
+
+        // Commit stable OPEN state before cancelling any WAAPI animation.
+        Object.assign(root.style, {
+            transform: 'none',
+            borderRadius: cardStyle.borderRadius,
+            backgroundColor: cardStyle.backgroundColor,
+            borderColor: cardStyle.borderColor,
+            boxShadow: cardStyle.boxShadow
+        });
+        content.style.opacity = '1';
+        content.style.transform = 'none';
+
+        label.style.transform =
+            `translate3d(${labelTarget.dx}px,${labelTarget.dy}px,0) scale(1.06)`;
+
+        const extra = label.querySelector('.gx-auth-title-extra');
+        if (extra) {
+            extra.style.opacity = '1';
+            extra.style.transform = 'translate(-50%, 0)';
+        }
+
+        [shape, labelMove, extraIn, contentIn].forEach(anim => {
+            try { anim?.cancel(); } catch (_) {}
+        });
 
         gxAuthOpen = true;
         gxAuthBusy = false;
@@ -8361,7 +8480,7 @@ function goxionLegacyAdapter(data) {
 
         const root = document.getElementById('header-action-btn');
         const overlay = document.getElementById('auth-overlay');
-        const label = root?.querySelector('.gx-auth-pill-label');
+        const label = document.querySelector('.gx-auth-pill-label.gx-auth-label-floating');
         const destination = gxAuthPlaceholder?.getBoundingClientRect();
 
         if (!root || !overlay || !label || !destination) return;
@@ -8374,40 +8493,105 @@ function goxionLegacyAdapter(data) {
         }
 
         gxAuthBusy = true;
-        gxAuthCancelAnimations();
 
-        const fromRect = root.getBoundingClientRect();
-        const endRadius = '20px';
+        const cardRect = root.getBoundingClientRect();
+        const flip = gxAuthFlipData(destination, cardRect);
+        const inverse = gxAuthFlipMatrix(flip);
+        const endRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
+        const content = gxAuthContent(root);
 
-        // Important difference from earlier betas:
-        // shrinking begins immediately while the content is fading.
-        const shape = root.animate([
-            gxAuthRectStyles(fromRect, '26px'),
-            gxAuthRectStyles(destination, endRadius)
+        const currentLabelRect = label.getBoundingClientRect();
+        const sourceCx = gxAuthLabelSourceRect.left + gxAuthLabelSourceRect.width / 2;
+        const sourceCy = gxAuthLabelSourceRect.top + gxAuthLabelSourceRect.height / 2;
+        const currentCx = currentLabelRect.left + currentLabelRect.width / 2;
+        const currentCy = currentLabelRect.top + currentLabelRect.height / 2;
+        const labelDx = sourceCx - currentCx;
+        const labelDy = sourceCy - currentCy;
+
+        // Card, form, and title all start returning in the SAME frame.
+        const shapeBack = root.animate([
+            {
+                transform: 'matrix(1,0,0,1,0,0)',
+                borderRadius: '26px',
+                backgroundColor: 'rgba(8,8,12,.84)',
+                borderColor: 'rgba(0,242,254,.20)'
+            },
+            {
+                transform: inverse,
+                borderRadius: endRadius,
+                backgroundColor: gxAuthSourceStyle.backgroundColor,
+                borderColor: gxAuthSourceStyle.borderColor
+            }
         ], {
-            duration: 385,
+            duration: 390,
             easing: 'cubic-bezier(.22,.72,.18,1)',
             fill: 'forwards'
         });
-        gxAuthAnimations.push(shape);
 
-        const labelAnim = gxAuthLabelAnimation(label, fromRect, false);
-        const contentAnims = gxAuthHideWhileShrinking(root);
-        const textChange = gxAuthChangeText(false);
+        const contentOut = content.animate([
+            { opacity: 1, transform: 'translateY(0) scale(1)' },
+            { opacity: 0, transform: 'translateY(6px) scale(.992)' }
+        ], {
+            duration: 145,
+            easing: 'ease-in',
+            fill: 'forwards'
+        });
 
-        // Blur starts clearing only after the card is already clearly returning.
-        setTimeout(() => overlay.classList.remove('show'), 220);
+        // We use the current visual label position as the start. No snap.
+        const labelBack = label.animate([
+            { transform: label.style.transform || 'translate3d(0,0,0) scale(1.06)' },
+            {
+                transform:
+                    `translate3d(${(parseFloat(label.style.transform.match(/translate3d\(([-\d.]+)px/)?.[1]) || 0) + labelDx}px,` +
+                    `${(parseFloat(label.style.transform.match(/translate3d\([^,]+,([-\d.]+)px/)?.[1]) || 0) + labelDy}px,0) scale(1)`
+            }
+        ], {
+            duration: 390,
+            easing: 'cubic-bezier(.22,.72,.18,1)',
+            fill: 'forwards'
+        });
+
+        const extraOut = gxAuthAnimateExtra(label, false);
+
+        // Clear blur only after the card is already mostly home.
+        setTimeout(() => overlay.classList.remove('show'), 245);
 
         await Promise.allSettled([
-            shape.finished,
-            labelAnim.finished,
-            textChange,
-            ...contentAnims.map(a => a.finished)
+            shapeBack.finished,
+            contentOut.finished,
+            labelBack.finished,
+            extraOut?.finished || Promise.resolve()
         ]);
 
-        gxAuthCancelAnimations();
+        // Commit the exact SOURCE geometry before cancelling transform animations.
+        Object.assign(root.style, {
+            left: `${destination.left}px`,
+            top: `${destination.top}px`,
+            width: `${destination.width}px`,
+            height: `${destination.height}px`,
+            transform: 'none',
+            borderRadius: gxAuthSourceStyle.borderRadius,
+            backgroundColor: gxAuthSourceStyle.backgroundColor,
+            borderColor: gxAuthSourceStyle.borderColor,
+            boxShadow: gxAuthSourceStyle.boxShadow
+        });
 
-        // Put the SAME node back exactly where its placeholder lives.
+        [shapeBack, contentOut, labelBack, extraOut].forEach(anim => {
+            try { anim?.cancel(); } catch (_) {}
+        });
+
+        // Return the SAME shared label to the SAME root.
+        label.classList.remove('gx-auth-label-floating');
+        label.removeAttribute('style');
+
+        const extra = label.querySelector('.gx-auth-title-extra');
+        if (extra) {
+            extra.removeAttribute('style');
+        }
+
+        root.insertBefore(label, root.firstChild);
+
+        // Return the SAME root to its exact placeholder location.
         if (gxAuthOriginalParent && gxAuthPlaceholder) {
             gxAuthOriginalParent.insertBefore(root, gxAuthPlaceholder);
         } else if (gxAuthOriginalParent) {
@@ -8417,12 +8601,13 @@ function goxionLegacyAdapter(data) {
         gxAuthPlaceholder?.remove();
         gxAuthPlaceholder = null;
 
-        root.classList.remove('gx-auth-open', 'gx-auth-morphing');
+        root.classList.remove('gx-auth-card-open', 'gx-auth-flip-card');
         root.removeAttribute('style');
         root.setAttribute('aria-expanded', 'false');
-
         gxAuthResetContent(root);
+
         document.body.style.overflow = 'auto';
+        gxAuthPauseWave(false);
 
         gxAuthOpen = false;
         gxAuthBusy = false;
