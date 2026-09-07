@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.24-beta-wave-02-18">
+<html lang="es" data-goxion-version="1.0.25-beta-wave-02-19">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,59 +3676,60 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio shared-container morph ---------- */
-.gx-auth-morph-ghost {
-    position: fixed !important;
-    z-index: 3200 !important;
-    margin: 0 !important;
-    box-sizing: border-box !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-    will-change: left, top, width, height, border-radius, opacity, background-color, border-color;
+/* ---------- Mi Espacio // Full-Screen Flood Reveal ---------- */
+.auth-overlay.gx-auth-flood-mode {
+    background: transparent !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    overflow: hidden;
 }
 
-.gx-auth-morph-ghost-content {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    font-weight: 700;
-    white-space: nowrap;
+.gx-auth-flood {
+    position: fixed;
+    z-index: 0;
+    pointer-events: none;
+    overflow: hidden;
+    box-sizing: border-box;
+    will-change: left, top, width, height, border-radius, opacity;
+    background:
+        radial-gradient(circle at 34% 30%,
+            rgba(0,242,254,.40) 0%,
+            rgba(0,143,255,.30) 30%,
+            rgba(124,77,255,.27) 58%,
+            rgba(3,3,5,.90) 100%);
+    border: 1px solid rgba(0,242,254,.45);
+    box-shadow:
+        0 0 34px rgba(0,242,254,.18),
+        0 0 80px rgba(124,77,255,.12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+.auth-overlay.gx-auth-flood-mode .auth-sheet {
+    z-index: 2;
+    transform: translateY(0) !important;
+    transition: none !important;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.auth-overlay.gx-auth-flood-ready .auth-sheet {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.auth-overlay.gx-auth-flood-mode .auth-sheet > * {
     will-change: opacity, transform;
 }
 
-.auth-overlay.gx-auth-measure {
-    opacity: 0 !important;
-    pointer-events: none !important;
-}
-
-.auth-overlay.gx-auth-measure .auth-sheet {
-    transform: translateY(0) !important;
-    transition: none !important;
-}
-
-.auth-overlay.gx-auth-shared-open .auth-sheet {
-    transform: translateY(0) !important;
-    transition: none !important;
-}
-
-.auth-sheet.gx-auth-content-hidden > * {
-    visibility: hidden !important;
-}
-
-.auth-sheet.gx-auth-content-fade {
-    will-change: opacity, transform;
-}
-
-/* Keep the header source stable while its temporary twin travels. */
-#header-action-btn.gx-auth-source-hidden {
-    visibility: hidden !important;
+#header-action-btn.gx-auth-source-pulse {
+    will-change: transform, opacity;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .gx-auth-morph-ghost {
+    .gx-auth-flood {
         display: none !important;
     }
 
@@ -7725,7 +7726,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.24 · BETA WAVE 02.18</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.25 · BETA WAVE 02.19</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -7955,54 +7956,128 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> AUTH SHEET SHARED CONTAINER
+       3) MI ESPACIO -> FULL-SCREEN FLOOD REVEAL
+       Inspirado en transiciones donde una superficie nace del
+       control y se expande hasta cubrir toda la pantalla.
        ========================================================= */
     let gxAuthBusy = false;
+    let gxAuthFloodEl = null;
 
-    function gxComputedSurface(el) {
-        const cs = getComputedStyle(el);
+    function gxAuthCreateFlood(sourceRect, source) {
+        const flood = document.createElement('div');
+        flood.className = 'gx-auth-flood';
+
+        const cs = getComputedStyle(source);
+
+        Object.assign(flood.style, {
+            left: `${sourceRect.left}px`,
+            top: `${sourceRect.top}px`,
+            width: `${sourceRect.width}px`,
+            height: `${sourceRect.height}px`,
+            borderRadius: cs.borderRadius || '28px',
+            opacity: '1'
+        });
+
+        document.getElementById('auth-overlay')?.prepend(flood);
+        return flood;
+    }
+
+    function gxAuthFloodTarget(sourceRect) {
+        const cx = sourceRect.left + sourceRect.width / 2;
+        const cy = sourceRect.top + sourceRect.height / 2;
+
+        const distances = [
+            Math.hypot(cx, cy),
+            Math.hypot(innerWidth - cx, cy),
+            Math.hypot(cx, innerHeight - cy),
+            Math.hypot(innerWidth - cx, innerHeight - cy)
+        ];
+
+        const radius = Math.max(...distances) + 70;
+        const size = radius * 2;
+
         return {
-            backgroundColor: cs.backgroundColor,
-            borderColor: cs.borderColor,
-            borderWidth: cs.borderWidth,
-            borderStyle: cs.borderStyle,
-            borderRadius: cs.borderRadius,
-            boxShadow: cs.boxShadow
+            left: cx - radius,
+            top: cy - radius,
+            width: size,
+            height: size,
+            borderRadius: '50%'
         };
     }
 
-    function gxCreateAuthGhost(source, rect) {
-        const surface = gxComputedSurface(source);
-        const ghost = document.createElement('div');
-        ghost.className = 'gx-auth-morph-ghost';
-
-        Object.assign(ghost.style, {
-            left: `${rect.left}px`,
-            top: `${rect.top}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`,
-            backgroundColor: surface.backgroundColor,
-            borderColor: surface.borderColor,
-            borderWidth: surface.borderWidth,
-            borderStyle: surface.borderStyle,
-            borderRadius: surface.borderRadius,
-            boxShadow: surface.boxShadow
-        });
-
-        const content = document.createElement('div');
-        content.className = 'gx-auth-morph-ghost-content';
-        content.innerHTML = source.innerHTML;
-        ghost.appendChild(content);
-
-        document.body.appendChild(ghost);
-        return { ghost, content };
+    function gxAuthFormElements(sheet) {
+        return [
+            sheet.querySelector('.sheet-handle'),
+            sheet.querySelector('.close-sheet-btn'),
+            sheet.querySelector('.section-title'),
+            sheet.querySelector('#auth-view p'),
+            sheet.querySelector('#login-id'),
+            sheet.querySelector('#login-pin'),
+            sheet.querySelector('#btn-login-submit'),
+            sheet.querySelector('#login-error')
+        ].filter(Boolean);
     }
 
-    function gxMeasureAuthTarget(overlay, sheet) {
-        overlay.classList.add('gx-auth-measure');
-        const rect = sheet.getBoundingClientRect();
-        overlay.classList.remove('gx-auth-measure');
-        return rect;
+    function gxAuthHideForm(sheet) {
+        gxAuthFormElements(sheet).forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(10px) scale(.992)';
+        });
+    }
+
+    async function gxAuthRevealForm(sheet) {
+        const items = gxAuthFormElements(sheet);
+
+        if (reduceMotion() || !Element.prototype.animate) {
+            items.forEach(el => {
+                el.style.opacity = '';
+                el.style.transform = '';
+            });
+            return;
+        }
+
+        const animations = items.map((el, index) => {
+            const anim = el.animate([
+                { opacity: 0, transform: 'translateY(10px) scale(.992)' },
+                { opacity: 1, transform: 'translateY(0) scale(1)' }
+            ], {
+                duration: 300,
+                delay: Math.min(index, 6) * 42,
+                easing: 'cubic-bezier(.16,1,.3,1)',
+                fill: 'forwards'
+            });
+
+            return anim;
+        });
+
+        await Promise.allSettled(animations.map(anim => anim.finished));
+
+        items.forEach((el, index) => {
+            try { animations[index]?.cancel(); } catch (_) {}
+            el.style.opacity = '';
+            el.style.transform = '';
+        });
+    }
+
+    async function gxAuthHideFormAnimated(sheet) {
+        const items = gxAuthFormElements(sheet);
+
+        if (reduceMotion() || !Element.prototype.animate) return;
+
+        const animations = items.map((el, index) => el.animate([
+            { opacity: 1, transform: 'translateY(0) scale(1)' },
+            { opacity: 0, transform: 'translateY(6px) scale(.992)' }
+        ], {
+            duration: 145,
+            delay: Math.min(index, 5) * 9,
+            easing: 'cubic-bezier(.4,0,.2,1)',
+            fill: 'forwards'
+        }));
+
+        await Promise.allSettled(animations.map(anim => anim.finished));
+        animations.forEach(anim => {
+            try { anim.cancel(); } catch (_) {}
+        });
     }
 
     window.openAuthSheet = async function() {
@@ -8023,66 +8098,78 @@ function goxionLegacyAdapter(data) {
         gxAuthBusy = true;
 
         const sourceRect = source.getBoundingClientRect();
-        const targetRect = gxMeasureAuthTarget(overlay, sheet);
-        const targetSurface = gxComputedSurface(sheet);
-        const { ghost, content } = gxCreateAuthGhost(source, sourceRect);
+        const target = gxAuthFloodTarget(sourceRect);
 
-        source.classList.add('gx-auth-source-hidden');
-
-        overlay.classList.add('show', 'gx-auth-shared-open');
-        sheet.classList.add('gx-auth-content-hidden', 'gx-auth-content-fade');
+        overlay.classList.add('show', 'gx-auth-flood-mode');
         document.body.style.overflow = 'hidden';
 
-        const ghostAnim = ghost.animate([
+        gxAuthHideForm(sheet);
+        sheet.style.opacity = '0';
+        sheet.style.pointerEvents = 'none';
+
+        source.classList.add('gx-auth-source-pulse');
+        const sourcePulse = source.animate([
+            { transform: 'scale(1)', opacity: 1 },
+            { transform: 'scale(.96)', opacity: .88 },
+            { transform: 'scale(1)', opacity: 1 }
+        ], {
+            duration: 210,
+            easing: 'cubic-bezier(.2,.8,.2,1)'
+        });
+
+        gxAuthFloodEl?.remove();
+        gxAuthFloodEl = gxAuthCreateFlood(sourceRect, source);
+
+        const floodAnim = gxAuthFloodEl.animate([
             {
                 left: `${sourceRect.left}px`,
                 top: `${sourceRect.top}px`,
                 width: `${sourceRect.width}px`,
                 height: `${sourceRect.height}px`,
-                borderRadius: getComputedStyle(source).borderRadius,
-                backgroundColor: getComputedStyle(source).backgroundColor,
-                borderColor: getComputedStyle(source).borderColor
+                borderRadius: getComputedStyle(source).borderRadius || '28px',
+                opacity: 1
             },
             {
-                left: `${targetRect.left}px`,
-                top: `${targetRect.top}px`,
-                width: `${targetRect.width}px`,
-                height: `${targetRect.height}px`,
-                borderRadius: targetSurface.borderRadius,
-                backgroundColor: targetSurface.backgroundColor,
-                borderColor: targetSurface.borderColor
+                offset: .55,
+                borderRadius: '42%'
+            },
+            {
+                left: `${target.left}px`,
+                top: `${target.top}px`,
+                width: `${target.width}px`,
+                height: `${target.height}px`,
+                borderRadius: target.borderRadius,
+                opacity: 1
             }
         ], {
-            duration: 460,
+            duration: 610,
             easing: 'cubic-bezier(.18,.86,.22,1)',
             fill: 'forwards'
         });
 
-        content.animate([
-            { opacity: 1, transform: 'scale(1)' },
-            { opacity: 0, transform: 'scale(.90)' }
-        ], {
-            duration: 230,
-            easing: 'ease-in',
-            fill: 'forwards'
-        });
+        await wait(500);
 
-        await wait(275);
+        overlay.classList.add('gx-auth-flood-ready');
+        sheet.style.opacity = '1';
+        sheet.style.pointerEvents = 'auto';
 
-        sheet.classList.remove('gx-auth-content-hidden');
-        sheet.animate([
-            { opacity: 0, transform: 'translateY(8px) scale(.995)' },
+        const sheetIn = sheet.animate([
+            { opacity: 0, transform: 'translateY(14px) scale(.985)' },
             { opacity: 1, transform: 'translateY(0) scale(1)' }
         ], {
             duration: 250,
             easing: 'cubic-bezier(.16,1,.3,1)'
         });
 
-        await ghostAnim.finished.catch(() => {});
-        ghost.remove();
+        await Promise.allSettled([
+            floodAnim.finished,
+            sourcePulse.finished,
+            sheetIn.finished
+        ]);
 
-        sheet.classList.remove('gx-auth-content-fade');
-        source.classList.remove('gx-auth-source-hidden');
+        source.classList.remove('gx-auth-source-pulse');
+        await gxAuthRevealForm(sheet);
+
         gxAuthBusy = false;
     };
 
@@ -8091,91 +8178,81 @@ function goxionLegacyAdapter(data) {
 
         const overlay = document.getElementById('auth-overlay');
         const sheet = document.getElementById('auth-sheet');
-        const target = document.getElementById('header-action-btn');
+        const targetBtn = document.getElementById('header-action-btn');
 
-        if (!overlay || !sheet || !target || !overlay.classList.contains('show')) return;
+        if (!overlay || !sheet || !targetBtn || !overlay.classList.contains('show')) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.remove('show', 'gx-auth-shared-open');
+            overlay.classList.remove('show', 'gx-auth-flood-mode', 'gx-auth-flood-ready');
             document.body.style.overflow = 'auto';
+            gxAuthFloodEl?.remove();
+            gxAuthFloodEl = null;
             return;
         }
 
         gxAuthBusy = true;
 
-        const sourceRect = sheet.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
+        await gxAuthHideFormAnimated(sheet);
 
-        // Build a neutral sheet-colored surface and let it collapse back into Mi Espacio.
-        const ghost = document.createElement('div');
-        ghost.className = 'gx-auth-morph-ghost';
-
-        const sourceSurface = gxComputedSurface(sheet);
-        const targetSurface = gxComputedSurface(target);
-
-        Object.assign(ghost.style, {
-            left: `${sourceRect.left}px`,
-            top: `${sourceRect.top}px`,
-            width: `${sourceRect.width}px`,
-            height: `${sourceRect.height}px`,
-            backgroundColor: sourceSurface.backgroundColor,
-            borderColor: sourceSurface.borderColor,
-            borderWidth: sourceSurface.borderWidth,
-            borderStyle: sourceSurface.borderStyle,
-            borderRadius: sourceSurface.borderRadius,
-            boxShadow: sourceSurface.boxShadow
-        });
-
-        document.body.appendChild(ghost);
-        target.classList.add('gx-auth-source-hidden');
-
-        const sheetFade = sheet.animate([
+        const sheetOut = sheet.animate([
             { opacity: 1, transform: 'translateY(0) scale(1)' },
-            { opacity: 0, transform: 'translateY(6px) scale(.992)' }
+            { opacity: 0, transform: 'translateY(10px) scale(.988)' }
         ], {
-            duration: 150,
-            easing: 'ease-in',
+            duration: 155,
+            easing: 'cubic-bezier(.4,0,.2,1)',
             fill: 'forwards'
         });
 
-        await wait(95);
+        await sheetOut.finished.catch(() => {});
 
-        const ghostAnim = ghost.animate([
-            {
-                left: `${sourceRect.left}px`,
-                top: `${sourceRect.top}px`,
-                width: `${sourceRect.width}px`,
-                height: `${sourceRect.height}px`,
-                borderRadius: sourceSurface.borderRadius,
-                backgroundColor: sourceSurface.backgroundColor,
-                borderColor: sourceSurface.borderColor
-            },
-            {
-                left: `${targetRect.left}px`,
-                top: `${targetRect.top}px`,
-                width: `${targetRect.width}px`,
-                height: `${targetRect.height}px`,
-                borderRadius: targetSurface.borderRadius,
-                backgroundColor: targetSurface.backgroundColor,
-                borderColor: targetSurface.borderColor
-            }
-        ], {
-            duration: 420,
-            easing: 'cubic-bezier(.22,.72,.18,1)',
-            fill: 'forwards'
-        });
+        overlay.classList.remove('gx-auth-flood-ready');
+        sheet.style.pointerEvents = 'none';
 
-        await ghostAnim.finished.catch(() => {});
+        const targetRect = targetBtn.getBoundingClientRect();
+        const currentRect = gxAuthFloodEl?.getBoundingClientRect();
 
-        overlay.classList.remove('show', 'gx-auth-shared-open');
-        document.body.style.overflow = 'auto';
+        if (gxAuthFloodEl && currentRect) {
+            const floodBack = gxAuthFloodEl.animate([
+                {
+                    left: `${currentRect.left}px`,
+                    top: `${currentRect.top}px`,
+                    width: `${currentRect.width}px`,
+                    height: `${currentRect.height}px`,
+                    borderRadius: '50%',
+                    opacity: 1
+                },
+                {
+                    offset: .52,
+                    borderRadius: '38%'
+                },
+                {
+                    left: `${targetRect.left}px`,
+                    top: `${targetRect.top}px`,
+                    width: `${targetRect.width}px`,
+                    height: `${targetRect.height}px`,
+                    borderRadius: getComputedStyle(targetBtn).borderRadius || '28px',
+                    opacity: 1
+                }
+            ], {
+                duration: 480,
+                easing: 'cubic-bezier(.22,.72,.18,1)',
+                fill: 'forwards'
+            });
 
-        try { sheetFade.cancel(); } catch (_) {}
+            await floodBack.finished.catch(() => {});
+        }
+
+        try { sheetOut.cancel(); } catch (_) {}
         sheet.style.opacity = '';
         sheet.style.transform = '';
+        sheet.style.pointerEvents = '';
 
-        ghost.remove();
-        target.classList.remove('gx-auth-source-hidden');
+        gxAuthFloodEl?.remove();
+        gxAuthFloodEl = null;
+
+        overlay.classList.remove('show', 'gx-auth-flood-mode');
+        document.body.style.overflow = 'auto';
+
         gxAuthBusy = false;
     };
 
