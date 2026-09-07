@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.18-beta-wave-02-12">
+<html lang="es" data-goxion-version="1.0.19-beta-wave-02-13">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -6371,6 +6371,11 @@ function goxionLegacyAdapter(data) {
         );
 
         await Promise.allSettled([realFade.finished, floatFade.finished]);
+
+        realTarget.style.opacity = targetOpacity;
+        try { realFade.cancel(); } catch (_) {}
+        try { floatFade.cancel(); } catch (_) {}
+
         realTarget.style.opacity = oldInlineOpacity;
         realTarget.style.visibility = '';
         floating.remove();
@@ -6398,7 +6403,7 @@ function goxionLegacyAdapter(data) {
                 duration: entering ? 300 : 205,
                 delay,
                 easing: entering ? 'cubic-bezier(.16,1,.3,1)' : 'cubic-bezier(.4,0,.2,1)',
-                fill: 'both'
+                fill: entering ? 'backwards' : 'forwards'
             });
         });
     }
@@ -6411,6 +6416,31 @@ function goxionLegacyAdapter(data) {
         panel.style.visibility = visible ? 'visible' : '';
         panel.style.transform = '';
         panel.style.filter = '';
+    }
+
+    function gxReleaseFinishedMorphAnimations(root) {
+        if (!root || !root.getAnimations) return;
+        const nodes = [root, ...root.querySelectorAll('*')];
+
+        nodes.forEach(node => {
+            if (!node.getAnimations) return;
+            node.getAnimations().forEach(anim => {
+                // Only finished Web Animations can leak their composited final frame.
+                // CSS animations that are still running (shake, progress, tags, etc.) stay untouched.
+                if (anim.playState === 'finished') {
+                    const effect = anim.effect;
+                    const frames = effect && effect.getKeyframes ? effect.getKeyframes() : [];
+                    const isMorphResidue = frames.some(frame =>
+                        Object.prototype.hasOwnProperty.call(frame, 'filter') ||
+                        Object.prototype.hasOwnProperty.call(frame, 'transform') ||
+                        Object.prototype.hasOwnProperty.call(frame, 'opacity')
+                    );
+                    if (isMorphResidue) {
+                        try { anim.cancel(); } catch (_) {}
+                    }
+                }
+            });
+        });
     }
 
     function gxMeasureHiddenGrid(grid, source, host) {
@@ -6468,6 +6498,9 @@ function goxionLegacyAdapter(data) {
 
         gxGamifMorphing = true;
         gxActiveGamifType = type;
+
+        gxReleaseFinishedMorphAnimations(panel);
+        gxReleaseFinishedMorphAnimations(grid);
 
         if (gxReduceMotion() || !Element.prototype.animate) {
             grid.style.display = 'none';
@@ -6540,8 +6573,9 @@ function goxionLegacyAdapter(data) {
                 fill: 'forwards'
             });
 
+            let openPanelFade = null;
             setTimeout(() => {
-                panel.animate([{ opacity: 0 }, { opacity: 1 }], {
+                openPanelFade = panel.animate([{ opacity: 0 }, { opacity: 1 }], {
                     duration: 170,
                     easing: 'ease-out',
                     fill: 'forwards'
@@ -6569,6 +6603,13 @@ function goxionLegacyAdapter(data) {
             source.style.visibility = '';
             panel.style.opacity = '1';
 
+            // Safari can keep a finished WAAPI animation composited above inline styles.
+            // Release it now so a second open never inherits opacity/filter state.
+            if (openPanelFade) {
+                try { openPanelFade.cancel(); } catch (_) {}
+                openPanelFade = null;
+            }
+
             if (type === 'coupon') setTimeout(animarMisionesCompletadasEnSecuencia, 90);
         } finally {
             gxGamifMorphing = false;
@@ -6585,6 +6626,9 @@ function goxionLegacyAdapter(data) {
         if (!grid || !panel || !source || !host) return;
 
         gxGamifMorphing = true;
+
+        gxReleaseFinishedMorphAnimations(panel);
+        gxReleaseFinishedMorphAnimations(grid);
 
         if (gxReduceMotion() || !Element.prototype.animate) {
             gxSetPanelReady(panel, false);
@@ -6634,7 +6678,7 @@ function goxionLegacyAdapter(data) {
                   )
                 : null;
 
-            gxAnimateChildren(panel, false);
+            const exitChildAnims = gxAnimateChildren(panel, false);
 
             // Content leaves first, while the glass surface stays in place.
             const panelFade = panel.animate([
@@ -6686,6 +6730,14 @@ function goxionLegacyAdapter(data) {
             // A temporary spacer preserves the old height and then collapses smoothly,
             // so "Tu próxima fecha de corte" never jumps over/behind the cards.
             panel.style.display = 'none';
+
+            // Critical iOS/Safari cleanup: finished animations with fill:'forwards'
+            // otherwise retain blur()/transform in the compositor on later openings.
+            try { panelFade.cancel(); } catch (_) {}
+            exitChildAnims.forEach(anim => {
+                try { anim.cancel(); } catch (_) {}
+            });
+
             panel.style.opacity = '';
             panel.style.transform = '';
             panel.style.filter = '';
@@ -6750,7 +6802,11 @@ function goxionLegacyAdapter(data) {
                 ...cardAnims.map(a => a.finished)
             ]);
 
-            cards.forEach(card => {
+            cards.forEach((card, index) => {
+                // Commit the natural final state, then release the WAAPI layer.
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+                try { cardAnims[index]?.cancel(); } catch (_) {}
                 card.style.opacity = '';
                 card.style.transform = '';
             });
@@ -7012,6 +7068,6 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.18 · BETA WAVE 02.12</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.19 · BETA WAVE 02.13</div>
 </body>
 </html>
