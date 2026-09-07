@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.31-beta-wave-02-25">
+<html lang="es" data-goxion-version="1.0.32-beta-wave-02-26">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,167 +3676,85 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // REAL PILL MORPH 02.25 ---------- */
+/* ---------- Mi Espacio // SINGLE COMPONENT MORPH 02.26 ---------- */
 /*
-   No ghost. No clone. No second card surface.
-   The actual #header-action-btn is temporarily moved into this overlay
-   and becomes the centered login card.
+   One DOM object from start to finish:
+   pill + title + fields + button all live inside #header-action-btn.
+   No ghost, no clone, no auth-sheet, no visual handoff.
 */
-.auth-overlay.gx-auth-real-mode {
-    display: block !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    background: transparent !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    transition: none !important;
-    overflow: hidden;
-}
 
-.auth-overlay.gx-auth-real-mode::before {
-    content: "";
+.auth-overlay.gx-auth-backdrop-only {
     position: fixed;
     inset: 0;
-    z-index: 0;
+    z-index: 3000;
+    display: block !important;
+    opacity: 0;
     pointer-events: none;
-    background: rgba(3,3,5,.34);
+    background: rgba(3,3,5,.30) !important;
     backdrop-filter: blur(14px) saturate(1.04);
     -webkit-backdrop-filter: blur(14px) saturate(1.04);
-    opacity: 0;
+    transition: opacity .26s cubic-bezier(.2,.8,.2,1) !important;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
-    will-change: opacity;
-    transition: opacity .27s cubic-bezier(.2,.8,.2,1);
 }
 
-.auth-overlay.gx-auth-real-mode.gx-auth-blurred::before {
+.auth-overlay.gx-auth-backdrop-only.show {
     opacity: 1;
+    pointer-events: auto;
 }
 
 .gx-auth-pill-placeholder {
+    display: block;
     flex: 0 0 auto;
     visibility: hidden;
     pointer-events: none;
 }
 
-/* This is the REAL header pill while it is morphing / expanded. */
-#header-action-btn.gx-auth-real-morph {
-    position: fixed !important;
-    z-index: 1 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-    cursor: default !important;
-    box-sizing: border-box !important;
-
-    display: block !important;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    contain: layout paint;
-
-    transition:
-        left .46s cubic-bezier(.18,.86,.22,1),
-        top .46s cubic-bezier(.18,.86,.22,1),
-        width .46s cubic-bezier(.18,.86,.22,1),
-        height .46s cubic-bezier(.18,.86,.22,1),
-        border-radius .46s cubic-bezier(.18,.86,.22,1),
-        background-color .32s ease,
-        border-color .32s ease !important;
-
-    box-shadow:
-        0 18px 58px rgba(0,0,0,.42),
-        0 0 28px rgba(0,242,254,.06) !important;
+/* Closed pill state remains the existing GOXION header style. */
+.gx-auth-root {
+    position: relative;
+    isolation: isolate;
 }
 
-#header-action-btn.gx-auth-real-morph:hover {
-    color: var(--neon-blue);
-}
-
-/* SAME icon/text wrapper moves from pill center to card title position. */
-.gx-auth-pill-label {
+.gx-auth-root .gx-auth-pill-label {
+    position: relative;
+    z-index: 3;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
     white-space: nowrap;
-}
-
-#header-action-btn.gx-auth-real-morph .gx-auth-pill-label {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 2;
-    transform: translate(-50%, -50%) translateY(0) scale(1);
     transform-origin: center;
-    will-change: transform, color;
-    transition:
-        transform .46s cubic-bezier(.18,.86,.22,1),
-        color .30s ease;
 }
 
-#header-action-btn.gx-auth-real-morph.gx-auth-real-expanded .gx-auth-pill-label {
-    transform:
-        translate(-50%, -50%)
-        translateY(var(--gx-auth-title-y, -108px))
-        scale(1.08);
-    color: var(--text-main);
-}
+/* Content lives inside the pill from the beginning, but is visually dormant. */
+.gx-auth-inline-content {
+    position: absolute;
+    z-index: 2;
+    left: 22px;
+    right: 22px;
+    top: 66px;
+    bottom: 22px;
 
-/* Content-only layer. The shape behind it is the real header pill. */
-.auth-overlay.gx-auth-real-mode .auth-sheet {
-    position: fixed !important;
-    z-index: 2 !important;
-    margin: 0 !important;
-    padding: 66px 22px 22px !important;
-    overflow: visible !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
 
-    background: transparent !important;
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-
-    transform: none !important;
-    transition: none !important;
     opacity: 0;
+    visibility: hidden;
     pointer-events: none;
 }
 
-.auth-overlay.gx-auth-real-mode.gx-auth-content-ready .auth-sheet {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-.auth-overlay.gx-auth-real-mode #auth-view {
-    position: relative;
-    z-index: 2;
-    width: 100%;
-}
-
-.auth-overlay.gx-auth-real-mode .login-card {
-    margin: 0 !important;
-    padding: 0 !important;
-    text-align: center !important;
-}
-
-/* The real pill label is the title; don't reserve a second visible title. */
-.auth-overlay.gx-auth-real-mode .gx-auth-title-space {
-    display: none !important;
-}
-
-.auth-overlay.gx-auth-real-mode .gx-auth-login-subtitle {
+.gx-auth-login-subtitle {
     width: min(100%, 315px);
-    margin: 0 auto 20px !important;
+    margin: 0 auto 19px !important;
     color: var(--text-muted);
     font-size: 12px;
     line-height: 1.5;
+    text-align: center;
 }
 
-.auth-overlay.gx-auth-real-mode .input-smart {
+.gx-auth-inline-content .input-smart {
     min-height: 54px;
     margin-bottom: 12px;
     padding: 15px 16px;
@@ -3847,45 +3765,128 @@ body.gx-tab-transitioning {
     box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
 }
 
-.auth-overlay.gx-auth-real-mode .input-smart:focus {
+.gx-auth-inline-content .input-smart:focus {
     border-color: rgba(0,242,254,.68);
     box-shadow: 0 0 0 3px rgba(0,242,254,.07);
 }
 
-.auth-overlay.gx-auth-real-mode #btn-login-submit {
+.gx-auth-submit {
     min-height: 54px;
     margin-top: 4px;
-    border-radius: 17px;
+    border-radius: 17px !important;
 }
 
-.auth-overlay.gx-auth-real-mode .close-sheet-btn {
-    position: absolute !important;
-    z-index: 4;
-    top: 12px !important;
-    right: 12px !important;
-    width: 34px !important;
-    height: 34px !important;
-    display: flex !important;
+.gx-auth-inline-close {
+    position: absolute;
+    top: -52px;
+    right: -10px;
+    width: 34px;
+    height: 34px;
+    display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0,242,254,.10) !important;
-    border: 1px solid rgba(0,242,254,.34) !important;
-    color: var(--neon-blue) !important;
-    border-radius: 50% !important;
-    font-size: 15px !important;
-    box-shadow: none !important;
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+
+    border-radius: 50%;
+    border: 1px solid rgba(0,242,254,.34);
+    background: rgba(0,242,254,.10);
+    color: var(--neon-blue);
+    font-size: 15px;
+    cursor: pointer;
+    box-shadow: none;
 }
 
-.auth-overlay.gx-auth-real-mode .auth-sheet > *,
-.auth-overlay.gx-auth-real-mode .login-card > * {
-    will-change: opacity, transform;
+.gx-auth-error {
+    text-align: center;
+}
+
+/* The REAL component while it has left the header and is morphing. */
+#header-action-btn.gx-auth-morphing {
+    position: fixed !important;
+    z-index: 3100 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+
+    display: block !important;
+    cursor: default !important;
+    pointer-events: auto !important;
+
+    /* Important Safari/iPhone simplification:
+       no backdrop-filter on the object while geometry is moving. */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    transition: none !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+
+    background: rgba(8,8,12,.76) !important;
+    border: 1px solid rgba(0,242,254,.20) !important;
+    box-shadow:
+        0 22px 64px rgba(0,0,0,.46),
+        0 0 28px rgba(0,242,254,.06) !important;
+
+    will-change: left, top, width, height, border-radius;
+}
+
+#header-action-btn.gx-auth-morphing:hover {
+    background: rgba(8,8,12,.76) !important;
+    color: var(--neon-blue) !important;
+    box-shadow:
+        0 22px 64px rgba(0,0,0,.46),
+        0 0 28px rgba(0,242,254,.06) !important;
+}
+
+/* Same label, now physically moving inside the same component. */
+#header-action-btn.gx-auth-morphing .gx-auth-pill-label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+    will-change: transform, color;
+}
+
+#header-action-btn.gx-auth-open .gx-auth-inline-content {
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Content is revealed progressively by WAAPI, not by swapping a second panel. */
+#header-action-btn.gx-auth-open .gx-auth-inline-content {
+    opacity: 1;
+}
+
+@media (max-height: 670px) {
+    .gx-auth-inline-content {
+        top: 58px;
+        bottom: 16px;
+    }
+
+    .gx-auth-login-subtitle {
+        margin-bottom: 13px !important;
+    }
+
+    .gx-auth-inline-content .input-smart {
+        min-height: 48px;
+        margin-bottom: 9px;
+    }
+
+    .gx-auth-submit {
+        min-height: 49px;
+    }
 }
 
 @media (prefers-reduced-motion: reduce) {
     .gx-auth-pill-placeholder {
         visibility: hidden !important;
+    }
+
+    #header-action-btn.gx-auth-morphing {
+        transition: none !important;
     }
 
     .view-section.gx-view-motion {
@@ -3910,7 +3911,23 @@ body.gx-tab-transitioning {
 
     <header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
         <img src="logo2.PNG" alt="GOXION" class="app-logo">
-        <button class="header-action-btn" id="header-action-btn" onclick="toggleAuth()"><span class="gx-auth-pill-label"><span class="gx-auth-pill-icon">👤</span><span id="header-btn-text">Mi Espacio</span></span></button>
+        <div class="header-action-btn gx-auth-root" id="header-action-btn" role="button" tabindex="0" aria-expanded="false" onclick="gxAuthRootClick(event)">
+            <span class="gx-auth-pill-label">
+                <span class="gx-auth-pill-icon">👤</span>
+                <span id="header-btn-text">Mi Espacio</span>
+            </span>
+
+            <div class="gx-auth-inline-content" onclick="event.stopPropagation()">
+                <button type="button" class="gx-auth-inline-close" aria-label="Cerrar acceso" onclick="closeAuthSheet(event)">✕</button>
+                <p class="gx-auth-login-subtitle">Ingresa tus datos para acceder a tu panel personal.</p>
+
+                <input type="text" id="login-id" class="input-smart gx-auth-field" placeholder="Tu Nombre o ID (Ej. Juan de Dios)" autocomplete="username">
+                <input type="password" id="login-pin" class="input-smart gx-auth-field" placeholder="Código de Acceso (PIN)" autocomplete="current-password">
+
+                <button type="button" id="btn-login-submit" class="btn-primary gx-auth-submit" onclick="iniciarSesion()">Validar acceso</button>
+                <p id="login-error" class="gx-auth-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
+            </div>
+        </div>
     </header>
 
     <div class="bg" aria-hidden="true">
@@ -4255,24 +4272,7 @@ body.gx-tab-transitioning {
         </div>
     </div>
 
-    <div id="auth-overlay" class="auth-overlay" onclick="closeAuthSheetEvent(event)">
-        <div class="auth-sheet" id="auth-sheet">
-            <button class="close-sheet-btn" aria-label="Cerrar acceso" onclick="closeAuthSheet()">✕</button>
-
-            <div id="auth-view">
-                <div class="login-card">
-                    <div class="gx-auth-title-space" aria-hidden="true"></div>
-                    <p class="gx-auth-login-subtitle">Ingresa tus datos para acceder a tu panel personal.</p>
-
-                    <input type="text" id="login-id" class="input-smart" placeholder="Tu Nombre o ID (Ej. Juan de Dios)" autocomplete="username">
-                    <input type="password" id="login-pin" class="input-smart" placeholder="Código de Acceso (PIN)" autocomplete="current-password">
-
-                    <button id="btn-login-submit" class="btn-primary" onclick="iniciarSesion()">Validar acceso</button>
-                    <p id="login-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="auth-overlay" class="auth-overlay gx-auth-backdrop-only" onclick="closeAuthSheetEvent(event)"></div>
 
     <div id="floating-cart" class="glass-card floating-cart">
         <div class="cart-info">
@@ -7878,7 +7878,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.25</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.26</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8108,82 +8108,45 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> REAL DOM ELEMENT MORPH
-       The actual header button is reparented and transformed.
-       There is no visual clone / ghost at any point.
+       3) MI ESPACIO -> SINGLE COMPONENT MORPH
+       One real component. Container + title + fields animate together.
        ========================================================= */
     let gxAuthBusy = false;
+    let gxAuthOpen = false;
     let gxAuthPlaceholder = null;
     let gxAuthOriginalParent = null;
     let gxAuthOriginalNextSibling = null;
+    let gxAuthAnimations = [];
 
     const gxAuthWait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    function gxAuthContentElements(sheet) {
-        return [
-            sheet.querySelector('.close-sheet-btn'),
-            sheet.querySelector('.gx-auth-login-subtitle'),
-            sheet.querySelector('#login-id'),
-            sheet.querySelector('#login-pin'),
-            sheet.querySelector('#btn-login-submit'),
-            sheet.querySelector('#login-error')
-        ].filter(Boolean);
-    }
-
-    function gxAuthSetContentHidden(sheet) {
-        gxAuthContentElements(sheet).forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(7px) scale(.992)';
+    function gxAuthCancelAnimations() {
+        gxAuthAnimations.forEach(anim => {
+            try { anim.cancel(); } catch (_) {}
         });
+        gxAuthAnimations = [];
     }
 
-    function gxAuthResetContent(sheet) {
-        gxAuthContentElements(sheet).forEach(el => {
-            el.style.opacity = '';
-            el.style.transform = '';
-        });
+    function gxAuthCardGeometry() {
+        const width = Math.min(390, Math.max(300, window.innerWidth - 40));
+        const height = Math.min(306, Math.max(278, window.innerHeight - 250));
+        const left = Math.round((window.innerWidth - width) / 2);
+        const top = Math.round(Math.max(
+            76,
+            (window.innerHeight - height) / 2 - 10
+        ));
+
+        return { left, top, width, height };
     }
 
-    async function gxAuthRevealContent(sheet) {
-        const items = gxAuthContentElements(sheet);
-
-        if (reduceMotion() || !Element.prototype.animate) {
-            gxAuthResetContent(sheet);
-            return;
-        }
-
-        const animations = items.map((el, index) => el.animate([
-            { opacity: 0, transform: 'translateY(7px) scale(.992)' },
-            { opacity: 1, transform: 'translateY(0) scale(1)' }
-        ], {
-            duration: index === 0 ? 160 : 235,
-            delay: Math.min(index, 5) * 28,
-            easing: 'cubic-bezier(.16,1,.3,1)',
-            fill: 'forwards'
-        }));
-
-        await Promise.allSettled(animations.map(a => a.finished));
-        animations.forEach(a => { try { a.cancel(); } catch (_) {} });
-        gxAuthResetContent(sheet);
-    }
-
-    async function gxAuthHideContent(sheet) {
-        const items = gxAuthContentElements(sheet);
-
-        if (reduceMotion() || !Element.prototype.animate) return;
-
-        const animations = items.map((el, index) => el.animate([
-            { opacity: 1, transform: 'translateY(0) scale(1)' },
-            { opacity: 0, transform: 'translateY(4px) scale(.992)' }
-        ], {
-            duration: 100,
-            delay: Math.min(index, 5) * 3,
-            easing: 'cubic-bezier(.4,0,.2,1)',
-            fill: 'forwards'
-        }));
-
-        await Promise.allSettled(animations.map(a => a.finished));
-        animations.forEach(a => { try { a.cancel(); } catch (_) {} });
+    function gxAuthRectStyles(rect, radius) {
+        return {
+            left: `${rect.left}px`,
+            top: `${rect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            borderRadius: radius
+        };
     }
 
     function gxAuthCreatePlaceholder(source, rect) {
@@ -8191,7 +8154,6 @@ function goxionLegacyAdapter(data) {
         placeholder.className = 'gx-auth-pill-placeholder';
         placeholder.style.width = `${rect.width}px`;
         placeholder.style.height = `${rect.height}px`;
-        placeholder.style.display = 'block';
 
         gxAuthOriginalParent = source.parentNode;
         gxAuthOriginalNextSibling = source.nextSibling;
@@ -8200,242 +8162,283 @@ function goxionLegacyAdapter(data) {
         return placeholder;
     }
 
-    function gxAuthCardGeometry() {
-        const width = Math.min(390, Math.max(300, window.innerWidth - 40));
-        const height = 306;
-        const left = Math.round((window.innerWidth - width) / 2);
-        const top = Math.round(Math.max(
-            74,
-            (window.innerHeight - height) / 2 - 6
-        ));
-
-        return { left, top, width, height };
+    function gxAuthContentItems(root) {
+        return [
+            root.querySelector('.gx-auth-login-subtitle'),
+            root.querySelector('#login-id'),
+            root.querySelector('#login-pin'),
+            root.querySelector('#btn-login-submit'),
+            root.querySelector('.gx-auth-inline-close'),
+            root.querySelector('#login-error')
+        ].filter(Boolean);
     }
 
-    function gxAuthApplyRect(el, rect) {
-        el.style.left = `${rect.left}px`;
-        el.style.top = `${rect.top}px`;
-        el.style.width = `${rect.width}px`;
-        el.style.height = `${rect.height}px`;
-    }
-
-    function gxAuthSetSheetRect(sheet, rect) {
-        sheet.style.left = `${rect.left}px`;
-        sheet.style.top = `${rect.top}px`;
-        sheet.style.width = `${rect.width}px`;
-        sheet.style.height = `${rect.height}px`;
-    }
-
-    async function gxAuthMorphText(toExpanded) {
-        const label = document.getElementById('header-btn-text');
-        if (!label) return;
-
-        if (reduceMotion() || !Element.prototype.animate) {
-            label.textContent = toExpanded ? 'Accede a tu espacio' : 'Mi Espacio';
-            return;
+    function gxAuthPrimeContent(root) {
+        const content = root.querySelector('.gx-auth-inline-content');
+        if (content) {
+            content.style.visibility = 'visible';
+            content.style.opacity = '1';
+            content.style.pointerEvents = 'auto';
         }
 
-        const out = label.animate([
-            { opacity: 1, transform: 'translateY(0)' },
-            { opacity: .20, transform: `translateY(${toExpanded ? -3 : 3}px)` }
-        ], {
-            duration: 95,
-            easing: 'ease-in',
+        gxAuthContentItems(root).forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(8px) scale(.99)';
+        });
+    }
+
+    function gxAuthResetContent(root) {
+        const content = root.querySelector('.gx-auth-inline-content');
+        if (content) {
+            content.style.visibility = '';
+            content.style.opacity = '';
+            content.style.pointerEvents = '';
+        }
+
+        gxAuthContentItems(root).forEach(item => {
+            item.style.opacity = '';
+            item.style.transform = '';
+        });
+    }
+
+    function gxAuthRevealWhileGrowing(root) {
+        const items = gxAuthContentItems(root);
+        const delays = [75, 125, 165, 205, 245, 245];
+
+        return items.map((item, index) => {
+            const anim = item.animate([
+                { opacity: 0, transform: 'translateY(8px) scale(.99)' },
+                { opacity: 1, transform: 'translateY(0) scale(1)' }
+            ], {
+                duration: 225,
+                delay: delays[index] ?? 180,
+                easing: 'cubic-bezier(.16,1,.3,1)',
+                fill: 'forwards'
+            });
+
+            gxAuthAnimations.push(anim);
+            return anim;
+        });
+    }
+
+    function gxAuthHideWhileShrinking(root) {
+        const items = gxAuthContentItems(root);
+
+        return items.map((item, index) => {
+            const anim = item.animate([
+                { opacity: 1, transform: 'translateY(0) scale(1)' },
+                { opacity: 0, transform: 'translateY(5px) scale(.992)' }
+            ], {
+                duration: 125,
+                delay: Math.min(index, 4) * 5,
+                easing: 'cubic-bezier(.4,0,.2,1)',
+                fill: 'forwards'
+            });
+
+            gxAuthAnimations.push(anim);
+            return anim;
+        });
+    }
+
+    function gxAuthLabelAnimation(label, cardRect, opening) {
+        const targetY = -(cardRect.height / 2) + 31;
+
+        const frames = opening
+            ? [
+                { transform: 'translate(-50%, -50%) translateY(0) scale(1)', color: getComputedStyle(label).color },
+                { transform: 'translate(-50%, -50%) translateY(-18px) scale(1.02)', offset: .44 },
+                { transform: `translate(-50%, -50%) translateY(${targetY}px) scale(1.08)`, color: 'var(--text-main)' }
+              ]
+            : [
+                { transform: `translate(-50%, -50%) translateY(${targetY}px) scale(1.08)`, color: 'var(--text-main)' },
+                { transform: 'translate(-50%, -50%) translateY(-18px) scale(1.02)', offset: .50 },
+                { transform: 'translate(-50%, -50%) translateY(0) scale(1)', color: 'var(--neon-blue)' }
+              ];
+
+        const anim = label.animate(frames, {
+            duration: opening ? 410 : 385,
+            easing: opening
+                ? 'cubic-bezier(.18,.86,.22,1)'
+                : 'cubic-bezier(.22,.72,.18,1)',
             fill: 'forwards'
         });
 
-        await out.finished.catch(() => {});
-        try { out.cancel(); } catch (_) {}
-
-        label.textContent = toExpanded ? 'Accede a tu espacio' : 'Mi Espacio';
-
-        const incoming = label.animate([
-            { opacity: .20, transform: `translateY(${toExpanded ? 3 : -3}px)` },
-            { opacity: 1, transform: 'translateY(0)' }
-        ], {
-            duration: 155,
-            easing: 'cubic-bezier(.16,1,.3,1)'
-        });
-
-        await incoming.finished.catch(() => {});
+        gxAuthAnimations.push(anim);
+        return anim;
     }
 
-    function gxAuthClearMorphStyles(source) {
-        [
-            'position','zIndex','margin','padding','overflow','pointerEvents',
-            'cursor','boxSizing','left','top','width','height',
-            'borderRadius','backgroundColor','borderColor','boxShadow',
-            '--gx-auth-title-y'
-        ].forEach(prop => source.style.removeProperty(
-            prop.startsWith('--') ? prop : prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase())
-        ));
+    async function gxAuthChangeText(opening) {
+        const textEl = document.getElementById('header-btn-text');
+        if (!textEl) return;
 
-        source.classList.remove('gx-auth-real-morph', 'gx-auth-real-expanded');
+        // Same DOM text node; no duplicate label and no second title.
+        await gxAuthWait(opening ? 135 : 105);
+        textEl.textContent = opening ? 'Accede a tu espacio' : 'Mi Espacio';
     }
+
+    window.gxAuthRootClick = function(event) {
+        if (gxAuthOpen || gxAuthBusy) return;
+        if (event?.target?.closest?.('.gx-auth-inline-content')) return;
+        toggleAuth();
+    };
 
     window.openAuthSheet = async function() {
-        if (gxAuthBusy) return;
+        if (gxAuthBusy || gxAuthOpen) return;
 
+        const root = document.getElementById('header-action-btn');
         const overlay = document.getElementById('auth-overlay');
-        const sheet = document.getElementById('auth-sheet');
-        const source = document.getElementById('header-action-btn');
+        const label = root?.querySelector('.gx-auth-pill-label');
 
-        if (!overlay || !sheet || !source) return;
+        if (!root || !overlay || !label) return;
 
-        if (reduceMotion()) {
-            overlay.classList.add('show', 'gx-auth-real-mode', 'gx-auth-blurred', 'gx-auth-content-ready');
+        if (reduceMotion() || !Element.prototype.animate) {
+            gxAuthOpen = true;
+            overlay.classList.add('show');
             document.body.style.overflow = 'hidden';
             return;
         }
 
         gxAuthBusy = true;
+        gxAuthCancelAnimations();
 
-        const sourceRect = source.getBoundingClientRect();
-        const cardRect = gxAuthCardGeometry();
+        const fromRect = root.getBoundingClientRect();
+        const toRect = gxAuthCardGeometry();
+        const startRadius = getComputedStyle(root).borderRadius || '20px';
 
-        gxAuthPlaceholder = gxAuthCreatePlaceholder(source, sourceRect);
+        gxAuthPlaceholder = gxAuthCreatePlaceholder(root, fromRect);
 
-        // Activate the overlay without fading the pill itself.
-        overlay.classList.add('show', 'gx-auth-real-mode');
+        // Freeze the real component at the exact source pixels BEFORE reparenting.
+        root.classList.add('gx-auth-morphing');
+        Object.assign(root.style, gxAuthRectStyles(fromRect, startRadius));
+
+        // Move the SAME component to body. No visual replacement exists.
+        document.body.appendChild(root);
+
+        root.setAttribute('aria-expanded', 'true');
+        gxAuthPrimeContent(root);
+
+        // Backdrop comes in behind the already-existing component.
+        overlay.classList.add('show');
         document.body.style.overflow = 'hidden';
 
-        // Reparent THE REAL pill into the overlay at exactly the same pixels.
-        overlay.insertBefore(source, sheet);
+        // Force exact starting layout.
+        void root.offsetWidth;
 
-        source.classList.add('gx-auth-real-morph');
-        gxAuthApplyRect(source, sourceRect);
-
-        source.style.borderRadius = getComputedStyle(source).borderRadius;
-        source.style.backgroundColor = getComputedStyle(source).backgroundColor;
-        source.style.borderColor = getComputedStyle(source).borderColor;
-
-        source.style.setProperty('--gx-auth-title-y', `${-(cardRect.height / 2) + 45}px`);
-
-        gxAuthSetSheetRect(sheet, cardRect);
-        gxAuthSetContentHidden(sheet);
-        sheet.style.opacity = '0';
-        sheet.style.pointerEvents = 'none';
-
-        // Commit the exact start position before changing any geometry.
-        void source.offsetWidth;
-
-        requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-                overlay.classList.add('gx-auth-blurred');
-
-                gxAuthApplyRect(source, cardRect);
-                source.style.borderRadius = '26px';
-                source.style.backgroundColor = 'rgba(8, 8, 12, 0.76)';
-                source.style.borderColor = 'rgba(0,242,254,0.20)';
-                source.classList.add('gx-auth-real-expanded');
-            });
+        const shape = root.animate([
+            gxAuthRectStyles(fromRect, startRadius),
+            gxAuthRectStyles(toRect, '26px')
+        ], {
+            duration: 410,
+            easing: 'cubic-bezier(.18,.86,.22,1)',
+            fill: 'forwards'
         });
+        gxAuthAnimations.push(shape);
 
-        // Same text node adjusts while the same pill is moving.
-        await gxAuthWait(155);
-        const textMorph = gxAuthMorphText(true);
+        const labelAnim = gxAuthLabelAnimation(label, toRect, true);
+        const contentAnims = gxAuthRevealWhileGrowing(root);
+        const textChange = gxAuthChangeText(true);
 
-        // Let fields join before the surface completely stops.
-        await gxAuthWait(175);
-        overlay.classList.add('gx-auth-content-ready');
-        sheet.style.opacity = '1';
-        sheet.style.pointerEvents = 'auto';
-        const reveal = gxAuthRevealContent(sheet);
+        // The component is considered open while the SAME movement is still finishing.
+        await gxAuthWait(150);
+        root.classList.add('gx-auth-open');
 
         await Promise.allSettled([
-            gxAuthWait(165),
-            textMorph,
-            reveal
+            shape.finished,
+            labelAnim.finished,
+            textChange,
+            ...contentAnims.map(a => a.finished)
         ]);
 
+        gxAuthOpen = true;
         gxAuthBusy = false;
     };
 
-    window.closeAuthSheet = async function() {
-        if (gxAuthBusy) return;
+    window.closeAuthSheet = async function(event) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
 
+        if (gxAuthBusy || !gxAuthOpen) return;
+
+        const root = document.getElementById('header-action-btn');
         const overlay = document.getElementById('auth-overlay');
-        const sheet = document.getElementById('auth-sheet');
-        const source = document.getElementById('header-action-btn');
+        const label = root?.querySelector('.gx-auth-pill-label');
+        const destination = gxAuthPlaceholder?.getBoundingClientRect();
 
-        if (!overlay || !sheet || !source || !overlay.classList.contains('show')) return;
+        if (!root || !overlay || !label || !destination) return;
 
-        if (reduceMotion()) {
-            overlay.classList.remove('show', 'gx-auth-real-mode', 'gx-auth-blurred', 'gx-auth-content-ready');
+        if (reduceMotion() || !Element.prototype.animate) {
+            overlay.classList.remove('show');
             document.body.style.overflow = 'auto';
+            gxAuthOpen = false;
             return;
         }
 
         gxAuthBusy = true;
+        gxAuthCancelAnimations();
 
-        await gxAuthHideContent(sheet);
+        const fromRect = root.getBoundingClientRect();
+        const endRadius = '20px';
 
-        overlay.classList.remove('gx-auth-content-ready');
-        sheet.style.opacity = '0';
-        sheet.style.pointerEvents = 'none';
+        // Important difference from earlier betas:
+        // shrinking begins immediately while the content is fading.
+        const shape = root.animate([
+            gxAuthRectStyles(fromRect, '26px'),
+            gxAuthRectStyles(destination, endRadius)
+        ], {
+            duration: 385,
+            easing: 'cubic-bezier(.22,.72,.18,1)',
+            fill: 'forwards'
+        });
+        gxAuthAnimations.push(shape);
 
-        const destination = gxAuthPlaceholder?.getBoundingClientRect();
-        if (!destination) {
-            gxAuthBusy = false;
-            return;
-        }
+        const labelAnim = gxAuthLabelAnimation(label, fromRect, false);
+        const contentAnims = gxAuthHideWhileShrinking(root);
+        const textChange = gxAuthChangeText(false);
 
-        // The actual card starts returning. No replacement surface exists.
-        source.classList.remove('gx-auth-real-expanded');
-        gxAuthApplyRect(source, destination);
-        source.style.borderRadius = '20px';
-        source.style.backgroundColor = 'rgba(0, 242, 254, 0.1)';
-        source.style.borderColor = 'rgba(0, 242, 254, 0.3)';
-
-        // Text returns during the same contraction.
-        await gxAuthWait(150);
-        const textMorph = gxAuthMorphText(false);
-
-        // Keep the blur until the card is already close to the original pill.
-        await gxAuthWait(115);
-        overlay.classList.remove('gx-auth-blurred');
+        // Blur starts clearing only after the card is already clearly returning.
+        setTimeout(() => overlay.classList.remove('show'), 220);
 
         await Promise.allSettled([
-            gxAuthWait(175),
-            textMorph
+            shape.finished,
+            labelAnim.finished,
+            textChange,
+            ...contentAnims.map(a => a.finished)
         ]);
 
-        // Reinsert THE SAME element in the exact placeholder location.
-        if (gxAuthOriginalParent) {
-            gxAuthOriginalParent.insertBefore(
-                source,
-                gxAuthPlaceholder || gxAuthOriginalNextSibling
-            );
+        gxAuthCancelAnimations();
+
+        // Put the SAME node back exactly where its placeholder lives.
+        if (gxAuthOriginalParent && gxAuthPlaceholder) {
+            gxAuthOriginalParent.insertBefore(root, gxAuthPlaceholder);
+        } else if (gxAuthOriginalParent) {
+            gxAuthOriginalParent.insertBefore(root, gxAuthOriginalNextSibling);
         }
 
         gxAuthPlaceholder?.remove();
         gxAuthPlaceholder = null;
 
-        gxAuthClearMorphStyles(source);
+        root.classList.remove('gx-auth-open', 'gx-auth-morphing');
+        root.removeAttribute('style');
+        root.setAttribute('aria-expanded', 'false');
 
-        overlay.classList.remove('show', 'gx-auth-real-mode');
+        gxAuthResetContent(root);
         document.body.style.overflow = 'auto';
 
-        gxAuthResetContent(sheet);
-        sheet.style.opacity = '';
-        sheet.style.pointerEvents = '';
-        sheet.style.left = '';
-        sheet.style.top = '';
-        sheet.style.width = '';
-        sheet.style.height = '';
-
+        gxAuthOpen = false;
         gxAuthBusy = false;
     };
 
     window.closeAuthSheetEvent = function(event) {
-        if (event.target?.classList?.contains('auth-overlay')) {
-            window.closeAuthSheet();
+        if (event.target?.id === 'auth-overlay') {
+            window.closeAuthSheet(event);
         }
     };
 
     window.toggleAuth = function() {
         if (typeof getCurrentClientKey === 'function' && getCurrentClientKey()) {
             cerrarSesion?.();
+        } else if (gxAuthOpen) {
+            window.closeAuthSheet();
         } else {
             window.openAuthSheet();
         }
