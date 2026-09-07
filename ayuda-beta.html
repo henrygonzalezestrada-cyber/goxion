@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.25-beta-wave-02-19">
+<html lang="es" data-goxion-version="1.0.26-beta-wave-02-20">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,40 +3676,92 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // Full-Screen Flood Reveal ---------- */
+/* ---------- Mi Espacio // Refined Full-Screen Flood ---------- */
 .auth-overlay.gx-auth-flood-mode {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding:
+        max(18px, env(safe-area-inset-top))
+        22px
+        max(22px, env(safe-area-inset-bottom)) !important;
     background: transparent !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    overflow: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
-.gx-auth-flood {
+/* Blur appears as a separate static layer.
+   Only opacity changes; filter itself is never animated. */
+.auth-overlay.gx-auth-flood-mode::before {
+    content: "";
     position: fixed;
+    inset: 0;
     z-index: 0;
     pointer-events: none;
-    overflow: hidden;
-    box-sizing: border-box;
-    will-change: left, top, width, height, border-radius, opacity;
     background:
-        radial-gradient(circle at 34% 30%,
-            rgba(0,242,254,.40) 0%,
-            rgba(0,143,255,.30) 30%,
-            rgba(124,77,255,.27) 58%,
-            rgba(3,3,5,.90) 100%);
-    border: 1px solid rgba(0,242,254,.45);
-    box-shadow:
-        0 0 34px rgba(0,242,254,.18),
-        0 0 80px rgba(124,77,255,.12);
+        radial-gradient(circle at 75% 14%, rgba(0,242,254,.09), transparent 34%),
+        radial-gradient(circle at 20% 82%, rgba(124,77,255,.10), transparent 38%),
+        rgba(3,3,5,.40);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    opacity: 0;
+    transition: opacity .24s ease-out;
 }
 
+.auth-overlay.gx-auth-flood-covered::before {
+    opacity: 1;
+}
+
+/* The expanding color mass. Its blur/color is static;
+   only transform/opacity animate for Safari stability. */
+.gx-auth-flood {
+    position: fixed;
+    z-index: 1;
+    width: 96px;
+    height: 96px;
+    left: 0;
+    top: 0;
+    margin: -48px 0 0 -48px;
+    pointer-events: none;
+    border-radius: 50%;
+    transform: translate3d(0,0,0) scale(.15);
+    transform-origin: center center;
+    will-change: transform, opacity;
+    background:
+        radial-gradient(circle at 32% 30%,
+            rgba(222,252,255,.98) 0%,
+            rgba(0,242,254,.92) 11%,
+            rgba(0,138,255,.88) 31%,
+            rgba(101,54,255,.86) 56%,
+            rgba(3,3,5,.97) 100%);
+    box-shadow:
+        0 0 34px rgba(0,242,254,.24),
+        0 0 90px rgba(79,92,255,.18);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* No bottom sheet anymore. This is only a logical centered container. */
 .auth-overlay.gx-auth-flood-mode .auth-sheet {
-    z-index: 2;
-    transform: translateY(0) !important;
+    position: relative !important;
+    z-index: 3;
+    width: min(100%, 410px) !important;
+    max-width: 410px !important;
+    max-height: none !important;
+    margin: auto !important;
+    padding: 72px 0 44px !important;
+    overflow: visible !important;
+
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+
+    transform: none !important;
     transition: none !important;
     opacity: 0;
     pointer-events: none;
@@ -3720,7 +3772,105 @@ body.gx-tab-transitioning {
     pointer-events: auto;
 }
 
-.auth-overlay.gx-auth-flood-mode .auth-sheet > * {
+.auth-overlay.gx-auth-flood-mode #auth-view {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+}
+
+.auth-overlay.gx-auth-flood-mode .login-card {
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 4px;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.gx-auth-kicker {
+    color: var(--neon-blue);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 9px;
+}
+
+.auth-overlay.gx-auth-flood-mode .gx-auth-title {
+    margin: 0 0 8px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    color: var(--text-main) !important;
+    font-size: 25px !important;
+    font-weight: 800;
+    text-transform: none;
+    letter-spacing: -.5px;
+}
+
+.gx-auth-subtitle {
+    width: min(100%, 330px);
+    margin: 0 auto 27px;
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.55;
+}
+
+.gx-auth-fields {
+    width: 100%;
+}
+
+.auth-overlay.gx-auth-flood-mode .input-smart {
+    min-height: 54px;
+    margin-bottom: 13px;
+    padding: 15px 17px;
+    font-size: 16px; /* Prevent iOS input zoom */
+    border-radius: 17px;
+    background: rgba(5,7,13,.62);
+    border: 1px solid rgba(255,255,255,.12);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025),
+        0 8px 25px rgba(0,0,0,.16);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.auth-overlay.gx-auth-flood-mode .input-smart:focus {
+    border-color: rgba(0,242,254,.72);
+    box-shadow:
+        0 0 0 3px rgba(0,242,254,.07),
+        0 8px 28px rgba(0,0,0,.18);
+}
+
+.auth-overlay.gx-auth-flood-mode #btn-login-submit {
+    min-height: 55px;
+    margin-top: 5px;
+    border-radius: 18px;
+    font-size: 15px;
+    box-shadow: 0 10px 34px rgba(0,168,255,.22);
+}
+
+.auth-overlay.gx-auth-flood-mode .close-sheet-btn {
+    position: fixed !important;
+    z-index: 5;
+    top: max(18px, env(safe-area-inset-top)) !important;
+    right: 20px !important;
+    width: 38px !important;
+    height: 38px !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(4,7,12,.48) !important;
+    border: 1px solid rgba(255,255,255,.12) !important;
+    color: #fff !important;
+    border-radius: 50% !important;
+    font-size: 17px !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.auth-overlay.gx-auth-flood-mode .auth-sheet > *,
+.auth-overlay.gx-auth-flood-mode .gx-auth-fields > * {
     will-change: opacity, transform;
 }
 
@@ -6716,7 +6866,7 @@ function goxionLegacyAdapter(data) {
                 setLoginState("gx-error", "✕ Datos incompletos");
                 errorMsg.innerText = "Por favor ingresa tu Nombre y PIN de acceso.";
                 errorMsg.style.display = "block";
-                setTimeout(() => setLoginState("", "Entrar a mi Panel"), 1050);
+                setTimeout(() => setLoginState("", "Validar acceso"), 1050);
                 return;
             }
 
@@ -6767,7 +6917,7 @@ function goxionLegacyAdapter(data) {
                     closeAuthSheet();
                     switchTab("inicio");
                     loginBtn.disabled = false;
-                    setTimeout(() => setLoginState("", "Entrar a mi Panel"), 220);
+                    setTimeout(() => setLoginState("", "Validar acceso"), 220);
                 }, 470);
 
             } catch (e) {
@@ -6778,7 +6928,7 @@ function goxionLegacyAdapter(data) {
                 loginBtn.disabled = false;
 
                 setTimeout(() => {
-                    setLoginState("", "Entrar a mi Panel");
+                    setLoginState("", "Validar acceso");
                 }, 1300);
             }
         };
@@ -7726,7 +7876,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.25 · BETA WAVE 02.19</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.26 · BETA WAVE 02.20</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -7956,61 +8106,18 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> FULL-SCREEN FLOOD REVEAL
-       Inspirado en transiciones donde una superficie nace del
-       control y se expande hasta cubrir toda la pantalla.
+       3) MI ESPACIO -> REFINED FULL-SCREEN FLOOD
+       Transform-only expansion/contraction + centered login.
        ========================================================= */
     let gxAuthBusy = false;
     let gxAuthFloodEl = null;
 
-    function gxAuthCreateFlood(sourceRect, source) {
-        const flood = document.createElement('div');
-        flood.className = 'gx-auth-flood';
-
-        const cs = getComputedStyle(source);
-
-        Object.assign(flood.style, {
-            left: `${sourceRect.left}px`,
-            top: `${sourceRect.top}px`,
-            width: `${sourceRect.width}px`,
-            height: `${sourceRect.height}px`,
-            borderRadius: cs.borderRadius || '28px',
-            opacity: '1'
-        });
-
-        document.getElementById('auth-overlay')?.prepend(flood);
-        return flood;
-    }
-
-    function gxAuthFloodTarget(sourceRect) {
-        const cx = sourceRect.left + sourceRect.width / 2;
-        const cy = sourceRect.top + sourceRect.height / 2;
-
-        const distances = [
-            Math.hypot(cx, cy),
-            Math.hypot(innerWidth - cx, cy),
-            Math.hypot(cx, innerHeight - cy),
-            Math.hypot(innerWidth - cx, innerHeight - cy)
-        ];
-
-        const radius = Math.max(...distances) + 70;
-        const size = radius * 2;
-
-        return {
-            left: cx - radius,
-            top: cy - radius,
-            width: size,
-            height: size,
-            borderRadius: '50%'
-        };
-    }
-
     function gxAuthFormElements(sheet) {
         return [
-            sheet.querySelector('.sheet-handle'),
             sheet.querySelector('.close-sheet-btn'),
-            sheet.querySelector('.section-title'),
-            sheet.querySelector('#auth-view p'),
+            sheet.querySelector('.gx-auth-kicker'),
+            sheet.querySelector('.gx-auth-title'),
+            sheet.querySelector('.gx-auth-subtitle'),
             sheet.querySelector('#login-id'),
             sheet.querySelector('#login-pin'),
             sheet.querySelector('#btn-login-submit'),
@@ -8018,66 +8125,95 @@ function goxionLegacyAdapter(data) {
         ].filter(Boolean);
     }
 
-    function gxAuthHideForm(sheet) {
+    function gxAuthSetFormHidden(sheet) {
         gxAuthFormElements(sheet).forEach(el => {
             el.style.opacity = '0';
-            el.style.transform = 'translateY(10px) scale(.992)';
+            el.style.transform = 'translateY(12px) scale(.985)';
         });
+    }
+
+    function gxAuthResetFormStyles(sheet) {
+        gxAuthFormElements(sheet).forEach(el => {
+            el.style.opacity = '';
+            el.style.transform = '';
+        });
+    }
+
+    function gxAuthCreateFlood(sourceRect) {
+        const flood = document.createElement('div');
+        flood.className = 'gx-auth-flood';
+
+        const cx = sourceRect.left + sourceRect.width / 2;
+        const cy = sourceRect.top + sourceRect.height / 2;
+
+        flood.style.left = `${cx}px`;
+        flood.style.top = `${cy}px`;
+
+        document.getElementById('auth-overlay')?.prepend(flood);
+        return flood;
+    }
+
+    function gxAuthFloodScale(sourceRect) {
+        const cx = sourceRect.left + sourceRect.width / 2;
+        const cy = sourceRect.top + sourceRect.height / 2;
+
+        const farthest = Math.max(
+            Math.hypot(cx, cy),
+            Math.hypot(innerWidth - cx, cy),
+            Math.hypot(cx, innerHeight - cy),
+            Math.hypot(innerWidth - cx, innerHeight - cy)
+        );
+
+        // Base flood radius is 48px.
+        return (farthest + 120) / 48;
     }
 
     async function gxAuthRevealForm(sheet) {
         const items = gxAuthFormElements(sheet);
 
         if (reduceMotion() || !Element.prototype.animate) {
-            items.forEach(el => {
-                el.style.opacity = '';
-                el.style.transform = '';
-            });
+            gxAuthResetFormStyles(sheet);
             return;
         }
 
-        const animations = items.map((el, index) => {
-            const anim = el.animate([
-                { opacity: 0, transform: 'translateY(10px) scale(.992)' },
-                { opacity: 1, transform: 'translateY(0) scale(1)' }
-            ], {
-                duration: 300,
-                delay: Math.min(index, 6) * 42,
-                easing: 'cubic-bezier(.16,1,.3,1)',
-                fill: 'forwards'
-            });
+        const animations = items.map((el, index) => el.animate([
+            { opacity: 0, transform: 'translateY(12px) scale(.985)' },
+            { opacity: 1, transform: 'translateY(0) scale(1)' }
+        ], {
+            duration: index < 1 ? 180 : 300,
+            delay: index < 1 ? 0 : 35 + Math.min(index, 7) * 42,
+            easing: 'cubic-bezier(.16,1,.3,1)',
+            fill: 'forwards'
+        }));
 
-            return anim;
+        await Promise.allSettled(animations.map(a => a.finished));
+
+        animations.forEach(a => {
+            try { a.cancel(); } catch (_) {}
         });
-
-        await Promise.allSettled(animations.map(anim => anim.finished));
-
-        items.forEach((el, index) => {
-            try { animations[index]?.cancel(); } catch (_) {}
-            el.style.opacity = '';
-            el.style.transform = '';
-        });
+        gxAuthResetFormStyles(sheet);
     }
 
-    async function gxAuthHideFormAnimated(sheet) {
+    async function gxAuthHideForm(sheet) {
         const items = gxAuthFormElements(sheet);
 
         if (reduceMotion() || !Element.prototype.animate) return;
 
         const animations = items.map((el, index) => el.animate([
             { opacity: 1, transform: 'translateY(0) scale(1)' },
-            { opacity: 0, transform: 'translateY(6px) scale(.992)' }
+            { opacity: 0, transform: 'translateY(7px) scale(.988)' }
         ], {
             duration: 145,
-            delay: Math.min(index, 5) * 9,
+            delay: Math.min(index, 5) * 7,
             easing: 'cubic-bezier(.4,0,.2,1)',
             fill: 'forwards'
         }));
 
-        await Promise.allSettled(animations.map(anim => anim.finished));
-        animations.forEach(anim => {
-            try { anim.cancel(); } catch (_) {}
+        await Promise.allSettled(animations.map(a => a.finished));
+        animations.forEach(a => {
+            try { a.cancel(); } catch (_) {}
         });
+        gxAuthSetFormHidden(sheet);
     }
 
     window.openAuthSheet = async function() {
@@ -8090,84 +8226,68 @@ function goxionLegacyAdapter(data) {
         if (!overlay || !sheet || !source) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.add('show');
+            overlay.classList.add('show', 'gx-auth-flood-mode', 'gx-auth-flood-covered', 'gx-auth-flood-ready');
+            sheet.style.opacity = '1';
+            sheet.style.pointerEvents = 'auto';
             document.body.style.overflow = 'hidden';
+            gxAuthResetFormStyles(sheet);
             return;
         }
 
         gxAuthBusy = true;
 
         const sourceRect = source.getBoundingClientRect();
-        const target = gxAuthFloodTarget(sourceRect);
+        const finalScale = gxAuthFloodScale(sourceRect);
 
         overlay.classList.add('show', 'gx-auth-flood-mode');
         document.body.style.overflow = 'hidden';
 
-        gxAuthHideForm(sheet);
+        gxAuthSetFormHidden(sheet);
         sheet.style.opacity = '0';
         sheet.style.pointerEvents = 'none';
 
         source.classList.add('gx-auth-source-pulse');
-        const sourcePulse = source.animate([
-            { transform: 'scale(1)', opacity: 1 },
-            { transform: 'scale(.96)', opacity: .88 },
-            { transform: 'scale(1)', opacity: 1 }
+
+        const pulse = source.animate([
+            { transform: 'scale(1)' },
+            { transform: 'scale(.94)', offset: .48 },
+            { transform: 'scale(1)' }
         ], {
-            duration: 210,
+            duration: 235,
             easing: 'cubic-bezier(.2,.8,.2,1)'
         });
 
         gxAuthFloodEl?.remove();
-        gxAuthFloodEl = gxAuthCreateFlood(sourceRect, source);
+        gxAuthFloodEl = gxAuthCreateFlood(sourceRect);
 
+        // One continuous scale animation. No width/height/left/top animation.
         const floodAnim = gxAuthFloodEl.animate([
-            {
-                left: `${sourceRect.left}px`,
-                top: `${sourceRect.top}px`,
-                width: `${sourceRect.width}px`,
-                height: `${sourceRect.height}px`,
-                borderRadius: getComputedStyle(source).borderRadius || '28px',
-                opacity: 1
-            },
-            {
-                offset: .55,
-                borderRadius: '42%'
-            },
-            {
-                left: `${target.left}px`,
-                top: `${target.top}px`,
-                width: `${target.width}px`,
-                height: `${target.height}px`,
-                borderRadius: target.borderRadius,
-                opacity: 1
-            }
+            { transform: 'translate3d(0,0,0) scale(.18)', opacity: .96 },
+            { transform: `translate3d(0,0,0) scale(${finalScale * .32})`, opacity: 1, offset: .42 },
+            { transform: `translate3d(0,0,0) scale(${finalScale})`, opacity: 1 }
         ], {
-            duration: 610,
+            duration: 640,
             easing: 'cubic-bezier(.18,.86,.22,1)',
             fill: 'forwards'
         });
 
-        await wait(500);
+        // Blur fades in only once the color has nearly covered the viewport.
+        await wait(430);
+        overlay.classList.add('gx-auth-flood-covered');
 
+        await wait(115);
         overlay.classList.add('gx-auth-flood-ready');
+
         sheet.style.opacity = '1';
         sheet.style.pointerEvents = 'auto';
 
-        const sheetIn = sheet.animate([
-            { opacity: 0, transform: 'translateY(14px) scale(.985)' },
-            { opacity: 1, transform: 'translateY(0) scale(1)' }
-        ], {
-            duration: 250,
-            easing: 'cubic-bezier(.16,1,.3,1)'
-        });
-
         await Promise.allSettled([
             floodAnim.finished,
-            sourcePulse.finished,
-            sheetIn.finished
+            pulse.finished
         ]);
 
         source.classList.remove('gx-auth-source-pulse');
+
         await gxAuthRevealForm(sheet);
 
         gxAuthBusy = false;
@@ -8178,63 +8298,45 @@ function goxionLegacyAdapter(data) {
 
         const overlay = document.getElementById('auth-overlay');
         const sheet = document.getElementById('auth-sheet');
-        const targetBtn = document.getElementById('header-action-btn');
+        const source = document.getElementById('header-action-btn');
 
-        if (!overlay || !sheet || !targetBtn || !overlay.classList.contains('show')) return;
+        if (!overlay || !sheet || !source || !overlay.classList.contains('show')) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.remove('show', 'gx-auth-flood-mode', 'gx-auth-flood-ready');
+            overlay.classList.remove(
+                'show',
+                'gx-auth-flood-mode',
+                'gx-auth-flood-covered',
+                'gx-auth-flood-ready'
+            );
             document.body.style.overflow = 'auto';
             gxAuthFloodEl?.remove();
             gxAuthFloodEl = null;
+            gxAuthResetFormStyles(sheet);
             return;
         }
 
         gxAuthBusy = true;
 
-        await gxAuthHideFormAnimated(sheet);
+        // 1. Content disappears first.
+        await gxAuthHideForm(sheet);
 
-        const sheetOut = sheet.animate([
-            { opacity: 1, transform: 'translateY(0) scale(1)' },
-            { opacity: 0, transform: 'translateY(10px) scale(.988)' }
-        ], {
-            duration: 155,
-            easing: 'cubic-bezier(.4,0,.2,1)',
-            fill: 'forwards'
-        });
-
-        await sheetOut.finished.catch(() => {});
-
-        overlay.classList.remove('gx-auth-flood-ready');
+        sheet.style.opacity = '0';
         sheet.style.pointerEvents = 'none';
+        overlay.classList.remove('gx-auth-flood-ready');
 
-        const targetRect = targetBtn.getBoundingClientRect();
-        const currentRect = gxAuthFloodEl?.getBoundingClientRect();
+        // 2. Blur recedes while the color still fills the viewport.
+        await wait(55);
+        overlay.classList.remove('gx-auth-flood-covered');
 
-        if (gxAuthFloodEl && currentRect) {
+        // 3. The color mass contracts directly back into Mi Espacio.
+        if (gxAuthFloodEl) {
+            const current = getComputedStyle(gxAuthFloodEl).transform;
             const floodBack = gxAuthFloodEl.animate([
-                {
-                    left: `${currentRect.left}px`,
-                    top: `${currentRect.top}px`,
-                    width: `${currentRect.width}px`,
-                    height: `${currentRect.height}px`,
-                    borderRadius: '50%',
-                    opacity: 1
-                },
-                {
-                    offset: .52,
-                    borderRadius: '38%'
-                },
-                {
-                    left: `${targetRect.left}px`,
-                    top: `${targetRect.top}px`,
-                    width: `${targetRect.width}px`,
-                    height: `${targetRect.height}px`,
-                    borderRadius: getComputedStyle(targetBtn).borderRadius || '28px',
-                    opacity: 1
-                }
+                { transform: current === 'none' ? 'scale(1)' : current, opacity: 1 },
+                { transform: 'translate3d(0,0,0) scale(.18)', opacity: .96 }
             ], {
-                duration: 480,
+                duration: 510,
                 easing: 'cubic-bezier(.22,.72,.18,1)',
                 fill: 'forwards'
             });
@@ -8242,16 +8344,15 @@ function goxionLegacyAdapter(data) {
             await floodBack.finished.catch(() => {});
         }
 
-        try { sheetOut.cancel(); } catch (_) {}
-        sheet.style.opacity = '';
-        sheet.style.transform = '';
-        sheet.style.pointerEvents = '';
-
         gxAuthFloodEl?.remove();
         gxAuthFloodEl = null;
 
         overlay.classList.remove('show', 'gx-auth-flood-mode');
         document.body.style.overflow = 'auto';
+
+        gxAuthResetFormStyles(sheet);
+        sheet.style.opacity = '';
+        sheet.style.pointerEvents = '';
 
         gxAuthBusy = false;
     };
