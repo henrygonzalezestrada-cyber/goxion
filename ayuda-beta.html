@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.33-beta-wave-02-27">
+<html lang="es" data-goxion-version="1.0.34-beta-wave-02-28">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,11 +3676,12 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // FLIP OPTIMIZED 02.27 ---------- */
+/* ---------- Mi Espacio // SHARED TITLE + EMOJI 02.28 ---------- */
 /*
-   Same real component, but the expensive geometry animation is gone.
-   The card receives its final geometry once, then only transform is animated.
-   The real Mi Espacio label is temporarily lifted as a shared element.
+   Keeps the stable 02.27 FLIP architecture.
+   The SAME text and SAME emoji leave the pill as shared elements:
+   - Mi Espacio grows/moves and becomes "Accede a tu espacio".
+   - 👤 travels independently into a subtle watermark behind the card.
 */
 
 .auth-overlay.gx-auth-backdrop-only {
@@ -3726,31 +3727,41 @@ body.gx-tab-transitioning {
     white-space: nowrap;
 }
 
-.gx-auth-title-extra {
-    position: absolute;
-    left: 50%;
-    top: calc(100% + 5px);
-    opacity: 0;
-    color: var(--text-muted);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: .15px;
-    transform: translate(-50%, 4px);
-    pointer-events: none;
+/* SAME text node from the pill. */
+#header-btn-text.gx-auth-text-floating {
+    position: fixed !important;
+    z-index: 3206 !important;
+    left: 0;
+    top: 0;
+    margin: 0 !important;
+    pointer-events: none !important;
     white-space: nowrap;
+    transform-origin: center center;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform, opacity;
 }
 
-/* Real label temporarily becomes its own shared element.
-   Still the exact same DOM node; never cloned. */
-.gx-auth-pill-label.gx-auth-label-floating {
+/* SAME emoji node from the pill. */
+.gx-auth-pill-icon.gx-auth-icon-floating {
     position: fixed !important;
     z-index: 3205 !important;
+    left: 0;
+    top: 0;
     margin: 0 !important;
     pointer-events: none !important;
     transform-origin: center center;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    will-change: transform;
+    will-change: transform, opacity;
+}
+
+/* Static landed watermark state. Filter is NOT animated. */
+.gx-auth-pill-icon.gx-auth-icon-watermark {
+    z-index: 3099 !important; /* physically behind the card */
+    opacity: .72;
+    filter: blur(1.15px);
+    -webkit-filter: blur(1.15px);
 }
 
 /* Inline login content already belongs to the real Mi Espacio component. */
@@ -3825,8 +3836,7 @@ body.gx-tab-transitioning {
     text-align: center;
 }
 
-/* REAL root at its final card geometry.
-   No backdrop-filter here while moving; only the static page backdrop is blurred. */
+/* REAL root at final card geometry; movement is transform-only FLIP. */
 #header-action-btn.gx-auth-flip-card {
     position: fixed !important;
     z-index: 3100 !important;
@@ -3912,7 +3922,6 @@ body.gx-tab-transitioning {
             <span class="gx-auth-pill-label">
                 <span class="gx-auth-pill-icon">👤</span>
                 <span id="header-btn-text">Mi Espacio</span>
-                <span class="gx-auth-title-extra">Accede a tu espacio</span>
             </span>
 
             <div class="gx-auth-inline-content" onclick="event.stopPropagation()">
@@ -7888,7 +7897,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.27</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.28</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8118,8 +8127,8 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> FLIP OPTIMIZED
-       Same DOM component. No clone. No layout animation per frame.
+       3) MI ESPACIO -> SHARED TITLE + EMOJI
+       Stable FLIP card from 02.27 + true shared text/icon motion.
        ========================================================= */
     let gxAuthBusy = false;
     let gxAuthOpen = false;
@@ -8128,7 +8137,10 @@ function goxionLegacyAdapter(data) {
     let gxAuthOriginalNextSibling = null;
     let gxAuthSourceRect = null;
     let gxAuthSourceStyle = null;
-    let gxAuthLabelSourceRect = null;
+    let gxAuthTextSourceRect = null;
+    let gxAuthIconSourceRect = null;
+    let gxAuthTextTarget = null;
+    let gxAuthIconTarget = null;
 
     const gxAuthWait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -8180,7 +8192,11 @@ function goxionLegacyAdapter(data) {
             pointerEvents: 'none'
         });
 
-        const height = Math.ceil(content.scrollHeight || content.getBoundingClientRect().height || 232);
+        const height = Math.ceil(
+            content.scrollHeight ||
+            content.getBoundingClientRect().height ||
+            232
+        );
 
         Object.assign(content.style, snapshot);
         return height;
@@ -8190,7 +8206,6 @@ function goxionLegacyAdapter(data) {
         const width = Math.min(390, Math.max(310, window.innerWidth - 40));
         const contentHeight = gxAuthMeasureContentHeight(root, width);
 
-        // Title area + real form height + comfortable bottom breathing room.
         const naturalHeight = 94 + contentHeight + 26;
         const maxHeight = Math.max(350, window.innerHeight - 118);
         const height = Math.min(maxHeight, Math.max(350, naturalHeight));
@@ -8261,52 +8276,195 @@ function goxionLegacyAdapter(data) {
         content.style.transform = '';
     }
 
-    function gxAuthMoveLabelToFloating(label, rect) {
-        label.classList.add('gx-auth-label-floating');
-        Object.assign(label.style, {
-            left: `${rect.left}px`,
-            top: `${rect.top}px`,
-            width: `${rect.width}px`,
-            height: `${rect.height}px`,
-            color: gxAuthSourceStyle.color
-        });
-        document.body.appendChild(label);
-    }
-
-    function gxAuthLabelTarget(cardRect, labelRect) {
-        const startCx = labelRect.left + labelRect.width / 2;
-        const startCy = labelRect.top + labelRect.height / 2;
-
-        const targetCx = cardRect.left + cardRect.width / 2;
-        const targetCy = cardRect.top + 34;
-
+    function gxAuthCenter(rect) {
         return {
-            dx: targetCx - startCx,
-            dy: targetCy - startCy
+            x: rect.left + rect.width / 2,
+            y: rect.top + rect.height / 2
         };
     }
 
-    function gxAuthAnimateExtra(label, opening) {
-        const extra = label.querySelector('.gx-auth-title-extra');
-        if (!extra || !Element.prototype.animate) return null;
+    function gxAuthLiftSharedParts(root) {
+        const label = root.querySelector('.gx-auth-pill-label');
+        const textEl = root.querySelector('#header-btn-text');
+        const iconEl = root.querySelector('.gx-auth-pill-icon');
 
-        return extra.animate(
-            opening
-                ? [
-                    { opacity: 0, transform: 'translate(-50%, 5px)' },
-                    { opacity: 1, transform: 'translate(-50%, 0)' }
-                  ]
-                : [
-                    { opacity: 1, transform: 'translate(-50%, 0)' },
-                    { opacity: 0, transform: 'translate(-50%, 5px)' }
-                  ],
-            {
-                duration: opening ? 185 : 125,
-                delay: opening ? 190 : 0,
-                easing: opening ? 'cubic-bezier(.16,1,.3,1)' : 'ease-in',
-                fill: 'forwards'
+        if (!label || !textEl || !iconEl) return null;
+
+        gxAuthTextSourceRect = textEl.getBoundingClientRect();
+        gxAuthIconSourceRect = iconEl.getBoundingClientRect();
+
+        const textCenter = gxAuthCenter(gxAuthTextSourceRect);
+        const iconCenter = gxAuthCenter(gxAuthIconSourceRect);
+
+        textEl.classList.add('gx-auth-text-floating');
+        Object.assign(textEl.style, {
+            left: `${textCenter.x}px`,
+            top: `${textCenter.y}px`,
+            transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
+            color: gxAuthSourceStyle.color
+        });
+
+        iconEl.classList.add('gx-auth-icon-floating');
+        Object.assign(iconEl.style, {
+            left: `${iconCenter.x}px`,
+            top: `${iconCenter.y}px`,
+            transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
+            opacity: '1'
+        });
+
+        document.body.appendChild(textEl);
+        document.body.appendChild(iconEl);
+
+        return { label, textEl, iconEl };
+    }
+
+    function gxAuthSharedTargets(cardRect) {
+        return {
+            text: {
+                x: cardRect.left + cardRect.width / 2,
+                y: cardRect.top + 36,
+                scale: 1.20
+            },
+            icon: {
+                // Watermark inspired by Misiones / Referidos.
+                x: cardRect.left + cardRect.width - 58,
+                y: cardRect.top + 92,
+                scale: 5.15,
+                rotate: -10
             }
-        );
+        };
+    }
+
+    function gxAuthDelta(sourceRect, target) {
+        const source = gxAuthCenter(sourceRect);
+        return {
+            dx: target.x - source.x,
+            dy: target.y - source.y
+        };
+    }
+
+    async function gxAuthChangeSharedText(textEl, opening) {
+        if (!textEl) return;
+
+        // Change happens late in the same continuous trip.
+        await gxAuthWait(opening ? 292 : 82);
+        textEl.textContent = opening ? 'Accede a tu espacio' : 'Mi Espacio';
+    }
+
+    function gxAuthAnimateTextOpen(textEl, target) {
+        const d = gxAuthDelta(gxAuthTextSourceRect, target);
+
+        return textEl.animate([
+            {
+                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
+                opacity: 1
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx * .58}px,${d.dy * .58}px,0) scale(1.10)`,
+                opacity: 1,
+                offset: .58
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx * .77}px,${d.dy * .77}px,0) scale(1.16)`,
+                opacity: .34,
+                offset: .72
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale})`,
+                opacity: 1
+            }
+        ], {
+            duration: 430,
+            easing: 'cubic-bezier(.18,.86,.22,1)',
+            fill: 'forwards'
+        });
+    }
+
+    function gxAuthAnimateIconOpen(iconEl, target) {
+        const d = gxAuthDelta(gxAuthIconSourceRect, target);
+
+        return iconEl.animate([
+            {
+                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1) rotate(0deg)',
+                opacity: 1
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx * .58}px,${d.dy * .58}px,0) scale(2.2) rotate(-4deg)`,
+                opacity: .68,
+                offset: .58
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale}) rotate(${target.rotate}deg)`,
+                opacity: .72
+            }
+        ], {
+            duration: 430,
+            easing: 'cubic-bezier(.18,.86,.22,1)',
+            fill: 'forwards'
+        });
+    }
+
+    function gxAuthAnimateTextClose(textEl, target) {
+        const d = gxAuthDelta(gxAuthTextSourceRect, target);
+
+        return textEl.animate([
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale})`,
+                opacity: 1
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx * .72}px,${d.dy * .72}px,0) scale(1.15)`,
+                opacity: .34,
+                offset: .30
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx * .45}px,${d.dy * .45}px,0) scale(1.08)`,
+                opacity: 1,
+                offset: .48
+            },
+            {
+                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
+                opacity: 1
+            }
+        ], {
+            duration: 390,
+            easing: 'cubic-bezier(.22,.72,.18,1)',
+            fill: 'forwards'
+        });
+    }
+
+    function gxAuthAnimateIconClose(iconEl, target) {
+        const d = gxAuthDelta(gxAuthIconSourceRect, target);
+
+        return iconEl.animate([
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale}) rotate(${target.rotate}deg)`,
+                opacity: .72
+            },
+            {
+                transform:
+                    `translate(-50%, -50%) translate3d(${d.dx * .55}px,${d.dy * .55}px,0) scale(2.0) rotate(-4deg)`,
+                opacity: .72,
+                offset: .46
+            },
+            {
+                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1) rotate(0deg)',
+                opacity: 1
+            }
+        ], {
+            duration: 390,
+            easing: 'cubic-bezier(.22,.72,.18,1)',
+            fill: 'forwards'
+        });
     }
 
     function gxAuthPauseWave(paused) {
@@ -8315,6 +8473,21 @@ function goxionLegacyAdapter(data) {
                 window.gxWaveSetPaused(paused);
             }
         } catch (_) {}
+    }
+
+    function gxAuthRestoreSharedParts(root, textEl, iconEl) {
+        const label = root.querySelector('.gx-auth-pill-label');
+        if (!label || !textEl || !iconEl) return;
+
+        textEl.classList.remove('gx-auth-text-floating');
+        iconEl.classList.remove('gx-auth-icon-floating', 'gx-auth-icon-watermark');
+
+        textEl.removeAttribute('style');
+        iconEl.removeAttribute('style');
+        textEl.textContent = 'Mi Espacio';
+
+        label.appendChild(iconEl);
+        label.appendChild(textEl);
     }
 
     window.gxAuthRootClick = function(event) {
@@ -8328,9 +8501,8 @@ function goxionLegacyAdapter(data) {
 
         const root = document.getElementById('header-action-btn');
         const overlay = document.getElementById('auth-overlay');
-        const label = root?.querySelector('.gx-auth-pill-label');
 
-        if (!root || !overlay || !label) return;
+        if (!root || !overlay) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
             gxAuthOpen = true;
@@ -8343,7 +8515,6 @@ function goxionLegacyAdapter(data) {
 
         gxAuthSourceRect = root.getBoundingClientRect();
         gxAuthSourceStyle = gxAuthReadSourceStyle(root);
-        gxAuthLabelSourceRect = label.getBoundingClientRect();
 
         const cardRect = gxAuthCardGeometry(root);
         const cardStyle = gxAuthCardStyle();
@@ -8353,7 +8524,6 @@ function goxionLegacyAdapter(data) {
 
         gxAuthPlaceholder = gxAuthCreatePlaceholder(root, gxAuthSourceRect);
 
-        // Freeze the REAL root before changing parent.
         root.classList.add('gx-auth-flip-card');
         Object.assign(root.style, {
             left: `${gxAuthSourceRect.left}px`,
@@ -8367,12 +8537,15 @@ function goxionLegacyAdapter(data) {
             transform: 'none'
         });
 
+        // Detach the REAL text and REAL emoji before the card receives inverse scale.
+        const shared = gxAuthLiftSharedParts(root);
+        if (!shared) {
+            gxAuthBusy = false;
+            return;
+        }
+
         document.body.appendChild(root);
 
-        // Lift THE REAL label out before the root receives the FLIP scale.
-        gxAuthMoveLabelToFloating(label, gxAuthLabelSourceRect);
-
-        // One layout jump only: put root at final card geometry.
         Object.assign(root.style, {
             left: `${cardRect.left}px`,
             top: `${cardRect.top}px`,
@@ -8387,12 +8560,14 @@ function goxionLegacyAdapter(data) {
         root.classList.add('gx-auth-card-open');
         root.setAttribute('aria-expanded', 'true');
 
-        // Freeze the moving WebGL wave before applying a full-screen blur.
         gxAuthPauseWave(true);
         overlay.classList.add('show');
         document.body.style.overflow = 'hidden';
 
         void root.offsetWidth;
+
+        gxAuthTextTarget = gxAuthSharedTargets(cardRect).text;
+        gxAuthIconTarget = gxAuthSharedTargets(cardRect).icon;
 
         const shape = root.animate([
             {
@@ -8413,38 +8588,31 @@ function goxionLegacyAdapter(data) {
             fill: 'forwards'
         });
 
-        const labelTarget = gxAuthLabelTarget(cardRect, gxAuthLabelSourceRect);
-        const labelMove = label.animate([
-            { transform: 'translate3d(0,0,0) scale(1)' },
-            { transform: `translate3d(${labelTarget.dx}px,${labelTarget.dy}px,0) scale(1.06)` }
-        ], {
-            duration: 430,
-            easing: 'cubic-bezier(.18,.86,.22,1)',
-            fill: 'forwards'
-        });
+        const textMove = gxAuthAnimateTextOpen(shared.textEl, gxAuthTextTarget);
+        const iconMove = gxAuthAnimateIconOpen(shared.iconEl, gxAuthIconTarget);
+        const textChange = gxAuthChangeSharedText(shared.textEl, true);
 
-        const extraIn = gxAuthAnimateExtra(label, true);
-
-        // One compositor animation for the WHOLE form instead of six animations.
+        // One compositor animation for the whole form.
         const content = gxAuthContent(root);
         const contentIn = content.animate([
             { opacity: 0, transform: 'translateY(10px) scale(.992)' },
             { opacity: 1, transform: 'translateY(0) scale(1)' }
         ], {
-            duration: 235,
-            delay: 235,
+            duration: 225,
+            delay: 245,
             easing: 'cubic-bezier(.16,1,.3,1)',
             fill: 'forwards'
         });
 
         await Promise.allSettled([
             shape.finished,
-            labelMove.finished,
-            extraIn?.finished || Promise.resolve(),
+            textMove.finished,
+            iconMove.finished,
+            textChange,
             contentIn.finished
         ]);
 
-        // Commit stable OPEN state before cancelling any WAAPI animation.
+        // Commit stable OPEN state before cancelling WAAPI.
         Object.assign(root.style, {
             transform: 'none',
             borderRadius: cardStyle.borderRadius,
@@ -8452,21 +8620,26 @@ function goxionLegacyAdapter(data) {
             borderColor: cardStyle.borderColor,
             boxShadow: cardStyle.boxShadow
         });
+
         content.style.opacity = '1';
         content.style.transform = 'none';
 
-        label.style.transform =
-            `translate3d(${labelTarget.dx}px,${labelTarget.dy}px,0) scale(1.06)`;
+        const textD = gxAuthDelta(gxAuthTextSourceRect, gxAuthTextTarget);
+        shared.textEl.style.transform =
+            `translate(-50%, -50%) translate3d(${textD.dx}px,${textD.dy}px,0) scale(${gxAuthTextTarget.scale})`;
+        shared.textEl.style.opacity = '1';
 
-        const extra = label.querySelector('.gx-auth-title-extra');
-        if (extra) {
-            extra.style.opacity = '1';
-            extra.style.transform = 'translate(-50%, 0)';
-        }
+        const iconD = gxAuthDelta(gxAuthIconSourceRect, gxAuthIconTarget);
+        shared.iconEl.style.transform =
+            `translate(-50%, -50%) translate3d(${iconD.dx}px,${iconD.dy}px,0) scale(${gxAuthIconTarget.scale}) rotate(${gxAuthIconTarget.rotate}deg)`;
+        shared.iconEl.style.opacity = '.72';
 
-        [shape, labelMove, extraIn, contentIn].forEach(anim => {
+        [shape, textMove, iconMove, contentIn].forEach(anim => {
             try { anim?.cancel(); } catch (_) {}
         });
+
+        // Landed watermark: static blur only after motion has stopped.
+        shared.iconEl.classList.add('gx-auth-icon-watermark');
 
         gxAuthOpen = true;
         gxAuthBusy = false;
@@ -8480,10 +8653,11 @@ function goxionLegacyAdapter(data) {
 
         const root = document.getElementById('header-action-btn');
         const overlay = document.getElementById('auth-overlay');
-        const label = document.querySelector('.gx-auth-pill-label.gx-auth-label-floating');
+        const textEl = document.querySelector('#header-btn-text.gx-auth-text-floating');
+        const iconEl = document.querySelector('.gx-auth-pill-icon.gx-auth-icon-floating');
         const destination = gxAuthPlaceholder?.getBoundingClientRect();
 
-        if (!root || !overlay || !label || !destination) return;
+        if (!root || !overlay || !textEl || !iconEl || !destination) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
             overlay.classList.remove('show');
@@ -8494,21 +8668,15 @@ function goxionLegacyAdapter(data) {
 
         gxAuthBusy = true;
 
+        // Remove the static watermark blur BEFORE motion begins.
+        iconEl.classList.remove('gx-auth-icon-watermark');
+
         const cardRect = root.getBoundingClientRect();
         const flip = gxAuthFlipData(destination, cardRect);
         const inverse = gxAuthFlipMatrix(flip);
         const endRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
         const content = gxAuthContent(root);
 
-        const currentLabelRect = label.getBoundingClientRect();
-        const sourceCx = gxAuthLabelSourceRect.left + gxAuthLabelSourceRect.width / 2;
-        const sourceCy = gxAuthLabelSourceRect.top + gxAuthLabelSourceRect.height / 2;
-        const currentCx = currentLabelRect.left + currentLabelRect.width / 2;
-        const currentCy = currentLabelRect.top + currentLabelRect.height / 2;
-        const labelDx = sourceCx - currentCx;
-        const labelDy = sourceCy - currentCy;
-
-        // Card, form, and title all start returning in the SAME frame.
         const shapeBack = root.animate([
             {
                 transform: 'matrix(1,0,0,1,0,0)',
@@ -8528,6 +8696,10 @@ function goxionLegacyAdapter(data) {
             fill: 'forwards'
         });
 
+        const textBack = gxAuthAnimateTextClose(textEl, gxAuthTextTarget);
+        const iconBack = gxAuthAnimateIconClose(iconEl, gxAuthIconTarget);
+        const textChange = gxAuthChangeSharedText(textEl, false);
+
         const contentOut = content.animate([
             { opacity: 1, transform: 'translateY(0) scale(1)' },
             { opacity: 0, transform: 'translateY(6px) scale(.992)' }
@@ -8537,33 +8709,17 @@ function goxionLegacyAdapter(data) {
             fill: 'forwards'
         });
 
-        // We use the current visual label position as the start. No snap.
-        const labelBack = label.animate([
-            { transform: label.style.transform || 'translate3d(0,0,0) scale(1.06)' },
-            {
-                transform:
-                    `translate3d(${(parseFloat(label.style.transform.match(/translate3d\(([-\d.]+)px/)?.[1]) || 0) + labelDx}px,` +
-                    `${(parseFloat(label.style.transform.match(/translate3d\([^,]+,([-\d.]+)px/)?.[1]) || 0) + labelDy}px,0) scale(1)`
-            }
-        ], {
-            duration: 390,
-            easing: 'cubic-bezier(.22,.72,.18,1)',
-            fill: 'forwards'
-        });
-
-        const extraOut = gxAuthAnimateExtra(label, false);
-
-        // Clear blur only after the card is already mostly home.
+        // Blur clears only after the card is already heading home.
         setTimeout(() => overlay.classList.remove('show'), 245);
 
         await Promise.allSettled([
             shapeBack.finished,
-            contentOut.finished,
-            labelBack.finished,
-            extraOut?.finished || Promise.resolve()
+            textBack.finished,
+            iconBack.finished,
+            textChange,
+            contentOut.finished
         ]);
 
-        // Commit the exact SOURCE geometry before cancelling transform animations.
         Object.assign(root.style, {
             left: `${destination.left}px`,
             top: `${destination.top}px`,
@@ -8576,22 +8732,14 @@ function goxionLegacyAdapter(data) {
             boxShadow: gxAuthSourceStyle.boxShadow
         });
 
-        [shapeBack, contentOut, labelBack, extraOut].forEach(anim => {
+        [shapeBack, textBack, iconBack, contentOut].forEach(anim => {
             try { anim?.cancel(); } catch (_) {}
         });
 
-        // Return the SAME shared label to the SAME root.
-        label.classList.remove('gx-auth-label-floating');
-        label.removeAttribute('style');
+        // Return SAME text + SAME emoji to SAME label.
+        gxAuthRestoreSharedParts(root, textEl, iconEl);
 
-        const extra = label.querySelector('.gx-auth-title-extra');
-        if (extra) {
-            extra.removeAttribute('style');
-        }
-
-        root.insertBefore(label, root.firstChild);
-
-        // Return the SAME root to its exact placeholder location.
+        // Return SAME root to its exact placeholder location.
         if (gxAuthOriginalParent && gxAuthPlaceholder) {
             gxAuthOriginalParent.insertBefore(root, gxAuthPlaceholder);
         } else if (gxAuthOriginalParent) {
