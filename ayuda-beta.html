@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.29-beta-wave-02-23">
+<html lang="es" data-goxion-version="1.0.30-beta-wave-02-24">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3720,6 +3720,8 @@ body.gx-tab-transitioning {
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
     will-change: left, top, width, height, border-radius, background-color, border-color, box-shadow;
 }
 
@@ -3730,7 +3732,7 @@ body.gx-tab-transitioning {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 7px;
     white-space: nowrap;
     font-size: 13px;
     font-weight: 700;
@@ -3738,6 +3740,29 @@ body.gx-tab-transitioning {
     transform: translate(-50%, -50%);
     transform-origin: center;
     will-change: transform, color;
+}
+
+.gx-auth-title-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.gx-auth-title-copy {
+    position: relative;
+    display: inline-grid;
+    align-items: center;
+}
+
+.gx-auth-title-copy > span {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+    will-change: opacity, transform;
+}
+
+.gx-auth-title-target {
+    opacity: 0;
 }
 
 /* No visible second card. This layer contains only the fields/buttons. */
@@ -3865,7 +3890,7 @@ body.gx-tab-transitioning {
 
     <header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
         <img src="logo2.PNG" alt="GOXION" class="app-logo">
-        <button class="header-action-btn" id="header-action-btn" onclick="toggleAuth()">👤 <span id="header-btn-text">Accede a tu espacio</span></button>
+        <button class="header-action-btn" id="header-action-btn" onclick="toggleAuth()">👤 <span id="header-btn-text">Mi Espacio</span></button>
     </header>
 
     <div class="bg" aria-hidden="true">
@@ -4537,7 +4562,7 @@ body.gx-tab-transitioning {
 
                 // No mostramos "Cerrar Sesión" hasta confirmar qué cliente corresponde al token.
                 document.getElementById('header-btn-text').innerText =
-                    initialKey ? 'Cerrar Sesión' : 'Accede a tu espacio';
+                    initialKey ? 'Cerrar Sesión' : 'Mi Espacio';
             } else {
                 document.getElementById('view-inicio').classList.add('active');
                 document.getElementById('view-dashboard').classList.remove('active');
@@ -4762,7 +4787,7 @@ body.gx-tab-transitioning {
     function resetSesionVisual() {
             window.goxionCurrentClientKey = "";
             if(greetingInterval) clearInterval(greetingInterval);
-            document.getElementById('header-btn-text').innerText = 'Accede a tu espacio'; 
+            document.getElementById('header-btn-text').innerText = 'Mi Espacio'; 
             document.getElementById('tab-inicio-icon').innerText = '🏠';
             document.getElementById('tab-inicio-text').innerText = 'Inicio';
             document.getElementById('login-id').value = ''; 
@@ -6788,7 +6813,7 @@ function goxionLegacyAdapter(data) {
                     const tabText = document.getElementById("tab-inicio-text");
                     const guestCard = document.getElementById("guest-action-card");
 
-                    if (headerText) headerText.innerText = "Accede a tu espacio";
+                    if (headerText) headerText.innerText = "Mi Espacio";
                     if (tabIcon) tabIcon.innerText = "🏠";
                     if (tabText) tabText.innerText = "Inicio";
                     if (guestCard) guestCard.style.display = "block";
@@ -7833,7 +7858,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.23</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.24</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8069,6 +8094,8 @@ function goxionLegacyAdapter(data) {
     let gxAuthBusy = false;
     let gxAuthSurfaceEl = null;
     let gxAuthTitleEl = null;
+    let gxAuthSourceTextEl = null;
+    let gxAuthTargetTextEl = null;
 
     function gxAuthContentElements(sheet) {
         return [
@@ -8109,16 +8136,16 @@ function goxionLegacyAdapter(data) {
 
     function gxAuthCardStyle() {
         return {
-            backgroundColor: 'rgba(8, 8, 12, 0.78)',
-            borderColor: 'rgba(255,255,255,0.10)',
+            backgroundColor: 'rgba(8, 8, 12, 0.72)',
+            borderColor: 'rgba(0,242,254,0.22)',
             borderWidth: '1px',
             borderStyle: 'solid',
             borderRadius: '26px',
-            boxShadow: '0 24px 70px rgba(0,0,0,.50), 0 0 30px rgba(0,242,254,.07)'
+            boxShadow: '0 24px 70px rgba(0,0,0,.52), 0 0 34px rgba(0,242,254,.08)'
         };
     }
 
-    function gxAuthCreateSurface(source, rect) {
+    function gxAuthCreateSurface(source, rect, overlay, sheet) {
         const s = gxAuthSurfaceStyle(source);
         const surface = document.createElement('div');
         surface.className = 'gx-auth-live-surface';
@@ -8138,12 +8165,38 @@ function goxionLegacyAdapter(data) {
 
         const title = document.createElement('div');
         title.className = 'gx-auth-live-title';
-        title.innerHTML = source.innerHTML;
         title.style.color = getComputedStyle(source).color;
+
+        const icon = document.createElement('span');
+        icon.className = 'gx-auth-title-icon';
+        icon.textContent = '👤';
+
+        const copy = document.createElement('span');
+        copy.className = 'gx-auth-title-copy';
+
+        const sourceText = document.createElement('span');
+        sourceText.className = 'gx-auth-title-source';
+        sourceText.textContent = 'Mi Espacio';
+
+        const targetText = document.createElement('span');
+        targetText.className = 'gx-auth-title-target';
+        targetText.textContent = 'Accede a tu espacio';
+
+        copy.append(sourceText, targetText);
+        title.append(icon, copy);
         surface.appendChild(title);
 
-        document.body.appendChild(surface);
-        return { surface, title, sourceStyle: s };
+        // Critical Safari/iOS fix: keep the transforming surface inside
+        // the auth overlay stacking context, behind the form content.
+        overlay.insertBefore(surface, sheet);
+
+        return {
+            surface,
+            title,
+            sourceText,
+            targetText,
+            sourceStyle: s
+        };
     }
 
     function gxAuthFrames(fromRect, toRect, fromStyle, toStyle) {
@@ -8250,9 +8303,11 @@ function goxionLegacyAdapter(data) {
         const targetRect = sheet.getBoundingClientRect();
         const targetStyle = gxAuthCardStyle();
 
-        const created = gxAuthCreateSurface(source, sourceRect);
+        const created = gxAuthCreateSurface(source, sourceRect, overlay, sheet);
         gxAuthSurfaceEl = created.surface;
         gxAuthTitleEl = created.title;
+        gxAuthSourceTextEl = created.sourceText;
+        gxAuthTargetTextEl = created.targetText;
 
         source.classList.add('gx-auth-source-hidden');
         sheet.style.visibility = 'visible';
@@ -8268,7 +8323,8 @@ function goxionLegacyAdapter(data) {
             }
         );
 
-        // Same label stays visible and moves with the same surface.
+        // The SAME title container travels with the surface.
+        // "Mi Espacio" adjusts into "Accede a tu espacio" during the morph.
         const titleAnim = gxAuthTitleEl.animate([
             {
                 transform: 'translate(-50%, -50%) translateY(0) scale(1)',
@@ -8289,6 +8345,26 @@ function goxionLegacyAdapter(data) {
             fill: 'forwards'
         });
 
+        const sourceCopyOut = gxAuthSourceTextEl.animate([
+            { opacity: 1, transform: 'translateY(0)' },
+            { opacity: 1, transform: 'translateY(0)', offset: .38 },
+            { opacity: 0, transform: 'translateY(-5px)' }
+        ], {
+            duration: 360,
+            easing: 'cubic-bezier(.4,0,.2,1)',
+            fill: 'forwards'
+        });
+
+        const targetCopyIn = gxAuthTargetTextEl.animate([
+            { opacity: 0, transform: 'translateY(5px)' },
+            { opacity: 0, transform: 'translateY(5px)', offset: .33 },
+            { opacity: 1, transform: 'translateY(0)' }
+        ], {
+            duration: 430,
+            easing: 'cubic-bezier(.16,1,.3,1)',
+            fill: 'forwards'
+        });
+
         await wait(350);
 
         overlay.classList.add('gx-auth-content-ready');
@@ -8300,6 +8376,8 @@ function goxionLegacyAdapter(data) {
         await Promise.allSettled([
             shapeAnim.finished,
             titleAnim.finished,
+            sourceCopyOut.finished,
+            targetCopyIn.finished,
             reveal
         ]);
 
@@ -8322,6 +8400,8 @@ function goxionLegacyAdapter(data) {
             gxAuthSurfaceEl?.remove();
             gxAuthSurfaceEl = null;
             gxAuthTitleEl = null;
+            gxAuthSourceTextEl = null;
+            gxAuthTargetTextEl = null;
             gxAuthResetContent(sheet);
             return;
         }
@@ -8365,11 +8445,33 @@ function goxionLegacyAdapter(data) {
                 fill: 'forwards'
             });
 
+            const targetCopyOut = gxAuthTargetTextEl.animate([
+                { opacity: 1, transform: 'translateY(0)' },
+                { opacity: 1, transform: 'translateY(0)', offset: .34 },
+                { opacity: 0, transform: 'translateY(5px)' }
+            ], {
+                duration: 315,
+                easing: 'cubic-bezier(.4,0,.2,1)',
+                fill: 'forwards'
+            });
+
+            const sourceCopyIn = gxAuthSourceTextEl.animate([
+                { opacity: 0, transform: 'translateY(-5px)' },
+                { opacity: 0, transform: 'translateY(-5px)', offset: .28 },
+                { opacity: 1, transform: 'translateY(0)' }
+            ], {
+                duration: 390,
+                easing: 'cubic-bezier(.16,1,.3,1)',
+                fill: 'forwards'
+            });
+
             setTimeout(() => overlay.classList.remove('gx-auth-blurred'), 255);
 
             await Promise.allSettled([
                 shapeBack.finished,
-                titleBack.finished
+                titleBack.finished,
+                targetCopyOut.finished,
+                sourceCopyIn.finished
             ]);
         }
 
@@ -8379,6 +8481,8 @@ function goxionLegacyAdapter(data) {
         gxAuthSurfaceEl?.remove();
         gxAuthSurfaceEl = null;
         gxAuthTitleEl = null;
+        gxAuthSourceTextEl = null;
+        gxAuthTargetTextEl = null;
 
         overlay.classList.remove('show', 'gx-auth-shared-mode');
         document.body.style.overflow = 'auto';
