@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.27-beta-wave-02-21">
+<html lang="es" data-goxion-version="1.0.28-beta-wave-02-22">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3717,10 +3717,14 @@ body.gx-tab-transitioning {
     box-sizing: border-box;
     pointer-events: none;
     overflow: hidden;
-    will-change: transform, opacity, border-radius, background-color, border-color;
-    transform-origin: top left;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    will-change:
+        left, top, width, height,
+        opacity, border-radius,
+        background-color, border-color, box-shadow;
 }
 
 .gx-auth-card-ghost-label {
@@ -3734,7 +3738,18 @@ body.gx-tab-transitioning {
     font-size: 13px;
     font-weight: 700;
     white-space: nowrap;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
     will-change: opacity, transform;
+}
+
+.gx-auth-card-ghost.gx-auth-card-to-pill .gx-auth-card-ghost-label {
+    color: #030305;
+}
+
+/* Slightly calmer backdrop handoff while the surface is moving. */
+.auth-overlay.gx-auth-card-mode::before {
+    transition: opacity .34s cubic-bezier(.2,.8,.2,1) !important;
 }
 
 /* The old bottom sheet becomes a centered glass login card. */
@@ -7852,7 +7867,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.27 · BETA WAVE 02.21</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.22</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8082,8 +8097,9 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> CENTER CARD MORPH
-       Pill -> centered glass login card + blurred background.
+       3) MI ESPACIO -> REFINED CENTER CARD MORPH
+       Geometry morph (not non-uniform scale):
+       pill -> centered glass card -> pill
        ========================================================= */
     let gxAuthBusy = false;
     let gxAuthGhost = null;
@@ -8103,7 +8119,7 @@ function goxionLegacyAdapter(data) {
     function gxAuthHideContents(sheet) {
         gxAuthElements(sheet).forEach(el => {
             el.style.opacity = '0';
-            el.style.transform = 'translateY(8px) scale(.99)';
+            el.style.transform = 'translateY(7px) scale(.992)';
         });
     }
 
@@ -8126,41 +8142,56 @@ function goxionLegacyAdapter(data) {
         };
     }
 
-    function gxAuthCreateGhost(source, targetRect, sourceRect) {
+    function gxAuthCreateGhost(rect, surface, labelHTML = '') {
         const ghost = document.createElement('div');
         ghost.className = 'gx-auth-card-ghost';
 
-        const sourceSurface = gxAuthSurface(source);
-
         Object.assign(ghost.style, {
-            left: `${targetRect.left}px`,
-            top: `${targetRect.top}px`,
-            width: `${targetRect.width}px`,
-            height: `${targetRect.height}px`,
-            backgroundColor: sourceSurface.backgroundColor,
-            borderColor: sourceSurface.borderColor,
-            borderWidth: sourceSurface.borderWidth,
-            borderStyle: sourceSurface.borderStyle,
-            borderRadius: sourceSurface.borderRadius,
-            boxShadow: sourceSurface.boxShadow
+            left: `${rect.left}px`,
+            top: `${rect.top}px`,
+            width: `${rect.width}px`,
+            height: `${rect.height}px`,
+            backgroundColor: surface.backgroundColor,
+            borderColor: surface.borderColor,
+            borderWidth: surface.borderWidth,
+            borderStyle: surface.borderStyle,
+            borderRadius: surface.borderRadius,
+            boxShadow: surface.boxShadow,
+            opacity: '1'
         });
 
         const label = document.createElement('div');
         label.className = 'gx-auth-card-ghost-label';
-        label.innerHTML = source.innerHTML;
+        label.innerHTML = labelHTML;
         ghost.appendChild(label);
 
-        const dx = sourceRect.left - targetRect.left;
-        const dy = sourceRect.top - targetRect.top;
-        const sx = sourceRect.width / Math.max(targetRect.width, 1);
-        const sy = sourceRect.height / Math.max(targetRect.height, 1);
-
-        ghost.style.transform =
-            `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`;
-
         document.body.appendChild(ghost);
+        return { ghost, label };
+    }
 
-        return { ghost, label, dx, dy, sx, sy };
+    function gxAuthGeometryFrames(fromRect, toRect, fromSurface, toSurface) {
+        return [
+            {
+                left: `${fromRect.left}px`,
+                top: `${fromRect.top}px`,
+                width: `${fromRect.width}px`,
+                height: `${fromRect.height}px`,
+                borderRadius: fromSurface.borderRadius,
+                backgroundColor: fromSurface.backgroundColor,
+                borderColor: fromSurface.borderColor,
+                boxShadow: fromSurface.boxShadow
+            },
+            {
+                left: `${toRect.left}px`,
+                top: `${toRect.top}px`,
+                width: `${toRect.width}px`,
+                height: `${toRect.height}px`,
+                borderRadius: toSurface.borderRadius,
+                backgroundColor: toSurface.backgroundColor,
+                borderColor: toSurface.borderColor,
+                boxShadow: toSurface.boxShadow
+            }
+        ];
     }
 
     async function gxAuthRevealContents(sheet) {
@@ -8172,11 +8203,11 @@ function goxionLegacyAdapter(data) {
         }
 
         const animations = items.map((el, index) => el.animate([
-            { opacity: 0, transform: 'translateY(8px) scale(.99)' },
+            { opacity: 0, transform: 'translateY(7px) scale(.992)' },
             { opacity: 1, transform: 'translateY(0) scale(1)' }
         ], {
-            duration: 260,
-            delay: Math.min(index, 6) * 34,
+            duration: index === 0 ? 180 : 255,
+            delay: index === 0 ? 0 : Math.min(index, 6) * 30,
             easing: 'cubic-bezier(.16,1,.3,1)',
             fill: 'forwards'
         }));
@@ -8197,15 +8228,16 @@ function goxionLegacyAdapter(data) {
 
         const animations = items.map((el, index) => el.animate([
             { opacity: 1, transform: 'translateY(0) scale(1)' },
-            { opacity: 0, transform: 'translateY(5px) scale(.99)' }
+            { opacity: 0, transform: 'translateY(4px) scale(.992)' }
         ], {
-            duration: 120,
-            delay: Math.min(index, 5) * 5,
+            duration: 105,
+            delay: Math.min(index, 5) * 4,
             easing: 'cubic-bezier(.4,0,.2,1)',
             fill: 'forwards'
         }));
 
         await Promise.allSettled(animations.map(a => a.finished));
+
         animations.forEach(a => {
             try { a.cancel(); } catch (_) {}
         });
@@ -8221,7 +8253,12 @@ function goxionLegacyAdapter(data) {
         if (!overlay || !sheet || !source) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.add('show', 'gx-auth-card-mode', 'gx-auth-blurred', 'gx-auth-card-ready');
+            overlay.classList.add(
+                'show',
+                'gx-auth-card-mode',
+                'gx-auth-blurred',
+                'gx-auth-card-ready'
+            );
             sheet.style.opacity = '1';
             sheet.style.pointerEvents = 'auto';
             document.body.style.overflow = 'hidden';
@@ -8235,76 +8272,94 @@ function goxionLegacyAdapter(data) {
         document.body.style.overflow = 'hidden';
 
         gxAuthHideContents(sheet);
+
+        // Make the final centered layout measurable, but invisible.
         sheet.style.visibility = 'hidden';
         sheet.style.opacity = '0';
         sheet.style.pointerEvents = 'none';
 
-        // Measure the real centered card while invisible.
-        const targetRect = sheet.getBoundingClientRect();
         const sourceRect = source.getBoundingClientRect();
+        const targetRect = sheet.getBoundingClientRect();
+
+        const sourceSurface = gxAuthSurface(source);
         const targetSurface = gxAuthSurface(sheet);
 
-        const { ghost, label } = gxAuthCreateGhost(source, targetRect, sourceRect);
+        const { ghost, label } = gxAuthCreateGhost(
+            sourceRect,
+            sourceSurface,
+            source.innerHTML
+        );
+
         gxAuthGhost = ghost;
 
+        // Hide the real pill only after its exact visual twin exists.
         source.classList.add('gx-auth-source-hidden');
         sheet.style.visibility = 'visible';
 
-        // Blur starts just after the pill begins to grow.
-        setTimeout(() => overlay.classList.add('gx-auth-blurred'), 55);
+        // Blur follows the beginning of the morph, not before it.
+        setTimeout(() => overlay.classList.add('gx-auth-blurred'), 70);
 
-        const labelAnim = label.animate([
+        const labelOut = label.animate([
             { opacity: 1, transform: 'scale(1)' },
-            { opacity: .75, transform: 'scale(.97)', offset: .42 },
-            { opacity: 0, transform: 'scale(.90)' }
+            { opacity: .90, transform: 'scale(.98)', offset: .44 },
+            { opacity: 0, transform: 'scale(.93)' }
         ], {
-            duration: 260,
-            easing: 'ease-in',
+            duration: 315,
+            easing: 'cubic-bezier(.4,0,.2,1)',
             fill: 'forwards'
         });
 
-        const ghostAnim = ghost.animate([
-            { transform: ghost.style.transform },
+        const shape = ghost.animate(
+            gxAuthGeometryFrames(
+                sourceRect,
+                targetRect,
+                sourceSurface,
+                targetSurface
+            ),
             {
-                transform: 'translate(0,0) scale(1)',
-                backgroundColor: targetSurface.backgroundColor,
-                borderColor: targetSurface.borderColor,
-                borderRadius: targetSurface.borderRadius,
-                boxShadow: targetSurface.boxShadow
+                duration: 470,
+                easing: 'cubic-bezier(.18,.86,.22,1)',
+                fill: 'forwards'
             }
-        ], {
-            duration: 430,
-            easing: 'cubic-bezier(.18,.86,.22,1)',
-            fill: 'forwards'
-        });
+        );
 
-        await ghostAnim.finished.catch(() => {});
+        // Begin the real card handoff before the temporary surface fully stops.
+        await wait(355);
 
         overlay.classList.add('gx-auth-card-ready');
         sheet.style.opacity = '1';
         sheet.style.pointerEvents = 'auto';
 
-        const sheetFade = sheet.animate(
-            [{ opacity: 0 }, { opacity: 1 }],
-            { duration: 115, easing: 'ease-out' }
-        );
+        const sheetIn = sheet.animate([
+            { opacity: 0 },
+            { opacity: 1 }
+        ], {
+            duration: 150,
+            easing: 'ease-out'
+        });
 
-        const ghostFade = ghost.animate(
+        // Inputs start appearing while the final 20% of the shape settles.
+        const revealPromise = gxAuthRevealContents(sheet);
+
+        await Promise.allSettled([
+            shape.finished,
+            sheetIn.finished
+        ]);
+
+        const ghostOut = ghost.animate(
             [{ opacity: 1 }, { opacity: 0 }],
-            { duration: 115, easing: 'ease-out', fill: 'forwards' }
+            { duration: 90, easing: 'ease-out', fill: 'forwards' }
         );
 
         await Promise.allSettled([
-            sheetFade.finished,
-            ghostFade.finished,
-            labelAnim.finished
+            ghostOut.finished,
+            labelOut.finished,
+            revealPromise
         ]);
 
         ghost.remove();
         gxAuthGhost = null;
         source.classList.remove('gx-auth-source-hidden');
-
-        await gxAuthRevealContents(sheet);
 
         gxAuthBusy = false;
     };
@@ -8319,7 +8374,12 @@ function goxionLegacyAdapter(data) {
         if (!overlay || !sheet || !target || !overlay.classList.contains('show')) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.remove('show', 'gx-auth-card-mode', 'gx-auth-blurred', 'gx-auth-card-ready');
+            overlay.classList.remove(
+                'show',
+                'gx-auth-card-mode',
+                'gx-auth-blurred',
+                'gx-auth-card-ready'
+            );
             document.body.style.overflow = 'auto';
             gxAuthResetContents(sheet);
             return;
@@ -8327,75 +8387,81 @@ function goxionLegacyAdapter(data) {
 
         gxAuthBusy = true;
 
+        // First remove only the form content. The card surface itself stays visible.
         await gxAuthHideContentsAnimated(sheet);
 
         const sourceRect = sheet.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
+
         const sourceSurface = gxAuthSurface(sheet);
         const targetSurface = gxAuthSurface(target);
 
-        // Ghost starts exactly as the centered card.
-        const ghost = document.createElement('div');
-        ghost.className = 'gx-auth-card-ghost';
+        const { ghost, label } = gxAuthCreateGhost(
+            sourceRect,
+            sourceSurface,
+            target.innerHTML
+        );
 
-        Object.assign(ghost.style, {
-            left: `${sourceRect.left}px`,
-            top: `${sourceRect.top}px`,
-            width: `${sourceRect.width}px`,
-            height: `${sourceRect.height}px`,
-            backgroundColor: sourceSurface.backgroundColor,
-            borderColor: sourceSurface.borderColor,
-            borderWidth: sourceSurface.borderWidth,
-            borderStyle: sourceSurface.borderStyle,
-            borderRadius: sourceSurface.borderRadius,
-            boxShadow: sourceSurface.boxShadow,
-            transform: 'translate(0,0) scale(1)'
-        });
-
-        document.body.appendChild(ghost);
+        ghost.classList.add('gx-auth-card-to-pill');
         gxAuthGhost = ghost;
 
-        target.classList.add('gx-auth-source-hidden');
+        // The target label exists inside the moving surface but starts invisible.
+        label.style.opacity = '0';
+        label.style.transform = 'scale(.93)';
 
+        // Hide the real card only after the ghost is exactly on top of it.
         sheet.style.opacity = '0';
         sheet.style.pointerEvents = 'none';
         overlay.classList.remove('gx-auth-card-ready');
 
-        const dx = targetRect.left - sourceRect.left;
-        const dy = targetRect.top - sourceRect.top;
-        const sx = targetRect.width / Math.max(sourceRect.width, 1);
-        const sy = targetRect.height / Math.max(sourceRect.height, 1);
+        target.classList.add('gx-auth-source-hidden');
 
-        const ghostBack = ghost.animate([
+        const shapeBack = ghost.animate(
+            gxAuthGeometryFrames(
+                sourceRect,
+                targetRect,
+                sourceSurface,
+                targetSurface
+            ),
             {
-                transform: 'translate(0,0) scale(1)',
-                backgroundColor: sourceSurface.backgroundColor,
-                borderColor: sourceSurface.borderColor,
-                borderRadius: sourceSurface.borderRadius,
-                boxShadow: sourceSurface.boxShadow
-            },
-            {
-                transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`,
-                backgroundColor: targetSurface.backgroundColor,
-                borderColor: targetSurface.borderColor,
-                borderRadius: targetSurface.borderRadius,
-                boxShadow: targetSurface.boxShadow
+                duration: 430,
+                easing: 'cubic-bezier(.22,.72,.18,1)',
+                fill: 'forwards'
             }
+        );
+
+        // Bring the Mi Espacio identity back during the last part of the contraction.
+        await wait(255);
+
+        const labelIn = label.animate([
+            { opacity: 0, transform: 'scale(.93)' },
+            { opacity: 1, transform: 'scale(1)' }
         ], {
-            duration: 390,
-            easing: 'cubic-bezier(.22,.72,.18,1)',
+            duration: 155,
+            easing: 'cubic-bezier(.16,1,.3,1)',
             fill: 'forwards'
         });
 
-        // Keep blur during most of the contraction, then clear it near the end.
-        setTimeout(() => overlay.classList.remove('gx-auth-blurred'), 235);
+        // Keep the page blurred until the card is already mostly back in the pill.
+        setTimeout(() => overlay.classList.remove('gx-auth-blurred'), 55);
 
-        await ghostBack.finished.catch(() => {});
+        await Promise.allSettled([
+            shapeBack.finished,
+            labelIn.finished
+        ]);
+
+        // Exact handoff: real pill appears underneath the finished twin.
+        target.classList.remove('gx-auth-source-hidden');
+
+        const ghostOut = ghost.animate(
+            [{ opacity: 1 }, { opacity: 0 }],
+            { duration: 85, easing: 'ease-out', fill: 'forwards' }
+        );
+
+        await ghostOut.finished.catch(() => {});
 
         ghost.remove();
         gxAuthGhost = null;
-
-        target.classList.remove('gx-auth-source-hidden');
 
         overlay.classList.remove('show', 'gx-auth-card-mode');
         document.body.style.overflow = 'auto';
