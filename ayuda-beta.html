@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.16-beta-wave-02-10">
+<html lang="es" data-goxion-version="1.0.17-beta-wave-02-11">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3359,6 +3359,48 @@
     to{opacity:1;transform:translateY(0) scale(1)}
 }
 
+
+.gx-gamif-morph-ghost::before{
+    opacity:0!important;
+}
+
+/* Shared emoji: the watermark visually travels into the expanded hero icon. */
+.gx-gamif-shared-emoji{
+    transform-origin:center center;
+    -webkit-transform-origin:center center;
+}
+
+.gx-gamif-floating-emoji{
+    position:fixed!important;
+    z-index:2470!important;
+    margin:0!important;
+    padding:0!important;
+    line-height:1!important;
+    pointer-events:none!important;
+    user-select:none!important;
+    -webkit-user-select:none!important;
+    transform-origin:center center!important;
+    -webkit-transform-origin:center center!important;
+    will-change:left,top,font-size,opacity,transform,filter;
+    white-space:nowrap;
+}
+
+/* The contraction uses a neutral copy of the existing panel surface.
+   Its styles are read from computed CSS, so the original glass stays untouched. */
+.gx-gamif-morph-surface{
+    position:fixed!important;
+    z-index:2450!important;
+    margin:0!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+    pointer-events:none!important;
+    will-change:left,top,width,height,border-radius,opacity,box-shadow,background-color,border-color;
+}
+
+.gx-gamif-closing-layout{
+    overflow:visible!important;
+}
+
 @media(prefers-reduced-motion:reduce){
     .gx-gamif-morph-ghost{display:none!important}
     #gamif-grid.gx-shared-grid-return .gx-gamif-card{
@@ -4708,7 +4750,7 @@
                     <div class="gx-gamif-expanded-head"><button class="btn-gamif-close" onclick="closeGamif()">← Volver</button><span class="gx-gamif-expanded-kicker">GOXION REWARDS</span></div>
 
                     <div style="text-align:center; margin-bottom:25px; margin-top:5px;">
-                        <div class="${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:42px; margin-bottom:8px; display:inline-block; filter: drop-shadow(0 0 15px rgba(0,242,254,0.3));">${beneficioReclamado ? '💝' : '🎁'}</div>
+                        <div class="gx-gamif-shared-emoji ${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:42px; margin-bottom:8px; display:inline-block; filter: drop-shadow(0 0 15px rgba(0,242,254,0.3));">${beneficioReclamado ? '💝' : '🎁'}</div>
                         <div class="gx-referral-name" style="font-size:18px; font-weight:800; color:#fff;">Tus Recompensas</div>
                         <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">Progreso de tu invitado: <span style="color:var(--text-main); font-weight:700;">${refNombre}</span></div>
                     </div>
@@ -4756,7 +4798,7 @@
                 expandedRefHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
                     <div style="text-align:center;margin-bottom:15px;margin-top:-5px;">
-                        <div style="font-size:38px;margin-bottom:5px;">🫂</div>
+                        <div class="gx-gamif-shared-emoji" style="font-size:38px;margin-bottom:5px;">🫂</div>
                         <div style="font-size:16px;font-weight:800;">Gana 1 Mes Gratis</div>
                         <div style="font-size:12px;color:var(--text-muted);line-height:1.4;margin-top:5px;">Invita a un amigo. Cuando contrate y cumpla 3 meses, ¡tu próxima mensualidad es 100% gratis!</div>
                     </div>
@@ -4869,7 +4911,7 @@
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
                     <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
-                        <div class="${couponClaimed ? '' : 'shake-anim'}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${couponClaimed ? '🥇' : '🎟️'}</div>
+                        <div class="gx-gamif-shared-emoji ${couponClaimed ? '' : 'shake-anim'}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
                         <div style="font-size: 16px; font-weight: 800; color: var(--neon-blue);">¡Desbloquea ${gamifConfig.descuento}% OFF!</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Completa las siguientes misiones para reclamar tu descuento especial:</div>
                     </div>
@@ -4884,7 +4926,7 @@
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
                     <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
-                        <div style="font-size: 38px; margin-bottom: 5px; opacity: 0.5;">🎟️</div>
+                        <div class="gx-gamif-shared-emoji" style="font-size: 38px; margin-bottom: 5px; opacity: 0.5;">🎯</div>
                         <div style="font-size: 16px; font-weight: 800;">Sin misiones activas</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Vuelve pronto. Constantemente lanzamos dinámicas para que interactúes y ahorres más.</div>
                     </div>`;
@@ -6152,7 +6194,11 @@ function goxionLegacyAdapter(data) {
 (() => {
     let gxGamifMorphing = false;
     let gxActiveGamifType = null;
-    const gxReduceMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const gxReduceMotion = () =>
+        window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const gxWait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     function gxGetParts(type) {
         const grid = document.getElementById('gamif-grid');
@@ -6161,7 +6207,7 @@ function goxionLegacyAdapter(data) {
         const panel = type === 'referral' ? refPanel : cupPanel;
         const otherPanel = type === 'referral' ? cupPanel : refPanel;
         const source = grid?.querySelector(type === 'referral' ? '.gx-gamif-card-ref' : '.gx-gamif-card-mission');
-        return { grid, refPanel, cupPanel, panel, otherPanel, source };
+        return { grid, refPanel, cupPanel, panel, otherPanel, source, host: grid?.parentElement || null };
     }
 
     function gxRectStyles(el, rect) {
@@ -6184,26 +6230,123 @@ function goxionLegacyAdapter(data) {
         return ghost;
     }
 
+    function gxCreateSurface(panel, rect) {
+        const cs = getComputedStyle(panel);
+        const surface = document.createElement('div');
+        surface.className = 'gx-gamif-morph-surface';
+        gxRectStyles(surface, rect);
+        surface.style.backgroundColor = cs.backgroundColor;
+        surface.style.border = cs.border;
+        surface.style.borderColor = cs.borderColor;
+        surface.style.borderRadius = cs.borderRadius;
+        surface.style.boxShadow = cs.boxShadow;
+        surface.style.backdropFilter = cs.backdropFilter;
+        surface.style.webkitBackdropFilter = cs.webkitBackdropFilter;
+        surface.style.opacity = '1';
+        document.body.appendChild(surface);
+        return surface;
+    }
+
+    function gxSourceEmojiMetrics(source) {
+        const rect = source.getBoundingClientRect();
+        const pseudo = getComputedStyle(source, '::before');
+        const fontSize = parseFloat(pseudo.fontSize) || 112;
+        const opacity = parseFloat(pseudo.opacity);
+        const right = parseFloat(pseudo.right);
+        const topPct = 0.51;
+
+        return {
+            text: source.dataset.watermark || '✨',
+            left: rect.right + (Number.isFinite(right) ? -right : 7) - fontSize * 0.50,
+            top: rect.top + rect.height * topPct,
+            fontSize,
+            opacity: Number.isFinite(opacity) ? opacity : 0.145,
+            rotation: -14,
+            scale: 1.04
+        };
+    }
+
+    function gxTargetEmojiMetrics(target) {
+        const rect = target.getBoundingClientRect();
+        const cs = getComputedStyle(target);
+        const fontSize = parseFloat(cs.fontSize) || Math.max(rect.height, 38);
+        const opacity = parseFloat(cs.opacity);
+        return {
+            text: target.textContent.trim() || '✨',
+            left: rect.left + rect.width / 2,
+            top: rect.top + rect.height / 2,
+            fontSize,
+            opacity: Number.isFinite(opacity) ? opacity : 1,
+            rotation: 0,
+            scale: 1
+        };
+    }
+
+    function gxCreateFloatingEmoji(metrics) {
+        const emoji = document.createElement('span');
+        emoji.className = 'gx-gamif-floating-emoji';
+        emoji.textContent = metrics.text;
+        emoji.style.left = `${metrics.left}px`;
+        emoji.style.top = `${metrics.top}px`;
+        emoji.style.fontSize = `${metrics.fontSize}px`;
+        emoji.style.opacity = `${metrics.opacity}`;
+        emoji.style.transform = `translate(-50%,-50%) rotate(${metrics.rotation}deg) scale(${metrics.scale})`;
+        emoji.style.filter = 'drop-shadow(0 0 0 rgba(0,0,0,0))';
+        document.body.appendChild(emoji);
+        return emoji;
+    }
+
+    function gxAnimateEmoji(emoji, from, to, opening) {
+        if (!emoji || gxReduceMotion() || !Element.prototype.animate) return null;
+        return emoji.animate([
+            {
+                left: `${from.left}px`,
+                top: `${from.top}px`,
+                fontSize: `${from.fontSize}px`,
+                opacity: from.opacity,
+                transform: `translate(-50%,-50%) rotate(${from.rotation}deg) scale(${from.scale})`,
+                filter: opening ? 'drop-shadow(0 0 0 rgba(0,242,254,0))' : 'drop-shadow(0 0 15px rgba(0,242,254,.28))'
+            },
+            {
+                offset: .66,
+                opacity: opening ? .78 : .42,
+                filter: 'drop-shadow(0 0 16px rgba(0,242,254,.28))'
+            },
+            {
+                left: `${to.left}px`,
+                top: `${to.top}px`,
+                fontSize: `${to.fontSize}px`,
+                opacity: to.opacity,
+                transform: `translate(-50%,-50%) rotate(${to.rotation}deg) scale(${to.scale})`,
+                filter: opening ? 'drop-shadow(0 0 15px rgba(0,242,254,.28))' : 'drop-shadow(0 0 0 rgba(0,242,254,0))'
+            }
+        ], {
+            duration: opening ? 470 : 520,
+            easing: opening ? 'cubic-bezier(.16,1,.3,1)' : 'cubic-bezier(.2,.75,.2,1)',
+            fill: 'forwards'
+        });
+    }
+
     function gxAnimateChildren(panel, entering) {
-        const children = Array.from(panel.children);
+        const children = Array.from(panel.children).filter(el => !el.querySelector?.('.gx-gamif-shared-emoji') && !el.classList.contains('gx-gamif-shared-emoji'));
         if (!children.length || gxReduceMotion() || !Element.prototype.animate) return [];
 
         return children.map((child, index) => {
-            const delay = entering ? 85 + Math.min(index, 7) * 24 : Math.min(index, 5) * 8;
+            const delay = entering ? 95 + Math.min(index, 7) * 24 : Math.min(index, 6) * 16;
             const frames = entering
                 ? [
-                    { opacity: 0, transform: 'translateY(9px)', filter: 'blur(3px)' },
-                    { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' }
+                    { opacity: 0, transform: 'translateY(10px) scale(.99)', filter: 'blur(3px)' },
+                    { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)' }
                   ]
                 : [
-                    { opacity: 1, transform: 'translateY(0)', filter: 'blur(0px)' },
-                    { opacity: 0, transform: 'translateY(-5px)', filter: 'blur(2px)' }
+                    { opacity: 1, transform: 'translateY(0) scale(1)', filter: 'blur(0px)' },
+                    { opacity: 0, transform: 'translateY(-8px) scale(.985)', filter: 'blur(2.5px)' }
                   ];
 
             return child.animate(frames, {
-                duration: entering ? 300 : 150,
+                duration: entering ? 320 : 230,
                 delay,
-                easing: entering ? 'cubic-bezier(.16,1,.3,1)' : 'cubic-bezier(.4,0,1,1)',
+                easing: entering ? 'cubic-bezier(.16,1,.3,1)' : 'cubic-bezier(.4,0,.2,1)',
                 fill: 'both'
             });
         });
@@ -6215,6 +6358,8 @@ function goxionLegacyAdapter(data) {
         panel.style.display = visible ? 'block' : 'none';
         panel.style.opacity = visible ? '1' : '';
         panel.style.visibility = visible ? 'visible' : '';
+        panel.style.transform = '';
+        panel.style.filter = '';
     }
 
     async function gxOpenShared(type) {
@@ -6228,8 +6373,6 @@ function goxionLegacyAdapter(data) {
 
         if (gxReduceMotion() || !Element.prototype.animate) {
             grid.style.display = 'none';
-            grid.style.opacity = '';
-            grid.style.transform = '';
             gxSetPanelReady(otherPanel, false);
             gxSetPanelReady(panel, true);
             if (type === 'coupon') setTimeout(animarMisionesCompletadasEnSecuencia, 80);
@@ -6238,12 +6381,11 @@ function goxionLegacyAdapter(data) {
         }
 
         const sourceRect = source.getBoundingClientRect();
+        const sourceEmoji = gxSourceEmojiMetrics(source);
         const ghost = gxCreateGhost(source, sourceRect);
 
-        // Congelamos visualmente la tarjeta real; sus clases y animaciones siguen intactas.
         source.style.visibility = 'hidden';
 
-        // Quitamos la cuadrícula del flujo y medimos el panel en su posición definitiva.
         grid.style.display = 'none';
         grid.style.opacity = '';
         grid.style.transform = '';
@@ -6256,17 +6398,28 @@ function goxionLegacyAdapter(data) {
         panel.style.opacity = '0';
 
         const targetRect = panel.getBoundingClientRect();
+        const targetEmojiEl = panel.querySelector('.gx-gamif-shared-emoji');
+        const targetEmoji = targetEmojiEl ? gxTargetEmojiMetrics(targetEmojiEl) : null;
 
+        if (targetEmojiEl) targetEmojiEl.style.visibility = 'hidden';
         panel.style.visibility = 'visible';
+
+        const floatingEmoji = targetEmoji
+            ? gxCreateFloatingEmoji({ ...sourceEmoji, text: targetEmoji.text })
+            : null;
+
+        const emojiAnim = targetEmoji
+            ? gxAnimateEmoji(floatingEmoji, sourceEmoji, targetEmoji, true)
+            : null;
 
         const ghostChildren = Array.from(ghost.children);
         ghostChildren.forEach((child, index) => {
             child.animate([
                 { opacity: 1, transform: 'translateY(0) scale(1)' },
-                { opacity: index === ghostChildren.length - 1 ? 0.18 : 0.06, transform: 'translateY(-3px) scale(.985)' }
+                { opacity: index === ghostChildren.length - 1 ? 0.15 : 0.04, transform: 'translateY(-4px) scale(.982)' }
             ], {
-                duration: 260,
-                delay: 55,
+                duration: 280,
+                delay: 45,
                 easing: 'cubic-bezier(.4,0,.2,1)',
                 fill: 'forwards'
             });
@@ -6290,45 +6443,44 @@ function goxionLegacyAdapter(data) {
                 opacity: 1
             }
         ], {
-            duration: 430,
+            duration: 460,
             easing: 'cubic-bezier(.18,.86,.22,1)',
             fill: 'forwards'
         });
 
-        // El contenido nuevo nace dentro de la superficie ya expandida.
         setTimeout(() => {
             panel.animate([
                 { opacity: 0 },
                 { opacity: 1 }
             ], {
-                duration: 150,
+                duration: 180,
                 easing: 'ease-out',
                 fill: 'forwards'
             });
             gxAnimateChildren(panel, true);
-        }, 265);
+        }, 270);
 
-        await ghostAnim.finished.catch(() => {});
+        await Promise.allSettled([
+            ghostAnim.finished,
+            emojiAnim?.finished || Promise.resolve()
+        ]);
 
-        ghost.animate([
-            { opacity: 1 },
-            { opacity: 0 }
-        ], {
-            duration: 95,
+        ghost.animate([{ opacity: 1 }, { opacity: 0 }], {
+            duration: 105,
             easing: 'ease-out',
             fill: 'forwards'
         });
 
-        setTimeout(() => {
-            ghost.remove();
-            source.style.visibility = '';
-            panel.style.opacity = '1';
-            gxGamifMorphing = false;
+        await gxWait(105);
 
-            if (type === 'coupon') {
-                setTimeout(animarMisionesCompletadasEnSecuencia, 90);
-            }
-        }, 100);
+        ghost.remove();
+        floatingEmoji?.remove();
+        if (targetEmojiEl) targetEmojiEl.style.visibility = '';
+        source.style.visibility = '';
+        panel.style.opacity = '1';
+        gxGamifMorphing = false;
+
+        if (type === 'coupon') setTimeout(animarMisionesCompletadasEnSecuencia, 90);
     }
 
     async function gxCloseShared() {
@@ -6337,7 +6489,7 @@ function goxionLegacyAdapter(data) {
         const type = gxActiveGamifType ||
             (document.getElementById('gamif-expanded-referral')?.style.display !== 'none' ? 'referral' : 'coupon');
 
-        const { grid, panel, source } = gxGetParts(type);
+        const { grid, panel, source, host } = gxGetParts(type);
         if (!grid || !panel || !source) return;
 
         gxGamifMorphing = true;
@@ -6353,48 +6505,88 @@ function goxionLegacyAdapter(data) {
         }
 
         const panelRect = panel.getBoundingClientRect();
+        const panelEmojiEl = panel.querySelector('.gx-gamif-shared-emoji');
+        const panelEmoji = panelEmojiEl ? gxTargetEmojiMetrics(panelEmojiEl) : null;
+        const sourceEmoji = gxSourceEmojiMetrics(source);
 
-        // Medimos dónde quedará exactamente la tarjeta cuando el panel desaparezca.
+        // Preserve the current panel height while we calculate the card destination.
+        const hostStartHeight = host ? host.getBoundingClientRect().height : 0;
+        if (host && hostStartHeight > 0) {
+            host.classList.add('gx-gamif-closing-layout');
+            host.style.height = `${hostStartHeight}px`;
+        }
+
+        // Measure the real destination after returning the grid to document flow.
         panel.style.visibility = 'hidden';
         panel.style.display = 'none';
         grid.style.display = 'grid';
         grid.style.visibility = 'hidden';
         source.style.visibility = 'hidden';
-        const destinationRect = source.getBoundingClientRect();
 
-        // Restauramos el estado visual actual sin permitir que el navegador lo pinte entre medias.
+        const destinationRect = source.getBoundingClientRect();
+        const gridHeight = grid.getBoundingClientRect().height;
+
+        // Restore panel visually for the beginning of the contraction.
         grid.style.display = 'none';
         grid.style.visibility = '';
         panel.style.display = 'block';
         panel.style.visibility = 'visible';
         panel.style.opacity = '1';
 
-        const ghost = gxCreateGhost(source, panelRect);
-        ghost.style.opacity = '0';
+        const surface = gxCreateSurface(panel, panelRect);
 
+        if (panelEmojiEl) panelEmojiEl.style.visibility = 'hidden';
+        const floatingEmoji = panelEmoji
+            ? gxCreateFloatingEmoji(panelEmoji)
+            : null;
+        const emojiAnim = panelEmoji
+            ? gxAnimateEmoji(floatingEmoji, panelEmoji, { ...sourceEmoji, text: panelEmoji.text }, false)
+            : null;
+
+        // Phase 1: content recedes naturally while the glass surface remains.
         gxAnimateChildren(panel, false);
 
-        const ghostFadeIn = ghost.animate([
-            { opacity: 0 },
-            { opacity: 1 }
+        const panelFade = panel.animate([
+            { opacity: 1, transform: 'scale(1)', filter: 'blur(0px)' },
+            { opacity: .72, transform: 'scale(.995)', filter: 'blur(.5px)', offset: .52 },
+            { opacity: 0, transform: 'scale(.985)', filter: 'blur(2px)' }
         ], {
-            duration: 100,
-            easing: 'ease-out',
+            duration: 260,
+            easing: 'cubic-bezier(.4,0,.2,1)',
             fill: 'forwards'
         });
 
-        panel.animate([
-            { opacity: 1 },
-            { opacity: 0 }
-        ], {
-            duration: 135,
-            easing: 'ease-in',
-            fill: 'forwards'
+        await gxWait(155);
+
+        // Put the compact layout back in flow, invisible, before the surface contracts.
+        panel.style.display = 'none';
+        panel.style.opacity = '';
+        panel.style.transform = '';
+        panel.style.filter = '';
+
+        grid.style.display = 'grid';
+        grid.style.visibility = 'visible';
+        Array.from(grid.children).forEach(card => {
+            card.style.opacity = '0';
         });
+        source.style.visibility = '';
 
-        await ghostFadeIn.finished.catch(() => {});
+        // Animate the section's actual height too, so exiting never "snaps".
+        let hostHeightAnim = null;
+        if (host && hostStartHeight > 0 && gridHeight > 0) {
+            hostHeightAnim = host.animate([
+                { height: `${hostStartHeight}px` },
+                { height: `${gridHeight}px` }
+            ], {
+                duration: 525,
+                easing: 'cubic-bezier(.2,.75,.2,1)',
+                fill: 'forwards'
+            });
+        }
 
-        const shrinkAnim = ghost.animate([
+        const sourceStyle = getComputedStyle(source);
+
+        const surfaceAnim = surface.animate([
             {
                 left: `${panelRect.left}px`,
                 top: `${panelRect.top}px`,
@@ -6404,35 +6596,81 @@ function goxionLegacyAdapter(data) {
                 opacity: 1
             },
             {
+                offset: .72,
+                opacity: 1
+            },
+            {
                 left: `${destinationRect.left}px`,
                 top: `${destinationRect.top}px`,
                 width: `${destinationRect.width}px`,
                 height: `${destinationRect.height}px`,
                 borderRadius: '22px',
+                backgroundColor: sourceStyle.backgroundColor,
+                borderColor: sourceStyle.borderColor,
+                boxShadow: sourceStyle.boxShadow,
                 opacity: 1
             }
         ], {
-            duration: 390,
-            easing: 'cubic-bezier(.2,.78,.2,1)',
+            duration: 525,
+            easing: 'cubic-bezier(.2,.75,.2,1)',
             fill: 'forwards'
         });
 
-        await shrinkAnim.finished.catch(() => {});
+        // The sister card returns first; the source card waits until the surface lands.
+        const sibling = Array.from(grid.children).find(card => card !== source);
+        if (sibling) {
+            setTimeout(() => {
+                sibling.animate([
+                    { opacity: 0, transform: 'translateY(7px) scale(.985)' },
+                    { opacity: 1, transform: 'translateY(0) scale(1)' }
+                ], {
+                    duration: 280,
+                    easing: 'cubic-bezier(.16,1,.3,1)',
+                    fill: 'forwards'
+                });
+            }, 245);
+        }
 
-        panel.style.display = 'none';
-        panel.style.opacity = '';
-        panel.style.visibility = '';
+        await Promise.allSettled([
+            surfaceAnim.finished,
+            hostHeightAnim?.finished || Promise.resolve(),
+            emojiAnim?.finished || Promise.resolve(),
+            panelFade.finished
+        ]);
+
+        source.style.opacity = '0';
+        source.animate([
+            { opacity: 0, transform: 'scale(.985)' },
+            { opacity: 1, transform: 'scale(1)' }
+        ], {
+            duration: 170,
+            easing: 'cubic-bezier(.16,1,.3,1)',
+            fill: 'forwards'
+        });
+
+        surface.animate([{ opacity: 1 }, { opacity: 0 }], {
+            duration: 150,
+            easing: 'ease-out',
+            fill: 'forwards'
+        });
+
+        await gxWait(155);
+
+        surface.remove();
+        floatingEmoji?.remove();
+        if (panelEmojiEl) panelEmojiEl.style.visibility = '';
+
+        Array.from(grid.children).forEach(card => {
+            card.style.opacity = '';
+            card.style.transform = '';
+        });
+
         panel.classList.remove('gx-shared-panel');
 
-        grid.style.display = 'grid';
-        grid.style.visibility = 'visible';
-        grid.classList.add('gx-shared-grid-return');
-        source.style.visibility = '';
-
-        // La geometría final del ghost coincide ya con la tarjeta real.
-        ghost.remove();
-
-        setTimeout(() => grid.classList.remove('gx-shared-grid-return'), 330);
+        if (host) {
+            host.style.height = '';
+            host.classList.remove('gx-gamif-closing-layout');
+        }
 
         gxActiveGamifType = null;
         gxGamifMorphing = false;
@@ -6671,6 +6909,6 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.16 · BETA WAVE 02.10</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.17 · BETA WAVE 02.11</div>
 </body>
 </html>
