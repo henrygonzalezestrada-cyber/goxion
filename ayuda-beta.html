@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.34-beta-wave-02-28">
+<html lang="es" data-goxion-version="1.0.35-beta-wave-02-29">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,12 +3676,16 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // SHARED TITLE + EMOJI 02.28 ---------- */
+/* ---------- Mi Espacio // CONTENT + TITLE + WATERMARK 02.29 ---------- */
 /*
-   Keeps the stable 02.27 FLIP architecture.
-   The SAME text and SAME emoji leave the pill as shared elements:
-   - Mi Espacio grows/moves and becomes "Accede a tu espacio".
-   - 👤 travels independently into a subtle watermark behind the card.
+   Based on stable 02.27/02.28 FLIP architecture.
+
+   Main fixes:
+   - Form content no longer lives inside the FLIP-scaled container while moving.
+     It becomes a transparent fixed content layer aligned to the real card.
+   - Same Mi Espacio text travels and becomes a stronger Poppins title.
+   - Same 👤 travels to a center-right watermark position inspired by
+     Misiones / Referidos.
 */
 
 .auth-overlay.gx-auth-backdrop-only {
@@ -3736,6 +3740,13 @@ body.gx-tab-transitioning {
     margin: 0 !important;
     pointer-events: none !important;
     white-space: nowrap;
+
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    letter-spacing: -.22px !important;
+    line-height: 1 !important;
+
     transform-origin: center center;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -3750,21 +3761,22 @@ body.gx-tab-transitioning {
     top: 0;
     margin: 0 !important;
     pointer-events: none !important;
+    line-height: 1 !important;
     transform-origin: center center;
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
     will-change: transform, opacity;
 }
 
-/* Static landed watermark state. Filter is NOT animated. */
+/* Landed watermark. Filter is static; never animated. */
 .gx-auth-pill-icon.gx-auth-icon-watermark {
-    z-index: 3099 !important; /* physically behind the card */
-    opacity: .72;
-    filter: blur(1.15px);
-    -webkit-filter: blur(1.15px);
+    z-index: 3101 !important; /* card = 3100, form = 3102 */
+    opacity: .145 !important;
+    filter: blur(1.15px) saturate(.92);
+    -webkit-filter: blur(1.15px) saturate(.92);
 }
 
-/* Inline login content already belongs to the real Mi Espacio component. */
+/* Native closed-state content holder. */
 .gx-auth-inline-content {
     position: absolute;
     z-index: 2;
@@ -3772,6 +3784,7 @@ body.gx-tab-transitioning {
     right: 22px;
     top: 94px;
     bottom: auto;
+
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -3779,6 +3792,32 @@ body.gx-tab-transitioning {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
+}
+
+/*
+   OPEN STATE:
+   The exact same content node is moved out of the FLIP container.
+   It has NO card/background of its own. This prevents inputs/button
+   from being squashed, clipped or re-rasterized by the card scale.
+*/
+.gx-auth-inline-content.gx-auth-content-floating {
+    position: fixed !important;
+    z-index: 3102 !important;
+    right: auto !important;
+    bottom: auto !important;
+    margin: 0 !important;
+
+    display: flex !important;
+    flex-direction: column;
+    justify-content: flex-start;
+
+    visibility: visible !important;
+    pointer-events: auto !important;
+    box-sizing: border-box;
+    transform-origin: center top;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: opacity, transform;
 }
 
 .gx-auth-login-subtitle {
@@ -3820,9 +3859,11 @@ body.gx-tab-transitioning {
     right: -10px;
     width: 34px;
     height: 34px;
+
     display: flex;
     align-items: center;
     justify-content: center;
+
     border-radius: 50%;
     border: 1px solid rgba(0,242,254,.34);
     background: rgba(0,242,254,.10);
@@ -3836,7 +3877,7 @@ body.gx-tab-transitioning {
     text-align: center;
 }
 
-/* REAL root at final card geometry; movement is transform-only FLIP. */
+/* REAL card surface; movement remains transform-only FLIP. */
 #header-action-btn.gx-auth-flip-card {
     position: fixed !important;
     z-index: 3100 !important;
@@ -3863,16 +3904,7 @@ body.gx-tab-transitioning {
     color: var(--neon-blue) !important;
 }
 
-#header-action-btn.gx-auth-card-open .gx-auth-inline-content {
-    visibility: visible;
-    pointer-events: auto;
-}
-
 @media (max-height: 690px) {
-    .gx-auth-inline-content {
-        top: 84px;
-    }
-
     .gx-auth-login-subtitle {
         margin-bottom: 13px !important;
     }
@@ -7897,7 +7929,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.28</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.29</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8127,8 +8159,10 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> SHARED TITLE + EMOJI
-       Stable FLIP card from 02.27 + true shared text/icon motion.
+       3) MI ESPACIO -> CONTENT + TITLE + WATERMARK
+       Card = optimized FLIP.
+       Content = transparent fixed layer (never FLIP-scaled).
+       Title + emoji = same real DOM nodes from the pill.
        ========================================================= */
     let gxAuthBusy = false;
     let gxAuthOpen = false;
@@ -8141,6 +8175,7 @@ function goxionLegacyAdapter(data) {
     let gxAuthIconSourceRect = null;
     let gxAuthTextTarget = null;
     let gxAuthIconTarget = null;
+    let gxAuthOpenCardRect = null;
 
     const gxAuthWait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -8252,28 +8287,39 @@ function goxionLegacyAdapter(data) {
         return `${rx}px / ${ry}px`;
     }
 
-    function gxAuthContent(root) {
-        return root.querySelector('.gx-auth-inline-content');
+    function gxAuthContent(root = null) {
+        return (
+            document.querySelector('.gx-auth-inline-content.gx-auth-content-floating') ||
+            root?.querySelector('.gx-auth-inline-content') ||
+            document.querySelector('.gx-auth-inline-content')
+        );
     }
 
-    function gxAuthPrimeContent(root) {
-        const content = gxAuthContent(root);
-        if (!content) return;
+    function gxAuthFloatContent(root, cardRect) {
+        const content = root.querySelector('.gx-auth-inline-content');
+        if (!content) return null;
 
-        content.style.visibility = 'visible';
-        content.style.pointerEvents = 'auto';
-        content.style.opacity = '0';
-        content.style.transform = 'translateY(10px) scale(.992)';
+        content.classList.add('gx-auth-content-floating');
+
+        Object.assign(content.style, {
+            left: `${cardRect.left + 22}px`,
+            top: `${cardRect.top + 94}px`,
+            width: `${cardRect.width - 44}px`,
+            opacity: '0',
+            transform: 'translateY(10px) scale(.992)'
+        });
+
+        // No visible second card: this is only the existing form content.
+        document.body.appendChild(content);
+        return content;
     }
 
-    function gxAuthResetContent(root) {
-        const content = gxAuthContent(root);
-        if (!content) return;
+    function gxAuthRestoreContent(root, content) {
+        if (!content || !root) return;
 
-        content.style.visibility = '';
-        content.style.pointerEvents = '';
-        content.style.opacity = '';
-        content.style.transform = '';
+        content.classList.remove('gx-auth-content-floating');
+        content.removeAttribute('style');
+        root.appendChild(content);
     }
 
     function gxAuthCenter(rect) {
@@ -8308,7 +8354,7 @@ function goxionLegacyAdapter(data) {
         Object.assign(iconEl.style, {
             left: `${iconCenter.x}px`,
             top: `${iconCenter.y}px`,
-            transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
+            transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1) rotate(0deg)',
             opacity: '1'
         });
 
@@ -8322,15 +8368,18 @@ function goxionLegacyAdapter(data) {
         return {
             text: {
                 x: cardRect.left + cardRect.width / 2,
-                y: cardRect.top + 36,
-                scale: 1.20
+                y: cardRect.top + 37,
+                scale: 1.18
             },
             icon: {
-                // Watermark inspired by Misiones / Referidos.
-                x: cardRect.left + cardRect.width - 58,
-                y: cardRect.top + 92,
-                scale: 5.15,
-                rotate: -10
+                /*
+                   Same visual logic as Misiones/Referidos:
+                   large watermark on the center-right, not top-right.
+                */
+                x: cardRect.left + cardRect.width - 52,
+                y: cardRect.top + cardRect.height * .51,
+                scale: 7.15,
+                rotate: -14
             }
         };
     }
@@ -8346,8 +8395,9 @@ function goxionLegacyAdapter(data) {
     async function gxAuthChangeSharedText(textEl, opening) {
         if (!textEl) return;
 
-        // Change happens late in the same continuous trip.
-        await gxAuthWait(opening ? 292 : 82);
+        // Switch near the end: Mi Espacio grows/moves first;
+        // the landed title reads "Accede a tu espacio".
+        await gxAuthWait(opening ? 316 : 78);
         textEl.textContent = opening ? 'Accede a tu espacio' : 'Mi Espacio';
     }
 
@@ -8361,15 +8411,15 @@ function goxionLegacyAdapter(data) {
             },
             {
                 transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .58}px,${d.dy * .58}px,0) scale(1.10)`,
+                    `translate(-50%, -50%) translate3d(${d.dx * .64}px,${d.dy * .64}px,0) scale(1.10)`,
                 opacity: 1,
-                offset: .58
+                offset: .64
             },
             {
                 transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .77}px,${d.dy * .77}px,0) scale(1.16)`,
-                opacity: .34,
-                offset: .72
+                    `translate(-50%, -50%) translate3d(${d.dx * .78}px,${d.dy * .78}px,0) scale(1.14)`,
+                opacity: .30,
+                offset: .75
             },
             {
                 transform:
@@ -8393,14 +8443,14 @@ function goxionLegacyAdapter(data) {
             },
             {
                 transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .58}px,${d.dy * .58}px,0) scale(2.2) rotate(-4deg)`,
-                opacity: .68,
-                offset: .58
+                    `translate(-50%, -50%) translate3d(${d.dx * .52}px,${d.dy * .52}px,0) scale(2.55) rotate(-5deg)`,
+                opacity: .50,
+                offset: .52
             },
             {
                 transform:
                     `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale}) rotate(${target.rotate}deg)`,
-                opacity: .72
+                opacity: .145
             }
         ], {
             duration: 430,
@@ -8420,15 +8470,15 @@ function goxionLegacyAdapter(data) {
             },
             {
                 transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .72}px,${d.dy * .72}px,0) scale(1.15)`,
-                opacity: .34,
-                offset: .30
+                    `translate(-50%, -50%) translate3d(${d.dx * .74}px,${d.dy * .74}px,0) scale(1.13)`,
+                opacity: .30,
+                offset: .28
             },
             {
                 transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .45}px,${d.dy * .45}px,0) scale(1.08)`,
+                    `translate(-50%, -50%) translate3d(${d.dx * .52}px,${d.dy * .52}px,0) scale(1.08)`,
                 opacity: 1,
-                offset: .48
+                offset: .46
             },
             {
                 transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
@@ -8448,13 +8498,13 @@ function goxionLegacyAdapter(data) {
             {
                 transform:
                     `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale}) rotate(${target.rotate}deg)`,
-                opacity: .72
+                opacity: .145
             },
             {
                 transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .55}px,${d.dy * .55}px,0) scale(2.0) rotate(-4deg)`,
-                opacity: .72,
-                offset: .46
+                    `translate(-50%, -50%) translate3d(${d.dx * .52}px,${d.dy * .52}px,0) scale(2.45) rotate(-5deg)`,
+                opacity: .50,
+                offset: .48
             },
             {
                 transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1) rotate(0deg)',
@@ -8517,6 +8567,8 @@ function goxionLegacyAdapter(data) {
         gxAuthSourceStyle = gxAuthReadSourceStyle(root);
 
         const cardRect = gxAuthCardGeometry(root);
+        gxAuthOpenCardRect = cardRect;
+
         const cardStyle = gxAuthCardStyle();
         const flip = gxAuthFlipData(gxAuthSourceRect, cardRect);
         const inverse = gxAuthFlipMatrix(flip);
@@ -8537,12 +8589,18 @@ function goxionLegacyAdapter(data) {
             transform: 'none'
         });
 
-        // Detach the REAL text and REAL emoji before the card receives inverse scale.
         const shared = gxAuthLiftSharedParts(root);
         if (!shared) {
             gxAuthBusy = false;
             return;
         }
+
+        /*
+           Important 02.29 change:
+           move the SAME form out of the element BEFORE applying inverse FLIP.
+           It never gets squeezed by the card transform.
+        */
+        const content = gxAuthFloatContent(root, cardRect);
 
         document.body.appendChild(root);
 
@@ -8556,8 +8614,6 @@ function goxionLegacyAdapter(data) {
             borderRadius: startRadius
         });
 
-        gxAuthPrimeContent(root);
-        root.classList.add('gx-auth-card-open');
         root.setAttribute('aria-expanded', 'true');
 
         gxAuthPauseWave(true);
@@ -8566,8 +8622,9 @@ function goxionLegacyAdapter(data) {
 
         void root.offsetWidth;
 
-        gxAuthTextTarget = gxAuthSharedTargets(cardRect).text;
-        gxAuthIconTarget = gxAuthSharedTargets(cardRect).icon;
+        const targets = gxAuthSharedTargets(cardRect);
+        gxAuthTextTarget = targets.text;
+        gxAuthIconTarget = targets.icon;
 
         const shape = root.animate([
             {
@@ -8592,13 +8649,11 @@ function goxionLegacyAdapter(data) {
         const iconMove = gxAuthAnimateIconOpen(shared.iconEl, gxAuthIconTarget);
         const textChange = gxAuthChangeSharedText(shared.textEl, true);
 
-        // One compositor animation for the whole form.
-        const content = gxAuthContent(root);
         const contentIn = content.animate([
             { opacity: 0, transform: 'translateY(10px) scale(.992)' },
             { opacity: 1, transform: 'translateY(0) scale(1)' }
         ], {
-            duration: 225,
+            duration: 220,
             delay: 245,
             easing: 'cubic-bezier(.16,1,.3,1)',
             fill: 'forwards'
@@ -8612,7 +8667,7 @@ function goxionLegacyAdapter(data) {
             contentIn.finished
         ]);
 
-        // Commit stable OPEN state before cancelling WAAPI.
+        // Commit stable OPEN state before cancelling animations.
         Object.assign(root.style, {
             transform: 'none',
             borderRadius: cardStyle.borderRadius,
@@ -8632,13 +8687,13 @@ function goxionLegacyAdapter(data) {
         const iconD = gxAuthDelta(gxAuthIconSourceRect, gxAuthIconTarget);
         shared.iconEl.style.transform =
             `translate(-50%, -50%) translate3d(${iconD.dx}px,${iconD.dy}px,0) scale(${gxAuthIconTarget.scale}) rotate(${gxAuthIconTarget.rotate}deg)`;
-        shared.iconEl.style.opacity = '.72';
+        shared.iconEl.style.opacity = '.145';
 
         [shape, textMove, iconMove, contentIn].forEach(anim => {
             try { anim?.cancel(); } catch (_) {}
         });
 
-        // Landed watermark: static blur only after motion has stopped.
+        // Static blur only after the emoji has completely landed.
         shared.iconEl.classList.add('gx-auth-icon-watermark');
 
         gxAuthOpen = true;
@@ -8655,9 +8710,10 @@ function goxionLegacyAdapter(data) {
         const overlay = document.getElementById('auth-overlay');
         const textEl = document.querySelector('#header-btn-text.gx-auth-text-floating');
         const iconEl = document.querySelector('.gx-auth-pill-icon.gx-auth-icon-floating');
+        const content = gxAuthContent();
         const destination = gxAuthPlaceholder?.getBoundingClientRect();
 
-        if (!root || !overlay || !textEl || !iconEl || !destination) return;
+        if (!root || !overlay || !textEl || !iconEl || !content || !destination) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
             overlay.classList.remove('show');
@@ -8668,15 +8724,18 @@ function goxionLegacyAdapter(data) {
 
         gxAuthBusy = true;
 
-        // Remove the static watermark blur BEFORE motion begins.
+        // Remove static filter before the emoji starts moving.
         iconEl.classList.remove('gx-auth-icon-watermark');
 
         const cardRect = root.getBoundingClientRect();
         const flip = gxAuthFlipData(destination, cardRect);
         const inverse = gxAuthFlipMatrix(flip);
         const endRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
-        const content = gxAuthContent(root);
 
+        /*
+           All four parts start in the same frame:
+           card shrinks, title returns, watermark returns, form fades.
+        */
         const shapeBack = root.animate([
             {
                 transform: 'matrix(1,0,0,1,0,0)',
@@ -8702,14 +8761,13 @@ function goxionLegacyAdapter(data) {
 
         const contentOut = content.animate([
             { opacity: 1, transform: 'translateY(0) scale(1)' },
-            { opacity: 0, transform: 'translateY(6px) scale(.992)' }
+            { opacity: 0, transform: 'translateY(5px) scale(.992)' }
         ], {
-            duration: 145,
+            duration: 115,
             easing: 'ease-in',
             fill: 'forwards'
         });
 
-        // Blur clears only after the card is already heading home.
         setTimeout(() => overlay.classList.remove('show'), 245);
 
         await Promise.allSettled([
@@ -8736,10 +8794,10 @@ function goxionLegacyAdapter(data) {
             try { anim?.cancel(); } catch (_) {}
         });
 
-        // Return SAME text + SAME emoji to SAME label.
+        // Restore same shared text/emoji and same form node.
         gxAuthRestoreSharedParts(root, textEl, iconEl);
+        gxAuthRestoreContent(root, content);
 
-        // Return SAME root to its exact placeholder location.
         if (gxAuthOriginalParent && gxAuthPlaceholder) {
             gxAuthOriginalParent.insertBefore(root, gxAuthPlaceholder);
         } else if (gxAuthOriginalParent) {
@@ -8749,10 +8807,9 @@ function goxionLegacyAdapter(data) {
         gxAuthPlaceholder?.remove();
         gxAuthPlaceholder = null;
 
-        root.classList.remove('gx-auth-card-open', 'gx-auth-flip-card');
+        root.classList.remove('gx-auth-flip-card');
         root.removeAttribute('style');
         root.setAttribute('aria-expanded', 'false');
-        gxAuthResetContent(root);
 
         document.body.style.overflow = 'auto';
         gxAuthPauseWave(false);
