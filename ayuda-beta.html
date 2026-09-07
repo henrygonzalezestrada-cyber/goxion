@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.28-beta-wave-02-22">
+<html lang="es" data-goxion-version="1.0.29-beta-wave-02-23">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,8 +3676,8 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // Center Card Morph ---------- */
-.auth-overlay.gx-auth-card-mode {
+/* ---------- Mi Espacio // TRUE Shared Surface Morph ---------- */
+.auth-overlay.gx-auth-shared-mode {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -3692,28 +3692,27 @@ body.gx-tab-transitioning {
     overscroll-behavior: contain;
 }
 
-/* Background blur is static; only this layer's opacity changes. */
-.auth-overlay.gx-auth-card-mode::before {
+.auth-overlay.gx-auth-shared-mode::before {
     content: "";
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background: rgba(3,3,5,.34);
-    backdrop-filter: blur(18px) saturate(1.08);
-    -webkit-backdrop-filter: blur(18px) saturate(1.08);
+    background: rgba(3,3,5,.30);
+    backdrop-filter: blur(18px) saturate(1.06);
+    -webkit-backdrop-filter: blur(18px) saturate(1.06);
     opacity: 0;
-    transition: opacity .28s ease-out;
+    transition: opacity .30s cubic-bezier(.2,.8,.2,1);
 }
 
-.auth-overlay.gx-auth-card-mode.gx-auth-blurred::before {
+.auth-overlay.gx-auth-shared-mode.gx-auth-blurred::before {
     opacity: 1;
 }
 
-/* Temporary surface that visually transforms from Mi Espacio into the card. */
-.gx-auth-card-ghost {
+/* This object starts as the header pill and remains visible as the login card. */
+.gx-auth-live-surface {
     position: fixed;
-    z-index: 3200;
+    z-index: 2;
     box-sizing: border-box;
     pointer-events: none;
     overflow: hidden;
@@ -3721,39 +3720,28 @@ body.gx-tab-transitioning {
     -webkit-transform: translateZ(0);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
-    will-change:
-        left, top, width, height,
-        opacity, border-radius,
-        background-color, border-color, box-shadow;
+    will-change: left, top, width, height, border-radius, background-color, border-color, box-shadow;
 }
 
-.gx-auth-card-ghost-label {
+.gx-auth-live-title {
     position: absolute;
-    inset: 0;
-    display: flex;
+    left: 50%;
+    top: 50%;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    color: inherit;
+    white-space: nowrap;
     font-size: 13px;
     font-weight: 700;
-    white-space: nowrap;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: opacity, transform;
+    line-height: 1;
+    transform: translate(-50%, -50%);
+    transform-origin: center;
+    will-change: transform, color;
 }
 
-.gx-auth-card-ghost.gx-auth-card-to-pill .gx-auth-card-ghost-label {
-    color: #030305;
-}
-
-/* Slightly calmer backdrop handoff while the surface is moving. */
-.auth-overlay.gx-auth-card-mode::before {
-    transition: opacity .34s cubic-bezier(.2,.8,.2,1) !important;
-}
-
-/* The old bottom sheet becomes a centered glass login card. */
-.auth-overlay.gx-auth-card-mode .auth-sheet {
+/* No visible second card. This layer contains only the fields/buttons. */
+.auth-overlay.gx-auth-shared-mode .auth-sheet {
     position: relative !important;
     z-index: 3;
     width: min(100%, 390px) !important;
@@ -3762,62 +3750,49 @@ body.gx-tab-transitioning {
     margin: auto !important;
     padding: 30px 22px 24px !important;
     overflow: visible !important;
-
-    background: var(--card-glass) !important;
-    border: 1px solid rgba(255,255,255,0.10) !important;
+    background: transparent !important;
+    border: 0 !important;
     border-radius: 26px !important;
-    box-shadow:
-        0 24px 70px rgba(0,0,0,.50),
-        0 0 30px rgba(0,242,254,.07) !important;
-    backdrop-filter: blur(18px) !important;
-    -webkit-backdrop-filter: blur(18px) !important;
-
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     transform: none !important;
     transition: none !important;
     opacity: 0;
     pointer-events: none;
 }
 
-.auth-overlay.gx-auth-card-mode.gx-auth-card-ready .auth-sheet {
+.auth-overlay.gx-auth-shared-mode.gx-auth-content-ready .auth-sheet {
     opacity: 1;
     pointer-events: auto;
 }
 
-/* Remove the old bottom-sheet affordances. */
-.auth-overlay.gx-auth-card-mode .auth-bg-logo,
-.auth-overlay.gx-auth-card-mode .sheet-handle {
-    display: none !important;
-}
-
-.auth-overlay.gx-auth-card-mode #auth-view {
+.auth-overlay.gx-auth-shared-mode #auth-view {
     position: relative;
     z-index: 2;
     width: 100%;
 }
 
-.auth-overlay.gx-auth-card-mode .login-card {
+.auth-overlay.gx-auth-shared-mode .login-card {
     margin: 0 !important;
     padding: 0 !important;
     text-align: center !important;
 }
 
-.auth-overlay.gx-auth-card-mode .section-title {
-    margin: 0 0 7px !important;
-    padding: 0 !important;
-    border: 0 !important;
-    color: var(--text-main) !important;
-    font-size: 18px !important;
-    font-weight: 800 !important;
-    text-transform: none !important;
-    letter-spacing: -.2px !important;
+.gx-auth-title-space {
+    height: 48px;
+    margin-bottom: 2px;
 }
 
-.auth-overlay.gx-auth-card-mode .login-card > p {
-    margin-bottom: 22px !important;
+.gx-auth-login-subtitle {
+    width: min(100%, 315px);
+    margin: 0 auto 22px !important;
+    color: var(--text-muted);
+    font-size: 12px;
     line-height: 1.5;
 }
 
-.auth-overlay.gx-auth-card-mode .input-smart {
+.auth-overlay.gx-auth-shared-mode .input-smart {
     min-height: 54px;
     margin-bottom: 12px;
     padding: 15px 16px;
@@ -3828,18 +3803,18 @@ body.gx-tab-transitioning {
     box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
 }
 
-.auth-overlay.gx-auth-card-mode .input-smart:focus {
+.auth-overlay.gx-auth-shared-mode .input-smart:focus {
     border-color: rgba(0,242,254,.68);
     box-shadow: 0 0 0 3px rgba(0,242,254,.07);
 }
 
-.auth-overlay.gx-auth-card-mode #btn-login-submit {
+.auth-overlay.gx-auth-shared-mode #btn-login-submit {
     min-height: 54px;
     margin-top: 4px;
     border-radius: 17px;
 }
 
-.auth-overlay.gx-auth-card-mode .close-sheet-btn {
+.auth-overlay.gx-auth-shared-mode .close-sheet-btn {
     position: absolute !important;
     z-index: 5;
     top: 12px !important;
@@ -3849,7 +3824,6 @@ body.gx-tab-transitioning {
     display: flex !important;
     align-items: center;
     justify-content: center;
-
     background: rgba(0,242,254,.10) !important;
     border: 1px solid rgba(0,242,254,.34) !important;
     color: var(--neon-blue) !important;
@@ -3860,17 +3834,12 @@ body.gx-tab-transitioning {
     -webkit-backdrop-filter: none !important;
 }
 
-.auth-overlay.gx-auth-card-mode .auth-sheet > *,
-.auth-overlay.gx-auth-card-mode .login-card > * {
-    will-change: opacity, transform;
-}
-
 #header-action-btn.gx-auth-source-hidden {
     visibility: hidden !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .gx-auth-card-ghost {
+    .gx-auth-live-surface {
         display: none !important;
     }
 
@@ -3896,7 +3865,7 @@ body.gx-tab-transitioning {
 
     <header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
         <img src="logo2.PNG" alt="GOXION" class="app-logo">
-        <button class="header-action-btn" id="header-action-btn" onclick="toggleAuth()">👤 <span id="header-btn-text">Mi Espacio</span></button>
+        <button class="header-action-btn" id="header-action-btn" onclick="toggleAuth()">👤 <span id="header-btn-text">Accede a tu espacio</span></button>
     </header>
 
     <div class="bg" aria-hidden="true">
@@ -4243,20 +4212,17 @@ body.gx-tab-transitioning {
 
     <div id="auth-overlay" class="auth-overlay" onclick="closeAuthSheetEvent(event)">
         <div class="auth-sheet" id="auth-sheet">
-            <img src="Logo individual.png" class="auth-bg-logo" onerror="this.src='logo2.PNG'">
-            
-            <div class="sheet-handle"></div>
-            <button class="close-sheet-btn" onclick="closeAuthSheet()">✕</button>
+            <button class="close-sheet-btn" aria-label="Cerrar acceso" onclick="closeAuthSheet()">✕</button>
 
-            <div id="auth-view" style="position: relative; z-index: 1;">
-                <div class="login-card" style="text-align: center; margin-top: 10px;">
-                    <div class="section-title" style="margin-bottom: 4px; font-size: 14px; color: var(--text-main);">Vincular Dispositivo</div>
-                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 20px;">Ingresa tus datos para acceder a tu panel personal.</p>
-                    
-                    <input type="text" id="login-id" class="input-smart" placeholder="Tu Nombre o ID (Ej. Juan de Dios)">
-                    <input type="password" id="login-pin" class="input-smart" placeholder="Código de Acceso (PIN)">
-                    
-                    <button id="btn-login-submit" class="btn-primary" onclick="iniciarSesion()">Entrar a mi Panel</button>
+            <div id="auth-view">
+                <div class="login-card">
+                    <div class="gx-auth-title-space" aria-hidden="true"></div>
+                    <p class="gx-auth-login-subtitle">Ingresa tus datos para acceder a tu panel personal.</p>
+
+                    <input type="text" id="login-id" class="input-smart" placeholder="Tu Nombre o ID (Ej. Juan de Dios)" autocomplete="username">
+                    <input type="password" id="login-pin" class="input-smart" placeholder="Código de Acceso (PIN)" autocomplete="current-password">
+
+                    <button id="btn-login-submit" class="btn-primary" onclick="iniciarSesion()">Validar acceso</button>
                     <p id="login-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
                 </div>
             </div>
@@ -4571,7 +4537,7 @@ body.gx-tab-transitioning {
 
                 // No mostramos "Cerrar Sesión" hasta confirmar qué cliente corresponde al token.
                 document.getElementById('header-btn-text').innerText =
-                    initialKey ? 'Cerrar Sesión' : 'Mi Espacio';
+                    initialKey ? 'Cerrar Sesión' : 'Accede a tu espacio';
             } else {
                 document.getElementById('view-inicio').classList.add('active');
                 document.getElementById('view-dashboard').classList.remove('active');
@@ -4796,7 +4762,7 @@ body.gx-tab-transitioning {
     function resetSesionVisual() {
             window.goxionCurrentClientKey = "";
             if(greetingInterval) clearInterval(greetingInterval);
-            document.getElementById('header-btn-text').innerText = 'Mi Espacio'; 
+            document.getElementById('header-btn-text').innerText = 'Accede a tu espacio'; 
             document.getElementById('tab-inicio-icon').innerText = '🏠';
             document.getElementById('tab-inicio-text').innerText = 'Inicio';
             document.getElementById('login-id').value = ''; 
@@ -6822,7 +6788,7 @@ function goxionLegacyAdapter(data) {
                     const tabText = document.getElementById("tab-inicio-text");
                     const guestCard = document.getElementById("guest-action-card");
 
-                    if (headerText) headerText.innerText = "Mi Espacio";
+                    if (headerText) headerText.innerText = "Accede a tu espacio";
                     if (tabIcon) tabIcon.innerText = "🏠";
                     if (tabText) tabText.innerText = "Inicio";
                     if (guestCard) guestCard.style.display = "block";
@@ -7867,7 +7833,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.22</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.23</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8097,18 +8063,17 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> REFINED CENTER CARD MORPH
-       Geometry morph (not non-uniform scale):
-       pill -> centered glass card -> pill
+       3) MI ESPACIO -> TRUE SHARED SURFACE MORPH
+       Same visible surface and same visible title throughout.
        ========================================================= */
     let gxAuthBusy = false;
-    let gxAuthGhost = null;
+    let gxAuthSurfaceEl = null;
+    let gxAuthTitleEl = null;
 
-    function gxAuthElements(sheet) {
+    function gxAuthContentElements(sheet) {
         return [
             sheet.querySelector('.close-sheet-btn'),
-            sheet.querySelector('.section-title'),
-            sheet.querySelector('.login-card > p'),
+            sheet.querySelector('.gx-auth-login-subtitle'),
             sheet.querySelector('#login-id'),
             sheet.querySelector('#login-pin'),
             sheet.querySelector('#btn-login-submit'),
@@ -8116,21 +8081,21 @@ function goxionLegacyAdapter(data) {
         ].filter(Boolean);
     }
 
-    function gxAuthHideContents(sheet) {
-        gxAuthElements(sheet).forEach(el => {
+    function gxAuthHideContent(sheet) {
+        gxAuthContentElements(sheet).forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(7px) scale(.992)';
         });
     }
 
-    function gxAuthResetContents(sheet) {
-        gxAuthElements(sheet).forEach(el => {
+    function gxAuthResetContent(sheet) {
+        gxAuthContentElements(sheet).forEach(el => {
             el.style.opacity = '';
             el.style.transform = '';
         });
     }
 
-    function gxAuthSurface(el) {
+    function gxAuthSurfaceStyle(el) {
         const cs = getComputedStyle(el);
         return {
             backgroundColor: cs.backgroundColor,
@@ -8142,63 +8107,80 @@ function goxionLegacyAdapter(data) {
         };
     }
 
-    function gxAuthCreateGhost(rect, surface, labelHTML = '') {
-        const ghost = document.createElement('div');
-        ghost.className = 'gx-auth-card-ghost';
+    function gxAuthCardStyle() {
+        return {
+            backgroundColor: 'rgba(8, 8, 12, 0.78)',
+            borderColor: 'rgba(255,255,255,0.10)',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+            borderRadius: '26px',
+            boxShadow: '0 24px 70px rgba(0,0,0,.50), 0 0 30px rgba(0,242,254,.07)'
+        };
+    }
 
-        Object.assign(ghost.style, {
+    function gxAuthCreateSurface(source, rect) {
+        const s = gxAuthSurfaceStyle(source);
+        const surface = document.createElement('div');
+        surface.className = 'gx-auth-live-surface';
+
+        Object.assign(surface.style, {
             left: `${rect.left}px`,
             top: `${rect.top}px`,
             width: `${rect.width}px`,
             height: `${rect.height}px`,
-            backgroundColor: surface.backgroundColor,
-            borderColor: surface.borderColor,
-            borderWidth: surface.borderWidth,
-            borderStyle: surface.borderStyle,
-            borderRadius: surface.borderRadius,
-            boxShadow: surface.boxShadow,
-            opacity: '1'
+            backgroundColor: s.backgroundColor,
+            borderColor: s.borderColor,
+            borderWidth: s.borderWidth,
+            borderStyle: s.borderStyle,
+            borderRadius: s.borderRadius,
+            boxShadow: s.boxShadow
         });
 
-        const label = document.createElement('div');
-        label.className = 'gx-auth-card-ghost-label';
-        label.innerHTML = labelHTML;
-        ghost.appendChild(label);
+        const title = document.createElement('div');
+        title.className = 'gx-auth-live-title';
+        title.innerHTML = source.innerHTML;
+        title.style.color = getComputedStyle(source).color;
+        surface.appendChild(title);
 
-        document.body.appendChild(ghost);
-        return { ghost, label };
+        document.body.appendChild(surface);
+        return { surface, title, sourceStyle: s };
     }
 
-    function gxAuthGeometryFrames(fromRect, toRect, fromSurface, toSurface) {
+    function gxAuthFrames(fromRect, toRect, fromStyle, toStyle) {
         return [
             {
                 left: `${fromRect.left}px`,
                 top: `${fromRect.top}px`,
                 width: `${fromRect.width}px`,
                 height: `${fromRect.height}px`,
-                borderRadius: fromSurface.borderRadius,
-                backgroundColor: fromSurface.backgroundColor,
-                borderColor: fromSurface.borderColor,
-                boxShadow: fromSurface.boxShadow
+                borderRadius: fromStyle.borderRadius,
+                backgroundColor: fromStyle.backgroundColor,
+                borderColor: fromStyle.borderColor,
+                boxShadow: fromStyle.boxShadow
             },
             {
                 left: `${toRect.left}px`,
                 top: `${toRect.top}px`,
                 width: `${toRect.width}px`,
                 height: `${toRect.height}px`,
-                borderRadius: toSurface.borderRadius,
-                backgroundColor: toSurface.backgroundColor,
-                borderColor: toSurface.borderColor,
-                boxShadow: toSurface.boxShadow
+                borderRadius: toStyle.borderRadius,
+                backgroundColor: toStyle.backgroundColor,
+                borderColor: toStyle.borderColor,
+                boxShadow: toStyle.boxShadow
             }
         ];
     }
 
-    async function gxAuthRevealContents(sheet) {
-        const items = gxAuthElements(sheet);
+    function gxAuthTitleFinalTransform(rect) {
+        const y = -(rect.height / 2) + 54;
+        return `translate(-50%, -50%) translateY(${y}px) scale(1.10)`;
+    }
+
+    async function gxAuthRevealContent(sheet) {
+        const items = gxAuthContentElements(sheet);
 
         if (reduceMotion() || !Element.prototype.animate) {
-            gxAuthResetContents(sheet);
+            gxAuthResetContent(sheet);
             return;
         }
 
@@ -8206,23 +8188,19 @@ function goxionLegacyAdapter(data) {
             { opacity: 0, transform: 'translateY(7px) scale(.992)' },
             { opacity: 1, transform: 'translateY(0) scale(1)' }
         ], {
-            duration: index === 0 ? 180 : 255,
-            delay: index === 0 ? 0 : Math.min(index, 6) * 30,
+            duration: index === 0 ? 170 : 255,
+            delay: Math.min(index, 5) * 34,
             easing: 'cubic-bezier(.16,1,.3,1)',
             fill: 'forwards'
         }));
 
         await Promise.allSettled(animations.map(a => a.finished));
-
-        animations.forEach(a => {
-            try { a.cancel(); } catch (_) {}
-        });
-
-        gxAuthResetContents(sheet);
+        animations.forEach(a => { try { a.cancel(); } catch (_) {} });
+        gxAuthResetContent(sheet);
     }
 
-    async function gxAuthHideContentsAnimated(sheet) {
-        const items = gxAuthElements(sheet);
+    async function gxAuthHideContentAnimated(sheet) {
+        const items = gxAuthContentElements(sheet);
 
         if (reduceMotion() || !Element.prototype.animate) return;
 
@@ -8237,10 +8215,7 @@ function goxionLegacyAdapter(data) {
         }));
 
         await Promise.allSettled(animations.map(a => a.finished));
-
-        animations.forEach(a => {
-            try { a.cancel(); } catch (_) {}
-        });
+        animations.forEach(a => { try { a.cancel(); } catch (_) {} });
     }
 
     window.openAuthSheet = async function() {
@@ -8253,114 +8228,82 @@ function goxionLegacyAdapter(data) {
         if (!overlay || !sheet || !source) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.add(
-                'show',
-                'gx-auth-card-mode',
-                'gx-auth-blurred',
-                'gx-auth-card-ready'
-            );
+            overlay.classList.add('show', 'gx-auth-shared-mode', 'gx-auth-blurred', 'gx-auth-content-ready');
             sheet.style.opacity = '1';
             sheet.style.pointerEvents = 'auto';
             document.body.style.overflow = 'hidden';
-            gxAuthResetContents(sheet);
+            gxAuthResetContent(sheet);
             return;
         }
 
         gxAuthBusy = true;
 
-        overlay.classList.add('show', 'gx-auth-card-mode');
+        overlay.classList.add('show', 'gx-auth-shared-mode');
         document.body.style.overflow = 'hidden';
 
-        gxAuthHideContents(sheet);
-
-        // Make the final centered layout measurable, but invisible.
+        gxAuthHideContent(sheet);
         sheet.style.visibility = 'hidden';
         sheet.style.opacity = '0';
         sheet.style.pointerEvents = 'none';
 
         const sourceRect = source.getBoundingClientRect();
         const targetRect = sheet.getBoundingClientRect();
+        const targetStyle = gxAuthCardStyle();
 
-        const sourceSurface = gxAuthSurface(source);
-        const targetSurface = gxAuthSurface(sheet);
+        const created = gxAuthCreateSurface(source, sourceRect);
+        gxAuthSurfaceEl = created.surface;
+        gxAuthTitleEl = created.title;
 
-        const { ghost, label } = gxAuthCreateGhost(
-            sourceRect,
-            sourceSurface,
-            source.innerHTML
-        );
-
-        gxAuthGhost = ghost;
-
-        // Hide the real pill only after its exact visual twin exists.
         source.classList.add('gx-auth-source-hidden');
         sheet.style.visibility = 'visible';
 
-        // Blur follows the beginning of the morph, not before it.
-        setTimeout(() => overlay.classList.add('gx-auth-blurred'), 70);
+        setTimeout(() => overlay.classList.add('gx-auth-blurred'), 65);
 
-        const labelOut = label.animate([
-            { opacity: 1, transform: 'scale(1)' },
-            { opacity: .90, transform: 'scale(.98)', offset: .44 },
-            { opacity: 0, transform: 'scale(.93)' }
-        ], {
-            duration: 315,
-            easing: 'cubic-bezier(.4,0,.2,1)',
-            fill: 'forwards'
-        });
-
-        const shape = ghost.animate(
-            gxAuthGeometryFrames(
-                sourceRect,
-                targetRect,
-                sourceSurface,
-                targetSurface
-            ),
+        const shapeAnim = gxAuthSurfaceEl.animate(
+            gxAuthFrames(sourceRect, targetRect, created.sourceStyle, targetStyle),
             {
-                duration: 470,
+                duration: 480,
                 easing: 'cubic-bezier(.18,.86,.22,1)',
                 fill: 'forwards'
             }
         );
 
-        // Begin the real card handoff before the temporary surface fully stops.
-        await wait(355);
+        // Same label stays visible and moves with the same surface.
+        const titleAnim = gxAuthTitleEl.animate([
+            {
+                transform: 'translate(-50%, -50%) translateY(0) scale(1)',
+                color: getComputedStyle(source).color
+            },
+            {
+                transform: 'translate(-50%, -50%) translateY(-8px) scale(1.03)',
+                color: 'var(--neon-blue)',
+                offset: .42
+            },
+            {
+                transform: gxAuthTitleFinalTransform(targetRect),
+                color: 'var(--text-main)'
+            }
+        ], {
+            duration: 480,
+            easing: 'cubic-bezier(.18,.86,.22,1)',
+            fill: 'forwards'
+        });
 
-        overlay.classList.add('gx-auth-card-ready');
+        await wait(350);
+
+        overlay.classList.add('gx-auth-content-ready');
         sheet.style.opacity = '1';
         sheet.style.pointerEvents = 'auto';
 
-        const sheetIn = sheet.animate([
-            { opacity: 0 },
-            { opacity: 1 }
-        ], {
-            duration: 150,
-            easing: 'ease-out'
-        });
-
-        // Inputs start appearing while the final 20% of the shape settles.
-        const revealPromise = gxAuthRevealContents(sheet);
+        const reveal = gxAuthRevealContent(sheet);
 
         await Promise.allSettled([
-            shape.finished,
-            sheetIn.finished
+            shapeAnim.finished,
+            titleAnim.finished,
+            reveal
         ]);
 
-        const ghostOut = ghost.animate(
-            [{ opacity: 1 }, { opacity: 0 }],
-            { duration: 90, easing: 'ease-out', fill: 'forwards' }
-        );
-
-        await Promise.allSettled([
-            ghostOut.finished,
-            labelOut.finished,
-            revealPromise
-        ]);
-
-        ghost.remove();
-        gxAuthGhost = null;
-        source.classList.remove('gx-auth-source-hidden');
-
+        // No handoff: the shared surface remains the visible card.
         gxAuthBusy = false;
     };
 
@@ -8374,99 +8317,73 @@ function goxionLegacyAdapter(data) {
         if (!overlay || !sheet || !target || !overlay.classList.contains('show')) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
-            overlay.classList.remove(
-                'show',
-                'gx-auth-card-mode',
-                'gx-auth-blurred',
-                'gx-auth-card-ready'
-            );
+            overlay.classList.remove('show', 'gx-auth-shared-mode', 'gx-auth-blurred', 'gx-auth-content-ready');
             document.body.style.overflow = 'auto';
-            gxAuthResetContents(sheet);
+            gxAuthSurfaceEl?.remove();
+            gxAuthSurfaceEl = null;
+            gxAuthTitleEl = null;
+            gxAuthResetContent(sheet);
             return;
         }
 
         gxAuthBusy = true;
 
-        // First remove only the form content. The card surface itself stays visible.
-        await gxAuthHideContentsAnimated(sheet);
+        await gxAuthHideContentAnimated(sheet);
 
-        const sourceRect = sheet.getBoundingClientRect();
-        const targetRect = target.getBoundingClientRect();
-
-        const sourceSurface = gxAuthSurface(sheet);
-        const targetSurface = gxAuthSurface(target);
-
-        const { ghost, label } = gxAuthCreateGhost(
-            sourceRect,
-            sourceSurface,
-            target.innerHTML
-        );
-
-        ghost.classList.add('gx-auth-card-to-pill');
-        gxAuthGhost = ghost;
-
-        // The target label exists inside the moving surface but starts invisible.
-        label.style.opacity = '0';
-        label.style.transform = 'scale(.93)';
-
-        // Hide the real card only after the ghost is exactly on top of it.
+        overlay.classList.remove('gx-auth-content-ready');
         sheet.style.opacity = '0';
         sheet.style.pointerEvents = 'none';
-        overlay.classList.remove('gx-auth-card-ready');
 
-        target.classList.add('gx-auth-source-hidden');
+        const fromRect = gxAuthSurfaceEl?.getBoundingClientRect();
+        const toRect = target.getBoundingClientRect();
 
-        const shapeBack = ghost.animate(
-            gxAuthGeometryFrames(
-                sourceRect,
-                targetRect,
-                sourceSurface,
-                targetSurface
-            ),
-            {
+        if (gxAuthSurfaceEl && gxAuthTitleEl && fromRect) {
+            const cardStyle = gxAuthCardStyle();
+            const pillStyle = gxAuthSurfaceStyle(target);
+
+            const shapeBack = gxAuthSurfaceEl.animate(
+                gxAuthFrames(fromRect, toRect, cardStyle, pillStyle),
+                {
+                    duration: 430,
+                    easing: 'cubic-bezier(.22,.72,.18,1)',
+                    fill: 'forwards'
+                }
+            );
+
+            const titleBack = gxAuthTitleEl.animate([
+                {
+                    transform: gxAuthTitleFinalTransform(fromRect),
+                    color: 'var(--text-main)'
+                },
+                {
+                    transform: 'translate(-50%, -50%) translateY(0) scale(1)',
+                    color: getComputedStyle(target).color
+                }
+            ], {
                 duration: 430,
                 easing: 'cubic-bezier(.22,.72,.18,1)',
                 fill: 'forwards'
-            }
-        );
+            });
 
-        // Bring the Mi Espacio identity back during the last part of the contraction.
-        await wait(255);
+            setTimeout(() => overlay.classList.remove('gx-auth-blurred'), 255);
 
-        const labelIn = label.animate([
-            { opacity: 0, transform: 'scale(.93)' },
-            { opacity: 1, transform: 'scale(1)' }
-        ], {
-            duration: 155,
-            easing: 'cubic-bezier(.16,1,.3,1)',
-            fill: 'forwards'
-        });
+            await Promise.allSettled([
+                shapeBack.finished,
+                titleBack.finished
+            ]);
+        }
 
-        // Keep the page blurred until the card is already mostly back in the pill.
-        setTimeout(() => overlay.classList.remove('gx-auth-blurred'), 55);
-
-        await Promise.allSettled([
-            shapeBack.finished,
-            labelIn.finished
-        ]);
-
-        // Exact handoff: real pill appears underneath the finished twin.
+        // Handoff happens only when the shared object is exactly back at the pill.
         target.classList.remove('gx-auth-source-hidden');
 
-        const ghostOut = ghost.animate(
-            [{ opacity: 1 }, { opacity: 0 }],
-            { duration: 85, easing: 'ease-out', fill: 'forwards' }
-        );
+        gxAuthSurfaceEl?.remove();
+        gxAuthSurfaceEl = null;
+        gxAuthTitleEl = null;
 
-        await ghostOut.finished.catch(() => {});
-
-        ghost.remove();
-        gxAuthGhost = null;
-
-        overlay.classList.remove('show', 'gx-auth-card-mode');
+        overlay.classList.remove('show', 'gx-auth-shared-mode');
         document.body.style.overflow = 'auto';
 
-        gxAuthResetContents(sheet);
+        gxAuthResetContent(sheet);
         sheet.style.opacity = '';
         sheet.style.visibility = '';
         sheet.style.pointerEvents = '';
