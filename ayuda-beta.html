@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.21-beta-wave-02-15">
+<html lang="es" data-goxion-version="1.0.22-beta-wave-02-16">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -1534,6 +1534,7 @@
         .platform-btn.gx-support-expanded {
             width: 100%;
             display: grid;
+            position: relative;
             grid-template-columns: 48px minmax(0, 1fr);
             align-items: center;
             column-gap: 12px;
@@ -1581,7 +1582,7 @@
             display: block;
             grid-column: 1 / -1;
             width: 100%;
-            margin-top: 14px;
+            margin-top: 18px;
             padding-top: 14px;
             border-top: 1px dashed rgba(255,255,255,0.1);
             text-align: left;
@@ -1594,24 +1595,54 @@
             margin-top: 0;
         }
 
+        .gx-support-flow-shell.gx-inside-platform #step-3.active {
+            margin-top: 16px;
+        }
+
+        .gx-support-flow-shell.gx-inside-platform #solution-text {
+            margin-top: 2px;
+        }
+
+        .platform-btn.gx-support-expanded > .gx-support-platform-name {
+            padding-right: 42px;
+        }
+
+        #smart-support-card.gx-support-height-lock {
+            overflow: hidden;
+            will-change: height;
+        }
+
         .gx-support-back {
             display: none;
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 34px;
+            height: 34px;
             appearance: none;
             -webkit-appearance: none;
-            border: 0;
-            background: transparent;
-            color: var(--neon-blue);
+            border: 1px solid rgba(255,255,255,0.10);
+            background: rgba(0,0,0,0.22);
+            color: var(--text-main);
+            border-radius: 50%;
             padding: 0;
-            margin: 0 0 13px;
-            font-size: 12px;
-            font-weight: 700;
+            margin: 0;
+            font-size: 23px;
+            font-weight: 400;
+            line-height: 1;
             cursor: pointer;
-            min-height: 28px;
+            align-items: center;
+            justify-content: center;
+            z-index: 4;
+            transition: transform .22s cubic-bezier(.2,.8,.2,1), background .22s ease, border-color .22s ease;
         }
 
         .gx-support-flow-shell.gx-inside-platform .gx-support-back {
             display: inline-flex;
-            align-items: center;
+        }
+
+        .gx-support-back:active {
+            transform: scale(.92);
         }
 
         .gx-support-issue-options {
@@ -3869,7 +3900,7 @@
 
                 <div id="support-flow-home">
                     <div id="support-flow-shell" class="gx-support-flow-shell">
-                        <button type="button" class="gx-support-back" onclick="closeSupportMorph(event)">← Cambiar plataforma</button>
+                        <button type="button" class="gx-support-back" aria-label="Cerrar asistente y cambiar plataforma" onclick="closeSupportMorph(event)">×</button>
 
                         <div id="step-2" class="step-box">
                             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
@@ -5878,13 +5909,35 @@
         let gxSupportExpandedEl = null;
 
         function gxSupportAnimateCardHeight(card, fromHeight, toHeight, duration = 420) {
-            if (!card || !Element.prototype.animate || Math.abs(toHeight - fromHeight) < 2) return null;
-            card.classList.add('gx-support-morph-running');
+            if (!card || Math.abs(toHeight - fromHeight) < 2) return null;
+
+            card.classList.add('gx-support-morph-running', 'gx-support-height-lock');
+            card.style.height = `${fromHeight}px`;
+
+            if (!Element.prototype.animate) {
+                card.style.height = `${toHeight}px`;
+                requestAnimationFrame(() => {
+                    card.style.height = '';
+                    card.classList.remove('gx-support-morph-running', 'gx-support-height-lock');
+                });
+                return null;
+            }
+
             const anim = card.animate(
                 [{ height: `${fromHeight}px` }, { height: `${toHeight}px` }],
-                { duration, easing: 'cubic-bezier(.2,.78,.2,1)' }
+                {
+                    duration,
+                    easing: 'cubic-bezier(.22,.72,.18,1)',
+                    fill: 'forwards'
+                }
             );
-            anim.finished.finally(() => card.classList.remove('gx-support-morph-running'));
+
+            anim.finished.finally(() => {
+                try { anim.cancel(); } catch (_) {}
+                card.style.height = '';
+                card.classList.remove('gx-support-morph-running', 'gx-support-height-lock');
+            });
+
             return anim;
         }
 
@@ -6018,6 +6071,11 @@
                 await fadeFlow.finished.catch(() => {});
             }
 
+            // Lock the large card height BEFORE collapsing its DOM.
+            // This prevents the lower support blocks from jumping upward.
+            card.classList.add('gx-support-height-lock');
+            card.style.height = `${firstCardHeight}px`;
+
             home.appendChild(flow);
             flow.classList.remove('gx-inside-platform', 'gx-support-step-enter');
 
@@ -6028,36 +6086,87 @@
             if (selector) selector.value = "";
             document.querySelectorAll('.gx-support-issue-btn').forEach(btn => btn.classList.remove('selected'));
 
+            // Temporarily reveal the compact grid invisibly so we can measure the
+            // exact destination without showing the siblings too early.
             el.classList.remove('gx-support-expanded', 'selected');
             grid.classList.remove('gx-support-focus');
+            const siblings = Array.from(grid.querySelectorAll('.platform-btn')).filter(btn => btn !== el);
+            siblings.forEach(btn => {
+                btn.style.opacity = '0';
+                btn.style.pointerEvents = 'none';
+            });
 
-            if (step1) step1.style.display = '';
+            if (step1) {
+                step1.style.display = '';
+                step1.style.opacity = '0';
+            }
 
             const lastRect = el.getBoundingClientRect();
+
+            // Measure the real compact height while the outer card is locked.
+            card.style.height = '';
             const lastCardHeight = card.getBoundingClientRect().height;
-            const siblings = Array.from(grid.querySelectorAll('.platform-btn')).filter(btn => btn !== el);
+            card.style.height = `${firstCardHeight}px`;
+
+            let flipAnim = null;
+            let heightAnim = null;
 
             if (!reduceMotion) {
-                gxSupportFlip(el, firstRect, lastRect, false);
-                gxSupportAnimateCardHeight(card, firstCardHeight, lastCardHeight, 390);
+                flipAnim = gxSupportFlip(el, firstRect, lastRect, false);
+                heightAnim = card.animate(
+                    [{ height: `${firstCardHeight}px` }, { height: `${lastCardHeight}px` }],
+                    {
+                        duration: 460,
+                        easing: 'cubic-bezier(.22,.72,.18,1)',
+                        fill: 'forwards'
+                    }
+                );
 
-                siblings.forEach((btn, index) => {
-                    btn.animate([
-                        { opacity: 0, transform: 'scale(.95) translateY(3px)' },
-                        { opacity: 1, transform: 'scale(1) translateY(0)' }
-                    ], {
-                        duration: 250,
-                        delay: 115 + Math.min(index, 5) * 18,
-                        easing: 'cubic-bezier(.16,1,.3,1)'
+                // Return the other platforms only near the end of the contraction.
+                setTimeout(() => {
+                    siblings.forEach((btn, index) => {
+                        btn.style.opacity = '';
+                        btn.style.pointerEvents = '';
+                        btn.animate([
+                            { opacity: 0, transform: 'scale(.96) translateY(4px)' },
+                            { opacity: 1, transform: 'scale(1) translateY(0)' }
+                        ], {
+                            duration: 230,
+                            delay: Math.min(index, 5) * 16,
+                            easing: 'cubic-bezier(.16,1,.3,1)'
+                        });
                     });
+
+                    if (step1) {
+                        step1.animate(
+                            [{ opacity: 0 }, { opacity: 1 }],
+                            { duration: 190, easing: 'ease-out' }
+                        );
+                        step1.style.opacity = '';
+                    }
+                }, 285);
+            } else {
+                siblings.forEach(btn => {
+                    btn.style.opacity = '';
+                    btn.style.pointerEvents = '';
                 });
+                if (step1) step1.style.opacity = '';
             }
+
+            await Promise.allSettled([
+                flipAnim?.finished || Promise.resolve(),
+                heightAnim?.finished || Promise.resolve()
+            ]);
+
+            try { heightAnim?.cancel(); } catch (_) {}
+            card.style.height = '';
+            card.classList.remove('gx-support-height-lock', 'gx-support-morph-running');
 
             gxSupportExpandedEl = null;
             selectedPlat = "";
             currentIssues = [];
 
-            setTimeout(() => { gxSupportMorphBusy = false; }, reduceMotion ? 0 : 420);
+            gxSupportMorphBusy = false;
         }
 
         function selectPlatform(p, el, event) {
@@ -7443,6 +7552,6 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.21 · BETA WAVE 02.15</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.22 · BETA WAVE 02.16</div>
 </body>
 </html>
