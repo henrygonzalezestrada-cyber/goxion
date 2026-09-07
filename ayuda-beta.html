@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.20-beta-wave-02-14">
+<html lang="es" data-goxion-version="1.0.21-beta-wave-02-15">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -1511,6 +1511,156 @@
             color: var(--text-muted); 
             margin-bottom: 15px; 
             line-height: 1.5;
+        }
+
+        /* === GOXION SUPPORT CONTAINER MORPH 02.15 === */
+        #smart-support-card.gx-support-morph-running { overflow: hidden; }
+
+        .platform-btn {
+            min-width: 0;
+            transform-origin: center center;
+            will-change: transform, opacity;
+        }
+
+        .platform-grid.gx-support-focus {
+            display: block;
+            margin-bottom: 0;
+        }
+
+        .platform-grid.gx-support-focus .platform-btn:not(.gx-support-expanded) {
+            display: none;
+        }
+
+        .platform-btn.gx-support-expanded {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 48px minmax(0, 1fr);
+            align-items: center;
+            column-gap: 12px;
+            row-gap: 0;
+            padding: 15px;
+            text-align: left;
+            cursor: default;
+            border-color: var(--neon-blue);
+            background: rgba(0, 242, 254, 0.07);
+        }
+
+        .platform-btn.gx-support-expanded > img {
+            width: 42px !important;
+            height: 42px !important;
+            margin: 0 !important;
+            grid-column: 1;
+            grid-row: 1;
+        }
+
+        .platform-btn.gx-support-expanded > .gx-support-platform-name {
+            grid-column: 2;
+            grid-row: 1;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1.2;
+            min-width: 0;
+        }
+
+        .gx-support-platform-subtitle {
+            display: none;
+            font-size: 10px;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        .platform-btn.gx-support-expanded .gx-support-platform-subtitle {
+            display: block;
+        }
+
+        #support-flow-home { min-height: 0; }
+        .gx-support-flow-shell { display: none; }
+
+        .gx-support-flow-shell.gx-inside-platform {
+            display: block;
+            grid-column: 1 / -1;
+            width: 100%;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px dashed rgba(255,255,255,0.1);
+            text-align: left;
+            cursor: default;
+        }
+
+        .gx-support-flow-shell.gx-inside-platform .step-box {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+        }
+
+        .gx-support-back {
+            display: none;
+            appearance: none;
+            -webkit-appearance: none;
+            border: 0;
+            background: transparent;
+            color: var(--neon-blue);
+            padding: 0;
+            margin: 0 0 13px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            min-height: 28px;
+        }
+
+        .gx-support-flow-shell.gx-inside-platform .gx-support-back {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .gx-support-issue-options {
+            display: none;
+            gap: 8px;
+            flex-direction: column;
+        }
+
+        .smart-support-card.gx-support-enhanced .gx-support-flow-shell.gx-inside-platform .custom-select-smart {
+            display: none;
+        }
+
+        .smart-support-card.gx-support-enhanced .gx-support-flow-shell.gx-inside-platform .gx-support-issue-options {
+            display: flex;
+        }
+
+        .gx-support-issue-btn {
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(0,0,0,0.28);
+            color: var(--text-main);
+            border-radius: 12px;
+            padding: 12px 13px;
+            min-height: 46px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: border-color .22s ease, background .22s ease, transform .22s cubic-bezier(.2,.8,.2,1);
+        }
+
+        .gx-support-issue-btn:active { transform: scale(.985); }
+
+        .gx-support-issue-btn.selected {
+            border-color: rgba(0,242,254,.52);
+            background: rgba(0,242,254,.08);
+        }
+
+        .gx-support-step-enter {
+            animation: gxSupportStepEnter .30s cubic-bezier(.16,1,.3,1) both;
+        }
+
+        @keyframes gxSupportStepEnter {
+            from { opacity: 0; transform: translateY(8px) scale(.992); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .gx-support-step-enter { animation: none !important; }
         }
 
         .faq-container {
@@ -3710,27 +3860,34 @@
                     <div class="support-lock-text">Por seguridad, las herramientas de soporte están disponibles únicamente para clientes con una sesión activa. Usa <strong>Mi Espacio</strong> en la parte superior para iniciar sesión.</div>
                 </div>
             </div>
-            <div class="glass-card smart-support-card">
-                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
-                
+            <div class="glass-card smart-support-card" id="smart-support-card">
+                <p id="support-step-1-label" style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
+
                 <div class="platform-grid" id="support-platforms-grid">
                     <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
                 </div>
-                
-                <div id="step-2" class="step-box">
-                    <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
-                    <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
-                </div>
-                
-                <div id="step-3" class="step-box">
-                    <div class="solution-instructions" id="solution-text"></div>
-                    <div id="extra-inputs-container">
-                        <p style="font-size: 12px; color: var(--text-main); font-weight: 600; margin-bottom: 8px;" id="input-label">Dato requerido:</p>
-                        <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
+
+                <div id="support-flow-home">
+                    <div id="support-flow-shell" class="gx-support-flow-shell">
+                        <button type="button" class="gx-support-back" onclick="closeSupportMorph(event)">← Cambiar plataforma</button>
+
+                        <div id="step-2" class="step-box">
+                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
+                            <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
+                            <div id="support-issue-options" class="gx-support-issue-options"></div>
+                        </div>
+
+                        <div id="step-3" class="step-box">
+                            <div class="solution-instructions" id="solution-text"></div>
+                            <div id="extra-inputs-container">
+                                <p style="font-size: 12px; color: var(--text-main); font-weight: 600; margin-bottom: 8px;" id="input-label">Dato requerido:</p>
+                                <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
+                            </div>
+                            <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()" style="padding: 14px; font-size: 14px; border-radius: 30px;">
+                                📲 Enviar Solicitud a Soporte
+                            </button>
+                        </div>
                     </div>
-                    <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()" style="padding: 14px; font-size: 14px; border-radius: 30px;">
-                        📲 Enviar Solicitud a Soporte
-                    </button>
                 </div>
             </div>
 
@@ -5704,9 +5861,12 @@
                 if (!addedBrands.has(brandKeyId)) {
                     addedBrands.add(brandKeyId);
                     html += `
-                    <div class="platform-btn" onclick="selectPlatform('${brandName}', this)">
+                    <div class="platform-btn" onclick="selectPlatform('${brandName}', this, event)">
                         <img src="${imgSrc}" style="width: 35px; height: 35px; border-radius: 10px; object-fit: cover; margin-bottom: 3px; box-shadow: 0 5px 15px rgba(0,0,0,0.5);" onerror="this.src='logo2.PNG'">
-                        <div style="line-height:1.2;">${brandName}</div>
+                        <div class="gx-support-platform-name" style="line-height:1.2;">
+                            ${brandName}
+                            <div class="gx-support-platform-subtitle">Asistente inteligente de soporte</div>
+                        </div>
                     </div>`; 
                 }
             });
@@ -5714,56 +5874,282 @@
             container.innerHTML = html;
         }
 
-        function selectPlatform(p, el) { 
-            selectedPlat = p; 
-            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected')); 
-            el.classList.add('selected'); 
-            const sel = document.getElementById('issue-selector'); 
-            sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
-            
-            let issues = DATABASE_ISSUES["Default"]; 
-            for(let key in DATABASE_ISSUES) { 
-                if(p.toLowerCase().includes(key.toLowerCase())) { 
-                    issues = DATABASE_ISSUES[key]; break; 
-                } 
-            }
-            
-            currentIssues = issues; 
-            currentIssues.forEach((i, idx) => { 
-                sel.innerHTML += `<option value="${idx}">${i.issue}</option>`; 
+        let gxSupportMorphBusy = false;
+        let gxSupportExpandedEl = null;
+
+        function gxSupportAnimateCardHeight(card, fromHeight, toHeight, duration = 420) {
+            if (!card || !Element.prototype.animate || Math.abs(toHeight - fromHeight) < 2) return null;
+            card.classList.add('gx-support-morph-running');
+            const anim = card.animate(
+                [{ height: `${fromHeight}px` }, { height: `${toHeight}px` }],
+                { duration, easing: 'cubic-bezier(.2,.78,.2,1)' }
+            );
+            anim.finished.finally(() => card.classList.remove('gx-support-morph-running'));
+            return anim;
+        }
+
+        function gxSupportFlip(el, firstRect, lastRect, opening = true) {
+            if (!el || !Element.prototype.animate) return null;
+
+            const dx = firstRect.left - lastRect.left;
+            const dy = firstRect.top - lastRect.top;
+            const sx = firstRect.width / Math.max(lastRect.width, 1);
+            const sy = firstRect.height / Math.max(lastRect.height, 1);
+
+            return el.animate([
+                {
+                    transformOrigin: 'top left',
+                    transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
+                },
+                {
+                    transformOrigin: 'top left',
+                    transform: 'translate(0,0) scale(1)'
+                }
+            ], {
+                duration: opening ? 430 : 390,
+                easing: opening
+                    ? 'cubic-bezier(.18,.86,.22,1)'
+                    : 'cubic-bezier(.22,.72,.18,1)'
             });
-            
-            document.getElementById('step-2').classList.add('active'); 
+        }
+
+        function gxRenderSupportIssueOptions(issues) {
+            const wrap = document.getElementById('support-issue-options');
+            if (!wrap) return;
+
+            wrap.innerHTML = issues.map((item, idx) => `
+                <button type="button"
+                    class="gx-support-issue-btn"
+                    data-support-issue="${idx}"
+                    onclick="selectSupportIssue(${idx}, this, event)">
+                    ${item.issue}
+                </button>
+            `).join('');
+        }
+
+        async function gxOpenSupportMorph(el) {
+            if (!el || gxSupportMorphBusy || gxSupportExpandedEl === el) return;
+
+            const reduceMotion = window.matchMedia &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const grid = document.getElementById('support-platforms-grid');
+            const card = document.getElementById('smart-support-card');
+            const flow = document.getElementById('support-flow-shell');
+            const step1 = document.getElementById('support-step-1-label');
+
+            if (!grid || !card || !flow) return;
+
+            gxSupportMorphBusy = true;
+            card.classList.add('gx-support-enhanced');
+
+            const firstRect = el.getBoundingClientRect();
+            const firstCardHeight = card.getBoundingClientRect().height;
+            const siblings = Array.from(grid.querySelectorAll('.platform-btn')).filter(btn => btn !== el);
+
+            if (!reduceMotion && Element.prototype.animate) {
+                const fades = siblings.map((btn, index) => btn.animate([
+                    { opacity: 1, transform: 'scale(1)' },
+                    { opacity: 0, transform: 'scale(.94)' }
+                ], {
+                    duration: 155,
+                    delay: Math.min(index, 5) * 10,
+                    easing: 'ease-in'
+                }));
+                await Promise.allSettled(fades.map(anim => anim.finished));
+            }
+
+            grid.classList.add('gx-support-focus');
+            el.classList.add('gx-support-expanded', 'selected');
+            gxSupportExpandedEl = el;
+
+            flow.classList.add('gx-inside-platform');
+            el.appendChild(flow);
+
+            if (step1) step1.style.display = 'none';
+
+            document.getElementById('step-2')?.classList.add('active');
+            document.getElementById('step-3')?.classList.remove('active');
+
+            const lastRect = el.getBoundingClientRect();
+            const lastCardHeight = card.getBoundingClientRect().height;
+
+            if (!reduceMotion) {
+                gxSupportFlip(el, firstRect, lastRect, true);
+                gxSupportAnimateCardHeight(card, firstCardHeight, lastCardHeight, 430);
+
+                flow.classList.remove('gx-support-step-enter');
+                void flow.offsetWidth;
+                flow.classList.add('gx-support-step-enter');
+            }
+
+            setTimeout(() => {
+                flow.classList.remove('gx-support-step-enter');
+                gxSupportMorphBusy = false;
+            }, reduceMotion ? 0 : 450);
+        }
+
+        async function closeSupportMorph(event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
+            if (gxSupportMorphBusy || !gxSupportExpandedEl) return;
+
+            const reduceMotion = window.matchMedia &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+            const grid = document.getElementById('support-platforms-grid');
+            const card = document.getElementById('smart-support-card');
+            const flow = document.getElementById('support-flow-shell');
+            const home = document.getElementById('support-flow-home');
+            const step1 = document.getElementById('support-step-1-label');
+            const el = gxSupportExpandedEl;
+
+            gxSupportMorphBusy = true;
+
+            const firstRect = el.getBoundingClientRect();
+            const firstCardHeight = card.getBoundingClientRect().height;
+
+            if (!reduceMotion && Element.prototype.animate) {
+                const fadeFlow = flow.animate([
+                    { opacity: 1, transform: 'translateY(0) scale(1)' },
+                    { opacity: 0, transform: 'translateY(-5px) scale(.992)' }
+                ], { duration: 145, easing: 'ease-in' });
+                await fadeFlow.finished.catch(() => {});
+            }
+
+            home.appendChild(flow);
+            flow.classList.remove('gx-inside-platform', 'gx-support-step-enter');
+
+            document.getElementById('step-2')?.classList.remove('active');
+            document.getElementById('step-3')?.classList.remove('active');
+
+            const selector = document.getElementById('issue-selector');
+            if (selector) selector.value = "";
+            document.querySelectorAll('.gx-support-issue-btn').forEach(btn => btn.classList.remove('selected'));
+
+            el.classList.remove('gx-support-expanded', 'selected');
+            grid.classList.remove('gx-support-focus');
+
+            if (step1) step1.style.display = '';
+
+            const lastRect = el.getBoundingClientRect();
+            const lastCardHeight = card.getBoundingClientRect().height;
+            const siblings = Array.from(grid.querySelectorAll('.platform-btn')).filter(btn => btn !== el);
+
+            if (!reduceMotion) {
+                gxSupportFlip(el, firstRect, lastRect, false);
+                gxSupportAnimateCardHeight(card, firstCardHeight, lastCardHeight, 390);
+
+                siblings.forEach((btn, index) => {
+                    btn.animate([
+                        { opacity: 0, transform: 'scale(.95) translateY(3px)' },
+                        { opacity: 1, transform: 'scale(1) translateY(0)' }
+                    ], {
+                        duration: 250,
+                        delay: 115 + Math.min(index, 5) * 18,
+                        easing: 'cubic-bezier(.16,1,.3,1)'
+                    });
+                });
+            }
+
+            gxSupportExpandedEl = null;
+            selectedPlat = "";
+            currentIssues = [];
+
+            setTimeout(() => { gxSupportMorphBusy = false; }, reduceMotion ? 0 : 420);
+        }
+
+        function selectPlatform(p, el, event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
+            if (gxSupportMorphBusy || gxSupportExpandedEl === el) return;
+
+            selectedPlat = p;
+            document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('selected'));
+            el.classList.add('selected');
+
+            const sel = document.getElementById('issue-selector');
+            sel.innerHTML = `<option value="">-- Selecciona tu situación --</option>`;
+
+            let issues = DATABASE_ISSUES["Default"];
+            for (let key in DATABASE_ISSUES) {
+                if (p.toLowerCase().includes(key.toLowerCase())) {
+                    issues = DATABASE_ISSUES[key];
+                    break;
+                }
+            }
+
+            currentIssues = issues;
+            currentIssues.forEach((i, idx) => {
+                sel.innerHTML += `<option value="${idx}">${i.issue}</option>`;
+            });
+
+            gxRenderSupportIssueOptions(currentIssues);
+            document.getElementById('step-2').classList.add('active');
             document.getElementById('step-3').classList.remove('active');
+
+            gxOpenSupportMorph(el);
+        }
+
+        function selectSupportIssue(idx, button, event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
+            const sel = document.getElementById('issue-selector');
+            if (!sel || !currentIssues[idx]) return;
+
+            sel.value = String(idx);
+            document.querySelectorAll('.gx-support-issue-btn').forEach(btn => btn.classList.remove('selected'));
+            button?.classList.add('selected');
+
+            showSolution();
+
+            const step3 = document.getElementById('step-3');
+            if (step3 && !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches)) {
+                step3.classList.remove('gx-support-step-enter');
+                void step3.offsetWidth;
+                step3.classList.add('gx-support-step-enter');
+                setTimeout(() => step3.classList.remove('gx-support-step-enter'), 320);
+            }
         }
 
         function showSolution() {
-            const idx = document.getElementById('issue-selector').value; 
-            if (idx === "") { 
-                document.getElementById('step-3').classList.remove('active'); 
-                return; 
+            const idx = document.getElementById('issue-selector').value;
+
+            if (idx === "") {
+                document.getElementById('step-3').classList.remove('active');
+                document.querySelectorAll('.gx-support-issue-btn').forEach(btn => btn.classList.remove('selected'));
+                return;
             }
-            
+
             const data = currentIssues[idx];
-            document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`; 
+            document.getElementById('solution-text').innerHTML = `<strong>💡 Instrucciones:</strong><br>${data.instructions}`;
             document.getElementById('input-label').innerText = data.labelInput;
-            
-            let autoData = ""; 
+
+            document.querySelectorAll('.gx-support-issue-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.supportIssue === String(idx));
+            });
+
+            let autoData = "";
             const key = getCurrentClientKey();
+
             if (key && globalClientesData && globalClientesData[key]) {
                 const cliente = globalClientesData[key];
                 if (cliente.servicios) {
-                    let platKeyword = srvCleanName(selectedPlat).toLowerCase(); 
+                    let platKeyword = srvCleanName(selectedPlat).toLowerCase();
                     const srv = cliente.servicios.find(s => s.nombre.toLowerCase().includes(platKeyword));
-                    if (srv) { 
-                        let labelLow = data.labelInput.toLowerCase(); 
-                        if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login; 
-                        else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre; 
-                        else if (labelLow.includes("pin") && srv.perfil_pin) autoData = srv.perfil_pin; 
+                    if (srv) {
+                        let labelLow = data.labelInput.toLowerCase();
+                        if (labelLow.includes("correo") && srv.correo_login) autoData = srv.correo_login;
+                        else if (labelLow.includes("perfil") && srv.perfil_nombre) autoData = srv.perfil_nombre;
+                        else if (labelLow.includes("pin") && srv.perfil_pin) autoData = srv.perfil_pin;
                     }
                 }
             }
-            document.getElementById('smart-extra-input').value = autoData; 
+
+            document.getElementById('smart-extra-input').value = autoData;
             document.getElementById('step-3').classList.add('active');
         }
 
@@ -7057,6 +7443,6 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.20 · BETA WAVE 02.14</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.21 · BETA WAVE 02.15</div>
 </body>
 </html>
