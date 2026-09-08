@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.35-beta-wave-02-29">
+<html lang="es" data-goxion-version="1.0.36-beta-wave-02-30a">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -3676,16 +3676,11 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // CONTENT + TITLE + WATERMARK 02.29 ---------- */
+/* ---------- Mi Espacio // MODERN STABLE LOGIN 02.30 ---------- */
 /*
-   Based on stable 02.27/02.28 FLIP architecture.
-
-   Main fixes:
-   - Form content no longer lives inside the FLIP-scaled container while moving.
-     It becomes a transparent fixed content layer aligned to the real card.
-   - Same Mi Espacio text travels and becomes a stronger Poppins title.
-   - Same 👤 travels to a center-right watermark position inspired by
-     Misiones / Referidos.
+   Keep what works: only the pill -> card FLIP transform.
+   No shared text morph. No emoji travel. No cloned title.
+   Login content appears only after the card has fully landed.
 */
 
 .auth-overlay.gx-auth-backdrop-only {
@@ -3695,7 +3690,7 @@ body.gx-tab-transitioning {
     display: block !important;
     opacity: 0;
     pointer-events: none;
-    background: rgba(3,3,5,.26) !important;
+    background: rgba(3,3,5,.28) !important;
     backdrop-filter: blur(10px) saturate(1.03);
     -webkit-backdrop-filter: blur(10px) saturate(1.03);
     transform: translateZ(0);
@@ -3731,59 +3726,14 @@ body.gx-tab-transitioning {
     white-space: nowrap;
 }
 
-/* SAME text node from the pill. */
-#header-btn-text.gx-auth-text-floating {
-    position: fixed !important;
-    z-index: 3206 !important;
-    left: 0;
-    top: 0;
-    margin: 0 !important;
-    pointer-events: none !important;
-    white-space: nowrap;
-
-    font-family: 'Poppins', sans-serif !important;
-    font-size: 14px !important;
-    font-weight: 800 !important;
-    letter-spacing: -.22px !important;
-    line-height: 1 !important;
-
-    transform-origin: center center;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    will-change: transform, opacity;
-}
-
-/* SAME emoji node from the pill. */
-.gx-auth-pill-icon.gx-auth-icon-floating {
-    position: fixed !important;
-    z-index: 3205 !important;
-    left: 0;
-    top: 0;
-    margin: 0 !important;
-    pointer-events: none !important;
-    line-height: 1 !important;
-    transform-origin: center center;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    will-change: transform, opacity;
-}
-
-/* Landed watermark. Filter is static; never animated. */
-.gx-auth-pill-icon.gx-auth-icon-watermark {
-    z-index: 3101 !important; /* card = 3100, form = 3102 */
-    opacity: .145 !important;
-    filter: blur(1.15px) saturate(.92);
-    -webkit-filter: blur(1.15px) saturate(.92);
-}
-
-/* Native closed-state content holder. */
+/* Login is dormant while the shape is transforming. */
 .gx-auth-inline-content {
     position: absolute;
     z-index: 2;
     left: 22px;
     right: 22px;
-    top: 94px;
-    bottom: auto;
+    top: 24px;
+    bottom: 22px;
 
     display: flex;
     flex-direction: column;
@@ -3794,79 +3744,231 @@ body.gx-tab-transitioning {
     pointer-events: none;
 }
 
-/*
-   OPEN STATE:
-   The exact same content node is moved out of the FLIP container.
-   It has NO card/background of its own. This prevents inputs/button
-   from being squashed, clipped or re-rasterized by the card scale.
-*/
-.gx-auth-inline-content.gx-auth-content-floating {
-    position: fixed !important;
-    z-index: 3102 !important;
-    right: auto !important;
-    bottom: auto !important;
-    margin: 0 !important;
+#header-action-btn.gx-auth-login-visible .gx-auth-inline-content {
+    visibility: visible;
+    pointer-events: auto;
+}
 
-    display: flex !important;
-    flex-direction: column;
-    justify-content: flex-start;
+.gx-auth-login-head {
+    text-align: left;
+    padding-right: 44px;
+    margin-bottom: 22px;
+}
 
-    visibility: visible !important;
-    pointer-events: auto !important;
-    box-sizing: border-box;
-    transform-origin: center top;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    will-change: opacity, transform;
+.gx-auth-kicker {
+    color: var(--neon-blue);
+    font-family: 'Poppins', sans-serif;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2.4px;
+    margin-bottom: 6px;
+}
+
+.gx-auth-login-title {
+    margin: 0 0 7px;
+    color: var(--text-main);
+    font-family: 'Poppins', sans-serif;
+    font-size: 24px;
+    line-height: 1.08;
+    font-weight: 800;
+    letter-spacing: -.65px;
 }
 
 .gx-auth-login-subtitle {
-    width: min(100%, 315px);
-    margin: 0 auto 19px !important;
+    width: min(100%, 330px);
+    margin: 0 !important;
     color: var(--text-muted);
     font-size: 12px;
-    line-height: 1.5;
-    text-align: center;
+    line-height: 1.55;
+}
+
+.gx-auth-field-group {
+    margin-bottom: 14px;
+}
+
+.gx-auth-field-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 7px;
+}
+
+.gx-auth-field-label {
+    display: block;
+    margin-bottom: 7px;
+    color: rgba(255,255,255,.86);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1px;
+}
+
+.gx-auth-field-row .gx-auth-field-label {
+    margin-bottom: 0;
+}
+
+.gx-auth-forgot-link {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    color: var(--neon-blue);
+    font: inherit;
+    font-size: 10.5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.gx-auth-input-shell {
+    position: relative;
 }
 
 .gx-auth-inline-content .input-smart {
-    min-height: 54px;
-    margin-bottom: 12px;
-    padding: 15px 16px;
+    width: 100%;
+    min-height: 53px;
+    margin: 0;
+    padding: 14px 16px;
     font-size: 16px;
-    border-radius: 17px;
-    background: rgba(5,7,13,.62);
-    border: 1px solid rgba(255,255,255,.11);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+    border-radius: 16px;
+    background: rgba(4,7,12,.66);
+    border: 1px solid rgba(255,255,255,.105);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.025),
+        0 8px 24px rgba(0,0,0,.12);
+    transition:
+        border-color .20s ease,
+        box-shadow .20s ease,
+        background .20s ease;
 }
 
 .gx-auth-inline-content .input-smart:focus {
-    border-color: rgba(0,242,254,.68);
-    box-shadow: 0 0 0 3px rgba(0,242,254,.07);
+    background: rgba(5,8,14,.76);
+    border-color: rgba(0,242,254,.60);
+    box-shadow:
+        0 0 0 3px rgba(0,242,254,.065),
+        0 8px 26px rgba(0,0,0,.15);
+}
+
+.gx-auth-pin-shell .input-smart {
+    padding-right: 52px;
+    letter-spacing: 4px;
+}
+
+.gx-pin-eye {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    width: 38px;
+    height: 38px;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    appearance: none;
+    -webkit-appearance: none;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color .18s ease, background .18s ease;
+}
+
+.gx-pin-eye:active {
+    background: rgba(255,255,255,.05);
+}
+
+.gx-pin-eye.is-visible {
+    color: var(--neon-blue);
+}
+
+.gx-eye-hide {
+    display: none;
+}
+
+.gx-pin-eye.is-visible .gx-eye-show {
+    display: none;
+}
+
+.gx-pin-eye.is-visible .gx-eye-hide {
+    display: inline-flex;
+}
+
+.gx-pin-recovery {
+    margin: 0 0 14px;
+    padding: 13px 14px;
+    border: 1px solid rgba(124,77,255,.22);
+    border-radius: 15px;
+    background: rgba(124,77,255,.065);
+}
+
+.gx-pin-recovery[hidden] {
+    display: none !important;
+}
+
+.gx-pin-recovery-title {
+    color: var(--text-main);
+    font-size: 11.5px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.gx-pin-recovery-copy {
+    color: var(--text-muted);
+    font-size: 10.5px;
+    line-height: 1.45;
+}
+
+.gx-pin-recovery-action {
+    width: 100%;
+    min-height: 38px;
+    margin-top: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 12px;
+    border: 1px solid rgba(0,242,254,.28);
+    background: rgba(0,242,254,.085);
+    color: var(--neon-blue);
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.gx-pin-recovery-action:disabled {
+    opacity: .55;
+    cursor: default;
+}
+
+.gx-pin-recovery-status {
+    min-height: 0;
+    margin-top: 7px;
+    color: var(--text-muted);
+    font-size: 10.5px;
+    line-height: 1.4;
 }
 
 .gx-auth-submit {
     min-height: 54px;
-    margin-top: 4px;
-    margin-bottom: 2px;
+    margin-top: 2px;
     border-radius: 17px !important;
     flex: 0 0 auto;
 }
 
 .gx-auth-inline-close {
     position: absolute;
-    top: -80px;
-    right: -10px;
+    top: 0;
+    right: 0;
     width: 34px;
     height: 34px;
-
     display: flex;
     align-items: center;
     justify-content: center;
 
     border-radius: 50%;
-    border: 1px solid rgba(0,242,254,.34);
-    background: rgba(0,242,254,.10);
+    border: 1px solid rgba(0,242,254,.28);
+    background: rgba(0,242,254,.08);
     color: var(--neon-blue);
     font-size: 15px;
     cursor: pointer;
@@ -3877,7 +3979,26 @@ body.gx-tab-transitioning {
     text-align: center;
 }
 
-/* REAL card surface; movement remains transform-only FLIP. */
+.gx-auth-secure-note {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    margin-top: 13px;
+    color: rgba(149,164,189,.72);
+    font-size: 9.5px;
+    font-weight: 600;
+}
+
+.gx-auth-secure-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success-neon);
+    box-shadow: 0 0 9px rgba(0,255,157,.36);
+}
+
+/* REAL card surface. Transform-only FLIP remains the only shape animation. */
 #header-action-btn.gx-auth-flip-card {
     position: fixed !important;
     z-index: 3100 !important;
@@ -3904,18 +4025,29 @@ body.gx-tab-transitioning {
     color: var(--neon-blue) !important;
 }
 
-@media (max-height: 690px) {
-    .gx-auth-login-subtitle {
-        margin-bottom: 13px !important;
+@media (max-height: 720px) {
+    .gx-auth-login-title {
+        font-size: 21px;
+    }
+
+    .gx-auth-login-head {
+        margin-bottom: 16px;
+    }
+
+    .gx-auth-field-group {
+        margin-bottom: 10px;
     }
 
     .gx-auth-inline-content .input-smart {
-        min-height: 49px;
-        margin-bottom: 9px;
+        min-height: 48px;
     }
 
     .gx-auth-submit {
-        min-height: 50px;
+        min-height: 49px;
+    }
+
+    .gx-auth-secure-note {
+        margin-top: 9px;
     }
 }
 
@@ -3958,13 +4090,60 @@ body.gx-tab-transitioning {
 
             <div class="gx-auth-inline-content" onclick="event.stopPropagation()">
                 <button type="button" class="gx-auth-inline-close" aria-label="Cerrar acceso" onclick="closeAuthSheet(event)">✕</button>
-                <p class="gx-auth-login-subtitle">Ingresa tus datos para acceder a tu panel personal.</p>
 
-                <input type="text" id="login-id" class="input-smart gx-auth-field" placeholder="Tu Nombre o ID (Ej. Juan de Dios)" autocomplete="username">
-                <input type="password" id="login-pin" class="input-smart gx-auth-field" placeholder="Código de Acceso (PIN)" autocomplete="current-password">
+                <div class="gx-auth-login-head">
+                    <div class="gx-auth-kicker">MI ESPACIO</div>
+                    <h2 class="gx-auth-login-title">Accede a tu espacio</h2>
+                    <p class="gx-auth-login-subtitle">Tus servicios, beneficios y cuenta en un solo lugar.</p>
+                </div>
+
+                <div class="gx-auth-field-group">
+                    <label class="gx-auth-field-label" for="login-id">Nombre o ID</label>
+                    <div class="gx-auth-input-shell">
+                        <input type="text" id="login-id" class="input-smart gx-auth-field" placeholder="Ej. Juan de Dios" autocomplete="username">
+                    </div>
+                </div>
+
+                <div class="gx-auth-field-group">
+                    <div class="gx-auth-field-row">
+                        <label class="gx-auth-field-label" for="login-pin">PIN de acceso</label>
+                        <button type="button" class="gx-auth-forgot-link" onclick="openPinRecovery(event)">¿Olvidaste tu PIN?</button>
+                    </div>
+
+                    <div class="gx-auth-input-shell gx-auth-pin-shell">
+                        <input type="password" id="login-pin" class="input-smart gx-auth-field" placeholder="••••" inputmode="numeric" maxlength="4" autocomplete="current-password">
+                        <button type="button" id="gx-pin-eye-btn" class="gx-pin-eye" aria-label="Mostrar PIN" onclick="togglePinVisibility(event)">
+                            <span class="gx-eye-icon gx-eye-show" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
+                                    <circle cx="12" cy="12" r="2.5"/>
+                                </svg>
+                            </span>
+                            <span class="gx-eye-icon gx-eye-hide" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="m3 3 18 18"/>
+                                    <path d="M10.6 6.15A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.6 15.6 0 0 1-2.05 2.67"/>
+                                    <path d="M6.1 7.1C3.8 8.75 2.5 12 2.5 12s3.5 6 9.5 6a9.8 9.8 0 0 0 3.15-.5"/>
+                                </svg>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gx-pin-recovery" class="gx-pin-recovery" hidden>
+                    <div class="gx-pin-recovery-title">Recuperar acceso</div>
+                    <div class="gx-pin-recovery-copy">Enviaremos una solicitud al equipo GOXION usando el nombre o ID escrito arriba. Por seguridad, tu PIN nunca se mostrará aquí.</div>
+                    <button type="button" id="gx-pin-recovery-btn" class="gx-pin-recovery-action" onclick="sendPinRecovery(event)">Solicitar recuperación</button>
+                    <div id="gx-pin-recovery-status" class="gx-pin-recovery-status" aria-live="polite"></div>
+                </div>
 
                 <button type="button" id="btn-login-submit" class="btn-primary gx-auth-submit" onclick="iniciarSesion()">Validar acceso</button>
                 <p id="login-error" class="gx-auth-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
+
+                <div class="gx-auth-secure-note">
+                    <span class="gx-auth-secure-dot"></span>
+                    Acceso protegido por GOXION
+                </div>
             </div>
         </div>
     </header>
@@ -7929,7 +8108,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.29</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.30A</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8159,10 +8338,8 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> CONTENT + TITLE + WATERMARK
-       Card = optimized FLIP.
-       Content = transparent fixed layer (never FLIP-scaled).
-       Title + emoji = same real DOM nodes from the pill.
+       3) MI ESPACIO -> STABLE TRANSFORM ONLY
+       No shared title motion. No emoji motion. No visual handoffs.
        ========================================================= */
     let gxAuthBusy = false;
     let gxAuthOpen = false;
@@ -8171,20 +8348,13 @@ function goxionLegacyAdapter(data) {
     let gxAuthOriginalNextSibling = null;
     let gxAuthSourceRect = null;
     let gxAuthSourceStyle = null;
-    let gxAuthTextSourceRect = null;
-    let gxAuthIconSourceRect = null;
-    let gxAuthTextTarget = null;
-    let gxAuthIconTarget = null;
-    let gxAuthOpenCardRect = null;
-
-    const gxAuthWait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     function gxAuthCardStyle() {
         return {
-            backgroundColor: 'rgba(8,8,12,.84)',
-            borderColor: 'rgba(0,242,254,.20)',
+            backgroundColor: 'rgba(8,8,12,.88)',
+            borderColor: 'rgba(0,242,254,.18)',
             borderRadius: '26px',
-            boxShadow: '0 22px 64px rgba(0,0,0,.46), 0 0 28px rgba(0,242,254,.06)'
+            boxShadow: '0 22px 64px rgba(0,0,0,.48), 0 0 28px rgba(0,242,254,.055)'
         };
     }
 
@@ -8194,22 +8364,22 @@ function goxionLegacyAdapter(data) {
             backgroundColor: cs.backgroundColor,
             borderColor: cs.borderColor,
             borderRadius: cs.borderRadius,
-            boxShadow: cs.boxShadow,
-            color: cs.color
+            boxShadow: cs.boxShadow
         };
     }
 
     function gxAuthMeasureContentHeight(root, cardWidth) {
         const content = root.querySelector('.gx-auth-inline-content');
-        if (!content) return 232;
+        if (!content) return 340;
 
-        const snapshot = {
+        const old = {
             position: content.style.position,
             left: content.style.left,
             right: content.style.right,
             top: content.style.top,
             bottom: content.style.bottom,
             width: content.style.width,
+            height: content.style.height,
             visibility: content.style.visibility,
             opacity: content.style.opacity,
             pointerEvents: content.style.pointerEvents
@@ -8221,50 +8391,41 @@ function goxionLegacyAdapter(data) {
             right: 'auto',
             top: '0',
             bottom: 'auto',
-            width: `${Math.max(240, cardWidth - 44)}px`,
+            width: `${Math.max(250, cardWidth - 44)}px`,
+            height: 'auto',
             visibility: 'hidden',
             opacity: '0',
             pointerEvents: 'none'
         });
 
-        const height = Math.ceil(
-            content.scrollHeight ||
-            content.getBoundingClientRect().height ||
-            232
-        );
-
-        Object.assign(content.style, snapshot);
-        return height;
+        const h = Math.ceil(content.scrollHeight || content.getBoundingClientRect().height || 340);
+        Object.assign(content.style, old);
+        return h;
     }
 
     function gxAuthCardGeometry(root) {
         const width = Math.min(390, Math.max(310, window.innerWidth - 40));
         const contentHeight = gxAuthMeasureContentHeight(root, width);
-
-        const naturalHeight = 94 + contentHeight + 26;
-        const maxHeight = Math.max(350, window.innerHeight - 118);
-        const height = Math.min(maxHeight, Math.max(350, naturalHeight));
+        const naturalHeight = contentHeight + 48;
+        const maxHeight = Math.max(390, window.innerHeight - 100);
+        const height = Math.min(maxHeight, Math.max(410, naturalHeight));
 
         const left = Math.round((window.innerWidth - width) / 2);
-        const top = Math.round(Math.max(
-            66,
-            (window.innerHeight - height) / 2 - 5
-        ));
+        const top = Math.round(Math.max(52, (window.innerHeight - height) / 2));
 
         return { left, top, width, height };
     }
 
     function gxAuthCreatePlaceholder(root, rect) {
-        const placeholder = document.createElement('span');
-        placeholder.className = 'gx-auth-pill-placeholder';
-        placeholder.style.width = `${rect.width}px`;
-        placeholder.style.height = `${rect.height}px`;
+        const p = document.createElement('span');
+        p.className = 'gx-auth-pill-placeholder';
+        p.style.width = `${rect.width}px`;
+        p.style.height = `${rect.height}px`;
 
         gxAuthOriginalParent = root.parentNode;
         gxAuthOriginalNextSibling = root.nextSibling;
-        gxAuthOriginalParent.insertBefore(placeholder, root);
-
-        return placeholder;
+        gxAuthOriginalParent.insertBefore(p, root);
+        return p;
     }
 
     function gxAuthFlipData(sourceRect, cardRect) {
@@ -8287,236 +8448,6 @@ function goxionLegacyAdapter(data) {
         return `${rx}px / ${ry}px`;
     }
 
-    function gxAuthContent(root = null) {
-        return (
-            document.querySelector('.gx-auth-inline-content.gx-auth-content-floating') ||
-            root?.querySelector('.gx-auth-inline-content') ||
-            document.querySelector('.gx-auth-inline-content')
-        );
-    }
-
-    function gxAuthFloatContent(root, cardRect) {
-        const content = root.querySelector('.gx-auth-inline-content');
-        if (!content) return null;
-
-        content.classList.add('gx-auth-content-floating');
-
-        Object.assign(content.style, {
-            left: `${cardRect.left + 22}px`,
-            top: `${cardRect.top + 94}px`,
-            width: `${cardRect.width - 44}px`,
-            opacity: '0',
-            transform: 'translateY(10px) scale(.992)'
-        });
-
-        // No visible second card: this is only the existing form content.
-        document.body.appendChild(content);
-        return content;
-    }
-
-    function gxAuthRestoreContent(root, content) {
-        if (!content || !root) return;
-
-        content.classList.remove('gx-auth-content-floating');
-        content.removeAttribute('style');
-        root.appendChild(content);
-    }
-
-    function gxAuthCenter(rect) {
-        return {
-            x: rect.left + rect.width / 2,
-            y: rect.top + rect.height / 2
-        };
-    }
-
-    function gxAuthLiftSharedParts(root) {
-        const label = root.querySelector('.gx-auth-pill-label');
-        const textEl = root.querySelector('#header-btn-text');
-        const iconEl = root.querySelector('.gx-auth-pill-icon');
-
-        if (!label || !textEl || !iconEl) return null;
-
-        gxAuthTextSourceRect = textEl.getBoundingClientRect();
-        gxAuthIconSourceRect = iconEl.getBoundingClientRect();
-
-        const textCenter = gxAuthCenter(gxAuthTextSourceRect);
-        const iconCenter = gxAuthCenter(gxAuthIconSourceRect);
-
-        textEl.classList.add('gx-auth-text-floating');
-        Object.assign(textEl.style, {
-            left: `${textCenter.x}px`,
-            top: `${textCenter.y}px`,
-            transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
-            color: gxAuthSourceStyle.color
-        });
-
-        iconEl.classList.add('gx-auth-icon-floating');
-        Object.assign(iconEl.style, {
-            left: `${iconCenter.x}px`,
-            top: `${iconCenter.y}px`,
-            transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1) rotate(0deg)',
-            opacity: '1'
-        });
-
-        document.body.appendChild(textEl);
-        document.body.appendChild(iconEl);
-
-        return { label, textEl, iconEl };
-    }
-
-    function gxAuthSharedTargets(cardRect) {
-        return {
-            text: {
-                x: cardRect.left + cardRect.width / 2,
-                y: cardRect.top + 37,
-                scale: 1.18
-            },
-            icon: {
-                /*
-                   Same visual logic as Misiones/Referidos:
-                   large watermark on the center-right, not top-right.
-                */
-                x: cardRect.left + cardRect.width - 52,
-                y: cardRect.top + cardRect.height * .51,
-                scale: 7.15,
-                rotate: -14
-            }
-        };
-    }
-
-    function gxAuthDelta(sourceRect, target) {
-        const source = gxAuthCenter(sourceRect);
-        return {
-            dx: target.x - source.x,
-            dy: target.y - source.y
-        };
-    }
-
-    async function gxAuthChangeSharedText(textEl, opening) {
-        if (!textEl) return;
-
-        // Switch near the end: Mi Espacio grows/moves first;
-        // the landed title reads "Accede a tu espacio".
-        await gxAuthWait(opening ? 316 : 78);
-        textEl.textContent = opening ? 'Accede a tu espacio' : 'Mi Espacio';
-    }
-
-    function gxAuthAnimateTextOpen(textEl, target) {
-        const d = gxAuthDelta(gxAuthTextSourceRect, target);
-
-        return textEl.animate([
-            {
-                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
-                opacity: 1
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .64}px,${d.dy * .64}px,0) scale(1.10)`,
-                opacity: 1,
-                offset: .64
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .78}px,${d.dy * .78}px,0) scale(1.14)`,
-                opacity: .30,
-                offset: .75
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale})`,
-                opacity: 1
-            }
-        ], {
-            duration: 430,
-            easing: 'cubic-bezier(.18,.86,.22,1)',
-            fill: 'forwards'
-        });
-    }
-
-    function gxAuthAnimateIconOpen(iconEl, target) {
-        const d = gxAuthDelta(gxAuthIconSourceRect, target);
-
-        return iconEl.animate([
-            {
-                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1) rotate(0deg)',
-                opacity: 1
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .52}px,${d.dy * .52}px,0) scale(2.55) rotate(-5deg)`,
-                opacity: .50,
-                offset: .52
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale}) rotate(${target.rotate}deg)`,
-                opacity: .145
-            }
-        ], {
-            duration: 430,
-            easing: 'cubic-bezier(.18,.86,.22,1)',
-            fill: 'forwards'
-        });
-    }
-
-    function gxAuthAnimateTextClose(textEl, target) {
-        const d = gxAuthDelta(gxAuthTextSourceRect, target);
-
-        return textEl.animate([
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale})`,
-                opacity: 1
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .74}px,${d.dy * .74}px,0) scale(1.13)`,
-                opacity: .30,
-                offset: .28
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .52}px,${d.dy * .52}px,0) scale(1.08)`,
-                opacity: 1,
-                offset: .46
-            },
-            {
-                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1)',
-                opacity: 1
-            }
-        ], {
-            duration: 390,
-            easing: 'cubic-bezier(.22,.72,.18,1)',
-            fill: 'forwards'
-        });
-    }
-
-    function gxAuthAnimateIconClose(iconEl, target) {
-        const d = gxAuthDelta(gxAuthIconSourceRect, target);
-
-        return iconEl.animate([
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx}px,${d.dy}px,0) scale(${target.scale}) rotate(${target.rotate}deg)`,
-                opacity: .145
-            },
-            {
-                transform:
-                    `translate(-50%, -50%) translate3d(${d.dx * .52}px,${d.dy * .52}px,0) scale(2.45) rotate(-5deg)`,
-                opacity: .50,
-                offset: .48
-            },
-            {
-                transform: 'translate(-50%, -50%) translate3d(0,0,0) scale(1) rotate(0deg)',
-                opacity: 1
-            }
-        ], {
-            duration: 390,
-            easing: 'cubic-bezier(.22,.72,.18,1)',
-            fill: 'forwards'
-        });
-    }
-
     function gxAuthPauseWave(paused) {
         try {
             if (typeof window.gxWaveSetPaused === 'function') {
@@ -8525,19 +8456,24 @@ function goxionLegacyAdapter(data) {
         } catch (_) {}
     }
 
-    function gxAuthRestoreSharedParts(root, textEl, iconEl) {
-        const label = root.querySelector('.gx-auth-pill-label');
-        if (!label || !textEl || !iconEl) return;
+    function gxAuthResetLoginExtras() {
+        const recovery = document.getElementById('gx-pin-recovery');
+        const status = document.getElementById('gx-pin-recovery-status');
+        const btn = document.getElementById('gx-pin-recovery-btn');
+        const pin = document.getElementById('login-pin');
+        const eye = document.getElementById('gx-pin-eye-btn');
 
-        textEl.classList.remove('gx-auth-text-floating');
-        iconEl.classList.remove('gx-auth-icon-floating', 'gx-auth-icon-watermark');
-
-        textEl.removeAttribute('style');
-        iconEl.removeAttribute('style');
-        textEl.textContent = 'Mi Espacio';
-
-        label.appendChild(iconEl);
-        label.appendChild(textEl);
+        if (recovery) recovery.hidden = true;
+        if (status) status.textContent = '';
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Solicitar recuperación';
+        }
+        if (pin) pin.type = 'password';
+        if (eye) {
+            eye.classList.remove('is-visible');
+            eye.setAttribute('aria-label', 'Mostrar PIN');
+        }
     }
 
     window.gxAuthRootClick = function(event) {
@@ -8551,24 +8487,29 @@ function goxionLegacyAdapter(data) {
 
         const root = document.getElementById('header-action-btn');
         const overlay = document.getElementById('auth-overlay');
+        const pillLabel = root?.querySelector('.gx-auth-pill-label');
+        const content = root?.querySelector('.gx-auth-inline-content');
 
-        if (!root || !overlay) return;
+        if (!root || !overlay || !pillLabel || !content) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
             gxAuthOpen = true;
             overlay.classList.add('show');
+            root.classList.add('gx-auth-login-visible');
+            content.style.visibility = 'visible';
+            content.style.opacity = '1';
+            pillLabel.style.display = 'none';
             document.body.style.overflow = 'hidden';
             return;
         }
 
         gxAuthBusy = true;
+        gxAuthResetLoginExtras();
 
         gxAuthSourceRect = root.getBoundingClientRect();
         gxAuthSourceStyle = gxAuthReadSourceStyle(root);
 
         const cardRect = gxAuthCardGeometry(root);
-        gxAuthOpenCardRect = cardRect;
-
         const cardStyle = gxAuthCardStyle();
         const flip = gxAuthFlipData(gxAuthSourceRect, cardRect);
         const inverse = gxAuthFlipMatrix(flip);
@@ -8577,32 +8518,6 @@ function goxionLegacyAdapter(data) {
         gxAuthPlaceholder = gxAuthCreatePlaceholder(root, gxAuthSourceRect);
 
         root.classList.add('gx-auth-flip-card');
-        Object.assign(root.style, {
-            left: `${gxAuthSourceRect.left}px`,
-            top: `${gxAuthSourceRect.top}px`,
-            width: `${gxAuthSourceRect.width}px`,
-            height: `${gxAuthSourceRect.height}px`,
-            backgroundColor: gxAuthSourceStyle.backgroundColor,
-            borderColor: gxAuthSourceStyle.borderColor,
-            borderRadius: gxAuthSourceStyle.borderRadius,
-            boxShadow: 'none',
-            transform: 'none'
-        });
-
-        const shared = gxAuthLiftSharedParts(root);
-        if (!shared) {
-            gxAuthBusy = false;
-            return;
-        }
-
-        /*
-           Important 02.29 change:
-           move the SAME form out of the element BEFORE applying inverse FLIP.
-           It never gets squeezed by the card transform.
-        */
-        const content = gxAuthFloatContent(root, cardRect);
-
-        document.body.appendChild(root);
 
         Object.assign(root.style, {
             left: `${cardRect.left}px`,
@@ -8611,20 +8526,25 @@ function goxionLegacyAdapter(data) {
             height: `${cardRect.height}px`,
             transformOrigin: '0 0',
             transform: inverse,
-            borderRadius: startRadius
+            borderRadius: startRadius,
+            backgroundColor: gxAuthSourceStyle.backgroundColor,
+            borderColor: gxAuthSourceStyle.borderColor,
+            boxShadow: 'none'
         });
 
-        root.setAttribute('aria-expanded', 'true');
+        document.body.appendChild(root);
+
+        // Keep the pill's own content out of the animation.
+        pillLabel.style.opacity = '0';
+        content.style.visibility = 'hidden';
+        content.style.opacity = '0';
+        content.style.pointerEvents = 'none';
 
         gxAuthPauseWave(true);
         overlay.classList.add('show');
         document.body.style.overflow = 'hidden';
 
         void root.offsetWidth;
-
-        const targets = gxAuthSharedTargets(cardRect);
-        gxAuthTextTarget = targets.text;
-        gxAuthIconTarget = targets.icon;
 
         const shape = root.animate([
             {
@@ -8645,29 +8565,9 @@ function goxionLegacyAdapter(data) {
             fill: 'forwards'
         });
 
-        const textMove = gxAuthAnimateTextOpen(shared.textEl, gxAuthTextTarget);
-        const iconMove = gxAuthAnimateIconOpen(shared.iconEl, gxAuthIconTarget);
-        const textChange = gxAuthChangeSharedText(shared.textEl, true);
+        await shape.finished.catch(() => {});
 
-        const contentIn = content.animate([
-            { opacity: 0, transform: 'translateY(10px) scale(.992)' },
-            { opacity: 1, transform: 'translateY(0) scale(1)' }
-        ], {
-            duration: 220,
-            delay: 245,
-            easing: 'cubic-bezier(.16,1,.3,1)',
-            fill: 'forwards'
-        });
-
-        await Promise.allSettled([
-            shape.finished,
-            textMove.finished,
-            iconMove.finished,
-            textChange,
-            contentIn.finished
-        ]);
-
-        // Commit stable OPEN state before cancelling animations.
+        // Commit the final card BEFORE showing any login UI.
         Object.assign(root.style, {
             transform: 'none',
             borderRadius: cardStyle.borderRadius,
@@ -8675,27 +8575,27 @@ function goxionLegacyAdapter(data) {
             borderColor: cardStyle.borderColor,
             boxShadow: cardStyle.boxShadow
         });
+        try { shape.cancel(); } catch (_) {}
 
-        content.style.opacity = '1';
-        content.style.transform = 'none';
+        root.classList.add('gx-auth-login-visible');
+        content.style.visibility = 'visible';
+        content.style.pointerEvents = 'auto';
 
-        const textD = gxAuthDelta(gxAuthTextSourceRect, gxAuthTextTarget);
-        shared.textEl.style.transform =
-            `translate(-50%, -50%) translate3d(${textD.dx}px,${textD.dy}px,0) scale(${gxAuthTextTarget.scale})`;
-        shared.textEl.style.opacity = '1';
-
-        const iconD = gxAuthDelta(gxAuthIconSourceRect, gxAuthIconTarget);
-        shared.iconEl.style.transform =
-            `translate(-50%, -50%) translate3d(${iconD.dx}px,${iconD.dy}px,0) scale(${gxAuthIconTarget.scale}) rotate(${gxAuthIconTarget.rotate}deg)`;
-        shared.iconEl.style.opacity = '.145';
-
-        [shape, textMove, iconMove, contentIn].forEach(anim => {
-            try { anim?.cancel(); } catch (_) {}
+        const contentIn = content.animate([
+            { opacity: 0, transform: 'translateY(8px)' },
+            { opacity: 1, transform: 'translateY(0)' }
+        ], {
+            duration: 220,
+            easing: 'cubic-bezier(.16,1,.3,1)',
+            fill: 'forwards'
         });
 
-        // Static blur only after the emoji has completely landed.
-        shared.iconEl.classList.add('gx-auth-icon-watermark');
+        await contentIn.finished.catch(() => {});
+        content.style.opacity = '1';
+        content.style.transform = 'none';
+        try { contentIn.cancel(); } catch (_) {}
 
+        root.setAttribute('aria-expanded', 'true');
         gxAuthOpen = true;
         gxAuthBusy = false;
     };
@@ -8708,40 +8608,51 @@ function goxionLegacyAdapter(data) {
 
         const root = document.getElementById('header-action-btn');
         const overlay = document.getElementById('auth-overlay');
-        const textEl = document.querySelector('#header-btn-text.gx-auth-text-floating');
-        const iconEl = document.querySelector('.gx-auth-pill-icon.gx-auth-icon-floating');
-        const content = gxAuthContent();
+        const pillLabel = root?.querySelector('.gx-auth-pill-label');
+        const content = root?.querySelector('.gx-auth-inline-content');
         const destination = gxAuthPlaceholder?.getBoundingClientRect();
 
-        if (!root || !overlay || !textEl || !iconEl || !content || !destination) return;
+        if (!root || !overlay || !pillLabel || !content || !destination) return;
 
         if (reduceMotion() || !Element.prototype.animate) {
             overlay.classList.remove('show');
-            document.body.style.overflow = 'auto';
+            content.style.visibility = '';
+            content.style.opacity = '';
+            pillLabel.style.display = '';
             gxAuthOpen = false;
+            document.body.style.overflow = 'auto';
             return;
         }
 
         gxAuthBusy = true;
 
-        // Remove static filter before the emoji starts moving.
-        iconEl.classList.remove('gx-auth-icon-watermark');
+        const contentOut = content.animate([
+            { opacity: 1, transform: 'translateY(0)' },
+            { opacity: 0, transform: 'translateY(6px)' }
+        ], {
+            duration: 130,
+            easing: 'ease-in',
+            fill: 'forwards'
+        });
+
+        await contentOut.finished.catch(() => {});
+        content.style.visibility = 'hidden';
+        content.style.pointerEvents = 'none';
+        try { contentOut.cancel(); } catch (_) {}
+
+        root.classList.remove('gx-auth-login-visible');
 
         const cardRect = root.getBoundingClientRect();
         const flip = gxAuthFlipData(destination, cardRect);
         const inverse = gxAuthFlipMatrix(flip);
         const endRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
 
-        /*
-           All four parts start in the same frame:
-           card shrinks, title returns, watermark returns, form fades.
-        */
         const shapeBack = root.animate([
             {
                 transform: 'matrix(1,0,0,1,0,0)',
                 borderRadius: '26px',
-                backgroundColor: 'rgba(8,8,12,.84)',
-                borderColor: 'rgba(0,242,254,.20)'
+                backgroundColor: 'rgba(8,8,12,.88)',
+                borderColor: 'rgba(0,242,254,.18)'
             },
             {
                 transform: inverse,
@@ -8755,29 +8666,11 @@ function goxionLegacyAdapter(data) {
             fill: 'forwards'
         });
 
-        const textBack = gxAuthAnimateTextClose(textEl, gxAuthTextTarget);
-        const iconBack = gxAuthAnimateIconClose(iconEl, gxAuthIconTarget);
-        const textChange = gxAuthChangeSharedText(textEl, false);
+        setTimeout(() => overlay.classList.remove('show'), 235);
 
-        const contentOut = content.animate([
-            { opacity: 1, transform: 'translateY(0) scale(1)' },
-            { opacity: 0, transform: 'translateY(5px) scale(.992)' }
-        ], {
-            duration: 115,
-            easing: 'ease-in',
-            fill: 'forwards'
-        });
+        await shapeBack.finished.catch(() => {});
 
-        setTimeout(() => overlay.classList.remove('show'), 245);
-
-        await Promise.allSettled([
-            shapeBack.finished,
-            textBack.finished,
-            iconBack.finished,
-            textChange,
-            contentOut.finished
-        ]);
-
+        // Exact source geometry before returning to header.
         Object.assign(root.style, {
             left: `${destination.left}px`,
             top: `${destination.top}px`,
@@ -8789,14 +8682,7 @@ function goxionLegacyAdapter(data) {
             borderColor: gxAuthSourceStyle.borderColor,
             boxShadow: gxAuthSourceStyle.boxShadow
         });
-
-        [shapeBack, textBack, iconBack, contentOut].forEach(anim => {
-            try { anim?.cancel(); } catch (_) {}
-        });
-
-        // Restore same shared text/emoji and same form node.
-        gxAuthRestoreSharedParts(root, textEl, iconEl);
-        gxAuthRestoreContent(root, content);
+        try { shapeBack.cancel(); } catch (_) {}
 
         if (gxAuthOriginalParent && gxAuthPlaceholder) {
             gxAuthOriginalParent.insertBefore(root, gxAuthPlaceholder);
@@ -8811,11 +8697,76 @@ function goxionLegacyAdapter(data) {
         root.removeAttribute('style');
         root.setAttribute('aria-expanded', 'false');
 
+        pillLabel.style.opacity = '';
+        content.removeAttribute('style');
+        gxAuthResetLoginExtras();
+
         document.body.style.overflow = 'auto';
         gxAuthPauseWave(false);
 
         gxAuthOpen = false;
         gxAuthBusy = false;
+    };
+
+    window.togglePinVisibility = function(event) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
+
+        const pin = document.getElementById('login-pin');
+        const btn = document.getElementById('gx-pin-eye-btn');
+        if (!pin || !btn) return;
+
+        const show = pin.type === 'password';
+        pin.type = show ? 'text' : 'password';
+        btn.classList.toggle('is-visible', show);
+        btn.setAttribute('aria-label', show ? 'Ocultar PIN' : 'Mostrar PIN');
+        pin.focus({ preventScroll: true });
+    };
+
+    window.openPinRecovery = function(event) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
+
+        const recovery = document.getElementById('gx-pin-recovery');
+        const status = document.getElementById('gx-pin-recovery-status');
+        if (!recovery) return;
+
+        recovery.hidden = !recovery.hidden;
+        if (status) status.textContent = '';
+    };
+
+    window.sendPinRecovery = function(event) {
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
+
+        const inputId = document.getElementById('login-id');
+        const status = document.getElementById('gx-pin-recovery-status');
+        const btn = document.getElementById('gx-pin-recovery-btn');
+        const identificador = inputId?.value?.trim() || '';
+
+        if (!identificador) {
+            if (status) status.textContent = 'Escribe primero tu nombre o ID.';
+            inputId?.focus({ preventScroll: false });
+            return;
+        }
+
+        const message =
+            `Hola, necesito recuperar mi acceso a GOXION.\n\n` +
+            `Nombre o ID: ${identificador}\n` +
+            `Motivo: Olvidé mi PIN de acceso.`;
+
+        if (status) {
+            status.textContent = 'Abriendo soporte seguro para solicitar tu recuperación…';
+        }
+
+        if (btn) {
+            btn.textContent = 'Abrir soporte';
+        }
+
+        window.open(
+            `https://wa.me/${NUMERO_GOXION}?text=${encodeURIComponent(message)}`,
+            '_blank'
+        );
     };
 
     window.closeAuthSheetEvent = function(event) {
