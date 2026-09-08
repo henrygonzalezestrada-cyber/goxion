@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.36-beta-wave-02-30a">
+<html lang="es" data-goxion-version="1.0.37-beta-wave-02-31">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -150,10 +150,25 @@
             cursor: pointer; 
         }
 
-        .header-action-btn:hover { 
-            background: var(--neon-blue); 
-            color: #000; 
-            box-shadow: 0 0 15px rgba(0,242,254,0.4); 
+        @media (hover: hover) and (pointer: fine) {
+            .header-action-btn:hover { 
+                background: var(--neon-blue); 
+                color: #000; 
+                box-shadow: 0 0 15px rgba(0,242,254,0.4); 
+            }
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            .header-action-btn:hover {
+                background: rgba(0, 242, 254, 0.1);
+                color: var(--neon-blue);
+                box-shadow: none;
+            }
+
+            .header-action-btn:active {
+                background: rgba(0, 242, 254, 0.14);
+                color: var(--neon-blue);
+            }
         }
 
         .sticky-client-bar {
@@ -3908,6 +3923,15 @@ body.gx-tab-transitioning {
     display: none !important;
 }
 
+#header-action-btn.gx-auth-recovery-open .gx-pin-recovery {
+    display: block;
+}
+
+#header-action-btn.gx-auth-recovery-open .gx-auth-inline-content {
+    padding-bottom: 2px;
+}
+
+
 .gx-pin-recovery-title {
     color: var(--text-main);
     font-size: 11.5px;
@@ -3966,13 +3990,22 @@ body.gx-tab-transitioning {
     align-items: center;
     justify-content: center;
 
+    appearance: none;
+    -webkit-appearance: none;
     border-radius: 50%;
-    border: 1px solid rgba(0,242,254,.28);
-    background: rgba(0,242,254,.08);
-    color: var(--neon-blue);
-    font-size: 15px;
+    border: 1px solid rgba(0,242,254,.90);
+    background: var(--neon-blue);
+    color: #030305;
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 1;
     cursor: pointer;
-    box-shadow: none;
+    box-shadow: 0 0 12px rgba(0,242,254,.16);
+    transition: transform .18s cubic-bezier(.16,1,.3,1);
+}
+
+.gx-auth-inline-close:active {
+    transform: scale(.91);
 }
 
 .gx-auth-error {
@@ -4089,7 +4122,7 @@ body.gx-tab-transitioning {
             </span>
 
             <div class="gx-auth-inline-content" onclick="event.stopPropagation()">
-                <button type="button" class="gx-auth-inline-close" aria-label="Cerrar acceso" onclick="closeAuthSheet(event)">✕</button>
+                <button type="button" class="gx-auth-inline-close" aria-label="Cerrar acceso" onclick="closeAuthSheet(event)">×</button>
 
                 <div class="gx-auth-login-head">
                     <div class="gx-auth-kicker">MI ESPACIO</div>
@@ -8108,7 +8141,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.30A</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.31</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8348,6 +8381,8 @@ function goxionLegacyAdapter(data) {
     let gxAuthOriginalNextSibling = null;
     let gxAuthSourceRect = null;
     let gxAuthSourceStyle = null;
+    let gxAuthBaseCardRect = null;
+    let gxAuthResizeAnim = null;
 
     function gxAuthCardStyle() {
         return {
@@ -8456,6 +8491,72 @@ function goxionLegacyAdapter(data) {
         } catch (_) {}
     }
 
+    async function gxAuthResizeCardForRecovery(opening) {
+        const root = document.getElementById('header-action-btn');
+        const content = root?.querySelector('.gx-auth-inline-content');
+
+        if (!root || !content || !gxAuthOpen) return;
+
+        try { gxAuthResizeAnim?.cancel(); } catch (_) {}
+        gxAuthResizeAnim = null;
+
+        // Let the DOM settle after hidden was toggled.
+        await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
+        const current = root.getBoundingClientRect();
+
+        let targetHeight;
+        let targetTop;
+
+        if (opening) {
+            const contentHeight = Math.ceil(content.scrollHeight || content.getBoundingClientRect().height);
+            const needed = contentHeight + 48;
+            const viewportMax = Math.max(420, window.innerHeight - 72);
+
+            targetHeight = Math.min(viewportMax, Math.max(current.height, needed));
+            targetTop = Math.max(36, Math.round((window.innerHeight - targetHeight) / 2));
+        } else if (gxAuthBaseCardRect) {
+            targetHeight = gxAuthBaseCardRect.height;
+            targetTop = gxAuthBaseCardRect.top;
+        } else {
+            return;
+        }
+
+        if (Math.abs(targetHeight - current.height) < 2 && Math.abs(targetTop - current.top) < 2) {
+            return;
+        }
+
+        if (!Element.prototype.animate || reduceMotion()) {
+            root.style.height = `${targetHeight}px`;
+            root.style.top = `${targetTop}px`;
+            return;
+        }
+
+        gxAuthResizeAnim = root.animate([
+            {
+                top: `${current.top}px`,
+                height: `${current.height}px`
+            },
+            {
+                top: `${targetTop}px`,
+                height: `${targetHeight}px`
+            }
+        ], {
+            duration: 285,
+            easing: 'cubic-bezier(.16,1,.3,1)',
+            fill: 'forwards'
+        });
+
+        await gxAuthResizeAnim.finished.catch(() => {});
+
+        // Commit final size before cancelling fill:forwards.
+        root.style.top = `${targetTop}px`;
+        root.style.height = `${targetHeight}px`;
+
+        try { gxAuthResizeAnim.cancel(); } catch (_) {}
+        gxAuthResizeAnim = null;
+    }
+
     function gxAuthResetLoginExtras() {
         const recovery = document.getElementById('gx-pin-recovery');
         const status = document.getElementById('gx-pin-recovery-status');
@@ -8464,6 +8565,7 @@ function goxionLegacyAdapter(data) {
         const eye = document.getElementById('gx-pin-eye-btn');
 
         if (recovery) recovery.hidden = true;
+        document.getElementById('header-action-btn')?.classList.remove('gx-auth-recovery-open');
         if (status) status.textContent = '';
         if (btn) {
             btn.disabled = false;
@@ -8510,6 +8612,7 @@ function goxionLegacyAdapter(data) {
         gxAuthSourceStyle = gxAuthReadSourceStyle(root);
 
         const cardRect = gxAuthCardGeometry(root);
+        gxAuthBaseCardRect = { ...cardRect };
         const cardStyle = gxAuthCardStyle();
         const flip = gxAuthFlipData(gxAuthSourceRect, cardRect);
         const inverse = gxAuthFlipMatrix(flip);
@@ -8626,6 +8729,9 @@ function goxionLegacyAdapter(data) {
 
         gxAuthBusy = true;
 
+        try { gxAuthResizeAnim?.cancel(); } catch (_) {}
+        gxAuthResizeAnim = null;
+
         const contentOut = content.animate([
             { opacity: 1, transform: 'translateY(0)' },
             { opacity: 0, transform: 'translateY(6px)' }
@@ -8704,6 +8810,7 @@ function goxionLegacyAdapter(data) {
         document.body.style.overflow = 'auto';
         gxAuthPauseWave(false);
 
+        gxAuthBaseCardRect = null;
         gxAuthOpen = false;
         gxAuthBusy = false;
     };
@@ -8723,16 +8830,24 @@ function goxionLegacyAdapter(data) {
         pin.focus({ preventScroll: true });
     };
 
-    window.openPinRecovery = function(event) {
+    window.openPinRecovery = async function(event) {
         event?.preventDefault?.();
         event?.stopPropagation?.();
 
+        const root = document.getElementById('header-action-btn');
         const recovery = document.getElementById('gx-pin-recovery');
         const status = document.getElementById('gx-pin-recovery-status');
-        if (!recovery) return;
 
-        recovery.hidden = !recovery.hidden;
+        if (!root || !recovery || gxAuthBusy) return;
+
+        const opening = recovery.hidden;
+
+        recovery.hidden = !opening;
+        root.classList.toggle('gx-auth-recovery-open', opening);
+
         if (status) status.textContent = '';
+
+        await gxAuthResizeCardForRecovery(opening);
     };
 
     window.sendPinRecovery = function(event) {
