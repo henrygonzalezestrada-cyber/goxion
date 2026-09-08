@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.37-beta-wave-02-31">
+<html lang="es" data-goxion-version="1.0.38-beta-wave-02-32">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -256,6 +256,9 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
             overflow: hidden;
             isolation: isolate;
+            contain: layout paint;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
         }
 
         .gx-nav-trail,
@@ -284,14 +287,14 @@
             -webkit-tap-highlight-color: transparent;
             transform-origin: center;
             transition:
-                flex-grow 500ms cubic-bezier(.34,1.56,.64,1),
-                flex-basis 500ms cubic-bezier(.34,1.56,.64,1),
-                padding 500ms cubic-bezier(.34,1.56,.64,1),
-                background 300ms ease,
-                border-color 300ms ease,
-                box-shadow 300ms ease,
-                color 260ms ease,
-                transform 160ms cubic-bezier(.22,.8,.24,1);
+                flex-grow 300ms cubic-bezier(.2,.8,.2,1),
+                flex-basis 300ms cubic-bezier(.2,.8,.2,1),
+                padding 300ms cubic-bezier(.2,.8,.2,1),
+                background 210ms ease,
+                border-color 210ms ease,
+                box-shadow 210ms ease,
+                color 190ms ease,
+                transform 150ms cubic-bezier(.22,.8,.24,1);
         }
 
         /* Estado activo: interior sutil y luz hacia afuera */
@@ -318,9 +321,9 @@
             transform: translateZ(0) scale(1);
             transform-origin: center;
             transition:
-                transform 500ms cubic-bezier(.34,1.56,.64,1),
-                filter 300ms ease,
-                font-size 500ms cubic-bezier(.34,1.56,.64,1);
+                transform 270ms cubic-bezier(.2,.8,.2,1),
+                filter 180ms ease,
+                font-size 270ms cubic-bezier(.2,.8,.2,1);
         }
 
         /* El icono conserva un brillo más intenso */
@@ -344,10 +347,10 @@
             color: #fff;
             transform: translate3d(-15px,0,0);
             transition:
-                max-width 400ms cubic-bezier(.34,1.56,.64,1),
-                margin-left 400ms cubic-bezier(.34,1.56,.64,1),
-                opacity 220ms ease,
-                transform 400ms cubic-bezier(.34,1.56,.64,1);
+                max-width 270ms cubic-bezier(.2,.8,.2,1),
+                margin-left 270ms cubic-bezier(.2,.8,.2,1),
+                opacity 175ms ease,
+                transform 250ms cubic-bezier(.2,.8,.2,1);
         }
 
         .tab-btn.active .gx-nav-label {
@@ -414,18 +417,18 @@
         }
 
         .view-section { 
-            display: none; 
-            animation: fadeIn 0.4s ease; 
+            display: none;
+            opacity: 1;
+            transform: none;
         }
 
         .view-section.active { 
             display: block; 
         }
 
-        @keyframes fadeIn { 
-            from { opacity: 0; transform: translateY(10px); } 
-            to { opacity: 1; transform: translateY(0); } 
-        }
+        /* La navegación usa un único sistema de motion.
+           Quitamos el fadeIn legado para no competir por
+           opacity/transform con WAAPI en Safari. */
 
         .section-title { 
             font-size: 11px; 
@@ -1966,7 +1969,7 @@
         .mission-item.done .mission-checkbox { background: var(--success-green); border-color: var(--success-green); }
         .mission-item.done .mission-checkbox::after { content: '✓'; color: #fff; font-size: 12px; font-weight: bold; }
         
-        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.2, 0.8, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .reveal.active { opacity: 1; transform: translateY(0); }
 
         .teaser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
@@ -3662,6 +3665,8 @@
 /* ---------- Spatial navigation ---------- */
 .view-section.gx-view-motion {
     will-change: transform, opacity;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 body.gx-tab-transitioning {
@@ -4802,18 +4807,22 @@ body.gx-tab-transitioning {
                 }
             }
         }
-        window.addEventListener("scroll", revealOnScroll);
-
+        let gxScrollFrame = 0;
         window.addEventListener('scroll', () => {
-            const bar = document.getElementById('sticky-client-bar');
-            const dashActive = document.getElementById('view-dashboard').classList.contains('active');
-            
-            if (dashActive && window.scrollY > 120) {
-                bar.classList.add('show');
-            } else if (bar) {
-                bar.classList.remove('show');
-            }
-        });
+            if (gxScrollFrame) return;
+
+            gxScrollFrame = requestAnimationFrame(() => {
+                gxScrollFrame = 0;
+                revealOnScroll();
+
+                const bar = document.getElementById('sticky-client-bar');
+                const dashActive = document.getElementById('view-dashboard')?.classList.contains('active');
+
+                if (bar) {
+                    bar.classList.toggle('show', Boolean(dashActive && window.scrollY > 120));
+                }
+            });
+        }, { passive: true });
 
         document.addEventListener('DOMContentLoaded', () => {
             // Tras una recarga, la identidad vive otra vez sólo en memoria.
@@ -4844,6 +4853,7 @@ body.gx-tab-transitioning {
             let popIdx = 0;
             if(popLogosEls.length > 0) {
                 setInterval(() => {
+                    if (document.hidden || !document.getElementById('view-inicio')?.classList.contains('active')) return;
                     popLogosEls.forEach(el => el.classList.remove('active'));
                     popIdx = (popIdx + 1) % popLogosEls.length;
                     popLogosEls[popIdx].classList.add('active');
@@ -4861,6 +4871,7 @@ body.gx-tab-transitioning {
             
             if(leftEl && rightEl) {
                 setInterval(() => {
+                    if (document.hidden || !document.getElementById('view-inicio')?.classList.contains('active')) return;
                     comboIdx = (comboIdx + 1) % comboPairs.length;
                     leftEl.src = comboPairs[comboIdx][0];
                     rightEl.src = comboPairs[comboIdx][1];
@@ -4871,6 +4882,7 @@ body.gx-tab-transitioning {
             let benIdx = 0;
             if(benefitsEls.length > 0) {
                 setInterval(() => {
+                    if (document.hidden || !document.getElementById('view-inicio')?.classList.contains('active')) return;
                     benefitsEls.forEach(el => el.classList.remove('active'));
                     benIdx = (benIdx + 1) % benefitsEls.length;
                     benefitsEls[benIdx].classList.add('active');
@@ -4887,6 +4899,7 @@ body.gx-tab-transitioning {
         
         let rotatorIdx = 0;
         setInterval(() => {
+            if (document.hidden || !document.getElementById('view-inicio')?.classList.contains('active')) return;
             const textEl = document.getElementById('dynamic-rotator');
             const boxEl = document.getElementById('rotator-box');
             if(textEl && boxEl) {
@@ -5040,6 +5053,7 @@ body.gx-tab-transitioning {
             el.style.opacity = 1;
             
             greetingInterval = setInterval(() => {
+                if (document.hidden || !document.getElementById('view-dashboard')?.classList.contains('active')) return;
                 el.style.opacity = 0;
                 setTimeout(() => { 
                     index = (index + 1) % frases.length; 
@@ -8141,7 +8155,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.31</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.32</div>
 
 <script id="goxion-motion-system-02-18-js">
 (() => {
@@ -8151,7 +8165,8 @@ function goxionLegacyAdapter(data) {
     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
     /* =========================================================
-       1) SPATIAL NAVIGATION
+       1) SPATIAL NAVIGATION // PERFORMANCE PASS 02.32
+       No blank frame, no scale of whole glass-heavy views.
        ========================================================= */
     let gxTabBusy = false;
     let gxPendingTab = null;
@@ -8170,20 +8185,21 @@ function goxionLegacyAdapter(data) {
         return document.getElementById(`view-${tabName}`);
     }
 
-    function gxPrepareTabState(tabName) {
+    function gxSetNavState(tabName) {
         ['inicio', 'catalogo', 'soporte'].forEach(name => {
             const btn = document.getElementById(`btn-tab-${name}`);
             if (btn) btn.classList.toggle('active', name === tabName);
         });
+    }
 
+    function gxPrepareTabAux(tabName) {
         if (tabName === 'inicio') {
             const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : '';
             const guestCard = document.getElementById('guest-action-card');
             if (guestCard) guestCard.style.display = key ? 'none' : 'block';
         }
 
-        const bar = document.getElementById('sticky-client-bar');
-        if (bar) bar.classList.remove('show');
+        document.getElementById('sticky-client-bar')?.classList.remove('show');
 
         if (tabName !== 'catalogo') {
             document.getElementById('floating-cart')?.classList.remove('show');
@@ -8200,13 +8216,24 @@ function goxionLegacyAdapter(data) {
 
         actualizarBloqueoSoporte?.();
 
-        if (tabName === 'inicio') setTimeout(() => revealOnScroll?.(), 100);
+        if (tabName === 'inicio') {
+            requestAnimationFrame(() => revealOnScroll?.());
+        }
+    }
+
+    function gxPauseWaveForTab(paused) {
+        try {
+            if (typeof window.gxWaveSetPaused === 'function') {
+                window.gxWaveSetPaused(paused);
+            }
+        } catch (_) {}
     }
 
     window.switchTab = async function(tabName) {
         if (!['inicio', 'catalogo', 'soporte'].includes(tabName)) return;
 
         if (gxTabBusy) {
+            // Only remember the latest tap, not every intermediate tap.
             gxPendingTab = tabName;
             return;
         }
@@ -8215,67 +8242,94 @@ function goxionLegacyAdapter(data) {
         const currentView = document.querySelector('.view-section.active');
         const targetView = gxTargetView(tabName);
 
-        gxPrepareTabState(tabName);
-
         if (!targetView) return;
 
         if (currentView === targetView) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            gxSetNavState(tabName);
+            gxPrepareTabAux(tabName);
+
+            if (window.scrollY > 2) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
             gxPostTabState(tabName);
             return;
         }
 
         gxTabBusy = true;
+        gxPendingTab = null;
+
+        const direction =
+            (gxTabOrder[tabName] ?? 0) >= (gxTabOrder[oldTab] ?? 0) ? 1 : -1;
+
+        const canAnimate =
+            !reduceMotion() &&
+            typeof Element.prototype.animate === 'function';
+
         document.body.classList.add('gx-tab-transitioning');
 
-        const direction = (gxTabOrder[tabName] ?? 0) >= (gxTabOrder[oldTab] ?? 0) ? 1 : -1;
-        const canAnimate = !reduceMotion() && Element.prototype.animate;
+        // Respond immediately in the nav.
+        gxSetNavState(tabName);
+        gxPrepareTabAux(tabName);
+
+        // Freeze only the WebGL redraw for ~260 ms.
+        gxPauseWaveForTab(true);
 
         try {
             if (canAnimate && currentView) {
                 currentView.classList.add('gx-view-motion');
 
+                // Do NOT fade to zero: the recording showed a blank gap.
                 const outAnim = currentView.animate([
-                    { opacity: 1, transform: 'translateX(0) scale(1)' },
-                    { opacity: 0, transform: `translateX(${-18 * direction}px) scale(.995)` }
+                    { opacity: 1, transform: 'translate3d(0,0,0)' },
+                    { opacity: .30, transform: `translate3d(${-7 * direction}px,0,0)` }
                 ], {
-                    duration: 155,
-                    easing: 'cubic-bezier(.4,0,.2,1)'
+                    duration: 92,
+                    easing: 'cubic-bezier(.4,0,.2,1)',
+                    fill: 'forwards'
                 });
 
                 await outAnim.finished.catch(() => {});
+                try { outAnim.cancel(); } catch (_) {}
             }
 
-            document.querySelectorAll('.view-section.active').forEach(view => view.classList.remove('active'));
+            // One midpoint swap. The target starts at the same 30% opacity.
+            currentView?.classList.remove('active');
             targetView.classList.add('active', 'gx-view-motion');
 
-            window.scrollTo({ top: 0, behavior: 'auto' });
+            // No smooth scroll during a tab animation; it created a second motion system.
+            if (window.scrollY > 0) {
+                window.scrollTo(0, 0);
+            }
 
             if (canAnimate) {
                 const inAnim = targetView.animate([
-                    { opacity: 0, transform: `translateX(${22 * direction}px) scale(.992)` },
-                    { opacity: 1, transform: 'translateX(0) scale(1)' }
+                    { opacity: .30, transform: `translate3d(${7 * direction}px,0,0)` },
+                    { opacity: 1, transform: 'translate3d(0,0,0)' }
                 ], {
-                    duration: 285,
-                    easing: 'cubic-bezier(.16,1,.3,1)'
+                    duration: 168,
+                    easing: 'cubic-bezier(.16,1,.3,1)',
+                    fill: 'forwards'
                 });
 
                 await inAnim.finished.catch(() => {});
+                try { inAnim.cancel(); } catch (_) {}
             }
 
             targetView.classList.remove('gx-view-motion');
             currentView?.classList.remove('gx-view-motion');
+
             gxPostTabState(tabName);
         } finally {
+            gxPauseWaveForTab(false);
             document.body.classList.remove('gx-tab-transitioning');
             gxTabBusy = false;
 
-            if (gxPendingTab && gxPendingTab !== tabName) {
-                const next = gxPendingTab;
-                gxPendingTab = null;
-                window.switchTab(next);
-            } else {
-                gxPendingTab = null;
+            const pending = gxPendingTab;
+            gxPendingTab = null;
+
+            if (pending && pending !== tabName) {
+                requestAnimationFrame(() => window.switchTab(pending));
             }
         }
     };
