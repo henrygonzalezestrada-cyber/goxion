@@ -6652,7 +6652,7 @@ function goxionViewModelAdapter(data) {
 
                 window.goxionCurrentClientKey = String(login.cliente.clave || data?.cliente?.clave || "");
                 await migrarProgresoLocalSiExiste(data);
-                globalClientesData = await aplicarInventarioPublico(goxionLegacyAdapter(data));
+                globalClientesData = await aplicarInventarioPublico(goxionViewModelAdapter(data));
                 cargarCatalogo(globalClientesData);
                 renderizarSoporteDinamico(globalClientesData);
 
