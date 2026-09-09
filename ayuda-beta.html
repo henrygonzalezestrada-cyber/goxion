@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-02">
+<html lang="es" data-goxion-version="1.1.0-beta-03">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -4569,6 +4569,322 @@
 }
 </style>
 
+
+<style id="goxion-beta-03-03-ui">
+/* =========================================================
+   GOXION BETA 03.03
+   - Estado de Cuenta en cápsula
+   - Historial más informativo
+   - Servicios con logos + flecha Catálogo
+   - Subacciones con crecimiento de su propio contenedor
+   ========================================================= */
+
+/* ---- Estado de Cuenta dentro de la tarjeta principal ---- */
+.gx-account-capsule{
+    width:auto;
+    min-height:38px;
+    margin:15px auto 0;
+    padding:0 12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+
+    appearance:none;
+    -webkit-appearance:none;
+    border-radius:999px;
+    border:1px solid rgba(0,242,254,.23);
+    background:rgba(0,242,254,.065);
+    color:var(--neon-blue);
+    font-family:'Poppins',sans-serif;
+    font-size:9.8px;
+    font-weight:800;
+    cursor:pointer;
+    box-shadow:none;
+    -webkit-tap-highlight-color:transparent;
+}
+.gx-account-capsule-icon{font-size:13px}
+.gx-account-capsule-arrow{
+    font-size:14px;
+    transform:translateX(0);
+    transition:transform .18s ease;
+}
+.gx-account-capsule:active .gx-account-capsule-arrow{
+    transform:translateX(2px);
+}
+
+/* Retira la tarjeta standalone de la beta anterior */
+.gx-account-card{display:none!important}
+
+/* ---- Historial de pagos ---- */
+.gx-payment-history-card{
+    padding:4px 13px 5px;
+}
+.gx-payment-history-row{
+    min-height:66px;
+    grid-template-columns:auto minmax(0,1fr) auto;
+}
+.gx-payment-history-main{
+    min-width:0;
+}
+.gx-payment-history-date{
+    font-size:11.5px;
+    font-weight:800;
+}
+.gx-payment-history-meta{
+    display:flex;
+    flex-wrap:wrap;
+    align-items:center;
+    gap:5px;
+    margin-top:5px;
+}
+.gx-payment-history-badge{
+    display:inline-flex;
+    align-items:center;
+    min-height:20px;
+    padding:0 7px;
+    border-radius:999px;
+    font-size:8.2px;
+    font-weight:800;
+    white-space:nowrap;
+}
+.gx-payment-history-badge.ontime{
+    color:var(--success-green);
+    border:1px solid rgba(46,160,67,.17);
+    background:rgba(46,160,67,.08);
+}
+.gx-payment-history-badge.late{
+    color:var(--warning-amber);
+    border:1px solid rgba(255,170,0,.18);
+    background:rgba(255,170,0,.075);
+}
+.gx-payment-history-badge.review{
+    color:#b59cff;
+    border:1px solid rgba(124,77,255,.20);
+    background:rgba(124,77,255,.075);
+}
+.gx-payment-history-loyalty{
+    margin-top:0;
+    font-size:8.7px;
+    font-weight:700;
+}
+.gx-payment-history-amount{
+    color:#fff;
+    font-size:11.5px;
+    font-weight:800;
+    text-align:right;
+    white-space:nowrap;
+}
+.gx-payment-history-status{
+    margin-top:3px;
+    color:var(--text-muted);
+    font-size:8.2px;
+    font-weight:650;
+    text-align:right;
+}
+
+/* ---- Servicios: logo real + misma cápsula/flecha del Catálogo ---- */
+.gx-service-icon{display:none!important}
+.gx-service-logo-img{
+    width:48px;
+    height:48px;
+    flex:0 0 48px;
+    border-radius:13px;
+    object-fit:cover;
+    background:rgba(0,0,0,.40);
+    box-shadow:0 5px 15px rgba(0,0,0,.36);
+    transform:translateZ(0) scale(1);
+}
+.gx-service-manage-card.expanded .gx-service-logo-img{
+    transform:scale(1.05);
+}
+.gx-service-manage-card .brand-expand-icon{
+    min-width:40px;
+}
+.gx-service-manage-card.expanded .brand-expand-icon{
+    background:var(--neon-blue);
+    color:#000;
+    box-shadow:0 0 15px rgba(0,242,254,.4);
+}
+
+/* La card principal ya no necesita su flecha antigua. */
+.gx-service-chevron{display:none!important}
+
+/* ---- Administración: cada subacción es su propio contenedor morph ---- */
+.gx-service-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    align-items:start;
+}
+.gx-service-action-card{
+    position:relative;
+    min-width:0;
+    overflow:hidden;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.032);
+}
+.gx-service-action-card.expanded{
+    border-color:rgba(0,242,254,.16);
+    background:rgba(0,242,254,.038);
+}
+.gx-service-action-card.support-direct{
+    height:auto;
+}
+.gx-service-action-head{
+    width:100%;
+    min-height:58px;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    align-items:center;
+    gap:9px;
+    padding:9px 9px;
+
+    appearance:none;
+    -webkit-appearance:none;
+    border:0;
+    background:transparent;
+    color:var(--text-main);
+    text-align:left;
+    cursor:pointer;
+}
+.gx-service-action-card .gx-service-action-icon{
+    width:32px;
+    height:32px;
+}
+.gx-service-action-card .brand-expand-icon{
+    min-width:30px;
+    padding:7px 9px;
+    border-radius:11px;
+    font-size:10px;
+}
+.gx-service-action-card.expanded .brand-expand-icon{
+    background:var(--neon-blue);
+    color:#000;
+    box-shadow:0 0 12px rgba(0,242,254,.24);
+}
+.gx-service-action-copy strong{
+    display:block;
+    font-size:10.5px;
+    line-height:1.25;
+}
+.gx-service-action-copy small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:8.5px;
+    line-height:1.3;
+}
+.gx-service-action-body{
+    padding:0 10px 10px;
+    opacity:0;
+    transform:translateY(-6px);
+    pointer-events:none;
+}
+.gx-service-action-card.expanded .gx-service-action-body{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+.gx-service-action-body[hidden]{display:none!important}
+.gx-service-action-body .gx-service-access-label{
+    margin:0 0 8px;
+}
+.gx-service-action-body .gx-service-access-list{
+    margin:0;
+}
+
+/* Se anulan los paneles "caja dentro de caja" anteriores. */
+.gx-service-access-panel,
+.gx-service-more-panel,
+.gx-service-cancel-panel{
+    border:0!important;
+    background:transparent!important;
+    padding:0!important;
+}
+
+/* Más opciones es una línea; la cancelación es una única tarjeta que crece. */
+.gx-service-more-panel{
+    margin-top:0;
+}
+.gx-service-cancel-card{
+    width:100%;
+    overflow:hidden;
+    border-radius:13px;
+    border:1px solid rgba(255,51,102,.13);
+    background:rgba(255,51,102,.025);
+}
+.gx-service-cancel-card.expanded{
+    background:rgba(255,51,102,.035);
+    border-color:rgba(255,51,102,.19);
+}
+.gx-service-cancel-head{
+    width:100%;
+    min-height:43px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:9px;
+    padding:0 10px;
+
+    appearance:none;
+    -webkit-appearance:none;
+    border:0;
+    background:transparent;
+    color:rgba(255,154,177,.94);
+    font-size:9.6px;
+    font-weight:800;
+    text-align:left;
+    cursor:pointer;
+}
+.gx-service-cancel-card .brand-expand-icon{
+    min-width:30px;
+    padding:7px 9px;
+    border-radius:11px;
+    border-color:rgba(255,51,102,.20);
+    background:rgba(255,51,102,.05);
+    color:#ff8caa;
+    font-size:10px;
+}
+.gx-service-cancel-card.expanded .brand-expand-icon{
+    background:#ff789b;
+    border-color:#ff789b;
+    color:#16040a;
+    box-shadow:0 0 12px rgba(255,51,102,.18);
+}
+.gx-service-cancel-body{
+    padding:0 10px 10px;
+    opacity:0;
+    transform:translateY(-5px);
+    pointer-events:none;
+}
+.gx-service-cancel-card.expanded .gx-service-cancel-body{
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+.gx-service-cancel-body[hidden]{display:none!important}
+.gx-service-cancel-body p{
+    margin:0;
+    color:var(--text-muted);
+    font-size:9px;
+    line-height:1.5;
+}
+
+/* Soporte conserva la tarjeta, pero no crea contenido adicional debajo. */
+.gx-service-support-arrow{
+    color:var(--neon-blue);
+    font-size:16px;
+    font-weight:800;
+    padding-right:3px;
+}
+
+@media(max-width:390px){
+    .gx-service-actions{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -4871,6 +5187,12 @@
                     <div class="loyalty-progress-fill" id="loyalty-bar"></div>
                 </div>
                 <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
+
+                <button type="button" class="gx-account-capsule" onclick="irAlTicket()">
+                    <span class="gx-account-capsule-icon">🧾</span>
+                    <span>Estado de Cuenta</span>
+                    <span class="gx-account-capsule-arrow">→</span>
+                </button>
             </div>
 
             <div class="gx-dashboard-section-head">
@@ -6091,37 +6413,90 @@
 
             let historyHTML = '';
             if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
-                const pagosHist = [...cliente.historial_pagos].reverse();
+                // mi-espacio ya entrega pagos del más reciente al más antiguo.
+                const pagosHist = [...cliente.historial_pagos];
 
-                const pagoSumaLealtad = (p) => {
+                const paymentMeta = (p) => {
                     const estado = gxNormalizeUiText(p?.estado || '');
                     const notas = gxNormalizeUiText(p?.notas || '');
-                    const noSuma = /(mora|tarde|tardio|atras|vencid|fuera de fecha|no suma|sin lealtad)/.test(notas);
-                    const acreditado = estado.includes('pagado') || estado.includes('aprobado') || estado.includes('acreditado');
-                    return acreditado && !noSuma;
+
+                    const isLate = /(mora|recargo|tarde|tardio|atras|vencid|fuera de fecha)/.test(notas);
+                    const isReview = /(revision|revisi[oó]n|pendiente)/.test(estado) || /(revision|revisi[oó]n)/.test(notas);
+                    const isPaid = /(pagado|aprobado|acreditado)/.test(estado);
+
+                    if (isLate) {
+                        return {
+                            label:'Pagaste mora',
+                            badgeClass:'late',
+                            loyalty:'○ No sumó a tu lealtad',
+                            loyaltyClass:'no',
+                            status:'Acreditado'
+                        };
+                    }
+
+                    if (isReview) {
+                        return {
+                            label:'En revisión',
+                            badgeClass:'review',
+                            loyalty:'○ Pendiente de lealtad',
+                            loyaltyClass:'no',
+                            status:'Revisión'
+                        };
+                    }
+
+                    if (isPaid) {
+                        return {
+                            label:'Pago en tiempo',
+                            badgeClass:'ontime',
+                            loyalty:'⭐ Sumó a tu lealtad',
+                            loyaltyClass:'yes',
+                            status:'Acreditado'
+                        };
+                    }
+
+                    return {
+                        label:'Pago registrado',
+                        badgeClass:'review',
+                        loyalty:'○ Sin cambio de lealtad',
+                        loyaltyClass:'no',
+                        status:'Registrado'
+                    };
                 };
+
+                const money = (value) => Number(value || 0).toLocaleString('es-MX',{
+                    style:'currency',
+                    currency:'MXN',
+                    minimumFractionDigits:2
+                });
 
                 historyHTML = `<div id="gx-payment-history-card" class="gx-payment-history-card">`;
 
-                pagosHist.forEach((p, index) => {
-                    const suma = pagoSumaLealtad(p);
+                pagosHist.forEach((p,index) => {
+                    const meta = paymentMeta(p);
+
                     historyHTML += `
                         <div class="gx-payment-history-row ${index >= 3 ? 'gx-history-extra' : ''}">
                             <div class="gx-payment-history-dot"></div>
-                            <div>
+
+                            <div class="gx-payment-history-main">
                                 <div class="gx-payment-history-date">${p.fecha || 'Pago registrado'}</div>
-                                <div class="gx-payment-history-loyalty ${suma ? 'yes' : 'no'}">
-                                    ${suma ? '⭐ Sumó a tu lealtad' : '○ No sumó lealtad'}
+                                <div class="gx-payment-history-meta">
+                                    <span class="gx-payment-history-badge ${meta.badgeClass}">${meta.label}</span>
+                                    <span class="gx-payment-history-loyalty ${meta.loyaltyClass}">${meta.loyalty}</span>
                                 </div>
                             </div>
-                            <div class="gx-payment-history-status">Acreditado</div>
+
+                            <div>
+                                <div class="gx-payment-history-amount">${money(p.monto)}</div>
+                                <div class="gx-payment-history-status">${meta.status}</div>
+                            </div>
                         </div>`;
                 });
 
                 if (pagosHist.length > 3) {
                     historyHTML += `
                         <button type="button" id="gx-history-toggle" class="gx-history-toggle" onclick="gxTogglePaymentHistory()">
-                            Ver historial completo
+                            Ver todos
                         </button>`;
                 }
 
@@ -6132,19 +6507,31 @@
                         <div style="color:var(--text-muted);font-size:10px;">Aún no hay pagos registrados.</div>
                     </div>`;
             }
+
             document.getElementById('dash-history').innerHTML = historyHTML;
 
-            const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
 
-            if(cliente.servicios && cliente.servicios.length > 0) {
-                cliente.servicios.forEach((s, idx) => {
-                    let icon = "📺";
-                    for(const key in iconosMap) {
-                        if(String(s.nombre || '').toLowerCase().includes(key)) icon = iconosMap[key];
-                    }
+            const serviceLogo = (name) => {
+                const n = gxNormalizeUiText(name);
 
-                    const safe = (value) => String(value || '').replace(/'/g, "\\'");
+                if(n.includes('netflix')) return 'logos/netflix.PNG';
+                if(n.includes('disney')) return 'logos/disney.PNG';
+                if(n.includes('hbo') || n.includes('max')) return 'logos/hbo-max.PNG';
+                if(n.includes('prime') || n.includes('amazon')) return 'logos/prime-video.PNG';
+                if(n.includes('youtube')) return 'logos/youtube.PNG';
+                if(n.includes('vix')) return 'logos/vix.PNG';
+                if(n.includes('crunchy')) return 'logos/crunchyroll.PNG';
+                if(n.includes('spotify')) return 'logos/spotify.PNG';
+                if(n.includes('google')) return 'logos/google-one.PNG';
+                if(n.includes('microsoft') || n.includes('365')) return 'logos/microsoft.PNG';
+
+                return 'logo2.PNG';
+            };
+
+            if(cliente.servicios && cliente.servicios.length > 0) {
+                cliente.servicios.forEach((s,idx) => {
+                    const safe = (value) => String(value || '').replace(/'/g,"\\'");
                     const creds = [];
 
                     if(s.correo_login) {
@@ -6164,32 +6551,46 @@
                     srvHTML += `
                         <article class="gx-service-manage-card" id="gx-service-card-${idx}">
                             <button type="button" class="gx-service-summary" aria-expanded="false" onclick="gxToggleServiceCard(${idx})">
-                                <span class="gx-service-icon">${icon}</span>
+                                <img src="${serviceLogo(s.nombre)}" class="gx-service-logo-img" alt="${s.nombre}" onerror="this.src='logo2.PNG'">
+
                                 <span>
                                     <span class="gx-service-name">${s.nombre}</span>
                                     <span class="gx-service-state">Activo</span>
                                 </span>
-                                <span class="gx-service-chevron" id="gx-service-chevron-${idx}">⌄</span>
+
+                                <span class="brand-expand-icon gx-service-expand-icon" id="gx-service-chevron-${idx}">⏷</span>
                             </button>
 
                             <div class="gx-service-expanded" id="gx-service-expanded-${idx}" hidden>
                                 <div class="gx-service-divider"></div>
 
                                 <div class="gx-service-actions">
-                                    <button type="button" class="gx-service-action" onclick="gxToggleServiceAccess(${idx},event)">
-                                        <span class="gx-service-action-icon">🔐</span>
-                                        <span><strong>Accesos</strong><small>Ver datos del servicio</small></span>
-                                    </button>
+                                    <article class="gx-service-action-card" id="gx-service-access-card-${idx}">
+                                        <button type="button" class="gx-service-action-head" aria-expanded="false" onclick="gxToggleServiceAccess(${idx},event)">
+                                            <span class="gx-service-action-icon">🔐</span>
+                                            <span class="gx-service-action-copy">
+                                                <strong>Accesos</strong>
+                                                <small>Datos de esta plataforma</small>
+                                            </span>
+                                            <span class="brand-expand-icon" id="gx-service-access-chevron-${idx}">⏷</span>
+                                        </button>
 
-                                    <button type="button" class="gx-service-action" onclick="gxOpenServiceSupport(${idx},event)">
-                                        <span class="gx-service-action-icon">🛠️</span>
-                                        <span><strong>Necesito ayuda</strong><small>Soporte para esta plataforma</small></span>
-                                    </button>
-                                </div>
+                                        <div class="gx-service-action-body" id="gx-service-access-${idx}" hidden aria-hidden="true">
+                                            <div class="gx-service-access-label">DATOS DE ACCESO</div>
+                                            ${credsHTML}
+                                        </div>
+                                    </article>
 
-                                <div class="gx-service-access-panel" id="gx-service-access-${idx}" hidden>
-                                    <div class="gx-service-access-label">DATOS DE ACCESO</div>
-                                    ${credsHTML}
+                                    <article class="gx-service-action-card support-direct">
+                                        <button type="button" class="gx-service-action-head" onclick="gxOpenServiceSupport(${idx},event)">
+                                            <span class="gx-service-action-icon">🛠️</span>
+                                            <span class="gx-service-action-copy">
+                                                <strong>Necesito ayuda</strong>
+                                                <small>Soporte de ${s.nombre}</small>
+                                            </span>
+                                            <span class="gx-service-support-arrow">→</span>
+                                        </button>
+                                    </article>
                                 </div>
 
                                 <button type="button" class="gx-service-more-toggle" onclick="gxToggleServiceMore(${idx},event)">
@@ -6198,22 +6599,27 @@
                                 </button>
 
                                 <div class="gx-service-more-panel" id="gx-service-more-${idx}" hidden>
-                                    <button type="button" class="gx-service-cancel-entry" onclick="gxOpenCancellation(${idx},event)">
-                                        <span>Solicitar cancelación</span><span>→</span>
-                                    </button>
+                                    <article class="gx-service-cancel-card" id="gx-service-cancel-card-${idx}">
+                                        <button type="button" class="gx-service-cancel-head" aria-expanded="false" onclick="gxToggleCancellationCard(${idx},event)">
+                                            <span>Solicitar cancelación</span>
+                                            <span class="brand-expand-icon" id="gx-service-cancel-chevron-${idx}">⏷</span>
+                                        </button>
 
-                                    <div class="gx-service-cancel-panel" id="gx-service-cancel-${idx}" hidden>
-                                        <strong>Solicitar cancelación</strong>
-                                        <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
-                                        <div class="gx-service-cancel-note">
-                                            Los cargos ya generados no cambian. La fecha y hora de tu aviso quedan registradas para revisión.
+                                        <div class="gx-service-cancel-body" id="gx-service-cancel-${idx}" hidden aria-hidden="true">
+                                            <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
+
+                                            <div class="gx-service-cancel-note">
+                                                Los cargos ya generados no cambian. La fecha y hora de tu aviso quedan registradas para revisión.
+                                            </div>
+
+                                            <div class="gx-service-cancel-actions">
+                                                <button type="button" class="gx-service-cancel-back" onclick="gxToggleCancellationCard(${idx},event,false)">Volver</button>
+                                                <button type="button" class="gx-service-cancel-submit" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar solicitud</button>
+                                            </div>
+
+                                            <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>
                                         </div>
-                                        <div class="gx-service-cancel-actions">
-                                            <button type="button" class="gx-service-cancel-back" onclick="gxCloseCancellation(${idx},event)">Volver</button>
-                                            <button type="button" class="gx-service-cancel-submit" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar solicitud</button>
-                                        </div>
-                                        <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>
-                                    </div>
+                                    </article>
                                 </div>
                             </div>
                         </article>`;
@@ -6240,28 +6646,46 @@
 
             const open = !card.classList.contains('expanded');
             card.classList.toggle('expanded', open);
-            btn.textContent = open ? 'Mostrar menos' : 'Ver historial completo';
+            btn.textContent = open ? 'Mostrar menos' : 'Ver todos';
         }
 
         function gxServiceReducedMotion() {
             return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         }
 
-        function gxSetServiceCardState(card, index, open) {
+        function gxAnimateCatalogArrow(icon,open) {
+            if (!icon || gxServiceReducedMotion() || typeof icon.animate !== 'function') return;
+
+            icon.animate(open ? [
+                {transform:'scale(.88) rotate(-25deg)'},
+                {transform:'scale(1.08) rotate(8deg)',offset:.58},
+                {transform:'scale(1) rotate(0deg)'}
+            ] : [
+                {transform:'scale(.90) rotate(22deg)'},
+                {transform:'scale(1) rotate(0deg)'}
+            ],{
+                duration:open ? 420 : 300,
+                easing:'cubic-bezier(.2,.82,.2,1)'
+            });
+        }
+
+        function gxSetServiceCardState(card,index,open) {
             const summary = card.querySelector('.gx-service-summary');
             const body = document.getElementById(`gx-service-expanded-${index}`);
             const chevron = document.getElementById(`gx-service-chevron-${index}`);
 
-            card.classList.toggle('expanded', open);
-            if (summary) summary.setAttribute('aria-expanded', open ? 'true' : 'false');
-            if (body) body.hidden = !open;
-            if (chevron) chevron.textContent = open ? '×' : '⌄';
+            card.classList.toggle('expanded',open);
+            if(summary) summary.setAttribute('aria-expanded',open ? 'true' : 'false');
+            if(body) body.hidden = !open;
+            if(chevron) chevron.textContent = open ? '×' : '⏷';
         }
 
-        function gxMorphServiceCard(card, index, open) {
+        function gxMorphServiceCard(card,index,open) {
             if (!card || card.dataset.gxServiceMorphing === '1') return;
 
             const body = document.getElementById(`gx-service-expanded-${index}`);
+            const icon = document.getElementById(`gx-service-chevron-${index}`);
+            const logo = card.querySelector('.gx-service-logo-img');
             if (!body) return;
 
             if (gxServiceReducedMotion() || typeof card.animate !== 'function') {
@@ -6272,7 +6696,7 @@
             card.dataset.gxServiceMorphing = '1';
 
             const startHeight = card.getBoundingClientRect().height;
-            const oldTransition = card.style.transition;
+            const previousTransition = card.style.transition;
 
             card.style.transition = 'none';
             card.style.height = 'auto';
@@ -6284,7 +6708,7 @@
             void card.offsetHeight;
 
             const easing = 'cubic-bezier(.2,.82,.2,1)';
-            const duration = open ? 410 : 330;
+            const duration = open ? 540 : 430;
 
             const container = card.animate([
                 {height:`${startHeight}px`},
@@ -6296,23 +6720,40 @@
             });
 
             const bodyAnim = body.animate(open ? [
-                {opacity:0,transform:'translateY(-7px) scale(.992)'},
+                {opacity:0,transform:'translateY(-9px) scale(.987)'},
                 {opacity:1,transform:'translateY(0) scale(1)'}
             ] : [
                 {opacity:1,transform:'translateY(0) scale(1)'},
-                {opacity:0,transform:'translateY(-5px) scale(.994)'}
+                {opacity:0,transform:'translateY(-6px) scale(.993)'}
             ],{
-                duration:open ? 250 : 180,
-                delay:open ? 80 : 0,
+                duration:open ? 360 : 240,
+                delay:open ? 90 : 0,
                 easing,
                 fill:'both'
             });
 
+            if (logo && typeof logo.animate === 'function') {
+                logo.animate(open ? [
+                    {transform:'translateY(0) scale(1)'},
+                    {transform:'translateY(-2px) scale(1.05)'}
+                ] : [
+                    {transform:'translateY(-2px) scale(1.05)'},
+                    {transform:'translateY(0) scale(1)'}
+                ],{
+                    duration:open ? 460 : 360,
+                    easing,
+                    fill:'both'
+                });
+            }
+
+            gxAnimateCatalogArrow(icon,open);
+
             container.onfinish = () => {
                 card.style.height = '';
                 card.style.overflow = '';
-                card.style.transition = oldTransition;
+                card.style.transition = previousTransition;
                 delete card.dataset.gxServiceMorphing;
+
                 try { container.cancel(); } catch (_) {}
                 try { bodyAnim.cancel(); } catch (_) {}
             };
@@ -6336,11 +6777,82 @@
             gxMorphServiceCard(card,index,opening);
         }
 
+        function gxSetInnerActionState(card,body,icon,open) {
+            card.classList.toggle('expanded',open);
+            card.querySelector('button[aria-expanded]')?.setAttribute('aria-expanded',open ? 'true' : 'false');
+
+            if(body) {
+                body.hidden = !open;
+                body.setAttribute('aria-hidden',open ? 'false' : 'true');
+            }
+            if(icon) icon.textContent = open ? '×' : '⏷';
+        }
+
+        function gxMorphInnerAction(card,body,icon,open) {
+            if (!card || !body || card.dataset.gxInnerMorphing === '1') return;
+
+            if (gxServiceReducedMotion() || typeof card.animate !== 'function') {
+                gxSetInnerActionState(card,body,icon,open);
+                return;
+            }
+
+            card.dataset.gxInnerMorphing = '1';
+
+            const startHeight = card.getBoundingClientRect().height;
+            card.style.height = 'auto';
+            gxSetInnerActionState(card,body,icon,open);
+            const endHeight = card.getBoundingClientRect().height;
+
+            card.style.height = `${startHeight}px`;
+            card.style.overflow = 'hidden';
+            void card.offsetHeight;
+
+            const easing = 'cubic-bezier(.2,.82,.2,1)';
+
+            const container = card.animate([
+                {height:`${startHeight}px`},
+                {height:`${endHeight}px`}
+            ],{
+                duration:open ? 420 : 330,
+                easing,
+                fill:'forwards'
+            });
+
+            const contentAnim = body.animate(open ? [
+                {opacity:0,transform:'translateY(-7px) scale(.988)'},
+                {opacity:1,transform:'translateY(0) scale(1)'}
+            ] : [
+                {opacity:1,transform:'translateY(0) scale(1)'},
+                {opacity:0,transform:'translateY(-5px) scale(.994)'}
+            ],{
+                duration:open ? 260 : 180,
+                delay:open ? 70 : 0,
+                easing,
+                fill:'both'
+            });
+
+            gxAnimateCatalogArrow(icon,open);
+
+            container.onfinish = () => {
+                card.style.height = '';
+                card.style.overflow = '';
+                delete card.dataset.gxInnerMorphing;
+
+                try { container.cancel(); } catch (_) {}
+                try { contentAnim.cancel(); } catch (_) {}
+            };
+        }
+
         function gxToggleServiceAccess(index,event) {
             event?.preventDefault?.();
             event?.stopPropagation?.();
-            const panel = document.getElementById(`gx-service-access-${index}`);
-            if (panel) panel.hidden = !panel.hidden;
+
+            const card = document.getElementById(`gx-service-access-card-${index}`);
+            const body = document.getElementById(`gx-service-access-${index}`);
+            const icon = document.getElementById(`gx-service-access-chevron-${index}`);
+            if (!card || !body) return;
+
+            gxMorphInnerAction(card,body,icon,!card.classList.contains('expanded'));
         }
 
         function gxToggleServiceMore(index,event) {
@@ -6352,26 +6864,33 @@
             if (!panel) return;
 
             panel.hidden = !panel.hidden;
-            if (chevron) chevron.textContent = panel.hidden ? '⌄' : '⌃';
+            if(chevron) chevron.textContent = panel.hidden ? '⌄' : '⌃';
 
-            if (panel.hidden) {
-                const cancel = document.getElementById(`gx-service-cancel-${index}`);
-                if (cancel) cancel.hidden = true;
+            if(panel.hidden) {
+                const cancelCard = document.getElementById(`gx-service-cancel-card-${index}`);
+                const cancelBody = document.getElementById(`gx-service-cancel-${index}`);
+                const cancelIcon = document.getElementById(`gx-service-cancel-chevron-${index}`);
+
+                if(cancelCard && cancelBody && cancelCard.classList.contains('expanded')) {
+                    gxSetInnerActionState(cancelCard,cancelBody,cancelIcon,false);
+                }
             }
         }
 
-        function gxOpenCancellation(index,event) {
+        function gxToggleCancellationCard(index,event,forceOpen) {
             event?.preventDefault?.();
             event?.stopPropagation?.();
-            const panel = document.getElementById(`gx-service-cancel-${index}`);
-            if (panel) panel.hidden = false;
-        }
 
-        function gxCloseCancellation(index,event) {
-            event?.preventDefault?.();
-            event?.stopPropagation?.();
-            const panel = document.getElementById(`gx-service-cancel-${index}`);
-            if (panel) panel.hidden = true;
+            const card = document.getElementById(`gx-service-cancel-card-${index}`);
+            const body = document.getElementById(`gx-service-cancel-${index}`);
+            const icon = document.getElementById(`gx-service-cancel-chevron-${index}`);
+            if (!card || !body) return;
+
+            const open = typeof forceOpen === 'boolean'
+                ? forceOpen
+                : !card.classList.contains('expanded');
+
+            gxMorphInnerAction(card,body,icon,open);
         }
 
         function gxSupportButtonForService(name) {
@@ -8070,7 +8589,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Beta 03.02: Mi Espacio + Catálogo Inteligente.");
+        console.info("GOXION Beta 03.03: Mi Espacio refinado + Catálogo Inteligente.");
     })();
     </script>
 
