@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-04">
+<html lang="es" data-goxion-version="1.1.0-beta-05">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -2789,22 +2789,6 @@
             }
         }
 
-/* Beta 03.04 — cápsula y administración directa */
-.gx-account-capsule{position:relative;overflow:hidden;min-height:40px;padding:0 16px;border:1px solid rgba(155,132,255,.55);background:linear-gradient(115deg,rgba(124,77,255,.28),rgba(37,123,255,.18));color:#e8e5ff;font-size:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
-.gx-account-capsule::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-110%);pointer-events:none}
-.gx-account-capsule:active::after{transform:translateX(110%);transition:transform .4s ease}
-.gx-account-capsule-icon{font-size:14px}.gx-account-capsule:focus-visible,.gx-service-manage-card button:focus-visible{outline:2px solid #a999ff;outline-offset:3px}
-.gx-service-summary{padding:14px;gap:12px}.gx-service-logo-img{width:36px;height:36px;flex:0 0 36px;border-radius:10px;object-fit:contain;box-shadow:none}.gx-service-manage-card.expanded .gx-service-logo-img{transform:none}
-.gx-service-manage-card .gx-service-expand-icon{min-width:32px;width:32px;font-size:16px}.gx-service-manage-card.expanded .gx-service-expand-icon{background:rgba(139,112,255,.18);color:#d9ceff;box-shadow:none}
-.gx-service-home,.gx-service-view{padding:4px 4px 8px}.gx-service-view[hidden],.gx-service-home[hidden]{display:none!important}
-.gx-access-heading{color:#aeb5c8;font-size:12px;margin:3px 0 12px;font-weight:600}
-.gx-access-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}.gx-access-row+ .gx-access-row{border-top:1px solid rgba(255,255,255,.06)}
-.gx-access-row>div{min-width:0}.gx-access-row span{display:block;font-size:12px;color:#9da7bc}.gx-access-row strong{display:block;font-size:14px;color:#eef0fa;font-weight:500;overflow-wrap:anywhere;margin-top:3px}
-.gx-access-row button,.gx-service-toolbar button,.gx-service-back{border:0;background:transparent;color:#c4b8ff;font:inherit;font-size:12px;cursor:pointer;min-height:40px;padding:8px;flex-shrink:0}
-.gx-service-toolbar{display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:12px;padding-top:8px}.gx-service-toolbar button:last-child{color:#aab1c2}
-.gx-service-view h3{font-size:16px;margin:12px 0}.gx-service-view p,.gx-access-empty{font-size:14px;line-height:1.6;color:#ccd0dc}.gx-service-view .gx-cancel-detail{color:#98a3b9;font-size:12px;margin:10px 0 18px}.gx-service-back{padding-left:0}.gx-cancel-link{width:100%;display:flex;justify-content:space-between;padding:18px 0;border:0;background:transparent;color:#e8becb;font:inherit;font-size:14px;cursor:pointer}.gx-service-view .gx-service-cancel-submit{font-size:14px;min-height:44px;padding:10px 16px;border-radius:999px}
-@media(prefers-reduced-motion:reduce){.gx-account-capsule::after{display:none}}
-
 </style>
 
 <style id="goxion-referral-ui">
@@ -5213,7 +5197,7 @@
             </div>
 
             <div class="gx-dashboard-section-head">
-                <div class="section-title">Tus Servicios Activos</div>
+                <div class="section-title">Tus servicios</div>
                 <div class="gx-dashboard-section-subtitle">Toca una plataforma para administrarla</div>
             </div>
             <div id="dash-services" class="gx-services-stack"></div>
@@ -6563,7 +6547,7 @@
 
                                 <span>
                                     <span class="gx-service-name">${s.nombre}</span>
-                                    <span class="gx-service-state">Activo</span>
+                                    <span class="gx-service-state ${gxServiceHasAlert(s.nombre) ? 'gx-service-interrupted' : ''}">${gxServiceHasAlert(s.nombre) ? 'Temporalmente inactivo' : 'Activo'}</span>
                                 </span>
 
                                 <span class="brand-expand-icon gx-service-expand-icon" id="gx-service-chevron-${idx}">⏷</span>
@@ -6576,12 +6560,12 @@
                                     <div class="gx-access-heading">Tus accesos</div>
                                     ${credsHTML}
                                     <div class="gx-service-toolbar">
-                                        <button type="button" onclick="gxOpenServiceSupport(${idx},event)"><span aria-hidden="true">◉</span> Soporte</button>
                                         <button type="button" onclick="gxServiceView(${idx},'options',event)">Más opciones <span aria-hidden="true">···</span></button>
                                     </div>
                                 </div>
                                 <div id="gx-service-options-${idx}" class="gx-service-view" hidden>
                                     <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                                    <button type="button" class="gx-option-support" onclick="gxOpenServiceSupport(${idx},event)"><span>Soporte de la plataforma</span><span aria-hidden="true">→</span></button>
                                     <button type="button" class="gx-cancel-link" onclick="gxServiceView(${idx},'cancel',event)">Solicitar cancelación <span aria-hidden="true">→</span></button>
                                 </div>
                                 <div id="gx-service-cancel-${idx}" class="gx-service-view" hidden>
@@ -6623,6 +6607,17 @@
             active.querySelector('button')?.focus({preventScroll:true});
         }
 
+        function gxServiceHasAlert(name) {
+            const raw=globalClientesData?._goxion_config?.alertas;
+            const alerts=Array.isArray(raw)?raw:[raw];
+            const normalize=value=>gxNormalizeUiText(value).replace(/[^a-z0-9]+/g,' ').trim();
+            const service=normalize(name);
+            return alerts.some(alert=>{
+                if(alert?.activa!==true) return false;
+                const platform=normalize(alert.plataforma);
+                return platform==='todos los servicios' || platform==='todos' || (platform && (service===platform || service.startsWith(platform+' ')));
+            });
+        }
         function gxNormalizeUiText(value) {
             return String(value || '')
                 .normalize('NFD')
@@ -7529,16 +7524,15 @@
                                 <div style="display:flex; align-items:center; gap:6px; flex-wrap: wrap;">
                                     <div class="brand-name">${brand.name}</div>
                                     ${badgeHtml}
-                                    ${gxContextBadge}
                                 </div>
-                                <div class="brand-price-start">Desde $${minPrice}</div>
-                                ${gxReason}
+                                <div class="gx-brand-meta"><div class="brand-price-start">Desde $${minPrice}</div>${gxContextBadge}</div>
                             </div>
                         </div>
                         <div class="brand-expand-icon">⏷</div>
                     </div>
                     
                     <div class="brand-expanded-content" aria-hidden="true">
+                        ${gxReason}
                         <div class="plan-pills-container">
                             ${pillsHtml}
                         </div>
@@ -10206,5 +10200,32 @@ function goxionViewModelAdapter(data) {
 })();
 </script>
 
+<style id="gx-beta-final-styles">
+/* Beta 03.04 — cápsula y administración directa */
+.gx-account-capsule{position:relative;overflow:hidden;min-height:40px;padding:0 16px;border:1px solid rgba(155,132,255,.55);background:linear-gradient(115deg,rgba(124,77,255,.28),rgba(37,123,255,.18));color:#e8e5ff;font-size:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
+.gx-account-capsule::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-110%);pointer-events:none}
+.gx-account-capsule:active::after{transform:translateX(110%);transition:transform .4s ease}
+.gx-account-capsule-icon{font-size:14px}.gx-account-capsule:focus-visible,.gx-service-manage-card button:focus-visible{outline:2px solid #a999ff;outline-offset:3px}
+.gx-service-summary{padding:14px;gap:12px}.gx-service-logo-img{width:36px;height:36px;flex:0 0 36px;border-radius:10px;object-fit:contain;box-shadow:none}.gx-service-manage-card.expanded .gx-service-logo-img{transform:none}
+.gx-service-manage-card .gx-service-expand-icon{min-width:32px;width:32px;font-size:16px}.gx-service-manage-card.expanded .gx-service-expand-icon{background:rgba(139,112,255,.18);color:#d9ceff;box-shadow:none}
+.gx-service-home,.gx-service-view{padding:4px 4px 8px}.gx-service-view[hidden],.gx-service-home[hidden]{display:none!important}
+.gx-access-heading{color:#aeb5c8;font-size:12px;margin:3px 0 12px;font-weight:600}
+.gx-access-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}.gx-access-row+ .gx-access-row{border-top:1px solid rgba(255,255,255,.06)}
+.gx-access-row>div{min-width:0}.gx-access-row span{display:block;font-size:12px;color:#9da7bc}.gx-access-row strong{display:block;font-size:14px;color:#eef0fa;font-weight:500;overflow-wrap:anywhere;margin-top:3px}
+.gx-access-row button,.gx-service-toolbar button,.gx-service-back{border:0;background:transparent;color:#c4b8ff;font:inherit;font-size:12px;cursor:pointer;min-height:40px;padding:8px;flex-shrink:0}
+.gx-service-toolbar{display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:12px;padding-top:8px}.gx-service-toolbar button:last-child{color:#aab1c2}
+.gx-service-view h3{font-size:16px;margin:12px 0}.gx-service-view p,.gx-access-empty{font-size:14px;line-height:1.6;color:#ccd0dc}.gx-service-view .gx-cancel-detail{color:#98a3b9;font-size:12px;margin:10px 0 18px}.gx-service-back{padding-left:0}.gx-cancel-link{width:100%;display:flex;justify-content:space-between;padding:18px 0;border:0;background:transparent;color:#e8becb;font:inherit;font-size:14px;cursor:pointer}.gx-service-view .gx-service-cancel-submit{font-size:14px;min-height:44px;padding:10px 16px;border-radius:999px}
+@media(prefers-reduced-motion:reduce){.gx-account-capsule::after{display:none}}
+
+
+/* Beta 03.05 — overrides finales, después de la cascada histórica */
+.gx-account-capsule{background:linear-gradient(110deg,#7041db,#345de0);border:1px solid #a58afa;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 12px rgba(82,49,174,.20);font-size:12px;min-height:40px;padding:0 17px}
+.gx-service-toolbar{justify-content:flex-end}.gx-option-support,.gx-service-view .gx-cancel-link{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:13px 15px;margin-top:10px;border:1px solid rgba(164,141,240,.22);border-radius:14px;background:rgba(124,77,255,.10);color:#ded5ff;font:inherit;font-size:13px;cursor:pointer}.gx-service-view .gx-cancel-link{border-color:rgba(255,153,180,.14);background:rgba(255,153,180,.04);color:#dfb8c5}
+.gx-service-state.gx-service-interrupted{color:#e9bb73}.gx-service-state.gx-service-interrupted::before{background:#e9bb73;box-shadow:none}
+body:has(#view-catalogo.active) #goxion-main-nav{margin-bottom:6px}#view-catalogo .gx-catalog-toolbar{margin-top:0;margin-bottom:12px}
+.brand-header-left{min-width:0;flex:1}.brand-titles{min-width:0;flex:1}.brand-logo-img{flex-shrink:0}.brand-header>.brand-expand-icon{flex-shrink:0;margin-left:10px}.gx-brand-meta{display:flex;align-items:center;gap:8px;min-width:0;margin-top:5px}.gx-brand-meta .brand-price-start{white-space:nowrap;flex-shrink:0}.gx-brand-meta .gx-catalog-context-badge{font-size:9px;line-height:1.2;min-height:18px;padding:2px 5px;white-space:nowrap;flex-shrink:0;border:0;background:transparent}.gx-catalog-smart-reason{margin:0 0 12px;font-size:12px}.brand-name{overflow-wrap:anywhere}
+@media(max-width:380px){.brand-header-left{gap:10px}.gx-brand-meta{gap:5px}.gx-brand-meta .gx-catalog-context-badge{font-size:8px;padding:2px}.brand-header>.brand-expand-icon{margin-left:6px}}
+
+</style>
 </body>
 </html>
