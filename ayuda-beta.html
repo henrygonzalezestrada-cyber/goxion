@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-03">
+<html lang="es" data-goxion-version="1.1.0-beta-04">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -2788,6 +2788,23 @@
                 transition-duration: .01ms !important;
             }
         }
+
+/* Beta 03.04 — cápsula y administración directa */
+.gx-account-capsule{position:relative;overflow:hidden;min-height:40px;padding:0 16px;border:1px solid rgba(155,132,255,.55);background:linear-gradient(115deg,rgba(124,77,255,.28),rgba(37,123,255,.18));color:#e8e5ff;font-size:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
+.gx-account-capsule::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-110%);pointer-events:none}
+.gx-account-capsule:active::after{transform:translateX(110%);transition:transform .4s ease}
+.gx-account-capsule-icon{font-size:14px}.gx-account-capsule:focus-visible,.gx-service-manage-card button:focus-visible{outline:2px solid #a999ff;outline-offset:3px}
+.gx-service-summary{padding:14px;gap:12px}.gx-service-logo-img{width:36px;height:36px;flex:0 0 36px;border-radius:10px;object-fit:contain;box-shadow:none}.gx-service-manage-card.expanded .gx-service-logo-img{transform:none}
+.gx-service-manage-card .gx-service-expand-icon{min-width:32px;width:32px;font-size:16px}.gx-service-manage-card.expanded .gx-service-expand-icon{background:rgba(139,112,255,.18);color:#d9ceff;box-shadow:none}
+.gx-service-home,.gx-service-view{padding:4px 4px 8px}.gx-service-view[hidden],.gx-service-home[hidden]{display:none!important}
+.gx-access-heading{color:#aeb5c8;font-size:12px;margin:3px 0 12px;font-weight:600}
+.gx-access-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}.gx-access-row+ .gx-access-row{border-top:1px solid rgba(255,255,255,.06)}
+.gx-access-row>div{min-width:0}.gx-access-row span{display:block;font-size:12px;color:#9da7bc}.gx-access-row strong{display:block;font-size:14px;color:#eef0fa;font-weight:500;overflow-wrap:anywhere;margin-top:3px}
+.gx-access-row button,.gx-service-toolbar button,.gx-service-back{border:0;background:transparent;color:#c4b8ff;font:inherit;font-size:12px;cursor:pointer;min-height:40px;padding:8px;flex-shrink:0}
+.gx-service-toolbar{display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:12px;padding-top:8px}.gx-service-toolbar button:last-child{color:#aab1c2}
+.gx-service-view h3{font-size:16px;margin:12px 0}.gx-service-view p,.gx-access-empty{font-size:14px;line-height:1.6;color:#ccd0dc}.gx-service-view .gx-cancel-detail{color:#98a3b9;font-size:12px;margin:10px 0 18px}.gx-service-back{padding-left:0}.gx-cancel-link{width:100%;display:flex;justify-content:space-between;padding:18px 0;border:0;background:transparent;color:#e8becb;font:inherit;font-size:14px;cursor:pointer}.gx-service-view .gx-service-cancel-submit{font-size:14px;min-height:44px;padding:10px 16px;border-radius:999px}
+@media(prefers-reduced-motion:reduce){.gx-account-capsule::after{display:none}}
+
 </style>
 
 <style id="goxion-referral-ui">
@@ -6531,22 +6548,13 @@
 
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s,idx) => {
-                    const safe = (value) => String(value || '').replace(/'/g,"\\'");
+                    const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
                     const creds = [];
-
-                    if(s.correo_login) {
-                        creds.push(`<button type="button" class="cred-tag" onclick="copiarDatoRapido('${safe(s.correo_login)}','Correo')">📧 <strong>${s.correo_login}</strong></button>`);
+                    for (const [field,label] of [['correo_login','Correo'],['perfil_nombre','Perfil']]) {
+                        if(s[field]) creds.push(`<div class="gx-access-row"><div><span>${label}</span><strong>${escape(s[field])}</strong></div><button type="button" data-value="${escape(s[field])}" data-label="${label}" onclick="copiarDatoRapido(this.dataset.value,this.dataset.label)" aria-label="Copiar ${label}">Copiar</button></div>`);
                     }
-                    if(s.perfil_nombre) {
-                        creds.push(`<button type="button" class="cred-tag" onclick="copiarDatoRapido('${safe(s.perfil_nombre)}','Perfil')">👤 <strong>${s.perfil_nombre}</strong></button>`);
-                    }
-                    if(s.perfil_pin) {
-                        creds.push(`<button type="button" class="cred-tag" onclick="copiarDatoRapido('${safe(s.perfil_pin)}','PIN')">🔢 PIN: <strong>${s.perfil_pin}</strong></button>`);
-                    }
-
-                    const credsHTML = creds.length
-                        ? `<div class="gx-service-access-list">${creds.join('')}</div>`
-                        : `<div style="color:var(--text-muted);font-size:9px;line-height:1.45;">No hay credenciales visibles para este servicio. Si necesitas acceso, abre Soporte.</div>`;
+                    if(s.perfil_pin) creds.push(`<div class="gx-access-row"><div><span>PIN del perfil</span><strong id="gx-pin-${idx}">••••</strong></div><button type="button" data-pin="${escape(s.perfil_pin)}" aria-pressed="false" aria-label="Mostrar PIN" onclick="gxRevealServicePin(this,${idx})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>`);
+                    const credsHTML = creds.length ? creds.join('') : '<p class="gx-access-empty">¿Necesitas tus datos de acceso? Escríbenos desde Soporte.</p>';
 
                     srvHTML += `
                         <article class="gx-service-manage-card" id="gx-service-card-${idx}">
@@ -6564,62 +6572,25 @@
                             <div class="gx-service-expanded" id="gx-service-expanded-${idx}" hidden>
                                 <div class="gx-service-divider"></div>
 
-                                <div class="gx-service-actions">
-                                    <article class="gx-service-action-card" id="gx-service-access-card-${idx}">
-                                        <button type="button" class="gx-service-action-head" aria-expanded="false" onclick="gxToggleServiceAccess(${idx},event)">
-                                            <span class="gx-service-action-icon">🔐</span>
-                                            <span class="gx-service-action-copy">
-                                                <strong>Accesos</strong>
-                                                <small>Datos de esta plataforma</small>
-                                            </span>
-                                            <span class="brand-expand-icon" id="gx-service-access-chevron-${idx}">⏷</span>
-                                        </button>
-
-                                        <div class="gx-service-action-body" id="gx-service-access-${idx}" hidden aria-hidden="true">
-                                            <div class="gx-service-access-label">DATOS DE ACCESO</div>
-                                            ${credsHTML}
-                                        </div>
-                                    </article>
-
-                                    <article class="gx-service-action-card support-direct">
-                                        <button type="button" class="gx-service-action-head" onclick="gxOpenServiceSupport(${idx},event)">
-                                            <span class="gx-service-action-icon">🛠️</span>
-                                            <span class="gx-service-action-copy">
-                                                <strong>Necesito ayuda</strong>
-                                                <small>Soporte de ${s.nombre}</small>
-                                            </span>
-                                            <span class="gx-service-support-arrow">→</span>
-                                        </button>
-                                    </article>
+                                <div id="gx-service-home-${idx}" class="gx-service-home">
+                                    <div class="gx-access-heading">Tus accesos</div>
+                                    ${credsHTML}
+                                    <div class="gx-service-toolbar">
+                                        <button type="button" onclick="gxOpenServiceSupport(${idx},event)"><span aria-hidden="true">◉</span> Soporte</button>
+                                        <button type="button" onclick="gxServiceView(${idx},'options',event)">Más opciones <span aria-hidden="true">···</span></button>
+                                    </div>
                                 </div>
-
-                                <button type="button" class="gx-service-more-toggle" onclick="gxToggleServiceMore(${idx},event)">
-                                    <span>Más opciones</span>
-                                    <span id="gx-service-more-chevron-${idx}">⌄</span>
-                                </button>
-
-                                <div class="gx-service-more-panel" id="gx-service-more-${idx}" hidden>
-                                    <article class="gx-service-cancel-card" id="gx-service-cancel-card-${idx}">
-                                        <button type="button" class="gx-service-cancel-head" aria-expanded="false" onclick="gxToggleCancellationCard(${idx},event)">
-                                            <span>Solicitar cancelación</span>
-                                            <span class="brand-expand-icon" id="gx-service-cancel-chevron-${idx}">⏷</span>
-                                        </button>
-
-                                        <div class="gx-service-cancel-body" id="gx-service-cancel-${idx}" hidden aria-hidden="true">
-                                            <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
-
-                                            <div class="gx-service-cancel-note">
-                                                Los cargos ya generados no cambian. La fecha y hora de tu aviso quedan registradas para revisión.
-                                            </div>
-
-                                            <div class="gx-service-cancel-actions">
-                                                <button type="button" class="gx-service-cancel-back" onclick="gxToggleCancellationCard(${idx},event,false)">Volver</button>
-                                                <button type="button" class="gx-service-cancel-submit" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar solicitud</button>
-                                            </div>
-
-                                            <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>
-                                        </div>
-                                    </article>
+                                <div id="gx-service-options-${idx}" class="gx-service-view" hidden>
+                                    <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                                    <button type="button" class="gx-cancel-link" onclick="gxServiceView(${idx},'cancel',event)">Solicitar cancelación <span aria-hidden="true">→</span></button>
+                                </div>
+                                <div id="gx-service-cancel-${idx}" class="gx-service-view" hidden>
+                                    <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                                    <h3>Solicitar cancelación</h3>
+                                    <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
+                                    <p class="gx-cancel-detail">Los cargos ya generados no cambian. Revisaremos tu solicitud y te confirmaremos la fecha de baja.</p>
+                                    <button type="button" class="gx-service-cancel-submit" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar solicitud</button>
+                                    <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>
                                 </div>
                             </div>
                         </article>`;
@@ -6631,6 +6602,26 @@
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
 
+
+
+        function gxRevealServicePin(button,index) {
+            const show=button.getAttribute('aria-pressed')!=='true';
+            document.getElementById(`gx-pin-${index}`).textContent=show?button.dataset.pin:'••••';
+            button.setAttribute('aria-pressed',String(show));
+            button.setAttribute('aria-label',show?'Ocultar PIN':'Mostrar PIN');
+        }
+        function gxServiceView(index,view,event) {
+            event?.preventDefault(); event?.stopPropagation();
+            const card=document.getElementById(`gx-service-card-${index}`);
+            if(!card || card.dataset.gxServiceMorphing==='1') return;
+            for(const name of ['home','options','cancel']) {
+                const el=document.getElementById(`gx-service-${name}-${index}`);
+                if(el) el.hidden=name!==view;
+            }
+            const active=document.getElementById(`gx-service-${view}-${index}`);
+            if(!gxServiceReducedMotion()) active.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'ease-out'});
+            active.querySelector('button')?.focus({preventScroll:true});
+        }
 
         function gxNormalizeUiText(value) {
             return String(value || '')
@@ -6674,6 +6665,10 @@
             const body = document.getElementById(`gx-service-expanded-${index}`);
             const chevron = document.getElementById(`gx-service-chevron-${index}`);
 
+            if(!open) {
+                card.querySelectorAll('[data-pin]').forEach(button=>{button.setAttribute('aria-pressed','false');button.setAttribute('aria-label','Mostrar PIN');});
+                const pin=document.getElementById(`gx-pin-${index}`); if(pin) pin.textContent='••••';
+            }
             card.classList.toggle('expanded',open);
             if(summary) summary.setAttribute('aria-expanded',open ? 'true' : 'false');
             if(body) body.hidden = !open;
