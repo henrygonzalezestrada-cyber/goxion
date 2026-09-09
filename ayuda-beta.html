@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.39-beta-wave-02-33">
+<html lang="es" data-goxion-version="1.1.0-beta-01">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -70,7 +70,7 @@
             100% { transform: scale(1); opacity: 1; } 
         }
 
-        /* === GOXION BETA BACKGROUND // WAVE LAB 01 === */
+        /* === GOXION BACKGROUND // WAVE === */
         .bg {
             position: fixed;
             inset: 0;
@@ -1528,7 +1528,7 @@
             line-height: 1.5;
         }
 
-        /* === GOXION SUPPORT CONTAINER MORPH 02.15 === */
+        /* === GOXION SUPPORT CONTAINER MORPH === */
         #smart-support-card.gx-support-morph-running { overflow: hidden; }
 
         .platform-btn {
@@ -1942,16 +1942,11 @@
             border-radius: 20px;
             padding: 15px; 
             margin-bottom: 25px;
-            animation: slideInExpand 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         @keyframes slideInExpand { from { opacity: 0; transform: scale(0.95) translateX(20px); } to { opacity: 1; transform: scale(1) translateX(0); } }
-        @keyframes slideInExpandLeft { from { opacity: 0; transform: scale(0.95) translateX(-20px); } to { opacity: 1; transform: scale(1) translateX(0); } }
-        
-        .gamif-expanded-container.slide-left { animation: slideInExpandLeft 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-
-        .btn-gamif-close {
+.btn-gamif-close {
             background: rgba(255,255,255,0.1); border: none; color: var(--text-main);
             padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 600;
             cursor: pointer; margin-bottom: 5px; 
@@ -2789,9 +2784,9 @@
             }
         }
 </style>
-
-<style id="goxion-referral-ui">
-    .gx-ref-sync-note{
+<style id="goxion-gamification-ui">
+/* GOXION Gamificación // estilos activos de producción */
+.gx-ref-sync-note{
         margin:9px 0 0;padding:8px 10px;border-radius:10px;background:rgba(0,242,254,.045);
         border:1px solid rgba(0,242,254,.11);color:#b9c9dc;font-size:10px;line-height:1.45
     }
@@ -2799,444 +2794,6 @@
         padding:8px;border-radius:9px;background:rgba(255,170,0,.06);
         border:1px dashed rgba(255,170,0,.18);color:var(--warning-amber);font-size:10px
     }
-</style>
-
-
-<style id="goxion-gamification-base">
-    #gamif-grid{
-        gap:12px!important;
-        align-items:stretch;
-    }
-    .gx-gamif-card{
-        position:relative;
-        overflow:hidden;
-        min-height:168px;
-        padding:16px!important;
-        border-radius:22px!important;
-        display:flex!important;
-        flex-direction:column;
-        justify-content:flex-start;
-        align-items:stretch!important;
-        text-align:left!important;
-        background:
-            radial-gradient(circle at 85% 10%, rgba(124,77,255,.14), transparent 34%),
-            linear-gradient(180deg, rgba(12,12,18,.82), rgba(7,7,11,.72))!important;
-        border:1px solid rgba(255,255,255,.08)!important;
-        box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
-    }
-    .gx-gamif-card::after{
-        content:"";
-        position:absolute;
-        inset:auto -28px -52px auto;
-        width:120px;
-        height:120px;
-        border-radius:50%;
-        background:rgba(0,242,254,.05);
-        filter:blur(10px);
-        pointer-events:none;
-    }
-    .gx-gamif-card-top{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:10px;
-        margin-bottom:13px;
-    }
-    .gx-gamif-card .gamif-icon{
-        width:40px;
-        height:40px;
-        display:grid;
-        place-items:center;
-        margin:0!important;
-        border-radius:14px;
-        background:rgba(255,255,255,.045);
-        border:1px solid rgba(255,255,255,.08);
-        font-size:1.25rem!important;
-    }
-    .gx-gamif-card-kicker{
-        color:var(--text-muted);
-        font-size:.58rem;
-        font-weight:900;
-        letter-spacing:1.15px;
-    }
-    .gx-gamif-card .gamif-title{
-        margin:0!important;
-        font-size:.96rem!important;
-        line-height:1.15;
-        font-weight:850!important;
-        letter-spacing:.1px;
-    }
-    .gx-gamif-card-status{
-        margin-top:5px;
-        font-size:.7rem;
-        font-weight:850;
-        color:var(--neon-blue);
-    }
-    .gx-gamif-card-meta{
-        margin-top:4px;
-        color:var(--text-muted);
-        font-size:.63rem;
-        line-height:1.35;
-    }
-    .gx-gamif-progress{
-        width:100%;
-        height:6px;
-        margin-top:auto;
-        padding-top:14px;
-        box-sizing:content-box;
-    }
-    .gx-gamif-progress::before{
-        content:"";
-        position:absolute;
-    }
-    .gx-gamif-progress{
-        background:transparent;
-        position:relative;
-    }
-    .gx-gamif-progress::after{
-        content:"";
-        position:absolute;
-        left:0;right:0;bottom:0;
-        height:6px;
-        border-radius:999px;
-        background:rgba(255,255,255,.07);
-    }
-    .gx-gamif-progress span{
-        position:absolute;
-        left:0;
-        bottom:0;
-        z-index:2;
-        height:6px;
-        border-radius:999px;
-        background:linear-gradient(90deg,var(--neon-purple),var(--neon-blue));
-        box-shadow:0 0 14px rgba(0,242,254,.18);
-        transition:width .35s ease;
-    }
-    .gx-gamif-card-ref.gx-referral-ready .gx-gamif-card-status,
-    .gx-gamif-card-ref .gx-gamif-card-status[style*="success"]{
-        color:var(--success-green)!important;
-    }
-
-    .gamif-expanded-container{
-        border-radius:24px!important;
-        padding:18px!important;
-    }
-    .gx-gamif-expanded-head{
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:10px;
-        margin-bottom:14px;
-    }
-    .gx-gamif-expanded-head .btn-gamif-close{
-        margin:0!important;
-    }
-    .gx-gamif-expanded-kicker{
-        color:var(--text-muted);
-        font-size:.56rem;
-        font-weight:900;
-        letter-spacing:1px;
-    }
-    #gamif-expanded-referral,
-    #gamif-expanded-coupon{
-        overflow:hidden;
-    }
-    #gamif-expanded-referral .gamif-title,
-    #gamif-expanded-coupon .gamif-title{
-        font-size:1.05rem;
-    }
-    #gamif-expanded-referral .mission-item,
-    #gamif-expanded-coupon .mission-item{
-        border-radius:13px!important;
-        border:1px solid rgba(255,255,255,.07)!important;
-        background:rgba(255,255,255,.025)!important;
-    }
-
-    @media(max-width:520px){
-        #gamif-grid{grid-template-columns:1fr 1fr!important;gap:9px!important}
-        .gx-gamif-card{min-height:156px;padding:13px!important}
-        .gx-gamif-card .gamif-icon{width:36px;height:36px;border-radius:12px}
-        .gx-gamif-card .gamif-title{font-size:.86rem!important}
-        .gx-gamif-card-status{font-size:.66rem}
-        .gx-gamif-card-meta{font-size:.59rem}
-        .gamif-expanded-container{padding:15px!important}
-    }
-</style>
-
-<style id="goxion-user-card-tuning">
-#gamif-grid {
-        gap: 12px !important;
-        align-items: stretch;
-    }
-    
-    .gx-gamif-card {
-        position: relative;
-        overflow: hidden;
-        min-height: 168px;
-        padding: 18px 16px !important;
-        border-radius: 22px !important;
-        display: flex !important;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: stretch !important;
-        text-align: left !important;
-        background: radial-gradient(circle at 85% 10%, rgba(124,77,255,.14), transparent 34%), linear-gradient(180deg, rgba(12,12,18,.82), rgba(7,7,11,.72)) !important;
-        border: 1px solid rgba(255,255,255,.08) !important;
-        box-shadow: 0 14px 34px rgba(0,0,0,.28) !important;
-    }
-
-    .gx-gamif-card::after {
-        content: "";
-        position: absolute;
-        inset: auto -28px -52px auto;
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: rgba(0,242,254,.05);
-        filter: blur(10px);
-        pointer-events: none;
-    }
-
-    /* --- ALINEACIÓN PERFECTA DEL HEADER --- */
-    .gx-gamif-card-top {
-        display: flex;
-        align-items: center; /* Alinea verticalmente el icono y el texto */
-        justify-content: flex-start;
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-
-    .gx-gamif-card .gamif-icon {
-        width: 32px !important;
-        height: 32px !important;
-        min-width: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 !important;
-        border-radius: 10px;
-        background: rgba(255,255,255,.05);
-        border: 1px solid rgba(255,255,255,.1);
-        font-size: 16px !important; /* Tamaño exacto para no desbordar la caja */
-    }
-
-    .gx-gamif-card-kicker {
-        color: var(--text-muted);
-        font-size: 0.65rem;
-        font-weight: 800;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        line-height: 1; /* Remueve espacios fantasma arriba o abajo del texto */
-        margin-top: 2px;
-    }
-
-    .gx-gamif-card .gamif-title {
-        margin: 0 !important;
-        font-size: 1rem !important;
-        line-height: 1.2;
-        font-weight: 800 !important;
-    }
-
-    .gx-gamif-card-status {
-        margin-top: 6px;
-        font-size: .75rem;
-        font-weight: 700;
-        color: var(--neon-blue);
-    }
-
-    .gx-gamif-card-meta {
-        margin-top: 4px;
-        color: var(--text-muted);
-        font-size: .65rem;
-    }
-
-/* Mantiene la barra al fondo de ambas tarjetas después de la nueva distribución. */
-.gx-gamif-card .gx-gamif-progress {
-    margin-top: auto;
-}
-</style>
-
-<style id="goxion-user-morph-css">
-
-/* --- PROGRESO VIVO: compatible con Safari/iPhone --- */
-.gx-gamif-progress {
-    width: 100%;
-    height: 6px;
-    padding-top: 14px;
-    box-sizing: content-box;
-    position: relative;
-    background: transparent;
-}
-
-/* Riel base */
-.gx-gamif-progress::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 6px;
-    border-radius: 999px;
-    background: rgba(255,255,255,.075);
-    box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
-}
-
-/* Energía tenue sobre TODO el riel: sigue siendo visible incluso en 0%. */
-.gx-gamif-progress::before {
-    content: "";
-    position: absolute;
-    z-index: 1;
-    bottom: 0;
-    left: -34%;
-    width: 34%;
-    height: 6px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, transparent, rgba(0,242,254,.28), rgba(255,255,255,.48), transparent);
-    filter: blur(.15px);
-    animation: gxTrackEnergy 2.4s ease-in-out infinite;
-    -webkit-animation: gxTrackEnergy 2.4s ease-in-out infinite;
-    pointer-events: none;
-}
-
-/* Porcentaje real. Se anima el propio gradiente, más fiable en Safari que depender solo de ::after. */
-.gx-gamif-progress > span {
-    position: absolute !important;
-    z-index: 2;
-    left: 0;
-    bottom: 0;
-    height: 6px;
-    min-width: 0;
-    overflow: hidden;
-    border-radius: 999px;
-    background: linear-gradient(
-        90deg,
-        var(--neon-purple) 0%,
-        var(--neon-blue) 35%,
-        rgba(255,255,255,.92) 50%,
-        var(--neon-blue) 65%,
-        var(--neon-purple) 100%
-    );
-    background-size: 220% 100%;
-    box-shadow: 0 0 15px rgba(0,242,254,.23);
-    animation: gxFilledEnergy 2s linear infinite;
-    -webkit-animation: gxFilledEnergy 2s linear infinite;
-    transition: width .4s ease;
-}
-
-/* Brillo adicional dentro de la porción completada */
-.gx-gamif-progress > span::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.05) 35%, rgba(255,255,255,.58) 50%, transparent 70%);
-    transform: translateX(-120%);
-    -webkit-transform: translateX(-120%);
-    animation: gxFillSweep 1.8s ease-in-out infinite;
-    -webkit-animation: gxFillSweep 1.8s ease-in-out infinite;
-}
-
-@keyframes gxTrackEnergy {
-    0%   { transform: translateX(0); opacity: .25; }
-    45%  { opacity: .9; }
-    100% { transform: translateX(395%); opacity: .25; }
-}
-@-webkit-keyframes gxTrackEnergy {
-    0%   { -webkit-transform: translateX(0); opacity: .25; }
-    45%  { opacity: .9; }
-    100% { -webkit-transform: translateX(395%); opacity: .25; }
-}
-
-@keyframes gxFilledEnergy {
-    0%   { background-position: 100% 0; }
-    100% { background-position: -120% 0; }
-}
-@-webkit-keyframes gxFilledEnergy {
-    0%   { background-position: 100% 0; }
-    100% { background-position: -120% 0; }
-}
-
-@keyframes gxFillSweep {
-    0%   { transform: translateX(-120%); opacity: 0; }
-    20%  { opacity: .85; }
-    70%  { opacity: .65; }
-    100% { transform: translateX(120%); opacity: 0; }
-}
-@-webkit-keyframes gxFillSweep {
-    0%   { -webkit-transform: translateX(-120%); opacity: 0; }
-    20%  { opacity: .85; }
-    70%  { opacity: .65; }
-    100% { -webkit-transform: translateX(120%); opacity: 0; }
-}
-
-/* El morph nuevo del usuario queda por encima de las animaciones antiguas. */
-
-
-.gamif-expanded-container {
-    display: none;
-    background: var(--card-glass);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(0, 242, 254, 0.3);
-    border-radius: 24px;
-    padding: 20px; 
-    margin-bottom: 25px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 20px rgba(0, 242, 254, 0.1);
-    transform-origin: top center;
-    will-change: transform, opacity, clip-path;
-}
-
-/* Animación: Crece desde las dimensiones de la tarjeta pequeña */
-.gamif-expanded-container.gx-morph-in {
-    display: block !important;
-    animation: trueMorphExpand 0.4s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-}
-
-/* Animación: Se encoge de vuelta a la tarjeta original */
-.gamif-expanded-container.gx-morph-out {
-    display: block !important;
-    animation: trueMorphCollapse 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes trueMorphExpand {
-    0% {
-        opacity: 0.5;
-        /* El recorte inicial simula el tamaño de la tarjeta pequeña */
-        clip-path: inset(0% 25% 65% 25% round 22px);
-        transform: translateY(-10px) scale(0.95);
-    }
-    100% {
-        opacity: 1;
-        /* Se desdobla revelando el contenido completo */
-        clip-path: inset(0% 0% 0% 0% round 24px);
-        transform: translateY(0) scale(1);
-    }
-}
-
-@keyframes trueMorphCollapse {
-    0% {
-        opacity: 1;
-        clip-path: inset(0% 0% 0% 0% round 24px);
-        transform: translateY(0) scale(1);
-    }
-    100% {
-        opacity: 0;
-        clip-path: inset(0% 25% 65% 25% round 22px);
-        transform: translateY(-15px) scale(0.95);
-    }
-}
-
-/* En Reduce Motion conservamos el porcentaje y un pulso estático, sin eliminar visualmente la barra. */
-@media (prefers-reduced-motion: reduce) {
-    .gx-gamif-progress::before,
-    .gx-gamif-progress > span,
-    .gx-gamif-progress > span::after {
-        animation-duration: 5s;
-        -webkit-animation-duration: 5s;
-    }
-}
-</style>
-
-<style id="goxion-gamification-cards-final">
 /* Tarjetas finales de Referidos / Misiones */
 #gamif-grid{
     gap:10px!important;
@@ -3499,7 +3056,51 @@
         -webkit-transform:none!important;
     }
 }
-
+/* Paneles expandidos activos */
+.gamif-expanded-container{
+    display:none;
+    background:var(--card-glass);
+    backdrop-filter:blur(15px);
+    -webkit-backdrop-filter:blur(15px);
+    border:1px solid rgba(0,242,254,.30);
+    border-radius:24px!important;
+    padding:18px!important;
+    margin-bottom:25px;
+    box-shadow:0 15px 35px rgba(0,0,0,.40),0 0 20px rgba(0,242,254,.10);
+    transform-origin:top center;
+    will-change:opacity;
+}
+.gx-gamif-expanded-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:14px;
+}
+.gx-gamif-expanded-head .btn-gamif-close{margin:0!important}
+.gx-gamif-expanded-kicker{
+    color:var(--text-muted);
+    font-size:.56rem;
+    font-weight:900;
+    letter-spacing:1px;
+}
+#gamif-expanded-referral,
+#gamif-expanded-coupon{overflow:hidden}
+#gamif-expanded-referral .gamif-title,
+#gamif-expanded-coupon .gamif-title{font-size:1.05rem}
+#gamif-expanded-referral .mission-item,
+#gamif-expanded-coupon .mission-item{
+    border-radius:13px!important;
+    border:1px solid rgba(255,255,255,.07)!important;
+    background:rgba(255,255,255,.025)!important;
+}
+.gx-gamif-card-ref.gx-referral-ready .gx-gamif-card-status,
+.gx-gamif-card-ref .gx-gamif-card-status[style*="success"]{
+    color:var(--success-green)!important;
+}
+@media(max-width:520px){
+    .gamif-expanded-container{padding:15px!important}
+}
 </style>
 
 <style id="goxion-gamification-shared-morph">
@@ -3629,44 +3230,13 @@
 }
 </style>
 
-<style id="goxion-release-version-style">
-.goxion-release-version {
-    width: 100%;
-    box-sizing: border-box;
-    text-align: center;
-    padding: 16px 8px calc(10px + env(safe-area-inset-bottom, 0px));
-    color: rgba(149, 164, 189, 0.38);
-    font-size: 8px;
-    line-height: 1;
-    font-weight: 600;
-    letter-spacing: 0.85px;
-    text-transform: uppercase;
-    user-select: none;
-    -webkit-user-select: none;
-    pointer-events: none;
-}
-</style>
-
-
-<style id="goxion-motion-system-02-18">
+<style id="goxion-production-interactions">
 /* =========================================================
-   GOXION MOTION SYSTEM // COMBINED PASS
-   1) Spatial tab transitions
-   2) Action-button state morphs
-   3) Mi Espacio -> Auth Sheet shared container morph
-
-   No modifica los parámetros glass existentes.
-   No anima filter/blur para evitar residuos en Safari/iOS.
+   GOXION // INTERACCIONES DE PRODUCCIÓN
+   - Estados de botones
+   - Login Mi Espacio
+   - Recuperación de PIN
    ========================================================= */
-
-/* ---------- Spatial navigation ---------- */
-.view-section.gx-view-motion {
-    will-change: transform, opacity;
-}
-
-body.gx-tab-transitioning {
-    overflow-x: hidden;
-}
 
 /* ---------- Reusable action-state morph ---------- */
 .gx-action-morph {
@@ -3691,7 +3261,7 @@ body.gx-tab-transitioning {
     min-width: 0;
 }
 
-/* ---------- Mi Espacio // MODERN STABLE LOGIN 02.30 ---------- */
+/* ---------- Mi Espacio // MODERN STABLE LOGIN ---------- */
 /*
    Keep what works: only the pill -> card FLIP transform.
    No shared text morph. No emoji travel. No cloned title.
@@ -4100,6 +3670,28 @@ body.gx-tab-transitioning {
 }
 </style>
 
+
+<style id="goxion-beta-03-01-ui">
+.gx-dashboard-section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin:22px 0 10px}
+.gx-dashboard-section-copy{color:var(--text-muted);font-size:10.5px;line-height:1.45;max-width:330px}
+.gx-account-primary{min-height:62px;margin:0 0 8px!important;padding:12px 15px!important;display:grid!important;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;text-align:left!important}
+.gx-account-primary>span:first-child{font-size:20px}.gx-account-primary strong{display:block;font-size:12px;line-height:1.25}.gx-account-primary small{display:block;margin-top:3px;color:rgba(255,255,255,.68);font-size:9.5px;font-weight:500}.gx-account-arrow{font-size:18px;opacity:.82}
+.gx-service-card{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:72px;margin-bottom:10px;padding:12px 12px 12px 14px;overflow:hidden;background:var(--card-glass);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.08);border-radius:17px;box-shadow:0 6px 20px rgba(0,0,0,.20)}
+.gx-service-card-main{min-width:0;display:flex;align-items:center;gap:11px}.gx-service-card-icon{width:42px;height:42px;flex:0 0 42px;display:flex;align-items:center;justify-content:center;border-radius:13px;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.07);font-size:21px}.gx-service-card-info{min-width:0}.gx-service-card-name{max-width:205px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-main);font-size:12.5px;font-weight:750}.gx-service-card-state{display:inline-flex;align-items:center;gap:5px;margin-top:5px;color:var(--success-green);font-size:9.5px;font-weight:700}.gx-service-card-state:before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;box-shadow:0 0 7px currentColor}.gx-service-manage-btn{flex:0 0 auto;min-height:34px;padding:0 11px;border-radius:12px;border:1px solid rgba(0,242,254,.20);background:rgba(0,242,254,.065);color:var(--neon-blue);font-size:9.5px;font-weight:800;cursor:pointer}
+.gx-service-admin-overlay{position:fixed;inset:0;z-index:5200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;pointer-events:none;background:rgba(3,3,5,.62);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);transition:opacity .22s ease,visibility .22s ease}.gx-service-admin-overlay.show{opacity:1;visibility:visible;pointer-events:auto}
+.gx-service-admin-card{position:relative;width:min(390px,100%);max-height:min(690px,calc(100vh - 44px));overflow:auto;-webkit-overflow-scrolling:touch;padding:20px;border-radius:25px;border:1px solid rgba(255,255,255,.10);background:rgba(8,8,12,.91);box-shadow:0 24px 70px rgba(0,0,0,.54),0 0 28px rgba(0,242,254,.06);transform:translate3d(0,10px,0) scale(.975);opacity:.72;transition:transform .26s cubic-bezier(.16,1,.3,1),opacity .20s ease}.gx-service-admin-overlay.show .gx-service-admin-card{transform:translate3d(0,0,0) scale(1);opacity:1}
+.gx-service-admin-close{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:50%;border:1px solid rgba(0,242,254,.92);background:var(--neon-blue);color:#030305;font-size:22px;line-height:1;cursor:pointer}.gx-service-admin-head{display:flex;align-items:center;gap:13px;padding-right:42px;margin-bottom:20px}.gx-service-admin-icon{width:48px;height:48px;flex:0 0 48px;display:flex;align-items:center;justify-content:center;border-radius:15px;background:rgba(0,242,254,.07);border:1px solid rgba(0,242,254,.13);font-size:24px}.gx-service-admin-kicker{display:block;margin-bottom:3px;color:var(--neon-blue);font-size:8px;font-weight:800;letter-spacing:1.7px}.gx-service-admin-head h2{margin:0;color:#fff;font-size:18px;line-height:1.15;font-weight:800;letter-spacing:-.35px}.gx-service-admin-status{margin-top:5px;color:var(--success-green);font-size:9.5px;font-weight:700}
+.gx-service-admin-actions{display:grid;gap:8px}.gx-service-admin-action{width:100%;min-height:58px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:11px;padding:10px 12px;border-radius:15px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);color:var(--text-main);text-align:left;cursor:pointer}.gx-service-admin-action-icon{width:35px;height:35px;display:flex;align-items:center;justify-content:center;border-radius:11px;background:rgba(255,255,255,.045)}.gx-service-admin-action strong{display:block;font-size:11px}.gx-service-admin-action small{display:block;margin-top:2px;color:var(--text-muted);font-size:9px;line-height:1.35}
+.gx-service-admin-panel{margin-top:10px;padding:13px;border-radius:15px;border:1px solid rgba(0,242,254,.12);background:rgba(0,242,254,.035)}.gx-service-admin-panel[hidden],.gx-service-more-panel[hidden],.gx-cancellation-panel[hidden]{display:none!important}.gx-service-admin-panel-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:10px}.gx-service-admin-panel-head strong{font-size:10.5px}.gx-service-admin-panel-head span{color:var(--text-muted);font-size:8.5px}.gx-service-admin-creds{display:flex;flex-wrap:wrap;gap:7px}.gx-service-admin-creds .cred-tag{flex:1 1 145px;min-height:37px;justify-content:flex-start}
+.gx-service-more-toggle{width:100%;min-height:42px;margin-top:14px;display:flex;align-items:center;justify-content:space-between;padding:0 4px;border:0;border-top:1px solid rgba(255,255,255,.065);background:transparent;color:var(--text-muted);font-size:9.5px;font-weight:700;cursor:pointer}.gx-service-more-panel{padding:12px;border-radius:14px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}.gx-service-more-copy{color:var(--text-muted);font-size:9px;line-height:1.45;margin-bottom:10px}.gx-service-cancel-entry{width:100%;display:flex;align-items:center;justify-content:space-between;min-height:40px;padding:0 11px;border-radius:12px;border:1px solid rgba(255,51,102,.16);background:rgba(255,51,102,.035);color:rgba(255,150,175,.92);font-size:10px;font-weight:750;cursor:pointer}
+.gx-cancellation-panel{margin-top:13px;padding:15px;border-radius:17px;border:1px solid rgba(255,51,102,.14);background:rgba(255,51,102,.035)}.gx-cancellation-title{color:#fff;font-size:13px;font-weight:800;margin-bottom:5px}.gx-cancellation-panel p{color:var(--text-muted);font-size:9.5px;line-height:1.55}.gx-cancellation-note{margin-top:10px;padding:9px 10px;border-radius:11px;background:rgba(0,0,0,.20);color:rgba(255,255,255,.70);font-size:8.8px;line-height:1.5}.gx-cancellation-actions{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px;margin-top:12px}.gx-cancellation-back,.gx-cancellation-submit{min-height:42px;border-radius:12px;font-size:9.5px;font-weight:800;cursor:pointer}.gx-cancellation-back{border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.035);color:var(--text-muted)}.gx-cancellation-submit{border:1px solid rgba(255,51,102,.24);background:rgba(255,51,102,.11);color:#ff8bab}.gx-cancellation-submit:disabled{opacity:.56;cursor:default}.gx-cancellation-status{margin-top:9px;color:var(--text-muted);font-size:9px;line-height:1.45}
+.gx-catalog-smart-intro{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin:4px 0 13px}.gx-catalog-smart-copy{min-width:0}.gx-catalog-kicker{display:block;margin-bottom:5px;color:var(--neon-blue);font-size:8.5px;font-weight:850;letter-spacing:1.75px}.gx-catalog-smart-intro h2{margin:0;color:#fff;font-size:22px;line-height:1.1;font-weight:800;letter-spacing:-.55px}.gx-catalog-smart-intro p{margin-top:6px;max-width:330px;color:var(--text-muted);font-size:10px;line-height:1.5}.gx-catalog-session-badge{flex:0 0 auto;max-width:125px;padding:6px 9px;border-radius:11px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.035);color:var(--text-muted);font-size:8.5px;font-weight:700;text-align:center}.gx-catalog-session-badge.personalized{border-color:rgba(0,242,254,.16);background:rgba(0,242,254,.05);color:var(--neon-blue)}
+.gx-catalog-toolbar{margin-bottom:14px}.gx-catalog-search-shell{height:45px;display:flex;align-items:center;gap:8px;padding:0 13px;border-radius:15px;border:1px solid rgba(255,255,255,.07);background:rgba(8,8,12,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.gx-catalog-search-shell>span{color:var(--neon-blue);font-size:17px}.gx-catalog-search-shell input{flex:1;min-width:0;border:0;outline:0;background:transparent;color:#fff;font-family:'Poppins',sans-serif;font-size:11px}.gx-catalog-search-shell input::placeholder{color:rgba(149,164,189,.68)}.gx-catalog-filters{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;margin-top:9px}.gx-catalog-filters::-webkit-scrollbar{display:none}.gx-catalog-filter-chip{flex:0 0 auto;min-height:30px;padding:0 11px;border-radius:999px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);color:var(--text-muted);font-size:8.8px;font-weight:750;cursor:pointer}.gx-catalog-filter-chip.active{border-color:rgba(0,242,254,.24);background:rgba(0,242,254,.085);color:var(--neon-blue)}
+.gx-catalog-context-badge{display:inline-flex;align-items:center;min-height:20px;padding:0 7px;border-radius:8px;font-size:7.8px;font-weight:800}.gx-catalog-context-badge.owned{color:var(--success-green);background:rgba(46,160,67,.09);border:1px solid rgba(46,160,67,.15)}.gx-catalog-context-badge.recommended{color:var(--neon-blue);background:rgba(0,242,254,.08);border:1px solid rgba(0,242,254,.16)}.gx-catalog-smart-reason{margin-top:5px;color:var(--neon-blue);font-size:8.5px;font-weight:700}.brand-card.gx-owned-service{opacity:.82}.brand-card.gx-owned-service.expanded{opacity:1}
+.gx-catalog-empty{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:8px 0 16px;padding:18px;border-radius:18px;border:1px dashed rgba(255,255,255,.08);color:var(--text-muted);text-align:center}.gx-catalog-empty[hidden]{display:none!important}.gx-catalog-empty>span{color:var(--neon-blue);font-size:25px;margin-bottom:8px}.gx-catalog-empty strong{color:#fff;font-size:11px}.gx-catalog-empty small{margin-top:4px;font-size:9px}
+@media(max-width:390px){.gx-service-card-name{max-width:155px}.gx-catalog-smart-intro{align-items:flex-start;flex-direction:column}.gx-catalog-session-badge{align-self:flex-start}}
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -4388,8 +3980,6 @@ body.gx-tab-transitioning {
             </div>
 
             <div id="dash-payment-review-alert"></div>
-            <div id="dash-upsell"></div>
-            <div id="referral-section-container"></div>
 
             <div class="glass-card dash-card" style="background: rgba(0,0,0,0.3);">
                 <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
@@ -4406,16 +3996,50 @@ body.gx-tab-transitioning {
                 <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
             </div>
 
-            <div id="dash-history"></div>
+            <div class="gx-dashboard-section-head">
+                <div>
+                    <div class="section-title" style="margin-bottom:4px;">Tus Servicios Activos</div>
+                    <div class="gx-dashboard-section-copy">Administra accesos y soporte sin duplicar información de cobro.</div>
+                </div>
+            </div>
+            <div id="dash-services" style="margin-bottom: 18px;"></div>
 
-            <div class="section-title">Tus Servicios Activos</div>
-            <div id="dash-services" style="margin-bottom: 25px;"></div>
+            <button class="btn-primary gx-account-primary" onclick="irAlTicket()">
+                <span>💳</span>
+                <span>
+                    <strong>Ver Estado de Cuenta</strong>
+                    <small>Cargos, pagos y detalles monetarios</small>
+                </span>
+                <span class="gx-account-arrow">→</span>
+            </button>
 
-            <button class="btn-primary" onclick="irAlTicket()" style="margin-bottom: 15px;">💳 Ver Estado de Cuenta y Pagar</button>
+            <div id="referral-section-container" style="margin-top:24px;"></div>
         </div>
 
         <div id="view-catalogo" class="view-section">
-            <div class="section-title">Nuestros Ecosistemas y Promociones</div>
+            <div class="gx-catalog-smart-intro">
+                <div class="gx-catalog-smart-copy">
+                    <span class="gx-catalog-kicker">CATÁLOGO GOXION</span>
+                    <h2 id="gx-catalog-title">Explora GOXION</h2>
+                    <p id="gx-catalog-subtitle">Servicios, beneficios y disponibilidad en un solo lugar.</p>
+                </div>
+                <div id="gx-catalog-session-badge" class="gx-catalog-session-badge">Catálogo general</div>
+            </div>
+
+            <div class="gx-catalog-toolbar">
+                <div class="gx-catalog-search-shell">
+                    <span aria-hidden="true">⌕</span>
+                    <input id="gx-catalog-search" type="search" placeholder="Buscar plataforma o plan" autocomplete="off" oninput="gxApplyCatalogFilters()">
+                </div>
+                <div id="gx-catalog-filters" class="gx-catalog-filters"></div>
+            </div>
+
+            <div id="gx-catalog-empty" class="gx-catalog-empty" hidden>
+                <span>⌕</span>
+                <strong>No encontramos coincidencias</strong>
+                <small>Prueba con otro nombre o cambia el filtro.</small>
+            </div>
+
             <div id="catalog-container" class="catalog-grid">
                 <p style="font-size: 13px; color: var(--text-muted); text-align: center; width: 100%;">Cargando catálogo en vivo...</p>
             </div>
@@ -4525,6 +4149,66 @@ body.gx-tab-transitioning {
 
     <div id="auth-overlay" class="auth-overlay gx-auth-backdrop-only" onclick="closeAuthSheetEvent(event)"></div>
 
+
+    <div id="gx-service-admin-overlay" class="gx-service-admin-overlay" aria-hidden="true" onclick="gxCloseServiceManager(event)">
+        <section id="gx-service-admin-card" class="gx-service-admin-card" role="dialog" aria-modal="true" aria-labelledby="gx-service-admin-title" onclick="event.stopPropagation()">
+            <button type="button" class="gx-service-admin-close" aria-label="Cerrar" onclick="gxCloseServiceManager(event)">×</button>
+
+            <div class="gx-service-admin-head">
+                <div id="gx-service-admin-icon" class="gx-service-admin-icon">📺</div>
+                <div>
+                    <span class="gx-service-admin-kicker">ADMINISTRAR SERVICIO</span>
+                    <h2 id="gx-service-admin-title">Servicio</h2>
+                    <div class="gx-service-admin-status">Activo</div>
+                </div>
+            </div>
+
+            <div class="gx-service-admin-actions">
+                <button type="button" class="gx-service-admin-action" onclick="gxToggleServiceAccess()">
+                    <span class="gx-service-admin-action-icon">🔐</span>
+                    <span><strong>Accesos</strong><small>Consulta tus datos de acceso</small></span>
+                    <span>→</span>
+                </button>
+
+                <button type="button" class="gx-service-admin-action" onclick="gxOpenServiceSupport()">
+                    <span class="gx-service-admin-action-icon">🛠️</span>
+                    <span><strong>Necesito ayuda</strong><small>Abre soporte para esta plataforma</small></span>
+                    <span>→</span>
+                </button>
+            </div>
+
+            <div id="gx-service-access-panel" class="gx-service-admin-panel" hidden>
+                <div class="gx-service-admin-panel-head">
+                    <strong>Datos de acceso</strong>
+                    <span>Toca un dato para copiarlo</span>
+                </div>
+                <div id="gx-service-access-content"></div>
+            </div>
+
+            <button type="button" class="gx-service-more-toggle" onclick="gxToggleServiceMore()">
+                <span>Más opciones</span><span id="gx-service-more-chevron">⌄</span>
+            </button>
+
+            <div id="gx-service-more-panel" class="gx-service-more-panel" hidden>
+                <div class="gx-service-more-copy">Las acciones de baja se mantienen en un segundo nivel para evitar cambios accidentales.</div>
+                <button type="button" class="gx-service-cancel-entry" onclick="gxOpenCancellationFlow()">
+                    <span>Solicitar cancelación</span><span>→</span>
+                </button>
+            </div>
+
+            <div id="gx-cancellation-panel" class="gx-cancellation-panel" hidden>
+                <div class="gx-cancellation-title">Solicitar cancelación</div>
+                <p>La solicitud se registra para revisión. Tu servicio continúa activo hasta que recibas la confirmación de GOXION.</p>
+                <div class="gx-cancellation-note">Los cargos ya generados no cambian por esta solicitud. La fecha y hora del aviso quedan registradas para revisión.</div>
+                <div class="gx-cancellation-actions">
+                    <button type="button" class="gx-cancellation-back" onclick="gxCloseCancellationFlow()">Volver</button>
+                    <button type="button" id="gx-cancellation-submit" class="gx-cancellation-submit" onclick="gxSubmitCancellation()">Enviar solicitud</button>
+                </div>
+                <div id="gx-cancellation-status" class="gx-cancellation-status" aria-live="polite"></div>
+            </div>
+        </section>
+    </div>
+
     <div id="floating-cart" class="glass-card floating-cart">
         <div class="cart-info">
             <span class="cart-total" id="cart-total-price">$0 MXN</span>
@@ -4617,8 +4301,6 @@ body.gx-tab-transitioning {
         function getCurrentClientKey() { return String(window.goxionCurrentClientKey || ""); }
         
         window.catalogGroups = {}; 
-
-    // [LIMPIEZA] notificarAdmin legado eliminado; la implementación activa vive en la capa Supabase.
 
         function solicitarCuenta() {
             let nombre = prompt("¿Cómo te llamas?");
@@ -4956,72 +4638,9 @@ body.gx-tab-transitioning {
             document.body.classList.toggle("support-scroll-locked", bloquearScroll);
         }
 
-        function switchTab(tabName) {
-            ['inicio', 'catalogo', 'soporte'].forEach(name => {
-                const btn = document.getElementById(`btn-tab-${name}`);
-                const view = document.getElementById(`view-${name}`);
-                if(btn) btn.classList.remove('active');
-                if(view) view.classList.remove('active');
-            });
-            const activeBtn = document.getElementById(`btn-tab-${tabName}`);
-            if(activeBtn) activeBtn.classList.add('active');
-
-            if (tabName === 'inicio') {
-                const key = getCurrentClientKey();
-                const guestCard = document.getElementById('guest-action-card');
-                if(guestCard) guestCard.style.display = key ? 'none' : 'block';
-
-                if(key) {
-                    document.getElementById('view-inicio').classList.remove('active');
-                    document.getElementById('view-dashboard').classList.add('active');
-                } else {
-                    document.getElementById('view-inicio').classList.add('active');
-                    document.getElementById('view-dashboard').classList.remove('active');
-                }
-                setTimeout(revealOnScroll, 100);
-            } else {
-                document.getElementById('view-dashboard').classList.remove('active');
-                const activeView = document.getElementById(`view-${tabName}`);
-                if(activeView) activeView.classList.add('active');
-            }
-
-            if (tabName === 'catalogo') {
-                setTimeout(() => completarMisionInteligente('catalogo'), 800);
-            } else if (tabName === 'soporte') {
-                setTimeout(() => completarMisionInteligente('soporte'), 800);
-            }
-
-            const bar = document.getElementById('sticky-client-bar');
-            if(bar) bar.classList.remove('show');
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            if(tabName !== 'catalogo') {
-                document.getElementById('floating-cart').classList.remove('show');
-            } else {
-                renderCartFloating();
-            }
-
-            actualizarBloqueoSoporte();
-        }
-
-        window.switchTab = switchTab;
-
         function openModal(id) { document.getElementById(id).classList.add('show'); }
         function closeModal(id) { document.getElementById(id).classList.remove('show'); }
         window.onclick = function(e) { if (e.target.classList.contains('modal')) e.target.classList.remove('show'); }
-
-        function openAuthSheet() { document.getElementById('auth-overlay').classList.add('show'); document.body.style.overflow = 'hidden'; }
-        function closeAuthSheet() { document.getElementById('auth-overlay').classList.remove('show'); document.body.style.overflow = 'auto'; }
-        function closeAuthSheetEvent(e) { if (e.target.classList.contains('auth-overlay')) closeAuthSheet(); }
-
-        function toggleAuth() {
-            if(getCurrentClientKey()) {
-                cerrarSesion();
-            } else {
-                openAuthSheet();
-            }
-        }
 
         function iniciarSaludoDinamico(nombreCompleto) {
             const primerNombre = String(nombreCompleto || "Cliente").trim().split(/\s+/)[0] || "Cliente";
@@ -5048,12 +4667,6 @@ body.gx-tab-transitioning {
                 }, 500);
             }, 6000);
         }
-
-    // [LIMPIEZA] normalizeString legado eliminado; la implementación activa vive en la capa Supabase.
-
-    // [LIMPIEZA] cargarDatosYVerificarSesion legado eliminado; la implementación activa vive en la capa Supabase.
-
-    // [LIMPIEZA] iniciarSesion legado eliminado; la implementación activa vive en la capa Supabase.
 
     function resetSesionVisual() {
             window.goxionCurrentClientKey = "";
@@ -5334,46 +4947,6 @@ body.gx-tab-transitioning {
 
             iniciarSaludoDinamico(cliente.nombre);
 
-            let configGlobal = globalClientesData._goxion_config || {};
-            let isComboUpsellActive = configGlobal.combo_upsell !== false; 
-
-            let hasPrime = false, hasHBO = false, hasCombo = false;
-            if(cliente.servicios && cliente.servicios.length > 0) {
-                cliente.servicios.forEach(s => {
-                    let n = s.nombre.toLowerCase();
-                    if(n.includes("prime") && !n.includes("hbo") && !n.includes("max")) hasPrime = true;
-                    if(n.includes("hbo") || n.includes("max")) { 
-                        if(n.includes("prime")) hasCombo = true; 
-                        else hasHBO = true; 
-                    }
-                });
-            }
-
-            let upsellHTML = '';
-            if(hasCombo) { 
-                upsellHTML = `
-                <div class="promo-card" style="background: rgba(46, 160, 67, 0.1); border-color: rgba(46, 160, 67, 0.3); box-shadow: 0 0 20px rgba(46, 160, 67, 0.15);">
-                    <div class="promo-title" style="color: var(--success-green);"><span>✨</span> ¡Felicidades, tienes el Combo GOXION!</div>
-                    <div class="promo-desc" style="color: var(--text-main);">Estás disfrutando de la mejor combinación (HBO Max + Prime Video) a un precio preferencial, ahorrando mes a mes.</div>
-                </div>`; 
-            } else if (isComboUpsellActive) {
-                if(hasPrime) { 
-                    upsellHTML = `
-                    <div class="promo-card">
-                        <div class="promo-title"><span>🔥</span> ¡Mejora tu plan hoy!</div>
-                        <div class="promo-desc">Detectamos que ya tienes Prime Video. Añade <strong>HBO Max Platino</strong> por un costo menor y arma tu Combo GOXION. ¡Ahorras todos los meses!</div>
-                        <button class="btn-promo" onclick="solicitarMejoraSilenciosa('HBO Max')">Añadir HBO Max al mejor precio</button>
-                    </div>`; 
-                } else if(hasHBO) { 
-                    upsellHTML = `
-                    <div class="promo-card">
-                        <div class="promo-title"><span>🔥</span> ¡Completa tu Combo!</div>
-                        <div class="promo-desc">Ya disfrutas de HBO Max. Suma <strong>Prime Video</strong> por un costo preferencial y arma tu Combo GOXION. ¡Ahorro garantizado cada mes!</div>
-                        <button class="btn-promo" onclick="solicitarMejoraSilenciosa('Prime Video')">Añadir Prime Video con descuento</button>
-                    </div>`; 
-                }
-            }
-
             const payAlert = document.getElementById('dash-payment-review-alert');
             if(payAlert) {
                 const reviewState = String(cliente.pago_revision_estado || '').toLowerCase();
@@ -5389,8 +4962,6 @@ body.gx-tab-transitioning {
                     payAlert.innerHTML = '';
                 }
             }
-
-            document.getElementById('dash-upsell').innerHTML = upsellHTML;
 
             const refContainer = document.getElementById('referral-section-container');
             
@@ -5658,7 +5229,7 @@ body.gx-tab-transitioning {
                     ${btnRefHtml}
                     ${btnCupHtml}
                 </div>
-                <div id="gamif-expanded-referral" class="gamif-expanded-container slide-left">
+                <div id="gamif-expanded-referral" class="gamif-expanded-container">
                     ${expandedRefHtml}
                 </div>
                 <div id="gamif-expanded-coupon" class="gamif-expanded-container">
@@ -5706,60 +5277,183 @@ body.gx-tab-transitioning {
             setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${Math.min((pagos / meta) * 100, 100)}%`; }, 300);
             document.getElementById('loyalty-msg').innerText = pagos >= 9 ? "¡Felicidades! Disfrutas de tu Nivel 2." : `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
 
-            let historyHTML = '';
-            if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
-                historyHTML = `<div class="glass-card"><div class="section-title">Historial de Transacciones</div>`;
-                [...cliente.historial_pagos].reverse().forEach(p => { 
-                    historyHTML += `
-                    <div class="history-item">
-                        <div class="history-dot"></div>
-                        <div class="history-info">
-                            <div class="history-month">${p.fecha}</div>
-                            <div class="history-status">✅ Acreditado a tiempo</div>
-                        </div>
-                        <div class="history-amount">$${p.monto.toFixed(2)}</div>
-                    </div>`; 
-                });
-                historyHTML += `</div>`;
-            }
-            document.getElementById('dash-history').innerHTML = historyHTML;
-
             const iconosMap = { "netflix": "🍿", "disney": "🏰", "max": "🎥", "prime": "📦", "youtube": "▶️", "vix": "⚽", "crunchyroll": "🍥", "spotify": "🎧", "apple": "🍎", "microsoft": "💻", "google": "☁️" };
             let srvHTML = '';
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s, idx) => {
-                    let icon = "📺"; 
-                    for(let i in iconosMap) { 
-                        if(s.nombre.toLowerCase().includes(i)) icon = iconosMap[i]; 
-                    }
-                    
-                    let credsBtns = '';
-                    if(s.correo_login || s.perfil_nombre || s.perfil_pin) {
-                        if(s.correo_login) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.correo_login}', 'Correo')">📧 <strong>${s.correo_login}</strong></div>`;
-                        if(s.perfil_nombre) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_nombre}', 'Perfil')">👤 <strong>${s.perfil_nombre}</strong></div>`;
-                        if(s.perfil_pin) credsBtns += `<div class="cred-tag" onclick="copiarDatoRapido('${s.perfil_pin}', 'PIN')">🔢 PIN: <strong>${s.perfil_pin}</strong></div>`;
-                    } else { 
-                        credsBtns = `<div style="font-size:11px; color:var(--text-muted); width:100%;">Tus accesos llegarán a tu correo o WhatsApp pronto.</div>`; 
-                    }
-                    
+                    let icon = "📺";
+                    for(const key in iconosMap) if(String(s.nombre || '').toLowerCase().includes(key)) icon = iconosMap[key];
+
                     srvHTML += `
-                    <div class="service-pill-container">
-                        <div class="service-pill-header">
-                            <div class="service-pill-left">
-                                <span>${icon}</span> <span>${s.nombre}</span>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <div class="service-status">Activo</div>
-                                <button class="btn-creds-toggle" onclick="toggleCreds('creds-${idx}')">👁️ Ver Accesos</button>
+                    <article class="gx-service-card">
+                        <div class="gx-service-card-main">
+                            <div class="gx-service-card-icon">${icon}</div>
+                            <div class="gx-service-card-info">
+                                <div class="gx-service-card-name">${s.nombre}</div>
+                                <div class="gx-service-card-state">Activo</div>
                             </div>
                         </div>
-                        <div class="cred-box" id="creds-${idx}" style="display:none;">${credsBtns}</div>
-                    </div>`;
+                        <button type="button" class="gx-service-manage-btn" onclick="gxOpenServiceManager(${idx})">Administrar</button>
+                    </article>`;
                 });
-            } else { 
-                srvHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center;">No tienes servicios activos.</p>`; 
+            } else {
+                srvHTML = `<div class="gx-catalog-empty" style="min-height:115px;margin:0;"><span>◌</span><strong>No tienes servicios activos</strong><small>Cuando contrates uno, aparecerá aquí.</small></div>`;
             }
             document.getElementById('dash-services').innerHTML = srvHTML;
+        }
+
+
+        let gxManagedServiceIndex = -1;
+
+        function gxNormalizeBrandName(nombre) {
+            return String(nombre || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+        }
+
+        function gxServiceIcon(nombre) {
+            const n = gxNormalizeBrandName(nombre);
+            const icons = {netflix:'🍿',disney:'🏰',max:'🎥',hbo:'🎥',prime:'📦',youtube:'▶️',vix:'⚽',crunchyroll:'🍥',spotify:'🎧',apple:'🍎',microsoft:'💻',google:'☁️'};
+            for (const key in icons) if (n.includes(key)) return icons[key];
+            return '📺';
+        }
+
+        function gxCurrentClient() {
+            const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : '';
+            return key && globalClientesData ? globalClientesData[key] : null;
+        }
+
+        function gxOpenServiceManager(index) {
+            const cliente = gxCurrentClient();
+            const servicio = cliente?.servicios?.[index];
+            if (!servicio) return;
+            gxManagedServiceIndex = index;
+
+            document.getElementById('gx-service-admin-icon').textContent = gxServiceIcon(servicio.nombre);
+            document.getElementById('gx-service-admin-title').textContent = servicio.nombre || 'Servicio';
+
+            const creds = [];
+            const safe = value => String(value || '').replace(/'/g,"\\'");
+            if (servicio.correo_login) creds.push(`<button type="button" class="cred-tag" onclick="copiarDatoRapido('${safe(servicio.correo_login)}','Correo')">📧 <strong>${servicio.correo_login}</strong></button>`);
+            if (servicio.perfil_nombre) creds.push(`<button type="button" class="cred-tag" onclick="copiarDatoRapido('${safe(servicio.perfil_nombre)}','Perfil')">👤 <strong>${servicio.perfil_nombre}</strong></button>`);
+            if (servicio.perfil_pin) creds.push(`<button type="button" class="cred-tag" onclick="copiarDatoRapido('${safe(servicio.perfil_pin)}','PIN')">🔢 PIN: <strong>${servicio.perfil_pin}</strong></button>`);
+
+            document.getElementById('gx-service-access-content').innerHTML = creds.length
+                ? `<div class="gx-service-admin-creds">${creds.join('')}</div>`
+                : `<div style="color:var(--text-muted);font-size:9.5px;line-height:1.5;">No hay credenciales visibles para este servicio. Si necesitas acceso, abre Soporte.</div>`;
+
+            gxResetServiceManagerPanels();
+            const overlay = document.getElementById('gx-service-admin-overlay');
+            overlay.classList.add('show');
+            overlay.setAttribute('aria-hidden','false');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function gxResetServiceManagerPanels() {
+            document.getElementById('gx-service-access-panel').hidden = true;
+            document.getElementById('gx-service-more-panel').hidden = true;
+            document.getElementById('gx-cancellation-panel').hidden = true;
+            document.getElementById('gx-service-more-chevron').textContent = '⌄';
+            document.getElementById('gx-cancellation-status').textContent = '';
+            const submit = document.getElementById('gx-cancellation-submit');
+            submit.disabled = false;
+            submit.textContent = 'Enviar solicitud';
+        }
+
+        function gxCloseServiceManager(event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+            const overlay = document.getElementById('gx-service-admin-overlay');
+            overlay.classList.remove('show');
+            overlay.setAttribute('aria-hidden','true');
+            document.body.style.overflow = 'auto';
+            gxManagedServiceIndex = -1;
+            setTimeout(gxResetServiceManagerPanels,220);
+        }
+
+        function gxToggleServiceAccess() {
+            const panel = document.getElementById('gx-service-access-panel');
+            panel.hidden = !panel.hidden;
+        }
+
+        function gxToggleServiceMore() {
+            const panel = document.getElementById('gx-service-more-panel');
+            panel.hidden = !panel.hidden;
+            document.getElementById('gx-service-more-chevron').textContent = panel.hidden ? '⌄' : '⌃';
+            if (panel.hidden) document.getElementById('gx-cancellation-panel').hidden = true;
+        }
+
+        function gxOpenCancellationFlow() { document.getElementById('gx-cancellation-panel').hidden = false; }
+        function gxCloseCancellationFlow() { document.getElementById('gx-cancellation-panel').hidden = true; }
+
+        function gxBestSupportButtonForService(name) {
+            const n = gxNormalizeBrandName(name);
+            const key = n.includes('hbo')||n.includes('max') ? 'max'
+                : n.includes('prime') ? 'prime'
+                : n.includes('netflix') ? 'netflix'
+                : n.includes('disney') ? 'disney'
+                : n.includes('youtube') ? 'youtube'
+                : n.includes('vix') ? 'vix'
+                : n.includes('crunchy') ? 'crunchy'
+                : n.includes('spotify') ? 'spotify'
+                : n.includes('google') ? 'google'
+                : n.includes('microsoft')||n.includes('365') ? 'microsoft'
+                : n.split(' ')[0];
+
+            return [...document.querySelectorAll('#support-platforms-grid .platform-btn')]
+                .find(btn => gxNormalizeBrandName(btn.textContent).includes(key)) || null;
+        }
+
+        function gxOpenServiceSupport() {
+            const cliente = gxCurrentClient();
+            const servicio = cliente?.servicios?.[gxManagedServiceIndex];
+            if (!servicio) return;
+            gxCloseServiceManager();
+            switchTab('soporte');
+            setTimeout(() => {
+                const btn = gxBestSupportButtonForService(servicio.nombre);
+                if (btn) selectPlatform(servicio.nombre,btn,null);
+            },430);
+        }
+
+        async function gxSubmitCancellation() {
+            const cliente = gxCurrentClient();
+            const servicio = cliente?.servicios?.[gxManagedServiceIndex];
+            const token = localStorage.getItem('goxion_client_token') || '';
+            const status = document.getElementById('gx-cancellation-status');
+            const submit = document.getElementById('gx-cancellation-submit');
+            if (!cliente || !servicio || !token) return;
+
+            submit.disabled = true;
+            submit.textContent = 'Registrando…';
+            status.textContent = '';
+
+            try {
+                const r = await fetch(NOTIFY_URL,{
+                    method:'POST',
+                    headers:{'Content-Type':'application/json','X-Client-Token':token},
+                    body:JSON.stringify({
+                        categoria:'soporte',
+                        titulo:'Solicitud de cancelación',
+                        mensaje:[
+                            `Servicio: ${servicio.nombre}`,
+                            servicio.id ? `Servicio ID: ${servicio.id}` : '',
+                            `Cliente: ${cliente.nombre || ''}`,
+                            cliente.folio ? `Folio: ${cliente.folio}` : '',
+                            'El cliente solicita iniciar el proceso de cancelación de este servicio.',
+                            'Requiere confirmación administrativa.'
+                        ].filter(Boolean).join('\n'),
+                        colorHex:'ff3366'
+                    })
+                });
+                const data = await r.json().catch(()=>({}));
+                if (!r.ok || data?.ok !== true) throw new Error(data?.error || 'No fue posible registrar la solicitud.');
+
+                submit.textContent = 'Solicitud enviada';
+                status.innerHTML = '<span style="color:var(--success-green);font-weight:800;">✓ Solicitud registrada.</span> Te confirmaremos cuando el cambio haya sido procesado.';
+            } catch (e) {
+                submit.disabled = false;
+                submit.textContent = 'Reintentar';
+                status.textContent = e?.message || 'No fue posible registrar la solicitud.';
+            }
         }
 
         function srvCleanName(n) { 
@@ -6029,10 +5723,104 @@ body.gx-tab-transitioning {
             }, 200);
         }
 
+
+        let gxCatalogActiveFilter = 'all';
+
+        function gxCatalogBrandKey(nombre) {
+            const n = gxNormalizeBrandName(nombre);
+            if (n.includes('netflix')) return 'netflix';
+            if (n.includes('disney')) return 'disney';
+            if (n.includes('hbo') || n.includes('max')) return 'max';
+            if (n.includes('prime') || n.includes('amazon')) return 'prime';
+            if (n.includes('youtube')) return 'youtube';
+            if (n.includes('vix')) return 'vix';
+            if (n.includes('crunchy')) return 'crunchyroll';
+            if (n.includes('spotify')) return 'spotify';
+            if (n.includes('google')) return 'google';
+            if (n.includes('microsoft') || n.includes('365')) return 'microsoft';
+            return n.replace(/[^a-z0-9]/g,'').slice(0,24);
+        }
+
+        function gxCatalogClientContext(data) {
+            const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : '';
+            const cliente = key ? data?.[key] : null;
+            return {
+                authenticated:Boolean(cliente),
+                cliente,
+                owned:new Set((cliente?.servicios || []).map(s => gxCatalogBrandKey(s.nombre)))
+            };
+        }
+
+        function gxCatalogRecommendation(brandKey, context, group) {
+            if (!context.authenticated || context.owned.has(brandKey)) return {score:0,reason:''};
+            let score = group.plans.some(p => Number(p.disponibles||0)>0) ? 4 : 0;
+            let reason = 'Disponible para ti';
+            if (brandKey === 'prime' && context.owned.has('max')) { score = 20; reason = 'Complementa tu HBO Max'; }
+            if (brandKey === 'max' && context.owned.has('prime')) { score = 20; reason = 'Complementa tu Prime Video'; }
+            if (group.plans.some(p => String(p.etiqueta||'').trim())) score += 2;
+            return {score,reason};
+        }
+
+        function gxSetupCatalogContext(context) {
+            const title = document.getElementById('gx-catalog-title');
+            const subtitle = document.getElementById('gx-catalog-subtitle');
+            const badge = document.getElementById('gx-catalog-session-badge');
+            const filters = document.getElementById('gx-catalog-filters');
+            gxCatalogActiveFilter = 'all';
+
+            if (context.authenticated) {
+                const count = context.cliente?.servicios?.length || 0;
+                title.textContent = 'Un catálogo que te conoce';
+                subtitle.textContent = 'Priorizamos opciones que complementan lo que ya tienes, sin duplicar información de tu cuenta.';
+                badge.textContent = `${count} servicio${count===1?'':'s'} activo${count===1?'':'s'}`;
+                badge.classList.add('personalized');
+                filters.innerHTML = `
+                    <button type="button" class="gx-catalog-filter-chip active" onclick="gxSetCatalogFilter('all',this)">Todos</button>
+                    <button type="button" class="gx-catalog-filter-chip" onclick="gxSetCatalogFilter('recommended',this)">Para ti</button>
+                    <button type="button" class="gx-catalog-filter-chip" onclick="gxSetCatalogFilter('available',this)">Disponibles</button>`;
+            } else {
+                title.textContent = 'Explora GOXION';
+                subtitle.textContent = 'Descubre servicios, promociones y disponibilidad en tiempo real.';
+                badge.textContent = 'Catálogo general';
+                badge.classList.remove('personalized');
+                filters.innerHTML = `
+                    <button type="button" class="gx-catalog-filter-chip active" onclick="gxSetCatalogFilter('all',this)">Todos</button>
+                    <button type="button" class="gx-catalog-filter-chip" onclick="gxSetCatalogFilter('available',this)">Disponibles</button>`;
+            }
+
+            const search = document.getElementById('gx-catalog-search');
+            if (search) search.value = '';
+        }
+
+        function gxSetCatalogFilter(filter,button) {
+            gxCatalogActiveFilter = filter || 'all';
+            document.querySelectorAll('#gx-catalog-filters .gx-catalog-filter-chip').forEach(b=>b.classList.toggle('active',b===button));
+            gxApplyCatalogFilters();
+        }
+
+        function gxApplyCatalogFilters() {
+            const q = gxNormalizeBrandName(document.getElementById('gx-catalog-search')?.value || '').trim();
+            const cards = [...document.querySelectorAll('#catalog-container .brand-card')];
+            let visible = 0;
+            cards.forEach(card => {
+                const matchesText = !q || gxNormalizeBrandName(card.dataset.gxSearch || card.textContent).includes(q);
+                const matchesFilter = gxCatalogActiveFilter === 'all'
+                    || (gxCatalogActiveFilter === 'available' && card.dataset.gxAvailable === '1')
+                    || (gxCatalogActiveFilter === 'recommended' && card.dataset.gxRecommended === '1');
+                const show = matchesText && matchesFilter;
+                card.style.display = show ? '' : 'none';
+                if (show) visible++;
+            });
+            document.getElementById('gx-catalog-empty').hidden = visible > 0;
+        }
+
         function cargarCatalogo(data) {
             const config = data._goxion_config;
             const catalogContainer = document.getElementById('catalog-container');
             if (!config || !config.serviciosGlobales || !Array.isArray(config.serviciosGlobales)) return;
+
+            const gxCatalogContext = gxCatalogClientContext(data);
+            gxSetupCatalogContext(gxCatalogContext);
 
             if (config.alertas && config.alertas.activa) {
                 const banner = document.getElementById('dynamic-alert');
@@ -6113,10 +5901,40 @@ body.gx-tab-transitioning {
                 });
             });
 
+            const gxCatalogEntries = Object.entries(window.catalogGroups).map(([bKey,brand]) => {
+                const canonical = gxCatalogBrandKey(brand.name || bKey);
+                const rec = gxCatalogRecommendation(canonical,gxCatalogContext,brand);
+                brand.gxOwned = gxCatalogContext.owned.has(canonical);
+                brand.gxAvailable = brand.plans.some(p => Number(p.disponibles||0)>0);
+                brand.gxRecommendationScore = rec.score;
+                brand.gxRecommendationReason = rec.reason;
+                brand.gxRecommended = gxCatalogContext.authenticated && !brand.gxOwned && brand.gxAvailable && rec.score > 0;
+                return [bKey,brand];
+            });
+
+            gxCatalogEntries.sort((a,b) => {
+                const A=a[1], B=b[1];
+                if (gxCatalogContext.authenticated) {
+                    if (A.gxOwned !== B.gxOwned) return A.gxOwned ? 1 : -1;
+                    if (A.gxRecommendationScore !== B.gxRecommendationScore) return B.gxRecommendationScore - A.gxRecommendationScore;
+                }
+                if (A.gxAvailable !== B.gxAvailable) return A.gxAvailable ? -1 : 1;
+                return String(A.name||'').localeCompare(String(B.name||''),'es');
+            });
+
+            // Evita saturar: solo las 3 opciones más relevantes reciben "Para ti".
+            if (gxCatalogContext.authenticated) {
+                let recommendedSlots = 0;
+                gxCatalogEntries.forEach(([,brand]) => {
+                    const eligible = !brand.gxOwned && brand.gxAvailable && brand.gxRecommendationScore > 0;
+                    brand.gxRecommended = eligible && recommendedSlots < 3;
+                    if (brand.gxRecommended) recommendedSlots++;
+                });
+            }
+
             let htmlCatalogo = '';
-            
-            for (let bKey in window.catalogGroups) {
-                let brand = window.catalogGroups[bKey];
+
+            for (const [bKey,brand] of gxCatalogEntries) {
                 let minPrice = Math.min(...brand.plans.map(p => p.precio));
                 
                 let pillsHtml = '';
@@ -6153,8 +5971,23 @@ body.gx-tab-transitioning {
                 
                 let badgeHtml = brandTag ? `<span class="${badgeClass}" style="margin-top: 2px;">${brandTag}</span>` : '';
 
+                const gxContextBadge = gxCatalogContext.authenticated
+                    ? (brand.gxOwned
+                        ? `<span class="gx-catalog-context-badge owned">✓ Ya lo tienes</span>`
+                        : (brand.gxRecommended ? `<span class="gx-catalog-context-badge recommended">✦ Para ti</span>` : ''))
+                    : '';
+
+                const gxReason = gxCatalogContext.authenticated && brand.gxRecommended && !brand.gxOwned
+                    ? `<div class="gx-catalog-smart-reason">${brand.gxRecommendationReason}</div>`
+                    : '';
+
                 htmlCatalogo += `
-                <div class="brand-card ${cardPromoClass}" id="brand-card-${bKey}">
+                <div class="brand-card ${cardPromoClass} ${brand.gxOwned ? 'gx-owned-service' : ''}"
+                     id="brand-card-${bKey}"
+                     data-gx-search="${brand.name} ${brand.plans.map(p=>p.nombre).join(' ')}"
+                     data-gx-owned="${brand.gxOwned ? '1' : '0'}"
+                     data-gx-recommended="${brand.gxRecommended ? '1' : '0'}"
+                     data-gx-available="${brand.gxAvailable ? '1' : '0'}">
                     <div class="brand-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleBrandCard('${bKey}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrandCard('${bKey}');}">
                         <div class="brand-header-left">
                             <img src="${brand.img}" class="brand-logo-img" onerror="this.src='logo2.PNG'">
@@ -6162,8 +5995,10 @@ body.gx-tab-transitioning {
                                 <div style="display:flex; align-items:center; gap:6px; flex-wrap: wrap;">
                                     <div class="brand-name">${brand.name}</div>
                                     ${badgeHtml}
+                                    ${gxContextBadge}
                                 </div>
                                 <div class="brand-price-start">Desde $${minPrice}</div>
+                                ${gxReason}
                             </div>
                         </div>
                         <div class="brand-expand-icon">⏷</div>
@@ -6193,6 +6028,7 @@ body.gx-tab-transitioning {
             for (let bKey in window.catalogGroups) {
                 selectSubPlan(bKey, 0, null, true);
             }
+            gxApplyCatalogFilters();
         }
 
         function actualizarCarrito(nombre, precio, cambio, safeId) {
@@ -6221,7 +6057,7 @@ body.gx-tab-transitioning {
             }
         }
 
-        function enviarPedido() {
+        function enviarPedidoBase() {
             let msgDiscord = ""; 
             let totalPrecio = 0;
             
@@ -6839,7 +6675,7 @@ body.gx-tab-transitioning {
             document.getElementById('step-3').classList.add('active');
         }
 
-        function sendSmartWA() {
+        function sendSmartWABase() {
             const idx = document.getElementById('issue-selector').value; 
             if(idx === "") return;
             const val = document.getElementById('smart-extra-input').value.trim(); 
@@ -6930,8 +6766,8 @@ body.gx-tab-transitioning {
 
 
         
-function goxionLegacyAdapter(data) {
-    const legacy = {
+function goxionViewModelAdapter(data) {
+    const viewModel = {
         _goxion_config: {
             alertas: data?.alertas || {},
             serviciosGlobales: Array.isArray(data?.catalogo) ? data.catalogo : [],
@@ -6942,7 +6778,7 @@ function goxionLegacyAdapter(data) {
     if (data?.cliente) {
         const c = data.cliente;
         const key = c.clave || "";
-        legacy[key] = {
+        viewModel[key] = {
             id: c.id,
             clave: c.clave,
             folio: c.folio || "",
@@ -6982,7 +6818,7 @@ function goxionLegacyAdapter(data) {
         };
     }
 
-    return legacy;
+    return viewModel;
 }
 
 
@@ -6993,7 +6829,7 @@ function goxionLegacyAdapter(data) {
             return { text:t, json:j };
         }
 
-        async function aplicarInventarioPublico(legacy) {
+        async function aplicarInventarioPublico(viewModel) {
             try {
                 const r = await fetch(INVENTARIO_PUBLICO_URL, {
                     method: "POST",
@@ -7009,7 +6845,7 @@ function goxionLegacyAdapter(data) {
                 const porId = new Map((json.inventario || []).map(x => [String(x.id), x]));
                 const porNombre = new Map((json.inventario || []).map(x => [String(x.nombre).toLowerCase(), x]));
 
-                const catalogo = legacy?._goxion_config?.serviciosGlobales;
+                const catalogo = viewModel?._goxion_config?.serviciosGlobales;
                 if (Array.isArray(catalogo)) {
                     catalogo.forEach(s => {
                         const info =
@@ -7023,10 +6859,10 @@ function goxionLegacyAdapter(data) {
                     });
                 }
 
-                return legacy;
+                return viewModel;
             } catch (e) {
                 console.error("Inventario público:", e);
-                return legacy;
+                return viewModel;
             }
         }
 
@@ -7044,7 +6880,7 @@ function goxionLegacyAdapter(data) {
                     if (r.ok && json?.ok === true) {
                         window.goxionCurrentClientKey = String(json?.cliente?.clave || "");
                         await migrarProgresoLocalSiExiste(json);
-                        return await aplicarInventarioPublico(goxionLegacyAdapter(json));
+                        return await aplicarInventarioPublico(goxionViewModelAdapter(json));
                     }
                     if (r.status === 401) {
                         localStorage.removeItem(TOKEN_KEY);
@@ -7063,7 +6899,7 @@ function goxionLegacyAdapter(data) {
             });
             const {text,json} = await parseJSON(r);
             if (!r.ok || json?.ok !== true) throw new Error(json?.error || text || "No fue posible cargar el catálogo.");
-            return await aplicarInventarioPublico(goxionLegacyAdapter(json));
+            return await aplicarInventarioPublico(goxionViewModelAdapter(json));
         }
 
         cargarDatosYVerificarSesion = async function() {
@@ -7214,7 +7050,7 @@ function goxionLegacyAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda v1.0.4: Supabase activo; login y carga legacy retirados.");
+        console.info("GOXION Beta 03.01: Control de Cliente + Catálogo Inteligente.");
     })();
     </script>
 
@@ -7474,7 +7310,7 @@ function goxionLegacyAdapter(data) {
     }
 
     function gxSetPanelReady(panel, visible) {
-        panel.classList.remove('gx-morph-in', 'gx-morph-out', 'slide-left');
+        
         panel.classList.toggle('gx-shared-panel', visible);
         panel.style.display = visible ? 'block' : 'none';
         panel.style.opacity = visible ? '1' : '';
@@ -7584,7 +7420,7 @@ function goxionLegacyAdapter(data) {
             grid.style.display = 'none';
             gxSetPanelReady(otherPanel, false);
 
-            panel.classList.remove('gx-morph-in', 'gx-morph-out', 'slide-left');
+            
             panel.classList.add('gx-shared-panel');
             panel.style.display = 'block';
             panel.style.visibility = 'hidden';
@@ -7901,7 +7737,7 @@ function goxionLegacyAdapter(data) {
 })();
 </script>
 
-<script id="goxion-wave-background-beta">
+<script id="goxion-wave-background">
 (() => {
     const canvas = document.getElementById('gx-wave-canvas');
     if (!canvas) return;
@@ -8137,22 +7973,18 @@ function goxionLegacyAdapter(data) {
     window.addEventListener('resize', resize, {passive:true});
     resize();
     raf = requestAnimationFrame(frame);
-    console.info('GOXION Beta Background: Wave 02.9 Catalog Morph activo.');
+    console.info('GOXION Background Wave activo.');
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Ayuda v1.0.28 · BETA WAVE 02.33</div>
-
-<script id="goxion-motion-system-02-18-js">
+<script id="goxion-production-interactions-js">
 (() => {
     const reduceMotion = () =>
         window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-
     /* =========================================================
-       1) NAVIGATION // OFFICIAL ENGINE 02.33
-       Restores the production behavior:
+       1) NAVIGATION // PRODUCTION
+       Uses the approved production behavior:
        - instant active-class swap
        - one lightweight fadeIn on the incoming view
        - nav pill morph remains pure CSS
@@ -8176,7 +8008,7 @@ function goxionLegacyAdapter(data) {
         if (tabName === 'inicio') {
             const key = typeof getCurrentClientKey === 'function'
                 ? getCurrentClientKey()
-                : (localStorage.getItem('goxion_user_key') || '');
+                : '';
 
             const guestCard = document.getElementById('guest-action-card');
             if (guestCard) guestCard.style.display = key ? 'none' : 'block';
@@ -8258,7 +8090,7 @@ function goxionLegacyAdapter(data) {
         });
     }
 
-    const originalEnviarPedido = window.enviarPedido;
+    const originalEnviarPedido = typeof enviarPedidoBase === 'function' ? enviarPedidoBase : null;
     if (typeof originalEnviarPedido === 'function') {
         window.enviarPedido = function(...args) {
             const btn = document.querySelector('#floating-cart .cart-btn');
@@ -8281,7 +8113,7 @@ function goxionLegacyAdapter(data) {
         };
     }
 
-    const originalSendSmartWA = window.sendSmartWA;
+    const originalSendSmartWA = typeof sendSmartWABase === 'function' ? sendSmartWABase : null;
     if (typeof originalSendSmartWA === 'function') {
         window.sendSmartWA = function(...args) {
             const selector = document.getElementById('issue-selector');
@@ -8309,7 +8141,7 @@ function goxionLegacyAdapter(data) {
     }
 
     /* =========================================================
-       3) MI ESPACIO -> STABLE TRANSFORM ONLY
+       3) MI ESPACIO -> STABLE TRANSFORM
        No shared title motion. No emoji motion. No visual handoffs.
        ========================================================= */
     let gxAuthBusy = false;
