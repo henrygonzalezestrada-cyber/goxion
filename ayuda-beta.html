@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-05">
+<html lang="es" data-goxion-version="1.1.0-beta-06">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -5190,34 +5190,31 @@
                 <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
 
                 <button type="button" class="gx-account-capsule" onclick="irAlTicket()">
-                    <span class="gx-account-capsule-icon">🧾</span>
-                    <span>Estado de Cuenta</span>
+                    <span class="gx-account-capsule-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M6.5 3.5h8l3 3V20.5h-11z"></path>
+                            <path d="M14.5 3.5v3h3"></path>
+                            <path d="M9 11h6M9 14.5h6"></path>
+                        </svg>
+                    </span>
+                    <span class="gx-account-capsule-label">Estado de Cuenta</span>
                     <span class="gx-account-capsule-arrow">→</span>
                 </button>
             </div>
 
-            <div class="gx-dashboard-section-head">
+            <div id="referral-section-container" class="gx-gamification-mid"></div>
+
+            <div class="gx-dashboard-section-head gx-services-head">
                 <div class="section-title">Tus servicios</div>
                 <div class="gx-dashboard-section-subtitle">Toca una plataforma para administrarla</div>
             </div>
             <div id="dash-services" class="gx-services-stack"></div>
-
-            <div id="referral-section-container" class="gx-gamification-mid"></div>
 
             <div class="gx-dashboard-section-head gx-history-head">
                 <div class="section-title">Historial de pagos</div>
                 <div class="gx-dashboard-section-subtitle">Tu constancia y lealtad</div>
             </div>
             <div id="dash-history"></div>
-
-            <button type="button" class="gx-account-card" onclick="irAlTicket()">
-                <span class="gx-account-card-icon">🧾</span>
-                <span class="gx-account-card-copy">
-                    <strong>Estado de Cuenta</strong>
-                    <small>Consulta cargos, descuentos y total actual</small>
-                </span>
-                <span class="gx-account-card-arrow">→</span>
-            </button>
         </div>
 
         <div id="view-catalogo" class="view-section">
@@ -6306,7 +6303,7 @@
 
                     if (smartType === 'pago') {
                         extraIcon = '💳';
-                        clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nDebes ir al menú principal y presionar el botón \\'Ver Estado de Cuenta y Pagar\\' para completar esta misión.')"`;
+                        clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nDebes abrir \\'Estado de Cuenta\\' desde Mi Espacio para completar esta misión.')"`;
                     } else if (smartType === 'catalogo') {
                         extraIcon = '🛒';
                         clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nDebes visitar nuestra pestaña de \\'Catálogo\\' en la app para completarlo.')"`;
@@ -6338,7 +6335,7 @@
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
                     <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
-                        <div class="gx-gamif-shared-emoji ${couponClaimed ? '' : 'shake-anim'}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
+                        <div class="gx-gamif-shared-emoji ${missionReady && !missionClaimed ? 'shake-anim' : ''}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
                         <div style="font-size: 16px; font-weight: 800; color: var(--neon-blue);">¡Desbloquea ${gamifConfig.descuento}% OFF!</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Completa las siguientes misiones para reclamar tu descuento especial:</div>
                     </div>
@@ -8787,6 +8784,13 @@ function goxionViewModelAdapter(data) {
         if (!floating || !realTarget) return;
 
         const oldInlineOpacity = realTarget.style.opacity;
+        const oldInlineAnimation = realTarget.style.animation;
+        const oldInlineWebkitAnimation = realTarget.style.webkitAnimation;
+
+        // Evita que el emoji real se mueva debajo del emoji flotante durante
+        // el handoff (Safari hacía visible una "doble" misión durante unos ms).
+        realTarget.style.animation = 'none';
+        realTarget.style.webkitAnimation = 'none';
         realTarget.style.visibility = 'visible';
         realTarget.style.opacity = '0';
 
@@ -8808,6 +8812,10 @@ function goxionViewModelAdapter(data) {
         realTarget.style.opacity = oldInlineOpacity;
         realTarget.style.visibility = '';
         floating.remove();
+
+        // Restauramos la animación después de retirar la copia flotante.
+        realTarget.style.animation = oldInlineAnimation;
+        realTarget.style.webkitAnimation = oldInlineWebkitAnimation;
     }
 
     function gxAnimateChildren(panel, entering) {
@@ -9185,6 +9193,7 @@ function goxionViewModelAdapter(data) {
                 host.appendChild(spacer);
             }
 
+            source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
 
             const cards = Array.from(grid.children);
@@ -9242,6 +9251,7 @@ function goxionViewModelAdapter(data) {
             surface = null;
             floatingEmoji?.remove();
             floatingEmoji = null;
+            source.classList.remove('gx-gamif-watermark-hidden');
             spacer?.remove();
             spacer = null;
 
@@ -9252,6 +9262,7 @@ function goxionViewModelAdapter(data) {
             if (surface?.isConnected) surface.remove();
             if (floatingEmoji?.isConnected) floatingEmoji.remove();
             if (spacer?.isConnected) spacer.remove();
+            source?.classList?.remove('gx-gamif-watermark-hidden');
 
             panel.style.opacity = '';
             panel.style.transform = '';
@@ -10201,31 +10212,394 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <style id="gx-beta-final-styles">
-/* Beta 03.04 — cápsula y administración directa */
-.gx-account-capsule{position:relative;overflow:hidden;min-height:40px;padding:0 16px;border:1px solid rgba(155,132,255,.55);background:linear-gradient(115deg,rgba(124,77,255,.28),rgba(37,123,255,.18));color:#e8e5ff;font-size:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.13)}
-.gx-account-capsule::after{content:'';position:absolute;inset:0;background:linear-gradient(110deg,transparent,rgba(255,255,255,.22),transparent);transform:translateX(-110%);pointer-events:none}
-.gx-account-capsule:active::after{transform:translateX(110%);transition:transform .4s ease}
-.gx-account-capsule-icon{font-size:14px}.gx-account-capsule:focus-visible,.gx-service-manage-card button:focus-visible{outline:2px solid #a999ff;outline-offset:3px}
-.gx-service-summary{padding:14px;gap:12px}.gx-service-logo-img{width:36px;height:36px;flex:0 0 36px;border-radius:10px;object-fit:contain;box-shadow:none}.gx-service-manage-card.expanded .gx-service-logo-img{transform:none}
-.gx-service-manage-card .gx-service-expand-icon{min-width:32px;width:32px;font-size:16px}.gx-service-manage-card.expanded .gx-service-expand-icon{background:rgba(139,112,255,.18);color:#d9ceff;box-shadow:none}
-.gx-service-home,.gx-service-view{padding:4px 4px 8px}.gx-service-view[hidden],.gx-service-home[hidden]{display:none!important}
-.gx-access-heading{color:#aeb5c8;font-size:12px;margin:3px 0 12px;font-weight:600}
-.gx-access-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0}.gx-access-row+ .gx-access-row{border-top:1px solid rgba(255,255,255,.06)}
-.gx-access-row>div{min-width:0}.gx-access-row span{display:block;font-size:12px;color:#9da7bc}.gx-access-row strong{display:block;font-size:14px;color:#eef0fa;font-weight:500;overflow-wrap:anywhere;margin-top:3px}
-.gx-access-row button,.gx-service-toolbar button,.gx-service-back{border:0;background:transparent;color:#c4b8ff;font:inherit;font-size:12px;cursor:pointer;min-height:40px;padding:8px;flex-shrink:0}
-.gx-service-toolbar{display:flex;justify-content:space-between;gap:8px;border-top:1px solid rgba(255,255,255,.08);margin-top:12px;padding-top:8px}.gx-service-toolbar button:last-child{color:#aab1c2}
-.gx-service-view h3{font-size:16px;margin:12px 0}.gx-service-view p,.gx-access-empty{font-size:14px;line-height:1.6;color:#ccd0dc}.gx-service-view .gx-cancel-detail{color:#98a3b9;font-size:12px;margin:10px 0 18px}.gx-service-back{padding-left:0}.gx-cancel-link{width:100%;display:flex;justify-content:space-between;padding:18px 0;border:0;background:transparent;color:#e8becb;font:inherit;font-size:14px;cursor:pointer}.gx-service-view .gx-service-cancel-submit{font-size:14px;min-height:44px;padding:10px 16px;border-radius:999px}
-@media(prefers-reduced-motion:reduce){.gx-account-capsule::after{display:none}}
+/* =========================================================
+   GOXION BETA 03.06 · PULIDO VISUAL
+   Mantiene las funciones de 03.05 y corrige jerarquía,
+   coherencia visual y pequeños artefactos de interacción.
+   ========================================================= */
 
+/* ---------- Orden y respiración de Mi Espacio ---------- */
+.gx-gamification-mid{
+    margin-top:0!important;
+    margin-bottom:25px;
+}
+.gx-services-head{
+    margin-top:0!important;
+}
+.gx-history-head{
+    margin-top:25px!important;
+}
 
-/* Beta 03.05 — overrides finales, después de la cascada histórica */
-.gx-account-capsule{background:linear-gradient(110deg,#7041db,#345de0);border:1px solid #a58afa;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 3px 12px rgba(82,49,174,.20);font-size:12px;min-height:40px;padding:0 17px}
-.gx-service-toolbar{justify-content:flex-end}.gx-option-support,.gx-service-view .gx-cancel-link{display:flex;width:100%;justify-content:space-between;align-items:center;gap:12px;min-height:48px;padding:13px 15px;margin-top:10px;border:1px solid rgba(164,141,240,.22);border-radius:14px;background:rgba(124,77,255,.10);color:#ded5ff;font:inherit;font-size:13px;cursor:pointer}.gx-service-view .gx-cancel-link{border-color:rgba(255,153,180,.14);background:rgba(255,153,180,.04);color:#dfb8c5}
-.gx-service-state.gx-service-interrupted{color:#e9bb73}.gx-service-state.gx-service-interrupted::before{background:#e9bb73;box-shadow:none}
-body:has(#view-catalogo.active) #goxion-main-nav{margin-bottom:6px}#view-catalogo .gx-catalog-toolbar{margin-top:0;margin-bottom:12px}
-.brand-header-left{min-width:0;flex:1}.brand-titles{min-width:0;flex:1}.brand-logo-img{flex-shrink:0}.brand-header>.brand-expand-icon{flex-shrink:0;margin-left:10px}.gx-brand-meta{display:flex;align-items:center;gap:8px;min-width:0;margin-top:5px}.gx-brand-meta .brand-price-start{white-space:nowrap;flex-shrink:0}.gx-brand-meta .gx-catalog-context-badge{font-size:9px;line-height:1.2;min-height:18px;padding:2px 5px;white-space:nowrap;flex-shrink:0;border:0;background:transparent}.gx-catalog-smart-reason{margin:0 0 12px;font-size:12px}.brand-name{overflow-wrap:anywhere}
-@media(max-width:380px){.brand-header-left{gap:10px}.gx-brand-meta{gap:5px}.gx-brand-meta .gx-catalog-context-badge{font-size:8px;padding:2px}.brand-header>.brand-expand-icon{margin-left:6px}}
+/* ---------- Estado de Cuenta: cápsula GOXION ---------- */
+.gx-account-capsule{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    width:fit-content;
+    max-width:100%;
+    min-height:40px;
+    margin:16px auto 0;
+    padding:0 15px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
 
+    appearance:none;
+    -webkit-appearance:none;
+    border:1px solid transparent;
+    border-radius:999px;
+    background:
+        linear-gradient(180deg,rgba(15,16,23,.82),rgba(8,9,14,.76)) padding-box,
+        linear-gradient(105deg,rgba(124,77,255,.70),rgba(0,242,254,.58)) border-box;
+    color:#f7f8ff;
+    font-family:'Poppins',sans-serif;
+    font-size:10.5px;
+    font-weight:800;
+    letter-spacing:.05px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.055),
+        0 8px 22px rgba(0,0,0,.18);
+    -webkit-tap-highlight-color:transparent;
+    cursor:pointer;
+}
+.gx-account-capsule::before{
+    content:'';
+    position:absolute;
+    inset:1px auto 1px 1px;
+    width:34%;
+    border-radius:999px;
+    background:linear-gradient(90deg,rgba(124,77,255,.10),transparent);
+    pointer-events:none;
+}
+.gx-account-capsule::after{
+    content:'';
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:-42%;
+    width:34%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);
+    transform:skewX(-18deg);
+    opacity:0;
+    pointer-events:none;
+}
+.gx-account-capsule:active::after{
+    opacity:1;
+    animation:gxAccountCapsuleSweep .42s ease-out 1;
+}
+@keyframes gxAccountCapsuleSweep{
+    from{left:-42%}
+    to{left:112%}
+}
+.gx-account-capsule-icon{
+    position:relative;
+    z-index:1;
+    width:26px;
+    height:26px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:rgba(0,242,254,.07);
+    color:var(--neon-blue);
+    border:1px solid rgba(0,242,254,.13);
+}
+.gx-account-capsule-label,
+.gx-account-capsule-arrow{
+    position:relative;
+    z-index:1;
+}
+.gx-account-capsule-arrow{
+    color:var(--neon-blue);
+    font-size:14px;
+    transform:translateX(0);
+    transition:transform .18s ease;
+}
+.gx-account-capsule:active .gx-account-capsule-arrow{
+    transform:translateX(2px);
+}
+.gx-account-capsule:focus-visible,
+.gx-service-manage-card button:focus-visible{
+    outline:2px solid rgba(0,242,254,.62);
+    outline-offset:3px;
+}
+
+/* ---------- Tus servicios: mismo lenguaje del Catálogo ---------- */
+.gx-service-summary{
+    padding:13px 14px!important;
+    gap:12px!important;
+}
+.gx-service-logo-img{
+    width:43px!important;
+    height:43px!important;
+    flex:0 0 43px!important;
+    border-radius:12px!important;
+    object-fit:contain!important;
+    padding:2px;
+    background:rgba(0,0,0,.34)!important;
+    border:1px solid rgba(255,255,255,.055);
+    box-shadow:0 5px 14px rgba(0,0,0,.26)!important;
+}
+.gx-service-manage-card.expanded .gx-service-logo-img{
+    transform:scale(1.035)!important;
+}
+.gx-service-name{
+    font-size:14px!important;
+    line-height:1.2!important;
+    font-weight:800!important;
+}
+.gx-service-state{
+    margin-top:5px!important;
+    font-size:10px!important;
+    font-weight:750!important;
+}
+.gx-service-manage-card .gx-service-expand-icon{
+    min-width:44px!important;
+    width:auto!important;
+    height:auto!important;
+    padding:8px 14px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(0,242,254,.30)!important;
+    background:rgba(0,242,254,.10)!important;
+    color:var(--neon-blue)!important;
+    font-size:12px!important;
+    line-height:1!important;
+    font-weight:700!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    flex-shrink:0!important;
+    margin-left:8px;
+    box-shadow:none!important;
+}
+.gx-service-manage-card.expanded .gx-service-expand-icon{
+    background:var(--neon-blue)!important;
+    border-color:var(--neon-blue)!important;
+    color:#000!important;
+    box-shadow:0 0 15px rgba(0,242,254,.40)!important;
+}
+
+/* Contenido integrado: sin cuadros dentro de cuadros */
+.gx-service-home,
+.gx-service-view{
+    padding:2px 3px 7px!important;
+}
+.gx-service-view[hidden],
+.gx-service-home[hidden]{
+    display:none!important;
+}
+.gx-access-heading{
+    margin:2px 0 5px!important;
+    color:rgba(168,181,204,.74)!important;
+    font-size:9px!important;
+    line-height:1.2!important;
+    font-weight:800!important;
+    letter-spacing:1.15px;
+    text-transform:uppercase;
+}
+.gx-access-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:11px 2px!important;
+}
+.gx-access-row + .gx-access-row{
+    border-top:1px solid rgba(255,255,255,.055)!important;
+}
+.gx-access-row>div{min-width:0}
+.gx-access-row span{
+    display:block;
+    color:var(--text-muted)!important;
+    font-size:9.5px!important;
+}
+.gx-access-row strong{
+    display:block;
+    margin-top:2px!important;
+    color:#eef2fb!important;
+    font-size:12px!important;
+    line-height:1.35;
+    font-weight:650!important;
+    overflow-wrap:anywhere;
+}
+.gx-access-row button{
+    min-height:31px!important;
+    padding:0 9px!important;
+    border:1px solid rgba(0,242,254,.12)!important;
+    border-radius:999px!important;
+    background:rgba(0,242,254,.04)!important;
+    color:var(--neon-blue)!important;
+    font:inherit;
+    font-size:9px!important;
+    font-weight:800!important;
+    cursor:pointer;
+    flex-shrink:0;
+}
+.gx-access-empty{
+    padding:9px 1px;
+    color:var(--text-muted)!important;
+    font-size:10px!important;
+    line-height:1.5!important;
+}
+.gx-service-toolbar{
+    display:flex!important;
+    justify-content:flex-end!important;
+    gap:8px;
+    margin-top:5px!important;
+    padding-top:10px!important;
+    border-top:1px solid rgba(255,255,255,.055)!important;
+}
+.gx-service-toolbar button{
+    min-height:32px!important;
+    padding:0 11px!important;
+    border:1px solid rgba(255,255,255,.075)!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.025)!important;
+    color:var(--text-muted)!important;
+    font:inherit;
+    font-size:9.5px!important;
+    font-weight:750!important;
+    cursor:pointer;
+}
+
+/* Vista Más opciones: filas limpias dentro de la misma tarjeta */
+.gx-service-back{
+    min-height:34px!important;
+    padding:0 2px 7px!important;
+    border:0!important;
+    background:transparent!important;
+    color:var(--text-muted)!important;
+    font:inherit;
+    font-size:9.5px!important;
+    font-weight:700!important;
+    cursor:pointer;
+}
+.gx-option-support,
+.gx-service-view .gx-cancel-link{
+    width:100%!important;
+    min-height:49px!important;
+    margin:0!important;
+    padding:12px 2px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    border:0!important;
+    border-top:1px solid rgba(255,255,255,.055)!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:#e8ecf6!important;
+    font:inherit!important;
+    font-size:11px!important;
+    font-weight:700!important;
+    text-align:left;
+    cursor:pointer;
+}
+.gx-option-support span:last-child{
+    color:var(--neon-blue);
+}
+.gx-service-view .gx-cancel-link{
+    color:rgba(238,184,201,.90)!important;
+}
+.gx-service-view .gx-cancel-link span:last-child{
+    color:#ff91ad;
+}
+.gx-service-view h3{
+    margin:9px 0 8px!important;
+    color:#fff;
+    font-size:14px!important;
+    line-height:1.25;
+}
+.gx-service-view p{
+    color:#cbd1df!important;
+    font-size:10.5px!important;
+    line-height:1.55!important;
+}
+.gx-service-view .gx-cancel-detail{
+    margin:8px 0 15px!important;
+    color:var(--text-muted)!important;
+    font-size:9.5px!important;
+}
+.gx-service-view .gx-service-cancel-submit{
+    min-height:38px!important;
+    padding:0 14px!important;
+    border-radius:999px!important;
+    border:1px solid rgba(255,51,102,.20)!important;
+    background:rgba(255,51,102,.07)!important;
+    color:#ff91ad!important;
+    box-shadow:none!important;
+    font-size:9.5px!important;
+    font-weight:800!important;
+}
+
+/* Estado especial del servicio conservado */
+.gx-service-state.gx-service-interrupted{
+    color:#e9bb73!important;
+}
+.gx-service-state.gx-service-interrupted::before{
+    background:#e9bb73!important;
+    box-shadow:none!important;
+}
+
+/* ---------- Catálogo: recupera respiración bajo la navegación ---------- */
+/* La navegación vuelve a usar su margen base de 20px. */
+#view-catalogo .gx-catalog-toolbar{
+    margin-top:2px!important;
+    margin-bottom:14px!important;
+}
+
+/* Ajustes acertados de 03.05 que sí conservamos */
+.brand-header-left{min-width:0;flex:1}
+.brand-titles{min-width:0;flex:1}
+.brand-logo-img{flex-shrink:0}
+.brand-header>.brand-expand-icon{flex-shrink:0;margin-left:10px}
+.gx-brand-meta{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-width:0;
+    margin-top:5px;
+}
+.gx-brand-meta .brand-price-start{
+    white-space:nowrap;
+    flex-shrink:0;
+}
+.gx-brand-meta .gx-catalog-context-badge{
+    min-height:18px;
+    padding:2px 5px;
+    border:0;
+    background:transparent;
+    white-space:nowrap;
+    flex-shrink:0;
+    font-size:9px;
+    line-height:1.2;
+}
+.gx-catalog-smart-reason{
+    margin:0 0 12px;
+    font-size:12px;
+}
+.brand-name{overflow-wrap:anywhere}
+
+/* ---------- Misiones: sin doble watermark durante el morph ---------- */
+.gx-gamif-card.gx-gamif-watermark-hidden::before{
+    opacity:0!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+}
+
+@media(max-width:380px){
+    .brand-header-left{gap:10px}
+    .gx-brand-meta{gap:5px}
+    .gx-brand-meta .gx-catalog-context-badge{font-size:8px;padding:2px}
+    .brand-header>.brand-expand-icon{margin-left:6px}
+    .gx-service-summary{gap:10px!important;padding:12px!important}
+    .gx-service-logo-img{width:40px!important;height:40px!important;flex-basis:40px!important}
+    .gx-service-manage-card .gx-service-expand-icon{padding:8px 12px!important;margin-left:5px}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-account-capsule::after{display:none}
+}
 </style>
 </body>
 </html>
