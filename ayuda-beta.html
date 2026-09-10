@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-09">
+
+<html data-goxion-version="1.1.0-beta-10" lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <meta name="theme-color" content="#030305">
-    <title>GOXION - Ecosistema Central</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta content="#030305" name="theme-color"/>
+<title>GOXION - Ecosistema Central</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
         :root {
             --bg-black: #030305;
             --card-glass: rgba(8, 8, 12, 0.25);
@@ -2790,7 +2791,6 @@
         }
 
 </style>
-
 <style id="goxion-referral-ui">
     .gx-ref-sync-note{
         margin:9px 0 0;padding:8px 10px;border-radius:10px;background:rgba(0,242,254,.045);
@@ -2801,8 +2801,6 @@
         border:1px dashed rgba(255,170,0,.18);color:var(--warning-amber);font-size:10px
     }
 </style>
-
-
 <style id="goxion-gamification-base">
     #gamif-grid{
         gap:12px!important;
@@ -2963,7 +2961,6 @@
         .gamif-expanded-container{padding:15px!important}
     }
 </style>
-
 <style id="goxion-user-card-tuning">
 #gamif-grid {
         gap: 12px !important;
@@ -3056,7 +3053,6 @@
     margin-top: auto;
 }
 </style>
-
 <style id="goxion-user-morph-css">
 
 /* --- PROGRESO VIVO: compatible con Safari/iPhone --- */
@@ -3236,7 +3232,6 @@
     }
 }
 </style>
-
 <style id="goxion-gamification-cards-final">
 /* Tarjetas finales de Referidos / Misiones */
 #gamif-grid{
@@ -3502,7 +3497,6 @@
 }
 
 </style>
-
 <style id="goxion-gamification-shared-morph">
 /* =========================================================
    GOXION // GAMIFICATION SHARED ELEMENT MORPH
@@ -3629,7 +3623,6 @@
     }
 }
 </style>
-
 <style id="goxion-production-interactions">
 /* =========================================================
    GOXION // INTERACCIONES DE PRODUCCIÓN
@@ -4069,8 +4062,6 @@
     }
 }
 </style>
-
-
 <style id="goxion-beta-03-02-ui">
 /* =========================================================
    GOXION BETA 03.02
@@ -4569,8 +4560,6 @@
     .gx-service-actions{grid-template-columns:1fr}
 }
 </style>
-
-
 <style id="goxion-beta-03-03-ui">
 /* =========================================================
    GOXION BETA 03.03
@@ -4886,607 +4875,497 @@
 }
 </style>
 
-
-<style id="goxion-beta-03-08-final">
-/* =========================================================
-   GOXION BETA 03.08 · ESTABILIZACIÓN
-   ========================================================= */
-
-/* Misiones/Referidos:
-   solo se oculta el watermark real durante el handoff del emoji compartido. */
-.gx-gamif-card.gx-gamif-watermark-hidden::before{
-    opacity:0!important;
-    animation:none!important;
-    -webkit-animation:none!important;
-}
-
-/* Estado de Cuenta:
-   conserva el CTA aprobado de 03.07, ahora con mezcla de color animada. */
-.gx-account-capsule{
-    background:
-        linear-gradient(
-            120deg,
-            #7c4dff 0%,
-            #6260f2 23%,
-            #416ff4 46%,
-            #13b9e7 69%,
-            #00d4df 82%,
-            #7c4dff 100%
-        )!important;
-    background-size:260% 260%!important;
-    animation:gxAccountGradientFlow 8s ease-in-out infinite!important;
-    font-size:12.5px!important;
-    font-weight:800!important;
-}
-@keyframes gxAccountGradientFlow{
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
-}
-
-/* El shimmer sigue siendo secundario; la protagonista es la mezcla de color. */
-.gx-account-capsule::after{
-    opacity:.42!important;
-}
-
-/* Catálogo personalizado:
-   "Ya lo tienes" informa estado, pero NO altera el vidrio de la tarjeta. */
-.brand-card.gx-owned-service,
-.brand-card.gx-owned-service.expanded{
-    opacity:1!important;
-    filter:none!important;
-}
-.brand-card.gx-owned-service{
-    background:var(--card-glass)!important;
-    backdrop-filter:blur(10px)!important;
-    -webkit-backdrop-filter:blur(10px)!important;
-}
-
-/* Las promos conservan su propia superficie exactamente como las demás promos. */
-.brand-card.gx-owned-service.has-promo{
-    background:transparent!important;
-}
-
-@media(prefers-reduced-motion:reduce){
-    .gx-account-capsule{
-        animation:none!important;
-        background-position:50% 50%!important;
-    }
+<style id="goxion-release-version-style">
+.goxion-release-version{
+    width:100%;
+    box-sizing:border-box;
+    text-align:center;
+    padding:16px 8px calc(10px + env(safe-area-inset-bottom,0px));
+    color:rgba(149,164,189,.38);
+    font-size:8px;
+    line-height:1;
+    font-weight:600;
+    letter-spacing:.85px;
+    text-transform:uppercase;
+    user-select:none;
+    -webkit-user-select:none;
+    pointer-events:none;
 }
 </style>
 
 </head>
 <body class="no-scroll">
-
-    <div id="splash-screen" onclick="hideSplash()">
-        <div class="splash-content">
-            <img src="Logo individual.png" alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'">
-        </div>
-    </div>
-
-    <div id="sticky-client-bar" class="sticky-client-bar">
-        <div class="sticky-client-title">Tu Espacio, <span id="sticky-client-name"></span></div>
-    </div>
-
-    <header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
-        <img src="logo2.PNG" alt="GOXION" class="app-logo">
-        <div class="header-action-btn gx-auth-root" id="header-action-btn" role="button" tabindex="0" aria-expanded="false" onclick="gxAuthRootClick(event)">
-            <span class="gx-auth-pill-label">
-                <span class="gx-auth-pill-icon">👤</span>
-                <span id="header-btn-text">Mi Espacio</span>
-            </span>
-
-            <div class="gx-auth-inline-content" onclick="event.stopPropagation()">
-                <button type="button" class="gx-auth-inline-close" aria-label="Cerrar acceso" onclick="closeAuthSheet(event)">×</button>
-
-                <div class="gx-auth-login-head">
-                    <div class="gx-auth-kicker">MI ESPACIO</div>
-                    <h2 class="gx-auth-login-title">Accede a tu espacio</h2>
-                    <p class="gx-auth-login-subtitle">Tus servicios, beneficios y cuenta en un solo lugar.</p>
-                </div>
-
-                <div class="gx-auth-field-group">
-                    <label class="gx-auth-field-label" for="login-id">Nombre o ID</label>
-                    <div class="gx-auth-input-shell">
-                        <input type="text" id="login-id" class="input-smart gx-auth-field" placeholder="Ej. Juan de Dios" autocomplete="username">
-                    </div>
-                </div>
-
-                <div class="gx-auth-field-group">
-                    <div class="gx-auth-field-row">
-                        <label class="gx-auth-field-label" for="login-pin">PIN de acceso</label>
-                        <button type="button" class="gx-auth-forgot-link" onclick="openPinRecovery(event)">¿Olvidaste tu PIN?</button>
-                    </div>
-
-                    <div class="gx-auth-input-shell gx-auth-pin-shell">
-                        <input type="password" id="login-pin" class="input-smart gx-auth-field" placeholder="••••" inputmode="numeric" maxlength="4" autocomplete="current-password">
-                        <button type="button" id="gx-pin-eye-btn" class="gx-pin-eye" aria-label="Mostrar PIN" onclick="togglePinVisibility(event)">
-                            <span class="gx-eye-icon gx-eye-show" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/>
-                                    <circle cx="12" cy="12" r="2.5"/>
-                                </svg>
-                            </span>
-                            <span class="gx-eye-icon gx-eye-hide" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="m3 3 18 18"/>
-                                    <path d="M10.6 6.15A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.6 15.6 0 0 1-2.05 2.67"/>
-                                    <path d="M6.1 7.1C3.8 8.75 2.5 12 2.5 12s3.5 6 9.5 6a9.8 9.8 0 0 0 3.15-.5"/>
-                                </svg>
-                            </span>
-                        </button>
-                    </div>
-                </div>
-
-                <div id="gx-pin-recovery" class="gx-pin-recovery" hidden>
-                    <div class="gx-pin-recovery-title">Recuperar acceso</div>
-                    <div class="gx-pin-recovery-copy">Enviaremos una solicitud al equipo GOXION usando el nombre o ID escrito arriba. Por seguridad, tu PIN nunca se mostrará aquí.</div>
-                    <button type="button" id="gx-pin-recovery-btn" class="gx-pin-recovery-action" onclick="sendPinRecovery(event)">Solicitar recuperación</button>
-                    <div id="gx-pin-recovery-status" class="gx-pin-recovery-status" aria-live="polite"></div>
-                </div>
-
-                <button type="button" id="btn-login-submit" class="btn-primary gx-auth-submit" onclick="iniciarSesion()">Validar acceso</button>
-                <p id="login-error" class="gx-auth-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
-
-                <div class="gx-auth-secure-note">
-                    <span class="gx-auth-secure-dot"></span>
+<div id="splash-screen" onclick="hideSplash()">
+<div class="splash-content">
+<img alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'" src="Logo individual.png"/>
+</div>
+</div>
+<div class="sticky-client-bar" id="sticky-client-bar">
+<div class="sticky-client-title">Tu Espacio, <span id="sticky-client-name"></span></div>
+</div>
+<header class="app-header" style="width: 100%; max-width: 580px; padding-left: 20px; padding-right: 20px; margin: 0 auto 10px auto;">
+<img alt="GOXION" class="app-logo" src="logo2.PNG"/>
+<div aria-expanded="false" class="header-action-btn gx-auth-root" id="header-action-btn" onclick="gxAuthRootClick(event)" role="button" tabindex="0">
+<span class="gx-auth-pill-label">
+<span class="gx-auth-pill-icon">👤</span>
+<span id="header-btn-text">Mi Espacio</span>
+</span>
+<div class="gx-auth-inline-content" onclick="event.stopPropagation()">
+<button aria-label="Cerrar acceso" class="gx-auth-inline-close" onclick="closeAuthSheet(event)" type="button">×</button>
+<div class="gx-auth-login-head">
+<div class="gx-auth-kicker">MI ESPACIO</div>
+<h2 class="gx-auth-login-title">Accede a tu espacio</h2>
+<p class="gx-auth-login-subtitle">Tus servicios, beneficios y cuenta en un solo lugar.</p>
+</div>
+<div class="gx-auth-field-group">
+<label class="gx-auth-field-label" for="login-id">Nombre o ID</label>
+<div class="gx-auth-input-shell">
+<input autocomplete="username" class="input-smart gx-auth-field" id="login-id" placeholder="Ej. Juan de Dios" type="text"/>
+</div>
+</div>
+<div class="gx-auth-field-group">
+<div class="gx-auth-field-row">
+<label class="gx-auth-field-label" for="login-pin">PIN de acceso</label>
+<button class="gx-auth-forgot-link" onclick="openPinRecovery(event)" type="button">¿Olvidaste tu PIN?</button>
+</div>
+<div class="gx-auth-input-shell gx-auth-pin-shell">
+<input autocomplete="current-password" class="input-smart gx-auth-field" id="login-pin" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<button aria-label="Mostrar PIN" class="gx-pin-eye" id="gx-pin-eye-btn" onclick="togglePinVisibility(event)" type="button">
+<span aria-hidden="true" class="gx-eye-icon gx-eye-show">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="20">
+<path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"></path>
+<circle cx="12" cy="12" r="2.5"></circle>
+</svg>
+</span>
+<span aria-hidden="true" class="gx-eye-icon gx-eye-hide">
+<svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="20">
+<path d="m3 3 18 18"></path>
+<path d="M10.6 6.15A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.6 15.6 0 0 1-2.05 2.67"></path>
+<path d="M6.1 7.1C3.8 8.75 2.5 12 2.5 12s3.5 6 9.5 6a9.8 9.8 0 0 0 3.15-.5"></path>
+</svg>
+</span>
+</button>
+</div>
+</div>
+<div class="gx-pin-recovery" hidden="" id="gx-pin-recovery">
+<div class="gx-pin-recovery-title">Recuperar acceso</div>
+<div class="gx-pin-recovery-copy">Enviaremos una solicitud al equipo GOXION usando el nombre o ID escrito arriba. Por seguridad, tu PIN nunca se mostrará aquí.</div>
+<button class="gx-pin-recovery-action" id="gx-pin-recovery-btn" onclick="sendPinRecovery(event)" type="button">Solicitar recuperación</button>
+<div aria-live="polite" class="gx-pin-recovery-status" id="gx-pin-recovery-status"></div>
+</div>
+<button class="btn-primary gx-auth-submit" id="btn-login-submit" onclick="iniciarSesion()" type="button">Validar acceso</button>
+<p class="gx-auth-error" id="login-error" style="color: var(--danger-red); font-size: 12px; margin-top: 10px; display: none;"></p>
+<div class="gx-auth-secure-note">
+<span class="gx-auth-secure-dot"></span>
                     Acceso protegido por GOXION
                 </div>
-            </div>
-        </div>
-    </header>
-
-    <div class="bg" aria-hidden="true">
-        <canvas id="gx-wave-canvas" class="gx-wave-canvas"></canvas>
-    </div>
-
-    <div class="container">
-
-        <div class="glass-card alert-banner" id="dynamic-alert">
-            <span style="font-size: 20px;">⚠️</span><div style="font-size: 13px; color: #fff;" id="alert-content"></div>
-        </div>
-
-        <div class="glass-card tab-container" id="goxion-main-nav">
-            <button type="button" class="tab-btn active" id="btn-tab-inicio" data-goxion-tab="inicio">
-                <span class="gx-nav-icon" id="tab-inicio-icon">🏠</span>
-                <span class="gx-nav-label" id="tab-inicio-text">Inicio</span>
-            </button>
-
-            <button type="button" class="tab-btn" id="btn-tab-catalogo" data-goxion-tab="catalogo">
-                <span class="gx-nav-icon">🛒</span>
-                <span class="gx-nav-label">Catálogo</span>
-            </button>
-
-            <button type="button" class="tab-btn" id="btn-tab-soporte" data-goxion-tab="soporte">
-                <span class="gx-nav-icon">🛠️</span>
-                <span class="gx-nav-label">Soporte</span>
-            </button>
-        </div>
-
-        <div id="view-inicio" class="view-section">
-            <div style="text-align: center; margin-top: 10px;" class="reveal">
-                <h2 class="hero-title">Tus apps premium<br><span>al mejor precio</span></h2>
-                
-                <div class="rotator-container">
-                    <div class="rotator-box" id="rotator-box">
-                        <span class="rotator-text" id="dynamic-rotator">✓ Calidad 4K Ultra HD</span>
-                    </div>
-                </div>
-
-                <button class="btn-shimmer" onclick="solicitarCuenta()" style="margin-bottom: 25px;">
+</div>
+</div>
+</header>
+<div aria-hidden="true" class="bg">
+<canvas class="gx-wave-canvas" id="gx-wave-canvas"></canvas>
+</div>
+<div class="container">
+<div class="glass-card alert-banner" id="dynamic-alert">
+<span style="font-size: 20px;">⚠️</span><div id="alert-content" style="font-size: 13px; color: #fff;"></div>
+</div>
+<div class="glass-card tab-container" id="goxion-main-nav">
+<button class="tab-btn active" data-goxion-tab="inicio" id="btn-tab-inicio" type="button">
+<span class="gx-nav-icon" id="tab-inicio-icon">🏠</span>
+<span class="gx-nav-label" id="tab-inicio-text">Inicio</span>
+</button>
+<button class="tab-btn" data-goxion-tab="catalogo" id="btn-tab-catalogo" type="button">
+<span class="gx-nav-icon">🛒</span>
+<span class="gx-nav-label">Catálogo</span>
+</button>
+<button class="tab-btn" data-goxion-tab="soporte" id="btn-tab-soporte" type="button">
+<span class="gx-nav-icon">🛠️</span>
+<span class="gx-nav-label">Soporte</span>
+</button>
+</div>
+<div class="view-section" id="view-inicio">
+<div class="reveal" style="text-align: center; margin-top: 10px;">
+<h2 class="hero-title">Tus apps premium<br/><span>al mejor precio</span></h2>
+<div class="rotator-container">
+<div class="rotator-box" id="rotator-box">
+<span class="rotator-text" id="dynamic-rotator">✓ Calidad 4K Ultra HD</span>
+</div>
+</div>
+<button class="btn-shimmer" onclick="solicitarCuenta()" style="margin-bottom: 25px;">
                     🎁 Únete hoy y obtén -10% OFF
                 </button>
-            </div>
-
-            <div class="section-title reveal">🔥 Servicios Populares</div>
-            <div class="teaser-grid reveal">
-                <div class="teaser-card" onclick="switchTab('catalogo')">
-                    <div class="dynamic-popular">
-                        <img src="logos/netflix.PNG" class="pop-logo active" onerror="this.src='logo2.PNG'">
-                        <img src="logos/disney.PNG" class="pop-logo" onerror="this.src='logo2.PNG'">
-                        <img src="logos/hbo-max.PNG" class="pop-logo" onerror="this.src='logo2.PNG'">
-                        <div class="fire-fx">🔥</div>
-                    </div>
-                    <div class="teaser-title">Netflix & Más</div>
-                    <div class="teaser-price">Desde $49 MXN</div>
-                </div>
-                <div class="teaser-card" onclick="switchTab('catalogo')">
-                    <div class="dynamic-combo">
-                        <img src="logos/hbo-max.PNG" id="combo-img-left" class="combo-logo left" onerror="this.src='logo2.PNG'">
-                        <img src="logos/prime-video.PNG" id="combo-img-right" class="combo-logo right" onerror="this.src='logo2.PNG'">
-                        <div class="impact-fx">💥</div>
-                    </div>
-                    <div class="teaser-title">Combos Premium</div>
-                    <div class="teaser-price">Ahorro Mensual</div>
-                </div>
-            </div>
-
-            <div class="section-title reveal">¿Cómo funciona Goxion?</div>
-            <div class="hiw-grid reveal">
-                <div class="hiw-step">
-                    <div class="hiw-num">01</div>
-                    <div class="hiw-title"><span>🛒</span> Elige tu servicio</div>
-                    <div class="hiw-desc">Selecciona la plataforma o producto que necesitas desde nuestro catálogo.</div>
-                </div>
-                <div class="hiw-step">
-                    <div class="hiw-num">02</div>
-                    <div class="hiw-title"><span>💳</span> Realiza tu compra</div>
-                    <div class="hiw-desc">Completa tu pedido de forma rápida, privada y 100% segura.</div>
-                </div>
-                <div class="hiw-step">
-                    <div class="hiw-num">03</div>
-                    <div class="hiw-title"><span>🚀</span> Recibe tu acceso</div>
-                    <div class="hiw-desc">Obtén tus datos inmediatamente y comienza a disfrutar de tu contenido.</div>
-                </div>
-            </div>
-            
-            <button class="btn-primary reveal" style="margin-bottom: 35px; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none;" onclick="switchTab('catalogo')">Ver servicios disponibles →</button>
-
-            <div class="section-title reveal">¿Por qué comprar aquí?</div>
-            <div class="benefits-grid reveal">
-                <div class="benefit-box">
-                    <div class="benefit-icon">⚡</div>
-                    <div class="benefit-title">Activación Inmediata</div>
-                    <div class="benefit-desc">Tus accesos se entregan al instante tras confirmar tu pago. Sin esperas.</div>
-                </div>
-                <div class="benefit-box">
-                    <div class="benefit-icon">🛡️</div>
-                    <div class="benefit-title">Garantía Total</div>
-                    <div class="benefit-desc">Reglas claras y trato justo. Si hay fallas técnicas, te compensamos.</div>
-                </div>
-                <div class="benefit-box">
-                    <div class="benefit-icon">💬</div>
-                    <div class="benefit-title">Soporte Dedicado</div>
-                    <div class="benefit-desc">Atención real para cualquier eventualidad, reposición o duda técnica.</div>
-                </div>
-                <div class="benefit-box">
-                    <div class="benefit-icon">🔒</div>
-                    <div class="benefit-title">100% Seguro</div>
-                    <div class="benefit-desc">Cuentas privadas y pagos protegidos. Tu información siempre a salvo.</div>
-                </div>
-            </div>
-
-            <div class="feature-card reveal">
-                <div class="feature-title">Tu compra, sin complicaciones</div>
-                <div class="feature-desc">Al realizar tu pedido, recibirás instrucciones exactas para usar tu servicio al instante. Además, tu compra quedará ligada a tu cuenta para que puedas gestionarla cuando quieras.</div>
-                
-                <hr style="border:0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;">
-                
-                <div class="feature-title" style="font-size: 15px; color: var(--neon-blue);">🤝 Estamos contigo post-compra</div>
-                <div class="feature-desc" style="margin-bottom: 5px;">¿Tu acceso no funciona o necesitas ayuda con tu renovación? Nuestro equipo de soporte lo resuelve en tres simples pasos:</div>
-                <div class="timeline-box">
-                    <div class="timeline-step">
-                        <div class="timeline-icon">📱</div>
-                        <div class="timeline-text">Reportas</div>
-                    </div>
-                    <div class="timeline-step">
-                        <div class="timeline-icon">🔍</div>
-                        <div class="timeline-text">Revisamos</div>
-                    </div>
-                    <div class="timeline-step">
-                        <div class="timeline-icon">✅</div>
-                        <div class="timeline-text">Resolvemos</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="feature-card reveal has-promo-card" id="guest-action-card">
-                <div class="feature-badge">EXCLUSIVO</div>
-                <div class="feature-title" style="margin-top: 0;">Todo bajo control en tu Espacio</div>
-                <div class="feature-desc">Registra tu dispositivo gratis y lleva la administración de tu entretenimiento a otro nivel.</div>
-                
-                <div class="rotating-benefits-container">
-                    <div class="rotating-benefit-item active">
-                        <span>🧾</span>
-                        <div class="rotating-benefit-text">Consulta tus compras y recibos al instante</div>
-                    </div>
-                    <div class="rotating-benefit-item">
-                        <span>🔄</span>
-                        <div class="rotating-benefit-text">Administra tus renovaciones fácilmente</div>
-                    </div>
-                    <div class="rotating-benefit-item">
-                        <span>🎁</span>
-                        <div class="rotating-benefit-text">Desbloquea cupones y beneficios exclusivos</div>
-                    </div>
-                    <div class="rotating-benefit-item">
-                        <span>💬</span>
-                        <div class="rotating-benefit-text">Solicita soporte técnico priorizado</div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 10px; margin-top: 20px;">
-                    <button class="btn-primary" style="flex: 1; padding: 14px; font-size: 14px;" onclick="solicitarCuenta()">Crear cuenta</button>
-                    <button class="btn-primary" style="flex: 1; padding: 14px; font-size: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none; color: #fff;" onclick="openAuthSheet()">Iniciar sesión</button>
-                </div>
-            </div>
-
-            <div class="feature-card reveal">
-                <div class="feature-title">⭐ Tu lealtad te da más</div>
-                <div class="feature-desc">La puntualidad tiene recompensas. Compra, renueva y sube de nivel automáticamente dentro de Goxion.</div>
-                
-                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="font-size: 13px; font-weight: 700;">Nivel 1 (4 pagos puntuales)</div>
-                    <div style="color: var(--neon-blue); font-weight: 800;">3% OFF</div>
-                </div>
-                <div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
-                    <div style="font-size: 13px; font-weight: 700;">Nivel 2 (9 pagos puntuales)</div>
-                    <div style="color: var(--neon-purple); font-weight: 800;">6% OFF</div>
-                </div>
-                
-                <div class="link-discreto" onclick="openModal('modal-lealtad')">Ver reglas de lealtad completas</div>
-            </div>
-
-            <div class="feature-card reveal">
-                <div style="font-size: 35px; margin-bottom: 10px; text-align: center;">🫂</div>
-                <div class="feature-title" style="text-align: center;">¿Tienes amigos que usan esto?</div>
-                <div class="feature-desc" style="text-align: center;">Invítalos a GOXION. Por cada referido que adquiera servicios y mantenga su suscripción activa, tú obtendrás un mes 100% gratis.</div>
-                
-                <button class="btn-primary" style="background: rgba(255,255,255,0.1); box-shadow: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; margin-top: 10px;" onclick="openModal('modal-referidos')">Conocer el programa de referidos</button>
-            </div>
-
-            <div style="display: flex; justify-content: center; gap: 20px; margin-bottom: 25px;" class="reveal">
-                <div class="link-discreto" style="margin: 0;" onclick="openModal('modal-terminos')">📄 Términos de Uso</div>
-                <div class="link-discreto" style="margin: 0;" onclick="openModal('modal-garantia')">🛡️ Garantía Comercial</div>
-            </div>
-
-            <div class="final-cta reveal">
-                <div style="font-size: 18px; font-weight: 800; color: #fff;">¿Tienes alguna duda antes de comprar?</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-top: 10px; margin-bottom: 20px;">Nuestro equipo puede asesorarte para encontrar el servicio adecuado.</div>
-                <button class="btn-primary" style="background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); box-shadow: none; padding: 12px;" onclick="switchTab('soporte')">Hablar con soporte</button>
-            </div>
-        </div>
-
-        <!-- DASHBOARD -->
-        <div id="view-dashboard" class="view-section">
-            <div id="dash-greeting-container" class="dash-greeting-box">
-                <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
-            </div>
-
-            <div id="dash-payment-review-alert"></div>
-
-            <div class="glass-card dash-card" style="background: rgba(0,0,0,0.3);">
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
-                <div class="dash-date" id="dash-date">Cargando...</div>
-                <div style="text-align: center;" id="dash-badge"></div>
-                <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
-                    <div style="font-size: 11px; color: var(--neon-blue); font-weight: 700;" id="loyalty-count">0 Pagos</div>
-                </div>
-                <div class="loyalty-progress-bg">
-                    <div class="loyalty-progress-fill" id="loyalty-bar"></div>
-                </div>
-                <div style="font-size: 11px; color: var(--text-muted); text-align: left;" id="loyalty-msg">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
-
-                <button type="button" class="gx-account-capsule" onclick="irAlTicket()">
-                    <span class="gx-account-capsule-icon" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M6.5 3.5h8l3 3V20.5h-11z"></path>
-                            <path d="M14.5 3.5v3h3"></path>
-                            <path d="M9 11h6M9 14.5h6"></path>
-                        </svg>
-                    </span>
-                    <span class="gx-account-capsule-label">Ver Estado de Cuenta</span>
-                    <span class="gx-account-capsule-arrow">→</span>
-                </button>
-            </div>
-
-            <div id="referral-section-container" class="gx-gamification-mid"></div>
-
-            <div class="gx-dashboard-section-head gx-services-head">
-                <div class="section-title">Tus servicios</div>
-                <div class="gx-dashboard-section-subtitle">Toca una plataforma para administrarla</div>
-            </div>
-            <div id="dash-services" class="gx-services-stack"></div>
-
-            <div class="gx-dashboard-section-head gx-history-head">
-                <div class="section-title">Historial de pagos</div>
-                <div class="gx-dashboard-section-subtitle">Tu constancia y lealtad</div>
-            </div>
-            <div id="dash-history"></div>
-        </div>
-
-        <div id="view-catalogo" class="view-section">
-            <div class="gx-catalog-toolbar">
-                <div class="gx-catalog-search-shell">
-                    <span aria-hidden="true">⌕</span>
-                    <input id="gx-catalog-search" type="search" placeholder="Buscar plataforma o plan" autocomplete="off" oninput="gxApplyCatalogFilters()">
-                </div>
-                <div id="gx-catalog-filters" class="gx-catalog-filters"></div>
-            </div>
-
-            <div id="gx-catalog-empty" class="gx-catalog-empty" hidden>
-                <span>⌕</span>
-                <strong>No encontramos coincidencias</strong>
-                <small>Prueba con otro nombre o cambia el filtro.</small>
-            </div>
-
-            <div id="catalog-container" class="catalog-grid">
-                <p style="font-size: 13px; color: var(--text-muted); text-align: center; width: 100%;">Cargando catálogo en vivo...</p>
-            </div>
-        </div>
-
-        <div id="view-soporte" class="view-section">
-            <div id="support-lock-overlay" class="support-lock-overlay" aria-hidden="true">
-                <div class="support-lock-card">
-                    <div class="support-lock-icon">🔒</div>
-                    <div class="support-lock-title">Inicia sesión para acceder a Soporte</div>
-                    <div class="support-lock-text">Por seguridad, las herramientas de soporte están disponibles únicamente para clientes con una sesión activa. Usa <strong>Mi Espacio</strong> en la parte superior para iniciar sesión.</div>
-                </div>
-            </div>
-            <div class="glass-card smart-support-card" id="smart-support-card">
-                <p id="support-step-1-label" style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
-
-                <div class="platform-grid" id="support-platforms-grid">
-                    <p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
-                </div>
-
-                <div id="support-flow-home">
-                    <div id="support-flow-shell" class="gx-support-flow-shell">
-                        <div id="step-2" class="step-box">
-                            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
-                            <select id="issue-selector" class="custom-select-smart" onchange="showSolution()"></select>
-                            <div id="support-issue-options" class="gx-support-issue-options"></div>
-                        </div>
-
-                        <div id="step-3" class="step-box">
-                            <div class="solution-instructions" id="solution-text"></div>
-                            <div id="extra-inputs-container">
-                                <p style="font-size: 12px; color: var(--text-main); font-weight: 600; margin-bottom: 8px;" id="input-label">Dato requerido:</p>
-                                <input type="text" id="smart-extra-input" class="input-smart" placeholder="...">
-                            </div>
-                            <button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()" style="padding: 14px; font-size: 14px; border-radius: 30px;">
+</div>
+<div class="section-title reveal">🔥 Servicios Populares</div>
+<div class="teaser-grid reveal">
+<div class="teaser-card" onclick="switchTab('catalogo')">
+<div class="dynamic-popular">
+<img class="pop-logo active" onerror="this.src='logo2.PNG'" src="logos/netflix.PNG"/>
+<img class="pop-logo" onerror="this.src='logo2.PNG'" src="logos/disney.PNG"/>
+<img class="pop-logo" onerror="this.src='logo2.PNG'" src="logos/hbo-max.PNG"/>
+<div class="fire-fx">🔥</div>
+</div>
+<div class="teaser-title">Netflix &amp; Más</div>
+<div class="teaser-price">Desde $49 MXN</div>
+</div>
+<div class="teaser-card" onclick="switchTab('catalogo')">
+<div class="dynamic-combo">
+<img class="combo-logo left" id="combo-img-left" onerror="this.src='logo2.PNG'" src="logos/hbo-max.PNG"/>
+<img class="combo-logo right" id="combo-img-right" onerror="this.src='logo2.PNG'" src="logos/prime-video.PNG"/>
+<div class="impact-fx">💥</div>
+</div>
+<div class="teaser-title">Combos Premium</div>
+<div class="teaser-price">Ahorro Mensual</div>
+</div>
+</div>
+<div class="section-title reveal">¿Cómo funciona Goxion?</div>
+<div class="hiw-grid reveal">
+<div class="hiw-step">
+<div class="hiw-num">01</div>
+<div class="hiw-title"><span>🛒</span> Elige tu servicio</div>
+<div class="hiw-desc">Selecciona la plataforma o producto que necesitas desde nuestro catálogo.</div>
+</div>
+<div class="hiw-step">
+<div class="hiw-num">02</div>
+<div class="hiw-title"><span>💳</span> Realiza tu compra</div>
+<div class="hiw-desc">Completa tu pedido de forma rápida, privada y 100% segura.</div>
+</div>
+<div class="hiw-step">
+<div class="hiw-num">03</div>
+<div class="hiw-title"><span>🚀</span> Recibe tu acceso</div>
+<div class="hiw-desc">Obtén tus datos inmediatamente y comienza a disfrutar de tu contenido.</div>
+</div>
+</div>
+<button class="btn-primary reveal" onclick="switchTab('catalogo')" style="margin-bottom: 35px; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none;">Ver servicios disponibles →</button>
+<div class="section-title reveal">¿Por qué comprar aquí?</div>
+<div class="benefits-grid reveal">
+<div class="benefit-box">
+<div class="benefit-icon">⚡</div>
+<div class="benefit-title">Activación Inmediata</div>
+<div class="benefit-desc">Tus accesos se entregan al instante tras confirmar tu pago. Sin esperas.</div>
+</div>
+<div class="benefit-box">
+<div class="benefit-icon">🛡️</div>
+<div class="benefit-title">Garantía Total</div>
+<div class="benefit-desc">Reglas claras y trato justo. Si hay fallas técnicas, te compensamos.</div>
+</div>
+<div class="benefit-box">
+<div class="benefit-icon">💬</div>
+<div class="benefit-title">Soporte Dedicado</div>
+<div class="benefit-desc">Atención real para cualquier eventualidad, reposición o duda técnica.</div>
+</div>
+<div class="benefit-box">
+<div class="benefit-icon">🔒</div>
+<div class="benefit-title">100% Seguro</div>
+<div class="benefit-desc">Cuentas privadas y pagos protegidos. Tu información siempre a salvo.</div>
+</div>
+</div>
+<div class="feature-card reveal">
+<div class="feature-title">Tu compra, sin complicaciones</div>
+<div class="feature-desc">Al realizar tu pedido, recibirás instrucciones exactas para usar tu servicio al instante. Además, tu compra quedará ligada a tu cuenta para que puedas gestionarla cuando quieras.</div>
+<hr style="border:0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;"/>
+<div class="feature-title" style="font-size: 15px; color: var(--neon-blue);">🤝 Estamos contigo post-compra</div>
+<div class="feature-desc" style="margin-bottom: 5px;">¿Tu acceso no funciona o necesitas ayuda con tu renovación? Nuestro equipo de soporte lo resuelve en tres simples pasos:</div>
+<div class="timeline-box">
+<div class="timeline-step">
+<div class="timeline-icon">📱</div>
+<div class="timeline-text">Reportas</div>
+</div>
+<div class="timeline-step">
+<div class="timeline-icon">🔍</div>
+<div class="timeline-text">Revisamos</div>
+</div>
+<div class="timeline-step">
+<div class="timeline-icon">✅</div>
+<div class="timeline-text">Resolvemos</div>
+</div>
+</div>
+</div>
+<div class="feature-card reveal has-promo-card" id="guest-action-card">
+<div class="feature-badge">EXCLUSIVO</div>
+<div class="feature-title" style="margin-top: 0;">Todo bajo control en tu Espacio</div>
+<div class="feature-desc">Registra tu dispositivo gratis y lleva la administración de tu entretenimiento a otro nivel.</div>
+<div class="rotating-benefits-container">
+<div class="rotating-benefit-item active">
+<span>🧾</span>
+<div class="rotating-benefit-text">Consulta tus compras y recibos al instante</div>
+</div>
+<div class="rotating-benefit-item">
+<span>🔄</span>
+<div class="rotating-benefit-text">Administra tus renovaciones fácilmente</div>
+</div>
+<div class="rotating-benefit-item">
+<span>🎁</span>
+<div class="rotating-benefit-text">Desbloquea cupones y beneficios exclusivos</div>
+</div>
+<div class="rotating-benefit-item">
+<span>💬</span>
+<div class="rotating-benefit-text">Solicita soporte técnico priorizado</div>
+</div>
+</div>
+<div style="display: flex; gap: 10px; margin-top: 20px;">
+<button class="btn-primary" onclick="solicitarCuenta()" style="flex: 1; padding: 14px; font-size: 14px;">Crear cuenta</button>
+<button class="btn-primary" onclick="openAuthSheet()" style="flex: 1; padding: 14px; font-size: 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); box-shadow: none; color: #fff;">Iniciar sesión</button>
+</div>
+</div>
+<div class="feature-card reveal">
+<div class="feature-title">⭐ Tu lealtad te da más</div>
+<div class="feature-desc">La puntualidad tiene recompensas. Compra, renueva y sube de nivel automáticamente dentro de Goxion.</div>
+<div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+<div style="font-size: 13px; font-weight: 700;">Nivel 1 (4 pagos puntuales)</div>
+<div style="color: var(--neon-blue); font-weight: 800;">3% OFF</div>
+</div>
+<div style="background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between;">
+<div style="font-size: 13px; font-weight: 700;">Nivel 2 (9 pagos puntuales)</div>
+<div style="color: var(--neon-purple); font-weight: 800;">6% OFF</div>
+</div>
+<div class="link-discreto" onclick="openModal('modal-lealtad')">Ver reglas de lealtad completas</div>
+</div>
+<div class="feature-card reveal">
+<div style="font-size: 35px; margin-bottom: 10px; text-align: center;">🫂</div>
+<div class="feature-title" style="text-align: center;">¿Tienes amigos que usan esto?</div>
+<div class="feature-desc" style="text-align: center;">Invítalos a GOXION. Por cada referido que adquiera servicios y mantenga su suscripción activa, tú obtendrás un mes 100% gratis.</div>
+<button class="btn-primary" onclick="openModal('modal-referidos')" style="background: rgba(255,255,255,0.1); box-shadow: none; border: 1px solid rgba(255,255,255,0.2); color: #fff; margin-top: 10px;">Conocer el programa de referidos</button>
+</div>
+<div class="reveal" style="display: flex; justify-content: center; gap: 20px; margin-bottom: 25px;">
+<div class="link-discreto" onclick="openModal('modal-terminos')" style="margin: 0;">📄 Términos de Uso</div>
+<div class="link-discreto" onclick="openModal('modal-garantia')" style="margin: 0;">🛡️ Garantía Comercial</div>
+</div>
+<div class="final-cta reveal">
+<div style="font-size: 18px; font-weight: 800; color: #fff;">¿Tienes alguna duda antes de comprar?</div>
+<div style="font-size: 12px; color: var(--text-muted); margin-top: 10px; margin-bottom: 20px;">Nuestro equipo puede asesorarte para encontrar el servicio adecuado.</div>
+<button class="btn-primary" onclick="switchTab('soporte')" style="background: transparent; border: 1px solid var(--neon-blue); color: var(--neon-blue); box-shadow: none; padding: 12px;">Hablar con soporte</button>
+</div>
+</div>
+<!-- DASHBOARD -->
+<div class="view-section" id="view-dashboard">
+<div class="dash-greeting-box" id="dash-greeting-container">
+<h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
+</div>
+<div id="dash-payment-review-alert"></div>
+<div class="glass-card dash-card" style="background: rgba(0,0,0,0.3);">
+<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
+<div class="dash-date" id="dash-date">Cargando...</div>
+<div id="dash-badge" style="text-align: center;"></div>
+<hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;"/>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
+<div id="loyalty-count" style="font-size: 11px; color: var(--neon-blue); font-weight: 700;">0 Pagos</div>
+</div>
+<div class="loyalty-progress-bg">
+<div class="loyalty-progress-fill" id="loyalty-bar"></div>
+</div>
+<div id="loyalty-msg" style="font-size: 11px; color: var(--text-muted); text-align: left;">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
+<button aria-label="Ver Estado de Cuenta" class="gx-account-capsule" onclick="irAlTicket()" type="button">
+<span aria-hidden="true" class="gx-account-capsule-icon">
+<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M6 3.75h9.4L18 6.35V20.25H6z"></path>
+<path d="M15.25 3.75v3h2.75"></path>
+<path d="M9 11h6M9 14.5h6M9 18h4"></path>
+</svg>
+</span>
+<span class="gx-account-capsule-label">Ver Estado de Cuenta</span>
+<span aria-hidden="true" class="gx-account-capsule-arrow">→</span>
+</button>
+</div>
+<div class="gx-gamification-mid" id="referral-section-container"></div>
+<div class="gx-dashboard-section-head">
+<div class="section-title">Tus servicios</div>
+<div class="gx-dashboard-section-subtitle">Toca una plataforma para administrarla</div>
+</div>
+<div class="gx-services-stack" id="dash-services"></div>
+<div class="gx-dashboard-section-head gx-history-head">
+<div class="section-title">Historial de pagos</div>
+<div class="gx-dashboard-section-subtitle">Tu constancia y lealtad</div>
+</div>
+<div id="dash-history"></div>
+<button class="gx-account-card" onclick="irAlTicket()" type="button">
+<span class="gx-account-card-icon">🧾</span>
+<span class="gx-account-card-copy">
+<strong>Estado de Cuenta</strong>
+<small>Consulta cargos, descuentos y total actual</small>
+</span>
+<span class="gx-account-card-arrow">→</span>
+</button>
+</div>
+<div class="view-section" id="view-catalogo">
+<div class="gx-catalog-toolbar">
+<div class="gx-catalog-search-shell">
+<span aria-hidden="true">⌕</span>
+<input autocomplete="off" id="gx-catalog-search" oninput="gxApplyCatalogFilters()" placeholder="Buscar plataforma o plan" type="search"/>
+</div>
+<div class="gx-catalog-filters" id="gx-catalog-filters"></div>
+</div>
+<div class="gx-catalog-empty" hidden="" id="gx-catalog-empty">
+<span>⌕</span>
+<strong>No encontramos coincidencias</strong>
+<small>Prueba con otro nombre o cambia el filtro.</small>
+</div>
+<div class="catalog-grid" id="catalog-container">
+<p style="font-size: 13px; color: var(--text-muted); text-align: center; width: 100%;">Cargando catálogo en vivo...</p>
+</div>
+</div>
+<div class="view-section" id="view-soporte">
+<div aria-hidden="true" class="support-lock-overlay" id="support-lock-overlay">
+<div class="support-lock-card">
+<div class="support-lock-icon">🔒</div>
+<div class="support-lock-title">Inicia sesión para acceder a Soporte</div>
+<div class="support-lock-text">Por seguridad, las herramientas de soporte están disponibles únicamente para clientes con una sesión activa. Usa <strong>Mi Espacio</strong> en la parte superior para iniciar sesión.</div>
+</div>
+</div>
+<div class="glass-card smart-support-card" id="smart-support-card">
+<p id="support-step-1-label" style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;"><strong>Paso 1:</strong> Selecciona la plataforma con la falla:</p>
+<div class="platform-grid" id="support-platforms-grid">
+<p style="font-size: 11px; color: var(--text-muted); grid-column: span 3; text-align: center;">Cargando opciones...</p>
+</div>
+<div id="support-flow-home">
+<div class="gx-support-flow-shell" id="support-flow-shell">
+<div class="step-box" id="step-2">
+<p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><strong>Paso 2:</strong> ¿Qué asistencia necesitas?</p>
+<select class="custom-select-smart" id="issue-selector" onchange="showSolution()"></select>
+<div class="gx-support-issue-options" id="support-issue-options"></div>
+</div>
+<div class="step-box" id="step-3">
+<div class="solution-instructions" id="solution-text"></div>
+<div id="extra-inputs-container">
+<p id="input-label" style="font-size: 12px; color: var(--text-main); font-weight: 600; margin-bottom: 8px;">Dato requerido:</p>
+<input class="input-smart" id="smart-extra-input" placeholder="..." type="text"/>
+</div>
+<button class="btn-primary" id="smart-action-btn" onclick="sendSmartWA()" style="padding: 14px; font-size: 14px; border-radius: 30px;">
                                 📲 Enviar Solicitud a Soporte
                             </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="direct-contact-box">
-                <div style="font-size: 20px; margin-bottom: 5px;">💬</div>
-                <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tu problema es distinto?</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Si presentas una situación especial o no encuentras tu falla en la lista superior, contáctanos directamente.</div>
-                <button class="btn-primary" style="background: transparent; border: 1px solid rgba(255, 51, 102, 0.5); color: #fff; box-shadow: none; padding: 10px;" onclick="window.open(`https://wa.me/${NUMERO_GOXION}?text=Hola,%20requiero%20asistencia%20especial%20con%20mi%20cuenta.%20Mi%20ID%20de%20cliente%20es:%20`, '_blank')">
+</div>
+</div>
+</div>
+</div>
+<div class="direct-contact-box">
+<div style="font-size: 20px; margin-bottom: 5px;">💬</div>
+<div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tu problema es distinto?</div>
+<div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Si presentas una situación especial o no encuentras tu falla en la lista superior, contáctanos directamente.</div>
+<button class="btn-primary" onclick="window.open(`https://wa.me/${NUMERO_GOXION}?text=Hola,%20requiero%20asistencia%20especial%20con%20mi%20cuenta.%20Mi%20ID%20de%20cliente%20es:%20`, '_blank')" style="background: transparent; border: 1px solid rgba(255, 51, 102, 0.5); color: #fff; box-shadow: none; padding: 10px;">
                     Hablar con Asesor Humano
                 </button>
-            </div>
-
-            <div class="glass-card" style="margin-top: 15px; text-align: center; padding: 15px;">
-                <div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tienes alguna sugerencia?</div>
-                <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ayúdanos a mejorar nuestro servicio dejándonos un comentario o califica tu experiencia.</div>
-                <button class="btn-primary" style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none; padding: 10px;" onclick="openFeedbackModal()">
+</div>
+<div class="glass-card" style="margin-top: 15px; text-align: center; padding: 15px;">
+<div style="font-size: 14px; font-weight: 700; color: var(--text-main); margin-bottom: 5px;">¿Tienes alguna sugerencia?</div>
+<div style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Ayúdanos a mejorar nuestro servicio dejándonos un comentario o califica tu experiencia.</div>
+<button class="btn-primary" onclick="openFeedbackModal()" style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none; padding: 10px;">
                     Dejar Comentario
                 </button>
-            </div>
-
-            <div class="faq-container">
-                <div class="section-title">Preguntas Frecuentes (FAQ)</div>
-                
-                <div class="faq-item">
-                    <div class="faq-header" onclick="toggleFAQ(this)">
-                        <span>¿Cuáles son los métodos de pago?</span>
-                        <span class="icon">▼</span>
-                    </div>
-                    <div class="faq-body">Aceptamos transferencias bancarias interbancarias (SPEI) y depósitos en efectivo mediante tiendas OXXO. Los datos de la cuenta te serán proporcionados por soporte cuando vayas a renovar.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-header" onclick="toggleFAQ(this)">
-                        <span>¿Qué pasa si me atraso un día en mi pago?</span>
-                        <span class="icon">▼</span>
-                    </div>
-                    <div class="faq-body">Si te atrasas sin dar aviso, se genera un recargo del 5% diario. Si tienes un imprevisto, ¡no te preocupes! Solo envíanos un mensaje antes de tu fecha de corte y te otorgaremos una prórroga sin penalización.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-header" onclick="toggleFAQ(this)">
-                        <span>¿Puedo cambiar la contraseña de mi perfil?</span>
-                        <span class="icon">▼</span>
-                    </div>
-                    <div class="faq-body">Si tu servicio incluye un perfil privado (ej. Netflix, Disney+), sí puedes y te recomendamos ponerle un PIN. Sin embargo, <strong>NUNCA</strong> debes cambiar la contraseña general o correo de la cuenta principal, ya que perderías tu garantía.</div>
-                </div>
-
-                <div class="faq-item">
-                    <div class="faq-header" onclick="toggleFAQ(this)">
-                        <span>¿Cómo reclamo mi mes gratis por referido?</span>
-                        <span class="icon">▼</span>
-                    </div>
-                    <div class="faq-body">Al invitar a alguien con tu enlace, asegúrate de que nos mencione tu nombre al contratar. Cuando tu referido cumpla 3 meses activos pagando, el sistema automáticamente te bonificará el 100% de descuento en tu cuarta mensualidad.</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="footer-info">
-            <div class="schedule">
-                <div class="schedule-title" style="font-weight: 700; color: var(--neon-purple); margin-bottom: 5px;">🕒 Atención Asistida</div>
-                <div class="schedule-time" style="font-size: 13px; color: var(--text-muted);">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
-            </div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">
+</div>
+<div class="faq-container">
+<div class="section-title">Preguntas Frecuentes (FAQ)</div>
+<div class="faq-item">
+<div class="faq-header" onclick="toggleFAQ(this)">
+<span>¿Cuáles son los métodos de pago?</span>
+<span class="icon">▼</span>
+</div>
+<div class="faq-body">Aceptamos transferencias bancarias interbancarias (SPEI) y depósitos en efectivo mediante tiendas OXXO. Los datos de la cuenta te serán proporcionados por soporte cuando vayas a renovar.</div>
+</div>
+<div class="faq-item">
+<div class="faq-header" onclick="toggleFAQ(this)">
+<span>¿Qué pasa si me atraso un día en mi pago?</span>
+<span class="icon">▼</span>
+</div>
+<div class="faq-body">Si te atrasas sin dar aviso, se genera un recargo del 5% diario. Si tienes un imprevisto, ¡no te preocupes! Solo envíanos un mensaje antes de tu fecha de corte y te otorgaremos una prórroga sin penalización.</div>
+</div>
+<div class="faq-item">
+<div class="faq-header" onclick="toggleFAQ(this)">
+<span>¿Puedo cambiar la contraseña de mi perfil?</span>
+<span class="icon">▼</span>
+</div>
+<div class="faq-body">Si tu servicio incluye un perfil privado (ej. Netflix, Disney+), sí puedes y te recomendamos ponerle un PIN. Sin embargo, <strong>NUNCA</strong> debes cambiar la contraseña general o correo de la cuenta principal, ya que perderías tu garantía.</div>
+</div>
+<div class="faq-item">
+<div class="faq-header" onclick="toggleFAQ(this)">
+<span>¿Cómo reclamo mi mes gratis por referido?</span>
+<span class="icon">▼</span>
+</div>
+<div class="faq-body">Al invitar a alguien con tu enlace, asegúrate de que nos mencione tu nombre al contratar. Cuando tu referido cumpla 3 meses activos pagando, el sistema automáticamente te bonificará el 100% de descuento en tu cuarta mensualidad.</div>
+</div>
+</div>
+</div>
+<div class="footer-info">
+<div class="schedule">
+<div class="schedule-title" style="font-weight: 700; color: var(--neon-purple); margin-bottom: 5px;">🕒 Atención Asistida</div>
+<div class="schedule-time" style="font-size: 13px; color: var(--text-muted);">Lunes a Sábado • 09:00 AM - 11:00 PM</div>
+</div>
+<div style="font-size: 11px; color: var(--text-muted); margin-top: 15px;">
                 © 2026 GOXION. Todos los derechos reservados.
             </div>
-        </div>
-    </div>
-
-    <div id="auth-overlay" class="auth-overlay gx-auth-backdrop-only" onclick="closeAuthSheetEvent(event)"></div>
-
-    <div id="floating-cart" class="glass-card floating-cart">
-        <div class="cart-info">
-            <span class="cart-total" id="cart-total-price">$0 MXN</span>
-            <span class="cart-items" id="cart-items-count">0 perfiles</span>
-        </div>
-        <button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
-    </div>
-
-    <div id="modal-terminos" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-terminos')">&times;</span>
-            <div class="modal-title">GOXION - Términos y Condiciones</div>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Al hacer uso de cualquiera de los servicios ofrecidos, el usuario acepta de manera íntegra las condiciones establecidas en este instrumento.</p>
-            <ul class="terms-list">
-                <li><strong>1. Confidencialidad de Credenciales</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
-                <li><strong>2. Uso Permitido</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
-                <li><strong>3. Sanciones</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
-                <li><strong>4. Esquema de Pagos y Notificaciones</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial. Métodos aceptados: Transferencias bancarias electrónicas y depósitos.</li>
-                <li><strong>5. Aviso Previo por Imposibilidad de Pago</strong> Si el usuario prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos.</li>
-            </ul>
-        </div>
-    </div>
-    
-    <div id="modal-garantia" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-garantia')">&times;</span>
-            <div class="modal-title">Garantía, Satisfacción y Trato Justo</div>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
-            <table>
-                <tr><th>Concepto</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
-                <tr><td style="color:var(--text-main);"><strong>Falla Técnica</strong></td><td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td><td>Hasta 50% de descuento (equivalente a 10 días).</td></tr>
-                <tr><td style="color:var(--warning-amber);"><strong>Mora sin Previo Aviso</strong></td><td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento.</td><td>Hasta 50% de interés acumulado.</td></tr>
-                <tr><td style="color:var(--danger-red);"><strong>Baja / Cancelación del Servicio</strong></td><td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td><td>20% sobre saldo pendiente.</td></tr>
-            </table>
-        </div>
-    </div>
-
-    <div id="modal-lealtad" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-lealtad')">&times;</span>
-            <div class="modal-title">Programa de Fidelidad</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
-            <table>
-                <tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
-                <tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr>
-                <tr><td style="color: var(--neon-purple); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
-            </table>
-            <p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
-        </div>
-    </div>
-
-    <div id="modal-referidos" class="modal">
-        <div class="glass-card modal-content">
-            <span class="close-btn" onclick="closeModal('modal-referidos')">&times;</span>
-            <div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
-            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">El cliente actual podrá obtener un descuento del 100% en una mensualidad de su servicio actual por cada nuevo cliente que concrete una compra bajo estas bases:</p>
-            <ul class="terms-list">
-                <li><strong>1. Requisitos para el Referido</strong> Debe ser un cliente nuevo. Adquirir un mínimo de dos (2) perfiles y mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos.</li>
-                <li><strong>2. Condiciones de Aplicación</strong> El descuento del 100% se aplicará en el cuarto mes. El Referidor debe mantener su cuenta activa y al corriente durante el tiempo que dure la validación.</li>
-                <li><strong>3. Restricciones</strong> Si el Referido cancela antes de los 3 meses, el beneficio se anula. No es acumulable con otros descuentos. El descuento aplica sobre la tarifa base mensual. Sin límite de referidos (un mes gratis por cada ciclo cumplido).</li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="modal-feedback" class="modal">
-        <div class="glass-card modal-content" style="text-align: center;">
-            <span class="close-btn" onclick="closeModal('modal-feedback')">&times;</span>
-            <div style="font-size: 38px; margin-bottom: 10px;">💬</div>
-            <div class="modal-title">Déjanos tu comentario</div>
-            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Tu opinión nos ayuda a mejorar. ¿Qué te gustaría decirnos?</p>
-            <textarea id="feedback-text" class="input-smart" rows="4" placeholder="Escribe aquí tu comentario, sugerencia o experiencia..." style="resize: none;"></textarea>
-            <button class="btn-primary" onclick="enviarFeedback()" id="btn-send-feedback">Enviar Comentario</button>
-            <p id="feedback-success" style="color: var(--success-green); font-size: 13px; font-weight: 700; margin-top: 15px; display: none;">¡Feedback enviado con éxito! Gracias.</p>
-        </div>
-    </div>
-
-    <script>
+</div>
+</div>
+<div class="auth-overlay gx-auth-backdrop-only" id="auth-overlay" onclick="closeAuthSheetEvent(event)"></div>
+<div class="glass-card floating-cart" id="floating-cart">
+<div class="cart-info">
+<span class="cart-total" id="cart-total-price">$0 MXN</span>
+<span class="cart-items" id="cart-items-count">0 perfiles</span>
+</div>
+<button class="cart-btn" onclick="enviarPedido()">Enviar Pedido 📲</button>
+</div>
+<div class="modal" id="modal-terminos">
+<div class="glass-card modal-content">
+<span class="close-btn" onclick="closeModal('modal-terminos')">×</span>
+<div class="modal-title">GOXION - Términos y Condiciones</div>
+<p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Al hacer uso de cualquiera de los servicios ofrecidos, el usuario acepta de manera íntegra las condiciones establecidas en este instrumento.</p>
+<ul class="terms-list">
+<li><strong>1. Confidencialidad de Credenciales</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
+<li><strong>2. Uso Permitido</strong> Las cuentas deben utilizarse exclusivamente para los fines estipulados. Se prohíbe el uso de software malicioso, intentos de acceso no autorizado, spam o cualquier actividad que vulnere la seguridad del sistema.</li>
+<li><strong>3. Sanciones</strong> El incumplimiento de estas normas faculta a GOXION para aplicar la suspensión temporal o definitiva del servicio sin derecho a reembolso.</li>
+<li><strong>4. Esquema de Pagos y Notificaciones</strong> La fecha límite de pago corresponde exactamente al día del mes en que se realizó la contratación inicial. Métodos aceptados: Transferencias bancarias electrónicas y depósitos.</li>
+<li><strong>5. Aviso Previo por Imposibilidad de Pago</strong> Si el usuario prevé un retraso en su fecha de vencimiento, bastará con notificarlo con antelación al equipo de atención para pactar una prórroga sin aplicación de recargos.</li>
+</ul>
+</div>
+</div>
+<div class="modal" id="modal-garantia">
+<div class="glass-card modal-content">
+<span class="close-btn" onclick="closeModal('modal-garantia')">×</span>
+<div class="modal-title">Garantía, Satisfacción y Trato Justo</div>
+<p style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
+<table>
+<tr><th>Concepto</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
+<tr><td style="color:var(--text-main);"><strong>Falla Técnica</strong></td><td>5% de descuento diario sobre la cuota del perfil por cada día completo sin servicio no imputable al usuario.</td><td>Hasta 50% de descuento (equivalente a 10 días).</td></tr>
+<tr><td style="color:var(--warning-amber);"><strong>Mora sin Previo Aviso</strong></td><td>5% de recargo diario acumulable sobre el saldo pendiente a partir del día posterior al vencimiento.</td><td>Hasta 50% de interés acumulado.</td></tr>
+<tr><td style="color:var(--danger-red);"><strong>Baja / Cancelación del Servicio</strong></td><td>A los 15 días de inactividad sin reporte, se aplicará un 20% de cargo administrativo sobre el saldo adeudado.</td><td>20% sobre saldo pendiente.</td></tr>
+</table>
+</div>
+</div>
+<div class="modal" id="modal-lealtad">
+<div class="glass-card modal-content">
+<span class="close-btn" onclick="closeModal('modal-lealtad')">×</span>
+<div class="modal-title">Programa de Fidelidad</div>
+<p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
+<table>
+<tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
+<tr><td style="color: var(--neon-blue); font-weight: bold;">Nivel 1</td><td>4 Pagos Seguidos</td><td>3% OFF</td></tr>
+<tr><td style="color: var(--neon-purple); font-weight: bold;">Nivel 2</td><td>9 Pagos Seguidos</td><td>6% OFF</td></tr>
+</table>
+<p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
+</div>
+</div>
+<div class="modal" id="modal-referidos">
+<div class="glass-card modal-content">
+<span class="close-btn" onclick="closeModal('modal-referidos')">×</span>
+<div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
+<p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">El cliente actual podrá obtener un descuento del 100% en una mensualidad de su servicio actual por cada nuevo cliente que concrete una compra bajo estas bases:</p>
+<ul class="terms-list">
+<li><strong>1. Requisitos para el Referido</strong> Debe ser un cliente nuevo. Adquirir un mínimo de dos (2) perfiles y mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos.</li>
+<li><strong>2. Condiciones de Aplicación</strong> El descuento del 100% se aplicará en el cuarto mes. El Referidor debe mantener su cuenta activa y al corriente durante el tiempo que dure la validación.</li>
+<li><strong>3. Restricciones</strong> Si el Referido cancela antes de los 3 meses, el beneficio se anula. No es acumulable con otros descuentos. El descuento aplica sobre la tarifa base mensual. Sin límite de referidos (un mes gratis por cada ciclo cumplido).</li>
+</ul>
+</div>
+</div>
+<div class="modal" id="modal-feedback">
+<div class="glass-card modal-content" style="text-align: center;">
+<span class="close-btn" onclick="closeModal('modal-feedback')">×</span>
+<div style="font-size: 38px; margin-bottom: 10px;">💬</div>
+<div class="modal-title">Déjanos tu comentario</div>
+<p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Tu opinión nos ayuda a mejorar. ¿Qué te gustaría decirnos?</p>
+<textarea class="input-smart" id="feedback-text" placeholder="Escribe aquí tu comentario, sugerencia o experiencia..." rows="4" style="resize: none;"></textarea>
+<button class="btn-primary" id="btn-send-feedback" onclick="enviarFeedback()">Enviar Comentario</button>
+<p id="feedback-success" style="color: var(--success-green); font-size: 13px; font-weight: 700; margin-top: 15px; display: none;">¡Feedback enviado con éxito! Gracias.</p>
+</div>
+</div>
+<script>
         const NUMERO_GOXION = "528136836901"; 
         
         const WEBHOOKS_DISCORD = {
@@ -6372,7 +6251,7 @@
 
                     if (smartType === 'pago') {
                         extraIcon = '💳';
-                        clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nDebes abrir \\'Estado de Cuenta\\' desde Mi Espacio para completar esta misión.')"`;
+                        clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nDebes ir al menú principal y presionar el botón \\'Ver Estado de Cuenta y Pagar\\' para completar esta misión.')"`;
                     } else if (smartType === 'catalogo') {
                         extraIcon = '🛒';
                         clickAction = isDone ? '' : `onclick="alert('🔒 ACCIÓN REQUERIDA:\\nDebes visitar nuestra pestaña de \\'Catálogo\\' en la app para completarlo.')"`;
@@ -6404,7 +6283,7 @@
                 expandedCupHtml = `
                     <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
                     <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
-                        <div class="gx-gamif-shared-emoji ${missionReady && !missionClaimed ? 'shake-anim' : ''}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
+                        <div class="gx-gamif-shared-emoji ${couponClaimed ? '' : 'shake-anim'}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
                         <div style="font-size: 16px; font-weight: 800; color: var(--neon-blue);">¡Desbloquea ${gamifConfig.descuento}% OFF!</div>
                         <div style="font-size: 12px; color: var(--text-muted); line-height: 1.4; margin-top: 5px;">Completa las siguientes misiones para reclamar tu descuento especial:</div>
                     </div>
@@ -8302,9 +8181,8 @@
         }
 
     </script>
-
-    <!-- GOXION // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
-    <script id="goxion-client-supabase-layer">
+<!-- GOXION // CLIENTE + CATÁLOGO + SOPORTE EN SUPABASE -->
+<script id="goxion-client-supabase-layer">
     (() => {
         const LOGIN_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion";
         const MI_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
@@ -8647,8 +8525,6 @@ function goxionViewModelAdapter(data) {
         console.info("GOXION Beta 03.03: Mi Espacio refinado + Catálogo Inteligente.");
     })();
     </script>
-
-
 <script id="goxion-nav-controller">
 (() => {
     const nav = document.getElementById("goxion-main-nav");
@@ -8669,8 +8545,6 @@ function goxionViewModelAdapter(data) {
     });
 })();
 </script>
-
-
 <script id="goxion-support-lock-feedback">
 (() => {
     const overlay = document.getElementById("support-lock-overlay");
@@ -8708,7 +8582,6 @@ function goxionViewModelAdapter(data) {
     });
 })();
 </script>
-
 <script id="goxion-gamification-shared-morph-js">
 (() => {
     let gxGamifMorphing = false;
@@ -8853,13 +8726,6 @@ function goxionViewModelAdapter(data) {
         if (!floating || !realTarget) return;
 
         const oldInlineOpacity = realTarget.style.opacity;
-        const oldInlineAnimation = realTarget.style.animation;
-        const oldInlineWebkitAnimation = realTarget.style.webkitAnimation;
-
-        // Evita que el emoji real se mueva debajo del emoji flotante durante
-        // el handoff (Safari hacía visible una "doble" misión durante unos ms).
-        realTarget.style.animation = 'none';
-        realTarget.style.webkitAnimation = 'none';
         realTarget.style.visibility = 'visible';
         realTarget.style.opacity = '0';
 
@@ -8881,10 +8747,6 @@ function goxionViewModelAdapter(data) {
         realTarget.style.opacity = oldInlineOpacity;
         realTarget.style.visibility = '';
         floating.remove();
-
-        // Restauramos la animación después de retirar la copia flotante.
-        realTarget.style.animation = oldInlineAnimation;
-        realTarget.style.webkitAnimation = oldInlineWebkitAnimation;
     }
 
     function gxAnimateChildren(panel, entering) {
@@ -9138,10 +9000,6 @@ function goxionViewModelAdapter(data) {
             gxSetPanelReady(panel, false);
             grid.style.display = 'grid';
             grid.style.visibility = 'visible';
-            // Corrección puntual del doble watermark:
-            // la tarjeta real ya vuelve, pero su ::before permanece oculto
-            // únicamente mientras aterriza la copia flotante.
-            source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
             gxActiveGamifType = null;
             gxGamifMorphing = false;
@@ -9266,6 +9124,10 @@ function goxionViewModelAdapter(data) {
                 host.appendChild(spacer);
             }
 
+            // ÚNICA corrección al morph aprobado:
+            // la tarjeta destino vuelve a existir, pero ocultamos su watermark
+            // mientras la copia flotante termina de aterrizar.
+            source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
 
             const cards = Array.from(grid.children);
@@ -9347,7 +9209,6 @@ function goxionViewModelAdapter(data) {
     window.closeGamif = gxCloseShared;
 })();
 </script>
-
 <script id="goxion-wave-background">
 (() => {
     const canvas = document.getElementById('gx-wave-canvas');
@@ -9587,6 +9448,10 @@ function goxionViewModelAdapter(data) {
     console.info('GOXION Background Wave activo.');
 })();
 </script>
+
+<div class="goxion-release-version" aria-label="Versión de GOXION">
+    GOXION · Ayuda · Beta 03.10 · Cierre auditado
+</div>
 
 <script id="goxion-production-interactions-js">
 (() => {
@@ -10282,36 +10147,23 @@ function goxionViewModelAdapter(data) {
     };
 })();
 </script>
-
-<style id="gx-beta-final-styles">
+<style id="goxion-beta-03-10-final">
 /* =========================================================
-   GOXION BETA 03.06 · PULIDO VISUAL
-   Mantiene las funciones de 03.05 y corrige jerarquía,
-   coherencia visual y pequeños artefactos de interacción.
+   GOXION · BETA 03.10 · CIERRE AUDITADO
+   ÚNICA CAPA AUTORITATIVA DE OVERRIDES PARA ESTA RUTA.
    ========================================================= */
 
-/* ---------- Orden y respiración de Mi Espacio ---------- */
-.gx-gamification-mid{
-    margin-top:0!important;
-    margin-bottom:25px;
-}
-.gx-services-head{
-    margin-top:0!important;
-}
-.gx-history-head{
-    margin-top:25px!important;
-}
-
-/* ---------- Estado de Cuenta: cápsula GOXION ---------- */
+/* ---------- Estado de Cuenta ---------- */
 .gx-account-capsule{
     position:relative;
     isolation:isolate;
     overflow:hidden;
-    width:fit-content;
-    max-width:100%;
-    min-height:40px;
-    margin:16px auto 0;
-    padding:0 15px;
+
+    width:100%;
+    min-height:44px;
+    margin:15px 0 0;
+    padding:0 16px;
+
     display:flex;
     align-items:center;
     justify-content:center;
@@ -10319,313 +10171,349 @@ function goxionViewModelAdapter(data) {
 
     appearance:none;
     -webkit-appearance:none;
-    border:1px solid transparent;
-    border-radius:999px;
-    background:
-        linear-gradient(180deg,rgba(15,16,23,.82),rgba(8,9,14,.76)) padding-box,
-        linear-gradient(105deg,rgba(124,77,255,.70),rgba(0,242,254,.58)) border-box;
-    color:#f7f8ff;
+    border:0;
+    border-radius:15px;
+
+    background:linear-gradient(
+        105deg,
+        #7c4dff 0%,
+        #684ff0 14%,
+        #4c5ff2 30%,
+        #3479f2 45%,
+        #20a3ec 61%,
+        #00c9df 77%,
+        #326eea 90%,
+        #7c4dff 100%
+    );
+    background-size:260% 100%;
+
+    /* IMPORTANTE: background-position NO lleva !important.
+       Los keyframes pueden modificarlo realmente en Safari/iOS. */
+    animation:gxAccountGradientFlow 6.2s ease-in-out infinite;
+
+    color:#fff;
     font-family:'Poppins',sans-serif;
-    font-size:10.5px;
+    font-size:12.7px;
     font-weight:800;
-    letter-spacing:.05px;
+    letter-spacing:.01px;
+
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.055),
-        0 8px 22px rgba(0,0,0,.18);
-    -webkit-tap-highlight-color:transparent;
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 8px 22px rgba(65,72,202,.18);
+
     cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    will-change:background-position;
 }
-.gx-account-capsule::before{
-    content:'';
-    position:absolute;
-    inset:1px auto 1px 1px;
-    width:34%;
-    border-radius:999px;
-    background:linear-gradient(90deg,rgba(124,77,255,.10),transparent);
-    pointer-events:none;
+
+@keyframes gxAccountGradientFlow{
+    0%   { background-position:0% 50%; }
+    50%  { background-position:100% 50%; }
+    100% { background-position:0% 50%; }
 }
+
 .gx-account-capsule::after{
     content:'';
     position:absolute;
+    z-index:-1;
     top:0;
     bottom:0;
-    left:-42%;
-    width:34%;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);
-    transform:skewX(-18deg);
+    left:-55%;
+    width:38%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+    transform:skewX(-22deg);
     opacity:0;
     pointer-events:none;
+    animation:gxAccountSoftSweep 6.2s ease-in-out infinite;
 }
-.gx-account-capsule:active::after{
-    opacity:1;
-    animation:gxAccountCapsuleSweep .42s ease-out 1;
+
+@keyframes gxAccountSoftSweep{
+    0%,68%{left:-55%;opacity:0}
+    72%{opacity:.32}
+    88%{left:118%;opacity:.18}
+    100%{left:118%;opacity:0}
 }
-@keyframes gxAccountCapsuleSweep{
-    from{left:-42%}
-    to{left:112%}
-}
+
 .gx-account-capsule-icon{
-    position:relative;
-    z-index:1;
-    width:26px;
-    height:26px;
+    width:17px;
+    height:17px;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    border-radius:50%;
-    background:rgba(0,242,254,.07);
-    color:var(--neon-blue);
-    border:1px solid rgba(0,242,254,.13);
+    flex:0 0 17px;
 }
-.gx-account-capsule-label,
-.gx-account-capsule-arrow{
+.gx-account-capsule-icon svg{
+    width:17px;
+    height:17px;
+}
+.gx-account-capsule-label{
     position:relative;
     z-index:1;
 }
 .gx-account-capsule-arrow{
-    color:var(--neon-blue);
-    font-size:14px;
-    transform:translateX(0);
+    position:relative;
+    z-index:1;
+    font-size:15px;
     transition:transform .18s ease;
+}
+.gx-account-capsule:active{
+    transform:scale(.985);
 }
 .gx-account-capsule:active .gx-account-capsule-arrow{
     transform:translateX(2px);
 }
-.gx-account-capsule:focus-visible,
-.gx-service-manage-card button:focus-visible{
-    outline:2px solid rgba(0,242,254,.62);
-    outline-offset:3px;
-}
 
-/* ---------- Tus servicios: mismo lenguaje del Catálogo ---------- */
+/* La tarjeta antigua standalone permanece fuera de uso. */
+.gx-account-card{display:none!important}
+
+/* ---------- Tus servicios ---------- */
 .gx-service-summary{
-    padding:13px 14px!important;
-    gap:12px!important;
+    padding:14px;
+    gap:12px;
 }
 .gx-service-logo-img{
-    width:43px!important;
-    height:43px!important;
-    flex:0 0 43px!important;
-    border-radius:12px!important;
-    object-fit:contain!important;
-    padding:2px;
-    background:rgba(0,0,0,.34)!important;
-    border:1px solid rgba(255,255,255,.055);
-    box-shadow:0 5px 14px rgba(0,0,0,.26)!important;
+    width:36px;
+    height:36px;
+    flex:0 0 36px;
+    border-radius:10px;
+    object-fit:contain;
+    box-shadow:none;
 }
 .gx-service-manage-card.expanded .gx-service-logo-img{
-    transform:scale(1.035)!important;
-}
-.gx-service-name{
-    font-size:14px!important;
-    line-height:1.2!important;
-    font-weight:800!important;
-}
-.gx-service-state{
-    margin-top:5px!important;
-    font-size:10px!important;
-    font-weight:750!important;
-}
-.gx-service-manage-card .gx-service-expand-icon{
-    min-width:44px!important;
-    width:auto!important;
-    height:auto!important;
-    padding:8px 14px!important;
-    border-radius:14px!important;
-    border:1px solid rgba(0,242,254,.30)!important;
-    background:rgba(0,242,254,.10)!important;
-    color:var(--neon-blue)!important;
-    font-size:12px!important;
-    line-height:1!important;
-    font-weight:700!important;
-    display:inline-flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    flex-shrink:0!important;
-    margin-left:8px;
-    box-shadow:none!important;
-}
-.gx-service-manage-card.expanded .gx-service-expand-icon{
-    background:var(--neon-blue)!important;
-    border-color:var(--neon-blue)!important;
-    color:#000!important;
-    box-shadow:0 0 15px rgba(0,242,254,.40)!important;
+    transform:none;
 }
 
-/* Contenido integrado: sin cuadros dentro de cuadros */
+/* Flecha/×: proporción fija para que nunca se deforme. */
+.gx-service-manage-card .gx-service-expand-icon{
+    width:34px;
+    min-width:34px;
+    height:34px;
+    padding:0;
+    margin-left:8px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 34px;
+
+    border-radius:11px;
+    border:1px solid rgba(0,242,254,.18);
+    background:rgba(0,242,254,.075);
+    color:var(--neon-blue);
+    font-size:12px;
+    line-height:1;
+    box-shadow:none;
+}
+.gx-service-manage-card.expanded .gx-service-expand-icon{
+    border-color:rgba(0,242,254,.82);
+    background:var(--neon-blue);
+    color:#020305;
+    box-shadow:0 0 12px rgba(0,242,254,.22);
+}
+
 .gx-service-home,
 .gx-service-view{
-    padding:2px 3px 7px!important;
+    padding:4px 4px 8px;
 }
 .gx-service-view[hidden],
 .gx-service-home[hidden]{
     display:none!important;
 }
 .gx-access-heading{
-    margin:2px 0 5px!important;
-    color:rgba(168,181,204,.74)!important;
-    font-size:9px!important;
-    line-height:1.2!important;
-    font-weight:800!important;
-    letter-spacing:1.15px;
-    text-transform:uppercase;
+    color:#aeb5c8;
+    font-size:12px;
+    margin:3px 0 12px;
+    font-weight:600;
 }
 .gx-access-row{
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    padding:11px 2px!important;
+    padding:10px 0;
 }
 .gx-access-row + .gx-access-row{
-    border-top:1px solid rgba(255,255,255,.055)!important;
+    border-top:1px solid rgba(255,255,255,.06);
 }
 .gx-access-row>div{min-width:0}
 .gx-access-row span{
     display:block;
-    color:var(--text-muted)!important;
-    font-size:9.5px!important;
+    font-size:12px;
+    color:#9da7bc;
 }
 .gx-access-row strong{
     display:block;
-    margin-top:2px!important;
-    color:#eef2fb!important;
-    font-size:12px!important;
-    line-height:1.35;
-    font-weight:650!important;
+    margin-top:3px;
+    color:#eef0fa;
+    font-size:14px;
+    font-weight:500;
     overflow-wrap:anywhere;
 }
+
+/* Copiar y ojo: acciones libres, SIN cápsula/recuadro. */
 .gx-access-row button{
-    min-height:31px!important;
-    padding:0 9px!important;
-    border:1px solid rgba(0,242,254,.12)!important;
-    border-radius:999px!important;
-    background:rgba(0,242,254,.04)!important;
-    color:var(--neon-blue)!important;
-    font:inherit;
-    font-size:9px!important;
-    font-weight:800!important;
-    cursor:pointer;
     flex-shrink:0;
+    min-width:34px;
+    min-height:34px;
+    padding:0 3px;
+
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+
+    color:var(--neon-blue);
+    font:inherit;
+    font-size:10px;
+    font-weight:800;
+    cursor:pointer;
 }
-.gx-access-empty{
-    padding:9px 1px;
-    color:var(--text-muted)!important;
-    font-size:10px!important;
-    line-height:1.5!important;
+.gx-access-row button svg{
+    width:19px;
+    height:19px;
 }
+.gx-access-row button:active{
+    opacity:.62;
+    transform:scale(.94);
+}
+
+/* Solo Más opciones usa cápsula. */
 .gx-service-toolbar{
-    display:flex!important;
-    justify-content:flex-end!important;
+    display:flex;
+    justify-content:flex-end;
     gap:8px;
-    margin-top:5px!important;
-    padding-top:10px!important;
-    border-top:1px solid rgba(255,255,255,.055)!important;
+    margin-top:12px;
+    padding-top:11px;
+    border-top:1px solid rgba(255,255,255,.08);
 }
 .gx-service-toolbar button{
-    min-height:32px!important;
-    padding:0 11px!important;
-    border:1px solid rgba(255,255,255,.075)!important;
-    border-radius:999px!important;
-    background:rgba(255,255,255,.025)!important;
-    color:var(--text-muted)!important;
+    flex-shrink:0;
+    min-height:34px;
+    padding:0 13px;
+
+    border:1px solid rgba(124,77,255,.22);
+    border-radius:999px;
+    background:rgba(124,77,255,.065);
+
+    color:#cfc4ff;
     font:inherit;
-    font-size:9.5px!important;
-    font-weight:750!important;
+    font-size:9.5px;
+    font-weight:800;
     cursor:pointer;
 }
 
-/* Vista Más opciones: filas limpias dentro de la misma tarjeta */
+/* Vista secundaria: clara, sin caja dentro de caja. */
 .gx-service-back{
-    min-height:34px!important;
-    padding:0 2px 7px!important;
-    border:0!important;
-    background:transparent!important;
-    color:var(--text-muted)!important;
+    min-height:38px;
+    padding:0;
+    border:0;
+    background:transparent;
+    color:#aeb5c8;
     font:inherit;
-    font-size:9.5px!important;
-    font-weight:700!important;
+    font-size:10px;
+    font-weight:700;
     cursor:pointer;
 }
 .gx-option-support,
 .gx-service-view .gx-cancel-link{
-    width:100%!important;
-    min-height:49px!important;
-    margin:0!important;
-    padding:12px 2px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:space-between!important;
-    gap:12px!important;
-    border:0!important;
-    border-top:1px solid rgba(255,255,255,.055)!important;
-    border-radius:0!important;
-    background:transparent!important;
-    color:#e8ecf6!important;
-    font:inherit!important;
-    font-size:11px!important;
-    font-weight:700!important;
-    text-align:left;
+    width:100%;
+    min-height:46px;
+    margin-top:8px;
+    padding:0 13px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+
+    border-radius:13px;
+    font:inherit;
+    font-size:10.5px;
+    font-weight:750;
     cursor:pointer;
+}
+.gx-option-support{
+    border:1px solid rgba(0,242,254,.14);
+    background:rgba(0,242,254,.045);
+    color:#e8faff;
 }
 .gx-option-support span:last-child{
     color:var(--neon-blue);
 }
 .gx-service-view .gx-cancel-link{
-    color:rgba(238,184,201,.90)!important;
+    border:1px solid rgba(255,112,148,.12);
+    background:rgba(255,112,148,.035);
+    color:#e8c3ce;
 }
 .gx-service-view .gx-cancel-link span:last-child{
     color:#ff91ad;
 }
 .gx-service-view h3{
-    margin:9px 0 8px!important;
-    color:#fff;
-    font-size:14px!important;
-    line-height:1.25;
+    margin:12px 0;
+    font-size:16px;
 }
-.gx-service-view p{
-    color:#cbd1df!important;
-    font-size:10.5px!important;
-    line-height:1.55!important;
+.gx-service-view p,
+.gx-access-empty{
+    color:#ccd0dc;
+    font-size:14px;
+    line-height:1.6;
 }
 .gx-service-view .gx-cancel-detail{
-    margin:8px 0 15px!important;
-    color:var(--text-muted)!important;
-    font-size:9.5px!important;
+    margin:10px 0 18px;
+    color:#98a3b9;
+    font-size:12px;
 }
 .gx-service-view .gx-service-cancel-submit{
-    min-height:38px!important;
-    padding:0 14px!important;
-    border-radius:999px!important;
-    border:1px solid rgba(255,51,102,.20)!important;
-    background:rgba(255,51,102,.07)!important;
-    color:#ff91ad!important;
-    box-shadow:none!important;
-    font-size:9.5px!important;
-    font-weight:800!important;
+    min-height:44px;
+    padding:10px 16px;
+    border-radius:999px;
+    font-size:14px;
 }
 
-/* Estado especial del servicio conservado */
+/* Estado administrable desde backend. */
 .gx-service-state.gx-service-interrupted{
-    color:#e9bb73!important;
+    color:#e9bb73;
 }
 .gx-service-state.gx-service-interrupted::before{
-    background:#e9bb73!important;
-    box-shadow:none!important;
+    background:#e9bb73;
+    box-shadow:none;
 }
 
-/* ---------- Catálogo: recupera respiración bajo la navegación ---------- */
-/* La navegación vuelve a usar su margen base de 20px. */
+/* ---------- Catálogo ---------- */
+/* Arriba y abajo de búsqueda quedan visualmente equilibrados. */
+body:has(#view-catalogo.active) #goxion-main-nav{
+    margin-bottom:10px;
+}
 #view-catalogo .gx-catalog-toolbar{
-    margin-top:2px!important;
-    margin-bottom:14px!important;
+    margin-top:0;
+    margin-bottom:14px;
+}
+#view-catalogo .gx-catalog-filters{
+    margin-top:9px;
 }
 
-/* Ajustes acertados de 03.05 que sí conservamos */
+/* Personalización sin cambiar el cristal de la tarjeta. */
+.brand-card.gx-owned-service,
+.brand-card.gx-owned-service.expanded{
+    opacity:1;
+    filter:none;
+}
+.brand-card.gx-owned-service{
+    background:var(--card-glass);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+.brand-card.gx-owned-service.has-promo{
+    background:transparent;
+}
+
+/* Protecciones de layout del catálogo inteligente. */
 .brand-header-left{min-width:0;flex:1}
 .brand-titles{min-width:0;flex:1}
 .brand-logo-img{flex-shrink:0}
-.brand-header>.brand-expand-icon{flex-shrink:0;margin-left:10px}
+.brand-header>.brand-expand-icon{
+    flex-shrink:0;
+    margin-left:10px;
+}
 .gx-brand-meta{
     display:flex;
     align-items:center;
@@ -10642,10 +10530,10 @@ function goxionViewModelAdapter(data) {
     padding:2px 5px;
     border:0;
     background:transparent;
-    white-space:nowrap;
-    flex-shrink:0;
     font-size:9px;
     line-height:1.2;
+    white-space:nowrap;
+    flex-shrink:0;
 }
 .gx-catalog-smart-reason{
     margin:0 0 12px;
@@ -10653,245 +10541,45 @@ function goxionViewModelAdapter(data) {
 }
 .brand-name{overflow-wrap:anywhere}
 
-/* ---------- Misiones: sin doble watermark durante el morph ---------- */
+/* ---------- Gamificación ---------- */
+/* Única corrección nueva: evita el doble watermark durante el handoff.
+   NO cambia tiempos, card fade ni geometría del morph aprobado. */
 .gx-gamif-card.gx-gamif-watermark-hidden::before{
     opacity:0!important;
     animation:none!important;
     -webkit-animation:none!important;
+}
+
+/* ---------- Focus / accesibilidad ---------- */
+.gx-account-capsule:focus-visible,
+.gx-service-manage-card button:focus-visible{
+    outline:2px solid #a999ff;
+    outline-offset:3px;
 }
 
 @media(max-width:380px){
     .brand-header-left{gap:10px}
     .gx-brand-meta{gap:5px}
-    .gx-brand-meta .gx-catalog-context-badge{font-size:8px;padding:2px}
-    .brand-header>.brand-expand-icon{margin-left:6px}
-    .gx-service-summary{gap:10px!important;padding:12px!important}
-    .gx-service-logo-img{width:40px!important;height:40px!important;flex-basis:40px!important}
-    .gx-service-manage-card .gx-service-expand-icon{padding:8px 12px!important;margin-left:5px}
-}
-
-/* =========================================================
-   GOXION BETA 03.07 · AJUSTE FINO
-   ========================================================= */
-
-/* ---------- Estado de Cuenta: lenguaje del CTA -10% OFF ---------- */
-.gx-account-capsule{
-    width:100%!important;
-    min-height:44px!important;
-    margin:15px 0 0!important;
-    padding:0 16px!important;
-    border:0!important;
-    border-radius:15px!important;
-    background:linear-gradient(125deg,#6f46e8 0%,#5267f0 48%,#17bfe5 100%)!important;
-    color:#fff!important;
-    box-shadow:0 8px 22px rgba(76,73,211,.20)!important;
-    font-size:11.5px!important;
-    letter-spacing:.02px!important;
-}
-.gx-account-capsule::before{
-    display:none!important;
-}
-.gx-account-capsule::after{
-    content:''!important;
-    display:block!important;
-    position:absolute!important;
-    top:0!important;
-    bottom:0!important;
-    left:-58%!important;
-    width:42%!important;
-    border-radius:0!important;
-    background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)!important;
-    transform:skewX(-22deg)!important;
-    opacity:.58!important;
-    animation:gxAccountPremiumSweep 4.2s cubic-bezier(.4,0,.2,1) infinite!important;
-    pointer-events:none!important;
-}
-@keyframes gxAccountPremiumSweep{
-    0%,68%{left:-58%;opacity:0}
-    72%{opacity:.48}
-    88%{left:118%;opacity:.28}
-    100%{left:118%;opacity:0}
-}
-.gx-account-capsule-icon{
-    width:auto!important;
-    height:auto!important;
-    border:0!important;
-    border-radius:0!important;
-    background:transparent!important;
-    color:#fff!important;
-}
-.gx-account-capsule-icon svg{
-    width:16px!important;
-    height:16px!important;
-    stroke-width:1.8!important;
-}
-.gx-account-capsule-label{
-    font-weight:800!important;
-}
-.gx-account-capsule-arrow{
-    margin-left:2px;
-    color:#fff!important;
-    font-size:15px!important;
-}
-.gx-account-capsule:active{
-    transform:scale(.985);
-}
-
-/* ---------- Tus accesos: Copiar y ojo sin cápsulas ---------- */
-.gx-access-row button{
-    min-width:34px!important;
-    min-height:34px!important;
-    padding:0 3px!important;
-    border:0!important;
-    border-radius:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    color:var(--neon-blue)!important;
-    font-size:9.5px!important;
-    font-weight:800!important;
-}
-.gx-access-row button svg{
-    width:19px!important;
-    height:19px!important;
-}
-.gx-access-row button:active{
-    opacity:.62;
-    transform:scale(.94);
-}
-
-/* Solo "Más opciones" conserva el tratamiento de cápsula */
-.gx-service-toolbar{
-    padding-top:11px!important;
-}
-.gx-service-toolbar button{
-    min-height:34px!important;
-    padding:0 13px!important;
-    border:1px solid rgba(124,77,255,.22)!important;
-    border-radius:999px!important;
-    background:rgba(124,77,255,.065)!important;
-    color:#cfc4ff!important;
-    font-size:9.5px!important;
-    font-weight:800!important;
-}
-
-/* ---------- Más opciones: acciones que sí parecen botones ---------- */
-.gx-option-support,
-.gx-service-view .gx-cancel-link{
-    min-height:46px!important;
-    margin:8px 0 0!important;
-    padding:0 13px!important;
-    border-radius:13px!important;
-    font-size:10.5px!important;
-    font-weight:750!important;
-}
-.gx-option-support{
-    border:1px solid rgba(0,242,254,.14)!important;
-    background:rgba(0,242,254,.045)!important;
-    color:#e8faff!important;
-}
-.gx-option-support span:last-child{
-    color:var(--neon-blue)!important;
-}
-.gx-service-view .gx-cancel-link{
-    border:1px solid rgba(255,112,148,.12)!important;
-    background:rgba(255,112,148,.035)!important;
-    color:#e8c3ce!important;
-}
-.gx-service-view .gx-cancel-link span:last-child{
-    color:#ff91ad!important;
-}
-
-/* ---------- Catálogo: separación simétrica ---------- */
-/* 10px arriba de búsqueda ≈ 9px entre búsqueda y filtros */
-body:has(#view-catalogo.active) #goxion-main-nav{
-    margin-bottom:10px!important;
-}
-#view-catalogo .gx-catalog-toolbar{
-    margin-top:0!important;
-    margin-bottom:14px!important;
-}
-#view-catalogo .gx-catalog-filters{
-    margin-top:9px!important;
-}
-
-/* Gamificación: el watermark oculto solo durante el handoff del emoji. */
-.gx-gamif-card.gx-gamif-watermark-hidden::before{
-    opacity:0!important;
-    animation:none!important;
-    -webkit-animation:none!important;
-}
-
-@media(prefers-reduced-motion:reduce){
-    .gx-account-capsule::after{
-        animation:none!important;
-        display:none!important;
+    .gx-brand-meta .gx-catalog-context-badge{
+        font-size:8px;
+        padding:2px;
     }
-}
-
-@media(prefers-reduced-motion:reduce){
-    .gx-account-capsule::after{display:none}
-}
-</style>
-
-<style id="goxion-beta-03-09-account-gradient-fix">
-/* =========================================================
-   GOXION BETA 03.09
-   Estado de Cuenta · gradiente realmente visible
-   Debe permanecer como la última regla de esta cápsula.
-   ========================================================= */
-
-.gx-account-capsule{
-    background:
-        linear-gradient(
-            105deg,
-            #7c4dff 0%,
-            #6a55f1 16%,
-            #455ff2 34%,
-            #287ff4 50%,
-            #18aeea 67%,
-            #00d1df 82%,
-            #5663f0 94%,
-            #7c4dff 100%
-        )!important;
-    background-size:220% 100%!important;
-    background-position:0% 50%!important;
-    animation:gxAccountColorMix 5.8s cubic-bezier(.45,.05,.55,.95) infinite!important;
-
-    font-size:12.7px!important;
-    font-weight:800!important;
-}
-
-/* Mezcla continua: el violeta, azul y cian atraviesan el botón,
-   pero sin parecer una luz agresiva o un anuncio. */
-@keyframes gxAccountColorMix{
-    0%{
-        background-position:0% 50%;
+    .brand-header>.brand-expand-icon{
+        margin-left:6px;
     }
-    50%{
-        background-position:100% 50%;
-    }
-    100%{
-        background-position:0% 50%;
-    }
-}
-
-/* El barrido blanco queda como detalle secundario y más espaciado. */
-.gx-account-capsule::after{
-    opacity:.30!important;
-    animation:gxAccountPremiumSweep 5.8s cubic-bezier(.4,0,.2,1) infinite!important;
 }
 
 @media(prefers-reduced-motion:reduce){
     .gx-account-capsule{
-        animation:none!important;
-        background-position:48% 50%!important;
+        animation:none;
+        background-position:48% 50%;
+        will-change:auto;
     }
     .gx-account-capsule::after{
-        animation:none!important;
-        display:none!important;
+        display:none;
+        animation:none;
     }
 }
 </style>
-
 </body>
 </html>
