@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-06">
+<html lang="es" data-goxion-version="1.1.0-beta-07">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -5197,7 +5197,7 @@
                             <path d="M9 11h6M9 14.5h6"></path>
                         </svg>
                     </span>
-                    <span class="gx-account-capsule-label">Estado de Cuenta</span>
+                    <span class="gx-account-capsule-label">Ver Estado de Cuenta</span>
                     <span class="gx-account-capsule-arrow">→</span>
                 </button>
             </div>
@@ -9180,9 +9180,14 @@ function goxionViewModelAdapter(data) {
             grid.style.display = 'grid';
             grid.style.visibility = 'visible';
 
-            Array.from(grid.children).forEach(card => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(4px) scale(.992)';
+            // El grid real vuelve ya en su estado natural. No hacemos un segundo
+            // fade/scale de las tarjetas: ese paso era el que producía el parpadeo
+            // "desaparece -> se encoge -> reaparece" al terminar la contracción.
+            const cards = Array.from(grid.children);
+            cards.forEach(card => {
+                card.style.opacity = '';
+                card.style.transform = '';
+                card.style.visibility = 'visible';
             });
 
             const heightDifference = Math.max(0, panelOuterHeight - gridOuterHeight);
@@ -9193,33 +9198,20 @@ function goxionViewModelAdapter(data) {
                 host.appendChild(spacer);
             }
 
+            // Ocultamos SOLO el watermark real de la tarjeta destino mientras
+            // aterriza el emoji flotante. Así no aparecen dos checks/trofeos.
             source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
 
-            const cards = Array.from(grid.children);
-            const cardAnims = cards.map((card, index) =>
-                card.animate([
-                    { opacity: 0, transform: 'translateY(4px) scale(.992)' },
-                    { opacity: 1, transform: 'translateY(0) scale(1)' }
-                ], {
-                    duration: 220,
-                    delay: index * 32,
-                    easing: 'cubic-bezier(.16,1,.3,1)',
-                    fill: 'forwards'
-                })
-            );
-
             const surfaceFade = surface.animate(
                 [{ opacity: 1 }, { opacity: 0 }],
-                { duration: 120, easing: 'ease-out', fill: 'forwards' }
+                { duration: 105, easing: 'ease-out', fill: 'forwards' }
             );
 
-            // The floating emoji lands on the watermark and fades together with
-            // the real card instead of "snapping" into its final position.
             const emojiFade = floatingEmoji
                 ? floatingEmoji.animate(
                     [{ opacity: sourceEmoji.opacity }, { opacity: 0 }],
-                    { duration: 120, easing: 'ease-out', fill: 'forwards' }
+                    { duration: 105, easing: 'ease-out', fill: 'forwards' }
                   )
                 : null;
 
@@ -9233,18 +9225,8 @@ function goxionViewModelAdapter(data) {
             await Promise.allSettled([
                 surfaceFade.finished,
                 emojiFade?.finished || Promise.resolve(),
-                spacerAnim?.finished || Promise.resolve(),
-                ...cardAnims.map(a => a.finished)
+                spacerAnim?.finished || Promise.resolve()
             ]);
-
-            cards.forEach((card, index) => {
-                // Commit the natural final state, then release the WAAPI layer.
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0) scale(1)';
-                try { cardAnims[index]?.cancel(); } catch (_) {}
-                card.style.opacity = '';
-                card.style.transform = '';
-            });
 
             if (panelEmojiEl) panelEmojiEl.style.visibility = '';
             surface.remove();
@@ -10597,6 +10579,165 @@ function goxionViewModelAdapter(data) {
     .gx-service-logo-img{width:40px!important;height:40px!important;flex-basis:40px!important}
     .gx-service-manage-card .gx-service-expand-icon{padding:8px 12px!important;margin-left:5px}
 }
+
+/* =========================================================
+   GOXION BETA 03.07 · AJUSTE FINO
+   ========================================================= */
+
+/* ---------- Estado de Cuenta: lenguaje del CTA -10% OFF ---------- */
+.gx-account-capsule{
+    width:100%!important;
+    min-height:44px!important;
+    margin:15px 0 0!important;
+    padding:0 16px!important;
+    border:0!important;
+    border-radius:15px!important;
+    background:linear-gradient(125deg,#6f46e8 0%,#5267f0 48%,#17bfe5 100%)!important;
+    color:#fff!important;
+    box-shadow:0 8px 22px rgba(76,73,211,.20)!important;
+    font-size:11.5px!important;
+    letter-spacing:.02px!important;
+}
+.gx-account-capsule::before{
+    display:none!important;
+}
+.gx-account-capsule::after{
+    content:''!important;
+    display:block!important;
+    position:absolute!important;
+    top:0!important;
+    bottom:0!important;
+    left:-58%!important;
+    width:42%!important;
+    border-radius:0!important;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent)!important;
+    transform:skewX(-22deg)!important;
+    opacity:.58!important;
+    animation:gxAccountPremiumSweep 4.2s cubic-bezier(.4,0,.2,1) infinite!important;
+    pointer-events:none!important;
+}
+@keyframes gxAccountPremiumSweep{
+    0%,68%{left:-58%;opacity:0}
+    72%{opacity:.48}
+    88%{left:118%;opacity:.28}
+    100%{left:118%;opacity:0}
+}
+.gx-account-capsule-icon{
+    width:auto!important;
+    height:auto!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    color:#fff!important;
+}
+.gx-account-capsule-icon svg{
+    width:16px!important;
+    height:16px!important;
+    stroke-width:1.8!important;
+}
+.gx-account-capsule-label{
+    font-weight:800!important;
+}
+.gx-account-capsule-arrow{
+    margin-left:2px;
+    color:#fff!important;
+    font-size:15px!important;
+}
+.gx-account-capsule:active{
+    transform:scale(.985);
+}
+
+/* ---------- Tus accesos: Copiar y ojo sin cápsulas ---------- */
+.gx-access-row button{
+    min-width:34px!important;
+    min-height:34px!important;
+    padding:0 3px!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:var(--neon-blue)!important;
+    font-size:9.5px!important;
+    font-weight:800!important;
+}
+.gx-access-row button svg{
+    width:19px!important;
+    height:19px!important;
+}
+.gx-access-row button:active{
+    opacity:.62;
+    transform:scale(.94);
+}
+
+/* Solo "Más opciones" conserva el tratamiento de cápsula */
+.gx-service-toolbar{
+    padding-top:11px!important;
+}
+.gx-service-toolbar button{
+    min-height:34px!important;
+    padding:0 13px!important;
+    border:1px solid rgba(124,77,255,.22)!important;
+    border-radius:999px!important;
+    background:rgba(124,77,255,.065)!important;
+    color:#cfc4ff!important;
+    font-size:9.5px!important;
+    font-weight:800!important;
+}
+
+/* ---------- Más opciones: acciones que sí parecen botones ---------- */
+.gx-option-support,
+.gx-service-view .gx-cancel-link{
+    min-height:46px!important;
+    margin:8px 0 0!important;
+    padding:0 13px!important;
+    border-radius:13px!important;
+    font-size:10.5px!important;
+    font-weight:750!important;
+}
+.gx-option-support{
+    border:1px solid rgba(0,242,254,.14)!important;
+    background:rgba(0,242,254,.045)!important;
+    color:#e8faff!important;
+}
+.gx-option-support span:last-child{
+    color:var(--neon-blue)!important;
+}
+.gx-service-view .gx-cancel-link{
+    border:1px solid rgba(255,112,148,.12)!important;
+    background:rgba(255,112,148,.035)!important;
+    color:#e8c3ce!important;
+}
+.gx-service-view .gx-cancel-link span:last-child{
+    color:#ff91ad!important;
+}
+
+/* ---------- Catálogo: separación simétrica ---------- */
+/* 10px arriba de búsqueda ≈ 9px entre búsqueda y filtros */
+body:has(#view-catalogo.active) #goxion-main-nav{
+    margin-bottom:10px!important;
+}
+#view-catalogo .gx-catalog-toolbar{
+    margin-top:0!important;
+    margin-bottom:14px!important;
+}
+#view-catalogo .gx-catalog-filters{
+    margin-top:9px!important;
+}
+
+/* Gamificación: el watermark oculto solo durante el handoff del emoji. */
+.gx-gamif-card.gx-gamif-watermark-hidden::before{
+    opacity:0!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-account-capsule::after{
+        animation:none!important;
+        display:none!important;
+    }
+}
+
 @media(prefers-reduced-motion:reduce){
     .gx-account-capsule::after{display:none}
 }
