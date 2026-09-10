@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-07">
+<html lang="es" data-goxion-version="1.1.0-beta-08">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -4886,6 +4886,75 @@
 }
 </style>
 
+
+<style id="goxion-beta-03-08-final">
+/* =========================================================
+   GOXION BETA 03.08 · ESTABILIZACIÓN
+   ========================================================= */
+
+/* Misiones/Referidos:
+   solo se oculta el watermark real durante el handoff del emoji compartido. */
+.gx-gamif-card.gx-gamif-watermark-hidden::before{
+    opacity:0!important;
+    animation:none!important;
+    -webkit-animation:none!important;
+}
+
+/* Estado de Cuenta:
+   conserva el CTA aprobado de 03.07, ahora con mezcla de color animada. */
+.gx-account-capsule{
+    background:
+        linear-gradient(
+            120deg,
+            #7c4dff 0%,
+            #6260f2 23%,
+            #416ff4 46%,
+            #13b9e7 69%,
+            #00d4df 82%,
+            #7c4dff 100%
+        )!important;
+    background-size:260% 260%!important;
+    animation:gxAccountGradientFlow 8s ease-in-out infinite!important;
+    font-size:12.5px!important;
+    font-weight:800!important;
+}
+@keyframes gxAccountGradientFlow{
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+/* El shimmer sigue siendo secundario; la protagonista es la mezcla de color. */
+.gx-account-capsule::after{
+    opacity:.42!important;
+}
+
+/* Catálogo personalizado:
+   "Ya lo tienes" informa estado, pero NO altera el vidrio de la tarjeta. */
+.brand-card.gx-owned-service,
+.brand-card.gx-owned-service.expanded{
+    opacity:1!important;
+    filter:none!important;
+}
+.brand-card.gx-owned-service{
+    background:var(--card-glass)!important;
+    backdrop-filter:blur(10px)!important;
+    -webkit-backdrop-filter:blur(10px)!important;
+}
+
+/* Las promos conservan su propia superficie exactamente como las demás promos. */
+.brand-card.gx-owned-service.has-promo{
+    background:transparent!important;
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-account-capsule{
+        animation:none!important;
+        background-position:50% 50%!important;
+    }
+}
+</style>
+
 </head>
 <body class="no-scroll">
 
@@ -9069,6 +9138,10 @@ function goxionViewModelAdapter(data) {
             gxSetPanelReady(panel, false);
             grid.style.display = 'grid';
             grid.style.visibility = 'visible';
+            // Corrección puntual del doble watermark:
+            // la tarjeta real ya vuelve, pero su ::before permanece oculto
+            // únicamente mientras aterriza la copia flotante.
+            source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
             gxActiveGamifType = null;
             gxGamifMorphing = false;
@@ -9180,14 +9253,9 @@ function goxionViewModelAdapter(data) {
             grid.style.display = 'grid';
             grid.style.visibility = 'visible';
 
-            // El grid real vuelve ya en su estado natural. No hacemos un segundo
-            // fade/scale de las tarjetas: ese paso era el que producía el parpadeo
-            // "desaparece -> se encoge -> reaparece" al terminar la contracción.
-            const cards = Array.from(grid.children);
-            cards.forEach(card => {
-                card.style.opacity = '';
-                card.style.transform = '';
-                card.style.visibility = 'visible';
+            Array.from(grid.children).forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(4px) scale(.992)';
             });
 
             const heightDifference = Math.max(0, panelOuterHeight - gridOuterHeight);
@@ -9198,20 +9266,32 @@ function goxionViewModelAdapter(data) {
                 host.appendChild(spacer);
             }
 
-            // Ocultamos SOLO el watermark real de la tarjeta destino mientras
-            // aterriza el emoji flotante. Así no aparecen dos checks/trofeos.
-            source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
+
+            const cards = Array.from(grid.children);
+            const cardAnims = cards.map((card, index) =>
+                card.animate([
+                    { opacity: 0, transform: 'translateY(4px) scale(.992)' },
+                    { opacity: 1, transform: 'translateY(0) scale(1)' }
+                ], {
+                    duration: 220,
+                    delay: index * 32,
+                    easing: 'cubic-bezier(.16,1,.3,1)',
+                    fill: 'forwards'
+                })
+            );
 
             const surfaceFade = surface.animate(
                 [{ opacity: 1 }, { opacity: 0 }],
-                { duration: 105, easing: 'ease-out', fill: 'forwards' }
+                { duration: 120, easing: 'ease-out', fill: 'forwards' }
             );
 
+            // The floating emoji lands on the watermark and fades together with
+            // the real card instead of "snapping" into its final position.
             const emojiFade = floatingEmoji
                 ? floatingEmoji.animate(
                     [{ opacity: sourceEmoji.opacity }, { opacity: 0 }],
-                    { duration: 105, easing: 'ease-out', fill: 'forwards' }
+                    { duration: 120, easing: 'ease-out', fill: 'forwards' }
                   )
                 : null;
 
@@ -9225,8 +9305,18 @@ function goxionViewModelAdapter(data) {
             await Promise.allSettled([
                 surfaceFade.finished,
                 emojiFade?.finished || Promise.resolve(),
-                spacerAnim?.finished || Promise.resolve()
+                spacerAnim?.finished || Promise.resolve(),
+                ...cardAnims.map(a => a.finished)
             ]);
+
+            cards.forEach((card, index) => {
+                // Commit the natural final state, then release the WAAPI layer.
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0) scale(1)';
+                try { cardAnims[index]?.cancel(); } catch (_) {}
+                card.style.opacity = '';
+                card.style.transform = '';
+            });
 
             if (panelEmojiEl) panelEmojiEl.style.visibility = '';
             surface.remove();
