@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.0-beta-08">
+<html lang="es" data-goxion-version="1.1.0-beta-09">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -10832,5 +10832,66 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     .gx-account-capsule::after{display:none}
 }
 </style>
+
+<style id="goxion-beta-03-09-account-gradient-fix">
+/* =========================================================
+   GOXION BETA 03.09
+   Estado de Cuenta · gradiente realmente visible
+   Debe permanecer como la última regla de esta cápsula.
+   ========================================================= */
+
+.gx-account-capsule{
+    background:
+        linear-gradient(
+            105deg,
+            #7c4dff 0%,
+            #6a55f1 16%,
+            #455ff2 34%,
+            #287ff4 50%,
+            #18aeea 67%,
+            #00d1df 82%,
+            #5663f0 94%,
+            #7c4dff 100%
+        )!important;
+    background-size:220% 100%!important;
+    background-position:0% 50%!important;
+    animation:gxAccountColorMix 5.8s cubic-bezier(.45,.05,.55,.95) infinite!important;
+
+    font-size:12.7px!important;
+    font-weight:800!important;
+}
+
+/* Mezcla continua: el violeta, azul y cian atraviesan el botón,
+   pero sin parecer una luz agresiva o un anuncio. */
+@keyframes gxAccountColorMix{
+    0%{
+        background-position:0% 50%;
+    }
+    50%{
+        background-position:100% 50%;
+    }
+    100%{
+        background-position:0% 50%;
+    }
+}
+
+/* El barrido blanco queda como detalle secundario y más espaciado. */
+.gx-account-capsule::after{
+    opacity:.30!important;
+    animation:gxAccountPremiumSweep 5.8s cubic-bezier(.4,0,.2,1) infinite!important;
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-account-capsule{
+        animation:none!important;
+        background-position:48% 50%!important;
+    }
+    .gx-account-capsule::after{
+        animation:none!important;
+        display:none!important;
+    }
+}
+</style>
+
 </body>
 </html>
