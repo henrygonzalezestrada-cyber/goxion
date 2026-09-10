@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.1.0-beta-10" lang="es">
+<html data-goxion-version="1.1.0-beta-11" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -4893,6 +4893,75 @@
 }
 </style>
 
+
+<style id="goxion-beta-03-11-last">
+/* =========================================================
+   GOXION BETA 03.11 · AJUSTES DE CIERRE
+   ========================================================= */
+
+/* Historial: estado de lealtad como segunda píldora, sin emoji. */
+.gx-payment-history-loyalty.gx-loyalty-pill{
+    display:inline-flex;
+    align-items:center;
+    min-height:20px;
+    margin:0;
+    padding:0 7px;
+    border-radius:999px;
+    font-size:8.2px;
+    line-height:1;
+    font-weight:800;
+    white-space:nowrap;
+}
+.gx-payment-history-loyalty.gx-loyalty-pill.yes{
+    color:#7de8b2;
+    border:1px solid rgba(46,160,103,.18);
+    background:rgba(46,160,103,.075);
+}
+.gx-payment-history-loyalty.gx-loyalty-pill.no{
+    color:#aeb5c8;
+    border:1px solid rgba(174,181,200,.13);
+    background:rgba(174,181,200,.045);
+}
+
+/* Activo: pulso pequeño y limpio, sin animar texto ni tarjeta. */
+.gx-service-state:not(.gx-service-interrupted)::before{
+    animation:gxServiceActivePulse 2.05s ease-in-out infinite;
+    will-change:transform,box-shadow,opacity;
+}
+@keyframes gxServiceActivePulse{
+    0%,100%{
+        transform:scale(1);
+        opacity:.78;
+        box-shadow:0 0 4px currentColor;
+    }
+    50%{
+        transform:scale(1.55);
+        opacity:1;
+        box-shadow:0 0 9px currentColor;
+    }
+}
+
+/* Temporalmente inactivo mantiene un punto estable: no comunica actividad. */
+.gx-service-state.gx-service-interrupted::before{
+    animation:none!important;
+    transform:none!important;
+}
+
+/* El helper de watermark queda neutralizado: en 03.11 ya no se usa
+   para el cierre. Se conserva solo por compatibilidad si una apertura
+   antigua lo invoca accidentalmente. */
+.gx-gamif-card.gx-gamif-watermark-hidden::before{
+    opacity:0!important;
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-service-state::before{
+        animation:none!important;
+        transform:none!important;
+    }
+}
+</style>
+
 </head>
 <body class="no-scroll">
 <div id="splash-screen" onclick="hideSplash()">
@@ -6374,7 +6443,7 @@
                         return {
                             label:'Pagaste mora',
                             badgeClass:'late',
-                            loyalty:'○ No sumó a tu lealtad',
+                            loyalty:'No sumó lealtad',
                             loyaltyClass:'no',
                             status:'Acreditado'
                         };
@@ -6384,7 +6453,7 @@
                         return {
                             label:'En revisión',
                             badgeClass:'review',
-                            loyalty:'○ Pendiente de lealtad',
+                            loyalty:'Lealtad pendiente',
                             loyaltyClass:'no',
                             status:'Revisión'
                         };
@@ -6394,7 +6463,7 @@
                         return {
                             label:'Pago en tiempo',
                             badgeClass:'ontime',
-                            loyalty:'⭐ Sumó a tu lealtad',
+                            loyalty:'Sumó lealtad',
                             loyaltyClass:'yes',
                             status:'Acreditado'
                         };
@@ -6403,7 +6472,7 @@
                     return {
                         label:'Pago registrado',
                         badgeClass:'review',
-                        loyalty:'○ Sin cambio de lealtad',
+                        loyalty:'Sin cambio de lealtad',
                         loyaltyClass:'no',
                         status:'Registrado'
                     };
@@ -6428,7 +6497,7 @@
                                 <div class="gx-payment-history-date">${p.fecha || 'Pago registrado'}</div>
                                 <div class="gx-payment-history-meta">
                                     <span class="gx-payment-history-badge ${meta.badgeClass}">${meta.label}</span>
-                                    <span class="gx-payment-history-loyalty ${meta.loyaltyClass}">${meta.loyalty}</span>
+                                    <span class="gx-payment-history-loyalty gx-loyalty-pill ${meta.loyaltyClass}">${meta.loyalty}</span>
                                 </div>
                             </div>
 
@@ -9036,12 +9105,43 @@ function goxionViewModelAdapter(data) {
             }
 
             const emojiAnim = floatingEmoji && panelEmoji
-                ? gxAnimateEmoji(
-                    floatingEmoji,
-                    panelEmoji,
-                    { ...sourceEmoji, text: panelEmoji.text },
-                    false
-                  )
+                ? (() => {
+                    const target = { ...sourceEmoji, text: panelEmoji.text };
+                    const baseFont = Number(floatingEmoji.dataset.baseFont) ||
+                        Math.max(panelEmoji.fontSize, target.fontSize);
+                    const fromScale = (panelEmoji.fontSize / baseFont) * panelEmoji.scale;
+                    const toScale = (target.fontSize / baseFont) * target.scale;
+
+                    // Cierre refinado:
+                    // el icono conserva el recorrido compartido, pero desaparece
+                    // antes de convertirse visualmente en el watermark grande
+                    // de la tarjeta. El watermark real entra junto con la card.
+                    return floatingEmoji.animate([
+                        {
+                            left:`${panelEmoji.left}px`,
+                            top:`${panelEmoji.top}px`,
+                            opacity:panelEmoji.opacity,
+                            transform:`translate(-50%,-50%) rotate(${panelEmoji.rotation}deg) scale(${fromScale})`
+                        },
+                        {
+                            left:`${panelEmoji.left + (target.left - panelEmoji.left) * .62}px`,
+                            top:`${panelEmoji.top + (target.top - panelEmoji.top) * .62}px`,
+                            opacity:Math.min(panelEmoji.opacity, .72),
+                            transform:`translate(-50%,-50%) rotate(${panelEmoji.rotation + (target.rotation - panelEmoji.rotation) * .62}deg) scale(${fromScale + (toScale - fromScale) * .44})`,
+                            offset:.62
+                        },
+                        {
+                            left:`${target.left}px`,
+                            top:`${target.top}px`,
+                            opacity:0,
+                            transform:`translate(-50%,-50%) rotate(${target.rotation}deg) scale(${Math.min(toScale, fromScale + (toScale - fromScale) * .62)})`
+                        }
+                    ],{
+                        duration:420,
+                        easing:'cubic-bezier(.22,.72,.18,1)',
+                        fill:'forwards'
+                    });
+                  })()
                 : null;
 
             const exitChildAnims = gxAnimateChildren(panel, false);
@@ -9124,10 +9224,9 @@ function goxionViewModelAdapter(data) {
                 host.appendChild(spacer);
             }
 
-            // ÚNICA corrección al morph aprobado:
-            // la tarjeta destino vuelve a existir, pero ocultamos su watermark
-            // mientras la copia flotante termina de aterrizar.
-            source.classList.add('gx-gamif-watermark-hidden');
+            // La tarjeta real vuelve con su watermark normal.
+            // El emoji flotante ya se desvaneció antes de este punto,
+            // por lo que no existe doble watermark ni aparición tardía.
             source.style.visibility = '';
 
             const cards = Array.from(grid.children);
@@ -9148,14 +9247,13 @@ function goxionViewModelAdapter(data) {
                 { duration: 120, easing: 'ease-out', fill: 'forwards' }
             );
 
-            // The floating emoji lands on the watermark and fades together with
-            // the real card instead of "snapping" into its final position.
-            const emojiFade = floatingEmoji
-                ? floatingEmoji.animate(
-                    [{ opacity: sourceEmoji.opacity }, { opacity: 0 }],
-                    { duration: 120, easing: 'ease-out', fill: 'forwards' }
-                  )
-                : null;
+            // El icono flotante ya terminó invisible durante el recorrido.
+            // Lo retiramos antes del fade del grid para que el watermark real
+            // pertenezca siempre a su tarjeta y nunca "aparezca después".
+            if (floatingEmoji?.isConnected) {
+                floatingEmoji.remove();
+                floatingEmoji = null;
+            }
 
             const spacerAnim = spacer
                 ? spacer.animate(
@@ -9166,7 +9264,6 @@ function goxionViewModelAdapter(data) {
 
             await Promise.allSettled([
                 surfaceFade.finished,
-                emojiFade?.finished || Promise.resolve(),
                 spacerAnim?.finished || Promise.resolve(),
                 ...cardAnims.map(a => a.finished)
             ]);
@@ -9185,7 +9282,6 @@ function goxionViewModelAdapter(data) {
             surface = null;
             floatingEmoji?.remove();
             floatingEmoji = null;
-            source.classList.remove('gx-gamif-watermark-hidden');
             spacer?.remove();
             spacer = null;
 
@@ -9196,7 +9292,6 @@ function goxionViewModelAdapter(data) {
             if (surface?.isConnected) surface.remove();
             if (floatingEmoji?.isConnected) floatingEmoji.remove();
             if (spacer?.isConnected) spacer.remove();
-            source?.classList?.remove('gx-gamif-watermark-hidden');
 
             panel.style.opacity = '';
             panel.style.transform = '';
@@ -9450,7 +9545,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda · Beta 03.10 · Cierre auditado
+    GOXION · Ayuda · Beta 03.11 · Cierre ajustado
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -10149,7 +10244,7 @@ function goxionViewModelAdapter(data) {
 </script>
 <style id="goxion-beta-03-10-final">
 /* =========================================================
-   GOXION · BETA 03.10 · CIERRE AUDITADO
+   GOXION · BETA 03.11 · CIERRE AJUSTADO
    ÚNICA CAPA AUTORITATIVA DE OVERRIDES PARA ESTA RUTA.
    ========================================================= */
 
