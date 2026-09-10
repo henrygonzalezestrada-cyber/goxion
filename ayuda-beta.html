@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.1.0-beta-11" lang="es">
+<html data-goxion-version="1.1.0-beta-12" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -4896,7 +4896,7 @@
 
 <style id="goxion-beta-03-11-last">
 /* =========================================================
-   GOXION BETA 03.11 · AJUSTES DE CIERRE
+   GOXION BETA 03.12 · HANDOFF CONTINUO
    ========================================================= */
 
 /* Historial: estado de lealtad como segunda píldora, sin emoji. */
@@ -4947,11 +4947,12 @@
     transform:none!important;
 }
 
-/* El helper de watermark queda neutralizado: en 03.11 ya no se usa
-   para el cierre. Se conserva solo por compatibilidad si una apertura
-   antigua lo invoca accidentalmente. */
+/* Durante el cierre el watermark real se oculta solamente mientras
+   el mismo emoji compartido está encima. El swap final es atómico. */
 .gx-gamif-card.gx-gamif-watermark-hidden::before{
     opacity:0!important;
+    animation:none!important;
+    -webkit-animation:none!important;
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -9104,44 +9105,15 @@ function goxionViewModelAdapter(data) {
                 floatingEmoji = gxCreateFloatingEmoji(panelEmoji, { ...sourceEmoji, text: panelEmoji.text });
             }
 
+            // MISMO emoji compartido durante todo el cierre.
+            // No se desvanece a mitad del recorrido ni se sustituye antes de tiempo.
             const emojiAnim = floatingEmoji && panelEmoji
-                ? (() => {
-                    const target = { ...sourceEmoji, text: panelEmoji.text };
-                    const baseFont = Number(floatingEmoji.dataset.baseFont) ||
-                        Math.max(panelEmoji.fontSize, target.fontSize);
-                    const fromScale = (panelEmoji.fontSize / baseFont) * panelEmoji.scale;
-                    const toScale = (target.fontSize / baseFont) * target.scale;
-
-                    // Cierre refinado:
-                    // el icono conserva el recorrido compartido, pero desaparece
-                    // antes de convertirse visualmente en el watermark grande
-                    // de la tarjeta. El watermark real entra junto con la card.
-                    return floatingEmoji.animate([
-                        {
-                            left:`${panelEmoji.left}px`,
-                            top:`${panelEmoji.top}px`,
-                            opacity:panelEmoji.opacity,
-                            transform:`translate(-50%,-50%) rotate(${panelEmoji.rotation}deg) scale(${fromScale})`
-                        },
-                        {
-                            left:`${panelEmoji.left + (target.left - panelEmoji.left) * .62}px`,
-                            top:`${panelEmoji.top + (target.top - panelEmoji.top) * .62}px`,
-                            opacity:Math.min(panelEmoji.opacity, .72),
-                            transform:`translate(-50%,-50%) rotate(${panelEmoji.rotation + (target.rotation - panelEmoji.rotation) * .62}deg) scale(${fromScale + (toScale - fromScale) * .44})`,
-                            offset:.62
-                        },
-                        {
-                            left:`${target.left}px`,
-                            top:`${target.top}px`,
-                            opacity:0,
-                            transform:`translate(-50%,-50%) rotate(${target.rotation}deg) scale(${Math.min(toScale, fromScale + (toScale - fromScale) * .62)})`
-                        }
-                    ],{
-                        duration:420,
-                        easing:'cubic-bezier(.22,.72,.18,1)',
-                        fill:'forwards'
-                    });
-                  })()
+                ? gxAnimateEmoji(
+                    floatingEmoji,
+                    panelEmoji,
+                    { ...sourceEmoji, text: panelEmoji.text },
+                    false
+                  )
                 : null;
 
             const exitChildAnims = gxAnimateChildren(panel, false);
@@ -9224,9 +9196,10 @@ function goxionViewModelAdapter(data) {
                 host.appendChild(spacer);
             }
 
-            // La tarjeta real vuelve con su watermark normal.
-            // El emoji flotante ya se desvaneció antes de este punto,
-            // por lo que no existe doble watermark ni aparición tardía.
+            // La tarjeta real vuelve, pero su watermark permanece oculto
+            // mientras el MISMO emoji flotante sigue visible encima.
+            // Esto evita tanto el doble icono como el "desaparece y reaparece".
+            source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
 
             const cards = Array.from(grid.children);
@@ -9247,13 +9220,9 @@ function goxionViewModelAdapter(data) {
                 { duration: 120, easing: 'ease-out', fill: 'forwards' }
             );
 
-            // El icono flotante ya terminó invisible durante el recorrido.
-            // Lo retiramos antes del fade del grid para que el watermark real
-            // pertenezca siempre a su tarjeta y nunca "aparezca después".
-            if (floatingEmoji?.isConnected) {
-                floatingEmoji.remove();
-                floatingEmoji = null;
-            }
+            // El emoji flotante permanece visible durante TODO el fade del grid.
+            // El handoff al watermark real se hace únicamente cuando la tarjeta
+            // ya terminó de aparecer.
 
             const spacerAnim = spacer
                 ? spacer.animate(
@@ -9278,10 +9247,20 @@ function goxionViewModelAdapter(data) {
             });
 
             if (panelEmojiEl) panelEmojiEl.style.visibility = '';
+
+            // HANDOFF ATÓMICO DEL MISMO EMOJI:
+            // la copia flotante ya está exactamente en la posición/escala
+            // del watermark. Revelamos el real y retiramos la copia en el mismo
+            // ciclo de JavaScript, sin fade intermedio ni frame vacío.
+            source.classList.remove('gx-gamif-watermark-hidden');
+            if (floatingEmoji) {
+                floatingEmoji.style.visibility = 'hidden';
+                floatingEmoji.remove();
+                floatingEmoji = null;
+            }
+
             surface.remove();
             surface = null;
-            floatingEmoji?.remove();
-            floatingEmoji = null;
             spacer?.remove();
             spacer = null;
 
@@ -9292,6 +9271,7 @@ function goxionViewModelAdapter(data) {
             if (surface?.isConnected) surface.remove();
             if (floatingEmoji?.isConnected) floatingEmoji.remove();
             if (spacer?.isConnected) spacer.remove();
+            source?.classList?.remove('gx-gamif-watermark-hidden');
 
             panel.style.opacity = '';
             panel.style.transform = '';
@@ -9545,7 +9525,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda · Beta 03.11 · Cierre ajustado
+    GOXION · Ayuda · Beta 03.12 · Handoff continuo
 </div>
 
 <script id="goxion-production-interactions-js">
