@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.7-beta-05">
+<html lang="es" data-goxion-version="1.0.8-beta-06">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -2144,6 +2144,444 @@ details.gx-client-ops-context{
 }
 </style>
 
+
+<style id="goxion-admin-beta-06-loyalty-client-polish">
+/* =========================================================
+   GOXION ADMIN · BETA 06
+   Lealtad masiva + vista previa enriquecida + detalle pulido
+   ========================================================= */
+
+/* ---------- Preview del cliente ---------- */
+.gx-client-preview-meta{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    flex-wrap:wrap;
+    margin:6px 0 7px;
+}
+.gx-client-preview-meta span{
+    min-height:21px;
+    display:inline-flex;
+    align-items:center;
+    padding:0 7px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:999px;
+    background:rgba(255,255,255,.025);
+    color:#aeb8ca;
+    font-size:.54rem;
+    font-weight:850;
+    white-space:nowrap;
+}
+.gx-client-preview-meta .services{
+    color:#aab5c8;
+}
+.gx-client-preview-meta .loyalty{
+    color:#cebfff;
+    border-color:rgba(124,77,255,.16);
+    background:rgba(124,77,255,.045);
+}
+.gx-client-preview-meta .referral{
+    color:#90f4d1;
+    border-color:rgba(0,255,157,.13);
+    background:rgba(0,255,157,.035);
+}
+.gx-client-preview-meta .missions{
+    color:#93f8ff;
+    border-color:rgba(0,242,254,.13);
+    background:rgba(0,242,254,.035);
+}
+
+/* ---------- Resumen superior de la ficha ---------- */
+.gx-focus-summary{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px!important;
+    overflow:visible!important;
+    padding:8px 12px!important;
+}
+.gx-focus-summary .gx-focus-metric{
+    min-width:0!important;
+    min-height:47px;
+    display:flex!important;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    gap:2px;
+    padding:6px 8px!important;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:11px!important;
+    background:rgba(255,255,255,.025)!important;
+    white-space:normal!important;
+}
+.gx-focus-summary .gx-focus-metric small{
+    display:block;
+    width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#7f8a9f;
+    font-size:.48rem;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.25px;
+}
+.gx-focus-summary .gx-focus-metric b{
+    display:block;
+    width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#f4f7fb;
+    font-size:.66rem;
+    line-height:1.1;
+}
+.gx-focus-summary .gx-focus-metric.status b{color:#9ef5df}
+.gx-focus-summary .gx-focus-metric.overdue b{color:#ff8aa5}
+.gx-focus-summary .gx-focus-metric.review b{color:#d09bff}
+
+/* ---------- Acciones de baja prioridad ---------- */
+.gx-client-secondary-tools{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:5px;
+    min-height:31px;
+    margin:0 1px 8px;
+}
+.gx-client-secondary-tools>span{
+    margin-right:auto;
+    color:#68758a;
+    font-size:.49rem;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.35px;
+}
+.gx-client-secondary-tools button{
+    min-height:29px;
+    padding:0 8px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:8px;
+    background:rgba(255,255,255,.018);
+    color:#9aa8bc;
+    font:inherit;
+    font-size:.53rem;
+    font-weight:850;
+}
+.gx-client-secondary-tools button:active{
+    color:#dffcff;
+    border-color:rgba(0,242,254,.16);
+    background:rgba(0,242,254,.04);
+}
+
+/* ---------- Herramienta de Lealtad masiva ---------- */
+.gx-loyalty-bulk-panel{
+    max-width:900px;
+}
+.gx-loyalty-title-row{
+    align-items:flex-start!important;
+}
+.gx-loyalty-level-badge{
+    flex:0 0 auto;
+    padding:6px 9px;
+    border:1px solid rgba(124,77,255,.18);
+    border-radius:999px;
+    background:rgba(124,77,255,.055);
+    color:#d5c8ff;
+    font-size:.58rem;
+    font-weight:900;
+    white-space:nowrap;
+}
+.gx-loyalty-config{
+    display:grid;
+    grid-template-columns:180px 140px minmax(220px,1fr);
+    gap:8px;
+    margin-top:12px;
+}
+.gx-loyalty-field{
+    min-width:0;
+}
+.gx-loyalty-field>span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--text-muted);
+    font-size:.52rem;
+    font-weight:900;
+    text-transform:uppercase;
+}
+.gx-loyalty-field input,
+.gx-loyalty-field select{
+    width:100%;
+    min-height:39px;
+    padding:7px 9px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:9px;
+    background:#0e0e15;
+    color:#fff;
+    font:inherit;
+    font-size:.64rem;
+    outline:none;
+}
+.gx-loyalty-custom-field[hidden]{display:none!important}
+
+.gx-loyalty-selection-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:15px;
+}
+.gx-loyalty-selection-head strong{
+    display:block;
+    font-size:.72rem;
+}
+.gx-loyalty-selection-head small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.56rem;
+}
+.gx-loyalty-selection-actions{
+    display:flex;
+    gap:5px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+.gx-loyalty-selection-actions button{
+    min-height:30px;
+    padding:0 8px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:8px;
+    background:rgba(255,255,255,.02);
+    color:#aeb8ca;
+    font:inherit;
+    font-size:.54rem;
+    font-weight:850;
+}
+
+.gx-loyalty-search{
+    min-height:38px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:9px;
+    padding:0 9px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:10px;
+    background:rgba(255,255,255,.018);
+}
+.gx-loyalty-search span{color:var(--neon-blue)}
+.gx-loyalty-search input{
+    flex:1;
+    min-width:0;
+    border:0;
+    background:transparent;
+    color:#fff;
+    font:inherit;
+    font-size:.65rem;
+    outline:none;
+}
+
+.gx-loyalty-preview{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    margin:9px 0;
+}
+.gx-loyalty-preview>div{
+    min-width:0;
+    padding:8px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:10px;
+    background:rgba(255,255,255,.018);
+}
+.gx-loyalty-preview strong{
+    display:block;
+    font-size:.92rem;
+    color:#f6f8fb;
+}
+.gx-loyalty-preview span{
+    display:block;
+    margin-top:1px;
+    color:var(--text-muted);
+    font-size:.5rem;
+    font-weight:850;
+}
+
+.gx-loyalty-client-list{
+    max-height:320px;
+    overflow-y:auto;
+    display:grid;
+    gap:4px;
+    padding:1px;
+    overscroll-behavior:contain;
+}
+.gx-loyalty-client-row{
+    display:grid;
+    grid-template-columns:26px minmax(0,1fr) auto;
+    align-items:center;
+    gap:8px;
+    min-height:47px;
+    padding:6px 8px;
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:10px;
+    background:rgba(255,255,255,.014);
+    cursor:pointer;
+}
+.gx-loyalty-client-row input{
+    width:17px;height:17px;
+    accent-color:#7c4dff;
+}
+.gx-loyalty-client-copy{min-width:0}
+.gx-loyalty-client-copy strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.64rem;
+}
+.gx-loyalty-client-copy small{
+    display:block;
+    margin-top:1px;
+    color:var(--text-muted);
+    font-size:.52rem;
+}
+.gx-loyalty-client-row em{
+    font-style:normal;
+    color:#aeb8ca;
+    font-size:.54rem;
+    font-weight:850;
+}
+.gx-loyalty-client-row.excluded{
+    opacity:.5;
+}
+.gx-loyalty-client-row.at-target em{
+    color:#7ee7bd;
+}
+
+.gx-loyalty-apply-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid rgba(255,255,255,.06);
+}
+.gx-loyalty-apply-row>div{
+    min-width:0;
+}
+.gx-loyalty-apply-row small{
+    display:block;
+    color:var(--text-muted);
+    font-size:.5rem;
+    font-weight:850;
+    text-transform:uppercase;
+}
+.gx-loyalty-apply-row strong{
+    display:block;
+    margin-top:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.62rem;
+}
+.gx-loyalty-apply-row button{
+    flex:0 0 auto;
+}
+
+/* Mobile polish */
+@media(max-width:840px){
+    .gx-client-preview-meta{
+        gap:4px;
+        margin:5px 0 6px;
+    }
+    .gx-client-preview-meta span{
+        min-height:19px;
+        padding:0 6px;
+        font-size:.49rem;
+    }
+
+    .gx-focus-summary{
+        grid-template-columns:1fr 1fr!important;
+        gap:5px!important;
+        padding:7px 10px!important;
+    }
+    .gx-focus-summary .gx-focus-metric{
+        min-height:43px;
+        padding:5px 7px!important;
+        border-radius:10px!important;
+    }
+    .gx-focus-summary .gx-focus-metric b{
+        font-size:.64rem;
+    }
+
+    .gx-client-secondary-tools{
+        min-height:28px;
+        margin-bottom:6px;
+    }
+    .gx-client-secondary-tools>span{
+        display:none;
+    }
+    .gx-client-secondary-tools button{
+        min-height:27px;
+        padding:0 7px;
+        font-size:.5rem;
+    }
+
+    .gx-settings-tabs{
+        overflow-x:auto;
+        flex-wrap:nowrap!important;
+        scrollbar-width:none;
+    }
+    .gx-settings-tabs::-webkit-scrollbar{display:none}
+    .gx-settings-tabs button{flex:0 0 auto}
+
+    .gx-loyalty-config{
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+        margin-top:9px;
+    }
+    .gx-loyalty-reason{
+        grid-column:1/-1;
+    }
+    .gx-loyalty-selection-head{
+        align-items:flex-start;
+        flex-direction:column;
+        margin-top:12px;
+    }
+    .gx-loyalty-selection-actions{
+        width:100%;
+        justify-content:flex-start;
+    }
+    .gx-loyalty-preview{
+        gap:5px;
+    }
+    .gx-loyalty-preview>div{
+        padding:7px 6px;
+    }
+    .gx-loyalty-preview strong{
+        font-size:.82rem;
+    }
+    .gx-loyalty-client-list{
+        max-height:43vh;
+    }
+    .gx-loyalty-apply-row{
+        position:sticky;
+        bottom:0;
+        z-index:5;
+        margin-left:-10px;
+        margin-right:-10px;
+        margin-bottom:-10px;
+        padding:9px 10px calc(9px + env(safe-area-inset-bottom));
+        background:linear-gradient(180deg,rgba(6,6,9,.94),#060609 36%);
+    }
+    .gx-loyalty-level-badge{
+        padding:5px 7px;
+        font-size:.52rem;
+    }
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -2289,7 +2727,7 @@ details.gx-client-ops-context{
 
             <section id="tab-ajustes" class="tab-content">
                 <div class="gx-page-heading"><div><div class="gx-eyebrow">Configuración</div><h1>Ajustes & automatizaciones</h1><p>Misiones, experiencia del cliente y alertas globales.</p></div><button class="gx-primary-action desktop-only" onclick="gxSaveSettings()">Guardar ajustes</button></div>
-                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
+                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('loyalty',this)">✦ Lealtad</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
                 <div class="gx-settings-view active" data-settings-view="missions">
                     <div class="panel gx-panel-modern">
                         <div class="gx-panel-title-row">
@@ -2329,6 +2767,73 @@ details.gx-client-ops-context{
                     </div>
                 </div>
 
+
+                <div class="gx-settings-view" data-settings-view="loyalty">
+                    <div class="panel gx-panel-modern gx-loyalty-bulk-panel">
+                        <div class="gx-panel-title-row gx-loyalty-title-row">
+                            <div>
+                                <span class="gx-eyebrow">Automatización</span>
+                                <h2>Lealtad masiva</h2>
+                                <p class="gx-panel-desc">Parte de todos los clientes y quita únicamente las excepciones antes de aplicar.</p>
+                            </div>
+                            <span class="gx-loyalty-level-badge">Nivel 2 · 9 pagos</span>
+                        </div>
+
+                        <div class="gx-loyalty-config">
+                            <label class="gx-loyalty-field">
+                                <span>Valor final</span>
+                                <select id="gx-loyalty-target" class="custom-select" onchange="gxLoyaltyTargetChanged()">
+                                    <option value="9" selected>Nivel 2 · 9 pagos</option>
+                                    <option value="0">Reiniciar · 0 pagos</option>
+                                    <option value="custom">Personalizado</option>
+                                </select>
+                            </label>
+                            <label class="gx-loyalty-field gx-loyalty-custom-field" id="gx-loyalty-custom-wrap" hidden>
+                                <span>Pagos puntuales</span>
+                                <input id="gx-loyalty-custom" type="number" min="0" max="99" value="9" oninput="gxRenderLoyaltyTool()">
+                            </label>
+                            <label class="gx-loyalty-field gx-loyalty-reason">
+                                <span>Motivo</span>
+                                <input id="gx-loyalty-reason" type="text" maxlength="180" value="Beneficio migración GOXION" placeholder="Motivo interno">
+                            </label>
+                        </div>
+
+                        <div class="gx-loyalty-selection-head">
+                            <div>
+                                <strong>Clientes incluidos</strong>
+                                <small>Todos se seleccionan al abrir. Desmarca las excepciones.</small>
+                            </div>
+                            <div class="gx-loyalty-selection-actions">
+                                <button type="button" onclick="gxLoyaltySelectScope('all')">Todos</button>
+                                <button type="button" onclick="gxLoyaltySelectScope('active')">No suspendidos</button>
+                                <button type="button" onclick="gxLoyaltySelectScope('none')">Limpiar</button>
+                            </div>
+                        </div>
+
+                        <div class="gx-loyalty-search">
+                            <span>⌕</span>
+                            <input id="gx-loyalty-search" type="text" placeholder="Buscar cliente..." oninput="gxRenderLoyaltyClientList()">
+                        </div>
+
+                        <div class="gx-loyalty-preview">
+                            <div><strong id="gx-loyalty-selected">0</strong><span>Incluidos</span></div>
+                            <div><strong id="gx-loyalty-excluded">0</strong><span>Excluidos</span></div>
+                            <div><strong id="gx-loyalty-changing">0</strong><span>Cambiarán</span></div>
+                            <div><strong id="gx-loyalty-already">0</strong><span>Ya están</span></div>
+                        </div>
+
+                        <div id="gx-loyalty-client-list" class="gx-loyalty-client-list"></div>
+
+                        <div class="gx-loyalty-apply-row">
+                            <div>
+                                <small>Vista previa</small>
+                                <strong id="gx-loyalty-preview-text">Selecciona clientes para continuar.</strong>
+                            </div>
+                            <button id="gx-loyalty-apply" type="button" class="gx-primary-action" onclick="gxApplyBulkLoyalty()">Aplicar</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="gx-settings-view" data-settings-view="app"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Experiencia</span><h2>Configuración de App</h2></div></div><div class="gx-setting-row"><div><strong>Promoción Upsell</strong><small>Mostrar Combo GOXION a clientes.</small></div><label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar configuración</button></div></div>
                 <div class="gx-settings-view" data-settings-view="alerts"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Comunicación</span><h2>Alertas globales</h2></div><label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label></div><div id="alert-settings" class="gx-alert-settings" style="opacity:.5;pointer-events:none;transition:.3s"><select id="alert-platform" class="custom-select"></select><select id="alert-type" class="custom-select"><option value="presentando intermitencias temporales">Intermitencias temporales</option><option value="en mantenimiento programado">Mantenimiento programado</option><option value="experimentando una caída global">Caída global</option><option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option></select><textarea id="global-msg" class="gx-large-textarea" placeholder="Mensaje adicional para clientes (opcional)..."></textarea></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar alerta</button></div></div>
             </section>
@@ -2353,7 +2858,8 @@ details.gx-client-ops-context{
                 </div>
                 <div class="gx-more-grid">
                     <button onclick="gxOpenMoreDestination('catalog')"><span>📦</span><div><strong>Catálogo e inventario</strong><small>Precios, capacidad, stock y sincronización</small></div><em>›</em></button>
-                    <button onclick="gxOpenMoreDestination('missions')"><span>🎯</span><div><strong>Automatizaciones</strong><small>Misiones globales y asignaciones</small></div><em>›</em></button>
+                    <button onclick="gxOpenMoreDestination('missions')"><span>🎯</span><div><strong>Misiones</strong><small>Plantillas, asignaciones y rondas</small></div><em>›</em></button>
+                    <button onclick="gxOpenMoreDestination('loyalty')"><span>✦</span><div><strong>Lealtad masiva</strong><small>Nivel, selección y excepciones</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('app')"><span>✨</span><div><strong>Experiencia</strong><small>Promociones y comportamiento de la app</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('alerts')"><span>⚠</span><div><strong>Incidencias</strong><small>Estado operativo visible para clientes</small></div><em>›</em></button>
 
@@ -3285,17 +3791,21 @@ details.gx-client-ops-context{
                     </div>
                     <div class="gx-client-money"><strong>$${subtotal}</strong><span>mensual</span></div>
                 </div>
-                <div class="gx-client-brief" onclick="toggleClientDetails('${key}')"><div class="gx-service-brief">${servicesBrief}</div><div class="gx-client-brief-footer"><span class="client-status-badge" style="color:${statusColor};border-color:${statusColor}40;background:${statusColor}10;${pulseAnim}">${statusBadge}</span><span class="gx-open-client">Abrir ›</span></div></div>
+                <div class="gx-client-brief" onclick="toggleClientDetails('${key}')">
+                    <div class="gx-service-brief">${servicesBrief}</div>
+                    <div class="gx-client-preview-meta">
+                        <span class="services">${serviceNames.length} servicio${serviceNames.length===1?'':'s'}</span>
+                        ${Number(cliente.pagos_puntuales||0)>=9 ? `<span class="loyalty">✦ Nivel 2</span>` : ''}
+                        ${refActivo ? `<span class="referral">🎁 Referido</span>` : ''}
+                        ${gamifConfig.misiones_activas ? `<span class="missions">🎯 Misiones</span>` : ''}
+                    </div>
+                    <div class="gx-client-brief-footer"><span class="client-status-badge" style="color:${statusColor};border-color:${statusColor}40;background:${statusColor}10;${pulseAnim}">${statusBadge}</span><span class="gx-open-client">Abrir ›</span></div>
+                </div>
                 <div class="client-details gx-focus-details" id="details-${key}">
-                    <div class="gx-client-quick-actions">
-                        <button type="button" onclick="enviarMensaje('${cliente.nombre}','${key}')">Mensaje</button>
-                        <button type="button" onclick="copiarInfo('${cliente.nombre}','${key}')">Copiar enlace</button>
-                        <button type="button" class="more" onclick="gxToggleClientQuickMenu(this)">Más</button>
-                        <div class="gx-client-quick-menu">
-                            <button type="button" onclick="gxOpenClientSection('benefits')">Beneficios</button>
-                            <button type="button" onclick="gxOpenClientSection('account')">Cuenta y acceso</button>
-                            <button type="button" onclick="gxOpenClientSection('activity')">Actividad reciente</button>
-                        </div>
+                    <div class="gx-client-secondary-tools">
+                        <span>Acciones</span>
+                        <button type="button" onclick="enviarMensaje('${cliente.nombre}','${key}')">WA Mensaje</button>
+                        <button type="button" onclick="copiarInfo('${cliente.nombre}','${key}')">↗ Link</button>
                     </div>
                     ${enRevision ? `<div class="gx-payment-priority">
                         <div class="gx-payment-priority-icon">💳</div>
@@ -6047,7 +6557,7 @@ details.gx-client-ops-context{
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 05 · v1.0.7-beta-05</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 06 · v1.0.8-beta-06</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -7060,6 +7570,267 @@ details.gx-client-ops-context{
     });
 
     console.info("GOXION Admin Beta 05: filtros compactos y gestión segura de PIN activos.");
+})();
+</script>
+
+
+<script id="goxion-admin-beta-06-controller">
+(() => {
+    let loyaltySelection = new Set();
+    let loyaltyInitialized = false;
+
+    const esc = value => String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+    function clients(){
+        return Object.entries(typeof clientesDict!=="undefined" ? (clientesDict||{}) : {})
+            .map(([key,c])=>({key,c,id:String(c?._id||c?.id||"")}))
+            .filter(x=>x.id);
+    }
+
+    function loyaltyTarget(){
+        const select=document.getElementById("gx-loyalty-target");
+        if(select?.value==="custom"){
+            return Math.max(0,Math.min(99,Math.trunc(Number(document.getElementById("gx-loyalty-custom")?.value||0))));
+        }
+        return Math.max(0,Math.min(99,Math.trunc(Number(select?.value||9))));
+    }
+
+    function ensureLoyaltySelection(){
+        const rows=clients();
+        if(!loyaltyInitialized){
+            loyaltySelection=new Set(rows.map(x=>x.id));
+            loyaltyInitialized=true;
+        }else{
+            const valid=new Set(rows.map(x=>x.id));
+            loyaltySelection=new Set([...loyaltySelection].filter(id=>valid.has(id)));
+        }
+    }
+
+    window.gxLoyaltyTargetChanged=function(){
+        const custom=document.getElementById("gx-loyalty-custom-wrap");
+        const select=document.getElementById("gx-loyalty-target");
+        if(custom) custom.hidden=select?.value!=="custom";
+        window.gxRenderLoyaltyTool();
+    };
+
+    window.gxLoyaltySelectScope=function(scope){
+        const rows=clients();
+        if(scope==="all") loyaltySelection=new Set(rows.map(x=>x.id));
+        else if(scope==="active") loyaltySelection=new Set(rows.filter(x=>x.c?.estado!=="suspendido").map(x=>x.id));
+        else loyaltySelection=new Set();
+        loyaltyInitialized=true;
+        window.gxRenderLoyaltyTool();
+    };
+
+    window.gxToggleLoyaltyClient=function(id,checked){
+        loyaltyInitialized=true;
+        if(checked) loyaltySelection.add(String(id));
+        else loyaltySelection.delete(String(id));
+        window.gxRenderLoyaltyTool(false);
+    };
+
+    window.gxRenderLoyaltyClientList=function(){
+        ensureLoyaltySelection();
+        const list=document.getElementById("gx-loyalty-client-list");
+        if(!list)return;
+
+        const q=String(document.getElementById("gx-loyalty-search")?.value||"").trim().toLowerCase();
+        const target=loyaltyTarget();
+        const rows=clients().filter(x=>{
+            if(!q)return true;
+            return `${x.c?.nombre||""} ${x.c?.folio||""}`.toLowerCase().includes(q);
+        });
+
+        if(!rows.length){
+            list.innerHTML='<div class="gx-empty-inline">No hay clientes que coincidan.</div>';
+            return;
+        }
+
+        list.innerHTML=rows.map(({c,id})=>{
+            const selected=loyaltySelection.has(id);
+            const current=Number(c?.pagos_puntuales||0);
+            const atTarget=current===target;
+            return `<label class="gx-loyalty-client-row ${selected?"":"excluded"} ${atTarget?"at-target":""}">
+                <input type="checkbox" ${selected?"checked":""} onchange="gxToggleLoyaltyClient('${esc(id)}',this.checked)">
+                <div class="gx-loyalty-client-copy">
+                    <strong>${esc(c?.nombre||"Cliente")}</strong>
+                    <small>${esc(c?.folio||"Sin folio")} · ${c?.estado==="suspendido"?"Suspendido":"Activo"}</small>
+                </div>
+                <em>${atTarget?`${target} pagos ✓`:`${current} → ${target}`}</em>
+            </label>`;
+        }).join("");
+    };
+
+    window.gxRenderLoyaltyTool=function(renderList=true){
+        ensureLoyaltySelection();
+        const rows=clients();
+        const target=loyaltyTarget();
+        const selectedRows=rows.filter(x=>loyaltySelection.has(x.id));
+        const excluded=rows.length-selectedRows.length;
+        const changing=selectedRows.filter(x=>Number(x.c?.pagos_puntuales||0)!==target).length;
+        const already=selectedRows.length-changing;
+
+        const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=String(v)};
+        set("gx-loyalty-selected",selectedRows.length);
+        set("gx-loyalty-excluded",excluded);
+        set("gx-loyalty-changing",changing);
+        set("gx-loyalty-already",already);
+
+        const preview=document.getElementById("gx-loyalty-preview-text");
+        if(preview){
+            preview.textContent=selectedRows.length
+                ? `${selectedRows.length} incluidos · ${excluded} excluidos · ${changing} cambiarán`
+                : "Selecciona al menos un cliente.";
+        }
+        const btn=document.getElementById("gx-loyalty-apply");
+        if(btn){
+            btn.disabled=selectedRows.length===0;
+            btn.textContent=`Aplicar a ${selectedRows.length}`;
+        }
+
+        if(renderList) window.gxRenderLoyaltyClientList();
+    };
+
+    window.gxApplyBulkLoyalty=async function(){
+        ensureLoyaltySelection();
+        const rows=clients();
+        const selected=rows.filter(x=>loyaltySelection.has(x.id));
+        const target=loyaltyTarget();
+        const reason=String(document.getElementById("gx-loyalty-reason")?.value||"Ajuste masivo de lealtad").trim()||"Ajuste masivo de lealtad";
+        const changing=selected.filter(x=>Number(x.c?.pagos_puntuales||0)!==target).length;
+        const already=selected.length-changing;
+
+        if(!selected.length)return alert("Selecciona al menos un cliente.");
+        const ok=confirm(
+            `Aplicar lealtad masiva\n\n`+
+            `${selected.length} incluidos\n`+
+            `${rows.length-selected.length} excluidos\n`+
+            `${changing} cambiarán\n`+
+            `${already} ya están en ${target}\n\n`+
+            `Valor final: ${target} pagos puntuales\n`+
+            `Motivo: ${reason}\n\n¿Continuar?`
+        );
+        if(!ok)return;
+
+        const btn=document.getElementById("gx-loyalty-apply");
+        const previous=btn?.textContent||"Aplicar";
+        if(btn){btn.disabled=true;btn.textContent="Aplicando…";}
+
+        try{
+            if(typeof window.gxOps!=="function")throw new Error("La conexión de operaciones no está disponible.");
+            const r=await window.gxOps("establecer_lealtad_masiva",{
+                cliente_ids:selected.map(x=>x.id),
+                valor:target,
+                motivo:reason
+            });
+
+            selected.forEach(({c})=>{c.pagos_puntuales=target;});
+            if(typeof window.gxReloadAdminClient==="function"){
+                await window.gxReloadAdminClient();
+            }else if(typeof filtrarClientes==="function"){
+                filtrarClientes();
+            }
+
+            loyaltyInitialized=false;
+            ensureLoyaltySelection();
+            window.gxRenderLoyaltyTool();
+
+            alert(
+                `✅ Lealtad actualizada\n\n`+
+                `${Number(r.actualizados||0)} clientes cambiaron\n`+
+                `${Number(r.sin_cambio||0)} ya estaban en el valor seleccionado\n`+
+                `Valor final: ${target} pagos`
+            );
+        }catch(e){
+            console.error(e);
+            alert("No se pudo aplicar la lealtad masiva.\n\n"+(e?.message||e));
+        }finally{
+            if(btn){btn.disabled=false;btn.textContent=previous;}
+            window.gxRenderLoyaltyTool(false);
+        }
+    };
+
+    // Acceso desde Más.
+    const previousMore=window.gxOpenMoreDestination;
+    window.gxOpenMoreDestination=function(dest){
+        if(dest==="loyalty"){
+            goAdminTab("tab-ajustes");
+            setTimeout(()=>{
+                const button=[...document.querySelectorAll(".gx-settings-tabs button")].find(b=>(b.textContent||"").toLowerCase().includes("lealtad"));
+                window.gxSettingsView?.("loyalty",button);
+                loyaltyInitialized=false;
+                window.gxRenderLoyaltyTool();
+            },40);
+            return;
+        }
+        return typeof previousMore==="function" ? previousMore.call(this,dest) : undefined;
+    };
+
+    // La vista superior de cliente conserva cuatro datos, pero ya no son
+    // cápsulas de texto amontonado: cada métrica tiene etiqueta y valor.
+    function polishFocus(key){
+        const c=(typeof clientesDict!=="undefined")?clientesDict?.[key]:null;
+        const summary=document.getElementById("gx-focus-summary");
+        if(!c||!summary)return;
+
+        const t=typeof gxPaymentTiming==="function"?gxPaymentTiming(c):{type:"none",days:0,due:null};
+        const due=t?.due instanceof Date && !Number.isNaN(t.due.getTime())
+            ? t.due.toLocaleDateString("es-MX",{day:"numeric",month:"short"})
+            : `Día ${c.dia_pago||15}`;
+        const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x?.monto||0),0);
+        const state=c.pago_en_revision?"En revisión"
+            : c.estado==="pagado"?"Pagado"
+            : t.type==="overdue"?"Vencido"
+            : c.estado==="suspendido"?"Suspendido"
+            : "Pendiente";
+        const statusClass=c.pago_en_revision?"review":t.type==="overdue"?"overdue":"status";
+        const period=typeof gxPeriodLabel==="function"
+            ? gxPeriodLabel(c.periodo_pendiente)
+            : String(c.periodo_pendiente||"").slice(0,7);
+
+        summary.innerHTML=`
+            <span class="gx-focus-metric"><small>Vencimiento</small><b>${esc(due)}</b></span>
+            <span class="gx-focus-metric"><small>Mensualidad</small><b>$${Number(monthly).toFixed(0)}</b></span>
+            <span class="gx-focus-metric ${statusClass}"><small>Estado</small><b>${esc(state)}</b></span>
+            <span class="gx-focus-metric"><small>Periodo</small><b>${esc(period)}</b></span>`;
+    }
+
+    const previousOpen=window.gxOpenClientFocus;
+    if(typeof previousOpen==="function"){
+        window.gxOpenClientFocus=function(key,...args){
+            const result=previousOpen.call(this,key,...args);
+            setTimeout(()=>polishFocus(key),60);
+            return result;
+        };
+    }
+
+    // Si la propia pestaña Lealtad se abre desde desktop, prepara selección.
+    const previousSettingsView=window.gxSettingsView;
+    if(typeof previousSettingsView==="function"){
+        window.gxSettingsView=function(name,btn){
+            const result=previousSettingsView.call(this,name,btn);
+            if(name==="loyalty"){
+                setTimeout(()=>{
+                    loyaltyInitialized=false;
+                    window.gxRenderLoyaltyTool();
+                },20);
+            }
+            return result;
+        };
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        setTimeout(()=>{
+            if(document.querySelector('[data-settings-view="loyalty"]')) window.gxRenderLoyaltyTool();
+        },850);
+    });
+
+    console.info("GOXION Admin Beta 06: lealtad masiva y ficha de cliente refinada.");
 })();
 </script>
 
