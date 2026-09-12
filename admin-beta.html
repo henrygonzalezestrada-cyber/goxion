@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.3-beta-01">
+<html lang="es" data-goxion-version="1.0.4-beta-02">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -716,6 +716,230 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 }
 </style>
 
+
+<style id="goxion-admin-beta-02-priority-ui">
+/* Filtros siempre visibles dentro del drawer */
+.gx-notification-drawer{
+    padding-bottom:max(14px,env(safe-area-inset-bottom));
+}
+.gx-notification-drawer-head,
+.gx-notification-toolbar,
+.gx-notification-filter-row{
+    flex:0 0 auto;
+}
+.gx-notification-filter-row{
+    position:relative;
+    z-index:4;
+    margin:0 -2px;
+    padding:0 2px 10px;
+    background:#09090e;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+}
+.gx-notification-list{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    align-content:start;
+    overscroll-behavior:contain;
+}
+
+/* Actividad secundaria, en formato compacto */
+.gx-notif-compact{
+    display:grid;
+    grid-template-columns:8px minmax(0,1fr) auto;
+    align-items:center;
+    gap:9px;
+    min-height:54px;
+    padding:9px 10px;
+    border:1px solid var(--gx-line);
+    border-radius:12px;
+    background:rgba(255,255,255,.018);
+}
+.gx-notif-compact-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:rgba(124,77,255,.65);
+}
+.gx-notif-compact.unread .gx-notif-compact-dot{
+    background:var(--neon-blue);
+    box-shadow:0 0 8px rgba(0,242,254,.55);
+}
+.gx-notif-compact-copy{min-width:0}
+.gx-notif-compact-copy strong{
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    font-size:.69rem;
+}
+.gx-notif-compact-copy small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.57rem;
+}
+.gx-notif-compact-actions{
+    display:flex;gap:5px;align-items:center;
+}
+.gx-notif-compact-actions button,
+.gx-notif-delete{
+    border:0;
+    background:transparent;
+    color:var(--neon-blue);
+    font-size:.57rem;
+    font-weight:900;
+    cursor:pointer;
+    padding:5px 2px;
+}
+.gx-notif-compact-actions .danger,
+.gx-notif-delete{color:#ff91ad}
+
+/* Tarjeta de cliente: pago primero, beneficios dejan de competir */
+.gx-client-card-header{
+    padding-bottom:9px;
+    align-items:flex-start;
+}
+.gx-client-payment-primary{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:7px;
+}
+.gx-client-payment-primary .gx-client-payment-dot{
+    width:7px;height:7px;border-radius:50%;
+    background:#8b95a9;flex:0 0 7px;
+}
+.gx-client-payment-primary>div{min-width:0}
+.gx-client-payment-primary strong{
+    display:block;
+    font-size:.74rem;
+    line-height:1.1;
+}
+.gx-client-payment-primary small{
+    display:block;
+    margin-top:3px;
+    color:var(--text-muted);
+    font-size:.61rem;
+    line-height:1.1;
+}
+.gx-client-payment-primary.paid .gx-client-payment-dot{background:#00ff9d;box-shadow:0 0 7px rgba(0,255,157,.45)}
+.gx-client-payment-primary.review .gx-client-payment-dot{background:#bc13fe;box-shadow:0 0 7px rgba(188,19,254,.45)}
+.gx-client-payment-primary.overdue .gx-client-payment-dot{background:#ff4d70;box-shadow:0 0 7px rgba(255,77,112,.45)}
+.gx-client-payment-primary.upcoming .gx-client-payment-dot{background:#ffaa00;box-shadow:0 0 7px rgba(255,170,0,.4)}
+.gx-client-payment-primary.overdue strong{color:#ff9db0}
+.gx-client-payment-primary.upcoming strong{color:#ffd36c}
+.gx-client-payment-primary.review strong{color:#e5a7ff}
+.gx-client-payment-primary.paid strong{color:#83f4bd}
+
+.gx-client-brief{
+    padding-top:0;
+}
+.gx-client-brief-footer{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:7px;
+}
+.gx-client-brief-footer .gx-open-client{margin-left:auto}
+
+/* Lealtad / mensaje / link como herramientas secundarias compactas */
+.gx-operations-dock.gx-operations-dock-compact{
+    grid-template-columns:minmax(0,1.35fr) auto auto;
+    align-items:center;
+    gap:6px;
+    margin:0 0 8px;
+}
+.gx-operations-dock-compact .gx-dock-loyalty,
+.gx-operations-dock-compact .gx-dock-action{
+    min-height:42px;
+    border-radius:11px;
+}
+.gx-operations-dock-compact .gx-dock-loyalty{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 8px;
+}
+.gx-operations-dock-compact .gx-dock-copy{min-width:62px}
+.gx-operations-dock-compact .gx-dock-copy small{
+    font-size:.52rem;
+}
+.gx-operations-dock-compact .gx-dock-copy strong{
+    font-size:.68rem;
+}
+.gx-operations-dock-compact .gx-dock-stepper{
+    margin-left:auto;
+}
+.gx-operations-dock-compact .gx-dock-stepper button{
+    width:25px;height:28px;
+}
+.gx-operations-dock-compact .gx-dock-action{
+    min-width:76px;
+    justify-content:center;
+    padding:6px 9px;
+    text-align:center;
+}
+.gx-operations-dock-compact .gx-dock-action strong{
+    font-size:.63rem;
+}
+.gx-operations-dock-compact .gx-dock-icon,
+.gx-operations-dock-compact .gx-dock-action>span,
+.gx-operations-dock-compact .gx-dock-action small{
+    display:none;
+}
+
+/* Actividad en ficha: cerrada por defecto */
+details.gx-client-ops-context{
+    display:block;
+    padding:0;
+    overflow:hidden;
+}
+.gx-client-ops-context-head{
+    list-style:none;
+    margin:0;
+    padding:9px 10px;
+    cursor:pointer;
+}
+.gx-client-ops-context-head::-webkit-details-marker{display:none}
+.gx-client-ops-context-head>div{
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+}
+.gx-client-ops-context-head>div span{
+    margin-top:2px;
+}
+.gx-client-ops-context-head em{
+    font-style:normal;
+    color:var(--neon-blue);
+    font-size:.57rem;
+    font-weight:900;
+}
+.gx-client-ops-context-body{
+    padding:0 10px 8px;
+}
+
+@media(max-width:620px){
+    .gx-operations-dock.gx-operations-dock-compact{
+        grid-template-columns:minmax(0,1fr) auto auto;
+    }
+    .gx-operations-dock-compact .gx-dock-loyalty{
+        grid-column:auto;
+    }
+}
+@media(max-width:390px){
+    .gx-operations-dock.gx-operations-dock-compact{
+        grid-template-columns:1fr 1fr;
+    }
+    .gx-operations-dock-compact .gx-dock-loyalty{
+        grid-column:1/-1;
+    }
+    .gx-operations-dock-compact .gx-dock-action{
+        min-width:0;
+    }
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -841,7 +1065,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             <button class="gx-notif-refresh" type="button" onclick="gxRefreshNotifications()" title="Actualizar">↻</button>
         </div>
         <div class="gx-notification-filter-row" id="gx-notification-filters">
-            <button type="button" class="gx-notif-filter active" data-gx-notif-filter="all" onclick="gxSetNotificationFilter('all',this)">Todos <b id="gx-notif-count-all">0</b></button>
+            <button type="button" class="gx-notif-filter active" data-gx-notif-filter="all" onclick="gxSetNotificationFilter('all',this)">Prioridad <b id="gx-notif-count-all">0</b></button>
             <button type="button" class="gx-notif-filter" data-gx-notif-filter="review" onclick="gxSetNotificationFilter('review',this)">Por revisar <b id="gx-notif-count-review">0</b></button>
             <button type="button" class="gx-notif-filter" data-gx-notif-filter="overdue" onclick="gxSetNotificationFilter('overdue',this)">Vencidos <b id="gx-notif-count-overdue">0</b></button>
             <button type="button" class="gx-notif-filter" data-gx-notif-filter="cancellation" onclick="gxSetNotificationFilter('cancellation',this)">Cancelaciones <b id="gx-notif-count-cancellation">0</b></button>
@@ -1693,13 +1917,39 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             const couponCycle = Number(gamifConfig.cupon_ciclo || 1);
             const couponClaimed = Number(gamifConfig.cupon_reclamado_ciclo || 0) >= couponCycle;
             const missionBrief = gamifConfig.misiones_activas ? (couponClaimed ? `🥇 Ronda ${couponCycle}` : `🎟️ Ronda ${couponCycle}`) : "🎟️ Sin misiones";
+            const cardTiming = typeof gxPaymentTiming==='function' ? gxPaymentTiming(cliente) : {type:'none',days:0,due:null};
+            const dueText = cardTiming?.due instanceof Date && !Number.isNaN(cardTiming.due.getTime())
+                ? cardTiming.due.toLocaleDateString('es-MX',{day:'numeric',month:'short'})
+                : `día ${cliente.dia_pago||15}`;
+            const paymentPrimary = cliente.pago_en_revision
+                ? 'Pago en revisión'
+                : cliente.estado==='pagado'
+                    ? 'Mensualidad cubierta'
+                    : cardTiming.type==='overdue'
+                        ? `Vencido hace ${cardTiming.days} día${cardTiming.days===1?'':'s'}`
+                        : cardTiming.type==='upcoming'
+                            ? (cardTiming.days===0?'Vence hoy':`Vence en ${cardTiming.days} día${cardTiming.days===1?'':'s'}`)
+                            : `Vence ${dueText}`;
+            const paymentSecondary = cliente.estado==='pagado'
+                ? `${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}`
+                : `Fecha ${dueText} · ${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}`;
+            const paymentClass = cliente.pago_en_revision?'review'
+                : cliente.estado==='pagado'?'paid'
+                : cardTiming.type==='overdue'?'overdue'
+                : cardTiming.type==='upcoming'?'upcoming':'normal';
 
             card.innerHTML = `
                 <div class="card-header-main gx-client-card-header" onclick="toggleClientDetails('${key}')">
-                    <div class="client-info-basic"><div class="gx-client-name-line"><h3 style="color:${statusColor};">${cliente.nombre}</h3><span class="gx-client-folio">${cliente.folio}</span></div><div class="gx-client-status-line"><span class="client-status-badge" style="color:${statusColor};border-color:${statusColor}40;background:${statusColor}10;${pulseAnim}">${statusBadge}</span><span>· Día ${cliente.dia_pago || 15}</span></div></div>
+                    <div class="client-info-basic">
+                        <div class="gx-client-name-line"><h3 style="color:${statusColor};">${cliente.nombre}</h3><span class="gx-client-folio">${cliente.folio}</span></div>
+                        <div class="gx-client-payment-primary ${paymentClass}">
+                            <span class="gx-client-payment-dot"></span>
+                            <div><strong>${paymentPrimary}</strong><small>${paymentSecondary}</small></div>
+                        </div>
+                    </div>
                     <div class="gx-client-money"><strong>$${subtotal}</strong><span>mensual</span></div>
                 </div>
-                <div class="gx-client-brief" onclick="toggleClientDetails('${key}')"><div class="gx-service-brief">${servicesBrief}</div><div class="gx-benefit-brief"><span>${refBrief}</span><span>${missionBrief}</span><span class="gx-open-client">Abrir ›</span></div></div>
+                <div class="gx-client-brief" onclick="toggleClientDetails('${key}')"><div class="gx-service-brief">${servicesBrief}</div><div class="gx-client-brief-footer"><span class="client-status-badge" style="color:${statusColor};border-color:${statusColor}40;background:${statusColor}10;${pulseAnim}">${statusBadge}</span><span class="gx-open-client">Abrir ›</span></div></div>
                 <div class="client-details gx-focus-details" id="details-${key}">
                     ${enRevision ? `<div class="gx-payment-priority">
                         <div class="gx-payment-priority-icon">💳</div>
@@ -1709,20 +1959,6 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                         </div>
                         <button type="button" onclick="gxOpenPaymentModal('${key}', ${subtotal})">Revisar ahora</button>
                     </div>` : ''}
-
-                    <div class="gx-operations-dock">
-                        <div class="gx-dock-loyalty">
-                            <div class="gx-dock-icon">⭐</div>
-                            <div class="gx-dock-copy"><small>Lealtad</small><strong><span id="pagos-${key}">${cliente.pagos_puntuales || 0}</span> pagos</strong></div>
-                            <div class="gx-dock-stepper">
-                                <button type="button" onclick="updatePagos('${key}',-1)">−</button>
-                                <button type="button" onclick="updatePagos('${key}',1)">＋</button>
-                                <button type="button" class="reset" onclick="reiniciarLealtad('${key}')" title="Reiniciar">↻</button>
-                            </div>
-                        </div>
-                        <button type="button" class="gx-dock-action message" onclick="enviarMensaje('${cliente.nombre}','${key}')"><span>💬</span><div><small>Contacto</small><strong>Mensaje</strong></div></button>
-                        <button type="button" class="gx-dock-action link" onclick="copiarInfo('${cliente.nombre}','${key}')"><span>🔗</span><div><small>Acceso</small><strong>Copiar link</strong></div></button>
-                    </div>
 
                     <div class="gx-accordion open gx-billing-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>💳</i><b>Cobro y estado</b><small>${cliente.ciclo_cobro_manual ? '🧪 Excepción manual' : 'Ciclo automático'} · ${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}</small></span><em>⌄</em></button><div class="gx-accordion-content">
                         <div class="gx-billing-overview ${cliente.ciclo_cobro_manual ? 'manual' : ''}">
@@ -1743,6 +1979,20 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                         </div>
                         ${cliente.ciclo_cobro_manual ? `<label class="gx-manual-status"><span>Estado manual</span><select class="status-select status-${cliente.estado}" onchange="updateClientData('${key}','estado',this.value)"><option value="pendiente" ${cliente.estado==='pendiente'?'selected':''}>Pendiente (Deuda)</option><option value="pagado" ${cliente.estado==='pagado'?'selected':''}>Pagado</option><option value="suspendido" ${cliente.estado==='suspendido'?'selected':''}>Suspendido</option></select></label>` : `<div class="gx-auto-note">El estado se calcula con el periodo pendiente. Usa Manual únicamente para pruebas, acuerdos o excepciones.</div>`}
                     </div></div>
+
+                    <div class="gx-operations-dock gx-operations-dock-compact">
+                        <div class="gx-dock-loyalty">
+                            <div class="gx-dock-copy"><small>Lealtad</small><strong><span id="pagos-${key}">${cliente.pagos_puntuales || 0}</span> pagos</strong></div>
+                            <div class="gx-dock-stepper">
+                                <button type="button" onclick="updatePagos('${key}',-1)">−</button>
+                                <button type="button" onclick="updatePagos('${key}',1)">＋</button>
+                                <button type="button" class="reset" onclick="reiniciarLealtad('${key}')" title="Reiniciar">↻</button>
+                            </div>
+                        </div>
+                        <button type="button" class="gx-dock-action message" onclick="enviarMensaje('${cliente.nombre}','${key}')"><strong>Mensaje</strong></button>
+                        <button type="button" class="gx-dock-action link" onclick="copiarInfo('${cliente.nombre}','${key}')"><strong>Copiar link</strong></button>
+                    </div>
+
                     <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🔑</i><b>Acceso al portal</b><small>Nombre, usuario y PIN</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="access-portal-box gx-access-compact"><input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)"><div class="cred-row-split"><input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)"><input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)"></div></div></div></div>
                     <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>📺</i><b>Servicios</b><small>${serviceNames.length} activo${serviceNames.length===1?'':'s'} · $${subtotal}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="client-services-list">${clientServicesHTML}<div class="client-service-add-row"><select id="add-srv-sel-${key}">${globalOptions}</select><button class="btn-save" onclick="addClientService('${key}')">＋</button></div>${descuentosHTML}</div></div></div>
                     <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎁</i><b>Referidos & beneficios</b><small>Progreso, servicios y recompensa</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${refHTML}</div></div></div>
@@ -3337,7 +3587,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
  window.gxShowBenefitReady=()=>{goAdminTab('tab-clientes');const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{const r=c.referido_activo;if(r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3)filtered[k]=c});renderizarClientes(filtered)};
  window.gxToggleAccordion=b=>{const a=b.closest('.gx-accordion');const p=a?.parentElement;if(!a||!p)return;p.querySelectorAll(':scope > .gx-accordion').forEach(x=>{if(x!==a)x.classList.remove('open')});a.classList.toggle('open')};
  function restore(){if(!focusHome)return;const{details,parent,next}=focusHome;details.style.display='';details.classList.add('client-details');next&&next.parentNode===parent?parent.insertBefore(details,next):parent.appendChild(details);focusHome=null}
- window.gxOpenClientFocusBase=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>${periodChip}</span><span>$${monthly}/mes</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
+ window.gxOpenClientFocusBase=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${periodChip}</span><span>${status}</span><span>$${monthly}/mes</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
  window.gxCloseClientFocus=()=>{const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;restore();f.classList.remove('show');document.body.style.overflow=''};
  window.toggleClientDetails=key=>gxOpenClientFocus(key);
  function stockLow(){let n=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>{const a=s?._inventario_auto;if(a){const v=s.stock_manual!==undefined&&s.stock_manual!==null&&s.stock_manual!==''?Number(s.stock_manual):Number(a.disponibles_auto??a.disponibles??0);if(v<=1||Number(a.sobrecupo||0)>0)n++}})}catch{}return n}
@@ -3525,15 +3775,23 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             else activity.push(item);
         });
 
+        const priority=[
+            ...cancellations.filter(n=>!n.leida),
+            ...reviews,
+            ...support.filter(n=>!n.leida),
+            ...overdue,
+            ...upcoming
+        ];
+
         return {
-            reviews,overdue,upcoming,cancellations,support,activity,
+            reviews,overdue,upcoming,cancellations,support,activity,priority,
             all:[...cancellations,...reviews,...support,...overdue,...upcoming,...activity]
         };
     }
 
     function updateNotificationCounts(model){
         const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
-        set("gx-notif-count-all",model.all.length);
+        set("gx-notif-count-all",model.priority.length);
         set("gx-notif-count-review",model.reviews.length);
         set("gx-notif-count-overdue",model.overdue.length);
         set("gx-notif-count-upcoming",model.upcoming.length);
@@ -3577,7 +3835,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             : window.gxNotificationFilter==="cancellation" ? model.cancellations
             : window.gxNotificationFilter==="support" ? model.support
             : window.gxNotificationFilter==="activity" ? model.activity
-            : model.all;
+            : model.priority;
 
         const priority={cancellation:0,review:1,support:2,overdue:3,upcoming:4,activity:5};
         items=[...items].sort((a,b)=>{
@@ -3595,9 +3853,27 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             activity:"Actividad"
         };
 
+        const renderActivity=(n)=>{
+            const key=n.key||clientKeyById(n.cliente_id);
+            const unread=!n.synthetic && n.leida!==true;
+            return `<div class="gx-notif-compact ${unread?'unread':''}" data-gx-notification-id="${window.gxEscapeAdminHtml?.(n.id||'')||''}">
+                <div class="gx-notif-compact-dot"></div>
+                <div class="gx-notif-compact-copy">
+                    <strong>${window.gxEscapeAdminHtml?.(n.titulo||"Actividad")||""}</strong>
+                    <small>${n.cliente_nombre?`${window.gxEscapeAdminHtml?.(n.cliente_nombre)||""} · `:""}${relativeTime(n.created_at)}</small>
+                </div>
+                <div class="gx-notif-compact-actions">
+                    ${key?`<button onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}', '${String(n.id||"").replace(/'/g,"")}')">Abrir</button>`:""}
+                    ${!n.synthetic&&n.id?`<button class="danger" onclick="gxDeleteNotification('${String(n.id).replace(/'/g,"")}')">Eliminar</button>`:""}
+                </div>
+            </div>`;
+        };
+
         list.innerHTML=items.length?items.map(n=>{
             const key=n.key||clientKeyById(n.cliente_id);
             const cls=n.categoria||"activity";
+            if(cls==="activity") return renderActivity(n);
+
             const meta=window.gxParseAdminNotificationMeta?.(n)||{};
             const unread=!n.synthetic && n.leida!==true;
             const action=cls==="review"?"Revisar pago →"
@@ -3614,6 +3890,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 <div class="gx-notif-actions-row">
                     ${key?`<button class="gx-notif-action" onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}', '${String(n.id||"").replace(/'/g,"")}')">${action}</button>`:""}
                     ${unread&&n.id?`<button class="gx-notif-mark" onclick="gxMarkNotificationRead('${String(n.id).replace(/'/g,"")}')">${markLabel}</button>`:""}
+                    ${!n.synthetic&&n.id?`<button class="gx-notif-delete" onclick="gxDeleteNotification('${String(n.id).replace(/'/g,"")}')">Eliminar</button>`:""}
                 </div>
             </div>`;
         }).join(""):`<div class="gx-empty-inline">No hay avisos en esta categoría.</div>`;
@@ -3652,7 +3929,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             :current==="cancellation"?model.cancellations
             :current==="support"?model.support
             :current==="activity"?model.activity
-            :model.all;
+            :model.priority;
 
         const ids=[...new Set(visible.filter(n=>!n.synthetic && n.id && !n.leida).map(n=>n.id))];
         if(!ids.length)return;
@@ -3679,6 +3956,24 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         }catch(e){
             console.error(e);
             alert("No se pudo marcar la solicitud como atendida.");
+        }
+    };
+
+    window.gxDeleteNotification=async(id)=>{
+        if(!id)return;
+        const n=(window.gxAdminNotifications||[]).find(x=>String(x?.id||"")===String(id));
+        const title=String(n?.titulo||"esta notificación");
+        if(!confirm(`¿Eliminar "${title}"?\n\nSe quitará definitivamente del Centro de Operaciones.`))return;
+        try{
+            await ops("eliminar_notificaciones",{ids:[id]});
+            window.gxAdminNotifications=(window.gxAdminNotifications||[]).filter(x=>String(x?.id||"")!==String(id));
+            renderNotifications();
+            window.gxRefreshClientOperationalContext?.();
+            window.gxRefreshServiceRequestBadges?.();
+            window.gxUpdateOperationsSummary?.();
+        }catch(e){
+            console.error(e);
+            alert("No se pudo eliminar la notificación.");
         }
     };
     window.gxRefreshNotifications=async()=>{if(typeof inicializarPanel==="function"){await inicializarPanel();setTimeout(renderNotifications,80)}};
@@ -4307,7 +4602,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 01 · v1.0.3-beta-01</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 02 · v1.0.4-beta-02</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -4336,6 +4631,13 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             mensaje.includes("proceso de cancelacion") ||
             mensaje.includes("solicita iniciar el proceso de cancelacion")
         ) return "cancellation";
+
+        // Feedback/comentarios son actividad, no una solicitud de soporte pendiente.
+        if(
+            titulo.includes("feedback") ||
+            titulo.includes("comentario") ||
+            mensaje.includes("comentario:")
+        ) return "activity";
 
         if(tipo==="soporte") return "support";
 
@@ -4481,12 +4783,14 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!items.length)return;
 
         const unread=items.filter(n=>!n.leida).length;
-        const box=document.createElement("section");
+        const box=document.createElement("details");
         box.className="gx-client-ops-context";
-        box.innerHTML=`<div class="gx-client-ops-context-head">
-            <strong>Actividad de Mi Espacio</strong>
-            <span>${unread?`${unread} pendiente${unread===1?"":"s"}`:"Sin pendientes"}</span>
-        </div>` + items.map(n=>{
+        box.open=false;
+        box.innerHTML=`<summary class="gx-client-ops-context-head">
+            <div><strong>Actividad de Mi Espacio</strong><span>${items.length} movimiento${items.length===1?"":"s"}</span></div>
+            <em>${unread?`${unread} pendiente${unread===1?"":"s"}`:"Ver historial"}</em>
+        </summary>
+        <div class="gx-client-ops-context-body">` + items.map(n=>{
             const cat=window.gxClassifyAdminNotification(n);
             const meta=window.gxParseAdminNotificationMeta(n);
             const safeId=window.gxEscapeAdminHtml(n.id||"");
@@ -4499,12 +4803,15 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 <p>${window.gxEscapeAdminHtml(n.mensaje||"")}</p>
                 <div class="gx-client-request-actions">
                     ${!n.leida&&n.id?`<button class="done" type="button" onclick="gxMarkNotificationRead('${String(n.id).replace(/'/g,"")}')">Marcar atendida</button>`:""}
+                    ${n.id?`<button class="danger" type="button" onclick="gxDeleteNotification('${String(n.id).replace(/'/g,"")}')">Eliminar</button>`:""}
                     <button type="button" onclick="gxOpenNotificationCategory('${cat}')">Ver en operaciones</button>
                 </div>
             </article>`;
-        }).join("");
+        }).join("") + `</div>`;
 
-        details.insertBefore(box,details.firstChild);
+        const placement=details.querySelector(".gx-operations-dock-compact") || details.querySelector(".gx-billing-accordion");
+        if(placement) placement.insertAdjacentElement("afterend",box);
+        else details.appendChild(box);
     };
 
     window.gxHighlightClientRequest = function(id){
@@ -4562,7 +4869,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         },650);
     });
 
-    console.info("GOXION Admin Beta 01: puente operativo con Ayuda/Mi Espacio activo.");
+    console.info("GOXION Admin Beta 02: prioridad de cobro, actividad compacta y gestión de notificaciones.");
 })();
 </script>
 
