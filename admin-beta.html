@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-goxion-version="1.0.3-beta-01">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -461,6 +461,261 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 @media(min-width:700px){.gx-tj-overlay{align-items:center}.gx-tj-modal{border-bottom:1px solid rgba(0,242,254,.18);border-radius:22px}}
 </style>
 
+
+<style id="goxion-release-version-style">
+.goxion-release-version {
+    width: 100%;
+    box-sizing: border-box;
+    text-align: center;
+    padding: 16px 8px calc(10px + env(safe-area-inset-bottom, 0px));
+    color: rgba(149, 164, 189, 0.38);
+    font-size: 8px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: 0.85px;
+    text-transform: uppercase;
+    user-select: none;
+    -webkit-user-select: none;
+    pointer-events: none;
+}
+</style>
+
+
+<style id="goxion-admin-beta-01-ayuda-bridge">
+/* =========================================================
+   GOXION ADMIN · BETA 01
+   Puente operativo con Ayuda / Mi Espacio
+   ========================================================= */
+
+.gx-ops-grid{grid-template-columns:repeat(5,1fr)}
+.gx-op-card-requests .gx-op-icon{
+    color:#ffc2d1;
+    background:rgba(255,51,102,.08);
+}
+.gx-op-card-requests strong{color:#ffd5df}
+
+.gx-notification-toolbar .gx-notif-read{
+    flex:0 0 auto;
+    width:38px;
+    height:36px;
+    padding:0;
+    border:1px solid rgba(0,255,157,.16);
+    border-radius:10px;
+    background:rgba(0,255,157,.045);
+    color:#72ffd4;
+    font-weight:900;
+    cursor:pointer;
+}
+
+.gx-notif-item.cancellation{
+    border-color:rgba(255,51,102,.28);
+    background:rgba(255,51,102,.045);
+}
+.gx-notif-item.support{
+    border-color:rgba(0,242,254,.22);
+    background:rgba(0,242,254,.035);
+}
+.gx-notif-item.activity{
+    border-color:rgba(124,77,255,.18);
+    background:rgba(124,77,255,.025);
+}
+.gx-notif-item.unread{
+    box-shadow:inset 3px 0 0 rgba(255,255,255,.16);
+}
+.gx-notif-kind.cancellation{color:#ff9bb4;background:rgba(255,51,102,.09)}
+.gx-notif-kind.support{color:#8ff8ff;background:rgba(0,242,254,.08)}
+.gx-notif-kind.activity{color:#c6b7ff;background:rgba(124,77,255,.09)}
+
+.gx-notif-service{
+    display:inline-flex;
+    width:max-content;
+    max-width:100%;
+    margin:0 0 7px;
+    padding:4px 7px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.035);
+    color:#d8dcea;
+    font-size:.58rem;
+    font-weight:850;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.gx-notif-actions-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:7px;
+    margin-top:9px;
+}
+.gx-notif-actions-row .gx-notif-action{margin-top:0}
+.gx-notif-mark{
+    border:0;
+    background:transparent;
+    color:#72ffd4;
+    font-size:.62rem;
+    font-weight:900;
+    cursor:pointer;
+    padding:7px 3px;
+}
+
+/* Estado operativo del servicio: usa la misma alerta que Ayuda. */
+.gx-service-state-row{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    flex-wrap:wrap;
+    margin-top:6px;
+}
+.gx-service-live-state,
+.gx-service-request-state{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    min-height:20px;
+    padding:0 7px;
+    border-radius:999px;
+    font-size:.56rem;
+    font-weight:900;
+    white-space:nowrap;
+}
+.gx-service-live-state{
+    color:#8deec0;
+    border:1px solid rgba(0,255,157,.13);
+    background:rgba(0,255,157,.045);
+}
+.gx-service-live-state i{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#00ff9d;
+    box-shadow:0 0 7px rgba(0,255,157,.55);
+    animation:gxAdminServicePulse 2s ease-in-out infinite;
+}
+.gx-service-live-state.interrupted{
+    color:#ffd18a;
+    border-color:rgba(255,170,0,.18);
+    background:rgba(255,170,0,.055);
+}
+.gx-service-live-state.interrupted i{
+    background:#ffaa00;
+    box-shadow:none;
+    animation:none;
+}
+.gx-service-request-state{
+    color:#ff9bb4;
+    border:1px solid rgba(255,51,102,.16);
+    background:rgba(255,51,102,.05);
+}
+@keyframes gxAdminServicePulse{
+    0%,100%{transform:scale(1);opacity:.72}
+    50%{transform:scale(1.45);opacity:1}
+}
+
+/* Solicitudes dentro de la ficha actual del cliente. */
+.gx-client-ops-context{
+    margin:0 0 11px;
+    padding:10px;
+    border:1px solid rgba(124,77,255,.16);
+    border-radius:13px;
+    background:linear-gradient(145deg,rgba(124,77,255,.045),rgba(0,242,254,.018));
+}
+.gx-client-ops-context-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:7px;
+}
+.gx-client-ops-context-head strong{
+    font-size:.69rem;
+}
+.gx-client-ops-context-head span{
+    color:var(--text-muted);
+    font-size:.56rem;
+    font-weight:800;
+}
+.gx-client-request{
+    padding:8px 0;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+.gx-client-request:first-of-type{border-top:0}
+.gx-client-request-top{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+}
+.gx-client-request-top strong{
+    flex:1;
+    min-width:120px;
+    font-size:.66rem;
+}
+.gx-client-request-status{
+    padding:3px 6px;
+    border-radius:999px;
+    font-size:.52rem;
+    font-weight:900;
+}
+.gx-client-request-status.pending{
+    color:#ff9bb4;
+    background:rgba(255,51,102,.07);
+}
+.gx-client-request-status.seen{
+    color:#9fa9bd;
+    background:rgba(159,169,189,.06);
+}
+.gx-client-request p{
+    margin:5px 0 0;
+    color:#bdc5d5;
+    font-size:.61rem;
+    line-height:1.42;
+    white-space:pre-line;
+}
+.gx-client-request small{
+    display:block;
+    margin-top:5px;
+    color:var(--text-muted);
+    font-size:.55rem;
+}
+.gx-client-request-actions{
+    display:flex;
+    gap:8px;
+    margin-top:6px;
+}
+.gx-client-request-actions button{
+    border:0;
+    background:none;
+    color:var(--neon-blue);
+    padding:2px 0;
+    font-size:.58rem;
+    font-weight:900;
+    cursor:pointer;
+}
+.gx-client-request-actions button.done{color:#72ffd4}
+.gx-client-request.highlight{
+    margin-left:-7px;
+    margin-right:-7px;
+    padding-left:7px;
+    padding-right:7px;
+    border-radius:9px;
+    background:rgba(255,255,255,.045);
+}
+
+@media(max-width:1080px){
+    .gx-ops-grid{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:840px){
+    .gx-ops-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:390px){
+    .gx-ops-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-service-live-state i{animation:none!important}
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -494,6 +749,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                     <button class="gx-op-card" onclick="gxFilterFromSummary('pendiente')"><span class="gx-op-icon">◷</span><span class="gx-op-copy"><strong id="gx-count-pending">0</strong><small>Pagos pendientes</small></span><span class="gx-op-arrow">›</span></button>
                     <button class="gx-op-card" onclick="gxShowBenefitReady()"><span class="gx-op-icon">🎁</span><span class="gx-op-copy"><strong id="gx-count-benefits">0</strong><small>Beneficios listos</small></span><span class="gx-op-arrow">›</span></button>
                     <button class="gx-op-card" onclick="goAdminTab('tab-catalogo')"><span class="gx-op-icon">📦</span><span class="gx-op-copy"><strong id="gx-count-stock">0</strong><small>Stock bajo / lleno</small></span><span class="gx-op-arrow">›</span></button>
+                    <button class="gx-op-card gx-op-card-requests" onclick="gxOpenNotificationCategory('cancellation')"><span class="gx-op-icon">◎</span><span class="gx-op-copy"><strong id="gx-count-requests">0</strong><small>Solicitudes Mi Espacio</small></span><span class="gx-op-arrow">›</span></button>
                 </div>
                 <div class="gx-section-head gx-section-space"><div><span class="gx-eyebrow">Panorama</span><h2>Estado de clientes</h2></div><button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button></div>
                 <div class="gx-client-stats"><div><strong id="gx-count-total">0</strong><span>Total</span></div><div><strong id="gx-count-paid">0</strong><span>Pagados</span></div><div><strong id="gx-count-suspended">0</strong><span>Suspendidos</span></div><div><strong id="gx-count-missions">0</strong><span>Con misiones</span></div></div>
@@ -580,13 +836,17 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             <button class="gx-focus-close" type="button" onclick="gxToggleNotifications(false)">×</button>
         </div>
         <div class="gx-notification-toolbar">
-            <div class="gx-notif-summary" id="gx-notification-summary">Pagos que requieren atención y fechas de vencimiento.</div>
+            <div class="gx-notif-summary" id="gx-notification-summary">Pagos, solicitudes y actividad de Mi Espacio.</div>
+            <button class="gx-notif-read" type="button" onclick="gxMarkAllNotificationsRead()" title="Marcar como atendidas las visibles">✓</button>
             <button class="gx-notif-refresh" type="button" onclick="gxRefreshNotifications()" title="Actualizar">↻</button>
         </div>
         <div class="gx-notification-filter-row" id="gx-notification-filters">
             <button type="button" class="gx-notif-filter active" data-gx-notif-filter="all" onclick="gxSetNotificationFilter('all',this)">Todos <b id="gx-notif-count-all">0</b></button>
             <button type="button" class="gx-notif-filter" data-gx-notif-filter="review" onclick="gxSetNotificationFilter('review',this)">Por revisar <b id="gx-notif-count-review">0</b></button>
             <button type="button" class="gx-notif-filter" data-gx-notif-filter="overdue" onclick="gxSetNotificationFilter('overdue',this)">Vencidos <b id="gx-notif-count-overdue">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="cancellation" onclick="gxSetNotificationFilter('cancellation',this)">Cancelaciones <b id="gx-notif-count-cancellation">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="support" onclick="gxSetNotificationFilter('support',this)">Soporte <b id="gx-notif-count-support">0</b></button>
+            <button type="button" class="gx-notif-filter" data-gx-notif-filter="activity" onclick="gxSetNotificationFilter('activity',this)">Actividad <b id="gx-notif-count-activity">0</b></button>
             <button type="button" class="gx-notif-filter" data-gx-notif-filter="upcoming" onclick="gxSetNotificationFilter('upcoming',this)">Próximos <b id="gx-notif-count-upcoming">0</b></button>
         </div>
         <div id="gx-notification-list" class="gx-notification-list"></div>
@@ -628,7 +888,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
 <script>
     const CONFIG = { username: "henrygonzalezestrada-cyber", repo: "goxion", path: "clientes.json", branch: "main" };
-    let currentToken = localStorage.getItem("GOXION_PAT") || "";
+    let currentToken = "";
     let currentFileData = null; 
     let clientesDict = {}; 
     let configGlobal = { alertas: {}, serviciosGlobales: [], combo_upsell: true };
@@ -684,11 +944,11 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     function pedirToken() {
         const userToken = prompt("🔒 ACCESO RESTRINGIDO // GOXION ADMIN\n\nIngresa tu Personal Access Token:");
         if (userToken && userToken.trim() !== "") {
-            currentToken = userToken.trim(); localStorage.setItem("GOXION_PAT", currentToken); inicializarPanel();
+            currentToken = userToken.trim(); inicializarPanel();
         } else { alert("Acceso denegado."); }
     }
 
-    function cerrarSesion() { localStorage.removeItem("GOXION_PAT"); location.reload(); }
+    function cerrarSesion() { currentToken = ""; location.reload(); }
 
     async function inicializarPanel() {
         const version = new Date().getTime();
@@ -1201,16 +1461,23 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                     const lockStatus = esInvitacion ? 'disabled title="No aplica para este servicio"' : '';
                     
                     clientServicesHTML += `
-                        <div class="gx-service-compact">
+                        <div class="gx-service-compact" data-gx-client-key="${key}" data-gx-service-index="${sIdx}" data-gx-service-name="${String(s.nombre||'').replace(/"/g,'&quot;')}">
                             <div class="gx-service-compact-head">
                                 <div class="gx-service-identity">
                                     <strong>${s.nombre}</strong>
                                     <small>${s.correo_login ? s.correo_login : 'Acceso sin configurar'}</small>
+                                    <div class="gx-service-state-row">
+                                        <span class="gx-service-live-state ${gxAdminServiceHasAlert(s.nombre) ? 'interrupted' : 'active'}" data-gx-service-live-state>
+                                            <i></i>${gxAdminServiceHasAlert(s.nombre) ? 'Temporalmente inactivo' : 'Activo'}
+                                        </span>
+                                        <span class="gx-service-request-state" data-gx-service-request-state style="${gxPendingCancellationForService(cliente,s) ? '' : 'display:none'}">Cancelación solicitada</span>
+                                    </div>
                                 </div>
                                 <strong class="gx-service-price">$${s.monto}</strong>
                                 <details class="gx-service-actions-menu">
                                     <summary title="Más acciones">•••</summary>
                                     <div class="gx-service-actions-pop">
+                                        <button type="button" onclick="gxToggleServiceIncident('${key}', ${sIdx});this.closest('details').removeAttribute('open')">${gxAdminServiceHasAlert(s.nombre) ? '✓ Resolver incidencia global' : '⚠ Marcar incidencia global'}</button>
                                         <button type="button" onclick="gxOpenTratoJusto('${key}', ${sIdx});this.closest('details').removeAttribute('open')">🛡 Gestionar Trato Justo</button>
                                         <button type="button" class="danger" onclick="removeClientService('${key}', ${sIdx});this.closest('details').removeAttribute('open')">✖ Eliminar servicio</button>
                                     </div>
@@ -1404,8 +1671,8 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                                 <div><strong>Ronda ${gamifConfig.cupon_ciclo || 1}</strong><small>${Number(gamifConfig.cupon_reclamado_ciclo || 0) >= Number(gamifConfig.cupon_ciclo || 1) ? 'Cupón reclamado' : 'Cupón pendiente de completar'}</small></div>
                             </div>
                             <div class="gx-client-mission-admin-actions">
-                                <button type="button" class="reset" onclick="reiniciarMisionesClienteBeta('${key}')">↻ Reiniciar progreso</button>
-                                <button type="button" class="round" onclick="nuevaRondaCuponBeta('${key}')">🎟️ Nueva ronda</button>
+                                <button type="button" class="reset" onclick="reiniciarMisionesCliente('${key}')">↻ Reiniciar progreso</button>
+                                <button type="button" class="round" onclick="nuevaRondaCupon('${key}')">🎟️ Nueva ronda</button>
                             </div>
                         </div>
                     </details>
@@ -1618,18 +1885,16 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     }
     </script>
 
-    <!-- GOXION ADMIN BETA // CAPA SUPABASE V2
+    <!-- GOXION ADMIN // CAPA SUPABASE V2
          Mantiene intacta la interfaz y añade diagnóstico visible. -->
-    <script id="goxion-supabase-beta">
+    <script id="goxion-admin-supabase-layer">
     (() => {
         const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
         const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
-        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos-beta`;
-        const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro-beta`;
-        const TRATO_URL = `${SUPABASE_URL}/functions/v1/trato-justo-beta`;
+        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos`;
+        const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro`;
+        const TRATO_URL = `${SUPABASE_URL}/functions/v1/trato-justo`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
-
-        localStorage.removeItem("GOXION_PAT");
         currentToken = localStorage.getItem(ADMIN_TOKEN_KEY) || "";
         currentFileData = { source: "supabase" };
 
@@ -1892,7 +2157,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         function adaptarRespuestaAdmin(data) {
             const root = unwrapRoot(data);
 
-            // admin-datos-beta ya entrega las notificaciones administrativas.
+            // admin-datos entrega las notificaciones administrativas.
             // Las conservamos en memoria para que la campana, el punto rojo y
             // "Marcar leídas" trabajen con datos reales y no solo con alertas sintéticas.
             window.gxAdminNotifications = Array.isArray(root.notificaciones)
@@ -2054,7 +2319,6 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
         cerrarSesion = function() {
             localStorage.removeItem(ADMIN_TOKEN_KEY);
-            localStorage.removeItem("GOXION_PAT");
             currentToken = "";
             location.reload();
         };
@@ -2089,18 +2353,18 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
         };
 
-        console.info("GOXION Admin Beta: periodo de cobro persistente cargado.");
+        console.info("GOXION Admin: periodo de cobro persistente cargado.");
     })();
     </script>
 
 
-    <!-- GOXION ADMIN BETA V3 // ESCRITURA INMEDIATA SUPABASE -->
+    <!-- GOXION ADMIN // ESCRITURA INMEDIATA SUPABASE -->
     <script id="goxion-supabase-v3-writes">
     (() => {
         const SB = "https://hmpevcwodcgbkviarfic.supabase.co";
         const ACCIONES = `${SB}/functions/v1/admin-acciones`;
-        const PERIODOS = `${SB}/functions/v1/periodo-cobro-beta`;
-        const TRATO_JUSTO = `${SB}/functions/v1/trato-justo-beta`;
+        const PERIODOS = `${SB}/functions/v1/periodo-cobro`;
+        const TRATO_JUSTO = `${SB}/functions/v1/trato-justo`;
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
         async function accion(accion, datos = {}) {
@@ -2402,7 +2666,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 const r = await accionPeriodo("aprobar_pago_periodo", {
                     cliente_id: c._id,
                     monto: num(monto),
-                    notas: "Aprobado desde Admin Beta",
+                    notas: "Aprobado desde Admin",
                     puntual
                 });
                 if (!puntual && !alreadyPaid) await accion("reiniciar_lealtad", { cliente_id: c._id });
@@ -2668,13 +2932,13 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     </script>
 
 
-    <!-- GOXION ADMIN BETA V4 // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
+    <!-- GOXION ADMIN // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
     <script id="goxion-admin-v4-fixes">
     (() => {
-        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes-beta";
+        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
         const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
 
-        async function ajusteBeta(accion, datos = {}) {
+        async function ajusteAdmin(accion, datos = {}) {
             const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
             if (!token) throw new Error("Sesión administrativa no disponible.");
 
@@ -2699,7 +2963,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
         async function cargarStockManual() {
             try {
-                const r = await ajusteBeta("obtener_stock_manual");
+                const r = await ajusteAdmin("obtener_stock_manual");
                 const mapa = new Map((r.stock || []).map(x => [String(x.id), x.stock_manual]));
 
                 configGlobal.serviciosGlobales.forEach(s => {
@@ -2740,7 +3004,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             const stockManual = limpio === "" ? null : Math.max(0, parseInt(limpio) || 0);
 
             try {
-                const r = await ajusteBeta("guardar_stock_manual", {
+                const r = await ajusteAdmin("guardar_stock_manual", {
                     id: s.id || s._id,
                     stock_manual: stockManual
                 });
@@ -2767,7 +3031,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             try {
                 if (isChecked) {
                     const actual = c.referido_activo || {};
-                    await ajusteBeta("guardar_referido", {
+                    await ajusteAdmin("guardar_referido", {
                         cliente_id: c._id,
                         nombre: actual.nombre || "",
                         plataformas: Number(actual.plataformas || 2),
@@ -2828,7 +3092,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             c.referido_activo = actual;
 
             try {
-                const r = await ajusteBeta("guardar_referido", {
+                const r = await ajusteAdmin("guardar_referido", {
                     cliente_id: c._id,
                     nombre: actual.nombre || "",
                     plataformas: Number(actual.plataformas || 2),
@@ -2849,7 +3113,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         };
 
 
-        window.reiniciarMisionesClienteBeta = async function(key) {
+        window.reiniciarMisionesCliente = async function(key) {
             const c = clientesDict[key];
             if(!c?._id) {
                 alert("No encontré el cliente en memoria.");
@@ -2863,7 +3127,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
 
             try {
-                const result = await ajusteBeta("reiniciar_misiones_cliente", {
+                const result = await ajusteAdmin("reiniciar_misiones_cliente", {
                     cliente_id: c._id
                 });
 
@@ -2881,7 +3145,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         };
 
 
-        window.nuevaRondaCuponBeta = async function(key) {
+        window.nuevaRondaCupon = async function(key) {
             const c = clientesDict[key];
             if(!c?._id) {
                 alert("No encontré el cliente en memoria.");
@@ -2895,7 +3159,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
 
             try {
-                const result = await ajusteBeta("nueva_ronda_cupon", {
+                const result = await ajusteAdmin("nueva_ronda_cupon", {
                     cliente_id: c._id
                 });
 
@@ -2917,10 +3181,10 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     </script>
 
 
-    <!-- GOXION ADMIN BETA V5 // INVENTARIO INTELIGENTE DESDE SUPABASE -->
+    <!-- GOXION ADMIN // INVENTARIO INTELIGENTE DESDE SUPABASE -->
     <script id="goxion-admin-v5-inventory">
     (() => {
-        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-beta";
+        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario";
         const TOKEN_KEY_INV = "GOXION_ADMIN_TOKEN";
         let inventarioServidor = null;
 
@@ -3073,11 +3337,11 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
  window.gxShowBenefitReady=()=>{goAdminTab('tab-clientes');const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{const r=c.referido_activo;if(r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3)filtered[k]=c});renderizarClientes(filtered)};
  window.gxToggleAccordion=b=>{const a=b.closest('.gx-accordion');const p=a?.parentElement;if(!a||!p)return;p.querySelectorAll(':scope > .gx-accordion').forEach(x=>{if(x!==a)x.classList.remove('open')});a.classList.toggle('open')};
  function restore(){if(!focusHome)return;const{details,parent,next}=focusHome;details.style.display='';details.classList.add('client-details');next&&next.parentNode===parent?parent.insertBefore(details,next):parent.appendChild(details);focusHome=null}
- window.gxOpenClientFocus=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>${periodChip}</span><span>$${monthly}/mes</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
+ window.gxOpenClientFocusBase=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${status}</span><span>${periodChip}</span><span>$${monthly}/mes</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
  window.gxCloseClientFocus=()=>{const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;restore();f.classList.remove('show');document.body.style.overflow=''};
  window.toggleClientDetails=key=>gxOpenClientFocus(key);
  function stockLow(){let n=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>{const a=s?._inventario_auto;if(a){const v=s.stock_manual!==undefined&&s.stock_manual!==null&&s.stock_manual!==''?Number(s.stock_manual):Number(a.disponibles_auto??a.disponibles??0);if(v<=1||Number(a.sobrecupo||0)>0)n++}})}catch{}return n}
- window.gxUpdateOperationsSummary=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>c.pago_en_revision===true).length,pending=v.filter(c=>!c.pago_en_revision&&c.estado==='pendiente').length,paid=v.filter(c=>c.estado==='pagado').length,susp=v.filter(c=>c.estado==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
+ window.gxUpdateOperationsSummaryBase=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>c.pago_en_revision===true).length,pending=v.filter(c=>!c.pago_en_revision&&c.estado==='pendiente').length,paid=v.filter(c=>c.estado==='pagado').length,susp=v.filter(c=>c.estado==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
  const add=window.agregarNuevoCliente;if(typeof add==='function')window.agregarNuevoCliente=function(...a){const before=new Set(Object.keys(clientesDict||{})),r=add.apply(this,a);setTimeout(()=>{const k=Object.keys(clientesDict||{}).find(x=>!before.has(x));if(k){goAdminTab('tab-clientes');gxOpenClientFocus(k)}gxUpdateOperationsSummary()},180);return r};
  const render=window.renderizarClientes;if(typeof render==='function')window.renderizarClientes=function(...a){const r=render.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
  const calc=window.calcularInventarioYFinanzas;if(typeof calc==='function')window.calcularInventarioYFinanzas=function(...a){const r=calc.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
@@ -3088,7 +3352,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
 <script id="goxion-admin-ops-v2">
 (() => {
-    const OPS_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-operaciones-beta";
+    const OPS_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-operaciones";
     const TAGS = [
         {tag:"CATALOGO", emoji:"🛒", name:"Catálogo", mode:"Automática", info:"Se completa cuando el cliente visita la pestaña Catálogo."},
         {tag:"PAGO", emoji:"💳", name:"Pago", mode:"Automática", info:"Se completa cuando el cliente reporta su comprobante de pago."},
@@ -3116,7 +3380,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!r.ok || j?.ok !== true) throw new Error(j?.error || `HTTP ${r.status}`);
         return j;
     }
-    window.gxOpsBeta = ops;
+    window.gxOps = ops;
 
     // ---------- Mission Builder ----------
     function tagOption(tag) {
@@ -3188,7 +3452,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 
     window.gxNotificationFilter = window.gxNotificationFilter || "all";
 
-    function paymentNotificationModel(){
+    function operationsNotificationModel(){
         const persisted=Array.isArray(window.gxAdminNotifications)?window.gxAdminNotifications:[];
         const latestReviewByClient=new Map();
 
@@ -3200,7 +3464,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 if(!prev || new Date(n.created_at||0)>new Date(prev.created_at||0)) latestReviewByClient.set(id,n);
             });
 
-        const reviews=[], overdue=[], upcoming=[];
+        const reviews=[], overdue=[], upcoming=[], cancellations=[], support=[], activity=[];
 
         Object.entries(clientesDict||{}).forEach(([key,c])=>{
             if(c.pago_en_revision===true){
@@ -3210,7 +3474,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                     id:persistedReview?.id||`review-${key}`,
                     tipo:"pago_revision",
                     categoria:"review",
-                    titulo:persistedReview?.titulo||"💳 Pago pendiente de revisión",
+                    titulo:persistedReview?.titulo||"Pago pendiente de revisión",
                     mensaje:persistedReview?.mensaje||`${c.nombre} tiene un comprobante pendiente de validar.`,
                     cliente_id:c._id,
                     cliente_nombre:c.nombre,
@@ -3226,14 +3490,14 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             if(timing.type==="overdue"){
                 overdue.push({
                     id:`od-${key}`,tipo:"pago_vencido",categoria:"overdue",
-                    titulo:"⚠️ Pago vencido",
+                    titulo:"Pago vencido",
                     mensaje:`${c.nombre} lleva ${timing.days} día${timing.days===1?'':'s'} de atraso en ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)}. Fecha de pago: día ${c.dia_pago||15}.`,
                     cliente_id:c._id,cliente_nombre:c.nombre,leida:true,created_at:new Date().toISOString(),synthetic:true,key
                 });
             }else if(timing.type==="upcoming"){
                 upcoming.push({
                     id:`up-${key}`,tipo:"cobro_proximo",categoria:"upcoming",
-                    titulo:timing.days===0?"⏰ Pago vence hoy":"⏳ Pago próximo",
+                    titulo:timing.days===0?"Pago vence hoy":"Pago próximo",
                     mensaje:timing.days===0
                         ? `${c.nombre} tiene fecha de pago hoy para ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)} (día ${c.dia_pago||15}).`
                         : `${c.nombre} vence en ${timing.days} día${timing.days===1?'':'s'} para ${timing.periodo||gxPeriodLabel(c.periodo_pendiente)} (día ${c.dia_pago||15}).`,
@@ -3242,7 +3506,29 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             }
         });
 
-        return {reviews,overdue,upcoming,all:[...reviews,...overdue,...upcoming]};
+        persisted.forEach(n=>{
+            const tipo=String(n?.tipo||"").toLowerCase();
+            if(tipo==="pago_revision") return;
+
+            const key=clientKeyById(n?.cliente_id);
+            const c=key?clientesDict?.[key]:null;
+
+            // Evita duplicar el aviso de comprobante cuando el cliente ya aparece
+            // explícitamente en "Por revisar".
+            if(tipo==="pagos" && c?.pago_en_revision===true) return;
+
+            const categoria=window.gxClassifyAdminNotification?.(n)||"activity";
+            const item={...n,categoria,key,synthetic:false};
+
+            if(categoria==="cancellation") cancellations.push(item);
+            else if(categoria==="support") support.push(item);
+            else activity.push(item);
+        });
+
+        return {
+            reviews,overdue,upcoming,cancellations,support,activity,
+            all:[...cancellations,...reviews,...support,...overdue,...upcoming,...activity]
+        };
     }
 
     function updateNotificationCounts(model){
@@ -3251,51 +3537,84 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         set("gx-notif-count-review",model.reviews.length);
         set("gx-notif-count-overdue",model.overdue.length);
         set("gx-notif-count-upcoming",model.upcoming.length);
+        set("gx-notif-count-cancellation",model.cancellations.length);
+        set("gx-notif-count-support",model.support.length);
+        set("gx-notif-count-activity",model.activity.length);
 
-        const urgent=model.reviews.length+model.overdue.length;
+        const unreadCancellation=model.cancellations.filter(n=>!n.leida).length;
+        const unreadSupport=model.support.filter(n=>!n.leida).length;
+        const urgent=model.reviews.length+model.overdue.length+unreadCancellation+unreadSupport;
+
         const bell=document.getElementById("gx-notification-bell");
         bell?.classList.toggle("has-new",urgent>0);
         const badge=document.getElementById("gx-notification-badge");
-        if(badge)badge.title=urgent?`${urgent} requieren atención`:"Sin pagos urgentes";
+        if(badge)badge.title=urgent?`${urgent} requieren atención`:"Sin pendientes urgentes";
 
         const summary=document.getElementById("gx-notification-summary");
         if(summary){
-            if(model.reviews.length) summary.textContent=`${model.reviews.length} pago${model.reviews.length===1?'':'s'} por revisar · ${model.overdue.length} vencido${model.overdue.length===1?'':'s'}`;
-            else if(model.overdue.length) summary.textContent=`${model.overdue.length} pago${model.overdue.length===1?'':'s'} vencido${model.overdue.length===1?'':'s'} requieren seguimiento.`;
-            else summary.textContent="Sin pagos urgentes. Revisa los próximos vencimientos.";
+            const parts=[];
+            if(model.reviews.length) parts.push(`${model.reviews.length} pago${model.reviews.length===1?'':'s'} por revisar`);
+            if(unreadCancellation) parts.push(`${unreadCancellation} cancelación${unreadCancellation===1?'':'es'}`);
+            if(unreadSupport) parts.push(`${unreadSupport} soporte${unreadSupport===1?'':'s'}`);
+            if(model.overdue.length) parts.push(`${model.overdue.length} vencido${model.overdue.length===1?'':'s'}`);
+            summary.textContent=parts.length?parts.join(" · "):"Sin pendientes urgentes. La actividad reciente queda disponible aquí.";
         }
+
+        const requests=document.getElementById("gx-count-requests");
+        if(requests) requests.textContent=unreadCancellation+unreadSupport;
     }
 
     function renderNotifications(){
         const list=document.getElementById("gx-notification-list");
         if(!list)return;
 
-        const model=paymentNotificationModel();
+        const model=operationsNotificationModel();
         updateNotificationCounts(model);
 
         let items=window.gxNotificationFilter==="review" ? model.reviews
             : window.gxNotificationFilter==="overdue" ? model.overdue
             : window.gxNotificationFilter==="upcoming" ? model.upcoming
+            : window.gxNotificationFilter==="cancellation" ? model.cancellations
+            : window.gxNotificationFilter==="support" ? model.support
+            : window.gxNotificationFilter==="activity" ? model.activity
             : model.all;
 
-        const priority={review:0,overdue:1,upcoming:2};
+        const priority={cancellation:0,review:1,support:2,overdue:3,upcoming:4,activity:5};
         items=[...items].sort((a,b)=>{
             const pa=priority[a.categoria]??9,pb=priority[b.categoria]??9;
             if(pa!==pb)return pa-pb;
             return new Date(b.created_at||0)-new Date(a.created_at||0);
         });
 
-        const labels={review:"Por revisar",overdue:"Vencido",upcoming:"Próximo"};
+        const labels={
+            review:"Por revisar",
+            overdue:"Vencido",
+            upcoming:"Próximo",
+            cancellation:"Cancelación",
+            support:"Soporte",
+            activity:"Actividad"
+        };
+
         list.innerHTML=items.length?items.map(n=>{
             const key=n.key||clientKeyById(n.cliente_id);
-            const cls=n.categoria||"";
-            const action=n.categoria==="review"?"Revisar pago →":"Abrir cliente →";
-            return `<div class="gx-notif-item ${cls} ${n.categoria==="review"&&!n.leida?'unread':''}">
-                <span class="gx-notif-kind ${cls}">${labels[cls]||"Pago"}</span>
-                <strong>${n.titulo||"Actividad"}</strong>
-                <p>${n.mensaje||""}</p>
-                <small>${n.cliente_nombre?`${n.cliente_nombre} · `:""}${relativeTime(n.created_at)}</small>
-                ${key?`<button class="gx-notif-action" onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}')">${action}</button>`:""}
+            const cls=n.categoria||"activity";
+            const meta=window.gxParseAdminNotificationMeta?.(n)||{};
+            const unread=!n.synthetic && n.leida!==true;
+            const action=cls==="review"?"Revisar pago →"
+                : cls==="cancellation"?"Abrir solicitud →"
+                : "Abrir cliente →";
+            const markLabel=cls==="cancellation"||cls==="support"?"Marcar atendida":"Marcar leída";
+
+            return `<div class="gx-notif-item ${cls} ${unread?'unread':''}" data-gx-notification-id="${window.gxEscapeAdminHtml?.(n.id||'')||''}">
+                <span class="gx-notif-kind ${cls}">${labels[cls]||"Actividad"}</span>
+                <strong>${window.gxEscapeAdminHtml?.(n.titulo||"Actividad")||""}</strong>
+                ${meta.servicio?`<span class="gx-notif-service">${window.gxEscapeAdminHtml?.(meta.servicio)||""}</span>`:""}
+                <p>${window.gxEscapeAdminHtml?.(n.mensaje||"")||""}</p>
+                <small>${n.cliente_nombre?`${window.gxEscapeAdminHtml?.(n.cliente_nombre)||""} · `:""}${relativeTime(n.created_at)}</small>
+                <div class="gx-notif-actions-row">
+                    ${key?`<button class="gx-notif-action" onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}', '${String(n.id||"").replace(/'/g,"")}')">${action}</button>`:""}
+                    ${unread&&n.id?`<button class="gx-notif-mark" onclick="gxMarkNotificationRead('${String(n.id).replace(/'/g,"")}')">${markLabel}</button>`:""}
+                </div>
             </div>`;
         }).join(""):`<div class="gx-empty-inline">No hay avisos en esta categoría.</div>`;
     }
@@ -3306,34 +3625,61 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         renderNotifications();
     };
 
-    window.gxToggleNotifications=function(force){
+    window.gxToggleNotificationsBase=function(force){
         const drawer=document.getElementById("gx-notification-drawer"),overlay=document.getElementById("gx-notification-overlay");
         const show=force===undefined?!drawer.classList.contains("show"):Boolean(force);
         drawer.classList.toggle("show",show);overlay.classList.toggle("show",show);drawer.setAttribute("aria-hidden",show?"false":"true");
         if(show)renderNotifications();
     };
 
-    window.gxOpenNotificationClient=(key,tipo)=>{
+    window.gxOpenNotificationClient=(key,tipo,notificationId="")=>{
         gxToggleNotifications(false);
         goAdminTab("tab-clientes");
         setTimeout(()=>{
             gxOpenClientFocus(key);
             if(tipo==="pago_revision") setTimeout(()=>gxOpenPaymentModal(key),150);
+            if(notificationId) setTimeout(()=>window.gxHighlightClientRequest?.(notificationId),180);
         },80);
     };
 
-    // Se conservan en Supabase los eventos existentes, pero el Centro de Operaciones
-    // solo muestra pagos/fechas. Logins, soporte y pedidos continúan por Discord.
+    // Centro de Operaciones unificado: pagos + solicitudes + actividad persistente.
     window.gxMarkAllNotificationsRead=async()=>{
-        const ids=(window.gxAdminNotifications||[])
-            .filter(n=>String(n?.tipo||"").toLowerCase()==="pago_revision" && !n.leida)
-            .map(n=>n.id).filter(Boolean);
+        const model=operationsNotificationModel();
+        const current=window.gxNotificationFilter||"all";
+        const visible=current==="review"?model.reviews
+            :current==="overdue"?model.overdue
+            :current==="upcoming"?model.upcoming
+            :current==="cancellation"?model.cancellations
+            :current==="support"?model.support
+            :current==="activity"?model.activity
+            :model.all;
+
+        const ids=[...new Set(visible.filter(n=>!n.synthetic && n.id && !n.leida).map(n=>n.id))];
         if(!ids.length)return;
         try{
             await ops("marcar_notificaciones_leidas",{ids});
             (window.gxAdminNotifications||[]).forEach(n=>{if(ids.includes(n.id))n.leida=true});
             renderNotifications();
-        }catch(e){console.warn("No se pudieron marcar avisos de pago como leídos",e)}
+            window.gxRefreshClientOperationalContext?.();
+            window.gxRefreshServiceRequestBadges?.();
+            window.gxUpdateOperationsSummary?.();
+        }catch(e){console.warn("No se pudieron marcar los avisos como leídos",e)}
+    };
+
+    window.gxMarkNotificationRead=async(id)=>{
+        if(!id)return;
+        try{
+            await ops("marcar_notificaciones_leidas",{ids:[id]});
+            const n=(window.gxAdminNotifications||[]).find(x=>String(x?.id||"")===String(id));
+            if(n)n.leida=true;
+            renderNotifications();
+            window.gxRefreshClientOperationalContext?.();
+            window.gxRefreshServiceRequestBadges?.();
+            window.gxUpdateOperationsSummary?.();
+        }catch(e){
+            console.error(e);
+            alert("No se pudo marcar la solicitud como atendida.");
+        }
     };
     window.gxRefreshNotifications=async()=>{if(typeof inicializarPanel==="function"){await inicializarPanel();setTimeout(renderNotifications,80)}};
 
@@ -3371,7 +3717,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     };
 
     // ---------- Payment review ----------
-    window.gxOpenPaymentModal=function(key,monto){
+    window.gxOpenPaymentModalBase=function(key,monto){
         const c=clientesDict?.[key];if(!c)return;
         paymentCtx={key,monto:Number(monto||((c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)))};
         document.getElementById("gx-payment-client-name").textContent=c.nombre;
@@ -3398,7 +3744,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
                 const puntual=document.getElementById("gx-payment-punctual").checked;
                 const before=Number(c.pagos_puntuales||0);
                 const alreadyPaid=gxPeriodAlreadyPaid(c);
-                const r=await gxPeriodAction("aprobar_pago_periodo",{cliente_id:c._id,monto:paymentCtx.monto,puntual,notas:note||"Aprobado desde Admin Beta"});
+                const r=await gxPeriodAction("aprobar_pago_periodo",{cliente_id:c._id,monto:paymentCtx.monto,puntual,notas:note||"Aprobado desde Admin"});
                 let after=Number(r.pagos_puntuales||before);
                 if(!puntual && !alreadyPaid){
                     await gxCoreAdminAction("reiniciar_lealtad",{cliente_id:c._id});
@@ -3426,33 +3772,12 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         }catch(e){alert("No se pudo procesar el pago.\n\n"+e.message)}
     }
     window.gxPaymentApprove=()=>paymentAction("approve");
-    window.gxPaymentIncomplete=()=>{document.getElementById("gx-missing-amount-wrap").classList.add("show");const note=document.getElementById("gx-payment-note");if(!note.value)note.value="Tu pago está incompleto. Por favor revisa el monto faltante y vuelve a enviar el comprobante."; if(confirm("¿Marcar este pago como INCOMPLETO y registrar el aviso?"))paymentAction("incomplete")};
+    
     window.gxPaymentReject=()=>{if(confirm("¿Rechazar este comprobante? La lealtad no aumentará."))paymentAction("reject")};
 
-    // ---------- Smart referrals ----------
-    window.gxReferralSmartMonths=function(r){
-        if(!r)return 0;
-        if(r.meses_override!==null && r.meses_override!==undefined)return Math.min(3,Math.max(0,Number(r.meses_override)||0));
-        if((r.servicios||[]).length<2)return Math.min(3,Math.max(0,Number(r.meses)||0));
-        const start=new Date(r.fecha_inicio||Date.now()); if(Number.isNaN(start.getTime()))return Number(r.meses||0);
-        const now=new Date();let months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());if(now.getDate()<start.getDate())months--;return Math.min(3,Math.max(0,months));
-    };
-    window.gxSaveReferralSmart=async function(key,patch={}){
-        const c=clientesDict?.[key],r=c?.referido_activo;if(!c?._id||!r)return;
-        Object.assign(r,patch);
-        try{
-            const x=await ops("guardar_referido_inteligente",{cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios||[],fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)});
-            c.referido_activo={...r,...x.referido};
-            setTimeout(()=>{filtrarClientes();gxOpenClientFocus(key)},80);
-        }catch(e){alert("No se pudo guardar el referido.\n\n"+e.message)}
-    };
-    window.gxToggleReferralService=function(key,name,checked){
-        const r=clientesDict?.[key]?.referido_activo;if(!r)return;
-        const set=new Set(r.servicios||[]);checked?set.add(name):set.delete(name);r.servicios=[...set];gxSaveReferralSmart(key,{servicios:r.servicios});
-    };
 
     // ---------- Summary enrichment ----------
-    const originalSummary=window.gxUpdateOperationsSummary;
+    const originalSummary=window.gxUpdateOperationsSummaryBase;
     window.gxUpdateOperationsSummary=function(){
         originalSummary?.();
         const vals=Object.values(clientesDict||{});
@@ -3471,10 +3796,10 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
 </script>
 
 
-<script id="goxion-admin-ops-v3-fixes">
+<script id="goxion-admin-payment-referral-guards">
 (() => {
     // Hard guard: if modal/drawer ever disappear from the DOM, explain it instead of failing silently.
-    const oldToggle = window.gxToggleNotifications;
+    const oldToggle = window.gxToggleNotificationsBase;
     window.gxToggleNotifications = function(force) {
         const drawer = document.getElementById("gx-notification-drawer");
         const overlay = document.getElementById("gx-notification-overlay");
@@ -3482,7 +3807,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         return oldToggle ? oldToggle(force) : undefined;
     };
 
-    const oldOpenPayment = window.gxOpenPaymentModal;
+    const oldOpenPayment = window.gxOpenPaymentModalBase;
     window.gxOpenPaymentModal = function(key, monto) {
         const modal = document.getElementById("gx-payment-modal");
         if(!modal) return alert("No se pudo abrir la revisión de pago. Recarga esta versión del Admin.");
@@ -3507,7 +3832,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!wrap?.classList.contains("show")) return gxPreparePaymentIncomplete();
         if(!confirm("¿Confirmar este pago como INCOMPLETO y registrar el aviso?")) return;
 
-        // Call the existing beta action directly using public helper.
+        // Ejecuta la operación administrativa usando el helper público.
         const key = document.getElementById("gx-payment-client-meta")?.dataset?.key;
         // Existing V2 closure doesn't expose context; infer active client from focus name/folio.
         let foundKey = null;
@@ -3522,7 +3847,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         const amount = Number(document.getElementById("gx-missing-amount")?.value || 0);
         const msg = document.getElementById("gx-payment-note")?.value.trim() || `Detectamos un pago incompleto${amount>0?` por $${amount}`:""}.`;
         try {
-            await gxOpsBeta("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+            await gxOps("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
             c.estado="pendiente"; c.pago_en_revision=false; c.pago_revision_estado="incompleto"; c.pago_revision_mensaje=msg; c.pago_revision_monto_faltante=amount;
             gxClosePaymentModal(); gxCloseClientFocus(); filtrarClientes(); gxUpdateOperationsSummary();
             alert("⚠️ Pago marcado como incompleto.");
@@ -3534,7 +3859,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!c?._id || !r) return;
         if(!confirm(`¿Reiniciar el progreso de ${r.nombre || "este referido"} a 0/3 desde hoy?\n\nSe conservarán el referido y los servicios seleccionados.`)) return;
         try {
-            const x = await gxOpsBeta("reiniciar_referido_inteligente",{cliente_id:c._id});
+            const x = await gxOps("reiniciar_referido_inteligente",{cliente_id:c._id});
             c.referido_activo = {...r,...x.referido, meses:0, meses_override:null, beneficio_reclamado:false, beneficio_reclamado_at:null};
             gxCloseClientFocus();
             if(typeof inicializarPanel === "function") await inicializarPanel();
@@ -3547,7 +3872,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         if(!c?._id || !r) return;
         if(!confirm(`¿Eliminar el referido "${r.nombre || "activo"}"?\n\nEsta acción quitará el registro activo de este cliente.`)) return;
         try {
-            await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+            await gxOps("eliminar_referido_inteligente",{cliente_id:c._id});
             c.referido_activo = null;
             gxCloseClientFocus();
             if(typeof inicializarPanel === "function") await inicializarPanel();
@@ -3610,7 +3935,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         updateRefUI(key);
         try{
             const c=clientesDict[key];
-            const x=await gxOpsBeta("guardar_referido_inteligente",{
+            const x=await gxOps("guardar_referido_inteligente",{
                 cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios,fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)
             });
             Object.assign(r,x.referido||{});
@@ -3635,7 +3960,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         Object.assign(r,patch); updateRefUI(key);
         try{
             const c=clientesDict[key];
-            const x=await gxOpsBeta("guardar_referido_inteligente",{
+            const x=await gxOps("guardar_referido_inteligente",{
                 cliente_id:c._id,nombre:r.nombre||"",servicios:r.servicios||[],fecha_inicio:r.fecha_inicio||new Date().toISOString().slice(0,10)
             });
             Object.assign(r,x.referido||{});
@@ -3647,7 +3972,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     window.gxAdjustReferralMonth = async function(key,delta){
         const c=clientesDict?.[key],r=refObj(key); if(!c?._id||!r)return;
         try{
-            const x=await gxOpsBeta("ajustar_meses_referido",{cliente_id:c._id,delta});
+            const x=await gxOps("ajustar_meses_referido",{cliente_id:c._id,delta});
             Object.assign(r,x.referido||{}); r.meses_override=x.meses_efectivos; r.meses_efectivos=x.meses_efectivos;
             updateRefUI(key);
         }catch(e){ alert("No se pudo ajustar el progreso.\n\n"+e.message); }
@@ -3656,14 +3981,14 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
     window.gxReferralAutoMode = async function(key){
         const c=clientesDict?.[key],r=refObj(key); if(!c?._id||!r)return;
         try{
-            const x=await gxOpsBeta("modo_automatico_referido",{cliente_id:c._id});
+            const x=await gxOps("modo_automatico_referido",{cliente_id:c._id});
             Object.assign(r,x.referido||{}); r.meses_override=null; r.meses_efectivos=x.meses_efectivos;
             updateRefUI(key);
         }catch(e){ alert("No se pudo volver al modo automático.\n\n"+e.message); }
     };
 
     // Keep focus summary current after any render.
-    const openBase=window.gxOpenClientFocus;
+    const openBase=window.gxOpenClientFocusBase;
     window.gxOpenClientFocus=function(key){
         const r=openBase?.(key);
         setTimeout(()=>updateRefUI(key),40);
@@ -3753,7 +4078,7 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         gxUpdateLinkedReferralUI(referrerKey);
 
         try{
-            const x=await gxOpsBeta("guardar_referido_inteligente",{
+            const x=await gxOps("guardar_referido_inteligente",{
                 cliente_id:referrer._id,
                 nombre:r.nombre,
                 servicios:r.servicios,
@@ -3792,14 +4117,14 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         try{
             if(isChecked){
                 const today=new Date().toISOString().slice(0,10);
-                await gxOpsBeta("guardar_referido_inteligente",{
+                await gxOps("guardar_referido_inteligente",{
                     cliente_id:c._id,
                     nombre:"",
                     servicios:[],
                     fecha_inicio:today
                 });
             }else{
-                await gxOpsBeta("eliminar_referido_inteligente",{cliente_id:c._id});
+                await gxOps("eliminar_referido_inteligente",{cliente_id:c._id});
             }
 
             if(typeof gxCloseClientFocus==="function") gxCloseClientFocus();
@@ -3979,6 +4304,265 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
             alert('✅ Compensación eliminada.');
         }catch(e){console.error(e);alert('❌ No se pudo eliminar la compensación.\n\n'+(e?.message||e))}
     };
+})();
+</script>
+
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 01 · v1.0.3-beta-01</div>
+
+<script id="goxion-admin-beta-01-ayuda-bridge-controller">
+(() => {
+    const normalize = (v="") => String(v)
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g,"")
+        .toLowerCase()
+        .trim();
+
+    window.gxEscapeAdminHtml = (value="") => String(value)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+    window.gxClassifyAdminNotification = function(n={}){
+        const tipo=normalize(n.tipo);
+        const titulo=normalize(n.titulo);
+        const mensaje=normalize(n.mensaje);
+
+        if(tipo==="pago_revision") return "review";
+
+        if(
+            titulo.includes("solicitud de cancelacion") ||
+            mensaje.includes("proceso de cancelacion") ||
+            mensaje.includes("solicita iniciar el proceso de cancelacion")
+        ) return "cancellation";
+
+        if(tipo==="soporte") return "support";
+
+        return "activity";
+    };
+
+    window.gxParseAdminNotificationMeta = function(n={}){
+        const message=String(n.mensaje||"");
+        const service=message.match(/(?:^|\n)\s*Servicio:\s*([^\n]+)/i);
+        const serviceId=message.match(/(?:^|\n)\s*Servicio ID:\s*([^\n]+)/i);
+        const folio=message.match(/(?:^|\n)\s*Folio:\s*([^\n]+)/i);
+        return {
+            servicio:service?.[1]?.trim()||"",
+            servicio_id:serviceId?.[1]?.trim()||"",
+            folio:folio?.[1]?.trim()||""
+        };
+    };
+
+    window.gxAdminServiceHasAlert = function(name){
+        const alert=configGlobal?.alertas||{};
+        if(alert?.activa!==true)return false;
+        const platform=normalize(alert.plataforma).replace(/[^a-z0-9]+/g," ").trim();
+        const service=normalize(name).replace(/[^a-z0-9]+/g," ").trim();
+        return platform==="todos los servicios" ||
+            platform==="todos" ||
+            Boolean(platform && (service===platform || service.startsWith(platform+" ")));
+    };
+
+    function notificationMatchesService(n,service={}){
+        if(window.gxClassifyAdminNotification(n)!=="cancellation")return false;
+        const meta=window.gxParseAdminNotificationMeta(n);
+        const serviceId=String(service?._id||service?.id||"");
+        if(meta.servicio_id && serviceId && meta.servicio_id===serviceId)return true;
+        return normalize(meta.servicio)===normalize(service?.nombre);
+    }
+
+    window.gxPendingCancellationForService = function(cliente,service){
+        const cid=String(cliente?._id||cliente?.id||"");
+        return (window.gxAdminNotifications||[]).some(n=>
+            !n.leida &&
+            String(n?.cliente_id||"")===cid &&
+            notificationMatchesService(n,service)
+        );
+    };
+
+    window.gxRefreshServiceRequestBadges = function(){
+        document.querySelectorAll(".gx-service-compact[data-gx-client-key]").forEach(card=>{
+            const key=card.dataset.gxClientKey;
+            const idx=Number(card.dataset.gxServiceIndex);
+            const c=clientesDict?.[key];
+            const s=c?.servicios?.[idx];
+            const request=card.querySelector("[data-gx-service-request-state]");
+            const live=card.querySelector("[data-gx-service-live-state]");
+            if(request) request.style.display=window.gxPendingCancellationForService(c,s)?"inline-flex":"none";
+            if(live && s){
+                const interrupted=window.gxAdminServiceHasAlert(s.nombre);
+                live.classList.toggle("interrupted",interrupted);
+                live.classList.toggle("active",!interrupted);
+                live.innerHTML=`<i></i>${interrupted?"Temporalmente inactivo":"Activo"}`;
+            }
+        });
+    };
+
+    window.gxToggleServiceIncident = async function(key,index){
+        const c=clientesDict?.[key];
+        const s=c?.servicios?.[index];
+        if(!c||!s)return;
+
+        const current={...(configGlobal?.alertas||{})};
+        const same=window.gxAdminServiceHasAlert(s.nombre);
+
+        let next;
+        if(same){
+            const scope=normalize(current.plataforma)==="todos los servicios"||normalize(current.plataforma)==="todos"
+                ?"la alerta global de todos los servicios"
+                :`la incidencia de ${s.nombre}`;
+            if(!confirm(`¿Resolver ${scope}?\n\nAyuda volverá a mostrar este servicio como Activo.`))return;
+            next={
+                activa:false,
+                plataforma:current.plataforma||s.nombre,
+                falla:current.falla||"presentando intermitencias temporales",
+                mensaje:current.mensaje||""
+            };
+        }else{
+            if(current.activa===true && current.plataforma && !window.gxAdminServiceHasAlert(s.nombre)){
+                if(!confirm(`Ya existe una alerta activa para "${current.plataforma}".\n\n¿Quieres reemplazarla por una incidencia de "${s.nombre}"?`))return;
+            }
+            next={
+                activa:true,
+                plataforma:s.nombre,
+                falla:current.falla||document.getElementById("alert-type")?.value||"presentando intermitencias temporales",
+                mensaje:""
+            };
+        }
+
+        try{
+            if(typeof window.gxCoreAdminAction!=="function") throw new Error("La conexión administrativa no está disponible.");
+            await window.gxCoreAdminAction("guardar_alerta",next);
+            configGlobal.alertas=next;
+
+            const active=document.getElementById("alert-active");
+            const platform=document.getElementById("alert-platform");
+            const type=document.getElementById("alert-type");
+            const msg=document.getElementById("global-msg");
+            if(active)active.checked=next.activa;
+            if(platform)platform.value=next.plataforma;
+            if(type)type.value=next.falla;
+            if(msg)msg.value=next.mensaje;
+
+            if(typeof toggleAlertFields==="function")toggleAlertFields();
+            if(typeof window.gxReloadAdminClient==="function") await window.gxReloadAdminClient(key);
+            else window.gxRefreshServiceRequestBadges();
+        }catch(e){
+            console.error(e);
+            alert("No se pudo actualizar la incidencia.\n\n"+(e?.message||e));
+        }
+    };
+
+    function clientOperationalItems(clienteId){
+        return (window.gxAdminNotifications||[])
+            .filter(n=>{
+                if(String(n?.cliente_id||"")!==String(clienteId||""))return false;
+                const cat=window.gxClassifyAdminNotification(n);
+                return cat==="cancellation"||cat==="support";
+            })
+            .sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))
+            .slice(0,5);
+    }
+
+    window.gxRefreshClientOperationalContext = function(){
+        const focus=document.getElementById("gx-client-focus");
+        if(!focus?.classList.contains("show"))return;
+        const body=document.getElementById("gx-focus-body");
+        const details=body?.querySelector("[id^='details-']");
+        if(!details)return;
+        const key=details.id.replace(/^details-/,"");
+        const c=clientesDict?.[key];
+        if(!c)return;
+
+        details.querySelector(".gx-client-ops-context")?.remove();
+
+        const items=clientOperationalItems(c._id);
+        if(!items.length)return;
+
+        const unread=items.filter(n=>!n.leida).length;
+        const box=document.createElement("section");
+        box.className="gx-client-ops-context";
+        box.innerHTML=`<div class="gx-client-ops-context-head">
+            <strong>Actividad de Mi Espacio</strong>
+            <span>${unread?`${unread} pendiente${unread===1?"":"s"}`:"Sin pendientes"}</span>
+        </div>` + items.map(n=>{
+            const cat=window.gxClassifyAdminNotification(n);
+            const meta=window.gxParseAdminNotificationMeta(n);
+            const safeId=window.gxEscapeAdminHtml(n.id||"");
+            return `<article class="gx-client-request" data-gx-client-request-id="${safeId}">
+                <div class="gx-client-request-top">
+                    <strong>${window.gxEscapeAdminHtml(n.titulo|| (cat==="cancellation"?"Solicitud de cancelación":"Solicitud de soporte"))}</strong>
+                    <span class="gx-client-request-status ${n.leida?"seen":"pending"}">${n.leida?"Vista":"Pendiente"}</span>
+                </div>
+                ${meta.servicio?`<small>${window.gxEscapeAdminHtml(meta.servicio)}</small>`:""}
+                <p>${window.gxEscapeAdminHtml(n.mensaje||"")}</p>
+                <div class="gx-client-request-actions">
+                    ${!n.leida&&n.id?`<button class="done" type="button" onclick="gxMarkNotificationRead('${String(n.id).replace(/'/g,"")}')">Marcar atendida</button>`:""}
+                    <button type="button" onclick="gxOpenNotificationCategory('${cat}')">Ver en operaciones</button>
+                </div>
+            </article>`;
+        }).join("");
+
+        details.insertBefore(box,details.firstChild);
+    };
+
+    window.gxHighlightClientRequest = function(id){
+        if(!id)return;
+        const el=document.querySelector(`[data-gx-client-request-id="${CSS.escape(String(id))}"]`);
+        if(!el)return;
+        el.classList.add("highlight");
+        el.scrollIntoView({behavior:"smooth",block:"center"});
+        setTimeout(()=>el.classList.remove("highlight"),1200);
+    };
+
+    window.gxOpenNotificationCategory = function(filter="all"){
+        if(typeof window.gxToggleNotifications==="function") window.gxToggleNotifications(true);
+        setTimeout(()=>{
+            const btn=document.querySelector(`[data-gx-notif-filter="${filter}"]`);
+            if(typeof window.gxSetNotificationFilter==="function") window.gxSetNotificationFilter(filter,btn);
+        },20);
+    };
+
+    // Enriquece la ficha actual sin sustituir su comportamiento.
+    const openClient=window.gxOpenClientFocus;
+    if(typeof openClient==="function"){
+        window.gxOpenClientFocus=function(key,...args){
+            const result=openClient.call(this,key,...args);
+            setTimeout(()=>{
+                window.gxRefreshClientOperationalContext();
+                window.gxRefreshServiceRequestBadges();
+            },20);
+            return result;
+        };
+    }
+
+    // Mantener contador de solicitudes en el Resumen.
+    const summary=window.gxUpdateOperationsSummary;
+    if(typeof summary==="function"){
+        window.gxUpdateOperationsSummary=function(...args){
+            const result=summary.apply(this,args);
+            setTimeout(()=>{
+                const ops=(window.gxAdminNotifications||[]).filter(n=>{
+                    const cat=window.gxClassifyAdminNotification(n);
+                    return !n.leida && (cat==="cancellation"||cat==="support");
+                }).length;
+                const el=document.getElementById("gx-count-requests");
+                if(el)el.textContent=ops;
+                window.gxRefreshServiceRequestBadges();
+            },0);
+            return result;
+        };
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        setTimeout(()=>{
+            window.gxRefreshServiceRequestBadges();
+            window.gxUpdateOperationsSummary?.();
+        },650);
+    });
+
+    console.info("GOXION Admin Beta 01: puente operativo con Ayuda/Mi Espacio activo.");
 })();
 </script>
 
