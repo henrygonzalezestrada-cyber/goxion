@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.4-beta-02">
+<html lang="es" data-goxion-version="1.0.5-beta-03">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -940,6 +940,566 @@ details.gx-client-ops-context{
 }
 </style>
 
+
+<style id="goxion-admin-beta-03-mobile-architecture">
+/* =========================================================
+   GOXION ADMIN · BETA 03
+   Arquitectura móvil progresiva
+   ========================================================= */
+
+/* Inicio */
+.gx-home-priority-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:9px;
+    margin-bottom:20px;
+}
+.gx-home-priority{
+    min-height:104px;
+    padding:13px;
+    border:1px solid var(--gx-line);
+    border-radius:16px;
+    background:rgba(255,255,255,.025);
+    color:#fff;
+    text-align:left;
+    cursor:pointer;
+}
+.gx-home-priority span{
+    display:block;
+    color:var(--text-muted);
+    font-size:.54rem;
+    font-weight:900;
+    letter-spacing:.9px;
+}
+.gx-home-priority strong{
+    display:block;
+    margin:8px 0 1px;
+    font-size:1.55rem;
+}
+.gx-home-priority small{font-size:.65rem;font-weight:800}
+.gx-home-priority.today strong{color:var(--neon-blue)}
+.gx-home-priority.overdue strong{color:#ff7998}
+.gx-home-priority.review strong{color:#d097ff}
+.gx-home-priority.requests strong{color:#72ffd4}
+
+.gx-upcoming-section{margin-top:2px}
+.gx-next-payments-list{
+    display:grid;
+    gap:7px;
+}
+.gx-next-payment{
+    width:100%;
+    min-height:58px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:13px;
+    background:rgba(255,255,255,.018);
+    color:#fff;
+    text-align:left;
+    cursor:pointer;
+}
+.gx-next-payment>div{min-width:0}
+.gx-next-payment strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.75rem;
+}
+.gx-next-payment small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.59rem;
+}
+.gx-next-payment em{
+    font-style:normal;
+    font-size:.63rem;
+    font-weight:900;
+}
+.gx-next-payment.today em{color:var(--neon-blue)}
+.gx-next-payment.overdue em{color:#ff7998}
+.gx-next-payment.upcoming em{color:#aeb8ca}
+
+.gx-business-panel{
+    margin-top:21px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:16px;
+    background:rgba(255,255,255,.015);
+    overflow:hidden;
+}
+.gx-business-panel>summary{
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:13px 14px;
+    cursor:pointer;
+}
+.gx-business-panel>summary::-webkit-details-marker{display:none}
+.gx-business-panel>summary>div{display:flex;flex-direction:column}
+.gx-business-panel>summary strong{font-size:.83rem}
+.gx-business-panel>summary em{
+    font-style:normal;
+    color:var(--neon-blue);
+    font-size:.6rem;
+    font-weight:900;
+}
+.gx-business-panel-body{padding:0 12px 13px}
+.gx-business-mini-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-top:8px;
+}
+.gx-business-mini-grid button{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:9px 10px;
+    border:1px solid var(--gx-line);
+    border-radius:11px;
+    background:rgba(255,255,255,.02);
+    color:#fff;
+    text-align:left;
+}
+.gx-business-mini-grid strong{color:var(--neon-blue);font-size:.95rem}
+.gx-business-mini-grid span{font-size:.58rem;font-weight:800}
+
+/* Ficha cliente */
+.gx-client-quick-actions{
+    position:relative;
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:7px;
+    margin:0 0 10px;
+}
+.gx-client-quick-actions>button{
+    min-height:38px;
+    border:1px solid rgba(0,242,254,.10);
+    border-radius:11px;
+    background:rgba(0,242,254,.035);
+    color:#e6faff;
+    font:inherit;
+    font-size:.64rem;
+    font-weight:900;
+}
+.gx-client-quick-actions>button.more{
+    width:48px;
+    color:var(--neon-blue);
+}
+.gx-client-quick-menu{
+    position:absolute;
+    z-index:80;
+    top:44px;
+    right:0;
+    width:180px;
+    display:none;
+    padding:6px;
+    border:1px solid rgba(0,242,254,.18);
+    border-radius:12px;
+    background:#0b0b12;
+    box-shadow:0 18px 45px rgba(0,0,0,.55);
+}
+.gx-client-quick-menu.show{display:grid}
+.gx-client-quick-menu button{
+    min-height:37px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:#fff;
+    text-align:left;
+    padding:0 9px;
+    font:inherit;
+    font-size:.62rem;
+    font-weight:800;
+}
+.gx-client-quick-menu button:active{background:rgba(255,255,255,.05)}
+
+.gx-billing-primary{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:7px;
+    margin-bottom:8px;
+}
+.gx-billing-primary>div{
+    min-width:0;
+    padding:10px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:11px;
+    background:rgba(255,255,255,.022);
+}
+.gx-billing-primary small{
+    display:block;
+    color:var(--text-muted);
+    font-size:.52rem;
+    font-weight:800;
+    text-transform:uppercase;
+}
+.gx-billing-primary strong{
+    display:block;
+    margin-top:3px;
+    font-size:.75rem;
+}
+.gx-billing-status.review strong{color:#d097ff}
+.gx-billing-status.overdue strong{color:#ff7998}
+.gx-billing-status.paid strong{color:#72ffd4}
+
+.gx-billing-admin{
+    border-top:1px solid rgba(255,255,255,.055);
+}
+.gx-billing-admin>summary,
+.gx-benefit-sub>summary{
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-height:43px;
+    cursor:pointer;
+}
+.gx-billing-admin>summary::-webkit-details-marker,
+.gx-benefit-sub>summary::-webkit-details-marker{display:none}
+.gx-billing-admin>summary span,
+.gx-benefit-sub>summary span{font-size:.64rem;font-weight:850}
+.gx-billing-admin>summary em,
+.gx-benefit-sub>summary em{
+    font-style:normal;
+    color:var(--text-muted);
+    font-size:.57rem;
+    font-weight:800;
+}
+.gx-billing-admin-body{padding:0 0 9px}
+.gx-billing-adjustments .gx-billing-admin-body{
+    padding-bottom:12px;
+}
+
+.gx-benefit-loyalty{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 0;
+}
+.gx-benefit-loyalty small{
+    display:block;
+    color:var(--text-muted);
+    font-size:.53rem;
+    font-weight:800;
+}
+.gx-benefit-loyalty strong{
+    display:block;
+    margin-top:2px;
+    font-size:.73rem;
+}
+.gx-benefit-loyalty details{position:relative}
+.gx-benefit-loyalty details>summary{
+    list-style:none;
+    min-height:32px;
+    display:flex;
+    align-items:center;
+    padding:0 9px;
+    border:1px solid rgba(124,77,255,.16);
+    border-radius:9px;
+    color:#cfc4ff;
+    font-size:.56rem;
+    font-weight:900;
+    cursor:pointer;
+}
+.gx-benefit-loyalty details>summary::-webkit-details-marker{display:none}
+.gx-benefit-loyalty .gx-dock-stepper{
+    margin-top:6px;
+    justify-content:flex-end;
+}
+.gx-benefit-sub{
+    border-top:1px solid rgba(255,255,255,.055);
+}
+.gx-benefit-sub-body{padding:2px 0 10px}
+.gx-client-mission-tip{display:none!important}
+
+/* Servicio cerrado = nombre + estado + precio. Acceso vive dentro. */
+.gx-service-compact-head .gx-service-identity>small{
+    display:none;
+}
+.gx-service-compact{
+    padding:10px!important;
+}
+.gx-service-access-details summary{
+    min-height:35px;
+}
+
+/* Actividad = contexto secundario */
+details.gx-client-ops-context{
+    margin-top:8px;
+    order:99;
+}
+
+/* Operaciones móvil */
+.gx-mobile-ops-filters{
+    position:sticky;
+    top:0;
+    z-index:25;
+    display:flex;
+    gap:6px;
+    overflow-x:auto;
+    padding:7px 0 10px;
+    margin-bottom:7px;
+    background:linear-gradient(#030305 82%,rgba(3,3,5,0));
+    scrollbar-width:none;
+}
+.gx-mobile-ops-filters::-webkit-scrollbar{display:none}
+.gx-mobile-ops-filters button{
+    flex:0 0 auto;
+    min-height:34px;
+    padding:0 10px;
+    border:1px solid var(--gx-line);
+    border-radius:999px;
+    background:rgba(255,255,255,.025);
+    color:var(--text-muted);
+    font:inherit;
+    font-size:.6rem;
+    font-weight:900;
+}
+.gx-mobile-ops-filters button.active{
+    color:#031014;
+    border-color:var(--neon-blue);
+    background:var(--neon-blue);
+}
+.gx-mobile-ops-list{
+    display:grid;
+    gap:8px;
+}
+.gx-mobile-op-item{
+    padding:11px 12px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:13px;
+    background:rgba(255,255,255,.02);
+}
+.gx-mobile-op-item.overdue{border-color:rgba(255,51,102,.20)}
+.gx-mobile-op-item.review{border-color:rgba(188,19,254,.22)}
+.gx-mobile-op-item.cancellation{border-color:rgba(255,51,102,.18)}
+.gx-mobile-op-item.support{border-color:rgba(0,242,254,.18)}
+.gx-mobile-op-item.activity{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:10px;
+    padding:9px 11px;
+}
+.gx-mobile-op-item .kind{
+    display:inline-flex;
+    width:max-content;
+    padding:3px 6px;
+    border-radius:999px;
+    background:rgba(255,255,255,.05);
+    color:var(--text-muted);
+    font-size:.51rem;
+    font-weight:900;
+    text-transform:uppercase;
+}
+.gx-mobile-op-item strong{
+    display:block;
+    margin-top:5px;
+    font-size:.72rem;
+}
+.gx-mobile-op-item p{
+    margin:4px 0 0;
+    color:#b8c0d0;
+    font-size:.61rem;
+    line-height:1.4;
+}
+.gx-mobile-op-item small{
+    display:block;
+    margin-top:6px;
+    color:var(--text-muted);
+    font-size:.54rem;
+}
+.gx-mobile-op-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:8px;
+}
+.gx-mobile-op-actions button{
+    border:0;
+    background:transparent;
+    color:var(--neon-blue);
+    padding:2px 0;
+    font:inherit;
+    font-size:.58rem;
+    font-weight:900;
+}
+.gx-mobile-op-actions button.done{color:#72ffd4}
+.gx-mobile-op-actions button.danger{color:#ff8aa5}
+
+/* Más */
+.gx-more-grid{
+    display:grid;
+    gap:8px;
+}
+.gx-more-grid>button{
+    width:100%;
+    min-height:67px;
+    display:grid;
+    grid-template-columns:36px minmax(0,1fr) auto;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:14px;
+    background:rgba(255,255,255,.02);
+    color:#fff;
+    text-align:left;
+}
+.gx-more-grid>button>span{
+    width:34px;height:34px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:10px;
+    background:rgba(0,242,254,.055);
+}
+.gx-more-grid strong{display:block;font-size:.72rem}
+.gx-more-grid small{display:block;margin-top:2px;color:var(--text-muted);font-size:.57rem}
+.gx-more-grid em{font-style:normal;color:var(--neon-blue);font-size:1rem}
+
+/* Catálogo móvil: misma funcionalidad, presentación tipo tarjeta */
+@media(max-width:720px){
+    #tab-catalogo .gx-catalog-scroll{overflow:visible}
+    #tab-catalogo .catalog-table,
+    #tab-catalogo .catalog-table tbody,
+    #tab-catalogo .catalog-table tr,
+    #tab-catalogo .catalog-table td{
+        display:block;
+        width:100%;
+    }
+    #tab-catalogo .catalog-table thead{display:none}
+    #tab-catalogo .catalog-table tr{
+        margin-bottom:10px;
+        padding:10px;
+        border:1px solid rgba(255,255,255,.075);
+        border-radius:14px;
+        background:rgba(255,255,255,.02);
+    }
+    #tab-catalogo .catalog-table td{
+        display:grid;
+        grid-template-columns:92px minmax(0,1fr);
+        align-items:center;
+        gap:8px;
+        min-height:39px;
+        padding:5px 0!important;
+        border:0!important;
+    }
+    #tab-catalogo .catalog-table td::before{
+        color:var(--text-muted);
+        font-size:.55rem;
+        font-weight:900;
+        text-transform:uppercase;
+    }
+    #tab-catalogo .catalog-table td:nth-child(1)::before{content:"Servicio"}
+    #tab-catalogo .catalog-table td:nth-child(2)::before{content:"Etiqueta"}
+    #tab-catalogo .catalog-table td:nth-child(3)::before{content:"Beneficios"}
+    #tab-catalogo .catalog-table td:nth-child(4)::before{content:"Cuentas"}
+    #tab-catalogo .catalog-table td:nth-child(5)::before{content:"Venta"}
+    #tab-catalogo .catalog-table td:nth-child(6)::before{content:"Costo"}
+    #tab-catalogo .catalog-table td:nth-child(7)::before{content:"Límite"}
+    #tab-catalogo .catalog-table td:nth-child(8)::before{content:"Stock fijo"}
+    #tab-catalogo .catalog-table td:nth-child(9)::before{content:"Disponible"}
+    #tab-catalogo .catalog-table td:nth-child(10){
+        grid-template-columns:1fr 1fr;
+        gap:7px;
+        padding-top:9px!important;
+    }
+    #tab-catalogo .catalog-table td:nth-child(10)::before{display:none}
+    #tab-catalogo .catalog-table input{
+        width:100%!important;
+        min-width:0!important;
+    }
+}
+
+/* Móvil: la jerarquía cambia, no la funcionalidad. */
+@media(max-width:840px){
+    .gx-desktop-nav{display:none!important}
+
+    .gx-page-heading h1{font-size:1.35rem}
+    .gx-page-heading p{max-width:300px}
+
+    #tab-resumen .gx-page-heading{
+        margin-bottom:14px;
+    }
+    .gx-home-priority-grid{
+        grid-template-columns:1fr 1fr;
+        gap:7px;
+    }
+    .gx-home-priority{
+        min-height:91px;
+        padding:11px;
+    }
+    .gx-home-priority strong{font-size:1.4rem}
+
+    .gx-business-panel:not([open]) .gx-business-panel-body{display:none}
+    .gx-business-panel .gx-kpi-strip{
+        grid-template-columns:1fr 1fr;
+    }
+
+    /* La tarjeta cerrada del cliente prioriza cobro, no lista de servicios. */
+    .client-card .gx-service-brief{
+        display:none;
+    }
+    .client-card .gx-client-brief{
+        padding-top:2px;
+    }
+
+    .gx-focus-summary{
+        display:grid!important;
+        grid-template-columns:1fr 1fr!important;
+        gap:6px!important;
+    }
+    .gx-focus-summary span{
+        min-width:0!important;
+        width:auto!important;
+    }
+
+    .gx-billing-primary{
+        grid-template-columns:1fr 1fr;
+    }
+    .gx-billing-primary .gx-billing-status{
+        grid-column:1/-1;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+    }
+
+    .gx-operations-dock-compact{
+        display:none!important;
+    }
+
+    #sort-by{
+        min-width:148px;
+    }
+}
+
+/* Desktop: nuevas áreas móviles no compiten con el flujo existente. */
+@media(min-width:841px){
+    .gx-mobile-workspace{display:none!important}
+    .gx-business-panel>summary{cursor:default}
+    .gx-business-panel>summary em{display:none}
+}
+
+/* En móvil Catálogo/Ajustes se alcanzan desde Más, pero siguen siendo tabs normales. */
+@media(max-width:840px){
+    .gx-mobile-nav{
+        grid-template-columns:1fr 1fr 58px 1fr 1fr!important;
+    }
+    .gx-mobile-nav-btn i{
+        font-style:normal;
+    }
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -960,23 +1520,70 @@ details.gx-client-ops-context{
 
         <main class="gx-main">
             <section id="tab-resumen" class="tab-content active">
-                <div class="gx-page-heading"><div><div class="gx-eyebrow">Panel administrativo</div><h1>Resumen operativo</h1><p>Lo importante de GOXION, sin buscar entre tarjetas.</p></div><button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
-                <div class="gx-kpi-strip">
-                    <button class="gx-kpi-card gx-kpi-blue" onclick="goAdminTab('tab-clientes')"><span class="gx-kpi-label">Ingresos</span><strong id="kpi-ingresos">$0.00</strong><small>Brutos mensuales</small></button>
-                    <div class="gx-kpi-card gx-kpi-red"><span class="gx-kpi-label">Costos</span><strong id="kpi-costos">$0.00</strong><small>Inversión mensual</small></div>
-                    <div class="gx-kpi-card gx-kpi-green"><span class="gx-kpi-label">Ganancia</span><strong id="kpi-ganancias">$0.00</strong><small>Neta estimada</small></div>
-                    <div class="gx-kpi-card gx-kpi-purple"><span class="gx-kpi-label">Margen</span><strong id="kpi-margen">0%</strong><small>Rentabilidad</small></div>
+                <div class="gx-page-heading">
+                    <div>
+                        <div class="gx-eyebrow">Hoy en GOXION</div>
+                        <h1>Qué requiere tu atención</h1>
+                        <p>Primero cobros, revisiones y solicitudes. Lo demás queda a un toque.</p>
+                    </div>
+                    <button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button>
                 </div>
-                <div class="gx-section-head"><div><span class="gx-eyebrow">Prioridad</span><h2>Necesita tu atención</h2></div></div>
-                <div class="gx-ops-grid">
-                    <button class="gx-op-card" onclick="gxFilterFromSummary('revision')"><span class="gx-op-icon">🔔</span><span class="gx-op-copy"><strong id="gx-count-review">0</strong><small>En revisión</small></span><span class="gx-op-arrow">›</span></button>
-                    <button class="gx-op-card" onclick="gxFilterFromSummary('pendiente')"><span class="gx-op-icon">◷</span><span class="gx-op-copy"><strong id="gx-count-pending">0</strong><small>Pagos pendientes</small></span><span class="gx-op-arrow">›</span></button>
-                    <button class="gx-op-card" onclick="gxShowBenefitReady()"><span class="gx-op-icon">🎁</span><span class="gx-op-copy"><strong id="gx-count-benefits">0</strong><small>Beneficios listos</small></span><span class="gx-op-arrow">›</span></button>
-                    <button class="gx-op-card" onclick="goAdminTab('tab-catalogo')"><span class="gx-op-icon">📦</span><span class="gx-op-copy"><strong id="gx-count-stock">0</strong><small>Stock bajo / lleno</small></span><span class="gx-op-arrow">›</span></button>
-                    <button class="gx-op-card gx-op-card-requests" onclick="gxOpenNotificationCategory('cancellation')"><span class="gx-op-icon">◎</span><span class="gx-op-copy"><strong id="gx-count-requests">0</strong><small>Solicitudes Mi Espacio</small></span><span class="gx-op-arrow">›</span></button>
+
+                <div class="gx-home-priority-grid">
+                    <button class="gx-home-priority today" onclick="gxShowClientTiming('today')">
+                        <span>HOY</span><strong id="gx-count-due-today">0</strong><small>Cobran hoy</small>
+                    </button>
+                    <button class="gx-home-priority overdue" onclick="gxShowClientTiming('overdue')">
+                        <span>COBRO</span><strong id="gx-count-overdue-home">0</strong><small>Vencidos</small>
+                    </button>
+                    <button class="gx-home-priority review" onclick="gxFilterFromSummary('revision')">
+                        <span>VALIDAR</span><strong id="gx-count-review">0</strong><small>En revisión</small>
+                    </button>
+                    <button class="gx-home-priority requests" onclick="goAdminTab('tab-operaciones')">
+                        <span>MI ESPACIO</span><strong id="gx-count-requests">0</strong><small>Solicitudes</small>
+                    </button>
                 </div>
-                <div class="gx-section-head gx-section-space"><div><span class="gx-eyebrow">Panorama</span><h2>Estado de clientes</h2></div><button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button></div>
-                <div class="gx-client-stats"><div><strong id="gx-count-total">0</strong><span>Total</span></div><div><strong id="gx-count-paid">0</strong><span>Pagados</span></div><div><strong id="gx-count-suspended">0</strong><span>Suspendidos</span></div><div><strong id="gx-count-missions">0</strong><span>Con misiones</span></div></div>
+
+                <section class="gx-upcoming-section">
+                    <div class="gx-section-head">
+                        <div><span class="gx-eyebrow">Cobro</span><h2>Próximos vencimientos</h2></div>
+                        <button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button>
+                    </div>
+                    <div id="gx-next-payments-list" class="gx-next-payments-list">
+                        <div class="gx-empty-inline">Calculando próximos cobros…</div>
+                    </div>
+                </section>
+
+                <details class="gx-business-panel" id="gx-business-panel" open>
+                    <summary>
+                        <div><span class="gx-eyebrow">Negocio</span><strong>Finanzas y panorama</strong></div>
+                        <em>Ver</em>
+                    </summary>
+                    <div class="gx-business-panel-body">
+                        <div class="gx-kpi-strip">
+                            <button class="gx-kpi-card gx-kpi-blue" onclick="goAdminTab('tab-clientes')"><span class="gx-kpi-label">Ingresos</span><strong id="kpi-ingresos">$0.00</strong><small>Brutos mensuales</small></button>
+                            <div class="gx-kpi-card gx-kpi-red"><span class="gx-kpi-label">Costos</span><strong id="kpi-costos">$0.00</strong><small>Inversión mensual</small></div>
+                            <div class="gx-kpi-card gx-kpi-green"><span class="gx-kpi-label">Ganancia</span><strong id="kpi-ganancias">$0.00</strong><small>Neta estimada</small></div>
+                            <div class="gx-kpi-card gx-kpi-purple"><span class="gx-kpi-label">Margen</span><strong id="kpi-margen">0%</strong><small>Rentabilidad</small></div>
+                        </div>
+
+                        <div class="gx-business-mini-grid">
+                            <button onclick="gxShowBenefitReady()"><strong id="gx-count-benefits">0</strong><span>Beneficios listos</span></button>
+                            <button onclick="goAdminTab('tab-catalogo')"><strong id="gx-count-stock">0</strong><span>Stock bajo / lleno</span></button>
+                        </div>
+
+                        <div class="gx-section-head gx-section-space">
+                            <div><span class="gx-eyebrow">Panorama</span><h2>Estado de clientes</h2></div>
+                            <button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button>
+                        </div>
+                        <div class="gx-client-stats">
+                            <div><strong id="gx-count-total">0</strong><span>Total</span></div>
+                            <div><strong id="gx-count-paid">0</strong><span>Pagados</span></div>
+                            <div><strong id="gx-count-suspended">0</strong><span>Suspendidos</span></div>
+                            <div><strong id="gx-count-missions">0</strong><span>Con misiones</span></div>
+                        </div>
+                    </div>
+                </details>
             </section>
 
             <section id="tab-clientes" class="tab-content">
@@ -990,7 +1597,7 @@ details.gx-client-ops-context{
                         <button class="filter-pill" data-status-filter="pagado" onclick="setStatusFilter('pagado',this)">Pagados <b id="pill-paid">0</b></button>
                         <button class="filter-pill" data-status-filter="suspendido" onclick="setStatusFilter('suspendido',this)">Suspendidos <b id="pill-suspended">0</b></button>
                     </div>
-                    <div class="gx-filter-tools"><select id="sort-by" class="custom-select" onchange="filtrarClientes()"><option value="name">Nombre A–Z</option><option value="date">Día de cobro</option><option value="loyalty">Lealtad</option></select><button class="gx-secondary-action" onclick="gxClearClientFilters()">↺ Limpiar</button></div>
+                    <div class="gx-filter-tools"><select id="sort-by" class="custom-select" onchange="filtrarClientes()"><option value="priority" selected>Prioridad de cobro</option><option value="date">Día de cobro</option><option value="name">Nombre A–Z</option><option value="loyalty">Lealtad</option></select><button class="gx-secondary-action" onclick="gxClearClientFilters()">↺ Limpiar</button></div>
                 </div>
                 <div id="clients-container" class="gx-clients-list"><p style="color:var(--text-muted)">Conectando con la base de datos...</p></div>
             </section>
@@ -1045,9 +1652,43 @@ details.gx-client-ops-context{
                 <div class="gx-settings-view" data-settings-view="app"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Experiencia</span><h2>Configuración de App</h2></div></div><div class="gx-setting-row"><div><strong>Promoción Upsell</strong><small>Mostrar Combo GOXION a clientes.</small></div><label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar configuración</button></div></div>
                 <div class="gx-settings-view" data-settings-view="alerts"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Comunicación</span><h2>Alertas globales</h2></div><label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label></div><div id="alert-settings" class="gx-alert-settings" style="opacity:.5;pointer-events:none;transition:.3s"><select id="alert-platform" class="custom-select"></select><select id="alert-type" class="custom-select"><option value="presentando intermitencias temporales">Intermitencias temporales</option><option value="en mantenimiento programado">Mantenimiento programado</option><option value="experimentando una caída global">Caída global</option><option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option></select><textarea id="global-msg" class="gx-large-textarea" placeholder="Mensaje adicional para clientes (opcional)..."></textarea></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar alerta</button></div></div>
             </section>
+        
+            <section id="tab-operaciones" class="tab-content gx-mobile-workspace">
+                <div class="gx-page-heading">
+                    <div><div class="gx-eyebrow">Bandeja operativa</div><h1>Operaciones</h1><p>Todo lo que requiere una decisión o seguimiento.</p></div>
+                </div>
+                <div class="gx-mobile-ops-filters" id="gx-mobile-ops-filters">
+                    <button class="active" data-gx-mobile-ops="priority" onclick="gxSetMobileOpsFilter('priority',this)">Prioridad</button>
+                    <button data-gx-mobile-ops="review" onclick="gxSetMobileOpsFilter('review',this)">Pagos</button>
+                    <button data-gx-mobile-ops="cancellation" onclick="gxSetMobileOpsFilter('cancellation',this)">Cancelaciones</button>
+                    <button data-gx-mobile-ops="support" onclick="gxSetMobileOpsFilter('support',this)">Soporte</button>
+                    <button data-gx-mobile-ops="activity" onclick="gxSetMobileOpsFilter('activity',this)">Actividad</button>
+                </div>
+                <div id="gx-mobile-ops-list" class="gx-mobile-ops-list"></div>
+            </section>
+
+            <section id="tab-mas" class="tab-content gx-mobile-workspace">
+                <div class="gx-page-heading">
+                    <div><div class="gx-eyebrow">Administración</div><h1>Más</h1><p>Herramientas que no necesitas tener siempre en pantalla.</p></div>
+                </div>
+                <div class="gx-more-grid">
+                    <button onclick="gxOpenMoreDestination('catalog')"><span>📦</span><div><strong>Catálogo e inventario</strong><small>Precios, capacidad, stock y sincronización</small></div><em>›</em></button>
+                    <button onclick="gxOpenMoreDestination('missions')"><span>🎯</span><div><strong>Automatizaciones</strong><small>Misiones globales y asignaciones</small></div><em>›</em></button>
+                    <button onclick="gxOpenMoreDestination('app')"><span>✨</span><div><strong>Experiencia</strong><small>Promociones y comportamiento de la app</small></div><em>›</em></button>
+                    <button onclick="gxOpenMoreDestination('alerts')"><span>⚠</span><div><strong>Incidencias</strong><small>Estado operativo visible para clientes</small></div><em>›</em></button>
+                    <button onclick="goAdminTab('tab-resumen')"><span>▦</span><div><strong>Finanzas</strong><small>Ingresos, costos, margen y panorama</small></div><em>›</em></button>
+                </div>
+            </section>
+
         </main>
 
-        <nav class="gx-mobile-nav"><button class="gx-mobile-nav-btn active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)"><i>⌂</i><span>Resumen</span></button><button class="gx-mobile-nav-btn" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)"><i>👥</i><span>Clientes</span></button><button class="gx-mobile-nav-btn gx-mobile-fab" onclick="agregarNuevoCliente()"><i>＋</i></button><button class="gx-mobile-nav-btn" data-admin-target="tab-catalogo" onclick="goAdminTab('tab-catalogo',this)"><i>📦</i><span>Catálogo</span></button><button class="gx-mobile-nav-btn" data-admin-target="tab-ajustes" onclick="goAdminTab('tab-ajustes',this)"><i>⚙</i><span>Ajustes</span></button></nav>
+        <nav class="gx-mobile-nav">
+            <button class="gx-mobile-nav-btn active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)"><i>⌂</i><span>Inicio</span></button>
+            <button class="gx-mobile-nav-btn" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)"><i>👥</i><span>Clientes</span></button>
+            <button class="gx-mobile-nav-btn gx-mobile-fab" onclick="agregarNuevoCliente()" aria-label="Nuevo cliente"><i>＋</i></button>
+            <button class="gx-mobile-nav-btn" data-admin-target="tab-operaciones" onclick="goAdminTab('tab-operaciones',this)"><i>◎</i><span>Operaciones</span></button>
+            <button class="gx-mobile-nav-btn" data-admin-target="tab-mas" onclick="goAdminTab('tab-mas',this)"><i>•••</i><span>Más</span></button>
+        </nav>
     </div>
 
     <div class="gx-client-focus" id="gx-client-focus" aria-hidden="true"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
@@ -1458,7 +2099,22 @@ details.gx-client-ops-context{
             return matchText && matchStatus;
         });
 
-        if (sortBy === 'name') {
+        if (sortBy === 'priority') {
+            const priority = c => {
+                if (c.pago_en_revision === true) return [0, 0];
+                const t = typeof gxPaymentTiming === 'function' ? gxPaymentTiming(c) : {type:'none',days:999};
+                if (t.type === 'overdue') return [1, -Number(t.days || 0)];
+                if (t.type === 'upcoming' && Number(t.days || 0) === 0) return [2, 0];
+                if (t.type === 'upcoming') return [3, Number(t.days || 0)];
+                if (c.estado === 'pendiente') return [4, Number(c.dia_pago || 15)];
+                if (c.estado === 'suspendido') return [5, Number(c.dia_pago || 15)];
+                return [6, Number(c.dia_pago || 15)];
+            };
+            filtradosArr.sort((a,b)=>{
+                const pa=priority(a), pb=priority(b);
+                return pa[0]-pb[0] || pa[1]-pb[1] || String(a.nombre||'').localeCompare(String(b.nombre||''),'es');
+            });
+        } else if (sortBy === 'name') {
             filtradosArr.sort((a, b) => a.nombre.localeCompare(b.nombre));
         } else if (sortBy === 'date') {
             filtradosArr.sort((a, b) => (a.dia_pago || 15) - (b.dia_pago || 15));
@@ -1951,6 +2607,16 @@ details.gx-client-ops-context{
                 </div>
                 <div class="gx-client-brief" onclick="toggleClientDetails('${key}')"><div class="gx-service-brief">${servicesBrief}</div><div class="gx-client-brief-footer"><span class="client-status-badge" style="color:${statusColor};border-color:${statusColor}40;background:${statusColor}10;${pulseAnim}">${statusBadge}</span><span class="gx-open-client">Abrir ›</span></div></div>
                 <div class="client-details gx-focus-details" id="details-${key}">
+                    <div class="gx-client-quick-actions">
+                        <button type="button" onclick="enviarMensaje('${cliente.nombre}','${key}')">Mensaje</button>
+                        <button type="button" onclick="copiarInfo('${cliente.nombre}','${key}')">Copiar enlace</button>
+                        <button type="button" class="more" onclick="gxToggleClientQuickMenu(this)">Más</button>
+                        <div class="gx-client-quick-menu">
+                            <button type="button" onclick="gxOpenClientSection('benefits')">Beneficios</button>
+                            <button type="button" onclick="gxOpenClientSection('account')">Cuenta y acceso</button>
+                            <button type="button" onclick="gxOpenClientSection('activity')">Actividad reciente</button>
+                        </div>
+                    </div>
                     ${enRevision ? `<div class="gx-payment-priority">
                         <div class="gx-payment-priority-icon">💳</div>
                         <div class="gx-payment-priority-copy">
@@ -1960,43 +2626,100 @@ details.gx-client-ops-context{
                         <button type="button" onclick="gxOpenPaymentModal('${key}', ${subtotal})">Revisar ahora</button>
                     </div>` : ''}
 
-                    <div class="gx-accordion open gx-billing-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>💳</i><b>Cobro y estado</b><small>${cliente.ciclo_cobro_manual ? '🧪 Excepción manual' : 'Ciclo automático'} · ${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}</small></span><em>⌄</em></button><div class="gx-accordion-content">
-                        <div class="gx-billing-overview ${cliente.ciclo_cobro_manual ? 'manual' : ''}">
-                            <div><small>Periodo pendiente</small><strong>${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}</strong></div>
-                            <div><small>Estado operativo</small><strong>${cliente.pago_en_revision?'🔔 En revisión':cliente.estado==='pagado'?'✓ Pagado':cliente.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente'}</strong></div>
-                            <span class="gx-cycle-badge ${cliente.ciclo_cobro_manual?'manual':'auto'}">${cliente.ciclo_cobro_manual?'🧪 MANUAL':'● AUTO'}</span>
-                        </div>
-                        <div class="gx-billing-fields">
-                            <label class="gx-period-field"><span>Periodo a cobrar</span><input type="month" value="${String(cliente.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7)}" onchange="updateClientData('${key}','periodo_pendiente',this.value)"></label>
-                            <label><span>Día de cobro</span><input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" onchange="updateClientData('${key}','dia_pago',this.value)"></label>
-                        </div>
-                        <div class="gx-cycle-mode-row">
-                            <div><strong>Ciclo de cobro</strong><small>${cliente.ciclo_cobro_manual?'El corte mensual no modificará esta cuenta.':'Al iniciar el mes, el periodo pendiente se presenta como nuevo cobro.'}</small></div>
-                            <div class="gx-cycle-segment">
-                                <button type="button" class="${!cliente.ciclo_cobro_manual?'active':''}" onclick="gxSetBillingCycleMode('${key}',false)">Automático</button>
-                                <button type="button" class="${cliente.ciclo_cobro_manual?'active manual':''}" onclick="gxSetBillingCycleMode('${key}',true)">Manual</button>
+                    <div class="gx-accordion open gx-billing-accordion" data-gx-section="billing">
+                        <button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)">
+                            <span><i>💳</i><b>Cobro y estado</b><small>${paymentPrimary} · ${dueText}</small></span><em>⌄</em>
+                        </button>
+                        <div class="gx-accordion-content">
+                            <div class="gx-billing-primary">
+                                <div><small>Próximo vencimiento</small><strong>${dueText}</strong></div>
+                                <div><small>Mensualidad</small><strong>$${subtotal}</strong></div>
+                                <div class="gx-billing-status ${paymentClass}"><small>Estado</small><strong>${cliente.pago_en_revision?'En revisión':cliente.estado==='pagado'?'Pagado':cliente.estado==='suspendido'?'Suspendido':cardTiming.type==='overdue'?'Vencido':'Pendiente'}</strong></div>
                             </div>
-                        </div>
-                        ${cliente.ciclo_cobro_manual ? `<label class="gx-manual-status"><span>Estado manual</span><select class="status-select status-${cliente.estado}" onchange="updateClientData('${key}','estado',this.value)"><option value="pendiente" ${cliente.estado==='pendiente'?'selected':''}>Pendiente (Deuda)</option><option value="pagado" ${cliente.estado==='pagado'?'selected':''}>Pagado</option><option value="suspendido" ${cliente.estado==='suspendido'?'selected':''}>Suspendido</option></select></label>` : `<div class="gx-auto-note">El estado se calcula con el periodo pendiente. Usa Manual únicamente para pruebas, acuerdos o excepciones.</div>`}
-                    </div></div>
 
-                    <div class="gx-operations-dock gx-operations-dock-compact">
-                        <div class="gx-dock-loyalty">
-                            <div class="gx-dock-copy"><small>Lealtad</small><strong><span id="pagos-${key}">${cliente.pagos_puntuales || 0}</span> pagos</strong></div>
-                            <div class="gx-dock-stepper">
-                                <button type="button" onclick="updatePagos('${key}',-1)">−</button>
-                                <button type="button" onclick="updatePagos('${key}',1)">＋</button>
-                                <button type="button" class="reset" onclick="reiniciarLealtad('${key}')" title="Reiniciar">↻</button>
-                            </div>
+                            <details class="gx-billing-admin">
+                                <summary><span>Administrar ciclo</span><em>${cliente.ciclo_cobro_manual?'Manual':'Automático'}</em></summary>
+                                <div class="gx-billing-admin-body">
+                                    <div class="gx-billing-fields">
+                                        <label class="gx-period-field"><span>Periodo a cobrar</span><input type="month" value="${String(cliente.periodo_pendiente || new Date().toISOString().slice(0,7)).slice(0,7)}" onchange="updateClientData('${key}','periodo_pendiente',this.value)"></label>
+                                        <label><span>Día de cobro</span><input type="number" value="${cliente.dia_pago || 15}" min="1" max="31" onchange="updateClientData('${key}','dia_pago',this.value)"></label>
+                                    </div>
+                                    <div class="gx-cycle-mode-row">
+                                        <div><strong>Ciclo de cobro</strong><small>${cliente.ciclo_cobro_manual?'El corte mensual no modificará esta cuenta.':'Al iniciar el mes, el periodo pendiente se presenta como nuevo cobro.'}</small></div>
+                                        <div class="gx-cycle-segment">
+                                            <button type="button" class="${!cliente.ciclo_cobro_manual?'active':''}" onclick="gxSetBillingCycleMode('${key}',false)">Automático</button>
+                                            <button type="button" class="${cliente.ciclo_cobro_manual?'active manual':''}" onclick="gxSetBillingCycleMode('${key}',true)">Manual</button>
+                                        </div>
+                                    </div>
+                                    ${cliente.ciclo_cobro_manual ? `<label class="gx-manual-status"><span>Estado manual</span><select class="status-select status-${cliente.estado}" onchange="updateClientData('${key}','estado',this.value)"><option value="pendiente" ${cliente.estado==='pendiente'?'selected':''}>Pendiente (Deuda)</option><option value="pagado" ${cliente.estado==='pagado'?'selected':''}>Pagado</option><option value="suspendido" ${cliente.estado==='suspendido'?'selected':''}>Suspendido</option></select></label>` : `<div class="gx-auto-note">Usa Manual únicamente para acuerdos, pruebas o excepciones.</div>`}
+                                </div>
+                            </details>
+
+                            <details class="gx-billing-admin gx-billing-adjustments">
+                                <summary><span>Ajustes y descuentos</span><em>${(cliente.descuentos_especiales?.length||0) + (cliente.descuento_especial?1:0) + (cliente.descuento_fallas?1:0)} activo${((cliente.descuentos_especiales?.length||0) + (cliente.descuento_especial?1:0) + (cliente.descuento_fallas?1:0))===1?'':'s'}</em></summary>
+                                <div class="gx-billing-admin-body">${descuentosHTML}</div>
+                            </details>
                         </div>
-                        <button type="button" class="gx-dock-action message" onclick="enviarMensaje('${cliente.nombre}','${key}')"><strong>Mensaje</strong></button>
-                        <button type="button" class="gx-dock-action link" onclick="copiarInfo('${cliente.nombre}','${key}')"><strong>Copiar link</strong></button>
                     </div>
 
-                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🔑</i><b>Acceso al portal</b><small>Nombre, usuario y PIN</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="access-portal-box gx-access-compact"><input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)"><div class="cred-row-split"><input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)"><input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)"></div></div></div></div>
-                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>📺</i><b>Servicios</b><small>${serviceNames.length} activo${serviceNames.length===1?'':'s'} · $${subtotal}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="client-services-list">${clientServicesHTML}<div class="client-service-add-row"><select id="add-srv-sel-${key}">${globalOptions}</select><button class="btn-save" onclick="addClientService('${key}')">＋</button></div>${descuentosHTML}</div></div></div>
-                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎁</i><b>Referidos & beneficios</b><small>Progreso, servicios y recompensa</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${refHTML}</div></div></div>
-                    <div class="gx-accordion"><button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)"><span><i>🎯</i><b>Misiones & cupón</b><small>${gamifConfig.misiones_activas ? missionBrief : 'Sin automatización activa'}</small></span><em>⌄</em></button><div class="gx-accordion-content"><div class="gx-embedded-block">${gamifHTML}</div></div></div>
+                    <div class="gx-accordion" data-gx-section="services">
+                        <button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)">
+                            <span><i>📺</i><b>Servicios</b><small>${serviceNames.length} activo${serviceNames.length===1?'':'s'} · $${subtotal}</small></span><em>⌄</em>
+                        </button>
+                        <div class="gx-accordion-content">
+                            <div class="client-services-list">
+                                ${clientServicesHTML}
+                                <div class="client-service-add-row"><select id="add-srv-sel-${key}">${globalOptions}</select><button class="btn-save" onclick="addClientService('${key}')">＋</button></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="gx-accordion gx-benefits-accordion" data-gx-section="benefits">
+                        <button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)">
+                            <span><i>✦</i><b>Beneficios</b><small>${cliente.pagos_puntuales || 0} pagos · ${refActivo?'Referido activo':'Sin referido'} · ${gamifConfig.misiones_activas?'Misiones activas':'Sin misiones'}</small></span><em>⌄</em>
+                        </button>
+                        <div class="gx-accordion-content">
+                            <div class="gx-benefit-loyalty">
+                                <div>
+                                    <small>Lealtad</small>
+                                    <strong><span id="pagos-${key}">${cliente.pagos_puntuales || 0}</span> pagos puntuales</strong>
+                                </div>
+                                <details>
+                                    <summary>Administrar</summary>
+                                    <div class="gx-dock-stepper">
+                                        <button type="button" onclick="updatePagos('${key}',-1)">−</button>
+                                        <button type="button" onclick="updatePagos('${key}',1)">＋</button>
+                                        <button type="button" class="reset" onclick="reiniciarLealtad('${key}')" title="Reiniciar">↻</button>
+                                    </div>
+                                </details>
+                            </div>
+
+                            <details class="gx-benefit-sub">
+                                <summary><span>Referidos</span><em>${refActivo ? `${refSmartMonths}/3 meses` : 'Sin referido'}</em></summary>
+                                <div class="gx-benefit-sub-body">${refHTML}</div>
+                            </details>
+
+                            <details class="gx-benefit-sub">
+                                <summary><span>Misiones y cupón</span><em>${gamifConfig.misiones_activas ? missionBrief : 'Inactivas'}</em></summary>
+                                <div class="gx-benefit-sub-body">${gamifHTML}</div>
+                            </details>
+                        </div>
+                    </div>
+
+                    <div class="gx-accordion" data-gx-section="account">
+                        <button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)">
+                            <span><i>🔑</i><b>Cuenta y acceso</b><small>Nombre, usuario y PIN</small></span><em>⌄</em>
+                        </button>
+                        <div class="gx-accordion-content">
+                            <div class="access-portal-box gx-access-compact">
+                                <input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)">
+                                <div class="cred-row-split">
+                                    <input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)">
+                                    <input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
             `;
@@ -4602,7 +5325,7 @@ details.gx-client-ops-context{
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 02 · v1.0.4-beta-02</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 03 · v1.0.5-beta-03</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -4809,9 +5532,8 @@ details.gx-client-ops-context{
             </article>`;
         }).join("") + `</div>`;
 
-        const placement=details.querySelector(".gx-operations-dock-compact") || details.querySelector(".gx-billing-accordion");
-        if(placement) placement.insertAdjacentElement("afterend",box);
-        else details.appendChild(box);
+        // Actividad es contexto secundario: siempre al final de la ficha.
+        details.appendChild(box);
     };
 
     window.gxHighlightClientRequest = function(id){
@@ -4869,7 +5591,342 @@ details.gx-client-ops-context{
         },650);
     });
 
-    console.info("GOXION Admin Beta 02: prioridad de cobro, actividad compacta y gestión de notificaciones.");
+    console.info("GOXION Admin Beta 03: arquitectura móvil progresiva y prioridad operativa.");
+})();
+</script>
+
+
+<script id="goxion-admin-beta-03-mobile-controller">
+(() => {
+    const isMobile = () => window.matchMedia("(max-width:840px)").matches;
+    let mobileOpsFilter = "priority";
+
+    function money(v){
+        return `$${Number(v||0).toFixed(0)}`;
+    }
+
+    function clientMonthly(c){
+        return (c?.servicios||[]).reduce((sum,s)=>sum+Number(s?.monto||0),0);
+    }
+
+    function timing(c){
+        return typeof window.gxPaymentTiming==="function"
+            ? window.gxPaymentTiming(c)
+            : {type:"none",days:999,due:null};
+    }
+
+    window.gxShowClientTiming = function(type){
+        goAdminTab("tab-clientes");
+        const filtered={};
+        Object.entries(clientesDict||{}).forEach(([key,c])=>{
+            const t=timing(c);
+            if(type==="today" && t.type==="upcoming" && Number(t.days||0)===0) filtered[key]=c;
+            if(type==="overdue" && t.type==="overdue") filtered[key]=c;
+        });
+        if(typeof renderizarClientes==="function") renderizarClientes(filtered);
+        const p=document.querySelector('[data-status-filter="all"]');
+        document.querySelectorAll('[data-status-filter]').forEach(x=>x.classList.remove("active"));
+        p?.classList.add("active");
+    };
+
+    function renderUpcoming(){
+        const list=document.getElementById("gx-next-payments-list");
+        if(!list || typeof clientesDict==="undefined") return;
+
+        const rows=Object.entries(clientesDict||{})
+            .map(([key,c])=>({key,c,t:timing(c)}))
+            .filter(x=>x.c.estado!=="pagado" && x.c.estado!=="suspendido" && !x.c.pago_en_revision && ["upcoming","overdue"].includes(x.t.type))
+            .sort((a,b)=>{
+                const pa=a.t.type==="overdue"?-1000-Number(a.t.days||0):Number(a.t.days||999);
+                const pb=b.t.type==="overdue"?-1000-Number(b.t.days||0):Number(b.t.days||999);
+                return pa-pb;
+            })
+            .slice(0,6);
+
+        if(!rows.length){
+            list.innerHTML='<div class="gx-empty-inline">No hay cobros próximos que requieran atención.</div>';
+            return;
+        }
+
+        list.innerHTML=rows.map(({key,c,t})=>{
+            const label=t.type==="overdue"
+                ? `Vencido ${Number(t.days||0)}d`
+                : Number(t.days||0)===0
+                    ? "Vence hoy"
+                    : `En ${Number(t.days||0)}d`;
+            const cls=t.type==="overdue"?"overdue":Number(t.days||0)===0?"today":"upcoming";
+            const date=t.due instanceof Date && !Number.isNaN(t.due.getTime())
+                ? t.due.toLocaleDateString("es-MX",{day:"numeric",month:"short"})
+                : `día ${c.dia_pago||15}`;
+            return `<button class="gx-next-payment ${cls}" onclick="gxOpenClientFocus('${key}')">
+                <div><strong>${window.gxEscapeAdminHtml?.(c.nombre)||c.nombre}</strong><small>${date} · ${money(clientMonthly(c))}/mes</small></div>
+                <em>${label}</em>
+            </button>`;
+        }).join("");
+    }
+
+    function updateHomePriority(){
+        if(typeof clientesDict==="undefined") return;
+        const values=Object.values(clientesDict||{});
+        const review=values.filter(c=>c.pago_en_revision===true).length;
+        const overdue=values.filter(c=>!c.pago_en_revision && timing(c).type==="overdue").length;
+        const today=values.filter(c=>!c.pago_en_revision && timing(c).type==="upcoming" && Number(timing(c).days||0)===0).length;
+        const requests=(window.gxAdminNotifications||[]).filter(n=>{
+            const cat=window.gxClassifyAdminNotification?.(n);
+            return !n.leida && (cat==="cancellation"||cat==="support");
+        }).length;
+
+        const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+        set("gx-count-review",review);
+        set("gx-count-overdue-home",overdue);
+        set("gx-count-due-today",today);
+        set("gx-count-requests",requests);
+        renderUpcoming();
+    }
+
+    function buildOps(){
+        const persisted=Array.isArray(window.gxAdminNotifications)?window.gxAdminNotifications:[];
+        const rows=[];
+
+        Object.entries(clientesDict||{}).forEach(([key,c])=>{
+            if(c.pago_en_revision){
+                rows.push({
+                    id:`review-${key}`, key, synthetic:true, category:"review",
+                    title:"Pago pendiente de revisión",
+                    message:`${c.nombre} tiene un comprobante esperando validación.`,
+                    client:c.nombre, created_at:new Date().toISOString()
+                });
+                return;
+            }
+            const t=timing(c);
+            if(t.type==="overdue"){
+                rows.push({
+                    id:`overdue-${key}`, key, synthetic:true, category:"overdue",
+                    title:"Pago vencido",
+                    message:`${c.nombre} lleva ${Number(t.days||0)} día${Number(t.days||0)===1?"":"s"} de atraso.`,
+                    client:c.nombre, created_at:new Date().toISOString()
+                });
+            }
+        });
+
+        persisted.forEach(n=>{
+            const cat=window.gxClassifyAdminNotification?.(n)||"activity";
+            if(String(n?.tipo||"").toLowerCase()==="pago_revision") return;
+            const key=Object.entries(clientesDict||{}).find(([,c])=>String(c?._id||c?.id||"")===String(n?.cliente_id||""))?.[0]||"";
+            rows.push({
+                id:n.id,key,synthetic:false,category:cat,
+                title:n.titulo||"Actividad",
+                message:n.mensaje||"",
+                client:n.cliente_nombre||"",
+                created_at:n.created_at,
+                read:n.leida===true
+            });
+        });
+
+        const order={review:0,overdue:1,cancellation:2,support:3,activity:4};
+        return rows.sort((a,b)=>(order[a.category]??9)-(order[b.category]??9) || new Date(b.created_at||0)-new Date(a.created_at||0));
+    }
+
+    window.gxSetMobileOpsFilter = function(filter,btn){
+        mobileOpsFilter=filter||"priority";
+        document.querySelectorAll("[data-gx-mobile-ops]").forEach(x=>x.classList.remove("active"));
+        btn?.classList.add("active");
+        renderMobileOps();
+    };
+
+    function renderMobileOps(){
+        const list=document.getElementById("gx-mobile-ops-list");
+        if(!list)return;
+        let rows=buildOps();
+
+        if(mobileOpsFilter==="priority"){
+            rows=rows.filter(x=>["review","overdue","cancellation","support"].includes(x.category) && (x.synthetic || !x.read));
+        }else{
+            rows=rows.filter(x=>x.category===mobileOpsFilter);
+        }
+
+        if(!rows.length){
+            list.innerHTML='<div class="gx-empty-inline">No hay pendientes en esta categoría.</div>';
+            return;
+        }
+
+        const labels={review:"Pago",overdue:"Vencido",cancellation:"Cancelación",support:"Soporte",activity:"Actividad"};
+        list.innerHTML=rows.slice(0,40).map(x=>{
+            const activity=x.category==="activity";
+            const safeId=String(x.id||"").replace(/'/g,"");
+            const safeKey=String(x.key||"").replace(/'/g,"");
+            return `<article class="gx-mobile-op-item ${x.category}">
+                <div>
+                    <span class="kind">${labels[x.category]||"Actividad"}</span>
+                    <strong>${window.gxEscapeAdminHtml?.(x.title)||x.title}</strong>
+                    ${activity?"":`<p>${window.gxEscapeAdminHtml?.(x.message)||x.message}</p>`}
+                    <small>${x.client?`${window.gxEscapeAdminHtml?.(x.client)||x.client} · `:""}${x.read?"Atendida":"Pendiente"}</small>
+                    ${activity?`<p>${window.gxEscapeAdminHtml?.(x.message)||x.message}</p>`:""}
+                </div>
+                <div class="gx-mobile-op-actions">
+                    ${safeKey?`<button onclick="gxOpenClientFocus('${safeKey}')">Abrir cliente</button>`:""}
+                    ${!x.synthetic&&!x.read&&safeId?`<button class="done" onclick="gxMarkNotificationRead('${safeId}')">Atendida</button>`:""}
+                    ${!x.synthetic&&safeId?`<button class="danger" onclick="gxDeleteNotification('${safeId}')">Eliminar</button>`:""}
+                </div>
+            </article>`;
+        }).join("");
+    }
+
+    window.gxOpenMoreDestination = function(dest){
+        if(dest==="catalog"){
+            goAdminTab("tab-catalogo");
+            return;
+        }
+        if(["missions","app","alerts"].includes(dest)){
+            goAdminTab("tab-ajustes");
+            const btn=[...document.querySelectorAll(".gx-settings-tabs button")].find(b=>{
+                const txt=(b.textContent||"").toLowerCase();
+                return dest==="missions" ? txt.includes("misiones")
+                    : dest==="app" ? txt.includes("app")
+                    : txt.includes("alertas");
+            });
+            window.gxSettingsView?.(dest,btn);
+        }
+    };
+
+    window.gxToggleClientQuickMenu = function(btn){
+        const menu=btn?.parentElement?.querySelector(".gx-client-quick-menu");
+        if(!menu)return;
+        document.querySelectorAll(".gx-client-quick-menu.show").forEach(x=>{if(x!==menu)x.classList.remove("show")});
+        menu.classList.toggle("show");
+    };
+
+    window.gxOpenClientSection = function(section){
+        document.querySelectorAll(".gx-client-quick-menu.show").forEach(x=>x.classList.remove("show"));
+        const body=document.getElementById("gx-focus-body");
+        if(!body)return;
+
+        if(section==="activity"){
+            const target=body.querySelector("details.gx-client-ops-context");
+            if(target){
+                target.open=true;
+                target.scrollIntoView({behavior:"smooth",block:"center"});
+            }
+            return;
+        }
+
+        const target=body.querySelector(`[data-gx-section="${section}"]`);
+        if(!target)return;
+        body.querySelectorAll(":scope > [data-gx-section].gx-accordion").forEach(x=>x.classList.remove("open"));
+        target.classList.add("open");
+        target.scrollIntoView({behavior:"smooth",block:"center"});
+    };
+
+    function enhanceFocus(){
+        const body=document.getElementById("gx-focus-body");
+        const details=body?.querySelector("[id^='details-']");
+        if(!details)return;
+        const key=details.id.replace(/^details-/,"");
+        const c=clientesDict?.[key];
+        if(!c)return;
+
+        const t=timing(c);
+        const monthly=clientMonthly(c);
+        const due=t.due instanceof Date && !Number.isNaN(t.due.getTime())
+            ? t.due.toLocaleDateString("es-MX",{day:"numeric",month:"short"})
+            : `día ${c.dia_pago||15}`;
+        const state=c.pago_en_revision?"En revisión"
+            : c.estado==="pagado"?"Pagado"
+            : t.type==="overdue"?"Vencido"
+            : c.estado==="suspendido"?"Suspendido"
+            : "Pendiente";
+
+        const summary=document.getElementById("gx-focus-summary");
+        if(summary){
+            summary.innerHTML=`<span><small>Vence</small><b>${due}</b></span>
+                <span><small>Mensualidad</small><b>${money(monthly)}</b></span>
+                <span><small>Estado</small><b>${state}</b></span>
+                <span><small>Periodo</small><b>${typeof gxPeriodLabel==="function"?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||"").slice(0,7)}</b></span>`;
+        }
+    }
+
+    // Bell: en teléfono abre Operaciones; en escritorio conserva el drawer.
+    const originalToggle=window.gxToggleNotifications;
+    if(typeof originalToggle==="function"){
+        window.gxToggleNotifications=function(force){
+            if(isMobile() && force!==false){
+                goAdminTab("tab-operaciones");
+                setTimeout(renderMobileOps,30);
+                return;
+            }
+            return originalToggle.call(this,force);
+        };
+    }
+
+    // Integrar con navegación existente.
+    const originalTab=window.goAdminTab;
+    if(typeof originalTab==="function"){
+        window.goAdminTab=function(id,...args){
+            const r=originalTab.call(this,id,...args);
+            if(id==="tab-resumen") setTimeout(updateHomePriority,30);
+            if(id==="tab-operaciones") setTimeout(renderMobileOps,30);
+            return r;
+        };
+    }
+
+    // Integrar con ficha existente sin cambiar su motor.
+    const originalOpen=window.gxOpenClientFocus;
+    if(typeof originalOpen==="function"){
+        window.gxOpenClientFocus=function(key,...args){
+            const r=originalOpen.call(this,key,...args);
+            setTimeout(enhanceFocus,25);
+            return r;
+        };
+    }
+
+    // Resumen: conservar el cálculo original y añadir jerarquía móvil.
+    const originalSummary=window.gxUpdateOperationsSummary;
+    if(typeof originalSummary==="function"){
+        window.gxUpdateOperationsSummary=function(...args){
+            const r=originalSummary.apply(this,args);
+            setTimeout(()=>{
+                updateHomePriority();
+                renderMobileOps();
+            },0);
+            return r;
+        };
+    }
+
+    // Limpiar vuelve al orden recomendado.
+    const originalClear=window.gxClearClientFilters;
+    window.gxClearClientFilters=function(){
+        if(typeof originalClear==="function") originalClear();
+        const sort=document.getElementById("sort-by");
+        if(sort) sort.value="priority";
+        if(typeof filtrarClientes==="function") filtrarClientes();
+    };
+
+    function responsiveBusinessPanel(){
+        const d=document.getElementById("gx-business-panel");
+        if(!d)return;
+        if(isMobile()) d.removeAttribute("open");
+        else d.setAttribute("open","");
+    }
+
+    document.addEventListener("click",e=>{
+        if(!e.target.closest(".gx-client-quick-actions")){
+            document.querySelectorAll(".gx-client-quick-menu.show").forEach(x=>x.classList.remove("show"));
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        responsiveBusinessPanel();
+        const sort=document.getElementById("sort-by");
+        if(sort) sort.value="priority";
+        setTimeout(()=>{
+            if(typeof filtrarClientes==="function") filtrarClientes();
+            updateHomePriority();
+            renderMobileOps();
+        },700);
+    });
+    window.addEventListener("resize",responsiveBusinessPanel);
+
+    console.info("GOXION Admin Beta 03: arquitectura móvil progresiva activa.");
 })();
 </script>
 
