@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.6-beta-04">
+<html lang="es" data-goxion-version="1.0.7-beta-05">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -1835,6 +1835,315 @@ details.gx-client-ops-context{
 }
 </style>
 
+
+<style id="goxion-admin-beta-05-filters-pin">
+/* =========================================================
+   GOXION ADMIN · BETA 05
+   Filtros compactos + gestión segura de PIN
+   ========================================================= */
+
+/* ---------- Filtros compactos ---------- */
+.gx-client-toolbar{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:7px;
+    align-items:center;
+}
+.gx-filter-toggle{
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    padding:5px 9px;
+    border:1px solid rgba(0,242,254,.12);
+    border-radius:12px;
+    background:rgba(0,242,254,.035);
+    color:#fff;
+    font:inherit;
+    cursor:pointer;
+}
+.gx-filter-icon{
+    width:27px;height:27px;
+    display:grid;place-items:center;
+    border-radius:9px;
+    background:rgba(0,242,254,.07);
+    color:var(--neon-blue);
+    font-size:.9rem;
+    font-weight:900;
+}
+.gx-filter-toggle-copy{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    min-width:0;
+}
+.gx-filter-toggle-copy strong{
+    font-size:.62rem;
+    line-height:1.05;
+}
+.gx-filter-toggle-copy small{
+    max-width:128px;
+    margin-top:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:var(--text-muted);
+    font-size:.49rem;
+    line-height:1.05;
+}
+.gx-filter-toggle>b{
+    min-width:19px;height:19px;
+    display:grid;place-items:center;
+    border-radius:999px;
+    background:var(--neon-blue);
+    color:#041013;
+    font-size:.52rem;
+    font-weight:900;
+}
+.gx-filter-toggle[aria-expanded="true"]{
+    border-color:rgba(0,242,254,.28);
+    background:rgba(0,242,254,.065);
+}
+
+.gx-filter-drawer{
+    max-height:0;
+    overflow:hidden;
+    opacity:0;
+    transform:translateY(-5px);
+    pointer-events:none;
+    transition:max-height .28s cubic-bezier(.2,.8,.2,1),opacity .2s ease,transform .25s ease;
+}
+.gx-command-panel.filters-open .gx-filter-drawer{
+    max-height:180px;
+    opacity:1;
+    transform:translateY(0);
+    pointer-events:auto;
+}
+.gx-filter-drawer .gx-status-pills{
+    margin:8px 0 0;
+}
+.gx-filter-sort{
+    flex:1;
+    min-width:0;
+}
+.gx-filter-sort>span{
+    display:block;
+    margin-bottom:3px;
+    color:var(--text-muted);
+    font-size:.5rem;
+    font-weight:900;
+    text-transform:uppercase;
+}
+.gx-filter-clear{
+    align-self:end;
+    min-height:38px;
+    white-space:nowrap;
+}
+
+/* ---------- Cuenta / PIN ---------- */
+.gx-account-access{
+    display:grid;
+    gap:8px;
+}
+.gx-account-field{
+    display:block;
+}
+.gx-account-field>span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--text-muted);
+    font-size:.53rem;
+    font-weight:850;
+    text-transform:uppercase;
+}
+.gx-pin-control{
+    margin-top:2px;
+    padding:10px;
+    border:1px solid rgba(124,77,255,.15);
+    border-radius:12px;
+    background:linear-gradient(145deg,rgba(124,77,255,.04),rgba(0,242,254,.018));
+}
+.gx-pin-control-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.gx-pin-control-head>div small{
+    display:block;
+    color:var(--text-muted);
+    font-size:.52rem;
+    font-weight:850;
+    text-transform:uppercase;
+}
+.gx-pin-control-head>div strong{
+    display:block;
+    margin-top:2px;
+    letter-spacing:3px;
+    font-size:.95rem;
+}
+.gx-pin-control-head>span{
+    padding:4px 7px;
+    border:1px solid rgba(0,255,157,.12);
+    border-radius:999px;
+    background:rgba(0,255,157,.04);
+    color:#7de8b2;
+    font-size:.51rem;
+    font-weight:900;
+}
+.gx-pin-control>p{
+    margin:7px 0 9px;
+    color:#aab4c7;
+    font-size:.57rem;
+    line-height:1.42;
+}
+.gx-pin-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+}
+.gx-pin-actions button,
+.gx-pin-editor button,
+.gx-pin-reveal-actions button{
+    min-height:36px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:9px;
+    background:rgba(255,255,255,.025);
+    color:#fff;
+    font:inherit;
+    font-size:.58rem;
+    font-weight:900;
+}
+.gx-pin-actions button.primary,
+.gx-pin-editor button.save{
+    border-color:rgba(0,242,254,.18);
+    background:rgba(0,242,254,.06);
+    color:#9afaff;
+}
+.gx-pin-editor{
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+.gx-pin-editor[hidden]{display:none!important}
+.gx-pin-editor label>span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--text-muted);
+    font-size:.52rem;
+    font-weight:850;
+    text-transform:uppercase;
+}
+.gx-pin-editor input{
+    width:100%;
+    min-height:39px;
+    padding:8px 10px;
+    border:1px solid rgba(0,242,254,.16);
+    border-radius:9px;
+    background:#0d0d14;
+    color:#fff;
+    font:inherit;
+    font-size:.85rem;
+    font-weight:800;
+    letter-spacing:3px;
+    text-align:center;
+    outline:none;
+}
+.gx-pin-editor>div{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+    margin-top:7px;
+}
+.gx-pin-reveal{
+    margin-top:8px;
+    padding:9px;
+    border:1px solid rgba(0,255,157,.14);
+    border-radius:10px;
+    background:rgba(0,255,157,.035);
+}
+.gx-pin-reveal[hidden]{display:none!important}
+.gx-pin-reveal>div:first-child{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+.gx-pin-reveal small{
+    color:#9fb0b9;
+    font-size:.52rem;
+}
+.gx-pin-reveal strong{
+    color:#78ffd0;
+    font-size:1rem;
+    letter-spacing:3px;
+}
+.gx-pin-reveal-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr auto;
+    gap:6px;
+    margin-top:8px;
+}
+.gx-pin-reveal-actions .quiet{
+    padding:0 8px;
+    color:var(--text-muted);
+}
+
+@media(max-width:840px){
+    #tab-clientes .gx-command-panel{
+        top:6px!important;
+        padding:6px!important;
+        border-radius:13px!important;
+        margin-bottom:8px!important;
+    }
+    #tab-clientes .gx-search-wrap{
+        min-height:42px;
+        padding:0 8px!important;
+        border-radius:11px!important;
+    }
+    #tab-clientes .gx-search-wrap .search-bar{
+        padding:8px 0!important;
+        font-size:.72rem!important;
+    }
+    #tab-clientes .gx-filter-toggle{
+        width:43px;
+        padding:5px;
+        justify-content:center;
+    }
+    #tab-clientes .gx-filter-toggle-copy{
+        display:none;
+    }
+    #tab-clientes .gx-filter-toggle>b{
+        position:absolute;
+        transform:translate(14px,-14px);
+        box-shadow:0 0 0 2px #07070b;
+    }
+    #tab-clientes .gx-filter-toggle{
+        position:relative;
+    }
+    .gx-command-panel.filters-open .gx-filter-drawer{
+        max-height:175px;
+    }
+    .gx-filter-drawer .gx-status-pills{
+        display:flex!important;
+        overflow-x:auto;
+        flex-wrap:nowrap!important;
+        padding-bottom:2px;
+        scrollbar-width:none;
+    }
+    .gx-filter-drawer .gx-status-pills::-webkit-scrollbar{display:none}
+    .gx-filter-drawer .filter-pill{
+        flex:0 0 auto;
+    }
+    .gx-filter-tools{
+        margin-top:6px!important;
+    }
+    .gx-filter-clear{
+        padding:0 10px!important;
+    }
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -1921,16 +2230,28 @@ details.gx-client-ops-context{
 
             <section id="tab-clientes" class="tab-content">
                 <div class="gx-page-heading"><div><div class="gx-eyebrow">CRM operativo</div><h1>Clientes</h1><p id="gx-client-page-subtitle">Busca, filtra y entra directo a lo que necesitas.</p></div><button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
-                <div class="gx-command-panel">
-                    <div class="gx-search-wrap"><span>⌕</span><input type="text" class="search-bar" id="search-input" placeholder="Buscar nombre, folio..." oninput="filtrarClientes()"></div>
-                    <div class="filter-pills-container gx-status-pills">
-                        <button class="filter-pill active" data-status-filter="all" onclick="setStatusFilter('all',this)">Todos <b id="pill-all">0</b></button>
-                        <button class="filter-pill" data-status-filter="revision" onclick="setStatusFilter('revision',this)">🔔 Revisión <b id="pill-review">0</b></button>
-                        <button class="filter-pill" data-status-filter="pendiente" onclick="setStatusFilter('pendiente',this)">Pendientes <b id="pill-pending">0</b></button>
-                        <button class="filter-pill" data-status-filter="pagado" onclick="setStatusFilter('pagado',this)">Pagados <b id="pill-paid">0</b></button>
-                        <button class="filter-pill" data-status-filter="suspendido" onclick="setStatusFilter('suspendido',this)">Suspendidos <b id="pill-suspended">0</b></button>
+                <div class="gx-command-panel" id="gx-client-command-panel">
+                    <div class="gx-client-toolbar">
+                        <div class="gx-search-wrap"><span>⌕</span><input type="text" class="search-bar" id="search-input" placeholder="Buscar nombre, folio..." oninput="filtrarClientes()"></div>
+                        <button type="button" class="gx-filter-toggle" id="gx-filter-toggle" onclick="gxToggleClientFilters()" aria-expanded="false" aria-controls="gx-filter-drawer">
+                            <span class="gx-filter-icon">⌁</span>
+                            <span class="gx-filter-toggle-copy"><strong>Filtros</strong><small id="gx-filter-summary">Todos · Prioridad</small></span>
+                            <b id="gx-filter-active-count" hidden>0</b>
+                        </button>
                     </div>
-                    <div class="gx-filter-tools"><select id="sort-by" class="custom-select" onchange="filtrarClientes()"><option value="priority" selected>Prioridad de cobro</option><option value="date">Día de cobro</option><option value="name">Nombre A–Z</option><option value="loyalty">Lealtad</option></select><button class="gx-secondary-action" onclick="gxClearClientFilters()">↺ Limpiar</button></div>
+                    <div class="gx-filter-drawer" id="gx-filter-drawer" aria-hidden="true">
+                        <div class="filter-pills-container gx-status-pills">
+                            <button class="filter-pill active" data-status-filter="all" onclick="setStatusFilter('all',this)">Todos <b id="pill-all">0</b></button>
+                            <button class="filter-pill" data-status-filter="revision" onclick="setStatusFilter('revision',this)">🔔 Revisión <b id="pill-review">0</b></button>
+                            <button class="filter-pill" data-status-filter="pendiente" onclick="setStatusFilter('pendiente',this)">Pendientes <b id="pill-pending">0</b></button>
+                            <button class="filter-pill" data-status-filter="pagado" onclick="setStatusFilter('pagado',this)">Pagados <b id="pill-paid">0</b></button>
+                            <button class="filter-pill" data-status-filter="suspendido" onclick="setStatusFilter('suspendido',this)">Suspendidos <b id="pill-suspended">0</b></button>
+                        </div>
+                        <div class="gx-filter-tools">
+                            <label class="gx-filter-sort"><span>Orden</span><select id="sort-by" class="custom-select" onchange="filtrarClientes();gxUpdateFilterSummary()"><option value="priority" selected>Prioridad de cobro</option><option value="date">Día de cobro</option><option value="name">Nombre A–Z</option><option value="loyalty">Lealtad</option></select></label>
+                            <button class="gx-secondary-action gx-filter-clear" onclick="gxClearClientFilters()">↺ Limpiar</button>
+                        </div>
+                    </div>
                 </div>
                 <div id="clients-container" class="gx-clients-list"><p style="color:var(--text-muted)">Conectando con la base de datos...</p></div>
             </section>
@@ -3067,15 +3388,57 @@ details.gx-client-ops-context{
 
                     <div class="gx-accordion" data-gx-section="account">
                         <button class="gx-accordion-trigger" type="button" onclick="gxToggleAccordion(this)">
-                            <span><i>🔑</i><b>Cuenta y acceso</b><small>Nombre, usuario y PIN</small></span><em>⌄</em>
+                            <span><i>🔑</i><b>Cuenta y acceso</b><small>Identidad, usuario y PIN seguro</small></span><em>⌄</em>
                         </button>
                         <div class="gx-accordion-content">
-                            <div class="access-portal-box gx-access-compact">
-                                <input type="text" placeholder="Nombre a mostrar" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)">
-                                <div class="cred-row-split">
-                                    <input type="text" placeholder="Usuario / Correo" value="${cliente.usuario_acceso || ''}" class="cred-input" onchange="updateClientData('${key}','usuario_acceso',this.value)">
-                                    <input type="text" placeholder="PIN" value="${cliente.codigo || ''}" class="cred-input pin" onchange="updateClientData('${key}','codigo',this.value)">
-                                </div>
+                            <div class="access-portal-box gx-access-compact gx-account-access">
+                                <label class="gx-account-field">
+                                    <span>Nombre a mostrar</span>
+                                    <input type="text" value="${cliente.nombre}" class="cred-input" onchange="updateClientData('${key}','nombre',this.value)">
+                                </label>
+                                <label class="gx-account-field">
+                                    <span>Usuario / Correo</span>
+                                    <input type="text" value="${cliente.usuario_acceso || ''}" class="cred-input" placeholder="Sin configurar" onchange="updateClientData('${key}','usuario_acceso',this.value)">
+                                </label>
+
+                                <section class="gx-pin-control" data-gx-pin-key="${key}">
+                                    <div class="gx-pin-control-head">
+                                        <div>
+                                            <small>PIN de acceso</small>
+                                            <strong>••••</strong>
+                                        </div>
+                                        <span>Protegido</span>
+                                    </div>
+                                    <p>Por seguridad, el PIN actual no se puede recuperar. Puedes cambiarlo o generar uno nuevo.</p>
+
+                                    <div class="gx-pin-actions">
+                                        <button type="button" onclick="gxOpenPinEditor('${key}')">Cambiar PIN</button>
+                                        <button type="button" class="primary" onclick="gxGenerateUniquePin('${key}')">Generar PIN</button>
+                                    </div>
+
+                                    <div class="gx-pin-editor" id="gx-pin-editor-${key}" hidden>
+                                        <label>
+                                            <span>Nuevo PIN</span>
+                                            <input id="gx-pin-input-${key}" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="4 dígitos">
+                                        </label>
+                                        <div>
+                                            <button type="button" onclick="gxCancelPinEditor('${key}')">Cancelar</button>
+                                            <button type="button" class="save" onclick="gxSaveUniquePin('${key}')">Guardar</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="gx-pin-reveal" id="gx-pin-reveal-${key}" hidden>
+                                        <div>
+                                            <small>PIN actualizado · visible solo en esta sesión</small>
+                                            <strong id="gx-pin-value-${key}">••••</strong>
+                                        </div>
+                                        <div class="gx-pin-reveal-actions">
+                                            <button type="button" onclick="gxCopyPin('${key}')">Copiar PIN</button>
+                                            <button type="button" onclick="gxCopyFullAccess('${key}')">Copiar acceso</button>
+                                            <button type="button" class="quiet" onclick="gxHideSessionPin('${key}')">Ocultar</button>
+                                        </div>
+                                    </div>
+                                </section>
                             </div>
                         </div>
                     </div>
@@ -5684,7 +6047,7 @@ details.gx-client-ops-context{
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 04 · v1.0.6-beta-04</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 05 · v1.0.7-beta-05</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -6485,6 +6848,218 @@ details.gx-client-ops-context{
     });
 
     console.info("GOXION Admin Beta 04: catálogo móvil selectivo y navegación depurada activos.");
+})();
+</script>
+
+
+<script id="goxion-admin-beta-05-controller">
+(() => {
+    const sessionPins = new Map();
+    let lastWindowY = window.scrollY || 0;
+
+    const statusLabels = {
+        all:"Todos",
+        revision:"Revisión",
+        pendiente:"Pendientes",
+        pagado:"Pagados",
+        suspendido:"Suspendidos"
+    };
+    const sortLabels = {
+        priority:"Prioridad",
+        date:"Día de cobro",
+        name:"Nombre A–Z",
+        loyalty:"Lealtad"
+    };
+
+    function clientByKey(key){
+        return typeof clientesDict!=="undefined" ? clientesDict?.[key] : null;
+    }
+
+    window.gxUpdateFilterSummary = function(){
+        const status = typeof currentStatusFilter!=="undefined" ? currentStatusFilter : "all";
+        const sort = document.getElementById("sort-by")?.value || "priority";
+        const summary = document.getElementById("gx-filter-summary");
+        const count = document.getElementById("gx-filter-active-count");
+        const active = (status!=="all"?1:0) + (sort!=="priority"?1:0);
+
+        if(summary) summary.textContent = `${statusLabels[status]||"Todos"} · ${sortLabels[sort]||"Prioridad"}`;
+        if(count){
+            count.textContent=String(active);
+            count.hidden=active===0;
+        }
+    };
+
+    window.gxToggleClientFilters = function(force){
+        const panel=document.getElementById("gx-client-command-panel");
+        const toggle=document.getElementById("gx-filter-toggle");
+        const drawer=document.getElementById("gx-filter-drawer");
+        if(!panel||!toggle||!drawer)return;
+
+        const open = typeof force==="boolean" ? force : !panel.classList.contains("filters-open");
+        panel.classList.toggle("filters-open",open);
+        toggle.setAttribute("aria-expanded",open?"true":"false");
+        drawer.setAttribute("aria-hidden",open?"false":"true");
+    };
+
+    const oldSetStatus = window.setStatusFilter || (typeof setStatusFilter==="function" ? setStatusFilter : null);
+    if(typeof oldSetStatus==="function"){
+        window.setStatusFilter=function(status,btn){
+            const result=oldSetStatus.call(this,status,btn);
+            setTimeout(window.gxUpdateFilterSummary,0);
+            return result;
+        };
+        try{ setStatusFilter=window.setStatusFilter; }catch{}
+    }
+
+    const oldClear = window.gxClearClientFilters;
+    if(typeof oldClear==="function"){
+        window.gxClearClientFilters=function(...args){
+            const result=oldClear.apply(this,args);
+            setTimeout(()=>{
+                window.gxUpdateFilterSummary();
+                window.gxToggleClientFilters(false);
+            },0);
+            return result;
+        };
+    }
+
+    // Si el bloque está desplegado y empiezas a navegar por clientes,
+    // vuelve automáticamente a su formato compacto.
+    window.addEventListener("scroll",()=>{
+        const y=window.scrollY||0;
+        if(y>lastWindowY+18 && document.getElementById("gx-client-command-panel")?.classList.contains("filters-open")){
+            window.gxToggleClientFilters(false);
+        }
+        lastWindowY=y;
+    },{passive:true});
+
+    function renderSessionPin(key){
+        const value=sessionPins.get(String(key));
+        const reveal=document.getElementById(`gx-pin-reveal-${key}`);
+        const output=document.getElementById(`gx-pin-value-${key}`);
+        if(!reveal||!output)return;
+        if(value){
+            output.textContent=value;
+            reveal.hidden=false;
+        }else{
+            output.textContent="••••";
+            reveal.hidden=true;
+        }
+    }
+
+    window.gxOpenPinEditor=function(key){
+        const editor=document.getElementById(`gx-pin-editor-${key}`);
+        const input=document.getElementById(`gx-pin-input-${key}`);
+        if(!editor||!input)return;
+        editor.hidden=false;
+        input.value="";
+        setTimeout(()=>input.focus(),20);
+    };
+
+    window.gxCancelPinEditor=function(key){
+        const editor=document.getElementById(`gx-pin-editor-${key}`);
+        const input=document.getElementById(`gx-pin-input-${key}`);
+        if(editor)editor.hidden=true;
+        if(input)input.value="";
+    };
+
+    window.gxSaveUniquePin=async function(key){
+        const c=clientByKey(key);
+        const input=document.getElementById(`gx-pin-input-${key}`);
+        const pin=String(input?.value||"").trim();
+        if(!c?._id)return alert("Cliente sin ID de Supabase.");
+        if(!/^\d{4}$/.test(pin))return alert("El PIN debe tener exactamente 4 dígitos.");
+
+        try{
+            const r=await window.gxOps("cambiar_pin_unico",{cliente_id:c._id,pin});
+            sessionPins.set(String(key),String(r.pin||pin));
+            window.gxCancelPinEditor(key);
+            renderSessionPin(key);
+        }catch(e){
+            alert(e?.message||"No se pudo actualizar el PIN.");
+        }
+    };
+
+    window.gxGenerateUniquePin=async function(key){
+        const c=clientByKey(key);
+        if(!c?._id)return alert("Cliente sin ID de Supabase.");
+        if(!confirm("Se reemplazará el PIN actual por uno nuevo y único. ¿Continuar?"))return;
+
+        try{
+            const r=await window.gxOps("generar_pin_unico",{cliente_id:c._id});
+            const pin=String(r.pin||"");
+            if(!/^\d{4}$/.test(pin))throw new Error("El servidor no devolvió un PIN válido.");
+            sessionPins.set(String(key),pin);
+            window.gxCancelPinEditor(key);
+            renderSessionPin(key);
+        }catch(e){
+            alert(e?.message||"No se pudo generar el PIN.");
+        }
+    };
+
+    async function copyText(text){
+        if(navigator.clipboard?.writeText){
+            await navigator.clipboard.writeText(text);
+            return;
+        }
+        const ta=document.createElement("textarea");
+        ta.value=text;
+        ta.style.position="fixed";
+        ta.style.opacity="0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+    }
+
+    window.gxCopyPin=async function(key){
+        const pin=sessionPins.get(String(key));
+        if(!pin)return alert("Genera o cambia el PIN primero.");
+        try{
+            await copyText(pin);
+        }catch{
+            alert(`PIN: ${pin}`);
+        }
+    };
+
+    window.gxCopyFullAccess=async function(key){
+        const c=clientByKey(key);
+        const pin=sessionPins.get(String(key));
+        if(!c||!pin)return alert("Genera o cambia el PIN primero.");
+        const parts=[
+            `GOXION · Acceso`,
+            `Nombre: ${c.nombre||""}`,
+            c.usuario_acceso ? `Usuario: ${c.usuario_acceso}` : "",
+            `PIN: ${pin}`
+        ].filter(Boolean).join("\n");
+        try{
+            await copyText(parts);
+        }catch{
+            alert(parts);
+        }
+    };
+
+    window.gxHideSessionPin=function(key){
+        sessionPins.delete(String(key));
+        renderSessionPin(key);
+    };
+
+    // Si vuelves a abrir la ficha durante la misma sesión,
+    // el PIN recién cambiado sigue disponible para copiarlo.
+    const oldOpenClient=window.gxOpenClientFocus;
+    if(typeof oldOpenClient==="function"){
+        window.gxOpenClientFocus=function(key,...args){
+            const result=oldOpenClient.call(this,key,...args);
+            setTimeout(()=>renderSessionPin(key),35);
+            return result;
+        };
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        setTimeout(window.gxUpdateFilterSummary,700);
+    });
+
+    console.info("GOXION Admin Beta 05: filtros compactos y gestión segura de PIN activos.");
 })();
 </script>
 
