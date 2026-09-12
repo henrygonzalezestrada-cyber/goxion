@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.8-beta-06">
+<html lang="es" data-goxion-version="1.0.9-beta-07">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -2578,6 +2578,450 @@ details.gx-client-ops-context{
     .gx-loyalty-level-badge{
         padding:5px 7px;
         font-size:.52rem;
+    }
+}
+</style>
+
+
+<style id="goxion-admin-beta-07-responsive-adaptive">
+/* =========================================================
+   GOXION ADMIN · BETA 07
+   Responsive adaptativo
+   ---------------------------------------------------------
+   IMPORTANTE:
+   - <= 840px: NO se redefine la experiencia móvil aprobada.
+   - >= 841px: tablet / iPad
+   - >= 1100px: laptop
+   - >= 1280px: desktop con navegación lateral
+   - >= 1600px: desktop amplio
+   ========================================================= */
+
+/* Base fluida solamente para pantallas mayores a móvil */
+@media (min-width:841px){
+    html{
+        font-size:clamp(14px,.82vw + 5px,16px);
+    }
+
+    .gx-admin-shell{
+        width:min(100%, 1760px);
+        max-width:none;
+        padding:
+            clamp(14px,1.55vw,26px)
+            clamp(16px,2vw,32px)
+            clamp(28px,3vw,48px);
+    }
+
+    .gx-main{
+        min-width:0;
+        container-type:inline-size;
+        container-name:gx-admin-main;
+    }
+
+    .gx-page-heading{
+        margin:
+            clamp(18px,2vw,28px)
+            2px
+            clamp(13px,1.4vw,20px);
+    }
+
+    .gx-page-heading h1{
+        font-size:clamp(1.75rem,2.35vw,2.65rem);
+    }
+
+    .gx-page-heading p{
+        max-width:64ch;
+        font-size:clamp(.78rem,.35vw + .62rem,.92rem);
+    }
+
+    /* Tarjetas e indicadores aprovechan ancho sin crecer indefinidamente */
+    .gx-home-priority-grid{
+        grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+        gap:clamp(7px,.7vw,11px);
+    }
+
+    .gx-home-priority{
+        min-height:clamp(88px,7vw,112px);
+    }
+
+    .gx-kpi-strip{
+        grid-template-columns:repeat(auto-fit,minmax(175px,1fr));
+    }
+
+    .gx-client-stats{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+
+    .gx-more-grid{
+        grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+    }
+
+    /* Lista de clientes: cards fluidas en tablet/PC */
+    .gx-clients-list{
+        grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));
+        gap:clamp(9px,.85vw,14px);
+        align-items:start;
+    }
+
+    .client-card{
+        margin-bottom:0!important;
+        min-width:0;
+    }
+
+    /* El panel de filtros deja de estirarse de forma absurda */
+    #tab-clientes .gx-command-panel{
+        max-width:100%;
+    }
+
+    #tab-clientes .gx-client-toolbar{
+        grid-template-columns:minmax(280px,1fr) auto;
+    }
+
+    /* Catálogo: tabla completa, no una tabla interminablemente ancha */
+    #tab-catalogo .gx-catalog-desktop{
+        width:100%;
+    }
+
+    #tab-catalogo .gx-catalog-scroll{
+        max-width:100%;
+        overflow:auto;
+    }
+
+    #tab-catalogo .catalog-table{
+        width:100%;
+    }
+
+    /* Ajustes: el contenido conserva una medida cómoda de lectura */
+    #tab-ajustes .gx-settings-view{
+        min-width:0;
+    }
+
+    #tab-ajustes .gx-settings-view > .panel{
+        width:100%;
+    }
+
+    /* Modales administrativos se centran en tablet */
+    .gx-selection-modal{
+        width:min(620px,calc(100vw - 48px));
+    }
+
+    /* Ficha cliente = diálogo centrado en tablet/iPad */
+    .gx-client-focus{
+        align-items:center;
+        justify-content:center;
+        padding:clamp(18px,3vw,36px);
+    }
+
+    .gx-focus-sheet{
+        width:min(820px,calc(100vw - 48px));
+        height:min(88dvh,920px);
+        border:1px solid rgba(0,242,254,.16);
+        border-radius:24px;
+        animation:gxDesktopDialogIn .26s cubic-bezier(.16,1,.3,1);
+    }
+
+    .gx-focus-handle{
+        display:none;
+    }
+
+    .gx-focus-backdrop{
+        background:rgba(0,0,0,.62);
+        backdrop-filter:blur(7px);
+        -webkit-backdrop-filter:blur(7px);
+    }
+
+    .gx-focus-header{
+        padding:11px 14px 10px;
+    }
+
+    .gx-focus-body{
+        padding:13px 15px 24px;
+    }
+
+    @keyframes gxDesktopDialogIn{
+        from{opacity:0;transform:translateY(16px) scale(.985)}
+        to{opacity:1;transform:translateY(0) scale(1)}
+    }
+}
+
+/* =========================================================
+   TABLET / IPAD PORTRAIT — 841 a 1099
+   ========================================================= */
+@media (min-width:841px) and (max-width:1099px){
+    .gx-admin-shell{
+        padding-left:clamp(16px,2.4vw,24px);
+        padding-right:clamp(16px,2.4vw,24px);
+    }
+
+    .gx-topbar{
+        top:10px;
+    }
+
+    .gx-desktop-nav{
+        position:sticky;
+        top:78px;
+        z-index:3500;
+        width:100%;
+        max-width:max-content;
+        margin-bottom:15px;
+        overflow-x:auto;
+        scrollbar-width:none;
+    }
+
+    .gx-desktop-nav::-webkit-scrollbar{display:none}
+
+    .gx-home-priority-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    #tab-resumen .gx-kpi-strip{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .gx-clients-list{
+        grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+    }
+
+    .gx-loyalty-config{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .gx-loyalty-reason{
+        grid-column:1/-1;
+    }
+}
+
+/* =========================================================
+   LAPTOP — 1100 a 1279
+   ========================================================= */
+@media (min-width:1100px) and (max-width:1279px){
+    .gx-desktop-nav{
+        position:sticky;
+        top:84px;
+        z-index:3500;
+    }
+
+    /* Inicio se convierte en dashboard de dos columnas */
+    #tab-resumen.active{
+        display:grid;
+        grid-template-columns:minmax(0,1.08fr) minmax(360px,.92fr);
+        column-gap:clamp(14px,1.5vw,22px);
+        align-items:start;
+    }
+
+    #tab-resumen > .gx-page-heading,
+    #tab-resumen > .gx-home-priority-grid{
+        grid-column:1/-1;
+    }
+
+    #tab-resumen > .gx-upcoming-section{
+        grid-column:1;
+        margin-top:0;
+    }
+
+    #tab-resumen > .gx-business-panel{
+        grid-column:2;
+        margin-top:24px;
+    }
+
+    #tab-resumen .gx-business-panel .gx-kpi-strip{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .gx-clients-list{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+/* =========================================================
+   DESKTOP — >=1280
+   Navegación lateral; contenido a la derecha.
+   ========================================================= */
+@media (min-width:1280px){
+    .gx-admin-shell{
+        display:grid;
+        grid-template-columns:210px minmax(0,1fr);
+        grid-template-rows:auto minmax(0,1fr);
+        column-gap:clamp(18px,1.8vw,30px);
+        align-items:start;
+    }
+
+    .gx-topbar{
+        grid-column:1/-1;
+        grid-row:1;
+        top:12px;
+        margin-bottom:18px;
+    }
+
+    .gx-desktop-nav{
+        grid-column:1;
+        grid-row:2;
+        position:sticky;
+        top:92px;
+        z-index:3200;
+        width:100%;
+        display:flex;
+        flex-direction:column;
+        align-items:stretch;
+        gap:5px;
+        margin:0;
+        padding:7px;
+        border-radius:17px;
+    }
+
+    .gx-nav-chip{
+        width:100%;
+        min-height:43px;
+        display:flex;
+        align-items:center;
+        justify-content:flex-start;
+        padding:10px 12px;
+        text-align:left;
+    }
+
+    .gx-main{
+        grid-column:2;
+        grid-row:2;
+        width:100%;
+        min-width:0;
+    }
+
+    /* Dashboard */
+    #tab-resumen.active{
+        display:grid;
+        grid-template-columns:minmax(0,1.15fr) minmax(380px,.85fr);
+        column-gap:clamp(16px,1.5vw,26px);
+        align-items:start;
+    }
+
+    #tab-resumen > .gx-page-heading,
+    #tab-resumen > .gx-home-priority-grid{
+        grid-column:1/-1;
+    }
+
+    #tab-resumen > .gx-upcoming-section{
+        grid-column:1;
+        margin-top:0;
+    }
+
+    #tab-resumen > .gx-business-panel{
+        grid-column:2;
+        margin-top:24px;
+    }
+
+    #tab-resumen .gx-business-panel .gx-kpi-strip{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    /* Clientes aprovechan ancho de PC */
+    .gx-clients-list{
+        grid-template-columns:repeat(auto-fit,minmax(360px,1fr));
+    }
+
+    /* La ficha deja de ser bottom sheet: se convierte en panel lateral */
+    .gx-client-focus{
+        justify-content:flex-end;
+        align-items:stretch;
+        padding:16px;
+    }
+
+    .gx-focus-sheet{
+        width:min(720px,48vw);
+        height:calc(100dvh - 32px);
+        max-height:none;
+        margin:0;
+        border-radius:24px;
+        animation:gxDesktopPanelIn .30s cubic-bezier(.16,1,.3,1);
+    }
+
+    .gx-focus-backdrop{
+        background:rgba(0,0,0,.48);
+    }
+
+    @keyframes gxDesktopPanelIn{
+        from{opacity:0;transform:translateX(38px) scale(.992)}
+        to{opacity:1;transform:translateX(0) scale(1)}
+    }
+
+    /* Catálogo en desktop: cabecera fija dentro de la tabla */
+    #tab-catalogo .catalog-table thead th{
+        position:sticky;
+        top:0;
+        z-index:5;
+        background:#0b0b11;
+        box-shadow:0 1px 0 rgba(255,255,255,.06);
+    }
+
+    /* Ajustes más cómodos en pantallas anchas */
+    #tab-ajustes .gx-settings-tabs{
+        position:sticky;
+        top:92px;
+        z-index:3000;
+        background:rgba(10,10,15,.90);
+        backdrop-filter:blur(16px);
+        -webkit-backdrop-filter:blur(16px);
+    }
+
+    #tab-ajustes .gx-loyalty-bulk-panel{
+        max-width:none;
+    }
+}
+
+/* =========================================================
+   DESKTOP AMPLIO — >=1600
+   No se estira el contenido sin límite.
+   ========================================================= */
+@media (min-width:1600px){
+    .gx-admin-shell{
+        grid-template-columns:224px minmax(0,1fr);
+    }
+
+    .gx-main{
+        max-width:1480px;
+        width:100%;
+    }
+
+    #tab-resumen.active{
+        grid-template-columns:minmax(0,1.2fr) minmax(430px,.8fr);
+    }
+
+    .gx-clients-list{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+
+    .gx-focus-sheet{
+        width:min(760px,42vw);
+    }
+}
+
+/* =========================================================
+   CONTAINER QUERIES
+   Ajustes locales según el espacio REAL del contenido,
+   no únicamente el ancho de la ventana.
+   ========================================================= */
+@container gx-admin-main (min-width:900px){
+    .gx-loyalty-preview{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+
+    .gx-loyalty-client-list{
+        max-height:min(430px,48vh);
+    }
+}
+
+@container gx-admin-main (min-width:1120px){
+    #tab-ajustes .gx-loyalty-config{
+        grid-template-columns:190px 150px minmax(260px,1fr);
+    }
+
+    #tab-ajustes .gx-loyalty-reason{
+        grid-column:auto;
+    }
+}
+
+/* Accesibilidad y estabilidad visual */
+@media (prefers-reduced-motion:reduce){
+    .gx-focus-sheet{
+        animation:none!important;
     }
 }
 </style>
@@ -6557,7 +7001,7 @@ details.gx-client-ops-context{
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 06 · v1.0.8-beta-06</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 07 · v1.0.9-beta-07</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -7831,6 +8275,29 @@ details.gx-client-ops-context{
     });
 
     console.info("GOXION Admin Beta 06: lealtad masiva y ficha de cliente refinada.");
+})();
+</script>
+
+
+<script id="goxion-admin-beta-07-responsive-controller">
+(() => {
+    function gxResponsiveMode(){
+        const w=window.innerWidth;
+        if(w<=840)return "mobile";
+        if(w<1100)return "tablet";
+        if(w<1280)return "laptop";
+        if(w<1600)return "desktop";
+        return "desktop-wide";
+    }
+
+    function applyMode(){
+        document.documentElement.dataset.gxResponsiveMode=gxResponsiveMode();
+    }
+
+    applyMode();
+    window.addEventListener("resize",applyMode,{passive:true});
+
+    console.info("GOXION Admin Beta 07: responsive adaptativo activo.", gxResponsiveMode());
 })();
 </script>
 
