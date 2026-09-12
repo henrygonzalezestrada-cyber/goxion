@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.5-beta-03">
+<html lang="es" data-goxion-version="1.0.6-beta-04">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -1500,6 +1500,341 @@ details.gx-client-ops-context{
 }
 </style>
 
+
+<style id="goxion-admin-beta-04-refinement">
+/* =========================================================
+   GOXION ADMIN · BETA 04
+   Menos repetición · mayor densidad útil · catálogo selectivo
+   ========================================================= */
+
+/* Negocio: indicadores, ya no enlaces duplicados. */
+.gx-business-mini-grid>div{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:9px 10px;
+    border:1px solid var(--gx-line);
+    border-radius:11px;
+    background:rgba(255,255,255,.02);
+    color:#fff;
+}
+.gx-business-mini-grid>div strong{color:var(--neon-blue);font-size:.95rem}
+.gx-business-mini-grid>div span{font-size:.58rem;font-weight:800}
+
+/* Catálogo móvil nuevo. */
+.gx-catalog-mobile{display:none}
+.gx-catalog-mobile-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:8px;
+}
+.gx-catalog-mobile-toolbar>div{
+    display:flex;
+    flex-direction:column;
+}
+.gx-catalog-mobile-toolbar strong{
+    margin-top:1px;
+    font-size:.77rem;
+}
+.gx-catalog-mobile-toolbar>button{
+    width:36px;
+    height:36px;
+    padding:0;
+    border:1px solid rgba(0,242,254,.16);
+    border-radius:11px;
+    background:rgba(0,242,254,.055);
+    color:var(--neon-blue);
+    font-size:1.1rem;
+    font-weight:900;
+}
+.gx-catalog-mobile-list{
+    display:grid;
+    gap:6px;
+}
+.gx-catalog-platform-row{
+    width:100%;
+    min-height:54px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center;
+    gap:9px;
+    padding:8px 10px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:12px;
+    background:rgba(255,255,255,.018);
+    color:#fff;
+    text-align:left;
+}
+.gx-catalog-platform-copy{min-width:0}
+.gx-catalog-platform-copy strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.7rem;
+}
+.gx-catalog-platform-copy small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.55rem;
+}
+.gx-catalog-platform-stock{
+    min-width:30px;
+    padding:4px 6px;
+    border-radius:999px;
+    border:1px solid rgba(0,255,157,.12);
+    background:rgba(0,255,157,.045);
+    color:#7de8b2;
+    font-size:.55rem;
+    font-weight:900;
+    text-align:center;
+}
+.gx-catalog-platform-stock.warn{
+    color:#ffd18a;
+    border-color:rgba(255,170,0,.16);
+    background:rgba(255,170,0,.05);
+}
+.gx-catalog-platform-stock.full{
+    color:#ff94ad;
+    border-color:rgba(255,51,102,.16);
+    background:rgba(255,51,102,.05);
+}
+.gx-catalog-platform-row>em{
+    font-style:normal;
+    color:var(--neon-blue);
+    font-size:.9rem;
+}
+
+.gx-catalog-mobile-editor{
+    border:1px solid rgba(0,242,254,.12);
+    border-radius:15px;
+    background:rgba(255,255,255,.018);
+    overflow:hidden;
+}
+.gx-catalog-mobile-editor[hidden]{display:none!important}
+.gx-catalog-editor-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 10px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+}
+.gx-catalog-editor-back{
+    width:34px;height:34px;
+    border:0;
+    border-radius:10px;
+    background:rgba(255,255,255,.04);
+    color:var(--neon-blue);
+    font-size:1rem;
+}
+.gx-catalog-editor-title{min-width:0;flex:1}
+.gx-catalog-editor-title strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.74rem;
+}
+.gx-catalog-editor-title small{
+    display:block;
+    margin-top:1px;
+    color:var(--text-muted);
+    font-size:.54rem;
+}
+.gx-catalog-editor-stock{
+    padding:4px 7px;
+    border-radius:999px;
+    background:rgba(0,255,157,.05);
+    color:#7de8b2;
+    font-size:.55rem;
+    font-weight:900;
+}
+.gx-catalog-editor-body{
+    padding:9px 10px 10px;
+}
+.gx-catalog-editor-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+}
+.gx-catalog-editor-field{
+    display:block;
+    min-width:0;
+}
+.gx-catalog-editor-field.full{grid-column:1/-1}
+.gx-catalog-editor-field>span{
+    display:block;
+    margin-bottom:3px;
+    color:var(--text-muted);
+    font-size:.51rem;
+    font-weight:900;
+    text-transform:uppercase;
+}
+.gx-catalog-editor-field input{
+    width:100%;
+    min-height:36px;
+    padding:7px 8px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:9px;
+    background:#101017;
+    color:#fff;
+    font:inherit;
+    font-size:.64rem;
+    outline:none;
+}
+.gx-catalog-editor-field input:focus{
+    border-color:rgba(0,242,254,.45);
+}
+.gx-catalog-editor-actions{
+    display:grid;
+    grid-template-columns:1fr auto;
+    gap:7px;
+    margin-top:9px;
+    padding-top:9px;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+.gx-catalog-editor-actions button{
+    min-height:37px;
+    padding:0 10px;
+    border-radius:9px;
+    font:inherit;
+    font-size:.58rem;
+    font-weight:900;
+}
+.gx-catalog-editor-sync{
+    border:1px solid rgba(0,242,254,.14);
+    background:rgba(0,242,254,.045);
+    color:#93f9ff;
+}
+.gx-catalog-editor-delete{
+    border:1px solid rgba(255,51,102,.14);
+    background:rgba(255,51,102,.04);
+    color:#ff91ab;
+}
+
+/* Compactación general de las superficies nuevas. */
+@media(max-width:840px){
+    .gx-page-heading{
+        margin:12px 2px 9px!important;
+    }
+    .gx-page-heading h1{
+        font-size:1.25rem!important;
+    }
+    .gx-page-heading p{
+        margin-top:2px;
+        font-size:.68rem!important;
+        line-height:1.35;
+    }
+
+    .gx-home-priority-grid{
+        gap:6px!important;
+        margin-bottom:14px!important;
+    }
+    .gx-home-priority{
+        min-height:72px!important;
+        padding:8px 9px!important;
+        border-radius:12px!important;
+    }
+    .gx-home-priority strong{
+        margin:4px 0 0!important;
+        font-size:1.15rem!important;
+    }
+    .gx-home-priority span{
+        font-size:.48rem!important;
+    }
+    .gx-home-priority small{
+        font-size:.58rem!important;
+    }
+
+    .gx-next-payments-list{gap:5px!important}
+    .gx-next-payment{
+        min-height:49px!important;
+        padding:7px 9px!important;
+        border-radius:11px!important;
+    }
+
+    .gx-business-panel{
+        margin-top:14px!important;
+        border-radius:13px!important;
+    }
+    .gx-business-panel>summary{
+        padding:10px 11px!important;
+    }
+    .gx-business-panel-body{
+        padding:0 9px 10px!important;
+    }
+    .gx-business-panel .gx-kpi-strip{
+        gap:6px!important;
+    }
+    .gx-business-panel .gx-kpi-card{
+        min-height:72px!important;
+        padding:8px 9px!important;
+    }
+    .gx-business-mini-grid{
+        gap:6px!important;
+    }
+    .gx-business-mini-grid>div{
+        padding:7px 8px!important;
+        border-radius:9px!important;
+    }
+
+    .client-card{
+        border-radius:14px!important;
+        margin-bottom:7px!important;
+    }
+    .gx-client-card-header{
+        padding:9px 10px 5px!important;
+    }
+    .gx-client-brief{
+        padding:0 10px 8px!important;
+    }
+    .gx-client-name-line h3{
+        font-size:.91rem!important;
+    }
+    .gx-client-money strong{
+        font-size:.98rem!important;
+    }
+
+    .gx-more-grid{
+        gap:6px!important;
+    }
+    .gx-more-grid>button{
+        min-height:54px!important;
+        padding:7px 9px!important;
+        border-radius:12px!important;
+        grid-template-columns:31px minmax(0,1fr) auto!important;
+    }
+    .gx-more-grid>button>span{
+        width:30px!important;
+        height:30px!important;
+        border-radius:9px!important;
+    }
+    .gx-more-grid strong{
+        font-size:.66rem!important;
+    }
+    .gx-more-grid small{
+        font-size:.53rem!important;
+    }
+
+    .gx-mobile-op-item{
+        padding:9px 10px!important;
+        border-radius:11px!important;
+    }
+
+    /* En móvil desaparece la tabla completa: lista → detalle. */
+    .gx-catalog-mobile{display:block}
+    .gx-catalog-desktop{display:none!important}
+}
+
+/* Desktop conserva tabla tradicional. */
+@media(min-width:841px){
+    .gx-catalog-mobile{display:none!important}
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -1547,7 +1882,6 @@ details.gx-client-ops-context{
                 <section class="gx-upcoming-section">
                     <div class="gx-section-head">
                         <div><span class="gx-eyebrow">Cobro</span><h2>Próximos vencimientos</h2></div>
-                        <button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button>
                     </div>
                     <div id="gx-next-payments-list" class="gx-next-payments-list">
                         <div class="gx-empty-inline">Calculando próximos cobros…</div>
@@ -1561,20 +1895,19 @@ details.gx-client-ops-context{
                     </summary>
                     <div class="gx-business-panel-body">
                         <div class="gx-kpi-strip">
-                            <button class="gx-kpi-card gx-kpi-blue" onclick="goAdminTab('tab-clientes')"><span class="gx-kpi-label">Ingresos</span><strong id="kpi-ingresos">$0.00</strong><small>Brutos mensuales</small></button>
+                            <div class="gx-kpi-card gx-kpi-blue"><span class="gx-kpi-label">Ingresos</span><strong id="kpi-ingresos">$0.00</strong><small>Brutos mensuales</small></div>
                             <div class="gx-kpi-card gx-kpi-red"><span class="gx-kpi-label">Costos</span><strong id="kpi-costos">$0.00</strong><small>Inversión mensual</small></div>
                             <div class="gx-kpi-card gx-kpi-green"><span class="gx-kpi-label">Ganancia</span><strong id="kpi-ganancias">$0.00</strong><small>Neta estimada</small></div>
                             <div class="gx-kpi-card gx-kpi-purple"><span class="gx-kpi-label">Margen</span><strong id="kpi-margen">0%</strong><small>Rentabilidad</small></div>
                         </div>
 
                         <div class="gx-business-mini-grid">
-                            <button onclick="gxShowBenefitReady()"><strong id="gx-count-benefits">0</strong><span>Beneficios listos</span></button>
-                            <button onclick="goAdminTab('tab-catalogo')"><strong id="gx-count-stock">0</strong><span>Stock bajo / lleno</span></button>
+                            <div><strong id="gx-count-benefits">0</strong><span>Beneficios listos</span></div>
+                            <div><strong id="gx-count-stock">0</strong><span>Stock bajo / lleno</span></div>
                         </div>
 
                         <div class="gx-section-head gx-section-space">
                             <div><span class="gx-eyebrow">Panorama</span><h2>Estado de clientes</h2></div>
-                            <button class="gx-text-action" onclick="goAdminTab('tab-clientes')">Ver clientes →</button>
                         </div>
                         <div class="gx-client-stats">
                             <div><strong id="gx-count-total">0</strong><span>Total</span></div>
@@ -1603,8 +1936,34 @@ details.gx-client-ops-context{
             </section>
 
             <section id="tab-catalogo" class="tab-content">
-                <div class="gx-page-heading"><div><div class="gx-eyebrow">Inventario</div><h1>Catálogo</h1><p>Precios, capacidad, ocupación y disponibilidad.</p></div><button class="gx-primary-action desktop-only" onclick="addGlobalService()">＋ Servicio</button></div>
-                <div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Servicios</span><h2>Catálogo & inventario</h2></div><button class="gx-secondary-action" onclick="addGlobalService()">＋ Añadir servicio</button></div><div class="gx-catalog-scroll"><table class="catalog-table"><thead><tr><th>Servicio</th><th>Etiqueta</th><th>Beneficios</th><th>Ctas</th><th>Venta</th><th>Costo</th><th>Lím.</th><th>Fijo</th><th>Disp.</th><th></th></tr></thead><tbody id="global-services-container"></tbody></table></div></div>
+                <div class="gx-page-heading">
+                    <div><div class="gx-eyebrow">Inventario</div><h1>Catálogo</h1><p>Selecciona una plataforma para administrar sus datos.</p></div>
+                    <button class="gx-primary-action desktop-only" onclick="addGlobalService()">＋ Servicio</button>
+                </div>
+
+                <div class="gx-catalog-mobile" id="gx-catalog-mobile">
+                    <div class="gx-catalog-mobile-toolbar">
+                        <div>
+                            <span class="gx-eyebrow">Plataformas</span>
+                            <strong id="gx-catalog-mobile-count">0 servicios</strong>
+                        </div>
+                        <button type="button" onclick="gxAddCatalogServiceMobile()">＋</button>
+                    </div>
+                    <div id="gx-catalog-mobile-list" class="gx-catalog-mobile-list"></div>
+                    <div id="gx-catalog-mobile-editor" class="gx-catalog-mobile-editor" hidden></div>
+                </div>
+
+                <div class="panel gx-panel-modern gx-catalog-desktop">
+                    <div class="gx-panel-title-row">
+                        <div><span class="gx-eyebrow">Servicios</span><h2>Catálogo & inventario</h2></div>
+                    </div>
+                    <div class="gx-catalog-scroll">
+                        <table class="catalog-table">
+                            <thead><tr><th>Servicio</th><th>Etiqueta</th><th>Beneficios</th><th>Ctas</th><th>Venta</th><th>Costo</th><th>Lím.</th><th>Fijo</th><th>Disp.</th><th></th></tr></thead>
+                            <tbody id="global-services-container"></tbody>
+                        </table>
+                    </div>
+                </div>
             </section>
 
             <section id="tab-ajustes" class="tab-content">
@@ -1676,7 +2035,7 @@ details.gx-client-ops-context{
                     <button onclick="gxOpenMoreDestination('missions')"><span>🎯</span><div><strong>Automatizaciones</strong><small>Misiones globales y asignaciones</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('app')"><span>✨</span><div><strong>Experiencia</strong><small>Promociones y comportamiento de la app</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('alerts')"><span>⚠</span><div><strong>Incidencias</strong><small>Estado operativo visible para clientes</small></div><em>›</em></button>
-                    <button onclick="goAdminTab('tab-resumen')"><span>▦</span><div><strong>Finanzas</strong><small>Ingresos, costos, margen y panorama</small></div><em>›</em></button>
+
                 </div>
             </section>
 
@@ -5325,7 +5684,7 @@ details.gx-client-ops-context{
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 03 · v1.0.5-beta-03</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 04 · v1.0.6-beta-04</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -5591,7 +5950,7 @@ details.gx-client-ops-context{
         },650);
     });
 
-    console.info("GOXION Admin Beta 03: arquitectura móvil progresiva y prioridad operativa.");
+    console.info("GOXION Admin Beta 04: navegación depurada, KPIs persistentes y catálogo selectivo.");
 })();
 </script>
 
@@ -5903,7 +6262,8 @@ details.gx-client-ops-context{
 
     function responsiveBusinessPanel(){
         const d=document.getElementById("gx-business-panel");
-        if(!d)return;
+        if(!d || d.dataset.gxInitialised==="1") return;
+        d.dataset.gxInitialised="1";
         if(isMobile()) d.removeAttribute("open");
         else d.setAttribute("open","");
     }
@@ -5924,9 +6284,207 @@ details.gx-client-ops-context{
             renderMobileOps();
         },700);
     });
-    window.addEventListener("resize",responsiveBusinessPanel);
 
     console.info("GOXION Admin Beta 03: arquitectura móvil progresiva activa.");
+})();
+</script>
+
+
+<script id="goxion-admin-beta-04-controller">
+(() => {
+    let gxCatalogSelectedIndex = null;
+
+    const esc = value => String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+    function isMobile(){
+        return window.matchMedia("(max-width:840px)").matches;
+    }
+
+    function catalogStock(index){
+        const row=document.querySelectorAll("#global-services-container tr")[index];
+        const badge=row?.querySelector(".inv-badge");
+        const raw=(badge?.textContent||"").replace(/[^\d-]/g,"");
+        const value=Number(raw||0);
+        return {
+            value:Number.isFinite(value)?Math.max(0,value):0,
+            title:badge?.title||"",
+            state:badge?.classList.contains("inv-full")?"full":
+                  badge?.classList.contains("inv-warn")?"warn":"ok"
+        };
+    }
+
+    function renderCatalogList(){
+        const list=document.getElementById("gx-catalog-mobile-list");
+        const editor=document.getElementById("gx-catalog-mobile-editor");
+        const count=document.getElementById("gx-catalog-mobile-count");
+        if(!list || !editor || typeof configGlobal==="undefined") return;
+
+        const services=Array.isArray(configGlobal.serviciosGlobales)?configGlobal.serviciosGlobales:[];
+        if(count) count.textContent=`${services.length} servicio${services.length===1?"":"s"}`;
+
+        if(gxCatalogSelectedIndex!==null && !services[gxCatalogSelectedIndex]){
+            gxCatalogSelectedIndex=null;
+        }
+
+        if(gxCatalogSelectedIndex!==null){
+            list.style.display="none";
+            renderCatalogEditor(gxCatalogSelectedIndex);
+            return;
+        }
+
+        editor.hidden=true;
+        editor.innerHTML="";
+        list.style.display="grid";
+
+        if(!services.length){
+            list.innerHTML='<div class="gx-empty-inline">Aún no hay servicios en el catálogo.</div>';
+            return;
+        }
+
+        list.innerHTML=services.map((srv,index)=>{
+            const stock=catalogStock(index);
+            return `<button type="button" class="gx-catalog-platform-row" onclick="gxOpenMobileCatalog(${index})">
+                <div class="gx-catalog-platform-copy">
+                    <strong>${esc(srv.nombre||"Servicio")}</strong>
+                    <small>Venta $${Number(srv.precio||0).toFixed(0)} · Costo $${Number(srv.costo||0).toFixed(0)}</small>
+                </div>
+                <span class="gx-catalog-platform-stock ${stock.state}">${stock.value}</span>
+                <em>›</em>
+            </button>`;
+        }).join("");
+    }
+
+    function renderCatalogEditor(index){
+        const list=document.getElementById("gx-catalog-mobile-list");
+        const editor=document.getElementById("gx-catalog-mobile-editor");
+        const srv=configGlobal?.serviciosGlobales?.[index];
+        if(!editor || !srv) return;
+
+        const stock=catalogStock(index);
+        const cuentas=Number(srv.cuentas||1);
+        const limite=Number(srv.limite||0);
+        const fixed=srv.stock_manual===undefined || srv.stock_manual===null ? "" : srv.stock_manual;
+
+        if(list) list.style.display="none";
+        editor.hidden=false;
+        editor.innerHTML=`<div class="gx-catalog-editor-head">
+            <button type="button" class="gx-catalog-editor-back" onclick="gxCloseMobileCatalog()">‹</button>
+            <div class="gx-catalog-editor-title">
+                <strong>${esc(srv.nombre||"Servicio")}</strong>
+                <small>${cuentas} cuenta${cuentas===1?"":"s"} · límite ${limite} por cuenta</small>
+            </div>
+            <span class="gx-catalog-editor-stock">${stock.value} disp.</span>
+        </div>
+        <div class="gx-catalog-editor-body">
+            <div class="gx-catalog-editor-grid">
+                <label class="gx-catalog-editor-field full">
+                    <span>Nombre</span>
+                    <input type="text" value="${esc(srv.nombre||"")}" onchange="updateGlobalService(${index},'nombre',this.value)">
+                </label>
+                <label class="gx-catalog-editor-field">
+                    <span>Venta</span>
+                    <input type="number" inputmode="decimal" value="${Number(srv.precio||0)}" onchange="updateGlobalService(${index},'precio',this.value)">
+                </label>
+                <label class="gx-catalog-editor-field">
+                    <span>Costo</span>
+                    <input type="number" inputmode="decimal" value="${Number(srv.costo||0)}" onchange="updateGlobalService(${index},'costo',this.value)">
+                </label>
+                <label class="gx-catalog-editor-field">
+                    <span>Cuentas</span>
+                    <input type="number" inputmode="numeric" value="${cuentas}" onchange="updateGlobalService(${index},'cuentas',this.value)">
+                </label>
+                <label class="gx-catalog-editor-field">
+                    <span>Límite</span>
+                    <input type="number" inputmode="numeric" value="${limite}" onchange="updateGlobalService(${index},'limite',this.value)">
+                </label>
+                <label class="gx-catalog-editor-field full">
+                    <span>Stock fijo · vacío = automático</span>
+                    <input type="number" inputmode="numeric" placeholder="Automático" value="${esc(fixed)}" onchange="updateGlobalService(${index},'stock_manual',this.value)">
+                </label>
+                <label class="gx-catalog-editor-field full">
+                    <span>Etiqueta</span>
+                    <input type="text" placeholder="Ej. Promo" value="${esc(srv.etiqueta||"")}" onchange="updateGlobalService(${index},'etiqueta',this.value)">
+                </label>
+                <label class="gx-catalog-editor-field full">
+                    <span>Beneficios</span>
+                    <input type="text" placeholder="Ej. 4K, 1 perfil…" value="${esc(srv.beneficios||"")}" onchange="updateGlobalService(${index},'beneficios',this.value)">
+                </label>
+            </div>
+            <div class="gx-catalog-editor-actions">
+                <button type="button" class="gx-catalog-editor-sync" onclick="sincronizarPrecioMasivo(${index})">Sincronizar precio</button>
+                <button type="button" class="gx-catalog-editor-delete" onclick="gxRemoveCatalogServiceMobile(${index})">Eliminar</button>
+            </div>
+        </div>`;
+    }
+
+    window.gxOpenMobileCatalog=function(index){
+        gxCatalogSelectedIndex=Number(index);
+        renderCatalogList();
+        document.getElementById("gx-catalog-mobile")?.scrollIntoView({behavior:"smooth",block:"start"});
+    };
+
+    window.gxCloseMobileCatalog=function(){
+        gxCatalogSelectedIndex=null;
+        renderCatalogList();
+    };
+
+    window.gxAddCatalogServiceMobile=function(){
+        const before=Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales.length:0;
+        addGlobalService();
+        const after=Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales.length:0;
+        if(after>before){
+            gxCatalogSelectedIndex=after-1;
+            renderCatalogList();
+        }
+    };
+
+    window.gxRemoveCatalogServiceMobile=function(index){
+        const before=Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales.length:0;
+        removeGlobalService(index);
+        const after=Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales.length:0;
+        if(after<before){
+            gxCatalogSelectedIndex=null;
+            renderCatalogList();
+        }
+    };
+
+    // Cualquier actualización del catálogo conserva la selección móvil actual.
+    const previousRender=window.renderGlobalServicesUI || renderGlobalServicesUI;
+    if(typeof previousRender==="function"){
+        window.renderGlobalServicesUI=function(...args){
+            const result=previousRender.apply(this,args);
+            setTimeout(renderCatalogList,0);
+            return result;
+        };
+        // La función global original puede estar referenciada por nombre léxico;
+        // sincronizamos también esa referencia cuando el navegador lo permite.
+        try{ renderGlobalServicesUI=window.renderGlobalServicesUI; }catch{}
+    }
+
+    // Cuando se entra al catálogo desde Más o escritorio, siempre refresca lista.
+    const previousTab=window.goAdminTab;
+    if(typeof previousTab==="function"){
+        window.goAdminTab=function(id,...args){
+            const result=previousTab.call(this,id,...args);
+            if(id==="tab-catalogo"){
+                setTimeout(()=>{
+                    if(isMobile()) renderCatalogList();
+                },20);
+            }
+            return result;
+        };
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        setTimeout(renderCatalogList,800);
+    });
+
+    console.info("GOXION Admin Beta 04: catálogo móvil selectivo y navegación depurada activos.");
 })();
 </script>
 
