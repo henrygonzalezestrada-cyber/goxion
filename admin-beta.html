@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.9-beta-07">
+<html lang="es" data-goxion-version="1.0.10-beta-08">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -3026,6 +3026,330 @@ details.gx-client-ops-context{
 }
 </style>
 
+
+<style id="goxion-admin-beta-08-trato-justo-masivo">
+/* =========================================================
+   GOXION ADMIN · BETA 08
+   Trato Justo masivo
+   ========================================================= */
+
+.gx-tj-bulk-panel{
+    max-width:980px;
+}
+.gx-tj-bulk-title{
+    align-items:flex-start!important;
+}
+.gx-tj-bulk-badge{
+    flex:0 0 auto;
+    min-width:50px;
+    padding:6px 9px;
+    border:1px solid rgba(0,242,254,.16);
+    border-radius:999px;
+    background:rgba(0,242,254,.045);
+    color:#a4fbff;
+    text-align:center;
+    font-size:.62rem;
+    font-weight:900;
+}
+.gx-tj-bulk-config{
+    display:grid;
+    grid-template-columns:minmax(180px,1.35fr) 150px 180px minmax(210px,1.35fr);
+    gap:8px;
+    margin-top:12px;
+}
+.gx-tj-bulk-field{
+    min-width:0;
+}
+.gx-tj-bulk-field>span,
+.gx-tj-bulk-days>span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--text-muted);
+    font-size:.52rem;
+    font-weight:900;
+    text-transform:uppercase;
+}
+.gx-tj-bulk-field input,
+.gx-tj-bulk-field select{
+    width:100%;
+    min-height:39px;
+    padding:7px 9px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:9px;
+    background:#0e0e15;
+    color:#fff;
+    font:inherit;
+    font-size:.64rem;
+    outline:none;
+}
+.gx-tj-bulk-days{
+    min-width:0;
+}
+.gx-tj-bulk-days>div{
+    min-height:39px;
+    display:grid;
+    grid-template-columns:34px 1fr 34px;
+    align-items:center;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:9px;
+    overflow:hidden;
+    background:#0e0e15;
+}
+.gx-tj-bulk-days button{
+    height:100%;
+    border:0;
+    background:rgba(255,255,255,.025);
+    color:var(--neon-blue);
+    font:inherit;
+    font-size:.86rem;
+    font-weight:900;
+}
+.gx-tj-bulk-days strong{
+    text-align:center;
+    font-size:.72rem;
+}
+.gx-tj-bulk-days small{
+    display:block;
+    margin-top:3px;
+    color:#68758a;
+    font-size:.48rem;
+}
+
+.gx-tj-bulk-selection-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:15px;
+}
+.gx-tj-bulk-selection-head strong{
+    display:block;
+    font-size:.72rem;
+}
+.gx-tj-bulk-selection-head small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.55rem;
+}
+.gx-tj-bulk-selection-actions{
+    display:flex;
+    gap:5px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+.gx-tj-bulk-selection-actions button{
+    min-height:30px;
+    padding:0 8px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:8px;
+    background:rgba(255,255,255,.02);
+    color:#aeb8ca;
+    font:inherit;
+    font-size:.53rem;
+    font-weight:850;
+}
+
+.gx-tj-bulk-search{
+    min-height:38px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:9px;
+    padding:0 9px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:10px;
+    background:rgba(255,255,255,.018);
+}
+.gx-tj-bulk-search span{color:var(--neon-blue)}
+.gx-tj-bulk-search input{
+    flex:1;
+    min-width:0;
+    border:0;
+    background:transparent;
+    color:#fff;
+    font:inherit;
+    font-size:.65rem;
+    outline:none;
+}
+
+.gx-tj-bulk-preview{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    margin:9px 0;
+}
+.gx-tj-bulk-preview>div{
+    min-width:0;
+    padding:8px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:10px;
+    background:rgba(255,255,255,.018);
+}
+.gx-tj-bulk-preview strong{
+    display:block;
+    font-size:.92rem;
+}
+.gx-tj-bulk-preview span{
+    display:block;
+    margin-top:1px;
+    color:var(--text-muted);
+    font-size:.5rem;
+    font-weight:850;
+}
+
+.gx-tj-bulk-client-list{
+    max-height:340px;
+    overflow-y:auto;
+    display:grid;
+    gap:4px;
+    padding:1px;
+    overscroll-behavior:contain;
+}
+.gx-tj-bulk-row{
+    display:grid;
+    grid-template-columns:26px minmax(0,1fr) minmax(84px,auto);
+    align-items:center;
+    gap:8px;
+    min-height:52px;
+    padding:6px 8px;
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:10px;
+    background:rgba(255,255,255,.014);
+    cursor:pointer;
+}
+.gx-tj-bulk-row input{
+    width:17px;height:17px;
+    accent-color:#00f2fe;
+}
+.gx-tj-bulk-row.excluded{
+    opacity:.48;
+}
+.gx-tj-bulk-copy{
+    min-width:0;
+}
+.gx-tj-bulk-copy strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.64rem;
+}
+.gx-tj-bulk-copy small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.51rem;
+}
+.gx-tj-bulk-amount{
+    text-align:right;
+}
+.gx-tj-bulk-amount strong{
+    display:block;
+    color:#7de8b2;
+    font-size:.63rem;
+}
+.gx-tj-bulk-amount small{
+    display:block;
+    margin-top:2px;
+    color:#8f9aaf;
+    font-size:.48rem;
+}
+.gx-tj-bulk-amount small.update{
+    color:#d2a4ff;
+}
+
+.gx-tj-bulk-total{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    align-items:center;
+    gap:14px;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid rgba(255,255,255,.06);
+}
+.gx-tj-bulk-total>div{
+    min-width:0;
+}
+.gx-tj-bulk-total small{
+    display:block;
+    color:var(--text-muted);
+    font-size:.49rem;
+    font-weight:850;
+    text-transform:uppercase;
+}
+.gx-tj-bulk-total strong{
+    display:block;
+    margin-top:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.65rem;
+}
+#gx-tj-bulk-total{
+    color:#78ffd0;
+    font-size:.92rem;
+}
+
+@media(max-width:840px){
+    .gx-tj-bulk-config{
+        grid-template-columns:1fr 1fr;
+        gap:6px;
+        margin-top:9px;
+    }
+    .gx-tj-bulk-service-field,
+    .gx-tj-bulk-reason{
+        grid-column:1/-1;
+    }
+    .gx-tj-bulk-selection-head{
+        align-items:flex-start;
+        flex-direction:column;
+        margin-top:12px;
+    }
+    .gx-tj-bulk-selection-actions{
+        width:100%;
+        justify-content:flex-start;
+    }
+    .gx-tj-bulk-preview{
+        gap:5px;
+    }
+    .gx-tj-bulk-preview>div{
+        padding:7px 6px;
+    }
+    .gx-tj-bulk-client-list{
+        max-height:42vh;
+    }
+    .gx-tj-bulk-total{
+        position:sticky;
+        bottom:0;
+        z-index:5;
+        grid-template-columns:auto minmax(0,1fr);
+        gap:8px;
+        margin-left:-10px;
+        margin-right:-10px;
+        margin-bottom:-10px;
+        padding:9px 10px calc(9px + env(safe-area-inset-bottom));
+        background:linear-gradient(180deg,rgba(6,6,9,.94),#060609 36%);
+    }
+    .gx-tj-bulk-total button{
+        grid-column:1/-1;
+        width:100%;
+    }
+}
+
+@media(min-width:841px){
+    #tab-ajustes .gx-tj-bulk-panel{
+        max-width:none;
+    }
+}
+
+@container gx-admin-main (min-width:1120px){
+    #tab-ajustes .gx-tj-bulk-config{
+        grid-template-columns:minmax(210px,1.35fr) 160px 190px minmax(230px,1.35fr);
+    }
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -3171,7 +3495,7 @@ details.gx-client-ops-context{
 
             <section id="tab-ajustes" class="tab-content">
                 <div class="gx-page-heading"><div><div class="gx-eyebrow">Configuración</div><h1>Ajustes & automatizaciones</h1><p>Misiones, experiencia del cliente y alertas globales.</p></div><button class="gx-primary-action desktop-only" onclick="gxSaveSettings()">Guardar ajustes</button></div>
-                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('loyalty',this)">✦ Lealtad</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
+                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('loyalty',this)">✦ Lealtad</button><button onclick="gxSettingsView('fairdeal',this)">🛡 Trato Justo</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
                 <div class="gx-settings-view active" data-settings-view="missions">
                     <div class="panel gx-panel-modern">
                         <div class="gx-panel-title-row">
@@ -3278,6 +3602,91 @@ details.gx-client-ops-context{
                     </div>
                 </div>
 
+
+                <div class="gx-settings-view" data-settings-view="fairdeal">
+                    <div class="panel gx-panel-modern gx-tj-bulk-panel">
+                        <div class="gx-panel-title-row gx-tj-bulk-title">
+                            <div>
+                                <span class="gx-eyebrow">Compensaciones</span>
+                                <h2>Trato Justo masivo</h2>
+                                <p class="gx-panel-desc">Selecciona la plataforma, el periodo y únicamente los clientes afectados. Cada descuento se calcula con la mensualidad real de ese cliente.</p>
+                            </div>
+                            <span class="gx-tj-bulk-badge" id="gx-tj-bulk-pct-badge">5%</span>
+                        </div>
+
+                        <div class="gx-tj-bulk-config">
+                            <label class="gx-tj-bulk-field gx-tj-bulk-service-field">
+                                <span>Plataforma</span>
+                                <select id="gx-tj-bulk-service" class="custom-select" onchange="gxTJMassServiceChanged()"></select>
+                            </label>
+
+                            <label class="gx-tj-bulk-field">
+                                <span>Periodo</span>
+                                <input id="gx-tj-bulk-period" type="month" onchange="gxTJMassPeriodChanged()">
+                            </label>
+
+                            <div class="gx-tj-bulk-days">
+                                <span>Días de falla</span>
+                                <div>
+                                    <button type="button" onclick="gxTJMassStep(-1)">−</button>
+                                    <strong id="gx-tj-bulk-days">1</strong>
+                                    <button type="button" onclick="gxTJMassStep(1)">＋</button>
+                                </div>
+                                <small>5% por día · máximo 50%</small>
+                            </div>
+
+                            <label class="gx-tj-bulk-field gx-tj-bulk-reason">
+                                <span>Motivo</span>
+                                <select id="gx-tj-bulk-reason">
+                                    <option value="Falla técnica">Falla técnica</option>
+                                    <option value="Intermitencia prolongada">Intermitencia prolongada</option>
+                                    <option value="Acceso no disponible">Acceso no disponible</option>
+                                    <option value="Mantenimiento / incidencia de plataforma">Mantenimiento / incidencia de plataforma</option>
+                                    <option value="Compensación autorizada">Compensación autorizada</option>
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="gx-tj-bulk-selection-head">
+                            <div>
+                                <strong>Clientes elegibles</strong>
+                                <small>Solo aparecen quienes tienen activa la plataforma seleccionada.</small>
+                            </div>
+                            <div class="gx-tj-bulk-selection-actions">
+                                <button type="button" onclick="gxTJMassSelectScope('all')">Todos</button>
+                                <button type="button" onclick="gxTJMassSelectScope('without')">Sin compensación</button>
+                                <button type="button" onclick="gxTJMassSelectScope('none')">Limpiar</button>
+                            </div>
+                        </div>
+
+                        <div class="gx-tj-bulk-search">
+                            <span>⌕</span>
+                            <input id="gx-tj-bulk-search" type="text" placeholder="Buscar cliente..." oninput="gxRenderTJMassList()">
+                        </div>
+
+                        <div class="gx-tj-bulk-preview">
+                            <div><strong id="gx-tj-bulk-eligible">0</strong><span>Elegibles</span></div>
+                            <div><strong id="gx-tj-bulk-selected">0</strong><span>Incluidos</span></div>
+                            <div><strong id="gx-tj-bulk-excluded">0</strong><span>Excluidos</span></div>
+                            <div><strong id="gx-tj-bulk-updates">0</strong><span>Se actualizarán</span></div>
+                        </div>
+
+                        <div id="gx-tj-bulk-client-list" class="gx-tj-bulk-client-list"></div>
+
+                        <div class="gx-tj-bulk-total">
+                            <div>
+                                <small>Compensación estimada</small>
+                                <strong id="gx-tj-bulk-total">$0.00</strong>
+                            </div>
+                            <div>
+                                <small>Resumen</small>
+                                <strong id="gx-tj-bulk-summary">Selecciona una plataforma.</strong>
+                            </div>
+                            <button id="gx-tj-bulk-apply" type="button" class="gx-primary-action" onclick="gxApplyTJMass()">Aplicar</button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="gx-settings-view" data-settings-view="app"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Experiencia</span><h2>Configuración de App</h2></div></div><div class="gx-setting-row"><div><strong>Promoción Upsell</strong><small>Mostrar Combo GOXION a clientes.</small></div><label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar configuración</button></div></div>
                 <div class="gx-settings-view" data-settings-view="alerts"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Comunicación</span><h2>Alertas globales</h2></div><label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label></div><div id="alert-settings" class="gx-alert-settings" style="opacity:.5;pointer-events:none;transition:.3s"><select id="alert-platform" class="custom-select"></select><select id="alert-type" class="custom-select"><option value="presentando intermitencias temporales">Intermitencias temporales</option><option value="en mantenimiento programado">Mantenimiento programado</option><option value="experimentando una caída global">Caída global</option><option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option></select><textarea id="global-msg" class="gx-large-textarea" placeholder="Mensaje adicional para clientes (opcional)..."></textarea></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar alerta</button></div></div>
             </section>
@@ -3304,6 +3713,7 @@ details.gx-client-ops-context{
                     <button onclick="gxOpenMoreDestination('catalog')"><span>📦</span><div><strong>Catálogo e inventario</strong><small>Precios, capacidad, stock y sincronización</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('missions')"><span>🎯</span><div><strong>Misiones</strong><small>Plantillas, asignaciones y rondas</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('loyalty')"><span>✦</span><div><strong>Lealtad masiva</strong><small>Nivel, selección y excepciones</small></div><em>›</em></button>
+                    <button onclick="gxOpenMoreDestination('fairdeal')"><span>🛡</span><div><strong>Trato Justo masivo</strong><small>Plataforma, periodo y clientes afectados</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('app')"><span>✨</span><div><strong>Experiencia</strong><small>Promociones y comportamiento de la app</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('alerts')"><span>⚠</span><div><strong>Incidencias</strong><small>Estado operativo visible para clientes</small></div><em>›</em></button>
 
@@ -7001,7 +7411,7 @@ details.gx-client-ops-context{
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 07 · v1.0.9-beta-07</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 08 · v1.0.10-beta-08</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -8298,6 +8708,312 @@ details.gx-client-ops-context{
     window.addEventListener("resize",applyMode,{passive:true});
 
     console.info("GOXION Admin Beta 07: responsive adaptativo activo.", gxResponsiveMode());
+})();
+</script>
+
+
+<script id="goxion-admin-beta-08-trato-justo-masivo-controller">
+(() => {
+    let tjMassDays=1;
+    let tjMassSelection=new Set();
+    let tjMassInitialized=false;
+
+    const esc=value=>String(value??"")
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    const money=v=>Number(v||0).toFixed(2);
+    const norm=v=>String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+
+    function selectedCatalogService(){
+        const sel=document.getElementById("gx-tj-bulk-service");
+        const idx=Number(sel?.value);
+        return Number.isInteger(idx) ? configGlobal?.serviciosGlobales?.[idx] || null : null;
+    }
+
+    function currentPeriodValue(){
+        const input=document.getElementById("gx-tj-bulk-period");
+        return String(input?.value||"").slice(0,7);
+    }
+
+    function serviceMatches(s,catalog){
+        if(!s||!catalog||s.activo===false)return false;
+        const sid=String(s.servicio_id||"");
+        const cid=String(catalog._id||catalog.id||"");
+        if(sid&&cid)return sid===cid;
+        return norm(s.nombre)===norm(catalog.nombre);
+    }
+
+    function eligibleClients(){
+        const catalog=selectedCatalogService();
+        if(!catalog)return [];
+        return Object.entries(clientesDict||{}).map(([key,c])=>{
+            const assignments=(c.servicios||[]).filter(s=>serviceMatches(s,catalog));
+            if(!assignments.length)return null;
+            const base=assignments.reduce((sum,s)=>sum+Number(s.monto||0),0);
+            const period=currentPeriodValue();
+            const activeExisting=(c.trato_justo_compensaciones||[]).filter(comp=>
+                comp.activo!==false &&
+                String(comp.periodo||"").slice(0,7)===period &&
+                assignments.some(s=>String(comp.cliente_servicio_id||"")===String(s._id||s.id||""))
+            );
+            return {
+                key,c,id:String(c._id||c.id||""),
+                assignments,base,
+                existing:activeExisting,
+                predicted:Math.round(base*(tjMassDays*5/100)*100)/100
+            };
+        }).filter(Boolean).filter(x=>x.id);
+    }
+
+    function ensureSelection(){
+        const rows=eligibleClients();
+        const valid=new Set(rows.map(x=>x.id));
+        if(!tjMassInitialized){
+            tjMassSelection=new Set(rows.map(x=>x.id));
+            tjMassInitialized=true;
+        }else{
+            tjMassSelection=new Set([...tjMassSelection].filter(id=>valid.has(id)));
+        }
+    }
+
+    function populateServices(){
+        const sel=document.getElementById("gx-tj-bulk-service");
+        if(!sel||!configGlobal)return;
+        const previous=sel.value;
+        const list=Array.isArray(configGlobal.serviciosGlobales)?configGlobal.serviciosGlobales:[];
+        sel.innerHTML=list.map((s,i)=>`<option value="${i}">${esc(s.nombre||"Servicio")}</option>`).join("");
+        if(previous && list[Number(previous)])sel.value=previous;
+    }
+
+    function defaultPeriod(){
+        const input=document.getElementById("gx-tj-bulk-period");
+        if(!input||input.value)return;
+        const counts=new Map();
+        Object.values(clientesDict||{}).forEach(c=>{
+            const p=String(c?.periodo_pendiente||"").slice(0,7);
+            if(/^\d{4}-\d{2}$/.test(p))counts.set(p,(counts.get(p)||0)+1);
+        });
+        const top=[...counts.entries()].sort((a,b)=>b[1]-a[1])[0]?.[0];
+        input.value=top||new Date().toISOString().slice(0,7);
+    }
+
+    window.gxTJMassServiceChanged=function(){
+        tjMassInitialized=false;
+        ensureSelection();
+        window.gxRenderTJMass();
+    };
+
+    window.gxTJMassPeriodChanged=function(){
+        tjMassInitialized=false;
+        ensureSelection();
+        window.gxRenderTJMass();
+    };
+
+    window.gxTJMassStep=function(delta){
+        tjMassDays=Math.max(1,Math.min(10,tjMassDays+Number(delta||0)));
+        window.gxRenderTJMass();
+    };
+
+    window.gxTJMassSelectScope=function(scope){
+        const rows=eligibleClients();
+        if(scope==="all")tjMassSelection=new Set(rows.map(x=>x.id));
+        else if(scope==="without")tjMassSelection=new Set(rows.filter(x=>!x.existing.length).map(x=>x.id));
+        else tjMassSelection=new Set();
+        tjMassInitialized=true;
+        window.gxRenderTJMass();
+    };
+
+    window.gxToggleTJMassClient=function(id,checked){
+        tjMassInitialized=true;
+        if(checked)tjMassSelection.add(String(id));
+        else tjMassSelection.delete(String(id));
+        window.gxRenderTJMass(false);
+    };
+
+    window.gxRenderTJMassList=function(){
+        ensureSelection();
+        const list=document.getElementById("gx-tj-bulk-client-list");
+        if(!list)return;
+        const q=norm(document.getElementById("gx-tj-bulk-search")?.value||"");
+        const rows=eligibleClients().filter(x=>!q||norm(`${x.c.nombre||""} ${x.c.folio||""}`).includes(q));
+        if(!rows.length){
+            list.innerHTML='<div class="gx-empty-inline">No hay clientes elegibles para esta plataforma.</div>';
+            return;
+        }
+        list.innerHTML=rows.map(x=>{
+            const selected=tjMassSelection.has(x.id);
+            const update=x.existing.length>0;
+            const assignmentNote=x.assignments.length>1?`${x.assignments.length} accesos · `:"";
+            const current=update
+                ? `Actualiza ${Math.max(...x.existing.map(r=>Number(r.dias_falla||0)))}d`
+                : "Nueva compensación";
+            return `<label class="gx-tj-bulk-row ${selected?"":"excluded"}">
+                <input type="checkbox" ${selected?"checked":""} onchange="gxToggleTJMassClient('${esc(x.id)}',this.checked)">
+                <div class="gx-tj-bulk-copy">
+                    <strong>${esc(x.c.nombre||"Cliente")}</strong>
+                    <small>${esc(x.c.folio||"Sin folio")} · ${assignmentNote}$${money(x.base)}/mes</small>
+                </div>
+                <div class="gx-tj-bulk-amount">
+                    <strong>−$${money(x.predicted)}</strong>
+                    <small class="${update?"update":""}">${current}</small>
+                </div>
+            </label>`;
+        }).join("");
+    };
+
+    window.gxRenderTJMass=function(renderList=true){
+        populateServices();
+        defaultPeriod();
+        ensureSelection();
+
+        const rows=eligibleClients();
+        const selected=rows.filter(x=>tjMassSelection.has(x.id));
+        const excluded=rows.length-selected.length;
+        const updates=selected.filter(x=>x.existing.length>0).length;
+        const total=selected.reduce((s,x)=>s+x.predicted,0);
+        const catalog=selectedCatalogService();
+
+        const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=String(v)};
+        set("gx-tj-bulk-days",tjMassDays);
+        set("gx-tj-bulk-pct-badge",`${tjMassDays*5}%`);
+        set("gx-tj-bulk-eligible",rows.length);
+        set("gx-tj-bulk-selected",selected.length);
+        set("gx-tj-bulk-excluded",excluded);
+        set("gx-tj-bulk-updates",updates);
+        set("gx-tj-bulk-total",`$${money(total)}`);
+
+        const summary=document.getElementById("gx-tj-bulk-summary");
+        if(summary){
+            summary.textContent=catalog
+                ? `${catalog.nombre} · ${currentPeriodValue()} · ${tjMassDays} día${tjMassDays===1?"":"s"} · ${selected.length} cliente${selected.length===1?"":"s"}`
+                : "Selecciona una plataforma.";
+        }
+        const btn=document.getElementById("gx-tj-bulk-apply");
+        if(btn){
+            btn.disabled=selected.length===0||!catalog||!/^\d{4}-\d{2}$/.test(currentPeriodValue());
+            btn.textContent=`Aplicar a ${selected.length}`;
+        }
+        if(renderList)window.gxRenderTJMassList();
+    };
+
+    window.gxApplyTJMass=async function(){
+        const catalog=selectedCatalogService();
+        const period=currentPeriodValue();
+        const rows=eligibleClients();
+        const selected=rows.filter(x=>tjMassSelection.has(x.id));
+        const reason=String(document.getElementById("gx-tj-bulk-reason")?.value||"Falla técnica");
+        const updates=selected.filter(x=>x.existing.length>0).length;
+        const total=selected.reduce((s,x)=>s+x.predicted,0);
+
+        if(!catalog)return alert("Selecciona una plataforma.");
+        if(!/^\d{4}-\d{2}$/.test(period))return alert("Selecciona un periodo válido.");
+        if(!selected.length)return alert("Selecciona al menos un cliente.");
+
+        const ok=confirm(
+            `Aplicar Trato Justo masivo\n\n`+
+            `${catalog.nombre}\n`+
+            `Periodo: ${period}\n`+
+            `${tjMassDays} día${tjMassDays===1?"":"s"} · ${tjMassDays*5}%\n`+
+            `${selected.length} clientes incluidos\n`+
+            `${rows.length-selected.length} excluidos\n`+
+            `${updates} compensaciones existentes serán actualizadas\n`+
+            `Estimado total: -$${money(total)}\n\n`+
+            `Motivo: ${reason}\n\n¿Continuar?`
+        );
+        if(!ok)return;
+
+        const btn=document.getElementById("gx-tj-bulk-apply");
+        if(btn){btn.disabled=true;btn.textContent="Aplicando…";}
+        try{
+            if(typeof window.gxTratoJustoAction!=="function")throw new Error("La conexión de Trato Justo no está disponible.");
+            const r=await window.gxTratoJustoAction("guardar_compensaciones_masivas",{
+                cliente_ids:selected.map(x=>x.id),
+                servicio_id:String(catalog._id||catalog.id||""),
+                servicio_nombre:String(catalog.nombre||""),
+                periodo:period+"-01",
+                dias_falla:tjMassDays,
+                motivo:reason
+            });
+
+            if(typeof window.gxReloadAdminClient==="function")await window.gxReloadAdminClient();
+
+            // Después de aplicar, no volvemos a seleccionar automáticamente
+            // para evitar sobreescribir por accidente en un segundo lote.
+            tjMassSelection=new Set();
+            tjMassInitialized=true;
+            window.gxRenderTJMass();
+
+            alert(
+                `✅ Trato Justo aplicado\n\n`+
+                `${r.clientes_aplicados||0} clientes procesados\n`+
+                `${r.creadas||0} compensaciones nuevas\n`+
+                `${r.actualizadas||0} actualizadas\n`+
+                `${(r.no_elegibles||[]).length} no elegibles\n`+
+                `Total: -$${money(r.total_compensacion)}`
+            );
+        }catch(e){
+            console.error(e);
+            alert("❌ No se pudo aplicar Trato Justo masivo.\n\n"+(e?.message||e));
+        }finally{
+            if(btn)btn.disabled=false;
+            window.gxRenderTJMass(false);
+        }
+    };
+
+    // Acceso desde Más.
+    const oldMore=window.gxOpenMoreDestination;
+    window.gxOpenMoreDestination=function(dest){
+        if(dest==="fairdeal"){
+            goAdminTab("tab-ajustes");
+            setTimeout(()=>{
+                const button=[...document.querySelectorAll(".gx-settings-tabs button")].find(b=>(b.textContent||"").toLowerCase().includes("trato justo"));
+                window.gxSettingsView?.("fairdeal",button);
+                tjMassInitialized=false;
+                window.gxRenderTJMass();
+            },40);
+            return;
+        }
+        return typeof oldMore==="function"?oldMore.call(this,dest):undefined;
+    };
+
+    // Abrir la pestaña directamente también prepara la herramienta.
+    const oldSettings=window.gxSettingsView;
+    if(typeof oldSettings==="function"){
+        window.gxSettingsView=function(name,btn){
+            const r=oldSettings.call(this,name,btn);
+            if(name==="fairdeal"){
+                setTimeout(()=>{
+                    tjMassInitialized=false;
+                    window.gxRenderTJMass();
+                },20);
+            }
+            return r;
+        };
+    }
+
+    // Después de recargar datos, refresca catálogo/elegibles si la herramienta está visible.
+    const oldReload=window.gxReloadAdminClient;
+    if(typeof oldReload==="function"){
+        window.gxReloadAdminClient=async function(...args){
+            const r=await oldReload.apply(this,args);
+            setTimeout(()=>{
+                if(document.querySelector('[data-settings-view="fairdeal"].active')){
+                    window.gxRenderTJMass();
+                }
+            },80);
+            return r;
+        };
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        setTimeout(()=>{
+            populateServices();
+            defaultPeriod();
+            window.gxRenderTJMass();
+        },900);
+    });
+
+    console.info("GOXION Admin Beta 08: Trato Justo masivo activo.");
 })();
 </script>
 
