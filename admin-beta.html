@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.0.10-beta-08">
+<html lang="es" data-goxion-version="1.0.11-beta-09">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -3350,6 +3350,386 @@ details.gx-client-ops-context{
 }
 </style>
 
+
+<style id="goxion-admin-beta-09-security-cancellations">
+/* =========================================================
+   GOXION ADMIN · BETA 09
+   Cancelaciones formales + credenciales seguras
+   ========================================================= */
+
+/* Cancelaciones */
+.gx-cancel-state{
+    min-height:27px;
+    display:inline-flex;
+    align-items:center;
+    padding:0 8px;
+    border-radius:8px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.025);
+    color:#aeb8ca;
+    font-size:.52rem;
+    font-weight:900;
+}
+.gx-cancel-state.approved{
+    color:#7de8b2;
+    border-color:rgba(0,255,157,.14);
+    background:rgba(0,255,157,.04);
+}
+.gx-cancel-state.rejected{
+    color:#ff9ab0;
+    border-color:rgba(255,51,102,.14);
+    background:rgba(255,51,102,.04);
+}
+.gx-cancel-state.effective{
+    color:#9bf8ff;
+    border-color:rgba(0,242,254,.14);
+    background:rgba(0,242,254,.04);
+}
+.gx-cancel-approve,
+.gx-cancel-reject,
+.gx-cancel-effective{
+    min-height:27px!important;
+    padding:0 8px!important;
+    border-radius:8px!important;
+    font-size:.52rem!important;
+    font-weight:900!important;
+}
+.gx-cancel-approve{
+    color:#78ffd0!important;
+    border-color:rgba(0,255,157,.15)!important;
+    background:rgba(0,255,157,.04)!important;
+}
+.gx-cancel-reject{
+    color:#ff8fa8!important;
+    border-color:rgba(255,51,102,.14)!important;
+    background:rgba(255,51,102,.04)!important;
+}
+.gx-cancel-effective{
+    color:#97f9ff!important;
+    border-color:rgba(0,242,254,.16)!important;
+    background:rgba(0,242,254,.05)!important;
+}
+
+/* Credenciales */
+.gx-credentials-panel{
+    max-width:980px;
+}
+.gx-credentials-title{
+    align-items:flex-start!important;
+}
+.gx-vault-badge{
+    flex:0 0 auto;
+    padding:6px 9px;
+    border:1px solid rgba(0,255,157,.14);
+    border-radius:999px;
+    background:rgba(0,255,157,.04);
+    color:#7de8b2;
+    font-size:.56rem;
+    font-weight:900;
+    white-space:nowrap;
+}
+.gx-credentials-note{
+    margin-top:11px;
+    padding:9px 10px;
+    border:1px solid rgba(124,77,255,.14);
+    border-radius:11px;
+    background:rgba(124,77,255,.035);
+}
+.gx-credentials-note strong{
+    display:block;
+    color:#d1c5ff;
+    font-size:.64rem;
+}
+.gx-credentials-note p{
+    margin:3px 0 0;
+    color:#a8b2c5;
+    font-size:.56rem;
+    line-height:1.42;
+}
+.gx-credentials-config{
+    display:grid;
+    grid-template-columns:minmax(170px,.9fr) minmax(220px,1.15fr) minmax(240px,1.25fr);
+    gap:8px;
+    margin-top:12px;
+}
+.gx-credentials-config label{
+    min-width:0;
+}
+.gx-credentials-config label>span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--text-muted);
+    font-size:.51rem;
+    font-weight:900;
+    text-transform:uppercase;
+}
+.gx-credentials-config select,
+.gx-cred-password-field input{
+    width:100%;
+    min-height:39px;
+    padding:7px 9px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:9px;
+    background:#0e0e15;
+    color:#fff;
+    font:inherit;
+    font-size:.64rem;
+    outline:none;
+}
+.gx-cred-password-field>div{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 38px;
+    gap:5px;
+}
+.gx-cred-password-field button{
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:9px;
+    background:rgba(255,255,255,.025);
+    color:#aeb8ca;
+}
+
+.gx-credentials-selection-head{
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:10px;
+    margin-top:14px;
+}
+.gx-credentials-selection-head strong{
+    display:block;
+    font-size:.7rem;
+}
+.gx-credentials-selection-head small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.54rem;
+}
+.gx-credentials-selection-head>div:last-child{
+    display:flex;
+    gap:5px;
+}
+.gx-credentials-selection-head button{
+    min-height:30px;
+    padding:0 8px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:8px;
+    background:rgba(255,255,255,.02);
+    color:#aeb8ca;
+    font:inherit;
+    font-size:.53rem;
+    font-weight:850;
+}
+
+.gx-credential-search{
+    min-height:38px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-top:8px;
+    padding:0 9px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:10px;
+    background:rgba(255,255,255,.018);
+}
+.gx-credential-search span{color:var(--neon-blue)}
+.gx-credential-search input{
+    flex:1;
+    min-width:0;
+    border:0;
+    background:transparent;
+    color:#fff;
+    font:inherit;
+    font-size:.64rem;
+    outline:none;
+}
+
+.gx-credential-stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:6px;
+    margin:8px 0;
+}
+.gx-credential-stats>div{
+    min-width:0;
+    padding:7px;
+    border:1px solid rgba(255,255,255,.06);
+    border-radius:9px;
+    background:rgba(255,255,255,.016);
+}
+.gx-credential-stats strong{
+    display:block;
+    font-size:.86rem;
+}
+.gx-credential-stats span{
+    display:block;
+    margin-top:1px;
+    color:var(--text-muted);
+    font-size:.49rem;
+    font-weight:850;
+}
+.gx-cred-recipient-list{
+    max-height:300px;
+    overflow-y:auto;
+    display:grid;
+    gap:4px;
+    overscroll-behavior:contain;
+}
+.gx-cred-recipient{
+    display:grid;
+    grid-template-columns:25px minmax(0,1fr) auto;
+    align-items:center;
+    gap:8px;
+    min-height:46px;
+    padding:6px 8px;
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:10px;
+    background:rgba(255,255,255,.014);
+}
+.gx-cred-recipient.excluded{opacity:.48}
+.gx-cred-recipient input{
+    width:17px;height:17px;
+    accent-color:#00f2fe;
+}
+.gx-cred-recipient strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.63rem;
+}
+.gx-cred-recipient small{
+    display:block;
+    margin-top:1px;
+    color:var(--text-muted);
+    font-size:.5rem;
+}
+.gx-cred-recipient em{
+    font-style:normal;
+    color:#8ef5ff;
+    font-size:.5rem;
+    font-weight:850;
+}
+.gx-credentials-publish{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:9px;
+    padding-top:9px;
+    border-top:1px solid rgba(255,255,255,.06);
+}
+.gx-credentials-publish>div{
+    min-width:0;
+}
+.gx-credentials-publish small{
+    display:block;
+    color:var(--text-muted);
+    font-size:.49rem;
+    font-weight:850;
+    text-transform:uppercase;
+}
+.gx-credentials-publish strong{
+    display:block;
+    margin-top:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.61rem;
+}
+.gx-credentials-history{
+    margin-top:11px;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+.gx-credentials-history>summary{
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    list-style:none;
+    cursor:pointer;
+}
+.gx-credentials-history>summary::-webkit-details-marker{display:none}
+.gx-credentials-history>summary span{font-size:.63rem;font-weight:850}
+.gx-credentials-history>summary em{font-style:normal;color:var(--text-muted);font-size:.52rem}
+.gx-cred-history-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:9px;
+    align-items:center;
+    padding:7px 0;
+    border-top:1px solid rgba(255,255,255,.045);
+}
+.gx-cred-history-row strong{
+    display:block;
+    font-size:.61rem;
+}
+.gx-cred-history-row small{
+    display:block;
+    margin-top:2px;
+    color:var(--text-muted);
+    font-size:.49rem;
+}
+.gx-cred-history-counts{
+    display:flex;
+    gap:4px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+.gx-cred-history-counts span{
+    padding:3px 6px;
+    border-radius:999px;
+    background:rgba(255,255,255,.035);
+    color:#9da9ba;
+    font-size:.47rem;
+    font-weight:850;
+}
+.gx-cred-history-row.inactive{
+    opacity:.48;
+}
+
+@media(max-width:840px){
+    .gx-credentials-config{
+        grid-template-columns:1fr;
+        gap:6px;
+        margin-top:9px;
+    }
+    .gx-credentials-selection-head{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .gx-credential-stats{
+        gap:5px;
+    }
+    .gx-credential-stats>div{
+        padding:6px 5px;
+    }
+    .gx-cred-recipient-list{
+        max-height:42vh;
+    }
+    .gx-credentials-publish{
+        position:sticky;
+        bottom:0;
+        z-index:5;
+        margin-left:-10px;
+        margin-right:-10px;
+        margin-bottom:-10px;
+        padding:9px 10px calc(9px + env(safe-area-inset-bottom));
+        background:linear-gradient(180deg,rgba(6,6,9,.94),#060609 36%);
+    }
+    .gx-vault-badge{
+        padding:5px 7px;
+        font-size:.5rem;
+    }
+}
+
+@media(min-width:841px){
+    #tab-ajustes .gx-credentials-panel{
+        max-width:none;
+    }
+}
+</style>
+
 </head>
 <body>
     <div class="gx-admin-shell">
@@ -3495,7 +3875,7 @@ details.gx-client-ops-context{
 
             <section id="tab-ajustes" class="tab-content">
                 <div class="gx-page-heading"><div><div class="gx-eyebrow">Configuración</div><h1>Ajustes & automatizaciones</h1><p>Misiones, experiencia del cliente y alertas globales.</p></div><button class="gx-primary-action desktop-only" onclick="gxSaveSettings()">Guardar ajustes</button></div>
-                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('loyalty',this)">✦ Lealtad</button><button onclick="gxSettingsView('fairdeal',this)">🛡 Trato Justo</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
+                <div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('loyalty',this)">✦ Lealtad</button><button onclick="gxSettingsView('fairdeal',this)">🛡 Trato Justo</button><button onclick="gxSettingsView('credentials',this)">🔐 Credenciales</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
                 <div class="gx-settings-view active" data-settings-view="missions">
                     <div class="panel gx-panel-modern">
                         <div class="gx-panel-title-row">
@@ -3687,6 +4067,81 @@ details.gx-client-ops-context{
                     </div>
                 </div>
 
+
+                <div class="gx-settings-view" data-settings-view="credentials">
+                    <div class="panel gx-panel-modern gx-credentials-panel">
+                        <div class="gx-panel-title-row gx-credentials-title">
+                            <div>
+                                <span class="gx-eyebrow">Seguridad</span>
+                                <h2>Credenciales de plataformas</h2>
+                                <p class="gx-panel-desc">Publica una nueva contraseña solo para los clientes que usan esa cuenta. La contraseña se guarda cifrada en Supabase Vault y nunca vuelve a cargarse en este Admin.</p>
+                            </div>
+                            <span class="gx-vault-badge">Vault protegido</span>
+                        </div>
+
+                        <div class="gx-credentials-note">
+                            <strong>Entrega de una sola vista</strong>
+                            <p>En la siguiente Beta de Ayuda, el cliente tendrá que confirmar su PIN antes de verla. Una vez revelada, la entrega queda consumida y no podrá consultarla otra vez.</p>
+                        </div>
+
+                        <div class="gx-credentials-config">
+                            <label>
+                                <span>Plataforma</span>
+                                <select id="gx-cred-service" class="custom-select" onchange="gxCredentialServiceChanged()"></select>
+                            </label>
+                            <label>
+                                <span>Cuenta / correo de acceso</span>
+                                <select id="gx-cred-account" class="custom-select" onchange="gxCredentialAccountChanged()"></select>
+                            </label>
+                            <label class="gx-cred-password-field">
+                                <span>Nueva contraseña</span>
+                                <div>
+                                    <input id="gx-cred-password" type="password" autocomplete="new-password" placeholder="Escribe la nueva contraseña">
+                                    <button type="button" onclick="gxToggleCredentialPassword()">👁</button>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="gx-credentials-selection-head">
+                            <div>
+                                <strong>Quiénes recibirán esta contraseña</strong>
+                                <small>Solo aparecen clientes activos con la misma plataforma y cuenta de acceso.</small>
+                            </div>
+                            <div>
+                                <button type="button" onclick="gxCredentialSelectScope('all')">Todos</button>
+                                <button type="button" onclick="gxCredentialSelectScope('none')">Limpiar</button>
+                            </div>
+                        </div>
+
+                        <div class="gx-credential-search">
+                            <span>⌕</span>
+                            <input id="gx-cred-search" type="text" placeholder="Buscar cliente..." oninput="gxRenderCredentialRecipients()">
+                        </div>
+
+                        <div class="gx-credential-stats">
+                            <div><strong id="gx-cred-eligible">0</strong><span>Elegibles</span></div>
+                            <div><strong id="gx-cred-selected">0</strong><span>Incluidos</span></div>
+                            <div><strong id="gx-cred-excluded">0</strong><span>Excluidos</span></div>
+                            <div><strong id="gx-cred-pending">0</strong><span>Pendientes previas</span></div>
+                        </div>
+
+                        <div id="gx-cred-recipient-list" class="gx-cred-recipient-list"></div>
+
+                        <div class="gx-credentials-publish">
+                            <div>
+                                <small>Acción</small>
+                                <strong id="gx-cred-publish-summary">Selecciona una plataforma y una cuenta.</strong>
+                            </div>
+                            <button id="gx-cred-publish" type="button" class="gx-primary-action" onclick="gxPublishCredential()">Publicar contraseña</button>
+                        </div>
+
+                        <details class="gx-credentials-history">
+                            <summary><span>Historial seguro</span><em id="gx-cred-history-count">0 versiones</em></summary>
+                            <div id="gx-cred-history-list"></div>
+                        </details>
+                    </div>
+                </div>
+
                 <div class="gx-settings-view" data-settings-view="app"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Experiencia</span><h2>Configuración de App</h2></div></div><div class="gx-setting-row"><div><strong>Promoción Upsell</strong><small>Mostrar Combo GOXION a clientes.</small></div><label class="switch"><input type="checkbox" id="combo-active" onchange="toggleComboUpsell()"><span class="slider"></span></label></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar configuración</button></div></div>
                 <div class="gx-settings-view" data-settings-view="alerts"><div class="panel gx-panel-modern"><div class="gx-panel-title-row"><div><span class="gx-eyebrow">Comunicación</span><h2>Alertas globales</h2></div><label class="switch"><input type="checkbox" id="alert-active" onchange="toggleAlertFields()"><span class="slider"></span></label></div><div id="alert-settings" class="gx-alert-settings" style="opacity:.5;pointer-events:none;transition:.3s"><select id="alert-platform" class="custom-select"></select><select id="alert-type" class="custom-select"><option value="presentando intermitencias temporales">Intermitencias temporales</option><option value="en mantenimiento programado">Mantenimiento programado</option><option value="experimentando una caída global">Caída global</option><option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option></select><textarea id="global-msg" class="gx-large-textarea" placeholder="Mensaje adicional para clientes (opcional)..."></textarea></div><button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar alerta</button></div></div>
             </section>
@@ -3714,6 +4169,7 @@ details.gx-client-ops-context{
                     <button onclick="gxOpenMoreDestination('missions')"><span>🎯</span><div><strong>Misiones</strong><small>Plantillas, asignaciones y rondas</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('loyalty')"><span>✦</span><div><strong>Lealtad masiva</strong><small>Nivel, selección y excepciones</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('fairdeal')"><span>🛡</span><div><strong>Trato Justo masivo</strong><small>Plataforma, periodo y clientes afectados</small></div><em>›</em></button>
+                    <button onclick="gxOpenMoreDestination('credentials')"><span>🔐</span><div><strong>Credenciales</strong><small>Contraseñas seguras y entregas de una sola vista</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('app')"><span>✨</span><div><strong>Experiencia</strong><small>Promociones y comportamiento de la app</small></div><em>›</em></button>
                     <button onclick="gxOpenMoreDestination('alerts')"><span>⚠</span><div><strong>Incidencias</strong><small>Estado operativo visible para clientes</small></div><em>›</em></button>
 
@@ -6698,7 +7154,8 @@ details.gx-client-ops-context{
                 <small>${n.cliente_nombre?`${window.gxEscapeAdminHtml?.(n.cliente_nombre)||""} · `:""}${relativeTime(n.created_at)}</small>
                 <div class="gx-notif-actions-row">
                     ${key?`<button class="gx-notif-action" onclick="gxOpenNotificationClient('${key}', '${String(n.tipo||"").replace(/'/g,"")}', '${String(n.id||"").replace(/'/g,"")}')">${action}</button>`:""}
-                    ${unread&&n.id?`<button class="gx-notif-mark" onclick="gxMarkNotificationRead('${String(n.id).replace(/'/g,"")}')">${markLabel}</button>`:""}
+                    ${cls==="cancellation"&&!n.synthetic&&n.id?(window.gxCancellationButtons?.(String(n.id).replace(/'/g,""),"drawer")||""):""}
+                    ${unread&&n.id&&cls!=="cancellation"?`<button class="gx-notif-mark" onclick="gxMarkNotificationRead('${String(n.id).replace(/'/g,"")}')">${markLabel}</button>`:""}
                     ${!n.synthetic&&n.id?`<button class="gx-notif-delete" onclick="gxDeleteNotification('${String(n.id).replace(/'/g,"")}')">Eliminar</button>`:""}
                 </div>
             </div>`;
@@ -7411,7 +7868,7 @@ details.gx-client-ops-context{
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 08 · v1.0.10-beta-08</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 09 · v1.0.11-beta-09</div>
 
 <script id="goxion-admin-beta-01-ayuda-bridge-controller">
 (() => {
@@ -7851,7 +8308,8 @@ details.gx-client-ops-context{
                 </div>
                 <div class="gx-mobile-op-actions">
                     ${safeKey?`<button onclick="gxOpenClientFocus('${safeKey}')">Abrir cliente</button>`:""}
-                    ${!x.synthetic&&!x.read&&safeId?`<button class="done" onclick="gxMarkNotificationRead('${safeId}')">Atendida</button>`:""}
+                    ${x.category==="cancellation"&&!x.synthetic&&safeId?(window.gxCancellationButtons?.(safeId,"mobile")||""):""}
+                    ${!x.synthetic&&!x.read&&safeId&&x.category!=="cancellation"?`<button class="done" onclick="gxMarkNotificationRead('${safeId}')">Atendida</button>`:""}
                     ${!x.synthetic&&safeId?`<button class="danger" onclick="gxDeleteNotification('${safeId}')">Eliminar</button>`:""}
                 </div>
             </article>`;
@@ -9014,6 +9472,379 @@ details.gx-client-ops-context{
     });
 
     console.info("GOXION Admin Beta 08: Trato Justo masivo activo.");
+})();
+</script>
+
+
+<script id="goxion-admin-beta-09-security-controller">
+(() => {
+    const PROJECT_URL="https://hmpevcwodcgbkviarfic.supabase.co";
+    const CANCEL_URL=`${PROJECT_URL}/functions/v1/cancelaciones-admin`;
+    const CRED_URL=`${PROJECT_URL}/functions/v1/credenciales-admin`;
+
+    let cancellationData={solicitudes:[],legacy:[]};
+    let credentialData={credenciales:[],entregas:[]};
+    let credentialSelection=new Set();
+    let credentialSelectionInitialized=false;
+
+    const esc=value=>String(value??"")
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    const norm=value=>String(value??"").trim().toLowerCase();
+
+    async function adminApi(url,accion,datos={}){
+        const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
+        const r=await fetch(url,{
+            method:"POST",
+            headers:{"Content-Type":"application/json","X-Admin-Token":token},
+            body:JSON.stringify({accion,datos}),
+            cache:"no-store"
+        });
+        const j=await r.json().catch(()=>({}));
+        if(!r.ok||j?.ok!==true)throw new Error(j?.error||`HTTP ${r.status}`);
+        return j;
+    }
+
+    // =====================================================
+    // CANCELACIONES FORMALES
+    // =====================================================
+    async function loadCancellations(){
+        try{
+            const r=await adminApi(CANCEL_URL,"listar",{});
+            cancellationData={solicitudes:Array.isArray(r.solicitudes)?r.solicitudes:[],legacy:Array.isArray(r.legacy)?r.legacy:[]};
+            refreshCancellationViews();
+        }catch(e){
+            console.warn("No se pudieron cargar cancelaciones formales",e);
+        }
+    }
+
+    function cancellationByNotification(notificationId){
+        return cancellationData.solicitudes.find(x=>String(x?.notificacion_id||"")===String(notificationId||""))||null;
+    }
+
+    function refreshCancellationViews(){
+        window.gxUpdateOperationsSummary?.();
+        const drawer=document.getElementById("gx-notification-drawer");
+        if(drawer?.classList.contains("show"))window.gxToggleNotificationsBase?.(true);
+    }
+
+    window.gxCancellationButtons=function(notificationId,mode="mobile"){
+        const request=cancellationByNotification(notificationId);
+        if(!request){
+            return `<button class="gx-cancel-approve" onclick="gxResolveCancellation('${esc(notificationId)}','aprobada')">Aceptar</button>
+                    <button class="gx-cancel-reject" onclick="gxResolveCancellation('${esc(notificationId)}','rechazada')">Rechazar</button>`;
+        }
+        const state=String(request.estado||"solicitada");
+        if(state==="solicitada"){
+            return `<button class="gx-cancel-approve" onclick="gxResolveCancellation('${esc(notificationId)}','aprobada')">Aceptar</button>
+                    <button class="gx-cancel-reject" onclick="gxResolveCancellation('${esc(notificationId)}','rechazada')">Rechazar</button>`;
+        }
+        if(state==="aprobada"){
+            return `<span class="gx-cancel-state approved">Aprobada</span>
+                    <button class="gx-cancel-effective" onclick="gxMakeCancellationEffective('${esc(request.id)}')">Hacer efectiva</button>`;
+        }
+        if(state==="rechazada")return `<span class="gx-cancel-state rejected">Rechazada</span>`;
+        if(state==="efectiva")return `<span class="gx-cancel-state effective">Efectiva</span>`;
+        return `<span class="gx-cancel-state">${esc(state)}</span>`;
+    };
+
+    window.gxResolveCancellation=async function(notificationId,decision){
+        const approve=decision==="aprobada";
+        const message=approve
+            ?"¿Aprobar esta solicitud de cancelación?\n\nEl servicio seguirá activo hasta que marques la cancelación como efectiva."
+            :"¿Rechazar esta solicitud de cancelación?\n\nLa solicitud quedará registrada como rechazada.";
+        if(!confirm(message))return;
+        try{
+            await adminApi(CANCEL_URL,"resolver",{notificacion_id:notificationId,decision});
+            await loadCancellations();
+            if(typeof inicializarPanel==="function")await inicializarPanel();
+        }catch(e){
+            console.error(e);
+            alert("No se pudo procesar la cancelación.\n\n"+(e?.message||e));
+        }
+    };
+
+    window.gxMakeCancellationEffective=async function(requestId){
+        if(!confirm("¿Hacer efectiva esta cancelación ahora?\n\nEl servicio del cliente se desactivará. Los cargos o deudas ya existentes no se borrarán."))return;
+        try{
+            await adminApi(CANCEL_URL,"hacer_efectiva",{solicitud_id:requestId});
+            if(typeof inicializarPanel==="function")await inicializarPanel();
+            await loadCancellations();
+            alert("✓ Cancelación efectiva. El servicio quedó desactivado.");
+        }catch(e){
+            console.error(e);
+            alert("No se pudo hacer efectiva la cancelación.\n\n"+(e?.message||e));
+        }
+    };
+
+    // =====================================================
+    // CREDENCIALES SEGURAS
+    // =====================================================
+    function catalog(){
+        return Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales:[];
+    }
+
+    function selectedCatalog(){
+        const i=Number(document.getElementById("gx-cred-service")?.value);
+        return Number.isInteger(i)?catalog()[i]||null:null;
+    }
+
+    function selectedAccount(){
+        return String(document.getElementById("gx-cred-account")?.value||"").trim();
+    }
+
+    function assignmentsFor(service,account=""){
+        if(!service)return[];
+        const serviceId=String(service._id||service.id||"");
+        const out=[];
+        Object.entries(clientesDict||{}).forEach(([key,c])=>{
+            (c.servicios||[]).forEach(s=>{
+                const sid=String(s.servicio_id||"");
+                const same=sid&&serviceId ? sid===serviceId : norm(s.nombre)===norm(service.nombre);
+                if(!same||s.activo===false)return;
+                const login=String(s.correo_login||"").trim();
+                if(account&&norm(login)!==norm(account))return;
+                out.push({key,c,s,id:String(c._id||c.id||""),login});
+            });
+        });
+        return out.filter(x=>x.id);
+    }
+
+    function populateCredentialServices(){
+        const sel=document.getElementById("gx-cred-service");
+        if(!sel)return;
+        const prev=sel.value;
+        sel.innerHTML=catalog().map((s,i)=>`<option value="${i}">${esc(s.nombre||"Servicio")}</option>`).join("");
+        if(prev!==""&&catalog()[Number(prev)])sel.value=prev;
+    }
+
+    function populateCredentialAccounts(){
+        const sel=document.getElementById("gx-cred-account");
+        if(!sel)return;
+        const service=selectedCatalog();
+        const prev=sel.value;
+        const accounts=[...new Set(assignmentsFor(service).map(x=>x.login).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+        sel.innerHTML=accounts.length
+            ? accounts.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join("")
+            : `<option value="">Sin cuenta/correo configurado</option>`;
+        if(prev&&accounts.includes(prev))sel.value=prev;
+    }
+
+    function eligibleRecipients(){
+        const service=selectedCatalog(),account=selectedAccount();
+        if(!service||!account)return[];
+        const byClient=new Map();
+        assignmentsFor(service,account).forEach(x=>{
+            if(!byClient.has(x.id))byClient.set(x.id,x);
+        });
+        return [...byClient.values()];
+    }
+
+    function ensureCredentialSelection(){
+        const rows=eligibleRecipients();
+        const valid=new Set(rows.map(x=>x.id));
+        if(!credentialSelectionInitialized){
+            credentialSelection=new Set(rows.map(x=>x.id));
+            credentialSelectionInitialized=true;
+        }else{
+            credentialSelection=new Set([...credentialSelection].filter(id=>valid.has(id)));
+        }
+    }
+
+    function activeCredential(){
+        const service=selectedCatalog(),account=selectedAccount();
+        const serviceId=String(service?._id||service?.id||"");
+        return credentialData.credenciales.find(x=>x.activa===true&&String(x.servicio_id||"")===serviceId&&norm(x.cuenta_login)===norm(account))||null;
+    }
+
+    function renderCredentialHistory(){
+        const list=document.getElementById("gx-cred-history-list");
+        const count=document.getElementById("gx-cred-history-count");
+        if(!list||!count)return;
+        const service=selectedCatalog(),account=selectedAccount();
+        const serviceId=String(service?._id||service?.id||"");
+        const rows=credentialData.credenciales.filter(x=>
+            (!serviceId||String(x.servicio_id||"")===serviceId)&&
+            (!account||norm(x.cuenta_login)===norm(account))
+        );
+        count.textContent=`${rows.length} versión${rows.length===1?"":"es"}`;
+        if(!rows.length){
+            list.innerHTML='<div class="gx-empty-inline">Todavía no hay contraseñas publicadas para esta cuenta.</div>';
+            return;
+        }
+        list.innerHTML=rows.map(c=>{
+            const deliveries=credentialData.entregas.filter(e=>String(e.credencial_id)===String(c.id));
+            const pending=deliveries.filter(e=>e.estado==="pendiente").length;
+            const seen=deliveries.filter(e=>e.estado==="vista").length;
+            const revoked=deliveries.filter(e=>e.estado==="revocada"||e.estado==="expirada").length;
+            const date=new Date(c.created_at||0).toLocaleDateString("es-MX",{day:"numeric",month:"short"});
+            return `<div class="gx-cred-history-row ${c.activa?"":"inactive"}">
+                <div><strong>${esc(c.plataforma)} · v${Number(c.version||1)}</strong><small>${esc(c.cuenta_login)} · ${date} · ${c.activa?"Activa":"Anterior"}</small></div>
+                <div class="gx-cred-history-counts"><span>${pending} pendientes</span><span>${seen} vistas</span>${revoked?`<span>${revoked} cerradas</span>`:""}</div>
+            </div>`;
+        }).join("");
+    }
+
+    window.gxRenderCredentialRecipients=function(){
+        ensureCredentialSelection();
+        const list=document.getElementById("gx-cred-recipient-list");
+        if(!list)return;
+        const q=norm(document.getElementById("gx-cred-search")?.value||"");
+        const rows=eligibleRecipients().filter(x=>!q||norm(`${x.c.nombre||""} ${x.c.folio||""}`).includes(q));
+        if(!rows.length){
+            list.innerHTML='<div class="gx-empty-inline">No hay clientes con esa cuenta de acceso.</div>';
+            return;
+        }
+        list.innerHTML=rows.map(x=>{
+            const selected=credentialSelection.has(x.id);
+            return `<label class="gx-cred-recipient ${selected?"":"excluded"}">
+                <input type="checkbox" ${selected?"checked":""} onchange="gxToggleCredentialRecipient('${esc(x.id)}',this.checked)">
+                <div><strong>${esc(x.c.nombre||"Cliente")}</strong><small>${esc(x.c.folio||"Sin folio")} · ${esc(x.login)}</small></div>
+                <em>1 vista</em>
+            </label>`;
+        }).join("");
+    };
+
+    window.gxToggleCredentialRecipient=function(id,checked){
+        credentialSelectionInitialized=true;
+        if(checked)credentialSelection.add(String(id));else credentialSelection.delete(String(id));
+        window.gxRenderCredentials(false);
+    };
+
+    window.gxCredentialSelectScope=function(scope){
+        const rows=eligibleRecipients();
+        credentialSelection=scope==="all"?new Set(rows.map(x=>x.id)):new Set();
+        credentialSelectionInitialized=true;
+        window.gxRenderCredentials();
+    };
+
+    window.gxRenderCredentials=function(renderList=true){
+        populateCredentialServices();
+        populateCredentialAccounts();
+        ensureCredentialSelection();
+        const rows=eligibleRecipients();
+        const selected=rows.filter(x=>credentialSelection.has(x.id));
+        const excluded=rows.length-selected.length;
+        const active=activeCredential();
+        const pending=active?credentialData.entregas.filter(e=>String(e.credencial_id)===String(active.id)&&e.estado==="pendiente").length:0;
+        const service=selectedCatalog(),account=selectedAccount();
+        const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=String(v)};
+        set("gx-cred-eligible",rows.length);
+        set("gx-cred-selected",selected.length);
+        set("gx-cred-excluded",excluded);
+        set("gx-cred-pending",pending);
+        const summary=document.getElementById("gx-cred-publish-summary");
+        if(summary)summary.textContent=service&&account?`${service.nombre} · ${account} · ${selected.length} cliente${selected.length===1?"":"s"}`:"Selecciona una plataforma y una cuenta.";
+        const btn=document.getElementById("gx-cred-publish");
+        if(btn)btn.disabled=!service||!account||selected.length===0;
+        if(renderList)window.gxRenderCredentialRecipients();
+        renderCredentialHistory();
+    };
+
+    window.gxCredentialServiceChanged=function(){
+        credentialSelectionInitialized=false;
+        populateCredentialAccounts();
+        window.gxRenderCredentials();
+    };
+    window.gxCredentialAccountChanged=function(){
+        credentialSelectionInitialized=false;
+        window.gxRenderCredentials();
+    };
+
+    window.gxToggleCredentialPassword=function(){
+        const input=document.getElementById("gx-cred-password");
+        if(input)input.type=input.type==="password"?"text":"password";
+    };
+
+    async function loadCredentials(){
+        try{
+            const r=await adminApi(CRED_URL,"listar",{});
+            credentialData={credenciales:Array.isArray(r.credenciales)?r.credenciales:[],entregas:Array.isArray(r.entregas)?r.entregas:[]};
+            window.gxRenderCredentials();
+        }catch(e){
+            console.warn("No se pudieron cargar credenciales",e);
+        }
+    }
+
+    window.gxPublishCredential=async function(){
+        const service=selectedCatalog(),account=selectedAccount();
+        const password=String(document.getElementById("gx-cred-password")?.value||"");
+        const rows=eligibleRecipients().filter(x=>credentialSelection.has(x.id));
+        if(!service||!account)return alert("Selecciona una plataforma y una cuenta.");
+        if(password.length<4)return alert("Escribe la nueva contraseña.");
+        if(!rows.length)return alert("Selecciona al menos un cliente.");
+        const active=activeCredential();
+        const warning=active?`\n\nEsto revocará las entregas pendientes de la versión ${active.version}.`:"";
+        if(!confirm(`Publicar nueva contraseña\n\n${service.nombre}\n${account}\n${rows.length} clientes\nEntrega: una sola vista${warning}\n\n¿Continuar?`))return;
+
+        const btn=document.getElementById("gx-cred-publish");
+        if(btn){btn.disabled=true;btn.textContent="Publicando…";}
+        try{
+            const r=await adminApi(CRED_URL,"publicar",{
+                servicio_id:String(service._id||service.id||""),
+                plataforma:String(service.nombre||""),
+                cuenta_login:account,
+                password,
+                cliente_ids:rows.map(x=>x.id)
+            });
+            const input=document.getElementById("gx-cred-password");
+            if(input){input.value="";input.type="password";}
+            await loadCredentials();
+            alert(`✓ Contraseña protegida en Vault.\n\nVersión ${r.credencial?.version||""}\n${r.entregas||0} entregas preparadas.\n\nTodavía no se muestra en Ayuda hasta que implementemos esa Beta.`);
+        }catch(e){
+            console.error(e);
+            alert("No se pudo publicar la contraseña.\n\n"+(e?.message||e));
+        }finally{
+            if(btn){btn.disabled=false;btn.textContent="Publicar contraseña";}
+        }
+    };
+
+    // =====================================================
+    // NAVEGACIÓN
+    // =====================================================
+    const oldMore=window.gxOpenMoreDestination;
+    window.gxOpenMoreDestination=function(dest){
+        if(dest==="credentials"){
+            goAdminTab("tab-ajustes");
+            setTimeout(()=>{
+                const btn=[...document.querySelectorAll(".gx-settings-tabs button")].find(b=>(b.textContent||"").toLowerCase().includes("credenciales"));
+                window.gxSettingsView?.("credentials",btn);
+                credentialSelectionInitialized=false;
+                populateCredentialServices();
+                populateCredentialAccounts();
+                loadCredentials();
+            },40);
+            return;
+        }
+        return typeof oldMore==="function"?oldMore.call(this,dest):undefined;
+    };
+
+    const oldSettings=window.gxSettingsView;
+    if(typeof oldSettings==="function"){
+        window.gxSettingsView=function(name,btn){
+            const r=oldSettings.call(this,name,btn);
+            if(name==="credentials"){
+                setTimeout(()=>{
+                    credentialSelectionInitialized=false;
+                    populateCredentialServices();
+                    populateCredentialAccounts();
+                    loadCredentials();
+                },20);
+            }
+            return r;
+        };
+    }
+
+    document.addEventListener("DOMContentLoaded",()=>{
+        setTimeout(()=>{
+            loadCancellations();
+            populateCredentialServices();
+            populateCredentialAccounts();
+            loadCredentials();
+        },950);
+    });
+
+    console.info("GOXION Admin Beta 09: cancelaciones formales y credenciales Vault activas.");
 })();
 </script>
 
