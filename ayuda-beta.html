@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.0-beta-05" lang="es">
+<html data-goxion-version="1.2.0-beta-06" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -5037,7 +5037,7 @@
 <div class="hiw-desc">Obtén tus datos inmediatamente y comienza a disfrutar de tu contenido.</div>
 </div>
 </div>
-<button class="btn-primary reveal" onclick="switchTab('catalogo')" style="margin-bottom: 35px; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none;">Ver servicios disponibles →</button>
+<button class="btn-primary reveal" onclick="switchTab('catalogo')" style="margin-bottom: 35px; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none;">Ver servicios disponibles <span class="gx-nav-arrow gx-nav-arrow-right" aria-hidden="true"><i></i></span></button>
 <div class="section-title reveal">¿Por qué comprar aquí?</div>
 <div class="benefits-grid reveal">
 <div class="benefit-box">
@@ -5166,7 +5166,7 @@
 </svg>
 </span>
 <span class="gx-account-capsule-label">Ver Estado de Cuenta</span>
-<span aria-hidden="true" class="gx-account-capsule-arrow">→</span>
+<span class="gx-account-capsule-arrow"><span class="gx-nav-arrow gx-nav-arrow-right" aria-hidden="true"><i></i></span></span>
 </button>
 </div>
 <div class="gx-gamification-mid" id="referral-section-container"></div>
@@ -6113,7 +6113,7 @@
                     </div>`;
 
                 expandedRefHtml = `
-                    <div class="gx-gamif-expanded-head"><button class="btn-gamif-close" onclick="closeGamif()">← Volver</button><span class="gx-gamif-expanded-kicker">GOXION REWARDS</span></div>
+                    <div class="gx-gamif-expanded-head"><button class="btn-gamif-close" onclick="closeGamif()"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver</span></button><span class="gx-gamif-expanded-kicker">GOXION REWARDS</span></div>
 
                     <div style="text-align:center; margin-bottom:25px; margin-top:5px;">
                         <div class="gx-gamif-shared-emoji ${beneficioListo && !beneficioReclamado ? 'shake-anim' : ''}" style="font-size:42px; margin-bottom:8px; display:inline-block; filter: drop-shadow(0 0 15px rgba(0,242,254,0.3));">${beneficioReclamado ? '💝' : '🎁'}</div>
@@ -6162,7 +6162,7 @@
                     </div>`;
 
                 expandedRefHtml = `
-                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <button class="btn-gamif-close" onclick="closeGamif()"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver</span></button>
                     <div style="text-align:center;margin-bottom:15px;margin-top:-5px;">
                         <div class="gx-gamif-shared-emoji" style="font-size:38px;margin-bottom:5px;">🫂</div>
                         <div style="font-size:16px;font-weight:800;">Gana 1 Mes Gratis</div>
@@ -6173,7 +6173,7 @@
                         <button class="btn-primary" style="width:auto;padding:10px 15px;border-radius:12px;font-size:12px;" onclick="copiarEnlace()">📋 Copiar</button>
                     </div>
                     <button class="btn-primary" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;box-shadow:0 0 15px rgba(37,211,102,.4);padding:14px;font-size:13px;" onclick="compartirAppGoxion('${msgWhatsApp}')">📲 Compartir por WhatsApp</button>
-                    <div style="font-size:11px;color:var(--neon-blue);margin-top:15px;text-align:center;cursor:pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio →</div>`;
+                    <div style="font-size:11px;color:var(--neon-blue);margin-top:15px;text-align:center;cursor:pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio <span class="gx-nav-arrow gx-nav-arrow-right" aria-hidden="true"><i></i></span></div>`;
             }
 
             let tareasArr = gamifConfig.tareas ? gamifConfig.tareas.split('\n').filter(t => t.trim() !== '') : [];
@@ -6275,7 +6275,7 @@
                 });
 
                 expandedCupHtml = `
-                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <button class="btn-gamif-close" onclick="closeGamif()"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver</span></button>
                     <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
                         <div class="gx-gamif-shared-emoji ${couponClaimed ? '' : 'shake-anim'}" style="font-size: 38px; margin-bottom: 5px; display: inline-block;">${missionClaimed ? '✅' : missionReady ? '🏆' : '🎯'}</div>
                         <div style="font-size: 16px; font-weight: 800; color: var(--neon-blue);">¡Desbloquea ${gamifConfig.descuento}% OFF!</div>
@@ -6290,7 +6290,7 @@
                     }`;
             } else {
                 expandedCupHtml = `
-                    <button class="btn-gamif-close" onclick="closeGamif()">← Volver</button>
+                    <button class="btn-gamif-close" onclick="closeGamif()"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver</span></button>
                     <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
                         <div class="gx-gamif-shared-emoji" style="font-size: 38px; margin-bottom: 5px; opacity: 0.5;">🎯</div>
                         <div style="font-size: 16px; font-weight: 800;">Sin misiones activas</div>
@@ -6491,7 +6491,7 @@
                                 <strong>Nueva contraseña disponible</strong>
                                 <small>${escape(delivery.plataforma || s.nombre)} · una sola consulta · requiere tu PIN</small>
                             </span>
-                            <span class="gx-credential-notice-arrow" aria-hidden="true">›</span>
+                            <span class="gx-credential-notice-arrow"><span class="gx-nav-arrow gx-nav-arrow-right" aria-hidden="true"><i></i></span></span>
                         </button>` : '';
 
                     const cancellationLabel = cancellationState === 'solicitada'
@@ -6507,14 +6507,14 @@
                                 <span>${cancellationState === 'solicitada' ? 'Solicitud de cancelación' : cancellationState === 'aprobada' ? 'Cancelación aprobada' : 'Solicitud resuelta'}</span>
                                 <span class="gx-cancel-inline-status ${cancellationState === 'solicitada' ? 'requested' : cancellationState === 'aprobada' ? 'approved' : 'rejected'}">${cancellationLabel}</span>
                            </button>`
-                        : `<button type="button" class="gx-cancel-link" onclick="gxServiceView(${idx},'cancel',event)">Solicitar cancelación <span aria-hidden="true">→</span></button>`;
+                        : `<button type="button" class="gx-cancel-link" onclick="gxServiceView(${idx},'cancel',event)"><span>Solicitar cancelación</span><span class="gx-nav-arrow gx-nav-arrow-right" aria-hidden="true"><i></i></span></button>`;
 
                     const cancelAdminNote = cancellation?.nota_admin
                         ? `<div class="gx-cancel-admin-note"><strong>Nota de GOXION</strong><br>${escape(cancellation.nota_admin)}</div>`
                         : '';
 
                     let cancellationPanelHTML = `
-                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver a accesos</span></button>
                         <div class="gx-cancellation-kicker">GESTIÓN DE SERVICIO</div>
                         <h3>Solicitar cancelación</h3>
                         <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
@@ -6524,7 +6524,7 @@
 
                     if(cancellationState === 'solicitada') {
                         cancellationPanelHTML = `
-                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver a accesos</span></button>
                             <div class="gx-cancellation-kicker">SOLICITUD RECIBIDA</div>
                             <h3>Cancelación en revisión</h3>
                             <p>Ya recibimos tu solicitud. Tu servicio permanece activo mientras revisamos la baja.</p>
@@ -6541,7 +6541,7 @@
                             ? ` Fecha prevista: ${escape(cancellation.fecha_efectiva)}.`
                             : '';
                         cancellationPanelHTML = `
-                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver a accesos</span></button>
                             <div class="gx-cancellation-kicker">SOLICITUD APROBADA</div>
                             <h3>Cancelación aprobada</h3>
                             <p>La solicitud fue autorizada. El servicio seguirá disponible hasta que la baja sea marcada como efectiva.${effectiveDate}</p>
@@ -6555,7 +6555,7 @@
                             ${cancelAdminNote}`;
                     } else if(cancellationState === 'rechazada') {
                         cancellationPanelHTML = `
-                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver a accesos</span></button>
                             <div class="gx-cancellation-kicker">SOLICITUD RESUELTA</div>
                             <h3>Solicitud no autorizada</h3>
                             <p>La solicitud anterior fue revisada y no se hizo efectiva. Tu servicio continúa activo.</p>
@@ -6569,7 +6569,7 @@
                     }
 
                     const credentialPanelHTML = delivery ? `
-                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver a accesos</span></button>
                         <div class="gx-credential-kicker">ACTUALIZACIÓN DE ACCESO · UNA SOLA VISTA</div>
                         <h3>Nueva contraseña disponible</h3>
                         <p>GOXION actualizó la contraseña de esta cuenta. Confirma tu PIN de Mi Espacio para verla.</p>
@@ -6613,7 +6613,10 @@
                                     <span class="gx-service-state ${gxServiceHasAlert(s.nombre) ? 'gx-service-interrupted' : ''}">${gxServiceHasAlert(s.nombre) ? 'Temporalmente inactivo' : 'Activo'}</span>
                                 </span>
 
-                                <span class="brand-expand-icon gx-service-expand-icon gx-experience-toggle" id="gx-service-chevron-${idx}">⏷</span>
+                                <span class="brand-expand-icon gx-service-expand-icon gx-chevron-motion" id="gx-service-chevron-${idx}" aria-hidden="true">
+                                <span class="gx-chevron-bar gx-chevron-bar-left"></span>
+                                <span class="gx-chevron-bar gx-chevron-bar-right"></span>
+                            </span>
                             </button>
 
                             <div class="gx-service-expanded" id="gx-service-expanded-${idx}" hidden>
@@ -6628,8 +6631,8 @@
                                     </div>
                                 </div>
                                 <div id="gx-service-options-${idx}" class="gx-service-view" hidden>
-                                    <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
-                                    <button type="button" class="gx-option-support" onclick="gxOpenServiceSupport(${idx},event)"><span>Soporte de la plataforma</span><span aria-hidden="true">→</span></button>
+                                    <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><span class="gx-nav-arrow gx-nav-arrow-left" aria-hidden="true"><i></i></span><span>Volver a accesos</span></button>
+                                    <button type="button" class="gx-option-support" onclick="gxOpenServiceSupport(${idx},event)"><span>Soporte de la plataforma</span><span class="gx-nav-arrow gx-nav-arrow-right" aria-hidden="true"><i></i></span></button>
                                     ${cancellationOptionHTML}
                                 </div>
                                 <div id="gx-service-cancel-${idx}" class="gx-service-view gx-cancellation-state-view" hidden>
@@ -6653,6 +6656,17 @@
             button.setAttribute('aria-pressed',String(show));
             button.setAttribute('aria-label',show?'Ocultar PIN':'Mostrar PIN');
         }
+        function gxRunNavigationArrows(root) {
+            if(!root) return;
+            root.querySelectorAll('.gx-nav-arrow').forEach(arrow=>{
+                arrow.classList.remove('gx-nav-arrow-run');
+                void arrow.offsetWidth;
+                arrow.classList.add('gx-nav-arrow-run');
+                clearTimeout(arrow._gxNavArrowTimer);
+                arrow._gxNavArrowTimer=setTimeout(()=>arrow.classList.remove('gx-nav-arrow-run'),620);
+            });
+        }
+
         function gxServiceView(index,view,event) {
             event?.preventDefault(); event?.stopPropagation();
             const card=document.getElementById(`gx-service-card-${index}`);
@@ -6665,6 +6679,7 @@
             const active=document.getElementById(`gx-service-${view}-${index}`);
             if(!active) return;
             if(!gxServiceReducedMotion()) active.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'ease-out'});
+            gxRunNavigationArrows(active);
             active.querySelector('button')?.focus({preventScroll:true});
         }
 
@@ -6716,28 +6731,6 @@
             });
         }
 
-        function gxAnimateExperienceToggle(icon,open) {
-            if (!icon) return;
-
-            const reduced = gxServiceReducedMotion();
-            icon.dataset.gxToggleDirection = open ? 'open' : 'close';
-
-            if (reduced) {
-                icon.classList.remove('gx-toggle-effect-running');
-                return;
-            }
-
-            icon.classList.remove('gx-toggle-effect-running');
-            void icon.offsetWidth;
-            icon.classList.add('gx-toggle-effect-running');
-
-            clearTimeout(icon._gxToggleTimer);
-            icon._gxToggleTimer = setTimeout(() => {
-                icon.classList.remove('gx-toggle-effect-running');
-                delete icon.dataset.gxToggleDirection;
-            }, 720);
-        }
-
         function gxSetServiceCardState(card,index,open) {
             const summary = card.querySelector('.gx-service-summary');
             const body = document.getElementById(`gx-service-expanded-${index}`);
@@ -6750,7 +6743,7 @@
             card.classList.toggle('expanded',open);
             if(summary) summary.setAttribute('aria-expanded',open ? 'true' : 'false');
             if(body) body.hidden = !open;
-            if(chevron) chevron.textContent = open ? '×' : '⏷';
+            if(chevron) chevron.classList.toggle('open',open);
         }
 
         function gxMorphServiceCard(card,index,open) {
@@ -6818,8 +6811,6 @@
                     fill:'both'
                 });
             }
-
-            gxAnimateExperienceToggle(icon,open);
 
             container.onfinish = () => {
                 card.style.height = '';
@@ -7240,7 +7231,7 @@
             card.classList.toggle('expanded', open);
             if (header) header.setAttribute('aria-expanded', open ? 'true' : 'false');
             if (content) content.setAttribute('aria-hidden', open ? 'false' : 'true');
-            if (icon) icon.textContent = open ? '×' : '⏷';
+            if (icon) icon.classList.toggle('open',open);
         }
 
         function gxMorphBrandCard(card, open) {
@@ -7314,10 +7305,6 @@
                     { transform: 'translateY(-2px) scale(1.05)' },
                     { transform: 'translateY(0) scale(1)' }
                 ], { duration: open ? 460 : 360, easing, fill: 'both' });
-            }
-
-            if (icon) {
-                gxAnimateExperienceToggle(icon,open);
             }
 
             // Stagger only expanded body blocks; the promotional badge and its
@@ -7774,7 +7761,10 @@
                                 <div class="gx-brand-meta"><div class="brand-price-start">Desde $${minPrice}</div>${gxContextBadge}</div>
                             </div>
                         </div>
-                        <div class="brand-expand-icon gx-experience-toggle">⏷</div>
+                        <div class="brand-expand-icon gx-chevron-motion" aria-hidden="true">
+                            <span class="gx-chevron-bar gx-chevron-bar-left"></span>
+                            <span class="gx-chevron-bar gx-chevron-bar-right"></span>
+                        </div>
                     </div>
                     
                     <div class="brand-expanded-content" aria-hidden="true">
@@ -8885,7 +8875,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 05 v1.2.0-beta-05: microinteracciones de expansión + acciones con cuerpo + feedback de copiado.");
+        console.info("GOXION Ayuda Beta 06 v1.2.0-beta-06: flechas de interfaz + nuevo chevron puro de expansión.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -9818,7 +9808,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda Beta 05 · v1.2.0-beta-05
+    GOXION · Ayuda Beta 06 · v1.2.0-beta-06
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -11324,193 +11314,6 @@ body:has(#view-catalogo.active) #goxion-main-nav{
    ========================================================= */
 
 /* ---------------------------------------------------------
-   EXPANDER "FOLD / DIVE"
-   Inspirado en el efecto de flecha del video de referencia:
-   el chevron se hunde, aparece un pequeño cuerpo y reaparece
-   antes de que el control quede en su estado final.
-   El estado estable aprobado continúa siendo ⏷ / ×.
-   --------------------------------------------------------- */
-.gx-experience-toggle{
-    position:relative;
-    isolation:isolate;
-    overflow:visible!important;
-    transform:translateZ(0);
-}
-.gx-experience-toggle.gx-toggle-effect-running{
-    color:transparent!important;
-    text-shadow:none!important;
-}
-.gx-experience-toggle.gx-toggle-effect-running::before,
-.gx-experience-toggle.gx-toggle-effect-running::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    pointer-events:none;
-}
-.gx-experience-toggle.gx-toggle-effect-running::before{
-    z-index:2;
-    width:12px;
-    height:12px;
-    border-right:3px solid #071015;
-    border-bottom:3px solid #071015;
-    border-radius:1px;
-    transform-origin:center;
-}
-.gx-experience-toggle.gx-toggle-effect-running::after{
-    z-index:1;
-    width:20px;
-    height:18px;
-    margin-left:-10px;
-    margin-top:-1px;
-    border-radius:4px 4px 6px 6px;
-    background:
-        linear-gradient(180deg,rgba(3,5,7,.36),rgba(3,5,7,.72));
-    box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.08),
-        0 4px 10px rgba(0,0,0,.24);
-    opacity:0;
-}
-
-/* Apertura: chevron baja al cuerpo, desaparece y reaparece arriba. */
-.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="open"]::before{
-    animation:gxFoldChevronOpen 680ms cubic-bezier(.2,.84,.22,1) both;
-}
-.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="open"]::after{
-    animation:gxFoldBodyOpen 680ms cubic-bezier(.2,.84,.22,1) both;
-}
-
-/* Cierre: recorrido inverso y salida limpia. */
-.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="close"]::before{
-    animation:gxFoldChevronClose 640ms cubic-bezier(.2,.84,.22,1) both;
-}
-.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="close"]::after{
-    animation:gxFoldBodyClose 640ms cubic-bezier(.2,.84,.22,1) both;
-}
-
-@keyframes gxFoldChevronOpen{
-    0%{
-        opacity:1;
-        transform:translate(-50%,-62%) rotate(45deg) scale(.84);
-    }
-    28%{
-        opacity:1;
-        transform:translate(-50%,-18%) rotate(45deg) scale(.96);
-    }
-    43%{
-        opacity:.22;
-        transform:translate(-50%,5%) rotate(45deg) scale(.72);
-    }
-    55%{
-        opacity:0;
-        transform:translate(-50%,13%) rotate(45deg) scale(.62);
-    }
-    70%{
-        opacity:0;
-        transform:translate(-50%,-110%) rotate(225deg) scale(.7);
-    }
-    86%{
-        opacity:1;
-        transform:translate(-50%,-66%) rotate(225deg) scale(1.08);
-    }
-    100%{
-        opacity:1;
-        transform:translate(-50%,-58%) rotate(225deg) scale(.9);
-    }
-}
-@keyframes gxFoldBodyOpen{
-    0%,20%{
-        opacity:0;
-        transform:translateY(7px) scale(.72,.58);
-    }
-    38%{
-        opacity:.8;
-        transform:translateY(1px) scale(.96,.94);
-    }
-    57%{
-        opacity:.9;
-        transform:translateY(0) scale(1,1);
-    }
-    72%{
-        opacity:.22;
-        transform:translateY(-3px) scale(.9,.72);
-    }
-    100%{
-        opacity:0;
-        transform:translateY(-6px) scale(.7,.48);
-    }
-}
-@keyframes gxFoldChevronClose{
-    0%{
-        opacity:1;
-        transform:translate(-50%,-58%) rotate(225deg) scale(.88);
-    }
-    28%{
-        opacity:1;
-        transform:translate(-50%,-14%) rotate(225deg) scale(.98);
-    }
-    44%{
-        opacity:.2;
-        transform:translate(-50%,7%) rotate(225deg) scale(.7);
-    }
-    57%{
-        opacity:0;
-        transform:translate(-50%,13%) rotate(225deg) scale(.62);
-    }
-    71%{
-        opacity:0;
-        transform:translate(-50%,-105%) rotate(45deg) scale(.68);
-    }
-    88%{
-        opacity:1;
-        transform:translate(-50%,-63%) rotate(45deg) scale(1.08);
-    }
-    100%{
-        opacity:1;
-        transform:translate(-50%,-58%) rotate(45deg) scale(.9);
-    }
-}
-@keyframes gxFoldBodyClose{
-    0%,20%{
-        opacity:0;
-        transform:translateY(7px) scale(.72,.58);
-    }
-    39%{
-        opacity:.76;
-        transform:translateY(1px) scale(.95,.93);
-    }
-    57%{
-        opacity:.88;
-        transform:translateY(0) scale(1,1);
-    }
-    74%{
-        opacity:.18;
-        transform:translateY(-3px) scale(.9,.72);
-    }
-    100%{
-        opacity:0;
-        transform:translateY(-6px) scale(.7,.48);
-    }
-}
-
-/* El expander del catálogo conserva la cápsula de GOXION,
-   pero durante el efecto gana un pequeño pulso cian. */
-.brand-card .gx-experience-toggle.gx-toggle-effect-running,
-.gx-service-manage-card .gx-experience-toggle.gx-toggle-effect-running{
-    animation:gxToggleCapsulePulse 680ms ease-out both;
-}
-@keyframes gxToggleCapsulePulse{
-    0%,100%{
-        box-shadow:0 0 0 rgba(0,242,254,0);
-    }
-    48%{
-        box-shadow:
-            0 0 0 4px rgba(0,242,254,.035),
-            0 0 18px rgba(0,242,254,.18);
-    }
-}
-
-/* ---------------------------------------------------------
    MÁS OPCIONES: MENOS TRANSLÚCIDO, MÁS CUERPO
    Mantiene negro, morado, cian y rosa como estados.
    --------------------------------------------------------- */
@@ -11724,6 +11527,319 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         animation:none!important;
     }
     .gx-copy-spark{display:none!important}
+}
+</style>
+
+
+<script id="goxion-ayuda-beta-06-nav-arrow-controller">
+document.addEventListener('pointerdown',event=>{
+    const host=event.target.closest('button,a,[onclick]');
+    const arrow=host?.querySelector?.('.gx-nav-arrow');
+    if(!arrow) return;
+    arrow.classList.remove('gx-nav-arrow-run');
+    void arrow.offsetWidth;
+    arrow.classList.add('gx-nav-arrow-run');
+    clearTimeout(arrow._gxNavArrowTimer);
+    arrow._gxNavArrowTimer=setTimeout(()=>arrow.classList.remove('gx-nav-arrow-run'),620);
+},{passive:true});
+</script>
+
+
+<style id="goxion-ayuda-beta-06-arrows">
+/* =========================================================
+   GOXION · AYUDA BETA 06
+   Referencias:
+   - Video 1: únicamente Animation 1 para flechas ir/regresar.
+   - Video 2: chevron de dos barras para expandir/contraer.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   CATÁLOGO / TUS SERVICIOS
+   Reemplazo TOTAL de la animación Beta05.
+   Sin cápsula, sin cuadro, sin FOLD/DIVE, sin ×.
+   --------------------------------------------------------- */
+.brand-expand-icon.gx-chevron-motion,
+.gx-service-expand-icon.gx-chevron-motion,
+.brand-card.expanded .brand-expand-icon.gx-chevron-motion{
+    position:relative!important;
+    flex:0 0 30px!important;
+    width:30px!important;
+    height:24px!important;
+    min-width:30px!important;
+    min-height:24px!important;
+    padding:0!important;
+    margin:0!important;
+    display:block!important;
+    overflow:visible!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:var(--neon-blue)!important;
+    font-size:0!important;
+    line-height:0!important;
+}
+
+.gx-chevron-motion .gx-chevron-bar{
+    position:absolute;
+    top:10px;
+    width:16px;
+    height:3px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#8e7dff 0%,#00f2fe 100%);
+    box-shadow:0 0 8px rgba(0,242,254,.16);
+    transition:
+        transform .48s cubic-bezier(.25,1.7,.35,.8),
+        left .48s cubic-bezier(.25,1.7,.35,.8),
+        right .48s cubic-bezier(.25,1.7,.35,.8),
+        background .35s ease,
+        box-shadow .35s ease;
+    will-change:transform;
+}
+
+/* Cerrado: V hacia abajo. */
+.gx-chevron-motion .gx-chevron-bar-left{
+    left:2px;
+    transform-origin:calc(100% - 1px) 50%;
+    transform:rotate(38deg);
+}
+.gx-chevron-motion .gx-chevron-bar-right{
+    right:2px;
+    transform-origin:1px 50%;
+    transform:rotate(-38deg);
+}
+
+/* Abierto: ∧ hacia arriba.
+   Mismo principio del segundo video: cada barra rota por separado. */
+.gx-chevron-motion.open .gx-chevron-bar-left{
+    transform:rotate(-38deg);
+}
+.gx-chevron-motion.open .gx-chevron-bar-right{
+    transform:rotate(38deg);
+}
+.gx-chevron-motion.open .gx-chevron-bar{
+    background:linear-gradient(90deg,#b096ff 0%,#72fbff 100%);
+    box-shadow:0 0 10px rgba(0,242,254,.21);
+}
+
+/* Un toque de rebote sólo en las barras, nunca en un recuadro. */
+.brand-header:active .gx-chevron-motion .gx-chevron-bar,
+.gx-service-summary:active .gx-chevron-motion .gx-chevron-bar{
+    box-shadow:0 0 13px rgba(0,242,254,.28);
+}
+
+/* ---------------------------------------------------------
+   FLECHAS DE IR / REGRESAR — ANIMATION 1
+   Estructura del ejemplo: línea central + dos piezas de cabeza.
+   La animación reconstruye la flecha atravesando su propio eje.
+   --------------------------------------------------------- */
+.gx-nav-arrow{
+    --gx-arrow-dir:1;
+    position:relative;
+    flex:0 0 22px;
+    width:22px;
+    height:16px;
+    display:inline-block;
+    color:currentColor;
+    vertical-align:middle;
+    transform:scaleX(var(--gx-arrow-dir));
+    transform-origin:center;
+}
+.gx-nav-arrow-left{--gx-arrow-dir:-1}
+.gx-nav-arrow-right{--gx-arrow-dir:1}
+
+/* eje */
+.gx-nav-arrow>i{
+    position:absolute;
+    left:2px;
+    top:7px;
+    width:17px;
+    height:2px;
+    border-radius:999px;
+    background:currentColor;
+    opacity:.92;
+}
+/* piezas de la cabeza */
+.gx-nav-arrow::before,
+.gx-nav-arrow::after{
+    content:"";
+    position:absolute;
+    right:1px;
+    width:8px;
+    height:2px;
+    border-radius:999px;
+    background:currentColor;
+    transform-origin:right center;
+}
+.gx-nav-arrow::before{
+    top:6px;
+    transform:rotate(45deg);
+}
+.gx-nav-arrow::after{
+    top:8px;
+    transform:rotate(-45deg);
+}
+
+/* Sólo la primera animación de la referencia:
+   cabeza -> punto central -> reconstrucción al frente. */
+.gx-nav-arrow.gx-nav-arrow-run::before{
+    animation:gxArrowOneTop .58s cubic-bezier(.2,.82,.2,1) both;
+}
+.gx-nav-arrow.gx-nav-arrow-run::after{
+    animation:gxArrowOneBottom .58s cubic-bezier(.2,.82,.2,1) both;
+}
+.gx-nav-arrow.gx-nav-arrow-run>i{
+    animation:gxArrowOneShaft .58s cubic-bezier(.2,.82,.2,1) both;
+}
+
+@keyframes gxArrowOneTop{
+    0%{
+        right:1px;
+        top:6px;
+        width:8px;
+        height:2px;
+        border-radius:999px;
+        transform:rotate(45deg);
+        opacity:1;
+    }
+    43%{
+        right:10px;
+        top:7px;
+        width:3px;
+        height:3px;
+        border-radius:50%;
+        transform:rotate(0deg);
+        opacity:.9;
+    }
+    56%{
+        right:15px;
+        top:7px;
+        width:3px;
+        height:3px;
+        border-radius:50%;
+        transform:rotate(0deg);
+        opacity:.15;
+    }
+    72%{
+        right:-2px;
+        top:7px;
+        width:3px;
+        height:3px;
+        border-radius:50%;
+        transform:rotate(0deg);
+        opacity:.2;
+    }
+    100%{
+        right:1px;
+        top:6px;
+        width:8px;
+        height:2px;
+        border-radius:999px;
+        transform:rotate(45deg);
+        opacity:1;
+    }
+}
+@keyframes gxArrowOneBottom{
+    0%{
+        right:1px;
+        top:8px;
+        width:8px;
+        height:2px;
+        border-radius:999px;
+        transform:rotate(-45deg);
+        opacity:1;
+    }
+    43%{
+        right:10px;
+        top:7px;
+        width:3px;
+        height:3px;
+        border-radius:50%;
+        transform:rotate(0deg);
+        opacity:.9;
+    }
+    56%{
+        right:15px;
+        top:7px;
+        width:3px;
+        height:3px;
+        border-radius:50%;
+        transform:rotate(0deg);
+        opacity:.15;
+    }
+    72%{
+        right:-2px;
+        top:7px;
+        width:3px;
+        height:3px;
+        border-radius:50%;
+        transform:rotate(0deg);
+        opacity:.2;
+    }
+    100%{
+        right:1px;
+        top:8px;
+        width:8px;
+        height:2px;
+        border-radius:999px;
+        transform:rotate(-45deg);
+        opacity:1;
+    }
+}
+@keyframes gxArrowOneShaft{
+    0%,100%{transform:scaleX(1);opacity:.92}
+    44%{transform:scaleX(.68);opacity:.72}
+    58%{transform:scaleX(.42);opacity:.48}
+    74%{transform:scaleX(.82);opacity:.82}
+}
+
+/* Integración en controles actuales. */
+.gx-service-back,
+.btn-gamif-close{
+    display:inline-flex!important;
+    align-items:center!important;
+    gap:7px!important;
+}
+.gx-option-support,
+.gx-service-view .gx-cancel-link{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:9px!important;
+}
+.gx-account-capsule-arrow{
+    display:inline-flex;
+    align-items:center;
+}
+.gx-account-capsule-arrow .gx-nav-arrow{
+    color:var(--neon-blue);
+}
+.btn-primary .gx-nav-arrow,
+.btn-gamif-close .gx-nav-arrow{
+    margin-left:4px;
+}
+.btn-gamif-close .gx-nav-arrow{
+    margin-left:0;
+}
+
+/* En los botones hacia atrás el espejo es geométrico, no otra animación. */
+.gx-service-back .gx-nav-arrow,
+.btn-gamif-close .gx-nav-arrow{
+    color:#9cefff;
+}
+
+/* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
+@media(prefers-reduced-motion:reduce){
+    .gx-chevron-motion .gx-chevron-bar{
+        transition:none!important;
+    }
+    .gx-nav-arrow.gx-nav-arrow-run::before,
+    .gx-nav-arrow.gx-nav-arrow-run::after,
+    .gx-nav-arrow.gx-nav-arrow-run>i{
+        animation:none!important;
+    }
 }
 </style>
 
