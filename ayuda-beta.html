@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.0-beta-04" lang="es">
+<html data-goxion-version="1.2.0-beta-05" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -6592,7 +6592,7 @@
                             <div class="gx-credential-result-label">Contraseña actualizada</div>
                             <div class="gx-credential-password" id="gx-credential-password-${idx}"></div>
                             <div class="gx-credential-result-actions">
-                                <button type="button" onclick="gxCopyCredentialPassword(${idx})">Copiar contraseña</button>
+                                <button type="button" id="gx-credential-copy-${idx}" onclick="gxCopyCredentialPassword(${idx})">Copiar contraseña</button>
                                 <button type="button" onclick="gxFinishCredentialView(${idx},event)">Listo, ocultar</button>
                             </div>
                         </div>` : '';
@@ -6613,7 +6613,7 @@
                                     <span class="gx-service-state ${gxServiceHasAlert(s.nombre) ? 'gx-service-interrupted' : ''}">${gxServiceHasAlert(s.nombre) ? 'Temporalmente inactivo' : 'Activo'}</span>
                                 </span>
 
-                                <span class="brand-expand-icon gx-service-expand-icon" id="gx-service-chevron-${idx}">⏷</span>
+                                <span class="brand-expand-icon gx-service-expand-icon gx-experience-toggle" id="gx-service-chevron-${idx}">⏷</span>
                             </button>
 
                             <div class="gx-service-expanded" id="gx-service-expanded-${idx}" hidden>
@@ -6716,6 +6716,28 @@
             });
         }
 
+        function gxAnimateExperienceToggle(icon,open) {
+            if (!icon) return;
+
+            const reduced = gxServiceReducedMotion();
+            icon.dataset.gxToggleDirection = open ? 'open' : 'close';
+
+            if (reduced) {
+                icon.classList.remove('gx-toggle-effect-running');
+                return;
+            }
+
+            icon.classList.remove('gx-toggle-effect-running');
+            void icon.offsetWidth;
+            icon.classList.add('gx-toggle-effect-running');
+
+            clearTimeout(icon._gxToggleTimer);
+            icon._gxToggleTimer = setTimeout(() => {
+                icon.classList.remove('gx-toggle-effect-running');
+                delete icon.dataset.gxToggleDirection;
+            }, 720);
+        }
+
         function gxSetServiceCardState(card,index,open) {
             const summary = card.querySelector('.gx-service-summary');
             const body = document.getElementById(`gx-service-expanded-${index}`);
@@ -6797,7 +6819,7 @@
                 });
             }
 
-            gxAnimateCatalogArrow(icon,open);
+            gxAnimateExperienceToggle(icon,open);
 
             container.onfinish = () => {
                 card.style.height = '';
@@ -7125,13 +7147,67 @@
             }
         }
 
+        function gxCredentialCopyExperience(index) {
+            const button=document.getElementById(`gx-credential-copy-${index}`);
+            const result=document.getElementById(`gx-credential-result-${index}`);
+            const password=document.getElementById(`gx-credential-password-${index}`);
+            if(!button || !result || !password) return;
+
+            const reduced=gxServiceReducedMotion();
+            clearTimeout(button._gxCopyRestoreTimer);
+            clearTimeout(result._gxCopyClearTimer);
+
+            button.querySelectorAll('.gx-copy-spark').forEach(x=>x.remove());
+            button.classList.remove('gx-copy-celebrate');
+            result.classList.remove('gx-copy-success');
+            password.classList.remove('gx-password-confirmed');
+            void button.offsetWidth;
+
+            button.dataset.gxOriginalText=button.dataset.gxOriginalText || 'Copiar contraseña';
+            button.textContent='✓ Copiada';
+
+            if(!reduced) {
+                button.classList.add('gx-copy-celebrate');
+                result.classList.add('gx-copy-success');
+                password.classList.add('gx-password-confirmed');
+
+                const angles=[0,60,120,180,240,300];
+                angles.forEach((angle,i)=>{
+                    const spark=document.createElement('span');
+                    spark.className='gx-copy-spark';
+                    spark.style.setProperty('--gx-copy-angle',`${angle}deg`);
+                    spark.style.setProperty('--gx-copy-delay',`${i*18}ms`);
+                    button.appendChild(spark);
+                });
+            }
+
+            if(navigator.vibrate) {
+                try { navigator.vibrate([22,28,35]); } catch(_) {}
+            }
+
+            button._gxCopyRestoreTimer=setTimeout(()=>{
+                button.querySelectorAll('.gx-copy-spark').forEach(x=>x.remove());
+                button.classList.remove('gx-copy-celebrate');
+                button.textContent=button.dataset.gxOriginalText || 'Copiar contraseña';
+            },1450);
+
+            result._gxCopyClearTimer=setTimeout(()=>{
+                result.classList.remove('gx-copy-success');
+                password.classList.remove('gx-password-confirmed');
+            },1250);
+        }
+
         async function gxCopyCredentialPassword(index) {
             const password=document.getElementById(`gx-credential-password-${index}`)?.textContent || '';
             const status=document.getElementById(`gx-credential-status-${index}`);
             if(!password) return;
             try {
                 await navigator.clipboard.writeText(password);
-                if(status) status.textContent='✓ Contraseña copiada. Úsala ahora en tu inicio de sesión.';
+                if(status) {
+                    status.classList.remove('error');
+                    status.textContent='✓ Copiada. Ya puedes pegarla en la plataforma.';
+                }
+                gxCredentialCopyExperience(index);
             } catch {
                 if(status) {
                     status.classList.add('error');
@@ -7241,14 +7317,7 @@
             }
 
             if (icon) {
-                icon.animate(open ? [
-                    { transform: 'scale(0.88) rotate(-25deg)' },
-                    { transform: 'scale(1.08) rotate(8deg)', offset: .58 },
-                    { transform: 'scale(1) rotate(0deg)' }
-                ] : [
-                    { transform: 'scale(0.90) rotate(22deg)' },
-                    { transform: 'scale(1) rotate(0deg)' }
-                ], { duration: open ? 420 : 300, easing });
+                gxAnimateExperienceToggle(icon,open);
             }
 
             // Stagger only expanded body blocks; the promotional badge and its
@@ -7705,7 +7774,7 @@
                                 <div class="gx-brand-meta"><div class="brand-price-start">Desde $${minPrice}</div>${gxContextBadge}</div>
                             </div>
                         </div>
-                        <div class="brand-expand-icon">⏷</div>
+                        <div class="brand-expand-icon gx-experience-toggle">⏷</div>
                     </div>
                     
                     <div class="brand-expanded-content" aria-hidden="true">
@@ -8816,7 +8885,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 04 v1.2.0-beta-04: cancelaciones formales + credenciales de una sola vista.");
+        console.info("GOXION Ayuda Beta 05 v1.2.0-beta-05: microinteracciones de expansión + acciones con cuerpo + feedback de copiado.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -9749,7 +9818,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda Beta 04 · v1.2.0-beta-04
+    GOXION · Ayuda Beta 05 · v1.2.0-beta-05
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -11247,5 +11316,416 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     }
 }
 </style>
+
+<style id="goxion-ayuda-beta-05-interaction-experience">
+/* =========================================================
+   GOXION · AYUDA BETA 05
+   Microinteracciones de expansión y feedback táctil/visual.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   EXPANDER "FOLD / DIVE"
+   Inspirado en el efecto de flecha del video de referencia:
+   el chevron se hunde, aparece un pequeño cuerpo y reaparece
+   antes de que el control quede en su estado final.
+   El estado estable aprobado continúa siendo ⏷ / ×.
+   --------------------------------------------------------- */
+.gx-experience-toggle{
+    position:relative;
+    isolation:isolate;
+    overflow:visible!important;
+    transform:translateZ(0);
+}
+.gx-experience-toggle.gx-toggle-effect-running{
+    color:transparent!important;
+    text-shadow:none!important;
+}
+.gx-experience-toggle.gx-toggle-effect-running::before,
+.gx-experience-toggle.gx-toggle-effect-running::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    pointer-events:none;
+}
+.gx-experience-toggle.gx-toggle-effect-running::before{
+    z-index:2;
+    width:12px;
+    height:12px;
+    border-right:3px solid #071015;
+    border-bottom:3px solid #071015;
+    border-radius:1px;
+    transform-origin:center;
+}
+.gx-experience-toggle.gx-toggle-effect-running::after{
+    z-index:1;
+    width:20px;
+    height:18px;
+    margin-left:-10px;
+    margin-top:-1px;
+    border-radius:4px 4px 6px 6px;
+    background:
+        linear-gradient(180deg,rgba(3,5,7,.36),rgba(3,5,7,.72));
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.08),
+        0 4px 10px rgba(0,0,0,.24);
+    opacity:0;
+}
+
+/* Apertura: chevron baja al cuerpo, desaparece y reaparece arriba. */
+.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="open"]::before{
+    animation:gxFoldChevronOpen 680ms cubic-bezier(.2,.84,.22,1) both;
+}
+.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="open"]::after{
+    animation:gxFoldBodyOpen 680ms cubic-bezier(.2,.84,.22,1) both;
+}
+
+/* Cierre: recorrido inverso y salida limpia. */
+.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="close"]::before{
+    animation:gxFoldChevronClose 640ms cubic-bezier(.2,.84,.22,1) both;
+}
+.gx-experience-toggle.gx-toggle-effect-running[data-gx-toggle-direction="close"]::after{
+    animation:gxFoldBodyClose 640ms cubic-bezier(.2,.84,.22,1) both;
+}
+
+@keyframes gxFoldChevronOpen{
+    0%{
+        opacity:1;
+        transform:translate(-50%,-62%) rotate(45deg) scale(.84);
+    }
+    28%{
+        opacity:1;
+        transform:translate(-50%,-18%) rotate(45deg) scale(.96);
+    }
+    43%{
+        opacity:.22;
+        transform:translate(-50%,5%) rotate(45deg) scale(.72);
+    }
+    55%{
+        opacity:0;
+        transform:translate(-50%,13%) rotate(45deg) scale(.62);
+    }
+    70%{
+        opacity:0;
+        transform:translate(-50%,-110%) rotate(225deg) scale(.7);
+    }
+    86%{
+        opacity:1;
+        transform:translate(-50%,-66%) rotate(225deg) scale(1.08);
+    }
+    100%{
+        opacity:1;
+        transform:translate(-50%,-58%) rotate(225deg) scale(.9);
+    }
+}
+@keyframes gxFoldBodyOpen{
+    0%,20%{
+        opacity:0;
+        transform:translateY(7px) scale(.72,.58);
+    }
+    38%{
+        opacity:.8;
+        transform:translateY(1px) scale(.96,.94);
+    }
+    57%{
+        opacity:.9;
+        transform:translateY(0) scale(1,1);
+    }
+    72%{
+        opacity:.22;
+        transform:translateY(-3px) scale(.9,.72);
+    }
+    100%{
+        opacity:0;
+        transform:translateY(-6px) scale(.7,.48);
+    }
+}
+@keyframes gxFoldChevronClose{
+    0%{
+        opacity:1;
+        transform:translate(-50%,-58%) rotate(225deg) scale(.88);
+    }
+    28%{
+        opacity:1;
+        transform:translate(-50%,-14%) rotate(225deg) scale(.98);
+    }
+    44%{
+        opacity:.2;
+        transform:translate(-50%,7%) rotate(225deg) scale(.7);
+    }
+    57%{
+        opacity:0;
+        transform:translate(-50%,13%) rotate(225deg) scale(.62);
+    }
+    71%{
+        opacity:0;
+        transform:translate(-50%,-105%) rotate(45deg) scale(.68);
+    }
+    88%{
+        opacity:1;
+        transform:translate(-50%,-63%) rotate(45deg) scale(1.08);
+    }
+    100%{
+        opacity:1;
+        transform:translate(-50%,-58%) rotate(45deg) scale(.9);
+    }
+}
+@keyframes gxFoldBodyClose{
+    0%,20%{
+        opacity:0;
+        transform:translateY(7px) scale(.72,.58);
+    }
+    39%{
+        opacity:.76;
+        transform:translateY(1px) scale(.95,.93);
+    }
+    57%{
+        opacity:.88;
+        transform:translateY(0) scale(1,1);
+    }
+    74%{
+        opacity:.18;
+        transform:translateY(-3px) scale(.9,.72);
+    }
+    100%{
+        opacity:0;
+        transform:translateY(-6px) scale(.7,.48);
+    }
+}
+
+/* El expander del catálogo conserva la cápsula de GOXION,
+   pero durante el efecto gana un pequeño pulso cian. */
+.brand-card .gx-experience-toggle.gx-toggle-effect-running,
+.gx-service-manage-card .gx-experience-toggle.gx-toggle-effect-running{
+    animation:gxToggleCapsulePulse 680ms ease-out both;
+}
+@keyframes gxToggleCapsulePulse{
+    0%,100%{
+        box-shadow:0 0 0 rgba(0,242,254,0);
+    }
+    48%{
+        box-shadow:
+            0 0 0 4px rgba(0,242,254,.035),
+            0 0 18px rgba(0,242,254,.18);
+    }
+}
+
+/* ---------------------------------------------------------
+   MÁS OPCIONES: MENOS TRANSLÚCIDO, MÁS CUERPO
+   Mantiene negro, morado, cian y rosa como estados.
+   --------------------------------------------------------- */
+.gx-service-toolbar button{
+    border-color:rgba(151,120,255,.30)!important;
+    background:
+        linear-gradient(135deg,#191426 0%,#131221 52%,#0e111a 100%)!important;
+    color:#ddd4ff!important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.055),
+        0 7px 16px rgba(0,0,0,.20)!important;
+}
+.gx-service-toolbar button:active{
+    transform:scale(.975);
+    border-color:rgba(0,242,254,.28)!important;
+    background:
+        linear-gradient(135deg,#18162a,#0e1b22)!important;
+}
+
+.gx-service-back{
+    width:auto!important;
+    min-height:34px!important;
+    margin-bottom:4px!important;
+    padding:0 10px!important;
+    border:1px solid rgba(255,255,255,.075)!important;
+    border-radius:10px!important;
+    background:#11131a!important;
+    color:#b9c3d2!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+
+.gx-option-support{
+    border-color:rgba(0,242,254,.20)!important;
+    background:
+        linear-gradient(135deg,#0e2026 0%,#101b22 62%,#11151b 100%)!important;
+    color:#e9fbff!important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.045),
+        0 8px 18px rgba(0,0,0,.16)!important;
+}
+.gx-service-view .gx-cancel-link{
+    border-color:rgba(255,112,148,.19)!important;
+    background:
+        linear-gradient(135deg,#25131a 0%,#1d131a 62%,#141216 100%)!important;
+    color:#f1ccd6!important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 8px 18px rgba(0,0,0,.15)!important;
+}
+
+.gx-option-support:active,
+.gx-service-view .gx-cancel-link:active,
+.gx-service-back:active{
+    transform:scale(.985);
+}
+
+/* También damos cuerpo a las acciones críticas de credenciales. */
+.gx-credential-reveal-btn{
+    background:
+        linear-gradient(135deg,#0d252b,#10202a)!important;
+    border-color:rgba(0,242,254,.22)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.04)!important;
+}
+.gx-credential-result-actions button{
+    background:#12151d!important;
+    border-color:rgba(255,255,255,.085)!important;
+}
+.gx-credential-result-actions button:first-child{
+    background:
+        linear-gradient(135deg,#0c2028,#111a24)!important;
+    border-color:rgba(0,242,254,.18)!important;
+}
+
+/* ---------------------------------------------------------
+   COPIAR CONTRASEÑA: FEEDBACK VISTOSO
+   --------------------------------------------------------- */
+.gx-credential-result{
+    position:relative;
+    overflow:visible;
+}
+.gx-credential-result.gx-copy-success{
+    animation:gxCopyCardConfirm 1120ms cubic-bezier(.2,.85,.2,1) both;
+}
+.gx-credential-result.gx-copy-success::after{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    z-index:4;
+    pointer-events:none;
+    border-radius:13px;
+    background:
+        linear-gradient(105deg,
+            transparent 0%,
+            transparent 28%,
+            rgba(0,242,254,.06) 38%,
+            rgba(255,255,255,.26) 50%,
+            rgba(0,255,157,.10) 62%,
+            transparent 72%);
+    transform:translateX(-135%);
+    animation:gxCopySweep 820ms cubic-bezier(.2,.8,.2,1) 80ms both;
+}
+@keyframes gxCopyCardConfirm{
+    0%{
+        border-color:rgba(0,255,157,.14);
+        box-shadow:0 0 0 rgba(0,242,254,0);
+    }
+    36%{
+        border-color:rgba(0,242,254,.46);
+        box-shadow:
+            0 0 0 4px rgba(0,242,254,.045),
+            0 0 26px rgba(0,242,254,.16);
+    }
+    65%{
+        border-color:rgba(0,255,157,.36);
+        box-shadow:
+            0 0 0 2px rgba(0,255,157,.035),
+            0 0 20px rgba(0,255,157,.11);
+    }
+    100%{
+        border-color:rgba(0,255,157,.14);
+        box-shadow:0 0 0 rgba(0,242,254,0);
+    }
+}
+@keyframes gxCopySweep{
+    0%{transform:translateX(-135%);opacity:0}
+    16%{opacity:1}
+    100%{transform:translateX(135%);opacity:0}
+}
+
+.gx-credential-password.gx-password-confirmed{
+    animation:gxPasswordConfirmGlow 980ms cubic-bezier(.2,.85,.2,1) both;
+}
+@keyframes gxPasswordConfirmGlow{
+    0%{transform:scale(1);color:#fff}
+    30%{
+        transform:scale(1.025);
+        color:#dffff7;
+        box-shadow:0 0 18px rgba(0,242,254,.12);
+    }
+    58%{
+        transform:scale(.995);
+        color:#cffff0;
+        box-shadow:0 0 14px rgba(0,255,157,.10);
+    }
+    100%{transform:scale(1);color:#fff;box-shadow:none}
+}
+
+#gx-credential-copy-0,
+[id^="gx-credential-copy-"]{
+    position:relative;
+    overflow:visible!important;
+    isolation:isolate;
+}
+[id^="gx-credential-copy-"].gx-copy-celebrate{
+    color:#06120f!important;
+    border-color:rgba(0,255,157,.72)!important;
+    background:
+        linear-gradient(120deg,#72ffcf,#7df4ff 52%,#b99cff)!important;
+    animation:gxCopyButtonPop 980ms cubic-bezier(.18,.9,.2,1) both;
+    box-shadow:
+        0 0 0 4px rgba(0,255,157,.045),
+        0 0 24px rgba(0,242,254,.20)!important;
+}
+@keyframes gxCopyButtonPop{
+    0%{transform:scale(1)}
+    22%{transform:scale(.92)}
+    43%{transform:scale(1.10)}
+    61%{transform:scale(.985)}
+    78%{transform:scale(1.025)}
+    100%{transform:scale(1)}
+}
+
+.gx-copy-spark{
+    --gx-copy-angle:0deg;
+    --gx-copy-delay:0ms;
+    position:absolute;
+    z-index:10;
+    left:50%;
+    top:50%;
+    width:5px;
+    height:5px;
+    margin:-2.5px;
+    border-radius:50%;
+    background:#b9ffff;
+    box-shadow:0 0 7px rgba(0,242,254,.8);
+    pointer-events:none;
+    animation:gxCopySpark 720ms cubic-bezier(.16,.8,.3,1) var(--gx-copy-delay) both;
+}
+@keyframes gxCopySpark{
+    0%{
+        opacity:0;
+        transform:rotate(var(--gx-copy-angle)) translateY(0) scale(.2);
+    }
+    18%{opacity:1}
+    72%{opacity:1}
+    100%{
+        opacity:0;
+        transform:rotate(var(--gx-copy-angle)) translateY(-33px) scale(.95);
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-experience-toggle.gx-toggle-effect-running,
+    .gx-experience-toggle.gx-toggle-effect-running::before,
+    .gx-experience-toggle.gx-toggle-effect-running::after,
+    .gx-credential-result.gx-copy-success,
+    .gx-credential-result.gx-copy-success::after,
+    .gx-credential-password.gx-password-confirmed,
+    [id^="gx-credential-copy-"].gx-copy-celebrate,
+    .gx-copy-spark{
+        animation:none!important;
+    }
+    .gx-copy-spark{display:none!important}
+}
+</style>
+
 </body>
 </html>
