@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.1.0-beta-12" lang="es">
+<html data-goxion-version="1.2.0-beta-04" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -2729,7 +2729,6 @@
     .gx-ref-service-chips span{padding:5px 7px;border-radius:999px;background:rgba(0,242,254,.07);border:1px solid rgba(0,242,254,.13);color:#cceff3;font-size:9.5px;font-weight:700}
 
 
-
         /* === GOXION CATALOG // CONTAINER MORPH 01 ===
            Motion-only layer. Deliberately does NOT redefine glass backgrounds,
            blur, borders, promo connections or animated tag styling. */
@@ -4062,10 +4061,10 @@
     }
 }
 </style>
-<style id="goxion-beta-03-02-ui">
+<style id="goxion-client-space-layout">
 /* =========================================================
-   GOXION BETA 03.02
-   Mi Espacio hierarchy + service morph + smart catalog
+   GOXION · MI ESPACIO + CATÁLOGO INTELIGENTE
+   Layout base y superficies de administración
    ========================================================= */
 
 .gx-dashboard-section-head{
@@ -4128,18 +4127,7 @@
     text-align:left;
     cursor:pointer;
 }
-.gx-service-icon{
-    width:43px;
-    height:43px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:13px;
-    border:1px solid rgba(255,255,255,.075);
-    background:rgba(255,255,255,.045);
-    font-size:21px;
-    flex:0 0 auto;
-}
+
 .gx-service-name{
     color:#fff;
     font-size:13.5px;
@@ -4164,19 +4152,7 @@
     background:currentColor;
     box-shadow:0 0 7px currentColor;
 }
-.gx-service-chevron{
-    width:31px;
-    height:31px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:10px;
-    background:rgba(0,242,254,.055);
-    border:1px solid rgba(0,242,254,.13);
-    color:var(--neon-blue);
-    font-size:16px;
-    font-weight:700;
-}
+
 .gx-service-expanded{
     padding:0 13px 13px;
 }
@@ -4408,51 +4384,7 @@
 }
 
 /* ---------- State of Account compact entry ---------- */
-.gx-account-card{
-    width:100%;
-    min-height:66px;
-    display:grid;
-    grid-template-columns:auto 1fr auto;
-    align-items:center;
-    gap:12px;
-    margin:4px 0 15px;
-    padding:11px 13px;
-    border-radius:17px;
-    border:1px solid rgba(0,242,254,.18);
-    background:rgba(0,242,254,.042);
-    color:var(--text-main);
-    text-align:left;
-    box-shadow:0 8px 24px rgba(0,0,0,.22);
-    cursor:pointer;
-}
-.gx-account-card-icon{
-    width:39px;
-    height:39px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:12px;
-    border:1px solid rgba(0,242,254,.13);
-    background:rgba(0,242,254,.065);
-    font-size:18px;
-}
-.gx-account-card-copy strong{
-    display:block;
-    color:#fff;
-    font-size:11.5px;
-    font-weight:800;
-}
-.gx-account-card-copy small{
-    display:block;
-    margin-top:3px;
-    color:var(--text-muted);
-    font-size:8.8px;
-    line-height:1.35;
-}
-.gx-account-card-arrow{
-    color:var(--neon-blue);
-    font-size:18px;
-}
+
 
 /* ---------- Smart catalog: only search + quick filters ---------- */
 .gx-catalog-toolbar{
@@ -4560,13 +4492,10 @@
     .gx-service-actions{grid-template-columns:1fr}
 }
 </style>
-<style id="goxion-beta-03-03-ui">
+<style id="goxion-client-space-components">
 /* =========================================================
-   GOXION BETA 03.03
-   - Estado de Cuenta en cápsula
-   - Historial más informativo
-   - Servicios con logos + flecha Catálogo
-   - Subacciones con crecimiento de su propio contenedor
+   GOXION · COMPONENTES DE MI ESPACIO
+   Historial, servicios, logos y controles contextuales
    ========================================================= */
 
 /* ---- Estado de Cuenta dentro de la tarjeta principal ---- */
@@ -4603,8 +4532,8 @@
     transform:translateX(2px);
 }
 
-/* Retira la tarjeta standalone de la beta anterior */
-.gx-account-card{display:none!important}
+/* La entrada financiera principal vive dentro de la tarjeta de cuenta. */
+
 
 /* ---- Historial de pagos ---- */
 .gx-payment-history-card{
@@ -4674,7 +4603,7 @@
 }
 
 /* ---- Servicios: logo real + misma cápsula/flecha del Catálogo ---- */
-.gx-service-icon{display:none!important}
+
 .gx-service-logo-img{
     width:48px;
     height:48px;
@@ -4698,7 +4627,7 @@
 }
 
 /* La card principal ya no necesita su flecha antigua. */
-.gx-service-chevron{display:none!important}
+
 
 /* ---- Administración: cada subacción es su propio contenedor morph ---- */
 .gx-service-actions{
@@ -4894,9 +4823,9 @@
 </style>
 
 
-<style id="goxion-beta-03-11-last">
+<style id="goxion-client-space-approved-states">
 /* =========================================================
-   GOXION BETA 03.12 · HANDOFF CONTINUO
+   GOXION · ESTADOS APROBADOS
    ========================================================= */
 
 /* Historial: estado de lealtad como segunda píldora, sin emoji. */
@@ -4962,6 +4891,9 @@
     }
 }
 </style>
+
+
+
 
 </head>
 <body class="no-scroll">
@@ -5248,14 +5180,6 @@
 <div class="gx-dashboard-section-subtitle">Tu constancia y lealtad</div>
 </div>
 <div id="dash-history"></div>
-<button class="gx-account-card" onclick="irAlTicket()" type="button">
-<span class="gx-account-card-icon">🧾</span>
-<span class="gx-account-card-copy">
-<strong>Estado de Cuenta</strong>
-<small>Consulta cargos, descuentos y total actual</small>
-</span>
-<span class="gx-account-card-arrow">→</span>
-</button>
 </div>
 <div class="view-section" id="view-catalogo">
 <div class="gx-catalog-toolbar">
@@ -6548,6 +6472,130 @@
             if(cliente.servicios && cliente.servicios.length > 0) {
                 cliente.servicios.forEach((s,idx) => {
                     const escape = value => String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+                    const cancellation = s.cancelacion || null;
+                    const cancellationState = String(cancellation?.estado || '').toLowerCase();
+                    const delivery = s.credencial_pendiente && s.credencial_pendiente.estado === 'pendiente'
+                        ? s.credencial_pendiente
+                        : null;
+
+                    const credentialNoticeHTML = delivery ? `
+                        <button type="button" class="gx-credential-notice" id="gx-credential-notice-${idx}" onclick="gxServiceView(${idx},'credential',event)">
+                            <span class="gx-credential-notice-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+                                    <rect x="5" y="10" width="14" height="10" rx="3"></rect>
+                                    <path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"></path>
+                                    <path d="M12 14v2"></path>
+                                </svg>
+                            </span>
+                            <span class="gx-credential-notice-copy">
+                                <strong>Nueva contraseña disponible</strong>
+                                <small>${escape(delivery.plataforma || s.nombre)} · una sola consulta · requiere tu PIN</small>
+                            </span>
+                            <span class="gx-credential-notice-arrow" aria-hidden="true">›</span>
+                        </button>` : '';
+
+                    const cancellationLabel = cancellationState === 'solicitada'
+                        ? 'En revisión'
+                        : cancellationState === 'aprobada'
+                            ? 'Aprobada'
+                            : cancellationState === 'rechazada'
+                                ? 'No autorizada'
+                                : '';
+
+                    const cancellationOptionHTML = cancellation && ['solicitada','aprobada','rechazada'].includes(cancellationState)
+                        ? `<button type="button" class="gx-cancel-link gx-cancel-open-state" onclick="gxServiceView(${idx},'cancel',event)">
+                                <span>${cancellationState === 'solicitada' ? 'Solicitud de cancelación' : cancellationState === 'aprobada' ? 'Cancelación aprobada' : 'Solicitud resuelta'}</span>
+                                <span class="gx-cancel-inline-status ${cancellationState === 'solicitada' ? 'requested' : cancellationState === 'aprobada' ? 'approved' : 'rejected'}">${cancellationLabel}</span>
+                           </button>`
+                        : `<button type="button" class="gx-cancel-link" onclick="gxServiceView(${idx},'cancel',event)">Solicitar cancelación <span aria-hidden="true">→</span></button>`;
+
+                    const cancelAdminNote = cancellation?.nota_admin
+                        ? `<div class="gx-cancel-admin-note"><strong>Nota de GOXION</strong><br>${escape(cancellation.nota_admin)}</div>`
+                        : '';
+
+                    let cancellationPanelHTML = `
+                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                        <div class="gx-cancellation-kicker">GESTIÓN DE SERVICIO</div>
+                        <h3>Solicitar cancelación</h3>
+                        <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
+                        <p class="gx-cancel-detail">Los cargos ya generados no cambian. Revisaremos tu solicitud antes de efectuar cualquier baja.</p>
+                        <button type="button" class="gx-service-cancel-submit" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar solicitud</button>
+                        <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>`;
+
+                    if(cancellationState === 'solicitada') {
+                        cancellationPanelHTML = `
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                            <div class="gx-cancellation-kicker">SOLICITUD RECIBIDA</div>
+                            <h3>Cancelación en revisión</h3>
+                            <p>Ya recibimos tu solicitud. Tu servicio permanece activo mientras revisamos la baja.</p>
+                            <div class="gx-cancel-progress" aria-label="Solicitud recibida, revisión pendiente">
+                                <span class="done"></span><i class="done"></i><span class="done"></span><i></i><span></span>
+                            </div>
+                            <div class="gx-cancel-state-card requested">
+                                <strong>Estamos revisando tu solicitud</strong>
+                                <small>No necesitas enviarla nuevamente. Te mostraremos aquí cuando haya una resolución.</small>
+                            </div>
+                            ${cancelAdminNote}`;
+                    } else if(cancellationState === 'aprobada') {
+                        const effectiveDate = cancellation?.fecha_efectiva
+                            ? ` Fecha prevista: ${escape(cancellation.fecha_efectiva)}.`
+                            : '';
+                        cancellationPanelHTML = `
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                            <div class="gx-cancellation-kicker">SOLICITUD APROBADA</div>
+                            <h3>Cancelación aprobada</h3>
+                            <p>La solicitud fue autorizada. El servicio seguirá disponible hasta que la baja sea marcada como efectiva.${effectiveDate}</p>
+                            <div class="gx-cancel-progress" aria-label="Solicitud y revisión completadas">
+                                <span class="success"></span><i class="success"></i><span class="success"></span><i class="success"></i><span></span>
+                            </div>
+                            <div class="gx-cancel-state-card approved">
+                                <strong>Autorizada por GOXION</strong>
+                                <small>Los cargos ya generados permanecen sin cambios. No es necesario volver a solicitar la cancelación.</small>
+                            </div>
+                            ${cancelAdminNote}`;
+                    } else if(cancellationState === 'rechazada') {
+                        cancellationPanelHTML = `
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                            <div class="gx-cancellation-kicker">SOLICITUD RESUELTA</div>
+                            <h3>Solicitud no autorizada</h3>
+                            <p>La solicitud anterior fue revisada y no se hizo efectiva. Tu servicio continúa activo.</p>
+                            <div class="gx-cancel-state-card rejected">
+                                <strong>La cancelación no fue aplicada</strong>
+                                <small>Si tu situación cambió, puedes enviar una nueva solicitud para que la revisemos nuevamente.</small>
+                            </div>
+                            ${cancelAdminNote}
+                            <button type="button" class="gx-cancel-retry" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar nueva solicitud</button>
+                            <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>`;
+                    }
+
+                    const credentialPanelHTML = delivery ? `
+                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
+                        <div class="gx-credential-kicker">ACTUALIZACIÓN DE ACCESO · UNA SOLA VISTA</div>
+                        <h3>Nueva contraseña disponible</h3>
+                        <p>GOXION actualizó la contraseña de esta cuenta. Confirma tu PIN de Mi Espacio para verla.</p>
+                        <div class="gx-one-time-warning">
+                            Esta contraseña solo se mostrará una vez. Ten listo el dispositivo donde iniciarás sesión antes de continuar.
+                        </div>
+                        <div class="gx-credential-account">
+                            <span>Cuenta de acceso</span>
+                            <strong>${escape(delivery.cuenta_login || s.correo_login || 'Cuenta asignada')}</strong>
+                        </div>
+                        <div class="gx-credential-pin-wrap" id="gx-credential-auth-${idx}">
+                            <label for="gx-credential-pin-${idx}">Confirma tu PIN de GOXION</label>
+                            <div class="gx-credential-pin-row">
+                                <input id="gx-credential-pin-${idx}" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="••••">
+                                <button type="button" class="gx-credential-reveal-btn" id="gx-credential-reveal-${idx}" onclick="gxRevealCredential(${idx},event)">Ver contraseña</button>
+                            </div>
+                        </div>
+                        <div class="gx-credential-status" id="gx-credential-status-${idx}" aria-live="polite"></div>
+                        <div class="gx-credential-result" id="gx-credential-result-${idx}" hidden>
+                            <div class="gx-credential-result-label">Contraseña actualizada</div>
+                            <div class="gx-credential-password" id="gx-credential-password-${idx}"></div>
+                            <div class="gx-credential-result-actions">
+                                <button type="button" onclick="gxCopyCredentialPassword(${idx})">Copiar contraseña</button>
+                                <button type="button" onclick="gxFinishCredentialView(${idx},event)">Listo, ocultar</button>
+                            </div>
+                        </div>` : '';
                     const creds = [];
                     for (const [field,label] of [['correo_login','Correo'],['perfil_nombre','Perfil']]) {
                         if(s[field]) creds.push(`<div class="gx-access-row"><div><span>${label}</span><strong>${escape(s[field])}</strong></div><button type="button" data-value="${escape(s[field])}" data-label="${label}" onclick="copiarDatoRapido(this.dataset.value,this.dataset.label)" aria-label="Copiar ${label}">Copiar</button></div>`);
@@ -6572,6 +6620,7 @@
                                 <div class="gx-service-divider"></div>
 
                                 <div id="gx-service-home-${idx}" class="gx-service-home">
+                                    ${credentialNoticeHTML}
                                     <div class="gx-access-heading">Tus accesos</div>
                                     ${credsHTML}
                                     <div class="gx-service-toolbar">
@@ -6581,16 +6630,12 @@
                                 <div id="gx-service-options-${idx}" class="gx-service-view" hidden>
                                     <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
                                     <button type="button" class="gx-option-support" onclick="gxOpenServiceSupport(${idx},event)"><span>Soporte de la plataforma</span><span aria-hidden="true">→</span></button>
-                                    <button type="button" class="gx-cancel-link" onclick="gxServiceView(${idx},'cancel',event)">Solicitar cancelación <span aria-hidden="true">→</span></button>
+                                    ${cancellationOptionHTML}
                                 </div>
-                                <div id="gx-service-cancel-${idx}" class="gx-service-view" hidden>
-                                    <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)">← Volver a accesos</button>
-                                    <h3>Solicitar cancelación</h3>
-                                    <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
-                                    <p class="gx-cancel-detail">Los cargos ya generados no cambian. Revisaremos tu solicitud y te confirmaremos la fecha de baja.</p>
-                                    <button type="button" class="gx-service-cancel-submit" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar solicitud</button>
-                                    <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>
+                                <div id="gx-service-cancel-${idx}" class="gx-service-view gx-cancellation-state-view" hidden>
+                                    ${cancellationPanelHTML}
                                 </div>
+                                ${delivery ? `<div id="gx-service-credential-${idx}" class="gx-service-view gx-credential-view" hidden>${credentialPanelHTML}</div>` : ''}
                             </div>
                         </article>`;
                 });
@@ -6600,7 +6645,6 @@
 
             document.getElementById('dash-services').innerHTML = srvHTML;
         }
-
 
 
         function gxRevealServicePin(button,index) {
@@ -6613,11 +6657,13 @@
             event?.preventDefault(); event?.stopPropagation();
             const card=document.getElementById(`gx-service-card-${index}`);
             if(!card || card.dataset.gxServiceMorphing==='1') return;
-            for(const name of ['home','options','cancel']) {
+            if(view !== 'credential') gxDiscardCredentialReveal(index);
+            for(const name of ['home','options','cancel','credential']) {
                 const el=document.getElementById(`gx-service-${name}-${index}`);
                 if(el) el.hidden=name!==view;
             }
             const active=document.getElementById(`gx-service-${view}-${index}`);
+            if(!active) return;
             if(!gxServiceReducedMotion()) active.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:240,easing:'ease-out'});
             active.querySelector('button')?.focus({preventScroll:true});
         }
@@ -6948,27 +6994,22 @@
 
             submit.disabled = true;
             submit.textContent = 'Registrando…';
+            status.classList.remove('error');
             status.textContent = '';
 
             try {
-                const r = await fetch(NOTIFY_URL,{
+                const r = await fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente',{
                     method:'POST',
                     headers:{
                         'Content-Type':'application/json',
                         'X-Client-Token':token
                     },
                     body:JSON.stringify({
-                        categoria:'soporte',
-                        titulo:'Solicitud de cancelación',
-                        mensaje:[
-                            `Servicio: ${servicio.nombre}`,
-                            servicio.id ? `Servicio ID: ${servicio.id}` : '',
-                            `Cliente: ${cliente.nombre || ''}`,
-                            cliente.folio ? `Folio: ${cliente.folio}` : '',
-                            'El cliente solicita iniciar el proceso de cancelación de este servicio.',
-                            'Requiere confirmación administrativa.'
-                        ].filter(Boolean).join('\n'),
-                        colorHex:'ff3366'
+                        accion:'crear',
+                        datos:{
+                            cliente_servicio_id:servicio.id,
+                            motivo:'Solicitud desde Mi Espacio'
+                        }
                     })
                 });
 
@@ -6977,13 +7018,134 @@
                     throw new Error(data?.error || 'No fue posible registrar la solicitud.');
                 }
 
-                submit.textContent = 'Solicitud enviada';
-                status.innerHTML = '<span style="color:var(--success-green);font-weight:800;">✓ Solicitud registrada.</span> Te confirmaremos cuando el cambio haya sido procesado.';
+                servicio.cancelacion = {
+                    ...(data.solicitud || {}),
+                    cliente_servicio_id:servicio.id,
+                    estado:String(data?.solicitud?.estado || 'solicitada')
+                };
+
+                submit.textContent = data?.already_open ? 'Solicitud ya registrada' : 'Solicitud enviada';
+                status.innerHTML = data?.already_open
+                    ? '<span style="color:#cdbfff;font-weight:800;">Solicitud en revisión.</span> No necesitas enviarla nuevamente.'
+                    : '<span style="color:var(--success-green);font-weight:800;">✓ Solicitud registrada.</span> Tu servicio seguirá activo mientras la revisamos.';
+
+                setTimeout(() => {
+                    renderDashboard(key);
+                    setTimeout(() => {
+                        gxToggleServiceCard(index);
+                        setTimeout(() => gxServiceView(index,'cancel'), 620);
+                    }, 80);
+                }, 520);
             } catch (error) {
                 submit.disabled = false;
                 submit.textContent = 'Reintentar';
+                status.classList.add('error');
                 status.textContent = error?.message || 'No fue posible registrar la solicitud.';
             }
+        }
+
+        function gxDiscardCredentialReveal(index) {
+            const password=document.getElementById(`gx-credential-password-${index}`);
+            const result=document.getElementById(`gx-credential-result-${index}`);
+            const input=document.getElementById(`gx-credential-pin-${index}`);
+            if(password) password.textContent='';
+            if(result) result.hidden=true;
+            if(input) input.value='';
+
+            const key=typeof getCurrentClientKey==='function' ? getCurrentClientKey() : '';
+            const servicio=key ? globalClientesData?.[key]?.servicios?.[index] : null;
+            if(servicio && !servicio.credencial_pendiente) {
+                document.getElementById(`gx-credential-notice-${index}`)?.remove();
+            }
+        }
+
+        async function gxRevealCredential(index,event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
+            const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : '';
+            const cliente = key ? globalClientesData?.[key] : null;
+            const servicio = cliente?.servicios?.[index];
+            const delivery = servicio?.credencial_pendiente;
+            const token = localStorage.getItem('goxion_client_token') || '';
+            const input = document.getElementById(`gx-credential-pin-${index}`);
+            const button = document.getElementById(`gx-credential-reveal-${index}`);
+            const status = document.getElementById(`gx-credential-status-${index}`);
+            const result = document.getElementById(`gx-credential-result-${index}`);
+            const passwordBox = document.getElementById(`gx-credential-password-${index}`);
+
+            if(!delivery || !token || !input || !button || !status || !result || !passwordBox) return;
+            const pin=String(input.value||'').trim();
+            status.classList.remove('error');
+
+            if(!/^\d{4}$/.test(pin)) {
+                status.classList.add('error');
+                status.textContent='Ingresa tu PIN de 4 dígitos para continuar.';
+                input.focus();
+                return;
+            }
+
+            button.disabled=true;
+            button.textContent='Validando…';
+            status.textContent='';
+
+            try {
+                const r=await fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/credenciales-cliente',{
+                    method:'POST',
+                    headers:{
+                        'Content-Type':'application/json',
+                        'X-Client-Token':token
+                    },
+                    body:JSON.stringify({
+                        accion:'revelar',
+                        datos:{entrega_id:delivery.id,pin}
+                    }),
+                    cache:'no-store'
+                });
+                const data=await r.json().catch(()=>({}));
+                if(!r.ok || data?.ok!==true || !data?.password) {
+                    throw new Error(data?.error || 'No fue posible mostrar la contraseña.');
+                }
+
+                passwordBox.textContent=String(data.password);
+                result.hidden=false;
+                input.value='';
+                input.disabled=true;
+                button.hidden=true;
+                status.textContent='Contraseña revelada. Al salir de esta vista se ocultará definitivamente.';
+
+                delivery.estado='vista';
+                delivery.vista_at=data.vista_at || new Date().toISOString();
+                servicio.credencial_pendiente=null;
+            } catch(error) {
+                status.classList.add('error');
+                status.textContent=error?.message || 'No fue posible mostrar la contraseña.';
+                button.disabled=false;
+                button.textContent='Ver contraseña';
+            }
+        }
+
+        async function gxCopyCredentialPassword(index) {
+            const password=document.getElementById(`gx-credential-password-${index}`)?.textContent || '';
+            const status=document.getElementById(`gx-credential-status-${index}`);
+            if(!password) return;
+            try {
+                await navigator.clipboard.writeText(password);
+                if(status) status.textContent='✓ Contraseña copiada. Úsala ahora en tu inicio de sesión.';
+            } catch {
+                if(status) {
+                    status.classList.add('error');
+                    status.textContent='No pudimos copiarla automáticamente. Mantén presionada la contraseña para copiarla.';
+                }
+            }
+        }
+
+        function gxFinishCredentialView(index,event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+            gxDiscardCredentialReveal(index);
+            document.getElementById(`gx-credential-notice-${index}`)?.remove();
+            gxServiceView(index,'home',event);
         }
 
         function srvCleanName(n) { 
@@ -8258,6 +8420,8 @@
         const MI_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
         const NOTIFY_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
         const INVENTARIO_PUBLICO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico";
+        const CANCELACIONES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente";
+        const CREDENCIALES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/credenciales-cliente";
         const TOKEN_KEY = "goxion_client_token";
 
         async function missionRequest(payload) {
@@ -8307,7 +8471,48 @@
         }
 
 
-        
+
+        async function cargarExtrasPrivados(data, token) {
+            if(!data || !token) return data;
+
+            const request = async (url) => {
+                const r=await fetch(url,{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","X-Client-Token":token},
+                    body:JSON.stringify({accion:"listar"}),
+                    cache:"no-store"
+                });
+                const {text,json}=await parseJSON(r);
+                if(!r.ok || json?.ok!==true) throw new Error(json?.error || text || "No disponible");
+                return json;
+            };
+
+            const [cancelaciones,credenciales]=await Promise.allSettled([
+                request(CANCELACIONES_CLIENTE_URL),
+                request(CREDENCIALES_CLIENTE_URL)
+            ]);
+
+            if(cancelaciones.status==="fulfilled") {
+                data.cancelaciones=Array.isArray(cancelaciones.value?.solicitudes)
+                    ? cancelaciones.value.solicitudes
+                    : [];
+            } else {
+                console.warn("Cancelaciones Mi Espacio:",cancelaciones.reason);
+                data.cancelaciones=[];
+            }
+
+            if(credenciales.status==="fulfilled") {
+                data.credenciales_entregas=Array.isArray(credenciales.value?.entregas)
+                    ? credenciales.value.entregas
+                    : [];
+            } else {
+                console.warn("Credenciales Mi Espacio:",credenciales.reason);
+                data.credenciales_entregas=[];
+            }
+
+            return data;
+        }
+
 function goxionViewModelAdapter(data) {
     const viewModel = {
         _goxion_config: {
@@ -8335,14 +8540,31 @@ function goxionViewModelAdapter(data) {
             pago_revision_updated_at: c.pago_revision_updated_at || null,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
-            servicios: (data.servicios || []).map(s => ({
-                id: s.id,
-                nombre: s.nombre,
-                monto: Number(s.monto || 0),
-                correo_login: s.correo_login || "",
-                perfil_nombre: s.perfil_nombre || "",
-                perfil_pin: s.perfil_pin || ""
-            })),
+            servicios: (data.servicios || []).map(s => {
+                const serviceCancellations=(data.cancelaciones || [])
+                    .filter(x => String(x.cliente_servicio_id || "") === String(s.id || ""))
+                    .sort((a,b) => new Date(b.created_at || b.solicitada_at || 0) - new Date(a.created_at || a.solicitada_at || 0));
+                const openCancellation=serviceCancellations.find(x => ["solicitada","aprobada"].includes(String(x.estado || "").toLowerCase()));
+                const latestCancellation=openCancellation || serviceCancellations[0] || null;
+
+                const pendingCredential=(data.credenciales_entregas || []).find(x =>
+                    String(x.cliente_servicio_id || "") === String(s.id || "") &&
+                    String(x.estado || "").toLowerCase() === "pendiente" &&
+                    x.activa !== false &&
+                    x.servicio_activo !== false
+                ) || null;
+
+                return {
+                    id: s.id,
+                    nombre: s.nombre,
+                    monto: Number(s.monto || 0),
+                    correo_login: s.correo_login || "",
+                    perfil_nombre: s.perfil_nombre || "",
+                    perfil_pin: s.perfil_pin || "",
+                    cancelacion: latestCancellation,
+                    credencial_pendiente: pendingCredential
+                };
+            }),
             historial_pagos: (data.pagos || []).map(p => ({
                 id: p.id,
                 fecha: p.periodo || p.fecha || "",
@@ -8422,6 +8644,7 @@ function goxionViewModelAdapter(data) {
                     if (r.ok && json?.ok === true) {
                         window.goxionCurrentClientKey = String(json?.cliente?.clave || "");
                         await migrarProgresoLocalSiExiste(json);
+                        await cargarExtrasPrivados(json,token);
                         return await aplicarInventarioPublico(goxionViewModelAdapter(json));
                     }
                     if (r.status === 401) {
@@ -8531,6 +8754,7 @@ function goxionViewModelAdapter(data) {
 
                 window.goxionCurrentClientKey = String(login.cliente.clave || data?.cliente?.clave || "");
                 await migrarProgresoLocalSiExiste(data);
+                await cargarExtrasPrivados(data,login.session_token);
                 globalClientesData = await aplicarInventarioPublico(goxionViewModelAdapter(data));
                 cargarCatalogo(globalClientesData);
                 renderizarSoporteDinamico(globalClientesData);
@@ -8592,7 +8816,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Beta 03.03: Mi Espacio refinado + Catálogo Inteligente.");
+        console.info("GOXION Ayuda Beta 04 v1.2.0-beta-04: cancelaciones formales + credenciales de una sola vista.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -9525,7 +9749,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda · Beta 03.12 · Handoff continuo
+    GOXION · Ayuda Beta 04 · v1.2.0-beta-04
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -10222,10 +10446,10 @@ function goxionViewModelAdapter(data) {
     };
 })();
 </script>
-<style id="goxion-beta-03-10-final">
+<style id="goxion-release-ui">
 /* =========================================================
-   GOXION · BETA 03.11 · CIERRE AJUSTADO
-   ÚNICA CAPA AUTORITATIVA DE OVERRIDES PARA ESTA RUTA.
+   GOXION · RELEASE UI
+   Capa autoritativa de estilos aprobados.
    ========================================================= */
 
 /* ---------- Estado de Cuenta ---------- */
@@ -10339,7 +10563,7 @@ function goxionViewModelAdapter(data) {
 }
 
 /* La tarjeta antigua standalone permanece fuera de uso. */
-.gx-account-card{display:none!important}
+
 
 /* ---------- Tus servicios ---------- */
 .gx-service-summary{
@@ -10619,11 +10843,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 /* ---------- Gamificación ---------- */
 /* Única corrección nueva: evita el doble watermark durante el handoff.
    NO cambia tiempos, card fade ni geometría del morph aprobado. */
-.gx-gamif-card.gx-gamif-watermark-hidden::before{
-    opacity:0!important;
-    animation:none!important;
-    -webkit-animation:none!important;
-}
+
 
 /* ---------- Focus / accesibilidad ---------- */
 .gx-account-capsule:focus-visible,
@@ -10653,6 +10873,377 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     .gx-account-capsule::after{
         display:none;
         animation:none;
+    }
+}
+</style>
+<style id="goxion-ayuda-beta-04-account-security">
+/* =========================================================
+   GOXION · AYUDA BETA 04
+   Cancelaciones formales + credenciales de una sola vista
+   Mantiene la escala móvil y el lenguaje visual existente.
+   ========================================================= */
+
+/* ---------- Aviso compacto dentro de Tus servicios ---------- */
+.gx-credential-notice{
+    width:100%;
+    min-height:58px;
+    margin:0 0 11px;
+    padding:9px 10px;
+    display:grid;
+    grid-template-columns:34px minmax(0,1fr) auto;
+    align-items:center;
+    gap:9px;
+    border:1px solid rgba(0,242,254,.14);
+    border-radius:14px;
+    background:
+        linear-gradient(120deg,rgba(124,77,255,.055),rgba(0,242,254,.035) 58%,rgba(0,0,0,0));
+    color:#fff;
+    text-align:left;
+    font:inherit;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+}
+.gx-credential-notice:active{
+    transform:scale(.993);
+}
+.gx-credential-notice-icon{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border-radius:11px;
+    border:1px solid rgba(0,242,254,.16);
+    background:rgba(0,242,254,.055);
+    color:var(--neon-blue);
+}
+.gx-credential-notice-icon svg{
+    width:17px;
+    height:17px;
+}
+.gx-credential-notice-copy{
+    min-width:0;
+}
+.gx-credential-notice-copy strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:10px;
+    font-weight:850;
+}
+.gx-credential-notice-copy small{
+    display:block;
+    margin-top:2px;
+    color:#9eacc1;
+    font-size:8.3px;
+    font-weight:650;
+    line-height:1.35;
+}
+.gx-credential-notice-arrow{
+    color:var(--neon-blue);
+    font-size:14px;
+    font-weight:850;
+}
+
+/* ---------- Vista de credencial ---------- */
+.gx-credential-view{
+    padding-top:1px;
+}
+.gx-credential-kicker,
+.gx-cancellation-kicker{
+    display:inline-flex;
+    align-items:center;
+    min-height:21px;
+    margin:3px 0 8px;
+    padding:0 7px;
+    border:1px solid rgba(124,77,255,.14);
+    border-radius:999px;
+    background:rgba(124,77,255,.045);
+    color:#cdbfff;
+    font-size:7.5px;
+    font-weight:850;
+    letter-spacing:.35px;
+}
+.gx-credential-view h3,
+.gx-cancellation-state-view h3{
+    margin:0 0 5px;
+    font-size:13px;
+    line-height:1.25;
+}
+.gx-credential-view>p,
+.gx-cancellation-state-view>p{
+    margin:0 0 10px;
+    color:#a7b3c6;
+    font-size:9.2px;
+    line-height:1.48;
+}
+.gx-one-time-warning{
+    margin:9px 0 10px;
+    padding:8px 9px;
+    border:1px solid rgba(255,170,0,.12);
+    border-radius:11px;
+    background:rgba(255,170,0,.035);
+    color:#d8c08f;
+    font-size:8.5px;
+    line-height:1.45;
+}
+.gx-credential-account{
+    margin:0 0 10px;
+    padding:8px 9px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:11px;
+    background:rgba(255,255,255,.018);
+}
+.gx-credential-account span{
+    display:block;
+    color:#77859b;
+    font-size:7.4px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.25px;
+}
+.gx-credential-account strong{
+    display:block;
+    margin-top:2px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#f3f7fb;
+    font-size:9.6px;
+}
+.gx-credential-pin-wrap{
+    margin-top:9px;
+}
+.gx-credential-pin-wrap label{
+    display:block;
+    margin-bottom:5px;
+    color:#8f9db2;
+    font-size:8px;
+    font-weight:750;
+}
+.gx-credential-pin-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:6px;
+}
+.gx-credential-pin-row input{
+    min-width:0;
+    min-height:39px;
+    padding:0 11px;
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:11px;
+    outline:none;
+    background:rgba(255,255,255,.025);
+    color:#fff;
+    font:inherit;
+    font-size:11px;
+    font-weight:750;
+    letter-spacing:2px;
+}
+.gx-credential-pin-row input:focus{
+    border-color:rgba(0,242,254,.24);
+    box-shadow:0 0 0 3px rgba(0,242,254,.035);
+}
+.gx-credential-reveal-btn{
+    min-height:39px;
+    padding:0 11px;
+    border:1px solid rgba(0,242,254,.16);
+    border-radius:11px;
+    background:rgba(0,242,254,.055);
+    color:var(--neon-blue);
+    font:inherit;
+    font-size:8.8px;
+    font-weight:850;
+    white-space:nowrap;
+}
+.gx-credential-status{
+    min-height:18px;
+    margin-top:7px;
+    color:#9eacc1;
+    font-size:8.3px;
+    line-height:1.4;
+}
+.gx-credential-status.error{
+    color:#ff7897;
+}
+.gx-credential-result{
+    margin-top:10px;
+    padding:10px;
+    border:1px solid rgba(0,255,157,.14);
+    border-radius:13px;
+    background:linear-gradient(135deg,rgba(0,255,157,.04),rgba(0,242,254,.025));
+}
+.gx-credential-result[hidden]{display:none!important}
+.gx-credential-result-label{
+    color:#80a99a;
+    font-size:7.4px;
+    font-weight:850;
+    text-transform:uppercase;
+    letter-spacing:.25px;
+}
+.gx-credential-password{
+    margin-top:4px;
+    padding:8px 9px;
+    overflow-wrap:anywhere;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:10px;
+    background:rgba(0,0,0,.22);
+    color:#fff;
+    font-size:12px;
+    font-weight:800;
+    line-height:1.35;
+    letter-spacing:.3px;
+    user-select:text;
+}
+.gx-credential-result-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    margin-top:8px;
+}
+.gx-credential-result-actions button{
+    min-height:34px;
+    border:1px solid rgba(255,255,255,.075);
+    border-radius:10px;
+    background:rgba(255,255,255,.025);
+    color:#b8c4d5;
+    font:inherit;
+    font-size:8.4px;
+    font-weight:800;
+}
+.gx-credential-result-actions button:first-child{
+    color:var(--neon-blue);
+    border-color:rgba(0,242,254,.13);
+}
+
+/* ---------- Cancelación formal ---------- */
+.gx-cancel-link.gx-cancel-open-state{
+    border-color:rgba(124,77,255,.11);
+}
+.gx-cancel-link .gx-cancel-inline-status{
+    margin-left:auto;
+    padding:3px 6px;
+    border-radius:999px;
+    background:rgba(255,255,255,.035);
+    color:#aab5c7;
+    font-size:7.2px;
+    font-weight:850;
+    white-space:nowrap;
+}
+.gx-cancel-inline-status.requested{
+    color:#cfbfff;
+    background:rgba(124,77,255,.06);
+}
+.gx-cancel-inline-status.approved{
+    color:#7de8b2;
+    background:rgba(0,255,157,.045);
+}
+.gx-cancel-inline-status.rejected{
+    color:#ff91aa;
+    background:rgba(255,51,102,.045);
+}
+.gx-cancellation-state-view{
+    padding-top:1px;
+}
+.gx-cancel-state-card{
+    margin:8px 0 10px;
+    padding:9px 10px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:12px;
+    background:rgba(255,255,255,.018);
+}
+.gx-cancel-state-card.requested{
+    border-color:rgba(124,77,255,.13);
+    background:rgba(124,77,255,.03);
+}
+.gx-cancel-state-card.approved{
+    border-color:rgba(0,255,157,.12);
+    background:rgba(0,255,157,.025);
+}
+.gx-cancel-state-card.rejected{
+    border-color:rgba(255,51,102,.11);
+    background:rgba(255,51,102,.022);
+}
+.gx-cancel-state-card strong{
+    display:block;
+    color:#f1f5fa;
+    font-size:9.4px;
+}
+.gx-cancel-state-card small{
+    display:block;
+    margin-top:3px;
+    color:#8f9caf;
+    font-size:8.1px;
+    line-height:1.42;
+}
+.gx-cancel-progress{
+    display:grid;
+    grid-template-columns:auto 1fr auto 1fr auto;
+    align-items:center;
+    gap:4px;
+    margin:10px 0 11px;
+}
+.gx-cancel-progress span{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.12);
+    background:#101018;
+}
+.gx-cancel-progress i{
+    height:1px;
+    background:rgba(255,255,255,.08);
+}
+.gx-cancel-progress span.done,
+.gx-cancel-progress i.done{
+    border-color:rgba(0,242,254,.4);
+    background:rgba(0,242,254,.55);
+}
+.gx-cancel-progress span.success,
+.gx-cancel-progress i.success{
+    border-color:rgba(0,255,157,.4);
+    background:rgba(0,255,157,.5);
+}
+.gx-cancel-admin-note{
+    margin:8px 0 10px;
+    padding:8px 9px;
+    border-radius:10px;
+    background:rgba(255,255,255,.02);
+    color:#aab5c7;
+    font-size:8.3px;
+    line-height:1.45;
+}
+.gx-cancel-admin-note strong{
+    color:#dce4ef;
+}
+.gx-cancel-retry{
+    width:100%;
+    min-height:38px;
+    border:1px solid rgba(0,242,254,.14);
+    border-radius:11px;
+    background:rgba(0,242,254,.045);
+    color:var(--neon-blue);
+    font:inherit;
+    font-size:9px;
+    font-weight:850;
+}
+
+/* ---------- Safari / tamaños reducidos ---------- */
+@media(max-width:390px){
+    .gx-credential-notice{
+        grid-template-columns:31px minmax(0,1fr) auto;
+        padding:8px;
+        gap:7px;
+    }
+    .gx-credential-notice-icon{
+        width:31px;
+        height:31px;
+    }
+    .gx-credential-pin-row{
+        grid-template-columns:1fr;
+    }
+    .gx-credential-reveal-btn{
+        width:100%;
     }
 }
 </style>
