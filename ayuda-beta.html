@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.1-beta-15" lang="es">
+<html data-goxion-version="1.2.1-beta-16" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -5487,6 +5487,7 @@
 
 <div class="gx-welcome-modal" id="gx-welcome-modal" aria-hidden="true">
     <div class="gx-welcome-backdrop" onclick="gxCloseWelcomeRegistration()"></div>
+    <div class="gx-welcome-morph-shell" id="gx-welcome-morph-shell" aria-hidden="true"></div>
     <section class="gx-welcome-sheet">
         <button class="gx-welcome-close" type="button" onclick="gxCloseWelcomeRegistration()">×</button>
         <div class="gx-welcome-icon">✦</div>
@@ -5534,64 +5535,95 @@
             return document.querySelector('.gx-welcome-trigger');
         }
 
-        function gxWelcomeMorphGeometry(sheet,fromRect) {
-            if(!sheet || !fromRect) return null;
-            const to=sheet.getBoundingClientRect();
-            if(!fromRect.width || !fromRect.height || !to.width || !to.height) return null;
+        function gxWelcomeValidRect(rect) {
+            return rect && rect.width > 2 && rect.height > 2;
+        }
+
+        function gxWelcomeSetShellRect(shell,rect) {
+            shell.style.left=`${rect.left}px`;
+            shell.style.top=`${rect.top}px`;
+            shell.style.width=`${rect.width}px`;
+            shell.style.height=`${rect.height}px`;
+        }
+
+        function gxWelcomeShellKeyframe(rect,radius) {
             return {
-                dx:(fromRect.left+fromRect.width/2)-(to.left+to.width/2),
-                dy:(fromRect.top+fromRect.height/2)-(to.top+to.height/2),
-                sx:Math.max(.08,fromRect.width/to.width),
-                sy:Math.max(.08,fromRect.height/to.height)
+                left:`${rect.left}px`,
+                top:`${rect.top}px`,
+                width:`${rect.width}px`,
+                height:`${rect.height}px`,
+                borderRadius:radius
             };
         }
 
-        function gxAnimateWelcomeOpen(fromRect) {
+        async function gxAnimateWelcomeOpen(fromRect) {
             const modal=document.getElementById('gx-welcome-modal');
             const sheet=modal?.querySelector('.gx-welcome-sheet');
-            if(!modal || !sheet || gxWelcomeReducedMotion() || typeof sheet.animate!=='function') {
-                modal?.classList.add('gx-welcome-ready');
-                return;
-            }
+            const shell=document.getElementById('gx-welcome-morph-shell');
+            if(!modal || !sheet) return;
 
-            const g=gxWelcomeMorphGeometry(sheet,fromRect);
-            if(!g) {
+            const targetRect=sheet.getBoundingClientRect();
+
+            if(
+                !shell ||
+                !gxWelcomeValidRect(fromRect) ||
+                !gxWelcomeValidRect(targetRect) ||
+                gxWelcomeReducedMotion() ||
+                typeof shell.animate!=='function'
+            ) {
+                modal.classList.remove('gx-welcome-preparing','gx-welcome-morphing');
                 modal.classList.add('gx-welcome-ready');
                 return;
             }
 
+            gxWelcomeSetShellRect(shell,fromRect);
+            shell.hidden=false;
             modal.classList.add('gx-welcome-morphing');
-            const animation=sheet.animate([
-                {
-                    transform:`translate(${g.dx}px,${g.dy}px) scale(${g.sx},${g.sy})`,
-                    borderRadius:'18px',
-                    opacity:.88,
-                    filter:'saturate(1.35) brightness(1.12)'
-                },
-                {
-                    offset:.58,
-                    transform:'translate(0,0) scale(1.018,.988)',
-                    borderRadius:'25px',
-                    opacity:1,
-                    filter:'saturate(1.08) brightness(1.03)'
-                },
-                {
-                    transform:'translate(0,0) scale(1)',
-                    borderRadius:'24px',
-                    opacity:1,
-                    filter:'none'
-                }
-            ],{
-                duration:620,
-                easing:'cubic-bezier(.2,.84,.18,1)',
-                fill:'both'
-            });
 
-            animation.finished.catch(()=>{}).finally(()=>{
-                modal.classList.remove('gx-welcome-morphing');
-                modal.classList.add('gx-welcome-ready');
-                animation.cancel();
-            });
+            try {
+                await shell.animate([
+                    {...gxWelcomeShellKeyframe(fromRect,'20px'),opacity:1,filter:'saturate(1) brightness(1)'},
+                    {
+                        ...gxWelcomeShellKeyframe({
+                            left:targetRect.left,
+                            top:targetRect.top + targetRect.height*.015,
+                            width:targetRect.width,
+                            height:targetRect.height*.97
+                        },'24px'),
+                        offset:.78,
+                        opacity:1,
+                        filter:'saturate(1.06) brightness(1.02)'
+                    },
+                    {...gxWelcomeShellKeyframe(targetRect,'24px'),opacity:1,filter:'none'}
+                ],{
+                    duration:560,
+                    easing:'cubic-bezier(.2,.82,.18,1)',
+                    fill:'forwards'
+                }).finished;
+            } catch(_) {}
+
+            modal.classList.remove('gx-welcome-preparing','gx-welcome-morphing');
+            modal.classList.add('gx-welcome-ready');
+
+            if(typeof sheet.animate==='function') {
+                sheet.animate([
+                    {opacity:0,transform:'translateY(4px) scale(.995)'},
+                    {opacity:1,transform:'translateY(0) scale(1)'}
+                ],{
+                    duration:220,
+                    easing:'cubic-bezier(.2,.8,.2,1)'
+                });
+            }
+
+            try {
+                await shell.animate(
+                    [{opacity:1},{opacity:0}],
+                    {duration:180,easing:'ease-out',fill:'forwards'}
+                ).finished;
+            } catch(_) {}
+
+            shell.hidden=true;
+            shell.getAnimations().forEach(a=>a.cancel());
         }
 
         function solicitarCuenta() {
@@ -5616,63 +5648,90 @@
                 submit.textContent="Validar y solicitar";
             }
 
-            modal.classList.remove('gx-welcome-ready','gx-welcome-closing');
-            modal.classList.add("show");
+            trigger?.classList.add('gx-welcome-source-active');
+            modal.classList.remove('gx-welcome-ready','gx-welcome-closing','gx-welcome-morphing');
+            modal.classList.add("show",'gx-welcome-preparing');
             modal.setAttribute("aria-hidden","false");
             document.body.style.overflow="hidden";
 
             requestAnimationFrame(()=>requestAnimationFrame(()=>{
                 gxAnimateWelcomeOpen(fromRect);
-                setTimeout(()=>document.getElementById("gx-welcome-name")?.focus({preventScroll:true}),560);
+                setTimeout(()=>document.getElementById("gx-welcome-name")?.focus({preventScroll:true}),700);
             }));
         }
 
         async function gxCloseWelcomeRegistration() {
             const modal=document.getElementById("gx-welcome-modal");
             const sheet=modal?.querySelector('.gx-welcome-sheet');
+            const shell=document.getElementById('gx-welcome-morph-shell');
             const trigger=gxWelcomeTrigger();
             if(!modal) return;
 
             const finish=()=>{
-                modal.classList.remove("show",'gx-welcome-ready','gx-welcome-morphing','gx-welcome-closing');
+                shell && (shell.hidden=true);
+                shell?.getAnimations?.().forEach(a=>a.cancel());
+                modal.classList.remove(
+                    "show",
+                    'gx-welcome-ready',
+                    'gx-welcome-preparing',
+                    'gx-welcome-morphing',
+                    'gx-welcome-closing'
+                );
                 modal.setAttribute("aria-hidden","true");
+                trigger?.classList.remove('gx-welcome-source-active');
                 document.body.style.overflow="";
             };
 
-            if(!sheet || !trigger || gxWelcomeReducedMotion() || typeof sheet.animate!=='function') {
-                finish();
-                return;
-            }
+            const targetRect=trigger?.getBoundingClientRect();
+            const fromRect=sheet?.getBoundingClientRect();
 
-            const toRect=trigger.getBoundingClientRect();
-            const g=gxWelcomeMorphGeometry(sheet,toRect);
-            if(!g) {
+            if(
+                !sheet ||
+                !shell ||
+                !gxWelcomeValidRect(fromRect) ||
+                !gxWelcomeValidRect(targetRect) ||
+                gxWelcomeReducedMotion() ||
+                typeof shell.animate!=='function'
+            ) {
                 finish();
                 return;
             }
 
             modal.classList.add('gx-welcome-closing');
+
+            if(typeof sheet.animate==='function') {
+                try {
+                    await sheet.animate([
+                        {opacity:1,transform:'scale(1)'},
+                        {opacity:0,transform:'scale(.992)'}
+                    ],{
+                        duration:140,
+                        easing:'ease-in',
+                        fill:'forwards'
+                    }).finished;
+                } catch(_) {}
+            }
+
+            gxWelcomeSetShellRect(shell,fromRect);
+            shell.hidden=false;
+
             try {
-                await sheet.animate([
-                    {transform:'translate(0,0) scale(1)',opacity:1,filter:'none'},
-                    {offset:.42,transform:'translate(0,0) scale(.985)',opacity:1,filter:'saturate(1.08)'},
-                    {
-                        transform:`translate(${g.dx}px,${g.dy}px) scale(${g.sx},${g.sy})`,
-                        opacity:.66,
-                        filter:'saturate(1.34) brightness(1.08)'
-                    }
+                await shell.animate([
+                    {...gxWelcomeShellKeyframe(fromRect,'24px'),opacity:1},
+                    {...gxWelcomeShellKeyframe(targetRect,'20px'),opacity:1}
                 ],{
-                    duration:430,
+                    duration:410,
                     easing:'cubic-bezier(.4,0,.2,1)',
-                    fill:'both'
+                    fill:'forwards'
                 }).finished;
             } catch(_) {}
+
             finish();
         }
 
-        function gxRegistrationToRecovery() {
+        async function gxRegistrationToRecovery() {
             const name=document.getElementById("gx-welcome-name")?.value?.trim() || "";
-            gxCloseWelcomeRegistration();
+            await gxCloseWelcomeRegistration();
             if(typeof openAuthSheet==="function") openAuthSheet();
             setTimeout(()=>{
                 const loginId=document.getElementById("login-id");
@@ -7527,6 +7586,15 @@
             return `$${n.toFixed(2)}`;
         }
 
+        function gxRetentionEscape(value) {
+            return String(value ?? '')
+                .replace(/&/g,'&amp;')
+                .replace(/</g,'&lt;')
+                .replace(/>/g,'&gt;')
+                .replace(/"/g,'&quot;')
+                .replace(/'/g,'&#039;');
+        }
+
         function gxRenderRetentionOffer(index,offer) {
             const panel=document.getElementById(`gx-service-retention-${index}`);
             if(!panel || !offer) return;
@@ -7539,10 +7607,10 @@
 
             panel.innerHTML=`
                 <div class="gx-retention-stage">
-                    <div class="gx-retention-orbit" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
+                    <img class="gx-retention-logo" src="Logo individual.png" onerror="this.src='logo2.PNG'" alt="GOXION">
                     <span class="gx-retention-eyebrow">UNA OPCIÓN ANTES DE IRTE</span>
                     <h3>Nos gustaría que te quedaras</h3>
-                    <p class="gx-retention-lead">Antes de cancelar <strong>${escape(serviceName)}</strong>, podemos aplicar un beneficio automático en tu próximo pago.</p>
+                    <p class="gx-retention-lead">Antes de cancelar <strong>${gxRetentionEscape(serviceName)}</strong>, podemos aplicar un beneficio automático en tu próximo pago.</p>
 
                     <div class="gx-retention-value">
                         <div class="gx-retention-percent">-${percent}%</div>
@@ -7562,7 +7630,7 @@
                         <button type="button" class="gx-retention-accept" id="gx-retention-accept-${index}" onclick="gxAcceptRetention(${index},event)">
                             <span>Quedarme con -${percent}%</span>
                         </button>
-                        <button type="button" class="gx-retention-decline" id="gx-retention-decline-${index}" onclick="gxDeclineRetention(${index},event)">Continuar cancelación</button>
+                        <button type="button" class="gx-retention-decline" id="gx-retention-decline-${index}" onclick="gxDeclineRetention(${index},event)">Continuar con la cancelación</button>
                     </div>
 
                     <div class="gx-retention-status" id="gx-retention-status-${index}" aria-live="polite"></div>
@@ -7633,7 +7701,7 @@
 
                 if(status) {
                     status.className='gx-retention-status success';
-                    status.innerHTML=`<strong>Beneficio aplicado</strong><span>La cancelación no fue enviada. Ahorrarás ${gxRetentionMoney(data?.oferta?.monto_descuento || offer.monto_descuento)} en tu próximo pago de ${escape(data?.oferta?.servicio_nombre || offer.servicio_nombre || service.nombre)}.</span>`;
+                    status.innerHTML=`<strong>Beneficio aplicado</strong><span>La cancelación no fue enviada. Ahorrarás ${gxRetentionMoney(data?.oferta?.monto_descuento || offer.monto_descuento)} en tu próximo pago de ${gxRetentionEscape(data?.oferta?.servicio_nombre || offer.servicio_nombre || service.nombre)}.</span>`;
                 }
 
                 if(navigator.vibrate) {
@@ -9625,7 +9693,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 15 v1.2.1-beta-15: morph de bienvenida + retención inteligente.");
+        console.info("GOXION Ayuda Beta 16 v1.2.1-beta-16: morph orgánico + retención visual refinada.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -13005,13 +13073,14 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 </style>
 
 
-<style id="goxion-ayuda-beta-15-morph-retention">
+
+<style id="goxion-ayuda-beta-16-organic-morph">
 /* =========================================================
-   GOXION · AYUDA BETA 15
-   CTA reparado + shared morph + retención inteligente.
+   GOXION · AYUDA BETA 16
+   Morph orgánico + retención visual refinada.
    ========================================================= */
 
-/* CTA "Ver servicios disponibles": Safari ya no puede mandar la flecha a otra línea. */
+/* CTA catálogo reparado */
 .gx-catalog-main-cta{
     width:100%!important;
     min-height:58px!important;
@@ -13038,122 +13107,120 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 }
 
 /* ---------------------------------------------------------
-   REGISTRO -10% — lenguaje visual de Ayuda / GOXION.
+   REGISTRO -10% — el botón se convierte en la tarjeta.
    --------------------------------------------------------- */
+.gx-welcome-trigger.gx-welcome-source-active{
+    opacity:0!important;
+    pointer-events:none!important;
+}
+.gx-welcome-trigger.gx-welcome-source-active::before{
+    animation:none!important;
+    opacity:0!important;
+}
+
 .gx-welcome-modal{
     perspective:1200px;
 }
 .gx-welcome-backdrop{
     background:
-        radial-gradient(circle at 18% 18%,rgba(124,77,255,.11),transparent 32%),
-        radial-gradient(circle at 84% 73%,rgba(0,242,254,.075),transparent 31%),
-        rgba(2,2,5,.77)!important;
-    backdrop-filter:blur(18px) saturate(1.08)!important;
-    -webkit-backdrop-filter:blur(18px) saturate(1.08)!important;
+        radial-gradient(circle at 18% 18%,rgba(124,77,255,.09),transparent 32%),
+        radial-gradient(circle at 84% 73%,rgba(0,242,254,.055),transparent 31%),
+        rgba(2,2,5,.80)!important;
+    backdrop-filter:blur(18px) saturate(1.04)!important;
+    -webkit-backdrop-filter:blur(18px) saturate(1.04)!important;
     opacity:0;
-    transition:opacity .28s ease;
+    transition:opacity .24s ease;
 }
 .gx-welcome-modal.show .gx-welcome-backdrop{
     opacity:1;
 }
+
+.gx-welcome-morph-shell{
+    position:fixed;
+    z-index:2;
+    pointer-events:none;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.08);
+    background:linear-gradient(135deg,var(--neon-purple),#ff3366);
+    box-shadow:
+        0 18px 54px rgba(0,0,0,.34),
+        0 0 30px rgba(124,77,255,.20);
+    transform:translateZ(0);
+}
+.gx-welcome-morph-shell[hidden]{
+    display:none!important;
+}
+
+/* La tarjeta no aparece hasta que el botón terminó de crecer. */
+.gx-welcome-modal.gx-welcome-preparing .gx-welcome-sheet,
+.gx-welcome-modal.gx-welcome-morphing .gx-welcome-sheet{
+    opacity:0!important;
+    visibility:hidden!important;
+}
+.gx-welcome-modal.gx-welcome-ready .gx-welcome-sheet{
+    opacity:1;
+    visibility:visible;
+}
+
 .gx-welcome-sheet{
-    isolation:isolate;
+    z-index:3;
     width:min(430px,100%)!important;
     padding:21px!important;
     overflow:hidden!important;
-    border:1px solid rgba(151,120,255,.22)!important;
+    border:1px solid rgba(151,120,255,.28)!important;
     border-radius:24px!important;
+
+    /* Fondo sólido: no depende de transparencias para sentirse GOXION. */
     background:
-        radial-gradient(circle at 11% 7%,rgba(124,77,255,.16),transparent 29%),
-        radial-gradient(circle at 91% 15%,rgba(255,51,102,.075),transparent 26%),
-        radial-gradient(circle at 82% 91%,rgba(0,242,254,.065),transparent 31%),
-        linear-gradient(180deg,rgba(12,11,20,.97),rgba(5,6,10,.987))!important;
+        radial-gradient(circle at 9% 5%,#21143f 0,transparent 30%),
+        radial-gradient(circle at 91% 8%,#25101f 0,transparent 27%),
+        radial-gradient(circle at 88% 94%,#08242a 0,transparent 31%),
+        linear-gradient(180deg,#0d0b16 0%,#07080e 57%,#05060a 100%)!important;
+
     box-shadow:
-        0 34px 110px rgba(0,0,0,.66),
-        inset 0 1px 0 rgba(255,255,255,.025),
-        0 0 42px rgba(124,77,255,.075)!important;
+        0 34px 110px rgba(0,0,0,.68),
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 0 35px rgba(124,77,255,.08)!important;
 }
 .gx-welcome-sheet::before{
     content:"";
     position:absolute;
-    z-index:-1;
     inset:0;
     border-radius:inherit;
     padding:1px;
     background:linear-gradient(
-        115deg,
-        rgba(0,242,254,.58),
-        rgba(124,77,255,.72) 42%,
-        rgba(255,51,102,.48) 73%,
-        rgba(0,242,254,.34)
+        120deg,
+        rgba(0,242,254,.56),
+        rgba(124,77,255,.70) 40%,
+        rgba(255,51,102,.50) 74%,
+        rgba(0,242,254,.28)
     );
     -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
     -webkit-mask-composite:xor;
     mask-composite:exclude;
-    opacity:.58;
     pointer-events:none;
 }
+/* Sin sweep/brillo permanente: el movimiento termina al terminar el morph. */
 .gx-welcome-sheet::after{
-    content:"";
-    position:absolute;
-    z-index:-1;
-    left:-48%;
-    top:-35%;
-    width:64%;
-    height:170%;
-    background:linear-gradient(
-        100deg,
-        transparent,
-        rgba(255,255,255,.105),
-        rgba(0,242,254,.075),
-        transparent
-    );
-    transform:skewX(-18deg);
-    animation:gxWelcomeGlassSweep 5.8s ease-in-out infinite;
-    pointer-events:none;
+    display:none!important;
 }
-@keyframes gxWelcomeGlassSweep{
-    0%,45%{transform:translateX(-35%) skewX(-18deg);opacity:0}
-    58%{opacity:.82}
-    78%,100%{transform:translateX(245%) skewX(-18deg);opacity:0}
-}
-.gx-welcome-modal.gx-welcome-morphing .gx-welcome-sheet>*{
-    animation:gxWelcomeContentReveal .42s ease .18s both;
-}
-@keyframes gxWelcomeContentReveal{
-    from{opacity:0;transform:translateY(7px)}
-    to{opacity:1;transform:none}
-}
+
 .gx-welcome-icon{
     position:relative;
-    width:44px!important;
-    height:44px!important;
-    border-radius:14px!important;
+    width:42px!important;
+    height:42px!important;
+    border-radius:13px!important;
     border:1px solid rgba(151,120,255,.28)!important;
-    background:
-        radial-gradient(circle at 35% 30%,rgba(255,255,255,.13),transparent 23%),
-        linear-gradient(135deg,#251844,#121121)!important;
+    background:linear-gradient(135deg,#251844,#121121)!important;
     color:#d5c8ff!important;
-    box-shadow:0 0 22px rgba(124,77,255,.14)!important;
-}
-.gx-welcome-icon::after{
-    content:"";
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:18px;
-    height:18px;
-    margin:-9px;
-    border:1px solid rgba(0,242,254,.55);
-    border-radius:50%;
-    transform:rotate(38deg) scaleY(.48);
+    box-shadow:0 0 20px rgba(124,77,255,.10)!important;
 }
 .gx-welcome-eyebrow{
-    color:#aa9bdb!important;
+    color:#a99bd8!important;
     letter-spacing:.17em!important;
 }
 .gx-welcome-sheet h3{
-    margin-top:5px!important;
+    margin:5px 0 7px!important;
     font-size:23px!important;
     letter-spacing:-.025em;
 }
@@ -13165,70 +13232,67 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-welcome-copy strong{
     color:#f4f0ff!important;
 }
+
 .gx-welcome-form{
     gap:10px!important;
 }
 .gx-welcome-form input{
     min-height:47px!important;
     border-radius:13px!important;
-    border-color:rgba(151,120,255,.12)!important;
-    background:rgba(9,10,16,.78)!important;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    border:1px solid #292b36!important;
+    background:#0f1017!important;
+    color:#fff!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.02)!important;
 }
 .gx-welcome-form input:focus{
-    border-color:rgba(0,242,254,.36)!important;
-    box-shadow:0 0 0 3px rgba(0,242,254,.045),0 0 24px rgba(0,242,254,.045)!important;
+    border-color:#1bbfce!important;
+    box-shadow:0 0 0 3px rgba(0,242,254,.045)!important;
 }
 .gx-welcome-rule{
-    border-color:rgba(255,190,92,.11)!important;
-    background:linear-gradient(135deg,rgba(37,28,14,.70),rgba(20,16,12,.58))!important;
+    border:1px solid #392c16!important;
+    background:linear-gradient(135deg,#1b160d,#13110d)!important;
     border-radius:12px!important;
 }
 .gx-welcome-submit{
     position:relative;
-    overflow:hidden;
     min-height:48px!important;
-    border:1px solid rgba(151,120,255,.28)!important;
+    border:1px solid rgba(151,120,255,.34)!important;
     border-radius:14px!important;
     background:
-        linear-gradient(135deg,rgba(124,77,255,.31),rgba(255,51,102,.14) 58%,rgba(0,242,254,.10))!important;
-    color:#f1ebff!important;
-    box-shadow:0 9px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.06)!important;
+        linear-gradient(135deg,#39206d 0%,#251942 48%,#0f353c 100%)!important;
+    color:#f3edff!important;
+    box-shadow:
+        0 9px 24px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.055)!important;
 }
 .gx-welcome-submit::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.12) 48%,transparent 72%);
-    transform:translateX(-120%);
-    transition:transform .5s ease;
+    display:none!important;
 }
 .gx-welcome-submit:active{
     transform:scale(.985);
 }
-.gx-welcome-submit:not(:disabled):active::after{
-    transform:translateX(120%);
-}
+
 .gx-welcome-result.success,
 .gx-welcome-result.blocked,
 .gx-welcome-result.review,
 .gx-welcome-result.error,
 .gx-welcome-result.checking{
     border-radius:13px!important;
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
 }
 .gx-welcome-result.success{
-    background:rgba(10,31,22,.68)!important;
-    border-color:rgba(57,229,140,.16)!important;
+    background:#0d2017!important;
+    border-color:#173e2c!important;
 }
 .gx-welcome-result.blocked{
-    background:rgba(35,15,24,.68)!important;
-    border-color:rgba(255,84,119,.16)!important;
+    background:#211218!important;
+    border-color:#47202d!important;
 }
 .gx-welcome-result.review{
-    background:rgba(34,27,12,.66)!important;
-    border-color:rgba(255,190,92,.15)!important;
+    background:#211a0d!important;
+    border-color:#443517!important;
+}
+.gx-welcome-result.checking{
+    background:#0e171b!important;
 }
 .gx-welcome-existing-actions{
     grid-template-columns:minmax(0,1fr) 82px!important;
@@ -13246,7 +13310,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 }
 
 /* ---------------------------------------------------------
-   RETENCIÓN: ocurre DENTRO de la tarjeta de servicio.
+   RETENCIÓN: identidad GOXION real.
    --------------------------------------------------------- */
 .gx-retention-view{
     position:relative;
@@ -13256,7 +13320,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     position:relative;
     isolation:isolate;
     overflow:hidden;
-    padding:5px 0 2px;
+    padding:7px 0 3px;
 }
 .gx-retention-stage::before{
     content:"";
@@ -13264,8 +13328,8 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     z-index:-2;
     inset:-42px -28px -34px;
     background:
-        radial-gradient(circle at 18% 18%,rgba(124,77,255,.13),transparent 34%),
-        radial-gradient(circle at 82% 65%,rgba(0,242,254,.07),transparent 31%);
+        radial-gradient(circle at 18% 18%,rgba(124,77,255,.12),transparent 34%),
+        radial-gradient(circle at 82% 65%,rgba(0,242,254,.055),transparent 31%);
     pointer-events:none;
 }
 .gx-retention-stage::after{
@@ -13274,56 +13338,33 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     z-index:-1;
     top:-20px;
     left:-45%;
-    width:45%;
+    width:42%;
     height:125%;
     background:linear-gradient(
         100deg,
         transparent,
-        rgba(151,120,255,.10),
-        rgba(0,242,254,.08),
+        rgba(151,120,255,.075),
+        rgba(0,242,254,.055),
         transparent
     );
     transform:skewX(-17deg);
-    animation:gxRetentionSweep 3.8s ease-out 1 both;
+    animation:gxRetentionSweep 2.8s ease-out 1 both;
     pointer-events:none;
 }
 @keyframes gxRetentionSweep{
     0%{transform:translateX(-60%) skewX(-17deg);opacity:0}
-    25%{opacity:1}
+    25%{opacity:.9}
     100%{transform:translateX(360%) skewX(-17deg);opacity:0}
 }
-.gx-retention-orbit{
-    position:relative;
-    width:46px;
-    height:46px;
-    margin:0 auto 10px;
-}
-.gx-retention-orbit i{
-    position:absolute;
-    inset:8px 2px;
-    border:1.4px solid rgba(0,242,254,.62);
-    border-radius:50%;
-    transform:rotate(25deg) scaleY(.45);
-    filter:drop-shadow(0 0 4px rgba(0,242,254,.16));
-}
-.gx-retention-orbit i:nth-child(2){
-    border-color:rgba(151,120,255,.72);
-    transform:rotate(-34deg) scaleY(.45);
-}
-.gx-retention-orbit i:nth-child(3){
-    border-color:rgba(255,90,145,.48);
-    transform:rotate(90deg) scaleY(.45);
-}
-.gx-retention-orbit b{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:7px;
-    height:7px;
-    margin:-3.5px;
-    border-radius:50%;
-    background:#f7f4ff;
-    box-shadow:0 0 14px rgba(151,120,255,.72);
+
+.gx-retention-logo{
+    display:block;
+    width:112px;
+    max-width:40%;
+    height:auto;
+    margin:1px auto 11px;
+    object-fit:contain;
+    filter:drop-shadow(0 0 16px rgba(0,242,254,.15));
 }
 .gx-retention-eyebrow{
     display:block;
@@ -13342,28 +13383,28 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 }
 .gx-retention-lead{
     max-width:330px;
-    margin:0 auto 13px!important;
+    margin:0 auto 14px!important;
     color:#99a5b8;
     text-align:center;
     font-size:9.7px;
     line-height:1.55;
 }
 .gx-retention-lead strong{
-    color:#e8e2fb;
+    color:#f0ebff;
 }
+
 .gx-retention-value{
     display:grid;
     grid-template-columns:88px minmax(0,1fr);
     align-items:center;
     gap:11px;
     max-width:330px;
-    margin:0 auto 10px;
+    margin:0 auto 11px;
     padding:10px;
     border:1px solid rgba(151,120,255,.15);
     border-radius:15px;
     background:
-        linear-gradient(135deg,rgba(124,77,255,.09),rgba(0,242,254,.035)),
-        rgba(11,12,18,.80);
+        linear-gradient(135deg,#151128,#0a1820);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
 }
 .gx-retention-percent{
@@ -13371,14 +13412,13 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     display:flex;
     align-items:center;
     justify-content:center;
-    border:1px solid rgba(151,120,255,.22);
+    border:1px solid rgba(151,120,255,.24);
     border-radius:13px;
-    background:linear-gradient(135deg,#251844,#141322);
+    background:linear-gradient(135deg,#2a194e,#161326);
     color:#d6caff;
     font-size:23px;
     font-weight:900;
     letter-spacing:-.04em;
-    box-shadow:0 0 24px rgba(124,77,255,.08);
 }
 .gx-retention-price span{
     display:block;
@@ -13403,13 +13443,14 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-retention-price s{
     color:#737e90;
 }
+
 .gx-retention-rule{
     max-width:330px;
-    margin:0 auto 13px;
+    margin:0 auto 15px;
     padding:9px 10px;
-    border:1px solid rgba(255,255,255,.055);
+    border:1px solid #20222c;
     border-radius:11px;
-    background:rgba(9,10,15,.72);
+    background:#0a0b10;
 }
 .gx-retention-rule strong{
     display:block;
@@ -13423,24 +13464,32 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     font-size:7.8px;
     line-height:1.5;
 }
+
 .gx-retention-actions{
     max-width:330px;
     margin:0 auto;
-    display:grid;
-    gap:7px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:11px;
 }
 .gx-retention-accept{
     position:relative;
     overflow:hidden;
-    min-height:44px;
-    border:1px solid rgba(151,120,255,.27);
-    border-radius:13px;
+    width:100%;
+    min-height:54px;
+    border:1px solid rgba(151,120,255,.30);
+    border-radius:15px;
     background:
-        linear-gradient(135deg,rgba(124,77,255,.32),rgba(0,242,254,.11) 58%,rgba(255,51,102,.10));
-    color:#f2edff;
+        linear-gradient(135deg,#3b206e 0%,#241941 52%,#0e343b 100%);
+    color:#f5f1ff;
     font:inherit;
-    font-size:9.8px;
+    font-size:11px;
     font-weight:900;
+    letter-spacing:.005em;
+    box-shadow:
+        0 9px 22px rgba(0,0,0,.20),
+        inset 0 1px 0 rgba(255,255,255,.055);
     transition:
         width .42s cubic-bezier(.2,.82,.2,1),
         min-height .42s cubic-bezier(.2,.82,.2,1),
@@ -13448,16 +13497,16 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         transform .18s ease;
 }
 .gx-retention-accept:active{
-    transform:scale(.98);
+    transform:scale(.985);
 }
 .gx-retention-accept.is-loading{
-    width:100%;
     min-height:8px;
     height:8px;
     color:transparent;
     border:0;
     border-radius:999px;
     background:#191a22;
+    box-shadow:none;
 }
 .gx-retention-accept.is-loading::after{
     content:"";
@@ -13503,22 +13552,33 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     top:28px;
     transform:rotate(-48deg);
 }
+
+/* Acción secundaria deliberadamente discreta. */
 .gx-retention-decline{
-    min-height:38px;
-    border:1px solid rgba(255,90,145,.12);
-    border-radius:11px;
-    background:rgba(31,15,22,.58);
-    color:#d7a6b4;
+    min-height:auto;
+    padding:2px 4px 5px;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    color:#9e8290;
     font:inherit;
-    font-size:8.8px;
-    font-weight:800;
+    font-size:8.4px;
+    font-weight:750;
+    text-decoration:underline;
+    text-decoration-thickness:1px;
+    text-underline-offset:3px;
+}
+.gx-retention-decline:active{
+    color:#d7a6b4;
 }
 .gx-retention-decline:disabled{
-    opacity:.55;
+    opacity:.45;
 }
+
 .gx-retention-status{
     max-width:330px;
-    margin:8px auto 0;
+    margin:9px auto 0;
     text-align:center;
     color:#8d99aa;
     font-size:8px;
@@ -13538,7 +13598,6 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     color:#ff9bb0;
 }
 
-/* Si se recarga Mi Espacio después de aceptar, la novedad usa el lenguaje existente. */
 .gx-service-update-badge.gx-update-retencion{
     border-color:rgba(57,229,140,.22)!important;
     background:#0d2118!important;
@@ -13546,8 +13605,14 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 }
 
 @media(max-width:480px){
+    .gx-welcome-modal{
+        align-items:flex-end!important;
+        padding:10px 9px calc(9px + env(safe-area-inset-bottom))!important;
+    }
     .gx-welcome-sheet{
-        padding:18px 15px calc(18px + env(safe-area-inset-bottom))!important;
+        width:100%!important;
+        border-radius:24px!important;
+        padding:18px 15px!important;
     }
 }
 @media(max-width:390px){
@@ -13557,9 +13622,11 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     .gx-retention-percent{
         font-size:21px;
     }
+    .gx-retention-logo{
+        width:104px;
+    }
 }
 @media(prefers-reduced-motion:reduce){
-    .gx-welcome-sheet::after,
     .gx-retention-stage::after,
     .gx-retention-accept.is-loading::after{
         animation:none!important;
