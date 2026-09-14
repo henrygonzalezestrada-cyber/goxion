@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.0-beta-13" lang="es">
+<html data-goxion-version="1.2.1-beta-14" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -4895,6 +4895,127 @@
 
 
 
+
+<style id="goxion-ayuda-beta-14-welcome-validation">
+.gx-welcome-eligibility-note{
+    width:min(340px,92%);
+    margin:0 auto 24px;
+    color:#8390a5;
+    font-size:9px;
+    line-height:1.45;
+    text-align:center;
+}
+.gx-welcome-eligibility-note button{
+    border:0;
+    padding:0 0 0 3px;
+    background:transparent;
+    color:#79ecf8;
+    font:inherit;
+    font-weight:800;
+    text-decoration:underline;
+    text-underline-offset:2px;
+}
+
+.gx-welcome-modal{
+    position:fixed;
+    inset:0;
+    z-index:100500;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.gx-welcome-modal.show{display:flex}
+.gx-welcome-backdrop{
+    position:absolute;inset:0;background:rgba(0,0,0,.76);backdrop-filter:blur(12px);
+}
+.gx-welcome-sheet{
+    position:relative;
+    width:min(410px,100%);
+    padding:19px;
+    overflow:hidden;
+    border:1px solid rgba(151,120,255,.18);
+    border-radius:22px;
+    background:
+        radial-gradient(circle at 88% 6%,rgba(124,77,255,.11),transparent 34%),
+        linear-gradient(180deg,#0b0c12,#08090e);
+    box-shadow:0 28px 100px rgba(0,0,0,.62);
+}
+.gx-welcome-close{
+    position:absolute;right:12px;top:12px;
+    width:32px;height:32px;border:1px solid rgba(255,255,255,.07);border-radius:999px;
+    background:#11131a;color:#dce6f2;font-size:18px;
+}
+.gx-welcome-icon{
+    width:38px;height:38px;display:grid;place-items:center;margin-bottom:9px;
+    border:1px solid rgba(151,120,255,.22);border-radius:12px;background:#171327;color:#cab9ff;font-size:17px;
+}
+.gx-welcome-eyebrow{
+    color:#8b7bbd;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;
+}
+.gx-welcome-sheet h3{margin:4px 0 6px;font-size:20px;line-height:1.15}
+.gx-welcome-copy{margin:0 0 14px;color:#909db0;font-size:10px;line-height:1.55}
+.gx-welcome-copy strong{color:#d9d2ee}
+.gx-welcome-form{display:grid;gap:8px}
+.gx-welcome-form label>span{
+    display:block;margin:0 0 4px;color:#7e8a9c;font-size:8px;font-weight:850;text-transform:uppercase;
+}
+.gx-welcome-form input{
+    width:100%;min-height:43px;padding:0 11px;border:1px solid rgba(255,255,255,.08);
+    border-radius:11px;background:#0f1118;color:#fff;font-family:inherit;font-size:12px;outline:none;
+}
+.gx-welcome-form input:focus{border-color:rgba(0,242,254,.28);box-shadow:0 0 0 3px rgba(0,242,254,.035)}
+.gx-welcome-rule{
+    display:grid;gap:2px;padding:9px 10px;border:1px solid rgba(255,190,92,.10);
+    border-radius:10px;background:#17140f;
+}
+.gx-welcome-rule b{color:#e8c17d;font-size:9px}
+.gx-welcome-rule span{color:#9c927f;font-size:8.5px;line-height:1.45}
+.gx-welcome-submit{
+    min-height:45px;margin-top:2px;border:1px solid rgba(151,120,255,.26);border-radius:12px;
+    background:linear-gradient(135deg,#241839,#151321);color:#ded3ff;font-family:inherit;font-size:11px;font-weight:850;
+}
+.gx-welcome-submit:disabled{opacity:.62}
+.gx-welcome-result{
+    display:grid;gap:4px;margin-top:9px;padding:0;color:#9ba7b8;font-size:10px;line-height:1.5;
+}
+.gx-welcome-result:empty{display:none}
+.gx-welcome-result strong{font-size:12px}
+.gx-welcome-result span{display:block}
+.gx-welcome-result.checking{
+    padding:9px;border-radius:10px;background:#10151a;color:#8fdce4;
+}
+.gx-welcome-result.success{
+    padding:11px;border:1px solid rgba(57,229,140,.13);border-radius:11px;background:#0e1c16;color:#8edeb5;
+}
+.gx-welcome-result.success strong{color:#73e6aa}
+.gx-welcome-result.blocked{
+    padding:11px;border:1px solid rgba(255,84,119,.15);border-radius:11px;background:#211218;color:#d9a3b0;
+}
+.gx-welcome-result.blocked strong{color:#ff8da6}
+.gx-welcome-result.review{
+    padding:11px;border:1px solid rgba(255,190,92,.14);border-radius:11px;background:#1d170e;color:#cdb894;
+}
+.gx-welcome-result.review strong{color:#ffd08a}
+.gx-welcome-result.error{
+    padding:8px 9px;border-radius:9px;background:#211218;color:#ff92aa;
+}
+.gx-welcome-existing-actions{
+    display:grid;grid-template-columns:1fr 88px;gap:6px;margin-top:9px;
+}
+.gx-welcome-existing-actions button{
+    min-height:39px;border:1px solid rgba(0,242,254,.16);border-radius:10px;
+    background:#0d1d23;color:#79edf8;font-family:inherit;font-size:9px;font-weight:850;
+}
+.gx-welcome-existing-actions button.secondary{
+    border-color:rgba(151,120,255,.13);background:#17131f;color:#cabdff;
+}
+@media(max-width:480px){
+    .gx-welcome-modal{align-items:flex-end;padding:0}
+    .gx-welcome-sheet{width:100%;border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+}
+</style>
+
 </head>
 <body class="no-scroll">
 <div id="splash-screen" onclick="hideSplash()">
@@ -4993,9 +5114,13 @@
 <span class="rotator-text" id="dynamic-rotator">✓ Calidad 4K Ultra HD</span>
 </div>
 </div>
-<button class="btn-shimmer" onclick="solicitarCuenta()" style="margin-bottom: 25px;">
+<button class="btn-shimmer" onclick="solicitarCuenta()" style="margin-bottom: 9px;">
                     🎁 Únete hoy y obtén -10% OFF
                 </button>
+                <div class="gx-welcome-eligibility-note">
+                    Exclusivo para clientes completamente nuevos.
+                    <button type="button" onclick="openAuthSheet()">¿Ya eras cliente? Recupera tu acceso</button>
+                </div>
 </div>
 <div class="section-title reveal">🔥 Servicios Populares</div>
 <div class="teaser-grid reveal">
@@ -5359,6 +5484,31 @@
 <p id="feedback-success" style="color: var(--success-green); font-size: 13px; font-weight: 700; margin-top: 15px; display: none;">¡Feedback enviado con éxito! Gracias.</p>
 </div>
 </div>
+
+<div class="gx-welcome-modal" id="gx-welcome-modal" aria-hidden="true">
+    <div class="gx-welcome-backdrop" onclick="gxCloseWelcomeRegistration()"></div>
+    <section class="gx-welcome-sheet">
+        <button class="gx-welcome-close" type="button" onclick="gxCloseWelcomeRegistration()">×</button>
+        <div class="gx-welcome-icon">✦</div>
+        <div class="gx-welcome-eyebrow">Bienvenida GOXION</div>
+        <h3>Obtén -10% en tu alta</h3>
+        <p class="gx-welcome-copy">Este beneficio es exclusivo para personas que <strong>nunca han sido clientes</strong> de SD Streaming ni GOXION. Validaremos tu registro antes de confirmar el descuento.</p>
+
+        <div id="gx-welcome-form" class="gx-welcome-form">
+            <label><span>Nombre</span><input id="gx-welcome-name" type="text" autocomplete="name" placeholder="Tu nombre completo"></label>
+            <label><span>WhatsApp</span><input id="gx-welcome-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="961 000 0000"></label>
+            <div class="gx-welcome-rule"><b>Importante</b><span>Si ya tenías usuario, PIN o servicios con nosotros, tu espacio sigue siendo válido y esta promoción no aplica como alta nueva.</span></div>
+            <button id="gx-welcome-submit" class="gx-welcome-submit" type="button" onclick="gxSubmitWelcomeRegistration(event)">Validar y solicitar</button>
+        </div>
+
+        <div id="gx-welcome-result" class="gx-welcome-result" aria-live="polite"></div>
+        <div id="gx-welcome-existing-actions" class="gx-welcome-existing-actions" hidden>
+            <button type="button" onclick="gxRegistrationToRecovery()">Recuperar mi acceso</button>
+            <button type="button" class="secondary" onclick="gxCloseWelcomeRegistration()">Cerrar</button>
+        </div>
+    </section>
+</div>
+
 <script>
         const NUMERO_GOXION = "528136836901"; 
         
@@ -5377,14 +5527,128 @@
         window.catalogGroups = {}; 
 
         function solicitarCuenta() {
-            let nombre = prompt("¿Cómo te llamas?");
-            if(!nombre) return;
-            let contacto = prompt("Déjanos tu número de WhatsApp para contactarte y crear tu perfil:");
-            if(!contacto) return;
+            const modal=document.getElementById("gx-welcome-modal");
+            const form=document.getElementById("gx-welcome-form");
+            const result=document.getElementById("gx-welcome-result");
+            const actions=document.getElementById("gx-welcome-existing-actions");
+            const submit=document.getElementById("gx-welcome-submit");
+            if(!modal) return;
 
-            notificarAdmin("pedidos", "🎁 REGISTRO -10% OFF", `**Nombre:** ${nombre}\n**WhatsApp:** ${contacto}\n\n*Prospecto interesado en crear una cuenta y aprovechar el beneficio de -10% OFF.*`, "7c4dff");
-            
-            alert(`¡Gracias ${nombre}! Hemos recibido tus datos. Te enviaremos un mensaje por WhatsApp en breve para activar tu espacio.`);
+            if(form) form.hidden=false;
+            if(result) {
+                result.className="gx-welcome-result";
+                result.innerHTML="";
+            }
+            if(actions) actions.hidden=true;
+            if(submit) {
+                submit.disabled=false;
+                submit.textContent="Validar y solicitar";
+            }
+
+            modal.classList.add("show");
+            modal.setAttribute("aria-hidden","false");
+            document.body.style.overflow="hidden";
+            setTimeout(()=>document.getElementById("gx-welcome-name")?.focus({preventScroll:true}),180);
+        }
+
+        function gxCloseWelcomeRegistration() {
+            const modal=document.getElementById("gx-welcome-modal");
+            modal?.classList.remove("show");
+            modal?.setAttribute("aria-hidden","true");
+            document.body.style.overflow="";
+        }
+
+        function gxRegistrationToRecovery() {
+            const name=document.getElementById("gx-welcome-name")?.value?.trim() || "";
+            gxCloseWelcomeRegistration();
+            if(typeof openAuthSheet==="function") openAuthSheet();
+            setTimeout(()=>{
+                const loginId=document.getElementById("login-id");
+                if(loginId && name) loginId.value=name;
+                if(typeof openPinRecovery==="function") openPinRecovery();
+            },420);
+        }
+
+        async function gxSubmitWelcomeRegistration(event) {
+            event?.preventDefault?.();
+            const name=document.getElementById("gx-welcome-name")?.value?.trim() || "";
+            const phone=document.getElementById("gx-welcome-phone")?.value?.trim() || "";
+            const form=document.getElementById("gx-welcome-form");
+            const result=document.getElementById("gx-welcome-result");
+            const actions=document.getElementById("gx-welcome-existing-actions");
+            const submit=document.getElementById("gx-welcome-submit");
+
+            if(name.length<2) {
+                result.className="gx-welcome-result error";
+                result.textContent="Escribe tu nombre completo.";
+                return;
+            }
+            if(phone.replace(/\D/g,"").length<10) {
+                result.className="gx-welcome-result error";
+                result.textContent="Escribe un número de WhatsApp válido.";
+                return;
+            }
+
+            submit.disabled=true;
+            submit.textContent="Validando…";
+            result.className="gx-welcome-result checking";
+            result.textContent="Revisando si ya existe un registro previo…";
+
+            try {
+                const response=await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/registro-goxion",{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify({nombre:name,telefono:phone}),
+                    cache:"no-store"
+                });
+                const data=await response.json().catch(()=>({}));
+                if(!response.ok || data?.ok!==true) throw new Error(data?.error || "No pudimos validar tu registro.");
+
+                if(data.status==="existing") {
+                    if(form) form.hidden=true;
+                    result.className="gx-welcome-result blocked";
+                    result.innerHTML="<strong>Ya tienes un registro previo</strong><span>Este número ya está asociado a un espacio GOXION. El -10% es únicamente para clientes completamente nuevos. Puedes recuperar tus datos de acceso y seguir usando tu espacio actual.</span>";
+                    if(actions) actions.hidden=false;
+                    return;
+                }
+
+                if(data.status==="review") {
+                    if(form) form.hidden=true;
+                    result.className="gx-welcome-result review";
+                    result.innerHTML="<strong>Necesitamos validar tu registro</strong><span>Encontramos información que podría corresponder a un cliente previo. No confirmaremos el -10% hasta revisarlo. Te contactaremos por WhatsApp.</span>";
+                    if(actions) actions.hidden=false;
+                    return;
+                }
+
+                if(data.status==="already_requested") {
+                    if(form) form.hidden=true;
+                    result.className="gx-welcome-result success";
+                    result.innerHTML="<strong>Tu solicitud ya está registrada</strong><span>No necesitas enviarla nuevamente. El beneficio se confirmará después de validar que se trata de un cliente completamente nuevo.</span>";
+                    return;
+                }
+
+                if(data.status==="new") {
+                    if(!data.already) {
+                        notificarAdmin(
+                            "pedidos",
+                            "🎁 REGISTRO -10% OFF",
+                            `**Nombre:** ${name}\n**WhatsApp:** ${phone}\n**Solicitud:** ${data.request_id || "N/A"}\n\n*Validación inicial: sin coincidencias como cliente previo. El beneficio queda sujeto a alta final.*`,
+                            "7c4dff"
+                        );
+                    }
+                    if(form) form.hidden=true;
+                    result.className="gx-welcome-result success";
+                    result.innerHTML=`<strong>Solicitud recibida ✓</strong><span>Gracias ${name}. No encontramos un registro previo con esos datos. Te contactaremos por WhatsApp para completar tu alta y confirmar el beneficio.</span>`;
+                    return;
+                }
+
+                throw new Error("No pudimos determinar el estado de tu solicitud.");
+            } catch(error) {
+                result.className="gx-welcome-result error";
+                result.textContent=error?.message || "No pudimos validar tu registro.";
+                submit.disabled=false;
+                submit.textContent="Reintentar";
+            }
         }
 
         async function reclamarCuponSilencioso(nombre, folio, descuento) {
@@ -9051,7 +9315,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 13 v1.2.0-beta-13: retorno de notificaciones premium + acciones internas GOXION.");
+        console.info("GOXION Ayuda Beta 14 v1.2.1-beta-14: registro validado + protección de promoción -10%.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -9984,7 +10248,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda Beta 13 · v1.2.0-beta-13
+    GOXION · Ayuda · v1.2.0
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -11111,9 +11375,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     }
 }
 </style>
-<style id="goxion-ayuda-beta-04-account-security">
+<style id="goxion-account-security">
 /* =========================================================
-   GOXION · AYUDA BETA 04
+   GOXION · AYUDA v1.2.0
    Cancelaciones formales + credenciales de una sola vista
    Mantiene la escala móvil y el lenguaje visual existente.
    ========================================================= */
@@ -11184,8 +11448,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-credential-view{
     padding-top:1px;
 }
-.gx-credential-kicker,
-.gx-cancellation-kicker{
+.gx-credential-kicker{
     display:inline-flex;
     align-items:center;
     min-height:21px;
@@ -11355,28 +11618,6 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-cancel-link.gx-cancel-open-state{
     border-color:rgba(124,77,255,.11);
 }
-.gx-cancel-link .gx-cancel-inline-status{
-    margin-left:auto;
-    padding:3px 6px;
-    border-radius:999px;
-    background:rgba(255,255,255,.035);
-    color:#aab5c7;
-    font-size:7.2px;
-    font-weight:850;
-    white-space:nowrap;
-}
-.gx-cancel-inline-status.requested{
-    color:#cfbfff;
-    background:rgba(124,77,255,.06);
-}
-.gx-cancel-inline-status.approved{
-    color:#7de8b2;
-    background:rgba(0,255,157,.045);
-}
-.gx-cancel-inline-status.rejected{
-    color:#ff91aa;
-    background:rgba(255,51,102,.045);
-}
 .gx-cancellation-state-view{
     padding-top:1px;
 }
@@ -11483,9 +11724,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 }
 </style>
 
-<style id="goxion-ayuda-beta-05-interaction-experience">
+<style id="goxion-interaction-experience">
 /* =========================================================
-   GOXION · AYUDA BETA 05
+   GOXION · AYUDA v1.2.0
    Microinteracciones de expansión y feedback táctil/visual.
    ========================================================= */
 
@@ -11709,9 +11950,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 
 
 
-<style id="goxion-ayuda-beta-08-icons">
+<style id="goxion-interface-icons">
 /* =========================================================
-   GOXION · AYUDA BETA 08
+   GOXION · AYUDA v1.2.0
    Iconos de una sola pieza.
    ========================================================= */
 
@@ -11836,10 +12077,10 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 
 
 
-<style id="goxion-ayuda-beta-09-copy-button-green">
+<style id="goxion-copy-button-success">
 /* =========================================================
    GOXION · COPIADO EXITOSO
-   Conserva EXACTAMENTE la animación aprobada de Beta06.
+   Conserva la animación de confirmación aprobada.
    La única diferencia: durante la confirmación el botón
    cambia realmente a verde sólido.
    ========================================================= */
@@ -11853,14 +12094,14 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         inset 0 -1px 0 rgba(0,0,0,.10)!important;
 }
 
-/* El pop, partículas, sweep y pulso siguen viniendo de Beta05/Beta06.
-   Aquí no se modifica tarjeta, contraseña, partículas ni resplandores. */
+/* El pop, partículas, sweep y pulso forman parte del estado aprobado.
+   Esta regla sólo fija el color sólido de confirmación. */
 </style>
 
 
-<style id="goxion-ayuda-beta-10-service-refinement">
+<style id="goxion-service-refinement">
 /* =========================================================
-   GOXION · AYUDA BETA 10
+   GOXION · AYUDA v1.2.0
    Refinamiento de Tus servicios.
    ========================================================= */
 
@@ -11964,9 +12205,6 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     margin:3px 0 17px!important;
     font-size:11px!important;
     line-height:1.5!important;
-}
-.gx-cancellation-kicker:first-of-type{
-    margin-top:0;
 }
 
 /* El kicker inicial "Gestión de servicio" fue eliminado del HTML.
@@ -12157,18 +12395,12 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 </style>
 
 
-<style id="goxion-ayuda-beta-11-service-notices">
+<style id="goxion-service-notices">
 /* =========================================================
-   GOXION · AYUDA BETA 11
+   GOXION · AYUDA v1.2.0
    Subnavegación alineada + novedades de servicio.
    ========================================================= */
 
-/* ---------------------------------------------------------
-   MÁS OPCIONES
-   --------------------------------------------------------- */
-.gx-service-more{
-    min-width:86px!important;
-}
 
 /* ---------------------------------------------------------
    SUBNAV: botón y cápsula secundaria SIEMPRE centrados.
@@ -12186,8 +12418,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     min-width:92px!important;
     margin:0!important;
 }
-.gx-service-subnav .gx-credential-kicker,
-.gx-service-subnav .gx-cancellation-kicker{
+.gx-service-subnav .gx-credential-kicker{
     flex:1 1 auto;
     min-width:0;
     min-height:34px!important;
@@ -12224,46 +12455,6 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-service-state-line .gx-service-state{
     margin-top:0!important;
     flex:0 0 auto;
-}
-.gx-service-update-badge{
-    min-width:0;
-    max-width:148px;
-    min-height:20px;
-    padding:0 8px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-    border:1px solid rgba(0,242,254,.16);
-    border-radius:999px;
-    background:#0e1b22;
-    color:#7ef3ff;
-    font-size:7.4px;
-    font-weight:850;
-    line-height:1;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-}
-.gx-service-update-badge.gx-update-pin{
-    border-color:rgba(151,120,255,.20);
-    background:#171327;
-    color:#c7b6ff;
-}
-.gx-service-update-badge.gx-update-correo{
-    border-color:rgba(74,165,255,.20);
-    background:#101a29;
-    color:#9ed3ff;
-}
-.gx-service-update-badge.gx-update-perfil,
-.gx-service-update-badge.gx-update-acceso{
-    border-color:rgba(151,120,255,.18);
-    background:#151522;
-    color:#c8c0ef;
-}
-.gx-service-update-badge.gx-update-password{
-    border-color:rgba(0,242,254,.22);
-    background:#0d2025;
-    color:#7cf7ff;
 }
 
 /* Notificación visual UNA VEZ por evento/sesión.
@@ -12333,7 +12524,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 
 
 
-<style id="goxion-ayuda-beta-13-goxion-language">
+<style id="goxion-service-visual-language">
 .gx-service-toolbar{
     display:flex!important;
     align-items:center!important;
