@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.0-beta-09" lang="es">
+<html data-goxion-version="1.2.0-beta-10" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -6514,17 +6514,18 @@
                         : '';
 
                     let cancellationPanelHTML = `
-                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver a accesos</span></button>
-                        <div class="gx-cancellation-kicker">GESTIÓN DE SERVICIO</div>
+                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                         <h3>Solicitar cancelación</h3>
                         <p>Tu servicio continúa activo hasta que GOXION confirme la solicitud.</p>
                         <p class="gx-cancel-detail">Los cargos ya generados no cambian. Revisaremos tu solicitud antes de efectuar cualquier baja.</p>
-                        <button type="button" class="gx-service-cancel-submit" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar solicitud</button>
+                        <div class="gx-cancel-submit-zone">
+                            <button type="button" class="gx-service-cancel-submit gx-action-morph" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)"><span class="gx-action-label">Enviar solicitud</span></button>
+                        </div>
                         <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>`;
 
                     if(cancellationState === 'solicitada') {
                         cancellationPanelHTML = `
-                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver a accesos</span></button>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                             <div class="gx-cancellation-kicker">SOLICITUD RECIBIDA</div>
                             <h3>Cancelación en revisión</h3>
                             <p>Ya recibimos tu solicitud. Tu servicio permanece activo mientras revisamos la baja.</p>
@@ -6541,7 +6542,7 @@
                             ? ` Fecha prevista: ${escape(cancellation.fecha_efectiva)}.`
                             : '';
                         cancellationPanelHTML = `
-                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver a accesos</span></button>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                             <div class="gx-cancellation-kicker">SOLICITUD APROBADA</div>
                             <h3>Cancelación aprobada</h3>
                             <p>La solicitud fue autorizada. El servicio seguirá disponible hasta que la baja sea marcada como efectiva.${effectiveDate}</p>
@@ -6555,7 +6556,7 @@
                             ${cancelAdminNote}`;
                     } else if(cancellationState === 'rechazada') {
                         cancellationPanelHTML = `
-                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver a accesos</span></button>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                             <div class="gx-cancellation-kicker">SOLICITUD RESUELTA</div>
                             <h3>Solicitud no autorizada</h3>
                             <p>La solicitud anterior fue revisada y no se hizo efectiva. Tu servicio continúa activo.</p>
@@ -6564,12 +6565,14 @@
                                 <small>Si tu situación cambió, puedes enviar una nueva solicitud para que la revisemos nuevamente.</small>
                             </div>
                             ${cancelAdminNote}
-                            <button type="button" class="gx-cancel-retry" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)">Enviar nueva solicitud</button>
+                            <div class="gx-cancel-submit-zone">
+                                <button type="button" class="gx-cancel-retry gx-action-morph" id="gx-service-cancel-submit-${idx}" onclick="gxSubmitServiceCancellation(${idx},event)"><span class="gx-action-label">Enviar nueva solicitud</span></button>
+                            </div>
                             <div class="gx-service-cancel-status" id="gx-service-cancel-status-${idx}" aria-live="polite"></div>`;
                     }
 
                     const credentialPanelHTML = delivery ? `
-                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver a accesos</span></button>
+                        <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                         <div class="gx-credential-kicker">ACTUALIZACIÓN DE ACCESO · UNA SOLA VISTA</div>
                         <h3>Nueva contraseña disponible</h3>
                         <p>GOXION actualizó la contraseña de esta cuenta. Confirma tu PIN de Mi Espacio para verla.</p>
@@ -6628,11 +6631,11 @@
                                     <div class="gx-access-heading">Tus accesos</div>
                                     ${credsHTML}
                                     <div class="gx-service-toolbar">
-                                        <button type="button" onclick="gxServiceView(${idx},'options',event)">Más opciones <span aria-hidden="true">···</span></button>
+                                        <button type="button" class="gx-service-more" onclick="gxServiceView(${idx},'options',event)">Más</button>
                                     </div>
                                 </div>
                                 <div id="gx-service-options-${idx}" class="gx-service-view" hidden>
-                                    <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver a accesos</span></button>
+                                    <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                                     <button type="button" class="gx-option-support" onclick="gxOpenServiceSupport(${idx},event)"><span>Soporte de la plataforma</span><svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></button>
                                     ${cancellationOptionHTML}
                                 </div>
@@ -6981,6 +6984,41 @@
             },420);
         }
 
+        function gxCancellationActionState(button,state,label='') {
+            if(!button) return;
+            const span=button.querySelector('.gx-action-label');
+
+            button.classList.remove('gx-action-loading','gx-action-success','gx-action-error');
+
+            if(state==='loading') {
+                button.disabled=true;
+                button.classList.add('gx-action-loading');
+                if(span) span.textContent='';
+                button.setAttribute('aria-label','Registrando solicitud');
+                return;
+            }
+
+            if(state==='success') {
+                button.disabled=true;
+                button.classList.add('gx-action-success');
+                if(span) span.textContent='';
+                button.setAttribute('aria-label','Solicitud registrada');
+                return;
+            }
+
+            if(state==='error') {
+                button.disabled=false;
+                button.classList.add('gx-action-error');
+                if(span) span.textContent=label || 'Reintentar';
+                button.setAttribute('aria-label',label || 'Reintentar');
+                return;
+            }
+
+            button.disabled=false;
+            if(span) span.textContent=label || 'Enviar solicitud';
+            button.setAttribute('aria-label',label || 'Enviar solicitud');
+        }
+
         async function gxSubmitServiceCancellation(index,event) {
             event?.preventDefault?.();
             event?.stopPropagation?.();
@@ -6994,13 +7032,14 @@
 
             if (!cliente || !servicio || !token || !status || !submit) return;
 
-            submit.disabled = true;
-            submit.textContent = 'Registrando…';
+            gxCancellationActionState(submit,'loading');
             status.classList.remove('error');
             status.textContent = '';
 
+            const minimumAnimation = new Promise(resolve=>setTimeout(resolve,900));
+
             try {
-                const r = await fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente',{
+                const request = fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente',{
                     method:'POST',
                     headers:{
                         'Content-Type':'application/json',
@@ -7015,7 +7054,9 @@
                     })
                 });
 
+                const [r] = await Promise.all([request,minimumAnimation]);
                 const data = await r.json().catch(()=>({}));
+
                 if (!r.ok || data?.ok !== true) {
                     throw new Error(data?.error || 'No fue posible registrar la solicitud.');
                 }
@@ -7026,10 +7067,15 @@
                     estado:String(data?.solicitud?.estado || 'solicitada')
                 };
 
-                submit.textContent = data?.already_open ? 'Solicitud ya registrada' : 'Solicitud enviada';
+                gxCancellationActionState(submit,'success');
+
                 status.innerHTML = data?.already_open
                     ? '<span style="color:#cdbfff;font-weight:800;">Solicitud en revisión.</span> No necesitas enviarla nuevamente.'
                     : '<span style="color:var(--success-green);font-weight:800;">✓ Solicitud registrada.</span> Tu servicio seguirá activo mientras la revisamos.';
+
+                if(navigator.vibrate) {
+                    try { navigator.vibrate([20,35,30]); } catch(_) {}
+                }
 
                 setTimeout(() => {
                     renderDashboard(key);
@@ -7037,10 +7083,9 @@
                         gxToggleServiceCard(index);
                         setTimeout(() => gxServiceView(index,'cancel'), 620);
                     }, 80);
-                }, 520);
+                }, 950);
             } catch (error) {
-                submit.disabled = false;
-                submit.textContent = 'Reintentar';
+                gxCancellationActionState(submit,'error','Reintentar');
                 status.classList.add('error');
                 status.textContent = error?.message || 'No fue posible registrar la solicitud.';
             }
@@ -8865,7 +8910,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 09 v1.2.0-beta-09: restauración de animación de copiado + botón verde sólido.");
+        console.info("GOXION Ayuda Beta 10 v1.2.0-beta-10: servicios refinados + carga transformativa + copiado contenido.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -9798,7 +9843,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda Beta 09 · v1.2.0-beta-09
+    GOXION · Ayuda Beta 10 · v1.2.0-beta-10
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -11669,6 +11714,305 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 
 /* El pop, partículas, sweep y pulso siguen viniendo de Beta05/Beta06.
    Aquí no se modifica tarjeta, contraseña, partículas ni resplandores. */
+</style>
+
+
+<style id="goxion-ayuda-beta-10-service-refinement">
+/* =========================================================
+   GOXION · AYUDA BETA 10
+   Refinamiento de Tus servicios.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   Copiado: el sweep queda CONFINADO a la tarjeta.
+   --------------------------------------------------------- */
+.gx-credential-result{
+    overflow:hidden!important;
+    isolation:isolate;
+}
+.gx-credential-result.gx-copy-success{
+    box-shadow:none!important;
+}
+.gx-credential-result.gx-copy-success::after{
+    z-index:0!important;
+    border-radius:inherit!important;
+}
+.gx-credential-result > *{
+    position:relative;
+    z-index:1;
+}
+.gx-credential-result-actions [id^="gx-credential-copy-"]{
+    overflow:visible!important;
+}
+/* Las partículas siguen visibles, pero se cortan en los límites de la tarjeta. */
+.gx-credential-result .gx-copy-spark{
+    z-index:2!important;
+}
+
+/* ---------------------------------------------------------
+   MÁS / VOLVER — mismo sistema visual.
+   --------------------------------------------------------- */
+.gx-service-toolbar{
+    margin-top:14px!important;
+    padding-top:12px!important;
+}
+.gx-service-toolbar button,
+.gx-service-back{
+    min-height:34px!important;
+    height:34px!important;
+    padding:0 12px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:6px!important;
+    border:1px solid rgba(137,112,220,.22)!important;
+    border-radius:999px!important;
+    background:#15131d!important;
+    color:#cfc8e7!important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.045),
+        0 5px 14px rgba(0,0,0,.15)!important;
+    font-family:inherit!important;
+    font-size:9.4px!important;
+    font-weight:800!important;
+    letter-spacing:0!important;
+    line-height:1!important;
+    white-space:nowrap;
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        background .18s ease;
+}
+.gx-service-toolbar button:active,
+.gx-service-back:active{
+    transform:scale(.955)!important;
+    border-color:rgba(0,242,254,.25)!important;
+    background:#121923!important;
+}
+.gx-service-back{
+    margin:0 0 15px!important;
+}
+.gx-service-back .gx-nav-arrow{
+    width:15px!important;
+    height:15px!important;
+    flex-basis:15px!important;
+    color:#78eefe!important;
+}
+
+/* Más mantiene ubicación al final, pero ya no es otro lenguaje visual. */
+.gx-service-more{
+    min-width:62px;
+}
+
+/* ---------------------------------------------------------
+   Vistas secundarias: ritmo vertical consistente.
+   --------------------------------------------------------- */
+.gx-service-view{
+    padding-top:0;
+}
+.gx-service-view h3{
+    margin:0 0 8px!important;
+    font-size:15px!important;
+    font-weight:800!important;
+    line-height:1.25!important;
+}
+.gx-service-view > p{
+    margin:0 0 8px!important;
+}
+.gx-service-view .gx-cancel-detail{
+    margin:3px 0 17px!important;
+    font-size:11px!important;
+    line-height:1.5!important;
+}
+.gx-cancellation-kicker:first-of-type{
+    margin-top:0;
+}
+
+/* El kicker inicial "Gestión de servicio" fue eliminado del HTML.
+   Los kickers de ESTADO sí se conservan porque aportan información. */
+
+/* ---------------------------------------------------------
+   Soporte / Cancelación — bloques gemelos.
+   --------------------------------------------------------- */
+.gx-option-support,
+.gx-service-view .gx-cancel-link{
+    min-height:44px!important;
+    margin-top:7px!important;
+    padding:0 12px!important;
+    border-radius:12px!important;
+    font-family:inherit!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        background .18s ease;
+}
+.gx-option-support:active,
+.gx-service-view .gx-cancel-link:active{
+    transform:scale(.985)!important;
+}
+
+/* ---------------------------------------------------------
+   ENVIAR SOLICITUD — centrado + morph de referencia.
+   Inspirado en el video: botón -> línea de progreso -> check.
+   --------------------------------------------------------- */
+.gx-cancel-submit-zone{
+    min-height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:15px 0 3px;
+}
+.gx-service-view .gx-action-morph{
+    --gx-action-accent:#ff6f9c;
+    position:relative;
+    width:148px;
+    min-width:0!important;
+    height:40px!important;
+    min-height:40px!important;
+    padding:0 16px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden;
+    border:1px solid rgba(255,111,156,.28)!important;
+    border-radius:999px!important;
+    background:#25131c!important;
+    color:#ff92b4!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+    font-family:inherit!important;
+    font-size:10px!important;
+    font-weight:800!important;
+    line-height:1!important;
+    letter-spacing:0!important;
+    transform:translateZ(0);
+    transition:
+        width .42s cubic-bezier(.2,.8,.2,1),
+        height .42s cubic-bezier(.2,.8,.2,1),
+        border-radius .42s cubic-bezier(.2,.8,.2,1),
+        background .28s ease,
+        border-color .28s ease,
+        transform .18s ease;
+}
+.gx-action-morph .gx-action-label{
+    position:relative;
+    z-index:2;
+    transition:opacity .15s ease,transform .2s ease;
+}
+.gx-action-morph:not(:disabled):active{
+    transform:scale(.97);
+}
+
+/* Línea de carga */
+.gx-service-view .gx-action-morph.gx-action-loading{
+    width:178px!important;
+    height:8px!important;
+    min-height:8px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:999px!important;
+    background:#1b1d24!important;
+    box-shadow:none!important;
+}
+.gx-action-morph.gx-action-loading .gx-action-label{
+    opacity:0;
+    transform:scale(.7);
+}
+.gx-action-morph.gx-action-loading::after{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:0%;
+    border-radius:999px;
+    background:linear-gradient(90deg,#ff6f9c,#ff9bbb);
+    animation:gxCancelLoad 900ms cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes gxCancelLoad{
+    0%{width:0%}
+    58%{width:72%}
+    100%{width:100%}
+}
+
+/* Confirmación circular */
+.gx-service-view .gx-action-morph.gx-action-success{
+    width:48px!important;
+    height:48px!important;
+    min-height:48px!important;
+    padding:0!important;
+    border:0!important;
+    border-radius:50%!important;
+    background:#39e58c!important;
+    color:#062014!important;
+    box-shadow:none!important;
+}
+.gx-action-morph.gx-action-success::before,
+.gx-action-morph.gx-action-success::after{
+    content:"";
+    position:absolute;
+    height:3px;
+    border-radius:999px;
+    background:#062014;
+    transform-origin:left center;
+}
+.gx-action-morph.gx-action-success::before{
+    width:9px;
+    left:13px;
+    top:25px;
+    transform:rotate(44deg);
+}
+.gx-action-morph.gx-action-success::after{
+    width:18px;
+    left:19px;
+    top:29px;
+    transform:rotate(-48deg);
+}
+.gx-action-morph.gx-action-success{
+    animation:gxCancelSuccessPop .52s cubic-bezier(.18,.9,.25,1) both;
+}
+@keyframes gxCancelSuccessPop{
+    0%{transform:scale(.76);opacity:.45}
+    55%{transform:scale(1.12);opacity:1}
+    100%{transform:scale(1);opacity:1}
+}
+
+.gx-service-view .gx-action-morph.gx-action-error{
+    width:126px!important;
+    height:40px!important;
+    min-height:40px!important;
+    border-color:rgba(255,111,156,.38)!important;
+    background:#25131c!important;
+    color:#ff9aba!important;
+    animation:gxCancelErrorShake .34s ease both;
+}
+@keyframes gxCancelErrorShake{
+    0%,100%{transform:translateX(0)}
+    30%{transform:translateX(-4px)}
+    65%{transform:translateX(4px)}
+}
+
+/* Status centrado para acompañar el CTA. */
+.gx-service-cancel-status{
+    max-width:310px;
+    margin:7px auto 0!important;
+    text-align:center;
+    font-family:inherit!important;
+    font-size:8.8px!important;
+    line-height:1.45!important;
+}
+
+/* ---------------------------------------------------------
+   Reduced motion.
+   --------------------------------------------------------- */
+@media(prefers-reduced-motion:reduce){
+    .gx-service-view .gx-action-morph,
+    .gx-action-morph.gx-action-loading::after,
+    .gx-action-morph.gx-action-success,
+    .gx-action-morph.gx-action-error{
+        animation:none!important;
+        transition:none!important;
+    }
+}
 </style>
 
 </body>
