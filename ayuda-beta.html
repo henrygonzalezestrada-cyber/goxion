@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.1-beta-14" lang="es">
+<html data-goxion-version="1.2.1-beta-15" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -5114,7 +5114,7 @@
 <span class="rotator-text" id="dynamic-rotator">✓ Calidad 4K Ultra HD</span>
 </div>
 </div>
-<button class="btn-shimmer" onclick="solicitarCuenta()" style="margin-bottom: 9px;">
+<button class="btn-shimmer gx-welcome-trigger" onclick="solicitarCuenta()" style="margin-bottom: 9px;">
                     🎁 Únete hoy y obtén -10% OFF
                 </button>
                 <div class="gx-welcome-eligibility-note">
@@ -5162,7 +5162,7 @@
 <div class="hiw-desc">Obtén tus datos inmediatamente y comienza a disfrutar de tu contenido.</div>
 </div>
 </div>
-<button class="btn-primary reveal" onclick="switchTab('catalogo')" style="margin-bottom: 35px; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none;">Ver servicios disponibles <svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></button>
+<button class="btn-primary reveal gx-catalog-main-cta" onclick="switchTab('catalogo')" style="margin-bottom: 35px; background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); color: var(--text-main); box-shadow: none;"><span>Ver servicios disponibles</span><svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></button>
 <div class="section-title reveal">¿Por qué comprar aquí?</div>
 <div class="benefits-grid reveal">
 <div class="benefit-box">
@@ -5526,13 +5526,84 @@
         
         window.catalogGroups = {}; 
 
+        function gxWelcomeReducedMotion() {
+            return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+        }
+
+        function gxWelcomeTrigger() {
+            return document.querySelector('.gx-welcome-trigger');
+        }
+
+        function gxWelcomeMorphGeometry(sheet,fromRect) {
+            if(!sheet || !fromRect) return null;
+            const to=sheet.getBoundingClientRect();
+            if(!fromRect.width || !fromRect.height || !to.width || !to.height) return null;
+            return {
+                dx:(fromRect.left+fromRect.width/2)-(to.left+to.width/2),
+                dy:(fromRect.top+fromRect.height/2)-(to.top+to.height/2),
+                sx:Math.max(.08,fromRect.width/to.width),
+                sy:Math.max(.08,fromRect.height/to.height)
+            };
+        }
+
+        function gxAnimateWelcomeOpen(fromRect) {
+            const modal=document.getElementById('gx-welcome-modal');
+            const sheet=modal?.querySelector('.gx-welcome-sheet');
+            if(!modal || !sheet || gxWelcomeReducedMotion() || typeof sheet.animate!=='function') {
+                modal?.classList.add('gx-welcome-ready');
+                return;
+            }
+
+            const g=gxWelcomeMorphGeometry(sheet,fromRect);
+            if(!g) {
+                modal.classList.add('gx-welcome-ready');
+                return;
+            }
+
+            modal.classList.add('gx-welcome-morphing');
+            const animation=sheet.animate([
+                {
+                    transform:`translate(${g.dx}px,${g.dy}px) scale(${g.sx},${g.sy})`,
+                    borderRadius:'18px',
+                    opacity:.88,
+                    filter:'saturate(1.35) brightness(1.12)'
+                },
+                {
+                    offset:.58,
+                    transform:'translate(0,0) scale(1.018,.988)',
+                    borderRadius:'25px',
+                    opacity:1,
+                    filter:'saturate(1.08) brightness(1.03)'
+                },
+                {
+                    transform:'translate(0,0) scale(1)',
+                    borderRadius:'24px',
+                    opacity:1,
+                    filter:'none'
+                }
+            ],{
+                duration:620,
+                easing:'cubic-bezier(.2,.84,.18,1)',
+                fill:'both'
+            });
+
+            animation.finished.catch(()=>{}).finally(()=>{
+                modal.classList.remove('gx-welcome-morphing');
+                modal.classList.add('gx-welcome-ready');
+                animation.cancel();
+            });
+        }
+
         function solicitarCuenta() {
             const modal=document.getElementById("gx-welcome-modal");
             const form=document.getElementById("gx-welcome-form");
             const result=document.getElementById("gx-welcome-result");
             const actions=document.getElementById("gx-welcome-existing-actions");
             const submit=document.getElementById("gx-welcome-submit");
+            const trigger=gxWelcomeTrigger();
             if(!modal) return;
+
+            const fromRect=trigger?.getBoundingClientRect();
 
             if(form) form.hidden=false;
             if(result) {
@@ -5545,17 +5616,58 @@
                 submit.textContent="Validar y solicitar";
             }
 
+            modal.classList.remove('gx-welcome-ready','gx-welcome-closing');
             modal.classList.add("show");
             modal.setAttribute("aria-hidden","false");
             document.body.style.overflow="hidden";
-            setTimeout(()=>document.getElementById("gx-welcome-name")?.focus({preventScroll:true}),180);
+
+            requestAnimationFrame(()=>requestAnimationFrame(()=>{
+                gxAnimateWelcomeOpen(fromRect);
+                setTimeout(()=>document.getElementById("gx-welcome-name")?.focus({preventScroll:true}),560);
+            }));
         }
 
-        function gxCloseWelcomeRegistration() {
+        async function gxCloseWelcomeRegistration() {
             const modal=document.getElementById("gx-welcome-modal");
-            modal?.classList.remove("show");
-            modal?.setAttribute("aria-hidden","true");
-            document.body.style.overflow="";
+            const sheet=modal?.querySelector('.gx-welcome-sheet');
+            const trigger=gxWelcomeTrigger();
+            if(!modal) return;
+
+            const finish=()=>{
+                modal.classList.remove("show",'gx-welcome-ready','gx-welcome-morphing','gx-welcome-closing');
+                modal.setAttribute("aria-hidden","true");
+                document.body.style.overflow="";
+            };
+
+            if(!sheet || !trigger || gxWelcomeReducedMotion() || typeof sheet.animate!=='function') {
+                finish();
+                return;
+            }
+
+            const toRect=trigger.getBoundingClientRect();
+            const g=gxWelcomeMorphGeometry(sheet,toRect);
+            if(!g) {
+                finish();
+                return;
+            }
+
+            modal.classList.add('gx-welcome-closing');
+            try {
+                await sheet.animate([
+                    {transform:'translate(0,0) scale(1)',opacity:1,filter:'none'},
+                    {offset:.42,transform:'translate(0,0) scale(.985)',opacity:1,filter:'saturate(1.08)'},
+                    {
+                        transform:`translate(${g.dx}px,${g.dy}px) scale(${g.sx},${g.sy})`,
+                        opacity:.66,
+                        filter:'saturate(1.34) brightness(1.08)'
+                    }
+                ],{
+                    duration:430,
+                    easing:'cubic-bezier(.4,0,.2,1)',
+                    fill:'both'
+                }).finished;
+            } catch(_) {}
+            finish();
         }
 
         function gxRegistrationToRecovery() {
@@ -6969,6 +7081,7 @@
                                 <div id="gx-service-cancel-${idx}" class="gx-service-view gx-cancellation-state-view" hidden>
                                     ${cancellationPanelHTML}
                                 </div>
+                                <div id="gx-service-retention-${idx}" class="gx-service-view gx-retention-view" hidden></div>
                                 ${delivery ? `<div id="gx-service-credential-${idx}" class="gx-service-view gx-credential-view" hidden>${credentialPanelHTML}</div>` : ''}
                             </div>
                         </article>`;
@@ -7040,7 +7153,7 @@
             const card=document.getElementById(`gx-service-card-${index}`);
             if(!card || card.dataset.gxServiceMorphing==='1') return;
             if(view !== 'credential') gxDiscardCredentialReveal(index);
-            for(const name of ['home','options','cancel','credential']) {
+            for(const name of ['home','options','cancel','retention','credential']) {
                 const el=document.getElementById(`gx-service-${name}-${index}`);
                 if(el) el.hidden=name!==view;
             }
@@ -7395,49 +7508,211 @@
             button.setAttribute('aria-label',label || 'Enviar solicitud');
         }
 
-        async function gxSubmitServiceCancellation(index,event) {
+        async function gxCancellationApi(accion,datos={}) {
+            const token=localStorage.getItem('goxion_client_token') || '';
+            if(!token) throw new Error('Tu sesión expiró. Inicia sesión nuevamente.');
+            const r=await fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente',{
+                method:'POST',
+                headers:{'Content-Type':'application/json','X-Client-Token':token},
+                body:JSON.stringify({accion,datos}),
+                cache:'no-store'
+            });
+            const data=await r.json().catch(()=>({}));
+            if(!r.ok || data?.ok!==true) throw new Error(data?.error || 'No fue posible completar la operación.');
+            return data;
+        }
+
+        function gxRetentionMoney(value) {
+            const n=Number(value||0);
+            return `$${n.toFixed(2)}`;
+        }
+
+        function gxRenderRetentionOffer(index,offer) {
+            const panel=document.getElementById(`gx-service-retention-${index}`);
+            if(!panel || !offer) return;
+
+            const serviceName=String(offer.servicio_nombre || 'este servicio');
+            const percent=Number(offer.porcentaje || 30);
+            const base=Number(offer.monto_base || 0);
+            const discount=Number(offer.monto_descuento || 0);
+            const final=Number(offer.monto_final || Math.max(0,base-discount));
+
+            panel.innerHTML=`
+                <div class="gx-retention-stage">
+                    <div class="gx-retention-orbit" aria-hidden="true"><i></i><i></i><i></i><b></b></div>
+                    <span class="gx-retention-eyebrow">UNA OPCIÓN ANTES DE IRTE</span>
+                    <h3>Nos gustaría que te quedaras</h3>
+                    <p class="gx-retention-lead">Antes de cancelar <strong>${escape(serviceName)}</strong>, podemos aplicar un beneficio automático en tu próximo pago.</p>
+
+                    <div class="gx-retention-value">
+                        <div class="gx-retention-percent">-${percent}%</div>
+                        <div class="gx-retention-price">
+                            <span>Próximo pago</span>
+                            <strong>${gxRetentionMoney(final)}</strong>
+                            <small>Precio habitual <s>${gxRetentionMoney(base)}</s> · ahorras ${gxRetentionMoney(discount)}</small>
+                        </div>
+                    </div>
+
+                    <div class="gx-retention-rule">
+                        <strong>Beneficio único de retención</strong>
+                        <span>Solo puede aceptarse una vez en toda tu cuenta GOXION y se aplica únicamente a este servicio durante un periodo. Después vuelve a su precio habitual.</span>
+                    </div>
+
+                    <div class="gx-retention-actions">
+                        <button type="button" class="gx-retention-accept" id="gx-retention-accept-${index}" onclick="gxAcceptRetention(${index},event)">
+                            <span>Quedarme con -${percent}%</span>
+                        </button>
+                        <button type="button" class="gx-retention-decline" id="gx-retention-decline-${index}" onclick="gxDeclineRetention(${index},event)">Continuar cancelación</button>
+                    </div>
+
+                    <div class="gx-retention-status" id="gx-retention-status-${index}" aria-live="polite"></div>
+                </div>`;
+
+            if(!gxServiceReducedMotion() && typeof panel.animate==='function') {
+                panel.animate([
+                    {opacity:0,transform:'translateY(11px) scale(.985)',filter:'blur(4px)'},
+                    {offset:.58,opacity:1,transform:'translateY(-2px) scale(1.008)',filter:'blur(0)'},
+                    {opacity:1,transform:'translateY(0) scale(1)',filter:'none'}
+                ],{
+                    duration:540,
+                    easing:'cubic-bezier(.2,.82,.2,1)'
+                });
+            }
+        }
+
+        function gxRetentionButtonState(button,state,defaultLabel='') {
+            if(!button) return;
+            button.classList.remove('is-loading','is-success');
+            const span=button.querySelector('span');
+
+            if(state==='loading') {
+                button.disabled=true;
+                button.classList.add('is-loading');
+                if(span) span.textContent='Aplicando beneficio…';
+                return;
+            }
+
+            if(state==='success') {
+                button.disabled=true;
+                button.classList.add('is-success');
+                if(span) span.textContent='';
+                return;
+            }
+
+            button.disabled=false;
+            if(span && defaultLabel) span.textContent=defaultLabel;
+        }
+
+        async function gxAcceptRetention(index,event) {
             event?.preventDefault?.();
             event?.stopPropagation?.();
 
-            const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : '';
-            const cliente = key ? globalClientesData?.[key] : null;
-            const servicio = cliente?.servicios?.[index];
-            const token = localStorage.getItem('goxion_client_token') || '';
-            const status = document.getElementById(`gx-service-cancel-status-${index}`);
-            const submit = document.getElementById(`gx-service-cancel-submit-${index}`);
+            const key=typeof getCurrentClientKey==='function' ? getCurrentClientKey() : '';
+            const service=key ? globalClientesData?.[key]?.servicios?.[index] : null;
+            const offer=service?._retentionOffer;
+            const accept=document.getElementById(`gx-retention-accept-${index}`);
+            const decline=document.getElementById(`gx-retention-decline-${index}`);
+            const status=document.getElementById(`gx-retention-status-${index}`);
+            if(!service || !offer?.id || !accept) return;
 
-            if (!cliente || !servicio || !token || !status || !submit) return;
+            const label=`Quedarme con -${Number(offer.porcentaje||30)}%`;
+            gxRetentionButtonState(accept,'loading',label);
+            if(decline) decline.disabled=true;
+            if(status) {
+                status.className='gx-retention-status';
+                status.textContent='';
+            }
+
+            try {
+                const [data]=await Promise.all([
+                    gxCancellationApi('aceptar_retencion',{oferta_id:offer.id}),
+                    new Promise(resolve=>setTimeout(resolve,850))
+                ]);
+
+                gxRetentionButtonState(accept,'success',label);
+
+                if(status) {
+                    status.className='gx-retention-status success';
+                    status.innerHTML=`<strong>Beneficio aplicado</strong><span>La cancelación no fue enviada. Ahorrarás ${gxRetentionMoney(data?.oferta?.monto_descuento || offer.monto_descuento)} en tu próximo pago de ${escape(data?.oferta?.servicio_nombre || offer.servicio_nombre || service.nombre)}.</span>`;
+                }
+
+                if(navigator.vibrate) {
+                    try { navigator.vibrate([18,40,28]); } catch(_) {}
+                }
+
+                setTimeout(async()=>{
+                    try {
+                        globalClientesData=await cargarPublicoOCliente();
+                        cargarCatalogo(globalClientesData);
+                        renderizarSoporteDinamico(globalClientesData);
+                        const freshKey=typeof getCurrentClientKey==='function' ? (getCurrentClientKey() || key) : key;
+                        if(freshKey && globalClientesData?.[freshKey]) renderDashboard(freshKey);
+                    } catch(error) {
+                        console.warn('Beneficio aplicado; actualización visual pendiente.',error);
+                    }
+                },1250);
+            } catch(error) {
+                gxRetentionButtonState(accept,'idle',label);
+                if(decline) decline.disabled=false;
+                if(status) {
+                    status.className='gx-retention-status error';
+                    status.textContent=error?.message || 'No pudimos aplicar el beneficio.';
+                }
+            }
+        }
+
+        async function gxDeclineRetention(index,event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
+            const key=typeof getCurrentClientKey==='function' ? getCurrentClientKey() : '';
+            const service=key ? globalClientesData?.[key]?.servicios?.[index] : null;
+            const offer=service?._retentionOffer;
+            const accept=document.getElementById(`gx-retention-accept-${index}`);
+            const decline=document.getElementById(`gx-retention-decline-${index}`);
+
+            if(accept) accept.disabled=true;
+            if(decline) {
+                decline.disabled=true;
+                decline.textContent='Continuando…';
+            }
+
+            if(offer?.id) {
+                try {
+                    await gxCancellationApi('rechazar_retencion',{oferta_id:offer.id});
+                } catch(error) {
+                    console.warn('No se pudo registrar el rechazo de retención.',error);
+                }
+            }
+
+            if(service) delete service._retentionOffer;
+            gxServiceView(index,'cancel',event);
+            setTimeout(()=>gxCreateCancellationRequest(index),200);
+        }
+
+        async function gxCreateCancellationRequest(index) {
+            const key=typeof getCurrentClientKey==='function' ? getCurrentClientKey() : '';
+            const cliente=key ? globalClientesData?.[key] : null;
+            const servicio=cliente?.servicios?.[index];
+            const status=document.getElementById(`gx-service-cancel-status-${index}`);
+            const submit=document.getElementById(`gx-service-cancel-submit-${index}`);
+
+            if(!cliente || !servicio || !status || !submit) return;
 
             gxCancellationActionState(submit,'loading');
             status.classList.remove('error');
-            status.textContent = '';
-
-            const minimumAnimation = new Promise(resolve=>setTimeout(resolve,900));
+            status.textContent='';
 
             try {
-                const request = fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente',{
-                    method:'POST',
-                    headers:{
-                        'Content-Type':'application/json',
-                        'X-Client-Token':token
-                    },
-                    body:JSON.stringify({
-                        accion:'crear',
-                        datos:{
-                            cliente_servicio_id:servicio.id,
-                            motivo:'Solicitud desde Mi Espacio'
-                        }
-                    })
-                });
+                const [data]=await Promise.all([
+                    gxCancellationApi('crear',{
+                        cliente_servicio_id:servicio.id,
+                        motivo:'Solicitud desde Mi Espacio'
+                    }),
+                    new Promise(resolve=>setTimeout(resolve,900))
+                ]);
 
-                const [r] = await Promise.all([request,minimumAnimation]);
-                const data = await r.json().catch(()=>({}));
-
-                if (!r.ok || data?.ok !== true) {
-                    throw new Error(data?.error || 'No fue posible registrar la solicitud.');
-                }
-
-                servicio.cancelacion = {
+                servicio.cancelacion={
                     ...(data.solicitud || {}),
                     cliente_servicio_id:servicio.id,
                     estado:String(data?.solicitud?.estado || 'solicitada')
@@ -7445,7 +7720,7 @@
 
                 gxCancellationActionState(submit,'success');
 
-                status.innerHTML = data?.already_open
+                status.innerHTML=data?.already_open
                     ? '<span style="color:#cdbfff;font-weight:800;">Solicitud en revisión.</span> No necesitas enviarla nuevamente.'
                     : '<span style="color:var(--success-green);font-weight:800;">✓ Solicitud registrada.</span> Tu servicio seguirá activo mientras la revisamos.';
 
@@ -7453,7 +7728,7 @@
                     try { navigator.vibrate([20,35,30]); } catch(_) {}
                 }
 
-                setTimeout(async () => {
+                setTimeout(async()=>{
                     const currentPanel=document.getElementById(`gx-service-cancel-${index}`);
                     if(currentPanel && !gxServiceReducedMotion() && typeof currentPanel.animate==='function') {
                         try {
@@ -7469,17 +7744,52 @@
                     }
 
                     renderDashboard(key);
-
-                    setTimeout(() => {
+                    setTimeout(()=>{
                         gxToggleServiceCard(index);
-                        setTimeout(() => gxServiceView(index,'cancel'), 560);
-                    }, 60);
-                }, 620);
-            } catch (error) {
+                        setTimeout(()=>gxServiceView(index,'cancel'),560);
+                    },60);
+                },620);
+            } catch(error) {
                 gxCancellationActionState(submit,'error','Reintentar');
                 status.classList.add('error');
-                status.textContent = error?.message || 'No fue posible registrar la solicitud.';
+                status.textContent=error?.message || 'No fue posible registrar la solicitud.';
             }
+        }
+
+        async function gxSubmitServiceCancellation(index,event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
+            const key=typeof getCurrentClientKey==='function' ? getCurrentClientKey() : '';
+            const servicio=key ? globalClientesData?.[key]?.servicios?.[index] : null;
+            const status=document.getElementById(`gx-service-cancel-status-${index}`);
+            const submit=document.getElementById(`gx-service-cancel-submit-${index}`);
+
+            if(!servicio || !status || !submit) return;
+
+            gxCancellationActionState(submit,'loading');
+            status.classList.remove('error');
+            status.textContent='Revisando si tenemos un beneficio disponible para ti…';
+
+            try {
+                const [evaluation]=await Promise.all([
+                    gxCancellationApi('evaluar_retencion',{cliente_servicio_id:servicio.id}),
+                    new Promise(resolve=>setTimeout(resolve,650))
+                ]);
+
+                if(evaluation?.elegible===true && evaluation?.oferta?.id) {
+                    servicio._retentionOffer=evaluation.oferta;
+                    gxCancellationActionState(submit,'idle','Enviar solicitud');
+                    status.textContent='';
+                    gxRenderRetentionOffer(index,evaluation.oferta);
+                    gxServiceView(index,'retention',event);
+                    return;
+                }
+            } catch(error) {
+                console.warn('Evaluación de retención no disponible; se continúa con la cancelación.',error);
+            }
+
+            await gxCreateCancellationRequest(index);
         }
 
         function gxDiscardCredentialReveal(index) {
@@ -9315,7 +9625,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 14 v1.2.1-beta-14: registro validado + protección de promoción -10%.");
+        console.info("GOXION Ayuda Beta 15 v1.2.1-beta-15: morph de bienvenida + retención inteligente.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -12690,6 +13000,569 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         max-width:126px;
         padding:0 7px;
         font-size:7px;
+    }
+}
+</style>
+
+
+<style id="goxion-ayuda-beta-15-morph-retention">
+/* =========================================================
+   GOXION · AYUDA BETA 15
+   CTA reparado + shared morph + retención inteligente.
+   ========================================================= */
+
+/* CTA "Ver servicios disponibles": Safari ya no puede mandar la flecha a otra línea. */
+.gx-catalog-main-cta{
+    width:100%!important;
+    min-height:58px!important;
+    height:auto!important;
+    padding:0 18px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:9px!important;
+    line-height:1.15!important;
+}
+.gx-catalog-main-cta>span{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+}
+.gx-catalog-main-cta .gx-nav-arrow{
+    display:inline-block!important;
+    width:18px!important;
+    height:18px!important;
+    flex:0 0 18px!important;
+    margin:0!important;
+    transform:none!important;
+}
+
+/* ---------------------------------------------------------
+   REGISTRO -10% — lenguaje visual de Ayuda / GOXION.
+   --------------------------------------------------------- */
+.gx-welcome-modal{
+    perspective:1200px;
+}
+.gx-welcome-backdrop{
+    background:
+        radial-gradient(circle at 18% 18%,rgba(124,77,255,.11),transparent 32%),
+        radial-gradient(circle at 84% 73%,rgba(0,242,254,.075),transparent 31%),
+        rgba(2,2,5,.77)!important;
+    backdrop-filter:blur(18px) saturate(1.08)!important;
+    -webkit-backdrop-filter:blur(18px) saturate(1.08)!important;
+    opacity:0;
+    transition:opacity .28s ease;
+}
+.gx-welcome-modal.show .gx-welcome-backdrop{
+    opacity:1;
+}
+.gx-welcome-sheet{
+    isolation:isolate;
+    width:min(430px,100%)!important;
+    padding:21px!important;
+    overflow:hidden!important;
+    border:1px solid rgba(151,120,255,.22)!important;
+    border-radius:24px!important;
+    background:
+        radial-gradient(circle at 11% 7%,rgba(124,77,255,.16),transparent 29%),
+        radial-gradient(circle at 91% 15%,rgba(255,51,102,.075),transparent 26%),
+        radial-gradient(circle at 82% 91%,rgba(0,242,254,.065),transparent 31%),
+        linear-gradient(180deg,rgba(12,11,20,.97),rgba(5,6,10,.987))!important;
+    box-shadow:
+        0 34px 110px rgba(0,0,0,.66),
+        inset 0 1px 0 rgba(255,255,255,.025),
+        0 0 42px rgba(124,77,255,.075)!important;
+}
+.gx-welcome-sheet::before{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    inset:0;
+    border-radius:inherit;
+    padding:1px;
+    background:linear-gradient(
+        115deg,
+        rgba(0,242,254,.58),
+        rgba(124,77,255,.72) 42%,
+        rgba(255,51,102,.48) 73%,
+        rgba(0,242,254,.34)
+    );
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;
+    mask-composite:exclude;
+    opacity:.58;
+    pointer-events:none;
+}
+.gx-welcome-sheet::after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    left:-48%;
+    top:-35%;
+    width:64%;
+    height:170%;
+    background:linear-gradient(
+        100deg,
+        transparent,
+        rgba(255,255,255,.105),
+        rgba(0,242,254,.075),
+        transparent
+    );
+    transform:skewX(-18deg);
+    animation:gxWelcomeGlassSweep 5.8s ease-in-out infinite;
+    pointer-events:none;
+}
+@keyframes gxWelcomeGlassSweep{
+    0%,45%{transform:translateX(-35%) skewX(-18deg);opacity:0}
+    58%{opacity:.82}
+    78%,100%{transform:translateX(245%) skewX(-18deg);opacity:0}
+}
+.gx-welcome-modal.gx-welcome-morphing .gx-welcome-sheet>*{
+    animation:gxWelcomeContentReveal .42s ease .18s both;
+}
+@keyframes gxWelcomeContentReveal{
+    from{opacity:0;transform:translateY(7px)}
+    to{opacity:1;transform:none}
+}
+.gx-welcome-icon{
+    position:relative;
+    width:44px!important;
+    height:44px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(151,120,255,.28)!important;
+    background:
+        radial-gradient(circle at 35% 30%,rgba(255,255,255,.13),transparent 23%),
+        linear-gradient(135deg,#251844,#121121)!important;
+    color:#d5c8ff!important;
+    box-shadow:0 0 22px rgba(124,77,255,.14)!important;
+}
+.gx-welcome-icon::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:18px;
+    height:18px;
+    margin:-9px;
+    border:1px solid rgba(0,242,254,.55);
+    border-radius:50%;
+    transform:rotate(38deg) scaleY(.48);
+}
+.gx-welcome-eyebrow{
+    color:#aa9bdb!important;
+    letter-spacing:.17em!important;
+}
+.gx-welcome-sheet h3{
+    margin-top:5px!important;
+    font-size:23px!important;
+    letter-spacing:-.025em;
+}
+.gx-welcome-copy{
+    color:#9da9bc!important;
+    font-size:10.2px!important;
+    line-height:1.62!important;
+}
+.gx-welcome-copy strong{
+    color:#f4f0ff!important;
+}
+.gx-welcome-form{
+    gap:10px!important;
+}
+.gx-welcome-form input{
+    min-height:47px!important;
+    border-radius:13px!important;
+    border-color:rgba(151,120,255,.12)!important;
+    background:rgba(9,10,16,.78)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.gx-welcome-form input:focus{
+    border-color:rgba(0,242,254,.36)!important;
+    box-shadow:0 0 0 3px rgba(0,242,254,.045),0 0 24px rgba(0,242,254,.045)!important;
+}
+.gx-welcome-rule{
+    border-color:rgba(255,190,92,.11)!important;
+    background:linear-gradient(135deg,rgba(37,28,14,.70),rgba(20,16,12,.58))!important;
+    border-radius:12px!important;
+}
+.gx-welcome-submit{
+    position:relative;
+    overflow:hidden;
+    min-height:48px!important;
+    border:1px solid rgba(151,120,255,.28)!important;
+    border-radius:14px!important;
+    background:
+        linear-gradient(135deg,rgba(124,77,255,.31),rgba(255,51,102,.14) 58%,rgba(0,242,254,.10))!important;
+    color:#f1ebff!important;
+    box-shadow:0 9px 24px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+.gx-welcome-submit::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(105deg,transparent 25%,rgba(255,255,255,.12) 48%,transparent 72%);
+    transform:translateX(-120%);
+    transition:transform .5s ease;
+}
+.gx-welcome-submit:active{
+    transform:scale(.985);
+}
+.gx-welcome-submit:not(:disabled):active::after{
+    transform:translateX(120%);
+}
+.gx-welcome-result.success,
+.gx-welcome-result.blocked,
+.gx-welcome-result.review,
+.gx-welcome-result.error,
+.gx-welcome-result.checking{
+    border-radius:13px!important;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+.gx-welcome-result.success{
+    background:rgba(10,31,22,.68)!important;
+    border-color:rgba(57,229,140,.16)!important;
+}
+.gx-welcome-result.blocked{
+    background:rgba(35,15,24,.68)!important;
+    border-color:rgba(255,84,119,.16)!important;
+}
+.gx-welcome-result.review{
+    background:rgba(34,27,12,.66)!important;
+    border-color:rgba(255,190,92,.15)!important;
+}
+.gx-welcome-existing-actions{
+    grid-template-columns:minmax(0,1fr) 82px!important;
+    gap:7px!important;
+}
+.gx-welcome-existing-actions[hidden]{
+    display:none!important;
+}
+.gx-welcome-existing-actions button{
+    border-radius:12px!important;
+    background:linear-gradient(135deg,#0d2026,#10151c)!important;
+}
+.gx-welcome-existing-actions button.secondary{
+    background:linear-gradient(135deg,#181426,#12111a)!important;
+}
+
+/* ---------------------------------------------------------
+   RETENCIÓN: ocurre DENTRO de la tarjeta de servicio.
+   --------------------------------------------------------- */
+.gx-retention-view{
+    position:relative;
+    overflow:hidden;
+}
+.gx-retention-stage{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    padding:5px 0 2px;
+}
+.gx-retention-stage::before{
+    content:"";
+    position:absolute;
+    z-index:-2;
+    inset:-42px -28px -34px;
+    background:
+        radial-gradient(circle at 18% 18%,rgba(124,77,255,.13),transparent 34%),
+        radial-gradient(circle at 82% 65%,rgba(0,242,254,.07),transparent 31%);
+    pointer-events:none;
+}
+.gx-retention-stage::after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    top:-20px;
+    left:-45%;
+    width:45%;
+    height:125%;
+    background:linear-gradient(
+        100deg,
+        transparent,
+        rgba(151,120,255,.10),
+        rgba(0,242,254,.08),
+        transparent
+    );
+    transform:skewX(-17deg);
+    animation:gxRetentionSweep 3.8s ease-out 1 both;
+    pointer-events:none;
+}
+@keyframes gxRetentionSweep{
+    0%{transform:translateX(-60%) skewX(-17deg);opacity:0}
+    25%{opacity:1}
+    100%{transform:translateX(360%) skewX(-17deg);opacity:0}
+}
+.gx-retention-orbit{
+    position:relative;
+    width:46px;
+    height:46px;
+    margin:0 auto 10px;
+}
+.gx-retention-orbit i{
+    position:absolute;
+    inset:8px 2px;
+    border:1.4px solid rgba(0,242,254,.62);
+    border-radius:50%;
+    transform:rotate(25deg) scaleY(.45);
+    filter:drop-shadow(0 0 4px rgba(0,242,254,.16));
+}
+.gx-retention-orbit i:nth-child(2){
+    border-color:rgba(151,120,255,.72);
+    transform:rotate(-34deg) scaleY(.45);
+}
+.gx-retention-orbit i:nth-child(3){
+    border-color:rgba(255,90,145,.48);
+    transform:rotate(90deg) scaleY(.45);
+}
+.gx-retention-orbit b{
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:7px;
+    height:7px;
+    margin:-3.5px;
+    border-radius:50%;
+    background:#f7f4ff;
+    box-shadow:0 0 14px rgba(151,120,255,.72);
+}
+.gx-retention-eyebrow{
+    display:block;
+    margin-bottom:5px;
+    text-align:center;
+    color:#a899d7;
+    font-size:7.6px;
+    font-weight:900;
+    letter-spacing:.16em;
+}
+.gx-retention-stage h3{
+    margin:0 0 7px!important;
+    text-align:center;
+    font-size:18px!important;
+    letter-spacing:-.02em;
+}
+.gx-retention-lead{
+    max-width:330px;
+    margin:0 auto 13px!important;
+    color:#99a5b8;
+    text-align:center;
+    font-size:9.7px;
+    line-height:1.55;
+}
+.gx-retention-lead strong{
+    color:#e8e2fb;
+}
+.gx-retention-value{
+    display:grid;
+    grid-template-columns:88px minmax(0,1fr);
+    align-items:center;
+    gap:11px;
+    max-width:330px;
+    margin:0 auto 10px;
+    padding:10px;
+    border:1px solid rgba(151,120,255,.15);
+    border-radius:15px;
+    background:
+        linear-gradient(135deg,rgba(124,77,255,.09),rgba(0,242,254,.035)),
+        rgba(11,12,18,.80);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.gx-retention-percent{
+    min-height:61px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid rgba(151,120,255,.22);
+    border-radius:13px;
+    background:linear-gradient(135deg,#251844,#141322);
+    color:#d6caff;
+    font-size:23px;
+    font-weight:900;
+    letter-spacing:-.04em;
+    box-shadow:0 0 24px rgba(124,77,255,.08);
+}
+.gx-retention-price span{
+    display:block;
+    color:#79869a;
+    font-size:7px;
+    font-weight:850;
+    text-transform:uppercase;
+}
+.gx-retention-price strong{
+    display:block;
+    margin:1px 0;
+    color:#7ef3ff;
+    font-size:22px;
+    line-height:1;
+}
+.gx-retention-price small{
+    display:block;
+    color:#8c98aa;
+    font-size:7.5px;
+    line-height:1.4;
+}
+.gx-retention-price s{
+    color:#737e90;
+}
+.gx-retention-rule{
+    max-width:330px;
+    margin:0 auto 13px;
+    padding:9px 10px;
+    border:1px solid rgba(255,255,255,.055);
+    border-radius:11px;
+    background:rgba(9,10,15,.72);
+}
+.gx-retention-rule strong{
+    display:block;
+    margin-bottom:2px;
+    color:#d9d2ee;
+    font-size:8.4px;
+}
+.gx-retention-rule span{
+    display:block;
+    color:#8793a5;
+    font-size:7.8px;
+    line-height:1.5;
+}
+.gx-retention-actions{
+    max-width:330px;
+    margin:0 auto;
+    display:grid;
+    gap:7px;
+}
+.gx-retention-accept{
+    position:relative;
+    overflow:hidden;
+    min-height:44px;
+    border:1px solid rgba(151,120,255,.27);
+    border-radius:13px;
+    background:
+        linear-gradient(135deg,rgba(124,77,255,.32),rgba(0,242,254,.11) 58%,rgba(255,51,102,.10));
+    color:#f2edff;
+    font:inherit;
+    font-size:9.8px;
+    font-weight:900;
+    transition:
+        width .42s cubic-bezier(.2,.82,.2,1),
+        min-height .42s cubic-bezier(.2,.82,.2,1),
+        border-radius .42s cubic-bezier(.2,.82,.2,1),
+        transform .18s ease;
+}
+.gx-retention-accept:active{
+    transform:scale(.98);
+}
+.gx-retention-accept.is-loading{
+    width:100%;
+    min-height:8px;
+    height:8px;
+    color:transparent;
+    border:0;
+    border-radius:999px;
+    background:#191a22;
+}
+.gx-retention-accept.is-loading::after{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:0;
+    border-radius:999px;
+    background:linear-gradient(90deg,#7c4dff,#00f2fe,#ff5d91);
+    animation:gxRetentionLoad .85s cubic-bezier(.2,.82,.2,1) forwards;
+}
+@keyframes gxRetentionLoad{
+    to{width:100%}
+}
+.gx-retention-accept.is-success{
+    width:46px;
+    min-height:46px;
+    height:46px;
+    margin:0 auto;
+    border:0;
+    border-radius:50%;
+    background:#39e58c;
+    color:#062014;
+    box-shadow:0 0 22px rgba(57,229,140,.12);
+}
+.gx-retention-accept.is-success::before,
+.gx-retention-accept.is-success::after{
+    content:"";
+    position:absolute;
+    height:3px;
+    border-radius:999px;
+    background:#062014;
+    transform-origin:left center;
+}
+.gx-retention-accept.is-success::before{
+    width:9px;
+    left:12px;
+    top:24px;
+    transform:rotate(44deg);
+}
+.gx-retention-accept.is-success::after{
+    width:18px;
+    left:18px;
+    top:28px;
+    transform:rotate(-48deg);
+}
+.gx-retention-decline{
+    min-height:38px;
+    border:1px solid rgba(255,90,145,.12);
+    border-radius:11px;
+    background:rgba(31,15,22,.58);
+    color:#d7a6b4;
+    font:inherit;
+    font-size:8.8px;
+    font-weight:800;
+}
+.gx-retention-decline:disabled{
+    opacity:.55;
+}
+.gx-retention-status{
+    max-width:330px;
+    margin:8px auto 0;
+    text-align:center;
+    color:#8d99aa;
+    font-size:8px;
+    line-height:1.45;
+}
+.gx-retention-status strong,
+.gx-retention-status span{
+    display:block;
+}
+.gx-retention-status.success strong{
+    color:#69e6a3;
+}
+.gx-retention-status.success span{
+    color:#9fc7b3;
+}
+.gx-retention-status.error{
+    color:#ff9bb0;
+}
+
+/* Si se recarga Mi Espacio después de aceptar, la novedad usa el lenguaje existente. */
+.gx-service-update-badge.gx-update-retencion{
+    border-color:rgba(57,229,140,.22)!important;
+    background:#0d2118!important;
+    color:#7de8b2!important;
+}
+
+@media(max-width:480px){
+    .gx-welcome-sheet{
+        padding:18px 15px calc(18px + env(safe-area-inset-bottom))!important;
+    }
+}
+@media(max-width:390px){
+    .gx-retention-value{
+        grid-template-columns:78px minmax(0,1fr);
+    }
+    .gx-retention-percent{
+        font-size:21px;
+    }
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-welcome-sheet::after,
+    .gx-retention-stage::after,
+    .gx-retention-accept.is-loading::after{
+        animation:none!important;
     }
 }
 </style>
