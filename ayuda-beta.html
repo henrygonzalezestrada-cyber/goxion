@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.0-beta-08" lang="es">
+<html data-goxion-version="1.2.0-beta-09" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -7050,14 +7050,9 @@
             const password=document.getElementById(`gx-credential-password-${index}`);
             const result=document.getElementById(`gx-credential-result-${index}`);
             const input=document.getElementById(`gx-credential-pin-${index}`);
-            const copyButton=document.getElementById(`gx-credential-copy-${index}`);
             if(password) password.textContent='';
             if(result) result.hidden=true;
             if(input) input.value='';
-            if(copyButton) {
-                copyButton.classList.remove('gx-copy-celebrate','gx-copy-complete');
-                copyButton.textContent='Copiar contraseña';
-            }
 
             const key=typeof getCurrentClientKey==='function' ? getCurrentClientKey() : '';
             const servicio=key ? globalClientesData?.[key]?.servicios?.[index] : null;
@@ -7170,12 +7165,10 @@
                 try { navigator.vibrate([22,28,35]); } catch(_) {}
             }
 
-            button.classList.add('gx-copy-complete');
-
             button._gxCopyRestoreTimer=setTimeout(()=>{
                 button.querySelectorAll('.gx-copy-spark').forEach(x=>x.remove());
                 button.classList.remove('gx-copy-celebrate');
-                button.textContent='✓ Copiada';
+                button.textContent=button.dataset.gxOriginalText || 'Copiar contraseña';
             },1450);
 
             result._gxCopyClearTimer=setTimeout(()=>{
@@ -7192,13 +7185,11 @@
                 await navigator.clipboard.writeText(password);
                 if(status) {
                     status.classList.remove('error');
-                    status.classList.add('gx-copy-status-success');
                     status.textContent='✓ Copiada. Ya puedes pegarla en la plataforma.';
                 }
                 gxCredentialCopyExperience(index);
             } catch {
                 if(status) {
-                    status.classList.remove('gx-copy-status-success');
                     status.classList.add('error');
                     status.textContent='No pudimos copiarla automáticamente. Mantén presionada la contraseña para copiarla.';
                 }
@@ -8874,7 +8865,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 08 v1.2.0-beta-08: flechas de una sola pieza + chevrons SVG + botón de copiado verde.");
+        console.info("GOXION Ayuda Beta 09 v1.2.0-beta-09: restauración de animación de copiado + botón verde sólido.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -9807,7 +9798,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda Beta 08 · v1.2.0-beta-08
+    GOXION · Ayuda Beta 09 · v1.2.0-beta-09
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -11658,56 +11649,27 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 
 
 
-<style id="goxion-ayuda-beta-08-copy-success">
+
+<style id="goxion-ayuda-beta-09-copy-button-green">
 /* =========================================================
-   COPIADO EXITOSO
-   El protagonista es el BOTÓN VERDE, no el resplandor.
+   GOXION · COPIADO EXITOSO
+   Conserva EXACTAMENTE la animación aprobada de Beta06.
+   La única diferencia: durante la confirmación el botón
+   cambia realmente a verde sólido.
    ========================================================= */
 
-.gx-credential-status.gx-copy-status-success{
-    color:#63e9a2!important;
-    font-weight:800;
-    text-shadow:none!important;
-}
-
-/* Estado temporal de animación */
-[id^="gx-credential-copy-"].gx-copy-celebrate,
-/* Estado persistente después de terminar la animación */
-[id^="gx-credential-copy-"].gx-copy-complete{
-    color:#052014!important;
-    border-color:#39e58c!important;
+.gx-credential-result-actions [id^="gx-credential-copy-"].gx-copy-celebrate{
+    color:#06150d!important;
     background:#39e58c!important;
+    border-color:#39e58c!important;
     box-shadow:
         inset 0 1px 0 rgba(255,255,255,.28),
-        inset 0 -1px 0 rgba(0,0,0,.08)!important;
+        inset 0 -1px 0 rgba(0,0,0,.10)!important;
 }
 
-/* Conserva la experiencia de confirmación, pero sin halo verde exterior. */
-.gx-credential-result.gx-copy-success{
-    border-color:rgba(0,255,157,.22)!important;
-    box-shadow:none!important;
-}
-.gx-credential-result.gx-copy-success::after{
-    background:
-        linear-gradient(105deg,
-            transparent 0%,
-            transparent 28%,
-            rgba(255,255,255,.04) 38%,
-            rgba(122,255,188,.22) 50%,
-            rgba(255,255,255,.03) 62%,
-            transparent 72%)!important;
-}
-.gx-credential-password.gx-password-confirmed{
-    border-color:rgba(57,229,140,.20)!important;
-    background:rgba(9,21,16,.74)!important;
-    box-shadow:none!important;
-}
-.gx-copy-spark{
-    background:#66eda7!important;
-    box-shadow:none!important;
-}
+/* El pop, partículas, sweep y pulso siguen viniendo de Beta05/Beta06.
+   Aquí no se modifica tarjeta, contraseña, partículas ni resplandores. */
 </style>
-
 
 </body>
 </html>
