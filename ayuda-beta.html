@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.0-beta-11" lang="es">
+<html data-goxion-version="1.2.0-beta-12" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -6479,22 +6479,62 @@
                         : null;
 
                     const serviceNotices = Array.isArray(s.novedades)
-                        ? s.novedades.slice().sort((a,b) =>
-                            (Number(b.prioridad||0)-Number(a.prioridad||0)) ||
-                            (new Date(b.created_at||0)-new Date(a.created_at||0))
-                        )
+                        ? s.novedades.slice()
                         : [];
 
-                    const updateNotice = serviceNotices[0] || (delivery ? {
-                        id:`cred-${delivery.id}`,
-                        tipo:'password',
-                        titulo:'Nueva contraseña',
-                        resumen:'Actualiza tu acceso',
-                        prioridad:3,
-                        created_at:delivery.created_at || delivery.disponible_desde || ''
-                    } : null);
+                    const cancellationNotice = cancellationState === 'aprobada'
+                        ? {
+                            id:`cancel-${cancellation?.id || s.id}-aprobada`,
+                            tipo:'cancelacion_aprobada',
+                            titulo:'Cancelación aprobada',
+                            resumen:'Pendiente de baja efectiva',
+                            prioridad:7,
+                            created_at:cancellation?.resuelta_at || cancellation?.updated_at || cancellation?.created_at || ''
+                        }
+                        : cancellationState === 'rechazada'
+                            ? {
+                                id:`cancel-${cancellation?.id || s.id}-rechazada`,
+                                tipo:'cancelacion_rechazada',
+                                titulo:'Cancelación no autorizada',
+                                resumen:'Puedes enviar una nueva solicitud',
+                                prioridad:6,
+                                created_at:cancellation?.resuelta_at || cancellation?.updated_at || cancellation?.created_at || ''
+                            }
+                            : cancellationState === 'solicitada'
+                                ? {
+                                    id:`cancel-${cancellation?.id || s.id}-solicitada`,
+                                    tipo:'cancelacion_revision',
+                                    titulo:'Cancelación en revisión',
+                                    resumen:'Solicitud recibida por GOXION',
+                                    prioridad:5,
+                                    created_at:cancellation?.solicitada_at || cancellation?.created_at || ''
+                                }
+                                : null;
 
-                    const updateExtraCount = Math.max(0,serviceNotices.length-1);
+                    const combinedNotices = serviceNotices.slice();
+
+                    if(cancellationNotice) {
+                        combinedNotices.push(cancellationNotice);
+                    }
+
+                    if(delivery && !combinedNotices.some(n => String(n?.tipo || '').toLowerCase() === 'password')) {
+                        combinedNotices.push({
+                            id:`cred-${delivery.id}`,
+                            tipo:'password',
+                            titulo:'Nueva contraseña',
+                            resumen:'Actualiza tu acceso',
+                            prioridad:3,
+                            created_at:delivery.created_at || delivery.disponible_desde || ''
+                        });
+                    }
+
+                    combinedNotices.sort((a,b) =>
+                        (Number(b.prioridad||0)-Number(a.prioridad||0)) ||
+                        (new Date(b.created_at||0)-new Date(a.created_at||0))
+                    );
+
+                    const updateNotice = combinedNotices[0] || null;
+                    const updateExtraCount = Math.max(0,combinedNotices.length-1);
                     const updateLabel = updateNotice
                         ? `${escape(updateNotice.titulo || 'Acceso actualizado')}${updateExtraCount ? ` +${updateExtraCount}` : ''}`
                         : '';
@@ -6523,18 +6563,10 @@
                             <span class="gx-credential-notice-arrow"><svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></span>
                         </button>` : '';
 
-                    const cancellationLabel = cancellationState === 'solicitada'
-                        ? 'En revisión'
-                        : cancellationState === 'aprobada'
-                            ? 'Aprobada'
-                            : cancellationState === 'rechazada'
-                                ? 'No autorizada'
-                                : '';
-
                     const cancellationOptionHTML = cancellation && ['solicitada','aprobada','rechazada'].includes(cancellationState)
                         ? `<button type="button" class="gx-cancel-link gx-cancel-open-state" onclick="gxServiceView(${idx},'cancel',event)">
-                                <span>${cancellationState === 'solicitada' ? 'Solicitud de cancelación' : cancellationState === 'aprobada' ? 'Cancelación aprobada' : 'Solicitud resuelta'}</span>
-                                <span class="gx-cancel-inline-status ${cancellationState === 'solicitada' ? 'requested' : cancellationState === 'aprobada' ? 'approved' : 'rejected'}">${cancellationLabel}</span>
+                                <span>${cancellationState === 'rechazada' ? 'Solicitar de nuevo' : 'Ver cancelación'}</span>
+                                <svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg>
                            </button>`
                         : `<button type="button" class="gx-cancel-link" onclick="gxServiceView(${idx},'cancel',event)"><span>Solicitar cancelación</span><svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></button>`;
 
@@ -6554,10 +6586,7 @@
 
                     if(cancellationState === 'solicitada') {
                         cancellationPanelHTML = `
-                            <div class="gx-service-subnav">
-                                <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
-                                <div class="gx-cancellation-kicker">SOLICITUD RECIBIDA</div>
-                            </div>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                             <h3>Cancelación en revisión</h3>
                             <p>Ya recibimos tu solicitud. Tu servicio permanece activo mientras revisamos la baja.</p>
                             <div class="gx-cancel-progress" aria-label="Solicitud recibida, revisión pendiente">
@@ -6573,10 +6602,7 @@
                             ? ` Fecha prevista: ${escape(cancellation.fecha_efectiva)}.`
                             : '';
                         cancellationPanelHTML = `
-                            <div class="gx-service-subnav">
-                                <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
-                                <div class="gx-cancellation-kicker">SOLICITUD APROBADA</div>
-                            </div>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                             <h3>Cancelación aprobada</h3>
                             <p>La solicitud fue autorizada. El servicio seguirá disponible hasta que la baja sea marcada como efectiva.${effectiveDate}</p>
                             <div class="gx-cancel-progress" aria-label="Solicitud y revisión completadas">
@@ -6589,10 +6615,7 @@
                             ${cancelAdminNote}`;
                     } else if(cancellationState === 'rechazada') {
                         cancellationPanelHTML = `
-                            <div class="gx-service-subnav">
-                                <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
-                                <div class="gx-cancellation-kicker">SOLICITUD RESUELTA</div>
-                            </div>
+                            <button type="button" class="gx-service-back" onclick="gxServiceView(${idx},'home',event)"><svg class="gx-nav-arrow gx-nav-arrow-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg><span>Volver</span></button>
                             <h3>Solicitud no autorizada</h3>
                             <p>La solicitud anterior fue revisada y no se hizo efectiva. Tu servicio continúa activo.</p>
                             <div class="gx-cancel-state-card rejected">
@@ -9028,7 +9051,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 11 v1.2.0-beta-11: novedades de servicio + subnavegación alineada + transición de cancelación.");
+        console.info("GOXION Ayuda Beta 12 v1.2.0-beta-12: cancelaciones en notificaciones + acciones sólidas + Más opciones centrado.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -9961,7 +9984,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda Beta 11 · v1.2.0-beta-11
+    GOXION · Ayuda Beta 12 · v1.2.0-beta-12
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -12304,6 +12327,181 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     .gx-service-update-ping,
     .gx-service-update-ping .gx-service-summary::after{
         animation:none!important;
+    }
+}
+</style>
+
+
+<style id="goxion-ayuda-beta-12-solid-actions">
+/* =========================================================
+   GOXION · AYUDA BETA 12
+   Estados de cancelación en notificaciones + acciones sólidas.
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   MÁS OPCIONES — centrado real.
+   --------------------------------------------------------- */
+.gx-service-toolbar{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:100%!important;
+}
+.gx-service-toolbar .gx-service-more{
+    min-width:104px!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+}
+
+/* ---------------------------------------------------------
+   ACCIONES SÓLIDAS
+   Los botones interactivos dejan de depender de transparencias.
+   --------------------------------------------------------- */
+
+/* Más opciones: morado GOXION sólido */
+.gx-service-toolbar .gx-service-more{
+    border-color:#7c4dff!important;
+    background:#7c4dff!important;
+    color:#ffffff!important;
+    box-shadow:none!important;
+}
+
+/* Volver: cian sólido */
+.gx-service-back{
+    border-color:#20d9e8!important;
+    background:#20d9e8!important;
+    color:#061418!important;
+    box-shadow:none!important;
+}
+.gx-service-back .gx-nav-arrow{
+    color:#061418!important;
+}
+
+/* Soporte: cian sólido, un poco más profundo que Volver */
+.gx-option-support{
+    border-color:#11c9d9!important;
+    background:#11c9d9!important;
+    color:#061418!important;
+    box-shadow:none!important;
+}
+.gx-option-support .gx-nav-arrow{
+    color:#061418!important;
+}
+
+/* Cancelación: rosa sólido, sin dramatismo excesivo */
+.gx-service-view .gx-cancel-link{
+    border-color:#c74470!important;
+    background:#c74470!important;
+    color:#ffffff!important;
+    box-shadow:none!important;
+}
+.gx-service-view .gx-cancel-link .gx-nav-arrow{
+    color:#ffffff!important;
+}
+
+/* Ver contraseña: cian sólido */
+.gx-credential-reveal-btn{
+    border-color:#19d4e3!important;
+    background:#19d4e3!important;
+    color:#061418!important;
+    box-shadow:none!important;
+}
+
+/* Copiar contraseña, antes de confirmar: azul-cian sólido.
+   Al copiar, la regla verde aprobada de Beta09 sigue ganando. */
+.gx-credential-result-actions button:first-child{
+    border-color:#169fcb!important;
+    background:#169fcb!important;
+    color:#ffffff!important;
+    box-shadow:none!important;
+}
+
+/* Listo, ocultar: morado sólido */
+.gx-credential-result-actions button:last-child{
+    border-color:#6f4ed7!important;
+    background:#6f4ed7!important;
+    color:#ffffff!important;
+    box-shadow:none!important;
+}
+
+/* Enviar / reenviar solicitud: rosa sólido en reposo.
+   Loading y success conservan el morph aprobado. */
+.gx-service-view .gx-action-morph:not(.gx-action-loading):not(.gx-action-success):not(.gx-action-error){
+    border-color:#d34b79!important;
+    background:#d34b79!important;
+    color:#ffffff!important;
+    box-shadow:none!important;
+}
+.gx-service-view .gx-action-morph.gx-action-error{
+    border-color:#c74470!important;
+    background:#c74470!important;
+    color:#ffffff!important;
+}
+
+/* Presión consistente en botones sólidos */
+.gx-service-more:active,
+.gx-service-back:active,
+.gx-option-support:active,
+.gx-service-view .gx-cancel-link:active,
+.gx-credential-reveal-btn:active,
+.gx-credential-result-actions button:active{
+    transform:scale(.97)!important;
+    filter:brightness(.94);
+}
+
+/* ---------------------------------------------------------
+   CANCELACIONES DENTRO DEL SISTEMA DE NOTIFICACIONES
+   Prioridad visual acorde al estado.
+   --------------------------------------------------------- */
+.gx-service-update-badge.gx-update-cancelacion_aprobada{
+    border-color:#39e58c!important;
+    background:#39e58c!important;
+    color:#062014!important;
+}
+.gx-service-update-badge.gx-update-cancelacion_revision{
+    border-color:#7c4dff!important;
+    background:#7c4dff!important;
+    color:#ffffff!important;
+}
+.gx-service-update-badge.gx-update-cancelacion_rechazada{
+    border-color:#c74470!important;
+    background:#c74470!important;
+    color:#ffffff!important;
+}
+
+/* También solidificamos las cápsulas normales de novedad para que toda
+   la fila de estado use una misma lógica y no parezcan vidrios distintos. */
+.gx-service-update-badge.gx-update-pin{
+    border-color:#7255d9!important;
+    background:#7255d9!important;
+    color:#ffffff!important;
+}
+.gx-service-update-badge.gx-update-correo{
+    border-color:#2f86d8!important;
+    background:#2f86d8!important;
+    color:#ffffff!important;
+}
+.gx-service-update-badge.gx-update-perfil,
+.gx-service-update-badge.gx-update-acceso{
+    border-color:#6954ba!important;
+    background:#6954ba!important;
+    color:#ffffff!important;
+}
+.gx-service-update-badge.gx-update-password{
+    border-color:#16bfd0!important;
+    background:#16bfd0!important;
+    color:#061418!important;
+}
+
+/* Las rutas internas de cancelación ya no necesitan kicker de estado:
+   el título y la notificación superior hacen ese trabajo. */
+.gx-cancellation-state-view > .gx-service-back{
+    margin-bottom:16px!important;
+}
+
+@media(max-width:390px){
+    .gx-service-toolbar .gx-service-more{
+        min-width:100px!important;
     }
 }
 </style>
