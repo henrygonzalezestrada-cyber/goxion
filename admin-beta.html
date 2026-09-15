@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.1-beta-11">
+<html lang="es" data-goxion-version="1.1.1-beta-12">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -4722,7 +4722,7 @@ details.gx-client-ops-context{
 
                         <div class="gx-credentials-note">
                             <strong>Entrega de una sola vista</strong>
-                            <p>En la próxima versión de Ayuda, el cliente tendrá que confirmar su PIN antes de verla. Una vez revelada, la entrega queda consumida y no podrá consultarla otra vez.</p>
+                            <p>La entrega ya está conectada con Ayuda. El cliente verá la actualización en Mi Espacio, deberá confirmar su PIN de GOXION para revelar la contraseña y, una vez consultada, la entrega quedará consumida.</p>
                         </div>
 
                         <div class="gx-credentials-config">
@@ -8153,7 +8153,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 11 · v1.1.1-beta-11</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 12 · v1.1.1-beta-12</div>
 
 <script id="goxion-admin-ayuda-bridge-controller">
 (() => {
@@ -10075,7 +10075,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             const input=document.getElementById("gx-cred-password");
             if(input){input.value="";input.type="password";}
             await loadCredentials();
-            alert(`✓ Contraseña protegida en Vault.\n\nVersión ${r.credencial?.version||""}\n${r.entregas||0} entregas preparadas.\n\nTodavía no se muestra en Ayuda hasta que implementemos esa versión en Ayuda.`);
+            alert(`✓ Contraseña protegida en Vault.\n\nVersión ${r.credencial?.version||""}\n${r.entregas||0} entregas preparadas.\n\nLa conexión con Ayuda ya está activa: los clientes con entrega pendiente verán la actualización en Mi Espacio y deberán confirmar su PIN para revelarla.`);
         }catch(e){
             console.error(e);
             alert("No se pudo publicar la contraseña.\n\n"+(e?.message||e));
@@ -10704,5 +10704,8 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 })();
 </script>
 
+<script id="goxion-admin-beta-12-release-note">
+console.info("GOXION Admin Beta 12: copy de Credenciales actualizado para reflejar la conexión activa con Ayuda.");
+</script>
 </body>
 </html>
