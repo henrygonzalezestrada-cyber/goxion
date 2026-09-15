@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.1-beta-17" lang="es">
+<html data-goxion-version="1.2.1-beta-18" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -5114,7 +5114,7 @@
 <span class="rotator-text" id="dynamic-rotator">✓ Calidad 4K Ultra HD</span>
 </div>
 </div>
-<button class="btn-shimmer gx-welcome-trigger" onclick="solicitarCuenta()" style="margin-bottom: 9px;">
+<button type="button" class="btn-shimmer gx-welcome-trigger" onclick="return solicitarCuenta(event)" style="margin-bottom: 9px;">
                     🎁 Únete hoy y obtén -10% OFF
                 </button>
                 <div class="gx-welcome-eligibility-note">
@@ -5527,6 +5527,8 @@
         
         window.catalogGroups = {}; 
 
+        let gxWelcomeCycle=0;
+
         function gxWelcomeReducedMotion() {
             return Boolean(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         }
@@ -5556,7 +5558,7 @@
             };
         }
 
-        async function gxAnimateWelcomeOpen(fromRect) {
+        async function gxAnimateWelcomeOpen(fromRect,cycle) {
             const modal=document.getElementById('gx-welcome-modal');
             const sheet=modal?.querySelector('.gx-welcome-sheet');
             const shell=document.getElementById('gx-welcome-morph-shell');
@@ -5602,6 +5604,8 @@
                 }).finished;
             } catch(_) {}
 
+            if(cycle !== gxWelcomeCycle) return;
+
             modal.classList.remove('gx-welcome-preparing','gx-welcome-morphing');
             modal.classList.add('gx-welcome-ready');
 
@@ -5626,16 +5630,27 @@
             shell.getAnimations().forEach(a=>a.cancel());
         }
 
-        function solicitarCuenta() {
+        function solicitarCuenta(event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
             const modal=document.getElementById("gx-welcome-modal");
             const form=document.getElementById("gx-welcome-form");
             const result=document.getElementById("gx-welcome-result");
             const actions=document.getElementById("gx-welcome-existing-actions");
             const submit=document.getElementById("gx-welcome-submit");
             const trigger=gxWelcomeTrigger();
-            if(!modal) return;
+            const shell=document.getElementById('gx-welcome-morph-shell');
+            if(!modal) return false;
 
+            const cycle=++gxWelcomeCycle;
             const fromRect=trigger?.getBoundingClientRect();
+
+            /* Limpia cualquier animación de un cierre/apertura anterior.
+               Así una segunda apertura no puede ser cerrada por una promesa vieja. */
+            shell?.getAnimations?.().forEach(a=>a.cancel());
+            modal.querySelector('.gx-welcome-sheet')?.getAnimations?.().forEach(a=>a.cancel());
+            if(shell) shell.hidden=true;
 
             if(form) form.hidden=false;
             if(result) {
@@ -5649,18 +5664,33 @@
             }
 
             trigger?.classList.add('gx-welcome-source-active');
-            modal.classList.remove('gx-welcome-ready','gx-welcome-closing','gx-welcome-morphing');
+            modal.classList.remove(
+                'gx-welcome-ready',
+                'gx-welcome-closing',
+                'gx-welcome-morphing'
+            );
             modal.classList.add("show",'gx-welcome-preparing');
             modal.setAttribute("aria-hidden","false");
             document.body.style.overflow="hidden";
 
             requestAnimationFrame(()=>requestAnimationFrame(()=>{
-                gxAnimateWelcomeOpen(fromRect);
-                setTimeout(()=>document.getElementById("gx-welcome-name")?.focus({preventScroll:true}),700);
+                if(cycle !== gxWelcomeCycle) return;
+                gxAnimateWelcomeOpen(fromRect,cycle);
+                setTimeout(()=>{
+                    if(cycle === gxWelcomeCycle) {
+                        document.getElementById("gx-welcome-name")?.focus({preventScroll:true});
+                    }
+                },700);
             }));
+
+            return false;
         }
 
-        async function gxCloseWelcomeRegistration() {
+        async function gxCloseWelcomeRegistration(event) {
+            event?.preventDefault?.();
+            event?.stopPropagation?.();
+
+            const cycle=++gxWelcomeCycle;
             const modal=document.getElementById("gx-welcome-modal");
             const sheet=modal?.querySelector('.gx-welcome-sheet');
             const shell=document.getElementById('gx-welcome-morph-shell');
@@ -5668,6 +5698,7 @@
             if(!modal) return;
 
             const finish=()=>{
+                if(cycle !== gxWelcomeCycle) return;
                 shell && (shell.hidden=true);
                 shell?.getAnimations?.().forEach(a=>a.cancel());
                 modal.classList.remove(
@@ -7613,7 +7644,7 @@
                     <p class="gx-retention-lead">Antes de cancelar <strong>${gxRetentionEscape(serviceName)}</strong>, podemos aplicar un beneficio automático en tu próximo pago.</p>
 
                     <div class="gx-retention-value">
-                        <div class="gx-retention-percent">-${percent}%</div>
+                        <div class="gx-retention-percent"><span>-${percent}%</span><small>OFF</small></div>
                         <div class="gx-retention-price">
                             <span>Próximo pago</span>
                             <strong>${gxRetentionMoney(final)}</strong>
@@ -7628,7 +7659,7 @@
 
                     <div class="gx-retention-actions">
                         <button type="button" class="gx-retention-accept" id="gx-retention-accept-${index}" onclick="gxAcceptRetention(${index},event)">
-                            <span>Quedarme con -${percent}%</span>
+                            <span>Quedarme con -${percent}% OFF</span>
                         </button>
                         <button type="button" class="gx-retention-decline" id="gx-retention-decline-${index}" onclick="gxDeclineRetention(${index},event)">Continuar con la cancelación</button>
                     </div>
@@ -7683,7 +7714,7 @@
             const status=document.getElementById(`gx-retention-status-${index}`);
             if(!service || !offer?.id || !accept) return;
 
-            const label=`Quedarme con -${Number(offer.porcentaje||30)}%`;
+            const label=`Quedarme con -${Number(offer.porcentaje||30)}% OFF`;
             gxRetentionButtonState(accept,'loading',label);
             if(decline) decline.disabled=true;
             if(status) {
@@ -9693,7 +9724,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda Beta 17 v1.2.1-beta-17: lenguaje de descuentos GOXION + retención limpia.");
+        console.info("GOXION Ayuda Beta 18 v1.2.1-beta-18: descuentos unificados + reapertura estable.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -13635,30 +13666,21 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 </style>
 
 
-<style id="goxion-ayuda-beta-17-discount-language">
+
+<style id="goxion-ayuda-beta-18-discount-language">
 /* =========================================================
-   GOXION · AYUDA BETA 17
-   Un solo lenguaje para beneficios/descuentos:
-   morado → magenta, tipografía blanca, movimiento controlado.
+   GOXION · AYUDA BETA 18
+   Descuentos: misma referencia visual del CTA -10%.
    ========================================================= */
 
-:root{
-    --gx-discount-purple:#7c4dff;
-    --gx-discount-purple-2:#6948ef;
-    --gx-discount-magenta:#ff3366;
-    --gx-discount-magenta-2:#d63d8e;
-}
-
 /* ---------------------------------------------------------
-   REGISTRO -10%
-   El color del CTA se conserva durante TODO el morph.
+   -10%: misma paleta exacta del botón original.
    --------------------------------------------------------- */
 .gx-welcome-morph-shell{
     background:linear-gradient(
         135deg,
-        var(--gx-discount-purple) 0%,
-        var(--gx-discount-purple-2) 42%,
-        var(--gx-discount-magenta) 100%
+        var(--neon-purple),
+        #ff3366
     )!important;
     border-color:rgba(255,255,255,.16)!important;
     box-shadow:
@@ -13666,40 +13688,25 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         0 0 28px rgba(124,77,255,.18)!important;
 }
 
-/* La tarjeta abierta es la continuación del botón:
-   NO cambia a negro. */
 .gx-welcome-sheet{
     background:linear-gradient(
         135deg,
-        var(--gx-discount-purple) 0%,
-        #7147f4 24%,
-        #8a43dc 48%,
-        #c53b9d 73%,
-        var(--gx-discount-magenta) 100%
+        var(--neon-purple) 0%,
+        #ff3366 100%
     )!important;
-    background-size:170% 170%!important;
-    animation:gxDiscountCardFlow 9s ease-in-out infinite!important;
-
     border:1px solid rgba(255,255,255,.20)!important;
     box-shadow:
         0 30px 90px rgba(33,16,72,.46),
         inset 0 1px 0 rgba(255,255,255,.16)!important;
+    animation:none!important;
 }
 
-/* Sin máscara neón adicional ni reflejos.
-   El protagonista es el propio color del beneficio. */
+/* Sin shimmer ni reflejo una vez abierta. */
 .gx-welcome-sheet::before,
 .gx-welcome-sheet::after{
     display:none!important;
 }
 
-@keyframes gxDiscountCardFlow{
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
-}
-
-/* Tipografía blanca y jerarquía limpia. */
 .gx-welcome-eyebrow,
 .gx-welcome-sheet h3,
 .gx-welcome-copy,
@@ -13707,28 +13714,19 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-welcome-form label>span{
     color:#fff!important;
 }
-.gx-welcome-eyebrow{
-    opacity:.76;
-}
-.gx-welcome-copy{
-    opacity:.88;
-}
-.gx-welcome-copy strong{
-    opacity:1;
-}
+.gx-welcome-eyebrow{opacity:.76}
+.gx-welcome-copy{opacity:.88}
 
-/* Isotipo simple, integrado al fondo del beneficio. */
 .gx-welcome-icon{
     border-color:rgba(255,255,255,.26)!important;
-    background:#ffffff!important;
-    color:var(--gx-discount-purple)!important;
+    background:#fff!important;
+    color:var(--neon-purple)!important;
     box-shadow:none!important;
 }
 .gx-welcome-icon::after{
     border-color:rgba(124,77,255,.48)!important;
 }
 
-/* Campos sólidos: contrastan sin convertir la tarjeta en panel Admin. */
 .gx-welcome-form input{
     border:1px solid rgba(255,255,255,.20)!important;
     background:#261845!important;
@@ -13743,19 +13741,13 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     box-shadow:0 0 0 3px rgba(255,255,255,.10)!important;
 }
 
-/* Aviso importante dentro de la misma familia cromática. */
 .gx-welcome-rule{
     border-color:rgba(255,255,255,.16)!important;
     background:#3b2250!important;
 }
-.gx-welcome-rule b{
-    color:#fff!important;
-}
-.gx-welcome-rule span{
-    color:rgba(255,255,255,.78)!important;
-}
+.gx-welcome-rule b{color:#fff!important}
+.gx-welcome-rule span{color:rgba(255,255,255,.78)!important}
 
-/* CTA interno con cuerpo sólido, no translúcido. */
 .gx-welcome-submit{
     border:1px solid rgba(255,255,255,.28)!important;
     background:#1a102d!important;
@@ -13764,18 +13756,14 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         0 8px 20px rgba(28,10,56,.26),
         inset 0 1px 0 rgba(255,255,255,.08)!important;
 }
-.gx-welcome-submit::after{
-    display:none!important;
-}
+.gx-welcome-submit::after{display:none!important}
 
-/* X más limpia sobre el color de la tarjeta. */
 .gx-welcome-close{
     border-color:rgba(255,255,255,.20)!important;
     background:#24163f!important;
     color:#fff!important;
 }
 
-/* Estados: cuerpo sólido y texto blanco. */
 .gx-welcome-result.checking{
     background:#2b1b49!important;
     color:#fff!important;
@@ -13785,34 +13773,26 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     color:#fff!important;
     border-color:rgba(255,255,255,.14)!important;
 }
-.gx-welcome-result.success strong{
-    color:#9dffcb!important;
-}
+.gx-welcome-result.success strong{color:#9dffcb!important}
 .gx-welcome-result.blocked{
     background:#4a1930!important;
     color:#fff!important;
     border-color:rgba(255,255,255,.14)!important;
 }
-.gx-welcome-result.blocked strong{
-    color:#ffc1d1!important;
-}
+.gx-welcome-result.blocked strong{color:#ffc1d1!important}
 .gx-welcome-result.review{
     background:#4a3517!important;
     color:#fff!important;
     border-color:rgba(255,255,255,.14)!important;
 }
-.gx-welcome-result.review strong{
-    color:#ffe0a7!important;
-}
+.gx-welcome-result.review strong{color:#ffe0a7!important}
 .gx-welcome-result.error{
     background:#4a1930!important;
     color:#fff!important;
 }
 
 /* ---------------------------------------------------------
-   RETENCIÓN
-   Se elimina cualquier destello/blurry background.
-   Solo permanece el fondo natural de la tarjeta de servicio.
+   Retención: sin blur/destello ambiental.
    --------------------------------------------------------- */
 .gx-retention-stage{
     background:transparent!important;
@@ -13822,13 +13802,38 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     display:none!important;
     animation:none!important;
 }
-
-/* El logo queda limpio, sin halo añadido. */
 .gx-retention-logo{
     filter:none!important;
 }
 
-/* Bloques internos sobrios; no generan manchas sobre la tarjeta. */
+/* -30% OFF usa EXACTAMENTE la misma familia que -10%. */
+.gx-retention-percent{
+    flex-direction:column!important;
+    gap:0!important;
+    background:linear-gradient(
+        135deg,
+        var(--neon-purple),
+        #ff3366
+    )!important;
+    border-color:rgba(255,255,255,.14)!important;
+    color:#fff!important;
+}
+.gx-retention-percent>span{
+    display:block;
+    color:#fff;
+    font-size:21px;
+    font-weight:900;
+    line-height:.95;
+}
+.gx-retention-percent>small{
+    display:block;
+    margin-top:4px;
+    color:rgba(255,255,255,.82);
+    font-size:7px;
+    font-weight:900;
+    letter-spacing:.16em;
+}
+
 .gx-retention-value{
     background:linear-gradient(135deg,#151128,#0a1820)!important;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.025)!important;
@@ -13838,80 +13843,78 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 }
 
 /* ---------------------------------------------------------
-   "QUEDARME CON -30%"
-   Mismo concepto de Ver Estado de Cuenta:
-   gradiente en movimiento + sweep suave,
-   pero con la familia cromática del -10%.
+   CTA -30%:
+   mismo patrón de movimiento de Ver Estado de Cuenta,
+   pero usando SOLO los colores exactos del -10%.
+   IMPORTANTE: no usar background shorthand !important porque
+   bloquearía background-position en Safari.
    --------------------------------------------------------- */
 .gx-retention-accept{
-    isolation:isolate;
     width:100%;
     min-height:60px!important;
     border:0!important;
     border-radius:16px!important;
 
-    background:linear-gradient(
+    background-image:linear-gradient(
         105deg,
-        #7c4dff 0%,
-        #7645f2 15%,
-        #8c3fdd 31%,
-        #ae39bd 47%,
-        #d63d8e 65%,
-        #ff3366 82%,
-        #7c4dff 100%
+        var(--neon-purple) 0%,
+        #ff3366 50%,
+        var(--neon-purple) 100%
     )!important;
     background-size:260% 100%!important;
+    background-position:0% 50%;
+
     animation:gxRetentionDiscountFlow 6.2s ease-in-out infinite!important;
 
     color:#fff!important;
-    font-size:12.5px!important;
+    font-size:13.1px!important;
     font-weight:850!important;
     letter-spacing:.005em!important;
 
     box-shadow:
-        inset 0 1px 0 rgba(255,255,255,.18),
-        0 9px 23px rgba(86,41,154,.20)!important;
+        inset 0 1px 0 rgba(255,255,255,.20),
+        0 8px 22px rgba(124,77,255,.22)!important;
 
     will-change:background-position;
+    isolation:isolate;
 }
 
-/* Sweep contenido exclusivamente dentro del botón. */
+@keyframes gxRetentionDiscountFlow{
+    0%   {background-position:0% 50%}
+    50%  {background-position:100% 50%}
+    100% {background-position:0% 50%}
+}
+
+/* Sweep suave. Sin !important en left, para que keyframes sí funcionen. */
 .gx-retention-accept::after{
-    content:""!important;
-    position:absolute!important;
-    z-index:0!important;
-    top:0!important;
-    bottom:0!important;
-    left:-55%!important;
-    width:38%!important;
-    border-radius:inherit!important;
+    content:"";
+    position:absolute;
+    z-index:0;
+    top:0;
+    bottom:0;
+    left:-55%;
+    width:38%;
+    border-radius:inherit;
     background:linear-gradient(
         90deg,
         transparent,
-        rgba(255,255,255,.26),
+        rgba(255,255,255,.28),
         transparent
-    )!important;
-    transform:skewX(-22deg)!important;
+    );
+    transform:skewX(-22deg);
     opacity:0;
     pointer-events:none;
-    animation:gxRetentionDiscountSweep 6.2s ease-in-out infinite!important;
+    animation:gxRetentionDiscountSweep 6.2s ease-in-out infinite;
 }
-
-/* El texto siempre encima del sweep. */
 .gx-retention-accept>span{
     position:relative;
     z-index:1;
 }
 
-@keyframes gxRetentionDiscountFlow{
-    0%{background-position:0% 50%}
-    50%{background-position:100% 50%}
-    100%{background-position:0% 50%}
-}
 @keyframes gxRetentionDiscountSweep{
     0%,68%{left:-55%;opacity:0}
-    72%{opacity:.28}
-    88%{left:118%;opacity:.16}
+    72%{opacity:.32}
+    88%{left:118%;opacity:.18}
     100%{left:118%;opacity:0}
 }
 
@@ -13919,17 +13922,19 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     transform:scale(.985)!important;
 }
 
-/* Loading/check siguen mandando sobre el CTA animado. */
+/* Loading y success anulan temporalmente la animación de descuento. */
 .gx-retention-accept.is-loading{
     min-height:8px!important;
     height:8px!important;
-    background:#191a22!important;
+    background-image:none!important;
+    background-color:#191a22!important;
     background-size:auto!important;
     animation:none!important;
     box-shadow:none!important;
 }
 .gx-retention-accept.is-loading::after{
     content:""!important;
+    position:absolute!important;
     inset:0 auto 0 0!important;
     left:0!important;
     width:0!important;
@@ -13939,8 +13944,8 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     border-radius:999px!important;
     background:linear-gradient(
         90deg,
-        var(--gx-discount-purple),
-        var(--gx-discount-magenta)
+        var(--neon-purple),
+        #ff3366
     )!important;
     animation:gxRetentionLoad .85s cubic-bezier(.2,.82,.2,1) forwards!important;
 }
@@ -13948,7 +13953,8 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     width:46px!important;
     min-height:46px!important;
     height:46px!important;
-    background:#39e58c!important;
+    background-image:none!important;
+    background-color:#39e58c!important;
     background-size:auto!important;
     animation:none!important;
     box-shadow:0 0 22px rgba(57,229,140,.12)!important;
@@ -13965,7 +13971,6 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     animation:none!important;
 }
 
-/* Acción secundaria se mantiene pequeña y discreta. */
 .gx-retention-decline{
     color:#8f8492!important;
 }
@@ -13973,11 +13978,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     color:#c9b4c2!important;
 }
 
-/* ---------------------------------------------------------
-   Reduced motion
-   --------------------------------------------------------- */
 @media(prefers-reduced-motion:reduce){
-    .gx-welcome-sheet,
     .gx-retention-accept,
     .gx-retention-accept::after{
         animation:none!important;
