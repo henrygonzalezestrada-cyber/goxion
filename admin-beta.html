@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.2-beta-15">
+<html lang="es" data-goxion-version="1.1.2-beta-16">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -4756,7 +4756,7 @@ details.gx-client-ops-context{
                             <div>
                                 <span class="gx-eyebrow">Seguridad</span>
                                 <h2>Credenciales de plataformas</h2>
-                                <p class="gx-panel-desc">Publica una nueva contraseña solo para los clientes que usan esa cuenta. La contraseña se guarda cifrada en Supabase Vault y nunca vuelve a cargarse en este Admin.</p>
+                                <p class="gx-panel-desc">La contraseña pertenece a la cuenta madre y se comparte automáticamente con los clientes asignados a ella. Se guarda cifrada en Supabase Vault y nunca vuelve a cargarse en este Admin.</p>
                             </div>
                             <span class="gx-vault-badge">Vault protegido</span>
                         </div>
@@ -4787,7 +4787,7 @@ details.gx-client-ops-context{
                         <div class="gx-credentials-selection-head">
                             <div>
                                 <strong>Quiénes recibirán esta contraseña</strong>
-                                <small>Solo aparecen clientes activos con la misma plataforma y cuenta de acceso.</small>
+                                <small>Solo aparecen clientes cuyos accesos técnicos están asignados a esta cuenta madre.</small>
                             </div>
                             <div>
                                 <button type="button" onclick="gxCredentialSelectScope('all')">Todos</button>
@@ -8194,7 +8194,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 15 · v1.1.2-beta-15</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 16 · v1.1.2-beta-16</div>
 
 <script id="goxion-admin-ayuda-bridge-controller">
 (() => {
@@ -9806,7 +9806,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 (() => {
     const PROJECT_URL="https://hmpevcwodcgbkviarfic.supabase.co";
     const CANCEL_URL=`${PROJECT_URL}/functions/v1/cancelaciones-admin`;
-    const CRED_URL=`${PROJECT_URL}/functions/v1/credenciales-admin`;
+    const CRED_URL=`${PROJECT_URL}/functions/v1/credenciales-admin-beta`;
 
     let cancellationData={solicitudes:[],legacy:[]};
     let credentialData={credenciales:[],entregas:[]};
@@ -9919,21 +9919,31 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         return String(document.getElementById("gx-cred-account")?.value||"").trim();
     }
 
-    function assignmentsFor(service,account=""){
+    function accessModel(){
+        return window.gxAccessModelBeta||{accesos:[],cuentas:[]};
+    }
+
+    function accountById(id){
+        return (window.gxPlatformAccountState?.cuentas||accessModel().cuentas||[])
+            .find(a=>String(a.id)===String(id))||null;
+    }
+
+    function assignmentsFor(service,accountId=""){
         if(!service)return[];
         const serviceId=String(service._id||service.id||"");
-        const out=[];
-        Object.entries(clientesDict||{}).forEach(([key,c])=>{
-            (c.servicios||[]).forEach(s=>{
-                const sid=String(s.servicio_id||"");
-                const same=sid&&serviceId ? sid===serviceId : norm(s.nombre)===norm(service.nombre);
-                if(!same||s.activo===false)return;
-                const login=String(s.correo_login||"").trim();
-                if(account&&norm(login)!==norm(account))return;
-                out.push({key,c,s,id:String(c._id||c.id||""),login});
-            });
-        });
-        return out.filter(x=>x.id);
+        const accesses=(accessModel().accesos||[]).filter(a=>
+            a.activo!==false &&
+            String(a.servicio_id)===serviceId &&
+            (!accountId||String(a.cuenta_id||"")===String(accountId))
+        );
+        return accesses.map(a=>({
+            id:String(a.cliente_id||""),
+            accessId:String(a.id||""),
+            c:{nombre:a.cliente||"Cliente",folio:a.folio||""},
+            s:{_id:a.cliente_servicio_id,nombre:a.contratacion||a.servicio||""},
+            login:accountById(a.cuenta_id)?.correo_login||"",
+            cuenta_id:a.cuenta_id||""
+        })).filter(x=>x.id);
     }
 
     function populateCredentialServices(){
@@ -9948,19 +9958,22 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         const sel=document.getElementById("gx-cred-account");
         if(!sel)return;
         const service=selectedCatalog();
+        const serviceId=String(service?._id||service?.id||"");
         const prev=sel.value;
-        const accounts=[...new Set(assignmentsFor(service).map(x=>x.login).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+        const accounts=(window.gxPlatformAccountState?.cuentas||accessModel().cuentas||[])
+            .filter(a=>a.activo!==false&&String(a.servicio_id)===serviceId);
         sel.innerHTML=accounts.length
-            ? accounts.map(a=>`<option value="${esc(a)}">${esc(a)}</option>`).join("")
-            : `<option value="">Sin cuenta/correo configurado</option>`;
-        if(prev&&accounts.includes(prev))sel.value=prev;
+            ? accounts.map(a=>`<option value="${esc(a.id)}">${esc(a.alias)} · ${esc(a.correo_login)} · ${Number(a.ocupados||0)}/${Number(a.limite_perfiles||0)}</option>`).join("")
+            : `<option value="">Sin cuenta madre configurada</option>`;
+        if(prev&&accounts.some(a=>String(a.id)===String(prev)))sel.value=prev;
+        else if(accounts.length===1)sel.value=String(accounts[0].id);
     }
 
     function eligibleRecipients(){
-        const service=selectedCatalog(),account=selectedAccount();
-        if(!service||!account)return[];
+        const service=selectedCatalog(),accountId=selectedAccount();
+        if(!service||!accountId)return[];
         const byClient=new Map();
-        assignmentsFor(service,account).forEach(x=>{
+        assignmentsFor(service,accountId).forEach(x=>{
             if(!byClient.has(x.id))byClient.set(x.id,x);
         });
         return [...byClient.values()];
@@ -9978,20 +9991,19 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     }
 
     function activeCredential(){
-        const service=selectedCatalog(),account=selectedAccount();
-        const serviceId=String(service?._id||service?.id||"");
-        return credentialData.credenciales.find(x=>x.activa===true&&String(x.servicio_id||"")===serviceId&&norm(x.cuenta_login)===norm(account))||null;
+        const accountId=selectedAccount();
+        return credentialData.credenciales.find(x=>x.activa===true&&String(x.cuenta_id||"")===String(accountId))||null;
     }
 
     function renderCredentialHistory(){
         const list=document.getElementById("gx-cred-history-list");
         const count=document.getElementById("gx-cred-history-count");
         if(!list||!count)return;
-        const service=selectedCatalog(),account=selectedAccount();
+        const service=selectedCatalog(),accountId=selectedAccount();
         const serviceId=String(service?._id||service?.id||"");
         const rows=credentialData.credenciales.filter(x=>
             (!serviceId||String(x.servicio_id||"")===serviceId)&&
-            (!account||norm(x.cuenta_login)===norm(account))
+            (!accountId||String(x.cuenta_id||"")===String(accountId))
         );
         count.textContent=`${rows.length} versión${rows.length===1?"":"es"}`;
         if(!rows.length){
@@ -10053,16 +10065,16 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         const excluded=rows.length-selected.length;
         const active=activeCredential();
         const pending=active?credentialData.entregas.filter(e=>String(e.credencial_id)===String(active.id)&&e.estado==="pendiente").length:0;
-        const service=selectedCatalog(),account=selectedAccount();
+        const service=selectedCatalog(),accountId=selectedAccount(),account=accountById(accountId);
         const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=String(v)};
         set("gx-cred-eligible",rows.length);
         set("gx-cred-selected",selected.length);
         set("gx-cred-excluded",excluded);
         set("gx-cred-pending",pending);
         const summary=document.getElementById("gx-cred-publish-summary");
-        if(summary)summary.textContent=service&&account?`${service.nombre} · ${account} · ${selected.length} cliente${selected.length===1?"":"s"}`:"Selecciona una plataforma y una cuenta.";
+        if(summary)summary.textContent=service&&account?`${service.nombre} · ${account.alias} · ${selected.length} cliente${selected.length===1?"":"s"}`:"Selecciona una plataforma y una cuenta.";
         const btn=document.getElementById("gx-cred-publish");
-        if(btn)btn.disabled=!service||!account||selected.length===0;
+        if(btn)btn.disabled=!service||!accountId||selected.length===0;
         if(renderList)window.gxRenderCredentialRecipients();
         renderCredentialHistory();
     };
@@ -10093,30 +10105,28 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     }
 
     window.gxPublishCredential=async function(){
-        const service=selectedCatalog(),account=selectedAccount();
+        const service=selectedCatalog(),accountId=selectedAccount(),account=accountById(accountId);
         const password=String(document.getElementById("gx-cred-password")?.value||"");
         const rows=eligibleRecipients().filter(x=>credentialSelection.has(x.id));
-        if(!service||!account)return alert("Selecciona una plataforma y una cuenta.");
+        if(!service||!accountId||!account)return alert("Selecciona una plataforma y una cuenta madre.");
         if(password.length<4)return alert("Escribe la nueva contraseña.");
         if(!rows.length)return alert("Selecciona al menos un cliente.");
         const active=activeCredential();
         const warning=active?`\n\nEsto revocará las entregas pendientes de la versión ${active.version}.`:"";
-        if(!confirm(`Publicar nueva contraseña\n\n${service.nombre}\n${account}\n${rows.length} clientes\nEntrega: una sola vista${warning}\n\n¿Continuar?`))return;
+        if(!confirm(`Publicar nueva contraseña\n\n${service.nombre}\n${account.alias} · ${account.correo_login}\n${rows.length} clientes\nEntrega: una sola vista${warning}\n\n¿Continuar?`))return;
 
         const btn=document.getElementById("gx-cred-publish");
         if(btn){btn.disabled=true;btn.textContent="Publicando…";}
         try{
             const r=await adminApi(CRED_URL,"publicar",{
-                servicio_id:String(service._id||service.id||""),
-                plataforma:String(service.nombre||""),
-                cuenta_login:account,
+                cuenta_id:accountId,
                 password,
                 cliente_ids:rows.map(x=>x.id)
             });
             const input=document.getElementById("gx-cred-password");
             if(input){input.value="";input.type="password";}
             await loadCredentials();
-            alert(`✓ Contraseña protegida en Vault.\n\nVersión ${r.credencial?.version||""}\n${r.entregas||0} entregas preparadas.\n\nLa conexión con Ayuda ya está activa: los clientes con entrega pendiente verán la actualización en Mi Espacio y deberán confirmar su PIN para revelarla.`);
+            alert(`✓ Contraseña protegida en Vault.\n\n${account.alias} · versión ${r.credencial?.version||""}\n${r.entregas||0} entregas preparadas.\n\nLos clientes asignados a esta cuenta madre podrán recibir la nueva contraseña desde Mi Espacio.`);
         }catch(e){
             console.error(e);
             alert("No se pudo publicar la contraseña.\n\n"+(e?.message||e));
@@ -10937,6 +10947,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         if(gxAccessModelLoaded&&!force)return gxAccessModel;
         const r=await gxAccessCall("modelo");
         gxAccessModel={servicios:r.servicios||[],componentes:r.componentes||[],cuentas:r.cuentas||[],accesos:r.accesos||[]};
+        window.gxAccessModelBeta=gxAccessModel;
         gxAccessModelLoaded=true;
         // Enriquecer catálogo sin tocar admin-datos oficial.
         const meta=new Map(gxAccessModel.servicios.map(s=>[String(s.id),s]));
@@ -11056,20 +11067,43 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                     const current=access?.cuenta_id?accounts.find(a=>String(a.id)===String(access.cuenta_id)):null;
                     const repeated=p.items.filter(y=>y.servicio_id===x.servicio_id).length>1;
                     return `<div class="gx-beta-access-row gx-beta-access-row-live">
-                        <div>
+                        <div class="gx-tech-access-main">
                             <strong>${esc(x.servicio)}${repeated?` · acceso ${x.ordinal}`:''}</strong>
                             <small>${access?`ID técnico listo · ${current?`${esc(current.alias)} · ${esc(current.correo_login)}`:'pendiente de cuenta madre'}`:'No materializado'}</small>
+
+                            ${access?`
+                                <div class="gx-tech-credential-grid">
+                                    <label>
+                                        <span>Perfil</span>
+                                        <input type="text" value="${esc(access.perfil_nombre||'')}" placeholder="Ej. David" onchange="gxUpdateTechnicalAccess('${esc(access.id)}','perfil_nombre',this.value,this)">
+                                    </label>
+                                    <label>
+                                        <span>PIN</span>
+                                        <input type="text" value="${esc(access.perfil_pin||'')}" placeholder="PIN" maxlength="30" onchange="gxUpdateTechnicalAccess('${esc(access.id)}','perfil_pin',this.value,this)">
+                                    </label>
+                                </div>
+                                <div class="gx-tech-password-line">
+                                    <div>
+                                        <span>Contraseña</span>
+                                        <small>${current?'Heredada de la cuenta madre · se protege en Vault':'Asigna una cuenta madre para administrar su contraseña'}</small>
+                                    </div>
+                                    ${current?`<button type="button" onclick="gxOpenTechnicalPassword('${esc(x.servicio_id)}','${esc(current.id)}',event)">Gestionar contraseña</button>`:''}
+                                </div>
+                            `:''}
                         </div>
                         ${access?`
-                            <select class="gx-technical-account-select" onchange="gxAssignTechnicalAccess('${esc(access.id)}',this.value,this)">
-                                <option value="">Sin cuenta</option>
-                                ${accounts.map(a=>{
-                                    const occ=Number(a.ocupados||0),max=Number(a.limite_perfiles||0),selected=String(a.id)===String(access.cuenta_id||"");
-                                    const full=occ>=max&&!selected;
-                                    return `<option value="${esc(a.id)}" ${selected?'selected':''} ${full?'disabled':''}>${esc(a.alias)} · ${occ}/${max}${full?' · llena':''}</option>`;
-                                }).join('')}
-                            </select>
-                            <em class="${current?'assigned':'missing'}">${current?'Asignado':'Pendiente'}</em>
+                            <div class="gx-tech-account-side">
+                                <span>Cuenta madre</span>
+                                <select class="gx-technical-account-select" onchange="gxAssignTechnicalAccess('${esc(access.id)}',this.value,this)">
+                                    <option value="">Sin cuenta</option>
+                                    ${accounts.map(a=>{
+                                        const occ=Number(a.ocupados||0),max=Number(a.limite_perfiles||0),selected=String(a.id)===String(access.cuenta_id||"");
+                                        const full=occ>=max&&!selected;
+                                        return `<option value="${esc(a.id)}" ${selected?'selected':''} ${full?'disabled':''}>${esc(a.alias)} · ${occ}/${max}${full?' · llena':''}</option>`;
+                                    }).join('')}
+                                </select>
+                                <em class="${current?'assigned':'missing'}">${current?'Asignado':'Pendiente'}</em>
+                            </div>
                         `:`<em class="missing">Revisión</em>`}
                     </div>`;
                 }).join('')}
@@ -11171,6 +11205,46 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             if(select)select.value=String(previous||'');
             alert(`No se pudo cambiar la cuenta.\n\n${e?.message||e}`);
         }
+    };
+
+    window.gxUpdateTechnicalAccess=async function(accessId,field,value,input){
+        const allowed=['perfil_nombre','perfil_pin'];
+        if(!allowed.includes(field))return;
+        const access=(gxAccessModel.accesos||[]).find(a=>String(a.id)===String(accessId));
+        const previous=String(access?.[field]||'');
+        if(String(value||'')===previous)return;
+        if(input)input.classList.add('gx-saving');
+        try{
+            const r=await gxAccessCall('editar_acceso',{acceso_id:accessId,[field]:String(value||'')});
+            if(access&&r.acceso)Object.assign(access,r.acceso);
+            window.gxAccessModelBeta=gxAccessModel;
+            if(input){input.classList.remove('gx-saving');input.classList.add('gx-saved');setTimeout(()=>input.classList.remove('gx-saved'),700)}
+        }catch(e){
+            if(input){input.value=previous;input.classList.remove('gx-saving')}
+            alert(`No se pudo guardar ${field==='perfil_nombre'?'el perfil':'el PIN'}.\n\n${e?.message||e}`);
+        }
+    };
+
+    window.gxOpenTechnicalPassword=function(serviceId,accountId,event){
+        event?.preventDefault?.();event?.stopPropagation?.();
+        goAdminTab('tab-ajustes');
+        setTimeout(()=>{
+            const btn=[...document.querySelectorAll('.gx-settings-tabs button')].find(b=>(b.textContent||'').toLowerCase().includes('credenciales'));
+            window.gxSettingsView?.('credentials',btn);
+            setTimeout(()=>{
+                const svc=document.getElementById('gx-cred-service');
+                const list=Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales:[];
+                const idx=list.findIndex(s=>String(s._id||s.id||'')===String(serviceId));
+                if(svc&&idx>=0){svc.value=String(idx);window.gxCredentialServiceChanged?.()}
+                setTimeout(()=>{
+                    const acc=document.getElementById('gx-cred-account');
+                    if(acc&&[...acc.options].some(o=>String(o.value)===String(accountId))){
+                        acc.value=String(accountId);window.gxCredentialAccountChanged?.();
+                    }
+                    document.getElementById('gx-cred-password')?.focus();
+                },80);
+            },80);
+        },40);
     };
 
     // ---------- Constructor de productos / combos ----------
@@ -11477,6 +11551,88 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     .gx-platform-assign-toolbar{grid-template-columns:1fr}
     .gx-beta-access-row-live{grid-template-columns:1fr!important}
     .gx-beta-access-row-live em{justify-self:start}
+}
+</style>
+
+
+<style id="goxion-admin-beta-16-profile-pin">
+.gx-beta-access-row-live{
+    align-items:start!important;
+}
+.gx-tech-access-main{
+    min-width:0;
+}
+.gx-tech-credential-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.5fr) minmax(85px,.75fr);
+    gap:7px;
+    margin-top:9px;
+}
+.gx-tech-credential-grid label>span,
+.gx-tech-account-side>span,
+.gx-tech-password-line span{
+    display:block;
+    margin-bottom:4px;
+    color:#7f8ba0;
+    font-size:.44rem;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+}
+.gx-tech-credential-grid input{
+    width:100%;
+    min-height:34px;
+    padding:0 9px;
+    border-radius:9px;
+    border:1px solid rgba(255,255,255,.07);
+    background:#10141c;
+    color:#fff;
+    font-size:.52rem;
+    transition:border-color .2s,box-shadow .2s;
+}
+.gx-tech-credential-grid input.gx-saving{
+    border-color:rgba(255,197,90,.45);
+}
+.gx-tech-credential-grid input.gx-saved{
+    border-color:rgba(80,232,171,.5);
+    box-shadow:0 0 0 2px rgba(80,232,171,.06);
+}
+.gx-tech-account-side{
+    display:grid;
+    gap:5px;
+}
+.gx-tech-account-side em{
+    justify-self:start;
+}
+.gx-tech-password-line{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px solid rgba(255,255,255,.045);
+}
+.gx-tech-password-line small{
+    display:block;
+    color:#7f8ba0;
+    font-size:.45rem;
+    line-height:1.35;
+}
+.gx-tech-password-line button{
+    flex:0 0 auto;
+    border:1px solid rgba(124,77,255,.18);
+    background:rgba(124,77,255,.07);
+    color:#c9b8ff;
+    border-radius:9px;
+    min-height:30px;
+    padding:0 8px;
+    font-size:.46rem;
+    font-weight:800;
+}
+@media(max-width:700px){
+    .gx-tech-credential-grid{grid-template-columns:1fr}
+    .gx-tech-password-line{align-items:flex-start;flex-direction:column}
 }
 </style>
 
