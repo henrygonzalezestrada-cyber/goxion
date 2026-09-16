@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.2.1" lang="es">
+<html data-goxion-version="1.2.3" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
@@ -4896,7 +4896,7 @@
 
 
 
-<style id="goxion-welcome-validation">
+<style id="goxion-ayuda-beta-14-welcome-validation">
 .gx-welcome-eligibility-note{
     width:min(340px,92%);
     margin:0 auto 24px;
@@ -6426,7 +6426,11 @@
             const key = getCurrentClientKey(); 
             if(key) {
                 setTimeout(() => {
-                    window.location.href = `index.html?cliente=${encodeURIComponent(key)}`; 
+                    const indexUrl = new URL("index.html", window.location.href);
+                    indexUrl.search = "";
+                    indexUrl.hash = "";
+                    indexUrl.searchParams.set("cliente", key);
+                    window.location.href = indexUrl.toString(); 
                 }, 800);
             }
         }
@@ -6678,6 +6682,8 @@
             document.getElementById('tab-inicio-text').innerText = 'Mi Espacio';
 
             iniciarSaludoDinamico(cliente.nombre);
+
+            const gxEstadoCuenta = cliente.estado_cuenta || null;
 
             const payAlert = document.getElementById('dash-payment-review-alert');
             if(payAlert) {
@@ -6970,44 +6976,66 @@
             `;
 
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const hoy = new Date(); 
-            const diaPago = cliente.dia_pago || 15; 
-            const difDias = diaPago - hoy.getDate();
-            
-            document.getElementById('dash-date').innerText = `${diaPago} de ${meses[hoy.getMonth()]}`;
-            
-            let badgeHTML = "";
-            const dashboardReviewState = String(cliente.pago_revision_estado || '').toLowerCase();
-            const dashboardEnRevision = cliente.pago_en_revision === true || dashboardReviewState === 'revision';
+            const hoy = new Date();
+            const diaPago = Number(gxEstadoCuenta?.dia_pago ?? cliente.dia_pago ?? 15);
+            let difDias = gxEstadoCuenta
+                ? (Number(gxEstadoCuenta.dias_atraso || 0) > 0 ? -Number(gxEstadoCuenta.dias_atraso || 0) : Number(gxEstadoCuenta.dias_para_corte || 0))
+                : (diaPago - hoy.getDate());
 
-            if (dashboardEnRevision) {
-                badgeHTML = `<div class="time-badge badge-review">⏳ Pago en revisión</div>`;
-            } else if (cliente.estado === 'pagado') {
-                badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
-            } else if (difDias > 0) {
-                badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
-            } else if (difDias === 0) {
-                badgeHTML = `<div class="time-badge badge-today">⚠️ Vence HOY</div>`;
+            if(gxEstadoCuenta?.fecha_corte) {
+                const corte = new Date(`${gxEstadoCuenta.fecha_corte}T12:00:00`);
+                document.getElementById('dash-date').innerText = `${corte.getDate()} de ${meses[corte.getMonth()]}`;
             } else {
-                badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
+                document.getElementById('dash-date').innerText = `${diaPago} de ${meses[hoy.getMonth()]}`;
+            }
+
+            let badgeHTML = "";
+            if(gxEstadoCuenta) {
+                const st = String(gxEstadoCuenta.estado || "");
+                const cls = st === "pagado" ? "badge-ok" :
+                    st === "revision" ? "badge-review" :
+                    st === "incompleto" ? "badge-today" :
+                    st === "vencido" ? "badge-overdue" :
+                    st === "vence_hoy" ? "badge-today" : "badge-ok";
+                const icon = st === "pagado" ? "✨" :
+                    st === "revision" ? "⏳" :
+                    st === "incompleto" ? "⚠️" :
+                    st === "vencido" ? "🚨" :
+                    st === "vence_hoy" ? "⚠️" : "⏳";
+                badgeHTML = `<div class="time-badge ${cls}">${icon} ${gxEstadoCuenta.estado_label || "Estado actualizado"}</div>`;
+            } else {
+                const dashboardReviewState = String(cliente.pago_revision_estado || '').toLowerCase();
+                const dashboardEnRevision = cliente.pago_en_revision === true || dashboardReviewState === 'revision';
+                if (dashboardEnRevision) badgeHTML = `<div class="time-badge badge-review">⏳ Pago en revisión</div>`;
+                else if (cliente.estado === 'pagado') badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
+                else if (difDias > 0) badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
+                else if (difDias === 0) badgeHTML = `<div class="time-badge badge-today">⚠️ Vence HOY</div>`;
+                else badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
             }
             document.getElementById('dash-badge').innerHTML = badgeHTML;
 
-            let pagos = cliente.pagos_puntuales || 0; 
+            let pagos = gxEstadoCuenta ? Number(gxEstadoCuenta.lealtad?.pagos_efectivos || 0) : (cliente.pagos_puntuales || 0);
             let meta = 4;
             let beneficio = "3% OFF";
-            
-            if (pagos >= 4 && pagos < 9) { 
-                meta = 9; 
-                beneficio = "6% OFF"; 
-            } else if (pagos >= 9) { 
-                meta = pagos; 
-                beneficio = "Nivel Máximo (6% OFF)"; 
+
+            if (pagos >= 4 && pagos < 9) {
+                meta = 9;
+                beneficio = "6% OFF";
+            } else if (pagos >= 9) {
+                meta = pagos;
+                beneficio = "Nivel Máximo (6% OFF)";
             }
-            
+
             document.getElementById('loyalty-count').innerText = `${pagos}/${meta} Pagos`;
             setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${Math.min((pagos / meta) * 100, 100)}%`; }, 300);
             document.getElementById('loyalty-msg').innerText = pagos >= 9 ? "¡Felicidades! Disfrutas de tu Nivel 2." : `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
+
+            const accountLabel=document.querySelector('.gx-account-capsule-label');
+            if(accountLabel) {
+                accountLabel.textContent = gxEstadoCuenta
+                    ? `${gxEstadoCuenta.total_label || 'Estado de cuenta'} · $${Number(gxEstadoCuenta.total_actual || 0).toFixed(2)}`
+                    : 'Ver Estado de Cuenta';
+            }
 
             let historyHTML = '';
             if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
@@ -7317,12 +7345,61 @@
                                 <button type="button" onclick="gxFinishCredentialView(${idx},event)">Listo, ocultar</button>
                             </div>
                         </div>` : '';
-                    const creds = [];
-                    for (const [field,label] of [['correo_login','Correo'],['perfil_nombre','Perfil']]) {
-                        if(s[field]) creds.push(`<div class="gx-access-row"><div><span>${label}</span><strong>${escape(s[field])}</strong></div><button type="button" data-value="${escape(s[field])}" data-label="${label}" onclick="copiarDatoRapido(this.dataset.value,this.dataset.label)" aria-label="Copiar ${label}">Copiar</button></div>`);
+                    const realAccesses = Array.isArray(s.accesos) ? s.accesos : [];
+                    const invitationLabel = state => ({
+                        activa:'Invitación activa',
+                        enviada:'Invitación enviada',
+                        pendiente:'Invitación pendiente',
+                        revision:'En revisión',
+                        sin_verificar:'Pendiente de configurar'
+                    }[String(state || '').toLowerCase()] || 'Pendiente de configurar');
+                    const accessRow = (label,value,copyLabel=label) => value
+                        ? `<div class="gx-access-row"><div><span>${escape(label)}</span><strong>${escape(value)}</strong></div><button type="button" data-value="${escape(value)}" data-label="${escape(copyLabel)}" onclick="copiarDatoRapido(this.dataset.value,this.dataset.label)" aria-label="Copiar ${escape(copyLabel)}">Copiar</button></div>`
+                        : '';
+                    let credsHTML = '';
+
+                    if(realAccesses.length) {
+                        const normalizedNames = new Set(realAccesses.map(a => gxNormalizeUiText(a.servicio || s.nombre)));
+                        const multiPlatform = normalizedNames.size > 1;
+                        const multiAccess = realAccesses.length > 1;
+
+                        credsHTML = realAccesses.map((a,aIdx) => {
+                            const mode = String(a.modo_acceso || 'compartido').toLowerCase();
+                            const sameName = gxNormalizeUiText(a.servicio || '') === gxNormalizeUiText(s.nombre || '');
+                            let accessTitle = '';
+                            if(multiPlatform || !sameName) accessTitle = a.servicio || `Acceso ${aIdx+1}`;
+                            else if(multiAccess) accessTitle = `Acceso ${Number(a.ordinal || aIdx+1)}`;
+
+                            const groupHead = (accessTitle || mode === 'invitacion')
+                                ? `<div class="gx-access-group-head">${accessTitle ? `<strong>${escape(accessTitle)}</strong>` : '<strong>Acceso</strong>'}<span>${mode === 'invitacion' ? 'INVITACIÓN' : 'COMPARTIDO'}</span></div>`
+                                : '';
+
+                            const rows = [];
+                            if(mode === 'invitacion') {
+                                if(a.correo) rows.push(accessRow('Correo personal',a.correo,'Correo'));
+                                rows.push(`<div class="gx-access-row gx-access-row-static"><div><span>Estado</span><strong>${escape(invitationLabel(a.estado_invitacion))}</strong></div></div>`);
+                            } else {
+                                if(a.correo) rows.push(accessRow('Correo',a.correo,'Correo'));
+                                if(a.perfil_nombre) rows.push(accessRow('Perfil',a.perfil_nombre,'Perfil'));
+                                if(a.perfil_pin) {
+                                    const pinId=`gx-pin-${idx}-${aIdx}`;
+                                    rows.push(`<div class="gx-access-row"><div><span>PIN del perfil</span><strong id="${pinId}">••••</strong></div><button type="button" data-pin="${escape(a.perfil_pin)}" aria-pressed="false" aria-label="Mostrar PIN" onclick="gxRevealServicePin(this,'${pinId}')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>`);
+                                }
+                            }
+
+                            if(!rows.length) {
+                                rows.push(`<p class="gx-access-empty gx-access-empty-inline">${mode === 'invitacion' ? 'Falta configurar el correo de la cuenta personal.' : 'Este acceso todavía no tiene una cuenta asignada.'}</p>`);
+                            }
+                            return `<div class="gx-access-group">${groupHead}${rows.join('')}</div>`;
+                        }).join('');
+                    } else {
+                        const legacy = [];
+                        for (const [field,label] of [['correo_login','Correo'],['perfil_nombre','Perfil']]) {
+                            if(s[field]) legacy.push(accessRow(label,s[field],label));
+                        }
+                        if(s.perfil_pin) legacy.push(`<div class="gx-access-row"><div><span>PIN del perfil</span><strong id="gx-pin-${idx}">••••</strong></div><button type="button" data-pin="${escape(s.perfil_pin)}" aria-pressed="false" aria-label="Mostrar PIN" onclick="gxRevealServicePin(this,${idx})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>`);
+                        credsHTML = legacy.length ? legacy.join('') : '<p class="gx-access-empty">¿Necesitas tus datos de acceso? Escríbenos desde Soporte.</p>';
                     }
-                    if(s.perfil_pin) creds.push(`<div class="gx-access-row"><div><span>PIN del perfil</span><strong id="gx-pin-${idx}">••••</strong></div><button type="button" data-pin="${escape(s.perfil_pin)}" aria-pressed="false" aria-label="Mostrar PIN" onclick="gxRevealServicePin(this,${idx})"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></div>`);
-                    const credsHTML = creds.length ? creds.join('') : '<p class="gx-access-empty">¿Necesitas tus datos de acceso? Escríbenos desde Soporte.</p>';
 
                     srvHTML += `
                         <article class="gx-service-manage-card ${updateNotice ? 'gx-service-has-update' : ''}" id="gx-service-card-${idx}" ${updateNotice ? `data-gx-update-key="${escape(updateKey)}"` : ''}>
@@ -7424,9 +7501,12 @@
             }
         }
 
-        function gxRevealServicePin(button,index) {
+        function gxRevealServicePin(button,target) {
             const show=button.getAttribute('aria-pressed')!=='true';
-            document.getElementById(`gx-pin-${index}`).textContent=show?button.dataset.pin:'••••';
+            const targetId=String(target || '').startsWith('gx-pin-') ? String(target) : `gx-pin-${target}`;
+            const pinNode=document.getElementById(targetId);
+            if(!pinNode) return;
+            pinNode.textContent=show?button.dataset.pin:'••••';
             button.setAttribute('aria-pressed',String(show));
             button.setAttribute('aria-label',show?'Ocultar PIN':'Mostrar PIN');
         }
@@ -9509,6 +9589,8 @@
         const CANCELACIONES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente";
         const CREDENCIALES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/credenciales-cliente";
         const NOVEDADES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/novedades-cliente";
+        const ESTADO_CUENTA_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-cuenta-beta";
+        const ACCESOS_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/accesos-cliente-beta";
         const TOKEN_KEY = "goxion_client_token";
 
         async function missionRequest(payload) {
@@ -9562,11 +9644,11 @@
         async function cargarExtrasPrivados(data, token) {
             if(!data || !token) return data;
 
-            const request = async (url) => {
+            const request = async (url, accion="listar") => {
                 const r=await fetch(url,{
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
-                    body:JSON.stringify({accion:"listar"}),
+                    body:JSON.stringify({accion,datos:{}}),
                     cache:"no-store"
                 });
                 const {text,json}=await parseJSON(r);
@@ -9574,10 +9656,12 @@
                 return json;
             };
 
-            const [cancelaciones,credenciales,novedades]=await Promise.allSettled([
+            const [cancelaciones,credenciales,novedades,estadoCuenta,accesosCliente]=await Promise.allSettled([
                 request(CANCELACIONES_CLIENTE_URL),
                 request(CREDENCIALES_CLIENTE_URL),
-                request(NOVEDADES_CLIENTE_URL)
+                request(NOVEDADES_CLIENTE_URL),
+                request(ESTADO_CUENTA_URL,"mi_estado"),
+                request(ACCESOS_CLIENTE_URL)
             ]);
 
             if(cancelaciones.status==="fulfilled") {
@@ -9605,6 +9689,22 @@
             } else {
                 console.warn("Novedades Mi Espacio:",novedades.reason);
                 data.novedades_servicio=[];
+            }
+
+            if(estadoCuenta.status==="fulfilled" && estadoCuenta.value?.estado_cuenta) {
+                data.estado_cuenta=estadoCuenta.value.estado_cuenta;
+            } else {
+                console.warn("Estado de cuenta central Mi Espacio:",estadoCuenta.reason || "No disponible");
+                data.estado_cuenta=null;
+            }
+
+            if(accesosCliente.status==="fulfilled") {
+                data.cliente_accesos=Array.isArray(accesosCliente.value?.accesos)
+                    ? accesosCliente.value.accesos
+                    : [];
+            } else {
+                console.warn("Accesos reales Mi Espacio:",accesosCliente.reason || "No disponible");
+                data.cliente_accesos=[];
             }
 
             return data;
@@ -9637,6 +9737,7 @@ function goxionViewModelAdapter(data) {
             pago_revision_updated_at: c.pago_revision_updated_at || null,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
+            estado_cuenta: data?.estado_cuenta || null,
             servicios: (data.servicios || []).map(s => {
                 const serviceCancellations=(data.cancelaciones || [])
                     .filter(x => String(x.cliente_servicio_id || "") === String(s.id || ""))
@@ -9658,6 +9759,24 @@ function goxionViewModelAdapter(data) {
                     correo_login: s.correo_login || "",
                     perfil_nombre: s.perfil_nombre || "",
                     perfil_pin: s.perfil_pin || "",
+                    accesos: (data.cliente_accesos || [])
+                        .filter(a => String(a.cliente_servicio_id || "") === String(s.id || ""))
+                        .sort((a,b) =>
+                            String(a.servicio || "").localeCompare(String(b.servicio || ""),"es") ||
+                            Number(a.ordinal || 1)-Number(b.ordinal || 1)
+                        )
+                        .map(a => ({
+                            id: a.id || "",
+                            servicio_id: a.servicio_id || "",
+                            servicio: a.servicio || s.nombre || "Servicio",
+                            modo_acceso: a.modo_acceso || "compartido",
+                            ordinal: Number(a.ordinal || 1),
+                            correo: a.correo || "",
+                            perfil_nombre: a.perfil_nombre || "",
+                            perfil_pin: a.perfil_pin || "",
+                            estado_invitacion: a.estado_invitacion || "",
+                            configurado: a.configurado === true
+                        })),
                     cancelacion: latestCancellation,
                     credencial_pendiente: pendingCredential,
                     novedades: (data.novedades_servicio || []).filter(n =>
@@ -9916,7 +10035,7 @@ function goxionViewModelAdapter(data) {
             }).catch(e => console.log("Notificación no enviada", e));
         };
 
-        console.info("GOXION Ayuda v1.2.1: registro validado + retención inteligente + experiencia premium.");
+        console.info("GOXION Ayuda v1.2.3: accesos reales + ruta de Estado de Cuenta corregida.");
     })();
     </script>
 <script id="goxion-nav-controller">
@@ -10849,7 +10968,7 @@ function goxionViewModelAdapter(data) {
 </script>
 
 <div class="goxion-release-version" aria-label="Versión de GOXION">
-    GOXION · Ayuda · v1.2.0
+    GOXION · Ayuda · v1.2.3
 </div>
 
 <script id="goxion-production-interactions-js">
@@ -11723,6 +11842,35 @@ function goxionViewModelAdapter(data) {
     margin:3px 0 12px;
     font-weight:600;
 }
+.gx-access-group{
+    min-width:0;
+}
+.gx-access-group + .gx-access-group{
+    margin-top:8px;
+    padding-top:12px;
+    border-top:1px solid rgba(255,255,255,.08);
+}
+.gx-access-group-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0 0 2px;
+}
+.gx-access-group-head strong{
+    min-width:0;
+    color:#f2f4ff;
+    font-size:11px;
+    font-weight:700;
+    overflow-wrap:anywhere;
+}
+.gx-access-group-head span{
+    flex-shrink:0;
+    color:#8ea0bd;
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:.08em;
+}
 .gx-access-row{
     display:flex;
     align-items:center;
@@ -11773,6 +11921,14 @@ function goxionViewModelAdapter(data) {
 .gx-access-row button:active{
     opacity:.62;
     transform:scale(.94);
+}
+.gx-access-row-static{
+    padding-right:37px;
+}
+.gx-access-empty-inline{
+    margin:7px 0 2px;
+    color:#8f9ab0;
+    font-size:11px;
 }
 
 /* Solo Más opciones usa cápsula. */
@@ -13297,9 +13453,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 
 
 
-<style id="goxion-organic-morph">
+<style id="goxion-ayuda-beta-16-organic-morph">
 /* =========================================================
-   GOXION · AYUDA v1.2.1
+   GOXION · AYUDA BETA 16
    Morph orgánico + retención visual refinada.
    ========================================================= */
 
@@ -13859,9 +14015,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 
 
 
-<style id="goxion-discount-language">
+<style id="goxion-ayuda-beta-18-discount-language">
 /* =========================================================
-   GOXION · AYUDA v1.2.1
+   GOXION · AYUDA BETA 18
    Descuentos: misma referencia visual del CTA -10%.
    ========================================================= */
 
@@ -14179,9 +14335,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 </style>
 
 
-<style id="goxion-validation-retention">
+<style id="goxion-ayuda-beta-19-validation-retention">
 /* =========================================================
-   GOXION · AYUDA v1.2.1
+   GOXION · AYUDA BETA 19
    Ajuste fino visual, sin cambios de backend.
    ========================================================= */
 
@@ -14402,9 +14558,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 </style>
 
 
-<style id="goxion-registration-premium">
+<style id="goxion-ayuda-beta-20-registration-premium">
 /* =========================================================
-   GOXION · AYUDA v1.2.1
+   GOXION · AYUDA BETA 20
    Registro -10%: alineación Mi Espacio + paleta unificada.
    ========================================================= */
 
@@ -14672,9 +14828,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 </style>
 
 
-<style id="goxion-registration-transitions">
+<style id="goxion-ayuda-beta-21-transitions">
 /* =========================================================
-   GOXION · AYUDA v1.2.1
+   GOXION · AYUDA BETA 21
    Respiración, gradiente vivo y transiciones suaves.
    ========================================================= */
 
@@ -14815,9 +14971,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 </style>
 
 
-<style id="goxion-registration-close-alignment">
+<style id="goxion-ayuda-beta-22-close-alignment">
 /* =========================================================
-   GOXION · AYUDA v1.2.1
+   GOXION · AYUDA BETA 22
    Corrección puntual de jerarquía del botón cerrar.
    ========================================================= */
 
