@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-goxion-version="1.0.1">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -239,12 +239,34 @@
   </style>
 
 
-<style id="goxion-index-beta-v7-1-incomplete-badge">
+<style id="goxion-index-incomplete-payment-badge">
 .badge-incomplete{
     color:var(--warning-amber)!important;
     border-color:rgba(255,170,0,.34)!important;
     background:rgba(255,170,0,.10)!important;
     box-shadow:0 0 16px rgba(255,170,0,.08);
+}
+</style>
+
+
+<style id="goxion-release-version-style">
+.goxion-release-version {
+    display:block;
+    width:auto;
+    max-width:100%;
+    box-sizing:border-box;
+    margin:16px auto 0;
+    padding:0 8px calc(2px + env(safe-area-inset-bottom, 0px));
+    text-align:center;
+    color:rgba(149,164,189,.34);
+    font-size:8px;
+    line-height:1;
+    font-weight:600;
+    letter-spacing:.85px;
+    text-transform:uppercase;
+    user-select:none;
+    -webkit-user-select:none;
+    pointer-events:none;
 }
 </style>
 
@@ -291,17 +313,18 @@
 </div>
 
 
-<script id="goxion-beta-index-prelude">
+<script id="goxion-index-supabase-layer">
 (() => {
-    const MI_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio-beta";
-    const NOTIFY_BETA = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion-beta";
-    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro-beta";
-    const TRATO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/trato-justo-beta";
+    const MI_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
+    const NOTIFY_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
+    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro";
+    const TRATO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/trato-justo";
+    const ESTADO_CUENTA_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-cuenta-beta";
     const TOKEN_KEY = "goxion_client_token";
     const nativeFetch = window.fetch.bind(window);
 
     
-function goxionBetaLegacy(data) {
+function goxionLegacyAdapter(data) {
     const legacy = {
         _goxion_config: {
             alertas: data?.alertas || {},
@@ -331,6 +354,7 @@ function goxionBetaLegacy(data) {
             pago_revision_updated_at: c.pago_revision_updated_at || "",
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
+            estado_cuenta: data?.estado_cuenta || null,
             trato_justo_compensaciones: Array.isArray(data.trato_justo_compensaciones) ? data.trato_justo_compensaciones : [],
             servicios: (data.servicios || []).map(s => ({
                 id: s.id,
@@ -380,8 +404,8 @@ function goxionBetaLegacy(data) {
                 });
             }
 
-            const [r, periodoR, tratoR] = await Promise.all([
-                nativeFetch(MI_BETA, {
+            const [r, periodoR, tratoR, estadoR] = await Promise.all([
+                nativeFetch(MI_URL, {
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
                     body:"{}"
@@ -395,6 +419,12 @@ function goxionBetaLegacy(data) {
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
                     body:JSON.stringify({accion:"listar_cliente",datos:{}})
+                }).catch(() => null),
+                nativeFetch(ESTADO_CUENTA_URL, {
+                    method:"POST",
+                    headers:{"Content-Type":"application/json","X-Client-Token":token},
+                    body:JSON.stringify({accion:"mi_estado",datos:{}}),
+                    cache:"no-store"
                 }).catch(() => null)
             ]);
             const {json} = await parseJSON(r);
@@ -425,10 +455,21 @@ function goxionBetaLegacy(data) {
                 } catch {}
             }
 
+            if (estadoR?.ok) {
+                try {
+                    const estadoData = await estadoR.json();
+                    if (estadoData?.ok === true && estadoData.estado_cuenta) {
+                        json.estado_cuenta = estadoData.estado_cuenta;
+                        if (json.cliente && estadoData.estado_cuenta.periodo) {
+                            json.cliente.periodo_pendiente = estadoData.estado_cuenta.periodo;
+                        }
+                    }
+                } catch {}
+            }
+
             if (!r.ok || json?.ok !== true) {
                 if (r.status === 401) {
                     localStorage.removeItem(TOKEN_KEY);
-                    localStorage.removeItem("goxion_user_key");
                 }
                 return new Response(JSON.stringify({}), {
                     status:200,
@@ -436,7 +477,7 @@ function goxionBetaLegacy(data) {
                 });
             }
 
-            return new Response(JSON.stringify(goxionBetaLegacy(json)), {
+            return new Response(JSON.stringify(goxionLegacyAdapter(json)), {
                 status:200,
                 headers:{"Content-Type":"application/json","Cache-Control":"no-store"}
             });
@@ -448,7 +489,7 @@ function goxionBetaLegacy(data) {
             if (init?.body instanceof FormData) {
                 if (!token) return new Response(JSON.stringify({ok:false,error:"Sesión requerida"}), {status:401});
 
-                const mr = await nativeFetch(MI_BETA, {
+                const mr = await nativeFetch(MI_URL, {
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
                     body:JSON.stringify({modo:"marcar_pago_revision"})
@@ -458,7 +499,7 @@ function goxionBetaLegacy(data) {
 
                 const fd = init.body;
                 fd.set("categoria", "pagos");
-                return nativeFetch(NOTIFY_BETA, {
+                return nativeFetch(NOTIFY_URL, {
                     method:"POST",
                     headers:{"X-Client-Token":token},
                     body:fd
@@ -468,7 +509,7 @@ function goxionBetaLegacy(data) {
             let payload = {};
             try { payload = JSON.parse(init?.body || "{}"); } catch {}
             const emb = payload?.embeds?.[0] || {};
-            return nativeFetch(NOTIFY_BETA, {
+            return nativeFetch(NOTIFY_URL, {
                 method:"POST",
                 headers:{"Content-Type":"application/json"},
                 body:JSON.stringify({
@@ -565,10 +606,11 @@ function goxionBetaLegacy(data) {
       }
 
       const hoy = new Date();
+      const gxEstadoCuenta = cliente.estado_cuenta || null;
       const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
       // Periodo persistente: no cambia solo porque inició un mes nuevo.
-      const rawPeriodo = String(cliente.periodo_pendiente || "");
+      const rawPeriodo = String(gxEstadoCuenta?.periodo || cliente.periodo_pendiente || "");
       const matchPeriodo = rawPeriodo.match(/^(\d{4})-(\d{2})/);
       const periodoYear = matchPeriodo ? Number(matchPeriodo[1]) : hoy.getFullYear();
       const periodoMonth = matchPeriodo ? Math.max(0, Math.min(11, Number(matchPeriodo[2]) - 1)) : hoy.getMonth();
@@ -580,7 +622,10 @@ function goxionBetaLegacy(data) {
       const diaCorteReal = Math.min(Math.max(1, Number(diaPago) || 15), ultimoDiaPeriodo);
       const hoyUTC = Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
       const corteUTC = Date.UTC(periodoYear, periodoMonth, diaCorteReal);
-      const difDias = Math.round((corteUTC - hoyUTC) / 86400000);
+      const difDiasLocal = Math.round((corteUTC - hoyUTC) / 86400000);
+      const difDias = gxEstadoCuenta
+          ? (Number(gxEstadoCuenta.dias_atraso || 0) > 0 ? -Number(gxEstadoCuenta.dias_atraso || 0) : Number(gxEstadoCuenta.dias_para_corte ?? difDiasLocal))
+          : difDiasLocal;
       const etiquetaCorte = difDias < 0 ? "Venció" : "Corte";
 
       // Estado mensual real: un pago solo cubre el periodo al que pertenece.
@@ -603,21 +648,31 @@ function goxionBetaLegacy(data) {
           p => String(p.periodo || p.fecha || "").trim() !== ""
       );
 
-      let estaPagadoPeriodo = Boolean(
-          pagoPeriodoActual ||
-          (!tieneHistorialConPeriodo && cliente.estado === "pagado")
-      );
+      let estaPagadoPeriodo = gxEstadoCuenta
+          ? gxEstadoCuenta.esta_pagado_periodo === true
+          : Boolean(
+              pagoPeriodoActual ||
+              (!tieneHistorialConPeriodo && cliente.estado === "pagado")
+            );
+
+      // Un comprobante en revisión siempre tiene prioridad visual sobre "pagado".
+      // El estado verde sólo vuelve cuando Administración aprueba y Supabase
+      // limpia pago_en_revision / marca pago_revision_estado como aprobado.
+      const reviewState = String(cliente.pago_revision_estado || "").toLowerCase();
+      const enRevision = gxEstadoCuenta
+          ? gxEstadoCuenta.pago_en_revision === true
+          : (cliente.pago_en_revision === true || reviewState === "revision");
 
       // El cambio manual desde Admin manda sobre el periodo activo.
-      if (cliente.estado === "pendiente" || cliente.estado === "suspendido") {
+      if (cliente.estado === "pendiente" || cliente.estado === "suspendido" || enRevision) {
           estaPagadoPeriodo = false;
       }
 
-      let rachaOriginal = cliente.pagos_puntuales || 0;
-      let racha = rachaOriginal;
-      let perdioRacha = false;
+      let rachaOriginal = gxEstadoCuenta ? Number(gxEstadoCuenta.lealtad?.pagos_guardados || 0) : (cliente.pagos_puntuales || 0);
+      let racha = gxEstadoCuenta ? Number(gxEstadoCuenta.lealtad?.pagos_efectivos || 0) : rachaOriginal;
+      let perdioRacha = gxEstadoCuenta ? gxEstadoCuenta.lealtad?.racha_reiniciada_virtual === true : false;
 
-      if (!estaPagadoPeriodo && difDias < 0 && rachaOriginal > 0) {
+      if (!gxEstadoCuenta && !estaPagadoPeriodo && difDias < 0 && rachaOriginal > 0) {
           racha = 0;
           perdioRacha = true;
       }
@@ -637,6 +692,7 @@ function goxionBetaLegacy(data) {
       } else {
         serviciosHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; padding: 15px 0;">No tienes servicios activos asignados.</div>`;
       }
+      if (gxEstadoCuenta) subtotal = Number(gxEstadoCuenta.subtotal || subtotal);
 
       let pctMoraDiaria = 0;
       let montoMora = 0;
@@ -648,33 +704,23 @@ function goxionBetaLegacy(data) {
       let uiColor = "var(--neon-blue)";
       let mensajeAtrasoHTML = "";
 
-      const isReviewLocal = localStorage.getItem(`revision_pago_${clienteKey}`) === periodoStr;
-
-      // Si el periodo actual ya está pagado, cualquier bandera local de revisión quedó obsoleta.
-      if (estaPagadoPeriodo) {
-          localStorage.removeItem(`revision_pago_${clienteKey}`);
-      }
-
-      const enRevision = !estaPagadoPeriodo && (
-          cliente.pago_en_revision === true ||
-          (isReviewLocal && cliente.estado !== "pendiente" && cliente.estado !== "suspendido")
-      );
-
-      const montoFaltanteRevision = Math.max(0, Number(cliente.pago_revision_monto_faltante || 0));
-      const pagoIncompleto = !estaPagadoPeriodo
-          && !enRevision
-          && String(cliente.pago_revision_estado || "").toLowerCase() === "incompleto";
+      // Supabase es la única fuente de verdad del estado de revisión.
+      const montoFaltanteRevision = Math.max(0, Number(gxEstadoCuenta?.monto_faltante_revision ?? cliente.pago_revision_monto_faltante ?? 0));
+      const pagoIncompleto = gxEstadoCuenta
+          ? gxEstadoCuenta.pago_incompleto === true
+          : (!estaPagadoPeriodo
+              && !enRevision
+              && String(cliente.pago_revision_estado || "").toLowerCase() === "incompleto");
       const tieneDiferenciaPendiente = pagoIncompleto && montoFaltanteRevision > 0;
 
-      if (estaPagadoPeriodo) {
+      if (enRevision) {
+          badgeClass = "badge-review";
+          badgeText = `⏳ Pago en revisión`;
+          uiColor = "var(--neon-purple)";
+      } else if (estaPagadoPeriodo) {
           badgeClass = "badge-paid";
           badgeText = "✅ Al corriente este mes";
           uiColor = "var(--success-neon)";
-          localStorage.removeItem(`revision_pago_${clienteKey}`);
-      } else if (enRevision) {
-          badgeClass = "badge-review";
-          badgeText = `⏳ Validando Pago`;
-          uiColor = "var(--neon-purple)";
       } else if (pagoIncompleto) {
           badgeClass = "badge-incomplete";
           badgeText = tieneDiferenciaPendiente
@@ -695,12 +741,18 @@ function goxionBetaLegacy(data) {
           uiColor = "var(--danger-red)";
 
           let pctMoraCalculado = diasAtraso * 0.05;
-          pctMoraDiaria = Math.min(pctMoraCalculado, 0.50);
-          montoMora = Math.round(subtotal * pctMoraDiaria);
+          pctMoraDiaria = gxEstadoCuenta
+              ? Number(gxEstadoCuenta.cargos?.mora_porcentaje || 0) / 100
+              : Math.min(pctMoraCalculado, 0.50);
+          montoMora = gxEstadoCuenta
+              ? Number(gxEstadoCuenta.cargos?.mora || 0)
+              : Math.round(subtotal * pctMoraDiaria);
           let acumMoraTotal = subtotal + montoMora;
 
           if (diasAtraso > 15 || cliente.estado === 'suspendido') {
-              montoBajaAdmin = Math.round(acumMoraTotal * 0.20);
+              montoBajaAdmin = gxEstadoCuenta
+                  ? Number(gxEstadoCuenta.cargos?.reactivacion || 0)
+                  : Math.round(acumMoraTotal * 0.20);
           }
 
           mensajeAtrasoHTML = `
@@ -736,7 +788,10 @@ function goxionBetaLegacy(data) {
           : `Progreso: <span class="loyalty-highlight" style="color:var(--text-main);">${racha}/4 pagos</span>. Faltan ${faltantes} pago(s) para subir a Nivel 1.`;
       }
 
-      let ahorro = (diasAtraso === 0 && cliente.estado !== 'suspendido' && !estaPagadoPeriodo) ? Math.round(subtotal * pctDescuento) : 0;
+      if (gxEstadoCuenta) pctDescuento = Number(gxEstadoCuenta.lealtad?.porcentaje || 0) / 100;
+      let ahorro = gxEstadoCuenta
+          ? Number(gxEstadoCuenta.lealtad?.monto || 0)
+          : ((diasAtraso === 0 && cliente.estado !== 'suspendido' && !estaPagadoPeriodo) ? Math.round(subtotal * pctDescuento) : 0);
       
       let totalDescuentosEspeciales = 0;
       let desgloseDescuentosHTML = '';
@@ -777,28 +832,31 @@ function goxionBetaLegacy(data) {
       
       let ahorroTotal = ahorro + totalDescuentosEspeciales + descuentoTratoJusto;
 
-      let totalFinal = (subtotal - ahorroTotal) + montoMora + montoBajaAdmin;
+      let totalFinal = gxEstadoCuenta
+          ? Number(gxEstadoCuenta.total_actual || 0)
+          : ((subtotal - ahorroTotal) + montoMora + montoBajaAdmin);
       if (totalFinal < 0) totalFinal = 0; 
 
-      let labelTotal = "Total a Pagar";
+      let labelTotal = gxEstadoCuenta?.total_label || "Total a Pagar";
 
       let btnAccionHTML = "";
 
-      if (estaPagadoPeriodo) {
-          totalFinal = 0;
-          labelTotal = "Saldo Pendiente";
-      } else if (enRevision) {
+      if (enRevision) {
           btnAccionHTML = `
             <div class="btn-review-state">
               <span>⏳ <strong>Tu comprobante está en revisión</strong></span>
               <span style="font-size: 11px; color: var(--text-muted);">El equipo de Goxion actualizará tu estado en breve.</span>
             </div>
           `;
+      } else if (estaPagadoPeriodo) {
+          totalFinal = gxEstadoCuenta ? Number(gxEstadoCuenta.total_actual || 0) : 0;
+          labelTotal = gxEstadoCuenta?.total_label || "Saldo Pendiente";
       } else if (pagoIncompleto) {
           // Administración ya validó el pago anterior y registró la diferencia.
           // Ese monto pasa a ser el saldo mostrado y el monto del siguiente comprobante.
-          if (tieneDiferenciaPendiente) totalFinal = montoFaltanteRevision;
-          labelTotal = "Saldo Pendiente";
+          if (gxEstadoCuenta) totalFinal = Number(gxEstadoCuenta.total_actual || 0);
+          else if (tieneDiferenciaPendiente) totalFinal = montoFaltanteRevision;
+          labelTotal = gxEstadoCuenta?.total_label || "Saldo Pendiente";
           btnAccionHTML = `
             <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
             <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
@@ -815,7 +873,18 @@ function goxionBetaLegacy(data) {
       }
 
       let breakdownHTML = '';
-      if (!estaPagadoPeriodo && !pagoIncompleto && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
+      if (gxEstadoCuenta && Array.isArray(gxEstadoCuenta.desglose) && gxEstadoCuenta.desglose.length && !estaPagadoPeriodo && !pagoIncompleto) {
+          breakdownHTML = `
+            <div class="glass-card breakdown-box">
+              ${gxEstadoCuenta.desglose.map(item => {
+                  const amount = Number(item?.monto || 0);
+                  const cls = amount < 0 ? 'discount-line' : (item?.tipo === 'cargo' ? 'surcharge-line' : '');
+                  const shown = amount < 0 ? `-$${Math.abs(amount).toFixed(2)}` : (item?.tipo === 'cargo' ? `+$${amount.toFixed(2)}` : `$${amount.toFixed(2)}`);
+                  return `<div class="breakdown-line ${cls}" ${item?.tipo === 'subtotal' ? 'style="color: var(--text-muted);"' : ''}><span>${item?.concepto || 'Ajuste'}</span><span>${shown}</span></div>`;
+              }).join('')}
+            </div>
+          `;
+      } else if (!estaPagadoPeriodo && !pagoIncompleto && (ahorroTotal > 0 || montoMora > 0 || montoBajaAdmin > 0)) {
           breakdownHTML = `
             <div class="glass-card breakdown-box">
               <div class="breakdown-line" style="color: var(--text-muted);"><span>Subtotal Mensual</span><span>$${subtotal}</span></div>
@@ -841,7 +910,7 @@ function goxionBetaLegacy(data) {
           <div class="balance-hero">
               <div class="total-label">${labelTotal}</div>
               <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">$${totalFinal.toFixed(2)}</div>
-              <div class="time-badge ${badgeClass}">${badgeText}</div>
+              <div class="time-badge ${badgeClass}">${gxEstadoCuenta?.estado_label ? `${gxEstadoCuenta.estado==='pagado'?'✅':gxEstadoCuenta.estado==='revision'?'⏳':gxEstadoCuenta.estado==='incompleto'?'⚠️':gxEstadoCuenta.estado==='vencido'?'🚨':'⏳'} ${gxEstadoCuenta.estado_label}` : badgeText}</div>
           </div>
         </div>
 
@@ -895,6 +964,7 @@ function goxionBetaLegacy(data) {
             <div class="footer-logo-container">
               <img src="logo2.PNG" alt="Goxion - Todo conectado" class="footer-logo" onerror="this.style.display='none'">
             </div>
+            <div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Index Beta 01 · fuente única</div>
           </div>
         </div>
       `;
@@ -974,8 +1044,6 @@ function goxionBetaLegacy(data) {
       const { clienteKey, periodo, monto, folio, nombre } = pagoActualInfo;
 
       // 1. Guardamos localmente el estado de revisión y completamos la misión de la app
-      localStorage.setItem(`revision_pago_${clienteKey}`, periodo);
-      localStorage.setItem(`goxion_mission_pago_completed_${folio}`, 'true');
 
       // 2. Preparamos el "sobre" con el archivo y la información
       const formData = new FormData();
@@ -1021,6 +1089,6 @@ function goxionBetaLegacy(data) {
   cargarEstadoCuenta();
 </script>
 
-<script>console.info("GOXION Index Beta V6: Trato Justo detallado + ciclo mensual automático.");</script>
+<script>console.info("GOXION Index v1.0.2: revisión de pago con prioridad sobre estado pagado.");</script>
 </body>
 </html>
