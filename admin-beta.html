@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.2-beta-13">
+<html lang="es" data-goxion-version="1.1.2-beta-14">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -4687,7 +4687,7 @@ details.gx-client-ops-context{
                                 <div>
                                     <span class="gx-eyebrow">Beta 13 · nueva estructura</span>
                                     <h3>Arquitectura de accesos</h3>
-                                    <p>Una contratación puede contener uno o varios accesos reales. El diagnóstico no modifica clientes.</p>
+                                    <p>Una contratación puede contener uno o varios accesos reales. Aquí verás quién tiene cada plataforma incluso si viene desde un combo. El diagnóstico no modifica clientes.</p>
                                 </div>
                                 <button type="button" onclick="gxRunAccessDiagnostic()">↻ Diagnosticar</button>
                             </div>
@@ -4713,6 +4713,19 @@ details.gx-client-ops-context{
                                 <small id="gx-account-platform-capacity">0 perfiles vinculados</small>
                             </div>
                         </div>
+
+                        <section class="gx-platform-detected" id="gx-platform-detected">
+                            <div class="gx-platform-detected-head">
+                                <div>
+                                    <span>Clientes detectados</span>
+                                    <strong id="gx-platform-detected-title">Selecciona una plataforma</strong>
+                                </div>
+                                <em id="gx-platform-detected-count">0</em>
+                            </div>
+                            <div id="gx-platform-detected-list" class="gx-platform-detected-list">
+                                <div class="gx-empty-inline">La detección aparecerá aquí automáticamente.</div>
+                            </div>
+                        </section>
 
                         <div id="gx-account-manager-list" class="gx-account-manager-list">
                             <div class="gx-empty-inline">Cargando cuentas…</div>
@@ -8174,7 +8187,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 })();
 </script>
 
-<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 13 · v1.1.2-beta-13</div>
+<div class="goxion-release-version" aria-label="Versión de GOXION">GOXION · Admin Beta 14 · v1.1.2-beta-14</div>
 
 <script id="goxion-admin-ayuda-bridge-controller">
 (() => {
@@ -10924,13 +10937,14 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         gxPopulateComponentSelect();
         gxDecorateCatalogProducts();
         gxDecorateClientAccessCards();
+        gxRenderPlatformDetected();
         return gxAccessModel;
     }
 
     function gxComputeDiagnostic(){
         const rows=[];let contracts=0,expected=0,review=0,combos=0,multipliers=0,specials=0;
         const missing=new Set();
-        Object.entries(window.clientesDict||{}).forEach(([key,c])=>{
+        Object.entries(clientesDict||{}).forEach(([key,c])=>{
             (c?.servicios||[]).filter(s=>s?.activo!==false).forEach((s,index)=>{
                 contracts++;const p=planService(s);expected+=p.items.length;
                 if(p.issues.length||!p.items.length)review++;
@@ -10969,11 +10983,34 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     function gxDecorateClientAccessCards(){
         if(!gxAccessModelLoaded)return;
         document.querySelectorAll('.gx-service-compact[data-gx-client-key]').forEach(card=>{
-            const key=card.dataset.gxClientKey,index=Number(card.dataset.gxServiceIndex),s=window.clientesDict?.[key]?.servicios?.[index];if(!s)return;
+            const key=card.dataset.gxClientKey,index=Number(card.dataset.gxServiceIndex),s=clientesDict?.[key]?.servicios?.[index];if(!s)return;
             const p=planService(s),needsPreview=p.kind!=="individual"||!s.servicio_id;
             const box=card.querySelector('.gx-smart-access-box');if(!box)return;
+
+            const oldVisible=card.querySelector('.gx-access-visible-summary');
+            if(oldVisible) oldVisible.remove();
+
+            if(needsPreview){
+                const details=card.querySelector('.gx-service-access-details');
+                const label=p.kind==='combo_legacy'?'COMBO':
+                    p.kind==='combo_formal'?'COMBO':
+                    p.kind==='multiplicador'?'MÚLTIPLE':'ACCESO ESPECIAL';
+                const chips=p.items.map((x,i)=>{
+                    const repeated=p.items.filter(y=>y.servicio_id===x.servicio_id).length>1;
+                    return `<span>${esc(x.servicio)}${repeated?` #${x.ordinal}`:''}</span>`;
+                }).join('');
+                details?.insertAdjacentHTML('beforebegin',`
+                    <div class="gx-access-visible-summary">
+                        <div>
+                            <strong>${label} · ${p.items.length} acceso${p.items.length===1?'':'s'}</strong>
+                            <small>GOXION detectó la estructura automáticamente.</small>
+                        </div>
+                        <div class="gx-access-visible-chips">${chips || '<span>Revisión necesaria</span>'}</div>
+                    </div>
+                `);
+            }
+
             if(!needsPreview){box.removeAttribute('data-gx-beta-preview');return}
-            if(box.getAttribute('data-gx-beta-preview')==='1')return;
             box.setAttribute('data-gx-beta-preview','1');
             box.innerHTML=`<div class="gx-beta-access-preview">
                 <div class="gx-beta-access-preview-head"><div><strong>${p.items.length} acceso${p.items.length===1?'':'s'} detectado${p.items.length===1?'':'s'}</strong><small>${p.kind==='combo_legacy'?'Combo existente pendiente de formalizar':p.kind==='combo_formal'?'Combo formal':p.kind==='multiplicador'?'Múltiples accesos de la misma plataforma':'Servicio especial detectado'}</small></div><span>Vista previa</span></div>
@@ -10983,6 +11020,68 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             </div>`;
         });
     }
+
+
+    // ---------- Detección visible por plataforma ----------
+    function gxDetectedForPlatform(serviceId){
+        const groups=new Map();
+        Object.entries(clientesDict||{}).forEach(([key,c])=>{
+            (c?.servicios||[]).forEach((s,index)=>{
+                if(s?.activo===false)return;
+                const p=planService(s);
+                const hits=p.items.filter(x=>String(x.servicio_id)===String(serviceId));
+                if(!hits.length)return;
+
+                const clientId=String(c?._id||c?.id||key);
+                const groupKey=`${clientId}|${index}`;
+                groups.set(groupKey,{
+                    key,index,
+                    cliente:c?.nombre||'Cliente',
+                    folio:c?.folio||'',
+                    contratacion:s?.nombre||'Servicio',
+                    cantidad:hits.length,
+                    kind:p.kind
+                });
+            });
+        });
+        return [...groups.values()].sort((a,b)=>
+            String(a.cliente).localeCompare(String(b.cliente),'es')
+            || String(a.contratacion).localeCompare(String(b.contratacion),'es')
+        );
+    }
+
+    function gxRenderPlatformDetected(){
+        const sel=document.getElementById('gx-account-platform');
+        const title=document.getElementById('gx-platform-detected-title');
+        const count=document.getElementById('gx-platform-detected-count');
+        const list=document.getElementById('gx-platform-detected-list');
+        if(!sel||!list)return;
+
+        const serviceId=String(sel.value||'');
+        const srv=productById(serviceId) ||
+            (gxAccessModel.servicios||[]).find(s=>String(s.id)===serviceId) ||
+            null;
+        const rows=serviceId?gxDetectedForPlatform(serviceId):[];
+
+        if(title)title.textContent=srv?`Quién tiene ${srv.nombre}`:'Selecciona una plataforma';
+        if(count)count.textContent=String(rows.reduce((n,r)=>n+r.cantidad,0));
+
+        if(!rows.length){
+            list.innerHTML='<div class="gx-empty-inline">No detecté clientes activos con esta plataforma.</div>';
+            return;
+        }
+
+        list.innerHTML=rows.map(r=>`
+            <div class="gx-platform-detected-row">
+                <div>
+                    <strong>${esc(r.cliente)}</strong>
+                    <small>${esc(r.folio)} · ${esc(r.contratacion)}</small>
+                </div>
+                <span>${r.cantidad>1?`${r.cantidad} accesos`:(r.kind.includes('combo')?'Desde combo':'1 acceso')}</span>
+            </div>
+        `).join('');
+    }
+    window.gxRenderPlatformDetected=gxRenderPlatformDetected;
 
     // ---------- Constructor de productos / combos ----------
     function gxPopulateComponentSelect(){
@@ -11059,9 +11158,154 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         try{inicializarPanel=window.inicializarPanel}catch{}
     }
 
+    const gxOldAccountPlatformChanged=window.gxAccountPlatformChanged;
+    if(typeof gxOldAccountPlatformChanged==='function'){
+        window.gxAccountPlatformChanged=function(...args){
+            const r=gxOldAccountPlatformChanged.apply(this,args);
+            setTimeout(gxRenderPlatformDetected,0);
+            return r;
+        };
+    }
+
+    const gxOldRenderPlatformAccounts=window.gxRenderPlatformAccounts;
+    if(typeof gxOldRenderPlatformAccounts==='function'){
+        window.gxRenderPlatformAccounts=function(...args){
+            const r=gxOldRenderPlatformAccounts.apply(this,args);
+            setTimeout(gxRenderPlatformDetected,0);
+            return r;
+        };
+    }
+
     document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('gx-product-builder')?.classList.contains('show'))gxCloseProductBuilder(e)});
 })();
 </script>
+
+
+<style id="goxion-admin-beta-14-visible-accesses">
+.gx-platform-detected{
+    margin:10px 0 12px;
+    padding:11px;
+    border:1px solid rgba(91,210,255,.16);
+    border-radius:14px;
+    background:rgba(6,17,25,.56);
+}
+.gx-platform-detected-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:8px;
+}
+.gx-platform-detected-head span{
+    display:block;
+    color:#8392a9;
+    font-size:.5rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+.gx-platform-detected-head strong{
+    display:block;
+    margin-top:2px;
+    font-size:.66rem;
+}
+.gx-platform-detected-head em{
+    min-width:32px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    border-radius:999px;
+    background:rgba(0,229,255,.09);
+    border:1px solid rgba(0,229,255,.18);
+    color:#60f0ff;
+    font-size:.63rem;
+    font-style:normal;
+    font-weight:800;
+}
+.gx-platform-detected-list{
+    display:grid;
+    gap:6px;
+}
+.gx-platform-detected-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:8px 9px;
+    border-radius:10px;
+    background:rgba(255,255,255,.025);
+    border:1px solid rgba(255,255,255,.045);
+}
+.gx-platform-detected-row strong{
+    display:block;
+    font-size:.61rem;
+}
+.gx-platform-detected-row small{
+    display:block;
+    margin-top:2px;
+    color:#8490a4;
+    font-size:.48rem;
+    line-height:1.35;
+}
+.gx-platform-detected-row>span{
+    flex:0 0 auto;
+    padding:4px 7px;
+    border-radius:999px;
+    background:rgba(124,77,255,.10);
+    border:1px solid rgba(124,77,255,.18);
+    color:#c6b4ff;
+    font-size:.47rem;
+    font-weight:700;
+}
+
+.gx-access-visible-summary{
+    margin-top:8px;
+    padding:8px 9px;
+    border-radius:11px;
+    border:1px solid rgba(124,77,255,.18);
+    background:linear-gradient(135deg,rgba(124,77,255,.07),rgba(0,224,255,.035));
+}
+.gx-access-visible-summary>div:first-child{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+}
+.gx-access-visible-summary strong{
+    font-size:.54rem;
+    color:#d9ccff;
+}
+.gx-access-visible-summary small{
+    color:#7f8ba0;
+    font-size:.45rem;
+}
+.gx-access-visible-chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:5px;
+    margin-top:7px;
+}
+.gx-access-visible-chips span{
+    padding:4px 6px;
+    border-radius:999px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.055);
+    color:#c7d2e3;
+    font-size:.45rem;
+}
+
+@media(max-width:840px){
+    .gx-platform-detected-row{
+        align-items:flex-start;
+    }
+    .gx-access-visible-summary>div:first-child{
+        display:block;
+    }
+    .gx-access-visible-summary small{
+        display:block;
+        margin-top:2px;
+    }
+}
+</style>
 
 </body>
 </html>
