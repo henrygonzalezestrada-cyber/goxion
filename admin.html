@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" data-goxion-version="1.1.2">
+<html lang="es" data-goxion-version="1.1.3">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -4970,6 +4970,22 @@ let clientesDict = {};
     let inventarioActivo = {};
     let currentStatusFilter = 'all'; 
 
+    function gxBillingState(cliente) {
+        const central = String(cliente?.estado_cuenta?.estado || '').toLowerCase();
+        if (central) return central;
+        if (cliente?.pago_en_revision === true) return 'revision';
+        if (cliente?.estado === 'suspendido') return 'suspendido';
+        return cliente?.estado === 'pagado' ? 'pagado' : 'pendiente';
+    }
+
+    function gxBillingBucket(cliente) {
+        if (cliente?.estado === 'suspendido') return 'suspendido';
+        const state = gxBillingState(cliente);
+        if (state === 'revision') return 'revision';
+        if (state === 'pagado') return 'pagado';
+        return 'pendiente';
+    }
+
     const DEFAULT_SERVICES = [
         {nombre: "Netflix Premium", cuentas: 1, precio: 109, costo: 369, limite: 4, beneficios: "Resolución 4K Ultra HD, Audio Espacial"},
         {nombre: "Disney+ Premium", cuentas: 2, precio: 89, costo: 340, limite: 10, beneficios: "Descargas Offline, Calidad 4K"},
@@ -5138,7 +5154,7 @@ let clientesDict = {};
             const matchText = c.nombre.toLowerCase().includes(query) || c.folio.toLowerCase().includes(query);
             const matchStatus = statusFilter === 'all' 
                 ? true 
-                : (statusFilter === 'revision' ? c.pago_en_revision === true : c.estado === statusFilter);
+                : gxBillingBucket(c) === statusFilter;
             return matchText && matchStatus;
         });
 
@@ -5342,9 +5358,29 @@ let clientesDict = {};
                 </div>`;
             }
 
-            let enRevision = cliente.pago_en_revision === true;
-            let statusColor = enRevision ? 'var(--neon-yellow)' : (cliente.estado === 'pagado' ? 'var(--neon-green)' : (cliente.estado === 'suspendido' ? 'var(--neon-red)' : 'var(--neon-blue)'));
-            let statusBadge = enRevision ? '💳 REVISAR PAGO' : (cliente.estado === 'pagado' ? 'PAGADO' : (cliente.estado === 'suspendido' ? 'SUSPENDIDO' : 'PENDIENTE'));
+            const gxBillingStateNow = gxBillingState(cliente);
+            const gxBillingBucketNow = gxBillingBucket(cliente);
+            let enRevision = gxBillingStateNow === 'revision';
+            let statusColor = enRevision
+                ? 'var(--neon-yellow)'
+                : gxBillingBucketNow === 'pagado'
+                    ? 'var(--neon-green)'
+                    : (gxBillingStateNow === 'vencido' || gxBillingBucketNow === 'suspendido')
+                        ? 'var(--neon-red)'
+                        : 'var(--neon-blue)';
+            let statusBadge = enRevision
+                ? '💳 REVISAR PAGO'
+                : gxBillingBucketNow === 'pagado'
+                    ? 'PAGADO'
+                    : gxBillingBucketNow === 'suspendido'
+                        ? 'SUSPENDIDO'
+                        : gxBillingStateNow === 'vencido'
+                            ? 'VENCIDO'
+                            : gxBillingStateNow === 'incompleto'
+                                ? 'PAGO INCOMPLETO'
+                                : gxBillingStateNow === 'vence_hoy'
+                                    ? 'VENCE HOY'
+                                    : 'PENDIENTE';
             let pulseAnim = enRevision ? 'animation: pulse 1.5s infinite;' : '';
 
             let refActivo = cliente.referido_activo;
@@ -5495,22 +5531,32 @@ let clientesDict = {};
             const dueText = cardTiming?.due instanceof Date && !Number.isNaN(cardTiming.due.getTime())
                 ? cardTiming.due.toLocaleDateString('es-MX',{day:'numeric',month:'short'})
                 : `día ${cliente.dia_pago||15}`;
-            const paymentPrimary = cliente.pago_en_revision
+            const gxDaysLate = Number(gxEstadoCuenta?.dias_atraso || cardTiming.days || 0);
+            const gxDaysToCut = Number(gxEstadoCuenta?.dias_para_corte ?? cardTiming.days ?? 0);
+            const paymentPrimary = gxBillingStateNow === 'revision'
                 ? 'Pago en revisión'
-                : cliente.estado==='pagado'
+                : gxBillingStateNow === 'pagado'
                     ? 'Mensualidad cubierta'
-                    : cardTiming.type==='overdue'
-                        ? `Vencido hace ${cardTiming.days} día${cardTiming.days===1?'':'s'}`
-                        : cardTiming.type==='upcoming'
-                            ? (cardTiming.days===0?'Vence hoy':`Vence en ${cardTiming.days} día${cardTiming.days===1?'':'s'}`)
-                            : `Vence ${dueText}`;
-            const paymentSecondary = cliente.estado==='pagado'
+                    : gxBillingStateNow === 'vencido'
+                        ? `Vencido hace ${gxDaysLate} día${gxDaysLate===1?'':'s'}`
+                        : gxBillingStateNow === 'incompleto'
+                            ? 'Pago incompleto'
+                            : gxBillingStateNow === 'vence_hoy'
+                                ? 'Vence hoy'
+                                : gxBillingStateNow === 'por_vencer'
+                                    ? `Vence en ${gxDaysToCut} día${gxDaysToCut===1?'':'s'}`
+                                    : cardTiming.type==='overdue'
+                                        ? `Vencido hace ${cardTiming.days} día${cardTiming.days===1?'':'s'}`
+                                        : cardTiming.type==='upcoming'
+                                            ? (cardTiming.days===0?'Vence hoy':`Vence en ${cardTiming.days} día${cardTiming.days===1?'':'s'}`)
+                                            : `Vence ${dueText}`;
+            const paymentSecondary = gxBillingStateNow==='pagado'
                 ? `${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}`
                 : `Fecha ${dueText} · ${typeof gxPeriodLabel==='function'?gxPeriodLabel(cliente.periodo_pendiente):String(cliente.periodo_pendiente||'').slice(0,7)}`;
-            const paymentClass = cliente.pago_en_revision?'review'
-                : cliente.estado==='pagado'?'paid'
-                : cardTiming.type==='overdue'?'overdue'
-                : cardTiming.type==='upcoming'?'upcoming':'normal';
+            const paymentClass = gxBillingStateNow==='revision'?'review'
+                : gxBillingStateNow==='pagado'?'paid'
+                : gxBillingStateNow==='vencido'?'overdue'
+                : (gxBillingStateNow==='incompleto'||gxBillingStateNow==='vence_hoy'||gxBillingStateNow==='por_vencer')?'upcoming':'normal';
 
             card.innerHTML = `
                 <div class="card-header-main gx-client-card-header" onclick="toggleClientDetails('${key}')">
@@ -5556,7 +5602,7 @@ let clientesDict = {};
                             <div class="gx-billing-primary">
                                 <div><small>Próximo vencimiento</small><strong>${dueText}</strong></div>
                                 <div><small>Cobro actual</small><strong>$${gxCobroActual.toFixed(2)}</strong><span class="gx-billing-base-note">Base mensual $${gxSubtotalReal.toFixed(2)}</span></div>
-                                <div class="gx-billing-status ${paymentClass}"><small>Estado</small><strong>${cliente.pago_en_revision?'En revisión':cliente.estado==='pagado'?'Pagado':cliente.estado==='suspendido'?'Suspendido':cardTiming.type==='overdue'?'Vencido':'Pendiente'}</strong></div>
+                                <div class="gx-billing-status ${paymentClass}"><small>Estado</small><strong>${gxEstadoCuenta?.estado_label || (gxBillingBucketNow==='suspendido'?'Suspendido':gxBillingStateNow==='pagado'?'Pagado':gxBillingStateNow==='revision'?'En revisión':gxBillingStateNow==='vencido'?'Vencido':gxBillingStateNow==='incompleto'?'Pago incompleto':'Pendiente')}</strong></div>
                             </div>
 
                             ${gxBillingBreakdownHTML}
@@ -7197,11 +7243,11 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
  window.gxShowBenefitReady=()=>{goAdminTab('tab-clientes');const filtered={};Object.entries(clientesDict||{}).forEach(([k,c])=>{const r=c.referido_activo;if(r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3)filtered[k]=c});renderizarClientes(filtered)};
  window.gxToggleAccordion=b=>{const a=b.closest('.gx-accordion');const p=a?.parentElement;if(!a||!p)return;p.querySelectorAll(':scope > .gx-accordion').forEach(x=>{if(x!==a)x.classList.remove('open')});a.classList.toggle('open')};
  function restore(){if(!focusHome)return;const{details,parent,next}=focusHome;details.style.display='';details.classList.add('client-details');next&&next.parentNode===parent?parent.insertBefore(details,next):parent.appendChild(details);focusHome=null}
- window.gxOpenClientFocusBase=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=Number(c?.estado_cuenta?.total_actual ?? (c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)),status=c.pago_en_revision?'🔔 En revisión':c.estado==='pagado'?'✓ Pagado':c.estado==='suspendido'?'⛔ Suspendido':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${periodChip}</span><span>${status}</span><span>$${monthly.toFixed(2)} actual</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
+ window.gxOpenClientFocusBase=key=>{const d=document.getElementById(`details-${key}`),c=clientesDict?.[key],f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body');if(!d||!c||!f||!body)return;restore();focusHome={details:d,parent:d.parentNode,next:d.nextSibling};document.getElementById('gx-focus-folio').textContent=c.folio||'Cliente';document.getElementById('gx-focus-name').textContent=c.nombre||'Cliente';const monthly=Number(c?.estado_cuenta?.total_actual ?? (c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)),billingState=gxBillingState(c),billingBucket=gxBillingBucket(c),status=billingBucket==='suspendido'?'⛔ Suspendido':billingState==='revision'?'🔔 En revisión':billingState==='pagado'?'✓ Pagado':billingState==='vencido'?'⚠ Vencido':billingState==='incompleto'?'⚠ Pago incompleto':'◷ Pendiente',timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0},period=typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7),periodChip=timing.type==='overdue'?`${period} · ${timing.days}d vencido`:timing.type==='upcoming'?(timing.days===0?`${period} · hoy`:`${period} · ${timing.days}d`):period,alertChip=c.ciclo_cobro_manual?'🧪 Excepción manual':c.pago_en_revision?'🔔 Revisar pago':timing.type==='overdue'?'⚠️ Requiere cobro':timing.type==='upcoming'?'⏳ Próximo':'✓ Sin alertas';document.getElementById('gx-focus-summary').innerHTML=`<span>${periodChip}</span><span>${status}</span><span>$${monthly.toFixed(2)} actual</span><span>${alertChip}</span>`;d.style.display='block';d.classList.remove('client-details');body.innerHTML='';body.appendChild(d);f.classList.add('show');document.body.style.overflow='hidden';d.querySelectorAll('.gx-accordion').forEach((x,i)=>x.classList.toggle('open',i===0))};
  window.gxCloseClientFocus=()=>{const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;restore();f.classList.remove('show');document.body.style.overflow=''};
  window.toggleClientDetails=key=>gxOpenClientFocus(key);
  function stockLow(){let n=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>{const a=s?._inventario_auto;if(a){const v=s.stock_manual!==undefined&&s.stock_manual!==null&&s.stock_manual!==''?Number(s.stock_manual):Number(a.disponibles_auto??a.disponibles??0);if(v<=1||Number(a.sobrecupo||0)>0)n++}})}catch{}return n}
- window.gxUpdateOperationsSummaryBase=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>c.pago_en_revision===true).length,pending=v.filter(c=>!c.pago_en_revision&&c.estado==='pendiente').length,paid=v.filter(c=>c.estado==='pagado').length,susp=v.filter(c=>c.estado==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
+ window.gxUpdateOperationsSummaryBase=()=>{if(typeof clientesDict==='undefined')return;const v=Object.values(clientesDict||{}),total=v.length,review=v.filter(c=>gxBillingBucket(c)==='revision').length,pending=v.filter(c=>gxBillingBucket(c)==='pendiente').length,paid=v.filter(c=>gxBillingBucket(c)==='pagado').length,susp=v.filter(c=>gxBillingBucket(c)==='suspendido').length,benef=v.filter(c=>{const r=c.referido_activo;return r&&!r.beneficio_reclamado&&Number(r.plataformas||0)>=2&&Number(r.meses||0)>=3}).length,missions=v.filter(c=>c.gamificacion?.misiones_activas===true).length;const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=x};[['gx-count-total',total],['gx-count-review',review],['gx-count-pending',pending],['gx-count-paid',paid],['gx-count-suspended',susp],['gx-count-benefits',benef],['gx-count-missions',missions],['gx-count-stock',stockLow()],['pill-all',total],['pill-review',review],['pill-pending',pending],['pill-paid',paid],['pill-suspended',susp]].forEach(([a,b])=>set(a,b));let ing=0,cost=0;try{(configGlobal?.serviciosGlobales||[]).forEach(s=>cost+=Number(s.costo||0)*Number(s.cuentas||1));v.forEach(c=>{if(c.estado!=='suspendido')(c.servicios||[]).forEach(s=>ing+=Number(s.monto||0))})}catch{}set('kpi-margen',`${(ing>0?((ing-cost)/ing)*100:0).toFixed(1)}%`);const sub=document.getElementById('gx-client-page-subtitle');if(sub)sub.textContent=`${total} clientes · ${review} en revisión · ${pending} pendientes`};
  const add=window.agregarNuevoCliente;if(typeof add==='function')window.agregarNuevoCliente=function(...a){const before=new Set(Object.keys(clientesDict||{})),r=add.apply(this,a);setTimeout(()=>{const k=Object.keys(clientesDict||{}).find(x=>!before.has(x));if(k){goAdminTab('tab-clientes');gxOpenClientFocus(k)}gxUpdateOperationsSummary()},180);return r};
  const render=window.renderizarClientes;if(typeof render==='function')window.renderizarClientes=function(...a){const r=render.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
  const calc=window.calcularInventarioYFinanzas;if(typeof calc==='function')window.calcularInventarioYFinanzas=function(...a){const r=calc.apply(this,a);setTimeout(gxUpdateOperationsSummary,0);return r};
