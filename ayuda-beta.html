@@ -6426,7 +6426,10 @@
             const key = getCurrentClientKey(); 
             if(key) {
                 setTimeout(() => {
-                    window.location.href = `index.html?cliente=${encodeURIComponent(key)}`; 
+                    const indexTarget = /beta/i.test(window.location.pathname || "")
+                        ? "index-beta-01-estado-cuenta-central.html"
+                        : "index.html";
+                    window.location.href = `${indexTarget}?cliente=${encodeURIComponent(key)}`; 
                 }, 800);
             }
         }
@@ -6678,6 +6681,8 @@
             document.getElementById('tab-inicio-text').innerText = 'Mi Espacio';
 
             iniciarSaludoDinamico(cliente.nombre);
+
+            const gxEstadoCuenta = cliente.estado_cuenta || null;
 
             const payAlert = document.getElementById('dash-payment-review-alert');
             if(payAlert) {
@@ -6970,44 +6975,66 @@
             `;
 
             const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-            const hoy = new Date(); 
-            const diaPago = cliente.dia_pago || 15; 
-            const difDias = diaPago - hoy.getDate();
-            
-            document.getElementById('dash-date').innerText = `${diaPago} de ${meses[hoy.getMonth()]}`;
-            
-            let badgeHTML = "";
-            const dashboardReviewState = String(cliente.pago_revision_estado || '').toLowerCase();
-            const dashboardEnRevision = cliente.pago_en_revision === true || dashboardReviewState === 'revision';
+            const hoy = new Date();
+            const diaPago = Number(gxEstadoCuenta?.dia_pago ?? cliente.dia_pago ?? 15);
+            let difDias = gxEstadoCuenta
+                ? (Number(gxEstadoCuenta.dias_atraso || 0) > 0 ? -Number(gxEstadoCuenta.dias_atraso || 0) : Number(gxEstadoCuenta.dias_para_corte || 0))
+                : (diaPago - hoy.getDate());
 
-            if (dashboardEnRevision) {
-                badgeHTML = `<div class="time-badge badge-review">⏳ Pago en revisión</div>`;
-            } else if (cliente.estado === 'pagado') {
-                badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
-            } else if (difDias > 0) {
-                badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
-            } else if (difDias === 0) {
-                badgeHTML = `<div class="time-badge badge-today">⚠️ Vence HOY</div>`;
+            if(gxEstadoCuenta?.fecha_corte) {
+                const corte = new Date(`${gxEstadoCuenta.fecha_corte}T12:00:00`);
+                document.getElementById('dash-date').innerText = `${corte.getDate()} de ${meses[corte.getMonth()]}`;
             } else {
-                badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
+                document.getElementById('dash-date').innerText = `${diaPago} de ${meses[hoy.getMonth()]}`;
+            }
+
+            let badgeHTML = "";
+            if(gxEstadoCuenta) {
+                const st = String(gxEstadoCuenta.estado || "");
+                const cls = st === "pagado" ? "badge-ok" :
+                    st === "revision" ? "badge-review" :
+                    st === "incompleto" ? "badge-today" :
+                    st === "vencido" ? "badge-overdue" :
+                    st === "vence_hoy" ? "badge-today" : "badge-ok";
+                const icon = st === "pagado" ? "✨" :
+                    st === "revision" ? "⏳" :
+                    st === "incompleto" ? "⚠️" :
+                    st === "vencido" ? "🚨" :
+                    st === "vence_hoy" ? "⚠️" : "⏳";
+                badgeHTML = `<div class="time-badge ${cls}">${icon} ${gxEstadoCuenta.estado_label || "Estado actualizado"}</div>`;
+            } else {
+                const dashboardReviewState = String(cliente.pago_revision_estado || '').toLowerCase();
+                const dashboardEnRevision = cliente.pago_en_revision === true || dashboardReviewState === 'revision';
+                if (dashboardEnRevision) badgeHTML = `<div class="time-badge badge-review">⏳ Pago en revisión</div>`;
+                else if (cliente.estado === 'pagado') badgeHTML = `<div class="time-badge badge-ok">✨ Mensualidad Cubierta</div>`;
+                else if (difDias > 0) badgeHTML = `<div class="time-badge badge-ok">⏳ Faltan ${difDias} día(s)</div>`;
+                else if (difDias === 0) badgeHTML = `<div class="time-badge badge-today">⚠️ Vence HOY</div>`;
+                else badgeHTML = `<div class="time-badge badge-overdue">🚨 Pago Vencido</div>`;
             }
             document.getElementById('dash-badge').innerHTML = badgeHTML;
 
-            let pagos = cliente.pagos_puntuales || 0; 
+            let pagos = gxEstadoCuenta ? Number(gxEstadoCuenta.lealtad?.pagos_efectivos || 0) : (cliente.pagos_puntuales || 0);
             let meta = 4;
             let beneficio = "3% OFF";
-            
-            if (pagos >= 4 && pagos < 9) { 
-                meta = 9; 
-                beneficio = "6% OFF"; 
-            } else if (pagos >= 9) { 
-                meta = pagos; 
-                beneficio = "Nivel Máximo (6% OFF)"; 
+
+            if (pagos >= 4 && pagos < 9) {
+                meta = 9;
+                beneficio = "6% OFF";
+            } else if (pagos >= 9) {
+                meta = pagos;
+                beneficio = "Nivel Máximo (6% OFF)";
             }
-            
+
             document.getElementById('loyalty-count').innerText = `${pagos}/${meta} Pagos`;
             setTimeout(() => { document.getElementById('loyalty-bar').style.width = `${Math.min((pagos / meta) * 100, 100)}%`; }, 300);
             document.getElementById('loyalty-msg').innerText = pagos >= 9 ? "¡Felicidades! Disfrutas de tu Nivel 2." : `Acumula ${meta} pagos seguidos para obtener ${beneficio}.`;
+
+            const accountLabel=document.querySelector('.gx-account-capsule-label');
+            if(accountLabel) {
+                accountLabel.textContent = gxEstadoCuenta
+                    ? `${gxEstadoCuenta.total_label || 'Estado de cuenta'} · $${Number(gxEstadoCuenta.total_actual || 0).toFixed(2)}`
+                    : 'Ver Estado de Cuenta';
+            }
 
             let historyHTML = '';
             if(cliente.historial_pagos && cliente.historial_pagos.length > 0) {
@@ -9509,6 +9536,7 @@
         const CANCELACIONES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente";
         const CREDENCIALES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/credenciales-cliente";
         const NOVEDADES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/novedades-cliente";
+        const ESTADO_CUENTA_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-cuenta-beta";
         const TOKEN_KEY = "goxion_client_token";
 
         async function missionRequest(payload) {
@@ -9562,11 +9590,11 @@
         async function cargarExtrasPrivados(data, token) {
             if(!data || !token) return data;
 
-            const request = async (url) => {
+            const request = async (url, accion="listar") => {
                 const r=await fetch(url,{
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
-                    body:JSON.stringify({accion:"listar"}),
+                    body:JSON.stringify({accion,datos:{}}),
                     cache:"no-store"
                 });
                 const {text,json}=await parseJSON(r);
@@ -9574,10 +9602,11 @@
                 return json;
             };
 
-            const [cancelaciones,credenciales,novedades]=await Promise.allSettled([
+            const [cancelaciones,credenciales,novedades,estadoCuenta]=await Promise.allSettled([
                 request(CANCELACIONES_CLIENTE_URL),
                 request(CREDENCIALES_CLIENTE_URL),
-                request(NOVEDADES_CLIENTE_URL)
+                request(NOVEDADES_CLIENTE_URL),
+                request(ESTADO_CUENTA_URL,"mi_estado")
             ]);
 
             if(cancelaciones.status==="fulfilled") {
@@ -9605,6 +9634,13 @@
             } else {
                 console.warn("Novedades Mi Espacio:",novedades.reason);
                 data.novedades_servicio=[];
+            }
+
+            if(estadoCuenta.status==="fulfilled" && estadoCuenta.value?.estado_cuenta) {
+                data.estado_cuenta=estadoCuenta.value.estado_cuenta;
+            } else {
+                console.warn("Estado de cuenta central Mi Espacio:",estadoCuenta.reason || "No disponible");
+                data.estado_cuenta=null;
             }
 
             return data;
@@ -9637,6 +9673,7 @@ function goxionViewModelAdapter(data) {
             pago_revision_updated_at: c.pago_revision_updated_at || null,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
+            estado_cuenta: data?.estado_cuenta || null,
             servicios: (data.servicios || []).map(s => {
                 const serviceCancellations=(data.cancelaciones || [])
                     .filter(x => String(x.cliente_servicio_id || "") === String(s.id || ""))
