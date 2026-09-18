@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>GOXION // ADMIN BETA 19</title>
+<title>GOXION // ADMIN BETA 19.2</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
         :root {
@@ -4272,7 +4272,7 @@ details.gx-client-ops-context{
 }
 </style>
 </head>
-<body data-gx-version="admin-beta-19">
+<body data-gx-version="admin-beta-19-2">
 <div class="gx-admin-shell">
 <header class="gx-topbar">
 <div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION</div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
@@ -4634,9 +4634,9 @@ details.gx-client-ops-context{
 <section class="gx-access-architecture-card" id="gx-access-architecture-card">
 <div class="gx-access-architecture-head">
 <div>
-<span class="gx-eyebrow">Beta 13 · nueva estructura</span>
-<h3>Arquitectura de accesos</h3>
-<p>Una contratación puede contener uno o varios accesos reales. Aquí verás quién tiene cada plataforma incluso si viene desde un combo. El diagnóstico no modifica clientes.</p>
+<span class="gx-eyebrow">Control técnico</span>
+<h3>Estado de accesos</h3>
+<p>Contrataciones, accesos reales y pendientes en una sola vista.</p>
 </div>
 <button onclick="gxRunAccessDiagnostic()" type="button">↻ Diagnosticar</button>
 </div>
@@ -4649,7 +4649,7 @@ details.gx-client-ops-context{
 <div class="gx-access-diagnostic-state" id="gx-access-diagnostic-state">
 <i></i><span>Cargando modelo de accesos…</span>
 </div>
-<div class="gx-access-diagnostic-details" id="gx-access-diagnostic-details"></div>
+<details class="gx-access-details-collapse"><summary>Ver diagnóstico detallado</summary><div class="gx-access-diagnostic-details" id="gx-access-diagnostic-details"></div></details>
 </section>
 <div class="gx-account-manager-toolbar">
 <label>
@@ -4804,33 +4804,28 @@ details.gx-client-ops-context{
 </section>
 <section class="tab-content gx-mobile-workspace gx-management-hub" id="tab-gestion">
 <div class="gx-page-heading gx-management-heading">
-<div><div class="gx-eyebrow">Administración del ecosistema</div><h1>Gestión</h1><p>Una sola entrada para catálogo, accesos, beneficios, experiencia y sistema.</p></div>
+<div><div class="gx-eyebrow">Administración</div><h1>Gestión</h1><p>Configura el ecosistema sin perderte entre herramientas.</p></div>
 </div>
-<div class="gx-management-groups">
-<section class="gx-management-group">
-<header><span>COMERCIAL</span><h2>Catálogo</h2><p>Qué vendes, a qué precio y con qué disponibilidad.</p></header>
-<button onclick="gxOpenManagementDestination('catalog')"><span>▦</span><div><strong>Servicios e inventario</strong><small>Productos, precios, capacidad, stock y combos</small></div><em>›</em></button>
-<button onclick="gxOpenManagementDestination('promotions')"><span>⚡</span><div><strong>Promociones y ofertas</strong><small>Precio temporal, duración por periodos y ofertas flash</small></div><em>›</em></button>
+<div class="gx-management-stack">
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>▦</span><div><strong>Catálogo</strong><small>Productos, precios, inventario y ofertas.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('catalog')">Servicios</button><button onclick="gxOpenManagementDestination('promotions')">Promociones</button></div>
 </section>
-<section class="gx-management-group">
-<header><span>ENTREGA</span><h2>Accesos</h2><p>Cómo se entrega cada plataforma sin mezclarlo con el catálogo.</p></header>
-<button onclick="gxOpenManagementDestination('accounts')"><span>✉</span><div><strong>Cuentas de plataforma</strong><small>Cuentas madre, capacidad, ocupación y perfiles</small></div><em>›</em></button>
-<button onclick="gxOpenManagementDestination('credentials')"><span>🔐</span><div><strong>Credenciales</strong><small>Vault, contraseñas y entregas de una sola vista</small></div><em>›</em></button>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>⌁</span><div><strong>Accesos</strong><small>Cuentas madre, ocupación y credenciales.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('accounts')">Cuentas</button><button onclick="gxOpenManagementDestination('credentials')">Credenciales</button></div>
 </section>
-<section class="gx-management-group">
-<header><span>FIDELIZACIÓN</span><h2>Beneficios</h2><p>Reglas que premian o compensan al cliente.</p></header>
-<button onclick="gxOpenManagementDestination('loyalty')"><span>✦</span><div><strong>Lealtad</strong><small>Niveles, rachas y ajustes masivos</small></div><em>›</em></button>
-<button onclick="gxOpenManagementDestination('fairdeal')"><span>🛡</span><div><strong>Trato Justo</strong><small>Compensaciones por fallas y periodos afectados</small></div><em>›</em></button>
-<button onclick="gxOpenManagementDestination('missions')"><span>🎯</span><div><strong>Misiones</strong><small>Plantillas, rondas y recompensas</small></div><em>›</em></button>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>✦</span><div><strong>Beneficios</strong><small>Lealtad, compensaciones y misiones.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('loyalty')">Lealtad</button><button onclick="gxOpenManagementDestination('fairdeal')">Trato Justo</button><button onclick="gxOpenManagementDestination('missions')">Misiones</button></div>
 </section>
-<section class="gx-management-group">
-<header><span>CLIENTE</span><h2>Experiencia</h2><p>Qué ve el cliente y qué incidencias están activas.</p></header>
-<button onclick="gxOpenManagementDestination('app')"><span>✨</span><div><strong>Experiencia de App</strong><small>Comportamiento, módulos y previsualización</small></div><em>›</em></button>
-<button onclick="gxOpenManagementDestination('alerts')"><span>⚠</span><div><strong>Incidencias</strong><small>Avisos operativos visibles para clientes</small></div><em>›</em></button>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>◇</span><div><strong>Experiencia</strong><small>Qué ve el cliente y qué incidencias están activas.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('app')">App</button><button onclick="gxOpenManagementDestination('alerts')">Incidencias</button></div>
 </section>
-<section class="gx-management-group gx-management-system">
-<header><span>CONTROL</span><h2>Sistema</h2><p>Herramientas administrativas y validaciones internas.</p></header>
-<button onclick="gxOpenRegistrationControl()"><span>◉</span><div><strong>Registro y elegibilidad</strong><small>Clientes previos, teléfonos y beneficio de bienvenida</small></div><em>›</em></button>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>◎</span><div><strong>Sistema</strong><small>Registro, elegibilidad y controles internos.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenRegistrationControl()">Registro</button></div>
 </section>
 </div>
 </section>
@@ -4843,7 +4838,7 @@ details.gx-client-ops-context{
 <button class="gx-mobile-nav-btn" data-admin-target="tab-gestion" onclick="goAdminTab('tab-gestion',this)"><i>⌘</i><span>Gestión</span></button>
 </nav>
 </div>
-<div aria-hidden="true" class="gx-client-focus" id="gx-client-focus"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary"></div><nav class="gx-focus-nav" id="gx-focus-nav"><button class="active" data-gx-focus-section="summary" onclick="gxFocusSection('summary',this)">Resumen</button><button data-gx-focus-section="billing" onclick="gxFocusSection('billing',this)">Cobro</button><button data-gx-focus-section="services" onclick="gxFocusSection('services',this)">Servicios</button><button data-gx-focus-section="benefits" onclick="gxFocusSection('benefits',this)">Beneficios</button><button data-gx-focus-section="account" onclick="gxFocusSection('account',this)">Cuenta</button></nav><div class="gx-focus-overview" id="gx-focus-overview"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
+<div aria-hidden="true" class="gx-client-focus" id="gx-client-focus"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong><small id="gx-focus-meta">—</small></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary" hidden></div><nav class="gx-focus-nav" id="gx-focus-nav"><button class="active" data-gx-focus-section="summary" onclick="gxFocusSection('summary',this)">Resumen</button><button data-gx-focus-section="billing" onclick="gxFocusSection('billing',this)">Cobro</button><button data-gx-focus-section="services" onclick="gxFocusSection('services',this)">Servicios</button><button data-gx-focus-section="benefits" onclick="gxFocusSection('benefits',this)">Beneficios</button><button data-gx-focus-section="account" onclick="gxFocusSection('account',this)">Cuenta</button></nav><div class="gx-focus-overview" id="gx-focus-overview"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
 <div aria-hidden="true" class="gx-registration-control" id="gx-registration-control">
 <div class="gx-registration-backdrop" onclick="gxCloseRegistrationControl()"></div>
 <section class="gx-registration-sheet">
@@ -9407,33 +9402,19 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         return typeof previousMore==="function" ? previousMore.call(this,dest) : undefined;
     };
 
-    // La vista superior de cliente conserva cuatro datos, pero ya no son
-    // cápsulas de texto amontonado: cada métrica tiene etiqueta y valor.
+    // Beta 19.2: identidad y ciclo se leen en una sola línea compacta.
     function polishFocus(key){
         const c=(typeof clientesDict!=="undefined")?clientesDict?.[key]:null;
         const summary=document.getElementById("gx-focus-summary");
-        if(!c||!summary)return;
-
-        const t=typeof gxPaymentTiming==="function"?gxPaymentTiming(c):{type:"none",days:0,due:null};
-        const due=t?.due instanceof Date && !Number.isNaN(t.due.getTime())
-            ? t.due.toLocaleDateString("es-MX",{day:"numeric",month:"short"})
-            : `Día ${c.dia_pago||15}`;
-        const monthly=(c.servicios||[]).reduce((s,x)=>s+Number(x?.monto||0),0);
-        const state=c.pago_en_revision?"En revisión"
-            : c.estado==="pagado"?"Pagado"
-            : t.type==="overdue"?"Vencido"
-            : c.estado==="suspendido"?"Suspendido"
-            : "Pendiente";
-        const statusClass=c.pago_en_revision?"review":t.type==="overdue"?"overdue":"status";
-        const period=typeof gxPeriodLabel==="function"
-            ? gxPeriodLabel(c.periodo_pendiente)
-            : String(c.periodo_pendiente||"").slice(0,7);
-
-        summary.innerHTML=`
-            <span class="gx-focus-metric"><small>Vencimiento</small><b>${esc(due)}</b></span>
-            <span class="gx-focus-metric"><small>Mensualidad</small><b>$${Number(monthly).toFixed(0)}</b></span>
-            <span class="gx-focus-metric ${statusClass}"><small>Estado</small><b>${esc(state)}</b></span>
-            <span class="gx-focus-metric"><small>Periodo</small><b>${esc(period)}</b></span>`;
+        const meta=document.getElementById("gx-focus-meta");
+        if(!c)return;
+        if(summary){summary.innerHTML="";summary.hidden=true;}
+        const ec=c.estado_cuenta||{};
+        const total=Number(ec.total_actual ?? (c.servicios||[]).reduce((sum,x)=>sum+Number(x?.monto||0),0));
+        const timing=typeof gxPaymentTiming==="function"?gxPaymentTiming(c):{type:"none",days:0};
+        const state=c.estado==="suspendido"?"Suspendido":ec.estado_label||(c.pago_en_revision?"En revisión":timing.type==="overdue"?"Vencido":c.estado==="pagado"?"Pagado":"Pendiente");
+        const period=typeof gxPeriodLabel==="function"?gxPeriodLabel(ec.periodo||c.periodo_pendiente):String(ec.periodo||c.periodo_pendiente||"").slice(0,7);
+        if(meta) meta.textContent=`${state} · $${total.toFixed(2)} · ${period||`día ${c.dia_pago||15}`}`;
     }
 
     const previousOpen=window.gxOpenClientFocus;
@@ -10690,24 +10671,27 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         const wrap=document.createElement("section");
         wrap.className="gx-client-identity-card";
         wrap.innerHTML=`
-            <div class="gx-client-identity-head">
-                <div><strong>Identidad & promoción</strong><small>El teléfono se usa para detectar registros repetidos del beneficio -10%.</small></div>
-                <span class="gx-client-origin-badge ${legacy?"legacy":""}">${originLabel(ident.origen_cliente)}</span>
-            </div>
-            <div class="gx-client-identity-grid">
-                <label><span>WhatsApp / teléfono</span><input id="gx-identity-phone-${esc(id)}" inputmode="tel" value="${esc(ident.telefono_normalizado||"")}" placeholder="961 000 0000"></label>
-                <label><span>Origen</span><select id="gx-identity-origin-${esc(id)}">
-                    <option value="sd_streaming" ${ident.origen_cliente==="sd_streaming"?"selected":""}>SD Streaming / previo</option>
-                    <option value="goxion" ${ident.origen_cliente==="goxion"?"selected":""}>GOXION nuevo</option>
-                    <option value="manual" ${ident.origen_cliente==="manual"?"selected":""}>Alta manual</option>
-                    <option value="importado" ${ident.origen_cliente==="importado"?"selected":""}>Importado</option>
-                </select></label>
-                <label><span>Promo -10%</span><span class="gx-identity-eligible"><input id="gx-identity-eligible-${esc(id)}" type="checkbox" ${ident.promo_nuevo_elegible?"checked":""}> Elegible</span></label>
-                <button type="button" onclick="gxSaveClientIdentity('${esc(key)}','${esc(id)}')">Guardar</button>
-            </div>
-            ${!ident.telefono_normalizado&&legacy?'<div class="gx-client-identity-warning">Foco rojo: este cliente previo no tiene teléfono. Mientras lo completas, el registro público solo podrá detectarlo por coincidencia de nombre.</div>':""}
+            <details class="gx-identity-compact">
+                <summary>
+                    <div><strong>Registro y elegibilidad</strong><small>${originLabel(ident.origen_cliente)} · datos internos</small></div>
+                    <span class="gx-client-origin-badge ${legacy?"legacy":""}">${ident.promo_nuevo_elegible?"Elegible -10%":"Sin beneficio"}</span>
+                </summary>
+                <div class="gx-client-identity-grid">
+                    <label><span>WhatsApp / teléfono</span><input id="gx-identity-phone-${esc(id)}" inputmode="tel" value="${esc(ident.telefono_normalizado||"")}" placeholder="961 000 0000"></label>
+                    <label><span>Origen</span><select id="gx-identity-origin-${esc(id)}">
+                        <option value="sd_streaming" ${ident.origen_cliente==="sd_streaming"?"selected":""}>SD Streaming / previo</option>
+                        <option value="goxion" ${ident.origen_cliente==="goxion"?"selected":""}>GOXION nuevo</option>
+                        <option value="manual" ${ident.origen_cliente==="manual"?"selected":""}>Alta manual</option>
+                        <option value="importado" ${ident.origen_cliente==="importado"?"selected":""}>Importado</option>
+                    </select></label>
+                    <label class="gx-identity-check"><span>Beneficio bienvenida</span><span class="gx-identity-eligible"><input id="gx-identity-eligible-${esc(id)}" type="checkbox" ${ident.promo_nuevo_elegible?"checked":""}> Elegible -10%</span></label>
+                    <button class="gx-identity-save" type="button" onclick="gxSaveClientIdentity('${esc(key)}','${esc(id)}')">Guardar cambios</button>
+                </div>
+                ${!ident.telefono_normalizado&&legacy?'<div class="gx-client-identity-warning">Cliente previo sin teléfono: completa este dato para reforzar la detección de registros repetidos.</div>':""}
+            </details>
         `;
-        body.prepend(wrap);
+        const accountTarget=body.querySelector('[data-gx-section="account"] .gx-accordion-content')||body.querySelector('[data-gx-section="account"]')||body;
+        accountTarget.appendChild(wrap);
     }
 
     window.gxSaveClientIdentity=async function(key,id){
@@ -11122,7 +11106,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                 }).join('')}
 
                 ${p.issues.length?`<div class="gx-access-diagnostic-note warn">${esc(p.issues.join(' · '))}</div>`:''}
-                <div class="gx-access-diagnostic-note">Cada acceso es independiente. En un x2 puedes colocar el acceso 1 en una cuenta madre y el acceso 2 en otra; el precio y la contratación comercial no cambian.</div>
+                ${p.items.length>1?`<div class="gx-access-diagnostic-note">Cada acceso es independiente: en un x2 puedes distribuirlos entre cuentas madre distintas sin cambiar la contratación.</div>`:''}
             </div>`;
         });
     }
@@ -11785,17 +11769,84 @@ Esto cambia qué campos administra GOXION para esta plataforma, pero no modifica
 })();
 </script>
 <style id="goxion-admin-beta-19-third-redesign">
-/* GOXION ADMIN BETA 19 · Tercer rediseño */
-body[data-gx-version="admin-beta-19"] .gx-main{max-width:1180px}
-.gx-management-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
-.gx-management-group{padding:0;border-top:1px solid rgba(255,255,255,.07)}
-.gx-management-group header{padding:16px 2px 10px}.gx-management-group header>span{font-size:.48rem;font-weight:900;letter-spacing:.12em;color:#738199}.gx-management-group header h2{margin:4px 0 2px;font-size:1.05rem}.gx-management-group header p{margin:0;color:#77869a;font-size:.58rem}
-.gx-management-group>button{width:100%;display:grid;grid-template-columns:30px minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 2px;border:0;border-bottom:1px solid rgba(255,255,255,.055);background:transparent;color:#fff;text-align:left;font:inherit;cursor:pointer}
-.gx-management-group>button>span{width:28px;height:28px;border-radius:9px;background:rgba(111,85,255,.08);display:grid;place-items:center;font-size:.76rem}.gx-management-group>button strong{display:block;font-size:.66rem}.gx-management-group>button small{display:block;color:#748296;font-size:.5rem;margin-top:2px}.gx-management-group>button em{font-style:normal;color:#566477;font-size:1.1rem}.gx-management-group>button:hover strong{color:#8cefff}.gx-management-system{grid-column:1/-1}
-.gx-catalog-mode-switch{display:flex;gap:4px;margin:-4px 0 14px;padding:3px;border-radius:11px;background:#0b0d12;border:1px solid rgba(255,255,255,.055);width:max-content}.gx-catalog-mode-switch button{border:0;border-radius:8px;background:transparent;color:#738196;font:inherit;font-size:.55rem;font-weight:850;padding:7px 13px;cursor:pointer}.gx-catalog-mode-switch button.active{background:#161922;color:#fff}.gx-catalog-mode-view{display:none}.gx-catalog-mode-view.active{display:block}.gx-promo-hero{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;padding:3px 0 15px;border-bottom:1px solid rgba(255,255,255,.065)}.gx-promo-hero h2{font-size:1.02rem;margin:4px 0}.gx-promo-hero p{margin:0;color:#78869a;font-size:.58rem;max-width:650px}.gx-promo-rule-note{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.055)}.gx-promo-rule-note strong{font-size:.58rem;color:#d9caff;min-width:115px}.gx-promo-rule-note span{font-size:.54rem;color:#8390a3;line-height:1.5}.gx-promo-list{display:grid}.gx-promo-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:14px;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.055)}.gx-promo-main strong{font-size:.68rem;display:block}.gx-promo-main small{display:block;color:#77859a;font-size:.51rem;margin-top:3px}.gx-promo-price{display:flex;align-items:baseline;gap:7px}.gx-promo-price s{color:#657286;font-size:.53rem}.gx-promo-price b{color:#73efff;font-size:.78rem}.gx-promo-state{display:flex;flex-direction:column;align-items:flex-end;gap:4px}.gx-promo-state span{font-size:.44rem;font-weight:900;text-transform:uppercase;padding:4px 7px;border-radius:999px;background:#101d1a;color:#70e7b3}.gx-promo-state span.programada{background:#161828;color:#b8b8ff}.gx-promo-state span.finalizada,.gx-promo-state span.pausada{background:#1a161a;color:#9b8d9d}.gx-promo-state button{border:0;background:transparent;color:#8c99aa;font:inherit;font-size:.49rem;cursor:pointer;padding:0}.gx-promo-editor{margin-top:14px;padding:14px 0;border-top:1px solid rgba(132,95,255,.18)}.gx-promo-editor-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.gx-promo-editor-head h3{font-size:.95rem;margin:3px 0}.gx-promo-editor-head>button{border:0;background:transparent;color:#8f9bad;font-size:1.25rem}.gx-promo-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.gx-promo-form-grid label.wide{grid-column:1/-1}.gx-promo-form-grid label>span,.gx-alert-settings-v2 label>span{display:block;margin-bottom:4px;color:#77869b;font-size:.47rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.gx-promo-form-grid input,.gx-promo-form-grid select{width:100%;min-height:38px;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:#101219;color:#fff;padding:0 9px;font:inherit;font-size:.55rem}.gx-promo-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin-top:12px;border-top:1px solid rgba(255,255,255,.055)}.gx-promo-options label{display:flex;gap:9px;align-items:flex-start;padding:11px 0;border-bottom:1px solid rgba(255,255,255,.05)}.gx-promo-options label:nth-child(odd){padding-right:12px}.gx-promo-options input{margin-top:3px;accent-color:#8b6cff}.gx-promo-options strong{display:block;font-size:.56rem}.gx-promo-options small{display:block;color:#728095;font-size:.48rem;margin-top:2px}.gx-promo-editor-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
-.gx-experience-v2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr);gap:18px}.gx-experience-main{min-width:0}.gx-setting-row-v2{margin:14px 0;border-top:1px solid rgba(255,255,255,.06);border-bottom:1px solid rgba(255,255,255,.06);padding:14px 0}.gx-experience-preview{border-left:1px solid rgba(255,255,255,.065);padding-left:18px}.gx-experience-preview>span{font-size:.44rem;letter-spacing:.11em;font-weight:900;color:#68768a}.gx-preview-phone{margin-top:9px;min-height:230px;border:1px solid rgba(255,255,255,.065);border-radius:18px;background:linear-gradient(160deg,#0d1017,#090a0e);padding:18px;display:flex;flex-direction:column;justify-content:center}.gx-preview-pill{align-self:flex-start;padding:4px 7px;border-radius:999px;background:rgba(117,77,255,.12);color:#c8b7ff;font-size:.43rem;font-weight:900;margin-bottom:18px}.gx-preview-phone strong{font-size:.82rem}.gx-preview-phone p{color:#7c899d;font-size:.52rem;line-height:1.55}.gx-preview-module{margin-top:12px;padding:10px 0;border-top:1px solid rgba(255,255,255,.055);color:#72eefa;font-size:.56rem;font-weight:800}.gx-preview-alert-icon{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:rgba(255,186,86,.08);color:#ffc26a;font-weight:900;margin-bottom:18px}.gx-alert-settings-v2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.gx-alert-settings-v2 .wide{grid-column:1/-1}.gx-alert-settings-v2 select,.gx-alert-settings-v2 textarea{width:100%}
-.gx-focus-sheet{width:min(760px,100%)!important}.gx-focus-nav{display:flex;gap:2px;overflow-x:auto;padding:0 12px 10px;scrollbar-width:none;border-bottom:1px solid rgba(255,255,255,.055)}.gx-focus-nav::-webkit-scrollbar{display:none}.gx-focus-nav button{border:0;background:transparent;color:#718096;padding:8px 10px;font:inherit;font-size:.53rem;font-weight:850;white-space:nowrap;border-radius:8px}.gx-focus-nav button.active{background:#151820;color:#fff}.gx-focus-overview{padding:14px 12px 4px}.gx-focus-overview[hidden]{display:none}.gx-focus-v3 #gx-focus-body{padding-top:0}.gx-focus-v3 .gx-client-secondary-tools{display:none!important}.gx-focus-v3 .gx-payment-priority{margin:0 12px 10px}.gx-focus-v3 .gx-accordion{display:none!important;border:0!important;background:transparent!important;box-shadow:none!important;margin:0!important;padding:0 12px!important;border-radius:0!important}.gx-focus-v3 .gx-accordion.gx-focus-section-active{display:block!important}.gx-focus-v3 .gx-accordion-trigger{display:none!important}.gx-focus-v3 .gx-accordion-content{display:block!important;padding:0!important;margin:0!important}.gx-focus-v3 .gx-billing-primary{border-top:1px solid rgba(255,255,255,.055);border-bottom:1px solid rgba(255,255,255,.055);border-radius:0;background:transparent}.gx-focus-v3 .gx-billing-primary>div{background:transparent!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.045)!important;border-radius:0!important}.gx-focus-v3 .gx-billing-primary>div:last-child{border-bottom:0!important}.gx-focus-v3 .gx-admin-live-breakdown{background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.055);border-radius:0;padding:12px 0}.gx-focus-v3 .gx-service-compact{background:transparent!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.055)!important;border-radius:0!important;padding:14px 0!important}.gx-focus-v3 .gx-benefit-loyalty,.gx-focus-v3 .gx-benefit-sub,.gx-focus-v3 .gx-account-access,.gx-focus-v3 .gx-pin-control{background:transparent!important;border:0!important;border-radius:0!important}.gx-focus-v3 .gx-benefit-loyalty,.gx-focus-v3 .gx-benefit-sub{border-bottom:1px solid rgba(255,255,255,.055)!important;padding:13px 0!important}.gx-focus-v3 .gx-account-access{padding:2px 0}.gx-focus-v3 .gx-pin-control{border-top:1px solid rgba(255,255,255,.055)!important;margin-top:12px;padding-top:14px!important}.gx-overview-state{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:4px 0 15px;border-bottom:1px solid rgba(255,255,255,.06)}.gx-overview-state span{font-size:.46rem;font-weight:900;letter-spacing:.08em;color:#77859a}.gx-overview-state strong{display:block;font-size:1.28rem;margin-top:5px}.gx-overview-state em{font-style:normal;font-size:.52rem;color:#7f8da0;max-width:220px;text-align:right}.gx-overview-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:4px}.gx-overview-grid>div{padding:13px 0;border-bottom:1px solid rgba(255,255,255,.05)}.gx-overview-grid>div:nth-child(odd){padding-right:14px}.gx-overview-grid small{display:block;color:#718095;font-size:.46rem;text-transform:uppercase;font-weight:900;letter-spacing:.06em}.gx-overview-grid strong{display:block;font-size:.67rem;margin-top:4px}.gx-overview-actions{display:flex;gap:8px;padding:14px 0}.gx-overview-actions button{flex:1;min-height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.065);background:#11141b;color:#dce5f0;font:inherit;font-size:.52rem;font-weight:850}.gx-overview-actions button.primary{background:#111b21;border-color:rgba(71,228,255,.12);color:#75ecf7}
-@media(max-width:760px){.gx-management-groups{grid-template-columns:1fr}.gx-management-system{grid-column:auto}.gx-promo-row{grid-template-columns:1fr auto}.gx-promo-state{grid-column:1/-1;align-items:flex-start;flex-direction:row}.gx-promo-form-grid,.gx-promo-options,.gx-experience-v2,.gx-alert-settings-v2{grid-template-columns:1fr}.gx-promo-form-grid label.wide,.gx-alert-settings-v2 .wide{grid-column:auto}.gx-experience-preview{border-left:0;border-top:1px solid rgba(255,255,255,.065);padding:14px 0 0}.gx-overview-grid{grid-template-columns:1fr}.gx-overview-grid>div:nth-child(odd){padding-right:0}.gx-focus-sheet{width:100%!important}}
+/* GOXION ADMIN BETA 19.2 · Jerarquía compacta */
+body[data-gx-version="admin-beta-19-2"] .gx-main{max-width:1160px}
+body[data-gx-version="admin-beta-19-2"]{--gx192-line:rgba(255,255,255,.065);--gx192-muted:#78869a;--gx192-surface:#0d1016;--gx192-cyan:#69ebf7}
+
+/* Jerarquía de acciones: 40 / 36 / 30px. */
+body[data-gx-version="admin-beta-19-2"] .gx-primary-action{min-height:40px!important;padding:0 15px!important;border-radius:11px!important;font-size:.58rem!important;font-weight:850!important}
+body[data-gx-version="admin-beta-19-2"] .gx-secondary-action{min-height:34px!important;padding:0 11px!important;border-radius:9px!important;font-size:.52rem!important;font-weight:800!important}
+body[data-gx-version="admin-beta-19-2"] .gx-page-heading{margin-bottom:12px!important;gap:14px!important}
+body[data-gx-version="admin-beta-19-2"] .gx-page-heading h1{font-size:1.28rem!important;line-height:1.05}
+body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{max-width:620px;font-size:.6rem!important;line-height:1.45}
+
+/* Gestión: una lista de decisiones, no tarjetas por departamento. */
+.gx-management-heading{padding-bottom:4px;border-bottom:1px solid var(--gx192-line)}
+.gx-management-stack{display:grid;border-top:1px solid var(--gx192-line)}
+.gx-management-row{display:grid;grid-template-columns:minmax(240px,.9fr) minmax(330px,1.1fr);gap:20px;align-items:center;padding:17px 2px;border-bottom:1px solid var(--gx192-line)}
+.gx-management-row-main{display:grid;grid-template-columns:34px minmax(0,1fr);gap:11px;align-items:center}.gx-management-row-main>span{width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:rgba(94,82,255,.08);color:#c6b8ff;font-size:.8rem}.gx-management-row-main strong{display:block;font-size:.72rem}.gx-management-row-main small{display:block;margin-top:3px;color:var(--gx192-muted);font-size:.51rem;line-height:1.35}
+.gx-management-row-actions{display:flex;justify-content:flex-end;gap:7px;flex-wrap:wrap}.gx-management-row-actions button{min-width:92px;min-height:34px;border:1px solid var(--gx192-line);border-radius:9px;background:rgba(255,255,255,.025);color:#d9e2ed;font:inherit;font-size:.5rem;font-weight:800;padding:0 10px}.gx-management-row-actions button:active{background:rgba(104,232,247,.08);border-color:rgba(104,232,247,.16);color:#8ef4ff}
+
+/* Herramientas: encabezado y subnavegación ligeros. */
+#tab-ajustes .gx-page-heading{padding-bottom:8px;border-bottom:1px solid var(--gx192-line)}
+#tab-ajustes .gx-settings-tabs{display:flex!important;gap:0!important;overflow-x:auto!important;margin:0 0 13px!important;padding:0!important;border:0!important;border-bottom:1px solid var(--gx192-line)!important;border-radius:0!important;background:transparent!important;scrollbar-width:none}
+#tab-ajustes .gx-settings-tabs::-webkit-scrollbar{display:none}
+#tab-ajustes .gx-settings-tabs button{flex:0 0 auto!important;min-height:36px!important;padding:0 12px!important;border:0!important;border-radius:0!important;background:transparent!important;color:#6f7d91!important;font-size:.5rem!important;font-weight:800!important;box-shadow:none!important}
+#tab-ajustes .gx-settings-tabs button.active{color:#f5f8fc!important;box-shadow:inset 0 -2px 0 var(--gx192-cyan)!important}
+#tab-ajustes .gx-settings-view>.panel,#tab-ajustes .gx-tj-bulk-panel,#tab-ajustes .gx-account-manager-panel{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;padding:0!important}
+#tab-ajustes .gx-panel-title-row{align-items:flex-start!important;gap:12px!important;padding:3px 0 12px!important;margin:0!important;border-bottom:1px solid var(--gx192-line)}
+#tab-ajustes .gx-panel-title-row h2{font-size:1.04rem!important;margin:3px 0!important}
+#tab-ajustes .gx-panel-desc{font-size:.56rem!important;line-height:1.45!important;color:#78869a!important;max-width:620px}
+
+/* Misiones: editor lineal y compacto. */
+#tab-ajustes .gx-mission-builder,#tab-ajustes .gx-tag-library{border:0!important;border-radius:0!important;background:transparent!important;padding:13px 0!important;margin:0!important;border-bottom:1px solid var(--gx192-line)!important}
+#tab-ajustes .gx-mission-builder-head,#tab-ajustes .gx-library-title{align-items:center!important}.gx-mission-builder-head strong,.gx-library-title strong{font-size:.7rem!important}.gx-mission-builder-head small,.gx-library-title small{font-size:.5rem!important;line-height:1.35}
+#tab-ajustes .gx-mission-builder-list{gap:6px!important;margin-top:10px!important}
+#tab-ajustes .gx-mission-row{border-radius:10px!important;padding:8px!important;gap:6px!important;background:rgba(255,255,255,.018)!important;border:1px solid rgba(255,255,255,.045)!important}
+#tab-ajustes .gx-mission-row input,#tab-ajustes .gx-mission-row select{min-height:34px!important;border-radius:8px!important}
+#tab-ajustes .gx-action-grid{gap:7px!important;margin-top:12px!important}.gx-action-grid .gx-action-card{min-height:38px!important;border-radius:9px!important;padding:0 10px!important}.gx-action-grid .gx-action-card b{font-size:.65rem!important}.gx-action-grid .gx-action-card span{font-size:.49rem!important}
+
+/* Trato Justo: menos paneles, sin barra flotante que compita con navegación. */
+#tab-ajustes .gx-tj-bulk-config{gap:8px!important;margin-top:12px!important}.gx-tj-bulk-field input,.gx-tj-bulk-field select{min-height:36px!important;border-radius:9px!important}.gx-tj-bulk-days>div{min-height:36px!important;border-radius:9px!important}.gx-tj-bulk-days button{min-width:38px!important}.gx-tj-bulk-selection-head{margin-top:13px!important;padding-top:12px!important;border-top:1px solid var(--gx192-line)}
+.gx-tj-bulk-selection-actions{gap:6px!important}.gx-tj-bulk-selection-actions button{min-height:32px!important;padding:0 9px!important;border-radius:8px!important;font-size:.48rem!important}
+.gx-tj-bulk-search{min-height:36px!important;border-radius:9px!important;margin:9px 0!important}.gx-tj-bulk-preview{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:0!important;margin:8px 0 10px!important;border-top:1px solid var(--gx192-line);border-bottom:1px solid var(--gx192-line)}.gx-tj-bulk-preview>div{min-height:auto!important;padding:9px 7px!important;border:0!important;border-right:1px solid var(--gx192-line)!important;border-radius:0!important;background:transparent!important}.gx-tj-bulk-preview>div:last-child{border-right:0!important}.gx-tj-bulk-preview strong{font-size:.72rem!important}.gx-tj-bulk-preview span{font-size:.43rem!important}
+.gx-tj-bulk-client-list{border-radius:10px!important}.gx-tj-bulk-row{padding:9px!important}.gx-tj-bulk-total{position:static!important;inset:auto!important;margin-top:10px!important;border-radius:10px!important;padding:10px 0!important;background:transparent!important;border:0!important;border-top:1px solid var(--gx192-line)!important;box-shadow:none!important}
+
+/* Accesos: el diagnóstico es una cabecera operativa, no un informe gigante. */
+.gx-account-manager-explainer{display:grid!important;grid-template-columns:1fr 1fr!important;gap:0!important;margin:10px 0 0!important;border-top:1px solid var(--gx192-line);border-bottom:1px solid var(--gx192-line)}.gx-account-manager-explainer>div{padding:10px 10px 10px 0!important;border:0!important;background:transparent!important;border-right:1px solid var(--gx192-line)!important}.gx-account-manager-explainer>div:last-child{padding-left:10px!important;border-right:0!important}.gx-account-manager-explainer strong{font-size:.55rem!important}.gx-account-manager-explainer span{font-size:.47rem!important;line-height:1.35!important}
+.gx-access-architecture-card{margin:0 0 12px!important;padding:12px 0!important;border:0!important;border-bottom:1px solid var(--gx192-line)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}.gx-access-architecture-head{align-items:center!important}.gx-access-architecture-head h3{font-size:.88rem!important;margin:2px 0!important}.gx-access-architecture-head p{font-size:.52rem!important;line-height:1.35!important}.gx-access-architecture-head button{min-height:32px!important;padding:0 10px!important;border-radius:8px!important;font-size:.49rem!important}
+.gx-access-diagnostic-grid{grid-template-columns:repeat(4,1fr)!important;gap:0!important;margin-top:10px!important;border-top:1px solid var(--gx192-line);border-bottom:1px solid var(--gx192-line)}.gx-access-diagnostic-grid>div{padding:9px 8px!important;border:0!important;border-right:1px solid var(--gx192-line)!important;border-radius:0!important;background:transparent!important}.gx-access-diagnostic-grid>div:last-child{border-right:0!important}.gx-access-diagnostic-grid small{font-size:.43rem!important}.gx-access-diagnostic-grid strong{font-size:.78rem!important}.gx-access-diagnostic-state{margin:8px 0 0!important;padding:7px 0!important;border-radius:0!important;background:transparent!important;font-size:.5rem!important}.gx-access-details-collapse{margin-top:7px;border-top:1px solid rgba(255,255,255,.04);padding-top:7px}.gx-access-details-collapse summary{cursor:pointer;color:#7e8da2;font-size:.48rem;font-weight:800;list-style:none}.gx-access-details-collapse summary::-webkit-details-marker{display:none}.gx-access-diagnostic-details{margin-top:7px!important;gap:5px!important}.gx-access-diagnostic-note{padding:7px 0!important;border:0!important;border-radius:0!important;background:transparent!important;font-size:.5rem!important;line-height:1.35!important}
+
+/* Catálogo / promociones con la misma jerarquía de acciones. */
+.gx-catalog-mode-switch{display:flex;gap:0;margin:-2px 0 13px;padding:0;border:0;border-bottom:1px solid var(--gx192-line);border-radius:0;background:transparent;width:100%}.gx-catalog-mode-switch button{min-height:34px;border:0;border-radius:0;background:transparent;color:#748298;font:inherit;font-size:.52rem;font-weight:850;padding:0 13px}.gx-catalog-mode-switch button.active{background:transparent;color:#fff;box-shadow:inset 0 -2px 0 var(--gx192-cyan)}.gx-catalog-mode-view{display:none}.gx-catalog-mode-view.active{display:block}
+.gx-promo-hero{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:4px 0 12px;border-bottom:1px solid var(--gx192-line)}.gx-promo-hero h2{font-size:.95rem;margin:3px 0}.gx-promo-hero p{margin:0;color:#78869a;font-size:.54rem;max-width:620px}.gx-promo-rule-note{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--gx192-line)}.gx-promo-rule-note strong{font-size:.52rem;color:#d9caff;min-width:100px}.gx-promo-rule-note span{font-size:.5rem;color:#8390a3;line-height:1.4}.gx-promo-list{display:grid}.gx-promo-row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--gx192-line)}.gx-promo-main strong{font-size:.64rem;display:block}.gx-promo-main small{display:block;color:#77859a;font-size:.48rem;margin-top:3px}.gx-promo-price{display:flex;align-items:baseline;gap:7px}.gx-promo-price s{color:#657286;font-size:.5rem}.gx-promo-price b{color:#73efff;font-size:.74rem}.gx-promo-state{display:flex;align-items:center;gap:7px}.gx-promo-state span{font-size:.42rem;font-weight:900;text-transform:uppercase;padding:4px 7px;border-radius:999px;background:#101d1a;color:#70e7b3}.gx-promo-state span.programada{background:#161828;color:#b8b8ff}.gx-promo-state span.finalizada,.gx-promo-state span.pausada{background:#1a161a;color:#9b8d9d}.gx-promo-state button{border:0;background:transparent;color:#8c99aa;font:inherit;font-size:.47rem}.gx-promo-editor{margin-top:12px;padding:12px 0;border-top:1px solid rgba(132,95,255,.15)}.gx-promo-editor-head{display:flex;justify-content:space-between;gap:12px}.gx-promo-editor-head h3{font-size:.88rem;margin:3px 0}.gx-promo-editor-head>button{width:32px;height:32px;border:0;border-radius:8px;background:rgba(255,255,255,.035);color:#8f9bad;font-size:1.1rem}.gx-promo-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:11px}.gx-promo-form-grid label.wide{grid-column:1/-1}.gx-promo-form-grid label>span,.gx-alert-settings-v2 label>span{display:block;margin-bottom:4px;color:#77869b;font-size:.44rem;font-weight:900;text-transform:uppercase;letter-spacing:.06em}.gx-promo-form-grid input,.gx-promo-form-grid select{width:100%;min-height:36px;border:1px solid var(--gx192-line);border-radius:8px;background:#101219;color:#fff;padding:0 9px;font:inherit;font-size:.52rem}.gx-promo-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:10px;border-top:1px solid var(--gx192-line)}.gx-promo-options label{display:flex;gap:8px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.045)}.gx-promo-options label:nth-child(odd){padding-right:10px}.gx-promo-options strong{font-size:.52rem}.gx-promo-options small{font-size:.45rem;color:#728095}.gx-promo-editor-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:11px}
+
+/* Experiencia: configuración y preview, sin doble tarjeta. */
+.gx-experience-v2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(210px,.7fr);gap:16px}.gx-experience-main{min-width:0}.gx-setting-row-v2{margin:10px 0;border-bottom:1px solid var(--gx192-line);padding:10px 0}.gx-experience-preview{border-left:1px solid var(--gx192-line);padding-left:16px}.gx-experience-preview>span{font-size:.42rem;letter-spacing:.1em;font-weight:900;color:#68768a}.gx-preview-phone{margin-top:8px;min-height:180px;border:1px solid var(--gx192-line);border-radius:14px;background:linear-gradient(160deg,#0d1017,#090a0e);padding:14px;display:flex;flex-direction:column;justify-content:center}.gx-preview-pill{align-self:flex-start;padding:4px 7px;border-radius:999px;background:rgba(117,77,255,.12);color:#c8b7ff;font-size:.4rem;font-weight:900;margin-bottom:12px}.gx-preview-phone strong{font-size:.72rem}.gx-preview-phone p{font-size:.49rem;line-height:1.45;color:#7c899d}.gx-preview-module{margin-top:8px;padding:8px 0;border-top:1px solid var(--gx192-line);color:#72eefa;font-size:.51rem;font-weight:800}.gx-preview-alert-icon{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:rgba(255,186,86,.08);color:#ffc26a;font-weight:900;margin-bottom:12px}.gx-alert-settings-v2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.gx-alert-settings-v2 .wide{grid-column:1/-1}.gx-alert-settings-v2 select,.gx-alert-settings-v2 textarea{width:100%}
+
+/* Cliente: encabezado compacto + navegación simple; sin cuadrícula redundante. */
+.gx-focus-sheet{width:min(720px,100%)!important;height:min(94vh,940px)!important;background:linear-gradient(180deg,#0b0c11,#060609)!important}
+.gx-focus-handle{width:38px!important;height:4px!important;margin:7px auto 1px!important}.gx-focus-header{gap:9px!important;padding:8px 12px 9px!important;border-bottom:0!important}.gx-focus-back,.gx-focus-close{width:34px!important;height:34px!important;border-radius:10px!important;font-size:1.2rem!important}.gx-focus-identity span{font-size:.48rem!important;letter-spacing:.1em!important;color:#728095!important}.gx-focus-identity strong{font-size:1rem!important;line-height:1.15}.gx-focus-identity small{display:block;margin-top:3px;color:#8a98aa;font-size:.48rem;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gx-focus-summary{display:none!important}
+.gx-focus-nav{display:flex;gap:0;overflow-x:auto;padding:0 10px;border-top:1px solid rgba(255,255,255,.04);border-bottom:1px solid var(--gx192-line);scrollbar-width:none}.gx-focus-nav::-webkit-scrollbar{display:none}.gx-focus-nav button{flex:1 0 auto;min-height:38px;border:0;border-radius:0;background:transparent;color:#6f7e92;padding:0 10px;font:inherit;font-size:.49rem;font-weight:850;white-space:nowrap}.gx-focus-nav button.active{background:transparent;color:#fff;box-shadow:inset 0 -2px 0 var(--gx192-cyan)}
+.gx-focus-overview{padding:0 13px!important}.gx-focus-overview[hidden]{display:none}.gx-overview-compact{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--gx192-line)}.gx-overview-compact-main{min-width:0}.gx-overview-compact-main strong{display:block;font-size:.59rem;color:#e8eef6}.gx-overview-compact-main span{display:block;margin-top:3px;color:#77869a;font-size:.46rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gx-overview-compact-actions{display:flex;gap:5px}.gx-overview-compact-actions button{min-height:30px;border:1px solid var(--gx192-line);border-radius:8px;background:transparent;color:#aebac9;font:inherit;font-size:.46rem;font-weight:800;padding:0 8px}.gx-overview-compact-actions button:first-child{color:#78edf8;border-color:rgba(104,232,247,.12)}
+.gx-focus-v3 #gx-focus-body{padding:0 13px 26px!important}.gx-focus-v3 .gx-client-secondary-tools{display:none!important}.gx-focus-v3 .gx-payment-priority{margin:0!important;padding:10px 0!important;border-radius:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--gx192-line)!important}.gx-focus-v3 .gx-accordion{display:none!important;border:0!important;background:transparent!important;box-shadow:none!important;margin:0!important;padding:0!important;border-radius:0!important}.gx-focus-v3 .gx-accordion.gx-focus-section-active{display:block!important}.gx-focus-v3 .gx-accordion-trigger{display:none!important}.gx-focus-v3 .gx-accordion-content{display:block!important;padding:0!important;margin:0!important}.gx-focus-v3 .gx-billing-primary{border:0!important;border-bottom:1px solid var(--gx192-line)!important;border-radius:0!important;background:transparent!important}.gx-focus-v3 .gx-billing-primary>div{min-height:48px!important;padding:9px 0!important;background:transparent!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.045)!important;border-radius:0!important}.gx-focus-v3 .gx-billing-primary>div:last-child{border-bottom:0!important}.gx-focus-v3 .gx-admin-live-breakdown{margin:0!important;background:transparent!important;border:0!important;border-bottom:1px solid var(--gx192-line)!important;border-radius:0!important;padding:10px 0!important}.gx-focus-v3 .gx-service-compact{background:transparent!important;border:0!important;border-bottom:1px solid var(--gx192-line)!important;border-radius:0!important;padding:11px 0!important}.gx-focus-v3 .gx-benefit-loyalty,.gx-focus-v3 .gx-benefit-sub,.gx-focus-v3 .gx-account-access,.gx-focus-v3 .gx-pin-control{background:transparent!important;border:0!important;border-radius:0!important}.gx-focus-v3 .gx-benefit-loyalty,.gx-focus-v3 .gx-benefit-sub{border-bottom:1px solid var(--gx192-line)!important;padding:11px 0!important}.gx-focus-v3 .gx-account-access{padding:4px 0!important}.gx-focus-v3 .gx-pin-control{border-top:1px solid var(--gx192-line)!important;margin-top:10px!important;padding-top:11px!important}
+
+/* Accesos dentro del cliente: una lista técnica, no otra tarjeta. */
+.gx-focus-v3 .gx-beta-access-preview{gap:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important}.gx-focus-v3 .gx-beta-access-preview-head{padding:10px 0;border-bottom:1px solid var(--gx192-line);align-items:center!important}.gx-focus-v3 .gx-beta-access-preview-head strong{font-size:.62rem!important}.gx-focus-v3 .gx-beta-access-preview-head small{font-size:.47rem!important}.gx-focus-v3 .gx-beta-access-row-live{padding:11px 0!important;border-radius:0!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.05)!important;background:transparent!important}.gx-focus-v3 .gx-tech-credential-grid{margin-top:7px!important;gap:6px!important}.gx-focus-v3 .gx-tech-credential-grid input,.gx-focus-v3 .gx-technical-account-select{min-height:34px!important;border-radius:8px!important}.gx-focus-v3 .gx-tech-password-line{margin-top:7px!important;padding-top:7px!important}.gx-focus-v3 .gx-tech-password-line button{min-height:30px!important;border-radius:8px!important}.gx-focus-v3 .gx-access-diagnostic-note{font-size:.46rem!important;padding:8px 0!important}
+
+/* Identidad solo vive en Cuenta y parte colapsada. */
+.gx-focus-v3 .gx-client-identity-card{display:none!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}.gx-focus-v3[data-gx-focus-section="account"] .gx-client-identity-card{display:block!important}.gx-identity-compact{margin-top:12px;border-top:1px solid var(--gx192-line);border-bottom:1px solid var(--gx192-line)}.gx-identity-compact>summary{display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:48px;list-style:none;cursor:pointer}.gx-identity-compact>summary::-webkit-details-marker{display:none}.gx-identity-compact>summary strong{display:block;font-size:.58rem}.gx-identity-compact>summary small{display:block;margin-top:2px;color:#77869a;font-size:.45rem}.gx-identity-compact .gx-client-origin-badge{position:static!important;white-space:nowrap!important}.gx-identity-compact .gx-client-identity-grid{padding:10px 0 12px!important;gap:7px!important}.gx-identity-compact .gx-client-identity-grid input,.gx-identity-compact .gx-client-identity-grid select{min-height:34px!important;border-radius:8px!important}.gx-identity-save{min-height:34px!important;border-radius:8px!important}.gx-identity-compact .gx-client-identity-warning{margin-top:0!important;border-radius:8px!important;padding:8px!important;font-size:.46rem!important}
+
+@media(max-width:760px){
+ body[data-gx-version="admin-beta-19-2"] .gx-page-heading{margin-bottom:9px!important}body[data-gx-version="admin-beta-19-2"] .gx-page-heading h1{font-size:1.16rem!important}body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{display:none}
+ .gx-management-row{grid-template-columns:1fr;gap:9px;padding:14px 0}.gx-management-row-actions{justify-content:flex-start;display:grid;grid-template-columns:repeat(auto-fit,minmax(82px,1fr));width:100%}.gx-management-row-actions button{min-width:0;width:100%}.gx-management-row-main small{font-size:.48rem}
+ #tab-ajustes .gx-settings-tabs button{padding:0 10px!important;font-size:.47rem!important}#tab-ajustes .gx-panel-desc{display:none}.gx-discount-badge{transform:scale(.88);transform-origin:right top}
+ .gx-tj-bulk-config{grid-template-columns:1fr 1fr!important}.gx-tj-bulk-service-field,.gx-tj-bulk-reason{grid-column:1/-1!important}.gx-tj-bulk-preview{grid-template-columns:repeat(4,1fr)!important}.gx-tj-bulk-preview>div{padding:8px 3px!important}.gx-tj-bulk-preview span{font-size:.38rem!important}
+ .gx-account-manager-explainer{grid-template-columns:1fr!important}.gx-account-manager-explainer>div{border-right:0!important;border-bottom:1px solid var(--gx192-line)!important;padding:9px 0!important}.gx-account-manager-explainer>div:last-child{border-bottom:0!important}.gx-access-architecture-head p{display:none}.gx-access-diagnostic-grid{grid-template-columns:repeat(4,1fr)!important}.gx-access-diagnostic-grid>div{padding:8px 4px!important}.gx-access-diagnostic-grid small{font-size:.37rem!important;letter-spacing:.02em!important}.gx-access-diagnostic-grid strong{font-size:.7rem!important}
+ .gx-promo-row{grid-template-columns:1fr auto}.gx-promo-row>.gx-secondary-action{grid-column:2}.gx-promo-state{grid-column:1;justify-self:start}.gx-promo-form-grid,.gx-promo-options,.gx-experience-v2,.gx-alert-settings-v2{grid-template-columns:1fr}.gx-promo-form-grid label.wide,.gx-alert-settings-v2 .wide{grid-column:auto}.gx-experience-preview{border-left:0;border-top:1px solid var(--gx192-line);padding:12px 0 0}.gx-preview-phone{min-height:145px}.gx-promo-hero p,.gx-promo-rule-note{display:none}
+ .gx-focus-sheet{width:100%!important;height:94vh!important}.gx-focus-nav button{padding:0 8px;font-size:.47rem}.gx-overview-compact-main span{max-width:190px}.gx-overview-compact-actions button{padding:0 7px}.gx-focus-v3 .gx-tech-credential-grid{grid-template-columns:minmax(0,1fr) 88px!important}.gx-focus-v3 .gx-tech-password-line{align-items:center!important;flex-direction:row!important}.gx-focus-v3 .gx-tech-password-line small{max-width:190px}
+ .gx-identity-compact .gx-client-identity-grid{grid-template-columns:1fr!important}.gx-identity-save{width:100%!important}
+}
 </style><script id="goxion-admin-beta-19-controller">
 (()=>{
   const PROMO_URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/promociones-admin-beta";
@@ -11806,7 +11857,12 @@ body[data-gx-version="admin-beta-19"] .gx-main{max-width:1180px}
     if(dest==='promotions'){gxOpenCatalogMode('promotions');return;}
     if(dest==='registration'){window.gxOpenRegistrationControl?.();return;}
     window.gxOpenMoreDestination?.(dest);
+    setTimeout(()=>gxSetSettingsContext(dest),80);
   };
+  function gxSetSettingsContext(dest){
+    const map={missions:['Misiones','Plantillas, rondas y recompensas.'],loyalty:['Lealtad','Niveles, rachas y ajustes.'],fairdeal:['Trato Justo','Compensaciones del periodo afectado.'],accounts:['Accesos','Cuentas madre y distribución.'],credentials:['Credenciales','Contraseñas y entregas seguras.'],app:['Experiencia','Comportamiento visible de la app.'],alerts:['Incidencias','Avisos operativos para clientes.']};
+    const pair=map[dest];if(!pair)return;const tab=document.getElementById('tab-ajustes');if(!tab)return;const h=tab.querySelector('.gx-page-heading h1'),p=tab.querySelector('.gx-page-heading p');if(h)h.textContent=pair[0];if(p)p.textContent=pair[1];
+  }
 
   window.gxOpenCatalogMode=function(mode,btn){
     goAdminTab('tab-catalogo');
@@ -11869,8 +11925,12 @@ body[data-gx-version="admin-beta-19"] .gx-main{max-width:1180px}
 
   function focusOverview(key){
     const c=typeof clientesDict!=='undefined'?clientesDict?.[key]:null,box=document.getElementById('gx-focus-overview');if(!c||!box)return;
-    const ec=c.estado_cuenta||{},total=Number(ec.total_actual??(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)),base=Number(ec.subtotal??(c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)),state=ec.estado_label||(c.estado==='suspendido'?'Suspendido':'Pendiente'),services=(c.servicios||[]).length,loyal=Number(ec?.lealtad?.pagos_efectivos??c.pagos_puntuales??0),period=typeof gxPeriodLabel==='function'?gxPeriodLabel(ec.periodo||c.periodo_pendiente):String(ec.periodo||c.periodo_pendiente||'').slice(0,7),due=ec.fecha_corte?new Date(`${ec.fecha_corte}T12:00:00`).toLocaleDateString('es-MX',{day:'numeric',month:'short'}):`día ${c.dia_pago||15}`;
-    box.innerHTML=`<div class="gx-overview-state"><div><span>COBRO ACTUAL</span><strong>$${total.toFixed(2)}</strong></div><em>${esc(state)}${total!==base?` · base $${base.toFixed(2)}`:''}</em></div><div class="gx-overview-grid"><div><small>Periodo</small><strong>${esc(period)}</strong></div><div><small>Vencimiento</small><strong>${esc(due)}</strong></div><div><small>Servicios</small><strong>${services} activo${services===1?'':'s'}</strong></div><div><small>Lealtad</small><strong>${loyal>=9?'Nivel 2 · 6%':loyal>=4?'Nivel 1 · 3%':`${loyal} pagos`}</strong></div></div><div class="gx-overview-actions"><button class="primary" onclick="gxFocusSection('billing',document.querySelector('[data-gx-focus-section=\\'billing\\']'))">Ver cobro</button><button onclick="enviarMensaje('${String(c.nombre||'').replace(/'/g,"\\'")}','${String(key).replace(/'/g,"\\'")}')">Mensaje</button><button onclick="copiarInfo('${String(c.nombre||'').replace(/'/g,"\\'")}','${String(key).replace(/'/g,"\\'")}')">Copiar link</button></div>`;
+    const ec=c.estado_cuenta||{},services=(c.servicios||[]),loyal=Number(ec?.lealtad?.pagos_efectivos??c.pagos_puntuales??0);
+    const timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0};
+    const serviceLabel=services.length?`${services.length} servicio${services.length===1?'':'s'} activo${services.length===1?'':'s'}`:'Sin servicios activos';
+    const loyaltyLabel=loyal>=9?'Nivel 2 · 6%':loyal>=4?'Nivel 1 · 3%':`${loyal} pago${loyal===1?'':'s'} puntual${loyal===1?'':'es'}`;
+    const attention=c.pago_en_revision?'Comprobante pendiente de revisión':timing.type==='overdue'?`Cobro vencido · ${Number(timing.days||0)} día${Number(timing.days||0)===1?'':'s'}`:timing.type==='upcoming'?(Number(timing.days||0)===0?'Cobro programado para hoy':`Próximo cobro en ${Number(timing.days||0)} día${Number(timing.days||0)===1?'':'s'}`):'Sin alertas operativas';
+    box.innerHTML=`<div class="gx-overview-compact"><div class="gx-overview-compact-main"><strong>${esc(attention)}</strong><span>${esc(serviceLabel)} · ${esc(loyaltyLabel)}</span></div><div class="gx-overview-compact-actions"><button onclick="gxFocusSection('billing',document.querySelector('[data-gx-focus-section=\'billing\']'))">Cobro</button><button onclick="enviarMensaje('${String(c.nombre||'').replace(/'/g,"\'")}','${String(key).replace(/'/g,"\'")}')">Mensaje</button></div></div>`;
   }
   window.gxFocusSection=function(section,btn){const f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body'),overview=document.getElementById('gx-focus-overview');if(!f||!body)return;document.querySelectorAll('[data-gx-focus-section]').forEach(x=>x.classList.toggle('active',x.dataset.gxFocusSection===section));if(overview)overview.hidden=section!=='summary';body.querySelectorAll('[data-gx-section]').forEach(x=>x.classList.toggle('gx-focus-section-active',x.dataset.gxSection===section));f.dataset.gxFocusSection=section;};
   function setupFocus(key){const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;f.classList.add('gx-focus-v3');f.dataset.gxClientKey=key;focusOverview(key);gxFocusSection('summary');}
@@ -11878,7 +11938,7 @@ body[data-gx-version="admin-beta-19"] .gx-main{max-width:1180px}
   const currentOpenSection=window.gxOpenClientSection;window.gxOpenClientSection=function(section,...args){if(document.getElementById('gx-client-focus')?.classList.contains('show')&&['summary','billing','services','benefits','account'].includes(section)){gxFocusSection(section);return;}return typeof currentOpenSection==='function'?currentOpenSection.call(this,section,...args):undefined;};
 
   document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{gxUpdateExperiencePreview();gxUpdateIncidentPreview();},700));
-  console.info('GOXION Admin Beta 19 · tercer rediseño estructural activo.');
+  console.info('GOXION Admin Beta 19.2 · jerarquía compacta activa.');
 })();
-</script><div id="gx-beta19-marker" style="display:none">GOXION ADMIN BETA 19 · tercer rediseño</div></body>
+</script><div id="gx-beta19-marker" style="display:none">GOXION ADMIN BETA 19.2 · jerarquía compacta</div></body>
 </html>
