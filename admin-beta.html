@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>GOXION // ADMIN BETA 19.2</title>
+<title>GOXION // ADMIN BETA 19.3</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
         :root {
@@ -4272,7 +4272,7 @@ details.gx-client-ops-context{
 }
 </style>
 </head>
-<body data-gx-version="admin-beta-19-2">
+<body data-gx-version="admin-beta-19-3">
 <div class="gx-admin-shell">
 <header class="gx-topbar">
 <div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION</div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
@@ -9402,7 +9402,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         return typeof previousMore==="function" ? previousMore.call(this,dest) : undefined;
     };
 
-    // Beta 19.2: identidad y ciclo se leen en una sola línea compacta.
+    // Beta 19.3: identidad y ciclo se leen en una sola línea compacta.
     function polishFocus(key){
         const c=(typeof clientesDict!=="undefined")?clientesDict?.[key]:null;
         const summary=document.getElementById("gx-focus-summary");
@@ -11769,16 +11769,16 @@ Esto cambia qué campos administra GOXION para esta plataforma, pero no modifica
 })();
 </script>
 <style id="goxion-admin-beta-19-third-redesign">
-/* GOXION ADMIN BETA 19.2 · Jerarquía compacta */
-body[data-gx-version="admin-beta-19-2"] .gx-main{max-width:1160px}
-body[data-gx-version="admin-beta-19-2"]{--gx192-line:rgba(255,255,255,.065);--gx192-muted:#78869a;--gx192-surface:#0d1016;--gx192-cyan:#69ebf7}
+/* GOXION ADMIN BETA 19.3 · Jerarquía compacta */
+body[data-gx-version="admin-beta-19-3"] .gx-main{max-width:1160px}
+body[data-gx-version="admin-beta-19-3"]{--gx192-line:rgba(255,255,255,.065);--gx192-muted:#78869a;--gx192-surface:#0d1016;--gx192-cyan:#69ebf7}
 
 /* Jerarquía de acciones: 40 / 36 / 30px. */
-body[data-gx-version="admin-beta-19-2"] .gx-primary-action{min-height:40px!important;padding:0 15px!important;border-radius:11px!important;font-size:.58rem!important;font-weight:850!important}
-body[data-gx-version="admin-beta-19-2"] .gx-secondary-action{min-height:34px!important;padding:0 11px!important;border-radius:9px!important;font-size:.52rem!important;font-weight:800!important}
-body[data-gx-version="admin-beta-19-2"] .gx-page-heading{margin-bottom:12px!important;gap:14px!important}
-body[data-gx-version="admin-beta-19-2"] .gx-page-heading h1{font-size:1.28rem!important;line-height:1.05}
-body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{max-width:620px;font-size:.6rem!important;line-height:1.45}
+body[data-gx-version="admin-beta-19-3"] .gx-primary-action{min-height:40px!important;padding:0 15px!important;border-radius:11px!important;font-size:.58rem!important;font-weight:850!important}
+body[data-gx-version="admin-beta-19-3"] .gx-secondary-action{min-height:34px!important;padding:0 11px!important;border-radius:9px!important;font-size:.52rem!important;font-weight:800!important}
+body[data-gx-version="admin-beta-19-3"] .gx-page-heading{margin-bottom:12px!important;gap:14px!important}
+body[data-gx-version="admin-beta-19-3"] .gx-page-heading h1{font-size:1.28rem!important;line-height:1.05}
+body[data-gx-version="admin-beta-19-3"] .gx-page-heading p{max-width:620px;font-size:.6rem!important;line-height:1.45}
 
 /* Gestión: una lista de decisiones, no tarjetas por departamento. */
 .gx-management-heading{padding-bottom:4px;border-bottom:1px solid var(--gx192-line)}
@@ -11838,7 +11838,7 @@ body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{max-width:620px;font-
 .gx-focus-v3 .gx-client-identity-card{display:none!important;margin:0!important;padding:0!important;border:0!important;background:transparent!important}.gx-focus-v3[data-gx-focus-section="account"] .gx-client-identity-card{display:block!important}.gx-identity-compact{margin-top:12px;border-top:1px solid var(--gx192-line);border-bottom:1px solid var(--gx192-line)}.gx-identity-compact>summary{display:flex;justify-content:space-between;gap:12px;align-items:center;min-height:48px;list-style:none;cursor:pointer}.gx-identity-compact>summary::-webkit-details-marker{display:none}.gx-identity-compact>summary strong{display:block;font-size:.58rem}.gx-identity-compact>summary small{display:block;margin-top:2px;color:#77869a;font-size:.45rem}.gx-identity-compact .gx-client-origin-badge{position:static!important;white-space:nowrap!important}.gx-identity-compact .gx-client-identity-grid{padding:10px 0 12px!important;gap:7px!important}.gx-identity-compact .gx-client-identity-grid input,.gx-identity-compact .gx-client-identity-grid select{min-height:34px!important;border-radius:8px!important}.gx-identity-save{min-height:34px!important;border-radius:8px!important}.gx-identity-compact .gx-client-identity-warning{margin-top:0!important;border-radius:8px!important;padding:8px!important;font-size:.46rem!important}
 
 @media(max-width:760px){
- body[data-gx-version="admin-beta-19-2"] .gx-page-heading{margin-bottom:9px!important}body[data-gx-version="admin-beta-19-2"] .gx-page-heading h1{font-size:1.16rem!important}body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{display:none}
+ body[data-gx-version="admin-beta-19-3"] .gx-page-heading{margin-bottom:9px!important}body[data-gx-version="admin-beta-19-3"] .gx-page-heading h1{font-size:1.16rem!important}body[data-gx-version="admin-beta-19-3"] .gx-page-heading p{display:none}
  .gx-management-row{grid-template-columns:1fr;gap:9px;padding:14px 0}.gx-management-row-actions{justify-content:flex-start;display:grid;grid-template-columns:repeat(auto-fit,minmax(82px,1fr));width:100%}.gx-management-row-actions button{min-width:0;width:100%}.gx-management-row-main small{font-size:.48rem}
  #tab-ajustes .gx-settings-tabs button{padding:0 10px!important;font-size:.47rem!important}#tab-ajustes .gx-panel-desc{display:none}.gx-discount-badge{transform:scale(.88);transform-origin:right top}
  .gx-tj-bulk-config{grid-template-columns:1fr 1fr!important}.gx-tj-bulk-service-field,.gx-tj-bulk-reason{grid-column:1/-1!important}.gx-tj-bulk-preview{grid-template-columns:repeat(4,1fr)!important}.gx-tj-bulk-preview>div{padding:8px 3px!important}.gx-tj-bulk-preview span{font-size:.38rem!important}
@@ -11847,6 +11847,294 @@ body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{max-width:620px;font-
  .gx-focus-sheet{width:100%!important;height:94vh!important}.gx-focus-nav button{padding:0 8px;font-size:.47rem}.gx-overview-compact-main span{max-width:190px}.gx-overview-compact-actions button{padding:0 7px}.gx-focus-v3 .gx-tech-credential-grid{grid-template-columns:minmax(0,1fr) 88px!important}.gx-focus-v3 .gx-tech-password-line{align-items:center!important;flex-direction:row!important}.gx-focus-v3 .gx-tech-password-line small{max-width:190px}
  .gx-identity-compact .gx-client-identity-grid{grid-template-columns:1fr!important}.gx-identity-save{width:100%!important}
 }
+/* =========================================================
+   GOXION ADMIN BETA 19.3 · JERARQUÍA + LEGIBILIDAD
+   Refinamiento sobre la arquitectura aprobada de Beta 19.
+   ========================================================= */
+
+/* Tipografía operativa: menos texto fino y más lectura real en móvil. */
+body[data-gx-version="admin-beta-19-3"]{
+    --gx193-line:rgba(255,255,255,.075);
+    --gx193-muted:#93a0b3;
+    --gx193-strong:#f5f8fc;
+    --gx193-cyan:#69edf8;
+}
+body[data-gx-version="admin-beta-19-3"] .gx-eyebrow{font-size:11px!important;letter-spacing:.16em!important;font-weight:900!important}
+body[data-gx-version="admin-beta-19-3"] .gx-page-heading h1{font-size:28px!important;line-height:1.05!important;font-weight:800!important}
+body[data-gx-version="admin-beta-19-3"] .gx-page-heading p{font-size:13px!important;line-height:1.5!important;color:var(--gx193-muted)!important}
+body[data-gx-version="admin-beta-19-3"] .gx-panel-title-row h2{font-size:24px!important;line-height:1.1!important;font-weight:800!important}
+body[data-gx-version="admin-beta-19-3"] .gx-panel-desc{font-size:13px!important;line-height:1.5!important}
+
+/* Sistema de acciones consistente: primaria 46, secundaria 42, icono 42. */
+body[data-gx-version="admin-beta-19-3"] .gx-primary-action{
+    min-height:46px!important;padding:0 16px!important;border-radius:12px!important;
+    font-size:14px!important;line-height:1!important;font-weight:800!important
+}
+body[data-gx-version="admin-beta-19-3"] .gx-secondary-action{
+    min-height:42px!important;padding:0 14px!important;border-radius:11px!important;
+    font-size:13px!important;line-height:1!important;font-weight:750!important
+}
+body[data-gx-version="admin-beta-19-3"] button{touch-action:manipulation}
+
+/* Subnavegación de Gestión: legible y con hit-area real. */
+#tab-ajustes .gx-settings-tabs{margin-bottom:18px!important}
+#tab-ajustes .gx-settings-tabs button{
+    min-height:44px!important;padding:0 14px!important;font-size:12px!important;font-weight:750!important;
+    color:#8290a4!important
+}
+#tab-ajustes .gx-settings-tabs button.active{color:#fff!important}
+#tab-ajustes .gx-panel-title-row{padding:7px 0 16px!important}
+#tab-ajustes{padding-bottom:120px}
+
+/* TRATO JUSTO ------------------------------------------------ */
+#tab-ajustes .gx-tj-bulk-title{
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:start!important;
+}
+#tab-ajustes .gx-tj-bulk-badge{
+    min-width:58px!important;min-height:42px!important;padding:0 12px!important;border-radius:999px!important;
+    display:grid!important;place-items:center!important;font-size:16px!important;font-weight:850!important
+}
+#tab-ajustes .gx-tj-bulk-config{gap:12px!important;margin-top:18px!important}
+#tab-ajustes .gx-tj-bulk-field>span,.gx-tj-bulk-days>span{
+    display:block!important;margin-bottom:7px!important;font-size:11px!important;font-weight:850!important;
+    letter-spacing:.05em!important;color:#909caf!important
+}
+#tab-ajustes .gx-tj-bulk-field input,
+#tab-ajustes .gx-tj-bulk-field select,
+#tab-ajustes .gx-tj-bulk-reason select{
+    min-height:46px!important;border-radius:12px!important;font-size:14px!important;padding:0 14px!important
+}
+#tab-ajustes .gx-tj-bulk-days>div{min-height:46px!important;border-radius:12px!important}
+#tab-ajustes .gx-tj-bulk-days button{min-width:48px!important;font-size:22px!important}
+#tab-ajustes .gx-tj-bulk-days strong{font-size:16px!important}
+#tab-ajustes .gx-tj-bulk-days small{margin-top:6px!important;font-size:11px!important}
+.gx-tj-bulk-selection-head{margin-top:20px!important;padding-top:18px!important}
+.gx-tj-bulk-selection-head strong{font-size:17px!important;font-weight:800!important}
+.gx-tj-bulk-selection-head small{font-size:12px!important;line-height:1.45!important}
+.gx-tj-bulk-selection-actions{display:grid!important;grid-template-columns:repeat(3,1fr)!important;width:100%!important;gap:8px!important;margin-top:10px!important}
+.gx-tj-bulk-selection-actions button{
+    width:100%!important;min-height:42px!important;padding:0 8px!important;border-radius:11px!important;
+    font-size:12px!important;font-weight:750!important
+}
+.gx-tj-bulk-search{min-height:46px!important;border-radius:12px!important;margin:12px 0!important}
+.gx-tj-bulk-search input{font-size:14px!important}
+.gx-tj-bulk-preview{
+    grid-template-columns:repeat(4,1fr)!important;margin:12px 0 14px!important;
+    border-color:var(--gx193-line)!important
+}
+.gx-tj-bulk-preview>div{padding:12px 8px!important}
+.gx-tj-bulk-preview strong{font-size:18px!important}
+.gx-tj-bulk-preview span{font-size:10px!important;line-height:1.25!important}
+.gx-tj-bulk-row{min-height:52px!important;padding:11px 8px!important}
+.gx-tj-bulk-copy strong,.gx-tj-bulk-amount strong{font-size:14px!important}
+.gx-tj-bulk-copy small,.gx-tj-bulk-amount small{font-size:11px!important}
+.gx-tj-bulk-total{
+    display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;gap:12px!important;
+    margin:16px 0 0!important;padding:16px 0 0!important;border-top:1px solid var(--gx193-line)!important;
+    position:static!important;background:transparent!important
+}
+.gx-tj-bulk-total>div:nth-child(2){text-align:right}
+.gx-tj-bulk-total small{font-size:10px!important}
+.gx-tj-bulk-total strong{font-size:14px!important;white-space:normal!important}
+#gx-tj-bulk-total{font-size:22px!important}
+.gx-tj-bulk-total button{grid-column:1/-1!important;width:100%!important;min-height:48px!important;margin-top:2px!important}
+
+/* ACCESOS ---------------------------------------------------- */
+.gx-account-manager-title{padding-bottom:15px!important}
+.gx-account-manager-title h2{font-size:24px!important}
+.gx-account-manager-title .gx-panel-desc{max-width:640px!important}
+.gx-account-manager-explainer{
+    margin:0 0 18px!important;border-top:0!important;border-bottom:1px solid var(--gx193-line)!important
+}
+.gx-account-manager-explainer>div{padding:12px 0!important}
+.gx-account-manager-explainer strong{font-size:14px!important}
+.gx-account-manager-explainer span{font-size:12px!important;line-height:1.45!important}
+.gx-access-architecture-card{padding:16px 0 18px!important;margin-bottom:18px!important}
+.gx-access-architecture-head h3{font-size:21px!important}
+.gx-access-architecture-head p{font-size:12px!important;line-height:1.45!important}
+.gx-access-architecture-head button{
+    min-height:42px!important;padding:0 13px!important;border-radius:11px!important;font-size:12px!important
+}
+.gx-access-diagnostic-grid{margin-top:14px!important}
+.gx-access-diagnostic-grid>div{padding:13px 10px!important}
+.gx-access-diagnostic-grid small{font-size:10px!important;line-height:1.2!important}
+.gx-access-diagnostic-grid strong{font-size:20px!important;margin-top:3px!important}
+.gx-access-diagnostic-state{padding:12px 0!important;font-size:12px!important;line-height:1.45!important}
+.gx-access-details-collapse summary{min-height:38px;display:flex;align-items:center;font-size:12px!important}
+.gx-account-manager-toolbar label>span{font-size:11px!important}
+.gx-account-manager-toolbar select{min-height:46px!important;font-size:14px!important;border-radius:12px!important}
+.gx-account-manager-summary strong{font-size:16px!important}
+.gx-account-manager-summary small{font-size:11px!important}
+.gx-platform-detected{
+    border:0!important;background:transparent!important;border-radius:0!important;padding:0!important;
+    box-shadow:none!important;margin-top:16px!important
+}
+.gx-platform-detected-head{padding:0 0 12px!important;border-bottom:1px solid var(--gx193-line)!important}
+.gx-platform-detected-head span{font-size:10px!important}
+.gx-platform-detected-head strong{font-size:15px!important}
+.gx-platform-detected-head em{min-width:42px!important;height:42px!important;font-size:15px!important}
+.gx-multi-access-help{
+    margin:12px 0!important;padding:10px 0 10px 12px!important;border:0!important;border-left:2px solid rgba(105,237,248,.18)!important;
+    border-radius:0!important;background:transparent!important
+}
+.gx-multi-access-help strong{font-size:12px!important}
+.gx-multi-access-help span{font-size:11px!important;line-height:1.45!important}
+.gx-platform-assign-toolbar{margin:12px 0 14px!important;gap:9px!important}
+.gx-platform-assign-toolbar button,.gx-platform-assign-toolbar select{min-height:44px!important;border-radius:11px!important;font-size:12px!important}
+.gx-platform-detected-list{border-top:1px solid var(--gx193-line)!important}
+.gx-platform-detected-row{
+    border:0!important;border-bottom:1px solid rgba(255,255,255,.055)!important;border-radius:0!important;
+    background:transparent!important;padding:12px 0!important
+}
+.gx-platform-detected-row strong{font-size:14px!important}
+.gx-platform-detected-row small{font-size:11px!important}
+.gx-account-manager-list{margin-bottom:18px!important}
+
+/* CLIENTE ---------------------------------------------------- */
+.gx-focus-header{padding:11px 16px 12px!important}
+.gx-focus-back,.gx-focus-close{width:44px!important;height:44px!important;border-radius:13px!important}
+.gx-focus-identity span{font-size:10px!important}
+.gx-focus-identity strong{font-size:24px!important;font-weight:800!important}
+.gx-focus-identity small{font-size:12px!important;line-height:1.4!important}
+.gx-focus-nav{padding:0 12px!important}
+.gx-focus-nav button{min-height:48px!important;padding:0 12px!important;font-size:12px!important;font-weight:750!important}
+.gx-focus-overview{padding:0 16px!important}
+.gx-overview-dashboard{padding:18px 0 8px}
+.gx-overview-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding-bottom:16px}
+.gx-overview-kicker{display:block;color:#8c99ac;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}
+.gx-overview-hero>div>strong{display:block;margin-top:4px;font-size:34px;line-height:1;font-weight:850;color:#fff}
+.gx-overview-hero>div>small{display:block;margin-top:7px;color:#8c99ac;font-size:12px}
+.gx-overview-state{
+    flex:0 0 auto;display:inline-flex;align-items:center;min-height:34px;padding:0 11px;border-radius:999px;
+    font-size:12px;font-weight:850;border:1px solid rgba(255,255,255,.08);background:#12151c;color:#dce5ef
+}
+.gx-overview-state.ok{color:#7ce8b6;background:rgba(43,208,143,.08);border-color:rgba(43,208,143,.16)}
+.gx-overview-state.review{color:#ffd47a;background:rgba(255,190,70,.08);border-color:rgba(255,190,70,.16)}
+.gx-overview-state.danger{color:#ff8ca9;background:rgba(255,74,115,.08);border-color:rgba(255,74,115,.16)}
+.gx-overview-state.warn{color:#ffc17a;background:rgba(255,167,63,.08);border-color:rgba(255,167,63,.16)}
+.gx-overview-facts{
+    display:grid;grid-template-columns:1.4fr .8fr .8fr 1.2fr;border-top:1px solid var(--gx193-line);
+    border-bottom:1px solid var(--gx193-line)
+}
+.gx-overview-facts>div{min-width:0;padding:14px 10px;border-right:1px solid var(--gx193-line)}
+.gx-overview-facts>div:first-child{padding-left:0}.gx-overview-facts>div:last-child{border-right:0;padding-right:0}
+.gx-overview-facts span{display:block;color:#8593a7;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em}
+.gx-overview-facts strong{display:block;margin-top:5px;color:#edf3f8;font-size:14px;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-overview-attention{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:14px 0;border-bottom:1px solid var(--gx193-line)}
+.gx-overview-attention span{font-size:11px;color:#7f8da1;font-weight:800;text-transform:uppercase}
+.gx-overview-attention strong{font-size:13px;text-align:right;color:#b7c2d0}
+.gx-overview-attention.has-alert strong{color:#ffbd78}
+.gx-overview-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:14px 0 6px}
+.gx-overview-actions button{
+    min-height:44px;border:1px solid var(--gx193-line);border-radius:12px;background:transparent;color:#b8c3d1;
+    font:inherit;font-size:13px;font-weight:800
+}
+.gx-overview-actions button.primary{color:#7bf1fb;border-color:rgba(105,237,248,.2);background:rgba(105,237,248,.05)}
+.gx-focus-v3 #gx-focus-body{padding:0 16px 34px!important}
+
+/* Cobro: lectura más clara y controles secundarios sin competir con el total. */
+.gx-focus-v3 .gx-billing-primary>div{min-height:58px!important;padding:12px 0!important}
+.gx-focus-v3 .gx-billing-primary small{font-size:11px!important}
+.gx-focus-v3 .gx-billing-primary strong{font-size:16px!important}
+.gx-focus-v3 .gx-admin-live-breakdown{padding:14px 0!important;gap:9px!important}
+.gx-focus-v3 .gx-admin-live-breakdown>div{font-size:13px!important}
+.gx-focus-v3 .gx-admin-live-breakdown strong{font-size:13px!important}
+.gx-focus-v3 .gx-admin-live-breakdown .total strong{font-size:18px!important}
+.gx-focus-v3 .gx-billing-admin>summary{min-height:52px!important;font-size:14px!important}
+.gx-focus-v3 .gx-billing-fields label>span{font-size:11px!important}
+.gx-focus-v3 .gx-billing-fields input,.gx-focus-v3 .gx-billing-fields select{min-height:46px!important;font-size:14px!important;border-radius:12px!important}
+
+/* Servicios: cabecera compacta, edición legible y sin tarjeta interna adicional. */
+.gx-focus-v3 .gx-service-compact{padding:16px 0!important}
+.gx-focus-v3 .gx-service-compact-head{grid-template-columns:minmax(0,1fr) auto 44px!important;gap:10px!important}
+.gx-focus-v3 .gx-service-identity strong{font-size:17px!important}
+.gx-focus-v3 .gx-service-live-state,.gx-focus-v3 .gx-service-request-state{font-size:11px!important}
+.gx-focus-v3 .gx-service-price{font-size:20px!important}
+.gx-focus-v3 .gx-service-actions-menu>summary{width:44px!important;height:44px!important;border-radius:12px!important}
+.gx-focus-v3 .gx-service-access-details{margin-top:12px!important;padding-top:0!important;border-top:1px solid var(--gx193-line)!important}
+.gx-focus-v3 .gx-service-access-details>summary{min-height:46px!important;padding:0!important;font-size:13px!important}
+.gx-focus-v3 .gx-service-access-details>summary em{font-size:12px!important}
+.gx-focus-v3 .gx-beta-access-preview-head{padding:13px 0!important}
+.gx-focus-v3 .gx-beta-access-preview-head strong{font-size:15px!important}
+.gx-focus-v3 .gx-beta-access-preview-head small{font-size:11px!important}
+.gx-focus-v3 .gx-beta-access-row-live{padding:14px 0!important}
+.gx-focus-v3 .gx-beta-access-row strong{font-size:15px!important}
+.gx-focus-v3 .gx-beta-access-row small{font-size:11px!important;line-height:1.4!important}
+.gx-focus-v3 .gx-tech-credential-grid label>span,
+.gx-focus-v3 .gx-tech-account-side>span,
+.gx-focus-v3 .gx-tech-password-line span{font-size:10px!important;margin-bottom:6px!important}
+.gx-focus-v3 .gx-tech-credential-grid input,.gx-focus-v3 .gx-technical-account-select{
+    min-height:46px!important;border-radius:12px!important;font-size:14px!important;padding:0 12px!important
+}
+.gx-focus-v3 .gx-tech-password-line small{font-size:11px!important;line-height:1.45!important}
+.gx-focus-v3 .gx-tech-password-line button{min-height:42px!important;border-radius:11px!important;font-size:12px!important;padding:0 12px!important}
+.gx-focus-v3 .gx-beta-access-row em{font-size:11px!important;padding:5px 8px!important}
+
+/* Cuenta: identidad, seguridad y registro con jerarquía real. */
+.gx-focus-v3[data-gx-focus-section="account"] .gx-account-access label>span,
+.gx-focus-v3[data-gx-focus-section="account"] .gx-pin-control span{font-size:11px!important}
+.gx-focus-v3[data-gx-focus-section="account"] .gx-account-access input,
+.gx-focus-v3[data-gx-focus-section="account"] .gx-account-access select{
+    min-height:48px!important;border-radius:12px!important;font-size:15px!important;padding:0 14px!important
+}
+.gx-focus-v3 .gx-pin-control{padding-top:16px!important;margin-top:16px!important}
+.gx-focus-v3 .gx-pin-control-head strong{font-size:14px!important}
+.gx-focus-v3 .gx-pin-control-head small,.gx-focus-v3 .gx-pin-control p{font-size:12px!important;line-height:1.5!important}
+.gx-focus-v3 .gx-pin-control button{min-height:44px!important;font-size:13px!important;border-radius:12px!important}
+.gx-identity-compact{margin-top:18px!important}
+.gx-identity-compact>summary{min-height:60px!important}
+.gx-identity-compact>summary strong{font-size:15px!important}
+.gx-identity-compact>summary small{font-size:11px!important}
+.gx-identity-compact .gx-client-origin-badge{font-size:11px!important;min-height:30px!important;padding:0 9px!important}
+.gx-identity-compact .gx-client-identity-grid{padding:14px 0 16px!important;gap:10px!important}
+.gx-identity-compact .gx-client-identity-grid label>span{font-size:10px!important;margin-bottom:6px!important}
+.gx-identity-compact .gx-client-identity-grid input,.gx-identity-compact .gx-client-identity-grid select{
+    min-height:46px!important;border-radius:12px!important;font-size:14px!important;padding:0 12px!important
+}
+.gx-identity-compact .gx-identity-eligible{min-height:46px!important;font-size:12px!important}
+.gx-identity-save{min-height:46px!important;border-radius:12px!important;font-size:13px!important}
+.gx-identity-compact .gx-client-identity-warning{padding:10px 12px!important;font-size:11px!important;line-height:1.45!important}
+
+/* Acordeones reutilizados fuera de la ficha: alturas y texto consistentes. */
+body[data-gx-version="admin-beta-19-3"] .gx-accordion-trigger{min-height:54px!important;padding:12px 14px!important}
+body[data-gx-version="admin-beta-19-3"] .gx-accordion-trigger b{font-size:14px!important}
+body[data-gx-version="admin-beta-19-3"] .gx-accordion-trigger small{font-size:11px!important;line-height:1.35!important}
+body[data-gx-version="admin-beta-19-3"] .gx-accordion-trigger i{width:34px!important;height:34px!important;border-radius:10px!important}
+body[data-gx-version="admin-beta-19-3"] .gx-accordion-content{padding:0 14px 14px!important}
+
+/* Móvil: evitar deformaciones y solapamiento con navegación/Safari. */
+@media(max-width:760px){
+    body[data-gx-version="admin-beta-19-3"] .gx-page-heading h1{font-size:25px!important}
+    body[data-gx-version="admin-beta-19-3"] .gx-page-heading p{display:none!important}
+    #tab-ajustes{padding-bottom:150px!important}
+    #tab-ajustes .gx-settings-tabs button{font-size:11px!important;padding:0 12px!important}
+    #tab-ajustes .gx-panel-desc{display:none!important}
+    .gx-tj-bulk-config{grid-template-columns:1fr 1fr!important}
+    .gx-tj-bulk-service-field,.gx-tj-bulk-reason{grid-column:1/-1!important}
+    .gx-tj-bulk-preview{grid-template-columns:repeat(2,1fr)!important}
+    .gx-tj-bulk-preview>div:nth-child(2){border-right:0!important}
+    .gx-tj-bulk-preview>div:nth-child(-n+2){border-bottom:1px solid var(--gx193-line)!important}
+    .gx-tj-bulk-total{margin-bottom:34px!important}
+    .gx-account-manager-explainer{grid-template-columns:1fr!important}
+    .gx-access-diagnostic-grid{grid-template-columns:repeat(2,1fr)!important}
+    .gx-access-diagnostic-grid>div:nth-child(2){border-right:0!important}
+    .gx-access-diagnostic-grid>div:nth-child(-n+2){border-bottom:1px solid var(--gx193-line)!important}
+    .gx-platform-assign-toolbar{grid-template-columns:1fr 1fr!important}
+    .gx-platform-assign-toolbar select{grid-column:2!important}
+    .gx-platform-assign-toolbar .gx-primary-action{grid-column:1/-1!important}
+    .gx-focus-sheet{height:94vh!important}
+    .gx-focus-nav button{font-size:11px!important;padding:0 8px!important}
+    .gx-overview-facts{grid-template-columns:1.35fr .65fr!important}
+    .gx-overview-facts>div:nth-child(2){border-right:0!important}
+    .gx-overview-facts>div:nth-child(-n+2){border-bottom:1px solid var(--gx193-line)!important}
+    .gx-overview-facts>div:nth-child(3){padding-left:0!important}
+    .gx-overview-hero>div>strong{font-size:32px!important}
+    .gx-focus-v3 .gx-tech-credential-grid{grid-template-columns:minmax(0,1fr) 110px!important}
+    .gx-focus-v3 .gx-tech-password-line{align-items:center!important;flex-direction:row!important}
+    .gx-focus-v3 .gx-tech-password-line small{max-width:210px!important}
+    .gx-identity-compact .gx-client-identity-grid{grid-template-columns:1fr!important}
+}
+
 </style><script id="goxion-admin-beta-19-controller">
 (()=>{
   const PROMO_URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/promociones-admin-beta";
@@ -11863,6 +12151,13 @@ body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{max-width:620px;font-
     const map={missions:['Misiones','Plantillas, rondas y recompensas.'],loyalty:['Lealtad','Niveles, rachas y ajustes.'],fairdeal:['Trato Justo','Compensaciones del periodo afectado.'],accounts:['Accesos','Cuentas madre y distribución.'],credentials:['Credenciales','Contraseñas y entregas seguras.'],app:['Experiencia','Comportamiento visible de la app.'],alerts:['Incidencias','Avisos operativos para clientes.']};
     const pair=map[dest];if(!pair)return;const tab=document.getElementById('tab-ajustes');if(!tab)return;const h=tab.querySelector('.gx-page-heading h1'),p=tab.querySelector('.gx-page-heading p');if(h)h.textContent=pair[0];if(p)p.textContent=pair[1];
   }
+
+  const gxSettingsView19Base=window.gxSettingsView;
+  window.gxSettingsView=function(view,btn){
+    const r=typeof gxSettingsView19Base==='function'?gxSettingsView19Base.call(this,view,btn):undefined;
+    gxSetSettingsContext(view);
+    return r;
+  };
 
   window.gxOpenCatalogMode=function(mode,btn){
     goAdminTab('tab-catalogo');
@@ -11925,12 +12220,64 @@ body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{max-width:620px;font-
 
   function focusOverview(key){
     const c=typeof clientesDict!=='undefined'?clientesDict?.[key]:null,box=document.getElementById('gx-focus-overview');if(!c||!box)return;
-    const ec=c.estado_cuenta||{},services=(c.servicios||[]),loyal=Number(ec?.lealtad?.pagos_efectivos??c.pagos_puntuales??0);
+    const ec=c.estado_cuenta||{},services=(c.servicios||[]);
+    const total=Number(ec?.total_actual ?? services.reduce((s,x)=>s+Number(x?.monto||0),0));
+    const base=Number(ec?.subtotal ?? services.reduce((s,x)=>s+Number(x?.monto||0),0));
+    const mora=Number(ec?.cargos?.mora||0),react=Number(ec?.cargos?.reactivacion||0);
+    const loyal=Number(ec?.lealtad?.pagos_efectivos??c.pagos_puntuales??0);
+    const period=String(ec?.periodo_label || (typeof gxPeriodLabel==='function'?gxPeriodLabel(c.periodo_pendiente):String(c.periodo_pendiente||'').slice(0,7)) || 'Periodo actual');
+    const dueDay=Number(ec?.dia_pago??c.dia_pago??15);
+    const billingState=String(ec?.estado||'').toLowerCase();
     const timing=typeof gxPaymentTiming==='function'?gxPaymentTiming(c):{type:'none',days:0};
-    const serviceLabel=services.length?`${services.length} servicio${services.length===1?'':'s'} activo${services.length===1?'':'s'}`:'Sin servicios activos';
-    const loyaltyLabel=loyal>=9?'Nivel 2 · 6%':loyal>=4?'Nivel 1 · 3%':`${loyal} pago${loyal===1?'':'s'} puntual${loyal===1?'':'es'}`;
-    const attention=c.pago_en_revision?'Comprobante pendiente de revisión':timing.type==='overdue'?`Cobro vencido · ${Number(timing.days||0)} día${Number(timing.days||0)===1?'':'s'}`:timing.type==='upcoming'?(Number(timing.days||0)===0?'Cobro programado para hoy':`Próximo cobro en ${Number(timing.days||0)} día${Number(timing.days||0)===1?'':'s'}`):'Sin alertas operativas';
-    box.innerHTML=`<div class="gx-overview-compact"><div class="gx-overview-compact-main"><strong>${esc(attention)}</strong><span>${esc(serviceLabel)} · ${esc(loyaltyLabel)}</span></div><div class="gx-overview-compact-actions"><button onclick="gxFocusSection('billing',document.querySelector('[data-gx-focus-section=\'billing\']'))">Cobro</button><button onclick="enviarMensaje('${String(c.nombre||'').replace(/'/g,"\'")}','${String(key).replace(/'/g,"\'")}')">Mensaje</button></div></div>`;
+    const clientId=String(c?._id||c?.id||'');
+    const accessRows=(window.gxAccessModelBeta?.accesos||[]).filter(a=>a.activo!==false&&String(a.cliente_id||'')===clientId);
+    const pendingAccess=accessRows.filter(a=>{
+      const mode=String(a.modo_acceso||'compartido');
+      return mode==='invitacion'
+        ? (!String(a.correo_override||'').trim() || !a.estado_invitacion || a.estado_invitacion==='sin_verificar')
+        : !a.cuenta_id;
+    }).length;
+    const stateLabel=billingState==='pagado'?'Al corriente'
+      :billingState==='revision'?'Pago en revisión'
+      :billingState==='incompleto'?'Pago incompleto'
+      :billingState==='vencido'?`Vencido${Number(ec?.dias_atraso||0)>0?` · ${Number(ec.dias_atraso)}d`:''}`
+      :billingState==='vence_hoy'?'Vence hoy'
+      :billingState==='por_vencer'?'Por vencer'
+      :(c.estado==='suspendido'?'Suspendido':'Pendiente');
+    const stateClass=billingState==='pagado'?'ok':billingState==='revision'?'review':billingState==='vencido'?'danger':billingState==='incompleto'?'warn':'neutral';
+    const loyaltyLabel=loyal>=9?'Nivel 2 · 6%':loyal>=4?'Nivel 1 · 3%':`${loyal} pago${loyal===1?'':'s'}`;
+    const attention=[];
+    if(mora>0)attention.push(`Mora $${money(mora)}`);
+    if(react>0)attention.push(`Reactivación $${money(react)}`);
+    if(pendingAccess>0)attention.push(`${pendingAccess} acceso${pendingAccess===1?'':'s'} pendiente${pendingAccess===1?'':'s'}`);
+    if(c.pago_en_revision)attention.unshift('Comprobante por revisar');
+    else if(timing.type==='overdue'&&!attention.length)attention.push(`Cobro vencido ${Number(timing.days||0)} día${Number(timing.days||0)===1?'':'s'}`);
+    const attentionText=attention.length?attention.join(' · '):'Sin alertas operativas';
+    box.innerHTML=`
+      <section class="gx-overview-dashboard">
+        <div class="gx-overview-hero">
+          <div>
+            <span class="gx-overview-kicker">Total actual</span>
+            <strong>$${money(total)}</strong>
+            <small>Base mensual $${money(base)}</small>
+          </div>
+          <span class="gx-overview-state ${stateClass}">${esc(stateLabel)}</span>
+        </div>
+        <div class="gx-overview-facts">
+          <div><span>Periodo</span><strong>${esc(period)}</strong></div>
+          <div><span>Día de pago</span><strong>${dueDay}</strong></div>
+          <div><span>Servicios</span><strong>${services.length}</strong></div>
+          <div><span>Lealtad</span><strong>${esc(loyaltyLabel)}</strong></div>
+        </div>
+        <div class="gx-overview-attention ${attention.length?'has-alert':''}">
+          <span>${attention.length?'Atención':'Estado'}</span>
+          <strong>${esc(attentionText)}</strong>
+        </div>
+        <div class="gx-overview-actions">
+          <button class="primary" onclick="gxFocusSection('billing',document.querySelector('[data-gx-focus-section=\'billing\']'))">Ver cobro</button>
+          <button onclick="enviarMensaje('${String(c.nombre||'').replace(/'/g,"\'")}','${String(key).replace(/'/g,"\'")}')">Mensaje</button>
+        </div>
+      </section>`;
   }
   window.gxFocusSection=function(section,btn){const f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body'),overview=document.getElementById('gx-focus-overview');if(!f||!body)return;document.querySelectorAll('[data-gx-focus-section]').forEach(x=>x.classList.toggle('active',x.dataset.gxFocusSection===section));if(overview)overview.hidden=section!=='summary';body.querySelectorAll('[data-gx-section]').forEach(x=>x.classList.toggle('gx-focus-section-active',x.dataset.gxSection===section));f.dataset.gxFocusSection=section;};
   function setupFocus(key){const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;f.classList.add('gx-focus-v3');f.dataset.gxClientKey=key;focusOverview(key);gxFocusSection('summary');}
@@ -11938,7 +12285,7 @@ body[data-gx-version="admin-beta-19-2"] .gx-page-heading p{max-width:620px;font-
   const currentOpenSection=window.gxOpenClientSection;window.gxOpenClientSection=function(section,...args){if(document.getElementById('gx-client-focus')?.classList.contains('show')&&['summary','billing','services','benefits','account'].includes(section)){gxFocusSection(section);return;}return typeof currentOpenSection==='function'?currentOpenSection.call(this,section,...args):undefined;};
 
   document.addEventListener('DOMContentLoaded',()=>setTimeout(()=>{gxUpdateExperiencePreview();gxUpdateIncidentPreview();},700));
-  console.info('GOXION Admin Beta 19.2 · jerarquía compacta activa.');
+  console.info('GOXION Admin Beta 19.3 · jerarquía legible activa.');
 })();
-</script><div id="gx-beta19-marker" style="display:none">GOXION ADMIN BETA 19.2 · jerarquía compacta</div></body>
+</script><div id="gx-beta19-marker" style="display:none">GOXION ADMIN BETA 19.3 · jerarquía legible</div></body>
 </html>
