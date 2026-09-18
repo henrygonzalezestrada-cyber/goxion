@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>GOXION // ADMIN BETA 19.4</title>
+<title>GOXION // ADMIN BETA 19.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
         :root {
@@ -4838,7 +4838,7 @@ details.gx-client-ops-context{
 <button class="gx-mobile-nav-btn" data-admin-target="tab-gestion" onclick="goAdminTab('tab-gestion',this)"><i>⌘</i><span>Gestión</span></button>
 </nav>
 </div>
-<div aria-hidden="true" class="gx-client-focus" id="gx-client-focus"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong><small id="gx-focus-meta">—</small></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary" hidden></div><nav class="gx-focus-nav" id="gx-focus-nav"><button class="active" data-gx-focus-section="summary" onclick="gxFocusSection('summary',this)">Resumen</button><button data-gx-focus-section="billing" onclick="gxFocusSection('billing',this)">Cobro</button><button data-gx-focus-section="services" onclick="gxFocusSection('services',this)">Servicios</button><button data-gx-focus-section="benefits" onclick="gxFocusSection('benefits',this)">Beneficios</button><button data-gx-focus-section="account" onclick="gxFocusSection('account',this)">Cuenta</button></nav><div class="gx-focus-overview" id="gx-focus-overview"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
+<div aria-hidden="true" class="gx-client-focus" id="gx-client-focus"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong><small id="gx-focus-meta">—</small></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary" hidden></div><nav class="gx-focus-nav gx-focus-nav-v195" id="gx-focus-nav"><button class="active" data-gx-focus-section="billing" onclick="gxFocusSection('billing',this)">Cobro</button><button data-gx-focus-section="services" onclick="gxFocusSection('services',this)">Servicios</button><button data-gx-focus-section="benefits" onclick="gxFocusSection('benefits',this)">Beneficios</button><button data-gx-focus-section="account" onclick="gxFocusSection('account',this)">Cuenta</button></nav><div class="gx-focus-overview" id="gx-focus-overview"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
 <div aria-hidden="true" class="gx-registration-control" id="gx-registration-control">
 <div class="gx-registration-backdrop" onclick="gxCloseRegistrationControl()"></div>
 <section class="gx-registration-sheet">
@@ -5604,19 +5604,16 @@ let clientesDict = {};
                             <span><i>✦</i><b>Beneficios</b><small>${cliente.pagos_puntuales || 0} pagos · ${refActivo?'Referido activo':'Sin referido'} · ${gamifConfig.misiones_activas?'Misiones activas':'Sin misiones'}</small></span><em>⌄</em>
                         </button>
                         <div class="gx-accordion-content">
-                            <div class="gx-benefit-loyalty">
-                                <div>
+                            <div class="gx-benefit-loyalty gx-benefit-loyalty-v195">
+                                <div class="gx-benefit-copy">
                                     <small>Lealtad</small>
                                     <strong><span id="pagos-${key}">${cliente.pagos_puntuales || 0}</span> pagos puntuales</strong>
                                 </div>
-                                <details>
-                                    <summary>Administrar</summary>
-                                    <div class="gx-dock-stepper">
-                                        <button type="button" onclick="updatePagos('${key}',-1)">−</button>
-                                        <button type="button" onclick="updatePagos('${key}',1)">＋</button>
-                                        <button type="button" class="reset" onclick="reiniciarLealtad('${key}')" title="Reiniciar">↻</button>
-                                    </div>
-                                </details>
+                                <div class="gx-loyalty-inline-actions" aria-label="Administrar lealtad">
+                                    <button type="button" onclick="updatePagos('${key}',-1)" title="Restar pago">−</button>
+                                    <button type="button" onclick="updatePagos('${key}',1)" title="Sumar pago">＋</button>
+                                    <button type="button" class="reset" onclick="reiniciarLealtad('${key}')" title="Reiniciar lealtad">↻</button>
+                                </div>
                             </div>
 
                             <details class="gx-benefit-sub">
@@ -12476,5 +12473,164 @@ body[data-gx-version="admin-beta-19-4"] .gx-secondary-action{
   .gx-tj-bulk-selection-actions button{min-height:40px!important}
 }
 </style>
+
+<script id="goxion-admin-beta-19-5-behavior">
+(()=>{
+  document.body.classList.add('gx-beta-19-5');
+
+  // Beta 19.5: Resumen y Cobro se unifican. Cualquier llamada heredada a "summary"
+  // aterriza en Cobro para conservar compatibilidad con funciones previas.
+  window.gxFocusSection=function(section,btn){
+    const normalized=section==='summary'?'billing':section;
+    const f=document.getElementById('gx-client-focus');
+    const body=document.getElementById('gx-focus-body');
+    const overview=document.getElementById('gx-focus-overview');
+    if(!f||!body)return;
+    document.querySelectorAll('[data-gx-focus-section]').forEach(x=>x.classList.toggle('active',x.dataset.gxFocusSection===normalized));
+    if(overview){overview.hidden=true;overview.setAttribute('aria-hidden','true');}
+    body.querySelectorAll('[data-gx-section]').forEach(x=>x.classList.toggle('gx-focus-section-active',x.dataset.gxSection===normalized));
+    f.dataset.gxFocusSection=normalized;
+  };
+
+  // La función de apertura de 19.4 todavía intenta iniciar en Resumen; la normalización
+  // anterior la redirige a Cobro. Este refuerzo evita un frame visual en la pestaña antigua.
+  const open195=window.gxOpenClientFocus;
+  if(typeof open195==='function'){
+    window.gxOpenClientFocus=function(key,...args){
+      const r=open195.call(this,key,...args);
+      setTimeout(()=>window.gxFocusSection('billing',document.querySelector('[data-gx-focus-section="billing"]')),105);
+      return r;
+    };
+  }
+
+  console.info('GOXION Admin Beta 19.5 · Cobro unificado y composición refinada.');
+})();
+</script>
+<style id="goxion-admin-beta-19-5-composition">
+/* =========================================================
+   GOXION ADMIN BETA 19.5 · COBRO UNIFICADO + COMPOSICIÓN
+   Sólo UI/flujo. No modifica endpoints ni reglas de negocio.
+   ========================================================= */
+
+/* Cliente: 4 destinos reales. El encabezado ya cumple la lectura ejecutiva. */
+.gx-beta-19-5 .gx-focus-nav-v195{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  padding-inline:18px!important;
+}
+.gx-beta-19-5 .gx-focus-nav-v195 button{
+  height:50px!important;min-height:50px!important;font-size:12px!important;font-weight:800!important;
+}
+.gx-beta-19-5 #gx-focus-overview{display:none!important}
+.gx-beta-19-5 .gx-focus-v3 #gx-focus-body{padding-top:0!important}
+
+/* Cobro ya no repite el encabezado: desglose primero, edición después. */
+.gx-beta-19-5 .gx-focus-v3[data-gx-focus-section="billing"] .gx-billing-primary{display:none!important}
+.gx-beta-19-5 .gx-focus-v3[data-gx-focus-section="billing"] .gx-admin-live-breakdown{
+  padding:18px 0!important;margin:0!important;border-top:0!important;
+}
+.gx-beta-19-5 .gx-focus-v3[data-gx-focus-section="billing"] .gx-admin-live-breakdown::before{
+  content:"Desglose del cobro";display:block;margin:0 0 12px;color:#f5f8fc;font-size:15px;font-weight:800;
+}
+.gx-beta-19-5 .gx-focus-v3 .gx-billing-admin>summary{
+  min-height:54px!important;border-bottom:0!important;
+}
+.gx-beta-19-5 .gx-focus-v3 .gx-billing-admin>summary span{font-size:15px!important}
+.gx-beta-19-5 .gx-focus-v3 .gx-billing-admin>summary em{font-size:12px!important}
+.gx-beta-19-5 .gx-focus-v3 .gx-billing-fields{gap:10px!important}
+.gx-beta-19-5 .gx-focus-v3 .gx-billing-fields input,
+.gx-beta-19-5 .gx-focus-v3 .gx-billing-fields select{min-height:46px!important;border-radius:12px!important}
+
+/* Beneficios: una fila = una idea. Lealtad ya no tiene un disclosure dentro de otro. */
+.gx-beta-19-5 .gx-benefits-accordion .gx-accordion-content{padding-top:2px!important}
+.gx-beta-19-5 .gx-benefit-loyalty-v195{
+  min-height:66px!important;display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+  align-items:center!important;gap:14px!important;padding:12px 0!important;
+}
+.gx-beta-19-5 .gx-benefit-copy small{font-size:11px!important;color:#929eb0!important;font-weight:750!important}
+.gx-beta-19-5 .gx-benefit-copy strong{font-size:16px!important;margin-top:3px!important;line-height:1.2!important}
+.gx-beta-19-5 .gx-loyalty-inline-actions{display:grid!important;grid-template-columns:repeat(3,42px)!important;gap:7px!important}
+.gx-beta-19-5 .gx-loyalty-inline-actions button{
+  width:42px!important;height:42px!important;min-width:42px!important;padding:0!important;
+  border:1px solid rgba(255,255,255,.09)!important;border-radius:12px!important;
+  background:rgba(255,255,255,.025)!important;color:#eef4fb!important;font:inherit!important;font-size:18px!important;font-weight:800!important;
+}
+.gx-beta-19-5 .gx-loyalty-inline-actions button.reset{font-size:15px!important;color:#aeb8c9!important}
+.gx-beta-19-5 .gx-benefit-sub>summary{
+  min-height:62px!important;padding:0!important;align-items:center!important;
+}
+.gx-beta-19-5 .gx-benefit-sub>summary span{font-size:16px!important;font-weight:800!important}
+.gx-beta-19-5 .gx-benefit-sub>summary em{font-size:12px!important;max-width:45%;text-align:right!important}
+.gx-beta-19-5 .gx-benefit-sub-body{padding:2px 0 14px!important}
+
+/* Experiencia / incidencias: acción secundaria al formulario; preview no compite. */
+.gx-beta-19-5 .gx-experience-main>.gx-full-action,
+.gx-beta-19-5 .gx-incidents-v2 .gx-experience-main>.gx-full-action{
+  width:176px!important;min-width:0!important;max-width:176px!important;min-height:44px!important;
+  margin:12px 0 0 auto!important;padding:0 14px!important;font-size:13px!important;border-radius:12px!important;
+}
+.gx-beta-19-5 .gx-experience-main .gx-panel-title-row{padding-bottom:12px!important;margin-bottom:12px!important}
+.gx-beta-19-5 .gx-setting-row-v2{padding:13px 0!important}
+.gx-beta-19-5 .gx-setting-row-v2 strong{font-size:15px!important}
+.gx-beta-19-5 .gx-experience-preview{padding-top:16px!important}
+.gx-beta-19-5 .gx-preview-phone{min-height:112px!important;padding:14px!important;border-radius:15px!important}
+.gx-beta-19-5 .gx-preview-phone strong{font-size:14px!important}
+.gx-beta-19-5 .gx-preview-phone p{font-size:11px!important;line-height:1.4!important}
+.gx-beta-19-5 .gx-alert-settings-v2{gap:10px!important}
+.gx-beta-19-5 .gx-alert-settings-v2 label>span{margin-bottom:6px!important}
+.gx-beta-19-5 .gx-alert-settings-v2 .gx-large-textarea{min-height:116px!important;border-radius:13px!important}
+
+/* Trato Justo: un único scroll de página. Se elimina el footer pegajoso que chocaba con la navegación. */
+.gx-beta-19-5 .gx-tj-bulk-client-list{max-height:none!important;overflow:visible!important}
+.gx-beta-19-5 .gx-tj-bulk-total{
+  position:static!important;bottom:auto!important;z-index:auto!important;
+  display:grid!important;grid-template-columns:minmax(0,.72fr) minmax(0,1.5fr) auto!important;
+  align-items:center!important;gap:14px!important;
+  margin:18px 0 0!important;padding:16px 0 4px!important;
+  border-top:1px solid rgba(255,255,255,.075)!important;background:transparent!important;
+}
+.gx-beta-19-5 .gx-tj-bulk-total>div{min-width:0!important}
+.gx-beta-19-5 .gx-tj-bulk-total small{display:block!important;font-size:10px!important;letter-spacing:.05em!important;color:#8e9aaf!important}
+.gx-beta-19-5 .gx-tj-bulk-total strong{display:block!important;margin-top:4px!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important}
+.gx-beta-19-5 #gx-tj-bulk-total{font-size:22px!important;color:#72e9bd!important}
+.gx-beta-19-5 #gx-tj-bulk-summary{font-size:13px!important;line-height:1.35!important}
+.gx-beta-19-5 #gx-tj-bulk-apply{width:auto!important;min-width:132px!important;min-height:44px!important;padding:0 16px!important}
+.gx-beta-19-5 .gx-tj-bulk-preview{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;border:1px solid rgba(255,255,255,.07)!important;
+  border-radius:14px!important;overflow:hidden!important;margin:14px 0!important;
+}
+.gx-beta-19-5 .gx-tj-bulk-preview>div{min-height:64px!important;padding:10px 8px!important;border-bottom:0!important}
+.gx-beta-19-5 .gx-tj-bulk-preview strong{font-size:17px!important}.gx-beta-19-5 .gx-tj-bulk-preview span{font-size:10px!important}
+
+/* Subnav de Gestión: scroll deliberado, sin "medio botón" pegado al borde. */
+.gx-beta-19-5 #tab-ajustes .gx-settings-tabs{
+  overflow-x:auto!important;overscroll-behavior-x:contain!important;padding:0 2px 5px!important;scroll-padding-inline:2px!important;
+}
+.gx-beta-19-5 #tab-ajustes .gx-settings-tabs button{flex:0 0 auto!important;min-width:max-content!important}
+
+@media(max-width:760px){
+  .gx-beta-19-5 .gx-focus-nav-v195{padding-inline:12px!important}
+  .gx-beta-19-5 .gx-focus-nav-v195 button{font-size:12px!important}
+  .gx-beta-19-5 .gx-focus-v3 #gx-focus-body{padding-left:18px!important;padding-right:18px!important;padding-bottom:44px!important}
+
+  .gx-beta-19-5 .gx-benefit-loyalty-v195{gap:10px!important}
+  .gx-beta-19-5 .gx-loyalty-inline-actions{grid-template-columns:repeat(3,40px)!important;gap:6px!important}
+  .gx-beta-19-5 .gx-loyalty-inline-actions button{width:40px!important;height:40px!important;min-width:40px!important}
+
+  .gx-beta-19-5 .gx-experience-main>.gx-full-action,
+  .gx-beta-19-5 .gx-incidents-v2 .gx-experience-main>.gx-full-action{width:168px!important;max-width:168px!important}
+
+  .gx-beta-19-5 .gx-tj-bulk-preview{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .gx-beta-19-5 .gx-tj-bulk-preview>div{min-height:58px!important;padding:9px 12px!important}
+  .gx-beta-19-5 .gx-tj-bulk-preview>div:nth-child(odd){border-right:1px solid rgba(255,255,255,.07)!important}
+  .gx-beta-19-5 .gx-tj-bulk-preview>div:nth-child(-n+2){border-bottom:1px solid rgba(255,255,255,.07)!important}
+  .gx-beta-19-5 .gx-tj-bulk-total{
+    grid-template-columns:1fr auto!important;gap:12px!important;padding-top:14px!important;margin-top:16px!important;
+  }
+  .gx-beta-19-5 .gx-tj-bulk-total>div:nth-child(2){grid-column:1/-1!important;grid-row:2!important}
+  .gx-beta-19-5 #gx-tj-bulk-apply{grid-column:2!important;grid-row:1!important;min-width:118px!important}
+  .gx-beta-19-5 #gx-tj-bulk-summary{font-size:12px!important}
+}
+</style>
+<div id="gx-beta195-marker" style="display:none">GOXION ADMIN BETA 19.5 · cobro unificado</div>
 </body>
 </html>
