@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.1.3" lang="es">
+<html data-goxion-version="1.1.3-beta-20" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>GOXION // ADMIN BETA 19.8</title>
+<title>GOXION // ADMIN BETA 20 · BENEFICIOS INTELIGENTES</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
         :root {
@@ -5272,12 +5272,22 @@ let clientesDict = {};
                 </div>` : '';
 
             let descuentosHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 10px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
-                    <span style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; font-weight:bold;">Descuentos / Trato Justo</span>
-                    <button class="btn-save" style="padding: 4px 10px; font-size: 0.8rem; background:rgba(0, 242, 254, 0.15); color:var(--neon-blue);" onclick="agregarDescuentoEspecial('${key}')">+ Añadir</button>
+                <div class="gx-benefit-section-head">
+                    <div><span>Beneficios y descuentos</span><small>Reglas automáticas por periodo</small></div>
+                    <button class="gx-benefit-add" type="button" onclick="gxOpenBenefitModal('${key}')">＋ Programar</button>
                 </div>
             `;
-            
+
+            if (Array.isArray(cliente.beneficios_programados) && cliente.beneficios_programados.length) {
+                descuentosHTML += `<div class="gx-benefit-list">${cliente.beneficios_programados.map(b => window.gxBenefitCardHTML ? window.gxBenefitCardHTML(b, cliente, '${key}') : '').join('')}</div>`;
+            } else {
+                descuentosHTML += `<div class="gx-benefit-empty">Sin beneficios programados.</div>`;
+            }
+
+            if (cliente.descuento_especial || (cliente.descuentos_especiales && cliente.descuentos_especiales.length)) {
+                descuentosHTML += `<div class="gx-benefit-legacy-label">Descuentos anteriores</div>`;
+            }
+
             if (cliente.descuento_especial) {
                 descuentosHTML += `
                 <div style="background: rgba(0, 242, 254, 0.1); border: 1px solid var(--neon-blue); padding: 6px 10px; border-radius: 6px; margin-top: 6px; display:flex; justify-content:space-between; align-items:center;">
@@ -5721,6 +5731,7 @@ let clientesDict = {};
         const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro`;
         const TRATO_URL = `${SUPABASE_URL}/functions/v1/trato-justo`;
         const ESTADO_CUENTA_URL = `${SUPABASE_URL}/functions/v1/estado-cuenta-beta`;
+        const BENEFICIOS_URL = `${SUPABASE_URL}/functions/v1/beneficios-admin-beta`;
         const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
         currentToken = localStorage.getItem(ADMIN_TOKEN_KEY) || "";
 const n = (v, fallback = 0) => {
@@ -5903,6 +5914,34 @@ const n = (v, fallback = 0) => {
                 console.warn("Estado de cuenta central no disponible temporalmente:", e);
             }
 
+            try {
+                const br = await fetch(BENEFICIOS_URL, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Admin-Token": currentToken
+                    },
+                    body: JSON.stringify({ accion: "listar", datos: {} }),
+                    cache: "no-store"
+                });
+                const parsed = await parseResponse(br);
+                if (br.status === 401) {
+                    localStorage.removeItem(ADMIN_TOKEN_KEY);
+                    currentToken = "";
+                    const err = new Error("SESION_EXPIRADA");
+                    err.raw = parsed.text;
+                    throw err;
+                }
+                if (br.ok && parsed.json?.ok === true) {
+                    json.beneficios_programados = parsed.json.beneficios || [];
+                } else {
+                    console.warn("Beneficios programados no disponibles:", parsed.text);
+                }
+            } catch (e) {
+                if (e?.message === "SESION_EXPIRADA") throw e;
+                console.warn("No se pudieron cargar beneficios programados:", e);
+            }
+
             console.log("admin-datos RAW:", json);
             return json;
         }
@@ -6043,6 +6082,7 @@ const n = (v, fallback = 0) => {
             const descuentosGlobal = getArray(root, "descuentos", "descuentos_especiales", "clientes_descuentos");
             const tratoJustoGlobal = getArray(root, "trato_justo_compensaciones");
             const estadosCuentaGlobal = getArray(root, "estados_cuenta");
+            const beneficiosProgramadosGlobal = getArray(root, "beneficios_programados");
             const estadoCuentaPorCliente = new Map(estadosCuentaGlobal.map(x => [String(x?.cliente_id || ""), x]));
             const periodosCobro = getArray(root, "periodos_cobro");
             const periodoPorCliente = new Map(
@@ -6116,6 +6156,7 @@ const n = (v, fallback = 0) => {
                     historial_pagos: pagos.map(adaptarPago),
                     servicios: servicios.map(adaptarServicioCliente),
                     descuentos_especiales: descuentos.map(adaptarDescuento),
+                    beneficios_programados: beneficiosProgramadosGlobal.filter(x => String(x?.cliente_id || "") === String(id)),
                     trato_justo_compensaciones: tratoJusto,
                     descuento_fallas: tratoJusto.filter(x => x.activo !== false && String(x.periodo || "").slice(0,7) === String(c.periodo_pendiente || periodoMeta.periodo_pendiente || "").slice(0,7)).reduce((s,x)=>s+n(x.monto,0), n(c.descuento_fallas,0)),
                     referido_activo: refActivo ? adaptarReferido(refActivo) : undefined,
@@ -12867,5 +12908,79 @@ body[data-gx-version="admin-beta-19-4"] .gx-secondary-action{
 </style>
 <div id="gx-beta196-marker" style="display:none">GOXION ADMIN BETA 19.8 · pulido final</div>
 
+
+<!-- GOXION ADMIN BETA 20 // MOTOR DE BENEFICIOS -->
+<div class="gx-benefit-modal" id="gx-benefit-modal" aria-hidden="true">
+  <div class="gx-benefit-modal-backdrop" onclick="gxCloseBenefitModal()"></div>
+  <section class="gx-benefit-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-benefit-title">
+    <header>
+      <div><span class="gx-eyebrow">Cobro inteligente</span><h2 id="gx-benefit-title">Programar descuento</h2><p id="gx-benefit-client">Cliente</p></div>
+      <button type="button" class="gx-benefit-close" onclick="gxCloseBenefitModal()">×</button>
+    </header>
+    <input type="hidden" id="gx-benefit-key">
+    <div class="gx-benefit-form">
+      <label class="wide"><span>Concepto</span><input id="gx-benefit-concept" type="text" maxlength="140" placeholder="Ej. Ajuste comercial"></label>
+      <label><span>Tipo</span><select id="gx-benefit-type" onchange="gxUpdateBenefitPreview()"><option value="monto">Monto fijo</option><option value="porcentaje">Porcentaje</option></select></label>
+      <label><span>Valor</span><div class="gx-benefit-value-wrap"><b id="gx-benefit-symbol">$</b><input id="gx-benefit-value" type="number" min="0.01" step="0.01" inputmode="decimal" oninput="gxUpdateBenefitPreview()"></div></label>
+      <label><span>Comienza</span><input id="gx-benefit-period" type="month" onchange="gxUpdateBenefitPreview()"></label>
+      <label><span>Duración</span><div class="gx-benefit-duration"><input id="gx-benefit-duration" type="number" min="1" max="36" step="1" value="1" inputmode="numeric" oninput="gxUpdateBenefitPreview()"><em>periodos</em></div></label>
+    </div>
+    <div class="gx-benefit-preview" id="gx-benefit-preview">Se aplicará durante 1 periodo.</div>
+    <div class="gx-benefit-actions"><button type="button" onclick="gxCloseBenefitModal()">Cancelar</button><button type="button" class="primary" id="gx-benefit-save" onclick="gxSaveBenefit()">Programar descuento</button></div>
+  </section>
+</div>
+<script id="goxion-admin-beta-20-benefits">
+(()=>{
+  document.body.classList.add('gx-beta-20');
+  const URL='https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/beneficios-admin-beta';
+  const TOKEN_KEY='GOXION_ADMIN_TOKEN';
+  const money=v=>Number(v||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
+  const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  function monthLabel(v){if(!v)return '—';const d=new Date(String(v).slice(0,7)+'-01T12:00:00');return Number.isNaN(d.getTime())?String(v).slice(0,7):d.toLocaleDateString('es-MX',{month:'short',year:'numeric'}).replace('.','');}
+  function monthDiff(a,b){const A=new Date(String(a).slice(0,7)+'-01T12:00:00'),B=new Date(String(b).slice(0,7)+'-01T12:00:00');if(Number.isNaN(A.getTime())||Number.isNaN(B.getTime()))return 0;return (B.getFullYear()-A.getFullYear())*12+(B.getMonth()-A.getMonth());}
+  async function call(accion,datos={}){const token=localStorage.getItem(TOKEN_KEY)||(typeof currentToken!=='undefined'?currentToken:'')||'';if(!token)throw new Error('Sesión administrativa no disponible.');const r=await fetch(URL,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({accion,datos}),cache:'no-store'});const t=await r.text();let j={};try{j=t?JSON.parse(t):{}}catch{}if(!r.ok||j?.ok!==true)throw new Error(j?.error||`HTTP ${r.status}`);return j;}
+  window.gxBenefitAction=call;
+  window.gxBenefitCardHTML=function(b,c,key){
+    const state=String(b.estado_visual||b.estado||'activo');
+    const stateText={activo:'Activo',programado:'Programado',reservado:'Reservado',consumido:'Consumido',finalizado:'Finalizado',cancelado:'Cancelado'}[state]||state;
+    const value=b.tipo==='porcentaje'?`${Number(b.valor||0).toFixed(0)}%`:`$${money(b.valor)}`;
+    const current=String(c?.estado_cuenta?.periodo||c?.periodo_pendiente||'').slice(0,10);
+    let detail='';
+    if(b.modo==='una_vez_elegible'){
+      const applied=(c?.estado_cuenta?.beneficios_programados||[]).find(x=>String(x.id)===String(b.id));
+      detail=applied?`Aplicando $${money(applied.monto)} en ${monthLabel(current)}`:`Disponible desde ${monthLabel(b.periodo_inicio)} · espera el siguiente periodo con saldo`;
+    }else{
+      const idx=Math.max(1,Math.min(Number(b.periodos_total||1),monthDiff(b.periodo_inicio,current)+1));
+      const end=new Date(String(b.periodo_inicio).slice(0,7)+'-01T12:00:00');end.setMonth(end.getMonth()+Number(b.periodos_total||1)-1);
+      detail=`${state==='programado'?'Inicia':'Periodo '+idx+' de '+Number(b.periodos_total||1)} · hasta ${end.toLocaleDateString('es-MX',{month:'short',year:'numeric'}).replace('.','')}`;
+    }
+    const cancellable=b.activo!==false&&!['consumido','finalizado','cancelado'].includes(state);
+    return `<div class="gx-benefit-row ${esc(state)}"><div class="gx-benefit-row-main"><span class="gx-benefit-origin">${b.origen==='misiones'?'🎯 Misiones':b.origen==='bienvenida'?'✦ Bienvenida':'◷ Programado'}</span><strong>${esc(b.concepto||'Beneficio')}</strong><small>${esc(detail)}</small></div><div class="gx-benefit-row-side"><strong>−${esc(value)}</strong><span>${esc(stateText)}</span>${cancellable?`<button type="button" onclick="gxCancelBenefit('${esc(b.id)}','${String(key).replace(/'/g,"\\'")}')" aria-label="Cancelar beneficio">×</button>`:''}</div></div>`;
+  };
+  window.gxOpenBenefitModal=function(key){const c=(typeof clientesDict!=='undefined'?clientesDict?.[key]:null);if(!c)return;document.getElementById('gx-benefit-key').value=key;document.getElementById('gx-benefit-client').textContent=`${c.nombre||'Cliente'} · ${c.folio||''}`;document.getElementById('gx-benefit-concept').value='';document.getElementById('gx-benefit-type').value='monto';document.getElementById('gx-benefit-value').value='';document.getElementById('gx-benefit-duration').value='1';document.getElementById('gx-benefit-period').value=String(c.periodo_pendiente||new Date().toISOString().slice(0,7)).slice(0,7);gxUpdateBenefitPreview();const m=document.getElementById('gx-benefit-modal');m.classList.add('show');m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';setTimeout(()=>document.getElementById('gx-benefit-concept')?.focus(),120);};
+  window.gxCloseBenefitModal=function(){const m=document.getElementById('gx-benefit-modal');m.classList.remove('show');m.setAttribute('aria-hidden','true');document.body.style.overflow='';};
+  window.gxUpdateBenefitPreview=function(){const type=document.getElementById('gx-benefit-type')?.value||'monto',value=Number(document.getElementById('gx-benefit-value')?.value||0),n=Math.max(1,Number(document.getElementById('gx-benefit-duration')?.value||1)),period=document.getElementById('gx-benefit-period')?.value||'';document.getElementById('gx-benefit-symbol').textContent=type==='porcentaje'?'%':'$';const shown=type==='porcentaje'?`${value||0}%`:`$${money(value)}`;document.getElementById('gx-benefit-preview').textContent=`${shown} por ${n} periodo${n===1?'':'s'} · inicia ${monthLabel(period+'-01')}. Al terminar, el cobro vuelve automáticamente a su condición normal.`;};
+  window.gxSaveBenefit=async function(){const key=document.getElementById('gx-benefit-key').value,c=(typeof clientesDict!=='undefined'?clientesDict?.[key]:null);if(!c?._id)return;const btn=document.getElementById('gx-benefit-save');btn.disabled=true;btn.textContent='Guardando…';try{await call('crear_manual',{cliente_id:c._id,concepto:document.getElementById('gx-benefit-concept').value.trim()||'Descuento programado',tipo:document.getElementById('gx-benefit-type').value,valor:Number(document.getElementById('gx-benefit-value').value),periodo_inicio:document.getElementById('gx-benefit-period').value+'-01',periodos_total:Number(document.getElementById('gx-benefit-duration').value)});gxCloseBenefitModal();await window.gxReloadAdminClient?.(key);}catch(e){alert('❌ No se pudo programar el descuento.\n\n'+(e?.message||e));}finally{btn.disabled=false;btn.textContent='Programar descuento';}};
+  window.gxCancelBenefit=async function(id,key){if(!confirm('¿Cancelar este beneficio? Dejará de aplicarse desde el próximo cálculo.'))return;try{await call('cancelar',{id});await window.gxReloadAdminClient?.(key);}catch(e){alert('❌ No se pudo cancelar.\n\n'+(e?.message||e));}};
+  console.info('GOXION Admin Beta 20 · motor de beneficios activo.');
+})();
+</script>
+<style id="goxion-admin-beta-20-benefits-style">
+.gx-beta-20 .gx-benefit-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0 12px;border-top:1px solid rgba(255,255,255,.07)}
+.gx-beta-20 .gx-benefit-section-head>div{min-width:0}.gx-beta-20 .gx-benefit-section-head span{display:block;font-size:13px;font-weight:750;color:#fff}.gx-beta-20 .gx-benefit-section-head small{display:block;margin-top:3px;font-size:10px;color:#7f8a9d}
+.gx-beta-20 .gx-benefit-add{min-height:38px;padding:0 12px;border-radius:11px;border:1px solid rgba(0,242,254,.24);background:rgba(0,242,254,.08);color:var(--neon-blue);font-size:11px;font-weight:750}
+.gx-beta-20 .gx-benefit-list{display:grid;gap:0;border-top:1px solid rgba(255,255,255,.055)}
+.gx-beta-20 .gx-benefit-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid rgba(255,255,255,.055)}
+.gx-beta-20 .gx-benefit-row-main{min-width:0}.gx-beta-20 .gx-benefit-origin{display:block;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:#7f8a9d;font-weight:750}.gx-beta-20 .gx-benefit-row-main strong{display:block;margin-top:4px;font-size:13px;color:#eef4ff}.gx-beta-20 .gx-benefit-row-main small{display:block;margin-top:4px;font-size:10px;line-height:1.4;color:#7f8a9d}
+.gx-beta-20 .gx-benefit-row-side{text-align:right;min-width:78px}.gx-beta-20 .gx-benefit-row-side>strong{display:block;font-size:14px;color:#65e8bb}.gx-beta-20 .gx-benefit-row-side>span{display:inline-block;margin-top:3px;font-size:9px;color:#8895aa;text-transform:uppercase;letter-spacing:.05em}.gx-beta-20 .gx-benefit-row-side>button{margin:6px 0 0 auto;width:30px;height:30px;border:0;border-radius:9px;background:rgba(255,70,100,.08);color:#ff6f88;font-size:16px}
+.gx-beta-20 .gx-benefit-row.consumido,.gx-beta-20 .gx-benefit-row.finalizado,.gx-beta-20 .gx-benefit-row.cancelado{opacity:.56}.gx-beta-20 .gx-benefit-empty{padding:12px 0 14px;font-size:11px;color:#6f7b8e}.gx-beta-20 .gx-benefit-legacy-label{margin:14px 0 4px;padding-top:12px;border-top:1px dashed rgba(255,255,255,.08);font-size:9px;color:#667287;text-transform:uppercase;letter-spacing:.09em;font-weight:700}
+.gx-benefit-modal{position:fixed;inset:0;z-index:99999;display:none}.gx-benefit-modal.show{display:block}.gx-benefit-modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(11px);-webkit-backdrop-filter:blur(11px)}
+.gx-benefit-sheet{position:absolute;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(560px,calc(100% - 24px));padding:18px;background:linear-gradient(180deg,rgba(11,14,24,.98),rgba(5,7,13,.99));border:1px solid rgba(120,160,255,.18);border-radius:22px;box-shadow:0 28px 80px rgba(0,0,0,.55)}
+.gx-benefit-sheet header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.07)}.gx-benefit-sheet h2{margin:3px 0 0;font-size:21px}.gx-benefit-sheet header p{margin:5px 0 0;color:#8491a6;font-size:11px}.gx-benefit-close{width:40px;height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#cbd5e5;font-size:22px}
+.gx-benefit-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.gx-benefit-form label{min-width:0}.gx-benefit-form label.wide{grid-column:1/-1}.gx-benefit-form label>span{display:block;margin-bottom:6px;font-size:10px;color:#7f8a9d;font-weight:700}.gx-benefit-form input,.gx-benefit-form select{width:100%;min-width:0;height:44px;padding:0 11px;border:1px solid rgba(255,255,255,.09);border-radius:11px;background:#0b0e17;color:#eef4ff;font-size:13px;box-sizing:border-box}.gx-benefit-value-wrap{position:relative}.gx-benefit-value-wrap b{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:12px;color:#728096}.gx-benefit-value-wrap input{padding-left:28px}.gx-benefit-duration{position:relative}.gx-benefit-duration input{padding-right:64px}.gx-benefit-duration em{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-style:normal;font-size:10px;color:#738096}
+.gx-benefit-preview{margin-top:14px;padding:11px 12px;border-radius:12px;background:rgba(74,107,255,.07);border:1px solid rgba(74,107,255,.14);font-size:11px;line-height:1.45;color:#a9b5c8}.gx-benefit-actions{display:grid;grid-template-columns:1fr 1.4fr;gap:10px;margin-top:16px}.gx-benefit-actions button{min-height:44px;border-radius:12px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:#aab5c6;font-weight:750}.gx-benefit-actions button.primary{background:linear-gradient(135deg,rgba(88,74,255,.95),rgba(0,197,255,.88));color:white;border:0}
+@media(max-width:520px){.gx-benefit-form{grid-template-columns:1fr 1fr;gap:10px}.gx-benefit-sheet{padding:16px}.gx-beta-20 .gx-benefit-row{grid-template-columns:minmax(0,1fr) 82px}}
+</style>
+<div id="gx-beta20-marker" style="display:none">GOXION ADMIN BETA 20 · MOTOR DE BENEFICIOS</div>
 </body>
 </html>
