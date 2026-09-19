@@ -343,6 +343,177 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         .gx-ref-counter button,.gx-ref-counter strong{height:38px}
     }
 
+
+/* =========================================================
+   GOXION ADMIN BETA 21 · REGISTRO INTELIGENTE
+   Aprobación -> Mi Espacio -> usuario/PIN -> bienvenida 10%
+   ========================================================= */
+.gx-reg-actions button.approve{
+    border-color:rgba(0,242,254,.18);
+    background:linear-gradient(135deg,rgba(0,242,254,.11),rgba(151,120,255,.12));
+    color:#aef7ff;
+}
+.gx-reg-created-meta{
+    margin-top:4px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+    color:#7fe9b4;
+    font-size:.49rem;
+    font-weight:800;
+}
+.gx-reg-created-meta code{
+    padding:2px 6px;
+    border-radius:999px;
+    background:#111923;
+    color:#bdefff;
+    font:inherit;
+}
+.gx-space-created{
+    position:fixed;
+    inset:0;
+    z-index:100160;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+.gx-space-created.show{display:flex}
+.gx-space-created-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.78);
+    backdrop-filter:blur(12px);
+}
+.gx-space-created-sheet{
+    position:relative;
+    width:min(440px,100%);
+    padding:18px;
+    border:1px solid rgba(0,242,254,.13);
+    border-radius:20px;
+    background:linear-gradient(145deg,#0b0d13,#08090d);
+    box-shadow:0 28px 90px rgba(0,0,0,.62);
+}
+.gx-space-created-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:16px;
+}
+.gx-space-created-head span{
+    display:block;
+    color:#69e9f4;
+    font-size:.62rem;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+.gx-space-created-head h3{
+    margin:4px 0 3px;
+    font-size:1.25rem;
+    line-height:1.1;
+}
+.gx-space-created-head p{
+    margin:0;
+    color:#8e9aab;
+    font-size:.72rem;
+    line-height:1.45;
+}
+.gx-space-created-close{
+    flex:0 0 38px;
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:999px;
+    background:#11131a;
+    color:#fff;
+    font-size:1.2rem;
+}
+.gx-space-created-creds{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 112px;
+    gap:8px;
+    margin-bottom:10px;
+}
+.gx-space-created-creds>div{
+    min-width:0;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:13px;
+    background:#0e1016;
+}
+.gx-space-created-creds span{
+    display:block;
+    margin-bottom:5px;
+    color:#7f8b9d;
+    font-size:.58rem;
+    font-weight:900;
+    text-transform:uppercase;
+}
+.gx-space-created-creds strong{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color:#fff;
+    font-size:1rem;
+    white-space:nowrap;
+}
+.gx-space-created-creds .pin strong{
+    color:#83eff8;
+    font-size:1.42rem;
+    letter-spacing:.12em;
+}
+.gx-space-created-benefit{
+    margin-bottom:13px;
+    padding:10px 12px;
+    border-left:2px solid rgba(151,120,255,.72);
+    border-radius:0 11px 11px 0;
+    background:rgba(151,120,255,.055);
+    color:#aeb8c8;
+    font-size:.68rem;
+    line-height:1.45;
+}
+.gx-space-created-benefit strong{color:#d8ccff}
+.gx-space-created-warning{
+    margin:0 0 13px;
+    color:#8a96a7;
+    font-size:.61rem;
+    line-height:1.45;
+}
+.gx-space-created-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:7px;
+}
+.gx-space-created-actions button{
+    min-height:44px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:11px;
+    background:#12141b;
+    color:#d4dbe5;
+    font:inherit;
+    font-size:.72rem;
+    font-weight:850;
+}
+.gx-space-created-actions button.primary{
+    border-color:rgba(0,242,254,.14);
+    background:#0d1d23;
+    color:#83edf7;
+}
+.gx-space-created-actions button.open{
+    grid-column:1/-1;
+    border-color:rgba(151,120,255,.13);
+    background:#17131f;
+    color:#d2c4ff;
+}
+@media(max-width:480px){
+    .gx-space-created{align-items:flex-end;padding:0}
+    .gx-space-created-sheet{width:100%;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+    .gx-space-created-creds{grid-template-columns:minmax(0,1fr) 104px}
+}
+
 </style>
 <style id="goxion-admin-v6-ui">
     /* Centro de notificaciones: solo pagos y vencimientos */
@@ -4272,7 +4443,7 @@ details.gx-client-ops-context{
 }
 </style>
 </head>
-<body data-gx-version="admin-beta-19-4">
+<body data-gx-version="admin-beta-21">
 <div class="gx-admin-shell">
 <header class="gx-topbar">
 <div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION</div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
@@ -4862,6 +5033,28 @@ details.gx-client-ops-context{
 <div class="gx-registration-list" id="gx-registration-list"></div>
 </section>
 </div>
+
+<div aria-hidden="true" class="gx-space-created" id="gx-space-created">
+<div class="gx-space-created-backdrop" onclick="gxCloseCreatedSpace()"></div>
+<section class="gx-space-created-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-space-created-title">
+<div class="gx-space-created-head">
+<div><span>Mi Espacio listo</span><h3 id="gx-space-created-title">Acceso creado</h3><p id="gx-space-created-name">—</p></div>
+<button class="gx-space-created-close" onclick="gxCloseCreatedSpace()" type="button" aria-label="Cerrar">×</button>
+</div>
+<div class="gx-space-created-creds">
+<div><span>Usuario</span><strong id="gx-space-created-user">—</strong></div>
+<div class="pin"><span>PIN</span><strong id="gx-space-created-pin">••••</strong></div>
+</div>
+<div class="gx-space-created-benefit"><strong>✦ Bienvenida −10%</strong><br>Quedó reservada para el primer periodo elegible en el que genere ahorro real.</div>
+<p class="gx-space-created-warning">El PIN se muestra únicamente en esta confirmación. Después solo podrás reemplazarlo desde la cuenta del cliente; GOXION no guarda el PIN en texto plano.</p>
+<div class="gx-space-created-actions">
+<button class="primary" onclick="gxCopyCreatedSpace()" type="button">Copiar acceso</button>
+<button onclick="gxCloseCreatedSpace()" type="button">Listo</button>
+<button class="open" onclick="gxOpenCreatedClient()" type="button">Abrir cliente</button>
+</div>
+</section>
+</div>
+
 <!-- CENTRO DE NOTIFICACIONES / ACTIVIDAD -->
 <aside aria-hidden="true" class="gx-notification-drawer" id="gx-notification-drawer">
 <div class="gx-notification-drawer-head">
@@ -10570,8 +10763,9 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 (() => {
     const URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/registro-admin";
     window.gxRegistrationState={clientes:[],solicitudes:[],resumen:{foco_rojo:0,nuevos_pendientes:0,legacy_sin_telefono:0},tab:"attempts"};
+    window.gxCreatedSpaceData=null;
 
-    const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
     const fmtPhone=v=>{
         const d=String(v||"").replace(/\D/g,"");
         const local=d.startsWith("52")&&d.length===12?d.slice(2):d;
@@ -10584,7 +10778,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
         const r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion,datos}),cache:"no-store"});
         const j=await r.json().catch(()=>({}));
-        if(!r.ok||j?.ok!==true)throw new Error(j?.error||`HTTP ${r.status}`);
+        if(!r.ok||j?.ok!==true){const e=new Error(j?.error||`HTTP ${r.status}`);e.payload=j;e.status=r.status;throw e;}
         return j;
     }
 
@@ -10623,7 +10817,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     window.gxCloseRegistrationControl=function(){
         const modal=document.getElementById("gx-registration-control");
         modal?.classList.remove("show");modal?.setAttribute("aria-hidden","true");
-        document.body.style.overflow="";
+        if(!document.getElementById("gx-space-created")?.classList.contains("show")) document.body.style.overflow="";
     };
     window.gxRegistrationTab=function(tab,btn){
         gxRegistrationState.tab=tab;
@@ -10654,10 +10848,12 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 
         const rows=s.solicitudes;
         list.innerHTML=rows.length?rows.map(r=>{
-            const cls=r.resultado==="cliente_existente"?"danger":r.resultado==="revisar"?"review":r.resultado==="nuevo"?"new":"";
-            const label=r.resultado==="cliente_existente"?"Cliente existente":r.resultado==="revisar"?"Requiere revisión":r.resultado==="nuevo"?"Cliente nuevo":"Solicitud previa";
             const linked=clientIdentity(r.cliente_id);
-            const pending=r.estado_admin==="pendiente";
+            const created=r.resultado==="nuevo"&&r.estado_admin==="resuelto"&&linked;
+            const cls=r.resultado==="cliente_existente"?"danger":r.resultado==="revisar"?"review":r.resultado==="nuevo"?"new":"";
+            const label=created?"Espacio creado":r.resultado==="cliente_existente"?"Cliente existente":r.resultado==="revisar"?"Requiere revisión":r.resultado==="nuevo"?"Cliente nuevo":"Solicitud previa";
+            const actionable=["pendiente","contactado"].includes(r.estado_admin);
+            const canCreate=actionable&&r.resultado==="nuevo"&&!r.cliente_id&&r.elegible_promocion===true;
             return `<article class="gx-reg-row ${cls}">
                 <div class="gx-reg-main">
                     <div class="gx-reg-top">
@@ -10665,20 +10861,23 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                         <span class="gx-reg-badge ${cls}">${label}</span>
                         <span class="gx-reg-badge">${esc(r.estado_admin)}</span>
                     </div>
-                    <div class="gx-reg-meta">${fmtPhone(r.telefono_normalizado)}${linked?` · Coincide con ${esc(linked.nombre)}`:""} · ${new Date(r.created_at).toLocaleString("es-MX")}</div>
+                    <div class="gx-reg-meta">${fmtPhone(r.telefono_normalizado)}${linked?` · ${esc(linked.folio||"")}`:""} · ${new Date(r.created_at).toLocaleString("es-MX")}</div>
                     ${r.detalle?`<div class="gx-reg-meta">${esc(r.detalle)}</div>`:""}
+                    ${created&&linked?.usuario_acceso?`<div class="gx-reg-created-meta">✓ Mi Espacio activo <code>@${esc(linked.usuario_acceso)}</code> · bienvenida −10% reservada</div>`:""}
                 </div>
                 <div class="gx-reg-actions">
                     ${linked?`<button onclick="gxOpenIdentityClient('${esc(linked.id)}')">Ver cliente</button>`:""}
-                    ${pending&&linked&&(r.resultado==="revisar"||r.resultado==="cliente_existente")?`<button class="danger" onclick="gxLinkExistingRegistration('${esc(r.id)}','${esc(linked.id)}')">Vincular teléfono</button>`:""}
-                    ${pending&&r.resultado==="nuevo"?`<button class="ok" onclick="gxRegistrationStatus('${esc(r.id)}','contactado')">Contactado</button>`:""}
-                    ${pending?`<button onclick="gxRegistrationStatus('${esc(r.id)}','resuelto')">Cerrar</button>`:""}
+                    ${actionable&&linked&&(r.resultado==="revisar"||r.resultado==="cliente_existente")?`<button class="danger" onclick="gxLinkExistingRegistration('${esc(r.id)}','${esc(linked.id)}')">Vincular teléfono</button>`:""}
+                    ${canCreate&&r.estado_admin==="pendiente"?`<button class="ok" onclick="gxRegistrationStatus('${esc(r.id)}','contactado')">Contactado</button>`:""}
+                    ${canCreate?`<button class="approve" onclick="gxApproveNewRegistration('${esc(r.id)}','${esc(r.nombre_declarado)}')">Aprobar y crear espacio</button><button class="danger" onclick="gxRegistrationStatus('${esc(r.id)}','descartado')">Descartar</button>`:""}
+                    ${actionable&&!canCreate&&r.resultado!=="nuevo"?`<button onclick="gxRegistrationStatus('${esc(r.id)}','resuelto')">Cerrar</button>`:""}
                 </div>
             </article>`;
         }).join(""):'<div class="gx-empty-inline">Todavía no hay solicitudes del banner.</div>';
     };
 
     window.gxRegistrationStatus=async function(id,state){
+        if(state==="descartado"&&!confirm("¿Descartar esta solicitud? No se creará Mi Espacio ni se reservará el 10% de bienvenida."))return;
         try{await api("resolver_solicitud",{solicitud_id:id,estado_admin:state});await gxLoadRegistrationState(true)}
         catch(e){alert("No se pudo actualizar la solicitud.\n\n"+e.message)}
     };
@@ -10687,6 +10886,56 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         try{await api("vincular_existente",{solicitud_id:requestId,cliente_id:clientId});await gxLoadRegistrationState(true)}
         catch(e){alert("No se pudo vincular el registro.\n\n"+e.message)}
     };
+
+    window.gxApproveNewRegistration=async function(requestId,name){
+        const ok=confirm(`Aprobar a ${name||"este cliente"}?\n\nGOXION volverá a validar teléfono y nombre. Si sigue siendo cliente nuevo, creará automáticamente su Mi Espacio, usuario y PIN y reservará el 10% de bienvenida para el primer periodo elegible.`);
+        if(!ok)return;
+        try{
+            const r=await api("aprobar_nuevo",{solicitud_id:requestId});
+            if(typeof window.gxReloadAdminClient==="function") await window.gxReloadAdminClient();
+            await gxLoadRegistrationState(true);
+            gxShowCreatedSpace(r);
+        }catch(e){
+            await gxLoadRegistrationState(true);
+            if(e?.payload?.status==="review_required"){
+                alert("GOXION detuvo la creación porque encontró una coincidencia al volver a validar. La solicitud pasó a revisión y no se creó ningún espacio.\n\n"+e.message);
+                return;
+            }
+            alert("No se pudo crear Mi Espacio.\n\n"+e.message);
+        }
+    };
+
+    window.gxShowCreatedSpace=function(data){
+        window.gxCreatedSpaceData=data||null;
+        const modal=document.getElementById("gx-space-created");
+        const name=document.getElementById("gx-space-created-name");
+        const user=document.getElementById("gx-space-created-user");
+        const pin=document.getElementById("gx-space-created-pin");
+        if(name)name.textContent=`${data?.nombre||"Cliente"} · ${data?.folio||""}`;
+        if(user)user.textContent=data?.usuario||"—";
+        if(pin)pin.textContent=data?.pin||"••••";
+        modal?.classList.add("show");modal?.setAttribute("aria-hidden","false");
+        document.body.style.overflow="hidden";
+    };
+    window.gxCloseCreatedSpace=function(){
+        const modal=document.getElementById("gx-space-created");
+        modal?.classList.remove("show");modal?.setAttribute("aria-hidden","true");
+        const pin=document.getElementById("gx-space-created-pin");if(pin)pin.textContent="••••";
+        window.gxCreatedSpaceData=null;
+        if(!document.getElementById("gx-registration-control")?.classList.contains("show"))document.body.style.overflow="";
+    };
+    window.gxCopyCreatedSpace=async function(){
+        const d=window.gxCreatedSpaceData;if(!d?.usuario||!d?.pin)return alert("El PIN ya no está disponible en esta sesión. Puedes generar uno nuevo desde Cuenta.");
+        const txt=`Tu espacio GOXION está listo.\nUsuario: ${d.usuario}\nPIN: ${d.pin}\nBeneficio bienvenida: 10% reservado para tu primer periodo elegible.`;
+        try{await navigator.clipboard.writeText(txt);alert("✓ Acceso copiado");}
+        catch{prompt("Copia el acceso:",txt)}
+    };
+    window.gxOpenCreatedClient=function(){
+        const id=window.gxCreatedSpaceData?.cliente_id;
+        gxCloseCreatedSpace();
+        if(id)gxOpenIdentityClient(id);
+    };
+
     window.gxOpenIdentityClient=function(id){
         const key=clientKeyById(id);
         if(!key)return alert("No encontramos este cliente en la vista actual.");
@@ -10711,7 +10960,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         wrap.innerHTML=`
             <details class="gx-identity-compact">
                 <summary>
-                    <div><strong>Registro y elegibilidad</strong><small>${originLabel(ident.origen_cliente)} · datos internos</small></div>
+                    <div><strong>Registro y elegibilidad</strong><small>${originLabel(ident.origen_cliente)}${ident.usuario_acceso?` · @${esc(ident.usuario_acceso)}`:" · datos internos"}</small></div>
                     <span class="gx-client-origin-badge ${legacy?"legacy":""}">${ident.promo_nuevo_elegible?"Elegible -10%":"Sin beneficio"}</span>
                 </summary>
                 <div class="gx-client-identity-grid">
@@ -10725,6 +10974,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                     <label class="gx-identity-check"><span>Beneficio bienvenida</span><span class="gx-identity-eligible"><input id="gx-identity-eligible-${esc(id)}" type="checkbox" ${ident.promo_nuevo_elegible?"checked":""}> Elegible -10%</span></label>
                     <button class="gx-identity-save" type="button" onclick="gxSaveClientIdentity('${esc(key)}','${esc(id)}')">Guardar cambios</button>
                 </div>
+                ${ident.usuario_acceso?`<div class="gx-client-identity-warning" style="background:#0d1820;color:#a9dfea">Mi Espacio: usuario <strong>@${esc(ident.usuario_acceso)}</strong>. El PIN no se almacena en texto plano; si el cliente lo pierde, genera uno nuevo desde Cuenta.</div>`:""}
                 ${!ident.telefono_normalizado&&legacy?'<div class="gx-client-identity-warning">Cliente previo sin teléfono: completa este dato para reforzar la detección de registros repetidos.</div>':""}
             </details>
         `;
@@ -10763,7 +11013,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     }
 
     document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>gxLoadRegistrationState(false),1250));
-    console.info("GOXION Admin v1.1.1: identidad de cliente + control de promoción -10% activo.");
+    console.info("GOXION Admin Beta 21: aprobación inteligente + Mi Espacio + bienvenida -10% activos.");
 })();
 </script>
 <!-- GOXION ADMIN BETA 13 // PRODUCTOS Y ACCESOS -->
@@ -12984,3 +13234,5 @@ body[data-gx-version="admin-beta-19-4"] .gx-secondary-action{
 <div id="gx-beta20-marker" style="display:none">GOXION ADMIN BETA 20 · MOTOR DE BENEFICIOS</div>
 </body>
 </html>
+
+<!-- GOXION ADMIN BETA 21 · REGISTRO INTELIGENTE · base visual Beta 20/19.8 -->
