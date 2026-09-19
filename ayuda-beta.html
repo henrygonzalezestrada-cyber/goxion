@@ -5019,7 +5019,7 @@
 
 <style id="goxion-ayuda-beta-28-registro-alineado">
 /* =========================================================
-   GOXION · AYUDA BETA 28
+   GOXION · AYUDA BETA 29
    Registro: CTA promocional armónico + estado final alineado.
    El banner -10 OFF cerrado y su morphing permanecen intactos.
    ========================================================= */
@@ -5099,6 +5099,18 @@
 @media(max-width:390px){
     .gx-welcome-form[hidden]{min-height:60px!important;margin:8px 0 10px!important}
 }
+</style>
+
+<style id="goxion-ayuda-beta-29-estados-registro">
+.gx-welcome-submit.gx-welcome-status-success,.gx-welcome-submit.gx-welcome-status-blocked,.gx-welcome-submit.gx-welcome-status-review{width:48px!important;min-width:48px!important;height:48px!important;min-height:48px!important;margin:0 auto!important;padding:0!important;border:0!important;border-radius:50%!important;overflow:visible!important;animation:gxWelcomeDecisionPop .54s cubic-bezier(.16,.92,.24,1) both!important}
+.gx-welcome-submit.gx-welcome-status-success .gx-welcome-submit-label,.gx-welcome-submit.gx-welcome-status-blocked .gx-welcome-submit-label,.gx-welcome-submit.gx-welcome-status-review .gx-welcome-submit-label{opacity:0!important;transform:scale(.7)!important}
+.gx-welcome-submit.gx-welcome-status-success{background:linear-gradient(145deg,#37dfa0 0%,#1ebc7b 100%)!important;box-shadow:0 11px 28px rgba(17,122,82,.28),0 0 0 8px rgba(51,211,146,.09),inset 0 1px 0 rgba(255,255,255,.42)!important}
+.gx-welcome-submit.gx-welcome-status-success::before,.gx-welcome-submit.gx-welcome-status-success::after{content:""!important;display:block!important;position:absolute!important;height:3.5px!important;border-radius:999px!important;background:#fff!important;transform-origin:left center!important}.gx-welcome-submit.gx-welcome-status-success::before{width:10px!important;left:12px!important;top:25px!important;transform:rotate(44deg)!important}.gx-welcome-submit.gx-welcome-status-success::after{width:19px!important;left:19px!important;top:29px!important;transform:rotate(-48deg)!important}
+.gx-welcome-submit.gx-welcome-status-blocked{background:linear-gradient(145deg,#ff667e 0%,#e53c5d 100%)!important;box-shadow:0 11px 28px rgba(144,25,55,.30),0 0 0 8px rgba(255,79,111,.09),inset 0 1px 0 rgba(255,255,255,.34)!important;animation:gxWelcomeDecisionPop .46s cubic-bezier(.18,.9,.25,1) both,gxWelcomeDecisionImpact .34s .42s ease both!important}.gx-welcome-submit.gx-welcome-status-blocked::before,.gx-welcome-submit.gx-welcome-status-blocked::after{content:""!important;display:block!important;position:absolute!important;left:13px!important;top:22px!important;width:22px!important;height:3.5px!important;border-radius:999px!important;background:#fff!important;transform-origin:center!important}.gx-welcome-submit.gx-welcome-status-blocked::before{transform:rotate(45deg)!important}.gx-welcome-submit.gx-welcome-status-blocked::after{transform:rotate(-45deg)!important}
+.gx-welcome-submit.gx-welcome-status-review{background:linear-gradient(145deg,#f5e6bf 0%,#e8cb8e 100%)!important;box-shadow:0 11px 28px rgba(77,37,84,.20),0 0 0 8px rgba(240,221,178,.09),inset 0 1px 0 rgba(255,255,255,.62)!important}.gx-welcome-submit.gx-welcome-status-review::before{content:""!important;position:absolute!important;width:4px!important;height:17px!important;left:22px!important;top:11px!important;border-radius:999px!important;background:#6e2e8f!important}.gx-welcome-submit.gx-welcome-status-review::after{content:""!important;position:absolute!important;width:4.5px!important;height:4.5px!important;left:21.75px!important;top:33px!important;border-radius:50%!important;background:#6e2e8f!important}
+@keyframes gxWelcomeDecisionPop{0%{transform:scale(.72);opacity:.35}55%{transform:scale(1.13);opacity:1}100%{transform:scale(1);opacity:1}}@keyframes gxWelcomeDecisionImpact{0%,100%{transform:translateX(0)}28%{transform:translateX(-3px)}58%{transform:translateX(3px)}82%{transform:translateX(-1px)}}
+.gx-welcome-result.success{background:rgba(10,83,58,.34)!important;color:#d8f9ea!important;border:1px solid rgba(62,224,158,.22)!important}.gx-welcome-result.success strong{color:#7ef0ba!important}.gx-welcome-result.blocked{background:rgba(89,16,40,.42)!important;color:#ffc0cd!important;border:1px solid rgba(255,91,121,.24)!important;animation:gxWelcomeResultDenied .42s .12s ease both!important}.gx-welcome-result.blocked strong{color:#ff758f!important}.gx-welcome-result.review{background:rgba(83,54,22,.34)!important;color:#f1dfbd!important;border:1px solid rgba(241,207,139,.22)!important}.gx-welcome-result.review strong{color:#f5dda8!important}@keyframes gxWelcomeResultDenied{0%,100%{transform:translateX(0)}18%{transform:translateX(-5px)}38%{transform:translateX(5px)}58%{transform:translateX(-3px)}78%{transform:translateX(2px)}}
+@media(prefers-reduced-motion:reduce){.gx-welcome-submit.gx-welcome-status-success,.gx-welcome-submit.gx-welcome-status-blocked,.gx-welcome-submit.gx-welcome-status-review,.gx-welcome-result.blocked{animation:none!important}}
 </style>
 </head>
 <body class="no-scroll">
@@ -6053,40 +6065,11 @@
         function gxWelcomeValidationState(button,state,label='') {
             if(!button) return;
             const span=button.querySelector('.gx-welcome-submit-label');
-
-            button.classList.remove(
-                'gx-welcome-validating',
-                'gx-welcome-validated',
-                'gx-welcome-validation-error'
-            );
-
-            if(state==='loading') {
-                button.disabled=true;
-                button.classList.add('gx-welcome-validating');
-                if(span) span.textContent='';
-                button.setAttribute('aria-label','Validando registro');
-                return;
-            }
-
-            if(state==='success') {
-                button.disabled=true;
-                button.classList.add('gx-welcome-validated');
-                if(span) span.textContent='';
-                button.setAttribute('aria-label','Validación completada');
-                return;
-            }
-
-            if(state==='error') {
-                button.disabled=false;
-                button.classList.add('gx-welcome-validation-error');
-                if(span) span.textContent=label || 'Reintentar';
-                button.setAttribute('aria-label',label || 'Reintentar');
-                return;
-            }
-
-            button.disabled=false;
-            if(span) span.textContent=label || 'Validar y solicitar';
-            button.setAttribute('aria-label',label || 'Validar y solicitar');
+            button.classList.remove('gx-welcome-validating','gx-welcome-validated','gx-welcome-validation-error','gx-welcome-status-success','gx-welcome-status-blocked','gx-welcome-status-review');
+            if(state==='loading') {button.disabled=true;button.classList.add('gx-welcome-validating');if(span) span.textContent='';button.setAttribute('aria-label','Validando registro');return;}
+            if(state==='success' || state==='blocked' || state==='review') {button.disabled=true;button.classList.add(`gx-welcome-status-${state}`);if(span) span.textContent='';button.setAttribute('aria-label',state==='success'?'Solicitud válida':state==='blocked'?'Registro no elegible':'Registro en revisión');return;}
+            if(state==='error') {button.disabled=false;button.classList.add('gx-welcome-validation-error');if(span) span.textContent=label || 'Reintentar';button.setAttribute('aria-label',label || 'Reintentar');return;}
+            button.disabled=false;if(span) span.textContent=label || 'Validar y solicitar';button.setAttribute('aria-label',label || 'Validar y solicitar');
         }
 
         async function gxSubmitWelcomeRegistration(event) {
@@ -6140,48 +6123,44 @@
                    esta respuesta vieja no puede modificar la nueva vista. */
                 if(cycle !== gxWelcomeCycle) return;
 
-                gxWelcomeValidationState(submit,'success');
-
-                /* La palomita significa “validación completada”, no elegibilidad.
-                   Se deja visible brevemente antes de presentar el resultado real. */
-                await new Promise(resolve=>setTimeout(resolve,620));
-                if(cycle !== gxWelcomeCycle) return;
-
                 if(data.status==="existing") {
                     if(form) form.hidden=true;
+                    gxWelcomeValidationState(submit,'blocked');
+                    await new Promise(resolve=>setTimeout(resolve,380));
+                    if(cycle !== gxWelcomeCycle) return;
                     result.className="gx-welcome-result blocked";
-                    result.innerHTML="<strong>Ya tienes un registro previo</strong><span>Este número ya está asociado a un espacio GOXION. El -10% es únicamente para clientes completamente nuevos. Puedes recuperar tus datos de acceso y seguir usando tu espacio actual.</span>";
+                    result.innerHTML="<strong>Este número ya está registrado</strong><span>Ya existe un registro o espacio GOXION asociado a este número. El -10% es únicamente para clientes completamente nuevos.</span>";
                     if(actions) actions.hidden=false;
                     return;
                 }
-
                 if(data.status==="review") {
                     if(form) form.hidden=true;
+                    gxWelcomeValidationState(submit,'review');
+                    await new Promise(resolve=>setTimeout(resolve,380));
+                    if(cycle !== gxWelcomeCycle) return;
                     result.className="gx-welcome-result review";
-                    result.innerHTML="<strong>Necesitamos validar tu registro</strong><span>Encontramos información que podría corresponder a un cliente previo. No confirmaremos el -10% hasta revisarlo. Te contactaremos por WhatsApp.</span>";
-                    if(actions) actions.hidden=false;
+                    result.innerHTML="<strong>Tu registro necesita revisión</strong><span>Encontramos información que podría corresponder a un registro anterior. Aún no está rechazado: revisaremos el caso antes de autorizar el -10%.</span>";
                     return;
                 }
-
                 if(data.status==="already_requested") {
                     if(form) form.hidden=true;
+                    gxWelcomeValidationState(submit,'success');
+                    await new Promise(resolve=>setTimeout(resolve,380));
+                    if(cycle !== gxWelcomeCycle) return;
                     result.className="gx-welcome-result success";
                     result.innerHTML="<strong>Tu solicitud ya está registrada</strong><span>No necesitas enviarla nuevamente. Si es aprobada, recibirás por WhatsApp tu GOXION ID y un código de activación válido por 24 horas.</span>";
                     return;
                 }
-
                 if(data.status==="new") {
                     if(!data.already) {
-                        notificarAdmin(
-                            "pedidos",
-                            "🎁 REGISTRO -10% OFF",
-                            `**Nombre:** ${name}\n**WhatsApp:** ${phone}\n**Solicitud:** ${data.request_id || "N/A"}\n\n*Validación inicial: sin coincidencias como cliente previo. El beneficio queda sujeto a alta final.*`,
-                            "7c4dff"
-                        );
+                        notificarAdmin("pedidos","🎁 REGISTRO -10% OFF",`**Nombre:** ${name}\n**WhatsApp:** ${phone}\n**Solicitud:** ${data.request_id || "N/A"}\n\n*Validación inicial: sin coincidencias como cliente previo. El beneficio queda sujeto a alta final.*`,"7c4dff");
                     }
                     if(form) form.hidden=true;
+                    gxWelcomeValidationState(submit,'success');
+                    await new Promise(resolve=>setTimeout(resolve,380));
+                    if(cycle !== gxWelcomeCycle) return;
                     result.className="gx-welcome-result success";
-                    result.innerHTML=`<strong>Solicitud recibida ✓</strong><span>Gracias ${name}. Revisaremos tu solicitud. Si es aprobada, recibirás por WhatsApp tu GOXION ID y un código de activación. El -10% se habilita al terminar de configurar Mi Espacio.</span>`;
+                    result.innerHTML=`<strong>Solicitud registrada</strong><span>Gracias ${name}. Tu solicitud pasó la validación inicial. Si es aprobada en GOXION, recibirás por WhatsApp tu GOXION ID y código de activación.</span>`;
                     return;
                 }
 
