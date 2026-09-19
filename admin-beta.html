@@ -10762,7 +10762,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                     ${actionable&&linked&&(r.resultado==="revisar"||r.resultado==="cliente_existente")&&!a?`<button class="danger" onclick="gxLinkExistingRegistration('${esc(r.id)}','${esc(linked.id)}')">Vincular teléfono</button>`:""}
                     ${canPrepare?`<button class="ok gx-prepare-activation" onclick="gxPrepareActivation('${esc(r.id)}','${esc(r.nombre_declarado)}')">Aprobar registro</button><button class="danger" onclick="gxRegistrationStatus('${esc(r.id)}','descartado')">Descartar</button>`:""}
                     ${a?`<button onclick="gxGoActivationTab()">Ver activación</button>`:""}
-                    ${actionable&&!canPrepare&&!a&&r.resultado!=="nuevo"?`<button onclick="gxRegistrationStatus('${esc(r.id)}','resuelto')">Cerrar</button>`:""}
+                    ${actionable&&!canPrepare&&!a&&r.resultado!=="nuevo"?`<button class="danger" onclick="gxRegistrationStatus('${esc(r.id)}','descartado')">Rechazar registro</button>`:""}
                     ${!a||a.estado!=="activada"?`<button class="delete-record" onclick="gxDeleteRegistration('${esc(r.id)}','${esc(r.nombre_declarado)}')">Eliminar registro</button>`:""}
                 </div>
             </article>`;
@@ -13231,5 +13231,7 @@ body.gx-beta-22 .gx-reg-actions .gx-prepare-activation{border-color:rgba(0,242,2
 @media(max-width:390px){.gx-activation-delivery-actions{grid-template-columns:1fr}.gx-activation-credential-grid{grid-template-columns:1fr}.gx-activation-credential-grid .code strong{font-size:1.08rem}}
 </style>
 <script id="goxion-admin-beta-22-behavior">(()=>{document.body.classList.add('gx-beta-22');console.info('GOXION Admin Beta 22 · activación temporal 24 h');})();</script>
+
+<script id="goxion-admin-beta-25-marker">console.info('GOXION Admin Beta 25 · decisión explícita en revisión');</script>
 </body>
 </html>
