@@ -5016,6 +5016,90 @@
 }
 </style>
 
+
+<style id="goxion-ayuda-beta-28-registro-alineado">
+/* =========================================================
+   GOXION · AYUDA BETA 28
+   Registro: CTA promocional armónico + estado final alineado.
+   El banner -10 OFF cerrado y su morphing permanecen intactos.
+   ========================================================= */
+
+/* El CTA principal comparte el acento champagne de la X sin
+   perder profundidad ni convertirse en una superficie plana. */
+.gx-welcome-submit:not(.gx-welcome-validating):not(.gx-welcome-validated):not(.gx-welcome-validation-error){
+    background:linear-gradient(145deg,#f3e3bd 0%,#ead09a 100%)!important;
+    color:#2b123c!important;
+    box-shadow:
+        0 10px 24px rgba(66,20,79,.20),
+        inset 0 1px 0 rgba(255,255,255,.78),
+        inset 0 -1px 0 rgba(92,50,98,.08)!important;
+}
+.gx-welcome-submit:not(.gx-welcome-validating):not(.gx-welcome-validated):not(.gx-welcome-validation-error) .gx-welcome-submit-label{
+    color:#2b123c!important;
+    font-weight:860!important;
+}
+.gx-welcome-submit:not(.gx-welcome-validating):not(.gx-welcome-validated):not(.gx-welcome-validation-error):active{
+    background:linear-gradient(145deg,#ecd7a7 0%,#e5c786 100%)!important;
+}
+
+/* La línea de validación nace del mismo lenguaje cromático. */
+.gx-welcome-submit.gx-welcome-validating{
+    background:rgba(45,21,59,.52)!important;
+    box-shadow:inset 0 0 0 1px rgba(240,221,178,.16)!important;
+}
+.gx-welcome-submit.gx-welcome-validating::after{
+    background:linear-gradient(90deg,#ead09a,#f6e9c9)!important;
+}
+
+/* Check final centrado y armónico. */
+.gx-welcome-submit.gx-welcome-validated{
+    background:#f0ddb2!important;
+    box-shadow:
+        0 10px 26px rgba(67,24,80,.18),
+        0 0 0 8px rgba(240,221,178,.08),
+        inset 0 1px 0 rgba(255,255,255,.72)!important;
+    margin:0!important;
+}
+.gx-welcome-submit.gx-welcome-validated::before,
+.gx-welcome-submit.gx-welcome-validated::after{
+    background:#8b37ba!important;
+}
+
+/* Cuando ya existe un resultado, el formulario deja de competir
+   visualmente: desaparecen campos/aviso y el check queda centrado
+   entre el encabezado y el resultado. */
+.gx-welcome-form[hidden]{
+    display:flex!important;
+    width:100%!important;
+    min-height:64px!important;
+    margin:10px 0 12px!important;
+    padding:0!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:0!important;
+}
+.gx-welcome-form[hidden] > label,
+.gx-welcome-form[hidden] > .gx-welcome-rule{
+    display:none!important;
+}
+.gx-welcome-form[hidden] > .gx-welcome-submit{
+    flex:0 0 auto!important;
+}
+.gx-welcome-result{
+    margin-top:0!important;
+}
+.gx-welcome-result.success,
+.gx-welcome-result.blocked,
+.gx-welcome-result.review,
+.gx-welcome-result.error{
+    width:100%!important;
+    box-sizing:border-box!important;
+}
+
+@media(max-width:390px){
+    .gx-welcome-form[hidden]{min-height:60px!important;margin:8px 0 10px!important}
+}
+</style>
 </head>
 <body class="no-scroll">
 <div id="splash-screen" onclick="hideSplash()">
