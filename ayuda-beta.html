@@ -5430,7 +5430,20 @@
 <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
 </div>
 <div id="dash-payment-review-alert"></div>
-<div class="glass-card dash-card" style="background: rgba(0,0,0,0.3);">
+<div class="glass-card dash-card gx-new-client-card" id="dash-onboarding-card" hidden>
+    <div class="gx-new-client-kicker">PRIMEROS PASOS</div>
+    <h2>Tu espacio ya está listo</h2>
+    <p class="gx-new-client-copy">Aún no tienes servicios contratados. Explora el catálogo y elige el primero para comenzar a disfrutar GOXION.</p>
+    <div class="gx-new-client-benefit">
+        <span class="gx-new-client-benefit-value">−10%</span>
+        <span class="gx-new-client-benefit-copy"><strong>Bienvenida disponible</strong><small>Se aplicará a tu primera alta elegible.</small></span>
+    </div>
+    <button type="button" class="gx-new-client-cta" onclick="switchTab('catalogo')">
+        <span>Explorar catálogo</span>
+        <svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg>
+    </button>
+</div>
+<div class="glass-card dash-card" id="dash-billing-card" style="background: rgba(0,0,0,0.3);">
 <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
 <div class="dash-date" id="dash-date">Cargando...</div>
 <div id="dash-badge" style="text-align: center;"></div>
@@ -5664,7 +5677,7 @@
 
         <div id="gx-welcome-result" class="gx-welcome-result" aria-live="polite"></div>
         <div id="gx-welcome-existing-actions" class="gx-welcome-existing-actions" hidden>
-            <button type="button" onclick="gxRegistrationToRecovery()">Recuperar mi acceso</button>
+            <button type="button" onclick="gxRegistrationToLogin()"><span>Ir a Mi Espacio</span><svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></button>
             <button type="button" class="secondary" onclick="gxCloseWelcomeRegistration()">Cerrar</button>
         </div>
     </section>
@@ -5885,6 +5898,14 @@
                Así una segunda apertura no puede ser cerrada por una promesa vieja. */
             shell?.getAnimations?.().forEach(a=>a.cancel());
             modal.querySelector('.gx-welcome-sheet')?.getAnimations?.().forEach(a=>a.cancel());
+            modal.querySelectorAll('.gx-welcome-sheet *').forEach(el=>{
+                el.getAnimations?.().forEach(a=>{ try{ a.cancel(); }catch(_){} });
+                if(el instanceof HTMLElement){
+                    el.style.removeProperty('opacity');
+                    el.style.removeProperty('transform');
+                    el.style.removeProperty('filter');
+                }
+            });
             if(shell) shell.hidden=true;
 
             if(form) form.hidden=false;
@@ -5939,6 +5960,14 @@
                 shell?.getAnimations?.().forEach(a=>a.cancel());
                 sheet?.getAnimations?.().forEach(a=>a.cancel());
                 backdrop?.getAnimations?.().forEach(a=>a.cancel());
+                sheet?.querySelectorAll?.('*')?.forEach(el=>{
+                    el.getAnimations?.().forEach(a=>{ try{ a.cancel(); }catch(_){} });
+                    if(el instanceof HTMLElement){
+                        el.style.removeProperty('opacity');
+                        el.style.removeProperty('transform');
+                        el.style.removeProperty('filter');
+                    }
+                });
 
                 modal.classList.remove(
                     "show",
@@ -6051,14 +6080,14 @@
             finish();
         }
 
-        async function gxRegistrationToRecovery() {
+        async function gxRegistrationToLogin() {
             const name=document.getElementById("gx-welcome-name")?.value?.trim() || "";
             await gxCloseWelcomeRegistration();
             if(typeof openAuthSheet==="function") openAuthSheet();
             setTimeout(()=>{
                 const loginId=document.getElementById("login-id");
                 if(loginId && name) loginId.value=name;
-                if(typeof openPinRecovery==="function") openPinRecovery();
+                document.getElementById("login-pin")?.focus?.({preventScroll:true});
             },420);
         }
 
@@ -6812,6 +6841,17 @@
             iniciarSaludoDinamico(cliente.nombre);
 
             const gxEstadoCuenta = cliente.estado_cuenta || null;
+
+            const gxNoServices = !Array.isArray(cliente.servicios) || cliente.servicios.length === 0;
+            const gxNoPayments = !Array.isArray(cliente.historial_pagos) || cliente.historial_pagos.length === 0;
+            const gxIsFreshGoxionClient = String(cliente.origen_cliente || '').toLowerCase() === 'goxion'
+                && cliente.promo_nuevo_elegible === true
+                && Boolean(String(cliente.usuario_acceso || '').trim());
+            const gxShowNewClientOnboarding = gxIsFreshGoxionClient && gxNoServices && gxNoPayments;
+            const gxOnboardingCard = document.getElementById('dash-onboarding-card');
+            const gxBillingCard = document.getElementById('dash-billing-card');
+            if(gxOnboardingCard) gxOnboardingCard.hidden = !gxShowNewClientOnboarding;
+            if(gxBillingCard) gxBillingCard.hidden = gxShowNewClientOnboarding;
 
             const payAlert = document.getElementById('dash-payment-review-alert');
             if(payAlert) {
@@ -7574,7 +7614,9 @@
                         </article>`;
                 });
             } else {
-                srvHTML = `<div class="gx-payment-history-card" style="padding:16px;text-align:center;"><div style="color:var(--text-muted);font-size:10px;">No tienes servicios activos.</div></div>`;
+                srvHTML = gxShowNewClientOnboarding
+                    ? `<div class="gx-payment-history-card gx-first-service-empty"><strong>Tu primer servicio aparecerá aquí</strong><small>Explora el catálogo para comenzar.</small></div>`
+                    : `<div class="gx-payment-history-card" style="padding:16px;text-align:center;"><div style="color:var(--text-muted);font-size:10px;">No tienes servicios activos.</div></div>`;
             }
 
             document.getElementById('dash-services').innerHTML = srvHTML;
@@ -9865,6 +9907,9 @@ function goxionViewModelAdapter(data) {
             pago_revision_updated_at: c.pago_revision_updated_at || null,
             pagos_puntuales: Number(c.pagos_puntuales || 0),
             descuento_fallas: Number(c.descuento_fallas || 0),
+            origen_cliente: c.origen_cliente || "",
+            promo_nuevo_elegible: c.promo_nuevo_elegible === true,
+            created_at: c.created_at || null,
             estado_cuenta: data?.estado_cuenta || null,
             servicios: (data.servicios || []).map(s => {
                 const serviceCancellations=(data.cancelaciones || [])
@@ -16169,7 +16214,140 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     .gx-welcome-result.blocked span{animation:none!important}
 }
 </style>
-<script id="goxion-ayuda-beta-30-marker">console.info('GOXION Ayuda Beta 30 · estados y carga real');</script>
+
+
+
+<style id="goxion-ayuda-beta-31-final">
+/* Beta 31 · acciones de registro siempre recuperables */
+.gx-welcome-existing-actions{
+    grid-template-columns:minmax(0,1fr) 82px!important;
+    gap:8px!important;
+    margin-top:10px!important;
+}
+.gx-welcome-existing-actions button{
+    min-height:45px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    border-radius:13px!important;
+    font-weight:850!important;
+    letter-spacing:-.01em!important;
+    background:linear-gradient(145deg,#f7e8c4 0%,#e9ca8e 100%)!important;
+    color:#54246d!important;
+    border:1px solid rgba(255,248,226,.62)!important;
+    box-shadow:0 10px 25px rgba(72,38,82,.20),inset 0 1px 0 rgba(255,255,255,.72)!important;
+}
+.gx-welcome-existing-actions button .gx-nav-arrow{width:15px;height:15px;fill:currentColor}
+.gx-welcome-existing-actions button.secondary{
+    background:linear-gradient(145deg,rgba(32,22,43,.96),rgba(17,15,25,.98))!important;
+    color:#f5efff!important;
+    border:1px solid rgba(244,225,185,.20)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+
+/* Cliente recién activado, todavía sin servicios */
+.gx-new-client-card{
+    position:relative;
+    overflow:hidden;
+    padding:22px!important;
+    border:1px solid rgba(116,208,244,.18)!important;
+    background:
+        radial-gradient(circle at 90% 8%,rgba(0,242,254,.095),transparent 31%),
+        radial-gradient(circle at 8% 96%,rgba(124,77,255,.12),transparent 34%),
+        linear-gradient(155deg,rgba(11,13,22,.98),rgba(7,8,13,.99))!important;
+    box-shadow:0 20px 55px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.035)!important;
+}
+.gx-new-client-card::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.025) 47%,transparent 70%);
+    transform:translateX(-42%);
+}
+.gx-new-client-kicker{
+    color:#75edf5;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.19em;
+    margin-bottom:9px;
+}
+.gx-new-client-card h2{
+    margin:0;
+    color:#fff;
+    font-size:25px;
+    line-height:1.04;
+    letter-spacing:-.035em;
+}
+.gx-new-client-copy{
+    margin:10px 0 17px;
+    max-width:470px;
+    color:#9aa7bb;
+    font-size:12px;
+    line-height:1.55;
+}
+.gx-new-client-benefit{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 13px;
+    margin-bottom:15px;
+    border-radius:15px;
+    border:1px solid rgba(225,87,223,.20);
+    background:linear-gradient(135deg,rgba(113,42,132,.19),rgba(52,21,65,.18));
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+.gx-new-client-benefit-value{
+    flex:0 0 auto;
+    color:#ff8be6;
+    font-size:24px;
+    font-weight:950;
+    line-height:1;
+    letter-spacing:-.055em;
+    text-shadow:0 0 20px rgba(255,81,211,.20);
+}
+.gx-new-client-benefit-copy{display:grid;gap:2px;min-width:0}
+.gx-new-client-benefit-copy strong{color:#f8efff;font-size:12px;font-weight:850}
+.gx-new-client-benefit-copy small{color:#9f8fa9;font-size:9.5px;line-height:1.35}
+.gx-new-client-cta{
+    width:100%;
+    min-height:46px;
+    border-radius:14px;
+    border:1px solid rgba(0,242,254,.20);
+    background:linear-gradient(135deg,rgba(0,214,230,.15),rgba(79,106,255,.14));
+    color:#f7fbff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 15px;
+    font:inherit;
+    font-size:12px;
+    font-weight:850;
+    box-shadow:0 10px 25px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04);
+    transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,background .22s ease;
+}
+.gx-new-client-cta:active{transform:scale(.985)}
+.gx-new-client-cta .gx-nav-arrow{width:17px;height:17px;fill:var(--neon-blue)}
+.gx-first-service-empty{
+    padding:16px!important;
+    text-align:center!important;
+    display:grid!important;
+    gap:4px!important;
+}
+.gx-first-service-empty strong{font-size:11px;color:#e9eef8}
+.gx-first-service-empty small{font-size:9.5px;color:var(--text-muted)}
+
+@media(max-width:390px){
+    .gx-new-client-card{padding:18px!important}
+    .gx-new-client-card h2{font-size:23px}
+    .gx-new-client-copy{font-size:11.5px}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-new-client-cta{transition:none!important}
+}
+</style>
+<script id="goxion-ayuda-beta-31-marker">console.info('GOXION Ayuda Beta 31 · onboarding inicial + reset de acciones');</script>
 
 </body>
 </html>
