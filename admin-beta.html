@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 
-<html data-goxion-version="1.1.3-beta-20" lang="es">
+<html data-goxion-version="1.1.3-beta-22" lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>GOXION // ADMIN BETA 20 · BENEFICIOS INTELIGENTES</title>
+<title>GOXION // ADMIN BETA 22 · ACTIVACIÓN 24H</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
         :root {
@@ -342,177 +342,6 @@ body{max-width:none;padding:0;background:radial-gradient(circle at 10% 0,rgba(0,
         .gx-ref-counter{grid-template-columns:28px 38px 28px 44px;gap:3px}
         .gx-ref-counter button,.gx-ref-counter strong{height:38px}
     }
-
-
-/* =========================================================
-   GOXION ADMIN BETA 21 · REGISTRO INTELIGENTE
-   Aprobación -> Mi Espacio -> usuario/PIN -> bienvenida 10%
-   ========================================================= */
-.gx-reg-actions button.approve{
-    border-color:rgba(0,242,254,.18);
-    background:linear-gradient(135deg,rgba(0,242,254,.11),rgba(151,120,255,.12));
-    color:#aef7ff;
-}
-.gx-reg-created-meta{
-    margin-top:4px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    flex-wrap:wrap;
-    color:#7fe9b4;
-    font-size:.49rem;
-    font-weight:800;
-}
-.gx-reg-created-meta code{
-    padding:2px 6px;
-    border-radius:999px;
-    background:#111923;
-    color:#bdefff;
-    font:inherit;
-}
-.gx-space-created{
-    position:fixed;
-    inset:0;
-    z-index:100160;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-}
-.gx-space-created.show{display:flex}
-.gx-space-created-backdrop{
-    position:absolute;
-    inset:0;
-    background:rgba(0,0,0,.78);
-    backdrop-filter:blur(12px);
-}
-.gx-space-created-sheet{
-    position:relative;
-    width:min(440px,100%);
-    padding:18px;
-    border:1px solid rgba(0,242,254,.13);
-    border-radius:20px;
-    background:linear-gradient(145deg,#0b0d13,#08090d);
-    box-shadow:0 28px 90px rgba(0,0,0,.62);
-}
-.gx-space-created-head{
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:16px;
-}
-.gx-space-created-head span{
-    display:block;
-    color:#69e9f4;
-    font-size:.62rem;
-    font-weight:900;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-}
-.gx-space-created-head h3{
-    margin:4px 0 3px;
-    font-size:1.25rem;
-    line-height:1.1;
-}
-.gx-space-created-head p{
-    margin:0;
-    color:#8e9aab;
-    font-size:.72rem;
-    line-height:1.45;
-}
-.gx-space-created-close{
-    flex:0 0 38px;
-    width:38px;
-    height:38px;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:999px;
-    background:#11131a;
-    color:#fff;
-    font-size:1.2rem;
-}
-.gx-space-created-creds{
-    display:grid;
-    grid-template-columns:minmax(0,1fr) 112px;
-    gap:8px;
-    margin-bottom:10px;
-}
-.gx-space-created-creds>div{
-    min-width:0;
-    padding:12px;
-    border:1px solid rgba(255,255,255,.065);
-    border-radius:13px;
-    background:#0e1016;
-}
-.gx-space-created-creds span{
-    display:block;
-    margin-bottom:5px;
-    color:#7f8b9d;
-    font-size:.58rem;
-    font-weight:900;
-    text-transform:uppercase;
-}
-.gx-space-created-creds strong{
-    display:block;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    color:#fff;
-    font-size:1rem;
-    white-space:nowrap;
-}
-.gx-space-created-creds .pin strong{
-    color:#83eff8;
-    font-size:1.42rem;
-    letter-spacing:.12em;
-}
-.gx-space-created-benefit{
-    margin-bottom:13px;
-    padding:10px 12px;
-    border-left:2px solid rgba(151,120,255,.72);
-    border-radius:0 11px 11px 0;
-    background:rgba(151,120,255,.055);
-    color:#aeb8c8;
-    font-size:.68rem;
-    line-height:1.45;
-}
-.gx-space-created-benefit strong{color:#d8ccff}
-.gx-space-created-warning{
-    margin:0 0 13px;
-    color:#8a96a7;
-    font-size:.61rem;
-    line-height:1.45;
-}
-.gx-space-created-actions{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:7px;
-}
-.gx-space-created-actions button{
-    min-height:44px;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:11px;
-    background:#12141b;
-    color:#d4dbe5;
-    font:inherit;
-    font-size:.72rem;
-    font-weight:850;
-}
-.gx-space-created-actions button.primary{
-    border-color:rgba(0,242,254,.14);
-    background:#0d1d23;
-    color:#83edf7;
-}
-.gx-space-created-actions button.open{
-    grid-column:1/-1;
-    border-color:rgba(151,120,255,.13);
-    background:#17131f;
-    color:#d2c4ff;
-}
-@media(max-width:480px){
-    .gx-space-created{align-items:flex-end;padding:0}
-    .gx-space-created-sheet{width:100%;border-radius:20px 20px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
-    .gx-space-created-creds{grid-template-columns:minmax(0,1fr) 104px}
-}
 
 </style>
 <style id="goxion-admin-v6-ui">
@@ -4442,8 +4271,30 @@ details.gx-client-ops-context{
     .gx-reg-actions{justify-content:flex-start}
 }
 </style>
+
+<style id="goxion-admin-beta-23-registros-operativos">
+/* Registros es una bandeja operativa propia: nuevos, pendientes, revisión y activados. */
+.gx-registration-kpis{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+.gx-registration-kpis .new{border-color:rgba(0,242,254,.14);background:linear-gradient(145deg,#0b171c,#0d1016)}
+.gx-registration-kpis .new strong{color:#65eaf4}
+.gx-registration-kpis .activation{border-color:rgba(137,109,255,.14);background:linear-gradient(145deg,#12101b,#0d1016)}
+.gx-registration-kpis .activation strong{color:#b6a6ff}
+.gx-registration-kpis .activated{border-color:rgba(69,229,153,.12);background:linear-gradient(145deg,#0c1713,#0d1016)}
+.gx-registration-kpis .activated strong{color:#78e7ad}
+.gx-registration-tabs{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap!important}
+.gx-registration-tabs::-webkit-scrollbar{display:none}
+.gx-registration-tabs button{flex:0 0 auto;white-space:nowrap}
+.gx-registration-list{padding-right:1px}
+.gx-reg-section-label{margin:5px 2px 0;color:#758197;font-size:.48rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.gx-ops-registration-alert b:not(:empty){box-shadow:0 0 0 1px rgba(255,255,255,.045),0 0 18px rgba(255,84,119,.08)}
+@media(max-width:520px){
+ .gx-registration-kpis{grid-template-columns:1fr 1fr!important}
+ .gx-registration-kpis>div{min-height:70px}
+ .gx-registration-tabs{margin-left:-2px;margin-right:-2px;padding-left:4px;padding-right:4px}
+}
+</style>
 </head>
-<body data-gx-version="admin-beta-21">
+<body data-gx-version="admin-beta-19-4">
 <div class="gx-admin-shell">
 <header class="gx-topbar">
 <div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION</div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
@@ -5015,46 +4866,47 @@ details.gx-client-ops-context{
 <section class="gx-registration-sheet">
 <header>
 <div>
-<span class="gx-eyebrow">Foco rojo</span>
-<h2>Registro &amp; elegibilidad</h2>
-<p>Evita aplicar el -10% a clientes que ya pertenecían a SD Streaming o GOXION.</p>
+<span class="gx-eyebrow">Registro inteligente</span>
+<h2>Registro &amp; activación</h2>
+<p>Valida nuevas altas, prepara códigos temporales de 24 h y evita duplicados antes de crear Mi Espacio.</p>
 </div>
 <button onclick="gxCloseRegistrationControl()" type="button">×</button>
 </header>
 <div class="gx-registration-kpis">
-<div class="danger"><span>Revisar</span><strong id="gx-reg-kpi-review">0</strong><small>Posibles clientes previos</small></div>
-<div><span>Nuevos</span><strong id="gx-reg-kpi-new">0</strong><small>Pendientes de contacto</small></div>
-<div class="warning"><span>Base previa</span><strong id="gx-reg-kpi-missing">0</strong><small>Sin teléfono registrado</small></div>
+<div class="new"><span>Nuevos</span><strong id="gx-reg-kpi-new">0</strong><small>Listos para aprobar</small></div>
+<div class="activation"><span>Pendientes</span><strong id="gx-reg-kpi-activation">0</strong><small>Esperando activación</small></div>
+<div class="danger"><span>Revisión</span><strong id="gx-reg-kpi-review">0</strong><small>Requieren decisión</small></div>
+<div class="activated"><span>Activados</span><strong id="gx-reg-kpi-activated">0</strong><small>Altas completadas</small></div>
 </div>
 <div class="gx-registration-tabs">
-<button class="active" data-gx-reg-tab="attempts" onclick="gxRegistrationTab('attempts',this)">Solicitudes</button>
-<button data-gx-reg-tab="legacy" onclick="gxRegistrationTab('legacy',this)">Base previa sin teléfono</button>
+<button class="active" data-gx-reg-tab="new" onclick="gxRegistrationTab('new',this)">Nuevos</button>
+<button data-gx-reg-tab="pending" onclick="gxRegistrationTab('pending',this)">Pendientes</button>
+<button data-gx-reg-tab="review" onclick="gxRegistrationTab('review',this)">Revisión</button>
+<button data-gx-reg-tab="activated" onclick="gxRegistrationTab('activated',this)">Activados</button>
+<button data-gx-reg-tab="legacy" onclick="gxRegistrationTab('legacy',this)">Base previa</button>
 </div>
 <div class="gx-registration-list" id="gx-registration-list"></div>
 </section>
 </div>
-
-<div aria-hidden="true" class="gx-space-created" id="gx-space-created">
-<div class="gx-space-created-backdrop" onclick="gxCloseCreatedSpace()"></div>
-<section class="gx-space-created-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-space-created-title">
-<div class="gx-space-created-head">
-<div><span>Mi Espacio listo</span><h3 id="gx-space-created-title">Acceso creado</h3><p id="gx-space-created-name">—</p></div>
-<button class="gx-space-created-close" onclick="gxCloseCreatedSpace()" type="button" aria-label="Cerrar">×</button>
+<div aria-hidden="true" class="gx-activation-delivery" id="gx-activation-delivery">
+<div class="gx-activation-delivery-backdrop" onclick="gxCloseActivationDelivery()"></div>
+<section class="gx-activation-delivery-sheet">
+<header>
+<div><span class="gx-eyebrow">Código creado</span><h3 id="gx-activation-delivery-name">Cliente</h3><p>Este código se muestra una sola vez. Al regenerarlo, el anterior deja de funcionar.</p></div>
+<button onclick="gxCloseActivationDelivery()" type="button">×</button>
+</header>
+<div class="gx-activation-credential-grid">
+<div><span>GOXION ID</span><strong id="gx-activation-delivery-user">@usuario</strong></div>
+<div class="code"><span>Código</span><strong id="gx-activation-delivery-code">••••••</strong></div>
 </div>
-<div class="gx-space-created-creds">
-<div><span>Usuario</span><strong id="gx-space-created-user">—</strong></div>
-<div class="pin"><span>PIN</span><strong id="gx-space-created-pin">••••</strong></div>
+<div class="gx-activation-delivery-meta"><span>WhatsApp <b id="gx-activation-delivery-phone">—</b></span><span>Vence <b id="gx-activation-delivery-exp">—</b></span></div>
+<div class="gx-activation-delivery-actions">
+<button class="primary" onclick="gxOpenActivationWhatsApp()" type="button">Enviar por WhatsApp</button>
+<button onclick="gxCopyActivationMessage()" type="button">Copiar mensaje</button>
 </div>
-<div class="gx-space-created-benefit"><strong>✦ Bienvenida −10%</strong><br>Quedó reservada para el primer periodo elegible en el que genere ahorro real.</div>
-<p class="gx-space-created-warning">El PIN se muestra únicamente en esta confirmación. Después solo podrás reemplazarlo desde la cuenta del cliente; GOXION no guarda el PIN en texto plano.</p>
-<div class="gx-space-created-actions">
-<button class="primary" onclick="gxCopyCreatedSpace()" type="button">Copiar acceso</button>
-<button onclick="gxCloseCreatedSpace()" type="button">Listo</button>
-<button class="open" onclick="gxOpenCreatedClient()" type="button">Abrir cliente</button>
-</div>
+<small class="gx-activation-delivery-note">Mi Espacio todavía no está activo. El cliente deberá usar este código y crear su propio PIN.</small>
 </section>
 </div>
-
 <!-- CENTRO DE NOTIFICACIONES / ACTIVIDAD -->
 <aside aria-hidden="true" class="gx-notification-drawer" id="gx-notification-drawer">
 <div class="gx-notification-drawer-head">
@@ -10762,50 +10614,60 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
 <script id="goxion-admin-registration-controller">
 (() => {
     const URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/registro-admin";
-    window.gxRegistrationState={clientes:[],solicitudes:[],resumen:{foco_rojo:0,nuevos_pendientes:0,legacy_sin_telefono:0},tab:"attempts"};
-    window.gxCreatedSpaceData=null;
+    window.gxRegistrationState={clientes:[],solicitudes:[],activaciones:[],resumen:{foco_rojo:0,nuevos_pendientes:0,activaciones_pendientes:0,activaciones_bloqueadas:0,activaciones_expiradas:0,legacy_sin_telefono:0},tab:"new"};
 
-    const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;").replace(/'/g,"&#039;");
+    const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
     const fmtPhone=v=>{
         const d=String(v||"").replace(/\D/g,"");
         const local=d.startsWith("52")&&d.length===12?d.slice(2):d;
         return local.length===10?`${local.slice(0,3)} ${local.slice(3,6)} ${local.slice(6)}`:(d||"Sin teléfono");
     };
+    const fmtDate=v=>{
+        if(!v)return "—";
+        const d=new Date(v);if(Number.isNaN(d.getTime()))return "—";
+        return d.toLocaleString("es-MX",{dateStyle:"medium",timeStyle:"short"});
+    };
+    const remaining=v=>{
+        if(!v)return "Sin vigencia";
+        const ms=new Date(v).getTime()-Date.now();
+        if(!Number.isFinite(ms)||ms<=0)return "Vencido";
+        const h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000);
+        return h>=1?`${h} h ${m} min`:`${Math.max(1,m)} min`;
+    };
     const clientKeyById=id=>Object.entries(clientesDict||{}).find(([,c])=>String(c?._id||c?.id||"")===String(id))?.[0]||"";
     const clientIdentity=id=>gxRegistrationState.clientes.find(c=>String(c.id)===String(id))||null;
+    const activationByRequest=id=>gxRegistrationState.activaciones.find(a=>String(a.solicitud_id)===String(id))||null;
 
     async function api(accion,datos={}){
         const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
         const r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion,datos}),cache:"no-store"});
         const j=await r.json().catch(()=>({}));
-        if(!r.ok||j?.ok!==true){const e=new Error(j?.error||`HTTP ${r.status}`);e.payload=j;e.status=r.status;throw e;}
+        if(!r.ok||j?.ok!==true){const e=new Error(j?.error||`HTTP ${r.status}`);e.payload=j;e.status=r.status;throw e}
         return j;
     }
 
     window.gxLoadRegistrationState=async function(render=false){
         try{
             const r=await api("resumen",{});
-            gxRegistrationState={clientes:r.clientes||[],solicitudes:r.solicitudes||[],resumen:r.resumen||{},tab:gxRegistrationState.tab||"attempts"};
-            const red=Number(gxRegistrationState.resumen.foco_rojo||0);
+            gxRegistrationState={clientes:r.clientes||[],solicitudes:r.solicitudes||[],activaciones:r.activaciones||[],resumen:r.resumen||{},tab:gxRegistrationState.tab||"attempts"};
+            const red=Number(gxRegistrationState.resumen.foco_rojo||0)+Number(gxRegistrationState.resumen.activaciones_bloqueadas||0)+Number(gxRegistrationState.resumen.activaciones_expiradas||0);
+            const attention=red+Number(gxRegistrationState.resumen.nuevos_pendientes||0)+Number(gxRegistrationState.resumen.activaciones_pendientes||0);
             const dec=document.getElementById("gx-decision-registrations");
             const ops=document.getElementById("gx-ops-registration-count");
-            if(dec)dec.textContent=String(red);
-            if(ops)ops.textContent=String(red);
+            if(dec)dec.textContent=String(attention);
+            if(ops)ops.textContent=String(attention);
             const total=document.getElementById("gx-decision-total");
             if(total){
                 const current=Number((total.textContent.match(/\d+/)||["0"])[0]);
                 if(!total.dataset.gxRegCount) total.dataset.gxRegCount="0";
                 const prev=Number(total.dataset.gxRegCount||0);
-                const next=Math.max(0,current-prev+red);
+                const next=Math.max(0,current-prev+attention);
                 total.textContent=`${next} pendiente${next===1?"":"s"}`;
-                total.dataset.gxRegCount=String(red);
+                total.dataset.gxRegCount=String(attention);
             }
             if(render)gxRenderRegistrationControl();
             return r;
-        }catch(e){
-            console.warn("Registro & elegibilidad",e);
-            return null;
-        }
+        }catch(e){console.warn("Registro & activación",e);return null}
     };
 
     window.gxOpenRegistrationControl=async function(){
@@ -10817,13 +10679,28 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     window.gxCloseRegistrationControl=function(){
         const modal=document.getElementById("gx-registration-control");
         modal?.classList.remove("show");modal?.setAttribute("aria-hidden","true");
-        if(!document.getElementById("gx-space-created")?.classList.contains("show")) document.body.style.overflow="";
+        if(!document.getElementById("gx-activation-delivery")?.classList.contains("show"))document.body.style.overflow="";
     };
     window.gxRegistrationTab=function(tab,btn){
         gxRegistrationState.tab=tab;
         document.querySelectorAll(".gx-registration-tabs button").forEach(b=>b.classList.toggle("active",b===btn));
         gxRenderRegistrationControl();
     };
+    window.gxGoActivationTab=function(){
+        gxRegistrationState.tab="pending";
+        document.querySelectorAll(".gx-registration-tabs button").forEach(b=>b.classList.toggle("active",b.dataset.gxRegTab==="pending"));
+        gxRenderRegistrationControl();
+    };
+
+    function activationStatus(a){
+        if(!a)return {label:"Sin activar",cls:""};
+        if(a.estado==="pendiente")return {label:"Pendiente de activación",cls:"pending"};
+        if(a.estado==="activada")return {label:"Cuenta activada",cls:"new"};
+        if(a.estado==="bloqueada")return {label:"Código bloqueado",cls:"danger"};
+        if(a.estado==="expirada")return {label:"Código vencido",cls:"review"};
+        if(a.estado==="cancelada")return {label:"Cancelada",cls:""};
+        return {label:a.estado||"—",cls:""};
+    }
 
     window.gxRenderRegistrationControl=function(){
         const list=document.getElementById("gx-registration-list");if(!list)return;
@@ -10831,7 +10708,60 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=String(v)};
         set("gx-reg-kpi-review",s.resumen.foco_rojo||0);
         set("gx-reg-kpi-new",s.resumen.nuevos_pendientes||0);
-        set("gx-reg-kpi-missing",s.resumen.legacy_sin_telefono||0);
+        set("gx-reg-kpi-activation",s.resumen.activaciones_pendientes||0);
+        set("gx-reg-kpi-activated",s.resumen.activadas||0);
+
+        const renderActivation=a=>{
+            const st=activationStatus(a);
+            const linked=a.cliente_id?clientIdentity(a.cliente_id):null;
+            const canRenew=["pendiente","expirada","bloqueada"].includes(a.estado);
+            const canCancel=["pendiente","expirada","bloqueada"].includes(a.estado);
+            return `<article class="gx-reg-row ${st.cls}">
+                <div class="gx-reg-main">
+                    <div class="gx-reg-top">
+                        <strong>${esc(a.nombre_declarado)}</strong>
+                        <span class="gx-reg-badge ${st.cls}">${esc(st.label)}</span>
+                        <span class="gx-reg-tag">@${esc(a.goxion_id)}</span>
+                    </div>
+                    <div class="gx-reg-meta">${fmtPhone(a.telefono_normalizado)} · ${a.estado==="pendiente"?`vence en ${remaining(a.expira_at)}`:a.expira_at?`vigencia: ${fmtDate(a.expira_at)}`:"sin código activo"}</div>
+                    <div class="gx-reg-meta">Intentos ${Number(a.intentos_fallidos||0)}/${Number(a.max_intentos||5)} · regeneraciones ${Number(a.regeneraciones||0)}${a.activada_at?` · activada ${fmtDate(a.activada_at)}`:""}</div>
+                </div>
+                <div class="gx-reg-actions">
+                    ${linked?`<button onclick="gxOpenIdentityClient('${esc(linked.id)}')">Ver cliente</button>`:""}
+                    ${canRenew?`<button class="ok" onclick="gxRegenerateActivation('${esc(a.solicitud_id)}','${esc(a.nombre_declarado)}',${a.estado==="pendiente"?"true":"false"})">${a.estado==="pendiente"?"Regenerar y enviar":"Generar nuevo código"}</button>`:""}
+                    ${canCancel?`<button class="danger" onclick="gxCancelActivation('${esc(a.solicitud_id)}','${esc(a.nombre_declarado)}')">Cancelar</button>`:""}
+                </div>
+            </article>`;
+        };
+
+        const renderRequest=r=>{
+            const a=r.activacion||activationByRequest(r.id);
+            const cls=r.resultado==="cliente_existente"?"danger":r.resultado==="revisar"?"review":r.resultado==="nuevo"?"new":"";
+            const label=r.resultado==="cliente_existente"?"Cliente existente":r.resultado==="revisar"?"Requiere revisión":r.resultado==="nuevo"?"Cliente nuevo":"Solicitud previa";
+            const linked=clientIdentity(r.cliente_id);
+            const actionable=r.estado_admin!=="resuelto"&&r.estado_admin!=="descartado";
+            const canPrepare=actionable&&r.resultado==="nuevo"&&!a;
+            const ast=activationStatus(a);
+            return `<article class="gx-reg-row ${cls}">
+                <div class="gx-reg-main">
+                    <div class="gx-reg-top">
+                        <strong>${esc(r.nombre_declarado)}</strong>
+                        <span class="gx-reg-badge ${cls}">${label}</span>
+                        ${a?`<span class="gx-reg-badge ${ast.cls}">${esc(ast.label)}</span>`:`<span class="gx-reg-badge">${esc(r.estado_admin)}</span>`}
+                    </div>
+                    <div class="gx-reg-meta">${fmtPhone(r.telefono_normalizado)}${linked?` · Coincide con ${esc(linked.nombre)}`:""} · ${fmtDate(r.created_at)}</div>
+                    ${a?`<div class="gx-reg-meta"><b class="gx-reg-inline-id">@${esc(a.goxion_id)}</b>${a.estado==="pendiente"?` · código activo por ${remaining(a.expira_at)}`:""}</div>`:""}
+                    ${r.detalle?`<div class="gx-reg-meta">${esc(r.detalle)}</div>`:""}
+                </div>
+                <div class="gx-reg-actions">
+                    ${linked?`<button onclick="gxOpenIdentityClient('${esc(linked.id)}')">Ver cliente</button>`:""}
+                    ${actionable&&linked&&(r.resultado==="revisar"||r.resultado==="cliente_existente")&&!a?`<button class="danger" onclick="gxLinkExistingRegistration('${esc(r.id)}','${esc(linked.id)}')">Vincular teléfono</button>`:""}
+                    ${canPrepare?`<button class="ok gx-prepare-activation" onclick="gxPrepareActivation('${esc(r.id)}','${esc(r.nombre_declarado)}')">Aprobar registro</button><button class="danger" onclick="gxRegistrationStatus('${esc(r.id)}','descartado')">Descartar</button>`:""}
+                    ${a?`<button onclick="gxGoActivationTab()">Ver activación</button>`:""}
+                    ${actionable&&!canPrepare&&!a&&r.resultado!=="nuevo"?`<button onclick="gxRegistrationStatus('${esc(r.id)}','resuelto')">Cerrar</button>`:""}
+                </div>
+            </article>`;
+        };
 
         if(s.tab==="legacy"){
             const rows=s.clientes.filter(c=>c.origen_cliente==="sd_streaming"&&!c.telefono_normalizado);
@@ -10839,45 +10769,41 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                 <article class="gx-reg-row review">
                     <div class="gx-reg-main">
                         <div class="gx-reg-top"><strong>${esc(c.nombre)}</strong><span class="gx-reg-badge review">Base previa</span></div>
-                        <div class="gx-reg-meta">Folio ${esc(c.folio||"—")} · Sin teléfono para detectar intentos del -10% por número.</div>
+                        <div class="gx-reg-meta">Folio ${esc(c.folio||"—")} · Sin teléfono para reforzar la detección de altas repetidas.</div>
                     </div>
                     <div class="gx-reg-actions"><button onclick="gxOpenIdentityClient('${esc(c.id)}')">Abrir cliente</button></div>
                 </article>`).join(""):'<div class="gx-empty-inline">Todos los clientes previos ya tienen teléfono registrado.</div>';
             return;
         }
 
-        const rows=s.solicitudes;
-        list.innerHTML=rows.length?rows.map(r=>{
-            const linked=clientIdentity(r.cliente_id);
-            const created=r.resultado==="nuevo"&&r.estado_admin==="resuelto"&&linked;
-            const cls=r.resultado==="cliente_existente"?"danger":r.resultado==="revisar"?"review":r.resultado==="nuevo"?"new":"";
-            const label=created?"Espacio creado":r.resultado==="cliente_existente"?"Cliente existente":r.resultado==="revisar"?"Requiere revisión":r.resultado==="nuevo"?"Cliente nuevo":"Solicitud previa";
-            const actionable=["pendiente","contactado"].includes(r.estado_admin);
-            const canCreate=actionable&&r.resultado==="nuevo"&&!r.cliente_id&&r.elegible_promocion===true;
-            return `<article class="gx-reg-row ${cls}">
-                <div class="gx-reg-main">
-                    <div class="gx-reg-top">
-                        <strong>${esc(r.nombre_declarado)}</strong>
-                        <span class="gx-reg-badge ${cls}">${label}</span>
-                        <span class="gx-reg-badge">${esc(r.estado_admin)}</span>
-                    </div>
-                    <div class="gx-reg-meta">${fmtPhone(r.telefono_normalizado)}${linked?` · ${esc(linked.folio||"")}`:""} · ${new Date(r.created_at).toLocaleString("es-MX")}</div>
-                    ${r.detalle?`<div class="gx-reg-meta">${esc(r.detalle)}</div>`:""}
-                    ${created&&linked?.usuario_acceso?`<div class="gx-reg-created-meta">✓ Mi Espacio activo <code>@${esc(linked.usuario_acceso)}</code> · bienvenida −10% reservada</div>`:""}
-                </div>
-                <div class="gx-reg-actions">
-                    ${linked?`<button onclick="gxOpenIdentityClient('${esc(linked.id)}')">Ver cliente</button>`:""}
-                    ${actionable&&linked&&(r.resultado==="revisar"||r.resultado==="cliente_existente")?`<button class="danger" onclick="gxLinkExistingRegistration('${esc(r.id)}','${esc(linked.id)}')">Vincular teléfono</button>`:""}
-                    ${canCreate&&r.estado_admin==="pendiente"?`<button class="ok" onclick="gxRegistrationStatus('${esc(r.id)}','contactado')">Contactado</button>`:""}
-                    ${canCreate?`<button class="approve" onclick="gxApproveNewRegistration('${esc(r.id)}','${esc(r.nombre_declarado)}')">Aprobar y crear espacio</button><button class="danger" onclick="gxRegistrationStatus('${esc(r.id)}','descartado')">Descartar</button>`:""}
-                    ${actionable&&!canCreate&&r.resultado!=="nuevo"?`<button onclick="gxRegistrationStatus('${esc(r.id)}','resuelto')">Cerrar</button>`:""}
-                </div>
-            </article>`;
-        }).join(""):'<div class="gx-empty-inline">Todavía no hay solicitudes del banner.</div>';
+        if(s.tab==="pending"){
+            const rows=s.activaciones.filter(a=>a.estado==="pendiente");
+            list.innerHTML=rows.length?rows.map(renderActivation).join(""):'<div class="gx-empty-inline">No hay cuentas esperando activación.</div>';
+            return;
+        }
+
+        if(s.tab==="activated"){
+            const rows=s.activaciones.filter(a=>a.estado==="activada");
+            list.innerHTML=rows.length?rows.map(renderActivation).join(""):'<div class="gx-empty-inline">Todavía no hay altas completadas mediante este flujo.</div>';
+            return;
+        }
+
+        if(s.tab==="review"){
+            const requests=s.solicitudes.filter(r=>r.estado_admin!=="resuelto"&&r.estado_admin!=="descartado"&&(r.resultado==="revisar"||r.resultado==="cliente_existente"));
+            const acts=s.activaciones.filter(a=>a.estado==="bloqueada"||a.estado==="expirada");
+            const parts=[];
+            if(requests.length)parts.push(`<div class="gx-reg-section-label">Solicitudes que requieren decisión</div>${requests.map(renderRequest).join("")}`);
+            if(acts.length)parts.push(`<div class="gx-reg-section-label">Activaciones con incidencia</div>${acts.map(renderActivation).join("")}`);
+            list.innerHTML=parts.length?parts.join(""):'<div class="gx-empty-inline">No hay registros que requieran revisión.</div>';
+            return;
+        }
+
+        const rows=s.solicitudes.filter(r=>r.resultado==="nuevo"&&r.estado_admin!=="resuelto"&&r.estado_admin!=="descartado"&&!activationByRequest(r.id));
+        list.innerHTML=rows.length?rows.map(renderRequest).join(""):'<div class="gx-empty-inline">No hay registros nuevos pendientes de aprobación.</div>';
     };
 
     window.gxRegistrationStatus=async function(id,state){
-        if(state==="descartado"&&!confirm("¿Descartar esta solicitud? No se creará Mi Espacio ni se reservará el 10% de bienvenida."))return;
+        if(state==="descartado"&&!confirm("¿Descartar esta solicitud? No se preparará ninguna activación ni beneficio de bienvenida."))return;
         try{await api("resolver_solicitud",{solicitud_id:id,estado_admin:state});await gxLoadRegistrationState(true)}
         catch(e){alert("No se pudo actualizar la solicitud.\n\n"+e.message)}
     };
@@ -10887,53 +10813,70 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         catch(e){alert("No se pudo vincular el registro.\n\n"+e.message)}
     };
 
-    window.gxApproveNewRegistration=async function(requestId,name){
-        const ok=confirm(`Aprobar a ${name||"este cliente"}?\n\nGOXION volverá a validar teléfono y nombre. Si sigue siendo cliente nuevo, creará automáticamente su Mi Espacio, usuario y PIN y reservará el 10% de bienvenida para el primer periodo elegible.`);
+    window.gxPrepareActivation=async function(requestId,name){
+        const ok=confirm(`Aprobar el registro de ${name||"este cliente"}?\n\nGOXION volverá a validar nombre y teléfono. Si sigue siendo cliente nuevo, preparará su GOXION ID y un código de activación de 6 dígitos válido por 24 horas. Todavía NO se creará su PIN ni se activará el 10%.`);
         if(!ok)return;
         try{
-            const r=await api("aprobar_nuevo",{solicitud_id:requestId});
-            if(typeof window.gxReloadAdminClient==="function") await window.gxReloadAdminClient();
+            const r=await api("preparar_activacion",{solicitud_id:requestId});
             await gxLoadRegistrationState(true);
-            gxShowCreatedSpace(r);
+            if(r?.codigo)gxShowActivationDelivery(r);
+            else{gxGoActivationTab();alert("Esta solicitud ya tenía una activación preparada. Por seguridad el código anterior no puede volver a mostrarse; puedes regenerarlo desde Activaciones.")}
         }catch(e){
             await gxLoadRegistrationState(true);
-            if(e?.payload?.status==="review_required"){
-                alert("GOXION detuvo la creación porque encontró una coincidencia al volver a validar. La solicitud pasó a revisión y no se creó ningún espacio.\n\n"+e.message);
-                return;
-            }
-            alert("No se pudo crear Mi Espacio.\n\n"+e.message);
+            if(e?.payload?.status==="review_required")return alert("GOXION detuvo la aprobación porque encontró una coincidencia al volver a validar. No se generó ningún código.\n\n"+e.message);
+            alert("No se pudo preparar la activación.\n\n"+e.message);
         }
     };
+    window.gxRegenerateActivation=async function(requestId,name,hasActive){
+        const msg=hasActive
+          ?`¿Regenerar el código de ${name||"este cliente"}?\n\nEl código actual quedará inválido inmediatamente y comenzará una nueva vigencia de 24 horas.`
+          :`¿Generar un nuevo código para ${name||"este cliente"}?\n\nTendrá una vigencia nueva de 24 horas y reiniciará los intentos fallidos.`;
+        if(!confirm(msg))return;
+        try{
+            const r=await api("regenerar_activacion",{solicitud_id:requestId});
+            await gxLoadRegistrationState(true);
+            gxShowActivationDelivery(r);
+        }catch(e){alert("No se pudo generar un nuevo código.\n\n"+e.message)}
+    };
+    window.gxCancelActivation=async function(requestId,name){
+        if(!confirm(`¿Cancelar la activación de ${name||"este cliente"}?\n\nEl código dejará de funcionar y la solicitud quedará descartada.`))return;
+        try{await api("cancelar_activacion",{solicitud_id:requestId});await gxLoadRegistrationState(true)}
+        catch(e){alert("No se pudo cancelar la activación.\n\n"+e.message)}
+    };
 
-    window.gxShowCreatedSpace=function(data){
-        window.gxCreatedSpaceData=data||null;
-        const modal=document.getElementById("gx-space-created");
-        const name=document.getElementById("gx-space-created-name");
-        const user=document.getElementById("gx-space-created-user");
-        const pin=document.getElementById("gx-space-created-pin");
-        if(name)name.textContent=`${data?.nombre||"Cliente"} · ${data?.folio||""}`;
-        if(user)user.textContent=data?.usuario||"—";
-        if(pin)pin.textContent=data?.pin||"••••";
+    window.gxShowActivationDelivery=function(data){
+        window.gxActivationDeliveryData=data||null;
+        const modal=document.getElementById("gx-activation-delivery");
+        const name=document.getElementById("gx-activation-delivery-name");
+        const user=document.getElementById("gx-activation-delivery-user");
+        const code=document.getElementById("gx-activation-delivery-code");
+        const phone=document.getElementById("gx-activation-delivery-phone");
+        const exp=document.getElementById("gx-activation-delivery-exp");
+        if(name)name.textContent=data?.nombre||"Cliente";
+        if(user)user.textContent=`@${data?.goxion_id||"—"}`;
+        if(code)code.textContent=data?.codigo||"••••••";
+        if(phone)phone.textContent=fmtPhone(data?.telefono);
+        if(exp)exp.textContent=data?.expira_at?fmtDate(data.expira_at):"24 horas";
         modal?.classList.add("show");modal?.setAttribute("aria-hidden","false");
         document.body.style.overflow="hidden";
     };
-    window.gxCloseCreatedSpace=function(){
-        const modal=document.getElementById("gx-space-created");
+    window.gxCloseActivationDelivery=function(){
+        const modal=document.getElementById("gx-activation-delivery");
         modal?.classList.remove("show");modal?.setAttribute("aria-hidden","true");
-        const pin=document.getElementById("gx-space-created-pin");if(pin)pin.textContent="••••";
-        window.gxCreatedSpaceData=null;
+        const code=document.getElementById("gx-activation-delivery-code");if(code)code.textContent="••••••";
+        window.gxActivationDeliveryData=null;
         if(!document.getElementById("gx-registration-control")?.classList.contains("show"))document.body.style.overflow="";
     };
-    window.gxCopyCreatedSpace=async function(){
-        const d=window.gxCreatedSpaceData;if(!d?.usuario||!d?.pin)return alert("El PIN ya no está disponible en esta sesión. Puedes generar uno nuevo desde Cuenta.");
-        const txt=`Tu espacio GOXION está listo.\nUsuario: ${d.usuario}\nPIN: ${d.pin}\nBeneficio bienvenida: 10% reservado para tu primer periodo elegible.`;
-        try{await navigator.clipboard.writeText(txt);alert("✓ Acceso copiado");}
-        catch{prompt("Copia el acceso:",txt)}
+    window.gxOpenActivationWhatsApp=function(){
+        const d=window.gxActivationDeliveryData;
+        if(!d?.whatsapp_url)return alert("No hay un mensaje de activación disponible. Regenera el código para crear uno nuevo.");
+        window.open(d.whatsapp_url,"_blank","noopener,noreferrer");
     };
-    window.gxOpenCreatedClient=function(){
-        const id=window.gxCreatedSpaceData?.cliente_id;
-        gxCloseCreatedSpace();
-        if(id)gxOpenIdentityClient(id);
+    window.gxCopyActivationMessage=async function(){
+        const d=window.gxActivationDeliveryData;
+        if(!d?.mensaje_whatsapp)return alert("No hay mensaje disponible.");
+        try{await navigator.clipboard.writeText(d.mensaje_whatsapp);alert("Mensaje de activación copiado.")}
+        catch{alert("No se pudo copiar automáticamente. Abre WhatsApp para usar el mensaje preparado.")}
     };
 
     window.gxOpenIdentityClient=function(id){
@@ -10960,8 +10903,8 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         wrap.innerHTML=`
             <details class="gx-identity-compact">
                 <summary>
-                    <div><strong>Registro y elegibilidad</strong><small>${originLabel(ident.origen_cliente)}${ident.usuario_acceso?` · @${esc(ident.usuario_acceso)}`:" · datos internos"}</small></div>
-                    <span class="gx-client-origin-badge ${legacy?"legacy":""}">${ident.promo_nuevo_elegible?"Elegible -10%":"Sin beneficio"}</span>
+                    <div><strong>Registro e identidad</strong><small>${originLabel(ident.origen_cliente)} · datos internos</small></div>
+                    <span class="gx-client-origin-badge ${legacy?"legacy":""}">${ident.usuario_acceso?`@${esc(ident.usuario_acceso)}`:(ident.promo_nuevo_elegible?"Elegible -10%":"Sin beneficio")}</span>
                 </summary>
                 <div class="gx-client-identity-grid">
                     <label><span>WhatsApp / teléfono</span><input id="gx-identity-phone-${esc(id)}" inputmode="tel" value="${esc(ident.telefono_normalizado||"")}" placeholder="961 000 0000"></label>
@@ -10974,7 +10917,6 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                     <label class="gx-identity-check"><span>Beneficio bienvenida</span><span class="gx-identity-eligible"><input id="gx-identity-eligible-${esc(id)}" type="checkbox" ${ident.promo_nuevo_elegible?"checked":""}> Elegible -10%</span></label>
                     <button class="gx-identity-save" type="button" onclick="gxSaveClientIdentity('${esc(key)}','${esc(id)}')">Guardar cambios</button>
                 </div>
-                ${ident.usuario_acceso?`<div class="gx-client-identity-warning" style="background:#0d1820;color:#a9dfea">Mi Espacio: usuario <strong>@${esc(ident.usuario_acceso)}</strong>. El PIN no se almacena en texto plano; si el cliente lo pierde, genera uno nuevo desde Cuenta.</div>`:""}
                 ${!ident.telefono_normalizado&&legacy?'<div class="gx-client-identity-warning">Cliente previo sin teléfono: completa este dato para reforzar la detección de registros repetidos.</div>':""}
             </details>
         `;
@@ -11013,9 +10955,10 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     }
 
     document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>gxLoadRegistrationState(false),1250));
-    console.info("GOXION Admin Beta 21: aprobación inteligente + Mi Espacio + bienvenida -10% activos.");
+    console.info("GOXION Admin Beta 23: panel operativo de registros + activación 24 h activo.");
 })();
 </script>
+
 <!-- GOXION ADMIN BETA 13 // PRODUCTOS Y ACCESOS -->
 <div aria-hidden="true" class="gx-product-builder" id="gx-product-builder">
 <div class="gx-product-builder-backdrop" onclick="gxCloseProductBuilder(event)"></div>
@@ -13232,7 +13175,36 @@ body[data-gx-version="admin-beta-19-4"] .gx-secondary-action{
 @media(max-width:520px){.gx-benefit-form{grid-template-columns:1fr 1fr;gap:10px}.gx-benefit-sheet{padding:16px}.gx-beta-20 .gx-benefit-row{grid-template-columns:minmax(0,1fr) 82px}}
 </style>
 <div id="gx-beta20-marker" style="display:none">GOXION ADMIN BETA 20 · MOTOR DE BENEFICIOS</div>
+
+<style id="goxion-admin-beta-22-activation">
+body.gx-beta-22 .gx-registration-kpis{grid-template-columns:repeat(4,minmax(0,1fr))}
+body.gx-beta-22 .gx-registration-kpis .activation{border-color:rgba(0,242,254,.14);background:linear-gradient(135deg,#0d151b,#0e1016)}
+body.gx-beta-22 .gx-registration-kpis .activation strong{color:#7deffc}
+body.gx-beta-22 .gx-reg-tag,body.gx-beta-22 .gx-reg-inline-id{display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:#101b22;color:#84edf7;font-size:.47rem;font-weight:900}
+body.gx-beta-22 .gx-reg-badge.pending{background:#102029;color:#83edf7}
+body.gx-beta-22 .gx-reg-actions .gx-prepare-activation{border-color:rgba(0,242,254,.18);background:linear-gradient(135deg,rgba(0,242,254,.10),rgba(151,120,255,.10));color:#aef8ff}
+.gx-activation-delivery{position:fixed;inset:0;z-index:100170;display:none;align-items:center;justify-content:center;padding:16px}
+.gx-activation-delivery.show{display:flex}
+.gx-activation-delivery-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.79);backdrop-filter:blur(12px)}
+.gx-activation-delivery-sheet{position:relative;width:min(460px,100%);padding:17px;border:1px solid rgba(0,242,254,.14);border-radius:20px;background:linear-gradient(145deg,#0a0d13,#08090d);box-shadow:0 28px 90px rgba(0,0,0,.64)}
+.gx-activation-delivery-sheet>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.gx-activation-delivery-sheet>header h3{margin:3px 0;font-size:1.12rem}
+.gx-activation-delivery-sheet>header p{margin:0;max-width:330px;color:#8592a5;font-size:.62rem;line-height:1.4}
+.gx-activation-delivery-sheet>header>button{width:36px;height:36px;flex:0 0 36px;border:1px solid rgba(255,255,255,.08);border-radius:999px;background:#11131a;color:#fff;font-size:1.1rem}
+.gx-activation-credential-grid{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:7px;margin-bottom:8px}
+.gx-activation-credential-grid>div{padding:11px;border:1px solid rgba(255,255,255,.065);border-radius:12px;background:#0e1016}
+.gx-activation-credential-grid span{display:block;margin-bottom:5px;color:#7d899a;font-size:.52rem;font-weight:900;text-transform:uppercase}
+.gx-activation-credential-grid strong{display:block;color:#dffcff;font-size:.88rem;overflow:hidden;text-overflow:ellipsis}
+.gx-activation-credential-grid .code strong{font-size:1.18rem;letter-spacing:.12em;color:#fff}
+.gx-activation-delivery-meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:8px 0 12px;padding:0 2px;color:#7f8c9f;font-size:.58rem}
+.gx-activation-delivery-meta b{color:#c8d5e5}
+.gx-activation-delivery-actions{display:grid;grid-template-columns:1fr 126px;gap:7px}
+.gx-activation-delivery-actions button{min-height:42px;border:1px solid rgba(151,120,255,.15);border-radius:10px;background:#17131f;color:#cfc0ff;font:inherit;font-size:.62rem;font-weight:900}
+.gx-activation-delivery-actions button.primary{border-color:rgba(0,242,254,.18);background:linear-gradient(135deg,rgba(0,242,254,.12),rgba(151,120,255,.13));color:#c7fbff}
+.gx-activation-delivery-note{display:block;margin-top:10px;color:#778497;font-size:.55rem;line-height:1.4}
+@media(max-width:680px){body.gx-beta-22 .gx-registration-kpis{grid-template-columns:1fr 1fr}.gx-activation-credential-grid{grid-template-columns:1fr 120px}}
+@media(max-width:390px){.gx-activation-delivery-actions{grid-template-columns:1fr}.gx-activation-credential-grid{grid-template-columns:1fr}.gx-activation-credential-grid .code strong{font-size:1.08rem}}
+</style>
+<script id="goxion-admin-beta-22-behavior">(()=>{document.body.classList.add('gx-beta-22');console.info('GOXION Admin Beta 22 · activación temporal 24 h');})();</script>
 </body>
 </html>
-
-<!-- GOXION ADMIN BETA 21 · REGISTRO INTELIGENTE · base visual Beta 20/19.8 -->
