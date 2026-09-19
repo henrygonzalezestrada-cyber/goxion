@@ -4293,6 +4293,8 @@ details.gx-client-ops-context{
  .gx-registration-tabs{margin-left:-2px;margin-right:-2px;padding-left:4px;padding-right:4px}
 }
 </style>
+
+<style id="goxion-admin-beta-24-registro-mantenimiento">.gx-registration-tabs{overflow-x:auto!important;flex-wrap:nowrap!important;scrollbar-width:none;-webkit-overflow-scrolling:touch}.gx-registration-tabs::-webkit-scrollbar{display:none}.gx-registration-tabs button{flex:0 0 auto}.gx-reg-actions button.delete-record{border-color:rgba(255,84,119,.24)!important;background:#321219!important;color:#ff9bae!important}.gx-identity-maintenance{margin-top:7px;padding-top:7px;border-top:1px solid rgba(255,255,255,.055);display:flex;align-items:center;justify-content:space-between;gap:8px}.gx-identity-maintenance small{color:#738095;font-size:.47rem;line-height:1.35}.gx-identity-release{min-height:31px;padding:0 9px;border:1px solid rgba(255,84,119,.18);border-radius:8px;background:#251218;color:#ff94aa;font:inherit;font-size:.48rem;font-weight:900;white-space:nowrap}@media(max-width:520px){.gx-identity-maintenance{align-items:stretch;flex-direction:column}.gx-identity-release{width:100%}}</style>
 </head>
 <body data-gx-version="admin-beta-19-4">
 <div class="gx-admin-shell">
@@ -4883,6 +4885,7 @@ details.gx-client-ops-context{
 <button data-gx-reg-tab="pending" onclick="gxRegistrationTab('pending',this)">Pendientes</button>
 <button data-gx-reg-tab="review" onclick="gxRegistrationTab('review',this)">Revisión</button>
 <button data-gx-reg-tab="activated" onclick="gxRegistrationTab('activated',this)">Activados</button>
+<button data-gx-reg-tab="history" onclick="gxRegistrationTab('history',this)">Historial</button>
 <button data-gx-reg-tab="legacy" onclick="gxRegistrationTab('legacy',this)">Base previa</button>
 </div>
 <div class="gx-registration-list" id="gx-registration-list"></div>
@@ -10730,6 +10733,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                     ${linked?`<button onclick="gxOpenIdentityClient('${esc(linked.id)}')">Ver cliente</button>`:""}
                     ${canRenew?`<button class="ok" onclick="gxRegenerateActivation('${esc(a.solicitud_id)}','${esc(a.nombre_declarado)}',${a.estado==="pendiente"?"true":"false"})">${a.estado==="pendiente"?"Regenerar y enviar":"Generar nuevo código"}</button>`:""}
                     ${canCancel?`<button class="danger" onclick="gxCancelActivation('${esc(a.solicitud_id)}','${esc(a.nombre_declarado)}')">Cancelar</button>`:""}
+                    ${a.estado!=="activada"?`<button class="delete-record" onclick="gxDeleteRegistration('${esc(a.solicitud_id)}','${esc(a.nombre_declarado)}')">Eliminar registro</button>`:""}
                 </div>
             </article>`;
         };
@@ -10759,6 +10763,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                     ${canPrepare?`<button class="ok gx-prepare-activation" onclick="gxPrepareActivation('${esc(r.id)}','${esc(r.nombre_declarado)}')">Aprobar registro</button><button class="danger" onclick="gxRegistrationStatus('${esc(r.id)}','descartado')">Descartar</button>`:""}
                     ${a?`<button onclick="gxGoActivationTab()">Ver activación</button>`:""}
                     ${actionable&&!canPrepare&&!a&&r.resultado!=="nuevo"?`<button onclick="gxRegistrationStatus('${esc(r.id)}','resuelto')">Cerrar</button>`:""}
+                    ${!a||a.estado!=="activada"?`<button class="delete-record" onclick="gxDeleteRegistration('${esc(r.id)}','${esc(r.nombre_declarado)}')">Eliminar registro</button>`:""}
                 </div>
             </article>`;
         };
@@ -10788,6 +10793,12 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             return;
         }
 
+        if(s.tab==="history"){
+            const rows=s.solicitudes;
+            list.innerHTML=rows.length?rows.map(renderRequest).join(""):'<div class="gx-empty-inline">Todavía no hay historial de registros.</div>';
+            return;
+        }
+
         if(s.tab==="review"){
             const requests=s.solicitudes.filter(r=>r.estado_admin!=="resuelto"&&r.estado_admin!=="descartado"&&(r.resultado==="revisar"||r.resultado==="cliente_existente"));
             const acts=s.activaciones.filter(a=>a.estado==="bloqueada"||a.estado==="expirada");
@@ -10811,6 +10822,13 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
         if(!confirm("Se guardará este número en el cliente existente, quedará marcado como cartera previa y sin derecho al -10% de bienvenida.\n\n¿Continuar?"))return;
         try{await api("vincular_existente",{solicitud_id:requestId,cliente_id:clientId});await gxLoadRegistrationState(true)}
         catch(e){alert("No se pudo vincular el registro.\n\n"+e.message)}
+    };
+
+    window.gxDeleteRegistration=async function(requestId,name){
+        const ok=confirm(`¿Eliminar el registro de ${name||"esta persona"}?\n\nSe borrará la solicitud y cualquier código de activación NO completado. No se elimina ningún cliente, pago, servicio ni beneficio ya creado. Esta acción permite que la persona vuelva a solicitar su registro desde Ayuda.`);
+        if(!ok)return;
+        if(!confirm("Confirma por segunda vez: eliminar este registro y permitir un nuevo intento."))return;
+        try{await api("eliminar_registro",{solicitud_id:requestId});await gxLoadRegistrationState(true)}catch(e){alert("No se pudo eliminar el registro.\n\n"+e.message)}
     };
 
     window.gxPrepareActivation=async function(requestId,name){
@@ -10918,11 +10936,18 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
                     <button class="gx-identity-save" type="button" onclick="gxSaveClientIdentity('${esc(key)}','${esc(id)}')">Guardar cambios</button>
                 </div>
                 ${!ident.telefono_normalizado&&legacy?'<div class="gx-client-identity-warning">Cliente previo sin teléfono: completa este dato para reforzar la detección de registros repetidos.</div>':""}
+                ${ident.telefono_normalizado?`<div class="gx-identity-maintenance"><small>Si el número se guardó por error, puedes liberarlo sin borrar al cliente ni su historial comercial.</small><button class="gx-identity-release" type="button" onclick="gxReleaseClientPhone('${esc(key)}','${esc(id)}','${esc(ident.nombre)}')">Liberar teléfono</button></div>`:""}
             </details>
         `;
         const accountTarget=body.querySelector('[data-gx-section="account"] .gx-accordion-content')||body.querySelector('[data-gx-section="account"]')||body;
         accountTarget.appendChild(wrap);
     }
+
+    window.gxReleaseClientPhone=async function(key,id,name){
+        if(!confirm(`¿Liberar el teléfono registrado de ${name||"este cliente"}?\n\nLa cuenta, PIN, servicios, pagos y beneficios permanecen intactos. Solo se elimina el teléfono de la identidad comercial.`))return;
+        if(!confirm("Confirma por segunda vez. Si además quieres borrar una solicitud anterior, hazlo desde Registros > Historial."))return;
+        try{await api("liberar_telefono",{cliente_id:id});await gxLoadRegistrationState(false);injectIdentity(key)}catch(e){alert("No se pudo liberar el teléfono.\n\n"+e.message)}
+    };
 
     window.gxSaveClientIdentity=async function(key,id){
         const phone=document.getElementById(`gx-identity-phone-${id}`)?.value||"";
@@ -10955,7 +10980,7 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
     }
 
     document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>gxLoadRegistrationState(false),1250));
-    console.info("GOXION Admin Beta 23: panel operativo de registros + activación 24 h activo.");
+    console.info("GOXION Admin Beta 24: mantenimiento seguro de registros + activación 24 h activo.");
 })();
 </script>
 
