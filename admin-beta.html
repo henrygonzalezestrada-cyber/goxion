@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<title>GOXION // ADMIN BETA 19.6</title>
+<title>GOXION // ADMIN BETA 19.5</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
 <style>
         :root {
@@ -12633,164 +12633,85 @@ body[data-gx-version="admin-beta-19-4"] .gx-secondary-action{
 </style>
 <div id="gx-beta195-marker" style="display:none">GOXION ADMIN BETA 19.5 · cobro unificado</div>
 
-<script id="goxion-admin-beta-19-6-behavior">
-(()=>{
-  document.body.classList.add('gx-beta-19-6');
 
-  // Mantiene cada pestaña del cliente anclada a su inicio. En 19.5 el scroll
-  // interno se conservaba al cambiar de sección y podía dejar Cuenta/Cobro cortados.
-  const previousFocusSection = window.gxFocusSection;
-  if(typeof previousFocusSection === 'function'){
-    window.gxFocusSection = function(section, btn){
-      const focus = document.getElementById('gx-client-focus');
-      const body = document.getElementById('gx-focus-body');
-      const normalized = section === 'summary' ? 'billing' : section;
-      const previous = focus?.dataset?.gxFocusSection || '';
-      const result = previousFocusSection.call(this, section, btn);
-      if(body && previous !== normalized){
-        body.scrollTop = 0;
-        try{ body.scrollTo({top:0,left:0,behavior:'instant'}); }catch{}
-      }
+<!-- GOXION ADMIN BETA 19.7 · corrección scroll iOS -->
+<style id="goxion-admin-beta-19-7-ios-scroll-fix">
+/* Corrección de navegación interna en iOS/Safari.
+   Parte de 19.5: no modifica backend ni composición funcional. */
+.gx-beta-19-7 .gx-focus-sheet{
+  overflow:hidden!important;
+}
+.gx-beta-19-7 .gx-focus-header,
+.gx-beta-19-7 .gx-focus-nav{
+  flex:0 0 auto!important;
+}
+.gx-beta-19-7 #gx-focus-body{
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-anchor:none!important;
+  scroll-behavior:auto!important;
+  -webkit-overflow-scrolling:touch;
+}
+.gx-beta-19-7 #gx-focus-body>.gx-focus-details,
+.gx-beta-19-7 #gx-focus-body [data-gx-section]{
+  overflow-anchor:none!important;
+}
+/* El primer elemento de cada sección debe comenzar limpio bajo las tabs. */
+.gx-beta-19-7 #gx-focus-body .gx-focus-section-active{
+  scroll-margin-top:0!important;
+}
+</style>
+<script id="goxion-admin-beta-19-7-ios-scroll-fix-script">
+(()=>{
+  document.body.classList.add('gx-beta-19-7');
+  document.body.dataset.gxVersion='admin-beta-19-7';
+
+  const baseFocusSection=window.gxFocusSection;
+  function hardResetFocusScroll(){
+    const body=document.getElementById('gx-focus-body');
+    if(!body)return;
+    body.style.scrollBehavior='auto';
+    body.scrollTop=0;
+    try{ body.scrollTo(0,0); }catch{}
+  }
+  function settleReset(){
+    hardResetFocusScroll();
+    requestAnimationFrame(()=>{
+      hardResetFocusScroll();
+      requestAnimationFrame(hardResetFocusScroll);
+    });
+    setTimeout(hardResetFocusScroll,40);
+    setTimeout(hardResetFocusScroll,120);
+  }
+
+  if(typeof baseFocusSection==='function'){
+    window.gxFocusSection=function(section,btn){
+      hardResetFocusScroll();
+      const result=baseFocusSection.call(this,section,btn);
+      settleReset();
       return result;
     };
   }
 
-  console.info('GOXION Admin Beta 19.6 · pulido final de Cobro y Cuenta.');
+  const baseOpenFocus=window.gxOpenClientFocus;
+  if(typeof baseOpenFocus==='function'){
+    window.gxOpenClientFocus=function(key,...args){
+      const result=baseOpenFocus.call(this,key,...args);
+      setTimeout(settleReset,115);
+      setTimeout(settleReset,220);
+      return result;
+    };
+  }
+
+  // Refuerzo directo en las tabs: Safari puede restaurar el scroll después del click.
+  document.addEventListener('click',e=>{
+    const tab=e.target?.closest?.('[data-gx-focus-section]');
+    if(tab) settleReset();
+  },true);
+
+  console.info('GOXION Admin Beta 19.7 · corrección robusta de scroll interno iOS.');
 })();
 </script>
-<style id="goxion-admin-beta-19-6-polish">
-/* =========================================================
-   GOXION ADMIN BETA 19.6 · PULIDO FINAL
-   Sólo composición/ritmo. No toca backend ni reglas.
-   ========================================================= */
-
-/* Cobro: menos tarjeta dentro de tarjeta y proporciones más naturales. */
-.gx-beta-19-6 .gx-focus-v3[data-gx-focus-section="billing"] .gx-admin-live-breakdown{
-  padding:18px 0 20px!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-billing-admin{
-  margin:0!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-billing-admin>summary{
-  min-height:58px!important;
-  padding:0!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-billing-admin>summary span{
-  font-size:15px!important;
-  letter-spacing:-.01em;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-billing-admin>summary em{
-  font-size:12px!important;
-  font-weight:750!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-billing-fields{
-  grid-template-columns:minmax(0,1.65fr) minmax(104px,.72fr)!important;
-  gap:12px!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-cycle-mode-row{
-  display:grid!important;
-  grid-template-columns:1fr!important;
-  gap:12px!important;
-  margin:14px 0 0!important;
-  padding:14px 0 0!important;
-  border:0!important;
-  border-top:1px solid rgba(255,255,255,.065)!important;
-  border-radius:0!important;
-  background:transparent!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-cycle-mode-row>div:first-child strong{font-size:14px!important}
-.gx-beta-19-6 .gx-focus-v3 .gx-cycle-mode-row>div:first-child small{
-  margin-top:4px!important;font-size:11px!important;line-height:1.45!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-cycle-segment{
-  width:100%!important;min-height:44px!important;padding:4px!important;border-radius:12px!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-cycle-segment button{
-  min-height:36px!important;border-radius:9px!important;font-size:12px!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-auto-note{
-  margin:10px 0 0!important;padding:0!important;background:transparent!important;border:0!important;
-  font-size:11px!important;line-height:1.45!important;color:#7f8a9d!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-billing-adjustments{
-  margin-top:2px!important;
-}
-
-/* Cuenta: siempre empieza arriba y los bloques secundarios pierden peso. */
-.gx-beta-19-6 .gx-focus-v3[data-gx-focus-section="account"] .gx-account-access{
-  padding-top:14px!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-pin-control{
-  padding-top:16px!important;margin-top:2px!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-pin-control>p{
-  max-width:560px!important;margin:8px 0 12px!important;font-size:12px!important;line-height:1.5!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-pin-actions{
-  gap:10px!important;
-}
-.gx-beta-19-6 .gx-focus-v3 .gx-pin-actions button{
-  min-height:44px!important;border-radius:12px!important;font-size:13px!important;
-}
-
-/* Registro y elegibilidad: claramente secundario y toggle compacto. */
-.gx-beta-19-6 .gx-identity-compact{
-  margin-top:20px!important;
-}
-.gx-beta-19-6 .gx-identity-compact>summary{
-  min-height:62px!important;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-client-identity-grid{
-  padding:14px 0 15px!important;gap:12px!important;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-client-identity-grid input,
-.gx-beta-19-6 .gx-identity-compact .gx-client-identity-grid select{
-  min-height:44px!important;font-size:13px!important;
-}
-.gx-beta-19-6 .gx-identity-check{
-  margin:0!important;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-identity-eligible{
-  min-height:44px!important;display:flex!important;align-items:center!important;justify-content:space-between!important;
-  gap:12px!important;padding:0 12px!important;border-radius:11px!important;font-size:11px!important;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-identity-eligible input[type="checkbox"]{
-  appearance:none!important;-webkit-appearance:none!important;
-  width:40px!important;height:22px!important;min-width:40px!important;margin:0!important;padding:0!important;
-  border:1px solid rgba(255,255,255,.12)!important;border-radius:999px!important;
-  background:#171922!important;position:relative!important;box-shadow:none!important;outline:none!important;
-  transition:.2s ease!important;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-identity-eligible input[type="checkbox"]::after{
-  content:"";position:absolute;width:16px;height:16px;left:2px;top:2px;border-radius:50%;
-  background:#d7dde8;transition:.2s ease;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-identity-eligible input[type="checkbox"]:checked{
-  border-color:rgba(0,242,254,.38)!important;background:rgba(0,242,254,.15)!important;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-identity-eligible input[type="checkbox"]:checked::after{
-  transform:translateX(18px);background:#74f4ff;
-}
-.gx-beta-19-6 .gx-identity-save{
-  min-height:44px!important;border-radius:12px!important;font-size:13px!important;
-}
-.gx-beta-19-6 .gx-identity-compact .gx-client-identity-warning{
-  margin:10px 0 0!important;padding:11px 12px!important;border-radius:11px!important;
-  font-size:11px!important;line-height:1.45!important;
-}
-
-/* El módulo de mensajes no vuelve como botón genérico: queda reservado para su arquitectura propia. */
-.gx-beta-19-6 .gx-client-secondary-tools{display:none!important}
-
-@media(max-width:760px){
-  .gx-beta-19-6 .gx-focus-v3 .gx-billing-fields{
-    grid-template-columns:minmax(0,1.55fr) minmax(96px,.72fr)!important;gap:10px!important;
-  }
-  .gx-beta-19-6 .gx-focus-v3 .gx-pin-actions{grid-template-columns:1fr 1fr!important}
-  .gx-beta-19-6 .gx-identity-compact .gx-client-identity-grid{grid-template-columns:1fr!important}
-}
-</style>
-<div id="gx-beta196-marker" style="display:none">GOXION ADMIN BETA 19.6 · pulido final</div>
-
+<div id="gx-beta197-marker" style="display:none">GOXION ADMIN BETA 19.7 · iOS scroll fix</div>
 </body>
 </html>
