@@ -17408,7 +17408,7 @@ if(document.readyState==="loading"){
     position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);
     overflow:visible;pointer-events:none
 }
-.gx-otp-node-trace rect{fill:none;rx:13;ry:13;vector-effect:non-scaling-stroke}
+.gx-otp-node-trace rect{fill:none;vector-effect:non-scaling-stroke}
 .gx-otp-node-lit{
     stroke:#45ffc0;stroke-width:1.35;opacity:0;
     filter:drop-shadow(0 0 2px rgba(69,255,192,.68)) drop-shadow(0 0 5px rgba(0,242,254,.22))
@@ -17556,7 +17556,7 @@ if(document.readyState==="loading"){
         var nodes=slotRects.map(function(r,i){
             var n=document.createElement('div');
             n.className='gx-otp-fold-node';
-            n.innerHTML='<span class="gx-otp-node-digit">'+v[i]+'</span><svg class="gx-otp-node-trace" viewBox="0 0 58 58" aria-hidden="true"><rect class="gx-otp-node-lit" x="2" y="2" width="54" height="54" pathLength="1"></rect><rect class="gx-otp-node-energy" x="2" y="2" width="54" height="54" pathLength="1"></rect></svg>';
+            n.innerHTML='<span class="gx-otp-node-digit">'+v[i]+'</span><svg class="gx-otp-node-trace" viewBox="0 0 58 58" aria-hidden="true"><rect class="gx-otp-node-lit" x="2" y="2" width="54" height="54" rx="13" ry="13" pathLength="1"></rect><rect class="gx-otp-node-energy" x="2" y="2" width="54" height="54" rx="13" ry="13" pathLength="1"></rect></svg>';
             var centerX=r.left-stepRect.left+r.width/2;
             var centerY=r.top-stepRect.top+r.height/2;
             n.style.left=(centerX-nodeSize/2)+'px';
