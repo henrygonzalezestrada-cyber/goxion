@@ -5137,19 +5137,16 @@
 <h2 class="gx-auth-login-title">Accede a tu espacio</h2>
 <p class="gx-auth-login-subtitle">Tus servicios, beneficios y cuenta en un solo lugar.</p>
 </div>
-<div class="gx-auth-field-group">
-<label class="gx-auth-field-label" for="login-id">Nombre o ID</label>
-<div class="gx-auth-input-shell">
-<input autocomplete="username" class="input-smart gx-auth-field" id="login-id" placeholder="Ej. Juan de Dios" type="text"/>
+<div class="gx-auth-field-group gx-float-group gx-login-float-group">
+<div class="gx-auth-input-shell gx-float-shell">
+<input autocomplete="username" class="input-smart gx-auth-field gx-float-input" id="login-id" placeholder="Ej. Juan de Dios" type="text"/>
+<label class="gx-auth-field-label gx-float-label" for="login-id">Nombre o ID</label>
 </div>
 </div>
-<div class="gx-auth-field-group">
-<div class="gx-auth-field-row">
-<label class="gx-auth-field-label" for="login-pin">PIN de acceso</label>
-<button class="gx-auth-forgot-link" onclick="openPinRecovery(event)" type="button">¿Olvidaste tu PIN?</button>
-</div>
-<div class="gx-auth-input-shell gx-auth-pin-shell">
-<input autocomplete="current-password" class="input-smart gx-auth-field" id="login-pin" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<div class="gx-auth-field-group gx-float-group gx-login-float-group gx-login-pin-float-group">
+<div class="gx-auth-input-shell gx-auth-pin-shell gx-float-shell">
+<input autocomplete="current-password" class="input-smart gx-auth-field gx-float-input" id="login-pin" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<label class="gx-auth-field-label gx-float-label" for="login-pin">PIN de acceso</label>
 <button aria-label="Mostrar PIN" class="gx-pin-eye" id="gx-pin-eye-btn" onclick="togglePinVisibility(event)" type="button">
 <span aria-hidden="true" class="gx-eye-icon gx-eye-show">
 <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="20">
@@ -5166,6 +5163,7 @@
 </span>
 </button>
 </div>
+<button class="gx-auth-forgot-link gx-float-forgot" onclick="openPinRecovery(event)" type="button">¿Olvidaste tu PIN?</button>
 </div>
 <div class="gx-pin-recovery" hidden="" id="gx-pin-recovery">
 <div class="gx-pin-recovery-title">Recuperar acceso</div>
@@ -15846,37 +15844,80 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         if (!from || !to || from === to || gxStageBusy) return;
         gxStageBusy = true;
 
-        if (!reduceMotion26() && Element.prototype.animate) {
-            const out = from.animate([
-                {opacity:1, transform:'translateX(0) scale(1)', filter:'blur(0)'},
-                {opacity:0, transform:`translateX(${-10 * direction}px) scale(.988)`, filter:'blur(3px)'}
-            ],{
-                duration:145,
-                easing:'cubic-bezier(.4,0,.7,.2)',
-                fill:'forwards'
-            });
-            await out.finished.catch(() => {});
-            try { out.cancel(); } catch(_) {}
-        }
+        const reduced = reduceMotion26() || !Element.prototype.animate;
+        const enterX = 12 * direction;
+        const exitX = -8 * direction;
 
-        from.hidden = true;
-        to.hidden = false;
-        const resizeTarget = to.closest?.('.gx-auth-stage') || to;
-        await gxResizeForStage(resizeTarget);
+        try {
+            if (!reduced) {
+                const out = from.animate([
+                    {opacity:1, transform:'translate3d(0,0,0) scale(1)'},
+                    {opacity:0, transform:`translate3d(${exitX}px,0,0) scale(.992)`}
+                ],{
+                    duration:155,
+                    easing:'cubic-bezier(.4,0,.7,.2)',
+                    fill:'forwards'
+                });
+                await out.finished.catch(() => {});
+                /* Ocultamos ANTES de cancelar el fill, evitando que el
+                   frame final reaparezca un instante en Safari. */
+                from.hidden = true;
+                try { out.cancel(); } catch(_) {}
+            } else {
+                from.hidden = true;
+            }
 
-        if (!reduceMotion26() && Element.prototype.animate) {
-            const incoming = to.animate([
-                {opacity:0, transform:`translateX(${14 * direction}px) scale(.988)`, filter:'blur(3px)'},
-                {opacity:1, transform:'translateX(0) scale(1)', filter:'blur(0)'}
-            ],{
-                duration:285,
-                easing:'cubic-bezier(.16,1,.3,1)',
-                fill:'both'
+            /* El destino nace invisible ANTES de quitar hidden.
+               Antes ocurría al revés: Safari alcanzaba a pintarlo al 100%
+               durante el resize y luego lo devolvíamos a opacity:0. */
+            to.style.opacity = '0';
+            to.style.transform = `translate3d(${enterX}px,0,0) scale(.992)`;
+            to.style.willChange = 'transform, opacity';
+            to.style.pointerEvents = 'none';
+            to.hidden = false;
+
+            const resizeTarget = to.closest?.('.gx-auth-stage') || to;
+
+            if (reduced) {
+                await gxResizeForStage(resizeTarget);
+                to.style.opacity = '1';
+                to.style.transform = 'translate3d(0,0,0) scale(1)';
+            } else {
+                /* Resize e entrada ocurren juntos. Ya no existe una
+                   tarjeta vacía de ~300ms entre una etapa y la otra. */
+                const resizePromise = gxResizeForStage(resizeTarget);
+                const incoming = to.animate([
+                    {opacity:0, transform:`translate3d(${enterX}px,0,0) scale(.992)`},
+                    {opacity:1, transform:'translate3d(0,0,0) scale(1)'}
+                ],{
+                    duration:275,
+                    easing:'cubic-bezier(.16,1,.3,1)',
+                    fill:'both'
+                });
+
+                await Promise.all([
+                    resizePromise,
+                    incoming.finished.catch(() => {})
+                ]);
+
+                to.style.opacity = '1';
+                to.style.transform = 'translate3d(0,0,0) scale(1)';
+                try { incoming.cancel(); } catch(_) {}
+            }
+
+            to.style.pointerEvents = '';
+            to.style.willChange = '';
+            /* Se limpian en el siguiente frame cuando ya existe un estado
+               pintado estable; así no hay salto al retirar los inline. */
+            requestAnimationFrame(() => {
+                if (!to.hidden) {
+                    to.style.opacity = '';
+                    to.style.transform = '';
+                }
             });
-            await incoming.finished.catch(() => {});
-            try { incoming.cancel(); } catch(_) {}
+        } finally {
+            gxStageBusy = false;
         }
-        gxStageBusy = false;
     }
 
     function gxResetActivationFlow() {
@@ -15898,6 +15939,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         });
         if (typeof window.gxCleanupActivationFold === 'function') window.gxCleanupActivationFold();
         if (typeof window.gxSyncActivationCodeVisual === 'function') window.gxSyncActivationCodeVisual();
+        if (typeof window.gxSyncFloatingLabels === 'function') window.gxSyncFloatingLabels();
         gxActivationSetStatus('gx-activation-code-status');
         gxActivationSetStatus('gx-activation-pin-status');
         $('gx-activation-progress-1')?.classList.add('is-active');
@@ -15921,6 +15963,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         const loginId = $('login-id')?.value?.trim() || '';
         gxResetActivationFlow();
         if (loginId) $('gx-activation-id').value = loginId;
+        if (typeof window.gxSyncFloatingLabels === 'function') window.gxSyncFloatingLabels();
         await gxSwitchStage(login, activation, 1);
         setTimeout(() => $('gx-activation-id')?.focus({preventScroll:true}), 60);
     };
@@ -16081,6 +16124,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         await gxSwitchStage(activation, login, -1);
         if ($('login-id')) $('login-id').value = id;
         if ($('login-pin')) $('login-pin').value = '';
+        if (typeof window.gxSyncFloatingLabels === 'function') window.gxSyncFloatingLabels();
         setTimeout(() => $('login-pin')?.focus({preventScroll:true}), 70);
     };
 
@@ -17764,17 +17808,23 @@ if(document.readyState==="loading"){
      Sólo afecta GOXION ID, Crear PIN y Confirmar PIN.
      ========================================================= -->
 <style id="goxion-floating-labels-beta-07">
+/* =========================================================
+   GOXION · BETA 07 · FLOATING LABELS v2
+   Movimiento continuo: el label nunca cambia de top; sólo se mueve
+   mediante transform, para que Safari pueda interpolarlo sin salto.
+   ========================================================= */
+
 .gx-float-group{
-    margin-bottom:16px!important;
+    margin-bottom:14px!important;
 }
 .gx-float-shell{
+    --gx-float-lift:26.5px;
     position:relative!important;
     min-height:53px;
     isolation:isolate;
 }
 
-/* El input sigue siendo la superficie real. El label vive encima
-   y tapa exactamente el pequeño tramo del borde cuando sube. */
+/* El label y el input forman una sola pieza. */
 .gx-auth-inline-content .gx-float-shell .gx-float-input{
     min-height:53px;
     padding:14px 16px!important;
@@ -17784,12 +17834,11 @@ if(document.readyState==="loading"){
     transition:
         border-color .24s ease,
         background .24s ease,
-        box-shadow .24s ease,
-        padding .24s cubic-bezier(.16,1,.3,1)!important;
+        box-shadow .24s ease!important;
 }
 .gx-float-shell .gx-float-label{
     position:absolute;
-    z-index:3;
+    z-index:4;
     left:15px;
     top:50%;
     margin:0!important;
@@ -17803,31 +17852,20 @@ if(document.readyState==="loading"){
     letter-spacing:.05px;
     background:transparent;
     pointer-events:none;
-    will-change:transform,color,background;
+    will-change:transform,color;
+    backface-visibility:hidden;
     transition:
-        transform .26s cubic-bezier(.16,1,.3,1),
-        color .22s ease,
-        background-color .18s ease,
-        padding .22s ease;
+        transform .34s cubic-bezier(.16,1,.3,1),
+        color .24s ease,
+        background-color .20s ease,
+        padding .24s ease!important;
 }
 
-/* En reposo el placeholder desaparece para no competir con el label.
-   Aparece sólo cuando el label ya dejó libre el interior. */
-.gx-float-shell .gx-float-input::placeholder{
-    opacity:0;
-    color:rgba(149,164,189,.48);
-    transition:opacity .18s ease;
-}
-.gx-float-shell.is-float .gx-float-input::placeholder{
-    opacity:1;
-}
-
-/* El label se asienta exactamente sobre la línea del borde. El fondo
-   del label no crea una cápsula: sólo enmascara ese tramo del stroke. */
+/* top SIEMPRE permanece al 50%. El ascenso completo ocurre aquí,
+   usando la misma propiedad transform de principio a fin. */
 .gx-float-shell.is-float .gx-float-label{
-    top:0;
     padding:0 6px;
-    transform:translate3d(0,-50%,0) scale(.84);
+    transform:translate3d(0,calc(-50% - var(--gx-float-lift)),0) scale(.84);
     color:#9fb5c8;
     background:#060910;
 }
@@ -17835,6 +17873,17 @@ if(document.readyState==="loading"){
     color:var(--neon-blue);
     background:#060a10;
 }
+
+.gx-float-shell .gx-float-input::placeholder{
+    opacity:0;
+    color:rgba(149,164,189,.48);
+    transition:opacity .18s ease .02s;
+}
+.gx-float-shell.is-float .gx-float-input::placeholder{
+    opacity:1;
+    transition-delay:.12s;
+}
+
 .gx-auth-inline-content .gx-float-shell.is-focus .gx-float-input{
     border-color:rgba(0,242,254,.52)!important;
     background:rgba(5,8,14,.78)!important;
@@ -17843,36 +17892,91 @@ if(document.readyState==="loading"){
         0 8px 26px rgba(0,0,0,.14)!important;
 }
 
-/* Un acento morado muy sutil aparece en la esquina opuesta mientras
-   el campo está activo, para conservar el contraste GOXION sin pintar
-   toda la superficie. */
+/* Acento secundario GOXION muy contenido. */
 .gx-float-shell::after{
     content:"";
     position:absolute;
     z-index:1;
     right:10px;
     top:50%;
-    width:26px;
-    height:26px;
+    width:24px;
+    height:24px;
     border-radius:50%;
-    transform:translateY(-50%) scale(.7);
+    transform:translate3d(0,-50%,0) scale(.72);
     opacity:0;
     pointer-events:none;
-    background:radial-gradient(circle,rgba(124,77,255,.13),transparent 70%);
-    transition:opacity .22s ease,transform .28s cubic-bezier(.16,1,.3,1);
+    background:radial-gradient(circle,rgba(124,77,255,.11),transparent 70%);
+    transition:opacity .24s ease,transform .32s cubic-bezier(.16,1,.3,1);
 }
 .gx-float-shell.is-focus::after{
     opacity:1;
-    transform:translateY(-50%) scale(1);
+    transform:translate3d(0,-50%,0) scale(1);
 }
 
-/* Los PIN mantienen su espaciado, pero ya no necesitan una etiqueta
-   exterior ocupando otra línea. */
+/* PIN: conservar espacio para el ojo en login. */
 .gx-float-shell.gx-auth-pin-shell .gx-float-input{
+    padding-right:52px!important;
+}
+#gx-activation-step-pin .gx-float-shell.gx-auth-pin-shell .gx-float-input{
     padding-right:18px!important;
 }
 .gx-float-shell.gx-auth-pin-shell.is-float .gx-float-input{
     letter-spacing:7px!important;
+}
+
+/* Recuperación se acomoda debajo del campo, no compite con el label. */
+.gx-float-forgot{
+    display:block!important;
+    width:max-content;
+    margin:7px 3px 0 auto!important;
+    font-size:10px!important;
+}
+
+/* Distribución vertical consistente de ACTIVACIÓN. */
+#gx-activation-step-code:not([hidden]),
+#gx-activation-step-pin:not([hidden]){
+    display:flex!important;
+    flex-direction:column;
+}
+#gx-activation-step-code .gx-auth-field-group,
+#gx-activation-step-pin .gx-auth-field-group{
+    width:100%;
+}
+#gx-activation-step-code .gx-float-group{
+    margin-bottom:16px!important;
+}
+#gx-activation-step-pin .gx-activation-valid-chip{
+    margin:0 0 16px!important;
+}
+#gx-activation-step-pin .gx-float-group{
+    margin-bottom:14px!important;
+}
+#gx-activation-step-code .gx-activation-primary,
+#gx-activation-step-pin .gx-activation-primary{
+    margin-top:3px!important;
+}
+#gx-activation-step-code .gx-activation-back,
+#gx-activation-step-pin .gx-activation-back{
+    display:flex!important;
+    width:max-content!important;
+    margin:8px auto 0!important;
+    align-self:center!important;
+}
+
+/* Login principal: ahora usa el mismo lenguaje que activación. */
+#gx-auth-login-stage .gx-login-float-group{
+    margin-bottom:14px!important;
+}
+#gx-auth-login-stage .gx-login-pin-float-group{
+    margin-bottom:12px!important;
+}
+
+@media(max-height:720px){
+    .gx-float-shell{--gx-float-lift:24px;min-height:48px}
+    .gx-auth-inline-content .gx-float-shell .gx-float-input{min-height:48px}
+    #gx-activation-step-code .gx-float-group,
+    #gx-activation-step-pin .gx-float-group,
+    #gx-auth-login-stage .gx-login-float-group{margin-bottom:11px!important}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -17886,16 +17990,30 @@ if(document.readyState==="loading"){
 
 <script id="goxion-floating-labels-beta-07-script">
 (function(){
-    var ids=['gx-activation-id','gx-activation-pin','gx-activation-pin-confirm'];
+    var ids=[
+        'login-id',
+        'login-pin',
+        'gx-activation-id',
+        'gx-activation-pin',
+        'gx-activation-pin-confirm'
+    ];
 
     function sync(input){
-        var shell=input.closest('.gx-float-shell');
+        var shell=input && input.closest('.gx-float-shell');
         if(!shell)return;
         var hasValue=String(input.value||'').length>0;
         var focused=document.activeElement===input;
         shell.classList.toggle('is-float',hasValue||focused);
         shell.classList.toggle('is-focus',focused);
     }
+
+    function syncAll(){
+        ids.forEach(function(id){
+            var input=document.getElementById(id);
+            if(input)sync(input);
+        });
+    }
+    window.gxSyncFloatingLabels=syncAll;
 
     ids.forEach(function(id){
         var input=document.getElementById(id);
@@ -17907,21 +18025,12 @@ if(document.readyState==="loading"){
         sync(input);
     });
 
-    /* Autofill de Safari puede llegar después del primer render. */
-    requestAnimationFrame(function(){
-        ids.forEach(function(id){
-            var input=document.getElementById(id);
-            if(input)sync(input);
-        });
-    });
-    setTimeout(function(){
-        ids.forEach(function(id){
-            var input=document.getElementById(id);
-            if(input)sync(input);
-        });
-    },180);
+    /* Autofill de Safari puede asentarse después del primer layout. */
+    requestAnimationFrame(syncAll);
+    setTimeout(syncAll,180);
+    setTimeout(syncAll,520);
 
-    console.info('[GOXION] Beta 07 · Floating Labels activos');
+    console.info('[GOXION] Beta 07 · Floating Labels v2 + stage flicker fix');
 })();
 </script>
 
