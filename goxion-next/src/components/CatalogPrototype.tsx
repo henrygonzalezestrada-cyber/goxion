@@ -115,14 +115,14 @@ export function CatalogPrototype() {
     <section className="gx-catalog-real">
       <div className="gx-catalog-title-row">
         <div>
-          <span className="gx-kicker">CATÁLOGO NEXT</span>
+          <span className="gx-kicker">CATÁLOGO</span>
           <h2>Elige tu próxima plataforma</h2>
-          <p>Replica la lógica actual con componentes y animación de layout.</p>
+          <p>Explora tus opciones y encuentra el servicio ideal para ti.</p>
         </div>
 
         <button type="button" className="gx-demo-context" onClick={changeContext}>
           <span className={authenticated ? 'is-on' : ''} />
-          {authenticated ? 'Cliente demo' : 'Invitado'}
+          {authenticated ? 'Vista Mi Espacio' : 'Vista invitado'}
         </button>
       </div>
 
