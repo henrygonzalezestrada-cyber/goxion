@@ -17324,14 +17324,12 @@ if(document.readyState==="loading"){
 <!-- GOXION · BETA 06 · ACTIVATION CONSTELLATION -->
 <style id="goxion-activation-constellation-beta-06">
 /* =========================================================
-   GOXION · BETA 06 · OTP FOLD
-   La referencia funciona porque el OTP se comporta como un solo
-   objeto físico. Aquí se replica esa idea: fila → matriz → conexión
-   → validación → plegado → una única pieza central.
+   GOXION · BETA 06 · OTP FOLD v2
+   Suavizado para iPhone: una sola continuidad de transformaciones,
+   sin filtros animados en los nodos y con iluminación ambiental.
+   Fila → matriz → conexión → validación → inclinación → plegado.
    ========================================================= */
 
-/* El input real permanece para teclado/autofill. Lo visual son seis
-   piezas planas; no seis inputs compitiendo entre sí. */
 .gx-feral-code-shell{
     position:relative!important;
     min-height:50px!important;
@@ -17393,41 +17391,59 @@ if(document.readyState==="loading"){
 }
 @keyframes gxOtpCaret{50%{opacity:.15}}
 
-/* El paso se vuelve escenario sólo durante el éxito. No dejamos el
-   formulario borroso debajo: se retira limpiamente de la composición. */
 #gx-activation-step-code{position:relative}
-#gx-activation-step-code.gx-otp-fold-running{
-    min-height:292px;
-}
+#gx-activation-step-code.gx-otp-fold-running{min-height:292px}
 #gx-activation-step-code.gx-otp-fold-running > :not(.gx-otp-fold-stage){
     opacity:0!important;
-    transform:scale(.985)!important;
+    transform:scale(.988)!important;
     pointer-events:none!important;
-    transition:opacity .16s ease,transform .18s ease!important;
+    transition:opacity .20s ease,transform .24s cubic-bezier(.16,1,.3,1)!important;
 }
+
 .gx-otp-fold-stage{
     position:absolute;
     inset:0;
     z-index:40;
     overflow:visible;
     pointer-events:none;
+    transform:translateZ(0);
 }
 .gx-otp-fold-stage::before{
     content:"";
     position:absolute;
     inset:0;
     border-radius:18px;
-    background:radial-gradient(circle at 50% 50%,rgba(51,72,160,.055),transparent 46%);
+    background:radial-gradient(circle at 50% 50%,rgba(31,42,88,.08),transparent 50%);
     opacity:0;
-    animation:gxOtpStageIn .24s ease forwards;
+    animation:gxOtpStageIn .34s ease forwards;
 }
 @keyframes gxOtpStageIn{to{opacity:1}}
+
+/* Una única fuente de luz para todo el objeto. Se anima sólo con
+   opacity + transform; evita seis glows independientes repintándose. */
+.gx-otp-neon-field{
+    position:absolute;
+    width:270px;
+    height:190px;
+    border-radius:50%;
+    opacity:0;
+    transform:translate3d(-50%,-50%,0) scale(.78);
+    background:
+        radial-gradient(circle at 32% 50%,rgba(124,77,255,.24),transparent 43%),
+        radial-gradient(circle at 68% 50%,rgba(0,242,254,.23),transparent 45%),
+        radial-gradient(circle at 50% 50%,rgba(68,101,255,.10),transparent 62%);
+    pointer-events:none;
+    will-change:transform,opacity;
+    backface-visibility:hidden;
+}
 
 .gx-otp-fold-group{
     position:absolute;
     inset:0;
     transform-origin:50% 50%;
+    transform:translateZ(0);
     will-change:transform;
+    backface-visibility:hidden;
 }
 .gx-otp-fold-lines{
     position:absolute;
@@ -17438,14 +17454,12 @@ if(document.readyState==="loading"){
 }
 .gx-otp-fold-lines line{
     fill:none;
-    stroke:rgba(0,242,254,.45);
+    stroke:rgba(124,77,255,.44);
     stroke-width:1.15;
     stroke-linecap:round;
     vector-effect:non-scaling-stroke;
 }
 
-/* Nodos deliberadamente simples. Nada de halos grandes ni gradientes
-   dentro de cada tarjeta: la referencia se ve premium por su precisión. */
 .gx-otp-fold-node{
     position:absolute;
     width:54px;
@@ -17458,17 +17472,19 @@ if(document.readyState==="loading"){
     color:#eef5ff;
     font:760 17px/1 'Poppins',sans-serif;
     font-variant-numeric:tabular-nums;
-    box-shadow:0 8px 20px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.025);
+    box-shadow:0 8px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025);
     transform-origin:center;
-    will-change:transform,opacity,filter,border-color;
+    transform:translate3d(0,0,0);
+    will-change:transform,opacity;
+    backface-visibility:hidden;
+    -webkit-font-smoothing:antialiased;
+    transition:border-color .48s ease,color .48s ease;
 }
 .gx-otp-fold-node.is-verified{
-    border-color:rgba(0,242,254,.56);
-    color:#dffcff;
+    border-color:rgba(0,242,254,.64);
+    color:#e4fdff;
 }
 
-/* La pieza final se acerca a la referencia: un único cuadrado,
-   con estructura y pequeños puntos alrededor, no un sticker/check. */
 .gx-otp-final{
     position:absolute;
     width:66px;
@@ -17476,23 +17492,27 @@ if(document.readyState==="loading"){
     display:grid;
     place-items:center;
     opacity:0;
-    transform:scale(.58) rotate(-7deg);
+    transform:translate3d(0,0,0) scale(.58) rotateZ(-7deg);
     will-change:transform,opacity;
+    backface-visibility:hidden;
 }
 .gx-otp-final-frame{
     position:absolute;
     inset:3px;
     border-radius:14px;
-    border:1px solid rgba(0,242,254,.52);
-    background:rgba(7,10,15,.96);
-    box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025);
+    border:1px solid rgba(0,242,254,.62);
+    background:rgba(7,10,15,.97);
+    box-shadow:
+        0 0 22px rgba(0,242,254,.11),
+        0 10px 28px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.025);
 }
 .gx-otp-final-frame::before{
     content:"";
     position:absolute;
     inset:7px;
     border-radius:10px;
-    border:1px solid rgba(124,77,255,.40);
+    border:1px solid rgba(124,77,255,.46);
 }
 .gx-otp-final-check{
     position:relative;
@@ -17502,8 +17522,9 @@ if(document.readyState==="loading"){
     display:grid;
     place-items:center;
     border-radius:9px;
-    background:rgba(0,242,254,.90);
+    background:rgba(0,242,254,.92);
     color:#030305;
+    box-shadow:0 0 14px rgba(0,242,254,.14);
 }
 .gx-otp-final-check svg{
     width:17px;height:17px;
@@ -17512,7 +17533,8 @@ if(document.readyState==="loading"){
 .gx-otp-dot{
     position:absolute;
     width:3px;height:3px;border-radius:50%;
-    background:rgba(0,242,254,.72);
+    background:rgba(0,242,254,.78);
+    box-shadow:0 0 7px rgba(0,242,254,.32);
 }
 .gx-otp-dot.d1{left:-8px;top:31px}.gx-otp-dot.d2{right:-8px;top:31px}
 .gx-otp-dot.d3{top:-8px;left:31px}.gx-otp-dot.d4{bottom:-8px;left:31px}
@@ -17522,7 +17544,7 @@ if(document.readyState==="loading"){
     top:82px;
     left:50%;
     width:180px;
-    transform:translateX(-50%) translateY(4px);
+    transform:translate3d(-50%,5px,0);
     text-align:center;
     opacity:0;
 }
@@ -17560,7 +17582,6 @@ if(document.readyState==="loading"){
     var shell=code.closest('.gx-auth-input-shell');
     if(!shell)return;
 
-    /* El visual del OTP se crea una sola vez. */
     if(!shell.querySelector('.gx-feral-code-visual')){
         shell.classList.add('gx-feral-code-shell');
         var visual=document.createElement('div');
@@ -17574,7 +17595,7 @@ if(document.readyState==="loading"){
         shell.appendChild(visual);
     }
 
-    var visual= shell.querySelector('.gx-feral-code-visual');
+    var visual=shell.querySelector('.gx-feral-code-visual');
     var slots=Array.prototype.slice.call(visual.querySelectorAll('.gx-feral-code-slot'));
 
     function digits(){return String(code.value||'').replace(/\D/g,'').slice(0,6)}
@@ -17596,11 +17617,25 @@ if(document.readyState==="loading"){
     function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms)})}
     function reduced(){return !!window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
 
+    /* Persiste el último frame y cancela la Animation. Así la siguiente
+       fase parte EXACTAMENTE del estado anterior y Safari no compone
+       dos animaciones fill:forwards sobre el mismo transform. */
+    function play(el,frames,options){
+        var animation=el.animate(frames,options);
+        return animation.finished.catch(function(){}).then(function(){
+            var last=frames[frames.length-1]||{};
+            Object.keys(last).forEach(function(key){
+                if(key==='offset'||key==='easing'||key==='composite')return;
+                try{el.style[key]=last[key]}catch(_){}
+            });
+            try{animation.cancel()}catch(_){}
+        });
+    }
+
     window.gxRunActivationConstellation=async function(raw){
         var v=String(raw||digits()).replace(/\D/g,'').slice(0,6);
         if(v.length!==6)return;
-        code.blur();
-        sync();
+        code.blur();sync();
 
         var stepRect=step.getBoundingClientRect();
         var slotRects=slots.map(function(s){return s.getBoundingClientRect()});
@@ -17608,6 +17643,11 @@ if(document.readyState==="loading"){
 
         var stage=document.createElement('div');
         stage.className='gx-otp-fold-stage';
+
+        var neon=document.createElement('div');
+        neon.className='gx-otp-neon-field';
+        stage.appendChild(neon);
+
         var group=document.createElement('div');
         group.className='gx-otp-fold-group';
         stage.appendChild(group);
@@ -17618,6 +17658,8 @@ if(document.readyState==="loading"){
         group.appendChild(svg);
 
         var nodeSize=54;
+        var startTransforms=[];
+        var matrixTransforms=[];
         var nodes=slotRects.map(function(r,i){
             var n=document.createElement('div');
             n.className='gx-otp-fold-node';
@@ -17626,12 +17668,13 @@ if(document.readyState==="loading"){
             var centerY=r.top-stepRect.top+r.height/2;
             n.style.left=(centerX-nodeSize/2)+'px';
             n.style.top=(centerY-nodeSize/2)+'px';
-            n.style.transform='scale('+(r.width/nodeSize)+')';
+            var start='translate3d(0px,0px,0) scale('+(r.width/nodeSize)+')';
+            n.style.transform=start;
+            startTransforms[i]=start;
             group.appendChild(n);
             return n;
         });
 
-        /* 3 × 2, grande y centrado. La red es protagonista. */
         var gapX=22,gapY=18;
         var gridW=nodeSize*3+gapX*2;
         var gridH=nodeSize*2+gapY;
@@ -17645,7 +17688,18 @@ if(document.readyState==="loading"){
         ];
         var centers=targets.map(function(p){return[p[0]+nodeSize/2,p[1]+nodeSize/2]});
 
-        /* Sólo líneas estructurales. Sin diagonales decorativas. */
+        nodes.forEach(function(n,i){
+            var r=slotRects[i];
+            var startX=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var startY=r.top-stepRect.top+r.height/2-nodeSize/2;
+            var dx=targets[i][0]-startX;
+            var dy=targets[i][1]-startY;
+            matrixTransforms[i]='translate3d('+dx+'px,'+dy+'px,0) scale(1)';
+        });
+
+        neon.style.left=cx+'px';
+        neon.style.top=cy+'px';
+
         var edges=[[0,1],[1,2],[3,4],[4,5],[0,3],[1,4],[2,5]];
         var lines=edges.map(function(e){
             var line=document.createElementNS('http://www.w3.org/2000/svg','line');
@@ -17674,143 +17728,149 @@ if(document.readyState==="loading"){
         if(reduced()||typeof Element.prototype.animate!=='function'){
             nodes.forEach(function(n){n.style.opacity='0'});
             final.style.opacity='1';
-            final.style.transform='scale(1) rotate(0)';
+            final.style.transform='translate3d(0,0,0) scale(1) rotateZ(0deg)';
             var fc=final.querySelector('.gx-otp-final-copy');
-            if(fc){fc.style.opacity='1';fc.style.transform='translateX(-50%) translateY(0)'}
-            await sleep(420);
-            stage.remove();
-            step.classList.remove('gx-otp-fold-running');
-            return;
+            if(fc){fc.style.opacity='1';fc.style.transform='translate3d(-50%,0,0)'}
+            await sleep(520);
+            stage.remove();step.classList.remove('gx-otp-fold-running');sync();return;
         }
 
-        /* 1. Fila → matriz. */
-        var settle=nodes.map(function(n,i){
+        /* 1 · Fila → matriz. Más lento, sin cambiar el orden de transform. */
+        await Promise.all(nodes.map(function(n,i){
+            var r=slotRects[i];
+            var midScale=Math.max(.90,r.width/nodeSize+.08);
+            var r0=slotRects[i];
+            var sx=r0.left-stepRect.left+r0.width/2-nodeSize/2;
+            var sy=r0.top-stepRect.top+r0.height/2-nodeSize/2;
+            var dx=targets[i][0]-sx;
+            var dy=targets[i][1]-sy;
+            var frames=[
+                {transform:startTransforms[i]},
+                {transform:'translate3d('+(dx*.58)+'px,'+(dy*.56-4)+'px,0) scale('+midScale+')',offset:.58},
+                {transform:matrixTransforms[i]}
+            ];
+            return sleep(i*26).then(function(){
+                return play(n,frames,{duration:610,easing:'cubic-bezier(.18,.78,.18,1)',fill:'both'});
+            });
+        }));
+
+        /* Una pequeña respiración hace legible la nueva geometría. */
+        await sleep(150);
+
+        /* 2 · Se dibuja la estructura sin saltos. */
+        await Promise.all(lines.map(function(line,i){
+            return sleep(i*34).then(function(){
+                return play(line,[
+                    {strokeDashoffset:'1',opacity:'0'},
+                    {strokeDashoffset:'0',opacity:'.72'}
+                ],{duration:350,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+            });
+        }));
+
+        await sleep(180);
+
+        /* 3 · Validación + iluminación ambiental. Nada de filter/brightness
+           sobre cada nodo: el color cambia y una sola luz nace detrás. */
+        nodes.forEach(function(n){n.classList.add('is-verified')});
+        var glowIn=play(neon,[
+            {opacity:'0',transform:'translate3d(-50%,-50%,0) scale(.78)'},
+            {opacity:'.82',transform:'translate3d(-50%,-50%,0) scale(1.04)'}
+        ],{duration:520,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
+
+        var recolor=Promise.all(lines.map(function(line){
+            return play(line,[
+                {stroke:'rgba(124,77,255,.44)'},
+                {stroke:'rgba(0,242,254,.58)'}
+            ],{duration:500,easing:'ease-out',fill:'both'});
+        }));
+        await Promise.all([glowIn,recolor]);
+
+        /* Dejamos respirar el estado validado antes de plegarlo. */
+        await sleep(360);
+
+        /* 4 · El conjunto inclina y regresa en una sola curva continua.
+           Termina otra vez en neutral, así el fold no hereda perspectiva. */
+        await play(group,[
+            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'},
+            {transform:'translateZ(0) perspective(760px) rotateX(5.5deg) rotateZ(3.8deg) scale(.985)',offset:.48},
+            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'}
+        ],{duration:560,easing:'cubic-bezier(.2,.72,.2,1)',fill:'both'});
+
+        await sleep(90);
+
+        /* 5 · Plegado. Cada nodo parte del matrixTransform ya persistido. */
+        var lineFade=Promise.all(lines.map(function(line,i){
+            return sleep(i*10).then(function(){
+                return play(line,[{opacity:'.72'},{opacity:'0'}],{
+                    duration:300,easing:'ease-in',fill:'both'
+                });
+            });
+        }));
+
+        var glowFold=play(neon,[
+            {opacity:'.82',transform:'translate3d(-50%,-50%,0) scale(1.04)'},
+            {opacity:'.58',transform:'translate3d(-50%,-50%,0) scale(.58)'}
+        ],{duration:650,easing:'cubic-bezier(.2,.75,.18,1)',fill:'both'});
+
+        var folds=Promise.all(nodes.map(function(n,i){
             var r=slotRects[i];
             var startX=r.left-stepRect.left+r.width/2-nodeSize/2;
             var startY=r.top-stepRect.top+r.height/2-nodeSize/2;
-            var dx=targets[i][0]-startX;
-            var dy=targets[i][1]-startY;
-            return n.animate([
-                {transform:'scale('+(r.width/nodeSize)+') translate(0,0)'},
-                {transform:'translate('+(dx*.72)+'px,'+(dy*.72)+'px) scale(.96)',offset:.72},
-                {transform:'translate('+dx+'px,'+dy+'px) scale(1)'}
-            ],{
-                duration:430,
-                delay:i*22,
-                easing:'cubic-bezier(.18,.82,.22,1)',
-                fill:'forwards'
-            });
-        });
-        await Promise.all(settle.map(function(a){return a.finished.catch(function(){})}));
-
-        /* 2. La estructura se conecta. */
-        lines.forEach(function(line,i){
-            line.animate([
-                {strokeDashoffset:1,opacity:0},
-                {strokeDashoffset:0,opacity:.72}
-            ],{
-                duration:230,
-                delay:i*28,
-                easing:'cubic-bezier(.2,.8,.2,1)',
-                fill:'forwards'
-            });
-        });
-        await sleep(300);
-
-        /* 3. Estado válido: el sistema cambia de morado a cian. */
-        nodes.forEach(function(n,i){
-            n.classList.add('is-verified');
-            n.animate([
-                {transform:getComputedStyle(n).transform,filter:'brightness(1)'},
-                {filter:'brightness(1.24)',offset:.48},
-                {filter:'brightness(1)'}
-            ],{
-                duration:250,
-                delay:i*18,
-                easing:'ease-out'
-            });
-        });
-        lines.forEach(function(line){
-            line.animate([
-                {stroke:'rgba(124,77,255,.42)'},
-                {stroke:'rgba(0,242,254,.55)'}
-            ],{duration:240,easing:'ease-out',fill:'forwards'});
-        });
-        await sleep(280);
-
-        /* 4. El conjunto se comporta como UNA pieza antes de plegarse. */
-        await group.animate([
-            {transform:'perspective(700px) rotateX(0deg) rotateZ(0deg) scale(1)'},
-            {transform:'perspective(700px) rotateX(7deg) rotateZ(5deg) scale(.97)'}
-        ],{
-            duration:230,
-            easing:'cubic-bezier(.2,.75,.2,1)',
-            fill:'forwards'
-        }).finished.catch(function(){});
-
-        /* 5. Plegado: todos los nodos convergen al mismo centro. */
-        lines.forEach(function(line,i){
-            line.animate([{opacity:.72},{opacity:0}],{
-                duration:220,delay:i*8,easing:'ease-in',fill:'forwards'
-            });
-        });
-
-        var fold=nodes.map(function(n,i){
-            var r=slotRects[i];
-            var startX=r.left-stepRect.left+r.width/2-nodeSize/2;
-            var startY=r.top-stepRect.top+r.height/2-nodeSize/2;
-            var dx0=targets[i][0]-startX;
-            var dy0=targets[i][1]-startY;
             var tx=cx-nodeSize/2;
             var ty=cy-nodeSize/2;
             var dx=tx-startX;
             var dy=ty-startY;
-            var turn=(i%2===0?-1:1)*(26+i*2);
-            return n.animate([
-                {transform:'translate('+dx0+'px,'+dy0+'px) scale(1)',opacity:1},
-                {transform:'translate('+(dx0+(dx-dx0)*.68)+'px,'+(dy0+(dy-dy0)*.68)+'px) scale(.72) rotate('+(turn*.55)+'deg)',opacity:.88,offset:.58},
-                {transform:'translate('+dx+'px,'+dy+'px) scale(.20) rotate('+turn+'deg)',opacity:0}
-            ],{
-                duration:360,
-                delay:i*16,
-                easing:'cubic-bezier(.25,.72,.18,1)',
-                fill:'forwards'
+            var m=matrixTransforms[i];
+            var turn=(i%2===0?-1:1)*(22+i*1.8);
+            var midX=(targets[i][0]-startX)+(dx-(targets[i][0]-startX))*.64;
+            var midY=(targets[i][1]-startY)+(dy-(targets[i][1]-startY))*.64;
+            var frames=[
+                {transform:m,opacity:'1'},
+                {transform:'translate3d('+midX+'px,'+midY+'px,0) scale(.74) rotateZ('+(turn*.48)+'deg)',opacity:'.92',offset:.62},
+                {transform:'translate3d('+dx+'px,'+dy+'px,0) scale(.16) rotateZ('+turn+'deg)',opacity:'0'}
+            ];
+            return sleep(i*22).then(function(){
+                return play(n,frames,{duration:620,easing:'cubic-bezier(.22,.70,.16,1)',fill:'both'});
             });
+        }));
+
+        var finalPop=sleep(250).then(function(){
+            return play(final,[
+                {opacity:'0',transform:'translate3d(0,0,0) scale(.58) rotateZ(-7deg)'},
+                {opacity:'1',transform:'translate3d(0,0,0) scale(1.045) rotateZ(1deg)',offset:.72},
+                {opacity:'1',transform:'translate3d(0,0,0) scale(1) rotateZ(0deg)'}
+            ],{duration:520,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
         });
 
-        var finalPop=final.animate([
-            {opacity:0,transform:'scale(.58) rotate(-7deg)'},
-            {opacity:1,transform:'scale(1.05) rotate(1deg)',offset:.72},
-            {opacity:1,transform:'scale(1) rotate(0deg)'}
-        ],{
-            duration:360,
-            delay:145,
-            easing:'cubic-bezier(.16,1,.3,1)',
-            fill:'forwards'
-        });
+        await Promise.all([lineFade,glowFold,folds,finalPop]);
 
-        await Promise.all(fold.map(function(a){return a.finished.catch(function(){})}).concat([finalPop.finished.catch(function(){})]));
+        /* La luz se concentra en la pieza final en lugar de apagarse. */
+        await play(neon,[
+            {opacity:'.58',transform:'translate3d(-50%,-50%,0) scale(.58)'},
+            {opacity:'.38',transform:'translate3d(-50%,-50%,0) scale(.42)'}
+        ],{duration:260,easing:'ease-out',fill:'both'});
 
         var copy=final.querySelector('.gx-otp-final-copy');
         if(copy){
-            await copy.animate([
-                {opacity:0,transform:'translateX(-50%) translateY(5px)'},
-                {opacity:1,transform:'translateX(-50%) translateY(0)'}
-            ],{duration:190,easing:'ease-out',fill:'forwards'}).finished.catch(function(){});
+            await play(copy,[
+                {opacity:'0',transform:'translate3d(-50%,5px,0)'},
+                {opacity:'1',transform:'translate3d(-50%,0,0)'}
+            ],{duration:240,easing:'ease-out',fill:'both'});
         }
 
-        await sleep(340);
+        /* El resultado permanece lo suficiente para ser leído. */
+        await sleep(560);
 
-        await stage.animate([{opacity:1},{opacity:0}],{
-            duration:150,easing:'ease-in',fill:'forwards'
-        }).finished.catch(function(){});
+        await play(stage,[{opacity:'1'},{opacity:'0'}],{
+            duration:190,easing:'ease-in',fill:'both'
+        });
 
         stage.remove();
         step.classList.remove('gx-otp-fold-running');
         sync();
     };
 
-    console.info('[GOXION] Beta 06 · OTP Fold refinado activo');
+    console.info('[GOXION] Beta 06 · OTP Fold v2 suave + neon activo');
 })();
 </script>
 
