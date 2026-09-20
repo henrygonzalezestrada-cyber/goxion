@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
-import { useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { CatalogPrototype } from './CatalogPrototype';
+import { ClientSpaceData, loginClient, logoutClient, restoreClientSession } from '../lib/client-session';
 
 type Tab = 'inicio' | 'catalogo' | 'soporte';
 
@@ -51,7 +52,7 @@ function HomePrototype({ onCatalog, onSpace }: { onCatalog: () => void; onSpace:
   );
 }
 
-function SupportPrototype() {
+function SupportPrototype({ authenticated }: { authenticated: boolean }) {
   const steps = [
     ['01', 'Reportas', 'Cuéntanos qué sucede desde tu espacio.'],
     ['02', 'Revisamos', 'Validamos tu cuenta y el servicio relacionado.'],
@@ -72,23 +73,117 @@ function SupportPrototype() {
   );
 }
 
-function LoginCard({ onClose }: { onClose: () => void }) {
+function ClientDashboard({ data, onLogout, onCatalog }: { data: ClientSpaceData; onLogout: () => void; onCatalog: () => void }) {
+  const client = data.cliente ?? {};
+  const services = Array.isArray(data.servicios) ? data.servicios : [];
+  const payments = Array.isArray(data.pagos) ? data.pagos : [];
+  const firstName = String(client.nombre || 'Cliente').trim().split(/\s+/)[0] || 'Cliente';
+
   return (
-    <motion.div className="gx-login-card" layoutId="gx-space-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ type: 'spring', stiffness: 330, damping: 31 }}>
-      <button type="button" className="gx-login-close" onClick={onClose} aria-label="Cerrar acceso">×</button>
-      <span className="gx-login-kicker">MI ESPACIO</span><h2>Accede a tu espacio</h2><p>Tus servicios, beneficios y cuenta en un solo lugar.</p>
-      <label className="gx-next-float"><input placeholder=" " autoComplete="username" /><span>Nombre o ID</span></label>
-      <label className="gx-next-float"><input placeholder=" " type="password" inputMode="numeric" maxLength={4} autoComplete="current-password" /><span>PIN de acceso</span></label>
-      <button type="button" className="gx-login-submit" disabled><span>Entrar a Mi Espacio</span></button>
-      <small className="gx-login-note">Primera migración visual · acceso real se conectará en una etapa controlada.</small>
-    </motion.div>
+    <div className="gx-help-view gx-client-dashboard">
+      <section className="gx-client-welcome">
+        <span className="gx-help-eyebrow">MI ESPACIO</span>
+        <h1>¡Hola, <span>{firstName}</span>! 👋</h1>
+        <p>Tu información real ya está siendo leída desde GOXION Next.</p>
+      </section>
+
+      <div className="gx-client-summary-grid">
+        <article><small>Próximo corte</small><strong>Día {Number(client.dia_pago || 15)}</strong><span>de cada mes</span></article>
+        <article><small>Servicios</small><strong>{services.length}</strong><span>{services.length === 1 ? 'activo' : 'activos'}</span></article>
+        <article><small>Racha</small><strong>{Number(client.pagos_puntuales || 0)}</strong><span>pagos puntuales</span></article>
+      </div>
+
+      <section className="gx-help-block">
+        <div className="gx-help-section-head">
+          <div><span className="gx-help-section-kicker">TU CUENTA</span><h2>Tus servicios</h2></div>
+          <button type="button" onClick={onCatalog}>Explorar <span>→</span></button>
+        </div>
+        <div className="gx-client-services">
+          {services.length ? services.map((service, index) => (
+            <motion.article key={String(service.id || index)} layout>
+              <div className="gx-client-service-mark">{String(service.nombre || 'G').slice(0, 1).toUpperCase()}</div>
+              <div><strong>{service.nombre || 'Servicio GOXION'}</strong><small>{service.perfil_nombre ? 'Perfil: ' + service.perfil_nombre : 'Servicio activo'}</small></div>
+              <b>{'$'}{Number(service.monto || 0)} MXN</b>
+            </motion.article>
+          )) : (
+            <div className="gx-client-empty"><strong>Tu primer servicio aparecerá aquí</strong><small>Explora el catálogo para comenzar.</small></div>
+          )}
+        </div>
+      </section>
+
+      <section className="gx-client-readonly">
+        <div><span>LECTURA SEGURA</span><strong>Primera conexión real completada</strong></div>
+        <p>GOXION Next ya puede iniciar sesión, restaurarla y leer tu cuenta. Las acciones que modifican datos siguen bloqueadas.</p>
+      </section>
+
+      <button type="button" className="gx-client-logout" onClick={onLogout}>Cerrar sesión</button>
+      {payments.length > 0 && <small className="gx-client-sync-note">Historial detectado: {payments.length} pago{payments.length === 1 ? '' : 's'}.</small>}
+    </div>
   );
 }
 
+function LoginCard({ onClose, onLoggedIn }: { onClose: () => void; onLoggedIn: (data: ClientSpaceData) => void }) {
+  const [name, setName] = useState('');
+  const [pin, setPin] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!name.trim() || !pin.trim()) {
+      setStatus('error');
+      setMessage('Ingresa tu Nombre o ID y tu PIN.');
+      return;
+    }
+
+    setStatus('loading');
+    setMessage('');
+    try {
+      const result = await loginClient(name.trim(), pin.trim());
+      setStatus('success');
+      setMessage('Validación exitosa');
+      window.setTimeout(() => onLoggedIn(result.space), 260);
+    } catch (error) {
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : 'Datos incorrectos.');
+    }
+  };
+
+  return (
+    <motion.form className="gx-login-card" layoutId="gx-space-card" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.98 }} transition={{ type: 'spring', stiffness: 330, damping: 31 }} onSubmit={submit}>
+      <button type="button" className="gx-login-close" onClick={onClose} aria-label="Cerrar acceso">×</button>
+      <span className="gx-login-kicker">MI ESPACIO</span><h2>Accede a tu espacio</h2><p>Tus servicios, beneficios y cuenta en un solo lugar.</p>
+      <label className="gx-next-float"><input placeholder=" " autoComplete="username" value={name} onChange={(event) => setName(event.target.value)} disabled={status === 'loading'} /><span>Nombre o ID</span></label>
+      <label className="gx-next-float"><input placeholder=" " type="password" inputMode="numeric" maxLength={4} autoComplete="current-password" value={pin} onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, 4))} disabled={status === 'loading'} /><span>PIN de acceso</span></label>
+      <button type="submit" className={'gx-login-submit is-' + status} disabled={status === 'loading' || status === 'success'}><span>{status === 'loading' ? 'Validando información…' : status === 'success' ? '✓ Validación exitosa' : 'Validar acceso'}</span></button>
+      {message && <div className={'gx-login-status ' + status}>{message}</div>}
+      <small className="gx-login-note">GOXION Next usa el mismo acceso y el mismo contrato de Supabase que la versión oficial.</small>
+    </motion.form>
+  );
+}
 export function AyudaShell() {
   const [tab, setTab] = useState<Tab>('inicio');
   const [loginOpen, setLoginOpen] = useState(false);
+  const [session, setSession] = useState<ClientSpaceData | null>(null);
+  const [restoring, setRestoring] = useState(true);
   const reducedMotion = useReducedMotion();
+
+  useEffect(() => {
+    let active = true;
+    restoreClientSession().then((restored) => {
+      if (!active) return;
+      setSession(restored?.space ?? null);
+      setRestoring(false);
+    });
+    return () => { active = false; };
+  }, []);
+
+  const signOut = () => {
+    logoutClient();
+    setSession(null);
+    setLoginOpen(false);
+    setTab('inicio');
+  };
 
   const go = (next: Tab) => {
     setTab(next);
@@ -104,8 +199,8 @@ export function AyudaShell() {
         <button type="button" className="gx-help-brand" onClick={() => go('inicio')} aria-label="Ir al inicio">
           <span className="gx-help-brandmark"><i /><i /><i /></span><span>GOXION</span>
         </button>
-        <motion.button type="button" className="gx-space-pill" layoutId="gx-space-card" onClick={() => setLoginOpen(true)} whileTap={{ scale: 0.97 }}>
-          <span className="gx-space-dot">◉</span><span>Mi Espacio</span>
+        <motion.button type="button" className="gx-space-pill" layoutId="gx-space-card" onClick={() => (session ? signOut() : setLoginOpen(true))} whileTap={{ scale: 0.97 }}>
+          <span className="gx-space-dot">◉</span><span>{session ? 'Cerrar Sesión' : 'Mi Espacio'}</span>
         </motion.button>
       </header>
 
@@ -113,7 +208,7 @@ export function AyudaShell() {
         {navItems.map((item) => (
           <button key={item.id} type="button" className={tab === item.id ? 'active' : ''} onClick={() => go(item.id)}>
             {tab === item.id && <motion.span className="gx-help-nav-highlight" layoutId="gx-help-tab-highlight" />}
-            <span className="gx-help-nav-icon">{item.icon}</span><span>{item.label}</span>
+            <span className="gx-help-nav-icon">{item.icon}</span><span>{item.id === 'inicio' && session ? 'Mi Espacio' : item.label}</span>
           </button>
         ))}
       </nav>
@@ -121,9 +216,9 @@ export function AyudaShell() {
       <section className="gx-help-stage">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={tab} initial={reducedMotion ? false : { opacity: 0, y: 10, filter: 'blur(4px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={reducedMotion ? undefined : { opacity: 0, y: -7, filter: 'blur(3px)' }} transition={{ duration: reducedMotion ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}>
-            {tab === 'inicio' && <HomePrototype onCatalog={() => go('catalogo')} onSpace={() => setLoginOpen(true)} />}
+            {tab === 'inicio' && (restoring ? <div className="gx-session-restoring"><span /><strong>Sincronizando GOXION…</strong></div> : session ? <ClientDashboard data={session} onCatalog={() => go('catalogo')} onLogout={signOut} /> : <HomePrototype onCatalog={() => go('catalogo')} onSpace={() => setLoginOpen(true)} />)}
             {tab === 'catalogo' && <CatalogPrototype />}
-            {tab === 'soporte' && <SupportPrototype />}
+            {tab === 'soporte' && <SupportPrototype authenticated={Boolean(session)} />}
           </motion.div>
         </AnimatePresence>
       </section>
@@ -133,7 +228,7 @@ export function AyudaShell() {
       <AnimatePresence>
         {loginOpen && (
           <motion.div className="gx-login-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(event) => { if (event.target === event.currentTarget) setLoginOpen(false); }}>
-            <LoginCard onClose={() => setLoginOpen(false)} />
+            <LoginCard onClose={() => setLoginOpen(false)} onLoggedIn={(data) => { setSession(data); setLoginOpen(false); go('inicio'); }} />
           </motion.div>
         )}
       </AnimatePresence>
