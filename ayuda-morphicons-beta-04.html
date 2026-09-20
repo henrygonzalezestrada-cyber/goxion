@@ -16934,7 +16934,7 @@ if(document.readyState==="loading"){
     color:var(--gx-seek-ink);
     outline:none;
     opacity:var(--gx-seek-say);
-    transform:translateX(calc((1 - var(--gx-seek-say)) * -6px));
+    transform:translateX(var(--gx-seek-shift,-6px));
     pointer-events:none;
     -webkit-appearance:none;
     appearance:none;
@@ -17059,6 +17059,7 @@ if(document.readyState==="loading"){
         root.style.setProperty('--gx-seek-w',current.toFixed(2)+'px');
         root.style.setProperty('--gx-seek-p',p.toFixed(3));
         root.style.setProperty('--gx-seek-say',say.toFixed(3));
+        root.style.setProperty('--gx-seek-shift',(-6*(1-say)).toFixed(2)+'px');
     }
 
     function settleInstant(){
@@ -17121,11 +17122,22 @@ if(document.readyState==="loading"){
        para que el campo ya sea utilizable cuando visualmente aparece. */
     function start(){
         if(opened) return;
+
+        /* El foco ocurre DENTRO del gesto del usuario. Safari/iOS puede
+           negarse a mostrar el teclado si focus() llega después de un
+           setTimeout. El objeto sí espera 90ms para crecer: primero toma
+           foco y cede, luego se expande. Interacción y geometría siguen
+           siendo dos tiempos distintos sin sacrificar usabilidad. */
+        opened=true;
+        root.dataset.open='true';
+        field.tabIndex=0;
         root.dataset.press='true';
+        try{ field.focus({preventScroll:true}); }catch(_){ field.focus(); }
+
         clearTimeout(pressTimer);
         pressTimer=setTimeout(()=>{
             root.dataset.press='false';
-            setOpen(true,{focus:true});
+            setTarget(openWidth());
         },still()?0:90);
     }
 
