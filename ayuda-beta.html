@@ -4068,22 +4068,22 @@
    ========================================================= */
 
 .gx-dashboard-section-head{
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:12px;
-    margin:22px 0 10px;
+    display:grid;
+    gap:4px;
+    align-items:flex-start;
+    justify-items:flex-start;
+    margin:24px 0 12px;
 }
 .gx-dashboard-section-head .section-title{
     margin:0;
 }
 .gx-dashboard-section-subtitle{
-    max-width:180px;
+    max-width:none;
     color:var(--text-muted);
-    font-size:10px;
-    line-height:1.35;
+    font-size:10.2px;
+    line-height:1.45;
     font-weight:600;
-    text-align:right;
+    text-align:left;
 }
 .gx-gamification-mid{
     margin-top:24px;
@@ -4488,7 +4488,7 @@
 .gx-catalog-empty small{margin-top:4px;font-size:9px}
 
 @media(max-width:390px){
-    .gx-dashboard-section-subtitle{max-width:145px;font-size:9.2px}
+    .gx-dashboard-section-subtitle{font-size:9.4px}
     .gx-service-actions{grid-template-columns:1fr}
 }
 </style>
@@ -5471,12 +5471,12 @@
 <div class="gx-gamification-mid" id="referral-section-container"></div>
 <div class="gx-dashboard-section-head">
 <div class="section-title">Tus servicios</div>
-<div class="gx-dashboard-section-subtitle">Toca una plataforma para administrarla</div>
+<div class="gx-dashboard-section-subtitle">Administra tus accesos, soporte y movimientos desde aquí.</div>
 </div>
 <div class="gx-services-stack" id="dash-services"></div>
 <div class="gx-dashboard-section-head gx-history-head">
 <div class="section-title">Historial de pagos</div>
-<div class="gx-dashboard-section-subtitle">Tu constancia y lealtad</div>
+<div class="gx-dashboard-section-subtitle">Aquí verás tus pagos registrados y el avance de tu constancia.</div>
 </div>
 <div id="dash-history"></div>
 </div>
@@ -7005,7 +7005,7 @@
                         <button class="btn-primary" style="width:auto;padding:10px 15px;border-radius:12px;font-size:12px;" onclick="copiarEnlace()">📋 Copiar</button>
                     </div>
                     <button class="btn-primary" style="background:linear-gradient(135deg,#25D366,#128C7E);color:white;box-shadow:0 0 15px rgba(37,211,102,.4);padding:14px;font-size:13px;" onclick="compartirAppGoxion('${msgWhatsApp}')">📲 Compartir por WhatsApp</button>
-                    <div style="font-size:11px;color:var(--neon-blue);margin-top:15px;text-align:center;cursor:pointer;" onclick="openModal('modal-referidos')">Ver reglas del beneficio <svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></div>`;
+                    <div class="gx-referral-link-action" onclick="openModal('modal-referidos')"><span>Ver reglas del beneficio</span><svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></div>`;
             }
 
             let tareasArr = gamifConfig.tareas ? gamifConfig.tareas.split('\n').filter(t => t.trim() !== '') : [];
@@ -7297,8 +7297,9 @@
                 historyHTML += `</div>`;
             } else {
                 historyHTML = `
-                    <div class="gx-payment-history-card" style="padding:16px;text-align:center;">
-                        <div style="color:var(--text-muted);font-size:10px;">Aún no hay pagos registrados.</div>
+                    <div class="gx-dashboard-empty-card">
+                        <strong>Aún no hay pagos registrados</strong>
+                        <small>Tus próximos movimientos y constancia aparecerán aquí.</small>
                     </div>`;
             }
 
@@ -7616,7 +7617,7 @@
             } else {
                 srvHTML = gxShowNewClientOnboarding
                     ? `<div class="gx-payment-history-card gx-first-service-empty"><strong>Tu primer servicio aparecerá aquí</strong><small>Explora el catálogo para comenzar.</small></div>`
-                    : `<div class="gx-payment-history-card" style="padding:16px;text-align:center;"><div style="color:var(--text-muted);font-size:10px;">No tienes servicios activos.</div></div>`;
+                    : `<div class="gx-dashboard-empty-card"><strong>No tienes servicios activos</strong><small>Cuando contrates una plataforma, la podrás administrar aquí.</small></div>`;
             }
 
             document.getElementById('dash-services').innerHTML = srvHTML;
@@ -16313,32 +16314,95 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-new-client-benefit-copy strong{color:#f8efff;font-size:12px;font-weight:850}
 .gx-new-client-benefit-copy small{color:#9f8fa9;font-size:9.5px;line-height:1.35}
 .gx-new-client-cta{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
     width:100%;
-    min-height:46px;
-    border-radius:14px;
-    border:1px solid rgba(0,242,254,.20);
-    background:linear-gradient(135deg,rgba(0,214,230,.15),rgba(79,106,255,.14));
+    min-height:48px;
+    border-radius:16px;
+    border:1px solid rgba(0,242,254,.22);
+    background:linear-gradient(135deg,rgba(2,26,41,.82),rgba(7,42,72,.74));
     color:#f7fbff;
     display:flex;
     align-items:center;
     justify-content:space-between;
-    padding:0 15px;
+    gap:12px;
+    padding:0 16px;
     font:inherit;
     font-size:12px;
     font-weight:850;
-    box-shadow:0 10px 25px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.04);
-    transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,background .22s ease;
+    box-shadow:0 12px 26px rgba(0,0,0,.20), inset 0 1px 0 rgba(255,255,255,.04), 0 0 0 1px rgba(0,242,254,.06);
+    transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s ease,box-shadow .22s ease,background .22s ease;
+}
+.gx-new-client-cta::before{
+    content:'';
+    position:absolute;
+    inset:-1px;
+    background:linear-gradient(115deg,transparent 18%,rgba(140,238,255,.18) 36%,rgba(140,238,255,.05) 48%,transparent 66%);
+    transform:translateX(-135%);
+    animation:gxCtaSweep 4.8s ease-in-out infinite;
+    pointer-events:none;
+}
+.gx-new-client-cta::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    background:linear-gradient(135deg,rgba(0,242,254,.10),rgba(0,242,254,0) 46%,rgba(111,133,255,.12) 100%);
+    opacity:.95;
+    pointer-events:none;
+}
+.gx-new-client-cta > *{position:relative; z-index:1;}
+.gx-new-client-cta span{letter-spacing:.01em;}
+.gx-new-client-cta:hover,
+.gx-new-client-cta:active{
+    border-color:rgba(0,242,254,.32);
+    box-shadow:0 14px 32px rgba(0,0,0,.24), inset 0 1px 0 rgba(255,255,255,.05), 0 0 0 1px rgba(0,242,254,.08), 0 0 22px rgba(0,242,254,.10);
 }
 .gx-new-client-cta:active{transform:scale(.985)}
-.gx-new-client-cta .gx-nav-arrow{width:17px;height:17px;fill:var(--neon-blue)}
+.gx-new-client-cta .gx-nav-arrow{width:17px;height:17px;fill:var(--neon-blue); filter:drop-shadow(0 0 10px rgba(0,242,254,.22));}
+@keyframes gxCtaSweep{
+    0%,16%{transform:translateX(-135%);opacity:0;}
+    24%{opacity:1;}
+    48%{transform:translateX(135%);opacity:1;}
+    58%,100%{transform:translateX(135%);opacity:0;}
+}
+.gx-dashboard-empty-card,
 .gx-first-service-empty{
-    padding:16px!important;
+    padding:18px 16px!important;
     text-align:center!important;
     display:grid!important;
-    gap:4px!important;
+    gap:5px!important;
+    border-radius:18px!important;
+    border:1px solid rgba(255,255,255,.08)!important;
+    background:var(--card-glass)!important;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    box-shadow:0 8px 24px rgba(0,0,0,.22);
 }
-.gx-first-service-empty strong{font-size:11px;color:#e9eef8}
-.gx-first-service-empty small{font-size:9.5px;color:var(--text-muted)}
+.gx-dashboard-empty-card strong,
+.gx-first-service-empty strong{font-size:11.4px;color:#eef3fb;font-weight:800; line-height:1.35;}
+.gx-dashboard-empty-card small,
+.gx-first-service-empty small{font-size:9.7px;color:var(--text-muted); line-height:1.5;}
+.gx-referral-link-action{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    margin:16px auto 0;
+    color:var(--neon-blue);
+    font-size:11px;
+    font-weight:800;
+    cursor:pointer;
+    text-align:center;
+}
+.gx-referral-link-action .gx-nav-arrow{
+    width:15px;
+    height:15px;
+    color:var(--neon-blue);
+    flex:0 0 15px;
+}
+.gx-referral-link-action:hover{filter:drop-shadow(0 0 10px rgba(0,242,254,.18));}
 
 @media(max-width:390px){
     .gx-new-client-card{padding:18px!important}
@@ -16346,10 +16410,11 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     .gx-new-client-copy{font-size:11.5px}
 }
 @media(prefers-reduced-motion:reduce){
-    .gx-new-client-cta{transition:none!important}
+    .gx-new-client-cta, .gx-referral-link-action{transition:none!important}
+    .gx-new-client-cta::before{animation:none!important}
 }
 </style>
-<script id="goxion-ayuda-beta-31-marker">console.info('GOXION Ayuda Beta 32 · transparencia unificada en tarjeta onboarding');</script>
+<script id="goxion-ayuda-beta-31-marker">console.info('GOXION Ayuda Beta 33 · CTA premium, referidos alineados y ritmo visual refinado');</script>
 
 </body>
 </html>
