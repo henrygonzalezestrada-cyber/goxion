@@ -17323,259 +17323,494 @@ if(document.readyState==="loading"){
 
 <!-- GOXION · BETA 06 · ACTIVATION CONSTELLATION -->
 <style id="goxion-activation-constellation-beta-06">
+/* =========================================================
+   GOXION · BETA 06 · OTP FOLD
+   La referencia funciona porque el OTP se comporta como un solo
+   objeto físico. Aquí se replica esa idea: fila → matriz → conexión
+   → validación → plegado → una única pieza central.
+   ========================================================= */
+
+/* El input real permanece para teclado/autofill. Lo visual son seis
+   piezas planas; no seis inputs compitiendo entre sí. */
 .gx-feral-code-shell{
-  position:relative!important;min-height:54px!important;padding:0!important;
-  border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important
+    position:relative!important;
+    min-height:50px!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    overflow:visible!important;
 }
 .gx-feral-code-shell .gx-activation-code-field{
-  position:absolute!important;inset:0!important;z-index:3!important;width:100%!important;height:100%!important;
-  opacity:.01!important;color:transparent!important;caret-color:transparent!important;letter-spacing:0!important
+    position:absolute!important;
+    inset:0!important;
+    z-index:4!important;
+    width:100%!important;
+    height:100%!important;
+    opacity:.01!important;
+    color:transparent!important;
+    caret-color:transparent!important;
+    letter-spacing:0!important;
 }
 .gx-feral-code-visual{
-  position:relative;z-index:2;width:100%;max-width:330px;min-height:54px;margin:0 auto;
-  display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:7px;pointer-events:none
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:318px;
+    min-height:50px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:6px;
+    pointer-events:none;
 }
 .gx-feral-code-slot{
-  position:relative;height:50px;display:grid;place-items:center;overflow:hidden;border-radius:14px;
-  border:1px solid rgba(255,255,255,.085);
-  background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.012)),rgba(5,7,12,.72);
-  color:#edf8ff;font:780 18px/1 'Poppins',sans-serif;font-variant-numeric:tabular-nums;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.025),0 7px 18px rgba(0,0,0,.12);
-  transition:border-color .2s ease,background .2s ease,box-shadow .2s ease,transform .2s cubic-bezier(.16,1,.3,1)
+    position:relative;
+    height:47px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    border:1px solid rgba(124,77,255,.20);
+    background:rgba(7,9,14,.82);
+    color:#eaf3ff;
+    font:760 17px/1 'Poppins',sans-serif;
+    font-variant-numeric:tabular-nums;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.022);
+    transition:border-color .18s ease,background .18s ease,transform .18s cubic-bezier(.16,1,.3,1);
 }
-.gx-feral-code-slot.is-filled{
-  border-color:rgba(0,242,254,.16);
-  background:radial-gradient(circle at 50% 0%,rgba(0,242,254,.055),transparent 65%),rgba(5,7,12,.78)
-}
+.gx-feral-code-slot.is-filled{border-color:rgba(82,113,255,.28)}
 .gx-feral-code-slot.is-current{
-  border-color:rgba(124,77,255,.40);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.035),0 0 0 1px rgba(124,77,255,.035),0 0 16px rgba(124,77,255,.08);
-  transform:translateY(-1px)
+    border-color:rgba(0,242,254,.42);
+    transform:translateY(-1px);
 }
 .gx-feral-code-slot.is-current:empty::after{
-  content:"";width:1.5px;height:15px;border-radius:99px;
-  background:linear-gradient(180deg,var(--neon-purple),var(--neon-blue));
-  animation:gxFeralCaret .95s steps(1,end) infinite
+    content:"";
+    width:1.5px;
+    height:14px;
+    border-radius:999px;
+    background:var(--neon-blue);
+    animation:gxOtpCaret .9s steps(1,end) infinite;
 }
-@keyframes gxFeralCaret{50%{opacity:.18}}
-.gx-feral-code-shell:focus-within .gx-feral-code-slot{border-color:rgba(92,119,255,.16)}
-.gx-feral-code-shell:focus-within .gx-feral-code-slot.is-current{border-color:rgba(0,242,254,.36)}
+@keyframes gxOtpCaret{50%{opacity:.15}}
 
-#gx-auth-activation-stage{position:relative}
-.gx-feral-constellation-overlay{position:absolute;inset:0;z-index:80;overflow:visible;pointer-events:none}
-.gx-feral-constellation-dim{
-  position:absolute;inset:0;opacity:0;border-radius:22px;
-  background:radial-gradient(circle at 50% 57%,rgba(124,77,255,.08),transparent 34%),
-             radial-gradient(circle at 57% 52%,rgba(0,242,254,.055),transparent 36%);
-  backdrop-filter:blur(1.5px);-webkit-backdrop-filter:blur(1.5px)
+/* El paso se vuelve escenario sólo durante el éxito. No dejamos el
+   formulario borroso debajo: se retira limpiamente de la composición. */
+#gx-activation-step-code{position:relative}
+#gx-activation-step-code.gx-otp-fold-running{
+    min-height:292px;
 }
-.gx-feral-animating{pointer-events:none}
-.gx-feral-animating>*{opacity:.10!important;filter:blur(1px);transition:opacity .16s ease,filter .16s ease}
-.gx-feral-node{
-  position:absolute;display:grid;place-items:center;border-radius:14px;border:1px solid rgba(255,255,255,.10);
-  background:linear-gradient(145deg,rgba(13,16,25,.97),rgba(5,7,12,.97));color:#fff;
-  font:800 17px/1 'Poppins',sans-serif;font-variant-numeric:tabular-nums;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 10px 28px rgba(0,0,0,.22);
-  transform-origin:center;will-change:transform,opacity,filter
+#gx-activation-step-code.gx-otp-fold-running > :not(.gx-otp-fold-stage){
+    opacity:0!important;
+    transform:scale(.985)!important;
+    pointer-events:none!important;
+    transition:opacity .16s ease,transform .18s ease!important;
 }
-.gx-feral-node::before{
-  content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
-  background:linear-gradient(135deg,rgba(124,77,255,.62),rgba(75,108,255,.30),rgba(0,242,254,.56));
-  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;mask-composite:exclude;opacity:.78;pointer-events:none
+.gx-otp-fold-stage{
+    position:absolute;
+    inset:0;
+    z-index:40;
+    overflow:visible;
+    pointer-events:none;
 }
-.gx-feral-node.live{color:transparent}
-.gx-feral-node.live::after{
-  content:"";width:8px;height:8px;border-radius:50%;background:var(--neon-blue);
-  box-shadow:0 0 9px rgba(0,242,254,.48),0 0 18px rgba(124,77,255,.18)
+.gx-otp-fold-stage::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    border-radius:18px;
+    background:radial-gradient(circle at 50% 50%,rgba(51,72,160,.055),transparent 46%);
+    opacity:0;
+    animation:gxOtpStageIn .24s ease forwards;
 }
-.gx-feral-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.gx-feral-lines line{fill:none;stroke:url(#gxFeralGradient);stroke-width:1.25;stroke-linecap:round;opacity:.72;vector-effect:non-scaling-stroke}
+@keyframes gxOtpStageIn{to{opacity:1}}
 
-.gx-feral-core{
-  position:absolute;width:74px;height:74px;display:grid;place-items:center;opacity:0;
-  transform:scale(.45) rotate(-8deg);will-change:transform,opacity
+.gx-otp-fold-group{
+    position:absolute;
+    inset:0;
+    transform-origin:50% 50%;
+    will-change:transform;
 }
-.gx-feral-core-halo{
-  position:absolute;inset:8px;border-radius:50%;
-  background:radial-gradient(circle,rgba(0,242,254,.14),rgba(124,77,255,.06) 52%,transparent 72%)
+.gx-otp-fold-lines{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    overflow:visible;
 }
-.gx-feral-orbit{position:absolute;left:5px;right:5px;top:24px;height:25px;border:1px solid rgba(0,242,254,.52);border-radius:50%}
-.gx-feral-orbit.o1{transform:rotate(22deg)}
-.gx-feral-orbit.o2{border-color:rgba(124,77,255,.50);transform:rotate(-38deg)}
-.gx-feral-orbit.o3{border-color:rgba(76,112,255,.42);transform:rotate(82deg) scaleX(.78)}
-.gx-feral-core-check{
-  position:relative;z-index:3;width:35px;height:35px;display:grid;place-items:center;border-radius:12px;
-  background:linear-gradient(145deg,#8f7bff,#00e8f8);color:#030305;
-  box-shadow:0 0 22px rgba(0,242,254,.17),inset 0 1px 0 rgba(255,255,255,.34)
+.gx-otp-fold-lines line{
+    fill:none;
+    stroke:rgba(0,242,254,.45);
+    stroke-width:1.15;
+    stroke-linecap:round;
+    vector-effect:non-scaling-stroke;
 }
-.gx-feral-core-check svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-.gx-feral-core-copy{
-  position:absolute;top:83px;left:50%;width:190px;transform:translateX(-50%) translateY(4px);
-  text-align:center;opacity:0
+
+/* Nodos deliberadamente simples. Nada de halos grandes ni gradientes
+   dentro de cada tarjeta: la referencia se ve premium por su precisión. */
+.gx-otp-fold-node{
+    position:absolute;
+    width:54px;
+    height:54px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    border:1px solid rgba(124,77,255,.42);
+    background:#090c13;
+    color:#eef5ff;
+    font:760 17px/1 'Poppins',sans-serif;
+    font-variant-numeric:tabular-nums;
+    box-shadow:0 8px 20px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.025);
+    transform-origin:center;
+    will-change:transform,opacity,filter,border-color;
 }
-.gx-feral-core-copy strong{display:block;color:#fff;font-size:12px;font-weight:850}
-.gx-feral-core-copy small{display:block;margin-top:2px;color:#8da7bd;font-size:9px;font-weight:650}
+.gx-otp-fold-node.is-verified{
+    border-color:rgba(0,242,254,.56);
+    color:#dffcff;
+}
+
+/* La pieza final se acerca a la referencia: un único cuadrado,
+   con estructura y pequeños puntos alrededor, no un sticker/check. */
+.gx-otp-final{
+    position:absolute;
+    width:66px;
+    height:66px;
+    display:grid;
+    place-items:center;
+    opacity:0;
+    transform:scale(.58) rotate(-7deg);
+    will-change:transform,opacity;
+}
+.gx-otp-final-frame{
+    position:absolute;
+    inset:3px;
+    border-radius:14px;
+    border:1px solid rgba(0,242,254,.52);
+    background:rgba(7,10,15,.96);
+    box-shadow:0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025);
+}
+.gx-otp-final-frame::before{
+    content:"";
+    position:absolute;
+    inset:7px;
+    border-radius:10px;
+    border:1px solid rgba(124,77,255,.40);
+}
+.gx-otp-final-check{
+    position:relative;
+    z-index:3;
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    border-radius:9px;
+    background:rgba(0,242,254,.90);
+    color:#030305;
+}
+.gx-otp-final-check svg{
+    width:17px;height:17px;
+    fill:none;stroke:currentColor;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;
+}
+.gx-otp-dot{
+    position:absolute;
+    width:3px;height:3px;border-radius:50%;
+    background:rgba(0,242,254,.72);
+}
+.gx-otp-dot.d1{left:-8px;top:31px}.gx-otp-dot.d2{right:-8px;top:31px}
+.gx-otp-dot.d3{top:-8px;left:31px}.gx-otp-dot.d4{bottom:-8px;left:31px}
+
+.gx-otp-final-copy{
+    position:absolute;
+    top:82px;
+    left:50%;
+    width:180px;
+    transform:translateX(-50%) translateY(4px);
+    text-align:center;
+    opacity:0;
+}
+.gx-otp-final-copy strong{
+    display:block;
+    color:#dffcff;
+    font-size:10px;
+    font-weight:820;
+    letter-spacing:.35px;
+    text-transform:uppercase;
+}
+.gx-otp-final-copy small{
+    display:block;
+    margin-top:3px;
+    color:#8292a8;
+    font-size:8.7px;
+    font-weight:600;
+}
 
 @media(max-width:390px){
-  .gx-feral-code-visual{gap:5px}.gx-feral-code-slot{height:47px;border-radius:13px;font-size:17px}
+    .gx-feral-code-visual{gap:5px}
+    .gx-feral-code-slot{height:45px;border-radius:11px;font-size:16px}
 }
 @media(prefers-reduced-motion:reduce){
-  .gx-feral-code-slot{transition:none!important}.gx-feral-code-slot.is-current:empty::after{animation:none!important}
+    .gx-feral-code-slot{transition:none!important}
+    .gx-feral-code-slot.is-current:empty::after{animation:none!important}
 }
 </style>
 
 <script id="goxion-activation-constellation-beta-06-script">
 (function(){
-  var code=document.getElementById('gx-activation-code');
-  var stage=document.getElementById('gx-auth-activation-stage');
-  var step=document.getElementById('gx-activation-step-code');
-  if(!code||!stage||!step)return;
-  var shell=code.closest('.gx-auth-input-shell');
-  if(!shell)return;
+    var code=document.getElementById('gx-activation-code');
+    var step=document.getElementById('gx-activation-step-code');
+    if(!code||!step)return;
+    var shell=code.closest('.gx-auth-input-shell');
+    if(!shell)return;
 
-  shell.classList.add('gx-feral-code-shell');
-  var visual=document.createElement('div');
-  visual.className='gx-feral-code-visual';
-  visual.setAttribute('aria-hidden','true');
-  var slots=[];
-  for(var i=0;i<6;i++){
-    var slot=document.createElement('span');
-    slot.className='gx-feral-code-slot';
-    visual.appendChild(slot);slots.push(slot);
-  }
-  shell.appendChild(visual);
-
-  function value(){return String(code.value||'').replace(/\D/g,'').slice(0,6)}
-  function sync(){
-    var v=value();
-    slots.forEach(function(slot,i){
-      var ch=v[i]||'';
-      slot.textContent=ch;
-      slot.classList.toggle('is-filled',!!ch);
-      slot.classList.toggle('is-current',document.activeElement===code&&i===Math.min(v.length,5)&&v.length<6);
-    });
-  }
-  window.gxSyncActivationCodeVisual=sync;
-  code.addEventListener('input',sync,{passive:true});
-  code.addEventListener('focus',sync,{passive:true});
-  code.addEventListener('blur',sync,{passive:true});
-  sync();
-
-  function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms)})}
-  function reduced(){return !!window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
-  function clean(overlay){step.classList.remove('gx-feral-animating');if(overlay)overlay.remove();sync()}
-
-  window.gxRunActivationConstellation=async function(raw){
-    var v=String(raw||value()).replace(/\D/g,'').slice(0,6);
-    if(v.length!==6)return;
-    sync();code.blur();
-
-    var sr=stage.getBoundingClientRect();
-    var rr=slots.map(function(s){return s.getBoundingClientRect()});
-    if(!sr.width||rr.some(function(r){return !r.width}))return;
-
-    var overlay=document.createElement('div');overlay.className='gx-feral-constellation-overlay';
-    var dim=document.createElement('div');dim.className='gx-feral-constellation-dim';overlay.appendChild(dim);
-
-    var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    svg.setAttribute('class','gx-feral-lines');
-    svg.setAttribute('viewBox','0 0 '+sr.width+' '+sr.height);
-    svg.innerHTML='<defs><linearGradient id="gxFeralGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7c4dff"/><stop offset="48%" stop-color="#5575ff"/><stop offset="100%" stop-color="#00f2fe"/></linearGradient></defs>';
-    overlay.appendChild(svg);
-
-    var nodes=rr.map(function(r,i){
-      var n=document.createElement('div');n.className='gx-feral-node';n.textContent=v[i];
-      n.style.left=(r.left-sr.left)+'px';n.style.top=(r.top-sr.top)+'px';
-      n.style.width=r.width+'px';n.style.height=r.height+'px';overlay.appendChild(n);return n;
-    });
-
-    var sh=shell.getBoundingClientRect();
-    var nw=Math.min(46,Math.max(40,rr[0].width)),nh=nw,gap=18;
-    var gridW=nw*3+gap*2,gridH=nh*2+gap;
-    var cx=sr.width/2;
-    var desired=(sh.bottom-sr.top)+74;
-    var cy=Math.min(sr.height-92,Math.max(150,desired));
-    var left=cx-gridW/2,top=cy-gridH/2;
-    var targets=[
-      [left,top],[left+nw+gap,top],[left+(nw+gap)*2,top],
-      [left,top+nh+gap],[left+nw+gap,top+nh+gap],[left+(nw+gap)*2,top+nh+gap]
-    ];
-    var centers=targets.map(function(p){return[p[0]+nw/2,p[1]+nh/2]});
-    var edges=[[0,1],[1,2],[3,4],[4,5],[0,3],[1,4],[2,5],[0,4],[1,5]];
-    var lines=edges.map(function(e){
-      var line=document.createElementNS('http://www.w3.org/2000/svg','line');
-      line.setAttribute('x1',centers[e[0]][0]);line.setAttribute('y1',centers[e[0]][1]);
-      line.setAttribute('x2',centers[e[1]][0]);line.setAttribute('y2',centers[e[1]][1]);
-      line.setAttribute('pathLength','1');line.style.strokeDasharray='1';line.style.strokeDashoffset='1';
-      svg.appendChild(line);return line;
-    });
-
-    var core=document.createElement('div');core.className='gx-feral-core';
-    core.style.left=(cx-37)+'px';core.style.top=(cy-37)+'px';
-    core.innerHTML='<span class="gx-feral-core-halo"></span><span class="gx-feral-orbit o1"></span><span class="gx-feral-orbit o2"></span><span class="gx-feral-orbit o3"></span><span class="gx-feral-core-check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.6l4.2 4.1L19 7.2"/></svg></span><span class="gx-feral-core-copy"><strong>Código verificado</strong><small>Tu espacio está listo para crear el PIN.</small></span>';
-    overlay.appendChild(core);
-
-    stage.appendChild(overlay);step.classList.add('gx-feral-animating');
-
-    if(reduced()||typeof Element.prototype.animate!=='function'){
-      dim.style.opacity='1';nodes.forEach(function(n){n.style.opacity='0'});core.style.opacity='1';core.style.transform='scale(1)';
-      var rc=core.querySelector('.gx-feral-core-copy');if(rc){rc.style.opacity='1';rc.style.transform='translateX(-50%) translateY(0)'}
-      await sleep(420);clean(overlay);return;
+    /* El visual del OTP se crea una sola vez. */
+    if(!shell.querySelector('.gx-feral-code-visual')){
+        shell.classList.add('gx-feral-code-shell');
+        var visual=document.createElement('div');
+        visual.className='gx-feral-code-visual';
+        visual.setAttribute('aria-hidden','true');
+        for(var i=0;i<6;i++){
+            var slot=document.createElement('span');
+            slot.className='gx-feral-code-slot';
+            visual.appendChild(slot);
+        }
+        shell.appendChild(visual);
     }
 
-    dim.animate([{opacity:0},{opacity:1}],{duration:220,easing:'ease-out',fill:'forwards'});
+    var visual= shell.querySelector('.gx-feral-code-visual');
+    var slots=Array.prototype.slice.call(visual.querySelectorAll('.gx-feral-code-slot'));
 
-    var spread=nodes.map(function(n,i){
-      var startX=rr[i].left-sr.left,startY=rr[i].top-sr.top;
-      var tx=targets[i][0],ty=targets[i][1],dx=tx-startX,dy=ty-startY;
-      return n.animate([
-        {transform:'translate(0,0) scale(1)',filter:'blur(0)'},
-        {transform:'translate('+(dx*.56)+'px,'+(dy*.52-5)+'px) scale(.94) rotate('+((i-2.5)*1.7)+'deg)',offset:.58},
-        {transform:'translate('+dx+'px,'+dy+'px) scale('+(nw/rr[i].width)+') rotate(0deg)',filter:'blur(0)'}
-      ],{duration:430+i*18,delay:i*18,easing:'cubic-bezier(.18,.86,.22,1)',fill:'forwards'});
-    });
-    await Promise.all(spread.map(function(a){return a.finished.catch(function(){})}));
-
-    nodes.forEach(function(n){n.classList.add('live')});
-    lines.forEach(function(line,i){
-      line.animate([{strokeDashoffset:1,opacity:0},{strokeDashoffset:0,opacity:.78}],{duration:250,delay:i*24,easing:'cubic-bezier(.2,.8,.2,1)',fill:'forwards'});
-    });
-    await sleep(340);
-
-    lines.forEach(function(line,i){
-      line.animate([{opacity:.72,strokeDashoffset:0},{opacity:0,strokeDashoffset:-1}],{duration:300,delay:i*10,easing:'ease-in',fill:'forwards'});
-    });
-
-    var collapse=nodes.map(function(n,i){
-      var startX=rr[i].left-sr.left,startY=rr[i].top-sr.top;
-      var tx=targets[i][0],ty=targets[i][1];
-      var dx0=tx-startX,dy0=ty-startY;
-      var ncx=tx+nw/2,ncy=ty+nh/2,dx=cx-ncx,dy=cy-ncy;
-      return n.animate([
-        {transform:'translate('+dx0+'px,'+dy0+'px) scale('+(nw/rr[i].width)+')',opacity:1},
-        {transform:'translate('+(dx0+dx*.72)+'px,'+(dy0+dy*.72)+'px) scale(.72) rotate('+(i%2?18:-18)+'deg)',opacity:.9,offset:.58},
-        {transform:'translate('+(dx0+dx)+'px,'+(dy0+dy)+'px) scale(.24) rotate('+(i%2?38:-38)+'deg)',opacity:0,filter:'blur(2px)'}
-      ],{duration:430,delay:i*18,easing:'cubic-bezier(.2,.75,.18,1)',fill:'forwards'});
-    });
-
-    var coreAnim=core.animate([
-      {opacity:0,transform:'scale(.44) rotate(-10deg)'},
-      {opacity:1,transform:'scale(1.08) rotate(2deg)',offset:.68},
-      {opacity:1,transform:'scale(1) rotate(0deg)'}
-    ],{duration:470,delay:170,easing:'cubic-bezier(.16,1,.3,1)',fill:'forwards'});
-
-    await Promise.all(collapse.map(function(a){return a.finished.catch(function(){})}).concat([coreAnim.finished.catch(function(){})]));
-
-    var copy=core.querySelector('.gx-feral-core-copy');
-    if(copy){
-      await copy.animate([{opacity:0,transform:'translateX(-50%) translateY(5px)'},{opacity:1,transform:'translateX(-50%) translateY(0)'}],
-        {duration:220,easing:'ease-out',fill:'forwards'}).finished.catch(function(){});
+    function digits(){return String(code.value||'').replace(/\D/g,'').slice(0,6)}
+    function sync(){
+        var v=digits();
+        slots.forEach(function(slot,i){
+            var ch=v[i]||'';
+            slot.textContent=ch;
+            slot.classList.toggle('is-filled',!!ch);
+            slot.classList.toggle('is-current',document.activeElement===code&&i===Math.min(v.length,5)&&v.length<6);
+        });
     }
-    await sleep(310);clean(overlay);
-  };
+    window.gxSyncActivationCodeVisual=sync;
+    code.addEventListener('input',sync,{passive:true});
+    code.addEventListener('focus',sync,{passive:true});
+    code.addEventListener('blur',sync,{passive:true});
+    sync();
 
-  console.info('[GOXION] Beta 06 · Activation Constellation activa');
+    function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms)})}
+    function reduced(){return !!window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
+
+    window.gxRunActivationConstellation=async function(raw){
+        var v=String(raw||digits()).replace(/\D/g,'').slice(0,6);
+        if(v.length!==6)return;
+        code.blur();
+        sync();
+
+        var stepRect=step.getBoundingClientRect();
+        var slotRects=slots.map(function(s){return s.getBoundingClientRect()});
+        if(!stepRect.width||slotRects.some(function(r){return !r.width}))return;
+
+        var stage=document.createElement('div');
+        stage.className='gx-otp-fold-stage';
+        var group=document.createElement('div');
+        group.className='gx-otp-fold-group';
+        stage.appendChild(group);
+
+        var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        svg.setAttribute('class','gx-otp-fold-lines');
+        svg.setAttribute('viewBox','0 0 '+stepRect.width+' '+stepRect.height);
+        group.appendChild(svg);
+
+        var nodeSize=54;
+        var nodes=slotRects.map(function(r,i){
+            var n=document.createElement('div');
+            n.className='gx-otp-fold-node';
+            n.textContent=v[i];
+            var centerX=r.left-stepRect.left+r.width/2;
+            var centerY=r.top-stepRect.top+r.height/2;
+            n.style.left=(centerX-nodeSize/2)+'px';
+            n.style.top=(centerY-nodeSize/2)+'px';
+            n.style.transform='scale('+(r.width/nodeSize)+')';
+            group.appendChild(n);
+            return n;
+        });
+
+        /* 3 × 2, grande y centrado. La red es protagonista. */
+        var gapX=22,gapY=18;
+        var gridW=nodeSize*3+gapX*2;
+        var gridH=nodeSize*2+gapY;
+        var cx=stepRect.width/2;
+        var cy=Math.max(126,Math.min(stepRect.height-118,stepRect.height*.48));
+        var left=cx-gridW/2;
+        var top=cy-gridH/2;
+        var targets=[
+            [left,top],[left+nodeSize+gapX,top],[left+(nodeSize+gapX)*2,top],
+            [left,top+nodeSize+gapY],[left+nodeSize+gapX,top+nodeSize+gapY],[left+(nodeSize+gapX)*2,top+nodeSize+gapY]
+        ];
+        var centers=targets.map(function(p){return[p[0]+nodeSize/2,p[1]+nodeSize/2]});
+
+        /* Sólo líneas estructurales. Sin diagonales decorativas. */
+        var edges=[[0,1],[1,2],[3,4],[4,5],[0,3],[1,4],[2,5]];
+        var lines=edges.map(function(e){
+            var line=document.createElementNS('http://www.w3.org/2000/svg','line');
+            line.setAttribute('x1',centers[e[0]][0]);
+            line.setAttribute('y1',centers[e[0]][1]);
+            line.setAttribute('x2',centers[e[1]][0]);
+            line.setAttribute('y2',centers[e[1]][1]);
+            line.setAttribute('pathLength','1');
+            line.style.strokeDasharray='1';
+            line.style.strokeDashoffset='1';
+            line.style.opacity='0';
+            svg.appendChild(line);
+            return line;
+        });
+
+        var final=document.createElement('div');
+        final.className='gx-otp-final';
+        final.style.left=(cx-33)+'px';
+        final.style.top=(cy-33)+'px';
+        final.innerHTML='<span class="gx-otp-final-frame"></span><span class="gx-otp-final-check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.1 4.1L19 7.3"/></svg></span><i class="gx-otp-dot d1"></i><i class="gx-otp-dot d2"></i><i class="gx-otp-dot d3"></i><i class="gx-otp-dot d4"></i><span class="gx-otp-final-copy"><strong>Código verificado</strong><small>Preparando tu PIN</small></span>';
+        stage.appendChild(final);
+
+        step.appendChild(stage);
+        step.classList.add('gx-otp-fold-running');
+
+        if(reduced()||typeof Element.prototype.animate!=='function'){
+            nodes.forEach(function(n){n.style.opacity='0'});
+            final.style.opacity='1';
+            final.style.transform='scale(1) rotate(0)';
+            var fc=final.querySelector('.gx-otp-final-copy');
+            if(fc){fc.style.opacity='1';fc.style.transform='translateX(-50%) translateY(0)'}
+            await sleep(420);
+            stage.remove();
+            step.classList.remove('gx-otp-fold-running');
+            return;
+        }
+
+        /* 1. Fila → matriz. */
+        var settle=nodes.map(function(n,i){
+            var r=slotRects[i];
+            var startX=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var startY=r.top-stepRect.top+r.height/2-nodeSize/2;
+            var dx=targets[i][0]-startX;
+            var dy=targets[i][1]-startY;
+            return n.animate([
+                {transform:'scale('+(r.width/nodeSize)+') translate(0,0)'},
+                {transform:'translate('+(dx*.72)+'px,'+(dy*.72)+'px) scale(.96)',offset:.72},
+                {transform:'translate('+dx+'px,'+dy+'px) scale(1)'}
+            ],{
+                duration:430,
+                delay:i*22,
+                easing:'cubic-bezier(.18,.82,.22,1)',
+                fill:'forwards'
+            });
+        });
+        await Promise.all(settle.map(function(a){return a.finished.catch(function(){})}));
+
+        /* 2. La estructura se conecta. */
+        lines.forEach(function(line,i){
+            line.animate([
+                {strokeDashoffset:1,opacity:0},
+                {strokeDashoffset:0,opacity:.72}
+            ],{
+                duration:230,
+                delay:i*28,
+                easing:'cubic-bezier(.2,.8,.2,1)',
+                fill:'forwards'
+            });
+        });
+        await sleep(300);
+
+        /* 3. Estado válido: el sistema cambia de morado a cian. */
+        nodes.forEach(function(n,i){
+            n.classList.add('is-verified');
+            n.animate([
+                {transform:getComputedStyle(n).transform,filter:'brightness(1)'},
+                {filter:'brightness(1.24)',offset:.48},
+                {filter:'brightness(1)'}
+            ],{
+                duration:250,
+                delay:i*18,
+                easing:'ease-out'
+            });
+        });
+        lines.forEach(function(line){
+            line.animate([
+                {stroke:'rgba(124,77,255,.42)'},
+                {stroke:'rgba(0,242,254,.55)'}
+            ],{duration:240,easing:'ease-out',fill:'forwards'});
+        });
+        await sleep(280);
+
+        /* 4. El conjunto se comporta como UNA pieza antes de plegarse. */
+        await group.animate([
+            {transform:'perspective(700px) rotateX(0deg) rotateZ(0deg) scale(1)'},
+            {transform:'perspective(700px) rotateX(7deg) rotateZ(5deg) scale(.97)'}
+        ],{
+            duration:230,
+            easing:'cubic-bezier(.2,.75,.2,1)',
+            fill:'forwards'
+        }).finished.catch(function(){});
+
+        /* 5. Plegado: todos los nodos convergen al mismo centro. */
+        lines.forEach(function(line,i){
+            line.animate([{opacity:.72},{opacity:0}],{
+                duration:220,delay:i*8,easing:'ease-in',fill:'forwards'
+            });
+        });
+
+        var fold=nodes.map(function(n,i){
+            var r=slotRects[i];
+            var startX=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var startY=r.top-stepRect.top+r.height/2-nodeSize/2;
+            var dx0=targets[i][0]-startX;
+            var dy0=targets[i][1]-startY;
+            var tx=cx-nodeSize/2;
+            var ty=cy-nodeSize/2;
+            var dx=tx-startX;
+            var dy=ty-startY;
+            var turn=(i%2===0?-1:1)*(26+i*2);
+            return n.animate([
+                {transform:'translate('+dx0+'px,'+dy0+'px) scale(1)',opacity:1},
+                {transform:'translate('+(dx0+(dx-dx0)*.68)+'px,'+(dy0+(dy-dy0)*.68)+'px) scale(.72) rotate('+(turn*.55)+'deg)',opacity:.88,offset:.58},
+                {transform:'translate('+dx+'px,'+dy+'px) scale(.20) rotate('+turn+'deg)',opacity:0}
+            ],{
+                duration:360,
+                delay:i*16,
+                easing:'cubic-bezier(.25,.72,.18,1)',
+                fill:'forwards'
+            });
+        });
+
+        var finalPop=final.animate([
+            {opacity:0,transform:'scale(.58) rotate(-7deg)'},
+            {opacity:1,transform:'scale(1.05) rotate(1deg)',offset:.72},
+            {opacity:1,transform:'scale(1) rotate(0deg)'}
+        ],{
+            duration:360,
+            delay:145,
+            easing:'cubic-bezier(.16,1,.3,1)',
+            fill:'forwards'
+        });
+
+        await Promise.all(fold.map(function(a){return a.finished.catch(function(){})}).concat([finalPop.finished.catch(function(){})]));
+
+        var copy=final.querySelector('.gx-otp-final-copy');
+        if(copy){
+            await copy.animate([
+                {opacity:0,transform:'translateX(-50%) translateY(5px)'},
+                {opacity:1,transform:'translateX(-50%) translateY(0)'}
+            ],{duration:190,easing:'ease-out',fill:'forwards'}).finished.catch(function(){});
+        }
+
+        await sleep(340);
+
+        await stage.animate([{opacity:1},{opacity:0}],{
+            duration:150,easing:'ease-in',fill:'forwards'
+        }).finished.catch(function(){});
+
+        stage.remove();
+        step.classList.remove('gx-otp-fold-running');
+        sync();
+    };
+
+    console.info('[GOXION] Beta 06 · OTP Fold refinado activo');
 })();
 </script>
 
