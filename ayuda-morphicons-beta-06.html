@@ -15896,6 +15896,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         ['gx-activation-id','gx-activation-code','gx-activation-pin','gx-activation-pin-confirm'].forEach(id => {
             const el = $(id); if (el) el.value = '';
         });
+        if (typeof window.gxCleanupActivationFold === 'function') window.gxCleanupActivationFold();
         if (typeof window.gxSyncActivationCodeVisual === 'function') window.gxSyncActivationCodeVisual();
         gxActivationSetStatus('gx-activation-code-status');
         gxActivationSetStatus('gx-activation-pin-status');
@@ -15984,7 +15985,11 @@ body:has(#view-catalogo.active) #goxion-main-nav{
             } else {
                 gxActivationSetStatus('gx-activation-code-status','Código confirmado.','is-ok');
             }
+            /* El escenario final permanece visible DURANTE el relevo.
+               Así no reaparece un frame del formulario anterior antes
+               de que entre el paso de PIN. */
             await gxSwitchStage(codeStep, pinStep, 1);
+            if (typeof window.gxCleanupActivationFold === 'function') window.gxCleanupActivationFold();
             setTimeout(() => $('gx-activation-pin')?.focus({preventScroll:true}), 60);
         } catch (e) {
             gxActivationSetStatus('gx-activation-code-status', e?.message || 'No pudimos validar tu código.', 'is-error');
@@ -17324,253 +17329,140 @@ if(document.readyState==="loading"){
 <!-- GOXION · BETA 06 · ACTIVATION CONSTELLATION -->
 <style id="goxion-activation-constellation-beta-06">
 /* =========================================================
-   GOXION · BETA 06 · OTP FOLD v2
-   Suavizado para iPhone: una sola continuidad de transformaciones,
-   sin filtros animados en los nodos y con iluminación ambiental.
-   Fila → matriz → conexión → validación → inclinación → plegado.
+   GOXION · BETA 06 · OTP FOLD v3
+   La iluminación ya no vive detrás del objeto. Como en la referencia,
+   una carga de neón RECORRE las conexiones y el perímetro de los nodos,
+   y deja la estructura encendida al validar.
    ========================================================= */
 
 .gx-feral-code-shell{
-    position:relative!important;
-    min-height:50px!important;
-    padding:0!important;
-    border:0!important;
-    background:transparent!important;
-    box-shadow:none!important;
-    overflow:visible!important;
+    position:relative!important;min-height:50px!important;padding:0!important;
+    border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important
 }
 .gx-feral-code-shell .gx-activation-code-field{
-    position:absolute!important;
-    inset:0!important;
-    z-index:4!important;
-    width:100%!important;
-    height:100%!important;
-    opacity:.01!important;
-    color:transparent!important;
-    caret-color:transparent!important;
-    letter-spacing:0!important;
+    position:absolute!important;inset:0!important;z-index:4!important;width:100%!important;height:100%!important;
+    opacity:.01!important;color:transparent!important;caret-color:transparent!important;letter-spacing:0!important
 }
 .gx-feral-code-visual{
-    position:relative;
-    z-index:2;
-    width:100%;
-    max-width:318px;
-    min-height:50px;
-    margin:0 auto;
-    display:grid;
-    grid-template-columns:repeat(6,minmax(0,1fr));
-    gap:6px;
-    pointer-events:none;
+    position:relative;z-index:2;width:100%;max-width:318px;min-height:50px;margin:0 auto;
+    display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;pointer-events:none
 }
 .gx-feral-code-slot{
-    position:relative;
-    height:47px;
-    display:grid;
-    place-items:center;
-    border-radius:12px;
-    border:1px solid rgba(124,77,255,.20);
-    background:rgba(7,9,14,.82);
-    color:#eaf3ff;
-    font:760 17px/1 'Poppins',sans-serif;
-    font-variant-numeric:tabular-nums;
+    position:relative;height:47px;display:grid;place-items:center;border-radius:12px;
+    border:1px solid rgba(124,77,255,.20);background:rgba(7,9,14,.82);color:#eaf3ff;
+    font:760 17px/1 'Poppins',sans-serif;font-variant-numeric:tabular-nums;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.022);
-    transition:border-color .18s ease,background .18s ease,transform .18s cubic-bezier(.16,1,.3,1);
+    transition:border-color .18s ease,background .18s ease,transform .18s cubic-bezier(.16,1,.3,1)
 }
 .gx-feral-code-slot.is-filled{border-color:rgba(82,113,255,.28)}
-.gx-feral-code-slot.is-current{
-    border-color:rgba(0,242,254,.42);
-    transform:translateY(-1px);
-}
+.gx-feral-code-slot.is-current{border-color:rgba(0,242,254,.42);transform:translateY(-1px)}
 .gx-feral-code-slot.is-current:empty::after{
-    content:"";
-    width:1.5px;
-    height:14px;
-    border-radius:999px;
-    background:var(--neon-blue);
-    animation:gxOtpCaret .9s steps(1,end) infinite;
+    content:"";width:1.5px;height:14px;border-radius:999px;background:var(--neon-blue);
+    animation:gxOtpCaret .9s steps(1,end) infinite
 }
 @keyframes gxOtpCaret{50%{opacity:.15}}
 
 #gx-activation-step-code{position:relative}
 #gx-activation-step-code.gx-otp-fold-running{min-height:292px}
 #gx-activation-step-code.gx-otp-fold-running > :not(.gx-otp-fold-stage){
-    opacity:0!important;
-    transform:scale(.988)!important;
-    pointer-events:none!important;
-    transition:opacity .20s ease,transform .24s cubic-bezier(.16,1,.3,1)!important;
+    opacity:0!important;transform:scale(.988)!important;pointer-events:none!important;
+    transition:opacity .18s ease,transform .22s cubic-bezier(.16,1,.3,1)!important
 }
-
 .gx-otp-fold-stage{
-    position:absolute;
-    inset:0;
-    z-index:40;
-    overflow:visible;
-    pointer-events:none;
-    transform:translateZ(0);
+    position:absolute;inset:0;z-index:40;overflow:visible;pointer-events:none;
+    transform:translateZ(0);backface-visibility:hidden
 }
 .gx-otp-fold-stage::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    border-radius:18px;
-    background:radial-gradient(circle at 50% 50%,rgba(31,42,88,.08),transparent 50%);
-    opacity:0;
-    animation:gxOtpStageIn .34s ease forwards;
+    content:"";position:absolute;inset:0;border-radius:18px;
+    background:radial-gradient(circle at 50% 50%,rgba(24,30,48,.055),transparent 52%);
+    opacity:0;animation:gxOtpStageIn .24s ease forwards
 }
 @keyframes gxOtpStageIn{to{opacity:1}}
 
-/* Una única fuente de luz para todo el objeto. Se anima sólo con
-   opacity + transform; evita seis glows independientes repintándose. */
-.gx-otp-neon-field{
-    position:absolute;
-    width:270px;
-    height:190px;
-    border-radius:50%;
-    opacity:0;
-    transform:translate3d(-50%,-50%,0) scale(.78);
-    background:
-        radial-gradient(circle at 32% 50%,rgba(124,77,255,.24),transparent 43%),
-        radial-gradient(circle at 68% 50%,rgba(0,242,254,.23),transparent 45%),
-        radial-gradient(circle at 50% 50%,rgba(68,101,255,.10),transparent 62%);
-    pointer-events:none;
-    will-change:transform,opacity;
-    backface-visibility:hidden;
-}
-
 .gx-otp-fold-group{
-    position:absolute;
-    inset:0;
-    transform-origin:50% 50%;
-    transform:translateZ(0);
-    will-change:transform;
-    backface-visibility:hidden;
+    position:absolute;inset:0;transform-origin:50% 50%;transform:translateZ(0);
+    will-change:transform;backface-visibility:hidden
 }
-.gx-otp-fold-lines{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    overflow:visible;
+.gx-otp-fold-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.gx-otp-line-base{
+    fill:none;stroke:rgba(124,77,255,.38);stroke-width:1.05;stroke-linecap:round;
+    vector-effect:non-scaling-stroke
 }
-.gx-otp-fold-lines line{
-    fill:none;
-    stroke:rgba(124,77,255,.44);
-    stroke-width:1.15;
-    stroke-linecap:round;
-    vector-effect:non-scaling-stroke;
+.gx-otp-line-energy{
+    fill:none;stroke:#45ffc0;stroke-width:1.65;stroke-linecap:round;
+    vector-effect:non-scaling-stroke;opacity:0;
+    filter:drop-shadow(0 0 2px rgba(69,255,192,.85)) drop-shadow(0 0 5px rgba(0,242,254,.34))
 }
 
 .gx-otp-fold-node{
-    position:absolute;
-    width:54px;
-    height:54px;
-    display:grid;
-    place-items:center;
-    border-radius:12px;
-    border:1px solid rgba(124,77,255,.42);
-    background:#090c13;
-    color:#eef5ff;
-    font:760 17px/1 'Poppins',sans-serif;
-    font-variant-numeric:tabular-nums;
+    position:absolute;width:54px;height:54px;display:grid;place-items:center;border-radius:12px;
+    border:1px solid rgba(124,77,255,.38);background:#090c13;color:#eef5ff;
+    font:760 17px/1 'Poppins',sans-serif;font-variant-numeric:tabular-nums;
     box-shadow:0 8px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025);
-    transform-origin:center;
-    transform:translate3d(0,0,0);
-    will-change:transform,opacity;
-    backface-visibility:hidden;
-    -webkit-font-smoothing:antialiased;
-    transition:border-color .48s ease,color .48s ease;
+    transform-origin:center;transform:translate3d(0,0,0);
+    will-change:transform,opacity;backface-visibility:hidden;-webkit-font-smoothing:antialiased;
+    transition:border-color .26s ease,color .26s ease
+}
+.gx-otp-node-digit{position:relative;z-index:2}
+.gx-otp-node-trace{
+    position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);
+    overflow:visible;pointer-events:none
+}
+.gx-otp-node-trace rect{fill:none;rx:13;ry:13;vector-effect:non-scaling-stroke}
+.gx-otp-node-lit{
+    stroke:#45ffc0;stroke-width:1.35;opacity:0;
+    filter:drop-shadow(0 0 2px rgba(69,255,192,.68)) drop-shadow(0 0 5px rgba(0,242,254,.22))
+}
+.gx-otp-node-energy{
+    stroke:#b9ffe9;stroke-width:2;opacity:0;stroke-linecap:round;
+    stroke-dasharray:.18 .82;stroke-dashoffset:1;
+    filter:drop-shadow(0 0 2px rgba(255,255,255,.78)) drop-shadow(0 0 6px rgba(69,255,192,.82))
 }
 .gx-otp-fold-node.is-verified{
-    border-color:rgba(0,242,254,.64);
-    color:#e4fdff;
+    border-color:rgba(69,255,192,.30);
+    color:#eafff8
 }
 
 .gx-otp-final{
-    position:absolute;
-    width:66px;
-    height:66px;
-    display:grid;
-    place-items:center;
-    opacity:0;
+    position:absolute;width:66px;height:66px;display:grid;place-items:center;opacity:0;
     transform:translate3d(0,0,0) scale(.58) rotateZ(-7deg);
-    will-change:transform,opacity;
-    backface-visibility:hidden;
+    will-change:transform,opacity;backface-visibility:hidden
 }
 .gx-otp-final-frame{
-    position:absolute;
-    inset:3px;
-    border-radius:14px;
-    border:1px solid rgba(0,242,254,.62);
+    position:absolute;inset:3px;border-radius:14px;border:1px solid rgba(69,255,192,.70);
     background:rgba(7,10,15,.97);
-    box-shadow:
-        0 0 22px rgba(0,242,254,.11),
-        0 10px 28px rgba(0,0,0,.22),
-        inset 0 1px 0 rgba(255,255,255,.025);
+    box-shadow:0 0 15px rgba(69,255,192,.13),0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025)
 }
 .gx-otp-final-frame::before{
-    content:"";
-    position:absolute;
-    inset:7px;
-    border-radius:10px;
-    border:1px solid rgba(124,77,255,.46);
+    content:"";position:absolute;inset:7px;border-radius:10px;border:1px solid rgba(0,242,254,.48)
 }
 .gx-otp-final-check{
-    position:relative;
-    z-index:3;
-    width:28px;
-    height:28px;
-    display:grid;
-    place-items:center;
-    border-radius:9px;
-    background:rgba(0,242,254,.92);
-    color:#030305;
-    box-shadow:0 0 14px rgba(0,242,254,.14);
+    position:relative;z-index:3;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;
+    background:#45ffc0;color:#030305;box-shadow:0 0 12px rgba(69,255,192,.16)
 }
 .gx-otp-final-check svg{
-    width:17px;height:17px;
-    fill:none;stroke:currentColor;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round;
+    width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round
 }
 .gx-otp-dot{
-    position:absolute;
-    width:3px;height:3px;border-radius:50%;
-    background:rgba(0,242,254,.78);
-    box-shadow:0 0 7px rgba(0,242,254,.32);
+    position:absolute;width:3px;height:3px;border-radius:50%;background:#45ffc0;
+    box-shadow:0 0 6px rgba(69,255,192,.52)
 }
 .gx-otp-dot.d1{left:-8px;top:31px}.gx-otp-dot.d2{right:-8px;top:31px}
 .gx-otp-dot.d3{top:-8px;left:31px}.gx-otp-dot.d4{bottom:-8px;left:31px}
-
 .gx-otp-final-copy{
-    position:absolute;
-    top:82px;
-    left:50%;
-    width:180px;
-    transform:translate3d(-50%,5px,0);
-    text-align:center;
-    opacity:0;
+    position:absolute;top:82px;left:50%;width:180px;transform:translate3d(-50%,5px,0);
+    text-align:center;opacity:0
 }
 .gx-otp-final-copy strong{
-    display:block;
-    color:#dffcff;
-    font-size:10px;
-    font-weight:820;
-    letter-spacing:.35px;
-    text-transform:uppercase;
+    display:block;color:#dfffee;font-size:10px;font-weight:820;letter-spacing:.35px;text-transform:uppercase
 }
-.gx-otp-final-copy small{
-    display:block;
-    margin-top:3px;
-    color:#8292a8;
-    font-size:8.7px;
-    font-weight:600;
-}
+.gx-otp-final-copy small{display:block;margin-top:3px;color:#8292a8;font-size:8.7px;font-weight:600}
 
 @media(max-width:390px){
-    .gx-feral-code-visual{gap:5px}
-    .gx-feral-code-slot{height:45px;border-radius:11px;font-size:16px}
+    .gx-feral-code-visual{gap:5px}.gx-feral-code-slot{height:45px;border-radius:11px;font-size:16px}
 }
 @media(prefers-reduced-motion:reduce){
-    .gx-feral-code-slot{transition:none!important}
-    .gx-feral-code-slot.is-current:empty::after{animation:none!important}
+    .gx-feral-code-slot{transition:none!important}.gx-feral-code-slot.is-current:empty::after{animation:none!important}
 }
 </style>
 
@@ -17597,6 +17489,7 @@ if(document.readyState==="loading"){
 
     var visual=shell.querySelector('.gx-feral-code-visual');
     var slots=Array.prototype.slice.call(visual.querySelectorAll('.gx-feral-code-slot'));
+    var activeStage=null;
 
     function digits(){return String(code.value||'').replace(/\D/g,'').slice(0,6)}
     function sync(){
@@ -17609,6 +17502,12 @@ if(document.readyState==="loading"){
         });
     }
     window.gxSyncActivationCodeVisual=sync;
+    window.gxCleanupActivationFold=function(){
+        if(activeStage){activeStage.remove();activeStage=null}
+        step.classList.remove('gx-otp-fold-running');
+        sync();
+    };
+
     code.addEventListener('input',sync,{passive:true});
     code.addEventListener('focus',sync,{passive:true});
     code.addEventListener('blur',sync,{passive:true});
@@ -17616,23 +17515,20 @@ if(document.readyState==="loading"){
 
     function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms)})}
     function reduced(){return !!window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
-
-    /* Persiste el último frame y cancela la Animation. Así la siguiente
-       fase parte EXACTAMENTE del estado anterior y Safari no compone
-       dos animaciones fill:forwards sobre el mismo transform. */
     function play(el,frames,options){
-        var animation=el.animate(frames,options);
-        return animation.finished.catch(function(){}).then(function(){
+        var a=el.animate(frames,options);
+        return a.finished.catch(function(){}).then(function(){
             var last=frames[frames.length-1]||{};
-            Object.keys(last).forEach(function(key){
-                if(key==='offset'||key==='easing'||key==='composite')return;
-                try{el.style[key]=last[key]}catch(_){}
+            Object.keys(last).forEach(function(k){
+                if(k==='offset'||k==='easing'||k==='composite')return;
+                try{el.style[k]=last[k]}catch(_){}
             });
-            try{animation.cancel()}catch(_){}
+            try{a.cancel()}catch(_){}
         });
     }
 
     window.gxRunActivationConstellation=async function(raw){
+        window.gxCleanupActivationFold();
         var v=String(raw||digits()).replace(/\D/g,'').slice(0,6);
         if(v.length!==6)return;
         code.blur();sync();
@@ -17643,10 +17539,7 @@ if(document.readyState==="loading"){
 
         var stage=document.createElement('div');
         stage.className='gx-otp-fold-stage';
-
-        var neon=document.createElement('div');
-        neon.className='gx-otp-neon-field';
-        stage.appendChild(neon);
+        activeStage=stage;
 
         var group=document.createElement('div');
         group.className='gx-otp-fold-group';
@@ -17663,7 +17556,7 @@ if(document.readyState==="loading"){
         var nodes=slotRects.map(function(r,i){
             var n=document.createElement('div');
             n.className='gx-otp-fold-node';
-            n.textContent=v[i];
+            n.innerHTML='<span class="gx-otp-node-digit">'+v[i]+'</span><svg class="gx-otp-node-trace" viewBox="0 0 58 58" aria-hidden="true"><rect class="gx-otp-node-lit" x="2" y="2" width="54" height="54" pathLength="1"></rect><rect class="gx-otp-node-energy" x="2" y="2" width="54" height="54" pathLength="1"></rect></svg>';
             var centerX=r.left-stepRect.left+r.width/2;
             var centerY=r.top-stepRect.top+r.height/2;
             n.style.left=(centerX-nodeSize/2)+'px';
@@ -17690,29 +17583,28 @@ if(document.readyState==="loading"){
 
         nodes.forEach(function(n,i){
             var r=slotRects[i];
-            var startX=r.left-stepRect.left+r.width/2-nodeSize/2;
-            var startY=r.top-stepRect.top+r.height/2-nodeSize/2;
-            var dx=targets[i][0]-startX;
-            var dy=targets[i][1]-startY;
-            matrixTransforms[i]='translate3d('+dx+'px,'+dy+'px,0) scale(1)';
+            var sx=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var sy=r.top-stepRect.top+r.height/2-nodeSize/2;
+            matrixTransforms[i]='translate3d('+(targets[i][0]-sx)+'px,'+(targets[i][1]-sy)+'px,0) scale(1)';
         });
 
-        neon.style.left=cx+'px';
-        neon.style.top=cy+'px';
+        /* Línea tenue + línea de energía encima. El segundo trazo es el
+           que "viaja" y enciende la estructura, como en la referencia. */
+        var edges=[[0,1],[1,2],[2,5],[5,4],[4,3],[3,0],[1,4]];
+        var connections=edges.map(function(e){
+            var base=document.createElementNS('http://www.w3.org/2000/svg','line');
+            base.setAttribute('class','gx-otp-line-base');
+            base.setAttribute('x1',centers[e[0]][0]);base.setAttribute('y1',centers[e[0]][1]);
+            base.setAttribute('x2',centers[e[1]][0]);base.setAttribute('y2',centers[e[1]][1]);
+            base.setAttribute('pathLength','1');
+            base.style.strokeDasharray='1';base.style.strokeDashoffset='1';base.style.opacity='0';
+            svg.appendChild(base);
 
-        var edges=[[0,1],[1,2],[3,4],[4,5],[0,3],[1,4],[2,5]];
-        var lines=edges.map(function(e){
-            var line=document.createElementNS('http://www.w3.org/2000/svg','line');
-            line.setAttribute('x1',centers[e[0]][0]);
-            line.setAttribute('y1',centers[e[0]][1]);
-            line.setAttribute('x2',centers[e[1]][0]);
-            line.setAttribute('y2',centers[e[1]][1]);
-            line.setAttribute('pathLength','1');
-            line.style.strokeDasharray='1';
-            line.style.strokeDashoffset='1';
-            line.style.opacity='0';
-            svg.appendChild(line);
-            return line;
+            var energy=base.cloneNode(false);
+            energy.setAttribute('class','gx-otp-line-energy');
+            energy.style.strokeDasharray='.20 .80';energy.style.strokeDashoffset='1';energy.style.opacity='0';
+            svg.appendChild(energy);
+            return {base:base,energy:energy};
         });
 
         var final=document.createElement('div');
@@ -17727,150 +17619,141 @@ if(document.readyState==="loading"){
 
         if(reduced()||typeof Element.prototype.animate!=='function'){
             nodes.forEach(function(n){n.style.opacity='0'});
-            final.style.opacity='1';
-            final.style.transform='translate3d(0,0,0) scale(1) rotateZ(0deg)';
-            var fc=final.querySelector('.gx-otp-final-copy');
-            if(fc){fc.style.opacity='1';fc.style.transform='translate3d(-50%,0,0)'}
-            await sleep(520);
-            stage.remove();step.classList.remove('gx-otp-fold-running');sync();return;
+            final.style.opacity='1';final.style.transform='translate3d(0,0,0) scale(1) rotateZ(0deg)';
+            var rc=final.querySelector('.gx-otp-final-copy');
+            if(rc){rc.style.opacity='1';rc.style.transform='translate3d(-50%,0,0)'}
+            await sleep(420);
+            return;
         }
 
-        /* 1 · Fila → matriz. Más lento, sin cambiar el orden de transform. */
+        /* 1 · Fila → matriz. */
         await Promise.all(nodes.map(function(n,i){
             var r=slotRects[i];
-            var midScale=Math.max(.90,r.width/nodeSize+.08);
-            var r0=slotRects[i];
-            var sx=r0.left-stepRect.left+r0.width/2-nodeSize/2;
-            var sy=r0.top-stepRect.top+r0.height/2-nodeSize/2;
-            var dx=targets[i][0]-sx;
-            var dy=targets[i][1]-sy;
-            var frames=[
-                {transform:startTransforms[i]},
-                {transform:'translate3d('+(dx*.58)+'px,'+(dy*.56-4)+'px,0) scale('+midScale+')',offset:.58},
-                {transform:matrixTransforms[i]}
-            ];
-            return sleep(i*26).then(function(){
-                return play(n,frames,{duration:610,easing:'cubic-bezier(.18,.78,.18,1)',fill:'both'});
+            var sx=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var sy=r.top-stepRect.top+r.height/2-nodeSize/2;
+            var dx=targets[i][0]-sx,dy=targets[i][1]-sy;
+            return sleep(i*16).then(function(){
+                return play(n,[
+                    {transform:startTransforms[i]},
+                    {transform:'translate3d('+(dx*.60)+'px,'+(dy*.58-3)+'px,0) scale(.94)',offset:.60},
+                    {transform:matrixTransforms[i]}
+                ],{duration:470,easing:'cubic-bezier(.18,.78,.18,1)',fill:'both'});
             });
         }));
 
-        /* Una pequeña respiración hace legible la nueva geometría. */
-        await sleep(150);
+        await sleep(70);
 
-        /* 2 · Se dibuja la estructura sin saltos. */
-        await Promise.all(lines.map(function(line,i){
-            return sleep(i*34).then(function(){
-                return play(line,[
+        /* 2 · La geometría base se dibuja primero, todavía morada. */
+        await Promise.all(connections.map(function(cn,i){
+            return sleep(i*20).then(function(){
+                return play(cn.base,[
                     {strokeDashoffset:'1',opacity:'0'},
                     {strokeDashoffset:'0',opacity:'.72'}
-                ],{duration:350,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+                ],{duration:250,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
             });
         }));
 
-        await sleep(180);
+        /* 3 · CARGA DE NEÓN. Recorre las líneas y después el borde de
+           cada nodo. Cuando pasa, deja detrás la estructura encendida. */
+        var traceOrder=[0,1,2,5,4,3];
+        var energyJobs=connections.map(function(cn,i){
+            return sleep(i*48).then(async function(){
+                await play(cn.energy,[
+                    {strokeDashoffset:'1',opacity:'0'},
+                    {strokeDashoffset:'.72',opacity:'1',offset:.18},
+                    {strokeDashoffset:'-.20',opacity:'1',offset:.82},
+                    {strokeDashoffset:'-.36',opacity:'0'}
+                ],{duration:360,easing:'linear',fill:'both'});
+                cn.base.style.stroke='#45ffc0';
+                cn.base.style.opacity='.82';
+            });
+        });
 
-        /* 3 · Validación + iluminación ambiental. Nada de filter/brightness
-           sobre cada nodo: el color cambia y una sola luz nace detrás. */
-        nodes.forEach(function(n){n.classList.add('is-verified')});
-        var glowIn=play(neon,[
-            {opacity:'0',transform:'translate3d(-50%,-50%,0) scale(.78)'},
-            {opacity:'.82',transform:'translate3d(-50%,-50%,0) scale(1.04)'}
-        ],{duration:520,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
-
-        var recolor=Promise.all(lines.map(function(line){
-            return play(line,[
-                {stroke:'rgba(124,77,255,.44)'},
-                {stroke:'rgba(0,242,254,.58)'}
-            ],{duration:500,easing:'ease-out',fill:'both'});
-        }));
-        await Promise.all([glowIn,recolor]);
-
-        /* Dejamos respirar el estado validado antes de plegarlo. */
-        await sleep(360);
-
-        /* 4 · El conjunto inclina y regresa en una sola curva continua.
-           Termina otra vez en neutral, así el fold no hereda perspectiva. */
-        await play(group,[
-            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'},
-            {transform:'translateZ(0) perspective(760px) rotateX(5.5deg) rotateZ(3.8deg) scale(.985)',offset:.48},
-            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'}
-        ],{duration:560,easing:'cubic-bezier(.2,.72,.2,1)',fill:'both'});
-
-        await sleep(90);
-
-        /* 5 · Plegado. Cada nodo parte del matrixTransform ya persistido. */
-        var lineFade=Promise.all(lines.map(function(line,i){
-            return sleep(i*10).then(function(){
-                return play(line,[{opacity:'.72'},{opacity:'0'}],{
-                    duration:300,easing:'ease-in',fill:'both'
+        var nodeJobs=traceOrder.map(function(nodeIndex,order){
+            var n=nodes[nodeIndex];
+            var lit=n.querySelector('.gx-otp-node-lit');
+            var energy=n.querySelector('.gx-otp-node-energy');
+            return sleep(80+order*58).then(async function(){
+                n.classList.add('is-verified');
+                await play(energy,[
+                    {strokeDashoffset:'1',opacity:'0'},
+                    {strokeDashoffset:'.72',opacity:'1',offset:.18},
+                    {strokeDashoffset:'-.20',opacity:'1',offset:.82},
+                    {strokeDashoffset:'-.36',opacity:'0'}
+                ],{duration:390,easing:'linear',fill:'both'});
+                await play(lit,[{opacity:'0'},{opacity:'.92'}],{
+                    duration:120,easing:'ease-out',fill:'both'
                 });
             });
-        }));
+        });
 
-        var glowFold=play(neon,[
-            {opacity:'.82',transform:'translate3d(-50%,-50%,0) scale(1.04)'},
-            {opacity:'.58',transform:'translate3d(-50%,-50%,0) scale(.58)'}
-        ],{duration:650,easing:'cubic-bezier(.2,.75,.18,1)',fill:'both'});
+        await Promise.all(energyJobs.concat(nodeJobs));
+        await sleep(150);
+
+        /* 4 · Un beat físico intermedio: visible, pero sin la pausa larga. */
+        await play(group,[
+            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'},
+            {transform:'translateZ(0) perspective(760px) rotateX(5deg) rotateZ(3.2deg) scale(.988)',offset:.50},
+            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'}
+        ],{duration:330,easing:'cubic-bezier(.2,.72,.2,1)',fill:'both'});
+
+        await sleep(35);
+
+        /* 5 · Plegado continuo. */
+        var lineFade=Promise.all(connections.map(function(cn,i){
+            return sleep(i*7).then(function(){
+                return Promise.all([
+                    play(cn.base,[{opacity:'.82'},{opacity:'0'}],{duration:230,easing:'ease-in',fill:'both'}),
+                    play(cn.energy,[{opacity:'0'},{opacity:'0'}],{duration:1,fill:'both'})
+                ]);
+            });
+        }));
 
         var folds=Promise.all(nodes.map(function(n,i){
             var r=slotRects[i];
-            var startX=r.left-stepRect.left+r.width/2-nodeSize/2;
-            var startY=r.top-stepRect.top+r.height/2-nodeSize/2;
-            var tx=cx-nodeSize/2;
-            var ty=cy-nodeSize/2;
-            var dx=tx-startX;
-            var dy=ty-startY;
-            var m=matrixTransforms[i];
-            var turn=(i%2===0?-1:1)*(22+i*1.8);
-            var midX=(targets[i][0]-startX)+(dx-(targets[i][0]-startX))*.64;
-            var midY=(targets[i][1]-startY)+(dy-(targets[i][1]-startY))*.64;
-            var frames=[
-                {transform:m,opacity:'1'},
-                {transform:'translate3d('+midX+'px,'+midY+'px,0) scale(.74) rotateZ('+(turn*.48)+'deg)',opacity:'.92',offset:.62},
-                {transform:'translate3d('+dx+'px,'+dy+'px,0) scale(.16) rotateZ('+turn+'deg)',opacity:'0'}
-            ];
-            return sleep(i*22).then(function(){
-                return play(n,frames,{duration:620,easing:'cubic-bezier(.22,.70,.16,1)',fill:'both'});
+            var sx=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var sy=r.top-stepRect.top+r.height/2-nodeSize/2;
+            var dx0=targets[i][0]-sx,dy0=targets[i][1]-sy;
+            var dx=(cx-nodeSize/2)-sx,dy=(cy-nodeSize/2)-sy;
+            var turn=(i%2===0?-1:1)*(20+i*1.6);
+            var midX=dx0+(dx-dx0)*.65;
+            var midY=dy0+(dy-dy0)*.65;
+            return sleep(i*14).then(function(){
+                return play(n,[
+                    {transform:matrixTransforms[i],opacity:'1'},
+                    {transform:'translate3d('+midX+'px,'+midY+'px,0) scale(.72) rotateZ('+(turn*.46)+'deg)',opacity:'.90',offset:.60},
+                    {transform:'translate3d('+dx+'px,'+dy+'px,0) scale(.15) rotateZ('+turn+'deg)',opacity:'0'}
+                ],{duration:470,easing:'cubic-bezier(.22,.70,.16,1)',fill:'both'});
             });
         }));
 
-        var finalPop=sleep(250).then(function(){
+        var finalPop=sleep(175).then(function(){
             return play(final,[
                 {opacity:'0',transform:'translate3d(0,0,0) scale(.58) rotateZ(-7deg)'},
-                {opacity:'1',transform:'translate3d(0,0,0) scale(1.045) rotateZ(1deg)',offset:.72},
+                {opacity:'1',transform:'translate3d(0,0,0) scale(1.04) rotateZ(1deg)',offset:.72},
                 {opacity:'1',transform:'translate3d(0,0,0) scale(1) rotateZ(0deg)'}
-            ],{duration:520,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
+            ],{duration:390,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
         });
 
-        await Promise.all([lineFade,glowFold,folds,finalPop]);
-
-        /* La luz se concentra en la pieza final en lugar de apagarse. */
-        await play(neon,[
-            {opacity:'.58',transform:'translate3d(-50%,-50%,0) scale(.58)'},
-            {opacity:'.38',transform:'translate3d(-50%,-50%,0) scale(.42)'}
-        ],{duration:260,easing:'ease-out',fill:'both'});
+        await Promise.all([lineFade,folds,finalPop]);
 
         var copy=final.querySelector('.gx-otp-final-copy');
         if(copy){
             await play(copy,[
-                {opacity:'0',transform:'translate3d(-50%,5px,0)'},
+                {opacity:'0',transform:'translate3d(-50%,4px,0)'},
                 {opacity:'1',transform:'translate3d(-50%,0,0)'}
-            ],{duration:240,easing:'ease-out',fill:'both'});
+            ],{duration:170,easing:'ease-out',fill:'both'});
         }
 
-        /* El resultado permanece lo suficiente para ser leído. */
-        await sleep(560);
+        /* Intermedio entre las dos versiones anteriores: suficiente para
+           leer el resultado, sin detener la sensación de continuidad. */
+        await sleep(320);
 
-        await play(stage,[{opacity:'1'},{opacity:'0'}],{
-            duration:190,easing:'ease-in',fill:'both'
-        });
-
-        stage.remove();
-        step.classList.remove('gx-otp-fold-running');
-        sync();
+        /* IMPORTANTE: no quitamos el stage aquí. gxSwitchStage animará
+           este resultado final hacia afuera y sólo después se limpia. */
     };
 
-    console.info('[GOXION] Beta 06 · OTP Fold v2 suave + neon activo');
+    console.info('[GOXION] Beta 06 · OTP Fold v3 neon trace activo');
 })();
 </script>
 
