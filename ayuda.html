@@ -5137,19 +5137,16 @@
 <h2 class="gx-auth-login-title">Accede a tu espacio</h2>
 <p class="gx-auth-login-subtitle">Tus servicios, beneficios y cuenta en un solo lugar.</p>
 </div>
-<div class="gx-auth-field-group">
-<label class="gx-auth-field-label" for="login-id">Nombre o ID</label>
-<div class="gx-auth-input-shell">
-<input autocomplete="username" class="input-smart gx-auth-field" id="login-id" placeholder="Ej. Juan de Dios" type="text"/>
+<div class="gx-auth-field-group gx-float-group gx-login-float-group">
+<div class="gx-auth-input-shell gx-float-shell">
+<input autocomplete="username" class="input-smart gx-auth-field gx-float-input" id="login-id" placeholder="Ej. Juan de Dios" type="text"/>
+<label class="gx-auth-field-label gx-float-label" for="login-id">Nombre o ID</label>
 </div>
 </div>
-<div class="gx-auth-field-group">
-<div class="gx-auth-field-row">
-<label class="gx-auth-field-label" for="login-pin">PIN de acceso</label>
-<button class="gx-auth-forgot-link" onclick="openPinRecovery(event)" type="button">¿Olvidaste tu PIN?</button>
-</div>
-<div class="gx-auth-input-shell gx-auth-pin-shell">
-<input autocomplete="current-password" class="input-smart gx-auth-field" id="login-pin" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<div class="gx-auth-field-group gx-float-group gx-login-float-group gx-login-pin-float-group">
+<div class="gx-auth-input-shell gx-auth-pin-shell gx-float-shell">
+<input autocomplete="current-password" class="input-smart gx-auth-field gx-float-input" id="login-pin" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<label class="gx-auth-field-label gx-float-label" for="login-pin">PIN de acceso</label>
 <button aria-label="Mostrar PIN" class="gx-pin-eye" id="gx-pin-eye-btn" onclick="togglePinVisibility(event)" type="button">
 <span aria-hidden="true" class="gx-eye-icon gx-eye-show">
 <svg fill="none" height="20" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24" width="20">
@@ -5166,6 +5163,7 @@
 </span>
 </button>
 </div>
+<button class="gx-auth-forgot-link gx-float-forgot" onclick="openPinRecovery(event)" type="button">¿Olvidaste tu PIN?</button>
 </div>
 <div class="gx-pin-recovery" hidden="" id="gx-pin-recovery">
 <div class="gx-pin-recovery-title">Recuperar acceso</div>
@@ -5197,10 +5195,10 @@
 </div>
 
 <div class="gx-activation-step" id="gx-activation-step-code">
-<div class="gx-auth-field-group">
-<label class="gx-auth-field-label" for="gx-activation-id">GOXION ID</label>
-<div class="gx-auth-input-shell">
-<input autocomplete="username" autocapitalize="none" class="input-smart gx-auth-field" id="gx-activation-id" placeholder="Ej. juan.perez" spellcheck="false" type="text"/>
+<div class="gx-auth-field-group gx-float-group">
+<div class="gx-auth-input-shell gx-float-shell">
+<input autocomplete="username" autocapitalize="none" class="input-smart gx-auth-field gx-float-input" id="gx-activation-id" placeholder="Ej. juan.perez" spellcheck="false" type="text"/>
+<label class="gx-auth-field-label gx-float-label" for="gx-activation-id">GOXION ID</label>
 </div>
 </div>
 <div class="gx-auth-field-group">
@@ -5216,16 +5214,16 @@
 
 <div class="gx-activation-step" id="gx-activation-step-pin" hidden>
 <div class="gx-activation-valid-chip"><span>✓</span> Código confirmado</div>
-<div class="gx-auth-field-group">
-<label class="gx-auth-field-label" for="gx-activation-pin">Crea tu PIN</label>
-<div class="gx-auth-input-shell gx-auth-pin-shell">
-<input autocomplete="new-password" class="input-smart gx-auth-field gx-activation-pin-field" id="gx-activation-pin" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<div class="gx-auth-field-group gx-float-group">
+<div class="gx-auth-input-shell gx-auth-pin-shell gx-float-shell">
+<input autocomplete="new-password" class="input-smart gx-auth-field gx-activation-pin-field gx-float-input" id="gx-activation-pin" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<label class="gx-auth-field-label gx-float-label" for="gx-activation-pin">Crea tu PIN</label>
 </div>
 </div>
-<div class="gx-auth-field-group">
-<label class="gx-auth-field-label" for="gx-activation-pin-confirm">Confirma tu PIN</label>
-<div class="gx-auth-input-shell gx-auth-pin-shell">
-<input autocomplete="new-password" class="input-smart gx-auth-field gx-activation-pin-field" id="gx-activation-pin-confirm" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<div class="gx-auth-field-group gx-float-group">
+<div class="gx-auth-input-shell gx-auth-pin-shell gx-float-shell">
+<input autocomplete="new-password" class="input-smart gx-auth-field gx-activation-pin-field gx-float-input" id="gx-activation-pin-confirm" inputmode="numeric" maxlength="4" placeholder="••••" type="password"/>
+<label class="gx-auth-field-label gx-float-label" for="gx-activation-pin-confirm">Confirma tu PIN</label>
 </div>
 </div>
 <button class="btn-primary gx-auth-submit gx-activation-primary" id="gx-activation-finish" onclick="gxFinishActivation(event)" type="button"><span>Activar Mi Espacio</span></button>
@@ -5481,10 +5479,16 @@
 <div id="dash-history"></div>
 </div>
 <div class="view-section" id="view-catalogo">
-<div class="gx-catalog-toolbar">
-<div class="gx-catalog-search-shell">
-<span aria-hidden="true">⌕</span>
-<input autocomplete="off" id="gx-catalog-search" oninput="gxApplyCatalogFilters()" placeholder="Buscar plataforma o plan" type="search"/>
+<div class="gx-catalog-toolbar gx-seek-toolbar">
+<div class="gx-seek" id="gx-seek" data-open="false" data-press="false" data-busy="false">
+<div class="gx-seek-skin">
+<svg class="gx-seek-lens" viewBox="0 0 18 18" aria-hidden="true">
+<circle cx="7.6" cy="7.6" r="5.4"></circle>
+<path d="M11.6 11.6 L15.4 15.4"></path>
+</svg>
+<input autocomplete="off" class="gx-seek-field" id="gx-catalog-search" oninput="gxApplyCatalogFilters()" placeholder="Buscar plataforma o plan" type="search" inputmode="search" aria-label="Buscar plataforma o plan"/>
+<button class="gx-seek-hit" id="gx-seek-hit" type="button" aria-label="Buscar en el catálogo"></button>
+</div>
 </div>
 <div class="gx-catalog-filters" id="gx-catalog-filters"></div>
 </div>
@@ -5669,8 +5673,14 @@
         <p class="gx-welcome-copy">Exclusivo para quienes <strong>nunca han sido clientes</strong> de SD Streaming ni GOXION. Si tu solicitud es aprobada, recibirás por WhatsApp tu GOXION ID y código de activación.</p>
 
         <div id="gx-welcome-form" class="gx-welcome-form">
-            <label><span>Nombre</span><input id="gx-welcome-name" type="text" autocomplete="name" placeholder="Tu nombre completo"></label>
-            <label><span>WhatsApp</span><input id="gx-welcome-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="961 000 0000"></label>
+            <label class="gx-welcome-float-shell">
+                <input class="gx-welcome-float-input" id="gx-welcome-name" type="text" autocomplete="name" placeholder="Tu nombre completo">
+                <span class="gx-welcome-float-label">Nombre</span>
+            </label>
+            <label class="gx-welcome-float-shell">
+                <input class="gx-welcome-float-input" id="gx-welcome-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="961 000 0000">
+                <span class="gx-welcome-float-label">WhatsApp</span>
+            </label>
             <div class="gx-welcome-rule"><b>Importante</b><span>Si ya tenías usuario, PIN o servicios con nosotros, tu espacio sigue siendo válido. El -10% se activa únicamente al completar un alta nueva autorizada.</span></div>
             <button id="gx-welcome-submit" class="gx-welcome-submit" type="button" onclick="gxSubmitWelcomeRegistration(event)"><span class="gx-welcome-submit-label">Validar y solicitar</span></button>
         </div>
@@ -15840,37 +15850,80 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         if (!from || !to || from === to || gxStageBusy) return;
         gxStageBusy = true;
 
-        if (!reduceMotion26() && Element.prototype.animate) {
-            const out = from.animate([
-                {opacity:1, transform:'translateX(0) scale(1)', filter:'blur(0)'},
-                {opacity:0, transform:`translateX(${-10 * direction}px) scale(.988)`, filter:'blur(3px)'}
-            ],{
-                duration:145,
-                easing:'cubic-bezier(.4,0,.7,.2)',
-                fill:'forwards'
-            });
-            await out.finished.catch(() => {});
-            try { out.cancel(); } catch(_) {}
-        }
+        const reduced = reduceMotion26() || !Element.prototype.animate;
+        const enterX = 12 * direction;
+        const exitX = -8 * direction;
 
-        from.hidden = true;
-        to.hidden = false;
-        const resizeTarget = to.closest?.('.gx-auth-stage') || to;
-        await gxResizeForStage(resizeTarget);
+        try {
+            if (!reduced) {
+                const out = from.animate([
+                    {opacity:1, transform:'translate3d(0,0,0) scale(1)'},
+                    {opacity:0, transform:`translate3d(${exitX}px,0,0) scale(.992)`}
+                ],{
+                    duration:155,
+                    easing:'cubic-bezier(.4,0,.7,.2)',
+                    fill:'forwards'
+                });
+                await out.finished.catch(() => {});
+                /* Ocultamos ANTES de cancelar el fill, evitando que el
+                   frame final reaparezca un instante en Safari. */
+                from.hidden = true;
+                try { out.cancel(); } catch(_) {}
+            } else {
+                from.hidden = true;
+            }
 
-        if (!reduceMotion26() && Element.prototype.animate) {
-            const incoming = to.animate([
-                {opacity:0, transform:`translateX(${14 * direction}px) scale(.988)`, filter:'blur(3px)'},
-                {opacity:1, transform:'translateX(0) scale(1)', filter:'blur(0)'}
-            ],{
-                duration:285,
-                easing:'cubic-bezier(.16,1,.3,1)',
-                fill:'both'
+            /* El destino nace invisible ANTES de quitar hidden.
+               Antes ocurría al revés: Safari alcanzaba a pintarlo al 100%
+               durante el resize y luego lo devolvíamos a opacity:0. */
+            to.style.opacity = '0';
+            to.style.transform = `translate3d(${enterX}px,0,0) scale(.992)`;
+            to.style.willChange = 'transform, opacity';
+            to.style.pointerEvents = 'none';
+            to.hidden = false;
+
+            const resizeTarget = to.closest?.('.gx-auth-stage') || to;
+
+            if (reduced) {
+                await gxResizeForStage(resizeTarget);
+                to.style.opacity = '1';
+                to.style.transform = 'translate3d(0,0,0) scale(1)';
+            } else {
+                /* Resize e entrada ocurren juntos. Ya no existe una
+                   tarjeta vacía de ~300ms entre una etapa y la otra. */
+                const resizePromise = gxResizeForStage(resizeTarget);
+                const incoming = to.animate([
+                    {opacity:0, transform:`translate3d(${enterX}px,0,0) scale(.992)`},
+                    {opacity:1, transform:'translate3d(0,0,0) scale(1)'}
+                ],{
+                    duration:275,
+                    easing:'cubic-bezier(.16,1,.3,1)',
+                    fill:'both'
+                });
+
+                await Promise.all([
+                    resizePromise,
+                    incoming.finished.catch(() => {})
+                ]);
+
+                to.style.opacity = '1';
+                to.style.transform = 'translate3d(0,0,0) scale(1)';
+                try { incoming.cancel(); } catch(_) {}
+            }
+
+            to.style.pointerEvents = '';
+            to.style.willChange = '';
+            /* Se limpian en el siguiente frame cuando ya existe un estado
+               pintado estable; así no hay salto al retirar los inline. */
+            requestAnimationFrame(() => {
+                if (!to.hidden) {
+                    to.style.opacity = '';
+                    to.style.transform = '';
+                }
             });
-            await incoming.finished.catch(() => {});
-            try { incoming.cancel(); } catch(_) {}
+        } finally {
+            gxStageBusy = false;
         }
-        gxStageBusy = false;
     }
 
     function gxResetActivationFlow() {
@@ -15890,6 +15943,9 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         ['gx-activation-id','gx-activation-code','gx-activation-pin','gx-activation-pin-confirm'].forEach(id => {
             const el = $(id); if (el) el.value = '';
         });
+        if (typeof window.gxCleanupActivationFold === 'function') window.gxCleanupActivationFold();
+        if (typeof window.gxSyncActivationCodeVisual === 'function') window.gxSyncActivationCodeVisual();
+        if (typeof window.gxSyncFloatingLabels === 'function') window.gxSyncFloatingLabels();
         gxActivationSetStatus('gx-activation-code-status');
         gxActivationSetStatus('gx-activation-pin-status');
         $('gx-activation-progress-1')?.classList.add('is-active');
@@ -15913,6 +15969,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         const loginId = $('login-id')?.value?.trim() || '';
         gxResetActivationFlow();
         if (loginId) $('gx-activation-id').value = loginId;
+        if (typeof window.gxSyncFloatingLabels === 'function') window.gxSyncFloatingLabels();
         await gxSwitchStage(login, activation, 1);
         setTimeout(() => $('gx-activation-id')?.focus({preventScroll:true}), 60);
     };
@@ -15967,12 +16024,21 @@ body:has(#view-catalogo.active) #goxion-main-nav{
                 codigo:code,
                 nombre:String(data.nombre || '')
             };
-            gxActivationSetStatus('gx-activation-code-status','Código confirmado.','is-ok');
+            gxActivationSetStatus('gx-activation-code-status','');
             $('gx-activation-progress-2')?.classList.add('is-active');
 
             const codeStep = $('gx-activation-step-code');
             const pinStep = $('gx-activation-step-pin');
+            if (typeof window.gxRunActivationConstellation === 'function') {
+                await window.gxRunActivationConstellation(code);
+            } else {
+                gxActivationSetStatus('gx-activation-code-status','Código confirmado.','is-ok');
+            }
+            /* El escenario final permanece visible DURANTE el relevo.
+               Así no reaparece un frame del formulario anterior antes
+               de que entre el paso de PIN. */
             await gxSwitchStage(codeStep, pinStep, 1);
+            if (typeof window.gxCleanupActivationFold === 'function') window.gxCleanupActivationFold();
             setTimeout(() => $('gx-activation-pin')?.focus({preventScroll:true}), 60);
         } catch (e) {
             gxActivationSetStatus('gx-activation-code-status', e?.message || 'No pudimos validar tu código.', 'is-error');
@@ -16064,6 +16130,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
         await gxSwitchStage(activation, login, -1);
         if ($('login-id')) $('login-id').value = id;
         if ($('login-pin')) $('login-pin').value = '';
+        if (typeof window.gxSyncFloatingLabels === 'function') window.gxSyncFloatingLabels();
         setTimeout(() => $('login-pin')?.focus({preventScroll:true}), 70);
     };
 
@@ -16411,6 +16478,1766 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     .gx-new-client-cta::before{animation:none!important}
 }
 </style>
+
+
+<!-- =========================================================
+     GOXION · MORPHICONS · PRODUCCIÓN
+     Prueba aislada sobre Ayuda v1.3.0.
+     No modifica Supabase ni la lógica de negocio.
+     ========================================================= -->
+<style id="goxion-morphicons-production">
+/* Morphicons dibuja la geometría; anulamos los giros CSS anteriores. */
+    .gx-chevron-svg,
+    .gx-chevron-motion.open .gx-chevron-svg{
+        transform:none!important;
+        transition:color .25s ease,filter .25s ease!important;
+    }
+    .gx-chevron-svg.gx-morph-chevron{
+        width:21px!important;
+        height:21px!important;
+    }
+    .gx-chevron-svg.gx-morph-chevron path,
+    .gx-morph-faq-svg path,
+    .gx-morph-eye path{
+        fill:none!important;
+        stroke:currentColor!important;
+        stroke-linecap:round!important;
+        stroke-linejoin:round!important;
+        vector-effect:non-scaling-stroke;
+    }
+    .gx-chevron-svg.gx-morph-chevron path{
+        stroke-width:2.45!important;
+    }
+
+    /* FAQ: ya no rotamos el contenedor; cambia la propia forma del SVG. */
+    .faq-header .icon,
+    .faq-item.open .faq-header .icon{
+        transform:none!important;
+    }
+    .faq-header .icon.gx-morph-faq-host{
+        width:26px;
+        height:26px;
+        min-width:26px;
+        display:grid;
+        place-items:center;
+        font-size:0!important;
+        color:var(--neon-blue);
+    }
+    .gx-morph-faq-svg{
+        width:18px;
+        height:18px;
+        display:block;
+        overflow:visible;
+    }
+    .gx-morph-faq-svg path{
+        stroke-width:2.25;
+    }
+
+    /* PIN: dejamos una sola figura continua para el morph ojo ↔ oculto. */
+    #gx-pin-eye-btn .gx-eye-show,
+    #gx-pin-eye-btn .gx-eye-hide{
+        display:none!important;
+    }
+    .gx-morph-eye{
+        width:20px;
+        height:20px;
+        display:block;
+        overflow:visible;
+    }
+    .gx-morph-eye path{
+        stroke-width:1.8;
+    }
+</style>
+
+<script type="module" id="goxion-morphicons-production-script">
+import { createMorph } from "https://esm.sh/morphicons@1.5.0/dom";
+
+const CHEVRON_DOWN = "M6 9l6 6 6-6";
+const CHEVRON_UP   = "M6 15l6-6 6 6";
+
+const EYE = "M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6ZM9.5 12a2.5 2.5 0 1 0 5 0a2.5 2.5 0 1 0-5 0Z";
+const EYE_OFF = "M3 3l18 18M10.6 6.15A10.7 10.7 0 0 1 12 6c6 0 9.5 6 9.5 6a15.6 15.6 0 0 1-2.05 2.67M6.1 7.1C3.8 8.75 2.5 12 2.5 12s3.5 6 9.5 6a9.8 9.8 0 0 0 3.15-.5";
+
+let enabled = true;
+const records = new Set();
+
+function transition(record, icon, spring = "snappy"){
+    if(!record?.morph) return;
+    if(enabled) record.morph.morphTo(icon, spring);
+    else record.morph.set(icon);
+}
+
+function register(path, initial, getTarget, targetNode, spring = "snappy"){
+    if(!path || path.dataset.gxMorphiconsReady === "1") return;
+    path.dataset.gxMorphiconsReady = "1";
+
+    const morph = createMorph(path, initial, { reducedMotion:"user" });
+    const record = { path, morph, getTarget, spring };
+    records.add(record);
+
+    if(targetNode){
+        const observer = new MutationObserver(() => {
+            transition(record, getTarget(), spring);
+        });
+        observer.observe(targetNode, {attributes:true, attributeFilter:["class","aria-expanded"]});
+        record.observer = observer;
+    }
+}
+
+function initServiceChevrons(root = document){
+    root.querySelectorAll(".gx-service-expand-icon.gx-chevron-motion").forEach(host => {
+        if(host.dataset.gxMorphiconsHost === "1") return;
+
+        const svg = host.querySelector(".gx-chevron-svg");
+        const path = svg?.querySelector("path");
+        if(!svg || !path) return;
+
+        host.dataset.gxMorphiconsHost = "1";
+        svg.classList.add("gx-morph-chevron");
+        svg.setAttribute("viewBox","0 0 24 24");
+        svg.setAttribute("aria-hidden","true");
+
+        const getTarget = () => host.classList.contains("open") ? CHEVRON_UP : CHEVRON_DOWN;
+        register(path, getTarget(), getTarget, host, "snappy");
+    });
+}
+
+function initFAQ(root = document){
+    root.querySelectorAll(".faq-item").forEach(item => {
+        if(item.dataset.gxMorphiconsFaq === "1") return;
+        const icon = item.querySelector(".faq-header .icon");
+        if(!icon) return;
+
+        item.dataset.gxMorphiconsFaq = "1";
+        icon.classList.add("gx-morph-faq-host");
+        icon.textContent = "";
+
+        const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+        svg.setAttribute("viewBox","0 0 24 24");
+        svg.setAttribute("aria-hidden","true");
+        svg.classList.add("gx-morph-faq-svg");
+
+        const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+        svg.appendChild(path);
+        icon.appendChild(svg);
+
+        const getTarget = () => item.classList.contains("open") ? CHEVRON_UP : CHEVRON_DOWN;
+        register(path, getTarget(), getTarget, item, "smooth");
+    });
+}
+
+function initPinEye(){
+    const btn = document.getElementById("gx-pin-eye-btn");
+    if(!btn || btn.dataset.gxMorphiconsEye === "1") return;
+
+    btn.dataset.gxMorphiconsEye = "1";
+    const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+    svg.setAttribute("viewBox","0 0 24 24");
+    svg.setAttribute("aria-hidden","true");
+    svg.classList.add("gx-morph-eye");
+
+    const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+    svg.appendChild(path);
+    btn.appendChild(svg);
+
+    const getTarget = () => btn.classList.contains("is-visible") ? EYE_OFF : EYE;
+    register(path, getTarget(), getTarget, btn, "snappy");
+}
+
+function initAll(root = document){
+    initServiceChevrons(root);
+    initFAQ(root);
+    initPinEye();
+}
+
+function boot(){
+    initAll();
+
+    const observer = new MutationObserver(mutations => {
+        for(const mutation of mutations){
+            for(const node of mutation.addedNodes){
+                if(node.nodeType !== 1) continue;
+                initAll(node);
+                if(node.matches?.(".gx-service-expand-icon.gx-chevron-motion, .faq-item")) initAll(node.parentElement || node);
+            }
+        }
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+
+}
+
+if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded",boot,{once:true});
+}else{
+    boot();
+}
+</script>
+
+
+<!-- =========================================================
+     GOXION · CATÁLOGO MORPH · PRODUCCIÓN
+     Catálogo ↓ ↔ X sin recuadro.
+     Más opciones conserva su diseño/posición original.
+     ========================================================= -->
+<style id="goxion-catalog-morph-production">
+    /* Catálogo: símbolo libre, sin cápsula ni caja añadida. */
+    .brand-card > .brand-header > .brand-expand-icon.gx-morph-catalog-free,
+    .brand-card.expanded > .brand-header > .brand-expand-icon.gx-morph-catalog-free{
+        position:relative!important;
+        flex:0 0 28px!important;
+        width:28px!important;
+        height:24px!important;
+        min-width:28px!important;
+        min-height:24px!important;
+        padding:0!important;
+        margin-left:10px!important;
+        display:grid!important;
+        place-items:center!important;
+        overflow:visible!important;
+        border:0!important;
+        border-radius:0!important;
+        background:transparent!important;
+        box-shadow:none!important;
+        color:#62ecff!important;
+        font-size:0!important;
+        line-height:0!important;
+    }
+    .brand-card.expanded > .brand-header > .brand-expand-icon.gx-morph-catalog-free{
+        color:#9b91ff!important;
+    }
+    .gx-morph-catalog-free-svg{
+        width:22px!important;
+        height:22px!important;
+        display:block;
+        overflow:visible;
+        transform:none!important;
+    }
+    .gx-morph-catalog-free-svg path{
+        fill:none!important;
+        stroke:currentColor!important;
+        stroke-width:2.45!important;
+        stroke-linecap:round!important;
+        stroke-linejoin:round!important;
+        vector-effect:non-scaling-stroke;
+    }
+    @media(max-width:380px){
+        .brand-card > .brand-header > .brand-expand-icon.gx-morph-catalog-free{
+            margin-left:6px!important;
+        }
+    }
+</style>
+
+<script type="module" id="goxion-catalog-morph-production-script">
+import { createMorph } from "https://esm.sh/morphicons@1.5.0/dom";
+
+const DOWN="M6 9l6 6 6-6";
+const CLOSE="M6 6l12 12M18 6L6 18";
+
+function reduced(){
+    return Boolean(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
+function initCatalog(root=document){
+    const hosts=[];
+    if(root.matches?.(".brand-card > .brand-header > .brand-expand-icon.gx-chevron-motion")) hosts.push(root);
+    root.querySelectorAll?.(".brand-card > .brand-header > .brand-expand-icon.gx-chevron-motion").forEach(el=>hosts.push(el));
+
+    hosts.forEach(host=>{
+        if(host.dataset.gxMorphBeta03==="1") return;
+        const card=host.closest(".brand-card");
+        const svg=host.querySelector(".gx-chevron-svg");
+        const path=svg?.querySelector("path");
+        if(!card || !svg || !path) return;
+
+        host.dataset.gxMorphBeta03="1";
+        host.classList.add("gx-morph-catalog-free");
+        svg.classList.add("gx-morph-catalog-free-svg");
+        svg.setAttribute("viewBox","0 0 24 24");
+
+        const initial=card.classList.contains("expanded")?CLOSE:DOWN;
+        const morph=createMorph(path,initial,{reducedMotion:"user"});
+
+        const sync=()=>{
+            const target=card.classList.contains("expanded")?CLOSE:DOWN;
+            try{
+                if(reduced()) morph.set(target);
+                else morph.morphTo(target,"snappy");
+            }catch(_){
+                try{morph.set(target);}catch(__){}
+            }
+        };
+
+        const observer=new MutationObserver(sync);
+        observer.observe(card,{attributes:true,attributeFilter:["class"]});
+    });
+}
+
+function boot(){
+    initCatalog();
+    const observer=new MutationObserver(mutations=>{
+        for(const mutation of mutations){
+            for(const node of mutation.addedNodes){
+                if(node.nodeType!==1) continue;
+                initCatalog(node);
+            }
+        }
+    });
+    observer.observe(document.body,{childList:true,subtree:true});
+
+}
+
+if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",boot,{once:true});
+}else{
+    boot();
+}
+</script>
+
+
+<!-- =========================================================
+     GOXION · SEEK SEARCH · PRODUCCIÓN
+     Adaptación del componente Search/Seek de Bencho (MIT).
+     Fuente conceptual: bencho.dev
+     Se conserva la idea central: UN objeto cuya anchura ES el estado.
+     No se incorpora React; esta versión usa el mismo modelo de spring
+     traducido a JavaScript nativo para no alterar la arquitectura actual.
+     ========================================================= -->
+<style id="goxion-seek-production">
+/* ── Mapeo local de los tokens de Bencho ──────────────────
+   No se crean variables globales nuevas: el componente consume
+   directamente los equivalentes que GOXION ya tiene. Los únicos
+   valores sin equivalente viven aquí, dentro de la raíz del Seek. */
+.gx-seek{
+    --gx-seek-bg:var(--bg-black);
+    --gx-seek-ink:var(--text-main);
+    --gx-seek-ink-2:#dce5f3;
+    --gx-seek-ink-3:var(--neon-blue);
+    --gx-seek-ink-4:#8aa6bd;
+    --gx-seek-ink-5:rgba(149,164,189,.68);
+    --gx-seek-pane:rgba(8,8,12,.42);
+    --gx-seek-edge:rgba(255,255,255,.075);
+    --gx-seek-ink-rgb:255,255,255;
+
+    --gx-seek-shut:44px;
+    --gx-seek-lens:20px;
+    --gx-seek-inset:12px;
+    --gx-seek-w:44px;
+    --gx-seek-p:0;
+    --gx-seek-say:0;
+    --gx-seek-lx:0px;
+    --gx-seek-ly:0px;
+
+    position:relative;
+    flex:0 0 auto;
+    width:var(--gx-seek-w);
+    height:44px;
+    display:grid;
+    place-items:center;
+    font-family:'Poppins',sans-serif;
+    z-index:2;
+}
+
+/* ── ONE OBJECT, NOT TWO ──────────────────────────────────
+   La lupa y el campo están dentro de la misma superficie desde
+   el primer frame. La anchura es el estado; la altura nunca cambia.
+   A 44px es un círculo y al crecer es una píldora: una sola regla. */
+.gx-seek-skin{
+    position:relative;
+    width:var(--gx-seek-w);
+    height:var(--gx-seek-shut);
+    border-radius:999px;
+    background:var(--gx-seek-pane);
+    border:1px solid var(--gx-seek-edge);
+    backdrop-filter:blur(8px) saturate(150%);
+    -webkit-backdrop-filter:blur(8px) saturate(150%);
+    isolation:isolate;
+    overflow:hidden;
+    transform:translate(var(--gx-seek-lx),var(--gx-seek-ly)) scale(var(--gx-seek-scale,1));
+    transition:
+        transform 260ms cubic-bezier(.22,.9,.28,1),
+        background 220ms ease,
+        border-color 220ms ease,
+        box-shadow 220ms ease;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+    -webkit-tap-highlight-color:transparent;
+}
+
+/* Hover sólo en dispositivos que realmente tienen hover. El efecto
+   es pequeño: debe sentirse receptivo, no perseguir al cursor. */
+@media(hover:hover) and (pointer:fine){
+    .gx-seek:not([data-open="true"]) .gx-seek-skin:hover{
+        --gx-seek-scale:1.045;
+        border-color:rgba(0,242,254,.16);
+    }
+}
+
+/* El press es un beat real: primero cede y después se expande.
+   Sin este pequeño momento la expansión se lee como "trigger";
+   con él se siente como un objeto que fue empujado. */
+.gx-seek[data-press="true"] .gx-seek-skin{
+    --gx-seek-scale:.93;
+    transition:transform 90ms cubic-bezier(.4,0,.6,1);
+}
+
+.gx-seek[data-open="true"] .gx-seek-skin{
+    cursor:text;
+    border-color:rgba(0,242,254,.15);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 8px 22px rgba(0,0,0,.15);
+}
+
+/* ── THE LENS NEVER TRAVELS ────────────────────────────────
+   Se queda fija al borde izquierdo. Cerrada, ese inset la centra.
+   Abierta, el mismo inset se convierte en el padding visual del campo.
+   La sensación de que la lupa viaja ocurre porque el objeto crece
+   alrededor de una marca que nunca cambió de sitio. */
+.gx-seek-lens{
+    position:absolute;
+    left:var(--gx-seek-inset);
+    top:50%;
+    width:var(--gx-seek-lens);
+    height:var(--gx-seek-lens);
+    margin-top:calc(var(--gx-seek-lens) / -2);
+    fill:none;
+    stroke:var(--gx-seek-ink-3);
+    stroke-width:1.5;
+    stroke-linecap:round;
+    pointer-events:none;
+    transition:stroke 200ms ease,stroke-width 200ms ease,filter 200ms ease;
+    filter:drop-shadow(0 0 7px rgba(0,242,254,.10));
+}
+
+.gx-seek[data-open="true"] .gx-seek-lens{
+    stroke:var(--gx-seek-ink-4);
+    filter:none;
+}
+
+/* Una sola respuesta visual por ráfaga de escritura. Un destello por
+   carácter convertiría el control en una máquina de escribir. */
+.gx-seek[data-busy="true"] .gx-seek-lens{
+    stroke:var(--neon-blue);
+    stroke-width:1.8;
+}
+
+/* El campo está presente desde el inicio y sólo se vuelve legible
+   durante el último tramo de la expansión. Así parece salir de la lupa,
+   en vez de aparecer como un segundo objeto mediante crossfade. */
+.gx-seek-field{
+    position:absolute;
+    left:43px;
+    right:13px;
+    top:0;
+    height:100%;
+    min-width:0;
+    padding:0;
+    border:0;
+    background:none;
+    font:inherit;
+    font-size:11px;
+    font-weight:550;
+    letter-spacing:-.003em;
+    color:var(--gx-seek-ink);
+    outline:none;
+    opacity:var(--gx-seek-say);
+    transform:translateX(var(--gx-seek-shift,-6px));
+    pointer-events:none;
+    -webkit-appearance:none;
+    appearance:none;
+}
+.gx-seek-field::-webkit-search-cancel-button{display:none}
+.gx-seek[data-open="true"] .gx-seek-field{pointer-events:auto}
+.gx-seek-field::placeholder{color:var(--gx-seek-ink-5)}
+
+/* La forma de entrar existe únicamente mientras está cerrado.
+   Cuando el campo está abierto, el propio input debe recibir el toque
+   para colocar el cursor y escribir. */
+.gx-seek-hit{
+    position:absolute;
+    inset:0;
+    border:0;
+    border-radius:inherit;
+    background:none;
+    cursor:pointer;
+}
+.gx-seek[data-open="true"] .gx-seek-hit{
+    display:none;
+}
+.gx-seek-hit:focus-visible{
+    outline:none;
+    box-shadow:0 0 0 2px var(--gx-seek-bg),0 0 0 4px rgba(var(--gx-seek-ink-rgb),.35);
+}
+
+/* ── Toolbar integrada ─────────────────────────────────────
+   El buscador deja de ocupar una fila completa cuando está cerrado.
+   Los filtros se quedan físicamente en la misma línea y simplemente
+   reciben más o menos espacio conforme el mismo objeto se ensancha. */
+#view-catalogo .gx-catalog-toolbar.gx-seek-toolbar{
+    width:100%;
+    display:flex!important;
+    align-items:center;
+    gap:8px;
+    margin-top:0!important;
+    margin-bottom:14px!important;
+    overflow:visible;
+}
+#view-catalogo .gx-seek-toolbar .gx-catalog-filters{
+    flex:1 1 auto;
+    min-width:0;
+    height:44px;
+    margin-top:0!important;
+    display:flex;
+    align-items:center;
+    gap:7px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    overscroll-behavior-inline:contain;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+}
+#view-catalogo .gx-seek-toolbar .gx-catalog-filters::-webkit-scrollbar{display:none}
+#view-catalogo .gx-seek-toolbar .gx-catalog-filter-chip{
+    flex:0 0 auto;
+    min-height:30px;
+}
+
+/* Reglas legacy de la antigua barra: ya no participan. */
+#view-catalogo .gx-seek-toolbar .gx-catalog-search-shell{display:none!important}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-seek-skin,
+    .gx-seek-lens{
+        transition-duration:.01ms!important;
+    }
+}
+</style>
+
+<script id="goxion-seek-production-script">
+(()=>{
+    const root=document.getElementById('gx-seek');
+    const skin=root?.querySelector('.gx-seek-skin');
+    const field=document.getElementById('gx-catalog-search');
+    const hit=document.getElementById('gx-seek-hit');
+    const toolbar=root?.closest('.gx-seek-toolbar');
+    if(!root || !skin || !field || !hit || !toolbar) return;
+
+    const clamp=(v,lo,hi)=>Math.min(hi,Math.max(lo,v));
+
+    /* ── ONE SPRING, FOR EVERYTHING THAT SETTLES ──────────
+       Frames, no milisegundos. dt se expresa en unidades de 1/60 s
+       y el damping se ELEVA a dt en vez de multiplicarse por dt.
+       De esa manera un frame perdido disipa la misma energía que los
+       dos frames que reemplazó y el spring no cambia en una página ocupada. */
+    const springOf=tune=>({
+        k:.08+(tune/100)*.16,
+        d:.62+(tune/100)*.20
+    });
+
+    const SHUT=44;
+    const SPRING=64;
+    let current=SHUT;
+    let velocity=0;
+    let target=SHUT;
+    let raf=0;
+    let prev=0;
+    let pressTimer=0;
+    let busyTimer=0;
+    let opened=false;
+
+    const still=()=>Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
+
+    /* GOXION no usa los 64px del componente aislado de Bencho.
+       Aquí la pieza convive con chips de 30px dentro de una toolbar.
+       Cerrada conserva 44px; abierta toma ~62% del espacio, con techo
+       de 280px, dejando a los filtros visibles al costado. */
+    function openWidth(){
+        const total=toolbar.getBoundingClientRect().width||320;
+        const compact=window.matchMedia?.('(max-width:390px)').matches;
+        const ceiling=compact?230:280;
+        const floor=compact?196:220;
+        return Math.round(clamp(total*.62,floor,ceiling));
+    }
+
+    function publish(){
+        const span=Math.max(SHUT,target);
+        const p=clamp((current-SHUT)/Math.max(1,span-SHUT),0,1);
+        const say=clamp((p-.55)/.45,0,1);
+        root.style.setProperty('--gx-seek-w',current.toFixed(2)+'px');
+        root.style.setProperty('--gx-seek-p',p.toFixed(3));
+        root.style.setProperty('--gx-seek-say',say.toFixed(3));
+        root.style.setProperty('--gx-seek-shift',(-6*(1-say)).toFixed(2)+'px');
+    }
+
+    function settleInstant(){
+        current=target;
+        velocity=0;
+        publish();
+    }
+
+    function run(){
+        cancelAnimationFrame(raf);
+        raf=0;
+        prev=0;
+
+        if(still()){
+            settleInstant();
+            return;
+        }
+
+        const {k,d}=springOf(SPRING);
+        const tick=t=>{
+            const dt=prev?clamp((t-prev)/16.67,0,2.5):1;
+            prev=t;
+            velocity+=(target-current)*k*dt;
+            velocity*=Math.pow(d,dt);
+            current+=velocity*dt;
+            publish();
+
+            if(Math.abs(target-current)<.02 && Math.abs(velocity)<.02){
+                current=target;
+                velocity=0;
+                publish();
+                raf=0;
+                return;
+            }
+            raf=requestAnimationFrame(tick);
+        };
+        raf=requestAnimationFrame(tick);
+    }
+
+    function setTarget(next){
+        target=next;
+        run();
+    }
+
+    function setOpen(value,{focus=false}={}){
+        opened=Boolean(value);
+        root.dataset.open=String(opened);
+        field.tabIndex=opened?0:-1;
+        setTarget(opened?openWidth():SHUT);
+        if(focus){
+            /* En GOXION sí permitimos el teclado de software: esto es una
+               búsqueda funcional, no una tarjeta demostrativa. */
+            setTimeout(()=>field.focus({preventScroll:true}),still()?0:65);
+        }
+    }
+
+    /* ── OPENING: COMPRESS, THEN EXPAND ────────────────────
+       90 ms alcanza para sentir que el objeto cede sin convertirlo
+       en una espera. El foco llega durante la expansión, no al final,
+       para que el campo ya sea utilizable cuando visualmente aparece. */
+    function start(){
+        if(opened) return;
+
+        /* El foco ocurre DENTRO del gesto del usuario. Safari/iOS puede
+           negarse a mostrar el teclado si focus() llega después de un
+           setTimeout. El objeto sí espera 90ms para crecer: primero toma
+           foco y cede, luego se expande. Interacción y geometría siguen
+           siendo dos tiempos distintos sin sacrificar usabilidad. */
+        opened=true;
+        root.dataset.open='true';
+        field.tabIndex=0;
+        root.dataset.press='true';
+        try{ field.focus({preventScroll:true}); }catch(_){ field.focus(); }
+
+        clearTimeout(pressTimer);
+        pressTimer=setTimeout(()=>{
+            root.dataset.press='false';
+            setTarget(openWidth());
+        },still()?0:90);
+    }
+
+    function away(){
+        if(field.value.trim()) return;
+        setOpen(false);
+    }
+
+    function typingBeat(){
+        root.dataset.busy='true';
+        clearTimeout(busyTimer);
+        busyTimer=setTimeout(()=>{root.dataset.busy='false';},340);
+    }
+
+    hit.addEventListener('click',start);
+    field.addEventListener('input',()=>{
+        typingBeat();
+        if(!opened) setOpen(true);
+    });
+    field.addEventListener('blur',away);
+    field.addEventListener('keydown',e=>{
+        if(e.key!=='Escape') return;
+        e.preventDefault();
+        field.value='';
+        if(typeof window.gxApplyCatalogFilters==='function') window.gxApplyCatalogFilters();
+        setOpen(false);
+        field.blur();
+    });
+
+    /* ── MAGNET ────────────────────────────────────────────
+       Se mide contra la toolbar estable, no contra el objeto que ya está
+       desplazándose. Si el vector se midiera desde el propio objeto se
+       formaría un feedback loop visible como temblor. Se desactiva en
+       touch y una vez abierto: un campo no debe pelear con quien escribe. */
+    if(window.matchMedia?.('(hover:hover) and (pointer:fine)').matches && !still()){
+        let magRaf=0;
+        let lean={x:0,y:0};
+        const publishLean=()=>{
+            magRaf=0;
+            root.style.setProperty('--gx-seek-lx',lean.x.toFixed(2)+'px');
+            root.style.setProperty('--gx-seek-ly',lean.y.toFixed(2)+'px');
+        };
+        const read=e=>{
+            if(opened){
+                if(lean.x||lean.y){lean={x:0,y:0};if(!magRaf)magRaf=requestAnimationFrame(publishLean);}
+                return;
+            }
+            const b=root.getBoundingClientRect();
+            const dx=e.clientX-(b.left+b.width/2);
+            const dy=e.clientY-(b.top+b.height/2);
+            const dist=Math.hypot(dx,dy);
+            const R=92;
+            if(dist>R){
+                if(lean.x||lean.y){lean={x:0,y:0};if(!magRaf)magRaf=requestAnimationFrame(publishLean);}
+                return;
+            }
+            const pull=(1-dist/R)**1.4*4.5;
+            lean={x:(dx/(dist||1))*pull,y:(dy/(dist||1))*pull};
+            if(!magRaf)magRaf=requestAnimationFrame(publishLean);
+        };
+        const gone=()=>{
+            lean={x:0,y:0};
+            if(!magRaf)magRaf=requestAnimationFrame(publishLean);
+        };
+        document.addEventListener('pointermove',read,{passive:true});
+        document.addEventListener('pointerleave',gone);
+    }
+
+    const resize=()=>{
+        if(opened){
+            target=openWidth();
+            run();
+        }
+    };
+    window.addEventListener('resize',resize,{passive:true});
+
+    if(field.value.trim()){
+        opened=true;
+        root.dataset.open='true';
+        field.tabIndex=0;
+        target=openWidth();
+        current=target;
+    }else{
+        field.tabIndex=-1;
+    }
+    publish();
+
+})();
+</script>
+
+
+<!-- =========================================================
+     GOXION · SEEK CONTRAST · PRODUCCIÓN
+     Sólo añade contraste de marca al Seek de Beta 04.
+     Cerrado permanece sobrio; el color aparece con la interacción.
+     ========================================================= -->
+<style id="goxion-seek-contrast-production">
+/* Reposo: conserva el aspecto aprobado de Beta 04. */
+.gx-seek:not([data-open="true"]):not([data-press="true"]) .gx-seek-skin{
+    background:rgba(8,8,12,.42);
+    border-color:rgba(255,255,255,.075);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+}
+
+/* PRESS: un beat de marca muy corto. El color no vive aquí
+   permanentemente; aparece justo cuando el objeto "cede". */
+.gx-seek[data-press="true"] .gx-seek-skin{
+    border-color:rgba(124,77,255,.38);
+    background:
+        radial-gradient(circle at 18% 50%,rgba(124,77,255,.13),transparent 42%),
+        radial-gradient(circle at 82% 50%,rgba(0,242,254,.08),transparent 46%),
+        rgba(8,8,12,.50);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 0 0 1px rgba(124,77,255,.045),
+        0 0 14px rgba(124,77,255,.07);
+}
+
+/* ABIERTO: borde de contraste GOXION, pero el cuerpo sigue siendo
+   oscuro. Dos backgrounds permiten que el degradado viva sólo en
+   el borde sin convertir el campo en una superficie de color. */
+.gx-seek[data-open="true"] .gx-seek-skin{
+    border:1px solid transparent!important;
+    background:
+        linear-gradient(rgba(8,8,12,.88),rgba(8,8,12,.88)) padding-box,
+        linear-gradient(
+            115deg,
+            rgba(124,77,255,.55) 0%,
+            rgba(73,108,255,.34) 46%,
+            rgba(0,242,254,.48) 100%
+        ) border-box;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.03),
+        0 8px 22px rgba(0,0,0,.15),
+        0 0 18px rgba(66,111,255,.035);
+}
+
+/* La lupa deja de competir con el texto cuando el campo está abierto,
+   pero conserva una mezcla fría de los colores GOXION. */
+.gx-seek[data-open="true"] .gx-seek-lens{
+    stroke:#8ea9cf;
+}
+
+/* Escribiendo: sólo un pulso corto por ráfaga. La regla de Beta 04
+   ya agrupa las teclas en un beat de 340ms; aquí únicamente cambiamos
+   su apariencia, no su temporización. */
+.gx-seek[data-busy="true"] .gx-seek-lens{
+    stroke:var(--neon-blue)!important;
+    filter:
+        drop-shadow(0 0 5px rgba(0,242,254,.22))
+        drop-shadow(0 0 9px rgba(124,77,255,.08));
+    animation:gxSeekGoxionPulse .34s ease-out both;
+}
+@keyframes gxSeekGoxionPulse{
+    0%{transform:scale(1);opacity:.82}
+    45%{transform:scale(1.08);opacity:1}
+    100%{transform:scale(1);opacity:.9}
+}
+
+/* Con teclado/foco activo reforzamos apenas el borde cian del extremo
+   derecho; no se dibuja un segundo aro alrededor del control. */
+.gx-seek:focus-within[data-open="true"] .gx-seek-skin{
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 8px 22px rgba(0,0,0,.15),
+        0 0 16px rgba(0,242,254,.045);
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-seek[data-busy="true"] .gx-seek-lens{
+        animation:none!important;
+    }
+}
+</style>
+
+
+<!-- GOXION · BETA 06 · ACTIVATION CONSTELLATION -->
+<style id="goxion-activation-constellation-production">
+/* =========================================================
+   GOXION · OTP FOLD · PRODUCCIÓN
+   La iluminación ya no vive detrás del objeto. Como en la referencia,
+   una carga de neón RECORRE las conexiones y el perímetro de los nodos,
+   y deja la estructura encendida al validar.
+   ========================================================= */
+
+.gx-feral-code-shell{
+    position:relative!important;min-height:50px!important;padding:0!important;
+    border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important
+}
+.gx-feral-code-shell .gx-activation-code-field{
+    position:absolute!important;inset:0!important;z-index:4!important;width:100%!important;height:100%!important;
+    opacity:.01!important;color:transparent!important;caret-color:transparent!important;letter-spacing:0!important
+}
+.gx-feral-code-visual{
+    position:relative;z-index:2;width:100%;max-width:318px;min-height:50px;margin:0 auto;
+    display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;pointer-events:none
+}
+.gx-feral-code-slot{
+    position:relative;height:47px;display:grid;place-items:center;border-radius:12px;
+    border:1px solid rgba(124,77,255,.20);background:rgba(7,9,14,.82);color:#eaf3ff;
+    font:760 17px/1 'Poppins',sans-serif;font-variant-numeric:tabular-nums;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.022);
+    transition:border-color .18s ease,background .18s ease,transform .18s cubic-bezier(.16,1,.3,1)
+}
+.gx-feral-code-slot.is-filled{border-color:rgba(82,113,255,.28)}
+.gx-feral-code-slot.is-current{border-color:rgba(0,242,254,.42);transform:translateY(-1px)}
+.gx-feral-code-slot.is-current:empty::after{
+    content:"";width:1.5px;height:14px;border-radius:999px;background:var(--neon-blue);
+    animation:gxOtpCaret .9s steps(1,end) infinite
+}
+@keyframes gxOtpCaret{50%{opacity:.15}}
+
+#gx-activation-step-code{position:relative}
+#gx-activation-step-code.gx-otp-fold-running{min-height:292px}
+#gx-activation-step-code.gx-otp-fold-running > :not(.gx-otp-fold-stage){
+    opacity:0!important;transform:scale(.988)!important;pointer-events:none!important;
+    transition:opacity .18s ease,transform .22s cubic-bezier(.16,1,.3,1)!important
+}
+.gx-otp-fold-stage{
+    position:absolute;inset:0;z-index:40;overflow:visible;pointer-events:none;
+    transform:translateZ(0);backface-visibility:hidden
+}
+.gx-otp-fold-stage::before{
+    content:"";position:absolute;inset:0;border-radius:18px;
+    background:radial-gradient(circle at 50% 50%,rgba(24,30,48,.055),transparent 52%);
+    opacity:0;animation:gxOtpStageIn .24s ease forwards
+}
+@keyframes gxOtpStageIn{to{opacity:1}}
+
+.gx-otp-fold-group{
+    position:absolute;inset:0;transform-origin:50% 50%;transform:translateZ(0);
+    will-change:transform;backface-visibility:hidden
+}
+.gx-otp-fold-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.gx-otp-line-base{
+    fill:none;stroke:rgba(124,77,255,.38);stroke-width:1.05;stroke-linecap:round;
+    vector-effect:non-scaling-stroke
+}
+.gx-otp-line-energy{
+    fill:none;stroke:#45ffc0;stroke-width:1.65;stroke-linecap:round;
+    vector-effect:non-scaling-stroke;opacity:0;
+    filter:drop-shadow(0 0 2px rgba(69,255,192,.85)) drop-shadow(0 0 5px rgba(0,242,254,.34))
+}
+
+.gx-otp-fold-node{
+    position:absolute;width:54px;height:54px;display:grid;place-items:center;border-radius:12px;
+    border:1px solid rgba(124,77,255,.38);background:#090c13;color:#eef5ff;
+    font:760 17px/1 'Poppins',sans-serif;font-variant-numeric:tabular-nums;
+    box-shadow:0 8px 20px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.025);
+    transform-origin:center;transform:translate3d(0,0,0);
+    will-change:transform,opacity;backface-visibility:hidden;-webkit-font-smoothing:antialiased;
+    transition:border-color .26s ease,color .26s ease
+}
+.gx-otp-node-digit{position:relative;z-index:2}
+.gx-otp-node-trace{
+    position:absolute;inset:-2px;width:calc(100% + 4px);height:calc(100% + 4px);
+    overflow:visible;pointer-events:none
+}
+.gx-otp-node-trace rect{fill:none;vector-effect:non-scaling-stroke}
+.gx-otp-node-lit{
+    stroke:#45ffc0;stroke-width:1.35;opacity:0;
+    filter:drop-shadow(0 0 2px rgba(69,255,192,.68)) drop-shadow(0 0 5px rgba(0,242,254,.22))
+}
+.gx-otp-node-energy{
+    stroke:#b9ffe9;stroke-width:2;opacity:0;stroke-linecap:round;
+    stroke-dasharray:.18 .82;stroke-dashoffset:1;
+    filter:drop-shadow(0 0 2px rgba(255,255,255,.78)) drop-shadow(0 0 6px rgba(69,255,192,.82))
+}
+.gx-otp-fold-node.is-verified{
+    border-color:rgba(69,255,192,.30);
+    color:#eafff8
+}
+
+.gx-otp-final{
+    position:absolute;width:66px;height:66px;display:grid;place-items:center;opacity:0;
+    transform:translate3d(0,0,0) scale(.58) rotateZ(-7deg);
+    will-change:transform,opacity;backface-visibility:hidden
+}
+.gx-otp-final-frame{
+    position:absolute;inset:3px;border-radius:14px;border:1px solid rgba(69,255,192,.70);
+    background:rgba(7,10,15,.97);
+    box-shadow:0 0 15px rgba(69,255,192,.13),0 10px 28px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.025)
+}
+.gx-otp-final-frame::before{
+    content:"";position:absolute;inset:7px;border-radius:10px;border:1px solid rgba(0,242,254,.48)
+}
+.gx-otp-final-check{
+    position:relative;z-index:3;width:28px;height:28px;display:grid;place-items:center;border-radius:9px;
+    background:#45ffc0;color:#030305;box-shadow:0 0 12px rgba(69,255,192,.16)
+}
+.gx-otp-final-check svg{
+    width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.7;stroke-linecap:round;stroke-linejoin:round
+}
+.gx-otp-dot{
+    position:absolute;width:3px;height:3px;border-radius:50%;background:#45ffc0;
+    box-shadow:0 0 6px rgba(69,255,192,.52)
+}
+.gx-otp-dot.d1{left:-8px;top:31px}.gx-otp-dot.d2{right:-8px;top:31px}
+.gx-otp-dot.d3{top:-8px;left:31px}.gx-otp-dot.d4{bottom:-8px;left:31px}
+.gx-otp-final-copy{
+    position:absolute;top:82px;left:50%;width:180px;transform:translate3d(-50%,5px,0);
+    text-align:center;opacity:0
+}
+.gx-otp-final-copy strong{
+    display:block;color:#dfffee;font-size:10px;font-weight:820;letter-spacing:.35px;text-transform:uppercase
+}
+.gx-otp-final-copy small{display:block;margin-top:3px;color:#8292a8;font-size:8.7px;font-weight:600}
+
+@media(max-width:390px){
+    .gx-feral-code-visual{gap:5px}.gx-feral-code-slot{height:45px;border-radius:11px;font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-feral-code-slot{transition:none!important}.gx-feral-code-slot.is-current:empty::after{animation:none!important}
+}
+</style>
+
+<script id="goxion-activation-constellation-production-script">
+(function(){
+    var code=document.getElementById('gx-activation-code');
+    var step=document.getElementById('gx-activation-step-code');
+    if(!code||!step)return;
+    var shell=code.closest('.gx-auth-input-shell');
+    if(!shell)return;
+
+    if(!shell.querySelector('.gx-feral-code-visual')){
+        shell.classList.add('gx-feral-code-shell');
+        var visual=document.createElement('div');
+        visual.className='gx-feral-code-visual';
+        visual.setAttribute('aria-hidden','true');
+        for(var i=0;i<6;i++){
+            var slot=document.createElement('span');
+            slot.className='gx-feral-code-slot';
+            visual.appendChild(slot);
+        }
+        shell.appendChild(visual);
+    }
+
+    var visual=shell.querySelector('.gx-feral-code-visual');
+    var slots=Array.prototype.slice.call(visual.querySelectorAll('.gx-feral-code-slot'));
+    var activeStage=null;
+
+    function digits(){return String(code.value||'').replace(/\D/g,'').slice(0,6)}
+    function sync(){
+        var v=digits();
+        slots.forEach(function(slot,i){
+            var ch=v[i]||'';
+            slot.textContent=ch;
+            slot.classList.toggle('is-filled',!!ch);
+            slot.classList.toggle('is-current',document.activeElement===code&&i===Math.min(v.length,5)&&v.length<6);
+        });
+    }
+    window.gxSyncActivationCodeVisual=sync;
+    window.gxCleanupActivationFold=function(){
+        if(activeStage){activeStage.remove();activeStage=null}
+        step.classList.remove('gx-otp-fold-running');
+        sync();
+    };
+
+    code.addEventListener('input',sync,{passive:true});
+    code.addEventListener('focus',sync,{passive:true});
+    code.addEventListener('blur',sync,{passive:true});
+    sync();
+
+    function sleep(ms){return new Promise(function(resolve){setTimeout(resolve,ms)})}
+    function reduced(){return !!window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches}
+    function play(el,frames,options){
+        var a=el.animate(frames,options);
+        return a.finished.catch(function(){}).then(function(){
+            var last=frames[frames.length-1]||{};
+            Object.keys(last).forEach(function(k){
+                if(k==='offset'||k==='easing'||k==='composite')return;
+                try{el.style[k]=last[k]}catch(_){}
+            });
+            try{a.cancel()}catch(_){}
+        });
+    }
+
+    window.gxRunActivationConstellation=async function(raw){
+        window.gxCleanupActivationFold();
+        var v=String(raw||digits()).replace(/\D/g,'').slice(0,6);
+        if(v.length!==6)return;
+        code.blur();sync();
+
+        var stepRect=step.getBoundingClientRect();
+        var slotRects=slots.map(function(s){return s.getBoundingClientRect()});
+        if(!stepRect.width||slotRects.some(function(r){return !r.width}))return;
+
+        var stage=document.createElement('div');
+        stage.className='gx-otp-fold-stage';
+        activeStage=stage;
+
+        var group=document.createElement('div');
+        group.className='gx-otp-fold-group';
+        stage.appendChild(group);
+
+        var svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        svg.setAttribute('class','gx-otp-fold-lines');
+        svg.setAttribute('viewBox','0 0 '+stepRect.width+' '+stepRect.height);
+        group.appendChild(svg);
+
+        var nodeSize=54;
+        var startTransforms=[];
+        var matrixTransforms=[];
+        var nodes=slotRects.map(function(r,i){
+            var n=document.createElement('div');
+            n.className='gx-otp-fold-node';
+            n.innerHTML='<span class="gx-otp-node-digit">'+v[i]+'</span><svg class="gx-otp-node-trace" viewBox="0 0 58 58" aria-hidden="true"><rect class="gx-otp-node-lit" x="2" y="2" width="54" height="54" rx="13" ry="13" pathLength="1"></rect><rect class="gx-otp-node-energy" x="2" y="2" width="54" height="54" rx="13" ry="13" pathLength="1"></rect></svg>';
+            var centerX=r.left-stepRect.left+r.width/2;
+            var centerY=r.top-stepRect.top+r.height/2;
+            n.style.left=(centerX-nodeSize/2)+'px';
+            n.style.top=(centerY-nodeSize/2)+'px';
+            var start='translate3d(0px,0px,0) scale('+(r.width/nodeSize)+')';
+            n.style.transform=start;
+            startTransforms[i]=start;
+            group.appendChild(n);
+            return n;
+        });
+
+        var gapX=22,gapY=18;
+        var gridW=nodeSize*3+gapX*2;
+        var gridH=nodeSize*2+gapY;
+        var cx=stepRect.width/2;
+        var cy=Math.max(126,Math.min(stepRect.height-118,stepRect.height*.48));
+        var left=cx-gridW/2;
+        var top=cy-gridH/2;
+        var targets=[
+            [left,top],[left+nodeSize+gapX,top],[left+(nodeSize+gapX)*2,top],
+            [left,top+nodeSize+gapY],[left+nodeSize+gapX,top+nodeSize+gapY],[left+(nodeSize+gapX)*2,top+nodeSize+gapY]
+        ];
+        var centers=targets.map(function(p){return[p[0]+nodeSize/2,p[1]+nodeSize/2]});
+
+        nodes.forEach(function(n,i){
+            var r=slotRects[i];
+            var sx=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var sy=r.top-stepRect.top+r.height/2-nodeSize/2;
+            matrixTransforms[i]='translate3d('+(targets[i][0]-sx)+'px,'+(targets[i][1]-sy)+'px,0) scale(1)';
+        });
+
+        /* Línea tenue + línea de energía encima. El segundo trazo es el
+           que "viaja" y enciende la estructura, como en la referencia. */
+        var edges=[[0,1],[1,2],[2,5],[5,4],[4,3],[3,0],[1,4]];
+        var connections=edges.map(function(e){
+            var base=document.createElementNS('http://www.w3.org/2000/svg','line');
+            base.setAttribute('class','gx-otp-line-base');
+            base.setAttribute('x1',centers[e[0]][0]);base.setAttribute('y1',centers[e[0]][1]);
+            base.setAttribute('x2',centers[e[1]][0]);base.setAttribute('y2',centers[e[1]][1]);
+            base.setAttribute('pathLength','1');
+            base.style.strokeDasharray='1';base.style.strokeDashoffset='1';base.style.opacity='0';
+            svg.appendChild(base);
+
+            var energy=base.cloneNode(false);
+            energy.setAttribute('class','gx-otp-line-energy');
+            energy.style.strokeDasharray='.20 .80';energy.style.strokeDashoffset='1';energy.style.opacity='0';
+            svg.appendChild(energy);
+            return {base:base,energy:energy};
+        });
+
+        var final=document.createElement('div');
+        final.className='gx-otp-final';
+        final.style.left=(cx-33)+'px';
+        final.style.top=(cy-33)+'px';
+        final.innerHTML='<span class="gx-otp-final-frame"></span><span class="gx-otp-final-check"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.1 4.1L19 7.3"/></svg></span><i class="gx-otp-dot d1"></i><i class="gx-otp-dot d2"></i><i class="gx-otp-dot d3"></i><i class="gx-otp-dot d4"></i><span class="gx-otp-final-copy"><strong>Código verificado</strong><small>Preparando tu PIN</small></span>';
+        stage.appendChild(final);
+
+        step.appendChild(stage);
+        step.classList.add('gx-otp-fold-running');
+
+        if(reduced()||typeof Element.prototype.animate!=='function'){
+            nodes.forEach(function(n){n.style.opacity='0'});
+            final.style.opacity='1';final.style.transform='translate3d(0,0,0) scale(1) rotateZ(0deg)';
+            var rc=final.querySelector('.gx-otp-final-copy');
+            if(rc){rc.style.opacity='1';rc.style.transform='translate3d(-50%,0,0)'}
+            await sleep(420);
+            return;
+        }
+
+        /* 1 · Fila → matriz. */
+        await Promise.all(nodes.map(function(n,i){
+            var r=slotRects[i];
+            var sx=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var sy=r.top-stepRect.top+r.height/2-nodeSize/2;
+            var dx=targets[i][0]-sx,dy=targets[i][1]-sy;
+            return sleep(i*16).then(function(){
+                return play(n,[
+                    {transform:startTransforms[i]},
+                    {transform:'translate3d('+(dx*.60)+'px,'+(dy*.58-3)+'px,0) scale(.94)',offset:.60},
+                    {transform:matrixTransforms[i]}
+                ],{duration:470,easing:'cubic-bezier(.18,.78,.18,1)',fill:'both'});
+            });
+        }));
+
+        await sleep(70);
+
+        /* 2 · La geometría base se dibuja primero, todavía morada. */
+        await Promise.all(connections.map(function(cn,i){
+            return sleep(i*20).then(function(){
+                return play(cn.base,[
+                    {strokeDashoffset:'1',opacity:'0'},
+                    {strokeDashoffset:'0',opacity:'.72'}
+                ],{duration:250,easing:'cubic-bezier(.2,.8,.2,1)',fill:'both'});
+            });
+        }));
+
+        /* 3 · CARGA DE NEÓN. Recorre las líneas y después el borde de
+           cada nodo. Cuando pasa, deja detrás la estructura encendida. */
+        var traceOrder=[0,1,2,5,4,3];
+        var energyJobs=connections.map(function(cn,i){
+            return sleep(i*48).then(async function(){
+                await play(cn.energy,[
+                    {strokeDashoffset:'1',opacity:'0'},
+                    {strokeDashoffset:'.72',opacity:'1',offset:.18},
+                    {strokeDashoffset:'-.20',opacity:'1',offset:.82},
+                    {strokeDashoffset:'-.36',opacity:'0'}
+                ],{duration:360,easing:'linear',fill:'both'});
+                cn.base.style.stroke='#45ffc0';
+                cn.base.style.opacity='.82';
+            });
+        });
+
+        var nodeJobs=traceOrder.map(function(nodeIndex,order){
+            var n=nodes[nodeIndex];
+            var lit=n.querySelector('.gx-otp-node-lit');
+            var energy=n.querySelector('.gx-otp-node-energy');
+            return sleep(80+order*58).then(async function(){
+                n.classList.add('is-verified');
+                await play(energy,[
+                    {strokeDashoffset:'1',opacity:'0'},
+                    {strokeDashoffset:'.72',opacity:'1',offset:.18},
+                    {strokeDashoffset:'-.20',opacity:'1',offset:.82},
+                    {strokeDashoffset:'-.36',opacity:'0'}
+                ],{duration:390,easing:'linear',fill:'both'});
+                await play(lit,[{opacity:'0'},{opacity:'.92'}],{
+                    duration:120,easing:'ease-out',fill:'both'
+                });
+            });
+        });
+
+        await Promise.all(energyJobs.concat(nodeJobs));
+        await sleep(150);
+
+        /* 4 · Un beat físico intermedio: visible, pero sin la pausa larga. */
+        await play(group,[
+            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'},
+            {transform:'translateZ(0) perspective(760px) rotateX(5deg) rotateZ(3.2deg) scale(.988)',offset:.50},
+            {transform:'translateZ(0) perspective(760px) rotateX(0deg) rotateZ(0deg) scale(1)'}
+        ],{duration:330,easing:'cubic-bezier(.2,.72,.2,1)',fill:'both'});
+
+        await sleep(35);
+
+        /* 5 · Plegado continuo. */
+        var lineFade=Promise.all(connections.map(function(cn,i){
+            return sleep(i*7).then(function(){
+                return Promise.all([
+                    play(cn.base,[{opacity:'.82'},{opacity:'0'}],{duration:230,easing:'ease-in',fill:'both'}),
+                    play(cn.energy,[{opacity:'0'},{opacity:'0'}],{duration:1,fill:'both'})
+                ]);
+            });
+        }));
+
+        var folds=Promise.all(nodes.map(function(n,i){
+            var r=slotRects[i];
+            var sx=r.left-stepRect.left+r.width/2-nodeSize/2;
+            var sy=r.top-stepRect.top+r.height/2-nodeSize/2;
+            var dx0=targets[i][0]-sx,dy0=targets[i][1]-sy;
+            var dx=(cx-nodeSize/2)-sx,dy=(cy-nodeSize/2)-sy;
+            var turn=(i%2===0?-1:1)*(20+i*1.6);
+            var midX=dx0+(dx-dx0)*.65;
+            var midY=dy0+(dy-dy0)*.65;
+            return sleep(i*14).then(function(){
+                return play(n,[
+                    {transform:matrixTransforms[i],opacity:'1'},
+                    {transform:'translate3d('+midX+'px,'+midY+'px,0) scale(.72) rotateZ('+(turn*.46)+'deg)',opacity:'.90',offset:.60},
+                    {transform:'translate3d('+dx+'px,'+dy+'px,0) scale(.15) rotateZ('+turn+'deg)',opacity:'0'}
+                ],{duration:470,easing:'cubic-bezier(.22,.70,.16,1)',fill:'both'});
+            });
+        }));
+
+        var finalPop=sleep(175).then(function(){
+            return play(final,[
+                {opacity:'0',transform:'translate3d(0,0,0) scale(.58) rotateZ(-7deg)'},
+                {opacity:'1',transform:'translate3d(0,0,0) scale(1.04) rotateZ(1deg)',offset:.72},
+                {opacity:'1',transform:'translate3d(0,0,0) scale(1) rotateZ(0deg)'}
+            ],{duration:390,easing:'cubic-bezier(.16,1,.3,1)',fill:'both'});
+        });
+
+        await Promise.all([lineFade,folds,finalPop]);
+
+        var copy=final.querySelector('.gx-otp-final-copy');
+        if(copy){
+            await play(copy,[
+                {opacity:'0',transform:'translate3d(-50%,4px,0)'},
+                {opacity:'1',transform:'translate3d(-50%,0,0)'}
+            ],{duration:170,easing:'ease-out',fill:'both'});
+        }
+
+        /* Intermedio entre las dos versiones anteriores: suficiente para
+           leer el resultado, sin detener la sensación de continuidad. */
+        await sleep(320);
+
+        /* IMPORTANTE: no quitamos el stage aquí. gxSwitchStage animará
+           este resultado final hacia afuera y sólo después se limpia. */
+    };
+
+})();
+</script>
+
+
+<!-- =========================================================
+     GOXION · BETA 07 · FLOATING LABELS
+     Inspirado en el segundo video compartido.
+     Sólo afecta GOXION ID, Crear PIN y Confirmar PIN.
+     ========================================================= -->
+<style id="goxion-floating-labels-production">
+/* =========================================================
+   GOXION · FLOATING LABELS · PRODUCCIÓN
+   Movimiento continuo: el label nunca cambia de top; sólo se mueve
+   mediante transform, para que Safari pueda interpolarlo sin salto.
+   ========================================================= */
+
+.gx-float-group{
+    margin-bottom:14px!important;
+}
+.gx-float-shell{
+    --gx-float-lift:26.5px;
+    position:relative!important;
+    min-height:53px;
+    isolation:isolate;
+}
+
+/* El label y el input forman una sola pieza. */
+.gx-auth-inline-content .gx-float-shell .gx-float-input{
+    min-height:53px;
+    padding:14px 16px!important;
+    border-radius:16px;
+    color:#fff;
+    caret-color:var(--neon-blue);
+    transition:
+        border-color .24s ease,
+        background .24s ease,
+        box-shadow .24s ease!important;
+}
+.gx-float-shell .gx-float-label{
+    position:absolute;
+    z-index:4;
+    left:15px;
+    top:50%;
+    margin:0!important;
+    padding:0 3px;
+    transform:translate3d(0,-50%,0) scale(1);
+    transform-origin:left center;
+    color:rgba(149,164,189,.88);
+    font-size:12px;
+    line-height:1;
+    font-weight:700;
+    letter-spacing:.05px;
+    background:transparent;
+    pointer-events:none;
+    will-change:transform,color;
+    backface-visibility:hidden;
+    transition:
+        transform .34s cubic-bezier(.16,1,.3,1),
+        color .24s ease,
+        background-color .20s ease,
+        padding .24s ease!important;
+}
+
+/* top SIEMPRE permanece al 50%. El ascenso completo ocurre aquí,
+   usando la misma propiedad transform de principio a fin. */
+.gx-float-shell.is-float .gx-float-label{
+    padding:0 6px;
+    transform:translate3d(0,calc(-50% - var(--gx-float-lift)),0) scale(.84);
+    color:#9fb5c8;
+    background:#060910;
+}
+.gx-float-shell.is-focus .gx-float-label{
+    color:var(--neon-blue);
+    background:#060a10;
+}
+
+.gx-float-shell .gx-float-input::placeholder{
+    opacity:0;
+    color:rgba(149,164,189,.48);
+    transition:opacity .18s ease .02s;
+}
+.gx-float-shell.is-float .gx-float-input::placeholder{
+    opacity:1;
+    transition-delay:.12s;
+}
+
+.gx-auth-inline-content .gx-float-shell.is-focus .gx-float-input{
+    border-color:rgba(0,242,254,.52)!important;
+    background:rgba(5,8,14,.78)!important;
+    box-shadow:
+        0 0 0 2px rgba(0,242,254,.04),
+        0 8px 26px rgba(0,0,0,.14)!important;
+}
+
+/* Acento secundario GOXION muy contenido. */
+.gx-float-shell::after{
+    content:"";
+    position:absolute;
+    z-index:1;
+    right:10px;
+    top:50%;
+    width:24px;
+    height:24px;
+    border-radius:50%;
+    transform:translate3d(0,-50%,0) scale(.72);
+    opacity:0;
+    pointer-events:none;
+    background:radial-gradient(circle,rgba(124,77,255,.11),transparent 70%);
+    transition:opacity .24s ease,transform .32s cubic-bezier(.16,1,.3,1);
+}
+.gx-float-shell.is-focus::after{
+    opacity:1;
+    transform:translate3d(0,-50%,0) scale(1);
+}
+
+/* PIN: conservar espacio para el ojo en login. */
+.gx-float-shell.gx-auth-pin-shell .gx-float-input{
+    padding-right:52px!important;
+}
+#gx-activation-step-pin .gx-float-shell.gx-auth-pin-shell .gx-float-input{
+    padding-right:18px!important;
+}
+.gx-float-shell.gx-auth-pin-shell.is-float .gx-float-input{
+    letter-spacing:7px!important;
+}
+
+/* Recuperación se acomoda debajo del campo, no compite con el label. */
+.gx-float-forgot{
+    display:block!important;
+    width:max-content;
+    margin:7px 3px 0 auto!important;
+    font-size:10px!important;
+}
+
+/* Distribución vertical consistente de ACTIVACIÓN. */
+#gx-activation-step-code:not([hidden]),
+#gx-activation-step-pin:not([hidden]){
+    display:flex!important;
+    flex-direction:column;
+}
+#gx-activation-step-code .gx-auth-field-group,
+#gx-activation-step-pin .gx-auth-field-group{
+    width:100%;
+}
+#gx-activation-step-code .gx-float-group{
+    margin-bottom:16px!important;
+}
+#gx-activation-step-pin .gx-activation-valid-chip{
+    margin:0 0 16px!important;
+}
+#gx-activation-step-pin .gx-float-group{
+    margin-bottom:14px!important;
+}
+#gx-activation-step-code .gx-activation-primary,
+#gx-activation-step-pin .gx-activation-primary{
+    margin-top:3px!important;
+}
+#gx-activation-step-code .gx-activation-back,
+#gx-activation-step-pin .gx-activation-back{
+    display:flex!important;
+    width:max-content!important;
+    margin:8px auto 0!important;
+    align-self:center!important;
+}
+
+/* Login principal: ahora usa el mismo lenguaje que activación. */
+#gx-auth-login-stage .gx-login-float-group{
+    margin-bottom:14px!important;
+}
+#gx-auth-login-stage .gx-login-pin-float-group{
+    margin-bottom:12px!important;
+}
+
+@media(max-height:720px){
+    .gx-float-shell{--gx-float-lift:24px;min-height:48px}
+    .gx-auth-inline-content .gx-float-shell .gx-float-input{min-height:48px}
+    #gx-activation-step-code .gx-float-group,
+    #gx-activation-step-pin .gx-float-group,
+    #gx-auth-login-stage .gx-login-float-group{margin-bottom:11px!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-float-shell .gx-float-label,
+    .gx-auth-inline-content .gx-float-shell .gx-float-input,
+    .gx-float-shell::after{
+        transition:none!important;
+    }
+}
+</style>
+
+<script id="goxion-floating-labels-production-script">
+(function(){
+    var ids=[
+        'login-id',
+        'login-pin',
+        'gx-activation-id',
+        'gx-activation-pin',
+        'gx-activation-pin-confirm'
+    ];
+
+    function sync(input){
+        var shell=input && input.closest('.gx-float-shell');
+        if(!shell)return;
+        var hasValue=String(input.value||'').length>0;
+        var focused=document.activeElement===input;
+        shell.classList.toggle('is-float',hasValue||focused);
+        shell.classList.toggle('is-focus',focused);
+    }
+
+    function syncAll(){
+        ids.forEach(function(id){
+            var input=document.getElementById(id);
+            if(input)sync(input);
+        });
+    }
+    window.gxSyncFloatingLabels=syncAll;
+
+    ids.forEach(function(id){
+        var input=document.getElementById(id);
+        if(!input)return;
+        input.addEventListener('focus',function(){sync(input)});
+        input.addEventListener('blur',function(){sync(input)});
+        input.addEventListener('input',function(){sync(input)},{passive:true});
+        input.addEventListener('change',function(){sync(input)},{passive:true});
+        sync(input);
+    });
+
+    /* Autofill de Safari puede asentarse después del primer layout. */
+    requestAnimationFrame(syncAll);
+    setTimeout(syncAll,180);
+    setTimeout(syncAll,520);
+
+})();
+</script>
+
+
+<!-- =========================================================
+     GOXION · UI/UX HARMONY · PRODUCCIÓN
+     Refina jerarquía, ritmo vertical y floating labels en:
+     1) Login principal
+     2) Activación
+     3) Registro -10%
+     ========================================================= -->
+<style id="goxion-ui-harmony-production">
+/* ---------- LOGIN PRINCIPAL ---------- */
+
+/* La recuperación pertenece al PIN, por eso conserva alineación
+   contextual a la derecha. La activación es una ruta alternativa
+   del formulario completo, por eso se centra debajo del CTA. */
+#gx-auth-login-stage .gx-float-forgot{
+    margin:6px 4px 0 auto!important;
+    font-size:10px!important;
+    line-height:1.2;
+}
+#gx-auth-login-stage .gx-auth-submit{
+    margin-top:7px!important;
+}
+#gx-auth-login-stage .gx-auth-activate-entry{
+    display:flex!important;
+    width:max-content!important;
+    max-width:100%;
+    margin:14px auto 0!important;
+    padding:3px 1px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    text-align:center!important;
+}
+#gx-auth-login-stage .gx-auth-activate-copy{
+    justify-content:center!important;
+}
+#gx-auth-login-stage .gx-auth-secure-note{
+    margin-top:13px!important;
+}
+
+/* ---------- ACTIVACIÓN ---------- */
+
+/* El floating label de GOXION ID necesita una zona de respiración
+   propia sobre el borde; la barra de progreso no debe competir con él. */
+.gx-auth-stage-activation .gx-activation-progress{
+    margin:-2px 0 24px!important;
+}
+#gx-activation-step-code .gx-float-group{
+    margin-bottom:17px!important;
+}
+#gx-activation-step-code .gx-auth-field-group:not(.gx-float-group){
+    margin-bottom:16px!important;
+}
+
+/* Cuando no hay mensaje de estado no reservamos una línea vacía.
+   Esto elimina el hueco artificial entre CTA y navegación secundaria. */
+.gx-activation-status:empty{
+    min-height:0!important;
+    margin-top:0!important;
+}
+#gx-activation-step-code .gx-activation-back,
+#gx-activation-step-pin .gx-activation-back{
+    margin:14px auto 0!important;
+}
+#gx-activation-step-pin .gx-activation-valid-chip{
+    margin:0 0 18px!important;
+}
+#gx-activation-step-pin .gx-float-group{
+    margin-bottom:15px!important;
+}
+#gx-activation-step-pin .gx-activation-primary{
+    margin-top:5px!important;
+}
+
+/* El contenido respira por bloques, no mediante espacios accidentales. */
+#gx-activation-step-code:not([hidden]),
+#gx-activation-step-pin:not([hidden]){
+    gap:0;
+}
+
+/* ---------- REGISTRO -10% ---------- */
+
+.gx-welcome-form{
+    gap:11px!important;
+}
+
+/* Desactivamos el estilo de label exterior de generaciones anteriores
+   únicamente para estos dos campos nuevos. */
+.gx-welcome-form .gx-welcome-float-shell{
+    position:relative;
+    display:block;
+    min-height:46px;
+    margin:0!important;
+    isolation:isolate;
+}
+.gx-welcome-form .gx-welcome-float-label{
+    position:absolute;
+    z-index:4;
+    left:13px;
+    top:50%;
+    margin:0!important;
+    padding:0 3px;
+    transform:translate3d(0,-50%,0) scale(1);
+    transform-origin:left center;
+    color:rgba(255,255,255,.72);
+    font-size:9px!important;
+    line-height:1;
+    font-weight:780;
+    letter-spacing:.02em!important;
+    pointer-events:none;
+    background:transparent;
+    will-change:transform,color;
+    backface-visibility:hidden;
+    transition:
+        transform .34s cubic-bezier(.16,1,.3,1),
+        color .22s ease,
+        background-color .20s ease,
+        padding .24s ease!important;
+}
+.gx-welcome-form .gx-welcome-float-input{
+    width:100%;
+    min-height:46px!important;
+    padding:0 13px!important;
+    border-radius:13px!important;
+    border:1px solid rgba(255,255,255,.15)!important;
+    background:rgba(31,14,51,.92)!important;
+    color:#fff!important;
+    caret-color:#f4e5c1;
+    outline:none;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 7px 18px rgba(52,14,76,.10)!important;
+    transition:
+        border-color .24s ease,
+        background .24s ease,
+        box-shadow .24s ease!important;
+}
+.gx-welcome-form .gx-welcome-float-input::placeholder{
+    opacity:0;
+    color:rgba(255,255,255,.46);
+    transition:opacity .18s ease .02s;
+}
+.gx-welcome-form .gx-welcome-float-shell.is-float .gx-welcome-float-label{
+    padding:0 6px;
+    transform:translate3d(0,calc(-50% - 23px),0) scale(.82);
+    color:#f4e5c1;
+    /* Parche visual del borde, alineado con la identidad propia
+       de esta promoción y no con el cian del resto de la app. */
+    background:rgba(154,55,211,.98);
+}
+.gx-welcome-form .gx-welcome-float-shell.is-float .gx-welcome-float-input::placeholder{
+    opacity:1;
+    transition-delay:.12s;
+}
+.gx-welcome-form .gx-welcome-float-shell.is-focus .gx-welcome-float-label{
+    color:#fff0c9;
+}
+.gx-welcome-form .gx-welcome-float-shell.is-focus .gx-welcome-float-input{
+    border-color:rgba(240,221,178,.68)!important;
+    background:rgba(37,16,59,.96)!important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.07),
+        0 0 0 2px rgba(240,221,178,.06),
+        0 8px 20px rgba(52,14,76,.12)!important;
+}
+
+/* Con floating labels ganamos espacio; lo reinvertimos en aire útil
+   alrededor de la nota y del CTA, no en huecos vacíos arriba. */
+.gx-welcome-rule{
+    margin-top:1px!important;
+}
+.gx-welcome-submit{
+    margin-top:3px!important;
+}
+.gx-welcome-copy{
+    margin-bottom:14px!important;
+}
+
+/* ---------- CONSISTENCIA EN MÓVILES BAJOS ---------- */
+@media(max-height:720px){
+    .gx-auth-stage-activation .gx-activation-progress{
+        margin-bottom:20px!important;
+    }
+    #gx-activation-step-code .gx-activation-back,
+    #gx-activation-step-pin .gx-activation-back{
+        margin-top:11px!important;
+    }
+    .gx-welcome-form{
+        gap:9px!important;
+    }
+    .gx-welcome-form .gx-welcome-float-shell{
+        min-height:43px;
+    }
+    .gx-welcome-form .gx-welcome-float-input{
+        min-height:43px!important;
+    }
+    .gx-welcome-form .gx-welcome-float-shell.is-float .gx-welcome-float-label{
+        transform:translate3d(0,calc(-50% - 21.5px),0) scale(.82);
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-welcome-form .gx-welcome-float-label,
+    .gx-welcome-form .gx-welcome-float-input{
+        transition:none!important;
+    }
+}
+</style>
+
+<script id="goxion-ui-harmony-production-script">
+(function(){
+    var welcomeIds=['gx-welcome-name','gx-welcome-phone'];
+
+    function syncWelcome(input){
+        var shell=input && input.closest('.gx-welcome-float-shell');
+        if(!shell)return;
+        var hasValue=String(input.value||'').length>0;
+        var focused=document.activeElement===input;
+        shell.classList.toggle('is-float',hasValue||focused);
+        shell.classList.toggle('is-focus',focused);
+    }
+
+    function syncAllWelcome(){
+        welcomeIds.forEach(function(id){
+            var input=document.getElementById(id);
+            if(input)syncWelcome(input);
+        });
+    }
+    window.gxSyncWelcomeFloatingLabels=syncAllWelcome;
+
+    welcomeIds.forEach(function(id){
+        var input=document.getElementById(id);
+        if(!input)return;
+        input.addEventListener('focus',function(){syncWelcome(input)});
+        input.addEventListener('blur',function(){syncWelcome(input)});
+        input.addEventListener('input',function(){syncWelcome(input)},{passive:true});
+        input.addEventListener('change',function(){syncWelcome(input)},{passive:true});
+        syncWelcome(input);
+    });
+
+    /* El formulario puede abrir después de varios segundos; Safari
+       también puede completar datos después del primer frame. */
+    requestAnimationFrame(syncAllWelcome);
+    setTimeout(syncAllWelcome,180);
+    setTimeout(syncAllWelcome,520);
+
+    /* Sincronizamos al abrir la promoción, incluso si el navegador
+       conservó valores de una sesión anterior. */
+    var trigger=document.querySelector('.gx-welcome-trigger');
+    trigger?.addEventListener('click',function(){
+        requestAnimationFrame(function(){
+            requestAnimationFrame(syncAllWelcome);
+        });
+    },{passive:true});
+
+})();
+</script>
 
 </body>
 </html>
