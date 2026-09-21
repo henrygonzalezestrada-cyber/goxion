@@ -7,6 +7,75 @@
         return /AppleWebKit/i.test(ua) && !/(Chrome|Chromium|Edg|OPR)/i.test(ua);
     };
 
+    function gxAuthCubicBezier(x1, y1, x2, y2) {
+        const sample = (a1, a2, t) =>
+            3 * (1 - t) * (1 - t) * t * a1 +
+            3 * (1 - t) * t * t * a2 +
+            t * t * t;
+        const derivative = (a1, a2, t) =>
+            3 * (1 - t) * (1 - t) * a1 +
+            6 * (1 - t) * t * (a2 - a1) +
+            3 * t * t * (1 - a2);
+
+        return (progress) => {
+            const x = Math.max(0, Math.min(1, progress));
+            let t = x;
+            for (let i = 0; i < 6; i++) {
+                const dx = sample(x1, x2, t) - x;
+                const d = derivative(x1, x2, t);
+                if (Math.abs(d) < 1e-6) break;
+                t -= dx / d;
+                t = Math.max(0, Math.min(1, t));
+            }
+            return sample(y1, y2, t);
+        };
+    }
+
+    function gxAuthAnimateGeometry(element, from, to, duration, easing) {
+        let cancelled = false;
+        let raf = 0;
+        const ease = gxAuthCubicBezier(...easing);
+
+        const finished = new Promise(resolve => {
+            const start = performance.now();
+            const radiusFrom = parseFloat(from.borderRadius) || 0;
+            const radiusTo = parseFloat(to.borderRadius) || 0;
+            const lerp = (a, b, p) => a + (b - a) * p;
+
+            const frame = now => {
+                if (cancelled) {
+                    resolve();
+                    return;
+                }
+
+                const linear = Math.min(1, Math.max(0, (now - start) / duration));
+                const p = ease(linear);
+
+                element.style.left = `${lerp(from.left, to.left, p)}px`;
+                element.style.top = `${lerp(from.top, to.top, p)}px`;
+                element.style.width = `${lerp(from.width, to.width, p)}px`;
+                element.style.height = `${lerp(from.height, to.height, p)}px`;
+                element.style.borderRadius = `${lerp(radiusFrom, radiusTo, p)}px`;
+
+                if (linear < 1) {
+                    raf = requestAnimationFrame(frame);
+                } else {
+                    resolve();
+                }
+            };
+
+            raf = requestAnimationFrame(frame);
+        });
+
+        return {
+            finished,
+            cancel() {
+                cancelled = true;
+                if (raf) cancelAnimationFrame(raf);
+            }
+        };
+    }
+
     /* =========================================================
        1) NAVIGATION // PRODUCTION
        Uses the approved production behavior:
@@ -450,30 +519,19 @@
         void root.offsetWidth;
 
         const shape = useLayoutMorph
-            ? root.animate([
-                {
-                    left: `${gxAuthSourceRect.left}px`,
-                    top: `${gxAuthSourceRect.top}px`,
-                    width: `${gxAuthSourceRect.width}px`,
-                    height: `${gxAuthSourceRect.height}px`,
-                    borderRadius: gxAuthSourceStyle.borderRadius,
-                    backgroundColor: gxAuthSourceStyle.backgroundColor,
-                    borderColor: gxAuthSourceStyle.borderColor
-                },
-                {
-                    left: `${cardRect.left}px`,
-                    top: `${cardRect.top}px`,
-                    width: `${cardRect.width}px`,
-                    height: `${cardRect.height}px`,
-                    borderRadius: cardStyle.borderRadius,
-                    backgroundColor: cardStyle.backgroundColor,
-                    borderColor: cardStyle.borderColor
-                }
-            ], {
-                duration: 430,
-                easing: 'cubic-bezier(.18,.86,.22,1)',
-                fill: 'forwards'
-            })
+            ? gxAuthAnimateGeometry(root, {
+                left: gxAuthSourceRect.left,
+                top: gxAuthSourceRect.top,
+                width: gxAuthSourceRect.width,
+                height: gxAuthSourceRect.height,
+                borderRadius: gxAuthSourceStyle.borderRadius
+            }, {
+                left: cardRect.left,
+                top: cardRect.top,
+                width: cardRect.width,
+                height: cardRect.height,
+                borderRadius: cardStyle.borderRadius
+            }, 430, [.18,.86,.22,1])
             : root.animate([
                 {
                     transform: inverse,
@@ -589,30 +647,19 @@
         }
 
         const shapeBack = useLayoutMorph
-            ? root.animate([
-                {
-                    left: `${cardRect.left}px`,
-                    top: `${cardRect.top}px`,
-                    width: `${cardRect.width}px`,
-                    height: `${cardRect.height}px`,
-                    borderRadius: '26px',
-                    backgroundColor: 'rgba(8,8,12,.88)',
-                    borderColor: 'rgba(0,242,254,.18)'
-                },
-                {
-                    left: `${destination.left}px`,
-                    top: `${destination.top}px`,
-                    width: `${destination.width}px`,
-                    height: `${destination.height}px`,
-                    borderRadius: gxAuthSourceStyle.borderRadius,
-                    backgroundColor: gxAuthSourceStyle.backgroundColor,
-                    borderColor: gxAuthSourceStyle.borderColor
-                }
-            ], {
-                duration: 390,
-                easing: 'cubic-bezier(.22,.72,.18,1)',
-                fill: 'forwards'
-            })
+            ? gxAuthAnimateGeometry(root, {
+                left: cardRect.left,
+                top: cardRect.top,
+                width: cardRect.width,
+                height: cardRect.height,
+                borderRadius: '26px'
+            }, {
+                left: destination.left,
+                top: destination.top,
+                width: destination.width,
+                height: destination.height,
+                borderRadius: gxAuthSourceStyle.borderRadius
+            }, 390, [.22,.72,.18,1])
             : root.animate([
                 {
                     transform: 'matrix(1,0,0,1,0,0)',
