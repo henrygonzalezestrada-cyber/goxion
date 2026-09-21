@@ -2,6 +2,7 @@ import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { FormEvent, useEffect, useState } from 'react';
 import { CatalogPrototype } from './CatalogPrototype';
 import { OnboardingFlow } from './OnboardingFlow';
+import { ClientSpace } from './ClientSpace';
 import { ClientSpaceData, loginClient, logoutClient, restoreClientSession } from '../lib/client-session';
 
 type Tab = 'inicio' | 'catalogo' | 'soporte';
@@ -70,55 +71,6 @@ function SupportPrototype({ authenticated }: { authenticated: boolean }) {
         ))}
       </div>
       <div className="gx-support-card"><div className="gx-support-glow" /><span className="gx-help-section-kicker">DESDE MI ESPACIO</span><h2>Soporte con contexto</h2><p>La conexión real llegará después de validar esta migración visual. Por ahora no se envía ninguna solicitud.</p><button type="button" disabled>Disponible al conectar Mi Espacio</button></div>
-    </div>
-  );
-}
-
-function ClientDashboard({ data, onLogout, onCatalog }: { data: ClientSpaceData; onLogout: () => void; onCatalog: () => void }) {
-  const client = data.cliente ?? {};
-  const services = Array.isArray(data.servicios) ? data.servicios : [];
-  const payments = Array.isArray(data.pagos) ? data.pagos : [];
-  const firstName = String(client.nombre || 'Cliente').trim().split(/\s+/)[0] || 'Cliente';
-
-  return (
-    <div className="gx-help-view gx-client-dashboard">
-      <section className="gx-client-welcome">
-        <span className="gx-help-eyebrow">MI ESPACIO</span>
-        <h1>¡Hola, <span>{firstName}</span>! 👋</h1>
-        <p>Tu información real ya está siendo leída desde GOXION Next.</p>
-      </section>
-
-      <div className="gx-client-summary-grid">
-        <article><small>Próximo corte</small><strong>Día {Number(client.dia_pago || 15)}</strong><span>de cada mes</span></article>
-        <article><small>Servicios</small><strong>{services.length}</strong><span>{services.length === 1 ? 'activo' : 'activos'}</span></article>
-        <article><small>Racha</small><strong>{Number(client.pagos_puntuales || 0)}</strong><span>pagos puntuales</span></article>
-      </div>
-
-      <section className="gx-help-block">
-        <div className="gx-help-section-head">
-          <div><span className="gx-help-section-kicker">TU CUENTA</span><h2>Tus servicios</h2></div>
-          <button type="button" onClick={onCatalog}>Explorar <span>→</span></button>
-        </div>
-        <div className="gx-client-services">
-          {services.length ? services.map((service, index) => (
-            <motion.article key={String(service.id || index)} layout>
-              <div className="gx-client-service-mark">{String(service.nombre || 'G').slice(0, 1).toUpperCase()}</div>
-              <div><strong>{service.nombre || 'Servicio GOXION'}</strong><small>{service.perfil_nombre ? 'Perfil: ' + service.perfil_nombre : 'Servicio activo'}</small></div>
-              <b>{'$'}{Number(service.monto || 0)} MXN</b>
-            </motion.article>
-          )) : (
-            <div className="gx-client-empty"><strong>Tu primer servicio aparecerá aquí</strong><small>Explora el catálogo para comenzar.</small></div>
-          )}
-        </div>
-      </section>
-
-      <section className="gx-client-readonly">
-        <div><span>LECTURA SEGURA</span><strong>Primera conexión real completada</strong></div>
-        <p>GOXION Next ya puede iniciar sesión, restaurarla y leer tu cuenta. Las acciones que modifican datos siguen bloqueadas.</p>
-      </section>
-
-      <button type="button" className="gx-client-logout" onClick={onLogout}>Cerrar sesión</button>
-      {payments.length > 0 && <small className="gx-client-sync-note">Historial detectado: {payments.length} pago{payments.length === 1 ? '' : 's'}.</small>}
     </div>
   );
 }
@@ -222,7 +174,7 @@ export function AyudaShell() {
       <section className="gx-help-stage">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={tab} initial={reducedMotion ? false : { opacity: 0, y: 10, filter: 'blur(4px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={reducedMotion ? undefined : { opacity: 0, y: -7, filter: 'blur(3px)' }} transition={{ duration: reducedMotion ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}>
-            {tab === 'inicio' && (restoring ? <div className="gx-session-restoring"><span /><strong>Sincronizando GOXION…</strong></div> : session ? <ClientDashboard data={session} onCatalog={() => go('catalogo')} onLogout={signOut} /> : <HomePrototype onCatalog={() => go('catalogo')} onSpace={() => { setLoginPrefill(''); setLoginOpen(true); }} onRegister={() => setOnboarding('registration')} />)}
+            {tab === 'inicio' && (restoring ? <div className="gx-session-restoring"><span /><strong>Sincronizando GOXION…</strong></div> : session ? <ClientSpace data={session} onCatalog={() => go('catalogo')} onLogout={signOut} onDataChange={setSession} /> : <HomePrototype onCatalog={() => go('catalogo')} onSpace={() => { setLoginPrefill(''); setLoginOpen(true); }} onRegister={() => setOnboarding('registration')} />)}
             {tab === 'catalogo' && <CatalogPrototype ownedServiceNames={(session?.servicios || []).map((service) => String(service.nombre || ''))} />}
             {tab === 'soporte' && <SupportPrototype authenticated={Boolean(session)} />}
           </motion.div>
