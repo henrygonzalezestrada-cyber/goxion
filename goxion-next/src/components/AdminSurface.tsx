@@ -1077,27 +1077,45 @@ function OperationsView({
   );
 }
 
-function CatalogManagement({ bundle }: { bundle: Bundle }) {
+function CatalogManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
   const services = bundle.core.catalogo;
-  const clientServices = bundle.core.cliente_servicios.filter((x) => x.activo !== false);
+  const clientServices = bundle.core.cliente_servicios.filter(
+    (x) => x.activo !== false,
+  );
+  const [editing, setEditing] = useState<AdminCatalogService | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [name, setName] = useState('');
+  const [tag, setTag] = useState('');
+  const [benefitsText, setBenefitsText] = useState('');
+  const [price, setPrice] = useState('');
+  const [cost, setCost] = useState('');
+  const [accounts, setAccounts] = useState('1');
+  const [limit, setLimit] = useState('5');
+  const [active, setActive] = useState(true);
 
   const sold = (service: AdminCatalogService) => {
-    const name = normalize(service.nombre);
+    const serviceName = normalize(service.nombre);
     return clientServices.reduce((count, row) => {
       const rowName = normalize(row.nombre);
       let match = false;
-      if (name.includes('netflix')) match = rowName.includes('netflix');
-      else if (name.includes('disney')) match = rowName.includes('disney');
-      else if (name.includes('max') || name.includes('hbo'))
+      if (serviceName.includes('netflix')) match = rowName.includes('netflix');
+      else if (serviceName.includes('disney')) match = rowName.includes('disney');
+      else if (serviceName.includes('max') || serviceName.includes('hbo'))
         match = rowName.includes('max') || rowName.includes('hbo');
-      else if (name.includes('prime'))
+      else if (serviceName.includes('prime'))
         match = rowName.includes('prime') || rowName.includes('amazon');
-      else if (name.includes('youtube')) match = rowName.includes('youtube');
-      else if (name.includes('vix')) match = rowName.includes('vix');
-      else if (name.includes('crunchy')) match = rowName.includes('crunchy');
-      else if (name.includes('microsoft') || name.includes('365'))
+      else if (serviceName.includes('youtube')) match = rowName.includes('youtube');
+      else if (serviceName.includes('vix')) match = rowName.includes('vix');
+      else if (serviceName.includes('crunchy')) match = rowName.includes('crunchy');
+      else if (serviceName.includes('microsoft') || serviceName.includes('365'))
         match = rowName.includes('microsoft') || rowName.includes('365');
-      else if (name.includes('google'))
+      else if (serviceName.includes('google'))
         match = rowName.includes('google') || rowName.includes('one');
       if (!match) return count;
       const quantity = rowName.match(/\(x\s*(\d+)\)/)?.[1];
@@ -1105,29 +1123,291 @@ function CatalogManagement({ bundle }: { bundle: Bundle }) {
     }, 0);
   };
 
+  const openEditor = (service?: AdminCatalogService) => {
+    const current = service || null;
+    setEditing(current);
+    setCreating(true);
+    setName(current?.nombre || '');
+    setTag(current?.etiqueta || '');
+    setBenefitsText(
+      Array.isArray(current?.beneficios)
+        ? current!.beneficios!.join('\n')
+        : String(current?.beneficios || ''),
+    );
+    setPrice(String(current?.precio ?? ''));
+    setCost(String(current?.costo ?? ''));
+    setAccounts(String(current?.cuentas ?? 1));
+    setLimit(String(current?.limite ?? 5));
+    setActive(current?.activo !== false);
+  };
+
+  const save = async () => {
+    if (!name.trim()) {
+      window.alert('Escribe el nombre del servicio.');
+      return;
+    }
+    if (!Number.isFinite(Number(price)) || Number(price) < 0) {
+      window.alert('Revisa el precio de venta.');
+      return;
+    }
+
+    const payload = {
+      nombre: name.trim(),
+      etiqueta: tag.trim(),
+      beneficios: benefitsText.trim(),
+      precio: Number(price || 0),
+      costo: Number(cost || 0),
+      cuentas: Math.max(1, Number(accounts || 1)),
+      limite: Math.max(1, Number(limit || 1)),
+      activo: active,
+    };
+
+    if (editing?.id) {
+      await onMutation(
+        () =>
+          adminAction('editar_servicio_catalogo', {
+            id: editing.id,
+            ...payload,
+          }),
+        'Servicio actualizado.',
+      );
+    } else {
+      await onMutation(
+        () => adminAction('crear_servicio_catalogo', payload),
+        'Servicio creado.',
+      );
+    }
+
+    setCreating(false);
+    setEditing(null);
+  };
+
+  const toggleActive = async (service: AdminCatalogService) => {
+    const next = service.activo === false;
+    if (
+      !next &&
+      !window.confirm(
+        'El servicio dejará de mostrarse como activo en el catálogo. Las contrataciones existentes no se eliminan. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        adminAction('editar_servicio_catalogo', {
+          id: service.id,
+          activo: next,
+        }),
+      next ? 'Servicio reactivado.' : 'Servicio desactivado.',
+    );
+  };
+
+  const syncPrice = async (service: AdminCatalogService) => {
+    if (
+      !window.confirm(
+        'Se actualizará la mensualidad de todas las contrataciones cuyo nombre coincida con ' +
+          String(service.nombre || 'este servicio') +
+          ' a ' +
+          money(service.precio) +
+          '.\n\n¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        adminAction('sincronizar_precio', {
+          nombre: service.nombre || '',
+          precio: Number(service.precio || 0),
+        }),
+      'Precio sincronizado con clientes.',
+    );
+  };
+
   return (
-    <div className="gx-admin-management-list">
-      {services.map((service) => {
-        const capacity = Number(service.cuentas || 0) * Number(service.limite || 0);
-        const used = sold(service);
-        const available =
-          service.stock_manual === null || service.stock_manual === undefined
-            ? Math.max(0, capacity - used)
-            : Math.max(0, Number(service.stock_manual));
-        return (
-          <article key={service.id}>
-            <div>
-              <strong>{service.nombre}</strong>
-              <small>{service.etiqueta || 'Servicio activo'}</small>
+    <div className="gx-admin-management-block">
+      <div className="gx-admin-management-head">
+        <div>
+          <span className="gx-admin-eyebrow">INVENTARIO</span>
+          <h3>Catálogo y disponibilidad</h3>
+        </div>
+        <button type="button" onClick={() => openEditor()}>
+          ＋ Servicio
+        </button>
+      </div>
+
+      <div className="gx-admin-management-list">
+        {services.map((service) => {
+          const capacity =
+            Number(service.cuentas || 0) * Number(service.limite || 0);
+          const used = sold(service);
+          const available =
+            service.stock_manual === null || service.stock_manual === undefined
+              ? Math.max(0, capacity - used)
+              : Math.max(0, Number(service.stock_manual));
+
+          return (
+            <article
+              key={service.id}
+              className={service.activo === false ? 'inactive' : ''}
+            >
+              <div>
+                <strong>{service.nombre}</strong>
+                <small>
+                  {service.etiqueta || 'Sin etiqueta'} ·{' '}
+                  {service.activo === false ? 'Inactivo' : 'Activo'}
+                </small>
+              </div>
+
+              <div className="gx-admin-catalog-numbers">
+                <span>
+                  Venta <b>{money(service.precio)}</b>
+                </span>
+                <span>
+                  Costo <b>{money(service.costo)}</b>
+                </span>
+                <span>
+                  Disp.{' '}
+                  <b className={available <= 1 ? 'bad' : 'good'}>
+                    {available}
+                  </b>
+                </span>
+              </div>
+
+              <div className="gx-admin-catalog-actions">
+                <button type="button" onClick={() => openEditor(service)}>
+                  Editar
+                </button>
+                <button type="button" onClick={() => void syncPrice(service)}>
+                  Sincronizar precio
+                </button>
+                <button
+                  type="button"
+                  className={service.activo === false ? 'success' : 'warning'}
+                  onClick={() => void toggleActive(service)}
+                >
+                  {service.activo === false ? 'Reactivar' : 'Desactivar'}
+                </button>
+              </div>
+            </article>
+          );
+        })}
+        {!services.length && (
+          <div className="gx-admin-empty">No hay servicios configurados.</div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {creating && (
+          <motion.div
+            className="gx-admin-inline-editor gx-admin-catalog-editor"
+            initial={{ opacity: 0, y: 7 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+          >
+            <div className="gx-admin-inline-editor-head">
+              <strong>{editing ? 'Editar servicio' : 'Nuevo servicio'}</strong>
+              <button
+                type="button"
+                onClick={() => {
+                  setCreating(false);
+                  setEditing(null);
+                }}
+              >
+                ×
+              </button>
             </div>
-            <div className="gx-admin-catalog-numbers">
-              <span>Venta <b>{money(service.precio)}</b></span>
-              <span>Costo <b>{money(service.costo)}</b></span>
-              <span>Disp. <b className={available <= 1 ? 'bad' : 'good'}>{available}</b></span>
+
+            <label>
+              <span>Nombre</span>
+              <input value={name} onChange={(e) => setName(e.target.value)} />
+            </label>
+
+            <label>
+              <span>Etiqueta</span>
+              <input value={tag} onChange={(e) => setTag(e.target.value)} />
+            </label>
+
+            <label>
+              <span>Beneficios</span>
+              <textarea
+                rows={4}
+                value={benefitsText}
+                onChange={(e) => setBenefitsText(e.target.value)}
+              />
+            </label>
+
+            <div className="gx-admin-form-pair">
+              <label>
+                <span>Precio venta</span>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Costo</span>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={cost}
+                  onChange={(e) => setCost(e.target.value)}
+                />
+              </label>
             </div>
-          </article>
-        );
-      })}
+
+            <div className="gx-admin-form-pair">
+              <label>
+                <span>Cuentas</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={accounts}
+                  onChange={(e) => setAccounts(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Límite por cuenta</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={limit}
+                  onChange={(e) => setLimit(e.target.value)}
+                />
+              </label>
+            </div>
+
+            {editing && (
+              <label className="gx-admin-check-row">
+                <input
+                  type="checkbox"
+                  checked={active}
+                  onChange={(e) => setActive(e.target.checked)}
+                />
+                <span>Servicio activo</span>
+              </label>
+            )}
+
+            <div className="gx-admin-rule-note">
+              Cambiar el precio del catálogo no modifica automáticamente las
+              mensualidades ya contratadas. Usa “Sincronizar precio” sólo cuando
+              quieras aplicar ese cambio a clientes existentes.
+            </div>
+
+            <button
+              type="button"
+              className="primary"
+              onClick={() => void save()}
+            >
+              {editing ? 'Guardar cambios' : 'Crear servicio'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -1610,7 +1890,7 @@ function ManagementView({
           <button type="button" key={id} className={section===id?'active':''} onClick={()=>setSection(id)}>{label}</button>
         ))}
       </div>
-      {section === 'catalog' && <CatalogManagement bundle={bundle} />}
+      {section === 'catalog' && <CatalogManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'promotions' && <PromotionsManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'benefits' && <BenefitsManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'access' && <InfrastructureManagement bundle={bundle} onMutation={onMutation} />}
