@@ -1,5 +1,5 @@
 (()=>{
-  const PROMO_URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/promociones-admin-beta";
+  const PROMO_URL=GXCORE.endpoint("promociones-admin-beta");
   let promoState={servicios:[],promociones:[]};
 
   window.gxOpenManagementDestination=function(dest){
@@ -32,7 +32,7 @@
   };
 
   async function promoApi(accion,datos={}){
-    const token=localStorage.getItem('GOXION_ADMIN_TOKEN')||'';
+    const token=localStorage.getItem(GXCORE.STORAGE.ADMIN_TOKEN)||'';
     const r=await fetch(PROMO_URL,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({accion,datos})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||j?.ok!==true)throw new Error(j?.error||`HTTP ${r.status}`);
