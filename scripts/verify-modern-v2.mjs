@@ -259,6 +259,35 @@ for (const relative of [...MODERNIZED_SCRIPTS, ...ADDED_SCRIPTS]) {
   }
 }
 
+// Gamificación compartida: trofeo, check y demás watermarks deben seguir
+// exactamente el mismo flujo. El clon visual no puede conservar data-watermark,
+// porque Safari puede rasterizar ese pseudo-elemento como una segunda copia.
+{
+  const gamifPath = join(ROOT, 'assets', 'js', 'ayuda', '05-gamification-shared-morph-js.js');
+  if (existsSync(gamifPath)) {
+    const gamif = readFileSync(gamifPath, 'utf8');
+
+    if (gamif.includes('gxShouldTravelSharedEmoji')) {
+      failures.push('Gamificación: reapareció una rama especial por tipo de emoji.');
+    }
+
+    if (!gamif.includes("ghost.removeAttribute('data-watermark')")) {
+      failures.push('Gamificación: el clon visual volvió a conservar data-watermark.');
+    }
+
+    const openShared = gamif.includes(
+      "const floatingEmoji = targetEmoji ? gxCreateFloatingEmoji(sourceEmoji, targetEmoji) : null;"
+    );
+    const closeShared = gamif.includes(
+      "floatingEmoji = gxCreateFloatingEmoji(panelEmoji, { ...sourceEmoji, text: panelEmoji.text });"
+    );
+
+    if (!openShared || !closeShared) {
+      failures.push('Gamificación: el shared-element flow dejó de ser común en apertura/cierre.');
+    }
+  }
+}
+
 for (const page of PAGES) {
   const modern = readFileSync(join(ROOT, page + '.html'), 'utf8');
   const runtimeTag = '<script src="./assets/js/core/runtime.js"></script>';
