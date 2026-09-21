@@ -328,7 +328,7 @@
             return;
         }
 
-        gxAuthResizeAnim = gxMotionAnimate(root, [
+        gxAuthResizeAnim = root.animate([
             {
                 top: `${current.top}px`,
                 height: `${current.height}px`
@@ -445,7 +445,7 @@
 
         void root.offsetWidth;
 
-        const shape = gxMotionAnimate(root, [
+        const shape = root.animate([
             {
                 transform: inverse,
                 borderRadius: startRadius,
@@ -549,7 +549,7 @@
         const inverse = gxAuthFlipMatrix(flip);
         const endRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
 
-        const shapeBack = gxMotionAnimate(root, [
+        const shapeBack = root.animate([
             {
                 transform: 'matrix(1,0,0,1,0,0)',
                 borderRadius: '26px',
