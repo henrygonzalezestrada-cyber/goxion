@@ -3,6 +3,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { CatalogPrototype } from './CatalogPrototype';
 import { OnboardingFlow } from './OnboardingFlow';
 import { ClientSpace } from './ClientSpace';
+import { SupportCenter } from './SupportCenter';
 import { ClientSpaceData, loginClient, logoutClient, restoreClientSession } from '../lib/client-session';
 
 type Tab = 'inicio' | 'catalogo' | 'soporte';
@@ -50,27 +51,6 @@ function HomePrototype({ onCatalog, onSpace, onRegister }: { onCatalog: () => vo
           </div>
         </div>
       </section>
-    </div>
-  );
-}
-
-function SupportPrototype({ authenticated }: { authenticated: boolean }) {
-  const steps = [
-    ['01', 'Reportas', 'Cuéntanos qué sucede desde tu espacio.'],
-    ['02', 'Revisamos', 'Validamos tu cuenta y el servicio relacionado.'],
-    ['03', 'Resolvemos', 'Te guiamos con una solución concreta.'],
-  ];
-  return (
-    <div className="gx-help-view gx-support-view">
-      <section className="gx-support-hero"><span className="gx-help-eyebrow">SOPORTE GOXION</span><h1>Estamos para ayudarte</h1><p>Un flujo más claro para que tus solicitudes lleguen al lugar correcto.</p></section>
-      <div className="gx-support-flow">
-        {steps.map(([step, title, copy], index) => (
-          <motion.article key={step} className="gx-support-step" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.06 }}>
-            <span>{step}</span><div><strong>{title}</strong><p>{copy}</p></div>
-          </motion.article>
-        ))}
-      </div>
-      <div className="gx-support-card"><div className="gx-support-glow" /><span className="gx-help-section-kicker">DESDE MI ESPACIO</span><h2>Soporte con contexto</h2><p>La conexión real llegará después de validar esta migración visual. Por ahora no se envía ninguna solicitud.</p><button type="button" disabled>Disponible al conectar Mi Espacio</button></div>
     </div>
   );
 }
@@ -176,7 +156,7 @@ export function AyudaShell() {
           <motion.div key={tab} initial={reducedMotion ? false : { opacity: 0, y: 10, filter: 'blur(4px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={reducedMotion ? undefined : { opacity: 0, y: -7, filter: 'blur(3px)' }} transition={{ duration: reducedMotion ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}>
             {tab === 'inicio' && (restoring ? <div className="gx-session-restoring"><span /><strong>Sincronizando GOXION…</strong></div> : session ? <ClientSpace data={session} onCatalog={() => go('catalogo')} onLogout={signOut} onDataChange={setSession} /> : <HomePrototype onCatalog={() => go('catalogo')} onSpace={() => { setLoginPrefill(''); setLoginOpen(true); }} onRegister={() => setOnboarding('registration')} />)}
             {tab === 'catalogo' && <CatalogPrototype ownedServiceNames={(session?.servicios || []).map((service) => String(service.nombre || ''))} />}
-            {tab === 'soporte' && <SupportPrototype authenticated={Boolean(session)} />}
+            {tab === 'soporte' && <SupportCenter data={session} onLogin={() => { setLoginPrefill(''); setLoginOpen(true); }} />}
           </motion.div>
         </AnimatePresence>
       </section>
