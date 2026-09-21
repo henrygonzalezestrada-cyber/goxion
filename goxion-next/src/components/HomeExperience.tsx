@@ -22,152 +22,231 @@ const FAQS = [
   },
 ];
 
-export function HomeExperience({ onCatalog }: { onCatalog: () => void }) {
+export function HomeExperience({
+  onCatalog,
+  onSpace,
+}: {
+  onCatalog: () => void;
+  onSpace: () => void;
+}) {
   const [faq, setFaq] = useState<number | null>(null);
   const [legal, setLegal] = useState<LegalModal>(null);
 
   return (
     <>
-      <section className="gx-home-experience">
-        <div className="gx-help-section-head gx-help-section-simple">
-          <div>
-            <span className="gx-help-section-kicker">ASÍ DE SIMPLE</span>
-            <h2>¿Cómo funciona GOXION?</h2>
-          </div>
-        </div>
+      <section>
+        <div className="section-title">¿Cómo funciona Goxion?</div>
 
-        <div className="gx-how-grid">
-          {[
-            ['01', '◈', 'Elige tu servicio', 'Selecciona la plataforma o producto que necesitas desde nuestro catálogo.'],
-            ['02', '▣', 'Realiza tu pedido', 'Define la cantidad y envía tu solicitud directamente desde GOXION.'],
-            ['03', '✦', 'Recibe tu acceso', 'Tras la validación correspondiente, tus accesos quedan disponibles para comenzar a disfrutar.'],
-          ].map(([number, icon, title, copy], index) => (
-            <motion.article
-              key={number}
-              initial={{ opacity: 0, y: 9 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-35px' }}
-              transition={{ delay: index * 0.05 }}
-            >
-              <span className="gx-how-number">{number}</span>
-              <i>{icon}</i>
-              <strong>{title}</strong>
-              <p>{copy}</p>
-            </motion.article>
-          ))}
+        <div className="hiw-grid">
+          <motion.article
+            className="hiw-step"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-35px' }}
+          >
+            <div className="hiw-num">01</div>
+            <div className="hiw-title">
+              <span>🛒</span> Elige tu servicio
+            </div>
+            <div className="hiw-desc">
+              Selecciona la plataforma o producto que necesitas desde nuestro
+              catálogo.
+            </div>
+          </motion.article>
+
+          <motion.article
+            className="hiw-step"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-35px' }}
+            transition={{ delay: 0.05 }}
+          >
+            <div className="hiw-num">02</div>
+            <div className="hiw-title">
+              <span>💳</span> Realiza tu compra
+            </div>
+            <div className="hiw-desc">
+              Completa tu pedido de forma rápida, privada y segura.
+            </div>
+          </motion.article>
+
+          <motion.article
+            className="hiw-step"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-35px' }}
+            transition={{ delay: 0.1 }}
+          >
+            <div className="hiw-num">03</div>
+            <div className="hiw-title">
+              <span>🚀</span> Recibe tu acceso
+            </div>
+            <div className="hiw-desc">
+              Tras la validación correspondiente, recibe tus datos y comienza a
+              disfrutar.
+            </div>
+          </motion.article>
         </div>
 
         <motion.button
           type="button"
-          className="gx-home-catalog-action"
+          className="btn-primary gx-catalog-main-cta"
           onClick={onCatalog}
           whileTap={{ scale: 0.985 }}
         >
           <span>Ver servicios disponibles</span>
-          <i>→</i>
+          <span>→</span>
         </motion.button>
       </section>
 
-      <section className="gx-home-experience">
-        <div className="gx-help-section-head gx-help-section-simple">
-          <div>
-            <span className="gx-help-section-kicker">CONFIANZA GOXION</span>
-            <h2>¿Por qué comprar aquí?</h2>
-          </div>
-        </div>
+      <section>
+        <div className="section-title">¿Por qué comprar aquí?</div>
 
-        <div className="gx-trust-grid">
-          {[
-            ['⚡', 'Activación ágil', 'Seguimiento claro desde que registras tu pedido hasta que recibes tu acceso.'],
-            ['🛡', 'Trato Justo', 'Si una falla técnica aplica, GOXION calcula la compensación correspondiente.'],
-            ['✦', 'Soporte dedicado', 'Tu solicitud llega con el contexto de tu cuenta y servicio, sin repetir información.'],
-            ['◉', 'Espacio protegido', 'Sesiones, PIN y credenciales sensibles usan flujos separados y controlados.'],
-          ].map(([icon, title, copy]) => (
-            <article key={title}>
-              <span>{icon}</span>
-              <strong>{title}</strong>
-              <p>{copy}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="gx-home-postpurchase">
-        <div>
-          <span className="gx-help-section-kicker">DESPUÉS DE TU COMPRA</span>
-          <h2>Tu servicio, sin complicaciones</h2>
-          <p>
-            Tus servicios quedan ligados a Mi Espacio para consultar accesos,
-            estado de cuenta, beneficios y soporte desde un mismo lugar.
-          </p>
-        </div>
-
-        <div className="gx-postpurchase-flow">
-          {[
-            ['01', 'Reportas'],
-            ['02', 'Revisamos'],
-            ['03', 'Resolvemos'],
-          ].map(([n, label], index) => (
-            <div key={n}>
-              <span>{n}</span>
-              <strong>{label}</strong>
-              {index < 2 && <i />}
+        <div className="benefits-grid">
+          <article className="benefit-box">
+            <div className="benefit-icon">⚡</div>
+            <div className="benefit-title">Activación ágil</div>
+            <div className="benefit-desc">
+              Seguimiento claro desde que registras tu pedido hasta que recibes
+              tu acceso.
             </div>
-          ))}
+          </article>
+
+          <article className="benefit-box">
+            <div className="benefit-icon">🛡️</div>
+            <div className="benefit-title">Garantía y Trato Justo</div>
+            <div className="benefit-desc">
+              Si una falla técnica aplica, GOXION calcula la compensación
+              correspondiente.
+            </div>
+          </article>
+
+          <article className="benefit-box">
+            <div className="benefit-icon">💬</div>
+            <div className="benefit-title">Soporte dedicado</div>
+            <div className="benefit-desc">
+              Tu solicitud llega con el contexto de tu cuenta y servicio.
+            </div>
+          </article>
+
+          <article className="benefit-box">
+            <div className="benefit-icon">🔒</div>
+            <div className="benefit-title">Espacio protegido</div>
+            <div className="benefit-desc">
+              Sesiones, PIN y credenciales sensibles usan flujos separados y
+              controlados.
+            </div>
+          </article>
         </div>
       </section>
 
-      <section className="gx-home-experience">
-        <div className="gx-help-section-head gx-help-section-simple">
-          <div>
-            <span className="gx-help-section-kicker">AYUDA RÁPIDA</span>
-            <h2>Preguntas frecuentes</h2>
+      <section className="feature-card">
+        <div className="feature-title">Tu compra, sin complicaciones</div>
+        <div className="feature-desc">
+          Tus servicios quedan ligados a Mi Espacio para consultar accesos,
+          estado de cuenta, beneficios y soporte desde un mismo lugar.
+        </div>
+
+        <hr />
+
+        <div className="feature-title feature-title-blue">
+          🤝 Estamos contigo post-compra
+        </div>
+        <div className="feature-desc">
+          Si necesitas ayuda con un acceso, renovación o incidencia, el flujo
+          queda dentro de GOXION.
+        </div>
+
+        <div className="timeline-box">
+          <div className="timeline-step">
+            <div className="timeline-icon">📱</div>
+            <div className="timeline-text">Reportas</div>
+          </div>
+          <div className="timeline-step">
+            <div className="timeline-icon">🔍</div>
+            <div className="timeline-text">Revisamos</div>
+          </div>
+          <div className="timeline-step">
+            <div className="timeline-icon">✅</div>
+            <div className="timeline-text">Resolvemos</div>
+          </div>
+        </div>
+      </section>
+
+      <section className="feature-card has-promo-card">
+        <div className="feature-badge">EXCLUSIVO</div>
+        <div className="feature-title">Todo bajo control en tu Espacio</div>
+        <div className="feature-desc">
+          Consulta tu cuenta, administra accesos, revisa beneficios y solicita
+          soporte desde el mismo lugar.
+        </div>
+
+        <div className="rotating-benefits-container">
+          <div className="rotating-benefit-item active">
+            <span>🧾</span>
+            <div className="rotating-benefit-text">
+              Consulta tu estado de cuenta y reporta tu pago desde GOXION.
+            </div>
           </div>
         </div>
 
-        <div className="gx-faq-list">
-          {FAQS.map((item, index) => {
-            const open = faq === index;
-            return (
-              <motion.article layout key={item.q}>
-                <button
-                  type="button"
-                  onClick={() => setFaq(open ? null : index)}
-                  aria-expanded={open}
-                >
-                  <strong>{item.q}</strong>
-                  <motion.span animate={{ rotate: open ? 180 : 0 }}>⌄</motion.span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {open && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                    >
-                      <p>{item.a}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.article>
-            );
-          })}
-        </div>
+        <button
+          type="button"
+          className="btn-primary gx-space-feature-entry"
+          onClick={onSpace}
+        >
+          Entrar a Mi Espacio
+        </button>
       </section>
 
-      <section className="gx-home-legal">
-        <div>
-          <strong>Reglas claras, siempre disponibles</strong>
-          <small>Consulta las condiciones que respaldan tu servicio.</small>
-        </div>
-        <div>
-          <button type="button" onClick={() => setLegal('terms')}>
-            Términos
-          </button>
-          <button type="button" onClick={() => setLegal('guarantee')}>
-            Garantía y Trato Justo
-          </button>
-        </div>
+      <section className="faq-container">
+        <div className="section-title">Preguntas Frecuentes</div>
+
+        {FAQS.map((item, index) => {
+          const open = faq === index;
+          return (
+            <motion.article
+              layout
+              key={item.q}
+              className={'faq-item ' + (open ? 'open' : '')}
+            >
+              <button
+                type="button"
+                className="faq-header"
+                onClick={() => setFaq(open ? null : index)}
+                aria-expanded={open}
+              >
+                <span>{item.q}</span>
+                <motion.span className="icon" animate={{ rotate: open ? 180 : 0 }}>
+                  ▼
+                </motion.span>
+              </button>
+
+              <AnimatePresence initial={false}>
+                {open && (
+                  <motion.div
+                    className="faq-body"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                  >
+                    {item.a}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.article>
+          );
+        })}
+      </section>
+
+      <section className="gx-official-legal-links">
+        <button type="button" onClick={() => setLegal('terms')}>
+          Términos y Condiciones
+        </button>
+        <span>•</span>
+        <button type="button" onClick={() => setLegal('guarantee')}>
+          Garantía y Trato Justo
+        </button>
       </section>
 
       <AnimatePresence>
@@ -217,17 +296,12 @@ export function HomeExperience({ onCatalog }: { onCatalog: () => void }) {
                     <li>
                       <strong>Dispositivos.</strong> Los cambios de dispositivo o
                       uso simultáneo deben respetar las condiciones indicadas por
-                      GOXION para cada servicio.
+                      GOXION.
                     </li>
                     <li>
                       <strong>Pagos.</strong> La fecha y el importe vigentes son
                       los que aparecen en Mi Espacio. El comprobante debe
-                      reportarse desde GOXION para ser validado.
-                    </li>
-                    <li>
-                      <strong>Incumplimiento.</strong> El uso no autorizado puede
-                      provocar suspensión temporal o cancelación conforme a las
-                      reglas del servicio.
+                      reportarse desde GOXION.
                     </li>
                   </ol>
                 </>
@@ -256,10 +330,6 @@ export function HomeExperience({ onCatalog }: { onCatalog: () => void }) {
                       <small>Aplica conforme al estado de la cuenta.</small>
                     </article>
                   </div>
-                  <p className="gx-legal-note">
-                    El estado de cuenta calculado por GOXION es la referencia
-                    vigente para descuentos, cargos y beneficios del periodo.
-                  </p>
                 </>
               )}
             </motion.section>
