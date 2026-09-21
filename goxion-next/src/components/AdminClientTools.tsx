@@ -321,6 +321,23 @@ export function ClientOperationalTools({
     );
   };
 
+  const resetReferral = async () => {
+    if (
+      !window.confirm(
+        'Se reiniciará el progreso del referido desde hoy: meses a 0, beneficio sin reclamar y cálculo automático desde una nueva fecha. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        adminOperation('reiniciar_referido_inteligente', {
+          cliente_id: client.id,
+        }),
+      'Progreso del referido reiniciado.',
+    );
+  };
+
   const saveMissions = async () => {
     await onMutation(
       () =>
@@ -500,6 +517,9 @@ export function ClientOperationalTools({
                 </button>
                 <button type="button" onClick={() => void automaticReferral()}>
                   Automático
+                </button>
+                <button type="button" className="warning" onClick={() => void resetReferral()}>
+                  Reiniciar progreso
                 </button>
                 <button type="button" className="danger" onClick={() => void removeReferral()}>
                   Desactivar
