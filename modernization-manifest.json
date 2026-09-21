@@ -3,7 +3,8 @@
   "policy": "DOM y CSS permanecen 1:1 con main. Sólo estos scripts pueden diferir internamente.",
   "addedScripts": [
     "assets/js/core/runtime.js",
-    "assets/js/core/motion-engine.mjs"
+    "assets/js/core/motion-engine.mjs",
+    "assets/js/ayuda/data/support-issues.js"
   ],
   "modernizedScripts": [
     "assets/js/ayuda/01-01-inline.js",
@@ -25,6 +26,7 @@
   ],
   "phases": {
     "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",
-    "motion-engine": "Motion 13.4 adaptado a geometría de Mi Espacio y FLIP/altura de Soporte, con fallback WAAPI"
+    "motion-engine": "Motion 13.4 adaptado a geometría de Mi Espacio y FLIP/altura de Soporte, con fallback WAAPI",
+    "feature-data": "Datos editables de Soporte separados de lógica y animaciones"
   }
 }
