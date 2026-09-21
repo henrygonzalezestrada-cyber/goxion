@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { ClientOperationalTools, NewClientModal } from './AdminClientTools';
+import { AdminBillingCycleTools } from './AdminBillingCycleTools';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -352,12 +353,23 @@ function ClientEditor({
   client,
   state,
   data,
+  period,
   onClose,
   onMutation,
 }: {
   client: AdminClient;
   state?: AdminAccountState;
   data: AdminData;
+  period?: {
+    id?: string;
+    folio?: string;
+    nombre?: string;
+    periodo_pendiente?: string;
+    estado?: string;
+    estado_guardado?: string;
+    ciclo_cobro_manual?: boolean;
+    corte_aplicado?: boolean;
+  };
   onClose: () => void;
   onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
 }) {
@@ -468,6 +480,12 @@ function ClientEditor({
             <button type="button" onClick={() => void adjustLoyalty(1)}>＋</button>
           </div>
         </section>
+
+        <AdminBillingCycleTools
+          client={client}
+          period={period}
+          onMutation={onMutation}
+        />
 
         <ClientOperationalTools
           client={client}
@@ -611,6 +629,9 @@ function ClientsView({
               (item) => String(item.cliente_id) === selected.id,
             )}
             data={data}
+            period={bundle.periods?.periodos?.find(
+              (item) => String(item.id) === selected.id,
+            )}
             onClose={() => setSelected(null)}
             onMutation={onMutation}
           />
