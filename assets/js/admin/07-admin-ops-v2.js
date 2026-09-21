@@ -1,5 +1,6 @@
 (() => {
-    const OPS_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-operaciones";
+        const GXCORE = window.GOXION_CORE;
+    const OPS_URL = GXCORE.endpoint("admin-operaciones");
     const TAGS = [
         {tag:"CATALOGO", emoji:"🛒", name:"Catálogo", mode:"Automática", info:"Se completa cuando el cliente visita la pestaña Catálogo."},
         {tag:"PAGO", emoji:"💳", name:"Pago", mode:"Automática", info:"Se completa cuando el cliente reporta su comprobante de pago."},
@@ -17,7 +18,7 @@
     let paymentCtx = null;
 
     async function ops(accion, datos={}) {
-        const token = localStorage.getItem("GOXION_ADMIN_TOKEN") || "";
+        const token = localStorage.getItem(GXCORE.STORAGE.ADMIN_TOKEN) || "";
         const r = await fetch(OPS_URL, {
             method:"POST",
             headers:{"Content-Type":"application/json","X-Admin-Token":token},
