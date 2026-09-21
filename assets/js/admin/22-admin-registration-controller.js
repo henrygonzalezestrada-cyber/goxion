@@ -1,5 +1,6 @@
 (() => {
-    const URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/registro-admin";
+        const GXCORE = window.GOXION_CORE;
+    const URL=GXCORE.endpoint("registro-admin");
     window.gxRegistrationState={clientes:[],solicitudes:[],activaciones:[],resumen:{foco_rojo:0,nuevos_pendientes:0,activaciones_pendientes:0,activaciones_bloqueadas:0,activaciones_expiradas:0,legacy_sin_telefono:0},tab:"new"};
 
     const esc=v=>String(v??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
@@ -25,7 +26,7 @@
     const activationByRequest=id=>gxRegistrationState.activaciones.find(a=>String(a.solicitud_id)===String(id))||null;
 
     async function api(accion,datos={}){
-        const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
+        const token=localStorage.getItem(GXCORE.STORAGE.ADMIN_TOKEN)||"";
         const r=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion,datos}),cache:"no-store"});
         const j=await r.json().catch(()=>({}));
         if(!r.ok||j?.ok!==true){const e=new Error(j?.error||`HTTP ${r.status}`);e.payload=j;e.status=r.status;throw e}
