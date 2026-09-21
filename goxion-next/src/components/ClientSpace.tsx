@@ -10,6 +10,7 @@ import {
   revealCredential,
   refreshClientSpace,
 } from '../lib/client-session';
+import { ServiceCancellation } from './ServiceCancellation';
 
 type Props = {
   data: ClientSpaceData;
@@ -173,6 +174,18 @@ function BillingCard({ data }: { data: ClientSpaceData }) {
         <span>{details ? 'Ocultar desglose' : 'Ver desglose'}</span>
         <motion.i animate={{ rotate: details ? 180 : 0 }}>⌄</motion.i>
       </button>
+
+      <motion.a
+        href="./index.html"
+        className="gx-billing-payment-link"
+        whileTap={{ scale: 0.985 }}
+      >
+        <span>
+          <b>Ver estado de cuenta completo</b>
+          <small>Consulta el desglose y reporta tu pago desde GOXION</small>
+        </span>
+        <i>→</i>
+      </motion.a>
 
       <AnimatePresence initial={false}>
         {details && (
@@ -363,6 +376,7 @@ function ServicesSection({
     ? data.credenciales_entregas
     : [];
   const news = Array.isArray(data.novedades_servicio) ? data.novedades_servicio : [];
+  const cancellations = Array.isArray(data.cancelaciones) ? data.cancelaciones : [];
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
@@ -387,6 +401,9 @@ function ServicesSection({
               item.servicio_activo !== false,
           );
           const serviceNews = news.filter(
+            (item) => String(item.cliente_servicio_id || '') === id,
+          );
+          const cancellation = cancellations.find(
             (item) => String(item.cliente_servicio_id || '') === id,
           );
 
@@ -477,6 +494,12 @@ function ServicesSection({
                           onRevealed={() => void onRefresh()}
                         />
                       )}
+
+                      <ServiceCancellation
+                        service={service}
+                        cancellation={cancellation}
+                        onRefresh={onRefresh}
+                      />
                     </div>
                   </motion.div>
                 )}
