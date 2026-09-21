@@ -194,25 +194,59 @@ async function runAyuda(browser, browserName, errors) {
   await page.close();
 }
 
-async function runAdmin(browser, browserName, errors) {
-  const label = `${browserName} · Admin`;
-  const page = await browser.newPage({ viewport: { width: 1280, height: 900 } });
+async function runAdminViewport(browser, browserName, errors, viewport, suffix) {
+  const label = `${browserName} · Admin · ${suffix}`;
+  const page = await browser.newPage({ viewport });
   attachDiagnostics(page, label, errors);
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(900);
+
+  // Cualquier función invocada desde HTML debe seguir expuesta globalmente
+  // después de externalizar los scripts. Esto detecta roturas de alcance
+  // aunque el control todavía se vea correctamente.
+  const missingHandlers = await page.evaluate(() => {
+    const names = new Set();
+    const events = ['onclick','onchange','oninput','onsubmit'];
+    const ignored = new Set([
+      'if','for','while','switch','function','setTimeout','setInterval',
+      'Math','Number','String','Array','Object','Boolean','Date',
+      'parseInt','parseFloat'
+    ]);
+
+    for (const el of document.querySelectorAll('*')) {
+      for (const attr of events) {
+        const code = el.getAttribute(attr);
+        if (!code) continue;
+        for (const match of code.matchAll(/\\b([A-Za-z_$][\\w$]*)\\s*\\(/g)) {
+          const name = match[1];
+          if (!ignored.has(name)) names.add(name);
+        }
+      }
+    }
+
+    return [...names].filter(name => typeof window[name] !== 'function').sort();
+  });
+  if (missingHandlers.length) {
+    errors.push(`${label}: funciones de controles no expuestas: ${missingHandlers.join(', ')}`);
+  }
 
   for (const fn of [
     'goAdminTab',
     'gxOpenCatalogMode',
     'gxSettingsView',
     'gxOpenRegistrationControl',
+    'gxCloseRegistrationControl',
+    'gxRegistrationTab',
     'gxToggleNotifications',
     'gxOpenManagementDestination',
     'gxToggleClientFilters',
+    'gxClearClientFilters',
   ]) {
     await assertFunction(page, fn, errors, label);
   }
 
+  // Navegación principal: la estructura aprobada debe poder recorrer todas
+  // las vistas sin excepciones tanto en escritorio como en WebKit móvil.
   for (const id of ['tab-resumen','tab-clientes','tab-catalogo','tab-ajustes','tab-operaciones','tab-gestion']) {
     const ok = await page.evaluate(tabId => {
       if (typeof window.goAdminTab !== 'function') return false;
@@ -220,10 +254,96 @@ async function runAdmin(browser, browserName, errors) {
       return document.getElementById(tabId)?.classList.contains('active') === true;
     }, id).catch(() => false);
     if (!ok) errors.push(`${label}: no pudo activar ${id}.`);
+    await page.waitForTimeout(90);
+  }
+
+  // Catálogo: sólo alternar modos visuales, sin guardar ni crear.
+  for (const mode of ['services','promotions']) {
+    const ok = await page.evaluate(value => {
+      try {
+        window.goAdminTab?.('tab-catalogo');
+        window.gxOpenCatalogMode?.(value);
+        return true;
+      } catch {
+        return false;
+      }
+    }, mode);
+    if (!ok) errors.push(`${label}: falló modo de catálogo ${mode}.`);
     await page.waitForTimeout(80);
   }
 
+  // Ajustes: recorrer las siete superficies, sin ejecutar acciones persistentes.
+  for (const view of ['missions','loyalty','fairdeal','accounts','credentials','app','alerts']) {
+    const ok = await page.evaluate(value => {
+      try {
+        window.goAdminTab?.('tab-ajustes');
+        window.gxSettingsView?.(value);
+        return true;
+      } catch {
+        return false;
+      }
+    }, view);
+    if (!ok) errors.push(`${label}: falló vista de ajustes ${view}.`);
+    await page.waitForTimeout(70);
+  }
+
+  // Filtros de clientes: abrir/cerrar debe ser reversible.
+  const filtersOk = await page.evaluate(() => {
+    try {
+      window.goAdminTab?.('tab-clientes');
+      window.gxToggleClientFilters?.();
+      window.gxClearClientFilters?.();
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!filtersOk) errors.push(`${label}: filtros de clientes fallaron.`);
+
+  // Registros: abrir, recorrer pestañas y cerrar, sin aprobar/rechazar.
+  const registrationOk = await page.evaluate(async () => {
+    try {
+      window.gxOpenRegistrationControl?.();
+      const tabs = ['new','pending','review','activated','history','legacy'];
+      for (const tab of tabs) window.gxRegistrationTab?.(tab);
+      window.gxCloseRegistrationControl?.();
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!registrationOk) errors.push(`${label}: control de registros falló.`);
+
+  // Notificaciones: sólo abrir/cerrar el drawer.
+  const notifOk = await page.evaluate(() => {
+    try {
+      window.gxToggleNotifications?.(true);
+      window.gxToggleNotifications?.(false);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!notifOk) errors.push(`${label}: panel de notificaciones falló.`);
+
   await page.close();
+}
+
+async function runAdmin(browser, browserName, errors) {
+  await runAdminViewport(
+    browser,
+    browserName,
+    errors,
+    { width: 1280, height: 900 },
+    'desktop'
+  );
+  await runAdminViewport(
+    browser,
+    browserName,
+    errors,
+    { width: 390, height: 844 },
+    'mobile'
+  );
 }
 
 const errors = [];
@@ -263,5 +383,6 @@ console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
 console.log('✓ Soporte conserva crecimiento/contracción intermedia');
 console.log('✓ Registro de bienvenida abre');
-console.log('✓ Admin expone controladores principales');
-console.log('✓ Admin cambia entre secciones principales');
+console.log('✓ Admin expone todas las funciones usadas por controles HTML');
+console.log('✓ Admin recorre navegación, catálogo, ajustes, filtros, registros y notificaciones');
+console.log('✓ Admin pasa smoke en desktop y mobile');
