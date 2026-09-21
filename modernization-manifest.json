@@ -31,14 +31,17 @@
     "assets/js/admin/28-admin-beta-20-benefits.js",
     "assets/js/ayuda/07-production-interactions-js.js",
     "assets/js/index/02-02-inline.js",
-    "assets/js/admin/06-admin-operations-ui.js"
+    "assets/js/admin/06-admin-operations-ui.js",
+    "assets/js/ayuda/05-gamification-shared-morph-js.js",
+    "assets/js/ayuda/01g-support-runtime.js"
   ],
   "phases": {
     "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",
-    "motion-engine": "Motion 13.4 limitado al FLIP/altura de Soporte; Mi Espacio conserva WAAPI nativo por paridad Safari/WebKit",
+    "motion-engine": "Motion 13.4 queda como infraestructura experimental; Mi Espacio y Soporte usan WAAPI nativo por paridad Safari/WebKit",
     "feature-data": "Datos editables de Soporte separados de lógica y animaciones",
     "business-config": "Teléfono, banco, CLABE, titular y canales centralizados en GOXION_CORE",
     "ayuda-segmentation": "El antiguo 01-01-inline.js se segmentó por responsabilidad preservando orden y lógica.",
-    "browser-smoke": "Pruebas funcionales en Chromium y WebKit, incluyendo apertura/cierre geométrico de Mi Espacio"
+    "browser-smoke": "Pruebas funcionales en Chromium y WebKit, incluyendo apertura/cierre geométrico de Mi Espacio",
+    "gamification-safari": "El check ✅ no usa shared-element flight para evitar doble rasterizado/ghost en Safari; los demás watermarks conservan el morph"
   }
 }

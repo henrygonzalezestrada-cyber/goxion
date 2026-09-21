@@ -90,6 +90,14 @@
         };
     }
 
+    // Safari rasteriza el emoji ✅ como un glifo cuadrado con fondo propio.
+    // Durante un shared-element flight puede coexistir un frame con el check
+    // real y parecer un segundo "fantasma". Sólo este glifo evita el viaje;
+    // trofeo, regalo, referidos y demás conservan el morph compartido.
+    function gxShouldTravelSharedEmoji(metrics) {
+        return Boolean(metrics && metrics.text !== '✅');
+    }
+
     function gxCreateFloatingEmoji(from, to) {
         const emoji = document.createElement('span');
         const baseFont = Math.max(from.fontSize, to.fontSize);
@@ -313,11 +321,12 @@
             const targetEmoji = targetEmojiEl ? gxTargetEmojiMetrics(targetEmojiEl) : null;
             const targetOpacity = targetEmoji?.opacity ?? 1;
 
-            if (targetEmojiEl) targetEmojiEl.style.visibility = 'hidden';
+            const travelEmoji = gxShouldTravelSharedEmoji(targetEmoji);
+            if (targetEmojiEl && travelEmoji) targetEmojiEl.style.visibility = 'hidden';
             panel.style.visibility = 'visible';
 
-            const floatingEmoji = targetEmoji ? gxCreateFloatingEmoji(sourceEmoji, targetEmoji) : null;
-            const emojiAnim = targetEmoji
+            const floatingEmoji = travelEmoji ? gxCreateFloatingEmoji(sourceEmoji, targetEmoji) : null;
+            const emojiAnim = travelEmoji
                 ? gxAnimateEmoji(floatingEmoji, sourceEmoji, targetEmoji, true)
                 : null;
 
@@ -445,13 +454,15 @@
 
             surface = gxCreateSurface(panel, panelRect);
 
-            if (panelEmojiEl && panelEmoji) {
+            const travelEmoji = gxShouldTravelSharedEmoji(panelEmoji);
+            if (panelEmojiEl && panelEmoji && travelEmoji) {
                 panelEmojiEl.style.visibility = 'hidden';
                 floatingEmoji = gxCreateFloatingEmoji(panelEmoji, { ...sourceEmoji, text: panelEmoji.text });
             }
 
             // MISMO emoji compartido durante todo el cierre.
-            // No se desvanece a mitad del recorrido ni se sustituye antes de tiempo.
+            // El check ✅ permanece integrado en su tarjeta para evitar el
+            // doble rasterizado observado en Safari.
             const emojiAnim = floatingEmoji && panelEmoji
                 ? gxAnimateEmoji(
                     floatingEmoji,
@@ -544,7 +555,7 @@
             // La tarjeta real vuelve, pero su watermark permanece oculto
             // mientras el MISMO emoji flotante sigue visible encima.
             // Esto evita tanto el doble icono como el "desaparece y reaparece".
-            source.classList.add('gx-gamif-watermark-hidden');
+            if (floatingEmoji) source.classList.add('gx-gamif-watermark-hidden');
             source.style.visibility = '';
 
             const cards = Array.from(grid.children);

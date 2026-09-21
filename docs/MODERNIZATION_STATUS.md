@@ -13,10 +13,11 @@
 - Configuración comercial centralizada.
 - Contratos de dominio para editor.
 - Datos de soporte separados de lógica.
-- Motor Motion 13.4 con fallback WAAPI.
+- Motor Motion 13.4 conservado como infraestructura, sin intervenir en los morphs aprobados de Mi Espacio/Soporte.
 - Mi Espacio: morph cápsula ↔ tarjeta preservado con WAAPI nativo por compatibilidad Safari/WebKit.
-- Soporte: FLIP y altura delegados selectivamente a Motion.
+- Soporte: FLIP y altura restaurados a WAAPI nativo para conservar la cadencia oficial en Safari/WebKit.
 - Navegación oficial preservada en CSS puro.
+- Gamificación: el check `✅` evita únicamente el shared-element flight en Safari para eliminar el duplicado/ghost; trofeo y demás watermarks conservan su morph.
 - CI de paridad visual/estructural.
 - Smoke funcional automático en Chromium y WebKit: splash, navegación, Mi Espacio, registro y secciones principales de Admin.
 - CI evita reintroducir URLs/token hardcodeados.

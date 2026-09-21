@@ -108,11 +108,12 @@ un motor existente sin cambiar:
 - radios;
 - composición.
 
-Actualmente Motion interviene únicamente en el FLIP y la altura del morph de Soporte.
+El motor Motion permanece disponible como infraestructura experimental, pero ninguna
+interacción aprobada de Mi Espacio o Soporte depende ya de él.
 
-Mi Espacio conserva WAAPI nativo para la geometría cápsula ↔ tarjeta. La prueba en
-Safari/WebKit demostró que sustituir ese FLIP por Motion altera el comportamiento
-aprobado, por lo que este flujo queda deliberadamente fuera del motor común.
+Mi Espacio y Soporte conservan WAAPI nativo. Las pruebas en Safari/WebKit demostraron
+que sustituir estos FLIP/alturas por Motion puede alterar la cadencia o la geometría
+aprobada, por lo que estos flujos quedan deliberadamente fuera del motor común.
 
 La navegación Inicio/Catálogo/Soporte permanece CSS puro porque ya es la
 implementación aprobada y más ligera.
