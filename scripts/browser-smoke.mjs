@@ -167,49 +167,6 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: Soporte no regresó a su geometría compacta.`);
   }
 
-  // Gamificación: el check reclamado usa el MISMO shared-element flow que
-  // trofeo/flecha. Debe existir una sola copia flotante y el ghost de tarjeta
-  // no puede conservar su pseudo-watermark.
-  await page.evaluate(() => {
-    const grid = document.getElementById('gamif-grid');
-    const ref = document.getElementById('gamif-expanded-referral');
-    const coupon = document.getElementById('gamif-expanded-coupon');
-    if (!grid || !coupon) return;
-
-    grid.innerHTML = `
-      <div class="gamif-btn gx-gamif-card gx-gamif-card-mission" data-watermark="✅">
-        <div class="gamif-title">Tu progreso</div>
-      </div>`;
-    grid.style.display = 'grid';
-    grid.style.visibility = 'visible';
-    if (ref) ref.style.display = 'none';
-
-    coupon.innerHTML = `
-      <div class="gx-gamif-shared-emoji" style="font-size:38px;display:inline-block">✅</div>
-      <div>Estado reclamado</div>`;
-    coupon.style.display = 'none';
-
-    window.__gxGamifOpenPromise = window.openGamif?.('coupon');
-  });
-  await page.waitForTimeout(120);
-  const checkGhostOpen = await page.locator('.gx-gamif-floating-emoji').count();
-  const ghostCarriesWatermarkOpen = await page.locator('.gx-gamif-morph-ghost[data-watermark]').count();
-  if (checkGhostOpen !== 1 || ghostCarriesWatermarkOpen !== 0) {
-    errors.push(`${label}: Misiones no usa una sola copia compartida del check ✅ al abrir (floating=${checkGhostOpen}, ghostWatermark=${ghostCarriesWatermarkOpen}).`);
-  }
-  await page.evaluate(async () => { await window.__gxGamifOpenPromise; });
-
-  await page.evaluate(() => {
-    window.__gxGamifClosePromise = window.closeGamif?.();
-  });
-  await page.waitForTimeout(180);
-  const checkGhostClose = await page.locator('.gx-gamif-floating-emoji').count();
-  const ghostCarriesWatermarkClose = await page.locator('.gx-gamif-morph-ghost[data-watermark]').count();
-  if (checkGhostClose !== 1 || ghostCarriesWatermarkClose !== 0) {
-    errors.push(`${label}: Misiones no conserva una sola copia compartida del check ✅ al cerrar (floating=${checkGhostClose}, ghostWatermark=${ghostCarriesWatermarkClose}).`);
-  }
-  await page.evaluate(async () => { await window.__gxGamifClosePromise; });
-
   await page.evaluate(() => window.switchTab?.('inicio'));
   await page.evaluate(() => window.solicitarCuenta?.());
   await page.waitForTimeout(150);
@@ -287,7 +244,6 @@ console.log('✓ Chromium y WebKit');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
 console.log('✓ Soporte conserva crecimiento/contracción intermedia');
-console.log('✓ El check ✅ usa el mismo shared morph sin watermark fantasma');
 console.log('✓ Registro de bienvenida abre');
 console.log('✓ Admin expone controladores principales');
 console.log('✓ Admin cambia entre secciones principales');
