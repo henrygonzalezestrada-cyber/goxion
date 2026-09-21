@@ -37,11 +37,22 @@ function slugify(value, fallback) {
     .toLowerCase();
 }
 
-function cssBlocksFromExtracted(css) {
+function cssBlocksFromExtracted(css, page) {
   const blocks = [];
-  const regex = /\/\* ===== .*?style block \d+ ===== \*\/\n([\s\S]*?)(?=\n\n\/\* =====|$)/g;
-  let match;
-  while ((match = regex.exec(css))) blocks.push(match[1].trim());
+  const markerPrefix = '/* ===== ' + page + '.html · style block ';
+  const markerRegex = /\/\* ===== ([a-z]+\.html) · style block (\d+) ===== \*\//g;
+  const markers = [];
+  let marker;
+  while ((marker = markerRegex.exec(css))) {
+    if (marker[1] === page + '.html') {
+      markers.push({ start: marker.index, bodyStart: markerRegex.lastIndex });
+    }
+  }
+  for (let index = 0; index < markers.length; index += 1) {
+    const bodyStart = markers[index].bodyStart;
+    const bodyEnd = index + 1 < markers.length ? markers[index + 1].start : css.length;
+    blocks.push(css.slice(bodyStart, bodyEnd).trim());
+  }
   return blocks;
 }
 
@@ -113,7 +124,7 @@ for (const page of PAGES) {
   const official = originalFile(page + '.html');
   const modern = readFileSync(htmlPath, 'utf8');
   const officialStyles = styleBlocks(official);
-  const extractedStyles = cssBlocksFromExtracted(readFileSync(cssPath, 'utf8'));
+  const extractedStyles = cssBlocksFromExtracted(readFileSync(cssPath, 'utf8'), page);
 
   if (
     officialStyles.length !== extractedStyles.length ||
