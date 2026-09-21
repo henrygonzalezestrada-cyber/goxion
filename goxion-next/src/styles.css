@@ -443,3 +443,13 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
 .gx-activation-id-card{width:100%;box-sizing:border-box;padding:11px 13px;border-radius:13px;background:#0e1016;border:1px solid rgba(255,255,255,.07);display:grid;gap:3px}.gx-activation-id-card small{color:#667389;font-size:7px;text-transform:uppercase;letter-spacing:.08em}.gx-activation-id-card strong{color:#8cecf4;font-size:13px}
 @media(max-width:480px){.gx-onboarding-overlay{align-items:end;padding:0}.gx-onboarding-sheet{width:100%;max-height:90vh;border-radius:25px 25px 0 0;padding:20px 17px calc(20px + env(safe-area-inset-bottom))}}
 @media(prefers-reduced-motion:reduce){.gx-registration-submit i{animation:none}.gx-activation-progress span{transition:none}}
+
+
+/* GOXION NEXT · CATÁLOGO EN VIVO */
+.gx-live-catalog-badge{min-height:30px;padding:0 10px;border-radius:999px;border:1px solid rgba(0,242,254,.11);background:rgba(0,242,254,.045);color:#76eaf3;display:flex;align-items:center;gap:6px;font-size:7.7px;font-weight:850;white-space:nowrap}
+.gx-live-catalog-badge span{width:6px;height:6px;border-radius:50%;background:#53e6b0;box-shadow:0 0 8px rgba(83,230,176,.45)}
+.gx-live-catalog-badge.client{border-color:rgba(124,77,255,.14);background:rgba(124,77,255,.055);color:#bca8ff}
+.gx-catalog-sync,.gx-catalog-error{min-height:150px;border-radius:20px;border:1px solid rgba(255,255,255,.065);background:rgba(9,9,14,.65);display:grid;place-items:center;align-content:center;gap:7px;text-align:center}
+.gx-catalog-sync i{width:27px;height:27px;border-radius:50%;border:2px solid rgba(255,255,255,.07);border-top-color:#00dce8;animation:gxSpin .8s linear infinite}
+.gx-catalog-sync strong,.gx-catalog-error strong{font-size:9.5px}.gx-catalog-sync small,.gx-catalog-error small{max-width:280px;color:#6f7d92;font-size:7.7px;line-height:1.45}
+.gx-catalog-error{border-color:rgba(255,87,123,.10);background:rgba(33,18,24,.48)}.gx-catalog-error strong{color:#ff91ab}
