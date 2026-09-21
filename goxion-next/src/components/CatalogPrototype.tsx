@@ -369,7 +369,7 @@ export function CatalogPrototype({
             transition={{ type: 'spring', stiffness: 340, damping: 29 }}
           >
             <div>
-              <strong>$${totalPrice} MXN</strong>
+              <strong>${totalPrice} MXN</strong>
               <small>
                 {totalItems} {totalItems === 1 ? 'perfil' : 'perfiles'}
               </small>
