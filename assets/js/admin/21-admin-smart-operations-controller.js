@@ -1,5 +1,6 @@
 (() => {
-    const PROJECT_URL="https://hmpevcwodcgbkviarfic.supabase.co";
+        const GXCORE = window.GOXION_CORE;
+    const PROJECT_URL=GXCORE.SUPABASE_ORIGIN;
     const ACCOUNTS_URL=`${PROJECT_URL}/functions/v1/cuentas-plataforma-admin-beta`;
     const CANCELLATIONS_URL=`${PROJECT_URL}/functions/v1/cancelaciones-admin`;
 
@@ -12,7 +13,7 @@
     const norm=v=>String(v??"").trim().toLowerCase();
 
     async function api(url,accion,datos={}){
-        const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
+        const token=localStorage.getItem(GXCORE.STORAGE.ADMIN_TOKEN)||"";
         const r=await fetch(url,{
             method:"POST",
             headers:{"Content-Type":"application/json","X-Admin-Token":token},
