@@ -762,3 +762,17 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
 .gx-admin-danger-zone strong{display:block;font-size:8px}.gx-admin-danger-zone small{display:block;margin-top:2px;color:#7d7782;font-size:6.7px;line-height:1.4}
 .gx-admin-danger-zone button{min-height:32px;padding:0 9px;border-radius:9px;border:1px solid rgba(255,78,114,.14);background:rgba(255,78,114,.055);color:#ff94aa;font-size:6.8px;font-weight:850;white-space:nowrap}
 @media(max-width:560px){.gx-admin-danger-zone{align-items:flex-start;flex-direction:column}.gx-admin-danger-zone button{width:100%}}
+
+
+/* GOXION NEXT · ADMIN INFRASTRUCTURE MAINTENANCE */
+.gx-admin-maintenance-list{display:grid;gap:6px}
+.gx-admin-maintenance-list article{min-height:54px;padding:9px 10px;border-radius:13px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.02);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gx-admin-maintenance-list article.inactive{opacity:.55}
+.gx-admin-maintenance-list article strong{display:block;font-size:7.9px}.gx-admin-maintenance-list article small{display:block;margin-top:2px;color:#6f7b8f;font-size:6.5px}
+.gx-admin-maintenance-list article>div:last-child{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.gx-admin-maintenance-list article span{color:#778397;font-size:6.4px}.gx-admin-maintenance-list article b{padding:4px 6px;border-radius:999px;background:rgba(255,255,255,.035);color:#8e9aac;font-size:6.2px}
+.gx-admin-maintenance-list article button{min-height:30px;padding:0 8px;border-radius:9px;border:1px solid rgba(0,218,232,.09);background:rgba(0,218,232,.035);color:#79e8f0;font-size:6.5px;font-weight:850}
+.gx-admin-maintenance-list article button.danger{border-color:rgba(255,78,114,.12);background:rgba(255,78,114,.05);color:#ff94aa}
+.gx-admin-account-maintenance-sheet{max-width:470px}
+.gx-admin-benefit-list article>div:last-child button.danger{min-height:28px;padding:0 7px;border-radius:8px;border:1px solid rgba(255,78,114,.11);background:rgba(255,78,114,.045);color:#ff94aa;font-size:6.2px;font-weight:850}
+@media(max-width:560px){.gx-admin-maintenance-list article{align-items:flex-start;flex-direction:column}.gx-admin-maintenance-list article>div:last-child{width:100%;justify-content:flex-start}}
