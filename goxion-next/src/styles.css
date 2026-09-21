@@ -669,3 +669,25 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
   .gx-admin-form-pair{grid-template-columns:1fr}
   .gx-admin-sheet-overlay{align-items:end;padding:0}.gx-admin-client-sheet{width:100%;max-height:92vh;border-radius:22px 22px 0 0;padding-bottom:calc(18px + env(safe-area-inset-bottom))}
 }
+
+
+/* GOXION NEXT · ADMIN DAILY CLIENT TOOLS */
+.gx-admin-primary-action{min-height:40px;padding:0 13px;border:0;border-radius:12px;background:linear-gradient(135deg,#714cff,#20cfe0);color:#fff;font-size:8px;font-weight:900;box-shadow:0 10px 24px rgba(79,65,210,.18)}
+.gx-admin-new-client-sheet{max-width:470px}
+.gx-admin-inline-editor textarea{width:100%;box-sizing:border-box;padding:10px 11px;border-radius:11px;border:1px solid rgba(255,255,255,.07);background:#0d0f15;color:#fff;outline:0;resize:vertical;font:inherit;font-size:8px;line-height:1.45}
+.gx-admin-inline-editor textarea:focus{border-color:rgba(0,218,232,.18);box-shadow:0 0 0 3px rgba(0,218,232,.025)}
+.gx-admin-service-editor-list{display:grid;gap:6px;margin-bottom:9px}
+.gx-admin-service-editor-list article{min-height:48px;padding:8px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.02);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gx-admin-service-editor-list strong{display:block;font-size:8px}.gx-admin-service-editor-list small{display:block;margin-top:2px;color:#6f7b8f;font-size:6.7px}
+.gx-admin-service-editor-list button,.gx-admin-referral-actions button,.gx-admin-pin-actions button,.gx-admin-pin-session button{min-height:31px;padding:0 9px;border-radius:9px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:#9aa6b8;font-size:6.8px;font-weight:850}
+.gx-admin-service-editor-list button.danger,.gx-admin-referral-actions button.danger{border-color:rgba(255,78,114,.12);background:rgba(255,78,114,.055);color:#ff94aa}
+.gx-admin-referral-actions button.primary,.gx-admin-pin-actions button.primary{border-color:rgba(0,218,232,.12);background:rgba(0,218,232,.055);color:#7ce9f1}
+.gx-admin-pin-protected{padding:10px 11px;border-radius:12px;border:1px solid rgba(124,77,255,.08);background:rgba(124,77,255,.035)}
+.gx-admin-pin-protected span{display:block;color:#b7a6ff;font-size:7px;font-weight:900}.gx-admin-pin-protected small{display:block;margin-top:3px;color:#758195;font-size:6.8px;line-height:1.45}
+.gx-admin-pin-actions{display:flex;align-items:flex-end;gap:6px;height:100%}
+.gx-admin-pin-session{margin-top:7px;padding:10px 11px;border-radius:12px;border:1px solid rgba(240,221,178,.11);background:rgba(240,221,178,.025);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gx-admin-pin-session small{display:block;color:#7d7565;font-size:6.4px}.gx-admin-pin-session strong{display:block;margin-top:2px;color:#f0ddb2;font-size:14px;letter-spacing:.10em}
+.gx-admin-referral-actions{display:flex;flex-wrap:wrap;gap:6px}
+.gx-admin-check-row{display:flex!important;align-items:center;gap:8px;min-height:40px;padding:0 10px;border-radius:11px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.02)}
+.gx-admin-check-row input{width:16px!important;height:16px!important;min-height:0!important;accent-color:#7a5cff}.gx-admin-check-row span{margin:0!important;color:#8b97a9!important;font-size:7px!important;text-transform:none!important;letter-spacing:0!important}
+@media(max-width:600px){.gx-admin-heading{align-items:flex-start!important}.gx-admin-heading .gx-admin-primary-action{width:auto;min-width:112px}.gx-admin-pin-actions{flex-direction:column;align-items:stretch}.gx-admin-pin-actions button{width:100%}}
