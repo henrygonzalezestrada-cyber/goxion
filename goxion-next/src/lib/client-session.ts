@@ -484,6 +484,38 @@ export async function claimReferralMonth() {
   }>(response);
 }
 
+export async function sendSupportRequest(input: {
+  titulo: string;
+  mensaje: string;
+}) {
+  const token = localStorage.getItem(CLIENT_TOKEN_KEY) || '';
+  if (!token) throw new Error('Inicia sesión para enviar una solicitud de soporte.');
+
+  const response = await fetch(
+    SUPABASE_PROJECT_URL + '/functions/v1/notificar-goxion',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Client-Token': token,
+      },
+      body: JSON.stringify({
+        categoria: 'soporte',
+        titulo: input.titulo,
+        mensaje: input.mensaje,
+        colorHex: '00f2fe',
+      }),
+      cache: 'no-store',
+    },
+  );
+
+  const result = await parseResponse<{ ok: boolean; error?: string }>(response);
+  if (result.ok !== true) {
+    throw new Error(result.error || 'No fue posible enviar la solicitud.');
+  }
+  return result;
+}
+
 export function logoutClient() {
   localStorage.removeItem(CLIENT_TOKEN_KEY);
 }
