@@ -9,6 +9,20 @@ declare global {
         readonly CLIENT_TOKEN: 'goxion_client_token';
         readonly ADMIN_TOKEN: 'GOXION_ADMIN_TOKEN';
       };
+      readonly BUSINESS: {
+        readonly WHATSAPP: string;
+        readonly BANK: {
+          readonly NAME: string;
+          readonly HOLDER: string;
+          readonly CLABE: string;
+        };
+        readonly CHANNELS: {
+          readonly pedidos: string;
+          readonly soporte: string;
+          readonly logins: string;
+          readonly pagos: string;
+        };
+      };
       endpoint(name: string): string;
       parseJSON(response: Response): Promise<{ text: string; json: any }>;
       getClientToken(): string;
