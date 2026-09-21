@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'node:fs';
+import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { join } from 'node:path';
 
@@ -217,6 +217,40 @@ for (const page of PAGES) {
 const ayudaModern = readFileSync(join(ROOT, 'ayuda.html'), 'utf8');
 if (!ayudaModern.includes('<script type="module" src="./assets/js/core/motion-engine.mjs"></script>')) {
   failures.push('ayuda: motion-engine no está cargado.');
+}
+
+function walkFiles(directory) {
+  if (!existsSync(directory)) return [];
+  const files = [];
+  for (const name of readdirSync(directory)) {
+    const absolute = join(directory, name);
+    if (statSync(absolute).isDirectory()) files.push(...walkFiles(absolute));
+    else files.push(absolute);
+  }
+  return files;
+}
+
+for (const area of ['ayuda', 'index', 'admin']) {
+  const root = join(ROOT, 'assets', 'js', area);
+  for (const absolute of walkFiles(root)) {
+    if (!/\.(?:js|mjs)$/i.test(absolute)) continue;
+    const source = readFileSync(absolute, 'utf8');
+    const relative = absolute.slice(ROOT.length + 1).replace(/\\/g, '/');
+
+    if (source.includes('hmpevcwodcgbkviarfic.supabase.co')) {
+      failures.push(relative + ': volvió a hardcodear el origen de Supabase.');
+    }
+
+    if (
+      MODERNIZED_SCRIPTS.has(relative) &&
+      (source.includes('"goxion_client_token"') ||
+        source.includes("'goxion_client_token'") ||
+        source.includes('"GOXION_ADMIN_TOKEN"') ||
+        source.includes("'GOXION_ADMIN_TOKEN'"))
+    ) {
+      failures.push(relative + ': volvió a hardcodear una clave de sesión.');
+    }
+  }
 }
 
 for (const relative of [...MODERNIZED_SCRIPTS, ...ADDED_SCRIPTS]) {
