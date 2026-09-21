@@ -1,9 +1,10 @@
     (() => {
-        const SB = "https://hmpevcwodcgbkviarfic.supabase.co";
-        const ACCIONES = `${SB}/functions/v1/admin-acciones`;
-        const PERIODOS = `${SB}/functions/v1/periodo-cobro`;
-        const TRATO_JUSTO = `${SB}/functions/v1/trato-justo`;
-        const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
+        const GXCORE = window.GOXION_CORE;
+        const SB = GXCORE.SUPABASE_ORIGIN;
+        const ACCIONES = GXCORE.endpoint("admin-acciones");
+        const PERIODOS = GXCORE.endpoint("periodo-cobro");
+        const TRATO_JUSTO = GXCORE.endpoint("trato-justo");
+        const TOKEN_KEY = GXCORE.STORAGE.ADMIN_TOKEN;
 
         async function accion(accion, datos = {}) {
             const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
