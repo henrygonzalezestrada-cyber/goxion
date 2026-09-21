@@ -776,3 +776,19 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
 .gx-admin-account-maintenance-sheet{max-width:470px}
 .gx-admin-benefit-list article>div:last-child button.danger{min-height:28px;padding:0 7px;border-radius:8px;border:1px solid rgba(255,78,114,.11);background:rgba(255,78,114,.045);color:#ff94aa;font-size:6.2px;font-weight:850}
 @media(max-width:560px){.gx-admin-maintenance-list article{align-items:flex-start;flex-direction:column}.gx-admin-maintenance-list article>div:last-child{width:100%;justify-content:flex-start}}
+
+
+/* GOXION NEXT · ADMIN GLOBAL SETTINGS */
+.gx-admin-settings-card{display:grid;gap:9px;padding:12px;border-radius:17px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.018)}
+.gx-admin-mass-selector{display:grid;gap:7px}
+.gx-admin-mass-selector-head{display:grid;grid-template-columns:1fr auto;gap:6px}
+.gx-admin-mass-selector-head input{min-height:38px;padding:0 10px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:#0d0f15;color:#fff;outline:0;font-size:7.5px}
+.gx-admin-mass-selector-head input:focus{border-color:rgba(0,218,232,.15)}
+.gx-admin-mass-selector-head button{min-height:38px;padding:0 9px;border-radius:10px;border:1px solid rgba(0,218,232,.09);background:rgba(0,218,232,.035);color:#78e7ef;font-size:6.5px;font-weight:850}
+.gx-admin-mass-client-list{max-height:270px;overflow:auto;display:grid;gap:4px;padding-right:2px}
+.gx-admin-mass-client-list label{min-height:43px;padding:7px 8px;border-radius:11px;border:1px solid rgba(255,255,255,.045);background:rgba(255,255,255,.016);display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:center}
+.gx-admin-mass-client-list input{width:15px;height:15px;accent-color:#7457ff}.gx-admin-mass-client-list strong{display:block;font-size:7.4px}.gx-admin-mass-client-list small{display:block;margin-top:1px;color:#69768a;font-size:6.2px}.gx-admin-mass-client-list b{min-width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:rgba(124,77,255,.055);color:#b8a6ff;font-size:6.7px}
+.gx-admin-mass-count{padding:6px 8px;border-radius:9px;background:rgba(255,255,255,.02);color:#727f92;text-align:center;font-size:6.5px}
+.gx-admin-destructive-maintenance{width:100%;min-height:36px;border-radius:10px;border:1px solid rgba(255,78,114,.10);background:rgba(255,78,114,.035);color:#c7788b;font-size:6.6px;font-weight:850}
+.gx-admin-inline-editor button.primary:disabled{opacity:.4;cursor:default}
+@media(max-width:520px){.gx-admin-mass-selector-head{grid-template-columns:1fr}.gx-admin-mass-selector-head button{width:100%}}
