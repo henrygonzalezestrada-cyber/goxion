@@ -2,12 +2,6 @@
     const reduceMotion = () =>
         window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const gxMotionAnimate = (element, keyframes, options) => {
-        const engine = window.GOXION_MOTION;
-        if (engine?.animateElement) return engine.animateElement(element, keyframes, options);
-        return element.animate(keyframes, options);
-    };
-
     /* =========================================================
        1) NAVIGATION // PRODUCTION
        Uses the approved production behavior:
