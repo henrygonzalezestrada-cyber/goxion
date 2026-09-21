@@ -5,6 +5,9 @@ import { join } from 'node:path';
 const ROOT = process.cwd();
 const PAGES = ['ayuda', 'index', 'admin'];
 const failures = [];
+const manifest = JSON.parse(readFileSync(join(ROOT, 'modernization-manifest.json'), 'utf8'));
+const MODERNIZED_SCRIPTS = new Set(manifest.modernizedScripts || []);
+const ADDED_SCRIPTS = new Set(manifest.addedScripts || []);
 
 function originalFile(name) {
   try {
@@ -83,7 +86,9 @@ function officialSkeleton(html) {
 }
 
 function modernSkeleton(html, page) {
-  let output = html.replace(
+  let output = html.replace(/<script\s+src=["']\.\/assets\/js\/core\/runtime\.js["']\s*><\/script>\s*/i, '');
+
+  output = output.replace(
     new RegExp(
       '<link\\s+rel=["\\\']stylesheet["\\\']\\s+href=["\\\']\\./assets/css/' +
         page +
@@ -150,7 +155,7 @@ for (const page of PAGES) {
     }
 
     const extracted = readFileSync(absolute, 'utf8').trim();
-    if (extracted !== match[2].trim()) {
+    if (!MODERNIZED_SCRIPTS.has(relative) && extracted !== match[2].trim()) {
       failures.push(page + ': ' + relative + ' ya no coincide con su script original.');
     }
 
@@ -191,6 +196,22 @@ for (const page of PAGES) {
   const remainingInline = inlineScripts(modern);
   if (remainingInline.length) {
     failures.push(page + ': quedaron ' + remainingInline.length + ' scripts inline.');
+  }
+}
+
+for (const relative of [...MODERNIZED_SCRIPTS, ...ADDED_SCRIPTS]) {
+  if (!existsSync(join(ROOT, relative))) {
+    failures.push('Manifest: falta ' + relative);
+  }
+}
+
+for (const page of PAGES) {
+  const modern = readFileSync(join(ROOT, page + '.html'), 'utf8');
+  const runtimeTag = '<script src="./assets/js/core/runtime.js"></script>';
+  const runtimeAt = modern.indexOf(runtimeTag);
+  const pageScriptAt = modern.indexOf('<script', runtimeAt + runtimeTag.length);
+  if (runtimeAt < 0 || pageScriptAt < 0 || runtimeAt > pageScriptAt) {
+    failures.push(page + ': runtime core no está cargado antes de los scripts de página.');
   }
 }
 
