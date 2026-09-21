@@ -2,6 +2,11 @@
     const reduceMotion = () =>
         window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const gxAuthUseLayoutMorph = () => {
+        const ua = navigator.userAgent || '';
+        return /AppleWebKit/i.test(ua) && !/(Chrome|Chromium|Edg|OPR)/i.test(ua);
+    };
+
     /* =========================================================
        1) NAVIGATION // PRODUCTION
        Uses the approved production behavior:
@@ -412,17 +417,22 @@
 
         root.classList.add('gx-auth-flip-card');
 
+        const useLayoutMorph = gxAuthUseLayoutMorph();
+
         Object.assign(root.style, {
-            left: `${cardRect.left}px`,
-            top: `${cardRect.top}px`,
-            width: `${cardRect.width}px`,
-            height: `${cardRect.height}px`,
+            left: `${useLayoutMorph ? gxAuthSourceRect.left : cardRect.left}px`,
+            top: `${useLayoutMorph ? gxAuthSourceRect.top : cardRect.top}px`,
+            width: `${useLayoutMorph ? gxAuthSourceRect.width : cardRect.width}px`,
+            height: `${useLayoutMorph ? gxAuthSourceRect.height : cardRect.height}px`,
             transformOrigin: '0 0',
-            transform: inverse,
-            borderRadius: startRadius,
+            transform: useLayoutMorph ? 'none' : inverse,
+            borderRadius: useLayoutMorph ? gxAuthSourceStyle.borderRadius : startRadius,
             backgroundColor: gxAuthSourceStyle.backgroundColor,
             borderColor: gxAuthSourceStyle.borderColor,
-            boxShadow: 'none'
+            boxShadow: 'none',
+            willChange: useLayoutMorph
+                ? 'left, top, width, height, border-radius, background-color'
+                : 'transform, border-radius, background-color'
         });
 
         document.body.appendChild(root);
@@ -439,34 +449,64 @@
 
         void root.offsetWidth;
 
-        const shape = root.animate([
-            {
-                transform: inverse,
-                borderRadius: startRadius,
-                backgroundColor: gxAuthSourceStyle.backgroundColor,
-                borderColor: gxAuthSourceStyle.borderColor
-            },
-            {
-                transform: 'matrix(1,0,0,1,0,0)',
-                borderRadius: cardStyle.borderRadius,
-                backgroundColor: cardStyle.backgroundColor,
-                borderColor: cardStyle.borderColor
-            }
-        ], {
-            duration: 430,
-            easing: 'cubic-bezier(.18,.86,.22,1)',
-            fill: 'forwards'
-        });
+        const shape = useLayoutMorph
+            ? root.animate([
+                {
+                    left: `${gxAuthSourceRect.left}px`,
+                    top: `${gxAuthSourceRect.top}px`,
+                    width: `${gxAuthSourceRect.width}px`,
+                    height: `${gxAuthSourceRect.height}px`,
+                    borderRadius: gxAuthSourceStyle.borderRadius,
+                    backgroundColor: gxAuthSourceStyle.backgroundColor,
+                    borderColor: gxAuthSourceStyle.borderColor
+                },
+                {
+                    left: `${cardRect.left}px`,
+                    top: `${cardRect.top}px`,
+                    width: `${cardRect.width}px`,
+                    height: `${cardRect.height}px`,
+                    borderRadius: cardStyle.borderRadius,
+                    backgroundColor: cardStyle.backgroundColor,
+                    borderColor: cardStyle.borderColor
+                }
+            ], {
+                duration: 430,
+                easing: 'cubic-bezier(.18,.86,.22,1)',
+                fill: 'forwards'
+            })
+            : root.animate([
+                {
+                    transform: inverse,
+                    borderRadius: startRadius,
+                    backgroundColor: gxAuthSourceStyle.backgroundColor,
+                    borderColor: gxAuthSourceStyle.borderColor
+                },
+                {
+                    transform: 'matrix(1,0,0,1,0,0)',
+                    borderRadius: cardStyle.borderRadius,
+                    backgroundColor: cardStyle.backgroundColor,
+                    borderColor: cardStyle.borderColor
+                }
+            ], {
+                duration: 430,
+                easing: 'cubic-bezier(.18,.86,.22,1)',
+                fill: 'forwards'
+            });
 
         await shape.finished.catch(() => {});
 
         // Commit the final card BEFORE showing any login UI.
         Object.assign(root.style, {
+            left: `${cardRect.left}px`,
+            top: `${cardRect.top}px`,
+            width: `${cardRect.width}px`,
+            height: `${cardRect.height}px`,
             transform: 'none',
             borderRadius: cardStyle.borderRadius,
             backgroundColor: cardStyle.backgroundColor,
             borderColor: cardStyle.borderColor,
-            boxShadow: cardStyle.boxShadow
+            boxShadow: cardStyle.boxShadow,
+            willChange: ''
         });
         try { shape.cancel(); } catch (_) {}
 
@@ -543,24 +583,54 @@
         const inverse = gxAuthFlipMatrix(flip);
         const endRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
 
-        const shapeBack = root.animate([
-            {
-                transform: 'matrix(1,0,0,1,0,0)',
-                borderRadius: '26px',
-                backgroundColor: 'rgba(8,8,12,.88)',
-                borderColor: 'rgba(0,242,254,.18)'
-            },
-            {
-                transform: inverse,
-                borderRadius: endRadius,
-                backgroundColor: gxAuthSourceStyle.backgroundColor,
-                borderColor: gxAuthSourceStyle.borderColor
-            }
-        ], {
-            duration: 390,
-            easing: 'cubic-bezier(.22,.72,.18,1)',
-            fill: 'forwards'
-        });
+        const useLayoutMorph = gxAuthUseLayoutMorph();
+        if (useLayoutMorph) {
+            root.style.willChange = 'left, top, width, height, border-radius, background-color';
+        }
+
+        const shapeBack = useLayoutMorph
+            ? root.animate([
+                {
+                    left: `${cardRect.left}px`,
+                    top: `${cardRect.top}px`,
+                    width: `${cardRect.width}px`,
+                    height: `${cardRect.height}px`,
+                    borderRadius: '26px',
+                    backgroundColor: 'rgba(8,8,12,.88)',
+                    borderColor: 'rgba(0,242,254,.18)'
+                },
+                {
+                    left: `${destination.left}px`,
+                    top: `${destination.top}px`,
+                    width: `${destination.width}px`,
+                    height: `${destination.height}px`,
+                    borderRadius: gxAuthSourceStyle.borderRadius,
+                    backgroundColor: gxAuthSourceStyle.backgroundColor,
+                    borderColor: gxAuthSourceStyle.borderColor
+                }
+            ], {
+                duration: 390,
+                easing: 'cubic-bezier(.22,.72,.18,1)',
+                fill: 'forwards'
+            })
+            : root.animate([
+                {
+                    transform: 'matrix(1,0,0,1,0,0)',
+                    borderRadius: '26px',
+                    backgroundColor: 'rgba(8,8,12,.88)',
+                    borderColor: 'rgba(0,242,254,.18)'
+                },
+                {
+                    transform: inverse,
+                    borderRadius: endRadius,
+                    backgroundColor: gxAuthSourceStyle.backgroundColor,
+                    borderColor: gxAuthSourceStyle.borderColor
+                }
+            ], {
+                duration: 390,
+                easing: 'cubic-bezier(.22,.72,.18,1)',
+                fill: 'forwards'
+            });
 
         setTimeout(() => overlay.classList.remove('show'), 235);
 
