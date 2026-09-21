@@ -38,6 +38,9 @@ jobs:
       - name: Build GOXION Next
         run: npm run build
 
+      - name: Verify GOXION Next output
+        run: npm run verify
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
