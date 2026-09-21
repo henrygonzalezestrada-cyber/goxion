@@ -1,6 +1,7 @@
     (() => {
-        const AJUSTES_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-ajustes";
-        const TOKEN_KEY = "GOXION_ADMIN_TOKEN";
+        const GXCORE = window.GOXION_CORE;
+        const AJUSTES_URL = GXCORE.endpoint("admin-ajustes");
+        const TOKEN_KEY = GXCORE.STORAGE.ADMIN_TOKEN;
 
         async function ajusteAdmin(accion, datos = {}) {
             const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
@@ -105,7 +106,7 @@
                 } else {
                     // La desactivación existente ya funciona y permanece en admin-acciones.
                     const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
-                    const r = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/admin-acciones", {
+                    const r = await fetch(GXCORE.endpoint("admin-acciones"), {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
