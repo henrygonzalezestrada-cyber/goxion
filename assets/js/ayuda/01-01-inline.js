@@ -3617,6 +3617,12 @@ if(cycle !== gxWelcomeCycle) return;
         let gxSupportMorphBusy = false;
         let gxSupportExpandedEl = null;
 
+        const gxSupportMotionAnimate = (element, keyframes, options) => {
+            const engine = window.GOXION_MOTION;
+            if (engine?.animateElement) return engine.animateElement(element, keyframes, options);
+            return element.animate(keyframes, options);
+        };
+
         function gxSupportAnimateCardHeight(card, fromHeight, toHeight, duration = 420) {
             if (!card || Math.abs(toHeight - fromHeight) < 2) return null;
 
@@ -3632,7 +3638,7 @@ if(cycle !== gxWelcomeCycle) return;
                 return null;
             }
 
-            const anim = card.animate(
+            const anim = gxSupportMotionAnimate(card, 
                 [{ height: `${fromHeight}px` }, { height: `${toHeight}px` }],
                 {
                     duration,
@@ -3658,7 +3664,7 @@ if(cycle !== gxWelcomeCycle) return;
             const sx = firstRect.width / Math.max(lastRect.width, 1);
             const sy = firstRect.height / Math.max(lastRect.height, 1);
 
-            return el.animate([
+            return gxSupportMotionAnimate(el, [
                 {
                     transformOrigin: 'top left',
                     transform: `translate(${dx}px, ${dy}px) scale(${sx}, ${sy})`
@@ -3883,7 +3889,7 @@ if(cycle !== gxWelcomeCycle) return;
 
             if (!reduceMotion) {
                 flipAnim = gxSupportFlip(el, firstRect, lastRect, false);
-                heightAnim = card.animate(
+                heightAnim = gxSupportMotionAnimate(card, 
                     [{ height: `${firstCardHeight}px` }, { height: `${lastCardHeight}px` }],
                     {
                         duration: 460,
