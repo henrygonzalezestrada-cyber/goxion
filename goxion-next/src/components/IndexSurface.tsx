@@ -114,7 +114,7 @@ function PaymentModal({
             ? '**Periodo:** ' + account.periodo_label
             : '',
           '**Monto esperado:** ' + money(account?.total_actual),
-          'Comprobante enviado desde GOXION Next.',
+          'Comprobante enviado desde GOXION.',
         ]
           .filter(Boolean)
           .join('\n'),
@@ -447,7 +447,7 @@ export function IndexSurface() {
 
       <footer className="gx-index-footer">
         <a href="./ayuda.html">Volver a Mi Espacio</a>
-        <span>GOXION Next</span>
+        <span>GOXION</span>
       </footer>
 
       <AnimatePresence>
