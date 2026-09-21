@@ -74,6 +74,12 @@ export type AdminReferral = Record<string, unknown> & {
   nombre?: string;
   plataformas?: number;
   meses?: number;
+  servicios?: string[];
+  fecha_inicio?: string | null;
+  progreso_pausado?: boolean;
+  meses_override?: number | null;
+  beneficio_reclamado?: boolean;
+  beneficio_reclamado_at?: string | null;
   activo?: boolean;
 };
 
@@ -82,6 +88,10 @@ export type AdminGamification = Record<string, unknown> & {
   cliente_id?: string;
   misiones_activas?: boolean;
   descuento?: number;
+  tareas?: string;
+  cupon_reclamado?: boolean;
+  misiones_version?: number;
+  cupon_ciclo?: number;
 };
 
 export type AdminData = {
