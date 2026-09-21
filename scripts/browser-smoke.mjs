@@ -63,6 +63,49 @@ try {
       await assertFunction(page, fn, errors, 'Ayuda');
     }
 
+    // Mi Espacio debe conservar el morph aprobado cápsula ↔ tarjeta.
+    const authBefore = await page.locator('#header-action-btn').boundingBox();
+    await page.evaluate(() => {
+      window.__gxAuthOpenPromise = window.openAuthSheet?.();
+    });
+    await page.waitForTimeout(140);
+    const authOpening = await page.locator('#header-action-btn').boundingBox();
+    if (!authBefore || !authOpening || authOpening.width <= authBefore.width + 20) {
+      errors.push('Ayuda: Mi Espacio no creció durante el morph de apertura.');
+    }
+    await page.evaluate(async () => { await window.__gxAuthOpenPromise; });
+    const authOpen = await page.locator('#header-action-btn').boundingBox();
+    const authVisible = await page.locator('#header-action-btn').evaluate(el =>
+      el.classList.contains('gx-auth-login-visible') && el.getAttribute('aria-expanded') === 'true'
+    ).catch(() => false);
+    if (!authOpen || authOpen.width <= (authBefore?.width || 0) + 80 || !authVisible) {
+      errors.push('Ayuda: Mi Espacio no terminó como tarjeta expandida.');
+    }
+
+    await page.evaluate(() => {
+      window.__gxAuthClosePromise = window.closeAuthSheet?.();
+    });
+    await page.waitForTimeout(120);
+    const authClosing = await page.locator('#header-action-btn').boundingBox();
+    if (!authClosing || !authOpen || authClosing.width >= authOpen.width - 20) {
+      errors.push('Ayuda: Mi Espacio no se contrajo durante el morph de cierre.');
+    }
+    await page.evaluate(async () => { await window.__gxAuthClosePromise; });
+    await page.waitForTimeout(40);
+    const authAfter = await page.locator('#header-action-btn').boundingBox();
+    const authClosedClean = await page.locator('#header-action-btn').evaluate(el =>
+      !el.classList.contains('gx-auth-flip-card') &&
+      !el.classList.contains('gx-auth-login-visible') &&
+      el.getAttribute('aria-expanded') === 'false' &&
+      !el.getAttribute('style')
+    ).catch(() => false);
+    if (!authBefore || !authAfter ||
+        Math.abs(authAfter.width - authBefore.width) > 3 ||
+        Math.abs(authAfter.height - authBefore.height) > 3 ||
+        !authClosedClean) {
+      errors.push('Ayuda: Mi Espacio no regresó limpiamente a la cápsula original.');
+    }
+
     for (const [button,view] of [
       ['#btn-tab-catalogo','#view-catalogo'],
       ['#btn-tab-soporte','#view-soporte'],
