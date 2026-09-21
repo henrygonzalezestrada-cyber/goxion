@@ -5,6 +5,7 @@ import { AdminAccessAssignments } from './AdminAccessAssignments';
 import { AdminClientAdvancedTools } from './AdminClientAdvancedTools';
 import { AdminRegistrationCenter } from './AdminRegistrationCenter';
 import { AdminInfrastructureMaintenance } from './AdminInfrastructureMaintenance';
+import { AdminGlobalSettings } from './AdminGlobalSettings';
 import { AdminSystemSettings } from './AdminSystemSettings';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
@@ -1874,6 +1875,9 @@ function ManagementView({
       {section === 'benefits' && <BenefitsManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'access' && <InfrastructureManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'fairdeal' && <FairDealManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'settings' && (
+        <AdminGlobalSettings data={bundle.core} onMutation={onMutation} />
+      )}
       {section === 'settings' && (
         <AdminSystemSettings data={bundle.core} onMutation={onMutation} />
       )}
