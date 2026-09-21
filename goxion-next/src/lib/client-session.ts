@@ -484,6 +484,71 @@ export async function claimReferralMonth() {
   }>(response);
 }
 
+export async function submitPaymentProof(input: {
+  file: File;
+  titulo?: string;
+  mensaje?: string;
+}) {
+  const token = localStorage.getItem(CLIENT_TOKEN_KEY) || '';
+  if (!token) throw new Error('Sesión requerida.');
+
+  const markResponse = await fetch(
+    SUPABASE_PROJECT_URL + '/functions/v1/mi-espacio',
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Client-Token': token,
+      },
+      body: JSON.stringify({ modo: 'marcar_pago_revision' }),
+      cache: 'no-store',
+    },
+  );
+
+  const marked = await parseResponse<{ ok: boolean; error?: string }>(markResponse);
+  if (marked.ok !== true) {
+    throw new Error(marked.error || 'No fue posible marcar el pago para revisión.');
+  }
+
+  const form = new FormData();
+  form.set('categoria', 'pagos');
+  form.set('file', input.file, input.file.name || 'comprobante.jpg');
+  form.set(
+    'payload_json',
+    JSON.stringify({
+      embeds: [
+        {
+          title: input.titulo || '💳 Comprobante recibido',
+          description:
+            input.mensaje ||
+            'El cliente envió un comprobante de pago desde GOXION.',
+          color: 3055683,
+        },
+      ],
+    }),
+  );
+
+  const notifyResponse = await fetch(
+    SUPABASE_PROJECT_URL + '/functions/v1/notificar-goxion',
+    {
+      method: 'POST',
+      headers: { 'X-Client-Token': token },
+      body: form,
+      cache: 'no-store',
+    },
+  );
+
+  const notified = await parseResponse<{ ok: boolean; error?: string }>(
+    notifyResponse,
+  );
+  if (notified.ok !== true) {
+    throw new Error(notified.error || 'No fue posible enviar el comprobante.');
+  }
+
+  return { ok: true };
+}
+
+
 export async function sendSupportRequest(input: {
   titulo: string;
   mensaje: string;
