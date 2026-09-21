@@ -15,7 +15,7 @@ const navItems: Array<{ id: Tab; label: string; icon: string }> = [
   { id: 'soporte', label: 'Soporte', icon: '✦' },
 ];
 
-function HomePrototype({ onCatalog, onSpace, onRegister }: { onCatalog: () => void; onSpace: () => void; onRegister: () => void }) {
+function HomeView({ onCatalog, onSpace, onRegister }: { onCatalog: () => void; onSpace: () => void; onRegister: () => void }) {
   return (
     <div className="gx-help-view gx-home-view">
       <motion.section className="gx-help-hero" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}>
@@ -157,7 +157,7 @@ export function AyudaShell() {
       <section className="gx-help-stage">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={tab} initial={reducedMotion ? false : { opacity: 0, y: 10, filter: 'blur(4px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={reducedMotion ? undefined : { opacity: 0, y: -7, filter: 'blur(3px)' }} transition={{ duration: reducedMotion ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}>
-            {tab === 'inicio' && (restoring ? <div className="gx-session-restoring"><span /><strong>Sincronizando GOXION…</strong></div> : session ? <ClientSpace data={session} onCatalog={() => go('catalogo')} onLogout={signOut} onDataChange={setSession} /> : <HomePrototype onCatalog={() => go('catalogo')} onSpace={() => { setLoginPrefill(''); setLoginOpen(true); }} onRegister={() => setOnboarding('registration')} />)}
+            {tab === 'inicio' && (restoring ? <div className="gx-session-restoring"><span /><strong>Sincronizando GOXION…</strong></div> : session ? <ClientSpace data={session} onCatalog={() => go('catalogo')} onLogout={signOut} onDataChange={setSession} /> : <HomeView onCatalog={() => go('catalogo')} onSpace={() => { setLoginPrefill(''); setLoginOpen(true); }} onRegister={() => setOnboarding('registration')} />)}
             {tab === 'catalogo' && <CatalogView ownedServiceNames={(session?.servicios || []).map((service) => String(service.nombre || ''))} client={session?.cliente || null} />}
             {tab === 'soporte' && <SupportCenter data={session} onLogin={() => { setLoginPrefill(''); setLoginOpen(true); }} />}
           </motion.div>
