@@ -1,5 +1,6 @@
 (() => {
-    const ACTIVATION_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/activar-cuenta-goxion";
+        const GXCORE = window.GOXION_CORE;
+const ACTIVATION_URL = GXCORE.endpoint("activar-cuenta-goxion");
     let gxActivationContext = null;
     let gxStageBusy = false;
 
