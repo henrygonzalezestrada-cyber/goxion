@@ -243,7 +243,8 @@
             document.body.style.overflow="hidden";
 
             requestAnimationFrame(()=>requestAnimationFrame(()=>{
-                if(cycle !== gxWelcomeCycle) return;
+                    const GXCORE = window.GOXION_CORE;
+if(cycle !== gxWelcomeCycle) return;
                 gxAnimateWelcomeOpen(fromRect,cycle);
                 setTimeout(()=>{
                     if(cycle === gxWelcomeCycle) {
@@ -447,7 +448,7 @@
 
             try {
                 const [response]=await Promise.all([
-                    fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/registro-goxion",{
+                    fetch(GXCORE.endpoint("registro-goxion"),{
                         method:"POST",
                         headers:{"Content-Type":"application/json"},
                         body:JSON.stringify({nombre:name,telefono:phone}),
@@ -518,7 +519,7 @@
 
         async function reclamarCuponSilencioso(nombre, folio, descuento) {
             const btn = document.getElementById('btn-claim-coupon');
-            const token = localStorage.getItem('goxion_client_token') || "";
+            const token = localStorage.getItem(GXCORE.STORAGE.CLIENT_TOKEN) || "";
             const key = getCurrentClientKey() || "";
 
             if(!token || !key) {
@@ -532,7 +533,7 @@
             }
 
             try {
-                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio", {
+                const response = await fetch(GXCORE.endpoint("mi-espacio"), {
                     method:"POST",
                     headers:{
                         "Content-Type":"application/json",
@@ -594,7 +595,7 @@
 
         async function reclamarMesGratis(nombre, folio, referidoNombre) {
             const btn = document.getElementById("btn-claim-free-month");
-            const token = localStorage.getItem("goxion_client_token") || "";
+            const token = localStorage.getItem(GXCORE.STORAGE.CLIENT_TOKEN) || "";
             const key = getCurrentClientKey() || "";
 
             if(!token || !key) {
@@ -608,7 +609,7 @@
             }
 
             try {
-                const response = await fetch("https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio", {
+                const response = await fetch(GXCORE.endpoint("mi-espacio"), {
                     method:"POST",
                     headers:{
                         "Content-Type":"application/json",
@@ -703,7 +704,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // Tras una recarga, la identidad vive otra vez sólo en memoria.
             // Si existe token, esperamos a Supabase antes de decidir la vista final.
-            const hasSessionToken = Boolean(localStorage.getItem('goxion_client_token'));
+            const hasSessionToken = Boolean(localStorage.getItem(GXCORE.STORAGE.CLIENT_TOKEN));
             const initialKey = getCurrentClientKey();
             const restoringSession = hasSessionToken && !initialKey;
 
@@ -825,7 +826,7 @@
             const soporteView = document.getElementById("view-soporte");
             if (!overlay || !soporteView) return;
 
-            const token = localStorage.getItem("goxion_client_token") || "";
+            const token = localStorage.getItem(GXCORE.STORAGE.CLIENT_TOKEN) || "";
             const key = getCurrentClientKey() || "";
             const autenticado = Boolean(token && key);
             const soporteActivo = soporteView.classList.contains("active");
@@ -1965,14 +1966,14 @@
         async function gxAcknowledgeServiceNotices(index) {
             const key=typeof getCurrentClientKey==='function' ? getCurrentClientKey() : '';
             const servicio=key ? globalClientesData?.[key]?.servicios?.[index] : null;
-            const token=localStorage.getItem('goxion_client_token') || '';
+            const token=localStorage.getItem(GXCORE.STORAGE.CLIENT_TOKEN) || '';
             if(!servicio?.id || !token) return;
 
             const pending=(servicio.novedades||[]).some(n=>String(n?.tipo||'')!=='password');
             if(!pending) return;
 
             try {
-                await fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/novedades-cliente',{
+                await fetch(GXCORE.endpoint("novedades-cliente"),{
                     method:'POST',
                     headers:{'Content-Type':'application/json','X-Client-Token':token},
                     body:JSON.stringify({
@@ -2356,9 +2357,9 @@
         }
 
         async function gxCancellationApi(accion,datos={}) {
-            const token=localStorage.getItem('goxion_client_token') || '';
+            const token=localStorage.getItem(GXCORE.STORAGE.CLIENT_TOKEN) || '';
             if(!token) throw new Error('Tu sesión expiró. Inicia sesión nuevamente.');
-            const r=await fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente',{
+            const r=await fetch(GXCORE.endpoint("cancelaciones-cliente"),{
                 method:'POST',
                 headers:{'Content-Type':'application/json','X-Client-Token':token},
                 body:JSON.stringify({accion,datos}),
@@ -2671,7 +2672,7 @@
             const cliente = key ? globalClientesData?.[key] : null;
             const servicio = cliente?.servicios?.[index];
             const delivery = servicio?.credencial_pendiente;
-            const token = localStorage.getItem('goxion_client_token') || '';
+            const token = localStorage.getItem(GXCORE.STORAGE.CLIENT_TOKEN) || '';
             const input = document.getElementById(`gx-credential-pin-${index}`);
             const button = document.getElementById(`gx-credential-reveal-${index}`);
             const status = document.getElementById(`gx-credential-status-${index}`);
@@ -2694,7 +2695,7 @@
             status.textContent='';
 
             try {
-                const r=await fetch('https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/credenciales-cliente',{
+                const r=await fetch(GXCORE.endpoint("credenciales-cliente"),{
                     method:'POST',
                     headers:{
                         'Content-Type':'application/json',
