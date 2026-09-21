@@ -182,6 +182,14 @@ export function SupportCenter({ data, onLogin }: Props) {
     'idle',
   );
   const [message, setMessage] = useState('');
+  const [specialText, setSpecialText] = useState('');
+  const [specialState, setSpecialState] = useState<
+    'idle' | 'sending' | 'success' | 'error'
+  >('idle');
+  const [feedbackText, setFeedbackText] = useState('');
+  const [feedbackState, setFeedbackState] = useState<
+    'idle' | 'sending' | 'success' | 'error'
+  >('idle');
 
   const selectedPlatform = platforms.find((item) => item.id === platformId);
   const issueList = selectedPlatform
@@ -247,6 +255,64 @@ export function SupportCenter({ data, onLogin }: Props) {
       setMessage(
         error instanceof Error ? error.message : 'No fue posible enviar la solicitud.',
       );
+    }
+  };
+
+  const submitSpecial = async () => {
+    if (!data?.cliente) {
+      onLogin();
+      return;
+    }
+    if (specialText.trim().length < 8) {
+      setSpecialState('error');
+      return;
+    }
+
+    setSpecialState('sending');
+    try {
+      await sendSupportRequest({
+        titulo: '🧭 Soporte especial',
+        mensaje: [
+          '**Cliente:** ' + (data.cliente.nombre || 'Cliente'),
+          data.cliente.folio ? '**Folio:** ' + data.cliente.folio : '',
+          '**Situación especial:** ' + specialText.trim(),
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      });
+      setSpecialState('success');
+      setSpecialText('');
+    } catch {
+      setSpecialState('error');
+    }
+  };
+
+  const submitFeedback = async () => {
+    if (!data?.cliente) {
+      onLogin();
+      return;
+    }
+    if (feedbackText.trim().length < 4) {
+      setFeedbackState('error');
+      return;
+    }
+
+    setFeedbackState('sending');
+    try {
+      await sendSupportRequest({
+        titulo: '💬 Feedback GOXION',
+        mensaje: [
+          '**Cliente:** ' + (data.cliente.nombre || 'Cliente'),
+          data.cliente.folio ? '**Folio:** ' + data.cliente.folio : '',
+          '**Comentario:** ' + feedbackText.trim(),
+        ]
+          .filter(Boolean)
+          .join('\n'),
+      });
+      setFeedbackState('success');
+      setFeedbackText('');
+    } catch {
+      setFeedbackState('error');
     }
   };
 
@@ -395,6 +461,76 @@ export function SupportCenter({ data, onLogin }: Props) {
             </motion.div>
           )}
         </AnimatePresence>
+      </section>
+
+      <section className="gx-support-extra-grid">
+        <article>
+          <span className="gx-help-section-kicker">SITUACIÓN ESPECIAL</span>
+          <h3>¿Tu problema es distinto?</h3>
+          <p>
+            Cuéntanos qué sucede y el equipo recibirá tu solicitud junto con el
+            contexto de tu cuenta.
+          </p>
+          <textarea
+            rows={4}
+            value={specialText}
+            onChange={(event) => {
+              setSpecialText(event.target.value);
+              if (specialState !== 'sending') setSpecialState('idle');
+            }}
+            placeholder="Describe brevemente la situación…"
+          />
+          <button
+            type="button"
+            disabled={specialState === 'sending' || specialState === 'success'}
+            onClick={() => void submitSpecial()}
+          >
+            {specialState === 'sending'
+              ? 'Enviando…'
+              : specialState === 'success'
+                ? 'Solicitud enviada ✓'
+                : data?.cliente
+                  ? 'Enviar a soporte'
+                  : 'Entrar para enviar'}
+          </button>
+          {specialState === 'error' && (
+            <small className="error">Escribe un poco más de detalle e inténtalo de nuevo.</small>
+          )}
+        </article>
+
+        <article>
+          <span className="gx-help-section-kicker">TU OPINIÓN</span>
+          <h3>Ayúdanos a mejorar</h3>
+          <p>
+            Comparte una sugerencia, comentario o experiencia directamente con
+            GOXION.
+          </p>
+          <textarea
+            rows={4}
+            value={feedbackText}
+            onChange={(event) => {
+              setFeedbackText(event.target.value);
+              if (feedbackState !== 'sending') setFeedbackState('idle');
+            }}
+            placeholder="Escribe tu comentario…"
+          />
+          <button
+            type="button"
+            disabled={feedbackState === 'sending' || feedbackState === 'success'}
+            onClick={() => void submitFeedback()}
+          >
+            {feedbackState === 'sending'
+              ? 'Enviando…'
+              : feedbackState === 'success'
+                ? 'Comentario enviado ✓'
+                : data?.cliente
+                  ? 'Enviar comentario'
+                  : 'Entrar para comentar'}
+          </button>
+          {feedbackState === 'error' && (
+            <small className="error">No pudimos enviar el comentario. Revisa el texto e inténtalo de nuevo.</small>
+          )}
+        </article>
       </section>
 
       <div className="gx-support-security">
