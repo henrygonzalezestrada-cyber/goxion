@@ -6,6 +6,7 @@ import { AdminClientAdvancedTools } from './AdminClientAdvancedTools';
 import { AdminRegistrationCenter } from './AdminRegistrationCenter';
 import { AdminInfrastructureMaintenance } from './AdminInfrastructureMaintenance';
 import { AdminGlobalSettings } from './AdminGlobalSettings';
+import { AdminAccessArchitecture } from './AdminAccessArchitecture';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -1659,6 +1660,12 @@ function InfrastructureManagement({
       <AdminInfrastructureMaintenance
         accounts={accounts}
         credentials={bundle.credentials}
+        onMutation={onMutation}
+      />
+
+      <AdminAccessArchitecture
+        model={access}
+        accounts={accounts}
         onMutation={onMutation}
       />
 
