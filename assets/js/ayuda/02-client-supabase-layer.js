@@ -1,14 +1,15 @@
     (() => {
-        const LOGIN_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/login-goxion";
-        const MI_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
-        const NOTIFY_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
-        const INVENTARIO_PUBLICO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario-publico";
-        const CANCELACIONES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/cancelaciones-cliente";
-        const CREDENCIALES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/credenciales-cliente";
-        const NOVEDADES_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/novedades-cliente";
-        const ESTADO_CUENTA_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-cuenta-beta";
-        const ACCESOS_CLIENTE_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/accesos-cliente-beta";
-        const TOKEN_KEY = "goxion_client_token";
+            const GXCORE = window.GOXION_CORE;
+const LOGIN_URL = GXCORE.endpoint("login-goxion");
+        const MI_URL = GXCORE.endpoint("mi-espacio");
+        const NOTIFY_URL = GXCORE.endpoint("notificar-goxion");
+        const INVENTARIO_PUBLICO_URL = GXCORE.endpoint("inventario-publico");
+        const CANCELACIONES_CLIENTE_URL = GXCORE.endpoint("cancelaciones-cliente");
+        const CREDENCIALES_CLIENTE_URL = GXCORE.endpoint("credenciales-cliente");
+        const NOVEDADES_CLIENTE_URL = GXCORE.endpoint("novedades-cliente");
+        const ESTADO_CUENTA_URL = GXCORE.endpoint("estado-cuenta-beta");
+        const ACCESOS_CLIENTE_URL = GXCORE.endpoint("accesos-cliente-beta");
+        const TOKEN_KEY = GXCORE.STORAGE.CLIENT_TOKEN;
 
         async function missionRequest(payload) {
             const token = localStorage.getItem(TOKEN_KEY) || "";
