@@ -15,10 +15,13 @@ import {
   adminOperation,
   benefitAction,
   cancellationAction,
+  credentialAction,
+  fairDealAction,
   getAdminToken,
   loadAdminBundle,
   loginAdmin,
   logoutAdmin,
+  motherAccountAction,
   promotionAction,
   registrationAction,
 } from '../lib/admin-api';
@@ -1245,7 +1248,13 @@ function BenefitsManagement({
   );
 }
 
-function InfrastructureManagement({ bundle }: { bundle: Bundle }) {
+function InfrastructureManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
   const access = bundle.accessModel;
   const accounts = bundle.motherAccounts?.cuentas || [];
   const credentials = bundle.credentials?.credenciales || [];
@@ -1253,43 +1262,269 @@ function InfrastructureManagement({ bundle }: { bundle: Bundle }) {
     (item) => String(item.estado) === 'pendiente',
   );
   const activeAccesses = access?.accesos || [];
+  const services = (access?.servicios || bundle.core.catalogo).filter(
+    (item) => item.activo !== false,
+  );
+
+  const [serviceId, setServiceId] = useState(String(services[0]?.id || ''));
+  const [alias, setAlias] = useState('Cuenta 1');
+  const [email, setEmail] = useState('');
+  const [limit, setLimit] = useState('5');
+  const [credentialAccount, setCredentialAccount] = useState('');
+  const [password, setPassword] = useState('');
+
+  const createAccount = async () => {
+    await onMutation(
+      () =>
+        motherAccountAction('crear', {
+          servicio_id: serviceId,
+          alias,
+          correo_login: email,
+          limite_perfiles: Number(limit),
+        }),
+      'Cuenta madre creada.',
+    );
+    setEmail('');
+  };
+
+  const publishCredential = async () => {
+    const account = accounts.find(
+      (item) => String(item.id) === credentialAccount,
+    );
+    const clientIds = Array.from(
+      new Set(
+        (account?.clientes || [])
+          .map((item) => String(item.cliente_id || ''))
+          .filter(Boolean),
+      ),
+    );
+    if (!account || !clientIds.length) {
+      window.alert('La cuenta seleccionada no tiene clientes asignados.');
+      return;
+    }
+    if (password.length < 4) {
+      window.alert('Escribe la nueva contraseña.');
+      return;
+    }
+    if (
+      !window.confirm(
+        'La contraseña se publicará como entrega segura de una sola vista para los clientes asignados. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        credentialAction('publicar', {
+          cuenta_id: credentialAccount,
+          password,
+          cliente_ids: clientIds,
+        }),
+      'Credencial publicada de forma segura.',
+    );
+    setPassword('');
+  };
 
   return (
     <div className="gx-admin-management-block">
       <div className="gx-admin-management-head">
-        <div><span className="gx-admin-eyebrow">ARQUITECTURA</span><h3>Accesos y credenciales</h3></div>
+        <div>
+          <span className="gx-admin-eyebrow">ARQUITECTURA</span>
+          <h3>Accesos y credenciales</h3>
+        </div>
       </div>
+
       <div className="gx-admin-infra-kpis">
         <div><strong>{accounts.length}</strong><span>Cuentas madre</span></div>
         <div><strong>{activeAccesses.length}</strong><span>Accesos activos</span></div>
         <div><strong>{credentials.length}</strong><span>Versiones credencial</span></div>
         <div><strong>{pendingDeliveries.length}</strong><span>Entregas pendientes</span></div>
       </div>
-      <div className="gx-admin-account-list">
-        {accounts.map((account) => (
-          <article key={String(account.id)}>
-            <div><strong>{String(account.alias || 'Cuenta')}</strong><small>{String(account.correo_login || '')}</small></div>
-            <div><b>{Number(account.ocupados || 0)}/{Number(account.limite_perfiles || 0)}</b><span>{Number(account.disponibles || 0)} libres</span></div>
-          </article>
-        ))}
-      </div>
+
+      <section className="gx-admin-subpanel">
+        <div className="gx-admin-section-head">
+          <div><span className="gx-admin-eyebrow">CUENTAS MADRE</span><h3>Capacidad y asignación</h3></div>
+        </div>
+        <div className="gx-admin-account-list">
+          {accounts.map((account) => (
+            <article key={String(account.id)}>
+              <div>
+                <strong>{String(account.alias || 'Cuenta')}</strong>
+                <small>{String(account.correo_login || '')}</small>
+              </div>
+              <div>
+                <b>{Number(account.ocupados || 0)}/{Number(account.limite_perfiles || 0)}</b>
+                <span>{Number(account.disponibles || 0)} libres</span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="gx-admin-inline-editor gx-admin-account-editor">
+          <strong>Nueva cuenta madre</strong>
+          <label>
+            <span>Plataforma</span>
+            <select value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+              {services.map((service) => (
+                <option key={service.id} value={service.id}>{service.nombre}</option>
+              ))}
+            </select>
+          </label>
+          <div className="gx-admin-form-pair">
+            <label><span>Alias</span><input value={alias} onChange={(e)=>setAlias(e.target.value)} /></label>
+            <label><span>Límite</span><input type="number" min={1} max={99} value={limit} onChange={(e)=>setLimit(e.target.value)} /></label>
+          </div>
+          <label><span>Correo / login</span><input value={email} onChange={(e)=>setEmail(e.target.value)} /></label>
+          <button type="button" className="primary" onClick={() => void createAccount()}>
+            Crear cuenta
+          </button>
+        </div>
+      </section>
+
+      <section className="gx-admin-subpanel">
+        <div className="gx-admin-section-head">
+          <div><span className="gx-admin-eyebrow">ENTREGA SEGURA</span><h3>Publicar nueva contraseña</h3></div>
+        </div>
+        <div className="gx-admin-inline-editor">
+          <label>
+            <span>Cuenta madre</span>
+            <select
+              value={credentialAccount}
+              onChange={(e) => setCredentialAccount(e.target.value)}
+            >
+              <option value="">Selecciona una cuenta</option>
+              {accounts
+                .filter((account) => account.activo !== false)
+                .map((account) => (
+                  <option key={String(account.id)} value={String(account.id)}>
+                    {String(account.alias || 'Cuenta')} · {String(account.correo_login || '')}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <label>
+            <span>Nueva contraseña</span>
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          <div className="gx-admin-rule-note">
+            La contraseña se guarda en Vault y cada cliente sólo podrá verla una vez después de confirmar su PIN.
+          </div>
+          <button type="button" className="primary" onClick={() => void publishCredential()}>
+            Publicar a clientes asignados
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
 
-function FairDealManagement({ rows }: { rows: FairDeal[] }) {
+function FairDealManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const rows = bundle.fairDeals;
   const active = rows.filter((item) => item.activo !== false);
+  const services = bundle.core.catalogo.filter((item) => item.activo !== false);
+  const [serviceId, setServiceId] = useState(String(services[0]?.id || ''));
+  const [days, setDays] = useState('1');
+  const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7) + '-01');
+  const [reason, setReason] = useState('Falla técnica');
+  const [onlyAffected, setOnlyAffected] = useState(true);
+
+  const eligibleClientIds = useMemo(() => {
+    const selected = bundle.core.cliente_servicios.filter(
+      (row) =>
+        row.activo !== false &&
+        String(row.servicio_id || '') === serviceId,
+    );
+    const ids = new Set(selected.map((row) => String(row.cliente_id || '')).filter(Boolean));
+    return [...ids];
+  }, [bundle.core.cliente_servicios, serviceId]);
+
+  const apply = async () => {
+    if (!eligibleClientIds.length) {
+      window.alert('No hay clientes activos con ese servicio.');
+      return;
+    }
+    const service = services.find((item) => String(item.id) === serviceId);
+    if (
+      !window.confirm(
+        'Se aplicará Trato Justo a ' +
+          eligibleClientIds.length +
+          ' cliente(s) de ' +
+          String(service?.nombre || 'este servicio') +
+          '. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        fairDealAction('guardar_compensaciones_masivas', {
+          cliente_ids: eligibleClientIds,
+          servicio_id: serviceId,
+          servicio_nombre: service?.nombre || '',
+          periodo: period,
+          dias_falla: Number(days),
+          motivo: reason,
+          solo_afectados: onlyAffected,
+        }),
+      'Compensaciones de Trato Justo guardadas.',
+    );
+  };
+
   return (
     <div className="gx-admin-management-block">
       <div className="gx-admin-management-head">
-        <div><span className="gx-admin-eyebrow">TRATO JUSTO</span><h3>Compensaciones activas</h3></div>
-        <span>{active.length}</span>
+        <div><span className="gx-admin-eyebrow">TRATO JUSTO</span><h3>Compensaciones del periodo</h3></div>
+        <span>{active.length} activas</span>
       </div>
+
+      <div className="gx-admin-inline-editor">
+        <label>
+          <span>Servicio afectado</span>
+          <select value={serviceId} onChange={(e)=>setServiceId(e.target.value)}>
+            {services.map((service)=>(
+              <option key={service.id} value={service.id}>{service.nombre}</option>
+            ))}
+          </select>
+        </label>
+        <div className="gx-admin-form-pair">
+          <label><span>Periodo</span><input type="month" value={period.slice(0,7)} onChange={(e)=>setPeriod(e.target.value + '-01')} /></label>
+          <label><span>Días de falla</span><input type="number" min={1} max={10} value={days} onChange={(e)=>setDays(e.target.value)} /></label>
+        </div>
+        <label><span>Motivo</span><input value={reason} onChange={(e)=>setReason(e.target.value)} /></label>
+        <label className="gx-admin-check-row">
+          <input type="checkbox" checked={onlyAffected} onChange={(e)=>setOnlyAffected(e.target.checked)} />
+          <span>Aplicar sólo a clientes que tienen este servicio activo</span>
+        </label>
+        <div className="gx-admin-rule-note">
+          {Number(days || 0) * 5}% de compensación · {eligibleClientIds.length} cliente(s) elegibles.
+        </div>
+        <button type="button" className="primary" onClick={() => void apply()}>
+          Aplicar compensación masiva
+        </button>
+      </div>
+
       <div className="gx-admin-benefit-list">
         {active.slice(0, 30).map((item) => (
           <article key={String(item.id)}>
-            <div><strong>{item.motivo || 'Compensación'}</strong><small>{item.periodo} · {item.dias_falla || 0} día(s)</small></div>
-            <div><b>−{money(item.monto)}</b><span>{Number(item.porcentaje || 0)}%</span></div>
+            <div>
+              <strong>{item.motivo || 'Compensación'}</strong>
+              <small>{item.periodo} · {item.dias_falla || 0} día(s)</small>
+            </div>
+            <div>
+              <b>−{money(item.monto)}</b>
+              <span>{Number(item.porcentaje || 0)}%</span>
+            </div>
           </article>
         ))}
         {!active.length && <div className="gx-admin-empty">No hay compensaciones activas.</div>}
@@ -1329,8 +1564,8 @@ function ManagementView({
       {section === 'catalog' && <CatalogManagement bundle={bundle} />}
       {section === 'promotions' && <PromotionsManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'benefits' && <BenefitsManagement bundle={bundle} onMutation={onMutation} />}
-      {section === 'access' && <InfrastructureManagement bundle={bundle} />}
-      {section === 'fairdeal' && <FairDealManagement rows={bundle.fairDeals} />}
+      {section === 'access' && <InfrastructureManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'fairdeal' && <FairDealManagement bundle={bundle} onMutation={onMutation} />}
     </div>
   );
 }
