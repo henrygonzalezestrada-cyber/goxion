@@ -1,10 +1,6 @@
-        const NUMERO_GOXION = "528136836901"; 
+        const NUMERO_GOXION = GXCORE.BUSINESS.WHATSAPP;
         
-        const WEBHOOKS_DISCORD = {
-            pedidos: "goxion://pedidos",
-            soporte: "goxion://soporte",
-            logins: "goxion://logins"
-        }; 
+        const WEBHOOKS_DISCORD = GXCORE.BUSINESS.CHANNELS;
 
         let globalClientesData = null;
         let greetingInterval = null;
