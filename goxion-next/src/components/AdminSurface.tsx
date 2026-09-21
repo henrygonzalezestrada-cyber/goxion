@@ -5,6 +5,7 @@ import { AdminAccessAssignments } from './AdminAccessAssignments';
 import { AdminClientAdvancedTools } from './AdminClientAdvancedTools';
 import { AdminRegistrationCenter } from './AdminRegistrationCenter';
 import { AdminInfrastructureMaintenance } from './AdminInfrastructureMaintenance';
+import { AdminSystemSettings } from './AdminSystemSettings';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -1863,6 +1864,7 @@ function ManagementView({
           ['benefits', 'Beneficios'],
           ['access', 'Accesos'],
           ['fairdeal', 'Trato Justo'],
+          ['settings', 'Ajustes'],
         ].map(([id,label])=>(
           <button type="button" key={id} className={section===id?'active':''} onClick={()=>setSection(id)}>{label}</button>
         ))}
@@ -1872,6 +1874,9 @@ function ManagementView({
       {section === 'benefits' && <BenefitsManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'access' && <InfrastructureManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'fairdeal' && <FairDealManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'settings' && (
+        <AdminSystemSettings data={bundle.core} onMutation={onMutation} />
+      )}
     </div>
   );
 }
