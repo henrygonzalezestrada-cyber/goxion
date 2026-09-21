@@ -1,7 +1,7 @@
 (()=>{
   document.body.classList.add('gx-beta-20');
-  const URL='https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/beneficios-admin-beta';
-  const TOKEN_KEY='GOXION_ADMIN_TOKEN';
+  const URL=GXCORE.endpoint("beneficios-admin-beta");
+  const TOKEN_KEY=GXCORE.STORAGE.ADMIN_TOKEN;
   const money=v=>Number(v||0).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
   const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   function monthLabel(v){if(!v)return '—';const d=new Date(String(v).slice(0,7)+'-01T12:00:00');return Number.isNaN(d.getTime())?String(v).slice(0,7):d.toLocaleDateString('es-MX',{month:'short',year:'numeric'}).replace('.','');}
