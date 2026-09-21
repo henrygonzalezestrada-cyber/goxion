@@ -551,7 +551,30 @@
                 fill: 'forwards'
             });
 
-        await shape.finished.catch(() => {});
+        // Safari/WebKit: geometry is tweened manually, so color needs its own
+        // short transition. Finish it early so the expanding surface already
+        // reads as the dark login card instead of a large cyan pill.
+        const colorMorph = useLayoutMorph
+            ? root.animate([
+                {
+                    backgroundColor: gxAuthSourceStyle.backgroundColor,
+                    borderColor: gxAuthSourceStyle.borderColor
+                },
+                {
+                    backgroundColor: cardStyle.backgroundColor,
+                    borderColor: cardStyle.borderColor
+                }
+            ], {
+                duration: 165,
+                easing: 'cubic-bezier(.16,1,.3,1)',
+                fill: 'forwards'
+            })
+            : null;
+
+        await Promise.allSettled([
+            shape.finished,
+            colorMorph?.finished || Promise.resolve()
+        ]);
 
         // Commit the final card BEFORE showing any login UI.
         Object.assign(root.style, {
@@ -567,6 +590,7 @@
             willChange: ''
         });
         try { shape.cancel(); } catch (_) {}
+        try { colorMorph?.cancel(); } catch (_) {}
 
         root.classList.add('gx-auth-login-visible');
         content.style.visibility = 'visible';
