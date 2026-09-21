@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react';
+import { ClientOperationalTools, NewClientModal } from './AdminClientTools';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -467,19 +468,11 @@ function ClientEditor({
           </div>
         </section>
 
-        <section className="gx-admin-sheet-section">
-          <div className="gx-admin-section-head">
-            <div><span className="gx-admin-eyebrow">SERVICIOS</span><h3>{services.length} activos</h3></div>
-          </div>
-          <div className="gx-admin-client-services">
-            {services.map((service) => (
-              <div key={service.id}>
-                <span>{service.nombre}</span>
-                <strong>{money(service.monto)}</strong>
-              </div>
-            ))}
-          </div>
-        </section>
+        <ClientOperationalTools
+          client={client}
+          data={data}
+          onMutation={onMutation}
+        />
       </motion.section>
     </motion.div>
   );
@@ -499,6 +492,7 @@ function ClientsView({
     focus === 'today' ? 'today' : focus === 'overdue' ? 'overdue' : 'all',
   );
   const [selected, setSelected] = useState<AdminClient | null>(null);
+  const [creating, setCreating] = useState(false);
   const data = bundle.core;
 
   const rows = useMemo(() => {
@@ -546,6 +540,13 @@ function ClientsView({
           <h1>Clientes</h1>
           <p>Busca, filtra y entra directo a lo que necesitas.</p>
         </div>
+        <button
+          type="button"
+          className="gx-admin-primary-action"
+          onClick={() => setCreating(true)}
+        >
+          ＋ Nuevo cliente
+        </button>
       </section>
 
       <div className="gx-admin-client-toolbar">
@@ -610,6 +611,15 @@ function ClientsView({
             )}
             data={data}
             onClose={() => setSelected(null)}
+            onMutation={onMutation}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {creating && (
+          <NewClientModal
+            onClose={() => setCreating(false)}
             onMutation={onMutation}
           />
         )}
