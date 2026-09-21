@@ -8,5 +8,12 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    rollupOptions: {
+      input: {
+        index: 'index.html',
+        ayuda: 'ayuda.html',
+        admin: 'admin.html',
+      },
+    },
   },
 });
