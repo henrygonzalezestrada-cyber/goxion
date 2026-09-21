@@ -60,17 +60,35 @@ async function runAyuda(browser, browserName, errors) {
 
   // Mi Espacio: validar el morph cápsula → tarjeta → cápsula también en WebKit/Safari.
   const authBefore = await page.locator('#header-action-btn').boundingBox();
+  const authSourceBg = await page.locator('#header-action-btn').evaluate(el => getComputedStyle(el).backgroundColor);
   await page.evaluate(() => {
     window.__gxAuthOpenPromise = window.openAuthSheet?.();
   });
   await page.waitForTimeout(140);
   const authOpening = await page.locator('#header-action-btn').boundingBox();
+  const authOpeningBg = await page.locator('#header-action-btn').evaluate(el => getComputedStyle(el).backgroundColor);
   if (!authBefore || !authOpening || authOpening.width <= authBefore.width + 20) {
     errors.push(`${label}: Mi Espacio no creció durante el morph de apertura.`);
   }
 
   await page.evaluate(async () => { await window.__gxAuthOpenPromise; });
   const authOpen = await page.locator('#header-action-btn').boundingBox();
+  const authFinalBg = await page.locator('#header-action-btn').evaluate(el => getComputedStyle(el).backgroundColor);
+
+  const parseRgb = value => (String(value).match(/[\d.]+/g) || []).slice(0, 4).map(Number);
+  const colorDistance = (a, b) => {
+    const aa = parseRgb(a), bb = parseRgb(b);
+    if (aa.length < 3 || bb.length < 3) return Infinity;
+    return Math.hypot(
+      (aa[0] || 0) - (bb[0] || 0),
+      (aa[1] || 0) - (bb[1] || 0),
+      (aa[2] || 0) - (bb[2] || 0),
+      ((aa[3] ?? 1) - (bb[3] ?? 1)) * 255
+    );
+  };
+  if (colorDistance(authOpeningBg, authFinalBg) >= colorDistance(authSourceBg, authFinalBg)) {
+    errors.push(`${label}: Mi Espacio conservó demasiado tiempo el fondo de la cápsula durante la apertura.`);
+  }
   const authVisible = await page.locator('#header-action-btn').evaluate(el =>
     el.classList.contains('gx-auth-login-visible') && el.getAttribute('aria-expanded') === 'true'
   ).catch(() => false);
