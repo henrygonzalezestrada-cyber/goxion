@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { ClientOperationalTools, NewClientModal } from './AdminClientTools';
 import { AdminBillingCycleTools } from './AdminBillingCycleTools';
+import { AdminAccessAssignments } from './AdminAccessAssignments';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -1751,6 +1752,12 @@ function InfrastructureManagement({
           </button>
         </div>
       </section>
+
+      <AdminAccessAssignments
+        model={access}
+        accounts={accounts}
+        onMutation={onMutation}
+      />
 
       <section className="gx-admin-subpanel">
         <div className="gx-admin-section-head">
