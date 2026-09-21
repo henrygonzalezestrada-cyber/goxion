@@ -85,8 +85,23 @@ function officialSkeleton(html) {
   return output.trim();
 }
 
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function modernSkeleton(html, page) {
-  let output = html.replace(/<script\s+src=["']\.\/assets\/js\/core\/runtime\.js["']\s*><\/script>\s*/i, '');
+  let output = html;
+
+  for (const relative of ADDED_SCRIPTS) {
+    const src = './' + relative;
+    const pattern = new RegExp(
+      '<script\\b[^>]*\\bsrc=["\\\']' +
+        escapeRegExp(src) +
+        '["\\\'][^>]*><\\/script>\\s*',
+      'gi',
+    );
+    output = output.replace(pattern, '');
+  }
 
   output = output.replace(
     new RegExp(
@@ -197,6 +212,11 @@ for (const page of PAGES) {
   if (remainingInline.length) {
     failures.push(page + ': quedaron ' + remainingInline.length + ' scripts inline.');
   }
+}
+
+const ayudaModern = readFileSync(join(ROOT, 'ayuda.html'), 'utf8');
+if (!ayudaModern.includes('<script type="module" src="./assets/js/core/motion-engine.mjs"></script>')) {
+  failures.push('ayuda: motion-engine no está cargado.');
 }
 
 for (const relative of [...MODERNIZED_SCRIPTS, ...ADDED_SCRIPTS]) {
