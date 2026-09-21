@@ -81,8 +81,14 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() => {
     window.__gxAuthClosePromise = window.closeAuthSheet?.();
   });
-  // El oficial desvanece contenido 130ms antes de iniciar el FLIP de regreso.
-  await page.waitForTimeout(280);
+  // WebKit puede estirar el fade previo. Medimos desde el inicio real
+  // del morph: cuando el formulario deja de estar visible.
+  await page.waitForFunction(() =>
+    !document.getElementById('header-action-btn')?.classList.contains('gx-auth-login-visible'),
+    null,
+    { timeout: 2500 }
+  );
+  await page.waitForTimeout(140);
   const authClosing = await page.locator('#header-action-btn').boundingBox();
   if (!authClosing || !authOpen || authClosing.width >= authOpen.width - 20) {
     errors.push(`${label}: Mi Espacio no se contrajo durante el morph de cierre (abierto=${authOpen?.width}, cierre=${authClosing?.width}).`);
