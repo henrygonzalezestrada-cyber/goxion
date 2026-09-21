@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import { FormEvent, useEffect, useState } from 'react';
-import { CatalogPrototype } from './CatalogPrototype';
+import { CatalogView } from './CatalogView';
 import { OnboardingFlow } from './OnboardingFlow';
 import { ClientSpace } from './ClientSpace';
 import { SupportCenter } from './SupportCenter';
@@ -158,7 +158,7 @@ export function AyudaShell() {
         <AnimatePresence mode="wait" initial={false}>
           <motion.div key={tab} initial={reducedMotion ? false : { opacity: 0, y: 10, filter: 'blur(4px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={reducedMotion ? undefined : { opacity: 0, y: -7, filter: 'blur(3px)' }} transition={{ duration: reducedMotion ? 0 : 0.26, ease: [0.16, 1, 0.3, 1] }}>
             {tab === 'inicio' && (restoring ? <div className="gx-session-restoring"><span /><strong>Sincronizando GOXION…</strong></div> : session ? <ClientSpace data={session} onCatalog={() => go('catalogo')} onLogout={signOut} onDataChange={setSession} /> : <HomePrototype onCatalog={() => go('catalogo')} onSpace={() => { setLoginPrefill(''); setLoginOpen(true); }} onRegister={() => setOnboarding('registration')} />)}
-            {tab === 'catalogo' && <CatalogPrototype ownedServiceNames={(session?.servicios || []).map((service) => String(service.nombre || ''))} client={session?.cliente || null} />}
+            {tab === 'catalogo' && <CatalogView ownedServiceNames={(session?.servicios || []).map((service) => String(service.nombre || ''))} client={session?.cliente || null} />}
             {tab === 'soporte' && <SupportCenter data={session} onLogin={() => { setLoginPrefill(''); setLoginOpen(true); }} />}
           </motion.div>
         </AnimatePresence>
