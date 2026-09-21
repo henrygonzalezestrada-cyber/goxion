@@ -123,6 +123,90 @@ async function runAyuda(browser, browserName, errors) {
     if (!active) errors.push(`${label}: ${view} no quedó activo tras ${button}.`);
   }
 
+  // Soporte: comprobar que el morph realmente tenga geometría intermedia,
+  // no sólo un salto entre estado compacto y expandido.
+  await page.evaluate(() => window.switchTab?.('soporte'));
+  await page.waitForTimeout(120);
+  await page.evaluate(() => {
+    window.renderizarSoporteDinamico?.({
+      _goxion_config: { serviciosGlobales: [{ nombre: 'ViX' }] }
+    });
+  });
+
+  const supportBtn = page.locator('#support-platforms-grid .platform-btn').first();
+  const supportBefore = await supportBtn.boundingBox();
+  await page.evaluate(() => {
+    const el = document.querySelector('#support-platforms-grid .platform-btn');
+    window.selectPlatform?.('ViX', el, {
+      preventDefault(){},
+      stopPropagation(){}
+    });
+  });
+  await page.waitForTimeout(150);
+  const supportOpening = await supportBtn.boundingBox();
+  if (!supportBefore || !supportOpening || supportOpening.width <= supportBefore.width + 20) {
+    errors.push(`${label}: Soporte no mostró crecimiento intermedio del morph.`);
+  }
+  await page.waitForTimeout(420);
+  const supportOpen = await supportBtn.boundingBox();
+
+  await page.evaluate(() => window.closeSupportMorph?.());
+  await page.waitForFunction(() =>
+    !document.querySelector('#support-platforms-grid .platform-btn')?.classList.contains('gx-support-expanded'),
+    null,
+    { timeout: 2500 }
+  ).catch(() => {});
+  await page.waitForTimeout(140);
+  const supportClosing = await supportBtn.boundingBox();
+  if (!supportOpen || !supportClosing || supportClosing.width >= supportOpen.width - 20) {
+    errors.push(`${label}: Soporte no mostró contracción intermedia del morph.`);
+  }
+  await page.waitForTimeout(420);
+  const supportAfter = await supportBtn.boundingBox();
+  if (!supportBefore || !supportAfter || Math.abs(supportAfter.width - supportBefore.width) > 4) {
+    errors.push(`${label}: Soporte no regresó a su geometría compacta.`);
+  }
+
+  // Gamificación: el check reclamado no debe crear una copia flotante/ghost.
+  await page.evaluate(() => {
+    const grid = document.getElementById('gamif-grid');
+    const ref = document.getElementById('gamif-expanded-referral');
+    const coupon = document.getElementById('gamif-expanded-coupon');
+    if (!grid || !coupon) return;
+
+    grid.innerHTML = `
+      <div class="gamif-btn gx-gamif-card gx-gamif-card-mission" data-watermark="✅">
+        <div class="gamif-title">Tu progreso</div>
+      </div>`;
+    grid.style.display = 'grid';
+    grid.style.visibility = 'visible';
+    if (ref) ref.style.display = 'none';
+
+    coupon.innerHTML = `
+      <div class="gx-gamif-shared-emoji" style="font-size:38px;display:inline-block">✅</div>
+      <div>Estado reclamado</div>`;
+    coupon.style.display = 'none';
+
+    window.__gxGamifOpenPromise = window.openGamif?.('coupon');
+  });
+  await page.waitForTimeout(120);
+  const checkGhostOpen = await page.locator('.gx-gamif-floating-emoji').count();
+  if (checkGhostOpen !== 0) {
+    errors.push(`${label}: Misiones creó un ghost flotante para el check ✅ al abrir.`);
+  }
+  await page.evaluate(async () => { await window.__gxGamifOpenPromise; });
+
+  await page.evaluate(() => {
+    window.__gxGamifClosePromise = window.closeGamif?.();
+  });
+  await page.waitForTimeout(180);
+  const checkGhostClose = await page.locator('.gx-gamif-floating-emoji').count();
+  if (checkGhostClose !== 0) {
+    errors.push(`${label}: Misiones creó un ghost flotante para el check ✅ al cerrar.`);
+  }
+  await page.evaluate(async () => { await window.__gxGamifClosePromise; });
+
+  await page.evaluate(() => window.switchTab?.('inicio'));
   await page.evaluate(() => window.solicitarCuenta?.());
   await page.waitForTimeout(150);
   const welcomeOpen = await page.locator('#gx-welcome-modal').evaluate(el => el.classList.contains('show')).catch(() => false);
@@ -198,6 +282,8 @@ console.log('GOXION modern-v2 · browser smoke OK');
 console.log('✓ Chromium y WebKit');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
+console.log('✓ Soporte conserva crecimiento/contracción intermedia');
+console.log('✓ El check ✅ de Misiones no crea ghost flotante');
 console.log('✓ Registro de bienvenida abre');
 console.log('✓ Admin expone controladores principales');
 console.log('✓ Admin cambia entre secciones principales');
