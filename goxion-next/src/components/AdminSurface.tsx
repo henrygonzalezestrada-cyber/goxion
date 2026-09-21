@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ClientOperationalTools, NewClientModal } from './AdminClientTools';
 import { AdminBillingCycleTools } from './AdminBillingCycleTools';
 import { AdminAccessAssignments } from './AdminAccessAssignments';
+import { AdminRegistrationCenter } from './AdminRegistrationCenter';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -13,7 +14,6 @@ import {
   Cancellation,
   FairDeal,
   Promotion,
-  RegistrationRequest,
   adminAction,
   adminOperation,
   benefitAction,
@@ -27,7 +27,6 @@ import {
   logoutAdmin,
   motherAccountAction,
   promotionAction,
-  registrationAction,
 } from '../lib/admin-api';
 
 type Tab = 'home' | 'clients' | 'operations' | 'management';
@@ -852,129 +851,6 @@ function CancellationDecisions({
   );
 }
 
-function RegistrationDecisions({
-  rows,
-  onMutation,
-}: {
-  rows: RegistrationRequest[];
-  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
-}) {
-  const pending = rows.filter(
-    (item) =>
-      item.estado_admin !== 'descartado' &&
-      (item.estado_admin === 'pendiente' ||
-        item.activacion?.estado === 'pendiente' ||
-        !item.cliente_id),
-  );
-  const [delivery, setDelivery] = useState<Record<string, unknown> | null>(null);
-
-  const prepare = async (request: RegistrationRequest) => {
-    try {
-      const result = await registrationAction('preparar_activacion', {
-        solicitud_id: request.id,
-      });
-      setDelivery(result);
-      await onMutation(async () => result, 'Activación preparada.');
-    } catch (error) {
-      window.alert(error instanceof Error ? error.message : 'No fue posible preparar la activación.');
-    }
-  };
-
-  return (
-    <>
-      <div className="gx-admin-ops-list">
-        {pending.map((item) => (
-          <article key={item.id} className="gx-admin-decision-card">
-            <div className="gx-admin-decision-card-head">
-              <div>
-                <strong>{item.nombre_declarado || 'Registro'}</strong>
-                <small>{item.telefono_normalizado || 'Sin teléfono'} · {item.resultado}</small>
-              </div>
-              <span className={'gx-admin-badge ' + (item.resultado || '')}>
-                {item.activacion?.estado || item.estado_admin || 'pendiente'}
-              </span>
-            </div>
-            {item.detalle && <p>{item.detalle}</p>}
-            <div className="gx-admin-decision-actions">
-              {item.resultado === 'nuevo' && !item.activacion && (
-                <button type="button" className="success" onClick={() => void prepare(item)}>
-                  Preparar activación
-                </button>
-              )}
-              {item.activacion?.estado === 'pendiente' && (
-                <button
-                  type="button"
-                  onClick={() =>
-                    void onMutation(
-                      () =>
-                        registrationAction('regenerar_activacion', {
-                          solicitud_id: item.id,
-                        }),
-                      'Código regenerado.',
-                    )
-                  }
-                >
-                  Regenerar código
-                </button>
-              )}
-              {item.resultado === 'review' || item.resultado === 'revisar' ? (
-                <span className="gx-admin-inline-note">Requiere vincular o resolver desde identidad.</span>
-              ) : null}
-            </div>
-          </article>
-        ))}
-        {!pending.length && <div className="gx-admin-empty">No hay registros pendientes.</div>}
-      </div>
-
-      <AnimatePresence>
-        {delivery && (
-          <motion.div
-            className="gx-admin-code-overlay"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onMouseDown={(event) => {
-              if (event.target === event.currentTarget) setDelivery(null);
-            }}
-          >
-            <motion.section
-              className="gx-admin-code-card"
-              initial={{ scale: 0.96, y: 12 }}
-              animate={{ scale: 1, y: 0 }}
-            >
-              <button type="button" onClick={() => setDelivery(null)}>×</button>
-              <span className="gx-admin-eyebrow">ACTIVACIÓN PREPARADA</span>
-              <h3>{String(delivery.nombre || 'Nuevo cliente')}</h3>
-              <div>
-                <small>GOXION ID</small>
-                <strong>{String(delivery.goxion_id || '—')}</strong>
-              </div>
-              <div>
-                <small>Código</small>
-                <strong>{String(delivery.codigo || '—')}</strong>
-              </div>
-              <p>Vence: {shortDate(delivery.expira_at)}</p>
-              {Boolean(delivery.mensaje_whatsapp) && (
-                <button
-                  type="button"
-                  className="primary"
-                  onClick={() =>
-                    void navigator.clipboard.writeText(
-                      String(delivery.mensaje_whatsapp || ''),
-                    )
-                  }
-                >
-                  Copiar mensaje
-                </button>
-              )}
-            </motion.section>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
 function NotificationsPanel({
   notifications,
   onMutation,
@@ -1063,7 +939,19 @@ function OperationsView({
         <CancellationDecisions rows={bundle.cancellations} onMutation={onMutation} />
       )}
       {section === 'registrations' && (
-        <RegistrationDecisions rows={registrationRows} onMutation={onMutation} />
+        <AdminRegistrationCenter
+          rows={registrationRows}
+          clients={(bundle.registrations?.clientes || []) as Array<{
+            id?: string;
+            nombre?: string;
+            folio?: string;
+            usuario_acceso?: string;
+            telefono_normalizado?: string | null;
+            origen_cliente?: string;
+            promo_nuevo_elegible?: boolean;
+          }>}
+          onMutation={onMutation}
+        />
       )}
       {section === 'support' && (
         <NotificationsPanel notifications={support} onMutation={onMutation} />
