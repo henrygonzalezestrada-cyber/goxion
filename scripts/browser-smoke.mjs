@@ -167,7 +167,9 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: Soporte no regresó a su geometría compacta.`);
   }
 
-  // Gamificación: el check reclamado no debe crear una copia flotante/ghost.
+  // Gamificación: el check reclamado usa el MISMO shared-element flow que
+  // trofeo/flecha. Debe existir una sola copia flotante y el ghost de tarjeta
+  // no puede conservar su pseudo-watermark.
   await page.evaluate(() => {
     const grid = document.getElementById('gamif-grid');
     const ref = document.getElementById('gamif-expanded-referral');
@@ -191,8 +193,9 @@ async function runAyuda(browser, browserName, errors) {
   });
   await page.waitForTimeout(120);
   const checkGhostOpen = await page.locator('.gx-gamif-floating-emoji').count();
-  if (checkGhostOpen !== 0) {
-    errors.push(`${label}: Misiones creó un ghost flotante para el check ✅ al abrir.`);
+  const ghostCarriesWatermarkOpen = await page.locator('.gx-gamif-morph-ghost[data-watermark]').count();
+  if (checkGhostOpen !== 1 || ghostCarriesWatermarkOpen !== 0) {
+    errors.push(`${label}: Misiones no usa una sola copia compartida del check ✅ al abrir (floating=${checkGhostOpen}, ghostWatermark=${ghostCarriesWatermarkOpen}).`);
   }
   await page.evaluate(async () => { await window.__gxGamifOpenPromise; });
 
@@ -201,8 +204,9 @@ async function runAyuda(browser, browserName, errors) {
   });
   await page.waitForTimeout(180);
   const checkGhostClose = await page.locator('.gx-gamif-floating-emoji').count();
-  if (checkGhostClose !== 0) {
-    errors.push(`${label}: Misiones creó un ghost flotante para el check ✅ al cerrar.`);
+  const ghostCarriesWatermarkClose = await page.locator('.gx-gamif-morph-ghost[data-watermark]').count();
+  if (checkGhostClose !== 1 || ghostCarriesWatermarkClose !== 0) {
+    errors.push(`${label}: Misiones no conserva una sola copia compartida del check ✅ al cerrar (floating=${checkGhostClose}, ghostWatermark=${ghostCarriesWatermarkClose}).`);
   }
   await page.evaluate(async () => { await window.__gxGamifClosePromise; });
 
@@ -283,7 +287,7 @@ console.log('✓ Chromium y WebKit');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
 console.log('✓ Soporte conserva crecimiento/contracción intermedia');
-console.log('✓ El check ✅ de Misiones no crea ghost flotante');
+console.log('✓ El check ✅ usa el mismo shared morph sin watermark fantasma');
 console.log('✓ Registro de bienvenida abre');
 console.log('✓ Admin expone controladores principales');
 console.log('✓ Admin cambia entre secciones principales');
