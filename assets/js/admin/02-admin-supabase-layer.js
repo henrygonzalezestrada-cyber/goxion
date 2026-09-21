@@ -1,12 +1,13 @@
     (() => {
-        const SUPABASE_URL = "https://hmpevcwodcgbkviarfic.supabase.co";
-        const LOGIN_URL = `${SUPABASE_URL}/functions/v1/login-admin`;
-        const DATOS_URL = `${SUPABASE_URL}/functions/v1/admin-datos`;
-        const PERIODOS_URL = `${SUPABASE_URL}/functions/v1/periodo-cobro`;
-        const TRATO_URL = `${SUPABASE_URL}/functions/v1/trato-justo`;
-        const ESTADO_CUENTA_URL = `${SUPABASE_URL}/functions/v1/estado-cuenta-beta`;
-        const BENEFICIOS_URL = `${SUPABASE_URL}/functions/v1/beneficios-admin-beta`;
-        const ADMIN_TOKEN_KEY = "GOXION_ADMIN_TOKEN";
+        const GXCORE = window.GOXION_CORE;
+        const SUPABASE_URL = GXCORE.SUPABASE_ORIGIN;
+        const LOGIN_URL = GXCORE.endpoint("login-admin");
+        const DATOS_URL = GXCORE.endpoint("admin-datos");
+        const PERIODOS_URL = GXCORE.endpoint("periodo-cobro");
+        const TRATO_URL = GXCORE.endpoint("trato-justo");
+        const ESTADO_CUENTA_URL = GXCORE.endpoint("estado-cuenta-beta");
+        const BENEFICIOS_URL = GXCORE.endpoint("beneficios-admin-beta");
+        const ADMIN_TOKEN_KEY = GXCORE.STORAGE.ADMIN_TOKEN;
         currentToken = localStorage.getItem(ADMIN_TOKEN_KEY) || "";
 const n = (v, fallback = 0) => {
             const x = Number(v);
