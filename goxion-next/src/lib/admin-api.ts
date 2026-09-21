@@ -136,6 +136,17 @@ export type AdminAccountState = {
   error?: string;
 };
 
+export type AdminBillingPeriod = {
+  id?: string;
+  folio?: string;
+  nombre?: string;
+  periodo_pendiente?: string;
+  estado?: string;
+  estado_guardado?: string;
+  ciclo_cobro_manual?: boolean;
+  corte_aplicado?: boolean;
+};
+
 export type RegistrationRequest = {
   id: string;
   nombre_declarado?: string;
@@ -428,8 +439,9 @@ export async function loadAdminCredentials() {
 export async function loadBillingPeriods() {
   return adminRequest<{
     ok: boolean;
-    periodos?: Array<Record<string, unknown>>;
+    periodos?: AdminBillingPeriod[];
     mes_actual?: string;
+    modo?: string;
   }>('periodo-cobro', 'listar_periodos');
 }
 
