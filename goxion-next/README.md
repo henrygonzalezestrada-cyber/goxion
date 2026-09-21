@@ -40,18 +40,26 @@ sesiones ni responsabilidades.
 Migrado y conectado:
 
 - Shell Inicio / Catálogo / Soporte.
+- Inicio completo con "Cómo funciona", confianza, post-compra, FAQ,
+  Términos y Garantía/Trato Justo.
 - Catálogo real desde `mi-espacio` en modo público + `inventario-publico`.
+- Carrito por cantidades, total estimado y envío real de pedidos a GOXION.
 - Login real mediante `login-goxion`.
 - Restauración de sesión con `goxion_client_token`.
 - Estado de cuenta central.
 - Servicios y accesos.
+- Novedades por servicio con marcado como vistas.
 - Entrega segura de credenciales de una sola vista.
+- Cancelación por servicio con evaluación previa de retención, oferta del 30%
+  cuando corresponde y solicitud administrativa de baja.
 - Historial de pagos.
 - Lealtad.
 - Misiones y referidos.
 - Registro de cliente nuevo.
 - Activación con GOXION ID + código de 6 dígitos + PIN de 4 dígitos.
 - Soporte dentro de la app con contexto de cliente/servicio.
+- Los 14 casos guiados del Ayuda oficial.
+- Solicitud de situación especial y feedback sin salir de GOXION.
 
 ### Index
 
@@ -126,7 +134,9 @@ El workflow **GOXION Next · Build Check** ejecuta:
 1. instalación limpia de dependencias;
 2. `tsc --noEmit`;
 3. `vite build`;
-4. artefacto `goxion-next-dist`.
+4. `npm run verify`, que exige las tres páginas, bundles JS/CSS y ausencia de
+   residuos de preview/prototipo;
+5. artefacto `goxion-next-dist`.
 
 El build multipágina debe producir:
 
@@ -143,4 +153,5 @@ No fusionar a `main` todavía. El cierre requiere:
 3. prueba controlada de Admin sin tocar clientes reales;
 4. comparación final contra los tres archivos oficiales;
 5. auditoría de conexiones y código descartado;
-6. sólo después, decisión explícita de producción.
+6. validación del carrito, soporte, retención/cancelación y pago con datos de prueba;
+7. sólo después, decisión explícita de producción.
