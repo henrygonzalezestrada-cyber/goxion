@@ -1,0 +1,1 @@
+console.info("GOXION Index v1.0.2: revisión de pago con prioridad sobre estado pagado.");
