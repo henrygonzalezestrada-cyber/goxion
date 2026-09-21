@@ -4,6 +4,7 @@ import { CatalogPrototype } from './CatalogPrototype';
 import { OnboardingFlow } from './OnboardingFlow';
 import { ClientSpace } from './ClientSpace';
 import { SupportCenter } from './SupportCenter';
+import { HomeExperience } from './HomeExperience';
 import { ClientSpaceData, loginClient, logoutClient, restoreClientSession } from '../lib/client-session';
 
 type Tab = 'inicio' | 'catalogo' | 'soporte';
@@ -51,6 +52,8 @@ function HomePrototype({ onCatalog, onSpace, onRegister }: { onCatalog: () => vo
           </div>
         </div>
       </section>
+
+      <HomeExperience onCatalog={onCatalog} />
     </div>
   );
 }
