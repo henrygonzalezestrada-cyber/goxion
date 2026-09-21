@@ -1761,6 +1761,25 @@ function FairDealManagement({
     );
   };
 
+
+  const removeCompensation = async (item: FairDeal) => {
+    if (!item.id) return;
+    if (
+      !window.confirm(
+        'Se retirará esta compensación de Trato Justo y GOXION recalculará el descuento activo del cliente. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        fairDealAction('eliminar_compensacion', {
+          id: item.id,
+        }),
+      'Compensación retirada.',
+    );
+  };
+
   return (
     <div className="gx-admin-management-block">
       <div className="gx-admin-management-head">
@@ -1804,6 +1823,13 @@ function FairDealManagement({
             <div>
               <b>−{money(item.monto)}</b>
               <span>{Number(item.porcentaje || 0)}%</span>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => void removeCompensation(item)}
+              >
+                Retirar
+              </button>
             </div>
           </article>
         ))}
