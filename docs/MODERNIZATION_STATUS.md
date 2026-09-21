@@ -17,7 +17,7 @@
 - Mi Espacio: morph cápsula ↔ tarjeta preservado con WAAPI nativo por compatibilidad Safari/WebKit.
 - Soporte: FLIP y altura restaurados a WAAPI nativo para conservar la cadencia oficial en Safari/WebKit.
 - Navegación oficial preservada en CSS puro.
-- Gamificación: el check `✅` evita únicamente el shared-element flight en Safari para eliminar el duplicado/ghost; trofeo y demás watermarks conservan su morph.
+- Gamificación: trofeo, check `✅`, flecha/regalos y demás watermarks comparten el mismo shared-element morph; el clon de tarjeta no conserva `data-watermark`, evitando un segundo pseudo-watermark en Safari.
 - CI de paridad visual/estructural.
 - Smoke funcional automático en Chromium y WebKit: splash, navegación, Mi Espacio, registro y secciones principales de Admin.
 - CI evita reintroducir URLs/token hardcodeados.
