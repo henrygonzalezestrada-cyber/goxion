@@ -2,6 +2,12 @@
     const reduceMotion = () =>
         window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    const gxMotionAnimate = (element, keyframes, options) => {
+        const engine = window.GOXION_MOTION;
+        if (engine?.animateElement) return engine.animateElement(element, keyframes, options);
+        return element.animate(keyframes, options);
+    };
+
     /* =========================================================
        1) NAVIGATION // PRODUCTION
        Uses the approved production behavior:
@@ -322,7 +328,7 @@
             return;
         }
 
-        gxAuthResizeAnim = root.animate([
+        gxAuthResizeAnim = gxMotionAnimate(root, [
             {
                 top: `${current.top}px`,
                 height: `${current.height}px`
@@ -439,7 +445,7 @@
 
         void root.offsetWidth;
 
-        const shape = root.animate([
+        const shape = gxMotionAnimate(root, [
             {
                 transform: inverse,
                 borderRadius: startRadius,
@@ -543,7 +549,7 @@
         const inverse = gxAuthFlipMatrix(flip);
         const endRadius = gxAuthInitialRadius(gxAuthSourceStyle, flip);
 
-        const shapeBack = root.animate([
+        const shapeBack = gxMotionAnimate(root, [
             {
                 transform: 'matrix(1,0,0,1,0,0)',
                 borderRadius: '26px',
