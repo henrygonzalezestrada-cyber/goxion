@@ -42,6 +42,6 @@
     "business-config": "Teléfono, banco, CLABE, titular y canales centralizados en GOXION_CORE",
     "ayuda-segmentation": "El antiguo 01-01-inline.js se segmentó por responsabilidad preservando orden y lógica.",
     "browser-smoke": "Pruebas funcionales en Chromium y WebKit, incluyendo apertura/cierre geométrico de Mi Espacio",
-    "gamification-safari": "El check ✅ no usa shared-element flight para evitar doble rasterizado/ghost en Safari; los demás watermarks conservan el morph"
+    "gamification-safari": "Todos los watermarks comparten el mismo shared-element morph; el clon visual elimina data-watermark para garantizar una sola representación durante el viaje en Safari"
   }
 }
