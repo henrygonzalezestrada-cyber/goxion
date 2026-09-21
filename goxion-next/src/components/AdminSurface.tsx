@@ -1468,6 +1468,34 @@ function PromotionsManagement({
     setEditing(null);
   };
 
+
+  const togglePromotion = async (promo: Promotion) => {
+    if (!promo.id) return;
+    const next = promo.activa !== true;
+    await onMutation(
+      () =>
+        promotionAction('cambiar_estado', {
+          id: promo.id,
+          activa: next,
+        }),
+      next ? 'Promoción activada.' : 'Promoción pausada.',
+    );
+  };
+
+  const removePromotion = async (promo: Promotion) => {
+    if (!promo.id) return;
+    if (
+      !window.confirm(
+        '¿Eliminar esta promoción?\n\nSi ya fue usada por clientes, GOXION la conservará como historial y sólo la desactivará.',
+      )
+    )
+      return;
+    await onMutation(
+      () => promotionAction('eliminar', { id: promo.id }),
+      'Promoción retirada.',
+    );
+  };
+
   return (
     <div className="gx-admin-management-block">
       <div className="gx-admin-management-head">
@@ -1489,6 +1517,20 @@ function PromotionsManagement({
               <b>{money(promo.precio_promocional)}</b>
               <span>{promo.estado_visual || (promo.activa ? 'activa' : 'inactiva')}</span>
               <button type="button" onClick={() => open(promo)}>Editar</button>
+              <button
+                type="button"
+                className={promo.activa ? 'warning' : 'success'}
+                onClick={() => void togglePromotion(promo)}
+              >
+                {promo.activa ? 'Pausar' : 'Activar'}
+              </button>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => void removePromotion(promo)}
+              >
+                Retirar
+              </button>
             </div>
           </article>
         ))}
