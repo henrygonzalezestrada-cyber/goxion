@@ -4,6 +4,7 @@ import { AdminBillingCycleTools } from './AdminBillingCycleTools';
 import { AdminAccessAssignments } from './AdminAccessAssignments';
 import { AdminClientAdvancedTools } from './AdminClientAdvancedTools';
 import { AdminRegistrationCenter } from './AdminRegistrationCenter';
+import { AdminInfrastructureMaintenance } from './AdminInfrastructureMaintenance';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -1651,6 +1652,12 @@ function InfrastructureManagement({
       <AdminAccessAssignments
         model={access}
         accounts={accounts}
+        onMutation={onMutation}
+      />
+
+      <AdminInfrastructureMaintenance
+        accounts={accounts}
+        credentials={bundle.credentials}
         onMutation={onMutation}
       />
 
