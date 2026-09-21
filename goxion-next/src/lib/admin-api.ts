@@ -15,6 +15,9 @@ export type AdminClient = {
   pago_revision_monto_faltante?: number;
   pago_revision_updated_at?: string | null;
   pagos_puntuales?: number;
+  telefono_normalizado?: string | null;
+  origen_cliente?: string | null;
+  promo_nuevo_elegible?: boolean;
   created_at?: string;
   updated_at?: string;
 };
@@ -496,6 +499,17 @@ export async function loadAdminBundle() {
       credentials.status === 'fulfilled' ? credentials.value : null,
     periods: periods.status === 'fulfilled' ? periods.value : null,
   };
+}
+
+export async function adminAdjustAction(
+  accion: string,
+  datos: Record<string, unknown> = {},
+) {
+  return adminRequest<Record<string, unknown> & { ok: boolean }>(
+    'admin-ajustes',
+    accion,
+    datos,
+  );
 }
 
 export async function billingPeriodAction(
