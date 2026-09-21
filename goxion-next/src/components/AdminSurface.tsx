@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ClientOperationalTools, NewClientModal } from './AdminClientTools';
 import { AdminBillingCycleTools } from './AdminBillingCycleTools';
 import { AdminAccessAssignments } from './AdminAccessAssignments';
+import { AdminClientAdvancedTools } from './AdminClientAdvancedTools';
 import { AdminRegistrationCenter } from './AdminRegistrationCenter';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
@@ -488,6 +489,12 @@ function ClientEditor({
         />
 
         <ClientOperationalTools
+          client={client}
+          data={data}
+          onMutation={onMutation}
+        />
+
+        <AdminClientAdvancedTools
           client={client}
           data={data}
           onMutation={onMutation}
