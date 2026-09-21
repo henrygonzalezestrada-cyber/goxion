@@ -139,9 +139,11 @@ Ambos consumen `GOXION_CORE`.
 
 `07-production-interactions-js.js` mantiene navegación aprobada y Mi Espacio.
 
-`01-01-inline.js` sigue siendo el módulo de compatibilidad grande. Se reduce
-de forma incremental sólo cuando una extracción tiene dependencia claramente
-aislada.
+`01-01-inline.js` queda únicamente como marcador de compatibilidad. Su antiguo
+contenido de 3,964 líneas fue segmentado, sin reescribir lógica, en siete
+módulos secuenciales: estado compartido, registro, recompensas/referidos,
+sesión/experiencia, dashboard/servicios, catálogo/pedidos y soporte. El orden
+de ejecución se conserva explícitamente en `ayuda.html`.
 
 ## Index
 

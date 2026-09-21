@@ -4,7 +4,14 @@
   "addedScripts": [
     "assets/js/core/runtime.js",
     "assets/js/core/motion-engine.mjs",
-    "assets/js/ayuda/data/support-issues.js"
+    "assets/js/ayuda/data/support-issues.js",
+    "assets/js/ayuda/01a-shared-state.js",
+    "assets/js/ayuda/01b-welcome-registration.js",
+    "assets/js/ayuda/01c-rewards-referrals.js",
+    "assets/js/ayuda/01d-experience-session.js",
+    "assets/js/ayuda/01e-client-dashboard.js",
+    "assets/js/ayuda/01f-catalog-orders.js",
+    "assets/js/ayuda/01g-support-runtime.js"
   ],
   "modernizedScripts": [
     "assets/js/ayuda/01-01-inline.js",
@@ -29,6 +36,7 @@
     "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",
     "motion-engine": "Motion 13.4 adaptado a geometría de Mi Espacio y FLIP/altura de Soporte, con fallback WAAPI",
     "feature-data": "Datos editables de Soporte separados de lógica y animaciones",
-    "business-config": "Teléfono, banco, CLABE, titular y canales centralizados en GOXION_CORE"
+    "business-config": "Teléfono, banco, CLABE, titular y canales centralizados en GOXION_CORE",
+    "ayuda-segmentation": "El antiguo 01-01-inline.js se segmentó por responsabilidad preservando orden y lógica."
   }
 }

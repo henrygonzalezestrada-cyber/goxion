@@ -6,7 +6,7 @@
 - Baseline visual 1:1 comprobado.
 - CSS inline extraído sin modificar reglas.
 - JavaScript inline extraído en módulos manteniendo orden.
-- Ayuda: 14 controladores separados.
+- Ayuda: controladores separados y antiguo `01-01-inline.js` segmentado en 7 módulos por responsabilidad.
 - Index: 3 controladores separados.
 - Admin: 29 controladores separados.
 - Núcleo común de Supabase/endpoints/tokens.
@@ -20,6 +20,7 @@
 - CI de paridad visual/estructural.
 - CI evita reintroducir URLs/token hardcodeados.
 - Preview estático aislado de producción.
+- El bloque de compatibilidad de Ayuda ya no concentra las 3,964 líneas: estado, registro, recompensas, sesión, dashboard, catálogo y soporte están desacoplados.
 
 ## Deliberadamente no cambiado
 
