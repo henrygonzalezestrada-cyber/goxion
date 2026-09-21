@@ -1123,6 +1123,40 @@ function CatalogManagement({
     );
   };
 
+  const deleteService = async (service: AdminCatalogService) => {
+    const linked = clientServices.some(
+      (row) => String(row.servicio_id || '') === String(service.id),
+    );
+
+    if (service.activo !== false) {
+      window.alert('Primero desactiva el servicio. El borrado físico queda reservado para mantenimiento.');
+      return;
+    }
+    if (linked) {
+      window.alert(
+        'Este servicio todavía tiene contrataciones activas vinculadas. No se puede borrar físicamente; mantenlo desactivado.',
+      );
+      return;
+    }
+
+    if (
+      !window.confirm(
+        'MANTENIMIENTO\n\nEl servicio está inactivo y no tiene contrataciones activas vinculadas. ¿Eliminarlo definitivamente del catálogo?',
+      )
+    )
+      return;
+    if (!window.confirm('Confirma por segunda vez: eliminar servicio del catálogo.'))
+      return;
+
+    await onMutation(
+      () =>
+        adminAction('eliminar_servicio_catalogo', {
+          id: service.id,
+        }),
+      'Servicio eliminado del catálogo.',
+    );
+  };
+
   return (
     <div className="gx-admin-management-block">
       <div className="gx-admin-management-head">
@@ -1187,6 +1221,19 @@ function CatalogManagement({
                 >
                   {service.activo === false ? 'Reactivar' : 'Desactivar'}
                 </button>
+                {service.activo === false &&
+                  !clientServices.some(
+                    (row) =>
+                      String(row.servicio_id || '') === String(service.id),
+                  ) && (
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={() => void deleteService(service)}
+                    >
+                      Eliminar
+                    </button>
+                  )}
               </div>
             </article>
           );
@@ -1726,6 +1773,28 @@ function FairDealManagement({
   const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7) + '-01');
   const [reason, setReason] = useState('Falla técnica');
   const [onlyAffected, setOnlyAffected] = useState(true);
+  const [individualClientId, setIndividualClientId] = useState(
+    String(bundle.core.clientes[0]?.id || ''),
+  );
+  const individualServices = useMemo(
+    () =>
+      bundle.core.cliente_servicios.filter(
+        (row) =>
+          row.activo !== false &&
+          String(row.cliente_id || '') === individualClientId,
+      ),
+    [bundle.core.cliente_servicios, individualClientId],
+  );
+  const [individualServiceId, setIndividualServiceId] = useState(
+    String(
+      bundle.core.cliente_servicios.find(
+        (row) =>
+          row.activo !== false &&
+          String(row.cliente_id || '') ===
+            String(bundle.core.clientes[0]?.id || ''),
+      )?.id || '',
+    ),
+  );
 
   const eligibleClientIds = useMemo(() => {
     const selected = bundle.core.cliente_servicios.filter(
@@ -1766,6 +1835,47 @@ function FairDealManagement({
           solo_afectados: onlyAffected,
         }),
       'Compensaciones de Trato Justo guardadas.',
+    );
+  };
+
+  const applyIndividual = async () => {
+    if (!individualClientId || !individualServiceId) {
+      window.alert('Selecciona cliente y servicio.');
+      return;
+    }
+
+    const client = bundle.core.clientes.find(
+      (item) => item.id === individualClientId,
+    );
+    const service = individualServices.find(
+      (item) => item.id === individualServiceId,
+    );
+
+    if (
+      !window.confirm(
+        'Se aplicará Trato Justo individual a ' +
+          String(client?.nombre || 'este cliente') +
+          ' por ' +
+          String(service?.nombre || 'el servicio seleccionado') +
+          ': ' +
+          Number(days || 1) * 5 +
+          '% para ' +
+          period.slice(0, 7) +
+          '. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        fairDealAction('guardar_compensacion', {
+          cliente_id: individualClientId,
+          cliente_servicio_id: individualServiceId,
+          periodo: period,
+          dias_falla: Number(days),
+          motivo: reason,
+        }),
+      'Compensación individual guardada.',
     );
   };
 
@@ -1818,6 +1928,58 @@ function FairDealManagement({
         </div>
         <button type="button" className="primary" onClick={() => void apply()}>
           Aplicar compensación masiva
+        </button>
+      </div>
+
+      <div className="gx-admin-inline-editor gx-admin-fair-individual">
+        <strong>Compensación individual</strong>
+        <label>
+          <span>Cliente</span>
+          <select
+            value={individualClientId}
+            onChange={(event) => {
+              const id = event.target.value;
+              setIndividualClientId(id);
+              const first = bundle.core.cliente_servicios.find(
+                (row) =>
+                  row.activo !== false &&
+                  String(row.cliente_id || '') === id,
+              );
+              setIndividualServiceId(String(first?.id || ''));
+            }}
+          >
+            {bundle.core.clientes.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.nombre || 'Cliente'} · {client.folio || 'sin folio'}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Servicio contratado</span>
+          <select
+            value={individualServiceId}
+            onChange={(event) => setIndividualServiceId(event.target.value)}
+          >
+            <option value="">Selecciona servicio</option>
+            {individualServices.map((service) => (
+              <option key={service.id} value={service.id}>
+                {service.nombre || 'Servicio'} · {money(service.monto)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="gx-admin-rule-note">
+          Usa los mismos días, periodo y motivo configurados arriba. GOXION calcula
+          automáticamente 5% por día sobre la mensualidad de ese servicio.
+        </div>
+        <button
+          type="button"
+          className="primary"
+          disabled={!individualServiceId}
+          onClick={() => void applyIndividual()}
+        >
+          Aplicar a este cliente
         </button>
       </div>
 
