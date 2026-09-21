@@ -486,6 +486,17 @@ export async function loadAdminBundle() {
   };
 }
 
+export async function billingPeriodAction(
+  accion: string,
+  datos: Record<string, unknown> = {},
+) {
+  return adminRequest<Record<string, unknown> & { ok: boolean }>(
+    'periodo-cobro',
+    accion,
+    datos,
+  );
+}
+
 export async function adminOperation(
   accion: string,
   datos: Record<string, unknown> = {},
