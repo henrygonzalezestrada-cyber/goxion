@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useMemo, useState } from 'react';
-import type { CatalogBrand } from '../data/catalog';
+import type { CatalogBrand, CatalogPlan } from '../data/catalog';
+import { sendCatalogOrder } from '../lib/orders';
 import { loadPublicCatalog } from '../lib/public-catalog';
 import { CatalogCard } from './CatalogCard';
 import { SeekSearch } from './SeekSearch';
@@ -8,6 +9,17 @@ import { SegmentedHighlight } from './SegmentedHighlight';
 
 type Props = {
   ownedServiceNames?: string[];
+  client?: {
+    nombre?: string;
+    folio?: string;
+  } | null;
+};
+
+type CartLine = {
+  planId: string;
+  name: string;
+  price: number;
+  quantity: number;
 };
 
 const normalize = (value: string) =>
@@ -62,18 +74,26 @@ function recommendation(
   return { score, reason };
 }
 
-export function CatalogPrototype({ ownedServiceNames = [] }: Props) {
+export function CatalogPrototype({
+  ownedServiceNames = [],
+  client = null,
+}: Props) {
   const [filter, setFilter] = useState('all');
   const [query, setQuery] = useState('');
   const [brands, setBrands] = useState<CatalogBrand[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState('');
+  const [cart, setCart] = useState<Record<string, CartLine>>({});
+  const [orderState, setOrderState] = useState<
+    'idle' | 'sending' | 'success' | 'error'
+  >('idle');
+  const [orderMessage, setOrderMessage] = useState('');
 
   const owned = useMemo(
     () => ownedBrandIds(ownedServiceNames),
     [ownedServiceNames],
   );
-  const authenticated = ownedServiceNames.length > 0;
+  const authenticated = Boolean(client?.nombre) || ownedServiceNames.length > 0;
 
   useEffect(() => {
     let active = true;
@@ -165,6 +185,85 @@ export function CatalogPrototype({ ownedServiceNames = [] }: Props) {
     });
   }, [authenticated, brands, filter, owned, query]);
 
+  const cartLines = useMemo(
+    () => Object.values(cart).filter((item) => item.quantity > 0),
+    [cart],
+  );
+
+  const totalItems = useMemo(
+    () => cartLines.reduce((sum, item) => sum + item.quantity, 0),
+    [cartLines],
+  );
+
+  const totalPrice = useMemo(
+    () =>
+      cartLines.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0,
+      ),
+    [cartLines],
+  );
+
+  const quantityForPlan = (planId: string) => cart[planId]?.quantity || 0;
+
+  const changeQuantity = (plan: CatalogPlan, delta: number) => {
+    setOrderState('idle');
+    setOrderMessage('');
+
+    setCart((current) => {
+      const previous = current[plan.id]?.quantity || 0;
+      const nextQuantity = Math.max(
+        0,
+        Math.min(plan.available, previous + delta),
+      );
+
+      if (nextQuantity === 0) {
+        const next = { ...current };
+        delete next[plan.id];
+        return next;
+      }
+
+      return {
+        ...current,
+        [plan.id]: {
+          planId: plan.id,
+          name: plan.name,
+          price: plan.price,
+          quantity: nextQuantity,
+        },
+      };
+    });
+  };
+
+  const submitOrder = async () => {
+    if (!cartLines.length) return;
+
+    setOrderState('sending');
+    setOrderMessage('');
+
+    try {
+      await sendCatalogOrder(
+        cartLines.map((line) => ({
+          name: line.name,
+          price: line.price,
+          quantity: line.quantity,
+        })),
+        client,
+      );
+      setOrderState('success');
+      setOrderMessage(
+        '¡Pedido recibido! Ya registramos tu solicitud y el equipo GOXION dará seguimiento.',
+      );
+      setCart({});
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      setOrderState('error');
+      setOrderMessage(
+        err instanceof Error ? err.message : 'No fue posible enviar tu pedido.',
+      );
+    }
+  };
+
   return (
     <section className="gx-catalog-real">
       <div className="gx-catalog-title-row">
@@ -179,6 +278,20 @@ export function CatalogPrototype({ ownedServiceNames = [] }: Props) {
           {authenticated ? 'Mi Espacio' : 'En vivo'}
         </div>
       </div>
+
+      <AnimatePresence>
+        {orderMessage && (
+          <motion.div
+            className={'gx-order-result ' + orderState}
+            initial={{ opacity: 0, y: -8, scale: 0.985 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -6 }}
+          >
+            <span>{orderState === 'success' ? '✓' : '!'}</span>
+            <p>{orderMessage}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="gx-catalog-toolbar-next">
         <SeekSearch value={query} onChange={setQuery} />
@@ -218,6 +331,8 @@ export function CatalogPrototype({ ownedServiceNames = [] }: Props) {
                 owned={item.owned}
                 recommended={item.recommended}
                 recommendationReason={item.recommendationReason}
+                quantityForPlan={quantityForPlan}
+                onQuantityChange={changeQuantity}
               />
             ))}
           </AnimatePresence>
@@ -240,9 +355,36 @@ export function CatalogPrototype({ ownedServiceNames = [] }: Props) {
       </AnimatePresence>
 
       <p className="gx-prototype-note">
-        Consulta en tiempo real. Las contrataciones permanecen bloqueadas durante
-        la migración segura.
+        Selecciona la cantidad que necesitas. El pedido se registra en GOXION y
+        el equipo dará seguimiento a la activación.
       </p>
+
+      <AnimatePresence>
+        {totalItems > 0 && (
+          <motion.div
+            className="gx-catalog-cart"
+            initial={{ opacity: 0, y: 22, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 18, scale: 0.98 }}
+            transition={{ type: 'spring', stiffness: 340, damping: 29 }}
+          >
+            <div>
+              <strong>$${totalPrice} MXN</strong>
+              <small>
+                {totalItems} {totalItems === 1 ? 'perfil' : 'perfiles'}
+              </small>
+            </div>
+            <button
+              type="button"
+              onClick={() => void submitOrder()}
+              disabled={orderState === 'sending'}
+            >
+              {orderState === 'sending' ? 'Enviando…' : 'Enviar pedido'}
+              <span>→</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }
