@@ -15,6 +15,7 @@ import {
   adminAction,
   adminOperation,
   benefitAction,
+  billingPeriodAction,
   cancellationAction,
   credentialAction,
   fairDealAction,
@@ -666,17 +667,34 @@ function PaymentDecisions({
               <button
                 type="button"
                 className="success"
-                onClick={() =>
+                onClick={() => {
+                  const punctual = Number(state?.dias_atraso || 0) <= 0;
+                  const periodLabel = state?.periodo_label || 'el periodo pendiente';
+                  if (
+                    !window.confirm(
+                      '¿Confirmas que verificaste el comprobante?\n\n' +
+                        'El pago se aplicará a ' +
+                        periodLabel +
+                        (punctual
+                          ? ' y contará para la racha puntual.'
+                          : ' y la racha se reiniciará por atraso.') +
+                        '\n\nMonto: ' +
+                        money(amount),
+                    )
+                  )
+                    return;
+
                   void onMutation(
                     () =>
-                      adminOperation('aprobar_pago', {
+                      billingPeriodAction('aprobar_pago_periodo', {
                         cliente_id: client.id,
                         monto: amount,
-                        puntual: true,
+                        notas: 'Aprobado desde Admin Next',
+                        puntual: punctual,
                       }),
-                    'Pago aprobado.',
-                  )
-                }
+                    'Pago aplicado al periodo correspondiente.',
+                  );
+                }}
               >
                 Aprobar
               </button>
