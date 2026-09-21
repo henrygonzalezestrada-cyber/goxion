@@ -1,4 +1,6 @@
 (()=>{
+  const GXCORE=window.GOXION_CORE;
+  if(!GXCORE) throw new Error('GOXION_CORE no disponible en beneficios Admin.');
   document.body.classList.add('gx-beta-20');
   const URL=GXCORE.endpoint("beneficios-admin-beta");
   const TOKEN_KEY=GXCORE.STORAGE.ADMIN_TOKEN;

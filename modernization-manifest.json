@@ -30,7 +30,8 @@
     "assets/js/admin/25-admin-beta-19-controller.js",
     "assets/js/admin/28-admin-beta-20-benefits.js",
     "assets/js/ayuda/07-production-interactions-js.js",
-    "assets/js/index/02-02-inline.js"
+    "assets/js/index/02-02-inline.js",
+    "assets/js/admin/06-admin-operations-ui.js"
   ],
   "phases": {
     "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",

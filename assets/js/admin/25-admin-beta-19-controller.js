@@ -1,4 +1,6 @@
 (()=>{
+  const GXCORE=window.GOXION_CORE;
+  if(!GXCORE) throw new Error('GOXION_CORE no disponible en promociones Admin.');
   const PROMO_URL=GXCORE.endpoint("promociones-admin-beta");
   let promoState={servicios:[],promociones:[]};
 

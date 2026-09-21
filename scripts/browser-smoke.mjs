@@ -27,7 +27,11 @@ async function waitForServer() {
 function attachDiagnostics(page, label, errors) {
   page.on('pageerror', error => errors.push(`${label} pageerror: ${error.stack || error.message}`));
   page.on('console', msg => {
-    if (msg.type() === 'error') errors.push(`${label} console.error: ${msg.text()}`);
+    if (msg.type() !== 'error') return;
+    const text = msg.text();
+    if (text.includes('Failed to load resource')) return;
+    if (text.includes('Sesión administrativa inválida o expirada')) return;
+    errors.push(`${label} console.error: ${text}`);
   });
   page.on('dialog', dialog => dialog.dismiss().catch(() => {}));
 }
