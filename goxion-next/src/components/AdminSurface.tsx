@@ -74,7 +74,7 @@ function stateLabel(state: string) {
   return map[state] || state;
 }
 
-function LoginPanel({ onLogin }: { onLogin: () => Promise<void> }) {
+function LoginPanel({ onLogin }: { onLogin: () => Promise<unknown> }) {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -901,7 +901,7 @@ function RegistrationDecisions({
                 <strong>{String(delivery.codigo || '—')}</strong>
               </div>
               <p>Vence: {shortDate(delivery.expira_at)}</p>
-              {delivery.mensaje_whatsapp && (
+              {Boolean(delivery.mensaje_whatsapp) && (
                 <button
                   type="button"
                   className="primary"
@@ -1120,7 +1120,7 @@ function PromotionsManagement({
         promotionAction('guardar', {
           id: editing?.id,
           servicio_id: serviceId,
-          nombre,
+          nombre: name,
           precio_promocional: Number(price),
           duracion_periodos: Number(periods),
           inicio: start,
