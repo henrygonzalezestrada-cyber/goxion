@@ -1,6 +1,7 @@
     (() => {
-        const INVENTARIO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/inventario";
-        const TOKEN_KEY_INV = "GOXION_ADMIN_TOKEN";
+        const GXCORE = window.GOXION_CORE;
+        const INVENTARIO_URL = GXCORE.endpoint("inventario");
+        const TOKEN_KEY_INV = GXCORE.STORAGE.ADMIN_TOKEN;
         let inventarioServidor = null;
 
         async function pedirInventarioServidor() {
