@@ -1296,3 +1296,257 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
     animation:none!important;
   }
 }
+
+
+/* ==========================================================================
+   GOXION NEXT · INDEX VISUAL PARITY
+   Fuente visual: index.html oficial (main)
+   ========================================================================== */
+
+.gx-index-official{
+  --bg-black:#030305;
+  --card-glass:rgba(8,8,12,.45);
+  --text-main:#fff;
+  --text-muted:#95a4bd;
+  --neon-blue:#00f2fe;
+  --neon-purple:#7c4dff;
+  --success-green:#2ea043;
+  --success-neon:#00ff9d;
+  --danger-red:#ff3366;
+  --warning-amber:#ffaa00;
+  width:100%;min-height:100dvh;margin:0;padding:0;
+  background:#030305;color:#fff;font-family:'Poppins',sans-serif;
+  overflow-x:hidden;
+}
+.gx-index-official *{font-family:'Poppins',sans-serif}
+.gx-index-official .gx-index-ambient{display:none!important}
+.gx-index-official .bg{
+  position:fixed;top:0;left:0;width:100vw;height:100dvh;
+  z-index:0;background:var(--bg-black);overflow:hidden;pointer-events:none;
+}
+.gx-index-official .bg::before{
+  content:"";position:absolute;inset:-20%;
+  background:
+    radial-gradient(circle at 20% 20%,rgba(124,77,255,.05),transparent 30%),
+    radial-gradient(circle at 80% 75%,rgba(0,242,254,.05),transparent 30%);
+  filter:blur(80px);animation:gxIndexAmbient 15s ease-in-out infinite alternate;
+}
+.gx-index-official .lava{position:absolute;border-radius:50%;filter:blur(75px);will-change:transform}
+.gx-index-official .lava-1{width:380px;height:380px;top:-100px;left:-100px;background:radial-gradient(circle,rgba(176,38,255,.35),transparent 70%);animation:gxIndexLava1 10s ease-in-out infinite alternate}
+.gx-index-official .lava-2{width:420px;height:420px;top:15%;right:-150px;background:radial-gradient(circle,rgba(0,242,254,.30),transparent 70%);animation:gxIndexLava2 12s ease-in-out infinite alternate}
+.gx-index-official .lava-3{width:350px;height:350px;bottom:-120px;left:10%;background:radial-gradient(circle,rgba(124,77,255,.25),transparent 70%);animation:gxIndexLava3 14s ease-in-out infinite alternate}
+.gx-index-official .lava-4{width:250px;height:250px;top:50%;left:-80px;background:radial-gradient(circle,rgba(0,242,254,.25),transparent 70%);animation:gxIndexLava4 11s ease-in-out infinite alternate}
+@keyframes gxIndexAmbient{0%{transform:translate3d(-30px,-20px,0) scale(1)}100%{transform:translate3d(30px,40px,0) scale(1.1)}}
+@keyframes gxIndexLava1{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(150px,150px,0) scale(1.2)}100%{transform:translate3d(60px,250px,0) scale(.9)}}
+@keyframes gxIndexLava2{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(-160px,100px,0) scale(1.3)}100%{transform:translate3d(-80px,-150px,0) scale(.85)}}
+@keyframes gxIndexLava3{0%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(180px,-120px,0) scale(1.15)}100%{transform:translate3d(-100px,-60px,0) scale(.95)}}
+@keyframes gxIndexLava4{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(140px,140px,0) scale(1.25)}}
+
+.gx-index-official .container{
+  width:100%;max-width:500px;position:relative;z-index:1;
+  padding:0 20px 40px;margin:0 auto;
+}
+.gx-index-official .sticky-area{
+  position:sticky;top:0;z-index:50;
+  background:rgba(3,3,5,.70);
+  backdrop-filter:blur(28px);-webkit-backdrop-filter:blur(28px);
+  margin:0 -20px 20px;
+  padding:max(15px,env(safe-area-inset-top)) 20px 15px;
+}
+.gx-index-official .sticky-area::after{
+  content:"";position:absolute;bottom:-35px;left:0;right:0;height:35px;
+  background:linear-gradient(to bottom,rgba(3,3,5,.70) 0%,rgba(3,3,5,0) 100%);
+  pointer-events:none;
+}
+.gx-index-official .header{
+  display:flex;align-items:center;justify-content:center;margin-bottom:15px;
+}
+.gx-index-official .header-title{
+  color:#fff;font-size:14px;font-weight:700;text-transform:uppercase;
+  letter-spacing:2.5px;text-shadow:0 0 15px rgba(255,255,255,.25);
+}
+.gx-index-official .balance-hero{text-align:center}
+.gx-index-official .total-label{
+  font-size:12px;color:var(--text-muted);text-transform:uppercase;
+  font-weight:700;letter-spacing:1.5px;margin-bottom:2px;
+}
+.gx-index-official .total-amount{
+  font-size:52px;font-weight:800;line-height:1;margin-bottom:12px;
+  color:var(--neon-blue);text-shadow:0 0 20px rgba(0,242,254,.40);
+}
+.gx-index-official .time-badge{
+  display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+  padding:6px 14px;border-radius:20px;border:1px solid;
+}
+.gx-index-official .badge-ok{background:rgba(0,242,254,.05);color:var(--neon-blue);border-color:rgba(0,242,254,.30)}
+.gx-index-official .badge-today{background:rgba(255,170,0,.10);color:var(--warning-amber);border-color:rgba(255,170,0,.40);box-shadow:0 0 15px rgba(255,170,0,.20)}
+.gx-index-official .badge-overdue{background:rgba(255,51,102,.10);color:var(--danger-red);border-color:rgba(255,51,102,.40);box-shadow:0 0 15px rgba(255,51,102,.20)}
+.gx-index-official .badge-paid{background:rgba(0,255,157,.05);color:var(--success-neon);border-color:rgba(0,255,157,.40);box-shadow:0 0 15px rgba(0,255,157,.15)}
+.gx-index-official .badge-review{background:rgba(124,77,255,.15);color:var(--neon-purple);border-color:rgba(124,77,255,.40);box-shadow:0 0 15px rgba(124,77,255,.20)}
+
+.gx-index-official .scrollable-content{position:relative;z-index:1}
+.gx-index-official .glass-card{
+  background:var(--card-glass);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 10px 30px rgba(0,0,0,.40);
+  border-radius:20px;padding:20px;
+}
+.gx-index-official .card-info{
+  margin-bottom:25px;display:grid;grid-template-columns:1fr 1fr;gap:15px;
+}
+.gx-index-official .info-block{display:flex;flex-direction:column}
+.gx-index-official .info-block .label{
+  font-size:10px;color:var(--text-muted);text-transform:uppercase;
+  font-weight:600;letter-spacing:1px;margin-bottom:2px;
+}
+.gx-index-official .info-block .value{font-size:16px;font-weight:700;color:#fff}
+.gx-index-official .gx-index-folio-block{text-align:right}
+.gx-index-official .gx-index-folio-block .value{color:var(--neon-purple)}
+.gx-index-official .info-block.full{
+  grid-column:span 2;border-top:1px dashed rgba(255,255,255,.08);
+  padding-top:12px;margin-top:-5px;
+}
+.gx-index-official .gx-index-period-line{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+}
+.gx-index-official .gx-index-period-line small{
+  color:var(--text-muted);font-size:12px;font-weight:500;
+}
+
+.gx-index-official .alert-banner{
+  padding:12px;border-radius:12px;text-align:center;margin-bottom:15px;
+  font-weight:700;font-size:12px;border:1px solid;text-transform:uppercase;letter-spacing:1px;
+}
+.gx-index-official .gx-index-review-banner{
+  background:rgba(124,77,255,.10);color:#c7b8ff;border-color:rgba(124,77,255,.30);
+}
+.gx-index-official .overdue-incentive-box{
+  background:rgba(255,51,102,.08);border:1px dashed rgba(255,51,102,.40);
+  border-radius:16px;padding:16px;font-size:13px;line-height:1.5;color:#ffb3c1;
+  margin-bottom:25px;text-align:center;font-weight:500;
+}
+.gx-index-official .section-title{
+  font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--neon-purple);
+  margin-bottom:12px;font-weight:700;
+}
+.gx-index-official .services-container{margin-bottom:25px;padding:10px 20px}
+.gx-index-official .service-item{
+  display:flex;justify-content:space-between;align-items:center;padding:14px 0;
+  border-bottom:1px dashed rgba(255,255,255,.08);font-size:15px;
+}
+.gx-index-official .service-item:last-child{border-bottom:0}
+.gx-index-official .service-name{font-weight:600;color:#fff}
+.gx-index-official .service-price{font-weight:700;color:var(--text-muted)}
+
+.gx-index-official .breakdown-box{margin-bottom:25px}
+.gx-index-official .breakdown-line{
+  font-size:13px;font-weight:500;margin-bottom:10px;
+  display:flex;justify-content:space-between;gap:12px;
+}
+.gx-index-official .breakdown-line:last-child{margin-bottom:0}
+.gx-index-official .discount-line{color:var(--success-neon)}
+.gx-index-official .surcharge-line{color:var(--danger-red)}
+
+.gx-index-official .loyalty-badge{
+  margin-bottom:25px;display:flex;align-items:center;gap:15px;
+  border-color:rgba(124,77,255,.30);
+}
+.gx-index-official .loyalty-icon{
+  font-size:32px;line-height:1;filter:drop-shadow(0 0 10px rgba(176,38,255,.40));
+}
+.gx-index-official .loyalty-content{flex:1}
+.gx-index-official .loyalty-title{font-size:14px;font-weight:800;color:#fff;margin-bottom:3px}
+.gx-index-official .loyalty-desc{font-size:11px;color:var(--text-muted);line-height:1.45}
+
+.gx-index-official .gx-index-payment-card{margin-bottom:25px}
+.gx-index-official .gx-index-official-bank-row{
+  display:grid;grid-template-columns:72px 1fr auto;gap:10px;align-items:center;
+  padding:11px 0;border-bottom:1px dashed rgba(255,255,255,.08);
+}
+.gx-index-official .gx-index-official-bank-row:last-child{border-bottom:0}
+.gx-index-official .gx-index-official-bank-row>span{
+  color:var(--text-muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:600;
+}
+.gx-index-official .gx-index-official-bank-row strong{
+  font-size:12px;color:#fff;word-break:break-all;
+}
+.gx-index-official .gx-index-official-bank-row button{
+  min-height:30px;padding:0 9px;border-radius:9px;
+  border:1px solid rgba(0,242,254,.25);background:rgba(0,242,254,.07);
+  color:var(--neon-blue);font-size:10px;font-weight:700;
+}
+
+.gx-index-official .actions-group{
+  display:flex;flex-direction:column;gap:12px;margin-bottom:25px;
+}
+.gx-index-official .btn{
+  width:100%;padding:16px;border-radius:20px;font-weight:700;font-size:14px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  text-decoration:none;border:0;outline:0;text-align:center;
+}
+.gx-index-official .gx-index-pay-action{
+  background:linear-gradient(135deg,var(--success-green),#38c153);
+  color:#fff;box-shadow:0 0 20px rgba(46,160,67,.40);
+}
+.gx-index-official .gx-index-pay-action:disabled{
+  opacity:.55;cursor:not-allowed;box-shadow:none;
+}
+.gx-index-official .btn-wa{
+  background:rgba(255,255,255,.05);color:#fff;border:1px solid rgba(255,255,255,.10);
+}
+.gx-index-official .footer{
+  text-align:center;font-size:12px;color:var(--text-muted);font-weight:500;line-height:1.6;
+  border-top:1px dashed rgba(255,255,255,.08);padding-top:20px;margin-bottom:20px;
+}
+.gx-index-official .gx-index-referral-title{color:#fff;font-weight:600}
+.gx-index-official .footer-logo-container{margin-top:35px;display:flex;justify-content:center}
+.gx-index-official .footer-logo{
+  max-width:130px;opacity:.65;filter:drop-shadow(0 0 8px rgba(0,0,0,.50));
+}
+.gx-index-official .loading{
+  position:relative;z-index:2;text-align:center;color:var(--text-muted);
+  padding:60px 0;font-size:15px;font-weight:600;
+}
+
+/* Modal de pago conservando lógica React, con proporción del oficial */
+.gx-index-official ~ .gx-payment-modal-overlay,
+.gx-payment-modal-overlay{
+  background:rgba(3,3,5,.80)!important;
+  backdrop-filter:blur(15px)!important;-webkit-backdrop-filter:blur(15px)!important;
+  padding:20px!important;
+}
+.gx-payment-modal{
+  width:min(100%,420px)!important;
+  padding:25px!important;border-radius:20px!important;
+  background:rgba(8,8,12,.92)!important;
+  border:1px solid rgba(0,242,254,.30)!important;
+  box-shadow:0 20px 50px rgba(0,0,0,.70)!important;
+  text-align:center!important;
+}
+.gx-payment-modal h2{font-size:18px!important}
+.gx-payment-modal>p{font-size:12px!important;line-height:1.5!important}
+.gx-payment-drop{
+  min-height:150px!important;margin:20px 0!important;padding:30px 20px!important;
+  border:2px dashed rgba(0,242,254,.40)!important;border-radius:16px!important;
+  background:rgba(0,0,0,.30)!important;
+}
+.gx-payment-drop strong{font-size:14px!important}
+.gx-payment-drop small{font-size:11px!important}
+.gx-payment-send{
+  min-height:50px!important;border-radius:16px!important;font-size:14px!important;font-weight:700!important;
+  background:linear-gradient(135deg,#2ea043,#38c153)!important;color:#fff!important;
+  box-shadow:0 0 20px rgba(46,160,67,.35)!important;
+}
+
+@media(max-width:600px){
+  .gx-index-official .lava{filter:blur(55px)}
+  .gx-index-official .lava-1{width:280px;height:280px}
+  .gx-index-official .lava-2{width:300px;height:300px}
+  .gx-index-official .lava-3{width:260px;height:260px}
+  .gx-index-official .lava-4{width:200px;height:200px}
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-index-official .bg::before,
+  .gx-index-official .lava{animation:none!important}
+}
