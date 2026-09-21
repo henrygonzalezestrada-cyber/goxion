@@ -9,6 +9,7 @@ import {
   GoxionService,
   revealCredential,
   refreshClientSpace,
+  markServiceNewsRead,
 } from '../lib/client-session';
 import { ServiceCancellation } from './ServiceCancellation';
 
@@ -412,7 +413,15 @@ function ServicesSection({
               <button
                 type="button"
                 className="gx-service-live-head"
-                onClick={() => setOpenId(open ? null : id)}
+                onClick={() => {
+                  const nextOpen = !open;
+                  setOpenId(nextOpen ? id : null);
+                  if (nextOpen && serviceNews.length && service.id) {
+                    void markServiceNewsRead(String(service.id))
+                      .then(() => onRefresh())
+                      .catch(() => {});
+                  }
+                }}
               >
                 <div className="gx-service-live-mark">
                   {String(service.nombre || 'G').slice(0, 1).toUpperCase()}
