@@ -64,7 +64,7 @@ createServer((req, res) => {
   const extension = extname(file).toLowerCase();
   res.writeHead(200, {
     'content-type': mime[extension] || 'application/octet-stream',
-    'cache-control': extension === '.html' ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
+    'cache-control': 'no-cache, no-store, must-revalidate',
   });
 
   if (extension === '.html') {
