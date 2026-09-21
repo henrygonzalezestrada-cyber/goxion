@@ -1,6 +1,7 @@
 (() => {
-    const ACCESS_URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/accesos-admin-beta";
-    const TOKEN_KEY="GOXION_ADMIN_TOKEN";
+        const GXCORE = window.GOXION_CORE;
+    const ACCESS_URL=GXCORE.endpoint("accesos-admin-beta");
+    const TOKEN_KEY=GXCORE.STORAGE.ADMIN_TOKEN;
     let gxAccessModel={servicios:[],componentes:[],cuentas:[],accesos:[]};
     let gxAccessModelLoaded=false;
     let gxBuilderComponents=new Map();
