@@ -6,7 +6,6 @@ import { AdminClientAdvancedTools } from './AdminClientAdvancedTools';
 import { AdminRegistrationCenter } from './AdminRegistrationCenter';
 import { AdminInfrastructureMaintenance } from './AdminInfrastructureMaintenance';
 import { AdminGlobalSettings } from './AdminGlobalSettings';
-import { AdminSystemSettings } from './AdminSystemSettings';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import {
   AdminAccountState,
@@ -1877,9 +1876,6 @@ function ManagementView({
       {section === 'fairdeal' && <FairDealManagement bundle={bundle} onMutation={onMutation} />}
       {section === 'settings' && (
         <AdminGlobalSettings data={bundle.core} onMutation={onMutation} />
-      )}
-      {section === 'settings' && (
-        <AdminSystemSettings data={bundle.core} onMutation={onMutation} />
       )}
     </div>
   );
