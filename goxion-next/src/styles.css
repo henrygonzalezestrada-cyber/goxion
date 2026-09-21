@@ -792,3 +792,39 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
 .gx-admin-destructive-maintenance{width:100%;min-height:36px;border-radius:10px;border:1px solid rgba(255,78,114,.10);background:rgba(255,78,114,.035);color:#c7788b;font-size:6.6px;font-weight:850}
 .gx-admin-inline-editor button.primary:disabled{opacity:.4;cursor:default}
 @media(max-width:520px){.gx-admin-mass-selector-head{grid-template-columns:1fr}.gx-admin-mass-selector-head button{width:100%}}
+
+
+/* GOXION NEXT · ADMIN GLOBAL SETTINGS */
+.gx-admin-global-select-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.gx-admin-global-select-actions button{min-height:32px;padding:0 9px;border-radius:9px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:#9aa6b8;font-size:6.8px;font-weight:850}
+.gx-admin-global-select-actions small{color:#6f7b8d;font-size:6.6px;text-align:right}
+.gx-admin-global-client-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;max-height:260px;overflow:auto;padding-right:2px}
+.gx-admin-global-client-grid label{min-height:46px;padding:7px 8px;border-radius:11px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.018);display:grid;grid-template-columns:16px 1fr;gap:7px;align-items:center}
+.gx-admin-global-client-grid label.active{border-color:rgba(0,218,232,.13);background:rgba(0,218,232,.035)}
+.gx-admin-global-client-grid input{accent-color:#7a5cff}.gx-admin-global-client-grid strong{display:block;font-size:7.5px}.gx-admin-global-client-grid small{display:block;margin-top:1px;color:#667286;font-size:6.3px}
+.gx-admin-stock-grid{display:grid;gap:6px}
+.gx-admin-stock-grid article{min-height:48px;padding:8px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.018);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gx-admin-stock-grid article strong{display:block;font-size:7.8px}.gx-admin-stock-grid article small{display:block;margin-top:2px;color:#6c788c;font-size:6.5px}
+.gx-admin-stock-grid article>div:last-child{display:flex;align-items:center;gap:6px}.gx-admin-stock-grid input{width:72px;min-height:31px;border-radius:9px;border:1px solid rgba(255,255,255,.07);background:#0d0f15;color:#fff;padding:0 8px;font-size:7px}.gx-admin-stock-grid button{min-height:31px;padding:0 8px;border-radius:9px;border:1px solid rgba(0,218,232,.10);background:rgba(0,218,232,.04);color:#79e8f0;font-size:6.6px;font-weight:850}
+
+/* GOXION NEXT · ADMIN ACCESS ARCHITECTURE */
+.gx-admin-access-architecture{display:grid;gap:12px}
+.gx-admin-architecture-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.gx-admin-component-builder{display:grid;gap:5px}.gx-admin-component-builder>span{color:#6f7b8e;font-size:6.8px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.gx-admin-component-builder>div{min-height:38px;padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.018);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gx-admin-component-builder>div.active{border-color:rgba(124,77,255,.14);background:rgba(124,77,255,.04)}
+.gx-admin-component-builder label{display:flex!important;align-items:center;gap:7px;flex:1}.gx-admin-component-builder label span{margin:0!important;text-transform:none!important;letter-spacing:0!important;color:#8f9bad!important;font-size:7px!important}.gx-admin-component-builder input[type="checkbox"]{width:15px!important;height:15px!important;min-height:0!important;accent-color:#7a5cff}.gx-admin-component-builder>div>input[type="number"]{width:58px;min-height:30px;border-radius:9px;border:1px solid rgba(255,255,255,.07);background:#0d0f15;color:#fff;padding:0 7px;font-size:7px}
+.gx-admin-mode-list{display:grid;gap:5px}.gx-admin-mode-list label{min-height:40px;padding:6px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.018);display:flex!important;align-items:center;justify-content:space-between;gap:8px}.gx-admin-mode-list label>span{margin:0!important;color:#8d99ab!important;font-size:7px!important;text-transform:none!important;letter-spacing:0!important}.gx-admin-mode-list select{min-width:124px}
+.gx-admin-batch-access-list{display:grid;gap:5px;max-height:230px;overflow:auto}.gx-admin-batch-access-list label{min-height:42px;padding:7px 8px;border-radius:10px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.018);display:grid!important;grid-template-columns:16px 1fr;gap:7px;align-items:center}.gx-admin-batch-access-list label.active{border-color:rgba(0,218,232,.13);background:rgba(0,218,232,.035)}.gx-admin-batch-access-list input{accent-color:#7a5cff}.gx-admin-batch-access-list strong{display:block;font-size:7.4px}.gx-admin-batch-access-list small{display:block;margin-top:2px;color:#69758a;font-size:6.3px}
+.gx-admin-diagnostic-card{padding:11px;border-radius:13px;border:1px solid rgba(255,255,255,.055);background:linear-gradient(145deg,rgba(124,77,255,.03),rgba(0,218,232,.02));display:flex;align-items:center;justify-content:space-between;gap:12px}.gx-admin-diagnostic-card strong{display:block;margin-top:2px;font-size:8.2px}.gx-admin-diagnostic-card small{display:block;margin-top:2px;color:#6c788b;font-size:6.6px;line-height:1.4}.gx-admin-diagnostic-card button{min-height:34px;padding:0 9px;border-radius:9px;border:1px solid rgba(0,218,232,.11);background:rgba(0,218,232,.045);color:#7ae9f1;font-size:6.8px;font-weight:850;white-space:nowrap}
+.gx-admin-diagnostic-results{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.gx-admin-diagnostic-results>div{padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.018);text-align:center}.gx-admin-diagnostic-results small{display:block;color:#687488;font-size:6.2px}.gx-admin-diagnostic-results strong{display:block;margin-top:2px;font-size:10px}.gx-admin-diagnostic-results .wide{grid-column:1/-1;text-align:left}.gx-admin-diagnostic-results .warning{border-color:rgba(240,191,91,.12);background:rgba(240,191,91,.035)}.gx-admin-diagnostic-results .warning strong{color:#e8cf98;font-size:7.2px}
+
+/* GOXION NEXT · ADMIN INFRA MAINTENANCE */
+.gx-admin-maintenance-list{display:grid;gap:6px}
+.gx-admin-maintenance-list article{min-height:52px;padding:8px 9px;border-radius:12px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.018);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gx-admin-maintenance-list strong{display:block;font-size:7.8px}.gx-admin-maintenance-list small{display:block;margin-top:2px;color:#6d798c;font-size:6.5px}
+.gx-admin-maintenance-list button{min-height:30px;padding:0 8px;border-radius:9px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:#98a4b6;font-size:6.6px;font-weight:850}
+.gx-admin-account-maintenance-sheet{max-width:480px}
+
+@media(max-width:760px){.gx-admin-architecture-grid{grid-template-columns:1fr}.gx-admin-diagnostic-results{grid-template-columns:1fr 1fr}}
+@media(max-width:430px){.gx-admin-global-client-grid{grid-template-columns:1fr}.gx-admin-diagnostic-results{grid-template-columns:1fr}.gx-admin-stock-grid article{align-items:flex-start;flex-direction:column}.gx-admin-stock-grid article>div:last-child{width:100%}.gx-admin-stock-grid input{flex:1;width:auto}}
