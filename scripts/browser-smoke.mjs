@@ -217,7 +217,7 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       for (const attr of events) {
         const code = el.getAttribute(attr);
         if (!code) continue;
-        for (const match of code.matchAll(/\\b([A-Za-z_$][\\w$]*)\\s*\\(/g)) {
+        for (const match of code.matchAll(/\b([A-Za-z_$][\w$]*)\s*\(/g)) {
           const name = match[1];
           if (!ignored.has(name)) names.add(name);
         }
