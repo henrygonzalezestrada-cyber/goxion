@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, statSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -40,6 +40,18 @@ function resolvePath(pathname) {
 }
 
 createServer((req, res) => {
+  if ((req.url || '').split('?')[0] === '/__gx_error' && req.method === 'POST') {
+    let body = '';
+    req.setEncoding('utf8');
+    req.on('data', chunk => { body += chunk; if (body.length > 16000) body = body.slice(0,16000); });
+    req.on('end', () => {
+      console.error('[GX_CLIENT_ERROR] ' + body);
+      res.writeHead(204, { 'cache-control': 'no-store' });
+      res.end();
+    });
+    return;
+  }
+
   const file = resolvePath(req.url || '/');
 
   if (!file) {
@@ -48,10 +60,38 @@ createServer((req, res) => {
     return;
   }
 
+  const extension = extname(file).toLowerCase();
   res.writeHead(200, {
-    'content-type': mime[extname(file).toLowerCase()] || 'application/octet-stream',
-    'cache-control': extname(file) === '.html' ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
+    'content-type': mime[extension] || 'application/octet-stream',
+    'cache-control': extension === '.html' ? 'no-cache, no-store, must-revalidate' : 'public, max-age=3600',
   });
+
+  if (extension === '.html') {
+    const telemetry = `<script>
+(function(){
+  function send(kind,payload){
+    try{
+      navigator.sendBeacon('/__gx_error', JSON.stringify({
+        kind:kind,
+        path:location.pathname,
+        payload:payload,
+        ua:navigator.userAgent,
+        at:new Date().toISOString()
+      }));
+    }catch(_){}
+  }
+  addEventListener('error',function(e){
+    send('error',{message:e.message,source:e.filename,line:e.lineno,column:e.colno,stack:e.error&&e.error.stack});
+  },true);
+  addEventListener('unhandledrejection',function(e){
+    var r=e.reason;
+    send('unhandledrejection',{message:r&&r.message||String(r),stack:r&&r.stack||''});
+  });
+})();</script>`;
+    const html = readFileSync(file, 'utf8').replace(/<head(\\s[^>]*)?>/i, match => match + telemetry);
+    res.end(html);
+    return;
+  }
 
   createReadStream(file).pipe(res);
 }).listen(port, host, () => {
