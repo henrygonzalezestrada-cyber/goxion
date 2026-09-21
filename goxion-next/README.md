@@ -44,3 +44,36 @@ Construir el shell real de Ayuda y migrar primero:
 5. Soporte.
 
 Después se aborda Index y finalmente Admin, preservando sus contratos.
+
+
+## Punto de control · 20 sep 2026
+
+Ya migrado y validado en `goxion-next`:
+
+- Shell real de Ayuda con navegación Inicio / Catálogo / Soporte.
+- Motion para presencia, layout, morphing y transiciones principales.
+- Mi Espacio conectado a `login-goxion` + `mi-espacio`.
+- Restauración y cierre de sesión con `goxion_client_token`.
+- Dashboard inicial de cliente con datos reales en modo lectura.
+- Registro nuevo conectado a `registro-goxion`, conservando estados:
+  `new`, `existing`, `review`, `already_requested`.
+- Notificación administrativa del registro nuevo mediante `notificar-goxion`.
+- Activación completa conectada a `activar-cuenta-goxion`:
+  GOXION ID + código de 6 dígitos → PIN de 4 dígitos → espacio activo.
+- Catálogo público conectado a datos reales de `mi-espacio` (`modo: publico`)
+  y disponibilidad de `inventario-publico`.
+- Personalización del catálogo cuando existe sesión (servicios ya contratados
+  y recomendaciones básicas).
+- Escrituras sensibles de Mi Espacio (pagos, cupones, cancelaciones,
+  modificaciones de servicio) siguen bloqueadas hasta su migración específica.
+
+Todos los commits de este punto de control pasan `npm run build` en GitHub Actions.
+`main` sigue siendo producción/referencia y no se modifica durante la migración.
+
+### Siguiente bloque
+
+1. Completar Mi Espacio visual con estado de cuenta, historial, lealtad,
+   beneficios y accesos reales.
+2. Migrar Soporte con contexto real de sesión.
+3. Revisar la fidelidad visual de Ayuda contra la versión oficial aprobada.
+4. Después migrar Index y, por último, Admin por módulos.
