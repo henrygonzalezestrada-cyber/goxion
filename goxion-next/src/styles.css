@@ -880,3 +880,13 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
 .gx-legal-rules{display:grid;gap:7px;margin-top:12px}.gx-legal-rules article{padding:10px 11px;border-radius:12px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.02);display:grid;grid-template-columns:1fr auto;gap:2px 10px;align-items:center}.gx-legal-rules strong{font-size:7.8px}.gx-legal-rules span{color:#8deaf0;font-size:7.4px;font-weight:850}.gx-legal-rules small{grid-column:1/-1;color:#667286;font-size:6.5px}.gx-legal-note{margin-top:12px!important;padding:9px;border-radius:10px;background:rgba(0,218,232,.03);border:1px solid rgba(0,218,232,.07)}
 @media(max-width:420px){.gx-how-grid{grid-template-columns:1fr}.gx-how-grid article{min-height:auto}.gx-trust-grid{grid-template-columns:1fr 1fr}.gx-home-legal{align-items:flex-start;flex-direction:column}.gx-home-legal>div:last-child{justify-content:flex-start}}
 @media(max-width:340px){.gx-trust-grid{grid-template-columns:1fr}.gx-postpurchase-flow{grid-template-columns:1fr}.gx-postpurchase-flow i{display:none}}
+
+
+/* GOXION · SOPORTE ESPECIAL + FEEDBACK */
+.gx-support-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.gx-support-extra-grid article{padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.06);background:rgba(10,10,15,.68);display:grid;align-content:start;gap:7px}
+.gx-support-extra-grid h3{margin:0;font-size:11px}.gx-support-extra-grid p{margin:0;color:#718095;font-size:6.9px;line-height:1.5;min-height:42px}
+.gx-support-extra-grid textarea{width:100%;box-sizing:border-box;padding:9px 10px;border-radius:11px;border:1px solid rgba(255,255,255,.07);background:#0d0f15;color:#fff;resize:vertical;outline:0;font:inherit;font-size:7px;line-height:1.45}.gx-support-extra-grid textarea:focus{border-color:rgba(0,218,232,.18);box-shadow:0 0 0 3px rgba(0,218,232,.025)}
+.gx-support-extra-grid button{width:100%;min-height:38px;border:1px solid rgba(0,218,232,.10);border-radius:11px;background:rgba(0,218,232,.04);color:#7ce9f1;font-size:7px;font-weight:850}.gx-support-extra-grid button:not(:disabled){background:linear-gradient(135deg,#714cff,#20cfe0);border-color:transparent;color:#fff}.gx-support-extra-grid button:disabled{opacity:.62}
+.gx-support-extra-grid small.error{color:#ff91aa;font-size:6.3px;line-height:1.4}
+@media(max-width:430px){.gx-support-extra-grid{grid-template-columns:1fr}.gx-support-extra-grid p{min-height:auto}}
