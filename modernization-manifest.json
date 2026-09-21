@@ -35,9 +35,10 @@
   ],
   "phases": {
     "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",
-    "motion-engine": "Motion 13.4 adaptado a geometría de Mi Espacio y FLIP/altura de Soporte, con fallback WAAPI",
+    "motion-engine": "Motion 13.4 limitado al FLIP/altura de Soporte; Mi Espacio conserva WAAPI nativo por paridad Safari/WebKit",
     "feature-data": "Datos editables de Soporte separados de lógica y animaciones",
     "business-config": "Teléfono, banco, CLABE, titular y canales centralizados en GOXION_CORE",
-    "ayuda-segmentation": "El antiguo 01-01-inline.js se segmentó por responsabilidad preservando orden y lógica."
+    "ayuda-segmentation": "El antiguo 01-01-inline.js se segmentó por responsabilidad preservando orden y lógica.",
+    "browser-smoke": "Pruebas funcionales en Chromium y WebKit, incluyendo apertura/cierre geométrico de Mi Espacio"
   }
 }

@@ -14,10 +14,11 @@
 - Contratos de dominio para editor.
 - Datos de soporte separados de lógica.
 - Motor Motion 13.4 con fallback WAAPI.
-- Mi Espacio: geometría de morph delegada a Motion.
-- Soporte: FLIP y altura delegados a Motion.
+- Mi Espacio: morph cápsula ↔ tarjeta preservado con WAAPI nativo por compatibilidad Safari/WebKit.
+- Soporte: FLIP y altura delegados selectivamente a Motion.
 - Navegación oficial preservada en CSS puro.
 - CI de paridad visual/estructural.
+- Smoke funcional automático en Chromium y WebKit: splash, navegación, Mi Espacio, registro y secciones principales de Admin.
 - CI evita reintroducir URLs/token hardcodeados.
 - Preview estático aislado de producción.
 - El bloque de compatibilidad de Ayuda ya no concentra las 3,964 líneas: estado, registro, recompensas, sesión, dashboard, catálogo y soporte están desacoplados.
@@ -38,7 +39,7 @@
 
 La modernización se considera técnicamente estable cuando:
 
-- CI queda verde;
+- CI estructural y smoke Chromium/WebKit quedan verdes;
 - Railway sirve los tres HTML;
 - no existen errores de sintaxis;
 - no existen endpoints duplicados fuera del core;

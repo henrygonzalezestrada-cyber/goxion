@@ -33,7 +33,7 @@ jobs:
       - name: Install browser test
         run: npm install --no-save playwright
 
-      - name: Install Chromium
+      - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
 
       - name: Browser smoke

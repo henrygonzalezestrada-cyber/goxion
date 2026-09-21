@@ -108,12 +108,11 @@ un motor existente sin cambiar:
 - radios;
 - composición.
 
-Actualmente Motion interviene sólo en:
+Actualmente Motion interviene únicamente en el FLIP y la altura del morph de Soporte.
 
-1. geometría cápsula ↔ tarjeta de Mi Espacio;
-2. FLIP y altura del morph de Soporte.
-
-Ambos tienen fallback al WAAPI oficial.
+Mi Espacio conserva WAAPI nativo para la geometría cápsula ↔ tarjeta. La prueba en
+Safari/WebKit demostró que sustituir ese FLIP por Motion altera el comportamiento
+aprobado, por lo que este flujo queda deliberadamente fuera del motor común.
 
 La navegación Inicio/Catálogo/Soporte permanece CSS puro porque ya es la
 implementación aprobada y más ligera.
@@ -178,8 +177,9 @@ La configuración Supabase de estos módulos proviene de `GOXION_CORE`.
 3. Si un script debe cambiar internamente, registrarlo en
    `modernization-manifest.json`.
 4. Ejecutar/verificar `npm run verify:modern`.
-5. Probar en Railway.
-6. Sólo después de validación visual/funcional, considerar producción.
+5. Pasar smoke real en Chromium y WebKit, incluyendo el morph de Mi Espacio.
+6. Probar en Railway.
+7. Sólo después de validación visual/funcional, considerar producción.
 
 ## Producción
 

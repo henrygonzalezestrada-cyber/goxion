@@ -81,10 +81,11 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() => {
     window.__gxAuthClosePromise = window.closeAuthSheet?.();
   });
-  await page.waitForTimeout(120);
+  // El oficial desvanece contenido 130ms antes de iniciar el FLIP de regreso.
+  await page.waitForTimeout(280);
   const authClosing = await page.locator('#header-action-btn').boundingBox();
   if (!authClosing || !authOpen || authClosing.width >= authOpen.width - 20) {
-    errors.push(`${label}: Mi Espacio no se contrajo durante el morph de cierre.`);
+    errors.push(`${label}: Mi Espacio no se contrajo durante el morph de cierre (abierto=${authOpen?.width}, cierre=${authClosing?.width}).`);
   }
 
   await page.evaluate(async () => { await window.__gxAuthClosePromise; });
@@ -120,7 +121,7 @@ async function runAyuda(browser, browserName, errors) {
   await page.waitForTimeout(150);
   const welcomeOpen = await page.locator('#gx-welcome-modal').evaluate(el => el.classList.contains('show')).catch(() => false);
   if (!welcomeOpen) errors.push(`${label}: el registro -10% no abrió.`);
-  await page.evaluate(() => window.gxCloseWelcomeRegistration?.());
+  // La página se cierra enseguida; no necesitamos esperar la animación de salida del modal.
   await page.close();
 }
 
