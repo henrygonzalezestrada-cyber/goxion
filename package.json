@@ -1,9 +1,10 @@
 {
   "name": "goxion-modern-v2-preview",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "serve:preview": "node scripts/serve-preview.mjs"
+    "serve:preview": "node scripts/serve-preview.mjs",
+    "verify:modern": "node scripts/verify-modern-v2.mjs"
   }
 }
