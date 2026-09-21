@@ -1,10 +1,11 @@
 (() => {
-    const MI_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/mi-espacio";
-    const NOTIFY_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/notificar-goxion";
-    const PERIODO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/periodo-cobro";
-    const TRATO_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/trato-justo";
-    const ESTADO_CUENTA_URL = "https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-cuenta-beta";
-    const TOKEN_KEY = "goxion_client_token";
+    const GXCORE = window.GOXION_CORE;
+    const MI_URL = GXCORE.endpoint("mi-espacio");
+    const NOTIFY_URL = GXCORE.endpoint("notificar-goxion");
+    const PERIODO_URL = GXCORE.endpoint("periodo-cobro");
+    const TRATO_URL = GXCORE.endpoint("trato-justo");
+    const ESTADO_CUENTA_URL = GXCORE.endpoint("estado-cuenta-beta");
+    const TOKEN_KEY = GXCORE.STORAGE.CLIENT_TOKEN;
     const nativeFetch = window.fetch.bind(window);
 
     
