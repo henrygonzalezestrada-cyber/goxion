@@ -213,7 +213,6 @@ export function IndexSurface() {
   const [loading, setLoading] = useState(true);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [copied, setCopied] = useState('');
-  const [details, setDetails] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -245,18 +244,20 @@ export function IndexSurface() {
   };
 
   const refresh = async () => {
-    const next = await refreshClientSpace();
-    setData(next);
+    const refreshed = await refreshClientSpace();
+    setData(refreshed);
   };
 
   if (loading) {
     return (
-      <main className="gx-index-shell">
-        <div className="gx-index-ambient" />
-        <div className="gx-index-loading">
-          <span />
-          <strong>Sincronizando con GOXION…</strong>
+      <main className="gx-index-shell gx-index-official">
+        <div className="bg gx-index-bg">
+          <div className="lava lava-1" />
+          <div className="lava lava-2" />
+          <div className="lava lava-3" />
+          <div className="lava lava-4" />
         </div>
+        <div className="loading">Sincronizando con Goxion...</div>
       </main>
     );
   }
@@ -269,186 +270,218 @@ export function IndexSurface() {
     data.cliente.pago_en_revision !== true;
 
   const breakdown = Array.isArray(account.desglose) ? account.desglose : [];
+  const badge =
+    account.estado === 'pagado'
+      ? 'badge-paid'
+      : account.estado === 'vence_hoy'
+        ? 'badge-today'
+        : account.estado === 'vencido' || account.estado === 'incompleto'
+          ? 'badge-overdue'
+          : account.estado === 'revision'
+            ? 'badge-review'
+            : 'badge-ok';
 
   return (
-    <main className="gx-index-shell">
-      <div className="gx-index-ambient gx-index-ambient-a" />
-      <div className="gx-index-ambient gx-index-ambient-b" />
+    <main className="gx-index-shell gx-index-official">
+      <div className="bg gx-index-bg">
+        <div className="lava lava-1" />
+        <div className="lava lava-2" />
+        <div className="lava lava-3" />
+        <div className="lava lava-4" />
+      </div>
 
-      <header className="gx-index-header">
-        <a href="./ayuda.html" className="gx-index-brand">
-          <span className="gx-help-brandmark">
-            <i />
-            <i />
-            <i />
-          </span>
-          <span>GOXION</span>
-        </a>
-        <span className="gx-index-folio">{data.cliente.folio || 'Mi cuenta'}</span>
-      </header>
-
-      <section className="gx-index-hero">
-        <span className="gx-space-kicker">RESUMEN DE CUENTA</span>
-        <h1>{data.cliente.nombre || 'Cliente GOXION'}</h1>
-        <p>{account.periodo_label || 'Periodo actual'}</p>
-      </section>
-
-      <section className="gx-index-total-card">
-        <div className="gx-index-total-top">
-          <span className={'gx-account-status ' + statusClass(account.estado)}>
-            {account.estado_label || 'Pendiente'}
-          </span>
-          <small>Corte {shortDate(account.fecha_corte)}</small>
-        </div>
-
-        <div className="gx-index-total">
-          <small>{account.total_label || 'Total a pagar'}</small>
-          <strong>{money(account.total_actual)}</strong>
-          <span>
-            Mensualidad base {money(account.subtotal || totalMonthly)}
-          </span>
-        </div>
-
-        <div className="gx-index-total-grid">
-          <div>
-            <small>Descuentos</small>
-            <strong className="good">-{money(account.descuentos?.total)}</strong>
+      <div className="container">
+        <div className="sticky-area">
+          <div className="header">
+            <div className="header-title">Estado de Cuenta</div>
           </div>
-          <div>
-            <small>Mora</small>
-            <strong className={Number(account.cargos?.mora || 0) > 0 ? 'bad' : ''}>
-              {money(account.cargos?.mora)}
-            </strong>
-          </div>
-          <div>
-            <small>Lealtad</small>
-            <strong>
-              Nivel {Number(account.lealtad?.nivel || 0)} ·{' '}
-              {Number(account.lealtad?.porcentaje || 0)}%
-            </strong>
+
+          <div className="balance-hero">
+            <div className="total-label">
+              {account.total_label || 'Total a pagar'}
+            </div>
+            <div className="total-amount">
+              {money(account.total_actual)}
+            </div>
+            <div className={'time-badge ' + badge}>
+              {account.estado === 'pagado'
+                ? '✅ '
+                : account.estado === 'revision'
+                  ? '⏳ '
+                  : account.estado === 'incompleto'
+                    ? '⚠️ '
+                    : account.estado === 'vencido'
+                      ? '🚨 '
+                      : '⏳ '}
+              {account.estado_label || 'Pendiente'}
+            </div>
           </div>
         </div>
 
-        <button
-          type="button"
-          className="gx-index-breakdown-toggle"
-          onClick={() => setDetails((value) => !value)}
-        >
-          <span>{details ? 'Ocultar desglose' : 'Ver desglose completo'}</span>
-          <motion.i animate={{ rotate: details ? 180 : 0 }}>⌄</motion.i>
-        </button>
-
-        <AnimatePresence initial={false}>
-          {details && (
-            <motion.div
-              className="gx-index-breakdown"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              <div>
-                {breakdown.map((line, index) => {
-                  const amount = Number(line.monto || 0);
-                  return (
-                    <p key={index}>
-                      <span>{line.concepto || 'Movimiento'}</span>
-                      <b
-                        className={
-                          amount < 0
-                            ? 'good'
-                            : line.tipo === 'cargo'
-                              ? 'bad'
-                              : ''
-                        }
-                      >
-                        {amount < 0
-                          ? '−' + money(Math.abs(amount))
-                          : money(amount)}
-                      </b>
-                    </p>
-                  );
-                })}
-              </div>
-            </motion.div>
+        <div className="scrollable-content">
+          {(account.estado === 'revision' || data.cliente.pago_en_revision) && (
+            <div className="alert-banner gx-index-review-banner">
+              Comprobante en revisión · ya recibimos tu reporte.
+            </div>
           )}
-        </AnimatePresence>
-      </section>
 
-      {(account.estado === 'revision' || data.cliente.pago_en_revision) && (
-        <section className="gx-index-review-note">
-          <span>⌛</span>
-          <div>
-            <strong>Comprobante en revisión</strong>
-            <small>Ya recibimos tu reporte. Te avisaremos cuando sea validado.</small>
+          {(account.estado === 'vencido' || account.estado === 'incompleto') && (
+            <div className="overdue-incentive-box">
+              Tu cuenta tiene un saldo pendiente. Revisa el total actualizado y
+              reporta tu pago desde GOXION para mantener tu cuenta al corriente.
+            </div>
+          )}
+
+          <div className="glass-card card-info">
+            <div className="info-block">
+              <span className="label">Titular</span>
+              <span className="value">
+                {String(data.cliente.nombre || 'Cliente').split(' ')[0]}
+              </span>
+            </div>
+
+            <div className="info-block gx-index-folio-block">
+              <span className="label">Folio</span>
+              <span className="value">{data.cliente.folio || '—'}</span>
+            </div>
+
+            <div className="info-block full">
+              <span className="label">Periodo Facturado</span>
+              <span className="value gx-index-period-line">
+                <span>{account.periodo_label || 'Periodo actual'}</span>
+                <small>Corte: {shortDate(account.fecha_corte)}</small>
+              </span>
+            </div>
           </div>
-        </section>
-      )}
 
-      <section className="gx-index-bank-card">
-        <div className="gx-index-section-title">
-          <span className="gx-space-kicker">DATOS DE PAGO</span>
-          <strong>Transferencia bancaria</strong>
-        </div>
+          <div className="section-title">Servicios Activos</div>
+          <div className="glass-card services-container">
+            {services.map((service, index) => (
+              <div className="service-item" key={String(service.id || index)}>
+                <span className="service-name">
+                  {service.nombre || 'Servicio'}
+                </span>
+                <span className="service-price">{money(service.monto)}</span>
+              </div>
+            ))}
+            {!services.length && (
+              <div className="service-item">
+                <span className="service-name">Sin servicios activos</span>
+              </div>
+            )}
+          </div>
 
-        <div className="gx-index-bank-row">
-          <span>Banco</span>
-          <strong>{BANK.bank}</strong>
-        </div>
-        <div className="gx-index-bank-row">
-          <span>Titular</span>
-          <div>
-            <strong>{BANK.holder}</strong>
-            <button type="button" onClick={() => void copy(BANK.holder, 'Titular copiado')}>
-              Copiar
+          {(breakdown.length > 0 ||
+            Number(account.descuentos?.total || 0) > 0 ||
+            Number(account.cargos?.mora || 0) > 0) && (
+            <div className="glass-card breakdown-box">
+              <div className="breakdown-line">
+                <span>Subtotal Mensual</span>
+                <span>{money(account.subtotal || totalMonthly)}</span>
+              </div>
+
+              {breakdown.map((line, index) => {
+                const amount = Number(line.monto || 0);
+                const cls =
+                  amount < 0
+                    ? 'discount-line'
+                    : line.tipo === 'cargo'
+                      ? 'surcharge-line'
+                      : '';
+                return (
+                  <div className={'breakdown-line ' + cls} key={index}>
+                    <span>{line.concepto || 'Movimiento'}</span>
+                    <span>
+                      {amount < 0
+                        ? '−' + money(Math.abs(amount))
+                        : amount > 0 && line.tipo === 'cargo'
+                          ? '+' + money(amount)
+                          : money(amount)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          <div className="glass-card loyalty-badge">
+            <div className="loyalty-icon">⭐</div>
+            <div className="loyalty-content">
+              <div className="loyalty-title">Programa Goxion</div>
+              <div className="loyalty-desc">
+                Nivel {Number(account.lealtad?.nivel || 0)} ·{' '}
+                {Number(account.lealtad?.porcentaje || 0)}% de beneficio · racha{' '}
+                {Number(data.cliente.pagos_puntuales || 0)}
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card gx-index-payment-card">
+            <div className="section-title">Datos de Transferencia</div>
+
+            <div className="gx-index-official-bank-row">
+              <span>Banco</span>
+              <strong>{BANK.bank}</strong>
+            </div>
+
+            <div className="gx-index-official-bank-row">
+              <span>Titular</span>
+              <strong>{BANK.holder}</strong>
+              <button
+                type="button"
+                onClick={() => void copy(BANK.holder, 'Titular copiado')}
+              >
+                Copiar
+              </button>
+            </div>
+
+            <div className="gx-index-official-bank-row">
+              <span>CLABE</span>
+              <strong>{BANK.clabe}</strong>
+              <button
+                type="button"
+                onClick={() => void copy(BANK.clabe, 'CLABE copiada')}
+              >
+                Copiar
+              </button>
+            </div>
+          </div>
+
+          <div className="actions-group">
+            <button
+              type="button"
+              className="btn gx-index-pay-action"
+              disabled={!canReport}
+              onClick={() => setPaymentOpen(true)}
+            >
+              {account.estado === 'pagado'
+                ? '✅ Periodo pagado'
+                : account.estado === 'revision' || data.cliente.pago_en_revision
+                  ? '⏳ Comprobante en revisión'
+                  : '🧾 Reportar pago'}
             </button>
+
+            <a href="./ayuda.html" className="btn btn-wa">
+              💬 Volver a Mi Espacio
+            </a>
+          </div>
+
+          <div className="footer">
+            <span className="gx-index-referral-title">
+              🎁 ¡Gana un mes gratis!
+            </span>
+            <br />
+            Invita a un amigo y consulta tus beneficios desde Mi Espacio.
+            <div className="footer-logo-container">
+              <img
+                src="https://raw.githubusercontent.com/henrygonzalezestrada-cyber/goxion/main/logo2.PNG"
+                alt="GOXION"
+                className="footer-logo"
+              />
+            </div>
           </div>
         </div>
-        <div className="gx-index-bank-row">
-          <span>CLABE</span>
-          <div>
-            <strong>{BANK.clabe}</strong>
-            <button type="button" onClick={() => void copy(BANK.clabe, 'CLABE copiada')}>
-              Copiar
-            </button>
-          </div>
-        </div>
-
-        <button
-          type="button"
-          className="gx-index-report-payment"
-          disabled={!canReport}
-          onClick={() => setPaymentOpen(true)}
-        >
-          {account.estado === 'pagado'
-            ? 'Periodo pagado ✓'
-            : account.estado === 'revision' || data.cliente.pago_en_revision
-              ? 'Comprobante en revisión'
-              : 'Reportar pago'}
-        </button>
-
-        <small className="gx-index-payment-note">
-          El pago sólo cuenta como reportado cuando adjuntas el comprobante desde
-          GOXION.
-        </small>
-      </section>
-
-      <section className="gx-index-services">
-        <div className="gx-index-section-title">
-          <span className="gx-space-kicker">SERVICIOS</span>
-          <strong>Tu mensualidad</strong>
-        </div>
-        {services.map((service, index) => (
-          <div key={String(service.id || index)}>
-            <span>{service.nombre || 'Servicio'}</span>
-            <strong>{money(service.monto)}</strong>
-          </div>
-        ))}
-      </section>
-
-      <footer className="gx-index-footer">
-        <a href="./ayuda.html">Volver a Mi Espacio</a>
-        <span>GOXION</span>
-      </footer>
+      </div>
 
       <AnimatePresence>
         {paymentOpen && (
