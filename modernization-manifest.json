@@ -2,7 +2,8 @@
   "version": 1,
   "policy": "DOM y CSS permanecen 1:1 con main. Sólo estos scripts pueden diferir internamente.",
   "addedScripts": [
-    "assets/js/core/runtime.js"
+    "assets/js/core/runtime.js",
+    "assets/js/core/motion-engine.mjs"
   ],
   "modernizedScripts": [
     "assets/js/ayuda/01-01-inline.js",
@@ -19,9 +20,11 @@
     "assets/js/admin/22-admin-registration-controller.js",
     "assets/js/admin/23-admin-beta-13-access-controller.js",
     "assets/js/admin/25-admin-beta-19-controller.js",
-    "assets/js/admin/28-admin-beta-20-benefits.js"
+    "assets/js/admin/28-admin-beta-20-benefits.js",
+    "assets/js/ayuda/07-production-interactions-js.js"
   ],
   "phases": {
-    "core-runtime": "Centralización de Supabase, endpoints y claves de sesión"
+    "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",
+    "motion-engine": "Motion 13.4 adaptado a geometría de Mi Espacio y FLIP/altura de Soporte, con fallback WAAPI"
   }
 }
