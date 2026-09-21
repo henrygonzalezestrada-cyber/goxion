@@ -1,79 +1,146 @@
 # GOXION Next
 
-Modernización paralela de la interfaz de GOXION.
+Modernización paralela de GOXION sobre React + TypeScript + Vite + Motion.
 
-## Principios
+## Regla de seguridad
 
-- Producción actual no se modifica durante la migración.
-- `ayuda.html`, `admin.html` e `index.html` siguen siendo la referencia funcional.
-- Se conservan los contratos actuales de Supabase.
-- Primero UI local/read-only; después lecturas reales; las escrituras se migran al final.
-- Los componentes aprobados reemplazan a la implementación anterior, evitando cadenas de overrides.
-- Motion se usa para layout, presencia, springs y gestos; CSS sigue resolviendo transiciones simples.
-- Animate UI se incorpora como código adaptado al sistema visual GOXION, no como estética genérica.
+- `main` es producción/referencia y no se modifica durante la migración.
+- Todo el trabajo moderno vive en `goxion-next`.
+- Los tres archivos oficiales (`index.html`, `ayuda.html`, `admin.html`) se
+  usan como especificación funcional y visual.
+- Los contratos de Supabase se conservan. Cuando existe un contrato nuevo más
+  seguro, Next sustituye el flujo antiguo en lugar de duplicarlo.
+- Las pruebas automáticas no disparan escrituras sobre clientes reales.
+
+## Arquitectura
+
+GOXION Next conserva tres superficies separadas dentro del mismo proyecto:
+
+- `index.html` → resumen de cuenta y reporte de pago.
+- `ayuda.html` → experiencia pública, registro, activación, catálogo,
+  Mi Espacio y soporte.
+- `admin.html` → centro de operaciones administrativo.
+
+Comparten contratos, estilos y componentes reutilizables sin mezclar sus
+sesiones ni responsabilidades.
 
 ## Stack
 
 - React
 - TypeScript
 - Vite
-- Tailwind CSS
 - Motion
-- Animate UI (componentes seleccionados, añadidos progresivamente)
+- Tailwind CSS
+- Supabase Edge Functions existentes
 
-## Fase 0 — lista
+## Estado actual · 21 sep 2026
 
-Contratos de Edge Functions inventariados desde los tres archivos oficiales.
+### Ayuda / Mi Espacio
 
-## Fase 1 — actual
+Migrado y conectado:
 
-Prototipo de Catálogo:
-- Highlight compartido entre filtros.
-- Layout animation.
-- AnimatePresence.
-- Reduced motion global.
-- Sin llamadas reales a Supabase.
+- Shell Inicio / Catálogo / Soporte.
+- Catálogo real desde `mi-espacio` en modo público + `inventario-publico`.
+- Login real mediante `login-goxion`.
+- Restauración de sesión con `goxion_client_token`.
+- Estado de cuenta central.
+- Servicios y accesos.
+- Entrega segura de credenciales de una sola vista.
+- Historial de pagos.
+- Lealtad.
+- Misiones y referidos.
+- Registro de cliente nuevo.
+- Activación con GOXION ID + código de 6 dígitos + PIN de 4 dígitos.
+- Soporte dentro de la app con contexto de cliente/servicio.
 
-## Próximo paso
+### Index
 
-Construir el shell real de Ayuda y migrar primero:
-1. Catálogo.
-2. Mi Espacio.
-3. Activación.
-4. Servicios / beneficios.
-5. Soporte.
+Migrado y conectado:
 
-Después se aborda Index y finalmente Admin, preservando sus contratos.
+- Sesión protegida.
+- Resumen de cuenta.
+- Estado/corte/desglose.
+- Datos bancarios.
+- Reporte de comprobante desde GOXION.
+- Marcado de pago en revisión y notificación administrativa.
 
+### Admin
 
-## Punto de control · 20 sep 2026
+Migrado por módulos:
 
-Ya migrado y validado en `goxion-next`:
+- Login administrativo.
+- Inicio y panorama financiero.
+- Clientes y ficha operativa.
+- Alta de cliente.
+- Edición de cliente.
+- Servicios del cliente.
+- PIN único.
+- Identidad comercial (teléfono/origen/elegibilidad bienvenida).
+- Lealtad individual y reinicio.
+- Referido inteligente, ajuste de meses, automático y reinicio.
+- Misiones individuales.
+- Descuentos especiales.
+- Periodo pendiente y ciclo manual/automático.
+- Pagos: incompleto, rechazo y aprobación por periodo.
+- Cancelaciones.
+- Centro de registros/activaciones.
+- Soporte y actividad administrativa.
+- Catálogo: alta, edición, activar/desactivar, sincronizar precio y borrado
+  físico protegido para servicios inactivos sin contrataciones activas.
+- Promociones: crear, editar, pausar, activar y retirar.
+- Beneficios programados.
+- Trato Justo masivo e individual por cliente/servicio/periodo.
+- Cuentas madre.
+- Asignación inteligente de accesos.
+- Edición y liberación de accesos.
+- Publicación/revocación segura de credenciales.
+- Productos/combos compuestos.
+- Modo de acceso compartido/invitación.
+- Asignación de accesos en lote.
+- Diagnóstico de arquitectura.
+- Stock manual.
+- Misiones masivas.
+- Lealtad masiva.
+- Alertas públicas.
+- Combo upsell.
+- Nueva ronda de cupón.
+- Limpieza de actividad administrativa.
 
-- Shell real de Ayuda con navegación Inicio / Catálogo / Soporte.
-- Motion para presencia, layout, morphing y transiciones principales.
-- Mi Espacio conectado a `login-goxion` + `mi-espacio`.
-- Restauración y cierre de sesión con `goxion_client_token`.
-- Dashboard inicial de cliente con datos reales en modo lectura.
-- Registro nuevo conectado a `registro-goxion`, conservando estados:
-  `new`, `existing`, `review`, `already_requested`.
-- Notificación administrativa del registro nuevo mediante `notificar-goxion`.
-- Activación completa conectada a `activar-cuenta-goxion`:
-  GOXION ID + código de 6 dígitos → PIN de 4 dígitos → espacio activo.
-- Catálogo público conectado a datos reales de `mi-espacio` (`modo: publico`)
-  y disponibilidad de `inventario-publico`.
-- Personalización del catálogo cuando existe sesión (servicios ya contratados
-  y recomendaciones básicas).
-- Escrituras sensibles de Mi Espacio (pagos, cupones, cancelaciones,
-  modificaciones de servicio) siguen bloqueadas hasta su migración específica.
+## Sustituciones deliberadas en Admin
 
-Todos los commits de este punto de control pasan `npm run build` en GitHub Actions.
-`main` sigue siendo producción/referencia y no se modifica durante la migración.
+Las siguientes acciones antiguas no se reintroducen porque ya existe una ruta
+más segura:
 
-### Siguiente bloque
+- `aprobar_pago` → `periodo-cobro / aprobar_pago_periodo`.
+- `cambiar_pin` → `admin-operaciones / cambiar_pin_unico`.
+- `guardar_referido` / `desactivar_referido` → referido inteligente.
+- `asignar` / `sugerir_pin` → asignación inteligente, lote y edición de acceso.
+- Trato Justo acumulativo antiguo → compensación por servicio y periodo.
 
-1. Completar Mi Espacio visual con estado de cuenta, historial, lealtad,
-   beneficios y accesos reales.
-2. Migrar Soporte con contexto real de sesión.
-3. Revisar la fidelidad visual de Ayuda contra la versión oficial aprobada.
-4. Después migrar Index y, por último, Admin por módulos.
+Esto evita mantener dos lógicas distintas para la misma operación.
+
+## Validación
+
+El workflow **GOXION Next · Build Check** ejecuta:
+
+1. instalación limpia de dependencias;
+2. `tsc --noEmit`;
+3. `vite build`;
+4. artefacto `goxion-next-dist`.
+
+El build multipágina debe producir:
+
+- `dist/index.html`
+- `dist/ayuda.html`
+- `dist/admin.html`
+
+## Antes de producción
+
+No fusionar a `main` todavía. El cierre requiere:
+
+1. revisión visual/táctil en dispositivo real;
+2. prueba controlada con cliente de prueba;
+3. prueba controlada de Admin sin tocar clientes reales;
+4. comparación final contra los tres archivos oficiales;
+5. auditoría de conexiones y código descartado;
+6. sólo después, decisión explícita de producción.
