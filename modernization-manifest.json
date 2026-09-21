@@ -22,11 +22,13 @@
     "assets/js/admin/23-admin-beta-13-access-controller.js",
     "assets/js/admin/25-admin-beta-19-controller.js",
     "assets/js/admin/28-admin-beta-20-benefits.js",
-    "assets/js/ayuda/07-production-interactions-js.js"
+    "assets/js/ayuda/07-production-interactions-js.js",
+    "assets/js/index/02-02-inline.js"
   ],
   "phases": {
     "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",
     "motion-engine": "Motion 13.4 adaptado a geometría de Mi Espacio y FLIP/altura de Soporte, con fallback WAAPI",
-    "feature-data": "Datos editables de Soporte separados de lógica y animaciones"
+    "feature-data": "Datos editables de Soporte separados de lógica y animaciones",
+    "business-config": "Teléfono, banco, CLABE, titular y canales centralizados en GOXION_CORE"
   }
 }
