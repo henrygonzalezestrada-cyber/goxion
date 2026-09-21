@@ -39,6 +39,21 @@
     ADMIN_TOKEN: 'GOXION_ADMIN_TOKEN',
   });
 
+  const BUSINESS = Object.freeze({
+    WHATSAPP: '528136836901',
+    BANK: Object.freeze({
+      NAME: 'NU BANCO',
+      HOLDER: 'Henry González',
+      CLABE: '638180000167909381',
+    }),
+    CHANNELS: Object.freeze({
+      pedidos: 'goxion://pedidos',
+      soporte: 'goxion://soporte',
+      logins: 'goxion://logins',
+      pagos: 'goxion://pagos',
+    }),
+  });
+
   const nativeFetch = window.fetch.bind(window);
 
   const endpoint = (name) => {
@@ -89,6 +104,7 @@
     SUPABASE_ORIGIN,
     ENDPOINTS,
     STORAGE,
+    BUSINESS,
     endpoint,
     parseJSON,
     getClientToken,
