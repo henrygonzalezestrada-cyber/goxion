@@ -2,6 +2,22 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
 import type { CatalogBrand, CatalogPlan } from '../data/catalog';
 
+const OFFICIAL_LOGO_BASE =
+  'https://raw.githubusercontent.com/henrygonzalezestrada-cyber/goxion/main/logos/';
+
+const OFFICIAL_LOGOS: Record<string, string> = {
+  netflix: 'netflix.PNG',
+  disney: 'disney.PNG',
+  max: 'hbo-max.PNG',
+  prime: 'prime-video.PNG',
+  youtube: 'youtube.PNG',
+  vix: 'vix.PNG',
+  crunchyroll: 'crunchyroll.PNG',
+  microsoft: 'microsoft.PNG',
+  google: 'google-one.PNG',
+};
+
+
 type Props = {
   brand: CatalogBrand;
   owned?: boolean;
@@ -54,7 +70,14 @@ export function CatalogCard({
             animate={{ scale: open ? 1.045 : 1 }}
             transition={{ type: 'spring', stiffness: 380, damping: 27 }}
           >
-            {brand.mark}
+            {OFFICIAL_LOGOS[brand.id] ? (
+              <img
+                src={OFFICIAL_LOGO_BASE + OFFICIAL_LOGOS[brand.id]}
+                alt={brand.name}
+              />
+            ) : (
+              brand.mark
+            )}
           </motion.div>
 
           <div className="gx-brand-titles">
