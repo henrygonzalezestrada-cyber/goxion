@@ -1,12 +1,14 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useMemo, useState } from 'react';
-import type { CatalogBrand } from '../data/catalog';
+import type { CatalogBrand, CatalogPlan } from '../data/catalog';
 
 type Props = {
   brand: CatalogBrand;
   owned?: boolean;
   recommended?: boolean;
   recommendationReason?: string;
+  quantityForPlan?: (planId: string) => number;
+  onQuantityChange?: (plan: CatalogPlan, delta: number) => void;
 };
 
 export function CatalogCard({
@@ -14,6 +16,8 @@ export function CatalogCard({
   owned = false,
   recommended = false,
   recommendationReason = '',
+  quantityForPlan = () => 0,
+  onQuantityChange,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(0);
@@ -129,9 +133,36 @@ export function CatalogCard({
                   <strong>{plan.price}</strong>
                   <span>MXN</span>
                 </div>
-                <button type="button" disabled={!plan.available} className="gx-readonly-action">
-                  {plan.available ? 'Vista previa' : 'Agotado'}
-                </button>
+
+                {plan.available > 0 ? (
+                  <div className="gx-catalog-qty" aria-label={'Cantidad de ' + plan.name}>
+                    <button
+                      type="button"
+                      onClick={() => onQuantityChange?.(plan, -1)}
+                      disabled={quantityForPlan(plan.id) <= 0}
+                      aria-label="Quitar uno"
+                    >
+                      −
+                    </button>
+                    <motion.strong
+                      key={quantityForPlan(plan.id)}
+                      initial={{ scale: 0.82, opacity: 0.55 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                    >
+                      {quantityForPlan(plan.id)}
+                    </motion.strong>
+                    <button
+                      type="button"
+                      onClick={() => onQuantityChange?.(plan, 1)}
+                      disabled={quantityForPlan(plan.id) >= plan.available}
+                      aria-label="Agregar uno"
+                    >
+                      ＋
+                    </button>
+                  </div>
+                ) : (
+                  <span className="gx-catalog-soldout">Agotado</span>
+                )}
               </motion.div>
             </div>
           </motion.div>
