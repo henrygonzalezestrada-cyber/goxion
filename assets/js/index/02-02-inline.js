@@ -1,10 +1,11 @@
-  const TELEFONO_GOXION = "528136836901"; 
-  const CLABE_PAGO = "638180000167909381";
-  const BANCO_PAGO = "NU BANCO";
-  const TITULAR_PAGO = "Henry González";
+  const GXCORE = window.GOXION_CORE;
+  const TELEFONO_GOXION = GXCORE.BUSINESS.WHATSAPP;
+  const CLABE_PAGO = GXCORE.BUSINESS.BANK.CLABE;
+  const BANCO_PAGO = GXCORE.BUSINESS.BANK.NAME;
+  const TITULAR_PAGO = GXCORE.BUSINESS.BANK.HOLDER;
   
-  // WEBHOOK DE DISCORD AÑADIDO Y ACTUALIZADO
-  const WEBHOOK_DISCORD = "goxion://pagos"; 
+  // Canal lógico de notificación, centralizado en GOXION_CORE.
+  const WEBHOOK_DISCORD = GXCORE.BUSINESS.CHANNELS.pagos;
 
   function notificarAdminDiscord(titulo, mensaje, colorHex) {
       if(!WEBHOOK_DISCORD) return;
