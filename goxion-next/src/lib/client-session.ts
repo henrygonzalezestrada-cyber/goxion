@@ -549,6 +549,77 @@ export async function submitPaymentProof(input: {
 }
 
 
+export type RetentionOffer = {
+  id?: string;
+  servicio_nombre?: string;
+  porcentaje?: number;
+  monto_base?: number;
+  monto_descuento?: number;
+  monto_final?: number;
+  periodo_aplicacion?: string;
+  uso_unico?: boolean;
+};
+
+export async function evaluateCancellationRetention(clienteServicioId: string) {
+  const token = localStorage.getItem(CLIENT_TOKEN_KEY) || '';
+  if (!token) throw new Error('Sesión requerida.');
+
+  return privateRequest<{
+    ok: boolean;
+    elegible?: boolean;
+    razon?: string;
+    oferta?: RetentionOffer;
+    error?: string;
+  }>(token, 'cancelaciones-cliente', 'evaluar_retencion', {
+    cliente_servicio_id: clienteServicioId,
+  });
+}
+
+export async function acceptCancellationRetention(ofertaId: string) {
+  const token = localStorage.getItem(CLIENT_TOKEN_KEY) || '';
+  if (!token) throw new Error('Sesión requerida.');
+
+  return privateRequest<{
+    ok: boolean;
+    aceptada?: boolean;
+    oferta?: RetentionOffer;
+    error?: string;
+  }>(token, 'cancelaciones-cliente', 'aceptar_retencion', {
+    oferta_id: ofertaId,
+  });
+}
+
+export async function rejectCancellationRetention(ofertaId: string) {
+  const token = localStorage.getItem(CLIENT_TOKEN_KEY) || '';
+  if (!token) throw new Error('Sesión requerida.');
+
+  return privateRequest<{
+    ok: boolean;
+    rechazada?: boolean;
+    error?: string;
+  }>(token, 'cancelaciones-cliente', 'rechazar_retencion', {
+    oferta_id: ofertaId,
+  });
+}
+
+export async function requestServiceCancellation(
+  clienteServicioId: string,
+  motivo = 'Solicitud desde Mi Espacio',
+) {
+  const token = localStorage.getItem(CLIENT_TOKEN_KEY) || '';
+  if (!token) throw new Error('Sesión requerida.');
+
+  return privateRequest<{
+    ok: boolean;
+    already_open?: boolean;
+    solicitud?: CancellationRequest;
+    error?: string;
+  }>(token, 'cancelaciones-cliente', 'crear', {
+    cliente_servicio_id: clienteServicioId,
+    motivo,
+  });
+}
+
 export async function sendSupportRequest(input: {
   titulo: string;
   mensaje: string;
