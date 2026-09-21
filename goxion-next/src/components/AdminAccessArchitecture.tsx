@@ -112,7 +112,7 @@ export function AdminAccessArchitecture({
           etiqueta: productTag.trim(),
           beneficios: productBenefits.trim(),
           limite: Math.max(1, Number(productLimit || 5)),
-          componentes,
+          componentes: components,
         }),
       'Producto compuesto creado.',
     );
@@ -456,7 +456,7 @@ export function AdminAccessArchitecture({
               ['Credenciales vinculadas', summary.credenciales_vinculadas_cuenta],
             ].map(([label, value]) => (
               <div key={String(label)}>
-                <small>{label}</small>
+                <small>{String(label)}</small>
                 <strong>{Number(value || 0)}</strong>
               </div>
             ))}
