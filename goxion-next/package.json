@@ -1,12 +1,13 @@
 {
   "name": "goxion-next",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify": "node scripts/verify-build.mjs"
   },
   "dependencies": {
     "motion": "^13.4.0",
