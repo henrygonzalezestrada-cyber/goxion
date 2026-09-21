@@ -722,3 +722,28 @@ html{background:#030305}body{margin:0;min-width:320px;background:#030305;color:#
 .gx-admin-cycle-status{display:grid;grid-template-columns:1fr 1fr;gap:6px}.gx-admin-cycle-status>div{padding:9px;border-radius:11px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.02)}.gx-admin-cycle-status small{display:block;color:#687589;font-size:6.4px}.gx-admin-cycle-status strong{display:block;margin-top:2px;font-size:7.6px}
 .gx-admin-cycle-actions{display:flex;gap:6px}.gx-admin-cycle-actions button{flex:1;min-height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.025);color:#99a5b5;font-size:6.8px;font-weight:850}.gx-admin-cycle-actions .primary{background:linear-gradient(135deg,#714cff,#20cfe0);border:0;color:#fff}.gx-admin-cycle-actions .warning{border-color:rgba(242,191,91,.11);background:rgba(242,191,91,.045);color:#e7c47b}.gx-admin-cycle-actions .success{border-color:rgba(58,222,151,.11);background:rgba(58,222,151,.045);color:#75dfaa}
 @media(max-width:520px){.gx-admin-access-summary{grid-template-columns:1fr 1fr}.gx-admin-access-summary>div:last-child{grid-column:1/-1}.gx-admin-access-group article{align-items:flex-start;flex-direction:column}.gx-admin-access-row-actions{width:100%;justify-content:flex-start}.gx-admin-assignment-result{grid-template-columns:1fr}.gx-admin-assignment-result>div:nth-child(2){text-align:left}.gx-admin-cycle-actions{flex-direction:column}}
+
+
+/* GOXION NEXT · ADMIN REGISTRATION CENTER */
+.gx-admin-registration-center{display:grid;gap:12px}
+.gx-admin-registration-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.gx-admin-registration-kpis button{min-height:78px;padding:10px;border-radius:15px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.02);color:#fff;text-align:left}
+.gx-admin-registration-kpis button span{display:block;font-size:6.2px;font-weight:900;letter-spacing:.10em;color:#667386}
+.gx-admin-registration-kpis button strong{display:block;margin-top:4px;font-size:20px;line-height:1}
+.gx-admin-registration-kpis button small{display:block;margin-top:4px;color:#6f7c8f;font-size:6.5px}
+.gx-admin-registration-kpis button.danger{border-color:rgba(255,78,114,.09);background:rgba(255,78,114,.025)}.gx-admin-registration-kpis button.danger strong{color:#ff93aa}
+.gx-admin-registration-kpis button.new{border-color:rgba(0,218,232,.09);background:rgba(0,218,232,.025)}.gx-admin-registration-kpis button.new strong{color:#74e8f0}
+.gx-admin-registration-kpis button.activation{border-color:rgba(124,77,255,.09);background:rgba(124,77,255,.025)}.gx-admin-registration-kpis button.activation strong{color:#baa7ff}
+.gx-admin-registration-kpis button.activated{border-color:rgba(58,222,151,.09);background:rgba(58,222,151,.025)}.gx-admin-registration-kpis button.activated strong{color:#75e0ac}
+.gx-admin-registration-kpis button.active{box-shadow:inset 0 0 0 1px rgba(255,255,255,.08),0 10px 28px rgba(0,0,0,.16)}
+.gx-admin-registration-tabs{display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.gx-admin-registration-tabs::-webkit-scrollbar{display:none}
+.gx-admin-registration-tabs button{flex:0 0 auto;min-height:34px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.02);color:#788599;font-size:6.7px;font-weight:850}
+.gx-admin-registration-tabs button.active{border-color:rgba(0,218,232,.12);background:rgba(0,218,232,.045);color:#7ce8f0}
+.gx-admin-registration-row.attention{border-color:rgba(255,78,114,.09)}.gx-admin-registration-row.new{border-color:rgba(0,218,232,.08)}.gx-admin-registration-row.activation{border-color:rgba(124,77,255,.09)}.gx-admin-registration-row.activated{border-color:rgba(58,222,151,.08)}
+.gx-admin-badge.attention{background:rgba(255,78,114,.06);color:#ff95ab}.gx-admin-badge.new{background:rgba(0,218,232,.05);color:#78e8f0}.gx-admin-badge.activation{background:rgba(124,77,255,.06);color:#baa7ff}.gx-admin-badge.activated{background:rgba(58,222,151,.05);color:#75dfaa}
+.gx-admin-registration-activation-info{display:grid;grid-template-columns:1fr .8fr 1.4fr;gap:6px;margin-top:8px}
+.gx-admin-registration-activation-info>div{padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,.045);background:rgba(255,255,255,.018)}
+.gx-admin-registration-activation-info small{display:block;color:#657286;font-size:5.9px;text-transform:uppercase;letter-spacing:.06em}.gx-admin-registration-activation-info strong{display:block;margin-top:2px;font-size:7px;word-break:break-word}
+.gx-admin-registration-actions button.maintenance{border-color:rgba(255,255,255,.055);background:rgba(255,255,255,.018);color:#687589}
+.gx-admin-registration-linker{max-width:480px}.gx-admin-registration-linker select[size]{height:auto!important;min-height:120px;padding:4px!important}
+@media(max-width:600px){.gx-admin-registration-kpis{grid-template-columns:1fr 1fr}.gx-admin-registration-activation-info{grid-template-columns:1fr 1fr}.gx-admin-registration-activation-info>div:last-child{grid-column:1/-1}}
