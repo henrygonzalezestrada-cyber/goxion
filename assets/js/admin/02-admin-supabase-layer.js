@@ -190,6 +190,19 @@ const n = (v, fallback = 0) => {
             }
 
             try {
+                const financialBatch = await (window.GOXION_FINANCIAL?.adminCompare?.() ?? Promise.resolve(null));
+                if (financialBatch?.ok === true) {
+                    json.estados_financieros = Array.isArray(financialBatch.estados)
+                        ? financialBatch.estados
+                        : [];
+                    json.estado_financiero_comparacion = financialBatch.comparacion || null;
+                    json.estado_financiero_fuente = financialBatch.fuente || "supabase:goxion_estado_financiero";
+                }
+            } catch (e) {
+                console.warn("Motor financiero Admin no disponible temporalmente:", e);
+            }
+
+            try {
                 const br = await fetch(BENEFICIOS_URL, {
                     method: "POST",
                     headers: {
@@ -358,6 +371,13 @@ const n = (v, fallback = 0) => {
             const estadosCuentaGlobal = getArray(root, "estados_cuenta");
             const beneficiosProgramadosGlobal = getArray(root, "beneficios_programados");
             const estadoCuentaPorCliente = new Map(estadosCuentaGlobal.map(x => [String(x?.cliente_id || ""), x]));
+            const estadosFinancierosGlobal = getArray(root, "estados_financieros");
+            const estadoFinancieroPorCliente = new Map(
+                estadosFinancierosGlobal
+                    .filter(x => x && !x.error)
+                    .map(x => [String(x?.cliente_id || ""), x])
+            );
+            const financeAudits = {};
             const periodosCobro = getArray(root, "periodos_cobro");
             const periodoPorCliente = new Map(
                 periodosCobro.map(x => [String(x?.id || x?.cliente_id || ""), x])
@@ -435,7 +455,30 @@ const n = (v, fallback = 0) => {
                     descuento_fallas: tratoJusto.filter(x => x.activo !== false && String(x.periodo || "").slice(0,7) === String(c.periodo_pendiente || periodoMeta.periodo_pendiente || "").slice(0,7)).reduce((s,x)=>s+n(x.monto,0), n(c.descuento_fallas,0)),
                     referido_activo: refActivo ? adaptarReferido(refActivo) : undefined,
                     gamificacion: gamificacion ? adaptarGamificacion(gamificacion) : undefined,
-                    estado_cuenta: estadoCuentaPorCliente.get(String(id)) || null
+                    estado_cuenta: null
+                };
+
+                const legacyEstadoCuenta = estadoCuentaPorCliente.get(String(id)) || null;
+                const financialEstadoCuenta = estadoFinancieroPorCliente.get(String(id)) || null;
+                const selection = window.GOXION_FINANCIAL?.selectCompatibleState
+                    ? window.GOXION_FINANCIAL.selectCompatibleState(
+                        legacyEstadoCuenta,
+                        financialEstadoCuenta,
+                        String(id)
+                      )
+                    : { state: legacyEstadoCuenta, audit: {
+                        source: legacyEstadoCuenta ? "legacy-fallback" : "none",
+                        financial_valid:false,
+                        compared:false,
+                        matches:null,
+                        differences:[]
+                      } };
+
+                nuevoDict[key].estado_cuenta = selection.state;
+                financeAudits[String(id)] = {
+                    key,
+                    nombre:c.nombre || key,
+                    ...selection.audit
                 };
             });
 
@@ -460,6 +503,21 @@ const n = (v, fallback = 0) => {
             }
 
             clientesDict = nuevoDict;
+            const auditValues = Object.values(financeAudits);
+            window.__GOXION_ADMIN_FINANCE_AUDIT = Object.freeze({
+                source:"financial-v1-admin",
+                checked_at:new Date().toISOString(),
+                clients:auditValues,
+                total:auditValues.length,
+                financial:auditValues.filter(x => x.source === "financial-v1").length,
+                fallback:auditValues.filter(x => x.source !== "financial-v1").length,
+                differences:auditValues.filter(x => x.matches === false)
+            });
+
+            const variance = auditValues.filter(x => x.matches === false);
+            if (variance.length) {
+                console.warn("GOXION Admin · diferencias financieras detectadas", variance);
+            }
         }
 
         async function cargarAdminDatos() {
