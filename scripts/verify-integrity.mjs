@@ -178,6 +178,35 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Financial engine phase 1: all production surfaces load the same shadow contract.
+{
+  const runtimePath = join(ROOT, 'assets', 'js', 'core', 'runtime.js');
+  const financialPath = join(ROOT, 'assets', 'js', 'core', 'financial-engine.js');
+  const financialTypesPath = join(ROOT, 'assets', 'js', 'core', 'financial-engine.d.ts');
+  const runtimeSource = existsSync(runtimePath) ? readFileSync(runtimePath, 'utf8') : '';
+
+  if (!runtimeSource.includes("'estado-financiero': 'estado-financiero'")) {
+    fail('Motor financiero: falta endpoint estado-financiero en runtime.');
+  }
+  if (!existsSync(financialPath)) {
+    fail('Motor financiero: falta assets/js/core/financial-engine.js.');
+  }
+  if (!existsSync(financialTypesPath)) {
+    fail('Motor financiero: falta contrato financial-engine.d.ts.');
+  }
+
+  for (const page of PAGES) {
+    const html = readFileSync(join(ROOT, page + '.html'), 'utf8');
+    const runtimeAt = html.indexOf('./assets/js/core/runtime.js');
+    const financialAt = html.indexOf('./assets/js/core/financial-engine.js');
+    const areaAt = html.indexOf('./assets/js/' + page + '/');
+    if (runtimeAt < 0 || financialAt < 0 || areaAt < 0 || !(runtimeAt < financialAt && financialAt < areaAt)) {
+      fail(page + ': motor financiero no carga entre runtime y scripts de página.');
+    }
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -191,3 +220,4 @@ console.log('✓ CSS/JS externalizados');
 console.log('✓ runtime central preservado');
 console.log('✓ sintaxis JavaScript válida');
 console.log('✓ invariantes Safari y lealtad preservados');
+console.log('✓ contrato financiero sombra cargado en las tres superficies');

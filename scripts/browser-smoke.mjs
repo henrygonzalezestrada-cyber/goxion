@@ -48,6 +48,14 @@ async function runAyuda(browser, browserName, errors) {
   await page.goto(origin + '/ayuda.html', { waitUntil: 'load' });
   await page.waitForTimeout(5200);
 
+  const financeReady = await page.evaluate(() =>
+    typeof window.GOXION_FINANCIAL === 'object' &&
+    window.GOXION_FINANCIAL?.MODE === 'shadow' &&
+    typeof window.GOXION_FINANCIAL?.clientState === 'function'
+  ).catch(() => false);
+  if (!financeReady) errors.push(`${label}: motor financiero compartido no disponible.`);
+
+
   const splashHidden = await page.locator('#splash-screen').evaluate(el => {
     const s = getComputedStyle(el);
     return s.visibility === 'hidden' || s.display === 'none' || Number(s.opacity) === 0;
@@ -233,6 +241,15 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
   await page.waitForTimeout(900);
 
+  const financeReady = await page.evaluate(() =>
+    typeof window.GOXION_FINANCIAL === 'object' &&
+    window.GOXION_FINANCIAL?.MODE === 'shadow' &&
+    typeof window.GOXION_FINANCIAL?.adminState === 'function' &&
+    typeof window.GOXION_FINANCIAL?.adminCompare === 'function'
+  ).catch(() => false);
+  if (!financeReady) errors.push(`${label}: motor financiero compartido no disponible.`);
+
+
   // Cualquier función invocada desde HTML debe seguir expuesta globalmente
   // después de externalizar los scripts. Esto detecta roturas de alcance
   // aunque el control todavía se vea correctamente.
@@ -411,6 +428,7 @@ if (errors.length) {
 
 console.log('GOXION modern-v2 · browser smoke OK');
 console.log('✓ Chromium y WebKit');
+console.log('✓ motor financiero compartido disponible en modo sombra');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
 console.log('✓ Soporte conserva crecimiento/contracción intermedia');

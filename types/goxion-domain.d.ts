@@ -47,6 +47,54 @@ declare global {
     monto?: number;
     estado?: string;
     notas?: string;
+    puntual?: boolean | null;
+    lealtad_efecto?: 'sumo' | 'reinicio' | 'sin_cambio' | string | null;
+    racha_resultado?: number | null;
+  }
+
+  interface GoxionFinancialPromotionLine {
+    asignacion_id?: GoxionId;
+    promocion_id?: GoxionId | null;
+    promocion?: string;
+    cliente_servicio_id?: GoxionId;
+    servicio?: string;
+    precio_base?: number;
+    precio_normal_snapshot?: number;
+    precio_promocional?: number;
+    ahorro?: number;
+    periodo_inicio?: string;
+    periodo_indice?: number;
+    periodos_totales?: number;
+    periodos_consumidos?: number;
+  }
+
+  interface GoxionFinancialState extends GoxionAccountState {
+    fuente_financiera?: string;
+    contrato_financiero?: {
+      version?: string;
+      motor?: string;
+      modo?: 'sombra' | 'oficial' | string;
+      total_oficial_preservado?: boolean;
+    };
+    promociones?: {
+      periodo?: string;
+      total_ahorro?: number;
+      detalles?: GoxionFinancialPromotionLine[];
+    };
+    shadow?: {
+      subtotal_oficial?: number;
+      subtotal_con_promociones?: number;
+      total_oficial?: number;
+      total_con_promociones?: number;
+      delta_total?: number;
+      coincide_con_oficial?: boolean;
+    };
+    reglas?: {
+      lealtad?: Array<{ nivel?: number; pagos?: number; porcentaje?: number }>;
+      mora?: { porcentaje_diario?: number; tope_porcentaje?: number };
+      reactivacion?: { despues_de_dias?: number; porcentaje?: number };
+      trato_justo?: { porcentaje_diario?: number; tope_dias?: number };
+    };
   }
 
   interface GoxionAccountBreakdownLine {
