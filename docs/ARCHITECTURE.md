@@ -186,3 +186,17 @@ La configuración Supabase de estos módulos proviene de `GOXION_CORE`.
 
 `main` permanece como referencia oficial hasta una aprobación explícita de
 migración. Esta rama no debe fusionarse automáticamente.
+
+
+## Motor financiero
+
+La capa común de cobro se expone mediante la Edge Function `estado-financiero`
+y se consume desde `assets/js/core/financial-engine.js`.
+
+La Fase 1 opera en modo sombra: conserva el total oficial existente y agrega un
+contrato común para subtotal, lealtad, Trato Justo, beneficios programados,
+promociones, mora y reactivación. Ver `docs/FINANCIAL_ENGINE.md`.
+
+El objetivo es que Index, Ayuda y Admin dejen de recalcular reglas financieras
+por separado. La sustitución de lecturas se hará gradualmente; las escrituras
+se mantienen intactas hasta validar paridad.
