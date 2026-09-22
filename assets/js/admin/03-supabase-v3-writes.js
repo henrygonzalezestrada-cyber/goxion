@@ -303,14 +303,13 @@
             try {
                 const timing = typeof gxPaymentTiming === "function" ? gxPaymentTiming({...c,estado:"pendiente",pago_en_revision:false}) : {type:"none"};
                 const puntual = timing.type !== "overdue";
-                const alreadyPaid = typeof gxPeriodAlreadyPaid === "function" ? gxPeriodAlreadyPaid(c) : false;
-                const r = await accionPeriodo("aprobar_pago_periodo", {
-                    cliente_id: c._id,
+                const r = await window.GOXION_FINANCIAL_ACTIONS.approvePayment({
+                    clienteId: c._id,
                     monto: num(monto),
                     notas: "Aprobado desde Admin",
-                    puntual
+                    puntual,
+                    periodoEsperado: String(c.periodo_pendiente || c.estado_cuenta?.periodo || "").slice(0,7)
                 });
-                if (!puntual && !alreadyPaid) await accion("reiniciar_lealtad", { cliente_id: c._id });
                 await recargar(key);
                 alert(`✅ Pago aplicado a ${r.periodo_pagado || "el periodo pendiente"}.\n\nSiguiente periodo: ${String(r.periodo_pendiente || "").slice(0,7)}.`);
             } catch (e) { errorUI("No se pudo aprobar el pago.", e); }

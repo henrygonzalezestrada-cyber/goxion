@@ -263,6 +263,52 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Phase 3A: payment approval must use the unified financial action gateway.
+{
+  const runtimePath = join(ROOT, 'assets', 'js', 'core', 'runtime.js');
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const actionsTypesPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.d.ts');
+  const adminHtmlPath = join(ROOT, 'admin.html');
+  const writePath = join(ROOT, 'assets', 'js', 'admin', '03-supabase-v3-writes.js');
+  const opsPath = join(ROOT, 'assets', 'js', 'admin', '07-admin-ops-v2.js');
+
+  const runtime = existsSync(runtimePath) ? readFileSync(runtimePath, 'utf8') : '';
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const adminHtml = existsSync(adminHtmlPath) ? readFileSync(adminHtmlPath, 'utf8') : '';
+  const writes = existsSync(writePath) ? readFileSync(writePath, 'utf8') : '';
+  const ops = existsSync(opsPath) ? readFileSync(opsPath, 'utf8') : '';
+
+  if (!runtime.includes("'acciones-financieras': 'acciones-financieras'")) {
+    fail('Acciones financieras: falta endpoint acciones-financieras en runtime.');
+  }
+  if (!existsSync(actionsPath) || !actions.includes('window.GOXION_FINANCIAL_ACTIONS')) {
+    fail('Acciones financieras: falta cliente compartido.');
+  }
+  if (!existsSync(actionsTypesPath)) {
+    fail('Acciones financieras: falta contrato TypeScript.');
+  }
+  if (!actions.includes("invoke('aprobar_pago'") || !actions.includes('periodo_esperado')) {
+    fail('Acciones financieras: aprobar pago no usa el contrato protegido por periodo.');
+  }
+
+  const engineAt = adminHtml.indexOf('./assets/js/core/financial-engine.js');
+  const actionsAt = adminHtml.indexOf('./assets/js/core/financial-actions.js');
+  const adminAt = adminHtml.indexOf('./assets/js/admin/');
+  if (engineAt < 0 || actionsAt < 0 || adminAt < 0 || !(engineAt < actionsAt && actionsAt < adminAt)) {
+    fail('Admin: acciones financieras no cargan entre el motor y los scripts de página.');
+  }
+
+  for (const [label, source] of [['writes', writes], ['ops', ops]]) {
+    if (!source.includes('GOXION_FINANCIAL_ACTIONS.approvePayment')) {
+      fail('Admin ' + label + ': aprobación de pago no usa acciones financieras.');
+    }
+    if (source.includes('aprobar_pago_periodo')) {
+      fail('Admin ' + label + ': persiste una aprobación directa a periodo-cobro.');
+    }
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -279,3 +325,4 @@ console.log('✓ invariantes Safari y lealtad preservados');
 console.log('✓ contrato financiero sombra cargado en las tres superficies');
 console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
+console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');

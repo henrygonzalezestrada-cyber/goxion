@@ -122,3 +122,37 @@ Las escrituras permanecen sin cambios. Aprobar pagos, Trato Justo, beneficios,
 promociones y demás acciones administrativas todavía usan sus flujos actuales.
 La siguiente fase debe centralizar esas escrituras gradualmente y retirar el
 doble cálculo sólo después de validar producción.
+
+
+## Fase 3A · Aprobación de pagos
+
+La primera escritura financiera centralizada es la aprobación de pagos.
+
+Admin ya no llama directamente a `periodo-cobro / aprobar_pago_periodo`.
+Las dos rutas de aprobación existentes usan
+`GOXION_FINANCIAL_ACTIONS.approvePayment()`, que invoca una única Edge
+Function: `acciones-financieras`.
+
+Flujo:
+
+1. Admin envía cliente, monto, puntualidad, notas y el periodo que tenía abierto.
+2. `acciones-financieras` valida la sesión administrativa.
+3. El motor consulta el estado financiero previo.
+4. Si el periodo actual ya no coincide con el periodo esperado, aborta con
+   `PERIODO_DESACTUALIZADO` y no escribe nada.
+5. Si coincide, delega la escritura estable existente a
+   `periodo-cobro / aprobar_pago_periodo`.
+6. Después de guardar, obtiene nuevamente `goxion_estado_financiero` y devuelve
+   el estado actualizado junto con un `operation_id`.
+
+La protección de periodo evita que un reenvío accidental, doble toque o retry
+después de que el primer intento avanzó el ciclo pueda aprobar el siguiente mes.
+
+También se retiró el reinicio redundante de lealtad que el frontend ejecutaba
+después de un pago tardío. Esa regla ya vive dentro de la aprobación del
+periodo; el frontend deja de coordinarla.
+
+Durante 3A, `periodo-cobro` sigue siendo la implementación estable de la
+escritura. `acciones-financieras` funciona como puerta única y capa de
+seguridad/contrato. Las siguientes acciones financieras migrarán gradualmente a
+la misma entrada antes de consolidar la lógica interna.
