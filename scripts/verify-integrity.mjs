@@ -227,6 +227,42 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Phase 2B/2C: Ayuda and Admin must feed estado_cuenta from the unified engine
+// through the shared compatibility selector, keeping the legacy fallback.
+{
+  const ayudaLayerPath = join(ROOT, 'assets', 'js', 'ayuda', '02-client-supabase-layer.js');
+  const adminLayerPath = join(ROOT, 'assets', 'js', 'admin', '02-admin-supabase-layer.js');
+  const financialPath = join(ROOT, 'assets', 'js', 'core', 'financial-engine.js');
+  const ayuda = existsSync(ayudaLayerPath) ? readFileSync(ayudaLayerPath, 'utf8') : '';
+  const admin = existsSync(adminLayerPath) ? readFileSync(adminLayerPath, 'utf8') : '';
+  const financial = existsSync(financialPath) ? readFileSync(financialPath, 'utf8') : '';
+
+  if (!financial.includes('function selectCompatibleState(') || !financial.includes('legacy-variance-fallback')) {
+    fail('Motor financiero: falta selector compartido con fallback por divergencia.');
+  }
+
+  if (!ayuda.includes('window.GOXION_FINANCIAL?.clientState?.()')) {
+    fail('Ayuda financiero: no consulta el motor financiero unificado.');
+  }
+  if (!ayuda.includes('GOXION_FINANCIAL.selectCompatibleState')) {
+    fail('Ayuda financiero: no usa el selector compartido.');
+  }
+  if (!ayuda.includes('__GOXION_AYUDA_FINANCE_AUDIT')) {
+    fail('Ayuda financiero: falta auditoría de paridad.');
+  }
+
+  if (!admin.includes('window.GOXION_FINANCIAL?.adminCompare?.()')) {
+    fail('Admin financiero: no consulta el motor financiero unificado por lote.');
+  }
+  if (!admin.includes('GOXION_FINANCIAL.selectCompatibleState')) {
+    fail('Admin financiero: no usa el selector compartido por cliente.');
+  }
+  if (!admin.includes('__GOXION_ADMIN_FINANCE_AUDIT')) {
+    fail('Admin financiero: falta auditoría por cliente.');
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -242,3 +278,4 @@ console.log('✓ sintaxis JavaScript válida');
 console.log('✓ invariantes Safari y lealtad preservados');
 console.log('✓ contrato financiero sombra cargado en las tres superficies');
 console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
+console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
