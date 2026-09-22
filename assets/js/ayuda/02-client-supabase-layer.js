@@ -74,12 +74,13 @@ const LOGIN_URL = GXCORE.endpoint("login-goxion");
                 return json;
             };
 
-            const [cancelaciones,credenciales,novedades,estadoCuenta,accesosCliente]=await Promise.allSettled([
+            const [cancelaciones,credenciales,novedades,estadoCuenta,accesosCliente,estadoFinanciero]=await Promise.allSettled([
                 request(CANCELACIONES_CLIENTE_URL),
                 request(CREDENCIALES_CLIENTE_URL),
                 request(NOVEDADES_CLIENTE_URL),
                 request(ESTADO_CUENTA_URL,"mi_estado"),
-                request(ACCESOS_CLIENTE_URL)
+                request(ACCESOS_CLIENTE_URL),
+                window.GOXION_FINANCIAL?.clientState?.() ?? Promise.resolve(null)
             ]);
 
             if(cancelaciones.status==="fulfilled") {
@@ -109,11 +110,37 @@ const LOGIN_URL = GXCORE.endpoint("login-goxion");
                 data.novedades_servicio=[];
             }
 
-            if(estadoCuenta.status==="fulfilled" && estadoCuenta.value?.estado_cuenta) {
-                data.estado_cuenta=estadoCuenta.value.estado_cuenta;
-            } else {
+            const legacyEstadoCuenta = estadoCuenta.status==="fulfilled"
+                ? (estadoCuenta.value?.estado_cuenta || null)
+                : null;
+            const financialEstadoCuenta = estadoFinanciero.status==="fulfilled"
+                ? (estadoFinanciero.value || null)
+                : null;
+            const financeSelection = window.GOXION_FINANCIAL?.selectCompatibleState
+                ? window.GOXION_FINANCIAL.selectCompatibleState(
+                    legacyEstadoCuenta,
+                    financialEstadoCuenta,
+                    data?.cliente?.id || ""
+                  )
+                : { state: legacyEstadoCuenta, audit: {
+                    source: legacyEstadoCuenta ? "legacy-fallback" : "none",
+                    financial_valid:false,
+                    compared:false,
+                    matches:null,
+                    differences:[]
+                  } };
+
+            data.estado_cuenta = financeSelection.state;
+            window.__GOXION_AYUDA_FINANCE_AUDIT = Object.freeze({
+                ...financeSelection.audit,
+                checked_at:new Date().toISOString()
+            });
+
+            if (financeSelection.audit.compared && financeSelection.audit.matches === false) {
+                console.warn("GOXION Ayuda · diferencia financiera detectada", financeSelection.audit.differences);
+            }
+            if(!legacyEstadoCuenta && estadoCuenta.status!=="fulfilled") {
                 console.warn("Estado de cuenta central Mi Espacio:",estadoCuenta.reason || "No disponible");
-                data.estado_cuenta=null;
             }
 
             if(accesosCliente.status==="fulfilled") {
