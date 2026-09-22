@@ -444,13 +444,14 @@
             if(type==="approve"){
                 const puntual=document.getElementById("gx-payment-punctual").checked;
                 const before=Number(c.pagos_puntuales||0);
-                const alreadyPaid=gxPeriodAlreadyPaid(c);
-                const r=await gxPeriodAction("aprobar_pago_periodo",{cliente_id:c._id,monto:paymentCtx.monto,puntual,notas:note||"Aprobado desde Admin"});
+                const r=await window.GOXION_FINANCIAL_ACTIONS.approvePayment({
+                    clienteId:c._id,
+                    monto:paymentCtx.monto,
+                    puntual,
+                    notas:note||"Aprobado desde Admin",
+                    periodoEsperado:String(c.periodo_pendiente||c.estado_cuenta?.periodo||"").slice(0,7)
+                });
                 let after=Number(r.pagos_puntuales||before);
-                if(!puntual && !alreadyPaid){
-                    await gxCoreAdminAction("reiniciar_lealtad",{cliente_id:c._id});
-                    after=0;
-                }
                 c.estado="pagado";c.pago_en_revision=false;c.pagos_puntuales=after;c.pago_revision_estado="aprobado";c.periodo_pendiente=r.periodo_pendiente||c.periodo_pendiente;
                 const periodoPagado=r.periodo_pagado||"el periodo pendiente";
                 const siguiente=gxPeriodLabel(r.periodo_pendiente);
