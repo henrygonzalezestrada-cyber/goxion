@@ -9,6 +9,68 @@
     const nativeFetch = window.fetch.bind(window);
 
     
+window.gxSelectIndexFinancialState = function(legacyState, financialState, expectedClientId = "") {
+    const legacy = legacyState && typeof legacyState === "object" ? legacyState : null;
+    const financial = financialState && typeof financialState === "object" ? financialState : null;
+    const expectedId = String(expectedClientId || "").trim();
+
+    const isFiniteMoney = (value) => Number.isFinite(Number(value)) && Number(value) >= 0;
+    const validFinancial = Boolean(
+        financial &&
+        financial.fuente_financiera === "supabase:goxion_estado_financiero" &&
+        financial.contrato_financiero?.version === "1.0" &&
+        financial.contrato_financiero?.modo === "sombra" &&
+        isFiniteMoney(financial.subtotal) &&
+        isFiniteMoney(financial.total_actual) &&
+        /^\d{4}-\d{2}/.test(String(financial.periodo || "")) &&
+        (!expectedId || !financial.cliente_id || String(financial.cliente_id) === expectedId)
+    );
+
+    const fields = [
+        ["periodo", value => String(value || "")],
+        ["estado", value => String(value || "")],
+        ["subtotal", value => Number(value || 0)],
+        ["total_actual", value => Number(value || 0)],
+        ["pagos_efectivos", value => Number(value || 0), state => state?.lealtad?.pagos_efectivos],
+        ["nivel_lealtad", value => Number(value || 0), state => state?.lealtad?.nivel],
+        ["mora", value => Number(value || 0), state => state?.cargos?.mora],
+        ["reactivacion", value => Number(value || 0), state => state?.cargos?.reactivacion],
+    ];
+
+    const diferencias = [];
+    if (legacy && financial) {
+        for (const [field, normalize, pick] of fields) {
+            const read = pick || (state => state?.[field]);
+            const a = normalize(read(legacy));
+            const b = normalize(read(financial));
+            if (typeof a === "number" && typeof b === "number") {
+                if (Math.abs(a - b) >= 0.005) diferencias.push({ field, legacy:a, financial:b });
+            } else if (a !== b) {
+                diferencias.push({ field, legacy:a, financial:b });
+            }
+        }
+    }
+
+    const compared = Boolean(legacy && financial);
+    const matches = compared ? diferencias.length === 0 : null;
+    const useFinancial = validFinancial && (!legacy || matches === true);
+    const chosen = useFinancial ? financial : legacy;
+
+    const audit = {
+        source: useFinancial
+            ? "financial-v1"
+            : (validFinancial && legacy && matches === false
+                ? "legacy-variance-fallback"
+                : (legacy ? "legacy-fallback" : "none")),
+        financial_valid: validFinancial,
+        compared,
+        differences: diferencias,
+        matches
+    };
+
+    return { state: chosen, audit };
+};
+
 function goxionLegacyAdapter(data) {
     const legacy = {
         _goxion_config: {
@@ -89,7 +151,7 @@ function goxionLegacyAdapter(data) {
                 });
             }
 
-            const [r, periodoR, tratoR, estadoR] = await Promise.all([
+            const [r, periodoR, tratoR, estadoR, financialState] = await Promise.all([
                 nativeFetch(MI_URL, {
                     method:"POST",
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
@@ -110,9 +172,11 @@ function goxionLegacyAdapter(data) {
                     headers:{"Content-Type":"application/json","X-Client-Token":token},
                     body:JSON.stringify({accion:"mi_estado",datos:{}}),
                     cache:"no-store"
-                }).catch(() => null)
+                }).catch(() => null),
+                window.GOXION_FINANCIAL?.clientState?.().catch(() => null) ?? Promise.resolve(null)
             ]);
             const {json} = await parseJSON(r);
+            let legacyEstadoCuenta = json?.estado_cuenta || null;
 
             if (periodoR?.ok) {
                 try {
@@ -144,12 +208,28 @@ function goxionLegacyAdapter(data) {
                 try {
                     const estadoData = await estadoR.json();
                     if (estadoData?.ok === true && estadoData.estado_cuenta) {
-                        json.estado_cuenta = estadoData.estado_cuenta;
-                        if (json.cliente && estadoData.estado_cuenta.periodo) {
-                            json.cliente.periodo_pendiente = estadoData.estado_cuenta.periodo;
-                        }
+                        legacyEstadoCuenta = estadoData.estado_cuenta;
                     }
                 } catch {}
+            }
+
+            const selection = window.gxSelectIndexFinancialState(
+                legacyEstadoCuenta,
+                financialState,
+                json?.cliente?.id || ""
+            );
+            json.estado_cuenta = selection.state;
+            window.__GOXION_INDEX_FINANCE_AUDIT = Object.freeze({
+                ...selection.audit,
+                checked_at: new Date().toISOString()
+            });
+
+            if (selection.audit.compared && selection.audit.matches === false) {
+                console.warn("GOXION Index · diferencia financiera detectada", selection.audit.differences);
+            }
+
+            if (json.cliente && json.estado_cuenta?.periodo) {
+                json.cliente.periodo_pendiente = json.estado_cuenta.periodo;
             }
 
             if (!r.ok || json?.ok !== true) {

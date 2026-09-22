@@ -207,6 +207,26 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Index phase 2A: prefer the unified financial engine with a safe legacy fallback.
+{
+  const indexLayerPath = join(ROOT, 'assets', 'js', 'index', '01-index-supabase-layer.js');
+  const source = existsSync(indexLayerPath) ? readFileSync(indexLayerPath, 'utf8') : '';
+
+  if (!source.includes('window.gxSelectIndexFinancialState = function')) {
+    fail('Index financiero: falta selector de fuente financiera.');
+  }
+  if (!source.includes('window.GOXION_FINANCIAL?.clientState?.()')) {
+    fail('Index financiero: no consulta el motor financiero unificado.');
+  }
+  if (!source.includes('legacy-fallback')) {
+    fail('Index financiero: falta fallback legacy seguro.');
+  }
+  if (!source.includes('__GOXION_INDEX_FINANCE_AUDIT')) {
+    fail('Index financiero: falta auditoría silenciosa de paridad.');
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -221,3 +241,4 @@ console.log('✓ runtime central preservado');
 console.log('✓ sintaxis JavaScript válida');
 console.log('✓ invariantes Safari y lealtad preservados');
 console.log('✓ contrato financiero sombra cargado en las tres superficies');
+console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
