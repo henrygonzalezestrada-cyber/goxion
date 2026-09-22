@@ -120,10 +120,51 @@ async function runAyuda(browser, browserName, errors) {
   const financeReady = await page.evaluate(() =>
     typeof window.GOXION_FINANCIAL === 'object' &&
     window.GOXION_FINANCIAL?.MODE === 'shadow' &&
-    typeof window.GOXION_FINANCIAL?.clientState === 'function'
+    typeof window.GOXION_FINANCIAL?.clientState === 'function' &&
+    typeof window.GOXION_FINANCIAL?.selectCompatibleState === 'function'
   ).catch(() => false);
   if (!financeReady) errors.push(`${label}: motor financiero compartido no disponible.`);
 
+  const selectorCases = await page.evaluate(() => {
+    const legacy = {
+      cliente_id:'c1',
+      periodo:'2026-09-01',
+      estado:'pendiente',
+      subtotal:200,
+      total_actual:210,
+      pago_en_revision:false,
+      pago_incompleto:false,
+      lealtad:{pagos_efectivos:4,nivel:1},
+      cargos:{mora:10,reactivacion:0}
+    };
+    const financial = {
+      ...legacy,
+      fuente_financiera:'supabase:goxion_estado_financiero',
+      contrato_financiero:{version:'1.0',modo:'sombra'}
+    };
+    return {
+      ok: window.GOXION_FINANCIAL.selectCompatibleState(legacy,financial,'c1'),
+      variance: window.GOXION_FINANCIAL.selectCompatibleState(
+        legacy,
+        {...financial,pago_en_revision:true},
+        'c1'
+      )
+    };
+  }).catch(() => null);
+
+  if (!selectorCases || selectorCases.ok.audit.source !== 'financial-v1' || selectorCases.ok.audit.matches !== true) {
+    errors.push(`${label}: selector financiero común no aceptó un contrato equivalente.`);
+  }
+  if (
+    selectorCases &&
+    (
+      selectorCases.variance.audit.source !== 'legacy-variance-fallback' ||
+      selectorCases.variance.audit.matches !== false ||
+      selectorCases.variance.state?.pago_en_revision !== false
+    )
+  ) {
+    errors.push(`${label}: selector financiero no hizo fallback ante diferencia de revisión.`);
+  }
 
   const splashHidden = await page.locator('#splash-screen').evaluate(el => {
     const s = getComputedStyle(el);
@@ -317,7 +358,8 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL === 'object' &&
     window.GOXION_FINANCIAL?.MODE === 'shadow' &&
     typeof window.GOXION_FINANCIAL?.adminState === 'function' &&
-    typeof window.GOXION_FINANCIAL?.adminCompare === 'function'
+    typeof window.GOXION_FINANCIAL?.adminCompare === 'function' &&
+    typeof window.GOXION_FINANCIAL?.selectCompatibleState === 'function'
   ).catch(() => false);
   if (!financeReady) errors.push(`${label}: motor financiero compartido no disponible.`);
 
@@ -503,6 +545,7 @@ console.log('GOXION modern-v2 · browser smoke OK');
 console.log('✓ Chromium y WebKit');
 console.log('✓ motor financiero compartido disponible en modo sombra');
 console.log('✓ Index prefiere motor financiero válido y conserva fallback legacy');
+console.log('✓ Ayuda/Admin consumen selector financiero común con fallback por divergencia');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
 console.log('✓ Soporte conserva crecimiento/contracción intermedia');
