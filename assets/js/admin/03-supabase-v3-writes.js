@@ -3,7 +3,6 @@
         const SB = GXCORE.SUPABASE_ORIGIN;
         const ACCIONES = GXCORE.endpoint("admin-acciones");
         const PERIODOS = GXCORE.endpoint("periodo-cobro");
-        const TRATO_JUSTO = GXCORE.endpoint("trato-justo");
         const TOKEN_KEY = GXCORE.STORAGE.ADMIN_TOKEN;
 
         async function accion(accion, datos = {}) {
@@ -52,23 +51,7 @@
             return body;
         }
 
-        async function accionTratoJusto(accionNombre, datos = {}) {
-            const token = localStorage.getItem(TOKEN_KEY) || currentToken || "";
-            if (!token) throw new Error("Sesión administrativa no disponible.");
-            const r = await fetch(TRATO_JUSTO, {
-                method: "POST",
-                headers: {"Content-Type":"application/json","X-Admin-Token":token},
-                body: JSON.stringify({accion:accionNombre,datos})
-            });
-            const text = await r.text();
-            let body = {};
-            try { body = text ? JSON.parse(text) : {}; } catch {}
-            if (!r.ok || body?.ok !== true) throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
-            return body;
-        }
-
         window.gxPeriodAction = accionPeriodo;
-        window.gxTratoJustoAction = accionTratoJusto;
         window.gxCoreAdminAction = accion;
 
         function cli(key) { return clientesDict[key]; }

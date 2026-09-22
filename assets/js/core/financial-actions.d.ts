@@ -4,6 +4,24 @@ declare global {
   interface Window {
     GOXION_FINANCIAL_ACTIONS: {
       readonly CONTRACT_VERSION: string;
+      saveFairDeal(input: {
+        clienteId: string;
+        clienteServicioId: string;
+        periodo: string;
+        diasFalla?: number;
+        motivo?: string;
+      }): Promise<Record<string, unknown>>;
+      deleteFairDeal(input: {
+        id: string;
+      }): Promise<Record<string, unknown>>;
+      applyFairDealBulk(input: {
+        clienteIds: string[];
+        servicioId?: string;
+        servicioNombre?: string;
+        periodo: string;
+        diasFalla?: number;
+        motivo?: string;
+      }): Promise<Record<string, unknown>>;
       approvePayment(input: {
         clienteId: string;
         monto: number;

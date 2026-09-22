@@ -309,6 +309,53 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Phase 3B: Fair Deal writes must use the unified financial action gateway.
+{
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const writePath = join(ROOT, 'assets', 'js', 'admin', '03-supabase-v3-writes.js');
+  const individualPath = join(ROOT, 'assets', 'js', 'admin', '12-admin-v10-trato-justo-controller.js');
+  const bulkPath = join(ROOT, 'assets', 'js', 'admin', '19-admin-trato-justo-masivo-controller.js');
+
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const writes = existsSync(writePath) ? readFileSync(writePath, 'utf8') : '';
+  const individual = existsSync(individualPath) ? readFileSync(individualPath, 'utf8') : '';
+  const bulk = existsSync(bulkPath) ? readFileSync(bulkPath, 'utf8') : '';
+
+  for (const required of [
+    "invoke('trato_justo_guardar'",
+    "invoke('trato_justo_eliminar'",
+    "invoke('trato_justo_masivo'",
+    'saveFairDeal',
+    'deleteFairDeal',
+    'applyFairDealBulk',
+  ]) {
+    if (!actions.includes(required)) fail('Acciones financieras: falta Trato Justo ' + required + '.');
+  }
+
+  if (writes.includes('gxTratoJustoAction') || writes.includes('GXCORE.endpoint("trato-justo")')) {
+    fail('Admin writes: persiste el puente directo de escritura a Trato Justo.');
+  }
+
+  if (
+    !individual.includes('GOXION_FINANCIAL_ACTIONS.saveFairDeal') ||
+    !individual.includes('GOXION_FINANCIAL_ACTIONS.deleteFairDeal') ||
+    individual.includes('gxTratoJustoAction') ||
+    individual.includes("'guardar_compensacion'") ||
+    individual.includes("'eliminar_compensacion'")
+  ) {
+    fail('Trato Justo individual: no usa exclusivamente acciones financieras.');
+  }
+
+  if (
+    !bulk.includes('GOXION_FINANCIAL_ACTIONS.applyFairDealBulk') ||
+    bulk.includes('gxTratoJustoAction') ||
+    bulk.includes('guardar_compensaciones_masivas')
+  ) {
+    fail('Trato Justo masivo: no usa exclusivamente acciones financieras.');
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -326,3 +373,4 @@ console.log('✓ contrato financiero sombra cargado en las tres superficies');
 console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
 console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
+console.log('✓ Trato Justo individual y masivo usan una sola puerta financiera');

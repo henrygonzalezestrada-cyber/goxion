@@ -210,13 +210,13 @@
         const btn=document.getElementById("gx-tj-bulk-apply");
         if(btn){btn.disabled=true;btn.textContent="Aplicando…";}
         try{
-            if(typeof window.gxTratoJustoAction!=="function")throw new Error("La conexión de Trato Justo no está disponible.");
-            const r=await window.gxTratoJustoAction("guardar_compensaciones_masivas",{
-                cliente_ids:selected.map(x=>x.id),
-                servicio_id:String(catalog._id||catalog.id||""),
-                servicio_nombre:String(catalog.nombre||""),
-                periodo:period+"-01",
-                dias_falla:tjMassDays,
+            if(typeof window.GOXION_FINANCIAL_ACTIONS?.applyFairDealBulk!=="function")throw new Error("La conexión financiera de Trato Justo no está disponible.");
+            const r=await window.GOXION_FINANCIAL_ACTIONS.applyFairDealBulk({
+                clienteIds:selected.map(x=>x.id),
+                servicioId:String(catalog._id||catalog.id||""),
+                servicioNombre:String(catalog.nombre||""),
+                periodo:period,
+                diasFalla:tjMassDays,
                 motivo:reason
             });
 

@@ -352,36 +352,60 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
   const page = await browser.newPage({ viewport });
   attachDiagnostics(page, label, errors);
 
-  let financialActionRequest = null;
+  const financialActionRequests = [];
   await page.route('**/functions/v1/acciones-financieras', async route => {
     const request = route.request();
     let body = {};
     try { body = JSON.parse(request.postData() || '{}'); } catch {}
-    financialActionRequest = {
+    financialActionRequests.push({
       body,
       token: request.headers()['x-admin-token'] || ''
+    });
+
+    const action = body?.accion || '';
+    const resultByAction = {
+      aprobar_pago: {
+        ok:true,
+        periodo_pagado:'septiembre de 2026',
+        periodo_pendiente:'2026-10-01',
+        pagos_puntuales:5,
+        puntual:true,
+        reutilizado:false,
+        lealtad_efecto:'sumo',
+        racha_resultado:5
+      },
+      trato_justo_guardar: {
+        ok:true,
+        compensacion:{id:'tj-smoke',monto:5},
+        total_periodo:5,
+        servicio:{nombre:'ViX',monto:50}
+      },
+      trato_justo_eliminar: {
+        ok:true,
+        total_periodo:0
+      },
+      trato_justo_masivo: {
+        ok:true,
+        clientes_aplicados:2,
+        creadas:2,
+        actualizadas:0,
+        no_elegibles:[],
+        total_compensacion:10
+      }
     };
+
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify({
         ok:true,
-        accion:'aprobar_pago',
-        operation_id:'smoke-operation',
+        accion:action,
+        operation_id:'smoke-' + action,
         contrato:'goxion-financial-actions-v1',
-        version:'1.0',
-        resultado:{
-          ok:true,
-          periodo_pagado:'septiembre de 2026',
-          periodo_pendiente:'2026-10-01',
-          pagos_puntuales:5,
-          puntual:true,
-          reutilizado:false,
-          lealtad_efecto:'sumo',
-          racha_resultado:5
-        },
+        version:'1.1',
+        resultado:resultByAction[action] || {ok:true},
         estado_anterior:{periodo:'2026-09-01',total_actual:100},
-        estado_financiero:{periodo:'2026-10-01',total_actual:100}
+        estado_financiero:{periodo:'2026-09-01',total_actual:95}
       })
     });
   });
@@ -400,7 +424,10 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
 
   const actionsReady = await page.evaluate(() =>
     typeof window.GOXION_FINANCIAL_ACTIONS === 'object' &&
-    typeof window.GOXION_FINANCIAL_ACTIONS?.approvePayment === 'function'
+    typeof window.GOXION_FINANCIAL_ACTIONS?.approvePayment === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.saveFairDeal === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.deleteFairDeal === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.applyFairDealBulk === 'function'
   ).catch(() => false);
   if (!actionsReady) errors.push(`${label}: acciones financieras compartidas no disponibles.`);
 
@@ -419,16 +446,71 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     if (actionResult?.error) {
       errors.push(`${label}: cliente de acciones financieras falló: ${actionResult.error}`);
     } else {
-      if (actionResult?.operation_id !== 'smoke-operation' || actionResult?.pagos_puntuales !== 5) {
+      if (actionResult?.operation_id !== 'smoke-aprobar_pago' || actionResult?.pagos_puntuales !== 5) {
         errors.push(`${label}: acciones financieras no normalizaron la respuesta de aprobación.`);
       }
+      const approvalRequest = financialActionRequests.find(x => x.body?.accion === 'aprobar_pago');
       if (
-        financialActionRequest?.body?.accion !== 'aprobar_pago' ||
-        financialActionRequest?.body?.datos?.cliente_id !== 'client-smoke' ||
-        financialActionRequest?.body?.datos?.periodo_esperado !== '2026-09' ||
-        financialActionRequest?.token !== 'smoke.admin.token'
+        approvalRequest?.body?.datos?.cliente_id !== 'client-smoke' ||
+        approvalRequest?.body?.datos?.periodo_esperado !== '2026-09' ||
+        approvalRequest?.token !== 'smoke.admin.token'
       ) {
         errors.push(`${label}: contrato HTTP de aprobación financiera incorrecto.`);
+      }
+    }
+
+    const fairDealResults = await page.evaluate(async () => ({
+      save: await window.GOXION_FINANCIAL_ACTIONS.saveFairDeal({
+        clienteId:'client-smoke',
+        clienteServicioId:'service-smoke',
+        periodo:'2026-09',
+        diasFalla:2,
+        motivo:'Falla técnica'
+      }),
+      remove: await window.GOXION_FINANCIAL_ACTIONS.deleteFairDeal({
+        id:'tj-smoke'
+      }),
+      bulk: await window.GOXION_FINANCIAL_ACTIONS.applyFairDealBulk({
+        clienteIds:['client-smoke','client-smoke-2'],
+        servicioId:'catalog-smoke',
+        servicioNombre:'ViX',
+        periodo:'2026-09',
+        diasFalla:2,
+        motivo:'Falla técnica'
+      })
+    })).catch(error => ({ error: error?.message || String(error) }));
+
+    if (fairDealResults?.error) {
+      errors.push(`${label}: contrato financiero de Trato Justo falló: ${fairDealResults.error}`);
+    } else {
+      if (fairDealResults.save?.compensacion?.monto !== 5) {
+        errors.push(`${label}: Trato Justo individual no normalizó la respuesta.`);
+      }
+      if (fairDealResults.remove?.total_periodo !== 0) {
+        errors.push(`${label}: eliminación de Trato Justo no normalizó la respuesta.`);
+      }
+      if (fairDealResults.bulk?.clientes_aplicados !== 2 || fairDealResults.bulk?.total_compensacion !== 10) {
+        errors.push(`${label}: Trato Justo masivo no normalizó la respuesta.`);
+      }
+
+      const byAction = Object.fromEntries(financialActionRequests.map(x => [x.body?.accion, x]));
+      if (
+        byAction.trato_justo_guardar?.body?.datos?.cliente_id !== 'client-smoke' ||
+        byAction.trato_justo_guardar?.body?.datos?.cliente_servicio_id !== 'service-smoke' ||
+        byAction.trato_justo_guardar?.body?.datos?.periodo !== '2026-09-01' ||
+        byAction.trato_justo_guardar?.body?.datos?.dias_falla !== 2
+      ) {
+        errors.push(`${label}: contrato HTTP de Trato Justo individual incorrecto.`);
+      }
+      if (byAction.trato_justo_eliminar?.body?.datos?.id !== 'tj-smoke') {
+        errors.push(`${label}: contrato HTTP de eliminación de Trato Justo incorrecto.`);
+      }
+      if (
+        byAction.trato_justo_masivo?.body?.datos?.cliente_ids?.length !== 2 ||
+        byAction.trato_justo_masivo?.body?.datos?.servicio_id !== 'catalog-smoke' ||
+        byAction.trato_justo_masivo?.body?.datos?.periodo !== '2026-09-01'
+      ) {
+        errors.push(`${label}: contrato HTTP de Trato Justo masivo incorrecto.`);
       }
     }
   }
@@ -625,3 +707,4 @@ console.log('✓ Admin expone todas las funciones usadas por controles HTML');
 console.log('✓ Admin recorre navegación, catálogo, ajustes, filtros, registros y notificaciones');
 console.log('✓ Admin pasa smoke en desktop y mobile');
 console.log('✓ Admin prueba contrato de aprobación financiera sin persistir');
+console.log('✓ Admin prueba Trato Justo individual/masivo sin persistir');

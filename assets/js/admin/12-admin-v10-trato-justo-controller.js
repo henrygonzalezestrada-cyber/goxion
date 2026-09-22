@@ -45,16 +45,16 @@
 
     window.gxSaveTratoJusto=async function(){
         const c=clientesDict?.[tj.key],s=currentService();
-        if(!c||!s||typeof gxTratoJustoAction!=='function')return;
+        if(!c||!s||typeof window.GOXION_FINANCIAL_ACTIONS?.saveFairDeal!=='function')return;
         const period=document.getElementById('gx-tj-period').value;
         const reason=document.getElementById('gx-tj-reason').value;
         if(!/^\d{4}-\d{2}$/.test(period)) return alert('❌ Selecciona un periodo válido.');
         try{
-            const r=await gxTratoJustoAction('guardar_compensacion',{
-                cliente_id:c._id,
-                cliente_servicio_id:s._id||s.id,
-                periodo:period+'-01',
-                dias_falla:tj.days,
+            const r=await window.GOXION_FINANCIAL_ACTIONS.saveFairDeal({
+                clienteId:c._id,
+                clienteServicioId:s._id||s.id,
+                periodo:period,
+                diasFalla:tj.days,
                 motivo:reason
             });
             gxCloseTratoJusto();
@@ -66,10 +66,10 @@
     };
 
     window.gxDeleteTratoJusto=async function(){
-        if(!tj.record?.id || typeof gxTratoJustoAction!=='function')return;
+        if(!tj.record?.id || typeof window.GOXION_FINANCIAL_ACTIONS?.deleteFairDeal!=='function')return;
         if(!confirm('¿Eliminar esta compensación de Trato Justo?'))return;
         try{
-            await gxTratoJustoAction('eliminar_compensacion',{id:tj.record.id});
+            await window.GOXION_FINANCIAL_ACTIONS.deleteFairDeal({id:tj.record.id});
             gxCloseTratoJusto();
             if(typeof gxReloadAdminClient==='function') await gxReloadAdminClient(tj.key);
             alert('✅ Compensación eliminada.');

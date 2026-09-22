@@ -156,3 +156,30 @@ Durante 3A, `periodo-cobro` sigue siendo la implementación estable de la
 escritura. `acciones-financieras` funciona como puerta única y capa de
 seguridad/contrato. Las siguientes acciones financieras migrarán gradualmente a
 la misma entrada antes de consolidar la lógica interna.
+
+
+## Fase 3B · Trato Justo
+
+Las escrituras de Trato Justo pasan a la misma puerta financiera creada en 3A.
+
+Acciones expuestas por `GOXION_FINANCIAL_ACTIONS`:
+
+- `saveFairDeal()`: crea o actualiza la compensación individual.
+- `deleteFairDeal()`: desactiva una compensación individual.
+- `applyFairDealBulk()`: aplica o actualiza compensaciones en lote.
+
+El frontend de Admin ya no llama directamente a `trato-justo` para escribir.
+El antiguo puente `gxTratoJustoAction` fue retirado de la capa general de
+escrituras.
+
+`acciones-financieras` valida primero la sesión administrativa y después
+delega en la Edge Function estable `trato-justo`. Las acciones individuales
+capturan el estado financiero previo y posterior; la acción masiva devuelve el
+resumen del lote y Admin recarga desde la fuente financiera unificada.
+
+La fórmula existente se conserva: 5% del precio mensual por día de falla, hasta
+10 días / 50%. Esta fase cambia la coordinación y el contrato de escritura, no
+la regla económica.
+
+Las pruebas de navegador interceptan `acciones-financieras` y validan los tres
+contratos sin crear, modificar ni eliminar compensaciones reales.
