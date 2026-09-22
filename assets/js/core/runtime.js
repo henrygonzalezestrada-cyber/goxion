@@ -9,6 +9,7 @@
     'cancelaciones-cliente': 'cancelaciones-cliente',
     'credenciales-cliente': 'credenciales-cliente',
     'estado-cuenta-beta': 'estado-cuenta-beta',
+    'estado-financiero': 'estado-financiero',
     'inventario-publico': 'inventario-publico',
     'login-goxion': 'login-goxion',
     'mi-espacio': 'mi-espacio',
