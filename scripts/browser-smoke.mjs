@@ -98,8 +98,13 @@ async function runIndex(browser, browserName, errors) {
   if (cases.wrongClient.audit.source !== 'legacy-fallback') {
     errors.push(`${label}: aceptó estado financiero de otro cliente.`);
   }
-  if (cases.diff.audit.matches !== false || !cases.diff.audit.differences.some(x => x.field === 'total_actual')) {
-    errors.push(`${label}: auditoría no detectó diferencia de total.`);
+  if (
+    cases.diff.audit.matches !== false ||
+    cases.diff.audit.source !== 'legacy-variance-fallback' ||
+    Number(cases.diff.state?.total_actual || 0) !== 210 ||
+    !cases.diff.audit.differences.some(x => x.field === 'total_actual')
+  ) {
+    errors.push(`${label}: diferencia financiera no activó fallback seguro/auditoría.`);
   }
 
   await page.close();
