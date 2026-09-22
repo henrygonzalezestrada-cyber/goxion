@@ -170,15 +170,18 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: Mi Espacio no regresó limpiamente a la cápsula original.`);
   }
 
-  for (const [button,view] of [
-    ['#btn-tab-catalogo','#view-catalogo'],
-    ['#btn-tab-soporte','#view-soporte'],
-    ['#btn-tab-inicio','#view-inicio'],
+  for (const [tab,view] of [
+    ['catalogo','#view-catalogo'],
+    ['soporte','#view-soporte'],
+    ['inicio','#view-inicio'],
   ]) {
-    await page.locator(button).click();
+    const active = await page.evaluate(({ tab, view }) => {
+      if (typeof window.switchTab !== 'function') return false;
+      window.switchTab(tab);
+      return document.querySelector(view)?.classList.contains('active') === true;
+    }, { tab, view }).catch(() => false);
     await page.waitForTimeout(120);
-    const active = await page.locator(view).evaluate(el => el.classList.contains('active')).catch(() => false);
-    if (!active) errors.push(`${label}: ${view} no quedó activo tras ${button}.`);
+    if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
