@@ -41,6 +41,70 @@ async function assertFunction(page, name, errors, label) {
   if (type !== 'function') errors.push(`${label}: falta función global ${name} (typeof=${type})`);
 }
 
+async function runIndex(browser, browserName, errors) {
+  const label = `${browserName} · Index`;
+  const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  attachDiagnostics(page, label, errors);
+  await page.goto(origin + '/index.html?cliente=prueba', { waitUntil: 'load' });
+  await page.waitForTimeout(500);
+
+  const financeReady = await page.evaluate(() =>
+    typeof window.GOXION_FINANCIAL === 'object' &&
+    typeof window.GOXION_FINANCIAL?.clientState === 'function' &&
+    typeof window.gxSelectIndexFinancialState === 'function'
+  ).catch(() => false);
+  if (!financeReady) errors.push(`${label}: motor financiero/selector no disponible.`);
+
+  const cases = await page.evaluate(() => {
+    const legacy = {
+      cliente_id:'c1',
+      periodo:'2026-09-01',
+      estado:'pendiente',
+      subtotal:200,
+      total_actual:210,
+      lealtad:{pagos_efectivos:4,nivel:1},
+      cargos:{mora:10,reactivacion:0}
+    };
+    const financial = {
+      cliente_id:'c1',
+      fuente_financiera:'supabase:goxion_estado_financiero',
+      contrato_financiero:{version:'1.0',modo:'sombra'},
+      periodo:'2026-09-01',
+      estado:'pendiente',
+      subtotal:200,
+      total_actual:210,
+      lealtad:{pagos_efectivos:4,nivel:1},
+      cargos:{mora:10,reactivacion:0}
+    };
+    const changed = {
+      ...financial,
+      total_actual:215
+    };
+
+    return {
+      preferred: window.gxSelectIndexFinancialState(legacy,financial,'c1'),
+      malformed: window.gxSelectIndexFinancialState(legacy,{...financial,total_actual:'x'},'c1'),
+      wrongClient: window.gxSelectIndexFinancialState(legacy,{...financial,cliente_id:'c2'},'c1'),
+      diff: window.gxSelectIndexFinancialState(legacy,changed,'c1')
+    };
+  });
+
+  if (cases.preferred.audit.source !== 'financial-v1' || cases.preferred.audit.matches !== true) {
+    errors.push(`${label}: no prefirió motor financiero válido o paridad incorrecta.`);
+  }
+  if (cases.malformed.audit.source !== 'legacy-fallback') {
+    errors.push(`${label}: no hizo fallback ante estado financiero inválido.`);
+  }
+  if (cases.wrongClient.audit.source !== 'legacy-fallback') {
+    errors.push(`${label}: aceptó estado financiero de otro cliente.`);
+  }
+  if (cases.diff.audit.matches !== false || !cases.diff.audit.differences.some(x => x.field === 'total_actual')) {
+    errors.push(`${label}: auditoría no detectó diferencia de total.`);
+  }
+
+  await page.close();
+}
+
 async function runAyuda(browser, browserName, errors) {
   const label = `${browserName} · Ayuda`;
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
@@ -411,6 +475,7 @@ try {
     let browser;
     try {
       browser = await browserType.launch({ headless: true });
+      await runIndex(browser, browserName, errors);
       await runAyuda(browser, browserName, errors);
       await runAdmin(browser, browserName, errors);
     } catch (error) {
@@ -432,6 +497,7 @@ if (errors.length) {
 console.log('GOXION modern-v2 · browser smoke OK');
 console.log('✓ Chromium y WebKit');
 console.log('✓ motor financiero compartido disponible en modo sombra');
+console.log('✓ Index prefiere motor financiero válido y conserva fallback legacy');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
 console.log('✓ Soporte conserva crecimiento/contracción intermedia');
