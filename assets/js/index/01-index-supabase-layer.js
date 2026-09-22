@@ -26,7 +26,6 @@ window.gxSelectIndexFinancialState = function(legacyState, financialState, expec
         (!expectedId || !financial.cliente_id || String(financial.cliente_id) === expectedId)
     );
 
-    const chosen = validFinancial ? financial : legacy;
     const fields = [
         ["periodo", value => String(value || "")],
         ["estado", value => String(value || "")],
@@ -52,12 +51,21 @@ window.gxSelectIndexFinancialState = function(legacyState, financialState, expec
         }
     }
 
+    const compared = Boolean(legacy && financial);
+    const matches = compared ? diferencias.length === 0 : null;
+    const useFinancial = validFinancial && (!legacy || matches === true);
+    const chosen = useFinancial ? financial : legacy;
+
     const audit = {
-        source: validFinancial ? "financial-v1" : (legacy ? "legacy-fallback" : "none"),
+        source: useFinancial
+            ? "financial-v1"
+            : (validFinancial && legacy && matches === false
+                ? "legacy-variance-fallback"
+                : (legacy ? "legacy-fallback" : "none")),
         financial_valid: validFinancial,
-        compared: Boolean(legacy && financial),
+        compared,
         differences: diferencias,
-        matches: Boolean(legacy && financial) ? diferencias.length === 0 : null
+        matches
     };
 
     return { state: chosen, audit };
