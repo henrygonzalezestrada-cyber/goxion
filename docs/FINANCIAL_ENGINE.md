@@ -77,3 +77,48 @@ Reglas de selección:
 
 Por tanto, la Fase 2A puede adoptar la lectura nueva sin permitir que una
 divergencia silenciosa cambie lo que el cliente ve.
+
+
+## Fase 2B · Ayuda / Mi Espacio
+
+Ayuda consulta simultáneamente el estado anterior de `estado-cuenta-beta` y
+`GOXION_FINANCIAL.clientState()`.
+
+Ambos pasan por `GOXION_FINANCIAL.selectCompatibleState()`.
+
+Ayuda adopta el motor financiero sólo cuando periodo, estado, subtotal, total,
+lealtad, mora, reactivación y estados de revisión/incompleto coinciden. Ante
+cualquier diferencia conserva el estado anterior y registra la auditoría en
+`window.__GOXION_AYUDA_FINANCE_AUDIT`.
+
+La migración ocurre antes de construir el view model, por lo que tarjeta de
+estado de cuenta, desglose, lealtad, mora, Trato Justo y total consumen la misma
+fuente sin reescribir sus componentes visuales.
+
+## Fase 2C · Admin / Cobro Inteligente
+
+Admin carga el lote legacy y además consulta
+`GOXION_FINANCIAL.adminCompare()`.
+
+Cada cliente se compara individualmente con
+`GOXION_FINANCIAL.selectCompatibleState()`. Cuando existe paridad,
+`cliente.estado_cuenta` recibe el contrato financiero nuevo; ante una
+divergencia ese cliente conserva exclusivamente su estado legacy.
+
+La auditoría consolidada vive en
+`window.__GOXION_ADMIN_FINANCE_AUDIT` e incluye clientes migrados, fallbacks y
+diferencias detectadas.
+
+Como los módulos de Resumen, clientes, móvil, lealtad, Cobro actual y Cobro
+Inteligente ya consumían `cliente.estado_cuenta`, todos quedan conectados al
+motor sin duplicar lógica ni modificar sus escrituras.
+
+## Estado al cerrar Fase 2
+
+Index, Ayuda y Admin comparten el mismo cerebro financiero para lectura, con
+fallback legacy por divergencia.
+
+Las escrituras permanecen sin cambios. Aprobar pagos, Trato Justo, beneficios,
+promociones y demás acciones administrativas todavía usan sus flujos actuales.
+La siguiente fase debe centralizar esas escrituras gradualmente y retirar el
+doble cálculo sólo después de validar producción.
