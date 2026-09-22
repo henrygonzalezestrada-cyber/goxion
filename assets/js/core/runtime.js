@@ -4,6 +4,7 @@
   const SUPABASE_ORIGIN = 'https://hmpevcwodcgbkviarfic.supabase.co';
 
   const ENDPOINTS = Object.freeze({
+    'acciones-financieras': 'acciones-financieras',
     'accesos-cliente-beta': 'accesos-cliente-beta',
     'activar-cuenta-goxion': 'activar-cuenta-goxion',
     'cancelaciones-cliente': 'cancelaciones-cliente',
