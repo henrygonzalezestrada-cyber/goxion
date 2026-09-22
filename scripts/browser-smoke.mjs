@@ -351,6 +351,41 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
   const label = `${browserName} · Admin · ${suffix}`;
   const page = await browser.newPage({ viewport });
   attachDiagnostics(page, label, errors);
+
+  let financialActionRequest = null;
+  await page.route('**/functions/v1/acciones-financieras', async route => {
+    const request = route.request();
+    let body = {};
+    try { body = JSON.parse(request.postData() || '{}'); } catch {}
+    financialActionRequest = {
+      body,
+      token: request.headers()['x-admin-token'] || ''
+    };
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok:true,
+        accion:'aprobar_pago',
+        operation_id:'smoke-operation',
+        contrato:'goxion-financial-actions-v1',
+        version:'1.0',
+        resultado:{
+          ok:true,
+          periodo_pagado:'septiembre de 2026',
+          periodo_pendiente:'2026-10-01',
+          pagos_puntuales:5,
+          puntual:true,
+          reutilizado:false,
+          lealtad_efecto:'sumo',
+          racha_resultado:5
+        },
+        estado_anterior:{periodo:'2026-09-01',total_actual:100},
+        estado_financiero:{periodo:'2026-10-01',total_actual:100}
+      })
+    });
+  });
+
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
   await page.waitForTimeout(900);
 
@@ -362,6 +397,41 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL?.selectCompatibleState === 'function'
   ).catch(() => false);
   if (!financeReady) errors.push(`${label}: motor financiero compartido no disponible.`);
+
+  const actionsReady = await page.evaluate(() =>
+    typeof window.GOXION_FINANCIAL_ACTIONS === 'object' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.approvePayment === 'function'
+  ).catch(() => false);
+  if (!actionsReady) errors.push(`${label}: acciones financieras compartidas no disponibles.`);
+
+  if (actionsReady) {
+    const actionResult = await page.evaluate(async () => {
+      localStorage.setItem('GOXION_ADMIN_TOKEN', 'smoke.admin.token');
+      return window.GOXION_FINANCIAL_ACTIONS.approvePayment({
+        clienteId:'client-smoke',
+        monto:100,
+        puntual:true,
+        notas:'Smoke no persistente',
+        periodoEsperado:'2026-09'
+      });
+    }).catch(error => ({ error: error?.message || String(error) }));
+
+    if (actionResult?.error) {
+      errors.push(`${label}: cliente de acciones financieras falló: ${actionResult.error}`);
+    } else {
+      if (actionResult?.operation_id !== 'smoke-operation' || actionResult?.pagos_puntuales !== 5) {
+        errors.push(`${label}: acciones financieras no normalizaron la respuesta de aprobación.`);
+      }
+      if (
+        financialActionRequest?.body?.accion !== 'aprobar_pago' ||
+        financialActionRequest?.body?.datos?.cliente_id !== 'client-smoke' ||
+        financialActionRequest?.body?.datos?.periodo_esperado !== '2026-09' ||
+        financialActionRequest?.token !== 'smoke.admin.token'
+      ) {
+        errors.push(`${label}: contrato HTTP de aprobación financiera incorrecto.`);
+      }
+    }
+  }
 
 
   // Cualquier función invocada desde HTML debe seguir expuesta globalmente
@@ -554,3 +624,4 @@ console.log('✓ Registro de bienvenida abre');
 console.log('✓ Admin expone todas las funciones usadas por controles HTML');
 console.log('✓ Admin recorre navegación, catálogo, ajustes, filtros, registros y notificaciones');
 console.log('✓ Admin pasa smoke en desktop y mobile');
+console.log('✓ Admin prueba contrato de aprobación financiera sin persistir');
