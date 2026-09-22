@@ -54,8 +54,40 @@ async function runAyuda(browser, browserName, errors) {
   }).catch(() => false);
   if (!splashHidden) errors.push(`${label}: el splash no desapareció.`);
 
-  for (const fn of ['switchTab','openAuthSheet','closeAuthSheet','solicitarCuenta','renderizarSoporteDinamico','cargarCatalogo']) {
+  for (const fn of ['switchTab','openAuthSheet','closeAuthSheet','solicitarCuenta','renderizarSoporteDinamico','cargarCatalogo','gxPaymentHistoryMeta']) {
     await assertFunction(page, fn, errors, label);
+  }
+
+  const loyaltyHistoryCases = await page.evaluate(() => ({
+    reset: window.gxPaymentHistoryMeta(
+      { estado:'pagado', puntual:false, lealtad_efecto:'reinicio', racha_resultado:0 },
+      { isLatestPaid:true, hadPriorPaid:true, storedStreak:0 }
+    ),
+    added: window.gxPaymentHistoryMeta(
+      { estado:'pagado', puntual:true, lealtad_efecto:'sumo', racha_resultado:5 },
+      { isLatestPaid:true, hadPriorPaid:true, storedStreak:5 }
+    ),
+    unchanged: window.gxPaymentHistoryMeta(
+      { estado:'pagado', lealtad_efecto:'sin_cambio', racha_resultado:5 },
+      { isLatestPaid:true, hadPriorPaid:true, storedStreak:5 }
+    ),
+    legacyReset: window.gxPaymentHistoryMeta(
+      { estado:'pagado', notas:'Aprobado desde Admin' },
+      { isLatestPaid:true, hadPriorPaid:true, storedStreak:0 }
+    )
+  }));
+
+  if (loyaltyHistoryCases.reset.loyalty !== 'Racha reiniciada') {
+    errors.push(`${label}: historial no refleja reinicio explícito de racha.`);
+  }
+  if (loyaltyHistoryCases.added.loyalty !== 'Sumó lealtad') {
+    errors.push(`${label}: historial no refleja suma explícita de lealtad.`);
+  }
+  if (loyaltyHistoryCases.unchanged.loyalty === 'Sumó lealtad') {
+    errors.push(`${label}: historial marca suma cuando la lealtad no cambió.`);
+  }
+  if (loyaltyHistoryCases.legacyReset.loyalty === 'Sumó lealtad') {
+    errors.push(`${label}: historial legacy afirma suma aunque la racha guardada terminó en 0.`);
   }
 
   // Mi Espacio: validar el morph cápsula → tarjeta → cápsula también en WebKit/Safari.
@@ -382,6 +414,7 @@ console.log('✓ Chromium y WebKit');
 console.log('✓ Ayuda quita splash y navega entre vistas');
 console.log('✓ Mi Espacio crece y se contrae a su cápsula original');
 console.log('✓ Soporte conserva crecimiento/contracción intermedia');
+console.log('✓ Historial distingue suma/reinicio de lealtad');
 console.log('✓ Registro de bienvenida abre');
 console.log('✓ Admin expone todas las funciones usadas por controles HTML');
 console.log('✓ Admin recorre navegación, catálogo, ajustes, filtros, registros y notificaciones');

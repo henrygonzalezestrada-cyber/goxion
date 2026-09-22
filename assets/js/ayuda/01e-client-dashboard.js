@@ -1,3 +1,114 @@
+        window.gxPaymentHistoryMeta = function(p, context = {}) {
+            const normalize = (value) => {
+                if (typeof gxNormalizeUiText === 'function') return gxNormalizeUiText(value);
+                return String(value ?? '')
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .trim();
+            };
+
+            const estado = normalize(p?.estado || '');
+            const notas = normalize(p?.notas || '');
+            const efecto = normalize(p?.lealtad_efecto || '');
+            const explicitPunctual = typeof p?.puntual === 'boolean' ? p.puntual : null;
+            const isLateText = /(mora|recargo|tarde|tardio|atras|vencid|fuera de fecha)/.test(notas);
+            const isReview = /(revision|pendiente)/.test(estado) || /(revision)/.test(notas);
+            const isPaid = /(pagado|aprobado|acreditado)/.test(estado);
+            const storedStreak = Math.max(0, Number(context?.storedStreak || 0));
+
+            if (isReview) {
+                return {
+                    label:'En revisión',
+                    badgeClass:'review',
+                    loyalty:'Lealtad pendiente',
+                    loyaltyClass:'no',
+                    status:'Revisión'
+                };
+            }
+
+            if (efecto === 'reinicio') {
+                return {
+                    label:'Pago fuera de fecha',
+                    badgeClass:'late',
+                    loyalty:'Racha reiniciada',
+                    loyaltyClass:'no',
+                    status:'Acreditado'
+                };
+            }
+
+            if (efecto === 'sin_cambio') {
+                return {
+                    label:'Pago acreditado',
+                    badgeClass:'ontime',
+                    loyalty:'Sin cambio de lealtad',
+                    loyaltyClass:'no',
+                    status:'Acreditado'
+                };
+            }
+
+            if (efecto === 'sumo') {
+                return {
+                    label:'Pago en tiempo',
+                    badgeClass:'ontime',
+                    loyalty:'Sumó lealtad',
+                    loyaltyClass:'yes',
+                    status:'Acreditado'
+                };
+            }
+
+            if (explicitPunctual === false || isLateText) {
+                return {
+                    label:isLateText ? 'Pago fuera de fecha' : 'Pago acreditado',
+                    badgeClass:'late',
+                    loyalty:context?.hadPriorPaid ? 'Racha reiniciada' : 'No sumó lealtad',
+                    loyaltyClass:'no',
+                    status:'Acreditado'
+                };
+            }
+
+            if (explicitPunctual === true && isPaid) {
+                return {
+                    label:'Pago en tiempo',
+                    badgeClass:'ontime',
+                    loyalty:'Sumó lealtad',
+                    loyaltyClass:'yes',
+                    status:'Acreditado'
+                };
+            }
+
+            if (isPaid) {
+                // Compatibilidad con pagos anteriores al campo de auditoría:
+                // si el último pago acreditado dejó la racha almacenada en 0,
+                // nunca afirmamos que "sumó lealtad".
+                if (context?.isLatestPaid === true && storedStreak === 0) {
+                    return {
+                        label:'Pago acreditado',
+                        badgeClass:'late',
+                        loyalty:context?.hadPriorPaid ? 'Racha reiniciada' : 'No sumó lealtad',
+                        loyaltyClass:'no',
+                        status:'Acreditado'
+                    };
+                }
+
+                return {
+                    label:'Pago en tiempo',
+                    badgeClass:'ontime',
+                    loyalty:'Sumó lealtad',
+                    loyaltyClass:'yes',
+                    status:'Acreditado'
+                };
+            }
+
+            return {
+                label:'Pago registrado',
+                badgeClass:'review',
+                loyalty:'Sin cambio de lealtad',
+                loyaltyClass:'no',
+                status:'Registrado'
+            };
+        };
+
         function renderDashboard(key) {
             const cliente = globalClientesData[key];
 
@@ -389,52 +500,11 @@
                 // mi-espacio ya entrega pagos del más reciente al más antiguo.
                 const pagosHist = [...cliente.historial_pagos];
 
-                const paymentMeta = (p) => {
-                    const estado = gxNormalizeUiText(p?.estado || '');
-                    const notas = gxNormalizeUiText(p?.notas || '');
-
-                    const isLate = /(mora|recargo|tarde|tardio|atras|vencid|fuera de fecha)/.test(notas);
-                    const isReview = /(revision|revisi[oó]n|pendiente)/.test(estado) || /(revision|revisi[oó]n)/.test(notas);
-                    const isPaid = /(pagado|aprobado|acreditado)/.test(estado);
-
-                    if (isLate) {
-                        return {
-                            label:'Pagaste mora',
-                            badgeClass:'late',
-                            loyalty:'No sumó lealtad',
-                            loyaltyClass:'no',
-                            status:'Acreditado'
-                        };
-                    }
-
-                    if (isReview) {
-                        return {
-                            label:'En revisión',
-                            badgeClass:'review',
-                            loyalty:'Lealtad pendiente',
-                            loyaltyClass:'no',
-                            status:'Revisión'
-                        };
-                    }
-
-                    if (isPaid) {
-                        return {
-                            label:'Pago en tiempo',
-                            badgeClass:'ontime',
-                            loyalty:'Sumó lealtad',
-                            loyaltyClass:'yes',
-                            status:'Acreditado'
-                        };
-                    }
-
-                    return {
-                        label:'Pago registrado',
-                        badgeClass:'review',
-                        loyalty:'Sin cambio de lealtad',
-                        loyaltyClass:'no',
-                        status:'Registrado'
-                    };
-                };
+                const paidIndexes = pagosHist
+                    .map((p,index) => (/(pagado|aprobado|acreditado)/.test(gxNormalizeUiText(p?.estado || '')) ? index : -1))
+                    .filter(index => index >= 0);
+                const latestPaidIndex = paidIndexes.length ? paidIndexes[0] : -1;
+                const storedStreak = Math.max(0, Number(cliente.pagos_puntuales || 0));
 
                 const money = (value) => Number(value || 0).toLocaleString('es-MX',{
                     style:'currency',
@@ -445,7 +515,11 @@
                 historyHTML = `<div id="gx-payment-history-card" class="gx-payment-history-card">`;
 
                 pagosHist.forEach((p,index) => {
-                    const meta = paymentMeta(p);
+                    const meta = window.gxPaymentHistoryMeta(p,{
+                        isLatestPaid:index === latestPaidIndex,
+                        hadPriorPaid:paidIndexes.some(paidIndex => paidIndex > index),
+                        storedStreak
+                    });
 
                     historyHTML += `
                         <div class="gx-payment-history-row ${index >= 3 ? 'gx-history-extra' : ''}">

@@ -208,9 +208,13 @@ function goxionViewModelAdapter(data) {
             historial_pagos: (data.pagos || []).map(p => ({
                 id: p.id,
                 fecha: p.periodo || p.fecha || "",
+                fecha_pago: p.fecha || "",
                 monto: Number(p.monto || 0),
                 estado: p.estado || "pagado",
-                notas: p.notas || ""
+                notas: p.notas || "",
+                puntual: typeof p.puntual === "boolean" ? p.puntual : null,
+                lealtad_efecto: p.lealtad_efecto || "",
+                racha_resultado: p.racha_resultado == null ? null : Number(p.racha_resultado)
             })),
             gamificacion: data.gamificacion ? {...data.gamificacion, progreso: Array.isArray(data.misiones_progreso) ? data.misiones_progreso : []} : null,
             referido_activo: Array.isArray(data.referidos) && data.referidos.length ? data.referidos[0] : undefined,
