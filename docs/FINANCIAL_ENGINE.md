@@ -54,3 +54,26 @@ Migrar lecturas, no escrituras, en este orden:
 3. Admin / resumen de cliente y Cobro Inteligente.
 
 El fallback anterior se retirará sólo después de validar paridad.
+
+
+## Fase 2A · Index
+
+Index migra primero a lectura financiera unificada.
+
+La capa `assets/js/index/01-index-supabase-layer.js` consulta en paralelo:
+
+- el estado anterior de `estado-cuenta-beta`;
+- el contrato nuevo de `GOXION_FINANCIAL.clientState()`.
+
+Antes de entregar datos al render existente se comparan periodo, estado, subtotal,
+total, racha efectiva, nivel de lealtad, mora y reactivación.
+
+Reglas de selección:
+
+1. Motor financiero válido + paridad con legacy: usa `financial-v1`.
+2. Motor inválido o incompleto: usa `legacy-fallback`.
+3. Motor válido pero con alguna diferencia: usa `legacy-variance-fallback`.
+4. La diferencia queda disponible en `window.__GOXION_INDEX_FINANCE_AUDIT`.
+
+Por tanto, la Fase 2A puede adoptar la lectura nueva sin permitir que una
+divergencia silenciosa cambie lo que el cliente ve.
