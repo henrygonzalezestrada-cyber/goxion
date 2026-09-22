@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false
+  },
+  "include": [
+    "assets/js/**/*.js",
+    "assets/js/**/*.mjs",
+    "assets/js/**/*.d.ts",
+    "types/**/*.d.ts"
+  ],
+  "exclude": [
+    "goxion-next/**"
+  ]
+}

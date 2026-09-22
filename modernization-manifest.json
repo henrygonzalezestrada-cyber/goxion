@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "policy": "DOM y CSS permanecen 1:1 con main. Sólo estos scripts pueden diferir internamente.",
+  "addedScripts": [
+    "assets/js/core/runtime.js",
+    "assets/js/core/motion-engine.mjs",
+    "assets/js/ayuda/data/support-issues.js",
+    "assets/js/ayuda/01a-shared-state.js",
+    "assets/js/ayuda/01b-welcome-registration.js",
+    "assets/js/ayuda/01c-rewards-referrals.js",
+    "assets/js/ayuda/01d-experience-session.js",
+    "assets/js/ayuda/01e-client-dashboard.js",
+    "assets/js/ayuda/01f-catalog-orders.js",
+    "assets/js/ayuda/01g-support-runtime.js"
+  ],
+  "modernizedScripts": [
+    "assets/js/ayuda/01-01-inline.js",
+    "assets/js/ayuda/02-client-supabase-layer.js",
+    "assets/js/ayuda/08-ayuda-beta-26-activation-js.js",
+    "assets/js/index/01-index-supabase-layer.js",
+    "assets/js/admin/02-admin-supabase-layer.js",
+    "assets/js/admin/03-supabase-v3-writes.js",
+    "assets/js/admin/04-admin-v4-fixes.js",
+    "assets/js/admin/05-admin-v5-inventory.js",
+    "assets/js/admin/07-admin-ops-v2.js",
+    "assets/js/admin/20-admin-security-controller.js",
+    "assets/js/admin/21-admin-smart-operations-controller.js",
+    "assets/js/admin/22-admin-registration-controller.js",
+    "assets/js/admin/23-admin-beta-13-access-controller.js",
+    "assets/js/admin/25-admin-beta-19-controller.js",
+    "assets/js/admin/28-admin-beta-20-benefits.js",
+    "assets/js/ayuda/07-production-interactions-js.js",
+    "assets/js/index/02-02-inline.js",
+    "assets/js/admin/06-admin-operations-ui.js",
+    "assets/js/ayuda/05-gamification-shared-morph-js.js",
+    "assets/js/ayuda/01g-support-runtime.js"
+  ],
+  "phases": {
+    "core-runtime": "Centralización de Supabase, endpoints y claves de sesión",
+    "motion-engine": "Motion 13.4 queda como infraestructura experimental; Mi Espacio y Soporte usan WAAPI nativo por paridad Safari/WebKit",
+    "feature-data": "Datos editables de Soporte separados de lógica y animaciones",
+    "business-config": "Teléfono, banco, CLABE, titular y canales centralizados en GOXION_CORE",
+    "ayuda-segmentation": "El antiguo 01-01-inline.js se segmentó por responsabilidad preservando orden y lógica.",
+    "browser-smoke": "Pruebas funcionales en Chromium y WebKit, incluyendo apertura/cierre geométrico de Mi Espacio",
+    "gamification-safari": "Todos los watermarks comparten el mismo shared-element morph; el clon visual elimina data-watermark para garantizar una sola representación durante el viaje en Safari"
+  }
+}

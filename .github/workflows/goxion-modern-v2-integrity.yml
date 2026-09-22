@@ -1,0 +1,40 @@
+name: GOXION modern-v2 · Integrity
+
+on:
+  push:
+    branches:
+      - goxion-modern-v2
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  parity:
+    if: github.event_name == 'push' || github.head_ref == 'goxion-modern-v2'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout modern-v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch official main
+        run: git fetch origin main
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify source parity
+        run: npm run verify:modern
+
+      - name: Install browser test
+        run: npm install --no-save playwright
+
+      - name: Install Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+
+      - name: Browser smoke
+        run: node scripts/browser-smoke.mjs
