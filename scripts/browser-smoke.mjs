@@ -392,6 +392,18 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         no_elegibles:[],
         total_compensacion:10
       },
+      beneficio_crear: {
+        ok:true,
+        beneficio:{id:'benefit-smoke',valor:25}
+      },
+      beneficio_cancelar: {
+        ok:true,
+        beneficio:{id:'benefit-smoke',estado:'cancelado'}
+      },
+      beneficio_eliminar: {
+        ok:true,
+        eliminado:true
+      },
       promocion_guardar: {
         ok:true,
         promocion:{id:'promo-smoke',precio_promocional:50}
@@ -457,6 +469,8 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL_ACTIONS?.saveFairDeal === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.deleteFairDeal === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.applyFairDealBulk === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.saveBenefit === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.cancelBenefit === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.savePromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.togglePromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.assignPromotion === 'function' &&
@@ -550,6 +564,15 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     }
 
     const phase3de = await page.evaluate(async () => ({
+      benefitSave: await window.GOXION_FINANCIAL_ACTIONS.saveBenefit({
+        clienteId:'client-smoke',
+        concepto:'Beneficio smoke',
+        tipo:'monto',
+        valor:25,
+        periodoInicio:'2026-09',
+        periodosTotal:2
+      }),
+      benefitCancel: await window.GOXION_FINANCIAL_ACTIONS.cancelBenefit({id:'benefit-smoke'}),
       promoSave: await window.GOXION_FINANCIAL_ACTIONS.savePromotion({
         servicio_id:'catalog-smoke',
         nombre:'Promo smoke',
@@ -587,6 +610,9 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     if (phase3de?.error) {
       errors.push(`${label}: contratos 3D/3E fallaron: ${phase3de.error}`);
     } else {
+      if (phase3de.benefitSave?.beneficio?.id !== 'benefit-smoke' || phase3de.benefitCancel?.beneficio?.estado !== 'cancelado') {
+        errors.push(`${label}: beneficio programado no normalizó la respuesta.`);
+      }
       if (phase3de.promoSave?.promocion?.id !== 'promo-smoke') {
         errors.push(`${label}: promoción no normalizó la respuesta.`);
       }
@@ -598,6 +624,11 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       }
 
       const actionMap = Object.fromEntries(financialActionRequests.map(x => [x.body?.accion, x]));
+      if (
+        actionMap.beneficio_crear?.body?.datos?.cliente_id !== 'client-smoke' ||
+        actionMap.beneficio_crear?.body?.datos?.periodos_total !== 2
+      ) errors.push(`${label}: contrato HTTP de beneficio programado incorrecto.`);
+
       if (
         actionMap.promocion_guardar?.body?.datos?.servicio_id !== 'catalog-smoke' ||
         actionMap.promocion_asignar?.body?.datos?.cliente_servicio_id !== 'service-smoke'
@@ -808,4 +839,4 @@ console.log('✓ Admin recorre navegación, catálogo, ajustes, filtros, registr
 console.log('✓ Admin pasa smoke en desktop y mobile');
 console.log('✓ Admin prueba contrato de aprobación financiera sin persistir');
 console.log('✓ Admin prueba Trato Justo individual/masivo sin persistir');
-console.log('✓ Admin prueba promociones y cobros especiales sin persistir');
+console.log('✓ Admin prueba beneficios, promociones y cobros especiales sin persistir');
