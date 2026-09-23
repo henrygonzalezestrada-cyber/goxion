@@ -223,6 +223,9 @@ for (const absolute of walk(jsRoot)) {
   if (!source.includes('window.GOXION_FINANCIAL?.clientState?.()')) {
     fail('Index financiero: no consulta el motor financiero unificado.');
   }
+  if (!source.includes('GOXION_FINANCIAL.selectCompatibleState')) {
+    fail('Index financiero: selector no delega al motor compartido.');
+  }
   if (!source.includes('legacy-fallback')) {
     fail('Index financiero: falta fallback legacy seguro.');
   }
