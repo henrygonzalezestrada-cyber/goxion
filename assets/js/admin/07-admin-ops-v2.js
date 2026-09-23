@@ -461,7 +461,16 @@
             } else if(type==="incomplete"){
                 const amount=Number(document.getElementById("gx-missing-amount").value||0);
                 const msg=note||`Detectamos un pago incompleto${amount>0?` por $${amount}`:""}. Revisa el monto y vuelve a enviar tu comprobante.`;
-                await ops("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+                if(amount>0 && typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment==='function'){
+                    await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
+                        clienteId:c._id,
+                        saldoRestante:amount,
+                        notas:msg,
+                        periodoEsperado:String(c.periodo_pendiente||c.estado_cuenta?.periodo||"").slice(0,7)
+                    });
+                }else{
+                    await ops("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+                }
                 c.estado="pendiente";c.pago_en_revision=false;c.pago_revision_estado="incompleto";c.pago_revision_mensaje=msg;c.pago_revision_monto_faltante=amount;
                 successMessage="⚠️ Pago marcado como incompleto.";
             } else {
