@@ -1,12 +1,13 @@
 # GOXION · Motor financiero v1
 
-## Estado de la fase
+## Estado actual
 
-Fase 1 activa en **modo sombra**.
+El motor financiero opera con **contrato v1.1 en modo oficial**.
 
-El motor financiero calcula un contrato común para Index, Ayuda y Admin, pero
-todavía no sustituye el total oficial mostrado/cobrado. Esto permite comparar el
-nuevo cálculo contra producción antes de cambiar comportamiento económico.
+La etapa de sombra ya cumplió su función: Index, Ayuda y Admin conservaron
+paridad durante la migración y el motor central es ahora la fuente financiera
+oficial. El fallback legacy permanece como protección de compatibilidad mientras
+se realiza la auditoría final.
 
 ## Fuente única
 
@@ -29,8 +30,8 @@ promociones asignadas, desglose, total oficial y total sombra.
 
 ## Seguridad de Fase 1
 
-`total_actual` sigue siendo el total oficial existente. Las promociones se
-auditan en `promociones` y su impacto hipotético vive en `shadow`.
+`total_actual` es producido por el motor financiero oficial. El bloque `shadow`
+se conserva únicamente como telemetría de compatibilidad y reporta delta 0.
 
 Las funciones PostgreSQL nuevas no tienen EXECUTE para `public`, `anon` ni
 `authenticated`; sólo `service_role`. La Edge Function valida primero la
