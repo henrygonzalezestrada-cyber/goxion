@@ -199,6 +199,14 @@ for (const absolute of walk(jsRoot)) {
   if (!financialSource.includes("MODE: 'official'") || !financialSource.includes("CONTRACT_VERSION: '1.1'")) {
     fail('Motor financiero: frontend no está alineado al contrato financiero oficial v1.1.');
   }
+  const financialActionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  if (!existsSync(financialActionsPath)) {
+    fail('Acciones financieras: falta assets/js/core/financial-actions.js.');
+  }
+  const financialActionsSource = existsSync(financialActionsPath) ? readFileSync(financialActionsPath, 'utf8') : '';
+  if (!financialActionsSource.includes("CONTRACT_VERSION: '1.2'")) {
+    fail('Acciones financieras: frontend no está alineado al contrato v1.2.');
+  }
 
   for (const page of PAGES) {
     const html = readFileSync(join(ROOT, page + '.html'), 'utf8');
@@ -452,6 +460,7 @@ console.log('✓ runtime central preservado');
 console.log('✓ sintaxis JavaScript válida');
 console.log('✓ invariantes Safari y lealtad preservados');
 console.log('✓ contrato financiero oficial v1.1 cargado en las tres superficies');
+console.log('✓ acciones financieras compartidas alineadas al contrato v1.2');
 console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
 console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
