@@ -357,6 +357,35 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
+
+// Phase 3C: Programmed benefits must use the unified financial action gateway.
+{
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const benefitPath = join(ROOT, 'assets', 'js', 'admin', '28-admin-beta-20-benefits.js');
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const benefits = existsSync(benefitPath) ? readFileSync(benefitPath, 'utf8') : '';
+
+  for (const required of [
+    "invoke('beneficio_crear'",
+    "invoke('beneficio_cancelar'",
+    "invoke('beneficio_eliminar'",
+    'saveBenefit',
+    'cancelBenefit',
+    'deleteBenefit',
+  ]) {
+    if (!actions.includes(required)) fail('Beneficios programados: falta ' + required + '.');
+  }
+  if (
+    !benefits.includes('GOXION_FINANCIAL_ACTIONS.saveBenefit') ||
+    !benefits.includes('GOXION_FINANCIAL_ACTIONS.cancelBenefit')
+  ) {
+    fail('Beneficios programados: Admin no usa acciones financieras.');
+  }
+  if (benefits.includes('GXCORE.endpoint("beneficios-admin-beta")') || benefits.includes('gxBenefitAction')) {
+    fail('Beneficios programados: persiste un puente directo de escritura.');
+  }
+}
+
 // Phase 3D/3E: Promotions and special collection actions must use the financial gateway.
 {
   const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
@@ -420,4 +449,5 @@ console.log('✓ Index usa motor financiero con fallback y auditoría de paridad
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
 console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
 console.log('✓ Trato Justo individual y masivo usan una sola puerta financiera');
+console.log('✓ beneficios programados usan el núcleo financiero');
 console.log('✓ promociones y cobros especiales usan el núcleo financiero');
