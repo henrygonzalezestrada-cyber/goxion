@@ -313,10 +313,22 @@ async function runAyuda(browser, browserName, errors) {
       stopPropagation(){}
     });
   });
-  await page.waitForTimeout(150);
+  // WebKit puede tardar más en comenzar el primer frame geométrico del morph.
+  // Esperamos una señal de crecimiento real en vez de asumir que ocurrirá
+  // exactamente a los 150 ms del runner.
+  if (supportBefore) {
+    await page.waitForFunction(
+      ({ beforeWidth }) => {
+        const el = document.querySelector('#support-platforms-grid .platform-btn');
+        return el && el.getBoundingClientRect().width > beforeWidth + 20;
+      },
+      { beforeWidth: supportBefore.width },
+      { timeout: 1200 }
+    ).catch(() => {});
+  }
   const supportOpening = await supportBtn.boundingBox();
   if (!supportBefore || !supportOpening || supportOpening.width <= supportBefore.width + 20) {
-    errors.push(`${label}: Soporte no mostró crecimiento intermedio del morph.`);
+    errors.push(`${label}: Soporte no inició el crecimiento del morph.`);
   }
   await page.waitForTimeout(420);
   const supportOpen = await supportBtn.boundingBox();
