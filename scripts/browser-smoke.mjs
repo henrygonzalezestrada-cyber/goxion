@@ -68,7 +68,7 @@ async function runIndex(browser, browserName, errors) {
     const financial = {
       cliente_id:'c1',
       fuente_financiera:'supabase:goxion_estado_financiero',
-      contrato_financiero:{version:'1.0',modo:'sombra'},
+      contrato_financiero:{version:'1.1',modo:'oficial'},
       periodo:'2026-09-01',
       estado:'pendiente',
       subtotal:200,
@@ -119,7 +119,7 @@ async function runAyuda(browser, browserName, errors) {
 
   const financeReady = await page.evaluate(() =>
     typeof window.GOXION_FINANCIAL === 'object' &&
-    window.GOXION_FINANCIAL?.MODE === 'shadow' &&
+    window.GOXION_FINANCIAL?.MODE === 'official' &&
     typeof window.GOXION_FINANCIAL?.clientState === 'function' &&
     typeof window.GOXION_FINANCIAL?.selectCompatibleState === 'function'
   ).catch(() => false);
@@ -140,7 +140,7 @@ async function runAyuda(browser, browserName, errors) {
     const financial = {
       ...legacy,
       fuente_financiera:'supabase:goxion_estado_financiero',
-      contrato_financiero:{version:'1.0',modo:'sombra'}
+      contrato_financiero:{version:'1.1',modo:'oficial'}
     };
     return {
       ok: window.GOXION_FINANCIAL.selectCompatibleState(legacy,financial,'c1'),
@@ -468,7 +468,7 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
 
   const financeReady = await page.evaluate(() =>
     typeof window.GOXION_FINANCIAL === 'object' &&
-    window.GOXION_FINANCIAL?.MODE === 'shadow' &&
+    window.GOXION_FINANCIAL?.MODE === 'official' &&
     typeof window.GOXION_FINANCIAL?.adminState === 'function' &&
     typeof window.GOXION_FINANCIAL?.adminCompare === 'function' &&
     typeof window.GOXION_FINANCIAL?.selectCompatibleState === 'function'
@@ -858,7 +858,7 @@ if (errors.length) {
 
 console.log('GOXION modern-v2 · browser smoke OK');
 console.log('✓ Chromium y WebKit');
-console.log('✓ motor financiero compartido disponible en modo sombra');
+console.log('✓ motor financiero compartido disponible en modo oficial');
 console.log('✓ Index prefiere motor financiero válido y conserva fallback legacy');
 console.log('✓ Ayuda/Admin consumen selector financiero común con fallback por divergencia');
 console.log('✓ Ayuda quita splash y navega entre vistas');
