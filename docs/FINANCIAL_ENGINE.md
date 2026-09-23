@@ -222,3 +222,33 @@ original.
 
 Las dos acciones exigen el periodo esperado para impedir que una ficha
 desactualizada escriba sobre el siguiente ciclo.
+
+
+## Fase 3C · Beneficios y descuentos programados
+
+Admin deja de escribir directamente en `beneficios-admin-beta`.
+
+- `saveBenefit()`: programa monto o porcentaje por N periodos.
+- `cancelBenefit()`: detiene el beneficio desde el siguiente cálculo.
+- `deleteBenefit()`: elimina beneficios que todavía admiten eliminación.
+
+El motor ya consume `beneficios_programados` por periodo y finaliza
+automáticamente las reglas al completar su duración. La interfaz no cambia;
+sólo cambia la puerta de escritura.
+
+
+## Estado previo a auditoría final
+
+Las lecturas financieras de Index, Ayuda y Admin comparten el motor central.
+Las escrituras migradas al gateway `acciones-financieras` son:
+
+- aprobación de pagos;
+- Trato Justo individual y masivo;
+- beneficios/descuentos programados;
+- promociones de catálogo y asignaciones;
+- pagos parciales;
+- fecha pactada de pago.
+
+El siguiente paso es la auditoría final: localizar escrituras financieras
+legacy restantes, validar contratos y datos reales, revisar seguridad/advisors y
+ejecutar smoke completo antes de declarar cerrado el núcleo financiero.
