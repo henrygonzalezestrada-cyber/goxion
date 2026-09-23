@@ -10,65 +10,25 @@
 
     
 window.gxSelectIndexFinancialState = function(legacyState, financialState, expectedClientId = "") {
-    const legacy = legacyState && typeof legacyState === "object" ? legacyState : null;
-    const financial = financialState && typeof financialState === "object" ? financialState : null;
-    const expectedId = String(expectedClientId || "").trim();
-
-    const isFiniteMoney = (value) => Number.isFinite(Number(value)) && Number(value) >= 0;
-    const validFinancial = Boolean(
-        financial &&
-        financial.fuente_financiera === "supabase:goxion_estado_financiero" &&
-        financial.contrato_financiero?.version === "1.0" &&
-        financial.contrato_financiero?.modo === "sombra" &&
-        isFiniteMoney(financial.subtotal) &&
-        isFiniteMoney(financial.total_actual) &&
-        /^\d{4}-\d{2}/.test(String(financial.periodo || "")) &&
-        (!expectedId || !financial.cliente_id || String(financial.cliente_id) === expectedId)
-    );
-
-    const fields = [
-        ["periodo", value => String(value || "")],
-        ["estado", value => String(value || "")],
-        ["subtotal", value => Number(value || 0)],
-        ["total_actual", value => Number(value || 0)],
-        ["pagos_efectivos", value => Number(value || 0), state => state?.lealtad?.pagos_efectivos],
-        ["nivel_lealtad", value => Number(value || 0), state => state?.lealtad?.nivel],
-        ["mora", value => Number(value || 0), state => state?.cargos?.mora],
-        ["reactivacion", value => Number(value || 0), state => state?.cargos?.reactivacion],
-    ];
-
-    const diferencias = [];
-    if (legacy && financial) {
-        for (const [field, normalize, pick] of fields) {
-            const read = pick || (state => state?.[field]);
-            const a = normalize(read(legacy));
-            const b = normalize(read(financial));
-            if (typeof a === "number" && typeof b === "number") {
-                if (Math.abs(a - b) >= 0.005) diferencias.push({ field, legacy:a, financial:b });
-            } else if (a !== b) {
-                diferencias.push({ field, legacy:a, financial:b });
-            }
-        }
+    if (typeof window.GOXION_FINANCIAL?.selectCompatibleState === "function") {
+        return window.GOXION_FINANCIAL.selectCompatibleState(
+            legacyState,
+            financialState,
+            expectedClientId
+        );
     }
 
-    const compared = Boolean(legacy && financial);
-    const matches = compared ? diferencias.length === 0 : null;
-    const useFinancial = validFinancial && (!legacy || matches === true);
-    const chosen = useFinancial ? financial : legacy;
-
-    const audit = {
-        source: useFinancial
-            ? "financial-v1"
-            : (validFinancial && legacy && matches === false
-                ? "legacy-variance-fallback"
-                : (legacy ? "legacy-fallback" : "none")),
-        financial_valid: validFinancial,
-        compared,
-        differences: diferencias,
-        matches
+    const legacy = legacyState && typeof legacyState === "object" ? legacyState : null;
+    return {
+        state: legacy,
+        audit: {
+            source: legacy ? "legacy-fallback" : "none",
+            financial_valid: false,
+            compared: false,
+            differences: [],
+            matches: null
+        }
     };
-
-    return { state: chosen, audit };
 };
 
 function goxionLegacyAdapter(data) {
