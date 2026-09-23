@@ -1,12 +1,13 @@
 # GOXION · Motor financiero v1
 
-## Estado de la fase
+## Estado actual
 
-Fase 1 activa en **modo sombra**.
+El motor financiero v1 opera en **modo oficial** para Index, Ayuda y Admin.
 
-El motor financiero calcula un contrato común para Index, Ayuda y Admin, pero
-todavía no sustituye el total oficial mostrado/cobrado. Esto permite comparar el
-nuevo cálculo contra producción antes de cambiar comportamiento económico.
+Las fases 1 y 2 documentadas abajo describen la transición histórica desde el
+modo sombra. A partir de la Fase 3, las lecturas y las principales escrituras
+financieras convergen en el mismo núcleo, conservando compatibilidad y
+trazabilidad para la auditoría final.
 
 ## Fuente única
 
@@ -183,3 +184,97 @@ la regla económica.
 
 Las pruebas de navegador interceptan `acciones-financieras` y validan los tres
 contratos sin crear, modificar ni eliminar compensaciones reales.
+
+
+## Fase 3C · Beneficios y descuentos programados
+
+Las altas y cancelaciones manuales de beneficios dejan de escribir directamente
+en `beneficios-admin-beta`. Admin utiliza ahora:
+
+- `GOXION_FINANCIAL_ACTIONS.saveBenefit()`
+- `GOXION_FINANCIAL_ACTIONS.cancelBenefit()`
+- `GOXION_FINANCIAL_ACTIONS.deleteBenefit()`
+
+La Edge Function `acciones-financieras` valida la sesión y delega la operación
+estable al backend de beneficios. El motor existente
+`goxion_consumir_beneficios_on_pago` continúa consumiendo los beneficios al
+registrar el pago y finaliza automáticamente los descuentos al completar su
+duración.
+
+Los descuentos porcentuales se calculan sobre el subtotal efectivo después de
+promociones, evitando que una promoción y un beneficio dupliquen la misma base.
+
+## Fase 3D · Promociones
+
+Las escrituras del catálogo de promociones también pasan por
+`acciones-financieras`:
+
+- crear/editar promoción;
+- activar o pausar;
+- eliminar;
+- asignar una promoción a un servicio contratado;
+- retirar una asignación.
+
+Las promociones dejan de ser sólo información de catálogo y forman parte del
+cálculo oficial del periodo. `goxion_estado_cuenta` conserva el subtotal
+normal y añade `subtotal_efectivo`, descontando el ahorro promocional antes de
+calcular lealtad, mora y beneficios posteriores.
+
+Cuando un servicio nuevo se agrega mientras existe una promoción activa para
+esa plataforma, el backend crea automáticamente la asignación correspondiente.
+La tabla `promocion_aplicaciones` registra el consumo por periodo y el trigger
+de pagos avanza `periodos_consumidos` de forma idempotente; al completar la
+duración, la asignación se desactiva automáticamente.
+
+## Fase 3E · Pagos parciales y fecha pactada
+
+Se agregan dos conceptos financieros persistentes:
+
+### Pagos parciales
+
+`pagos_parciales` guarda monto abonado, saldo anterior y saldo restante por
+periodo. El flujo que antes sólo marcaba un comprobante como "incompleto" ahora
+registra un pago parcial real mediante
+`GOXION_FINANCIAL_ACTIONS.registerPartialPayment()`.
+
+Después de un parcial:
+
+- el periodo no avanza;
+- la racha no se incrementa hasta liquidar;
+- el saldo restante se convierte en la base del cobro;
+- si vence, la mora nueva se calcula sobre ese saldo;
+- si se registra otro parcial, se conserva historial y el nuevo saldo pasa a ser
+  la referencia activa;
+- al liquidar el periodo, los parciales activos se marcan como liquidados.
+
+### Fecha pactada
+
+`acuerdos_cobro` permite pactar una fecha sólo para el periodo actual mediante
+`GOXION_FINANCIAL_ACTIONS.pactPaymentDate()`.
+
+El acuerdo conserva `fecha_original`; no modifica `clientes.dia_pago`. La
+mora del periodo comienza después de la fecha pactada mientras el acuerdo está
+activo. El backend limita el acuerdo a un máximo de 31 días posteriores al
+corte original.
+
+Al pagar el periodo el acuerdo queda cumplido; también puede cancelarse y el
+cálculo vuelve inmediatamente al corte original.
+
+## Estado previo a auditoría final
+
+Con 3C, 3D y 3E terminadas, el motor financiero cubre lectura y escritura de:
+
+- mensualidad y periodos;
+- lealtad;
+- mora y reactivación;
+- Trato Justo;
+- beneficios y descuentos programados;
+- promociones por servicio y consumo por periodo;
+- pagos parciales y saldos;
+- fechas pactadas por periodo;
+- aprobación y liquidación de pagos.
+
+El siguiente paso es **Fase 3F · auditoría final**. En ella se revisarán
+escrituras legacy restantes, permisos/RLS, contratos, triggers, cálculos,
+paridad de las tres superficies y pruebas Chromium/WebKit antes de la revisión
+manual general.
