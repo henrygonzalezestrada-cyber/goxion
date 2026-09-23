@@ -183,3 +183,42 @@ la regla económica.
 
 Las pruebas de navegador interceptan `acciones-financieras` y validan los tres
 contratos sin crear, modificar ni eliminar compensaciones reales.
+
+
+## Fase 3D · Promociones
+
+Las escrituras de promociones pasan por `GOXION_FINANCIAL_ACTIONS`.
+
+- `savePromotion()`: crear/editar promoción.
+- `togglePromotion()`: activar o pausar.
+- `deletePromotion()`: eliminar o desactivar según dependencias.
+- `assignPromotion()`: asignar manualmente a un servicio de cliente.
+- `removePromotionAssignment()`: desactivar una asignación.
+
+El listado sigue siendo una lectura directa del endpoint de promociones, pero
+guardar/activar ya no puede escribir fuera del gateway financiero.
+
+Las promociones activas se asignan automáticamente al alta de un servicio
+mediante el trigger existente y se consumen por periodo cuando el pago queda
+pagado. El motor financiero usa esa asignación para calcular el ahorro real.
+
+## Fase 3E · Cobros especiales
+
+El núcleo incorpora dos operaciones:
+
+- `registerPartialPayment()`: registra el saldo restante del periodo.
+- `pactPaymentDate()` / `cancelPactPaymentDate()`: crea o cancela una fecha
+  pactada sin borrar la fecha de corte original.
+
+Cuando Admin marca un comprobante como incompleto e introduce un monto faltante,
+ese flujo registra ahora un pago parcial real. El motor conserva el saldo,
+calcula la mora sobre el saldo restante después del pago parcial y mantiene el
+estado `incompleto` hasta liquidación.
+
+La fecha pactada conserva `fecha_corte_original` y expone `fecha_pactada`.
+El estado de cuenta usa la fecha pactada como corte operativo mientras el
+acuerdo esté activo; cancelar el acuerdo devuelve el cálculo a la fecha
+original.
+
+Las dos acciones exigen el periodo esperado para impedir que una ficha
+desactualizada escriba sobre el siguiente ciclo.
