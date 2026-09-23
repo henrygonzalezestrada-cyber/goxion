@@ -39,8 +39,8 @@
     const validFinancial = Boolean(
       financial &&
       financial.fuente_financiera === 'supabase:goxion_estado_financiero' &&
-      financial.contrato_financiero?.version === '1.0' &&
-      financial.contrato_financiero?.modo === 'sombra' &&
+      ['1.0','1.1'].includes(String(financial.contrato_financiero?.version || '')) &&
+      ['sombra','oficial'].includes(String(financial.contrato_financiero?.modo || '')) &&
       money(financial.subtotal) &&
       money(financial.total_actual) &&
       /^\d{4}-\d{2}/.test(String(financial.periodo || '')) &&
@@ -111,8 +111,8 @@
   }
 
   window.GOXION_FINANCIAL = Object.freeze({
-    MODE: 'shadow',
-    CONTRACT_VERSION: '1.0',
+    MODE: 'official',
+    CONTRACT_VERSION: '1.1',
     clientState,
     adminState,
     adminCompare,
