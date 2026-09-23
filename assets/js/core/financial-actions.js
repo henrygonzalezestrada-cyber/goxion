@@ -142,12 +142,148 @@
     return normalizeActionPayload(payload);
   }
 
+  async function saveBenefit({
+    clienteId,
+    concepto = 'Descuento programado',
+    tipo = 'monto',
+    valor,
+    periodoInicio,
+    periodosTotal = 1,
+  } = {}) {
+    const cliente_id=String(clienteId||'').trim();
+    const period=String(periodoInicio||'').trim().slice(0,7);
+    const amount=Number(valor);
+    const duration=Math.trunc(Number(periodosTotal||1));
+    if(!cliente_id) throw new Error('Falta cliente.');
+    if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(period)) throw new Error('Periodo inválido.');
+    if(!(amount>0)) throw new Error('El descuento debe ser mayor a cero.');
+    if(duration<1||duration>36) throw new Error('Duración inválida.');
+
+    const payload=await invoke('beneficio_crear',{
+      cliente_id,
+      concepto:String(concepto||'Descuento programado').trim(),
+      tipo:tipo==='porcentaje'?'porcentaje':'monto',
+      valor:amount,
+      periodo_inicio:period+'-01',
+      periodos_total:duration,
+    });
+    return normalizeActionPayload(payload);
+  }
+
+  async function cancelBenefit({ id } = {}) {
+    const benefitId=String(id||'').trim();
+    if(!benefitId) throw new Error('Falta beneficio.');
+    return normalizeActionPayload(await invoke('beneficio_cancelar',{id:benefitId}));
+  }
+
+  async function deleteBenefit({ id } = {}) {
+    const benefitId=String(id||'').trim();
+    if(!benefitId) throw new Error('Falta beneficio.');
+    return normalizeActionPayload(await invoke('beneficio_eliminar',{id:benefitId}));
+  }
+
+  async function savePromotion(data = {}) {
+    return normalizeActionPayload(await invoke('promocion_guardar',data));
+  }
+
+  async function setPromotionState({ id, activa } = {}) {
+    const promoId=String(id||'').trim();
+    if(!promoId) throw new Error('Falta promoción.');
+    return normalizeActionPayload(await invoke('promocion_estado',{id:promoId,activa:activa===true}));
+  }
+
+  async function deletePromotion({ id } = {}) {
+    const promoId=String(id||'').trim();
+    if(!promoId) throw new Error('Falta promoción.');
+    return normalizeActionPayload(await invoke('promocion_eliminar',{id:promoId}));
+  }
+
+  async function assignPromotion({ clienteServicioId, promocionId, periodoInicio = '' } = {}) {
+    const cliente_servicio_id=String(clienteServicioId||'').trim();
+    const promocion_id=String(promocionId||'').trim();
+    if(!cliente_servicio_id||!promocion_id) throw new Error('Servicio o promoción inválida.');
+    const payload=await invoke('promocion_asignar',{
+      cliente_servicio_id,
+      promocion_id,
+      periodo_inicio:String(periodoInicio||'').trim(),
+    });
+    return normalizeActionPayload(payload);
+  }
+
+  async function removePromotionAssignment({ id } = {}) {
+    const assignmentId=String(id||'').trim();
+    if(!assignmentId) throw new Error('Falta asignación.');
+    return normalizeActionPayload(await invoke('promocion_quitar_asignacion',{id:assignmentId}));
+  }
+
+  async function registerPartialPayment({
+    clienteId,
+    saldoRestante,
+    periodoEsperado,
+    notas = 'Pago parcial registrado',
+  } = {}) {
+    const cliente_id=String(clienteId||'').trim();
+    const periodo_esperado=String(periodoEsperado||'').trim().slice(0,7);
+    const saldo_restante=Math.round(Number(saldoRestante||0)*100)/100;
+    if(!cliente_id) throw new Error('Falta cliente.');
+    if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_esperado)) throw new Error('Periodo inválido.');
+    if(!(saldo_restante>0)) throw new Error('El saldo restante debe ser mayor a cero.');
+    return normalizeActionPayload(await invoke('registrar_pago_parcial',{
+      cliente_id,
+      saldo_restante,
+      periodo_esperado,
+      notas:String(notas||'Pago parcial registrado'),
+    }));
+  }
+
+  async function pactPaymentDate({
+    clienteId,
+    fechaPactada,
+    periodoEsperado,
+    motivo = 'Acuerdo de pago',
+  } = {}) {
+    const cliente_id=String(clienteId||'').trim();
+    const periodo_esperado=String(periodoEsperado||'').trim().slice(0,7);
+    const fecha_pactada=String(fechaPactada||'').trim().slice(0,10);
+    if(!cliente_id) throw new Error('Falta cliente.');
+    if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_esperado)) throw new Error('Periodo inválido.');
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(fecha_pactada)) throw new Error('Fecha pactada inválida.');
+    return normalizeActionPayload(await invoke('pactar_fecha_pago',{
+      cliente_id,
+      fecha_pactada,
+      periodo_esperado,
+      motivo:String(motivo||'Acuerdo de pago'),
+    }));
+  }
+
+  async function cancelPactDate({ clienteId, periodoEsperado } = {}) {
+    const cliente_id=String(clienteId||'').trim();
+    const periodo_esperado=String(periodoEsperado||'').trim().slice(0,7);
+    if(!cliente_id) throw new Error('Falta cliente.');
+    if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_esperado)) throw new Error('Periodo inválido.');
+    return normalizeActionPayload(await invoke('cancelar_fecha_pactada',{
+      cliente_id,
+      periodo_esperado,
+    }));
+  }
+
 
   window.GOXION_FINANCIAL_ACTIONS = Object.freeze({
-    CONTRACT_VERSION: '1.1',
+    CONTRACT_VERSION: '1.2',
     approvePayment,
     saveFairDeal,
     deleteFairDeal,
     applyFairDealBulk,
+    saveBenefit,
+    cancelBenefit,
+    deleteBenefit,
+    savePromotion,
+    setPromotionState,
+    deletePromotion,
+    assignPromotion,
+    removePromotionAssignment,
+    registerPartialPayment,
+    pactPaymentDate,
+    cancelPactDate,
   });
 })();
