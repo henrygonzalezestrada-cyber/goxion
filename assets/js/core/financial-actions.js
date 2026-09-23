@@ -143,11 +143,114 @@
   }
 
 
+  async function savePromotion(data = {}) {
+    const payload = await invoke('promocion_guardar', { ...data });
+    return normalizeActionPayload(payload);
+  }
+
+  async function togglePromotion({ id, activa } = {}) {
+    const promotionId = String(id || '').trim();
+    if (!promotionId) throw new Error('Falta promoción.');
+    const payload = await invoke('promocion_estado', { id: promotionId, activa: activa === true });
+    return normalizeActionPayload(payload);
+  }
+
+  async function deletePromotion({ id } = {}) {
+    const promotionId = String(id || '').trim();
+    if (!promotionId) throw new Error('Falta promoción.');
+    const payload = await invoke('promocion_eliminar', { id: promotionId });
+    return normalizeActionPayload(payload);
+  }
+
+  async function assignPromotion({
+    clienteServicioId,
+    promocionId,
+    periodoInicio = '',
+  } = {}) {
+    const cliente_servicio_id = String(clienteServicioId || '').trim();
+    const promocion_id = String(promocionId || '').trim();
+    if (!cliente_servicio_id || !promocion_id) throw new Error('Servicio o promoción inválida.');
+    const payload = await invoke('promocion_asignar', {
+      cliente_servicio_id,
+      promocion_id,
+      periodo_inicio: String(periodoInicio || '').trim(),
+    });
+    return normalizeActionPayload(payload);
+  }
+
+  async function removePromotionAssignment({ id } = {}) {
+    const assignmentId = String(id || '').trim();
+    if (!assignmentId) throw new Error('Falta asignación.');
+    const payload = await invoke('promocion_quitar_asignacion', { id: assignmentId });
+    return normalizeActionPayload(payload);
+  }
+
+  async function registerPartialPayment({
+    clienteId,
+    saldoRestante,
+    notas = 'Pago parcial registrado',
+    periodoEsperado,
+  } = {}) {
+    const cliente_id = String(clienteId || '').trim();
+    const saldo_restante = Number(saldoRestante);
+    const periodo_esperado = String(periodoEsperado || '').trim().slice(0, 7);
+    if (!cliente_id || !(saldo_restante > 0)) throw new Error('Cliente o saldo restante inválido.');
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_esperado)) throw new Error('Periodo inválido.');
+    const payload = await invoke('registrar_pago_parcial', {
+      cliente_id,
+      saldo_restante,
+      notas: String(notas || 'Pago parcial registrado'),
+      periodo_esperado,
+    });
+    return normalizeActionPayload(payload);
+  }
+
+  async function pactPaymentDate({
+    clienteId,
+    fechaPactada,
+    motivo = 'Acuerdo de pago',
+    periodoEsperado,
+  } = {}) {
+    const cliente_id = String(clienteId || '').trim();
+    const fecha_pactada = String(fechaPactada || '').trim().slice(0, 10);
+    const periodo_esperado = String(periodoEsperado || '').trim().slice(0, 7);
+    if (!cliente_id || !/^\d{4}-\d{2}-\d{2}$/.test(fecha_pactada)) throw new Error('Cliente o fecha pactada inválida.');
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_esperado)) throw new Error('Periodo inválido.');
+    const payload = await invoke('pactar_fecha_pago', {
+      cliente_id,
+      fecha_pactada,
+      motivo: String(motivo || 'Acuerdo de pago'),
+      periodo_esperado,
+    });
+    return normalizeActionPayload(payload);
+  }
+
+  async function cancelPactPaymentDate({
+    clienteId,
+    periodoEsperado,
+  } = {}) {
+    const cliente_id = String(clienteId || '').trim();
+    const periodo_esperado = String(periodoEsperado || '').trim().slice(0, 7);
+    if (!cliente_id) throw new Error('Falta cliente.');
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_esperado)) throw new Error('Periodo inválido.');
+    const payload = await invoke('cancelar_fecha_pactada', { cliente_id, periodo_esperado });
+    return normalizeActionPayload(payload);
+  }
+
+
   window.GOXION_FINANCIAL_ACTIONS = Object.freeze({
-    CONTRACT_VERSION: '1.1',
+    CONTRACT_VERSION: '1.2',
     approvePayment,
     saveFairDeal,
     deleteFairDeal,
     applyFairDealBulk,
+    savePromotion,
+    togglePromotion,
+    deletePromotion,
+    assignPromotion,
+    removePromotionAssignment,
+    registerPartialPayment,
+    pactPaymentDate,
+    cancelPactPaymentDate,
   });
 })();
