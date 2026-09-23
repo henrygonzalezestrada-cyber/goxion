@@ -143,6 +143,46 @@
   }
 
 
+  async function saveBenefit({
+    clienteId,
+    concepto = 'Descuento programado',
+    tipo = 'monto',
+    valor,
+    periodoInicio,
+    periodosTotal = 1,
+  } = {}) {
+    const cliente_id = String(clienteId || '').trim();
+    const value = Number(valor);
+    const periodo_inicio = String(periodoInicio || '').trim().slice(0, 7);
+    const periodos_total = Math.trunc(Number(periodosTotal || 1));
+    if (!cliente_id || !(value > 0)) throw new Error('Cliente o valor inválido.');
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_inicio)) throw new Error('Periodo inválido.');
+    const payload = await invoke('beneficio_crear', {
+      cliente_id,
+      concepto: String(concepto || 'Descuento programado'),
+      tipo: tipo === 'porcentaje' ? 'porcentaje' : 'monto',
+      valor: value,
+      periodo_inicio: periodo_inicio + '-01',
+      periodos_total,
+    });
+    return normalizeActionPayload(payload);
+  }
+
+  async function cancelBenefit({ id } = {}) {
+    const benefitId = String(id || '').trim();
+    if (!benefitId) throw new Error('Falta beneficio.');
+    const payload = await invoke('beneficio_cancelar', { id: benefitId });
+    return normalizeActionPayload(payload);
+  }
+
+  async function deleteBenefit({ id } = {}) {
+    const benefitId = String(id || '').trim();
+    if (!benefitId) throw new Error('Falta beneficio.');
+    const payload = await invoke('beneficio_eliminar', { id: benefitId });
+    return normalizeActionPayload(payload);
+  }
+
+
   async function savePromotion(data = {}) {
     const payload = await invoke('promocion_guardar', { ...data });
     return normalizeActionPayload(payload);
@@ -244,6 +284,9 @@
     saveFairDeal,
     deleteFairDeal,
     applyFairDealBulk,
+    saveBenefit,
+    cancelBenefit,
+    deleteBenefit,
     savePromotion,
     togglePromotion,
     deletePromotion,
