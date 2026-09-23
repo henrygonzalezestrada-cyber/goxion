@@ -275,3 +275,25 @@ operación y mantenimiento: proteger la rama `main`, añadir rate limiting al
 login administrativo, revisar grants redundantes de Data API y depurar índices
 duplicados o sin uso. Ninguna de estas tareas cambia el cálculo financiero ni
 bloquea la regresión manual posterior.
+
+
+## Cierre posterior a prueba manual · Referidos inteligentes
+
+Durante la regresión manual se corrigió la reactivación de referidos inactivos y
+se conectó el premio de 3/3 meses al motor financiero.
+
+Al reclamar un mes gratis por referido:
+
+- se crea un beneficio de origen `referidos`, 100%, `una_vez_elegible`;
+- se reserva para el periodo pendiente o para el siguiente si el actual ya fue
+  pagado o está en revisión;
+- tiene prioridad financiera sobre cupones menores para evitar consumir un cupón
+  de Misiones dentro de un mes que ya será 100% gratis;
+- el beneficio queda ligado al reclamo concreto del referido, por lo que la
+  operación es idempotente y un mismo reclamo no puede duplicarse;
+- al pagarse el periodo beneficiado, el motor lo consume automáticamente igual
+  que los demás beneficios programados.
+
+La prueba con el cliente de regresión confirmó total financiero 0 en el periodo
+beneficiado y conservación del cupón de Misiones pendiente para un periodo
+posterior.
