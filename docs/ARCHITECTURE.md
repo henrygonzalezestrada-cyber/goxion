@@ -177,10 +177,10 @@ La configuración Supabase de estos módulos proviene de `GOXION_CORE`.
 2. No modificar glass/DOM/CSS salvo que el cambio visual sea intencional.
 3. Si un script debe cambiar internamente, registrarlo en
    `modernization-manifest.json`.
-4. Ejecutar/verificar `npm run verify:modern`.
-5. Pasar smoke real en Chromium y WebKit, incluyendo el morph de Mi Espacio.
-6. Probar en Railway.
-7. Sólo después de validación visual/funcional, considerar producción.
+4. Ejecutar `npm run verify`.
+5. Pasar smoke real en Chromium y WebKit.
+6. Usar Railway sólo cuando el tipo de cambio necesite un preview de servidor.
+7. Integrar mediante Pull Request y volver a validar sobre `main`.
 
 ## Producción
 
@@ -193,10 +193,12 @@ migración. Esta rama no debe fusionarse automáticamente.
 La capa común de cobro se expone mediante la Edge Function `estado-financiero`
 y se consume desde `assets/js/core/financial-engine.js`.
 
-La Fase 1 opera en modo sombra: conserva el total oficial existente y agrega un
-contrato común para subtotal, lealtad, Trato Justo, beneficios programados,
-promociones, mora y reactivación. Ver `docs/FINANCIAL_ENGINE.md`.
+El motor financiero opera actualmente en modo oficial. Index, Ayuda y Admin
+consumen el mismo contrato para subtotal, lealtad, Trato Justo, beneficios,
+promociones, pagos parciales, acuerdos de fecha, mora y reactivación.
 
-El objetivo es que Index, Ayuda y Admin dejen de recalcular reglas financieras
-por separado. La sustitución de lecturas se hará gradualmente; las escrituras
-se mantienen intactas hasta validar paridad.
+Las escrituras financieras principales entran por
+`assets/js/core/financial-actions.js` y la Edge Function
+`acciones-financieras`. Los backends especializados existentes se conservan
+como implementaciones internas cuando siguen aportando lógica estable. Ver
+`docs/FINANCIAL_ENGINE.md`.
