@@ -391,6 +391,35 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         actualizadas:0,
         no_elegibles:[],
         total_compensacion:10
+      },
+      promocion_guardar: {
+        ok:true,
+        promocion:{id:'promo-smoke',precio_promocional:50}
+      },
+      promocion_estado: {
+        ok:true,
+        promocion:{id:'promo-smoke',activa:false}
+      },
+      promocion_eliminar: {
+        ok:true,
+        eliminada:true
+      },
+      promocion_asignar: {
+        asignacion:{id:'assign-smoke',precio_promocional:50}
+      },
+      promocion_quitar_asignacion: {
+        desactivada:true
+      },
+      registrar_pago_parcial: {
+        pago_parcial:{id:'partial-smoke',saldo_restante:40},
+        monto_pagado:60,
+        saldo_restante:40
+      },
+      pactar_fecha_pago: {
+        acuerdo:{id:'agreement-smoke',fecha_original:'2026-09-15',fecha_pactada:'2026-09-20'}
+      },
+      cancelar_fecha_pactada: {
+        cancelado:true
       }
     };
 
@@ -427,7 +456,13 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL_ACTIONS?.approvePayment === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.saveFairDeal === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.deleteFairDeal === 'function' &&
-    typeof window.GOXION_FINANCIAL_ACTIONS?.applyFairDealBulk === 'function'
+    typeof window.GOXION_FINANCIAL_ACTIONS?.applyFairDealBulk === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.savePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.togglePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.assignPromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.pactPaymentDate === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.cancelPactPaymentDate === 'function'
   ).catch(() => false);
   if (!actionsReady) errors.push(`${label}: acciones financieras compartidas no disponibles.`);
 
@@ -512,6 +547,71 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       ) {
         errors.push(`${label}: contrato HTTP de Trato Justo masivo incorrecto.`);
       }
+    }
+
+    const phase3de = await page.evaluate(async () => ({
+      promoSave: await window.GOXION_FINANCIAL_ACTIONS.savePromotion({
+        servicio_id:'catalog-smoke',
+        nombre:'Promo smoke',
+        precio_promocional:50,
+        duracion_periodos:2,
+        inicio:'2026-09-01T00:00',
+        fin:'2026-10-31T23:59',
+        activa:true
+      }),
+      promoState: await window.GOXION_FINANCIAL_ACTIONS.togglePromotion({id:'promo-smoke',activa:false}),
+      promoAssign: await window.GOXION_FINANCIAL_ACTIONS.assignPromotion({
+        clienteServicioId:'service-smoke',
+        promocionId:'promo-smoke',
+        periodoInicio:'2026-09'
+      }),
+      promoUnassign: await window.GOXION_FINANCIAL_ACTIONS.removePromotionAssignment({id:'assign-smoke'}),
+      partial: await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
+        clienteId:'client-smoke',
+        saldoRestante:40,
+        notas:'Pago parcial smoke',
+        periodoEsperado:'2026-09'
+      }),
+      pact: await window.GOXION_FINANCIAL_ACTIONS.pactPaymentDate({
+        clienteId:'client-smoke',
+        fechaPactada:'2026-09-20',
+        motivo:'Acuerdo smoke',
+        periodoEsperado:'2026-09'
+      }),
+      cancelPact: await window.GOXION_FINANCIAL_ACTIONS.cancelPactPaymentDate({
+        clienteId:'client-smoke',
+        periodoEsperado:'2026-09'
+      })
+    })).catch(error => ({ error: error?.message || String(error) }));
+
+    if (phase3de?.error) {
+      errors.push(`${label}: contratos 3D/3E fallaron: ${phase3de.error}`);
+    } else {
+      if (phase3de.promoSave?.promocion?.id !== 'promo-smoke') {
+        errors.push(`${label}: promoción no normalizó la respuesta.`);
+      }
+      if (phase3de.partial?.saldo_restante !== 40 || phase3de.partial?.monto_pagado !== 60) {
+        errors.push(`${label}: pago parcial no normalizó la respuesta.`);
+      }
+      if (phase3de.pact?.acuerdo?.fecha_pactada !== '2026-09-20' || phase3de.cancelPact?.cancelado !== true) {
+        errors.push(`${label}: fecha pactada no normalizó la respuesta.`);
+      }
+
+      const actionMap = Object.fromEntries(financialActionRequests.map(x => [x.body?.accion, x]));
+      if (
+        actionMap.promocion_guardar?.body?.datos?.servicio_id !== 'catalog-smoke' ||
+        actionMap.promocion_asignar?.body?.datos?.cliente_servicio_id !== 'service-smoke'
+      ) errors.push(`${label}: contrato HTTP de promociones incorrecto.`);
+
+      if (
+        actionMap.registrar_pago_parcial?.body?.datos?.saldo_restante !== 40 ||
+        actionMap.registrar_pago_parcial?.body?.datos?.periodo_esperado !== '2026-09'
+      ) errors.push(`${label}: contrato HTTP de pago parcial incorrecto.`);
+
+      if (
+        actionMap.pactar_fecha_pago?.body?.datos?.fecha_pactada !== '2026-09-20' ||
+        actionMap.cancelar_fecha_pactada?.body?.datos?.periodo_esperado !== '2026-09'
+      ) errors.push(`${label}: contrato HTTP de fecha pactada incorrecto.`);
     }
   }
 
@@ -708,3 +808,4 @@ console.log('✓ Admin recorre navegación, catálogo, ajustes, filtros, registr
 console.log('✓ Admin pasa smoke en desktop y mobile');
 console.log('✓ Admin prueba contrato de aprobación financiera sin persistir');
 console.log('✓ Admin prueba Trato Justo individual/masivo sin persistir');
+console.log('✓ Admin prueba promociones y cobros especiales sin persistir');
