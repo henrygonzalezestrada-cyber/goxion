@@ -455,7 +455,7 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         accion:action,
         operation_id:'smoke-' + action,
         contrato:'goxion-financial-actions-v1',
-        version:'1.1',
+        version:'1.2',
         resultado:resultByAction[action] || {ok:true},
         estado_anterior:{periodo:'2026-09-01',total_actual:100},
         estado_financiero:{periodo:'2026-09-01',total_actual:95}

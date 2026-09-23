@@ -2,12 +2,15 @@
 
 ## Estado actual
 
-El motor financiero opera con **contrato v1.1 en modo oficial**.
+El motor financiero de lectura opera con **contrato v1.1 en modo oficial** y
+el gateway compartido de escrituras `acciones-financieras` opera con
+**contrato v1.2**.
 
 La etapa de sombra ya cumplió su función: Index, Ayuda y Admin conservaron
 paridad durante la migración y el motor central es ahora la fuente financiera
-oficial. El fallback legacy permanece como protección de compatibilidad mientras
-se realiza la auditoría final.
+oficial. La auditoría 3F confirmó paridad real en producción. El fallback legacy
+se conserva deliberadamente como protección de continuidad durante la regresión
+manual posterior; no es la fuente financiera principal.
 
 ## Fuente única
 
@@ -238,18 +241,59 @@ automáticamente las reglas al completar su duración. La interfaz no cambia;
 sólo cambia la puerta de escritura.
 
 
-## Estado previo a auditoría final
+## Fase 3F · Auditoría final cerrada
 
-Las lecturas financieras de Index, Ayuda y Admin comparten el motor central.
-Las escrituras migradas al gateway `acciones-financieras` son:
+La auditoría final se ejecutó sobre el estado productivo posterior a 3C/3D/3E.
 
-- aprobación de pagos;
-- Trato Justo individual y masivo;
-- beneficios/descuentos programados;
-- promociones de catálogo y asignaciones;
-- pagos parciales;
-- fecha pactada de pago.
+- Los 23 clientes activos en la base comparada presentan paridad en los campos
+  protegidos por el selector entre `goxion_estado_cuenta_beneficios` y
+  `goxion_estado_financiero`.
+- Los 23 contratos financieros devueltos son válidos para v1.1 oficial.
+- No se detectaron estados financieros nulos ni totales negativos.
+- Las escrituras que afectan el cálculo financiero central pasan por
+  `GOXION_FINANCIAL_ACTIONS` / `acciones-financieras`: aprobación de pagos,
+  Trato Justo, beneficios/descuentos programados, promociones y asignaciones,
+  pagos parciales y fecha pactada.
+- Los accesos directos restantes a endpoints legacy en Admin corresponden a
+  lecturas/listados de compatibilidad; el estado `pago_incompleto` sin saldo
+  positivo conserva su ruta de notificación/estado y no registra un pago
+  parcial financiero.
+- Las funciones PostgreSQL financieras privilegiadas no exponen `EXECUTE` a
+  `public`, `anon` ni `authenticated`.
+- Las tablas de `public` mantienen RLS habilitado. La arquitectura productiva
+  accede a datos sensibles mediante Edge Functions autenticadas.
+- Integrity y el smoke de Chromium/WebKit quedaron en verde para el cierre.
 
-El siguiente paso es la auditoría final: localizar escrituras financieras
-legacy restantes, validar contratos y datos reales, revisar seguridad/advisors y
-ejecutar smoke completo antes de declarar cerrado el núcleo financiero.
+El fallback legacy se mantiene intencionalmente durante la prueba manual general
+de Admin, Ayuda e Index. Sólo entra ante indisponibilidad o divergencia y puede
+retirarse en una etapa posterior, cuando ya no aporte protección operacional.
+
+### Hardening posterior no bloqueante
+
+Quedan fuera del cierre funcional del núcleo financiero algunas mejoras de
+operación y mantenimiento: proteger la rama `main`, añadir rate limiting al
+login administrativo, revisar grants redundantes de Data API y depurar índices
+duplicados o sin uso. Ninguna de estas tareas cambia el cálculo financiero ni
+bloquea la regresión manual posterior.
+
+
+## Cierre posterior a prueba manual · Referidos inteligentes
+
+Durante la regresión manual se corrigió la reactivación de referidos inactivos y
+se conectó el premio de 3/3 meses al motor financiero.
+
+Al reclamar un mes gratis por referido:
+
+- se crea un beneficio de origen `referidos`, 100%, `una_vez_elegible`;
+- se reserva para el periodo pendiente o para el siguiente si el actual ya fue
+  pagado o está en revisión;
+- tiene prioridad financiera sobre cupones menores para evitar consumir un cupón
+  de Misiones dentro de un mes que ya será 100% gratis;
+- el beneficio queda ligado al reclamo concreto del referido, por lo que la
+  operación es idempotente y un mismo reclamo no puede duplicarse;
+- al pagarse el periodo beneficiado, el motor lo consume automáticamente igual
+  que los demás beneficios programados.
+
+La prueba con el cliente de regresión confirmó total financiero 0 en el periodo
+beneficiado y conservación del cupón de Misiones pendiente para un periodo
+posterior.
