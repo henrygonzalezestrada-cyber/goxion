@@ -94,6 +94,9 @@ declare global {
       mora?: { porcentaje_diario?: number; tope_porcentaje?: number };
       reactivacion?: { despues_de_dias?: number; porcentaje?: number };
       trato_justo?: { porcentaje_diario?: number; tope_dias?: number };
+      promociones?: { aplicacion?: string; consumo?: string };
+      pagos_parciales?: { mora_sobre_saldo?: boolean; reinicia_base_mora_en_parcial?: boolean };
+      acuerdos_cobro?: { solo_periodo_actual?: boolean; preserva_dia_original?: boolean };
     };
   }
 
@@ -114,6 +117,15 @@ declare global {
     periodo_label?: string;
     dia_pago?: number;
     fecha_corte?: string;
+    fecha_corte_original?: string;
+    fecha_pactada?: string | null;
+    acuerdo_cobro?: {
+      id?: GoxionId;
+      fecha_original?: string;
+      fecha_pactada?: string;
+      motivo?: string;
+      activo?: boolean;
+    } | null;
     dias_para_corte?: number;
     dias_atraso?: number;
     estado?: string;
@@ -122,8 +134,21 @@ declare global {
     pago_en_revision?: boolean;
     pago_incompleto?: boolean;
     monto_faltante_revision?: number;
+    pago_parcial?: {
+      id?: GoxionId;
+      fecha_pago?: string;
+      monto_pagado?: number;
+      saldo_restante?: number;
+      activo?: boolean;
+    } | null;
     esta_pagado_periodo?: boolean;
     subtotal?: number;
+    subtotal_efectivo?: number;
+    promociones?: {
+      total_ahorro?: number;
+      detalles?: GoxionFinancialPromotionLine[];
+      [key: string]: unknown;
+    };
     total_calculado?: number;
     total_actual?: number;
     total_label?: string;
@@ -140,6 +165,9 @@ declare global {
     };
     cargos?: {
       mora?: number;
+      mora_porcentaje?: number;
+      mora_base?: number;
+      mora_dias?: number;
       reactivacion?: number;
       [key: string]: unknown;
     };
