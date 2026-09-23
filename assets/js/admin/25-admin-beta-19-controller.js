@@ -33,9 +33,9 @@
     if(mode==='promotions')gxPromoLoad();
   };
 
-  async function promoApi(accion,datos={}){
+  async function promoRead(){
     const token=localStorage.getItem(GXCORE.STORAGE.ADMIN_TOKEN)||'';
-    const r=await fetch(PROMO_URL,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({accion,datos})});
+    const r=await fetch(PROMO_URL,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({accion:'listar',datos:{}})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||j?.ok!==true)throw new Error(j?.error||`HTTP ${r.status}`);
     return j;
@@ -48,7 +48,7 @@
   window.gxPromoLoad=async function(){
     const list=document.getElementById('gx-promo-list');if(!list)return;
     list.innerHTML='<div class="gx-empty-inline">Cargando promociones…</div>';
-    try{const r=await promoApi('listar');promoState={servicios:r.servicios||[],promociones:r.promociones||[]};gxPromoPopulateServices();gxPromoRender();}
+    try{const r=await promoRead();promoState={servicios:r.servicios||[],promociones:r.promociones||[]};gxPromoPopulateServices();gxPromoRender();}
     catch(e){console.error(e);list.innerHTML=`<div class="gx-empty-inline">No se pudieron cargar promociones: ${esc(e?.message||e)}</div>`;}
   };
   function gxPromoPopulateServices(){const sel=document.getElementById('gx-promo-service');if(!sel)return;sel.innerHTML=promoState.servicios.map(s=>`<option value="${esc(s.id)}">${esc(s.nombre)} · $${money(s.precio)}</option>`).join('');}
