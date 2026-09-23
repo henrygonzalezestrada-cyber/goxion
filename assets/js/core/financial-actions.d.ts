@@ -22,6 +22,41 @@ declare global {
         diasFalla?: number;
         motivo?: string;
       }): Promise<Record<string, unknown>>;
+      saveBenefit(input: {
+        clienteId: string;
+        concepto?: string;
+        tipo?: 'monto' | 'porcentaje' | string;
+        valor: number;
+        periodoInicio: string;
+        periodosTotal?: number;
+      }): Promise<Record<string, unknown>>;
+      cancelBenefit(input: { id: string }): Promise<Record<string, unknown>>;
+      deleteBenefit(input: { id: string }): Promise<Record<string, unknown>>;
+      savePromotion(input: Record<string, unknown>): Promise<Record<string, unknown>>;
+      setPromotionState(input: { id: string; activa: boolean }): Promise<Record<string, unknown>>;
+      deletePromotion(input: { id: string }): Promise<Record<string, unknown>>;
+      assignPromotion(input: {
+        clienteServicioId: string;
+        promocionId: string;
+        periodoInicio?: string;
+      }): Promise<Record<string, unknown>>;
+      removePromotionAssignment(input: { id: string }): Promise<Record<string, unknown>>;
+      registerPartialPayment(input: {
+        clienteId: string;
+        saldoRestante: number;
+        periodoEsperado: string;
+        notas?: string;
+      }): Promise<Record<string, unknown>>;
+      pactPaymentDate(input: {
+        clienteId: string;
+        fechaPactada: string;
+        periodoEsperado: string;
+        motivo?: string;
+      }): Promise<Record<string, unknown>>;
+      cancelPactDate(input: {
+        clienteId: string;
+        periodoEsperado: string;
+      }): Promise<Record<string, unknown>>;
       approvePayment(input: {
         clienteId: string;
         monto: number;
