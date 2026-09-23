@@ -179,7 +179,7 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
-// Financial engine phase 1: all production surfaces load the same shadow contract.
+// Financial engine: all production surfaces load the same official contract.
 {
   const runtimePath = join(ROOT, 'assets', 'js', 'core', 'runtime.js');
   const financialPath = join(ROOT, 'assets', 'js', 'core', 'financial-engine.js');
@@ -194,6 +194,10 @@ for (const absolute of walk(jsRoot)) {
   }
   if (!existsSync(financialTypesPath)) {
     fail('Motor financiero: falta contrato financial-engine.d.ts.');
+  }
+  const financialSource = existsSync(financialPath) ? readFileSync(financialPath, 'utf8') : '';
+  if (!financialSource.includes("MODE: 'official'") || !financialSource.includes("CONTRACT_VERSION: '1.1'")) {
+    fail('Motor financiero: frontend no está alineado al contrato financiero oficial v1.1.');
   }
 
   for (const page of PAGES) {
@@ -444,7 +448,7 @@ console.log('✓ CSS/JS externalizados');
 console.log('✓ runtime central preservado');
 console.log('✓ sintaxis JavaScript válida');
 console.log('✓ invariantes Safari y lealtad preservados');
-console.log('✓ contrato financiero sombra cargado en las tres superficies');
+console.log('✓ contrato financiero oficial v1.1 cargado en las tres superficies');
 console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
 console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
