@@ -356,6 +356,52 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Phase 3D/3E: Promotions and special collection actions must use the financial gateway.
+{
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const promoPath = join(ROOT, 'assets', 'js', 'admin', '25-admin-beta-19-controller.js');
+  const opsPath = join(ROOT, 'assets', 'js', 'admin', '07-admin-ops-v2.js');
+  const guardsPath = join(ROOT, 'assets', 'js', 'admin', '08-admin-payment-referral-guards.js');
+
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const promo = existsSync(promoPath) ? readFileSync(promoPath, 'utf8') : '';
+  const ops = existsSync(opsPath) ? readFileSync(opsPath, 'utf8') : '';
+  const guards = existsSync(guardsPath) ? readFileSync(guardsPath, 'utf8') : '';
+
+  for (const required of [
+    "invoke('promocion_guardar'",
+    "invoke('promocion_estado'",
+    "invoke('promocion_eliminar'",
+    "invoke('promocion_asignar'",
+    "invoke('promocion_quitar_asignacion'",
+    "invoke('registrar_pago_parcial'",
+    "invoke('pactar_fecha_pago'",
+    "invoke('cancelar_fecha_pactada'",
+    'savePromotion',
+    'togglePromotion',
+    'assignPromotion',
+    'registerPartialPayment',
+    'pactPaymentDate',
+    'cancelPactPaymentDate',
+  ]) {
+    if (!actions.includes(required)) fail('Acciones financieras 3D/3E: falta ' + required + '.');
+  }
+
+  if (!promo.includes('GOXION_FINANCIAL_ACTIONS.savePromotion') || !promo.includes('GOXION_FINANCIAL_ACTIONS.togglePromotion')) {
+    fail('Promociones: guardar/activar no pasan por acciones financieras.');
+  }
+  if (promo.includes("promoApi('guardar'") || promo.includes("promoApi('cambiar_estado'")) {
+    fail('Promociones: persiste una escritura directa al endpoint legacy.');
+  }
+
+  for (const [label, source] of [['ops', ops], ['guards', guards]]) {
+    if (!source.includes('GOXION_FINANCIAL_ACTIONS.registerPartialPayment')) {
+      fail('Pagos parciales ' + label + ': falta integración con acciones financieras.');
+    }
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -374,3 +420,4 @@ console.log('✓ Index usa motor financiero con fallback y auditoría de paridad
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
 console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
 console.log('✓ Trato Justo individual y masivo usan una sola puerta financiera');
+console.log('✓ promociones y cobros especiales usan el núcleo financiero');
