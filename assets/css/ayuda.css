@@ -10290,7 +10290,7 @@ body.gx-motion-buttons-v1 .gx-account-capsule{
 body.gx-motion-buttons-v1 .gx-account-capsule::before{
     content:'';
     position:absolute;
-    z-index:-1;
+    z-index:0;
     inset:-35% -20%;
     pointer-events:none;
     opacity:0;
@@ -10299,6 +10299,11 @@ body.gx-motion-buttons-v1 .gx-account-capsule::before{
         linear-gradient(105deg, transparent 30%, rgba(255,255,255,.13) 49%, transparent 68%);
     transform:translateX(-38%);
     transition:transform .5s cubic-bezier(.2,.8,.2,1),opacity .22s ease;
+}
+
+body.gx-motion-buttons-v1 .gx-account-capsule > *{
+    position:relative;
+    z-index:1;
 }
 
 body.gx-motion-buttons-v1 .gx-account-capsule:active::before{
