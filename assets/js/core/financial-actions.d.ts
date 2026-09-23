@@ -22,6 +22,16 @@ declare global {
         diasFalla?: number;
         motivo?: string;
       }): Promise<Record<string, unknown>>;
+      saveBenefit(input: {
+        clienteId: string;
+        concepto?: string;
+        tipo?: 'monto' | 'porcentaje' | string;
+        valor: number;
+        periodoInicio: string;
+        periodosTotal?: number;
+      }): Promise<Record<string, unknown>>;
+      cancelBenefit(input: { id: string }): Promise<Record<string, unknown>>;
+      deleteBenefit(input: { id: string }): Promise<Record<string, unknown>>;
       savePromotion(input: Record<string, unknown>): Promise<Record<string, unknown>>;
       togglePromotion(input: { id: string; activa: boolean }): Promise<Record<string, unknown>>;
       deletePromotion(input: { id: string }): Promise<Record<string, unknown>>;
