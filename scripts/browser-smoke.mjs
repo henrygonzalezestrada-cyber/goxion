@@ -810,21 +810,41 @@ const browsers = [
   ['WebKit', webkit],
 ];
 
+async function runBrowserStage(browserType, browserName, stageName, runner, errors) {
+  const attempts = browserName === 'WebKit' ? 2 : 1;
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    let browser;
+    try {
+      browser = await browserType.launch({ headless: true });
+      await runner(browser, browserName, errors);
+      return;
+    } catch (error) {
+      lastError = error;
+      const message = String(error?.stack || error?.message || error);
+      const closedUnexpectedly =
+        message.includes('Target page, context or browser has been closed') ||
+        message.includes('Browser has been closed');
+
+      if (!(browserName === 'WebKit' && closedUnexpectedly && attempt < attempts)) {
+        break;
+      }
+    } finally {
+      await browser?.close().catch(() => {});
+    }
+  }
+
+  errors.push(`${browserName} · ${stageName}: no pudo completar el smoke: ${lastError?.stack || lastError?.message || lastError}`);
+}
+
 try {
   await waitForServer();
 
   for (const [browserName, browserType] of browsers) {
-    let browser;
-    try {
-      browser = await browserType.launch({ headless: true });
-      await runIndex(browser, browserName, errors);
-      await runAyuda(browser, browserName, errors);
-      await runAdmin(browser, browserName, errors);
-    } catch (error) {
-      errors.push(`${browserName}: no pudo completar el smoke: ${error.stack || error.message}`);
-    } finally {
-      await browser?.close().catch(() => {});
-    }
+    await runBrowserStage(browserType, browserName, 'Index', runIndex, errors);
+    await runBrowserStage(browserType, browserName, 'Ayuda', runAyuda, errors);
+    await runBrowserStage(browserType, browserName, 'Admin', runAdmin, errors);
   }
 } finally {
   server.kill('SIGTERM');
