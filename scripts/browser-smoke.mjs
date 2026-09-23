@@ -68,7 +68,7 @@ async function runIndex(browser, browserName, errors) {
     const financial = {
       cliente_id:'c1',
       fuente_financiera:'supabase:goxion_estado_financiero',
-      contrato_financiero:{version:'1.0',modo:'sombra'},
+      contrato_financiero:{version:'1.1',modo:'oficial'},
       periodo:'2026-09-01',
       estado:'pendiente',
       subtotal:200,
@@ -119,7 +119,7 @@ async function runAyuda(browser, browserName, errors) {
 
   const financeReady = await page.evaluate(() =>
     typeof window.GOXION_FINANCIAL === 'object' &&
-    window.GOXION_FINANCIAL?.MODE === 'shadow' &&
+    window.GOXION_FINANCIAL?.MODE === 'official' &&
     typeof window.GOXION_FINANCIAL?.clientState === 'function' &&
     typeof window.GOXION_FINANCIAL?.selectCompatibleState === 'function'
   ).catch(() => false);
@@ -140,7 +140,7 @@ async function runAyuda(browser, browserName, errors) {
     const financial = {
       ...legacy,
       fuente_financiera:'supabase:goxion_estado_financiero',
-      contrato_financiero:{version:'1.0',modo:'sombra'}
+      contrato_financiero:{version:'1.1',modo:'oficial'}
     };
     return {
       ok: window.GOXION_FINANCIAL.selectCompatibleState(legacy,financial,'c1'),
@@ -313,10 +313,22 @@ async function runAyuda(browser, browserName, errors) {
       stopPropagation(){}
     });
   });
-  await page.waitForTimeout(150);
+  // WebKit puede tardar más en comenzar el primer frame geométrico del morph.
+  // Esperamos una señal de crecimiento real en vez de asumir que ocurrirá
+  // exactamente a los 150 ms del runner.
+  if (supportBefore) {
+    await page.waitForFunction(
+      ({ beforeWidth }) => {
+        const el = document.querySelector('#support-platforms-grid .platform-btn');
+        return el && el.getBoundingClientRect().width > beforeWidth + 20;
+      },
+      { beforeWidth: supportBefore.width },
+      { timeout: 1200 }
+    ).catch(() => {});
+  }
   const supportOpening = await supportBtn.boundingBox();
   if (!supportBefore || !supportOpening || supportOpening.width <= supportBefore.width + 20) {
-    errors.push(`${label}: Soporte no mostró crecimiento intermedio del morph.`);
+    errors.push(`${label}: Soporte no inició el crecimiento del morph.`);
   }
   await page.waitForTimeout(420);
   const supportOpen = await supportBtn.boundingBox();
@@ -391,6 +403,47 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         actualizadas:0,
         no_elegibles:[],
         total_compensacion:10
+      },
+      beneficio_crear: {
+        ok:true,
+        beneficio:{id:'benefit-smoke',valor:25}
+      },
+      beneficio_cancelar: {
+        ok:true,
+        beneficio:{id:'benefit-smoke',estado:'cancelado'}
+      },
+      beneficio_eliminar: {
+        ok:true,
+        eliminado:true
+      },
+      promocion_guardar: {
+        ok:true,
+        promocion:{id:'promo-smoke',precio_promocional:50}
+      },
+      promocion_estado: {
+        ok:true,
+        promocion:{id:'promo-smoke',activa:false}
+      },
+      promocion_eliminar: {
+        ok:true,
+        eliminada:true
+      },
+      promocion_asignar: {
+        asignacion:{id:'assign-smoke',precio_promocional:50}
+      },
+      promocion_quitar_asignacion: {
+        desactivada:true
+      },
+      registrar_pago_parcial: {
+        pago_parcial:{id:'partial-smoke',saldo_restante:40},
+        monto_pagado:60,
+        saldo_restante:40
+      },
+      pactar_fecha_pago: {
+        acuerdo:{id:'agreement-smoke',fecha_original:'2026-09-15',fecha_pactada:'2026-09-20'}
+      },
+      cancelar_fecha_pactada: {
+        cancelado:true
       }
     };
 
@@ -415,7 +468,7 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
 
   const financeReady = await page.evaluate(() =>
     typeof window.GOXION_FINANCIAL === 'object' &&
-    window.GOXION_FINANCIAL?.MODE === 'shadow' &&
+    window.GOXION_FINANCIAL?.MODE === 'official' &&
     typeof window.GOXION_FINANCIAL?.adminState === 'function' &&
     typeof window.GOXION_FINANCIAL?.adminCompare === 'function' &&
     typeof window.GOXION_FINANCIAL?.selectCompatibleState === 'function'
@@ -427,7 +480,15 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL_ACTIONS?.approvePayment === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.saveFairDeal === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.deleteFairDeal === 'function' &&
-    typeof window.GOXION_FINANCIAL_ACTIONS?.applyFairDealBulk === 'function'
+    typeof window.GOXION_FINANCIAL_ACTIONS?.applyFairDealBulk === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.saveBenefit === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.cancelBenefit === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.savePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.togglePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.assignPromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.pactPaymentDate === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.cancelPactPaymentDate === 'function'
   ).catch(() => false);
   if (!actionsReady) errors.push(`${label}: acciones financieras compartidas no disponibles.`);
 
@@ -512,6 +573,88 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       ) {
         errors.push(`${label}: contrato HTTP de Trato Justo masivo incorrecto.`);
       }
+    }
+
+    const phase3de = await page.evaluate(async () => ({
+      benefitSave: await window.GOXION_FINANCIAL_ACTIONS.saveBenefit({
+        clienteId:'client-smoke',
+        concepto:'Beneficio smoke',
+        tipo:'monto',
+        valor:25,
+        periodoInicio:'2026-09',
+        periodosTotal:2
+      }),
+      benefitCancel: await window.GOXION_FINANCIAL_ACTIONS.cancelBenefit({id:'benefit-smoke'}),
+      promoSave: await window.GOXION_FINANCIAL_ACTIONS.savePromotion({
+        servicio_id:'catalog-smoke',
+        nombre:'Promo smoke',
+        precio_promocional:50,
+        duracion_periodos:2,
+        inicio:'2026-09-01T00:00',
+        fin:'2026-10-31T23:59',
+        activa:true
+      }),
+      promoState: await window.GOXION_FINANCIAL_ACTIONS.togglePromotion({id:'promo-smoke',activa:false}),
+      promoAssign: await window.GOXION_FINANCIAL_ACTIONS.assignPromotion({
+        clienteServicioId:'service-smoke',
+        promocionId:'promo-smoke',
+        periodoInicio:'2026-09'
+      }),
+      promoUnassign: await window.GOXION_FINANCIAL_ACTIONS.removePromotionAssignment({id:'assign-smoke'}),
+      partial: await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
+        clienteId:'client-smoke',
+        saldoRestante:40,
+        notas:'Pago parcial smoke',
+        periodoEsperado:'2026-09'
+      }),
+      pact: await window.GOXION_FINANCIAL_ACTIONS.pactPaymentDate({
+        clienteId:'client-smoke',
+        fechaPactada:'2026-09-20',
+        motivo:'Acuerdo smoke',
+        periodoEsperado:'2026-09'
+      }),
+      cancelPact: await window.GOXION_FINANCIAL_ACTIONS.cancelPactPaymentDate({
+        clienteId:'client-smoke',
+        periodoEsperado:'2026-09'
+      })
+    })).catch(error => ({ error: error?.message || String(error) }));
+
+    if (phase3de?.error) {
+      errors.push(`${label}: contratos 3D/3E fallaron: ${phase3de.error}`);
+    } else {
+      if (phase3de.benefitSave?.beneficio?.id !== 'benefit-smoke' || phase3de.benefitCancel?.beneficio?.estado !== 'cancelado') {
+        errors.push(`${label}: beneficio programado no normalizó la respuesta.`);
+      }
+      if (phase3de.promoSave?.promocion?.id !== 'promo-smoke') {
+        errors.push(`${label}: promoción no normalizó la respuesta.`);
+      }
+      if (phase3de.partial?.saldo_restante !== 40 || phase3de.partial?.monto_pagado !== 60) {
+        errors.push(`${label}: pago parcial no normalizó la respuesta.`);
+      }
+      if (phase3de.pact?.acuerdo?.fecha_pactada !== '2026-09-20' || phase3de.cancelPact?.cancelado !== true) {
+        errors.push(`${label}: fecha pactada no normalizó la respuesta.`);
+      }
+
+      const actionMap = Object.fromEntries(financialActionRequests.map(x => [x.body?.accion, x]));
+      if (
+        actionMap.beneficio_crear?.body?.datos?.cliente_id !== 'client-smoke' ||
+        actionMap.beneficio_crear?.body?.datos?.periodos_total !== 2
+      ) errors.push(`${label}: contrato HTTP de beneficio programado incorrecto.`);
+
+      if (
+        actionMap.promocion_guardar?.body?.datos?.servicio_id !== 'catalog-smoke' ||
+        actionMap.promocion_asignar?.body?.datos?.cliente_servicio_id !== 'service-smoke'
+      ) errors.push(`${label}: contrato HTTP de promociones incorrecto.`);
+
+      if (
+        actionMap.registrar_pago_parcial?.body?.datos?.saldo_restante !== 40 ||
+        actionMap.registrar_pago_parcial?.body?.datos?.periodo_esperado !== '2026-09'
+      ) errors.push(`${label}: contrato HTTP de pago parcial incorrecto.`);
+
+      if (
+        actionMap.pactar_fecha_pago?.body?.datos?.fecha_pactada !== '2026-09-20' ||
+        actionMap.cancelar_fecha_pactada?.body?.datos?.periodo_esperado !== '2026-09'
+      ) errors.push(`${label}: contrato HTTP de fecha pactada incorrecto.`);
     }
   }
 
@@ -667,21 +810,41 @@ const browsers = [
   ['WebKit', webkit],
 ];
 
+async function runBrowserStage(browserType, browserName, stageName, runner, errors) {
+  const attempts = browserName === 'WebKit' ? 2 : 1;
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    let browser;
+    try {
+      browser = await browserType.launch({ headless: true });
+      await runner(browser, browserName, errors);
+      return;
+    } catch (error) {
+      lastError = error;
+      const message = String(error?.stack || error?.message || error);
+      const closedUnexpectedly =
+        message.includes('Target page, context or browser has been closed') ||
+        message.includes('Browser has been closed');
+
+      if (!(browserName === 'WebKit' && closedUnexpectedly && attempt < attempts)) {
+        break;
+      }
+    } finally {
+      await browser?.close().catch(() => {});
+    }
+  }
+
+  errors.push(`${browserName} · ${stageName}: no pudo completar el smoke: ${lastError?.stack || lastError?.message || lastError}`);
+}
+
 try {
   await waitForServer();
 
   for (const [browserName, browserType] of browsers) {
-    let browser;
-    try {
-      browser = await browserType.launch({ headless: true });
-      await runIndex(browser, browserName, errors);
-      await runAyuda(browser, browserName, errors);
-      await runAdmin(browser, browserName, errors);
-    } catch (error) {
-      errors.push(`${browserName}: no pudo completar el smoke: ${error.stack || error.message}`);
-    } finally {
-      await browser?.close().catch(() => {});
-    }
+    await runBrowserStage(browserType, browserName, 'Index', runIndex, errors);
+    await runBrowserStage(browserType, browserName, 'Ayuda', runAyuda, errors);
+    await runBrowserStage(browserType, browserName, 'Admin', runAdmin, errors);
   }
 } finally {
   server.kill('SIGTERM');
@@ -695,7 +858,7 @@ if (errors.length) {
 
 console.log('GOXION modern-v2 · browser smoke OK');
 console.log('✓ Chromium y WebKit');
-console.log('✓ motor financiero compartido disponible en modo sombra');
+console.log('✓ motor financiero compartido disponible en modo oficial');
 console.log('✓ Index prefiere motor financiero válido y conserva fallback legacy');
 console.log('✓ Ayuda/Admin consumen selector financiero común con fallback por divergencia');
 console.log('✓ Ayuda quita splash y navega entre vistas');
@@ -708,3 +871,4 @@ console.log('✓ Admin recorre navegación, catálogo, ajustes, filtros, registr
 console.log('✓ Admin pasa smoke en desktop y mobile');
 console.log('✓ Admin prueba contrato de aprobación financiera sin persistir');
 console.log('✓ Admin prueba Trato Justo individual/masivo sin persistir');
+console.log('✓ Admin prueba beneficios, promociones y cobros especiales sin persistir');

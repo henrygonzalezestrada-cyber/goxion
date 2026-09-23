@@ -33,9 +33,9 @@
     if(mode==='promotions')gxPromoLoad();
   };
 
-  async function promoApi(accion,datos={}){
+  async function promoRead(){
     const token=localStorage.getItem(GXCORE.STORAGE.ADMIN_TOKEN)||'';
-    const r=await fetch(PROMO_URL,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({accion,datos})});
+    const r=await fetch(PROMO_URL,{method:'POST',headers:{'Content-Type':'application/json','X-Admin-Token':token},body:JSON.stringify({accion:'listar',datos:{}})});
     const j=await r.json().catch(()=>({}));
     if(!r.ok||j?.ok!==true)throw new Error(j?.error||`HTTP ${r.status}`);
     return j;
@@ -48,7 +48,7 @@
   window.gxPromoLoad=async function(){
     const list=document.getElementById('gx-promo-list');if(!list)return;
     list.innerHTML='<div class="gx-empty-inline">Cargando promociones…</div>';
-    try{const r=await promoApi('listar');promoState={servicios:r.servicios||[],promociones:r.promociones||[]};gxPromoPopulateServices();gxPromoRender();}
+    try{const r=await promoRead();promoState={servicios:r.servicios||[],promociones:r.promociones||[]};gxPromoPopulateServices();gxPromoRender();}
     catch(e){console.error(e);list.innerHTML=`<div class="gx-empty-inline">No se pudieron cargar promociones: ${esc(e?.message||e)}</div>`;}
   };
   function gxPromoPopulateServices(){const sel=document.getElementById('gx-promo-service');if(!sel)return;sel.innerHTML=promoState.servicios.map(s=>`<option value="${esc(s.id)}">${esc(s.nombre)} · $${money(s.precio)}</option>`).join('');}
@@ -74,10 +74,19 @@
   window.gxPromoSave=async function(){
     const btn=document.getElementById('gx-promo-save');const data={id:document.getElementById('gx-promo-id')?.value||'',servicio_id:document.getElementById('gx-promo-service')?.value||'',nombre:document.getElementById('gx-promo-name')?.value||'',precio_promocional:Number(document.getElementById('gx-promo-price')?.value||0),duracion_periodos:Number(document.getElementById('gx-promo-periods')?.value||1),inicio:document.getElementById('gx-promo-start')?.value||'',fin:document.getElementById('gx-promo-end')?.value||'',mostrar_precio_anterior:document.getElementById('gx-promo-old-price')?.checked===true,oferta_flash:document.getElementById('gx-promo-flash')?.checked===true,mostrar_contador:document.getElementById('gx-promo-countdown')?.checked===true,activa:document.getElementById('gx-promo-active')?.checked===true};
     if(btn){btn.disabled=true;btn.textContent='Guardando…';}
-    try{await promoApi('guardar',data);gxPromoCloseEditor();await gxPromoLoad();}
+    try{
+      if(typeof window.GOXION_FINANCIAL_ACTIONS?.savePromotion!=='function') throw new Error('Acciones financieras no disponibles.');
+      await window.GOXION_FINANCIAL_ACTIONS.savePromotion(data);
+      gxPromoCloseEditor();
+      await gxPromoLoad();
+    }
     catch(e){alert(`No se pudo guardar la promoción.\n\n${e?.message||e}`)}finally{if(btn){btn.disabled=false;btn.textContent='Guardar promoción';}}
   };
-  window.gxPromoToggle=async function(id,activa){try{await promoApi('cambiar_estado',{id,activa});await gxPromoLoad();}catch(e){alert(`No se pudo cambiar el estado.\n\n${e?.message||e}`)}};
+  window.gxPromoToggle=async function(id,activa){try{
+    if(typeof window.GOXION_FINANCIAL_ACTIONS?.togglePromotion!=='function') throw new Error('Acciones financieras no disponibles.');
+    await window.GOXION_FINANCIAL_ACTIONS.togglePromotion({id,activa});
+    await gxPromoLoad();
+  }catch(e){alert(`No se pudo cambiar el estado.\n\n${e?.message||e}`)}};
 
   window.gxUpdateExperiencePreview=function(){const on=document.getElementById('combo-active')?.checked===true;const module=document.getElementById('gx-app-preview-module');const copy=document.getElementById('gx-app-preview-copy');if(module)module.style.opacity=on?'1':'.28';if(copy)copy.textContent=on?'El Combo GOXION está habilitado para mostrarse cuando corresponda.':'El módulo comercial está oculto actualmente.';};
   window.gxUpdateIncidentPreview=function(){const active=document.getElementById('alert-active')?.checked===true,platform=document.getElementById('alert-platform')?.selectedOptions?.[0]?.textContent||'Plataforma',type=document.getElementById('alert-type')?.value||'',msg=document.getElementById('global-msg')?.value?.trim()||'';const title=document.getElementById('gx-alert-preview-title'),copy=document.getElementById('gx-alert-preview-copy');if(title)title.textContent=active?platform:'Sin incidencia activa';if(copy)copy.textContent=active?`${type}${msg?`. ${msg}`:''}`:'Cuando actives una incidencia, la vista del cliente aparecerá aquí.';};

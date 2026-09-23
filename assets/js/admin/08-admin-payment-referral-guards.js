@@ -48,7 +48,16 @@
         const amount = Number(document.getElementById("gx-missing-amount")?.value || 0);
         const msg = document.getElementById("gx-payment-note")?.value.trim() || `Detectamos un pago incompleto${amount>0?` por $${amount}`:""}.`;
         try {
-            await gxOps("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+            if(amount>0 && typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment==='function'){
+                await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
+                    clienteId:c._id,
+                    saldoRestante:amount,
+                    notas:msg,
+                    periodoEsperado:String(c.periodo_pendiente||c.estado_cuenta?.periodo||"").slice(0,7)
+                });
+            }else{
+                await gxOps("pago_incompleto",{cliente_id:c._id,monto_faltante:amount,mensaje:msg});
+            }
             c.estado="pendiente"; c.pago_en_revision=false; c.pago_revision_estado="incompleto"; c.pago_revision_mensaje=msg; c.pago_revision_monto_faltante=amount;
             gxClosePaymentModal(); gxCloseClientFocus(); filtrarClientes(); gxUpdateOperationsSummary();
             alert("⚠️ Pago marcado como incompleto.");

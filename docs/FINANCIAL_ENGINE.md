@@ -1,12 +1,13 @@
 # GOXION · Motor financiero v1
 
-## Estado de la fase
+## Estado actual
 
-Fase 1 activa en **modo sombra**.
+El motor financiero opera con **contrato v1.1 en modo oficial**.
 
-El motor financiero calcula un contrato común para Index, Ayuda y Admin, pero
-todavía no sustituye el total oficial mostrado/cobrado. Esto permite comparar el
-nuevo cálculo contra producción antes de cambiar comportamiento económico.
+La etapa de sombra ya cumplió su función: Index, Ayuda y Admin conservaron
+paridad durante la migración y el motor central es ahora la fuente financiera
+oficial. El fallback legacy permanece como protección de compatibilidad mientras
+se realiza la auditoría final.
 
 ## Fuente única
 
@@ -29,8 +30,8 @@ promociones asignadas, desglose, total oficial y total sombra.
 
 ## Seguridad de Fase 1
 
-`total_actual` sigue siendo el total oficial existente. Las promociones se
-auditan en `promociones` y su impacto hipotético vive en `shadow`.
+`total_actual` es producido por el motor financiero oficial. El bloque `shadow`
+se conserva únicamente como telemetría de compatibilidad y reporta delta 0.
 
 Las funciones PostgreSQL nuevas no tienen EXECUTE para `public`, `anon` ni
 `authenticated`; sólo `service_role`. La Edge Function valida primero la
@@ -183,3 +184,72 @@ la regla económica.
 
 Las pruebas de navegador interceptan `acciones-financieras` y validan los tres
 contratos sin crear, modificar ni eliminar compensaciones reales.
+
+
+## Fase 3D · Promociones
+
+Las escrituras de promociones pasan por `GOXION_FINANCIAL_ACTIONS`.
+
+- `savePromotion()`: crear/editar promoción.
+- `togglePromotion()`: activar o pausar.
+- `deletePromotion()`: eliminar o desactivar según dependencias.
+- `assignPromotion()`: asignar manualmente a un servicio de cliente.
+- `removePromotionAssignment()`: desactivar una asignación.
+
+El listado sigue siendo una lectura directa del endpoint de promociones, pero
+guardar/activar ya no puede escribir fuera del gateway financiero.
+
+Las promociones activas se asignan automáticamente al alta de un servicio
+mediante el trigger existente y se consumen por periodo cuando el pago queda
+pagado. El motor financiero usa esa asignación para calcular el ahorro real.
+
+## Fase 3E · Cobros especiales
+
+El núcleo incorpora dos operaciones:
+
+- `registerPartialPayment()`: registra el saldo restante del periodo.
+- `pactPaymentDate()` / `cancelPactPaymentDate()`: crea o cancela una fecha
+  pactada sin borrar la fecha de corte original.
+
+Cuando Admin marca un comprobante como incompleto e introduce un monto faltante,
+ese flujo registra ahora un pago parcial real. El motor conserva el saldo,
+calcula la mora sobre el saldo restante después del pago parcial y mantiene el
+estado `incompleto` hasta liquidación.
+
+La fecha pactada conserva `fecha_corte_original` y expone `fecha_pactada`.
+El estado de cuenta usa la fecha pactada como corte operativo mientras el
+acuerdo esté activo; cancelar el acuerdo devuelve el cálculo a la fecha
+original.
+
+Las dos acciones exigen el periodo esperado para impedir que una ficha
+desactualizada escriba sobre el siguiente ciclo.
+
+
+## Fase 3C · Beneficios y descuentos programados
+
+Admin deja de escribir directamente en `beneficios-admin-beta`.
+
+- `saveBenefit()`: programa monto o porcentaje por N periodos.
+- `cancelBenefit()`: detiene el beneficio desde el siguiente cálculo.
+- `deleteBenefit()`: elimina beneficios que todavía admiten eliminación.
+
+El motor ya consume `beneficios_programados` por periodo y finaliza
+automáticamente las reglas al completar su duración. La interfaz no cambia;
+sólo cambia la puerta de escritura.
+
+
+## Estado previo a auditoría final
+
+Las lecturas financieras de Index, Ayuda y Admin comparten el motor central.
+Las escrituras migradas al gateway `acciones-financieras` son:
+
+- aprobación de pagos;
+- Trato Justo individual y masivo;
+- beneficios/descuentos programados;
+- promociones de catálogo y asignaciones;
+- pagos parciales;
+- fecha pactada de pago.
+
+El siguiente paso es la auditoría final: localizar escrituras financieras
+legacy restantes, validar contratos y datos reales, revisar seguridad/advisors y
+ejecutar smoke completo antes de declarar cerrado el núcleo financiero.

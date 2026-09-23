@@ -179,7 +179,7 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
-// Financial engine phase 1: all production surfaces load the same shadow contract.
+// Financial engine: all production surfaces load the same official contract.
 {
   const runtimePath = join(ROOT, 'assets', 'js', 'core', 'runtime.js');
   const financialPath = join(ROOT, 'assets', 'js', 'core', 'financial-engine.js');
@@ -194,6 +194,10 @@ for (const absolute of walk(jsRoot)) {
   }
   if (!existsSync(financialTypesPath)) {
     fail('Motor financiero: falta contrato financial-engine.d.ts.');
+  }
+  const financialSource = existsSync(financialPath) ? readFileSync(financialPath, 'utf8') : '';
+  if (!financialSource.includes("MODE: 'official'") || !financialSource.includes("CONTRACT_VERSION: '1.1'")) {
+    fail('Motor financiero: frontend no está alineado al contrato financiero oficial v1.1.');
   }
 
   for (const page of PAGES) {
@@ -218,6 +222,9 @@ for (const absolute of walk(jsRoot)) {
   }
   if (!source.includes('window.GOXION_FINANCIAL?.clientState?.()')) {
     fail('Index financiero: no consulta el motor financiero unificado.');
+  }
+  if (!source.includes('GOXION_FINANCIAL.selectCompatibleState')) {
+    fail('Index financiero: selector no delega al motor compartido.');
   }
   if (!source.includes('legacy-fallback')) {
     fail('Index financiero: falta fallback legacy seguro.');
@@ -356,6 +363,81 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+
+// Phase 3C: Programmed benefits must use the unified financial action gateway.
+{
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const benefitPath = join(ROOT, 'assets', 'js', 'admin', '28-admin-beta-20-benefits.js');
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const benefits = existsSync(benefitPath) ? readFileSync(benefitPath, 'utf8') : '';
+
+  for (const required of [
+    "invoke('beneficio_crear'",
+    "invoke('beneficio_cancelar'",
+    "invoke('beneficio_eliminar'",
+    'saveBenefit',
+    'cancelBenefit',
+    'deleteBenefit',
+  ]) {
+    if (!actions.includes(required)) fail('Beneficios programados: falta ' + required + '.');
+  }
+  if (
+    !benefits.includes('GOXION_FINANCIAL_ACTIONS.saveBenefit') ||
+    !benefits.includes('GOXION_FINANCIAL_ACTIONS.cancelBenefit')
+  ) {
+    fail('Beneficios programados: Admin no usa acciones financieras.');
+  }
+  if (benefits.includes('GXCORE.endpoint("beneficios-admin-beta")') || benefits.includes('gxBenefitAction')) {
+    fail('Beneficios programados: persiste un puente directo de escritura.');
+  }
+}
+
+// Phase 3D/3E: Promotions and special collection actions must use the financial gateway.
+{
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const promoPath = join(ROOT, 'assets', 'js', 'admin', '25-admin-beta-19-controller.js');
+  const opsPath = join(ROOT, 'assets', 'js', 'admin', '07-admin-ops-v2.js');
+  const guardsPath = join(ROOT, 'assets', 'js', 'admin', '08-admin-payment-referral-guards.js');
+
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const promo = existsSync(promoPath) ? readFileSync(promoPath, 'utf8') : '';
+  const ops = existsSync(opsPath) ? readFileSync(opsPath, 'utf8') : '';
+  const guards = existsSync(guardsPath) ? readFileSync(guardsPath, 'utf8') : '';
+
+  for (const required of [
+    "invoke('promocion_guardar'",
+    "invoke('promocion_estado'",
+    "invoke('promocion_eliminar'",
+    "invoke('promocion_asignar'",
+    "invoke('promocion_quitar_asignacion'",
+    "invoke('registrar_pago_parcial'",
+    "invoke('pactar_fecha_pago'",
+    "invoke('cancelar_fecha_pactada'",
+    'savePromotion',
+    'togglePromotion',
+    'assignPromotion',
+    'registerPartialPayment',
+    'pactPaymentDate',
+    'cancelPactPaymentDate',
+  ]) {
+    if (!actions.includes(required)) fail('Acciones financieras 3D/3E: falta ' + required + '.');
+  }
+
+  if (!promo.includes('GOXION_FINANCIAL_ACTIONS.savePromotion') || !promo.includes('GOXION_FINANCIAL_ACTIONS.togglePromotion')) {
+    fail('Promociones: guardar/activar no pasan por acciones financieras.');
+  }
+  if (promo.includes("promoApi('guardar'") || promo.includes("promoApi('cambiar_estado'")) {
+    fail('Promociones: persiste una escritura directa al endpoint legacy.');
+  }
+
+  for (const [label, source] of [['ops', ops], ['guards', guards]]) {
+    if (!source.includes('GOXION_FINANCIAL_ACTIONS.registerPartialPayment')) {
+      fail('Pagos parciales ' + label + ': falta integración con acciones financieras.');
+    }
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -369,8 +451,10 @@ console.log('✓ CSS/JS externalizados');
 console.log('✓ runtime central preservado');
 console.log('✓ sintaxis JavaScript válida');
 console.log('✓ invariantes Safari y lealtad preservados');
-console.log('✓ contrato financiero sombra cargado en las tres superficies');
+console.log('✓ contrato financiero oficial v1.1 cargado en las tres superficies');
 console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
 console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
 console.log('✓ Trato Justo individual y masivo usan una sola puerta financiera');
+console.log('✓ beneficios programados usan el núcleo financiero');
+console.log('✓ promociones y cobros especiales usan el núcleo financiero');

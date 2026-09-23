@@ -113,7 +113,23 @@ declare global {
     periodo_key?: string;
     periodo_label?: string;
     dia_pago?: number;
+    fecha_corte_original?: string;
     fecha_corte?: string;
+    fecha_pactada?: string | null;
+    acuerdo_cobro?: {
+      id?: GoxionId;
+      fecha_original?: string;
+      fecha_pactada?: string;
+      motivo?: string;
+      activo?: boolean;
+    } | null;
+    pago_parcial?: {
+      id?: GoxionId;
+      fecha_pago?: string;
+      monto_pagado?: number;
+      saldo_restante?: number;
+      activo?: boolean;
+    } | null;
     dias_para_corte?: number;
     dias_atraso?: number;
     estado?: string;
