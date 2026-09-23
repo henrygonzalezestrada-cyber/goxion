@@ -179,7 +179,7 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
-// Financial engine phase 1: all production surfaces load the same shadow contract.
+// Financial engine: all production surfaces load the same shared contract.
 {
   const runtimePath = join(ROOT, 'assets', 'js', 'core', 'runtime.js');
   const financialPath = join(ROOT, 'assets', 'js', 'core', 'financial-engine.js');
@@ -356,6 +356,78 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Phase 3C/3D/3E: remaining financial writes must use the common gateway.
+{
+  const financialPath = join(ROOT, 'assets', 'js', 'core', 'financial-engine.js');
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const benefitPath = join(ROOT, 'assets', 'js', 'admin', '28-admin-beta-20-benefits.js');
+  const promoPath = join(ROOT, 'assets', 'js', 'admin', '25-admin-beta-19-controller.js');
+  const opsPath = join(ROOT, 'assets', 'js', 'admin', '07-admin-ops-v2.js');
+  const guardsPath = join(ROOT, 'assets', 'js', 'admin', '08-admin-payment-referral-guards.js');
+
+  const financial = existsSync(financialPath) ? readFileSync(financialPath, 'utf8') : '';
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const benefits = existsSync(benefitPath) ? readFileSync(benefitPath, 'utf8') : '';
+  const promos = existsSync(promoPath) ? readFileSync(promoPath, 'utf8') : '';
+  const ops = existsSync(opsPath) ? readFileSync(opsPath, 'utf8') : '';
+  const guards = existsSync(guardsPath) ? readFileSync(guardsPath, 'utf8') : '';
+
+  if (!financial.includes("MODE: 'official'") || !financial.includes("CONTRACT_VERSION: '1.1'")) {
+    fail('Motor financiero: el contrato oficial 1.1 no está activo.');
+  }
+
+  for (const required of [
+    "invoke('beneficio_crear'",
+    "invoke('beneficio_cancelar'",
+    "invoke('promocion_guardar'",
+    "invoke('promocion_estado'",
+    "invoke('promocion_asignar'",
+    "invoke('registrar_pago_parcial'",
+    "invoke('pactar_fecha_pago'",
+    "invoke('cancelar_fecha_pactada'",
+    'saveBenefit',
+    'cancelBenefit',
+    'savePromotion',
+    'setPromotionState',
+    'assignPromotion',
+    'registerPartialPayment',
+    'pactPaymentDate',
+    'cancelPactDate',
+  ]) {
+    if (!actions.includes(required)) {
+      fail('Acciones financieras: falta contrato final ' + required + '.');
+    }
+  }
+
+  if (
+    !benefits.includes('GOXION_FINANCIAL_ACTIONS.saveBenefit') ||
+    !benefits.includes('GOXION_FINANCIAL_ACTIONS.cancelBenefit') ||
+    benefits.includes("call('crear_manual'") ||
+    benefits.includes("call('cancelar'")
+  ) {
+    fail('Beneficios: las escrituras no usan exclusivamente acciones financieras.');
+  }
+
+  if (
+    !promos.includes('GOXION_FINANCIAL_ACTIONS.savePromotion') ||
+    !promos.includes('GOXION_FINANCIAL_ACTIONS.setPromotionState') ||
+    promos.includes("promoApi('guardar'") ||
+    promos.includes("promoApi('cambiar_estado'")
+  ) {
+    fail('Promociones: las escrituras del catálogo no usan acciones financieras.');
+  }
+
+  for (const [label, source] of [['ops', ops], ['guards', guards]]) {
+    if (!source.includes('GOXION_FINANCIAL_ACTIONS.registerPartialPayment')) {
+      fail('Pagos parciales ' + label + ': no usa el núcleo financiero.');
+    }
+    if (source.includes('gxOps("pago_incompleto"') || source.includes('ops("pago_incompleto"')) {
+      fail('Pagos parciales ' + label + ': persiste una escritura legacy directa.');
+    }
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
@@ -369,8 +441,9 @@ console.log('✓ CSS/JS externalizados');
 console.log('✓ runtime central preservado');
 console.log('✓ sintaxis JavaScript válida');
 console.log('✓ invariantes Safari y lealtad preservados');
-console.log('✓ contrato financiero sombra cargado en las tres superficies');
+console.log('✓ contrato financiero oficial cargado en las tres superficies');
 console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
 console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
 console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
 console.log('✓ Trato Justo individual y masivo usan una sola puerta financiera');
+console.log('✓ beneficios, promociones y cobros especiales usan el núcleo financiero');
