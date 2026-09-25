@@ -51,6 +51,12 @@
     <div class="modal-content gx-payment-upload-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-payment-upload-title">
         <button class="close-modal" type="button" onclick="cerrarModalPago(event, true)" aria-label="Cerrar comprobante">×</button>
 
+        <div class="gx-payment-legacy-head">
+            <div style="font-size:38px;margin-bottom:5px;">🧾</div>
+            <h3 style="color:#fff;font-size:18px;font-weight:800;margin-bottom:5px;">Validar Pago</h3>
+            <p style="font-size:12px;color:var(--text-muted);line-height:1.5;margin-bottom:10px;">Para procesar tu pago rápidamente, adjunta la captura de tu transferencia o depósito.</p>
+        </div>
+
         <div class="gx-payment-upload-head">
             <div class="gx-payment-upload-symbol" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
@@ -68,7 +74,8 @@
         <div class="upload-area" id="upload-area">
             <input type="file" id="file-input" accept="image/*" onchange="mostrarPreview(this)">
             <div class="upload-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
+                <span class="gx-upload-legacy-icon">📸</span>
+                <svg class="gx-upload-beta-icon" viewBox="0 0 24 24">
                     <path d="M12 16V7m-4 4 4-4 4 4"/>
                     <path d="M5 17v1.2A2.8 2.8 0 0 0 7.8 21h8.4a2.8 2.8 0 0 0 2.8-2.8V17"/>
                 </svg>
@@ -103,7 +110,7 @@
                 </svg>
             </span>
             <span class="gx-submit-copy">
-                <strong class="gx-submit-title">Enviar comprobante</strong>
+                <strong class="gx-submit-title">📤 Enviar Comprobante Seguro</strong>
                 <small class="gx-submit-subtitle">Se enviará para validación</small>
             </span>
         </button>
