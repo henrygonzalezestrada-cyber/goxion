@@ -580,7 +580,8 @@
             <button class="gx-clabe-copy" type="button" onclick="copiarClabePago('${id}', this)" aria-label="Copiar CLABE de ${label}">
               <span class="gx-copy-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path class="gx-copy-clipboard" d="M9 6h6l1 2h1.5A2.5 2.5 0 0 1 20 10.5v7A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-7A2.5 2.5 0 0 1 6.5 8H8l1-2Z"/>
+                  <rect class="gx-copy-back" x="5" y="5" width="10" height="10" rx="2"/>
+                  <rect class="gx-copy-front" x="9" y="9" width="10" height="10" rx="2"/>
                   <path class="gx-copy-check" d="m6.8 12.4 3.2 3.2 7.2-7.2"/>
                 </svg>
               </span>
