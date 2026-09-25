@@ -15,6 +15,15 @@ declare global {
           readonly NAME: string;
           readonly HOLDER: string;
           readonly CLABE: string;
+          readonly ACCOUNTS: readonly {
+            readonly ID: string;
+            readonly LABEL: string;
+            readonly INSTITUTION: string;
+            readonly HOLDER: string;
+            readonly CLABE: string;
+            readonly CURRENCY: string;
+            readonly PRIMARY: boolean;
+          }[];
         };
         readonly CHANNELS: {
           readonly pedidos: string;
