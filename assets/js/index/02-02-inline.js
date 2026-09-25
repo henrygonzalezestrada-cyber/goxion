@@ -580,9 +580,8 @@
             <button class="gx-clabe-copy" type="button" onclick="copiarClabePago('${id}', this)" aria-label="Copiar CLABE de ${label}">
               <span class="gx-copy-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24">
-                  <path class="gx-copy-paper" d="M8.2 7.2V5.8A2.8 2.8 0 0 1 11 3h6.2A2.8 2.8 0 0 1 20 5.8V12a2.8 2.8 0 0 1-2.8 2.8h-1.4"/>
-                  <rect class="gx-copy-frame" x="4" y="8" width="12" height="13" rx="2.7"/>
-                  <path class="gx-copy-check" d="m7.3 14.7 2.2 2.2 4.4-5"/>
+                  <path class="gx-copy-clipboard" d="M9 6h6l1 2h1.5A2.5 2.5 0 0 1 20 10.5v7A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-7A2.5 2.5 0 0 1 6.5 8H8l1-2Z"/>
+                  <path class="gx-copy-check" d="m6.8 12.4 3.2 3.2 7.2-7.2"/>
                 </svg>
               </span>
               <span class="gx-copy-label">Copiar</span>
@@ -654,84 +653,162 @@
     }, 1900);
   }
 
-  function continuarAComprobante() {
-    if(!pagoActualInfo?.clienteKey) return;
-    const info = {...pagoActualInfo};
-    cerrarDatosPago(null, true, false);
-    abrirModalPago(info.clienteKey, info.periodo, info.monto, info.folio, info.nombre);
-  }
-
   document.addEventListener("keydown", (event) => {
     if(event.key === "Escape" && document.getElementById("bank-modal")?.classList.contains("show")) {
       cerrarDatosPago(null, true);
     }
   });
 
-  // --- NUEVA LÓGICA DE SUBIDA DE COMPROBANTES --- //
+  // --- FLUJO DE SUBIDA DE COMPROBANTES --- //
   let pagoActualInfo = {};
+  let gxPaymentCloseTimer = 0;
+
+  function gxSetPaymentSubmitState(state = "idle") {
+      const modal = document.getElementById("payment-modal");
+      const btn = document.getElementById("btn-enviar-comprobante");
+      if(!btn) return;
+
+      const title = btn.querySelector(".gx-submit-title");
+      const subtitle = btn.querySelector(".gx-submit-subtitle");
+      btn.dataset.state = state;
+
+      const labels = GX_PAYMENT_BETA
+        ? {
+            idle:["Enviar comprobante","Se enviará para validación"],
+            loading:["Enviando comprobante","Espera un momento"],
+            success:["Comprobante enviado","Quedó en revisión"],
+            error:["No se pudo enviar","Toca para reintentar"]
+          }
+        : {
+            idle:["📤 Enviar Comprobante Seguro",""],
+            loading:["⏳ Encriptando y subiendo comprobante...",""],
+            success:["✅ ¡Validación solicitada con éxito!",""],
+            error:["📤 Enviar Comprobante Seguro",""]
+          };
+
+      const [main,sub] = labels[state] || labels.idle;
+      if(title) title.textContent = main;
+      if(subtitle) subtitle.textContent = sub;
+
+      btn.disabled = state === "loading" || state === "success";
+      modal?.classList.toggle("is-sending", state === "loading");
+      modal?.classList.toggle("is-success", state === "success");
+      modal?.classList.toggle("is-error", state === "error");
+  }
 
   function abrirModalPago(clienteKey, periodo, monto, folio, nombre) {
       pagoActualInfo = { clienteKey, periodo, monto, folio, nombre };
-      document.getElementById('payment-modal').classList.add('show');
-      document.body.style.overflow = 'hidden'; 
+      const modal = document.getElementById("payment-modal");
+      if(!modal) return;
+
+      clearTimeout(gxPaymentCloseTimer);
+      gxSetPaymentSubmitState("idle");
+      modal.classList.remove("is-closing");
+      modal.setAttribute("aria-hidden","false");
+
+      if(GX_PAYMENT_BETA) {
+          requestAnimationFrame(() => modal.classList.add("show"));
+      } else {
+          modal.classList.add("show");
+      }
+
+      document.body.style.overflow = "hidden";
   }
 
   function cerrarModalPago(e, force = false) {
-      if (force || e.target.classList.contains('modal-overlay')) {
-          document.getElementById('payment-modal').classList.remove('show');
-          document.body.style.overflow = 'auto';
-          reiniciarSubida(); // Limpia los inputs si el usuario cierra la ventana
+      const modal = document.getElementById("payment-modal");
+      if(!modal) return;
+      const clickedOverlay = e?.target === modal || e?.target?.classList?.contains("modal-overlay");
+      if(!(force || clickedOverlay)) return;
+
+      modal.classList.remove("show");
+      modal.classList.add("is-closing");
+      modal.setAttribute("aria-hidden","true");
+      document.body.style.overflow = "auto";
+
+      clearTimeout(gxPaymentCloseTimer);
+      if(GX_PAYMENT_BETA) {
+          gxPaymentCloseTimer = setTimeout(() => {
+              reiniciarSubida();
+              modal.classList.remove("is-closing");
+          }, 320);
+      } else {
+          reiniciarSubida();
       }
   }
 
   function reiniciarSubida() {
-      document.getElementById('file-input').value = "";
-      document.getElementById('preview-container').style.display = 'none';
-      document.getElementById('upload-area').style.display = 'block';
-      document.getElementById('btn-enviar-comprobante').style.display = 'none';
-  }
+      const input = document.getElementById("file-input");
+      const preview = document.getElementById("preview-img");
+      const modal = document.getElementById("payment-modal");
+      const previewContainer = document.getElementById("preview-container");
+      const uploadArea = document.getElementById("upload-area");
+      const submit = document.getElementById("btn-enviar-comprobante");
 
-  function mostrarPreview(input) {
-      if (input.files && input.files[0]) {
-          const file = input.files[0];
-          
-          if (!file.type.startsWith('image/')) {
-              alert("Por favor, selecciona un archivo de imagen válido (Captura de pantalla o foto).");
-              input.value = "";
-              return;
-          }
+      if(input) input.value = "";
+      if(preview) preview.src = "";
 
-          const reader = new FileReader();
-          reader.onload = function(e) {
-              document.getElementById('preview-img').src = e.target.result;
-              document.getElementById('preview-container').style.display = 'block';
-              document.getElementById('upload-area').style.display = 'none'; 
-              document.getElementById('btn-enviar-comprobante').style.display = 'block';
-          }
-          reader.readAsDataURL(file);
+      modal?.classList.remove("has-preview","is-sending","is-success","is-error");
+      gxSetPaymentSubmitState("idle");
+
+      if(!GX_PAYMENT_BETA) {
+          if(previewContainer) previewContainer.style.display = "none";
+          if(uploadArea) uploadArea.style.display = "block";
+          if(submit) submit.style.display = "none";
       }
   }
 
+  function mostrarPreview(input) {
+      if (!input.files || !input.files[0]) return;
+
+      const file = input.files[0];
+      if (!file.type.startsWith("image/")) {
+          input.value = "";
+          if(GX_PAYMENT_BETA) {
+              mostrarToastPago("Formato no compatible", true);
+          } else {
+              alert("Por favor, selecciona un archivo de imagen válido (Captura de pantalla o foto).");
+          }
+          return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+          const preview = document.getElementById("preview-img");
+          const modal = document.getElementById("payment-modal");
+          if(preview) preview.src = e.target.result;
+
+          gxSetPaymentSubmitState("idle");
+
+          if(GX_PAYMENT_BETA) {
+              modal?.classList.remove("is-error");
+              modal?.classList.add("has-preview");
+          } else {
+              const previewContainer = document.getElementById("preview-container");
+              const uploadArea = document.getElementById("upload-area");
+              const submit = document.getElementById("btn-enviar-comprobante");
+              if(previewContainer) previewContainer.style.display = "block";
+              if(uploadArea) uploadArea.style.display = "none";
+              if(submit) submit.style.display = "block";
+          }
+      };
+      reader.readAsDataURL(file);
+  }
+
   async function enviarComprobanteDiscord() {
-      const input = document.getElementById('file-input');
-      if (!input.files || !input.files[0]) {
-          alert("Debes adjuntar una captura de pantalla antes de enviar.");
+      const input = document.getElementById("file-input");
+      if (!input?.files?.[0]) {
+          if(GX_PAYMENT_BETA) mostrarToastPago("Selecciona una captura primero", true);
+          else alert("Debes adjuntar una captura de pantalla antes de enviar.");
           return;
       }
 
       const file = input.files[0];
-      const btn = document.getElementById('btn-enviar-comprobante');
-      
-      btn.disabled = true;
-      btn.innerText = "⏳ Encriptando y subiendo comprobante...";
+      gxSetPaymentSubmitState("loading");
 
       const { clienteKey, periodo, monto, folio, nombre } = pagoActualInfo;
-
-      // 1. Guardamos localmente el estado de revisión y completamos la misión de la app
-
-      // 2. Preparamos el "sobre" con el archivo y la información
       const formData = new FormData();
-      formData.append('file', file, file.name);
+      formData.append("file", file, file.name);
 
       const colorDec = parseInt("00ff9d", 16);
       const payload = {
@@ -741,32 +818,37 @@
               color: colorDec,
               timestamp: new Date().toISOString(),
               footer: { text: "GOXION Pay System" },
-              image: { url: `attachment://${file.name}` } // Esta línea asegura que la foto se muestre bonito dentro del mensaje
+              image: { url: `attachment://${file.name}` }
           }]
       };
 
-      formData.append('payload_json', JSON.stringify(payload));
+      formData.append("payload_json", JSON.stringify(payload));
 
       try {
-          // 3. Enviamos a Discord
-          await fetch(WEBHOOK_DISCORD, {
-              method: 'POST',
+          const response = await fetch(WEBHOOK_DISCORD, {
+              method: "POST",
               body: formData
           });
 
-          btn.innerText = "✅ ¡Validación solicitada con éxito!";
-          btn.style.background = "linear-gradient(135deg, var(--neon-blue), #4f8cff)";
-          btn.style.boxShadow = "0 0 20px rgba(0, 242, 254, 0.4)";
-          
+          if(!response.ok) throw new Error(`HTTP ${response.status}`);
+
+          gxSetPaymentSubmitState("success");
+          if(GX_PAYMENT_BETA) mostrarToastPago("✓ Comprobante enviado");
+
           setTimeout(() => {
               location.reload();
-          }, 1500);
+          }, GX_PAYMENT_BETA ? 1350 : 1500);
 
       } catch (error) {
           console.error("Error al enviar el archivo:", error);
-          alert("Ocurrió un pequeño error de red al subir la imagen. Por favor, intenta de nuevo o avísanos por WhatsApp.");
-          btn.disabled = false;
-          btn.innerText = "📤 Enviar Comprobante Seguro";
+          gxSetPaymentSubmitState("error");
+
+          if(GX_PAYMENT_BETA) {
+              mostrarToastPago("No se pudo enviar · intenta de nuevo", true);
+          } else {
+              alert("Ocurrió un pequeño error de red al subir la imagen. Por favor, intenta de nuevo o avísanos por WhatsApp.");
+              gxSetPaymentSubmitState("idle");
+          }
       }
   }
 
