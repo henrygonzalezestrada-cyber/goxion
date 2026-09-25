@@ -841,113 +841,171 @@
     }
 }
 
-
-/* ===== GOXION PAY · HARMONY V2 ===== */
+/* ===== GOXION PAY · HARMONY V3 ===== */
 /*
-   Segunda iteración visual: menos lenguaje Admin, más Mi Espacio.
-   Mantiene intactos el flujo, la copia segura y la microinteracción.
+   Jerarquía final de la beta:
+   1) reportar pago = acción principal,
+   2) datos para transferir = apoyo,
+   3) soporte = acción terciaria.
+   Glass + superficies sólidas donde mejoran la lectura. Sin brillo perimetral continuo.
 */
 .gx-payment-actions{
-    gap:9px;
+    gap:10px;
     margin-top:2px;
 }
 
-/* Acción principal: misma familia visual de Mi Espacio */
-.gx-payment-actions .gx-bank-trigger{
-    min-height:58px;
-    padding:9px 13px;
-    border-radius:18px;
-    border:1px solid rgba(0,242,254,.18);
-    background:
-        linear-gradient(135deg,rgba(0,242,254,.075),rgba(79,140,255,.06) 55%,rgba(124,77,255,.07)),
-        rgba(8,10,15,.58);
+/* Acción principal · sólida, luminosa, inequívoca */
+.gx-payment-primary{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    min-height:64px;
+    padding:10px 14px;
+    border:0;
+    border-radius:19px;
+    justify-content:flex-start;
+    color:#fff;
+    background:linear-gradient(135deg,#12dff5 0%,#4f8cff 54%,#7656ff 100%);
     box-shadow:
-        0 10px 26px rgba(0,0,0,.20),
-        inset 0 1px 0 rgba(255,255,255,.035),
-        0 0 22px rgba(0,242,254,.035);
+        0 13px 32px rgba(25,119,255,.25),
+        0 0 25px rgba(0,242,254,.13),
+        inset 0 1px 0 rgba(255,255,255,.28);
+    text-shadow:0 1px 2px rgba(0,0,0,.16);
+    transform:translateZ(0);
 }
-.gx-payment-actions .gx-bank-trigger-icon{
-    width:36px;
-    height:36px;
-    flex-basis:36px;
-    border-radius:12px;
-    border-color:rgba(0,242,254,.14);
-    background:rgba(0,242,254,.06);
-    box-shadow:none;
+.gx-payment-primary::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    background:
+        radial-gradient(circle at 14% 0%,rgba(255,255,255,.30),transparent 32%),
+        linear-gradient(180deg,rgba(255,255,255,.06),transparent 55%);
 }
-.gx-payment-actions .gx-bank-trigger-copy strong{
-    font-size:12px;
-    font-weight:800;
+.gx-payment-primary:active{
+    transform:translateY(1px) scale(.985);
+    box-shadow:
+        0 7px 20px rgba(25,119,255,.22),
+        0 0 18px rgba(0,242,254,.10),
+        inset 0 1px 0 rgba(255,255,255,.20);
 }
-.gx-payment-actions .gx-bank-trigger-copy small{
-    font-size:9px;
-    color:#8fa1b8;
-    font-weight:600;
+.gx-payment-primary-icon{
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    background:rgba(255,255,255,.15);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.20);
 }
-.gx-payment-actions .gx-bank-trigger-arrow{
-    opacity:.85;
+.gx-payment-primary-icon svg,
+.gx-payment-primary-arrow svg{
+    width:21px;
+    height:21px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.85;
+    stroke-linecap:round;
+    stroke-linejoin:round;
 }
-
-/* Acción secundaria: no compite con transferir */
-.gx-payment-secondary{
-    min-height:48px;
-    padding:0 14px;
-    border-radius:16px;
-    border:1px solid rgba(255,255,255,.075);
-    background:rgba(255,255,255,.028);
-    color:#dce5f2;
-    justify-content:space-between;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
-}
-.gx-payment-secondary-copy{
+.gx-payment-primary-copy{
+    min-width:0;
+    margin-left:2px;
     display:flex;
     flex-direction:column;
     align-items:flex-start;
-    gap:1px;
+    gap:2px;
 }
-.gx-payment-secondary-copy strong{
-    font-size:10.8px;
-    font-weight:750;
+.gx-payment-primary-copy strong{
+    font-size:13px;
+    font-weight:850;
+    letter-spacing:-.15px;
 }
-.gx-payment-secondary-copy small{
-    color:var(--text-muted);
-    font-size:8.4px;
-    font-weight:600;
+.gx-payment-primary-copy small{
+    color:rgba(255,255,255,.78);
+    font-size:9.2px;
+    font-weight:650;
 }
-.gx-payment-secondary-arrow{
-    color:#93a4ba;
-    font-size:22px;
-    line-height:1;
-    transition:transform .18s ease,color .18s ease;
+.gx-payment-primary-arrow{
+    margin-left:auto;
+    display:grid;
+    place-items:center;
+    opacity:.92;
+    transition:transform .18s ease;
 }
-.gx-payment-secondary:active{
-    transform:scale(.988);
-    border-color:rgba(255,255,255,.12);
-}
-.gx-payment-secondary:active .gx-payment-secondary-arrow{
-    transform:translateX(2px);
-    color:var(--neon-blue);
+.gx-payment-primary:active .gx-payment-primary-arrow{
+    transform:translateX(3px);
 }
 
-/* Soporte: terciario, visualmente libre */
+/* Datos de transferencia · glass, secundario */
+.gx-payment-actions .gx-bank-trigger{
+    min-height:53px;
+    padding:8px 13px;
+    border-radius:17px;
+    border:1px solid rgba(255,255,255,.075);
+    background:rgba(10,12,18,.52);
+    -webkit-backdrop-filter:blur(16px) saturate(1.12);
+    backdrop-filter:blur(16px) saturate(1.12);
+    color:#eaf4ff;
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.20),
+        inset 0 1px 0 rgba(255,255,255,.035);
+}
+.gx-payment-actions .gx-bank-trigger::before{
+    display:none!important;
+    animation:none!important;
+}
+.gx-payment-actions .gx-bank-trigger::after{
+    opacity:.34;
+    background:radial-gradient(circle at 12% 50%,rgba(0,242,254,.11),transparent 38%);
+}
+.gx-payment-actions .gx-bank-trigger-icon{
+    width:34px;
+    height:34px;
+    flex-basis:34px;
+    border-radius:11px;
+    border:0;
+    background:rgba(0,242,254,.085);
+    color:var(--neon-blue);
+    box-shadow:none;
+}
+.gx-payment-actions .gx-bank-trigger-copy strong{
+    font-size:11.2px;
+    font-weight:760;
+}
+.gx-payment-actions .gx-bank-trigger-copy small{
+    font-size:8.5px;
+    color:#7f90a5;
+    font-weight:600;
+}
+.gx-payment-actions .gx-bank-trigger-arrow{
+    color:#8fefff;
+    opacity:.80;
+}
+.gx-payment-actions .gx-bank-trigger:active{
+    border-color:rgba(0,242,254,.20);
+    background:rgba(9,14,21,.64);
+}
+
+/* Soporte · sin tercera caja */
 .gx-payment-actions .gx-support-tertiary{
     min-height:auto;
-    padding:8px 6px 2px;
+    padding:7px 5px 1px;
     border:0;
     background:transparent;
     box-shadow:none;
     display:flex;
     flex-direction:row;
     gap:5px;
-    color:var(--text-muted);
+    color:#75869a;
     font-size:9px;
     font-weight:600;
 }
-.gx-payment-actions .gx-support-tertiary span{
-    color:#77879d;
-}
+.gx-payment-actions .gx-support-tertiary span{color:#708095}
 .gx-payment-actions .gx-support-tertiary strong{
-    color:#a9bbd0;
+    color:#a8b9cc;
     font-size:9px;
     font-weight:750;
 }
@@ -955,7 +1013,6 @@
 .gx-payment-actions .gx-support-tertiary:active{
     background:transparent;
     border-color:transparent;
-    color:var(--neon-blue);
     transform:none;
 }
 .gx-payment-actions .gx-support-tertiary:hover strong,
@@ -963,21 +1020,43 @@
     color:var(--neon-blue);
 }
 
-/* Sheet: más aire, menos panel */
+/* Sheet · vidrio GOXION */
+.gx-bank-overlay{
+    background:rgba(2,3,6,.68);
+    -webkit-backdrop-filter:blur(15px) saturate(1.08);
+    backdrop-filter:blur(15px) saturate(1.08);
+}
 .gx-bank-sheet{
     padding:26px 20px calc(20px + env(safe-area-inset-bottom,0px));
     border-radius:30px;
     border:1px solid rgba(255,255,255,.075);
     background:
-        radial-gradient(circle at 9% 0%,rgba(0,242,254,.055),transparent 27%),
-        radial-gradient(circle at 94% 8%,rgba(124,77,255,.065),transparent 31%),
-        rgba(6,7,11,.965);
+        radial-gradient(circle at 8% 0%,rgba(0,242,254,.075),transparent 27%),
+        radial-gradient(circle at 94% 7%,rgba(124,77,255,.09),transparent 32%),
+        rgba(7,8,13,.78);
+    -webkit-backdrop-filter:blur(28px) saturate(1.20);
+    backdrop-filter:blur(28px) saturate(1.20);
     box-shadow:
         0 34px 100px rgba(0,0,0,.72),
-        inset 0 1px 0 rgba(255,255,255,.03);
+        inset 0 1px 0 rgba(255,255,255,.045);
+}
+.gx-bank-close{
+    top:15px;
+    right:15px;
+    width:34px;
+    height:34px;
+    border:0;
+    color:#031015;
+    background:linear-gradient(135deg,#24f0ff,#61dcff);
+    box-shadow:0 0 18px rgba(0,242,254,.22);
+    font-size:21px;
+}
+.gx-bank-close:active{
+    transform:scale(.90);
+    background:linear-gradient(135deg,#0dd7e8,#45c9ef);
 }
 .gx-bank-kicker{
-    color:#7890aa;
+    color:#7f92a9;
     font-size:8px;
     font-weight:750;
     letter-spacing:1.35px;
@@ -985,80 +1064,88 @@
 .gx-bank-heading{
     display:block;
     margin-top:8px;
-    padding:0 42px 18px 0;
-    border-bottom:0;
+    padding:0 42px 17px 0;
+    border:0;
 }
 .gx-bank-heading h3{
+    margin:0;
+    color:#f7f9fd;
     font-size:22px;
-    line-height:1.1;
-    letter-spacing:-.6px;
+    line-height:1.08;
     font-weight:800;
+    letter-spacing:-.58px;
 }
 .gx-bank-heading h3 > strong{
     color:var(--neon-blue);
     font:inherit;
-    text-shadow:0 0 22px rgba(0,242,254,.13);
+    text-shadow:0 0 22px rgba(0,242,254,.12);
 }
 .gx-bank-heading p{
-    margin-top:7px;
-    width:min(100%,320px);
-    font-size:9.8px;
-    line-height:1.48;
-    color:#8495ab;
+    margin:6px 0 0;
+    color:#7f90a5;
+    font-size:9.4px;
+    line-height:1.4;
 }
 .gx-bank-total{display:none!important}
 
-/* Cuentas: más cercanas a tarjetas de Mi Espacio */
+/* Cuentas · dos superficies de vidrio, no paneles */
 .gx-bank-list{
+    display:grid;
     gap:10px;
     margin:4px 0 12px;
 }
 .gx-bank-card{
-    padding:15px 15px 14px;
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    padding:15px;
     border-radius:19px;
-    border:1px solid rgba(255,255,255,.055);
+    border:1px solid rgba(255,255,255,.065);
     background:
-        radial-gradient(circle at 100% 0%,rgba(124,77,255,.035),transparent 30%),
-        rgba(255,255,255,.026);
+        linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),
+        rgba(12,14,20,.34);
+    -webkit-backdrop-filter:blur(17px) saturate(1.12);
+    backdrop-filter:blur(17px) saturate(1.12);
     box-shadow:
-        0 8px 22px rgba(0,0,0,.18),
-        inset 0 1px 0 rgba(255,255,255,.022);
+        0 9px 25px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.035);
 }
 .gx-bank-card.is-primary{
-    border-color:rgba(0,242,254,.095);
+    border-color:rgba(255,255,255,.065);
     background:
-        radial-gradient(circle at 0 0,rgba(0,242,254,.045),transparent 34%),
-        rgba(255,255,255,.028);
+        linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),
+        rgba(12,14,20,.34);
 }
-.gx-bank-card-top{
-    gap:10px;
-}
+.gx-bank-card-top{gap:10px}
 .gx-bank-mark{
     width:36px;
     height:36px;
-    flex-basis:36px;
+    flex:0 0 36px;
     border-radius:12px;
     font-size:10px;
     box-shadow:none;
 }
 .gx-bank-mark.nu{
-    background:linear-gradient(145deg,rgba(126,53,216,.88),rgba(74,28,131,.82));
+    background:#6f32c9;
+    color:#fff;
 }
 .gx-bank-mark.revolut{
-    background:linear-gradient(145deg,#e8eef8,#9fb1ce);
+    background:#edf2fa;
+    color:#07101d;
 }
 .gx-bank-identity{
+    min-width:0;
     display:flex;
     flex-direction:column;
     gap:1px;
 }
 .gx-bank-identity > strong{
-    color:#f4f7fb;
+    color:#f6f8fc;
     font-size:12px;
     font-weight:800;
 }
 .gx-bank-identity > small{
-    color:#8190a4;
+    color:#8293a8;
     font-size:8.5px;
     font-weight:600;
 }
@@ -1075,115 +1162,230 @@
     margin-top:13px;
     padding:0 1px;
 }
-.gx-bank-beneficiary span{
-    color:#708096;
-    font-size:8px;
+.gx-bank-beneficiary span,
+.gx-bank-clabe span{
+    color:#6f8198;
+    font-size:7.8px;
     font-weight:650;
     text-transform:uppercase;
     letter-spacing:.55px;
 }
 .gx-bank-beneficiary strong{
     min-width:0;
-    color:#cbd5e2;
-    font-size:9.7px;
+    color:#cbd6e4;
+    font-size:9.6px;
     font-weight:650;
     text-align:right;
 }
 .gx-bank-clabe-wrap{
-    margin-top:10px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
     gap:8px;
+    align-items:center;
+    margin-top:10px;
 }
 .gx-bank-clabe{
+    min-width:0;
     padding:9px 10px;
-    border-radius:13px;
     border:0;
-    background:rgba(0,0,0,.20);
+    border-radius:13px;
+    background:rgba(0,0,0,.19);
 }
 .gx-bank-clabe span{
-    color:#708096;
-    font-size:7.7px;
-    font-weight:650;
+    display:block;
+    margin-bottom:3px;
 }
 .gx-bank-clabe strong{
+    display:block;
+    color:#fff;
     font-size:11.5px;
+    line-height:1.2;
     font-weight:750;
     letter-spacing:.45px;
+    white-space:nowrap;
+    user-select:text;
+    -webkit-user-select:text;
 }
 
-/* Copiar conserva la animación, pero baja el peso visual */
+/* Copiar → check verde. La única confirmación textual es la cápsula flotante. */
 .gx-clabe-copy{
-    min-width:99px;
+    width:78px;
+    min-width:78px;
     min-height:44px;
     padding:0 10px;
     border-radius:13px;
-    border:1px solid rgba(0,242,254,.13);
-    background:rgba(0,242,254,.055);
+    border:1px solid rgba(0,242,254,.15);
+    background:rgba(0,242,254,.065);
+    color:var(--neon-blue);
     box-shadow:none;
+    transition:
+        width .30s cubic-bezier(.2,.8,.2,1),
+        min-width .30s cubic-bezier(.2,.8,.2,1),
+        padding .30s cubic-bezier(.2,.8,.2,1),
+        transform .16s ease,
+        background .22s ease,
+        border-color .22s ease,
+        box-shadow .22s ease;
 }
 .gx-copy-label{
+    width:33px;
+    overflow:hidden;
+    opacity:1;
     font-size:8.8px;
-    font-weight:750;
+    font-weight:760;
+    transition:width .24s ease,opacity .18s ease;
 }
 .gx-clabe-copy.is-copied{
-    border-color:rgba(0,242,254,.30);
-    background:linear-gradient(135deg,rgba(0,242,254,.20),rgba(79,140,255,.13));
-    box-shadow:0 0 22px rgba(0,242,254,.08);
+    width:44px;
+    min-width:44px;
+    padding:0;
+    border-color:transparent;
+    background:#28c96f;
+    color:#fff;
+    box-shadow:0 0 22px rgba(40,201,111,.30);
 }
-.gx-bank-card.is-copied{
-    border-color:rgba(0,242,254,.22);
-    box-shadow:
-        0 10px 28px rgba(0,0,0,.22),
-        0 0 24px rgba(0,242,254,.055),
-        inset 0 1px 0 rgba(255,255,255,.025);
+.gx-clabe-copy.is-copied .gx-copy-label{
+    width:0;
+    opacity:0;
 }
-.gx-bank-copy-status{
-    color:#9defff;
+.gx-clabe-copy.is-copied .gx-copy-paper{
+    opacity:0;
+    transform:translateY(-5px) scale(.88);
 }
-.gx-bank-copy-status strong{font-size:8.8px}
-.gx-bank-copy-status small{font-size:8px}
+.gx-clabe-copy.is-copied .gx-copy-frame{
+    opacity:.12;
+    transform:scale(.82);
+}
+.gx-clabe-copy.is-copied .gx-copy-check{
+    opacity:1;
+    transform:scale(1);
+    stroke:#fff;
+    stroke-dashoffset:0;
+}
+.gx-bank-copy-status{display:none!important}
 
-/* Nota y CTA interior: casi sin cajas */
-.gx-bank-security-note{
-    padding:7px 2px 4px;
-    border:0;
-    background:transparent;
-    font-size:8.2px;
-    line-height:1.4;
-    color:#728299;
-}
-.gx-bank-security-icon{
-    width:18px;
-    height:18px;
-    flex-basis:18px;
-    border:0;
-    background:rgba(0,242,254,.055);
-}
+/* CTA posterior a transferencia */
 .gx-bank-finished{
-    min-height:48px;
-    margin-top:10px;
+    width:100%;
+    min-height:50px;
+    margin-top:12px;
+    padding:0 14px;
+    border:0;
     border-radius:16px;
-    border:1px solid rgba(46,160,67,.13);
-    background:rgba(46,160,67,.055);
-    color:#dff6e7;
-    font-size:10.4px;
-    font-weight:750;
-    box-shadow:none;
+    color:#fff;
+    background:linear-gradient(135deg,#2dbf70,#159b77);
+    box-shadow:0 9px 24px rgba(26,164,105,.18),inset 0 1px 0 rgba(255,255,255,.14);
+}
+.gx-bank-finished > span{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1px;
+}
+.gx-bank-finished strong{
+    font-size:10.8px;
+    font-weight:820;
+}
+.gx-bank-finished small{
+    color:rgba(255,255,255,.75);
+    font-size:8.3px;
+    font-weight:620;
+}
+.gx-bank-finished svg{
+    color:#fff;
+}
+.gx-bank-finished:active{
+    transform:scale(.986);
+    box-shadow:0 5px 16px rgba(26,164,105,.16),inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+/* Confirmación flotante · una sola vez */
+.gx-payment-beta .toast{
+    z-index:4600;
+    bottom:calc(24px + env(safe-area-inset-bottom,0px));
+    padding:10px 16px;
+    border-radius:999px;
+    font-size:10.5px;
+    font-weight:760;
+    letter-spacing:.05px;
+    color:#dfffea;
+    background:rgba(11,27,19,.82);
+    border:1px solid rgba(40,201,111,.28);
+    -webkit-backdrop-filter:blur(18px) saturate(1.12);
+    backdrop-filter:blur(18px) saturate(1.12);
+    box-shadow:0 10px 30px rgba(0,0,0,.30),0 0 20px rgba(40,201,111,.10);
+}
+.gx-payment-beta .toast.success{
+    color:#dfffea;
+    background:rgba(11,27,19,.86);
+    border-color:rgba(40,201,111,.34);
+}
+.gx-payment-beta .toast.error{
+    color:#ffe8ed;
+    background:rgba(42,10,17,.88);
+    border-color:rgba(255,77,111,.34);
+    box-shadow:0 10px 30px rgba(0,0,0,.30),0 0 20px rgba(255,77,111,.10);
+}
+
+@media(hover:hover) and (pointer:fine){
+    .gx-payment-primary:hover{
+        transform:translateY(-1px);
+        box-shadow:
+            0 15px 36px rgba(25,119,255,.28),
+            0 0 29px rgba(0,242,254,.15),
+            inset 0 1px 0 rgba(255,255,255,.28);
+    }
+    .gx-payment-actions .gx-bank-trigger:hover{
+        transform:translateY(-1px);
+        border-color:rgba(0,242,254,.18);
+        background:rgba(10,15,22,.62);
+    }
+    .gx-clabe-copy:hover{
+        border-color:rgba(0,242,254,.26);
+        background:rgba(0,242,254,.10);
+    }
 }
 
 @media(max-width:560px){
+    .gx-bank-overlay{
+        align-items:flex-end;
+        padding:0;
+    }
     .gx-bank-sheet{
+        width:100%;
+        max-height:91dvh;
         padding:24px 18px calc(18px + env(safe-area-inset-bottom,0px));
         border-radius:28px 28px 0 0;
+        border-left:0;
+        border-right:0;
+        border-bottom:0;
     }
 }
 @media(max-width:360px){
-    .gx-bank-heading{
-        padding-right:40px;
-    }
-    .gx-bank-clabe-wrap{
-        grid-template-columns:1fr;
-    }
+    .gx-bank-heading{padding-right:40px}
+    .gx-bank-clabe-wrap{grid-template-columns:1fr}
     .gx-clabe-copy{
         width:100%;
+        min-width:100%;
+    }
+    .gx-clabe-copy.is-copied{
+        width:44px;
+        min-width:44px;
+        justify-self:end;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-payment-primary,
+    .gx-bank-trigger,
+    .gx-bank-sheet,
+    .gx-bank-card,
+    .gx-clabe-copy,
+    .gx-copy-label,
+    .gx-copy-paper,
+    .gx-copy-frame,
+    .gx-copy-check{
+        animation:none!important;
+        transition:none!important;
     }
 }
