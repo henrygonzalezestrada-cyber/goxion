@@ -258,3 +258,585 @@
     -webkit-user-select:none;
     pointer-events:none;
 }
+
+
+/* ===== GOXION PAY · SELECTOR BANCARIO BETA ===== */
+/*
+   Beta visible únicamente con ?gxPay=beta.
+   Inspiración técnica: microinteracción de copiar + profundidad glass.
+   Implementación nativa GOXION, sin jQuery ni dependencias externas.
+*/
+.gx-bank-trigger{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    min-height:64px;
+    padding:10px 14px;
+    border:1px solid rgba(0,242,254,.22);
+    background:
+        linear-gradient(135deg,rgba(0,242,254,.12),rgba(79,140,255,.10) 52%,rgba(124,77,255,.12)),
+        rgba(7,10,16,.82);
+    color:#f7fbff;
+    box-shadow:
+        0 12px 30px rgba(0,0,0,.28),
+        inset 0 1px 0 rgba(255,255,255,.045),
+        0 0 0 1px rgba(0,242,254,.035);
+    justify-content:flex-start;
+    text-align:left;
+    transform:translateZ(0);
+}
+.gx-bank-trigger::before{
+    content:'';
+    position:absolute;
+    inset:-45% auto -45% -42%;
+    width:34%;
+    pointer-events:none;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.23),rgba(0,242,254,.12),transparent);
+    transform:skewX(-18deg) translateX(-180%);
+    animation:gxBankTriggerSweep 5.2s ease-in-out infinite;
+}
+.gx-bank-trigger::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    z-index:-1;
+    border-radius:inherit;
+    background:radial-gradient(circle at 16% 50%,rgba(0,242,254,.13),transparent 34%);
+    opacity:.7;
+}
+.gx-bank-trigger:active{
+    transform:translateY(1px) scale(.986);
+    border-color:rgba(0,242,254,.40);
+    box-shadow:
+        0 6px 18px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.05),
+        0 0 24px rgba(0,242,254,.09);
+}
+.gx-bank-trigger-icon{
+    position:relative;
+    z-index:1;
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    color:var(--neon-blue);
+    background:linear-gradient(145deg,rgba(0,242,254,.13),rgba(79,140,255,.08));
+    border:1px solid rgba(0,242,254,.18);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 7px 18px rgba(0,0,0,.18);
+}
+.gx-bank-trigger-icon svg,
+.gx-bank-trigger-arrow svg,
+.gx-bank-finished svg{
+    width:21px;
+    height:21px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+.gx-bank-trigger-copy{
+    position:relative;
+    z-index:1;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    margin-left:1px;
+}
+.gx-bank-trigger-copy strong{font-size:13px;font-weight:850;letter-spacing:-.12px}
+.gx-bank-trigger-copy small{font-size:9.5px;color:var(--text-muted);font-weight:650}
+.gx-bank-trigger-arrow{
+    position:relative;
+    z-index:1;
+    margin-left:auto;
+    color:var(--neon-blue);
+    display:grid;
+    place-items:center;
+    transition:transform .22s cubic-bezier(.2,.8,.2,1);
+}
+.gx-bank-trigger:active .gx-bank-trigger-arrow{transform:translateX(3px)}
+@keyframes gxBankTriggerSweep{
+    0%,62%{transform:skewX(-18deg) translateX(-180%);opacity:0}
+    68%{opacity:1}
+    82%{transform:skewX(-18deg) translateX(560%);opacity:1}
+    88%,100%{transform:skewX(-18deg) translateX(560%);opacity:0}
+}
+
+/* Overlay / sheet */
+.gx-bank-overlay{
+    position:fixed;
+    inset:0;
+    z-index:3200;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(3,3,5,.70);
+    backdrop-filter:blur(14px) saturate(1.08);
+    -webkit-backdrop-filter:blur(14px) saturate(1.08);
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .26s ease,visibility 0s linear .26s;
+}
+.gx-bank-overlay.show{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transition-delay:0s;
+}
+.gx-bank-sheet{
+    position:relative;
+    width:min(100%,430px);
+    max-height:min(88dvh,760px);
+    overflow:auto;
+    overscroll-behavior:contain;
+    padding:23px 18px calc(18px + env(safe-area-inset-bottom,0px));
+    border-radius:28px;
+    border:1px solid rgba(0,242,254,.17);
+    background:
+        radial-gradient(circle at 12% 0%,rgba(0,242,254,.085),transparent 30%),
+        radial-gradient(circle at 92% 12%,rgba(124,77,255,.10),transparent 31%),
+        linear-gradient(160deg,rgba(13,16,23,.97),rgba(5,6,10,.985));
+    box-shadow:
+        0 32px 90px rgba(0,0,0,.70),
+        inset 0 1px 0 rgba(255,255,255,.045);
+    transform:translateY(30px) scale(.955);
+    opacity:0;
+    transition:
+        transform .42s cubic-bezier(.18,.88,.22,1.05),
+        opacity .24s ease;
+}
+.gx-bank-overlay.show .gx-bank-sheet{
+    transform:translateY(0) scale(1);
+    opacity:1;
+}
+.gx-bank-close{
+    position:absolute;
+    top:15px;
+    right:15px;
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(255,255,255,.045);
+    color:#c9d3e1;
+    font-size:22px;
+    line-height:1;
+    cursor:pointer;
+    transition:transform .18s ease,background .18s ease,border-color .18s ease;
+}
+.gx-bank-close:active{transform:scale(.91);background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+.gx-bank-kicker{
+    padding-right:48px;
+    color:var(--neon-blue);
+    font-size:8.5px;
+    font-weight:850;
+    letter-spacing:1.45px;
+}
+.gx-bank-heading{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:14px;
+    align-items:end;
+    margin-top:7px;
+    padding-bottom:16px;
+    border-bottom:1px solid rgba(255,255,255,.065);
+}
+.gx-bank-heading h3{
+    margin:0;
+    color:#fff;
+    font-size:20px;
+    line-height:1.12;
+    font-weight:850;
+    letter-spacing:-.45px;
+}
+.gx-bank-heading p{
+    margin:6px 0 0;
+    color:var(--text-muted);
+    font-size:10px;
+    line-height:1.45;
+}
+.gx-bank-total{
+    min-width:94px;
+    text-align:right;
+    padding:9px 10px;
+    border-radius:14px;
+    background:rgba(0,242,254,.055);
+    border:1px solid rgba(0,242,254,.12);
+}
+.gx-bank-total span{
+    display:block;
+    color:var(--text-muted);
+    font-size:7.8px;
+    font-weight:750;
+    text-transform:uppercase;
+    letter-spacing:.7px;
+}
+.gx-bank-total strong{
+    display:block;
+    margin-top:2px;
+    color:#fff;
+    font-size:15px;
+    font-weight:850;
+    letter-spacing:-.25px;
+}
+
+/* Account cards */
+.gx-bank-list{display:grid;gap:11px;margin:15px 0 12px}
+.gx-bank-card{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
+    padding:14px;
+    border-radius:20px;
+    border:1px solid rgba(255,255,255,.085);
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018)),
+        rgba(4,6,10,.72);
+    box-shadow:0 12px 30px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.03);
+}
+.gx-bank-card.is-primary{
+    border-color:rgba(0,242,254,.18);
+    background:
+        radial-gradient(circle at 0 0,rgba(0,242,254,.075),transparent 34%),
+        linear-gradient(145deg,rgba(255,255,255,.047),rgba(255,255,255,.018)),
+        rgba(4,6,10,.75);
+}
+.gx-bank-overlay.show .gx-bank-card{
+    animation:gxBankCardIn .48s cubic-bezier(.18,.86,.22,1) both;
+    animation-delay:calc(80ms + (var(--gx-bank-order) * 70ms));
+}
+@keyframes gxBankCardIn{
+    from{opacity:0;transform:translateY(13px) scale(.98)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+}
+.gx-bank-card-shine{
+    position:absolute;
+    z-index:-1;
+    inset:-45% -25%;
+    pointer-events:none;
+    opacity:.55;
+    background:radial-gradient(circle at 86% 24%,rgba(124,77,255,.08),transparent 27%);
+}
+.gx-bank-card::after{
+    content:'';
+    position:absolute;
+    z-index:4;
+    top:-35%;
+    bottom:-35%;
+    left:-32%;
+    width:24%;
+    pointer-events:none;
+    opacity:0;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),rgba(0,242,254,.20),transparent);
+    transform:skewX(-18deg) translateX(-260%);
+}
+.gx-bank-card.is-copied{
+    border-color:rgba(0,242,254,.38);
+    box-shadow:
+        0 14px 38px rgba(0,0,0,.28),
+        0 0 28px rgba(0,242,254,.09),
+        inset 0 1px 0 rgba(255,255,255,.045);
+}
+.gx-bank-card.is-copied::after{
+    animation:gxBankCopySweep .78s cubic-bezier(.18,.72,.22,1);
+}
+@keyframes gxBankCopySweep{
+    0%{opacity:0;transform:skewX(-18deg) translateX(-260%)}
+    18%{opacity:1}
+    78%{opacity:1}
+    100%{opacity:0;transform:skewX(-18deg) translateX(760%)}
+}
+.gx-bank-card-top{display:flex;align-items:center;gap:11px}
+.gx-bank-mark{
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+    border-radius:13px;
+    display:grid;
+    place-items:center;
+    color:#fff;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:-.4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 8px 18px rgba(0,0,0,.24);
+}
+.gx-bank-mark.nu{background:linear-gradient(145deg,#7e35d8,#4a1c83)}
+.gx-bank-mark.revolut{background:linear-gradient(145deg,#eff4ff,#8fa9d8);color:#0a101c}
+.gx-bank-identity{min-width:0;flex:1}
+.gx-bank-name-row{display:flex;align-items:center;gap:7px}
+.gx-bank-name-row strong{color:#fff;font-size:13px;font-weight:850}
+.gx-bank-identity small{display:block;margin-top:2px;color:var(--text-muted);font-size:8.8px;font-weight:650}
+.gx-bank-primary{
+    display:inline-flex;
+    align-items:center;
+    min-height:18px;
+    padding:0 6px;
+    border-radius:999px;
+    color:var(--neon-blue);
+    font-size:7.5px;
+    font-weight:850;
+    letter-spacing:.25px;
+    background:rgba(0,242,254,.07);
+    border:1px solid rgba(0,242,254,.16);
+}
+.gx-bank-holder{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:13px;
+    padding-top:11px;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+.gx-bank-holder span,
+.gx-bank-clabe span{
+    color:var(--text-muted);
+    font-size:8.2px;
+    font-weight:750;
+    text-transform:uppercase;
+    letter-spacing:.58px;
+}
+.gx-bank-holder strong{
+    color:#dce5f2;
+    font-size:10.2px;
+    font-weight:750;
+    text-align:right;
+}
+.gx-bank-clabe-wrap{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px;
+    align-items:center;
+    margin-top:11px;
+}
+.gx-bank-clabe{
+    min-width:0;
+    padding:10px 11px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.065);
+    background:rgba(0,0,0,.21);
+}
+.gx-bank-clabe span{display:block;margin-bottom:3px}
+.gx-bank-clabe strong{
+    display:block;
+    color:#fff;
+    font-size:12.3px;
+    line-height:1.2;
+    font-weight:800;
+    letter-spacing:.55px;
+    white-space:nowrap;
+    user-select:text;
+    -webkit-user-select:text;
+}
+
+/* Clipboard micro-interaction */
+.gx-clabe-copy{
+    min-width:104px;
+    min-height:48px;
+    padding:0 11px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    border-radius:14px;
+    border:1px solid rgba(0,242,254,.20);
+    background:linear-gradient(145deg,rgba(0,242,254,.11),rgba(79,140,255,.08));
+    color:var(--neon-blue);
+    font:inherit;
+    cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+    transition:
+        transform .16s cubic-bezier(.2,.8,.2,1),
+        border-color .2s ease,
+        background .2s ease,
+        box-shadow .2s ease;
+}
+.gx-clabe-copy:active{transform:translateY(1px) scale(.965)}
+.gx-copy-label{font-size:9.4px;font-weight:850;white-space:nowrap}
+.gx-copy-icon{width:22px;height:22px;display:grid;place-items:center}
+.gx-copy-icon svg{
+    width:22px;
+    height:22px;
+    overflow:visible;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.65;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+.gx-copy-paper,
+.gx-copy-frame{
+    opacity:1;
+    transform-origin:center;
+    transition:opacity .2s ease,transform .36s cubic-bezier(.2,.8,.2,1);
+}
+.gx-copy-check{
+    opacity:0;
+    stroke:#fff;
+    stroke-width:2.15;
+    stroke-dasharray:18;
+    stroke-dashoffset:18;
+    transform:scale(.85);
+    transform-origin:center;
+}
+.gx-clabe-copy.is-copied{
+    color:#fff;
+    border-color:rgba(0,242,254,.44);
+    background:linear-gradient(135deg,rgba(0,242,254,.30),rgba(79,140,255,.22));
+    box-shadow:0 0 20px rgba(0,242,254,.12),inset 0 1px 0 rgba(255,255,255,.08);
+}
+.gx-clabe-copy.is-copied .gx-copy-paper{
+    opacity:0;
+    transform:translateY(-6px) rotate(-4deg) scale(.92);
+}
+.gx-clabe-copy.is-copied .gx-copy-frame{
+    opacity:.22;
+    transform:scale(.88);
+}
+.gx-clabe-copy.is-copied .gx-copy-check{
+    opacity:1;
+    transform:scale(1);
+    animation:gxCopyCheckDraw .42s .08s cubic-bezier(.2,.8,.2,1) forwards;
+}
+@keyframes gxCopyCheckDraw{to{stroke-dashoffset:0}}
+.gx-bank-copy-status{
+    max-height:0;
+    opacity:0;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:auto auto 1fr;
+    align-items:center;
+    gap:5px;
+    color:var(--neon-blue);
+    transform:translateY(-3px);
+    transition:max-height .3s ease,opacity .22s ease,transform .3s ease,margin-top .3s ease;
+}
+.gx-bank-copy-status span{
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:rgba(0,242,254,.11);
+    border:1px solid rgba(0,242,254,.20);
+    font-size:9px;
+}
+.gx-bank-copy-status strong{font-size:9.2px;font-weight:850}
+.gx-bank-copy-status small{font-size:8.4px;color:var(--text-muted);text-align:right}
+.gx-bank-card.is-copied .gx-bank-copy-status{
+    max-height:34px;
+    opacity:1;
+    transform:translateY(0);
+    margin-top:9px;
+}
+
+/* Footer actions */
+.gx-bank-security-note{
+    display:flex;
+    gap:9px;
+    align-items:flex-start;
+    padding:10px 11px;
+    border-radius:14px;
+    color:var(--text-muted);
+    font-size:8.7px;
+    line-height:1.45;
+    background:rgba(255,255,255,.027);
+    border:1px solid rgba(255,255,255,.055);
+}
+.gx-bank-security-note strong{color:#dce7f4}
+.gx-bank-security-icon{
+    flex:0 0 20px;
+    width:20px;
+    height:20px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    color:var(--neon-blue);
+    background:rgba(0,242,254,.08);
+    border:1px solid rgba(0,242,254,.15);
+    font-size:9px;
+    font-weight:900;
+}
+.gx-bank-finished{
+    width:100%;
+    min-height:50px;
+    margin-top:11px;
+    padding:0 15px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    border-radius:16px;
+    border:1px solid rgba(46,160,67,.22);
+    background:linear-gradient(135deg,rgba(46,160,67,.12),rgba(0,242,254,.055));
+    color:#eafff1;
+    font:inherit;
+    font-size:11px;
+    font-weight:850;
+    cursor:pointer;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+    transition:transform .17s ease,border-color .2s ease,box-shadow .2s ease;
+}
+.gx-bank-finished svg{width:18px;height:18px;color:var(--success-green);transition:transform .2s ease}
+.gx-bank-finished:active{transform:scale(.985);border-color:rgba(46,160,67,.38)}
+.gx-bank-finished:active svg{transform:translateX(3px)}
+
+.toast.error{
+    background:linear-gradient(135deg,#ff5575,#c62952);
+    color:#fff;
+    box-shadow:0 0 20px rgba(255,51,102,.30);
+}
+
+@media (hover:hover) and (pointer:fine){
+    .gx-bank-trigger:hover{
+        border-color:rgba(0,242,254,.36);
+        box-shadow:0 14px 34px rgba(0,0,0,.30),0 0 26px rgba(0,242,254,.08);
+        color:#fff;
+    }
+    .gx-bank-trigger:hover .gx-bank-trigger-arrow{transform:translateX(3px)}
+    .gx-clabe-copy:hover{
+        border-color:rgba(0,242,254,.35);
+        background:linear-gradient(145deg,rgba(0,242,254,.16),rgba(79,140,255,.10));
+        box-shadow:0 8px 18px rgba(0,0,0,.17);
+    }
+}
+
+@media(max-width:560px){
+    .gx-bank-overlay{align-items:flex-end;padding:0}
+    .gx-bank-sheet{
+        width:100%;
+        max-height:91dvh;
+        border-radius:28px 28px 0 0;
+        border-left:0;
+        border-right:0;
+        border-bottom:0;
+        padding:21px 16px calc(17px + env(safe-area-inset-bottom,0px));
+        transform:translateY(38px) scale(.985);
+    }
+}
+@media(max-width:360px){
+    .gx-bank-heading{grid-template-columns:1fr}
+    .gx-bank-total{text-align:left;width:max-content}
+    .gx-bank-clabe-wrap{grid-template-columns:1fr}
+    .gx-clabe-copy{width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-bank-trigger::before{animation:none!important;display:none}
+    .gx-bank-overlay,
+    .gx-bank-sheet,
+    .gx-bank-card,
+    .gx-bank-card::after,
+    .gx-clabe-copy,
+    .gx-copy-paper,
+    .gx-copy-frame,
+    .gx-copy-check,
+    .gx-bank-copy-status{
+        animation:none!important;
+        transition:none!important;
+    }
+}
