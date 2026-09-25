@@ -55,6 +55,34 @@ async function runIndex(browser, browserName, errors) {
   ).catch(() => false);
   if (!financeReady) errors.push(`${label}: motor financiero/selector no disponible.`);
 
+  const paymentExperience = await page.evaluate(() => ({
+    accounts: Array.isArray(window.GOXION_CORE?.BUSINESS?.BANK?.ACCOUNTS)
+      ? window.GOXION_CORE.BUSINESS.BANK.ACCOUNTS.map(x => ({
+          id:x.ID,
+          institution:x.INSTITUTION,
+          clabe:String(x.CLABE || "")
+        }))
+      : [],
+    hasModal: !!document.getElementById("bank-modal"),
+    hasOpen: typeof window.abrirDatosPago === "function",
+    hasCopy: typeof window.copiarClabePago === "function",
+    hasFallback: typeof window.copiarTextoSeguro === "function"
+  })).catch(() => null);
+
+  if (
+    !paymentExperience ||
+    paymentExperience.accounts.length !== 2 ||
+    paymentExperience.accounts.some(x => !/^\\d{18}$/.test(x.clabe)) ||
+    !paymentExperience.accounts.some(x => x.id === "nu") ||
+    !paymentExperience.accounts.some(x => x.id === "revolut" && x.institution === "STP") ||
+    !paymentExperience.hasModal ||
+    !paymentExperience.hasOpen ||
+    !paymentExperience.hasCopy ||
+    !paymentExperience.hasFallback
+  ) {
+    errors.push(`${label}: experiencia de pago Nu/Revolut incompleta o inválida.`);
+  }
+
   const cases = await page.evaluate(() => {
     const legacy = {
       cliente_id:'c1',
