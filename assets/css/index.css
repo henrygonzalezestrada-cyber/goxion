@@ -841,20 +841,34 @@
     }
 }
 
-/* ===== GOXION PAY · HARMONY V3 ===== */
+/* ===== GOXION PAY · HARMONY V4 ===== */
 /*
-   Jerarquía final de la beta:
-   1) reportar pago = acción principal,
-   2) datos para transferir = apoyo,
-   3) soporte = acción terciaria.
-   Glass + superficies sólidas donde mejoran la lectura. Sin brillo perimetral continuo.
+   Poda fina:
+   - reportar pago sigue siendo la acción protagonista;
+   - datos bancarios quedan como consulta;
+   - copiar usa morph iconográfico → check;
+   - comprobante usa transición A (sheet independiente) con estados visuales.
 */
+
+/* Compatibilidad fuera de la beta */
+html:not(.gx-payment-beta) .gx-payment-upload-head,
+html:not(.gx-payment-beta) .gx-upload-beta-icon,
+html:not(.gx-payment-beta) .gx-preview-ready,
+html:not(.gx-payment-beta) .gx-submit-icon,
+html:not(.gx-payment-beta) .gx-submit-subtitle{
+    display:none!important;
+}
+html:not(.gx-payment-beta) .gx-payment-legacy-head,
+html:not(.gx-payment-beta) .gx-upload-legacy-icon{
+    display:block;
+}
+html:not(.gx-payment-beta) .gx-submit-copy{display:block}
+
+/* Jerarquía principal */
 .gx-payment-actions{
     gap:10px;
     margin-top:2px;
 }
-
-/* Acción principal · sólida, luminosa, inequívoca */
 .gx-payment-primary{
     position:relative;
     isolation:isolate;
@@ -939,7 +953,7 @@
     transform:translateX(3px);
 }
 
-/* Datos de transferencia · glass, secundario */
+/* Datos para transferir · secundario */
 .gx-payment-actions .gx-bank-trigger{
     min-height:53px;
     padding:8px 13px;
@@ -989,7 +1003,7 @@
     background:rgba(9,14,21,.64);
 }
 
-/* Soporte · sin tercera caja */
+/* Soporte · terciario */
 .gx-payment-actions .gx-support-tertiary{
     min-height:auto;
     padding:7px 5px 1px;
@@ -1020,7 +1034,7 @@
     color:var(--neon-blue);
 }
 
-/* Sheet · vidrio GOXION */
+/* Sheet bancaria */
 .gx-bank-overlay{
     background:rgba(2,3,6,.68);
     -webkit-backdrop-filter:blur(15px) saturate(1.08);
@@ -1087,12 +1101,10 @@
     line-height:1.4;
 }
 .gx-bank-total{display:none!important}
-
-/* Cuentas · dos superficies de vidrio, no paneles */
 .gx-bank-list{
     display:grid;
     gap:10px;
-    margin:4px 0 12px;
+    margin:4px 0 2px;
 }
 .gx-bank-card{
     position:relative;
@@ -1125,14 +1137,8 @@
     font-size:10px;
     box-shadow:none;
 }
-.gx-bank-mark.nu{
-    background:#6f32c9;
-    color:#fff;
-}
-.gx-bank-mark.revolut{
-    background:#edf2fa;
-    color:#07101d;
-}
+.gx-bank-mark.nu{background:#6f32c9;color:#fff}
+.gx-bank-mark.revolut{background:#edf2fa;color:#07101d}
 .gx-bank-identity{
     min-width:0;
     display:flex;
@@ -1151,9 +1157,7 @@
 }
 .gx-bank-name-row,
 .gx-bank-primary,
-.gx-bank-holder{
-    display:none!important;
-}
+.gx-bank-holder{display:none!important}
 .gx-bank-beneficiary{
     display:flex;
     align-items:center;
@@ -1191,10 +1195,7 @@
     border-radius:13px;
     background:rgba(0,0,0,.19);
 }
-.gx-bank-clabe span{
-    display:block;
-    margin-bottom:3px;
-}
+.gx-bank-clabe span{display:block;margin-bottom:3px}
 .gx-bank-clabe strong{
     display:block;
     color:#fff;
@@ -1207,99 +1208,84 @@
     -webkit-user-select:text;
 }
 
-/* Copiar → check verde. La única confirmación textual es la cápsula flotante. */
+/* Clipboard → check: un solo icono visual */
 .gx-clabe-copy{
-    width:78px;
-    min-width:78px;
+    width:44px;
+    min-width:44px;
+    height:44px;
     min-height:44px;
-    padding:0 10px;
+    padding:0;
+    display:grid;
+    place-items:center;
     border-radius:13px;
     border:1px solid rgba(0,242,254,.15);
     background:rgba(0,242,254,.065);
     color:var(--neon-blue);
     box-shadow:none;
     transition:
-        width .30s cubic-bezier(.2,.8,.2,1),
-        min-width .30s cubic-bezier(.2,.8,.2,1),
-        padding .30s cubic-bezier(.2,.8,.2,1),
-        transform .16s ease,
+        transform .18s cubic-bezier(.2,.8,.2,1),
         background .22s ease,
         border-color .22s ease,
         box-shadow .22s ease;
 }
-.gx-copy-label{
-    width:33px;
-    overflow:hidden;
-    opacity:1;
-    font-size:8.8px;
-    font-weight:760;
-    transition:width .24s ease,opacity .18s ease;
+.gx-copy-icon,
+.gx-copy-icon svg{
+    width:22px;
+    height:22px;
+    display:block;
 }
+.gx-copy-icon svg{
+    overflow:visible;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.75;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+.gx-copy-clipboard{
+    opacity:1;
+    transform:scale(1) rotate(0deg);
+    transform-origin:center;
+    stroke-dasharray:60;
+    stroke-dashoffset:0;
+    transition:
+        opacity .16s ease,
+        transform .28s cubic-bezier(.2,.8,.2,1),
+        stroke-dashoffset .24s ease;
+}
+.gx-copy-check{
+    opacity:0;
+    transform:scale(.55) rotate(-8deg);
+    transform-origin:center;
+    stroke:#fff;
+    stroke-width:2.25;
+    stroke-dasharray:20;
+    stroke-dashoffset:20;
+    transition:
+        opacity .15s ease,
+        transform .30s cubic-bezier(.16,.88,.24,1.12),
+        stroke-dashoffset .30s .04s ease;
+}
+.gx-clabe-copy:active{transform:scale(.92)}
 .gx-clabe-copy.is-copied{
-    width:44px;
-    min-width:44px;
-    padding:0;
     border-color:transparent;
     background:#28c96f;
     color:#fff;
     box-shadow:0 0 22px rgba(40,201,111,.30);
 }
-.gx-clabe-copy.is-copied .gx-copy-label{
-    width:0;
+.gx-clabe-copy.is-copied .gx-copy-clipboard{
     opacity:0;
-}
-.gx-clabe-copy.is-copied .gx-copy-paper{
-    opacity:0;
-    transform:translateY(-5px) scale(.88);
-}
-.gx-clabe-copy.is-copied .gx-copy-frame{
-    opacity:.12;
-    transform:scale(.82);
+    transform:scale(.52) rotate(8deg);
+    stroke-dashoffset:35;
 }
 .gx-clabe-copy.is-copied .gx-copy-check{
     opacity:1;
-    transform:scale(1);
-    stroke:#fff;
+    transform:scale(1) rotate(0deg);
     stroke-dashoffset:0;
 }
 .gx-bank-copy-status{display:none!important}
 
-/* CTA posterior a transferencia */
-.gx-bank-finished{
-    width:100%;
-    min-height:50px;
-    margin-top:12px;
-    padding:0 14px;
-    border:0;
-    border-radius:16px;
-    color:#fff;
-    background:linear-gradient(135deg,#2dbf70,#159b77);
-    box-shadow:0 9px 24px rgba(26,164,105,.18),inset 0 1px 0 rgba(255,255,255,.14);
-}
-.gx-bank-finished > span{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:1px;
-}
-.gx-bank-finished strong{
-    font-size:10.8px;
-    font-weight:820;
-}
-.gx-bank-finished small{
-    color:rgba(255,255,255,.75);
-    font-size:8.3px;
-    font-weight:620;
-}
-.gx-bank-finished svg{
-    color:#fff;
-}
-.gx-bank-finished:active{
-    transform:scale(.986);
-    box-shadow:0 5px 16px rgba(26,164,105,.16),inset 0 1px 0 rgba(255,255,255,.10);
-}
-
-/* Confirmación flotante · una sola vez */
+/* Cápsula única de confirmación */
 .gx-payment-beta .toast{
     z-index:4600;
     bottom:calc(24px + env(safe-area-inset-bottom,0px));
@@ -1309,22 +1295,389 @@
     font-weight:760;
     letter-spacing:.05px;
     color:#dfffea;
-    background:rgba(11,27,19,.82);
-    border:1px solid rgba(40,201,111,.28);
+    background:rgba(11,27,19,.84);
+    border:1px solid rgba(40,201,111,.30);
     -webkit-backdrop-filter:blur(18px) saturate(1.12);
     backdrop-filter:blur(18px) saturate(1.12);
     box-shadow:0 10px 30px rgba(0,0,0,.30),0 0 20px rgba(40,201,111,.10);
 }
 .gx-payment-beta .toast.success{
     color:#dfffea;
-    background:rgba(11,27,19,.86);
-    border-color:rgba(40,201,111,.34);
+    background:rgba(11,27,19,.88);
+    border-color:rgba(40,201,111,.36);
 }
 .gx-payment-beta .toast.error{
     color:#ffe8ed;
-    background:rgba(42,10,17,.88);
-    border-color:rgba(255,77,111,.34);
+    background:rgba(42,10,17,.90);
+    border-color:rgba(255,77,111,.36);
     box-shadow:0 10px 30px rgba(0,0,0,.30),0 0 20px rgba(255,77,111,.10);
+}
+
+/* Opción A · modal independiente con entrada suave */
+.gx-payment-beta #payment-modal{
+    display:flex;
+    visibility:hidden;
+    pointer-events:none;
+    opacity:0;
+    background:rgba(2,3,6,.68);
+    -webkit-backdrop-filter:blur(0) saturate(1);
+    backdrop-filter:blur(0) saturate(1);
+    transition:
+        opacity .28s ease,
+        backdrop-filter .32s ease,
+        -webkit-backdrop-filter .32s ease,
+        visibility 0s linear .32s;
+}
+.gx-payment-beta #payment-modal.show{
+    visibility:visible;
+    pointer-events:auto;
+    opacity:1;
+    -webkit-backdrop-filter:blur(15px) saturate(1.08);
+    backdrop-filter:blur(15px) saturate(1.08);
+    transition-delay:0s;
+}
+.gx-payment-beta #payment-modal .modal-content{
+    width:min(100%,420px);
+    max-height:min(88dvh,760px);
+    overflow:auto;
+    text-align:left;
+    padding:24px 20px calc(20px + env(safe-area-inset-bottom,0px));
+    border-radius:28px;
+    border:1px solid rgba(255,255,255,.075);
+    background:
+        radial-gradient(circle at 10% 0%,rgba(0,242,254,.07),transparent 28%),
+        radial-gradient(circle at 94% 9%,rgba(124,77,255,.085),transparent 32%),
+        rgba(7,8,13,.80);
+    -webkit-backdrop-filter:blur(28px) saturate(1.18);
+    backdrop-filter:blur(28px) saturate(1.18);
+    box-shadow:
+        0 34px 100px rgba(0,0,0,.72),
+        inset 0 1px 0 rgba(255,255,255,.045);
+    opacity:0;
+    transform:translateY(18px) scale(.978);
+    transition:
+        opacity .22s ease,
+        transform .34s cubic-bezier(.18,.86,.22,1.04);
+}
+.gx-payment-beta #payment-modal.show .modal-content{
+    opacity:1;
+    transform:translateY(0) scale(1);
+}
+.gx-payment-beta .gx-payment-legacy-head,
+.gx-payment-beta .gx-upload-legacy-icon{
+    display:none!important;
+}
+.gx-payment-beta .gx-payment-upload-head{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding-right:42px;
+    opacity:0;
+    transform:translateY(8px);
+}
+.gx-payment-beta #payment-modal.show .gx-payment-upload-head{
+    animation:gxPaymentItemIn .34s .07s cubic-bezier(.2,.8,.2,1) forwards;
+}
+.gx-payment-beta .gx-payment-upload-symbol{
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+    display:grid;
+    place-items:center;
+    border-radius:14px;
+    color:#041015;
+    background:linear-gradient(135deg,#24f0ff,#61dcff);
+    box-shadow:0 0 20px rgba(0,242,254,.16);
+}
+.gx-payment-beta .gx-payment-upload-symbol svg,
+.gx-payment-beta .upload-icon svg,
+.gx-payment-beta .gx-upload-arrow svg,
+.gx-payment-beta .gx-submit-icon svg{
+    width:22px;
+    height:22px;
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.8;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+.gx-payment-beta .gx-payment-upload-copy{min-width:0}
+.gx-payment-beta .gx-payment-upload-kicker{
+    color:#7f92a9;
+    font-size:7.8px;
+    font-weight:760;
+    letter-spacing:1.25px;
+}
+.gx-payment-beta .gx-payment-upload-copy h3{
+    margin:3px 0 0;
+    color:#fff;
+    font-size:18px;
+    font-weight:820;
+    letter-spacing:-.35px;
+}
+.gx-payment-beta .gx-payment-upload-copy p{
+    margin:4px 0 0;
+    color:#8293a8;
+    font-size:9.3px;
+    line-height:1.4;
+}
+.gx-payment-beta #payment-modal .close-modal{
+    top:15px;
+    right:15px;
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    color:#031015;
+    background:linear-gradient(135deg,#24f0ff,#61dcff);
+    box-shadow:0 0 18px rgba(0,242,254,.20);
+    font-size:21px;
+    line-height:1;
+}
+.gx-payment-beta #payment-modal .close-modal:active{
+    transform:scale(.90);
+}
+
+/* Selector de imagen */
+.gx-payment-beta .upload-area{
+    min-height:84px;
+    margin:18px 0 0;
+    padding:13px;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    align-items:center;
+    gap:11px;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:18px;
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.018)),
+        rgba(11,13,19,.40);
+    -webkit-backdrop-filter:blur(16px) saturate(1.12);
+    backdrop-filter:blur(16px) saturate(1.12);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.03);
+    opacity:0;
+    transform:translateY(10px);
+}
+.gx-payment-beta #payment-modal.show .upload-area{
+    animation:gxPaymentItemIn .36s .12s cubic-bezier(.2,.8,.2,1) forwards;
+}
+.gx-payment-beta .upload-area:active{
+    transform:scale(.99);
+    border-color:rgba(0,242,254,.16);
+}
+.gx-payment-beta .upload-icon{
+    width:38px;
+    height:38px;
+    margin:0;
+    display:grid;
+    place-items:center;
+    border-radius:13px;
+    color:var(--neon-blue);
+    background:rgba(0,242,254,.075);
+    filter:none;
+}
+.gx-payment-beta .gx-upload-beta-icon{display:block}
+.gx-payment-beta .upload-text{
+    min-width:0;
+    color:#8191a5;
+    font-size:8.7px;
+}
+.gx-payment-beta .upload-text strong{
+    margin:0 0 2px;
+    color:#f4f7fb;
+    font-size:11px;
+    font-weight:780;
+}
+.gx-payment-beta .upload-text span{
+    font-size:8.4px;
+}
+.gx-payment-beta .gx-upload-arrow{
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    color:#8fefff;
+}
+.gx-payment-beta .gx-upload-arrow svg{width:18px;height:18px}
+
+/* Preview */
+.gx-payment-beta #preview-container{
+    display:none;
+    margin:14px 0 0;
+    border:1px solid rgba(255,255,255,.065);
+    border-radius:18px;
+    overflow:hidden;
+    background:rgba(4,5,8,.50);
+    box-shadow:0 10px 28px rgba(0,0,0,.18);
+}
+.gx-payment-beta #payment-modal.has-preview #preview-container{
+    display:block;
+    animation:gxPreviewIn .34s cubic-bezier(.18,.86,.22,1) both;
+}
+.gx-payment-beta #payment-modal.has-preview .upload-area{
+    display:none;
+}
+.gx-payment-beta #preview-img{
+    width:100%;
+    max-height:280px;
+    object-fit:contain;
+    display:block;
+    background:#020304;
+}
+.gx-payment-beta .gx-preview-footer{
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:8px 10px;
+    border-top:1px solid rgba(255,255,255,.05);
+    background:rgba(255,255,255,.025);
+    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(12px);
+}
+.gx-payment-beta .gx-preview-ready{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    color:#bfccd9;
+    font-size:8.9px;
+    font-weight:700;
+}
+.gx-payment-beta .gx-preview-ready-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#28c96f;
+    box-shadow:0 0 12px rgba(40,201,111,.42);
+}
+.gx-payment-beta .btn-change-img{
+    position:static;
+    padding:6px 10px;
+    border:0;
+    border-radius:999px;
+    color:#b8c7d7;
+    background:rgba(255,255,255,.055);
+    font-size:8.5px;
+    font-weight:720;
+    -webkit-backdrop-filter:blur(8px);
+    backdrop-filter:blur(8px);
+}
+
+/* Envío con estados */
+.gx-payment-beta .btn-submit-payment{
+    min-height:54px;
+    margin-top:12px;
+    padding:8px 13px;
+    display:none;
+    align-items:center;
+    justify-content:flex-start;
+    gap:10px;
+    border:0;
+    border-radius:17px;
+    color:#fff;
+    background:linear-gradient(135deg,#12dff5,#4f8cff 58%,#7656ff);
+    box-shadow:0 10px 28px rgba(37,119,255,.20),inset 0 1px 0 rgba(255,255,255,.20);
+    text-align:left;
+    transition:
+        transform .18s ease,
+        background .25s ease,
+        box-shadow .25s ease;
+}
+.gx-payment-beta #payment-modal.has-preview .btn-submit-payment{display:flex}
+.gx-payment-beta .btn-submit-payment:active:not(:disabled){transform:scale(.987)}
+.gx-payment-beta .gx-submit-icon{
+    width:36px;
+    height:36px;
+    flex:0 0 36px;
+    display:grid;
+    place-items:center;
+    border-radius:12px;
+    background:rgba(255,255,255,.14);
+}
+.gx-payment-beta .gx-submit-icon svg{
+    width:21px;
+    height:21px;
+    overflow:visible;
+}
+.gx-payment-beta .gx-submit-copy{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+    min-width:0;
+}
+.gx-payment-beta .gx-submit-title{
+    color:#fff;
+    font-size:10.9px;
+    font-weight:820;
+}
+.gx-payment-beta .gx-submit-subtitle{
+    color:rgba(255,255,255,.75);
+    font-size:8.3px;
+    font-weight:620;
+}
+.gx-submit-spinner,
+.gx-submit-check,
+.gx-submit-error{
+    opacity:0;
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+    background:linear-gradient(135deg,#5967ff,#8158ff);
+    box-shadow:0 10px 28px rgba(111,84,255,.22),inset 0 1px 0 rgba(255,255,255,.17);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-send{opacity:0}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+    opacity:1;
+    stroke-dasharray:30;
+    stroke-dashoffset:9;
+    transform-origin:center;
+    animation:gxSubmitSpin .82s linear infinite;
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"]{
+    background:linear-gradient(135deg,#2dcc73,#159f75);
+    box-shadow:0 10px 28px rgba(40,201,111,.22),0 0 22px rgba(40,201,111,.12);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-send{opacity:0}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+    opacity:1;
+    stroke-width:2.2;
+    stroke-dasharray:22;
+    stroke-dashoffset:22;
+    animation:gxSubmitCheck .36s .04s ease forwards;
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"]{
+    background:linear-gradient(135deg,#e94867,#b72f52);
+    box-shadow:0 10px 28px rgba(233,72,103,.18),0 0 20px rgba(233,72,103,.10);
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-send{opacity:0}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-error{
+    opacity:1;
+    stroke-width:2.1;
+}
+.gx-payment-beta #payment-modal.is-success .gx-preview-ready-dot{
+    animation:gxSuccessPulse .75s ease;
+}
+
+@keyframes gxPaymentItemIn{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
+}
+@keyframes gxPreviewIn{
+    from{opacity:0;transform:translateY(10px) scale(.985)}
+    to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes gxSubmitSpin{
+    to{transform:rotate(360deg)}
+}
+@keyframes gxSubmitCheck{
+    to{stroke-dashoffset:0}
+}
+@keyframes gxSuccessPulse{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.45)}
 }
 
 @media(hover:hover) and (pointer:fine){
@@ -1344,17 +1697,24 @@
         border-color:rgba(0,242,254,.26);
         background:rgba(0,242,254,.10);
     }
+    .gx-payment-beta .upload-area:hover{
+        border-color:rgba(0,242,254,.14);
+        background:
+            linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.022)),
+            rgba(11,13,19,.46);
+    }
 }
 
 @media(max-width:560px){
-    .gx-bank-overlay{
+    .gx-bank-overlay,
+    .gx-payment-beta #payment-modal{
         align-items:flex-end;
         padding:0;
     }
-    .gx-bank-sheet{
+    .gx-bank-sheet,
+    .gx-payment-beta #payment-modal .modal-content{
         width:100%;
         max-height:91dvh;
-        padding:24px 18px calc(18px + env(safe-area-inset-bottom,0px));
         border-radius:28px 28px 0 0;
         border-left:0;
         border-right:0;
@@ -1363,16 +1723,7 @@
 }
 @media(max-width:360px){
     .gx-bank-heading{padding-right:40px}
-    .gx-bank-clabe-wrap{grid-template-columns:1fr}
-    .gx-clabe-copy{
-        width:100%;
-        min-width:100%;
-    }
-    .gx-clabe-copy.is-copied{
-        width:44px;
-        min-width:44px;
-        justify-self:end;
-    }
+    .gx-bank-clabe strong{font-size:10.5px}
 }
 
 @media(prefers-reduced-motion:reduce){
@@ -1381,10 +1732,16 @@
     .gx-bank-sheet,
     .gx-bank-card,
     .gx-clabe-copy,
-    .gx-copy-label,
-    .gx-copy-paper,
-    .gx-copy-frame,
-    .gx-copy-check{
+    .gx-copy-clipboard,
+    .gx-copy-check,
+    .gx-payment-beta #payment-modal,
+    .gx-payment-beta #payment-modal .modal-content,
+    .gx-payment-beta .gx-payment-upload-head,
+    .gx-payment-beta .upload-area,
+    .gx-payment-beta #preview-container,
+    .gx-payment-beta .btn-submit-payment,
+    .gx-submit-spinner,
+    .gx-submit-check{
         animation:none!important;
         transition:none!important;
     }
