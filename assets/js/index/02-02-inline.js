@@ -534,7 +534,7 @@
       const moneda = gxEsc(cuenta.CURRENCY || "MXN");
       const primary = cuenta.PRIMARY === true;
       return `
-        <article class="gx-bank-card ${primary ? "is-primary" : ""}" data-bank="${id}" style="--gx-bank-order:${index}">
+        <article class="gx-bank-card ${primary ? "is-primary" : ""}" data-bank="${id}" style="--gx-bank-delay:${index * 70}ms">
           <div class="gx-bank-card-shine" aria-hidden="true"></div>
           <div class="gx-bank-card-top">
             <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
@@ -627,9 +627,11 @@
       if(node !== card) node.classList.remove("is-copied");
     });
 
-    card?.classList.remove("is-copied");
-    void card?.offsetWidth;
-    card?.classList.add("is-copied");
+    if(card) {
+      card.classList.remove("is-copied");
+      void card.offsetWidth;
+      card.classList.add("is-copied");
+    }
     btn.classList.add("is-copied");
 
     const label = btn.querySelector(".gx-copy-label");
