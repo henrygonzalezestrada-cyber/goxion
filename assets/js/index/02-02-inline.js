@@ -584,7 +584,6 @@
                   <path class="gx-copy-check" d="m6.8 12.4 3.2 3.2 7.2-7.2"/>
                 </svg>
               </span>
-              <span class="gx-copy-label">Copiar</span>
             </button>
           </div>
         </article>
