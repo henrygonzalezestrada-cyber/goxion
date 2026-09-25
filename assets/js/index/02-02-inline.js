@@ -325,17 +325,13 @@
           pagoActualInfo = { clienteKey, periodo: periodoStr, monto: totalFinal.toFixed(2), folio: cliente.folio, nombre: cliente.nombre };
           btnAccionHTML = `
             ${botonDatosPagoHTML()}
-            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
-              📤 Ya realicé mi depósito
-            </button>
+            ${botonComprobanteHTML(clienteKey, periodoStr, totalFinal, cliente.folio, cliente.nombre)}
           `;
       } else {
           pagoActualInfo = { clienteKey, periodo: periodoStr, monto: totalFinal.toFixed(2), folio: cliente.folio, nombre: cliente.nombre };
           btnAccionHTML = `
             ${botonDatosPagoHTML()}
-            <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
-              📤 Ya realicé mi depósito
-            </button>
+            ${botonComprobanteHTML(clienteKey, periodoStr, totalFinal, cliente.folio, cliente.nombre)}
           `;
       }
 
@@ -417,10 +413,10 @@
             </div>
           </div>
 
-          <div class="actions-group">
+          <div class="actions-group ${GX_PAYMENT_BETA ? "gx-payment-actions" : ""}">
             ${btnAccionHTML}
-            <a href="${urlWA}" target="_blank" class="btn btn-wa">
-              💬 Contactar a Soporte
+            <a href="${urlWA}" target="_blank" class="btn btn-wa ${GX_PAYMENT_BETA ? "gx-support-tertiary" : ""}">
+              ${GX_PAYMENT_BETA ? '<span>¿Necesitas ayuda?</span><strong>Contactar a soporte</strong>' : '💬 Contactar a Soporte'}
             </a>
           </div>
 
@@ -521,6 +517,26 @@
     `;
   }
 
+  function botonComprobanteHTML(clienteKey, periodoStr, totalFinal, folio, nombre) {
+    const action = `abrirModalPago('${clienteKey}', '${periodoStr}', '${Number(totalFinal).toFixed(2)}', '${folio}', '${nombre}')`;
+    if(!GX_PAYMENT_BETA) {
+      return `
+        <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="${action}">
+          📤 Ya realicé mi depósito
+        </button>
+      `;
+    }
+    return `
+      <button class="btn gx-payment-secondary" type="button" onclick="${action}">
+        <span class="gx-payment-secondary-copy">
+          <strong>Ya realicé mi depósito</strong>
+          <small>Subir comprobante</small>
+        </span>
+        <span class="gx-payment-secondary-arrow" aria-hidden="true">›</span>
+      </button>
+    `;
+  }
+
   function renderCuentasPago() {
     const list = document.getElementById("gx-bank-list");
     if(!list) return;
@@ -531,23 +547,24 @@
       const institucion = gxEsc(cuenta.INSTITUTION || cuenta.LABEL || "");
       const titular = gxEsc(cuenta.HOLDER || "");
       const clabe = gxEsc(gxFormatoClabe(cuenta.CLABE));
-      const moneda = gxEsc(cuenta.CURRENCY || "MXN");
       const primary = cuenta.PRIMARY === true;
+      const descriptor = primary
+        ? "Cuenta principal"
+        : (String(cuenta.INSTITUTION || "").toUpperCase() === "STP" ? "Transferencia vía STP" : institucion);
+
       return `
         <article class="gx-bank-card ${primary ? "is-primary" : ""}" data-bank="${id}" style="--gx-bank-delay:${index * 70}ms">
           <div class="gx-bank-card-shine" aria-hidden="true"></div>
+
           <div class="gx-bank-card-top">
             <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
             <div class="gx-bank-identity">
-              <div class="gx-bank-name-row">
-                <strong>${label}</strong>
-                ${primary ? '<span class="gx-bank-primary">Principal</span>' : ""}
-              </div>
-              <small>Institución · ${institucion} · ${moneda}</small>
+              <strong>${label}</strong>
+              <small>${gxEsc(descriptor)}</small>
             </div>
           </div>
 
-          <div class="gx-bank-holder">
+          <div class="gx-bank-beneficiary">
             <span>Beneficiario</span>
             <strong>${titular}</strong>
           </div>
@@ -570,7 +587,7 @@
           </div>
 
           <div class="gx-bank-copy-status" aria-live="polite">
-            <span>✓</span><strong>CLABE copiada</strong><small>Lista para pegar en tu banco.</small>
+            <span>✓</span><strong>CLABE copiada</strong><small>Lista para pegar.</small>
           </div>
         </article>
       `;
