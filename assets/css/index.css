@@ -1746,3 +1746,260 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         transition:none!important;
     }
 }
+
+
+/* ===== GOXION PAY · GLASS/SUBMIT V5 ===== */
+/* Cristal de Ayuda + microinteracción Submit adaptada a móvil. */
+
+/* Las sheets dejan pasar el fondo lava: mismo lenguaje glass de Ayuda */
+.gx-bank-sheet,
+.gx-payment-beta #payment-modal .modal-content{
+    border:1px solid rgba(255,255,255,.08);
+    background:var(--card-glass);
+    -webkit-backdrop-filter:blur(18px) saturate(1.16);
+    backdrop-filter:blur(18px) saturate(1.16);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.40),
+        inset 0 20px 40px -24px rgba(0,242,254,.12),
+        inset 0 1px 0 rgba(255,255,255,.045);
+}
+.gx-bank-sheet::before,
+.gx-payment-beta #payment-modal .modal-content::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    pointer-events:none;
+    background:
+        radial-gradient(circle at 7% 0%,rgba(0,242,254,.055),transparent 30%),
+        radial-gradient(circle at 94% 8%,rgba(124,77,255,.065),transparent 34%);
+    z-index:-1;
+}
+
+/* Tarjetas internas: transparencia real, no panel Admin */
+.gx-bank-card,
+.gx-payment-beta .upload-area,
+.gx-payment-beta #preview-container{
+    border:1px solid rgba(255,255,255,.08);
+    background:var(--card-glass);
+    -webkit-backdrop-filter:blur(10px) saturate(1.10);
+    backdrop-filter:blur(10px) saturate(1.10);
+    box-shadow:
+        inset 0 20px 40px -24px rgba(0,242,254,.14),
+        0 10px 30px rgba(0,0,0,.24);
+}
+.gx-bank-card.is-primary{
+    border-color:rgba(255,255,255,.08);
+    background:var(--card-glass);
+}
+.gx-bank-card-shine{
+    opacity:.34;
+    background:radial-gradient(circle at 88% 18%,rgba(124,77,255,.13),transparent 31%);
+}
+.gx-bank-clabe{
+    background:rgba(0,0,0,.14);
+    border:1px solid rgba(255,255,255,.035);
+}
+.gx-payment-beta .gx-preview-footer{
+    background:rgba(8,8,12,.28);
+    -webkit-backdrop-filter:blur(10px);
+    backdrop-filter:blur(10px);
+}
+.gx-payment-beta .btn-change-img{
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.055);
+}
+
+/* Copy/duplicate icon: dos hojas claras → una palomita */
+.gx-copy-icon,
+.gx-copy-icon svg{
+    width:24px;
+    height:24px;
+}
+.gx-copy-back,
+.gx-copy-front{
+    opacity:1;
+    fill:none;
+    transform-origin:center;
+    transition:
+        opacity .15s ease,
+        transform .28s cubic-bezier(.2,.8,.2,1),
+        stroke-dashoffset .26s ease;
+}
+.gx-copy-back{
+    stroke-dasharray:40;
+    stroke-dashoffset:0;
+    transform:translate(-.7px,-.7px) scale(.92);
+    opacity:.68;
+}
+.gx-copy-front{
+    stroke-dasharray:40;
+    stroke-dashoffset:0;
+    transform:translate(.7px,.7px) scale(.92);
+}
+.gx-clabe-copy.is-copied .gx-copy-back{
+    opacity:0;
+    stroke-dashoffset:24;
+    transform:translate(-3px,-3px) scale(.48) rotate(-8deg);
+}
+.gx-clabe-copy.is-copied .gx-copy-front{
+    opacity:0;
+    stroke-dashoffset:24;
+    transform:translate(3px,3px) scale(.48) rotate(8deg);
+}
+.gx-clabe-copy.is-copied .gx-copy-check{
+    opacity:1;
+    transform:scale(1.04) rotate(0deg);
+    stroke-dashoffset:0;
+}
+/* Evita que reglas de la versión anterior busquen un clipboard viejo */
+.gx-copy-clipboard{display:none!important}
+
+/* Submit estilo micro-interaction: contenido + carril lateral */
+.gx-payment-beta .btn-submit-payment{
+    position:relative;
+    overflow:hidden;
+    min-height:56px;
+    margin-top:12px;
+    padding:8px 66px 8px 16px;
+    gap:0;
+    border:0;
+    border-radius:17px;
+    background:linear-gradient(135deg,#13dff4,#4f8cff 58%,#7656ff);
+    box-shadow:
+        0 10px 28px rgba(37,119,255,.20),
+        inset 0 1px 0 rgba(255,255,255,.20);
+    transition:
+        transform .18s ease,
+        background .34s ease,
+        box-shadow .34s ease,
+        padding .30s cubic-bezier(.2,.8,.2,1);
+}
+.gx-payment-beta .gx-submit-copy{
+    position:relative;
+    z-index:1;
+    width:100%;
+    align-items:flex-start;
+    transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .22s ease;
+}
+.gx-payment-beta .gx-submit-icon{
+    position:absolute;
+    top:0;
+    right:0;
+    width:54px;
+    height:100%;
+    display:grid;
+    place-items:center;
+    border-radius:0;
+    border-left:1px solid rgba(255,255,255,.23);
+    background:rgba(0,0,0,.08);
+    transform:translateX(0);
+    transition:
+        width .30s cubic-bezier(.2,.8,.2,1),
+        background .30s ease,
+        border-color .30s ease,
+        transform .30s cubic-bezier(.2,.8,.2,1);
+}
+.gx-payment-beta .gx-submit-icon svg{
+    width:23px;
+    height:23px;
+    overflow:visible;
+}
+.gx-payment-beta .gx-submit-send{
+    opacity:1;
+    transform:scale(1);
+    transform-origin:center;
+    transition:opacity .18s ease,transform .26s cubic-bezier(.2,.8,.2,1);
+}
+.gx-submit-spinner,
+.gx-submit-check,
+.gx-submit-error{
+    transform-origin:center;
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+    background:linear-gradient(135deg,#5869ff,#7b58ff 60%,#9a52ed);
+    box-shadow:
+        0 10px 30px rgba(105,83,255,.24),
+        inset 0 1px 0 rgba(255,255,255,.17);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-icon{
+    width:60px;
+    background:rgba(255,255,255,.09);
+    border-left-color:rgba(255,255,255,.26);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-send{
+    opacity:0;
+    transform:scale(.35);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+    opacity:1;
+    stroke-dasharray:29 16;
+    stroke-dashoffset:5;
+    animation:gxSubmitSpin .78s linear infinite;
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"]{
+    background:linear-gradient(135deg,#2dcc73,#159f75);
+    box-shadow:
+        0 10px 28px rgba(40,201,111,.24),
+        0 0 22px rgba(40,201,111,.12),
+        inset 0 1px 0 rgba(255,255,255,.16);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-icon{
+    width:60px;
+    background:rgba(255,255,255,.10);
+    border-left-color:rgba(255,255,255,.24);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-send,
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-spinner{
+    opacity:0;
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+    opacity:1;
+    transform:scale(1.08);
+    stroke-width:2.2;
+    stroke-dasharray:22;
+    stroke-dashoffset:22;
+    animation:gxSubmitCheck .38s .04s ease forwards;
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"]{
+    background:linear-gradient(135deg,#e94867,#b72f52);
+    box-shadow:
+        0 10px 28px rgba(233,72,103,.20),
+        0 0 20px rgba(233,72,103,.10);
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-icon{
+    width:60px;
+    background:rgba(255,255,255,.08);
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-send,
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-spinner{
+    opacity:0;
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-error{
+    opacity:1;
+    animation:gxSubmitErrorPop .26s cubic-bezier(.2,.8,.2,1);
+}
+@keyframes gxSubmitErrorPop{
+    0%{transform:scale(.55) rotate(-8deg)}
+    100%{transform:scale(1) rotate(0)}
+}
+
+/* La transparencia debe seguir luciendo en móvil */
+@media(max-width:560px){
+    .gx-bank-sheet,
+    .gx-payment-beta #payment-modal .modal-content{
+        background:var(--card-glass);
+        -webkit-backdrop-filter:blur(18px) saturate(1.16);
+        backdrop-filter:blur(18px) saturate(1.16);
+    }
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-copy-back,
+    .gx-copy-front,
+    .gx-payment-beta .gx-submit-icon,
+    .gx-payment-beta .gx-submit-copy,
+    .gx-payment-beta .gx-submit-send{
+        animation:none!important;
+        transition:none!important;
+    }
+}
