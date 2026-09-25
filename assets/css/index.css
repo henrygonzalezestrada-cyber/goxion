@@ -840,3 +840,350 @@
         transition:none!important;
     }
 }
+
+
+/* ===== GOXION PAY · HARMONY V2 ===== */
+/*
+   Segunda iteración visual: menos lenguaje Admin, más Mi Espacio.
+   Mantiene intactos el flujo, la copia segura y la microinteracción.
+*/
+.gx-payment-actions{
+    gap:9px;
+    margin-top:2px;
+}
+
+/* Acción principal: misma familia visual de Mi Espacio */
+.gx-payment-actions .gx-bank-trigger{
+    min-height:58px;
+    padding:9px 13px;
+    border-radius:18px;
+    border:1px solid rgba(0,242,254,.18);
+    background:
+        linear-gradient(135deg,rgba(0,242,254,.075),rgba(79,140,255,.06) 55%,rgba(124,77,255,.07)),
+        rgba(8,10,15,.58);
+    box-shadow:
+        0 10px 26px rgba(0,0,0,.20),
+        inset 0 1px 0 rgba(255,255,255,.035),
+        0 0 22px rgba(0,242,254,.035);
+}
+.gx-payment-actions .gx-bank-trigger-icon{
+    width:36px;
+    height:36px;
+    flex-basis:36px;
+    border-radius:12px;
+    border-color:rgba(0,242,254,.14);
+    background:rgba(0,242,254,.06);
+    box-shadow:none;
+}
+.gx-payment-actions .gx-bank-trigger-copy strong{
+    font-size:12px;
+    font-weight:800;
+}
+.gx-payment-actions .gx-bank-trigger-copy small{
+    font-size:9px;
+    color:#8fa1b8;
+    font-weight:600;
+}
+.gx-payment-actions .gx-bank-trigger-arrow{
+    opacity:.85;
+}
+
+/* Acción secundaria: no compite con transferir */
+.gx-payment-secondary{
+    min-height:48px;
+    padding:0 14px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.075);
+    background:rgba(255,255,255,.028);
+    color:#dce5f2;
+    justify-content:space-between;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.02);
+}
+.gx-payment-secondary-copy{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:1px;
+}
+.gx-payment-secondary-copy strong{
+    font-size:10.8px;
+    font-weight:750;
+}
+.gx-payment-secondary-copy small{
+    color:var(--text-muted);
+    font-size:8.4px;
+    font-weight:600;
+}
+.gx-payment-secondary-arrow{
+    color:#93a4ba;
+    font-size:22px;
+    line-height:1;
+    transition:transform .18s ease,color .18s ease;
+}
+.gx-payment-secondary:active{
+    transform:scale(.988);
+    border-color:rgba(255,255,255,.12);
+}
+.gx-payment-secondary:active .gx-payment-secondary-arrow{
+    transform:translateX(2px);
+    color:var(--neon-blue);
+}
+
+/* Soporte: terciario, visualmente libre */
+.gx-payment-actions .gx-support-tertiary{
+    min-height:auto;
+    padding:8px 6px 2px;
+    border:0;
+    background:transparent;
+    box-shadow:none;
+    display:flex;
+    flex-direction:row;
+    gap:5px;
+    color:var(--text-muted);
+    font-size:9px;
+    font-weight:600;
+}
+.gx-payment-actions .gx-support-tertiary span{
+    color:#77879d;
+}
+.gx-payment-actions .gx-support-tertiary strong{
+    color:#a9bbd0;
+    font-size:9px;
+    font-weight:750;
+}
+.gx-payment-actions .gx-support-tertiary:hover,
+.gx-payment-actions .gx-support-tertiary:active{
+    background:transparent;
+    border-color:transparent;
+    color:var(--neon-blue);
+    transform:none;
+}
+.gx-payment-actions .gx-support-tertiary:hover strong,
+.gx-payment-actions .gx-support-tertiary:active strong{
+    color:var(--neon-blue);
+}
+
+/* Sheet: más aire, menos panel */
+.gx-bank-sheet{
+    padding:26px 20px calc(20px + env(safe-area-inset-bottom,0px));
+    border-radius:30px;
+    border:1px solid rgba(255,255,255,.075);
+    background:
+        radial-gradient(circle at 9% 0%,rgba(0,242,254,.055),transparent 27%),
+        radial-gradient(circle at 94% 8%,rgba(124,77,255,.065),transparent 31%),
+        rgba(6,7,11,.965);
+    box-shadow:
+        0 34px 100px rgba(0,0,0,.72),
+        inset 0 1px 0 rgba(255,255,255,.03);
+}
+.gx-bank-kicker{
+    color:#7890aa;
+    font-size:8px;
+    font-weight:750;
+    letter-spacing:1.35px;
+}
+.gx-bank-heading{
+    display:block;
+    margin-top:8px;
+    padding:0 42px 18px 0;
+    border-bottom:0;
+}
+.gx-bank-heading h3{
+    font-size:22px;
+    line-height:1.1;
+    letter-spacing:-.6px;
+    font-weight:800;
+}
+.gx-bank-heading h3 > strong{
+    color:var(--neon-blue);
+    font:inherit;
+    text-shadow:0 0 22px rgba(0,242,254,.13);
+}
+.gx-bank-heading p{
+    margin-top:7px;
+    width:min(100%,320px);
+    font-size:9.8px;
+    line-height:1.48;
+    color:#8495ab;
+}
+.gx-bank-total{display:none!important}
+
+/* Cuentas: más cercanas a tarjetas de Mi Espacio */
+.gx-bank-list{
+    gap:10px;
+    margin:4px 0 12px;
+}
+.gx-bank-card{
+    padding:15px 15px 14px;
+    border-radius:19px;
+    border:1px solid rgba(255,255,255,.055);
+    background:
+        radial-gradient(circle at 100% 0%,rgba(124,77,255,.035),transparent 30%),
+        rgba(255,255,255,.026);
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.18),
+        inset 0 1px 0 rgba(255,255,255,.022);
+}
+.gx-bank-card.is-primary{
+    border-color:rgba(0,242,254,.095);
+    background:
+        radial-gradient(circle at 0 0,rgba(0,242,254,.045),transparent 34%),
+        rgba(255,255,255,.028);
+}
+.gx-bank-card-top{
+    gap:10px;
+}
+.gx-bank-mark{
+    width:36px;
+    height:36px;
+    flex-basis:36px;
+    border-radius:12px;
+    font-size:10px;
+    box-shadow:none;
+}
+.gx-bank-mark.nu{
+    background:linear-gradient(145deg,rgba(126,53,216,.88),rgba(74,28,131,.82));
+}
+.gx-bank-mark.revolut{
+    background:linear-gradient(145deg,#e8eef8,#9fb1ce);
+}
+.gx-bank-identity{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+}
+.gx-bank-identity > strong{
+    color:#f4f7fb;
+    font-size:12px;
+    font-weight:800;
+}
+.gx-bank-identity > small{
+    color:#8190a4;
+    font-size:8.5px;
+    font-weight:600;
+}
+.gx-bank-name-row,
+.gx-bank-primary,
+.gx-bank-holder{
+    display:none!important;
+}
+.gx-bank-beneficiary{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:13px;
+    padding:0 1px;
+}
+.gx-bank-beneficiary span{
+    color:#708096;
+    font-size:8px;
+    font-weight:650;
+    text-transform:uppercase;
+    letter-spacing:.55px;
+}
+.gx-bank-beneficiary strong{
+    min-width:0;
+    color:#cbd5e2;
+    font-size:9.7px;
+    font-weight:650;
+    text-align:right;
+}
+.gx-bank-clabe-wrap{
+    margin-top:10px;
+    gap:8px;
+}
+.gx-bank-clabe{
+    padding:9px 10px;
+    border-radius:13px;
+    border:0;
+    background:rgba(0,0,0,.20);
+}
+.gx-bank-clabe span{
+    color:#708096;
+    font-size:7.7px;
+    font-weight:650;
+}
+.gx-bank-clabe strong{
+    font-size:11.5px;
+    font-weight:750;
+    letter-spacing:.45px;
+}
+
+/* Copiar conserva la animación, pero baja el peso visual */
+.gx-clabe-copy{
+    min-width:99px;
+    min-height:44px;
+    padding:0 10px;
+    border-radius:13px;
+    border:1px solid rgba(0,242,254,.13);
+    background:rgba(0,242,254,.055);
+    box-shadow:none;
+}
+.gx-copy-label{
+    font-size:8.8px;
+    font-weight:750;
+}
+.gx-clabe-copy.is-copied{
+    border-color:rgba(0,242,254,.30);
+    background:linear-gradient(135deg,rgba(0,242,254,.20),rgba(79,140,255,.13));
+    box-shadow:0 0 22px rgba(0,242,254,.08);
+}
+.gx-bank-card.is-copied{
+    border-color:rgba(0,242,254,.22);
+    box-shadow:
+        0 10px 28px rgba(0,0,0,.22),
+        0 0 24px rgba(0,242,254,.055),
+        inset 0 1px 0 rgba(255,255,255,.025);
+}
+.gx-bank-copy-status{
+    color:#9defff;
+}
+.gx-bank-copy-status strong{font-size:8.8px}
+.gx-bank-copy-status small{font-size:8px}
+
+/* Nota y CTA interior: casi sin cajas */
+.gx-bank-security-note{
+    padding:7px 2px 4px;
+    border:0;
+    background:transparent;
+    font-size:8.2px;
+    line-height:1.4;
+    color:#728299;
+}
+.gx-bank-security-icon{
+    width:18px;
+    height:18px;
+    flex-basis:18px;
+    border:0;
+    background:rgba(0,242,254,.055);
+}
+.gx-bank-finished{
+    min-height:48px;
+    margin-top:10px;
+    border-radius:16px;
+    border:1px solid rgba(46,160,67,.13);
+    background:rgba(46,160,67,.055);
+    color:#dff6e7;
+    font-size:10.4px;
+    font-weight:750;
+    box-shadow:none;
+}
+
+@media(max-width:560px){
+    .gx-bank-sheet{
+        padding:24px 18px calc(18px + env(safe-area-inset-bottom,0px));
+        border-radius:28px 28px 0 0;
+    }
+}
+@media(max-width:360px){
+    .gx-bank-heading{
+        padding-right:40px;
+    }
+    .gx-bank-clabe-wrap{
+        grid-template-columns:1fr;
+    }
+    .gx-clabe-copy{
+        width:100%;
+    }
+}
