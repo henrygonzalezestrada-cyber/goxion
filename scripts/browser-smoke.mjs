@@ -72,7 +72,7 @@ async function runIndex(browser, browserName, errors) {
   if (
     !paymentExperience ||
     paymentExperience.accounts.length !== 2 ||
-    paymentExperience.accounts.some(x => !/^\\d{18}$/.test(x.clabe)) ||
+    paymentExperience.accounts.some(x => !/^\d{18}$/.test(x.clabe)) ||
     !paymentExperience.accounts.some(x => x.id === "nu") ||
     !paymentExperience.accounts.some(x => x.id === "revolut" && x.institution === "STP") ||
     !paymentExperience.hasModal ||
