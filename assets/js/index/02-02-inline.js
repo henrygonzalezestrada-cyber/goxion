@@ -4,6 +4,7 @@
   const BANCO_PAGO = GXCORE.BUSINESS.BANK.NAME;
   const TITULAR_PAGO = GXCORE.BUSINESS.BANK.HOLDER;
   const GX_PAYMENT_BETA = new URLSearchParams(window.location.search).get("gxPay") === "beta";
+  if (GX_PAYMENT_BETA) document.documentElement.classList.add("gx-payment-beta");
   const CUENTAS_PAGO = Object.freeze(
     Array.isArray(GXCORE.BUSINESS.BANK.ACCOUNTS) && GXCORE.BUSINESS.BANK.ACCOUNTS.length
       ? GXCORE.BUSINESS.BANK.ACCOUNTS.map(x => Object.freeze({...x}))
@@ -324,14 +325,14 @@
           labelTotal = gxEstadoCuenta?.total_label || "Saldo Pendiente";
           pagoActualInfo = { clienteKey, periodo: periodoStr, monto: totalFinal.toFixed(2), folio: cliente.folio, nombre: cliente.nombre };
           btnAccionHTML = `
-            ${botonDatosPagoHTML()}
             ${botonComprobanteHTML(clienteKey, periodoStr, totalFinal, cliente.folio, cliente.nombre)}
+            ${botonDatosPagoHTML()}
           `;
       } else {
           pagoActualInfo = { clienteKey, periodo: periodoStr, monto: totalFinal.toFixed(2), folio: cliente.folio, nombre: cliente.nombre };
           btnAccionHTML = `
-            ${botonDatosPagoHTML()}
             ${botonComprobanteHTML(clienteKey, periodoStr, totalFinal, cliente.folio, cliente.nombre)}
+            ${botonDatosPagoHTML()}
           `;
       }
 
@@ -442,12 +443,13 @@
     if(!toast) return;
     toast.textContent = mensaje;
     toast.classList.toggle("error", error);
+    toast.classList.toggle("success", GX_PAYMENT_BETA && !error);
     toast.style.display = "block";
     clearTimeout(mostrarToastPago._timer);
     mostrarToastPago._timer = setTimeout(() => {
       toast.style.display = "none";
-      toast.classList.remove("error");
-    }, 2400);
+      toast.classList.remove("error","success");
+    }, 2100);
   }
 
   async function copiarTextoSeguro(texto) {
@@ -508,7 +510,7 @@
         </span>
         <span class="gx-bank-trigger-copy">
           <strong>Datos para transferir</strong>
-          <small>Nu o Revolut · Copia tu CLABE</small>
+          <small>Nu o Revolut</small>
         </span>
         <span class="gx-bank-trigger-arrow" aria-hidden="true">
           <svg viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5"/></svg>
@@ -527,12 +529,17 @@
       `;
     }
     return `
-      <button class="btn gx-payment-secondary" type="button" onclick="${action}">
-        <span class="gx-payment-secondary-copy">
-          <strong>Ya realicé mi depósito</strong>
+      <button class="btn gx-payment-primary" type="button" onclick="${action}">
+        <span class="gx-payment-primary-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 4v10m-4-4 4 4 4-4M5 18.5h14"/></svg>
+        </span>
+        <span class="gx-payment-primary-copy">
+          <strong>Ya realicé mi pago</strong>
           <small>Subir comprobante</small>
         </span>
-        <span class="gx-payment-secondary-arrow" aria-hidden="true">›</span>
+        <span class="gx-payment-primary-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5"/></svg>
+        </span>
       </button>
     `;
   }
@@ -547,20 +554,16 @@
       const institucion = gxEsc(cuenta.INSTITUTION || cuenta.LABEL || "");
       const titular = gxEsc(cuenta.HOLDER || "");
       const clabe = gxEsc(gxFormatoClabe(cuenta.CLABE));
-      const primary = cuenta.PRIMARY === true;
-      const descriptor = primary
-        ? "Cuenta principal"
-        : (String(cuenta.INSTITUTION || "").toUpperCase() === "STP" ? "Transferencia vía STP" : institucion);
 
       return `
-        <article class="gx-bank-card ${primary ? "is-primary" : ""}" data-bank="${id}" style="--gx-bank-delay:${index * 70}ms">
+        <article class="gx-bank-card" data-bank="${id}" style="--gx-bank-delay:${index * 70}ms">
           <div class="gx-bank-card-shine" aria-hidden="true"></div>
 
           <div class="gx-bank-card-top">
             <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
             <div class="gx-bank-identity">
               <strong>${label}</strong>
-              <small>${gxEsc(descriptor)}</small>
+              <small>${institucion}</small>
             </div>
           </div>
 
@@ -582,12 +585,8 @@
                   <path class="gx-copy-check" d="m7.3 14.7 2.2 2.2 4.4-5"/>
                 </svg>
               </span>
-              <span class="gx-copy-label">Copiar CLABE</span>
+              <span class="gx-copy-label">Copiar</span>
             </button>
-          </div>
-
-          <div class="gx-bank-copy-status" aria-live="polite">
-            <span>✓</span><strong>CLABE copiada</strong><small>Lista para pegar.</small>
           </div>
         </article>
       `;
@@ -636,29 +635,23 @@
 
     if(!ok) {
       seleccionarClabeVisible(card);
-      mostrarToastPago("Mantén presionada la CLABE para copiarla", true);
+      mostrarToastPago("No se pudo copiar · mantén presionada la CLABE", true);
       return;
     }
 
-    document.querySelectorAll(".gx-bank-card.is-copied").forEach(node => {
-      if(node !== card) node.classList.remove("is-copied");
+    document.querySelectorAll(".gx-clabe-copy.is-copied").forEach(node => {
+      if(node !== btn) node.classList.remove("is-copied");
     });
 
-    if(card) {
-      card.classList.remove("is-copied");
-      void card.offsetWidth;
-      card.classList.add("is-copied");
-    }
+    btn.classList.remove("is-copied");
+    void btn.offsetWidth;
     btn.classList.add("is-copied");
-
-    const label = btn.querySelector(".gx-copy-label");
-    if(label) label.textContent = "Copiada";
+    mostrarToastPago("✓ CLABE copiada");
 
     clearTimeout(btn._gxCopyTimer);
     btn._gxCopyTimer = setTimeout(() => {
       btn.classList.remove("is-copied");
-      if(label) label.textContent = "Copiar CLABE";
-    }, 2600);
+    }, 1900);
   }
 
   function continuarAComprobante() {
