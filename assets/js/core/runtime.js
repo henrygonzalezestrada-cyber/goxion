@@ -44,9 +44,30 @@
   const BUSINESS = Object.freeze({
     WHATSAPP: '528136836901',
     BANK: Object.freeze({
+      // Compatibilidad: la cuenta principal conserva las claves históricas.
       NAME: 'NU BANCO',
       HOLDER: 'Henry González',
       CLABE: '638180000167909381',
+      ACCOUNTS: Object.freeze([
+        Object.freeze({
+          ID: 'nu',
+          LABEL: 'Nu',
+          INSTITUTION: 'Nu México',
+          HOLDER: 'Henry González',
+          CLABE: '638180000167909381',
+          CURRENCY: 'MXN',
+          PRIMARY: true,
+        }),
+        Object.freeze({
+          ID: 'revolut',
+          LABEL: 'Revolut',
+          INSTITUTION: 'STP',
+          HOLDER: 'Henry González Estrada',
+          CLABE: '646990404063309449',
+          CURRENCY: 'MXN',
+          PRIMARY: false,
+        }),
+      ]),
     }),
     CHANNELS: Object.freeze({
       pedidos: 'goxion://pedidos',
