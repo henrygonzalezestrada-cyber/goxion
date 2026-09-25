@@ -508,7 +508,7 @@
 }
 .gx-bank-overlay.show .gx-bank-card{
     animation:gxBankCardIn .48s cubic-bezier(.18,.86,.22,1) both;
-    animation-delay:calc(80ms + (var(--gx-bank-order) * 70ms));
+    animation-delay:calc(80ms + var(--gx-bank-delay, 0ms));
 }
 @keyframes gxBankCardIn{
     from{opacity:0;transform:translateY(13px) scale(.98)}
