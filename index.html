@@ -35,23 +35,17 @@
     <section class="gx-bank-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-bank-title">
         <button class="gx-bank-close" type="button" onclick="cerrarDatosPago(event, true)" aria-label="Cerrar datos de transferencia">×</button>
 
-        <div class="gx-bank-kicker">TRANSFERENCIA SPEI · MXN</div>
+        <div class="gx-bank-kicker">PAGO POR TRANSFERENCIA</div>
         <div class="gx-bank-heading">
-            <div>
-                <h3 id="gx-bank-title">Elige dónde transferir</h3>
-                <p>Selecciona una cuenta y copia únicamente la CLABE.</p>
-            </div>
-            <div class="gx-bank-total">
-                <span>Monto exacto</span>
-                <strong id="gx-bank-amount">$0.00</strong>
-            </div>
+            <h3 id="gx-bank-title">Transfiere <strong id="gx-bank-amount">$0.00</strong></h3>
+            <p>Elige la cuenta que prefieras y copia únicamente la CLABE.</p>
         </div>
 
         <div class="gx-bank-list" id="gx-bank-list"></div>
 
         <div class="gx-bank-security-note">
             <span class="gx-bank-security-icon" aria-hidden="true">✓</span>
-            <span><strong>Copiado seguro.</strong> GOXION copiará solamente los 18 dígitos de la CLABE; banco, titular y monto quedan visibles como referencia.</span>
+            <span>Al tocar <strong>Copiar CLABE</strong> se copiarán únicamente los 18 dígitos.</span>
         </div>
 
         <button class="gx-bank-finished" type="button" onclick="continuarAComprobante()">
