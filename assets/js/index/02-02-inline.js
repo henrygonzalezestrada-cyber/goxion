@@ -3,6 +3,20 @@
   const CLABE_PAGO = GXCORE.BUSINESS.BANK.CLABE;
   const BANCO_PAGO = GXCORE.BUSINESS.BANK.NAME;
   const TITULAR_PAGO = GXCORE.BUSINESS.BANK.HOLDER;
+  const GX_PAYMENT_BETA = new URLSearchParams(window.location.search).get("gxPay") === "beta";
+  const CUENTAS_PAGO = Object.freeze(
+    Array.isArray(GXCORE.BUSINESS.BANK.ACCOUNTS) && GXCORE.BUSINESS.BANK.ACCOUNTS.length
+      ? GXCORE.BUSINESS.BANK.ACCOUNTS.map(x => Object.freeze({...x}))
+      : [Object.freeze({
+          ID:"nu",
+          LABEL:BANCO_PAGO,
+          INSTITUTION:BANCO_PAGO,
+          HOLDER:TITULAR_PAGO,
+          CLABE:CLABE_PAGO,
+          CURRENCY:"MXN",
+          PRIMARY:true
+        })]
+  );
   
   // Canal lógico de notificación, centralizado en GOXION_CORE.
   const WEBHOOK_DISCORD = GXCORE.BUSINESS.CHANNELS.pagos;
@@ -308,15 +322,17 @@
           if (gxEstadoCuenta) totalFinal = Number(gxEstadoCuenta.total_actual || 0);
           else if (tieneDiferenciaPendiente) totalFinal = montoFaltanteRevision;
           labelTotal = gxEstadoCuenta?.total_label || "Saldo Pendiente";
+          pagoActualInfo = { clienteKey, periodo: periodoStr, monto: totalFinal.toFixed(2), folio: cliente.folio, nombre: cliente.nombre };
           btnAccionHTML = `
-            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
+            ${botonDatosPagoHTML()}
             <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
               📤 Ya realicé mi depósito
             </button>
           `;
       } else {
+          pagoActualInfo = { clienteKey, periodo: periodoStr, monto: totalFinal.toFixed(2), folio: cliente.folio, nombre: cliente.nombre };
           btnAccionHTML = `
-            <button class="btn btn-copy" onclick="copiarDatos('${totalFinal.toFixed(2)}')">💳 Copiar Datos de Pago</button>
+            ${botonDatosPagoHTML()}
             <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="abrirModalPago('${clienteKey}', '${periodoStr}', '${totalFinal.toFixed(2)}', '${cliente.folio}', '${cliente.nombre}')">
               📤 Ya realicé mi depósito
             </button>
@@ -425,14 +441,221 @@
     }
   }
 
-  function copiarDatos(monto) {
-    const texto = `GOXION - Datos de Transferencia\n\nBanco: ${BANCO_PAGO}\nTitular: ${TITULAR_PAGO}\nCLABE: ${CLABE_PAGO}\nMonto exacto: $${monto} MXN`;
-    navigator.clipboard.writeText(texto).then(() => {
-      const toast = document.getElementById('toast');
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 2500);
-    });
+  function mostrarToastPago(mensaje, error = false) {
+    const toast = document.getElementById("toast");
+    if(!toast) return;
+    toast.textContent = mensaje;
+    toast.classList.toggle("error", error);
+    toast.style.display = "block";
+    clearTimeout(mostrarToastPago._timer);
+    mostrarToastPago._timer = setTimeout(() => {
+      toast.style.display = "none";
+      toast.classList.remove("error");
+    }, 2400);
   }
+
+  async function copiarTextoSeguro(texto) {
+    const limpio = String(texto || "").replace(/\D/g, "");
+    if(!limpio) return false;
+
+    if(window.isSecureContext && navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(limpio);
+        return true;
+      } catch (_) {}
+    }
+
+    const area = document.createElement("textarea");
+    area.value = limpio;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.left = "-9999px";
+    area.style.top = "0";
+    area.style.fontSize = "16px";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    area.setSelectionRange(0, area.value.length);
+
+    let ok = false;
+    try { ok = document.execCommand("copy"); } catch (_) {}
+    area.remove();
+    return ok;
+  }
+
+  async function copiarDatos() {
+    const ok = await copiarTextoSeguro(CLABE_PAGO);
+    mostrarToastPago(ok ? "✓ CLABE de Nu copiada" : "No se pudo copiar automáticamente", !ok);
+  }
+
+  function gxEsc(value) {
+    return String(value ?? "")
+      .replace(/&/g,"&amp;")
+      .replace(/</g,"&lt;")
+      .replace(/>/g,"&gt;")
+      .replace(/"/g,"&quot;")
+      .replace(/'/g,"&#39;");
+  }
+
+  function gxFormatoClabe(value) {
+    return String(value || "").replace(/\D/g, "").replace(/(.{3})(?=.)/g, "$1 ");
+  }
+
+  function botonDatosPagoHTML() {
+    if(!GX_PAYMENT_BETA) {
+      return '<button class="btn btn-copy" onclick="copiarDatos()">💳 Copiar CLABE de pago</button>';
+    }
+    return `
+      <button class="btn gx-bank-trigger" type="button" onclick="abrirDatosPago()">
+        <span class="gx-bank-trigger-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3.5 9.2 12 4l8.5 5.2M5.5 10.5v7m4.3-7v7m4.4-7v7m4.3-7v7M3.5 20h17"/></svg>
+        </span>
+        <span class="gx-bank-trigger-copy">
+          <strong>Datos para transferir</strong>
+          <small>Nu o Revolut · Copia tu CLABE</small>
+        </span>
+        <span class="gx-bank-trigger-arrow" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 12h13m-5-5 5 5-5 5"/></svg>
+        </span>
+      </button>
+    `;
+  }
+
+  function renderCuentasPago() {
+    const list = document.getElementById("gx-bank-list");
+    if(!list) return;
+
+    list.innerHTML = CUENTAS_PAGO.map((cuenta,index) => {
+      const id = gxEsc(cuenta.ID || `cuenta-${index}`);
+      const label = gxEsc(cuenta.LABEL || cuenta.INSTITUTION || "Cuenta");
+      const institucion = gxEsc(cuenta.INSTITUTION || cuenta.LABEL || "");
+      const titular = gxEsc(cuenta.HOLDER || "");
+      const clabe = gxEsc(gxFormatoClabe(cuenta.CLABE));
+      const moneda = gxEsc(cuenta.CURRENCY || "MXN");
+      const primary = cuenta.PRIMARY === true;
+      return `
+        <article class="gx-bank-card ${primary ? "is-primary" : ""}" data-bank="${id}" style="--gx-bank-delay:${index * 70}ms">
+          <div class="gx-bank-card-shine" aria-hidden="true"></div>
+          <div class="gx-bank-card-top">
+            <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
+            <div class="gx-bank-identity">
+              <div class="gx-bank-name-row">
+                <strong>${label}</strong>
+                ${primary ? '<span class="gx-bank-primary">Principal</span>' : ""}
+              </div>
+              <small>Institución · ${institucion} · ${moneda}</small>
+            </div>
+          </div>
+
+          <div class="gx-bank-holder">
+            <span>Beneficiario</span>
+            <strong>${titular}</strong>
+          </div>
+
+          <div class="gx-bank-clabe-wrap">
+            <div class="gx-bank-clabe">
+              <span>CLABE</span>
+              <strong>${clabe}</strong>
+            </div>
+            <button class="gx-clabe-copy" type="button" onclick="copiarClabePago('${id}', this)" aria-label="Copiar CLABE de ${label}">
+              <span class="gx-copy-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path class="gx-copy-paper" d="M8.2 7.2V5.8A2.8 2.8 0 0 1 11 3h6.2A2.8 2.8 0 0 1 20 5.8V12a2.8 2.8 0 0 1-2.8 2.8h-1.4"/>
+                  <rect class="gx-copy-frame" x="4" y="8" width="12" height="13" rx="2.7"/>
+                  <path class="gx-copy-check" d="m7.3 14.7 2.2 2.2 4.4-5"/>
+                </svg>
+              </span>
+              <span class="gx-copy-label">Copiar CLABE</span>
+            </button>
+          </div>
+
+          <div class="gx-bank-copy-status" aria-live="polite">
+            <span>✓</span><strong>CLABE copiada</strong><small>Lista para pegar en tu banco.</small>
+          </div>
+        </article>
+      `;
+    }).join("");
+  }
+
+  function abrirDatosPago() {
+    const modal = document.getElementById("bank-modal");
+    if(!modal || !pagoActualInfo?.monto) return;
+
+    const amount = document.getElementById("gx-bank-amount");
+    if(amount) amount.textContent = `$${Number(pagoActualInfo.monto || 0).toFixed(2)}`;
+
+    renderCuentasPago();
+    modal.classList.add("show");
+    modal.setAttribute("aria-hidden","false");
+    document.body.style.overflow = "hidden";
+  }
+
+  function cerrarDatosPago(e, force = false, restoreScroll = true) {
+    const modal = document.getElementById("bank-modal");
+    if(!modal) return;
+    if(force || !e || e.target === modal) {
+      modal.classList.remove("show");
+      modal.setAttribute("aria-hidden","true");
+      if(restoreScroll) document.body.style.overflow = "auto";
+    }
+  }
+
+  function seleccionarClabeVisible(card) {
+    const target = card?.querySelector(".gx-bank-clabe strong");
+    if(!target || !window.getSelection) return;
+    const range = document.createRange();
+    range.selectNodeContents(target);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  async function copiarClabePago(accountId, btn) {
+    const cuenta = CUENTAS_PAGO.find(x => String(x.ID) === String(accountId));
+    if(!cuenta || !btn) return;
+
+    const card = btn.closest(".gx-bank-card");
+    const ok = await copiarTextoSeguro(cuenta.CLABE);
+
+    if(!ok) {
+      seleccionarClabeVisible(card);
+      mostrarToastPago("Mantén presionada la CLABE para copiarla", true);
+      return;
+    }
+
+    document.querySelectorAll(".gx-bank-card.is-copied").forEach(node => {
+      if(node !== card) node.classList.remove("is-copied");
+    });
+
+    if(card) {
+      card.classList.remove("is-copied");
+      void card.offsetWidth;
+      card.classList.add("is-copied");
+    }
+    btn.classList.add("is-copied");
+
+    const label = btn.querySelector(".gx-copy-label");
+    if(label) label.textContent = "Copiada";
+
+    clearTimeout(btn._gxCopyTimer);
+    btn._gxCopyTimer = setTimeout(() => {
+      btn.classList.remove("is-copied");
+      if(label) label.textContent = "Copiar CLABE";
+    }, 2600);
+  }
+
+  function continuarAComprobante() {
+    if(!pagoActualInfo?.clienteKey) return;
+    const info = {...pagoActualInfo};
+    cerrarDatosPago(null, true, false);
+    abrirModalPago(info.clienteKey, info.periodo, info.monto, info.folio, info.nombre);
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if(event.key === "Escape" && document.getElementById("bank-modal")?.classList.contains("show")) {
+      cerrarDatosPago(null, true);
+    }
+  });
 
   // --- NUEVA LÓGICA DE SUBIDA DE COMPROBANTES --- //
   let pagoActualInfo = {};

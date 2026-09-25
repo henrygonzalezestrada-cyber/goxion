@@ -28,7 +28,38 @@
   <div class="loading">Sincronizando con Goxion...</div>
 </div>
 
-<div class="toast" id="toast">📋 ¡Datos copiados al portapapeles!</div>
+<div class="toast" id="toast" role="status" aria-live="polite">CLABE copiada</div>
+
+<!-- GOXION PAY · SELECTOR DE CUENTA (beta con ?gxPay=beta) -->
+<div class="gx-bank-overlay" id="bank-modal" onclick="cerrarDatosPago(event)" aria-hidden="true">
+    <section class="gx-bank-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-bank-title">
+        <button class="gx-bank-close" type="button" onclick="cerrarDatosPago(event, true)" aria-label="Cerrar datos de transferencia">×</button>
+
+        <div class="gx-bank-kicker">TRANSFERENCIA SPEI · MXN</div>
+        <div class="gx-bank-heading">
+            <div>
+                <h3 id="gx-bank-title">Elige dónde transferir</h3>
+                <p>Selecciona una cuenta y copia únicamente la CLABE.</p>
+            </div>
+            <div class="gx-bank-total">
+                <span>Monto exacto</span>
+                <strong id="gx-bank-amount">$0.00</strong>
+            </div>
+        </div>
+
+        <div class="gx-bank-list" id="gx-bank-list"></div>
+
+        <div class="gx-bank-security-note">
+            <span class="gx-bank-security-icon" aria-hidden="true">✓</span>
+            <span><strong>Copiado seguro.</strong> GOXION copiará solamente los 18 dígitos de la CLABE; banco, titular y monto quedan visibles como referencia.</span>
+        </div>
+
+        <button class="gx-bank-finished" type="button" onclick="continuarAComprobante()">
+            <span>Ya realicé mi transferencia</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5"/></svg>
+        </button>
+    </section>
+</div>
 
 <!-- MODAL DE PAGO PARA SUBIR COMPROBANTE -->
 <div class="modal-overlay" id="payment-modal" onclick="cerrarModalPago(event)">
