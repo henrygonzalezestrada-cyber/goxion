@@ -46,14 +46,14 @@
     BANK: Object.freeze({
       // Compatibilidad: la cuenta principal conserva las claves históricas.
       NAME: 'NU BANCO',
-      HOLDER: 'Henry González',
+      HOLDER: 'Henry González Estrada',
       CLABE: '638180000167909381',
       ACCOUNTS: Object.freeze([
         Object.freeze({
           ID: 'nu',
           LABEL: 'Nu',
           INSTITUTION: 'Nu México',
-          HOLDER: 'Henry González',
+          HOLDER: 'Henry González Estrada',
           CLABE: '638180000167909381',
           CURRENCY: 'MXN',
           PRIMARY: true,
