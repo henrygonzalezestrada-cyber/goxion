@@ -142,6 +142,55 @@ async function runAyuda(browser, browserName, errors) {
   const label = `${browserName} · Ayuda`;
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   attachDiagnostics(page, label, errors);
+
+  await page.route('**/functions/v1/promociones-catalogo', async route => {
+    const promo = (id, mechanic, title, items, normal, offer, priority) => ({
+      id,
+      nombre:title,
+      titulo_publico:title,
+      descripcion_publica:'Oferta promocional de prueba C1',
+      badge:mechanic==='combo'?'COMBO':(mechanic==='porcentaje'?'30% OFF':'PROMO'),
+      mecanica:mechanic,
+      precio_promocional:offer,
+      precio_promocional_total:offer,
+      descuento_porcentaje:mechanic==='porcentaje'?30:null,
+      duracion_periodos:3,
+      inicio:'2026-09-01T00:00:00Z',
+      fin:'2026-12-31T23:59:59Z',
+      mostrar_precio_anterior:true,
+      mostrar_contador:false,
+      oferta_flash:false,
+      activa:true,
+      audiencia:'todos',
+      destacada:true,
+      publicada:true,
+      adquisicion_habilitada:true,
+      prioridad,
+      revision:1,
+      precio_normal_total:normal,
+      ahorro_estimado:normal-offer,
+      items,
+      elegibilidad:{elegible:null,codigo:'PUBLICO',motivo:'Inicia sesión para confirmar si aplica a tu cuenta'},
+      adquirida:null
+    });
+    const svc=(id,nombre,precio,rol='incluido')=>({servicio_id:id,rol,orden:0,servicio:{id,nombre,precio,etiqueta:''}});
+    await route.fulfill({
+      status:200,
+      contentType:'application/json',
+      body:JSON.stringify({
+        ok:true,
+        autenticado:false,
+        contrato:'goxion-promotions-catalog-c1',
+        version:'1.0',
+        promociones:[
+          promo('c1-price','precio_fijo','Netflix · 3 meses',[svc('netflix','Netflix Premium',109,'principal')],109,79,30),
+          promo('c1-combo','combo','HBO Max + Prime Video',[svc('hbo','HBO Max Platino',79),svc('prime','Prime Video',45)],124,99,20),
+          promo('c1-percent','porcentaje','Disney+ · 30% OFF',[svc('disney','Disney+ Premium',89,'principal')],89,62.3,10)
+        ]
+      })
+    });
+  });
+
   await page.goto(origin + '/ayuda.html', { waitUntil: 'load' });
   await page.waitForTimeout(5200);
 
@@ -321,6 +370,55 @@ async function runAyuda(browser, browserName, errors) {
     await page.waitForTimeout(120);
     if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
+
+  // Catálogo C1: promociones protagonistas + curaduría + expansión.
+  await page.evaluate(() => window.switchTab?.('catalogo'));
+  await page.waitForTimeout(350);
+
+  const promoC1 = await page.evaluate(() => {
+    const showcase=document.getElementById('gx-promo-showcase');
+    const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
+    const curated=document.getElementById('gx-catalog-curated');
+    const rails=document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card');
+    const front=cards.find(x=>x.classList.contains('is-front'));
+    return {
+      showcaseVisible:!!showcase && showcase.hidden===false,
+      cardCount:cards.length,
+      frontIndex:Number(front?.dataset?.gxPromoIndex ?? -1),
+      curatedVisible:!!curated && curated.hidden===false,
+      railCount:rails.length,
+      hasAcquisitionCopy:String(document.querySelector('.gx-promo-showcase')?.textContent||'').includes('Ofertas')
+    };
+  }).catch(()=>null);
+
+  if (
+    !promoC1 ||
+    promoC1.showcaseVisible!==true ||
+    promoC1.cardCount!==3 ||
+    promoC1.frontIndex!==0 ||
+    promoC1.curatedVisible!==true ||
+    promoC1.railCount<1 ||
+    promoC1.hasAcquisitionCopy!==true
+  ) {
+    errors.push(`${label}: catálogo C1 no renderizó deck/curaduría correctamente.`);
+  }
+
+  await page.locator('#gx-promo-next').click().catch(()=>{});
+  await page.waitForTimeout(80);
+  const promoAdvanced=await page.evaluate(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.dataset?.gxPromoIndex==='1'
+  ).catch(()=>false);
+  if(!promoAdvanced) errors.push(`${label}: carrusel promocional C1 no avanzó manualmente.`);
+
+  await page.locator('#gx-promo-deck .gx-promo-deck-card.is-front').click().catch(()=>{});
+  await page.waitForTimeout(80);
+  const promoExpanded=await page.evaluate(() =>
+    document.querySelector('.gx-promo-expanded.active .gx-promo-expanded-card')!==null
+  ).catch(()=>false);
+  if(!promoExpanded) errors.push(`${label}: tarjeta promocional C1 no abrió la vista expandida.`);
+
+  await page.locator('.gx-promo-expanded-close').click().catch(()=>{});
+  await page.waitForTimeout(100);
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
   // no sólo un salto entre estado compacto y expandido.
