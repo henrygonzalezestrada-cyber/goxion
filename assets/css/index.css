@@ -2207,3 +2207,190 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         backdrop-filter:blur(20px) saturate(1.22);
     }
 }
+
+
+/* ===== GOXION PAY · GLASS BALANCE V7 ===== */
+/* Más cuerpo en el cristal, menos transparencia extrema y submit más compacto. */
+
+/* Overlay más limpio: conserva contexto sin lavar demasiado el fondo. */
+.gx-bank-overlay,
+.gx-payment-beta #payment-modal,
+.gx-payment-beta #payment-modal.show{
+    background:rgba(2,3,7,.38);
+    -webkit-backdrop-filter:blur(7px) saturate(1.08);
+    backdrop-filter:blur(7px) saturate(1.08);
+}
+
+/* Sheet principal: vidrio más denso con blur premium. */
+.gx-bank-sheet,
+.gx-payment-beta #payment-modal .modal-content{
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015)),
+        rgba(8,8,12,.40);
+    border:1px solid rgba(255,255,255,.10);
+    -webkit-backdrop-filter:blur(24px) saturate(1.24);
+    backdrop-filter:blur(24px) saturate(1.24);
+    box-shadow:
+        0 16px 42px rgba(0,0,0,.34),
+        inset 0 1px 0 rgba(255,255,255,.06),
+        inset 0 26px 46px -30px rgba(0,242,254,.17);
+}
+
+/* Nu / Revolut: mayor opacidad para que se lean como tarjetas, no sólo líneas. */
+.gx-bank-card,
+.gx-bank-card.is-primary{
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018)),
+        rgba(9,10,15,.50);
+    border:1px solid rgba(255,255,255,.085);
+    -webkit-backdrop-filter:blur(14px) saturate(1.14);
+    backdrop-filter:blur(14px) saturate(1.14);
+    box-shadow:
+        0 9px 24px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.04),
+        inset 0 18px 38px -27px rgba(0,242,254,.13);
+}
+.gx-bank-card-shine{
+    opacity:.26;
+}
+.gx-bank-clabe{
+    background:rgba(0,0,0,.15);
+    border:1px solid rgba(255,255,255,.045);
+}
+
+/* Upload y preview: ligeramente más ligeros que las tarjetas bancarias. */
+.gx-payment-beta .upload-area,
+.gx-payment-beta #preview-container{
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),
+        rgba(9,10,15,.34);
+    border:1px solid rgba(255,255,255,.08);
+    -webkit-backdrop-filter:blur(16px) saturate(1.16);
+    backdrop-filter:blur(16px) saturate(1.16);
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.20),
+        inset 0 1px 0 rgba(255,255,255,.035),
+        inset 0 16px 32px -24px rgba(0,242,254,.11);
+}
+
+/* Submit: cápsula realmente compacta, dark glass + contorno neón en reposo. */
+.gx-payment-beta .btn-submit-payment{
+    width:188px;
+    min-height:42px;
+    margin:12px auto 0;
+    padding:5px 44px 5px 14px;
+    border:1px solid rgba(0,242,254,.42);
+    border-radius:999px;
+    background:rgba(9,12,18,.74);
+    -webkit-backdrop-filter:blur(14px) saturate(1.12);
+    backdrop-filter:blur(14px) saturate(1.12);
+    box-shadow:
+        0 7px 20px rgba(0,0,0,.22),
+        0 0 16px rgba(0,242,254,.08),
+        inset 0 1px 0 rgba(255,255,255,.04);
+}
+.gx-payment-beta .gx-submit-copy{
+    min-height:30px;
+    justify-content:center;
+    align-items:flex-start;
+}
+.gx-payment-beta .gx-submit-title{
+    font-size:9.5px;
+    line-height:1;
+    letter-spacing:-.05px;
+}
+.gx-payment-beta .gx-submit-icon{
+    width:40px;
+    background:rgba(0,242,254,.055);
+    border-left:1px solid rgba(0,242,254,.22);
+}
+.gx-payment-beta .gx-submit-icon svg{
+    width:19px;
+    height:19px;
+}
+
+/* Loading: color sólido y luminoso; nunca se oscurece ni parece apagarse. */
+.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+    padding-right:14px;
+    border-color:transparent;
+    background:#655cf2;
+    box-shadow:
+        0 8px 22px rgba(101,92,242,.28),
+        0 0 18px rgba(101,92,242,.14),
+        inset 0 1px 0 rgba(255,255,255,.14);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-copy{
+    opacity:0;
+    transform:scale(.96);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-icon{
+    width:100%;
+    background:transparent;
+    border-left-color:transparent;
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+    opacity:1;
+    stroke:#fff;
+    stroke-width:1.9;
+}
+
+/* Success: sólido verde, misma cápsula, palomita simple. */
+.gx-payment-beta .btn-submit-payment[data-state="success"]{
+    padding-right:44px;
+    border-color:transparent;
+    background:#27b96a;
+    box-shadow:
+        0 8px 22px rgba(39,185,106,.25),
+        0 0 17px rgba(39,185,106,.12),
+        inset 0 1px 0 rgba(255,255,255,.13);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-icon{
+    width:40px;
+    background:rgba(255,255,255,.08);
+    border-left-color:rgba(255,255,255,.20);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+    stroke:#fff;
+    stroke-width:2.4;
+    transform:scale(1.04);
+}
+
+/* Error: sólido rojo, sin oscurecer la cápsula. */
+.gx-payment-beta .btn-submit-payment[data-state="error"]{
+    padding-right:44px;
+    border-color:transparent;
+    background:#d94161;
+    box-shadow:
+        0 8px 22px rgba(217,65,97,.22),
+        0 0 16px rgba(217,65,97,.10);
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-icon{
+    width:40px;
+    background:rgba(255,255,255,.07);
+    border-left-color:rgba(255,255,255,.18);
+}
+
+/* Evita dimming visual del botón durante los estados. */
+.gx-payment-beta .btn-submit-payment:disabled{
+    opacity:1;
+    filter:none;
+    cursor:default;
+}
+
+/* Mantener el equilibrio también en iPhone. */
+@media(max-width:560px){
+    .gx-bank-sheet,
+    .gx-payment-beta #payment-modal .modal-content{
+        background:
+            linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.014)),
+            rgba(8,8,12,.38);
+        -webkit-backdrop-filter:blur(24px) saturate(1.24);
+        backdrop-filter:blur(24px) saturate(1.24);
+    }
+    .gx-bank-card,
+    .gx-bank-card.is-primary{
+        background:
+            linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.016)),
+            rgba(9,10,15,.48);
+    }
+}
