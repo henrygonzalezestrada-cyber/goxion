@@ -125,7 +125,8 @@
         p.oferta_flash?'Flash':'',
         p.mostrar_contador?'Timer':'',
         p.destacada?'Destacada':'',
-        p.notificar_cliente?'Notificación preparada':''
+        p.notificar_cliente?'Notificación preparada':'',
+        p.adquisicion_habilitada?'Adquisición abierta':'Adquisición cerrada'
       ].filter(Boolean);
       return '<article class="gx-promo-row gx-promo-studio-row">'+
         '<div class="gx-promo-type-mark"><b>'+esc(MECHANICS[type]?.icon||'$')+'</b><span>'+esc(mechanicLabel(type))+'</span></div>'+
@@ -153,7 +154,7 @@
       mostrar_precio_anterior:true,mostrar_contador:false,oferta_flash:false,activa:true,
       audiencia:'todos',segmentacion:{},
       acumulacion:{lealtad:true,trato_justo:true,beneficios_programados:false,bienvenida:false},
-      destacada:false,notificar_cliente:false,publicada:false,prioridad:0,items:[]
+      destacada:false,notificar_cliente:false,publicada:false,adquisicion_habilitada:false,prioridad:0,items:[]
     };
   }
 
@@ -193,6 +194,7 @@
     byId('gx-promo-featured').checked=editing.destacada===true;
     byId('gx-promo-notify').checked=editing.notificar_cliente===true;
     byId('gx-promo-published').checked=editing.publicada===true;
+    byId('gx-promo-acquisition-enabled').checked=editing.adquisicion_habilitada===true;
     byId('gx-promo-active').checked=editing.activa!==false;
 
     byId('gx-promo-delete').hidden=!editing.id;
@@ -413,6 +415,7 @@
       destacada:byId('gx-promo-featured')?.checked===true,
       notificar_cliente:byId('gx-promo-notify')?.checked===true,
       publicada:byId('gx-promo-published')?.checked===true,
+      adquisicion_habilitada:byId('gx-promo-acquisition-enabled')?.checked===true,
       activa:byId('gx-promo-active')?.checked===true
     };
   }
@@ -422,6 +425,7 @@
     const data=collectData();
 
     if(!String(data.nombre).trim())return alert('Agrega un nombre interno para identificar la campaña.');
+    if(data.adquisicion_habilitada&&!data.publicada)return alert('Para aceptar adquisiciones primero debes publicar la campaña.');
     if(!data.items.length)return alert('Selecciona las plataformas de la promoción.');
     if(data.mecanica==='combo'&&data.items.length<2)return alert('Un combo necesita al menos dos plataformas.');
     if(data.mecanica==='addon'&&!data.servicios_complemento_ids.length)return alert('Selecciona al menos un complemento.');
