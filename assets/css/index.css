@@ -2003,3 +2003,204 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         transition:none!important;
     }
 }
+
+
+/* ===== GOXION PAY · FINAL POLISH V6 ===== */
+/* Cristal más transparente + submit cápsula con transformación de estados. */
+
+/* El fondo lava debe seguir siendo visible detrás de las sheets. */
+.gx-bank-overlay,
+.gx-payment-beta #payment-modal{
+    background:rgba(1,2,5,.30);
+}
+.gx-bank-sheet,
+.gx-payment-beta #payment-modal .modal-content{
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),
+        rgba(8,8,12,.24);
+    border:1px solid rgba(255,255,255,.09);
+    -webkit-backdrop-filter:blur(20px) saturate(1.22);
+    backdrop-filter:blur(20px) saturate(1.22);
+    box-shadow:
+        0 14px 38px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.055),
+        inset 0 22px 42px -28px rgba(0,242,254,.16);
+}
+.gx-bank-sheet::before,
+.gx-payment-beta #payment-modal .modal-content::before{
+    background:
+        radial-gradient(circle at 10% 0%,rgba(0,242,254,.08),transparent 32%),
+        radial-gradient(circle at 92% 8%,rgba(124,77,255,.09),transparent 36%);
+}
+
+/* Cristal secundario: visible, pero deja atravesar el fondo. */
+.gx-bank-card,
+.gx-payment-beta .upload-area,
+.gx-payment-beta #preview-container{
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),
+        rgba(8,8,12,.20);
+    border:1px solid rgba(255,255,255,.075);
+    -webkit-backdrop-filter:blur(13px) saturate(1.16);
+    backdrop-filter:blur(13px) saturate(1.16);
+    box-shadow:
+        0 8px 22px rgba(0,0,0,.19),
+        inset 0 1px 0 rgba(255,255,255,.035),
+        inset 0 18px 34px -25px rgba(0,242,254,.12);
+}
+.gx-bank-card.is-primary{
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),
+        rgba(8,8,12,.20);
+    border-color:rgba(255,255,255,.075);
+}
+.gx-bank-clabe{
+    background:rgba(0,0,0,.08);
+    border:1px solid rgba(255,255,255,.035);
+}
+
+/* Más jerarquía para banco/institución. */
+.gx-bank-mark{
+    width:40px;
+    height:40px;
+    flex-basis:40px;
+    font-size:11px;
+    border-radius:13px;
+}
+.gx-bank-identity > strong{
+    font-size:14px;
+    font-weight:820;
+    letter-spacing:-.2px;
+}
+.gx-bank-identity > small{
+    margin-top:1px;
+    font-size:9.3px;
+    color:#8ea0b7;
+}
+
+/* Botón protagonista: morado del lado del texto, cian hacia la salida. */
+.gx-payment-primary{
+    background:linear-gradient(135deg,#7455ff 0%,#4f8cff 54%,#14dff4 100%);
+    box-shadow:
+        0 13px 32px rgba(88,84,255,.24),
+        0 0 24px rgba(0,242,254,.11),
+        inset 0 1px 0 rgba(255,255,255,.25);
+}
+.gx-payment-primary::after{
+    background:
+        radial-gradient(circle at 12% 0%,rgba(255,255,255,.20),transparent 30%),
+        linear-gradient(180deg,rgba(255,255,255,.055),transparent 56%);
+}
+
+/* Enviar comprobante: cápsula compacta. */
+.gx-payment-beta .btn-submit-payment{
+    width:min(100%,238px);
+    min-height:46px;
+    margin:13px auto 0;
+    padding:6px 52px 6px 16px;
+    border-radius:999px;
+    background:linear-gradient(135deg,#7455ff,#4f8cff 62%,#15dff4);
+    box-shadow:
+        0 8px 22px rgba(74,102,255,.20),
+        inset 0 1px 0 rgba(255,255,255,.18);
+}
+.gx-payment-beta .gx-submit-copy{
+    min-height:34px;
+    justify-content:center;
+    align-items:flex-start;
+}
+.gx-payment-beta .gx-submit-title{
+    font-size:10.2px;
+    line-height:1;
+    white-space:nowrap;
+}
+.gx-payment-beta .gx-submit-subtitle{
+    display:none!important;
+}
+.gx-payment-beta .gx-submit-icon{
+    width:46px;
+    height:100%;
+    border-left:1px solid rgba(255,255,255,.20);
+    background:rgba(0,0,0,.08);
+    z-index:2;
+}
+.gx-payment-beta .gx-submit-icon svg{
+    width:21px;
+    height:21px;
+}
+
+/* Loading: el carril lateral se expande y toma toda la cápsula. */
+.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+    padding-right:16px;
+    background:linear-gradient(135deg,#5f5eff,#7a57ff 58%,#9952e7);
+    box-shadow:
+        0 9px 25px rgba(112,82,255,.24),
+        inset 0 1px 0 rgba(255,255,255,.16);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-copy{
+    opacity:0;
+    transform:scale(.94);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-icon{
+    width:100%;
+    border-left-color:transparent;
+    background:rgba(255,255,255,.055);
+}
+.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+    stroke-width:1.9;
+}
+
+/* Success: vuelve a su carril, botón verde y palomita simple. */
+.gx-payment-beta .btn-submit-payment[data-state="success"]{
+    padding-right:52px;
+    background:linear-gradient(135deg,#29c96f,#159d77);
+    box-shadow:
+        0 8px 22px rgba(40,201,111,.23),
+        0 0 19px rgba(40,201,111,.10),
+        inset 0 1px 0 rgba(255,255,255,.14);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-copy{
+    opacity:1;
+    transform:scale(1);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-icon{
+    width:46px;
+    border-left-color:rgba(255,255,255,.20);
+    background:rgba(255,255,255,.08);
+}
+.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+    stroke-width:2.4;
+    transform:scale(1.02);
+}
+
+/* Error: mismo botón, rojo y reintento. */
+.gx-payment-beta .btn-submit-payment[data-state="error"]{
+    padding-right:52px;
+    background:linear-gradient(135deg,#ea4969,#bb3155);
+    box-shadow:
+        0 8px 22px rgba(234,73,105,.19),
+        0 0 17px rgba(234,73,105,.08);
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-copy{
+    opacity:1;
+    transform:scale(1);
+}
+.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-icon{
+    width:46px;
+}
+
+/* El comprobante comunica sus estados por sí mismo; la cápsula queda sólo para copiar CLABE. */
+.gx-payment-beta #payment-modal ~ .toast{
+    pointer-events:none;
+}
+
+@media(max-width:560px){
+    .gx-bank-sheet,
+    .gx-payment-beta #payment-modal .modal-content{
+        background:
+            linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),
+            rgba(8,8,12,.22);
+        -webkit-backdrop-filter:blur(20px) saturate(1.22);
+        backdrop-filter:blur(20px) saturate(1.22);
+    }
+}
