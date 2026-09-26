@@ -585,7 +585,6 @@
                   <span>Datos de transferencia</span>
                   <strong>${label}</strong>
                 </div>
-                <button class="gx-wallet-back-close" type="button" aria-label="Volver al frente">↺</button>
               </div>
 
               <div class="gx-bank-beneficiary">
@@ -634,7 +633,11 @@
           const dist = Math.abs(cardCenter - center);
           if(dist < best) { best = dist; activeIndex = i; }
         });
-        cards.forEach((card,i)=>card.classList.toggle("is-active", i===activeIndex));
+        cards.forEach((card,i)=>{
+          card.classList.toggle("is-active", i===activeIndex);
+          card.classList.toggle("is-before", i<activeIndex);
+          card.classList.toggle("is-after", i>activeIndex);
+        });
         dots?.querySelectorAll("span").forEach((dot,i)=>dot.classList.toggle("is-active", i===activeIndex));
       });
     };
@@ -656,11 +659,6 @@
 
       const toggle = (event) => {
         if(event?.target?.closest(".gx-clabe-copy")) return;
-        if(event?.target?.closest(".gx-wallet-back-close")) {
-          card.classList.remove("is-flipped");
-          card.setAttribute("aria-pressed","false");
-          return;
-        }
         if(moved) return;
         card.classList.toggle("is-flipped");
         card.setAttribute("aria-pressed", card.classList.contains("is-flipped") ? "true" : "false");
