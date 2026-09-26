@@ -329,8 +329,12 @@
 
     deck.addEventListener('pointercancel',()=>{state.pointerStart=null;startAuto()},{passive:true});
 
-    $('gx-promo-prev')?.addEventListener('click',()=>moveDeck(-1));
-    $('gx-promo-next')?.addEventListener('click',()=>moveDeck(1));
+    const prev=$('gx-promo-prev');
+    const next=$('gx-promo-next');
+    if(prev) prev.onclick=()=>moveDeck(-1);
+    if(next) next.onclick=()=>moveDeck(1);
+    window.gxPromoCatalogPrev=()=>moveDeck(-1);
+    window.gxPromoCatalogNext=()=>moveDeck(1);
     $('gx-promo-dots')?.addEventListener('click',event=>{
       const dot=event.target.closest('[data-gx-promo-dot]');
       if(!dot) return;
@@ -396,7 +400,7 @@
         '</div>'+
       '</article>';
 
-    root.appendChild(panel);
+    document.body.appendChild(panel);
     requestAnimationFrame(()=>panel.classList.add('active'));
 
     panel.addEventListener('click',event=>{
