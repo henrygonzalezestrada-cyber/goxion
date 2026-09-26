@@ -546,6 +546,7 @@
 
   function renderCuentasPago() {
     const list = document.getElementById("gx-bank-list");
+    const dots = document.getElementById("gx-wallet-dots");
     if(!list) return;
 
     list.innerHTML = CUENTAS_PAGO.map((cuenta,index) => {
@@ -553,43 +554,134 @@
       const label = gxEsc(cuenta.LABEL || cuenta.INSTITUTION || "Cuenta");
       const institucion = gxEsc(cuenta.INSTITUTION || cuenta.LABEL || "");
       const titular = gxEsc(cuenta.HOLDER || "");
-      const clabe = gxEsc(gxFormatoClabe(cuenta.CLABE));
+      const clabeRaw = String(cuenta.CLABE || "").replace(/\D/g,"");
+      const clabe = gxEsc(gxFormatoClabe(clabeRaw));
+      const last4 = gxEsc(clabeRaw.slice(-4));
 
       return `
-        <article class="gx-bank-card" data-bank="${id}" style="--gx-bank-delay:${index * 70}ms">
-          <div class="gx-bank-card-shine" aria-hidden="true"></div>
+        <article class="gx-bank-card gx-wallet-card ${index===0 ? "is-active" : ""}" data-bank="${id}" data-index="${index}" tabindex="0" aria-label="${label}. Toca para ver datos" aria-pressed="false">
+          <div class="gx-wallet-card-inner">
+            <section class="gx-wallet-face gx-wallet-front">
+              <div class="gx-wallet-orb" aria-hidden="true"></div>
+              <div class="gx-bank-card-top">
+                <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
+                <div class="gx-bank-identity">
+                  <strong>${label}</strong>
+                  <small>${institucion}</small>
+                </div>
+              </div>
+              <div class="gx-wallet-front-bottom">
+                <div>
+                  <span>Cuenta de transferencia</span>
+                  <strong>•••• ${last4}</strong>
+                </div>
+                <small>Toca para ver datos</small>
+              </div>
+            </section>
 
-          <div class="gx-bank-card-top">
-            <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
-            <div class="gx-bank-identity">
-              <strong>${label}</strong>
-              <small>${institucion}</small>
-            </div>
-          </div>
+            <section class="gx-wallet-face gx-wallet-back">
+              <div class="gx-wallet-back-head">
+                <div>
+                  <span>Datos de transferencia</span>
+                  <strong>${label}</strong>
+                </div>
+                <button class="gx-wallet-back-close" type="button" aria-label="Volver al frente">↺</button>
+              </div>
 
-          <div class="gx-bank-beneficiary">
-            <span>Beneficiario</span>
-            <strong>${titular}</strong>
-          </div>
+              <div class="gx-bank-beneficiary">
+                <span>Beneficiario</span>
+                <strong>${titular}</strong>
+              </div>
 
-          <div class="gx-bank-clabe-wrap">
-            <div class="gx-bank-clabe">
-              <span>CLABE</span>
-              <strong>${clabe}</strong>
-            </div>
-            <button class="gx-clabe-copy" type="button" onclick="copiarClabePago('${id}', this)" aria-label="Copiar CLABE de ${label}">
-              <span class="gx-copy-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24">
-                  <rect class="gx-copy-back" x="5" y="5" width="10" height="10" rx="2"/>
-                  <rect class="gx-copy-front" x="9" y="9" width="10" height="10" rx="2"/>
-                  <path class="gx-copy-check" d="m6.8 12.4 3.2 3.2 7.2-7.2"/>
-                </svg>
-              </span>
-            </button>
+              <div class="gx-bank-clabe-wrap">
+                <div class="gx-bank-clabe">
+                  <span>CLABE</span>
+                  <strong>${clabe}</strong>
+                </div>
+                <button class="gx-clabe-copy" type="button" aria-label="Copiar CLABE de ${label}">
+                  <span class="gx-copy-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                      <rect class="gx-copy-back" x="5" y="5" width="10" height="10" rx="2"/>
+                      <rect class="gx-copy-front" x="9" y="9" width="10" height="10" rx="2"/>
+                      <path class="gx-copy-check" d="m6.8 12.4 3.2 3.2 7.2-7.2"/>
+                    </svg>
+                  </span>
+                </button>
+              </div>
+            </section>
           </div>
         </article>
       `;
     }).join("");
+
+    if(dots) {
+      dots.innerHTML = CUENTAS_PAGO.map((_,i)=>`<span class="${i===0 ? "is-active" : ""}"></span>`).join("");
+    }
+
+    const cards = [...list.querySelectorAll(".gx-wallet-card")];
+    let raf = 0;
+
+    const setActive = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const center = list.scrollLeft + list.clientWidth / 2;
+        let activeIndex = 0;
+        let best = Infinity;
+        cards.forEach((card,i) => {
+          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+          const dist = Math.abs(cardCenter - center);
+          card.classList.toggle("is-active", dist < best);
+          if(dist < best) { best = dist; activeIndex = i; }
+        });
+        cards.forEach((card,i)=>card.classList.toggle("is-active", i===activeIndex));
+        dots?.querySelectorAll("span").forEach((dot,i)=>dot.classList.toggle("is-active", i===activeIndex));
+      });
+    };
+
+    cards.forEach((card) => {
+      let downX = 0;
+      let downY = 0;
+      let moved = false;
+
+      card.addEventListener("pointerdown", e => {
+        downX = e.clientX;
+        downY = e.clientY;
+        moved = false;
+      });
+
+      card.addEventListener("pointermove", e => {
+        if(Math.abs(e.clientX-downX) > 8 || Math.abs(e.clientY-downY) > 8) moved = true;
+      });
+
+      const toggle = (event) => {
+        if(event?.target?.closest(".gx-clabe-copy")) return;
+        if(event?.target?.closest(".gx-wallet-back-close")) {
+          card.classList.remove("is-flipped");
+          card.setAttribute("aria-pressed","false");
+          return;
+        }
+        if(moved) return;
+        card.classList.toggle("is-flipped");
+        card.setAttribute("aria-pressed", card.classList.contains("is-flipped") ? "true" : "false");
+      };
+
+      card.addEventListener("click", toggle);
+      card.addEventListener("keydown", e => {
+        if(e.key==="Enter" || e.key===" ") {
+          e.preventDefault();
+          toggle(e);
+        }
+      });
+
+      const copyBtn = card.querySelector(".gx-clabe-copy");
+      copyBtn?.addEventListener("click", async e => {
+        e.stopPropagation();
+        await copiarClabePago(card.dataset.bank, copyBtn);
+      });
+    });
+
+    list.addEventListener("scroll", setActive, {passive:true});
+    requestAnimationFrame(setActive);
   }
 
   function abrirDatosPago() {
