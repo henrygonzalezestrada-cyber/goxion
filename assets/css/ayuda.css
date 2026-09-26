@@ -10581,9 +10581,7 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 .gx-promo-expanded-backdrop{
     position:absolute;
     inset:0;
-    background:rgba(2,3,7,.76);
-    backdrop-filter:blur(13px);
-    -webkit-backdrop-filter:blur(13px);
+    background:rgba(2,3,7,.88);
 }
 .gx-promo-expanded-card{
     position:relative;
