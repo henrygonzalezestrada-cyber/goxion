@@ -188,6 +188,48 @@ declare global {
     desglose?: GoxionAccountBreakdownLine[];
   }
 
+  interface GoxionCatalogPromotionItem {
+    servicio_id?: GoxionId;
+    rol?: 'principal' | 'incluido' | 'disparador' | 'complemento' | string;
+    orden?: number;
+    servicio?: {
+      id?: GoxionId;
+      nombre?: string;
+      precio?: number;
+      etiqueta?: string;
+    };
+  }
+
+  interface GoxionCatalogPromotion {
+    id: GoxionId;
+    nombre?: string;
+    titulo_publico?: string;
+    descripcion_publica?: string;
+    badge?: string;
+    mecanica?: 'precio_fijo' | 'porcentaje' | 'combo' | 'addon' | string;
+    precio_promocional?: number;
+    precio_promocional_total?: number;
+    precio_normal_total?: number;
+    ahorro_estimado?: number;
+    descuento_porcentaje?: number | null;
+    duracion_periodos?: number;
+    inicio?: string;
+    fin?: string;
+    mostrar_precio_anterior?: boolean;
+    mostrar_contador?: boolean;
+    oferta_flash?: boolean;
+    destacada?: boolean;
+    adquisicion_habilitada?: boolean;
+    prioridad?: number;
+    items?: GoxionCatalogPromotionItem[];
+    elegibilidad?: {
+      elegible?: boolean | null;
+      codigo?: string;
+      motivo?: string;
+    };
+    adquirida?: Record<string, unknown> | null;
+  }
+
   interface GoxionCatalogService {
     id: GoxionId;
     nombre: string;
