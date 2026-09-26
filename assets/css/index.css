@@ -2394,3 +2394,340 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
             rgba(9,10,15,.48);
     }
 }
+
+
+/* ===== GOXION PAY · WALLET FINAL V8 ===== */
+/* Cierre visual de beta: botones armónicos + wallet carrusel refinado. */
+
+/* Dos acciones principales con el mismo cuerpo. */
+.gx-payment-primary,
+.gx-payment-actions .gx-bank-trigger{
+    min-height:58px;
+    height:58px;
+    border-radius:18px;
+}
+.gx-payment-primary{
+    padding:9px 14px;
+}
+.gx-payment-actions .gx-bank-trigger{
+    padding:9px 13px;
+}
+.gx-payment-primary-icon,
+.gx-payment-actions .gx-bank-trigger-icon{
+    width:38px;
+    height:38px;
+    flex-basis:38px;
+    border-radius:12px;
+}
+.gx-payment-primary-copy strong,
+.gx-payment-actions .gx-bank-trigger-copy strong{
+    font-size:12px;
+    line-height:1.15;
+}
+.gx-payment-primary-copy small,
+.gx-payment-actions .gx-bank-trigger-copy small{
+    font-size:8.9px;
+}
+
+/* Soporte sigue terciario, pero ya no se pierde. */
+.gx-payment-actions .gx-support-tertiary{
+    padding:8px 5px 1px;
+    gap:6px;
+    font-size:10.2px;
+    line-height:1.2;
+}
+.gx-payment-actions .gx-support-tertiary span,
+.gx-payment-actions .gx-support-tertiary strong{
+    font-size:10.2px;
+}
+.gx-payment-actions .gx-support-tertiary strong{
+    font-weight:780;
+}
+
+/* Comprobante sin cámara: texto ocupa el encabezado completo. */
+.gx-payment-beta .gx-payment-upload-head{
+    display:block;
+    padding-right:42px;
+}
+.gx-payment-beta .gx-payment-upload-copy{
+    width:100%;
+}
+.gx-payment-beta .gx-payment-upload-copy h3{
+    font-size:19px;
+}
+.gx-payment-beta .gx-payment-upload-copy p{
+    max-width:300px;
+    font-size:9.6px;
+}
+
+/* Wallet track: swipe natural, una tarjeta dominante y la siguiente asomándose. */
+.gx-bank-list{
+    display:flex;
+    gap:12px;
+    overflow-x:auto;
+    overflow-y:visible;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    overscroll-behavior-x:contain;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    padding:5px 32px 12px 1px;
+    margin:3px -2px 0;
+    touch-action:pan-x;
+}
+.gx-bank-list::-webkit-scrollbar{display:none}
+
+.gx-wallet-card{
+    flex:0 0 88%;
+    min-width:0;
+    height:190px;
+    padding:0;
+    border:0;
+    background:transparent;
+    box-shadow:none;
+    scroll-snap-align:start;
+    perspective:1100px;
+    opacity:.72;
+    transform:scale(.965);
+    transition:
+        opacity .30s ease,
+        transform .38s cubic-bezier(.2,.8,.2,1),
+        filter .30s ease;
+    filter:saturate(.88);
+    cursor:pointer;
+    outline:none;
+}
+.gx-wallet-card.is-active{
+    opacity:1;
+    transform:scale(1);
+    filter:saturate(1);
+}
+.gx-wallet-card:focus-visible{
+    outline:1px solid rgba(0,242,254,.42);
+    outline-offset:3px;
+    border-radius:22px;
+}
+.gx-wallet-card-inner{
+    position:relative;
+    width:100%;
+    height:100%;
+    transform-style:preserve-3d;
+    transition:transform .58s cubic-bezier(.18,.82,.20,1);
+}
+.gx-wallet-card.is-flipped .gx-wallet-card-inner{
+    transform:rotateY(180deg);
+}
+.gx-wallet-face{
+    position:absolute;
+    inset:0;
+    overflow:hidden;
+    padding:16px;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.10);
+    background:
+        linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018)),
+        rgba(9,10,15,.56);
+    -webkit-backdrop-filter:blur(16px) saturate(1.18);
+    backdrop-filter:blur(16px) saturate(1.18);
+    box-shadow:
+        0 13px 32px rgba(0,0,0,.25),
+        inset 0 1px 0 rgba(255,255,255,.05),
+        inset 0 24px 45px -34px rgba(0,242,254,.17);
+    backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+}
+.gx-wallet-front{
+    transform:rotateY(0deg);
+}
+.gx-wallet-back{
+    transform:rotateY(180deg);
+}
+.gx-wallet-card[data-bank="nu"] .gx-wallet-front{
+    background:
+        radial-gradient(circle at 93% 12%,rgba(122,70,220,.28),transparent 34%),
+        radial-gradient(circle at 8% 100%,rgba(0,242,254,.10),transparent 35%),
+        linear-gradient(145deg,rgba(255,255,255,.065),rgba(255,255,255,.018)),
+        rgba(9,10,15,.58);
+}
+.gx-wallet-card[data-bank="revolut"] .gx-wallet-front{
+    background:
+        radial-gradient(circle at 92% 10%,rgba(82,137,255,.22),transparent 34%),
+        radial-gradient(circle at 12% 95%,rgba(0,242,254,.09),transparent 36%),
+        linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.02)),
+        rgba(9,10,15,.58);
+}
+.gx-wallet-orb{
+    position:absolute;
+    width:125px;
+    height:125px;
+    right:-45px;
+    top:-48px;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.14),rgba(255,255,255,.025) 45%,transparent 68%);
+    filter:blur(3px);
+    pointer-events:none;
+}
+.gx-wallet-card .gx-bank-card-top{
+    position:relative;
+    z-index:1;
+}
+.gx-wallet-card .gx-bank-mark{
+    width:42px;
+    height:42px;
+    flex-basis:42px;
+    border-radius:14px;
+    font-size:11px;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.10),
+        0 7px 18px rgba(0,0,0,.17);
+}
+.gx-wallet-card .gx-bank-identity > strong{
+    font-size:15px;
+    letter-spacing:-.25px;
+}
+.gx-wallet-card .gx-bank-identity > small{
+    font-size:9.4px;
+}
+.gx-wallet-front-bottom{
+    position:absolute;
+    left:16px;
+    right:16px;
+    bottom:15px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:12px;
+}
+.gx-wallet-front-bottom > div{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+.gx-wallet-front-bottom span,
+.gx-wallet-front-bottom small{
+    color:#8192a8;
+    font-size:8px;
+    font-weight:650;
+}
+.gx-wallet-front-bottom strong{
+    color:#eef4fb;
+    font-size:12px;
+    font-weight:760;
+    letter-spacing:.75px;
+}
+.gx-wallet-front-bottom small{
+    text-align:right;
+    color:#9aacbf;
+}
+
+/* Reverso: datos limpios y accionables. */
+.gx-wallet-back{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+.gx-wallet-back-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:11px;
+}
+.gx-wallet-back-head > div{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+.gx-wallet-back-head span{
+    color:#7d8ea4;
+    font-size:7.8px;
+    text-transform:uppercase;
+    letter-spacing:.65px;
+    font-weight:700;
+}
+.gx-wallet-back-head strong{
+    color:#f6f9fd;
+    font-size:14px;
+    font-weight:820;
+}
+.gx-wallet-back-close{
+    width:30px;
+    height:30px;
+    border:0;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    color:#8fefff;
+    background:rgba(0,242,254,.07);
+    font-size:15px;
+    line-height:1;
+}
+.gx-wallet-card .gx-bank-beneficiary{
+    margin-top:0;
+    padding:8px 0;
+    border-top:1px solid rgba(255,255,255,.05);
+}
+.gx-wallet-card .gx-bank-clabe-wrap{
+    margin-top:7px;
+}
+.gx-wallet-card .gx-bank-clabe{
+    background:rgba(0,0,0,.13);
+}
+.gx-wallet-card .gx-clabe-copy{
+    width:44px;
+    min-width:44px;
+    height:44px;
+}
+
+/* Indicador sutil de carrusel. */
+.gx-wallet-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-height:20px;
+    padding:0 2px;
+    margin-top:1px;
+}
+.gx-wallet-dots{
+    display:flex;
+    align-items:center;
+    gap:5px;
+}
+.gx-wallet-dots span{
+    width:5px;
+    height:5px;
+    border-radius:999px;
+    background:rgba(255,255,255,.18);
+    transition:width .25s ease,background .25s ease,box-shadow .25s ease;
+}
+.gx-wallet-dots span.is-active{
+    width:14px;
+    background:var(--neon-blue);
+    box-shadow:0 0 10px rgba(0,242,254,.28);
+}
+.gx-wallet-meta > span{
+    color:#74859a;
+    font-size:7.9px;
+    font-weight:620;
+}
+
+/* La animación de entrada anterior no debe pelear con el carrusel. */
+.gx-bank-overlay.show .gx-wallet-card{
+    animation:none;
+}
+
+/* El submit conserva la cápsula refinada de V7. */
+
+@media(max-width:380px){
+    .gx-wallet-card{flex-basis:91%}
+    .gx-wallet-meta > span{font-size:7.4px}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-wallet-card,
+    .gx-wallet-card-inner,
+    .gx-wallet-dots span{
+        transition:none!important;
+        animation:none!important;
+    }
+}
