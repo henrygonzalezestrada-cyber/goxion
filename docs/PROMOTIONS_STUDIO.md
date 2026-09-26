@@ -1,116 +1,169 @@
 # GOXION · Promotions Studio v2
 
-## Bloque A · P1 + P2
+## Estado actual
 
-Promotions Studio convierte el módulo previo de “precio especial por plataforma” en un motor comercial universal sin modificar el precio base de `servicios`.
+- **Bloque A · P1 + P2:** motor universal de campañas + Promotions Studio.
+- **Bloque B · P3:** adquisición promocional inmutable + ejecución económica multi-plataforma + stacking.
+- **Ayuda:** todavía no muestra ni permite contratar promociones; su experiencia visual sigue reservada para el bloque dedicado.
 
-## Mecánicas
+## 1. Campaña ≠ adquisición
 
-- `precio_fijo`: una plataforma con precio temporal durante N periodos.
-- `porcentaje`: una plataforma con descuento porcentual; el backend congela el precio promocional calculado al guardar la campaña.
-- `combo`: dos o más plataformas por un precio conjunto.
-- `addon`: una plataforma disparadora permite añadir uno o más complementos por un precio adicional.
+Una campaña en `promociones_catalogo` es una plantilla comercial editable.
 
-## Separación del dominio
+Cuando un cliente contrata, P3 crea un contrato separado en `promocion_adquisiciones`. Ese contrato congela:
 
-1. `promociones_catalogo` representa la campaña y su configuración comercial.
-2. `promocion_items` representa las plataformas que componen la oferta y el rol de cada una.
-3. `cliente_servicio_promociones` sigue siendo la capa histórica actual de asignación; el Bloque B/P3 evolucionará la adquisición para congelar todas las condiciones de la oferta aceptada.
-4. `promocion_aplicaciones` registra consumo por periodo.
-5. `servicios.precio` nunca se modifica por una promoción.
+- mecánica;
+- revisión de campaña;
+- nombre y título público;
+- audiencia/segmentación;
+- reglas de acumulación;
+- plataformas;
+- precios normales;
+- precios efectivos;
+- ahorro;
+- duración;
+- periodo inicial/final.
 
-## Seguro de adquisición
+Por lo tanto, editar, pausar o eliminar lógicamente una campaña **no modifica adquisiciones existentes**.
 
-La columna `adquisicion_habilitada` permanece en `false` durante P1/P2.
+## 2. Mecánicas
 
-El trigger heredado `goxion_asignar_promocion_on_servicio()` ahora sólo puede autoasignar cuando se cumplen simultáneamente:
+### Precio temporal
+Una plataforma queda a un precio fijo durante N periodos.
 
-- mecánica `precio_fijo`;
-- `publicada=true`;
-- `adquisicion_habilitada=true`;
-- `activa=true`;
-- campaña dentro de su ventana;
-- precio promocional menor al monto del servicio.
+### Porcentaje
+Se congela el precio resultante del porcentaje al momento de la adquisición.
 
-La Edge Function de Promotions Studio fuerza `adquisicion_habilitada=false` al guardar. El Bloque B/P3 será el único responsable de habilitar adquisición después de implementar su contrato inmutable.
+### Combo
+Dos o más plataformas se agregan como servicios normales. P3 reparte el precio promocional proporcionalmente entre los componentes y conserva la suma exacta.
 
-## Metadata preparada para Ayuda / Mi Espacio
+### Add-on
+La plataforma disparadora conserva su precio normal. Sólo los complementos reciben el precio promocional.
 
-- `titulo_publico`
-- `descripcion_publica`
-- `badge`
-- `mostrar_precio_anterior`
-- `oferta_flash`
-- `mostrar_contador`
-- `destacada`
-- `notificar_cliente`
-- `publicada`
-- `prioridad`
+## 3. Servicios siempre a precio normal
 
-Esto no define todavía el diseño final de Ayuda. Sólo establece una fuente comercial que la futura UI consumirá.
+P3 nunca modifica `servicios.precio`.
 
-## Audiencia
+Al adquirir:
 
-`audiencia` soporta:
+1. reutiliza el `cliente_servicios` activo si ya existe;
+2. reactiva uno compatible si estaba inactivo;
+3. crea el servicio si no existía;
+4. guarda el precio normal real como snapshot;
+5. aplica la promoción como descuento financiero separado.
 
-- todos;
-- nuevos;
-- actuales;
-- con una plataforma;
-- sin una plataforma;
-- Lealtad Nivel 1 o superior;
+Cuando la promoción termina, el servicio continúa automáticamente con su monto normal porque nunca fue reescrito con el precio promocional.
+
+## 4. Tablas P3
+
+### `promocion_adquisiciones`
+Contrato principal inmutable.
+
+### `promocion_adquisicion_items`
+Fotografía de cada plataforma y su precio normal/efectivo. Incluye `afecta_precio` para distinguir, por ejemplo, el disparador de un Add-on.
+
+### `promocion_adquisicion_aplicaciones`
+Registra cada periodo pagado que consumió una adquisición.
+
+Las tablas heredadas `cliente_servicio_promociones` y `promocion_aplicaciones` se conservan únicamente como compatibilidad histórica. El trigger automático heredado ya no crea nuevas asignaciones.
+
+## 5. Elegibilidad
+
+`goxion_promocion_elegibilidad()` valida antes de adquirir:
+
+- campaña activa;
+- publicada;
+- adquisición habilitada;
+- vigencia;
+- nuevos/actuales;
+- tener/no tener una plataforma;
+- Lealtad Nivel 1;
 - Lealtad Nivel 2.
 
-Las condiciones extensibles se guardan en `segmentacion`.
+La adquisición vuelve a validar todo dentro de la misma operación atómica.
 
-## Compatibilidad / stacking
+## 6. Idempotencia y conflictos
 
-`acumulacion` permite configurar compatibilidad futura con:
+Cada adquisición recibe un `operation_id` único.
 
-- lealtad;
-- Trato Justo;
-- beneficios programados;
-- bienvenida.
+Repetir accidentalmente la misma operación devuelve la adquisición existente en vez de duplicarla.
 
-P1/P2 persiste esta intención. P3 deberá convertirla en reglas ejecutables del contrato adquirido y del motor financiero.
+Una plataforma con descuento no puede quedar ligada simultáneamente a dos adquisiciones activas que modifiquen su precio.
 
-## Escrituras
+En Add-on, el disparador no bloquea otras promociones porque `afecta_precio=false`.
 
-Admin no escribe tablas directamente.
+## 7. Stacking ejecutable
 
-`GOXION_FINANCIAL_ACTIONS.savePromotion()`
-→ `acciones-financieras`
-→ `promociones-admin-beta`
-→ `goxion_guardar_promocion_v2()`.
+El snapshot `acumulacion_snapshot` ya no es metadata decorativa.
 
-La RPC guarda cabecera e items de forma atómica y aumenta `revision` cuando se edita una campaña.
+P3 hace cumplir:
 
-## Promotions Studio en Admin
+- **Lealtad:** excluye del cálculo la base promocional marcada como no acumulable.
+- **Trato Justo:** ignora compensaciones de plataformas promocionadas cuando la campaña lo bloquea.
+- **Beneficios programados:** limita monto/porcentaje a la base elegible.
+- **Bienvenida:** usa una base independiente de los demás beneficios programados.
 
-El panel incorpora:
+Los servicios no promocionados siguen siendo elegibles aunque otra plataforma del cliente tenga una campaña no acumulable.
 
-- resumen de campañas;
-- búsqueda y filtros;
-- constructor adaptable por mecánica;
-- selector múltiple para combos;
-- disparador + complementos para add-ons;
-- vigencia independiente de duración;
-- segmentación;
-- configuración de stacking;
-- metadata futura de publicación/notificación;
-- duplicado, pausa y eliminación segura;
-- preview lógico administrativo.
+## 8. Consumo
 
-La preview de Admin no es el diseño final del cliente.
+`goxion_consumir_promociones_on_pago()` consume la adquisición cuando existe un pago con estado `pagado` para ese periodo.
 
-## Estado al cierre de Bloque A
+Cada periodo se registra una sola vez.
 
-P1/P2 debe considerarse listo únicamente cuando:
+Al alcanzar `periodos_totales`:
 
-- esquema y Edge Function estén verificados;
-- las cuatro mecánicas puedan guardarse;
-- el Studio pase integridad/smoke test;
-- ninguna campaña pueda autoasignarse;
-- Ayuda permanezca sin cambios.
+- la adquisición pasa a `finalizada`;
+- sus items dejan de estar activos;
+- los servicios permanecen activos a precio normal.
 
-El siguiente bloque funcional es P3: adquisición promocional inmutable y ejecución económica de combos/add-ons/stacking.
+Cancelar una adquisición también detiene el descuento, pero no elimina los servicios.
+
+## 9. Promotions Studio
+
+Admin puede configurar:
+
+- precio temporal;
+- porcentaje;
+- combo;
+- add-on;
+- duración;
+- vigencia;
+- audiencia;
+- stacking;
+- publicación;
+- **Aceptar adquisiciones**.
+
+`Publicada` y `Aceptar adquisiciones` son controles distintos.
+
+Una campaña puede estar publicada para previsualización futura sin permitir contratación. Para abrir adquisiciones ambas condiciones deben estar activas.
+
+## 10. Gateway financiero
+
+Frontend:
+
+`GOXION_FINANCIAL_ACTIONS.acquirePromotion()`
+
+→ Edge Function `acciones-financieras`
+
+→ elegibilidad
+
+→ RPC `goxion_adquirir_promocion()`
+
+→ snapshot + servicios + estado financiero refrescado.
+
+Cancelación:
+
+`GOXION_FINANCIAL_ACTIONS.cancelPromotionAcquisition()`
+
+→ `goxion_cancelar_adquisicion_promocional()`.
+
+## 11. Invariantes de P3
+
+- nunca modificar `servicios.precio`;
+- nunca leer el precio actual de la campaña para recalcular una adquisición histórica;
+- editar campaña no altera snapshot;
+- pausar campaña sólo cierra nuevas adquisiciones;
+- pago consume exactamente un periodo;
+- finalizar promoción no elimina servicios;
+- Ayuda permanece sin cambios hasta su bloque visual.
