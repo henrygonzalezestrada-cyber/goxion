@@ -402,7 +402,7 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
-// Promotions Studio v2: universal campaign builder stays isolated from acquisition.
+// Promotions Studio v2 + P3: universal campaign builder with immutable acquisition gateway.
 {
   const adminHtmlPath = join(ROOT, 'admin.html');
   const studioPath = join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js');
@@ -431,8 +431,8 @@ for (const absolute of walk(jsRoot)) {
     if (!studio.includes(action)) fail('Promotions Studio: falta gateway financiero ' + action + '.');
   }
 
-  if (studio.includes('adquisicion_habilitada')) {
-    fail('Promotions Studio: Admin no debe poder abrir adquisición durante P1/P2.');
+  if (!studio.includes('adquisicion_habilitada')) {
+    fail('Promotions Studio P3: falta el estado de adquisición inmutable.');
   }
 
   for (const id of [
@@ -440,6 +440,7 @@ for (const absolute of walk(jsRoot)) {
     'gx-promo-audience',
     'gx-promo-stack-loyalty',
     'gx-promo-published',
+    'gx-promo-acquisition-enabled',
     'gx-promo-preview',
   ]) {
     if (!adminHtml.includes('id="' + id + '"')) fail('Promotions Studio: falta UI ' + id + '.');
@@ -464,12 +465,16 @@ for (const absolute of walk(jsRoot)) {
     "invoke('promocion_eliminar'",
     "invoke('promocion_asignar'",
     "invoke('promocion_quitar_asignacion'",
+    "invoke('promocion_adquirir'",
+    "invoke('promocion_cancelar_adquisicion'",
     "invoke('registrar_pago_parcial'",
     "invoke('pactar_fecha_pago'",
     "invoke('cancelar_fecha_pactada'",
     'savePromotion',
     'togglePromotion',
     'assignPromotion',
+    'acquirePromotion',
+    'cancelPromotionAcquisition',
     'registerPartialPayment',
     'pactPaymentDate',
     'cancelPactPaymentDate',
