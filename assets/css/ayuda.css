@@ -10989,3 +10989,282 @@ body:has(#view-catalogo.active) #goxion-main-nav{
     }
     .gx-promo-deck-card::after{animation:none!important}
 }
+
+
+/* =========================================================
+   GOXION · CATÁLOGO PROMOCIONAL C2
+   Hero vertical · circulación derecha → frente → izquierda.
+   ========================================================= */
+
+.gx-promo-showcase{
+    margin-bottom:22px;
+}
+.gx-promo-showcase-head{
+    margin-bottom:7px;
+}
+.gx-promo-showcase-head h2{
+    font-size:19px;
+    max-width:300px;
+}
+.gx-promo-showcase-head p{
+    max-width:330px;
+}
+
+.gx-promo-deck{
+    height:402px;
+    margin:0 -12px;
+    perspective:1100px;
+    overflow:hidden;
+}
+.gx-promo-deck-card{
+    inset:8px auto auto 50%;
+    width:min(64vw,244px);
+    height:366px;
+    padding:19px 18px 18px;
+    border-radius:29px;
+    background:
+        radial-gradient(circle at 84% 10%,color-mix(in srgb,var(--gx-brand-accent) 28%,transparent),transparent 34%),
+        linear-gradient(165deg,var(--gx-brand) 0%,var(--gx-brand-deep) 76%);
+    border:1px solid rgba(255,255,255,.13);
+    box-shadow:
+        0 28px 54px rgba(0,0,0,.42),
+        inset 0 1px 0 rgba(255,255,255,.12);
+    transform-origin:center center;
+    transition:
+        transform 920ms cubic-bezier(.22,.72,.16,1),
+        opacity 720ms ease,
+        filter 720ms ease,
+        box-shadow 720ms ease;
+}
+.gx-promo-deck-card::after{
+    background:linear-gradient(112deg,transparent 20%,rgba(255,255,255,.065) 48%,transparent 72%);
+    animation-duration:10.5s;
+}
+.gx-promo-card-glow{
+    position:absolute;
+    left:-12%;
+    right:-12%;
+    bottom:-22%;
+    height:52%;
+    border-radius:50%;
+    background:var(--gx-brand-accent);
+    opacity:.18;
+    filter:blur(42px);
+    pointer-events:none;
+}
+.gx-promo-deck-card.is-front{
+    z-index:5;
+    opacity:1;
+    filter:saturate(1.02) brightness(1);
+    transform:translate3d(-50%,10px,0) scale(1);
+    box-shadow:
+        0 32px 62px rgba(0,0,0,.48),
+        0 12px 34px color-mix(in srgb,var(--gx-brand) 20%,transparent),
+        inset 0 1px 0 rgba(255,255,255,.15);
+}
+.gx-promo-deck-card.is-right{
+    z-index:3;
+    opacity:.46;
+    filter:saturate(.82) brightness(.72) blur(.25px);
+    transform:translate3d(calc(-50% + 126px),31px,-90px) scale(.84) rotateY(-4deg);
+    pointer-events:auto;
+}
+.gx-promo-deck-card.is-left{
+    z-index:2;
+    opacity:.22;
+    filter:saturate(.68) brightness(.58) blur(.55px);
+    transform:translate3d(calc(-50% - 132px),38px,-125px) scale(.79) rotateY(5deg);
+    pointer-events:auto;
+}
+.gx-promo-deck-card.is-hidden{
+    z-index:1;
+    opacity:0;
+    pointer-events:none;
+    transform:translate3d(calc(-50% + 165px),48px,-150px) scale(.72);
+}
+.gx-promo-deck-card:focus-visible{
+    border-color:rgba(255,255,255,.32);
+    box-shadow:0 0 0 3px rgba(255,255,255,.12),0 30px 60px rgba(0,0,0,.46);
+}
+
+.gx-promo-card-orbit-a{
+    width:250px;
+    height:102px;
+    right:-116px;
+    top:106px;
+    border-color:rgba(255,255,255,.10);
+    transform:rotate(-32deg);
+}
+.gx-promo-card-orbit-b{display:none}
+
+.gx-promo-card-top{
+    min-height:24px;
+}
+.gx-promo-card-kind{
+    border-color:rgba(255,255,255,.16);
+    background:rgba(0,0,0,.12);
+    color:rgba(255,255,255,.88);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+.gx-promo-preview-chip{
+    border-color:rgba(255,255,255,.13);
+    background:rgba(0,0,0,.10);
+    color:rgba(255,255,255,.72);
+}
+
+.gx-promo-card-logos{
+    height:58px;
+    margin:21px 0 12px;
+}
+.gx-promo-card-logos img{
+    width:58px;
+    height:58px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+    filter:drop-shadow(0 8px 15px rgba(0,0,0,.24));
+}
+.gx-promo-card-logos img+img{
+    margin-left:7px;
+}
+.gx-promo-card-logos img:nth-child(2){
+    width:52px;
+    height:52px;
+    opacity:.95;
+}
+
+.gx-promo-card-copy{
+    margin-top:2px;
+}
+.gx-promo-card-copy .gx-promo-platform-name{
+    display:block;
+    max-width:100%;
+    color:#fff;
+    font-size:25px;
+    font-weight:850;
+    line-height:1.04;
+    letter-spacing:-.045em;
+    text-shadow:0 2px 16px rgba(0,0,0,.16);
+}
+.gx-promo-offer-title{
+    display:block;
+    margin-top:8px;
+    color:rgba(255,255,255,.88);
+    font-size:11px;
+    font-weight:750;
+    line-height:1.25;
+}
+.gx-promo-card-copy small{
+    max-width:100%;
+    margin-top:6px;
+    color:rgba(255,255,255,.63);
+    font-size:9.2px;
+    line-height:1.45;
+    -webkit-line-clamp:2;
+}
+
+.gx-promo-card-price{
+    align-items:flex-end;
+    margin-top:auto;
+    padding-top:16px;
+}
+.gx-promo-card-price>div{
+    display:grid;
+    gap:2px;
+}
+.gx-promo-card-price b{
+    color:#fff;
+    font-size:38px;
+    line-height:.95;
+    font-weight:900;
+    letter-spacing:-.055em;
+    text-shadow:0 3px 20px rgba(0,0,0,.17);
+}
+.gx-promo-card-price s{
+    color:rgba(255,255,255,.48);
+    font-size:11px;
+}
+.gx-promo-card-price>span{
+    max-width:74px;
+    color:rgba(255,255,255,.62);
+    font-size:8.5px;
+    font-weight:750;
+}
+.gx-promo-saving{
+    margin-top:7px;
+    color:rgba(255,255,255,.84);
+    font-size:9px;
+    font-weight:800;
+}
+
+.gx-promo-deck-controls{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin:-1px 0 0;
+}
+.gx-promo-deck-controls>button{
+    display:none!important;
+}
+.gx-promo-dots{
+    min-height:18px;
+}
+.gx-promo-dots button{
+    width:5px;
+    height:5px;
+    background:#2c3340;
+}
+.gx-promo-dots button.active{
+    width:17px;
+    background:rgba(214,224,241,.78);
+}
+
+/* C2: logos libres también en el detalle expandido. */
+.gx-promo-expanded-logos img{
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    filter:drop-shadow(0 8px 15px rgba(0,0,0,.24));
+}
+.gx-promo-expanded-card h3{
+    font-size:25px;
+}
+.gx-promo-expanded-price strong{
+    font-size:34px;
+}
+
+@media(max-width:390px){
+    .gx-promo-showcase-head h2{font-size:17px}
+    .gx-promo-deck{
+        height:388px;
+        margin-left:-10px;
+        margin-right:-10px;
+    }
+    .gx-promo-deck-card{
+        width:min(66vw,238px);
+        height:352px;
+        padding:18px 17px 17px;
+    }
+    .gx-promo-deck-card.is-right{
+        transform:translate3d(calc(-50% + 116px),30px,-90px) scale(.83) rotateY(-4deg);
+    }
+    .gx-promo-deck-card.is-left{
+        transform:translate3d(calc(-50% - 122px),36px,-120px) scale(.78) rotateY(5deg);
+    }
+    .gx-promo-card-copy .gx-promo-platform-name{font-size:23px}
+    .gx-promo-card-price b{font-size:35px}
+}
+
+@media(max-width:350px){
+    .gx-promo-deck-card{width:224px}
+    .gx-promo-deck-card.is-right{
+        transform:translate3d(calc(-50% + 105px),31px,-90px) scale(.82);
+    }
+    .gx-promo-deck-card.is-left{
+        transform:translate3d(calc(-50% - 110px),36px,-120px) scale(.77);
+    }
+}
