@@ -851,18 +851,18 @@
 */
 
 /* Compatibilidad fuera de la beta */
-html:not(.gx-payment-beta) .gx-payment-upload-head,
-html:not(.gx-payment-beta) .gx-upload-beta-icon,
-html:not(.gx-payment-beta) .gx-preview-ready,
-html:not(.gx-payment-beta) .gx-submit-icon,
-html:not(.gx-payment-beta) .gx-submit-subtitle{
+html:not(.gx-payment-v2) .gx-payment-upload-head,
+html:not(.gx-payment-v2) .gx-upload-beta-icon,
+html:not(.gx-payment-v2) .gx-preview-ready,
+html:not(.gx-payment-v2) .gx-submit-icon,
+html:not(.gx-payment-v2) .gx-submit-subtitle{
     display:none!important;
 }
-html:not(.gx-payment-beta) .gx-payment-legacy-head,
-html:not(.gx-payment-beta) .gx-upload-legacy-icon{
+html:not(.gx-payment-v2) .gx-payment-legacy-head,
+html:not(.gx-payment-v2) .gx-upload-legacy-icon{
     display:block;
 }
-html:not(.gx-payment-beta) .gx-submit-copy{display:block}
+html:not(.gx-payment-v2) .gx-submit-copy{display:block}
 
 /* Jerarquía principal */
 .gx-payment-actions{
@@ -1286,7 +1286,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 .gx-bank-copy-status{display:none!important}
 
 /* Cápsula única de confirmación */
-.gx-payment-beta .toast{
+.gx-payment-v2 .toast{
     z-index:4600;
     bottom:calc(24px + env(safe-area-inset-bottom,0px));
     padding:10px 16px;
@@ -1301,12 +1301,12 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     backdrop-filter:blur(18px) saturate(1.12);
     box-shadow:0 10px 30px rgba(0,0,0,.30),0 0 20px rgba(40,201,111,.10);
 }
-.gx-payment-beta .toast.success{
+.gx-payment-v2 .toast.success{
     color:#dfffea;
     background:rgba(11,27,19,.88);
     border-color:rgba(40,201,111,.36);
 }
-.gx-payment-beta .toast.error{
+.gx-payment-v2 .toast.error{
     color:#ffe8ed;
     background:rgba(42,10,17,.90);
     border-color:rgba(255,77,111,.36);
@@ -1314,7 +1314,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* Opción A · modal independiente con entrada suave */
-.gx-payment-beta #payment-modal{
+.gx-payment-v2 #payment-modal{
     display:flex;
     visibility:hidden;
     pointer-events:none;
@@ -1328,7 +1328,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         -webkit-backdrop-filter .32s ease,
         visibility 0s linear .32s;
 }
-.gx-payment-beta #payment-modal.show{
+.gx-payment-v2 #payment-modal.show{
     visibility:visible;
     pointer-events:auto;
     opacity:1;
@@ -1336,7 +1336,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     backdrop-filter:blur(15px) saturate(1.08);
     transition-delay:0s;
 }
-.gx-payment-beta #payment-modal .modal-content{
+.gx-payment-v2 #payment-modal .modal-content{
     width:min(100%,420px);
     max-height:min(88dvh,760px);
     overflow:auto;
@@ -1359,15 +1359,15 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         opacity .22s ease,
         transform .34s cubic-bezier(.18,.86,.22,1.04);
 }
-.gx-payment-beta #payment-modal.show .modal-content{
+.gx-payment-v2 #payment-modal.show .modal-content{
     opacity:1;
     transform:translateY(0) scale(1);
 }
-.gx-payment-beta .gx-payment-legacy-head,
-.gx-payment-beta .gx-upload-legacy-icon{
+.gx-payment-v2 .gx-payment-legacy-head,
+.gx-payment-v2 .gx-upload-legacy-icon{
     display:none!important;
 }
-.gx-payment-beta .gx-payment-upload-head{
+.gx-payment-v2 .gx-payment-upload-head{
     display:flex;
     align-items:center;
     gap:12px;
@@ -1375,10 +1375,10 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     opacity:0;
     transform:translateY(8px);
 }
-.gx-payment-beta #payment-modal.show .gx-payment-upload-head{
+.gx-payment-v2 #payment-modal.show .gx-payment-upload-head{
     animation:gxPaymentItemIn .34s .07s cubic-bezier(.2,.8,.2,1) forwards;
 }
-.gx-payment-beta .gx-payment-upload-symbol{
+.gx-payment-v2 .gx-payment-upload-symbol{
     width:42px;
     height:42px;
     flex:0 0 42px;
@@ -1389,10 +1389,10 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     background:linear-gradient(135deg,#24f0ff,#61dcff);
     box-shadow:0 0 20px rgba(0,242,254,.16);
 }
-.gx-payment-beta .gx-payment-upload-symbol svg,
-.gx-payment-beta .upload-icon svg,
-.gx-payment-beta .gx-upload-arrow svg,
-.gx-payment-beta .gx-submit-icon svg{
+.gx-payment-v2 .gx-payment-upload-symbol svg,
+.gx-payment-v2 .upload-icon svg,
+.gx-payment-v2 .gx-upload-arrow svg,
+.gx-payment-v2 .gx-submit-icon svg{
     width:22px;
     height:22px;
     fill:none;
@@ -1401,27 +1401,27 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     stroke-linecap:round;
     stroke-linejoin:round;
 }
-.gx-payment-beta .gx-payment-upload-copy{min-width:0}
-.gx-payment-beta .gx-payment-upload-kicker{
+.gx-payment-v2 .gx-payment-upload-copy{min-width:0}
+.gx-payment-v2 .gx-payment-upload-kicker{
     color:#7f92a9;
     font-size:7.8px;
     font-weight:760;
     letter-spacing:1.25px;
 }
-.gx-payment-beta .gx-payment-upload-copy h3{
+.gx-payment-v2 .gx-payment-upload-copy h3{
     margin:3px 0 0;
     color:#fff;
     font-size:18px;
     font-weight:820;
     letter-spacing:-.35px;
 }
-.gx-payment-beta .gx-payment-upload-copy p{
+.gx-payment-v2 .gx-payment-upload-copy p{
     margin:4px 0 0;
     color:#8293a8;
     font-size:9.3px;
     line-height:1.4;
 }
-.gx-payment-beta #payment-modal .close-modal{
+.gx-payment-v2 #payment-modal .close-modal{
     top:15px;
     right:15px;
     width:34px;
@@ -1437,12 +1437,12 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     font-size:21px;
     line-height:1;
 }
-.gx-payment-beta #payment-modal .close-modal:active{
+.gx-payment-v2 #payment-modal .close-modal:active{
     transform:scale(.90);
 }
 
 /* Selector de imagen */
-.gx-payment-beta .upload-area{
+.gx-payment-v2 .upload-area{
     min-height:84px;
     margin:18px 0 0;
     padding:13px;
@@ -1461,14 +1461,14 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     opacity:0;
     transform:translateY(10px);
 }
-.gx-payment-beta #payment-modal.show .upload-area{
+.gx-payment-v2 #payment-modal.show .upload-area{
     animation:gxPaymentItemIn .36s .12s cubic-bezier(.2,.8,.2,1) forwards;
 }
-.gx-payment-beta .upload-area:active{
+.gx-payment-v2 .upload-area:active{
     transform:scale(.99);
     border-color:rgba(0,242,254,.16);
 }
-.gx-payment-beta .upload-icon{
+.gx-payment-v2 .upload-icon{
     width:38px;
     height:38px;
     margin:0;
@@ -1479,32 +1479,32 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     background:rgba(0,242,254,.075);
     filter:none;
 }
-.gx-payment-beta .gx-upload-beta-icon{display:block}
-.gx-payment-beta .upload-text{
+.gx-payment-v2 .gx-upload-beta-icon{display:block}
+.gx-payment-v2 .upload-text{
     min-width:0;
     color:#8191a5;
     font-size:8.7px;
 }
-.gx-payment-beta .upload-text strong{
+.gx-payment-v2 .upload-text strong{
     margin:0 0 2px;
     color:#f4f7fb;
     font-size:11px;
     font-weight:780;
 }
-.gx-payment-beta .upload-text span{
+.gx-payment-v2 .upload-text span{
     font-size:8.4px;
 }
-.gx-payment-beta .gx-upload-arrow{
+.gx-payment-v2 .gx-upload-arrow{
     width:28px;
     height:28px;
     display:grid;
     place-items:center;
     color:#8fefff;
 }
-.gx-payment-beta .gx-upload-arrow svg{width:18px;height:18px}
+.gx-payment-v2 .gx-upload-arrow svg{width:18px;height:18px}
 
 /* Preview */
-.gx-payment-beta #preview-container{
+.gx-payment-v2 #preview-container{
     display:none;
     margin:14px 0 0;
     border:1px solid rgba(255,255,255,.065);
@@ -1513,21 +1513,21 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     background:rgba(4,5,8,.50);
     box-shadow:0 10px 28px rgba(0,0,0,.18);
 }
-.gx-payment-beta #payment-modal.has-preview #preview-container{
+.gx-payment-v2 #payment-modal.has-preview #preview-container{
     display:block;
     animation:gxPreviewIn .34s cubic-bezier(.18,.86,.22,1) both;
 }
-.gx-payment-beta #payment-modal.has-preview .upload-area{
+.gx-payment-v2 #payment-modal.has-preview .upload-area{
     display:none;
 }
-.gx-payment-beta #preview-img{
+.gx-payment-v2 #preview-img{
     width:100%;
     max-height:280px;
     object-fit:contain;
     display:block;
     background:#020304;
 }
-.gx-payment-beta .gx-preview-footer{
+.gx-payment-v2 .gx-preview-footer{
     min-height:44px;
     display:flex;
     align-items:center;
@@ -1539,7 +1539,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     -webkit-backdrop-filter:blur(12px);
     backdrop-filter:blur(12px);
 }
-.gx-payment-beta .gx-preview-ready{
+.gx-payment-v2 .gx-preview-ready{
     display:flex;
     align-items:center;
     gap:7px;
@@ -1547,14 +1547,14 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     font-size:8.9px;
     font-weight:700;
 }
-.gx-payment-beta .gx-preview-ready-dot{
+.gx-payment-v2 .gx-preview-ready-dot{
     width:8px;
     height:8px;
     border-radius:50%;
     background:#28c96f;
     box-shadow:0 0 12px rgba(40,201,111,.42);
 }
-.gx-payment-beta .btn-change-img{
+.gx-payment-v2 .btn-change-img{
     position:static;
     padding:6px 10px;
     border:0;
@@ -1568,7 +1568,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* Envío con estados */
-.gx-payment-beta .btn-submit-payment{
+.gx-payment-v2 .btn-submit-payment{
     min-height:54px;
     margin-top:12px;
     padding:8px 13px;
@@ -1587,9 +1587,9 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         background .25s ease,
         box-shadow .25s ease;
 }
-.gx-payment-beta #payment-modal.has-preview .btn-submit-payment{display:flex}
-.gx-payment-beta .btn-submit-payment:active:not(:disabled){transform:scale(.987)}
-.gx-payment-beta .gx-submit-icon{
+.gx-payment-v2 #payment-modal.has-preview .btn-submit-payment{display:flex}
+.gx-payment-v2 .btn-submit-payment:active:not(:disabled){transform:scale(.987)}
+.gx-payment-v2 .gx-submit-icon{
     width:36px;
     height:36px;
     flex:0 0 36px;
@@ -1598,23 +1598,23 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     border-radius:12px;
     background:rgba(255,255,255,.14);
 }
-.gx-payment-beta .gx-submit-icon svg{
+.gx-payment-v2 .gx-submit-icon svg{
     width:21px;
     height:21px;
     overflow:visible;
 }
-.gx-payment-beta .gx-submit-copy{
+.gx-payment-v2 .gx-submit-copy{
     display:flex;
     flex-direction:column;
     gap:1px;
     min-width:0;
 }
-.gx-payment-beta .gx-submit-title{
+.gx-payment-v2 .gx-submit-title{
     color:#fff;
     font-size:10.9px;
     font-weight:820;
 }
-.gx-payment-beta .gx-submit-subtitle{
+.gx-payment-v2 .gx-submit-subtitle{
     color:rgba(255,255,255,.75);
     font-size:8.3px;
     font-weight:620;
@@ -1624,40 +1624,40 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 .gx-submit-error{
     opacity:0;
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"]{
     background:linear-gradient(135deg,#5967ff,#8158ff);
     box-shadow:0 10px 28px rgba(111,84,255,.22),inset 0 1px 0 rgba(255,255,255,.17);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-send{opacity:0}
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-send{opacity:0}
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
     opacity:1;
     stroke-dasharray:30;
     stroke-dashoffset:9;
     transform-origin:center;
     animation:gxSubmitSpin .82s linear infinite;
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"]{
+.gx-payment-v2 .btn-submit-payment[data-state="success"]{
     background:linear-gradient(135deg,#2dcc73,#159f75);
     box-shadow:0 10px 28px rgba(40,201,111,.22),0 0 22px rgba(40,201,111,.12);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-send{opacity:0}
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-send{opacity:0}
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-check{
     opacity:1;
     stroke-width:2.2;
     stroke-dasharray:22;
     stroke-dashoffset:22;
     animation:gxSubmitCheck .36s .04s ease forwards;
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"]{
+.gx-payment-v2 .btn-submit-payment[data-state="error"]{
     background:linear-gradient(135deg,#e94867,#b72f52);
     box-shadow:0 10px 28px rgba(233,72,103,.18),0 0 20px rgba(233,72,103,.10);
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-send{opacity:0}
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-error{
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-send{opacity:0}
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-error{
     opacity:1;
     stroke-width:2.1;
 }
-.gx-payment-beta #payment-modal.is-success .gx-preview-ready-dot{
+.gx-payment-v2 #payment-modal.is-success .gx-preview-ready-dot{
     animation:gxSuccessPulse .75s ease;
 }
 
@@ -1697,7 +1697,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         border-color:rgba(0,242,254,.26);
         background:rgba(0,242,254,.10);
     }
-    .gx-payment-beta .upload-area:hover{
+    .gx-payment-v2 .upload-area:hover{
         border-color:rgba(0,242,254,.14);
         background:
             linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.022)),
@@ -1707,12 +1707,12 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 @media(max-width:560px){
     .gx-bank-overlay,
-    .gx-payment-beta #payment-modal{
+    .gx-payment-v2 #payment-modal{
         align-items:flex-end;
         padding:0;
     }
     .gx-bank-sheet,
-    .gx-payment-beta #payment-modal .modal-content{
+    .gx-payment-v2 #payment-modal .modal-content{
         width:100%;
         max-height:91dvh;
         border-radius:28px 28px 0 0;
@@ -1734,12 +1734,12 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     .gx-clabe-copy,
     .gx-copy-clipboard,
     .gx-copy-check,
-    .gx-payment-beta #payment-modal,
-    .gx-payment-beta #payment-modal .modal-content,
-    .gx-payment-beta .gx-payment-upload-head,
-    .gx-payment-beta .upload-area,
-    .gx-payment-beta #preview-container,
-    .gx-payment-beta .btn-submit-payment,
+    .gx-payment-v2 #payment-modal,
+    .gx-payment-v2 #payment-modal .modal-content,
+    .gx-payment-v2 .gx-payment-upload-head,
+    .gx-payment-v2 .upload-area,
+    .gx-payment-v2 #preview-container,
+    .gx-payment-v2 .btn-submit-payment,
     .gx-submit-spinner,
     .gx-submit-check{
         animation:none!important;
@@ -1753,7 +1753,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 /* Las sheets dejan pasar el fondo lava: mismo lenguaje glass de Ayuda */
 .gx-bank-sheet,
-.gx-payment-beta #payment-modal .modal-content{
+.gx-payment-v2 #payment-modal .modal-content{
     border:1px solid rgba(255,255,255,.08);
     background:var(--card-glass);
     -webkit-backdrop-filter:blur(18px) saturate(1.16);
@@ -1764,7 +1764,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         inset 0 1px 0 rgba(255,255,255,.045);
 }
 .gx-bank-sheet::before,
-.gx-payment-beta #payment-modal .modal-content::before{
+.gx-payment-v2 #payment-modal .modal-content::before{
     content:'';
     position:absolute;
     inset:0;
@@ -1778,8 +1778,8 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 /* Tarjetas internas: transparencia real, no panel Admin */
 .gx-bank-card,
-.gx-payment-beta .upload-area,
-.gx-payment-beta #preview-container{
+.gx-payment-v2 .upload-area,
+.gx-payment-v2 #preview-container{
     border:1px solid rgba(255,255,255,.08);
     background:var(--card-glass);
     -webkit-backdrop-filter:blur(10px) saturate(1.10);
@@ -1800,12 +1800,12 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     background:rgba(0,0,0,.14);
     border:1px solid rgba(255,255,255,.035);
 }
-.gx-payment-beta .gx-preview-footer{
+.gx-payment-v2 .gx-preview-footer{
     background:rgba(8,8,12,.28);
     -webkit-backdrop-filter:blur(10px);
     backdrop-filter:blur(10px);
 }
-.gx-payment-beta .btn-change-img{
+.gx-payment-v2 .btn-change-img{
     background:rgba(255,255,255,.07);
     border:1px solid rgba(255,255,255,.055);
 }
@@ -1856,7 +1856,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 .gx-copy-clipboard{display:none!important}
 
 /* Submit estilo micro-interaction: contenido + carril lateral */
-.gx-payment-beta .btn-submit-payment{
+.gx-payment-v2 .btn-submit-payment{
     position:relative;
     overflow:hidden;
     min-height:56px;
@@ -1875,14 +1875,14 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         box-shadow .34s ease,
         padding .30s cubic-bezier(.2,.8,.2,1);
 }
-.gx-payment-beta .gx-submit-copy{
+.gx-payment-v2 .gx-submit-copy{
     position:relative;
     z-index:1;
     width:100%;
     align-items:flex-start;
     transition:transform .28s cubic-bezier(.2,.8,.2,1),opacity .22s ease;
 }
-.gx-payment-beta .gx-submit-icon{
+.gx-payment-v2 .gx-submit-icon{
     position:absolute;
     top:0;
     right:0;
@@ -1900,12 +1900,12 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         border-color .30s ease,
         transform .30s cubic-bezier(.2,.8,.2,1);
 }
-.gx-payment-beta .gx-submit-icon svg{
+.gx-payment-v2 .gx-submit-icon svg{
     width:23px;
     height:23px;
     overflow:visible;
 }
-.gx-payment-beta .gx-submit-send{
+.gx-payment-v2 .gx-submit-send{
     opacity:1;
     transform:scale(1);
     transform-origin:center;
@@ -1916,44 +1916,44 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 .gx-submit-error{
     transform-origin:center;
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"]{
     background:linear-gradient(135deg,#5869ff,#7b58ff 60%,#9a52ed);
     box-shadow:
         0 10px 30px rgba(105,83,255,.24),
         inset 0 1px 0 rgba(255,255,255,.17);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-icon{
     width:60px;
     background:rgba(255,255,255,.09);
     border-left-color:rgba(255,255,255,.26);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-send{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-send{
     opacity:0;
     transform:scale(.35);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
     opacity:1;
     stroke-dasharray:29 16;
     stroke-dashoffset:5;
     animation:gxSubmitSpin .78s linear infinite;
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"]{
+.gx-payment-v2 .btn-submit-payment[data-state="success"]{
     background:linear-gradient(135deg,#2dcc73,#159f75);
     box-shadow:
         0 10px 28px rgba(40,201,111,.24),
         0 0 22px rgba(40,201,111,.12),
         inset 0 1px 0 rgba(255,255,255,.16);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-icon{
     width:60px;
     background:rgba(255,255,255,.10);
     border-left-color:rgba(255,255,255,.24);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-send,
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-spinner{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-send,
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-spinner{
     opacity:0;
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-check{
     opacity:1;
     transform:scale(1.08);
     stroke-width:2.2;
@@ -1961,21 +1961,21 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     stroke-dashoffset:22;
     animation:gxSubmitCheck .38s .04s ease forwards;
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"]{
+.gx-payment-v2 .btn-submit-payment[data-state="error"]{
     background:linear-gradient(135deg,#e94867,#b72f52);
     box-shadow:
         0 10px 28px rgba(233,72,103,.20),
         0 0 20px rgba(233,72,103,.10);
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-icon{
     width:60px;
     background:rgba(255,255,255,.08);
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-send,
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-spinner{
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-send,
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-spinner{
     opacity:0;
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-error{
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-error{
     opacity:1;
     animation:gxSubmitErrorPop .26s cubic-bezier(.2,.8,.2,1);
 }
@@ -1987,7 +1987,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 /* La transparencia debe seguir luciendo en móvil */
 @media(max-width:560px){
     .gx-bank-sheet,
-    .gx-payment-beta #payment-modal .modal-content{
+    .gx-payment-v2 #payment-modal .modal-content{
         background:var(--card-glass);
         -webkit-backdrop-filter:blur(18px) saturate(1.16);
         backdrop-filter:blur(18px) saturate(1.16);
@@ -1996,9 +1996,9 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 @media(prefers-reduced-motion:reduce){
     .gx-copy-back,
     .gx-copy-front,
-    .gx-payment-beta .gx-submit-icon,
-    .gx-payment-beta .gx-submit-copy,
-    .gx-payment-beta .gx-submit-send{
+    .gx-payment-v2 .gx-submit-icon,
+    .gx-payment-v2 .gx-submit-copy,
+    .gx-payment-v2 .gx-submit-send{
         animation:none!important;
         transition:none!important;
     }
@@ -2010,14 +2010,14 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 /* El fondo lava debe seguir siendo visible detrás de las sheets. */
 .gx-bank-overlay,
-.gx-payment-beta #payment-modal,
-.gx-payment-beta #payment-modal.show{
+.gx-payment-v2 #payment-modal,
+.gx-payment-v2 #payment-modal.show{
     background:rgba(1,2,5,.30);
     -webkit-backdrop-filter:blur(6px) saturate(1.06);
     backdrop-filter:blur(6px) saturate(1.06);
 }
 .gx-bank-sheet,
-.gx-payment-beta #payment-modal .modal-content{
+.gx-payment-v2 #payment-modal .modal-content{
     background:
         linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),
         rgba(8,8,12,.24);
@@ -2030,7 +2030,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         inset 0 22px 42px -28px rgba(0,242,254,.16);
 }
 .gx-bank-sheet::before,
-.gx-payment-beta #payment-modal .modal-content::before{
+.gx-payment-v2 #payment-modal .modal-content::before{
     background:
         radial-gradient(circle at 10% 0%,rgba(0,242,254,.08),transparent 32%),
         radial-gradient(circle at 92% 8%,rgba(124,77,255,.09),transparent 36%);
@@ -2038,8 +2038,8 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 /* Cristal secundario: visible, pero deja atravesar el fondo. */
 .gx-bank-card,
-.gx-payment-beta .upload-area,
-.gx-payment-beta #preview-container{
+.gx-payment-v2 .upload-area,
+.gx-payment-v2 #preview-container{
     background:
         linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),
         rgba(8,8,12,.20);
@@ -2096,7 +2096,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* Enviar comprobante: cápsula compacta. */
-.gx-payment-beta .btn-submit-payment{
+.gx-payment-v2 .btn-submit-payment{
     width:min(100%,238px);
     min-height:46px;
     margin:13px auto 0;
@@ -2107,54 +2107,54 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         0 8px 22px rgba(74,102,255,.20),
         inset 0 1px 0 rgba(255,255,255,.18);
 }
-.gx-payment-beta .gx-submit-copy{
+.gx-payment-v2 .gx-submit-copy{
     min-height:34px;
     justify-content:center;
     align-items:flex-start;
 }
-.gx-payment-beta .gx-submit-title{
+.gx-payment-v2 .gx-submit-title{
     font-size:10.2px;
     line-height:1;
     white-space:nowrap;
 }
-.gx-payment-beta .gx-submit-subtitle{
+.gx-payment-v2 .gx-submit-subtitle{
     display:none!important;
 }
-.gx-payment-beta .gx-submit-icon{
+.gx-payment-v2 .gx-submit-icon{
     width:46px;
     height:100%;
     border-left:1px solid rgba(255,255,255,.20);
     background:rgba(0,0,0,.08);
     z-index:2;
 }
-.gx-payment-beta .gx-submit-icon svg{
+.gx-payment-v2 .gx-submit-icon svg{
     width:21px;
     height:21px;
 }
 
 /* Loading: el carril lateral se expande y toma toda la cápsula. */
-.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"]{
     padding-right:16px;
     background:linear-gradient(135deg,#5f5eff,#7a57ff 58%,#9952e7);
     box-shadow:
         0 9px 25px rgba(112,82,255,.24),
         inset 0 1px 0 rgba(255,255,255,.16);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-copy{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-copy{
     opacity:0;
     transform:scale(.94);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-icon{
     width:100%;
     border-left-color:transparent;
     background:rgba(255,255,255,.055);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
     stroke-width:1.9;
 }
 
 /* Success: vuelve a su carril, botón verde y palomita simple. */
-.gx-payment-beta .btn-submit-payment[data-state="success"]{
+.gx-payment-v2 .btn-submit-payment[data-state="success"]{
     padding-right:52px;
     background:linear-gradient(135deg,#29c96f,#159d77);
     box-shadow:
@@ -2162,44 +2162,44 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         0 0 19px rgba(40,201,111,.10),
         inset 0 1px 0 rgba(255,255,255,.14);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-copy{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-copy{
     opacity:1;
     transform:scale(1);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-icon{
     width:46px;
     border-left-color:rgba(255,255,255,.20);
     background:rgba(255,255,255,.08);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-check{
     stroke-width:2.4;
     transform:scale(1.02);
 }
 
 /* Error: mismo botón, rojo y reintento. */
-.gx-payment-beta .btn-submit-payment[data-state="error"]{
+.gx-payment-v2 .btn-submit-payment[data-state="error"]{
     padding-right:52px;
     background:linear-gradient(135deg,#ea4969,#bb3155);
     box-shadow:
         0 8px 22px rgba(234,73,105,.19),
         0 0 17px rgba(234,73,105,.08);
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-copy{
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-copy{
     opacity:1;
     transform:scale(1);
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-icon{
     width:46px;
 }
 
 /* El comprobante comunica sus estados por sí mismo; la cápsula queda sólo para copiar CLABE. */
-.gx-payment-beta #payment-modal ~ .toast{
+.gx-payment-v2 #payment-modal ~ .toast{
     pointer-events:none;
 }
 
 @media(max-width:560px){
     .gx-bank-sheet,
-    .gx-payment-beta #payment-modal .modal-content{
+    .gx-payment-v2 #payment-modal .modal-content{
         background:
             linear-gradient(145deg,rgba(255,255,255,.035),rgba(255,255,255,.008)),
             rgba(8,8,12,.22);
@@ -2214,8 +2214,8 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 /* Overlay más limpio: conserva contexto sin lavar demasiado el fondo. */
 .gx-bank-overlay,
-.gx-payment-beta #payment-modal,
-.gx-payment-beta #payment-modal.show{
+.gx-payment-v2 #payment-modal,
+.gx-payment-v2 #payment-modal.show{
     background:rgba(2,3,7,.38);
     -webkit-backdrop-filter:blur(7px) saturate(1.08);
     backdrop-filter:blur(7px) saturate(1.08);
@@ -2223,7 +2223,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 /* Sheet principal: vidrio más denso con blur premium. */
 .gx-bank-sheet,
-.gx-payment-beta #payment-modal .modal-content{
+.gx-payment-v2 #payment-modal .modal-content{
     background:
         linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015)),
         rgba(8,8,12,.40);
@@ -2259,8 +2259,8 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* Upload y preview: ligeramente más ligeros que las tarjetas bancarias. */
-.gx-payment-beta .upload-area,
-.gx-payment-beta #preview-container{
+.gx-payment-v2 .upload-area,
+.gx-payment-v2 #preview-container{
     background:
         linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)),
         rgba(9,10,15,.34);
@@ -2274,7 +2274,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* Submit: cápsula realmente compacta, dark glass + contorno neón en reposo. */
-.gx-payment-beta .btn-submit-payment{
+.gx-payment-v2 .btn-submit-payment{
     width:188px;
     min-height:42px;
     margin:12px auto 0;
@@ -2289,28 +2289,28 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         0 0 16px rgba(0,242,254,.08),
         inset 0 1px 0 rgba(255,255,255,.04);
 }
-.gx-payment-beta .gx-submit-copy{
+.gx-payment-v2 .gx-submit-copy{
     min-height:30px;
     justify-content:center;
     align-items:flex-start;
 }
-.gx-payment-beta .gx-submit-title{
+.gx-payment-v2 .gx-submit-title{
     font-size:9.5px;
     line-height:1;
     letter-spacing:-.05px;
 }
-.gx-payment-beta .gx-submit-icon{
+.gx-payment-v2 .gx-submit-icon{
     width:40px;
     background:rgba(0,242,254,.055);
     border-left:1px solid rgba(0,242,254,.22);
 }
-.gx-payment-beta .gx-submit-icon svg{
+.gx-payment-v2 .gx-submit-icon svg{
     width:19px;
     height:19px;
 }
 
 /* Loading: color sólido y luminoso; nunca se oscurece ni parece apagarse. */
-.gx-payment-beta .btn-submit-payment[data-state="loading"]{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"]{
     padding-right:14px;
     border-color:transparent;
     background:#655cf2;
@@ -2319,23 +2319,23 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         0 0 18px rgba(101,92,242,.14),
         inset 0 1px 0 rgba(255,255,255,.14);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-copy{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-copy{
     opacity:0;
     transform:scale(.96);
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-icon{
     width:100%;
     background:transparent;
     border-left-color:transparent;
 }
-.gx-payment-beta .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
+.gx-payment-v2 .btn-submit-payment[data-state="loading"] .gx-submit-spinner{
     opacity:1;
     stroke:#fff;
     stroke-width:1.9;
 }
 
 /* Success: sólido verde, misma cápsula, palomita simple. */
-.gx-payment-beta .btn-submit-payment[data-state="success"]{
+.gx-payment-v2 .btn-submit-payment[data-state="success"]{
     padding-right:44px;
     border-color:transparent;
     background:#27b96a;
@@ -2344,19 +2344,19 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         0 0 17px rgba(39,185,106,.12),
         inset 0 1px 0 rgba(255,255,255,.13);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-icon{
     width:40px;
     background:rgba(255,255,255,.08);
     border-left-color:rgba(255,255,255,.20);
 }
-.gx-payment-beta .btn-submit-payment[data-state="success"] .gx-submit-check{
+.gx-payment-v2 .btn-submit-payment[data-state="success"] .gx-submit-check{
     stroke:#fff;
     stroke-width:2.4;
     transform:scale(1.04);
 }
 
 /* Error: sólido rojo, sin oscurecer la cápsula. */
-.gx-payment-beta .btn-submit-payment[data-state="error"]{
+.gx-payment-v2 .btn-submit-payment[data-state="error"]{
     padding-right:44px;
     border-color:transparent;
     background:#d94161;
@@ -2364,14 +2364,14 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         0 8px 22px rgba(217,65,97,.22),
         0 0 16px rgba(217,65,97,.10);
 }
-.gx-payment-beta .btn-submit-payment[data-state="error"] .gx-submit-icon{
+.gx-payment-v2 .btn-submit-payment[data-state="error"] .gx-submit-icon{
     width:40px;
     background:rgba(255,255,255,.07);
     border-left-color:rgba(255,255,255,.18);
 }
 
 /* Evita dimming visual del botón durante los estados. */
-.gx-payment-beta .btn-submit-payment:disabled{
+.gx-payment-v2 .btn-submit-payment:disabled{
     opacity:1;
     filter:none;
     cursor:default;
@@ -2380,7 +2380,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 /* Mantener el equilibrio también en iPhone. */
 @media(max-width:560px){
     .gx-bank-sheet,
-    .gx-payment-beta #payment-modal .modal-content{
+    .gx-payment-v2 #payment-modal .modal-content{
         background:
             linear-gradient(145deg,rgba(255,255,255,.05),rgba(255,255,255,.014)),
             rgba(8,8,12,.38);
@@ -2445,17 +2445,17 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* Comprobante sin cámara: texto ocupa el encabezado completo. */
-.gx-payment-beta .gx-payment-upload-head{
+.gx-payment-v2 .gx-payment-upload-head{
     display:block;
     padding-right:42px;
 }
-.gx-payment-beta .gx-payment-upload-copy{
+.gx-payment-v2 .gx-payment-upload-copy{
     width:100%;
 }
-.gx-payment-beta .gx-payment-upload-copy h3{
+.gx-payment-v2 .gx-payment-upload-copy h3{
     font-size:19px;
 }
-.gx-payment-beta .gx-payment-upload-copy p{
+.gx-payment-v2 .gx-payment-upload-copy p{
     max-width:300px;
     font-size:9.6px;
 }
@@ -3168,31 +3168,31 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 /* Ajuste opt-in: lava más perceptible por forma/movimiento y cabecera fija con fundido inferior. */
 
 /* Fondo lava: más presencia sin subir la saturación de forma agresiva. */
-.gx-payment-beta .bg::before{
+.gx-payment-v2 .bg::before{
     background:
         radial-gradient(circle at 18% 18%,rgba(124,77,255,.075),transparent 31%),
         radial-gradient(circle at 82% 72%,rgba(0,242,254,.065),transparent 32%);
     filter:blur(68px);
     animation:gxAmbientV12 18s ease-in-out infinite alternate;
 }
-.gx-payment-beta .lava{
+.gx-payment-v2 .lava{
     filter:blur(58px) saturate(1.05);
     opacity:.98;
     transform-origin:center;
 }
-.gx-payment-beta .lava-1{
+.gx-payment-v2 .lava-1{
     background:radial-gradient(circle,rgba(176,38,255,.38),transparent 69%);
     animation:gxLavaV12A 14s ease-in-out infinite alternate;
 }
-.gx-payment-beta .lava-2{
+.gx-payment-v2 .lava-2{
     background:radial-gradient(circle,rgba(0,242,254,.34),transparent 69%);
     animation:gxLavaV12B 16s ease-in-out infinite alternate;
 }
-.gx-payment-beta .lava-3{
+.gx-payment-v2 .lava-3{
     background:radial-gradient(circle,rgba(124,77,255,.30),transparent 69%);
     animation:gxLavaV12C 18s ease-in-out infinite alternate;
 }
-.gx-payment-beta .lava-4{
+.gx-payment-v2 .lava-4{
     background:radial-gradient(circle,rgba(0,242,254,.29),transparent 69%);
     animation:gxLavaV12D 15s ease-in-out infinite alternate;
 }
@@ -3255,7 +3255,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* Cabecera fija: eliminar el corte rectangular y fundirla hacia el contenido. */
-.gx-payment-beta .sticky-area{
+.gx-payment-v2 .sticky-area{
     isolation:isolate;
     overflow:visible;
     background:transparent;
@@ -3263,7 +3263,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
     backdrop-filter:none;
     margin-bottom:18px;
 }
-.gx-payment-beta .sticky-area::before{
+.gx-payment-v2 .sticky-area::before{
     content:"";
     position:absolute;
     z-index:-1;
@@ -3303,7 +3303,7 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         transparent 100%
     );
 }
-.gx-payment-beta .sticky-area::after{
+.gx-payment-v2 .sticky-area::after{
     content:"";
     position:absolute;
     z-index:-1;
@@ -3322,26 +3322,26 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 }
 
 /* El contenido entra bajo el fundido sin que aparezca una línea dura. */
-.gx-payment-beta .scrollable-content{
+.gx-payment-v2 .scrollable-content{
     position:relative;
     z-index:1;
 }
 
 /* Móvil: manchas un poco más definidas, todavía suaves. */
 @media(max-width:600px){
-    .gx-payment-beta .lava{
+    .gx-payment-v2 .lava{
         filter:blur(45px) saturate(1.05);
     }
-    .gx-payment-beta .lava-1{width:300px;height:300px}
-    .gx-payment-beta .lava-2{width:320px;height:320px}
-    .gx-payment-beta .lava-3{width:280px;height:280px}
-    .gx-payment-beta .lava-4{width:220px;height:220px}
+    .gx-payment-v2 .lava-1{width:300px;height:300px}
+    .gx-payment-v2 .lava-2{width:320px;height:320px}
+    .gx-payment-v2 .lava-3{width:280px;height:280px}
+    .gx-payment-v2 .lava-4{width:220px;height:220px}
 }
 
 /* Respetar reducción de movimiento sin apagar el ambiente. */
 @media(prefers-reduced-motion:reduce){
-    .gx-payment-beta .bg::before,
-    .gx-payment-beta .lava{
+    .gx-payment-v2 .bg::before,
+    .gx-payment-v2 .lava{
         animation:none!important;
     }
 }
