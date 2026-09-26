@@ -52,7 +52,21 @@ declare global {
     racha_resultado?: number | null;
   }
 
+  interface GoxionFinancialPromotionItem {
+    item_id?: GoxionId;
+    servicio_id?: GoxionId | null;
+    cliente_servicio_id?: GoxionId | null;
+    rol?: 'principal' | 'incluido' | 'disparador' | 'complemento' | string;
+    servicio?: string;
+    precio_normal?: number;
+    precio_efectivo?: number;
+    ahorro?: number;
+    afecta_precio?: boolean;
+  }
+
   interface GoxionFinancialPromotionLine {
+    fuente?: 'adquisicion_inmutable' | 'legacy' | string;
+    adquisicion_id?: GoxionId;
     asignacion_id?: GoxionId;
     promocion_id?: GoxionId | null;
     promocion?: string;
@@ -63,9 +77,15 @@ declare global {
     precio_promocional?: number;
     ahorro?: number;
     periodo_inicio?: string;
+    periodo_fin?: string;
     periodo_indice?: number;
     periodos_totales?: number;
     periodos_consumidos?: number;
+    mecanica?: 'precio_fijo' | 'porcentaje' | 'combo' | 'addon' | string;
+    titulo_publico?: string;
+    revision_snapshot?: number;
+    acumulacion?: Record<string, boolean>;
+    items?: GoxionFinancialPromotionItem[];
   }
 
   interface GoxionFinancialState extends GoxionAccountState {
@@ -80,6 +100,12 @@ declare global {
       periodo?: string;
       total_ahorro?: number;
       detalles?: GoxionFinancialPromotionLine[];
+      stacking?: {
+        base_bloqueada_lealtad?: number;
+        base_bloqueada_programados?: number;
+        base_bloqueada_bienvenida?: number;
+        servicios_bloqueados_trato_justo?: GoxionId[];
+      };
     };
     shadow?: {
       subtotal_oficial?: number;

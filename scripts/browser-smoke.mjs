@@ -462,6 +462,25 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       promocion_quitar_asignacion: {
         desactivada:true
       },
+      promocion_adquirir: {
+        adquisicion:{
+          adquisicion_id:'acq-smoke',
+          estado:'activa',
+          mecanica:'combo',
+          periodo_inicio:'2026-09-01',
+          periodos_totales:3,
+          subtotal_normal:188,
+          total_promocional:139,
+          ahorro:49
+        }
+      },
+      promocion_cancelar_adquisicion: {
+        adquisicion:{
+          adquisicion_id:'acq-smoke',
+          estado:'cancelada',
+          cambio:true
+        }
+      },
       registrar_pago_parcial: {
         pago_parcial:{id:'partial-smoke',saldo_restante:40},
         monto_pagado:60,
@@ -491,6 +510,24 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     });
   });
 
+  await page.route('**/functions/v1/promociones-admin-beta', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok:true,
+        contrato:'goxion-promotions-studio-v2',
+        version:'2.0',
+        servicios:[
+          {id:'catalog-smoke-a',nombre:'Netflix Smoke',precio:109,activo:true},
+          {id:'catalog-smoke-b',nombre:'HBO Smoke',precio:79,activo:true},
+          {id:'catalog-smoke-c',nombre:'Prime Smoke',precio:45,activo:true}
+        ],
+        promociones:[]
+      })
+    });
+  });
+
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
   await page.waitForTimeout(900);
 
@@ -513,6 +550,8 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL_ACTIONS?.cancelBenefit === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.savePromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.togglePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.acquirePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.cancelPromotionAcquisition === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.assignPromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.pactPaymentDate === 'function' &&
@@ -623,6 +662,16 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         activa:true
       }),
       promoState: await window.GOXION_FINANCIAL_ACTIONS.togglePromotion({id:'promo-smoke',activa:false}),
+      promoAcquire: await window.GOXION_FINANCIAL_ACTIONS.acquirePromotion({
+        clienteId:'client-smoke',
+        promocionId:'promo-smoke',
+        periodoInicio:'2026-09',
+        origen:'smoke'
+      }),
+      promoCancelAcquisition: await window.GOXION_FINANCIAL_ACTIONS.cancelPromotionAcquisition({
+        id:'acq-smoke',
+        motivo:'Smoke cancel'
+      }),
       promoAssign: await window.GOXION_FINANCIAL_ACTIONS.assignPromotion({
         clienteServicioId:'service-smoke',
         promocionId:'promo-smoke',
@@ -656,6 +705,13 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       if (phase3de.promoSave?.promocion?.id !== 'promo-smoke') {
         errors.push(`${label}: promoción no normalizó la respuesta.`);
       }
+      if (
+        phase3de.promoAcquire?.adquisicion?.adquisicion_id !== 'acq-smoke' ||
+        phase3de.promoAcquire?.adquisicion?.ahorro !== 49 ||
+        phase3de.promoCancelAcquisition?.adquisicion?.estado !== 'cancelada'
+      ) {
+        errors.push(`${label}: adquisición promocional P3 no normalizó la respuesta.`);
+      }
       if (phase3de.partial?.saldo_restante !== 40 || phase3de.partial?.monto_pagado !== 60) {
         errors.push(`${label}: pago parcial no normalizó la respuesta.`);
       }
@@ -673,6 +729,14 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         actionMap.promocion_guardar?.body?.datos?.servicio_id !== 'catalog-smoke' ||
         actionMap.promocion_asignar?.body?.datos?.cliente_servicio_id !== 'service-smoke'
       ) errors.push(`${label}: contrato HTTP de promociones incorrecto.`);
+
+      if (
+        actionMap.promocion_adquirir?.body?.datos?.cliente_id !== 'client-smoke' ||
+        actionMap.promocion_adquirir?.body?.datos?.promocion_id !== 'promo-smoke' ||
+        actionMap.promocion_adquirir?.body?.datos?.periodo_inicio !== '2026-09-01' ||
+        actionMap.promocion_adquirir?.body?.datos?.origen !== 'smoke' ||
+        actionMap.promocion_cancelar_adquisicion?.body?.datos?.id !== 'acq-smoke'
+      ) errors.push(`${label}: contrato HTTP de adquisición promocional P3 incorrecto.`);
 
       if (
         actionMap.registrar_pago_parcial?.body?.datos?.saldo_restante !== 40 ||
@@ -756,6 +820,61 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     }, mode);
     if (!ok) errors.push(`${label}: falló modo de catálogo ${mode}.`);
     await page.waitForTimeout(80);
+  }
+
+  // Promotions Studio: validar las cuatro mecánicas sin guardar nada.
+  const promoStudio = await page.evaluate(async () => {
+    try {
+      await window.gxPromoLoad?.();
+      window.gxPromoOpenEditor?.();
+
+      const mechanics = [...document.querySelectorAll('[data-gx-promo-mechanic]')]
+        .map(x => x.getAttribute('data-gx-promo-mechanic'));
+
+      window.gxPromoSetMechanic?.('combo');
+      const comboOptions = document.querySelectorAll('[data-gx-promo-service-check]').length;
+
+      window.gxPromoSetMechanic?.('addon');
+      const addonTrigger = document.getElementById('gx-promo-addon-trigger');
+      const addonOptions = document.querySelectorAll('[data-gx-promo-addon-check]').length;
+
+      const lockText = document.querySelector('.gx-promo-acquisition-lock')?.textContent || '';
+      const acquisitionToggle = document.getElementById('gx-promo-acquisition-enabled');
+      if (acquisitionToggle) acquisitionToggle.checked = true;
+      const hasPreview = !!document.getElementById('gx-promo-preview');
+      const editorVisible = document.getElementById('gx-promo-editor')?.hidden === false;
+
+      window.gxPromoCloseEditor?.();
+
+      return {
+        mechanics,
+        comboOptions,
+        addonOptions,
+        hasTrigger: !!addonTrigger,
+        hasPreview,
+        hasAcquisitionToggle: !!acquisitionToggle,
+        acquisitionEnabled: acquisitionToggle?.checked === true,
+        editorVisible,
+        lockText
+      };
+    } catch (error) {
+      return { error: error?.message || String(error) };
+    }
+  });
+
+  if (
+    promoStudio?.error ||
+    !['precio_fijo','porcentaje','combo','addon'].every(x => promoStudio?.mechanics?.includes(x)) ||
+    promoStudio?.comboOptions !== 3 ||
+    promoStudio?.addonOptions !== 3 ||
+    promoStudio?.hasTrigger !== true ||
+    promoStudio?.hasPreview !== true ||
+    promoStudio?.hasAcquisitionToggle !== true ||
+    promoStudio?.acquisitionEnabled !== true ||
+    promoStudio?.editorVisible !== true ||
+    !String(promoStudio?.lockText || '').includes('P3')
+  ) {
+    errors.push(`${label}: Promotions Studio universal no quedó operativo.`);
   }
 
   // Ajustes: recorrer las siete superficies, sin ejecutar acciones persistentes.
