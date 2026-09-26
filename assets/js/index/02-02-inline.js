@@ -3,8 +3,8 @@
   const CLABE_PAGO = GXCORE.BUSINESS.BANK.CLABE;
   const BANCO_PAGO = GXCORE.BUSINESS.BANK.NAME;
   const TITULAR_PAGO = GXCORE.BUSINESS.BANK.HOLDER;
-  const GX_PAYMENT_BETA = new URLSearchParams(window.location.search).get("gxPay") === "beta";
-  if (GX_PAYMENT_BETA) document.documentElement.classList.add("gx-payment-beta");
+  const GX_PAYMENT_V2 = true;
+  document.documentElement.classList.add("gx-payment-v2");
   const CUENTAS_PAGO = Object.freeze(
     Array.isArray(GXCORE.BUSINESS.BANK.ACCOUNTS) && GXCORE.BUSINESS.BANK.ACCOUNTS.length
       ? GXCORE.BUSINESS.BANK.ACCOUNTS.map(x => Object.freeze({...x}))
@@ -414,10 +414,10 @@
             </div>
           </div>
 
-          <div class="actions-group ${GX_PAYMENT_BETA ? "gx-payment-actions" : ""}">
+          <div class="actions-group ${GX_PAYMENT_V2 ? "gx-payment-actions" : ""}">
             ${btnAccionHTML}
-            <a href="${urlWA}" target="_blank" class="btn btn-wa ${GX_PAYMENT_BETA ? "gx-support-tertiary" : ""}">
-              ${GX_PAYMENT_BETA ? '<span>¿Necesitas ayuda?</span><strong>Contactar a soporte</strong>' : '💬 Contactar a Soporte'}
+            <a href="${urlWA}" target="_blank" class="btn btn-wa ${GX_PAYMENT_V2 ? "gx-support-tertiary" : ""}">
+              ${GX_PAYMENT_V2 ? '<span>¿Necesitas ayuda?</span><strong>Contactar a soporte</strong>' : '💬 Contactar a Soporte'}
             </a>
           </div>
 
@@ -443,7 +443,7 @@
     if(!toast) return;
     toast.textContent = mensaje;
     toast.classList.toggle("error", error);
-    toast.classList.toggle("success", GX_PAYMENT_BETA && !error);
+    toast.classList.toggle("success", GX_PAYMENT_V2 && !error);
     toast.style.display = "block";
     clearTimeout(mostrarToastPago._timer);
     mostrarToastPago._timer = setTimeout(() => {
@@ -500,7 +500,7 @@
   }
 
   function botonDatosPagoHTML() {
-    if(!GX_PAYMENT_BETA) {
+    if(!GX_PAYMENT_V2) {
       return '<button class="btn btn-copy" onclick="copiarDatos()">💳 Copiar CLABE de pago</button>';
     }
     return `
@@ -521,7 +521,7 @@
 
   function botonComprobanteHTML(clienteKey, periodoStr, totalFinal, folio, nombre) {
     const action = `abrirModalPago('${clienteKey}', '${periodoStr}', '${Number(totalFinal).toFixed(2)}', '${folio}', '${nombre}')`;
-    if(!GX_PAYMENT_BETA) {
+    if(!GX_PAYMENT_V2) {
       return `
         <button class="btn btn-wa" style="background: rgba(46, 160, 67, 0.15); border-color: var(--success-green); color: var(--success-green); text-shadow: 0 0 10px rgba(46, 160, 67, 0.4);" onclick="${action}">
           📤 Ya realicé mi depósito
@@ -763,7 +763,7 @@
       const subtitle = btn.querySelector(".gx-submit-subtitle");
       btn.dataset.state = state;
 
-      const labels = GX_PAYMENT_BETA
+      const labels = GX_PAYMENT_V2
         ? {
             idle:["Enviar comprobante",""],
             loading:["Enviando",""],
@@ -797,7 +797,7 @@
       modal.classList.remove("is-closing");
       modal.setAttribute("aria-hidden","false");
 
-      if(GX_PAYMENT_BETA) {
+      if(GX_PAYMENT_V2) {
           requestAnimationFrame(() => modal.classList.add("show"));
       } else {
           modal.classList.add("show");
@@ -818,7 +818,7 @@
       document.body.style.overflow = "auto";
 
       clearTimeout(gxPaymentCloseTimer);
-      if(GX_PAYMENT_BETA) {
+      if(GX_PAYMENT_V2) {
           gxPaymentCloseTimer = setTimeout(() => {
               reiniciarSubida();
               modal.classList.remove("is-closing");
@@ -842,7 +842,7 @@
       modal?.classList.remove("has-preview","is-sending","is-success","is-error");
       gxSetPaymentSubmitState("idle");
 
-      if(!GX_PAYMENT_BETA) {
+      if(!GX_PAYMENT_V2) {
           if(previewContainer) previewContainer.style.display = "none";
           if(uploadArea) uploadArea.style.display = "block";
           if(submit) submit.style.display = "none";
@@ -855,7 +855,7 @@
       const file = input.files[0];
       if (!file.type.startsWith("image/")) {
           input.value = "";
-          if(GX_PAYMENT_BETA) {
+          if(GX_PAYMENT_V2) {
               mostrarToastPago("Formato no compatible", true);
           } else {
               alert("Por favor, selecciona un archivo de imagen válido (Captura de pantalla o foto).");
@@ -871,7 +871,7 @@
 
           gxSetPaymentSubmitState("idle");
 
-          if(GX_PAYMENT_BETA) {
+          if(GX_PAYMENT_V2) {
               modal?.classList.remove("is-error");
               modal?.classList.add("has-preview");
           } else {
@@ -889,7 +889,7 @@
   async function enviarComprobanteDiscord() {
       const input = document.getElementById("file-input");
       if (!input?.files?.[0]) {
-          if(GX_PAYMENT_BETA) {
+          if(GX_PAYMENT_V2) {
               gxSetPaymentSubmitState("error");
               setTimeout(() => gxSetPaymentSubmitState("idle"), 1200);
           } else {
@@ -931,13 +931,13 @@
 
           setTimeout(() => {
               location.reload();
-          }, GX_PAYMENT_BETA ? 1350 : 1500);
+          }, GX_PAYMENT_V2 ? 1350 : 1500);
 
       } catch (error) {
           console.error("Error al enviar el archivo:", error);
           gxSetPaymentSubmitState("error");
 
-          if(GX_PAYMENT_BETA) {
+          if(GX_PAYMENT_V2) {
               // El propio botón comunica el error; evitamos otra cápsula superpuesta.
           } else {
               alert("Ocurrió un pequeño error de red al subir la imagen. Por favor, intenta de nuevo o avísanos por WhatsApp.");
