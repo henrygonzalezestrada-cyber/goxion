@@ -3056,3 +3056,109 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         bottom:15px;
     }
 }
+
+
+/* ===== GOXION PAY · WALLET HORIZONTAL V11 ===== */
+/* Corrección de proporción: más ancho real, menos altura, manteniendo centrado y profundidad. */
+
+/* Ganar ancho útil en iPhone sin pegar la tarjeta al borde de pantalla. */
+.gx-bank-overlay{
+    padding:12px;
+}
+.gx-bank-sheet{
+    width:min(100%,456px);
+    padding-left:14px;
+    padding-right:14px;
+}
+
+/* Track más aprovechado horizontalmente. */
+.gx-bank-list{
+    padding:8px 10px 14px;
+    margin:3px -4px 0;
+    scroll-padding-inline:10px;
+}
+
+/* Proporción más tipo tarjeta: ancha de izquierda a derecha, no alta. */
+.gx-wallet-card{
+    flex:0 0 calc(100% - 20px);
+    height:190px;
+    scroll-snap-align:center;
+}
+.gx-wallet-card + .gx-wallet-card{
+    margin-left:-64px;
+}
+
+/* Mantener la lectura 3D con la tarjeta secundaria más atrás. */
+.gx-wallet-card.is-active{
+    transform:translate3d(0,0,40px) scale(1);
+}
+.gx-wallet-card.is-after{
+    transform:translate3d(28px,7px,-60px) scale(.905) rotateY(-5deg);
+}
+.gx-wallet-card.is-before{
+    transform:translate3d(-26px,7px,-60px) scale(.905) rotateY(5deg);
+}
+.gx-wallet-card.is-flipped{
+    transform:translate3d(0,0,48px) scale(1);
+}
+
+/* El reverso conserva aire, ahora gracias al ancho y no a la altura. */
+.gx-wallet-face{
+    padding:16px 17px;
+}
+.gx-wallet-front-bottom{
+    left:17px;
+    right:17px;
+    bottom:15px;
+}
+.gx-wallet-back-head{
+    margin-bottom:9px;
+}
+.gx-wallet-card .gx-bank-beneficiary{
+    padding:7px 0;
+}
+.gx-wallet-card .gx-bank-clabe-wrap{
+    grid-template-columns:minmax(0,1fr) 44px;
+    gap:9px;
+    margin-top:7px;
+}
+.gx-wallet-card .gx-bank-clabe{
+    padding:9px 11px;
+}
+.gx-wallet-card .gx-bank-clabe strong{
+    font-size:11.8px;
+    letter-spacing:.34px;
+    white-space:nowrap;
+}
+
+/* iPhone angosto: conservar proporción horizontal y centrado. */
+@media(max-width:380px){
+    .gx-bank-overlay{
+        padding:10px;
+    }
+    .gx-bank-sheet{
+        padding-left:12px;
+        padding-right:12px;
+    }
+    .gx-bank-list{
+        padding:8px 8px 14px;
+        margin-left:-3px;
+        margin-right:-3px;
+        scroll-padding-inline:8px;
+    }
+    .gx-wallet-card{
+        flex-basis:calc(100% - 16px);
+        height:186px;
+    }
+    .gx-wallet-card + .gx-wallet-card{
+        margin-left:-58px;
+    }
+    .gx-wallet-face{
+        padding:15px 16px;
+    }
+    .gx-wallet-front-bottom{
+        left:16px;
+        right:16px;
+        bottom:14px;
+    }
+}
