@@ -373,7 +373,13 @@ async function runAyuda(browser, browserName, errors) {
 
   // Catálogo C1: promociones protagonistas + curaduría + expansión.
   await page.evaluate(() => window.switchTab?.('catalogo'));
-  await page.waitForTimeout(350);
+  await page.waitForFunction(() => {
+    const showcase=document.getElementById('gx-promo-showcase');
+    const cards=document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card');
+    const curated=document.getElementById('gx-catalog-curated');
+    const rails=document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card');
+    return showcase?.hidden===false && cards.length===3 && curated?.hidden===false && rails.length>=1;
+  }, null, { timeout: 3500 }).catch(()=>{});
 
   const promoC1 = await page.evaluate(() => {
     const showcase=document.getElementById('gx-promo-showcase');
@@ -403,22 +409,32 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: catálogo C1 no renderizó deck/curaduría correctamente.`);
   }
 
-  await page.locator('#gx-promo-next').click().catch(()=>{});
-  await page.waitForTimeout(80);
+  await page.evaluate(() => window.gxPromoCatalogNext?.());
+  await page.waitForFunction(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.dataset?.gxPromoIndex==='1',
+    null,
+    { timeout: 1000 }
+  ).catch(()=>{});
   const promoAdvanced=await page.evaluate(() =>
     document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.dataset?.gxPromoIndex==='1'
   ).catch(()=>false);
   if(!promoAdvanced) errors.push(`${label}: carrusel promocional C1 no avanzó manualmente.`);
 
-  await page.locator('#gx-promo-deck .gx-promo-deck-card.is-front').click().catch(()=>{});
-  await page.waitForTimeout(80);
+  await page.evaluate(() => {
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.click();
+  });
+  await page.waitForFunction(() =>
+    document.querySelector('.gx-promo-expanded.active .gx-promo-expanded-card')!==null,
+    null,
+    { timeout: 1500 }
+  ).catch(()=>{});
   const promoExpanded=await page.evaluate(() =>
     document.querySelector('.gx-promo-expanded.active .gx-promo-expanded-card')!==null
   ).catch(()=>false);
   if(!promoExpanded) errors.push(`${label}: tarjeta promocional C1 no abrió la vista expandida.`);
 
-  await page.locator('.gx-promo-expanded-close').click().catch(()=>{});
-  await page.waitForTimeout(100);
+  await page.evaluate(() => document.querySelector('.gx-promo-expanded-close')?.click());
+  await page.waitForFunction(() => !document.querySelector('.gx-promo-expanded'), null, { timeout: 1500 }).catch(()=>{});
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
   // no sólo un salto entre estado compacto y expandido.
