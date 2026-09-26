@@ -563,12 +563,12 @@
           <div class="gx-wallet-card-inner">
             <section class="gx-wallet-face gx-wallet-front">
               <div class="gx-wallet-orb" aria-hidden="true"></div>
-              <div class="gx-bank-card-top">
-                <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
-                <div class="gx-bank-identity">
-                  <strong>${label}</strong>
+              <div class="gx-wallet-brand-row">
+                <div>
+                  <strong class="gx-wallet-brand-name">${label}</strong>
                   <small>${institucion}</small>
                 </div>
+                <span class="gx-wallet-card-accent" aria-hidden="true"></span>
               </div>
               <div class="gx-wallet-front-bottom">
                 <div>
