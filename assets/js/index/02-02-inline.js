@@ -674,10 +674,10 @@
 
       const labels = GX_PAYMENT_BETA
         ? {
-            idle:["Enviar comprobante","Se enviará para validación"],
-            loading:["Enviando comprobante","Espera un momento"],
-            success:["Comprobante enviado","Quedó en revisión"],
-            error:["No se pudo enviar","Toca para reintentar"]
+            idle:["Enviar comprobante",""],
+            loading:["Enviando",""],
+            success:["Comprobante enviado",""],
+            error:["Reintentar",""]
           }
         : {
             idle:["📤 Enviar Comprobante Seguro",""],
@@ -798,8 +798,12 @@
   async function enviarComprobanteDiscord() {
       const input = document.getElementById("file-input");
       if (!input?.files?.[0]) {
-          if(GX_PAYMENT_BETA) mostrarToastPago("Selecciona una captura primero", true);
-          else alert("Debes adjuntar una captura de pantalla antes de enviar.");
+          if(GX_PAYMENT_BETA) {
+              gxSetPaymentSubmitState("error");
+              setTimeout(() => gxSetPaymentSubmitState("idle"), 1200);
+          } else {
+              alert("Debes adjuntar una captura de pantalla antes de enviar.");
+          }
           return;
       }
 
@@ -833,7 +837,6 @@
           if(!response.ok) throw new Error(`HTTP ${response.status}`);
 
           gxSetPaymentSubmitState("success");
-          if(GX_PAYMENT_BETA) mostrarToastPago("✓ Comprobante enviado");
 
           setTimeout(() => {
               location.reload();
@@ -844,7 +847,7 @@
           gxSetPaymentSubmitState("error");
 
           if(GX_PAYMENT_BETA) {
-              mostrarToastPago("No se pudo enviar · intenta de nuevo", true);
+              // El propio botón comunica el error; evitamos otra cápsula superpuesta.
           } else {
               alert("Ocurrió un pequeño error de red al subir la imagen. Por favor, intenta de nuevo o avísanos por WhatsApp.");
               gxSetPaymentSubmitState("idle");
