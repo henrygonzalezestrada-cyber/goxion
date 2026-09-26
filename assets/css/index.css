@@ -2731,3 +2731,237 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         animation:none!important;
     }
 }
+
+
+/* ===== GOXION PAY · WALLET DEPTH V9 ===== */
+/* Más sensación de wallet real: tarjetas superpuestas, profundidad y frente con identidad propia. */
+
+.gx-bank-list{
+    gap:0;
+    perspective:1200px;
+    padding:7px 56px 14px 2px;
+    margin:3px -2px 0;
+}
+
+.gx-wallet-card{
+    flex:0 0 86%;
+    height:194px;
+    margin:0;
+    transform-style:preserve-3d;
+    transform-origin:center center;
+    z-index:1;
+    opacity:.76;
+    filter:saturate(.88) brightness(.92);
+    transition:
+        opacity .34s ease,
+        transform .46s cubic-bezier(.18,.84,.22,1),
+        filter .34s ease;
+}
+.gx-wallet-card + .gx-wallet-card{
+    margin-left:-50px;
+}
+.gx-wallet-card.is-active{
+    z-index:4;
+    opacity:1;
+    filter:saturate(1) brightness(1);
+    transform:translate3d(0,0,38px) scale(1);
+}
+.gx-wallet-card.is-after{
+    z-index:2;
+    opacity:.78;
+    filter:saturate(.86) brightness(.86);
+    transform:translate3d(24px,7px,-54px) scale(.92) rotateY(-5deg);
+}
+.gx-wallet-card.is-before{
+    z-index:2;
+    opacity:.72;
+    filter:saturate(.84) brightness(.84);
+    transform:translate3d(-22px,7px,-54px) scale(.92) rotateY(5deg);
+}
+.gx-wallet-card.is-flipped{
+    z-index:6;
+    opacity:1;
+    filter:saturate(1) brightness(1);
+    transform:translate3d(0,0,46px) scale(1);
+}
+
+.gx-wallet-face{
+    border-radius:23px;
+    border:1px solid rgba(255,255,255,.11);
+    box-shadow:
+        0 16px 34px rgba(0,0,0,.30),
+        inset 0 1px 0 rgba(255,255,255,.055);
+}
+
+/* Frente inspirado en las referencias compartidas, sin convertirlo en una copia literal. */
+.gx-wallet-card[data-bank="nu"] .gx-wallet-front{
+    color:#fff;
+    background:
+        radial-gradient(circle at 20% -10%,rgba(255,255,255,.10),transparent 34%),
+        linear-gradient(135deg,#9910ed 0%,#7a08db 54%,#6800c9 100%);
+}
+.gx-wallet-card[data-bank="revolut"] .gx-wallet-front{
+    color:#fff;
+    background:
+        radial-gradient(circle at 8% 88%,rgba(232,40,142,.68),transparent 39%),
+        radial-gradient(circle at 92% 0%,rgba(69,115,218,.56),transparent 43%),
+        linear-gradient(135deg,#60146f 0%,#183b7d 58%,#0d2f65 100%);
+}
+.gx-wallet-card .gx-wallet-front::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    border-radius:inherit;
+    background:linear-gradient(160deg,rgba(255,255,255,.10),transparent 32%,transparent 72%,rgba(0,0,0,.08));
+}
+
+.gx-wallet-orb{
+    opacity:.38;
+    width:150px;
+    height:150px;
+    right:-62px;
+    top:-62px;
+    filter:blur(8px);
+}
+
+.gx-wallet-brand-row{
+    position:relative;
+    z-index:2;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+}
+.gx-wallet-brand-row > div{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+.gx-wallet-brand-name{
+    display:block;
+    color:#fff;
+    font-size:25px;
+    line-height:1;
+    font-weight:850;
+    letter-spacing:-1px;
+    text-shadow:0 1px 2px rgba(0,0,0,.10);
+}
+.gx-wallet-brand-row small{
+    color:rgba(255,255,255,.72);
+    font-size:8.7px;
+    font-weight:650;
+}
+.gx-wallet-card[data-bank="nu"] .gx-wallet-brand-name{
+    font-size:29px;
+    letter-spacing:-1.7px;
+}
+.gx-wallet-card[data-bank="revolut"] .gx-wallet-brand-name{
+    font-size:23px;
+    letter-spacing:-1.1px;
+}
+
+.gx-wallet-card-accent{
+    position:relative;
+    flex:0 0 auto;
+    display:block;
+}
+.gx-wallet-card[data-bank="nu"] .gx-wallet-card-accent{
+    width:58px;
+    height:30px;
+}
+.gx-wallet-card[data-bank="nu"] .gx-wallet-card-accent::before,
+.gx-wallet-card[data-bank="nu"] .gx-wallet-card-accent::after{
+    content:'';
+    position:absolute;
+    top:2px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+}
+.gx-wallet-card[data-bank="nu"] .gx-wallet-card-accent::before{
+    left:4px;
+    background:#ff1738;
+}
+.gx-wallet-card[data-bank="nu"] .gx-wallet-card-accent::after{
+    right:4px;
+    background:#ff9f19;
+    box-shadow:-12px 0 0 -2px rgba(255,104,20,.74);
+}
+.gx-wallet-card[data-bank="revolut"] .gx-wallet-card-accent{
+    width:38px;
+    height:28px;
+    margin-top:3px;
+    border-radius:6px;
+    border:1px solid rgba(255,255,255,.48);
+    background:
+        linear-gradient(90deg,transparent 31%,rgba(35,43,55,.34) 32% 34%,transparent 35% 65%,rgba(35,43,55,.34) 66% 68%,transparent 69%),
+        linear-gradient(180deg,transparent 31%,rgba(35,43,55,.34) 32% 35%,transparent 36% 64%,rgba(35,43,55,.34) 65% 68%,transparent 69%),
+        linear-gradient(135deg,#dbdfe4,#9ca3ad);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.42);
+}
+
+.gx-wallet-front-bottom{
+    z-index:2;
+}
+.gx-wallet-front-bottom span,
+.gx-wallet-front-bottom small{
+    color:rgba(255,255,255,.72);
+}
+.gx-wallet-front-bottom strong{
+    color:#fff;
+    font-size:12.5px;
+    text-shadow:0 1px 2px rgba(0,0,0,.12);
+}
+.gx-wallet-front-bottom small{
+    max-width:76px;
+}
+
+/* Reverso sigue siendo GOXION glass: tocar cualquier espacio vuelve al frente. */
+.gx-wallet-back{
+    background:
+        radial-gradient(circle at 10% 0%,rgba(0,242,254,.085),transparent 33%),
+        radial-gradient(circle at 94% 8%,rgba(124,77,255,.11),transparent 36%),
+        linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.018)),
+        rgba(8,9,14,.72);
+    -webkit-backdrop-filter:blur(18px) saturate(1.18);
+    backdrop-filter:blur(18px) saturate(1.18);
+}
+.gx-wallet-back-head{
+    justify-content:flex-start;
+    margin-bottom:10px;
+}
+.gx-wallet-back-head strong{
+    font-size:15px;
+}
+.gx-wallet-back-close{
+    display:none!important;
+}
+
+/* Al arrastrar, la tarjeta trasera se mantiene visualmente detrás y no compite. */
+.gx-wallet-card:not(.is-active):not(.is-flipped) .gx-wallet-face{
+    box-shadow:
+        0 10px 22px rgba(0,0,0,.22),
+        inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+@media(max-width:380px){
+    .gx-wallet-card{
+        flex-basis:88%;
+        height:188px;
+    }
+    .gx-wallet-card + .gx-wallet-card{
+        margin-left:-44px;
+    }
+    .gx-bank-list{
+        padding-right:48px;
+    }
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-wallet-card{
+        transform:none!important;
+        opacity:1!important;
+        filter:none!important;
+    }
+}
