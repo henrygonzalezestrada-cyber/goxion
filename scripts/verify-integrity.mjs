@@ -402,6 +402,28 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
+// Ayuda C1: promotional catalog stays isolated in its own presentation controller.
+{
+  const ayudaHtmlPath = join(ROOT, 'ayuda.html');
+  const promoCatalogPath = join(ROOT, 'assets', 'js', 'ayuda', '15-promotions-catalog-c1.js');
+  const ayudaCssPath = join(ROOT, 'assets', 'css', 'ayuda.css');
+  const ayudaHtml = existsSync(ayudaHtmlPath) ? readFileSync(ayudaHtmlPath, 'utf8') : '';
+  const promoCatalog = existsSync(promoCatalogPath) ? readFileSync(promoCatalogPath, 'utf8') : '';
+  const ayudaCss = existsSync(ayudaCssPath) ? readFileSync(ayudaCssPath, 'utf8') : '';
+
+  if (!existsSync(promoCatalogPath)) fail('Ayuda C1: falta controlador de catálogo promocional.');
+  if (!ayudaHtml.includes('id="gx-promo-showcase"')) fail('Ayuda C1: falta deck promocional.');
+  if (!ayudaHtml.includes('id="gx-catalog-curated"')) fail('Ayuda C1: falta curaduría del catálogo.');
+  if (!ayudaHtml.includes('./assets/js/ayuda/15-promotions-catalog-c1.js')) fail('Ayuda C1: controlador no está cargado.');
+  if (!promoCatalog.includes("GXCORE.endpoint('promociones-catalogo')")) fail('Ayuda C1: promociones no consumen el endpoint dedicado.');
+  if (!promoCatalog.includes('gx-promo-deck-card')) fail('Ayuda C1: falta deck interactivo.');
+  if (!promoCatalog.includes('gx-promo-expanded')) fail('Ayuda C1: falta expansión de tarjeta.');
+  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C1')) fail('Ayuda C1: faltan estilos aislados.');
+  if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
+    fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
+  }
+}
+
 // Promotions Studio v2 + P3: universal campaign builder with immutable acquisition gateway.
 {
   const adminHtmlPath = join(ROOT, 'admin.html');
