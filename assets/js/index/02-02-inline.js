@@ -563,12 +563,12 @@
           <div class="gx-wallet-card-inner">
             <section class="gx-wallet-face gx-wallet-front">
               <div class="gx-wallet-orb" aria-hidden="true"></div>
-              <div class="gx-bank-card-top">
-                <div class="gx-bank-mark ${id === "nu" ? "nu" : "revolut"}">${label.slice(0,2)}</div>
-                <div class="gx-bank-identity">
-                  <strong>${label}</strong>
+              <div class="gx-wallet-brand-row">
+                <div>
+                  <strong class="gx-wallet-brand-name">${label}</strong>
                   <small>${institucion}</small>
                 </div>
+                <span class="gx-wallet-card-accent" aria-hidden="true"></span>
               </div>
               <div class="gx-wallet-front-bottom">
                 <div>
@@ -585,7 +585,6 @@
                   <span>Datos de transferencia</span>
                   <strong>${label}</strong>
                 </div>
-                <button class="gx-wallet-back-close" type="button" aria-label="Volver al frente">↺</button>
               </div>
 
               <div class="gx-bank-beneficiary">
@@ -634,7 +633,11 @@
           const dist = Math.abs(cardCenter - center);
           if(dist < best) { best = dist; activeIndex = i; }
         });
-        cards.forEach((card,i)=>card.classList.toggle("is-active", i===activeIndex));
+        cards.forEach((card,i)=>{
+          card.classList.toggle("is-active", i===activeIndex);
+          card.classList.toggle("is-before", i<activeIndex);
+          card.classList.toggle("is-after", i>activeIndex);
+        });
         dots?.querySelectorAll("span").forEach((dot,i)=>dot.classList.toggle("is-active", i===activeIndex));
       });
     };
@@ -656,11 +659,6 @@
 
       const toggle = (event) => {
         if(event?.target?.closest(".gx-clabe-copy")) return;
-        if(event?.target?.closest(".gx-wallet-back-close")) {
-          card.classList.remove("is-flipped");
-          card.setAttribute("aria-pressed","false");
-          return;
-        }
         if(moved) return;
         card.classList.toggle("is-flipped");
         card.setAttribute("aria-pressed", card.classList.contains("is-flipped") ? "true" : "false");
