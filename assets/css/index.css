@@ -2010,8 +2010,11 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
 
 /* El fondo lava debe seguir siendo visible detrás de las sheets. */
 .gx-bank-overlay,
-.gx-payment-beta #payment-modal{
+.gx-payment-beta #payment-modal,
+.gx-payment-beta #payment-modal.show{
     background:rgba(1,2,5,.30);
+    -webkit-backdrop-filter:blur(6px) saturate(1.06);
+    backdrop-filter:blur(6px) saturate(1.06);
 }
 .gx-bank-sheet,
 .gx-payment-beta #payment-modal .modal-content{
