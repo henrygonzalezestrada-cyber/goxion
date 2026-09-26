@@ -92,7 +92,7 @@
       autenticado:authenticated===true,
       items:Array.isArray(raw?.items)?raw.items:[],
       precio_normal_total:Number(raw?.precio_normal_total||0),
-      precio_promocional_total:Number(raw?.precio_promocional_total??raw?.precio_promocional||0),
+      precio_promocional_total:Number(raw?.precio_promocional_total??raw?.precio_promocional??0),
       ahorro_estimado:Number(raw?.ahorro_estimado||0)
     };
   }
