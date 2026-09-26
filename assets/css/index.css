@@ -2965,3 +2965,94 @@ html:not(.gx-payment-beta) .gx-submit-copy{display:block}
         filter:none!important;
     }
 }
+
+
+/* ===== GOXION PAY · WALLET LAYOUT V10 ===== */
+/* Refinado final de geometría: tarjeta activa centrada y reverso con más aire. */
+
+.gx-bank-list{
+    padding:8px 24px 15px;
+    margin:3px -2px 0;
+    scroll-padding-inline:24px;
+}
+
+.gx-wallet-card{
+    flex:0 0 calc(100% - 48px);
+    height:202px;
+    scroll-snap-align:center;
+}
+
+.gx-wallet-card + .gx-wallet-card{
+    margin-left:-58px;
+}
+
+/* Mantener la activa centrada y la secundaria claramente detrás. */
+.gx-wallet-card.is-active{
+    transform:translate3d(0,0,40px) scale(1);
+}
+.gx-wallet-card.is-after{
+    transform:translate3d(26px,8px,-58px) scale(.91) rotateY(-5deg);
+}
+.gx-wallet-card.is-before{
+    transform:translate3d(-24px,8px,-58px) scale(.91) rotateY(5deg);
+}
+.gx-wallet-card.is-flipped{
+    transform:translate3d(0,0,48px) scale(1);
+}
+
+/* Más superficie útil en ambas caras. */
+.gx-wallet-face{
+    padding:18px;
+}
+
+.gx-wallet-front-bottom{
+    left:18px;
+    right:18px;
+    bottom:16px;
+}
+
+/* Reverso: mejor separación y CLABE con más espacio horizontal. */
+.gx-wallet-back{
+    justify-content:center;
+}
+.gx-wallet-back-head{
+    margin-bottom:12px;
+}
+.gx-wallet-card .gx-bank-beneficiary{
+    padding:9px 0;
+}
+.gx-wallet-card .gx-bank-clabe-wrap{
+    grid-template-columns:minmax(0,1fr) 44px;
+    gap:10px;
+    margin-top:9px;
+}
+.gx-wallet-card .gx-bank-clabe{
+    padding:10px 12px;
+}
+.gx-wallet-card .gx-bank-clabe strong{
+    font-size:11.7px;
+    letter-spacing:.40px;
+}
+
+/* iPhone angosto: mismo centrado con margen proporcional. */
+@media(max-width:380px){
+    .gx-bank-list{
+        padding:8px 20px 14px;
+        scroll-padding-inline:20px;
+    }
+    .gx-wallet-card{
+        flex-basis:calc(100% - 40px);
+        height:198px;
+    }
+    .gx-wallet-card + .gx-wallet-card{
+        margin-left:-52px;
+    }
+    .gx-wallet-face{
+        padding:16px;
+    }
+    .gx-wallet-front-bottom{
+        left:16px;
+        right:16px;
+        bottom:15px;
+    }
+}
