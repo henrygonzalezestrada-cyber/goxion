@@ -401,6 +401,51 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Promotions Studio v2: universal campaign builder stays isolated from acquisition.
+{
+  const adminHtmlPath = join(ROOT, 'admin.html');
+  const studioPath = join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js');
+  const adminHtml = existsSync(adminHtmlPath) ? readFileSync(adminHtmlPath, 'utf8') : '';
+  const studio = existsSync(studioPath) ? readFileSync(studioPath, 'utf8') : '';
+
+  if (!existsSync(studioPath)) {
+    fail('Promotions Studio: falta el controlador v2.');
+  }
+
+  const legacyPromoAt = adminHtml.indexOf('./assets/js/admin/25-admin-beta-19-controller.js');
+  const studioAt = adminHtml.indexOf('./assets/js/admin/29-promotions-studio-v2.js');
+  if (legacyPromoAt < 0 || studioAt < 0 || studioAt <= legacyPromoAt) {
+    fail('Promotions Studio: el controlador v2 no carga después del puente promocional heredado.');
+  }
+
+  for (const mechanic of ['precio_fijo', 'porcentaje', 'combo', 'addon']) {
+    if (!studio.includes(mechanic)) fail('Promotions Studio: falta mecánica ' + mechanic + '.');
+  }
+
+  for (const action of [
+    'GOXION_FINANCIAL_ACTIONS.savePromotion',
+    'GOXION_FINANCIAL_ACTIONS.togglePromotion',
+    'GOXION_FINANCIAL_ACTIONS.deletePromotion',
+  ]) {
+    if (!studio.includes(action)) fail('Promotions Studio: falta gateway financiero ' + action + '.');
+  }
+
+  if (studio.includes('adquisicion_habilitada')) {
+    fail('Promotions Studio: Admin no debe poder abrir adquisición durante P1/P2.');
+  }
+
+  for (const id of [
+    'gx-promo-mechanic-fields',
+    'gx-promo-audience',
+    'gx-promo-stack-loyalty',
+    'gx-promo-published',
+    'gx-promo-preview',
+  ]) {
+    if (!adminHtml.includes('id="' + id + '"')) fail('Promotions Studio: falta UI ' + id + '.');
+  }
+}
+
 // Phase 3D/3E: Promotions and special collection actions must use the financial gateway.
 {
   const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
