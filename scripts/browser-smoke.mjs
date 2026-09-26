@@ -165,7 +165,7 @@ async function runAyuda(browser, browserName, errors) {
       destacada:true,
       publicada:true,
       adquisicion_habilitada:true,
-      prioridad,
+      prioridad:priority,
       revision:1,
       precio_normal_total:normal,
       ahorro_estimado:normal-offer,
