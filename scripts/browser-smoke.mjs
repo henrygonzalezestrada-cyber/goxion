@@ -491,6 +491,24 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     });
   });
 
+  await page.route('**/functions/v1/promociones-admin-beta', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok:true,
+        contrato:'goxion-promotions-studio-v2',
+        version:'2.0',
+        servicios:[
+          {id:'catalog-smoke-a',nombre:'Netflix Smoke',precio:109,activo:true},
+          {id:'catalog-smoke-b',nombre:'HBO Smoke',precio:79,activo:true},
+          {id:'catalog-smoke-c',nombre:'Prime Smoke',precio:45,activo:true}
+        ],
+        promociones:[]
+      })
+    });
+  });
+
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
   await page.waitForTimeout(900);
 
@@ -756,6 +774,55 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     }, mode);
     if (!ok) errors.push(`${label}: falló modo de catálogo ${mode}.`);
     await page.waitForTimeout(80);
+  }
+
+  // Promotions Studio: validar las cuatro mecánicas sin guardar nada.
+  const promoStudio = await page.evaluate(async () => {
+    try {
+      await window.gxPromoLoad?.();
+      window.gxPromoOpenEditor?.();
+
+      const mechanics = [...document.querySelectorAll('[data-gx-promo-mechanic]')]
+        .map(x => x.getAttribute('data-gx-promo-mechanic'));
+
+      window.gxPromoSetMechanic?.('combo');
+      const comboOptions = document.querySelectorAll('[data-gx-promo-service-check]').length;
+
+      window.gxPromoSetMechanic?.('addon');
+      const addonTrigger = document.getElementById('gx-promo-addon-trigger');
+      const addonOptions = document.querySelectorAll('[data-gx-promo-addon-check]').length;
+
+      const lockText = document.querySelector('.gx-promo-acquisition-lock')?.textContent || '';
+      const hasPreview = !!document.getElementById('gx-promo-preview');
+      const editorVisible = document.getElementById('gx-promo-editor')?.hidden === false;
+
+      window.gxPromoCloseEditor?.();
+
+      return {
+        mechanics,
+        comboOptions,
+        addonOptions,
+        hasTrigger: !!addonTrigger,
+        hasPreview,
+        editorVisible,
+        lockText
+      };
+    } catch (error) {
+      return { error: error?.message || String(error) };
+    }
+  });
+
+  if (
+    promoStudio?.error ||
+    !['precio_fijo','porcentaje','combo','addon'].every(x => promoStudio?.mechanics?.includes(x)) ||
+    promoStudio?.comboOptions !== 3 ||
+    promoStudio?.addonOptions !== 3 ||
+    promoStudio?.hasTrigger !== true ||
+    promoStudio?.hasPreview !== true ||
+    promoStudio?.editorVisible !== true ||
+    !String(promoStudio?.lockText || '').includes('P3')
+  ) {
+    errors.push(`${label}: Promotions Studio universal no quedó operativo.`);
   }
 
   // Ajustes: recorrer las siete superficies, sin ejecutar acciones persistentes.
