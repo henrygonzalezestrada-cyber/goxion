@@ -624,13 +624,14 @@
     const setActive = () => {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const center = list.scrollLeft + list.clientWidth / 2;
+        const listRect = list.getBoundingClientRect();
+        const center = listRect.left + listRect.width / 2;
         let activeIndex = 0;
         let best = Infinity;
         cards.forEach((card,i) => {
-          const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+          const rect = card.getBoundingClientRect();
+          const cardCenter = rect.left + rect.width / 2;
           const dist = Math.abs(cardCenter - center);
-          card.classList.toggle("is-active", dist < best);
           if(dist < best) { best = dist; activeIndex = i; }
         });
         cards.forEach((card,i)=>card.classList.toggle("is-active", i===activeIndex));
