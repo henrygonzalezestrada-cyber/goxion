@@ -11,7 +11,10 @@
     latestData:null,
     curatedMode:'popular',
     lastToken:null,
-    loading:false
+    loading:false,
+    expandedCard:null,
+    expandedOrigin:null,
+    morphBackdrop:null
   };
 
   const reduced=()=>window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches===true;
@@ -230,10 +233,17 @@
 
   function logosHtml(p,large=false){
     const items=(p?.items||[]).slice(0,3);
-    if(!items.length) return '<img src="logo2.PNG" alt="GOXION">';
+    if(!items.length) return '<img src="logo2.PNG" alt="GOXION" class="gx-promo-logo-item">';
+    const combo=items.length>1;
     return items.map((item,index)=>{
       const name=item?.servicio?.nombre||'Plataforma';
-      return '<img src="'+esc(logoFor(name))+'" alt="'+esc(name)+'" style="--gx-logo-index:'+index+'" class="'+(large?'is-large':'')+'">';
+      const classes=[
+        'gx-promo-logo-item',
+        combo?'is-combo':'is-single',
+        'gx-logo-pos-'+index,
+        large?'is-large':''
+      ].filter(Boolean).join(' ');
+      return '<img src="'+esc(logoFor(name))+'" alt="'+esc(name)+'" class="'+classes+'">';
     }).join('');
   }
 
@@ -244,30 +254,43 @@
     const title=publicTitle(p);
     const platform=promoPlatformTitle(p);
     const palette=promoPalette(p);
+    const description=String(p?.descripcion_publica||promoSubprice(p));
     const oldPrice=p?.mostrar_precio_anterior!==false&&normal>0
       ? '<s>$'+money(normal)+'</s>'
       :'';
     const savingLine=saving>0
-      ? '<span class="gx-promo-saving">Ahorras $'+money(saving)+'</span>'
+      ? '<div class="gx-promo-saving"><span>AHORRO</span><strong>$'+money(saving)+'</strong><small>en esta oferta</small></div>'
       :'';
     const preview=p?.gx_preview===true?'<span class="gx-promo-preview-chip">PREVIEW</span>':'';
+    const comboClass=(p?.items||[]).length>1?' is-combo':'';
     const style='--gx-brand:'+palette.brand+';--gx-brand-deep:'+palette.deep+';--gx-brand-accent:'+palette.accent+';';
-    return '<button type="button" class="gx-promo-deck-card" style="'+esc(style)+'" data-gx-promo-index="'+index+'" aria-label="Abrir '+esc(title)+'">'+
+
+    return '<article class="gx-promo-deck-card'+comboClass+'" style="'+esc(style)+'" data-gx-promo-index="'+index+'" role="button" tabindex="0" aria-label="Abrir '+esc(title)+'" aria-expanded="false">'+
       '<span class="gx-promo-card-glow" aria-hidden="true"></span>'+
-      '<span class="gx-promo-card-orbit gx-promo-card-orbit-a" aria-hidden="true"></span>'+
       '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span>'+preview+'</div>'+
-      '<div class="gx-promo-card-logos">'+logosHtml(p)+'</div>'+
+      '<button type="button" class="gx-promo-morph-close" data-gx-promo-close aria-label="Cerrar promoción">×</button>'+
+      '<div class="gx-promo-card-logos'+comboClass+'">'+logosHtml(p)+'</div>'+
       '<div class="gx-promo-card-copy">'+
         '<strong class="gx-promo-platform-name">'+esc(platform)+'</strong>'+
         (title!==platform?'<span class="gx-promo-offer-title">'+esc(title)+'</span>':'')+
-        '<small>'+esc(String(p?.descripcion_publica||promoSubprice(p)))+'</small>'+
+        '<small>'+esc(description)+'</small>'+
       '</div>'+
       '<div class="gx-promo-card-price">'+
         '<div><b>'+esc(promoPrice(p))+'</b>'+oldPrice+'</div>'+
         '<span>'+esc(promoSubprice(p))+'</span>'+
       '</div>'+
       savingLine+
-    '</button>';
+      '<div class="gx-promo-morph-detail" aria-hidden="true">'+
+        '<div class="gx-promo-morph-divider"></div>'+
+        '<p class="gx-promo-morph-description">'+esc(description)+'</p>'+
+        '<div class="gx-promo-detail-items">'+detailItems(p)+'</div>'+
+        '<div class="gx-promo-expanded-status"><span></span><strong>'+esc(statusText(p))+'</strong></div>'+
+        '<div class="gx-promo-expanded-actions">'+
+          ((p?.items?.[0]?.servicio?.nombre)?'<button type="button" class="gx-promo-detail-secondary" data-gx-promo-service="'+esc(p.items[0].servicio.nombre)+'">Ver en catálogo</button>':'')+
+          (!clientToken()?'<button type="button" class="gx-promo-detail-primary" data-gx-promo-login>Iniciar sesión</button>':'')+
+        '</div>'+
+      '</div>'+
+    '</article>';
   }
 
   function renderPromotions(){
@@ -332,6 +355,28 @@
     deck.addEventListener('click',event=>{
       const card=event.target.closest('.gx-promo-deck-card');
       if(!card) return;
+
+      if(event.target.closest('[data-gx-promo-close]')){
+        event.stopPropagation();
+        closePromoDetail(card);
+        return;
+      }
+      const serviceBtn=event.target.closest('[data-gx-promo-service]');
+      if(serviceBtn){
+        event.stopPropagation();
+        const serviceName=serviceBtn.dataset.gxPromoService||'';
+        closePromoDetail(card);
+        setTimeout(()=>focusCatalogBrandByName(serviceName),420);
+        return;
+      }
+      if(event.target.closest('[data-gx-promo-login]')){
+        event.stopPropagation();
+        closePromoDetail(card);
+        setTimeout(()=>window.openAuthSheet?.(),420);
+        return;
+      }
+      if(card.classList.contains('is-expanded')) return;
+
       const index=Number(card.dataset.gxPromoIndex||0);
       if(index!==state.active){
         state.active=index;
@@ -339,16 +384,38 @@
         restartAuto();
         return;
       }
-      openPromoDetail(selectedPromotions()[index]);
+      openPromoDetail(selectedPromotions()[index],card);
+    });
+
+    deck.addEventListener('keydown',event=>{
+      const card=event.target.closest('.gx-promo-deck-card');
+      if(!card||event.target.closest('button')) return;
+      if((event.key==='Enter'||event.key===' ')&&!card.classList.contains('is-expanded')){
+        event.preventDefault();
+        const index=Number(card.dataset.gxPromoIndex||0);
+        if(index!==state.active){
+          state.active=index;
+          applyDeckPositions();
+          restartAuto();
+        }else{
+          openPromoDetail(selectedPromotions()[index],card);
+        }
+      }
+      if(event.key==='Escape'&&card.classList.contains('is-expanded')){
+        event.preventDefault();
+        closePromoDetail(card);
+      }
     });
 
     deck.addEventListener('pointerdown',event=>{
+      if(state.expandedCard) return;
       if(event.pointerType==='mouse'&&event.button!==0) return;
       state.pointerStart={x:event.clientX,y:event.clientY};
       stopAuto();
     },{passive:true});
 
     deck.addEventListener('pointerup',event=>{
+      if(state.expandedCard) return;
       const start=state.pointerStart;
       state.pointerStart=null;
       if(!start){startAuto();return}
@@ -360,7 +427,10 @@
       }
     },{passive:true});
 
-    deck.addEventListener('pointercancel',()=>{state.pointerStart=null;startAuto()},{passive:true});
+    deck.addEventListener('pointercancel',()=>{
+      state.pointerStart=null;
+      if(!state.expandedCard) startAuto();
+    },{passive:true});
 
     const prev=$('gx-promo-prev');
     const next=$('gx-promo-next');
@@ -369,6 +439,7 @@
     window.gxPromoCatalogPrev=()=>moveDeck(-1);
     window.gxPromoCatalogNext=()=>moveDeck(1);
     $('gx-promo-dots')?.addEventListener('click',event=>{
+      if(state.expandedCard) return;
       const dot=event.target.closest('[data-gx-promo-dot]');
       if(!dot) return;
       state.active=Number(dot.dataset.gxPromoDot||0);
@@ -379,7 +450,7 @@
 
   function startAuto(){
     stopAuto();
-    if(reduced()||document.hidden||selectedPromotions().length<2||document.querySelector('.gx-promo-expanded')) return;
+    if(reduced()||document.hidden||selectedPromotions().length<2||state.expandedCard) return;
     state.timer=setInterval(()=>moveDeck(1),6800);
   }
   function stopAuto(){
@@ -400,64 +471,93 @@
     }).join('');
   }
 
-  function openPromoDetail(p){
-    if(!p) return;
+  function createMorphBackdrop(){
+    state.morphBackdrop?.remove();
+    const backdrop=document.createElement('div');
+    backdrop.className='gx-promo-morph-backdrop';
+    backdrop.setAttribute('aria-hidden','true');
+    backdrop.addEventListener('click',()=>closePromoDetail(state.expandedCard));
+    document.body.appendChild(backdrop);
+    state.morphBackdrop=backdrop;
+    requestAnimationFrame(()=>backdrop.classList.add('active'));
+  }
+
+  function openPromoDetail(p,card){
+    if(!p||!card||state.expandedCard) return;
     stopAuto();
-    document.querySelector('.gx-promo-expanded')?.remove();
-    const root=$(ROOT_ID);
-    if(!root) return;
 
-    const panel=document.createElement('div');
-    panel.className='gx-promo-expanded';
-    const saving=Number(p?.ahorro_estimado||0);
-    const normal=Number(p?.precio_normal_total||0);
-    const description=String(p?.descripcion_publica||'Una oferta preparada dentro del catálogo GOXION.');
-    const detailStatus=statusText(p);
-    const primaryItem=p?.items?.[0]?.servicio?.nombre||'';
+    const rect=card.getBoundingClientRect();
+    state.expandedCard=card;
+    state.expandedOrigin={
+      top:rect.top,left:rect.left,width:rect.width,height:rect.height,
+      scrollY:window.scrollY
+    };
 
-    panel.innerHTML=
-      '<div class="gx-promo-expanded-backdrop" data-gx-promo-close></div>'+
-      '<article class="gx-promo-expanded-card" role="dialog" aria-modal="true" aria-label="'+esc(publicTitle(p))+'">'+
-        '<button type="button" class="gx-promo-expanded-close" data-gx-promo-close aria-label="Cerrar">×</button>'+
-        '<div class="gx-promo-expanded-top"><span>'+esc(campaignKind(p))+'</span>'+(p?.gx_preview?'<b>VISTA PREVIA C1</b>':'')+'</div>'+
-        '<div class="gx-promo-expanded-logos">'+logosHtml(p,true)+'</div>'+
-        '<h3>'+esc(publicTitle(p))+'</h3>'+
-        '<p>'+esc(description)+'</p>'+
-        '<div class="gx-promo-expanded-price"><div><strong>'+esc(promoPrice(p))+'</strong>'+(normal>0&&p?.mostrar_precio_anterior!==false?'<s>$'+money(normal)+'</s>':'')+'</div><span>'+esc(promoSubprice(p))+'</span></div>'+
-        (saving>0?'<div class="gx-promo-expanded-saving">Ahorras <strong>$'+money(saving)+'</strong> con esta oferta.</div>':'')+
-        '<div class="gx-promo-detail-items">'+detailItems(p)+'</div>'+
-        '<div class="gx-promo-expanded-status"><span></span><strong>'+esc(detailStatus)+'</strong></div>'+
-        '<div class="gx-promo-expanded-actions">'+
-          (primaryItem?'<button type="button" class="gx-promo-detail-secondary" data-gx-promo-service="'+esc(primaryItem)+'">Ver en catálogo</button>':'')+
-          (!clientToken()?'<button type="button" class="gx-promo-detail-primary" data-gx-promo-login>Iniciar sesión</button>':'')+
-        '</div>'+
-      '</article>';
+    card.style.position='fixed';
+    card.style.inset='auto';
+    card.style.top=rect.top+'px';
+    card.style.left=rect.left+'px';
+    card.style.width=rect.width+'px';
+    card.style.height=rect.height+'px';
+    card.style.transform='none';
+    card.style.zIndex='2102';
+    card.style.margin='0';
+    card.setAttribute('aria-expanded','true');
 
-    document.body.appendChild(panel);
-    requestAnimationFrame(()=>panel.classList.add('active'));
+    createMorphBackdrop();
+    document.documentElement.classList.add('gx-promo-morph-open');
+    document.body.classList.add('gx-promo-morph-open');
 
-    panel.addEventListener('click',event=>{
-      if(event.target.closest('[data-gx-promo-close]')){
-        closePromoDetail(panel); return;
-      }
-      const serviceBtn=event.target.closest('[data-gx-promo-service]');
-      if(serviceBtn){
-        const serviceName=serviceBtn.dataset.gxPromoService||'';
-        closePromoDetail(panel);
-        setTimeout(()=>focusCatalogBrandByName(serviceName),220);
-        return;
-      }
-      if(event.target.closest('[data-gx-promo-login]')){
-        closePromoDetail(panel);
-        setTimeout(()=>window.openAuthSheet?.(),180);
-      }
+    const targetWidth=Math.min(window.innerWidth-28,420);
+    const targetHeight=Math.min(window.innerHeight-38,640);
+    const targetLeft=Math.max(14,(window.innerWidth-targetWidth)/2);
+    const targetTop=Math.max(18,(window.innerHeight-targetHeight)/2);
+
+    requestAnimationFrame(()=>{
+      card.classList.add('is-expanded');
+      card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
+      card.style.top=targetTop+'px';
+      card.style.left=targetLeft+'px';
+      card.style.width=targetWidth+'px';
+      card.style.height=targetHeight+'px';
     });
   }
 
-  function closePromoDetail(panel=document.querySelector('.gx-promo-expanded')){
-    if(!panel)return;
-    panel.classList.remove('active');
-    setTimeout(()=>{panel.remove();startAuto()},260);
+  function closePromoDetail(card=state.expandedCard){
+    if(!card||card!==state.expandedCard) return;
+    const origin=state.expandedOrigin;
+    card.classList.add('is-closing');
+    card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','true');
+
+    if(origin){
+      card.style.top=origin.top+'px';
+      card.style.left=origin.left+'px';
+      card.style.width=origin.width+'px';
+      card.style.height=origin.height+'px';
+    }
+
+    state.morphBackdrop?.classList.remove('active');
+
+    setTimeout(()=>{
+      card.classList.remove('is-expanded','is-closing');
+      card.removeAttribute('style');
+      const p=selectedPromotions()[Number(card.dataset.gxPromoIndex||0)];
+      if(p){
+        const palette=promoPalette(p);
+        card.style.setProperty('--gx-brand',palette.brand);
+        card.style.setProperty('--gx-brand-deep',palette.deep);
+        card.style.setProperty('--gx-brand-accent',palette.accent);
+      }
+      card.setAttribute('aria-expanded','false');
+      document.documentElement.classList.remove('gx-promo-morph-open');
+      document.body.classList.remove('gx-promo-morph-open');
+      state.morphBackdrop?.remove();
+      state.morphBackdrop=null;
+      state.expandedCard=null;
+      state.expandedOrigin=null;
+      applyDeckPositions();
+      startAuto();
+    },520);
   }
 
   function brandPromoSaving(entry){
