@@ -39,6 +39,7 @@ interface GoxionPromotionInput {
   destacada?: boolean;
   notificar_cliente?: boolean;
   publicada?: boolean;
+  adquisicion_habilitada?: boolean;
   activa?: boolean;
 }
 
@@ -77,6 +78,16 @@ declare global {
       savePromotion(input: GoxionPromotionInput): Promise<Record<string, unknown>>;
       togglePromotion(input: { id: string; activa: boolean }): Promise<Record<string, unknown>>;
       deletePromotion(input: { id: string }): Promise<Record<string, unknown>>;
+      acquirePromotion(input: {
+        clienteId: string;
+        promocionId: string;
+        periodoInicio?: string;
+        origen?: string;
+      }): Promise<Record<string, unknown>>;
+      cancelPromotionAcquisition(input: {
+        id: string;
+        motivo?: string;
+      }): Promise<Record<string, unknown>>;
       assignPromotion(input: {
         clienteServicioId: string;
         promocionId: string;
