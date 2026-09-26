@@ -39,6 +39,34 @@
     return 'logo2.PNG';
   }
 
+  function brandPalette(name=''){
+    const n=norm(name);
+    if(n.includes('netflix')) return {brand:'#8f1118',deep:'#360609',accent:'#ef3340'};
+    if(n.includes('disney')) return {brand:'#164caa',deep:'#071d4e',accent:'#58a8ff'};
+    if(n.includes('hbo')||n==='max'||n.includes('max ')) return {brand:'#6636a8',deep:'#24113f',accent:'#b78cff'};
+    if(n.includes('prime')||n.includes('amazon')) return {brand:'#0877a8',deep:'#062d46',accent:'#53d6ff'};
+    if(n.includes('youtube')) return {brand:'#a8141b',deep:'#410508',accent:'#ff4d55'};
+    if(n.includes('vix')) return {brand:'#b56d08',deep:'#3e2104',accent:'#ffc15a'};
+    if(n.includes('crunchy')) return {brand:'#b84e12',deep:'#401505',accent:'#ff9b4a'};
+    if(n.includes('spotify')) return {brand:'#157a42',deep:'#07341e',accent:'#62df91'};
+    if(n.includes('google')) return {brand:'#2e5ea5',deep:'#10254b',accent:'#79a7ff'};
+    if(n.includes('microsoft')||n.includes('365')) return {brand:'#25698d',deep:'#0b2d43',accent:'#74d2ff'};
+    return {brand:'#5740a0',deep:'#1b123f',accent:'#9f8cff'};
+  }
+
+  function promoPlatformTitle(p){
+    const names=(p?.items||[]).map(x=>String(x?.servicio?.nombre||'').trim()).filter(Boolean);
+    if(!names.length) return publicTitle(p);
+    return names.slice(0,2).join(' + ');
+  }
+
+  function promoPalette(p){
+    const names=(p?.items||[]).map(x=>String(x?.servicio?.nombre||'').trim()).filter(Boolean);
+    const first=brandPalette(names[0]||'');
+    const second=brandPalette(names[1]||names[0]||'');
+    return {...first,accent:second.accent||first.accent};
+  }
+
   function campaignKind(p){
     if(p?.oferta_flash) return 'FLASH';
     if(p?.mecanica==='combo') return 'COMBO';
@@ -214,20 +242,24 @@
     const saving=Number(p?.ahorro_estimado||0);
     const kind=campaignKind(p);
     const title=publicTitle(p);
+    const platform=promoPlatformTitle(p);
+    const palette=promoPalette(p);
     const oldPrice=p?.mostrar_precio_anterior!==false&&normal>0
       ? '<s>$'+money(normal)+'</s>'
       :'';
     const savingLine=saving>0
       ? '<span class="gx-promo-saving">Ahorras $'+money(saving)+'</span>'
       :'';
-    const preview=p?.gx_preview===true?'<span class="gx-promo-preview-chip">VISTA PREVIA</span>':'';
-    return '<button type="button" class="gx-promo-deck-card" data-gx-promo-index="'+index+'" aria-label="Abrir '+esc(title)+'">'+
+    const preview=p?.gx_preview===true?'<span class="gx-promo-preview-chip">PREVIEW</span>':'';
+    const style='--gx-brand:'+palette.brand+';--gx-brand-deep:'+palette.deep+';--gx-brand-accent:'+palette.accent+';';
+    return '<button type="button" class="gx-promo-deck-card" style="'+esc(style)+'" data-gx-promo-index="'+index+'" aria-label="Abrir '+esc(title)+'">'+
+      '<span class="gx-promo-card-glow" aria-hidden="true"></span>'+
       '<span class="gx-promo-card-orbit gx-promo-card-orbit-a" aria-hidden="true"></span>'+
-      '<span class="gx-promo-card-orbit gx-promo-card-orbit-b" aria-hidden="true"></span>'+
       '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span>'+preview+'</div>'+
       '<div class="gx-promo-card-logos">'+logosHtml(p)+'</div>'+
       '<div class="gx-promo-card-copy">'+
-        '<strong>'+esc(title)+'</strong>'+
+        '<strong class="gx-promo-platform-name">'+esc(platform)+'</strong>'+
+        (title!==platform?'<span class="gx-promo-offer-title">'+esc(title)+'</span>':'')+
         '<small>'+esc(String(p?.descripcion_publica||promoSubprice(p)))+'</small>'+
       '</div>'+
       '<div class="gx-promo-card-price">'+
@@ -267,13 +299,14 @@
     if(!cards.length||!list.length) return;
 
     cards.forEach((card,i)=>{
-      card.classList.remove('is-front','is-middle','is-back','is-hidden');
-      const offset=(i-state.active+cards.length)%cards.length;
-      if(offset===0) card.classList.add('is-front');
-      else if(offset===1) card.classList.add('is-middle');
-      else if(offset===2) card.classList.add('is-back');
+      card.classList.remove('is-front','is-left','is-right','is-hidden','is-middle','is-back');
+      const previous=(state.active-1+cards.length)%cards.length;
+      const next=(state.active+1)%cards.length;
+      if(i===state.active) card.classList.add('is-front');
+      else if(i===previous) card.classList.add('is-left');
+      else if(i===next) card.classList.add('is-right');
       else card.classList.add('is-hidden');
-      card.setAttribute('aria-hidden',offset>2?'true':'false');
+      card.setAttribute('aria-hidden',i===state.active?'false':'true');
     });
     document.querySelectorAll('[data-gx-promo-dot]').forEach((dot,i)=>{
       dot.classList.toggle('active',i===state.active);
@@ -320,7 +353,7 @@
       state.pointerStart=null;
       if(!start){startAuto();return}
       const dx=event.clientX-start.x,dy=event.clientY-start.y;
-      if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.15){
+      if(Math.abs(dx)>34&&Math.abs(dx)>Math.abs(dy)*1.12){
         moveDeck(dx<0?1:-1);
       }else{
         startAuto();
@@ -347,7 +380,7 @@
   function startAuto(){
     stopAuto();
     if(reduced()||document.hidden||selectedPromotions().length<2||document.querySelector('.gx-promo-expanded')) return;
-    state.timer=setInterval(()=>moveDeck(1),7600);
+    state.timer=setInterval(()=>moveDeck(1),6800);
   }
   function stopAuto(){
     if(state.timer){clearInterval(state.timer);state.timer=null}
