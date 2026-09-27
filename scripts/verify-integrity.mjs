@@ -417,15 +417,19 @@ for (const absolute of walk(jsRoot)) {
   if (!ayudaHtml.includes('./assets/js/ayuda/15-promotions-catalog-c1.js')) fail('Ayuda C1: controlador no está cargado.');
   if (!promoCatalog.includes("GXCORE.endpoint('promociones-catalogo')")) fail('Ayuda C1: promociones no consumen el endpoint dedicado.');
   if (!promoCatalog.includes('gx-promo-deck-card')) fail('Ayuda C1: falta deck interactivo.');
-  if (!promoCatalog.includes('gx-promo-morph-detail')) fail('Ayuda C4: falta contenido interno del morph.');
+  if (!promoCatalog.includes('gx-promo-morph-detail')) fail('Ayuda C5: falta contenido interno del morph.');
   if (!promoCatalog.includes('document.body.appendChild(card)') || !promoCatalog.includes('expandedPlaceholder')) {
-    fail('Ayuda C4: la expansión debe reutilizar la misma tarjeta, no crear un modal/clon.');
+    fail('Ayuda C5: la expansión debe reutilizar la misma tarjeta, no crear un modal visible.');
   }
-  if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C4: las órbitas no deben existir en el hero promocional.');
-  if (!promoCatalog.includes('gx-promo-info-hint')) fail('Ayuda C4: falta acceso visual Info en tarjeta cerrada.');
-  if (!promoCatalog.includes('<span>Ahorro</span><strong>')) fail('Ayuda C4: el ahorro debe mostrarse libre como Ahorro + monto.');
-  if (promoCatalog.includes('en esta oferta')) fail('Ayuda C4: persiste el texto secundario del ahorro descartado.');
-  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C4')) fail('Ayuda C4: faltan estilos finales de la beta C4.');
+  if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C5: las órbitas no deben existir en el hero promocional.');
+  if (!promoCatalog.includes('gx-promo-card-description')) fail('Ayuda C5: falta descripción en la tarjeta cerrada.');
+  if (!promoCatalog.includes('Ver detalles')) fail('Ayuda C5: falta control Ver detalles.');
+  if (!promoCatalog.includes('<span>Ahorro</span><strong>')) fail('Ayuda C5: el ahorro debe mostrarse como Ahorro + monto.');
+  if (promoCatalog.includes('en esta oferta')) fail('Ayuda C5: persiste texto descartado del ahorro.');
+  if (!promoCatalog.includes('Contratar ahora') || !promoCatalog.includes('actualizarCarrito')) {
+    fail('Ayuda C5: Contratar ahora no está conectado al carrito existente.');
+  }
+  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C5')) fail('Ayuda C5: faltan estilos finales.');
   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
     fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
   }
