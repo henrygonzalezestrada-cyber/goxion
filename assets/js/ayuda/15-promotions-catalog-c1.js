@@ -615,7 +615,7 @@
     const targetWidth=Math.min(window.innerWidth-44,352);
     const maxHeight=Math.max(460,window.innerHeight-52);
     const itemCount=Math.min(3,(p?.items||[]).length);
-    const targetHeight=Math.min(maxHeight,itemCount>1?532:500);
+    const targetHeight=Math.min(maxHeight,itemCount>1?540:506);
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(26,(window.innerHeight-targetHeight)/2);
 
