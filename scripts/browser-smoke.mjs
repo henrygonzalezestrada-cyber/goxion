@@ -453,6 +453,14 @@ async function runAyuda(browser, browserName, errors) {
     null,
     { timeout: 2600 }
   ).catch(()=>{});
+  await page.waitForFunction(() => {
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c4"]');
+    const actions=expanded?.querySelector('.gx-promo-expanded-actions');
+    if(!expanded||!actions)return false;
+    const cardRect=expanded.getBoundingClientRect();
+    const actionsRect=actions.getBoundingClientRect();
+    return cardRect.height>440 && actionsRect.bottom<=cardRect.bottom-12;
+  }, null, { timeout: 2600 }).catch(()=>{});
 
   const promoExpanded=await page.evaluate(() => {
     const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c4"]');
