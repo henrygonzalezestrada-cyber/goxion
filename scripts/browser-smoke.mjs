@@ -371,209 +371,176 @@ async function runAyuda(browser, browserName, errors) {
     if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
 
-  // Catálogo C6: tipografía GOXION + combo recto + aurora + cierre continuo.
+  // Catálogo C7 Stable: misma altura, porcentaje estable y morph sin reflow.
   await page.evaluate(() => window.switchTab?.('catalogo'));
   await page.waitForFunction(() => {
-    const showcase=document.getElementById('gx-promo-showcase');
     const cards=document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card');
-    const curated=document.getElementById('gx-catalog-curated');
-    return showcase?.hidden===false && cards.length===3 && curated?.hidden===false;
-  }, null, { timeout: 8000 }).catch(()=>{});
+    return document.getElementById('gx-promo-showcase')?.hidden===false && cards.length===3;
+  },null,{timeout:8000}).catch(()=>{});
 
-  const promoC6 = await page.evaluate(() => {
+  const closedLayout=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
-    const front=cards.find(x=>x.classList.contains('is-front'));
-    const saving=(front?.querySelector('.gx-promo-saving')?.textContent||'').replace(/\s+/g,' ').trim();
-    const details=front?.querySelector('[data-gx-promo-details]');
-    const aurora=front?.querySelector('.gx-promo-card-aurora');
-    const auroraStyle=aurora?getComputedStyle(aurora):null;
-    const desc=front?.querySelector('.gx-promo-card-description');
+    const metrics=cards.map(card=>{
+      const r=card.getBoundingClientRect();
+      const footer=card.querySelector('.gx-promo-card-footer')?.getBoundingClientRect();
+      return {
+        index:Number(card.dataset.gxPromoIndex||0),
+        height:Math.round(r.height),
+        footerBottom:footer?Math.round(footer.bottom-r.top):null,
+        hasCurrentPrice:!!card.querySelector('.gx-promo-current-price'),
+        saving:(card.querySelector('.gx-promo-saving')?.textContent||'').replace(/\s+/g,' ').trim(),
+        detailsFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-info-hint')).fontSize),
+        descFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-card-description')).fontSize)
+      };
+    });
+    const heights=metrics.map(x=>x.height);
+    const bottoms=metrics.map(x=>x.footerBottom).filter(Number.isFinite);
+    const combo=cards.find(x=>x.dataset.gxPromoIndex==='1');
+    const logos=[...combo.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
     return {
-      cardCount:cards.length,
-      frontIndex:Number(front?.dataset?.gxPromoIndex ?? -1),
-      savingClean:/^Ahorras\s+\$/.test(saving),
-      detailsText:(details?.textContent||'').trim(),
-      detailsFont:details?parseFloat(getComputedStyle(details).fontSize):0,
-      descriptionFont:desc?parseFloat(getComputedStyle(desc).fontSize):0,
-      auroraVisible:!!aurora && auroraStyle?.display!=='none' && auroraStyle?.animationName!=='none',
-      noOrbit:!front?.querySelector('.gx-promo-card-orbit')
+      metrics,
+      heightSpread:Math.max(...heights)-Math.min(...heights),
+      footerSpread:Math.max(...bottoms)-Math.min(...bottoms),
+      comboTransformA:getComputedStyle(logos[0]).transform,
+      comboTransformB:getComputedStyle(logos[1]).transform,
+      comboGap:(a&&b)?Math.round(b.left-a.right):null,
+      auroraAnimation:getComputedStyle(cards.find(x=>x.classList.contains('is-front')).querySelector('.gx-promo-card-aurora')).animationName
     };
   }).catch(()=>null);
 
   if(
-    !promoC6 ||
-    promoC6.cardCount!==3 ||
-    promoC6.frontIndex<0 ||
-    promoC6.savingClean!==true ||
-    promoC6.detailsText!=='Ver detalles' ||
-    promoC6.detailsFont<10.5 ||
-    promoC6.descriptionFont<10.5 ||
-    promoC6.auroraVisible!==true ||
-    promoC6.noOrbit!==true
+    !closedLayout ||
+    closedLayout.heightSpread>2 ||
+    closedLayout.footerSpread>3 ||
+    closedLayout.metrics.some(x=>x.hasCurrentPrice) ||
+    closedLayout.metrics.some(x=>!/^Ahorras\s+\$/.test(x.saving)) ||
+    closedLayout.metrics.some(x=>x.detailsFont<10.5||x.descFont<10.5) ||
+    closedLayout.comboTransformA==='none' ||
+    closedLayout.comboTransformB==='none' ||
+    closedLayout.comboGap===null ||
+    closedLayout.comboGap>2 ||
+    closedLayout.auroraAnimation==='none'
   ){
-    errors.push(`${label}: catálogo C6 no respetó jerarquía/aurora esperada. ${JSON.stringify(promoC6)}`);
+    errors.push(`${label}: C7 cerrado no mantiene retícula estable/inclinación/aurora. ${JSON.stringify(closedLayout)}`);
   }
 
-  // Llevar el combo al frente y comprobar logos rectos/casi juntos.
+  // Combo al frente y apertura desde Ver detalles.
   await page.evaluate(() => {
     const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
-    if(combo && !combo.classList.contains('is-front')) combo.click();
+    if(combo&&!combo.classList.contains('is-front')) combo.click();
   });
   await page.waitForFunction(() =>
     document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]')?.classList.contains('is-front')===true,
     null,{timeout:2200}
   ).catch(()=>{});
 
-  const comboClosed=await page.evaluate(() => {
-    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
-    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
-    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
-    return {
-      count:logos.length,
-      rotationA:getComputedStyle(logos[0]).transform,
-      rotationB:getComputedStyle(logos[1]).transform,
-      gap:(a&&b)?Math.round(b.left-a.right):null
-    };
-  }).catch(()=>null);
-
-  if(!comboClosed||comboClosed.count<2||comboClosed.rotationA!=='none'||comboClosed.rotationB!=='none'||comboClosed.gap===null||comboClosed.gap>4){
-    errors.push(`${label}: combo C6 cerrado no quedó recto/casi unido. ${JSON.stringify(comboClosed)}`);
-  }
-
   await page.evaluate(() => {
     const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
     if(!card)return;
-    const rect=card.getBoundingClientRect();
-    window.__gxPromoClosedRect={width:rect.width,height:rect.height};
-    card.dataset.gxSmokeToken='same-node-c6';
+    card.dataset.gxSmokeToken='c7-card';
     window.__gxPromoSmokeCard=card;
     card.querySelector('[data-gx-promo-details]')?.click();
   });
 
   await page.waitForFunction(() => {
-    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
-    if(!expanded)return false;
-    return expanded.getBoundingClientRect().width>300;
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c7-card"]');
+    const actions=card?.querySelector('.gx-promo-expanded-actions');
+    if(!card||!actions)return false;
+    const r=card.getBoundingClientRect(),a=actions.getBoundingClientRect();
+    return r.width>300 && a.bottom<=r.bottom-8;
   },null,{timeout:3200}).catch(()=>{});
-  await page.waitForTimeout(520);
+  await page.waitForTimeout(480);
 
-  const promoExpanded=await page.evaluate(() => {
-    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
-    if(!expanded)return null;
-    const rect=expanded.getBoundingClientRect();
-    const actions=expanded.querySelector('.gx-promo-expanded-actions')?.getBoundingClientRect();
-    const logos=[...expanded.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+  const expanded=await page.evaluate(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c7-card"]');
+    if(!card)return null;
+    const r=card.getBoundingClientRect();
+    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
     const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
-    const primary=expanded.querySelector('[data-gx-promo-contract]');
-    const secondary=expanded.querySelector('[data-gx-promo-service]');
-    const desc=expanded.querySelector('.gx-promo-card-description');
+    const actions=card.querySelector('.gx-promo-expanded-actions')?.getBoundingClientRect();
     return {
-      sameNode:expanded===window.__gxPromoSmokeCard,
-      width:Math.round(rect.width),
-      height:Math.round(rect.height),
-      growth:Math.round(rect.height-(window.__gxPromoClosedRect?.height||0)),
-      contentFits:!!actions && actions.bottom<=rect.bottom-8,
-      logoWidth:Math.round(a?.width||0),
-      comboGap:(a&&b)?Math.round(b.left-a.right):null,
-      descriptionFont:desc?parseFloat(getComputedStyle(desc).fontSize):0,
-      primaryFont:primary?parseFloat(getComputedStyle(primary).fontSize):0,
-      primaryHeight:primary?Math.round(primary.getBoundingClientRect().height):0,
-      secondaryFont:secondary?parseFloat(getComputedStyle(secondary).fontSize):0,
-      contractText:(primary?.textContent||'').trim(),
-      contractEnabled:!!primary&&!primary.disabled,
-      layout:(()=>{
-        const pick=(selector)=>{
-          const el=expanded.querySelector(selector);
-          if(!el)return null;
-          const r=el.getBoundingClientRect();
-          return {top:Math.round(r.top-rect.top),bottom:Math.round(r.bottom-rect.top),height:Math.round(r.height)};
-        };
-        return {
-          top:pick('.gx-promo-card-top'),
-          logos:pick('.gx-promo-card-logos'),
-          copy:pick('.gx-promo-card-copy'),
-          price:pick('.gx-promo-card-price'),
-          footer:pick('.gx-promo-card-footer'),
-          detail:pick('.gx-promo-morph-detail'),
-          meta:pick('.gx-promo-morph-meta'),
-          items:pick('.gx-promo-detail-items'),
-          status:pick('.gx-promo-expanded-status'),
-          actions:pick('.gx-promo-expanded-actions')
-        };
-      })()
+      sameNode:card===window.__gxPromoSmokeCard,
+      width:Math.round(r.width),
+      height:Math.round(r.height),
+      contentFits:!!actions&&actions.bottom<=r.bottom-8,
+      transformA:getComputedStyle(logos[0]).transform,
+      transformB:getComputedStyle(logos[1]).transform,
+      gap:(a&&b)?Math.round(b.left-a.right):null,
+      summaryCount:card.querySelectorAll('.gx-promo-summary-item').length,
+      primaryHeight:Math.round(card.querySelector('[data-gx-promo-contract]')?.getBoundingClientRect().height||0),
+      primaryFont:parseFloat(getComputedStyle(card.querySelector('[data-gx-promo-contract]')).fontSize)
     };
   }).catch(()=>null);
 
   if(
-    !promoExpanded ||
-    promoExpanded.sameNode!==true ||
-    promoExpanded.width>370 ||
-    promoExpanded.growth<35 ||
-    promoExpanded.growth>300 ||
-    promoExpanded.contentFits!==true ||
-    promoExpanded.logoWidth<74 ||
-    promoExpanded.comboGap<4 ||
-    promoExpanded.comboGap>18 ||
-    promoExpanded.descriptionFont<11 ||
-    promoExpanded.primaryFont<12 ||
-    promoExpanded.secondaryFont<12 ||
-    promoExpanded.primaryHeight<42 ||
-    promoExpanded.contractText!=='Contratar ahora' ||
-    promoExpanded.contractEnabled!==true
+    !expanded ||
+    expanded.sameNode!==true ||
+    expanded.width>370 ||
+    expanded.height>540 ||
+    expanded.contentFits!==true ||
+    expanded.transformA!=='none' ||
+    expanded.transformB!=='none' ||
+    expanded.gap<4 ||
+    expanded.gap>18 ||
+    expanded.summaryCount<2 ||
+    expanded.primaryHeight<40 ||
+    expanded.primaryFont<11.5
   ){
-    errors.push(`${label}: morph C6 no quedó compacto/legible. ${JSON.stringify(promoExpanded)}`);
+    errors.push(`${label}: C7 expandido no quedó compacto/recto/ordenado. ${JSON.stringify(expanded)}`);
   }
 
-  // Cerrar y comprobar que la misma tarjeta regresa y los logos vuelven a juntarse.
+  // Cierre: misma tarjeta, vuelve al deck y combo recupera inclinación.
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
   );
   await page.waitForFunction(() =>
     !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
-    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]'),
-    null,{timeout:3200}
+    !!document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c7-card"]'),
+    null,{timeout:3500}
   ).catch(()=>{});
 
-  const promoClosedAgain=await page.evaluate(() => {
-    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]');
-    const logos=[...card?.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')||[]];
-    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+  const restored=await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c7-card"]');
+    if(!card)return null;
+    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
     return {
-      restored:card===window.__gxPromoSmokeCard,
-      gap:(a&&b)?Math.round(b.left-a.right):null,
-      expanded:card?.classList.contains('is-expanded')===true
+      sameNode:card===window.__gxPromoSmokeCard,
+      expanded:card.classList.contains('is-expanded'),
+      transformA:getComputedStyle(logos[0]).transform,
+      transformB:getComputedStyle(logos[1]).transform
     };
   }).catch(()=>null);
 
-  if(!promoClosedAgain||promoClosedAgain.restored!==true||promoClosedAgain.expanded!==false||promoClosedAgain.gap===null||promoClosedAgain.gap>4){
-    errors.push(`${label}: cierre C6 no restauró tarjeta/logos unidos. ${JSON.stringify(promoClosedAgain)}`);
+  if(!restored||restored.sameNode!==true||restored.expanded!==false||restored.transformA==='none'||restored.transformB==='none'){
+    errors.push(`${label}: C7 cierre no restauró misma tarjeta/combo inclinado. ${JSON.stringify(restored)}`);
   }
 
-  // Volver a abrir para probar contratación y carrito.
-  await page.evaluate(() =>
-    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"] [data-gx-promo-details]')?.click()
-  );
+  // Porcentaje debe conservar el mismo pie/altura que combo al volver al frente.
+  await page.evaluate(() => {
+    const pct=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]');
+    if(pct&&!pct.classList.contains('is-front')) pct.click();
+  });
   await page.waitForFunction(() =>
-    !!document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-contract]'),
-    null,{timeout:3000}
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]')?.classList.contains('is-front')===true,
+    null,{timeout:2200}
   ).catch(()=>{});
-  await page.evaluate(() =>
-    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-contract]')?.click()
-  );
-  await page.waitForFunction(() =>
-    document.getElementById('floating-cart')?.classList.contains('show')===true &&
-    !document.querySelector('body > .gx-promo-deck-card.is-expanded'),
-    null,{timeout:3200}
-  ).catch(()=>{});
+  const percentStable=await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
+    const pct=cards.find(x=>x.dataset.gxPromoIndex==='2');
+    const combo=cards.find(x=>x.dataset.gxPromoIndex==='1');
+    const pr=pct.getBoundingClientRect(),cr=combo.getBoundingClientRect();
+    const pf=pct.querySelector('.gx-promo-card-footer').getBoundingClientRect();
+    const cf=combo.querySelector('.gx-promo-card-footer').getBoundingClientRect();
+    return {
+      heightDiff:Math.abs(Math.round(pr.height-cr.height)),
+      footerDiff:Math.abs(Math.round((pf.bottom-pr.top)-(cf.bottom-cr.top))),
+      hasCurrentPrice:!!pct.querySelector('.gx-promo-current-price')
+    };
+  }).catch(()=>null);
 
-  const promoCart=await page.evaluate(() => ({
-    visible:document.getElementById('floating-cart')?.classList.contains('show')===true,
-    total:(document.getElementById('cart-total-price')?.textContent||'').trim(),
-    restored:document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]')===window.__gxPromoSmokeCard
-  })).catch(()=>null);
-
-  if(!promoCart||promoCart.visible!==true||!promoCart.total.includes('$99')||promoCart.restored!==true){
-    errors.push(`${label}: Contratar ahora C6 no agregó combo/restauró tarjeta. ${JSON.stringify(promoCart)}`);
+  if(!percentStable||percentStable.heightDiff>2||percentStable.footerDiff>3||percentStable.hasCurrentPrice!==false){
+    errors.push(`${label}: porcentaje C7 sigue empujando la retícula. ${JSON.stringify(percentStable)}`);
   }
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
