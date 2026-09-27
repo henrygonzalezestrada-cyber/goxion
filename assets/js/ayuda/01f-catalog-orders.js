@@ -590,6 +590,16 @@
             renderCartFloating();
         }
 
+        // Puente estable para módulos posteriores (promociones, recomendaciones, etc.).
+        window.GOXION_CATALOG_CART = window.GOXION_CATALOG_CART || {
+            add: function(nombre, precio, safeId) {
+                actualizarCarrito(String(nombre || 'Selección GOXION'), Number(precio || 0), 1, String(safeId || 'gx-item'));
+            },
+            render: function() {
+                renderCartFloating();
+            }
+        };
+
         function renderCartFloating() {
             let totalItems = 0, totalPrecio = 0;
             for (let item in carritoPedidos) { 
