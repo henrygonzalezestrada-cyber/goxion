@@ -430,7 +430,7 @@ for (const absolute of walk(jsRoot)) {
   if (promoCatalog.includes('gx-promo-current-price')) fail('Ayuda C7: precio porcentual extra no debe empujar la tarjeta cerrada.');
   if (!promoCatalog.includes('gx-promo-detail-summary')) fail('Ayuda C7: falta resumen expandido estable.');
   if (!promoCatalog.includes('pendingPromoRender')) fail('Ayuda C7: falta congelar render durante morph.');
-  if (!promoCatalog.includes('Fase 1') || !promoCatalog.includes('Fase 2')) {
+  if (!promoCatalog.includes('1) Detalles desaparecen') || !promoCatalog.includes('2) Al terminar la contracción')) {
     fail('Ayuda C7: el cierre debe resolverse en dos fases.');
   }
   if (!promoCatalog.includes('Contratar ahora') || !promoCatalog.includes('GOXION_CATALOG_CART')) {
