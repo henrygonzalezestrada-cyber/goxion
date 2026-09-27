@@ -118,6 +118,18 @@
                     <input type="text" placeholder="Ej. Promo" value="${esc(srv.etiqueta||"")}" onchange="updateGlobalService(${index},'etiqueta',this.value)">
                 </label>
                 <label class="gx-catalog-editor-field full">
+                    <span>Categoría del catálogo</span>
+                    <select class="custom-select" onchange="updateGlobalService(${index},'categoria_catalogo',this.value)">
+                        <option value="streaming" ${(srv.categoria_catalogo||'streaming')==='streaming'?'selected':''}>Streaming</option>
+                        <option value="productividad" ${srv.categoria_catalogo==='productividad'?'selected':''}>Productividad</option>
+                        <option value="almacenamiento" ${srv.categoria_catalogo==='almacenamiento'?'selected':''}>Almacenamiento</option>
+                        <option value="idiomas" ${srv.categoria_catalogo==='idiomas'?'selected':''}>Idiomas</option>
+                        <option value="educacion" ${srv.categoria_catalogo==='educacion'?'selected':''}>Educación</option>
+                        <option value="ia" ${srv.categoria_catalogo==='ia'?'selected':''}>IA</option>
+                        <option value="creatividad" ${srv.categoria_catalogo==='creatividad'?'selected':''}>Creatividad</option>
+                    </select>
+                </label>
+                <label class="gx-catalog-editor-field full">
                     <span>Beneficios</span>
                     <input type="text" placeholder="Ej. 4K, 1 perfil…" value="${esc(srv.beneficios||"")}" onchange="updateGlobalService(${index},'beneficios',this.value)">
                 </label>

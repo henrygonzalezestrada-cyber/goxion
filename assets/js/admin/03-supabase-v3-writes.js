@@ -456,6 +456,7 @@
                     nombre: nombre.trim(),
                     etiqueta: "",
                     beneficios: "",
+                    categoria_catalogo: "streaming",
                     cuentas: 1,
                     precio: num(precio),
                     costo: 0,
@@ -482,7 +483,7 @@
                 return;
             }
 
-            if (!["nombre","etiqueta","beneficios"].includes(field)) v = num(value);
+            if (!["nombre","etiqueta","beneficios","categoria_catalogo"].includes(field)) v = num(value);
 
             try {
                 await accion("editar_servicio_catalogo", {

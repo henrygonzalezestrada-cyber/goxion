@@ -495,6 +495,21 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+// Catalog categories: Admin must persist a real category instead of relying on name heuristics.
+{
+  const adminHtml = readFileSync(join(ROOT, 'admin.html'), 'utf8');
+  const inlineAdmin = readFileSync(join(ROOT, 'assets', 'js', 'admin', '01-01-inline.js'), 'utf8');
+  const mobileCatalog = readFileSync(join(ROOT, 'assets', 'js', 'admin', '15-admin-catalog-controller.js'), 'utf8');
+  const adminWrites = readFileSync(join(ROOT, 'assets', 'js', 'admin', '03-supabase-v3-writes.js'), 'utf8');
+
+  if (!adminHtml.includes('<th>Categoría</th>')) fail('Catálogo categorizado: falta columna Categoría.');
+  if (!inlineAdmin.includes("'categoria_catalogo'")) fail('Catálogo categorizado: escritorio no edita categoria_catalogo.');
+  if (!mobileCatalog.includes("'categoria_catalogo'")) fail('Catálogo categorizado: móvil no edita categoria_catalogo.');
+  if (!adminWrites.includes('categoria_catalogo: "streaming"') || !adminWrites.includes('"categoria_catalogo"')) {
+    fail('Catálogo categorizado: escritura/default no están integrados.');
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
