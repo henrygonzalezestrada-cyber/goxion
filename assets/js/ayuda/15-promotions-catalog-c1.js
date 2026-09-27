@@ -626,6 +626,7 @@
     card.parentNode?.insertBefore(placeholder,card);
     state.expandedPlaceholder=placeholder;
     document.body.appendChild(card);
+    card.classList.remove('is-front','is-left','is-right','is-hidden','is-middle','is-back');
 
     const expandedClickHandler=(event)=>{
       if(event.target.closest('[data-gx-promo-close]')){
@@ -666,12 +667,13 @@
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
         card.classList.add('is-expanded');
+        void card.offsetWidth;
         setPromoActionState(card,p,true);
         card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
         card.style.top=targetTop+'px';
         card.style.left=targetLeft+'px';
-        card.style.width=targetWidth+'px';
-        card.style.height=targetHeight+'px';
+        card.style.setProperty('width',targetWidth+'px','important');
+        card.style.setProperty('height',targetHeight+'px','important');
       });
     });
   }
@@ -694,8 +696,8 @@
       if(origin){
         card.style.top=origin.top+'px';
         card.style.left=origin.left+'px';
-        card.style.width=origin.width+'px';
-        card.style.height=origin.height+'px';
+        card.style.setProperty('width',origin.width+'px','important');
+        card.style.setProperty('height',origin.height+'px','important');
       }
     },80);
 
