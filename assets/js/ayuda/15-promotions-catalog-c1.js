@@ -433,12 +433,9 @@
           applyDeckPositions();
         }
         stopAuto();
-        setTimeout(()=>{
-          if(state.expandedCard) return;
-          const liveDeck=$('gx-promo-deck');
-          const liveCard=liveDeck?.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]')||card;
-          if(liveCard?.isConnected) openPromoDetail(selectedPromotions()[index],liveCard);
-        },0);
+        if(!state.expandedCard && card.isConnected){
+          openPromoDetail(selectedPromotions()[index],card);
+        }
       });
     });
   }
