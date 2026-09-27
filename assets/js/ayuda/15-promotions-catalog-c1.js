@@ -298,7 +298,7 @@
     const mechanicClass=' gx-mechanic-'+String(p?.mecanica||'promo').replace(/[^a-z0-9_-]/gi,'');
     const style='--gx-brand:'+palette.brand+';--gx-brand-deep:'+palette.deep+';--gx-brand-accent:'+palette.accent+';';
 
-    return '<article class="gx-promo-deck-card'+comboClass+mechanicClass+'" style="'+esc(style)+'" data-gx-promo-index="'+index+'" role="button" tabindex="0" aria-label="Abrir '+esc(title)+'" aria-expanded="false">'+
+    return '<article class="gx-promo-deck-card is-closed'+comboClass+mechanicClass+'" style="'+esc(style)+'" data-gx-promo-index="'+index+'" role="button" tabindex="0" aria-label="Abrir '+esc(title)+'" aria-expanded="false">'+
       '<span class="gx-promo-card-aurora" aria-hidden="true"></span>'+
       '<span class="gx-promo-card-glow" aria-hidden="true"></span>'+
       '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span>'+preview+'</div>'+
@@ -667,6 +667,7 @@
 
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
+        card.classList.remove('is-closed');
         card.classList.add('is-expanded');
         void card.offsetWidth;
         setPromoActionState(card,p,true);
@@ -704,7 +705,7 @@
       // Fase 2: la tarjeta adopta el layout cerrado REAL mientras sigue fija y grande.
       setPromoActionState(card,promo,false);
       card.classList.remove('is-expanded');
-      card.classList.add('is-returning');
+      card.classList.add('is-closed','is-returning');
       void card.offsetWidth;
 
       requestAnimationFrame(()=>{
