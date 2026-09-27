@@ -441,6 +441,141 @@ for (const absolute of walk(jsRoot)) {
     fail('Ayuda C9: faltan regla atómica de porcentaje o efecto premium visible.');
   }
   if (ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C8 FINAL UI')) fail('Ayuda C9: persiste capa C8 final.');
+  if (!ayudaCss.includes('GOXION · C11 CATÁLOGO GLASS HARMONY')) {
+    fail('Ayuda C11: falta armonización glass del catálogo.');
+  }
+  if (!ayudaCss.includes('#view-catalogo .gx-catalog-mini-card') ||
+      !ayudaCss.includes('background:var(--card-glass)') ||
+      !ayudaCss.includes('backdrop-filter:blur(10px)')) {
+    fail('Ayuda C11: la curaduría no reutiliza los parámetros glass existentes.');
+  }
+  if (!ayudaCss.includes('#view-catalogo .gx-catalog-mini-logo')) {
+    fail('Ayuda C11: faltan estilos de logo libre en la curaduría.');
+  }
+  if (promoCatalog.includes("entry.tag||('Desde   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
+    fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
+  }
+}
+
+// Promotions Studio v2 + P3: universal campaign builder with immutable acquisition gateway.
+{
+  const adminHtmlPath = join(ROOT, 'admin.html');
+  const studioPath = join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js');
+  const adminHtml = existsSync(adminHtmlPath) ? readFileSync(adminHtmlPath, 'utf8') : '';
+  const studio = existsSync(studioPath) ? readFileSync(studioPath, 'utf8') : '';
+
+  if (!existsSync(studioPath)) {
+    fail('Promotions Studio: falta el controlador v2.');
+  }
+
+  const legacyPromoAt = adminHtml.indexOf('./assets/js/admin/25-admin-beta-19-controller.js');
+  const studioAt = adminHtml.indexOf('./assets/js/admin/29-promotions-studio-v2.js');
+  if (legacyPromoAt < 0 || studioAt < 0 || studioAt <= legacyPromoAt) {
+    fail('Promotions Studio: el controlador v2 no carga después del puente promocional heredado.');
+  }
+
+  for (const mechanic of ['precio_fijo', 'porcentaje', 'combo', 'addon']) {
+    if (!studio.includes(mechanic)) fail('Promotions Studio: falta mecánica ' + mechanic + '.');
+  }
+
+  for (const action of [
+    'GOXION_FINANCIAL_ACTIONS.savePromotion',
+    'GOXION_FINANCIAL_ACTIONS.togglePromotion',
+    'GOXION_FINANCIAL_ACTIONS.deletePromotion',
+  ]) {
+    if (!studio.includes(action)) fail('Promotions Studio: falta gateway financiero ' + action + '.');
+  }
+
+  if (!studio.includes('adquisicion_habilitada')) {
+    fail('Promotions Studio P3: falta el estado de adquisición inmutable.');
+  }
+
+  for (const id of [
+    'gx-promo-mechanic-fields',
+    'gx-promo-audience',
+    'gx-promo-stack-loyalty',
+    'gx-promo-published',
+    'gx-promo-acquisition-enabled',
+    'gx-promo-preview',
+  ]) {
+    if (!adminHtml.includes('id="' + id + '"')) fail('Promotions Studio: falta UI ' + id + '.');
+  }
+}
+
+// Phase 3D/3E: Promotions and special collection actions must use the financial gateway.
+{
+  const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
+  const promoPath = join(ROOT, 'assets', 'js', 'admin', '25-admin-beta-19-controller.js');
+  const opsPath = join(ROOT, 'assets', 'js', 'admin', '07-admin-ops-v2.js');
+  const guardsPath = join(ROOT, 'assets', 'js', 'admin', '08-admin-payment-referral-guards.js');
+
+  const actions = existsSync(actionsPath) ? readFileSync(actionsPath, 'utf8') : '';
+  const promo = existsSync(promoPath) ? readFileSync(promoPath, 'utf8') : '';
+  const ops = existsSync(opsPath) ? readFileSync(opsPath, 'utf8') : '';
+  const guards = existsSync(guardsPath) ? readFileSync(guardsPath, 'utf8') : '';
+
+  for (const required of [
+    "invoke('promocion_guardar'",
+    "invoke('promocion_estado'",
+    "invoke('promocion_eliminar'",
+    "invoke('promocion_asignar'",
+    "invoke('promocion_quitar_asignacion'",
+    "invoke('promocion_adquirir'",
+    "invoke('promocion_cancelar_adquisicion'",
+    "invoke('registrar_pago_parcial'",
+    "invoke('pactar_fecha_pago'",
+    "invoke('cancelar_fecha_pactada'",
+    'savePromotion',
+    'togglePromotion',
+    'assignPromotion',
+    'acquirePromotion',
+    'cancelPromotionAcquisition',
+    'registerPartialPayment',
+    'pactPaymentDate',
+    'cancelPactPaymentDate',
+  ]) {
+    if (!actions.includes(required)) fail('Acciones financieras 3D/3E: falta ' + required + '.');
+  }
+
+  if (!promo.includes('GOXION_FINANCIAL_ACTIONS.savePromotion') || !promo.includes('GOXION_FINANCIAL_ACTIONS.togglePromotion')) {
+    fail('Promociones: guardar/activar no pasan por acciones financieras.');
+  }
+  if (promo.includes("promoApi('guardar'") || promo.includes("promoApi('cambiar_estado'")) {
+    fail('Promociones: persiste una escritura directa al endpoint legacy.');
+  }
+
+  for (const [label, source] of [['ops', ops], ['guards', guards]]) {
+    if (!source.includes('GOXION_FINANCIAL_ACTIONS.registerPartialPayment')) {
+      fail('Pagos parciales ' + label + ': falta integración con acciones financieras.');
+    }
+  }
+}
+
+if (failures.length) {
+  console.error('\nGOXION · verificación fallida\n');
+  failures.forEach((item) => console.error('• ' + item));
+  process.exit(1);
+}
+
+console.log('GOXION · integridad OK');
+console.log('✓ sólo existen los tres HTML oficiales en raíz');
+console.log('✓ referencias locales válidas');
+console.log('✓ CSS/JS externalizados');
+console.log('✓ runtime central preservado');
+console.log('✓ sintaxis JavaScript válida');
+console.log('✓ invariantes Safari y lealtad preservados');
+console.log('✓ contrato financiero oficial v1.1 cargado en las tres superficies');
+console.log('✓ acciones financieras compartidas alineadas al contrato v1.2');
+console.log('✓ Index usa motor financiero con fallback y auditoría de paridad');
+console.log('✓ Ayuda y Admin usan motor financiero con fallback por cliente');
+console.log('✓ aprobación de pagos usa una sola puerta financiera protegida por periodo');
+console.log('✓ Trato Justo individual y masivo usan una sola puerta financiera');
+console.log('✓ beneficios programados usan el núcleo financiero');
+console.log('✓ promociones y cobros especiales usan el núcleo financiero');
+") ||
+      !promoCatalog.includes("if(/^desde\\s*\\$/i.test(meta)) meta=''")) {
+    fail('Ayuda C11: el mini catálogo puede volver a duplicar Desde $xx.');
+  }
   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
     fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
   }
