@@ -17,6 +17,7 @@
     expandedPlaceholder:null,
     expandedClickHandler:null,
     expandedKeyHandler:null,
+    pendingPromoRender:false,
     morphBackdrop:null
   };
 
@@ -289,17 +290,18 @@
     const oldPrice=p?.mostrar_precio_anterior!==false&&normal>0
       ? '<s>$'+money(normal)+'</s>'
       :'';
-    const percentNow=p?.mecanica==='porcentaje'&&promoTotal>0
-      ? '<span class="gx-promo-current-price">Ahora $'+money(promoTotal)+'</span>'
-      :'';
     const savingLine=saving>0
-      ? '<div class="gx-promo-saving"><strong>Ahorras '+String.fromCharCode(36)+money(saving)+'</strong></div>'
+      ? '<div class="gx-promo-saving"><strong>Ahorras $'+money(saving)+'</strong></div>'
+      :'';
+    const percentDetail=p?.mecanica==='porcentaje'&&promoTotal>0
+      ? '<div class="gx-promo-summary-item"><span>Precio promo</span><strong>$'+money(promoTotal)+'</strong></div>'
       :'';
     const preview=p?.gx_preview===true?'<span class="gx-promo-preview-chip">PREVIEW</span>':'';
     const comboClass=(p?.items||[]).length>1?' is-combo':'';
+    const mechanicClass=' gx-mechanic-'+String(p?.mecanica||'promo').replace(/[^a-z0-9_-]/gi,'');
     const style='--gx-brand:'+palette.brand+';--gx-brand-deep:'+palette.deep+';--gx-brand-accent:'+palette.accent+';';
 
-    return '<article class="gx-promo-deck-card'+comboClass+'" style="'+esc(style)+'" data-gx-promo-index="'+index+'" role="button" tabindex="0" aria-label="Abrir '+esc(title)+'" aria-expanded="false">'+
+    return '<article class="gx-promo-deck-card'+comboClass+mechanicClass+'" style="'+esc(style)+'" data-gx-promo-index="'+index+'" role="button" tabindex="0" aria-label="Abrir '+esc(title)+'" aria-expanded="false">'+
       '<span class="gx-promo-card-aurora" aria-hidden="true"></span>'+
       '<span class="gx-promo-card-glow" aria-hidden="true"></span>'+
       '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span>'+preview+'</div>'+
@@ -311,16 +313,19 @@
         '<p class="gx-promo-card-description">'+esc(description)+'</p>'+
       '</div>'+
       '<div class="gx-promo-card-price">'+
-        '<div class="gx-promo-price-stack"><b>'+esc(promoPrice(p))+'</b>'+percentNow+oldPrice+'</div>'+
+        '<div class="gx-promo-price-stack"><b>'+esc(promoPrice(p))+'</b>'+oldPrice+'</div>'+
       '</div>'+
       '<div class="gx-promo-card-footer">'+
         savingLine+
         '<button type="button" class="gx-promo-info-hint" data-gx-promo-details>Ver detalles</button>'+
       '</div>'+
       '<div class="gx-promo-morph-detail" aria-hidden="true">'+
-        '<div class="gx-promo-morph-meta"><span>Duración</span><strong>'+esc(promoDurationLabel(p))+'</strong></div>'+
+        '<div class="gx-promo-detail-summary">'+
+          '<div class="gx-promo-summary-item"><span>Duración</span><strong>'+esc(promoDurationLabel(p))+'</strong></div>'+
+          percentDetail+
+          '<div class="gx-promo-summary-item gx-promo-summary-status"><span>Estado</span><strong>'+esc(statusText(p))+'</strong></div>'+
+        '</div>'+
         '<div class="gx-promo-detail-items">'+detailItems(p)+'</div>'+
-        '<div class="gx-promo-expanded-status"><span></span><strong>'+esc(statusText(p))+'</strong></div>'+
         '<div class="gx-promo-expanded-actions">'+
           ((p?.items?.[0]?.servicio?.nombre)?'<button type="button" class="gx-promo-detail-secondary" data-gx-promo-service="'+esc(p.items[0].servicio.nombre)+'">Ver en catálogo</button>':'')+
           '<button type="button" class="gx-promo-detail-primary" data-gx-promo-contract '+(contract.enabled?'':'disabled')+'>'+esc(contract.label)+'</button>'+
@@ -330,6 +335,10 @@
   }
 
   function renderPromotions(){
+    if(state.expandedCard){
+      state.pendingPromoRender=true;
+      return;
+    }
     const root=$(ROOT_ID),deck=$('gx-promo-deck'),controls=$('gx-promo-deck-controls'),dots=$('gx-promo-dots');
     if(!root||!deck||!controls||!dots) return;
     const list=selectedPromotions();
@@ -568,16 +577,20 @@
     const rect=card.getBoundingClientRect();
     state.expandedCard=card;
     state.expandedOrigin={top:rect.top,left:rect.left,width:rect.width,height:rect.height,scrollY:window.scrollY};
+    state.pendingPromoRender=false;
 
     const targetWidth=Math.min(window.innerWidth-44,352);
-    const maxHeight=Math.max(440,window.innerHeight-48);
+    const maxHeight=Math.max(460,window.innerHeight-52);
     const itemCount=Math.min(3,(p?.items||[]).length);
-    const preferredHeight=itemCount>1?510:490;
-    const targetHeight=Math.min(maxHeight,preferredHeight);
+    const targetHeight=Math.min(maxHeight,itemCount>1?520:492);
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
-    const targetTop=Math.max(24,(window.innerHeight-targetHeight)/2);
+    const targetTop=Math.max(26,(window.innerHeight-targetHeight)/2);
 
-    const placeholder=document.createComment('gx-promo-card-origin');
+    const placeholder=document.createElement('div');
+    placeholder.className='gx-promo-morph-placeholder';
+    placeholder.dataset.gxPromoIndex=String(card.dataset.gxPromoIndex||0);
+    placeholder.style.width=rect.width+'px';
+    placeholder.style.height=rect.height+'px';
     card.parentNode?.insertBefore(placeholder,card);
     state.expandedPlaceholder=placeholder;
     document.body.appendChild(card);
@@ -591,7 +604,7 @@
         event.preventDefault();event.stopPropagation();
         const serviceName=serviceBtn.dataset.gxPromoService||'';
         closePromoDetail(card);
-        setTimeout(()=>focusCatalogBrandByName(serviceName),460);
+        setTimeout(()=>focusCatalogBrandByName(serviceName),560);
         return;
       }
       const contractBtn=event.target.closest('[data-gx-promo-contract]');
@@ -610,16 +623,18 @@
     card.addEventListener('click',expandedClickHandler);
     card.addEventListener('keydown',expandedKeyHandler);
 
-    card.style.position='fixed';
-    card.style.inset='auto';
-    card.style.top=rect.top+'px';
-    card.style.left=rect.left+'px';
-    card.style.width=rect.width+'px';
-    card.style.height=rect.height+'px';
-    card.style.transform='none';
-    card.style.zIndex='2102';
-    card.style.margin='0';
-    card.style.willChange='top,left,width,height,border-radius';
+    Object.assign(card.style,{
+      position:'fixed',
+      inset:'auto',
+      top:rect.top+'px',
+      left:rect.left+'px',
+      width:rect.width+'px',
+      height:rect.height+'px',
+      transform:'none',
+      zIndex:'2102',
+      margin:'0',
+      willChange:'top,left,width,height,border-radius'
+    });
     card.setAttribute('aria-expanded','true');
 
     createMorphBackdrop();
@@ -639,33 +654,41 @@
   }
 
   function closePromoDetail(card=state.expandedCard){
-    if(!card||card!==state.expandedCard) return;
-    if(card.classList.contains('is-closing')) return;
+    if(!card||card!==state.expandedCard||card.classList.contains('is-closing')) return;
     const origin=state.expandedOrigin;
-
     card.classList.add('is-closing');
     card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','true');
     state.morphBackdrop?.classList.remove('active');
 
-    const finalize=()=>{
-      card.classList.remove('is-expanded','is-closing','is-returning');
+    // 1) Detalles desaparecen sin cambiar todavía el layout principal.
+    setTimeout(()=>{
+      if(card!==state.expandedCard) return;
+      card.classList.add('is-returning');
+      if(origin){
+        card.style.top=origin.top+'px';
+        card.style.left=origin.left+'px';
+        card.style.width=origin.width+'px';
+        card.style.height=origin.height+'px';
+      }
+    },140);
 
+    // 2) Al terminar la contracción regresamos exactamente el mismo nodo al deck.
+    setTimeout(()=>{
+      if(card!==state.expandedCard) return;
+
+      card.classList.remove('is-expanded','is-closing','is-returning');
       if(state.expandedClickHandler) card.removeEventListener('click',state.expandedClickHandler);
       if(state.expandedKeyHandler) card.removeEventListener('keydown',state.expandedKeyHandler);
       state.expandedClickHandler=null;
       state.expandedKeyHandler=null;
 
-      if(state.expandedPlaceholder?.parentNode){
-        state.expandedPlaceholder.parentNode.insertBefore(card,state.expandedPlaceholder);
-        state.expandedPlaceholder.remove();
+      const placeholder=state.expandedPlaceholder;
+      if(placeholder?.parentNode){
+        placeholder.parentNode.insertBefore(card,placeholder);
+        placeholder.remove();
       }else{
         const deck=$('gx-promo-deck');
-        if(deck){
-          const index=String(card.dataset.gxPromoIndex||'0');
-          const replacement=deck.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]');
-          if(replacement&&replacement!==card) replacement.replaceWith(card);
-          else if(!card.parentNode||card.parentNode===document.body) deck.appendChild(card);
-        }
+        if(deck) deck.appendChild(card);
       }
       state.expandedPlaceholder=null;
 
@@ -681,27 +704,15 @@
       state.expandedCard=null;
       state.expandedOrigin=null;
 
-      applyDeckPositions();
-      requestAnimationFrame(()=>startAuto());
-    };
-
-    // Fase 1: el contenido secundario desaparece y los elementos del hero
-    // comienzan a volver a su escala cerrada sin mover todavía la tarjeta.
-    setTimeout(()=>{
-      if(card!==state.expandedCard) return;
-      card.classList.add('is-returning');
-      if(origin){
-        card.style.top=origin.top+'px';
-        card.style.left=origin.left+'px';
-        card.style.width=origin.width+'px';
-        card.style.height=origin.height+'px';
+      if(state.pendingPromoRender){
+        state.pendingPromoRender=false;
+        renderPromotions();
+        renderCurated();
+      }else{
+        applyDeckPositions();
+        requestAnimationFrame(()=>startAuto());
       }
-    },90);
-
-    // Fase 2: sólo después de terminar la contracción devolvemos el mismo nodo al deck.
-    setTimeout(()=>{
-      if(card===state.expandedCard) finalize();
-    },570);
+    },620);
   }
 
   function brandPromoSaving(entry){
