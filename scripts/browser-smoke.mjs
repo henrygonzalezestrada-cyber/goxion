@@ -445,8 +445,8 @@ async function runAyuda(browser, browserName, errors) {
     if(!card)return;
     card.dataset.gxSmokeToken='c7-card';
     window.__gxPromoSmokeCard=card;
-    card.querySelector('[data-gx-promo-details]')?.click();
   });
+  await page.locator('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"] [data-gx-promo-details]').click({force:true}).catch(()=>{});
 
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c7-card"]');
