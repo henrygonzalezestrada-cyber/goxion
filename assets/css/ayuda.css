@@ -13013,3 +13013,117 @@ body.gx-promo-morph-open{overflow:hidden!important}
         display:none!important;
     }
 }
+
+
+/* =========================================================
+   GOXION · C10B LIVING BACKGROUND
+   Variante B: material vivo + flotación ambiental sutil.
+   ========================================================= */
+
+/* Marquee inteligente: sólo se activa cuando JS detecta overflow real. */
+.gx-promo-deck-card.is-expanded .gx-promo-availability-value{
+    display:block;
+    width:100%;
+    min-width:0;
+    overflow:hidden!important;
+    white-space:nowrap;
+    text-overflow:clip!important;
+}
+.gx-promo-availability-value>span{
+    display:inline-block;
+    min-width:max-content;
+    transform:translateX(0);
+    will-change:transform;
+}
+.gx-promo-availability-value.has-marquee>span{
+    animation:gxPromoAvailabilityMarquee 6.4s ease-in-out infinite;
+}
+@keyframes gxPromoAvailabilityMarquee{
+    0%,18%{transform:translateX(0)}
+    42%,62%{transform:translateX(var(--gx-marquee-distance,0px))}
+    84%,100%{transform:translateX(0)}
+}
+
+/* Se elimina por completo el barrido luminoso de C9. */
+.gx-promo-deck-card.is-closed.is-front .gx-promo-card-glow{
+    display:none!important;
+    animation:none!important;
+}
+.gx-promo-deck-card.is-closed.is-front::before{
+    display:none!important;
+    animation:none!important;
+}
+.gx-promo-deck-card.is-closed.is-front::after{
+    animation:none!important;
+    opacity:.40;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.13);
+}
+
+/* El propio material cambia de profundidad y posición lentamente. */
+.gx-promo-deck-card.is-closed.is-front{
+    background-size:165% 165%,145% 145%!important;
+    background-repeat:no-repeat!important;
+    animation:gxPromoC10BLivingMaterial 8.6s ease-in-out infinite!important;
+    will-change:background-position,translate,filter,box-shadow;
+}
+@keyframes gxPromoC10BLivingMaterial{
+    0%,100%{
+        background-position:84% 8%,0% 50%;
+        translate:0 0;
+        filter:saturate(1.00) brightness(1.00);
+        box-shadow:
+          0 32px 62px rgba(0,0,0,.48),
+          0 11px 30px color-mix(in srgb,var(--gx-brand) 15%,transparent),
+          inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    35%{
+        background-position:58% 25%,42% 52%;
+        translate:0 -2px;
+        filter:saturate(1.045) brightness(1.015);
+        box-shadow:
+          0 35px 67px rgba(0,0,0,.50),
+          0 14px 34px color-mix(in srgb,var(--gx-brand-accent) 17%,transparent),
+          inset 0 1px 0 rgba(255,255,255,.16);
+    }
+    68%{
+        background-position:72% 42%,100% 48%;
+        translate:0 -1px;
+        filter:saturate(1.025) brightness(1.005);
+        box-shadow:
+          0 34px 65px rgba(0,0,0,.49),
+          0 13px 33px color-mix(in srgb,var(--gx-brand) 18%,transparent),
+          inset 0 1px 0 rgba(255,255,255,.155);
+    }
+}
+
+/* Un mínimo de respiración interna para que el fondo no se sienta plano. */
+.gx-promo-deck-card.is-closed.is-front .gx-promo-card-logos{
+    animation:gxPromoC10BLogoDrift 7.2s ease-in-out infinite!important;
+    will-change:transform;
+}
+@keyframes gxPromoC10BLogoDrift{
+    0%,100%{transform:translate3d(0,0,0)}
+    50%{transform:translate3d(0,-1.5px,0)}
+}
+
+/* Al abrir, el material queda quieto para que mande el morph. */
+.gx-promo-morph-open .gx-promo-deck-card,
+.gx-promo-deck-card.is-expanded,
+.gx-promo-deck-card.is-returning{
+    animation:none!important;
+    translate:0 0!important;
+    filter:none!important;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos,
+.gx-promo-deck-card.is-returning .gx-promo-card-logos{
+    animation:none!important;
+    transform:none;
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-promo-deck-card.is-closed.is-front,
+    .gx-promo-deck-card.is-closed.is-front .gx-promo-card-logos,
+    .gx-promo-availability-value.has-marquee>span{
+        animation:none!important;
+    }
+}
