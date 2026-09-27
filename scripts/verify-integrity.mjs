@@ -401,6 +401,99 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Ayuda C1: promotional catalog stays isolated in its own presentation controller.
+{
+  const ayudaHtmlPath = join(ROOT, 'ayuda.html');
+  const promoCatalogPath = join(ROOT, 'assets', 'js', 'ayuda', '15-promotions-catalog-c1.js');
+  const ayudaCssPath = join(ROOT, 'assets', 'css', 'ayuda.css');
+  const catalogOrdersPath = join(ROOT, 'assets', 'js', 'ayuda', '01f-catalog-orders.js');
+  const ayudaHtml = existsSync(ayudaHtmlPath) ? readFileSync(ayudaHtmlPath, 'utf8') : '';
+  const promoCatalog = existsSync(promoCatalogPath) ? readFileSync(promoCatalogPath, 'utf8') : '';
+  const ayudaCss = existsSync(ayudaCssPath) ? readFileSync(ayudaCssPath, 'utf8') : '';
+  const catalogOrders = existsSync(catalogOrdersPath) ? readFileSync(catalogOrdersPath, 'utf8') : '';
+
+  if (!existsSync(promoCatalogPath)) fail('Ayuda C1: falta controlador de catálogo promocional.');
+  if (!ayudaHtml.includes('id="gx-promo-showcase"')) fail('Ayuda C1: falta deck promocional.');
+  if (!ayudaHtml.includes('id="gx-catalog-curated"')) fail('Ayuda C1: falta curaduría del catálogo.');
+  if (!ayudaHtml.includes('./assets/js/ayuda/15-promotions-catalog-c1.js')) fail('Ayuda C1: controlador no está cargado.');
+  if (!promoCatalog.includes("GXCORE.endpoint('promociones-catalogo')")) fail('Ayuda C1: promociones no consumen el endpoint dedicado.');
+  if (!promoCatalog.includes('gx-promo-deck-card')) fail('Ayuda C1: falta deck interactivo.');
+  if (!promoCatalog.includes('gx-promo-morph-detail')) fail('Ayuda C8: falta contenido interno del morph.');
+  if (!promoCatalog.includes('document.body.appendChild(card)') || !promoCatalog.includes('expandedPlaceholder')) {
+    fail('Ayuda C8: el morph debe reutilizar la misma tarjeta.');
+  }
+  if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C8: las órbitas no deben existir en el hero.');
+  if (!promoCatalog.includes('gx-promo-card-description')) fail('Ayuda C8: falta descripción en tarjeta cerrada.');
+  if (!promoCatalog.includes('Ahorras $')) fail('Ayuda C8: el ahorro debe expresarse como Ahorras $X.');
+  if (!promoCatalog.includes('data-gx-promo-action')) fail('Ayuda C8: falta CTA único morfable.');
+  if (!promoCatalog.includes('setPromoActionState')) fail('Ayuda C8: falta transición Ver detalles → Contratar ahora.');
+  if (promoCatalog.includes('Ver en catálogo')) fail('Ayuda C8: persiste el segundo botón descartado.');
+  if (promoCatalog.includes('gx-promo-expanded-actions')) fail('Ayuda C8: persiste contenedor de acciones dobles.');
+  if (!promoCatalog.includes('gx-promo-detail-section')) fail('Ayuda C8: falta seccionado interno.');
+  if (!promoCatalog.includes('pendingPromoRender')) fail('Ayuda C8: falta congelar render durante morph.');
+  if (!promoCatalog.includes('Primero desaparece sólo la información secundaria') || !promoCatalog.includes('El CTA sigue anclado abajo')) {
+    fail('Ayuda C8: el cierre no está sincronizado con CTA anclado.');
+  }
+  if (!promoCatalog.includes('GOXION_CATALOG_CART')) {
+    fail('Ayuda C8: Contratar ahora no usa el carrito estable.');
+  }
+  if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) {
+    fail('Ayuda C8: falta puente estable del carrito.');
+  }
+  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C8 FINAL UI')) fail('Ayuda C8: faltan estilos finales.');
+  if (!ayudaCss.includes('gxPromoEdgeBreath')) fail('Ayuda C8: falta respiración perimetral.');
+  if (ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C7 STABLE')) fail('Ayuda C8: persiste capa C7 final.');
+  if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
+    fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
+  }
+}
+
+// Promotions Studio v2 + P3: universal campaign builder with immutable acquisition gateway.
+{
+  const adminHtmlPath = join(ROOT, 'admin.html');
+  const studioPath = join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js');
+  const adminHtml = existsSync(adminHtmlPath) ? readFileSync(adminHtmlPath, 'utf8') : '';
+  const studio = existsSync(studioPath) ? readFileSync(studioPath, 'utf8') : '';
+
+  if (!existsSync(studioPath)) {
+    fail('Promotions Studio: falta el controlador v2.');
+  }
+
+  const legacyPromoAt = adminHtml.indexOf('./assets/js/admin/25-admin-beta-19-controller.js');
+  const studioAt = adminHtml.indexOf('./assets/js/admin/29-promotions-studio-v2.js');
+  if (legacyPromoAt < 0 || studioAt < 0 || studioAt <= legacyPromoAt) {
+    fail('Promotions Studio: el controlador v2 no carga después del puente promocional heredado.');
+  }
+
+  for (const mechanic of ['precio_fijo', 'porcentaje', 'combo', 'addon']) {
+    if (!studio.includes(mechanic)) fail('Promotions Studio: falta mecánica ' + mechanic + '.');
+  }
+
+  for (const action of [
+    'GOXION_FINANCIAL_ACTIONS.savePromotion',
+    'GOXION_FINANCIAL_ACTIONS.togglePromotion',
+    'GOXION_FINANCIAL_ACTIONS.deletePromotion',
+  ]) {
+    if (!studio.includes(action)) fail('Promotions Studio: falta gateway financiero ' + action + '.');
+  }
+
+  if (!studio.includes('adquisicion_habilitada')) {
+    fail('Promotions Studio P3: falta el estado de adquisición inmutable.');
+  }
+
+  for (const id of [
+    'gx-promo-mechanic-fields',
+    'gx-promo-audience',
+    'gx-promo-stack-loyalty',
+    'gx-promo-published',
+    'gx-promo-acquisition-enabled',
+    'gx-promo-preview',
+  ]) {
+    if (!adminHtml.includes('id="' + id + '"')) fail('Promotions Studio: falta UI ' + id + '.');
+  }
+}
+
 // Phase 3D/3E: Promotions and special collection actions must use the financial gateway.
 {
   const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
@@ -419,12 +512,16 @@ for (const absolute of walk(jsRoot)) {
     "invoke('promocion_eliminar'",
     "invoke('promocion_asignar'",
     "invoke('promocion_quitar_asignacion'",
+    "invoke('promocion_adquirir'",
+    "invoke('promocion_cancelar_adquisicion'",
     "invoke('registrar_pago_parcial'",
     "invoke('pactar_fecha_pago'",
     "invoke('cancelar_fecha_pactada'",
     'savePromotion',
     'togglePromotion',
     'assignPromotion',
+    'acquirePromotion',
+    'cancelPromotionAcquisition',
     'registerPartialPayment',
     'pactPaymentDate',
     'cancelPactPaymentDate',
