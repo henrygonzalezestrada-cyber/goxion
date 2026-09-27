@@ -12745,3 +12745,43 @@ body.gx-promo-morph-open{overflow:hidden!important}
         animation:none!important;
     }
 }
+
+
+/* C7.1 · Compactación final del detalle expandido */
+.gx-promo-deck-card.is-expanded .gx-promo-morph-detail{
+    max-height:166px;
+    margin-top:5px;
+}
+.gx-promo-detail-summary{
+    gap:11px;
+    padding-top:6px;
+}
+.gx-promo-summary-item>span{font-size:9.5px}
+.gx-promo-summary-item>strong{font-size:11px}
+.gx-promo-summary-status>strong{
+    max-width:125px;
+    font-size:10px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-items{
+    gap:6px;
+    margin-top:6px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+    min-height:37px;
+    padding:5px 7px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
+    width:25px;
+    height:25px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{font-size:10.5px}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item small{font-size:9px}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{font-size:10px}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{
+    gap:7px;
+    margin-top:7px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions button{
+    min-height:40px;
+    font-size:12px;
+}
