@@ -550,21 +550,40 @@
     card.style.margin='0';
     card.setAttribute('aria-expanded','true');
 
+    const targetWidth=Math.min(window.innerWidth-28,404);
+    const maxHeight=Math.max(420,window.innerHeight-28);
+    const detail=card.querySelector('.gx-promo-morph-detail');
+
+    // Medimos la misma tarjeta en su estado expandido antes de animarla.
+    // Así cada promoción crece sólo lo necesario y evitamos scroll interno.
+    card.classList.add('gx-promo-measuring','is-expanded');
+    detail?.setAttribute('aria-hidden','false');
+    card.style.visibility='hidden';
+    card.style.top='0px';
+    card.style.left='0px';
+    card.style.width=targetWidth+'px';
+    card.style.height='auto';
+    const naturalHeight=Math.ceil(card.scrollHeight)+2;
+
+    card.classList.remove('is-expanded','gx-promo-measuring');
+    detail?.setAttribute('aria-hidden','true');
+    card.style.visibility='';
+    card.style.top=rect.top+'px';
+    card.style.left=rect.left+'px';
+    card.style.width=rect.width+'px';
+    card.style.height=rect.height+'px';
+
+    const targetHeight=Math.min(maxHeight,Math.max(rect.height,naturalHeight));
+    const targetLeft=Math.max(14,(window.innerWidth-targetWidth)/2);
+    const targetTop=Math.max(14,(window.innerHeight-targetHeight)/2);
+
     createMorphBackdrop();
     document.documentElement.classList.add('gx-promo-morph-open');
     document.body.classList.add('gx-promo-morph-open');
 
-    const itemCount=Math.min(3,(p?.items||[]).length);
-    const hasLogin=!clientToken();
-    const desiredHeight=520+(itemCount*40)+(hasLogin?38:0);
-    const targetWidth=Math.min(window.innerWidth-28,404);
-    const targetHeight=Math.min(window.innerHeight-28,desiredHeight);
-    const targetLeft=Math.max(14,(window.innerWidth-targetWidth)/2);
-    const targetTop=Math.max(14,(window.innerHeight-targetHeight)/2);
-
     requestAnimationFrame(()=>{
       card.classList.add('is-expanded');
-      card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
+      detail?.setAttribute('aria-hidden','false');
       card.style.top=targetTop+'px';
       card.style.left=targetLeft+'px';
       card.style.width=targetWidth+'px';
