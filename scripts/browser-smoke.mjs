@@ -142,6 +142,55 @@ async function runAyuda(browser, browserName, errors) {
   const label = `${browserName} · Ayuda`;
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   attachDiagnostics(page, label, errors);
+
+  await page.route('**/functions/v1/promociones-catalogo', async route => {
+    const promo = (id, mechanic, title, items, normal, offer, priority) => ({
+      id,
+      nombre:title,
+      titulo_publico:title,
+      descripcion_publica:'Oferta promocional de prueba C1',
+      badge:mechanic==='combo'?'COMBO':(mechanic==='porcentaje'?'30% OFF':'PROMO'),
+      mecanica:mechanic,
+      precio_promocional:offer,
+      precio_promocional_total:offer,
+      descuento_porcentaje:mechanic==='porcentaje'?30:null,
+      duracion_periodos:3,
+      inicio:'2026-09-01T00:00:00Z',
+      fin:'2026-12-31T23:59:59Z',
+      mostrar_precio_anterior:true,
+      mostrar_contador:false,
+      oferta_flash:false,
+      activa:true,
+      audiencia:'todos',
+      destacada:true,
+      publicada:true,
+      adquisicion_habilitada:true,
+      prioridad:priority,
+      revision:1,
+      precio_normal_total:normal,
+      ahorro_estimado:normal-offer,
+      items,
+      elegibilidad:{elegible:null,codigo:'PUBLICO',motivo:'Inicia sesión para confirmar si aplica a tu cuenta'},
+      adquirida:null
+    });
+    const svc=(id,nombre,precio,rol='incluido')=>({servicio_id:id,rol,orden:0,servicio:{id,nombre,precio,etiqueta:''}});
+    await route.fulfill({
+      status:200,
+      contentType:'application/json',
+      body:JSON.stringify({
+        ok:true,
+        autenticado:false,
+        contrato:'goxion-promotions-catalog-c1',
+        version:'1.0',
+        promociones:[
+          promo('c1-price','precio_fijo','Netflix · 3 meses',[svc('netflix','Netflix Premium',109,'principal')],109,79,30),
+          promo('c1-combo','combo','HBO Max + Prime Video',[svc('hbo','HBO Max Platino',79),svc('prime','Prime Video',45)],124,99,20),
+          promo('c1-percent','porcentaje','Disney+ · 30% OFF',[svc('disney','Disney+ Premium',89,'principal')],89,62.3,10)
+        ]
+      })
+    });
+  });
+
   await page.goto(origin + '/ayuda.html', { waitUntil: 'load' });
   await page.waitForTimeout(5200);
 
@@ -322,6 +371,480 @@ async function runAyuda(browser, browserName, errors) {
     if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
 
+  // Catálogo C9 Polish: valor vertical + porcentaje atómico + cierre sin snap + detalle scrollable.
+  await page.evaluate(() => window.switchTab?.('catalogo'));
+  await page.waitForFunction(() => {
+    const cards=document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card');
+    return document.getElementById('gx-promo-showcase')?.hidden===false && cards.length===3;
+  },null,{timeout:8000}).catch(()=>{});
+
+  // C14 público vs Mi Espacio: en portada no se excluye por stock/propiedad;
+  // tras autenticar sí entra la capa inteligente.
+  const c14PublicPersonalized=await page.evaluate(() => {
+    const service=(nombre,precio,etiqueta,disponibles)=>({
+      nombre,precio,etiqueta,disponibles_servidor:disponibles,
+      cuentas:1,limite:1,activo:true,descripcion:'Smoke C14'
+    });
+    const config={
+      alertas:{activa:false},
+      combo_upsell:true,
+      serviciosGlobales:[
+        service('Netflix Premium',109,'Popular 🔥',0),
+        service('Disney+ Premium',89,'Popular 🔥',1),
+        service('YouTube Premium',89,'Mas ahorro',1),
+        service('Google One 2TB',29,'',1),
+        service('Microsoft 365',79,'',1)
+      ]
+    };
+
+    window.goxionCurrentClientKey='';
+    window.cargarCatalogo({_goxion_config:config});
+    const publicPopular=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
+    const publicMode=document.getElementById('gx-catalog-curated')?.dataset.gxCatalogMode||'';
+    const publicCardCount=document.querySelectorAll('#catalog-container .brand-card').length;
+
+    window.goxionCurrentClientKey='demo';
+    window.cargarCatalogo({
+      _goxion_config:config,
+      demo:{servicios:[{nombre:'Disney+ Premium'}]}
+    });
+    const personalPopular=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
+    const personalMode=document.getElementById('gx-catalog-curated')?.dataset.gxCatalogMode||'';
+    const personalOwned=document.querySelectorAll('#catalog-container .gx-owned-service').length;
+
+    window.goxionCurrentClientKey='';
+    window.cargarCatalogo({_goxion_config:config});
+
+    return {
+      publicMode,
+      publicPopularCount:publicPopular.length,
+      publicPopularNames:publicPopular.map(x=>x.textContent||''),
+      publicCardCount,
+      personalMode,
+      personalPopularCount:personalPopular.length,
+      personalOwned
+    };
+  }).catch(()=>null);
+
+  if(
+    !c14PublicPersonalized ||
+    c14PublicPersonalized.publicMode!=='public' ||
+    c14PublicPersonalized.publicPopularCount!==2 ||
+    !c14PublicPersonalized.publicPopularNames.some(x=>x.includes('Netflix')) ||
+    !c14PublicPersonalized.publicPopularNames.some(x=>x.includes('Disney')) ||
+    c14PublicPersonalized.publicCardCount!==5 ||
+    c14PublicPersonalized.personalMode!=='personalized' ||
+    c14PublicPersonalized.personalPopularCount!==0 ||
+    c14PublicPersonalized.personalOwned<1
+  ){
+    errors.push(`${label}: C14 público/Mi Espacio no separa correctamente repertorio y recomendaciones. ${JSON.stringify(c14PublicPersonalized)}`);
+  }
+
+  // C11 catálogo: cristal curado con los parámetros visuales ya usados por GOXION.
+  await page.waitForFunction(() =>
+    document.querySelectorAll('.gx-catalog-mini-card').length>=1,
+    null,{timeout:3000}
+  ).catch(()=>{});
+
+  const catalogC11=await page.evaluate(() => {
+    const mini=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card:not(.is-popular-featured):not(.is-new-featured)') ||
+      document.querySelector('#gx-catalog-discover-rail .gx-catalog-mini-card:not(.is-new-featured)') ||
+      document.querySelector('.gx-catalog-mini-card');
+    const logo=mini?.querySelector('.gx-catalog-mini-logo');
+    const img=logo?.querySelector('img');
+    const switchBtn=document.querySelector('.gx-catalog-curated-switch button');
+    const filterBtn=document.querySelector('.gx-catalog-filter-chip');
+    const cards=[...document.querySelectorAll('.gx-catalog-mini-card')];
+    const ms=mini?getComputedStyle(mini):null;
+    const ls=logo?getComputedStyle(logo):null;
+    const is=img?getComputedStyle(img):null;
+    const ss=switchBtn?getComputedStyle(switchBtn):null;
+    const fs=filterBtn?getComputedStyle(filterBtn):null;
+    return {
+      cardCount:cards.length,
+      backgroundColor:ms?.backgroundColor||'',
+      backdrop:(ms?.backdropFilter||ms?.webkitBackdropFilter||''),
+      borderColor:ms?.borderTopColor||'',
+      logoBackground:ls?.backgroundColor||'',
+      logoBorder:ls?.borderTopWidth||'',
+      imagePadding:is?.paddingTop||'',
+      switchHeight:switchBtn?.getBoundingClientRect().height||0,
+      filterHeight:filterBtn?.getBoundingClientRect().height||0,
+      switchFont:ss?parseFloat(ss.fontSize):0,
+      filterFont:fs?parseFloat(fs.fontSize):0,
+      switchPadding:ss?parseFloat(ss.paddingLeft):0,
+      filterPadding:fs?parseFloat(fs.paddingLeft):0,
+      duplicateDesde:cards.map(card=>(card.textContent.match(/Desde\s*\$/g)||[]).length)
+    };
+  }).catch(()=>null);
+
+  if(
+    !catalogC11 ||
+    catalogC11.cardCount<1 ||
+    catalogC11.backgroundColor!=='rgba(8, 8, 12, 0.25)' ||
+    !catalogC11.backdrop.includes('blur(10px)') ||
+    catalogC11.borderColor!=='rgba(255, 255, 255, 0.08)' ||
+    !['rgba(0, 0, 0, 0)','transparent'].includes(catalogC11.logoBackground) ||
+    catalogC11.logoBorder!=='0px' ||
+    catalogC11.imagePadding!=='0px' ||
+    Math.abs(catalogC11.switchHeight-catalogC11.filterHeight)>1 ||
+    Math.abs(catalogC11.switchFont-catalogC11.filterFont)>.15 ||
+    Math.abs(catalogC11.switchPadding-catalogC11.filterPadding)>.5 ||
+    catalogC11.duplicateDesde.some(n=>n>1)
+  ){
+    errors.push(`${label}: C11 catálogo no conserva glass/logo/filtros/precio limpio. ${JSON.stringify(catalogC11)}`);
+  }
+
+  // C12 curaduría: etiquetas viven arriba; catálogo completo queda neutral.
+  const c12Popular=await page.evaluate(() => {
+    const catalog=[...document.querySelectorAll('#catalog-container .brand-card')];
+    const featured=[...document.querySelectorAll('#gx-catalog-best-rail .is-popular-featured')];
+    const soft=[...document.querySelectorAll('#gx-catalog-best-rail .is-popular-soft')];
+    const newFeatured=[...document.querySelectorAll('#gx-catalog-discover-rail .is-new-featured')];
+    return {
+      catalogPromoClasses:catalog.filter(x=>x.classList.contains('has-promo')||[...x.classList].some(c=>c.startsWith('has-promo-'))).length,
+      catalogBadges:document.querySelectorAll('#catalog-container .animated-etiqueta').length,
+      featuredCount:featured.length,
+      featuredLabel:(featured[0]?.querySelector('.gx-catalog-mini-badge')?.textContent||'').trim(),
+      featuredBorderAnimation:featured[0]?getComputedStyle(featured[0],'::before').animationName:'none',
+      softCardAnimations:soft.map(x=>getComputedStyle(x).animationName),
+      softBadgeAnimations:soft.map(x=>getComputedStyle(x.querySelector('.gx-catalog-mini-badge')).animationName),
+      newFeaturedCount:newFeatured.length,
+      newFeaturedAnimation:newFeatured[0]?getComputedStyle(newFeatured[0]).animationName:'none',
+      fallbackCards:[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')]
+        .filter(x=>!x.classList.contains('is-popular-featured')&&!x.classList.contains('is-popular-soft')).length,
+      misplacedBadges:[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-badge')]
+        .filter(x=>!x.parentElement?.classList.contains('gx-catalog-mini-meta-line')).length
+    };
+  }).catch(()=>null);
+
+  if(
+    !c12Popular ||
+    c12Popular.catalogPromoClasses!==0 ||
+    c12Popular.catalogBadges!==0 ||
+    c12Popular.fallbackCards!==0 ||
+    c12Popular.misplacedBadges!==0 ||
+    c12Popular.featuredCount>1 ||
+    (c12Popular.featuredCount===1 && (
+      c12Popular.featuredLabel!=='MÁS POPULAR' ||
+      c12Popular.featuredBorderAnimation==='none'
+    )) ||
+    c12Popular.softCardAnimations.some(x=>x!=='none') ||
+    c12Popular.softBadgeAnimations.some(x=>x==='none') ||
+    c12Popular.newFeaturedCount>1 ||
+    (c12Popular.newFeaturedCount===1 && c12Popular.newFeaturedAnimation==='none')
+  ){
+    errors.push(`${label}: C12 no conserva jerarquía Popular/Nuevo o catálogo neutral. ${JSON.stringify(c12Popular)}`);
+  }
+
+  await page.evaluate(() =>
+    document.querySelector('[data-gx-curated-mode="saving"]')?.click()
+  );
+  await page.waitForTimeout(180);
+
+  const c12Saving=await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
+    const saving=[...document.querySelectorAll('#gx-catalog-best-rail .is-saving-soft')];
+    return {
+      cards:cards.length,
+      empty:!!document.querySelector('#gx-catalog-best-rail .gx-catalog-curated-empty'),
+      cardAnimations:saving.map(x=>getComputedStyle(x).animationName),
+      badgeAnimations:saving.map(x=>getComputedStyle(x.querySelector('.gx-catalog-mini-badge')).animationName),
+      featuredPopular:document.querySelectorAll('#gx-catalog-best-rail .is-popular-featured').length,
+      fallbackCards:cards.filter(x=>!x.classList.contains('is-saving-soft')).length,
+      misplacedBadges:[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-badge')]
+        .filter(x=>!x.parentElement?.classList.contains('gx-catalog-mini-meta-line')).length
+    };
+  }).catch(()=>null);
+
+  if(
+    !c12Saving ||
+    c12Saving.featuredPopular!==0 ||
+    c12Saving.fallbackCards!==0 ||
+    c12Saving.misplacedBadges!==0 ||
+    c12Saving.cardAnimations.some(x=>x!=='none') ||
+    c12Saving.badgeAnimations.some(x=>x==='none') ||
+    (c12Saving.cards===0 && c12Saving.empty!==true)
+  ){
+    errors.push(`${label}: C12 Mayor ahorro usa movimiento excesivo o queda sin estado vacío. ${JSON.stringify(c12Saving)}`);
+  }
+
+  await page.evaluate(() =>
+    document.querySelector('[data-gx-curated-mode="popular"]')?.click()
+  );
+  await page.waitForTimeout(120);
+
+  const c14Layout=await page.evaluate(() => {
+    const card=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
+    const title=card?.querySelector('.gx-catalog-mini-copy>strong');
+    const meta=card?.querySelector('.gx-catalog-mini-meta-line');
+    const price=card?.querySelector('.gx-catalog-mini-price');
+    const priceLabel=price?.querySelector('span');
+    const priceValue=price?.querySelector('b');
+    const allHead=document.getElementById('gx-catalog-all-head');
+    const toolbar=document.querySelector('.gx-catalog-toolbar');
+    const catalog=document.getElementById('catalog-container');
+    const cardBox=card?.getBoundingClientRect();
+    const titleBox=title?.getBoundingClientRect();
+    const metaBox=meta?.getBoundingClientRect();
+    const priceBox=price?.getBoundingClientRect();
+    const priceLabelBox=priceLabel?.getBoundingClientRect();
+    const priceValueBox=priceValue?.getBoundingClientRect();
+    const headBox=allHead?.getBoundingClientRect();
+    const toolbarBox=toolbar?.getBoundingClientRect();
+    const catalogBox=catalog?.getBoundingClientRect();
+    return {
+      cardHeight:cardBox?.height||0,
+      cardWidth:cardBox?.width||0,
+      titleBeforeMeta:!!titleBox&&!!metaBox&&titleBox.bottom<=metaBox.top+1,
+      priceVertical:!!priceLabelBox&&!!priceValueBox&&priceLabelBox.bottom<=priceValueBox.top+2,
+      priceRightOfCopy:!!priceBox&&!!titleBox&&priceBox.left>titleBox.left,
+      toolbarBelowHead:!!headBox&&!!toolbarBox&&toolbarBox.top>=headBox.bottom-1,
+      catalogBelowToolbar:!!toolbarBox&&!!catalogBox&&catalogBox.top>=toolbarBox.bottom-1,
+      leftAlignment:!!headBox&&!!cardBox&&Math.abs(headBox.left-cardBox.left)<=6
+    };
+  }).catch(()=>null);
+
+  if(
+    !c14Layout ||
+    c14Layout.cardHeight>80 ||
+    c14Layout.cardHeight<64 ||
+    c14Layout.cardWidth>250 ||
+    c14Layout.titleBeforeMeta!==true ||
+    c14Layout.priceVertical!==true ||
+    c14Layout.priceRightOfCopy!==true ||
+    c14Layout.toolbarBelowHead!==true ||
+    c14Layout.catalogBelowToolbar!==true ||
+    c14Layout.leftAlignment!==true
+  ){
+    errors.push(`${label}: C14 layout no mantiene jerarquía/espaciado compacto. ${JSON.stringify(c14Layout)}`);
+  }
+
+  const closedLayout=await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
+    const front=cards.find(x=>x.classList.contains('is-front'));
+    const metrics=cards.map(card=>{
+      const style=getComputedStyle(card);
+      const primary=card.querySelector('.gx-promo-primary-value');
+      const saving=card.querySelector('.gx-promo-saving');
+      const old=card.querySelector('.gx-promo-old-price');
+      const action=card.querySelector('[data-gx-promo-action]');
+      const cardRect=card.getBoundingClientRect();
+      const actionRect=action?.getBoundingClientRect();
+      const p=primary?.getBoundingClientRect();
+      const sv=saving?.getBoundingClientRect();
+      const o=old?.getBoundingClientRect();
+      return {
+        index:Number(card.dataset.gxPromoIndex||0),
+        cssHeight:parseFloat(style.height),
+        actionText:(action?.textContent||'').trim(),
+        actionCenterDiff:actionRect?Math.abs((actionRect.left+actionRect.width/2)-(cardRect.left+cardRect.width/2)):99,
+        oldPriceFont:old?parseFloat(getComputedStyle(old).fontSize):0,
+        saving:(saving?.textContent||'').replace(/\s+/g,' ').trim(),
+        verticalValue:!!p&&!!sv&&!!o&&p.top<sv.top&&sv.top<o.top
+      };
+    });
+    const pct=cards.find(x=>x.dataset.gxPromoIndex==='2');
+    const pctPrimary=pct?.querySelector('.gx-promo-primary-value');
+    const combo=cards.find(x=>x.dataset.gxPromoIndex==='1');
+    const logos=[...combo.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    return {
+      metrics,
+      heightSpread:Math.max(...metrics.map(x=>x.cssHeight))-Math.min(...metrics.map(x=>x.cssHeight)),
+      percentWhiteSpace:pctPrimary?getComputedStyle(pctPrimary).whiteSpace:null,
+      percentFits:pctPrimary?pctPrimary.scrollWidth<=pctPrimary.parentElement.clientWidth+2:false,
+      comboTransformA:getComputedStyle(logos[0]).transform,
+      comboTransformB:getComputedStyle(logos[1]).transform,
+      borderAnimation:front?getComputedStyle(front,'::after').animationName:'none',
+      traceAnimation:front?getComputedStyle(front,'::before').animationName:'none',
+      c10AHeroAnimation:front?getComputedStyle(front).animationName:'none',
+      c10ALogoAnimation:front?getComputedStyle(front.querySelector('.gx-promo-card-logos')).animationName:'none',
+      c10AGlowDisplay:front?getComputedStyle(front.querySelector('.gx-promo-card-glow')).display:'block'
+    };
+  }).catch(()=>null);
+
+  if(
+    !closedLayout ||
+    closedLayout.heightSpread>1 ||
+    closedLayout.metrics.some(x=>x.actionText!=='Ver detalles'||x.actionCenterDiff>2) ||
+    closedLayout.metrics.some(x=>x.oldPriceFont<13) ||
+    closedLayout.metrics.some(x=>!/^Ahorras\s+\$/.test(x.saving)) ||
+    closedLayout.metrics.some(x=>x.verticalValue!==true) ||
+    closedLayout.percentWhiteSpace!=='nowrap' ||
+    closedLayout.percentFits!==true ||
+    closedLayout.comboTransformA==='none' ||
+    closedLayout.comboTransformB==='none' ||
+    closedLayout.c10AHeroAnimation==='none' ||
+    closedLayout.c10ALogoAnimation==='none' ||
+    closedLayout.c10AGlowDisplay!=='none'
+  ){
+    errors.push(`${label}: C9 cerrado no conserva valor vertical/porcentaje/efecto premium. ${JSON.stringify(closedLayout)}`);
+  }
+
+  // Combo al frente y guardar geometría cerrada para comparar el cierre intermedio.
+  await page.evaluate(() => {
+    const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
+    if(combo&&!combo.classList.contains('is-front')) combo.click();
+  });
+  await page.waitForFunction(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]')?.classList.contains('is-front')===true,
+    null,{timeout:2200}
+  ).catch(()=>{});
+  // Esperar a que termine la transición del deck antes de guardar la geometría cerrada.
+  await page.waitForTimeout(900);
+
+  await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
+    if(!card)return;
+    const r=card.getBoundingClientRect();
+    const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
+    const value=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
+    window.__gxC9Closed={
+      height:r.height,
+      actionBottomGap:action?r.bottom-action.bottom:null,
+      valueTop:value?value.top-r.top:null
+    };
+    card.dataset.gxSmokeToken='c9-card';
+    window.__gxPromoSmokeCard=card;
+    card.querySelector('[data-gx-promo-action]')?.click();
+  });
+
+  await page.waitForFunction(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
+    const action=card?.querySelector('[data-gx-promo-action]');
+    return !!card && !!action && action.textContent.trim()==='Contratar ahora';
+  },null,{timeout:3200}).catch(()=>{});
+  await page.waitForTimeout(520);
+
+  const expanded=await page.evaluate(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
+    if(!card)return null;
+    const r=card.getBoundingClientRect();
+    const copy=card.querySelector('.gx-promo-card-copy')?.getBoundingClientRect();
+    const value=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
+    const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
+    const detail=card.querySelector('.gx-promo-morph-detail');
+    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    const angle=(node)=>{
+      const t=getComputedStyle(node).transform;
+      if(!t||t==='none')return 0;
+      const m=t.match(/matrix\(([^,]+),\s*([^,]+)/);
+      return m?Math.atan2(Number(m[2]),Number(m[1]))*180/Math.PI:99;
+    };
+    return {
+      sameNode:card===window.__gxPromoSmokeCard,
+      height:Math.round(r.height),
+      actionText:(card.querySelector('[data-gx-promo-action]')?.textContent||'').trim(),
+      actionBottomGap:action?Math.round(r.bottom-action.bottom):999,
+      valueGap:(copy&&value)?Math.round(value.top-copy.bottom):999,
+      oldPriceFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-old-price')).fontSize),
+      detailSections:card.querySelectorAll('.gx-promo-detail-section').length,
+      detailOverflow:detail?getComputedStyle(detail).overflowY:null,
+      detailScrollable:detail?detail.scrollHeight>=detail.clientHeight:false,
+      angleA:angle(logos[0]),
+      angleB:angle(logos[1])
+    };
+  }).catch(()=>null);
+
+  if(
+    !expanded ||
+    expanded.sameNode!==true ||
+    expanded.height>540 ||
+    expanded.actionText!=='Contratar ahora' ||
+    expanded.actionBottomGap>24 ||
+    expanded.valueGap>8 ||
+    expanded.oldPriceFont<14 ||
+    expanded.detailSections!==2 ||
+    expanded.detailOverflow!=='auto' ||
+    Math.abs(expanded.angleA)>0.5 ||
+    Math.abs(expanded.angleB)>0.5
+  ){
+    errors.push(`${label}: C9 expandido no quedó ordenado/scrollable/compacto. ${JSON.stringify(expanded)}`);
+  }
+
+  // Cierre: justo antes del final la composición ya debe coincidir con la cerrada.
+  await page.evaluate(() =>
+    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
+  );
+  await page.waitForTimeout(760);
+
+  const midClose=await page.evaluate(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
+    if(!card)return null;
+    const r=card.getBoundingClientRect();
+    const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
+    const value=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
+    const detail=card.querySelector('.gx-promo-morph-detail');
+    const closed=window.__gxC9Closed||{};
+    return {
+      returning:card.classList.contains('is-returning'),
+      actionText:(card.querySelector('[data-gx-promo-action]')?.textContent||'').trim(),
+      heightDiff:Math.abs(r.height-(closed.height||0)),
+      actionGapDiff:action&&closed.actionBottomGap!=null?Math.abs((r.bottom-action.bottom)-closed.actionBottomGap):999,
+      valueTopDiff:value&&closed.valueTop!=null?Math.abs((value.top-r.top)-closed.valueTop):999,
+      detailOpacity:detail?parseFloat(getComputedStyle(detail).opacity):1
+    };
+  }).catch(()=>null);
+
+  if(
+    !midClose ||
+    midClose.returning!==true ||
+    midClose.actionText!=='Ver detalles' ||
+    midClose.heightDiff>10 ||
+    midClose.actionGapDiff>12 ||
+    midClose.valueTopDiff>14 ||
+    midClose.detailOpacity>.12
+  ){
+    errors.push(`${label}: C9 cierre aún hace snap al último segundo. ${JSON.stringify(midClose)}`);
+  }
+
+  await page.waitForFunction(() =>
+    !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
+    !!document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c9-card"]'),
+    null,{timeout:3200}
+  ).catch(()=>{});
+
+  const restored=await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c9-card"]');
+    if(!card)return null;
+    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    return {
+      sameNode:card===window.__gxPromoSmokeCard,
+      actionText:(card.querySelector('[data-gx-promo-action]')?.textContent||'').trim(),
+      transformA:getComputedStyle(logos[0]).transform,
+      transformB:getComputedStyle(logos[1]).transform
+    };
+  }).catch(()=>null);
+
+  if(!restored||restored.sameNode!==true||restored.actionText!=='Ver detalles'||restored.transformA==='none'||restored.transformB==='none'){
+    errors.push(`${label}: C9 no restauró tarjeta/CTA/combo cerrado. ${JSON.stringify(restored)}`);
+  }
+
+  // Porcentaje: XX% OFF nunca puede saltar de línea ni empujar el bloque.
+  await page.evaluate(() => {
+    const pct=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]');
+    if(pct&&!pct.classList.contains('is-front')) pct.click();
+  });
+  await page.waitForFunction(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]')?.classList.contains('is-front')===true,
+    null,{timeout:2200}
+  ).catch(()=>{});
+
+  const percentStable=await page.evaluate(() => {
+    const pct=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]');
+    const primary=pct?.querySelector('.gx-promo-primary-value');
+    const value=pct?.querySelector('.gx-promo-value-stack');
+    return {
+      whiteSpace:primary?getComputedStyle(primary).whiteSpace:null,
+      fits:primary?primary.scrollWidth<=primary.parentElement.clientWidth+2:false,
+      minHeight:value?parseFloat(getComputedStyle(value).minHeight):0
+    };
+  }).catch(()=>null);
+
+  if(!percentStable||percentStable.whiteSpace!=='nowrap'||percentStable.fits!==true||percentStable.minHeight<70){
+    errors.push(`${label}: porcentaje C9 sigue rompiendo el bloque de valor. ${JSON.stringify(percentStable)}`);
+  }
+
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
   // no sólo un salto entre estado compacto y expandido.
   await page.evaluate(() => window.switchTab?.('soporte'));
@@ -462,6 +985,25 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       promocion_quitar_asignacion: {
         desactivada:true
       },
+      promocion_adquirir: {
+        adquisicion:{
+          adquisicion_id:'acq-smoke',
+          estado:'activa',
+          mecanica:'combo',
+          periodo_inicio:'2026-09-01',
+          periodos_totales:3,
+          subtotal_normal:188,
+          total_promocional:139,
+          ahorro:49
+        }
+      },
+      promocion_cancelar_adquisicion: {
+        adquisicion:{
+          adquisicion_id:'acq-smoke',
+          estado:'cancelada',
+          cambio:true
+        }
+      },
       registrar_pago_parcial: {
         pago_parcial:{id:'partial-smoke',saldo_restante:40},
         monto_pagado:60,
@@ -491,6 +1033,24 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     });
   });
 
+  await page.route('**/functions/v1/promociones-admin-beta', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok:true,
+        contrato:'goxion-promotions-studio-v2',
+        version:'2.0',
+        servicios:[
+          {id:'catalog-smoke-a',nombre:'Netflix Smoke',precio:109,activo:true},
+          {id:'catalog-smoke-b',nombre:'HBO Smoke',precio:79,activo:true},
+          {id:'catalog-smoke-c',nombre:'Prime Smoke',precio:45,activo:true}
+        ],
+        promociones:[]
+      })
+    });
+  });
+
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
   await page.waitForTimeout(900);
 
@@ -513,6 +1073,8 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL_ACTIONS?.cancelBenefit === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.savePromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.togglePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.acquirePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.cancelPromotionAcquisition === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.assignPromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.pactPaymentDate === 'function' &&
@@ -623,6 +1185,16 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         activa:true
       }),
       promoState: await window.GOXION_FINANCIAL_ACTIONS.togglePromotion({id:'promo-smoke',activa:false}),
+      promoAcquire: await window.GOXION_FINANCIAL_ACTIONS.acquirePromotion({
+        clienteId:'client-smoke',
+        promocionId:'promo-smoke',
+        periodoInicio:'2026-09',
+        origen:'smoke'
+      }),
+      promoCancelAcquisition: await window.GOXION_FINANCIAL_ACTIONS.cancelPromotionAcquisition({
+        id:'acq-smoke',
+        motivo:'Smoke cancel'
+      }),
       promoAssign: await window.GOXION_FINANCIAL_ACTIONS.assignPromotion({
         clienteServicioId:'service-smoke',
         promocionId:'promo-smoke',
@@ -656,6 +1228,13 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       if (phase3de.promoSave?.promocion?.id !== 'promo-smoke') {
         errors.push(`${label}: promoción no normalizó la respuesta.`);
       }
+      if (
+        phase3de.promoAcquire?.adquisicion?.adquisicion_id !== 'acq-smoke' ||
+        phase3de.promoAcquire?.adquisicion?.ahorro !== 49 ||
+        phase3de.promoCancelAcquisition?.adquisicion?.estado !== 'cancelada'
+      ) {
+        errors.push(`${label}: adquisición promocional P3 no normalizó la respuesta.`);
+      }
       if (phase3de.partial?.saldo_restante !== 40 || phase3de.partial?.monto_pagado !== 60) {
         errors.push(`${label}: pago parcial no normalizó la respuesta.`);
       }
@@ -673,6 +1252,14 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         actionMap.promocion_guardar?.body?.datos?.servicio_id !== 'catalog-smoke' ||
         actionMap.promocion_asignar?.body?.datos?.cliente_servicio_id !== 'service-smoke'
       ) errors.push(`${label}: contrato HTTP de promociones incorrecto.`);
+
+      if (
+        actionMap.promocion_adquirir?.body?.datos?.cliente_id !== 'client-smoke' ||
+        actionMap.promocion_adquirir?.body?.datos?.promocion_id !== 'promo-smoke' ||
+        actionMap.promocion_adquirir?.body?.datos?.periodo_inicio !== '2026-09-01' ||
+        actionMap.promocion_adquirir?.body?.datos?.origen !== 'smoke' ||
+        actionMap.promocion_cancelar_adquisicion?.body?.datos?.id !== 'acq-smoke'
+      ) errors.push(`${label}: contrato HTTP de adquisición promocional P3 incorrecto.`);
 
       if (
         actionMap.registrar_pago_parcial?.body?.datos?.saldo_restante !== 40 ||
@@ -756,6 +1343,61 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     }, mode);
     if (!ok) errors.push(`${label}: falló modo de catálogo ${mode}.`);
     await page.waitForTimeout(80);
+  }
+
+  // Promotions Studio: validar las cuatro mecánicas sin guardar nada.
+  const promoStudio = await page.evaluate(async () => {
+    try {
+      await window.gxPromoLoad?.();
+      window.gxPromoOpenEditor?.();
+
+      const mechanics = [...document.querySelectorAll('[data-gx-promo-mechanic]')]
+        .map(x => x.getAttribute('data-gx-promo-mechanic'));
+
+      window.gxPromoSetMechanic?.('combo');
+      const comboOptions = document.querySelectorAll('[data-gx-promo-service-check]').length;
+
+      window.gxPromoSetMechanic?.('addon');
+      const addonTrigger = document.getElementById('gx-promo-addon-trigger');
+      const addonOptions = document.querySelectorAll('[data-gx-promo-addon-check]').length;
+
+      const lockText = document.querySelector('.gx-promo-acquisition-lock')?.textContent || '';
+      const acquisitionToggle = document.getElementById('gx-promo-acquisition-enabled');
+      if (acquisitionToggle) acquisitionToggle.checked = true;
+      const hasPreview = !!document.getElementById('gx-promo-preview');
+      const editorVisible = document.getElementById('gx-promo-editor')?.hidden === false;
+
+      window.gxPromoCloseEditor?.();
+
+      return {
+        mechanics,
+        comboOptions,
+        addonOptions,
+        hasTrigger: !!addonTrigger,
+        hasPreview,
+        hasAcquisitionToggle: !!acquisitionToggle,
+        acquisitionEnabled: acquisitionToggle?.checked === true,
+        editorVisible,
+        lockText
+      };
+    } catch (error) {
+      return { error: error?.message || String(error) };
+    }
+  });
+
+  if (
+    promoStudio?.error ||
+    !['precio_fijo','porcentaje','combo','addon'].every(x => promoStudio?.mechanics?.includes(x)) ||
+    promoStudio?.comboOptions !== 3 ||
+    promoStudio?.addonOptions !== 3 ||
+    promoStudio?.hasTrigger !== true ||
+    promoStudio?.hasPreview !== true ||
+    promoStudio?.hasAcquisitionToggle !== true ||
+    promoStudio?.acquisitionEnabled !== true ||
+    promoStudio?.editorVisible !== true ||
+    !String(promoStudio?.lockText || '').includes('P3')
+  ) {
+    errors.push(`${label}: Promotions Studio universal no quedó operativo.`);
   }
 
   // Ajustes: recorrer las siete superficies, sin ejecutar acciones persistentes.
