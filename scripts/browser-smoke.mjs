@@ -446,7 +446,9 @@ async function runAyuda(browser, browserName, errors) {
     card.dataset.gxSmokeToken='c7-card';
     window.__gxPromoSmokeCard=card;
   });
-  await page.locator('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"] [data-gx-promo-details]').click({force:true}).catch(()=>{});
+  await page.evaluate(() => {
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"] [data-gx-promo-details]')?.click();
+  });
 
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c7-card"]');
