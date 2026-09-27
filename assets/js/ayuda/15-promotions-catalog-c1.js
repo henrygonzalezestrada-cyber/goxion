@@ -96,7 +96,16 @@
   function promoSubprice(p){
     const periods=Math.max(1,Number(p?.duracion_periodos||1));
     if(p?.mecanica==='porcentaje'){
-      return '
+      return '$'+money(p?.precio_promocional_total??p?.precio_promocional??0)+' · '+periods+' periodo'+(periods===1?'':'s');
+    }
+    return periods+' periodo'+(periods===1?'':'s');
+  }
+
+  function promoDurationLabel(p){
+    const periods=Math.max(1,Number(p?.duracion_periodos||1));
+    return periods+' periodo'+(periods===1?'':'s');
+  }
+
   function statusText(p){
     const acq=p?.adquirida;
     if(acq&&String(acq.estado)==='activa'){
