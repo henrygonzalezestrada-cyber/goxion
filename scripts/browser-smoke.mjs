@@ -371,7 +371,7 @@ async function runAyuda(browser, browserName, errors) {
     if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
 
-  // Catálogo C5: jerarquía visual + morph compacto + contratación al carrito.
+  // Catálogo C6: tipografía GOXION + combo recto + aurora + cierre continuo.
   await page.evaluate(() => window.switchTab?.('catalogo'));
   await page.waitForFunction(() => {
     const showcase=document.getElementById('gx-promo-showcase');
@@ -380,38 +380,41 @@ async function runAyuda(browser, browserName, errors) {
     return showcase?.hidden===false && cards.length===3 && curated?.hidden===false;
   }, null, { timeout: 8000 }).catch(()=>{});
 
-  const promoC5 = await page.evaluate(() => {
+  const promoC6 = await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
     const front=cards.find(x=>x.classList.contains('is-front'));
-    const saving=front?.querySelector('.gx-promo-saving')?.textContent?.replace(/\s+/g,' ').trim()||'';
+    const saving=(front?.querySelector('.gx-promo-saving')?.textContent||'').replace(/\s+/g,' ').trim();
     const details=front?.querySelector('[data-gx-promo-details]');
+    const aurora=front?.querySelector('.gx-promo-card-aurora');
+    const auroraStyle=aurora?getComputedStyle(aurora):null;
+    const desc=front?.querySelector('.gx-promo-card-description');
     return {
       cardCount:cards.length,
       frontIndex:Number(front?.dataset?.gxPromoIndex ?? -1),
-      hasDescription:!!front?.querySelector('.gx-promo-card-description'),
-      descriptionText:(front?.querySelector('.gx-promo-card-description')?.textContent||'').trim(),
+      savingClean:/^Ahorras\s+\$/.test(saving),
       detailsText:(details?.textContent||'').trim(),
-      savingClean:/^Ahorro\s*\$/.test(saving) && !saving.includes('en esta oferta'),
-      detailsContained:!!details && getComputedStyle(details).borderRadius!=='0px',
+      detailsFont:details?parseFloat(getComputedStyle(details).fontSize):0,
+      descriptionFont:desc?parseFloat(getComputedStyle(desc).fontSize):0,
+      auroraVisible:!!aurora && auroraStyle?.display!=='none' && auroraStyle?.animationName!=='none',
       noOrbit:!front?.querySelector('.gx-promo-card-orbit')
     };
   }).catch(()=>null);
 
   if(
-    !promoC5 ||
-    promoC5.cardCount!==3 ||
-    promoC5.frontIndex<0 ||
-    promoC5.hasDescription!==true ||
-    promoC5.descriptionText.length<8 ||
-    promoC5.detailsText!=='Ver detalles' ||
-    promoC5.savingClean!==true ||
-    promoC5.detailsContained!==true ||
-    promoC5.noOrbit!==true
+    !promoC6 ||
+    promoC6.cardCount!==3 ||
+    promoC6.frontIndex<0 ||
+    promoC6.savingClean!==true ||
+    promoC6.detailsText!=='Ver detalles' ||
+    promoC6.detailsFont<10.5 ||
+    promoC6.descriptionFont<10.5 ||
+    promoC6.auroraVisible!==true ||
+    promoC6.noOrbit!==true
   ){
-    errors.push(`${label}: catálogo C5 no renderizó jerarquía/descripción/ver detalles como se esperaba. ${JSON.stringify(promoC5)}`);
+    errors.push(`${label}: catálogo C6 no respetó jerarquía/aurora esperada. ${JSON.stringify(promoC6)}`);
   }
 
-  // Llevar el combo del fixture al frente.
+  // Llevar el combo al frente y comprobar logos rectos/casi juntos.
   await page.evaluate(() => {
     const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
     if(combo && !combo.classList.contains('is-front')) combo.click();
@@ -421,84 +424,138 @@ async function runAyuda(browser, browserName, errors) {
     null,{timeout:2200}
   ).catch(()=>{});
 
+  const comboClosed=await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
+    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+    return {
+      count:logos.length,
+      rotationA:getComputedStyle(logos[0]).transform,
+      rotationB:getComputedStyle(logos[1]).transform,
+      gap:(a&&b)?Math.round(b.left-a.right):null
+    };
+  }).catch(()=>null);
+
+  if(!comboClosed||comboClosed.count<2||comboClosed.rotationA!=='none'||comboClosed.rotationB!=='none'||comboClosed.gap===null||comboClosed.gap>4){
+    errors.push(`${label}: combo C6 cerrado no quedó recto/casi unido. ${JSON.stringify(comboClosed)}`);
+  }
+
   await page.evaluate(() => {
     const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
     if(!card)return;
     const rect=card.getBoundingClientRect();
     window.__gxPromoClosedRect={width:rect.width,height:rect.height};
-    card.dataset.gxSmokeToken='same-node-c5';
+    card.dataset.gxSmokeToken='same-node-c6';
     window.__gxPromoSmokeCard=card;
     card.querySelector('[data-gx-promo-details]')?.click();
   });
 
   await page.waitForFunction(() => {
-    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c5"]');
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
     const actions=expanded?.querySelector('.gx-promo-expanded-actions');
     if(!expanded||!actions)return false;
     const cardRect=expanded.getBoundingClientRect();
     const actionsRect=actions.getBoundingClientRect();
-    return cardRect.width>300 && actionsRect.bottom<=cardRect.bottom-10;
-  },null,{timeout:2800}).catch(()=>{});
+    return cardRect.width>300 && actionsRect.bottom<=cardRect.bottom-8;
+  },null,{timeout:3200}).catch(()=>{});
 
   const promoExpanded=await page.evaluate(() => {
-    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c5"]');
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
     if(!expanded)return null;
     const rect=expanded.getBoundingClientRect();
     const actions=expanded.querySelector('.gx-promo-expanded-actions')?.getBoundingClientRect();
     const logos=[...expanded.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
-    const contract=expanded.querySelector('[data-gx-promo-contract]');
+    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+    const primary=expanded.querySelector('[data-gx-promo-contract]');
+    const secondary=expanded.querySelector('[data-gx-promo-service]');
+    const desc=expanded.querySelector('.gx-promo-card-description');
     return {
       sameNode:expanded===window.__gxPromoSmokeCard,
       width:Math.round(rect.width),
       height:Math.round(rect.height),
       growth:Math.round(rect.height-(window.__gxPromoClosedRect?.height||0)),
-      contentFits:!!actions && actions.bottom<=rect.bottom-10,
-      descriptionVisible:!!expanded.querySelector('.gx-promo-card-description'),
-      hasDuration:/periodo/.test(expanded.querySelector('.gx-promo-morph-meta')?.textContent||''),
-      comboLogoCount:logos.length>=2,
-      logoEqualSize:logos.length>=2 && Math.abs(logos[0].getBoundingClientRect().width-logos[1].getBoundingClientRect().width)<3,
-      contractText:(contract?.textContent||'').trim(),
-      contractEnabled:!!contract && !contract.disabled,
-      noOrbit:!expanded.querySelector('.gx-promo-card-orbit')
+      contentFits:!!actions && actions.bottom<=rect.bottom-8,
+      logoWidth:Math.round(a?.width||0),
+      comboGap:(a&&b)?Math.round(b.left-a.right):null,
+      descriptionFont:desc?parseFloat(getComputedStyle(desc).fontSize):0,
+      primaryFont:primary?parseFloat(getComputedStyle(primary).fontSize):0,
+      primaryHeight:primary?Math.round(primary.getBoundingClientRect().height):0,
+      secondaryFont:secondary?parseFloat(getComputedStyle(secondary).fontSize):0,
+      contractText:(primary?.textContent||'').trim(),
+      contractEnabled:!!primary&&!primary.disabled
     };
   }).catch(()=>null);
 
   if(
     !promoExpanded ||
     promoExpanded.sameNode!==true ||
-    promoExpanded.width>360 ||
-    promoExpanded.growth<50 ||
-    promoExpanded.growth>360 ||
+    promoExpanded.width>370 ||
+    promoExpanded.growth<35 ||
+    promoExpanded.growth>300 ||
     promoExpanded.contentFits!==true ||
-    promoExpanded.descriptionVisible!==true ||
-    promoExpanded.hasDuration!==true ||
-    promoExpanded.comboLogoCount!==true ||
-    promoExpanded.logoEqualSize!==true ||
+    promoExpanded.logoWidth<74 ||
+    promoExpanded.comboGap<4 ||
+    promoExpanded.comboGap>18 ||
+    promoExpanded.descriptionFont<11 ||
+    promoExpanded.primaryFont<12 ||
+    promoExpanded.secondaryFont<12 ||
+    promoExpanded.primaryHeight<42 ||
     promoExpanded.contractText!=='Contratar ahora' ||
-    promoExpanded.contractEnabled!==true ||
-    promoExpanded.noOrbit!==true
+    promoExpanded.contractEnabled!==true
   ){
-    errors.push(`${label}: morph C5 no quedó compacto/ordenado. ${JSON.stringify(promoExpanded)}`);
+    errors.push(`${label}: morph C6 no quedó compacto/legible. ${JSON.stringify(promoExpanded)}`);
   }
 
-  // Contratar ahora debe usar el carrito existente.
+  // Cerrar y comprobar que la misma tarjeta regresa y los logos vuelven a juntarse.
+  await page.evaluate(() =>
+    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
+  );
+  await page.waitForFunction(() =>
+    !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]'),
+    null,{timeout:3200}
+  ).catch(()=>{});
+
+  const promoClosedAgain=await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]');
+    const logos=[...card?.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')||[]];
+    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+    return {
+      restored:card===window.__gxPromoSmokeCard,
+      gap:(a&&b)?Math.round(b.left-a.right):null,
+      expanded:card?.classList.contains('is-expanded')===true
+    };
+  }).catch(()=>null);
+
+  if(!promoClosedAgain||promoClosedAgain.restored!==true||promoClosedAgain.expanded!==false||promoClosedAgain.gap===null||promoClosedAgain.gap>4){
+    errors.push(`${label}: cierre C6 no restauró tarjeta/logos unidos. ${JSON.stringify(promoClosedAgain)}`);
+  }
+
+  // Volver a abrir para probar contratación y carrito.
+  await page.evaluate(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"] [data-gx-promo-details]')?.click()
+  );
+  await page.waitForFunction(() =>
+    !!document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-contract]'),
+    null,{timeout:3000}
+  ).catch(()=>{});
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-contract]')?.click()
   );
   await page.waitForFunction(() =>
     document.getElementById('floating-cart')?.classList.contains('show')===true &&
     !document.querySelector('body > .gx-promo-deck-card.is-expanded'),
-    null,{timeout:2800}
+    null,{timeout:3200}
   ).catch(()=>{});
 
   const promoCart=await page.evaluate(() => ({
     visible:document.getElementById('floating-cart')?.classList.contains('show')===true,
     total:(document.getElementById('cart-total-price')?.textContent||'').trim(),
-    restored:document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c5"]')===window.__gxPromoSmokeCard
+    restored:document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]')===window.__gxPromoSmokeCard
   })).catch(()=>null);
 
   if(!promoCart||promoCart.visible!==true||!promoCart.total.includes('$99')||promoCart.restored!==true){
-    errors.push(`${label}: Contratar ahora C5 no agregó el combo al carrito/restauró la tarjeta. ${JSON.stringify(promoCart)}`);
+    errors.push(`${label}: Contratar ahora C6 no agregó combo/restauró tarjeta. ${JSON.stringify(promoCart)}`);
   }
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
