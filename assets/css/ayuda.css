@@ -12789,3 +12789,31 @@ body.gx-promo-morph-open{overflow:hidden!important}
 
 /* C7.2 · Margen final de acciones */
 .gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{margin-top:5px}
+
+
+/* C7.3 · Ruta de composición segura para Safari/WebKit durante morph */
+.gx-promo-morph-backdrop{
+    background:rgba(2,3,7,.78)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+}
+.gx-promo-morph-open #gx-promo-deck .gx-promo-deck-card{
+    opacity:0!important;
+    filter:none!important;
+}
+.gx-promo-morph-open .gx-promo-card-aurora,
+.gx-promo-morph-open .gx-promo-card-glow,
+.gx-promo-morph-open .gx-promo-deck-card::before{
+    display:none!important;
+    animation:none!important;
+    filter:none!important;
+}
+.gx-promo-deck-card.is-expanded{
+    filter:none!important;
+    box-shadow:0 24px 58px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.13)!important;
+}
+.gx-promo-morph-close{
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    background:rgba(0,0,0,.24)!important;
+}
