@@ -452,7 +452,11 @@ for (const absolute of walk(jsRoot)) {
   if (!ayudaCss.includes('#view-catalogo .gx-catalog-mini-logo')) {
     fail('Ayuda C11: faltan estilos de logo libre en la curaduría.');
   }
-  if (promoCatalog.includes("entry.tag||('Desde   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
+  if (promoCatalog.includes("entry.tag||('Desde $'") ||
+      !promoCatalog.includes("gx-catalog-mini-price")) {
+    fail('Ayuda C11: el mini catálogo puede volver a duplicar Desde $xx.');
+  }
+  if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
     fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
   }
 
