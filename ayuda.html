@@ -400,6 +400,45 @@
 <div id="dash-history"></div>
 </div>
 <div class="view-section" id="view-catalogo">
+<section class="gx-promo-showcase" id="gx-promo-showcase" hidden aria-label="Promociones destacadas">
+<div class="gx-promo-showcase-head">
+<div>
+<span class="gx-promo-kicker">DESTACADO EN GOXION</span>
+<h2>Ofertas que vale la pena mirar</h2>
+<p>Promociones seleccionadas del catálogo, disponibles por tiempo limitado.</p>
+</div>
+<div class="gx-promo-deck-status" id="gx-promo-deck-status" aria-live="polite"></div>
+</div>
+<div class="gx-promo-deck" id="gx-promo-deck" aria-roledescription="carrusel">
+<div class="gx-promo-deck-loading">Preparando promociones…</div>
+</div>
+<div class="gx-promo-deck-controls" id="gx-promo-deck-controls" hidden>
+<button type="button" id="gx-promo-prev" aria-label="Promoción anterior">←</button>
+<div class="gx-promo-dots" id="gx-promo-dots" aria-label="Seleccionar promoción"></div>
+<button type="button" id="gx-promo-next" aria-label="Promoción siguiente">→</button>
+</div>
+</section>
+
+<section class="gx-catalog-curated" id="gx-catalog-curated" hidden>
+<div class="gx-catalog-curated-section">
+<div class="gx-catalog-curated-head">
+<div><span class="gx-promo-kicker">PARA EMPEZAR</span><h3>Lo que más conviene</h3></div>
+<div class="gx-catalog-curated-switch" role="tablist" aria-label="Orden del catálogo">
+<button class="active" data-gx-curated-mode="popular" type="button">Populares</button>
+<button data-gx-curated-mode="saving" type="button">Mayor ahorro</button>
+</div>
+</div>
+<div class="gx-catalog-mini-rail" id="gx-catalog-best-rail"></div>
+</div>
+
+<div class="gx-catalog-curated-section gx-catalog-discover-section">
+<div class="gx-catalog-curated-head">
+<div><span class="gx-promo-kicker">DESCUBRE MÁS</span><h3>Algo diferente para ti</h3></div>
+</div>
+<div class="gx-catalog-mini-rail" id="gx-catalog-discover-rail"></div>
+</div>
+</section>
+
 <div class="gx-catalog-toolbar gx-seek-toolbar">
 <div class="gx-seek" id="gx-seek" data-open="false" data-press="false" data-busy="false">
 <div class="gx-seek-skin">
@@ -417,6 +456,11 @@
 <span>⌕</span>
 <strong>No encontramos coincidencias</strong>
 <small>Prueba con otro nombre o cambia el filtro.</small>
+</div>
+<div class="gx-catalog-all-head" id="gx-catalog-all-head">
+<span class="gx-promo-kicker">CATÁLOGO COMPLETO</span>
+<h3>Explora todas las plataformas</h3>
+<p>Busca una plataforma o abre su tarjeta para ver planes y disponibilidad.</p>
 </div>
 <div class="catalog-grid" id="catalog-container">
 <p style="font-size: 13px; color: var(--text-muted); text-align: center; width: 100%;">Cargando catálogo en vivo...</p>
@@ -767,7 +811,8 @@
      ========================================================= -->
 
 
-<script id="goxion-ui-harmony-production-script" src="./assets/js/ayuda/14-ui-harmony-production-script.js"></script>\n
+<script id="goxion-ui-harmony-production-script" src="./assets/js/ayuda/14-ui-harmony-production-script.js"></script>
+<script id="goxion-promotions-catalog-c1" src="./assets/js/ayuda/15-promotions-catalog-c1.js"></script>\n
 
 </body>
 </html>

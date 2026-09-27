@@ -202,6 +202,41 @@
     return normalizeActionPayload(payload);
   }
 
+  async function acquirePromotion({
+    clienteId,
+    promocionId,
+    periodoInicio = '',
+    origen = 'admin',
+  } = {}) {
+    const cliente_id = String(clienteId || '').trim();
+    const promocion_id = String(promocionId || '').trim();
+    const periodo_inicio = String(periodoInicio || '').trim().slice(0, 7);
+    if (!cliente_id || !promocion_id) throw new Error('Cliente o promoción inválida.');
+    if (periodo_inicio && !/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_inicio)) {
+      throw new Error('Periodo inválido.');
+    }
+    const payload = await invoke('promocion_adquirir', {
+      cliente_id,
+      promocion_id,
+      periodo_inicio: periodo_inicio ? periodo_inicio + '-01' : '',
+      origen: String(origen || 'admin').trim().slice(0, 40) || 'admin',
+    });
+    return normalizeActionPayload(payload);
+  }
+
+  async function cancelPromotionAcquisition({
+    id,
+    motivo = 'Cancelada manualmente',
+  } = {}) {
+    const acquisitionId = String(id || '').trim();
+    if (!acquisitionId) throw new Error('Falta adquisición.');
+    const payload = await invoke('promocion_cancelar_adquisicion', {
+      id: acquisitionId,
+      motivo: String(motivo || 'Cancelada manualmente').trim().slice(0, 240),
+    });
+    return normalizeActionPayload(payload);
+  }
+
   async function assignPromotion({
     clienteServicioId,
     promocionId,
@@ -290,6 +325,8 @@
     savePromotion,
     togglePromotion,
     deletePromotion,
+    acquirePromotion,
+    cancelPromotionAcquisition,
     assignPromotion,
     removePromotionAssignment,
     registerPartialPayment,
