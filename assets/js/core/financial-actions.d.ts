@@ -39,6 +39,7 @@ interface GoxionPromotionInput {
   destacada?: boolean;
   notificar_cliente?: boolean;
   publicada?: boolean;
+  adquisicion_habilitada?: boolean;
   activa?: boolean;
 }
 
