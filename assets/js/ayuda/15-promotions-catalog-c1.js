@@ -424,10 +424,12 @@
       if(index!==state.active){
         state.active=index;
         applyDeckPositions();
-        restartAuto();
-        return;
       }
-      openPromoDetail(selectedPromotions()[index],card);
+      stopAuto();
+      requestAnimationFrame(()=>{
+        const freshCard=deck.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]')||card;
+        openPromoDetail(selectedPromotions()[index],freshCard);
+      });
     },true);
 
     deck.addEventListener('click',event=>{
@@ -588,7 +590,7 @@
     const naturalHeight=Math.ceil(measure.scrollHeight)+6;
     measure.remove();
 
-    const targetHeight=Math.min(maxHeight,Math.max(rect.height+100,Math.min(naturalHeight,540)));
+    const targetHeight=Math.min(maxHeight,Math.max(rect.height+96,Math.min(naturalHeight,552)));
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(24,(window.innerHeight-targetHeight)/2);
 
@@ -673,6 +675,14 @@
       if(state.expandedPlaceholder?.parentNode){
         state.expandedPlaceholder.parentNode.insertBefore(card,state.expandedPlaceholder);
         state.expandedPlaceholder.remove();
+      }else{
+        const deck=$('gx-promo-deck');
+        if(deck){
+          const index=String(card.dataset.gxPromoIndex||'0');
+          const replacement=deck.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]');
+          if(replacement&&replacement!==card) replacement.replaceWith(card);
+          else if(!card.parentNode||card.parentNode===document.body) deck.appendChild(card);
+        }
       }
       state.expandedPlaceholder=null;
 
