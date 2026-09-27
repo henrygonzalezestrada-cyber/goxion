@@ -444,6 +444,8 @@ async function runAyuda(browser, browserName, errors) {
     document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]')?.classList.contains('is-front')===true,
     null,{timeout:2200}
   ).catch(()=>{});
+  // Esperar a que termine la transición del deck antes de guardar la geometría cerrada.
+  await page.waitForTimeout(900);
 
   await page.evaluate(() => {
     const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
@@ -518,7 +520,7 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
   );
-  await page.waitForTimeout(620);
+  await page.waitForTimeout(680);
 
   const midClose=await page.evaluate(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
