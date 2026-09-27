@@ -12129,12 +12129,13 @@ body.gx-promo-morph-open{
 
 
 
+
+
 /* =========================================================
-   GOXION · CATÁLOGO PROMOCIONAL C7 STABLE
-   Una sola retícula · porcentaje estable · morph sin reflow.
+   GOXION · CATÁLOGO PROMOCIONAL C8 FINAL UI
+   Orden: identidad → valor → detalles → acción.
    ========================================================= */
 
-/* ---------- TARJETA CERRADA: MISMA RETÍCULA PARA TODAS ---------- */
 .gx-promo-deck-card{
     height:352px;
     padding:18px 19px;
@@ -12143,8 +12144,7 @@ body.gx-promo-morph-open{
     display:flex;
     flex-direction:column;
 }
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-top{
-    flex:0 0 24px;
+.gx-promo-card-top{
     min-height:24px;
 }
 .gx-promo-card-kind{
@@ -12154,7 +12154,6 @@ body.gx-promo-morph-open{
     font-weight:850;
 }
 .gx-promo-preview-chip{
-    min-height:0;
     padding:0;
     border:0;
     background:transparent;
@@ -12163,27 +12162,23 @@ body.gx-promo-morph-open{
     font-weight:800;
     letter-spacing:.10em;
 }
+
+/* Logos */
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos{
     flex:0 0 70px;
     height:70px;
     margin:12px 0 8px;
 }
-.gx-promo-card-logos .gx-promo-logo-item{
-    object-fit:contain;
-    object-position:center;
-}
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos:not(.is-combo) .gx-promo-logo-item{
     width:60px;
     height:60px;
+    object-fit:contain;
 }
-
-/* Combo cerrado: vuelve al look editorial inclinado/solapado que sí funcionaba. */
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo{
     position:relative;
     display:block;
     width:118px;
     height:70px;
-    overflow:visible;
 }
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-0,
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-1{
@@ -12191,50 +12186,34 @@ body.gx-promo-morph-open{
     width:62px!important;
     height:62px!important;
     margin:0!important;
-    opacity:1!important;
 }
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-0{
-    left:0!important;
-    top:2px!important;
-    transform:rotate(-4deg)!important;
-    z-index:2;
+    left:0!important;top:2px!important;transform:rotate(-4deg)!important;z-index:2;
 }
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-1{
-    left:45px!important;
-    top:9px!important;
-    transform:rotate(3deg)!important;
-    z-index:1;
-}
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-2{
-    position:absolute!important;
-    left:82px!important;
-    top:0!important;
-    width:52px!important;
-    height:52px!important;
-    margin:0!important;
-    transform:rotate(-2deg)!important;
+    left:45px!important;top:9px!important;transform:rotate(3deg)!important;z-index:1;
 }
 
-/* Identidad y descripción tienen una zona fija: ningún tipo de promo empuja al resto. */
+/* Texto */
 .gx-promo-deck-card:not(.is-expanded) .gx-promo-card-copy{
-    flex:0 0 91px;
-    min-height:91px;
-    margin:0;
+    flex:0 0 88px;
+    min-height:88px;
+    max-height:88px;
     overflow:hidden;
 }
 .gx-promo-card-copy .gx-promo-platform-name{
     font-size:23px;
     line-height:1.04;
-    font-weight:850;
-    letter-spacing:-.04em;
+    font-weight:860;
+    letter-spacing:-.035em;
 }
 .gx-promo-offer-title{
     display:-webkit-box;
-    margin-top:6px;
+    margin-top:5px;
     overflow:hidden;
     -webkit-line-clamp:2;
     -webkit-box-orient:vertical;
-    color:rgba(255,255,255,.90);
+    color:rgba(255,255,255,.91);
     font-size:12.5px;
     line-height:1.25;
     font-weight:780;
@@ -12251,57 +12230,51 @@ body.gx-promo-morph-open{
     font-weight:500;
 }
 
-/* Valor ocupa exactamente el mismo alto en precio fijo, combo y porcentaje. */
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-price{
-    flex:0 0 72px;
-    min-height:72px;
-    display:flex;
-    align-items:flex-end;
-    margin:0;
-    padding:4px 0 0;
+/* Valor: pegado al texto, sin aire muerto */
+.gx-promo-value-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:end;
+    gap:12px;
+    min-height:58px;
+    margin-top:6px;
 }
 .gx-promo-price-stack{
     display:flex;
     flex-direction:column;
     align-items:flex-start;
-    justify-content:flex-end;
     gap:3px;
-    min-height:0;
+    min-width:0;
 }
-.gx-promo-card-price b{
+.gx-promo-price-stack b{
     color:#fff;
     font-size:36px;
-    line-height:.92;
+    line-height:.90;
     font-weight:900;
-    letter-spacing:-.05em;
+    letter-spacing:-.045em;
 }
-.gx-mechanic-porcentaje .gx-promo-card-price b{
-    max-width:150px;
+.gx-mechanic-porcentaje .gx-promo-price-stack b{
+    max-width:160px;
     font-size:35px;
 }
-.gx-promo-card-price s{
-    color:rgba(255,255,255,.46);
-    font-size:11px;
+.gx-promo-price-stack s{
+    color:rgba(255,255,255,.56);
+    font-size:13.5px;
     line-height:1;
+    font-weight:430;
+    text-decoration-thickness:.7px;
+    text-underline-offset:2px;
 }
-.gx-promo-current-price{display:none!important}
-
-/* Pie fijo: Ahorras y Ver detalles siempre caen en la misma línea. */
-.gx-promo-card-footer{
-    flex:0 0 40px;
-    min-height:40px;
-    display:grid;
-    grid-template-columns:minmax(0,1fr) auto;
-    align-items:center;
-    gap:12px;
-    margin:0;
+.gx-promo-final-price{
+    display:none;
+    color:rgba(255,255,255,.68);
+    font-size:11px;
+    font-weight:650;
 }
 .gx-promo-saving{
-    min-width:0;
+    align-self:end;
     margin:0;
-    padding:0;
-    border:0;
-    background:transparent;
+    padding:0 0 2px;
     white-space:nowrap;
 }
 .gx-promo-saving>strong{
@@ -12309,79 +12282,90 @@ body.gx-promo-morph-open{
     font-size:13.5px;
     line-height:1;
     font-weight:830;
-    letter-spacing:-.015em;
 }
-.gx-promo-info-hint{
-    position:relative;
-    right:auto;
-    bottom:auto;
-    min-width:94px;
-    min-height:36px;
-    padding:0 12px;
+
+/* Un solo botón */
+.gx-promo-action-zone{
+    display:flex;
+    justify-content:center;
+    align-items:flex-end;
+    margin-top:auto;
+    padding-top:8px;
+}
+.gx-promo-action{
+    min-width:110px;
+    min-height:37px;
+    padding:0 14px;
     border:1px solid rgba(255,255,255,.18);
     border-radius:999px;
     background:rgba(255,255,255,.13);
     color:#fff;
     font:inherit;
     font-size:11px;
-    line-height:1;
-    font-weight:800;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.11),0 6px 16px rgba(0,0,0,.10);
-    backdrop-filter:blur(8px);
-    -webkit-backdrop-filter:blur(8px);
+    font-weight:820;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 6px 16px rgba(0,0,0,.10);
+    transition:
+      min-width .38s cubic-bezier(.18,.82,.2,1),
+      min-height .38s cubic-bezier(.18,.82,.2,1),
+      border-radius .38s cubic-bezier(.18,.82,.2,1),
+      background .28s ease,
+      box-shadow .28s ease,
+      transform .24s ease;
 }
+.gx-promo-action:active{transform:scale(.97)}
 
-/* ---------- AURORA VIVA: VISIBLE, LIGERA Y SEGURA EN SAFARI ---------- */
-.gx-promo-deck-card::after{
-    display:none!important;
-    animation:none!important;
-}
-.gx-promo-card-aurora{
-    position:absolute;
-    z-index:0;
-    inset:-8%;
-    pointer-events:none;
-    border-radius:34%;
-    background:
-      radial-gradient(ellipse at 24% 28%,rgba(255,255,255,.18) 0%,rgba(255,255,255,.06) 24%,transparent 48%),
-      radial-gradient(ellipse at 78% 72%,color-mix(in srgb,var(--gx-brand-accent) 48%,transparent) 0%,transparent 52%);
-    opacity:.34;
-    transform:translate3d(-6%,-4%,0) scale(.96);
-    animation:gxPromoC7Aurora 5.4s ease-in-out infinite alternate;
-    will-change:transform,opacity;
-}
-.gx-promo-deck-card:not(.is-front):not(.is-expanded) .gx-promo-card-aurora{
-    opacity:.10;
-    animation-play-state:paused;
-}
-.gx-promo-deck-card.is-front .gx-promo-card-aurora{
-    opacity:.52;
-}
+/* Efecto sustituto: respiración perimetral */
+.gx-promo-card-aurora,
 .gx-promo-card-glow{
+    display:none!important;
+}
+.gx-promo-deck-card::after{
+    display:block!important;
+    content:"";
+    position:absolute;
+    inset:1px;
+    z-index:6;
+    pointer-events:none;
+    border:1px solid color-mix(in srgb,var(--gx-brand-accent) 34%,rgba(255,255,255,.18));
+    border-radius:inherit;
     opacity:.18;
-    filter:blur(30px);
-    animation:gxPromoC7Glow 5.8s ease-in-out infinite alternate;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.10),
+      0 0 0 rgba(0,0,0,0);
 }
-.gx-promo-deck-card.is-front .gx-promo-card-glow{opacity:.25}
+.gx-promo-deck-card.is-front::after{
+    animation:gxPromoEdgeBreath 4.8s ease-in-out infinite alternate;
+}
+@keyframes gxPromoEdgeBreath{
+    0%{
+        opacity:.22;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.10),0 0 8px color-mix(in srgb,var(--gx-brand-accent) 8%,transparent);
+    }
+    100%{
+        opacity:.62;
+        box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 20px color-mix(in srgb,var(--gx-brand-accent) 24%,transparent);
+    }
+}
 
-@keyframes gxPromoC7Aurora{
-    0%{transform:translate3d(-7%,-4%,0) scale(.95);opacity:.30}
-    50%{transform:translate3d(1%,5%,0) scale(1.02);opacity:.50}
-    100%{transform:translate3d(8%,-1%,0) scale(1.07);opacity:.38}
-}
-@keyframes gxPromoC7Glow{
-    0%{transform:translate3d(-3%,2%,0) scale(.94);opacity:.16}
-    100%{transform:translate3d(4%,-3%,0) scale(1.08);opacity:.27}
-}
-
-/* ---------- EXPANDIDO: RETÍCULA SIMPLE, SIN ELEMENTOS FLOTANDO ---------- */
+/* Morph */
 html.gx-promo-morph-open,
 body.gx-promo-morph-open{overflow:hidden!important}
 
 .gx-promo-morph-placeholder{
-    flex:0 0 auto;
     visibility:hidden;
     pointer-events:none;
+}
+.gx-promo-morph-backdrop{
+    background:rgba(2,3,7,.78)!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+}
+.gx-promo-morph-open #gx-promo-deck .gx-promo-deck-card{
+    opacity:0!important;
+    filter:none!important;
+}
+.gx-promo-morph-open .gx-promo-deck-card::after{
+    animation-play-state:paused!important;
 }
 
 .gx-promo-deck-card.is-expanded{
@@ -12389,244 +12373,186 @@ body.gx-promo-morph-open{overflow:hidden!important}
     flex-direction:column;
     padding:18px 20px 17px;
     overflow:hidden!important;
-    overscroll-behavior:none;
     touch-action:none;
     border-radius:29px;
+    filter:none!important;
+    box-shadow:0 24px 58px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.13)!important;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-card-top{
-    flex:0 0 25px;
     min-height:25px;
     padding-right:42px;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-card-logos{
-    flex:0 0 92px;
-    height:92px;
-    margin:12px 0 8px;
+    flex:0 0 90px;
+    height:90px;
+    margin:11px 0 8px;
     display:flex;
     align-items:center;
     justify-content:center;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-card-logos:not(.is-combo) .gx-promo-logo-item{
-    width:88px;
-    height:88px;
+    width:86px;
+    height:86px;
 }
-
-/* Combo expandido: recto, separado sin exagerar. */
 .gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo{
     width:100%;
-    height:92px;
-    overflow:visible;
+    height:90px;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-0,
-.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1,
-.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-2{
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
     position:relative!important;
     left:auto!important;
     top:auto!important;
-    transform:none!important;
-    margin:0!important;
-    opacity:1!important;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-0,
-.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
     width:80px!important;
     height:80px!important;
+    margin:0!important;
+    transform:none!important;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
-    margin-left:9px!important;
+    margin-left:10px!important;
 }
-.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-2{
-    width:68px!important;
-    height:68px!important;
-    margin-left:8px!important;
-}
-
 .gx-promo-deck-card.is-expanded .gx-promo-card-copy{
     flex:0 0 auto;
     min-height:0;
-    margin:0;
+    max-height:118px;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-platform-name{
     font-size:26px;
-    line-height:1.04;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-offer-title{
-    margin-top:5px;
     font-size:13px;
-    -webkit-line-clamp:2;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-card-description{
-    margin-top:6px;
-    -webkit-line-clamp:2;
     font-size:11.5px;
     line-height:1.42;
 }
-
-.gx-promo-deck-card.is-expanded .gx-promo-card-price{
-    flex:0 0 64px;
-    min-height:64px;
-    display:flex;
-    align-items:flex-end;
-    margin:0;
-    padding-top:5px;
+.gx-promo-deck-card.is-expanded .gx-promo-value-row{
+    min-height:60px;
+    margin-top:7px;
 }
-.gx-promo-deck-card.is-expanded .gx-promo-card-price b{
+.gx-promo-deck-card.is-expanded .gx-promo-price-stack b{
     font-size:39px;
 }
-.gx-promo-deck-card.is-expanded .gx-promo-card-footer{
-    flex:0 0 30px;
-    min-height:30px;
-    margin:0;
+.gx-promo-deck-card.is-expanded .gx-promo-price-stack s{
+    font-size:14.5px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-final-price{
+    display:block;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-saving>strong{
     font-size:14.5px;
 }
-.gx-promo-deck-card.is-expanded .gx-promo-info-hint{
-    visibility:hidden;
-    opacity:0;
-    pointer-events:none;
-}
 
-/* Resumen secundario: una sola fila visual, sin cápsulas. */
+/* Detalles claramente seccionados */
 .gx-promo-morph-detail{
-    flex:1 1 auto;
-    min-height:0;
     max-height:0;
     overflow:hidden;
     opacity:0;
-    transform:translateY(8px);
+    transform:translateY(7px);
     pointer-events:none;
-    transition:max-height .28s cubic-bezier(.2,.8,.2,1),opacity .20s ease,transform .28s ease;
+    transition:max-height .28s cubic-bezier(.2,.8,.2,1),opacity .18s ease,transform .28s ease;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-morph-detail{
-    max-height:190px;
-    margin-top:7px;
+    max-height:170px;
+    margin-top:8px;
     opacity:1;
     transform:translateY(0);
     pointer-events:auto;
 }
-.gx-promo-detail-summary{
-    display:flex;
-    align-items:flex-start;
-    gap:14px;
-    padding-top:9px;
-    border-top:1px solid rgba(255,255,255,.11);
+.gx-promo-detail-section{
+    padding-top:8px;
+    border-top:1px solid rgba(255,255,255,.10);
 }
-.gx-promo-summary-item{
-    min-width:0;
+.gx-promo-detail-section+.gx-promo-detail-section{
+    margin-top:8px;
+}
+.gx-promo-detail-kicker{
+    display:block;
+    margin-bottom:6px;
+    color:rgba(255,255,255,.50);
+    font-size:9.5px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+.gx-promo-detail-facts{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+}
+.gx-promo-detail-facts>div{
     display:flex;
     flex-direction:column;
     gap:2px;
 }
-.gx-promo-summary-item>span{
-    color:rgba(255,255,255,.55);
+.gx-promo-detail-facts span{
+    color:rgba(255,255,255,.58);
     font-size:10px;
-    line-height:1.15;
 }
-.gx-promo-summary-item>strong{
+.gx-promo-detail-facts strong{
     color:#fff;
     font-size:11.5px;
-    line-height:1.25;
     font-weight:800;
 }
-.gx-promo-summary-status{
-    margin-left:auto;
-    text-align:right;
-}
-.gx-promo-summary-status>strong{
-    max-width:135px;
-    color:rgba(255,255,255,.80);
-    font-size:10.5px;
-}
-
 .gx-promo-deck-card.is-expanded .gx-promo-detail-items{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
     gap:7px;
-    margin-top:9px;
+    margin:0;
     border:0;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-detail-item{
-    min-height:43px;
+    min-height:39px;
     display:grid;
-    grid-template-columns:28px minmax(0,1fr);
-    grid-template-areas:
-      "logo copy"
-      "logo price";
+    grid-template-columns:26px minmax(0,1fr);
+    grid-template-areas:"logo copy" "logo price";
     column-gap:7px;
     row-gap:1px;
-    padding:6px 8px;
+    padding:5px 7px;
     border:1px solid rgba(255,255,255,.08);
-    border-radius:11px;
-    background:rgba(0,0,0,.08);
+    border-radius:10px;
+    background:rgba(0,0,0,.07);
 }
 .gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
     grid-area:logo;
     align-self:center;
-    width:27px;
-    height:27px;
+    width:25px;
+    height:25px;
     padding:0;
 }
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item>span{
-    grid-area:copy;
-    align-self:end;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{
-    font-size:11px;
-    font-weight:780;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item small{
-    margin-top:1px;
-    font-size:9.5px;
-}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item>span{grid-area:copy}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{font-size:10.5px}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item small{font-size:9.5px}
 .gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{
     grid-area:price;
     justify-self:start;
-    color:rgba(255,255,255,.70);
-    font-size:10.5px;
+    color:rgba(255,255,255,.68);
+    font-size:10px;
 }
 
-.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:8px;
-    margin-top:9px;
+/* El mismo botón se transforma */
+.gx-promo-deck-card.is-expanded .gx-promo-action-zone{
+    padding-top:8px;
 }
-.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions button{
+.gx-promo-action.is-contract{
+    min-width:182px;
     min-height:44px;
-    border-radius:13px;
-    font-size:12.5px;
-    font-weight:800;
-}
-
-/* CTA principal conserva vida, pero sin barridos ni filtros pesados. */
-.gx-promo-detail-primary{
-    position:relative;
-    border:1px solid rgba(255,255,255,.22)!important;
+    border-radius:14px;
+    border-color:rgba(255,255,255,.22);
     background:linear-gradient(135deg,
       color-mix(in srgb,var(--gx-brand-accent) 72%,#fff 28%),
-      color-mix(in srgb,var(--gx-brand) 88%,#0b0d12 12%))!important;
-    color:#fff!important;
+      color-mix(in srgb,var(--gx-brand) 88%,#0b0d12 12%));
+    font-size:12.5px;
     box-shadow:0 9px 24px color-mix(in srgb,var(--gx-brand-accent) 19%,transparent),inset 0 1px 0 rgba(255,255,255,.16);
-    animation:gxPromoC7Cta 3.4s ease-in-out infinite alternate;
 }
-.gx-promo-detail-secondary{
-    border:1px solid rgba(255,255,255,.12)!important;
-    background:rgba(0,0,0,.10)!important;
-    color:rgba(255,255,255,.90)!important;
-}
-@keyframes gxPromoC7Cta{
-    0%{box-shadow:0 7px 18px color-mix(in srgb,var(--gx-brand-accent) 12%,transparent),inset 0 1px 0 rgba(255,255,255,.14)}
-    100%{box-shadow:0 11px 28px color-mix(in srgb,var(--gx-brand-accent) 26%,transparent),inset 0 1px 0 rgba(255,255,255,.20)}
-}
+.gx-promo-action.is-contract:disabled{opacity:.46}
 
-/* ---------- CIERRE EN DOS FASES: SIN RE-DIBUJAR EL HERO ---------- */
+/* Cierre sincronizado: no queda hueco al centro */
 .gx-promo-deck-card.is-closing .gx-promo-morph-detail{
     max-height:0!important;
     margin-top:0!important;
     opacity:0!important;
-    transform:translateY(7px)!important;
-    pointer-events:none!important;
+    transform:translateY(6px)!important;
 }
 .gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos{
     flex-basis:70px;
@@ -12637,7 +12563,6 @@ body.gx-promo-morph-open{overflow:hidden!important}
     width:60px;
     height:60px;
 }
-/* Los combos vuelven a juntarse/inclinarse durante la contracción. */
 .gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo{
     position:relative;
     display:block;
@@ -12653,48 +12578,45 @@ body.gx-promo-morph-open{overflow:hidden!important}
     margin:0!important;
 }
 .gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo .gx-logo-pos-0{
-    left:0!important;
-    top:2px!important;
-    transform:rotate(-4deg)!important;
+    left:0!important;top:2px!important;transform:rotate(-4deg)!important;
 }
 .gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo .gx-logo-pos-1{
-    left:45px!important;
-    top:9px!important;
-    transform:rotate(3deg)!important;
+    left:45px!important;top:9px!important;transform:rotate(3deg)!important;
+}
+.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-copy{
+    flex-basis:88px;
+    min-height:88px;
+    max-height:88px;
+    overflow:hidden;
 }
 .gx-promo-deck-card.is-expanded.is-returning .gx-promo-platform-name{font-size:23px}
 .gx-promo-deck-card.is-expanded.is-returning .gx-promo-offer-title{font-size:12.5px}
 .gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-description{font-size:11px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-price{flex-basis:72px;min-height:72px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-price b{font-size:36px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-footer{flex-basis:40px;min-height:40px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-info-hint{
-    visibility:visible;
-    opacity:1;
-    pointer-events:none;
-}
+.gx-promo-deck-card.is-expanded.is-returning .gx-promo-value-row{min-height:58px;margin-top:6px}
+.gx-promo-deck-card.is-expanded.is-returning .gx-promo-price-stack b{font-size:36px}
+.gx-promo-deck-card.is-expanded.is-returning .gx-promo-price-stack s{font-size:13.5px}
+.gx-promo-deck-card.is-expanded.is-returning .gx-promo-final-price{display:none}
+.gx-promo-deck-card.is-expanded.is-returning .gx-promo-saving>strong{font-size:13.5px}
 
-/* Transiciones internas acompañan al rectángulo. */
 .gx-promo-card-logos,
 .gx-promo-card-logos .gx-promo-logo-item,
+.gx-promo-card-copy,
 .gx-promo-platform-name,
 .gx-promo-offer-title,
 .gx-promo-card-description,
-.gx-promo-card-price,
-.gx-promo-card-price b,
-.gx-promo-card-footer,
-.gx-promo-info-hint{
+.gx-promo-value-row,
+.gx-promo-price-stack b,
+.gx-promo-price-stack s{
     transition:
-      width .42s cubic-bezier(.18,.82,.2,1),
-      height .42s cubic-bezier(.18,.82,.2,1),
-      flex-basis .42s cubic-bezier(.18,.82,.2,1),
-      margin .42s cubic-bezier(.18,.82,.2,1),
-      font-size .36s cubic-bezier(.18,.82,.2,1),
-      opacity .22s ease,
-      transform .42s cubic-bezier(.18,.82,.2,1);
+      width .40s cubic-bezier(.18,.82,.2,1),
+      height .40s cubic-bezier(.18,.82,.2,1),
+      flex-basis .40s cubic-bezier(.18,.82,.2,1),
+      min-height .40s cubic-bezier(.18,.82,.2,1),
+      max-height .40s cubic-bezier(.18,.82,.2,1),
+      margin .40s cubic-bezier(.18,.82,.2,1),
+      font-size .34s cubic-bezier(.18,.82,.2,1),
+      transform .40s cubic-bezier(.18,.82,.2,1);
 }
-
-/* La tarjeta misma hace el morph; no hay salto de layout. */
 .gx-promo-deck-card{
     transition:
       top .46s cubic-bezier(.18,.82,.2,1),
@@ -12702,118 +12624,33 @@ body.gx-promo-morph-open{overflow:hidden!important}
       width .46s cubic-bezier(.18,.82,.2,1),
       height .46s cubic-bezier(.18,.82,.2,1),
       border-radius .42s cubic-bezier(.18,.82,.2,1),
-      opacity .32s ease,
-      filter .32s ease,
+      opacity .30s ease,
       box-shadow .42s ease,
       transform .82s cubic-bezier(.22,.72,.16,1);
 }
-
-/* Evitar carga gráfica innecesaria durante morph; la aurora vuelve al cerrar. */
-.gx-promo-morph-open .gx-promo-card-aurora,
-.gx-promo-morph-open .gx-promo-card-glow{
-    animation-play-state:paused!important;
-}
-
-/* Botón cerrar consistente. */
 .gx-promo-morph-close{
     width:36px;
     height:36px;
     font-size:18px;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+    background:rgba(0,0,0,.24)!important;
 }
 
-/* iPhone angosto: mantener legibilidad y dos servicios lado a lado. */
 @media(max-width:390px){
     .gx-promo-deck-card{height:348px;padding:17px 18px}
     .gx-promo-card-copy .gx-promo-platform-name{font-size:22px}
     .gx-promo-offer-title{font-size:12px}
     .gx-promo-card-description{font-size:10.8px}
-    .gx-promo-card-price b{font-size:34px}
-    .gx-mechanic-porcentaje .gx-promo-card-price b{font-size:33px}
+    .gx-promo-price-stack b{font-size:34px}
+    .gx-mechanic-porcentaje .gx-promo-price-stack b{font-size:33px}
+    .gx-promo-price-stack s{font-size:13px}
     .gx-promo-saving>strong{font-size:13px}
-    .gx-promo-info-hint{min-width:90px;min-height:35px;font-size:10.8px}
-
-    .gx-promo-deck-card.is-expanded{padding:17px 18px 16px}
+    .gx-promo-action{font-size:10.8px}
     .gx-promo-deck-card.is-expanded .gx-promo-platform-name{font-size:25px}
     .gx-promo-deck-card.is-expanded .gx-promo-card-description{font-size:11px}
-    .gx-promo-deck-card.is-expanded .gx-promo-expanded-actions button{min-height:42px;font-size:12px}
 }
 
 @media(prefers-reduced-motion:reduce){
-    .gx-promo-card-aurora,
-    .gx-promo-card-glow,
-    .gx-promo-detail-primary{
-        animation:none!important;
-    }
-}
-
-
-/* C7.1 · Compactación final del detalle expandido */
-.gx-promo-deck-card.is-expanded .gx-promo-morph-detail{
-    max-height:166px;
-    margin-top:5px;
-}
-.gx-promo-detail-summary{
-    gap:11px;
-    padding-top:6px;
-}
-.gx-promo-summary-item>span{font-size:9.5px}
-.gx-promo-summary-item>strong{font-size:11px}
-.gx-promo-summary-status>strong{
-    max-width:125px;
-    font-size:10px;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-items{
-    gap:6px;
-    margin-top:6px;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item{
-    min-height:37px;
-    padding:5px 7px;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
-    width:25px;
-    height:25px;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{font-size:10.5px}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item small{font-size:9px}
-.gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{font-size:10px}
-.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{
-    gap:7px;
-    margin-top:7px;
-}
-.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions button{
-    min-height:40px;
-    font-size:12px;
-}
-
-
-/* C7.2 · Margen final de acciones */
-.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{margin-top:5px}
-
-
-/* C7.3 · Ruta de composición segura para Safari/WebKit durante morph */
-.gx-promo-morph-backdrop{
-    background:rgba(2,3,7,.78)!important;
-    backdrop-filter:none!important;
-    -webkit-backdrop-filter:none!important;
-}
-.gx-promo-morph-open #gx-promo-deck .gx-promo-deck-card{
-    opacity:0!important;
-    filter:none!important;
-}
-.gx-promo-morph-open .gx-promo-card-aurora,
-.gx-promo-morph-open .gx-promo-card-glow,
-.gx-promo-morph-open .gx-promo-deck-card::before{
-    display:none!important;
-    animation:none!important;
-    filter:none!important;
-}
-.gx-promo-deck-card.is-expanded{
-    filter:none!important;
-    box-shadow:0 24px 58px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.13)!important;
-}
-.gx-promo-morph-close{
-    backdrop-filter:none!important;
-    -webkit-backdrop-filter:none!important;
-    background:rgba(0,0,0,.24)!important;
+    .gx-promo-deck-card.is-front::after{animation:none!important}
 }
