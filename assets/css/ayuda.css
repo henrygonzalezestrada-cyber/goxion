@@ -13138,3 +13138,93 @@ body.gx-promo-morph-open{
         align-self:center;
     }
 }
+
+
+/* C6.2 · Ajuste final de densidad sin sacrificar legibilidad */
+.gx-promo-deck-card.is-expanded{
+    padding:17px 19px 17px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos{
+    height:86px;
+    margin:11px 0 9px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos .gx-promo-logo-item{
+    width:82px;
+    height:82px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo{
+    height:86px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-platform-name{
+    font-size:27px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-description{
+    margin-top:6px;
+    font-size:11.5px;
+    line-height:1.42;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-price{
+    margin-top:8px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-price b{
+    font-size:38px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-footer{
+    min-height:36px;
+    margin-top:6px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-morph-detail{
+    margin-top:7px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-morph-meta,
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-status{
+    padding-top:7px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-items{
+    margin-top:7px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+    min-height:40px;
+    padding:6px 8px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{
+    margin-top:8px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions button{
+    min-height:44px;
+}
+
+/* Incluso en iPhone angosto, dos servicios caben como pareja compacta. */
+@media(max-width:360px){
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-items{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:6px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+        min-height:40px;
+        grid-template-columns:25px minmax(0,1fr);
+        grid-template-areas:
+          "logo copy"
+          "logo price";
+        column-gap:6px;
+        padding:5px 6px;
+        border:1px solid rgba(255,255,255,.075);
+        border-radius:11px;
+        background:rgba(0,0,0,.07);
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
+        width:24px;
+        height:24px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{
+        font-size:10.5px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item small{
+        font-size:9.5px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{
+        justify-self:start;
+        align-self:start;
+        font-size:10px;
+    }
+}
