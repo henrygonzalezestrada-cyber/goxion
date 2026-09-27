@@ -401,6 +401,199 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Ayuda C1: promotional catalog stays isolated in its own presentation controller.
+{
+  const ayudaHtmlPath = join(ROOT, 'ayuda.html');
+  const promoCatalogPath = join(ROOT, 'assets', 'js', 'ayuda', '15-promotions-catalog-c1.js');
+  const ayudaCssPath = join(ROOT, 'assets', 'css', 'ayuda.css');
+  const catalogOrdersPath = join(ROOT, 'assets', 'js', 'ayuda', '01f-catalog-orders.js');
+  const ayudaHtml = existsSync(ayudaHtmlPath) ? readFileSync(ayudaHtmlPath, 'utf8') : '';
+  const promoCatalog = existsSync(promoCatalogPath) ? readFileSync(promoCatalogPath, 'utf8') : '';
+  const ayudaCss = existsSync(ayudaCssPath) ? readFileSync(ayudaCssPath, 'utf8') : '';
+  const catalogOrders = existsSync(catalogOrdersPath) ? readFileSync(catalogOrdersPath, 'utf8') : '';
+
+  if (!existsSync(promoCatalogPath)) fail('Ayuda C1: falta controlador de catálogo promocional.');
+  if (!ayudaHtml.includes('id="gx-promo-showcase"')) fail('Ayuda C1: falta deck promocional.');
+  if (!ayudaHtml.includes('id="gx-catalog-curated"')) fail('Ayuda C1: falta curaduría del catálogo.');
+  if (!ayudaHtml.includes('./assets/js/ayuda/15-promotions-catalog-c1.js')) fail('Ayuda C1: controlador no está cargado.');
+  if (!promoCatalog.includes("GXCORE.endpoint('promociones-catalogo')")) fail('Ayuda C1: promociones no consumen el endpoint dedicado.');
+  if (!promoCatalog.includes('gx-promo-deck-card')) fail('Ayuda C1: falta deck interactivo.');
+  if (!promoCatalog.includes('gx-promo-morph-detail')) fail('Ayuda C9: falta contenido interno del morph.');
+  if (!promoCatalog.includes('document.body.appendChild(card)') || !promoCatalog.includes('expandedPlaceholder')) {
+    fail('Ayuda C9: el morph debe reutilizar la misma tarjeta.');
+  }
+  if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C9: las órbitas no deben existir en el hero.');
+  if (!promoCatalog.includes('gx-promo-value-stack')) fail('Ayuda C9: falta bloque de valor vertical.');
+  if (!promoCatalog.includes('gx-promo-old-price')) fail('Ayuda C9: falta precio anterior separado.');
+  if (!promoCatalog.includes('Ahorras $')) fail('Ayuda C9: el ahorro debe expresarse como Ahorras $X.');
+  if (!promoCatalog.includes('data-gx-promo-action')) fail('Ayuda C9: falta CTA único morfable.');
+  if (!promoCatalog.includes('setPromoActionState')) fail('Ayuda C9: falta transición Ver detalles → Contratar ahora.');
+  if (promoCatalog.includes('Ver en catálogo')) fail('Ayuda C9: persiste el segundo botón descartado.');
+  if (!promoCatalog.includes('detail.scrollTop=0')) fail('Ayuda C9: el detalle scrollable debe reiniciarse antes de abrir/cerrar.');
+  if (!promoCatalog.includes('Fase 2: la tarjeta adopta el layout cerrado REAL mientras sigue fija y grande')) {
+    fail('Ayuda C9: el cierre no prepara el layout cerrado real antes de contraer.');
+  }
+  if (!promoCatalog.includes('GOXION_CATALOG_CART')) fail('Ayuda C9: Contratar ahora no usa el carrito estable.');
+  if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) fail('Ayuda C9: falta puente estable del carrito.');
+  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C9 POLISH')) fail('Ayuda C9: faltan estilos finales.');
+  if (!ayudaCss.includes('white-space:nowrap') || !ayudaCss.includes('gxPromoC9EdgeTrace')) {
+    fail('Ayuda C9: faltan regla atómica de porcentaje o efecto premium visible.');
+  }
+  if (ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C8 FINAL UI')) fail('Ayuda C9: persiste capa C8 final.');
+  if (!ayudaCss.includes('GOXION · C11 CATÁLOGO GLASS HARMONY')) {
+    fail('Ayuda C11: falta armonización glass del catálogo.');
+  }
+  if (!ayudaCss.includes('#view-catalogo .gx-catalog-mini-card') ||
+      !ayudaCss.includes('background:var(--card-glass)') ||
+      !ayudaCss.includes('backdrop-filter:blur(10px)')) {
+    fail('Ayuda C11: la curaduría no reutiliza los parámetros glass existentes.');
+  }
+  if (!ayudaCss.includes('#view-catalogo .gx-catalog-mini-logo')) {
+    fail('Ayuda C11: faltan estilos de logo libre en la curaduría.');
+  }
+  if (promoCatalog.includes("entry.tag||('Desde $'") ||
+      !promoCatalog.includes("gx-catalog-mini-price")) {
+    fail('Ayuda C11: el mini catálogo puede volver a duplicar Desde $xx.');
+  }
+  if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
+    fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
+  }
+
+  // C12: las etiquetas de Admin alimentan curaduría, no decoran el catálogo completo.
+  if (catalogOrders.includes('animated-etiqueta') || catalogOrders.includes('has-promo')) {
+    fail('Ayuda C12: catálogo completo volvió a usar etiquetas comerciales.');
+  }
+  if (catalogOrders.includes('score += 2')) {
+    fail('Ayuda C12: una etiqueta volvió a alterar genéricamente el recommendation score.');
+  }
+  if (!catalogOrders.includes('const cardPromoClass = "";') || !catalogOrders.includes('const badgeHtml = "";')) {
+    fail('Ayuda C12: el catálogo neutral perdió su separación de presentación.');
+  }
+  if (!promoCatalog.includes("const tagPopular=") ||
+      !promoCatalog.includes("const tagSaving=") ||
+      !promoCatalog.includes("const tagNew=") ||
+      !promoCatalog.includes("const newEntries=") ||
+      !promoCatalog.includes(".filter(x=>x.isNew)") ||
+      !promoCatalog.includes("is-popular-featured") ||
+      !promoCatalog.includes("is-saving-soft")) {
+    fail('Ayuda C12: falta la lógica de curaduría Popular/Ahorro/Nuevo.');
+  }
+  if (!ayudaCss.includes('GOXION · C12 CURATED HIERARCHY')) {
+    fail('Ayuda C12: faltan estilos de jerarquía de movimiento.');
+  }
+
+  // C13: el preview pertenece sólo al carrusel; curaduría usa señales reales.
+  if (!promoCatalog.includes('function realPromotions()') ||
+      !promoCatalog.includes("p?.gx_preview!==true") ||
+      !promoCatalog.includes("!String(p?.id||'').startsWith('preview-')")) {
+    fail('Ayuda C13: preview volvió a contaminar Mayor ahorro.');
+  }
+  if (!promoCatalog.includes('.filter(x=>x.isPopular)') ||
+      !promoCatalog.includes('.filter(x=>brandPromoSaving(x)>0||x.isSaving)')) {
+    fail('Ayuda C13: Populares/Ahorro dejaron de ser curaduría estricta.');
+  }
+  if (!promoCatalog.includes('gx-catalog-mini-meta-line')) {
+    fail('Ayuda C13: etiqueta no está separada entre nombre y precio.');
+  }
+  if (!ayudaCss.includes('GOXION · C13 CURATION SYNC') ||
+      !ayudaCss.includes('#ff3366') ||
+      !ayudaCss.includes('#ffaa00') ||
+      !ayudaCss.includes('#00ff9d') ||
+      !ayudaCss.includes('#00f2fe')) {
+    fail('Ayuda C13: se perdió el lenguaje original Popular/Ahorro/Nuevo.');
+  }
+
+  // C14: portada pública completa; Mi Espacio personaliza sólo con sesión real.
+  if (!catalogOrders.includes('window.__GOXION_CATALOG_SESSION') ||
+      !catalogOrders.includes("authenticated: gxCatalogClient.authenticated === true")) {
+    fail('Ayuda C14: falta separación explícita público/personalizado.');
+  }
+  if (!promoCatalog.includes('function catalogIsPersonalized()') ||
+      !promoCatalog.includes('function curatedPool(entries)') ||
+      !promoCatalog.includes('entries.slice()') ||
+      !promoCatalog.includes('entries.filter(x=>x.available&&!x.owned)')) {
+    fail('Ayuda C14: la curaduría no distingue portada pública de Mi Espacio.');
+  }
+  if (!promoCatalog.includes("section.dataset.gxCatalogMode=personalized?'personalized':'public'")) {
+    fail('Ayuda C14: falta estado observable de curaduría.');
+  }
+  if (!promoCatalog.includes('<div class="gx-catalog-mini-price"><span>Desde</span><b>')) {
+    fail('Ayuda C14: el precio compacto no usa jerarquía Desde/monto.');
+  }
+  if (!ayudaCss.includes('GOXION · C14 PUBLIC / PERSONALIZED CATALOG') ||
+      !ayudaCss.includes('grid-template-columns:40px minmax(0,1fr) 48px')) {
+    fail('Ayuda C14: faltan escala compacta o ritmo espacial.');
+  }
+
+  // C15: la mini tarjeta Popular reutiliza el efecto histórico, sin inventar otro.
+  if (!ayudaCss.includes('GOXION · C15 MINI CARDS ALIGNMENT') ||
+      !ayudaCss.includes('animation:rotateLight 3.5s linear infinite!important') ||
+      !ayudaCss.includes('background:conic-gradient(')) {
+    fail('Ayuda C15: no reutiliza rotateLight histórico.');
+  }
+  if (!ayudaCss.includes('grid-template-columns:40px minmax(0,1fr) 48px 8px') ||
+      !ayudaCss.includes('grid-template-rows:14px 18px') ||
+      !ayudaCss.includes('grid-template-rows:12px 22px')) {
+    fail('Ayuda C15: falta la retícula fija de alineación interna.');
+  }
+  if (!ayudaCss.includes('grid-auto-columns:calc((100% - var(--gx-mini-gap))/2)')) {
+    fail('Ayuda C15: las mini tarjetas no ocupan dos columnas equilibradas.');
+  }
+
+  const allHeadAt = ayudaHtml.indexOf('id="gx-catalog-all-head"');
+  const toolbarAt = ayudaHtml.indexOf('class="gx-catalog-toolbar gx-seek-toolbar"');
+  const catalogGridAt = ayudaHtml.indexOf('id="catalog-container"');
+  if (allHeadAt < 0 || toolbarAt < 0 || catalogGridAt < 0 || !(allHeadAt < toolbarAt && toolbarAt < catalogGridAt)) {
+    fail('Ayuda C14: búsqueda/filtros no pertenecen visualmente al Catálogo completo.');
+  }
+}
+
+// Promotions Studio v2 + P3: universal campaign builder with immutable acquisition gateway.
+{
+  const adminHtmlPath = join(ROOT, 'admin.html');
+  const studioPath = join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js');
+  const adminHtml = existsSync(adminHtmlPath) ? readFileSync(adminHtmlPath, 'utf8') : '';
+  const studio = existsSync(studioPath) ? readFileSync(studioPath, 'utf8') : '';
+
+  if (!existsSync(studioPath)) {
+    fail('Promotions Studio: falta el controlador v2.');
+  }
+
+  const legacyPromoAt = adminHtml.indexOf('./assets/js/admin/25-admin-beta-19-controller.js');
+  const studioAt = adminHtml.indexOf('./assets/js/admin/29-promotions-studio-v2.js');
+  if (legacyPromoAt < 0 || studioAt < 0 || studioAt <= legacyPromoAt) {
+    fail('Promotions Studio: el controlador v2 no carga después del puente promocional heredado.');
+  }
+
+  for (const mechanic of ['precio_fijo', 'porcentaje', 'combo', 'addon']) {
+    if (!studio.includes(mechanic)) fail('Promotions Studio: falta mecánica ' + mechanic + '.');
+  }
+
+  for (const action of [
+    'GOXION_FINANCIAL_ACTIONS.savePromotion',
+    'GOXION_FINANCIAL_ACTIONS.togglePromotion',
+    'GOXION_FINANCIAL_ACTIONS.deletePromotion',
+  ]) {
+    if (!studio.includes(action)) fail('Promotions Studio: falta gateway financiero ' + action + '.');
+  }
+
+  if (!studio.includes('adquisicion_habilitada')) {
+    fail('Promotions Studio P3: falta el estado de adquisición inmutable.');
+  }
+
+  for (const id of [
+    'gx-promo-mechanic-fields',
+    'gx-promo-audience',
+    'gx-promo-stack-loyalty',
+    'gx-promo-published',
+    'gx-promo-acquisition-enabled',
+    'gx-promo-preview',
+  ]) {
+    if (!adminHtml.includes('id="' + id + '"')) fail('Promotions Studio: falta UI ' + id + '.');
+  }
+}
+
 // Phase 3D/3E: Promotions and special collection actions must use the financial gateway.
 {
   const actionsPath = join(ROOT, 'assets', 'js', 'core', 'financial-actions.js');
@@ -419,12 +612,16 @@ for (const absolute of walk(jsRoot)) {
     "invoke('promocion_eliminar'",
     "invoke('promocion_asignar'",
     "invoke('promocion_quitar_asignacion'",
+    "invoke('promocion_adquirir'",
+    "invoke('promocion_cancelar_adquisicion'",
     "invoke('registrar_pago_parcial'",
     "invoke('pactar_fecha_pago'",
     "invoke('cancelar_fecha_pactada'",
     'savePromotion',
     'togglePromotion',
     'assignPromotion',
+    'acquirePromotion',
+    'cancelPromotionAcquisition',
     'registerPartialPayment',
     'pactPaymentDate',
     'cancelPactPaymentDate',
