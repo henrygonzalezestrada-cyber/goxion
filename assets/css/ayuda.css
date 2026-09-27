@@ -13127,3 +13127,74 @@ body.gx-promo-morph-open{overflow:hidden!important}
         animation:none!important;
     }
 }
+
+
+/* =========================================================
+   GOXION · C11 CATÁLOGO GLASS HARMONY
+   Parámetros tomados de tarjetas ya existentes de GOXION:
+   --card-glass = rgba(8,8,12,.25)
+   blur = 10px
+   borde = rgba(255,255,255,.08)
+   sombra base brand-card = inset cyan .15 + 0 10px 20px rgba(0,0,0,.30)
+   ========================================================= */
+
+#view-catalogo .gx-catalog-mini-card{
+    border:1px solid rgba(255,255,255,.08);
+    background:var(--card-glass);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    box-shadow:
+        inset 0 20px 40px -20px rgba(0,242,254,.15),
+        0 10px 20px rgba(0,0,0,.30);
+}
+
+#view-catalogo .gx-catalog-mini-logo{
+    width:44px;
+    height:44px;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+}
+#view-catalogo .gx-catalog-mini-logo img{
+    width:40px;
+    height:40px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
+}
+
+#view-catalogo .gx-catalog-curated-switch{
+    gap:3px;
+    padding:3px;
+    border:1px solid rgba(255,255,255,.07);
+    background:rgba(255,255,255,.03);
+}
+#view-catalogo .gx-catalog-curated-switch button{
+    min-height:30px;
+    padding:0 11px;
+    font-size:8.8px;
+    font-weight:750;
+}
+#view-catalogo .gx-catalog-curated-switch button.active{
+    border:1px solid rgba(124,77,255,.20);
+    background:rgba(124,77,255,.10);
+    color:#c9bdff;
+}
+
+#view-catalogo .gx-catalog-mini-copy:not(:has(small)){
+    align-self:center;
+}
+#view-catalogo .gx-catalog-mini-copy:not(:has(small)) + .gx-catalog-mini-price{
+    align-self:center;
+    margin-top:0;
+}
+
+@media(max-width:390px){
+    #view-catalogo .gx-catalog-mini-logo img{
+        width:38px;
+        height:38px;
+    }
+}
