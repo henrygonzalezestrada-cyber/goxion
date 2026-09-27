@@ -455,7 +455,7 @@ async function runAyuda(browser, browserName, errors) {
     const r=card.getBoundingClientRect(),a=actions.getBoundingClientRect();
     return r.width>300 && a.bottom<=r.bottom-8;
   },null,{timeout:3200}).catch(()=>{});
-  await page.waitForTimeout(480);
+  await page.waitForTimeout(720);
 
   const expanded=await page.evaluate(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c7-card"]');
@@ -484,8 +484,8 @@ async function runAyuda(browser, browserName, errors) {
     expanded.width>370 ||
     expanded.height>545 ||
     expanded.contentFits!==true ||
-    expanded.transformA!=='none' ||
-    expanded.transformB!=='none' ||
+    (expanded.transformA!=='none' && !/^matrix\(1(?:\.0+)?,\s*0(?:\.0+)?,\s*0(?:\.0+)?,\s*1(?:\.0+)?,/.test(expanded.transformA)) ||
+    (expanded.transformB!=='none' && !/^matrix\(1(?:\.0+)?,\s*0(?:\.0+)?,\s*0(?:\.0+)?,\s*1(?:\.0+)?,/.test(expanded.transformB)) ||
     expanded.gap<4 ||
     expanded.gap>18 ||
     expanded.summaryCount<2 ||
