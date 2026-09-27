@@ -307,10 +307,11 @@
 <label><input id="gx-promo-countdown" type="checkbox"/><span><strong>Cuenta regresiva</strong><small>Timer durante la vigencia</small></span></label>
 <label><input id="gx-promo-featured" type="checkbox"/><span><strong>Destacada</strong><small>Prioridad visual futura</small></span></label>
 <label><input id="gx-promo-notify" type="checkbox"/><span><strong>Notificar cliente</strong><small>Metadata lista para Mi Espacio</small></span></label>
-<label><input id="gx-promo-published" type="checkbox"/><span><strong>Publicada</strong><small>Visible cuando Ayuda consuma campañas</small></span></label>
+<label><input id="gx-promo-published" onchange="gxPromoPublicationChanged()" type="checkbox"/><span><strong>Publicada</strong><small>Visible en Ayuda durante su vigencia</small></span></label>
+<label><input id="gx-promo-acquisition" onchange="gxPromoAcquisitionChanged()" type="checkbox"/><span><strong>Adquisición habilitada</strong><small>Permite que una oferta elegible pueda contratarse</small></span></label>
 <label><input checked="" id="gx-promo-active" type="checkbox"/><span><strong>Habilitada</strong><small>Puede quedar programada por fecha</small></span></label>
 </div>
-<div class="gx-promo-acquisition-lock"><b>⌁</b><span><strong>Adquisición protegida</strong><small>Aunque marques Publicada, la autoasignación seguirá bloqueada hasta el Bloque B/P3.</small></span></div>
+<div class="gx-promo-acquisition-lock" id="gx-promo-acquisition-note"><b>⌁</b><span><strong>Publicación y contratación separadas</strong><small>Puedes publicar una campaña sólo para mostrarla. La adquisición únicamente se habilita cuando Publicada también está activa.</small></span></div>
 </section>
 
 </div>
