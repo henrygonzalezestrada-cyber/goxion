@@ -32,8 +32,22 @@
   const tagNew=tag=>/nuevo|estreno|new\b/.test(norm(tag));
 
   function discoveryKind(entry){
-    const hay=norm((entry?.name||'')+' '+(entry?.tag||''));
     if(tagNew(entry?.tag)) return 'nuevo';
+
+    const category=norm(entry?.category||'');
+    const labels={
+      productividad:'Productividad',
+      almacenamiento:'Almacenamiento',
+      idiomas:'Idiomas',
+      educacion:'Aprendizaje',
+      ia:'IA y herramientas',
+      creatividad:'Creatividad'
+    };
+    if(labels[category]) return labels[category];
+    if(category==='streaming') return '';
+
+    // Compatibilidad temporal con datos antiguos sin categoria_catalogo.
+    const hay=norm((entry?.name||'')+' '+(entry?.tag||''));
     if(/microsoft|office|365|google one|gemini|productividad|almacenamiento|nube|cloud|drive|notion|evernote|dropbox/.test(hay)) return 'Productividad';
     if(/duolingo|babbel|busuu|idioma|idiomas|language|ingles|frances|aleman/.test(hay)) return 'Idiomas';
     if(/canva|adobe|diseno|creatividad|creative/.test(hay)) return 'Creatividad';
@@ -221,6 +235,7 @@
       const prices=plans.map(p=>Number(p?.precio||0)).filter(v=>v>0);
       const min=prices.length?Math.min(...prices):0;
       const tag=plans.find(p=>String(p?.etiqueta||'').trim())?.etiqueta||'';
+      const category=plans.find(p=>String(p?.categoria_catalogo||'').trim())?.categoria_catalogo||'';
       const entry={
         id,
         name:String(brand?.name||id),
@@ -230,6 +245,7 @@
         recommended:brand?.gxRecommended===true,
         score:Number(brand?.gxRecommendationScore||0),
         tag:String(tag||''),
+        category:String(category||''),
         owned:brand?.gxOwned===true
       };
       entry.isPopular=tagPopular(entry.tag);
