@@ -407,9 +407,11 @@ for (const absolute of walk(jsRoot)) {
   const ayudaHtmlPath = join(ROOT, 'ayuda.html');
   const promoCatalogPath = join(ROOT, 'assets', 'js', 'ayuda', '15-promotions-catalog-c1.js');
   const ayudaCssPath = join(ROOT, 'assets', 'css', 'ayuda.css');
+  const catalogOrdersPath = join(ROOT, 'assets', 'js', 'ayuda', '01f-catalog-orders.js');
   const ayudaHtml = existsSync(ayudaHtmlPath) ? readFileSync(ayudaHtmlPath, 'utf8') : '';
   const promoCatalog = existsSync(promoCatalogPath) ? readFileSync(promoCatalogPath, 'utf8') : '';
   const ayudaCss = existsSync(ayudaCssPath) ? readFileSync(ayudaCssPath, 'utf8') : '';
+  const catalogOrders = existsSync(catalogOrdersPath) ? readFileSync(catalogOrdersPath, 'utf8') : '';
 
   if (!existsSync(promoCatalogPath)) fail('Ayuda C1: falta controlador de catálogo promocional.');
   if (!ayudaHtml.includes('id="gx-promo-showcase"')) fail('Ayuda C1: falta deck promocional.');
@@ -426,8 +428,11 @@ for (const absolute of walk(jsRoot)) {
   if (!promoCatalog.includes('Ver detalles')) fail('Ayuda C5: falta control Ver detalles.');
   if (!promoCatalog.includes('<span>Ahorro</span><strong>')) fail('Ayuda C5: el ahorro debe mostrarse como Ahorro + monto.');
   if (promoCatalog.includes('en esta oferta')) fail('Ayuda C5: persiste texto descartado del ahorro.');
-  if (!promoCatalog.includes('Contratar ahora') || !promoCatalog.includes('actualizarCarrito')) {
-    fail('Ayuda C5: Contratar ahora no está conectado al carrito existente.');
+  if (!promoCatalog.includes('Contratar ahora') || !promoCatalog.includes('GOXION_CATALOG_CART')) {
+    fail('Ayuda C5: Contratar ahora no usa el puente estable del carrito.');
+  }
+  if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) {
+    fail('Ayuda C5: falta puente estable del carrito en catálogo.');
   }
   if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C5')) fail('Ayuda C5: faltan estilos finales.');
   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
