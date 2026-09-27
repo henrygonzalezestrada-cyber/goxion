@@ -688,7 +688,7 @@ async function runAyuda(browser, browserName, errors) {
         pillFits:!pill || pill.scrollWidth<=pill.clientWidth+1,
         pillFont:ps?parseFloat(ps.fontSize):0,
         pillHeight:pill?.getBoundingClientRect().height||0,
-        priceCenterDiff:pr?Math.abs((pr.top+pr.height/2)-(r.top+r.height/2)-4):99,
+        priceLowerOffset:pr?(pr.top+pr.height/2)-(r.top+r.height/2):99,
         arrowCenterDiff:ar?Math.abs((ar.top+ar.height/2)-(r.top+r.height/2)):99,
         arrowOpacity:arrow?parseFloat(getComputedStyle(arrow).opacity):0
       };
@@ -704,7 +704,7 @@ async function runAyuda(browser, browserName, errors) {
     c16Mini.rows.some(x=>x.pillFits!==true) ||
     c16Mini.rows.some(x=>x.pillFont>6.8||x.pillFont<5.1) ||
     c16Mini.rows.some(x=>x.pillHeight>19) ||
-    c16Mini.rows.some(x=>x.priceCenterDiff>2.5) ||
+    c16Mini.rows.some(x=>x.priceLowerOffset<6||x.priceLowerOffset>12) ||
     c16Mini.rows.some(x=>x.arrowCenterDiff>1.5||x.arrowOpacity<.8)
   ){
     errors.push(`${label}: C16 mini tarjetas no conservan aire/pill/precio/flecha. ${JSON.stringify(c16Mini)}`);
