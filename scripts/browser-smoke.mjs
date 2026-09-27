@@ -471,6 +471,18 @@ async function runAyuda(browser, browserName, errors) {
       contentFits:!!actions&&actions.bottom<=r.bottom-8,
       transformA:getComputedStyle(logos[0]).transform,
       transformB:getComputedStyle(logos[1]).transform,
+      angleA:(()=>{
+        const t=getComputedStyle(logos[0]).transform;
+        if(!t||t==='none')return 0;
+        const m=t.match(/matrix\(([^,]+),\s*([^,]+)/);
+        return m?Math.atan2(Number(m[2]),Number(m[1]))*180/Math.PI:99;
+      })(),
+      angleB:(()=>{
+        const t=getComputedStyle(logos[1]).transform;
+        if(!t||t==='none')return 0;
+        const m=t.match(/matrix\(([^,]+),\s*([^,]+)/);
+        return m?Math.atan2(Number(m[2]),Number(m[1]))*180/Math.PI:99;
+      })(),
       gap:(a&&b)?Math.round(b.left-a.right):null,
       summaryCount:card.querySelectorAll('.gx-promo-summary-item').length,
       primaryHeight:Math.round(card.querySelector('[data-gx-promo-contract]')?.getBoundingClientRect().height||0),
@@ -484,8 +496,8 @@ async function runAyuda(browser, browserName, errors) {
     expanded.width>370 ||
     expanded.height>545 ||
     expanded.contentFits!==true ||
-    (expanded.transformA!=='none' && !/^matrix\(1(?:\.0+)?,\s*0(?:\.0+)?,\s*0(?:\.0+)?,\s*1(?:\.0+)?,/.test(expanded.transformA)) ||
-    (expanded.transformB!=='none' && !/^matrix\(1(?:\.0+)?,\s*0(?:\.0+)?,\s*0(?:\.0+)?,\s*1(?:\.0+)?,/.test(expanded.transformB)) ||
+    Math.abs(expanded.angleA)>0.5 ||
+    Math.abs(expanded.angleB)>0.5 ||
     expanded.gap<4 ||
     expanded.gap>18 ||
     expanded.summaryCount<2 ||
