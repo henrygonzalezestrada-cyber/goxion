@@ -492,7 +492,7 @@ async function runAyuda(browser, browserName, errors) {
     promoExpanded.hasDescription!==true ||
     promoExpanded.noOrbit!==true
   ) {
-    errors.push(`${label}: tarjeta promocional C4 no hizo morph limpio/sin scroll como se esperaba.`);
+    errors.push(`${label}: tarjeta promocional C4 no hizo morph limpio/sin scroll como se esperaba. ${JSON.stringify(promoExpanded)}`);
   }
 
   await page.evaluate(() =>
