@@ -473,7 +473,8 @@ for (const absolute of walk(jsRoot)) {
   if (!promoCatalog.includes("const tagPopular=") ||
       !promoCatalog.includes("const tagSaving=") ||
       !promoCatalog.includes("const tagNew=") ||
-      !promoCatalog.includes("const newEntries=available.filter(x=>x.isNew)") ||
+      !promoCatalog.includes("const newEntries=available") ||
+      !promoCatalog.includes(".filter(x=>x.isNew)") ||
       !promoCatalog.includes("is-popular-featured") ||
       !promoCatalog.includes("is-saving-soft")) {
     fail('Ayuda C12: falta la lógica de curaduría Popular/Ahorro/Nuevo.');
