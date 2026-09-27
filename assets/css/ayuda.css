@@ -12500,3 +12500,116 @@ body.gx-promo-morph-open{
         animation:none!important;
     }
 }
+
+
+/* C5.1 · Compactación fina del morph */
+.gx-promo-deck-card.is-expanded{
+    padding:18px 19px 18px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos{
+    height:70px;
+    margin:11px 0 9px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos .gx-promo-logo-item{
+    width:64px;
+    height:64px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo{
+    width:102px;
+    height:70px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-0,
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
+    width:58px;
+    height:58px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-0{
+    left:0;
+    top:2px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
+    left:41px;
+    top:8px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-platform-name{
+    font-size:24px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-offer-title{
+    margin-top:5px;
+    font-size:11px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-description{
+    margin-top:6px;
+    -webkit-line-clamp:2;
+    font-size:9.5px;
+    line-height:1.4;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-price{
+    margin-top:9px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-price b{
+    font-size:36px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-footer{
+    min-height:28px;
+    margin-top:6px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-saving>span{
+    font-size:9.5px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-saving>strong{
+    font-size:16px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-morph-detail{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    grid-template-areas:
+      "meta status"
+      "items items"
+      "actions actions";
+    column-gap:14px;
+    row-gap:0;
+    max-height:220px;
+    margin-top:8px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-morph-meta{
+    grid-area:meta;
+    align-self:center;
+    justify-content:flex-start;
+    gap:6px;
+    margin:0;
+    padding:8px 0 0;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-morph-meta>strong{
+    font-size:9px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-status{
+    grid-area:status;
+    align-self:end;
+    justify-content:flex-end;
+    margin:0;
+    padding:8px 0 0;
+    white-space:nowrap;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-status strong{
+    font-size:7.5px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-items{
+    grid-area:items;
+    margin-top:7px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+    min-height:30px;
+    padding:4px 0;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
+    width:24px;
+    height:24px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{
+    grid-area:actions;
+    margin-top:8px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions button{
+    min-height:36px;
+}
