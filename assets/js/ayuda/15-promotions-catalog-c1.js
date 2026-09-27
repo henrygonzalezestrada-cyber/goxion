@@ -435,9 +435,11 @@
         applyDeckPositions();
       }
       stopAuto();
-      // Abrimos exactamente el nodo tocado. Si el catálogo refresca después,
-      // el retorno robusto reemplaza cualquier nodo nuevo al cerrar.
-      openPromoDetail(selectedPromotions()[index],card);
+      // WebKit es más estable si el reparent del mismo nodo ocurre después
+      // de terminar la propagación del click actual.
+      setTimeout(()=>{
+        if(!state.expandedCard) openPromoDetail(selectedPromotions()[index],card);
+      },0);
     },true);
 
     deck.addEventListener('click',event=>{
@@ -582,7 +584,7 @@
     const targetWidth=Math.min(window.innerWidth-44,352);
     const maxHeight=Math.max(460,window.innerHeight-52);
     const itemCount=Math.min(3,(p?.items||[]).length);
-    const targetHeight=Math.min(maxHeight,itemCount>1?520:492);
+    const targetHeight=Math.min(maxHeight,itemCount>1?536:504);
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(26,(window.innerHeight-targetHeight)/2);
 
