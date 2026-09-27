@@ -13013,3 +13013,117 @@ body.gx-promo-morph-open{overflow:hidden!important}
         display:none!important;
     }
 }
+
+
+/* =========================================================
+   GOXION · C10A FLOAT + PARALLAX
+   Variante A: levitación física + micro parallax.
+   ========================================================= */
+
+/* Marquee inteligente: sólo se activa cuando JS detecta overflow real. */
+.gx-promo-deck-card.is-expanded .gx-promo-availability-value{
+    display:block;
+    width:100%;
+    min-width:0;
+    overflow:hidden!important;
+    white-space:nowrap;
+    text-overflow:clip!important;
+}
+.gx-promo-availability-value>span{
+    display:inline-block;
+    min-width:max-content;
+    transform:translateX(0);
+    will-change:transform;
+}
+.gx-promo-availability-value.has-marquee>span{
+    animation:gxPromoAvailabilityMarquee 6.4s ease-in-out infinite;
+}
+@keyframes gxPromoAvailabilityMarquee{
+    0%,18%{transform:translateX(0)}
+    42%,62%{transform:translateX(var(--gx-marquee-distance,0px))}
+    84%,100%{transform:translateX(0)}
+}
+
+/* Retirar por completo el shimmer/glow de C9. */
+.gx-promo-deck-card.is-closed.is-front .gx-promo-card-glow{
+    display:none!important;
+    animation:none!important;
+}
+.gx-promo-deck-card.is-closed.is-front::before{
+    display:none!important;
+    animation:none!important;
+}
+.gx-promo-deck-card.is-closed.is-front::after{
+    animation:none!important;
+    opacity:.46;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,.14),
+      0 0 16px color-mix(in srgb,var(--gx-brand-accent) 17%,transparent);
+}
+
+/* La tarjeta protagonista flota como objeto, no como fuente de luz. */
+.gx-promo-deck-card.is-closed.is-front{
+    animation:gxPromoC10AFloat 4.9s cubic-bezier(.45,.05,.42,.95) infinite!important;
+    will-change:translate,scale,box-shadow;
+}
+@keyframes gxPromoC10AFloat{
+    0%,100%{
+        translate:0 0;
+        scale:1;
+        box-shadow:
+          0 32px 62px rgba(0,0,0,.48),
+          0 12px 34px color-mix(in srgb,var(--gx-brand) 16%,transparent),
+          inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    50%{
+        translate:0 -5px;
+        scale:1.006;
+        box-shadow:
+          0 38px 72px rgba(0,0,0,.52),
+          0 18px 42px color-mix(in srgb,var(--gx-brand) 21%,transparent),
+          inset 0 1px 0 rgba(255,255,255,.16);
+    }
+}
+
+/* Pizca de parallax: el hero interno tiene su propio ritmo. */
+.gx-promo-deck-card.is-closed.is-front .gx-promo-card-logos{
+    animation:gxPromoC10ALogoParallax 4.1s ease-in-out infinite!important;
+    will-change:transform;
+}
+.gx-promo-deck-card.is-closed.is-front .gx-promo-card-copy{
+    animation:gxPromoC10ACopyParallax 5.3s ease-in-out infinite!important;
+    will-change:transform;
+}
+@keyframes gxPromoC10ALogoParallax{
+    0%,100%{transform:translate3d(0,1px,0)}
+    50%{transform:translate3d(1px,-3px,0)}
+}
+@keyframes gxPromoC10ACopyParallax{
+    0%,100%{transform:translate3d(0,0,0)}
+    50%{transform:translate3d(-1px,-1px,0)}
+}
+
+/* Al iniciar morph se congelan las animaciones del carrusel. */
+.gx-promo-morph-open .gx-promo-deck-card,
+.gx-promo-deck-card.is-expanded,
+.gx-promo-deck-card.is-returning{
+    animation:none!important;
+    translate:0 0!important;
+    scale:1!important;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos,
+.gx-promo-deck-card.is-expanded .gx-promo-card-copy,
+.gx-promo-deck-card.is-returning .gx-promo-card-logos,
+.gx-promo-deck-card.is-returning .gx-promo-card-copy{
+    animation:none!important;
+    transform:none;
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-promo-deck-card.is-closed.is-front,
+    .gx-promo-deck-card.is-closed.is-front .gx-promo-card-logos,
+    .gx-promo-deck-card.is-closed.is-front .gx-promo-card-copy,
+    .gx-promo-availability-value.has-marquee>span{
+        animation:none!important;
+    }
+}
