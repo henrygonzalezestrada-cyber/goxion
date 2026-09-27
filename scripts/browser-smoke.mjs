@@ -452,12 +452,10 @@ async function runAyuda(browser, browserName, errors) {
 
   await page.waitForFunction(() => {
     const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
-    const actions=expanded?.querySelector('.gx-promo-expanded-actions');
-    if(!expanded||!actions)return false;
-    const cardRect=expanded.getBoundingClientRect();
-    const actionsRect=actions.getBoundingClientRect();
-    return cardRect.width>300 && actionsRect.bottom<=cardRect.bottom-8;
+    if(!expanded)return false;
+    return expanded.getBoundingClientRect().width>300;
   },null,{timeout:3200}).catch(()=>{});
+  await page.waitForTimeout(520);
 
   const promoExpanded=await page.evaluate(() => {
     const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
@@ -482,7 +480,27 @@ async function runAyuda(browser, browserName, errors) {
       primaryHeight:primary?Math.round(primary.getBoundingClientRect().height):0,
       secondaryFont:secondary?parseFloat(getComputedStyle(secondary).fontSize):0,
       contractText:(primary?.textContent||'').trim(),
-      contractEnabled:!!primary&&!primary.disabled
+      contractEnabled:!!primary&&!primary.disabled,
+      layout:(()=>{
+        const pick=(selector)=>{
+          const el=expanded.querySelector(selector);
+          if(!el)return null;
+          const r=el.getBoundingClientRect();
+          return {top:Math.round(r.top-rect.top),bottom:Math.round(r.bottom-rect.top),height:Math.round(r.height)};
+        };
+        return {
+          top:pick('.gx-promo-card-top'),
+          logos:pick('.gx-promo-card-logos'),
+          copy:pick('.gx-promo-card-copy'),
+          price:pick('.gx-promo-card-price'),
+          footer:pick('.gx-promo-card-footer'),
+          detail:pick('.gx-promo-morph-detail'),
+          meta:pick('.gx-promo-morph-meta'),
+          items:pick('.gx-promo-detail-items'),
+          status:pick('.gx-promo-expanded-status'),
+          actions:pick('.gx-promo-expanded-actions')
+        };
+      })()
     };
   }).catch(()=>null);
 
