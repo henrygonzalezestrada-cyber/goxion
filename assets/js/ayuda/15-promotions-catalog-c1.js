@@ -414,26 +414,48 @@
     return true;
   }
 
+  function setPromoActionState(card,p,expanded){
+    const button=card?.querySelector('[data-gx-promo-action]');
+    if(!button) return;
+    if(expanded){
+      const contract=promoContractState(p);
+      button.classList.add('is-contract');
+      button.textContent=contract.label||'Contratar ahora';
+      button.disabled=!contract.enabled;
+      button.setAttribute('aria-label',contract.label||'Contratar ahora');
+    }else{
+      button.classList.remove('is-contract','is-added');
+      button.textContent='Ver detalles';
+      button.disabled=false;
+      button.setAttribute('aria-label','Ver detalles');
+    }
+  }
+
   function bindPromoDetailButtons(){
     const deck=$('gx-promo-deck');
     if(!deck) return;
-    deck.querySelectorAll('[data-gx-promo-details]').forEach(button=>{
+    deck.querySelectorAll('[data-gx-promo-action]').forEach(button=>{
       if(button.dataset.gxDirectBound==='1') return;
       button.dataset.gxDirectBound='1';
       button.addEventListener('click',event=>{
         event.preventDefault();
         event.stopPropagation();
         const card=button.closest('.gx-promo-deck-card');
-        if(!card||state.expandedCard) return;
+        if(!card) return;
         const index=Number(card.dataset.gxPromoIndex||0);
+        const promo=selectedPromotions()[index];
+
+        if(card.classList.contains('is-expanded')){
+          if(addPromotionToCart(promo,button)) setTimeout(()=>closePromoDetail(card),430);
+          return;
+        }
+        if(state.expandedCard) return;
         if(index!==state.active){
           state.active=index;
           applyDeckPositions();
         }
         stopAuto();
-        if(!state.expandedCard && card.isConnected){
-          openPromoDetail(selectedPromotions()[index],card);
-        }
+        openPromoDetail(promo,card);
       });
     });
   }
@@ -446,7 +468,7 @@
     deck.addEventListener('click',event=>{
       const card=event.target.closest('.gx-promo-deck-card');
       if(!card) return;
-      if(event.target.closest('[data-gx-promo-details]')) return;
+      if(event.target.closest('[data-gx-promo-action]')) return;
 
       if(event.target.closest('[data-gx-promo-close]')){
         event.stopPropagation();
