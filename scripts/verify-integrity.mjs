@@ -481,6 +481,27 @@ for (const absolute of walk(jsRoot)) {
   if (!ayudaCss.includes('GOXION · C12 CURATED HIERARCHY')) {
     fail('Ayuda C12: faltan estilos de jerarquía de movimiento.');
   }
+
+  // C13: el preview pertenece sólo al carrusel; curaduría usa señales reales.
+  if (!promoCatalog.includes('function realPromotions()') ||
+      !promoCatalog.includes("p?.gx_preview!==true") ||
+      !promoCatalog.includes("!String(p?.id||'').startsWith('preview-')")) {
+    fail('Ayuda C13: preview volvió a contaminar Mayor ahorro.');
+  }
+  if (!promoCatalog.includes('.filter(x=>x.isPopular)') ||
+      !promoCatalog.includes('.filter(x=>brandPromoSaving(x)>0||x.isSaving)')) {
+    fail('Ayuda C13: Populares/Ahorro dejaron de ser curaduría estricta.');
+  }
+  if (!promoCatalog.includes('gx-catalog-mini-meta-line')) {
+    fail('Ayuda C13: etiqueta no está separada entre nombre y precio.');
+  }
+  if (!ayudaCss.includes('GOXION · C13 CURATION SYNC') ||
+      !ayudaCss.includes('#ff3366') ||
+      !ayudaCss.includes('#ffaa00') ||
+      !ayudaCss.includes('#00ff9d') ||
+      !ayudaCss.includes('#00f2fe')) {
+    fail('Ayuda C13: se perdió el lenguaje original Popular/Ahorro/Nuevo.');
+  }
 }
 
 // Promotions Studio v2 + P3: universal campaign builder with immutable acquisition gateway.
