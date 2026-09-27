@@ -13066,3 +13066,75 @@ body.gx-promo-morph-open{
     0%{transform:translate3d(0,0,0) scale(.82);opacity:.20}
     100%{transform:translate3d(-45%,34%,0) scale(1.20);opacity:.42}
 }
+
+
+/* C6.1 · Compactación estructural del expandido */
+.gx-promo-deck-card.is-expanded .gx-promo-detail-items{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+    border-top:0;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+    min-height:44px;
+    grid-template-columns:30px minmax(0,1fr);
+    grid-template-areas:
+      "logo copy"
+      "logo price";
+    column-gap:8px;
+    row-gap:1px;
+    padding:7px 9px;
+    border:1px solid rgba(255,255,255,.085);
+    border-radius:12px;
+    background:rgba(0,0,0,.08);
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
+    grid-area:logo;
+    align-self:center;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item>span{
+    grid-area:copy;
+    align-self:end;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{
+    grid-area:price;
+    justify-self:start;
+    align-self:start;
+    color:rgba(255,255,255,.72);
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{
+    margin-top:10px;
+}
+.gx-promo-deck-card.is-closing .gx-promo-detail-items,
+.gx-promo-deck-card.is-closing .gx-promo-expanded-actions,
+.gx-promo-deck-card.is-closing .gx-promo-expanded-status,
+.gx-promo-deck-card.is-closing .gx-promo-morph-meta{
+    opacity:0;
+    transform:translateY(5px);
+    transition:opacity .15s ease,transform .20s ease;
+}
+@media(max-width:360px){
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-items{
+        grid-template-columns:1fr;
+        gap:5px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+        min-height:36px;
+        grid-template-columns:28px minmax(0,1fr) auto;
+        grid-template-areas:"logo copy price";
+        padding:5px 0;
+        border:0;
+        border-bottom:1px solid rgba(255,255,255,.07);
+        border-radius:0;
+        background:transparent;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{
+        justify-self:end;
+        align-self:center;
+    }
+}
