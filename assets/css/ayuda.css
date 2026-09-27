@@ -13198,3 +13198,179 @@ body.gx-promo-morph-open{overflow:hidden!important}
         height:38px;
     }
 }
+
+
+/* =========================================================
+   GOXION · C12 CURATED HIERARCHY
+   Movimiento reservado por jerarquía:
+   - sólo el #1 etiquetado Popular recibe animación protagonista;
+   - Popular/Ahorro restantes animan únicamente su etiqueta;
+   - Nuevo tiene una entrada propia de una sola vez;
+   - Descubre y Catálogo completo permanecen tranquilos.
+   ========================================================= */
+
+#view-catalogo .gx-catalog-mini-title-row{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:6px;
+}
+#view-catalogo .gx-catalog-mini-title-row>strong{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+#view-catalogo .gx-catalog-mini-badge{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:18px;
+    padding:2px 7px;
+    border-radius:999px;
+    font-size:7px;
+    font-weight:850;
+    line-height:1;
+    letter-spacing:.28px;
+    white-space:nowrap;
+}
+
+/* #1 Popular: conserva el gesto fuerte, pero sólo una tarjeta por bloque. */
+#view-catalogo .gx-catalog-mini-card.is-popular-featured{
+    border:0;
+    background:transparent;
+    isolation:isolate;
+    overflow:hidden;
+    box-shadow:none;
+}
+#view-catalogo .gx-catalog-mini-card.is-popular-featured::before{
+    content:"";
+    position:absolute;
+    width:210%;
+    height:210%;
+    top:-55%;
+    left:-55%;
+    background:conic-gradient(
+        from 0deg,
+        transparent 0 47%,
+        rgba(124,77,255,.92) 61%,
+        rgba(0,242,254,.94) 74%,
+        transparent 88% 100%
+    );
+    animation:gxCatalogTopPopularOrbit 3.8s linear infinite;
+    z-index:0;
+    pointer-events:none;
+}
+#view-catalogo .gx-catalog-mini-card.is-popular-featured::after{
+    content:"";
+    position:absolute;
+    inset:1.5px;
+    border-radius:15.5px;
+    background:rgba(8,8,12,.82);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    box-shadow:
+        inset 0 20px 40px -20px rgba(0,242,254,.15),
+        0 10px 20px rgba(0,0,0,.30);
+    z-index:0;
+    pointer-events:none;
+}
+#view-catalogo .gx-catalog-mini-card.is-popular-featured>*{
+    position:relative;
+    z-index:1;
+}
+@keyframes gxCatalogTopPopularOrbit{
+    to{transform:rotate(360deg)}
+}
+
+/* Populares normales: tarjeta quieta; sólo respira la etiqueta. */
+#view-catalogo .gx-catalog-mini-badge.is-popular{
+    color:#d9d2ff;
+    border:1px solid rgba(124,77,255,.24);
+    background:rgba(124,77,255,.10);
+    animation:gxCatalogPopularBadge 5.2s ease-in-out infinite;
+}
+#view-catalogo .is-popular-featured .gx-catalog-mini-badge.is-popular{
+    color:#f1edff;
+    border-color:rgba(150,119,255,.42);
+    background:rgba(124,77,255,.18);
+    box-shadow:0 0 12px rgba(124,77,255,.13);
+}
+@keyframes gxCatalogPopularBadge{
+    0%,100%{opacity:.82;transform:translateY(0)}
+    50%{opacity:1;transform:translateY(-1px)}
+}
+
+/* Ahorro: sin borde animado; la información hace el trabajo. */
+#view-catalogo .gx-catalog-mini-badge.is-saving{
+    color:#aaf7da;
+    border:1px solid rgba(46,160,103,.22);
+    background:rgba(46,160,103,.085);
+    animation:gxCatalogSavingBadge 6.2s ease-in-out infinite;
+}
+@keyframes gxCatalogSavingBadge{
+    0%,100%{opacity:.78;box-shadow:0 0 0 rgba(46,160,103,0)}
+    50%{opacity:1;box-shadow:0 0 9px rgba(46,160,103,.08)}
+}
+
+/* Nuevo: identidad distinta. La tarjeta saluda una sola vez y luego descansa. */
+#view-catalogo .gx-catalog-mini-card.is-new-featured{
+    animation:gxCatalogNewArrival 1.35s cubic-bezier(.2,.85,.24,1) 1;
+}
+#view-catalogo .gx-catalog-mini-badge.is-new{
+    color:#b9fbff;
+    border:1px solid rgba(0,242,254,.24);
+    background:rgba(0,242,254,.08);
+    animation:gxCatalogNewBadge 4.8s ease-in-out infinite;
+}
+@keyframes gxCatalogNewArrival{
+    0%{
+        transform:translateY(7px) scale(.985);
+        border-color:rgba(0,242,254,.38);
+        box-shadow:
+            inset 0 20px 40px -20px rgba(0,242,254,.25),
+            0 0 0 rgba(0,242,254,0);
+    }
+    58%{
+        transform:translateY(-1px) scale(1.006);
+        border-color:rgba(0,242,254,.22);
+        box-shadow:
+            inset 0 20px 40px -20px rgba(0,242,254,.20),
+            0 12px 28px rgba(0,242,254,.08);
+    }
+    100%{
+        transform:none;
+        border-color:rgba(255,255,255,.08);
+        box-shadow:
+            inset 0 20px 40px -20px rgba(0,242,254,.15),
+            0 10px 20px rgba(0,0,0,.30);
+    }
+}
+@keyframes gxCatalogNewBadge{
+    0%,100%{opacity:.82}
+    50%{opacity:1}
+}
+
+#view-catalogo .gx-catalog-curated-empty{
+    grid-column:1/-1;
+    min-width:190px;
+    min-height:82px;
+    display:flex;
+    align-items:center;
+    padding:12px 14px;
+    border:1px dashed rgba(255,255,255,.07);
+    border-radius:17px;
+    background:rgba(8,8,12,.18);
+    color:#6f7e92;
+    font-size:8.3px;
+    line-height:1.4;
+}
+
+@media(prefers-reduced-motion:reduce){
+    #view-catalogo .gx-catalog-mini-card.is-popular-featured::before,
+    #view-catalogo .gx-catalog-mini-card.is-new-featured,
+    #view-catalogo .gx-catalog-mini-badge{
+        animation:none!important;
+    }
+}
