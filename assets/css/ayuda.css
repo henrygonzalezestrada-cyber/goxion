@@ -12244,7 +12244,7 @@ body.gx-promo-morph-open{
     justify-content:flex-start;
     gap:4px;
     min-height:78px;
-    margin-top:2px;
+    margin-top:0;
 }
 .gx-promo-primary-value{
     display:block;
@@ -12453,7 +12453,7 @@ body.gx-promo-morph-open{overflow:hidden!important}
 .gx-promo-deck-card.is-expanded .gx-promo-value-stack{
     flex:0 0 auto;
     min-height:82px;
-    margin-top:1px;
+    margin-top:-2px;
     gap:4px;
 }
 .gx-promo-deck-card.is-expanded .gx-promo-primary-value{font-size:39px}
@@ -12584,74 +12584,26 @@ body.gx-promo-morph-open{overflow:hidden!important}
 }
 .gx-promo-action.is-contract:disabled{opacity:.46}
 
-/* Cierre: la composición cerrada se alcanza antes de retirar is-expanded */
-.gx-promo-deck-card.is-closing .gx-promo-morph-detail{
+/* Cierre: al retirar is-expanded, el layout cerrado real anima dentro del rectángulo fijo */
+.gx-promo-deck-card.is-closing .gx-promo-morph-detail,
+.gx-promo-deck-card.is-returning .gx-promo-morph-detail{
+    flex:0 0 0!important;
+    width:100%;
     max-height:0!important;
-    margin-top:0!important;
-    padding-right:0!important;
+    height:0!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
     opacity:0!important;
     transform:translateY(5px)!important;
     overflow:hidden!important;
+    pointer-events:none!important;
 }
-.gx-promo-deck-card.is-expanded.is-returning{
-    padding:18px 19px;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos{
-    flex-basis:70px;
-    height:70px;
-    margin:12px 0 8px;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos:not(.is-combo) .gx-promo-logo-item{
-    width:60px;
-    height:60px;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo{
-    position:relative;
-    display:block;
-    width:118px;
-    height:70px;
-    margin-left:0;
-    margin-right:0;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo .gx-logo-pos-0,
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo .gx-logo-pos-1{
-    position:absolute!important;
-    width:62px!important;
-    height:62px!important;
-    margin:0!important;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo .gx-logo-pos-0{
-    left:0!important;
-    top:2px!important;
-    transform:rotate(-4deg)!important;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo .gx-logo-pos-1{
-    left:45px!important;
-    top:9px!important;
-    transform:rotate(3deg)!important;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-copy{
-    flex-basis:84px;
-    min-height:84px;
-    max-height:84px;
-    overflow:hidden;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-platform-name{font-size:23px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-offer-title{font-size:12.5px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-description{font-size:11px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-value-stack{
-    min-height:78px;
-    margin-top:2px;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-primary-value{font-size:36px}
-.gx-promo-deck-card.is-expanded.is-returning.gx-mechanic-porcentaje .gx-promo-primary-value{
-    white-space:nowrap;
-    font-size:35px;
-}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-saving>strong{font-size:13.5px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-old-price{font-size:14px}
-.gx-promo-deck-card.is-expanded.is-returning .gx-promo-action-zone{
-    padding-top:6px;
+.gx-promo-deck-card.is-returning{
+    display:flex!important;
+    flex-direction:column;
+    overflow:hidden!important;
+    touch-action:none;
 }
 
 /* Transiciones */
