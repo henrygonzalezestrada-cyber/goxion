@@ -371,7 +371,7 @@ async function runAyuda(browser, browserName, errors) {
     if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
 
-  // Catálogo C7 Stable: misma altura, porcentaje estable y morph sin reflow.
+  // Catálogo C8 Final UI: jerarquía, CTA único y cierre sin hueco intermedio.
   await page.evaluate(() => window.switchTab?.('catalogo'));
   await page.waitForFunction(() => {
     const cards=document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card');
@@ -382,55 +382,54 @@ async function runAyuda(browser, browserName, errors) {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
     const metrics=cards.map(card=>{
       const style=getComputedStyle(card);
-      const footer=card.querySelector('.gx-promo-card-footer');
-      const price=card.querySelector('.gx-promo-card-price');
+      const value=card.querySelector('.gx-promo-value-row');
+      const action=card.querySelector('[data-gx-promo-action]');
+      const oldPrice=card.querySelector('.gx-promo-price-stack s');
+      const actionRect=action?.getBoundingClientRect();
+      const cardRect=card.getBoundingClientRect();
       return {
         index:Number(card.dataset.gxPromoIndex||0),
         cssHeight:parseFloat(style.height),
-        footerHeight:footer?parseFloat(getComputedStyle(footer).height):null,
-        priceHeight:price?parseFloat(getComputedStyle(price).height):null,
-        hasCurrentPrice:!!card.querySelector('.gx-promo-current-price'),
-        saving:(card.querySelector('.gx-promo-saving')?.textContent||'').replace(/\s+/g,' ').trim(),
-        detailsFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-info-hint')).fontSize),
-        descFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-card-description')).fontSize)
+        valueHeight:value?parseFloat(getComputedStyle(value).height):0,
+        actionCount:card.querySelectorAll('[data-gx-promo-action]').length,
+        actionText:(action?.textContent||'').trim(),
+        actionFont:action?parseFloat(getComputedStyle(action).fontSize):0,
+        actionCenterDiff:actionRect?Math.abs((actionRect.left+actionRect.width/2)-(cardRect.left+cardRect.width/2)):99,
+        oldPriceFont:oldPrice?parseFloat(getComputedStyle(oldPrice).fontSize):0,
+        saving:(card.querySelector('.gx-promo-saving')?.textContent||'').replace(/\s+/g,' ').trim()
       };
     });
-    const heights=metrics.map(x=>x.cssHeight);
-    const footers=metrics.map(x=>x.footerHeight).filter(Number.isFinite);
-    const prices=metrics.map(x=>x.priceHeight).filter(Number.isFinite);
     const combo=cards.find(x=>x.dataset.gxPromoIndex==='1');
     const logos=[...combo.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
-    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+    const front=cards.find(x=>x.classList.contains('is-front'));
     return {
       metrics,
-      heightSpread:Math.max(...heights)-Math.min(...heights),
-      footerSpread:Math.max(...footers)-Math.min(...footers),
-      priceSpread:Math.max(...prices)-Math.min(...prices),
+      heightSpread:Math.max(...metrics.map(x=>x.cssHeight))-Math.min(...metrics.map(x=>x.cssHeight)),
+      valueSpread:Math.max(...metrics.map(x=>x.valueHeight))-Math.min(...metrics.map(x=>x.valueHeight)),
       comboTransformA:getComputedStyle(logos[0]).transform,
       comboTransformB:getComputedStyle(logos[1]).transform,
-      comboGap:(a&&b)?Math.round(b.left-a.right):null,
-      auroraAnimation:getComputedStyle(cards.find(x=>x.classList.contains('is-front')).querySelector('.gx-promo-card-aurora')).animationName
+      edgeAnimation:getComputedStyle(front,'::after').animationName,
+      oldSecondaryButtons:cards.reduce((n,x)=>n+x.querySelectorAll('[data-gx-promo-service],[data-gx-promo-contract]').length,0)
     };
   }).catch(()=>null);
 
   if(
     !closedLayout ||
     closedLayout.heightSpread>1 ||
-    closedLayout.footerSpread>1 ||
-    closedLayout.priceSpread>1 ||
-    closedLayout.metrics.some(x=>x.hasCurrentPrice) ||
+    closedLayout.valueSpread>2 ||
+    closedLayout.metrics.some(x=>x.actionCount!==1||x.actionText!=='Ver detalles') ||
+    closedLayout.metrics.some(x=>x.actionFont<10.5||x.actionCenterDiff>2) ||
+    closedLayout.metrics.some(x=>x.oldPriceFont>0&&x.oldPriceFont<12.5) ||
     closedLayout.metrics.some(x=>!/^Ahorras\s+\$/.test(x.saving)) ||
-    closedLayout.metrics.some(x=>x.detailsFont<10.5||x.descFont<10.5) ||
     closedLayout.comboTransformA==='none' ||
     closedLayout.comboTransformB==='none' ||
-    closedLayout.comboGap===null ||
-    closedLayout.comboGap>2 ||
-    closedLayout.auroraAnimation==='none'
+    closedLayout.edgeAnimation==='none' ||
+    closedLayout.oldSecondaryButtons!==0
   ){
-    errors.push(`${label}: C7 cerrado no mantiene retícula estable/inclinación/aurora. ${JSON.stringify(closedLayout)}`);
+    errors.push(`${label}: C8 cerrado no conserva jerarquía/CTA único/respiración. ${JSON.stringify(closedLayout)}`);
   }
 
-  // Combo al frente y apertura desde Ver detalles.
+  // Combo al frente.
   await page.evaluate(() => {
     const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
     if(combo&&!combo.classList.contains('is-front')) combo.click();
@@ -443,99 +442,109 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() => {
     const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
     if(!card)return;
-    card.dataset.gxSmokeToken='c7-card';
+    card.dataset.gxSmokeToken='c8-card';
     window.__gxPromoSmokeCard=card;
-  });
-  await page.evaluate(() => {
-    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"] [data-gx-promo-details]')?.click();
+    card.querySelector('[data-gx-promo-action]')?.click();
   });
 
   await page.waitForFunction(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c7-card"]');
-    const actions=card?.querySelector('.gx-promo-expanded-actions');
-    if(!card||!actions)return false;
-    const r=card.getBoundingClientRect(),a=actions.getBoundingClientRect();
-    return r.width>300 && a.bottom<=r.bottom-8;
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c8-card"]');
+    const action=card?.querySelector('[data-gx-promo-action]');
+    return !!card && !!action && action.textContent.trim()==='Contratar ahora';
   },null,{timeout:3200}).catch(()=>{});
-  await page.waitForTimeout(720);
+  await page.waitForTimeout(520);
 
   const expanded=await page.evaluate(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c7-card"]');
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c8-card"]');
     if(!card)return null;
     const r=card.getBoundingClientRect();
+    const copy=card.querySelector('.gx-promo-card-copy')?.getBoundingClientRect();
+    const value=card.querySelector('.gx-promo-value-row')?.getBoundingClientRect();
+    const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
     const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
-    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
-    const actions=card.querySelector('.gx-promo-expanded-actions')?.getBoundingClientRect();
+    const angle=(node)=>{
+      const t=getComputedStyle(node).transform;
+      if(!t||t==='none')return 0;
+      const m=t.match(/matrix\(([^,]+),\s*([^,]+)/);
+      return m?Math.atan2(Number(m[2]),Number(m[1]))*180/Math.PI:99;
+    };
     return {
       sameNode:card===window.__gxPromoSmokeCard,
-      width:Math.round(r.width),
       height:Math.round(r.height),
-      contentFits:!!actions&&actions.bottom<=r.bottom-8,
-      transformA:getComputedStyle(logos[0]).transform,
-      transformB:getComputedStyle(logos[1]).transform,
-      angleA:(()=>{
-        const t=getComputedStyle(logos[0]).transform;
-        if(!t||t==='none')return 0;
-        const m=t.match(/matrix\(([^,]+),\s*([^,]+)/);
-        return m?Math.atan2(Number(m[2]),Number(m[1]))*180/Math.PI:99;
-      })(),
-      angleB:(()=>{
-        const t=getComputedStyle(logos[1]).transform;
-        if(!t||t==='none')return 0;
-        const m=t.match(/matrix\(([^,]+),\s*([^,]+)/);
-        return m?Math.atan2(Number(m[2]),Number(m[1]))*180/Math.PI:99;
-      })(),
-      gap:(a&&b)?Math.round(b.left-a.right):null,
-      summaryCount:card.querySelectorAll('.gx-promo-summary-item').length,
-      primaryHeight:Math.round(card.querySelector('[data-gx-promo-contract]')?.getBoundingClientRect().height||0),
-      primaryFont:parseFloat(getComputedStyle(card.querySelector('[data-gx-promo-contract]')).fontSize)
+      actionText:(card.querySelector('[data-gx-promo-action]')?.textContent||'').trim(),
+      actionCount:card.querySelectorAll('[data-gx-promo-action]').length,
+      actionBottomGap:action?Math.round(r.bottom-action.bottom):999,
+      valueGap:(copy&&value)?Math.round(value.top-copy.bottom):999,
+      oldPriceFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-price-stack s')).fontSize),
+      detailSections:card.querySelectorAll('.gx-promo-detail-section').length,
+      angleA:angle(logos[0]),
+      angleB:angle(logos[1])
     };
   }).catch(()=>null);
 
   if(
     !expanded ||
     expanded.sameNode!==true ||
-    expanded.width>370 ||
-    expanded.height>545 ||
-    expanded.contentFits!==true ||
+    expanded.height>520 ||
+    expanded.actionText!=='Contratar ahora' ||
+    expanded.actionCount!==1 ||
+    expanded.actionBottomGap>24 ||
+    expanded.valueGap>12 ||
+    expanded.oldPriceFont<13 ||
+    expanded.detailSections!==2 ||
     Math.abs(expanded.angleA)>0.5 ||
-    Math.abs(expanded.angleB)>0.5 ||
-    expanded.gap<4 ||
-    expanded.gap>18 ||
-    expanded.summaryCount<2 ||
-    expanded.primaryHeight<40 ||
-    expanded.primaryFont<11.5
+    Math.abs(expanded.angleB)>0.5
   ){
-    errors.push(`${label}: C7 expandido no quedó compacto/recto/ordenado. ${JSON.stringify(expanded)}`);
+    errors.push(`${label}: C8 expandido no quedó ordenado/compacto/CTA único. ${JSON.stringify(expanded)}`);
   }
 
-  // Cierre: misma tarjeta, vuelve al deck y combo recupera inclinación.
+  // Cierre: revisar el estado intermedio para evitar el hueco que se veía en video.
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
   );
+  await page.waitForTimeout(260);
+
+  const midClose=await page.evaluate(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c8-card"]');
+    if(!card)return null;
+    const r=card.getBoundingClientRect();
+    const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
+    const detail=card.querySelector('.gx-promo-morph-detail');
+    return {
+      returning:card.classList.contains('is-returning'),
+      actionText:(card.querySelector('[data-gx-promo-action]')?.textContent||'').trim(),
+      bottomGap:action?Math.round(r.bottom-action.bottom):999,
+      detailOpacity:detail?parseFloat(getComputedStyle(detail).opacity):1
+    };
+  }).catch(()=>null);
+
+  if(!midClose||midClose.returning!==true||midClose.actionText!=='Ver detalles'||midClose.bottomGap>28||midClose.detailOpacity>.25){
+    errors.push(`${label}: C8 cierre vuelve a dejar hueco/salto intermedio. ${JSON.stringify(midClose)}`);
+  }
+
   await page.waitForFunction(() =>
     !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
-    !!document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c7-card"]'),
-    null,{timeout:3500}
+    !!document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c8-card"]'),
+    null,{timeout:3200}
   ).catch(()=>{});
 
   const restored=await page.evaluate(() => {
-    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c7-card"]');
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c8-card"]');
     if(!card)return null;
     const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
     return {
       sameNode:card===window.__gxPromoSmokeCard,
-      expanded:card.classList.contains('is-expanded'),
+      actionText:(card.querySelector('[data-gx-promo-action]')?.textContent||'').trim(),
       transformA:getComputedStyle(logos[0]).transform,
       transformB:getComputedStyle(logos[1]).transform
     };
   }).catch(()=>null);
 
-  if(!restored||restored.sameNode!==true||restored.expanded!==false||restored.transformA==='none'||restored.transformB==='none'){
-    errors.push(`${label}: C7 cierre no restauró misma tarjeta/combo inclinado. ${JSON.stringify(restored)}`);
+  if(!restored||restored.sameNode!==true||restored.actionText!=='Ver detalles'||restored.transformA==='none'||restored.transformB==='none'){
+    errors.push(`${label}: C8 no restauró tarjeta/CTA/combo cerrado. ${JSON.stringify(restored)}`);
   }
 
-  // Porcentaje debe conservar el mismo pie/altura que combo al volver al frente.
+  // Porcentaje: misma retícula, sin línea extra visible en cerrado.
   await page.evaluate(() => {
     const pct=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]');
     if(pct&&!pct.classList.contains('is-front')) pct.click();
@@ -544,20 +553,19 @@ async function runAyuda(browser, browserName, errors) {
     document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]')?.classList.contains('is-front')===true,
     null,{timeout:2200}
   ).catch(()=>{});
+
   const percentStable=await page.evaluate(() => {
     const pct=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]');
     const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
-    const section=(card,selector)=>parseFloat(getComputedStyle(card.querySelector(selector)).height);
     return {
       heightDiff:Math.abs(parseFloat(getComputedStyle(pct).height)-parseFloat(getComputedStyle(combo).height)),
-      footerDiff:Math.abs(section(pct,'.gx-promo-card-footer')-section(combo,'.gx-promo-card-footer')),
-      priceDiff:Math.abs(section(pct,'.gx-promo-card-price')-section(combo,'.gx-promo-card-price')),
-      hasCurrentPrice:!!pct.querySelector('.gx-promo-current-price')
+      valueDiff:Math.abs(parseFloat(getComputedStyle(pct.querySelector('.gx-promo-value-row')).height)-parseFloat(getComputedStyle(combo.querySelector('.gx-promo-value-row')).height)),
+      finalClosed:getComputedStyle(pct.querySelector('.gx-promo-final-price')).display
     };
   }).catch(()=>null);
 
-  if(!percentStable||percentStable.heightDiff>1||percentStable.footerDiff>1||percentStable.priceDiff>1||percentStable.hasCurrentPrice!==false){
-    errors.push(`${label}: porcentaje C7 sigue empujando la retícula. ${JSON.stringify(percentStable)}`);
+  if(!percentStable||percentStable.heightDiff>1||percentStable.valueDiff>2||percentStable.finalClosed!=='none'){
+    errors.push(`${label}: porcentaje C8 sigue empujando la tarjeta cerrada. ${JSON.stringify(percentStable)}`);
   }
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
