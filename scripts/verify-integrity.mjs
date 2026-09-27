@@ -526,6 +526,21 @@ for (const absolute of walk(jsRoot)) {
     fail('Ayuda C14: faltan escala compacta o ritmo espacial.');
   }
 
+  // C15: la mini tarjeta Popular reutiliza el efecto histórico, sin inventar otro.
+  if (!ayudaCss.includes('GOXION · C15 MINI CARDS ALIGNMENT') ||
+      !ayudaCss.includes('animation:rotateLight 3.5s linear infinite!important') ||
+      !ayudaCss.includes('background:conic-gradient(')) {
+    fail('Ayuda C15: no reutiliza rotateLight histórico.');
+  }
+  if (!ayudaCss.includes('grid-template-columns:40px minmax(0,1fr) 48px 8px') ||
+      !ayudaCss.includes('grid-template-rows:14px 18px') ||
+      !ayudaCss.includes('grid-template-rows:12px 22px')) {
+    fail('Ayuda C15: falta la retícula fija de alineación interna.');
+  }
+  if (!ayudaCss.includes('grid-auto-columns:calc((100% - var(--gx-mini-gap))/2)')) {
+    fail('Ayuda C15: las mini tarjetas no ocupan dos columnas equilibradas.');
+  }
+
   const allHeadAt = ayudaHtml.indexOf('id="gx-catalog-all-head"');
   const toolbarAt = ayudaHtml.indexOf('class="gx-catalog-toolbar gx-seek-toolbar"');
   const catalogGridAt = ayudaHtml.indexOf('id="catalog-container"');
