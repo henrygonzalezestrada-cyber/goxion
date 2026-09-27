@@ -799,10 +799,17 @@
     },820);
   }
 
+  function realPromotions(){
+    return state.promotions.filter(p=>
+      p?.gx_preview!==true &&
+      !String(p?.id||'').startsWith('preview-')
+    );
+  }
+
   function brandPromoSaving(entry){
     let best=0;
     const key=norm(entry.name);
-    for(const p of state.promotions){
+    for(const p of realPromotions()){
       const involved=(p.items||[]).some(item=>{
         const name=norm(item?.servicio?.nombre||'');
         return name.includes(key)||key.includes(name);
@@ -837,40 +844,40 @@
     let badge='';
     let badgeClass='';
     let cardClass='';
-    let meta='';
+    let note='';
 
     if(context==='popular'){
-      if(entry.isPopular){
-        badge=featured?'MÁS POPULAR':(String(entry.tag||'').trim()||'Popular');
-        badgeClass='is-popular';
-        cardClass=featured?'is-popular-featured':'is-popular-soft';
-      }
-      if(entry.recommended) meta='Recomendado para ti';
+      badge=featured?'MÁS POPULAR':(String(entry.tag||'').trim()||'POPULAR');
+      badgeClass='is-popular';
+      cardClass=featured?'is-popular-featured':'is-popular-soft';
     }else if(context==='saving'){
       if(saving>0){
         badge='AHORRA '+Math.round(saving*100)+'%';
-        badgeClass='is-saving';
-        cardClass='is-saving-soft';
-      }else if(entry.isSaving){
-        badge=String(entry.tag||'Ahorro').trim();
-        badgeClass='is-saving';
-        cardClass='is-saving-soft';
+      }else{
+        badge=String(entry.tag||'MÁS AHORRO').trim().toUpperCase();
       }
+      badgeClass='is-saving';
+      cardClass='is-saving-soft';
     }else if(context==='discover'){
       if(entry.isNew){
         badge=String(entry.tag||'NUEVO').trim().toUpperCase();
         badgeClass='is-new';
         cardClass=featured?'is-new-featured':'is-new-soft';
-        meta=featured?'Recién agregado':'Novedad';
+        note=entry.discovery&&entry.discovery!=='nuevo'?entry.discovery:'';
       }else{
-        meta=entry.discovery||'Algo diferente';
+        note=entry.discovery||'Algo diferente';
       }
     }
 
     const badgeHtml=badge?'<span class="gx-catalog-mini-badge '+badgeClass+'">'+esc(badge)+'</span>':'';
+    const noteHtml=note?'<span class="gx-catalog-mini-note">'+esc(note)+'</span>':'';
+    const metaLine=(badgeHtml||noteHtml)
+      ?'<div class="gx-catalog-mini-meta-line">'+badgeHtml+noteHtml+'</div>'
+      :'';
+
     return '<button type="button" class="gx-catalog-mini-card '+cardClass+'" data-gx-brand="'+esc(entry.id)+'" data-gx-curation="'+esc(context)+'">'+
       '<div class="gx-catalog-mini-logo"><img src="'+esc(entry.img||logoFor(entry.name))+'" alt="'+esc(entry.name)+'"></div>'+
-      '<div class="gx-catalog-mini-copy"><div class="gx-catalog-mini-title-row"><strong>'+esc(entry.name)+'</strong>'+badgeHtml+'</div>'+(meta?'<small>'+esc(meta)+'</small>':'')+'</div>'+
+      '<div class="gx-catalog-mini-copy"><strong>'+esc(entry.name)+'</strong>'+metaLine+'</div>'+
       '<div class="gx-catalog-mini-price">Desde <b>$'+money(entry.minPrice)+'</b></div>'+
       '<span class="gx-catalog-mini-arrow">›</span>'+
     '</button>';
@@ -886,21 +893,36 @@
     const available=entries.filter(x=>x.available&&!x.owned);
     if(!available.length){section.hidden=true;return}
 
-    const ranked=rankEntries(state.curatedMode);
     let bestEntries=[];
     let featuredPopularId='';
 
     if(state.curatedMode==='saving'){
-      bestEntries=ranked
+      bestEntries=available
         .filter(x=>brandPromoSaving(x)>0||x.isSaving)
+        .sort((a,b)=>{
+          const sa=brandPromoSaving(a),sb=brandPromoSaving(b);
+          if(sb!==sa)return sb-sa;
+          if(Number(b.isSaving)!==Number(a.isSaving))return Number(b.isSaving)-Number(a.isSaving);
+          return a.minPrice-b.minPrice||a.name.localeCompare(b.name,'es');
+        })
         .slice(0,4);
     }else{
-      bestEntries=ranked.slice(0,4);
-      featuredPopularId=bestEntries.find(x=>x.isPopular)?.id||'';
+      bestEntries=available
+        .filter(x=>x.isPopular)
+        .sort((a,b)=>
+          Number(b.recommended)-Number(a.recommended) ||
+          b.score-a.score ||
+          a.minPrice-b.minPrice ||
+          a.name.localeCompare(b.name,'es')
+        )
+        .slice(0,4);
+      featuredPopularId=bestEntries[0]?.id||'';
     }
 
     const used=new Set(bestEntries.map(x=>x.id));
-    const newEntries=available.filter(x=>x.isNew);
+    const newEntries=available
+      .filter(x=>x.isNew)
+      .sort((a,b)=>Number(b.recommended)-Number(a.recommended)||b.score-a.score||a.name.localeCompare(b.name,'es'));
     const discoveryEntries=available
       .filter(x=>!x.isNew&&x.discovery&&!used.has(x.id))
       .sort((a,b)=>Number(b.recommended)-Number(a.recommended)||b.score-a.score||a.minPrice-b.minPrice);
@@ -908,9 +930,13 @@
     const discoverEntries=[...newEntries,...discoveryEntries].slice(0,4);
     const featuredNewId=newEntries[0]?.id||'';
 
+    const emptyBest=state.curatedMode==='saving'
+      ?'No hay promociones reales ni servicios marcados como Mayor ahorro por ahora.'
+      :'No hay servicios marcados como Popular disponibles para tu cuenta por ahora.';
+
     best.innerHTML=bestEntries.length
       ? bestEntries.map(x=>miniCard(x,state.curatedMode,{featured:state.curatedMode==='popular'&&x.id===featuredPopularId})).join('')
-      : '<div class="gx-catalog-curated-empty">No hay ahorros especiales activos por ahora.</div>';
+      : '<div class="gx-catalog-curated-empty">'+emptyBest+'</div>';
 
     discover.innerHTML=discoverEntries.length
       ? discoverEntries.map(x=>miniCard(x,'discover',{featured:x.id===featuredNewId})).join('')
