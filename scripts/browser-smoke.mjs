@@ -378,6 +378,68 @@ async function runAyuda(browser, browserName, errors) {
     return document.getElementById('gx-promo-showcase')?.hidden===false && cards.length===3;
   },null,{timeout:8000}).catch(()=>{});
 
+  // C14 público vs Mi Espacio: en portada no se excluye por stock/propiedad;
+  // tras autenticar sí entra la capa inteligente.
+  const c14PublicPersonalized=await page.evaluate(() => {
+    const service=(nombre,precio,etiqueta,disponibles)=>({
+      nombre,precio,etiqueta,disponibles_servidor:disponibles,
+      cuentas:1,limite:1,activo:true,descripcion:'Smoke C14'
+    });
+    const config={
+      alertas:{activa:false},
+      combo_upsell:true,
+      serviciosGlobales:[
+        service('Netflix Premium',109,'Popular 🔥',0),
+        service('Disney+ Premium',89,'Popular 🔥',1),
+        service('YouTube Premium',89,'Mas ahorro',1),
+        service('Google One 2TB',29,'',1),
+        service('Microsoft 365',79,'',1)
+      ]
+    };
+
+    window.goxionCurrentClientKey='';
+    window.cargarCatalogo({_goxion_config:config});
+    const publicPopular=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
+    const publicMode=document.getElementById('gx-catalog-curated')?.dataset.gxCatalogMode||'';
+    const publicCardCount=document.querySelectorAll('#catalog-container .brand-card').length;
+
+    window.goxionCurrentClientKey='demo';
+    window.cargarCatalogo({
+      _goxion_config:config,
+      demo:{servicios:[{nombre:'Disney+ Premium'}]}
+    });
+    const personalPopular=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
+    const personalMode=document.getElementById('gx-catalog-curated')?.dataset.gxCatalogMode||'';
+    const personalOwned=document.querySelectorAll('#catalog-container .gx-owned-service').length;
+
+    window.goxionCurrentClientKey='';
+    window.cargarCatalogo({_goxion_config:config});
+
+    return {
+      publicMode,
+      publicPopularCount:publicPopular.length,
+      publicPopularNames:publicPopular.map(x=>x.textContent||''),
+      publicCardCount,
+      personalMode,
+      personalPopularCount:personalPopular.length,
+      personalOwned
+    };
+  }).catch(()=>null);
+
+  if(
+    !c14PublicPersonalized ||
+    c14PublicPersonalized.publicMode!=='public' ||
+    c14PublicPersonalized.publicPopularCount!==2 ||
+    !c14PublicPersonalized.publicPopularNames.some(x=>x.includes('Netflix')) ||
+    !c14PublicPersonalized.publicPopularNames.some(x=>x.includes('Disney')) ||
+    c14PublicPersonalized.publicCardCount!==5 ||
+    c14PublicPersonalized.personalMode!=='personalized' ||
+    c14PublicPersonalized.personalPopularCount!==0 ||
+    c14PublicPersonalized.personalOwned<1
+  ){
+    errors.push(`${label}: C14 público/Mi Espacio no separa correctamente repertorio y recomendaciones. ${JSON.stringify(c14PublicPersonalized)}`);
+  }
+
   // C11 catálogo: cristal curado con los parámetros visuales ya usados por GOXION.
   await page.waitForFunction(() =>
     document.querySelectorAll('.gx-catalog-mini-card').length>=1,
@@ -511,6 +573,52 @@ async function runAyuda(browser, browserName, errors) {
     document.querySelector('[data-gx-curated-mode="popular"]')?.click()
   );
   await page.waitForTimeout(120);
+
+  const c14Layout=await page.evaluate(() => {
+    const card=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
+    const title=card?.querySelector('.gx-catalog-mini-copy>strong');
+    const meta=card?.querySelector('.gx-catalog-mini-meta-line');
+    const price=card?.querySelector('.gx-catalog-mini-price');
+    const priceLabel=price?.querySelector('span');
+    const priceValue=price?.querySelector('b');
+    const allHead=document.getElementById('gx-catalog-all-head');
+    const toolbar=document.querySelector('.gx-catalog-toolbar');
+    const catalog=document.getElementById('catalog-container');
+    const cardBox=card?.getBoundingClientRect();
+    const titleBox=title?.getBoundingClientRect();
+    const metaBox=meta?.getBoundingClientRect();
+    const priceBox=price?.getBoundingClientRect();
+    const priceLabelBox=priceLabel?.getBoundingClientRect();
+    const priceValueBox=priceValue?.getBoundingClientRect();
+    const headBox=allHead?.getBoundingClientRect();
+    const toolbarBox=toolbar?.getBoundingClientRect();
+    const catalogBox=catalog?.getBoundingClientRect();
+    return {
+      cardHeight:cardBox?.height||0,
+      cardWidth:cardBox?.width||0,
+      titleBeforeMeta:!!titleBox&&!!metaBox&&titleBox.bottom<=metaBox.top+1,
+      priceVertical:!!priceLabelBox&&!!priceValueBox&&priceLabelBox.bottom<=priceValueBox.top+2,
+      priceRightOfCopy:!!priceBox&&!!titleBox&&priceBox.left>titleBox.left,
+      toolbarBelowHead:!!headBox&&!!toolbarBox&&toolbarBox.top>=headBox.bottom-1,
+      catalogBelowToolbar:!!toolbarBox&&!!catalogBox&&catalogBox.top>=toolbarBox.bottom-1,
+      leftAlignment:!!headBox&&!!cardBox&&Math.abs(headBox.left-cardBox.left)<=6
+    };
+  }).catch(()=>null);
+
+  if(
+    !c14Layout ||
+    c14Layout.cardHeight>80 ||
+    c14Layout.cardHeight<64 ||
+    c14Layout.cardWidth>250 ||
+    c14Layout.titleBeforeMeta!==true ||
+    c14Layout.priceVertical!==true ||
+    c14Layout.priceRightOfCopy!==true ||
+    c14Layout.toolbarBelowHead!==true ||
+    c14Layout.catalogBelowToolbar!==true ||
+    c14Layout.leftAlignment!==true
+  ){
+    errors.push(`${label}: C14 layout no mantiene jerarquía/espaciado compacto. ${JSON.stringify(c14Layout)}`);
+  }
 
   const closedLayout=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
