@@ -12670,3 +12670,180 @@ body.gx-promo-morph-open{overflow:hidden!important}
         animation:none!important;
     }
 }
+
+
+/* =========================================================
+   GOXION · C9.1 POLISH FINO
+   Compacta: cápsula de detalles.
+   Abierta: valor, disponibilidad y CTA.
+   Carrusel: movimiento premium visible sin tocar el morph.
+   ========================================================= */
+
+/* Compacta · cápsula "Ver detalles" más pequeña y ligeramente más arriba */
+.gx-promo-deck-card.is-closed .gx-promo-action-zone{
+    padding-top:2px;
+    margin-bottom:6px;
+}
+.gx-promo-deck-card.is-closed .gx-promo-action{
+    min-width:102px;
+    min-height:33px;
+    padding:0 13px;
+    border-color:rgba(255,255,255,.16);
+    background:rgba(255,255,255,.105);
+    font-size:10.4px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.09),0 5px 14px rgba(0,0,0,.11);
+}
+
+/* Abierta · precio / ahorro / precio anterior forman un único bloque compacto */
+.gx-promo-deck-card.is-expanded .gx-promo-value-stack{
+    min-height:70px;
+    margin-top:-4px;
+    gap:1px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-primary-value{
+    line-height:.88;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-saving{
+    margin-top:-1px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-saving>strong{
+    display:block;
+    font-size:14px;
+    line-height:1.03;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-old-price{
+    display:block;
+    margin-top:0;
+    font-size:14.5px;
+    line-height:1;
+}
+
+/* Abierta · disponibilidad no desperdicia una segunda línea */
+.gx-promo-deck-card.is-expanded .gx-promo-detail-facts>div:last-child:nth-child(2){
+    grid-column:2 / 4;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-facts>div:last-child strong{
+    white-space:nowrap;
+    overflow:visible;
+    text-overflow:clip;
+    font-size:10.5px;
+}
+
+/* Abierta · CTA más sobrio, integrado y premium */
+.gx-promo-deck-card.is-expanded .gx-promo-action-zone{
+    padding-top:9px;
+}
+.gx-promo-action.is-contract{
+    width:min(68%,210px);
+    min-width:184px;
+    min-height:42px;
+    padding:0 18px;
+    border:1px solid color-mix(in srgb,var(--gx-brand-accent) 34%,rgba(255,255,255,.20));
+    border-radius:16px;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,.045)),
+      color-mix(in srgb,var(--gx-brand-deep) 72%,#07101f 28%);
+    color:#fff;
+    font-size:12px;
+    font-weight:840;
+    letter-spacing:-.012em;
+    box-shadow:
+      0 10px 25px rgba(0,0,0,.25),
+      0 0 18px color-mix(in srgb,var(--gx-brand-accent) 12%,transparent),
+      inset 0 1px 0 rgba(255,255,255,.17);
+}
+.gx-promo-action.is-contract:active{
+    transform:scale(.985);
+}
+
+/* Carrusel · barrido luminoso visible sobre la cara completa de la protagonista */
+.gx-promo-deck-card.is-closed.is-front{
+    overflow:hidden;
+    isolation:isolate;
+}
+.gx-promo-deck-card.is-closed.is-front::before{
+    display:block!important;
+    content:"";
+    position:absolute;
+    z-index:7;
+    top:-24%;
+    left:-48%;
+    width:30%;
+    height:150%;
+    pointer-events:none;
+    opacity:0;
+    border-radius:46%;
+    background:linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,.035) 22%,
+      color-mix(in srgb,var(--gx-brand-accent) 28%,rgba(255,255,255,.18)) 48%,
+      rgba(255,255,255,.12) 64%,
+      transparent 100%
+    );
+    transform:translate3d(0,0,0) rotate(10deg);
+    animation:gxPromoC91FaceSweep 4.6s cubic-bezier(.28,.08,.22,1) infinite!important;
+}
+.gx-promo-deck-card.is-closed.is-front::after{
+    animation:gxPromoC91EdgeBreath 3.15s ease-in-out infinite alternate!important;
+}
+@keyframes gxPromoC91FaceSweep{
+    0%,42%{
+        opacity:0;
+        transform:translate3d(0,0,0) rotate(10deg);
+    }
+    51%{opacity:.30}
+    76%{opacity:.56}
+    88%{
+        opacity:.18;
+        transform:translate3d(520%,0,0) rotate(10deg);
+    }
+    89%,100%{
+        opacity:0;
+        transform:translate3d(520%,0,0) rotate(10deg);
+    }
+}
+@keyframes gxPromoC91EdgeBreath{
+    0%{
+        opacity:.32;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.10),
+          0 0 10px color-mix(in srgb,var(--gx-brand-accent) 13%,transparent);
+    }
+    100%{
+        opacity:.76;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.19),
+          0 0 27px color-mix(in srgb,var(--gx-brand-accent) 31%,transparent);
+    }
+}
+
+@media(max-width:390px){
+    .gx-promo-deck-card.is-closed .gx-promo-action-zone{margin-bottom:5px}
+    .gx-promo-deck-card.is-closed .gx-promo-action{
+        min-width:98px;
+        min-height:32px;
+        font-size:10.1px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-value-stack{
+        min-height:68px;
+        margin-top:-5px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-facts>div:last-child strong{
+        font-size:10px;
+    }
+    .gx-promo-action.is-contract{
+        width:min(70%,204px);
+        min-width:178px;
+        min-height:41px;
+        border-radius:15px;
+        font-size:11.7px;
+    }
+}
+
+@media(prefers-reduced-motion:reduce){
+    .gx-promo-deck-card.is-closed.is-front::before,
+    .gx-promo-deck-card.is-closed.is-front::after{
+        animation:none!important;
+    }
+}
