@@ -15,6 +15,8 @@
     expandedCard:null,
     expandedOrigin:null,
     expandedPlaceholder:null,
+    expandedClickHandler:null,
+    expandedKeyHandler:null,
     morphBackdrop:null
   };
 
@@ -503,6 +505,40 @@
     state.expandedPlaceholder=placeholder;
     document.body.appendChild(card);
 
+    const expandedClickHandler=(event)=>{
+      if(event.target.closest('[data-gx-promo-close]')){
+        event.preventDefault();
+        event.stopPropagation();
+        closePromoDetail(card);
+        return;
+      }
+      const serviceBtn=event.target.closest('[data-gx-promo-service]');
+      if(serviceBtn){
+        event.preventDefault();
+        event.stopPropagation();
+        const serviceName=serviceBtn.dataset.gxPromoService||'';
+        closePromoDetail(card);
+        setTimeout(()=>focusCatalogBrandByName(serviceName),520);
+        return;
+      }
+      if(event.target.closest('[data-gx-promo-login]')){
+        event.preventDefault();
+        event.stopPropagation();
+        closePromoDetail(card);
+        setTimeout(()=>window.openAuthSheet?.(),520);
+      }
+    };
+    const expandedKeyHandler=(event)=>{
+      if(event.key==='Escape'){
+        event.preventDefault();
+        closePromoDetail(card);
+      }
+    };
+    state.expandedClickHandler=expandedClickHandler;
+    state.expandedKeyHandler=expandedKeyHandler;
+    card.addEventListener('click',expandedClickHandler);
+    card.addEventListener('keydown',expandedKeyHandler);
+
     card.style.position='fixed';
     card.style.inset='auto';
     card.style.top=rect.top+'px';
@@ -520,7 +556,7 @@
 
     const itemCount=Math.min(3,(p?.items||[]).length);
     const hasLogin=!clientToken();
-    const desiredHeight=488+(itemCount*40)+(hasLogin?38:0);
+    const desiredHeight=520+(itemCount*40)+(hasLogin?38:0);
     const targetWidth=Math.min(window.innerWidth-28,404);
     const targetHeight=Math.min(window.innerHeight-28,desiredHeight);
     const targetLeft=Math.max(14,(window.innerWidth-targetWidth)/2);
@@ -552,6 +588,10 @@
 
     setTimeout(()=>{
       card.classList.remove('is-expanded','is-closing');
+      if(state.expandedClickHandler) card.removeEventListener('click',state.expandedClickHandler);
+      if(state.expandedKeyHandler) card.removeEventListener('keydown',state.expandedKeyHandler);
+      state.expandedClickHandler=null;
+      state.expandedKeyHandler=null;
       if(state.expandedPlaceholder?.parentNode){
         state.expandedPlaceholder.parentNode.insertBefore(card,state.expandedPlaceholder);
         state.expandedPlaceholder.remove();
