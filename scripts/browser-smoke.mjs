@@ -527,7 +527,7 @@ async function runAyuda(browser, browserName, errors) {
     c12Popular.featuredCount>1 ||
     (c12Popular.featuredCount===1 && (
       c12Popular.featuredLabel!=='MÁS POPULAR' ||
-      c12Popular.featuredBorderAnimation==='none'
+      c12Popular.featuredBorderAnimation!=='rotateLight'
     )) ||
     c12Popular.softCardAnimations.some(x=>x!=='none') ||
     c12Popular.softBadgeAnimations.some(x=>x==='none') ||
@@ -618,6 +618,58 @@ async function runAyuda(browser, browserName, errors) {
     c14Layout.leftAlignment!==true
   ){
     errors.push(`${label}: C14 layout no mantiene jerarquía/espaciado compacto. ${JSON.stringify(c14Layout)}`);
+  }
+
+  const c15Alignment=await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')].slice(0,2);
+    const metric=card=>{
+      const box=card.getBoundingClientRect();
+      const logo=card.querySelector('.gx-catalog-mini-logo')?.getBoundingClientRect();
+      const title=card.querySelector('.gx-catalog-mini-copy>strong')?.getBoundingClientRect();
+      const meta=card.querySelector('.gx-catalog-mini-meta-line')?.getBoundingClientRect();
+      const priceLabel=card.querySelector('.gx-catalog-mini-price>span')?.getBoundingClientRect();
+      const priceValue=card.querySelector('.gx-catalog-mini-price>b')?.getBoundingClientRect();
+      return {
+        top:box.top,bottom:box.bottom,width:box.width,height:box.height,
+        logoY:logo?(logo.top+logo.height/2):null,
+        titleY:title?title.top:null,
+        metaY:meta?meta.top:null,
+        priceLabelY:priceLabel?priceLabel.top:null,
+        priceValueY:priceValue?priceValue.top:null
+      };
+    };
+    const m=cards.map(metric);
+    const delta=(key)=>m.length===2&&m.every(x=>Number.isFinite(x[key]))
+      ?Math.abs(m[0][key]-m[1][key])
+      :0;
+    const featured=cards.find(x=>x.classList.contains('is-popular-featured'));
+    return {
+      count:cards.length,
+      metrics:m,
+      widthDelta:delta('width'),
+      heightDelta:delta('height'),
+      logoYDelta:delta('logoY'),
+      titleYDelta:delta('titleY'),
+      metaYDelta:delta('metaY'),
+      priceLabelYDelta:delta('priceLabelY'),
+      priceValueYDelta:delta('priceValueY'),
+      featuredAnimation:featured?getComputedStyle(featured,'::before').animationName:'none'
+    };
+  }).catch(()=>null);
+
+  if(
+    !c15Alignment ||
+    c15Alignment.count<1 ||
+    c15Alignment.widthDelta>1 ||
+    c15Alignment.heightDelta>1 ||
+    c15Alignment.logoYDelta>1.5 ||
+    c15Alignment.titleYDelta>1.5 ||
+    c15Alignment.metaYDelta>1.5 ||
+    c15Alignment.priceLabelYDelta>1.5 ||
+    c15Alignment.priceValueYDelta>1.5 ||
+    (c15Alignment.count>1 && c15Alignment.featuredAnimation!=='rotateLight')
+  ){
+    errors.push(`${label}: C15 mini tarjetas siguen desalineadas o no reutilizan rotateLight. ${JSON.stringify(c15Alignment)}`);
   }
 
   const closedLayout=await page.evaluate(() => {
