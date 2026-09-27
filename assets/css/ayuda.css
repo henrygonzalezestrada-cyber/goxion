@@ -11825,6 +11825,11 @@ body.gx-promo-morph-open{
 }
 
 /* Expandida: la misma tarjeta redistribuye su contenido; no es una página scrolleable. */
+.gx-promo-deck-card.gx-promo-measuring{
+    transition:none!important;
+    overflow:visible!important;
+    max-height:none!important;
+}
 .gx-promo-deck-card.is-expanded{
     display:grid;
     grid-template-columns:92px minmax(0,1fr);
