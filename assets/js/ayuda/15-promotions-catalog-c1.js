@@ -572,9 +572,8 @@
     const targetWidth=Math.min(window.innerWidth-44,352);
     const maxHeight=Math.max(440,window.innerHeight-48);
     const itemCount=Math.min(3,(p?.items||[]).length);
-    const preferredHeight=itemCount>1?520:500;
-    const minimumGrowth=itemCount>1?180:155;
-    const targetHeight=Math.min(maxHeight,preferredHeight,Math.max(rect.height+minimumGrowth,rect.height));
+    const preferredHeight=itemCount>1?510:490;
+    const targetHeight=Math.min(maxHeight,preferredHeight);
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(24,(window.innerHeight-targetHeight)/2);
 
