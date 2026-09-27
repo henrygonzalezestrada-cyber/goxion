@@ -11352,8 +11352,8 @@ body:has(#view-catalogo.active) #goxion-main-nav{
 }
 .gx-promo-card-logos.is-combo .gx-logo-pos-1{
     z-index:1;
-    width:58px;
-    height:58px;
+    width:64px;
+    height:64px;
     margin-left:-15px;
     transform:translate3d(-1px,14px,0) rotate(7deg);
     opacity:.96;
@@ -11432,7 +11432,7 @@ body.gx-promo-morph-open{
 .gx-promo-morph-backdrop.active{
     opacity:1;
 }
-.gx-promo-morph-open .gx-promo-deck-card:not(.is-expanded){
+.gx-promo-morph-open #gx-promo-deck .gx-promo-deck-card{
     opacity:0!important;
     filter:blur(5px) saturate(.55)!important;
     pointer-events:none!important;
@@ -11519,8 +11519,8 @@ body.gx-promo-morph-open{
     transform:translate3d(7px,0,0) rotate(-5deg);
 }
 .gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
-    width:74px;
-    height:74px;
+    width:84px;
+    height:84px;
     margin-left:-18px;
     transform:translate3d(0,18px,0) rotate(6deg);
 }
