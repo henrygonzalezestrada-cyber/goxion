@@ -205,6 +205,16 @@
     }
   }
 
+  function catalogIsPersonalized(){
+    return window.__GOXION_CATALOG_SESSION?.authenticated===true;
+  }
+
+  function curatedPool(entries){
+    return catalogIsPersonalized()
+      ? entries.filter(x=>x.available&&!x.owned)
+      : entries.slice();
+  }
+
   function catalogEntries(){
     return Object.entries(window.catalogGroups||{}).map(([id,brand])=>{
       const plans=Array.isArray(brand?.plans)?brand.plans:[];
@@ -890,14 +900,15 @@
     if(!section||!best||!discover) return;
 
     const entries=catalogEntries();
-    const available=entries.filter(x=>x.available&&!x.owned);
-    if(!available.length){section.hidden=true;return}
+    const personalized=catalogIsPersonalized();
+    const pool=curatedPool(entries);
+    if(!pool.length){section.hidden=true;return}
 
     let bestEntries=[];
     let featuredPopularId='';
 
     if(state.curatedMode==='saving'){
-      bestEntries=available
+      bestEntries=pool
         .filter(x=>brandPromoSaving(x)>0||x.isSaving)
         .sort((a,b)=>{
           const sa=brandPromoSaving(a),sb=brandPromoSaving(b);
@@ -907,32 +918,48 @@
         })
         .slice(0,4);
     }else{
-      bestEntries=available
+      bestEntries=pool
         .filter(x=>x.isPopular)
-        .sort((a,b)=>
-          Number(b.recommended)-Number(a.recommended) ||
-          b.score-a.score ||
-          a.minPrice-b.minPrice ||
-          a.name.localeCompare(b.name,'es')
-        )
+        .sort((a,b)=>{
+          if(personalized){
+            if(Number(b.recommended)!==Number(a.recommended))return Number(b.recommended)-Number(a.recommended);
+            if(b.score!==a.score)return b.score-a.score;
+          }
+          return a.minPrice-b.minPrice||a.name.localeCompare(b.name,'es');
+        })
         .slice(0,4);
       featuredPopularId=bestEntries[0]?.id||'';
     }
 
     const used=new Set(bestEntries.map(x=>x.id));
-    const newEntries=available
+    const newEntries=pool
       .filter(x=>x.isNew)
-      .sort((a,b)=>Number(b.recommended)-Number(a.recommended)||b.score-a.score||a.name.localeCompare(b.name,'es'));
-    const discoveryEntries=available
+      .sort((a,b)=>{
+        if(personalized){
+          if(Number(b.recommended)!==Number(a.recommended))return Number(b.recommended)-Number(a.recommended);
+          if(b.score!==a.score)return b.score-a.score;
+        }
+        return a.name.localeCompare(b.name,'es');
+      });
+
+    const discoveryEntries=pool
       .filter(x=>!x.isNew&&x.discovery&&!used.has(x.id))
-      .sort((a,b)=>Number(b.recommended)-Number(a.recommended)||b.score-a.score||a.minPrice-b.minPrice);
+      .sort((a,b)=>{
+        if(personalized){
+          if(Number(b.recommended)!==Number(a.recommended))return Number(b.recommended)-Number(a.recommended);
+          if(b.score!==a.score)return b.score-a.score;
+        }
+        return a.minPrice-b.minPrice||a.name.localeCompare(b.name,'es');
+      });
 
     const discoverEntries=[...newEntries,...discoveryEntries].slice(0,4);
     const featuredNewId=newEntries[0]?.id||'';
 
     const emptyBest=state.curatedMode==='saving'
       ?'No hay promociones reales ni servicios marcados como Mayor ahorro por ahora.'
-      :'No hay servicios marcados como Popular disponibles para tu cuenta por ahora.';
+      :(personalized
+        ?'No hay servicios marcados como Popular disponibles para tu cuenta por ahora.'
+        :'No hay servicios marcados como Popular por ahora.');
 
     best.innerHTML=bestEntries.length
       ? bestEntries.map(x=>miniCard(x,state.curatedMode,{featured:state.curatedMode==='popular'&&x.id===featuredPopularId})).join('')
@@ -943,6 +970,7 @@
       : '<div class="gx-catalog-curated-empty">Pronto agregaremos herramientas diferentes al streaming.</div>';
 
     section.hidden=false;
+    section.dataset.gxCatalogMode=personalized?'personalized':'public';
 
     section.querySelectorAll('[data-gx-brand]').forEach(btn=>{
       btn.addEventListener('click',()=>focusCatalogBrand(btn.dataset.gxBrand||''));
