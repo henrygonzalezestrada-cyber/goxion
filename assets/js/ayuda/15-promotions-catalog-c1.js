@@ -817,12 +817,13 @@
 
   function miniCard(entry,context='popular'){
     const saving=brandPromoSaving(entry);
-    let meta=entry.tag||('Desde $'+money(entry.minPrice));
+    let meta=String(entry.tag||'').trim();
     if(context==='saving'&&saving>0) meta=Math.round(saving*100)+'% de ahorro disponible';
     else if(entry.recommended) meta='Recomendado para ti';
+    if(/^desde\s*\$/i.test(meta)) meta='';
     return '<button type="button" class="gx-catalog-mini-card" data-gx-brand="'+esc(entry.id)+'">'+
       '<div class="gx-catalog-mini-logo"><img src="'+esc(entry.img||logoFor(entry.name))+'" alt="'+esc(entry.name)+'"></div>'+
-      '<div class="gx-catalog-mini-copy"><strong>'+esc(entry.name)+'</strong><small>'+esc(meta)+'</small></div>'+
+      '<div class="gx-catalog-mini-copy"><strong>'+esc(entry.name)+'</strong>'+(meta?'<small>'+esc(meta)+'</small>':'')+'</div>'+
       '<div class="gx-catalog-mini-price">Desde <b>$'+money(entry.minPrice)+'</b></div>'+
       '<span class="gx-catalog-mini-arrow">›</span>'+
     '</button>';
