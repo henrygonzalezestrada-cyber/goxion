@@ -288,11 +288,11 @@
     const contract=promoContractState(p);
     const promoTotal=promoContractPrice(p);
     const oldPrice=p?.mostrar_precio_anterior!==false&&normal>0
-      ? '<s>$'+money(normal)+'</s>' : '';
+      ? '<s class="gx-promo-old-price">$'+money(normal)+'</s>' : '';
     const savingLine=saving>0
       ? '<div class="gx-promo-saving"><strong>Ahorras $'+money(saving)+'</strong></div>' : '';
-    const percentFinal=p?.mecanica==='porcentaje'&&promoTotal>0
-      ? '<span class="gx-promo-final-price">Precio final $'+money(promoTotal)+'</span>' : '';
+    const percentFact=p?.mecanica==='porcentaje'&&promoTotal>0
+      ? '<div><span>Precio promo</span><strong>$'+money(promoTotal)+'</strong></div>' : '';
     const preview=p?.gx_preview===true?'<span class="gx-promo-preview-chip">PREVIEW</span>':'';
     const comboClass=(p?.items||[]).length>1?' is-combo':'';
     const mechanicClass=' gx-mechanic-'+String(p?.mecanica||'promo').replace(/[^a-z0-9_-]/gi,'');
@@ -309,15 +309,17 @@
         (title!==platform?'<span class="gx-promo-offer-title">'+esc(title)+'</span>':'')+
         '<p class="gx-promo-card-description">'+esc(description)+'</p>'+
       '</div>'+
-      '<div class="gx-promo-value-row">'+
-        '<div class="gx-promo-price-stack"><b>'+esc(promoPrice(p))+'</b>'+oldPrice+percentFinal+'</div>'+
+      '<div class="gx-promo-value-stack">'+
+        '<b class="gx-promo-primary-value">'+esc(promoPrice(p))+'</b>'+
         savingLine+
+        oldPrice+
       '</div>'+
       '<div class="gx-promo-morph-detail" aria-hidden="true">'+
         '<div class="gx-promo-detail-section">'+
           '<span class="gx-promo-detail-kicker">Detalles de la oferta</span>'+
           '<div class="gx-promo-detail-facts">'+
             '<div><span>Duración</span><strong>'+esc(promoDurationLabel(p))+'</strong></div>'+
+            percentFact+
             '<div><span>Disponibilidad</span><strong>'+esc(statusText(p))+'</strong></div>'+
           '</div>'+
         '</div>'+
@@ -612,9 +614,8 @@
     state.pendingPromoRender=false;
 
     const targetWidth=Math.min(window.innerWidth-44,352);
-    const maxHeight=Math.max(430,window.innerHeight-52);
-    const itemCount=Math.min(3,(p?.items||[]).length);
-    const targetHeight=Math.min(maxHeight,itemCount>1?500:472);
+    const maxHeight=Math.max(470,window.innerHeight-52);
+    const targetHeight=Math.min(maxHeight,526);
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(26,(window.innerHeight-targetHeight)/2);
 
@@ -669,7 +670,11 @@
         card.classList.add('is-expanded');
         void card.offsetWidth;
         setPromoActionState(card,p,true);
-        card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
+        const detail=card.querySelector('.gx-promo-morph-detail');
+        if(detail){
+          detail.scrollTop=0;
+          detail.setAttribute('aria-hidden','false');
+        }
         card.style.top=targetTop+'px';
         card.style.left=targetLeft+'px';
         card.style.setProperty('width',targetWidth+'px','important');
@@ -683,25 +688,33 @@
     const origin=state.expandedOrigin;
     const index=Number(card.dataset.gxPromoIndex||0);
     const promo=selectedPromotions()[index];
+    const detail=card.querySelector('.gx-promo-morph-detail');
 
     card.classList.add('is-closing');
-    card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','true');
+    if(detail){
+      detail.scrollTop=0;
+      detail.setAttribute('aria-hidden','true');
+    }
     state.morphBackdrop?.classList.remove('active');
-    setPromoActionState(card,promo,false);
 
-    // Primero desaparece sólo la información secundaria.
+    // Fase 1: desaparecen únicamente los detalles; hero, valor y CTA no se mueven.
     setTimeout(()=>{
       if(card!==state.expandedCard) return;
+      setPromoActionState(card,promo,false);
       card.classList.add('is-returning');
-      if(origin){
+      void card.offsetWidth;
+
+      // Fase 2: la composición ya es visualmente la cerrada antes de encoger el rectángulo.
+      requestAnimationFrame(()=>{
+        if(card!==state.expandedCard||!origin) return;
         card.style.top=origin.top+'px';
         card.style.left=origin.left+'px';
         card.style.setProperty('width',origin.width+'px','important');
         card.style.setProperty('height',origin.height+'px','important');
-      }
-    },80);
+      });
+    },110);
 
-    // El CTA sigue anclado abajo y el mismo nodo vuelve al deck al terminar.
+    // Sólo retiramos is-expanded cuando la composición y el tamaño ya coinciden con el estado cerrado.
     setTimeout(()=>{
       if(card!==state.expandedCard) return;
 
@@ -741,7 +754,7 @@
         applyDeckPositions();
         requestAnimationFrame(()=>startAuto());
       }
-    },560);
+    },650);
   }
 
   function brandPromoSaving(entry){
