@@ -459,6 +459,28 @@ for (const absolute of walk(jsRoot)) {
   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
     fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
   }
+
+  // C12: las etiquetas de Admin alimentan curaduría, no decoran el catálogo completo.
+  if (catalogOrders.includes('animated-etiqueta') || catalogOrders.includes('has-promo')) {
+    fail('Ayuda C12: catálogo completo volvió a usar etiquetas comerciales.');
+  }
+  if (catalogOrders.includes('score += 2')) {
+    fail('Ayuda C12: una etiqueta volvió a alterar genéricamente el recommendation score.');
+  }
+  if (!catalogOrders.includes('const cardPromoClass = "";') || !catalogOrders.includes('const badgeHtml = "";')) {
+    fail('Ayuda C12: el catálogo neutral perdió su separación de presentación.');
+  }
+  if (!promoCatalog.includes("const tagPopular=") ||
+      !promoCatalog.includes("const tagSaving=") ||
+      !promoCatalog.includes("const tagNew=") ||
+      !promoCatalog.includes("const newEntries=available.filter(x=>x.isNew)") ||
+      !promoCatalog.includes("is-popular-featured") ||
+      !promoCatalog.includes("is-saving-soft")) {
+    fail('Ayuda C12: falta la lógica de curaduría Popular/Ahorro/Nuevo.');
+  }
+  if (!ayudaCss.includes('GOXION · C12 CURATED HIERARCHY')) {
+    fail('Ayuda C12: faltan estilos de jerarquía de movimiento.');
+  }
 }
 
 // Promotions Studio v2 + P3: universal campaign builder with immutable acquisition gateway.
