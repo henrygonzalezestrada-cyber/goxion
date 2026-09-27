@@ -697,14 +697,16 @@
     }
     state.morphBackdrop?.classList.remove('active');
 
-    // Fase 1: desaparecen únicamente los detalles; hero, valor y CTA no se mueven.
+    // Fase 1: retiramos sólo el contenido secundario.
     setTimeout(()=>{
       if(card!==state.expandedCard) return;
+
+      // Fase 2: la tarjeta adopta el layout cerrado REAL mientras sigue fija y grande.
       setPromoActionState(card,promo,false);
+      card.classList.remove('is-expanded');
       card.classList.add('is-returning');
       void card.offsetWidth;
 
-      // Fase 2: la composición ya es visualmente la cerrada antes de encoger el rectángulo.
       requestAnimationFrame(()=>{
         if(card!==state.expandedCard||!origin) return;
         card.style.top=origin.top+'px';
@@ -714,11 +716,11 @@
       });
     },110);
 
-    // Sólo retiramos is-expanded cuando la composición y el tamaño ya coinciden con el estado cerrado.
+    // Al terminar, sólo devolvemos el mismo nodo al deck: ya no hay cambio de composición.
     setTimeout(()=>{
       if(card!==state.expandedCard) return;
 
-      card.classList.remove('is-expanded','is-closing','is-returning');
+      card.classList.remove('is-closing','is-returning');
       if(state.expandedClickHandler) card.removeEventListener('click',state.expandedClickHandler);
       if(state.expandedKeyHandler) card.removeEventListener('keydown',state.expandedKeyHandler);
       state.expandedClickHandler=null;
@@ -754,7 +756,7 @@
         applyDeckPositions();
         requestAnimationFrame(()=>startAuto());
       }
-    },650);
+    },720);
   }
 
   function brandPromoSaving(entry){
