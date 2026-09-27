@@ -720,4 +720,4 @@
   bindCuratedSwitch();
   bindSearch();
   loadPromotions(true);
-})()
+})();
