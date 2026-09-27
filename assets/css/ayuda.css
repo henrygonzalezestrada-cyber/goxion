@@ -14189,3 +14189,113 @@ body.gx-promo-morph-open{overflow:hidden!important}
         font-size:15px;
     }
 }
+
+
+/* =========================================================
+   GOXION · C17 FINAL MINI POLISH
+   Cierre de mini tarjetas:
+   - ancho idéntico y un poco menor en todos los railes;
+   - glow de píldoras sin recorte rectangular;
+   - aire vertical equilibrado;
+   - chevron redondeado alineado con el catálogo inferior.
+   ========================================================= */
+
+/* Mismo ancho REAL para Popular, Ahorro y Descubre. */
+#view-catalogo .gx-catalog-mini-rail{
+    grid-auto-columns:61%;
+    gap:9px;
+    padding:1px 2px 5px;
+}
+
+/* La píldora puede proyectar su glow redondeado sin que el padre lo recorte en caja. */
+#view-catalogo .gx-catalog-mini-meta-line{
+    overflow:visible;
+}
+
+/* MÁS POPULAR: glow orgánico, sin sombra rectangular/clipping. */
+#view-catalogo .is-popular-featured .gx-catalog-mini-badge.is-popular{
+    overflow:hidden;
+    border-radius:999px;
+    filter:none;
+    box-shadow:
+        0 0 8px 1px rgba(255,87,42,.30),
+        0 0 14px 2px rgba(255,170,0,.10),
+        inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+/* Mantener el auto-fit dentro de la zona disponible aunque el glow sea visible. */
+#view-catalogo .gx-catalog-mini-badge,
+#view-catalogo .gx-catalog-mini-note{
+    max-width:100%;
+}
+
+/* Chevron SVG redondeado: mismo lenguaje que los acordeones del catálogo. */
+#view-catalogo .gx-catalog-mini-card .gx-catalog-mini-arrow{
+    right:8px!important;
+    width:15px;
+    height:22px;
+    color:#8292a8;
+    opacity:.84;
+}
+#view-catalogo .gx-catalog-mini-chevron{
+    width:10px;
+    height:14px;
+    display:block;
+    overflow:visible;
+}
+#view-catalogo .gx-catalog-mini-chevron path{
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2.15;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;
+}
+#view-catalogo .gx-catalog-mini-card:active .gx-catalog-mini-arrow{
+    color:#c7d5e7;
+    opacity:1;
+}
+
+/* Menos aire muerto entre rail y siguiente título, conservando respiración. */
+#view-catalogo .gx-catalog-curated{
+    gap:14px;
+    margin-bottom:16px;
+}
+#view-catalogo .gx-catalog-curated-head{
+    margin-bottom:8px;
+}
+#view-catalogo .gx-catalog-discover-section{
+    padding-top:12px;
+}
+#view-catalogo .gx-catalog-all-head{
+    padding-top:14px;
+    margin-bottom:9px;
+}
+
+/* Las mini tarjetas conservan la escala C16: compactas, no aplastadas. */
+#view-catalogo .gx-catalog-mini-card{
+    min-height:72px;
+    height:72px;
+}
+
+/* Asegurar que ningún estado cambie el ancho visual de su tarjeta. */
+#view-catalogo .gx-catalog-mini-card.is-popular-featured,
+#view-catalogo .gx-catalog-mini-card.is-popular-soft,
+#view-catalogo .gx-catalog-mini-card.is-saving-soft,
+#view-catalogo .gx-catalog-mini-card.is-new-featured,
+#view-catalogo .gx-catalog-mini-card.is-new-soft{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+}
+
+@media(max-width:390px){
+    #view-catalogo .gx-catalog-mini-rail{
+        grid-auto-columns:60%;
+    }
+    #view-catalogo .gx-catalog-mini-card{
+        min-height:70px;
+        height:70px;
+    }
+}
