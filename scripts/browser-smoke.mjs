@@ -672,6 +672,44 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: C15 mini tarjetas siguen desalineadas o no reutilizan rotateLight. ${JSON.stringify(c15Alignment)}`);
   }
 
+  const c16Mini=await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')].slice(0,2);
+    const rows=cards.map(card=>{
+      const r=card.getBoundingClientRect();
+      const pill=card.querySelector('.gx-catalog-mini-badge,.gx-catalog-mini-note');
+      const price=card.querySelector('.gx-catalog-mini-price');
+      const arrow=card.querySelector('.gx-catalog-mini-arrow');
+      const pr=price?.getBoundingClientRect();
+      const ar=arrow?.getBoundingClientRect();
+      const ps=pill?getComputedStyle(pill):null;
+      return {
+        width:r.width,
+        height:r.height,
+        pillFits:!pill || pill.scrollWidth<=pill.clientWidth+1,
+        pillFont:ps?parseFloat(ps.fontSize):0,
+        pillHeight:pill?.getBoundingClientRect().height||0,
+        priceCenterDiff:pr?Math.abs((pr.top+pr.height/2)-(r.top+r.height/2)-4):99,
+        arrowCenterDiff:ar?Math.abs((ar.top+ar.height/2)-(r.top+r.height/2)):99,
+        arrowOpacity:arrow?parseFloat(getComputedStyle(arrow).opacity):0
+      };
+    });
+    return {count:cards.length,rows};
+  }).catch(()=>null);
+
+  if(
+    !c16Mini ||
+    c16Mini.count<1 ||
+    c16Mini.rows.some(x=>x.width<200||x.width>245) ||
+    c16Mini.rows.some(x=>x.height<70||x.height>76) ||
+    c16Mini.rows.some(x=>x.pillFits!==true) ||
+    c16Mini.rows.some(x=>x.pillFont>6.8||x.pillFont<5.1) ||
+    c16Mini.rows.some(x=>x.pillHeight>19) ||
+    c16Mini.rows.some(x=>x.priceCenterDiff>2.5) ||
+    c16Mini.rows.some(x=>x.arrowCenterDiff>1.5||x.arrowOpacity<.8)
+  ){
+    errors.push(`${label}: C16 mini tarjetas no conservan aire/pill/precio/flecha. ${JSON.stringify(c16Mini)}`);
+  }
+
   const closedLayout=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
     const front=cards.find(x=>x.classList.contains('is-front'));
