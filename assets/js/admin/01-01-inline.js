@@ -147,6 +147,17 @@ let clientesDict = {};
                 <tr>
                     <td><input type="text" value="${srv.nombre}" onchange="updateGlobalService(${index}, 'nombre', this.value)"></td>
                     <td><input type="text" placeholder="Ej: Promo" value="${srv.etiqueta || ''}" onchange="updateGlobalService(${index}, 'etiqueta', this.value)"></td>
+                    <td>
+                        <select class="custom-select" style="min-width:130px;" onchange="updateGlobalService(${index}, 'categoria_catalogo', this.value)">
+                            <option value="streaming" ${(srv.categoria_catalogo||'streaming')==='streaming'?'selected':''}>Streaming</option>
+                            <option value="productividad" ${srv.categoria_catalogo==='productividad'?'selected':''}>Productividad</option>
+                            <option value="almacenamiento" ${srv.categoria_catalogo==='almacenamiento'?'selected':''}>Almacenamiento</option>
+                            <option value="idiomas" ${srv.categoria_catalogo==='idiomas'?'selected':''}>Idiomas</option>
+                            <option value="educacion" ${srv.categoria_catalogo==='educacion'?'selected':''}>Educación</option>
+                            <option value="ia" ${srv.categoria_catalogo==='ia'?'selected':''}>IA</option>
+                            <option value="creatividad" ${srv.categoria_catalogo==='creatividad'?'selected':''}>Creatividad</option>
+                        </select>
+                    </td>
                     <td><input type="text" style="min-width:140px;" placeholder="Ej: 4K, 1 Perfil..." value="${srv.beneficios || ''}" onchange="updateGlobalService(${index}, 'beneficios', this.value)"></td>
                     <td><input type="number" style="color:var(--neon-green);" value="${cuentasMultiplicador}" onchange="updateGlobalService(${index}, 'cuentas', this.value)" title="Cuentas Madres Activas"></td>
                     <td><input type="number" value="${srv.precio}" onchange="updateGlobalService(${index}, 'precio', this.value)"></td>
