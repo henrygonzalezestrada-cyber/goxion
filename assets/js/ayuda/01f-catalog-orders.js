@@ -299,7 +299,6 @@
                 reason = 'Complementa tu Prime Video';
             }
 
-            if (brand.plans.some(p => String(p.etiqueta || '').trim())) score += 2;
             return {score,reason};
         }
 
@@ -496,25 +495,11 @@
                     pillsHtml += `<button class="plan-pill ${idx === 0 ? 'active' : ''}" style="opacity: ${opacity}" onclick="selectSubPlan('${bKey}', ${idx}, this)" ${plan.disponibles <= 0 ? 'disabled' : ''}>${planName}</button>`;
                 });
 
-                // ASIGNACIÓN INTELIGENTE DE CLASES PARA TARJETAS Y ETIQUETAS
-                let badgeClass = "animated-etiqueta";
-                let cardPromoClass = "";
-                
-                if (brandTag) {
-                    let tLow = brandTag.toLowerCase();
-                    if (tLow.includes("nuevo") || tLow.includes("estreno")) {
-                        badgeClass += " is-nuevo";
-                        cardPromoClass = "has-promo has-promo-nuevo";
-                    } else if (tLow.includes("ahorro") || tLow.includes("promo") || tLow.includes("descuento") || tLow.includes("oferta")) {
-                        badgeClass += " is-ahorro";
-                        cardPromoClass = "has-promo has-promo-ahorro";
-                    } else {
-                        // Animación rotatoria (Por defecto o Popular)
-                        cardPromoClass = "has-promo has-promo-popular";
-                    }
-                }
-                
-                let badgeHtml = brandTag ? `<span class="${badgeClass}" style="margin-top: 2px;">${brandTag}</span>` : '';
+                // C12: la etiqueta comercial sigue viviendo en los datos para la
+                // curaduría superior, pero el catálogo completo es deliberadamente neutral.
+                // Aquí no se pinta badge ni se activa ninguna animación promocional.
+                const cardPromoClass = "";
+                const badgeHtml = "";
 
                 const gxContextBadge = gxCatalogClient.authenticated
                     ? (brand.gxOwned
@@ -532,7 +517,8 @@
                      data-gx-search="${brand.name} ${brand.plans.map(p => p.nombre).join(' ')}"
                      data-gx-owned="${brand.gxOwned ? '1' : '0'}"
                      data-gx-recommended="${brand.gxRecommended ? '1' : '0'}"
-                     data-gx-available="${brand.gxAvailable ? '1' : '0'}">
+                     data-gx-available="${brand.gxAvailable ? '1' : '0'}"
+                     data-gx-tag="${brandTag || ''}">
                     <div class="brand-header" role="button" tabindex="0" aria-expanded="false" onclick="toggleBrandCard('${bKey}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleBrandCard('${bKey}');}">
                         <div class="brand-header-left">
                             <img src="${brand.img}" class="brand-logo-img" onerror="this.src='logo2.PNG'">
@@ -589,6 +575,16 @@
             
             renderCartFloating();
         }
+
+        // Puente estable para módulos posteriores (promociones, recomendaciones, etc.).
+        window.GOXION_CATALOG_CART = window.GOXION_CATALOG_CART || {
+            add: function(nombre, precio, safeId) {
+                actualizarCarrito(String(nombre || 'Selección GOXION'), Number(precio || 0), 1, String(safeId || 'gx-item'));
+            },
+            render: function() {
+                renderCartFloating();
+            }
+        };
 
         function renderCartFloating() {
             let totalItems = 0, totalPrecio = 0;
