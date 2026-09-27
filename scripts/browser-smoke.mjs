@@ -385,7 +385,8 @@ async function runAyuda(browser, browserName, errors) {
   ).catch(()=>{});
 
   const catalogC11=await page.evaluate(() => {
-    const mini=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
+    const mini=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card:not(.is-popular-featured):not(.is-new-featured)') ||
+      document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
     const logo=mini?.querySelector('.gx-catalog-mini-logo');
     const img=logo?.querySelector('img');
     const switchBtn=document.querySelector('.gx-catalog-curated-switch button');
@@ -430,6 +431,74 @@ async function runAyuda(browser, browserName, errors) {
   ){
     errors.push(`${label}: C11 catálogo no conserva glass/logo/filtros/precio limpio. ${JSON.stringify(catalogC11)}`);
   }
+
+  // C12 curaduría: etiquetas viven arriba; catálogo completo queda neutral.
+  const c12Popular=await page.evaluate(() => {
+    const catalog=[...document.querySelectorAll('#catalog-container .brand-card')];
+    const featured=[...document.querySelectorAll('#gx-catalog-best-rail .is-popular-featured')];
+    const soft=[...document.querySelectorAll('#gx-catalog-best-rail .is-popular-soft')];
+    const newFeatured=[...document.querySelectorAll('#gx-catalog-discover-rail .is-new-featured')];
+    return {
+      catalogPromoClasses:catalog.filter(x=>x.classList.contains('has-promo')||[...x.classList].some(c=>c.startsWith('has-promo-'))).length,
+      catalogBadges:document.querySelectorAll('#catalog-container .animated-etiqueta').length,
+      featuredCount:featured.length,
+      featuredLabel:(featured[0]?.querySelector('.gx-catalog-mini-badge')?.textContent||'').trim(),
+      featuredBorderAnimation:featured[0]?getComputedStyle(featured[0],'::before').animationName:'none',
+      softCardAnimations:soft.map(x=>getComputedStyle(x).animationName),
+      softBadgeAnimations:soft.map(x=>getComputedStyle(x.querySelector('.gx-catalog-mini-badge')).animationName),
+      newFeaturedCount:newFeatured.length,
+      newFeaturedAnimation:newFeatured[0]?getComputedStyle(newFeatured[0]).animationName:'none'
+    };
+  }).catch(()=>null);
+
+  if(
+    !c12Popular ||
+    c12Popular.catalogPromoClasses!==0 ||
+    c12Popular.catalogBadges!==0 ||
+    c12Popular.featuredCount>1 ||
+    (c12Popular.featuredCount===1 && (
+      c12Popular.featuredLabel!=='MÁS POPULAR' ||
+      c12Popular.featuredBorderAnimation==='none'
+    )) ||
+    c12Popular.softCardAnimations.some(x=>x!=='none') ||
+    c12Popular.softBadgeAnimations.some(x=>x==='none') ||
+    c12Popular.newFeaturedCount>1 ||
+    (c12Popular.newFeaturedCount===1 && c12Popular.newFeaturedAnimation==='none')
+  ){
+    errors.push(`${label}: C12 no conserva jerarquía Popular/Nuevo o catálogo neutral. ${JSON.stringify(c12Popular)}`);
+  }
+
+  await page.evaluate(() =>
+    document.querySelector('[data-gx-curated-mode="saving"]')?.click()
+  );
+  await page.waitForTimeout(180);
+
+  const c12Saving=await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
+    const saving=[...document.querySelectorAll('#gx-catalog-best-rail .is-saving-soft')];
+    return {
+      cards:cards.length,
+      empty:!!document.querySelector('#gx-catalog-best-rail .gx-catalog-curated-empty'),
+      cardAnimations:saving.map(x=>getComputedStyle(x).animationName),
+      badgeAnimations:saving.map(x=>getComputedStyle(x.querySelector('.gx-catalog-mini-badge')).animationName),
+      featuredPopular:document.querySelectorAll('#gx-catalog-best-rail .is-popular-featured').length
+    };
+  }).catch(()=>null);
+
+  if(
+    !c12Saving ||
+    c12Saving.featuredPopular!==0 ||
+    c12Saving.cardAnimations.some(x=>x!=='none') ||
+    c12Saving.badgeAnimations.some(x=>x==='none') ||
+    (c12Saving.cards===0 && c12Saving.empty!==true)
+  ){
+    errors.push(`${label}: C12 Mayor ahorro usa movimiento excesivo o queda sin estado vacío. ${JSON.stringify(c12Saving)}`);
+  }
+
+  await page.evaluate(() =>
+    document.querySelector('[data-gx-curated-mode="popular"]')?.click()
+  );
+  await page.waitForTimeout(120);
 
   const closedLayout=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
