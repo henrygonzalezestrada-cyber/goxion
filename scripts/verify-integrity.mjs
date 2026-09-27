@@ -429,8 +429,8 @@ for (const absolute of walk(jsRoot)) {
   if (!promoCatalog.includes('Ahorras ')) fail('Ayuda C6: el ahorro debe expresarse como Ahorras $X.');
   if (promoCatalog.includes('en esta oferta')) fail('Ayuda C6: persiste texto descartado del ahorro.');
   if (!promoCatalog.includes('gx-promo-card-aurora')) fail('Ayuda C6: falta la capa de aurora viva.');
-  if (!promoCatalog.includes('is-returning') || !promoCatalog.includes('transitionend')) {
-    fail('Ayuda C6: el cierre debe resolverse por transición continua, no salto final.');
+  if (!promoCatalog.includes('is-returning') || !promoCatalog.includes('setTimeout(()=>') || !promoCatalog.includes('Fase 1:') || !promoCatalog.includes('Fase 2:')) {
+    fail('Ayuda C6: el cierre debe resolverse en dos fases continuas, no con salto final.');
   }
   if (!promoCatalog.includes('Contratar ahora') || !promoCatalog.includes('GOXION_CATALOG_CART')) {
     fail('Ayuda C6: Contratar ahora no usa el puente estable del carrito.');
