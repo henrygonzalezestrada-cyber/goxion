@@ -12847,3 +12847,169 @@ body.gx-promo-morph-open{overflow:hidden!important}
         animation:none!important;
     }
 }
+
+
+/* =========================================================
+   GOXION · C9.2 MICRO POLISH
+   Alineación de ahorro · incluidos compactos · shimmer visible.
+   ========================================================= */
+
+/* Abierta · Ahorras arranca exactamente en el mismo eje que el precio */
+.gx-promo-deck-card.is-expanded .gx-promo-saving{
+    align-self:stretch!important;
+    width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    padding-left:0!important;
+    padding-right:0!important;
+    justify-content:flex-start!important;
+    transform:none!important;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-saving>strong{
+    margin:0!important;
+    padding:0!important;
+    text-align:left!important;
+}
+
+/* Abierta · tarjetas de plataformas: nombre / Incluida / precio llenan la altura del logo */
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+    min-height:45px;
+    grid-template-columns:34px minmax(0,1fr);
+    grid-template-rows:1fr auto;
+    grid-template-areas:
+      "logo copy"
+      "logo price";
+    column-gap:8px;
+    row-gap:0;
+    padding:5px 7px;
+    align-items:center;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
+    width:32px;
+    height:32px;
+    align-self:center;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item>span{
+    grid-area:copy;
+    align-self:end;
+    display:flex;
+    min-width:0;
+    flex-direction:column;
+    justify-content:flex-end;
+    gap:0;
+    line-height:1.05;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{
+    display:block;
+    line-height:1.08;
+    font-size:10.5px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item small{
+    display:block;
+    margin-top:1px;
+    line-height:1.04;
+    font-size:9.2px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{
+    grid-area:price;
+    align-self:start;
+    justify-self:start;
+    margin-top:1px;
+    line-height:1.05;
+    font-size:9.8px;
+}
+
+/* Carrusel · recupera un barrido REAL sobre la superficie.
+   Se usa el nodo .gx-promo-card-glow para no competir con el morph. */
+.gx-promo-deck-card.is-closed.is-front .gx-promo-card-glow{
+    display:block!important;
+    position:absolute!important;
+    z-index:8!important;
+    top:-28%!important;
+    bottom:auto!important;
+    left:-58%!important;
+    right:auto!important;
+    width:34%!important;
+    height:165%!important;
+    border-radius:38%!important;
+    pointer-events:none!important;
+    opacity:0;
+    filter:none!important;
+    background:linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255,255,255,.035) 18%,
+      rgba(255,255,255,.24) 46%,
+      color-mix(in srgb,var(--gx-brand-accent) 32%,rgba(255,255,255,.20)) 58%,
+      rgba(255,255,255,.08) 74%,
+      transparent 100%
+    )!important;
+    mix-blend-mode:screen;
+    transform:translate3d(0,0,0) rotate(11deg)!important;
+    transform-origin:center;
+    will-change:transform,opacity;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
+    animation:gxPromoC92SurfaceSweep 3.8s cubic-bezier(.25,.08,.22,1) infinite!important;
+}
+@keyframes gxPromoC92SurfaceSweep{
+    0%,30%{
+        opacity:0;
+        transform:translate3d(0,0,0) rotate(11deg);
+    }
+    38%{opacity:.42}
+    54%{opacity:.66}
+    78%{
+        opacity:.38;
+        transform:translate3d(520%,0,0) rotate(11deg);
+    }
+    84%,100%{
+        opacity:0;
+        transform:translate3d(520%,0,0) rotate(11deg);
+    }
+}
+
+/* Acompaña el barrido con una respiración de borde perceptible, no estridente. */
+.gx-promo-deck-card.is-closed.is-front::after{
+    animation:gxPromoC92BorderPulse 2.8s ease-in-out infinite alternate!important;
+}
+@keyframes gxPromoC92BorderPulse{
+    from{
+        opacity:.34;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.10),
+          0 0 9px color-mix(in srgb,var(--gx-brand-accent) 14%,transparent);
+    }
+    to{
+        opacity:.82;
+        box-shadow:
+          inset 0 1px 0 rgba(255,255,255,.20),
+          0 0 30px color-mix(in srgb,var(--gx-brand-accent) 34%,transparent);
+    }
+}
+
+@media(max-width:390px){
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item{
+        min-height:44px;
+        grid-template-columns:32px minmax(0,1fr);
+        column-gap:7px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item img{
+        width:30px;
+        height:30px;
+    }
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item strong{font-size:10.2px}
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item small{font-size:9px}
+    .gx-promo-deck-card.is-expanded .gx-promo-detail-item>b{font-size:9.6px}
+}
+
+/* Respeta el ajuste de accesibilidad de iOS/macOS. */
+@media(prefers-reduced-motion:reduce){
+    .gx-promo-deck-card.is-closed.is-front .gx-promo-card-glow,
+    .gx-promo-deck-card.is-closed.is-front::after{
+        animation:none!important;
+    }
+    .gx-promo-deck-card.is-closed.is-front .gx-promo-card-glow{
+        display:none!important;
+    }
+}
