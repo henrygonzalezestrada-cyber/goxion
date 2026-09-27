@@ -421,20 +421,47 @@ async function runAyuda(browser, browserName, errors) {
   if(!promoAdvanced) errors.push(`${label}: carrusel promocional C1 no avanzó manualmente.`);
 
   await page.evaluate(() => {
-    document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.click();
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front');
+    window.__gxPromoSmokeCard=card;
+    card?.click();
   });
   await page.waitForFunction(() =>
-    document.querySelector('.gx-promo-expanded.active .gx-promo-expanded-card')!==null,
+    document.querySelector('body > .gx-promo-deck-card.is-expanded')!==null,
     null,
-    { timeout: 1500 }
+    { timeout: 1800 }
   ).catch(()=>{});
-  const promoExpanded=await page.evaluate(() =>
-    document.querySelector('.gx-promo-expanded.active .gx-promo-expanded-card')!==null
-  ).catch(()=>false);
-  if(!promoExpanded) errors.push(`${label}: tarjeta promocional C1 no abrió la vista expandida.`);
+  const promoExpanded=await page.evaluate(() => {
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded');
+    return {
+      exists:!!expanded,
+      sameNode:expanded===window.__gxPromoSmokeCard,
+      detailVisible:expanded?.querySelector('.gx-promo-morph-detail')?.getAttribute('aria-hidden')==='false',
+      hasOrbit:!!expanded?.querySelector('.gx-promo-card-orbit'),
+      comboEditorial:!!expanded?.querySelector('.gx-promo-card-logos.is-combo .gx-logo-pos-1')
+    };
+  }).catch(()=>null);
+  if(
+    !promoExpanded ||
+    promoExpanded.exists!==true ||
+    promoExpanded.sameNode!==true ||
+    promoExpanded.detailVisible!==true ||
+    promoExpanded.hasOrbit!==false ||
+    promoExpanded.comboEditorial!==true
+  ) {
+    errors.push(`${label}: tarjeta promocional C3 no hizo morphing real/conservó composición esperada.`);
+  }
 
-  await page.evaluate(() => document.querySelector('.gx-promo-expanded-close')?.click());
-  await page.waitForFunction(() => !document.querySelector('.gx-promo-expanded'), null, { timeout: 1500 }).catch(()=>{});
+  await page.evaluate(() => document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click());
+  await page.waitForFunction(() =>
+    !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front'),
+    null,
+    { timeout: 2200 }
+  ).catch(()=>{});
+  const promoRestored=await page.evaluate(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')===window.__gxPromoSmokeCard
+  ).catch(()=>false);
+  if(!promoRestored) errors.push(`${label}: tarjeta promocional C3 no regresó al mismo nodo del deck.`);
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
   // no sólo un salto entre estado compacto y expandido.
