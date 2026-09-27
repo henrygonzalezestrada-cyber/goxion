@@ -13228,3 +13228,46 @@ body.gx-promo-morph-open{
         font-size:10px;
     }
 }
+
+
+/* C6.3 · Aurora optimizada para WebKit/Safari */
+.gx-promo-card-aurora{
+    inset:-10%;
+    border-radius:34%;
+    background:
+      radial-gradient(ellipse at 25% 28%,rgba(255,255,255,.16) 0%,rgba(255,255,255,.055) 24%,transparent 48%),
+      radial-gradient(ellipse at 78% 70%,color-mix(in srgb,var(--gx-brand-accent) 44%,transparent) 0%,transparent 50%);
+    mix-blend-mode:normal;
+    filter:blur(22px);
+    opacity:.24;
+    transform:translate3d(-5%,-2%,0) scale(.96);
+    animation:gxPromoC6AuroraLite 7.6s ease-in-out infinite alternate;
+    will-change:transform,opacity;
+    contain:paint;
+}
+.gx-promo-card-aurora::after{
+    display:none!important;
+    animation:none!important;
+}
+.gx-promo-deck-card:not(.is-front):not(.is-expanded) .gx-promo-card-aurora{
+    opacity:.11;
+    animation-play-state:paused;
+}
+.gx-promo-deck-card.is-front .gx-promo-card-aurora,
+.gx-promo-deck-card.is-expanded .gx-promo-card-aurora{
+    opacity:.31;
+}
+.gx-promo-card-glow{
+    filter:blur(34px);
+    animation:gxPromoGlowBreath 6.2s ease-in-out infinite alternate;
+}
+@keyframes gxPromoC6AuroraLite{
+    0%{
+        transform:translate3d(-6%,-3%,0) scale(.95);
+        opacity:.22;
+    }
+    100%{
+        transform:translate3d(6%,4%,0) scale(1.05);
+        opacity:.34;
+    }
+}
