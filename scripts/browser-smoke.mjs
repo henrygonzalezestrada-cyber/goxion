@@ -491,6 +491,24 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     });
   });
 
+  await page.route('**/functions/v1/promociones-admin-beta', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok:true,
+        contrato:'goxion-promotions-studio-v2',
+        version:'2.0',
+        servicios:[
+          {id:'catalog-smoke-a',nombre:'Netflix Smoke',precio:109,activo:true},
+          {id:'catalog-smoke-b',nombre:'HBO Smoke',precio:79,activo:true},
+          {id:'catalog-smoke-c',nombre:'Prime Smoke',precio:45,activo:true}
+        ],
+        promociones:[]
+      })
+    });
+  });
+
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
   await page.waitForTimeout(900);
 
@@ -756,6 +774,101 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     }, mode);
     if (!ok) errors.push(`${label}: falló modo de catálogo ${mode}.`);
     await page.waitForTimeout(80);
+  }
+
+  // Promotions Studio: validar las cuatro mecánicas sin guardar nada.
+  const promoStudio = await page.evaluate(async () => {
+    try {
+      await window.gxPromoLoad?.();
+      window.gxPromoOpenEditor?.();
+
+      const mechanics = [...document.querySelectorAll('[data-gx-promo-mechanic]')]
+        .map(x => x.getAttribute('data-gx-promo-mechanic'));
+
+      window.gxPromoSetMechanic?.('combo');
+      const comboOptions = document.querySelectorAll('[data-gx-promo-service-check]').length;
+
+      window.gxPromoSetMechanic?.('addon');
+      const addonTrigger = document.getElementById('gx-promo-addon-trigger');
+      const addonOptions = document.querySelectorAll('[data-gx-promo-addon-check]').length;
+
+      const acquisition = document.getElementById('gx-promo-acquisition');
+      const published = document.getElementById('gx-promo-published');
+      const acquisitionInitiallyDisabled = acquisition?.disabled === true;
+
+      if (published) published.checked = true;
+      window.gxPromoPublicationChanged?.();
+      const acquisitionEnabledAfterPublish = acquisition?.disabled === false;
+
+      const hasPreview = !!document.getElementById('gx-promo-preview');
+      const editorVisible = document.getElementById('gx-promo-editor')?.hidden === false;
+
+      window.gxPromoCloseEditor?.();
+
+      return {
+        mechanics,
+        comboOptions,
+        addonOptions,
+        hasTrigger: !!addonTrigger,
+        hasPreview,
+        editorVisible,
+        hasAcquisition: !!acquisition,
+        acquisitionInitiallyDisabled,
+        acquisitionEnabledAfterPublish
+      };
+    } catch (error) {
+      return { error: error?.message || String(error) };
+    }
+  });
+
+  if (
+    promoStudio?.error ||
+    !['precio_fijo','porcentaje','combo','addon'].every(x => promoStudio?.mechanics?.includes(x)) ||
+    promoStudio?.comboOptions !== 3 ||
+    promoStudio?.addonOptions !== 3 ||
+    promoStudio?.hasTrigger !== true ||
+    promoStudio?.hasPreview !== true ||
+    promoStudio?.editorVisible !== true ||
+    promoStudio?.hasAcquisition !== true ||
+    promoStudio?.acquisitionInitiallyDisabled !== true ||
+    promoStudio?.acquisitionEnabledAfterPublish !== true
+  ) {
+    errors.push(`${label}: Promotions Studio universal no quedó operativo.`);
+  }
+
+  // Promotions Studio: comprobar contrato real del formulario sin persistir.
+  const promoSaveUi = await page.evaluate(async () => {
+    try {
+      window.gxPromoOpenEditor?.();
+      document.getElementById('gx-promo-name').value = 'Smoke Promotions Studio';
+      document.getElementById('gx-promo-public-title').value = 'Oferta smoke';
+      document.getElementById('gx-promo-price').value = '50';
+      const published = document.getElementById('gx-promo-published');
+      const acquisition = document.getElementById('gx-promo-acquisition');
+      if (published) published.checked = true;
+      window.gxPromoPublicationChanged?.();
+      if (acquisition) acquisition.checked = true;
+      await window.gxPromoSave?.();
+      return { ok:true };
+    } catch (error) {
+      return { error:error?.message || String(error) };
+    }
+  });
+  if (promoSaveUi?.error) errors.push(`${label}: guardado UI de Promotions Studio falló: ${promoSaveUi.error}`);
+
+  const promoUiRequest = [...financialActionRequests].reverse().find(x =>
+    x.body?.accion === 'promocion_guardar' &&
+    x.body?.datos?.nombre === 'Smoke Promotions Studio'
+  );
+  if (
+    !promoUiRequest ||
+    promoUiRequest.body?.datos?.mecanica !== 'precio_fijo' ||
+    promoUiRequest.body?.datos?.publicada !== true ||
+    promoUiRequest.body?.datos?.adquisicion_habilitada !== true ||
+    !Array.isArray(promoUiRequest.body?.datos?.items) ||
+    promoUiRequest.body.datos.items.length !== 1
+  ) {
+    errors.push(`${label}: Promotions Studio no envió publicación/adquisición completas al gateway financiero.`);
   }
 
   // Ajustes: recorrer las siete superficies, sin ejecutar acciones persistentes.

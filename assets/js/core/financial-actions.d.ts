@@ -1,5 +1,48 @@
 export {};
 
+type GoxionPromotionMechanic = 'precio_fijo' | 'porcentaje' | 'combo' | 'addon';
+type GoxionPromotionAudience = 'todos' | 'nuevos' | 'actuales' | 'con_servicio' | 'sin_servicio' | 'lealtad_1' | 'lealtad_2';
+type GoxionPromotionItemRole = 'principal' | 'incluido' | 'disparador' | 'complemento';
+
+interface GoxionPromotionInput {
+  id?: string;
+  mecanica: GoxionPromotionMechanic;
+  nombre: string;
+  titulo_publico?: string;
+  descripcion_publica?: string;
+  badge?: string;
+  prioridad?: number;
+  items: Array<{
+    servicio_id: string;
+    rol: GoxionPromotionItemRole;
+    orden?: number;
+  }>;
+  servicio_id?: string;
+  servicio_disparador_id?: string;
+  servicios_complemento_ids?: string[];
+  precio_promocional?: number;
+  descuento_porcentaje?: number;
+  duracion_periodos: number;
+  inicio: string;
+  fin: string;
+  audiencia: GoxionPromotionAudience;
+  segmentacion?: { servicio_id?: string; [key: string]: unknown };
+  acumulacion?: {
+    lealtad?: boolean;
+    trato_justo?: boolean;
+    beneficios_programados?: boolean;
+    bienvenida?: boolean;
+  };
+  mostrar_precio_anterior?: boolean;
+  oferta_flash?: boolean;
+  mostrar_contador?: boolean;
+  destacada?: boolean;
+  notificar_cliente?: boolean;
+  publicada?: boolean;
+  adquisicion_habilitada?: boolean;
+  activa?: boolean;
+}
+
 declare global {
   interface Window {
     GOXION_FINANCIAL_ACTIONS: {
@@ -32,7 +75,7 @@ declare global {
       }): Promise<Record<string, unknown>>;
       cancelBenefit(input: { id: string }): Promise<Record<string, unknown>>;
       deleteBenefit(input: { id: string }): Promise<Record<string, unknown>>;
-      savePromotion(input: Record<string, unknown>): Promise<Record<string, unknown>>;
+      savePromotion(input: GoxionPromotionInput): Promise<Record<string, unknown>>;
       togglePromotion(input: { id: string; activa: boolean }): Promise<Record<string, unknown>>;
       deletePromotion(input: { id: string }): Promise<Record<string, unknown>>;
       assignPromotion(input: {

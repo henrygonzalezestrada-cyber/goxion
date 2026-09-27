@@ -177,30 +177,159 @@
 </div></div>
 
 <section class="gx-catalog-mode-view" hidden="" id="gx-catalog-promotions-view">
-<div class="gx-promo-hero">
-<div><span class="gx-eyebrow">Cerebro comercial</span><h2>Promociones del catálogo</h2><p>La oferta vive aquí; su experiencia en Ayuda/Catálogo queda pendiente del siguiente bloque.</p></div>
+<div class="gx-promo-studio-hero">
+<div>
+<span class="gx-eyebrow">Promotions Studio</span>
+<h2>Motor comercial</h2>
+<p>Configura precios temporales, porcentajes, combos y add-ons desde una sola fuente. Ayuda consumirá estas reglas en su bloque visual dedicado.</p>
+</div>
+<div class="gx-promo-studio-hero-actions">
+<button class="gx-secondary-action" onclick="gxPromoLoad()" type="button">↻ Actualizar</button>
 <button class="gx-primary-action" onclick="gxPromoOpenEditor()" type="button">＋ Nueva promoción</button>
 </div>
-<div class="gx-promo-rule-note"><strong>Regla aprobada</strong><span>El precio promocional puede durar 1, 2, 3 o más periodos para quien contrate durante la vigencia. Después vuelve al precio normal del servicio.</span></div>
-<div class="gx-promo-list" id="gx-promo-list"><div class="gx-empty-inline">Cargando promociones…</div></div>
-<div class="gx-promo-editor" hidden="" id="gx-promo-editor">
-<div class="gx-promo-editor-head"><div><span class="gx-eyebrow">Configuración</span><h3 id="gx-promo-editor-title">Nueva promoción</h3></div><button onclick="gxPromoCloseEditor()" type="button">×</button></div>
+</div>
+
+<div class="gx-promo-studio-stats">
+<div><span>Campañas</span><strong id="gx-promo-stat-total">0</strong></div>
+<div><span>Activas</span><strong id="gx-promo-stat-active">0</strong></div>
+<div><span>Programadas</span><strong id="gx-promo-stat-scheduled">0</strong></div>
+<div><span>Listas</span><strong id="gx-promo-stat-ready">0</strong></div>
+</div>
+
+<div class="gx-promo-studio-safety">
+<div>
+<strong>Arquitectura protegida</strong>
+<span>La campaña y la futura adquisición del cliente son objetos distintos. En este bloque ninguna promoción puede autoasignarse: el seguro de adquisición permanece bloqueado hasta P3.</span>
+</div>
+<span class="gx-promo-studio-lock">P1 + P2</span>
+</div>
+
+<div class="gx-promo-studio-toolbar">
+<label class="gx-promo-search"><span>⌕</span><input id="gx-promo-search" oninput="gxPromoRender()" placeholder="Buscar promoción o plataforma..." type="search"/></label>
+<select id="gx-promo-filter-mechanic" onchange="gxPromoRender()">
+<option value="">Todas las mecánicas</option>
+<option value="precio_fijo">Precio temporal</option>
+<option value="porcentaje">Porcentaje</option>
+<option value="combo">Combo</option>
+<option value="addon">Add-on</option>
+</select>
+<select id="gx-promo-filter-state" onchange="gxPromoRender()">
+<option value="">Todos los estados</option>
+<option value="activa">Activas</option>
+<option value="programada">Programadas</option>
+<option value="lista">Listas</option>
+<option value="pausada">Pausadas</option>
+<option value="finalizada">Finalizadas</option>
+</select>
+</div>
+
+<div class="gx-promo-list gx-promo-studio-list" id="gx-promo-list"><div class="gx-empty-inline">Cargando promociones…</div></div>
+
+<div class="gx-promo-editor gx-promo-studio-editor" hidden="" id="gx-promo-editor">
+<div class="gx-promo-editor-head">
+<div>
+<span class="gx-eyebrow">Constructor universal</span>
+<h3 id="gx-promo-editor-title">Nueva promoción</h3>
+<p id="gx-promo-editor-subtitle">Define la mecánica y GOXION adapta el resto del formulario.</p>
+</div>
+<button onclick="gxPromoCloseEditor()" type="button">×</button>
+</div>
 <input id="gx-promo-id" type="hidden"/>
+<input id="gx-promo-mechanic" type="hidden" value="precio_fijo"/>
+
+<div class="gx-promo-studio-layout">
+<div class="gx-promo-studio-form">
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>01</span><div><strong>Identidad de campaña</strong><small>Nombre interno y copy que podrá consumir Ayuda.</small></div></div>
 <div class="gx-promo-form-grid">
-<label class="wide"><span>Plataforma</span><select id="gx-promo-service"></select></label>
-<label class="wide"><span>Nombre interno</span><input id="gx-promo-name" maxlength="100" placeholder="Ej. Oferta Flash de septiembre" type="text"/></label>
-<label><span>Precio promocional</span><input id="gx-promo-price" min="1" placeholder="$0" step="0.01" type="number"/></label>
-<label><span>Duración del beneficio</span><select id="gx-promo-periods"><option value="1">Solo el primer mes</option><option value="2">2 periodos</option><option value="3">3 periodos</option><option value="4">4 periodos</option><option value="6">6 periodos</option><option value="12">12 periodos</option></select></label>
-<label><span>Inicio en catálogo</span><input id="gx-promo-start" type="datetime-local"/></label>
-<label><span>Fin en catálogo</span><input id="gx-promo-end" type="datetime-local"/></label>
+<label class="wide"><span>Nombre interno</span><input id="gx-promo-name" maxlength="100" oninput="gxPromoUpdatePreview()" placeholder="Ej. Septiembre · Netflix 3 meses" type="text"/></label>
+<label class="wide"><span>Título público</span><input id="gx-promo-public-title" maxlength="120" oninput="gxPromoUpdatePreview()" placeholder="Ej. 3 meses a precio especial" type="text"/></label>
+<label class="wide"><span>Descripción pública</span><input id="gx-promo-public-description" maxlength="220" oninput="gxPromoUpdatePreview()" placeholder="Texto breve para presentar la oferta" type="text"/></label>
+<label><span>Badge</span><input id="gx-promo-badge" maxlength="36" oninput="gxPromoUpdatePreview()" placeholder="PROMO" type="text"/></label>
+<label><span>Prioridad</span><input id="gx-promo-priority" max="100" min="-100" oninput="gxPromoUpdatePreview()" step="1" type="number" value="0"/></label>
 </div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>02</span><div><strong>Mecánica</strong><small>Elige cómo se construye la oferta.</small></div></div>
+<div class="gx-promo-mechanic-grid">
+<button data-gx-promo-mechanic="precio_fijo" onclick="gxPromoSetMechanic('precio_fijo',this)" type="button"><b>$</b><span><strong>Precio temporal</strong><small>$99 durante 3 meses</small></span></button>
+<button data-gx-promo-mechanic="porcentaje" onclick="gxPromoSetMechanic('porcentaje',this)" type="button"><b>%</b><span><strong>Porcentaje</strong><small>30% OFF</small></span></button>
+<button data-gx-promo-mechanic="combo" onclick="gxPromoSetMechanic('combo',this)" type="button"><b>＋</b><span><strong>Combo</strong><small>2 o más plataformas</small></span></button>
+<button data-gx-promo-mechanic="addon" onclick="gxPromoSetMechanic('addon',this)" type="button"><b>↗</b><span><strong>Add-on</strong><small>Contrata X y suma Y</small></span></button>
+</div>
+<div class="gx-promo-mechanic-fields" id="gx-promo-mechanic-fields"></div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>03</span><div><strong>Valor y duración</strong><small>La vigencia para contratar y la duración adquirida son independientes.</small></div></div>
+<div class="gx-promo-form-grid">
+<label id="gx-promo-price-wrap"><span id="gx-promo-price-label">Precio promocional</span><input id="gx-promo-price" min="0.01" oninput="gxPromoUpdatePreview()" placeholder="$0" step="0.01" type="number"/></label>
+<label hidden="" id="gx-promo-percent-wrap"><span>Descuento</span><div class="gx-promo-percent-input"><input id="gx-promo-percent" max="95" min="1" oninput="gxPromoUpdatePreview()" placeholder="30" step="1" type="number"/><b>%</b></div></label>
+<label><span>Duración adquirida</span><select id="gx-promo-periods" onchange="gxPromoUpdatePreview()"><option value="1">1 periodo</option><option value="2">2 periodos</option><option value="3">3 periodos</option><option value="4">4 periodos</option><option value="6">6 periodos</option><option value="12">12 periodos</option><option value="24">24 periodos</option></select></label>
+<label><span>Disponible desde</span><input id="gx-promo-start" onchange="gxPromoUpdatePreview()" type="datetime-local"/></label>
+<label><span>Disponible hasta</span><input id="gx-promo-end" onchange="gxPromoUpdatePreview()" type="datetime-local"/></label>
+</div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>04</span><div><strong>Audiencia</strong><small>Define quién podrá ser elegible cuando conectemos Ayuda.</small></div></div>
+<div class="gx-promo-form-grid">
+<label class="wide"><span>Segmento</span><select id="gx-promo-audience" onchange="gxPromoAudienceChanged();gxPromoUpdatePreview()">
+<option value="todos">Todos los clientes</option>
+<option value="nuevos">Nuevos clientes</option>
+<option value="actuales">Clientes actuales</option>
+<option value="con_servicio">Clientes que ya tienen una plataforma</option>
+<option value="sin_servicio">Clientes que no tienen una plataforma</option>
+<option value="lealtad_1">Lealtad Nivel 1 o superior</option>
+<option value="lealtad_2">Lealtad Nivel 2</option>
+</select></label>
+<label class="wide" hidden="" id="gx-promo-audience-service-wrap"><span>Plataforma de condición</span><select id="gx-promo-audience-service" onchange="gxPromoUpdatePreview()"></select></label>
+</div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>05</span><div><strong>Compatibilidad</strong><small>Controla qué beneficios podrán convivir con esta campaña.</small></div></div>
+<div class="gx-promo-options gx-promo-stack-options">
+<label><input checked="" id="gx-promo-stack-loyalty" type="checkbox"/><span><strong>Lealtad</strong><small>Permitir nivel del cliente</small></span></label>
+<label><input checked="" id="gx-promo-stack-fairdeal" type="checkbox"/><span><strong>Trato Justo</strong><small>Compensación por falla</small></span></label>
+<label><input id="gx-promo-stack-benefits" type="checkbox"/><span><strong>Beneficios programados</strong><small>Cupones y ajustes comerciales</small></span></label>
+<label><input id="gx-promo-stack-welcome" type="checkbox"/><span><strong>Bienvenida</strong><small>Beneficio de primer alta</small></span></label>
+</div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>06</span><div><strong>Presentación y estado</strong><small>Dejamos preparada la metadata que usará la experiencia del cliente.</small></div></div>
 <div class="gx-promo-options">
-<label><input checked="" id="gx-promo-old-price" type="checkbox"/><span><strong>Precio anterior tachado</strong><small>Ej. $109 → $89</small></span></label>
-<label><input id="gx-promo-flash" type="checkbox"/><span><strong>Oferta Flash</strong><small>Marca comercial destacada</small></span></label>
-<label><input id="gx-promo-countdown" type="checkbox"/><span><strong>Cuenta regresiva</strong><small>Timer visual durante la vigencia</small></span></label>
-<label><input checked="" id="gx-promo-active" type="checkbox"/><span><strong>Promoción habilitada</strong><small>Puede quedar programada por fecha</small></span></label>
+<label><input checked="" id="gx-promo-old-price" type="checkbox"/><span><strong>Precio anterior</strong><small>Mostrar referencia tachada</small></span></label>
+<label><input id="gx-promo-flash" type="checkbox"/><span><strong>Oferta Flash</strong><small>Tratamiento comercial especial</small></span></label>
+<label><input id="gx-promo-countdown" type="checkbox"/><span><strong>Cuenta regresiva</strong><small>Timer durante la vigencia</small></span></label>
+<label><input id="gx-promo-featured" type="checkbox"/><span><strong>Destacada</strong><small>Prioridad visual futura</small></span></label>
+<label><input id="gx-promo-notify" type="checkbox"/><span><strong>Notificar cliente</strong><small>Metadata lista para Mi Espacio</small></span></label>
+<label><input id="gx-promo-published" onchange="gxPromoPublicationChanged()" type="checkbox"/><span><strong>Publicada</strong><small>Visible en Ayuda durante su vigencia</small></span></label>
+<label><input id="gx-promo-acquisition" onchange="gxPromoAcquisitionChanged()" type="checkbox"/><span><strong>Adquisición habilitada</strong><small>Permite que una oferta elegible pueda contratarse</small></span></label>
+<label><input checked="" id="gx-promo-active" type="checkbox"/><span><strong>Habilitada</strong><small>Puede quedar programada por fecha</small></span></label>
 </div>
-<div class="gx-promo-editor-actions"><button class="gx-secondary-action" onclick="gxPromoCloseEditor()" type="button">Cancelar</button><button class="gx-primary-action" id="gx-promo-save" onclick="gxPromoSave()" type="button">Guardar promoción</button></div>
+<div class="gx-promo-acquisition-lock" id="gx-promo-acquisition-note"><b>⌁</b><span><strong>Publicación y contratación separadas</strong><small>Puedes publicar una campaña sólo para mostrarla. La adquisición únicamente se habilita cuando Publicada también está activa.</small></span></div>
+</section>
+
+</div>
+
+<aside class="gx-promo-studio-preview">
+<span class="gx-eyebrow">Vista lógica</span>
+<div class="gx-promo-preview-card" id="gx-promo-preview"><span>PROMO</span><strong>Nueva promoción</strong><p>Selecciona una mecánica y plataformas.</p></div>
+<div class="gx-promo-preview-facts" id="gx-promo-preview-facts"></div>
+</aside>
+</div>
+
+<div class="gx-promo-editor-actions gx-promo-studio-actions">
+<button class="gx-danger-ghost" hidden="" id="gx-promo-delete" onclick="gxPromoDeleteCurrent()" type="button">Eliminar</button>
+<span></span>
+<button class="gx-secondary-action" onclick="gxPromoCloseEditor()" type="button">Cancelar</button>
+<button class="gx-secondary-action" hidden="" id="gx-promo-duplicate" onclick="gxPromoDuplicateCurrent()" type="button">Duplicar</button>
+<button class="gx-primary-action" id="gx-promo-save" onclick="gxPromoSave()" type="button">Guardar promoción</button>
+</div>
 </div>
 </section></section>
 <section class="tab-content" id="tab-ajustes">
@@ -816,6 +945,7 @@
 
 <script id="goxion-admin-beta-18-central-billing-hooks" src="./assets/js/admin/24-admin-beta-18-central-billing-hooks.js"></script>
 <script id="goxion-admin-beta-19-controller" src="./assets/js/admin/25-admin-beta-19-controller.js"></script>
+<script id="goxion-promotions-studio-v2" src="./assets/js/admin/29-promotions-studio-v2.js"></script>
 
 
 <script id="goxion-admin-beta-19-5-behavior" src="./assets/js/admin/26-admin-beta-19-5-behavior.js"></script>
