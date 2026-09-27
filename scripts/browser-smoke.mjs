@@ -472,6 +472,17 @@ async function runAyuda(browser, browserName, errors) {
         const actionsRect=actions.getBoundingClientRect();
         return actionsRect.bottom<=cardRect.bottom-12;
       })(),
+      fitMetrics:(()=>{
+        const actions=expanded.querySelector('.gx-promo-expanded-actions');
+        const cardRect=expanded.getBoundingClientRect();
+        const actionsRect=actions?.getBoundingClientRect();
+        return actionsRect?{
+          cardHeight:Math.round(cardRect.height),
+          cardBottom:Math.round(cardRect.bottom),
+          actionsBottom:Math.round(actionsRect.bottom),
+          remaining:Math.round(cardRect.bottom-actionsRect.bottom)
+        }:null;
+      })(),
       comboLogoCount:logos.length>=2,
       logoEqualSize:logos.length>=2 && Math.abs(logos[0].getBoundingClientRect().width-logos[1].getBoundingClientRect().width)<3,
       hasDuration:/periodo/.test(expanded.querySelector('.gx-promo-morph-meta')?.textContent||''),
