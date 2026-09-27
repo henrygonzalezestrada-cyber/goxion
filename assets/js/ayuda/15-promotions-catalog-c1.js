@@ -426,10 +426,9 @@
         applyDeckPositions();
       }
       stopAuto();
-      requestAnimationFrame(()=>{
-        const freshCard=deck.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]')||card;
-        openPromoDetail(selectedPromotions()[index],freshCard);
-      });
+      // Abrimos exactamente el nodo tocado. Si el catálogo refresca después,
+      // el retorno robusto reemplaza cualquier nodo nuevo al cerrar.
+      openPromoDetail(selectedPromotions()[index],card);
     },true);
 
     deck.addEventListener('click',event=>{
