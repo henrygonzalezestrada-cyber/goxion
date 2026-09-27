@@ -357,6 +357,7 @@
     dots.innerHTML=list.map((_,i)=>'<button type="button" data-gx-promo-dot="'+i+'" aria-label="Ver promoción '+(i+1)+'"></button>').join('');
     controls.hidden=list.length<2;
     applyDeckPositions();
+    bindPromoDetailButtons();
     bindDeck();
     startAuto();
   }
@@ -415,13 +416,37 @@
     return true;
   }
 
+  function bindPromoDetailButtons(){
+    const deck=$('gx-promo-deck');
+    if(!deck) return;
+    deck.querySelectorAll('[data-gx-promo-details]').forEach(button=>{
+      if(button.dataset.gxDirectBound==='1') return;
+      button.dataset.gxDirectBound='1';
+      button.addEventListener('click',event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        const card=button.closest('.gx-promo-deck-card');
+        if(!card||state.expandedCard) return;
+        const index=Number(card.dataset.gxPromoIndex||0);
+        if(index!==state.active){
+          state.active=index;
+          applyDeckPositions();
+        }
+        stopAuto();
+        setTimeout(()=>{
+          if(!state.expandedCard && card.isConnected){
+            openPromoDetail(selectedPromotions()[index],card);
+          }
+        },16);
+      });
+    });
+  }
+
   function bindDeck(){
     const deck=$('gx-promo-deck');
     if(!deck||deck.dataset.gxBound==='1') return;
     deck.dataset.gxBound='1';
 
-    // Safari/WebKit: resolvemos "Ver detalles" en capture antes de mover
-    // la misma tarjeta fuera del carrusel para el morph.
     deck.addEventListener('click',event=>{
       const detailsBtn=event.target.closest('[data-gx-promo-details]');
       if(!detailsBtn) return;
@@ -474,7 +499,10 @@
         restartAuto();
         return;
       }
-      openPromoDetail(selectedPromotions()[index],card);
+      stopAuto();
+      setTimeout(()=>{
+        if(!state.expandedCard && card.isConnected) openPromoDetail(selectedPromotions()[index],card);
+      },16);
     });
 
     deck.addEventListener('keydown',event=>{
@@ -488,7 +516,10 @@
           applyDeckPositions();
           restartAuto();
         }else{
-          openPromoDetail(selectedPromotions()[index],card);
+          stopAuto();
+          setTimeout(()=>{
+            if(!state.expandedCard && card.isConnected) openPromoDetail(selectedPromotions()[index],card);
+          },16);
         }
       }
       if(event.key==='Escape'&&card.classList.contains('is-expanded')){
