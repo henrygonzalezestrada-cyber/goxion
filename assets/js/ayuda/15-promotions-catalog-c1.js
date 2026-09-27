@@ -320,7 +320,7 @@
           '<div class="gx-promo-detail-facts">'+
             '<div><span>Duración</span><strong>'+esc(promoDurationLabel(p))+'</strong></div>'+
             percentFact+
-            '<div><span>Disponibilidad</span><strong>'+esc(statusText(p))+'</strong></div>'+
+            '<div><span>Disponibilidad</span><strong class="gx-promo-availability-value"><span>'+esc(statusText(p))+'</span></strong></div>'+
           '</div>'+
         '</div>'+
         '<div class="gx-promo-detail-section gx-promo-includes">'+
@@ -431,6 +431,23 @@
       button.disabled=false;
       button.setAttribute('aria-label','Ver detalles');
     }
+  }
+
+  function syncPromoAvailabilityMarquee(card){
+    if(!card) return;
+    const values=[...card.querySelectorAll('.gx-promo-availability-value')];
+    values.forEach(value=>{
+      const inner=value.querySelector('span');
+      if(!inner) return;
+      value.classList.remove('has-marquee');
+      value.style.removeProperty('--gx-marquee-distance');
+      inner.style.removeProperty('transform');
+      const overflow=Math.ceil(inner.scrollWidth-value.clientWidth);
+      if(overflow>2){
+        value.style.setProperty('--gx-marquee-distance',(-overflow)+'px');
+        value.classList.add('has-marquee');
+      }
+    });
   }
 
   function bindPromoDetailButtons(){
@@ -680,6 +697,8 @@
         card.style.left=targetLeft+'px';
         card.style.setProperty('width',targetWidth+'px','important');
         card.style.setProperty('height',targetHeight+'px','important');
+        requestAnimationFrame(()=>syncPromoAvailabilityMarquee(card));
+        setTimeout(()=>{ if(card===state.expandedCard) syncPromoAvailabilityMarquee(card); },520); // gxMarqueeFinal
       });
     });
   }
@@ -897,6 +916,13 @@
     wrapped.__gxPromotionsC1=true;
     window.cargarCatalogo=wrapped;
   }
+
+  let gxPromoMarqueeResizeTimer=0;
+  window.addEventListener('resize',()=>{
+    clearTimeout(gxPromoMarqueeResizeTimer);
+    gxPromoMarqueeResizeTimer=setTimeout(()=>{ if(state.expandedCard) syncPromoAvailabilityMarquee(state.expandedCard); },120);
+  },{passive:true});
+  window.gxPromoMarqueeResizeBound=true;
 
   document.addEventListener('visibilitychange',()=>document.hidden?stopAuto():startAuto());
   window.addEventListener('beforeunload',stopAuto,{once:true});
