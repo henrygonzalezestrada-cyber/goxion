@@ -612,9 +612,9 @@
     state.pendingPromoRender=false;
 
     const targetWidth=Math.min(window.innerWidth-44,352);
-    const maxHeight=Math.max(460,window.innerHeight-52);
+    const maxHeight=Math.max(430,window.innerHeight-52);
     const itemCount=Math.min(3,(p?.items||[]).length);
-    const targetHeight=Math.min(maxHeight,itemCount>1?540:506);
+    const targetHeight=Math.min(maxHeight,itemCount>1?500:472);
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(26,(window.innerHeight-targetHeight)/2);
 
@@ -629,26 +629,16 @@
 
     const expandedClickHandler=(event)=>{
       if(event.target.closest('[data-gx-promo-close]')){
-        event.preventDefault();event.stopPropagation();closePromoDetail(card);return;
-      }
-      const serviceBtn=event.target.closest('[data-gx-promo-service]');
-      if(serviceBtn){
-        event.preventDefault();event.stopPropagation();
-        const serviceName=serviceBtn.dataset.gxPromoService||'';
+        event.preventDefault();
+        event.stopPropagation();
         closePromoDetail(card);
-        setTimeout(()=>focusCatalogBrandByName(serviceName),560);
-        return;
-      }
-      const contractBtn=event.target.closest('[data-gx-promo-contract]');
-      if(contractBtn){
-        event.preventDefault();event.stopPropagation();
-        const index=Number(card.dataset.gxPromoIndex||0);
-        const current=selectedPromotions()[index];
-        if(addPromotionToCart(current,contractBtn)) setTimeout(()=>closePromoDetail(card),420);
       }
     };
     const expandedKeyHandler=(event)=>{
-      if(event.key==='Escape'){event.preventDefault();closePromoDetail(card)}
+      if(event.key==='Escape'){
+        event.preventDefault();
+        closePromoDetail(card);
+      }
     };
     state.expandedClickHandler=expandedClickHandler;
     state.expandedKeyHandler=expandedKeyHandler;
@@ -676,6 +666,7 @@
     requestAnimationFrame(()=>{
       requestAnimationFrame(()=>{
         card.classList.add('is-expanded');
+        setPromoActionState(card,p,true);
         card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
         card.style.top=targetTop+'px';
         card.style.left=targetLeft+'px';
@@ -688,11 +679,15 @@
   function closePromoDetail(card=state.expandedCard){
     if(!card||card!==state.expandedCard||card.classList.contains('is-closing')) return;
     const origin=state.expandedOrigin;
+    const index=Number(card.dataset.gxPromoIndex||0);
+    const promo=selectedPromotions()[index];
+
     card.classList.add('is-closing');
     card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','true');
     state.morphBackdrop?.classList.remove('active');
+    setPromoActionState(card,promo,false);
 
-    // 1) Detalles desaparecen sin cambiar todavía el layout principal.
+    // Primero desaparece sólo la información secundaria.
     setTimeout(()=>{
       if(card!==state.expandedCard) return;
       card.classList.add('is-returning');
@@ -702,9 +697,9 @@
         card.style.width=origin.width+'px';
         card.style.height=origin.height+'px';
       }
-    },140);
+    },80);
 
-    // 2) Al terminar la contracción regresamos exactamente el mismo nodo al deck.
+    // El CTA sigue anclado abajo y el mismo nodo vuelve al deck al terminar.
     setTimeout(()=>{
       if(card!==state.expandedCard) return;
 
@@ -744,7 +739,7 @@
         applyDeckPositions();
         requestAnimationFrame(()=>startAuto());
       }
-    },620);
+    },560);
   }
 
   function brandPromoSaving(entry){
