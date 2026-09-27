@@ -14299,3 +14299,16 @@ body.gx-promo-morph-open{overflow:hidden!important}
         height:70px;
     }
 }
+
+
+/* =========================================================
+   GOXION · RELEASE SAFARI STABILITY
+   WebKit puede conservar el transform del estado cerrado
+   durante el morph. El estado expandido ya define logos rectos;
+   esta regla sólo refuerza esa intención aprobada.
+   ========================================================= */
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-promo-logo-item{
+    transform:none!important;
+    rotate:0deg!important;
+    animation:none!important;
+}
