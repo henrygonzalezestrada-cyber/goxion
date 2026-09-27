@@ -532,6 +532,20 @@ for (const absolute of walk(jsRoot)) {
       !ayudaCss.includes('background:conic-gradient(')) {
     fail('Ayuda C15: no reutiliza rotateLight histórico.');
   }
+
+  // C16: píldoras adaptativas, más aire horizontal y precio/flecha estables.
+  if (!promoCatalog.includes('function fitCuratedPills(') ||
+      !promoCatalog.includes('--gx-mini-pill-font') ||
+      !promoCatalog.includes('fitCuratedPills(section)')) {
+    fail('Ayuda C16: falta auto-fit de píldoras o layout respirado.');
+  }
+  if (!ayudaCss.includes('GOXION · C16 BREATHING MINI CARDS') ||
+      !ayudaCss.includes('grid-auto-columns:minmax(214px,66%)') ||
+      !ayudaCss.includes('translate:0 4px') ||
+      !ayudaCss.includes('position:absolute!important') ||
+      !ayudaCss.includes('font-size:var(--gx-mini-pill-font,6.7px)')) {
+    fail('Ayuda C16: faltan ancho, precio centrado, flecha fija o pill responsive.');
+  }
   if (!ayudaCss.includes('grid-template-columns:40px minmax(0,1fr) 48px 8px') ||
       !ayudaCss.includes('grid-template-rows:14px 18px') ||
       !ayudaCss.includes('grid-template-rows:12px 22px')) {
