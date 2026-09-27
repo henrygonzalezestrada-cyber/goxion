@@ -378,6 +378,59 @@ async function runAyuda(browser, browserName, errors) {
     return document.getElementById('gx-promo-showcase')?.hidden===false && cards.length===3;
   },null,{timeout:8000}).catch(()=>{});
 
+  // C11 catálogo: cristal curado con los parámetros visuales ya usados por GOXION.
+  await page.waitForFunction(() =>
+    document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card').length>=2,
+    null,{timeout:3000}
+  ).catch(()=>{});
+
+  const catalogC11=await page.evaluate(() => {
+    const mini=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
+    const logo=mini?.querySelector('.gx-catalog-mini-logo');
+    const img=logo?.querySelector('img');
+    const switchBtn=document.querySelector('.gx-catalog-curated-switch button');
+    const filterBtn=document.querySelector('.gx-catalog-filter-chip');
+    const cards=[...document.querySelectorAll('.gx-catalog-mini-card')];
+    const ms=mini?getComputedStyle(mini):null;
+    const ls=logo?getComputedStyle(logo):null;
+    const is=img?getComputedStyle(img):null;
+    const ss=switchBtn?getComputedStyle(switchBtn):null;
+    const fs=filterBtn?getComputedStyle(filterBtn):null;
+    return {
+      cardCount:cards.length,
+      backgroundColor:ms?.backgroundColor||'',
+      backdrop:(ms?.backdropFilter||ms?.webkitBackdropFilter||''),
+      borderColor:ms?.borderTopColor||'',
+      logoBackground:ls?.backgroundColor||'',
+      logoBorder:ls?.borderTopWidth||'',
+      imagePadding:is?.paddingTop||'',
+      switchHeight:switchBtn?.getBoundingClientRect().height||0,
+      filterHeight:filterBtn?.getBoundingClientRect().height||0,
+      switchFont:ss?parseFloat(ss.fontSize):0,
+      filterFont:fs?parseFloat(fs.fontSize):0,
+      switchPadding:ss?parseFloat(ss.paddingLeft):0,
+      filterPadding:fs?parseFloat(fs.paddingLeft):0,
+      duplicateDesde:cards.map(card=>(card.textContent.match(/Desde\s*\$/g)||[]).length)
+    };
+  }).catch(()=>null);
+
+  if(
+    !catalogC11 ||
+    catalogC11.cardCount<2 ||
+    catalogC11.backgroundColor!=='rgba(8, 8, 12, 0.25)' ||
+    !catalogC11.backdrop.includes('blur(10px)') ||
+    catalogC11.borderColor!=='rgba(255, 255, 255, 0.08)' ||
+    !['rgba(0, 0, 0, 0)','transparent'].includes(catalogC11.logoBackground) ||
+    catalogC11.logoBorder!=='0px' ||
+    catalogC11.imagePadding!=='0px' ||
+    Math.abs(catalogC11.switchHeight-catalogC11.filterHeight)>1 ||
+    Math.abs(catalogC11.switchFont-catalogC11.filterFont)>.15 ||
+    Math.abs(catalogC11.switchPadding-catalogC11.filterPadding)>.5 ||
+    catalogC11.duplicateDesde.some(n=>n>1)
+  ){
+    errors.push(`${label}: C11 catálogo no conserva glass/logo/filtros/precio limpio. ${JSON.stringify(catalogC11)}`);
+  }
+
   const closedLayout=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
     const front=cards.find(x=>x.classList.contains('is-front'));
