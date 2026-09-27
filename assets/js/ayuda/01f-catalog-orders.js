@@ -359,6 +359,12 @@
             if (!config || !config.serviciosGlobales || !Array.isArray(config.serviciosGlobales)) return;
 
             const gxCatalogClient = gxCatalogContext(data);
+            window.__GOXION_CATALOG_SESSION = Object.freeze({
+                authenticated: gxCatalogClient.authenticated === true,
+                owned: Object.freeze([...gxCatalogClient.owned])
+            });
+            document.getElementById('view-catalogo')?.classList.toggle('gx-catalog-personalized', gxCatalogClient.authenticated === true);
+            document.getElementById('view-catalogo')?.classList.toggle('gx-catalog-public', gxCatalogClient.authenticated !== true);
             gxSetupCatalogFilters(gxCatalogClient);
 
             if (config.alertas && config.alertas.activa) {
