@@ -417,7 +417,11 @@ for (const absolute of walk(jsRoot)) {
   if (!ayudaHtml.includes('./assets/js/ayuda/15-promotions-catalog-c1.js')) fail('Ayuda C1: controlador no está cargado.');
   if (!promoCatalog.includes("GXCORE.endpoint('promociones-catalogo')")) fail('Ayuda C1: promociones no consumen el endpoint dedicado.');
   if (!promoCatalog.includes('gx-promo-deck-card')) fail('Ayuda C1: falta deck interactivo.');
-  if (!promoCatalog.includes('gx-promo-expanded')) fail('Ayuda C1: falta expansión de tarjeta.');
+  if (!promoCatalog.includes('gx-promo-morph-detail')) fail('Ayuda C3: falta contenido interno del morph.');
+  if (!promoCatalog.includes('document.body.appendChild(card)') || !promoCatalog.includes('expandedPlaceholder')) {
+    fail('Ayuda C3: la expansión debe reutilizar la misma tarjeta, no crear un modal/clon.');
+  }
+  if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C3: las órbitas fueron retiradas del hero promocional.');
   if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C1')) fail('Ayuda C1: faltan estilos aislados.');
   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
     fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
