@@ -554,6 +554,14 @@ for (const absolute of walk(jsRoot)) {
       !ayudaCss.includes('gap:14px')) {
     fail('Ayuda C17: falta cierre visual de mini tarjetas.');
   }
+
+  // Categories: Descubre must prefer the explicit catalog category.
+  if (!promoCatalog.includes("p?.categoria_catalogo") ||
+      !promoCatalog.includes("category:String(category||'')") ||
+      !promoCatalog.includes("productividad:'Productividad'") ||
+      !promoCatalog.includes("almacenamiento:'Almacenamiento'")) {
+    fail('Ayuda categorías: categoria_catalogo no alimenta Descubre.');
+  }
   if (!promoCatalog.includes('gx-catalog-mini-chevron') ||
       !promoCatalog.includes('M3.2 2.8L8.2 8L3.2 13.2')) {
     fail('Ayuda C17: falta chevron SVG redondeado.');
