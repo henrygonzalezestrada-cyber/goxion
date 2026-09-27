@@ -12785,3 +12785,7 @@ body.gx-promo-morph-open{overflow:hidden!important}
     min-height:40px;
     font-size:12px;
 }
+
+
+/* C7.2 · Margen final de acciones */
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-actions{margin-top:5px}
