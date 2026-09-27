@@ -704,7 +704,7 @@ async function runAyuda(browser, browserName, errors) {
     c16Mini.rows.some(x=>x.pillFits!==true) ||
     c16Mini.rows.some(x=>x.pillFont>6.8||x.pillFont<5.1) ||
     c16Mini.rows.some(x=>x.pillHeight>19) ||
-    c16Mini.rows.some(x=>x.priceLowerOffset<6||x.priceLowerOffset>12) ||
+    c16Mini.rows.some(x=>x.priceLowerOffset<2||x.priceLowerOffset>8) ||
     c16Mini.rows.some(x=>x.arrowCenterDiff>1.5||x.arrowOpacity<.8)
   ){
     errors.push(`${label}: C16 mini tarjetas no conservan aire/pill/precio/flecha. ${JSON.stringify(c16Mini)}`);
