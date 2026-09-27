@@ -13374,3 +13374,180 @@ body.gx-promo-morph-open{overflow:hidden!important}
         animation:none!important;
     }
 }
+
+
+/* =========================================================
+   GOXION · C13 CURATION SYNC
+   Datos reales arriba, catálogo neutro abajo.
+   Recupera el lenguaje original de etiquetas:
+   Popular = coral/ámbar + shimmer
+   Ahorro = verde/cian + energía líquida
+   Nuevo = cian/morado + respiración
+   ========================================================= */
+
+#view-catalogo .gx-catalog-mini-copy{
+    min-width:0;
+    align-self:end;
+}
+#view-catalogo .gx-catalog-mini-copy>strong{
+    display:block;
+    min-width:0;
+    overflow:hidden;
+    color:#eef3fa;
+    font-size:10px;
+    font-weight:820;
+    line-height:1.15;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+#view-catalogo .gx-catalog-mini-meta-line{
+    min-width:0;
+    min-height:20px;
+    margin-top:4px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    overflow:visible;
+}
+#view-catalogo .gx-catalog-mini-copy:not(:has(small)) + .gx-catalog-mini-price{
+    align-self:start!important;
+    margin-top:3px!important;
+}
+
+#view-catalogo .gx-catalog-mini-badge,
+#view-catalogo .gx-catalog-mini-note{
+    position:relative;
+    flex:0 1 auto;
+    max-width:100%;
+    min-height:18px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:3px 8px;
+    overflow:hidden;
+    border-radius:999px;
+    font-size:6.9px;
+    font-weight:850;
+    line-height:1;
+    letter-spacing:.34px;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    -webkit-font-smoothing:antialiased;
+}
+
+/* POPULAR · recupera coral → ámbar y el barrido de luz original. */
+#view-catalogo .gx-catalog-mini-badge.is-popular{
+    color:#fff;
+    border:1px solid rgba(255,255,255,.24);
+    background:linear-gradient(135deg,#ff3366 0%,#ff6a34 48%,#ffaa00 100%);
+    box-shadow:
+        0 0 9px rgba(255,96,45,.24),
+        inset 0 1px 0 rgba(255,255,255,.18);
+    text-shadow:0 1px 2px rgba(50,8,0,.46);
+    animation:gxCatalogC13TagFloat 3.4s ease-in-out infinite;
+}
+#view-catalogo .gx-catalog-mini-badge.is-popular::before{
+    content:"";
+    position:absolute;
+    top:-20%;
+    bottom:-20%;
+    left:-65%;
+    width:38%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.72),transparent);
+    transform:skewX(-24deg);
+    animation:gxCatalogC13PopularShimmer 3.2s ease-in-out infinite;
+    pointer-events:none;
+}
+#view-catalogo .is-popular-featured .gx-catalog-mini-badge.is-popular{
+    box-shadow:
+        0 0 13px rgba(255,87,42,.44),
+        0 0 22px rgba(255,170,0,.16),
+        inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+/* Sólo el #1 Popular conserva animación protagonista de tarjeta. */
+#view-catalogo .gx-catalog-mini-card.is-popular-featured{
+    animation:gxCatalogC13FeaturedFloat 4.8s ease-in-out infinite;
+}
+#view-catalogo .gx-catalog-mini-card.is-popular-featured::after{
+    background:rgba(8,8,12,.62);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+}
+
+/* MAYOR AHORRO · verde/cian original, sólo la cápsula se mueve. */
+#view-catalogo .gx-catalog-mini-badge.is-saving{
+    color:#eafff6;
+    border:1px solid rgba(91,255,183,.34);
+    background:linear-gradient(135deg,#00ff9d 0%,#2ea043 48%,#00f2fe 100%);
+    background-size:210% 210%;
+    box-shadow:
+        0 0 10px rgba(0,255,157,.24),
+        inset 0 1px 0 rgba(255,255,255,.16);
+    text-shadow:0 1px 2px rgba(0,42,27,.52);
+    animation:
+        gxCatalogC13SavingLiquid 4.2s ease infinite,
+        gxCatalogC13TagFloat 2.8s ease-in-out infinite;
+}
+
+/* NUEVO · cian/morado con respiración y flotación propias. */
+#view-catalogo .gx-catalog-mini-badge.is-new{
+    color:#fff;
+    border:1px solid rgba(77,236,255,.42);
+    background:linear-gradient(135deg,#00f2fe 0%,#6384ff 48%,#7c4dff 100%);
+    box-shadow:
+        0 0 10px rgba(0,242,254,.24),
+        inset 0 1px 0 rgba(255,255,255,.18);
+    text-shadow:0 1px 2px rgba(10,15,60,.46);
+    animation:gxCatalogC13NewBreath 3.2s ease-in-out infinite;
+}
+
+/* Conceptos de Descubre: mismo ADN, muchísimo más discreto. */
+#view-catalogo .gx-catalog-mini-note{
+    color:#b9c6da;
+    border:1px solid rgba(124,77,255,.16);
+    background:linear-gradient(135deg,rgba(124,77,255,.10),rgba(0,242,254,.055));
+    box-shadow:0 0 8px rgba(124,77,255,.055);
+    animation:gxCatalogC13ConceptFloat 5.6s ease-in-out infinite;
+}
+
+@keyframes gxCatalogC13PopularShimmer{
+    0%,62%,100%{left:-65%;opacity:0}
+    68%{opacity:.82}
+    84%{left:128%;opacity:0}
+}
+@keyframes gxCatalogC13TagFloat{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-1.5px)}
+}
+@keyframes gxCatalogC13SavingLiquid{
+    0%,100%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+}
+@keyframes gxCatalogC13NewBreath{
+    0%,100%{
+        transform:translateY(0) scale(1);
+        box-shadow:0 0 7px rgba(0,242,254,.20),inset 0 1px 0 rgba(255,255,255,.18);
+    }
+    50%{
+        transform:translateY(-1.5px) scale(1.035);
+        box-shadow:0 0 14px rgba(0,242,254,.42),0 0 20px rgba(124,77,255,.20),inset 0 1px 0 rgba(255,255,255,.22);
+    }
+}
+@keyframes gxCatalogC13ConceptFloat{
+    0%,100%{transform:translateY(0);opacity:.82}
+    50%{transform:translateY(-1px);opacity:1}
+}
+@keyframes gxCatalogC13FeaturedFloat{
+    0%,100%{translate:0 0}
+    50%{translate:0 -2px}
+}
+
+@media(prefers-reduced-motion:reduce){
+    #view-catalogo .gx-catalog-mini-card.is-popular-featured,
+    #view-catalogo .gx-catalog-mini-badge,
+    #view-catalogo .gx-catalog-mini-badge::before,
+    #view-catalogo .gx-catalog-mini-note{
+        animation:none!important;
+    }
+}
