@@ -12142,7 +12142,7 @@ body.gx-promo-morph-open{
     height:352px;
     padding:18px 19px;
 }
-.gx-promo-deck-card:not(.is-expanded){
+.gx-promo-deck-card.is-closed{
     display:flex;
     flex-direction:column;
 }
@@ -12164,36 +12164,36 @@ body.gx-promo-morph-open{
 }
 
 /* Logos */
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos{
+.gx-promo-deck-card.is-closed .gx-promo-card-logos{
     flex:0 0 70px;
     height:70px;
     margin:12px 0 8px;
 }
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos:not(.is-combo) .gx-promo-logo-item{
+.gx-promo-deck-card.is-closed .gx-promo-card-logos:not(.is-combo) .gx-promo-logo-item{
     width:60px;
     height:60px;
     object-fit:contain;
 }
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo{
+.gx-promo-deck-card.is-closed .gx-promo-card-logos.is-combo{
     position:relative;
     display:block;
     width:118px;
     height:70px;
 }
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-0,
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-1{
+.gx-promo-deck-card.is-closed .gx-promo-card-logos.is-combo .gx-logo-pos-0,
+.gx-promo-deck-card.is-closed .gx-promo-card-logos.is-combo .gx-logo-pos-1{
     position:absolute!important;
     width:62px!important;
     height:62px!important;
     margin:0!important;
 }
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-0{
+.gx-promo-deck-card.is-closed .gx-promo-card-logos.is-combo .gx-logo-pos-0{
     left:0!important;
     top:2px!important;
     transform:rotate(-4deg)!important;
     z-index:2;
 }
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-logos.is-combo .gx-logo-pos-1{
+.gx-promo-deck-card.is-closed .gx-promo-card-logos.is-combo .gx-logo-pos-1{
     left:45px!important;
     top:9px!important;
     transform:rotate(3deg)!important;
@@ -12201,7 +12201,7 @@ body.gx-promo-morph-open{
 }
 
 /* Texto */
-.gx-promo-deck-card:not(.is-expanded) .gx-promo-card-copy{
+.gx-promo-deck-card.is-closed .gx-promo-card-copy{
     flex:0 0 84px;
     min-height:84px;
     max-height:84px;
