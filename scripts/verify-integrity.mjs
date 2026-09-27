@@ -423,8 +423,9 @@ for (const absolute of walk(jsRoot)) {
   }
   if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C4: las órbitas no deben existir en el hero promocional.');
   if (!promoCatalog.includes('gx-promo-info-hint')) fail('Ayuda C4: falta acceso visual Info en tarjeta cerrada.');
-  if (!promoCatalog.includes('<span>Ahorro</span><strong>
-  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C1')) fail('Ayuda C1: faltan estilos aislados.');
+  if (!promoCatalog.includes('<span>Ahorro</span><strong>')) fail('Ayuda C4: el ahorro debe mostrarse libre como Ahorro + monto.');
+  if (promoCatalog.includes('en esta oferta')) fail('Ayuda C4: persiste el texto secundario del ahorro descartado.');
+  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C4')) fail('Ayuda C4: faltan estilos finales de la beta C4.');
   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
     fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
   }
