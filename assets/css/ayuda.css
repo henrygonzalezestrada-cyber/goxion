@@ -13271,3 +13271,15 @@ body.gx-promo-morph-open{
         opacity:.34;
     }
 }
+
+
+/* C6.4 · Durante el morph priorizamos continuidad sobre ambientación */
+.gx-promo-morph-open .gx-promo-card-aurora,
+.gx-promo-morph-open .gx-promo-card-glow{
+    animation-play-state:paused!important;
+}
+.gx-promo-measure-clone .gx-promo-card-aurora{
+    display:none!important;
+    animation:none!important;
+    filter:none!important;
+}
