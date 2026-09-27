@@ -419,28 +419,29 @@ for (const absolute of walk(jsRoot)) {
   if (!ayudaHtml.includes('./assets/js/ayuda/15-promotions-catalog-c1.js')) fail('Ayuda C1: controlador no está cargado.');
   if (!promoCatalog.includes("GXCORE.endpoint('promociones-catalogo')")) fail('Ayuda C1: promociones no consumen el endpoint dedicado.');
   if (!promoCatalog.includes('gx-promo-deck-card')) fail('Ayuda C1: falta deck interactivo.');
-  if (!promoCatalog.includes('gx-promo-morph-detail')) fail('Ayuda C6: falta contenido interno del morph.');
+  if (!promoCatalog.includes('gx-promo-morph-detail')) fail('Ayuda C7: falta contenido interno del morph.');
   if (!promoCatalog.includes('document.body.appendChild(card)') || !promoCatalog.includes('expandedPlaceholder')) {
-    fail('Ayuda C6: la expansión debe reutilizar la misma tarjeta, no crear un modal visible.');
+    fail('Ayuda C7: el morph debe reutilizar la misma tarjeta.');
   }
-  if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C6: las órbitas no deben existir en el hero.');
-  if (!promoCatalog.includes('gx-promo-card-description')) fail('Ayuda C6: falta descripción en la tarjeta cerrada.');
-  if (!promoCatalog.includes('Ver detalles')) fail('Ayuda C6: falta control Ver detalles.');
-  if (!promoCatalog.includes('Ahorras ')) fail('Ayuda C6: el ahorro debe expresarse como Ahorras $X.');
-  if (promoCatalog.includes('en esta oferta')) fail('Ayuda C6: persiste texto descartado del ahorro.');
-  if (!promoCatalog.includes('gx-promo-card-aurora')) fail('Ayuda C6: falta la capa de aurora viva.');
-  if (!promoCatalog.includes('is-returning') || !promoCatalog.includes('setTimeout(()=>') || !promoCatalog.includes('Fase 1:') || !promoCatalog.includes('Fase 2:')) {
-    fail('Ayuda C6: el cierre debe resolverse en dos fases continuas, no con salto final.');
+  if (promoCatalog.includes('gx-promo-card-orbit')) fail('Ayuda C7: las órbitas no deben existir en el hero.');
+  if (!promoCatalog.includes('gx-promo-card-description')) fail('Ayuda C7: falta descripción en tarjeta cerrada.');
+  if (!promoCatalog.includes('Ver detalles')) fail('Ayuda C7: falta control Ver detalles.');
+  if (!promoCatalog.includes('Ahorras $')) fail('Ayuda C7: el ahorro debe expresarse como Ahorras $X.');
+  if (promoCatalog.includes('gx-promo-current-price')) fail('Ayuda C7: precio porcentual extra no debe empujar la tarjeta cerrada.');
+  if (!promoCatalog.includes('gx-promo-detail-summary')) fail('Ayuda C7: falta resumen expandido estable.');
+  if (!promoCatalog.includes('pendingPromoRender')) fail('Ayuda C7: falta congelar render durante morph.');
+  if (!promoCatalog.includes('Fase 1') || !promoCatalog.includes('Fase 2')) {
+    fail('Ayuda C7: el cierre debe resolverse en dos fases.');
   }
   if (!promoCatalog.includes('Contratar ahora') || !promoCatalog.includes('GOXION_CATALOG_CART')) {
-    fail('Ayuda C6: Contratar ahora no usa el puente estable del carrito.');
+    fail('Ayuda C7: Contratar ahora no usa el carrito estable.');
   }
   if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) {
-    fail('Ayuda C6: falta puente estable del carrito en catálogo.');
+    fail('Ayuda C7: falta puente estable del carrito.');
   }
-  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C6')) fail('Ayuda C6: faltan estilos finales.');
-  if (!ayudaCss.includes('font-size:13px') || !ayudaCss.includes('min-height:46px')) {
-    fail('Ayuda C6: la escala de acciones no quedó alineada a Ayuda/Mi Espacio.');
+  if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C7 STABLE')) fail('Ayuda C7: faltan estilos consolidados.');
+  if (ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C5') || ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C6')) {
+    fail('Ayuda C7: persisten capas C5/C6 que vuelven ambigua la cascada.');
   }
   if (promoCatalog.includes('promocion_adquirir') || promoCatalog.includes('acquirePromotion')) {
     fail('Ayuda C1: no debe ejecutar adquisiciones durante la fase visual/lectura.');
