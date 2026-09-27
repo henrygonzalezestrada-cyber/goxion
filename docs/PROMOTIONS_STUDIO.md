@@ -1,53 +1,48 @@
 # GOXION · Promotions Studio v2
 
-## Bloque A · P1 + P2
+## Estado actual
 
-Promotions Studio convierte el módulo previo de “precio especial por plataforma” en un motor comercial universal sin modificar el precio base de `servicios`.
+Promotions Studio es la consola administrativa de campañas que alimenta el motor real de promociones de GOXION. Ya no es sólo una maqueta de Bloque A: el formulario de Admin está alineado con el contrato vigente de Supabase y con el catálogo promocional consumido por Ayuda.
 
-## Mecánicas
+## Mecánicas soportadas
 
-- `precio_fijo`: una plataforma con precio temporal durante N periodos.
-- `porcentaje`: una plataforma con descuento porcentual; el backend congela el precio promocional calculado al guardar la campaña.
+- `precio_fijo`: una plataforma a precio especial durante N periodos.
+- `porcentaje`: una plataforma con descuento porcentual; el backend calcula y congela el precio promocional.
 - `combo`: dos o más plataformas por un precio conjunto.
-- `addon`: una plataforma disparadora permite añadir uno o más complementos por un precio adicional.
+- `addon`: una plataforma disparadora permite sumar uno o más complementos con precio especial.
 
-## Separación del dominio
+## Flujo de escritura
 
-1. `promociones_catalogo` representa la campaña y su configuración comercial.
-2. `promocion_items` representa las plataformas que componen la oferta y el rol de cada una.
-3. `cliente_servicio_promociones` sigue siendo la capa histórica actual de asignación; el Bloque B/P3 evolucionará la adquisición para congelar todas las condiciones de la oferta aceptada.
-4. `promocion_aplicaciones` registra consumo por periodo.
-5. `servicios.precio` nunca se modifica por una promoción.
+Admin no escribe tablas directamente.
 
-## Seguro de adquisición
+`Promotions Studio`
+→ `GOXION_FINANCIAL_ACTIONS.savePromotion()`
+→ `acciones-financieras`
+→ `promociones-admin-beta`
+→ `goxion_guardar_promocion_v2()`.
 
-La columna `adquisicion_habilitada` permanece en `false` durante P1/P2.
+La RPC guarda cabecera e items de forma atómica y aumenta `revision` cuando se edita una campaña.
 
-El trigger heredado `goxion_asignar_promocion_on_servicio()` ahora sólo puede autoasignar cuando se cumplen simultáneamente:
+## Publicación y adquisición
 
-- mecánica `precio_fijo`;
-- `publicada=true`;
-- `adquisicion_habilitada=true`;
-- `activa=true`;
-- campaña dentro de su ventana;
-- precio promocional menor al monto del servicio.
+Son controles distintos:
 
-La Edge Function de Promotions Studio fuerza `adquisicion_habilitada=false` al guardar. El Bloque B/P3 será el único responsable de habilitar adquisición después de implementar su contrato inmutable.
+- `publicada=true`: permite que la campaña sea visible para el catálogo promocional cuando además está activa y dentro de vigencia.
+- `adquisicion_habilitada=true`: permite que una campaña publicada pueda ofrecer contratación a clientes elegibles.
+- Admin no puede enviar adquisición habilitada si la campaña no está publicada.
+- Al quitar Publicada desde el Studio, el control de adquisición se desactiva y se limpia en el formulario.
+- El backend vuelve a validar esta dependencia y rechaza adquisiciones abiertas sobre campañas no publicadas.
 
-## Metadata preparada para Ayuda / Mi Espacio
+Esto permite preparar una campaña en tres estados prácticos: borrador privado, publicada sólo para mostrar, o publicada y contratable.
 
-- `titulo_publico`
-- `descripcion_publica`
-- `badge`
-- `mostrar_precio_anterior`
-- `oferta_flash`
-- `mostrar_contador`
-- `destacada`
-- `notificar_cliente`
-- `publicada`
-- `prioridad`
+## Datos del dominio
 
-Esto no define todavía el diseño final de Ayuda. Sólo establece una fuente comercial que la futura UI consumirá.
+1. `promociones_catalogo` guarda la campaña, audiencia, vigencia y reglas comerciales.
+2. `promocion_items` guarda las plataformas y su rol dentro de la oferta.
+3. `promocion_adquisiciones` congela la fotografía comercial aceptada por un cliente.
+4. `promocion_adquisicion_items` congela precios efectivos y ahorro por plataforma.
+5. `cliente_servicio_promociones` conserva compatibilidad con promociones heredadas.
+6. `servicios.precio` permanece como precio base y no se reescribe por una campaña.
 
 ## Audiencia
 
@@ -61,56 +56,54 @@ Esto no define todavía el diseño final de Ayuda. Sólo establece una fuente co
 - Lealtad Nivel 1 o superior;
 - Lealtad Nivel 2.
 
-Las condiciones extensibles se guardan en `segmentacion`.
+Las condiciones adicionales viven en `segmentacion`.
 
-## Compatibilidad / stacking
+## Compatibilidad
 
-`acumulacion` permite configurar compatibilidad futura con:
+`acumulacion` controla la convivencia con:
 
 - lealtad;
 - Trato Justo;
 - beneficios programados;
 - bienvenida.
 
-P1/P2 persiste esta intención. P3 deberá convertirla en reglas ejecutables del contrato adquirido y del motor financiero.
+La adquisición guarda una fotografía inmutable de estas reglas para que una edición posterior de la campaña no altere contratos ya aceptados.
 
-## Escrituras
+## Catálogo / Ayuda
 
-Admin no escribe tablas directamente.
+`promociones-catalogo` sólo entrega campañas publicadas, activas y dentro de vigencia. Para clientes autenticados también calcula elegibilidad y devuelve adquisiciones existentes.
 
-`GOXION_FINANCIAL_ACTIONS.savePromotion()`
-→ `acciones-financieras`
-→ `promociones-admin-beta`
-→ `goxion_guardar_promocion_v2()`.
+Ayuda consume, entre otros:
 
-La RPC guarda cabecera e items de forma atómica y aumenta `revision` cuando se edita una campaña.
+- título y descripción pública;
+- badge;
+- mecánica;
+- precio normal y promocional;
+- ahorro;
+- duración;
+- items incluidos;
+- prioridad y destacada;
+- precio anterior;
+- oferta flash;
+- contador;
+- elegibilidad;
+- adquisición habilitada.
 
-## Promotions Studio en Admin
+## Protecciones comprobadas
 
-El panel incorpora:
+- El precio base de `servicios` no cambia al crear una promoción.
+- Guardar, pausar y eliminar pasan por el gateway financiero.
+- Una campaña no publicada no puede habilitar adquisición.
+- La prueba de navegador valida las cuatro mecánicas y el payload real del formulario.
+- El smoke test comprueba que Admin envía `publicada=true` y `adquisicion_habilitada=true` al gateway cuando ambos controles están habilitados.
+- Las pruebas reales de integración han validado precio fijo, porcentaje, combo, publicación en Ayuda y adquisición con snapshot financiero.
 
-- resumen de campañas;
-- búsqueda y filtros;
-- constructor adaptable por mecánica;
-- selector múltiple para combos;
-- disparador + complementos para add-ons;
-- vigencia independiente de duración;
-- segmentación;
-- configuración de stacking;
-- metadata futura de publicación/notificación;
-- duplicado, pausa y eliminación segura;
-- preview lógico administrativo.
+## Criterio de integración
 
-La preview de Admin no es el diseño final del cliente.
+Promotions Studio se considera listo para integrarse a `main` cuando:
 
-## Estado al cierre de Bloque A
-
-P1/P2 debe considerarse listo únicamente cuando:
-
-- esquema y Edge Function estén verificados;
-- las cuatro mecánicas puedan guardarse;
-- el Studio pase integridad/smoke test;
-- ninguna campaña pueda autoasignarse;
-- Ayuda permanezca sin cambios.
-
-El siguiente bloque funcional es P3: adquisición promocional inmutable y ejecución económica de combos/add-ons/stacking.
+1. `npm run verify` termina correctamente.
+2. Chromium y WebKit completan el smoke test.
+3. El formulario expone Publicada y Adquisición habilitada con dependencia explícita.
+4. El payload usa `audiencia` correctamente.
+5. La rama no modifica precios base ni crea datos persistentes de prueba.
