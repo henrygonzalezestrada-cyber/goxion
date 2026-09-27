@@ -381,8 +381,8 @@ async function runAyuda(browser, browserName, errors) {
   // C14 público vs Mi Espacio: en portada no se excluye por stock/propiedad;
   // tras autenticar sí entra la capa inteligente.
   const c14PublicPersonalized=await page.evaluate(() => {
-    const service=(nombre,precio,etiqueta,disponibles)=>({
-      nombre,precio,etiqueta,disponibles_servidor:disponibles,
+    const service=(nombre,precio,etiqueta,disponibles,categoria_catalogo='streaming')=>({
+      nombre,precio,etiqueta,disponibles_servidor:disponibles,categoria_catalogo,
       cuentas:1,limite:1,activo:true,descripcion:'Smoke C14'
     });
     const config={
@@ -392,8 +392,8 @@ async function runAyuda(browser, browserName, errors) {
         service('Netflix Premium',109,'Popular 🔥',0),
         service('Disney+ Premium',89,'Popular 🔥',1),
         service('YouTube Premium',89,'Mas ahorro',1),
-        service('Google One 2TB',29,'',1),
-        service('Microsoft 365',79,'',1)
+        service('Google One 2TB',29,'',1,'almacenamiento'),
+        service('Mystery Tool',79,'',1,'productividad')
       ]
     };
 
@@ -402,6 +402,8 @@ async function runAyuda(browser, browserName, errors) {
     const publicPopular=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
     const publicMode=document.getElementById('gx-catalog-curated')?.dataset.gxCatalogMode||'';
     const publicCardCount=document.querySelectorAll('#catalog-container .brand-card').length;
+    const publicDiscoverNames=[...document.querySelectorAll('#gx-catalog-discover-rail .gx-catalog-mini-card')]
+      .map(x=>x.textContent||'');
 
     window.goxionCurrentClientKey='demo';
     window.cargarCatalogo({
@@ -419,6 +421,7 @@ async function runAyuda(browser, browserName, errors) {
       publicMode,
       publicPopularCount:publicPopular.length,
       publicPopularNames:publicPopular.map(x=>x.textContent||''),
+      publicDiscoverNames,
       publicCardCount,
       personalMode,
       personalPopularCount:personalPopular.length,
@@ -432,6 +435,7 @@ async function runAyuda(browser, browserName, errors) {
     c14PublicPersonalized.publicPopularCount!==2 ||
     !c14PublicPersonalized.publicPopularNames.some(x=>x.includes('Netflix')) ||
     !c14PublicPersonalized.publicPopularNames.some(x=>x.includes('Disney')) ||
+    !c14PublicPersonalized.publicDiscoverNames.some(x=>x.includes('Mystery Tool')&&x.includes('Productividad')) ||
     c14PublicPersonalized.publicCardCount!==5 ||
     c14PublicPersonalized.personalMode!=='personalized' ||
     c14PublicPersonalized.personalPopularCount!==0 ||
