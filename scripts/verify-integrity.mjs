@@ -431,7 +431,7 @@ for (const absolute of walk(jsRoot)) {
   if (!promoCatalog.includes('setPromoActionState')) fail('Ayuda C9: falta transición Ver detalles → Contratar ahora.');
   if (promoCatalog.includes('Ver en catálogo')) fail('Ayuda C9: persiste el segundo botón descartado.');
   if (!promoCatalog.includes('detail.scrollTop=0')) fail('Ayuda C9: el detalle scrollable debe reiniciarse antes de abrir/cerrar.');
-  if (!promoCatalog.includes('La composición ya es visualmente la cerrada antes de encoger el rectángulo')) {
+  if (!promoCatalog.includes('Fase 2: la composición ya es visualmente la cerrada antes de encoger el rectángulo')) {
     fail('Ayuda C9: el cierre no prepara la composición cerrada antes de contraer.');
   }
   if (!promoCatalog.includes('GOXION_CATALOG_CART')) fail('Ayuda C9: Contratar ahora no usa el carrito estable.');
