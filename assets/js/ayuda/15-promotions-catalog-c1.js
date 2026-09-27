@@ -571,25 +571,10 @@
 
     const targetWidth=Math.min(window.innerWidth-44,352);
     const maxHeight=Math.max(440,window.innerHeight-48);
-
-    // Medimos con un clon invisible para no tocar el layout de la tarjeta real
-    // antes de iniciar el morph.
-    const measure=card.cloneNode(true);
-    measure.classList.add('is-expanded','gx-promo-measure-clone');
-    measure.style.width=targetWidth+'px';
-    measure.style.height='auto';
-    measure.style.maxHeight='none';
-    measure.style.position='fixed';
-    measure.style.left='-9999px';
-    measure.style.top='0';
-    measure.style.visibility='hidden';
-    measure.style.pointerEvents='none';
-    document.body.appendChild(measure);
-    measure.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
-    const naturalHeight=Math.ceil(measure.scrollHeight)+6;
-    measure.remove();
-
-    const targetHeight=Math.min(maxHeight,Math.max(rect.height+96,Math.min(naturalHeight,552)));
+    const itemCount=Math.min(3,(p?.items||[]).length);
+    const preferredHeight=itemCount>1?520:500;
+    const minimumGrowth=itemCount>1?180:155;
+    const targetHeight=Math.min(maxHeight,preferredHeight,Math.max(rect.height+minimumGrowth,rect.height));
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(24,(window.innerHeight-targetHeight)/2);
 
