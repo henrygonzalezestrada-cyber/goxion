@@ -434,10 +434,11 @@
         }
         stopAuto();
         setTimeout(()=>{
-          if(!state.expandedCard && card.isConnected){
-            openPromoDetail(selectedPromotions()[index],card);
-          }
-        },16);
+          if(state.expandedCard) return;
+          const liveDeck=$('gx-promo-deck');
+          const liveCard=liveDeck?.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]')||card;
+          if(liveCard?.isConnected) openPromoDetail(selectedPromotions()[index],liveCard);
+        },0);
       });
     });
   }
@@ -448,31 +449,9 @@
     deck.dataset.gxBound='1';
 
     deck.addEventListener('click',event=>{
-      const detailsBtn=event.target.closest('[data-gx-promo-details]');
-      if(!detailsBtn) return;
-      const card=detailsBtn.closest('.gx-promo-deck-card');
-      if(!card) return;
-      event.preventDefault();
-      event.stopPropagation();
-      const index=Number(card.dataset.gxPromoIndex||0);
-      if(index!==state.active){
-        state.active=index;
-        applyDeckPositions();
-      }
-      stopAuto();
-      // WebKit es más estable si el reparent del mismo nodo ocurre después
-      // de terminar la propagación del click actual.
-      setTimeout(()=>{
-        if(state.expandedCard) return;
-        const liveDeck=$('gx-promo-deck');
-        const liveCard=liveDeck?.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]')||card;
-        if(liveCard?.isConnected) openPromoDetail(selectedPromotions()[index],liveCard);
-      },0);
-    },true);
-
-    deck.addEventListener('click',event=>{
       const card=event.target.closest('.gx-promo-deck-card');
       if(!card) return;
+      if(event.target.closest('[data-gx-promo-details]')) return;
 
       if(event.target.closest('[data-gx-promo-close]')){
         event.stopPropagation();
