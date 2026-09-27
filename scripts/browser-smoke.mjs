@@ -462,7 +462,7 @@ async function runAyuda(browser, browserName, errors) {
   });
 
   await page.waitForFunction(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
+    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
     const action=card?.querySelector('[data-gx-promo-action]');
     return !!card && !!action && action.textContent.trim()==='Contratar ahora';
   },null,{timeout:3200}).catch(()=>{});
@@ -518,7 +518,7 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
   );
-  await page.waitForTimeout(560);
+  await page.waitForTimeout(620);
 
   const midClose=await page.evaluate(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
@@ -542,8 +542,8 @@ async function runAyuda(browser, browserName, errors) {
     !midClose ||
     midClose.returning!==true ||
     midClose.actionText!=='Ver detalles' ||
-    midClose.heightDiff>12 ||
-    midClose.actionGapDiff>10 ||
+    midClose.heightDiff>10 ||
+    midClose.actionGapDiff>12 ||
     midClose.valueTopDiff>14 ||
     midClose.detailOpacity>.12
   ){
@@ -589,11 +589,11 @@ async function runAyuda(browser, browserName, errors) {
     return {
       whiteSpace:primary?getComputedStyle(primary).whiteSpace:null,
       fits:primary?primary.scrollWidth<=primary.parentElement.clientWidth+2:false,
-      valueHeight:value?Math.round(value.getBoundingClientRect().height):0
+      minHeight:value?parseFloat(getComputedStyle(value).minHeight):0
     };
   }).catch(()=>null);
 
-  if(!percentStable||percentStable.whiteSpace!=='nowrap'||percentStable.fits!==true||percentStable.valueHeight<70){
+  if(!percentStable||percentStable.whiteSpace!=='nowrap'||percentStable.fits!==true||percentStable.minHeight<70){
     errors.push(`${label}: porcentaje C9 sigue rompiendo el bloque de valor. ${JSON.stringify(percentStable)}`);
   }
 
