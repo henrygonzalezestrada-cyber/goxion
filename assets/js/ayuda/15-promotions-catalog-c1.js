@@ -757,7 +757,7 @@
         applyDeckPositions();
         requestAnimationFrame(()=>startAuto());
       }
-    },720);
+    },820);
   }
 
   function brandPromoSaving(entry){
