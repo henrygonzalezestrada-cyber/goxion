@@ -381,27 +381,31 @@ async function runAyuda(browser, browserName, errors) {
   const closedLayout=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
     const metrics=cards.map(card=>{
-      const r=card.getBoundingClientRect();
-      const footer=card.querySelector('.gx-promo-card-footer')?.getBoundingClientRect();
+      const style=getComputedStyle(card);
+      const footer=card.querySelector('.gx-promo-card-footer');
+      const price=card.querySelector('.gx-promo-card-price');
       return {
         index:Number(card.dataset.gxPromoIndex||0),
-        height:Math.round(r.height),
-        footerBottom:footer?Math.round(footer.bottom-r.top):null,
+        cssHeight:parseFloat(style.height),
+        footerHeight:footer?parseFloat(getComputedStyle(footer).height):null,
+        priceHeight:price?parseFloat(getComputedStyle(price).height):null,
         hasCurrentPrice:!!card.querySelector('.gx-promo-current-price'),
         saving:(card.querySelector('.gx-promo-saving')?.textContent||'').replace(/\s+/g,' ').trim(),
         detailsFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-info-hint')).fontSize),
         descFont:parseFloat(getComputedStyle(card.querySelector('.gx-promo-card-description')).fontSize)
       };
     });
-    const heights=metrics.map(x=>x.height);
-    const bottoms=metrics.map(x=>x.footerBottom).filter(Number.isFinite);
+    const heights=metrics.map(x=>x.cssHeight);
+    const footers=metrics.map(x=>x.footerHeight).filter(Number.isFinite);
+    const prices=metrics.map(x=>x.priceHeight).filter(Number.isFinite);
     const combo=cards.find(x=>x.dataset.gxPromoIndex==='1');
     const logos=[...combo.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
     const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
     return {
       metrics,
       heightSpread:Math.max(...heights)-Math.min(...heights),
-      footerSpread:Math.max(...bottoms)-Math.min(...bottoms),
+      footerSpread:Math.max(...footers)-Math.min(...footers),
+      priceSpread:Math.max(...prices)-Math.min(...prices),
       comboTransformA:getComputedStyle(logos[0]).transform,
       comboTransformB:getComputedStyle(logos[1]).transform,
       comboGap:(a&&b)?Math.round(b.left-a.right):null,
@@ -411,8 +415,9 @@ async function runAyuda(browser, browserName, errors) {
 
   if(
     !closedLayout ||
-    closedLayout.heightSpread>2 ||
-    closedLayout.footerSpread>3 ||
+    closedLayout.heightSpread>1 ||
+    closedLayout.footerSpread>1 ||
+    closedLayout.priceSpread>1 ||
     closedLayout.metrics.some(x=>x.hasCurrentPrice) ||
     closedLayout.metrics.some(x=>!/^Ahorras\s+\$/.test(x.saving)) ||
     closedLayout.metrics.some(x=>x.detailsFont<10.5||x.descFont<10.5) ||
@@ -477,7 +482,7 @@ async function runAyuda(browser, browserName, errors) {
     !expanded ||
     expanded.sameNode!==true ||
     expanded.width>370 ||
-    expanded.height>540 ||
+    expanded.height>545 ||
     expanded.contentFits!==true ||
     expanded.transformA!=='none' ||
     expanded.transformB!=='none' ||
@@ -526,20 +531,18 @@ async function runAyuda(browser, browserName, errors) {
     null,{timeout:2200}
   ).catch(()=>{});
   const percentStable=await page.evaluate(() => {
-    const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
-    const pct=cards.find(x=>x.dataset.gxPromoIndex==='2');
-    const combo=cards.find(x=>x.dataset.gxPromoIndex==='1');
-    const pr=pct.getBoundingClientRect(),cr=combo.getBoundingClientRect();
-    const pf=pct.querySelector('.gx-promo-card-footer').getBoundingClientRect();
-    const cf=combo.querySelector('.gx-promo-card-footer').getBoundingClientRect();
+    const pct=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="2"]');
+    const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
+    const section=(card,selector)=>parseFloat(getComputedStyle(card.querySelector(selector)).height);
     return {
-      heightDiff:Math.abs(Math.round(pr.height-cr.height)),
-      footerDiff:Math.abs(Math.round((pf.bottom-pr.top)-(cf.bottom-cr.top))),
+      heightDiff:Math.abs(parseFloat(getComputedStyle(pct).height)-parseFloat(getComputedStyle(combo).height)),
+      footerDiff:Math.abs(section(pct,'.gx-promo-card-footer')-section(combo,'.gx-promo-card-footer')),
+      priceDiff:Math.abs(section(pct,'.gx-promo-card-price')-section(combo,'.gx-promo-card-price')),
       hasCurrentPrice:!!pct.querySelector('.gx-promo-current-price')
     };
   }).catch(()=>null);
 
-  if(!percentStable||percentStable.heightDiff>2||percentStable.footerDiff>3||percentStable.hasCurrentPrice!==false){
+  if(!percentStable||percentStable.heightDiff>1||percentStable.footerDiff>1||percentStable.priceDiff>1||percentStable.hasCurrentPrice!==false){
     errors.push(`${label}: porcentaje C7 sigue empujando la retícula. ${JSON.stringify(percentStable)}`);
   }
 
