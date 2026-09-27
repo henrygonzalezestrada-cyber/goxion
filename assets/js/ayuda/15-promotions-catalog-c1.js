@@ -894,6 +894,35 @@
     '</button>';
   }
 
+  function fitCuratedPills(root=document){
+    requestAnimationFrame(()=>{
+      root.querySelectorAll?.('.gx-catalog-mini-badge,.gx-catalog-mini-note').forEach(pill=>{
+        const line=pill.closest('.gx-catalog-mini-meta-line');
+        if(!line) return;
+
+        pill.style.removeProperty('--gx-mini-pill-font');
+        pill.style.removeProperty('--gx-mini-pill-pad');
+        pill.style.removeProperty('--gx-mini-pill-letter');
+
+        const max=Math.max(48,Math.floor(line.clientWidth));
+        const base=6.7;
+        const min=5.15;
+        pill.style.setProperty('--gx-mini-pill-font',base+'px');
+        pill.style.setProperty('--gx-mini-pill-pad','8px');
+        pill.style.setProperty('--gx-mini-pill-letter','.28px');
+
+        const needed=Math.max(pill.scrollWidth,pill.getBoundingClientRect().width);
+        if(needed>max){
+          const ratio=max/needed;
+          const size=Math.max(min,base*ratio);
+          pill.style.setProperty('--gx-mini-pill-font',size.toFixed(2)+'px');
+          pill.style.setProperty('--gx-mini-pill-pad',size<=5.6?'5px':'6px');
+          pill.style.setProperty('--gx-mini-pill-letter',size<=5.6?'0px':'.12px');
+        }
+      });
+    });
+  }
+
   function renderCurated(){
     const section=$('gx-catalog-curated');
     const best=$('gx-catalog-best-rail');
@@ -973,6 +1002,7 @@
     section.hidden=false;
     section.dataset.gxCatalogMode=personalized?'personalized':'public';
 
+    fitCuratedPills(section);
     section.querySelectorAll('[data-gx-brand]').forEach(btn=>{
       btn.addEventListener('click',()=>focusCatalogBrand(btn.dataset.gxBrand||''));
     });
@@ -1041,6 +1071,12 @@
     wrapped.__gxPromotionsC1=true;
     window.cargarCatalogo=wrapped;
   }
+
+  let gxCuratedFitTimer=0;
+  window.addEventListener('resize',()=>{
+    clearTimeout(gxCuratedFitTimer);
+    gxCuratedFitTimer=setTimeout(()=>fitCuratedPills(document.getElementById('gx-catalog-curated')||document),120);
+  },{passive:true});
 
   let gxPromoMarqueeResizeTimer=0;
   window.addEventListener('resize',()=>{
