@@ -521,7 +521,7 @@ async function runAyuda(browser, browserName, errors) {
   await page.waitForTimeout(620);
 
   const midClose=await page.evaluate(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
+    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
     if(!card)return null;
     const r=card.getBoundingClientRect();
     const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
