@@ -447,7 +447,11 @@ async function runAyuda(browser, browserName, errors) {
       softCardAnimations:soft.map(x=>getComputedStyle(x).animationName),
       softBadgeAnimations:soft.map(x=>getComputedStyle(x.querySelector('.gx-catalog-mini-badge')).animationName),
       newFeaturedCount:newFeatured.length,
-      newFeaturedAnimation:newFeatured[0]?getComputedStyle(newFeatured[0]).animationName:'none'
+      newFeaturedAnimation:newFeatured[0]?getComputedStyle(newFeatured[0]).animationName:'none',
+      fallbackCards:[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')]
+        .filter(x=>!x.classList.contains('is-popular-featured')&&!x.classList.contains('is-popular-soft')).length,
+      misplacedBadges:[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-badge')]
+        .filter(x=>!x.parentElement?.classList.contains('gx-catalog-mini-meta-line')).length
     };
   }).catch(()=>null);
 
@@ -455,6 +459,8 @@ async function runAyuda(browser, browserName, errors) {
     !c12Popular ||
     c12Popular.catalogPromoClasses!==0 ||
     c12Popular.catalogBadges!==0 ||
+    c12Popular.fallbackCards!==0 ||
+    c12Popular.misplacedBadges!==0 ||
     c12Popular.featuredCount>1 ||
     (c12Popular.featuredCount===1 && (
       c12Popular.featuredLabel!=='MÁS POPULAR' ||
@@ -481,13 +487,18 @@ async function runAyuda(browser, browserName, errors) {
       empty:!!document.querySelector('#gx-catalog-best-rail .gx-catalog-curated-empty'),
       cardAnimations:saving.map(x=>getComputedStyle(x).animationName),
       badgeAnimations:saving.map(x=>getComputedStyle(x.querySelector('.gx-catalog-mini-badge')).animationName),
-      featuredPopular:document.querySelectorAll('#gx-catalog-best-rail .is-popular-featured').length
+      featuredPopular:document.querySelectorAll('#gx-catalog-best-rail .is-popular-featured').length,
+      fallbackCards:cards.filter(x=>!x.classList.contains('is-saving-soft')).length,
+      misplacedBadges:[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-badge')]
+        .filter(x=>!x.parentElement?.classList.contains('gx-catalog-mini-meta-line')).length
     };
   }).catch(()=>null);
 
   if(
     !c12Saving ||
     c12Saving.featuredPopular!==0 ||
+    c12Saving.fallbackCards!==0 ||
+    c12Saving.misplacedBadges!==0 ||
     c12Saving.cardAnimations.some(x=>x!=='none') ||
     c12Saving.badgeAnimations.some(x=>x==='none') ||
     (c12Saving.cards===0 && c12Saving.empty!==true)
