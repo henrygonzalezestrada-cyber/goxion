@@ -142,6 +142,55 @@ async function runAyuda(browser, browserName, errors) {
   const label = `${browserName} · Ayuda`;
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   attachDiagnostics(page, label, errors);
+
+  await page.route('**/functions/v1/promociones-catalogo', async route => {
+    const promo = (id, mechanic, title, items, normal, offer, priority) => ({
+      id,
+      nombre:title,
+      titulo_publico:title,
+      descripcion_publica:'Oferta promocional de prueba C1',
+      badge:mechanic==='combo'?'COMBO':(mechanic==='porcentaje'?'30% OFF':'PROMO'),
+      mecanica:mechanic,
+      precio_promocional:offer,
+      precio_promocional_total:offer,
+      descuento_porcentaje:mechanic==='porcentaje'?30:null,
+      duracion_periodos:3,
+      inicio:'2026-09-01T00:00:00Z',
+      fin:'2026-12-31T23:59:59Z',
+      mostrar_precio_anterior:true,
+      mostrar_contador:false,
+      oferta_flash:false,
+      activa:true,
+      audiencia:'todos',
+      destacada:true,
+      publicada:true,
+      adquisicion_habilitada:true,
+      prioridad:priority,
+      revision:1,
+      precio_normal_total:normal,
+      ahorro_estimado:normal-offer,
+      items,
+      elegibilidad:{elegible:null,codigo:'PUBLICO',motivo:'Inicia sesión para confirmar si aplica a tu cuenta'},
+      adquirida:null
+    });
+    const svc=(id,nombre,precio,rol='incluido')=>({servicio_id:id,rol,orden:0,servicio:{id,nombre,precio,etiqueta:''}});
+    await route.fulfill({
+      status:200,
+      contentType:'application/json',
+      body:JSON.stringify({
+        ok:true,
+        autenticado:false,
+        contrato:'goxion-promotions-catalog-c1',
+        version:'1.0',
+        promociones:[
+          promo('c1-price','precio_fijo','Netflix · 3 meses',[svc('netflix','Netflix Premium',109,'principal')],109,79,30),
+          promo('c1-combo','combo','HBO Max + Prime Video',[svc('hbo','HBO Max Platino',79),svc('prime','Prime Video',45)],124,99,20),
+          promo('c1-percent','porcentaje','Disney+ · 30% OFF',[svc('disney','Disney+ Premium',89,'principal')],89,62.3,10)
+        ]
+      })
+    });
+  });
+
   await page.goto(origin + '/ayuda.html', { waitUntil: 'load' });
   await page.waitForTimeout(5200);
 
@@ -322,6 +371,211 @@ async function runAyuda(browser, browserName, errors) {
     if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
 
+  // Catálogo C6: tipografía GOXION + combo recto + aurora + cierre continuo.
+  await page.evaluate(() => window.switchTab?.('catalogo'));
+  await page.waitForFunction(() => {
+    const showcase=document.getElementById('gx-promo-showcase');
+    const cards=document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card');
+    const curated=document.getElementById('gx-catalog-curated');
+    return showcase?.hidden===false && cards.length===3 && curated?.hidden===false;
+  }, null, { timeout: 8000 }).catch(()=>{});
+
+  const promoC6 = await page.evaluate(() => {
+    const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
+    const front=cards.find(x=>x.classList.contains('is-front'));
+    const saving=(front?.querySelector('.gx-promo-saving')?.textContent||'').replace(/\s+/g,' ').trim();
+    const details=front?.querySelector('[data-gx-promo-details]');
+    const aurora=front?.querySelector('.gx-promo-card-aurora');
+    const auroraStyle=aurora?getComputedStyle(aurora):null;
+    const desc=front?.querySelector('.gx-promo-card-description');
+    return {
+      cardCount:cards.length,
+      frontIndex:Number(front?.dataset?.gxPromoIndex ?? -1),
+      savingClean:/^Ahorras\s+\$/.test(saving),
+      detailsText:(details?.textContent||'').trim(),
+      detailsFont:details?parseFloat(getComputedStyle(details).fontSize):0,
+      descriptionFont:desc?parseFloat(getComputedStyle(desc).fontSize):0,
+      auroraVisible:!!aurora && auroraStyle?.display!=='none' && auroraStyle?.animationName!=='none',
+      noOrbit:!front?.querySelector('.gx-promo-card-orbit')
+    };
+  }).catch(()=>null);
+
+  if(
+    !promoC6 ||
+    promoC6.cardCount!==3 ||
+    promoC6.frontIndex<0 ||
+    promoC6.savingClean!==true ||
+    promoC6.detailsText!=='Ver detalles' ||
+    promoC6.detailsFont<10.5 ||
+    promoC6.descriptionFont<10.5 ||
+    promoC6.auroraVisible!==true ||
+    promoC6.noOrbit!==true
+  ){
+    errors.push(`${label}: catálogo C6 no respetó jerarquía/aurora esperada. ${JSON.stringify(promoC6)}`);
+  }
+
+  // Llevar el combo al frente y comprobar logos rectos/casi juntos.
+  await page.evaluate(() => {
+    const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
+    if(combo && !combo.classList.contains('is-front')) combo.click();
+  });
+  await page.waitForFunction(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]')?.classList.contains('is-front')===true,
+    null,{timeout:2200}
+  ).catch(()=>{});
+
+  const comboClosed=await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
+    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+    return {
+      count:logos.length,
+      rotationA:getComputedStyle(logos[0]).transform,
+      rotationB:getComputedStyle(logos[1]).transform,
+      gap:(a&&b)?Math.round(b.left-a.right):null
+    };
+  }).catch(()=>null);
+
+  if(!comboClosed||comboClosed.count<2||comboClosed.rotationA!=='none'||comboClosed.rotationB!=='none'||comboClosed.gap===null||comboClosed.gap>4){
+    errors.push(`${label}: combo C6 cerrado no quedó recto/casi unido. ${JSON.stringify(comboClosed)}`);
+  }
+
+  await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
+    if(!card)return;
+    const rect=card.getBoundingClientRect();
+    window.__gxPromoClosedRect={width:rect.width,height:rect.height};
+    card.dataset.gxSmokeToken='same-node-c6';
+    window.__gxPromoSmokeCard=card;
+    card.querySelector('[data-gx-promo-details]')?.click();
+  });
+
+  await page.waitForFunction(() => {
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
+    if(!expanded)return false;
+    return expanded.getBoundingClientRect().width>300;
+  },null,{timeout:3200}).catch(()=>{});
+  await page.waitForTimeout(520);
+
+  const promoExpanded=await page.evaluate(() => {
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c6"]');
+    if(!expanded)return null;
+    const rect=expanded.getBoundingClientRect();
+    const actions=expanded.querySelector('.gx-promo-expanded-actions')?.getBoundingClientRect();
+    const logos=[...expanded.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+    const primary=expanded.querySelector('[data-gx-promo-contract]');
+    const secondary=expanded.querySelector('[data-gx-promo-service]');
+    const desc=expanded.querySelector('.gx-promo-card-description');
+    return {
+      sameNode:expanded===window.__gxPromoSmokeCard,
+      width:Math.round(rect.width),
+      height:Math.round(rect.height),
+      growth:Math.round(rect.height-(window.__gxPromoClosedRect?.height||0)),
+      contentFits:!!actions && actions.bottom<=rect.bottom-8,
+      logoWidth:Math.round(a?.width||0),
+      comboGap:(a&&b)?Math.round(b.left-a.right):null,
+      descriptionFont:desc?parseFloat(getComputedStyle(desc).fontSize):0,
+      primaryFont:primary?parseFloat(getComputedStyle(primary).fontSize):0,
+      primaryHeight:primary?Math.round(primary.getBoundingClientRect().height):0,
+      secondaryFont:secondary?parseFloat(getComputedStyle(secondary).fontSize):0,
+      contractText:(primary?.textContent||'').trim(),
+      contractEnabled:!!primary&&!primary.disabled,
+      layout:(()=>{
+        const pick=(selector)=>{
+          const el=expanded.querySelector(selector);
+          if(!el)return null;
+          const r=el.getBoundingClientRect();
+          return {top:Math.round(r.top-rect.top),bottom:Math.round(r.bottom-rect.top),height:Math.round(r.height)};
+        };
+        return {
+          top:pick('.gx-promo-card-top'),
+          logos:pick('.gx-promo-card-logos'),
+          copy:pick('.gx-promo-card-copy'),
+          price:pick('.gx-promo-card-price'),
+          footer:pick('.gx-promo-card-footer'),
+          detail:pick('.gx-promo-morph-detail'),
+          meta:pick('.gx-promo-morph-meta'),
+          items:pick('.gx-promo-detail-items'),
+          status:pick('.gx-promo-expanded-status'),
+          actions:pick('.gx-promo-expanded-actions')
+        };
+      })()
+    };
+  }).catch(()=>null);
+
+  if(
+    !promoExpanded ||
+    promoExpanded.sameNode!==true ||
+    promoExpanded.width>370 ||
+    promoExpanded.growth<35 ||
+    promoExpanded.growth>300 ||
+    promoExpanded.contentFits!==true ||
+    promoExpanded.logoWidth<74 ||
+    promoExpanded.comboGap<4 ||
+    promoExpanded.comboGap>18 ||
+    promoExpanded.descriptionFont<11 ||
+    promoExpanded.primaryFont<12 ||
+    promoExpanded.secondaryFont<12 ||
+    promoExpanded.primaryHeight<42 ||
+    promoExpanded.contractText!=='Contratar ahora' ||
+    promoExpanded.contractEnabled!==true
+  ){
+    errors.push(`${label}: morph C6 no quedó compacto/legible. ${JSON.stringify(promoExpanded)}`);
+  }
+
+  // Cerrar y comprobar que la misma tarjeta regresa y los logos vuelven a juntarse.
+  await page.evaluate(() =>
+    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
+  );
+  await page.waitForFunction(() =>
+    !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]'),
+    null,{timeout:3200}
+  ).catch(()=>{});
+
+  const promoClosedAgain=await page.evaluate(() => {
+    const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]');
+    const logos=[...card?.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')||[]];
+    const a=logos[0]?.getBoundingClientRect(),b=logos[1]?.getBoundingClientRect();
+    return {
+      restored:card===window.__gxPromoSmokeCard,
+      gap:(a&&b)?Math.round(b.left-a.right):null,
+      expanded:card?.classList.contains('is-expanded')===true
+    };
+  }).catch(()=>null);
+
+  if(!promoClosedAgain||promoClosedAgain.restored!==true||promoClosedAgain.expanded!==false||promoClosedAgain.gap===null||promoClosedAgain.gap>4){
+    errors.push(`${label}: cierre C6 no restauró tarjeta/logos unidos. ${JSON.stringify(promoClosedAgain)}`);
+  }
+
+  // Volver a abrir para probar contratación y carrito.
+  await page.evaluate(() =>
+    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"] [data-gx-promo-details]')?.click()
+  );
+  await page.waitForFunction(() =>
+    !!document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-contract]'),
+    null,{timeout:3000}
+  ).catch(()=>{});
+  await page.evaluate(() =>
+    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-contract]')?.click()
+  );
+  await page.waitForFunction(() =>
+    document.getElementById('floating-cart')?.classList.contains('show')===true &&
+    !document.querySelector('body > .gx-promo-deck-card.is-expanded'),
+    null,{timeout:3200}
+  ).catch(()=>{});
+
+  const promoCart=await page.evaluate(() => ({
+    visible:document.getElementById('floating-cart')?.classList.contains('show')===true,
+    total:(document.getElementById('cart-total-price')?.textContent||'').trim(),
+    restored:document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c6"]')===window.__gxPromoSmokeCard
+  })).catch(()=>null);
+
+  if(!promoCart||promoCart.visible!==true||!promoCart.total.includes('$99')||promoCart.restored!==true){
+    errors.push(`${label}: Contratar ahora C6 no agregó combo/restauró tarjeta. ${JSON.stringify(promoCart)}`);
+  }
+
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
   // no sólo un salto entre estado compacto y expandido.
   await page.evaluate(() => window.switchTab?.('soporte'));
@@ -462,6 +716,25 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       promocion_quitar_asignacion: {
         desactivada:true
       },
+      promocion_adquirir: {
+        adquisicion:{
+          adquisicion_id:'acq-smoke',
+          estado:'activa',
+          mecanica:'combo',
+          periodo_inicio:'2026-09-01',
+          periodos_totales:3,
+          subtotal_normal:188,
+          total_promocional:139,
+          ahorro:49
+        }
+      },
+      promocion_cancelar_adquisicion: {
+        adquisicion:{
+          adquisicion_id:'acq-smoke',
+          estado:'cancelada',
+          cambio:true
+        }
+      },
       registrar_pago_parcial: {
         pago_parcial:{id:'partial-smoke',saldo_restante:40},
         monto_pagado:60,
@@ -491,6 +764,24 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     });
   });
 
+  await page.route('**/functions/v1/promociones-admin-beta', async route => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        ok:true,
+        contrato:'goxion-promotions-studio-v2',
+        version:'2.0',
+        servicios:[
+          {id:'catalog-smoke-a',nombre:'Netflix Smoke',precio:109,activo:true},
+          {id:'catalog-smoke-b',nombre:'HBO Smoke',precio:79,activo:true},
+          {id:'catalog-smoke-c',nombre:'Prime Smoke',precio:45,activo:true}
+        ],
+        promociones:[]
+      })
+    });
+  });
+
   await page.goto(origin + '/admin.html', { waitUntil: 'load' });
   await page.waitForTimeout(900);
 
@@ -513,6 +804,8 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     typeof window.GOXION_FINANCIAL_ACTIONS?.cancelBenefit === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.savePromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.togglePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.acquirePromotion === 'function' &&
+    typeof window.GOXION_FINANCIAL_ACTIONS?.cancelPromotionAcquisition === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.assignPromotion === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment === 'function' &&
     typeof window.GOXION_FINANCIAL_ACTIONS?.pactPaymentDate === 'function' &&
@@ -623,6 +916,16 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         activa:true
       }),
       promoState: await window.GOXION_FINANCIAL_ACTIONS.togglePromotion({id:'promo-smoke',activa:false}),
+      promoAcquire: await window.GOXION_FINANCIAL_ACTIONS.acquirePromotion({
+        clienteId:'client-smoke',
+        promocionId:'promo-smoke',
+        periodoInicio:'2026-09',
+        origen:'smoke'
+      }),
+      promoCancelAcquisition: await window.GOXION_FINANCIAL_ACTIONS.cancelPromotionAcquisition({
+        id:'acq-smoke',
+        motivo:'Smoke cancel'
+      }),
       promoAssign: await window.GOXION_FINANCIAL_ACTIONS.assignPromotion({
         clienteServicioId:'service-smoke',
         promocionId:'promo-smoke',
@@ -656,6 +959,13 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       if (phase3de.promoSave?.promocion?.id !== 'promo-smoke') {
         errors.push(`${label}: promoción no normalizó la respuesta.`);
       }
+      if (
+        phase3de.promoAcquire?.adquisicion?.adquisicion_id !== 'acq-smoke' ||
+        phase3de.promoAcquire?.adquisicion?.ahorro !== 49 ||
+        phase3de.promoCancelAcquisition?.adquisicion?.estado !== 'cancelada'
+      ) {
+        errors.push(`${label}: adquisición promocional P3 no normalizó la respuesta.`);
+      }
       if (phase3de.partial?.saldo_restante !== 40 || phase3de.partial?.monto_pagado !== 60) {
         errors.push(`${label}: pago parcial no normalizó la respuesta.`);
       }
@@ -673,6 +983,14 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
         actionMap.promocion_guardar?.body?.datos?.servicio_id !== 'catalog-smoke' ||
         actionMap.promocion_asignar?.body?.datos?.cliente_servicio_id !== 'service-smoke'
       ) errors.push(`${label}: contrato HTTP de promociones incorrecto.`);
+
+      if (
+        actionMap.promocion_adquirir?.body?.datos?.cliente_id !== 'client-smoke' ||
+        actionMap.promocion_adquirir?.body?.datos?.promocion_id !== 'promo-smoke' ||
+        actionMap.promocion_adquirir?.body?.datos?.periodo_inicio !== '2026-09-01' ||
+        actionMap.promocion_adquirir?.body?.datos?.origen !== 'smoke' ||
+        actionMap.promocion_cancelar_adquisicion?.body?.datos?.id !== 'acq-smoke'
+      ) errors.push(`${label}: contrato HTTP de adquisición promocional P3 incorrecto.`);
 
       if (
         actionMap.registrar_pago_parcial?.body?.datos?.saldo_restante !== 40 ||
@@ -756,6 +1074,61 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
     }, mode);
     if (!ok) errors.push(`${label}: falló modo de catálogo ${mode}.`);
     await page.waitForTimeout(80);
+  }
+
+  // Promotions Studio: validar las cuatro mecánicas sin guardar nada.
+  const promoStudio = await page.evaluate(async () => {
+    try {
+      await window.gxPromoLoad?.();
+      window.gxPromoOpenEditor?.();
+
+      const mechanics = [...document.querySelectorAll('[data-gx-promo-mechanic]')]
+        .map(x => x.getAttribute('data-gx-promo-mechanic'));
+
+      window.gxPromoSetMechanic?.('combo');
+      const comboOptions = document.querySelectorAll('[data-gx-promo-service-check]').length;
+
+      window.gxPromoSetMechanic?.('addon');
+      const addonTrigger = document.getElementById('gx-promo-addon-trigger');
+      const addonOptions = document.querySelectorAll('[data-gx-promo-addon-check]').length;
+
+      const lockText = document.querySelector('.gx-promo-acquisition-lock')?.textContent || '';
+      const acquisitionToggle = document.getElementById('gx-promo-acquisition-enabled');
+      if (acquisitionToggle) acquisitionToggle.checked = true;
+      const hasPreview = !!document.getElementById('gx-promo-preview');
+      const editorVisible = document.getElementById('gx-promo-editor')?.hidden === false;
+
+      window.gxPromoCloseEditor?.();
+
+      return {
+        mechanics,
+        comboOptions,
+        addonOptions,
+        hasTrigger: !!addonTrigger,
+        hasPreview,
+        hasAcquisitionToggle: !!acquisitionToggle,
+        acquisitionEnabled: acquisitionToggle?.checked === true,
+        editorVisible,
+        lockText
+      };
+    } catch (error) {
+      return { error: error?.message || String(error) };
+    }
+  });
+
+  if (
+    promoStudio?.error ||
+    !['precio_fijo','porcentaje','combo','addon'].every(x => promoStudio?.mechanics?.includes(x)) ||
+    promoStudio?.comboOptions !== 3 ||
+    promoStudio?.addonOptions !== 3 ||
+    promoStudio?.hasTrigger !== true ||
+    promoStudio?.hasPreview !== true ||
+    promoStudio?.hasAcquisitionToggle !== true ||
+    promoStudio?.acquisitionEnabled !== true ||
+    promoStudio?.editorVisible !== true ||
+    !String(promoStudio?.lockText || '').includes('P3')
+  ) {
+    errors.push(`${label}: Promotions Studio universal no quedó operativo.`);
   }
 
   // Ajustes: recorrer las siete superficies, sin ejecutar acciones persistentes.
