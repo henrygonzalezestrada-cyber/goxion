@@ -293,7 +293,9 @@
       ? '<span class="gx-promo-current-price">Ahora $'+money(promoTotal)+'</span>'
       :'';
     const savingLine=saving>0
-      ? '<div class="gx-promo-saving"><strong>Ahorras p?.gx_preview===true?'<span class="gx-promo-preview-chip">PREVIEW</span>':'';
+      ? '<div class="gx-promo-saving"><strong>Ahorras '+String.fromCharCode(36)+money(saving)+'</strong></div>'
+      :'';
+    const preview=p?.gx_preview===true?'<span class="gx-promo-preview-chip">PREVIEW</span>':'';
     const comboClass=(p?.items||[]).length>1?' is-combo':'';
     const style='--gx-brand:'+palette.brand+';--gx-brand-deep:'+palette.deep+';--gx-brand-accent:'+palette.accent+';';
 
