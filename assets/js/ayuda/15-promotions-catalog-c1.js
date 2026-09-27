@@ -108,6 +108,27 @@
     return periods+' periodo'+(periods===1?'':'s');
   }
 
+  function promoContractPrice(p){
+    return Math.max(0,Number(p?.precio_promocional_total??p?.precio_promocional??0));
+  }
+
+  function promoContractState(p){
+    if(p?.adquirida&&String(p.adquirida.estado)==='activa'){
+      return {enabled:false,label:'Ya la tienes'};
+    }
+    if(p?.autenticado===true&&p?.elegibilidad?.elegible===false){
+      return {enabled:false,label:'No disponible'};
+    }
+    if(p?.adquisicion_habilitada!==true){
+      return {enabled:false,label:'Próximamente'};
+    }
+    return {enabled:true,label:'Contratar ahora'};
+  }
+
+  function promoCartLabel(p){
+    return campaignKind(p)+' · '+publicTitle(p);
+  }
+
   function statusText(p){
     const acq=p?.adquirida;
     if(acq&&String(acq.estado)==='activa'){
@@ -263,8 +284,13 @@
     const platform=promoPlatformTitle(p);
     const palette=promoPalette(p);
     const description=String(p?.descripcion_publica||'Descubre los detalles de esta promoción.');
+    const contract=promoContractState(p);
+    const promoTotal=promoContractPrice(p);
     const oldPrice=p?.mostrar_precio_anterior!==false&&normal>0
       ? '<s>$'+money(normal)+'</s>'
+      :'';
+    const percentNow=p?.mecanica==='porcentaje'&&promoTotal>0
+      ? '<span class="gx-promo-current-price">Ahora $'+money(promoTotal)+'</span>'
       :'';
     const savingLine=saving>0
       ? '<div class="gx-promo-saving"><span>Ahorro</span><strong>$'+money(saving)+'</strong></div>'
@@ -281,20 +307,22 @@
       '<div class="gx-promo-card-copy">'+
         '<strong class="gx-promo-platform-name">'+esc(platform)+'</strong>'+
         (title!==platform?'<span class="gx-promo-offer-title">'+esc(title)+'</span>':'')+
+        '<p class="gx-promo-card-description">'+esc(description)+'</p>'+
       '</div>'+
       '<div class="gx-promo-card-price">'+
-        '<div class="gx-promo-price-stack"><b>'+esc(promoPrice(p))+'</b>'+oldPrice+'</div>'+
+        '<div class="gx-promo-price-stack"><b>'+esc(promoPrice(p))+'</b>'+percentNow+oldPrice+'</div>'+
       '</div>'+
-      savingLine+
-      '<span class="gx-promo-info-hint" aria-hidden="true">Info</span>'+
+      '<div class="gx-promo-card-footer">'+
+        savingLine+
+        '<button type="button" class="gx-promo-info-hint" data-gx-promo-details>Ver detalles</button>'+
+      '</div>'+
       '<div class="gx-promo-morph-detail" aria-hidden="true">'+
         '<div class="gx-promo-morph-meta"><span>Duración</span><strong>'+esc(promoDurationLabel(p))+'</strong></div>'+
-        '<p class="gx-promo-morph-description">'+esc(description)+'</p>'+
         '<div class="gx-promo-detail-items">'+detailItems(p)+'</div>'+
         '<div class="gx-promo-expanded-status"><span></span><strong>'+esc(statusText(p))+'</strong></div>'+
         '<div class="gx-promo-expanded-actions">'+
           ((p?.items?.[0]?.servicio?.nombre)?'<button type="button" class="gx-promo-detail-secondary" data-gx-promo-service="'+esc(p.items[0].servicio.nombre)+'">Ver en catálogo</button>':'')+
-          (!clientToken()?'<button type="button" class="gx-promo-detail-primary" data-gx-promo-login>Iniciar sesión</button>':'')+
+          '<button type="button" class="gx-promo-detail-primary" data-gx-promo-contract '+(contract.enabled?'':'disabled')+'>'+esc(contract.label)+'</button>'+
         '</div>'+
       '</div>'+
     '</article>';
@@ -352,6 +380,29 @@
     state.active=(state.active+direction+list.length)%list.length;
     applyDeckPositions();
     restartAuto();
+  }
+
+  function addPromotionToCart(p,button){
+    const price=promoContractPrice(p);
+    const contract=promoContractState(p);
+    if(!contract.enabled||price<=0||typeof actualizarCarrito!=='function') return false;
+
+    const label=promoCartLabel(p);
+    const safeId='promo-'+String(p?.id||label).replace(/[^a-z0-9_-]/gi,'').slice(0,32);
+    actualizarCarrito(label,price,1,safeId);
+
+    if(button){
+      const original=button.textContent;
+      button.disabled=true;
+      button.classList.add('is-added');
+      button.textContent='✓ Agregado al carrito';
+      setTimeout(()=>{
+        button.classList.remove('is-added');
+        button.disabled=false;
+        button.textContent=original||'Contratar ahora';
+      },900);
+    }
+    return true;
   }
 
   function bindDeck(){
@@ -495,10 +546,30 @@
 
     const rect=card.getBoundingClientRect();
     state.expandedCard=card;
-    state.expandedOrigin={
-      top:rect.top,left:rect.left,width:rect.width,height:rect.height,
-      scrollY:window.scrollY
-    };
+    state.expandedOrigin={top:rect.top,left:rect.left,width:rect.width,height:rect.height,scrollY:window.scrollY};
+
+    const targetWidth=Math.min(window.innerWidth-44,348);
+    const maxHeight=Math.max(430,window.innerHeight-56);
+
+    // Medimos con un clon invisible para no tocar el layout de la tarjeta real
+    // antes de iniciar el morph.
+    const measure=card.cloneNode(true);
+    measure.classList.add('is-expanded','gx-promo-measure-clone');
+    measure.style.width=targetWidth+'px';
+    measure.style.height='auto';
+    measure.style.position='fixed';
+    measure.style.left='-9999px';
+    measure.style.top='0';
+    measure.style.visibility='hidden';
+    measure.style.pointerEvents='none';
+    document.body.appendChild(measure);
+    measure.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
+    const naturalHeight=Math.ceil(measure.scrollHeight)+2;
+    measure.remove();
+
+    const targetHeight=Math.min(maxHeight,Math.max(rect.height+72,naturalHeight));
+    const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
+    const targetTop=Math.max(28,(window.innerHeight-targetHeight)/2);
 
     const placeholder=document.createComment('gx-promo-card-origin');
     card.parentNode?.insertBefore(placeholder,card);
@@ -507,32 +578,26 @@
 
     const expandedClickHandler=(event)=>{
       if(event.target.closest('[data-gx-promo-close]')){
-        event.preventDefault();
-        event.stopPropagation();
-        closePromoDetail(card);
-        return;
+        event.preventDefault();event.stopPropagation();closePromoDetail(card);return;
       }
       const serviceBtn=event.target.closest('[data-gx-promo-service]');
       if(serviceBtn){
-        event.preventDefault();
-        event.stopPropagation();
+        event.preventDefault();event.stopPropagation();
         const serviceName=serviceBtn.dataset.gxPromoService||'';
         closePromoDetail(card);
-        setTimeout(()=>focusCatalogBrandByName(serviceName),520);
+        setTimeout(()=>focusCatalogBrandByName(serviceName),460);
         return;
       }
-      if(event.target.closest('[data-gx-promo-login]')){
-        event.preventDefault();
-        event.stopPropagation();
-        closePromoDetail(card);
-        setTimeout(()=>window.openAuthSheet?.(),520);
+      const contractBtn=event.target.closest('[data-gx-promo-contract]');
+      if(contractBtn){
+        event.preventDefault();event.stopPropagation();
+        const index=Number(card.dataset.gxPromoIndex||0);
+        const current=selectedPromotions()[index];
+        if(addPromotionToCart(current,contractBtn)) setTimeout(()=>closePromoDetail(card),420);
       }
     };
     const expandedKeyHandler=(event)=>{
-      if(event.key==='Escape'){
-        event.preventDefault();
-        closePromoDetail(card);
-      }
+      if(event.key==='Escape'){event.preventDefault();closePromoDetail(card)}
     };
     state.expandedClickHandler=expandedClickHandler;
     state.expandedKeyHandler=expandedKeyHandler;
@@ -548,46 +613,22 @@
     card.style.transform='none';
     card.style.zIndex='2102';
     card.style.margin='0';
+    card.style.willChange='top,left,width,height,border-radius';
     card.setAttribute('aria-expanded','true');
-
-    const targetWidth=Math.min(window.innerWidth-28,404);
-    const maxHeight=Math.max(420,window.innerHeight-28);
-    const detail=card.querySelector('.gx-promo-morph-detail');
-
-    // Medimos la misma tarjeta en su estado expandido antes de animarla.
-    // Así cada promoción crece sólo lo necesario y evitamos scroll interno.
-    card.classList.add('gx-promo-measuring','is-expanded');
-    detail?.setAttribute('aria-hidden','false');
-    card.style.visibility='hidden';
-    card.style.top='0px';
-    card.style.left='0px';
-    card.style.width=targetWidth+'px';
-    card.style.height='auto';
-    const naturalHeight=Math.ceil(card.scrollHeight)+2;
-
-    card.classList.remove('is-expanded','gx-promo-measuring');
-    detail?.setAttribute('aria-hidden','true');
-    card.style.visibility='';
-    card.style.top=rect.top+'px';
-    card.style.left=rect.left+'px';
-    card.style.width=rect.width+'px';
-    card.style.height=rect.height+'px';
-
-    const targetHeight=Math.min(maxHeight,Math.max(rect.height,naturalHeight));
-    const targetLeft=Math.max(14,(window.innerWidth-targetWidth)/2);
-    const targetTop=Math.max(14,(window.innerHeight-targetHeight)/2);
 
     createMorphBackdrop();
     document.documentElement.classList.add('gx-promo-morph-open');
     document.body.classList.add('gx-promo-morph-open');
 
     requestAnimationFrame(()=>{
-      card.classList.add('is-expanded');
-      detail?.setAttribute('aria-hidden','false');
-      card.style.top=targetTop+'px';
-      card.style.left=targetLeft+'px';
-      card.style.width=targetWidth+'px';
-      card.style.height=targetHeight+'px';
+      requestAnimationFrame(()=>{
+        card.classList.add('is-expanded');
+        card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','false');
+        card.style.top=targetTop+'px';
+        card.style.left=targetLeft+'px';
+        card.style.width=targetWidth+'px';
+        card.style.height=targetHeight+'px';
+      });
     });
   }
 
@@ -617,7 +658,7 @@
       }
       state.expandedPlaceholder=null;
 
-      for(const prop of ['position','inset','top','left','width','height','transform','z-index','margin']){
+      for(const prop of ['position','inset','top','left','width','height','transform','z-index','margin','will-change']){
         card.style.removeProperty(prop);
       }
       card.setAttribute('aria-expanded','false');
@@ -631,7 +672,7 @@
 
       applyDeckPositions();
       requestAnimationFrame(()=>startAuto());
-    },500);
+    },390);
   }
 
   function brandPromoSaving(entry){
