@@ -890,7 +890,7 @@
       '<div class="gx-catalog-mini-logo"><img src="'+esc(entry.img||logoFor(entry.name))+'" alt="'+esc(entry.name)+'"></div>'+
       '<div class="gx-catalog-mini-copy"><strong>'+esc(entry.name)+'</strong>'+metaLine+'</div>'+
       priceHtml+
-      '<span class="gx-catalog-mini-arrow">›</span>'+
+      '<span class="gx-catalog-mini-arrow" aria-hidden="true"><svg class="gx-catalog-mini-chevron" viewBox="0 0 12 16"><path d="M3.2 2.8L8.2 8L3.2 13.2"></path></svg></span>'+
     '</button>';
   }
 
