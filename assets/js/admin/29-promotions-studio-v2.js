@@ -125,7 +125,8 @@
         p.oferta_flash?'Flash':'',
         p.mostrar_contador?'Timer':'',
         p.destacada?'Destacada':'',
-        p.notificar_cliente?'Notificación preparada':''
+        p.notificar_cliente?'Notificación preparada':'',
+        p.adquisicion_habilitada?'Contratable':(p.publicada?'Sólo visible':'')
       ].filter(Boolean);
       return '<article class="gx-promo-row gx-promo-studio-row">'+
         '<div class="gx-promo-type-mark"><b>'+esc(MECHANICS[type]?.icon||'$')+'</b><span>'+esc(mechanicLabel(type))+'</span></div>'+
@@ -153,7 +154,7 @@
       mostrar_precio_anterior:true,mostrar_contador:false,oferta_flash:false,activa:true,
       audiencia:'todos',segmentacion:{},
       acumulacion:{lealtad:true,trato_justo:true,beneficios_programados:false,bienvenida:false},
-      destacada:false,notificar_cliente:false,publicada:false,prioridad:0,items:[]
+      destacada:false,notificar_cliente:false,publicada:false,adquisicion_habilitada:false,prioridad:0,items:[]
     };
   }
 
@@ -193,6 +194,7 @@
     byId('gx-promo-featured').checked=editing.destacada===true;
     byId('gx-promo-notify').checked=editing.notificar_cliente===true;
     byId('gx-promo-published').checked=editing.publicada===true;
+    byId('gx-promo-acquisition').checked=editing.adquisicion_habilitada===true;
     byId('gx-promo-active').checked=editing.activa!==false;
 
     byId('gx-promo-delete').hidden=!editing.id;
@@ -200,6 +202,7 @@
 
     window.gxPromoSetMechanic(editing.mecanica||'precio_fijo',null,editing);
     window.gxPromoAudienceChanged();
+    window.gxPromoPublicationChanged();
     window.gxPromoUpdatePreview();
 
     ed.hidden=false;
@@ -224,6 +227,7 @@
     copy.id='';
     copy.nombre=(copy.nombre||'Promoción')+' · copia';
     copy.publicada=false;
+    copy.adquisicion_habilitada=false;
     copy.activa=true;
     copy.revision=1;
     window.gxPromoOpenEditor(copy);
@@ -306,6 +310,34 @@
     const audience=String(byId('gx-promo-audience')?.value||'todos');
     const wrap=byId('gx-promo-audience-service-wrap');
     if(wrap)wrap.hidden=!(audience==='con_servicio'||audience==='sin_servicio');
+  };
+
+  window.gxPromoPublicationChanged=function(){
+    const published=byId('gx-promo-published')?.checked===true;
+    const acquisition=byId('gx-promo-acquisition');
+    if(acquisition){
+      acquisition.disabled=!published;
+      if(!published)acquisition.checked=false;
+    }
+    const note=byId('gx-promo-acquisition-note');
+    if(note){
+      const strong=note.querySelector('strong');
+      const small=note.querySelector('small');
+      if(strong)strong.textContent=published?'Campaña visible en catálogo':'Campaña todavía privada';
+      if(small)small.textContent=published
+        ?'Puedes dejarla sólo visible o habilitar adquisición para que clientes elegibles puedan contratarla.'
+        :'Publica la campaña antes de permitir adquisiciones. Guardarla sin publicar no la mostrará en Ayuda.';
+    }
+    window.gxPromoUpdatePreview?.();
+  };
+
+  window.gxPromoAcquisitionChanged=function(){
+    const published=byId('gx-promo-published')?.checked===true;
+    const acquisition=byId('gx-promo-acquisition');
+    if(acquisition?.checked===true&&!published){
+      acquisition.checked=false;
+    }
+    window.gxPromoUpdatePreview?.();
   };
 
   function collectItems(){
@@ -413,6 +445,9 @@
       destacada:byId('gx-promo-featured')?.checked===true,
       notificar_cliente:byId('gx-promo-notify')?.checked===true,
       publicada:byId('gx-promo-published')?.checked===true,
+      adquisicion_habilitada:
+        byId('gx-promo-published')?.checked===true &&
+        byId('gx-promo-acquisition')?.checked===true,
       activa:byId('gx-promo-active')?.checked===true
     };
   }
@@ -426,6 +461,7 @@
     if(data.mecanica==='combo'&&data.items.length<2)return alert('Un combo necesita al menos dos plataformas.');
     if(data.mecanica==='addon'&&!data.servicios_complemento_ids.length)return alert('Selecciona al menos un complemento.');
     if((data.audiencia==='con_servicio'||data.audiencia==='sin_servicio')&&!data.segmentacion.servicio_id)return alert('Selecciona la plataforma usada para segmentar.');
+    if(data.adquisicion_habilitada===true&&data.publicada!==true)return alert('Publica la campaña antes de habilitar adquisiciones.');
 
     if(btn){btn.disabled=true;btn.textContent='Guardando…';}
     try{
