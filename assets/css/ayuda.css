@@ -13551,3 +13551,179 @@ body.gx-promo-morph-open{overflow:hidden!important}
         animation:none!important;
     }
 }
+
+
+/* =========================================================
+   GOXION · C14 PUBLIC / PERSONALIZED CATALOG
+   Escala compacta + ritmo espacial común.
+   Público: repertorio completo.
+   Mi Espacio: curaduría contextual.
+   ========================================================= */
+
+#view-catalogo{
+    --gx-catalog-x:2px;
+    --gx-catalog-section-gap:24px;
+    --gx-catalog-card-gap:8px;
+}
+
+/* Ritmo general entre escaparate, curaduría, descubre y catálogo. */
+#view-catalogo .gx-promo-showcase{
+    margin-bottom:24px;
+}
+#view-catalogo .gx-catalog-curated{
+    gap:22px;
+    margin:0 0 24px;
+}
+#view-catalogo .gx-catalog-curated-head{
+    margin:0 var(--gx-catalog-x) 10px;
+}
+#view-catalogo .gx-catalog-discover-section{
+    padding-top:20px;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+#view-catalogo .gx-catalog-discover-section .gx-catalog-curated-head{
+    padding-top:0;
+}
+#view-catalogo .gx-catalog-all-head{
+    margin:0 var(--gx-catalog-x) 10px;
+    padding-top:20px;
+    border-top:1px solid rgba(255,255,255,.055);
+}
+#view-catalogo .gx-catalog-all-head p{
+    max-width:340px;
+    margin-top:5px;
+}
+#view-catalogo .gx-catalog-toolbar{
+    margin:0 0 17px;
+}
+#view-catalogo .gx-catalog-filters{
+    margin-top:9px;
+}
+
+/* Mini rail: vuelve a sentirse como curaduría, no como una tarjeta principal. */
+#view-catalogo .gx-catalog-mini-rail{
+    grid-auto-columns:minmax(188px,62%);
+    gap:var(--gx-catalog-card-gap);
+    padding:1px var(--gx-catalog-x) 5px;
+}
+
+/* Tarjeta compacta: logo | nombre+etiqueta | precio. */
+#view-catalogo .gx-catalog-mini-card{
+    min-height:74px;
+    grid-template-columns:40px minmax(0,1fr) 48px;
+    grid-template-rows:1fr;
+    column-gap:8px;
+    align-items:center;
+    padding:8px 22px 8px 9px;
+    border-radius:16px;
+}
+#view-catalogo .gx-catalog-mini-logo{
+    grid-row:1;
+    width:40px;
+    height:40px;
+}
+#view-catalogo .gx-catalog-mini-logo img{
+    width:38px;
+    height:38px;
+}
+#view-catalogo .gx-catalog-mini-copy{
+    align-self:center;
+    min-width:0;
+}
+#view-catalogo .gx-catalog-mini-copy>strong{
+    font-size:9.7px;
+    line-height:1.12;
+}
+#view-catalogo .gx-catalog-mini-meta-line{
+    min-height:18px;
+    margin-top:5px;
+    gap:4px;
+}
+#view-catalogo .gx-catalog-mini-badge,
+#view-catalogo .gx-catalog-mini-note{
+    min-height:17px;
+    padding:3px 7px;
+    font-size:6.5px;
+    letter-spacing:.26px;
+}
+
+/* Precio protagonista lateral: "Desde" arriba y monto debajo. */
+#view-catalogo .gx-catalog-mini-price{
+    align-self:center!important;
+    width:48px;
+    margin:0!important;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:center;
+    gap:1px;
+    color:#77869a;
+    text-align:center;
+}
+#view-catalogo .gx-catalog-mini-price>span{
+    display:block;
+    width:100%;
+    font-size:7.2px;
+    font-weight:650;
+    line-height:1;
+    letter-spacing:.02em;
+}
+#view-catalogo .gx-catalog-mini-price>b{
+    display:block;
+    width:100%;
+    color:#edf4ff;
+    font-size:15px;
+    font-weight:850;
+    line-height:1.05;
+    letter-spacing:-.035em;
+}
+#view-catalogo .gx-catalog-mini-arrow{
+    right:7px;
+    font-size:14px;
+    opacity:.72;
+}
+
+/* El estado vacío ocupa sólo el espacio que una curaduría necesita. */
+#view-catalogo .gx-catalog-curated-empty{
+    min-height:74px;
+    padding:11px 13px;
+    font-size:8px;
+}
+
+/* El catálogo completo conserva su alineación con todas las secciones. */
+#view-catalogo .catalog-grid{
+    margin-left:0;
+    margin-right:0;
+}
+
+/* La personalización es una capa contextual, no una variante visual agresiva. */
+#view-catalogo.gx-catalog-public .gx-catalog-context-badge,
+#view-catalogo.gx-catalog-public .gx-catalog-smart-reason{
+    display:none!important;
+}
+
+@media(max-width:390px){
+    #view-catalogo .gx-catalog-mini-rail{
+        grid-auto-columns:minmax(184px,61%);
+    }
+    #view-catalogo .gx-catalog-mini-card{
+        min-height:72px;
+        grid-template-columns:38px minmax(0,1fr) 46px;
+        column-gap:7px;
+        padding:8px 20px 8px 8px;
+    }
+    #view-catalogo .gx-catalog-mini-logo{
+        width:38px;
+        height:38px;
+    }
+    #view-catalogo .gx-catalog-mini-logo img{
+        width:36px;
+        height:36px;
+    }
+    #view-catalogo .gx-catalog-mini-price{
+        width:46px;
+    }
+    #view-catalogo .gx-catalog-mini-price>b{
+        font-size:14.5px;
+    }
+}
