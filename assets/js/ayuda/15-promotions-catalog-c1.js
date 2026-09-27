@@ -463,7 +463,10 @@
       // WebKit es más estable si el reparent del mismo nodo ocurre después
       // de terminar la propagación del click actual.
       setTimeout(()=>{
-        if(!state.expandedCard) openPromoDetail(selectedPromotions()[index],card);
+        if(state.expandedCard) return;
+        const liveDeck=$('gx-promo-deck');
+        const liveCard=liveDeck?.querySelector('.gx-promo-deck-card[data-gx-promo-index="'+index+'"]')||card;
+        if(liveCard?.isConnected) openPromoDetail(selectedPromotions()[index],liveCard);
       },0);
     },true);
 
