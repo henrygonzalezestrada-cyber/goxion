@@ -385,11 +385,11 @@
   function addPromotionToCart(p,button){
     const price=promoContractPrice(p);
     const contract=promoContractState(p);
-    if(!contract.enabled||price<=0||typeof actualizarCarrito!=='function') return false;
+    if(!contract.enabled||price<=0||typeof window.GOXION_CATALOG_CART?.add!=='function') return false;
 
     const label=promoCartLabel(p);
     const safeId='promo-'+String(p?.id||label).replace(/[^a-z0-9_-]/gi,'').slice(0,32);
-    actualizarCarrito(label,price,1,safeId);
+    window.GOXION_CATALOG_CART.add(label,price,safeId);
 
     if(button){
       const original=button.textContent;
@@ -548,8 +548,8 @@
     state.expandedCard=card;
     state.expandedOrigin={top:rect.top,left:rect.left,width:rect.width,height:rect.height,scrollY:window.scrollY};
 
-    const targetWidth=Math.min(window.innerWidth-44,348);
-    const maxHeight=Math.max(430,window.innerHeight-56);
+    const targetWidth=Math.min(window.innerWidth-52,336);
+    const maxHeight=Math.max(420,window.innerHeight-64);
 
     // Medimos con un clon invisible para no tocar el layout de la tarjeta real
     // antes de iniciar el morph.
@@ -567,9 +567,9 @@
     const naturalHeight=Math.ceil(measure.scrollHeight)+2;
     measure.remove();
 
-    const targetHeight=Math.min(maxHeight,Math.max(rect.height+72,naturalHeight));
-    const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
-    const targetTop=Math.max(28,(window.innerHeight-targetHeight)/2);
+    const targetHeight=Math.min(maxHeight,Math.max(rect.height+68,Math.min(naturalHeight,560)));
+    const targetLeft=Math.max(26,(window.innerWidth-targetWidth)/2);
+    const targetTop=Math.max(32,(window.innerHeight-targetHeight)/2);
 
     const placeholder=document.createComment('gx-promo-card-origin');
     card.parentNode?.insertBefore(placeholder,card);
