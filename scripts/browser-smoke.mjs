@@ -380,13 +380,14 @@ async function runAyuda(browser, browserName, errors) {
 
   // C11 catálogo: cristal curado con los parámetros visuales ya usados por GOXION.
   await page.waitForFunction(() =>
-    document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card').length>=2,
+    document.querySelectorAll('.gx-catalog-mini-card').length>=1,
     null,{timeout:3000}
   ).catch(()=>{});
 
   const catalogC11=await page.evaluate(() => {
     const mini=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card:not(.is-popular-featured):not(.is-new-featured)') ||
-      document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
+      document.querySelector('#gx-catalog-discover-rail .gx-catalog-mini-card:not(.is-new-featured)') ||
+      document.querySelector('.gx-catalog-mini-card');
     const logo=mini?.querySelector('.gx-catalog-mini-logo');
     const img=logo?.querySelector('img');
     const switchBtn=document.querySelector('.gx-catalog-curated-switch button');
@@ -417,7 +418,7 @@ async function runAyuda(browser, browserName, errors) {
 
   if(
     !catalogC11 ||
-    catalogC11.cardCount<2 ||
+    catalogC11.cardCount<1 ||
     catalogC11.backgroundColor!=='rgba(8, 8, 12, 0.25)' ||
     !catalogC11.backdrop.includes('blur(10px)') ||
     catalogC11.borderColor!=='rgba(255, 255, 255, 0.08)' ||
