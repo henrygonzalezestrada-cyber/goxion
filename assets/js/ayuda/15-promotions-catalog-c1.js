@@ -885,10 +885,11 @@
       ?'<div class="gx-catalog-mini-meta-line">'+badgeHtml+noteHtml+'</div>'
       :'';
 
+    const priceHtml='<div class="gx-catalog-mini-price"><span>Desde</span><b>'+String.fromCharCode(36)+money(entry.minPrice)+'</b></div>';
     return '<button type="button" class="gx-catalog-mini-card '+cardClass+'" data-gx-brand="'+esc(entry.id)+'" data-gx-curation="'+esc(context)+'">'+
       '<div class="gx-catalog-mini-logo"><img src="'+esc(entry.img||logoFor(entry.name))+'" alt="'+esc(entry.name)+'"></div>'+
       '<div class="gx-catalog-mini-copy"><strong>'+esc(entry.name)+'</strong>'+metaLine+'</div>'+
-      '<div class="gx-catalog-mini-price"><span>Desde</span><b>
+      priceHtml+
       '<span class="gx-catalog-mini-arrow">›</span>'+
     '</button>';
   }
