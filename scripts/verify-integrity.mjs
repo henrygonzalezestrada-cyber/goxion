@@ -402,7 +402,7 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
-// Promotions Studio v2: universal campaign builder stays isolated from acquisition.
+// Promotions Studio v2: universal campaign builder exposes publication and protected acquisition.
 {
   const adminHtmlPath = join(ROOT, 'admin.html');
   const studioPath = join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js');
@@ -431,8 +431,11 @@ for (const absolute of walk(jsRoot)) {
     if (!studio.includes(action)) fail('Promotions Studio: falta gateway financiero ' + action + '.');
   }
 
-  if (studio.includes('adquisicion_habilitada')) {
-    fail('Promotions Studio: Admin no debe poder abrir adquisición durante P1/P2.');
+  if (!studio.includes('adquisicion_habilitada')) {
+    fail('Promotions Studio: falta el contrato de adquisición habilitada.');
+  }
+  if (!studio.includes("byId('gx-promo-published')?.checked===true &&") || !studio.includes("byId('gx-promo-acquisition')?.checked===true")) {
+    fail('Promotions Studio: adquisición debe depender explícitamente de publicación.');
   }
 
   for (const id of [
@@ -440,6 +443,7 @@ for (const absolute of walk(jsRoot)) {
     'gx-promo-audience',
     'gx-promo-stack-loyalty',
     'gx-promo-published',
+    'gx-promo-acquisition',
     'gx-promo-preview',
   ]) {
     if (!adminHtml.includes('id="' + id + '"')) fail('Promotions Studio: falta UI ' + id + '.');
