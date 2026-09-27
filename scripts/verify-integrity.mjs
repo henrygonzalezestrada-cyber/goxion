@@ -541,7 +541,7 @@ for (const absolute of walk(jsRoot)) {
   }
   if (!ayudaCss.includes('GOXION · C16 BREATHING MINI CARDS') ||
       !ayudaCss.includes('grid-auto-columns:minmax(214px,66%)') ||
-      !ayudaCss.includes('translate:0 4px') ||
+      !ayudaCss.includes('transform:translateY(6px)') ||
       !ayudaCss.includes('position:absolute!important') ||
       !ayudaCss.includes('font-size:var(--gx-mini-pill-font,6.7px)')) {
     fail('Ayuda C16: faltan ancho, precio centrado, flecha fija o pill responsive.');
