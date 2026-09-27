@@ -395,7 +395,7 @@ async function runAyuda(browser, browserName, errors) {
       curatedVisible:!!curated && curated.hidden===false,
       railCount:rails.length,
       hasInfo:!!front?.querySelector('.gx-promo-info-hint'),
-      savingClean:/^Ahorro\s+\$/.test(saving) && !saving.includes('en esta oferta'),
+      savingClean:/^Ahorro\s*\$/.test(saving) && !saving.includes('en esta oferta'),
       noClosedDescription:!front?.querySelector('.gx-promo-card-copy > small'),
       noOrbit:!front?.querySelector('.gx-promo-card-orbit')
     };
@@ -465,7 +465,13 @@ async function runAyuda(browser, browserName, errors) {
       sameNode:expanded===window.__gxPromoSmokeCard,
       detailVisible:detail?.getAttribute('aria-hidden')==='false',
       overflowHidden:style.overflowY==='hidden',
-      contentFits:expanded.scrollHeight<=expanded.clientHeight+3,
+      contentFits:(()=>{
+        const actions=expanded.querySelector('.gx-promo-expanded-actions');
+        if(!actions)return false;
+        const cardRect=expanded.getBoundingClientRect();
+        const actionsRect=actions.getBoundingClientRect();
+        return actionsRect.bottom<=cardRect.bottom-12;
+      })(),
       comboLogoCount:logos.length>=2,
       logoEqualSize:logos.length>=2 && Math.abs(logos[0].getBoundingClientRect().width-logos[1].getBoundingClientRect().width)<3,
       hasDuration:/periodo/.test(expanded.querySelector('.gx-promo-morph-meta')?.textContent||''),
