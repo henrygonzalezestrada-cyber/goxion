@@ -520,7 +520,7 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
   );
-  await page.waitForTimeout(680);
+  await page.waitForTimeout(760);
 
   const midClose=await page.evaluate(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
