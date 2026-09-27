@@ -410,6 +410,25 @@
     if(!deck||deck.dataset.gxBound==='1') return;
     deck.dataset.gxBound='1';
 
+    // Safari/WebKit: resolvemos "Ver detalles" en capture antes de mover
+    // la misma tarjeta fuera del carrusel para el morph.
+    deck.addEventListener('click',event=>{
+      const detailsBtn=event.target.closest('[data-gx-promo-details]');
+      if(!detailsBtn) return;
+      const card=detailsBtn.closest('.gx-promo-deck-card');
+      if(!card) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const index=Number(card.dataset.gxPromoIndex||0);
+      if(index!==state.active){
+        state.active=index;
+        applyDeckPositions();
+        restartAuto();
+        return;
+      }
+      openPromoDetail(selectedPromotions()[index],card);
+    },true);
+
     deck.addEventListener('click',event=>{
       const card=event.target.closest('.gx-promo-deck-card');
       if(!card) return;
