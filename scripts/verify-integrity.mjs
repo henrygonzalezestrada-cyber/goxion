@@ -546,6 +546,18 @@ for (const absolute of walk(jsRoot)) {
       !ayudaCss.includes('font-size:var(--gx-mini-pill-font,6.7px)')) {
     fail('Ayuda C16: faltan ancho, precio centrado, flecha fija o pill responsive.');
   }
+
+  if (!ayudaCss.includes('GOXION · C17 FINAL MINI POLISH') ||
+      !ayudaCss.includes('grid-auto-columns:61%') ||
+      !ayudaCss.includes('overflow:visible') ||
+      !ayudaCss.includes('stroke-linecap:round') ||
+      !ayudaCss.includes('gap:14px')) {
+    fail('Ayuda C17: falta cierre visual de mini tarjetas.');
+  }
+  if (!promoCatalog.includes('gx-catalog-mini-chevron') ||
+      !promoCatalog.includes('M3.2 2.8L8.2 8L3.2 13.2')) {
+    fail('Ayuda C17: falta chevron SVG redondeado.');
+  }
   if (!ayudaCss.includes('grid-template-columns:40px minmax(0,1fr) 48px 8px') ||
       !ayudaCss.includes('grid-template-rows:14px 18px') ||
       !ayudaCss.includes('grid-template-rows:12px 22px')) {
