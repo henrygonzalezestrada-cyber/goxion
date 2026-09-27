@@ -431,7 +431,7 @@
       duracion_periodos:Number(byId('gx-promo-periods')?.value||1),
       inicio:byId('gx-promo-start')?.value||'',
       fin:byId('gx-promo-end')?.value||'',
-      audiencia,
+      audiencia:audience,
       segmentacion,
       acumulacion:{
         lealtad:byId('gx-promo-stack-loyalty')?.checked===true,
