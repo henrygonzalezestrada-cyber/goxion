@@ -288,14 +288,11 @@
     const contract=promoContractState(p);
     const promoTotal=promoContractPrice(p);
     const oldPrice=p?.mostrar_precio_anterior!==false&&normal>0
-      ? '<s>$'+money(normal)+'</s>'
-      :'';
+      ? '<s>$'+money(normal)+'</s>' : '';
     const savingLine=saving>0
-      ? '<div class="gx-promo-saving"><strong>Ahorras $'+money(saving)+'</strong></div>'
-      :'';
-    const percentDetail=p?.mecanica==='porcentaje'&&promoTotal>0
-      ? '<div class="gx-promo-summary-item"><span>Precio promo</span><strong>$'+money(promoTotal)+'</strong></div>'
-      :'';
+      ? '<div class="gx-promo-saving"><strong>Ahorras $'+money(saving)+'</strong></div>' : '';
+    const percentFinal=p?.mecanica==='porcentaje'&&promoTotal>0
+      ? '<span class="gx-promo-final-price">Precio final $'+money(promoTotal)+'</span>' : '';
     const preview=p?.gx_preview===true?'<span class="gx-promo-preview-chip">PREVIEW</span>':'';
     const comboClass=(p?.items||[]).length>1?' is-combo':'';
     const mechanicClass=' gx-mechanic-'+String(p?.mecanica||'promo').replace(/[^a-z0-9_-]/gi,'');
@@ -312,24 +309,25 @@
         (title!==platform?'<span class="gx-promo-offer-title">'+esc(title)+'</span>':'')+
         '<p class="gx-promo-card-description">'+esc(description)+'</p>'+
       '</div>'+
-      '<div class="gx-promo-card-price">'+
-        '<div class="gx-promo-price-stack"><b>'+esc(promoPrice(p))+'</b>'+oldPrice+'</div>'+
-      '</div>'+
-      '<div class="gx-promo-card-footer">'+
+      '<div class="gx-promo-value-row">'+
+        '<div class="gx-promo-price-stack"><b>'+esc(promoPrice(p))+'</b>'+oldPrice+percentFinal+'</div>'+
         savingLine+
-        '<button type="button" class="gx-promo-info-hint" data-gx-promo-details>Ver detalles</button>'+
       '</div>'+
       '<div class="gx-promo-morph-detail" aria-hidden="true">'+
-        '<div class="gx-promo-detail-summary">'+
-          '<div class="gx-promo-summary-item"><span>Duración</span><strong>'+esc(promoDurationLabel(p))+'</strong></div>'+
-          percentDetail+
-          '<div class="gx-promo-summary-item gx-promo-summary-status"><span>Estado</span><strong>'+esc(statusText(p))+'</strong></div>'+
+        '<div class="gx-promo-detail-section">'+
+          '<span class="gx-promo-detail-kicker">Detalles de la oferta</span>'+
+          '<div class="gx-promo-detail-facts">'+
+            '<div><span>Duración</span><strong>'+esc(promoDurationLabel(p))+'</strong></div>'+
+            '<div><span>Disponibilidad</span><strong>'+esc(statusText(p))+'</strong></div>'+
+          '</div>'+
         '</div>'+
-        '<div class="gx-promo-detail-items">'+detailItems(p)+'</div>'+
-        '<div class="gx-promo-expanded-actions">'+
-          ((p?.items?.[0]?.servicio?.nombre)?'<button type="button" class="gx-promo-detail-secondary" data-gx-promo-service="'+esc(p.items[0].servicio.nombre)+'">Ver en catálogo</button>':'')+
-          '<button type="button" class="gx-promo-detail-primary" data-gx-promo-contract '+(contract.enabled?'':'disabled')+'>'+esc(contract.label)+'</button>'+
+        '<div class="gx-promo-detail-section gx-promo-includes">'+
+          '<span class="gx-promo-detail-kicker">Incluye</span>'+
+          '<div class="gx-promo-detail-items">'+detailItems(p)+'</div>'+
         '</div>'+
+      '</div>'+
+      '<div class="gx-promo-action-zone">'+
+        '<button type="button" class="gx-promo-action" data-gx-promo-action data-contract-label="'+esc(contract.label)+'" data-contract-enabled="'+(contract.enabled?'1':'0')+'">Ver detalles</button>'+
       '</div>'+
     '</article>';
   }
