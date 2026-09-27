@@ -13283,3 +13283,43 @@ body.gx-promo-morph-open{
     animation:none!important;
     filter:none!important;
 }
+
+
+/* C6.5 · Retícula final: compactar sin microtipografía */
+.gx-promo-deck-card.is-expanded .gx-promo-morph-detail{
+    grid-template-columns:auto minmax(0,1fr);
+    column-gap:10px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-morph-meta{
+    min-height:28px;
+    padding-top:4px;
+    align-items:center;
+    white-space:nowrap;
+    flex-wrap:nowrap;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-status{
+    min-height:28px;
+    padding-top:4px;
+    align-self:center;
+    justify-self:end;
+    white-space:nowrap;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-expanded-status strong{
+    font-size:10px;
+    line-height:1.2;
+}
+.gx-promo-deck-card.is-expanded.is-combo .gx-promo-price-stack{
+    flex-direction:row;
+    align-items:baseline;
+    gap:9px;
+}
+.gx-promo-deck-card.is-expanded.is-combo .gx-promo-card-price s{
+    margin:0;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-footer{
+    min-height:28px;
+    margin-top:4px;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-saving>strong{
+    font-size:14.5px;
+}
