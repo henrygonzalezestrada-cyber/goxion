@@ -12670,3 +12670,43 @@ body.gx-promo-morph-open{overflow:hidden!important}
     filter:none!important;
     box-shadow:none!important;
 }
+
+
+/* C8.2 · Geometría continua de combos: se separan sin cambiar de modelo */
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo{
+    position:relative;
+    display:block;
+    width:172px;
+    height:90px;
+    margin-left:auto;
+    margin-right:auto;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-0,
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
+    position:absolute!important;
+    width:80px!important;
+    height:80px!important;
+    top:5px!important;
+    margin:0!important;
+    transform:none!important;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-0{
+    left:4px!important;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-card-logos.is-combo .gx-logo-pos-1{
+    left:88px!important;
+}
+.gx-promo-deck-card.is-expanded.is-returning .gx-promo-card-logos.is-combo{
+    width:118px;
+    height:70px;
+    margin-left:0;
+    margin-right:0;
+}
+.gx-promo-card-logos .gx-promo-logo-item{
+    transition:
+      left .40s cubic-bezier(.18,.82,.2,1),
+      top .40s cubic-bezier(.18,.82,.2,1),
+      width .40s cubic-bezier(.18,.82,.2,1),
+      height .40s cubic-bezier(.18,.82,.2,1),
+      transform .40s cubic-bezier(.18,.82,.2,1);
+}
