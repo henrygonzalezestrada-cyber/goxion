@@ -14,6 +14,7 @@
     loading:false,
     expandedCard:null,
     expandedOrigin:null,
+    expandedPlaceholder:null,
     morphBackdrop:null
   };
 
@@ -493,6 +494,11 @@
       scrollY:window.scrollY
     };
 
+    const placeholder=document.createComment('gx-promo-card-origin');
+    card.parentNode?.insertBefore(placeholder,card);
+    state.expandedPlaceholder=placeholder;
+    document.body.appendChild(card);
+
     card.style.position='fixed';
     card.style.inset='auto';
     card.style.top=rect.top+'px';
@@ -541,6 +547,11 @@
     setTimeout(()=>{
       card.classList.remove('is-expanded','is-closing');
       card.removeAttribute('style');
+      if(state.expandedPlaceholder?.parentNode){
+        state.expandedPlaceholder.parentNode.insertBefore(card,state.expandedPlaceholder);
+        state.expandedPlaceholder.remove();
+      }
+      state.expandedPlaceholder=null;
       const p=selectedPromotions()[Number(card.dataset.gxPromoIndex||0)];
       if(p){
         const palette=promoPalette(p);
