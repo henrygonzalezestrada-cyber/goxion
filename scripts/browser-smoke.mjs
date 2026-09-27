@@ -414,7 +414,9 @@ async function runAyuda(browser, browserName, errors) {
       comboTransformA:getComputedStyle(logos[0]).transform,
       comboTransformB:getComputedStyle(logos[1]).transform,
       borderAnimation:front?getComputedStyle(front,'::after').animationName:'none',
-      traceAnimation:front?getComputedStyle(front,'::before').animationName:'none'
+      traceAnimation:front?getComputedStyle(front,'::before').animationName:'none',
+      surfaceSweepDisplay:front?getComputedStyle(front.querySelector('.gx-promo-card-glow')).display:'none',
+      surfaceSweepAnimation:front?getComputedStyle(front.querySelector('.gx-promo-card-glow')).animationName:'none'
     };
   }).catch(()=>null);
 
@@ -430,7 +432,9 @@ async function runAyuda(browser, browserName, errors) {
     closedLayout.comboTransformA==='none' ||
     closedLayout.comboTransformB==='none' ||
     closedLayout.borderAnimation==='none' ||
-    closedLayout.traceAnimation==='none'
+    closedLayout.traceAnimation==='none' ||
+    closedLayout.surfaceSweepDisplay==='none' ||
+    closedLayout.surfaceSweepAnimation==='none'
   ){
     errors.push(`${label}: C9 cerrado no conserva valor vertical/porcentaje/efecto premium. ${JSON.stringify(closedLayout)}`);
   }
