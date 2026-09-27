@@ -12654,3 +12654,19 @@ body.gx-promo-morph-open{overflow:hidden!important}
 @media(prefers-reduced-motion:reduce){
     .gx-promo-deck-card.is-front::after{animation:none!important}
 }
+
+
+/* C8.1 · Ajuste final de proximidad y composición WebKit */
+.gx-promo-deck-card.is-front::after{
+    animation:gxPromoEdgeBreath 4.8s ease-in-out infinite alternate!important;
+}
+.gx-promo-deck-card.is-expanded .gx-promo-value-row{
+    margin-top:3px;
+}
+.gx-promo-morph-open .gx-promo-deck-card::before,
+.gx-promo-morph-open .gx-promo-deck-card::after{
+    display:none!important;
+    animation:none!important;
+    filter:none!important;
+    box-shadow:none!important;
+}
