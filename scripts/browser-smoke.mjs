@@ -371,130 +371,94 @@ async function runAyuda(browser, browserName, errors) {
     if (!active) errors.push(`${label}: ${view} no quedó activo tras switchTab('${tab}').`);
   }
 
-  // Catálogo C4: hero limpio + morph de la misma tarjeta.
+  // Catálogo C5: jerarquía visual + morph compacto + contratación al carrito.
   await page.evaluate(() => window.switchTab?.('catalogo'));
   await page.waitForFunction(() => {
     const showcase=document.getElementById('gx-promo-showcase');
     const cards=document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card');
     const curated=document.getElementById('gx-catalog-curated');
-    const rails=document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card');
-    return showcase?.hidden===false && cards.length===3 && curated?.hidden===false && rails.length>=1;
+    return showcase?.hidden===false && cards.length===3 && curated?.hidden===false;
   }, null, { timeout: 8000 }).catch(()=>{});
 
-  const promoC4 = await page.evaluate(() => {
-    const showcase=document.getElementById('gx-promo-showcase');
+  const promoC5 = await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-promo-deck .gx-promo-deck-card')];
-    const curated=document.getElementById('gx-catalog-curated');
-    const rails=document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card');
     const front=cards.find(x=>x.classList.contains('is-front'));
     const saving=front?.querySelector('.gx-promo-saving')?.textContent?.replace(/\s+/g,' ').trim()||'';
+    const details=front?.querySelector('[data-gx-promo-details]');
     return {
-      showcaseVisible:!!showcase && showcase.hidden===false,
       cardCount:cards.length,
       frontIndex:Number(front?.dataset?.gxPromoIndex ?? -1),
-      curatedVisible:!!curated && curated.hidden===false,
-      railCount:rails.length,
-      hasInfo:!!front?.querySelector('.gx-promo-info-hint'),
+      hasDescription:!!front?.querySelector('.gx-promo-card-description'),
+      descriptionText:(front?.querySelector('.gx-promo-card-description')?.textContent||'').trim(),
+      detailsText:(details?.textContent||'').trim(),
       savingClean:/^Ahorro\s*\$/.test(saving) && !saving.includes('en esta oferta'),
-      noClosedDescription:!front?.querySelector('.gx-promo-card-copy > small'),
+      detailsContained:!!details && getComputedStyle(details).borderRadius!=='0px',
       noOrbit:!front?.querySelector('.gx-promo-card-orbit')
     };
   }).catch(()=>null);
 
-  if (
-    !promoC4 ||
-    promoC4.showcaseVisible!==true ||
-    promoC4.cardCount!==3 ||
-    promoC4.frontIndex<0 ||
-    promoC4.curatedVisible!==true ||
-    promoC4.railCount<1 ||
-    promoC4.hasInfo!==true ||
-    promoC4.savingClean!==true ||
-    promoC4.noClosedDescription!==true ||
-    promoC4.noOrbit!==true
-  ) {
-    errors.push(`${label}: catálogo C4 no renderizó el hero limpio esperado.`);
+  if(
+    !promoC5 ||
+    promoC5.cardCount!==3 ||
+    promoC5.frontIndex<0 ||
+    promoC5.hasDescription!==true ||
+    promoC5.descriptionText.length<8 ||
+    promoC5.detailsText!=='Ver detalles' ||
+    promoC5.savingClean!==true ||
+    promoC5.detailsContained!==true ||
+    promoC5.noOrbit!==true
+  ){
+    errors.push(`${label}: catálogo C5 no renderizó jerarquía/descripción/ver detalles como se esperaba. ${JSON.stringify(promoC5)}`);
   }
 
-  const beforeAdvance=await page.evaluate(() =>
-    document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.dataset?.gxPromoIndex||null
-  );
-  await page.evaluate(() => window.gxPromoCatalogNext?.());
-  await page.waitForFunction((before) => {
-    const current=document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.dataset?.gxPromoIndex||null;
-    return current!==null && current!==before;
-  }, beforeAdvance, { timeout: 2200 }).catch(()=>{});
-  const promoAdvanced=await page.evaluate((before) => {
-    const current=document.querySelector('#gx-promo-deck .gx-promo-deck-card.is-front')?.dataset?.gxPromoIndex||null;
-    return current!==null && current!==before;
-  }, beforeAdvance).catch(()=>false);
-  if(!promoAdvanced) errors.push(`${label}: carrusel promocional C4 no avanzó manualmente.`);
-
-  // Llevar el combo (índice 1 del fixture) al frente y expandirlo.
+  // Llevar el combo del fixture al frente.
   await page.evaluate(() => {
     const combo=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
     if(combo && !combo.classList.contains('is-front')) combo.click();
   });
   await page.waitForFunction(() =>
     document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]')?.classList.contains('is-front')===true,
-    null,
-    { timeout: 2200 }
+    null,{timeout:2200}
   ).catch(()=>{});
 
   await page.evaluate(() => {
     const card=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-promo-index="1"]');
     if(!card)return;
-    card.dataset.gxSmokeToken='same-node-c4';
+    const rect=card.getBoundingClientRect();
+    window.__gxPromoClosedRect={width:rect.width,height:rect.height};
+    card.dataset.gxSmokeToken='same-node-c5';
     window.__gxPromoSmokeCard=card;
-    card.click();
+    card.querySelector('[data-gx-promo-details]')?.click();
   });
-  await page.waitForFunction(() =>
-    document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c4"]')!==null,
-    null,
-    { timeout: 2600 }
-  ).catch(()=>{});
+
   await page.waitForFunction(() => {
-    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c4"]');
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c5"]');
     const actions=expanded?.querySelector('.gx-promo-expanded-actions');
     if(!expanded||!actions)return false;
     const cardRect=expanded.getBoundingClientRect();
     const actionsRect=actions.getBoundingClientRect();
-    return cardRect.height>440 && actionsRect.bottom<=cardRect.bottom-12;
-  }, null, { timeout: 2600 }).catch(()=>{});
+    return cardRect.width>300 && actionsRect.bottom<=cardRect.bottom-10;
+  },null,{timeout:2800}).catch(()=>{});
 
   const promoExpanded=await page.evaluate(() => {
-    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c4"]');
+    const expanded=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="same-node-c5"]');
     if(!expanded)return null;
-    const detail=expanded.querySelector('.gx-promo-morph-detail');
+    const rect=expanded.getBoundingClientRect();
+    const actions=expanded.querySelector('.gx-promo-expanded-actions')?.getBoundingClientRect();
     const logos=[...expanded.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
-    const style=getComputedStyle(expanded);
+    const contract=expanded.querySelector('[data-gx-promo-contract]');
     return {
-      exists:true,
       sameNode:expanded===window.__gxPromoSmokeCard,
-      detailVisible:detail?.getAttribute('aria-hidden')==='false',
-      overflowHidden:style.overflowY==='hidden',
-      contentFits:(()=>{
-        const actions=expanded.querySelector('.gx-promo-expanded-actions');
-        if(!actions)return false;
-        const cardRect=expanded.getBoundingClientRect();
-        const actionsRect=actions.getBoundingClientRect();
-        return actionsRect.bottom<=cardRect.bottom-12;
-      })(),
-      fitMetrics:(()=>{
-        const actions=expanded.querySelector('.gx-promo-expanded-actions');
-        const cardRect=expanded.getBoundingClientRect();
-        const actionsRect=actions?.getBoundingClientRect();
-        return actionsRect?{
-          cardHeight:Math.round(cardRect.height),
-          cardBottom:Math.round(cardRect.bottom),
-          actionsBottom:Math.round(actionsRect.bottom),
-          remaining:Math.round(cardRect.bottom-actionsRect.bottom)
-        }:null;
-      })(),
+      width:Math.round(rect.width),
+      height:Math.round(rect.height),
+      growth:Math.round(rect.height-(window.__gxPromoClosedRect?.height||0)),
+      contentFits:!!actions && actions.bottom<=rect.bottom-10,
+      descriptionVisible:!!expanded.querySelector('.gx-promo-card-description'),
+      hasDuration:/periodo/.test(expanded.querySelector('.gx-promo-morph-meta')?.textContent||''),
       comboLogoCount:logos.length>=2,
       logoEqualSize:logos.length>=2 && Math.abs(logos[0].getBoundingClientRect().width-logos[1].getBoundingClientRect().width)<3,
-      hasDuration:/periodo/.test(expanded.querySelector('.gx-promo-morph-meta')?.textContent||''),
-      hasDescription:!!expanded.querySelector('.gx-promo-morph-description'),
+      contractText:(contract?.textContent||'').trim(),
+      contractEnabled:!!contract && !contract.disabled,
       noOrbit:!expanded.querySelector('.gx-promo-card-orbit')
     };
   }).catch(()=>null);
@@ -502,32 +466,40 @@ async function runAyuda(browser, browserName, errors) {
   if(
     !promoExpanded ||
     promoExpanded.sameNode!==true ||
-    promoExpanded.detailVisible!==true ||
-    promoExpanded.overflowHidden!==true ||
+    promoExpanded.width>360 ||
+    promoExpanded.growth<50 ||
+    promoExpanded.growth>360 ||
     promoExpanded.contentFits!==true ||
+    promoExpanded.descriptionVisible!==true ||
+    promoExpanded.hasDuration!==true ||
     promoExpanded.comboLogoCount!==true ||
     promoExpanded.logoEqualSize!==true ||
-    promoExpanded.hasDuration!==true ||
-    promoExpanded.hasDescription!==true ||
+    promoExpanded.contractText!=='Contratar ahora' ||
+    promoExpanded.contractEnabled!==true ||
     promoExpanded.noOrbit!==true
-  ) {
-    errors.push(`${label}: tarjeta promocional C4 no hizo morph limpio/sin scroll como se esperaba. ${JSON.stringify(promoExpanded)}`);
+  ){
+    errors.push(`${label}: morph C5 no quedó compacto/ordenado. ${JSON.stringify(promoExpanded)}`);
   }
 
+  // Contratar ahora debe usar el carrito existente.
   await page.evaluate(() =>
-    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
+    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-contract]')?.click()
   );
   await page.waitForFunction(() =>
-    !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
-    document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c4"]'),
-    null,
-    { timeout: 2800 }
+    document.getElementById('floating-cart')?.classList.contains('show')===true &&
+    !document.querySelector('body > .gx-promo-deck-card.is-expanded'),
+    null,{timeout:2800}
   ).catch(()=>{});
-  const promoRestored=await page.evaluate(() => {
-    const restored=document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c4"]');
-    return restored===window.__gxPromoSmokeCard && restored?.classList.contains('is-front')===true;
-  }).catch(()=>false);
-  if(!promoRestored) errors.push(`${label}: tarjeta promocional C4 no regresó al mismo nodo del deck.`);
+
+  const promoCart=await page.evaluate(() => ({
+    visible:document.getElementById('floating-cart')?.classList.contains('show')===true,
+    total:(document.getElementById('cart-total-price')?.textContent||'').trim(),
+    restored:document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="same-node-c5"]')===window.__gxPromoSmokeCard
+  })).catch(()=>null);
+
+  if(!promoCart||promoCart.visible!==true||!promoCart.total.includes('$99')||promoCart.restored!==true){
+    errors.push(`${label}: Contratar ahora C5 no agregó el combo al carrito/restauró la tarjeta. ${JSON.stringify(promoCart)}`);
+  }
 
   // Soporte: comprobar que el morph realmente tenga geometría intermedia,
   // no sólo un salto entre estado compacto y expandido.
