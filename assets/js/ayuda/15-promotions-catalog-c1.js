@@ -588,7 +588,7 @@
     const naturalHeight=Math.ceil(measure.scrollHeight)+6;
     measure.remove();
 
-    const targetHeight=Math.min(maxHeight,Math.max(rect.height+46,naturalHeight));
+    const targetHeight=Math.min(maxHeight,Math.max(rect.height+100,Math.min(naturalHeight,540)));
     const targetLeft=Math.max(22,(window.innerWidth-targetWidth)/2);
     const targetTop=Math.max(24,(window.innerHeight-targetHeight)/2);
 
@@ -655,19 +655,15 @@
 
   function closePromoDetail(card=state.expandedCard){
     if(!card||card!==state.expandedCard) return;
-    const origin=state.expandedOrigin;
     if(card.classList.contains('is-closing')) return;
+    const origin=state.expandedOrigin;
 
     card.classList.add('is-closing');
     card.querySelector('.gx-promo-morph-detail')?.setAttribute('aria-hidden','true');
     state.morphBackdrop?.classList.remove('active');
 
     const finalize=()=>{
-      if(card.dataset.gxClosingDone==='1') return;
-      card.dataset.gxClosingDone='1';
-      card.removeEventListener('transitionend',onTransitionEnd);
       card.classList.remove('is-expanded','is-closing','is-returning');
-      delete card.dataset.gxClosingDone;
 
       if(state.expandedClickHandler) card.removeEventListener('click',state.expandedClickHandler);
       if(state.expandedKeyHandler) card.removeEventListener('keydown',state.expandedKeyHandler);
@@ -696,12 +692,10 @@
       requestAnimationFrame(()=>startAuto());
     };
 
-    const onTransitionEnd=(event)=>{
-      if(event.target===card && (event.propertyName==='height'||event.propertyName==='width')) finalize();
-    };
-    card.addEventListener('transitionend',onTransitionEnd);
-
-    requestAnimationFrame(()=>{
+    // Fase 1: el contenido secundario desaparece y los elementos del hero
+    // comienzan a volver a su escala cerrada sin mover todavía la tarjeta.
+    setTimeout(()=>{
+      if(card!==state.expandedCard) return;
       card.classList.add('is-returning');
       if(origin){
         card.style.top=origin.top+'px';
@@ -709,9 +703,12 @@
         card.style.width=origin.width+'px';
         card.style.height=origin.height+'px';
       }
-    });
+    },90);
 
-    setTimeout(finalize,620);
+    // Fase 2: sólo después de terminar la contracción devolvemos el mismo nodo al deck.
+    setTimeout(()=>{
+      if(card===state.expandedCard) finalize();
+    },570);
   }
 
   function brandPromoSaving(entry){
