@@ -440,9 +440,12 @@ for (const absolute of walk(jsRoot)) {
     fail('Ayuda promociones: Contratar ahora no genera solicitud administrativa.');
   }
   if (!promoCatalog.includes('promoAvailability') ||
-      !promoCatalog.includes('gx-promo-stock-pill') ||
-      !ayudaCss.includes('GOXION · disponibilidad de promociones')) {
-    fail('Ayuda promociones: falta bloqueo/estado visual por disponibilidad.');
+      !promoCatalog.includes("'1 disponible'") ||
+      !promoCatalog.includes("'Agotado'")) {
+    fail('Ayuda promociones: falta disponibilidad dentro del detalle o bloqueo por agotado.');
+  }
+  if (promoCatalog.includes('gx-promo-stock-pill') || ayudaCss.includes('gx-promo-stock-pill')) {
+    fail('Ayuda promociones: la disponibilidad no debe duplicarse como píldora en la tarjeta cerrada.');
   }
   if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) fail('Ayuda C9: falta puente estable del carrito general.');
   if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C9 POLISH')) fail('Ayuda C9: faltan estilos finales.');
