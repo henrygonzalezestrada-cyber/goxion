@@ -33,6 +33,15 @@ Ejemplo: Prime Video $45 × 3 = $135. Una campaña “3 meses por $100” cobra 
 
 `porcentaje` y `addon` conservan semántica por periodo.
 
+## Duración de la promoción
+
+GOXION maneja dos modalidades distintas:
+
+- `periodos`: el beneficio dura una cantidad fija de periodos. En precio fijo/combo, el valor capturado es el total de todo el paquete. Ejemplo: 3 meses por $99.
+- `hasta_fin_campana`: el precio promocional se cobra **en cada periodo** hasta el mes en que termina la campaña. Ejemplo: combo $99 al mes hasta el 31 de diciembre.
+
+La fecha `Disponible hasta` sigue controlando hasta cuándo se puede adquirir la campaña; en `hasta_fin_campana` también determina el último periodo cubierto por el beneficio.
+
 ## Publicación y adquisición
 
 Son controles distintos:
