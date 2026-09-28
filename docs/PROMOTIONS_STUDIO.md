@@ -6,10 +6,10 @@ Promotions Studio es la consola administrativa de campañas que alimenta el moto
 
 ## Mecánicas soportadas
 
-- `precio_fijo`: una plataforma a precio especial durante N periodos.
-- `porcentaje`: una plataforma con descuento porcentual; el backend calcula y congela el precio promocional.
-- `combo`: dos o más plataformas por un precio conjunto.
-- `addon`: una plataforma disparadora permite sumar uno o más complementos con precio especial.
+- `precio_fijo`: una plataforma por un **precio total de campaña** durante N periodos. Ejemplo: $45 × 3 = $135 normal; promoción de 3 periodos por $99.
+- `porcentaje`: una plataforma con descuento porcentual aplicado en cada periodo.
+- `combo`: dos o más plataformas por un **precio total de campaña** durante N periodos.
+- `addon`: una plataforma disparadora permite sumar uno o más complementos con precio especial por periodo.
 
 ## Flujo de escritura
 
@@ -22,6 +22,16 @@ Admin no escribe tablas directamente.
 → `goxion_guardar_promocion_v2()`.
 
 La RPC guarda cabecera e items de forma atómica y aumenta `revision` cuando se edita una campaña.
+
+## Precio multi-periodo
+
+Para `precio_fijo` y `combo`, `precio_promocional` representa el total comercial de toda la duración, no el cargo de un solo mes. La validación compara contra `precio base × duracion_periodos`.
+
+Al adquirir, GOXION distribuye ese total entre los periodos. Los centavos que no dividan exactamente se corrigen en el último periodo, de modo que la suma cobrada coincida exactamente con el precio anunciado.
+
+Ejemplo: Prime Video $45 × 3 = $135. Una campaña “3 meses por $100” cobra $33.33, $33.33 y $33.34; ahorro total $35.
+
+`porcentaje` y `addon` conservan semántica por periodo.
 
 ## Publicación y adquisición
 
