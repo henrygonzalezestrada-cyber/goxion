@@ -208,6 +208,8 @@ declare global {
     badge?: string;
     mecanica?: 'precio_fijo' | 'porcentaje' | 'combo' | 'addon' | string;
     precio_promocional?: number;
+    precio_normal_periodo?: number;
+    precio_promocional_periodo?: number;
     precio_promocional_total?: number;
     precio_normal_total?: number;
     ahorro_estimado?: number;
