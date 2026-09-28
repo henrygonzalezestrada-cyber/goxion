@@ -544,7 +544,15 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('[data-gx-curated-mode="saving"]')?.click()
   );
-  await page.waitForTimeout(180);
+  await page.waitForFunction(() => {
+    const active=document.querySelector('[data-gx-curated-mode="saving"]')?.classList.contains('active');
+    const rail=document.getElementById('gx-catalog-best-rail');
+    return active===true && !!rail && (
+      rail.querySelectorAll('.gx-catalog-mini-card').length>0 ||
+      !!rail.querySelector('.gx-catalog-curated-empty')
+    );
+  },null,{timeout:2200}).catch(()=>{});
+  await page.waitForTimeout(80);
 
   const c12Saving=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
@@ -576,7 +584,12 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('[data-gx-curated-mode="popular"]')?.click()
   );
-  await page.waitForTimeout(120);
+  await page.waitForFunction(() => {
+    const active=document.querySelector('[data-gx-curated-mode="popular"]')?.classList.contains('active');
+    const rail=document.getElementById('gx-catalog-best-rail');
+    return active===true && !!rail;
+  },null,{timeout:2200}).catch(()=>{});
+  await page.waitForTimeout(80);
 
   const c14Layout=await page.evaluate(() => {
     const card=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
