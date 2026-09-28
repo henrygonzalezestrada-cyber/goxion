@@ -672,8 +672,19 @@
     stopAuto();
 
     const rect=card.getBoundingClientRect();
+    const sourceStyle=getComputedStyle(card);
+    const sourceCssWidth=parseFloat(sourceStyle.width);
+    const sourceCssHeight=parseFloat(sourceStyle.height);
     state.expandedCard=card;
-    state.expandedOrigin={top:rect.top,left:rect.left,width:rect.width,height:rect.height,scrollY:window.scrollY};
+    state.expandedOrigin={
+      top:rect.top,
+      left:rect.left,
+      width:rect.width,
+      height:rect.height,
+      cssWidth:Number.isFinite(sourceCssWidth)?sourceCssWidth:rect.width,
+      cssHeight:Number.isFinite(sourceCssHeight)?sourceCssHeight:rect.height,
+      scrollY:window.scrollY
+    };
     state.pendingPromoRender=false;
 
     const targetWidth=Math.min(window.innerWidth-44,352);
@@ -715,8 +726,8 @@
       inset:'auto',
       top:rect.top+'px',
       left:rect.left+'px',
-      width:rect.width+'px',
-      height:rect.height+'px',
+      width:state.expandedOrigin.cssWidth+'px',
+      height:state.expandedOrigin.cssHeight+'px',
       transform:'none',
       zIndex:'2102',
       margin:'0',
@@ -777,8 +788,8 @@
         if(card!==state.expandedCard||!origin) return;
         card.style.top=origin.top+'px';
         card.style.left=origin.left+'px';
-        card.style.setProperty('width',origin.width+'px','important');
-        card.style.setProperty('height',origin.height+'px','important');
+        card.style.setProperty('width',(origin.cssWidth??origin.width)+'px','important');
+        card.style.setProperty('height',(origin.cssHeight??origin.height)+'px','important');
       });
     },110);
 
