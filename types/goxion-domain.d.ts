@@ -230,6 +230,14 @@ declare global {
       codigo?: string;
       motivo?: string;
     };
+    disponibilidad?: {
+      disponible?: boolean;
+      codigo?: string;
+      motivo?: string;
+      min_disponibles?: number;
+      faltantes?: string[];
+      items?: Array<Record<string, unknown>>;
+    };
     adquirida?: Record<string, unknown> | null;
   }
 
@@ -290,6 +298,7 @@ declare global {
     pagos?: GoxionPayment[];
     descuentos?: unknown[];
     notificaciones?: unknown[];
+    promociones_activas?: GoxionCatalogPromotion[];
     alertas?: unknown[];
     configuracion?: Record<string, unknown>;
     [key: string]: unknown;
