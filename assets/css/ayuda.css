@@ -14312,3 +14312,38 @@ body.gx-promo-morph-open{overflow:hidden!important}
     rotate:0deg!important;
     animation:none!important;
 }
+
+
+/* GOXION · disponibilidad de promociones */
+.gx-promo-stock-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:20px;
+    padding:0 8px;
+    margin-left:auto;
+    border-radius:999px;
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    white-space:nowrap;
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+.gx-promo-stock-pill.is-available{
+    color:#9fffd0;
+    background:rgba(21,122,66,.16);
+    border-color:rgba(98,223,145,.26);
+}
+.gx-promo-stock-pill.is-out{
+    color:#ffb9bd;
+    background:rgba(168,20,27,.18);
+    border-color:rgba(255,77,85,.28);
+}
+.gx-promo-action.is-contract:disabled{
+    opacity:.52;
+    cursor:not-allowed;
+    filter:saturate(.55);
+}
