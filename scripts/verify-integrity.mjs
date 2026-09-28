@@ -594,6 +594,17 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+// Promotions Studio duración hasta campaña: separar paquetes de precio recurrente.
+{
+  const adminHtmlDuration = readFileSync(join(ROOT, 'admin.html'), 'utf8');
+  const studioDuration = readFileSync(join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js'), 'utf8');
+  if (!adminHtmlDuration.includes('value="campaign_end"') ||
+      !studioDuration.includes("'hasta_fin_campana'") ||
+      !studioDuration.includes('duracion_tipo')) {
+    fail('Promotions Studio duración hasta campaña: falta el contrato de duración recurrente.');
+  }
+}
+
 // Promotions Studio v2: universal campaign builder exposes publication and protected acquisition.
 {
   const adminHtmlPath = join(ROOT, 'admin.html');
