@@ -153,11 +153,14 @@
     const raw=p?.disponibilidad||{};
     const available=raw?.disponible!==false;
     const missing=Array.isArray(raw?.faltantes)?raw.faltantes.filter(Boolean):[];
+    const min=Math.max(0,Number(raw?.min_disponibles||0));
     return {
       available,
       missing,
-      min:Number(raw?.min_disponibles||0),
-      text:available?'Disponible':(missing.length?'Agotado · '+missing.join(' + '):'Agotado')
+      min,
+      text:available
+        ?(min===1?'1 disponible':(min>1?min+' disponibles':'Disponible'))
+        :(missing.length?'Agotado · '+missing.join(' + '):'Agotado')
     };
   }
 
@@ -169,10 +172,7 @@
     if(!availability.available){
       return {enabled:false,label:'Agotado'};
     }
-    if(p?.autenticado!==true){
-      return {enabled:true,label:'Inicia sesión'};
-    }
-    if(p?.elegibilidad?.elegible===false){
+    if(p?.autenticado===true&&p?.elegibilidad?.elegible===false){
       return {enabled:false,label:'No disponible'};
     }
     if(p?.adquisicion_habilitada!==true){
@@ -193,14 +193,11 @@
     }
     const availability=promoAvailability(p);
     if(!availability.available) return availability.text;
-    if(p?.autenticado===false||p?.elegibilidad?.elegible===null){
-      return 'Disponible · inicia sesión para confirmar';
-    }
-    if(p?.elegibilidad?.elegible===false){
+    if(p?.autenticado===true&&p?.elegibilidad?.elegible===false){
       return String(p?.elegibilidad?.motivo||'No disponible para esta cuenta');
     }
     if(p?.adquisicion_habilitada===true){
-      return 'Disponible';
+      return availability.text;
     }
     return 'Próximamente';
   }
@@ -377,7 +374,7 @@
     return '<article class="gx-promo-deck-card is-closed'+comboClass+mechanicClass+'" style="'+esc(style)+'" data-gx-promo-index="'+index+'" role="button" tabindex="0" aria-label="Abrir '+esc(title)+'" aria-expanded="false">'+
       '<span class="gx-promo-card-aurora" aria-hidden="true"></span>'+
       '<span class="gx-promo-card-glow" aria-hidden="true"></span>'+
-      '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span><span class="gx-promo-stock-pill '+(promoAvailability(p).available?'is-available':'is-out')+'">'+esc(promoAvailability(p).available?'Disponible':'Agotado')+'</span>'+preview+'</div>'+
+      '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span>'+preview+'</div>'+
       '<button type="button" class="gx-promo-morph-close" data-gx-promo-close aria-label="Cerrar promoción">×</button>'+
       '<div class="gx-promo-card-logos'+comboClass+'">'+logosHtml(p)+'</div>'+
       '<div class="gx-promo-card-copy">'+
@@ -473,21 +470,10 @@
     const contract=promoContractState(p);
     if(!contract.enabled) return false;
 
-    if(p?.autenticado!==true){
-      closePromoDetail(state.expandedCard);
-      setTimeout(()=>window.openAuthSheet?.(),420);
-      return true;
-    }
-
     const availability=promoAvailability(p);
     if(!availability.available) return false;
 
     const token=clientToken();
-    if(!token){
-      closePromoDetail(state.expandedCard);
-      setTimeout(()=>window.openAuthSheet?.(),420);
-      return true;
-    }
 
     const key=window.goxionCurrentClientKey||'';
     const client=key&&typeof globalClientesData!=='undefined'&&globalClientesData
@@ -506,12 +492,14 @@
     try{
       const response=await fetch(GXCORE.endpoint('notificar-goxion'),{
         method:'POST',
-        headers:{'Content-Type':'application/json','X-Client-Token':token},
+        headers:token
+          ?{'Content-Type':'application/json','X-Client-Token':token}
+          :{'Content-Type':'application/json'},
         body:JSON.stringify({
           categoria:'pedidos',
           titulo:'🎟️ SOLICITUD DE PROMOCIÓN',
           mensaje:[
-            '**Cliente:** '+String(client?.nombre||'Cliente GOXION'),
+            '**Cliente:** '+String(client?.nombre||'INVITADO (sin Mi Espacio)'),
             client?.folio?'**Folio:** '+String(client.folio):'',
             '**Promoción:** '+title,
             '**Precio:** '+price,
@@ -521,7 +509,7 @@
             '**PROMO_ID:** '+String(p?.id||'')
           ].filter(Boolean).join('\n'),
           colorHex:'7c4dff',
-          session_token:token,
+          session_token:token||'',
           referencia:'promo:'+String(p?.id||'')
         }),
         cache:'no-store'
