@@ -197,7 +197,7 @@
       return String(p?.elegibilidad?.motivo||'No disponible para esta cuenta');
     }
     if(p?.adquisicion_habilitada===true){
-      return 'Disponible';
+      return availability.text;
     }
     return 'Próximamente';
   }
