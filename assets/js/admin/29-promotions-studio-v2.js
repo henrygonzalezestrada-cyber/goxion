@@ -76,7 +76,10 @@
   function priceLine(p){
     const type=String(p?.mecanica||'precio_fijo');
     const untilEnd=p?.duracion_tipo==='hasta_fin_campana';
-    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · 
+    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · $'+money(p.precio_promocional_total??p.precio_promocional)+(untilEnd?' / periodo':'');
+    if(type==='addon')return 'Complemento +$'+money(p.precio_promocional)+' / periodo';
+    return '$'+money(p.precio_normal_total||p?.servicio?.precio)+' → $'+money(p.precio_promocional_total??p.precio_promocional)+(untilEnd?' / periodo':'');
+  }
 
   window.gxPromoLoad=async function(){
     const list=byId('gx-promo-list');
