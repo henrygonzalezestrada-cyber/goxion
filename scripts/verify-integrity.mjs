@@ -434,8 +434,17 @@ for (const absolute of walk(jsRoot)) {
   if (!promoCatalog.includes('Fase 2: la tarjeta adopta el layout cerrado REAL mientras sigue fija y grande')) {
     fail('Ayuda C9: el cierre no prepara el layout cerrado real antes de contraer.');
   }
-  if (!promoCatalog.includes('GOXION_CATALOG_CART')) fail('Ayuda C9: Contratar ahora no usa el carrito estable.');
-  if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) fail('Ayuda C9: falta puente estable del carrito.');
+  if (!promoCatalog.includes("GXCORE.endpoint('notificar-goxion')") ||
+      !promoCatalog.includes('SOLICITUD DE PROMOCIÓN') ||
+      !promoCatalog.includes('requestPromotion')) {
+    fail('Ayuda promociones: Contratar ahora no genera solicitud administrativa.');
+  }
+  if (!promoCatalog.includes('promoAvailability') ||
+      !promoCatalog.includes('gx-promo-stock-pill') ||
+      !ayudaCss.includes('GOXION · disponibilidad de promociones')) {
+    fail('Ayuda promociones: falta bloqueo/estado visual por disponibilidad.');
+  }
+  if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) fail('Ayuda C9: falta puente estable del carrito general.');
   if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C9 POLISH')) fail('Ayuda C9: faltan estilos finales.');
   if (!ayudaCss.includes('white-space:nowrap') || !ayudaCss.includes('gxPromoC9EdgeTrace')) {
     fail('Ayuda C9: faltan regla atómica de porcentaje o efecto premium visible.');
