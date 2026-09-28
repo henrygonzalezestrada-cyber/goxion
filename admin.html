@@ -267,7 +267,7 @@
 <div class="gx-promo-form-grid">
 <label id="gx-promo-price-wrap"><span id="gx-promo-price-label">Precio promocional</span><input id="gx-promo-price" min="0.01" oninput="gxPromoUpdatePreview()" placeholder="$0" step="0.01" type="number"/></label>
 <label hidden="" id="gx-promo-percent-wrap"><span>Descuento</span><div class="gx-promo-percent-input"><input id="gx-promo-percent" max="95" min="1" oninput="gxPromoUpdatePreview()" placeholder="30" step="1" type="number"/><b>%</b></div></label>
-<label><span>Duración adquirida</span><select id="gx-promo-periods" onchange="gxPromoUpdatePreview()"><option value="1">1 periodo</option><option value="2">2 periodos</option><option value="3">3 periodos</option><option value="4">4 periodos</option><option value="6">6 periodos</option><option value="12">12 periodos</option><option value="24">24 periodos</option></select></label>
+<label><span>Duración adquirida</span><select id="gx-promo-periods" onchange="gxPromoDurationChanged()"><option value="1">1 periodo</option><option value="2">2 periodos</option><option value="3">3 periodos</option><option value="4">4 periodos</option><option value="6">6 periodos</option><option value="12">12 periodos</option><option value="24">24 periodos</option><option value="campaign_end">Hasta finalizar campaña</option></select></label>
 <label><span>Disponible desde</span><input id="gx-promo-start" onchange="gxPromoUpdatePreview()" type="datetime-local"/></label>
 <label><span>Disponible hasta</span><input id="gx-promo-end" onchange="gxPromoUpdatePreview()" type="datetime-local"/></label>
 </div>
