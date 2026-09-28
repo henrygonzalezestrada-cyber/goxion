@@ -490,7 +490,9 @@
     }
 
     const key=window.goxionCurrentClientKey||'';
-    const client=key&&window.globalClientesData?window.globalClientesData[key]:null;
+    const client=key&&typeof globalClientesData!=='undefined'&&globalClientesData
+      ?globalClientesData[key]
+      :null;
     const services=(p?.items||[]).map(x=>x?.servicio?.nombre).filter(Boolean);
     const duration=promoDurationLabel(p);
     const price=promoPrice(p);
