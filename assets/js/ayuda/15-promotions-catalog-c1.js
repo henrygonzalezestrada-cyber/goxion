@@ -127,6 +127,12 @@
 
   function promoSubprice(p){
     const periods=Math.max(1,Number(p?.duracion_periodos||1));
+    if(p?.duracion_tipo==='hasta_fin_campana'){
+      if(p?.mecanica==='porcentaje'){
+        return '$'+money(p?.precio_promocional_total??p?.precio_promocional??0)+' / periodo · hasta fin de campaña';
+      }
+      return 'Precio por periodo · hasta fin de campaña';
+    }
     if(p?.mecanica==='porcentaje'){
       return '$'+money(p?.precio_promocional_total??p?.precio_promocional??0)+' · '+periods+' periodo'+(periods===1?'':'s');
     }
@@ -134,6 +140,7 @@
   }
 
   function promoDurationLabel(p){
+    if(p?.duracion_tipo==='hasta_fin_campana') return 'Hasta finalizar campaña';
     const periods=Math.max(1,Number(p?.duracion_periodos||1));
     return periods+' periodo'+(periods===1?'':'s');
   }
@@ -162,6 +169,7 @@
   function statusText(p){
     const acq=p?.adquirida;
     if(acq&&String(acq.estado)==='activa'){
+      if(p?.duracion_tipo==='hasta_fin_campana') return 'Ya la tienes · precio vigente hasta fin de campaña';
       return 'Ya la tienes · '+Number(acq.periodos_consumidos||0)+'/'+Number(acq.periodos_totales||1)+' periodos';
     }
     if(p?.autenticado===false||p?.elegibilidad?.elegible===null){

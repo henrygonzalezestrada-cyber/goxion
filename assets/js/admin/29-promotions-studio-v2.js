@@ -75,9 +75,10 @@
 
   function priceLine(p){
     const type=String(p?.mecanica||'precio_fijo');
-    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · $'+money(p.precio_promocional_total??p.precio_promocional);
+    const untilEnd=p?.duracion_tipo==='hasta_fin_campana';
+    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · $'+money(p.precio_promocional_total??p.precio_promocional)+(untilEnd?' / periodo':'');
     if(type==='addon')return 'Complemento +$'+money(p.precio_promocional)+' / periodo';
-    return '$'+money(p.precio_normal_total||p?.servicio?.precio)+' → $'+money(p.precio_promocional_total??p.precio_promocional);
+    return '$'+money(p.precio_normal_total||p?.servicio?.precio)+' → $'+money(p.precio_promocional_total??p.precio_promocional)+(untilEnd?' / periodo':'');
   }
 
   window.gxPromoLoad=async function(){
@@ -121,6 +122,9 @@
     list.innerHTML=rows.map(p=>{
       const type=String(p.mecanica||'precio_fijo');
       const periods=Number(p.duracion_periodos||1);
+      const durationText=p.duracion_tipo==='hasta_fin_campana'
+        ?'Hasta fin de campaña'
+        :(periods+' periodo'+(periods===1?'':'s'));
       const flags=[
         p.oferta_flash?'Flash':'',
         p.mostrar_contador?'Timer':'',
@@ -133,7 +137,7 @@
         '<div class="gx-promo-main">'+
           '<div class="gx-promo-row-title"><strong>'+esc(p.nombre||'Promoción')+'</strong><span class="gx-promo-state-chip '+esc(p.estado_visual||'lista')+'">'+esc(p.estado_visual||'lista')+'</span></div>'+
           '<small>'+esc(itemNames(p))+'</small>'+
-          '<div class="gx-promo-row-meta"><b>'+esc(priceLine(p))+'</b><span>'+periods+' periodo'+(periods===1?'':'s')+' · '+esc(AUDIENCES[p.audiencia]||AUDIENCES.todos)+'</span></div>'+
+          '<div class="gx-promo-row-meta"><b>'+esc(priceLine(p))+'</b><span>'+esc(durationText)+' · '+esc(AUDIENCES[p.audiencia]||AUDIENCES.todos)+'</span></div>'+
           '<div class="gx-promo-row-foot"><span>'+fmtDate(p.inicio)+' → '+fmtDate(p.fin)+'</span><span>'+(p.publicada?'Publicada':'No publicada')+(flags.length?' · '+esc(flags.join(' · ')):'')+'</span></div>'+
         '</div>'+
         '<div class="gx-promo-row-actions">'+
@@ -149,7 +153,7 @@
     const now=new Date(),end=new Date(now.getTime()+7*24*3600000);
     return {
       id:'',mecanica:'precio_fijo',nombre:'',titulo_publico:'',descripcion_publica:'',badge:'PROMO',
-      precio_promocional:'',descuento_porcentaje:'',duracion_periodos:1,
+      precio_promocional:'',descuento_porcentaje:'',duracion_periodos:1,duracion_tipo:'periodos',
       inicio:now.toISOString(),fin:end.toISOString(),
       mostrar_precio_anterior:true,mostrar_contador:false,oferta_flash:false,activa:true,
       audiencia:'todos',segmentacion:{},
@@ -175,7 +179,7 @@
     byId('gx-promo-priority').value=String(editing.prioridad||0);
     byId('gx-promo-price').value=editing.precio_promocional??'';
     byId('gx-promo-percent').value=editing.descuento_porcentaje??'';
-    byId('gx-promo-periods').value=String(editing.duracion_periodos||1);
+    byId('gx-promo-periods').value=editing.duracion_tipo==='hasta_fin_campana'?'campaign_end':String(editing.duracion_periodos||1);
     byId('gx-promo-start').value=localInput(editing.inicio);
     byId('gx-promo-end').value=localInput(editing.fin);
     byId('gx-promo-audience').value=editing.audiencia||'todos';
@@ -244,14 +248,11 @@
 
     const priceWrap=byId('gx-promo-price-wrap');
     const pctWrap=byId('gx-promo-percent-wrap');
-    const priceLabel=byId('gx-promo-price-label');
     if(priceWrap)priceWrap.hidden=mech==='porcentaje';
     if(pctWrap)pctWrap.hidden=mech!=='porcentaje';
-    if(priceLabel)priceLabel.textContent=
-      mech==='addon'?'Precio adicional por periodo':
-      (mech==='combo'?'Precio total del combo':'Precio total de la promoción');
 
     renderMechanicFields(mech,model||editing||blankPromo());
+    updatePriceLabel();
     window.gxPromoUpdatePreview();
   };
 
@@ -342,6 +343,27 @@
     window.gxPromoUpdatePreview?.();
   };
 
+  function durationMode(){
+    return byId('gx-promo-periods')?.value==='campaign_end'?'hasta_fin_campana':'periodos';
+  }
+
+  function updatePriceLabel(){
+    const mech=String(byId('gx-promo-mechanic')?.value||'precio_fijo');
+    const untilEnd=durationMode()==='hasta_fin_campana';
+    const label=byId('gx-promo-price-label');
+    if(!label)return;
+    label.textContent=
+      mech==='addon'?'Precio adicional por periodo':
+      (mech==='combo'
+        ?(untilEnd?'Precio del combo por periodo':'Precio total del combo')
+        :(untilEnd?'Precio promocional por periodo':'Precio total de la promoción'));
+  }
+
+  window.gxPromoDurationChanged=function(){
+    updatePriceLabel();
+    window.gxPromoUpdatePreview();
+  };
+
   function collectItems(){
     const mech=String(byId('gx-promo-mechanic')?.value||'precio_fijo');
     if(mech==='precio_fijo'||mech==='porcentaje'){
@@ -364,7 +386,8 @@
   function previewNumbers(){
     const mech=String(byId('gx-promo-mechanic')?.value||'precio_fijo');
     const items=collectItems();
-    const periods=Math.max(1,Number(byId('gx-promo-periods')?.value||1));
+    const mode=durationMode();
+    const periods=mode==='periodos'?Math.max(1,Number(byId('gx-promo-periods')?.value||1)):1;
     const normalPeriod=items.reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
     const complementPeriod=items.filter(x=>x.rol==='complemento').reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
     const triggerPeriod=items.filter(x=>x.rol==='disparador').reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
@@ -376,29 +399,29 @@
     let offerTotal=inputPrice;
     let saving=0;
 
-    if(mech==='precio_fijo'||mech==='combo'){
+    if((mech==='precio_fijo'||mech==='combo')&&mode==='hasta_fin_campana'){
+      normalTotal=normalPeriod;
+      offerPeriod=inputPrice;
+      offerTotal=inputPrice;
+      saving=Math.max(0,normalPeriod-inputPrice);
+    }else if(mech==='precio_fijo'||mech==='combo'){
       normalTotal=normalPeriod*periods;
       offerTotal=inputPrice;
       offerPeriod=periods>0?inputPrice/periods:inputPrice;
       saving=Math.max(0,normalTotal-offerTotal);
     }else if(mech==='porcentaje'){
       offerPeriod=(normalPeriod>0&&pct>0)?Math.round(normalPeriod*(1-pct/100)*100)/100:0;
-      normalTotal=normalPeriod*periods;
-      offerTotal=Math.round(offerPeriod*periods*100)/100;
+      normalTotal=mode==='hasta_fin_campana'?normalPeriod:normalPeriod*periods;
+      offerTotal=mode==='hasta_fin_campana'?offerPeriod:Math.round(offerPeriod*periods*100)/100;
       saving=Math.max(0,normalTotal-offerTotal);
     }else{
-      normalTotal=normalPeriod*periods;
+      normalTotal=mode==='hasta_fin_campana'?normalPeriod:normalPeriod*periods;
       offerPeriod=inputPrice;
-      offerTotal=Math.round((triggerPeriod+inputPrice)*periods*100)/100;
-      saving=Math.max(0,(complementPeriod-inputPrice)*periods);
+      offerTotal=mode==='hasta_fin_campana'?Math.round((triggerPeriod+inputPrice)*100)/100:Math.round((triggerPeriod+inputPrice)*periods*100)/100;
+      saving=mode==='hasta_fin_campana'?Math.max(0,complementPeriod-inputPrice):Math.max(0,(complementPeriod-inputPrice)*periods);
     }
 
-    return {
-      mech,items,periods,pct,
-      normalPeriod,normalTotal,
-      complementPeriod,triggerPeriod,
-      offerPeriod,offerTotal,saving
-    };
+    return {mech,mode,items,periods,pct,normalPeriod,normalTotal,complementPeriod,triggerPeriod,offerPeriod,offerTotal,saving};
   }
 
   window.gxPromoUpdatePreview=function(){
@@ -406,6 +429,7 @@
     const facts=byId('gx-promo-preview-facts');
     if(!card)return;
 
+    updatePriceLabel();
     const x=previewNumbers();
     const title=String(byId('gx-promo-public-title')?.value||byId('gx-promo-name')?.value||'Nueva promoción').trim();
     const description=String(byId('gx-promo-public-description')?.value||MECHANICS[x.mech]?.hint||'').trim();
@@ -413,26 +437,27 @@
     const names=x.items.map(i=>service(i.servicio_id)?.nombre).filter(Boolean);
 
     let price='Define el valor';
-    if(x.mech==='porcentaje'&&x.pct>0)price=money(x.pct)+'% OFF · $'+money(x.offerTotal);
+    if(x.mech==='porcentaje'&&x.pct>0)price=money(x.pct)+'% OFF · $'+money(x.offerTotal)+(x.mode==='hasta_fin_campana'?' / periodo':'');
     else if(x.mech==='addon'&&x.offerPeriod>0)price='+$'+money(x.offerPeriod)+' / periodo';
-    else if(x.offerTotal>0)price='$'+money(x.offerTotal);
+    else if(x.offerTotal>0)price='$'+money(x.offerTotal)+(x.mode==='hasta_fin_campana'?' / periodo':'');
 
     card.innerHTML=
       '<span>'+esc(badge||'PROMO')+'</span>'+
       '<strong>'+esc(title)+'</strong>'+
       '<p>'+esc(description||names.join(' + ')||'Selecciona las plataformas.')+'</p>'+
-      '<div><b>'+esc(price)+'</b>'+(x.normalTotal>0&&x.mech!=='addon'?'<s>$'+money(x.normalTotal)+'</s>':'')+'</div>';
+      '<div><b>'+esc(price)+'</b>'+(x.normalTotal>0&&x.mech!=='addon'?'<s>$'+money(x.normalTotal)+(x.mode==='hasta_fin_campana'?' / periodo':'')+'</s>':'')+'</div>';
 
     if(facts){
       const audience=AUDIENCES[byId('gx-promo-audience')?.value]||AUDIENCES.todos;
-      const periods=x.periods;
-      const equivalent=(x.mech==='precio_fijo'||x.mech==='combo')&&x.offerTotal>0&&periods>1
+      const equivalent=x.mode==='periodos'&&(x.mech==='precio_fijo'||x.mech==='combo')&&x.offerTotal>0&&x.periods>1
         ?' · equiv. $'+money(x.offerPeriod)+'/periodo'
         :'';
+      const durationText=x.mode==='hasta_fin_campana'?'Hasta finalizar campaña':(x.periods+' periodo'+(x.periods===1?'':'s')+equivalent);
+      const savingLabel=x.mode==='hasta_fin_campana'?'Ahorro por periodo':'Ahorro total';
       facts.innerHTML=
         '<div><span>Composición</span><strong>'+esc(names.join(' + ')||'Pendiente')+'</strong></div>'+
-        '<div><span>Ahorro total</span><strong>$'+money(x.saving)+'</strong></div>'+
-        '<div><span>Duración</span><strong>'+periods+' periodo'+(periods===1?'':'s')+equivalent+'</strong></div>'+
+        '<div><span>'+savingLabel+'</span><strong>$'+money(x.saving)+'</strong></div>'+
+        '<div><span>Duración</span><strong>'+durationText+'</strong></div>'+
         '<div><span>Audiencia</span><strong>'+esc(audience)+'</strong></div>';
     }
   };
@@ -440,6 +465,8 @@
   function collectData(){
     const mech=String(byId('gx-promo-mechanic')?.value||'precio_fijo');
     const items=collectItems();
+    const durationValue=String(byId('gx-promo-periods')?.value||'1');
+    const duracion_tipo=durationValue==='campaign_end'?'hasta_fin_campana':'periodos';
     const audience=String(byId('gx-promo-audience')?.value||'todos');
     const segmentacion=(audience==='con_servicio'||audience==='sin_servicio')
       ?{servicio_id:String(byId('gx-promo-audience-service')?.value||'')}
@@ -461,7 +488,8 @@
       servicios_complemento_ids:complements,
       precio_promocional:Number(byId('gx-promo-price')?.value||0),
       descuento_porcentaje:Number(byId('gx-promo-percent')?.value||0),
-      duracion_periodos:Number(byId('gx-promo-periods')?.value||1),
+      duracion_periodos:duracion_tipo==='periodos'?Math.max(1,Number(durationValue||1)):1,
+      duracion_tipo,
       inicio:byId('gx-promo-start')?.value||'',
       fin:byId('gx-promo-end')?.value||'',
       audiencia:audience,

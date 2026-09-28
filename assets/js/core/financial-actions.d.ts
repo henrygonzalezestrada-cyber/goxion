@@ -23,6 +23,7 @@ interface GoxionPromotionInput {
   precio_promocional?: number;
   descuento_porcentaje?: number;
   duracion_periodos: number;
+  duracion_tipo?: 'periodos' | 'hasta_fin_campana';
   inicio: string;
   fin: string;
   audiencia: GoxionPromotionAudience;
