@@ -1485,19 +1485,29 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
       window.gxPromoOpenEditor?.();
       document.getElementById('gx-promo-name').value = 'Smoke Promotions Studio';
       document.getElementById('gx-promo-public-title').value = 'Oferta smoke';
-      document.getElementById('gx-promo-price').value = '50';
+      document.getElementById('gx-promo-price').value = '100';
+      document.getElementById('gx-promo-periods').value = '3';
+      window.gxPromoUpdatePreview?.();
+      const priceLabel=(document.getElementById('gx-promo-price-label')?.textContent||'').trim();
+      const previewText=(document.getElementById('gx-promo-preview')?.textContent||'').replace(/\s+/g,' ').trim();
       const published = document.getElementById('gx-promo-published');
       const acquisition = document.getElementById('gx-promo-acquisition');
       if (published) published.checked = true;
       window.gxPromoPublicationChanged?.();
       if (acquisition) acquisition.checked = true;
       await window.gxPromoSave?.();
-      return { ok:true };
+      return { ok:true, priceLabel, previewText };
     } catch (error) {
       return { error:error?.message || String(error) };
     }
   });
-  if (promoSaveUi?.error) errors.push(`${label}: guardado UI de Promotions Studio falló: ${promoSaveUi.error}`);
+  if (
+    promoSaveUi?.error ||
+    !String(promoSaveUi?.priceLabel||'').includes('Precio total') ||
+    !String(promoSaveUi?.previewText||'').includes('$100')
+  ) {
+    errors.push(`${label}: guardado UI de Promotions Studio multi-periodo falló: ${JSON.stringify(promoSaveUi)}`);
+  }
 
   const promoUiRequest = [...financialActionRequests].reverse().find(x =>
     x.body?.accion === 'promocion_guardar' &&
@@ -1506,6 +1516,8 @@ async function runAdminViewport(browser, browserName, errors, viewport, suffix) 
   if (
     !promoUiRequest ||
     promoUiRequest.body?.datos?.mecanica !== 'precio_fijo' ||
+    promoUiRequest.body?.datos?.precio_promocional !== 100 ||
+    promoUiRequest.body?.datos?.duracion_periodos !== 3 ||
     promoUiRequest.body?.datos?.publicada !== true ||
     promoUiRequest.body?.datos?.adquisicion_habilitada !== true ||
     !Array.isArray(promoUiRequest.body?.datos?.items) ||

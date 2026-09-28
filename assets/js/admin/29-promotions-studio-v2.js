@@ -75,9 +75,9 @@
 
   function priceLine(p){
     const type=String(p?.mecanica||'precio_fijo');
-    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · $'+money(p.precio_promocional);
-    if(type==='addon')return 'Complemento +$'+money(p.precio_promocional);
-    return '$'+money(p.precio_normal_total||p?.servicio?.precio)+' → $'+money(p.precio_promocional);
+    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · $'+money(p.precio_promocional_total??p.precio_promocional);
+    if(type==='addon')return 'Complemento +$'+money(p.precio_promocional)+' / periodo';
+    return '$'+money(p.precio_normal_total||p?.servicio?.precio)+' → $'+money(p.precio_promocional_total??p.precio_promocional);
   }
 
   window.gxPromoLoad=async function(){
@@ -247,7 +247,9 @@
     const priceLabel=byId('gx-promo-price-label');
     if(priceWrap)priceWrap.hidden=mech==='porcentaje';
     if(pctWrap)pctWrap.hidden=mech!=='porcentaje';
-    if(priceLabel)priceLabel.textContent=mech==='addon'?'Precio adicional':(mech==='combo'?'Precio del combo':'Precio promocional');
+    if(priceLabel)priceLabel.textContent=
+      mech==='addon'?'Precio adicional por periodo':
+      (mech==='combo'?'Precio total del combo':'Precio total de la promoción');
 
     renderMechanicFields(mech,model||editing||blankPromo());
     window.gxPromoUpdatePreview();
@@ -362,13 +364,41 @@
   function previewNumbers(){
     const mech=String(byId('gx-promo-mechanic')?.value||'precio_fijo');
     const items=collectItems();
-    const normal=items.reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
-    const complement=items.filter(x=>x.rol==='complemento').reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
+    const periods=Math.max(1,Number(byId('gx-promo-periods')?.value||1));
+    const normalPeriod=items.reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
+    const complementPeriod=items.filter(x=>x.rol==='complemento').reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
+    const triggerPeriod=items.filter(x=>x.rol==='disparador').reduce((sum,item)=>sum+Number(service(item.servicio_id)?.precio||0),0);
     const pct=Number(byId('gx-promo-percent')?.value||0);
-    let offer=Number(byId('gx-promo-price')?.value||0);
-    if(mech==='porcentaje'&&normal>0&&pct>0)offer=Math.round(normal*(1-pct/100)*100)/100;
-    const saving=mech==='addon'?Math.max(0,complement-offer):Math.max(0,normal-offer);
-    return {mech,items,normal,complement,pct,offer,saving};
+    const inputPrice=Number(byId('gx-promo-price')?.value||0);
+
+    let normalTotal=normalPeriod;
+    let offerPeriod=inputPrice;
+    let offerTotal=inputPrice;
+    let saving=0;
+
+    if(mech==='precio_fijo'||mech==='combo'){
+      normalTotal=normalPeriod*periods;
+      offerTotal=inputPrice;
+      offerPeriod=periods>0?inputPrice/periods:inputPrice;
+      saving=Math.max(0,normalTotal-offerTotal);
+    }else if(mech==='porcentaje'){
+      offerPeriod=(normalPeriod>0&&pct>0)?Math.round(normalPeriod*(1-pct/100)*100)/100:0;
+      normalTotal=normalPeriod*periods;
+      offerTotal=Math.round(offerPeriod*periods*100)/100;
+      saving=Math.max(0,normalTotal-offerTotal);
+    }else{
+      normalTotal=normalPeriod*periods;
+      offerPeriod=inputPrice;
+      offerTotal=Math.round((triggerPeriod+inputPrice)*periods*100)/100;
+      saving=Math.max(0,(complementPeriod-inputPrice)*periods);
+    }
+
+    return {
+      mech,items,periods,pct,
+      normalPeriod,normalTotal,
+      complementPeriod,triggerPeriod,
+      offerPeriod,offerTotal,saving
+    };
   }
 
   window.gxPromoUpdatePreview=function(){
@@ -383,23 +413,26 @@
     const names=x.items.map(i=>service(i.servicio_id)?.nombre).filter(Boolean);
 
     let price='Define el valor';
-    if(x.mech==='porcentaje'&&x.pct>0)price=money(x.pct)+'% OFF · $'+money(x.offer);
-    else if(x.mech==='addon'&&x.offer>0)price='+$'+money(x.offer);
-    else if(x.offer>0)price='$'+money(x.offer);
+    if(x.mech==='porcentaje'&&x.pct>0)price=money(x.pct)+'% OFF · $'+money(x.offerTotal);
+    else if(x.mech==='addon'&&x.offerPeriod>0)price='+$'+money(x.offerPeriod)+' / periodo';
+    else if(x.offerTotal>0)price='$'+money(x.offerTotal);
 
     card.innerHTML=
       '<span>'+esc(badge||'PROMO')+'</span>'+
       '<strong>'+esc(title)+'</strong>'+
       '<p>'+esc(description||names.join(' + ')||'Selecciona las plataformas.')+'</p>'+
-      '<div><b>'+esc(price)+'</b>'+(x.normal>0&&x.mech!=='addon'?'<s>$'+money(x.normal)+'</s>':'')+'</div>';
+      '<div><b>'+esc(price)+'</b>'+(x.normalTotal>0&&x.mech!=='addon'?'<s>$'+money(x.normalTotal)+'</s>':'')+'</div>';
 
     if(facts){
       const audience=AUDIENCES[byId('gx-promo-audience')?.value]||AUDIENCES.todos;
-      const periods=Number(byId('gx-promo-periods')?.value||1);
+      const periods=x.periods;
+      const equivalent=(x.mech==='precio_fijo'||x.mech==='combo')&&x.offerTotal>0&&periods>1
+        ?' · equiv. $'+money(x.offerPeriod)+'/periodo'
+        :'';
       facts.innerHTML=
         '<div><span>Composición</span><strong>'+esc(names.join(' + ')||'Pendiente')+'</strong></div>'+
-        '<div><span>Ahorro estimado</span><strong>$'+money(x.saving)+'</strong></div>'+
-        '<div><span>Duración</span><strong>'+periods+' periodo'+(periods===1?'':'s')+'</strong></div>'+
+        '<div><span>Ahorro total</span><strong>$'+money(x.saving)+'</strong></div>'+
+        '<div><span>Duración</span><strong>'+periods+' periodo'+(periods===1?'':'s')+equivalent+'</strong></div>'+
         '<div><span>Audiencia</span><strong>'+esc(audience)+'</strong></div>';
     }
   };
