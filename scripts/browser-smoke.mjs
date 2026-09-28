@@ -861,7 +861,8 @@ async function runAyuda(browser, browserName, errors) {
       detailSections:card.querySelectorAll('.gx-promo-detail-section').length,
       detailOverflow:detail?getComputedStyle(detail).overflowY:null,
       detailScrollable:detail?detail.scrollHeight>=detail.clientHeight:false,
-      stockText:(card.querySelector('.gx-promo-stock-pill')?.textContent||'').trim(),
+      availabilityText:(card.querySelector('.gx-promo-availability-value')?.textContent||'').trim(),
+      stockPillCount:card.querySelectorAll('.gx-promo-stock-pill').length,
       angleA:angle(logos[0]),
       angleB:angle(logos[1])
     };
@@ -871,13 +872,14 @@ async function runAyuda(browser, browserName, errors) {
     !expanded ||
     expanded.sameNode!==true ||
     expanded.height>540 ||
-    !['Contratar ahora','Inicia sesión'].includes(expanded.actionText) ||
+    expanded.actionText!=='Contratar ahora' ||
     expanded.actionBottomGap>24 ||
     expanded.valueGap>8 ||
     expanded.oldPriceFont<14 ||
     expanded.detailSections!==2 ||
     expanded.detailOverflow!=='auto' ||
-    expanded.stockText!=='Disponible' ||
+    !/disponible/i.test(expanded.availabilityText||'') ||
+    expanded.stockPillCount!==0 ||
     Math.abs(expanded.angleA)>0.5 ||
     Math.abs(expanded.angleB)>0.5
   ){
