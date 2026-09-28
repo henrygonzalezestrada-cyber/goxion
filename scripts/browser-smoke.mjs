@@ -544,7 +544,15 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('[data-gx-curated-mode="saving"]')?.click()
   );
-  await page.waitForTimeout(180);
+  await page.waitForFunction(() => {
+    const active=document.querySelector('[data-gx-curated-mode="saving"]')?.classList.contains('active');
+    const rail=document.getElementById('gx-catalog-best-rail');
+    return active===true && !!rail && (
+      rail.querySelectorAll('.gx-catalog-mini-card').length>0 ||
+      !!rail.querySelector('.gx-catalog-curated-empty')
+    );
+  },null,{timeout:2200}).catch(()=>{});
+  await page.waitForTimeout(80);
 
   const c12Saving=await page.evaluate(() => {
     const cards=[...document.querySelectorAll('#gx-catalog-best-rail .gx-catalog-mini-card')];
@@ -576,7 +584,12 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('[data-gx-curated-mode="popular"]')?.click()
   );
-  await page.waitForTimeout(120);
+  await page.waitForFunction(() => {
+    const active=document.querySelector('[data-gx-curated-mode="popular"]')?.classList.contains('active');
+    const rail=document.getElementById('gx-catalog-best-rail');
+    return active===true && !!rail;
+  },null,{timeout:2200}).catch(()=>{});
+  await page.waitForTimeout(80);
 
   const c14Layout=await page.evaluate(() => {
     const card=document.querySelector('#gx-catalog-best-rail .gx-catalog-mini-card');
@@ -808,7 +821,19 @@ async function runAyuda(browser, browserName, errors) {
     const action=card?.querySelector('[data-gx-promo-action]');
     return !!card && !!action && action.textContent.trim()==='Contratar ahora';
   },null,{timeout:3200}).catch(()=>{});
-  await page.waitForTimeout(520);
+  await page.waitForFunction(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
+    if(!card) return false;
+    const logos=[...card.querySelectorAll('.gx-promo-card-logos.is-combo .gx-promo-logo-item')];
+    const angle=(node)=>{
+      const t=getComputedStyle(node).transform;
+      if(!t||t==='none')return 0;
+      const m=t.match(/matrix\(([^,]+),\s*([^,]+)/);
+      return m?Math.atan2(Number(m[2]),Number(m[1]))*180/Math.PI:99;
+    };
+    return logos.length>=2 && Math.abs(angle(logos[0]))<=0.5 && Math.abs(angle(logos[1]))<=0.5;
+  },null,{timeout:1400}).catch(()=>{});
+  await page.waitForTimeout(40);
 
   const expanded=await page.evaluate(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
