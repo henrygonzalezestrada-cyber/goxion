@@ -206,6 +206,30 @@
 
             const sel = document.getElementById(`add-srv-sel-${key}`);
             if (!sel?.value) return;
+
+            if (String(sel.value).startsWith("promo:")) {
+                const promoId = String(sel.value).slice(6);
+                const promo = (configGlobal.promocionesActivas || []).find(p => String(p.id) === promoId);
+                if (!promo) return alert("❌ La promoción ya no está vigente. Recarga el Admin.");
+
+                try {
+                    if (typeof window.GOXION_FINANCIAL_ACTIONS?.acquirePromotion !== "function") {
+                        throw new Error("Motor de promociones no disponible.");
+                    }
+                    await window.GOXION_FINANCIAL_ACTIONS.acquirePromotion({
+                        clienteId: c._id,
+                        promocionId: promoId,
+                        periodoInicio: String(c.periodo_pendiente || "").slice(0,7),
+                        origen: "admin-servicios"
+                    });
+                    await recargar(key);
+                    alert(`✅ Promoción aplicada: ${promo.titulo_publico || promo.nombre || "Promoción GOXION"}.`);
+                } catch (e) {
+                    errorUI("No se pudo aplicar la promoción.", e);
+                }
+                return;
+            }
+
             const [nombre, precio] = sel.value.split("|");
             const cat = configGlobal.serviciosGlobales.find(s => s.nombre === nombre);
 

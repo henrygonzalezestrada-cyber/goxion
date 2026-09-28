@@ -149,11 +149,30 @@
     return Math.max(0,Number(p?.precio_promocional_total??p?.precio_promocional??0));
   }
 
+  function promoAvailability(p){
+    const raw=p?.disponibilidad||{};
+    const available=raw?.disponible!==false;
+    const missing=Array.isArray(raw?.faltantes)?raw.faltantes.filter(Boolean):[];
+    return {
+      available,
+      missing,
+      min:Number(raw?.min_disponibles||0),
+      text:available?'Disponible':(missing.length?'Agotado · '+missing.join(' + '):'Agotado')
+    };
+  }
+
   function promoContractState(p){
     if(p?.adquirida&&String(p.adquirida.estado)==='activa'){
       return {enabled:false,label:'Ya la tienes'};
     }
-    if(p?.autenticado===true&&p?.elegibilidad?.elegible===false){
+    const availability=promoAvailability(p);
+    if(!availability.available){
+      return {enabled:false,label:'Agotado'};
+    }
+    if(p?.autenticado!==true){
+      return {enabled:true,label:'Inicia sesión'};
+    }
+    if(p?.elegibilidad?.elegible===false){
       return {enabled:false,label:'No disponible'};
     }
     if(p?.adquisicion_habilitada!==true){
@@ -172,14 +191,16 @@
       if(p?.duracion_tipo==='hasta_fin_campana') return 'Ya la tienes · precio vigente hasta fin de campaña';
       return 'Ya la tienes · '+Number(acq.periodos_consumidos||0)+'/'+Number(acq.periodos_totales||1)+' periodos';
     }
+    const availability=promoAvailability(p);
+    if(!availability.available) return availability.text;
     if(p?.autenticado===false||p?.elegibilidad?.elegible===null){
-      return 'Inicia sesión para confirmar disponibilidad';
+      return 'Disponible · inicia sesión para confirmar';
     }
     if(p?.elegibilidad?.elegible===false){
       return String(p?.elegibilidad?.motivo||'No disponible para esta cuenta');
     }
     if(p?.adquisicion_habilitada===true){
-      return 'Disponible para tu cuenta';
+      return 'Disponible';
     }
     return 'Próximamente';
   }
@@ -191,7 +212,8 @@
       items:Array.isArray(raw?.items)?raw.items:[],
       precio_normal_total:Number(raw?.precio_normal_total||0),
       precio_promocional_total:Number(raw?.precio_promocional_total??raw?.precio_promocional??0),
-      ahorro_estimado:Number(raw?.ahorro_estimado||0)
+      ahorro_estimado:Number(raw?.ahorro_estimado||0),
+      disponibilidad:raw?.disponibilidad||{disponible:true,min_disponibles:0,items:[],faltantes:[]}
     };
   }
 
@@ -355,7 +377,7 @@
     return '<article class="gx-promo-deck-card is-closed'+comboClass+mechanicClass+'" style="'+esc(style)+'" data-gx-promo-index="'+index+'" role="button" tabindex="0" aria-label="Abrir '+esc(title)+'" aria-expanded="false">'+
       '<span class="gx-promo-card-aurora" aria-hidden="true"></span>'+
       '<span class="gx-promo-card-glow" aria-hidden="true"></span>'+
-      '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span>'+preview+'</div>'+
+      '<div class="gx-promo-card-top"><span class="gx-promo-card-kind">'+esc(kind)+'</span><span class="gx-promo-stock-pill '+(promoAvailability(p).available?'is-available':'is-out')+'">'+esc(promoAvailability(p).available?'Disponible':'Agotado')+'</span>'+preview+'</div>'+
       '<button type="button" class="gx-promo-morph-close" data-gx-promo-close aria-label="Cerrar promoción">×</button>'+
       '<div class="gx-promo-card-logos'+comboClass+'">'+logosHtml(p)+'</div>'+
       '<div class="gx-promo-card-copy">'+
@@ -447,27 +469,81 @@
     restartAuto();
   }
 
-  function addPromotionToCart(p,button){
-    const price=promoContractPrice(p);
+  async function requestPromotion(p,button){
     const contract=promoContractState(p);
-    if(!contract.enabled||price<=0||typeof window.GOXION_CATALOG_CART?.add!=='function') return false;
+    if(!contract.enabled) return false;
 
-    const label=promoCartLabel(p);
-    const safeId='promo-'+String(p?.id||label).replace(/[^a-z0-9_-]/gi,'').slice(0,32);
-    window.GOXION_CATALOG_CART.add(label,price,safeId);
+    if(p?.autenticado!==true){
+      closePromoDetail(state.expandedCard);
+      setTimeout(()=>window.openAuthSheet?.(),420);
+      return true;
+    }
+
+    const availability=promoAvailability(p);
+    if(!availability.available) return false;
+
+    const token=clientToken();
+    if(!token){
+      closePromoDetail(state.expandedCard);
+      setTimeout(()=>window.openAuthSheet?.(),420);
+      return true;
+    }
+
+    const key=window.goxionCurrentClientKey||'';
+    const client=key&&typeof globalClientesData!=='undefined'&&globalClientesData
+      ?globalClientesData[key]
+      :null;
+    const services=(p?.items||[]).map(x=>x?.servicio?.nombre).filter(Boolean);
+    const duration=promoDurationLabel(p);
+    const price=promoPrice(p);
+    const title=publicTitle(p);
 
     if(button){
-      const original=button.textContent;
       button.disabled=true;
-      button.classList.add('is-added');
-      button.textContent='✓ Agregado al carrito';
-      setTimeout(()=>{
-        button.classList.remove('is-added');
-        button.disabled=false;
-        button.textContent=original||'Contratar ahora';
-      },900);
+      button.textContent='Enviando…';
     }
-    return true;
+
+    try{
+      const response=await fetch(GXCORE.endpoint('notificar-goxion'),{
+        method:'POST',
+        headers:{'Content-Type':'application/json','X-Client-Token':token},
+        body:JSON.stringify({
+          categoria:'pedidos',
+          titulo:'🎟️ SOLICITUD DE PROMOCIÓN',
+          mensaje:[
+            '**Cliente:** '+String(client?.nombre||'Cliente GOXION'),
+            client?.folio?'**Folio:** '+String(client.folio):'',
+            '**Promoción:** '+title,
+            '**Precio:** '+price,
+            '**Duración:** '+duration,
+            services.length?'**Incluye:** '+services.join(' + '):'',
+            '**Disponibilidad al solicitar:** Disponible',
+            '**PROMO_ID:** '+String(p?.id||'')
+          ].filter(Boolean).join('\n'),
+          colorHex:'7c4dff',
+          session_token:token,
+          referencia:'promo:'+String(p?.id||'')
+        }),
+        cache:'no-store'
+      });
+      const data=await response.json().catch(()=>({}));
+      if(!response.ok||data?.ok!==true) throw new Error(data?.error||'No fue posible enviar la solicitud.');
+
+      if(button){
+        button.classList.add('is-added');
+        button.textContent='✓ Solicitud enviada';
+      }
+      setTimeout(()=>closePromoDetail(state.expandedCard),520);
+      return true;
+    }catch(error){
+      if(button){
+        button.disabled=false;
+        button.classList.remove('is-added');
+        button.textContent='Contratar ahora';
+      }
+      alert('No se pudo enviar la solicitud.\n\n'+(error?.message||error));
+      return false;
+    }
   }
 
   function setPromoActionState(card,p,expanded){
@@ -519,7 +595,7 @@
         const promo=selectedPromotions()[index];
 
         if(card.classList.contains('is-expanded')){
-          if(addPromotionToCart(promo,button)) setTimeout(()=>closePromoDetail(card),430);
+          requestPromotion(promo,button);
           return;
         }
         if(state.expandedCard) return;

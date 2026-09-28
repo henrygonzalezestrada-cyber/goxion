@@ -297,7 +297,16 @@ let clientesDict = {};
             return;
         }
 
-        const globalOptions = configGlobal.serviciosGlobales.map(s => `<option value="${s.nombre}|${s.precio}">${s.nombre} ($${s.precio})</option>`).join("");
+        const serviceOptions = configGlobal.serviciosGlobales.map(s => `<option value="${s.nombre}|${s.precio}">${s.nombre} (${s.precio})</option>`).join("");
+        const promoOptions = (configGlobal.promocionesActivas || []).map(p => {
+            const title = p.titulo_publico || p.nombre || "Promoción GOXION";
+            const price = Number(p.precio_promocional || 0);
+            const duration = p.duracion_tipo === "hasta_fin_campana"
+                ? "hasta fin de campaña"
+                : `${Number(p.duracion_periodos || 1)} periodo${Number(p.duracion_periodos || 1)===1?"":"s"}`;
+            return `<option value="promo:${p.id}">★ PROMO · ${title} (${price}) · ${duration}</option>`;
+        }).join("");
+        const globalOptions = `<optgroup label="Servicios">${serviceOptions}</optgroup>${promoOptions ? `<optgroup label="Promociones vigentes">${promoOptions}</optgroup>` : ""}`;
 
         keys.forEach(key => {
             const cliente = diccionario[key];

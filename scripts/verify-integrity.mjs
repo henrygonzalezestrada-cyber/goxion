@@ -434,8 +434,17 @@ for (const absolute of walk(jsRoot)) {
   if (!promoCatalog.includes('Fase 2: la tarjeta adopta el layout cerrado REAL mientras sigue fija y grande')) {
     fail('Ayuda C9: el cierre no prepara el layout cerrado real antes de contraer.');
   }
-  if (!promoCatalog.includes('GOXION_CATALOG_CART')) fail('Ayuda C9: Contratar ahora no usa el carrito estable.');
-  if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) fail('Ayuda C9: falta puente estable del carrito.');
+  if (!promoCatalog.includes("GXCORE.endpoint('notificar-goxion')") ||
+      !promoCatalog.includes('SOLICITUD DE PROMOCIÓN') ||
+      !promoCatalog.includes('requestPromotion')) {
+    fail('Ayuda promociones: Contratar ahora no genera solicitud administrativa.');
+  }
+  if (!promoCatalog.includes('promoAvailability') ||
+      !promoCatalog.includes('gx-promo-stock-pill') ||
+      !ayudaCss.includes('GOXION · disponibilidad de promociones')) {
+    fail('Ayuda promociones: falta bloqueo/estado visual por disponibilidad.');
+  }
+  if (!catalogOrders.includes('window.GOXION_CATALOG_CART')) fail('Ayuda C9: falta puente estable del carrito general.');
   if (!ayudaCss.includes('GOXION · CATÁLOGO PROMOCIONAL C9 POLISH')) fail('Ayuda C9: faltan estilos finales.');
   if (!ayudaCss.includes('white-space:nowrap') || !ayudaCss.includes('gxPromoC9EdgeTrace')) {
     fail('Ayuda C9: faltan regla atómica de porcentaje o efecto premium visible.');
@@ -602,6 +611,19 @@ for (const absolute of walk(jsRoot)) {
       !studioDuration.includes("'hasta_fin_campana'") ||
       !studioDuration.includes('duracion_tipo')) {
     fail('Promotions Studio duración hasta campaña: falta el contrato de duración recurrente.');
+  }
+}
+
+// Promotions: Admin aplica campañas vigentes desde la lista de servicios.
+{
+  const adminAdapterPromo = readFileSync(join(ROOT, 'assets', 'js', 'admin', '02-admin-supabase-layer.js'), 'utf8');
+  const adminInlinePromo = readFileSync(join(ROOT, 'assets', 'js', 'admin', '01-01-inline.js'), 'utf8');
+  const adminWritesPromo = readFileSync(join(ROOT, 'assets', 'js', 'admin', '03-supabase-v3-writes.js'), 'utf8');
+  if (!adminAdapterPromo.includes('promocionesActivas') ||
+      !adminInlinePromo.includes('Promociones vigentes') ||
+      !adminWritesPromo.includes('acquirePromotion') ||
+      !adminWritesPromo.includes('admin-servicios')) {
+    fail('Promociones: Admin no puede aplicar campañas vigentes desde Servicios.');
   }
 }
 

@@ -171,6 +171,7 @@ async function runAyuda(browser, browserName, errors) {
       ahorro_estimado:normal-offer,
       items,
       elegibilidad:{elegible:null,codigo:'PUBLICO',motivo:'Inicia sesión para confirmar si aplica a tu cuenta'},
+      disponibilidad:{disponible:true,codigo:'OK',motivo:'Disponible',min_disponibles:2,items:[],faltantes:[]},
       adquirida:null
     });
     const svc=(id,nombre,precio,rol='incluido')=>({servicio_id:id,rol,orden:0,servicio:{id,nombre,precio,etiqueta:''}});
@@ -860,6 +861,7 @@ async function runAyuda(browser, browserName, errors) {
       detailSections:card.querySelectorAll('.gx-promo-detail-section').length,
       detailOverflow:detail?getComputedStyle(detail).overflowY:null,
       detailScrollable:detail?detail.scrollHeight>=detail.clientHeight:false,
+      stockText:(card.querySelector('.gx-promo-stock-pill')?.textContent||'').trim(),
       angleA:angle(logos[0]),
       angleB:angle(logos[1])
     };
@@ -869,12 +871,13 @@ async function runAyuda(browser, browserName, errors) {
     !expanded ||
     expanded.sameNode!==true ||
     expanded.height>540 ||
-    expanded.actionText!=='Contratar ahora' ||
+    !['Contratar ahora','Inicia sesión'].includes(expanded.actionText) ||
     expanded.actionBottomGap>24 ||
     expanded.valueGap>8 ||
     expanded.oldPriceFont<14 ||
     expanded.detailSections!==2 ||
     expanded.detailOverflow!=='auto' ||
+    expanded.stockText!=='Disponible' ||
     Math.abs(expanded.angleA)>0.5 ||
     Math.abs(expanded.angleB)>0.5
   ){

@@ -344,6 +344,10 @@ const n = (v, fallback = 0) => {
                 ? root.notificaciones
                 : (Array.isArray(data?.notificaciones) ? data.notificaciones : []);
 
+            window.gxAdminActivePromotions = Array.isArray(root.promociones_activas)
+                ? root.promociones_activas
+                : (Array.isArray(data?.promociones_activas) ? data.promociones_activas : []);
+
             const clientes = firstArray(
                 root.clientes,
                 root.clients,
@@ -495,6 +499,7 @@ const n = (v, fallback = 0) => {
                     mensaje: alertas.mensaje || ""
                 },
                 serviciosGlobales: (catalogo.length ? catalogo : catalogoCfg).map(adaptarCatalogo),
+                promocionesActivas: Array.isArray(window.gxAdminActivePromotions) ? window.gxAdminActivePromotions : [],
                 combo_upsell: (root.combo_upsell ?? data.combo_upsell ?? cfg.combo_upsell) !== false
             };
 
