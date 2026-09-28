@@ -75,7 +75,9 @@
 
   function priceLine(p){
     const type=String(p?.mecanica||'precio_fijo');
-    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · 
+    if(type==='porcentaje')return money(p.descuento_porcentaje)+'% OFF · $'+money(p.precio_promocional_total??p.precio_promocional);
+    if(type==='addon')return 'Complemento +$'+money(p.precio_promocional)+' / periodo';
+    return '$'+money(p.precio_normal_total||p?.servicio?.precio)+' → $'+money(p.precio_promocional_total??p.precio_promocional);
   }
 
   window.gxPromoLoad=async function(){
