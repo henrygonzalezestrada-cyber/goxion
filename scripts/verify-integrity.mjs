@@ -614,6 +614,19 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+// Promotions: Admin aplica campañas vigentes desde la lista de servicios.
+{
+  const adminAdapterPromo = readFileSync(join(ROOT, 'assets', 'js', 'admin', '02-admin-supabase-layer.js'), 'utf8');
+  const adminInlinePromo = readFileSync(join(ROOT, 'assets', 'js', 'admin', '01-01-inline.js'), 'utf8');
+  const adminWritesPromo = readFileSync(join(ROOT, 'assets', 'js', 'admin', '03-supabase-v3-writes.js'), 'utf8');
+  if (!adminAdapterPromo.includes('promocionesActivas') ||
+      !adminInlinePromo.includes('Promociones vigentes') ||
+      !adminWritesPromo.includes('acquirePromotion') ||
+      !adminWritesPromo.includes('admin-servicios')) {
+    fail('Promociones: Admin no puede aplicar campañas vigentes desde Servicios.');
+  }
+}
+
 // Promotions Studio v2: universal campaign builder exposes publication and protected acquisition.
 {
   const adminHtmlPath = join(ROOT, 'admin.html');
