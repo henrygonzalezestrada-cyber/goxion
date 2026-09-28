@@ -215,6 +215,7 @@ declare global {
     ahorro_estimado?: number;
     descuento_porcentaje?: number | null;
     duracion_periodos?: number;
+    duracion_tipo?: 'periodos' | 'hasta_fin_campana';
     inicio?: string;
     fin?: string;
     mostrar_precio_anterior?: boolean;
