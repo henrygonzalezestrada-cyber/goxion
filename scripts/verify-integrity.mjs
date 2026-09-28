@@ -584,6 +584,16 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
+// Promotions Studio multi-periodo: precio fijo/combo representan total de campaña.
+{
+  const studioPackage = readFileSync(join(ROOT, 'assets', 'js', 'admin', '29-promotions-studio-v2.js'), 'utf8');
+  if (!studioPackage.includes("Precio total de la promoción") ||
+      !studioPackage.includes("normalPeriod*periods") ||
+      !studioPackage.includes("inputPrice/periods")) {
+    fail('Promotions Studio: se perdió la semántica de precio total multi-periodo.');
+  }
+}
+
 // Promotions Studio v2: universal campaign builder exposes publication and protected acquisition.
 {
   const adminHtmlPath = join(ROOT, 'admin.html');
