@@ -1,0 +1,64 @@
+/* Controles compartidos de Mi Espacio y carrito. */
+:root {
+  --gx-dialog-font: 'Poppins', sans-serif;
+  --gx-dialog-close-size: 32px;
+  --gx-dialog-close-icon: 16px;
+}
+.gx-auth-inline-close,
+#gx-cart-dialog .gx-cart-close {
+  display: grid;
+  place-items: center;
+  width: var(--gx-dialog-close-size);
+  height: var(--gx-dialog-close-size);
+  min-width: var(--gx-dialog-close-size);
+  flex-shrink: 0;
+  padding: 0;
+  border: 1px solid rgba(0,242,254,.9);
+  border-radius: 50%;
+  background: var(--neon-blue);
+  color: #030305;
+  box-shadow: 0 0 12px rgba(0,242,254,.13);
+  -webkit-tap-highlight-color: transparent;
+}
+#gx-cart-dialog .gx-cart-close { position: relative; }
+.gx-auth-inline-close::after,
+#gx-cart-dialog .gx-cart-close::after {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+}
+.gx-auth-inline-close svg,
+#gx-cart-dialog .gx-cart-close svg {
+  width: var(--gx-dialog-close-icon);
+  height: var(--gx-dialog-close-icon);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.gx-auth-inline-close:focus-visible,
+#gx-cart-dialog .gx-cart-close:focus-visible {
+  outline: 2px solid rgba(0,242,254,.45);
+  outline-offset: 3px;
+}
+#gx-cart-dialog { font-family: var(--gx-dialog-font); }
+#gx-cart-dialog h2 { font-weight: 800; letter-spacing: -.6px; }
+#gx-cart-dialog .gx-cart-copy h3,
+#gx-cart-dialog .gx-cart-price,
+#gx-cart-dialog .gx-cart-total strong { font-weight: 700; }
+#gx-cart-dialog .gx-cart-submit { font-weight: 700 !important; }
+#gx-cart-phone:-webkit-autofill,
+#gx-cart-phone:-webkit-autofill:hover,
+#gx-cart-phone:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #0d0c19 inset !important;
+  -webkit-text-fill-color: #f6f4ff !important;
+  caret-color: #f6f4ff;
+}
+#gx-cart-phone:autofill {
+  box-shadow: 0 0 0 1000px #0d0c19 inset !important;
+  -webkit-text-fill-color: #f6f4ff !important;
+  caret-color: #f6f4ff;
+}
