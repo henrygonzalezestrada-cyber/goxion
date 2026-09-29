@@ -10,6 +10,7 @@ try{
   for(const [name,engine] of Object.entries({chromium,webkit})){
     const browser=await engine.launch({headless:true});
     const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+    page.on('pageerror', e=>console.error('PAGE',e.message));
     let posts=[], fail=true, remaining=2;
     await page.route('**/*.supabase.co/**',async route=>{
       const url=route.request().url();
@@ -20,6 +21,7 @@ try{
       await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
     });
     await page.goto(origin+'/ayuda.html');
+    await page.waitForFunction(()=>typeof window.catalogGroups==='object');
     await page.evaluate(({services,promo})=>{
       window.catalogGroups={test:{plans:services}};
       document.getElementById('view-catalogo').classList.add('active');

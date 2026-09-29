@@ -48,6 +48,7 @@
     $('gx-cart-success').hidden = true;
     showError('');
     if (!dialog.open) dialog.showModal();
+    dialog.scrollTop = 0;
     render();
   }
   function close() { if (!busy) { dialog.close(); previousFocus?.focus(); } }
@@ -81,7 +82,7 @@
     const detail = (perPeriod ? 'Precio por periodo' : 'Precio total del paquete') + ' · ' +
       (recurring ? 'hasta finalizar campaña' : periods + (periods === 1 ? ' periodo' : ' periodos')) +
       (services.length ? ' · ' + services.join(' + ') : '');
-    carritoPedidos[key] = {title:p.titulo_publico || p.nombre || 'Promoción GOXION', precio:price / 100, cents:price, qty:1, max:1,
+    carritoPedidos[key] = {title:p.nombre || p.titulo_publico || 'Promoción GOXION', precio:price / 100, cents:price, qty:1, max:1,
       unit:services.length > 1 ? 'combo' : unit({nombre:services[0] || ''}), unitPlural:'promociones', detail, promotion:p.id, perPeriod};
     requestId = '';
     render();
