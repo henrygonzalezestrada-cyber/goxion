@@ -33,3 +33,6 @@ jobs:
 
       - name: Browser smoke
         run: npm run test:smoke
+
+      - name: Cart guest and member checkout
+        run: npm run test:cart

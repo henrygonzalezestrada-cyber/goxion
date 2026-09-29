@@ -467,71 +467,14 @@
   }
 
   async function requestPromotion(p,button){
-    const contract=promoContractState(p);
-    if(!contract.enabled) return false;
-
-    const availability=promoAvailability(p);
-    if(!availability.available) return false;
-
-    const token=clientToken();
-
-    const key=window.goxionCurrentClientKey||'';
-    const client=key&&typeof globalClientesData!=='undefined'&&globalClientesData
-      ?globalClientesData[key]
-      :null;
-    const services=(p?.items||[]).map(x=>x?.servicio?.nombre).filter(Boolean);
-    const duration=promoDurationLabel(p);
-    const price=promoPrice(p);
-    const title=publicTitle(p);
-
-    if(button){
-      button.disabled=true;
-      button.textContent='Enviando…';
-    }
-
-    try{
-      const response=await fetch(GXCORE.endpoint('notificar-goxion'),{
-        method:'POST',
-        headers:token
-          ?{'Content-Type':'application/json','X-Client-Token':token}
-          :{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          categoria:'pedidos',
-          titulo:'🎟️ SOLICITUD DE PROMOCIÓN',
-          mensaje:[
-            '**Cliente:** '+String(client?.nombre||'INVITADO (sin Mi Espacio)'),
-            client?.folio?'**Folio:** '+String(client.folio):'',
-            '**Promoción:** '+title,
-            '**Precio:** '+price,
-            '**Duración:** '+duration,
-            services.length?'**Incluye:** '+services.join(' + '):'',
-            '**Disponibilidad al solicitar:** Disponible',
-            '**PROMO_ID:** '+String(p?.id||'')
-          ].filter(Boolean).join('\n'),
-          colorHex:'7c4dff',
-          session_token:token||'',
-          referencia:'promo:'+String(p?.id||'')
-        }),
-        cache:'no-store'
-      });
-      const data=await response.json().catch(()=>({}));
-      if(!response.ok||data?.ok!==true) throw new Error(data?.error||'No fue posible enviar la solicitud.');
-
-      if(button){
-        button.classList.add('is-added');
-        button.textContent='✓ Solicitud enviada';
-      }
+    if(!promoContractState(p).enabled || !promoAvailability(p).available) return false;
+    const added=window.GOXION_CART?.addPromotion(p);
+    if(added && button){
+      button.classList.add('is-added');
+      button.textContent='✓ En tu carrito';
       setTimeout(()=>closePromoDetail(state.expandedCard),520);
-      return true;
-    }catch(error){
-      if(button){
-        button.disabled=false;
-        button.classList.remove('is-added');
-        button.textContent='Contratar ahora';
-      }
-      alert('No se pudo enviar la solicitud.\n\n'+(error?.message||error));
-      return false;
     }
+    return Boolean(added);
   }
 
   function setPromoActionState(card,p,expanded){

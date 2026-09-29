@@ -6,6 +6,7 @@
   "scripts": {
     "verify": "node scripts/verify-integrity.mjs",
     "test:smoke": "node scripts/browser-smoke.mjs",
+    "test:cart": "node scripts/cart-v2-smoke.mjs",
     "serve:preview": "node scripts/serve-preview.mjs"
   }
 }

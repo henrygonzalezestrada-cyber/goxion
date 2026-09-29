@@ -572,72 +572,11 @@
         }
 
         function actualizarCarrito(nombre, precio, cambio, safeId) {
-            if (!carritoPedidos[nombre]) carritoPedidos[nombre] = { precio: precio, qty: 0 };
-            carritoPedidos[nombre].qty += cambio; 
-            if (carritoPedidos[nombre].qty < 0) carritoPedidos[nombre].qty = 0;
-            
-            const qtyEl = document.getElementById('qty-' + safeId);
-            if (qtyEl) qtyEl.innerText = carritoPedidos[nombre].qty; 
-            
-            renderCartFloating();
+            window.GOXION_CART?.changeService(nombre, cambio, safeId);
         }
-
-        // Puente estable para módulos posteriores (promociones, recomendaciones, etc.).
-        window.GOXION_CATALOG_CART = window.GOXION_CATALOG_CART || {
-            add: function(nombre, precio, safeId) {
-                actualizarCarrito(String(nombre || 'Selección GOXION'), Number(precio || 0), 1, String(safeId || 'gx-item'));
-            },
-            render: function() {
-                renderCartFloating();
-            }
+        function renderCartFloating() { window.GOXION_CART?.render(); }
+        function enviarPedidoBase() { window.GOXION_CART?.open(); }
+        window.GOXION_CATALOG_CART = {
+            add: (nombre, precio, safeId) => actualizarCarrito(nombre, precio, 1, safeId),
+            render: renderCartFloating
         };
-
-        function renderCartFloating() {
-            let totalItems = 0, totalPrecio = 0;
-            for (let item in carritoPedidos) { 
-                totalItems += carritoPedidos[item].qty; 
-                totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio); 
-            }
-            const fc = document.getElementById('floating-cart');
-            if (totalItems > 0 && document.getElementById('view-catalogo').classList.contains('active')) {
-                document.getElementById('cart-items-count').innerText = totalItems + (totalItems === 1 ? " perfil" : " perfiles");
-                document.getElementById('cart-total-price').innerText = "$" + totalPrecio + " MXN"; fc.classList.add('show');
-            } else { 
-                fc.classList.remove('show'); 
-            }
-        }
-
-        function enviarPedidoBase() {
-            let msgDiscord = ""; 
-            let totalPrecio = 0;
-            
-            for (let item in carritoPedidos) {
-                if (carritoPedidos[item].qty > 0) { 
-                    msgDiscord += `🛒 **${carritoPedidos[item].qty}x** ${item} ($${carritoPedidos[item].precio * carritoPedidos[item].qty} MXN)\n`; 
-                    totalPrecio += (carritoPedidos[item].qty * carritoPedidos[item].precio); 
-                }
-            }
-            msgDiscord += `\n💰 **Total estimado:** $${totalPrecio} MXN`;
-
-            const key = getCurrentClientKey();
-            let clienteInfo = "👤 **Cliente:** INVITADO (Aún no inicia sesión)";
-            if (key && globalClientesData[key]) {
-                clienteInfo = `👤 **Cliente:** ${globalClientesData[key].nombre}\n📄 **Folio:** ${globalClientesData[key].folio}`;
-            }
-
-            notificarAdmin("pedidos", "🚀 NUEVO PEDIDO RECIBIDO", `${clienteInfo}\n\n${msgDiscord}`, "2ea043");
-
-            const alertContent = document.getElementById('alert-content');
-            const dynamicAlert = document.getElementById('dynamic-alert');
-            
-            alertContent.innerHTML = "<strong>¡Pedido recibido con éxito!</strong><br>Hemos registrado tu solicitud. Te contactaremos en breve o verás los accesos reflejados en tu panel pronto.";
-            dynamicAlert.style.display = 'flex';
-            dynamicAlert.style.background = 'rgba(46, 160, 67, 0.15)'; 
-            dynamicAlert.style.borderColor = 'var(--success-green)';
-            
-            carritoPedidos = {};
-            renderCartFloating();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            setTimeout(() => { dynamicAlert.style.display = 'none'; }, 8000);
-        }

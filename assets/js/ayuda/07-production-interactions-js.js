@@ -184,28 +184,7 @@
         });
     }
 
-    const originalEnviarPedido = typeof enviarPedidoBase === 'function' ? enviarPedidoBase : null;
-    if (typeof originalEnviarPedido === 'function') {
-        window.enviarPedido = function(...args) {
-            const btn = document.querySelector('#floating-cart .cart-btn');
-
-            gxMorphActionButton(btn, '••• Procesando', 'busy', 180).then(() => {
-                originalEnviarPedido.apply(this, args);
-
-                const cart = document.getElementById('floating-cart');
-                if (cart && btn) {
-                    cart.classList.add('show');
-                    gxMorphActionButton(btn, '✓ Pedido enviado', 'success', 220);
-
-                    setTimeout(() => {
-                        cart.classList.remove('show');
-                        btn.classList.remove('gx-action-busy', 'gx-action-success');
-                        btn.innerHTML = 'Enviar Pedido 📲';
-                    }, 780);
-                }
-            });
-        };
-    }
+    window.enviarPedido = function() { window.GOXION_CART?.open(); };
 
     const originalSendSmartWA = typeof sendSmartWABase === 'function' ? sendSmartWABase : null;
     if (typeof originalSendSmartWA === 'function') {
