@@ -1,5 +1,7 @@
 import { createMorph } from "https://esm.sh/morphicons@1.5.0/dom";
 
+window.gxCreateIconMorph = createMorph;
+
 const CHEVRON_DOWN = "M6 9l6 6 6-6";
 const CHEVRON_UP   = "M6 15l6-6 6 6";
 

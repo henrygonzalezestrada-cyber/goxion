@@ -11,11 +11,40 @@
     const key = typeof getCurrentClientKey === 'function' ? getCurrentClientKey() : window.goxionCurrentClientKey;
     return core.getClientToken?.() && key && typeof globalClientesData !== 'undefined' ? globalClientesData[key] : null;
   };
-  let busy = false, previousFocus, requestId = '';
+  const icons = {
+    bag:'M6 7H18L20 21H4L6 7ZM9 7V5A3 3 0 0 1 15 5V7',
+    close:'M6 6L18 18M18 6L6 18',
+    trash:'M4 7H20M9 7V4H15V7M6 7L7 21H17L18 7M10 11V17M14 11V17',
+    plus:'M5 12H19M12 5V19', minus:'M5 12H19',
+    send:'M5 12H19M13 6L19 12L13 18',
+    loading:'M20 12A8 8 0 1 1 12 4', check:'M5 12L10 17L20 7',
+    shield:'M12 3L20 6V12C20 17 12 21 12 21S4 17 4 12V6L12 3ZM8 12L11 15L16 10'
+  };
+  const svg = name => `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${icons[name]}"></path></svg>`;
+  const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const morphs = new WeakMap();
+  function iconTo(host, name) {
+    const path = host?.querySelector('path');
+    if (!path) return;
+    let morph = morphs.get(path);
+    if (!morph && window.gxCreateIconMorph) {
+      morph = window.gxCreateIconMorph(path, path.getAttribute('d'), {reducedMotion:'user'});
+      morphs.set(path, morph);
+    }
+    if (morph) { if (reduced()) morph.set(icons[name]); else morph.morphTo(icons[name], 'snappy'); }
+    else path.setAttribute('d', icons[name]);
+  }
+  const logo = title => {
+    const names = [['prime','prime-video'],['disney','disney'],['crunchyroll','crunchyroll'],['google','google-one'],['hbo','hbo-max'],['max','hbo-max'],['netflix','netflix'],['youtube','youtube'],['microsoft','microsoft'],['vix','vix']];
+    const found = names.find(([name]) => title.toLowerCase().includes(name));
+    return found ? 'logos/' + found[1] + '.PNG' : 'logo2.PNG';
+  };
+  let busy = false, previousFocus, requestId = '', closing = false, editing = false, motion, oldOverflow;
+
   const dialog = document.createElement('dialog');
   dialog.id = 'gx-cart-dialog';
   dialog.setAttribute('aria-labelledby', 'gx-cart-title');
-  dialog.innerHTML = `<div class="gx-cart-shell"><header><div><span class="gx-cart-eyebrow">TU SELECCIÓN · GOXION</span><h2 id="gx-cart-title">Tu próximo plan.</h2><p>Todo claro, antes de comenzar.</p></div><button type="button" class="gx-cart-close" aria-label="Cerrar carrito">×</button></header><form id="gx-cart-form"><div id="gx-cart-lines"></div><section class="gx-cart-contact"><label for="gx-cart-phone">Tu WhatsApp</label><input id="gx-cart-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+52 961 123 4567" aria-describedby="gx-cart-phone-help"><p id="gx-cart-phone-help">Aquí recibirás tus credenciales de acceso. Si tu número es de otro país, incluye el código internacional.</p></section><p id="gx-cart-member" hidden>Tus credenciales se te harán llegar en breve, después de enviar tu solicitud.</p><aside class="gx-cart-trust"><span aria-hidden="true">✦</span><div><strong>Primero tu acceso. Después tu pago.</strong><p>En GOXION somos transparentes: pagas hasta que tengas acceso a tus cuentas.</p></div></aside><footer><div class="gx-cart-total"><span>Total de tu selección</span><strong id="gx-cart-total"></strong></div><p class="gx-cart-caption">MXN · Cada concepto indica su duración. Los paquetes incluyen los periodos señalados; los servicios mensuales incluyen un mes. No se realiza ningún cobro ahora.</p><p id="gx-cart-error" role="alert"></p><button type="submit" class="gx-cart-submit">Enviar solicitud <span aria-hidden="true">↗</span></button><p class="gx-cart-caption">Confirmaremos disponibilidad al asignar tus accesos.</p></footer></form><section id="gx-cart-success" hidden tabindex="-1"><div class="gx-cart-check">✓</div><h3>¡Solicitud recibida!</h3><p id="gx-cart-success-text"></p><p>Recuerda: pagas cuando tengas acceso a tus cuentas.</p><button type="button" class="gx-cart-submit gx-cart-done">Seguir explorando</button></section></div>`;
+  dialog.innerHTML = `<div class="gx-cart-shell"><header><div class="gx-cart-heading"><span class="gx-cart-bag">${svg('bag')}</span><h2 id="gx-cart-title">Tu carrito</h2><span id="gx-cart-count"></span></div><button type="button" class="gx-cart-close" aria-label="Cerrar carrito">${svg('close')}</button></header><form id="gx-cart-form"><div class="gx-cart-scroll"><div id="gx-cart-lines"></div><section class="gx-cart-contact"><label for="gx-cart-phone">WhatsApp para tus accesos</label><input id="gx-cart-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="+52 961 123 4567" aria-describedby="gx-cart-phone-help"><p id="gx-cart-phone-help">México: 10 dígitos. Otro país: incluye + y código.</p></section><p id="gx-cart-member" hidden>Recibirás tus credenciales en breve.</p></div><footer><div class="gx-cart-trust">${svg('shield')}<span>En GOXION, primero tu acceso; después tu pago.</span></div><div class="gx-cart-total"><span>Total <small>MXN</small></span><strong id="gx-cart-total" aria-live="polite"></strong></div><p class="gx-cart-caption">Paquetes completos y servicios mensuales.</p><p id="gx-cart-error" role="alert"></p><button type="submit" class="gx-cart-submit"><span class="gx-cart-submit-label">Enviar solicitud</span><span class="gx-cart-send-icon">${svg('send')}</span></button></footer></form><section id="gx-cart-success" hidden tabindex="-1"><div class="gx-cart-check">${svg('check')}</div><h3>¡Todo listo!</h3><p id="gx-cart-success-text"></p><p>Pagas cuando tengas acceso.</p><button type="button" class="gx-cart-submit gx-cart-done">Seguir explorando ${svg('send')}</button></section></div>`;
   document.body.append(dialog);
   const $ = id => document.getElementById(id);
   function showError(message) { $('gx-cart-error').textContent = message; }
@@ -34,24 +63,76 @@
       if (el) el.textContent = carritoPedidos[p.nombre]?.qty || 0;
     }
     if (!dialog.open) return;
-    $('gx-cart-lines').innerHTML = items.length ? items.map(([key, x]) => `<article class="gx-cart-line"><div class="gx-cart-line-top"><div><span class="gx-cart-kind">${x.promotion ? 'PROMOCIÓN' : 'SERVICIO'}</span><h3>${escape(x.title)}</h3><p>${escape(x.detail)}</p><p>${escape(x.qty + ' ' + (x.qty > 1 ? x.unitPlural : x.unit))} · ${money(x.cents)} c/u</p></div><strong>${money(x.cents * x.qty)}</strong></div><div class="gx-cart-line-bottom"><div class="gx-cart-stepper"><button type="button" data-key="${escape(key)}" data-delta="-1" aria-label="Quitar uno de ${escape(x.title)}">−</button><span>${x.qty}</span><button type="button" data-key="${escape(key)}" data-delta="1" ${x.qty >= x.max ? 'disabled' : ''} aria-label="Agregar uno de ${escape(x.title)}">+</button></div><button class="gx-cart-remove" type="button" data-key="${escape(key)}" data-remove>Eliminar</button></div></article>`).join('') : '<p class="gx-cart-empty">Tu carrito está listo para algo nuevo.<br>Agrega servicios o promociones desde el catálogo.</p>';
-    $('gx-cart-total').textContent = money(total());
+    const list = $('gx-cart-lines');
+    const oldRows = new Map(Array.from(list.querySelectorAll('.gx-cart-line')).map(row => [row.dataset.cartKey, {row, top:row.getBoundingClientRect().top}]));
+    list.querySelector('.gx-cart-empty')?.remove();
+    for (const [index, [key, x]] of items.entries()) {
+      let row = oldRows.get(key)?.row;
+      const fresh = !row;
+      if (!row) { row = document.createElement('article'); row.className = 'gx-cart-line'; row.dataset.cartKey = key; }
+      const description = x.promotion
+        ? (x.summary || x.detail)
+        : 'Mensual';
+      const markup = `<img class="gx-cart-logo" src="${logo(x.title)}" alt=""><div class="gx-cart-copy"><h3>${escape(x.title)}</h3><p>${escape(x.qty + ' ' + (x.qty > 1 ? x.unitPlural : x.unit))} · ${escape(description)}</p></div><strong class="gx-cart-price">${money(x.cents*x.qty)}</strong><div class="gx-cart-line-bottom"><span class="gx-cart-unit-price">${x.qty > 1 ? money(x.cents) + ' c/u' : ''}</span><div class="gx-cart-stepper"><button type="button" data-key="${escape(key)}" data-delta="-1" aria-label="Quitar uno de ${escape(x.title)}">${svg('minus')}</button><span>${x.qty}</span><button type="button" data-key="${escape(key)}" data-delta="1" ${x.qty >= x.max ? 'disabled' : ''} aria-label="Agregar uno de ${escape(x.title)}">${svg('plus')}</button></div><button class="gx-cart-remove" type="button" data-key="${escape(key)}" data-remove aria-label="Eliminar ${escape(x.title)}">${svg('trash')}</button></div>`;
+      if (row._markup !== markup) {
+        row.innerHTML = markup; row._markup = markup;
+        if (!fresh && !reduced()) for (const node of row.querySelectorAll('.gx-cart-price,.gx-cart-stepper span')) node.animate([{opacity:.3,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:260,easing:'cubic-bezier(.16,1,.3,1)'});
+      }
+      row.style.setProperty('--row-delay', index * 45 + 'ms');
+      list.append(row);
+    }
+    for (const [key, {row}] of oldRows) if (!items.some(([id]) => key === id)) row.remove();
+    if (!items.length) list.innerHTML = `<p class="gx-cart-empty">${svg('bag')}Elige algo para ti en el catálogo.</p>`;
+    if (!reduced()) for (const {row, top} of oldRows.values()) if (row.isConnected) {
+      const delta = top - row.getBoundingClientRect().top;
+      if (Math.abs(delta)>1) row.animate([{transform:`translateY(${delta}px)`},{transform:'translateY(0)'}],{duration:320,easing:'cubic-bezier(.16,1,.3,1)'});
+    }
+    const amount = money(total());
+    if ($('gx-cart-total').textContent !== amount) {
+      $('gx-cart-total').textContent = amount;
+      if (!reduced()) $('gx-cart-total').animate([{opacity:.4,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:280});
+    }
+    $('gx-cart-count').textContent = count;
     const logged = Boolean(client());
     dialog.querySelector('.gx-cart-contact').hidden = logged;
     $('gx-cart-phone').required = !logged;
     $('gx-cart-member').hidden = !logged;
     dialog.querySelector('button[type=submit]').disabled = busy || !items.length;
   }
-  function open() {
-    previousFocus = document.activeElement;
-    $('gx-cart-form').hidden = false;
-    $('gx-cart-success').hidden = true;
-    showError('');
-    if (!dialog.open) dialog.showModal();
-    dialog.scrollTop = 0;
-    render();
+  function originTransform() {
+    const target = $('floating-cart');
+    if (!target?.classList.contains('show')) return 'translateY(28px) scale(.94)';
+    const from = target.getBoundingClientRect(), to = dialog.getBoundingClientRect();
+    return `translate(${from.left+from.width/2-to.left-to.width/2}px,${from.top+from.height/2-to.top-to.height/2}px) scale(${Math.min(1,from.width/to.width)},${Math.max(.08,from.height/to.height)})`;
   }
-  function close() { if (!busy) { dialog.close(); previousFocus?.focus(); } }
+  function open() {
+    if (dialog.open) return;
+    previousFocus = document.activeElement;
+    $('gx-cart-form').hidden = false; $('gx-cart-success').hidden = true;
+    showError(''); closing = false;
+    oldOverflow = document.body.style.overflow; document.body.style.overflow = 'hidden';
+    dialog.showModal();
+    dialog.classList.remove('is-closing'); dialog.classList.add('is-opening');
+    dialog.querySelector('.gx-cart-scroll').scrollTop = 0;
+    render();
+    iconTo(dialog.querySelector('.gx-cart-bag'), 'bag');
+    iconTo(dialog.querySelector('.gx-cart-close'), 'close');
+    if (!reduced()) {
+      motion = dialog.animate([{transform:originTransform(),opacity:.35,borderRadius:'36px'},{transform:'none',opacity:1,borderRadius:'26px'}],{duration:480,easing:'cubic-bezier(.16,1,.3,1)'});
+      motion.finished.catch(()=>{}).then(()=>dialog.classList.remove('is-opening'));
+    } else dialog.classList.remove('is-opening');
+  }
+  async function close() {
+    if (busy || closing || !dialog.open) return;
+    closing = true; motion?.cancel();
+    dialog.classList.remove('is-opening'); dialog.classList.add('is-closing');
+    iconTo(dialog.querySelector('.gx-cart-close'), 'bag');
+    if (!reduced()) {
+      motion = dialog.animate([{transform:'none',opacity:1},{transform:originTransform(),opacity:0,borderRadius:'36px'}],{duration:320,easing:'cubic-bezier(.4,0,.6,1)'});
+      await motion.finished.catch(()=>{});
+    }
+    dialog.close(); dialog.classList.remove('is-closing'); closing = false;
+  }
   function changeService(name, delta) {
     if (busy) return false;
     const plan = plans().find(x => x.nombre === name);
@@ -83,21 +164,29 @@
       (recurring ? 'hasta finalizar campaña' : periods + (periods === 1 ? ' periodo' : ' periodos')) +
       (services.length ? ' · ' + services.join(' + ') : '');
     carritoPedidos[key] = {title:p.nombre || p.titulo_publico || 'Promoción GOXION', precio:price / 100, cents:price, qty:1, max:1,
-      unit:services.length > 1 ? 'combo' : unit({nombre:services[0] || ''}), unitPlural:'promociones', detail, promotion:p.id, perPeriod};
+      unit:services.length > 1 ? 'combo' : unit({nombre:services[0] || ''}), unitPlural:'promociones', detail, summary:recurring ? 'Por mes · hasta fin de campaña' : perPeriod ? 'Por mes · ' + periods + ' periodo' + (periods>1?'s':'') : 'Paquete · ' + periods + (periods===1?' mes':' meses'), promotion:p.id, perPeriod};
     requestId = '';
     render();
     return true;
   }
   dialog.querySelector('.gx-cart-close').addEventListener('click', close);
   dialog.querySelector('.gx-cart-done').addEventListener('click', close);
-  dialog.addEventListener('cancel', e => { if (busy) e.preventDefault(); });
-  dialog.addEventListener('close', () => previousFocus?.focus());
-  dialog.addEventListener('click', e => {
+  dialog.addEventListener('cancel', e => { e.preventDefault(); close(); });
+  dialog.addEventListener('close', () => { document.body.style.overflow = oldOverflow || ''; previousFocus?.focus(); });
+  dialog.addEventListener('click', async e => {
     if (e.target === dialog) { const r = dialog.getBoundingClientRect(); if(e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) close(); }
     const btn = e.target.closest('[data-key]');
-    if (!btn || busy) return;
+    if (!btn || busy || editing || closing) return;
     const key = btn.dataset.key, item = carritoPedidos[key];
     if (!item) return;
+    const removing = btn.hasAttribute('data-remove') || (btn.dataset.delta === '-1' && item.qty === 1);
+    if (removing && !reduced()) {
+      editing = true;
+      const row = btn.closest('.gx-cart-line');
+      iconTo(btn, 'close');
+      await row.animate([{opacity:1,transform:'translateX(0)'},{opacity:0,transform:'translateX(35px) scale(.96)'}],{duration:200,easing:'ease-in',fill:'forwards'}).finished.catch(()=>{});
+      editing = false;
+    }
     if (btn.hasAttribute('data-remove')) item.qty = 0;
     else if (item.promotion) item.qty = Math.max(0, Math.min(item.max, item.qty + Number(btn.dataset.delta)));
     else changeService(key, Number(btn.dataset.delta));
@@ -108,7 +197,7 @@
   });
   $('gx-cart-form').addEventListener('submit', async e => {
     e.preventDefault();
-    if (busy || !entries().length) return;
+    if (busy || editing || closing || !entries().length) return;
     const customer = client();
     let phone = $('gx-cart-phone').value.replace(/[^\d+]/g, '');
     if (!customer) {
@@ -117,7 +206,8 @@
     }
     busy = true; showError(''); render();
     const submit = dialog.querySelector('button[type=submit]');
-    submit.textContent = 'Enviando tu solicitud…';
+    submit.querySelector('.gx-cart-submit-label').textContent = 'Enviando';
+    submit.classList.add('is-sending'); iconTo(submit, 'loading');
     const token = core.getClientToken?.() || localStorage.getItem(core.STORAGE.CLIENT_TOKEN) || '';
     const headers = {'Content-Type':'application/json', ...(token ? {'X-Client-Token':token} : {})};
     const controller = new AbortController();
@@ -164,12 +254,14 @@
       $('gx-cart-form').hidden = true;
       $('gx-cart-success').hidden = false;
       $('gx-cart-success-text').textContent = customer ? 'Tus credenciales se te harán llegar en breve.' : 'Te haremos llegar tus credenciales en breve al WhatsApp ' + phone + '.';
+      iconTo(dialog.querySelector('.gx-cart-check'), 'check');
+      if (!reduced()) $('gx-cart-success').animate([{opacity:0,transform:'translateY(18px) scale(.96)'},{opacity:1,transform:'none'}],{duration:500,easing:'cubic-bezier(.16,1,.3,1)'});
       $('gx-cart-success').focus();
       requestId = '';
     } catch (error) {
       showError(error.name === 'AbortError' ? 'El servidor tardó en responder. No pudimos confirmar el envío; tu selección se conserva.' : error.message);
     } finally {
-      clearTimeout(timeout); busy = false; submit.innerHTML = 'Enviar solicitud <span aria-hidden="true">↗</span>'; render();
+      clearTimeout(timeout); busy = false; submit.classList.remove('is-sending'); submit.querySelector('.gx-cart-submit-label').textContent = 'Enviar solicitud'; iconTo(submit, 'send'); render();
     }
   });
   window.GOXION_CART = {open, render, changeService, addPromotion};
