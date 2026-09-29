@@ -9,7 +9,7 @@ try{
   for(let i=0;i<50;i++){try{if((await fetch(origin)).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
   for(const [name,engine] of Object.entries({chromium,webkit})){
     const browser=await engine.launch({headless:true});
-    const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
+    const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'no-preference'});
     page.on('pageerror', e=>console.error('PAGE',e.message));
     let posts=[], fail=true, remaining=2;
     await page.route('**/*.supabase.co/**',async route=>{
@@ -30,10 +30,15 @@ try{
       GOXION_CART.changeService('Crunchyroll cuenta completa',1);
       GOXION_CART.addPromotion(promo);GOXION_CART.open();
     },{services,promo});
+    await page.waitForTimeout(550);
+    await page.screenshot({path:`/tmp/goxion-cart-compact-${name}.png`});
+    const layout = await page.evaluate(()=>{ const d=document.getElementById('gx-cart-dialog').getBoundingClientRect(); const f=document.querySelector('#gx-cart-dialog footer').getBoundingClientRect(); return {width:d.width,height:d.height,footer:f.bottom,viewport:innerHeight,rows:[...document.querySelectorAll('.gx-cart-line')].map(x=>x.getBoundingClientRect().height)}; });
+    console.log('Layout',layout);
+    assert.ok(layout.rows.every(h=>h<135)); assert.ok(layout.footer<layout.viewport);
     assert.match(await page.locator('#gx-cart-total').innerText(),/377/);
     assert.match(await page.locator('#gx-cart-lines').innerText(),/2 perfiles/);
     assert.match(await page.locator('#gx-cart-lines').innerText(),/1 cuenta completa/);
-    assert.match(await page.locator('#gx-cart-lines').innerText(),/Precio total del paquete · 3 periodos/);
+    assert.match(await page.locator('#gx-cart-lines').innerText(),/Paquete · 3 meses/);
     await page.locator('#gx-cart-phone').fill('123');
     await page.locator('#gx-cart-form button[type=submit]').click();
     assert.equal(posts.length,0);
@@ -58,6 +63,7 @@ try{
     assert.match(posts[1].mensaje,/377/);
     assert.equal(posts[1].categoria,'pedidos');
     await page.locator('.gx-cart-done').click();
+    await page.waitForFunction(()=>!document.getElementById('gx-cart-dialog').open);
     await page.evaluate(({services})=>{
       localStorage.setItem(GOXION_CORE.STORAGE.CLIENT_TOKEN,'test-token');
       window.goxionCurrentClientKey='cart-test';
