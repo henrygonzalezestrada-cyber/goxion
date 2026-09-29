@@ -434,10 +434,11 @@ for (const absolute of walk(jsRoot)) {
   if (!promoCatalog.includes('Fase 2: la tarjeta adopta el layout cerrado REAL mientras sigue fija y grande')) {
     fail('Ayuda C9: el cierre no prepara el layout cerrado real antes de contraer.');
   }
-  if (!promoCatalog.includes("GXCORE.endpoint('notificar-goxion')") ||
-      !promoCatalog.includes('SOLICITUD DE PROMOCIÓN') ||
-      !promoCatalog.includes('requestPromotion')) {
-    fail('Ayuda promociones: Contratar ahora no genera solicitud administrativa.');
+  const cartV2 = readFileSync(join(ROOT, 'assets/js/ayuda/16-cart-v2.js'), 'utf8');
+  if (!promoCatalog.includes('GOXION_CART?.addPromotion(p)') ||
+      !cartV2.includes("core.endpoint('notificar-goxion')") ||
+      !cartV2.includes("data.ok !== true")) {
+    fail('Ayuda carrito: falta integración promocional o confirmación del pedido.');
   }
   if (!promoCatalog.includes('promoAvailability') ||
       !promoCatalog.includes("'1 disponible'") ||
