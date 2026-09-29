@@ -15,15 +15,15 @@ try{
     await page.route('**/*.supabase.co/**',async route=>{
       const url=route.request().url();
       let data={ok:true};
+      if(url.includes('/mi-espacio'))data={ok:true,catalogo:services};
       if(url.includes('promociones-catalogo'))data={ok:true,promociones:[promo]};
       if(url.includes('inventario-publico'))data={ok:true,inventario:services.map(s=>({...s,disponibles:s.id==='disney'?remaining:s.disponibles}))};
       if(url.includes('notificar-goxion')){posts.push(route.request().postDataJSON());data=fail?{ok:false,error:'Prueba de error del servidor'}:{ok:true};}
       await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)});
     });
     await page.goto(origin+'/ayuda.html');
-    await page.waitForFunction(()=>typeof window.catalogGroups==='object');
+    await page.waitForFunction(()=>Object.values(window.catalogGroups||{}).flatMap(x=>x.plans||[]).some(x=>x.id==='disney'));
     await page.evaluate(({services,promo})=>{
-      window.catalogGroups={test:{plans:services}};
       document.getElementById('view-catalogo').classList.add('active');
       GOXION_CART.changeService('Disney+ Premium',1);GOXION_CART.changeService('Disney+ Premium',1);
       GOXION_CART.changeService('Disney+ Premium',1); // cap at two
@@ -40,7 +40,8 @@ try{
     await page.locator('#gx-cart-phone').fill('9611234567');
     remaining=1;
     await page.locator('#gx-cart-form button[type=submit]').click();
-    await page.waitForFunction(()=>document.getElementById('gx-cart-error').textContent.includes('cupos'));
+    await page.waitForFunction(()=>Boolean(document.getElementById('gx-cart-error').textContent));
+    assert.match(await page.locator('#gx-cart-error').innerText(),/cupos/);
     assert.equal(posts.length,0);
     remaining=2;
     await page.locator('#gx-cart-form button[type=submit]').click();
@@ -58,7 +59,6 @@ try{
     assert.equal(posts[1].categoria,'pedidos');
     await page.locator('.gx-cart-done').click();
     await page.evaluate(({services})=>{
-      window.catalogGroups={test:{plans:services}};
       localStorage.setItem(GOXION_CORE.STORAGE.CLIENT_TOKEN,'test-token');
       window.goxionCurrentClientKey='cart-test';
       globalClientesData['cart-test']={nombre:'Cliente Prueba',folio:'TEST'};
