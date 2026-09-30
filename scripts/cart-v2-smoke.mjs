@@ -30,7 +30,10 @@ try{
       GOXION_CART.changeService('Crunchyroll cuenta completa',1);
       GOXION_CART.addPromotion(promo);GOXION_CART.open();
     },{services,promo});
-    await page.waitForTimeout(550);
+    await page.waitForFunction(()=>{
+      const dialog=document.getElementById('gx-cart-dialog');
+      return dialog.open && !dialog.classList.contains('is-opening');
+    },null,{timeout:10000});
     await page.screenshot({path:`/tmp/goxion-cart-compact-${name}.png`});
     const layout = await page.evaluate(()=>{ const d=document.getElementById('gx-cart-dialog').getBoundingClientRect(); const f=document.querySelector('#gx-cart-dialog footer').getBoundingClientRect(); return {width:d.width,height:d.height,footer:f.bottom,viewport:innerHeight,rows:[...document.querySelectorAll('.gx-cart-line')].map(x=>x.getBoundingClientRect().height)}; });
     console.log('Layout',layout);

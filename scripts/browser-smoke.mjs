@@ -809,6 +809,7 @@ async function runAyuda(browser, browserName, errors) {
     const value=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
     window.__gxC9Closed={
       height:r.height,
+      cssHeight:parseFloat(getComputedStyle(card).height),
       actionBottomGap:action?r.bottom-action.bottom:null,
       valueTop:value?value.top-r.top:null
     };
@@ -818,10 +819,19 @@ async function runAyuda(browser, browserName, errors) {
   });
 
   await page.waitForFunction(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
     const action=card?.querySelector('[data-gx-promo-action]');
-    return !!card && !!action && action.textContent.trim()==='Contratar ahora';
-  },null,{timeout:3200}).catch(()=>{});
+    return !!card && !!action && action.textContent.trim()==='Contratar ahora' &&
+      card.style.height && Math.abs(card.getBoundingClientRect().height-parseFloat(card.style.height))<1;
+  },null,{timeout:5000}).catch(async error=>{
+    console.log('C9 apertura',await page.evaluate(()=>[...document.querySelectorAll('.gx-promo-deck-card')].map(card=>({
+      classes:card.className,token:card.dataset.gxSmokeToken,parent:card.parentElement?.id||card.parentElement?.tagName,
+      action:card.querySelector('[data-gx-promo-action]')?.textContent,inlineHeight:card.style.height,
+      height:card.getBoundingClientRect().height,cssHeight:getComputedStyle(card).height,
+      bound:card.querySelector('[data-gx-promo-action]')?.dataset.gxDirectBound
+    }))));
+    throw error;
+  });
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
     if(!card) return false;
@@ -890,7 +900,14 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
   );
-  await page.waitForTimeout(760);
+  // Medir el retorno desde un frame de la transición, no desde el reloj del runner.
+  await page.waitForFunction(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
+    if(!card) return false;
+    const target=window.__gxC9Closed.cssHeight;
+    return Math.abs(parseFloat(card.style.height)-target)<1 &&
+      Math.abs(card.getBoundingClientRect().height-target)<1;
+  },null,{timeout:3000});
 
   const midClose=await page.evaluate(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
