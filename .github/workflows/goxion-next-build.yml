@@ -1,0 +1,49 @@
+name: GOXION Next · Build Check
+
+on:
+  push:
+    branches: [goxion-next]
+    paths:
+      - 'goxion-next/**'
+      - '.github/workflows/goxion-next-build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'goxion-next/**'
+      - '.github/workflows/goxion-next-build.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: goxion-next
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build GOXION Next
+        run: npm run build
+
+      - name: Verify GOXION Next output
+        run: npm run verify
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: goxion-next-dist
+          path: goxion-next/dist
+          if-no-files-found: error
