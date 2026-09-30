@@ -809,6 +809,7 @@ async function runAyuda(browser, browserName, errors) {
     const value=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
     window.__gxC9Closed={
       height:r.height,
+      cssHeight:parseFloat(getComputedStyle(card).height),
       actionBottomGap:action?r.bottom-action.bottom:null,
       valueTop:value?value.top-r.top:null
     };
@@ -820,7 +821,8 @@ async function runAyuda(browser, browserName, errors) {
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
     const action=card?.querySelector('[data-gx-promo-action]');
-    return !!card && !!action && action.textContent.trim()==='Contratar ahora';
+    return !!card && !!action && action.textContent.trim()==='Contratar ahora' &&
+      card.style.height && Math.abs(card.getBoundingClientRect().height-parseFloat(card.style.height))<1;
   },null,{timeout:5000});
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
@@ -894,9 +896,9 @@ async function runAyuda(browser, browserName, errors) {
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
     if(!card) return false;
-    const height=card.getAnimations().find(a=>a.transitionProperty==='height');
-    const timing=height?.effect?.getComputedTiming();
-    return timing && timing.progress>=.94;
+    const target=window.__gxC9Closed.cssHeight;
+    return Math.abs(parseFloat(card.style.height)-target)<1 &&
+      Math.abs(card.getBoundingClientRect().height-target)<1;
   },null,{timeout:3000});
 
   const midClose=await page.evaluate(() => {
