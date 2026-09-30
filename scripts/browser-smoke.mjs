@@ -823,7 +823,15 @@ async function runAyuda(browser, browserName, errors) {
     const action=card?.querySelector('[data-gx-promo-action]');
     return !!card && !!action && action.textContent.trim()==='Contratar ahora' &&
       card.style.height && Math.abs(card.getBoundingClientRect().height-parseFloat(card.style.height))<1;
-  },null,{timeout:5000});
+  },null,{timeout:5000}).catch(async error=>{
+    console.log('C9 apertura',await page.evaluate(()=>[...document.querySelectorAll('.gx-promo-deck-card')].map(card=>({
+      classes:card.className,token:card.dataset.gxSmokeToken,parent:card.parentElement?.id||card.parentElement?.tagName,
+      action:card.querySelector('[data-gx-promo-action]')?.textContent,inlineHeight:card.style.height,
+      height:card.getBoundingClientRect().height,cssHeight:getComputedStyle(card).height,
+      bound:card.querySelector('[data-gx-promo-action]')?.dataset.gxDirectBound
+    }))));
+    throw error;
+  });
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
     if(!card) return false;
