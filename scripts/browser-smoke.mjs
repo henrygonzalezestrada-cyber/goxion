@@ -818,10 +818,10 @@ async function runAyuda(browser, browserName, errors) {
   });
 
   await page.waitForFunction(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
+    const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
     const action=card?.querySelector('[data-gx-promo-action]');
     return !!card && !!action && action.textContent.trim()==='Contratar ahora';
-  },null,{timeout:3200}).catch(()=>{});
+  },null,{timeout:5000});
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
     if(!card) return false;
@@ -890,7 +890,14 @@ async function runAyuda(browser, browserName, errors) {
   await page.evaluate(() =>
     document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
   );
-  await page.waitForTimeout(760);
+  // Medir el retorno desde un frame de la transición, no desde el reloj del runner.
+  await page.waitForFunction(() => {
+    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
+    if(!card) return false;
+    const height=card.getAnimations().find(a=>a.transitionProperty==='height');
+    const timing=height?.effect?.getComputedTiming();
+    return timing && timing.progress>=.94;
+  },null,{timeout:3000});
 
   const midClose=await page.evaluate(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
