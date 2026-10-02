@@ -809,7 +809,15 @@
     },110);
 
     // Al terminar, sólo devolvemos el mismo nodo al deck: ya no hay cambio de composición.
-    setTimeout(()=>{
+    setTimeout(async()=>{
+      if(card!==state.expandedCard) return;
+      // WebKit puede iniciar los frames después del temporizador: terminar el
+      // retorno geométrico antes de mover el nodo evita un salto al reinsertarlo.
+      const transitions=card.getAnimations().filter(animation=>
+        Number.isFinite(animation.effect?.getComputedTiming().endTime)
+      );
+      await Promise.allSettled(transitions.map(animation=>animation.finished));
+      await new Promise(resolve=>requestAnimationFrame(resolve));
       if(card!==state.expandedCard) return;
 
       card.classList.remove('is-closing','is-returning');
