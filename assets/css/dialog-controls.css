@@ -95,3 +95,8 @@
 @media(prefers-reduced-motion:reduce) { .gx-welcome-terms summary span { transition:none!important; } }
 
 #gx-welcome-modal .gx-welcome-sheet { max-height:calc(100dvh - 32px);overflow-y:auto!important;scrollbar-width:thin; }
+
+/* Etiquetas flotantes sin placa de color al enfocar o completar el campo. */
+#gx-welcome-modal .gx-welcome-form .gx-welcome-float-shell.is-float .gx-welcome-float-label {
+  background:transparent;
+}
