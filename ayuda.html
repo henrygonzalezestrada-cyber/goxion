@@ -34,7 +34,7 @@
 
 
 <link rel="stylesheet" href="./assets/css/cart-v2.css?v=compact3">
-<link rel="stylesheet" href="./assets/css/dialog-controls.css?v=1">
+<link rel="stylesheet" href="./assets/css/dialog-controls.css?v=2">
 </head>
 <body class="no-scroll">
 <div id="splash-screen" onclick="hideSplash()">
@@ -200,7 +200,8 @@
                     🎁 Únete hoy y obtén -10% OFF
                 </button>
                 <div class="gx-welcome-eligibility-note">
-                    Exclusivo para clientes completamente nuevos.
+                    <span>Clientes nuevos · Perfiles individuales</span>
+                    <span class="gx-welcome-exclusions">Sin promociones, combos ni cuentas completas.</span>
                     <button type="button" onclick="openAuthSheet()">¿Ya eras cliente? Recupera tu acceso</button>
                 </div>
 </div>
@@ -357,7 +358,7 @@
     <p class="gx-new-client-copy">Aún no tienes servicios contratados. Explora el catálogo y elige el primero para comenzar a disfrutar GOXION.</p>
     <div class="gx-new-client-benefit">
         <span class="gx-new-client-benefit-value">−10%</span>
-        <span class="gx-new-client-benefit-copy"><strong>Bienvenida disponible</strong><small>Se aplicará a tu primera alta elegible.</small></span>
+        <span class="gx-new-client-benefit-copy"><strong>Bienvenida disponible</strong><small>En tu primera alta de perfiles individuales. Sin promociones, combos ni cuentas completas.</small></span>
     </div>
     <button type="button" class="gx-new-client-cta" onclick="switchTab('catalogo')">
         <span>Explorar catálogo</span>
@@ -636,8 +637,8 @@
     <section class="gx-welcome-sheet">
         <button class="gx-welcome-close" type="button" onclick="gxCloseWelcomeRegistration()">×</button>
         <div class="gx-welcome-eyebrow">Bienvenida GOXION</div>
-        <h3>Obtén -10% en tu alta</h3>
-        <p class="gx-welcome-copy">Exclusivo para quienes <strong>nunca han sido clientes</strong> de SD Streaming ni GOXION. Si tu solicitud es aprobada, recibirás por WhatsApp tu GOXION ID y código de activación.</p>
+        <h3>Tu bienvenida con −10%</h3>
+        <p class="gx-welcome-copy">Solo perfiles individuales, <strong>uno o varios</strong>, en tu primera alta.</p>
 
         <div id="gx-welcome-form" class="gx-welcome-form">
             <label class="gx-welcome-float-shell">
@@ -648,7 +649,7 @@
                 <input class="gx-welcome-float-input" id="gx-welcome-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="961 000 0000">
                 <span class="gx-welcome-float-label">WhatsApp</span>
             </label>
-            <div class="gx-welcome-rule"><b>Importante</b><span>Si ya tenías usuario, PIN o servicios con nosotros, tu espacio sigue siendo válido. El -10% se activa únicamente al completar un alta nueva autorizada.</span></div>
+            <div class="gx-welcome-rule gx-welcome-scope"><b>Solo clientes nuevos</b><span>No aplica a promociones, combos ni cuentas completas.</span><details class="gx-welcome-terms"><summary>Condiciones <span aria-hidden="true">+</span></summary><p>El −10% se calcula únicamente sobre el precio de un perfil individual o la suma de varios perfiles individuales elegibles.</p><p>Exclusivo para quienes nunca han sido clientes de SD Streaming ni GOXION. Requiere un alta nueva autorizada. Si se aprueba, recibirás tu ID y código de activación por WhatsApp.</p><p>¿Ya tienes usuario, PIN o servicios? Tu espacio sigue siendo válido.</p></details></div>
             <button id="gx-welcome-submit" class="gx-welcome-submit" type="button" onclick="gxSubmitWelcomeRegistration(event)"><span class="gx-welcome-submit-label">Validar y solicitar</span></button>
         </div>
 
@@ -816,6 +817,6 @@
 <script id="goxion-ui-harmony-production-script" src="./assets/js/ayuda/14-ui-harmony-production-script.js"></script>
 <script id="goxion-promotions-catalog-c1" src="./assets/js/ayuda/15-promotions-catalog-c1.js?v=cart2"></script>\n
 
-<script src="./assets/js/ayuda/16-cart-v2.js?v=compact3"></script>
+<script src="./assets/js/ayuda/16-cart-v2.js?v=glass1"></script>
 </body>
 </html>
