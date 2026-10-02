@@ -1635,20 +1635,25 @@ async function runBrowserStage(browserType, browserName, stageName, runner, erro
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
     let browser;
+    const attemptErrors=[];
     try {
       browser = await browserType.launch({ headless: true });
-      await runner(browser, browserName, errors);
+      await runner(browser, browserName, attemptErrors);
+      errors.push(...attemptErrors);
       return;
     } catch (error) {
       lastError = error;
       const message = String(error?.stack || error?.message || error);
       const closedUnexpectedly =
         message.includes('Target page, context or browser has been closed') ||
-        message.includes('Browser has been closed');
+        message.includes('Browser has been closed') ||
+        message.includes('Target crashed');
 
       if (!(browserName === 'WebKit' && closedUnexpectedly && attempt < attempts)) {
+        errors.push(...attemptErrors);
         break;
       }
+      console.warn(`${browserName} · ${stageName}: proceso interrumpido; repitiendo la etapa completa (${attempt+1}/${attempts}).`);
     } finally {
       await browser?.close().catch(() => {});
     }
