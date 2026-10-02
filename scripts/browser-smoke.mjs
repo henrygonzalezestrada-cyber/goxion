@@ -896,28 +896,19 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: C9 expandido no quedó ordenado/scrollable/compacto. ${JSON.stringify(expanded)}`);
   }
 
-  // Cierre: justo antes del final la composición ya debe coincidir con la cerrada.
-  await page.evaluate(() =>
-    document.querySelector('body > .gx-promo-deck-card.is-expanded [data-gx-promo-close]')?.click()
-  );
-  // Medir el retorno desde un frame de la transición, no desde el reloj del runner.
-  await page.waitForFunction(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
-    if(!card) return false;
-    const target=window.__gxC9Closed.cssHeight;
-    return Math.abs(parseFloat(card.style.height)-target)<1 &&
-      Math.abs(card.getBoundingClientRect().height-target)<1;
-  },null,{timeout:3000});
-
-  const midClose=await page.evaluate(() => {
-    const card=document.querySelector('body > .gx-promo-deck-card.is-returning[data-gx-smoke-token="c9-card"]');
-    if(!card)return null;
+  // Capturar cada frame dentro del navegador evita perder el último estado
+  // de retorno por la latencia entre comandos del runner y WebKit.
+  await page.evaluate(() => {
+    window.__gxC9LastReturn=null;
+    const sample=()=>{
+      const card=window.__gxPromoSmokeCard;
+      if(card.classList.contains('is-returning')){
     const r=card.getBoundingClientRect();
     const action=card.querySelector('[data-gx-promo-action]')?.getBoundingClientRect();
     const value=card.querySelector('.gx-promo-value-stack')?.getBoundingClientRect();
     const detail=card.querySelector('.gx-promo-morph-detail');
     const closed=window.__gxC9Closed||{};
-    return {
+    window.__gxC9LastReturn = {
       returning:card.classList.contains('is-returning'),
       actionText:(card.querySelector('[data-gx-promo-action]')?.textContent||'').trim(),
       heightDiff:Math.abs(r.height-(closed.height||0)),
@@ -925,7 +916,17 @@ async function runAyuda(browser, browserName, errors) {
       valueTopDiff:value&&closed.valueTop!=null?Math.abs((value.top-r.top)-closed.valueTop):999,
       detailOpacity:detail?parseFloat(getComputedStyle(detail).opacity):1
     };
-  }).catch(()=>null);
+      }
+      if(card.parentElement?.id!=='gx-promo-deck') requestAnimationFrame(sample);
+    };
+    requestAnimationFrame(sample);
+    window.__gxPromoSmokeCard.querySelector('[data-gx-promo-close]').click();
+  });
+  await page.waitForFunction(()=>
+    window.__gxPromoSmokeCard.parentElement?.id==='gx-promo-deck',
+    null,{timeout:5000}
+  );
+  const midClose=await page.evaluate(()=>window.__gxC9LastReturn);
 
   if(
     !midClose ||
@@ -1634,20 +1635,25 @@ async function runBrowserStage(browserType, browserName, stageName, runner, erro
 
   for (let attempt = 1; attempt <= attempts; attempt++) {
     let browser;
+    const attemptErrors=[];
     try {
       browser = await browserType.launch({ headless: true });
-      await runner(browser, browserName, errors);
+      await runner(browser, browserName, attemptErrors);
+      errors.push(...attemptErrors);
       return;
     } catch (error) {
       lastError = error;
       const message = String(error?.stack || error?.message || error);
       const closedUnexpectedly =
         message.includes('Target page, context or browser has been closed') ||
-        message.includes('Browser has been closed');
+        message.includes('Browser has been closed') ||
+        message.includes('Target crashed');
 
       if (!(browserName === 'WebKit' && closedUnexpectedly && attempt < attempts)) {
+        errors.push(...attemptErrors);
         break;
       }
+      console.warn(`${browserName} · ${stageName}: proceso interrumpido; repitiendo la etapa completa (${attempt+1}/${attempts}).`);
     } finally {
       await browser?.close().catch(() => {});
     }
