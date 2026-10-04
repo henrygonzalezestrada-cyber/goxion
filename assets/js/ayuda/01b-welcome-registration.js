@@ -479,7 +479,7 @@ if(cycle !== gxWelcomeCycle) return;
                 }
                 if(data.status==="new") {
                     if(!data.already) {
-                        notificarAdmin("pedidos","🎁 REGISTRO -10% OFF",`**Nombre:** ${name}\n**WhatsApp:** ${phone}\n**Solicitud:** ${data.request_id || "N/A"}\n\n*Validación inicial: sin coincidencias como cliente previo. El beneficio queda sujeto a alta final.*`,"7c4dff");
+                        await notificarAdmin("pedidos","🎁 REGISTRO -10% OFF",`**Nombre:** ${name}\n**WhatsApp:** ${phone}\n**Solicitud:** ${data.request_id || "N/A"}\n\n*Validación inicial: sin coincidencias como cliente previo. El beneficio queda sujeto a alta final.*`,"7c4dff",data.request_id || "");
                     }
                     if(form) form.hidden=true;
                     gxWelcomeValidationState(submit,'success');
