@@ -466,7 +466,7 @@ function goxionViewModelAdapter(data) {
             resetSesionVisual();
         };
 
-        notificarAdmin = function(categoria, titulo, mensaje, colorHex = "00f2fe") {
+        notificarAdmin = async function(categoria, titulo, mensaje, colorHex = "00f2fe", referencia = "") {
             const headers = {"Content-Type":"application/json"};
             const token = localStorage.getItem(TOKEN_KEY) || "";
 
@@ -474,7 +474,7 @@ function goxionViewModelAdapter(data) {
                 headers["X-Client-Token"] = token;
             }
 
-            fetch(NOTIFY_URL, {
+            const response = await fetch(NOTIFY_URL, {
                 method:"POST",
                 headers,
                 body:JSON.stringify({
@@ -482,9 +482,13 @@ function goxionViewModelAdapter(data) {
                     titulo,
                     mensaje,
                     colorHex,
-                    session_token: token
+                    session_token: token,
+                    referencia
                 })
-            }).catch(e => console.warn("Notificación no enviada", e));
+            });
+            const data = await response.json().catch(() => ({}));
+            if(!response.ok || data?.ok !== true) throw new Error(data?.error || "No se pudo registrar la notificación.");
+            return data;
         };
 
     })();
