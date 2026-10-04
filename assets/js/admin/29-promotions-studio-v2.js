@@ -190,7 +190,8 @@
     byId('gx-promo-stack-loyalty').checked=editing.acumulacion?.lealtad!==false;
     byId('gx-promo-stack-fairdeal').checked=editing.acumulacion?.trato_justo!==false;
     byId('gx-promo-stack-benefits').checked=editing.acumulacion?.beneficios_programados===true;
-    byId('gx-promo-stack-welcome').checked=editing.acumulacion?.bienvenida===true;
+    byId('gx-promo-stack-welcome').checked=false;
+    byId('gx-promo-stack-welcome').disabled=true;
 
     byId('gx-promo-old-price').checked=editing.mostrar_precio_anterior!==false;
     byId('gx-promo-flash').checked=editing.oferta_flash===true;
@@ -498,7 +499,7 @@
         lealtad:byId('gx-promo-stack-loyalty')?.checked===true,
         trato_justo:byId('gx-promo-stack-fairdeal')?.checked===true,
         beneficios_programados:byId('gx-promo-stack-benefits')?.checked===true,
-        bienvenida:byId('gx-promo-stack-welcome')?.checked===true
+        bienvenida:false
       },
       mostrar_precio_anterior:byId('gx-promo-old-price')?.checked===true,
       oferta_flash:byId('gx-promo-flash')?.checked===true,
