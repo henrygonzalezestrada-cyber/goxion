@@ -545,12 +545,6 @@ document.getElementById("combo-active").checked = configGlobal.combo_upsell;
             filtrarClientes();
         }
 
-        window.gxAdminRealtimeRefresh = async function() {
-            if (!localStorage.getItem(ADMIN_TOKEN_KEY)) return false;
-            await cargarAdminDatos();
-            return true;
-        };
-
         pedirToken = async function() {
             const ok = await loginAdminInteractivo();
             if (ok) await inicializarPanel();
