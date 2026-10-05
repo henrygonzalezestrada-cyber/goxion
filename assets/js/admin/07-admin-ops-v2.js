@@ -464,13 +464,11 @@
                 if(!(amount>0)) throw new Error("Captura el monto faltante para registrar el pago parcial.");
                 if(typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment!=="function") throw new Error("Motor financiero no disponible. No se aplicó ningún cambio.");
                 await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
-                    await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
                         clienteId:c._id,
                         saldoRestante:amount,
                         notas:msg,
                         periodoEsperado:String(c.periodo_pendiente||c.estado_cuenta?.periodo||"").slice(0,7)
                     });
-                }
                 c.estado="pendiente";c.pago_en_revision=false;c.pago_revision_estado="incompleto";c.pago_revision_mensaje=msg;c.pago_revision_monto_faltante=amount;
                 successMessage="⚠️ Pago marcado como incompleto.";
             } else {
