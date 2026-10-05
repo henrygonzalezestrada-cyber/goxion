@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+
+<html data-goxion-version="1.2.0" lang="es">
+<head>
+<meta name="robots" content="noindex,nofollow">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>GOXION // ADMIN</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="./assets/css/admin.css">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body data-gx-version="admin-beta-19-4">
+<div class="gx-admin-shell">
+<header class="gx-topbar">
+<div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION</div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
+<div class="gx-top-actions">
+<button aria-label="Notificaciones" class="gx-notification-bell" id="gx-notification-bell" onclick="gxToggleNotifications()">
+<span>🔔</span><i id="gx-notification-badge"></i>
+</button><div class="gx-save-state" id="gx-save-state"><span class="gx-save-dot"></span><span>Sincronizado</span></div><div class="status"><div class="status-dot"></div> LIVE</div><button class="gx-icon-action danger" onclick="cerrarSesion()">⏻</button></div>
+</header>
+<nav class="gx-desktop-nav"><button class="gx-nav-chip active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)">⌂ Inicio</button><button class="gx-nav-chip" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)">👥 Clientes</button><button class="gx-nav-chip" data-admin-target="tab-operaciones" onclick="goAdminTab('tab-operaciones',this)">◎ Operaciones</button><button class="gx-nav-chip" data-admin-target="tab-gestion" onclick="goAdminTab('tab-gestion',this)">⌘ Gestión</button></nav>
+<main class="gx-main">
+<section class="tab-content active" id="tab-resumen">
+<div class="gx-page-heading">
+<div>
+<div class="gx-eyebrow">Hoy en GOXION</div>
+<h1>Qué requiere tu atención</h1>
+<p>Primero cobros, revisiones y solicitudes. Lo demás queda a un toque.</p>
+</div>
+<button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button>
+</div>
+<div class="gx-home-priority-grid">
+<button class="gx-home-priority today" onclick="gxShowClientTiming('today')">
+<span>HOY</span><strong id="gx-count-due-today">0</strong><small>Cobran hoy</small>
+</button>
+<button class="gx-home-priority overdue" onclick="gxShowClientTiming('overdue')">
+<span>COBRO</span><strong id="gx-count-overdue-home">0</strong><small>Vencidos</small>
+</button>
+<button class="gx-home-priority review" onclick="gxFilterFromSummary('revision')">
+<span>VALIDAR</span><strong id="gx-count-review">0</strong><small>En revisión</small>
+</button>
+<button class="gx-home-priority requests" onclick="goAdminTab('tab-operaciones')">
+<span>MI ESPACIO</span><strong id="gx-count-requests">0</strong><small>Solicitudes</small>
+</button>
+</div>
+<section class="gx-decision-center" id="gx-decision-center">
+<div class="gx-decision-head">
+<div>
+<span class="gx-eyebrow">Automatización</span>
+<h2>Tu veredicto</h2>
+<p>Solo lo que necesita una decisión tuya. El resto puede seguir su flujo automático.</p>
+</div>
+<span class="gx-decision-total" id="gx-decision-total">0 pendientes</span>
+</div>
+<div class="gx-decision-grid">
+<button onclick="gxOpenDecision('payments')" type="button">
+<span>Pagos</span><strong id="gx-decision-payments">0</strong><small>Por validar</small>
+</button>
+<button onclick="gxOpenDecision('cancellations')" type="button">
+<span>Cancelaciones</span><strong id="gx-decision-cancellations">0</strong><small>Esperan resolución</small>
+</button>
+<button onclick="gxOpenDecision('support')" type="button">
+<span>Soporte</span><strong id="gx-decision-support">0</strong><small>Solicitudes nuevas</small>
+</button>
+<button class="gx-decision-registration" onclick="gxOpenRegistrationControl()" type="button">
+<span>Registros</span><strong id="gx-decision-registrations">0</strong><small>Posibles clientes previos</small>
+</button>
+</div>
+</section>
+<section class="gx-upcoming-section">
+<div class="gx-section-head">
+<div><span class="gx-eyebrow">Cobro</span><h2>Próximos vencimientos</h2></div>
+</div>
+<div class="gx-next-payments-list" id="gx-next-payments-list">
+<div class="gx-empty-inline">Calculando próximos cobros…</div>
+</div>
+</section>
+<details class="gx-business-panel" id="gx-business-panel" open="">
+<summary>
+<div><span class="gx-eyebrow">Negocio</span><strong>Finanzas y panorama</strong></div>
+<em>Ver</em>
+</summary>
+<div class="gx-business-panel-body">
+<div class="gx-kpi-strip">
+<div class="gx-kpi-card gx-kpi-blue"><span class="gx-kpi-label">Ingresos</span><strong id="kpi-ingresos">$0.00</strong><small>Brutos mensuales</small></div>
+<div class="gx-kpi-card gx-kpi-red"><span class="gx-kpi-label">Costos</span><strong id="kpi-costos">$0.00</strong><small>Inversión mensual</small></div>
+<div class="gx-kpi-card gx-kpi-green"><span class="gx-kpi-label">Ganancia</span><strong id="kpi-ganancias">$0.00</strong><small>Neta estimada</small></div>
+<div class="gx-kpi-card gx-kpi-purple"><span class="gx-kpi-label">Margen</span><strong id="kpi-margen">0%</strong><small>Rentabilidad</small></div>
+</div>
+<div class="gx-business-mini-grid">
+<div><strong id="gx-count-benefits">0</strong><span>Beneficios listos</span></div>
+<div><strong id="gx-count-stock">0</strong><span>Stock bajo / lleno</span></div>
+</div>
+<div class="gx-section-head gx-section-space">
+<div><span class="gx-eyebrow">Panorama</span><h2>Estado de clientes</h2></div>
+</div>
+<div class="gx-client-stats">
+<div><strong id="gx-count-total">0</strong><span>Total</span></div>
+<div><strong id="gx-count-paid">0</strong><span>Pagados</span></div>
+<div><strong id="gx-count-suspended">0</strong><span>Suspendidos</span></div>
+<div><strong id="gx-count-missions">0</strong><span>Con misiones</span></div>
+</div>
+</div>
+</details>
+</section>
+<section class="tab-content" id="tab-clientes">
+<div class="gx-page-heading"><div><div class="gx-eyebrow">CRM operativo</div><h1>Clientes</h1><p id="gx-client-page-subtitle">Busca, filtra y entra directo a lo que necesitas.</p></div><button class="gx-primary-action desktop-only" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
+<div class="gx-command-panel" id="gx-client-command-panel">
+<div class="gx-client-toolbar">
+<div class="gx-search-wrap"><span>⌕</span><input class="search-bar" id="search-input" oninput="filtrarClientes()" placeholder="Buscar nombre, folio..." type="text"/></div>
+<button aria-controls="gx-filter-drawer" aria-expanded="false" class="gx-filter-toggle" id="gx-filter-toggle" onclick="gxToggleClientFilters()" type="button">
+<span class="gx-filter-icon">⌁</span>
+<span class="gx-filter-toggle-copy"><strong>Filtros</strong><small id="gx-filter-summary">Todos · Prioridad</small></span>
+<b hidden="" id="gx-filter-active-count">0</b>
+</button>
+</div>
+<div aria-hidden="true" class="gx-filter-drawer" id="gx-filter-drawer">
+<div class="filter-pills-container gx-status-pills">
+<button class="filter-pill active" data-status-filter="all" onclick="setStatusFilter('all',this)">Todos <b id="pill-all">0</b></button>
+<button class="filter-pill" data-status-filter="revision" onclick="setStatusFilter('revision',this)">🔔 Revisión <b id="pill-review">0</b></button>
+<button class="filter-pill" data-status-filter="pendiente" onclick="setStatusFilter('pendiente',this)">Pendientes <b id="pill-pending">0</b></button>
+<button class="filter-pill" data-status-filter="pagado" onclick="setStatusFilter('pagado',this)">Pagados <b id="pill-paid">0</b></button>
+<button class="filter-pill" data-status-filter="suspendido" onclick="setStatusFilter('suspendido',this)">Suspendidos <b id="pill-suspended">0</b></button>
+</div>
+<div class="gx-filter-tools">
+<label class="gx-filter-sort"><span>Orden</span><select class="custom-select" id="sort-by" onchange="filtrarClientes();gxUpdateFilterSummary()"><option selected="" value="priority">Prioridad de cobro</option><option value="date">Día de cobro</option><option value="name">Nombre A–Z</option><option value="loyalty">Lealtad</option></select></label>
+<button class="gx-secondary-action gx-filter-clear" onclick="gxClearClientFilters()">↺ Limpiar</button>
+</div>
+</div>
+</div>
+<div class="gx-clients-list" id="clients-container"><p style="color:var(--text-muted)">Conectando con la base de datos...</p></div>
+</section>
+<section class="tab-content" id="tab-catalogo">
+<div class="gx-page-heading">
+<div><div class="gx-eyebrow">Inventario</div><h1>Catálogo</h1><p>Selecciona una plataforma para administrar sus datos.</p></div>
+<button class="gx-primary-action desktop-only" onclick="addGlobalService()">＋ Servicio</button>
+</div><div class="gx-catalog-mode-switch"><button class="active" data-gx-catalog-mode="services" onclick="gxOpenCatalogMode('services',this)">Servicios</button><button data-gx-catalog-mode="promotions" onclick="gxOpenCatalogMode('promotions',this)">Promociones</button></div>
+<div class="gx-catalog-mode-view active" id="gx-catalog-services-view"><div class="gx-catalog-mobile" id="gx-catalog-mobile">
+<div class="gx-catalog-mobile-toolbar">
+<div>
+<span class="gx-eyebrow">Plataformas</span>
+<strong id="gx-catalog-mobile-count">0 servicios</strong>
+</div>
+<button onclick="gxAddCatalogServiceMobile()" type="button">＋</button>
+</div>
+<div class="gx-catalog-mobile-list" id="gx-catalog-mobile-list"></div>
+<div class="gx-catalog-mobile-editor" hidden="" id="gx-catalog-mobile-editor"></div>
+</div><div class="panel gx-panel-modern gx-catalog-desktop">
+<div class="gx-panel-title-row">
+<div><span class="gx-eyebrow">Servicios</span><h2>Catálogo &amp; inventario</h2></div>
+</div>
+<div class="gx-catalog-scroll">
+<table class="catalog-table">
+<thead><tr><th>Servicio</th><th>Etiqueta</th><th>Categoría</th><th>Beneficios</th><th>Ctas</th><th>Venta</th><th>Costo</th><th>Lím.</th><th>Fijo</th><th>Disp.</th><th></th></tr></thead>
+<tbody id="global-services-container"></tbody>
+</table>
+</div>
+</div></div>
+
+<section class="gx-catalog-mode-view" hidden="" id="gx-catalog-promotions-view">
+<div class="gx-promo-studio-hero">
+<div>
+<span class="gx-eyebrow">Promotions Studio</span>
+<h2>Motor comercial</h2>
+<p>Configura precios temporales, porcentajes, combos y add-ons desde una sola fuente. Ayuda consumirá estas reglas en su bloque visual dedicado.</p>
+</div>
+<div class="gx-promo-studio-hero-actions">
+<button class="gx-secondary-action" onclick="gxPromoLoad()" type="button">↻ Actualizar</button>
+<button class="gx-primary-action" onclick="gxPromoOpenEditor()" type="button">＋ Nueva promoción</button>
+</div>
+</div>
+
+<div class="gx-promo-studio-stats">
+<div><span>Campañas</span><strong id="gx-promo-stat-total">0</strong></div>
+<div><span>Activas</span><strong id="gx-promo-stat-active">0</strong></div>
+<div><span>Programadas</span><strong id="gx-promo-stat-scheduled">0</strong></div>
+<div><span>Listas</span><strong id="gx-promo-stat-ready">0</strong></div>
+</div>
+
+<div class="gx-promo-studio-safety">
+<div>
+<strong>Arquitectura protegida</strong>
+<span>Publicación y adquisición son controles separados. Una campaña puede mostrarse sin permitir contratación; GOXION valida elegibilidad antes de adquirir.</span>
+</div>
+<span class="gx-promo-studio-lock">Integrado</span>
+</div>
+
+<div class="gx-promo-studio-toolbar">
+<label class="gx-promo-search"><span>⌕</span><input id="gx-promo-search" oninput="gxPromoRender()" placeholder="Buscar promoción o plataforma..." type="search"/></label>
+<select id="gx-promo-filter-mechanic" onchange="gxPromoRender()">
+<option value="">Todas las mecánicas</option>
+<option value="precio_fijo">Precio temporal</option>
+<option value="porcentaje">Porcentaje</option>
+<option value="combo">Combo</option>
+<option value="addon">Add-on</option>
+</select>
+<select id="gx-promo-filter-state" onchange="gxPromoRender()">
+<option value="">Todos los estados</option>
+<option value="activa">Activas</option>
+<option value="programada">Programadas</option>
+<option value="lista">Listas</option>
+<option value="pausada">Pausadas</option>
+<option value="finalizada">Finalizadas</option>
+</select>
+</div>
+
+<div class="gx-promo-list gx-promo-studio-list" id="gx-promo-list"><div class="gx-empty-inline">Cargando promociones…</div></div>
+
+<div class="gx-promo-editor gx-promo-studio-editor" hidden="" id="gx-promo-editor">
+<div class="gx-promo-editor-head">
+<div>
+<span class="gx-eyebrow">Constructor universal</span>
+<h3 id="gx-promo-editor-title">Nueva promoción</h3>
+<p id="gx-promo-editor-subtitle">Define la mecánica y GOXION adapta el resto del formulario.</p>
+</div>
+<button onclick="gxPromoCloseEditor()" type="button">×</button>
+</div>
+<input id="gx-promo-id" type="hidden"/>
+<input id="gx-promo-mechanic" type="hidden" value="precio_fijo"/>
+
+<div class="gx-promo-studio-layout">
+<div class="gx-promo-studio-form">
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>01</span><div><strong>Identidad de campaña</strong><small>Nombre interno y copy que podrá consumir Ayuda.</small></div></div>
+<div class="gx-promo-form-grid">
+<label class="wide"><span>Nombre interno</span><input id="gx-promo-name" maxlength="100" oninput="gxPromoUpdatePreview()" placeholder="Ej. Septiembre · Netflix 3 meses" type="text"/></label>
+<label class="wide"><span>Título público</span><input id="gx-promo-public-title" maxlength="120" oninput="gxPromoUpdatePreview()" placeholder="Ej. 3 meses a precio especial" type="text"/></label>
+<label class="wide"><span>Descripción pública</span><input id="gx-promo-public-description" maxlength="220" oninput="gxPromoUpdatePreview()" placeholder="Texto breve para presentar la oferta" type="text"/></label>
+<label><span>Badge</span><input id="gx-promo-badge" maxlength="36" oninput="gxPromoUpdatePreview()" placeholder="PROMO" type="text"/></label>
+<label><span>Prioridad</span><input id="gx-promo-priority" max="100" min="-100" oninput="gxPromoUpdatePreview()" step="1" type="number" value="0"/></label>
+</div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>02</span><div><strong>Mecánica</strong><small>Elige cómo se construye la oferta.</small></div></div>
+<div class="gx-promo-mechanic-grid">
+<button data-gx-promo-mechanic="precio_fijo" onclick="gxPromoSetMechanic('precio_fijo',this)" type="button"><b>$</b><span><strong>Precio temporal</strong><small>$99 durante 3 meses</small></span></button>
+<button data-gx-promo-mechanic="porcentaje" onclick="gxPromoSetMechanic('porcentaje',this)" type="button"><b>%</b><span><strong>Porcentaje</strong><small>30% OFF</small></span></button>
+<button data-gx-promo-mechanic="combo" onclick="gxPromoSetMechanic('combo',this)" type="button"><b>＋</b><span><strong>Combo</strong><small>2 o más plataformas</small></span></button>
+<button data-gx-promo-mechanic="addon" onclick="gxPromoSetMechanic('addon',this)" type="button"><b>↗</b><span><strong>Add-on</strong><small>Contrata X y suma Y</small></span></button>
+</div>
+<div class="gx-promo-mechanic-fields" id="gx-promo-mechanic-fields"></div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>03</span><div><strong>Valor y duración</strong><small>La vigencia para contratar y la duración adquirida son independientes.</small></div></div>
+<div class="gx-promo-form-grid">
+<label id="gx-promo-price-wrap"><span id="gx-promo-price-label">Precio promocional</span><input id="gx-promo-price" min="0.01" oninput="gxPromoUpdatePreview()" placeholder="$0" step="0.01" type="number"/></label>
+<label hidden="" id="gx-promo-percent-wrap"><span>Descuento</span><div class="gx-promo-percent-input"><input id="gx-promo-percent" max="95" min="1" oninput="gxPromoUpdatePreview()" placeholder="30" step="1" type="number"/><b>%</b></div></label>
+<label><span>Duración adquirida</span><select id="gx-promo-periods" onchange="gxPromoDurationChanged()"><option value="1">1 periodo</option><option value="2">2 periodos</option><option value="3">3 periodos</option><option value="4">4 periodos</option><option value="6">6 periodos</option><option value="12">12 periodos</option><option value="24">24 periodos</option><option value="campaign_end">Hasta finalizar campaña</option></select></label>
+<label><span>Disponible desde</span><input id="gx-promo-start" onchange="gxPromoUpdatePreview()" type="datetime-local"/></label>
+<label><span>Disponible hasta</span><input id="gx-promo-end" onchange="gxPromoUpdatePreview()" type="datetime-local"/></label>
+</div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>04</span><div><strong>Audiencia</strong><small>Define quién podrá ser elegible cuando conectemos Ayuda.</small></div></div>
+<div class="gx-promo-form-grid">
+<label class="wide"><span>Segmento</span><select id="gx-promo-audience" onchange="gxPromoAudienceChanged();gxPromoUpdatePreview()">
+<option value="todos">Todos los clientes</option>
+<option value="nuevos">Nuevos clientes</option>
+<option value="actuales">Clientes actuales</option>
+<option value="con_servicio">Clientes que ya tienen una plataforma</option>
+<option value="sin_servicio">Clientes que no tienen una plataforma</option>
+<option value="lealtad_1">Lealtad Nivel 1 o superior</option>
+<option value="lealtad_2">Lealtad Nivel 2</option>
+</select></label>
+<label class="wide" hidden="" id="gx-promo-audience-service-wrap"><span>Plataforma de condición</span><select id="gx-promo-audience-service" onchange="gxPromoUpdatePreview()"></select></label>
+</div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>05</span><div><strong>Compatibilidad</strong><small>Controla qué beneficios podrán convivir con esta campaña.</small></div></div>
+<div class="gx-promo-options gx-promo-stack-options">
+<label><input checked="" id="gx-promo-stack-loyalty" type="checkbox"/><span><strong>Lealtad</strong><small>Permitir nivel del cliente</small></span></label>
+<label><input checked="" id="gx-promo-stack-fairdeal" type="checkbox"/><span><strong>Trato Justo</strong><small>Compensación por falla</small></span></label>
+<label><input id="gx-promo-stack-benefits" type="checkbox"/><span><strong>Beneficios programados</strong><small>Cupones y ajustes comerciales</small></span></label>
+<label><input disabled="" id="gx-promo-stack-welcome" type="checkbox"/><span><strong>Bienvenida</strong><small>No acumulable con promociones</small></span></label>
+</div>
+</section>
+
+<section class="gx-promo-builder-section">
+<div class="gx-promo-builder-heading"><span>06</span><div><strong>Presentación y estado</strong><small>Dejamos preparada la metadata que usará la experiencia del cliente.</small></div></div>
+<div class="gx-promo-options">
+<label><input checked="" id="gx-promo-old-price" type="checkbox"/><span><strong>Precio anterior</strong><small>Mostrar referencia tachada</small></span></label>
+<label><input id="gx-promo-flash" type="checkbox"/><span><strong>Oferta Flash</strong><small>Tratamiento comercial especial</small></span></label>
+<label><input id="gx-promo-countdown" type="checkbox"/><span><strong>Cuenta regresiva</strong><small>Timer durante la vigencia</small></span></label>
+<label><input id="gx-promo-featured" type="checkbox"/><span><strong>Destacada</strong><small>Prioridad visual futura</small></span></label>
+<label><input id="gx-promo-notify" type="checkbox"/><span><strong>Notificar cliente</strong><small>Metadata lista para Mi Espacio</small></span></label>
+<label><input id="gx-promo-published" onchange="gxPromoPublicationChanged()" type="checkbox"/><span><strong>Publicada</strong><small>Visible en Ayuda durante su vigencia</small></span></label>
+<label><input id="gx-promo-acquisition" onchange="gxPromoAcquisitionChanged()" type="checkbox"/><span><strong>Adquisición habilitada</strong><small>Permite que una oferta elegible pueda contratarse</small></span></label>
+<label><input checked="" id="gx-promo-active" type="checkbox"/><span><strong>Habilitada</strong><small>Puede quedar programada por fecha</small></span></label>
+</div>
+<div class="gx-promo-acquisition-lock" id="gx-promo-acquisition-note"><b>⌁</b><span><strong>Publicación y contratación separadas</strong><small>Puedes publicar una campaña sólo para mostrarla. La adquisición únicamente se habilita cuando Publicada también está activa.</small></span></div>
+</section>
+
+</div>
+
+<aside class="gx-promo-studio-preview">
+<span class="gx-eyebrow">Vista lógica</span>
+<div class="gx-promo-preview-card" id="gx-promo-preview"><span>PROMO</span><strong>Nueva promoción</strong><p>Selecciona una mecánica y plataformas.</p></div>
+<div class="gx-promo-preview-facts" id="gx-promo-preview-facts"></div>
+</aside>
+</div>
+
+<div class="gx-promo-editor-actions gx-promo-studio-actions">
+<button class="gx-danger-ghost" hidden="" id="gx-promo-delete" onclick="gxPromoDeleteCurrent()" type="button">Eliminar</button>
+<span></span>
+<button class="gx-secondary-action" onclick="gxPromoCloseEditor()" type="button">Cancelar</button>
+<button class="gx-secondary-action" hidden="" id="gx-promo-duplicate" onclick="gxPromoDuplicateCurrent()" type="button">Duplicar</button>
+<button class="gx-primary-action" id="gx-promo-save" onclick="gxPromoSave()" type="button">Guardar promoción</button>
+</div>
+</div>
+</section></section>
+<section class="tab-content" id="tab-ajustes">
+<div class="gx-page-heading"><div><div class="gx-eyebrow">Configuración</div><h1>Ajustes &amp; automatizaciones</h1><p>Misiones, experiencia del cliente y alertas globales.</p></div><button class="gx-primary-action desktop-only" onclick="gxSaveSettings()">Guardar ajustes</button></div>
+<div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('loyalty',this)">✦ Lealtad</button><button onclick="gxSettingsView('fairdeal',this)">🛡 Trato Justo</button><button onclick="gxSettingsView('accounts',this)">✉ Cuentas</button><button onclick="gxSettingsView('credentials',this)">🔐 Credenciales</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
+<div class="gx-settings-view active" data-settings-view="missions">
+<div class="panel gx-panel-modern">
+<div class="gx-panel-title-row">
+<div>
+<span class="gx-eyebrow">Automatización</span>
+<h2>Constructor de misiones</h2>
+<p class="gx-panel-desc">Crea misiones sin memorizar etiquetas. El sistema sigue guardando el formato compatible con GOXION.</p>
+</div>
+<div class="gx-discount-badge"><input id="global-misiones-desc" type="number" value="5"/><span>% OFF</span></div>
+</div>
+<textarea aria-hidden="true" class="gx-hidden-mission-source" id="global-misiones-tareas"></textarea>
+<div class="gx-mission-builder">
+<div class="gx-mission-builder-head">
+<div>
+<strong>Misiones de la plantilla</strong>
+<small>Arrastra no hace falta: usa + y elimina las que no necesites.</small>
+</div>
+<button class="gx-secondary-action" onclick="gxAddMissionRow()" type="button">＋ Crear misión</button>
+</div>
+<div class="gx-mission-builder-list" id="gx-mission-builder-list"></div>
+</div>
+<div class="gx-tag-library">
+<div class="gx-library-title">
+<div><strong>Biblioteca de etiquetas</strong><small>ⓘ toca la información para saber qué hace cada misión.</small></div>
+</div>
+<div class="gx-tag-library-grid" id="gx-tag-library-grid"></div>
+</div>
+<div class="gx-action-grid">
+<button class="gx-action-card primary" onclick="gxMissionBuilderApply('todos')"><b>✓</b><span>Aplicar a todos</span></button>
+<button class="gx-action-card" onclick="gxMissionBuilderSelectClients()"><b>☑</b><span>Seleccionar clientes</span></button>
+<button class="gx-action-card danger" onclick="borrarMisionesMasivas()"><b>⌫</b><span>Borrar de todos</span></button>
+</div>
+</div>
+</div>
+<div class="gx-settings-view" data-settings-view="loyalty">
+<div class="panel gx-panel-modern gx-loyalty-bulk-panel">
+<div class="gx-panel-title-row gx-loyalty-title-row">
+<div>
+<span class="gx-eyebrow">Automatización</span>
+<h2>Lealtad masiva</h2>
+<p class="gx-panel-desc">Parte de todos los clientes y quita únicamente las excepciones antes de aplicar.</p>
+</div>
+<span class="gx-loyalty-level-badge">Nivel 2 · 9 pagos</span>
+</div>
+<div class="gx-loyalty-config">
+<label class="gx-loyalty-field">
+<span>Valor final</span>
+<select class="custom-select" id="gx-loyalty-target" onchange="gxLoyaltyTargetChanged()">
+<option selected="" value="9">Nivel 2 · 9 pagos</option>
+<option value="0">Reiniciar · 0 pagos</option>
+<option value="custom">Personalizado</option>
+</select>
+</label>
+<label class="gx-loyalty-field gx-loyalty-custom-field" hidden="" id="gx-loyalty-custom-wrap">
+<span>Pagos puntuales</span>
+<input id="gx-loyalty-custom" max="99" min="0" oninput="gxRenderLoyaltyTool()" type="number" value="9"/>
+</label>
+<label class="gx-loyalty-field gx-loyalty-reason">
+<span>Motivo</span>
+<input id="gx-loyalty-reason" maxlength="180" placeholder="Motivo interno" type="text" value="Beneficio migración GOXION"/>
+</label>
+</div>
+<div class="gx-loyalty-selection-head">
+<div>
+<strong>Clientes incluidos</strong>
+<small>Todos se seleccionan al abrir. Desmarca las excepciones.</small>
+</div>
+<div class="gx-loyalty-selection-actions">
+<button onclick="gxLoyaltySelectScope('all')" type="button">Todos</button>
+<button onclick="gxLoyaltySelectScope('active')" type="button">No suspendidos</button>
+<button onclick="gxLoyaltySelectScope('none')" type="button">Limpiar</button>
+</div>
+</div>
+<div class="gx-loyalty-search">
+<span>⌕</span>
+<input id="gx-loyalty-search" oninput="gxRenderLoyaltyClientList()" placeholder="Buscar cliente..." type="text"/>
+</div>
+<div class="gx-loyalty-preview">
+<div><strong id="gx-loyalty-selected">0</strong><span>Incluidos</span></div>
+<div><strong id="gx-loyalty-excluded">0</strong><span>Excluidos</span></div>
+<div><strong id="gx-loyalty-changing">0</strong><span>Cambiarán</span></div>
+<div><strong id="gx-loyalty-already">0</strong><span>Ya están</span></div>
+</div>
+<div class="gx-loyalty-client-list" id="gx-loyalty-client-list"></div>
+<div class="gx-loyalty-apply-row">
+<div>
+<small>Vista previa</small>
+<strong id="gx-loyalty-preview-text">Selecciona clientes para continuar.</strong>
+</div>
+<button class="gx-primary-action" id="gx-loyalty-apply" onclick="gxApplyBulkLoyalty()" type="button">Aplicar</button>
+</div>
+</div>
+</div>
+<div class="gx-settings-view" data-settings-view="fairdeal">
+<div class="panel gx-panel-modern gx-tj-bulk-panel">
+<div class="gx-panel-title-row gx-tj-bulk-title">
+<div>
+<span class="gx-eyebrow">Compensaciones</span>
+<h2>Trato Justo masivo</h2>
+<p class="gx-panel-desc">Selecciona la plataforma, el periodo y únicamente los clientes afectados. Cada descuento se calcula con la mensualidad real de ese cliente.</p>
+</div>
+<span class="gx-tj-bulk-badge" id="gx-tj-bulk-pct-badge">5%</span>
+</div>
+<div class="gx-tj-bulk-config">
+<label class="gx-tj-bulk-field gx-tj-bulk-service-field">
+<span>Plataforma</span>
+<select class="custom-select" id="gx-tj-bulk-service" onchange="gxTJMassServiceChanged()"></select>
+</label>
+<label class="gx-tj-bulk-field">
+<span>Periodo</span>
+<input id="gx-tj-bulk-period" onchange="gxTJMassPeriodChanged()" type="month"/>
+</label>
+<div class="gx-tj-bulk-days">
+<span>Días de falla</span>
+<div>
+<button onclick="gxTJMassStep(-1)" type="button">−</button>
+<strong id="gx-tj-bulk-days">1</strong>
+<button onclick="gxTJMassStep(1)" type="button">＋</button>
+</div>
+<small>5% por día · máximo 50%</small>
+</div>
+<label class="gx-tj-bulk-field gx-tj-bulk-reason">
+<span>Motivo</span>
+<select id="gx-tj-bulk-reason">
+<option value="Falla técnica">Falla técnica</option>
+<option value="Intermitencia prolongada">Intermitencia prolongada</option>
+<option value="Acceso no disponible">Acceso no disponible</option>
+<option value="Mantenimiento / incidencia de plataforma">Mantenimiento / incidencia de plataforma</option>
+<option value="Compensación autorizada">Compensación autorizada</option>
+</select>
+</label>
+</div>
+<div class="gx-tj-bulk-selection-head">
+<div>
+<strong>Clientes elegibles</strong>
+<small>Solo aparecen quienes tienen activa la plataforma seleccionada.</small>
+</div>
+<div class="gx-tj-bulk-selection-actions">
+<button onclick="gxTJMassSelectScope('all')" type="button">Todos</button>
+<button onclick="gxTJMassSelectScope('without')" type="button">Sin compensación</button>
+<button onclick="gxTJMassSelectScope('none')" type="button">Limpiar</button>
+</div>
+</div>
+<div class="gx-tj-bulk-search">
+<span>⌕</span>
+<input id="gx-tj-bulk-search" oninput="gxRenderTJMassList()" placeholder="Buscar cliente..." type="text"/>
+</div>
+<div class="gx-tj-bulk-preview">
+<div><strong id="gx-tj-bulk-eligible">0</strong><span>Elegibles</span></div>
+<div><strong id="gx-tj-bulk-selected">0</strong><span>Incluidos</span></div>
+<div><strong id="gx-tj-bulk-excluded">0</strong><span>Excluidos</span></div>
+<div><strong id="gx-tj-bulk-updates">0</strong><span>Se actualizarán</span></div>
+</div>
+<div class="gx-tj-bulk-client-list" id="gx-tj-bulk-client-list"></div>
+<div class="gx-tj-bulk-total">
+<div>
+<small>Compensación estimada</small>
+<strong id="gx-tj-bulk-total">$0.00</strong>
+</div>
+<div>
+<small>Resumen</small>
+<strong id="gx-tj-bulk-summary">Selecciona una plataforma.</strong>
+</div>
+<button class="gx-primary-action" id="gx-tj-bulk-apply" onclick="gxApplyTJMass()" type="button">Aplicar</button>
+</div>
+</div>
+</div>
+<div class="gx-settings-view" data-settings-view="accounts">
+<div class="panel gx-panel-modern gx-account-manager-panel">
+<div class="gx-panel-title-row gx-account-manager-title">
+<div>
+<span class="gx-eyebrow">Accesos compartidos</span>
+<h2>Cuentas / grupos de plataforma</h2>
+<p class="gx-panel-desc">Registra cuentas compartidas o grupos/licencias una sola vez. GOXION adapta los campos según el tipo de acceso de cada plataforma.</p>
+</div>
+<span class="gx-account-manager-badge">Asignación inteligente</span>
+</div>
+<div class="gx-account-manager-explainer">
+<div><strong>Acceso compartido</strong><span>GOXION administra cuenta, perfil, PIN y contraseña cuando corresponde.</span></div>
+<div><strong>Invitación personal</strong><span>YouTube, Microsoft 365 y Google One usan la cuenta personal del cliente; GOXION solo gestiona correo, grupo/licencia y estado.</span></div>
+</div>
+<section class="gx-access-architecture-card" id="gx-access-architecture-card">
+<div class="gx-access-architecture-head">
+<div>
+<span class="gx-eyebrow">Control técnico</span>
+<h3>Estado de accesos</h3>
+<p>Contrataciones, accesos reales y pendientes en una sola vista.</p>
+</div>
+<button onclick="gxRunAccessDiagnostic()" type="button">↻ Diagnosticar</button>
+</div>
+<div class="gx-access-diagnostic-grid">
+<div><small>Contrataciones</small><strong id="gx-access-d-contracts">—</strong></div>
+<div><small>Accesos esperados</small><strong id="gx-access-d-accesses">—</strong></div>
+<div><small>Revisión</small><strong id="gx-access-d-review">—</strong></div>
+<div><small>Cuentas madre</small><strong id="gx-access-d-accounts">—</strong></div>
+</div>
+<div class="gx-access-diagnostic-state" id="gx-access-diagnostic-state">
+<i></i><span>Cargando modelo de accesos…</span>
+</div>
+<details class="gx-access-details-collapse"><summary>Ver diagnóstico detallado</summary><div class="gx-access-diagnostic-details" id="gx-access-diagnostic-details"></div></details>
+</section>
+<div class="gx-account-manager-toolbar">
+<label>
+<span>Plataforma</span>
+<select id="gx-account-platform" onchange="gxAccountPlatformChanged()"></select>
+</label>
+<div class="gx-account-manager-summary">
+<strong id="gx-account-platform-summary">0 cuentas</strong>
+<small id="gx-account-platform-capacity">0 perfiles vinculados</small>
+</div>
+</div>
+<section class="gx-platform-detected" id="gx-platform-detected">
+<div class="gx-platform-detected-head">
+<div>
+<span>Clientes detectados</span>
+<strong id="gx-platform-detected-title">Selecciona una plataforma</strong>
+</div>
+<em id="gx-platform-detected-count">0</em>
+</div>
+<div class="gx-multi-access-help">
+<strong>Distribución por acceso</strong>
+<span>Si un cliente tiene x2, cada acceso puede ir a una cuenta madre distinta. Usa el selector de su propia fila o la asignación masiva para enviarlos juntos.</span>
+</div>
+<div class="gx-platform-assign-toolbar">
+<button class="secondary" onclick="gxSelectPendingAccesses()" type="button">Seleccionar pendientes</button>
+<select aria-label="Cuenta madre destino" id="gx-platform-target-account">
+<option value="">Cuenta destino…</option>
+</select>
+<button class="gx-primary-action" onclick="gxAssignSelectedDetected()" type="button">Asignar seleccionados a esta cuenta</button>
+</div>
+<div class="gx-platform-detected-list" id="gx-platform-detected-list">
+<div class="gx-empty-inline">Cada fila representa un acceso real. En x2 verás Acceso 1 de 2 y Acceso 2 de 2.</div>
+</div>
+</section>
+<div class="gx-account-manager-list" id="gx-account-manager-list">
+<div class="gx-empty-inline">Cargando cuentas…</div>
+</div>
+<details class="gx-account-create">
+<summary><span>＋ Nueva cuenta madre</span><em>Agregar</em></summary>
+<div class="gx-account-create-grid">
+<label><span>Nombre corto</span><input id="gx-account-new-alias" placeholder="Cuenta 1" type="text"/></label>
+<label class="wide"><span>Correo / login</span><input id="gx-account-new-email" placeholder="cuenta@correo.com" type="text"/></label>
+<label><span>Capacidad</span><input id="gx-account-new-limit" max="99" min="1" type="number" value="5"/></label>
+<button class="gx-primary-action" onclick="gxCreatePlatformAccount()" type="button">Crear cuenta</button>
+</div>
+</details>
+</div>
+</div>
+<div class="gx-settings-view" data-settings-view="credentials">
+<div class="panel gx-panel-modern gx-credentials-panel">
+<div class="gx-panel-title-row gx-credentials-title">
+<div>
+<span class="gx-eyebrow">Seguridad</span>
+<h2>Credenciales de plataformas</h2>
+<p class="gx-panel-desc">La contraseña pertenece a la cuenta madre y se comparte automáticamente con los clientes asignados a ella. Se guarda cifrada en Supabase Vault y nunca vuelve a cargarse en este Admin.</p>
+</div>
+<span class="gx-vault-badge">Vault protegido</span>
+</div>
+<div class="gx-credentials-note">
+<strong>Entrega de una sola vista</strong>
+<p>La entrega ya está conectada con Ayuda. El cliente verá la actualización en Mi Espacio, deberá confirmar su PIN de GOXION para revelar la contraseña y, una vez consultada, la entrega quedará consumida.</p>
+</div>
+<div class="gx-credentials-config">
+<label>
+<span>Plataforma</span>
+<select class="custom-select" id="gx-cred-service" onchange="gxCredentialServiceChanged()"></select>
+</label>
+<label>
+<span>Cuenta / correo de acceso</span>
+<select class="custom-select" id="gx-cred-account" onchange="gxCredentialAccountChanged()"></select>
+</label>
+<label class="gx-cred-password-field">
+<span>Nueva contraseña</span>
+<div>
+<input autocomplete="new-password" id="gx-cred-password" placeholder="Escribe la nueva contraseña" type="password"/>
+<button onclick="gxToggleCredentialPassword()" type="button">👁</button>
+</div>
+</label>
+</div>
+<div class="gx-credentials-selection-head">
+<div>
+<strong>Quiénes recibirán esta contraseña</strong>
+<small>Solo aparecen clientes cuyos accesos técnicos están asignados a esta cuenta madre.</small>
+</div>
+<div>
+<button onclick="gxCredentialSelectScope('all')" type="button">Todos</button>
+<button onclick="gxCredentialSelectScope('none')" type="button">Limpiar</button>
+</div>
+</div>
+<div class="gx-credential-search">
+<span>⌕</span>
+<input id="gx-cred-search" oninput="gxRenderCredentialRecipients()" placeholder="Buscar cliente..." type="text"/>
+</div>
+<div class="gx-credential-stats">
+<div><strong id="gx-cred-eligible">0</strong><span>Elegibles</span></div>
+<div><strong id="gx-cred-selected">0</strong><span>Incluidos</span></div>
+<div><strong id="gx-cred-excluded">0</strong><span>Excluidos</span></div>
+<div><strong id="gx-cred-pending">0</strong><span>Pendientes previas</span></div>
+</div>
+<div class="gx-cred-recipient-list" id="gx-cred-recipient-list"></div>
+<div class="gx-credentials-publish">
+<div>
+<small>Acción</small>
+<strong id="gx-cred-publish-summary">Selecciona una plataforma y una cuenta.</strong>
+</div>
+<button class="gx-primary-action" id="gx-cred-publish" onclick="gxPublishCredential()" type="button">Publicar contraseña</button>
+</div>
+<details class="gx-credentials-history">
+<summary><span>Historial seguro</span><em id="gx-cred-history-count">0 versiones</em></summary>
+<div id="gx-cred-history-list"></div>
+</details>
+</div>
+</div>
+<div class="gx-settings-view" data-settings-view="app">
+<div class="gx-experience-v2">
+<div class="gx-experience-main">
+<div class="gx-panel-title-row"><div><span class="gx-eyebrow">Experiencia 2.0</span><h2>Comportamiento de la App</h2><p class="gx-panel-desc">Configura qué módulos comerciales se muestran. Las promociones se crean desde Catálogo.</p></div></div>
+<div class="gx-setting-row gx-setting-row-v2"><div><strong>Promoción Upsell</strong><small>Mostrar el Combo GOXION a clientes cuando corresponda.</small></div><label class="switch"><input id="combo-active" onchange="toggleComboUpsell();gxUpdateExperiencePreview()" type="checkbox"/><span class="slider"></span></label></div>
+<button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar experiencia</button>
+</div>
+<aside class="gx-experience-preview"><span>PREVISUALIZACIÓN</span><div class="gx-preview-phone"><div class="gx-preview-pill">GOXION</div><strong id="gx-app-preview-title">Tu experiencia está lista</strong><p id="gx-app-preview-copy">Los módulos activos aparecerán aquí.</p><div class="gx-preview-module" id="gx-app-preview-module">Combo GOXION</div></div></aside>
+</div>
+</div>
+<div class="gx-settings-view" data-settings-view="alerts">
+<div class="gx-experience-v2 gx-incidents-v2">
+<div class="gx-experience-main">
+<div class="gx-panel-title-row"><div><span class="gx-eyebrow">Incidencias 2.0</span><h2>Estado operativo</h2><p class="gx-panel-desc">Publica una incidencia clara y revisa cómo la verá el cliente antes de guardarla.</p></div><label class="switch"><input id="alert-active" onchange="toggleAlertFields();gxUpdateIncidentPreview()" type="checkbox"/><span class="slider"></span></label></div>
+<div class="gx-alert-settings gx-alert-settings-v2" id="alert-settings" style="opacity:.5;pointer-events:none;transition:.3s">
+<label><span>Plataforma</span><select class="custom-select" id="alert-platform" onchange="gxUpdateIncidentPreview()"></select></label>
+<label><span>Tipo de incidencia</span><select class="custom-select" id="alert-type" onchange="gxUpdateIncidentPreview()"><option value="presentando intermitencias temporales">Intermitencias temporales</option><option value="en mantenimiento programado">Mantenimiento programado</option><option value="experimentando una caída global">Caída global</option><option value="con retrasos en la entrega de pines">Retrasos en accesos (Pines)</option></select></label>
+<label class="wide"><span>Mensaje adicional</span><textarea class="gx-large-textarea" id="global-msg" oninput="gxUpdateIncidentPreview()" placeholder="Mensaje adicional para clientes (opcional)..."></textarea></label>
+</div>
+<button class="gx-primary-action gx-full-action" onclick="gxSaveSettings()">Guardar incidencia</button>
+</div>
+<aside class="gx-experience-preview"><span>PREVISUALIZACIÓN</span><div class="gx-preview-phone"><div class="gx-preview-alert-icon">!</div><strong id="gx-alert-preview-title">Sin incidencia activa</strong><p id="gx-alert-preview-copy">Cuando actives una incidencia, la vista del cliente aparecerá aquí.</p></div></aside>
+</div>
+</div>
+</section>
+<section class="tab-content gx-mobile-workspace" id="tab-operaciones">
+<div class="gx-page-heading">
+<div><div class="gx-eyebrow">Bandeja operativa</div><h1>Operaciones</h1><p>Todo lo que requiere una decisión o seguimiento.</p></div>
+</div>
+<div class="gx-mobile-ops-filters" id="gx-mobile-ops-filters">
+<button class="active" data-gx-mobile-ops="priority" onclick="gxSetMobileOpsFilter('priority',this)">Prioridad</button>
+<button data-gx-mobile-ops="review" onclick="gxSetMobileOpsFilter('review',this)">Pagos</button>
+<button data-gx-mobile-ops="cancellation" onclick="gxSetMobileOpsFilter('cancellation',this)">Cancelaciones</button>
+<button data-gx-mobile-ops="support" onclick="gxSetMobileOpsFilter('support',this)">Soporte</button>
+<button class="gx-ops-registration-alert" onclick="gxOpenRegistrationControl()">Registros <b id="gx-ops-registration-count">0</b></button>
+<button data-gx-mobile-ops="activity" onclick="gxSetMobileOpsFilter('activity',this)">Actividad</button>
+</div>
+<div class="gx-mobile-ops-list" id="gx-mobile-ops-list"></div>
+</section>
+<section class="tab-content gx-mobile-workspace gx-management-hub" id="tab-gestion">
+<div class="gx-page-heading gx-management-heading">
+<div><div class="gx-eyebrow">Administración</div><h1>Gestión</h1><p>Configura el ecosistema sin perderte entre herramientas.</p></div>
+</div>
+<div class="gx-management-stack">
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>▦</span><div><strong>Catálogo</strong><small>Productos, precios, inventario y ofertas.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('catalog')">Servicios</button><button onclick="gxOpenManagementDestination('promotions')">Promociones</button></div>
+</section>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>⌁</span><div><strong>Accesos</strong><small>Cuentas madre, ocupación y credenciales.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('accounts')">Cuentas</button><button onclick="gxOpenManagementDestination('credentials')">Credenciales</button></div>
+</section>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>✦</span><div><strong>Beneficios</strong><small>Lealtad, compensaciones y misiones.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('loyalty')">Lealtad</button><button onclick="gxOpenManagementDestination('fairdeal')">Trato Justo</button><button onclick="gxOpenManagementDestination('missions')">Misiones</button></div>
+</section>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>◇</span><div><strong>Experiencia</strong><small>Qué ve el cliente y qué incidencias están activas.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('app')">App</button><button onclick="gxOpenManagementDestination('alerts')">Incidencias</button></div>
+</section>
+<section class="gx-management-row">
+<div class="gx-management-row-main"><span>◎</span><div><strong>Sistema</strong><small>Registro, elegibilidad y controles internos.</small></div></div>
+<div class="gx-management-row-actions"><button onclick="gxOpenRegistrationControl()">Registro</button></div>
+</section>
+</div>
+</section>
+</main>
+<nav class="gx-mobile-nav">
+<button class="gx-mobile-nav-btn active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)"><i>⌂</i><span>Inicio</span></button>
+<button class="gx-mobile-nav-btn" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)"><i>👥</i><span>Clientes</span></button>
+<button aria-label="Nuevo cliente" class="gx-mobile-nav-btn gx-mobile-fab" onclick="agregarNuevoCliente()"><i>＋</i></button>
+<button class="gx-mobile-nav-btn" data-admin-target="tab-operaciones" onclick="goAdminTab('tab-operaciones',this)"><i>◎</i><span>Operaciones</span></button>
+<button class="gx-mobile-nav-btn" data-admin-target="tab-gestion" onclick="goAdminTab('tab-gestion',this)"><i>⌘</i><span>Gestión</span></button>
+</nav>
+</div>
+<div aria-hidden="true" class="gx-client-focus" id="gx-client-focus"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong><small id="gx-focus-meta">—</small></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary" hidden></div><nav class="gx-focus-nav gx-focus-nav-v195" id="gx-focus-nav"><button class="active" data-gx-focus-section="billing" onclick="gxFocusSection('billing',this)">Cobro</button><button data-gx-focus-section="services" onclick="gxFocusSection('services',this)">Servicios</button><button data-gx-focus-section="benefits" onclick="gxFocusSection('benefits',this)">Beneficios</button><button data-gx-focus-section="account" onclick="gxFocusSection('account',this)">Cuenta</button></nav><div class="gx-focus-overview" id="gx-focus-overview"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
+<div aria-hidden="true" class="gx-registration-control" id="gx-registration-control">
+<div class="gx-registration-backdrop" onclick="gxCloseRegistrationControl()"></div>
+<section class="gx-registration-sheet">
+<header>
+<div>
+<span class="gx-eyebrow">Registro inteligente</span>
+<h2>Registro &amp; activación</h2>
+<p>Valida nuevas altas, prepara códigos temporales de 24 h y evita duplicados antes de crear Mi Espacio.</p>
+</div>
+<button onclick="gxCloseRegistrationControl()" type="button">×</button>
+</header>
+<div class="gx-registration-kpis">
+<div class="new"><span>Nuevos</span><strong id="gx-reg-kpi-new">0</strong><small>Listos para aprobar</small></div>
+<div class="activation"><span>Pendientes</span><strong id="gx-reg-kpi-activation">0</strong><small>Esperando activación</small></div>
+<div class="danger"><span>Revisión</span><strong id="gx-reg-kpi-review">0</strong><small>Requieren decisión</small></div>
+<div class="activated"><span>Activados</span><strong id="gx-reg-kpi-activated">0</strong><small>Altas completadas</small></div>
+</div>
+<div class="gx-registration-tabs">
+<button class="active" data-gx-reg-tab="new" onclick="gxRegistrationTab('new',this)">Nuevos</button>
+<button data-gx-reg-tab="pending" onclick="gxRegistrationTab('pending',this)">Pendientes</button>
+<button data-gx-reg-tab="review" onclick="gxRegistrationTab('review',this)">Revisión</button>
+<button data-gx-reg-tab="activated" onclick="gxRegistrationTab('activated',this)">Activados</button>
+<button data-gx-reg-tab="history" onclick="gxRegistrationTab('history',this)">Historial</button>
+<button data-gx-reg-tab="legacy" onclick="gxRegistrationTab('legacy',this)">Base previa</button>
+</div>
+<div class="gx-registration-list" id="gx-registration-list"></div>
+</section>
+</div>
+<div aria-hidden="true" class="gx-activation-delivery" id="gx-activation-delivery">
+<div class="gx-activation-delivery-backdrop" onclick="gxCloseActivationDelivery()"></div>
+<section class="gx-activation-delivery-sheet">
+<header>
+<div><span class="gx-eyebrow">Código creado</span><h3 id="gx-activation-delivery-name">Cliente</h3><p>Este código se muestra una sola vez. Al regenerarlo, el anterior deja de funcionar.</p></div>
+<button onclick="gxCloseActivationDelivery()" type="button">×</button>
+</header>
+<div class="gx-activation-credential-grid">
+<div><span>GOXION ID</span><strong id="gx-activation-delivery-user">@usuario</strong></div>
+<div class="code"><span>Código</span><strong id="gx-activation-delivery-code">••••••</strong></div>
+</div>
+<div class="gx-activation-delivery-meta"><span>WhatsApp <b id="gx-activation-delivery-phone">—</b></span><span>Vence <b id="gx-activation-delivery-exp">—</b></span></div>
+<div class="gx-activation-delivery-actions">
+<button class="primary" onclick="gxOpenActivationWhatsApp()" type="button">Enviar por WhatsApp</button>
+<button onclick="gxCopyActivationMessage()" type="button">Copiar mensaje</button>
+</div>
+<small class="gx-activation-delivery-note">Mi Espacio todavía no está activo. El cliente deberá usar este código y crear su propio PIN.</small>
+</section>
+</div>
+<!-- CENTRO DE NOTIFICACIONES / ACTIVIDAD -->
+<aside aria-hidden="true" class="gx-notification-drawer" id="gx-notification-drawer">
+<div class="gx-notification-drawer-head">
+<div><span class="gx-eyebrow">Actividad</span><h3>Notificaciones</h3></div>
+<button class="gx-focus-close" onclick="gxToggleNotifications(false)" type="button">×</button>
+</div>
+<div class="gx-notification-toolbar">
+<div class="gx-notif-summary" id="gx-notification-summary">Pagos, solicitudes y actividad de Mi Espacio.</div>
+<button class="gx-notif-read" onclick="gxMarkAllNotificationsRead()" title="Marcar como atendidas las visibles" type="button">✓</button>
+<button class="gx-notif-refresh" onclick="gxRefreshNotifications()" title="Actualizar" type="button">↻</button>
+</div>
+<div class="gx-notification-filter-row" id="gx-notification-filters">
+<button class="gx-notif-filter active" data-gx-notif-filter="all" onclick="gxSetNotificationFilter('all',this)" type="button">Prioridad <b id="gx-notif-count-all">0</b></button>
+<button class="gx-notif-filter" data-gx-notif-filter="review" onclick="gxSetNotificationFilter('review',this)" type="button">Por revisar <b id="gx-notif-count-review">0</b></button>
+<button class="gx-notif-filter" data-gx-notif-filter="overdue" onclick="gxSetNotificationFilter('overdue',this)" type="button">Vencidos <b id="gx-notif-count-overdue">0</b></button>
+<button class="gx-notif-filter" data-gx-notif-filter="cancellation" onclick="gxSetNotificationFilter('cancellation',this)" type="button">Cancelaciones <b id="gx-notif-count-cancellation">0</b></button>
+<button class="gx-notif-filter" data-gx-notif-filter="support" onclick="gxSetNotificationFilter('support',this)" type="button">Soporte <b id="gx-notif-count-support">0</b></button>
+<button class="gx-notif-filter" data-gx-notif-filter="activity" onclick="gxSetNotificationFilter('activity',this)" type="button">Actividad <b id="gx-notif-count-activity">0</b></button>
+<button class="gx-notif-filter" data-gx-notif-filter="upcoming" onclick="gxSetNotificationFilter('upcoming',this)" type="button">Próximos <b id="gx-notif-count-upcoming">0</b></button>
+</div>
+<div class="gx-notification-list" id="gx-notification-list"></div>
+</aside>
+<div class="gx-notification-overlay" id="gx-notification-overlay" onclick="gxToggleNotifications(false)"></div>
+<!-- REVISIÓN DE PAGO -->
+<div aria-hidden="true" class="gx-payment-modal" id="gx-payment-modal">
+<div class="gx-payment-backdrop" onclick="gxClosePaymentModal()"></div>
+<section class="gx-payment-sheet">
+<div class="gx-focus-handle"></div>
+<header>
+<div>
+<span class="gx-eyebrow">Validación de pago</span>
+<h3 id="gx-payment-client-name">Cliente</h3>
+<small id="gx-payment-client-meta"></small>
+</div>
+<button class="gx-focus-close" onclick="gxClosePaymentModal()" type="button">×</button>
+</header>
+<div class="gx-payment-review-card" id="gx-payment-review-card"></div>
+<div class="gx-payment-actions">
+<button class="gx-payment-action approve" onclick="gxPaymentApprove()" type="button">✓ Aprobar</button>
+<button class="gx-payment-action incomplete" onclick="gxPreparePaymentIncomplete()" type="button">⚠ Pago incompleto</button>
+<button class="gx-payment-action reject" onclick="gxPaymentReject()" type="button">✕ Rechazar</button>
+</div>
+<div class="gx-payment-extra">
+<label class="gx-inline-check"><input checked="" id="gx-payment-punctual" type="checkbox"/><span>Contar como pago puntual para Lealtad</span></label>
+<textarea id="gx-payment-note" placeholder="Nota opcional / motivo para el cliente..."></textarea>
+<div class="gx-missing-amount" id="gx-missing-amount-wrap">
+<span>Monto faltante</span>
+<input id="gx-missing-amount" min="0" placeholder="$0" step="1" type="number"/>
+</div>
+<button class="gx-confirm-incomplete" id="gx-confirm-incomplete" onclick="gxPaymentIncomplete()" type="button">Confirmar pago incompleto</button>
+</div>
+</section>
+</div>
+<div id="modal-seleccionar-clientes" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;align-items:center;justify-content:center;padding:15px"><div class="gx-selection-modal"><h3>Seleccionar clientes</h3><input class="search-bar" id="search-modal-clientes" oninput="filtrarModalClientes()" placeholder="Buscar cliente por nombre..." type="text"/><div id="lista-clientes-modal"></div><div class="gx-modal-actions"><button class="gx-secondary-action" onclick="cerrarModalSeleccion()">Cancelar</button><button class="gx-primary-action" onclick="aplicarMisionesMasivas('seleccionados')">Aplicar misiones</button></div></div></div>
+<script src="./assets/js/core/runtime.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.91.0/dist/umd/supabase.min.js"></script>
+<script src="./assets/js/core/realtime.js"></script>
+<script src="./assets/js/core/financial-engine.js"></script>
+<script src="./assets/js/core/financial-actions.js"></script>
+<script src="./assets/js/admin/01-01-inline.js"></script>
+<!-- GOXION ADMIN // CAPA SUPABASE V2
+         Mantiene intacta la interfaz y añade diagnóstico visible. -->
+<script id="goxion-admin-supabase-layer" src="./assets/js/admin/02-admin-supabase-layer.js"></script>
+<!-- GOXION ADMIN // ESCRITURA INMEDIATA SUPABASE -->
+<script id="goxion-supabase-v3-writes" src="./assets/js/admin/03-supabase-v3-writes.js"></script>
+<!-- GOXION ADMIN // STOCK REAL + REACTIVACIÓN DE REFERIDOS -->
+<script id="goxion-admin-v4-fixes" src="./assets/js/admin/04-admin-v4-fixes.js"></script>
+<!-- GOXION ADMIN // INVENTARIO INTELIGENTE DESDE SUPABASE -->
+<script id="goxion-admin-v5-inventory" src="./assets/js/admin/05-admin-v5-inventory.js"></script>
+<script id="goxion-admin-operations-ui" src="./assets/js/admin/06-admin-operations-ui.js"></script>
+<script id="goxion-admin-ops-v2" src="./assets/js/admin/07-admin-ops-v2.js"></script>
+<script id="goxion-admin-payment-referral-guards" src="./assets/js/admin/08-admin-payment-referral-guards.js"></script>
+<script id="goxion-admin-v4-ergonomics" src="./assets/js/admin/09-admin-v4-ergonomics.js"></script>
+<script id="goxion-admin-v6-referral-linking" src="./assets/js/admin/10-admin-v6-referral-linking.js"></script>
+<script id="goxion-admin-v9-cycle-ui" src="./assets/js/admin/11-admin-v9-cycle-ui.js"></script>
+<div aria-hidden="true" class="gx-tj-overlay" id="gx-tj-overlay">
+<div class="gx-tj-backdrop" onclick="gxCloseTratoJusto()"></div>
+<section aria-modal="true" class="gx-tj-modal" role="dialog">
+<header class="gx-tj-head">
+<div><span>GARANTÍA GOXION</span><strong>🛡 Trato Justo</strong></div>
+<button onclick="gxCloseTratoJusto()" type="button">×</button>
+</header>
+<div class="gx-tj-body">
+<div class="gx-tj-service">
+<div><small>Servicio afectado</small><strong id="gx-tj-service-name">—</strong></div>
+<div><small>Mensualidad</small><strong id="gx-tj-service-price">$0.00</strong></div>
+</div>
+<label class="gx-tj-field">
+<span>Periodo al que aplica</span>
+<input id="gx-tj-period" type="month"/>
+</label>
+<div class="gx-tj-days-block">
+<div><span>Días completos sin servicio</span><small>5% por cada día · máximo 10 días</small></div>
+<div class="gx-tj-stepper">
+<button onclick="gxTJStep(-1)" type="button">−</button>
+<strong id="gx-tj-days">1</strong>
+<button onclick="gxTJStep(1)" type="button">+</button>
+</div>
+</div>
+<label class="gx-tj-field">
+<span>Motivo</span>
+<select id="gx-tj-reason">
+<option value="Falla técnica">Falla técnica</option>
+<option value="Intermitencia prolongada">Intermitencia prolongada</option>
+<option value="Acceso no disponible">Acceso no disponible</option>
+<option value="Mantenimiento / incidencia de plataforma">Mantenimiento / incidencia de plataforma</option>
+<option value="Compensación autorizada">Compensación autorizada</option>
+</select>
+</label>
+<div class="gx-tj-result">
+<div><small>Compensación</small><strong id="gx-tj-percent">5%</strong></div>
+<div><small>Descuento</small><strong id="gx-tj-amount">-$0.00</strong></div>
+</div>
+<div class="gx-tj-policy">La compensación se calcula sobre la cuota del servicio afectado y queda ligada al periodo seleccionado. Límite: 50% por servicio y periodo.</div>
+</div>
+<footer class="gx-tj-actions">
+<button class="gx-tj-delete" id="gx-tj-delete" onclick="gxDeleteTratoJusto()" style="display:none" type="button">Eliminar</button>
+<button class="gx-tj-cancel" onclick="gxCloseTratoJusto()" type="button">Cancelar</button>
+<button class="gx-tj-save" onclick="gxSaveTratoJusto()" type="button">Aplicar compensación</button>
+</footer>
+</section>
+</div>
+<script id="goxion-admin-v10-trato-justo-controller" src="./assets/js/admin/12-admin-v10-trato-justo-controller.js"></script>
+<div aria-label="Versión de GOXION" class="goxion-release-version">GOXION · Admin · v1.2.0</div>
+<script id="goxion-admin-ayuda-bridge-controller" src="./assets/js/admin/13-admin-ayuda-bridge-controller.js"></script>
+<script id="goxion-admin-mobile-controller" src="./assets/js/admin/14-admin-mobile-controller.js"></script>
+<script id="goxion-admin-catalog-controller" src="./assets/js/admin/15-admin-catalog-controller.js"></script>
+<script id="goxion-admin-filters-pin-controller" src="./assets/js/admin/16-admin-filters-pin-controller.js"></script>
+<script id="goxion-admin-loyalty-controller" src="./assets/js/admin/17-admin-loyalty-controller.js"></script>
+<script id="goxion-admin-responsive-controller" src="./assets/js/admin/18-admin-responsive-controller.js"></script>
+<script id="goxion-admin-trato-justo-masivo-controller" src="./assets/js/admin/19-admin-trato-justo-masivo-controller.js"></script>
+<script id="goxion-admin-security-controller" src="./assets/js/admin/20-admin-security-controller.js"></script>
+<script id="goxion-admin-smart-operations-controller" src="./assets/js/admin/21-admin-smart-operations-controller.js"></script>
+<script id="goxion-admin-registration-controller" src="./assets/js/admin/22-admin-registration-controller.js"></script>
+
+<!-- GOXION ADMIN BETA 13 // PRODUCTOS Y ACCESOS -->
+<div aria-hidden="true" class="gx-product-builder" id="gx-product-builder">
+<div class="gx-product-builder-backdrop" onclick="gxCloseProductBuilder(event)"></div>
+<section aria-labelledby="gx-product-builder-title" aria-modal="true" class="gx-product-builder-sheet" role="dialog">
+<button aria-label="Cerrar" class="gx-product-builder-close" onclick="gxCloseProductBuilder(event)" type="button">×</button>
+<span class="gx-eyebrow">Catálogo inteligente</span>
+<h2 id="gx-product-builder-title">Nuevo producto</h2>
+<p class="gx-product-builder-copy">Escribe un servicio normal o usa <strong> + </strong> entre plataformas. GOXION propondrá la composición y tú la confirmas antes de guardar.</p>
+<label class="gx-product-builder-field">
+<span>Nombre comercial</span>
+<input id="gx-product-name" oninput="gxProductNameChanged()" placeholder="Ej. ViX + Netflix" type="text"/>
+</label>
+<div class="gx-product-detection" id="gx-product-detection">
+<i>◇</i><div><strong>Esperando nombre</strong><span>Disney+ no se interpreta como combo; solo se detecta el signo + separado por espacios.</span></div>
+</div>
+<div class="gx-product-components" id="gx-product-components"></div>
+<div class="gx-product-manual-row">
+<select id="gx-product-component-select"></select>
+<input aria-label="Cantidad" id="gx-product-component-qty" max="20" min="1" type="number" value="1"/>
+<button onclick="gxAddManualProductComponent()" type="button">＋</button>
+</div>
+<div class="gx-product-builder-grid">
+<label class="gx-product-builder-field"><span>Precio de venta</span><input id="gx-product-price" min="0" step="0.01" type="number" value="0"/></label>
+<label class="gx-product-builder-field"><span>Etiqueta</span><input id="gx-product-label" placeholder="Opcional" type="text"/></label>
+<label class="gx-product-builder-field wide"><span>Beneficios</span><input id="gx-product-benefits" placeholder="Opcional" type="text"/></label>
+</div>
+<div class="gx-product-builder-foot">
+<div id="gx-product-builder-summary">Producto individual.</div>
+<button id="gx-product-create" onclick="gxCreateSmartProduct()" type="button">Crear producto</button>
+</div>
+</section>
+</div>
+
+<script id="goxion-admin-beta-13-access-controller" src="./assets/js/admin/23-admin-beta-13-access-controller.js"></script>
+
+
+
+
+
+<script id="goxion-admin-beta-18-central-billing-hooks" src="./assets/js/admin/24-admin-beta-18-central-billing-hooks.js"></script>
+<script id="goxion-admin-beta-19-controller" src="./assets/js/admin/25-admin-beta-19-controller.js"></script>
+<script id="goxion-promotions-studio-v2" src="./assets/js/admin/29-promotions-studio-v2.js"></script>
+
+
+<script id="goxion-admin-beta-19-5-behavior" src="./assets/js/admin/26-admin-beta-19-5-behavior.js"></script>
+
+<script id="goxion-admin-beta-19-8-behavior" src="./assets/js/admin/27-admin-beta-19-8-behavior.js"></script>
+
+<!-- GOXION ADMIN BETA 20 // MOTOR DE BENEFICIOS -->
+<div class="gx-benefit-modal" id="gx-benefit-modal" aria-hidden="true">
+  <div class="gx-benefit-modal-backdrop" onclick="gxCloseBenefitModal()"></div>
+  <section class="gx-benefit-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-benefit-title">
+    <header>
+      <div><span class="gx-eyebrow">Cobro inteligente</span><h2 id="gx-benefit-title">Programar descuento</h2><p id="gx-benefit-client">Cliente</p></div>
+      <button type="button" class="gx-benefit-close" onclick="gxCloseBenefitModal()">×</button>
+    </header>
+    <input type="hidden" id="gx-benefit-key">
+    <div class="gx-benefit-form">
+      <label class="wide"><span>Concepto</span><input id="gx-benefit-concept" type="text" maxlength="140" placeholder="Ej. Ajuste comercial"></label>
+      <label><span>Tipo</span><select id="gx-benefit-type" onchange="gxUpdateBenefitPreview()"><option value="monto">Monto fijo</option><option value="porcentaje">Porcentaje</option></select></label>
+      <label><span>Valor</span><div class="gx-benefit-value-wrap"><b id="gx-benefit-symbol">$</b><input id="gx-benefit-value" type="number" min="0.01" step="0.01" inputmode="decimal" oninput="gxUpdateBenefitPreview()"></div></label>
+      <label><span>Comienza</span><input id="gx-benefit-period" type="month" onchange="gxUpdateBenefitPreview()"></label>
+      <label><span>Duración</span><div class="gx-benefit-duration"><input id="gx-benefit-duration" type="number" min="1" max="36" step="1" value="1" inputmode="numeric" oninput="gxUpdateBenefitPreview()"><em>periodos</em></div></label>
+    </div>
+    <div class="gx-benefit-preview" id="gx-benefit-preview">Se aplicará durante 1 periodo.</div>
+    <div class="gx-benefit-actions"><button type="button" onclick="gxCloseBenefitModal()">Cancelar</button><button type="button" class="primary" id="gx-benefit-save" onclick="gxSaveBenefit()">Programar descuento</button></div>
+  </section>
+</div>
+<script id="goxion-admin-beta-20-benefits" src="./assets/js/admin/28-admin-beta-20-benefits.js"></script>
+
+
+<script id="goxion-admin-beta-22-behavior" src="./assets/js/admin/29-admin-beta-22-behavior.js"></script>
+<script id="goxion-admin-audit-closure" src="./assets/js/admin/30-admin-audit-closure.js"></script>
+
+<script id="goxion-admin-realtime" src="./assets/js/admin/31-admin-realtime.js"></script>
+
+</body>
+</html>
