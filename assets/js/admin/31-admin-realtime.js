@@ -4,10 +4,10 @@
 
   const refresh = async (reason) => {
     if (refreshing) { queued = true; return; }
-    if (typeof window.gxAdminRealtimeRefresh !== "function") return;
+    if (typeof window.inicializarPanel !== "function") return;
     refreshing = true;
     try {
-      await window.gxAdminRealtimeRefresh();
+      await window.inicializarPanel();
       if (reason === "promotions" && typeof window.gxPromoLoad === "function") {
         await window.gxPromoLoad();
       }
@@ -24,7 +24,7 @@
 
   window.addEventListener("goxion:realtime", (event) => {
     const scope = event.detail?.scope || "general";
-    if (["registrations", "admin_activity", "catalog", "inventory", "promotions", "resync"].includes(scope)) {
+    if (["registrations", "admin_activity", "catalog", "inventory", "promotions", "client_state", "resync"].includes(scope)) {
       refresh(scope);
     }
   });
