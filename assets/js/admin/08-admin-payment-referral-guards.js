@@ -51,7 +51,6 @@
             if(!(amount>0)) throw new Error("Captura el monto faltante para registrar el pago parcial.");
                 if(typeof window.GOXION_FINANCIAL_ACTIONS?.registerPartialPayment!=="function") throw new Error("Motor financiero no disponible. No se aplicó ningún cambio.");
                 await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
-                await window.GOXION_FINANCIAL_ACTIONS.registerPartialPayment({
                     clienteId:c._id,
                     saldoRestante:amount,
                     notas:msg,
