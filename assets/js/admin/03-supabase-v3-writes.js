@@ -155,14 +155,6 @@
                     return;
                 }
 
-                // usuario_acceso se mantiene visualmente; el backend principal
-                // se ampliará para persistirlo. Evitamos mentir con un guardado falso.
-                if (field === "usuario_acceso") {
-                    c.usuario_acceso = String(v || "");
-                    alert("ℹ️ Usuario/Correo actualizado en pantalla. Este campo se activará en persistencia al cerrar la compatibilidad del backend.");
-                    return;
-                }
-
                 await accion("editar_cliente", {
                     cliente_id: c._id,
                     [field]: v

@@ -316,7 +316,7 @@
                         <option value="manual" ${ident.origen_cliente==="manual"?"selected":""}>Alta manual</option>
                         <option value="importado" ${ident.origen_cliente==="importado"?"selected":""}>Importado</option>
                     </select></label>
-                    <label class="gx-identity-check"><span>Beneficio bienvenida</span><span class="gx-identity-eligible"><input id="gx-identity-eligible-${esc(id)}" type="checkbox" ${ident.promo_nuevo_elegible?"checked":""}> Elegible -10%</span></label>
+                    <label class="gx-identity-check"><span>Beneficio bienvenida</span><span class="gx-identity-eligible"><input id="gx-identity-eligible-${esc(id)}" type="checkbox" disabled ${ident.promo_nuevo_elegible?"checked":""}> ${ident.promo_nuevo_elegible?"Elegible -10%":"Sin beneficio"} · automático</span></label>
                     <button class="gx-identity-save" type="button" onclick="gxSaveClientIdentity('${esc(key)}','${esc(id)}')">Guardar cambios</button>
                 </div>
                 ${!ident.telefono_normalizado&&legacy?'<div class="gx-client-identity-warning">Cliente previo sin teléfono: completa este dato para reforzar la detección de registros repetidos.</div>':""}
@@ -336,10 +336,8 @@
     window.gxSaveClientIdentity=async function(key,id){
         const phone=document.getElementById(`gx-identity-phone-${id}`)?.value||"";
         const origin=document.getElementById(`gx-identity-origin-${id}`)?.value||"sd_streaming";
-        const eligible=Boolean(document.getElementById(`gx-identity-eligible-${id}`)?.checked);
-        if(origin==="sd_streaming"&&eligible&&!confirm("Este cliente está marcado como previo de SD Streaming. ¿Seguro que quieres hacerlo elegible para la promoción de cliente nuevo?"))return;
         try{
-            await api("actualizar_cliente",{cliente_id:id,telefono:phone,origen_cliente:origin,promo_nuevo_elegible:eligible});
+            await api("actualizar_cliente",{cliente_id:id,telefono:phone,origen_cliente:origin});
             await gxLoadRegistrationState(false);
             injectIdentity(key);
         }catch(e){alert("No se pudo guardar la identidad.\n\n"+e.message)}
