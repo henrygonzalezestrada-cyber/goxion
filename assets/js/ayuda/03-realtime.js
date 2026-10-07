@@ -141,7 +141,7 @@
   window.addEventListener("goxion:realtime", (event) => {
     const scope = event.detail?.scope || "";
     // Catálogo, inventario y promociones quedan explícitamente fuera de Realtime.
-    if (!["rewards", "referrals", "client_state", "resync"].includes(scope)) return;
+    if (!["account_state", "rewards", "referrals", "client_state", "resync"].includes(scope)) return;
     refreshClientSpace(scope);
   });
 })();
