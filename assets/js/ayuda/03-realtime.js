@@ -124,6 +124,20 @@
     }
   };
 
+
+  // En el preview móvil, "Estado de cuenta" permanece dentro del sandbox Realtime.
+  if (window.location.pathname.includes("/preview/realtime/")) {
+    window.irAlTicket = function() {
+      const key = typeof getCurrentClientKey === "function" ? getCurrentClientKey() : "";
+      if (!key) return;
+      const url = new URL("index-realtime.html", window.location.href);
+      url.search = "";
+      url.hash = "";
+      url.searchParams.set("cliente", key);
+      window.location.href = url.toString();
+    };
+  }
+
   window.addEventListener("goxion:realtime", (event) => {
     const scope = event.detail?.scope || "";
     // Catálogo, inventario y promociones quedan explícitamente fuera de Realtime.
