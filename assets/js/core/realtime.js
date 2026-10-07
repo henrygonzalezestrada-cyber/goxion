@@ -17,6 +17,7 @@
   const pending = new Map();
   let channel = null;
   let status = "CLOSED";
+  let hasSubscribedOnce = false;
 
   const emit = (scope, payload = {}) => {
     const key = String(scope || "general");
@@ -48,7 +49,10 @@
         if (nextStatus === "CHANNEL_ERROR" || nextStatus === "TIMED_OUT") {
           console.warn("GOXION Realtime:", nextStatus, error || "");
         }
-        if (nextStatus === "SUBSCRIBED") emit("resync", { operation: "RECONNECT" });
+        if (nextStatus === "SUBSCRIBED") {
+          if (hasSubscribedOnce) emit("resync", { operation: "RECONNECT" });
+          hasSubscribedOnce = true;
+        }
       });
     return channel;
   };
