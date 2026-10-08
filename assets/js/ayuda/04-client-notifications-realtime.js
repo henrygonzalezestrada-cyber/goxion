@@ -54,10 +54,21 @@
   function setSessionHeader(){
     const auth=document.getElementById("header-action-btn");
     const text=document.getElementById("header-btn-text");
+    const bell=document.getElementById("gx-client-notif-launch");
     const active=Boolean(token() && typeof getCurrentClientKey==="function" && getCurrentClientKey());
 
-    if(auth)auth.classList.toggle("gx-client-session-active",active);
-    if(active && text)text.textContent="Salir";
+    if(auth){
+      auth.classList.toggle("gx-client-session-active",active);
+      auth.classList.toggle("gx-client-session-guest",!active);
+    }
+    if(text)text.textContent=active?"Salir":"Iniciar sesión";
+    if(bell){
+      bell.classList.toggle("gx-session-guest",!active);
+      bell.disabled=!active;
+      bell.tabIndex=active?0:-1;
+      bell.setAttribute("aria-hidden",active?"false":"true");
+    }
+    return active;
   }
 
   function ringBell(){
@@ -102,7 +113,7 @@
     }
     if(btn.parentElement!==actions)actions.insertBefore(btn,auth);
 
-    btn.hidden=!token();
+    setSessionHeader();
 
     if(!document.getElementById("gx-client-notif-overlay")){
       const overlay=document.createElement("div");
@@ -248,9 +259,29 @@
     setSessionHeader();
   });
 
+  const baseLogout=window.cerrarSesion;
+  if(typeof baseLogout==="function"&&!baseLogout.__gxNotifWrapped){
+    const wrappedLogout=function(...args){
+      const result=baseLogout.apply(this,args);
+      state.items=[];
+      state.unread=0;
+      state.initialized=false;
+      setTimeout(()=>{
+        ensureUi();
+        setSessionHeader();
+        render();
+      },0);
+      return result;
+    };
+    wrappedLogout.__gxNotifWrapped=true;
+    window.cerrarSesion=wrappedLogout;
+    try{cerrarSesion=wrappedLogout;}catch(_){}
+  }
+
   document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{
     ensureUi();
-    if(token())load();
+    const active=setSessionHeader();
+    if(active)load();
   },450));
 
   window.GOXION_CLIENT_NOTIFICATIONS=Object.freeze({
