@@ -132,6 +132,7 @@
           '<div><strong>Notificaciones</strong><small id="gx-client-notif-head-summary">Actividad de tu cuenta</small></div>'+
           '<div class="gx-client-notif-head-actions">'+
             '<button type="button" id="gx-client-notif-mark-all">Marcar leídas</button>'+
+            '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all">Eliminar todo</button>'+
             '<button type="button" class="gx-client-notif-close" aria-label="Cerrar">×</button>'+
           '</div>'+
         '</div>'+
@@ -139,6 +140,7 @@
       document.body.appendChild(sheet);
       sheet.querySelector(".gx-client-notif-close").onclick=()=>closeSheet();
       sheet.querySelector("#gx-client-notif-mark-all").onclick=()=>markAll();
+      sheet.querySelector("#gx-client-notif-clear-all").onclick=()=>armClearAll();
     }
 
     setSessionHeader();
@@ -152,6 +154,14 @@
     const headSummary=document.getElementById("gx-client-notif-head-summary");
     const launch=document.getElementById("gx-client-notif-launch");
     const list=document.getElementById("gx-client-notif-list");
+    const markAllBtn=document.getElementById("gx-client-notif-mark-all");
+    const clearAllBtn=document.getElementById("gx-client-notif-clear-all");
+
+    if(markAllBtn)markAllBtn.disabled=state.unread<=0;
+    if(clearAllBtn){
+      clearAllBtn.disabled=state.items.length<=0;
+      if(state.items.length<=0)resetClearAll();
+    }
 
     if(badge)badge.textContent=state.unread>99?"99+":String(state.unread);
     if(headSummary)headSummary.textContent=state.unread?(state.unread+" sin leer"):"Actividad reciente";
@@ -221,6 +231,56 @@
     render();
     try{await api("marcar_todas");}
     catch(error){state.items=backup;state.unread=backupUnread;render();console.warn("No se pudieron marcar notificaciones:",error);}
+  }
+
+  function resetClearAll(){
+    const btn=document.getElementById("gx-client-notif-clear-all");
+    if(!btn)return;
+    clearTimeout(btn._gxConfirmTimer);
+    btn._gxArmed=false;
+    btn.classList.remove("gx-confirm");
+    btn.textContent="Eliminar todo";
+  }
+
+  function armClearAll(){
+    const btn=document.getElementById("gx-client-notif-clear-all");
+    if(!btn||state.items.length<=0)return;
+
+    if(btn._gxArmed){
+      clearAll();
+      return;
+    }
+
+    btn._gxArmed=true;
+    btn.classList.add("gx-confirm");
+    btn.textContent="Confirmar";
+    clearTimeout(btn._gxConfirmTimer);
+    btn._gxConfirmTimer=setTimeout(()=>resetClearAll(),2800);
+  }
+
+  async function clearAll(){
+    const btn=document.getElementById("gx-client-notif-clear-all");
+    if(!btn||state.items.length<=0)return;
+
+    const backup=state.items.map(x=>({...x}));
+    const backupUnread=state.unread;
+    btn.disabled=true;
+    btn.textContent="Eliminando…";
+
+    state.items=[];
+    state.unread=0;
+    render();
+
+    try{
+      await api("eliminar_todas");
+      resetClearAll();
+    }catch(error){
+      state.items=backup;
+      state.unread=backupUnread;
+      render();
+      resetClearAll();
+      console.warn("No se pudieron eliminar las notificaciones:",error);
+    }
   }
 
   function openSheet(){
