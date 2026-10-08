@@ -1,29 +1,153 @@
 /* GOXION · Client notifications preview */
-.gx-client-notif-launch{
-  width:100%;margin:0 0 14px;padding:12px 14px;border-radius:18px;
-  border:1px solid rgba(255,255,255,.09);background:rgba(8,10,18,.58);
-  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
-  color:#fff;display:flex;align-items:center;justify-content:space-between;
-  gap:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
-}
-.gx-client-notif-launch-main{display:flex;align-items:center;gap:10px;min-width:0}
-.gx-client-notif-icon{
-  width:36px;height:36px;border-radius:13px;display:grid;place-items:center;
-  background:rgba(0,242,254,.08);border:1px solid rgba(0,242,254,.18);color:var(--neon-blue);
-}
-.gx-client-notif-copy{text-align:left;min-width:0}
-.gx-client-notif-copy strong{display:block;font-size:12px;letter-spacing:.02em}
-.gx-client-notif-copy small{display:block;margin-top:2px;color:var(--text-muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.gx-client-notif-badge{
-  min-width:24px;height:24px;padding:0 7px;border-radius:999px;display:grid;place-items:center;
-  font-size:10px;font-weight:900;background:linear-gradient(135deg,#7c4dff,#00f2fe);color:#fff;
-  box-shadow:0 0 18px rgba(0,242,254,.22);
-}
-.gx-client-notif-badge[hidden]{display:none}
-.gx-client-notif-launch.gx-has-new{border-color:rgba(0,242,254,.26)}
-.gx-client-notif-launch.gx-has-new .gx-client-notif-icon{animation:gxNotifPulse 1.6s ease 1}
-@keyframes gxNotifPulse{0%,100%{transform:scale(1)}40%{transform:scale(1.08);box-shadow:0 0 20px rgba(0,242,254,.24)}}
 
+/* Header actions: bell + session */
+.gx-header-actions{
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:8px;
+  min-width:0;
+}
+#header-action-btn.gx-client-session-active{
+  min-height:42px;
+  padding:0 15px;
+  border-radius:21px;
+  flex:0 0 auto;
+}
+#header-action-btn.gx-client-session-active .gx-auth-pill-icon{
+  display:none!important;
+}
+#header-action-btn.gx-client-session-active .gx-auth-pill-label{
+  gap:0;
+}
+
+/* Morphing notification bubble */
+.gx-client-notif-launch{
+  appearance:none;
+  -webkit-appearance:none;
+  width:42px;
+  min-width:42px;
+  height:42px;
+  padding:0;
+  border-radius:21px;
+  border:1px solid rgba(0,242,254,.24);
+  background:rgba(0,242,254,.08);
+  color:var(--neon-blue);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0;
+  overflow:hidden;
+  cursor:pointer;
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+  transition:
+    width .38s cubic-bezier(.22,.82,.22,1),
+    min-width .38s cubic-bezier(.22,.82,.22,1),
+    padding .38s cubic-bezier(.22,.82,.22,1),
+    gap .38s cubic-bezier(.22,.82,.22,1),
+    border-color .25s ease,
+    background .25s ease,
+    box-shadow .25s ease;
+  flex:0 0 auto;
+}
+.gx-client-notif-launch[hidden]{
+  display:none!important;
+}
+.gx-client-notif-launch.gx-has-new{
+  width:74px;
+  min-width:74px;
+  padding:0 10px;
+  gap:7px;
+  justify-content:center;
+  border-color:rgba(0,242,254,.38);
+  background:rgba(0,242,254,.105);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.055),
+    0 0 20px rgba(0,242,254,.08);
+}
+.gx-client-notif-icon{
+  width:20px;
+  height:20px;
+  display:grid;
+  place-items:center;
+  flex:0 0 20px;
+}
+.gx-client-notif-bell{
+  width:19px;
+  height:19px;
+  display:block;
+  transform-origin:50% 18%;
+  will-change:transform;
+}
+.gx-client-notif-clapper{
+  transform-origin:50% 50%;
+}
+.gx-client-notif-badge{
+  display:grid;
+  place-items:center;
+  min-width:0;
+  max-width:0;
+  height:22px;
+  padding:0;
+  margin:0;
+  opacity:0;
+  overflow:hidden;
+  border-radius:999px;
+  font-size:10px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.02em;
+  background:linear-gradient(135deg,#7c4dff,#00f2fe);
+  color:#fff;
+  box-shadow:0 0 14px rgba(0,242,254,.18);
+  transform:translateX(-5px) scale(.78);
+  transition:
+    opacity .22s ease,
+    max-width .38s cubic-bezier(.22,.82,.22,1),
+    min-width .38s cubic-bezier(.22,.82,.22,1),
+    padding .38s cubic-bezier(.22,.82,.22,1),
+    transform .32s cubic-bezier(.22,.82,.22,1);
+}
+.gx-client-notif-launch.gx-has-new .gx-client-notif-badge{
+  min-width:22px;
+  max-width:34px;
+  padding:0 6px;
+  opacity:1;
+  transform:translateX(0) scale(1);
+}
+.gx-client-notif-launch.gx-ringing .gx-client-notif-bell{
+  animation:gxBellRing .82s cubic-bezier(.36,.07,.19,.97) both;
+}
+.gx-client-notif-launch.gx-ringing .gx-client-notif-clapper{
+  animation:gxBellClapper .82s cubic-bezier(.36,.07,.19,.97) both;
+}
+@keyframes gxBellRing{
+  0%,100%{transform:rotate(0deg)}
+  12%{transform:rotate(-18deg)}
+  26%{transform:rotate(15deg)}
+  40%{transform:rotate(-12deg)}
+  54%{transform:rotate(9deg)}
+  68%{transform:rotate(-6deg)}
+  82%{transform:rotate(3deg)}
+}
+@keyframes gxBellClapper{
+  0%,100%{transform:translateX(0)}
+  18%{transform:translateX(1.4px)}
+  36%{transform:translateX(-1.2px)}
+  54%{transform:translateX(1px)}
+  72%{transform:translateX(-.7px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .gx-client-notif-launch,
+  .gx-client-notif-badge{transition:none}
+  .gx-client-notif-launch.gx-ringing .gx-client-notif-bell,
+  .gx-client-notif-launch.gx-ringing .gx-client-notif-clapper{animation:none}
+}
+
+/* Notification sheet */
 .gx-client-notif-overlay{
   position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(8px);
   -webkit-backdrop-filter:blur(8px);z-index:10020;opacity:0;pointer-events:none;transition:opacity .24s ease;
@@ -58,6 +182,11 @@
 .gx-client-notif-item p{font-size:11px;line-height:1.45;color:#cdd0dc;margin:5px 0 0}
 .gx-client-notif-kind{display:inline-flex;margin-top:8px;padding:4px 7px;border-radius:999px;background:rgba(124,77,255,.08);border:1px solid rgba(124,77,255,.16);font-size:8px;color:#bca9ff;text-transform:uppercase;letter-spacing:.09em;font-weight:900}
 .gx-client-notif-empty{text-align:center;padding:35px 18px;color:var(--text-muted);font-size:11px}
+@media(max-width:420px){
+  .gx-header-actions{gap:7px}
+  #header-action-btn.gx-client-session-active{padding:0 13px}
+  .gx-client-notif-launch.gx-has-new{width:70px;min-width:70px;padding:0 9px}
+}
 @media(min-width:700px){
   .gx-client-notif-sheet{left:50%;right:auto;width:min(520px,92vw);transform:translate(-50%,104%);border-radius:26px 26px 0 0}
   .gx-client-notif-sheet.show{transform:translate(-50%,0)}
