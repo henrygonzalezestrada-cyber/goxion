@@ -15,6 +15,7 @@
     'login-goxion': 'login-goxion',
     'mi-espacio': 'mi-espacio',
     'notificar-goxion': 'notificar-goxion',
+    'notificaciones-cliente': 'notificaciones-cliente',
     'novedades-cliente': 'novedades-cliente',
     'registro-goxion': 'registro-goxion',
 
