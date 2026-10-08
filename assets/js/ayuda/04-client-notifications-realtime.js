@@ -332,7 +332,8 @@
     clearTimeout(btn._gxConfirmTimer);
     btn._gxArmed=false;
     btn.classList.remove("gx-confirm");
-    btn.textContent="Eliminar todo";
+    const label=btn.querySelector("span");
+    if(label)label.textContent="Eliminar todo";
   }
 
   function armClearAll(){
@@ -346,7 +347,8 @@
 
     btn._gxArmed=true;
     btn.classList.add("gx-confirm");
-    btn.textContent="Confirmar";
+    const label=btn.querySelector("span");
+    if(label)label.textContent="Confirmar";
     clearTimeout(btn._gxConfirmTimer);
     btn._gxConfirmTimer=setTimeout(()=>resetClearAll(),2800);
   }
@@ -358,7 +360,8 @@
     const backup=state.items.map(x=>({...x}));
     const backupUnread=state.unread;
     btn.disabled=true;
-    btn.textContent="Eliminando…";
+    const label=btn.querySelector("span");
+    if(label)label.textContent="Eliminando…";
 
     state.items=[];
     state.unread=0;
