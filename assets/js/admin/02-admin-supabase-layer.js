@@ -525,6 +525,24 @@ const n = (v, fallback = 0) => {
             }
         }
 
+        window.goxionReloadAdminModel = async function() {
+            currentToken = localStorage.getItem(ADMIN_TOKEN_KEY) || "";
+            if (!currentToken) {
+                const e = new Error("SESION_EXPIRADA");
+                e.status = 401;
+                throw e;
+            }
+
+            const data = await callAdminDatos();
+            adaptarRespuestaAdmin(data);
+
+            return {
+                clientes: clientesDict,
+                configuracion: configGlobal,
+                notificaciones: Array.isArray(window.gxAdminNotifications) ? window.gxAdminNotifications : []
+            };
+        };
+
         async function cargarAdminDatos() {
             const data = await callAdminDatos();
             adaptarRespuestaAdmin(data);
