@@ -186,7 +186,10 @@
 .gx-client-notif-head div strong{display:block;font-size:15px}
 .gx-client-notif-head div small{display:block;color:var(--text-muted);font-size:10px;margin-top:2px}
 .gx-client-notif-head-actions{display:flex;align-items:center;gap:7px}
-.gx-client-notif-head button{border:0;background:rgba(255,255,255,.06);color:#fff;border-radius:12px;padding:8px 10px;font-size:10px;font-weight:800}
+.gx-client-notif-head button{border:0;background:rgba(255,255,255,.06);color:#fff;border-radius:12px;padding:8px 10px;font-size:10px;font-weight:800;transition:background .2s ease,color .2s ease,opacity .2s ease}
+.gx-client-notif-head button:disabled{opacity:.34;cursor:default}
+.gx-client-notif-clear-all{color:#ff8b9a!important;background:rgba(255,51,102,.07)!important}
+.gx-client-notif-clear-all.gx-confirm{color:#fff!important;background:rgba(255,51,102,.34)!important;box-shadow:inset 0 0 0 1px rgba(255,51,102,.28)}
 .gx-client-notif-close{width:34px;height:34px;padding:0!important;font-size:18px!important}
 .gx-client-notif-list{padding:12px 14px calc(22px + env(safe-area-inset-bottom));overflow:auto;max-height:calc(min(76vh,720px) - 82px)}
 .gx-client-notif-item{
@@ -205,6 +208,10 @@
   .gx-header-actions{gap:7px}
   #header-action-btn.gx-client-session-active{padding:0 13px}
   .gx-client-notif-launch.gx-has-new{width:70px;min-width:70px;padding:0 9px}
+  .gx-client-notif-head{padding-left:14px;padding-right:12px}
+  .gx-client-notif-head-actions{gap:5px}
+  .gx-client-notif-head button{padding:7px 8px;font-size:9px}
+  .gx-client-notif-close{width:31px;height:31px;padding:0!important}
 }
 @media(min-width:700px){
   .gx-client-notif-sheet{left:50%;right:auto;width:min(520px,92vw);transform:translate(-50%,104%);border-radius:26px 26px 0 0}
