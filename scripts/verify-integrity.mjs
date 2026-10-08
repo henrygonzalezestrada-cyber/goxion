@@ -812,9 +812,11 @@ for (const absolute of walk(jsRoot)) {
     fail('Notification center actions: faltan acciones contextuales o navegación profunda.');
   }
   if (!notificationCss.includes('.gx-client-notif-close') ||
-      !notificationCss.includes('.gx-tone-account') ||
-      !notificationCss.includes('.gx-tone-reward')) {
-    fail('Notification center actions: se perdió el contraste visual por dominio.');
+      !notificationCss.includes('background:var(--card-glass)') ||
+      !notificationCss.includes('.gx-client-notif-swipe') ||
+      !rtNotifications.includes('bindSwipeRows(list)') ||
+      !rtNotifications.includes('eliminar_una')) {
+    fail('Notification center actions: se perdió el contrato glass o el swipe de eliminación.');
   }
   for (const triggerName of [
     'gx_notify_referral_progress',

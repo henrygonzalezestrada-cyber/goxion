@@ -154,6 +154,31 @@ Deno.serve(async(req)=>{
     }
 
 
+    if(accion==="eliminar_una"){
+      const id=String(d?.id||"").trim();
+      const source=String(d?.source||"general");
+      if(!id)return res({ok:false,error:"Falta id"},400);
+
+      if(source==="servicio"){
+        const q=await sb.from("cliente_servicio_novedades")
+          .delete()
+          .eq("id",id)
+          .eq("cliente_id",clienteId)
+          .neq("tipo","password")
+          .select("id");
+        if(q.error)throw q.error;
+        return res({ok:true,eliminadas:(q.data||[]).length});
+      }
+
+      const q=await sb.from("cliente_notificaciones")
+        .delete()
+        .eq("id",id)
+        .eq("cliente_id",clienteId)
+        .select("id");
+      if(q.error)throw q.error;
+      return res({ok:true,eliminadas:(q.data||[]).length});
+    }
+
     if(accion==="eliminar_todas"){
       const [general,servicio]=await Promise.all([
         sb.from("cliente_notificaciones")
