@@ -1,99 +1,60 @@
 (() => {
-  const GXCORE = window.GOXION_CORE;
-  const TOKEN_KEY = GXCORE?.STORAGE?.CLIENT_TOKEN;
-  const MI_URL = GXCORE?.endpoint?.("mi-espacio");
-  const ACCESS_URL = GXCORE?.endpoint?.("accesos-cliente-beta");
   let busy = false;
   let queuedScope = "";
 
-  const captureRewardsView = () => {
+  const captureUi = () => {
     const grid = document.getElementById("gamif-grid");
     const ref = document.getElementById("gamif-expanded-referral");
     const cup = document.getElementById("gamif-expanded-coupon");
-    const isVisible = el => !!el && getComputedStyle(el).display !== "none" && getComputedStyle(el).visibility !== "hidden";
+    const visible = el => !!el && getComputedStyle(el).display !== "none" && getComputedStyle(el).visibility !== "hidden";
+    const expandedService = document.querySelector(".gx-service-manage-card.expanded");
+
     return {
-      openType: isVisible(ref) && grid && getComputedStyle(grid).display === "none"
+      rewardsType: visible(ref) && grid && getComputedStyle(grid).display === "none"
         ? "referral"
-        : (isVisible(cup) && grid && getComputedStyle(grid).display === "none" ? "coupon" : ""),
+        : (visible(cup) && grid && getComputedStyle(grid).display === "none" ? "coupon" : ""),
+      serviceIndex: expandedService
+        ? Number(String(expandedService.id || "").split("-").pop())
+        : -1,
       scrollY: window.scrollY
     };
   };
 
-  const restoreRewardsView = (state) => {
-    if (!state?.openType) {
-      requestAnimationFrame(() => window.scrollTo({ top: state?.scrollY || 0, behavior: "instant" }));
-      return;
+  const restoreUi = (state) => {
+    if (Number.isInteger(state?.serviceIndex) && state.serviceIndex >= 0) {
+      const card = document.getElementById(`gx-service-card-${state.serviceIndex}`);
+      if (card && typeof gxSetServiceCardState === "function") {
+        gxSetServiceCardState(card, state.serviceIndex, true);
+      }
     }
 
-    const grid = document.getElementById("gamif-grid");
-    const ref = document.getElementById("gamif-expanded-referral");
-    const cup = document.getElementById("gamif-expanded-coupon");
-    const target = state.openType === "referral" ? ref : cup;
-    const other = state.openType === "referral" ? cup : ref;
+    if (state?.rewardsType) {
+      const grid = document.getElementById("gamif-grid");
+      const ref = document.getElementById("gamif-expanded-referral");
+      const cup = document.getElementById("gamif-expanded-coupon");
+      const target = state.rewardsType === "referral" ? ref : cup;
+      const other = state.rewardsType === "referral" ? cup : ref;
 
-    if (grid) grid.style.display = "none";
-    if (other) {
-      other.classList.remove("gx-shared-panel");
-      other.style.display = "none";
-      other.style.opacity = "";
-      other.style.visibility = "";
+      if (grid) grid.style.display = "none";
+      if (other) {
+        other.classList.remove("gx-shared-panel");
+        other.style.display = "none";
+        other.style.opacity = "";
+        other.style.visibility = "";
+      }
+      if (target) {
+        target.classList.remove("slide-left", "gx-morph-in", "gx-morph-out");
+        target.classList.add("gx-shared-panel");
+        target.style.display = "block";
+        target.style.opacity = "1";
+        target.style.visibility = "visible";
+        target.style.transform = "";
+      }
     }
-    if (target) {
-      target.classList.remove("slide-left", "gx-morph-in", "gx-morph-out");
-      target.classList.add("gx-shared-panel");
-      target.style.display = "block";
-      target.style.opacity = "1";
-      target.style.visibility = "visible";
-      target.style.transform = "";
-    }
 
-    requestAnimationFrame(() => window.scrollTo({ top: state.scrollY || 0, behavior: "instant" }));
-  };
-
-  const fetchClientSnapshot = async (scope = "resync") => {
-    const token = localStorage.getItem(TOKEN_KEY) || "";
-    if (!token || !MI_URL) return null;
-
-    const response = await fetch(MI_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Client-Token": token
-      },
-      body: "{}",
-      cache: "no-store"
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: Number(state?.scrollY || 0), behavior: "instant" });
     });
-
-    const data = await response.json().catch(() => ({}));
-    if (!response.ok || data?.ok !== true) {
-      if (response.status === 401 || response.status === 403) {
-        window.dispatchEvent(new CustomEvent("goxion:realtime:client-session", {
-          detail: { status: response.status }
-        }));
-      }
-      throw new Error(data?.error || "No fue posible resincronizar Mi Espacio.");
-    }
-    if (["client_access", "resync"].includes(scope) && ACCESS_URL) {
-      try {
-        const accessResponse = await fetch(ACCESS_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Client-Token": token
-          },
-          body: JSON.stringify({ accion: "listar", datos: {} }),
-          cache: "no-store"
-        });
-        const accessData = await accessResponse.json().catch(() => ({}));
-        if (accessResponse.ok && accessData?.ok === true) {
-          data.cliente_accesos = Array.isArray(accessData.accesos) ? accessData.accesos : [];
-        }
-      } catch (error) {
-        console.warn("GOXION Realtime · accesos:", error);
-      }
-    }
-
-    return data;
   };
 
   const refreshClientSpace = async (scope) => {
@@ -102,38 +63,38 @@
       return;
     }
 
-    const key = typeof getCurrentClientKey === "function" ? getCurrentClientKey() : "";
-    if (!key || typeof renderDashboard !== "function" || typeof goxionViewModelAdapter !== "function") return;
+    if (typeof window.goxionReloadPrivateClientView !== "function") {
+      console.warn("GOXION Realtime · API privada de Mi Espacio no disponible.");
+      return;
+    }
 
     busy = true;
-    const ui = captureRewardsView();
+    const ui = captureUi();
 
     try {
-      const raw = await fetchClientSnapshot(scope);
-      if (!raw) return;
+      const snapshot = await window.goxionReloadPrivateClientView();
+      const key = String(snapshot?.key || (typeof getCurrentClientKey === "function" ? getCurrentClientKey() : ""));
+      const fresh = snapshot?.cliente || (key ? snapshot?.viewModel?.[key] : null);
 
-      const adapted = goxionViewModelAdapter(raw);
-      const fresh = adapted?.[key] || Object.values(adapted || {}).find(value =>
-        value && typeof value === "object" && String(value.id || "") === String(globalClientesData?.[key]?.id || "")
-      );
+      if (!key || !fresh || !globalClientesData?.[key] || typeof renderDashboard !== "function") return;
 
-      if (!fresh || !globalClientesData?.[key]) return;
-
-      // Reemplazamos únicamente el modelo privado del cliente. No tocamos catálogo/inventario.
       globalClientesData[key] = {
         ...globalClientesData[key],
         ...fresh
       };
 
-      // renderDashboard actualiza Mi Espacio sin cambiar de pestaña.
-      // El estado expandido de Rewards se restaura en el mismo ciclo de JS, antes del siguiente paint.
       renderDashboard(key);
-      restoreRewardsView(ui);
+      restoreUi(ui);
 
       window.dispatchEvent(new CustomEvent("goxion:client-space:updated", {
         detail: { scope: scope || "resync", at: Date.now() }
       }));
     } catch (error) {
+      if (error?.status === 401 || error?.status === 403) {
+        window.dispatchEvent(new CustomEvent("goxion:realtime:client-session", {
+          detail: { status: error.status }
+        }));
+      }
       console.warn("GOXION Realtime · Mi Espacio:", error);
     } finally {
       busy = false;
@@ -145,8 +106,6 @@
     }
   };
 
-
-  // En el preview móvil, "Estado de cuenta" permanece dentro del sandbox Realtime.
   if (window.location.pathname.includes("/preview/realtime/")) {
     window.irAlTicket = function() {
       const key = typeof getCurrentClientKey === "function" ? getCurrentClientKey() : "";
@@ -161,8 +120,7 @@
 
   window.addEventListener("goxion:realtime", (event) => {
     const scope = event.detail?.scope || "";
-    // Catálogo, inventario y promociones quedan explícitamente fuera de Realtime.
-    if (!["account_state", "rewards", "referrals", "client_state", "client_access", "resync"].includes(scope)) return;
+    if (!["account_state", "rewards", "referrals", "client_state", "client_access", "client_notifications", "cancellations", "resync"].includes(scope)) return;
     refreshClientSpace(scope);
   });
 })();

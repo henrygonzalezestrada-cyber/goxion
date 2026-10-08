@@ -301,6 +301,37 @@ function goxionViewModelAdapter(data) {
             }
         }
 
+        window.goxionReloadPrivateClientView = async function() {
+            const token = localStorage.getItem(TOKEN_KEY) || "";
+            if (!token) return null;
+
+            const r = await fetch(MI_URL, {
+                method:"POST",
+                headers:{"Content-Type":"application/json","X-Client-Token":token},
+                body:JSON.stringify({}),
+                cache:"no-store"
+            });
+            const {text,json} = await parseJSON(r);
+
+            if (!r.ok || json?.ok !== true) {
+                const error = new Error(json?.error || text || "No fue posible actualizar Mi Espacio.");
+                error.status = r.status;
+                throw error;
+            }
+
+            window.goxionCurrentClientKey = String(json?.cliente?.clave || getCurrentClientKey() || "");
+            await cargarExtrasPrivados(json,token);
+
+            const viewModel = goxionViewModelAdapter(json);
+            const key = String(window.goxionCurrentClientKey || json?.cliente?.clave || "");
+
+            return {
+                key,
+                viewModel,
+                cliente: key ? viewModel?.[key] || null : null
+            };
+        };
+
         async function cargarPublicoOCliente() {
             const token = localStorage.getItem(TOKEN_KEY) || "";
 
