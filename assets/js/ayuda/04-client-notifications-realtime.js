@@ -4,7 +4,7 @@
   const GXCORE=window.GOXION_CORE;
   const URL=GXCORE?.endpoint?.("notificaciones-cliente");
   const TOKEN_KEY=GXCORE?.STORAGE?.CLIENT_TOKEN;
-  const state={items:[],unread:0,loading:false};
+  const state={items:[],unread:0,loading:false,initialized:false};
 
   const esc=(v)=>String(v??"")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -31,6 +31,7 @@
   };
 
   const token=()=>localStorage.getItem(TOKEN_KEY)||"";
+  const unreadIds=(items)=>new Set((items||[]).filter(x=>x?.leida!==true).map(x=>String(x.id||"")).filter(Boolean));
 
   async function api(accion,datos={}){
     const current=token();
@@ -50,27 +51,58 @@
     return j;
   }
 
-  function ensureUi(){
-    const greeting=document.getElementById("dash-greeting-container");
-    if(!greeting)return false;
+  function setSessionHeader(){
+    const auth=document.getElementById("header-action-btn");
+    const text=document.getElementById("header-btn-text");
+    const active=Boolean(token() && typeof getCurrentClientKey==="function" && getCurrentClientKey());
 
-    if(!document.getElementById("gx-client-notif-launch")){
-      const btn=document.createElement("button");
+    if(auth)auth.classList.toggle("gx-client-session-active",active);
+    if(active && text)text.textContent="Salir";
+  }
+
+  function ringBell(){
+    const launch=document.getElementById("gx-client-notif-launch");
+    if(!launch||window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches)return;
+    launch.classList.remove("gx-ringing");
+    void launch.offsetWidth;
+    launch.classList.add("gx-ringing");
+    clearTimeout(launch._gxRingTimer);
+    launch._gxRingTimer=setTimeout(()=>launch.classList.remove("gx-ringing"),900);
+  }
+
+  function ensureUi(){
+    const header=document.querySelector(".app-header");
+    const auth=document.getElementById("header-action-btn");
+    if(!header||!auth)return false;
+
+    let actions=header.querySelector(".gx-header-actions");
+    if(!actions){
+      actions=document.createElement("div");
+      actions.className="gx-header-actions";
+      header.insertBefore(actions,auth);
+      actions.appendChild(auth);
+    }
+
+    let btn=document.getElementById("gx-client-notif-launch");
+    if(!btn){
+      btn=document.createElement("button");
       btn.type="button";
       btn.id="gx-client-notif-launch";
       btn.className="gx-client-notif-launch";
       btn.setAttribute("aria-label","Abrir notificaciones");
       btn.innerHTML=
-        '<span class="gx-client-notif-launch-main">'+
-          '<span class="gx-client-notif-icon" aria-hidden="true">'+
-            '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>'+
-          '</span>'+
-          '<span class="gx-client-notif-copy"><strong>Notificaciones</strong><small id="gx-client-notif-summary">Todo al día</small></span>'+
+        '<span class="gx-client-notif-icon" aria-hidden="true">'+
+          '<svg class="gx-client-notif-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">'+
+            '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path>'+
+            '<path class="gx-client-notif-clapper" d="M10 21h4"></path>'+
+          '</svg>'+
         '</span>'+
-        '<span id="gx-client-notif-badge" class="gx-client-notif-badge" hidden>0</span>';
+        '<span id="gx-client-notif-badge" class="gx-client-notif-badge">0</span>';
       btn.onclick=()=>openSheet();
-      greeting.insertAdjacentElement("afterend",btn);
     }
+    if(btn.parentElement!==actions)actions.insertBefore(btn,auth);
+
+    btn.hidden=!token();
 
     if(!document.getElementById("gx-client-notif-overlay")){
       const overlay=document.createElement("div");
@@ -97,30 +129,27 @@
       sheet.querySelector(".gx-client-notif-close").onclick=()=>closeSheet();
       sheet.querySelector("#gx-client-notif-mark-all").onclick=()=>markAll();
     }
+
+    setSessionHeader();
     return true;
   }
 
-  function render(pulse=false){
+  function render(options={}){
+    const ring=options.ring===true;
     if(!ensureUi())return;
     const badge=document.getElementById("gx-client-notif-badge");
-    const summary=document.getElementById("gx-client-notif-summary");
     const headSummary=document.getElementById("gx-client-notif-head-summary");
     const launch=document.getElementById("gx-client-notif-launch");
     const list=document.getElementById("gx-client-notif-list");
 
-    if(badge){
-      badge.hidden=state.unread<=0;
-      badge.textContent=state.unread>99?"99+":String(state.unread);
-    }
-    if(summary)summary.textContent=state.unread?(state.unread+" nueva"+(state.unread===1?"":"s")):"Todo al día";
+    if(badge)badge.textContent=state.unread>99?"99+":String(state.unread);
     if(headSummary)headSummary.textContent=state.unread?(state.unread+" sin leer"):"Actividad reciente";
     if(launch){
       launch.classList.toggle("gx-has-new",state.unread>0);
-      if(pulse&&state.unread>0){
-        launch.classList.remove("gx-has-new");
-        void launch.offsetWidth;
-        launch.classList.add("gx-has-new");
-      }
+      launch.setAttribute("aria-label",state.unread>0
+        ? "Abrir notificaciones, "+state.unread+" sin leer"
+        : "Abrir notificaciones");
+      if(ring)ringBell();
     }
     if(!list)return;
 
@@ -141,16 +170,20 @@
   }
 
   async function load(options={}){
-    const pulse=options.pulse===true;
+    const realtime=options.realtime===true;
     if(state.loading||!token())return;
     state.loading=true;
     try{
+      const before=unreadIds(state.items);
       const r=await api("listar");
       if(!r)return;
-      const previousUnread=state.unread;
       state.items=Array.isArray(r.items)?r.items:[];
       state.unread=Number(r.no_leidas||0);
-      render(pulse||state.unread>previousUnread);
+
+      const after=unreadIds(state.items);
+      const hasNew=state.initialized && [...after].some(id=>!before.has(id));
+      render({ring:realtime&&hasNew});
+      state.initialized=true;
     }catch(error){
       console.warn("GOXION Notificaciones:",error);
     }finally{
@@ -208,11 +241,17 @@
 
   window.addEventListener("goxion:realtime",(event)=>{
     if(event.detail?.scope!=="client_notifications")return;
-    load({pulse:true});
+    load({realtime:true});
   });
-  window.addEventListener("goxion:client-space:updated",()=>{ensureUi();});
+  window.addEventListener("goxion:client-space:updated",()=>{
+    ensureUi();
+    setSessionHeader();
+  });
 
-  document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{ensureUi();if(token())load();},450));
+  document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{
+    ensureUi();
+    if(token())load();
+  },450));
 
   window.GOXION_CLIENT_NOTIFICATIONS=Object.freeze({
     open:openSheet,close:closeSheet,refresh:load,getUnread:()=>state.unread
