@@ -9,16 +9,20 @@
   gap:8px;
   min-width:0;
 }
-#header-action-btn.gx-client-session-active{
+#header-action-btn.gx-client-session-active,
+#header-action-btn.gx-client-session-guest{
   min-height:42px;
-  padding:0 15px;
   border-radius:21px;
   flex:0 0 auto;
 }
-#header-action-btn.gx-client-session-active .gx-auth-pill-icon{
+#header-action-btn.gx-client-session-active{padding:0 15px}
+#header-action-btn.gx-client-session-guest{padding:0 16px}
+#header-action-btn.gx-client-session-active .gx-auth-pill-icon,
+#header-action-btn.gx-client-session-guest .gx-auth-pill-icon{
   display:none!important;
 }
-#header-action-btn.gx-client-session-active .gx-auth-pill-label{
+#header-action-btn.gx-client-session-active .gx-auth-pill-label,
+#header-action-btn.gx-client-session-guest .gx-auth-pill-label{
   gap:0;
 }
 
@@ -50,11 +54,26 @@
     gap .38s cubic-bezier(.22,.82,.22,1),
     border-color .25s ease,
     background .25s ease,
-    box-shadow .25s ease;
+    box-shadow .25s ease,
+    opacity .26s ease,
+    transform .34s cubic-bezier(.22,.82,.22,1);
   flex:0 0 auto;
 }
-.gx-client-notif-launch[hidden]{
-  display:none!important;
+.gx-client-notif-launch.gx-session-guest{
+  width:0;
+  min-width:0;
+  padding:0;
+  gap:0;
+  opacity:0;
+  border-color:transparent;
+  background:transparent;
+  box-shadow:none;
+  transform:translateX(8px) scale(.72);
+  pointer-events:none;
+}
+.gx-client-notif-launch.gx-session-guest .gx-client-notif-icon,
+.gx-client-notif-launch.gx-session-guest .gx-client-notif-badge{
+  opacity:0;
 }
 .gx-client-notif-launch.gx-has-new{
   width:74px;
