@@ -2,6 +2,7 @@
   const GXCORE = window.GOXION_CORE;
   const TOKEN_KEY = GXCORE?.STORAGE?.CLIENT_TOKEN;
   const MI_URL = GXCORE?.endpoint?.("mi-espacio");
+  const ACCESS_URL = GXCORE?.endpoint?.("accesos-cliente-beta");
   let busy = false;
   let queuedScope = "";
 
@@ -49,7 +50,7 @@
     requestAnimationFrame(() => window.scrollTo({ top: state.scrollY || 0, behavior: "instant" }));
   };
 
-  const fetchClientSnapshot = async () => {
+  const fetchClientSnapshot = async (scope = "resync") => {
     const token = localStorage.getItem(TOKEN_KEY) || "";
     if (!token || !MI_URL) return null;
 
@@ -72,6 +73,26 @@
       }
       throw new Error(data?.error || "No fue posible resincronizar Mi Espacio.");
     }
+    if (["client_access", "resync"].includes(scope) && ACCESS_URL) {
+      try {
+        const accessResponse = await fetch(ACCESS_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Client-Token": token
+          },
+          body: JSON.stringify({ accion: "listar", datos: {} }),
+          cache: "no-store"
+        });
+        const accessData = await accessResponse.json().catch(() => ({}));
+        if (accessResponse.ok && accessData?.ok === true) {
+          data.cliente_accesos = Array.isArray(accessData.accesos) ? accessData.accesos : [];
+        }
+      } catch (error) {
+        console.warn("GOXION Realtime · accesos:", error);
+      }
+    }
+
     return data;
   };
 
@@ -88,7 +109,7 @@
     const ui = captureRewardsView();
 
     try {
-      const raw = await fetchClientSnapshot();
+      const raw = await fetchClientSnapshot(scope);
       if (!raw) return;
 
       const adapted = goxionViewModelAdapter(raw);
@@ -141,7 +162,7 @@
   window.addEventListener("goxion:realtime", (event) => {
     const scope = event.detail?.scope || "";
     // Catálogo, inventario y promociones quedan explícitamente fuera de Realtime.
-    if (!["account_state", "rewards", "referrals", "client_state", "resync"].includes(scope)) return;
+    if (!["account_state", "rewards", "referrals", "client_state", "client_access", "resync"].includes(scope)) return;
     refreshClientSpace(scope);
   });
 })();
