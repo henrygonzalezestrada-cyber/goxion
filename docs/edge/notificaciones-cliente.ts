@@ -127,6 +127,24 @@ Deno.serve(async(req)=>{
       return res({ok:true,marcadas:(a.data||[]).length+(b.data||[]).length});
     }
 
+
+    if(accion==="eliminar_todas"){
+      const [general,servicio]=await Promise.all([
+        sb.from("cliente_notificaciones")
+          .delete()
+          .eq("cliente_id",clienteId)
+          .select("id"),
+        sb.from("cliente_servicio_novedades")
+          .delete()
+          .eq("cliente_id",clienteId)
+          .neq("tipo","password")
+          .select("id")
+      ]);
+      if(general.error)throw general.error;
+      if(servicio.error)throw servicio.error;
+      return res({ok:true,eliminadas:(general.data||[]).length+(servicio.data||[]).length});
+    }
+
     return res({ok:false,error:`Acción no reconocida: ${accion}`},400);
   }catch(error){
     console.error(error);
