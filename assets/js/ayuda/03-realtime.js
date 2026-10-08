@@ -120,7 +120,7 @@
 
   window.addEventListener("goxion:realtime", (event) => {
     const scope = event.detail?.scope || "";
-    if (!["account_state", "rewards", "referrals", "client_state", "client_access", "client_notifications", "cancellations", "resync"].includes(scope)) return;
+    if (!["account_state", "rewards", "referrals", "client_state", "client_access", "cancellations", "resync"].includes(scope)) return;
     refreshClientSpace(scope);
   });
 })();
