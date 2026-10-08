@@ -73,3 +73,24 @@ Durante validación, únicamente las páginas bajo `preview/realtime/` cargan lo
 4. Reconnect/resync después de suspender Safari.
 5. Actualización modular correcta en Mi Espacio, Estado de cuenta y Admin.
 6. Integración a oficiales en un PR separado.
+
+
+### Centro de actividad
+
+La bandeja del cliente funciona como un centro de actividad contextual. Además de pagos, beneficios y cancelaciones, genera avisos automáticos para:
+
+- avance de referidos y beneficio listo;
+- misión completada y cupón disponible;
+- reporte de pago recibido y diferencias pendientes;
+- pedido recibido y pedido tomado por Administración;
+- acceso de servicio listo o actualizado.
+
+Cada notificación puede declarar una acción contextual sin transportar datos sensibles en Broadcast:
+
+- `account` → Estado de cuenta;
+- `referral` → Referidos;
+- `coupon` → Misiones / Rewards;
+- `service` → servicio concreto;
+- `services` → bloque de servicios.
+
+La acción se resuelve después de consultar `notificaciones-cliente` con `X-Client-Token`. Realtime sigue enviando únicamente invalidaciones.

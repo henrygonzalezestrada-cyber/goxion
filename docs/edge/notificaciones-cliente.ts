@@ -28,6 +28,30 @@ async function verify(token:string,secret:string){
     return j.role==="goxion_client"&&j.cliente_id&&j.exp>Math.floor(Date.now()/1000)?j:null;
   }catch{return null}
 }
+function actionFor(tipo:string,source:string,referencia?:string|null,clienteServicioId?:string|null){
+  const t=String(tipo||"").toLowerCase();
+  const src=String(source||"general");
+  if(src==="servicio"){
+    return {accion:"service",accion_label:"Ver servicio",accion_ref:String(clienteServicioId||referencia||"")};
+  }
+  if(t.startsWith("pago_")||t==="beneficio_aplicado"){
+    return {accion:"account",accion_label:"Ver estado de cuenta",accion_ref:String(referencia||"")};
+  }
+  if(t.startsWith("referido_")){
+    return {accion:"referral",accion_label:"Ver referidos",accion_ref:String(referencia||"")};
+  }
+  if(t.startsWith("mision_")||t.startsWith("cupon_")){
+    return {accion:"coupon",accion_label:"Ver recompensas",accion_ref:String(referencia||"")};
+  }
+  if(t.startsWith("pedido_")){
+    return {accion:"services",accion_label:"Ver servicios",accion_ref:String(referencia||"")};
+  }
+  if(t==="cancelacion"){
+    return {accion:"services",accion_label:"Ver solicitud",accion_ref:String(referencia||"")};
+  }
+  return {accion:"",accion_label:"",accion_ref:""};
+}
+
 async function exigirClienteActivo(sb:any,clienteId:string){
   const q=await sb.from("clientes").select("estado").eq("id",clienteId).maybeSingle();
   if(q.error)throw q.error;
@@ -75,7 +99,8 @@ Deno.serve(async(req)=>{
       const a=(general.data||[]).map((x:any)=>({
         id:x.id,source:"general",tipo:x.tipo,titulo:x.titulo,mensaje:x.mensaje,
         referencia:x.referencia,prioridad:Number(x.prioridad||0),leida:x.leida_at!=null,
-        leida_at:x.leida_at,created_at:x.created_at
+        leida_at:x.leida_at,created_at:x.created_at,
+        ...actionFor(x.tipo,"general",x.referencia,null)
       }));
       const b=(servicio.data||[])
         .filter((x:any)=>!x.expira_at||String(x.expira_at)>now)
@@ -83,7 +108,8 @@ Deno.serve(async(req)=>{
           id:x.id,source:"servicio",tipo:x.tipo,titulo:x.titulo,mensaje:x.resumen,
           referencia:x.referencia,cliente_servicio_id:x.cliente_servicio_id,
           prioridad:Number(x.prioridad||0),leida:x.leida_at!=null,
-          leida_at:x.leida_at,created_at:x.created_at
+          leida_at:x.leida_at,created_at:x.created_at,
+          ...actionFor(x.tipo,"servicio",x.referencia,x.cliente_servicio_id)
         }));
 
       const items=[...a,...b]

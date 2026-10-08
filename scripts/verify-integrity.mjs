@@ -801,6 +801,32 @@ for (const absolute of walk(jsRoot)) {
   if (!runtime.includes("'notificaciones-cliente': 'notificaciones-cliente'")) {
     fail('Realtime: runtime no registra notificaciones-cliente.');
   }
+
+  // Notification center actions and visual contract.
+  const notificationEdge = readFileSync(join(ROOT, 'docs/edge/notificaciones-cliente.ts'), 'utf8');
+  const notificationCss = readFileSync(join(ROOT, 'assets/css/realtime-client-notifications.css'), 'utf8');
+  const notificationMigration = readFileSync(join(ROOT, 'docs/sql/notification_center_activity_round3.sql'), 'utf8');
+  if (!notificationEdge.includes('function actionFor(') ||
+      !rtNotifications.includes('gx-client-notif-item-action') ||
+      !rtNotifications.includes('goAction(button)')) {
+    fail('Notification center actions: faltan acciones contextuales o navegación profunda.');
+  }
+  if (!notificationCss.includes('.gx-client-notif-close') ||
+      !notificationCss.includes('.gx-tone-account') ||
+      !notificationCss.includes('.gx-tone-reward')) {
+    fail('Notification center actions: se perdió el contraste visual por dominio.');
+  }
+  for (const triggerName of [
+    'gx_notify_referral_progress',
+    'gx_notify_mission_progress',
+    'gx_notify_payment_review',
+    'gx_notify_order_activity',
+    'gx_notify_cliente_acceso'
+  ]) {
+    if (!notificationMigration.includes(triggerName)) {
+      fail('Notification center actions: falta migración ' + triggerName + '.');
+    }
+  }
 }
 
 if (failures.length) {
