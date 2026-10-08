@@ -4,7 +4,7 @@
   const GXCORE=window.GOXION_CORE;
   const URL=GXCORE?.endpoint?.("notificaciones-cliente");
   const TOKEN_KEY=GXCORE?.STORAGE?.CLIENT_TOKEN;
-  const state={items:[],unread:0,loading:false,initialized:false};
+  const state={items:[],unread:0,loading:false,initialized:false,pendingDelete:null};
 
   const esc=(v)=>String(v??"")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -154,17 +154,19 @@
         '<div class="gx-client-notif-handle"></div>'+
         '<div class="gx-client-notif-head">'+
           '<div class="gx-client-notif-head-copy"><strong>Notificaciones</strong><small id="gx-client-notif-head-summary">Actividad de tu cuenta</small></div>'+
-          '<div class="gx-client-notif-head-actions">'+
-            '<button type="button" id="gx-client-notif-mark-all" class="gx-client-notif-soft-action" aria-label="Marcar todas como leídas" title="Marcar leídas"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg><span>Marcar leídas</span></button>'+
-            '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all" aria-label="Eliminar todas las notificaciones" title="Eliminar todo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg><span>Eliminar todo</span></button>'+
-            '<button type="button" class="gx-client-notif-close" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"></path></svg></button>'+
-          '</div>'+
+          '<button type="button" class="gx-client-notif-close" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"></path></svg></button>'+
         '</div>'+
-        '<div id="gx-client-notif-list" class="gx-client-notif-list"></div>';
+        '<div class="gx-client-notif-toolbar">'+
+          '<button type="button" id="gx-client-notif-mark-all" class="gx-client-notif-soft-action"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg><span>Marcar todo leído</span></button>'+
+          '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg><span>Eliminar todo</span></button>'+
+        '</div>'+
+        '<div id="gx-client-notif-list" class="gx-client-notif-list"></div>'+
+        '<div id="gx-client-notif-undo" class="gx-client-notif-undo" aria-live="polite" aria-hidden="true"><span>Notificación eliminada</span><button type="button">Deshacer</button></div>';
       document.body.appendChild(sheet);
       sheet.querySelector(".gx-client-notif-close").onclick=()=>closeSheet();
       sheet.querySelector("#gx-client-notif-mark-all").onclick=()=>markAll();
       sheet.querySelector("#gx-client-notif-clear-all").onclick=()=>armClearAll();
+      sheet.querySelector("#gx-client-notif-undo button").onclick=()=>undoPendingDelete();
     }
 
     setSessionHeader();
@@ -204,27 +206,24 @@
         ? '<button type="button" class="gx-client-notif-item-action" data-gx-notif-action="'+esc(action)+'" data-gx-notif-ref="'+esc(item.accion_ref||"")+'" data-gx-notif-id="'+esc(item.id)+'" data-gx-notif-source="'+esc(item.source||"general")+'"><span>'+esc(item.accion_label||"Abrir")+'</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l7 7-7 7"></path></svg></button>'
         : '';
       return '<div class="gx-client-notif-swipe" data-gx-notif-id="'+esc(item.id)+'" data-gx-notif-source="'+esc(item.source||"general")+'">'+
-        '<button type="button" class="gx-client-notif-delete-one" aria-label="Eliminar notificación"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"></path></svg><span>Eliminar</span></button>'+
+        '<div class="gx-client-notif-delete-bg" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M6 6 18 18M18 6 6 18"></path></svg><span>Eliminar</span></div>'+
         '<article class="gx-client-notif-item '+(item.leida===true?"":"unread")+'" data-gx-notif-id="'+esc(item.id)+'" data-gx-notif-source="'+esc(item.source||"general")+'">'+
           '<div class="gx-client-notif-item-top">'+
             '<strong>'+esc(item.titulo||"GOXION")+'</strong>'+
             '<span class="gx-client-notif-time">'+esc(relative(item.created_at))+'</span>'+
           '</div>'+
           '<p>'+esc(item.mensaje||"")+'</p>'+
-          '<div class="gx-client-notif-item-foot"><span class="gx-client-notif-kind">'+esc(kind(item))+'</span>'+actionHtml+'</div>'+
+          (actionHtml?'<div class="gx-client-notif-item-foot">'+actionHtml+'</div>':'')+
         '</article>'+
       '</div>';
     }).join(""):'<div class="gx-client-notif-empty"><strong>Todo al día</strong><small>No tienes notificaciones recientes.</small></div>';
 
-    list.querySelectorAll(".gx-client-notif-item.unread").forEach(node=>{
+    list.querySelectorAll(".gx-client-notif-item").forEach(node=>{
       node.addEventListener("click",event=>{
         if(event.target.closest(".gx-client-notif-item-action"))return;
         const shell=node.closest(".gx-client-notif-swipe");
-        if(shell?.classList.contains("gx-open")){
-          closeSwipe(shell);
-          return;
-        }
-        markOne(node.dataset.gxNotifId,node.dataset.gxNotifSource);
+        if(shell && Number(shell.dataset.gxSuppressClickUntil||0)>Date.now())return;
+        if(node.classList.contains("unread"))markOne(node.dataset.gxNotifId,node.dataset.gxNotifSource);
       });
     });
     list.querySelectorAll(".gx-client-notif-item-action").forEach(button=>{
@@ -234,31 +233,7 @@
         goAction(button);
       });
     });
-    list.querySelectorAll(".gx-client-notif-delete-one").forEach(button=>{
-      button.addEventListener("click",event=>{
-        event.preventDefault();
-        event.stopPropagation();
-        const shell=button.closest(".gx-client-notif-swipe");
-        deleteOne(shell?.dataset?.gxNotifId,shell?.dataset?.gxNotifSource,button);
-      });
-    });
     bindSwipeRows(list);
-  }
-
-  function closeSwipe(shell){
-    if(!shell)return;
-    shell.classList.remove("gx-open");
-    const card=shell.querySelector(".gx-client-notif-item");
-    if(card){
-      card.style.transform="";
-      card.style.transition="";
-    }
-  }
-
-  function closeOtherSwipes(except){
-    document.querySelectorAll(".gx-client-notif-swipe.gx-open").forEach(shell=>{
-      if(shell!==except)closeSwipe(shell);
-    });
   }
 
   function bindSwipeRows(list){
@@ -271,15 +246,16 @@
       let startX=0,startY=0,current=0,dragging=false,horizontal=false;
 
       card.addEventListener("touchstart",event=>{
+        if(event.target.closest(".gx-client-notif-item-action"))return;
         const touch=event.touches?.[0];
         if(!touch)return;
-        closeOtherSwipes(shell);
         startX=touch.clientX;
         startY=touch.clientY;
-        current=shell.classList.contains("gx-open")?-82:0;
+        current=0;
         dragging=true;
         horizontal=false;
         card.style.transition="none";
+        shell.classList.remove("gx-delete-ready");
       },{passive:true});
 
       card.addEventListener("touchmove",event=>{
@@ -288,30 +264,120 @@
         if(!touch)return;
         const dx=touch.clientX-startX;
         const dy=touch.clientY-startY;
-        if(!horizontal && Math.abs(dx)>8){
+
+        if(!horizontal && Math.abs(dx)>7){
           if(Math.abs(dx)<=Math.abs(dy))return;
           horizontal=true;
+          shell.dataset.gxSuppressClickUntil=String(Date.now()+420);
         }
         if(!horizontal)return;
+
         event.preventDefault();
-        current=Math.max(-82,Math.min(0,(shell.classList.contains("gx-open")?-82:0)+dx));
+        const width=Math.max(1,card.getBoundingClientRect().width);
+        const threshold=Math.min(width*.58,190);
+        current=Math.max(-width,Math.min(0,dx));
+        const progress=Math.min(1,Math.abs(current)/threshold);
         card.style.transform="translateX("+current+"px)";
-        shell.style.setProperty("--gx-swipe-progress",String(Math.min(1,Math.abs(current)/82)));
+        shell.style.setProperty("--gx-swipe-progress",String(progress));
+        shell.classList.toggle("gx-delete-ready",Math.abs(current)>=threshold);
       },{passive:false});
 
       const finish=()=>{
         if(!dragging)return;
         dragging=false;
         card.style.transition="";
-        card.style.transform="";
-        const open=current<=-42;
-        shell.classList.toggle("gx-open",open);
+        if(!horizontal){
+          card.style.transform="";
+          return;
+        }
+
+        const width=Math.max(1,card.getBoundingClientRect().width);
+        const threshold=Math.min(width*.58,190);
+        const shouldDelete=Math.abs(current)>=threshold;
+
         shell.style.removeProperty("--gx-swipe-progress");
+        shell.classList.remove("gx-delete-ready");
+
+        if(shouldDelete){
+          shell.dataset.gxSuppressClickUntil=String(Date.now()+700);
+          card.style.transform="translateX("+(-width-24)+"px)";
+          shell.classList.add("gx-commit-delete");
+          setTimeout(()=>deleteBySwipe(shell),170);
+        }else{
+          card.style.transform="";
+        }
         horizontal=false;
       };
+
       card.addEventListener("touchend",finish,{passive:true});
       card.addEventListener("touchcancel",finish,{passive:true});
     });
+  }
+
+  function pendingDeleteKey(item){
+    return String(item?.source||"general")+":"+String(item?.id||"");
+  }
+
+  function showUndo(){
+    const bar=document.getElementById("gx-client-notif-undo");
+    if(!bar)return;
+    bar.classList.add("show");
+    bar.setAttribute("aria-hidden","false");
+  }
+
+  function hideUndo(){
+    const bar=document.getElementById("gx-client-notif-undo");
+    if(!bar)return;
+    bar.classList.remove("show");
+    bar.setAttribute("aria-hidden","true");
+  }
+
+  async function finalizePendingDelete(){
+    const pending=state.pendingDelete;
+    if(!pending)return;
+    clearTimeout(pending.timer);
+    state.pendingDelete=null;
+    hideUndo();
+    try{
+      await api("eliminar_una",{id:pending.item.id,source:pending.item.source||"general"});
+    }catch(error){
+      state.items.splice(Math.min(pending.index,state.items.length),0,pending.item);
+      if(pending.item.leida!==true)state.unread++;
+      render();
+      console.warn("No se pudo eliminar la notificación:",error);
+    }
+  }
+
+  function undoPendingDelete(){
+    const pending=state.pendingDelete;
+    if(!pending)return;
+    clearTimeout(pending.timer);
+    state.pendingDelete=null;
+    hideUndo();
+    state.items.splice(Math.min(pending.index,state.items.length),0,pending.item);
+    if(pending.item.leida!==true)state.unread++;
+    render();
+  }
+
+  async function schedulePendingDelete(item,index){
+    if(state.pendingDelete)await finalizePendingDelete();
+    const pending={item,index,timer:null};
+    state.pendingDelete=pending;
+    showUndo();
+    pending.timer=setTimeout(()=>finalizePendingDelete(),3200);
+  }
+
+  async function deleteBySwipe(shell){
+    const id=shell?.dataset?.gxNotifId||"";
+    const source=shell?.dataset?.gxNotifSource||"general";
+    const index=state.items.findIndex(x=>String(x.id)===String(id)&&String(x.source||"general")===String(source));
+    if(index<0)return;
+
+    const item=state.items[index];
+    state.items.splice(index,1);
+    if(item.leida!==true)state.unread=Math.max(0,state.unread-1);
+    render();
+    await schedulePendingDelete(item,index);
   }
 
   async function load(options={}){
@@ -322,8 +388,10 @@
       const before=unreadIds(state.items);
       const r=await api("listar");
       if(!r)return;
-      state.items=Array.isArray(r.items)?r.items:[];
-      state.unread=Number(r.no_leidas||0);
+      const incoming=Array.isArray(r.items)?r.items:[];
+      const pendingKey=state.pendingDelete?pendingDeleteKey(state.pendingDelete.item):"";
+      state.items=pendingKey?incoming.filter(item=>pendingDeleteKey(item)!==pendingKey):incoming;
+      state.unread=state.items.filter(item=>item?.leida!==true).length;
 
       const after=unreadIds(state.items);
       const hasNew=state.initialized && [...after].some(id=>!before.has(id));
@@ -385,31 +453,6 @@
     },180);
   }
 
-  async function deleteOne(id,source,button){
-    if(!id)return;
-    const index=state.items.findIndex(x=>String(x.id)===String(id)&&String(x.source||"general")===String(source||"general"));
-    if(index<0)return;
-
-    const backup=state.items[index];
-    const backupUnread=state.unread;
-    const shell=button?.closest?.(".gx-client-notif-swipe");
-    shell?.classList.add("gx-removing");
-    await new Promise(resolve=>setTimeout(resolve,180));
-
-    state.items.splice(index,1);
-    if(backup.leida!==true)state.unread=Math.max(0,state.unread-1);
-    render();
-
-    try{
-      await api("eliminar_una",{id,source});
-    }catch(error){
-      state.items.splice(index,0,backup);
-      state.unread=backupUnread;
-      render();
-      console.warn("No se pudo eliminar la notificación:",error);
-    }
-  }
-
   async function markOne(id,source){
     const item=state.items.find(x=>String(x.id)===String(id)&&String(x.source||"general")===String(source||"general"));
     if(!item||item.leida===true)return;
@@ -460,7 +503,13 @@
 
   async function clearAll(){
     const btn=document.getElementById("gx-client-notif-clear-all");
-    if(!btn||state.items.length<=0)return;
+    if(!btn||(state.items.length<=0&&!state.pendingDelete))return;
+
+    if(state.pendingDelete){
+      clearTimeout(state.pendingDelete.timer);
+      state.pendingDelete=null;
+      hideUndo();
+    }
 
     const backup=state.items.map(x=>({...x}));
     const backupUnread=state.unread;
@@ -524,6 +573,9 @@
   if(typeof baseLogout==="function"&&!baseLogout.__gxNotifWrapped){
     const wrappedLogout=function(...args){
       const result=baseLogout.apply(this,args);
+      if(state.pendingDelete)clearTimeout(state.pendingDelete.timer);
+      state.pendingDelete=null;
+      hideUndo();
       state.items=[];
       state.unread=0;
       state.initialized=false;
