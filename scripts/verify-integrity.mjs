@@ -739,6 +739,70 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+
+// Realtime preview contract: production pages stay untouched while the live layer is validated.
+{
+  const officialAyuda = readFileSync(join(ROOT, 'ayuda.html'), 'utf8');
+  const officialAdmin = readFileSync(join(ROOT, 'admin.html'), 'utf8');
+  const officialIndex = readFileSync(join(ROOT, 'index.html'), 'utf8');
+  const previewAyuda = readFileSync(join(ROOT, 'preview/realtime/ayuda-realtime.html'), 'utf8');
+  const previewAdmin = readFileSync(join(ROOT, 'preview/realtime/admin-realtime.html'), 'utf8');
+  const previewIndex = readFileSync(join(ROOT, 'preview/realtime/index-realtime.html'), 'utf8');
+  const rtCore = readFileSync(join(ROOT, 'assets/js/core/realtime.js'), 'utf8');
+  const rtAyuda = readFileSync(join(ROOT, 'assets/js/ayuda/03-realtime.js'), 'utf8');
+  const rtAdmin = readFileSync(join(ROOT, 'assets/js/admin/31-admin-realtime.js'), 'utf8');
+  const rtIndex = readFileSync(join(ROOT, 'assets/js/index/04-realtime.js'), 'utf8');
+  const rtNotifications = readFileSync(join(ROOT, 'assets/js/ayuda/04-client-notifications-realtime.js'), 'utf8');
+  const runtime = readFileSync(join(ROOT, 'assets/js/core/runtime.js'), 'utf8');
+
+  for (const [label, html] of [['Ayuda',officialAyuda],['Admin',officialAdmin],['Index',officialIndex]]) {
+    if (html.includes('assets/js/core/realtime.js') || html.includes('-realtime.js')) {
+      fail('Realtime: ' + label + ' oficial no debe cargar la beta Realtime todavía.');
+    }
+  }
+
+  if (!previewAyuda.includes('assets/js/core/realtime.js') ||
+      !previewAyuda.includes('assets/js/ayuda/03-realtime.js') ||
+      !previewAyuda.includes('04-client-notifications-realtime.js')) {
+    fail('Realtime: preview de Ayuda perdió núcleo, adaptador o bandeja de notificaciones.');
+  }
+  if (!previewAdmin.includes('assets/js/admin/31-admin-realtime.js')) {
+    fail('Realtime: preview de Admin perdió su adaptador.');
+  }
+  if (!previewIndex.includes('assets/js/index/04-realtime.js')) {
+    fail('Realtime: preview de Index perdió su adaptador.');
+  }
+
+  if (!rtCore.includes('.channel("goxion:live"') || !rtCore.includes('"broadcast"')) {
+    fail('Realtime: el núcleo dejó de suscribirse al canal Broadcast oficial.');
+  }
+  if (rtAyuda.includes('"catalog"') || rtAyuda.includes('"inventory"')) {
+    fail('Realtime: catálogo/inventario no deben volver a formar parte de Mi Espacio Realtime.');
+  }
+  if (rtAyuda.includes('"client_notifications"')) {
+    fail('Realtime: las notificaciones no deben reconstruir el dashboard completo.');
+  }
+  if (rtAdmin.includes('inicializarPanel(')) {
+    fail('Realtime: Admin no debe reinicializar el panel completo ante cada evento.');
+  }
+  if (!rtAdmin.includes('goxionReloadAdminModel') ||
+      !rtAdmin.includes('"registrations"') ||
+      !rtAdmin.includes('"admin_activity"') ||
+      !rtAdmin.includes('"cancellations"')) {
+    fail('Realtime: Admin perdió el refresco modular de solicitudes.');
+  }
+  if (!rtIndex.includes('"account_state"') || !rtIndex.includes('cargarEstadoCuenta')) {
+    fail('Realtime: Index perdió la sincronización modular del estado de cuenta.');
+  }
+  if (!rtNotifications.includes('notificaciones-cliente') ||
+      !rtNotifications.includes('"client_notifications"')) {
+    fail('Realtime: la bandeja del cliente no está conectada a su endpoint/evento.');
+  }
+  if (!runtime.includes("'notificaciones-cliente': 'notificaciones-cliente'")) {
+    fail('Realtime: runtime no registra notificaciones-cliente.');
+  }
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
