@@ -18,6 +18,8 @@
   let channel = null;
   let status = "CLOSED";
   let hasSubscribedOnce = false;
+  let reconnectTimer = null;
+  let manualClose = false;
 
   const emit = (scope, payload = {}) => {
     const key = String(scope || "general");
@@ -27,12 +29,47 @@
       window.dispatchEvent(new CustomEvent("goxion:realtime", {
         detail: { scope: key, ...payload }
       }));
-    }, 350));
+    }, 220));
   };
 
-  const connect = () => {
-    if (channel) return channel;
-    channel = client
+  const dispatchStatus = (nextStatus, error = null) => {
+    status = nextStatus;
+    window.dispatchEvent(new CustomEvent("goxion:realtime:status", {
+      detail: { status: nextStatus, error: error || null }
+    }));
+  };
+
+  const clearReconnect = () => {
+    if (!reconnectTimer) return;
+    clearTimeout(reconnectTimer);
+    reconnectTimer = null;
+  };
+
+  const scheduleReconnect = (delay = 1200) => {
+    if (manualClose || reconnectTimer || !navigator.onLine) return;
+    reconnectTimer = setTimeout(async () => {
+      reconnectTimer = null;
+      if (manualClose || !navigator.onLine) return;
+
+      const stale = channel;
+      channel = null;
+      if (stale) {
+        try { await client.removeChannel(stale); } catch (_) {}
+      }
+      connect();
+    }, delay);
+  };
+
+  function connect() {
+    manualClose = false;
+
+    if (channel && status === "SUBSCRIBED") return channel;
+    if (channel) {
+      scheduleReconnect(0);
+      return channel;
+    }
+
+    const current = client
       .channel("goxion:live", { config: { broadcast: { self: false } } })
       .on("broadcast", { event: "invalidate" }, ({ payload }) => {
         emit(payload?.scope || "general", {
@@ -40,34 +77,57 @@
           operation: payload?.operation || "",
           at: payload?.at || Date.now()
         });
-      })
-      .subscribe((nextStatus, error) => {
-        status = nextStatus;
-        window.dispatchEvent(new CustomEvent("goxion:realtime:status", {
-          detail: { status: nextStatus, error: error || null }
-        }));
-        if (nextStatus === "CHANNEL_ERROR" || nextStatus === "TIMED_OUT") {
+      });
+
+    channel = current;
+
+    current.subscribe((nextStatus, error) => {
+      if (current !== channel) return;
+      dispatchStatus(nextStatus, error);
+
+      if (nextStatus === "SUBSCRIBED") {
+        clearReconnect();
+        if (hasSubscribedOnce) emit("resync", { operation: "RECONNECT" });
+        hasSubscribedOnce = true;
+        return;
+      }
+
+      if (["CHANNEL_ERROR", "TIMED_OUT", "CLOSED"].includes(nextStatus)) {
+        if (nextStatus !== "CLOSED" || !manualClose) {
           console.warn("GOXION Realtime:", nextStatus, error || "");
         }
-        if (nextStatus === "SUBSCRIBED") {
-          if (hasSubscribedOnce) emit("resync", { operation: "RECONNECT" });
-          hasSubscribedOnce = true;
-        }
-      });
-    return channel;
-  };
+        scheduleReconnect(nextStatus === "CLOSED" ? 700 : 1200);
+      }
+    });
+
+    return current;
+  }
 
   const disconnect = async () => {
-    if (!channel) return;
+    manualClose = true;
+    clearReconnect();
+    if (!channel) {
+      dispatchStatus("CLOSED");
+      return;
+    }
     const current = channel;
     channel = null;
-    await client.removeChannel(current);
-    status = "CLOSED";
+    try { await client.removeChannel(current); } catch (_) {}
+    dispatchStatus("CLOSED");
   };
 
-  window.addEventListener("online", connect);
+  window.addEventListener("online", () => {
+    if (status !== "SUBSCRIBED") scheduleReconnect(0);
+  });
+
   document.addEventListener("visibilitychange", () => {
-    if (!document.hidden && navigator.onLine) emit("resync", { operation: "VISIBLE" });
+    if (document.hidden || !navigator.onLine) return;
+
+    if (status === "SUBSCRIBED") {
+      emit("resync", { operation: "VISIBLE" });
+    } else {
+      scheduleReconnect(0);
+    }
   });
 
   window.GOXION_REALTIME = Object.freeze({
