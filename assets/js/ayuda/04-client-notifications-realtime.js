@@ -25,9 +25,33 @@
     const t=String(item?.tipo||"").toLowerCase();
     if(t.includes("pago"))return "Pago";
     if(t.includes("beneficio"))return "Beneficio";
-    if(t.includes("cancel"))return "Solicitud";
-    if(item?.source==="servicio")return "Servicio";
+    if(t.includes("referido"))return "Referidos";
+    if(t.includes("mision")||t.includes("cupon"))return "Rewards";
+    if(t.includes("pedido"))return "Solicitud";
+    if(t.includes("cancel"))return "Cancelación";
+    if(item?.source==="servicio"||t.includes("acceso")||t.includes("perfil")||t.includes("correo")||t.includes("pin"))return "Servicio";
     return "GOXION";
+  };
+
+  const tone=(item)=>{
+    const action=String(item?.accion||"");
+    const t=String(item?.tipo||"").toLowerCase();
+    if(action==="account")return "account";
+    if(action==="referral"||action==="coupon")return "reward";
+    if(action==="service"||action==="services")return t.includes("cancel")?"warning":"service";
+    return "neutral";
+  };
+
+  const notifIcon=(item)=>{
+    const action=String(item?.accion||"");
+    const t=String(item?.tipo||"").toLowerCase();
+    if(action==="account")return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16v11H4z"></path><path d="M4 10h16"></path><path d="M7 14h4"></path></svg>';
+    if(action==="referral")return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"></circle><path d="M3.5 18c.6-3 2.4-4.5 5.5-4.5s4.9 1.5 5.5 4.5"></path><path d="M17 7v6M14 10h6"></path></svg>';
+    if(action==="coupon")return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v4a2 2 0 0 0 0 4v4H4v-4a2 2 0 0 0 0-4z"></path><path d="M9 8.5v7"></path></svg>';
+    if(action==="service"||action==="services")return t.includes("cancel")
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 3.5 7.5 12 12l8.5-4.5z"></path><path d="M3.5 12 12 16.5 20.5 12"></path><path d="M3.5 16.5 12 21l8.5-4.5"></path></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="3"></rect><path d="M8 9h8M8 13h5"></path></svg>';
+    return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>';
   };
 
   const token=()=>localStorage.getItem(TOKEN_KEY)||"";
@@ -129,11 +153,14 @@
       sheet.innerHTML=
         '<div class="gx-client-notif-handle"></div>'+
         '<div class="gx-client-notif-head">'+
-          '<div><strong>Notificaciones</strong><small id="gx-client-notif-head-summary">Actividad de tu cuenta</small></div>'+
+          '<div class="gx-client-notif-head-copy">'+
+            '<span class="gx-client-notif-head-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg></span>'+
+            '<span><strong>Notificaciones</strong><small id="gx-client-notif-head-summary">Actividad de tu cuenta</small></span>'+
+          '</div>'+
           '<div class="gx-client-notif-head-actions">'+
-            '<button type="button" id="gx-client-notif-mark-all">Marcar leídas</button>'+
-            '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all">Eliminar todo</button>'+
-            '<button type="button" class="gx-client-notif-close" aria-label="Cerrar">×</button>'+
+            '<button type="button" id="gx-client-notif-mark-all" class="gx-client-notif-soft-action"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg><span>Marcar leídas</span></button>'+
+            '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg><span>Eliminar todo</span></button>'+
+            '<button type="button" class="gx-client-notif-close" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"></path></svg></button>'+
           '</div>'+
         '</div>'+
         '<div id="gx-client-notif-list" class="gx-client-notif-list"></div>';
@@ -174,19 +201,36 @@
     }
     if(!list)return;
 
-    list.innerHTML=state.items.length?state.items.map(item=>
-      '<article class="gx-client-notif-item '+(item.leida===true?"":"unread")+'" data-gx-notif-id="'+esc(item.id)+'" data-gx-notif-source="'+esc(item.source||"general")+'">'+
-        '<div class="gx-client-notif-item-top">'+
-          '<strong>'+esc(item.titulo||"GOXION")+'</strong>'+
-          '<span class="gx-client-notif-time">'+esc(relative(item.created_at))+'</span>'+
+    list.innerHTML=state.items.length?state.items.map(item=>{
+      const action=String(item.accion||"");
+      const actionHtml=action
+        ? '<button type="button" class="gx-client-notif-item-action" data-gx-notif-action="'+esc(action)+'" data-gx-notif-ref="'+esc(item.accion_ref||"")+'" data-gx-notif-id="'+esc(item.id)+'" data-gx-notif-source="'+esc(item.source||"general")+'"><span>'+esc(item.accion_label||"Abrir")+'</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l7 7-7 7"></path></svg></button>'
+        : '';
+      return '<article class="gx-client-notif-item gx-tone-'+tone(item)+' '+(item.leida===true?"":"unread")+'" data-gx-notif-id="'+esc(item.id)+'" data-gx-notif-source="'+esc(item.source||"general")+'">'+
+        '<div class="gx-client-notif-item-icon" aria-hidden="true">'+notifIcon(item)+'</div>'+
+        '<div class="gx-client-notif-item-body">'+
+          '<div class="gx-client-notif-item-top">'+
+            '<strong>'+esc(item.titulo||"GOXION")+'</strong>'+
+            '<span class="gx-client-notif-time">'+esc(relative(item.created_at))+'</span>'+
+          '</div>'+
+          '<p>'+esc(item.mensaje||"")+'</p>'+
+          '<div class="gx-client-notif-item-foot"><span class="gx-client-notif-kind">'+esc(kind(item))+'</span>'+actionHtml+'</div>'+
         '</div>'+
-        '<p>'+esc(item.mensaje||"")+'</p>'+
-        '<span class="gx-client-notif-kind">'+esc(kind(item))+'</span>'+
-      '</article>'
-    ).join(""):'<div class="gx-client-notif-empty">No tienes notificaciones recientes.</div>';
+      '</article>';
+    }).join(""):'<div class="gx-client-notif-empty"><span class="gx-client-notif-empty-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M9.5 21h5"></path></svg></span><strong>Todo al día</strong><small>No tienes notificaciones recientes.</small></div>';
 
     list.querySelectorAll(".gx-client-notif-item.unread").forEach(node=>{
-      node.addEventListener("click",()=>markOne(node.dataset.gxNotifId,node.dataset.gxNotifSource));
+      node.addEventListener("click",event=>{
+        if(event.target.closest(".gx-client-notif-item-action"))return;
+        markOne(node.dataset.gxNotifId,node.dataset.gxNotifSource);
+      });
+    });
+    list.querySelectorAll(".gx-client-notif-item-action").forEach(button=>{
+      button.addEventListener("click",event=>{
+        event.preventDefault();
+        event.stopPropagation();
+        goAction(button);
+      });
     });
   }
 
@@ -210,6 +254,55 @@
     }finally{
       state.loading=false;
     }
+  }
+
+  function showDashboard(){
+    if(typeof window.switchTab==="function")window.switchTab("inicio");
+  }
+
+  async function goAction(button){
+    const id=button?.dataset?.gxNotifId||"";
+    const source=button?.dataset?.gxNotifSource||"general";
+    const action=button?.dataset?.gxNotifAction||"";
+    const ref=button?.dataset?.gxNotifRef||"";
+
+    if(id)await markOne(id,source);
+    closeSheet();
+
+    if(action==="account"){
+      if(typeof window.irAlTicket==="function")window.irAlTicket();
+      return;
+    }
+
+    showDashboard();
+    setTimeout(()=>{
+      if(action==="referral"&&typeof window.openGamif==="function"){
+        window.openGamif("referral");
+        document.getElementById("referral-section-container")?.scrollIntoView({behavior:"smooth",block:"start"});
+        return;
+      }
+      if(action==="coupon"&&typeof window.openGamif==="function"){
+        window.openGamif("coupon");
+        document.getElementById("referral-section-container")?.scrollIntoView({behavior:"smooth",block:"start"});
+        return;
+      }
+
+      const stack=document.getElementById("dash-services");
+      if(action==="service"&&ref){
+        const key=typeof getCurrentClientKey==="function"?getCurrentClientKey():"";
+        const services=globalClientesData?.[key]?.servicios||[];
+        const index=services.findIndex(service=>String(service?.id||"")===String(ref));
+        const card=index>=0?document.getElementById("gx-service-card-"+index):null;
+        if(card){
+          card.scrollIntoView({behavior:"smooth",block:"center"});
+          if(!card.classList.contains("expanded")&&typeof window.gxToggleServiceCard==="function"){
+            setTimeout(()=>window.gxToggleServiceCard(index),260);
+          }
+          return;
+        }
+      }
+      stack?.scrollIntoView({behavior:"smooth",block:"start"});
+    },180);
   }
 
   async function markOne(id,source){
