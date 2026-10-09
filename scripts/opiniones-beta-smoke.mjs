@@ -41,7 +41,22 @@ try{
       });
       await page.goto(origin+'/preview/opiniones/ayuda-opiniones.html',{waitUntil:'domcontentloaded',timeout:30000});
       await dom(page,()=>!!window.GOXION_REVIEWS_BETA&&!!document.getElementById('gx-rb-home'));
-      assert.equal(await page.locator('.gx-rb-quote').count(),2);
+      assert.equal(await page.locator('.gx-rb-marquee-group').count(),3);
+      assert.equal(await page.locator('.gx-rb-marquee-group:first-child .gx-rb-quote').count(),2);
+      assert.equal(await page.locator('#gx-rb-open').count(),0,'La cinta no tiene CTA redundante');
+      const placement=await page.evaluate(()=>{
+        const section=document.querySelector('#gx-rb-home');
+        const final=document.querySelector('#view-inicio .final-cta');
+        return {
+          beforeFinal:section.nextElementSibling===final,
+          hasTopBorder:getComputedStyle(section).borderTopWidth,
+          mask:getComputedStyle(document.querySelector('.gx-rb-marquee')).maskImage
+        };
+      });
+      assert.equal(placement.beforeFinal,true,'Opiniones debe estar cerca del cierre de Inicio');
+      assert.equal(placement.hasTopBorder,'0px','Cinta sin línea divisoria');
+      assert.match(placement.mask,/linear-gradient/,'Bordes con difuminado');
+      assert.equal(await page.locator('#gx-rb-stars .gx-rb-star').count(),5);
       assert.equal(await page.locator('.gx-rb-star').count(),5);
       // Ayuda must use its glass/editorial language, not Admin dashboard chrome.
       const skin=await page.evaluate(()=>{
@@ -59,8 +74,16 @@ try{
       assert.equal(skin.homeTransparent,'rgba(0, 0, 0, 0)');
       assert.match(skin.heading,/GOXION/);
       assert.equal(skin.hasPreviewBar,true);
-      await click(page,'#gx-rb-open');
+      await page.evaluate(()=>window.openFeedbackModal());
       await dom(page,()=>document.getElementById('modal-feedback').classList.contains('show'));
+      const hero=await page.evaluate(()=>({
+        noBox:getComputedStyle(document.querySelector('.gx-rb-emblem')).borderTopStyle,
+        traced:document.querySelector('.gx-rb-neon-star-line')!==null,
+        cyan:getComputedStyle(document.querySelector('.gx-rb-close')).color
+      }));
+      assert.equal(hero.noBox,'none');
+      assert.equal(hero.traced,true);
+      assert.equal(hero.cyan,'rgb(0, 242, 254)');
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
@@ -78,7 +101,29 @@ try{
         'El control completo debe activar autorización explícita');
       await click(page,'#gx-rb-submit');
       await dom(page,()=>!document.getElementById('gx-rb-success').hidden);
-      assert.match(await page.locator('#gx-rb-success-text').innerText(),/después de aprobarla/i);
+      assert.match(await page.locator('#gx-rb-success-text').innerText(),/después de que se apruebe/i);
+      assert.equal(await page.locator('#gx-rb-submit').innerText(),'Listo');
+      assert.equal(await page.locator('#gx-rb-submit svg').count(),1);
+      await dom(page,()=>document.getElementById('gx-rb-fields').hidden,4000);
+      const successState=await page.evaluate(()=>{
+        const shell=document.querySelector('.gx-rb-shell');
+        return {
+          complete:document.getElementById('modal-feedback').classList.contains('gx-rb-complete'),
+          shellOverflow:getComputedStyle(shell).overflowY,
+          shellTouch:getComputedStyle(shell).touchAction,
+          pageLocked:getComputedStyle(document.body).position,
+          scrollable:shell.scrollHeight>shell.clientHeight+3
+        };
+      });
+      assert.equal(successState.complete,true);
+      assert.equal(successState.shellOverflow,'hidden');
+      assert.equal(successState.shellTouch,'none');
+      assert.equal(successState.pageLocked,'fixed');
+      assert.equal(successState.scrollable,false,'Éxito no debe permitir desplazamiento');
+      await click(page,'#gx-rb-submit');
+      await dom(page,()=>!document.getElementById('modal-feedback').classList.contains('show'));
+      const restored=await page.evaluate(()=>getComputedStyle(document.body).position);
+      assert.notEqual(restored,'fixed','Cerrar debe restaurar desplazamiento');
       assert.equal(realNotifications,0,'La beta no debe notificar a la base real');
 
       await page.goto(origin+'/preview/opiniones/admin-opiniones.html',{waitUntil:'domcontentloaded'});
@@ -100,15 +145,16 @@ try{
 
       await page.goto(origin+'/preview/opiniones/ayuda-opiniones.html',{waitUntil:'domcontentloaded'});
       await dom(page,()=>!!document.querySelector('#gx-rb-track'));
-      assert.equal(await page.locator('.gx-rb-quote').count(),3);
+      assert.equal(await page.locator('.gx-rb-marquee-group:first-child .gx-rb-quote').count(),3);
       assert.match(await page.locator('#gx-rb-track').innerText(),/Excelente ayuda beta/);
-      await click(page,'#gx-rb-open');
+      await page.evaluate(()=>window.openFeedbackModal());
       await click(page,'.gx-rb-star[data-score="3"]');
       await page.locator('#gx-rb-text').fill(privateMarker);
       assert.equal(await page.locator('#gx-rb-consent').isChecked(),false);
       await click(page,'#gx-rb-submit');
       await dom(page,()=>!document.getElementById('gx-rb-success').hidden);
-      assert.match(await page.locator('#gx-rb-success-text').innerText(),/privada/i);
+      assert.match(await page.locator('#gx-rb-success-text').innerText(),/privado/i);
+      assert.equal(await page.locator('#gx-rb-submit').innerText(),'Listo');
       await page.goto(origin+'/preview/opiniones/admin-opiniones.html',{waitUntil:'domcontentloaded'});
       await click(page,'[data-filter="private"]');
       const card=page.locator('.gx-rb-admin-card').filter({hasText:privateMarker});
