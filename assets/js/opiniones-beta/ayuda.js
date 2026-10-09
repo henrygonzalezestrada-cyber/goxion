@@ -16,11 +16,16 @@
   const heroStar='<svg class="gx-rb-neon-star" viewBox="0 0 100 100" aria-hidden="true">'+
     '<defs><linearGradient id="gx-rb-star-gradient" x1="0" y1="0" x2="1" y2="1">'+
       '<stop offset="0%" stop-color="#00f2fe"/><stop offset="55%" stop-color="#7c4dff"/><stop offset="100%" stop-color="#78faff"/>'+
-    '</linearGradient></defs>'+
+    '</linearGradient>'+
+    '<filter id="gx-rb-orbit-light" x="-55%" y="-55%" width="210%" height="210%" color-interpolation-filters="sRGB">'+
+      '<feGaussianBlur stdDeviation="2.5"/>'+
+    '</filter></defs>'+
     '<path class="gx-rb-neon-star-halo" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '<path class="gx-rb-neon-star-line" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '<path class="gx-rb-neon-star-bloom" pathLength="100" filter="url(#gx-rb-orbit-light)" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '<path class="gx-rb-neon-star-trail" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '<path class="gx-rb-neon-star-runner" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '<path class="gx-rb-neon-star-spark" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '</svg>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
@@ -85,6 +90,8 @@
   // The two paths share the offset so the bright beam keeps its soft halo.
   const neonRunner=modal.querySelector(".gx-rb-neon-star-runner");
   const neonTrail=modal.querySelector(".gx-rb-neon-star-trail");
+  const neonBloom=modal.querySelector(".gx-rb-neon-star-bloom");
+  const neonSpark=modal.querySelector(".gx-rb-neon-star-spark");
   const neonReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
   let neonTimer=null,neonStart=0,neonProgress=0;
   function tickNeon(){
@@ -93,6 +100,9 @@
     const offset=(-neonProgress*100).toFixed(2);
     if(neonRunner)neonRunner.style.strokeDashoffset=offset;
     if(neonTrail)neonTrail.style.strokeDashoffset=offset;
+    if(neonBloom)neonBloom.style.strokeDashoffset=offset;
+    // Brighter tip leads the long illuminated ribbon around the star.
+    if(neonSpark)neonSpark.style.strokeDashoffset=(Number(offset)-20).toFixed(2);
   }
   function syncNeon(){
     const active=modal.classList.contains("show")&&!document.hidden&&!neonReduce.matches;
