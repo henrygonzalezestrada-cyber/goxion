@@ -6,6 +6,14 @@ const server=spawn(process.execPath,['scripts/serve-preview.mjs'],{env:{...proce
 const services=[{id:'prime',nombre:'Prime Video',precio:45,disponibles:5,safeId:'prime'},{id:'disney',nombre:'Disney+ Premium',precio:89,disponibles:2,safeId:'disney'},{id:'crunch',nombre:'Crunchyroll cuenta completa',precio:100,disponibles:1,safeId:'crunch'}];
 // Exercise native form submission without Playwright waiting forever for a
 // moving WebKit footer to become geometrically stable (layout is checked below).
+async function waitForDom(page,predicate,timeout=6000){
+  const deadline=Date.now()+timeout;
+  while(Date.now()<deadline){
+    if(await page.evaluate(predicate).catch(()=>false))return;
+    await page.waitForTimeout(100);
+  }
+  throw new Error('Estado del DOM no alcanzado en '+timeout+'ms');
+}
 async function submitCart(page){
   // Error text is set before the handler's finally block unlocks the form.
   // Wait for a completed request rather than dropping the next click while busy.
@@ -72,8 +80,7 @@ try{
     assert.equal(posts.length,0);
     remaining=2;
     await submitCart(page);
-    await page.waitForFunction(()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'),
-      null,{timeout:9000,polling:100}).catch(async error=>{
+    await waitForDom(page,()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'),9000).catch(async error=>{
       console.log('CART DIAGNOSTIC',name,await page.evaluate(()=>({
         error:document.getElementById('gx-cart-error')?.textContent,
         buttonDisabled:document.querySelector('#gx-cart-form button[type=submit]')?.disabled,
