@@ -616,10 +616,17 @@
 }
 .gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell {
   overflow:hidden!important;
+  overflow-y:clip!important;
   overscroll-behavior:none;
   touch-action:none;
   width:min(100%,400px);
   max-height:none;
+}
+/* Earlier ornamental glows were positioned beyond the card's lower edge:
+   on iOS they expanded scrollHeight even when the contents were collapsed. */
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell::before,
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell::after {
+  display:none!important;
 }
 .gx-rb-modal.gx-rb-complete {
   overscroll-behavior:none;
