@@ -50,13 +50,20 @@ try{
           height:card.getBoundingClientRect().height,
           font:getComputedStyle(card.querySelector('p')).fontSize,
           blur:style.webkitBackdropFilter||style.backdropFilter,
-          background:style.backgroundImage
+          background:style.backgroundColor,
+          backgroundImage:style.backgroundImage,
+          border:style.borderTopColor,
+          shadow:style.boxShadow,
+          nativeGlass:getComputedStyle(document.querySelector('.glass-card.tab-container')).backgroundColor
         };
       });
       assert(reviewsGlass.height>=188,'Reseñas con altura protagonista');
       assert(parseFloat(reviewsGlass.font)>=13,'Tipografía más grande');
-      assert.match(reviewsGlass.blur,/blur\(22px\)/,'Cristal difuminado real');
-      assert.match(reviewsGlass.background,/linear-gradient/);
+      assert.match(reviewsGlass.blur,/blur\(10px\)/,'Mismo blur 10px que las tarjetas de Ayuda');
+      assert.equal(reviewsGlass.background,reviewsGlass.nativeGlass,'El cristal reutiliza --card-glass de Ayuda');
+      assert.equal(reviewsGlass.backgroundImage,'none','No añadir degradado distinto al cristal');
+      assert.equal(reviewsGlass.border,'rgba(255, 255, 255, 0.08)');
+      assert.match(reviewsGlass.shadow,/10px 30px/);
       // Move section into viewport: animation should advance without a pointer swipe.
       await page.locator('#gx-rb-home').scrollIntoViewIfNeeded();
       await page.waitForTimeout(100);
@@ -118,7 +125,10 @@ try{
         cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
         darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
         runner:document.querySelector('.gx-rb-neon-star-runner')!==null,
-        runnerLength:document.querySelector('.gx-rb-neon-star-runner')?.getAttribute('pathLength')
+        runnerLength:document.querySelector('.gx-rb-neon-star-runner')?.getAttribute('pathLength'),
+        beamWidth:getComputedStyle(document.querySelector('.gx-rb-neon-star-runner')).strokeWidth,
+        beamDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-runner')).strokeDasharray,
+        trailDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-trail')).strokeDasharray
       }));
       assert.equal(hero.noBox,'none');
       assert.equal(hero.traced,true);
@@ -126,6 +136,9 @@ try{
       assert.equal(hero.darkX,'rgb(6, 18, 24)','La X debe ser oscura');
       assert.equal(hero.runner,true,'La estrella tiene un trazo neón independiente');
       assert.equal(hero.runnerLength,'100');
+      assert.equal(hero.beamWidth,'1.65px','Haz más fino, similar a la línea de beneficios');
+      assert.match(hero.beamDash,/32/,'Haz más largo que antes');
+      assert.match(hero.trailDash,/43/,'Estela extendida');
       const orbitStart=await page.locator('.gx-rb-neon-star-runner').evaluate(
         node=>getComputedStyle(node).strokeDashoffset
       );
