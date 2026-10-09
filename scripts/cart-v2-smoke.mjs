@@ -4,6 +4,14 @@ import {spawn} from 'node:child_process';
 const port=4184, origin=`http://127.0.0.1:${port}`;
 const server=spawn(process.execPath,['scripts/serve-preview.mjs'],{env:{...process.env,PORT:String(port)},stdio:'ignore'});
 const services=[{id:'prime',nombre:'Prime Video',precio:45,disponibles:5,safeId:'prime'},{id:'disney',nombre:'Disney+ Premium',precio:89,disponibles:2,safeId:'disney'},{id:'crunch',nombre:'Crunchyroll cuenta completa',precio:100,disponibles:1,safeId:'crunch'}];
+// Exercise native form submission without Playwright waiting forever for a
+// moving WebKit footer to become geometrically stable (layout is checked below).
+async function submitCart(page){
+  await page.locator('#gx-cart-form button[type=submit]').evaluate(button=>{
+    if(button.disabled)throw new Error('Botón de carrito deshabilitado');
+    button.click();
+  });
+}
 const promo={id:'promo-prime',nombre:'Prime Video · 3 meses',titulo_publico:'Prime Video · 3 meses',adquisicion_habilitada:true,mecanica:'precio_fijo',duracion_periodos:3,precio_promocional_total:99,items:[{servicio_id:'prime',servicio:services[0]}],disponibilidad:{disponible:true,items:[{servicio_id:'prime',nombre:'Prime Video',requiere_cupo:true}]}};
 try{
   for(let i=0;i<50;i++){try{if((await fetch(origin)).ok)break;}catch{}await new Promise(r=>setTimeout(r,100));}
@@ -43,21 +51,21 @@ try{
     assert.match(await page.locator('#gx-cart-lines').innerText(),/1 cuenta completa/);
     assert.match(await page.locator('#gx-cart-lines').innerText(),/Paquete · 3 meses/);
     await page.locator('#gx-cart-phone').fill('123');
-    await page.locator('#gx-cart-form button[type=submit]').click();
+    await submitCart(page);
     assert.equal(posts.length,0);
     await page.locator('#gx-cart-phone').fill('9611234567');
     remaining=1;
-    await page.locator('#gx-cart-form button[type=submit]').click();
+    await submitCart(page);
     await page.waitForFunction(()=>Boolean(document.getElementById('gx-cart-error').textContent));
     assert.match(await page.locator('#gx-cart-error').innerText(),/cupos/);
     assert.equal(posts.length,0);
     remaining=2;
-    await page.locator('#gx-cart-form button[type=submit]').click();
+    await submitCart(page);
     await page.waitForFunction(()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'));
     assert.match(await page.locator('#gx-cart-total').innerText(),/377/);
     fail=false;
     await page.screenshot({path:`/tmp/goxion-cart-${name}.png`});
-    await page.locator('#gx-cart-form button[type=submit]').click();
+    await submitCart(page);
     await page.locator('#gx-cart-success').waitFor({state:'visible'});
     assert.equal(posts.length,2);
     assert.equal(posts[0].referencia,posts[1].referencia);
@@ -76,7 +84,7 @@ try{
       GOXION_CART.changeService('Crunchyroll cuenta completa',1);GOXION_CART.open();
     },{services});
     assert.equal(await page.locator('#gx-cart-phone').isVisible(),false);
-    await page.locator('#gx-cart-form button[type=submit]').click();
+    await submitCart(page);
     await page.locator('#gx-cart-success').waitFor({state:'visible'});
     assert.match(posts.at(-1).mensaje,/Folio: TEST/);
     assert.equal(posts.at(-1).session_token,'test-token');
