@@ -6,7 +6,21 @@ const server=spawn(process.execPath,['scripts/serve-preview.mjs'],{env:{...proce
 const services=[{id:'prime',nombre:'Prime Video',precio:45,disponibles:5,safeId:'prime'},{id:'disney',nombre:'Disney+ Premium',precio:89,disponibles:2,safeId:'disney'},{id:'crunch',nombre:'Crunchyroll cuenta completa',precio:100,disponibles:1,safeId:'crunch'}];
 // Exercise native form submission without Playwright waiting forever for a
 // moving WebKit footer to become geometrically stable (layout is checked below).
+async function waitForDom(page,predicate,timeout=6000){
+  const deadline=Date.now()+timeout;
+  while(Date.now()<deadline){
+    if(await page.evaluate(predicate).catch(()=>false))return;
+    await page.waitForTimeout(100);
+  }
+  throw new Error('Estado del DOM no alcanzado en '+timeout+'ms');
+}
 async function submitCart(page){
+  // Error text is set before the handler's finally block unlocks the form.
+  // Wait for a completed request rather than dropping the next click while busy.
+  await page.waitForFunction(()=>{
+    const button=document.querySelector('#gx-cart-form button[type=submit]');
+    return button && !button.disabled && !button.classList.contains('is-sending');
+  },null,{timeout:10000});
   await page.locator('#gx-cart-form button[type=submit]').evaluate(button=>{
     if(button.disabled)throw new Error('Botón de carrito deshabilitado');
     button.click();
@@ -18,6 +32,11 @@ try{
   for(const [name,engine] of Object.entries({chromium,webkit})){
     const browser=await engine.launch({headless:true});
     const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'no-preference'});
+    if(name==='webkit'){
+      const nativeWait=page.waitForFunction.bind(page);
+      page.waitForFunction=(expression,arg,options={})=>
+        nativeWait(expression,arg,{polling:100,...options});
+    }
     page.on('pageerror', e=>console.error('PAGE',e.message));
     let posts=[], fail=true, remaining=2;
     await page.route('**/*.supabase.co/**',async route=>{
@@ -61,7 +80,16 @@ try{
     assert.equal(posts.length,0);
     remaining=2;
     await submitCart(page);
-    await page.waitForFunction(()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'));
+    await waitForDom(page,()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'),9000).catch(async error=>{
+      console.log('CART DIAGNOSTIC',name,await page.evaluate(()=>({
+        error:document.getElementById('gx-cart-error')?.textContent,
+        buttonDisabled:document.querySelector('#gx-cart-form button[type=submit]')?.disabled,
+        sending:document.querySelector('#gx-cart-form button[type=submit]')?.classList.contains('is-sending'),
+        formHidden:document.querySelector('#gx-cart-form')?.hidden,
+        count:document.querySelectorAll('.gx-cart-line').length
+      })),{posts:posts.length,remaining,fail});
+      throw error;
+    });
     assert.match(await page.locator('#gx-cart-total').innerText(),/377/);
     fail=false;
     await page.screenshot({path:`/tmp/goxion-cart-${name}.png`});

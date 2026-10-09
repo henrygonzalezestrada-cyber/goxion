@@ -682,6 +682,23 @@
     requestAnimationFrame(()=>backdrop.classList.add('active'));
   }
 
+  // On some WebKit versions CSS transitions can remain suspended after DOM
+  // reparenting. Only when geometry is still stale *after* the normal morph
+  // duration do we finish the existing animations, avoiding a frozen card.
+  function settleStalledPromoMorph(card,targetHeight){
+    if(card!==state.expandedCard||!card.isConnected)return;
+    const now=card.getBoundingClientRect().height;
+    if(!Number.isFinite(now)||Math.abs(now-targetHeight)<8)return;
+    for(const animation of card.getAnimations({subtree:true})){
+      try{
+        if(animation.playState==='running'&&
+           Number.isFinite(animation.effect?.getComputedTiming()?.endTime)){
+          animation.finish();
+        }
+      }catch(_){}
+    }
+  }
+
   function openPromoDetail(p,card){
     if(!p||!card||state.expandedCard) return;
     stopAuto();
@@ -754,25 +771,32 @@
     document.documentElement.classList.add('gx-promo-morph-open');
     document.body.classList.add('gx-promo-morph-open');
 
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        card.classList.remove('is-closed');
-        card.classList.add('is-expanded');
-        void card.offsetWidth;
-        setPromoActionState(card,p,true);
-        const detail=card.querySelector('.gx-promo-morph-detail');
-        if(detail){
-          detail.scrollTop=0;
-          detail.setAttribute('aria-hidden','false');
-        }
-        card.style.top=targetTop+'px';
-        card.style.left=targetLeft+'px';
-        card.style.setProperty('width',targetWidth+'px','important');
-        card.style.setProperty('height',targetHeight+'px','important');
-        requestAnimationFrame(()=>syncPromoAvailabilityMarquee(card));
-        setTimeout(()=>{ if(card===state.expandedCard) syncPromoAvailabilityMarquee(card); },520); // gxMarqueeFinal
-      });
-    });
+    // WebKit can stall nested animation frames while detaching/reparenting the
+    // deck card. A guarded fallback completes the same morph without requiring
+    // a second RAF; the commit runs exactly once and does not change its styles.
+    let expansionCommitted=false;
+    const commitExpansion=()=>{
+      if(expansionCommitted||state.expandedCard!==card||!card.isConnected)return;
+      expansionCommitted=true;
+      card.classList.remove('is-closed');
+      card.classList.add('is-expanded');
+      void card.offsetWidth;
+      setPromoActionState(card,p,true);
+      const detail=card.querySelector('.gx-promo-morph-detail');
+      if(detail){
+        detail.scrollTop=0;
+        detail.setAttribute('aria-hidden','false');
+      }
+      card.style.top=targetTop+'px';
+      card.style.left=targetLeft+'px';
+      card.style.setProperty('width',targetWidth+'px','important');
+      card.style.setProperty('height',targetHeight+'px','important');
+      requestAnimationFrame(()=>syncPromoAvailabilityMarquee(card));
+      setTimeout(()=>{ if(card===state.expandedCard) syncPromoAvailabilityMarquee(card); },520); // gxMarqueeFinal
+      setTimeout(()=>settleStalledPromoMorph(card,targetHeight),850);
+    };
+    requestAnimationFrame(()=>requestAnimationFrame(commitExpansion));
+    setTimeout(commitExpansion,140);
   }
 
   function closePromoDetail(card=state.expandedCard){
@@ -806,6 +830,11 @@
         card.style.setProperty('width',(origin.cssWidth??origin.width)+'px','important');
         card.style.setProperty('height',(origin.cssHeight??origin.height)+'px','important');
       });
+      setTimeout(()=>{
+        if(card===state.expandedCard&&card.classList.contains('is-returning')){
+          settleStalledPromoMorph(card,origin.cssHeight??origin.height);
+        }
+      },850);
     },110);
 
     // Al terminar, sólo devolvemos el mismo nodo al deck: ya no hay cambio de composición.
@@ -816,8 +845,21 @@
       const transitions=card.getAnimations().filter(animation=>
         Number.isFinite(animation.effect?.getComputedTiming().endTime)
       );
-      await Promise.allSettled(transitions.map(animation=>animation.finished));
-      await new Promise(resolve=>requestAnimationFrame(resolve));
+      // On backgrounded/headless WebKit, CSS transitions and even RAF may stop
+      // resolving. The visual morph normally ends long before this deadline.
+      const finished=await Promise.race([
+        Promise.allSettled(transitions.map(animation=>animation.finished)).then(()=>true),
+        new Promise(resolve=>setTimeout(()=>resolve(false),350))
+      ]);
+      if(!finished){
+        for(const animation of transitions){
+          try{animation.finish()}catch(_){}
+        }
+      }
+      await Promise.race([
+        new Promise(resolve=>requestAnimationFrame(resolve)),
+        new Promise(resolve=>setTimeout(resolve,90))
+      ]);
       if(card!==state.expandedCard) return;
 
       card.classList.remove('is-closing','is-returning');
