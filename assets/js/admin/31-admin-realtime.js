@@ -17,7 +17,17 @@
       });
       document.body.appendChild(node);
     }
-    node.innerHTML = `<strong style="display:block;font-size:12px;">${String(title||"GOXION actualizado")}</strong>${detail?`<small style="display:block;margin-top:4px;opacity:.68;font-size:10px;line-height:1.35;">${String(detail)}</small>`:""}`;
+    // Notification titles and customer messages are data, never HTML.
+    const headline=document.createElement("strong");
+    Object.assign(headline.style,{display:"block",fontSize:"12px"});
+    headline.textContent=String(title||"GOXION actualizado");
+    node.replaceChildren(headline);
+    if(detail){
+      const description=document.createElement("small");
+      Object.assign(description.style,{display:"block",marginTop:"4px",opacity:".68",fontSize:"10px",lineHeight:"1.35"});
+      description.textContent=String(detail);
+      node.appendChild(description);
+    }
     node.style.opacity="1";
     node.style.transform="translateY(0)";
     clearTimeout(node._gxTimer);
