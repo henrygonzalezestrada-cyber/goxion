@@ -80,10 +80,38 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
+  // SVG dashoffset CSS keyframes remain fixed in some Safari/WebKit builds.
+  // Advance the moving neon segment via a lightweight, page-visible clock.
+  // The two paths share the offset so the bright beam keeps its soft halo.
+  const neonRunner=modal.querySelector(".gx-rb-neon-star-runner");
+  const neonTrail=modal.querySelector(".gx-rb-neon-star-trail");
+  const neonReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
+  let neonTimer=null,neonStart=0,neonProgress=0;
+  function tickNeon(){
+    const elapsed=(performance.now()-neonStart)%3500;
+    neonProgress=elapsed/3500;
+    const offset=(-neonProgress*100).toFixed(2);
+    if(neonRunner)neonRunner.style.strokeDashoffset=offset;
+    if(neonTrail)neonTrail.style.strokeDashoffset=offset;
+  }
+  function syncNeon(){
+    const active=modal.classList.contains("show")&&!document.hidden&&!neonReduce.matches;
+    if(!active){
+      clearInterval(neonTimer);neonTimer=null;
+      return;
+    }
+    if(neonTimer)return;
+    neonStart=performance.now()-neonProgress*3500;
+    tickNeon();
+    neonTimer=setInterval(tickNeon,30);
+  }
   const modalVisibility=new MutationObserver(()=>{
     if(modal.classList.contains("show"))lockBackground();
     else unlockBackground();
+    syncNeon();
   });
+  document.addEventListener("visibilitychange",syncNeon);
+  neonReduce.addEventListener?.("change",syncNeon);
   modalVisibility.observe(modal,{attributes:true,attributeFilter:["class"]});
   modal.addEventListener("touchmove",event=>{
     if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
