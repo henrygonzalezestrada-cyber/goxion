@@ -754,25 +754,31 @@
     document.documentElement.classList.add('gx-promo-morph-open');
     document.body.classList.add('gx-promo-morph-open');
 
-    requestAnimationFrame(()=>{
-      requestAnimationFrame(()=>{
-        card.classList.remove('is-closed');
-        card.classList.add('is-expanded');
-        void card.offsetWidth;
-        setPromoActionState(card,p,true);
-        const detail=card.querySelector('.gx-promo-morph-detail');
-        if(detail){
-          detail.scrollTop=0;
-          detail.setAttribute('aria-hidden','false');
-        }
-        card.style.top=targetTop+'px';
-        card.style.left=targetLeft+'px';
-        card.style.setProperty('width',targetWidth+'px','important');
-        card.style.setProperty('height',targetHeight+'px','important');
-        requestAnimationFrame(()=>syncPromoAvailabilityMarquee(card));
-        setTimeout(()=>{ if(card===state.expandedCard) syncPromoAvailabilityMarquee(card); },520); // gxMarqueeFinal
-      });
-    });
+    // WebKit can stall nested animation frames while detaching/reparenting the
+    // deck card. A guarded fallback completes the same morph without requiring
+    // a second RAF; the commit runs exactly once and does not change its styles.
+    let expansionCommitted=false;
+    const commitExpansion=()=>{
+      if(expansionCommitted||state.expandedCard!==card||!card.isConnected)return;
+      expansionCommitted=true;
+      card.classList.remove('is-closed');
+      card.classList.add('is-expanded');
+      void card.offsetWidth;
+      setPromoActionState(card,p,true);
+      const detail=card.querySelector('.gx-promo-morph-detail');
+      if(detail){
+        detail.scrollTop=0;
+        detail.setAttribute('aria-hidden','false');
+      }
+      card.style.top=targetTop+'px';
+      card.style.left=targetLeft+'px';
+      card.style.setProperty('width',targetWidth+'px','important');
+      card.style.setProperty('height',targetHeight+'px','important');
+      requestAnimationFrame(()=>syncPromoAvailabilityMarquee(card));
+      setTimeout(()=>{ if(card===state.expandedCard) syncPromoAvailabilityMarquee(card); },520); // gxMarqueeFinal
+    };
+    requestAnimationFrame(()=>requestAnimationFrame(commitExpansion));
+    setTimeout(commitExpansion,140);
   }
 
   function closePromoDetail(card=state.expandedCard){
