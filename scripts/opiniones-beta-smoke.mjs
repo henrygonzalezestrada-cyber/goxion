@@ -43,6 +43,42 @@ try{
       await dom(page,()=>!!window.GOXION_REVIEWS_BETA&&!!document.getElementById('gx-rb-home'));
       assert.equal(await page.locator('.gx-rb-marquee-group').count(),3);
       assert.equal(await page.locator('.gx-rb-marquee-group:first-child .gx-rb-quote').count(),2);
+      const reviewsGlass=await page.evaluate(()=>{
+        const card=document.querySelector('#view-inicio .gx-rb-quote');
+        const style=getComputedStyle(card);
+        return {
+          height:card.getBoundingClientRect().height,
+          font:getComputedStyle(card.querySelector('p')).fontSize,
+          blur:style.webkitBackdropFilter||style.backdropFilter,
+          background:style.backgroundImage
+        };
+      });
+      assert(reviewsGlass.height>=188,'Reseñas con altura protagonista');
+      assert(parseFloat(reviewsGlass.font)>=13,'Tipografía más grande');
+      assert.match(reviewsGlass.blur,/blur\(22px\)/,'Cristal difuminado real');
+      assert.match(reviewsGlass.background,/linear-gradient/);
+      // Move section into viewport: animation should advance without a pointer swipe.
+      await page.locator('#gx-rb-home').scrollIntoViewIfNeeded();
+      await page.waitForTimeout(100);
+      const firstTransform=await page.locator('.gx-rb-marquee-strip').evaluate(
+        node=>getComputedStyle(node).transform
+      );
+      await page.waitForTimeout(900);
+      const secondTransform=await page.locator('.gx-rb-marquee-strip').evaluate(
+        node=>getComputedStyle(node).transform
+      );
+      assert.notEqual(firstTransform,secondTransform,'La cinta avanza automáticamente');
+      await page.locator('#gx-rb-track').evaluate(node=>
+        node.dispatchEvent(new Event('pointerdown',{bubbles:true}))
+      );
+      await page.waitForTimeout(100);
+      const stopped=await page.locator('.gx-rb-marquee-strip').evaluate(
+        node=>getComputedStyle(node).animationPlayState
+      );
+      assert.equal(stopped,'paused','Pausar al tocar la cinta');
+      await page.locator('#gx-rb-track').evaluate(node=>
+        node.dispatchEvent(new Event('pointerup',{bubbles:true}))
+      );
       assert.equal(await page.locator('#gx-rb-open').count(),0,'La cinta no tiene CTA redundante');
       const placement=await page.evaluate(()=>{
         const section=document.querySelector('#gx-rb-home');
@@ -79,11 +115,25 @@ try{
       const hero=await page.evaluate(()=>({
         noBox:getComputedStyle(document.querySelector('.gx-rb-emblem')).borderTopStyle,
         traced:document.querySelector('.gx-rb-neon-star-line')!==null,
-        cyan:getComputedStyle(document.querySelector('.gx-rb-close')).color
+        cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
+        darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
+        runner:document.querySelector('.gx-rb-neon-star-runner')!==null,
+        runnerLength:document.querySelector('.gx-rb-neon-star-runner')?.getAttribute('pathLength')
       }));
       assert.equal(hero.noBox,'none');
       assert.equal(hero.traced,true);
-      assert.equal(hero.cyan,'rgb(0, 242, 254)');
+      assert.equal(hero.cyanFill,'rgb(0, 242, 254)','El disco debe estar completamente cyan');
+      assert.equal(hero.darkX,'rgb(6, 18, 24)','La X debe ser oscura');
+      assert.equal(hero.runner,true,'La estrella tiene un trazo neón independiente');
+      assert.equal(hero.runnerLength,'100');
+      const orbitStart=await page.locator('.gx-rb-neon-star-runner').evaluate(
+        node=>getComputedStyle(node).strokeDashoffset
+      );
+      await page.waitForTimeout(450);
+      const orbitEnd=await page.locator('.gx-rb-neon-star-runner').evaluate(
+        node=>getComputedStyle(node).strokeDashoffset
+      );
+      assert.notEqual(orbitStart,orbitEnd,'El haz neón recorre realmente el contorno');
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,

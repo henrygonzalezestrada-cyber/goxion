@@ -19,6 +19,8 @@
     '</linearGradient></defs>'+
     '<path class="gx-rb-neon-star-halo" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '<path class="gx-rb-neon-star-line" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '<path class="gx-rb-neon-star-trail" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '<path class="gx-rb-neon-star-runner" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '</svg>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
@@ -78,10 +80,38 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
+  // SVG dashoffset CSS keyframes remain fixed in some Safari/WebKit builds.
+  // Advance the moving neon segment via a lightweight, page-visible clock.
+  // The two paths share the offset so the bright beam keeps its soft halo.
+  const neonRunner=modal.querySelector(".gx-rb-neon-star-runner");
+  const neonTrail=modal.querySelector(".gx-rb-neon-star-trail");
+  const neonReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
+  let neonTimer=null,neonStart=0,neonProgress=0;
+  function tickNeon(){
+    const elapsed=(performance.now()-neonStart)%3500;
+    neonProgress=elapsed/3500;
+    const offset=(-neonProgress*100).toFixed(2);
+    if(neonRunner)neonRunner.style.strokeDashoffset=offset;
+    if(neonTrail)neonTrail.style.strokeDashoffset=offset;
+  }
+  function syncNeon(){
+    const active=modal.classList.contains("show")&&!document.hidden&&!neonReduce.matches;
+    if(!active){
+      clearInterval(neonTimer);neonTimer=null;
+      return;
+    }
+    if(neonTimer)return;
+    neonStart=performance.now()-neonProgress*3500;
+    tickNeon();
+    neonTimer=setInterval(tickNeon,30);
+  }
   const modalVisibility=new MutationObserver(()=>{
     if(modal.classList.contains("show"))lockBackground();
     else unlockBackground();
+    syncNeon();
   });
+  document.addEventListener("visibilitychange",syncNeon);
+  neonReduce.addEventListener?.("change",syncNeon);
   modalVisibility.observe(modal,{attributes:true,attributeFilter:["class"]});
   modal.addEventListener("touchmove",event=>{
     if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
@@ -194,20 +224,21 @@
     if(typeof window.openModal==="function")window.openModal("modal-feedback");
     else{modal.classList.add("show");modal.style.display="flex"}
   };
-  let marqueeFrame=0,pausedUntil=0,isInteracting=false,inViewport=false,stepTime=0,groupWidth=0;
+  // Animate a repeating STRIP, not fractional scrollLeft steps. Safari rounds
+  // subpixel scroll changes to zero on some devices, leaving the marquee frozen.
+  // Transform animations retain subpixel precision and loop seamlessly.
   const motionQuery=window.matchMedia("(prefers-reduced-motion: reduce)");
-  const pauseMarquee=(ms=2600)=>{pausedUntil=performance.now()+ms};
-  function advanceMarquee(time){
-    marqueeFrame=requestAnimationFrame(advanceMarquee);
-    const track=document.getElementById("gx-rb-track");
-    if(!track||!groupWidth||!inViewport||document.hidden||isInteracting||
-       time<pausedUntil||motionQuery.matches){stepTime=time;return}
-    const elapsed=stepTime?Math.min(time-stepTime,44):16;
-    stepTime=time;
-    track.scrollLeft+=elapsed*.024; // ~24 px per second
-    // Three identical groups: wrap within the middle copy without a visual snap.
-    if(track.scrollLeft>=groupWidth*1.5)track.scrollLeft-=groupWidth;
-    else if(track.scrollLeft<groupWidth*.5)track.scrollLeft+=groupWidth;
+  let marqueePauseTimer=null,isInteracting=false;
+  function pauseMarquee(){
+    clearTimeout(marqueePauseTimer);
+    document.getElementById("gx-rb-track")?.classList.add("gx-rb-paused");
+  }
+  function resumeMarquee(delay=2200){
+    clearTimeout(marqueePauseTimer);
+    marqueePauseTimer=setTimeout(()=>{
+      if(!isInteracting&&!document.hidden)
+        document.getElementById("gx-rb-track")?.classList.remove("gx-rb-paused");
+    },delay);
   }
   function buildHome(){
     const section=document.createElement("section");
@@ -224,36 +255,30 @@
     else view.appendChild(section);
     const track=$("gx-rb-track");
     for(const event of ["pointerdown","touchstart"]){
-      track.addEventListener(event,()=>{isInteracting=true;pauseMarquee(3500)},{passive:true});
+      track.addEventListener(event,()=>{isInteracting=true;pauseMarquee()},{passive:true});
     }
     for(const event of ["pointerup","pointercancel","touchend","touchcancel"]){
-      track.addEventListener(event,()=>{isInteracting=false;pauseMarquee(3500)},{passive:true});
+      track.addEventListener(event,()=>{isInteracting=false;resumeMarquee(2400)},{passive:true});
     }
-    track.addEventListener("mouseenter",()=>{isInteracting=true});
-    track.addEventListener("mouseleave",()=>{isInteracting=false;pauseMarquee(1600)});
-    track.addEventListener("focusin",()=>{isInteracting=true});
-    track.addEventListener("focusout",()=>{isInteracting=false;pauseMarquee(1800)});
-    track.addEventListener("scroll",()=>{
-      if(!groupWidth||motionQuery.matches)return;
-      if(track.scrollLeft>=groupWidth*1.5)track.scrollLeft-=groupWidth;
-      else if(track.scrollLeft<groupWidth*.5)track.scrollLeft+=groupWidth;
-    },{passive:true});
-    if("IntersectionObserver" in window){
-      const observer=new IntersectionObserver(entries=>{
-        inViewport=entries.some(entry=>entry.isIntersecting);
-        stepTime=0;
-      },{threshold:.12});
-      observer.observe(section);
-    }else inViewport=true;
-    marqueeFrame=requestAnimationFrame(advanceMarquee);
+    if(window.matchMedia("(hover:hover)").matches){
+      track.addEventListener("mouseenter",()=>{isInteracting=true;pauseMarquee()});
+      track.addEventListener("mouseleave",()=>{isInteracting=false;resumeMarquee(1600)});
+    }
+    track.addEventListener("focusin",()=>{isInteracting=true;pauseMarquee()});
+    track.addEventListener("focusout",()=>{isInteracting=false;resumeMarquee(1600)});
+    document.addEventListener("visibilitychange",()=>{
+      if(document.hidden)pauseMarquee();
+      else resumeMarquee(350);
+    });
   }
   function renderHome(){
     const track=$("gx-rb-track");
     if(!track)return;
     const reviews=store.load().filter(r=>r.status==="published"&&r.consent&&r.verified);
     track.replaceChildren();
-    groupWidth=0;
-    pauseMarquee(900);
+    const strip=document.createElement("div");
+    strip.className="gx-rb-marquee-strip";
+    track.appendChild(strip);
     if(!reviews.length){
       const empty=document.createElement("div");
       empty.className="gx-rb-empty";
@@ -283,19 +308,17 @@
       card.append(stars,p,line);
       group.appendChild(card);
     });
-    track.appendChild(group);
-    // Clones are aria-hidden to keep screen-reader reviews single and authentic.
+    strip.appendChild(group);
+    // Three identical groups form one seamless loop; duplicates are
+    // aria-hidden so accessible readers hear each review only once.
     if(reviews.length>1&&!motionQuery.matches){
       for(let i=0;i<2;i++){
         const clone=group.cloneNode(true);
         clone.setAttribute("aria-hidden","true");
-        track.appendChild(clone);
+        strip.appendChild(clone);
       }
-      requestAnimationFrame(()=>{
-        groupWidth=group.getBoundingClientRect().width;
-        track.scrollLeft=groupWidth;
-        stepTime=0;
-      });
+      strip.classList.add("gx-rb-marquee-running");
+      if(isInteracting||document.hidden)pauseMarquee();
     }
   }
   function createBar(){
