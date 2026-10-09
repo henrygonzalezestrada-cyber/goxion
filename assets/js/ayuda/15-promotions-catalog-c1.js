@@ -682,6 +682,23 @@
     requestAnimationFrame(()=>backdrop.classList.add('active'));
   }
 
+  // On some WebKit versions CSS transitions can remain suspended after DOM
+  // reparenting. Only when geometry is still stale *after* the normal morph
+  // duration do we finish the existing animations, avoiding a frozen card.
+  function settleStalledPromoMorph(card,targetHeight){
+    if(card!==state.expandedCard||!card.isConnected)return;
+    const now=card.getBoundingClientRect().height;
+    if(!Number.isFinite(now)||Math.abs(now-targetHeight)<8)return;
+    for(const animation of card.getAnimations({subtree:true})){
+      try{
+        if(animation.playState==='running'&&
+           Number.isFinite(animation.effect?.getComputedTiming()?.endTime)){
+          animation.finish();
+        }
+      }catch(_){}
+    }
+  }
+
   function openPromoDetail(p,card){
     if(!p||!card||state.expandedCard) return;
     stopAuto();
@@ -776,6 +793,7 @@
       card.style.setProperty('height',targetHeight+'px','important');
       requestAnimationFrame(()=>syncPromoAvailabilityMarquee(card));
       setTimeout(()=>{ if(card===state.expandedCard) syncPromoAvailabilityMarquee(card); },520); // gxMarqueeFinal
+      setTimeout(()=>settleStalledPromoMorph(card,targetHeight),850);
     };
     requestAnimationFrame(()=>requestAnimationFrame(commitExpansion));
     setTimeout(commitExpansion,140);
@@ -812,6 +830,11 @@
         card.style.setProperty('width',(origin.cssWidth??origin.width)+'px','important');
         card.style.setProperty('height',(origin.cssHeight??origin.height)+'px','important');
       });
+      setTimeout(()=>{
+        if(card===state.expandedCard&&card.classList.contains('is-returning')){
+          settleStalledPromoMorph(card,origin.cssHeight??origin.height);
+        }
+      },850);
     },110);
 
     // Al terminar, sólo devolvemos el mismo nodo al deck: ya no hay cambio de composición.
