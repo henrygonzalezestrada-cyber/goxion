@@ -43,8 +43,33 @@ try{
       await dom(page,()=>!!window.GOXION_REVIEWS_BETA&&!!document.getElementById('gx-rb-home'));
       assert.equal(await page.locator('.gx-rb-quote').count(),2);
       assert.equal(await page.locator('.gx-rb-star').count(),5);
+      // Ayuda must use its glass/editorial language, not Admin dashboard chrome.
+      const skin=await page.evaluate(()=>{
+        const home=document.querySelector('#view-inicio .gx-rb-home');
+        return {
+          accent:getComputedStyle(document.documentElement).getPropertyValue('--neon-blue').trim(),
+          homeBorder:getComputedStyle(home).borderRightStyle,
+          homeTransparent:getComputedStyle(home).backgroundColor,
+          heading:home.querySelector('h2')?.textContent,
+          hasPreviewBar:Boolean(document.querySelector('.gx-rb-demo-bar--ayuda'))
+        };
+      });
+      assert.equal(skin.accent,'#00f2fe');
+      assert.equal(skin.homeBorder,'none');
+      assert.equal(skin.homeTransparent,'rgba(0, 0, 0, 0)');
+      assert.match(skin.heading,/GOXION/);
+      assert.equal(skin.hasPreviewBar,true);
       await click(page,'#gx-rb-open');
       await dom(page,()=>document.getElementById('modal-feedback').classList.contains('show'));
+      assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
+      const modalSkin=await page.evaluate(()=>({
+        scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
+        buttonGradient:getComputedStyle(document.querySelector('.gx-rb-submit')).backgroundImage,
+        emblem:document.querySelectorAll('.gx-rb-form-head .gx-rb-emblem svg').length
+      }));
+      assert.equal(modalSkin.scoreBorder,'none');
+      assert.match(modalSkin.buttonGradient,/linear-gradient/);
+      assert.equal(modalSkin.emblem,1);
       await click(page,'.gx-rb-star[data-score="5"]');
       assert.equal(await page.locator('.gx-rb-star.is-lit').count(),5);
       await page.locator('#gx-rb-text').fill(marker);
@@ -59,6 +84,8 @@ try{
       await page.goto(origin+'/preview/opiniones/admin-opiniones.html',{waitUntil:'domcontentloaded'});
       await dom(page,()=>!!document.getElementById('gx-rb-admin-list'));
       assert.equal(await page.locator('#gx-rb-stat-pending').innerText(),'2');
+      const adminFont=await page.evaluate(()=>getComputedStyle(document.querySelector('.gx-rb-admin')).fontFamily);
+      assert.match(adminFont,/Rajdhani/i,'La estética de Admin debe mantenerse intacta');
       const pending=page.locator('.gx-rb-admin-card').filter({hasText:marker});
       assert.equal(await pending.count(),1);
       await pending.locator('[data-action="publish"]').click();

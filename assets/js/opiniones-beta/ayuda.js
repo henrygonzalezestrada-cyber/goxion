@@ -20,9 +20,12 @@
     '<div class="glass-card modal-content gx-rb-shell">'+
       '<button type="button" class="gx-rb-close" id="gx-rb-close" aria-label="Cerrar">'+icon.close+'</button>'+
       '<div class="gx-rb-form" id="gx-rb-form">'+
-        '<span class="gx-rb-eyebrow">GOXION · OPINIONES 2.0</span>'+
-        '<h2 id="gx-rb-title">Tu opinión importa</h2>'+
-        '<p class="gx-rb-intro">Cada experiencia nos ayuda a mejorar. Cuéntanos cómo te ha ido con GOXION.</p>'+
+        '<div class="gx-rb-form-head">'+
+          '<div class="gx-rb-emblem" aria-hidden="true">'+svg+'</div>'+
+          '<span class="gx-rb-eyebrow">TU EXPERIENCIA EN GOXION</span>'+
+          '<h2 id="gx-rb-title">¿Cómo te fue con nosotros?</h2>'+
+          '<p class="gx-rb-intro">Queremos escucharte. Comparte tu experiencia y ayúdanos a seguir mejorando.</p>'+
+        '</div>'+
         '<div class="gx-rb-score">'+
           '<span class="gx-rb-score-label">¿Cómo calificarías tu experiencia?</span>'+
           '<div class="gx-rb-stars" id="gx-rb-stars" role="group" aria-label="Califica de una a cinco estrellas">'+
@@ -136,7 +139,7 @@
     section.className="gx-rb-home";
     section.setAttribute("aria-label","Reseñas de GOXION en demostración");
     section.innerHTML=
-      '<div class="gx-rb-home-top"><div><span class="gx-rb-kicker">VOCES DE GOXION</span><h2>Lo que opinan de nosotros</h2></div><div class="gx-rb-home-count" id="gx-rb-count"></div></div>'+
+      '<div class="gx-rb-home-top"><div><span class="gx-rb-kicker">EXPERIENCIAS GOXION</span><h2>Lo que opinan de GOXION</h2></div><div class="gx-rb-home-count" id="gx-rb-count"></div></div>'+
       '<div class="gx-rb-track" id="gx-rb-track" tabindex="0" aria-label="Reseñas desliza horizontalmente"></div>'+
       '<div class="gx-rb-example-note">Vista de prueba: las reseñas de ejemplo no corresponden a clientes reales.</div>'+
       '<div class="gx-rb-home-footer"><span>Tu experiencia también cuenta ✨</span><button type="button" class="gx-rb-home-cta" id="gx-rb-open">Dejar mi opinión →</button></div>';
@@ -150,7 +153,7 @@
     if(!track)return;
     const reviews=store.load().filter(r=>r.status==="published"&&r.consent&&r.verified);
     track.replaceChildren();
-    $("gx-rb-count").textContent=reviews.length+" en esta demo";
+    $("gx-rb-count").textContent=reviews.length>1?"Desliza para leer →":"";
     if(!reviews.length){
       const empty=document.createElement("div");
       empty.className="gx-rb-empty";
@@ -181,8 +184,8 @@
   }
   function createBar(){
     const div=document.createElement("div");
-    div.className="gx-rb-demo-bar";
-    div.innerHTML='<div><strong>✨ OPINIONES 2.0 · BETA</strong><span>Guardado local · Sin datos reales</span></div><a href="./preview/opiniones/admin-opiniones.html?v=20261009a">Ver revisión en Admin ↗</a>';
+    div.className="gx-rb-demo-bar gx-rb-demo-bar--ayuda";
+    div.innerHTML='<div><strong>✨ Opiniones 2.0 · Beta</strong><span>Vista de prueba · Sin datos reales</span></div><a href="./preview/opiniones/admin-opiniones.html?v=20261009b">Ver en Admin ↗</a>';
     document.body.prepend(div);
   }
   buildHome();
