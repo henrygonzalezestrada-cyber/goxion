@@ -1054,3 +1054,70 @@
     width:36px;height:36px;min-width:36px;flex-basis:36px;
   }
 }
+
+/* ===============================================================
+   OPINIONES 2.7 — luz ambiental trasera / bias lighting
+   La silueta se mantiene fija. No hay recorridos por el contorno.
+   =============================================================== */
+.gx-rb-modal .gx-rb-emblem{
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+}
+.gx-rb-modal .gx-rb-emblem::before{display:none!important}
+.gx-rb-modal .gx-rb-emblem .gx-rb-neon-star{
+  position:relative;
+  z-index:2;
+  display:block;
+  overflow:visible;
+  /* La forma original permanece limpia y sin cambios de geometría. */
+  filter:drop-shadow(0 0 3px rgba(75,214,244,.24));
+}
+.gx-rb-modal .gx-rb-ambient-light{
+  position:absolute;
+  display:block;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  filter:blur(16px);
+  -webkit-filter:blur(16px);
+  transform:translate3d(0,0,0);
+  will-change:transform,opacity;
+  /* Position is advanced in JS for reliable iOS Safari behavior. */
+  animation:none!important;
+}
+.gx-rb-modal .gx-rb-ambient-light--cyan{
+  width:96px;
+  height:83px;
+  left:-24px;
+  top:-16px;
+  background:radial-gradient(ellipse at 48% 55%,rgba(27,242,255,.92) 0%,rgba(0,198,246,.54) 35%,rgba(0,198,246,0) 76%);
+  opacity:.67;
+  animation:none!important;
+}
+.gx-rb-modal .gx-rb-ambient-light--violet{
+  width:100px;
+  height:90px;
+  right:-24px;
+  top:0;
+  background:radial-gradient(ellipse at 50% 48%,rgba(149,83,255,.89) 0%,rgba(117,59,242,.5) 36%,rgba(117,59,242,0) 76%);
+  opacity:.63;
+  animation:none!important;
+}
+.gx-rb-modal .gx-rb-ambient-light--blue{
+  width:104px;
+  height:77px;
+  left:2px;
+  bottom:-20px;
+  background:radial-gradient(ellipse at 53% 45%,rgba(54,139,255,.83) 0%,rgba(25,113,244,.44) 36%,rgba(25,113,244,0) 75%);
+  opacity:.54;
+  animation:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal .gx-rb-ambient-light{
+    animation:none!important;
+    will-change:auto;
+    transform:none!important;
+    opacity:.42;
+  }
+}
