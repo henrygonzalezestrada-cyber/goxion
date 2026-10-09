@@ -48,7 +48,9 @@ try{
       await click(page,'.gx-rb-star[data-score="5"]');
       assert.equal(await page.locator('.gx-rb-star.is-lit').count(),5);
       await page.locator('#gx-rb-text').fill(marker);
-      await page.locator('#gx-rb-consent').check({force:true});
+      await page.locator('.gx-rb-consent').evaluate(label=>label.click());
+      assert.equal(await page.locator('#gx-rb-consent').isChecked(),true,
+        'El control completo debe activar autorización explícita');
       await click(page,'#gx-rb-submit');
       await dom(page,()=>!document.getElementById('gx-rb-success').hidden);
       assert.match(await page.locator('#gx-rb-success-text').innerText(),/después de aprobarla/i);
