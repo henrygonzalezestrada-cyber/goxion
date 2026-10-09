@@ -118,14 +118,14 @@ try{
         cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
         darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
         runner:document.querySelector('.gx-rb-neon-star-runner')!==null,
-        orbitName:getComputedStyle(document.querySelector('.gx-rb-neon-star-runner')).animationName
+        runnerLength:document.querySelector('.gx-rb-neon-star-runner')?.getAttribute('pathLength')
       }));
       assert.equal(hero.noBox,'none');
       assert.equal(hero.traced,true);
       assert.equal(hero.cyanFill,'rgb(0, 242, 254)','El disco debe estar completamente cyan');
       assert.equal(hero.darkX,'rgb(6, 18, 24)','La X debe ser oscura');
       assert.equal(hero.runner,true,'La estrella tiene un trazo neón independiente');
-      assert.match(hero.orbitName,/gxRbNeonOrbit/);
+      assert.equal(hero.runnerLength,'100');
       const orbitStart=await page.locator('.gx-rb-neon-star-runner').evaluate(
         node=>getComputedStyle(node).strokeDashoffset
       );
