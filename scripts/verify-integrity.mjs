@@ -817,6 +817,8 @@ for (const absolute of walk(jsRoot)) {
       !notificationCss.includes('--gx-notif-vv-bottom') ||
       !notificationCss.includes('visibility:hidden') ||
       !notificationCss.includes('mask-image:linear-gradient') ||
+      !notificationCss.includes('grid-template-columns:1fr auto 1fr') ||
+      !rtNotifications.includes('gx-client-notif-head-title') ||
       !rtNotifications.includes('bindSwipeRows(list)') ||
       !rtNotifications.includes('syncNotificationViewport()') ||
       rtNotifications.includes('document.body.style.overflow') ||
