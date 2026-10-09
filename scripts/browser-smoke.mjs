@@ -141,6 +141,13 @@ async function runIndex(browser, browserName, errors) {
 async function runAyuda(browser, browserName, errors) {
   const label = `${browserName} · Ayuda`;
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  // Headless WebKit can pause requestAnimationFrame despite an updated DOM.
+  // Poll the real condition on a clock, without relaxing any assertion.
+  if (browserName === 'WebKit') {
+    const nativeWait = page.waitForFunction.bind(page);
+    page.waitForFunction = (expression,arg,options={}) =>
+      nativeWait(expression,arg,{polling:100,...options});
+  }
   attachDiagnostics(page, label, errors);
 
   await page.route('**/functions/v1/promociones-catalogo', async route => {
