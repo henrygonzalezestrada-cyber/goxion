@@ -615,8 +615,7 @@
     box-shadow .35s ease,transform .3s ease,color .35s ease;
 }
 .gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell {
-  overflow:hidden!important;
-  overflow-y:clip!important;
+  overflow:clip!important;
   overscroll-behavior:none;
   touch-action:none;
   width:min(100%,400px);
