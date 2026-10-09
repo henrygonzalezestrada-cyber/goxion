@@ -34,6 +34,10 @@ jobs:
       - name: Browser smoke
         run: npm run test:smoke
 
+      - name: Realtime beta browser smoke (mock data)
+        if: ${{ !cancelled() }}
+        run: npm run test:realtime
+
       - name: Cart guest and member checkout
         if: ${{ !cancelled() }}
         run: npm run test:cart
