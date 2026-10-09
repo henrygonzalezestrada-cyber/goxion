@@ -143,43 +143,48 @@ try{
       assert.equal(skin.hasPreviewBar,true);
       await page.evaluate(()=>window.openFeedbackModal());
       await dom(page,()=>document.getElementById('modal-feedback').classList.contains('show'));
-      const hero=await page.evaluate(()=>({
-        noBox:getComputedStyle(document.querySelector('.gx-rb-emblem')).borderTopStyle,
-        cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
-        darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
-        outline:document.querySelector('.gx-rb-neon-star-line')!==null,
-        outlineWidth:getComputedStyle(document.querySelector('.gx-rb-neon-star-line')).strokeWidth,
-        outlineAnimation:getComputedStyle(document.querySelector('.gx-rb-neon-star-line')).animationName,
-        hasTravelingStroke:document.querySelectorAll('.gx-rb-neon-star-runner,.gx-rb-neon-star-trail,.gx-rb-neon-star-bloom,.gx-rb-neon-star-spark').length,
-        glow:document.querySelector('.gx-rb-star-backlight')!==null,
-        glowBehind:document.querySelector('.gx-rb-star-backlight').compareDocumentPosition(
-          document.querySelector('.gx-rb-neon-star-line')
-        )&Node.DOCUMENT_POSITION_FOLLOWING
-      }));
+      const hero=await page.evaluate(()=>{
+        const emblem=document.querySelector('.gx-rb-emblem');
+        const line=emblem.querySelector('.gx-rb-neon-star-line');
+        const glow=[...emblem.querySelectorAll('.gx-rb-ambient-light')];
+        return {
+          noBox:getComputedStyle(emblem).borderTopStyle,
+          cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
+          darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
+          outline:line!==null,
+          outlineWidth:getComputedStyle(line).strokeWidth,
+          outlineAnimation:getComputedStyle(line).animationName,
+          svgPaths:emblem.querySelectorAll('.gx-rb-neon-star path').length,
+          ambientCount:glow.length,
+          ambientBehind:glow.every(node=>Number(getComputedStyle(node).zIndex)<Number(getComputedStyle(emblem.querySelector('svg')).zIndex)),
+          hasPathFollower:Boolean(emblem.querySelector('[pathLength],.gx-rb-star-backlight')),
+          colors:glow.map(node=>getComputedStyle(node).backgroundImage),
+          names:glow.map(node=>getComputedStyle(node).animationName),
+          states:glow.map(node=>getComputedStyle(node).animationPlayState)
+        };
+      });
       assert.equal(hero.noBox,'none');
       assert.equal(hero.cyanFill,'rgb(0, 242, 254)');
       assert.equal(hero.darkX,'rgb(6, 18, 24)');
       assert.equal(hero.outline,true);
       assert.equal(hero.outlineWidth,'2.35px');
-      assert.equal(hero.outlineAnimation,'none','La silueta debe permanecer estable');
-      assert.equal(hero.hasTravelingStroke,0,'No se debe dibujar otra línea sobre la estrella');
-      assert.equal(hero.glow,true);
-      assert(hero.glowBehind,'El brillo móvil está detrás del contorno');
-      const pointStart=await page.locator('.gx-rb-star-backlight').evaluate(
-        node=>[node.getAttribute('cx'),node.getAttribute('cy')]
+      assert.equal(hero.outlineAnimation,'none','La estrella se mantiene fija');
+      assert.equal(hero.svgPaths,2,'Solo contorno frontal y halo estático');
+      assert.equal(hero.ambientCount,3,'Cyan, violeta y azul detrás de estrella');
+      assert.equal(hero.ambientBehind,true,'Luces detrás de la silueta');
+      assert.equal(hero.hasPathFollower,false,'La luz ambiental no sigue la línea');
+      assert(hero.names.every(name=>/gxRbAmbient/.test(name)));
+      assert(hero.states.every(state=>state==='running'),'El ambiente se anima cuando modal está abierto');
+      assert(hero.colors.every(bg=>bg.includes('radial-gradient')),'Las luces son halos difusos');
+      const ambientBefore=await page.locator('.gx-rb-ambient-light').evaluateAll(
+        nodes=>nodes.map(node=>getComputedStyle(node).transform)
       );
-      await page.waitForTimeout(470);
-      const pointEnd=await page.locator('.gx-rb-star-backlight').evaluate(
-        node=>[node.getAttribute('cx'),node.getAttribute('cy')]
+      await page.waitForTimeout(730);
+      const ambientAfter=await page.locator('.gx-rb-ambient-light').evaluateAll(
+        nodes=>nodes.map(node=>getComputedStyle(node).transform)
       );
-      assert.notDeepEqual(pointStart,pointEnd,'El brillo detrás recorre la estrella en Safari');
-      const pairedGlow=await page.evaluate(()=>({
-        glow:[document.querySelector('.gx-rb-star-backlight').getAttribute('cx'),
-              document.querySelector('.gx-rb-star-backlight').getAttribute('cy')],
-        core:[document.querySelector('.gx-rb-star-backlight-core').getAttribute('cx'),
-              document.querySelector('.gx-rb-star-backlight-core').getAttribute('cy')]
-      }));
-      assert.deepEqual(pairedGlow.glow,pairedGlow.core,'La iluminación y su centro viajan juntos');
+      assert(ambientBefore.some((value,i)=>value!==ambientAfter[i]),
+        'La iluminación ambiental se mueve de verdad en Chromium/WebKit');
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
