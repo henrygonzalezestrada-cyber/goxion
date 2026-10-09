@@ -12,20 +12,21 @@
     badge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 1.6 3.1.2.3 3.1L20 12l-1.8 3.1-.3 3.1-3.1.2L12 20l-2.8-1.6-3.1-.2-.3-3.1L4 12l1.8-3.1.3-3.1 3.1-.2L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.8 12.1 2.1 2.1 4.2-4.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
   };
 
-  // Star outline is the light source itself, not a symbol inside a box.
+  // Stable front silhouette. Only the light BEHIND it travels.
   const heroStar='<svg class="gx-rb-neon-star" viewBox="0 0 100 100" aria-hidden="true">'+
     '<defs><linearGradient id="gx-rb-star-gradient" x1="0" y1="0" x2="1" y2="1">'+
       '<stop offset="0%" stop-color="#00f2fe"/><stop offset="55%" stop-color="#7c4dff"/><stop offset="100%" stop-color="#78faff"/>'+
     '</linearGradient>'+
-    '<filter id="gx-rb-orbit-light" x="-55%" y="-55%" width="210%" height="210%" color-interpolation-filters="sRGB">'+
-      '<feGaussianBlur stdDeviation="2.5"/>'+
-    '</filter></defs>'+
+    '<radialGradient id="gx-rb-backlight-color"><stop offset="0%" stop-color="#b6ffff" stop-opacity=".98"/>'+
+      '<stop offset="32%" stop-color="#45dffe" stop-opacity=".7"/>'+
+      '<stop offset="70%" stop-color="#7c4dff" stop-opacity=".38"/>'+
+      '<stop offset="100%" stop-color="#7c4dff" stop-opacity="0"/></radialGradient>'+
+    '<filter id="gx-rb-backlight-blur" x="-100%" y="-100%" width="300%" height="300%">'+
+      '<feGaussianBlur stdDeviation="3.3"/></filter></defs>'+
     '<path class="gx-rb-neon-star-halo" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '<circle class="gx-rb-star-backlight" cx="50" cy="7" r="16" fill="url(#gx-rb-backlight-color)" filter="url(#gx-rb-backlight-blur)"/>'+
+    '<circle class="gx-rb-star-backlight-core" cx="50" cy="7" r="6" fill="url(#gx-rb-backlight-color)"/>'+
     '<path class="gx-rb-neon-star-line" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
-    '<path class="gx-rb-neon-star-bloom" pathLength="100" filter="url(#gx-rb-orbit-light)" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
-    '<path class="gx-rb-neon-star-trail" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
-    '<path class="gx-rb-neon-star-runner" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
-    '<path class="gx-rb-neon-star-spark" pathLength="100" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '</svg>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
@@ -85,24 +86,22 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
-  // SVG dashoffset CSS keyframes remain fixed in some Safari/WebKit builds.
-  // Advance the moving neon segment via a lightweight, page-visible clock.
-  // The two paths share the offset so the bright beam keeps its soft halo.
-  const neonRunner=modal.querySelector(".gx-rb-neon-star-runner");
-  const neonTrail=modal.querySelector(".gx-rb-neon-star-trail");
-  const neonBloom=modal.querySelector(".gx-rb-neon-star-bloom");
-  const neonSpark=modal.querySelector(".gx-rb-neon-star-spark");
+  // Draw the moving glow UNDER the static outline, never an animated
+  // line on top. SVG path geometry avoids Safari stroke-dash animation bugs.
+  const neonPath=modal.querySelector(".gx-rb-neon-star-line");
+  const neonGlow=modal.querySelector(".gx-rb-star-backlight");
+  const neonCore=modal.querySelector(".gx-rb-star-backlight-core");
   const neonReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
   let neonTimer=null,neonStart=0,neonProgress=0;
   function tickNeon(){
-    const elapsed=(performance.now()-neonStart)%3500;
-    neonProgress=elapsed/3500;
-    const offset=(-neonProgress*100).toFixed(2);
-    if(neonRunner)neonRunner.style.strokeDashoffset=offset;
-    if(neonTrail)neonTrail.style.strokeDashoffset=offset;
-    if(neonBloom)neonBloom.style.strokeDashoffset=offset;
-    // Brighter tip leads the long illuminated ribbon around the star.
-    if(neonSpark)neonSpark.style.strokeDashoffset=(Number(offset)-20).toFixed(2);
+    if(!neonPath||!neonGlow||!neonCore)return;
+    const elapsed=(performance.now()-neonStart)%4500;
+    neonProgress=elapsed/4500;
+    const point=neonPath.getPointAtLength(neonProgress*neonPath.getTotalLength());
+    for(const light of [neonGlow,neonCore]){
+      light.setAttribute("cx",point.x.toFixed(2));
+      light.setAttribute("cy",point.y.toFixed(2));
+    }
   }
   function syncNeon(){
     const active=modal.classList.contains("show")&&!document.hidden&&!neonReduce.matches;
@@ -111,7 +110,7 @@
       return;
     }
     if(neonTimer)return;
-    neonStart=performance.now()-neonProgress*3500;
+    neonStart=performance.now()-neonProgress*4500;
     tickNeon();
     neonTimer=setInterval(tickNeon,30);
   }
@@ -311,10 +310,27 @@
       p.textContent="“"+review.text+"”";
       const line=document.createElement("div");
       line.className="gx-rb-byline";
+      const avatar=document.createElement("img");
+      avatar.className="gx-rb-review-avatar";
+      avatar.src="./assets/img/opiniones-avatar-default.svg";
+      avatar.alt="Avatar predeterminado";
+      avatar.width=39;avatar.height=39;
+      avatar.decoding="async";
+      const details=document.createElement("div");
+      details.className="gx-rb-review-identity";
+      const displayName=document.createElement("strong");
+      // Fictional names only for sample reviews, including samples already
+      // stored in localStorage from older beta versions.
+      const sampleNames={"gx-rb-sample-1":"Mariana R.","gx-rb-sample-2":"Daniel M.","gx-rb-sample-3":"Andrea L."};
+      displayName.textContent=review.sample?(sampleNames[review.id]||"Cliente de ejemplo"):(review.author||"Cliente de prueba");
+      const caption=document.createElement("span");
+      caption.className="gx-rb-identity-caption";
       const badge=document.createElement("span");badge.innerHTML=icon.badge;
       const who=document.createElement("span");
-      who.textContent=review.sample?"Opinión ficticia · Ejemplo":"Cliente de prueba · Beta";
-      line.append(badge,who);
+      who.textContent=review.sample?"Ejemplo ficticio":"Perfil de prueba · Beta";
+      caption.append(badge,who);
+      details.append(displayName,caption);
+      line.append(avatar,details);
       card.append(stars,p,line);
       group.appendChild(card);
     });

@@ -43,6 +43,18 @@ try{
       await dom(page,()=>!!window.GOXION_REVIEWS_BETA&&!!document.getElementById('gx-rb-home'));
       assert.equal(await page.locator('.gx-rb-marquee-group').count(),3);
       assert.equal(await page.locator('.gx-rb-marquee-group:first-child .gx-rb-quote').count(),2);
+      assert.equal(await page.locator('.gx-rb-marquee-group:first-child .gx-rb-review-avatar').count(),2,
+        'Cada comentario publicado muestra un avatar predeterminado');
+      assert.equal(await page.locator('.gx-rb-marquee-group:first-child .gx-rb-review-identity strong').count(),2,
+        'Cada comentario muestra nombre de cliente');
+      assert.match(await page.locator('.gx-rb-marquee-group:first-child').innerText(),/Mariana R\./);
+      assert.match(await page.locator('.gx-rb-marquee-group:first-child').innerText(),/Daniel M\./);
+      assert.match(await page.locator('.gx-rb-marquee-group:first-child').innerText(),/Ejemplo ficticio/);
+      const avatarLoaded=await page.locator('.gx-rb-review-avatar').first().evaluate(async img=>{
+        await img.decode();
+        return img.naturalWidth>0&&img.getAttribute('src').includes('opiniones-avatar-default.svg');
+      });
+      assert.equal(avatarLoaded,true,'El retrato predefinido se carga desde GitHub Pages');
       const reviewsGlass=await page.evaluate(()=>{
         const card=document.querySelector('#view-inicio .gx-rb-quote');
         const style=getComputedStyle(card);
@@ -133,48 +145,41 @@ try{
       await dom(page,()=>document.getElementById('modal-feedback').classList.contains('show'));
       const hero=await page.evaluate(()=>({
         noBox:getComputedStyle(document.querySelector('.gx-rb-emblem')).borderTopStyle,
-        traced:document.querySelector('.gx-rb-neon-star-line')!==null,
         cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
         darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
-        runner:document.querySelector('.gx-rb-neon-star-runner')!==null,
-        runnerLength:document.querySelector('.gx-rb-neon-star-runner')?.getAttribute('pathLength'),
-        beamWidth:getComputedStyle(document.querySelector('.gx-rb-neon-star-runner')).strokeWidth,
-        beamDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-runner')).strokeDasharray,
-        trailDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-trail')).strokeDasharray,
-        bloom:document.querySelector('.gx-rb-neon-star-bloom')!==null,
-        bloomFilter:document.querySelector('.gx-rb-neon-star-bloom')?.getAttribute('filter'),
-        spark:document.querySelector('.gx-rb-neon-star-spark')!==null,
-        sparkDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-spark')).strokeDasharray
+        outline:document.querySelector('.gx-rb-neon-star-line')!==null,
+        outlineWidth:getComputedStyle(document.querySelector('.gx-rb-neon-star-line')).strokeWidth,
+        outlineAnimation:getComputedStyle(document.querySelector('.gx-rb-neon-star-line')).animationName,
+        hasTravelingStroke:document.querySelectorAll('.gx-rb-neon-star-runner,.gx-rb-neon-star-trail,.gx-rb-neon-star-bloom,.gx-rb-neon-star-spark').length,
+        glow:document.querySelector('.gx-rb-star-backlight')!==null,
+        glowBehind:document.querySelector('.gx-rb-star-backlight').compareDocumentPosition(
+          document.querySelector('.gx-rb-neon-star-line')
+        )&Node.DOCUMENT_POSITION_FOLLOWING
       }));
       assert.equal(hero.noBox,'none');
-      assert.equal(hero.traced,true);
-      assert.equal(hero.cyanFill,'rgb(0, 242, 254)','El disco debe estar completamente cyan');
-      assert.equal(hero.darkX,'rgb(6, 18, 24)','La X debe ser oscura');
-      assert.equal(hero.runner,true,'La estrella tiene un trazo neón independiente');
-      assert.equal(hero.runnerLength,'100');
-      assert.equal(hero.beamWidth,'1.65px','Haz más fino, similar a la línea de beneficios');
-      assert.match(hero.beamDash,/32/,'Haz más largo que antes');
-      assert.match(hero.trailDash,/43/,'Estela extendida');
-      assert(hero.bloom&&hero.spark,'Bloom y punta luminosa superpuestos al haz');
-      assert.equal(hero.bloomFilter,'url(#gx-rb-orbit-light)','Halo desenfocado real en SVG');
-      assert.match(hero.sparkDash,/6/,'Punta brillante corta');
-      const orbitStart=await page.locator('.gx-rb-neon-star-runner').evaluate(
-        node=>getComputedStyle(node).strokeDashoffset
+      assert.equal(hero.cyanFill,'rgb(0, 242, 254)');
+      assert.equal(hero.darkX,'rgb(6, 18, 24)');
+      assert.equal(hero.outline,true);
+      assert.equal(hero.outlineWidth,'2.35px');
+      assert.equal(hero.outlineAnimation,'none','La silueta debe permanecer estable');
+      assert.equal(hero.hasTravelingStroke,0,'No se debe dibujar otra línea sobre la estrella');
+      assert.equal(hero.glow,true);
+      assert(hero.glowBehind,'El brillo móvil está detrás del contorno');
+      const pointStart=await page.locator('.gx-rb-star-backlight').evaluate(
+        node=>[node.getAttribute('cx'),node.getAttribute('cy')]
       );
-      await page.waitForTimeout(450);
-      const orbitEnd=await page.locator('.gx-rb-neon-star-runner').evaluate(
-        node=>getComputedStyle(node).strokeDashoffset
+      await page.waitForTimeout(470);
+      const pointEnd=await page.locator('.gx-rb-star-backlight').evaluate(
+        node=>[node.getAttribute('cx'),node.getAttribute('cy')]
       );
-      assert.notEqual(orbitStart,orbitEnd,'El haz neón recorre realmente el contorno');
-      const glowOffsets=await page.evaluate(()=>({
-        runner:document.querySelector('.gx-rb-neon-star-runner').style.strokeDashoffset,
-        bloom:document.querySelector('.gx-rb-neon-star-bloom').style.strokeDashoffset,
-        trail:document.querySelector('.gx-rb-neon-star-trail').style.strokeDashoffset,
-        spark:document.querySelector('.gx-rb-neon-star-spark').style.strokeDashoffset
+      assert.notDeepEqual(pointStart,pointEnd,'El brillo detrás recorre la estrella en Safari');
+      const pairedGlow=await page.evaluate(()=>({
+        glow:[document.querySelector('.gx-rb-star-backlight').getAttribute('cx'),
+              document.querySelector('.gx-rb-star-backlight').getAttribute('cy')],
+        core:[document.querySelector('.gx-rb-star-backlight-core').getAttribute('cx'),
+              document.querySelector('.gx-rb-star-backlight-core').getAttribute('cy')]
       }));
-      assert.equal(glowOffsets.runner,glowOffsets.bloom,'Iluminación viaja junto al haz en Safari');
-      assert.equal(glowOffsets.runner,glowOffsets.trail,'Estela sigue al haz sin desfase');
-      assert.notEqual(glowOffsets.runner,glowOffsets.spark,'Punta brillante avanza por delante del haz');
+      assert.deepEqual(pairedGlow.glow,pairedGlow.core,'La iluminación y su centro viajan juntos');
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
