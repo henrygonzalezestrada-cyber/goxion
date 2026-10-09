@@ -12,22 +12,18 @@
     badge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 1.6 3.1.2.3 3.1L20 12l-1.8 3.1-.3 3.1-3.1.2L12 20l-2.8-1.6-3.1-.2-.3-3.1L4 12l1.8-3.1.3-3.1 3.1-.2L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.8 12.1 2.1 2.1 4.2-4.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
   };
 
-  // Stable front silhouette. Only the light BEHIND it travels.
+  // The star keeps its original fixed silhouette; ambient light breathes
+  // BEHIND it, like bias LEDs behind a TV, without tracing the outline.
   const heroStar='<svg class="gx-rb-neon-star" viewBox="0 0 100 100" aria-hidden="true">'+
     '<defs><linearGradient id="gx-rb-star-gradient" x1="0" y1="0" x2="1" y2="1">'+
       '<stop offset="0%" stop-color="#00f2fe"/><stop offset="55%" stop-color="#7c4dff"/><stop offset="100%" stop-color="#78faff"/>'+
-    '</linearGradient>'+
-    '<radialGradient id="gx-rb-backlight-color"><stop offset="0%" stop-color="#b6ffff" stop-opacity=".98"/>'+
-      '<stop offset="32%" stop-color="#45dffe" stop-opacity=".7"/>'+
-      '<stop offset="70%" stop-color="#7c4dff" stop-opacity=".38"/>'+
-      '<stop offset="100%" stop-color="#7c4dff" stop-opacity="0"/></radialGradient>'+
-    '<filter id="gx-rb-backlight-blur" x="-100%" y="-100%" width="300%" height="300%">'+
-      '<feGaussianBlur stdDeviation="3.3"/></filter></defs>'+
+    '</linearGradient></defs>'+
     '<path class="gx-rb-neon-star-halo" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
-    '<circle class="gx-rb-star-backlight" cx="50" cy="7" r="16" fill="url(#gx-rb-backlight-color)" filter="url(#gx-rb-backlight-blur)"/>'+
-    '<circle class="gx-rb-star-backlight-core" cx="50" cy="7" r="6" fill="url(#gx-rb-backlight-color)"/>'+
     '<path class="gx-rb-neon-star-line" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
     '</svg>';
+  const ambientLights='<span class="gx-rb-ambient-light gx-rb-ambient-light--cyan"></span>'+
+    '<span class="gx-rb-ambient-light gx-rb-ambient-light--violet"></span>'+
+    '<span class="gx-rb-ambient-light gx-rb-ambient-light--blue"></span>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
   if(!modal||!view)return;
@@ -38,7 +34,7 @@
       '<button type="button" class="gx-rb-close" id="gx-rb-close" aria-label="Cerrar">'+icon.close+'</button>'+
       '<div class="gx-rb-form" id="gx-rb-form">'+
         '<div class="gx-rb-form-head">'+
-          '<div class="gx-rb-emblem" aria-hidden="true">'+heroStar+'</div>'+
+          '<div class="gx-rb-emblem" aria-hidden="true">'+ambientLights+heroStar+'</div>'+
           '<span class="gx-rb-eyebrow">TU EXPERIENCIA EN GOXION</span>'+
           '<h2 id="gx-rb-title">¿Cómo te fue con nosotros?</h2>'+
           '<p class="gx-rb-intro">Queremos escucharte. Comparte tu experiencia y ayúdanos a seguir mejorando.</p>'+
@@ -86,41 +82,10 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
-  // Draw the moving glow UNDER the static outline, never an animated
-  // line on top. SVG path geometry avoids Safari stroke-dash animation bugs.
-  const neonPath=modal.querySelector(".gx-rb-neon-star-line");
-  const neonGlow=modal.querySelector(".gx-rb-star-backlight");
-  const neonCore=modal.querySelector(".gx-rb-star-backlight-core");
-  const neonReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
-  let neonTimer=null,neonStart=0,neonProgress=0;
-  function tickNeon(){
-    if(!neonPath||!neonGlow||!neonCore)return;
-    const elapsed=(performance.now()-neonStart)%4500;
-    neonProgress=elapsed/4500;
-    const point=neonPath.getPointAtLength(neonProgress*neonPath.getTotalLength());
-    for(const light of [neonGlow,neonCore]){
-      light.setAttribute("cx",point.x.toFixed(2));
-      light.setAttribute("cy",point.y.toFixed(2));
-    }
-  }
-  function syncNeon(){
-    const active=modal.classList.contains("show")&&!document.hidden&&!neonReduce.matches;
-    if(!active){
-      clearInterval(neonTimer);neonTimer=null;
-      return;
-    }
-    if(neonTimer)return;
-    neonStart=performance.now()-neonProgress*4500;
-    tickNeon();
-    neonTimer=setInterval(tickNeon,30);
-  }
   const modalVisibility=new MutationObserver(()=>{
     if(modal.classList.contains("show"))lockBackground();
     else unlockBackground();
-    syncNeon();
   });
-  document.addEventListener("visibilitychange",syncNeon);
-  neonReduce.addEventListener?.("change",syncNeon);
   modalVisibility.observe(modal,{attributes:true,attributeFilter:["class"]});
   modal.addEventListener("touchmove",event=>{
     if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
