@@ -712,7 +712,7 @@
   fill:none;
   opacity:.67;
   stroke:url(#gx-rb-star-gradient);
-  stroke-width:2.25px;
+  stroke-width:1.65px;
   stroke-dasharray:none;
   stroke-dashoffset:0;
   animation:none;
@@ -735,16 +735,18 @@
   pointer-events:none;
 }
 .gx-rb-modal .gx-rb-neon-star-trail{
-  stroke-width:7px;
-  opacity:.87;
-  stroke-dasharray:21 79;
-  filter:blur(4.3px) drop-shadow(0 0 5px rgba(0,242,254,.76));
+  /* Longer soft tail, inspired by Ayuda's traveling benefits outline. */
+  stroke-width:3px;
+  opacity:.58;
+  stroke-dasharray:43 57;
+  filter:blur(2.5px) drop-shadow(0 0 3px rgba(0,242,254,.54));
 }
 .gx-rb-modal .gx-rb-neon-star-runner{
-  stroke-width:4px;
-  stroke-dasharray:11 89;
-  filter:drop-shadow(0 0 4px rgba(0,242,254,.95))
-         drop-shadow(0 0 9px rgba(124,77,255,.7));
+  /* One long, fine, continuous beam moves along the star's edges. */
+  stroke-width:1.65px;
+  stroke-dasharray:32 68;
+  filter:drop-shadow(0 0 2.5px rgba(0,242,254,.86))
+         drop-shadow(0 0 5px rgba(124,77,255,.52));
 }
 @keyframes gxRbNeonOrbit{
   0%{stroke-dashoffset:0}
@@ -811,12 +813,14 @@
   min-height:188px;
   padding:19px 19px 17px;
   gap:12px;
+  /* EXACT glass-card / feature-card recipe from assets/css/ayuda.css.
+     Do not introduce tinted gradients or stronger saturation here. */
   border-radius:20px;
-  background:linear-gradient(135deg,rgba(36,40,69,.61),rgba(9,16,31,.66));
-  border:1px solid rgba(198,216,248,.18);
-  -webkit-backdrop-filter:blur(22px) saturate(152%);
-  backdrop-filter:blur(22px) saturate(152%);
-  box-shadow:0 13px 31px rgba(0,0,0,.21),inset 0 1px 0 rgba(255,255,255,.065);
+  background:var(--card-glass);
+  border:1px solid rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 #view-inicio .gx-rb-quote p{
   color:#f0f3fb;
