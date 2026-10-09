@@ -880,6 +880,29 @@ for (const absolute of walk(jsRoot)) {
   }
 }
 
+// Opiniones 2.0: the demo must never mutate the official pages nor call the live notification backend.
+{
+  const files=[
+    'preview/opiniones/ayuda-opiniones.html',
+    'preview/opiniones/admin-opiniones.html',
+    'assets/js/opiniones-beta/store.js',
+    'assets/js/opiniones-beta/ayuda.js',
+    'assets/js/opiniones-beta/admin.js',
+    'assets/css/opiniones-beta.css',
+    'scripts/opiniones-beta-smoke.mjs'
+  ];
+  for(const file of files)if(!existsSync(join(ROOT,file)))fail('Opiniones beta: falta '+file);
+  const realAyuda=readFileSync(join(ROOT,'ayuda.html'),'utf8');
+  const realAdmin=readFileSync(join(ROOT,'admin.html'),'utf8');
+  const store=readFileSync(join(ROOT,'assets/js/opiniones-beta/store.js'),'utf8');
+  const client=readFileSync(join(ROOT,'assets/js/opiniones-beta/ayuda.js'),'utf8');
+  const preview=readFileSync(join(ROOT,'preview/opiniones/ayuda-opiniones.html'),'utf8');
+  if(realAyuda.includes('opiniones-beta/')||realAdmin.includes('opiniones-beta/'))fail('Opiniones beta: no modificar HTML oficiales');
+  if(!preview.includes('assets/js/opiniones-beta/ayuda.js')||!preview.includes('<base href="../../"/>'))fail('Opiniones beta: vista Ayuda sin scripts/base');
+  if(!store.includes('localStorage.setItem(KEY')||store.includes('notificar-goxion')||store.includes('supabase.co')||client.includes('notificarAdmin('))fail('Opiniones beta: el prototipo debe ser local y sin escrituras reales');
+  if(!client.includes('gx-rb-consent')||!client.includes('openFeedbackModal'))fail('Opiniones beta: faltan consentimiento o formulario');
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
