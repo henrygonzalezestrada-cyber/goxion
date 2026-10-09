@@ -73,7 +73,11 @@ try{
     assert.match(posts[1].mensaje,/PROMO_ID: promo-prime/);
     assert.match(posts[1].mensaje,/377/);
     assert.equal(posts[1].categoria,'pedidos');
-    await page.locator('.gx-cart-done').click();
+    // WebKit puede mantener animada la geometría del diálogo aunque ya esté visible.
+    await page.locator('.gx-cart-done').evaluate(button=>{
+      if(button.disabled)throw new Error('Botón finalizar carrito deshabilitado');
+      button.click();
+    });
     await page.waitForFunction(()=>!document.getElementById('gx-cart-dialog').open);
     await page.evaluate(({services})=>{
       localStorage.setItem(GOXION_CORE.STORAGE.CLIENT_TOKEN,'test-token');
