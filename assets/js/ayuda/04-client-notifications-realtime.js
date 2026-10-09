@@ -159,6 +159,15 @@
     state.items=[];
     state.unread=0;
     state.actionBusy=false;
+    // Never leave the previous customer's notices visible while the new request loads.
+    document.getElementById("gx-client-notif-list")?.replaceChildren();
+    const badge=document.getElementById("gx-client-notif-badge");
+    if(badge)badge.textContent="0";
+    document.getElementById("gx-client-notif-launch")?.classList.remove("gx-has-new");
+    const read=document.getElementById("gx-client-notif-mark-all");
+    const clear=document.getElementById("gx-client-notif-clear-all");
+    if(read)read.disabled=true;
+    if(clear)clear.disabled=true;
     clearTimeout(state.confirmTimer);
     clearTimeout(state.feedbackTimer);
     if(state.pendingDelete)clearTimeout(state.pendingDelete.timer);
