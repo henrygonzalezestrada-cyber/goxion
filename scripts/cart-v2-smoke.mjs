@@ -68,7 +68,7 @@ try{
     remaining=2;
     await submitCart(page);
     await page.waitForFunction(()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'),
-      null,{timeout:9000}).catch(async error=>{
+      null,{timeout:9000,polling:100}).catch(async error=>{
       console.log('CART DIAGNOSTIC',name,await page.evaluate(()=>({
         error:document.getElementById('gx-cart-error')?.textContent,
         buttonDisabled:document.querySelector('#gx-cart-form button[type=submit]')?.disabled,
