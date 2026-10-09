@@ -700,3 +700,156 @@
   .gx-rb-modal .gx-rb-fields,
   .gx-rb-modal .gx-rb-submit {transition:none!important}
 }
+
+/* =========================================================
+   OPINIONES 2.3 — luz orbital y cristal de Ayuda
+   Exclusivamente la beta cliente; Admin no cambia.
+   ========================================================= */
+
+/* Estrella neón: silueta fija suave + haz luminoso que recorre cada arista.
+   pathLength=100 permite completar exactamente una vuelta, incluso en WebKit. */
+.gx-rb-modal .gx-rb-neon-star-line{
+  fill:none;
+  opacity:.67;
+  stroke:url(#gx-rb-star-gradient);
+  stroke-width:2.25px;
+  stroke-dasharray:none;
+  stroke-dashoffset:0;
+  animation:none;
+}
+.gx-rb-modal .gx-rb-neon-star-halo{
+  opacity:.14;
+  stroke-width:4.4px;
+  animation:none;
+}
+.gx-rb-modal .gx-rb-neon-star-trail,
+.gx-rb-modal .gx-rb-neon-star-runner{
+  fill:none;
+  stroke:url(#gx-rb-star-gradient);
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-dashoffset:0;
+  animation:gxRbNeonOrbit 3.5s linear infinite;
+  pointer-events:none;
+}
+.gx-rb-modal .gx-rb-neon-star-trail{
+  stroke-width:7px;
+  opacity:.87;
+  stroke-dasharray:21 79;
+  filter:blur(4.3px) drop-shadow(0 0 5px rgba(0,242,254,.76));
+}
+.gx-rb-modal .gx-rb-neon-star-runner{
+  stroke-width:4px;
+  stroke-dasharray:11 89;
+  filter:drop-shadow(0 0 4px rgba(0,242,254,.95))
+         drop-shadow(0 0 9px rgba(124,77,255,.7));
+}
+@keyframes gxRbNeonOrbit{
+  0%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-100}
+}
+
+/* Cerrar como login/notificaciones: pastilla completamente cyan,
+   X oscura de alto contraste, NO icono cyan sobre un disco negro. */
+.gx-rb-modal .gx-rb-close{
+  color:#061218!important;
+  background:var(--neon-blue,#00f2fe)!important;
+  border:1px solid rgba(163,255,255,.55);
+  box-shadow:0 3px 14px rgba(0,242,254,.16),inset 0 1px 0 rgba(255,255,255,.32);
+}
+.gx-rb-modal .gx-rb-close:hover{
+  color:#041018!important;
+  background:#74faff!important;
+  border-color:#74faff;
+  box-shadow:0 4px 18px rgba(0,242,254,.26);
+}
+.gx-rb-modal .gx-rb-close:active{
+  background:#2bdde7!important;
+  transform:scale(.95);
+}
+
+/* CSS compositor animation rather than scrollLeft+=0.4: Safari rounds
+   fractional scroll deltas and previously never advanced the strip. */
+#view-inicio .gx-rb-marquee{
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 9%,#000 91%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 9%,#000 91%,transparent 100%);
+}
+#view-inicio .gx-rb-track{
+  padding:7px 0 17px;
+  scroll-snap-type:none!important;
+  scroll-behavior:auto!important;
+}
+#view-inicio .gx-rb-marquee-strip{
+  width:max-content;
+  display:flex;
+  align-items:stretch;
+  flex:0 0 auto;
+  transform:translate3d(0,0,0);
+}
+#view-inicio .gx-rb-marquee-strip.gx-rb-marquee-running{
+  animation:gxRbMarqueeFlow 34s linear infinite;
+  will-change:transform;
+}
+@keyframes gxRbMarqueeFlow{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-33.333333%,0,0)}
+}
+#view-inicio .gx-rb-track.gx-rb-paused .gx-rb-marquee-strip{
+  animation-play-state:paused!important;
+}
+#view-inicio .gx-rb-marquee-group{
+  gap:13px;
+  padding-right:13px;
+}
+#view-inicio .gx-rb-quote{
+  box-sizing:border-box;
+  flex:0 0 min(305px,calc(100vw - 88px));
+  width:min(305px,calc(100vw - 88px));
+  min-height:188px;
+  padding:19px 19px 17px;
+  gap:12px;
+  border-radius:20px;
+  background:linear-gradient(135deg,rgba(36,40,69,.61),rgba(9,16,31,.66));
+  border:1px solid rgba(198,216,248,.18);
+  -webkit-backdrop-filter:blur(22px) saturate(152%);
+  backdrop-filter:blur(22px) saturate(152%);
+  box-shadow:0 13px 31px rgba(0,0,0,.21),inset 0 1px 0 rgba(255,255,255,.065);
+}
+#view-inicio .gx-rb-quote p{
+  color:#f0f3fb;
+  font-size:13px;
+  line-height:1.69;
+  font-weight:430;
+  letter-spacing:-.08px;
+}
+#view-inicio .gx-rb-quote .gx-rb-rating{gap:4px}
+#view-inicio .gx-rb-quote .gx-rb-rating svg{
+  width:15px;
+  height:15px;
+}
+#view-inicio .gx-rb-byline{
+  color:#b8c9df;
+  font-size:10.5px;
+  font-weight:500;
+  gap:7px;
+}
+#view-inicio .gx-rb-byline svg{width:14px;height:14px}
+#view-inicio .gx-rb-home-top{padding-bottom:14px}
+
+@media(max-width:370px){
+  #view-inicio .gx-rb-quote{
+    min-height:188px;
+    padding:17px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal .gx-rb-neon-star-trail,
+  .gx-rb-modal .gx-rb-neon-star-runner{
+    animation:none!important;
+  }
+  #view-inicio .gx-rb-marquee-strip.gx-rb-marquee-running{
+    animation:none!important;
+    will-change:auto;
+  }
+}
