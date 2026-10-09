@@ -41,3 +41,7 @@ jobs:
       - name: Cart guest and member checkout
         if: ${{ !cancelled() }}
         run: npm run test:cart
+
+      - name: Opiniones 2.0 beta (local-only)
+        if: ${{ !cancelled() }}
+        run: npm run test:opiniones
