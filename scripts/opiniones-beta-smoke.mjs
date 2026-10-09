@@ -112,14 +112,21 @@ try{
           shellOverflow:getComputedStyle(shell).overflowY,
           shellTouch:getComputedStyle(shell).touchAction,
           pageLocked:getComputedStyle(document.body).position,
-          scrollable:shell.scrollHeight>shell.clientHeight+3
+          height:shell.getBoundingClientRect().height,
+          before:shell.scrollTop
         };
       });
       assert.equal(successState.complete,true);
-      assert.equal(successState.shellOverflow,'hidden');
+      assert.equal(successState.shellOverflow,'clip');
       assert.equal(successState.shellTouch,'none');
       assert.equal(successState.pageLocked,'fixed');
-      assert.equal(successState.scrollable,false,'Éxito no debe permitir desplazamiento');
+      assert(successState.height<480,'Éxito debe ser compacto, sin hueco inferior');
+      const frozenScroll=await page.evaluate(()=>{
+        const shell=document.querySelector('.gx-rb-shell');
+        shell.scrollTop=150;
+        return shell.scrollTop;
+      });
+      assert.equal(frozenScroll,successState.before,'La confirmación no permite scroll interno');
       await click(page,'#gx-rb-submit');
       await dom(page,()=>!document.getElementById('modal-feedback').classList.contains('show'));
       const restored=await page.evaluate(()=>getComputedStyle(document.body).position);
