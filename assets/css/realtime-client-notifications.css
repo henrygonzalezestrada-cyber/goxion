@@ -333,11 +333,11 @@ html.gx-notif-open,html.gx-notif-open body{overscroll-behavior:none}
 }
 .gx-client-notif-toolbar button:active:not(:disabled){transform:scale(.93)}
 .gx-client-notif-toolbar button svg{
-  width:16px;
-  height:16px;
+  width:18px;
+  height:18px;
   fill:none;
   stroke:currentColor;
-  stroke-width:1.9;
+  stroke-width:2.35;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
@@ -383,8 +383,8 @@ html.gx-notif-open,html.gx-notif-open body{overscroll-behavior:none}
 }
 .gx-client-notif-toolbar.gx-confirm-read #gx-client-notif-mark-all svg,
 .gx-client-notif-toolbar.gx-confirm-clear #gx-client-notif-clear-all svg{
-  width:19px;
-  height:19px;
+  width:20px;
+  height:20px;
   transition:width .3s ease,height .3s ease;
 }
 .gx-client-notif-toolbar.gx-confirm-read #gx-client-notif-mark-all svg path,
