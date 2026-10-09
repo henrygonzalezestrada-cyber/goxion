@@ -1085,7 +1085,8 @@
   will-change:transform,opacity;
   animation-play-state:paused;
 }
-.gx-rb-modal.show .gx-rb-ambient-light{animation-play-state:running}
+.gx-rb-modal:not(.show) .gx-rb-ambient-light{animation-play-state:paused!important}
+.gx-rb-modal.show .gx-rb-ambient-light{animation-play-state:running!important}
 .gx-rb-modal .gx-rb-ambient-light--cyan{
   width:96px;
   height:83px;
