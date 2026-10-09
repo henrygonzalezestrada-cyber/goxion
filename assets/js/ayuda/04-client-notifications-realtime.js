@@ -747,6 +747,19 @@
     ensureUi();
     setSessionHeader();
   });
+  // Login/logout from another tab and Safari foreground return must not keep stale rows.
+  window.addEventListener("storage",(event)=>{
+    if(event.key!==TOKEN_KEY)return;
+    syncNotificationSession();
+    ensureUi();
+    render();
+    if(token())load();
+  });
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden)return;
+    syncNotificationSession();
+    if(token())load();
+  });
 
   const baseLogout=window.cerrarSesion;
   if(typeof baseLogout==="function"&&!baseLogout.__gxNotifWrapped){
