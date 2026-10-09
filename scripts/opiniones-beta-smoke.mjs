@@ -54,7 +54,13 @@ try{
           backgroundImage:style.backgroundImage,
           border:style.borderTopColor,
           shadow:style.boxShadow,
-          nativeGlass:getComputedStyle(document.querySelector('.glass-card.tab-container')).backgroundColor
+          nativeGlass:getComputedStyle(document.querySelector('.glass-card.tab-container')).backgroundColor,
+          nativeBlur:getComputedStyle(document.querySelector('#view-inicio .benefit-box')).backdropFilter,
+          outerIsolation:getComputedStyle(document.querySelector('#gx-rb-home')).isolation,
+          marqueeIsolation:getComputedStyle(document.querySelector('.gx-rb-marquee')).isolation,
+          marqueeMask:getComputedStyle(document.querySelector('.gx-rb-marquee')).webkitMaskImage,
+          leftFade:getComputedStyle(document.querySelector('.gx-rb-marquee'),'::before').webkitMaskImage,
+          rightFade:getComputedStyle(document.querySelector('.gx-rb-marquee'),'::after').webkitMaskImage
         };
       });
       assert(reviewsGlass.height>=188,'Reseñas con altura protagonista');
@@ -64,6 +70,12 @@ try{
       assert.equal(reviewsGlass.backgroundImage,'none','No añadir degradado distinto al cristal');
       assert.equal(reviewsGlass.border,'rgba(255, 255, 255, 0.08)');
       assert.match(reviewsGlass.shadow,/10px 30px/);
+      assert.equal(reviewsGlass.blur,reviewsGlass.nativeBlur,'Idéntico filtro que benefit-box de Ayuda');
+      assert.equal(reviewsGlass.outerIsolation,'auto','Home sin aislamiento que corte el backdrop');
+      assert.equal(reviewsGlass.marqueeIsolation,'auto','Marquee sin aislamiento de composición');
+      assert.equal(reviewsGlass.marqueeMask,'none','No aplicar máscara al ancestro del cristal');
+      assert.match(reviewsGlass.leftFade,/linear-gradient/,'Fade solo en overlay izquierdo');
+      assert.match(reviewsGlass.rightFade,/linear-gradient/,'Fade solo en overlay derecho');
       // Move section into viewport: animation should advance without a pointer swipe.
       await page.locator('#gx-rb-home').scrollIntoViewIfNeeded();
       await page.waitForTimeout(100);
@@ -93,7 +105,7 @@ try{
         return {
           beforeFinal:section.nextElementSibling===final,
           hasTopBorder:getComputedStyle(section).borderTopWidth,
-          mask:getComputedStyle(document.querySelector('.gx-rb-marquee')).maskImage
+          mask:getComputedStyle(document.querySelector('.gx-rb-marquee'),'::before').maskImage
         };
       });
       assert.equal(placement.beforeFinal,true,'Opiniones debe estar cerca del cierre de Inicio');
@@ -128,7 +140,11 @@ try{
         runnerLength:document.querySelector('.gx-rb-neon-star-runner')?.getAttribute('pathLength'),
         beamWidth:getComputedStyle(document.querySelector('.gx-rb-neon-star-runner')).strokeWidth,
         beamDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-runner')).strokeDasharray,
-        trailDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-trail')).strokeDasharray
+        trailDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-trail')).strokeDasharray,
+        bloom:document.querySelector('.gx-rb-neon-star-bloom')!==null,
+        bloomFilter:document.querySelector('.gx-rb-neon-star-bloom')?.getAttribute('filter'),
+        spark:document.querySelector('.gx-rb-neon-star-spark')!==null,
+        sparkDash:getComputedStyle(document.querySelector('.gx-rb-neon-star-spark')).strokeDasharray
       }));
       assert.equal(hero.noBox,'none');
       assert.equal(hero.traced,true);
@@ -139,6 +155,9 @@ try{
       assert.equal(hero.beamWidth,'1.65px','Haz más fino, similar a la línea de beneficios');
       assert.match(hero.beamDash,/32/,'Haz más largo que antes');
       assert.match(hero.trailDash,/43/,'Estela extendida');
+      assert(hero.bloom&&hero.spark,'Bloom y punta luminosa superpuestos al haz');
+      assert.equal(hero.bloomFilter,'url(#gx-rb-orbit-light)','Halo desenfocado real en SVG');
+      assert.match(hero.sparkDash,/6/,'Punta brillante corta');
       const orbitStart=await page.locator('.gx-rb-neon-star-runner').evaluate(
         node=>getComputedStyle(node).strokeDashoffset
       );
@@ -147,6 +166,15 @@ try{
         node=>getComputedStyle(node).strokeDashoffset
       );
       assert.notEqual(orbitStart,orbitEnd,'El haz neón recorre realmente el contorno');
+      const glowOffsets=await page.evaluate(()=>({
+        runner:document.querySelector('.gx-rb-neon-star-runner').style.strokeDashoffset,
+        bloom:document.querySelector('.gx-rb-neon-star-bloom').style.strokeDashoffset,
+        trail:document.querySelector('.gx-rb-neon-star-trail').style.strokeDashoffset,
+        spark:document.querySelector('.gx-rb-neon-star-spark').style.strokeDashoffset
+      }));
+      assert.equal(glowOffsets.runner,glowOffsets.bloom,'Iluminación viaja junto al haz en Safari');
+      assert.equal(glowOffsets.runner,glowOffsets.trail,'Estela sigue al haz sin desfase');
+      assert.notEqual(glowOffsets.runner,glowOffsets.spark,'Punta brillante avanza por delante del haz');
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
