@@ -174,12 +174,12 @@
       sheet.innerHTML=
         '<div class="gx-client-notif-handle"></div>'+
         '<div class="gx-client-notif-head">'+
-          '<div class="gx-client-notif-head-copy"><strong>Notificaciones</strong><small id="gx-client-notif-head-summary">Actividad de tu cuenta</small></div>'+
+          '<div class="gx-client-notif-toolbar" aria-label="Acciones de notificaciones">'+
+            '<button type="button" id="gx-client-notif-mark-all" class="gx-client-notif-soft-action" aria-label="Marcar todo como leído" title="Marcar todo como leído"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 4 4L18 6"></path><path d="m10 16 2 2 8-8"></path></svg></button>'+
+            '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all" aria-label="Eliminar todo" title="Eliminar todo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg></button>'+
+          '</div>'+
+          '<strong class="gx-client-notif-head-title">Notificaciones</strong>'+
           '<button type="button" class="gx-client-notif-close" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"></path></svg></button>'+
-        '</div>'+
-        '<div class="gx-client-notif-toolbar">'+
-          '<button type="button" id="gx-client-notif-mark-all" class="gx-client-notif-soft-action"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg><span>Marcar todo leído</span></button>'+
-          '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg><span>Eliminar todo</span></button>'+
         '</div>'+
         '<div id="gx-client-notif-list" class="gx-client-notif-list"></div>'+
         '<div id="gx-client-notif-undo" class="gx-client-notif-undo" aria-live="polite" aria-hidden="true"><span>Notificación eliminada</span><button type="button">Deshacer</button></div>';
@@ -198,7 +198,6 @@
     const ring=options.ring===true;
     if(!ensureUi())return;
     const badge=document.getElementById("gx-client-notif-badge");
-    const headSummary=document.getElementById("gx-client-notif-head-summary");
     const launch=document.getElementById("gx-client-notif-launch");
     const list=document.getElementById("gx-client-notif-list");
     const markAllBtn=document.getElementById("gx-client-notif-mark-all");
@@ -211,7 +210,6 @@
     }
 
     if(badge)badge.textContent=state.unread>99?"99+":String(state.unread);
-    if(headSummary)headSummary.textContent=state.unread?(state.unread+" sin leer"):"Actividad reciente";
     if(launch){
       launch.classList.toggle("gx-has-new",state.unread>0);
       launch.setAttribute("aria-label",state.unread>0
@@ -501,8 +499,9 @@
     clearTimeout(btn._gxConfirmTimer);
     btn._gxArmed=false;
     btn.classList.remove("gx-confirm");
-    const label=btn.querySelector("span");
-    if(label)label.textContent="Eliminar todo";
+    btn.removeAttribute("aria-busy");
+    btn.setAttribute("aria-label","Eliminar todo");
+    btn.setAttribute("title","Eliminar todo");
   }
 
   function armClearAll(){
@@ -516,8 +515,8 @@
 
     btn._gxArmed=true;
     btn.classList.add("gx-confirm");
-    const label=btn.querySelector("span");
-    if(label)label.textContent="Confirmar";
+    btn.setAttribute("aria-label","Confirmar eliminar todo");
+    btn.setAttribute("title","Confirmar eliminar todo");
     clearTimeout(btn._gxConfirmTimer);
     btn._gxConfirmTimer=setTimeout(()=>resetClearAll(),2800);
   }
@@ -535,8 +534,8 @@
     const backup=state.items.map(x=>({...x}));
     const backupUnread=state.unread;
     btn.disabled=true;
-    const label=btn.querySelector("span");
-    if(label)label.textContent="Eliminando…";
+    btn.setAttribute("aria-busy","true");
+    btn.setAttribute("aria-label","Eliminando notificaciones");
 
     state.items=[];
     state.unread=0;
