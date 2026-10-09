@@ -12,6 +12,17 @@ let serverOutput = '';
 server.stdout.on('data', chunk => { serverOutput += chunk; });
 server.stderr.on('data', chunk => { serverOutput += chunk; });
 
+// Evaluate DOM directly on each iteration; headless WebKit can hold its
+// internal requestAnimationFrame-based waitForFunction poller while the DOM is ready.
+async function waitForDom(page,predicate,timeout=6000){
+  const deadline=Date.now()+timeout;
+  while(Date.now()<deadline){
+    if(await page.evaluate(predicate).catch(()=>false))return;
+    await page.waitForTimeout(100);
+  }
+  throw new Error('Estado del DOM no alcanzado en '+timeout+'ms');
+}
+
 async function waitForServer() {
   const deadline = Date.now() + 15000;
   while (Date.now() < deadline) {
@@ -828,7 +839,7 @@ async function runAyuda(browser, browserName, errors) {
   await page.locator('[data-gx-smoke-token="c9-card"] [data-gx-promo-action]')
     .click({force:true,timeout:8000});
 
-  await page.waitForFunction(() => {
+  await waitForDom(page,() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
     const action=card?.querySelector('[data-gx-promo-action]');
     // Some headless WebKit builds expose the pre-transition bounding rect
@@ -836,7 +847,7 @@ async function runAyuda(browser, browserName, errors) {
     // the user-facing expanded state; subsequent assertions inspect layout.
     return !!card && !!action && action.textContent.trim()==='Contratar ahora' &&
       Math.abs(parseFloat(card.style.height)-Math.min(Math.max(470,innerHeight-52),526))<1;
-  },null,{timeout:5000,polling:100}).catch(async error=>{
+  },5000).catch(async error=>{
     console.log('C9 apertura',await page.evaluate(()=>[...document.querySelectorAll('.gx-promo-deck-card')].map(card=>({
       classes:card.className,token:card.dataset.gxSmokeToken,parent:card.parentElement?.id||card.parentElement?.tagName,
       action:card.querySelector('[data-gx-promo-action]')?.textContent,inlineHeight:card.style.height,
