@@ -829,7 +829,7 @@ async function runAyuda(browser, browserName, errors) {
     // the user-facing expanded state; subsequent assertions inspect layout.
     return !!card && !!action && action.textContent.trim()==='Contratar ahora' &&
       Math.abs(parseFloat(card.style.height)-Math.min(Math.max(470,innerHeight-52),526))<1;
-  },null,{timeout:5000}).catch(async error=>{
+  },null,{timeout:5000,polling:100}).catch(async error=>{
     console.log('C9 apertura',await page.evaluate(()=>[...document.querySelectorAll('.gx-promo-deck-card')].map(card=>({
       classes:card.className,token:card.dataset.gxSmokeToken,parent:card.parentElement?.id||card.parentElement?.tagName,
       action:card.querySelector('[data-gx-promo-action]')?.textContent,inlineHeight:card.style.height,
