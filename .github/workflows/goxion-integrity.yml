@@ -31,7 +31,12 @@ jobs:
       - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
 
+      # Run the changed beta first so iPhone regressions surface immediately.
+      - name: Opiniones 2.0 beta (local-only)
+        run: npm run test:opiniones
+
       - name: Browser smoke
+        if: ${{ !cancelled() }}
         run: npm run test:smoke
 
       - name: Realtime beta browser smoke (mock data)
@@ -41,7 +46,3 @@ jobs:
       - name: Cart guest and member checkout
         if: ${{ !cancelled() }}
         run: npm run test:cart
-
-      - name: Opiniones 2.0 beta (local-only)
-        if: ${{ !cancelled() }}
-        run: npm run test:opiniones
