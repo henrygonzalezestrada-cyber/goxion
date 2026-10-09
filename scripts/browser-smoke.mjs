@@ -946,9 +946,9 @@ async function runAyuda(browser, browserName, errors) {
     requestAnimationFrame(sample);
     window.__gxPromoSmokeCard.querySelector('[data-gx-promo-close]').click();
   });
-  await page.waitForFunction(()=>
+  await waitForDom(page,()=>
     window.__gxPromoSmokeCard.parentElement?.id==='gx-promo-deck',
-    null,{timeout:5000}
+    5000
   );
   const midClose=await page.evaluate(()=>window.__gxC9LastReturn);
 
@@ -964,10 +964,10 @@ async function runAyuda(browser, browserName, errors) {
     errors.push(`${label}: C9 cierre aún hace snap al último segundo. ${JSON.stringify(midClose)}`);
   }
 
-  await page.waitForFunction(() =>
+  await waitForDom(page,() =>
     !document.querySelector('body > .gx-promo-deck-card.is-expanded') &&
     !!document.querySelector('#gx-promo-deck .gx-promo-deck-card[data-gx-smoke-token="c9-card"]'),
-    null,{timeout:3200}
+    3200
   ).catch(()=>{});
 
   const restored=await page.evaluate(() => {
