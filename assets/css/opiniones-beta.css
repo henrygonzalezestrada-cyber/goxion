@@ -116,3 +116,321 @@
 .gx-rb-focus-anchor{scroll-margin-top:20px}
 @media(max-width:370px){.gx-rb-modal .gx-rb-form{padding:22px 16px}.gx-rb-star{width:40px;height:42px}.gx-rb-home-top{padding-inline:13px}.gx-rb-demo-bar{margin-inline:10px}}
 @media(prefers-reduced-motion:reduce){.gx-rb-star,.gx-rb-submit{animation:none!important;transition:none!important}.gx-rb-track{scroll-behavior:auto!important}.gx-rb-star:after{animation:none!important}}
+
+/* ===========================================================
+   OPINIONES 2.1 · SOLO AYUDA
+   Lenguaje visual nativo: Poppins, cristal negro, cian y violeta
+   sin estética de dashboard. Admin mantiene exactamente su UI.
+   =========================================================== */
+.gx-rb-demo-bar--ayuda {
+  width: min(100%,580px);
+  padding: 9px 12px;
+  background: rgba(8,8,12,.62);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.085);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.27);
+}
+.gx-rb-demo-bar--ayuda strong { font-size:10px; letter-spacing:.045em; font-weight:700 }
+.gx-rb-demo-bar--ayuda span { color:#aab6cd; opacity:1 }
+.gx-rb-demo-bar--ayuda a {
+  background:rgba(0,242,254,.065);
+  border-color:rgba(0,242,254,.18);
+  color:#a2f5fa;
+  transition:background .2s ease;
+}
+.gx-rb-demo-bar--ayuda a:hover {background:rgba(0,242,254,.13)}
+
+/* Invitación sutil entre secciones, NO tablero de métricas. */
+#view-inicio .gx-rb-home {
+  isolation:isolate;
+  background:transparent;
+  border:0;
+  border-top:1px solid rgba(255,255,255,.085);
+  box-shadow:none;
+  border-radius:0;
+  padding:23px 0 8px;
+  margin:2px 0 24px;
+  overflow:visible;
+}
+#view-inicio .gx-rb-home::before {display:none}
+#view-inicio .gx-rb-home-top {
+  padding:0 2px 12px;
+  align-items:center;
+  gap:8px;
+}
+#view-inicio .gx-rb-kicker {
+  font-family:'Poppins',sans-serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.7px;
+  color:var(--text-muted,#95a4bd);
+}
+#view-inicio .gx-rb-home h2 {
+  font-family:'Poppins',sans-serif;
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:-.35px;
+  line-height:1.35;
+  margin:6px 0 0;
+  color:#fff;
+}
+#view-inicio .gx-rb-home-count {
+  align-self:flex-end;
+  padding-bottom:2px;
+  font-size:10px;
+  font-weight:500;
+  color:#8fa7bc;
+  letter-spacing:0;
+}
+#view-inicio .gx-rb-track {
+  margin-inline:-2px;
+  padding:4px 2px 12px;
+  scroll-padding-inline:2px;
+  gap:10px;
+  -webkit-overflow-scrolling:touch;
+}
+#view-inicio .gx-rb-quote {
+  flex:0 0 min(84%,315px);
+  min-height:130px;
+  padding:15px 16px;
+  border-radius:18px;
+  gap:8px;
+  background:rgba(8,8,12,.33);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.085);
+  box-shadow:0 10px 24px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.035);
+}
+#view-inicio .gx-rb-quote::before {
+  content:"";
+  position:absolute;
+  left:16px;top:0;
+  width:32px;height:2px;
+  background:linear-gradient(90deg,var(--neon-purple,#7c4dff),var(--neon-blue,#00f2fe));
+  border-radius:0 0 8px 8px;
+}
+#view-inicio .gx-rb-quote p {font-size:12px;line-height:1.68;font-weight:400;color:#e8edf6}
+#view-inicio .gx-rb-byline {font-size:10px;color:#97a7bd}
+#view-inicio .gx-rb-example-note {
+  padding:0 2px 10px;
+  font-size:9px;
+  color:#8899ad;
+  line-height:1.5;
+}
+#view-inicio .gx-rb-home-footer {
+  padding:0 2px;
+  gap:10px;
+}
+#view-inicio .gx-rb-home-footer span {
+  color:var(--text-muted,#95a4bd);
+  font-size:11px;
+  line-height:1.45;
+}
+#view-inicio .gx-rb-home-cta {
+  background:rgba(0,242,254,.07);
+  border:1px solid rgba(0,242,254,.27);
+  color:#b3f8fb;
+  padding:10px 13px;
+  border-radius:14px;
+  font-size:11px;
+  font-weight:600;
+  min-height:40px;
+  transition:background .2s,transform .2s;
+}
+#view-inicio .gx-rb-home-cta:hover {background:rgba(0,242,254,.13)}
+#view-inicio .gx-rb-home-cta:active {transform:scale(.98)}
+#view-inicio .gx-rb-empty {width:100%;padding:19px 9px;color:#a8b9cd}
+#view-inicio .gx-rb-rating{color:#ffcb74}
+
+/* Modal: bienvenida cálida y ligera en el mismo ADN de Ayuda.
+   No es una ventana de gestión ni un panel anidado. */
+.gx-rb-modal {
+  padding:16px;
+  padding-bottom:max(16px,env(safe-area-inset-bottom));
+}
+.gx-rb-modal .modal-content.gx-rb-shell {
+  width:min(100%,432px);
+  max-height:min(88dvh,730px);
+  border:1px solid rgba(255,255,255,.12)!important;
+  border-radius:23px!important;
+  background:rgba(9,10,17,.88)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  box-shadow:0 22px 75px rgba(0,0,0,.58),0 0 32px rgba(124,77,255,.07)!important;
+  scrollbar-width:none;
+}
+.gx-rb-modal .modal-content.gx-rb-shell::-webkit-scrollbar {display:none}
+.gx-rb-modal .modal-content.gx-rb-shell::before {
+  top:-145px;right:-75px;
+  width:240px;height:250px;
+  background:radial-gradient(circle,rgba(124,77,255,.13),transparent 70%);
+}
+.gx-rb-modal .modal-content.gx-rb-shell::after {
+  left:-130px;bottom:-135px;
+  background:radial-gradient(circle,rgba(0,242,254,.07),transparent 70%);
+}
+.gx-rb-modal .gx-rb-form {padding:23px 22px 22px}
+.gx-rb-modal .gx-rb-close {
+  top:15px;right:16px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.1);
+  width:31px;height:31px;
+  color:#b8c7dd;
+}
+.gx-rb-modal .gx-rb-close:hover {background:rgba(255,255,255,.11)}
+.gx-rb-modal .gx-rb-form-head {
+  text-align:center;
+  padding:5px 8px 0;
+  margin-bottom:19px;
+}
+.gx-rb-modal .gx-rb-emblem {
+  width:51px;height:51px;
+  margin:0 auto 13px;
+  display:grid;place-items:center;
+  border-radius:17px;
+  border:1px solid rgba(0,242,254,.16);
+  background:linear-gradient(145deg,rgba(0,242,254,.115),rgba(124,77,255,.105));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  color:#a7faff;
+}
+.gx-rb-modal .gx-rb-emblem svg {
+  width:24px;height:24px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+}
+.gx-rb-modal .gx-rb-eyebrow {
+  color:var(--neon-blue,#00f2fe);
+  font-size:10px;
+  font-weight:650;
+  letter-spacing:1.4px;
+}
+.gx-rb-modal .gx-rb-form h2 {
+  font-family:'Poppins',sans-serif;
+  color:#fff;
+  font-weight:700;
+  font-size:21px;
+  letter-spacing:-.5px;
+  line-height:1.3;
+  margin:8px 0 8px;
+}
+.gx-rb-modal .gx-rb-intro {
+  font-size:12px;
+  line-height:1.65;
+  color:var(--text-muted,#95a4bd);
+  max-width:330px;
+  margin:0 auto;
+}
+.gx-rb-modal .gx-rb-score {
+  background:transparent;
+  border:0;
+  border-radius:0;
+  padding:0 2px 3px;
+  box-shadow:none;
+}
+.gx-rb-modal .gx-rb-score-label {
+  color:#e0e7f4;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0;
+  margin-bottom:8px;
+}
+.gx-rb-modal .gx-rb-stars {
+  gap:8px;
+  padding:0 0 2px;
+}
+.gx-rb-modal .gx-rb-star {
+  color:rgba(210,224,244,.28);
+}
+.gx-rb-modal .gx-rb-star.is-lit {
+  color:#ffcc75;
+  filter:drop-shadow(0 1px 6px rgba(255,184,82,.27));
+}
+.gx-rb-modal .gx-rb-rating-feedback {
+  min-height:18px;
+  margin-top:5px;
+  color:#ffcc75;
+  font-size:11px;
+  font-weight:600;
+}
+.gx-rb-modal .gx-rb-fieldhead {margin-top:17px;margin-bottom:8px}
+.gx-rb-modal .gx-rb-fieldhead label {
+  color:#eef4ff;
+  font-size:12px;
+  font-weight:600;
+}
+.gx-rb-modal .gx-rb-counter {font-size:10px;color:#98a9bc}
+.gx-rb-modal .gx-rb-text {
+  min-height:109px;
+  height:109px;
+  font-size:13px;
+  line-height:1.65;
+  padding:13px 14px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:13px;
+  background:rgba(0,0,0,.32);
+  color:#fff;
+}
+.gx-rb-modal .gx-rb-text::placeholder {color:#8191a7}
+.gx-rb-modal .gx-rb-text:focus {
+  border-color:var(--neon-blue,#00f2fe);
+  box-shadow:0 0 0 3px rgba(0,242,254,.065);
+}
+.gx-rb-modal .gx-rb-consent {
+  padding:11px 10px;
+  margin-top:14px;
+  border-radius:13px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.075);
+}
+.gx-rb-modal .gx-rb-consent input:checked {background:rgba(0,195,204,.62)}
+.gx-rb-modal .gx-rb-consent strong {font-size:11px;font-weight:600;color:#e9f1ff}
+.gx-rb-modal .gx-rb-consent small {font-size:10px;line-height:1.55;color:#96a6c0}
+.gx-rb-modal .gx-rb-formnote {
+  color:#8396ad;
+  font-size:9px;
+  line-height:1.55;
+  margin:9px 1px 0;
+}
+.gx-rb-modal .gx-rb-error {font-size:11px;margin-top:8px}
+.gx-rb-modal .gx-rb-submit {
+  margin-top:10px;
+  min-height:48px;
+  border-radius:15px;
+  border:0;
+  background:linear-gradient(135deg,var(--neon-blue,#00f2fe),#4f8cff);
+  color:#06101c;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:0 0 18px rgba(0,242,254,.13);
+}
+.gx-rb-modal .gx-rb-submit:hover {filter:brightness(1.055)}
+.gx-rb-modal .gx-rb-submit.is-success {background:#57d0aa}
+.gx-rb-modal .gx-rb-success-screen {padding:45px 25px 37px}
+.gx-rb-modal .gx-rb-success-icon {
+  border-radius:19px;
+  background:rgba(55,212,168,.095);
+}
+.gx-rb-modal .gx-rb-success-screen h2 {font-size:21px;font-weight:700;letter-spacing:-.45px}
+.gx-rb-modal .gx-rb-success-screen p {font-size:12px;line-height:1.65}
+.gx-rb-modal .gx-rb-done {background:rgba(0,242,254,.08);border-color:rgba(0,242,254,.22);color:#b5faff}
+.gx-rb-modal .gx-rb-close:focus-visible,
+.gx-rb-modal .gx-rb-star:focus-visible,
+.gx-rb-modal .gx-rb-submit:focus-visible,
+#view-inicio .gx-rb-home-cta:focus-visible {
+  outline:2px solid var(--neon-blue,#00f2fe);
+  outline-offset:3px;
+}
+@media(max-width:370px){
+  .gx-rb-modal .gx-rb-form {padding:22px 17px 18px}
+  .gx-rb-modal .gx-rb-star {width:42px;height:43px}
+  #view-inicio .gx-rb-home h2 {font-size:16px}
+  #view-inicio .gx-rb-home-footer span {font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-demo-bar--ayuda a,#view-inicio .gx-rb-home-cta{transition:none}
+}
