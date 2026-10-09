@@ -105,6 +105,7 @@
 .gx-rb-admin-actions button[data-action=hide]{color:#e9bac8}
 .gx-rb-admin-actions button:disabled{opacity:.3;cursor:not-allowed}
 .gx-rb-admin-answer{display:flex;gap:7px;align-items:center;margin-top:10px}
+.gx-rb-admin-answer[hidden],.gx-rb-success-screen[hidden],.gx-rb-form[hidden]{display:none!important}
 .gx-rb-admin-answer input{min-width:0;flex:1;outline:none;border:1px solid rgba(187,198,232,.19);background:rgba(3,6,14,.4);color:#ecf3ff;padding:10px 9px;border-radius:9px;font:500 11px Poppins,system-ui,sans-serif}
 .gx-rb-admin-answer button{cursor:pointer;border:1px solid rgba(74,206,225,.3);background:rgba(75,202,221,.13);border-radius:9px;color:#aef8fc;padding:10px;font:650 9px Poppins,system-ui,sans-serif}
 .gx-rb-admin-reply{font:500 10px/1.6 Poppins,system-ui,sans-serif;background:rgba(90,213,216,.055);border-left:2px solid #73d0e4;border-radius:4px;padding:8px 10px;color:#b5e8e4;margin-top:8px}
