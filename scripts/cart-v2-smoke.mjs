@@ -67,7 +67,17 @@ try{
     assert.equal(posts.length,0);
     remaining=2;
     await submitCart(page);
-    await page.waitForFunction(()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'));
+    await page.waitForFunction(()=>document.getElementById('gx-cart-error').textContent.includes('Prueba de error'),
+      null,{timeout:9000}).catch(async error=>{
+      console.log('CART DIAGNOSTIC',name,await page.evaluate(()=>({
+        error:document.getElementById('gx-cart-error')?.textContent,
+        buttonDisabled:document.querySelector('#gx-cart-form button[type=submit]')?.disabled,
+        sending:document.querySelector('#gx-cart-form button[type=submit]')?.classList.contains('is-sending'),
+        formHidden:document.querySelector('#gx-cart-form')?.hidden,
+        count:document.querySelectorAll('.gx-cart-line').length
+      })),{posts:posts.length,remaining,fail});
+      throw error;
+    });
     assert.match(await page.locator('#gx-cart-total').innerText(),/377/);
     fail=false;
     await page.screenshot({path:`/tmp/goxion-cart-${name}.png`});
