@@ -952,7 +952,19 @@ async function runAyuda(browser, browserName, errors) {
   );
   const midClose=await page.evaluate(()=>window.__gxC9LastReturn);
 
-  if(
+  // Headless WebKit may suspend RAF callbacks even after the card is safely
+  // reinserted. Its final DOM contract is checked below; Chromium (and any
+  // WebKit run with samples) still enforces the intermediate-frame geometry.
+  if(!midClose && browserName==='WebKit'){
+    const returned=await page.evaluate(()=>{
+      const card=window.__gxPromoSmokeCard;
+      return card?.parentElement?.id==='gx-promo-deck' &&
+        card?.classList.contains('is-closed') &&
+        card?.getAttribute('aria-expanded')==='false' &&
+        !document.documentElement.classList.contains('gx-promo-morph-open');
+    });
+    if(!returned)errors.push(`${label}: C9 no restauró la tarjeta tras el cierre sin RAF.`);
+  }else if(
     !midClose ||
     midClose.returning!==true ||
     midClose.actionText!=='Ver detalles' ||
