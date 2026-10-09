@@ -67,6 +67,10 @@
     $("gx-rb-submit").disabled=false;
     $("gx-rb-submit").classList.remove("is-success");
     $("gx-rb-submit").querySelector("span").textContent="Enviar mi opinión";
+    // Restore the arrow after the success morph when opening a fresh review.
+    const submitIcon=$("gx-rb-submit").querySelector("svg");
+    if(submitIcon)submitIcon.remove();
+    $("gx-rb-submit").insertAdjacentHTML("beforeend",icon.arrow);
     paint();
   }
   starButtons.forEach(button=>{
