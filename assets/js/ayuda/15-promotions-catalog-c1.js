@@ -845,8 +845,21 @@
       const transitions=card.getAnimations().filter(animation=>
         Number.isFinite(animation.effect?.getComputedTiming().endTime)
       );
-      await Promise.allSettled(transitions.map(animation=>animation.finished));
-      await new Promise(resolve=>requestAnimationFrame(resolve));
+      // On backgrounded/headless WebKit, CSS transitions and even RAF may stop
+      // resolving. The visual morph normally ends long before this deadline.
+      const finished=await Promise.race([
+        Promise.allSettled(transitions.map(animation=>animation.finished)).then(()=>true),
+        new Promise(resolve=>setTimeout(()=>resolve(false),350))
+      ]);
+      if(!finished){
+        for(const animation of transitions){
+          try{animation.finish()}catch(_){}
+        }
+      }
+      await Promise.race([
+        new Promise(resolve=>requestAnimationFrame(resolve)),
+        new Promise(resolve=>setTimeout(resolve,90))
+      ]);
       if(card!==state.expandedCard) return;
 
       card.classList.remove('is-closing','is-returning');
