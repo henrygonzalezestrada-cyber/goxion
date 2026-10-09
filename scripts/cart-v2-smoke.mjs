@@ -7,6 +7,12 @@ const services=[{id:'prime',nombre:'Prime Video',precio:45,disponibles:5,safeId:
 // Exercise native form submission without Playwright waiting forever for a
 // moving WebKit footer to become geometrically stable (layout is checked below).
 async function submitCart(page){
+  // Error text is set before the handler's finally block unlocks the form.
+  // Wait for a completed request rather than dropping the next click while busy.
+  await page.waitForFunction(()=>{
+    const button=document.querySelector('#gx-cart-form button[type=submit]');
+    return button && !button.disabled && !button.classList.contains('is-sending');
+  },null,{timeout:10000});
   await page.locator('#gx-cart-form button[type=submit]').evaluate(button=>{
     if(button.disabled)throw new Error('Botón de carrito deshabilitado');
     button.click();
