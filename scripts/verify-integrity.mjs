@@ -808,6 +808,10 @@ for (const absolute of walk(jsRoot)) {
   if (rtAdmin.includes('inicializarPanel(')) {
     fail('Realtime: Admin no debe reinicializar el panel completo ante cada evento.');
   }
+  if (rtAdmin.includes('node.innerHTML') || !rtAdmin.includes('headline.textContent') ||
+      !rtAdmin.includes('description.textContent')) {
+    fail('Realtime producción: los avisos de Admin deben mostrar texto seguro, nunca HTML recibido.');
+  }
   if (!rtAdmin.includes('goxionReloadAdminModel') ||
       !rtAdmin.includes('"registrations"') ||
       !rtAdmin.includes('"admin_activity"') ||
