@@ -11,6 +11,15 @@
     arrow:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-5-5 5 5-5 5"/></svg>',
     badge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 1.6 3.1.2.3 3.1L20 12l-1.8 3.1-.3 3.1-3.1.2L12 20l-2.8-1.6-3.1-.2-.3-3.1L4 12l1.8-3.1.3-3.1 3.1-.2L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.8 12.1 2.1 2.1 4.2-4.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
   };
+
+  // Star outline is the light source itself, not a symbol inside a box.
+  const heroStar='<svg class="gx-rb-neon-star" viewBox="0 0 100 100" aria-hidden="true">'+
+    '<defs><linearGradient id="gx-rb-star-gradient" x1="0" y1="0" x2="1" y2="1">'+
+      '<stop offset="0%" stop-color="#00f2fe"/><stop offset="55%" stop-color="#7c4dff"/><stop offset="100%" stop-color="#78faff"/>'+
+    '</linearGradient></defs>'+
+    '<path class="gx-rb-neon-star-halo" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '<path class="gx-rb-neon-star-line" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '</svg>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
   if(!modal||!view)return;
@@ -21,11 +30,12 @@
       '<button type="button" class="gx-rb-close" id="gx-rb-close" aria-label="Cerrar">'+icon.close+'</button>'+
       '<div class="gx-rb-form" id="gx-rb-form">'+
         '<div class="gx-rb-form-head">'+
-          '<div class="gx-rb-emblem" aria-hidden="true">'+svg+'</div>'+
+          '<div class="gx-rb-emblem" aria-hidden="true">'+heroStar+'</div>'+
           '<span class="gx-rb-eyebrow">TU EXPERIENCIA EN GOXION</span>'+
           '<h2 id="gx-rb-title">¿Cómo te fue con nosotros?</h2>'+
           '<p class="gx-rb-intro">Queremos escucharte. Comparte tu experiencia y ayúdanos a seguir mejorando.</p>'+
         '</div>'+
+        '<div class="gx-rb-fields" id="gx-rb-fields">'+
         '<div class="gx-rb-score">'+
           '<span class="gx-rb-score-label">¿Cómo calificarías tu experiencia?</span>'+
           '<div class="gx-rb-stars" id="gx-rb-stars" role="group" aria-label="Califica de una a cinco estrellas">'+
@@ -37,16 +47,50 @@
         '<label class="gx-rb-consent"><input id="gx-rb-consent" type="checkbox"><span><strong>Permitir compartir mi opinión</strong><small>Si la autorizas, podrá aparecer en la portada después de revisión. Sin nombres completos, teléfonos ni folios.</small></span></label>'+
         '<p class="gx-rb-formnote">Beta de demostración: simula un cliente, guarda solo en este navegador y no completa misiones ni envía mensajes reales.</p>'+
         '<p class="gx-rb-error" id="gx-rb-error" role="alert" aria-live="polite"></p>'+
+        '</div>'+
+        '<div class="gx-rb-success-screen" id="gx-rb-success" hidden>'+
+          '<p id="gx-rb-success-text">Tu comentario se encuentra en revisión.</p>'+
+        '</div>'+
         '<button type="button" class="gx-rb-submit" id="gx-rb-submit"><span>Enviar mi opinión</span>'+icon.arrow+'</button>'+
       '</div>'+
-      '<div class="gx-rb-success-screen" id="gx-rb-success" hidden>'+
-        '<div class="gx-rb-success-icon">'+icon.check+'</div>'+
-        '<h2>¡Opinión guardada!</h2>'+
-        '<p id="gx-rb-success-text">Tu comentario se encuentra en revisión.</p>'+
-        '<button type="button" class="gx-rb-done" id="gx-rb-done">Listo</button>'+
-      '</div>'+
     '</div>';
-  let rating=0,preview=0,sending=false;
+  let rating=0,preview=0,sending=false,lockedScroll=null,fieldsTimer=null;
+  const originalTitle="¿Cómo te fue con nosotros?";
+  function lockBackground(){
+    if(lockedScroll)return;
+    const body=document.body,styles=body.style;
+    lockedScroll={
+      y:window.scrollY,
+      position:styles.position,top:styles.top,left:styles.left,
+      right:styles.right,width:styles.width
+    };
+    styles.position="fixed";
+    styles.top=(-lockedScroll.y)+"px";
+    styles.left="0";
+    styles.right="0";
+    styles.width="100%";
+  }
+  function unlockBackground(){
+    if(!lockedScroll)return;
+    const saved=lockedScroll;
+    lockedScroll=null;
+    const style=document.body.style;
+    for(const key of ["position","top","left","right","width"])style[key]=saved[key];
+    window.scrollTo(0,saved.y);
+  }
+  const modalVisibility=new MutationObserver(()=>{
+    if(modal.classList.contains("show"))lockBackground();
+    else unlockBackground();
+  });
+  modalVisibility.observe(modal,{attributes:true,attributeFilter:["class"]});
+  modal.addEventListener("touchmove",event=>{
+    if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
+  },{passive:false});
+  function closeFeedback(){
+    if(typeof window.closeModal==="function")window.closeModal("modal-feedback");
+    else{modal.classList.remove("show");modal.style.display="none"}
+    unlockBackground();
+  }
   const $=id=>document.getElementById(id);
   const starButtons=[...modal.querySelectorAll(".gx-rb-star")];
   const names=["Selecciona las estrellas","Podemos mejorar","Hay oportunidad de mejorar","Buena experiencia","¡Muy buena experiencia!","¡Excelente experiencia!"];
@@ -61,6 +105,11 @@
   }
   function reset(){
     rating=0;preview=0;sending=false;
+    clearTimeout(fieldsTimer);
+    modal.classList.remove("gx-rb-complete","gx-rb-morphing");
+    $("gx-rb-fields").hidden=false;
+    $("gx-rb-fields").removeAttribute("aria-hidden");
+    $("gx-rb-title").textContent=originalTitle;
     $("gx-rb-text").value="";
     $("gx-rb-counter").textContent="0/500";
     $("gx-rb-consent").checked=false;
@@ -69,6 +118,7 @@
     $("gx-rb-success").hidden=true;
     $("gx-rb-submit").disabled=false;
     $("gx-rb-submit").classList.remove("is-success");
+    $("gx-rb-submit").removeAttribute("aria-label");
     $("gx-rb-submit").querySelector("span").textContent="Enviar mi opinión";
     // Restore the arrow after the success morph when opening a fresh review.
     const submitIcon=$("gx-rb-submit").querySelector("svg");
@@ -98,8 +148,7 @@
     $("gx-rb-counter").textContent=event.target.value.length+"/500";
     $("gx-rb-error").textContent="";
   });
-  $("gx-rb-close").addEventListener("click",()=>window.closeModal?.("modal-feedback"));
-  $("gx-rb-done").addEventListener("click",()=>window.closeModal?.("modal-feedback"));
+  $("gx-rb-close").addEventListener("click",closeFeedback);
   function send(){
     if(sending)return;
     sending=true;
@@ -110,21 +159,33 @@
       const review=store.add({
         rating,text:$("gx-rb-text").value,consent:$("gx-rb-consent").checked
       });
-      btn.classList.add("is-success");
-      btn.querySelector("span").textContent="¡Guardado!";
-      btn.querySelector("svg")?.remove();
-      btn.insertAdjacentHTML("beforeend",icon.check);
       $("gx-rb-success-text").textContent=review.consent?
-        "Ya puedes revisar esta opinión en Admin. Aparecerá en la cinta solo después de aprobarla.":
-        "Tu opinión es privada. Puedes verla en Admin, pero no podrá publicarse sin tu autorización.";
-      $("gx-rb-form").hidden=true;
+        "Podrás verla en la cinta después de que se apruebe su publicación.":
+        "Tu comentario es privado y solo podrá publicarse con tu autorización.";
+      // Same DOM button morphs from submit into compact ✓ Listo; no second CTA.
       $("gx-rb-success").hidden=false;
+      $("gx-rb-fields").setAttribute("aria-hidden","true");
+      $("gx-rb-title").textContent="¡Opinión guardada!";
+      modal.classList.add("gx-rb-morphing","gx-rb-complete");
+      btn.classList.add("is-success");
+      btn.querySelector("span").textContent="Listo";
+      btn.querySelector("svg")?.remove();
+      btn.insertAdjacentHTML("afterbegin",icon.check);
+      btn.setAttribute("aria-label","Listo, cerrar opinión");
+      btn.disabled=false;
+      fieldsTimer=setTimeout(()=>{
+        $("gx-rb-fields").hidden=true;
+        modal.classList.remove("gx-rb-morphing");
+      },450);
     }catch(error){
       $("gx-rb-error").textContent=error.message;
       btn.disabled=false;
     }finally{sending=false;}
   }
-  $("gx-rb-submit").addEventListener("click",send);
+  $("gx-rb-submit").addEventListener("click",()=>{
+    if(modal.classList.contains("gx-rb-complete"))closeFeedback();
+    else send();
+  });
   $("gx-rb-text").addEventListener("keydown",e=>{
     if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();send()}
   });
@@ -133,33 +194,74 @@
     if(typeof window.openModal==="function")window.openModal("modal-feedback");
     else{modal.classList.add("show");modal.style.display="flex"}
   };
+  let marqueeFrame=0,pausedUntil=0,isInteracting=false,inViewport=false,stepTime=0,groupWidth=0;
+  const motionQuery=window.matchMedia("(prefers-reduced-motion: reduce)");
+  const pauseMarquee=(ms=2600)=>{pausedUntil=performance.now()+ms};
+  function advanceMarquee(time){
+    marqueeFrame=requestAnimationFrame(advanceMarquee);
+    const track=document.getElementById("gx-rb-track");
+    if(!track||!groupWidth||!inViewport||document.hidden||isInteracting||
+       time<pausedUntil||motionQuery.matches){stepTime=time;return}
+    const elapsed=stepTime?Math.min(time-stepTime,44):16;
+    stepTime=time;
+    track.scrollLeft+=elapsed*.024; // ~24 px per second
+    // Three identical groups: wrap within the middle copy without a visual snap.
+    if(track.scrollLeft>=groupWidth*1.5)track.scrollLeft-=groupWidth;
+    else if(track.scrollLeft<groupWidth*.5)track.scrollLeft+=groupWidth;
+  }
   function buildHome(){
     const section=document.createElement("section");
     section.id="gx-rb-home";
     section.className="gx-rb-home";
     section.setAttribute("aria-label","Reseñas de GOXION en demostración");
     section.innerHTML=
-      '<div class="gx-rb-home-top"><div><span class="gx-rb-kicker">EXPERIENCIAS GOXION</span><h2>Lo que opinan de GOXION</h2></div><div class="gx-rb-home-count" id="gx-rb-count"></div></div>'+
-      '<div class="gx-rb-track" id="gx-rb-track" tabindex="0" aria-label="Reseñas desliza horizontalmente"></div>'+
-      '<div class="gx-rb-example-note">Vista de prueba: las reseñas de ejemplo no corresponden a clientes reales.</div>'+
-      '<div class="gx-rb-home-footer"><span>Tu experiencia también cuenta ✨</span><button type="button" class="gx-rb-home-cta" id="gx-rb-open">Dejar mi opinión →</button></div>';
-    const insertion=[...view.querySelectorAll(".section-title")].find(node=>node.textContent.includes("Cómo funciona"));
-    if(insertion)insertion.before(section);
+      '<div class="gx-rb-home-top"><div><span class="gx-rb-kicker">EXPERIENCIAS GOXION</span><h2>Lo que opinan de GOXION</h2></div></div>'+
+      '<div class="gx-rb-marquee"><div class="gx-rb-track" id="gx-rb-track" tabindex="0" aria-label="Reseñas que se desplazan lentamente; desliza para explorar"></div></div>'+
+      '<div class="gx-rb-example-note">Opiniones de ejemplo para visualizar esta beta.</div>';
+    // Editorial trust strip belongs near the end, before the final support invitation.
+    const finalCall=view.querySelector(".final-cta");
+    if(finalCall)finalCall.before(section);
     else view.appendChild(section);
-    $("gx-rb-open").addEventListener("click",()=>window.openFeedbackModal());
+    const track=$("gx-rb-track");
+    for(const event of ["pointerdown","touchstart"]){
+      track.addEventListener(event,()=>{isInteracting=true;pauseMarquee(3500)},{passive:true});
+    }
+    for(const event of ["pointerup","pointercancel","touchend","touchcancel"]){
+      track.addEventListener(event,()=>{isInteracting=false;pauseMarquee(3500)},{passive:true});
+    }
+    track.addEventListener("mouseenter",()=>{isInteracting=true});
+    track.addEventListener("mouseleave",()=>{isInteracting=false;pauseMarquee(1600)});
+    track.addEventListener("focusin",()=>{isInteracting=true});
+    track.addEventListener("focusout",()=>{isInteracting=false;pauseMarquee(1800)});
+    track.addEventListener("scroll",()=>{
+      if(!groupWidth||motionQuery.matches)return;
+      if(track.scrollLeft>=groupWidth*1.5)track.scrollLeft-=groupWidth;
+      else if(track.scrollLeft<groupWidth*.5)track.scrollLeft+=groupWidth;
+    },{passive:true});
+    if("IntersectionObserver" in window){
+      const observer=new IntersectionObserver(entries=>{
+        inViewport=entries.some(entry=>entry.isIntersecting);
+        stepTime=0;
+      },{threshold:.12});
+      observer.observe(section);
+    }else inViewport=true;
+    marqueeFrame=requestAnimationFrame(advanceMarquee);
   }
   function renderHome(){
     const track=$("gx-rb-track");
     if(!track)return;
     const reviews=store.load().filter(r=>r.status==="published"&&r.consent&&r.verified);
     track.replaceChildren();
-    $("gx-rb-count").textContent=reviews.length>1?"Desliza para leer →":"";
+    groupWidth=0;
+    pauseMarquee(900);
     if(!reviews.length){
       const empty=document.createElement("div");
       empty.className="gx-rb-empty";
       empty.textContent="Aún no hay opiniones públicas. Puedes aprobar una desde Admin.";
       track.appendChild(empty);return;
     }
+    const group=document.createElement("div");
+    group.className="gx-rb-marquee-group";
     reviews.forEach(review=>{
       const card=document.createElement("article");
       card.className="gx-rb-quote";
@@ -179,8 +281,22 @@
       who.textContent=review.sample?"Opinión ficticia · Ejemplo":"Cliente de prueba · Beta";
       line.append(badge,who);
       card.append(stars,p,line);
-      track.appendChild(card);
+      group.appendChild(card);
     });
+    track.appendChild(group);
+    // Clones are aria-hidden to keep screen-reader reviews single and authentic.
+    if(reviews.length>1&&!motionQuery.matches){
+      for(let i=0;i<2;i++){
+        const clone=group.cloneNode(true);
+        clone.setAttribute("aria-hidden","true");
+        track.appendChild(clone);
+      }
+      requestAnimationFrame(()=>{
+        groupWidth=group.getBoundingClientRect().width;
+        track.scrollLeft=groupWidth;
+        stepTime=0;
+      });
+    }
   }
   function createBar(){
     const div=document.createElement("div");
