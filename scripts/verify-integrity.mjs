@@ -740,7 +740,7 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
-// Realtime preview contract: production pages stay untouched while the live layer is validated.
+// Realtime production contract: official HTMLs load only approved adapters, and previews remain isolated.
 {
   const officialAyuda = readFileSync(join(ROOT, 'ayuda.html'), 'utf8');
   const officialAdmin = readFileSync(join(ROOT, 'admin.html'), 'utf8');
@@ -755,10 +755,33 @@ for (const absolute of walk(jsRoot)) {
   const rtNotifications = readFileSync(join(ROOT, 'assets/js/ayuda/04-client-notifications-realtime.js'), 'utf8');
   const runtime = readFileSync(join(ROOT, 'assets/js/core/runtime.js'), 'utf8');
 
-  for (const [label, html] of [['Ayuda',officialAyuda],['Admin',officialAdmin],['Index',officialIndex]]) {
-    if (html.includes('assets/js/core/realtime.js') || html.includes('-realtime.js')) {
-      fail('Realtime: ' + label + ' oficial no debe cargar la beta Realtime todavía.');
+  // Production pages share the same Realtime kernel but keep their original
+  // structures and load only the adapter that belongs to that surface.
+  for (const [label, html, adapter] of [
+    ['Ayuda',officialAyuda,'assets/js/ayuda/03-realtime.js'],
+    ['Admin',officialAdmin,'assets/js/admin/31-admin-realtime.js'],
+    ['Index',officialIndex,'assets/js/index/04-realtime.js']
+  ]) {
+    const core='assets/js/core/realtime.js';
+    const sdk='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.91.0/dist/umd/supabase.min.js';
+    const runtime='assets/js/core/runtime.js';
+    if (!html.includes(core) || !html.includes(adapter) ||
+        !html.includes(sdk) || html.indexOf(runtime)>html.indexOf(sdk) ||
+        html.indexOf(sdk)>html.indexOf(core) || html.indexOf(core)>html.indexOf(adapter)) {
+      fail('Realtime producción: '+label+' perdió SDK, kernel, adaptador u orden de carga.');
     }
+    if (html.includes('preview/realtime/') || html.includes('noindex,nofollow')) {
+      fail('Realtime producción: '+label+' no debe referenciar rutas ni metadatos de beta.');
+    }
+    for (const needle of [core,adapter]) {
+      if (html.split(needle).length!==2) fail('Realtime producción: '+label+' carga duplicado '+needle+'.');
+    }
+  }
+  if (!officialAyuda.includes('assets/css/realtime-client-notifications.css') ||
+      !officialAyuda.includes('assets/js/ayuda/04-client-notifications-realtime.js') ||
+      officialAdmin.includes('04-client-notifications-realtime.js') ||
+      officialIndex.includes('04-client-notifications-realtime.js')) {
+    fail('Realtime producción: bandeja premium debe existir solo en Ayuda.');
   }
 
   if (!previewAyuda.includes('assets/js/core/realtime.js') ||
@@ -784,6 +807,10 @@ for (const absolute of walk(jsRoot)) {
   }
   if (rtAdmin.includes('inicializarPanel(')) {
     fail('Realtime: Admin no debe reinicializar el panel completo ante cada evento.');
+  }
+  if (rtAdmin.includes('node.innerHTML') || !rtAdmin.includes('headline.textContent') ||
+      !rtAdmin.includes('description.textContent')) {
+    fail('Realtime producción: los avisos de Admin deben mostrar texto seguro, nunca HTML recibido.');
   }
   if (!rtAdmin.includes('goxionReloadAdminModel') ||
       !rtAdmin.includes('"registrations"') ||

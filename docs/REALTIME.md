@@ -63,7 +63,7 @@ Realtime solo avisa. Las respuestas con información privada siguen requiriendo 
 
 ## Previews
 
-Durante validación, únicamente las páginas bajo `preview/realtime/` cargan los adaptadores Realtime. `admin.html`, `ayuda.html` e `index.html` oficiales permanecen sin estos scripts hasta la aprobación final.
+Tras la promoción de producción, `ayuda.html`, `admin.html` e `index.html` incluyen el núcleo Realtime y su adaptador correspondiente. La bandeja premium (CSS + JavaScript) solo se carga en Ayuda. Las rutas `preview/realtime/` se conservan para pruebas controladas; nunca son el destino del cliente oficial.
 
 ## Criterio para promover a producción
 
@@ -72,11 +72,11 @@ Durante validación, únicamente las páginas bajo `preview/realtime/` cargan lo
 3. Sin regresión visual por eventos.
 4. Reconnect/resync después de suspender Safari.
 5. Actualización modular correcta en Mi Espacio, Estado de cuenta y Admin.
-6. Integración a oficiales en un PR separado.
+6. Integración a oficiales en un PR separado, después de pasar verificaciones del release.
 
 ## Cierre de beta y protección de regresiones (octubre 2026)
 
-La promoción a producción **no** se realiza desde un preview ni copiando todo el HTML de la beta. Solo se agregan a `ayuda.html`, `admin.html` e `index.html` los adaptadores/estilos aprobados con sus rutas relativas correctas. La regla de `scripts/verify-integrity.mjs` que hoy prohíbe Realtime en oficiales deberá actualizarse **en el mismo PR de producción**; hasta entonces funciona como barrera contra un despliegue prematuro.
+La promoción a producción **no** se realiza desde un preview ni copiando todo el HTML de la beta. El PR de lanzamiento agrega únicamente los adaptadores/estilos aprobados a los HTML oficiales, respeta sus rutas locales y actualiza el contrato de `scripts/verify-integrity.mjs` para exigirlos de manera explícita. La beta se conserva como entorno de verificación.
 
 Suite adicional: `npm run test:realtime`. Usa Chromium, WebKit, una fixture independiente y respuestas simuladas (no escribe datos en Supabase). Comprueba:
 - confirmación en dos toques, resultado y estado final de la bandeja;
@@ -108,3 +108,12 @@ Cada notificación puede declarar una acción contextual sin transportar datos s
 - `services` → bloque de servicios.
 
 La acción se resuelve después de consultar `notificaciones-cliente` con `X-Client-Token`. Realtime sigue enviando únicamente invalidaciones.
+
+## Verificación posdespliegue
+
+- Abrir Ayuda, Admin e Index oficiales y revisar que no aparezcan errores JavaScript.
+- Comprobar campana, bandeja, confirmaciones, swipe y bloqueo de desplazamiento en iPhone.
+- Probar conexión Realtime, renovación después de suspender Safari y recuperación de sesión.
+- Verificar eventos de registro, pedido, pago, acceso y beneficio con cuentas de ensayo autorizadas, sin datos destructivos de clientes.
+- Confirmar que ni el catálogo ni las tarjetas abiertas se reconstruyen ante eventos ajenos.
+- Ante cualquier regresión, revertir exclusivamente el PR de promoción; no borrar migraciones ni notificaciones reales.
