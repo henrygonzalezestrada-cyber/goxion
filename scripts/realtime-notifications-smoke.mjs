@@ -40,6 +40,7 @@ try{
         'token-B':[item('b1','Solicitud recibida')]
       };
       const actions=[];
+      let failNextRead=false;
       const listCount={'token-A':0,'token-B':0};
       let held=null;
       await page.route('**/functions/v1/notificaciones-cliente',async route=>{
@@ -59,6 +60,12 @@ try{
           }
           await post(route,{ok:true,items:snapshot,no_leidas:snapshot.filter(x=>!x.leida).length});
         }else if(action==='marcar_todas'){
+          if(failNextRead){
+            failNextRead=false;
+            await route.fulfill({status:503,contentType:'application/json',
+              body:JSON.stringify({ok:false,error:'Prueba de desconexión'})});
+            return;
+          }
           items.forEach(x=>x.leida=true);
           await post(route,{ok:true,marcadas:items.length});
         }else if(action==='eliminar_todas'){
@@ -154,6 +161,17 @@ try{
           .some(n=>n.textContent==='Segundo evento'),null,{timeout:6000}
       );
       assert((listCount['token-B']||0)>=3,'La invalidación concurrente debe reenviar consulta');
+
+      // Failed backend mutation must not show success or lose unread notices.
+      failNextRead=true;
+      await read.click();
+      await read.click();
+      await page.waitForFunction(()=>
+        document.querySelector('#gx-client-notif-feedback.gx-error.show span')
+          ?.textContent.includes('No se pudo marcar como leído'),null,{timeout:5000}
+      );
+      assert.equal(await page.locator('.gx-client-notif-item.unread').count(),2);
+      assert.equal(data['token-B'].filter(x=>!x.leida).length,2);
 
       const beforeResync=listCount['token-B'];
       await page.evaluate(()=>window.dispatchEvent(new CustomEvent('goxion:realtime',{
