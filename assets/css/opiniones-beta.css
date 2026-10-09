@@ -729,7 +729,9 @@
   stroke-linecap:round;
   stroke-linejoin:round;
   stroke-dashoffset:0;
-  animation:gxRbNeonOrbit 3.5s linear infinite;
+  /* Safari SVG CSS dash animations can freeze at zero. JavaScript controls
+     these two tiny path offsets at 30ms intervals only while visible. */
+  animation:none;
   pointer-events:none;
 }
 .gx-rb-modal .gx-rb-neon-star-trail{
