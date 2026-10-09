@@ -815,8 +815,11 @@ async function runAyuda(browser, browserName, errors) {
     };
     card.dataset.gxSmokeToken='c9-card';
     window.__gxPromoSmokeCard=card;
-    card.querySelector('[data-gx-promo-action]')?.click();
   });
+  // Drive an actual pointer interaction; WebKit handles scripted .click()
+  // differently during the 3D deck's composed transforms.
+  await page.locator('[data-gx-smoke-token="c9-card"] [data-gx-promo-action]')
+    .click({force:true,timeout:8000});
 
   await page.waitForFunction(() => {
     const card=document.querySelector('body > .gx-promo-deck-card.is-expanded[data-gx-smoke-token="c9-card"]');
