@@ -146,45 +146,56 @@ try{
       const hero=await page.evaluate(()=>{
         const emblem=document.querySelector('.gx-rb-emblem');
         const line=emblem.querySelector('.gx-rb-neon-star-line');
-        const glow=[...emblem.querySelectorAll('.gx-rb-ambient-light')];
+        const segments=[...emblem.querySelectorAll('.gx-rb-spectrum-edge')];
+        const outer=[...emblem.querySelectorAll('.gx-rb-spectrum-outer')];
+        const inner=[...emblem.querySelectorAll('.gx-rb-spectrum-inner')];
         return {
           noBox:getComputedStyle(emblem).borderTopStyle,
           cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
           darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
-          outline:line!==null,
-          outlineWidth:getComputedStyle(line).strokeWidth,
+          outline:!!line,
           outlineAnimation:getComputedStyle(line).animationName,
-          svgPaths:emblem.querySelectorAll('.gx-rb-neon-star path').length,
-          ambientCount:glow.length,
-          ambientBehind:glow.every(node=>Number(getComputedStyle(node).zIndex)<Number(getComputedStyle(emblem.querySelector('svg')).zIndex)),
-          hasPathFollower:Boolean(emblem.querySelector('[pathLength],.gx-rb-star-backlight')),
-          colors:glow.map(node=>getComputedStyle(node).backgroundImage),
-          names:glow.map(node=>getComputedStyle(node).animationName),
-          states:glow.map(node=>getComputedStyle(node).animationPlayState)
+          edgeCount:segments.length,outerCount:outer.length,innerCount:inner.length,
+          edgeColors:segments.map(node=>getComputedStyle(node).stroke),
+          widths:segments.map(node=>getComputedStyle(node).strokeWidth),
+          normalized:segments.every(node=>node.getAttribute('pathLength')==='100'),
+          fullRim:segments.every(node=>node.getAttribute('stroke-dasharray')==='25 75'),
+          offsets:segments.map(node=>Number(node.getAttribute('data-initial-offset'))),
+          glowFilter:outer.every(node=>getComputedStyle(node).filter.includes('gx-rb-spectrum-outer')),
+          noFloatingBlobs:emblem.querySelectorAll('.gx-rb-ambient-light,.gx-rb-star-backlight').length===0
         };
       });
       assert.equal(hero.noBox,'none');
       assert.equal(hero.cyanFill,'rgb(0, 242, 254)');
       assert.equal(hero.darkX,'rgb(6, 18, 24)');
       assert.equal(hero.outline,true);
-      assert.equal(hero.outlineWidth,'2.35px');
-      assert.equal(hero.outlineAnimation,'none','La estrella se mantiene fija');
-      assert.equal(hero.svgPaths,2,'Solo contorno frontal y halo estático');
-      assert.equal(hero.ambientCount,3,'Cyan, violeta y azul detrás de estrella');
-      assert.equal(hero.ambientBehind,true,'Luces detrás de la silueta');
-      assert.equal(hero.hasPathFollower,false,'La luz ambiental no sigue la línea');
-      assert(hero.names.every(name=>name==='none'),
-        'Safari: movimiento controlado por JavaScript, no por keyframes SVG/CSS');
-      assert(hero.colors.every(bg=>bg.includes('radial-gradient')),'Las luces son halos difusos');
-      const ambientBefore=await page.locator('.gx-rb-ambient-light').evaluateAll(
-        nodes=>nodes.map(node=>getComputedStyle(node).transform)
+      assert.equal(hero.outlineAnimation,'none','La figura de la estrella queda fija');
+      assert.equal(hero.edgeCount,4,'Todo el contorno debe cubrirse con cuatro colores');
+      assert.equal(hero.outerCount,4,'Los cuatro colores emiten luz exterior');
+      assert.equal(hero.innerCount,4,'El resplandor interior mantiene continuidad');
+      assert.equal(new Set(hero.edgeColors).size,4,'Cuatro segmentos de color definidos');
+      assert(hero.widths.every(v=>v==='2.6px'),'Contorno fino y nítido');
+      assert.equal(hero.normalized,true);
+      assert.equal(hero.fullRim,true,'Los cuatro tramos se reparten el contorno completo');
+      assert.deepEqual(hero.offsets,[0,-25,-50,-75]);
+      assert(hero.glowFilter,'El resplandor debe difuminarse hacia afuera');
+      assert(hero.noFloatingBlobs,'Sin manchas flotantes ni puntos de luz');
+      const startSpectrum=await page.locator('.gx-rb-spectrum-edge').evaluateAll(
+        nodes=>nodes.map(node=>node.getAttribute('stroke-dashoffset'))
       );
-      await page.waitForTimeout(730);
-      const ambientAfter=await page.locator('.gx-rb-ambient-light').evaluateAll(
-        nodes=>nodes.map(node=>getComputedStyle(node).transform)
+      await page.waitForTimeout(680);
+      const endSpectrum=await page.locator('.gx-rb-spectrum-edge').evaluateAll(
+        nodes=>nodes.map(node=>node.getAttribute('stroke-dashoffset'))
       );
-      assert(ambientBefore.some((value,i)=>value!==ambientAfter[i]),
-        'La iluminación ambiental se mueve de verdad en Chromium/WebKit');
+      assert(startSpectrum.some((v,i)=>v!==endSpectrum[i]),
+        'Los colores de toda la estrella deben desplazarse en Safari');
+      const aligned=await page.evaluate(()=>{
+        const select=klass=>[...document.querySelectorAll('.gx-rb-'+klass)].map(
+          node=>node.getAttribute('stroke-dashoffset'));
+        return [select('spectrum-edge'),select('spectrum-inner'),select('spectrum-outer')];
+      });
+      assert.deepEqual(aligned[0],aligned[1],'Luz interior sigue el mismo ritmo del borde');
+      assert.deepEqual(aligned[0],aligned[2],'Halo exterior acompaña los segmentos');
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,

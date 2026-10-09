@@ -12,18 +12,27 @@
     badge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 1.6 3.1.2.3 3.1L20 12l-1.8 3.1-.3 3.1-3.1.2L12 20l-2.8-1.6-3.1-.2-.3-3.1L4 12l1.8-3.1.3-3.1 3.1-.2L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.8 12.1 2.1 2.1 4.2-4.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
   };
 
-  // The star keeps its original fixed silhouette; ambient light breathes
-  // BEHIND it, like bias LEDs behind a TV, without tracing the outline.
+  // Inspired by the actual user-supplied Google TV motion reference:
+  // all of the perimeter stays luminous. Colored segments flow smoothly
+  // around its edges, casting soft light outward (not drifting blobs).
+  const starShape="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z";
+  const starSpectrum=["cyan","blue","violet","ice"];
+  const starBandMarkup=kind=>starSpectrum.map((color,index)=>
+    '<path class="gx-rb-spectrum-'+kind+' gx-rb-spectrum-'+color+
+    '" data-spectrum-band="true" data-initial-offset="'+(-index*25)+
+    '" pathLength="100" stroke-dasharray="25 75" stroke-dashoffset="'+
+    (-index*25)+'" d="'+starShape+'"/>'
+  ).join("");
   const heroStar='<svg class="gx-rb-neon-star" viewBox="0 0 100 100" aria-hidden="true">'+
-    '<defs><linearGradient id="gx-rb-star-gradient" x1="0" y1="0" x2="1" y2="1">'+
-      '<stop offset="0%" stop-color="#00f2fe"/><stop offset="55%" stop-color="#7c4dff"/><stop offset="100%" stop-color="#78faff"/>'+
-    '</linearGradient></defs>'+
-    '<path class="gx-rb-neon-star-halo" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
-    '<path class="gx-rb-neon-star-line" d="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z"/>'+
+    '<defs>'+
+      '<filter id="gx-rb-spectrum-outer" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4.4"/></filter>'+
+      '<filter id="gx-rb-spectrum-inner" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2"/></filter>'+
+    '</defs>'+
+    '<path class="gx-rb-neon-star-line" d="'+starShape+'"/>'+
+    starBandMarkup("outer")+
+    starBandMarkup("inner")+
+    starBandMarkup("edge")+
     '</svg>';
-  const ambientLights='<span class="gx-rb-ambient-light gx-rb-ambient-light--cyan"></span>'+
-    '<span class="gx-rb-ambient-light gx-rb-ambient-light--violet"></span>'+
-    '<span class="gx-rb-ambient-light gx-rb-ambient-light--blue"></span>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
   if(!modal||!view)return;
@@ -34,7 +43,7 @@
       '<button type="button" class="gx-rb-close" id="gx-rb-close" aria-label="Cerrar">'+icon.close+'</button>'+
       '<div class="gx-rb-form" id="gx-rb-form">'+
         '<div class="gx-rb-form-head">'+
-          '<div class="gx-rb-emblem" aria-hidden="true">'+ambientLights+heroStar+'</div>'+
+          '<div class="gx-rb-emblem" aria-hidden="true">'+heroStar+'</div>'+
           '<span class="gx-rb-eyebrow">TU EXPERIENCIA EN GOXION</span>'+
           '<h2 id="gx-rb-title">¿Cómo te fue con nosotros?</h2>'+
           '<p class="gx-rb-intro">Queremos escucharte. Comparte tu experiencia y ayúdanos a seguir mejorando.</p>'+
@@ -82,55 +91,45 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
-  // Safari/WebKit can suspend CSS keyframes on layered blurred elements.
-  // Animate the three independent LED-like glows by updating their transforms,
-  // not by tracing the star outline. The timer runs ONLY while visible.
-  const ambientNodes=[...modal.querySelectorAll(".gx-rb-ambient-light")];
-  const ambientReduced=window.matchMedia("(prefers-reduced-motion: reduce)");
-  const ambientParams=[
-    {period:6900,phase:-.6,x:13,y:9,baseX:2,baseY:-2,scale:1.01},
-    {period:8200,phase:1.5,x:15,y:8,baseX:-1,baseY:1,scale:1.06},
-    {period:7700,phase:3.4,x:10,y:12,baseX:1,baseY:2,scale:1.00}
-  ];
-  let ambientTimer=null,ambientStart=0,ambientElapsed=0;
-  function moveAmbientLights(){
-    ambientElapsed=performance.now()-ambientStart;
-    ambientNodes.forEach((node,index)=>{
-      const p=ambientParams[index];
-      if(!p)return;
-      const phase=ambientElapsed*(2*Math.PI)/p.period+p.phase;
-      const x=p.baseX+p.x*Math.sin(phase);
-      const y=p.baseY+p.y*Math.cos(phase*.82);
-      const scale=p.scale+.12*Math.sin(phase-.3);
-      const opacity=.55+.16*Math.sin(phase+.5);
-      node.style.transform="translate3d("+x.toFixed(2)+"px,"+
-        y.toFixed(2)+"px,0) scale("+scale.toFixed(3)+")";
-      node.style.opacity=opacity.toFixed(3);
+  // Safari-compatible moving spectrum: advance each FULL-COVERAGE colored
+  // arc together. No short traveling beam; every edge remains illuminated.
+  const spectrumBands=[...modal.querySelectorAll("[data-spectrum-band]")];
+  const spectrumReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
+  const spectrumPeriod=10500; // slow, continuous color motion
+  let spectrumTimer=null,spectrumStart=0,spectrumElapsed=0;
+  function tickSpectrum(){
+    spectrumElapsed=performance.now()-spectrumStart;
+    const shift=100*(spectrumElapsed%spectrumPeriod)/spectrumPeriod;
+    spectrumBands.forEach(path=>{
+      const initial=Number(path.getAttribute("data-initial-offset"))||0;
+      path.setAttribute("stroke-dashoffset",(initial-shift).toFixed(3));
     });
   }
-  function syncAmbientLights(){
-    const active=modal.classList.contains("show")&&!document.hidden&&!ambientReduced.matches;
+  function syncSpectrum(){
+    const active=modal.classList.contains("show")&&!document.hidden&&!spectrumReduce.matches;
     if(!active){
-      if(ambientTimer!==null)clearInterval(ambientTimer);
-      ambientTimer=null;
-      if(ambientReduced.matches)ambientNodes.forEach(node=>{
-        node.style.removeProperty("transform");
-        node.style.removeProperty("opacity");
-      });
+      if(spectrumTimer!==null)clearInterval(spectrumTimer);
+      spectrumTimer=null;
+      if(spectrumReduce.matches){
+        spectrumElapsed=0;
+        spectrumBands.forEach(path=>path.setAttribute(
+          "stroke-dashoffset",path.getAttribute("data-initial-offset")
+        ));
+      }
       return;
     }
-    if(ambientTimer!==null)return;
-    ambientStart=performance.now()-ambientElapsed;
-    moveAmbientLights();
-    ambientTimer=setInterval(moveAmbientLights,32);
+    if(spectrumTimer!==null)return;
+    spectrumStart=performance.now()-spectrumElapsed;
+    tickSpectrum();
+    spectrumTimer=setInterval(tickSpectrum,32);
   }
   const modalVisibility=new MutationObserver(()=>{
     if(modal.classList.contains("show"))lockBackground();
     else unlockBackground();
-    syncAmbientLights();
+    syncSpectrum();
   });
-  document.addEventListener("visibilitychange",syncAmbientLights);
-  ambientReduced.addEventListener?.("change",syncAmbientLights);
+  document.addEventListener("visibilitychange",syncSpectrum);
+  spectrumReduce.addEventListener?.("change",syncSpectrum);
   modalVisibility.observe(modal,{attributes:true,attributeFilter:["class"]});
   modal.addEventListener("touchmove",event=>{
     if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
