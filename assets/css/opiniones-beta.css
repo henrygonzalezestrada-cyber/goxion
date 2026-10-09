@@ -1054,3 +1054,85 @@
     width:36px;height:36px;min-width:36px;flex-basis:36px;
   }
 }
+
+/* ===============================================================
+   OPINIONES 2.7 — luz ambiental trasera / bias lighting
+   La silueta se mantiene fija. No hay recorridos por el contorno.
+   =============================================================== */
+.gx-rb-modal .gx-rb-emblem{
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+}
+.gx-rb-modal .gx-rb-emblem::before{display:none!important}
+.gx-rb-modal .gx-rb-emblem .gx-rb-neon-star{
+  position:relative;
+  z-index:2;
+  display:block;
+  overflow:visible;
+  /* La forma original permanece limpia y sin cambios de geometría. */
+  filter:drop-shadow(0 0 3px rgba(75,214,244,.24));
+}
+.gx-rb-modal .gx-rb-ambient-light{
+  position:absolute;
+  display:block;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  filter:blur(16px);
+  -webkit-filter:blur(16px);
+  transform:translate3d(0,0,0);
+  will-change:transform,opacity;
+  animation-play-state:paused;
+}
+.gx-rb-modal.show .gx-rb-ambient-light{animation-play-state:running}
+.gx-rb-modal .gx-rb-ambient-light--cyan{
+  width:96px;
+  height:83px;
+  left:-24px;
+  top:-16px;
+  background:radial-gradient(ellipse at 48% 55%,rgba(27,242,255,.92) 0%,rgba(0,198,246,.54) 35%,rgba(0,198,246,0) 76%);
+  opacity:.67;
+  animation:gxRbAmbientCyan 6.9s ease-in-out infinite alternate;
+}
+.gx-rb-modal .gx-rb-ambient-light--violet{
+  width:100px;
+  height:90px;
+  right:-24px;
+  top:0;
+  background:radial-gradient(ellipse at 50% 48%,rgba(149,83,255,.89) 0%,rgba(117,59,242,.5) 36%,rgba(117,59,242,0) 76%);
+  opacity:.63;
+  animation:gxRbAmbientViolet 8.2s ease-in-out infinite alternate;
+}
+.gx-rb-modal .gx-rb-ambient-light--blue{
+  width:104px;
+  height:77px;
+  left:2px;
+  bottom:-20px;
+  background:radial-gradient(ellipse at 53% 45%,rgba(54,139,255,.83) 0%,rgba(25,113,244,.44) 36%,rgba(25,113,244,0) 75%);
+  opacity:.54;
+  animation:gxRbAmbientBlue 7.7s ease-in-out infinite alternate;
+}
+@keyframes gxRbAmbientCyan{
+  0%{transform:translate3d(-7px,-5px,0) scale(.89);opacity:.44}
+  50%{transform:translate3d(7px,7px,0) scale(1.13);opacity:.76}
+  100%{transform:translate3d(17px,-2px,0) scale(.98);opacity:.62}
+}
+@keyframes gxRbAmbientViolet{
+  0%{transform:translate3d(10px,-6px,0) scale(1.05);opacity:.66}
+  50%{transform:translate3d(-14px,7px,0) scale(.93);opacity:.47}
+  100%{transform:translate3d(-5px,-9px,0) scale(1.2);opacity:.79}
+}
+@keyframes gxRbAmbientBlue{
+  0%{transform:translate3d(-9px,12px,0) scale(.93);opacity:.41}
+  50%{transform:translate3d(8px,-9px,0) scale(1.15);opacity:.70}
+  100%{transform:translate3d(15px,4px,0) scale(1.01);opacity:.51}
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal .gx-rb-ambient-light{
+    animation:none!important;
+    will-change:auto;
+    transform:none!important;
+    opacity:.42;
+  }
+}
