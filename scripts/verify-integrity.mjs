@@ -834,7 +834,10 @@ for (const absolute of walk(jsRoot)) {
       !rtNotifications.includes('state.confirmAction===action') ||
       !rtNotifications.includes('showActionFeedback("Todo marcado como leído")') ||
       !rtNotifications.includes('showActionFeedback("Todas las notificaciones eliminadas")') ||
-      !rtNotifications.includes('if(!response?.ok)throw new Error')) {
+      !rtNotifications.includes('if(!response?.ok)throw new Error') ||
+      !rtNotifications.includes('sessionEpoch') ||
+      !rtNotifications.includes('state.reloadQueued=true') ||
+      !rtNotifications.includes('scope!=="client_notifications"&&scope!=="resync"')) {
     fail('Notification center beta: falta bloqueo de scroll o confirmación animada validada.');
   }
   for (const triggerName of [

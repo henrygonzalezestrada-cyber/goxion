@@ -5,7 +5,8 @@
   const URL=GXCORE?.endpoint?.("notificaciones-cliente");
   const TOKEN_KEY=GXCORE?.STORAGE?.CLIENT_TOKEN;
   const state={items:[],unread:0,loading:false,initialized:false,pendingDelete:null,viewportBound:false,
-    confirmAction:null,confirmTimer:null,feedbackTimer:null,actionBusy:false,scrollLockY:null,scrollGuardBound:false};
+    confirmAction:null,confirmTimer:null,feedbackTimer:null,actionBusy:false,scrollLockY:null,scrollGuardBound:false,
+    sessionKey:"",sessionEpoch:0,reloadQueued:false,reloadRing:false};
 
   const esc=(v)=>String(v??"")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -58,8 +59,8 @@
   const token=()=>localStorage.getItem(TOKEN_KEY)||"";
   const unreadIds=(items)=>new Set((items||[]).filter(x=>x?.leida!==true).map(x=>String(x.id||"")).filter(Boolean));
 
-  async function api(accion,datos={}){
-    const current=token();
+  // The request always keeps its originating token; never borrow a later account's token.
+  async function api(accion,datos={},current=token()){
     if(!current||!URL)return null;
     const r=await fetch(URL,{
       method:"POST",
@@ -140,7 +141,45 @@
     },{passive:true});
   }
 
+  const sessionSignature=()=>{
+    let clientKey="";
+    try{clientKey=typeof getCurrentClientKey==="function"?String(getCurrentClientKey()||""):"";}catch(_){}
+    return token()+"|"+clientKey;
+  };
+
+  function syncNotificationSession(){
+    const signature=sessionSignature();
+    if(signature===state.sessionKey)return;
+    state.sessionKey=signature;
+    state.sessionEpoch++;
+    state.loading=false;
+    state.reloadQueued=false;
+    state.reloadRing=false;
+    state.initialized=false;
+    state.items=[];
+    state.unread=0;
+    state.actionBusy=false;
+    // Never leave the previous customer's notices visible while the new request loads.
+    document.getElementById("gx-client-notif-list")?.replaceChildren();
+    const badge=document.getElementById("gx-client-notif-badge");
+    if(badge)badge.textContent="0";
+    document.getElementById("gx-client-notif-launch")?.classList.remove("gx-has-new");
+    const read=document.getElementById("gx-client-notif-mark-all");
+    const clear=document.getElementById("gx-client-notif-clear-all");
+    if(read)read.disabled=true;
+    if(clear)clear.disabled=true;
+    clearTimeout(state.confirmTimer);
+    clearTimeout(state.feedbackTimer);
+    if(state.pendingDelete)clearTimeout(state.pendingDelete.timer);
+    state.pendingDelete=null;
+    resetActionConfirmation();
+    hideUndo();
+    document.getElementById("gx-client-notif-feedback")?.classList.remove("show");
+    if(!token()||!signature.split("|")[1])closeSheet();
+  }
+
   function setSessionHeader(){
+    syncNotificationSession();
     const auth=document.getElementById("header-action-btn");
     const text=document.getElementById("header-btn-text");
     const bell=document.getElementById("gx-client-notif-launch");
@@ -404,13 +443,14 @@
 
   async function finalizePendingDelete(){
     const pending=state.pendingDelete;
-    if(!pending)return;
+    if(!pending||pending.epoch!==state.sessionEpoch||pending.signature!==state.sessionKey)return;
     clearTimeout(pending.timer);
     state.pendingDelete=null;
     hideUndo();
     try{
-      await api("eliminar_una",{id:pending.item.id,source:pending.item.source||"general"});
+      await api("eliminar_una",{id:pending.item.id,source:pending.item.source||"general"},pending.token);
     }catch(error){
+      if(pending.epoch!==state.sessionEpoch||pending.signature!==state.sessionKey)return;
       state.items.splice(Math.min(pending.index,state.items.length),0,pending.item);
       if(pending.item.leida!==true)state.unread++;
       render();
@@ -431,7 +471,7 @@
 
   async function schedulePendingDelete(item,index){
     if(state.pendingDelete)await finalizePendingDelete();
-    const pending={item,index,timer:null};
+    const pending={item,index,timer:null,epoch:state.sessionEpoch,signature:state.sessionKey,token:token()};
     state.pendingDelete=pending;
     showUndo();
     pending.timer=setTimeout(()=>finalizePendingDelete(),3200);
@@ -452,25 +492,42 @@
 
   async function load(options={}){
     const realtime=options.realtime===true;
-    if(state.loading||!token())return;
+    syncNotificationSession();
+    const current=token();
+    if(!current)return;
+    if(state.loading){
+      state.reloadQueued=true;
+      state.reloadRing=state.reloadRing||realtime;
+      return;
+    }
+    const epoch=state.sessionEpoch;
+    const signature=state.sessionKey;
     state.loading=true;
     try{
       const before=unreadIds(state.items);
-      const r=await api("listar");
+      const r=await api("listar",{},current);
+      if(epoch!==state.sessionEpoch||signature!==state.sessionKey||current!==token())return;
       if(!r)return;
       const incoming=Array.isArray(r.items)?r.items:[];
       const pendingKey=state.pendingDelete?pendingDeleteKey(state.pendingDelete.item):"";
       state.items=pendingKey?incoming.filter(item=>pendingDeleteKey(item)!==pendingKey):incoming;
       state.unread=state.items.filter(item=>item?.leida!==true).length;
-
       const after=unreadIds(state.items);
       const hasNew=state.initialized && [...after].some(id=>!before.has(id));
       render({ring:realtime&&hasNew});
       state.initialized=true;
     }catch(error){
-      console.warn("GOXION Notificaciones:",error);
+      if(epoch===state.sessionEpoch&&signature===state.sessionKey)
+        console.warn("GOXION Notificaciones:",error);
     }finally{
+      if(epoch!==state.sessionEpoch||signature!==state.sessionKey)return;
       state.loading=false;
+      if(state.reloadQueued){
+        const queuedRealtime=state.reloadRing;
+        state.reloadQueued=false;
+        state.reloadRing=false;
+        setTimeout(()=>load({realtime:queuedRealtime}),0);
+      }
     }
   }
 
@@ -524,13 +581,17 @@
   }
 
   async function markOne(id,source){
+    const epoch=state.sessionEpoch,signature=state.sessionKey,current=token();
     const item=state.items.find(x=>String(x.id)===String(id)&&String(x.source||"general")===String(source||"general"));
     if(!item||item.leida===true)return;
     item.leida=true;
     state.unread=Math.max(0,state.unread-1);
     render();
-    try{await api("marcar_leida",{id,source});}
-    catch(error){item.leida=false;state.unread++;render();console.warn("No se pudo marcar notificación:",error);}
+    try{await api("marcar_leida",{id,source},current);}
+    catch(error){
+      if(epoch!==state.sessionEpoch||signature!==state.sessionKey)return;
+      item.leida=false;state.unread++;render();console.warn("No se pudo marcar notificación:",error);
+    }
   }
 
   function resetActionConfirmation(){
@@ -586,12 +647,14 @@
 
   async function markAll(){
     if(state.actionBusy||state.confirmAction!=="read"||state.unread<=0)return;
+    const epoch=state.sessionEpoch,signature=state.sessionKey,current=token();
     state.actionBusy=true;
     clearTimeout(state.confirmTimer);
     const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
     toolbar?.classList.add("gx-confirm-loading");
     try{
-      const response=await api("marcar_todas");
+      const response=await api("marcar_todas",{},current);
+      if(epoch!==state.sessionEpoch||signature!==state.sessionKey||current!==token())return;
       if(!response?.ok)throw new Error("Sesión de cliente no disponible");
       state.items.forEach(item=>{item.leida=true});
       state.unread=0;
@@ -600,6 +663,7 @@
       render();
       showActionFeedback("Todo marcado como leído");
     }catch(error){
+      if(epoch!==state.sessionEpoch||signature!==state.sessionKey)return;
       state.actionBusy=false;
       resetActionConfirmation();
       showActionFeedback("No se pudo marcar como leído",true);
@@ -609,12 +673,14 @@
 
   async function clearAll(){
     if(state.actionBusy||state.confirmAction!=="clear"||state.items.length<=0)return;
+    const epoch=state.sessionEpoch,signature=state.sessionKey,current=token();
     state.actionBusy=true;
     clearTimeout(state.confirmTimer);
     const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
     toolbar?.classList.add("gx-confirm-loading");
     try{
-      const response=await api("eliminar_todas");
+      const response=await api("eliminar_todas",{},current);
+      if(epoch!==state.sessionEpoch||signature!==state.sessionKey||current!==token())return;
       if(!response?.ok)throw new Error("Sesión de cliente no disponible");
       if(state.pendingDelete){
         clearTimeout(state.pendingDelete.timer);
@@ -628,6 +694,7 @@
       render();
       showActionFeedback("Todas las notificaciones eliminadas");
     }catch(error){
+      if(epoch!==state.sessionEpoch||signature!==state.sessionKey)return;
       state.actionBusy=false;
       resetActionConfirmation();
       showActionFeedback("No se pudieron eliminar",true);
@@ -672,12 +739,26 @@
   }
 
   window.addEventListener("goxion:realtime",(event)=>{
-    if(event.detail?.scope!=="client_notifications")return;
-    load({realtime:true});
+    const scope=event.detail?.scope;
+    if(scope!=="client_notifications"&&scope!=="resync")return;
+    load({realtime:scope==="client_notifications"});
   });
   window.addEventListener("goxion:client-space:updated",()=>{
     ensureUi();
     setSessionHeader();
+  });
+  // Login/logout from another tab and Safari foreground return must not keep stale rows.
+  window.addEventListener("storage",(event)=>{
+    if(event.key!==TOKEN_KEY)return;
+    syncNotificationSession();
+    ensureUi();
+    render();
+    if(token())load();
+  });
+  document.addEventListener("visibilitychange",()=>{
+    if(document.hidden)return;
+    syncNotificationSession();
+    if(token())load();
   });
 
   const baseLogout=window.cerrarSesion;
@@ -688,6 +769,7 @@
       closeSheet();
       state.pendingDelete=null;
       hideUndo();
+      syncNotificationSession();
       state.items=[];
       state.unread=0;
       state.initialized=false;
