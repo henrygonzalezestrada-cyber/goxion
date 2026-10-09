@@ -166,51 +166,52 @@
   .gx-client-notif-launch.gx-ringing .gx-client-notif-clapper{animation:none}
 }
 
-/* Notification sheet · modern GOXION */
+/* Notification sheet · iOS-safe, low-noise GOXION */
 .gx-client-notif-overlay{
   position:fixed;
   inset:0;
-  background:rgba(3,3,5,.68);
-  backdrop-filter:blur(8px);
-  -webkit-backdrop-filter:blur(8px);
+  background:rgba(2,2,4,.64);
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
   z-index:10020;
   opacity:0;
   pointer-events:none;
-  transition:opacity .24s ease;
+  touch-action:none;
+  transition:opacity .22s ease;
 }
 .gx-client-notif-overlay.show{opacity:1;pointer-events:auto}
 
 .gx-client-notif-sheet{
   position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
+  left:10px;
+  right:10px;
+  bottom:calc(var(--gx-notif-vv-bottom,0px) + max(8px,env(safe-area-inset-bottom)));
   z-index:10021;
-  max-height:min(80vh,760px);
-  border-radius:26px 26px 0 0;
+  max-height:var(--gx-notif-panel-max,74dvh);
+  border-radius:26px;
   background:var(--card-glass);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
-  border:1px solid rgba(255,255,255,.08);
-  border-bottom:none;
-  box-shadow:0 -12px 42px rgba(0,0,0,.52);
-  transform:translateY(104%);
+  border:1px solid rgba(255,255,255,.075);
+  box-shadow:0 18px 44px rgba(0,0,0,.48);
+  transform:translateY(calc(100% + 28px));
   transition:transform .34s cubic-bezier(.2,.82,.2,1);
   overflow:hidden;
+  contain:layout paint;
 }
 .gx-client-notif-sheet.show{transform:translateY(0)}
 
 .gx-client-notif-handle{
-  width:38px;
+  width:36px;
   height:4px;
-  margin:9px auto 2px;
+  margin:9px auto 1px;
   border-radius:999px;
-  background:rgba(255,255,255,.15);
+  background:rgba(255,255,255,.14);
 }
 
 .gx-client-notif-head{
-  min-height:58px;
-  padding:10px 12px 8px 16px;
+  min-height:56px;
+  padding:9px 11px 6px 16px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -223,28 +224,29 @@
   font-size:14px;
   line-height:1.2;
   font-weight:800;
+  letter-spacing:-.012em;
 }
 .gx-client-notif-head-copy small{
   display:block;
   margin-top:3px;
   color:var(--text-muted);
-  opacity:.68;
+  opacity:.66;
   font-size:9.5px;
 }
 .gx-client-notif-close{
-  width:34px;
-  min-width:34px;
-  height:34px;
-  min-height:34px;
+  width:36px;
+  min-width:36px;
+  height:36px;
+  min-height:36px;
   padding:0;
   border:0;
   border-radius:50%;
   display:grid;
   place-items:center;
-  color:#030305;
+  color:#020306;
   background:var(--neon-blue);
-  box-shadow:0 0 18px rgba(0,242,254,.16),inset 0 1px 0 rgba(255,255,255,.28);
-  transition:transform .18s ease,box-shadow .2s ease;
+  box-shadow:0 0 18px rgba(0,242,254,.14);
+  transition:transform .16s ease,box-shadow .2s ease;
 }
 .gx-client-notif-close:active{transform:scale(.94)}
 .gx-client-notif-close svg{
@@ -257,14 +259,19 @@
 }
 
 .gx-client-notif-toolbar{
-  min-height:38px;
-  margin:0 12px 9px;
-  padding:0 2px 8px;
+  width:max-content;
+  max-width:calc(100% - 24px);
+  min-height:34px;
+  margin:0 12px 7px auto;
+  padding:3px 7px;
   display:flex;
   align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  border-bottom:1px solid rgba(255,255,255,.055);
+  justify-content:flex-end;
+  gap:11px;
+  border-radius:999px;
+  background:rgba(7,8,12,.44);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
 }
 .gx-client-notif-toolbar button{
   min-height:28px;
@@ -274,44 +281,50 @@
   display:inline-flex;
   align-items:center;
   gap:5px;
-  font-size:9px;
+  font-size:8.8px;
   font-weight:800;
-  letter-spacing:.005em;
-  transition:opacity .18s ease,transform .16s ease;
+  letter-spacing:.002em;
+  white-space:nowrap;
+  transition:opacity .18s ease,transform .15s ease,color .18s ease;
 }
-.gx-client-notif-toolbar button:disabled{opacity:.25}
+.gx-client-notif-toolbar button:disabled{opacity:.22}
 .gx-client-notif-toolbar button:active:not(:disabled){transform:scale(.97)}
 .gx-client-notif-toolbar button svg{
-  width:13px;
-  height:13px;
+  width:12px;
+  height:12px;
   fill:none;
   stroke:currentColor;
   stroke-width:1.9;
   stroke-linecap:round;
   stroke-linejoin:round;
 }
-.gx-client-notif-soft-action{color:var(--neon-blue)}
-.gx-client-notif-clear-all{color:rgba(255,105,142,.72)}
+.gx-client-notif-soft-action{color:rgba(0,242,254,.80)}
+.gx-client-notif-clear-all{color:rgba(217,221,231,.50)}
 .gx-client-notif-clear-all.gx-confirm{
   color:#ff5f88;
-  text-shadow:0 0 12px rgba(255,51,102,.16);
+  text-shadow:0 0 10px rgba(255,51,102,.16);
 }
 
 .gx-client-notif-list{
-  padding:1px 11px calc(24px + env(safe-area-inset-bottom));
-  max-height:calc(min(80vh,760px) - 108px);
+  padding:2px 10px calc(18px + env(safe-area-inset-bottom));
+  max-height:calc(var(--gx-notif-panel-max,74dvh) - 101px);
   overflow:auto;
   overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  mask-image:linear-gradient(to bottom,transparent 0,#000 10px,#000 calc(100% - 22px),transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10px,#000 calc(100% - 22px),transparent 100%);
 }
+.gx-client-notif-list::-webkit-scrollbar{display:none}
 
-/* Solid notification rows over the glass sheet. */
+/* Swipe background exists only while the finger reveals it. */
 .gx-client-notif-swipe{
   --gx-swipe-progress:0;
   position:relative;
-  margin-bottom:8px;
-  border-radius:16px;
+  margin-bottom:7px;
+  border-radius:15px;
   overflow:hidden;
-  background:#ff3366;
+  background:transparent;
 }
 .gx-client-notif-delete-bg{
   position:absolute;
@@ -319,49 +332,39 @@
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:7px;
-  padding-right:18px;
+  gap:6px;
+  padding-right:17px;
   color:#fff;
   background:#ff3366;
-  font-size:9px;
+  font-size:8.8px;
   font-weight:900;
-  letter-spacing:.01em;
-  opacity:calc(.28 + (var(--gx-swipe-progress) * .72));
+  opacity:var(--gx-swipe-progress);
+  pointer-events:none;
 }
 .gx-client-notif-delete-bg svg{
-  width:17px;
-  height:17px;
+  width:16px;
+  height:16px;
   fill:none;
   stroke:currentColor;
   stroke-width:2;
   stroke-linecap:round;
-  transform:scale(calc(.78 + (var(--gx-swipe-progress) * .22)));
-  transition:transform .08s linear;
+  transform:scale(calc(.80 + (var(--gx-swipe-progress) * .20)));
 }
 .gx-client-notif-swipe.gx-delete-ready .gx-client-notif-delete-bg{
   background:#ff275d;
-}
-.gx-client-notif-swipe.gx-delete-ready .gx-client-notif-delete-bg svg{
-  transform:scale(1.08);
 }
 
 .gx-client-notif-item{
   position:relative;
   z-index:1;
-  min-height:76px;
+  min-height:74px;
   padding:13px 13px 12px 15px;
-  border-radius:16px;
-  border:1px solid rgba(255,255,255,.065);
+  border:0;
+  border-radius:15px;
   background:#07070b;
-  box-shadow:0 5px 16px rgba(0,0,0,.24);
-  transition:transform .24s cubic-bezier(.2,.8,.2,1),border-color .2s ease,opacity .18s ease;
+  box-shadow:none;
+  transition:transform .24s cubic-bezier(.2,.8,.2,1),opacity .18s ease;
   touch-action:pan-y;
-}
-.gx-client-notif-swipe.gx-commit-delete .gx-client-notif-item{
-  opacity:.98;
-}
-.gx-client-notif-item.unread{
-  border-color:rgba(0,242,254,.16);
 }
 .gx-client-notif-item.unread:before{
   content:"";
@@ -372,7 +375,7 @@
   height:4px;
   border-radius:50%;
   background:var(--neon-blue);
-  box-shadow:0 0 9px rgba(0,242,254,.48);
+  box-shadow:0 0 8px rgba(0,242,254,.40);
 }
 .gx-client-notif-item-top{
   display:flex;
@@ -383,13 +386,13 @@
 .gx-client-notif-item strong{
   color:rgba(255,255,255,.94);
   font-size:11.6px;
-  line-height:1.35;
+  line-height:1.34;
   font-weight:800;
 }
 .gx-client-notif-time{
   padding-top:1px;
   color:var(--text-muted);
-  opacity:.50;
+  opacity:.48;
   font-size:8.4px;
   white-space:nowrap;
 }
@@ -410,14 +413,14 @@
   border:0;
   background:transparent;
   color:var(--neon-blue);
-  padding:3px 0 2px 7px;
+  padding:3px 0 1px 7px;
   display:inline-flex;
   align-items:center;
   gap:3px;
   font-size:9px;
   font-weight:800;
   white-space:nowrap;
-  opacity:.86;
+  opacity:.82;
 }
 .gx-client-notif-item-action svg{
   width:11px;
@@ -430,50 +433,50 @@
 }
 
 .gx-client-notif-empty{
-  min-height:184px;
+  min-height:176px;
   display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:center;
   text-align:center;
-  padding:26px 18px 34px;
+  padding:24px 18px 30px;
 }
 .gx-client-notif-empty strong{
-  color:rgba(255,255,255,.76);
+  color:rgba(255,255,255,.74);
   font-size:12px;
   font-weight:800;
 }
 .gx-client-notif-empty small{
   margin-top:5px;
   color:var(--text-muted);
-  opacity:.62;
+  opacity:.60;
   font-size:9.5px;
 }
 
-/* Undo behaves like a transient banking-app snackbar, not another panel. */
+/* Undo stays above the browser chrome and does not create another section. */
 .gx-client-notif-undo{
   position:absolute;
   left:50%;
-  bottom:calc(12px + env(safe-area-inset-bottom));
+  bottom:calc(10px + env(safe-area-inset-bottom));
   z-index:5;
   width:max-content;
-  max-width:calc(100% - 30px);
-  min-height:42px;
-  padding:0 9px 0 13px;
-  border-radius:15px;
+  max-width:calc(100% - 28px);
+  min-height:40px;
+  padding:0 8px 0 12px;
+  border-radius:14px;
   display:flex;
   align-items:center;
-  gap:14px;
+  gap:13px;
   color:rgba(255,255,255,.84);
   background:rgba(3,3,5,.92);
-  border:1px solid rgba(255,255,255,.09);
-  box-shadow:0 12px 30px rgba(0,0,0,.42);
+  border:0;
+  box-shadow:0 10px 28px rgba(0,0,0,.40);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
   opacity:0;
   pointer-events:none;
-  transform:translate(-50%,14px) scale(.97);
-  transition:opacity .2s ease,transform .24s cubic-bezier(.2,.8,.2,1);
+  transform:translate(-50%,12px) scale(.98);
+  transition:opacity .18s ease,transform .22s cubic-bezier(.2,.8,.2,1);
 }
 .gx-client-notif-undo.show{
   opacity:1;
@@ -481,36 +484,36 @@
   transform:translate(-50%,0) scale(1);
 }
 .gx-client-notif-undo span{
-  font-size:9.5px;
+  font-size:9.4px;
   font-weight:700;
 }
 .gx-client-notif-undo button{
-  min-height:30px;
-  padding:0 8px;
+  min-height:28px;
+  padding:0 7px;
   border:0;
   background:transparent;
   color:var(--neon-blue);
-  font-size:9.5px;
+  font-size:9.4px;
   font-weight:900;
 }
 
 @media (hover:hover) and (pointer:fine){
   .gx-client-notif-toolbar button:hover:not(:disabled){opacity:.78}
-  .gx-client-notif-close:hover{box-shadow:0 0 22px rgba(0,242,254,.24)}
+  .gx-client-notif-close:hover{box-shadow:0 0 22px rgba(0,242,254,.22)}
   .gx-client-notif-item-action:hover{opacity:1}
 }
 @media(max-width:390px){
+  .gx-client-notif-sheet{left:8px;right:8px}
   .gx-client-notif-head{padding-left:14px;padding-right:10px}
-  .gx-client-notif-toolbar{margin-left:10px;margin-right:10px}
-  .gx-client-notif-list{padding-left:9px;padding-right:9px}
+  .gx-client-notif-toolbar{margin-right:10px}
+  .gx-client-notif-list{padding-left:8px;padding-right:8px}
 }
 @media(min-width:700px){
   .gx-client-notif-sheet{
     left:50%;
     right:auto;
-    width:min(520px,92vw);
-    transform:translate(-50%,104%);
-    border-radius:26px 26px 0 0;
+    width:min(520px,calc(100vw - 28px));
+    transform:translate(-50%,calc(100% + 28px));
   }
   .gx-client-notif-sheet.show{transform:translate(-50%,0)}
 }
