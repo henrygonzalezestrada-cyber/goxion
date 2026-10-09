@@ -275,6 +275,7 @@
         horizontal=false;
         card.style.transition="none";
         shell.classList.remove("gx-delete-ready");
+        shell.style.removeProperty("--gx-swipe-reveal");
       },{passive:true});
 
       card.addEventListener("touchmove",event=>{
@@ -298,6 +299,7 @@
         const progress=Math.min(1,Math.abs(current)/threshold);
         card.style.transform="translateX("+current+"px)";
         shell.style.setProperty("--gx-swipe-progress",String(progress));
+        shell.style.setProperty("--gx-swipe-reveal",Math.abs(current)+"px");
         shell.classList.toggle("gx-delete-ready",Math.abs(current)>=threshold);
       },{passive:false});
 
@@ -314,15 +316,18 @@
         const threshold=Math.min(width*.58,190);
         const shouldDelete=Math.abs(current)>=threshold;
 
-        shell.style.removeProperty("--gx-swipe-progress");
         shell.classList.remove("gx-delete-ready");
 
         if(shouldDelete){
+          shell.style.setProperty("--gx-swipe-progress","1");
+          shell.style.setProperty("--gx-swipe-reveal",width+"px");
           shell.dataset.gxSuppressClickUntil=String(Date.now()+700);
           card.style.transform="translateX("+(-width-24)+"px)";
           shell.classList.add("gx-commit-delete");
           setTimeout(()=>deleteBySwipe(shell),170);
         }else{
+          shell.style.removeProperty("--gx-swipe-progress");
+          shell.style.removeProperty("--gx-swipe-reveal");
           card.style.transform="";
         }
         horizontal=false;
