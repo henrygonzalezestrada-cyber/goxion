@@ -814,9 +814,14 @@ for (const absolute of walk(jsRoot)) {
   if (!notificationCss.includes('.gx-client-notif-close') ||
       !notificationCss.includes('background:var(--card-glass)') ||
       !notificationCss.includes('.gx-client-notif-swipe') ||
+      !notificationCss.includes('--gx-notif-vv-bottom') ||
+      !notificationCss.includes('visibility:hidden') ||
+      !notificationCss.includes('mask-image:linear-gradient') ||
       !rtNotifications.includes('bindSwipeRows(list)') ||
+      !rtNotifications.includes('syncNotificationViewport()') ||
+      rtNotifications.includes('document.body.style.overflow') ||
       !rtNotifications.includes('eliminar_una')) {
-    fail('Notification center actions: se perdió el contrato glass o el swipe de eliminación.');
+    fail('Notification center actions: se perdió glass, safe-area iOS, scroll continuo o swipe de eliminación.');
   }
   for (const triggerName of [
     'gx_notify_referral_progress',

@@ -4,7 +4,7 @@
   const GXCORE=window.GOXION_CORE;
   const URL=GXCORE?.endpoint?.("notificaciones-cliente");
   const TOKEN_KEY=GXCORE?.STORAGE?.CLIENT_TOKEN;
-  const state={items:[],unread:0,loading:false,initialized:false,pendingDelete:null};
+  const state={items:[],unread:0,loading:false,initialized:false,pendingDelete:null,viewportBound:false};
 
   const esc=(v)=>String(v??"")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -73,6 +73,27 @@
       throw e;
     }
     return j;
+  }
+
+  function syncNotificationViewport(){
+    const vv=window.visualViewport;
+    const viewportHeight=Math.max(320,Math.round(vv?.height||window.innerHeight||640));
+    const layoutHeight=Math.max(viewportHeight,Math.round(window.innerHeight||viewportHeight));
+    const offsetTop=Math.max(0,Math.round(vv?.offsetTop||0));
+    const bottomGap=Math.max(0,layoutHeight-viewportHeight-offsetTop);
+    const panelMax=Math.max(300,Math.min(760,Math.round(viewportHeight*.78)));
+
+    document.documentElement.style.setProperty("--gx-notif-vv-bottom",bottomGap+"px");
+    document.documentElement.style.setProperty("--gx-notif-panel-max",panelMax+"px");
+  }
+
+  function bindNotificationViewport(){
+    if(state.viewportBound)return;
+    state.viewportBound=true;
+    syncNotificationViewport();
+    window.addEventListener("resize",syncNotificationViewport,{passive:true});
+    window.visualViewport?.addEventListener("resize",syncNotificationViewport,{passive:true});
+    window.visualViewport?.addEventListener("scroll",syncNotificationViewport,{passive:true});
   }
 
   function setSessionHeader(){
@@ -535,11 +556,13 @@
 
   function openSheet(){
     ensureUi();
+    bindNotificationViewport();
+    syncNotificationViewport();
     document.getElementById("gx-client-notif-overlay")?.classList.add("show");
     const sheet=document.getElementById("gx-client-notif-sheet");
     sheet?.classList.add("show");
     sheet?.setAttribute("aria-hidden","false");
-    document.body.style.overflow="hidden";
+    document.documentElement.classList.add("gx-notif-open");
     load();
   }
 
@@ -548,7 +571,7 @@
     const sheet=document.getElementById("gx-client-notif-sheet");
     sheet?.classList.remove("show");
     sheet?.setAttribute("aria-hidden","true");
-    document.body.style.overflow="";
+    document.documentElement.classList.remove("gx-notif-open");
   }
 
   const baseRender=window.renderDashboard;
@@ -592,6 +615,7 @@
   }
 
   document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>{
+    bindNotificationViewport();
     ensureUi();
     const active=setSessionHeader();
     if(active)load();
