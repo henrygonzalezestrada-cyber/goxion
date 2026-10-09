@@ -1055,10 +1055,11 @@
   }
 }
 
-/* ===============================================================
-   OPINIONES 2.7 — luz ambiental trasera / bias lighting
-   La silueta se mantiene fija. No hay recorridos por el contorno.
-   =============================================================== */
+/* ================================================================
+   OPINIONES 2.8 — Google TV-inspired full-spectrum illuminated rim
+   Based on reference video: continuously colored EDGES + glow escaping
+   outward. No roaming blobs; no isolated moving stroke/pointer.
+   ================================================================ */
 .gx-rb-modal .gx-rb-emblem{
   position:relative;
   isolation:isolate;
@@ -1067,57 +1068,50 @@
 .gx-rb-modal .gx-rb-emblem::before{display:none!important}
 .gx-rb-modal .gx-rb-emblem .gx-rb-neon-star{
   position:relative;
-  z-index:2;
-  display:block;
+  z-index:1;
   overflow:visible;
-  /* La forma original permanece limpia y sin cambios de geometría. */
-  filter:drop-shadow(0 0 3px rgba(75,214,244,.24));
+  filter:none!important;
 }
-.gx-rb-modal .gx-rb-ambient-light{
-  position:absolute;
-  display:block;
-  border-radius:50%;
+.gx-rb-modal .gx-rb-neon-star-line{
+  fill:none;
+  stroke:#32638c!important;
+  stroke-width:2.1px;
+  opacity:.56;
+  stroke-dasharray:none!important;
+  stroke-dashoffset:0!important;
+  animation:none!important;
+  filter:none!important;
+}
+.gx-rb-modal .gx-rb-spectrum-outer,
+.gx-rb-modal .gx-rb-spectrum-inner,
+.gx-rb-modal .gx-rb-spectrum-edge{
+  fill:none;
+  stroke-linejoin:round;
+  stroke-linecap:butt;
   pointer-events:none;
-  z-index:0;
-  filter:blur(16px);
-  -webkit-filter:blur(16px);
-  transform:translate3d(0,0,0);
-  will-change:transform,opacity;
-  /* Position is advanced in JS for reliable iOS Safari behavior. */
   animation:none!important;
 }
-.gx-rb-modal .gx-rb-ambient-light--cyan{
-  width:96px;
-  height:83px;
-  left:-24px;
-  top:-16px;
-  background:radial-gradient(ellipse at 48% 55%,rgba(27,242,255,.92) 0%,rgba(0,198,246,.54) 35%,rgba(0,198,246,0) 76%);
-  opacity:.67;
-  animation:none!important;
+.gx-rb-modal .gx-rb-spectrum-outer{
+  stroke-width:17px;
+  opacity:.76;
+  filter:url(#gx-rb-spectrum-outer);
 }
-.gx-rb-modal .gx-rb-ambient-light--violet{
-  width:100px;
-  height:90px;
-  right:-24px;
-  top:0;
-  background:radial-gradient(ellipse at 50% 48%,rgba(149,83,255,.89) 0%,rgba(117,59,242,.5) 36%,rgba(117,59,242,0) 76%);
-  opacity:.63;
-  animation:none!important;
+.gx-rb-modal .gx-rb-spectrum-inner{
+  stroke-width:7px;
+  opacity:.84;
+  filter:url(#gx-rb-spectrum-inner);
 }
-.gx-rb-modal .gx-rb-ambient-light--blue{
-  width:104px;
-  height:77px;
-  left:2px;
-  bottom:-20px;
-  background:radial-gradient(ellipse at 53% 45%,rgba(54,139,255,.83) 0%,rgba(25,113,244,.44) 36%,rgba(25,113,244,0) 75%);
-  opacity:.54;
-  animation:none!important;
+.gx-rb-modal .gx-rb-spectrum-edge{
+  stroke-width:2.6px;
+  opacity:1;
+  filter:drop-shadow(0 0 2px currentColor);
 }
+.gx-rb-modal .gx-rb-spectrum-cyan{stroke:#00f2fe;color:#00f2fe}
+.gx-rb-modal .gx-rb-spectrum-blue{stroke:#3c7bff;color:#3c7bff}
+.gx-rb-modal .gx-rb-spectrum-violet{stroke:#ae59ff;color:#ae59ff}
+.gx-rb-modal .gx-rb-spectrum-ice{stroke:#87b0ff;color:#87b0ff}
 @media(prefers-reduced-motion:reduce){
-  .gx-rb-modal .gx-rb-ambient-light{
-    animation:none!important;
-    will-change:auto;
-    transform:none!important;
-    opacity:.42;
-  }
+  .gx-rb-modal .gx-rb-spectrum-outer,
+  .gx-rb-modal .gx-rb-spectrum-inner,
+  .gx-rb-modal .gx-rb-spectrum-edge{animation:none!important}
 }
