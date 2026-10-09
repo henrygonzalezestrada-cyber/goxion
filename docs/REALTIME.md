@@ -74,6 +74,20 @@ Durante validación, únicamente las páginas bajo `preview/realtime/` cargan lo
 5. Actualización modular correcta en Mi Espacio, Estado de cuenta y Admin.
 6. Integración a oficiales en un PR separado.
 
+## Cierre de beta y protección de regresiones (octubre 2026)
+
+La promoción a producción **no** se realiza desde un preview ni copiando todo el HTML de la beta. Solo se agregan a `ayuda.html`, `admin.html` e `index.html` los adaptadores/estilos aprobados con sus rutas relativas correctas. La regla de `scripts/verify-integrity.mjs` que hoy prohíbe Realtime en oficiales deberá actualizarse **en el mismo PR de producción**; hasta entonces funciona como barrera contra un despliegue prematuro.
+
+Suite adicional: `npm run test:realtime`. Usa Chromium, WebKit, una fixture independiente y respuestas simuladas (no escribe datos en Supabase). Comprueba:
+- confirmación en dos toques, resultado y estado final de la bandeja;
+- separación de clientes ante respuestas tardías, además del borrado inmediato de UI al cambiar de sesión;
+- invalidaciones concurrentes, `resync` y vuelta de Safari a primer plano;
+- contratos entre adaptadores de Ayuda, Admin e Index sin reconstruir el catálogo;
+- salida de sesión sin conservar avisos ajenos.
+
+La suite aislada **no sustituye** una prueba funcional con cuentas de ensayo en las páginas completas. Antes del PR oficial hay que validar los eventos reales (registro, pedido, pago, acceso, beneficio) desde Admin ↔ Ayuda ↔ Index, suspensión de Safari, sesión expirada, desconexión y protección del estado visual. Las pruebas generales de navegador y carrito deben revisarse por separado cuando fallen, sin desactivar comprobaciones para hacer verde el CI.
+
+
 
 ### Centro de actividad
 
