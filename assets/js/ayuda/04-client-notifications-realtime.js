@@ -4,7 +4,8 @@
   const GXCORE=window.GOXION_CORE;
   const URL=GXCORE?.endpoint?.("notificaciones-cliente");
   const TOKEN_KEY=GXCORE?.STORAGE?.CLIENT_TOKEN;
-  const state={items:[],unread:0,loading:false,initialized:false,pendingDelete:null,viewportBound:false};
+  const state={items:[],unread:0,loading:false,initialized:false,pendingDelete:null,viewportBound:false,
+    confirmAction:null,confirmTimer:null,feedbackTimer:null,actionBusy:false,scrollLockY:null,scrollGuardBound:false};
 
   const esc=(v)=>String(v??"")
     .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
@@ -96,6 +97,49 @@
     window.visualViewport?.addEventListener("scroll",syncNotificationViewport,{passive:true});
   }
 
+  /* iOS Safari: stop scroll chaining to the dashboard without changing body overflow or position. */
+  function bindSheetScrollGuard(){
+    if(state.scrollGuardBound)return;
+    state.scrollGuardBound=true;
+    let startX=0,startY=0;
+    const open=()=>document.documentElement.classList.contains("gx-notif-open");
+    document.addEventListener("touchstart",event=>{
+      if(!open())return;
+      const finger=event.touches?.[0];
+      if(finger){startX=finger.clientX;startY=finger.clientY;}
+    },{capture:true,passive:true});
+    document.addEventListener("touchmove",event=>{
+      if(!open()||!event.cancelable)return;
+      const list=event.target.closest?.("#gx-client-notif-list");
+      if(!list){event.preventDefault();return;}
+      const finger=event.touches?.[0];
+      if(!finger){event.preventDefault();return;}
+      const dx=finger.clientX-startX,dy=finger.clientY-startY;
+      // Let the existing notification-swipe handler own horizontal gestures.
+      if(Math.abs(dx)>Math.abs(dy)+3)return;
+      if(list.scrollHeight<=list.clientHeight+1||
+         (dy>0&&list.scrollTop<=0)||
+         (dy<0&&list.scrollTop+list.clientHeight>=list.scrollHeight-1)){
+        event.preventDefault();
+      }
+    },{capture:true,passive:false});
+    document.addEventListener("wheel",event=>{
+      if(!open()||!event.cancelable)return;
+      const list=event.target.closest?.("#gx-client-notif-list");
+      if(!list||list.scrollHeight<=list.clientHeight+1||
+         (event.deltaY<0&&list.scrollTop<=0)||
+         (event.deltaY>0&&list.scrollTop+list.clientHeight>=list.scrollHeight-1)){
+        event.preventDefault();
+      }
+    },{capture:true,passive:false});
+    window.addEventListener("scroll",()=>{
+      if(!open()||state.scrollLockY===null)return;
+      if(Math.abs(window.scrollY-state.scrollLockY)>1||Math.abs(window.scrollX)>1){
+        window.scrollTo(0,state.scrollLockY);
+      }
+    },{passive:true});
+  }
+
   function setSessionHeader(){
     const auth=document.getElementById("header-action-btn");
     const text=document.getElementById("header-btn-text");
@@ -174,7 +218,7 @@
       sheet.innerHTML=
         '<div class="gx-client-notif-handle"></div>'+
         '<div class="gx-client-notif-head">'+
-          '<div class="gx-client-notif-toolbar" aria-label="Acciones de notificaciones">'+
+          '<div class="gx-client-notif-toolbar" role="toolbar" aria-label="Acciones de notificaciones">'+
             '<button type="button" id="gx-client-notif-mark-all" class="gx-client-notif-soft-action" aria-label="Marcar todo como leído" title="Marcar todo como leído"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 12 4 4L18 6"></path><path d="m10 16 2 2 8-8"></path></svg></button>'+
             '<button type="button" id="gx-client-notif-clear-all" class="gx-client-notif-clear-all" aria-label="Eliminar todo" title="Eliminar todo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M7 7l1 13h8l1-13"></path></svg></button>'+
           '</div>'+
@@ -182,11 +226,13 @@
           '<button type="button" class="gx-client-notif-close" aria-label="Cerrar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6 18 18M18 6 6 18"></path></svg></button>'+
         '</div>'+
         '<div id="gx-client-notif-list" class="gx-client-notif-list"></div>'+
-        '<div id="gx-client-notif-undo" class="gx-client-notif-undo" aria-live="polite" aria-hidden="true"><span>Notificación eliminada</span><button type="button">Deshacer</button></div>';
+        '<div id="gx-client-notif-undo" class="gx-client-notif-undo" aria-live="polite" aria-hidden="true"><span>Notificación eliminada</span><button type="button">Deshacer</button></div>'+
+        '<div id="gx-client-notif-feedback" class="gx-client-notif-feedback" role="status" aria-live="polite" aria-atomic="true">'+
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"></path></svg><span></span></div>';
       document.body.appendChild(sheet);
       sheet.querySelector(".gx-client-notif-close").onclick=()=>closeSheet();
-      sheet.querySelector("#gx-client-notif-mark-all").onclick=()=>markAll();
-      sheet.querySelector("#gx-client-notif-clear-all").onclick=()=>armClearAll();
+      sheet.querySelector("#gx-client-notif-mark-all").onclick=()=>armActionConfirmation("read");
+      sheet.querySelector("#gx-client-notif-clear-all").onclick=()=>armActionConfirmation("clear");
       sheet.querySelector("#gx-client-notif-undo button").onclick=()=>undoPendingDelete();
     }
 
@@ -203,11 +249,11 @@
     const markAllBtn=document.getElementById("gx-client-notif-mark-all");
     const clearAllBtn=document.getElementById("gx-client-notif-clear-all");
 
-    if(markAllBtn)markAllBtn.disabled=state.unread<=0;
-    if(clearAllBtn){
-      clearAllBtn.disabled=state.items.length<=0;
-      if(state.items.length<=0)resetClearAll();
-    }
+    if(markAllBtn)markAllBtn.disabled=state.unread<=0&&!state.actionBusy;
+    if(clearAllBtn)clearAllBtn.disabled=state.items.length<=0&&!state.actionBusy;
+    if(!state.actionBusy&&state.confirmAction&&
+       ((state.confirmAction==="read"&&state.unread<=0)||
+        (state.confirmAction==="clear"&&state.items.length<=0)))resetActionConfirmation();
 
     if(badge)badge.textContent=state.unread>99?"99+":String(state.unread);
     if(launch){
@@ -487,73 +533,104 @@
     catch(error){item.leida=false;state.unread++;render();console.warn("No se pudo marcar notificación:",error);}
   }
 
-  async function markAll(){
-    if(state.unread<=0)return;
-    const backup=state.items.map(x=>({...x}));
-    const backupUnread=state.unread;
-    state.items.forEach(x=>{x.leida=true});
-    state.unread=0;
-    render();
-    try{await api("marcar_todas");}
-    catch(error){state.items=backup;state.unread=backupUnread;render();console.warn("No se pudieron marcar notificaciones:",error);}
+  function resetActionConfirmation(){
+    if(state.actionBusy)return;
+    clearTimeout(state.confirmTimer);
+    state.confirmTimer=null;
+    state.confirmAction=null;
+    const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
+    toolbar?.classList.remove("gx-confirm-read","gx-confirm-clear","gx-confirm-loading");
+    const read=document.getElementById("gx-client-notif-mark-all");
+    const clear=document.getElementById("gx-client-notif-clear-all");
+    for(const [button,label] of [[read,"Marcar todo como leído"],[clear,"Eliminar todo"]]){
+      if(!button)continue;
+      button.setAttribute("aria-label",label);
+      button.setAttribute("title",label);
+      button.setAttribute("aria-pressed","false");
+      button.removeAttribute("aria-busy");
+    }
   }
 
-  function resetClearAll(){
-    const btn=document.getElementById("gx-client-notif-clear-all");
-    if(!btn)return;
-    clearTimeout(btn._gxConfirmTimer);
-    btn._gxArmed=false;
-    btn.classList.remove("gx-confirm");
-    btn.removeAttribute("aria-busy");
-    btn.setAttribute("aria-label","Eliminar todo");
-    btn.setAttribute("title","Eliminar todo");
-  }
-
-  function armClearAll(){
-    const btn=document.getElementById("gx-client-notif-clear-all");
-    if(!btn||state.items.length<=0)return;
-
-    if(btn._gxArmed){
-      clearAll();
+  function armActionConfirmation(action){
+    if(state.actionBusy||!["read","clear"].includes(action))return;
+    if(action==="read"&&state.unread<=0)return;
+    if(action==="clear"&&state.items.length<=0)return;
+    if(state.confirmAction===action){
+      if(action==="read")markAll();
+      else clearAll();
       return;
     }
+    resetActionConfirmation();
+    state.confirmAction=action;
+    const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
+    const button=document.getElementById(action==="read"?"gx-client-notif-mark-all":"gx-client-notif-clear-all");
+    toolbar?.classList.add(action==="read"?"gx-confirm-read":"gx-confirm-clear");
+    button?.setAttribute("aria-label",action==="read"?"Confirmar marcar todo como leído":"Confirmar eliminar todas las notificaciones");
+    button?.setAttribute("title",action==="read"?"Toca otra vez para marcar todo":"Toca otra vez para eliminar todo");
+    button?.setAttribute("aria-pressed","true");
+    state.confirmTimer=setTimeout(()=>resetActionConfirmation(),3400);
+  }
 
-    btn._gxArmed=true;
-    btn.classList.add("gx-confirm");
-    btn.setAttribute("aria-label","Confirmar eliminar todo");
-    btn.setAttribute("title","Confirmar eliminar todo");
-    clearTimeout(btn._gxConfirmTimer);
-    btn._gxConfirmTimer=setTimeout(()=>resetClearAll(),2800);
+  function showActionFeedback(message,error=false){
+    const node=document.getElementById("gx-client-notif-feedback");
+    if(!node||!document.getElementById("gx-client-notif-sheet")?.classList.contains("show"))return;
+    clearTimeout(state.feedbackTimer);
+    node.querySelector("span").textContent=message;
+    node.classList.toggle("gx-error",error);
+    node.classList.remove("show");
+    // Reflow allows two successive actions to animate independently.
+    void node.offsetWidth;
+    node.classList.add("show");
+    state.feedbackTimer=setTimeout(()=>node.classList.remove("show"),3000);
+  }
+
+  async function markAll(){
+    if(state.actionBusy||state.confirmAction!=="read"||state.unread<=0)return;
+    state.actionBusy=true;
+    clearTimeout(state.confirmTimer);
+    const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
+    toolbar?.classList.add("gx-confirm-loading");
+    try{
+      const response=await api("marcar_todas");
+      if(!response?.ok)throw new Error("Sesión de cliente no disponible");
+      state.items.forEach(item=>{item.leida=true});
+      state.unread=0;
+      state.actionBusy=false;
+      resetActionConfirmation();
+      render();
+      showActionFeedback("Todo marcado como leído");
+    }catch(error){
+      state.actionBusy=false;
+      resetActionConfirmation();
+      showActionFeedback("No se pudo marcar como leído",true);
+      console.warn("No se pudieron marcar notificaciones:",error);
+    }
   }
 
   async function clearAll(){
-    const btn=document.getElementById("gx-client-notif-clear-all");
-    if(!btn||(state.items.length<=0&&!state.pendingDelete))return;
-
-    if(state.pendingDelete){
-      clearTimeout(state.pendingDelete.timer);
-      state.pendingDelete=null;
-      hideUndo();
-    }
-
-    const backup=state.items.map(x=>({...x}));
-    const backupUnread=state.unread;
-    btn.disabled=true;
-    btn.setAttribute("aria-busy","true");
-    btn.setAttribute("aria-label","Eliminando notificaciones");
-
-    state.items=[];
-    state.unread=0;
-    render();
-
+    if(state.actionBusy||state.confirmAction!=="clear"||state.items.length<=0)return;
+    state.actionBusy=true;
+    clearTimeout(state.confirmTimer);
+    const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
+    toolbar?.classList.add("gx-confirm-loading");
     try{
-      await api("eliminar_todas");
-      resetClearAll();
-    }catch(error){
-      state.items=backup;
-      state.unread=backupUnread;
+      const response=await api("eliminar_todas");
+      if(!response?.ok)throw new Error("Sesión de cliente no disponible");
+      if(state.pendingDelete){
+        clearTimeout(state.pendingDelete.timer);
+        state.pendingDelete=null;
+        hideUndo();
+      }
+      state.items=[];
+      state.unread=0;
+      state.actionBusy=false;
+      resetActionConfirmation();
       render();
-      resetClearAll();
+      showActionFeedback("Todas las notificaciones eliminadas");
+    }catch(error){
+      state.actionBusy=false;
+      resetActionConfirmation();
+      showActionFeedback("No se pudieron eliminar",true);
       console.warn("No se pudieron eliminar las notificaciones:",error);
     }
   }
@@ -561,7 +638,10 @@
   function openSheet(){
     ensureUi();
     bindNotificationViewport();
+    bindSheetScrollGuard();
     syncNotificationViewport();
+    state.scrollLockY=window.scrollY;
+    if(document.scrollingElement)document.scrollingElement.scrollLeft=0;
     document.getElementById("gx-client-notif-overlay")?.classList.add("show");
     const sheet=document.getElementById("gx-client-notif-sheet");
     sheet?.classList.add("show");
@@ -571,6 +651,10 @@
   }
 
   function closeSheet(){
+    state.scrollLockY=null;
+    resetActionConfirmation();
+    clearTimeout(state.feedbackTimer);
+    document.getElementById("gx-client-notif-feedback")?.classList.remove("show");
     document.getElementById("gx-client-notif-overlay")?.classList.remove("show");
     const sheet=document.getElementById("gx-client-notif-sheet");
     sheet?.classList.remove("show");
@@ -601,6 +685,7 @@
     const wrappedLogout=function(...args){
       const result=baseLogout.apply(this,args);
       if(state.pendingDelete)clearTimeout(state.pendingDelete.timer);
+      closeSheet();
       state.pendingDelete=null;
       hideUndo();
       state.items=[];

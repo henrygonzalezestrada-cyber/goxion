@@ -825,6 +825,18 @@ for (const absolute of walk(jsRoot)) {
       !rtNotifications.includes('eliminar_una')) {
     fail('Notification center actions: se perdió glass, safe-area iOS, scroll continuo o swipe de eliminación.');
   }
+  // Realtime beta: iOS scroll containment + two-tap morph confirmations.
+  if (!notificationCss.includes('overflow-x:clip') ||
+      !notificationCss.includes('gx-confirm-read::before') ||
+      !notificationCss.includes('gx-confirm-clear::after') ||
+      !notificationCss.includes('.gx-client-notif-feedback') ||
+      !rtNotifications.includes('bindSheetScrollGuard()') ||
+      !rtNotifications.includes('state.confirmAction===action') ||
+      !rtNotifications.includes('showActionFeedback("Todo marcado como leído")') ||
+      !rtNotifications.includes('showActionFeedback("Todas las notificaciones eliminadas")') ||
+      !rtNotifications.includes('if(!response?.ok)throw new Error')) {
+    fail('Notification center beta: falta bloqueo de scroll o confirmación animada validada.');
+  }
   for (const triggerName of [
     'gx_notify_referral_progress',
     'gx_notify_mission_progress',
