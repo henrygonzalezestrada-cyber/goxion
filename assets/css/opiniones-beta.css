@@ -859,3 +859,100 @@
     will-change:auto;
   }
 }
+
+/* =========================================================
+   OPINIONES 2.5 — cristal real en Safari + haz que ilumina
+   Solo Ayuda beta. El diseño de Admin no se modifica.
+   ========================================================= */
+
+/* FIX iOS/WebKit:
+   La máscara aplicada al CONTENEDOR del marquee lo convierte en
+   backdrop root; aunque las reseñas tenían blur(10px), el vidrio
+   no podía difuminar la estela luminosa que está DETRÁS de la sección.
+   Mantenemos la superficie sin máscara ni aislamiento y colocamos
+   el desvanecimiento únicamente en dos overlays sin descendientes. */
+#view-inicio .gx-rb-home {
+  isolation:auto!important;
+}
+#view-inicio .gx-rb-marquee {
+  isolation:auto!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  overflow:hidden;
+}
+#view-inicio .gx-rb-marquee::before,
+#view-inicio .gx-rb-marquee::after {
+  content:"";
+  display:block!important;
+  position:absolute;
+  z-index:3;
+  top:0;
+  bottom:0;
+  width:36px;
+  pointer-events:none;
+  background:rgba(3,3,5,.24);
+  -webkit-backdrop-filter:blur(9px);
+  backdrop-filter:blur(9px);
+}
+#view-inicio .gx-rb-marquee::before {
+  left:0;
+  -webkit-mask-image:linear-gradient(to right,#000,transparent);
+  mask-image:linear-gradient(to right,#000,transparent);
+}
+#view-inicio .gx-rb-marquee::after {
+  right:0;
+  -webkit-mask-image:linear-gradient(to left,#000,transparent);
+  mask-image:linear-gradient(to left,#000,transparent);
+}
+#view-inicio .gx-rb-quote{
+  /* Mismos 4 ingredientes de .glass-card y .benefit-box de Ayuda. */
+  background:var(--card-glass)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+  backdrop-filter:blur(10px)!important;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+/* Luz viajera: mismo contorno aprobado, pero el segmento ahora
+   enciende visiblemente la arista con bloom SVG + punta brillante.
+   El reloj existente actualiza los offsets al mismo tiempo para Safari. */
+.gx-rb-modal .gx-rb-neon-star-bloom,
+.gx-rb-modal .gx-rb-neon-star-spark{
+  fill:none;
+  pointer-events:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  animation:none!important;
+}
+.gx-rb-modal .gx-rb-neon-star-bloom{
+  stroke:url(#gx-rb-star-gradient);
+  stroke-width:8px;
+  stroke-dasharray:47 53;
+  opacity:.96;
+}
+.gx-rb-modal .gx-rb-neon-star-trail{
+  stroke-width:2.8px;
+  stroke-dasharray:43 57;
+  opacity:.77;
+  /* La luz difusa principal se dibuja con feGaussianBlur SVG,
+     sin duplicar un halo estático alrededor de toda la estrella. */
+  filter:drop-shadow(0 0 2.7px rgba(0,242,254,.7));
+}
+.gx-rb-modal .gx-rb-neon-star-runner{
+  stroke-width:1.65px;
+  stroke-dasharray:32 68;
+  filter:drop-shadow(0 0 3px rgba(0,242,254,.88));
+}
+.gx-rb-modal .gx-rb-neon-star-spark{
+  stroke:#caffff;
+  stroke-width:1.85px;
+  stroke-dasharray:6 94;
+  filter:drop-shadow(0 0 3px rgba(0,242,254,.98))
+         drop-shadow(0 0 6px rgba(124,77,255,.8));
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal .gx-rb-neon-star-bloom,
+  .gx-rb-modal .gx-rb-neon-star-spark{
+    animation:none!important;
+  }
+}
