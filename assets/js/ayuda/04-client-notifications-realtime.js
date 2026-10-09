@@ -573,7 +573,7 @@
 
   function showActionFeedback(message,error=false){
     const node=document.getElementById("gx-client-notif-feedback");
-    if(!node)return;
+    if(!node||!document.getElementById("gx-client-notif-sheet")?.classList.contains("show"))return;
     clearTimeout(state.feedbackTimer);
     node.querySelector("span").textContent=message;
     node.classList.toggle("gx-error",error);
@@ -591,7 +591,8 @@
     const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
     toolbar?.classList.add("gx-confirm-loading");
     try{
-      await api("marcar_todas");
+      const response=await api("marcar_todas");
+      if(!response?.ok)throw new Error("Sesión de cliente no disponible");
       state.items.forEach(item=>{item.leida=true});
       state.unread=0;
       state.actionBusy=false;
@@ -613,7 +614,8 @@
     const toolbar=document.querySelector("#gx-client-notif-sheet .gx-client-notif-toolbar");
     toolbar?.classList.add("gx-confirm-loading");
     try{
-      await api("eliminar_todas");
+      const response=await api("eliminar_todas");
+      if(!response?.ok)throw new Error("Sesión de cliente no disponible");
       if(state.pendingDelete){
         clearTimeout(state.pendingDelete.timer);
         state.pendingDelete=null;
