@@ -24,6 +24,11 @@ try{
   for(const [name,engine] of Object.entries({chromium,webkit})){
     const browser=await engine.launch({headless:true});
     const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'no-preference'});
+    if(name==='webkit'){
+      const nativeWait=page.waitForFunction.bind(page);
+      page.waitForFunction=(expression,arg,options={})=>
+        nativeWait(expression,arg,{polling:100,...options});
+    }
     page.on('pageerror', e=>console.error('PAGE',e.message));
     let posts=[], fail=true, remaining=2;
     await page.route('**/*.supabase.co/**',async route=>{
