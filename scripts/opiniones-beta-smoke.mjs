@@ -173,8 +173,8 @@ try{
       assert.equal(hero.ambientCount,3,'Cyan, violeta y azul detrás de estrella');
       assert.equal(hero.ambientBehind,true,'Luces detrás de la silueta');
       assert.equal(hero.hasPathFollower,false,'La luz ambiental no sigue la línea');
-      assert(hero.names.every(name=>/gxRbAmbient/.test(name)));
-      assert(hero.states.every(state=>state==='running'),'El ambiente se anima cuando modal está abierto');
+      assert(hero.names.every(name=>name==='none'),
+        'Safari: movimiento controlado por JavaScript, no por keyframes SVG/CSS');
       assert(hero.colors.every(bg=>bg.includes('radial-gradient')),'Las luces son halos difusos');
       const ambientBefore=await page.locator('.gx-rb-ambient-light').evaluateAll(
         nodes=>nodes.map(node=>getComputedStyle(node).transform)
