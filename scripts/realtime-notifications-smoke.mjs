@@ -159,10 +159,12 @@ try{
       await page.evaluate(()=>window.dispatchEvent(new CustomEvent('goxion:realtime',{
         detail:{scope:'resync',operation:'RECONNECT'}
       })));
-      await page.waitForFunction(n=>window.__resyncTestReady===true||false,null,
-        {timeout:300}).catch(()=>{});
       await pause(350);
       assert(listCount['token-B']>beforeResync,'resync debe consultar la bandeja');
+      const beforeVisible=listCount['token-B'];
+      await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+      await pause(350);
+      assert(listCount['token-B']>beforeVisible,'Al volver Safari debe revalidar notificaciones');
 
       // Three modular consumers, without rebuilding the catalogue on a notification.
       await page.evaluate(()=>{
