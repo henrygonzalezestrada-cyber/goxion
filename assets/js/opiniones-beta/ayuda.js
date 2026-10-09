@@ -82,10 +82,55 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
+  // Safari/WebKit can suspend CSS keyframes on layered blurred elements.
+  // Animate the three independent LED-like glows by updating their transforms,
+  // not by tracing the star outline. The timer runs ONLY while visible.
+  const ambientNodes=[...modal.querySelectorAll(".gx-rb-ambient-light")];
+  const ambientReduced=window.matchMedia("(prefers-reduced-motion: reduce)");
+  const ambientParams=[
+    {period:6900,phase:-.6,x:13,y:9,baseX:2,baseY:-2,scale:1.01},
+    {period:8200,phase:1.5,x:15,y:8,baseX:-1,baseY:1,scale:1.06},
+    {period:7700,phase:3.4,x:10,y:12,baseX:1,baseY:2,scale:1.00}
+  ];
+  let ambientTimer=null,ambientStart=0,ambientElapsed=0;
+  function moveAmbientLights(){
+    ambientElapsed=performance.now()-ambientStart;
+    ambientNodes.forEach((node,index)=>{
+      const p=ambientParams[index];
+      if(!p)return;
+      const phase=ambientElapsed*(2*Math.PI)/p.period+p.phase;
+      const x=p.baseX+p.x*Math.sin(phase);
+      const y=p.baseY+p.y*Math.cos(phase*.82);
+      const scale=p.scale+.12*Math.sin(phase-.3);
+      const opacity=.55+.16*Math.sin(phase+.5);
+      node.style.transform="translate3d("+x.toFixed(2)+"px,"+
+        y.toFixed(2)+"px,0) scale("+scale.toFixed(3)+")";
+      node.style.opacity=opacity.toFixed(3);
+    });
+  }
+  function syncAmbientLights(){
+    const active=modal.classList.contains("show")&&!document.hidden&&!ambientReduced.matches;
+    if(!active){
+      if(ambientTimer!==null)clearInterval(ambientTimer);
+      ambientTimer=null;
+      if(ambientReduced.matches)ambientNodes.forEach(node=>{
+        node.style.removeProperty("transform");
+        node.style.removeProperty("opacity");
+      });
+      return;
+    }
+    if(ambientTimer!==null)return;
+    ambientStart=performance.now()-ambientElapsed;
+    moveAmbientLights();
+    ambientTimer=setInterval(moveAmbientLights,32);
+  }
   const modalVisibility=new MutationObserver(()=>{
     if(modal.classList.contains("show"))lockBackground();
     else unlockBackground();
+    syncAmbientLights();
   });
+  document.addEventListener("visibilitychange",syncAmbientLights);
+  ambientReduced.addEventListener?.("change",syncAmbientLights);
   modalVisibility.observe(modal,{attributes:true,attributeFilter:["class"]});
   modal.addEventListener("touchmove",event=>{
     if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
