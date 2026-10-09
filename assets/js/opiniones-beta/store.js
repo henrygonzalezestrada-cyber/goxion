@@ -8,7 +8,8 @@
     const date=new Date().toISOString();
     return [
       {id:"gx-rb-sample-1",rating:5,text:"La atención fue muy clara y me gustó poder consultar mis servicios en un solo lugar.",author:"Cliente de ejemplo",consent:true,verified:true,sample:true,status:"published",date,reply:""},
-      {id:"gx-rb-sample-2",rating:4,text:"El espacio de cliente es práctico. Me gustaría ver todavía más opciones en el catálogo.",author:"Cliente de ejemplo",consent:true,verified:true,sample:true,status:"published",date,reply:""}
+      {id:"gx-rb-sample-2",rating:4,text:"El espacio de cliente es práctico. Me gustaría ver todavía más opciones en el catálogo.",author:"Cliente de ejemplo",consent:true,verified:true,sample:true,status:"published",date,reply:""},
+      {id:"gx-rb-sample-3",rating:3,text:"El servicio cumple, aunque una guía de primeros pasos más visible ayudaría bastante.",author:"Cliente de ejemplo",consent:true,verified:true,sample:true,status:"pending",date,reply:""}
     ];
   };
   function load(){
