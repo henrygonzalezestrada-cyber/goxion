@@ -434,3 +434,269 @@
 @media(prefers-reduced-motion:reduce){
   .gx-rb-demo-bar--ayuda a,#view-inicio .gx-rb-home-cta{transition:none}
 }
+
+/* =========================================================
+   Opiniones 2.2 — acabado final del CLIENTE (Admin intacto)
+   ========================================================= */
+
+/* Cinta editorial continua, sin contenedor ni líneas divisorias. */
+#view-inicio .gx-rb-home {
+  margin:4px 0 20px;
+  padding:12px 0 6px;
+  border:0!important;
+  border-top:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible;
+}
+#view-inicio .gx-rb-home::before,
+#view-inicio .gx-rb-home::after {display:none!important}
+#view-inicio .gx-rb-home-top {padding:0 2px 14px}
+#view-inicio .gx-rb-home h2 {font-size:16px;font-weight:650;letter-spacing:-.35px}
+#view-inicio .gx-rb-marquee {
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  isolation:isolate;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%);
+}
+#view-inicio .gx-rb-marquee::before,
+#view-inicio .gx-rb-marquee::after {display:none}
+#view-inicio .gx-rb-track {
+  width:100%;
+  display:flex;
+  flex-wrap:nowrap;
+  gap:0;
+  margin:0;
+  padding:3px 0 12px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  touch-action:pan-x;
+  scroll-behavior:auto!important;
+  scroll-snap-type:none!important;
+  scrollbar-width:none;
+}
+#view-inicio .gx-rb-track::-webkit-scrollbar {display:none}
+#view-inicio .gx-rb-marquee-group {
+  display:flex;
+  flex:0 0 auto;
+  align-items:stretch;
+  gap:11px;
+  padding-right:11px;
+}
+#view-inicio .gx-rb-quote {
+  flex:0 0 min(265px,calc(100vw - 105px));
+  width:min(265px,calc(100vw - 105px));
+  min-height:112px;
+  border-radius:16px;
+  background:rgba(8,8,12,.27);
+  border:1px solid rgba(255,255,255,.072);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  padding:13px 14px;
+  gap:7px;
+}
+#view-inicio .gx-rb-quote::before {display:none}
+#view-inicio .gx-rb-quote p {
+  font-size:11px;
+  line-height:1.65;
+  color:#e5eaf5;
+  font-weight:400;
+}
+#view-inicio .gx-rb-quote .gx-rb-rating svg {width:12px;height:12px}
+#view-inicio .gx-rb-byline {font-size:9px;gap:4px}
+#view-inicio .gx-rb-example-note {
+  padding:0 2px;
+  font-size:9px;
+  color:#8295ab;
+}
+#view-inicio .gx-rb-home-count,
+#view-inicio .gx-rb-home-footer,
+#view-inicio .gx-rb-home-cta {display:none!important}
+
+/* Estrella HERO: la línea de neón forma la figura por completo. */
+.gx-rb-modal .gx-rb-emblem {
+  width:98px;
+  height:91px;
+  margin:0 auto 5px;
+  background:none!important;
+  border:0!important;
+  border-radius:0;
+  box-shadow:none!important;
+  display:grid;
+  place-items:center;
+  overflow:visible;
+  color:#00f2fe;
+  isolation:isolate;
+}
+.gx-rb-modal .gx-rb-emblem::before {
+  content:"";
+  position:absolute;
+  width:65px;height:65px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(124,77,255,.20),transparent 73%);
+  filter:blur(15px);
+  z-index:-1;
+}
+.gx-rb-modal .gx-rb-emblem .gx-rb-neon-star {
+  width:93px;
+  height:93px;
+  display:block;
+  overflow:visible;
+  filter:drop-shadow(0 0 7px rgba(0,242,254,.36));
+}
+.gx-rb-neon-star-line {
+  fill:none;
+  stroke:url(#gx-rb-star-gradient);
+  stroke-width:2.7px;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-dasharray:340;
+  stroke-dashoffset:340;
+  animation:gxRbNeonTrace 1.2s cubic-bezier(.22,.84,.28,1) forwards,
+    gxRbNeonBreath 4s ease-in-out 1.2s infinite;
+}
+.gx-rb-neon-star-halo {
+  fill:none;
+  stroke:#00f2fe;
+  stroke-width:5.5px;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:.4;
+  filter:blur(5px);
+  animation:gxRbNeonHalo 4s ease-in-out infinite;
+}
+@keyframes gxRbNeonTrace {to{stroke-dashoffset:0}}
+@keyframes gxRbNeonBreath {0%,100%{stroke-width:2.7px}50%{stroke-width:3.3px}}
+@keyframes gxRbNeonHalo {0%,100%{opacity:.22}50%{opacity:.46}}
+
+/* Cerrar siempre con el acento cyan, sin aro de foco automático. */
+.gx-rb-modal .gx-rb-close {
+  color:var(--neon-blue,#00f2fe);
+  border:1px solid rgba(0,242,254,.23);
+  background:rgba(0,242,254,.055);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+  transition:background .2s,box-shadow .2s,transform .2s;
+}
+.gx-rb-modal .gx-rb-close:hover {
+  color:#b9fdff;
+  background:rgba(0,242,254,.105);
+  box-shadow:0 0 12px rgba(0,242,254,.11);
+}
+.gx-rb-modal .gx-rb-close:active {transform:scale(.95)}
+
+/* Un único botón real pasa de Enviar opinión a ✓ Listo.
+   El formulario colapsa en lugar de montar una segunda tarjeta. */
+.gx-rb-modal .gx-rb-fields {
+  max-height:720px;
+  opacity:1;
+  overflow:visible;
+  transition:max-height .43s cubic-bezier(.22,.84,.25,1),opacity .21s ease;
+}
+.gx-rb-modal .gx-rb-fields[hidden] {display:none!important}
+.gx-rb-modal .gx-rb-form-head {
+  transition:margin .38s ease,padding .38s ease;
+}
+.gx-rb-modal .gx-rb-form-head .gx-rb-intro {
+  max-height:100px;
+  opacity:1;
+  overflow:hidden;
+  transition:max-height .32s ease,opacity .23s ease,margin .32s ease;
+}
+.gx-rb-modal .gx-rb-submit {
+  margin:10px auto 0;
+  max-width:100%;
+  transition:width .46s cubic-bezier(.18,1.2,.24,1),
+    border-radius .46s ease,background .35s ease,
+    box-shadow .35s ease,transform .3s ease,color .35s ease;
+}
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell {
+  overflow:clip!important;
+  overscroll-behavior:none;
+  touch-action:none;
+  width:min(100%,400px);
+  max-height:none;
+}
+/* Earlier ornamental glows were positioned beyond the card's lower edge:
+   on iOS they expanded scrollHeight even when the contents were collapsed. */
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell::before,
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell::after {
+  display:none!important;
+}
+.gx-rb-modal.gx-rb-complete {
+  overscroll-behavior:none;
+  touch-action:none;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-form {
+  padding:28px 22px 30px;
+  text-align:center;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-form-head {
+  padding:0 2px;
+  margin:0 auto 7px;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-emblem {
+  width:104px;height:102px;
+  margin:0 auto 10px;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-emblem svg {width:99px;height:99px}
+.gx-rb-modal.gx-rb-complete .gx-rb-eyebrow {display:none}
+.gx-rb-modal.gx-rb-complete .gx-rb-form h2 {
+  margin:5px 0 0;
+  font-size:21px;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-form-head .gx-rb-intro {
+  max-height:0;
+  opacity:0;
+  margin:0;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-fields {
+  opacity:0;
+  max-height:0;
+  overflow:hidden;
+  margin:0;
+  pointer-events:none;
+  visibility:hidden;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-success-screen {
+  position:relative;
+  z-index:1;
+  text-align:center;
+  width:100%;
+  padding:0 8px 10px;
+  margin:0 auto;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-success-screen p {
+  max-width:305px;
+  margin:0 auto;
+  font-size:12px;
+  line-height:1.65;
+  color:#a6b6cd;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-submit.is-success {
+  width:142px;
+  min-height:45px;
+  margin:10px auto 0;
+  border-radius:100px;
+  background:rgba(0,242,254,.075);
+  color:#bdfaff;
+  border:1px solid rgba(0,242,254,.32);
+  box-shadow:0 0 22px rgba(0,242,254,.08),inset 0 1px 0 rgba(255,255,255,.04);
+  animation:gxRbMorphSettle .5s cubic-bezier(.2,1.3,.3,1) both;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-submit.is-success svg {
+  width:17px;height:17px;
+  stroke-width:2.5px;
+}
+@keyframes gxRbMorphSettle {0%{transform:scale(.94)}60%{transform:scale(1.045)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){
+  .gx-rb-neon-star-line,.gx-rb-neon-star-halo,
+  .gx-rb-modal .gx-rb-submit.is-success {animation:none!important}
+  .gx-rb-neon-star-line {stroke-dashoffset:0!important}
+  .gx-rb-modal .gx-rb-fields,
+  .gx-rb-modal .gx-rb-submit {transition:none!important}
+}
