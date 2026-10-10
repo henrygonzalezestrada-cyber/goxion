@@ -12,26 +12,27 @@
     badge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 1.6 3.1.2.3 3.1L20 12l-1.8 3.1-.3 3.1-3.1.2L12 20l-2.8-1.6-3.1-.2-.3-3.1L4 12l1.8-3.1.3-3.1 3.1-.2L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.8 12.1 2.1 2.1 4.2-4.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
   };
 
-  // Inspired by the actual user-supplied Google TV motion reference:
-  // all of the perimeter stays luminous. Colored segments flow smoothly
-  // around its edges, casting soft light outward (not drifting blobs).
+  // Seam-free chromatic light. One continuous multi-stop SVG gradient is
+  // shared by the front silhouette and its two blurred backlight layers.
+  // No quarter-circle/dashed segments: adjacent hues literally interpolate.
   const starShape="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z";
-  const starSpectrum=["cyan","blue","violet","ice"];
-  const starBandMarkup=kind=>starSpectrum.map((color,index)=>
-    '<path class="gx-rb-spectrum-'+kind+' gx-rb-spectrum-'+color+
-    '" data-spectrum-band="true" data-initial-offset="'+(-index*25)+
-    '" pathLength="100" stroke-dasharray="25 75" stroke-dashoffset="'+
-    (-index*25)+'" d="'+starShape+'"/>'
-  ).join("");
   const heroStar='<svg class="gx-rb-neon-star" viewBox="0 0 100 100" aria-hidden="true">'+
     '<defs>'+
-      '<filter id="gx-rb-spectrum-outer" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4.4"/></filter>'+
-      '<filter id="gx-rb-spectrum-inner" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2"/></filter>'+
+      '<linearGradient id="gx-rb-fluid-spectrum" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100" gradientTransform="rotate(0 50 50)">'+
+        '<stop offset="0%" stop-color="#00f2fe"/>'+
+        '<stop offset="18%" stop-color="#2ea9ff"/>'+
+        '<stop offset="39%" stop-color="#7859ee"/>'+
+        '<stop offset="60%" stop-color="#ae67fb"/>'+
+        '<stop offset="81%" stop-color="#4a89ff"/>'+
+        '<stop offset="100%" stop-color="#77f5fc"/>'+
+      '</linearGradient>'+
+      '<filter id="gx-rb-fluid-outer" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4.4"/></filter>'+
+      '<filter id="gx-rb-fluid-inner" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="1.9"/></filter>'+
     '</defs>'+
     '<path class="gx-rb-neon-star-line" d="'+starShape+'"/>'+
-    starBandMarkup("outer")+
-    starBandMarkup("inner")+
-    starBandMarkup("edge")+
+    '<path class="gx-rb-spectrum-outer" d="'+starShape+'"/>'+
+    '<path class="gx-rb-spectrum-inner" d="'+starShape+'"/>'+
+    '<path class="gx-rb-spectrum-edge" d="'+starShape+'"/>'+
     '</svg>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
@@ -91,19 +92,17 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
-  // Safari-compatible moving spectrum: advance each FULL-COVERAGE colored
-  // arc together. No short traveling beam; every edge remains illuminated.
-  const spectrumBands=[...modal.querySelectorAll("[data-spectrum-band]")];
+  // Smooth rotation changes the light's color field — not the star
+  // geometry. Updating one SVG gradient is Safari/WebKit-compatible.
+  const fluidGradient=modal.querySelector("#gx-rb-fluid-spectrum");
   const spectrumReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
-  const spectrumPeriod=10500; // slow, continuous color motion
+  const spectrumPeriod=13000;
   let spectrumTimer=null,spectrumStart=0,spectrumElapsed=0;
   function tickSpectrum(){
+    if(!fluidGradient)return;
     spectrumElapsed=performance.now()-spectrumStart;
-    const shift=100*(spectrumElapsed%spectrumPeriod)/spectrumPeriod;
-    spectrumBands.forEach(path=>{
-      const initial=Number(path.getAttribute("data-initial-offset"))||0;
-      path.setAttribute("stroke-dashoffset",(initial-shift).toFixed(3));
-    });
+    const angle=360*(spectrumElapsed%spectrumPeriod)/spectrumPeriod;
+    fluidGradient.setAttribute("gradientTransform","rotate("+angle.toFixed(2)+" 50 50)");
   }
   function syncSpectrum(){
     const active=modal.classList.contains("show")&&!document.hidden&&!spectrumReduce.matches;
@@ -112,9 +111,7 @@
       spectrumTimer=null;
       if(spectrumReduce.matches){
         spectrumElapsed=0;
-        spectrumBands.forEach(path=>path.setAttribute(
-          "stroke-dashoffset",path.getAttribute("data-initial-offset")
-        ));
+        fluidGradient?.setAttribute("gradientTransform","rotate(0 50 50)");
       }
       return;
     }
