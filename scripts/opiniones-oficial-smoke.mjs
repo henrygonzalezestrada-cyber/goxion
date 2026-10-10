@@ -114,7 +114,7 @@ try{
       await admin.route('**/functions/v1/**',handler);
       await admin.goto(origin+'/admin.html',{waitUntil:'domcontentloaded',timeout:30000});
       await until(admin,()=>!!window.GOXION_REVIEWS&&typeof window.gxOpenOpinionsAdmin==='function');
-      assert.match(await admin.locator('body').innerText(),/Opiniones/);
+      assert.equal(await admin.locator('button[onclick="gxOpenOpinionsAdmin()" ]').count(),1,'Acceso a Opiniones dentro de Gestión');
       await admin.evaluate(()=>localStorage.setItem(window.GOXION_CORE.STORAGE.ADMIN_TOKEN,'test-admin-token'));
       await admin.evaluate(()=>window.gxOpenOpinionsAdmin());
       await until(admin,()=>document.querySelector('#gx-rb-stat-pending')?.textContent==='1');
