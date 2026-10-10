@@ -196,6 +196,8 @@ try{
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
         buttonGradient:getComputedStyle(document.querySelector('.gx-rb-submit')).backgroundImage,
+        buttonColor:getComputedStyle(document.querySelector('.gx-rb-submit')).color,
+        buttonShadow:getComputedStyle(document.querySelector('.gx-rb-submit')).boxShadow,
         emblem:document.querySelectorAll('.gx-rb-form-head .gx-rb-emblem svg').length
       }));
       assert.equal(modalSkin.scoreBorder,'none');
@@ -219,6 +221,18 @@ try{
       assert.equal(await page.locator('#gx-rb-submit').innerText(),'Listo');
       assert.equal(await page.locator('#gx-rb-submit svg').count(),0,
         'El botón tiene solo texto: el check protagonista nace de la estrella');
+      const doneButtonStyle=await page.locator('#gx-rb-submit').evaluate(btn=>{
+        const style=getComputedStyle(btn);
+        return {background:style.backgroundImage,color:style.color,
+          shadow:style.boxShadow,borderWidth:style.borderTopWidth};
+      });
+      assert.equal(doneButtonStyle.background,modalSkin.buttonGradient,
+        'Enviar y Listo conservan exactamente el mismo degradado sólido');
+      assert.equal(doneButtonStyle.color,modalSkin.buttonColor,
+        'Enviar y Listo conservan el mismo contraste de texto');
+      assert.equal(doneButtonStyle.shadow,modalSkin.buttonShadow,
+        'La sombra de marca permanece consistente en el morph');
+      assert.equal(doneButtonStyle.borderWidth,'0px');
       await dom(page,()=>document.querySelector('.gx-rb-emblem')?.classList.contains('gx-rb-morph-done'),3000);
       const transformed=await page.evaluate(()=>{
         const emblem=document.querySelector('.gx-rb-emblem');
