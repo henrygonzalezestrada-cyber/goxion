@@ -1107,3 +1107,26 @@
   .gx-rb-modal .gx-rb-neon-star-halo{animation:none!important;opacity:.38}
   .gx-rb-modal .gx-rb-neon-star-line{animation:none!important}
 }
+
+/* OPINIONES 3.2 — una confirmación protagonista, estrella → check.
+   La forma SVG se interpola a mano; el contorno no hace un segundo efecto. */
+.gx-rb-modal.gx-rb-complete .gx-rb-neon-star-halo{
+  animation:none!important;
+  opacity:.35;
+}
+.gx-rb-modal .gx-rb-emblem.gx-rb-morph-done .gx-rb-neon-star-line{
+  stroke:#a0fbf5!important;
+  stroke-width:3.65px;
+}
+.gx-rb-modal .gx-rb-emblem.gx-rb-morph-done .gx-rb-neon-star-halo{
+  stroke:#00f2fe!important;
+  opacity:.38;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-submit.is-success{
+  width:118px;
+  justify-content:center;
+  gap:0;
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal.gx-rb-complete .gx-rb-neon-star-halo{animation:none!important}
+}
