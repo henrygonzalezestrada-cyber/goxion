@@ -1,5 +1,7 @@
 # GOXION · Centro de Comunicaciones Inteligentes
 
+> **Regla de integración:** consultar primero [el registro canónico de funciones de GOXION](ADMIN_FUNCTION_REGISTRY.md). Comunicaciones no administra promociones, descuentos, misiones ni incidencias: consume datos de los módulos propietarios. La beta actual puede mostrar opciones redundantes y es solo un laboratorio no aprobado para el Admin oficial.
+
 Estado: **beta de simulación**, 2026-10-09. No altera `admin.html` ni envía notificaciones.
 
 ## Recursos de esta entrega
