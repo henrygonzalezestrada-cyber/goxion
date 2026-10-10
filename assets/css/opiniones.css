@@ -1,0 +1,1166 @@
+/* GOXION OPINIONES OFICIALES · diseño aprobado beta 3.3 */
+:root { --gx-rb-ink:#edf4ff;--gx-rb-muted:#9ba9c5;--gx-rb-cyan:#54f2ff;--gx-rb-violet:#9772ff;--gx-rb-gold:#ffc96e;--gx-rb-border:rgba(167,196,243,.14); }
+.gx-rb-demo-bar { position:relative;z-index:5001;max-width:580px;margin:0 auto 12px;padding:9px 12px;border:1px solid rgba(97,239,250,.25);background:linear-gradient(110deg,rgba(27,34,63,.92),rgba(23,18,44,.93));border-radius:16px;box-shadow:0 8px 30px rgba(0,0,0,.24);color:#f3f7ff;font-family:Poppins,system-ui,sans-serif;font-size:10px;display:flex;align-items:center;justify-content:space-between;gap:10px }
+.gx-rb-demo-bar strong { font-size:10px;letter-spacing:.07em } .gx-rb-demo-bar span {display:block;opacity:.72;font-size:9px;margin-top:1px}
+.gx-rb-demo-bar a {display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;border-radius:999px;padding:9px 12px;background:rgba(105,230,255,.1);border:1px solid rgba(110,243,255,.23);font-size:10px;text-decoration:none;color:#99f5ff;font-weight:700}
+.gx-rb-demo-bar a:focus-visible{outline:2px solid #9af5ff;outline-offset:3px}
+.gx-rb-home { margin:14px 0 32px;position:relative;isolation:isolate;border:1px solid var(--gx-rb-border);border-radius:23px;padding:17px 0 16px;background:linear-gradient(140deg,rgba(39,38,80,.49),rgba(12,20,36,.68) 55%,rgba(16,30,35,.38));box-shadow:0 16px 45px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.045);overflow:hidden }
+.gx-rb-home:before{content:"";position:absolute;width:190px;height:170px;border-radius:50%;left:-120px;top:-90px;background:rgba(116,84,249,.24);filter:blur(46px);pointer-events:none}
+.gx-rb-home-top{padding:0 17px 14px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.gx-rb-kicker{display:block;font-size:9px;letter-spacing:.17em;text-transform:uppercase;color:#90d8ec;font-weight:750}
+.gx-rb-home h2{margin:4px 0 0;color:#fff;font-size:18px;font-weight:740;letter-spacing:-.03em;line-height:1.24}
+.gx-rb-home-count{font-size:10px;color:var(--gx-rb-muted);white-space:nowrap}
+.gx-rb-track{display:flex;align-items:stretch;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:16px;padding:2px 16px 13px;scrollbar-width:none;overscroll-behavior-x:contain}
+.gx-rb-track::-webkit-scrollbar{display:none}
+.gx-rb-quote{flex:0 0 min(84%,320px);scroll-snap-align:start;background:rgba(255,255,255,.035);border:1px solid rgba(199,212,255,.10);border-radius:18px;padding:14px 15px;min-height:125px;display:flex;flex-direction:column;gap:8px;position:relative}
+.gx-rb-rating{display:flex;align-items:center;gap:3px;color:var(--gx-rb-gold)}
+.gx-rb-rating svg{width:13px;height:13px;fill:currentColor}
+.gx-rb-quote p{margin:0;color:#f1f1fb;font-size:11px;font-weight:450;line-height:1.6;flex:1;overflow-wrap:anywhere}
+.gx-rb-byline{display:flex;align-items:center;gap:6px;color:#9eacc9;font-size:9px;font-weight:550}
+.gx-rb-byline svg{width:13px;height:13px;color:#5be6d2}
+.gx-rb-example-note{color:#8f9db3;font-size:9px;padding:0 17px 11px;line-height:1.4}
+.gx-rb-home-footer{padding:0 17px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.gx-rb-home-footer span{font-size:10px;color:#96a9c0}
+.gx-rb-home-cta{font-family:inherit;cursor:pointer;border:1px solid rgba(108,239,253,.28);background:rgba(83,205,245,.12);color:#baf8ff;padding:10px 14px;border-radius:100px;font-size:10px;font-weight:700;white-space:nowrap}
+.gx-rb-home-cta:hover{background:rgba(83,205,245,.19)}
+.gx-rb-empty{text-align:center;padding:16px;color:#a9bad2;font-size:11px}
+.gx-rb-modal .modal-content.gx-rb-shell{position:relative;overflow:hidden;background:linear-gradient(146deg,rgba(21,22,40,.97),rgba(10,13,24,.985))!important;border:1px solid rgba(172,190,248,.17)!important;border-radius:27px!important;padding:0!important;width:min(calc(100vw - 30px),440px);max-height:min(91dvh,760px);overflow-y:auto;box-shadow:0 28px 85px rgba(0,0,0,.57),0 0 55px rgba(101,73,238,.10)!important;text-align:left!important;scrollbar-width:thin}
+.gx-rb-modal .modal-content.gx-rb-shell:before{content:"";position:absolute;top:-145px;right:-90px;width:290px;height:265px;background:radial-gradient(circle,rgba(106,78,255,.19),transparent 68%);pointer-events:none}
+.gx-rb-modal .modal-content.gx-rb-shell:after{content:"";position:absolute;bottom:-100px;left:-120px;width:240px;height:205px;background:radial-gradient(circle,rgba(39,203,233,.11),transparent 70%);pointer-events:none}
+.gx-rb-form{position:relative;z-index:1;padding:25px 23px 22px}
+.gx-rb-eyebrow{color:var(--gx-rb-cyan);font-size:9px;font-weight:800;letter-spacing:.15em;text-transform:uppercase}
+.gx-rb-close{position:absolute;right:17px;top:16px;border:1px solid rgba(255,255,255,.09);border-radius:100%;display:grid;place-items:center;width:32px;height:32px;background:rgba(255,255,255,.045);color:#cedafa;cursor:pointer;z-index:2}
+.gx-rb-close svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;stroke-linecap:round;fill:none}
+.gx-rb-form h2{font-size:24px;line-height:1.2;letter-spacing:-.055em;color:#f5f7ff;font-weight:740;margin:7px 0 7px}
+.gx-rb-intro{color:#9ca9c5;margin:0 25px 22px 0;font-size:11px;line-height:1.6}
+.gx-rb-score{padding:16px 11px 13px;text-align:center;border:1px solid rgba(163,183,240,.12);background:rgba(255,255,255,.028);border-radius:19px}
+.gx-rb-score-label{color:#bdc8df;display:block;font-size:10px;letter-spacing:.02em;margin-bottom:10px}
+.gx-rb-stars{display:flex;align-items:center;justify-content:center;gap:7px}
+.gx-rb-star{position:relative;border:0;background:transparent;padding:4px;cursor:pointer;width:44px;height:45px;color:rgba(207,220,245,.22);transition:transform .26s cubic-bezier(.18,1.6,.32,1),color .24s ease,filter .24s ease;touch-action:manipulation}
+.gx-rb-star svg{width:100%;height:100%;fill:currentColor;stroke:currentColor;stroke-width:1.3;stroke-linejoin:round;overflow:visible}
+.gx-rb-star.is-lit{color:var(--gx-rb-gold);filter:drop-shadow(0 1px 7px rgba(255,178,76,.24))}
+.gx-rb-star:hover,.gx-rb-star:focus-visible{transform:scale(1.12)}
+.gx-rb-star.is-chosen{animation:gxRbStarPop .52s cubic-bezier(.18,1.4,.3,1) both}
+.gx-rb-star.is-chosen:after{content:"✦";position:absolute;right:-3px;top:-9px;color:#ffe7a6;font-size:13px;animation:gxRbTwinkle .57s ease-out forwards;pointer-events:none}
+@keyframes gxRbStarPop{0%{transform:scale(.72) rotate(-13deg)}49%{transform:scale(1.23) rotate(4deg)}100%{transform:scale(1)}}
+@keyframes gxRbTwinkle{0%{transform:scale(.4);opacity:0}30%{opacity:1}100%{transform:translate(11px,-13px) scale(.4);opacity:0}}
+.gx-rb-rating-feedback{display:block;min-height:20px;margin-top:10px;color:var(--gx-rb-gold);font-size:11px;font-weight:650}
+.gx-rb-fieldhead{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-top:20px;margin-bottom:8px}
+.gx-rb-fieldhead label{font-size:11px;font-weight:650;color:#e7e9f5}
+.gx-rb-counter{font-size:10px;color:#8896b2;font-variant-numeric:tabular-nums}
+.gx-rb-text{display:block;width:100%;height:108px;box-sizing:border-box;border:1px solid rgba(174,191,236,.18);border-radius:16px;background:rgba(1,5,16,.39);font-family:inherit;color:#ecf5ff;padding:14px;font-size:12px;line-height:1.65;resize:vertical;outline:none;transition:border-color .22s,box-shadow .22s}
+.gx-rb-text:focus{border-color:rgba(115,217,245,.67);box-shadow:0 0 0 3px rgba(78,213,247,.07)}
+.gx-rb-text::placeholder{color:#697a9a}
+.gx-rb-consent{display:flex;align-items:flex-start;gap:11px;margin-top:17px;padding:12px;border:1px solid rgba(191,207,243,.105);background:rgba(255,255,255,.025);border-radius:15px;cursor:pointer}
+.gx-rb-consent input{appearance:none;-webkit-appearance:none;width:34px;min-width:34px;height:20px;border-radius:12px;background:rgba(153,169,198,.25);position:relative;cursor:pointer;border:1px solid rgba(191,207,243,.16);margin:1px 0 0;transition:background .25s}
+.gx-rb-consent input:before{content:"";position:absolute;width:14px;height:14px;left:2px;top:2px;background:#cad4e8;border-radius:50%;transition:transform .23s cubic-bezier(.2,1,.3,1)}
+.gx-rb-consent input:checked{background:rgba(87,198,209,.7)}
+.gx-rb-consent input:checked:before{transform:translateX(14px);background:#fff}
+.gx-rb-consent strong{display:block;color:#e7ebf9;font-size:10.5px;margin-bottom:3px}
+.gx-rb-consent small{display:block;color:#90a0ba;line-height:1.5;font-size:9.5px}
+.gx-rb-formnote{font-size:9px;color:#8799b5;margin:10px 2px 0;line-height:1.5}
+.gx-rb-error{color:#ff9eab;font-size:10px;margin-top:11px;min-height:0;line-height:1.5}
+.gx-rb-submit{margin-top:13px;width:100%;border:1px solid rgba(104,236,250,.25);border-radius:15px;min-height:47px;background:linear-gradient(120deg,#6beaff,#85a6ff 65%,#bca4ff);color:#091422;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:filter .2s,transform .2s}
+.gx-rb-submit:hover{filter:brightness(1.06)}
+.gx-rb-submit:active{transform:scale(.986)}
+.gx-rb-submit:disabled{opacity:.5;cursor:not-allowed}
+.gx-rb-submit svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.gx-rb-submit.is-success{background:#53cfa0;border-color:#53cfa0;animation:gxRbSubmitPop .45s ease}
+@keyframes gxRbSubmitPop{40%{transform:scale(.965)}100%{transform:scale(1)}}
+.gx-rb-success-screen{text-align:center;padding:40px 22px 30px;position:relative;z-index:1}
+.gx-rb-success-icon{width:60px;height:60px;border:1px solid rgba(100,241,194,.35);border-radius:50%;background:rgba(68,199,153,.1);display:grid;place-items:center;margin:0 auto 18px;color:#68e5bf}
+.gx-rb-success-icon svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.gx-rb-success-screen h2{color:#f2f9ff;font-size:22px;letter-spacing:-.04em;margin:0 0 8px}
+.gx-rb-success-screen p{color:#a2b0c8;font-size:11px;line-height:1.7;max-width:270px;margin:0 auto 18px}
+.gx-rb-done{background:rgba(115,229,242,.1);color:#aef9ff;border:1px solid rgba(100,235,248,.23);padding:11px 26px;border-radius:999px;font-family:inherit;font-weight:700;cursor:pointer}
+/* Admin review center */
+.gx-rb-admin{margin:20px 0 26px;border-radius:24px;border:1px solid rgba(145,178,230,.16);background:linear-gradient(135deg,rgba(31,29,62,.56),rgba(11,19,31,.77));padding:19px 17px 17px;box-shadow:0 12px 36px rgba(0,0,0,.14);font-family:Rajdhani,Poppins,system-ui,sans-serif;color:var(--gx-rb-ink)}
+.gx-rb-admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.gx-rb-admin-head h2{margin:3px 0 2px;font-size:24px;letter-spacing:-.025em;line-height:1.15}
+.gx-rb-admin-head p{font:500 11px/1.6 Poppins,system-ui,sans-serif;color:#9caac3;margin:0}
+.gx-rb-admin-tag{padding:7px 10px;border:1px solid rgba(99,223,243,.25);border-radius:100px;color:#95eaf6;background:rgba(77,205,237,.07);font:700 9px Poppins,system-ui,sans-serif;white-space:nowrap}
+.gx-rb-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-bottom:15px}
+.gx-rb-stat{border:1px solid rgba(152,170,222,.10);border-radius:15px;padding:11px 12px;background:rgba(255,255,255,.025)}
+.gx-rb-stat strong{display:block;font-size:26px;line-height:1.1;color:#f3f6ff}
+.gx-rb-stat span{color:#99a8c6;font:500 9px Poppins,system-ui,sans-serif}
+.gx-rb-stat.is-new strong{color:#a5f7ff}
+.gx-rb-tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:13px;scrollbar-width:none}
+.gx-rb-tabs button{flex:1 0 auto;cursor:pointer;border:1px solid rgba(171,193,224,.12);color:#9eacc5;background:rgba(255,255,255,.02);border-radius:12px;padding:9px 10px;font:650 10px Poppins,system-ui,sans-serif}
+.gx-rb-tabs button[aria-pressed=true]{border-color:rgba(122,231,243,.36);background:rgba(111,216,244,.12);color:#b5faff}
+.gx-rb-admin-list{display:grid;gap:9px}
+.gx-rb-admin-card{border:1px solid rgba(161,184,228,.13);border-radius:17px;padding:13px 14px;background:rgba(9,13,24,.5)}
+.gx-rb-admin-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.gx-rb-admin-card-title{font:700 12px Poppins,system-ui,sans-serif;color:#e6f0ff}
+.gx-rb-admin-card-meta{font:500 9px Poppins,system-ui,sans-serif;color:#9eacc5;margin-top:2px}
+.gx-rb-status{padding:5px 7px;border-radius:999px;white-space:nowrap;border:1px solid rgba(177,191,225,.13);color:#b6c1da;font:700 9px Poppins,system-ui,sans-serif}
+.gx-rb-status.pending{background:rgba(255,200,113,.07);color:#ffd18b;border-color:rgba(255,200,113,.23)}
+.gx-rb-status.published{background:rgba(78,231,190,.075);color:#77e6c0;border-color:rgba(78,231,190,.23)}
+.gx-rb-status.hidden,.gx-rb-status.private{background:rgba(146,147,185,.07);color:#a5a7c4}
+.gx-rb-admin-card p{font:450 11px/1.65 Poppins,system-ui,sans-serif;white-space:pre-wrap;overflow-wrap:anywhere;color:#cdd7e9;margin:11px 0 12px}
+.gx-rb-admin-card .gx-rb-rating{margin-top:9px}
+.gx-rb-admin-card .gx-rb-rating svg{width:14px;height:14px}
+.gx-rb-admin-actions{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:11px}
+.gx-rb-admin-actions button{cursor:pointer;border:1px solid rgba(165,189,230,.16);background:rgba(255,255,255,.035);color:#bdc9df;border-radius:100px;padding:8px 11px;font:650 9px Poppins,system-ui,sans-serif}
+.gx-rb-admin-actions button[data-action=publish]{background:rgba(63,211,180,.1);border-color:rgba(63,211,180,.28);color:#92e7cf}
+.gx-rb-admin-actions button[data-action=hide]{color:#e9bac8}
+.gx-rb-admin-actions button:disabled{opacity:.3;cursor:not-allowed}
+.gx-rb-admin-answer{display:flex;gap:7px;align-items:center;margin-top:10px}
+.gx-rb-admin-answer[hidden],.gx-rb-success-screen[hidden],.gx-rb-form[hidden]{display:none!important}
+.gx-rb-admin-answer input{min-width:0;flex:1;outline:none;border:1px solid rgba(187,198,232,.19);background:rgba(3,6,14,.4);color:#ecf3ff;padding:10px 9px;border-radius:9px;font:500 11px Poppins,system-ui,sans-serif}
+.gx-rb-admin-answer button{cursor:pointer;border:1px solid rgba(74,206,225,.3);background:rgba(75,202,221,.13);border-radius:9px;color:#aef8fc;padding:10px;font:650 9px Poppins,system-ui,sans-serif}
+.gx-rb-admin-reply{font:500 10px/1.6 Poppins,system-ui,sans-serif;background:rgba(90,213,216,.055);border-left:2px solid #73d0e4;border-radius:4px;padding:8px 10px;color:#b5e8e4;margin-top:8px}
+.gx-rb-admin-empty{padding:27px 10px;text-align:center;border:1px dashed rgba(146,174,225,.19);border-radius:14px;color:#97a7c0;font:500 11px Poppins,system-ui,sans-serif}
+.gx-rb-tools{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-top:13px}
+.gx-rb-tools span{color:#8d9bb3;font:500 9px Poppins,system-ui,sans-serif}
+.gx-rb-reset{border:0;background:transparent;color:#a2b0c8;text-decoration:underline;font:600 9px Poppins,system-ui,sans-serif;cursor:pointer}
+.gx-rb-focus-anchor{scroll-margin-top:20px}
+@media(max-width:370px){.gx-rb-modal .gx-rb-form{padding:22px 16px}.gx-rb-star{width:40px;height:42px}.gx-rb-home-top{padding-inline:13px}.gx-rb-demo-bar{margin-inline:10px}}
+@media(prefers-reduced-motion:reduce){.gx-rb-star,.gx-rb-submit{animation:none!important;transition:none!important}.gx-rb-track{scroll-behavior:auto!important}.gx-rb-star:after{animation:none!important}}
+
+/* ===========================================================
+   OPINIONES 2.1 · SOLO AYUDA
+   Lenguaje visual nativo: Poppins, cristal negro, cian y violeta
+   sin estética de dashboard. Admin mantiene exactamente su UI.
+   =========================================================== */
+.gx-rb-demo-bar--ayuda {
+  width: min(100%,580px);
+  padding: 9px 12px;
+  background: rgba(8,8,12,.62);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255,255,255,.085);
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.27);
+}
+.gx-rb-demo-bar--ayuda strong { font-size:10px; letter-spacing:.045em; font-weight:700 }
+.gx-rb-demo-bar--ayuda span { color:#aab6cd; opacity:1 }
+.gx-rb-demo-bar--ayuda a {
+  background:rgba(0,242,254,.065);
+  border-color:rgba(0,242,254,.18);
+  color:#a2f5fa;
+  transition:background .2s ease;
+}
+.gx-rb-demo-bar--ayuda a:hover {background:rgba(0,242,254,.13)}
+
+/* Invitación sutil entre secciones, NO tablero de métricas. */
+#view-inicio .gx-rb-home {
+  isolation:isolate;
+  background:transparent;
+  border:0;
+  border-top:1px solid rgba(255,255,255,.085);
+  box-shadow:none;
+  border-radius:0;
+  padding:23px 0 8px;
+  margin:2px 0 24px;
+  overflow:visible;
+}
+#view-inicio .gx-rb-home::before {display:none}
+#view-inicio .gx-rb-home-top {
+  padding:0 2px 12px;
+  align-items:center;
+  gap:8px;
+}
+#view-inicio .gx-rb-kicker {
+  font-family:'Poppins',sans-serif;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:1.7px;
+  color:var(--text-muted,#95a4bd);
+}
+#view-inicio .gx-rb-home h2 {
+  font-family:'Poppins',sans-serif;
+  font-size:17px;
+  font-weight:700;
+  letter-spacing:-.35px;
+  line-height:1.35;
+  margin:6px 0 0;
+  color:#fff;
+}
+#view-inicio .gx-rb-home-count {
+  align-self:flex-end;
+  padding-bottom:2px;
+  font-size:10px;
+  font-weight:500;
+  color:#8fa7bc;
+  letter-spacing:0;
+}
+#view-inicio .gx-rb-track {
+  margin-inline:-2px;
+  padding:4px 2px 12px;
+  scroll-padding-inline:2px;
+  gap:10px;
+  -webkit-overflow-scrolling:touch;
+}
+#view-inicio .gx-rb-quote {
+  flex:0 0 min(84%,315px);
+  min-height:130px;
+  padding:15px 16px;
+  border-radius:18px;
+  gap:8px;
+  background:rgba(8,8,12,.33);
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.085);
+  box-shadow:0 10px 24px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.035);
+}
+#view-inicio .gx-rb-quote::before {
+  content:"";
+  position:absolute;
+  left:16px;top:0;
+  width:32px;height:2px;
+  background:linear-gradient(90deg,var(--neon-purple,#7c4dff),var(--neon-blue,#00f2fe));
+  border-radius:0 0 8px 8px;
+}
+#view-inicio .gx-rb-quote p {font-size:12px;line-height:1.68;font-weight:400;color:#e8edf6}
+#view-inicio .gx-rb-byline {font-size:10px;color:#97a7bd}
+#view-inicio .gx-rb-example-note {
+  padding:0 2px 10px;
+  font-size:9px;
+  color:#8899ad;
+  line-height:1.5;
+}
+#view-inicio .gx-rb-home-footer {
+  padding:0 2px;
+  gap:10px;
+}
+#view-inicio .gx-rb-home-footer span {
+  color:var(--text-muted,#95a4bd);
+  font-size:11px;
+  line-height:1.45;
+}
+#view-inicio .gx-rb-home-cta {
+  background:rgba(0,242,254,.07);
+  border:1px solid rgba(0,242,254,.27);
+  color:#b3f8fb;
+  padding:10px 13px;
+  border-radius:14px;
+  font-size:11px;
+  font-weight:600;
+  min-height:40px;
+  transition:background .2s,transform .2s;
+}
+#view-inicio .gx-rb-home-cta:hover {background:rgba(0,242,254,.13)}
+#view-inicio .gx-rb-home-cta:active {transform:scale(.98)}
+#view-inicio .gx-rb-empty {width:100%;padding:19px 9px;color:#a8b9cd}
+#view-inicio .gx-rb-rating{color:#ffcb74}
+
+/* Modal: bienvenida cálida y ligera en el mismo ADN de Ayuda.
+   No es una ventana de gestión ni un panel anidado. */
+.gx-rb-modal {
+  padding:16px;
+  padding-bottom:max(16px,env(safe-area-inset-bottom));
+}
+.gx-rb-modal .modal-content.gx-rb-shell {
+  width:min(100%,432px);
+  max-height:min(88dvh,730px);
+  border:1px solid rgba(255,255,255,.12)!important;
+  border-radius:23px!important;
+  background:rgba(9,10,17,.88)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(145%)!important;
+  backdrop-filter:blur(24px) saturate(145%)!important;
+  box-shadow:0 22px 75px rgba(0,0,0,.58),0 0 32px rgba(124,77,255,.07)!important;
+  scrollbar-width:none;
+}
+.gx-rb-modal .modal-content.gx-rb-shell::-webkit-scrollbar {display:none}
+.gx-rb-modal .modal-content.gx-rb-shell::before {
+  top:-145px;right:-75px;
+  width:240px;height:250px;
+  background:radial-gradient(circle,rgba(124,77,255,.13),transparent 70%);
+}
+.gx-rb-modal .modal-content.gx-rb-shell::after {
+  left:-130px;bottom:-135px;
+  background:radial-gradient(circle,rgba(0,242,254,.07),transparent 70%);
+}
+.gx-rb-modal .gx-rb-form {padding:23px 22px 22px}
+.gx-rb-modal .gx-rb-close {
+  top:15px;right:16px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.1);
+  width:31px;height:31px;
+  color:#b8c7dd;
+}
+.gx-rb-modal .gx-rb-close:hover {background:rgba(255,255,255,.11)}
+.gx-rb-modal .gx-rb-form-head {
+  text-align:center;
+  padding:5px 8px 0;
+  margin-bottom:19px;
+}
+.gx-rb-modal .gx-rb-emblem {
+  width:51px;height:51px;
+  margin:0 auto 13px;
+  display:grid;place-items:center;
+  border-radius:17px;
+  border:1px solid rgba(0,242,254,.16);
+  background:linear-gradient(145deg,rgba(0,242,254,.115),rgba(124,77,255,.105));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+  color:#a7faff;
+}
+.gx-rb-modal .gx-rb-emblem svg {
+  width:24px;height:24px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.9;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+}
+.gx-rb-modal .gx-rb-eyebrow {
+  color:var(--neon-blue,#00f2fe);
+  font-size:10px;
+  font-weight:650;
+  letter-spacing:1.4px;
+}
+.gx-rb-modal .gx-rb-form h2 {
+  font-family:'Poppins',sans-serif;
+  color:#fff;
+  font-weight:700;
+  font-size:21px;
+  letter-spacing:-.5px;
+  line-height:1.3;
+  margin:8px 0 8px;
+}
+.gx-rb-modal .gx-rb-intro {
+  font-size:12px;
+  line-height:1.65;
+  color:var(--text-muted,#95a4bd);
+  max-width:330px;
+  margin:0 auto;
+}
+.gx-rb-modal .gx-rb-score {
+  background:transparent;
+  border:0;
+  border-radius:0;
+  padding:0 2px 3px;
+  box-shadow:none;
+}
+.gx-rb-modal .gx-rb-score-label {
+  color:#e0e7f4;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0;
+  margin-bottom:8px;
+}
+.gx-rb-modal .gx-rb-stars {
+  gap:8px;
+  padding:0 0 2px;
+}
+.gx-rb-modal .gx-rb-star {
+  color:rgba(210,224,244,.28);
+}
+.gx-rb-modal .gx-rb-star.is-lit {
+  color:#ffcc75;
+  filter:drop-shadow(0 1px 6px rgba(255,184,82,.27));
+}
+.gx-rb-modal .gx-rb-rating-feedback {
+  min-height:18px;
+  margin-top:5px;
+  color:#ffcc75;
+  font-size:11px;
+  font-weight:600;
+}
+.gx-rb-modal .gx-rb-fieldhead {margin-top:17px;margin-bottom:8px}
+.gx-rb-modal .gx-rb-fieldhead label {
+  color:#eef4ff;
+  font-size:12px;
+  font-weight:600;
+}
+.gx-rb-modal .gx-rb-counter {font-size:10px;color:#98a9bc}
+.gx-rb-modal .gx-rb-text {
+  min-height:109px;
+  height:109px;
+  font-size:13px;
+  line-height:1.65;
+  padding:13px 14px;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:13px;
+  background:rgba(0,0,0,.32);
+  color:#fff;
+}
+.gx-rb-modal .gx-rb-text::placeholder {color:#8191a7}
+.gx-rb-modal .gx-rb-text:focus {
+  border-color:var(--neon-blue,#00f2fe);
+  box-shadow:0 0 0 3px rgba(0,242,254,.065);
+}
+.gx-rb-modal .gx-rb-consent {
+  padding:11px 10px;
+  margin-top:14px;
+  border-radius:13px;
+  background:rgba(255,255,255,.025);
+  border:1px solid rgba(255,255,255,.075);
+}
+.gx-rb-modal .gx-rb-consent input:checked {background:rgba(0,195,204,.62)}
+.gx-rb-modal .gx-rb-consent strong {font-size:11px;font-weight:600;color:#e9f1ff}
+.gx-rb-modal .gx-rb-consent small {font-size:10px;line-height:1.55;color:#96a6c0}
+.gx-rb-modal .gx-rb-formnote {
+  color:#8396ad;
+  font-size:9px;
+  line-height:1.55;
+  margin:9px 1px 0;
+}
+.gx-rb-modal .gx-rb-error {font-size:11px;margin-top:8px}
+.gx-rb-modal .gx-rb-submit {
+  margin-top:10px;
+  min-height:48px;
+  border-radius:15px;
+  border:0;
+  background:linear-gradient(135deg,var(--neon-blue,#00f2fe),#4f8cff);
+  color:#06101c;
+  font-size:13px;
+  font-weight:700;
+  box-shadow:0 0 18px rgba(0,242,254,.13);
+}
+.gx-rb-modal .gx-rb-submit:hover {filter:brightness(1.055)}
+.gx-rb-modal .gx-rb-submit.is-success {background:#57d0aa}
+.gx-rb-modal .gx-rb-success-screen {padding:45px 25px 37px}
+.gx-rb-modal .gx-rb-success-icon {
+  border-radius:19px;
+  background:rgba(55,212,168,.095);
+}
+.gx-rb-modal .gx-rb-success-screen h2 {font-size:21px;font-weight:700;letter-spacing:-.45px}
+.gx-rb-modal .gx-rb-success-screen p {font-size:12px;line-height:1.65}
+.gx-rb-modal .gx-rb-done {background:rgba(0,242,254,.08);border-color:rgba(0,242,254,.22);color:#b5faff}
+.gx-rb-modal .gx-rb-close:focus-visible,
+.gx-rb-modal .gx-rb-star:focus-visible,
+.gx-rb-modal .gx-rb-submit:focus-visible,
+#view-inicio .gx-rb-home-cta:focus-visible {
+  outline:2px solid var(--neon-blue,#00f2fe);
+  outline-offset:3px;
+}
+@media(max-width:370px){
+  .gx-rb-modal .gx-rb-form {padding:22px 17px 18px}
+  .gx-rb-modal .gx-rb-star {width:42px;height:43px}
+  #view-inicio .gx-rb-home h2 {font-size:16px}
+  #view-inicio .gx-rb-home-footer span {font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-demo-bar--ayuda a,#view-inicio .gx-rb-home-cta{transition:none}
+}
+
+/* =========================================================
+   Opiniones 2.2 — acabado final del CLIENTE (Admin intacto)
+   ========================================================= */
+
+/* Cinta editorial continua, sin contenedor ni líneas divisorias. */
+#view-inicio .gx-rb-home {
+  margin:4px 0 20px;
+  padding:12px 0 6px;
+  border:0!important;
+  border-top:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  overflow:visible;
+}
+#view-inicio .gx-rb-home::before,
+#view-inicio .gx-rb-home::after {display:none!important}
+#view-inicio .gx-rb-home-top {padding:0 2px 14px}
+#view-inicio .gx-rb-home h2 {font-size:16px;font-weight:650;letter-spacing:-.35px}
+#view-inicio .gx-rb-marquee {
+  position:relative;
+  width:100%;
+  overflow:hidden;
+  isolation:isolate;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 8%,#000 92%,transparent 100%);
+}
+#view-inicio .gx-rb-marquee::before,
+#view-inicio .gx-rb-marquee::after {display:none}
+#view-inicio .gx-rb-track {
+  width:100%;
+  display:flex;
+  flex-wrap:nowrap;
+  gap:0;
+  margin:0;
+  padding:3px 0 12px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  touch-action:pan-x;
+  scroll-behavior:auto!important;
+  scroll-snap-type:none!important;
+  scrollbar-width:none;
+}
+#view-inicio .gx-rb-track::-webkit-scrollbar {display:none}
+#view-inicio .gx-rb-marquee-group {
+  display:flex;
+  flex:0 0 auto;
+  align-items:stretch;
+  gap:11px;
+  padding-right:11px;
+}
+#view-inicio .gx-rb-quote {
+  flex:0 0 min(265px,calc(100vw - 105px));
+  width:min(265px,calc(100vw - 105px));
+  min-height:112px;
+  border-radius:16px;
+  background:rgba(8,8,12,.27);
+  border:1px solid rgba(255,255,255,.072);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.035);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  padding:13px 14px;
+  gap:7px;
+}
+#view-inicio .gx-rb-quote::before {display:none}
+#view-inicio .gx-rb-quote p {
+  font-size:11px;
+  line-height:1.65;
+  color:#e5eaf5;
+  font-weight:400;
+}
+#view-inicio .gx-rb-quote .gx-rb-rating svg {width:12px;height:12px}
+#view-inicio .gx-rb-byline {font-size:9px;gap:4px}
+#view-inicio .gx-rb-example-note {
+  padding:0 2px;
+  font-size:9px;
+  color:#8295ab;
+}
+#view-inicio .gx-rb-home-count,
+#view-inicio .gx-rb-home-footer,
+#view-inicio .gx-rb-home-cta {display:none!important}
+
+/* Estrella HERO: la línea de neón forma la figura por completo. */
+.gx-rb-modal .gx-rb-emblem {
+  width:98px;
+  height:91px;
+  margin:0 auto 5px;
+  background:none!important;
+  border:0!important;
+  border-radius:0;
+  box-shadow:none!important;
+  display:grid;
+  place-items:center;
+  overflow:visible;
+  color:#00f2fe;
+  isolation:isolate;
+}
+.gx-rb-modal .gx-rb-emblem::before {
+  content:"";
+  position:absolute;
+  width:65px;height:65px;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(124,77,255,.20),transparent 73%);
+  filter:blur(15px);
+  z-index:-1;
+}
+.gx-rb-modal .gx-rb-emblem .gx-rb-neon-star {
+  width:93px;
+  height:93px;
+  display:block;
+  overflow:visible;
+  filter:drop-shadow(0 0 7px rgba(0,242,254,.36));
+}
+.gx-rb-neon-star-line {
+  fill:none;
+  stroke:url(#gx-rb-star-gradient);
+  stroke-width:2.7px;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-dasharray:340;
+  stroke-dashoffset:340;
+  animation:gxRbNeonTrace 1.2s cubic-bezier(.22,.84,.28,1) forwards,
+    gxRbNeonBreath 4s ease-in-out 1.2s infinite;
+}
+.gx-rb-neon-star-halo {
+  fill:none;
+  stroke:#00f2fe;
+  stroke-width:5.5px;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  opacity:.4;
+  filter:blur(5px);
+  animation:gxRbNeonHalo 4s ease-in-out infinite;
+}
+@keyframes gxRbNeonTrace {to{stroke-dashoffset:0}}
+@keyframes gxRbNeonBreath {0%,100%{stroke-width:2.7px}50%{stroke-width:3.3px}}
+@keyframes gxRbNeonHalo {0%,100%{opacity:.22}50%{opacity:.46}}
+
+/* Cerrar siempre con el acento cyan, sin aro de foco automático. */
+.gx-rb-modal .gx-rb-close {
+  color:var(--neon-blue,#00f2fe);
+  border:1px solid rgba(0,242,254,.23);
+  background:rgba(0,242,254,.055);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.025);
+  transition:background .2s,box-shadow .2s,transform .2s;
+}
+.gx-rb-modal .gx-rb-close:hover {
+  color:#b9fdff;
+  background:rgba(0,242,254,.105);
+  box-shadow:0 0 12px rgba(0,242,254,.11);
+}
+.gx-rb-modal .gx-rb-close:active {transform:scale(.95)}
+
+/* Un único botón real pasa de Enviar opinión a ✓ Listo.
+   El formulario colapsa en lugar de montar una segunda tarjeta. */
+.gx-rb-modal .gx-rb-fields {
+  max-height:720px;
+  opacity:1;
+  overflow:visible;
+  transition:max-height .43s cubic-bezier(.22,.84,.25,1),opacity .21s ease;
+}
+.gx-rb-modal .gx-rb-fields[hidden] {display:none!important}
+.gx-rb-modal .gx-rb-form-head {
+  transition:margin .38s ease,padding .38s ease;
+}
+.gx-rb-modal .gx-rb-form-head .gx-rb-intro {
+  max-height:100px;
+  opacity:1;
+  overflow:hidden;
+  transition:max-height .32s ease,opacity .23s ease,margin .32s ease;
+}
+.gx-rb-modal .gx-rb-submit {
+  margin:10px auto 0;
+  max-width:100%;
+  transition:width .46s cubic-bezier(.18,1.2,.24,1),
+    border-radius .46s ease,background .35s ease,
+    box-shadow .35s ease,transform .3s ease,color .35s ease;
+}
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell {
+  overflow:clip!important;
+  overscroll-behavior:none;
+  touch-action:none;
+  width:min(100%,400px);
+  max-height:none;
+}
+/* Earlier ornamental glows were positioned beyond the card's lower edge:
+   on iOS they expanded scrollHeight even when the contents were collapsed. */
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell::before,
+.gx-rb-modal.gx-rb-complete .modal-content.gx-rb-shell::after {
+  display:none!important;
+}
+.gx-rb-modal.gx-rb-complete {
+  overscroll-behavior:none;
+  touch-action:none;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-form {
+  padding:28px 22px 30px;
+  text-align:center;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-form-head {
+  padding:0 2px;
+  margin:0 auto 7px;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-emblem {
+  width:104px;height:102px;
+  margin:0 auto 10px;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-emblem svg {width:99px;height:99px}
+.gx-rb-modal.gx-rb-complete .gx-rb-eyebrow {display:none}
+.gx-rb-modal.gx-rb-complete .gx-rb-form h2 {
+  margin:5px 0 0;
+  font-size:21px;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-form-head .gx-rb-intro {
+  max-height:0;
+  opacity:0;
+  margin:0;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-fields {
+  opacity:0;
+  max-height:0;
+  overflow:hidden;
+  margin:0;
+  pointer-events:none;
+  visibility:hidden;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-success-screen {
+  position:relative;
+  z-index:1;
+  text-align:center;
+  width:100%;
+  padding:0 8px 10px;
+  margin:0 auto;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-success-screen p {
+  max-width:305px;
+  margin:0 auto;
+  font-size:12px;
+  line-height:1.65;
+  color:#a6b6cd;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-submit.is-success {
+  width:142px;
+  min-height:45px;
+  margin:10px auto 0;
+  border-radius:100px;
+  /* Mismo botón que "Enviar mi opinión": solo cambia de forma y texto. */
+  background:linear-gradient(135deg,var(--neon-blue,#00f2fe),#4f8cff);
+  color:#06101c;
+  border:0;
+  box-shadow:0 0 18px rgba(0,242,254,.13);
+  animation:gxRbMorphSettle .5s cubic-bezier(.2,1.3,.3,1) both;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-submit.is-success svg {
+  width:17px;height:17px;
+  stroke-width:2.5px;
+}
+@keyframes gxRbMorphSettle {0%{transform:scale(.94)}60%{transform:scale(1.045)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){
+  .gx-rb-neon-star-line,.gx-rb-neon-star-halo,
+  .gx-rb-modal .gx-rb-submit.is-success {animation:none!important}
+  .gx-rb-neon-star-line {stroke-dashoffset:0!important}
+  .gx-rb-modal .gx-rb-fields,
+  .gx-rb-modal .gx-rb-submit {transition:none!important}
+}
+
+/* =========================================================
+   OPINIONES 2.3 — luz orbital y cristal de Ayuda
+   Exclusivamente la beta cliente; Admin no cambia.
+   ========================================================= */
+
+/* Estrella neón: silueta fija suave + haz luminoso que recorre cada arista.
+   pathLength=100 permite completar exactamente una vuelta, incluso en WebKit. */
+.gx-rb-modal .gx-rb-neon-star-line{
+  fill:none;
+  opacity:.67;
+  stroke:url(#gx-rb-star-gradient);
+  stroke-width:1.65px;
+  stroke-dasharray:none;
+  stroke-dashoffset:0;
+  animation:none;
+}
+.gx-rb-modal .gx-rb-neon-star-halo{
+  opacity:.14;
+  stroke-width:4.4px;
+  animation:none;
+}
+.gx-rb-modal .gx-rb-neon-star-trail,
+.gx-rb-modal .gx-rb-neon-star-runner{
+  fill:none;
+  stroke:url(#gx-rb-star-gradient);
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-dashoffset:0;
+  /* Safari SVG CSS dash animations can freeze at zero. JavaScript controls
+     these two tiny path offsets at 30ms intervals only while visible. */
+  animation:none;
+  pointer-events:none;
+}
+.gx-rb-modal .gx-rb-neon-star-trail{
+  /* Longer soft tail, inspired by Ayuda's traveling benefits outline. */
+  stroke-width:3px;
+  opacity:.58;
+  stroke-dasharray:43 57;
+  filter:blur(2.5px) drop-shadow(0 0 3px rgba(0,242,254,.54));
+}
+.gx-rb-modal .gx-rb-neon-star-runner{
+  /* One long, fine, continuous beam moves along the star's edges. */
+  stroke-width:1.65px;
+  stroke-dasharray:32 68;
+  filter:drop-shadow(0 0 2.5px rgba(0,242,254,.86))
+         drop-shadow(0 0 5px rgba(124,77,255,.52));
+}
+@keyframes gxRbNeonOrbit{
+  0%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-100}
+}
+
+/* Cerrar como login/notificaciones: pastilla completamente cyan,
+   X oscura de alto contraste, NO icono cyan sobre un disco negro. */
+.gx-rb-modal .gx-rb-close{
+  color:#061218!important;
+  background:var(--neon-blue,#00f2fe)!important;
+  border:1px solid rgba(163,255,255,.55);
+  box-shadow:0 3px 14px rgba(0,242,254,.16),inset 0 1px 0 rgba(255,255,255,.32);
+}
+.gx-rb-modal .gx-rb-close:hover{
+  color:#041018!important;
+  background:#74faff!important;
+  border-color:#74faff;
+  box-shadow:0 4px 18px rgba(0,242,254,.26);
+}
+.gx-rb-modal .gx-rb-close:active{
+  background:#2bdde7!important;
+  transform:scale(.95);
+}
+
+/* CSS compositor animation rather than scrollLeft+=0.4: Safari rounds
+   fractional scroll deltas and previously never advanced the strip. */
+#view-inicio .gx-rb-marquee{
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 9%,#000 91%,transparent 100%);
+  mask-image:linear-gradient(90deg,transparent 0%,#000 9%,#000 91%,transparent 100%);
+}
+#view-inicio .gx-rb-track{
+  padding:7px 0 17px;
+  scroll-snap-type:none!important;
+  scroll-behavior:auto!important;
+}
+#view-inicio .gx-rb-marquee-strip{
+  width:max-content;
+  display:flex;
+  align-items:stretch;
+  flex:0 0 auto;
+  transform:translate3d(0,0,0);
+}
+#view-inicio .gx-rb-marquee-strip.gx-rb-marquee-running{
+  animation:gxRbMarqueeFlow 34s linear infinite;
+  will-change:transform;
+}
+@keyframes gxRbMarqueeFlow{
+  from{transform:translate3d(0,0,0)}
+  to{transform:translate3d(-33.333333%,0,0)}
+}
+#view-inicio .gx-rb-track.gx-rb-paused .gx-rb-marquee-strip{
+  animation-play-state:paused!important;
+}
+#view-inicio .gx-rb-marquee-group{
+  gap:13px;
+  padding-right:13px;
+}
+#view-inicio .gx-rb-quote{
+  box-sizing:border-box;
+  flex:0 0 min(305px,calc(100vw - 88px));
+  width:min(305px,calc(100vw - 88px));
+  min-height:188px;
+  padding:19px 19px 17px;
+  gap:12px;
+  /* EXACT glass-card / feature-card recipe from assets/css/ayuda.css.
+     Do not introduce tinted gradients or stronger saturation here. */
+  border-radius:20px;
+  background:var(--card-glass);
+  border:1px solid rgba(255,255,255,.08);
+  -webkit-backdrop-filter:blur(10px);
+  backdrop-filter:blur(10px);
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+#view-inicio .gx-rb-quote p{
+  color:#f0f3fb;
+  font-size:13px;
+  line-height:1.69;
+  font-weight:430;
+  letter-spacing:-.08px;
+}
+#view-inicio .gx-rb-quote .gx-rb-rating{gap:4px}
+#view-inicio .gx-rb-quote .gx-rb-rating svg{
+  width:15px;
+  height:15px;
+}
+#view-inicio .gx-rb-byline{
+  color:#b8c9df;
+  font-size:10.5px;
+  font-weight:500;
+  gap:7px;
+}
+#view-inicio .gx-rb-byline svg{width:14px;height:14px}
+#view-inicio .gx-rb-home-top{padding-bottom:14px}
+
+@media(max-width:370px){
+  #view-inicio .gx-rb-quote{
+    min-height:188px;
+    padding:17px;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal .gx-rb-neon-star-trail,
+  .gx-rb-modal .gx-rb-neon-star-runner{
+    animation:none!important;
+  }
+  #view-inicio .gx-rb-marquee-strip.gx-rb-marquee-running{
+    animation:none!important;
+    will-change:auto;
+  }
+}
+
+/* =========================================================
+   OPINIONES 2.5 — cristal real en Safari + haz que ilumina
+   Solo Ayuda beta. El diseño de Admin no se modifica.
+   ========================================================= */
+
+/* FIX iOS/WebKit:
+   La máscara aplicada al CONTENEDOR del marquee lo convierte en
+   backdrop root; aunque las reseñas tenían blur(10px), el vidrio
+   no podía difuminar la estela luminosa que está DETRÁS de la sección.
+   Mantenemos la superficie sin máscara ni aislamiento y colocamos
+   el desvanecimiento únicamente en dos overlays sin descendientes. */
+#view-inicio .gx-rb-home {
+  isolation:auto!important;
+}
+#view-inicio .gx-rb-marquee {
+  isolation:auto!important;
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  overflow:hidden;
+}
+#view-inicio .gx-rb-marquee::before,
+#view-inicio .gx-rb-marquee::after {
+  content:"";
+  display:block!important;
+  position:absolute;
+  z-index:3;
+  top:0;
+  bottom:0;
+  width:36px;
+  pointer-events:none;
+  background:rgba(3,3,5,.24);
+  -webkit-backdrop-filter:blur(9px);
+  backdrop-filter:blur(9px);
+}
+#view-inicio .gx-rb-marquee::before {
+  left:0;
+  -webkit-mask-image:linear-gradient(to right,#000,transparent);
+  mask-image:linear-gradient(to right,#000,transparent);
+}
+#view-inicio .gx-rb-marquee::after {
+  right:0;
+  -webkit-mask-image:linear-gradient(to left,#000,transparent);
+  mask-image:linear-gradient(to left,#000,transparent);
+}
+#view-inicio .gx-rb-quote{
+  /* Mismos 4 ingredientes de .glass-card y .benefit-box de Ayuda. */
+  background:var(--card-glass)!important;
+  -webkit-backdrop-filter:blur(10px)!important;
+  backdrop-filter:blur(10px)!important;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+}
+
+/* Luz viajera: mismo contorno aprobado, pero el segmento ahora
+   enciende visiblemente la arista con bloom SVG + punta brillante.
+   El reloj existente actualiza los offsets al mismo tiempo para Safari. */
+.gx-rb-modal .gx-rb-neon-star-bloom,
+.gx-rb-modal .gx-rb-neon-star-spark{
+  fill:none;
+  pointer-events:none;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  animation:none!important;
+}
+.gx-rb-modal .gx-rb-neon-star-bloom{
+  stroke:url(#gx-rb-star-gradient);
+  stroke-width:8px;
+  stroke-dasharray:47 53;
+  opacity:.96;
+}
+.gx-rb-modal .gx-rb-neon-star-trail{
+  stroke-width:2.8px;
+  stroke-dasharray:43 57;
+  opacity:.77;
+  /* La luz difusa principal se dibuja con feGaussianBlur SVG,
+     sin duplicar un halo estático alrededor de toda la estrella. */
+  filter:drop-shadow(0 0 2.7px rgba(0,242,254,.7));
+}
+.gx-rb-modal .gx-rb-neon-star-runner{
+  stroke-width:1.65px;
+  stroke-dasharray:32 68;
+  filter:drop-shadow(0 0 3px rgba(0,242,254,.88));
+}
+.gx-rb-modal .gx-rb-neon-star-spark{
+  stroke:#caffff;
+  stroke-width:1.85px;
+  stroke-dasharray:6 94;
+  filter:drop-shadow(0 0 3px rgba(0,242,254,.98))
+         drop-shadow(0 0 6px rgba(124,77,255,.8));
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal .gx-rb-neon-star-bloom,
+  .gx-rb-modal .gx-rb-neon-star-spark{
+    animation:none!important;
+  }
+}
+
+/* =========================================================
+   OPINIONES 2.6 · identidad recuperada y perfil de cliente
+   ========================================================= */
+
+/* Una sola silueta neón, siempre estable. El brillo se mueve POR
+   DETRÁS, siguiendo el contorno con coordenadas SVG en WebKit. */
+.gx-rb-modal .gx-rb-neon-star-line{
+  fill:none;
+  stroke:url(#gx-rb-star-gradient);
+  stroke-width:2.35px;
+  stroke-dasharray:none!important;
+  stroke-dashoffset:0!important;
+  opacity:.95;
+  animation:none!important;
+  filter:drop-shadow(0 0 3px rgba(0,242,254,.35));
+}
+.gx-rb-modal .gx-rb-neon-star-halo{
+  fill:none;
+  stroke:#00f2fe;
+  stroke-width:4.5px;
+  opacity:.17;
+  filter:blur(5px);
+  animation:none!important;
+}
+.gx-rb-modal .gx-rb-star-backlight{
+  opacity:.94;
+  pointer-events:none;
+}
+.gx-rb-modal .gx-rb-star-backlight-core{
+  opacity:.74;
+  filter:blur(1.6px);
+  pointer-events:none;
+}
+
+/* Tarjetas: mismo vidrio nativo de Ayuda y más presencia en firma.
+   Avatar ilustrado de reserva hasta que el cliente tenga foto en Mi Espacio. */
+#view-inicio .gx-rb-quote{
+  min-height:196px;
+  padding:18px 18px 17px;
+  gap:11px;
+}
+#view-inicio .gx-rb-quote .gx-rb-byline{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  color:#c5d2e6;
+}
+#view-inicio .gx-rb-review-avatar{
+  width:39px;
+  height:39px;
+  min-width:39px;
+  flex:0 0 39px;
+  object-fit:cover;
+  border-radius:50%;
+  border:1px solid rgba(154,223,240,.26);
+  background:var(--card-glass);
+  box-shadow:0 3px 12px rgba(0,0,0,.16);
+}
+#view-inicio .gx-rb-review-identity{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:flex-start;
+  gap:3px;
+  min-width:0;
+}
+#view-inicio .gx-rb-review-identity strong{
+  display:block;
+  width:100%;
+  color:#f2f6ff;
+  font-size:12px;
+  font-weight:650;
+  line-height:1.3;
+  letter-spacing:-.1px;
+  overflow-wrap:anywhere;
+}
+#view-inicio .gx-rb-identity-caption{
+  display:flex;
+  gap:5px;
+  align-items:center;
+  color:#a8bad2;
+  font-size:9px;
+  font-weight:500;
+  line-height:1.35;
+}
+#view-inicio .gx-rb-identity-caption svg{
+  width:12px;
+  height:12px;
+  flex-shrink:0;
+  color:#66d9c8;
+}
+@media(max-width:370px){
+  #view-inicio .gx-rb-review-avatar{
+    width:36px;height:36px;min-width:36px;flex-basis:36px;
+  }
+}
+
+/* ================================================================
+   OPINIONES 3.1 — regreso a la estrella sin recuadro de Opiniones 2.2.
+   Un contorno cromático nítido; solo el backlight respira suavemente.
+   Sin segmentos móviles, línea blanca ni separador oscuro.
+   ================================================================ */
+.gx-rb-modal .gx-rb-emblem{
+  position:relative;
+  isolation:isolate;
+  overflow:visible;
+}
+.gx-rb-modal .gx-rb-emblem::before{display:none!important}
+.gx-rb-modal .gx-rb-emblem .gx-rb-neon-star{
+  position:relative;
+  z-index:1;
+  overflow:visible;
+  filter:none!important;
+}
+.gx-rb-modal .gx-rb-neon-star-halo{
+  fill:none;
+  stroke:url(#gx-rb-star-gradient)!important;
+  stroke-width:9.5px;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+  stroke-dasharray:none!important;
+  stroke-dashoffset:0!important;
+  opacity:.38;
+  filter:url(#gx-rb-premium-glow)!important;
+  animation:gxRbNaturalBacklight 5.4s ease-in-out infinite!important;
+  pointer-events:none;
+}
+.gx-rb-modal .gx-rb-neon-star-line{
+  fill:none;
+  stroke:url(#gx-rb-star-gradient)!important;
+  stroke-width:2.7px;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+  stroke-dasharray:none!important;
+  stroke-dashoffset:0!important;
+  opacity:1;
+  filter:none!important;
+  animation:none!important;
+  shape-rendering:geometricPrecision;
+  pointer-events:none;
+}
+@keyframes gxRbNaturalBacklight{
+  0%,100%{opacity:.32}
+  50%{opacity:.46}
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal .gx-rb-neon-star-halo{animation:none!important;opacity:.38}
+  .gx-rb-modal .gx-rb-neon-star-line{animation:none!important}
+}
+
+/* OPINIONES 3.2 — una confirmación protagonista, estrella → check.
+   La forma SVG se interpola a mano; el contorno no hace un segundo efecto. */
+.gx-rb-modal.gx-rb-complete .gx-rb-neon-star-halo{
+  animation:none!important;
+  opacity:.35;
+}
+.gx-rb-modal .gx-rb-emblem.gx-rb-morph-done .gx-rb-neon-star-line{
+  stroke:#a0fbf5!important;
+  stroke-width:3.65px;
+}
+.gx-rb-modal .gx-rb-emblem.gx-rb-morph-done .gx-rb-neon-star-halo{
+  stroke:#00f2fe!important;
+  opacity:.38;
+}
+.gx-rb-modal.gx-rb-complete .gx-rb-submit.is-success{
+  width:118px;
+  justify-content:center;
+  gap:0;
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-rb-modal.gx-rb-complete .gx-rb-neon-star-halo{animation:none!important}
+}
+
+/* Moderación real: overlay propio dentro del Admin, sin alterar su navegación. */
+.gx-rb-admin-overlay[hidden]{display:none!important}
+.gx-rb-admin-overlay{
+  position:fixed;inset:0;z-index:100110;
+  overflow:auto;overscroll-behavior:contain;
+  padding:max(18px,env(safe-area-inset-top)) 14px max(26px,env(safe-area-inset-bottom));
+  background:rgba(2,6,18,.78);
+  -webkit-backdrop-filter:blur(18px);
+  backdrop-filter:blur(18px);
+}
+.gx-rb-admin-overlay .gx-rb-admin{
+  position:relative;width:min(100%,930px);max-width:930px;
+  margin:0 auto 24px;
+  background:linear-gradient(155deg,rgba(21,29,49,.98),rgba(9,13,26,.98));
+  box-shadow:0 24px 90px rgba(0,0,0,.55);
+}
+.gx-rb-admin-close{
+  flex:0 0 36px;width:36px;height:36px;border-radius:50%;
+  background:var(--neon-blue,#00f2fe);border:0;
+  color:#061218;font-size:24px;line-height:1;cursor:pointer;
+}
+.gx-rb-admin-close:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.gx-rb-admin-loading,.gx-rb-admin-message{
+  padding:16px 12px;color:#b5c6db;font-size:13px;text-align:center
+}
+.gx-rb-admin-status{font-family:inherit;font-size:11px;color:#9cb0cf}
+.gx-rb-admin-status.is-error{color:#ffb3c0}
+body.gx-rb-admin-locked{overflow:hidden}
+@media(max-width:470px){
+  .gx-rb-admin-overlay{padding:env(safe-area-inset-top) 7px 28px}
+  .gx-rb-admin-overlay .gx-rb-admin{padding:16px 12px;margin-top:8px}
+}
