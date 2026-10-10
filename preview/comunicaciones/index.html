@@ -162,7 +162,7 @@ function refresh(){
    return '<label class="person"><div class="avatar">'+safe((c.nombre||"?").slice(0,1).toUpperCase())+'</div><div><span class="name">'+safe(c.nombre)+'</span><small>'+safe(c.servicios.map(function(s){return s.nombre}).join(" · "))+'</small></div><div class="right">'+c.misiones_pendientes+' pendientes</div><input type="checkbox" data-id="'+safe(c.id)+'" '+(removed?"":"checked")+' aria-label="Incluir a '+safe(c.nombre)+'"></label>';
  }).join(""):'<div class="empty">Ningún cliente coincide. Ajusta las condiciones.</div>';
  $("people").querySelectorAll("input[data-id]").forEach(function(el){el.addEventListener("change",function(){if(el.checked)excluded.delete(el.dataset.id);else excluded.add(el.dataset.id);refresh()})});
- $("people").querySelectorAll(".person").forEach(function(el){el.classList.toggle("hidden",value("showExcluded")==="0"&&!el.querySelector("input").checked)});
+ $("people").querySelectorAll(".person").forEach(function(el){el.classList.toggle("hidden",!$("showExcluded").checked&&!el.querySelector("input").checked)});
  write("titleCount",value("title").length+"/90 caracteres");
  write("messageCount",value("message").length+"/420 caracteres");
 }
