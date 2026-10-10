@@ -95,7 +95,8 @@ try{
       assert.equal(first,1,'Silueta original montada');
       await page.evaluate(()=>{
         localStorage.setItem(window.GOXION_CORE.STORAGE.CLIENT_TOKEN,'test-client-token');
-        window.getCurrentClientKey=()=> 'opiniones-mission-test';
+        window.goxionCurrentClientKey='opiniones-mission-test';
+        globalClientesData=globalClientesData||{};
         globalClientesData['opiniones-mission-test']={
           nombre:'Cliente de prueba',folio:'TEST-01',
           gamificacion:{progreso:[]}
