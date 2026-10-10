@@ -1056,8 +1056,9 @@
 }
 
 /* ================================================================
-   OPINIONES 2.9 — gradiente cromático sin uniones
-   Todo el contorno y halo usan una ÚNICA fuente de luz.
+   OPINIONES 3.0 — perfil de luz nítido y backlight contenido
+   Un solo gradiente, pero tres planos ópticos: luz difusa DETRÁS,
+   contraste oscuro y silueta enfocada DELANTE.
    No existen cuatro secciones ni cambios bruscos de color.
    ================================================================ */
 .gx-rb-modal .gx-rb-emblem{
@@ -1074,9 +1075,9 @@
 }
 .gx-rb-modal .gx-rb-neon-star-line{
   fill:none;
-  stroke:rgba(29,85,131,.38)!important;
-  stroke-width:2px;
-  opacity:.65;
+  stroke:rgba(5,9,21,.9)!important;
+  stroke-width:5px;
+  opacity:1;
   stroke-dasharray:none!important;
   stroke-dashoffset:0!important;
   animation:none!important;
@@ -1094,22 +1095,39 @@
   animation:none!important;
 }
 .gx-rb-modal .gx-rb-spectrum-outer{
-  stroke-width:18px;
-  opacity:.77;
+  stroke-width:8.5px;
+  opacity:.52;
   filter:url(#gx-rb-fluid-outer);
 }
 .gx-rb-modal .gx-rb-spectrum-inner{
-  stroke-width:7px;
-  opacity:.87;
+  stroke-width:4.6px;
+  opacity:.63;
   filter:url(#gx-rb-fluid-inner);
 }
+/* Outer light never softens the STAR's actual contour:
+   the highest-painted layers are completely unfiltered. */
 .gx-rb-modal .gx-rb-spectrum-edge{
-  stroke-width:2.6px;
+  stroke-width:3.25px;
   opacity:1;
-  filter:none;
+  filter:none!important;
+  shape-rendering:geometricPrecision;
+}
+.gx-rb-modal .gx-rb-spectrum-core{
+  fill:none;
+  stroke:rgba(246,251,255,.76);
+  stroke-width:.88px;
+  stroke-linejoin:round;
+  stroke-linecap:round;
+  stroke-dasharray:none!important;
+  opacity:.68;
+  filter:none!important;
+  animation:none!important;
+  pointer-events:none;
+  shape-rendering:geometricPrecision;
 }
 @media(prefers-reduced-motion:reduce){
   .gx-rb-modal .gx-rb-spectrum-outer,
   .gx-rb-modal .gx-rb-spectrum-inner,
-  .gx-rb-modal .gx-rb-spectrum-edge{animation:none!important}
+  .gx-rb-modal .gx-rb-spectrum-edge,
+  .gx-rb-modal .gx-rb-spectrum-core{animation:none!important}
 }
