@@ -203,15 +203,35 @@ try{
       assert.equal(modalSkin.emblem,1);
       await click(page,'.gx-rb-star[data-score="5"]');
       assert.equal(await page.locator('.gx-rb-star.is-lit').count(),5);
-      await page.locator('#gx-rb-text').fill(marker);
       await page.locator('.gx-rb-consent').evaluate(label=>label.click());
       assert.equal(await page.locator('#gx-rb-consent').isChecked(),true,
         'El control completo debe activar autorización explícita');
+      // No debe celebrarse un comentario que no pasó la validación.
+      const originalStarPath=await page.locator('.gx-rb-neon-star-line').getAttribute('d');
+      await click(page,'#gx-rb-submit');
+      assert.equal(await page.locator('.gx-rb-emblem.gx-rb-morph-done').count(),0);
+      assert.equal(await page.locator('.gx-rb-neon-star-line').getAttribute('d'),originalStarPath);
+      assert.match(await page.locator('#gx-rb-error').innerText(),/más|mínimo|selecciona/i);
+      await page.locator('#gx-rb-text').fill(marker);
       await click(page,'#gx-rb-submit');
       await dom(page,()=>!document.getElementById('gx-rb-success').hidden);
       assert.match(await page.locator('#gx-rb-success-text').innerText(),/después de que se apruebe/i);
       assert.equal(await page.locator('#gx-rb-submit').innerText(),'Listo');
-      assert.equal(await page.locator('#gx-rb-submit svg').count(),1);
+      assert.equal(await page.locator('#gx-rb-submit svg').count(),0,
+        'El botón tiene solo texto: el check protagonista nace de la estrella');
+      await dom(page,()=>document.querySelector('.gx-rb-emblem')?.classList.contains('gx-rb-morph-done'),3000);
+      const transformed=await page.evaluate(()=>{
+        const emblem=document.querySelector('.gx-rb-emblem');
+        const line=emblem.querySelector('.gx-rb-neon-star-line');
+        const halo=emblem.querySelector('.gx-rb-neon-star-halo');
+        return {path:line.getAttribute('d'),halo:halo.getAttribute('d'),
+          stroke:getComputedStyle(line).stroke,
+          label:document.getElementById('gx-rb-submit').innerText.trim()};
+      });
+      assert.notEqual(transformed.path,originalStarPath,'La estrella verdaderamente cambia su geometría');
+      assert.equal(transformed.halo,transformed.path,'El resplandor acompaña la transformación');
+      assert.match(transformed.stroke,/160, 251, 245|#a0fbf5/);
+      assert.equal(transformed.label,'Listo');
       await dom(page,()=>document.getElementById('gx-rb-fields').hidden,4000);
       const successState=await page.evaluate(()=>{
         const shell=document.querySelector('.gx-rb-shell');
@@ -239,6 +259,15 @@ try{
       await dom(page,()=>!document.getElementById('modal-feedback').classList.contains('show'));
       const restored=await page.evaluate(()=>getComputedStyle(document.body).position);
       assert.notEqual(restored,'fixed','Cerrar debe restaurar desplazamiento');
+      // Al reabrir, la estrella debe recuperar su forma original.
+      await page.evaluate(()=>window.openFeedbackModal());
+      await dom(page,()=>document.getElementById('modal-feedback').classList.contains('show'));
+      assert.equal(await page.locator('.gx-rb-neon-star-line').getAttribute('d'),originalStarPath);
+      assert.equal(await page.locator('.gx-rb-emblem.gx-rb-morph-done').count(),0);
+      assert.equal(await page.locator('#gx-rb-submit').innerText(),'Enviar mi opinión');
+      await click(page,'#gx-rb-close');
+      await dom(page,()=>!document.getElementById('modal-feedback').classList.contains('show'));
+
       assert.equal(realNotifications,0,'La beta no debe notificar a la base real');
 
       await page.goto(origin+'/preview/opiniones/admin-opiniones.html',{waitUntil:'domcontentloaded'});

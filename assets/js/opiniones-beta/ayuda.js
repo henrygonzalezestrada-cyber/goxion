@@ -63,6 +63,63 @@
     '</div>';
   let rating=0,preview=0,sending=false,lockedScroll=null,fieldsTimer=null;
   const originalTitle="¿Cómo te fue con nosotros?";
+  // Morph SVG auténtico, sin iconos superpuestos ni bibliotecas externas.
+  // La estrella es un trazo cerrado; su último punto repetido se abre
+  // gradualmente hasta formar la palomita mediante la misma geometría.
+  const heroEmblem=modal.querySelector(".gx-rb-emblem");
+  const heroPaths=[...heroEmblem.querySelectorAll(".gx-rb-neon-star-halo,.gx-rb-neon-star-line")];
+  const starPoints=[[50,7],[62.6,34.7],[93,38.5],[70.5,59.2],[76.5,89.5],
+    [50,74.2],[23.5,89.5],[29.5,59.2],[7,38.5],[37.4,34.7],[50,7]];
+  const checkPoints=[[19,51],[24,56],[29,61],[34,66],[39,71],
+    [44,66],[52,57],[60,48],[68,39],[76,30],[83,24]];
+  const checkPath=points=>"M"+points.map(point=>point[0]+" "+point[1]).join(" L");
+  const reducedHeroMotion=window.matchMedia("(prefers-reduced-motion: reduce)");
+  let heroFrame=null;
+  function paintHeroMorph(progress){
+    const interpolated=starPoints.map((point,index)=>[
+      +(point[0]+(checkPoints[index][0]-point[0])*progress).toFixed(2),
+      +(point[1]+(checkPoints[index][1]-point[1])*progress).toFixed(2)
+    ]);
+    const shape=checkPath(interpolated);
+    for(const path of heroPaths)path.setAttribute("d",shape);
+  }
+  function resetHeroMorph(){
+    if(heroFrame!==null)clearInterval(heroFrame);
+    heroFrame=null;
+    heroEmblem.classList.remove("gx-rb-morphing","gx-rb-morph-done");
+    for(const path of heroPaths)path.setAttribute("d",starShape);
+  }
+  function confirmHeroMorph(){
+    resetHeroMorph();
+    if(reducedHeroMotion.matches){
+      paintHeroMorph(1);
+      heroEmblem.classList.add("gx-rb-morph-done");
+      return;
+    }
+    heroEmblem.classList.add("gx-rb-morphing");
+    const started=performance.now(),duration=660;
+    function frame(){
+      if(!modal.classList.contains("gx-rb-complete")){
+        clearInterval(heroFrame);
+        heroFrame=null;
+        return;
+      }
+      // Safari/WebKit puede suspender requestAnimationFrame dentro del modal
+      // mientras colapsa. El reloj mantiene el morph estable en iPhone.
+      const t=Math.min(1,Math.max(0,(performance.now()-started)/duration));
+      const eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+      paintHeroMorph(eased);
+      if(t>=1){
+        clearInterval(heroFrame);
+        heroFrame=null;
+        heroEmblem.classList.remove("gx-rb-morphing");
+        heroEmblem.classList.add("gx-rb-morph-done");
+      }
+    }
+    frame();
+    heroFrame=setInterval(frame,24);
+  }
+
   function lockBackground(){
     if(lockedScroll)return;
     const body=document.body,styles=body.style;
@@ -113,6 +170,7 @@
   function reset(){
     rating=0;preview=0;sending=false;
     clearTimeout(fieldsTimer);
+    resetHeroMorph();
     modal.classList.remove("gx-rb-complete","gx-rb-morphing");
     $("gx-rb-fields").hidden=false;
     $("gx-rb-fields").removeAttribute("aria-hidden");
@@ -169,7 +227,7 @@
       $("gx-rb-success-text").textContent=review.consent?
         "Podrás verla en la cinta después de que se apruebe su publicación.":
         "Tu comentario es privado y solo podrá publicarse con tu autorización.";
-      // Same DOM button morphs from submit into compact ✓ Listo; no second CTA.
+      // La propia estrella se convierte en el check; el botón morph muestra solo Listo.
       $("gx-rb-success").hidden=false;
       $("gx-rb-fields").setAttribute("aria-hidden","true");
       $("gx-rb-title").textContent="¡Opinión guardada!";
@@ -177,8 +235,8 @@
       btn.classList.add("is-success");
       btn.querySelector("span").textContent="Listo";
       btn.querySelector("svg")?.remove();
-      btn.insertAdjacentHTML("afterbegin",icon.check);
       btn.setAttribute("aria-label","Listo, cerrar opinión");
+      confirmHeroMorph();
       btn.disabled=false;
       fieldsTimer=setTimeout(()=>{
         $("gx-rb-fields").hidden=true;
