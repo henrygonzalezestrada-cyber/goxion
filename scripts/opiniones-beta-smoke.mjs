@@ -146,56 +146,47 @@ try{
       const hero=await page.evaluate(()=>{
         const emblem=document.querySelector('.gx-rb-emblem');
         const line=emblem.querySelector('.gx-rb-neon-star-line');
-        const segments=[...emblem.querySelectorAll('.gx-rb-spectrum-edge')];
-        const outer=[...emblem.querySelectorAll('.gx-rb-spectrum-outer')];
-        const inner=[...emblem.querySelectorAll('.gx-rb-spectrum-inner')];
+        const gradient=emblem.querySelector('#gx-rb-fluid-spectrum');
+        const layers=['outer','inner','edge'].map(name=>emblem.querySelector('.gx-rb-spectrum-'+name));
         return {
           noBox:getComputedStyle(emblem).borderTopStyle,
           cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
           darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
           outline:!!line,
           outlineAnimation:getComputedStyle(line).animationName,
-          edgeCount:segments.length,outerCount:outer.length,innerCount:inner.length,
-          edgeColors:segments.map(node=>getComputedStyle(node).stroke),
-          widths:segments.map(node=>getComputedStyle(node).strokeWidth),
-          normalized:segments.every(node=>node.getAttribute('pathLength')==='100'),
-          fullRim:segments.every(node=>node.getAttribute('stroke-dasharray')==='25 75'),
-          offsets:segments.map(node=>Number(node.getAttribute('data-initial-offset'))),
-          glowFilter:outer.every(node=>getComputedStyle(node).filter.includes('gx-rb-spectrum-outer')),
-          noFloatingBlobs:emblem.querySelectorAll('.gx-rb-ambient-light,.gx-rb-star-backlight').length===0
+          svgPaths:emblem.querySelectorAll('.gx-rb-neon-star path').length,
+          layerCount:layers.filter(Boolean).length,
+          continuous:layers.every(node=>node.getAttribute('stroke-dasharray')===null),
+          sameGradient:layers.every(node=>getComputedStyle(node).stroke.includes('gx-rb-fluid-spectrum')),
+          stopColors:[...gradient.querySelectorAll('stop')].map(node=>node.getAttribute('stop-color')),
+          gradientUnits:gradient.getAttribute('gradientUnits'),
+          backglow:getComputedStyle(layers[0]).filter.includes('gx-rb-fluid-outer'),
+          midglow:getComputedStyle(layers[1]).filter.includes('gx-rb-fluid-inner'),
+          noQuarterBand:emblem.querySelectorAll('[data-spectrum-band]').length===0,
+          noFloatingBlob:emblem.querySelectorAll('.gx-rb-ambient-light').length===0,
+          widths:layers.map(node=>getComputedStyle(node).strokeWidth)
         };
       });
       assert.equal(hero.noBox,'none');
       assert.equal(hero.cyanFill,'rgb(0, 242, 254)');
       assert.equal(hero.darkX,'rgb(6, 18, 24)');
       assert.equal(hero.outline,true);
-      assert.equal(hero.outlineAnimation,'none','La figura de la estrella queda fija');
-      assert.equal(hero.edgeCount,4,'Todo el contorno debe cubrirse con cuatro colores');
-      assert.equal(hero.outerCount,4,'Los cuatro colores emiten luz exterior');
-      assert.equal(hero.innerCount,4,'El resplandor interior mantiene continuidad');
-      assert.equal(new Set(hero.edgeColors).size,4,'Cuatro segmentos de color definidos');
-      assert(hero.widths.every(v=>v==='2.6px'),'Contorno fino y nítido');
-      assert.equal(hero.normalized,true);
-      assert.equal(hero.fullRim,true,'Los cuatro tramos se reparten el contorno completo');
-      assert.deepEqual(hero.offsets,[0,-25,-50,-75]);
-      assert(hero.glowFilter,'El resplandor debe difuminarse hacia afuera');
-      assert(hero.noFloatingBlobs,'Sin manchas flotantes ni puntos de luz');
-      const startSpectrum=await page.locator('.gx-rb-spectrum-edge').evaluateAll(
-        nodes=>nodes.map(node=>node.getAttribute('stroke-dashoffset'))
-      );
-      await page.waitForTimeout(680);
-      const endSpectrum=await page.locator('.gx-rb-spectrum-edge').evaluateAll(
-        nodes=>nodes.map(node=>node.getAttribute('stroke-dashoffset'))
-      );
-      assert(startSpectrum.some((v,i)=>v!==endSpectrum[i]),
-        'Los colores de toda la estrella deben desplazarse en Safari');
-      const aligned=await page.evaluate(()=>{
-        const select=klass=>[...document.querySelectorAll('.gx-rb-'+klass)].map(
-          node=>node.getAttribute('stroke-dashoffset'));
-        return [select('spectrum-edge'),select('spectrum-inner'),select('spectrum-outer')];
-      });
-      assert.deepEqual(aligned[0],aligned[1],'Luz interior sigue el mismo ritmo del borde');
-      assert.deepEqual(aligned[0],aligned[2],'Halo exterior acompaña los segmentos');
+      assert.equal(hero.outlineAnimation,'none','La forma de la estrella no cambia');
+      assert.equal(hero.svgPaths,4,'Un único path para cada capa, sin particiones');
+      assert.equal(hero.layerCount,3);
+      assert.equal(hero.continuous,true,'Sin trazos segmentados ni separaciones');
+      assert.equal(hero.sameGradient,true,'El mismo gradiente funde todos los colores');
+      assert.equal(hero.gradientUnits,'userSpaceOnUse');
+      assert(hero.stopColors.length>=6,'Transición con varios puntos cromáticos suaves');
+      assert(hero.stopColors.includes('#00f2fe')&&hero.stopColors.includes('#ae67fb'));
+      assert(hero.backglow&&hero.midglow,'Resplandor exterior en dos intensidades');
+      assert(hero.noQuarterBand&&hero.noFloatingBlob,'Sin divisiones ni manchas');
+      assert.deepEqual(hero.widths,['18px','7px','2.6px']);
+      const beforeGradient=await page.locator('#gx-rb-fluid-spectrum').getAttribute('gradientTransform');
+      await page.waitForTimeout(800);
+      const afterGradient=await page.locator('#gx-rb-fluid-spectrum').getAttribute('gradientTransform');
+      assert.notEqual(beforeGradient,afterGradient,'El degradado rota suavemente en Safari');
+      assert.equal(await page.locator('.gx-rb-spectrum-edge').count(),1,'Contorno continuo');
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
