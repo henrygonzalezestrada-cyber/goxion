@@ -26,13 +26,16 @@
         '<stop offset="81%" stop-color="#4a89ff"/>'+
         '<stop offset="100%" stop-color="#77f5fc"/>'+
       '</linearGradient>'+
-      '<filter id="gx-rb-fluid-outer" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="4.4"/></filter>'+
-      '<filter id="gx-rb-fluid-inner" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="1.9"/></filter>'+
+      '<filter id="gx-rb-fluid-outer" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.4"/></filter>'+
+      '<filter id="gx-rb-fluid-inner" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation=".9"/></filter>'+
     '</defs>'+
-    '<path class="gx-rb-neon-star-line" d="'+starShape+'"/>'+
+    // Paint order is essential in Safari: blurred glow first, opaque dark
+    // silhouette separator next, SHARP colored line + delicate core last.
     '<path class="gx-rb-spectrum-outer" d="'+starShape+'"/>'+
     '<path class="gx-rb-spectrum-inner" d="'+starShape+'"/>'+
+    '<path class="gx-rb-neon-star-line" d="'+starShape+'"/>'+
     '<path class="gx-rb-spectrum-edge" d="'+starShape+'"/>'+
+    '<path class="gx-rb-spectrum-core" d="'+starShape+'"/>'+
     '</svg>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
