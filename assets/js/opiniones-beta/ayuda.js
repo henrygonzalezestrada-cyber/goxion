@@ -12,30 +12,20 @@
     badge:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 2.8 1.6 3.1.2.3 3.1L20 12l-1.8 3.1-.3 3.1-3.1.2L12 20l-2.8-1.6-3.1-.2-.3-3.1L4 12l1.8-3.1.3-3.1 3.1-.2L12 3Z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m8.8 12.1 2.1 2.1 4.2-4.4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>'
   };
 
-  // Seam-free chromatic light. One continuous multi-stop SVG gradient is
-  // shared by the front silhouette and its two blurred backlight layers.
-  // No quarter-circle/dashed segments: adjacent hues literally interpolate.
+  // Recupera la estrella sin cuadro de Opiniones 2.2. El único movimiento
+  // es un suave cambio de intensidad en el resplandor dibujado DETRÁS.
   const starShape="M50 7 62.6 34.7 93 38.5 70.5 59.2 76.5 89.5 50 74.2 23.5 89.5 29.5 59.2 7 38.5 37.4 34.7Z";
   const heroStar='<svg class="gx-rb-neon-star" viewBox="0 0 100 100" aria-hidden="true">'+
     '<defs>'+
-      '<linearGradient id="gx-rb-fluid-spectrum" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="100" y2="100" gradientTransform="rotate(0 50 50)">'+
+      '<linearGradient id="gx-rb-star-gradient" x1="0" y1="0" x2="1" y2="1">'+
         '<stop offset="0%" stop-color="#00f2fe"/>'+
-        '<stop offset="18%" stop-color="#2ea9ff"/>'+
-        '<stop offset="39%" stop-color="#7859ee"/>'+
-        '<stop offset="60%" stop-color="#ae67fb"/>'+
-        '<stop offset="81%" stop-color="#4a89ff"/>'+
-        '<stop offset="100%" stop-color="#77f5fc"/>'+
+        '<stop offset="55%" stop-color="#7c4dff"/>'+
+        '<stop offset="100%" stop-color="#78faff"/>'+
       '</linearGradient>'+
-      '<filter id="gx-rb-fluid-outer" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.4"/></filter>'+
-      '<filter id="gx-rb-fluid-inner" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation=".9"/></filter>'+
+      '<filter id="gx-rb-premium-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3.2"/></filter>'+
     '</defs>'+
-    // Paint order is essential in Safari: blurred glow first, opaque dark
-    // silhouette separator next, SHARP colored line + delicate core last.
-    '<path class="gx-rb-spectrum-outer" d="'+starShape+'"/>'+
-    '<path class="gx-rb-spectrum-inner" d="'+starShape+'"/>'+
+    '<path class="gx-rb-neon-star-halo" d="'+starShape+'"/>'+
     '<path class="gx-rb-neon-star-line" d="'+starShape+'"/>'+
-    '<path class="gx-rb-spectrum-edge" d="'+starShape+'"/>'+
-    '<path class="gx-rb-spectrum-core" d="'+starShape+'"/>'+
     '</svg>';
   const modal=document.getElementById("modal-feedback");
   const view=document.getElementById("view-inicio");
@@ -95,41 +85,10 @@
     for(const key of ["position","top","left","right","width"])style[key]=saved[key];
     window.scrollTo(0,saved.y);
   }
-  // Smooth rotation changes the light's color field — not the star
-  // geometry. Updating one SVG gradient is Safari/WebKit-compatible.
-  const fluidGradient=modal.querySelector("#gx-rb-fluid-spectrum");
-  const spectrumReduce=window.matchMedia("(prefers-reduced-motion: reduce)");
-  const spectrumPeriod=13000;
-  let spectrumTimer=null,spectrumStart=0,spectrumElapsed=0;
-  function tickSpectrum(){
-    if(!fluidGradient)return;
-    spectrumElapsed=performance.now()-spectrumStart;
-    const angle=360*(spectrumElapsed%spectrumPeriod)/spectrumPeriod;
-    fluidGradient.setAttribute("gradientTransform","rotate("+angle.toFixed(2)+" 50 50)");
-  }
-  function syncSpectrum(){
-    const active=modal.classList.contains("show")&&!document.hidden&&!spectrumReduce.matches;
-    if(!active){
-      if(spectrumTimer!==null)clearInterval(spectrumTimer);
-      spectrumTimer=null;
-      if(spectrumReduce.matches){
-        spectrumElapsed=0;
-        fluidGradient?.setAttribute("gradientTransform","rotate(0 50 50)");
-      }
-      return;
-    }
-    if(spectrumTimer!==null)return;
-    spectrumStart=performance.now()-spectrumElapsed;
-    tickSpectrum();
-    spectrumTimer=setInterval(tickSpectrum,32);
-  }
   const modalVisibility=new MutationObserver(()=>{
     if(modal.classList.contains("show"))lockBackground();
     else unlockBackground();
-    syncSpectrum();
   });
-  document.addEventListener("visibilitychange",syncSpectrum);
-  spectrumReduce.addEventListener?.("change",syncSpectrum);
   modalVisibility.observe(modal,{attributes:true,attributeFilter:["class"]});
   modal.addEventListener("touchmove",event=>{
     if(modal.classList.contains("gx-rb-complete")&&event.cancelable)event.preventDefault();
