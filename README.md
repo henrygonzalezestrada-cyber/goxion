@@ -51,3 +51,7 @@ npm run serve:preview
 ## Nota de mantenimiento
 
 Los archivos HTML de betas y respaldos históricos no viven en la raíz de producción. Si se necesita recuperar alguno, permanece disponible en el historial de Git y en las ramas de respaldo.
+
+## Mapa de funciones (obligatorio antes de desarrollar)
+
+Antes de añadir una función a Admin, Ayuda, Index o Supabase, consultar [el registro canónico de funciones y dependencias](docs/ADMIN_FUNCTION_REGISTRY.md). Se conserva la navegación e interfaz aprobadas; evitar módulos que dupliquen operaciones ya activas.
