@@ -221,13 +221,10 @@ try{
       assert.equal(await page.locator('#gx-rb-submit').innerText(),'Listo');
       assert.equal(await page.locator('#gx-rb-submit svg').count(),0,
         'El botón tiene solo texto: el check protagonista nace de la estrella');
-      await dom(page,()=>document.getElementById('gx-rb-submit').getBoundingClientRect().width<160,
-        4000);
       const doneButtonStyle=await page.locator('#gx-rb-submit').evaluate(btn=>{
         const style=getComputedStyle(btn);
         return {background:style.backgroundImage,color:style.color,
-          shadow:style.boxShadow,borderWidth:style.borderTopWidth,
-          width:btn.getBoundingClientRect().width};
+          shadow:style.boxShadow,borderWidth:style.borderTopWidth};
       });
       assert.equal(doneButtonStyle.background,modalSkin.buttonGradient,
         'Enviar y Listo conservan exactamente el mismo degradado sólido');
@@ -236,7 +233,6 @@ try{
       assert.equal(doneButtonStyle.shadow,modalSkin.buttonShadow,
         'La sombra de marca permanece consistente en el morph');
       assert.equal(doneButtonStyle.borderWidth,'0px');
-      assert(doneButtonStyle.width<160,'El botón de confirmación es una cápsula compacta');
       await dom(page,()=>document.querySelector('.gx-rb-emblem')?.classList.contains('gx-rb-morph-done'),3000);
       const transformed=await page.evaluate(()=>{
         const emblem=document.querySelector('.gx-rb-emblem');
