@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#070814">
+<title>GOXION · Centro de comunicaciones (Beta)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--text:#f2f5ff;--muted:#9ca7c6;--bg:#060711;--stroke:rgba(177,194,255,.13);--a:#8b5cf6;--b:#00d4ec;--green:#35e3aa;--red:#ff6785;--panel:rgba(19,22,39,.8)}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;background:radial-gradient(ellipse 65% 42% at 94% -5%,rgba(101,47,203,.24),transparent),radial-gradient(ellipse 50% 35% at -8% 38%,rgba(0,200,237,.09),transparent),var(--bg);color:var(--text);font:14px/1.5 Inter,system-ui,sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.48;cursor:not-allowed}a{color:var(--b);text-decoration:none}.shell{max-width:1350px;padding:22px 24px 100px;margin:auto}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:26px}.brand{display:flex;align-items:center;gap:12px}.logo{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(166,123,250,.55);border-radius:14px;background:linear-gradient(135deg,rgba(173,99,255,.26),rgba(7,227,250,.13));box-shadow:0 0 30px rgba(127,76,210,.13);font:700 23px Rajdhani}.brand strong{display:block;font:700 21px Rajdhani;letter-spacing:2px}.eyebrow{color:#83a6dc;letter-spacing:2px;text-transform:uppercase;font:700 11px Rajdhani}.head-actions{display:flex;gap:8px;align-items:center}.tag{border:1px solid rgba(255,205,102,.33);background:rgba(255,188,81,.07);color:#ffd58d;border-radius:100px;padding:5px 10px;font-size:11px;font-weight:700}.button{border:1px solid var(--stroke);background:rgba(167,187,255,.055);color:#eff2ff;border-radius:12px;padding:10px 15px;font-weight:600;transition:.2s}.button:hover:not(:disabled){border-color:rgba(164,159,255,.43);background:rgba(167,187,255,.11)}.button.primary{border-color:transparent;background:linear-gradient(110deg,#653fc6,#3469d5);box-shadow:0 9px 35px rgba(80,70,231,.24)}.button.ghost{background:transparent}.button.small{padding:7px 11px;font-size:12px}.hero{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:18px}.hero h1{font:700 clamp(27px,3.8vw,42px)/1.1 Rajdhani;margin:5px 0 8px;letter-spacing:.1px}.hero p{margin:0;color:var(--muted);max-width:690px}.hero .status{border:1px solid rgba(53,227,170,.24);color:#7de6c0;background:rgba(53,227,170,.07);border-radius:100px;padding:8px 12px;font-weight:600;white-space:nowrap}.dots{height:7px;width:7px;display:inline-block;margin-right:7px;border-radius:100%;background:var(--green);box-shadow:0 0 10px var(--green)}.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:22px 0}.glass{border:1px solid var(--stroke);border-radius:19px;background:linear-gradient(146deg,rgba(31,34,61,.83),rgba(11,14,28,.82));box-shadow:0 13px 45px rgba(0,0,0,.16);backdrop-filter:blur(18px)}.metric{padding:17px 19px;min-height:106px}.metric span{color:var(--muted);font-size:12px}.metric strong{display:block;font:700 33px/1.1 Rajdhani;margin-top:8px;letter-spacing:.3px}.metric small{color:#7e8baa;font-size:11px}.work{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(340px,.8fr);gap:15px;align-items:start}.stack{display:grid;gap:15px}.pane{padding:20px}.pane h2{font:700 23px Rajdhani;margin:0}.pane .intro{font-size:12px;color:var(--muted);margin:4px 0 18px}.field{display:flex;flex-direction:column;gap:7px;min-width:0}.field label{font-weight:600;color:#cfd6f3;font-size:12px}.field input,.field textarea,.field select{width:100%;min-width:0;background:rgba(5,7,19,.57);color:var(--text);border:1px solid rgba(146,160,214,.23);border-radius:12px;padding:11px 12px;outline:none;transition:border-color .2s}.field textarea{resize:vertical;min-height:96px}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--a);box-shadow:0 0 0 3px rgba(139,92,246,.09)}.field select option{color:#fff;background:#13182d}.formrow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.formrow.three{grid-template-columns:repeat(3,minmax(0,1fr))}.field + .field,.formrow + .formrow{margin-top:13px}.divider{height:1px;background:var(--stroke);margin:19px 0}.sub{font:700 15px Rajdhani;letter-spacing:.7px;color:#f3f0ff;margin-bottom:12px}.preset{display:flex;flex-wrap:wrap;gap:7px}.chip{border:1px solid rgba(139,155,220,.21);color:#bfcae8;background:rgba(141,169,237,.045);border-radius:100px;padding:7px 10px;font-size:11px;font-weight:600}.chip:hover,.chip.active{border-color:rgba(123,203,255,.46);color:white;background:linear-gradient(105deg,rgba(137,90,248,.28),rgba(0,210,237,.13))}.caption{font-size:11px;color:var(--muted)}.flex{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.mt{margin-top:14px}.preview-card{overflow:hidden;position:relative;padding:17px;border:1px solid rgba(162,146,253,.24);border-radius:17px;background:radial-gradient(circle at 100% 0%,rgba(139,92,246,.19),transparent 52%),linear-gradient(150deg,rgba(34,37,73,.85),rgba(12,17,34,.9))}.preview-card:after{content:'';pointer-events:none;position:absolute;inset:0 0 auto 0;height:2px;background:linear-gradient(90deg,#a16bff,#18e4ed,transparent)}.notifhead{display:flex;align-items:center;gap:10px;margin-bottom:12px}.notificon{width:37px;height:37px;border-radius:12px;display:grid;place-items:center;font-size:19px;background:rgba(130,94,238,.18);color:#c7b6ff}.notifhead strong{font-size:12px}.preview-title{font-weight:700;font-size:15px;margin-bottom:7px;line-height:1.4;overflow-wrap:anywhere}.preview-message{color:#bdc8e5;font-size:13px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere;min-height:42px}.preview-action{margin-top:12px;color:#69dbec;font-size:12px;font-weight:600}.count{padding:15px;border-radius:14px;border:1px solid rgba(66,229,179,.21);background:rgba(30,159,128,.055);display:flex;align-items:center;justify-content:space-between}.count strong{font:700 30px Rajdhani;color:#6ae5bd}.people{max-height:320px;overflow:auto;margin-top:9px;padding-right:4px}.person{display:flex;align-items:center;gap:11px;padding:12px 6px;border-bottom:1px solid rgba(161,170,217,.085)}.avatar{display:grid;place-items:center;flex:0 0 33px;width:33px;height:33px;border-radius:12px;color:#ccb7ff;background:rgba(139,92,246,.13);font:700 16px Rajdhani}.person .name{font-weight:700;font-size:12px}.person small{display:block;color:var(--muted);font-size:11px}.person .right{margin-left:auto;color:#b7c5e4;font-size:11px;white-space:nowrap}.person input{accent-color:#8b5cf6;inline-size:16px;block-size:16px;margin-left:4px}.alert{border:1px solid rgba(255,191,99,.22);border-radius:14px;padding:12px 14px;color:#e8cea2;background:rgba(255,185,77,.055);font-size:12px}.notice{color:#b6c2e1;font-size:12px}.foot{display:flex;flex-wrap:wrap;gap:9px;align-items:center;justify-content:space-between;margin-top:16px}.empty{color:var(--muted);text-align:center;padding:26px 12px}.hidden{display:none!important}.err{color:#ff9db0}.counter{font-size:11px;color:#8aa0c8}.mini{font-size:11px}.historyitem{padding:10px 0;border-bottom:1px solid var(--stroke)}.historyitem strong{font-size:12px}.historyitem small{color:var(--muted);font-size:11px;display:block}.callout{border:1px solid rgba(86,221,246,.18);border-radius:14px;background:rgba(30,184,218,.06);padding:12px;color:#b7d9e8;font-size:12px}.split-title{display:flex;justify-content:space-between;align-items:center;gap:9px}.toggle-row{display:flex;align-items:center;gap:9px;color:#aebfe0;font-size:12px;cursor:pointer}.toggle-row input{accent-color:#8b5cf6}.loader{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.18);border-top-color:#83e9ed;border-radius:100%;animation:spin .7s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}#feedback{font-size:12px;color:#7ce9c8;min-height:15px}@media(max-width:970px){.work{grid-template-columns:1fr}.grid4{grid-template-columns:repeat(2,1fr)}}@media(max-width:580px){.shell{padding:16px 13px 75px}.top{margin-bottom:18px}.head-actions{gap:5px}.button.small{padding:7px 9px}.hero{display:block}.hero .status{display:inline-block;margin-top:12px}.grid4{gap:8px;margin:15px 0}.metric{padding:12px;min-height:89px}.metric strong{font-size:28px}.pane{padding:17px 14px}.work{gap:12px}.formrow,.formrow.three{grid-template-columns:1fr}.formrow>.field{margin-top:0}.formrow>.field+.field{margin-top:10px}.tag{display:none}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="top">
+  <div class="brand"><div class="logo">✧</div><div><strong>GOXION</strong><div class="eyebrow">Admin · Comunicaciones</div></div></div>
+  <div class="head-actions"><span class="tag">BETA · SIN ENVÍOS</span><button class="button small" id="refresh">↻ Actualizar</button><a class="button small ghost" href="../../admin.html">← Admin</a></div>
+</header>
+<section class="hero">
+  <div><div class="eyebrow">Centro de comunicaciones inteligentes</div><h1>El mensaje correcto. A la persona correcta.</h1><p>Segmenta automáticamente por servicio contratado, progreso de misiones, cobro, antigüedad, promociones y fallas. Previsualiza el alcance antes de generar cualquier notificación.</p></div>
+  <div class="status"><span class="dots"></span>Datos de GOXION <span id="updated">· conectando</span></div>
+</section>
+<div id="auth" class="glass pane hidden"><h2>Conecta tu sesión administrativa</h2><p class="intro">Para proteger la información de clientes, abre primero Admin e inicia sesión. Después vuelve a esta beta.</p><a class="button primary" href="../../admin.html">Ir a Admin</a></div>
+<div id="error" class="alert hidden" role="alert"></div>
+<section id="workspace" class="hidden">
+  <div class="grid4">
+    <div class="glass metric"><span>Clientes elegibles</span><strong id="metric-clients">—</strong><small>Sin pruebas ni suspendidos</small></div>
+    <div class="glass metric"><span>Con misiones pendientes</span><strong id="metric-missions">—</strong><small>Estado actual</small></div>
+    <div class="glass metric"><span>Servicios disponibles</span><strong id="metric-services">—</strong><small>Segmentación por plataforma</small></div>
+    <div class="glass metric"><span>Audiencia seleccionada</span><strong id="metric-audience">—</strong><small>Tras aplicar condiciones</small></div>
+  </div>
+  <div class="work">
+    <div class="stack">
+      <section class="glass pane">
+        <h2>01 · ¿Qué vamos a comunicar?</h2><p class="intro">Elige una campaña o comienza desde cero. Cada categoría propone un mensaje y una audiencia recomendados.</p>
+        <div id="presets" class="preset">
+          <button class="chip active" data-preset="missions">✦ Misiones pendientes</button>
+          <button class="chip" data-preset="last">⏳ Última misión</button>
+          <button class="chip" data-preset="promo">✧ Promociones</button>
+          <button class="chip" data-preset="offer">% Descuentos</button>
+          <button class="chip" data-preset="outage">⚠ Fallas de servicio</button>
+          <button class="chip" data-preset="pay">▦ Próximo cobro</button>
+          <button class="chip" data-preset="general">✉ Aviso general</button>
+        </div>
+        <div class="divider"></div>
+        <div class="formrow">
+          <div class="field"><label for="category">Categoría</label><select id="category"><option value="missions">Misiones y recompensas</option><option value="promo">Oferta / promoción</option><option value="offer">Descuento especial</option><option value="outage">Falla o mantenimiento</option><option value="pay">Cobros y recordatorios</option><option value="general">Comunicado general</option></select></div>
+          <div class="field"><label for="deadline">Fecha importante / límite</label><input id="deadline" type="date" value="2026-10-20"></div>
+        </div>
+        <div class="field mt"><label for="title">Título de la notificación</label><input id="title" maxlength="90" value="Tus misiones finalizan el {fecha}"><span class="counter" id="titleCount"></span></div>
+        <div class="field mt"><label for="message">Mensaje personalizado</label><textarea id="message" maxlength="420" rows="4">Hola {nombre}, tienes {pendientes} misiones pendientes. Llevas {hechas} de {total} completadas. Tienes hasta el {fecha} para terminarlas y reclamar tu recompensa.</textarea><span class="counter" id="messageCount"></span></div>
+        <div class="mt">
+          <div class="sub">Variables inteligentes</div>
+          <div class="preset" id="variables"><button class="chip" data-variable="{nombre}">{nombre}</button><button class="chip" data-variable="{pendientes}">{pendientes}</button><button class="chip" data-variable="{hechas}">{hechas}</button><button class="chip" data-variable="{total}">{total}</button><button class="chip" data-variable="{servicios}">{servicios}</button><button class="chip" data-variable="{fecha}">{fecha}</button><button class="chip" data-variable="{dias_cobro}">{dias_cobro}</button></div>
+        </div>
+      </section>
+      <section class="glass pane">
+        <h2>02 · ¿A quiénes llegará?</h2><p class="intro">Las condiciones se combinan entre sí. Las cuentas suspendidas, de prueba o sin servicios activos siempre quedan fuera.</p>
+        <div class="formrow">
+          <div class="field"><label for="missionFilter">Progreso de misiones</label><select id="missionFilter"><option value="any">Cualquier progreso</option><option value="pending" selected>Tienen pendientes</option><option value="last">Solo 1 pendiente</option><option value="zero">No han completado ninguna</option><option value="done">Todas cumplidas</option></select></div>
+          <div class="field"><label for="stateFilter">Estado de cuenta</label><select id="stateFilter"><option value="any">Todos los estados válidos</option><option value="pagado">Pagado</option><option value="pendiente">Pendiente</option><option value="vencido">Vencido</option></select></div>
+        </div>
+        <div class="formrow mt">
+          <div class="field"><label for="serviceMode">Servicios contratados</label><select id="serviceMode"><option value="any">Sin restricción</option><option value="has">Que tengan este servicio</option><option value="lacks">Que NO tengan este servicio</option></select></div>
+          <div class="field"><label for="service">Seleccionar servicio</label><select id="service"><option value="">Cualquier plataforma</option></select></div>
+        </div>
+        <div class="formrow mt">
+          <div class="field"><label for="dueFilter">Fecha de cobro</label><select id="dueFilter"><option value="any">Cualquier fecha</option><option value="today">Cobran hoy</option><option value="3">En los próximos 3 días</option><option value="7">En los próximos 7 días</option><option value="15">En los próximos 15 días</option></select></div>
+          <div class="field"><label for="ageFilter">Antigüedad del cliente</label><select id="ageFilter"><option value="any">Cualquier antigüedad</option><option value="7">Ingresó últimos 7 días</option><option value="30">Ingresó últimos 30 días</option><option value="90">Ingresó últimos 90 días</option></select></div>
+        </div>
+        <div class="divider"></div>
+        <div class="split-title"><div class="sub" style="margin:0">Filtros sugeridos según datos reales</div><span class="caption">Toca para aplicar</span></div>
+        <div class="preset mt" id="smartChips"></div>
+        <div class="callout mt" id="rules">Se excluyen siempre las cuentas de prueba, suspendidas y sin servicios activos. Una campaña no modifica servicios ni estados de cuenta.</div>
+      </section>
+    </div>
+    <div class="stack">
+      <section class="glass pane">
+        <div class="split-title"><h2>03 · Vista previa</h2><span class="tag" style="display:inline-block">SIN ENVÍOS REALES</span></div>
+        <p class="intro">Así aparecerá en la campana de Mi Espacio. Los valores entre llaves se sustituyen para cada persona.</p>
+        <div class="preview-card" aria-live="polite">
+          <div class="notifhead"><div class="notificon">✦</div><div><strong>GOXION · <span id="notiftag">Recompensas</span></strong><div class="caption">Nueva notificación · Vista simulada</div></div></div>
+          <div class="preview-title" id="previewTitle"></div><div class="preview-message" id="previewMessage"></div><div class="preview-action" id="previewAction">Ver recompensas →</div>
+        </div>
+        <div class="field mt"><label for="sample">Previsualizar como</label><select id="sample"></select></div>
+        <div class="divider"></div>
+        <div class="count"><div><strong id="recipientCount">0</strong><div class="caption">Destinatarios potenciales</div></div><span class="tag" id="audienceState" style="display:inline-block">Sin enviar</span></div>
+        <div class="split-title mt"><div class="sub" style="margin:0">Audiencia exacta</div><label class="toggle-row"><input id="showExcluded" type="checkbox"> Ver excluidos manuales</label></div>
+        <div id="people" class="people"><div class="empty">Conectando con los clientes…</div></div>
+        <div class="foot"><button class="button" id="save">Guardar borrador local</button><button class="button primary" disabled title="La beta no puede enviar avisos a clientes reales">Activar campaña →</button></div>
+        <p id="feedback"></p>
+        <div class="alert mt">Protección de beta: esta pantalla <b>no puede detonar mensajes reales</b>. La activación se integrará después de probar segmentación, confirmación doble, deduplicación, programación y auditoría.</div>
+      </section>
+      <section class="glass pane">
+        <div class="split-title"><h2>Información en vivo</h2><span class="caption" id="databaseDate"></span></div>
+        <p class="intro">Datos conectados a la operación oficial.</p>
+        <div class="notice" id="businessInsights">Consultando promociones, fallas y fechas de cuenta…</div>
+        <div class="divider"></div>
+        <div class="sub">Actividad reciente de notificaciones</div>
+        <div id="history"><div class="empty">Cargando…</div></div>
+      </section>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+(function(){
+"use strict";
+var URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/comunicaciones-admin-preview";
+var TOKEN_KEY="GOXION_ADMIN_TOKEN";
+var $=function(id){return document.getElementById(id)};
+var names=["category","deadline","title","message","missionFilter","stateFilter","serviceMode","service","dueFilter","ageFilter","sample"];
+var data=null,filtered=[],excluded=new Set(),activePreset="missions",editing="message";
+function safe(str){return String(str??"").replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]})}
+function dateLabel(s){if(!s)return"sin fecha";var bits=s.split("-");return bits.length===3?Number(bits[2])+" de "+["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"][Number(bits[1])-1]:s}
+function write(id,text){$(id).textContent=String(text)}
+function value(id){return $(id).value}
+function set(id,v){$(id).value=v}
+function words(client){
+ var n=client||{nombre:"cliente",misiones_pendientes:0,misiones_hechas:0,misiones_total:0,dias_para_cobro:0,servicios:[]};
+ return {nombre:n.nombre,pendientes:n.misiones_pendientes,hechas:n.misiones_hechas,total:n.misiones_total,
+ servicios:(n.servicios||[]).map(function(s){return s.nombre}).join(", ")||"tus servicios",
+ fecha:dateLabel(value("deadline")),dias_cobro:n.dias_para_cobro??"—"};
+}
+function resolve(template,client){var v=words(client);return String(template).replace(/\{(nombre|pendientes|hechas|total|servicios|fecha|dias_cobro)\}/g,function(all,key){return String(v[key])})}
+function applies(c){
+ var mission=value("missionFilter"),service=value("service"),mode=value("serviceMode"),status=value("stateFilter"),due=value("dueFilter"),age=value("ageFilter");
+ if(mission==="pending"&&c.misiones_pendientes<=0)return false;
+ if(mission==="last"&&c.misiones_pendientes!==1)return false;
+ if(mission==="zero"&&!(c.misiones_total>0&&c.misiones_hechas===0))return false;
+ if(mission==="done"&&!(c.misiones_total>0&&c.misiones_pendientes===0))return false;
+ if(status!=="any"&&c.estado!==status)return false;
+ if(mode!=="any"){
+   if(!service)return false;
+   var has=c.servicios.some(function(s){return s.id===service||(s.nombre||"").toLowerCase()===(data.servicios.find(function(t){return t.id===service})||{}).nombre?.toLowerCase()});
+   if(mode==="has"&&!has)return false;
+   if(mode==="lacks"&&has)return false;
+ }
+ if(due!=="any"&&(c.dias_para_cobro===null||c.dias_para_cobro>Number(due==="today"?0:due)))return false;
+ if(age!=="any"&&(c.antiguedad_dias===null||c.antiguedad_dias>Number(age)))return false;
+ return true;
+}
+function refresh(){
+ if(!data)return;
+ filtered=data.clientes.filter(applies);
+ var audience=filtered.filter(function(c){return!excluded.has(c.id)});
+ write("metric-audience",audience.length);write("recipientCount",audience.length);
+ write("audienceState",audience.length?"Audiencia simulada":"Sin destinatarios");
+ var current=value("sample");
+ $("sample").innerHTML=audience.length?audience.map(function(c){return '<option value="'+safe(c.id)+'">'+safe(c.nombre)+'</option>'}).join(""):'<option value="">Sin destinatarios</option>';
+ if(audience.some(function(c){return c.id===current}))set("sample",current);
+ var client=audience.find(function(c){return c.id===value("sample")})||audience[0];
+ write("previewTitle",resolve(value("title"),client));
+ write("previewMessage",resolve(value("message"),client));
+ var selectedCategory=value("category");
+ var labels={missions:["Recompensas","Ver recompensas →"],promo:["Promociones","Ver catálogo →"],offer:["Beneficios","Ver catálogo →"],outage:["Soporte","Ver soporte →"],pay:["Tu cuenta","Ver estado de cuenta →"],general:["GOXION","Abrir Mi Espacio →"]};
+ write("notiftag",labels[selectedCategory][0]);write("previewAction",labels[selectedCategory][1]);
+ $("people").innerHTML=filtered.length?filtered.map(function(c){
+   var removed=excluded.has(c.id);
+   return '<label class="person"><div class="avatar">'+safe((c.nombre||"?").slice(0,1).toUpperCase())+'</div><div><span class="name">'+safe(c.nombre)+'</span><small>'+safe(c.servicios.map(function(s){return s.nombre}).join(" · "))+'</small></div><div class="right">'+c.misiones_pendientes+' pendientes</div><input type="checkbox" data-id="'+safe(c.id)+'" '+(removed?"":"checked")+' aria-label="Incluir a '+safe(c.nombre)+'"></label>';
+ }).join(""):'<div class="empty">Ningún cliente coincide. Ajusta las condiciones.</div>';
+ $("people").querySelectorAll("input[data-id]").forEach(function(el){el.addEventListener("change",function(){if(el.checked)excluded.delete(el.dataset.id);else excluded.add(el.dataset.id);refresh()})});
+ $("people").querySelectorAll(".person").forEach(function(el){el.classList.toggle("hidden",value("showExcluded")==="0"&&!el.querySelector("input").checked)});
+ write("titleCount",value("title").length+"/90 caracteres");
+ write("messageCount",value("message").length+"/420 caracteres");
+}
+function preset(name){
+ activePreset=name;
+ document.querySelectorAll("[data-preset]").forEach(function(x){x.classList.toggle("active",x.dataset.preset===name)});
+ var v={
+  missions:{category:"missions",missionFilter:"pending",title:"Tus misiones finalizan el {fecha}",message:"Hola {nombre}, tienes {pendientes} misiones pendientes. Llevas {hechas} de {total} completadas. Tienes hasta el {fecha} para terminarlas y reclamar tu recompensa.",dueFilter:"any",serviceMode:"any"},
+  last:{category:"missions",missionFilter:"last",title:"¡Solo te falta una misión!",message:"{nombre}, te falta una misión para completar tu recompensa. Finaliza antes del {fecha} y aprovecha tu beneficio.",dueFilter:"any",serviceMode:"any"},
+  promo:{category:"promo",missionFilter:"any",title:"Hay nuevas promociones para ti ✨",message:"Hola {nombre}, descubre las promociones vigentes en GOXION. Revisa el catálogo para conocer precios y disponibilidad.",dueFilter:"any",serviceMode:"any"},
+  offer:{category:"offer",missionFilter:"any",title:"Una oportunidad para ti",message:"Hola {nombre}, tenemos beneficios y descuentos disponibles en GOXION. Consulta las condiciones vigentes antes de contratar.",dueFilter:"any",serviceMode:"any"},
+  outage:{category:"outage",missionFilter:"any",title:"Aviso importante sobre tu servicio",message:"Hola {nombre}, estamos atendiendo una incidencia que podría afectar uno de tus servicios. Consulta Soporte para conocer las novedades. Gracias por tu comprensión.",dueFilter:"any",serviceMode:"has"},
+  pay:{category:"pay",missionFilter:"any",title:"Tu próxima fecha de cobro",message:"Hola {nombre}, faltan {dias_cobro} días para tu próxima fecha de cobro. Revisa tu estado de cuenta en Mi Espacio.",dueFilter:"7",serviceMode:"any"},
+  general:{category:"general",missionFilter:"any",title:"Novedades en GOXION",message:"Hola {nombre}, tenemos información importante para ti. Consulta tu espacio para conocer más detalles.",dueFilter:"any",serviceMode:"any"}
+ }[name];
+ if(!v)return;
+ Object.keys(v).forEach(function(k){set(k,v[k])});set("stateFilter","any");
+ if(name==="outage"&&data?.alertas?.length){var match=data.servicios.find(function(s){return s.nombre.toLowerCase().includes(String(data.alertas[0].plataforma).toLowerCase())});if(match)set("service",match.id)}
+ excluded.clear();refresh();
+}
+function insights(){
+ var m=data.clientes.filter(function(c){return c.misiones_pendientes>0}).length;
+ var dues=data.clientes.filter(function(c){return c.dias_para_cobro<=7}).length;
+ write("metric-clients",data.clientes.length);write("metric-missions",m);write("metric-services",data.servicios.length);write("databaseDate","Corte: "+data.fecha_local);
+ write("businessInsights",m+" clientes con misiones pendientes · "+dues+" con cobro dentro de 7 días · "+data.promociones.length+" promociones activas · "+data.alertas.length+" incidentes registrados como activos.");
+ var selected=data.servicios;
+ $("service").innerHTML='<option value="">Selecciona un servicio</option>'+selected.map(function(s){return '<option value="'+safe(s.id)+'">'+safe(s.nombre)+'</option>'}).join("");
+ var hints=[{title:"Pendientes de recompensa",fn:function(){preset("missions")}},{title:"Casi completan misiones",fn:function(){preset("last")}},{title:"Cobro en 7 días",fn:function(){preset("pay")}}];
+ var first=selected.find(function(s){return data.clientes.some(function(c){return c.servicios.some(function(t){return t.id===s.id})})});
+ if(first)hints.push({title:"Usuarios de "+first.nombre,fn:function(){preset("general");set("serviceMode","has");set("service",first.id);refresh()}});
+ if(data.alertas.length)hints.push({title:"Incidencia: "+data.alertas[0].plataforma,fn:function(){preset("outage")}});
+ if(data.promociones.length)hints.push({title:"Promociones vigentes",fn:function(){preset("promo")}});
+ $("smartChips").innerHTML="";
+ hints.forEach(function(h){var b=document.createElement("button");b.className="chip";b.textContent=h.title;b.addEventListener("click",h.fn);$("smartChips").appendChild(b)});
+ var h=data.historial||[];
+ var recent=h.slice(0,5);$("history").innerHTML=recent.length?recent.map(function(x){return '<div class="historyitem"><strong>'+safe(x.titulo)+'</strong><small>'+safe(x.tipo)+' · '+safe(new Date(x.created_at).toLocaleDateString("es-MX"))+'</small></div>'}).join(""):'<p class="caption">Todavía no hay notificaciones registradas.</p>';
+ var x=data.exclusiones;write("rules","Protección permanente: "+x.suspendidos+" suspendidos, "+x.sin_servicios+" sin servicios activos y "+x.prueba+" cuentas de prueba excluidos. Las promociones o descuentos solo se comunican; no se aplican automáticamente a las cuentas.");
+}
+async function load(){
+ $("refresh").disabled=true; $("refresh").innerHTML='<span class="loader"></span> Conectando'; $("error").classList.add("hidden");
+ var token=localStorage.getItem(TOKEN_KEY)||"";
+ if(!token){$("auth").classList.remove("hidden");$("workspace").classList.add("hidden");$("refresh").disabled=false;write("refresh","↻ Actualizar");return}
+ try{
+  var res=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion:"resumen"}),cache:"no-store"});
+  var json=await res.json();
+  if(!res.ok||json.ok!==true)throw new Error(json.error||"Error de conexión ("+res.status+")");
+  data=json;$("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
+  write("updated","· "+data.fecha_local);insights();refresh();
+ }catch(err){write("error",err.message||"No se pudieron consultar los datos");$("error").classList.remove("hidden");if(/sesión|inicia sesión/i.test(err.message)){$("auth").classList.remove("hidden");$("workspace").classList.add("hidden")}}
+ finally{$("refresh").disabled=false;write("refresh","↻ Actualizar")}
+}
+function save(){
+ var payload={};names.forEach(function(id){if(id!=="sample")payload[id]=value(id)});
+ try{localStorage.setItem("gx_communications_draft_v1",JSON.stringify(payload));write("feedback","Borrador guardado en este dispositivo. No se envió ninguna notificación.")}catch{write("feedback","No fue posible guardar el borrador en este dispositivo.")}
+}
+function restore(){
+ try{var payload=JSON.parse(localStorage.getItem("gx_communications_draft_v1")||"null");if(payload){Object.keys(payload).forEach(function(k){if($(k))set(k,payload[k])});activePreset="";document.querySelectorAll("[data-preset]").forEach(function(x){x.classList.remove("active")})}}catch{}
+}
+names.forEach(function(id){$(id).addEventListener(id==="title"||id==="message"?"input":"change",refresh)});
+$("title").addEventListener("focus",function(){editing="title"});
+$("message").addEventListener("focus",function(){editing="message"});
+$("variables").querySelectorAll("[data-variable]").forEach(function(b){b.addEventListener("click",function(){var el=$(editing);var pos=el.selectionStart??el.value.length;var v=b.dataset.variable;el.value=el.value.slice(0,pos)+v+el.value.slice(pos);el.focus();el.setSelectionRange(pos+v.length,pos+v.length);refresh()})});
+document.querySelectorAll("[data-preset]").forEach(function(b){b.addEventListener("click",function(){preset(b.dataset.preset)})});
+$("refresh").addEventListener("click",load);
+$("showExcluded").addEventListener("change",function(){if(!data)return;document.querySelectorAll(".person").forEach(function(el){el.classList.toggle("hidden",!$("showExcluded").checked&&!el.querySelector("input").checked)})});
+$("save").addEventListener("click",save);
+restore();load();
+})();
+</script>
+</body>
+</html>
