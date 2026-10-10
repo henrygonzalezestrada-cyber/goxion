@@ -34,11 +34,19 @@ try{
         row('22222222-2222-4222-8222-222222222222',4,'La experiencia es sencilla y el catálogo es claro.')
       ];
       const pending=row('33333333-3333-4333-8333-333333333333',5,'La ayuda fue amable y respondió mis dudas.','pending');
-      let all=[...published,pending],submission=0,adminActions=0;
+      let all=[...published,pending],submission=0,adminActions=0,missionCompletes=0;
       const handler=async route=>{
         const url=route.request().url();
         let body={};try{body=JSON.parse(route.request().postData()||'{}')}catch{}
         const h=route.request().headers();
+        if(url.includes('/mi-espacio')&&body.modo==='completar_mision_tipo'){
+          assert.equal(h['x-client-token'],'test-client-token','Misión solo con sesión de cliente');
+          assert.equal(body.tipo,'FEEDBACK','Solo completar misión de opinión');
+          assert(submission>0,'Prohibido completar misión sin haber guardado la opinión');
+          missionCompletes++;
+          return route.fulfill({status:200,contentType:'application/json',
+            body:JSON.stringify({ok:true,completadas:[0],progreso:[{mision_index:0}]})});
+        }
         if(!url.includes('/opiniones-goxion')){
           return route.fulfill({status:401,contentType:'application/json',body:'{"ok":false}'});
         }
@@ -85,18 +93,37 @@ try{
       assert.equal(await page.locator('#view-inicio .gx-rb-review-identity strong').first().innerText(),'Cliente G.');
       const first=await page.locator('.gx-rb-neon-star-line').count();
       assert.equal(first,1,'Silueta original montada');
-      await page.evaluate(()=>localStorage.setItem(window.GOXION_CORE.STORAGE.CLIENT_TOKEN,'test-client-token'));
-      await page.evaluate(()=>window.openFeedbackModal());
+      await page.evaluate(()=>{
+        localStorage.setItem(window.GOXION_CORE.STORAGE.CLIENT_TOKEN,'test-client-token');
+        window.getCurrentClientKey=()=> 'opiniones-mission-test';
+        globalClientesData['opiniones-mission-test']={
+          nombre:'Cliente de prueba',folio:'TEST-01',
+          gamificacion:{progreso:[]}
+        };
+        const mission=document.createElement('div');
+        mission.id='mission-0';
+        mission.className='mission-item locked';
+        mission.innerHTML='<span class="mission-checkbox">🔒</span>';
+        document.body.appendChild(mission);
+      });
+      await page.evaluate(()=>window.openFeedbackModal(0,'TEST-01'));
       await until(page,()=>document.querySelector('#modal-feedback')?.classList.contains('show'));
       const initialStyle=await page.locator('#gx-rb-submit').evaluate(b=>{
         let c=getComputedStyle(b);return {bg:c.backgroundImage,color:c.color};
       });
+      await page.locator('#gx-rb-submit').evaluate(b=>b.click());
+      await until(page,()=>document.getElementById('gx-rb-error')?.textContent.length>0);
+      assert.equal(submission,0,'No guardar formulario vacío');
+      assert.equal(missionCompletes,0,'La misión debe continuar pendiente si falla la validación');
       await page.locator('.gx-rb-star[data-score="5"]').evaluate(b=>b.click());
       await page.locator('#gx-rb-text').fill('GOXION es confiable y su equipo responde muy rápido.');
       await page.locator('.gx-rb-consent').evaluate(e=>e.click());
       await page.locator('#gx-rb-submit').evaluate(b=>b.click());
       await until(page,()=>document.querySelector('.gx-rb-emblem')?.classList.contains('gx-rb-morph-done'));
       assert.equal(submission,1);
+      assert.equal(missionCompletes,1,'Solo una misión FEEDBACK completada tras guardar');
+      assert.equal(await page.locator('#mission-0.done').count(),1,
+        'La misión pendiente debe transformarse en completada visualmente');
       assert.equal((await page.locator('#gx-rb-submit').innerText()).trim(),'Listo');
       assert.equal(await page.locator('#gx-rb-submit svg').count(),0);
       const finalStyle=await page.locator('#gx-rb-submit').evaluate(b=>{
@@ -125,7 +152,7 @@ try{
       await admin.locator('#gx-rb-admin-close').evaluate(b=>b.click());
       assert.equal(await admin.locator('.gx-rb-admin-overlay').evaluate(e=>e.hidden),true);
       await admin.close();
-      console.log(name+': carrusel verificado, envío, consentimiento, estrella→check, botón coherente y moderación Admin OK');
+      console.log(name+': carrusel, misión FEEDBACK verificada tras guardar, estrella→check y moderación Admin OK');
     }finally{await browser.close()}
   }
 }finally{server.kill('SIGTERM')}
