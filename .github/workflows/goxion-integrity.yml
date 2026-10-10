@@ -35,6 +35,10 @@ jobs:
       - name: Opiniones 2.0 beta (local-only)
         run: npm run test:opiniones
 
+      - name: Opiniones oficiales · flujo seguro simulado
+        if: ${{ !cancelled() }}
+        run: npm run test:opiniones:oficial
+
       - name: Browser smoke
         if: ${{ !cancelled() }}
         run: npm run test:smoke

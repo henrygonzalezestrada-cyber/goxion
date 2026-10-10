@@ -106,7 +106,7 @@ try{
       if(button.disabled)throw new Error('Botón finalizar carrito deshabilitado');
       button.click();
     });
-    await page.waitForFunction(()=>!document.getElementById('gx-cart-dialog').open);
+    await waitForDom(page,()=>!document.getElementById('gx-cart-dialog').open,10000);
     await page.evaluate(({services})=>{
       localStorage.setItem(GOXION_CORE.STORAGE.CLIENT_TOKEN,'test-token');
       window.goxionCurrentClientKey='cart-test';
