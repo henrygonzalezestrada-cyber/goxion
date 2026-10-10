@@ -1056,9 +1056,9 @@
 }
 
 /* ================================================================
-   OPINIONES 2.8 — Google TV-inspired full-spectrum illuminated rim
-   Based on reference video: continuously colored EDGES + glow escaping
-   outward. No roaming blobs; no isolated moving stroke/pointer.
+   OPINIONES 2.9 — gradiente cromático sin uniones
+   Todo el contorno y halo usan una ÚNICA fuente de luz.
+   No existen cuatro secciones ni cambios bruscos de color.
    ================================================================ */
 .gx-rb-modal .gx-rb-emblem{
   position:relative;
@@ -1074,9 +1074,9 @@
 }
 .gx-rb-modal .gx-rb-neon-star-line{
   fill:none;
-  stroke:#32638c!important;
-  stroke-width:2.1px;
-  opacity:.56;
+  stroke:rgba(29,85,131,.38)!important;
+  stroke-width:2px;
+  opacity:.65;
   stroke-dasharray:none!important;
   stroke-dashoffset:0!important;
   animation:none!important;
@@ -1086,30 +1086,28 @@
 .gx-rb-modal .gx-rb-spectrum-inner,
 .gx-rb-modal .gx-rb-spectrum-edge{
   fill:none;
+  stroke:url(#gx-rb-fluid-spectrum)!important;
+  stroke-dasharray:none!important;
   stroke-linejoin:round;
-  stroke-linecap:butt;
+  stroke-linecap:round;
   pointer-events:none;
   animation:none!important;
 }
 .gx-rb-modal .gx-rb-spectrum-outer{
-  stroke-width:17px;
-  opacity:.76;
-  filter:url(#gx-rb-spectrum-outer);
+  stroke-width:18px;
+  opacity:.77;
+  filter:url(#gx-rb-fluid-outer);
 }
 .gx-rb-modal .gx-rb-spectrum-inner{
   stroke-width:7px;
-  opacity:.84;
-  filter:url(#gx-rb-spectrum-inner);
+  opacity:.87;
+  filter:url(#gx-rb-fluid-inner);
 }
 .gx-rb-modal .gx-rb-spectrum-edge{
   stroke-width:2.6px;
   opacity:1;
-  filter:drop-shadow(0 0 2px currentColor);
+  filter:none;
 }
-.gx-rb-modal .gx-rb-spectrum-cyan{stroke:#00f2fe;color:#00f2fe}
-.gx-rb-modal .gx-rb-spectrum-blue{stroke:#3c7bff;color:#3c7bff}
-.gx-rb-modal .gx-rb-spectrum-violet{stroke:#ae59ff;color:#ae59ff}
-.gx-rb-modal .gx-rb-spectrum-ice{stroke:#87b0ff;color:#87b0ff}
 @media(prefers-reduced-motion:reduce){
   .gx-rb-modal .gx-rb-spectrum-outer,
   .gx-rb-modal .gx-rb-spectrum-inner,
