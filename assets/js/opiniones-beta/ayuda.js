@@ -84,7 +84,7 @@
     for(const path of heroPaths)path.setAttribute("d",shape);
   }
   function resetHeroMorph(){
-    if(heroFrame!==null)cancelAnimationFrame(heroFrame);
+    if(heroFrame!==null)clearInterval(heroFrame);
     heroFrame=null;
     heroEmblem.classList.remove("gx-rb-morphing","gx-rb-morph-done");
     for(const path of heroPaths)path.setAttribute("d",starShape);
@@ -98,19 +98,26 @@
     }
     heroEmblem.classList.add("gx-rb-morphing");
     const started=performance.now(),duration=660;
-    function frame(now){
-      if(!modal.classList.contains("gx-rb-complete")){heroFrame=null;return}
-      const t=Math.min(1,Math.max(0,(now-started)/duration));
+    function frame(){
+      if(!modal.classList.contains("gx-rb-complete")){
+        clearInterval(heroFrame);
+        heroFrame=null;
+        return;
+      }
+      // Safari/WebKit puede suspender requestAnimationFrame dentro del modal
+      // mientras colapsa. El reloj mantiene el morph estable en iPhone.
+      const t=Math.min(1,Math.max(0,(performance.now()-started)/duration));
       const eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
       paintHeroMorph(eased);
-      if(t<1)heroFrame=requestAnimationFrame(frame);
-      else{
+      if(t>=1){
+        clearInterval(heroFrame);
         heroFrame=null;
         heroEmblem.classList.remove("gx-rb-morphing");
         heroEmblem.classList.add("gx-rb-morph-done");
       }
     }
-    heroFrame=requestAnimationFrame(frame);
+    frame();
+    heroFrame=setInterval(frame,24);
   }
 
   function lockBackground(){
