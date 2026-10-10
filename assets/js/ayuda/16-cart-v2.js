@@ -130,9 +130,17 @@
     iconTo(dialog.querySelector('.gx-cart-close'), 'bag');
     if (!reduced()) {
       motion = dialog.animate([{transform:'none',opacity:1},{transform:originTransform(),opacity:0,borderRadius:'36px'}],{duration:320,easing:'cubic-bezier(.4,0,.6,1)'});
-      await motion.finished.catch(()=>{});
+      // WebKit puede dejar motion.finished pendiente si cambia el contexto del
+      // diálogo; el cierre NO debe depender de esa promesa indefinidamente.
+      const closingMotion = motion;
+      await Promise.race([
+        closingMotion.finished.catch(()=>{}),
+        new Promise(resolve=>setTimeout(resolve,440))
+      ]);
+      if(motion===closingMotion)closingMotion.cancel();
     }
-    dialog.close(); dialog.classList.remove('is-closing'); closing = false;
+    if(dialog.open)dialog.close();
+    dialog.classList.remove('is-closing'); closing = false;
   }
   function changeService(name, delta) {
     if (busy) return false;
