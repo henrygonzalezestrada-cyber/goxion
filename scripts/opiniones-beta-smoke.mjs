@@ -221,6 +221,8 @@ try{
       assert.equal(await page.locator('#gx-rb-submit').innerText(),'Listo');
       assert.equal(await page.locator('#gx-rb-submit svg').count(),0,
         'El botón tiene solo texto: el check protagonista nace de la estrella');
+      await dom(page,()=>document.getElementById('gx-rb-submit').getBoundingClientRect().width<160,
+        4000);
       const doneButtonStyle=await page.locator('#gx-rb-submit').evaluate(btn=>{
         const style=getComputedStyle(btn);
         return {background:style.backgroundImage,color:style.color,
