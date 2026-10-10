@@ -224,6 +224,12 @@
       const review=await store.add({
         rating,text:$("gx-rb-text").value,consent:$("gx-rb-consent").checked
       });
+      // Solo una opinión guardada de verdad puede acreditar la misión
+      // [FEEDBACK]. La API existente valida la sesión y el ciclo activo,
+      // sincroniza Supabase y actualiza el estado visual de Mi Espacio.
+      if(typeof window.completarMisionInteligente==="function"){
+        await window.completarMisionInteligente("feedback");
+      }
       $("gx-rb-success-text").textContent=review.consent?
         "Podrás verla en la cinta después de que se apruebe su publicación.":
         "Tu comentario es privado y solo podrá publicarse con tu autorización.";
