@@ -146,59 +146,52 @@ try{
       const hero=await page.evaluate(()=>{
         const emblem=document.querySelector('.gx-rb-emblem');
         const svg=emblem.querySelector('.gx-rb-neon-star');
-        const gradient=svg.querySelector('#gx-rb-fluid-spectrum');
-        const layers=['outer','inner','edge','core'].map(
-          name=>svg.querySelector('.gx-rb-spectrum-'+name)
-        );
-        const base=svg.querySelector('.gx-rb-neon-star-line');
-        const blur=(id)=>Number(svg.querySelector(id+' feGaussianBlur').getAttribute('stdDeviation'));
+        const halo=svg.querySelector('.gx-rb-neon-star-halo');
+        const line=svg.querySelector('.gx-rb-neon-star-line');
+        const gradient=svg.querySelector('#gx-rb-star-gradient');
         return {
           noBox:getComputedStyle(emblem).borderTopStyle,
           cyanFill:getComputedStyle(document.querySelector('.gx-rb-close')).backgroundColor,
           darkX:getComputedStyle(document.querySelector('.gx-rb-close')).color,
-          svgPaths:svg.querySelectorAll('path').length,
-          paintOrder:[...svg.querySelectorAll('path')].map(node=>node.getAttribute('class')),
-          widths:layers.map(node=>getComputedStyle(node).strokeWidth),
-          opacity:layers.map(node=>getComputedStyle(node).opacity),
-          strokeColors:layers.map(node=>getComputedStyle(node).stroke),
-          filters:layers.map(node=>getComputedStyle(node).filter),
-          baseStroke:getComputedStyle(base).stroke,
-          baseWidth:getComputedStyle(base).strokeWidth,
-          outerBlur:blur('#gx-rb-fluid-outer'),
-          innerBlur:blur('#gx-rb-fluid-inner'),
-          noSegments:svg.querySelectorAll('[data-spectrum-band],[stroke-dasharray]').length===0,
+          pathOrder:[...svg.querySelectorAll('path')].map(node=>node.getAttribute('class')),
+          lineWidth:getComputedStyle(line).strokeWidth,
+          lineStroke:getComputedStyle(line).stroke,
+          lineFilter:getComputedStyle(line).filter,
+          lineAnimation:getComputedStyle(line).animationName,
+          haloStroke:getComputedStyle(halo).stroke,
+          haloWidth:getComputedStyle(halo).strokeWidth,
+          haloFilter:getComputedStyle(halo).filter,
+          haloAnimation:getComputedStyle(halo).animationName,
+          blur:Number(svg.querySelector('#gx-rb-premium-glow feGaussianBlur').getAttribute('stdDeviation')),
           gradientStops:[...gradient.querySelectorAll('stop')].map(node=>node.getAttribute('stop-color')),
-          svgFilter:getComputedStyle(svg).filter,
-          gradientTransform:gradient.getAttribute('gradientTransform')
+          gradientMotion:gradient.hasAttribute('gradientTransform'),
+          hasDarkSeparator:!!svg.querySelector('.gx-rb-spectrum-edge,.gx-rb-spectrum-core,.gx-rb-spectrum-outer,.gx-rb-spectrum-inner'),
+          svgFilter:getComputedStyle(svg).filter
         };
       });
-      assert.equal(hero.noBox,'none');
+      assert.equal(hero.noBox,'none','La estrella no vuelve a una caja');
       assert.equal(hero.cyanFill,'rgb(0, 242, 254)');
       assert.equal(hero.darkX,'rgb(6, 18, 24)');
-      assert.equal(hero.svgPaths,5,'Una capa nítida adicional sobre el halo de la estrella');
-      assert.deepEqual(hero.paintOrder,[
-        'gx-rb-spectrum-outer','gx-rb-spectrum-inner',
-        'gx-rb-neon-star-line','gx-rb-spectrum-edge','gx-rb-spectrum-core'
-      ],'Las capas difusas se dibujan DETRÁS de la silueta nítida');
-      assert.deepEqual(hero.widths,['8.5px','4.6px','3.25px','0.88px'],
-        'La luz exterior es contenida y la línea visible está enfocada');
-      assert.deepEqual(hero.opacity,['0.52','0.63','1','0.68']);
-      assert.equal(hero.baseWidth,'5px','La silueta oscura separa visualmente el halo');
-      assert.equal(hero.baseStroke,'rgba(5, 9, 21, 0.9)');
-      assert.equal(hero.outerBlur,2.4,'El halo ya no debe diluir la estrella');
-      assert.equal(hero.innerBlur,0.9);
-      assert.match(hero.filters[0],/gx-rb-fluid-outer/);
-      assert.match(hero.filters[1],/gx-rb-fluid-inner/);
-      assert.equal(hero.filters[2],'none','Contorno sin ningún desenfoque');
-      assert.equal(hero.filters[3],'none','Núcleo brillante completamente nítido');
-      assert.equal(hero.svgFilter,'none','No difuminar la estrella entera');
-      assert.equal(hero.noSegments,true,'Gradiente cromático sin divisiones');
-      assert(hero.strokeColors.slice(0,3).every(c=>c.includes('gx-rb-fluid-spectrum')));
-      assert(hero.gradientStops.length>=6);
-      const beforeGradient=hero.gradientTransform;
-      await page.waitForTimeout(800);
-      const afterGradient=await page.locator('#gx-rb-fluid-spectrum').getAttribute('gradientTransform');
-      assert.notEqual(beforeGradient,afterGradient,'El degradado sigue animado en Safari');
+      assert.deepEqual(hero.pathOrder,['gx-rb-neon-star-halo','gx-rb-neon-star-line'],
+        'El único brillo está detrás de la silueta de Opiniones 2.2');
+      assert.equal(hero.lineWidth,'2.7px','La línea debe conservar la proporción elegante de la base');
+      assert.match(hero.lineStroke,/gx-rb-star-gradient/);
+      assert.match(hero.haloStroke,/gx-rb-star-gradient/,'El halo hereda el color sin dividir el perímetro');
+      assert.equal(hero.lineFilter,'none','La estrella debe ser nítida');
+      assert.equal(hero.lineAnimation,'none','No debe correr ni girar el contorno');
+      assert.equal(hero.haloWidth,'9.5px');
+      assert.match(hero.haloFilter,/gx-rb-premium-glow/);
+      assert.match(hero.haloAnimation,/gxRbNaturalBacklight/,
+        'Solo el glow posterior respira suavemente');
+      assert.equal(hero.blur,3.2);
+      assert.deepEqual(hero.gradientStops,['#00f2fe','#7c4dff','#78faff']);
+      assert.equal(hero.gradientMotion,false,'El gradiente frontal permanece quieto');
+      assert.equal(hero.hasDarkSeparator,false,'Sin separador grueso ni doble borde blanco');
+      assert.equal(hero.svgFilter,'none');
+      await page.emulateMedia({reducedMotion:'reduce'});
+      assert.equal(await page.locator('.gx-rb-neon-star-halo').evaluate(node=>getComputedStyle(node).animationName),
+        'none','Respeta reducir movimiento en iOS');
+      await page.emulateMedia({reducedMotion:'no-preference'});
       assert.match(await page.locator('#gx-rb-title').innerText(),/Cómo te fue/i);
       const modalSkin=await page.evaluate(()=>({
         scoreBorder:getComputedStyle(document.querySelector('.gx-rb-score')).borderTopStyle,
