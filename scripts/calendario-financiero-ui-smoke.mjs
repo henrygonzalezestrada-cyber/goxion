@@ -32,7 +32,7 @@ function setup(token){
    const obj=req.accion==="listar_calendarios_beta"?{ok:true,clientes:clients}:
      req.accion==="simular_calendario_beta"?{
        ok:true,cliente:clients[0],
-       calendario:simularCalendario({cliente:clients[0],servicios,financiero:financial,
+       calendario:simularCalendario({cliente:clients[0],servicios:services,financiero:financial,
          propuesta:req.datos.propuesta,hoy:"2026-10-11"})
      }:{ok:false,error:"Acción inesperada"};
    return {ok:obj.ok,status:obj.ok?200:400,json:async()=>obj};
