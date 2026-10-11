@@ -29,7 +29,7 @@ function setup(token){
  const opts=["proximo","todos","elegidos"].map(mode=>({dataset:{pay:mode},setAttribute(k,v){this[k]=v},addEventListener(k,fn){this[k]=fn}}));
  const fetch=async(url,opts)=>{
    const req=JSON.parse(opts.body);calls.push(req);
-   const obj=req.accion==="listar_calendarios_beta"?{ok:true,clientes}:
+   const obj=req.accion==="listar_calendarios_beta"?{ok:true,clientes:clients}:
      req.accion==="simular_calendario_beta"?{
        ok:true,cliente:clients[0],
        calendario:simularCalendario({cliente:clients[0],servicios,financiero:financial,
