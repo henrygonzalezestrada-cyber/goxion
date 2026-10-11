@@ -89,6 +89,12 @@ test.click('resetRecipients');
 assert.equal(test.nodes.audienceCount.textContent,'2','Restablecer recupera las recomendaciones originales');
 test.choice('pay');
 assert.equal(test.nodes.audienceCount.textContent,'2','La inclusión manual persiste en su motivo');
+fixture.clientes.find(x=>x.id==='d').cobro_pagado=true;
+test.click('refresh');
+await flush();
+assert.equal(test.nodes.audienceCount.textContent,'1','Una inclusión manual inválida se elimina después de actualizar los datos oficiales');
+test.input('recipientSearch','dora');
+assert(test.nodes.available.innerHTML.includes('disabled'),'La persona recién pagada deja de estar disponible para añadir');
 
 test.choice('promo');
 assert.equal(test.nodes.audienceCount.textContent,'0','Sin selección, no se estima audiencia de promoción');
