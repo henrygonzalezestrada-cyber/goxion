@@ -1,103 +1,75 @@
-import { readFileSync } from 'node:fs';
+import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
+const html=readFileSync('preview/comunicaciones/index.html','utf8');
+const js=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
+assert(js,'La beta necesita script');
+new vm.Script(js);
+assert(/id="send"[^>]*disabled|disabled[^>]*id="send"/.test(html),'El envío real debe estar deshabilitado');
+assert(!html.includes('data-preset="outage"'),'Las incidencias se gestionan en su módulo');
+assert(!html.includes('data-preset="offer"'),'Los descuentos se gestionan en Studio');
+const ids=[...html.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
+assert.equal(new Set(ids).size,ids.length,'Sin IDs duplicados');
+for(const kind of ['missions','pay','promo','general']) assert(html.includes('data-kind="'+kind+'"'),'Motivo faltante: '+kind);
 
-const html = readFileSync('preview/comunicaciones/index.html', 'utf8');
-const script = html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
-assert(script, 'Falta el script del simulador');
-assert(!/data-preset="(?:outage|offer)"/.test(html), 'Regresó un editor duplicado de fallas/descuentos');
-assert(html.includes('Activar campaña →') && /primary" disabled title="La beta no puede enviar/.test(html), 'La beta no debe habilitar envíos reales');
-assert(html.includes('id="automationList"'), 'Falta el mapa de detonaciones');
-const ids = [...html.matchAll(/\bid=["']([^"']+)["']/g)].map(m => m[1]);
-assert.equal(ids.length, new Set(ids).size, 'Hay IDs HTML duplicados');
-
-const fixture = {
-  ok:true, fecha_local:'2026-10-10',
-  clientes:[
-    {id:'a',nombre:'Ana',estado:'pagado',estado_cuenta:'pendiente',servicios:[{id:'s',nombre:'Netflix'}],misiones_total:3,misiones_hechas:1,misiones_pendientes:2,dias_para_cobro:2,cobro_oficial:true,cobro_pagado:false,antiguedad_dias:30,notificaciones_previas:[{tipo:'mision_recordatorio',dedupe_key:'misiones:2026-10-20:aviso-inicial'}]},
-    {id:'b',nombre:'Beto',estado:'pendiente',estado_cuenta:'pendiente',servicios:[{id:'s',nombre:'Netflix'}],misiones_total:3,misiones_hechas:2,misiones_pendientes:1,dias_para_cobro:5,cobro_oficial:true,cobro_pagado:false,antiguedad_dias:12,notificaciones_previas:[]},
-    {id:'c',nombre:'Caro',estado:'pagado',estado_cuenta:'pagado',servicios:[{id:'s',nombre:'Netflix'}],misiones_total:3,misiones_hechas:3,misiones_pendientes:0,dias_para_cobro:null,cobro_oficial:true,cobro_pagado:true,antiguedad_dias:200,notificaciones_previas:[]},
-    {id:'d',nombre:'Dora',estado:'pendiente',estado_cuenta:null,servicios:[{id:'s',nombre:'Netflix'}],misiones_total:0,misiones_hechas:0,misiones_pendientes:0,dias_para_cobro:null,cobro_oficial:false,cobro_pagado:false,antiguedad_dias:20,notificaciones_previas:[]}
-  ],
-  servicios:[{id:'s',nombre:'Netflix',activo:true}],
-  promociones:[{id:'p',nombre:'Combo Premium',titulo_publico:'Combo Premium',notificar_cliente:true}],
-  alertas:[],historial:[],exclusiones:{suspendidos:1,prueba:1,sin_servicios:0},
-  fiabilidad:{consultas_correctas:3,consultas_fallidas:1},
-  automatismos:[{id:'pago',nombre:'Pago acreditado',owner:'Finanzas',trigger:'goxion_notify_pago_cliente',estado:'activo'},{id:'vence',nombre:'Recordar misiones',owner:'Misiones',trigger:'pendiente',estado:'simulacion'}]
+const fixture={
+ ok:true,fecha_local:'2026-10-10',clientes:[
+ {id:'a',nombre:'Ana',misiones_total:3,misiones_hechas:1,misiones_pendientes:2,cobro_oficial:true,cobro_pagado:false,dias_para_cobro:2,notificaciones_previas:[{tipo:'mision_recordatorio'}]},
+ {id:'b',nombre:'Beto',misiones_total:3,misiones_hechas:3,misiones_pendientes:0,cobro_oficial:true,cobro_pagado:true,dias_para_cobro:null,notificaciones_previas:[]},
+ {id:'c',nombre:'Caro',misiones_total:2,misiones_hechas:1,misiones_pendientes:1,cobro_oficial:false,cobro_pagado:false,dias_para_cobro:null,notificaciones_previas:[]}
+ ],promociones:[{id:'p',nombre:'Oferta',titulo_publico:'Tres meses por $99'}],
+ automatismos:[{nombre:'Pago acreditado',owner:'Finanzas',estado:'activo'},{nombre:'Recordatorio futuro',owner:'Misiones',estado:'simulacion'}]
 };
-
-function harness(token) {
-  const nodes = {};
-  for (const id of ids) {
-    const flags = new Set(['hidden']);
-    nodes[id] = {
-      id, value:'', textContent:'', innerHTML:'', checked:false, disabled:false, style:{}, handlers:{},
-      classList:{add(k){flags.add(k)},remove(k){flags.delete(k)},toggle(k,on){if(on === undefined ? !flags.has(k) : on) flags.add(k);else flags.delete(k)},contains(k){return flags.has(k)}},
-      addEventListener(name, fn){this.handlers[name]=fn},
-      querySelectorAll(){return []},appendChild(){},
-      focus(){},setSelectionRange(){}
-    };
-  }
-  Object.assign(nodes.category,{value:'missions'});
-  const initial = {
-    deadline:'2026-10-20',title:'Misiones {fecha}',message:'Hola {nombre}: {pendientes} pendientes',
-    missionFilter:'pending',stateFilter:'any',serviceMode:'any',service:'',dueFilter:'any',ageFilter:'any',
-    promotion:'',phase:'new',previewDate:'2026-10-16',sample:''
+function harness(token){
+ const nodes={};
+ for(const id of ids){
+  const classes=new Set(['hidden']);
+  nodes[id]={id,value:'',textContent:'',innerHTML:'',checked:false,disabled:false,open:false,events:{},dataset:{},
+   classList:{add(k){classes.add(k)},remove(k){classes.delete(k)},toggle(k,x){const v=x??!classes.has(k);if(v)classes.add(k);else classes.delete(k)},contains(k){return classes.has(k)}},
+   addEventListener(k,fn){this.events[k]=fn},setAttribute(k,v){this[k]=v}
   };
-  for (const [id,val] of Object.entries(initial)) nodes[id].value=val;
-  const presets=['missions','last','promo','pay','general'].map(name=>({
-    dataset:{preset:name},classList:{toggle() {},remove() {}},handlers:{},
-    addEventListener(event,fn){this.handlers[event]=fn}
-  }));
-  const doc={
-    getElementById(id){assert(nodes[id], 'Falta elemento '+id);return nodes[id]},
-    createElement(){return {className:'',textContent:'',handlers:{},addEventListener(type,fn){this.handlers[type]=fn}}},
-    querySelectorAll(selector){return selector==='[data-preset]'?presets:[]}
-  };
-  const calls=[],store={getItem(k){return k==='GOXION_ADMIN_TOKEN'?token:null},setItem() {}};
-  const fakeFetch=async(url,init)=>{
-    calls.push({url,init});
-    return {ok:true,status:200,json:async()=>fixture};
-  };
-  vm.runInNewContext(script,{document:doc,localStorage:store,fetch:fakeFetch,console},{timeout:5000});
-  return {nodes,presets,calls};
+ }
+ const choices=['missions','pay','promo','general'].map(kind=>({dataset:{kind},setAttribute(key,v){this[key]=v},events:{},addEventListener(k,fn){this.events[k]=fn}}));
+ const calls=[];
+ const context={document:{
+  getElementById(id){assert(nodes[id],'Falta '+id);return nodes[id]},
+  querySelectorAll(sel){return sel==='[data-kind]'?choices:[]}
+ },localStorage:{getItem(key){return key==='GOXION_ADMIN_TOKEN'?token:null}},
+ fetch:async(url,opts)=>{calls.push({url,opts});return{ok:true,status:200,json:async()=>fixture}}};
+ vm.runInNewContext(js,context,{timeout:1000});
+ return{nodes,choices,calls,choice(k){choices.find(x=>x.dataset.kind===k).events.click()},change(id,v){nodes[id].value=v;nodes[id].events.change()},input(id,v){nodes[id].value=v;nodes[id].events.input()}};
 }
-async function settle(){for(let i=0;i<8;i++)await new Promise(resolve=>setImmediate(resolve));}
-function change(h,id,value){h.nodes[id].value=value;h.nodes[id].handlers.change?.();}
+async function flush(){for(let i=0;i<5;i++)await new Promise(r=>setImmediate(r));}
+const unauthorized=harness('');
+await flush();
+assert.equal(unauthorized.calls.length,0,'Sin sesión no debe consultar la API');
+assert.equal(unauthorized.nodes.auth.classList.contains('hidden'),false,'Pide iniciar sesión');
 
-const unauth=harness('');
-await settle();
-assert.equal(unauth.calls.length,0,'No debe consultar sin token');
-assert(!unauth.nodes.auth.classList.contains('hidden'),'Sin token se debe solicitar sesión');
+const test=harness('SESION_FICTICIA');
+await flush();
+assert.equal(test.calls.length,1);
+assert.deepEqual(JSON.parse(test.calls[0].opts.body),{accion:'resumen'});
+assert.equal(test.nodes.audienceCount.textContent,'2','Misiones: 2 candidatos reales');
+assert(test.nodes.previewMessage.textContent.includes('llevas 1 de 3'),'Variables personalizadas');
+assert(test.nodes.contextText.textContent.includes('1 de los seleccionados ya recibieron'),'Muestra aviso anterior');
+assert(test.nodes.existing.textContent.includes('Pago acreditado'),'Reutiliza detonaciones existentes');
+assert(!test.nodes.existing.textContent.includes('Recordatorio futuro'),'No presenta automatizaciones pendientes como activas');
 
-const h=harness('TOKEN_SIMULADO');
-await settle();
-assert.equal(h.calls.length,1);
-assert.equal(JSON.parse(h.calls[0].init.body).accion,'resumen','El único endpoint llamado debe ser read-only');
-assert.equal(h.nodes['metric-clients'].textContent,'4');
-assert.equal(h.nodes['metric-services'].textContent,'1');
-assert.equal(h.nodes.recipientCount.textContent,'2','Misiones pendientes: Ana y Beto');
-assert(h.nodes.automationList.innerHTML.includes('Pago acreditado'),'Evento automático de Supabase visible');
-assert(h.nodes.automationList.innerHTML.includes('solo simulación'),'Regla futura distinguible');
+test.choice('pay');
+assert.equal(test.nodes.audienceCount.textContent,'1','Cobros solo con fecha oficial y no pagados');
+assert(test.nodes.contextText.textContent.includes('motor financiero oficial'));
 
-change(h,'phase','initial');
-assert.equal(h.nodes.recipientCount.textContent,'1','El segundo aviso inicial debe excluir a Ana por deduplicación');
-assert(h.nodes.duplicateNotice.textContent.includes('1 clientes'),'Auditoría de aviso previo visible');
+test.choice('promo');
+assert.equal(test.nodes.audienceCount.textContent,'0','Sin selección, no se estima audiencia de promoción');
+test.change('promotion','p');
+assert.equal(test.nodes.audienceCount.textContent,'3','Promoción sin elegibilidad: candidatos preliminares');
+assert(test.nodes.contextText.textContent.includes('preliminares'),'No prometer elegibilidad');
 
-change(h,'category','pay');
-change(h,'missionFilter','any');
-change(h,'dueFilter','3');
-assert.equal(h.nodes.recipientCount.textContent,'1','Cobro 3 días: solo Ana; sin estados inventados');
+test.choice('general');
+assert.equal(test.nodes.audienceCount.textContent,'3','Comunicado a activos recibidos desde servidor');
+test.input('titleInput','Hola {nombre}');
+assert.equal(test.nodes.previewTitle.textContent,'Hola Ana','Edición opcional y segura');
 
-change(h,'category','promo');
-change(h,'dueFilter','any');
-change(h,'promotion','p');
-assert(h.nodes.sourceNotice.textContent.includes('Promotions Studio'),'Promoción real, sin editor paralelo');
-assert(h.nodes.duplicateNotice.textContent.includes('Falta comprobar elegibilidad'),'No se confunde candidatos con elegibles');
-
-change(h,'previewDate','2026-10-19');
-await settle();
-assert.equal(h.calls.length,2,'Cambiar fecha debe consultar de nuevo el motor financiero');
-assert.equal(JSON.parse(h.calls[1].init.body).fecha_simulacion,'2026-10-19','La fecha se evalúa en backend');
-assert(!h.calls.some(c=>JSON.parse(c.init.body).accion!=='resumen'), 'La beta no puede enviar campañas');
-console.log('GOXION Comunicaciones beta · escenarios OK: seguridad, detonaciones, duplicados, cobro, promociones y fecha');
+assert.equal(test.calls.length,1,'Cambiar motivo jamás ejecuta llamadas de escritura');
+assert(test.calls.every(x=>JSON.parse(x.opts.body).accion==='resumen'),'Solo lectura');
+console.log('Comunicaciones intuitivas · pruebas correctas: sesión, filtros, vista previa, edición, origen y solo lectura');
