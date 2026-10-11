@@ -89,9 +89,10 @@ assert.equal(x.calls.at(-1).datos.propuesta.servicios.disney.dia_original,20);
 assert(x.nodes.groups.innerHTML.includes("20 nov"),"Dos fechas distintas se reflejan");
 x.nodes.services.events.click({target:{closest(selector){if(selector==="[data-back]")return {};return null;}}});
 assert.equal((x.nodes.services.innerHTML.match(/class="contract-row"/g)||[]).length,2,"Volver a servicios compactos");
-x.nodes.unify.value="2026-11-01";x.nodes.unify.events.change();await flush();
+x.nodes.unify.value="2026-11-01";x.nodes.unify.events.change.call(x.nodes.unify);await flush();
+assert.equal(x.nodes.unifyDateValue.textContent,"1 nov 2026","Unificación refleja fecha elegida");
 assert.equal(x.calls.at(-1).datos.propuesta.unificar_dia,1,"El calendario permite día 1");
-x.nodes.unify.value="2026-11-31";x.nodes.unify.events.change();await flush();
+x.nodes.unify.value="2026-11-31";x.nodes.unify.events.change.call(x.nodes.unify);await flush();
 assert.equal(x.calls.at(-1).datos.propuesta.unificar_dia,31,"El cálculo maneja ancla día 31");
 assert(x.calls.every(c=>["listar_calendarios_beta","simular_calendario_beta"].includes(c.accion)),
  "Ninguna acción registra pagos");
