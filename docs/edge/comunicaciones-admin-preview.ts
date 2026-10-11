@@ -150,7 +150,7 @@ Deno.serve(async req=>{
      sb.from("servicios").select("id,nombre,activo").order("nombre").limit(5000),
      sb.from("cliente_servicios").select("cliente_id,servicio_id,nombre,activo").eq("activo",true).limit(5000),
      sb.from("gamificacion").select("cliente_id,misiones_activas,tareas,misiones_version,cupon_reclamado").limit(5000),
-     sb.from("cliente_misiones_progreso").select("cliente_id,misiones_version,mision_index").limit(5000),
+     sb.from("cliente_misiones_progreso").select("cliente_id,misiones_version,mision_index,completada_at").limit(5000),
      sb.from("alertas").select("id,plataforma,falla,mensaje,activa").eq("activa",true).limit(100),
      sb.from("promociones_catalogo").select("id,nombre,titulo_publico,inicio,fin,activa,publicada,audiencia,servicio_id,notificar_cliente,adquisicion_habilitada").eq("activa",true).eq("publicada",true).limit(100),
      sb.from("cliente_notificaciones").select("cliente_id,tipo,titulo,created_at,dedupe_key,leida_at").order("created_at",{ascending:false}).limit(1000)
@@ -177,7 +177,7 @@ Deno.serve(async req=>{
      const m=gamif.get(cl.id);
      const lines=m?.misiones_activas?String(m.tareas||"").split(/\r?\n/).map((x:string)=>x.trim()).filter(Boolean):[];
      const completed=new Set((progress.get(cl.id)||[]).filter((r:any)=>
-        r.misiones_version===m?.misiones_version && Number.isInteger(r.mision_index)&&r.mision_index>=0&&r.mision_index<lines.length
+        r.completada_at!=null && r.misiones_version===m?.misiones_version && Number.isInteger(r.mision_index)&&r.mision_index>=0&&r.mision_index<lines.length
      ).map((r:any)=>r.mision_index));
      const missions=lines.map((line:string,index:number)=>({
        titulo:line.replace(/\s*\[[^\]]+\]\s*$/,"").trim(),
@@ -247,7 +247,14 @@ Deno.serve(async req=>{
    ];
    const now=Date.now();
    const promociones=(promo.data||[]).filter((x:any)=>new Date(x.inicio).getTime()<=now&&new Date(x.fin).getTime()>now);
-   if(body.accion==="validar_plan")return await validarPlan(sb,body,clients,promociones);
+   if(body.accion==="validar_plan"){
+     // Esta operación valida a fecha REAL; no es una simulación futura de envío.
+     if(requested!==stamp)return respond({ok:false,error:"La validación de envío debe utilizar la fecha actual."},400);
+     // PostgREST puede truncar resultados; nunca validar una audiencia parcial como completa.
+     if([c.data,cs.data,g.data,p.data].some(a=>(a||[]).length>=1000))
+       return respond({ok:false,error:"Audiencia parcialmente cargada. Se requiere paginación segura antes de validar."},503);
+     return await validarPlan(sb,body,clients,promociones);
+   }
    return respond({ok:true,modo:"solo_lectura",fecha_local:stamp,fecha_simulada:requested,clientes:clients,
      exclusiones:totals,servicios:(s.data||[]).filter((x:any)=>x.activo),alertas:alert.data||[],
      promociones, automatismos,fiabilidad:{motor_financiero:"goxion_estado_financiero",consultas_correctas:clients.length-financialFailures,consultas_fallidas:financialFailures}, historial:(history.data||[]).slice(0,80)});
