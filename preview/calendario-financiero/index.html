@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GOXION · Laboratorio financiero</title>
+<style>
+:root{color-scheme:dark;--bg:#080d1b;--surface:#151b2d;--panel:#101629;--edge:#293550;--muted:#9ba9cb;--txt:#eef3ff;--accent:#80ddeb;--violet:#aa90fc;--good:#7fe1b2;--warn:#ffd291}
+*{box-sizing:border-box}body{margin:0;color:var(--txt);background:radial-gradient(ellipse at 100% 0%,#31264d 0,transparent 34%),var(--bg);font:14px/1.55 system-ui,-apple-system,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+.wrap{max-width:1050px;margin:0 auto;padding:20px 16px 65px}header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:38px}.logo{font-size:22px;letter-spacing:2px;font-weight:800}header a{color:#c1d5ff;text-decoration:none;border:1px solid var(--edge);padding:8px 11px;border-radius:10px;font-size:12px}
+h1{font-size:clamp(24px,5vw,37px);line-height:1.12;margin:7px 0 9px}h2{font-size:17px;margin:0 0 6px}p{margin:6px 0}small,.muted{color:var(--muted)}.intro{max-width:720px;color:var(--muted);font-size:13px;margin-bottom:26px}.chip{font-size:10px;font-weight:700;letter-spacing:.5px;border:1px solid #604f87;color:#cbbafa;background:#31234d;border-radius:20px;padding:6px 9px}
+section.panel{background:linear-gradient(140deg,#192039dd,#0d1326f2);border:1px solid var(--edge);border-radius:18px;padding:19px 20px;margin-bottom:13px;box-shadow:0 12px 35px #0003}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.row-start{display:flex;align-items:center;gap:10px}.field{display:block;margin:10px 0 0;font-size:12px;font-weight:600;color:#cbd7ef}.field input,.field select,select.selector{width:100%;display:block;border:1px solid #36425c;background:#0d1425;color:var(--txt);border-radius:11px;padding:11px 12px;margin-top:5px;min-width:0}.field input:focus,.field select:focus{outline:2px solid #9f8df0}
+.service{border:1px solid var(--edge);padding:14px;border-radius:13px;background:#101629;margin:11px 0}.service-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.service h3{font-size:14px;margin:0}.service small{font-size:11px;display:block}.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.checkbox{display:flex;align-items:center;gap:7px;color:#c3d0e8;font-size:11px;margin-top:10px}.checkbox input{width:16px;height:16px}.tag{font-size:10px;color:var(--warn)}.tag.good{color:var(--good)}
+button.primary{background:linear-gradient(120deg,#6952b8,#287a9e);border:0;color:white;font-weight:700;padding:12px 17px;border-radius:12px}button.secondary{border:1px solid #435172;background:#1a253d;color:#e4eeff;padding:10px 13px;border-radius:11px}
+.options{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.option{border:1px solid var(--edge);border-radius:11px;background:#11182b;color:#c7d1e9;padding:9px 12px}.option[aria-pressed="true"]{color:white;border-color:#9d7ff6;background:#322855}.group{background:#0c1325;border-radius:13px;padding:14px;margin-top:10px;border:1px solid #2b3452}.group strong{font-size:17px}.group .item{font-size:12px;color:#bac6df;display:flex;justify-content:space-between;padding:5px 0}
+.total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:12px;border-top:1px solid #34405b}.total b{font-size:24px;color:#b3f1fb}
+table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 6px;border-bottom:1px solid #2c3954}td:last-child,th:last-child{text-align:right}.warnings{margin:14px 0;padding:11px 15px;border:1px solid #6f533a;background:#34271966;color:#ffe0b2;border-radius:13px;font-size:12px}.warnings p{margin:6px 0}.error{color:#ffd1d5;border:1px solid #80414c;background:#57213288;padding:12px;border-radius:10px;margin-bottom:13px}.info{color:#b5c7e8;font-size:12px}.hidden{display:none!important}details summary{cursor:pointer;color:#bdc6e3;font-weight:700;font-size:12px}.bottom{margin-top:22px;text-align:center;font-size:11px;color:#8597bb}
+@media(max-width:750px){.grid,.service-grid{grid-template-columns:1fr}.service-grid{gap:0}header{margin-bottom:25px}section.panel{padding:15px}}
+</style></head><body>
+<main class="wrap"><header><div class="logo">GOXION <span class="chip">BETA FINANCIERA</span></div><a href="../../admin.html">← Admin</a></header>
+<h1>Calendarios por plataforma</h1><p class="intro">Laboratorio de cálculos: prueba fechas separadas, pago de un vencimiento o pago conjunto y ajustes para unificar cortes. No modifica el estado de cuenta oficial ni registra pagos.</p>
+<div id="error" class="error hidden" role="alert"></div>
+<section id="auth" class="panel hidden"><h2>Abre primero tu sesión de Admin</h2><p class="muted">Esta beta consulta únicamente la información autorizada de tu administrador.</p><a href="../../admin.html">Entrar a Admin</a></section>
+<div id="workspace" class="hidden">
+<section class="panel">
+<div class="row"><h2>1. Selecciona un cliente</h2><span id="status" class="chip">SOLO LECTURA</span></div>
+<label class="field" for="client">Cliente<select id="client" class="selector"></select></label>
+<p class="info" id="clientNote">La fecha actual proviene del motor financiero oficial. Para fechas distintas registra la cobertura que ya tiene pagada cada servicio.</p>
+</section>
+<section class="panel" id="servicesPanel"><h2>2. Fechas de cada plataforma</h2><p class="info">Si no escribes fecha, se hereda la fecha general del cliente únicamente como referencia. Para un cálculo confiable, confirma la cobertura vigente de cada plataforma.</p><div id="services"><p class="muted">Selecciona un cliente para ver sus servicios.</p></div>
+<div class="grid">
+<label class="field">Unificar fecha de corte (simulación)<select id="unify" class="selector"><option value="">No unificar</option></select></label>
+<div class="field"><button id="reset" class="secondary" type="button" style="margin-top:20px;width:100%">Restablecer simulación</button></div>
+</div>
+</section>
+<section class="panel">
+<h2>3. ¿Qué desea pagar?</h2>
+<div class="options" role="group" aria-label="Selección de pago">
+<button class="option" data-pay="proximo" aria-pressed="true">Próximo vencimiento</button>
+<button class="option" data-pay="todos" aria-pressed="false">Todos juntos</button>
+<button class="option" data-pay="elegidos" aria-pressed="false">Plataformas elegidas</button>
+</div>
+<div id="selected" class="hidden"></div>
+<label class="field">Simular abono parcial (opcional)<input type="number" id="amount" min="0" step="0.01" placeholder="Vacío = importe completo"></label>
+<button id="simulate" class="primary" type="button" style="margin-top:16px">Actualizar cálculo</button>
+</section>
+<section class="panel"><h2>Resultado de la simulación</h2>
+<div id="warnings" class="warnings hidden"></div>
+<div id="groups"></div>
+<div class="total"><span>Importe base seleccionado</span><b id="total">—</b></div>
+<h2 style="margin-top:23px">Aplicación propuesta del pago</h2><p class="info">El pago conjunto se reparte por plataforma y período. La simulación no marca ninguna renovación como pagada.</p>
+<div id="allocations"></div>
+<div id="adjustments"></div>
+</section>
+</div>
+<p class="bottom">Motor oficial intacto · Simulador aislado · El importe final y la acreditación requerirán una conciliación aprobada en Admin.</p>
+</main>
+<script>
+(function(){
+"use strict";
+var API="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-financiero";
+var $=id=>document.getElementById(id);
+var clients=[],current=null,result=null,plan={servicios:{},pago:{modo:"proximo"}},serial=0;
+var esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+var mx=c=>(Number(c||0)/100).toLocaleString("es-MX",{style:"currency",currency:"MXN"});
+function setError(m){$("error").textContent=m||"";$("error").classList.toggle("hidden",!m)}
+async function request(accion,datos){
+ const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
+ if(!token)throw Error("Debes iniciar sesión en Admin.");
+ const response=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},
+ body:JSON.stringify({accion,datos}),cache:"no-store"});
+ const data=await response.json();if(!response.ok||data.ok!==true)throw Error(data.error||"Error de consulta");
+ return data;
+}
+function clear(){
+ plan={servicios:{},pago:{modo:"proximo"}};$("unify").value="";$("amount").value="";
+ $("selected").innerHTML="";setError("");chooseMode("proximo",false);
+}
+function chooseMode(mode,run){
+ plan.pago.modo=mode;delete plan.pago.servicios;
+ document.querySelectorAll("[data-pay]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pay===mode)));
+ $("selected").classList.toggle("hidden",mode!=="elegidos");
+ if(mode==="elegidos"){
+   const services=result?.calendario?.servicios||[];
+   $("selected").innerHTML=services.map(s=>'<label class="checkbox"><input type="checkbox" data-select="'+esc(s.id)+'"> '+esc(s.nombre)+'</label>').join("");
+ }else $("selected").innerHTML="";
+ if(run)simulate();
+}
+function drawForm(){
+ const serv=result?.calendario?.servicios||[];
+ $("services").innerHTML=serv.map(s=>{
+   const item=plan.servicios[s.id]||{};
+   const flag=s.cobertura_confirmada?'<span class="tag good">Cobertura confirmada</span>':'<span class="tag">Fecha de referencia</span>';
+   return '<div class="service" data-id="'+esc(s.id)+'"><div class="service-head"><div><h3>'+esc(s.nombre)+'</h3><small>'+mx(s.monto_base_centavos)+' al mes · Fecha actual: '+esc(s.fecha_vencimiento)+'</small></div>'+flag+'</div>'+
+    '<div class="service-grid"><label class="field">Cubierto hasta (fecha real)<input type="date" data-field="cobertura_hasta" value="'+esc(item.cobertura_hasta||"")+'"></label>'+
+    '<label class="field">Día original (1–31)<input type="number" data-field="dia_original" min="1" max="31" placeholder="'+esc(s.dia_original)+'" value="'+esc(item.dia_original??"")+'"></label>'+
+    '<label class="field">Nuevo día de corte (opcional)<input type="number" data-field="nuevo_dia" min="1" max="31" placeholder="Sin cambio" value="'+esc(item.nuevo_dia??"")+'"></label></div>'+
+    '<label class="checkbox"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?"checked":"")+'> Ya verifiqué la cobertura pagada de este servicio</label></div>';
+ }).join("");
+}
+function render(){
+ if(!result)return;
+ const info=result.calendario;
+ drawForm();
+ $("warnings").classList.toggle("hidden",!info.advertencias.length);
+ $("warnings").innerHTML=info.advertencias.map(x=>"<p>⚠ "+esc(x)+"</p>").join("");
+ $("groups").innerHTML=info.grupos.map(g=>
+   '<div class="group"><div class="row"><strong>'+esc(g.fecha)+'</strong><strong>'+mx(g.total_centavos)+'</strong></div>'+
+   g.servicios.map(s=>'<div class="item"><span>'+esc(s.nombre)+'</span><span>'+mx(s.importe_centavos)+'</span></div>').join("")+'</div>'
+ ).join("");
+ $("total").textContent=mx(info.pago.total_seleccionado_centavos);
+ $("allocations").innerHTML='<table><thead><tr><th>Plataforma / ciclo</th><th>Asignado</th><th>Pendiente</th></tr></thead><tbody>'+
+   info.pago.asignaciones.map(a=>'<tr><td>'+esc(a.nombre)+'<br><small>'+esc(a.periodo_desde)+' → '+esc(a.periodo_hasta)+'</small></td><td>'+mx(a.pago_asignado_centavos)+'</td><td>'+mx(a.saldo_centavos)+'</td></tr>').join("")+
+   '</tbody></table>';
+ const changed=info.servicios.filter(s=>s.nuevo_dia!=null);
+ $("adjustments").innerHTML=changed.length?
+   '<div class="group" style="margin-top:20px"><h2>Ajuste proporcional (estimado)</h2>'+changed.map(s=>
+    '<div class="item"><span>'+esc(s.nombre)+' · '+s.ajuste.dias+' días más · '+esc(s.nueva_fecha)+'</span><strong>'+mx(s.ajuste.centavos)+'</strong></div>').join("")+
+    '<div class="total"><span>Ajuste único estimado</span><b>'+mx(info.ajuste_total_centavos)+'</b></div>'+
+    '<p class="info">Este ajuste no se agrega automáticamente al pago ni altera fechas; requiere confirmación de cobertura y reglas comerciales.</p></div>':"";
+}
+async function simulate(){
+ if(!current)return;
+ const generation=++serial;
+ $("simulate").disabled=true;$("simulate").textContent="Calculando…";
+ setError("");
+ try{
+   if(plan.pago.modo==="elegidos"){
+     plan.pago.servicios=Array.from($("selected").querySelectorAll("input:checked")).map(e=>e.dataset.select);
+   }
+   const raw=$("amount").value.trim();
+   if(raw==="")delete plan.pago.importe;else plan.pago.importe=Number(raw);
+   const value=$("unify").value;
+   if(value)plan.unificar_dia=Number(value);else delete plan.unificar_dia;
+   const res=await request("simular_calendario_beta",{cliente_id:current,propuesta:plan});
+   if(generation!==serial)return;
+   result=res;render();
+ }catch(e){if(generation===serial)setError(e?.message||"No fue posible calcular el calendario")}
+ finally{if(generation===serial){$("simulate").disabled=false;$("simulate").textContent="Actualizar cálculo"}}
+}
+async function load(){
+ const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
+ if(!token){$("auth").classList.remove("hidden");return}
+ try{
+   const data=await request("listar_calendarios_beta",{});
+   clients=data.clientes||[];
+   $("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
+   $("client").innerHTML='<option value="">Selecciona un cliente</option>'+clients.map(c=>
+     '<option value="'+esc(c.id)+'">'+esc(c.nombre)+' · '+c.numero_servicios+' servicios</option>').join("");
+   $("unify").innerHTML='<option value="">No unificar</option>'+Array.from({length:31},(_,i)=>'<option value="'+(i+1)+'">Día '+(i+1)+'</option>').join("");
+   $("status").textContent=clients.length+" clientes consultables";
+ }catch(e){setError(e?.message||"Error");$("auth").classList.remove("hidden")}
+}
+$("client").addEventListener("change",function(){
+ current=this.value||null;result=null;clear();
+ if(current)simulate();
+});
+$("services").addEventListener("change",function(e){
+ const input=e.target,field=input.dataset.field,container=input.closest("[data-id]");
+ if(!container||!field)return;
+ const id=container.dataset.id;const item=plan.servicios[id]||(plan.servicios[id]={});
+ const value=input.type==="checkbox"?input.checked:input.value;
+ if(field==="cobertura_hasta"){if(value)item[field]=value;else delete item[field];if(!value)delete item.cobertura_confirmada}
+ else if(field==="cobertura_confirmada")item[field]=value;
+ else if(value==="")delete item[field];
+ else item[field]=Number(value);
+ simulate();
+});
+$("unify").addEventListener("change",simulate);
+document.querySelectorAll("[data-pay]").forEach(b=>b.addEventListener("click",()=>chooseMode(b.dataset.pay,true)));
+$("selected").addEventListener("change",simulate);
+$("amount").addEventListener("change",simulate);
+$("simulate").addEventListener("click",simulate);
+$("reset").addEventListener("click",function(){clear();simulate()});
+load();
+})();
+</script></body></html>
