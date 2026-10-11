@@ -240,12 +240,18 @@ function draw(){
  $("contextHint").classList.toggle("warn",current==="promo");
  renderRecipients();
 }
+function forgetRoster(){
+ data=null;audience=[];
+ $("people").innerHTML="";$("available").innerHTML="";
+ $("sample").innerHTML='<option value="">Sin destinatarios</option>';
+ write("existing","");
+}
 async function load(){
  var myRequest=++requestSerial,needsLogin=false;
  $("refresh").disabled=true;write("refresh","Actualizando…");$("error").classList.add("hidden");
  var token=localStorage.getItem(tokenKey)||"";
  if(!token){
-  data=null;audience=[];
+  forgetRoster();
   $("auth").classList.remove("hidden");$("workspace").classList.add("hidden");
   $("refresh").disabled=false;write("refresh","↻ Actualizar");
   return;
@@ -269,7 +275,7 @@ async function load(){
   draw();
  }catch(e){
   if(myRequest!==requestSerial)return;
-  data=null;audience=[]; // Fail closed: never show a stale recipient roster.
+  forgetRoster(); // Fail closed: clear stale customer details from the page.
   $("workspace").classList.add("hidden");
   if(needsLogin)$("auth").classList.remove("hidden");
   write("error",e.message||"No fue posible consultar comunicaciones.");$("error").classList.remove("hidden");
