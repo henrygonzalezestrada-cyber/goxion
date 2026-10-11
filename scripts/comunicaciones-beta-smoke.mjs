@@ -95,5 +95,9 @@ change(h,'promotion','p');
 assert(h.nodes.sourceNotice.textContent.includes('Promotions Studio'),'Promoción real, sin editor paralelo');
 assert(h.nodes.duplicateNotice.textContent.includes('Falta comprobar elegibilidad'),'No se confunde candidatos con elegibles');
 
+change(h,'previewDate','2026-10-19');
+await settle();
+assert.equal(h.calls.length,2,'Cambiar fecha debe consultar de nuevo el motor financiero');
+assert.equal(JSON.parse(h.calls[1].init.body).fecha_simulacion,'2026-10-19','La fecha se evalúa en backend');
 assert(!h.calls.some(c=>JSON.parse(c.init.body).accion!=='resumen'), 'La beta no puede enviar campañas');
-console.log('GOXION Comunicaciones beta · 12 comprobaciones OK (simulación sin envíos)');
+console.log('GOXION Comunicaciones beta · escenarios OK: seguridad, detonaciones, duplicados, cobro, promociones y fecha');
