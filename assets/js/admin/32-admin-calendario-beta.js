@@ -38,7 +38,7 @@
     const url=new URL("./preview/calendario-financiero/index.html",location.href);
     url.searchParams.set("embedded","1");
     url.searchParams.set("cliente",client.id);
-    url.searchParams.set("v","20261011c"); // nueva vista compacta; evita caché en Safari
+    url.searchParams.set("v","20261011d"); // nueva vista compacta; evita caché en Safari
     frame.src=url.toString();
     if(!dialog.open)dialog.showModal();
   }
