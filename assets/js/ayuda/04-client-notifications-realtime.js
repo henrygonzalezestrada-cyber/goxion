@@ -548,6 +548,10 @@
       if(typeof window.irAlTicket==="function")window.irAlTicket();
       return;
     }
+    if(action==="catalog"){
+      if(typeof window.switchTab==="function")window.switchTab("catalogo");
+      return;
+    }
 
     showDashboard();
     setTimeout(()=>{
