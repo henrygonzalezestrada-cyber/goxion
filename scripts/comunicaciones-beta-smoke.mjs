@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
-const html=readFileSync('preview/comunicaciones/index.html','utf8');
+const html=readFileSync('preview/comunicaciones/legacy.html','utf8');
 const js=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert(js,'La beta necesita script');
 new vm.Script(js);
