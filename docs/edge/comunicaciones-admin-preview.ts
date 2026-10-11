@@ -141,16 +141,33 @@ Deno.serve(async req=>{
  try{
    if(!(await verifyAdmin(req.headers.get("X-Admin-Token")||"")))return respond({ok:false,error:"Inicia sesión como administrador para consultar comunicaciones."},401);
    const body=await req.json().catch(()=>({}));
-   if(!["resumen","validar_plan","enviar","historial"].includes(body.accion))return respond({ok:false,error:"Acción no permitida."},400);
+   if(!["resumen","validar_plan","enviar","historial","programar","cancelar_programada"].includes(body.accion))return respond({ok:false,error:"Acción no permitida."},400);
    const url=Deno.env.get("SUPABASE_URL"),key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
    if(!url||!key)throw new Error("Falta configuración de base de datos");
    const sb=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
    if(body.accion==="historial"){
-     const {data,error}=await sb.from("goxion_comunicacion_campanas")
-       .select("id,tipo,titulo,estado,creados,omitidos,created_at,ejecutada_at")
-       .order("created_at",{ascending:false}).limit(30);
+     const [sent,scheduled]=await Promise.all([
+       sb.from("goxion_comunicacion_campanas")
+         .select("id,tipo,titulo,estado,creados,omitidos,created_at,ejecutada_at")
+         .order("created_at",{ascending:false}).limit(30),
+       sb.from("goxion_comunicacion_agenda")
+         .select("id,tipo,titulo,estado,programada_at,created_at,resultado")
+         .order("created_at",{ascending:false}).limit(30)
+     ]);
+     if(sent.error||scheduled.error)throw sent.error||scheduled.error;
+     const completed=new Set((sent.data||[]).map((x:any)=>x.id));
+     const all=[...(sent.data||[]),...(scheduled.data||[]).filter((x:any)=>!completed.has(x.id))];
+     all.sort((a:any,b:any)=>Date.parse(b.created_at)-Date.parse(a.created_at));
+     return respond({ok:true,campanas:all.slice(0,30)});
+   }
+   if(body.accion==="cancelar_programada"){
+     if(!uuidRx.test(String(body.id||"")))return respond({ok:false,error:"Campaña inválida."},400);
+     const {data,error}=await sb.from("goxion_comunicacion_agenda")
+       .update({estado:"cancelada"}).eq("id",body.id).in("estado",["programada","error"])
+       .select("id,estado").maybeSingle();
      if(error)throw error;
-     return respond({ok:true,campanas:data||[]});
+     if(!data)return respond({ok:false,error:"Esta programación ya se ejecutó o no puede cancelarse."},409);
+     return respond({ok:true,cancelada:data.id});
    }
    const [c,s,cs,g,p,alert,promo,history]=await Promise.all([
      sb.from("clientes").select("id,nombre,estado,dia_pago,created_at").limit(5000),
@@ -254,7 +271,7 @@ Deno.serve(async req=>{
    ];
    const now=Date.now();
    const promociones=(promo.data||[]).filter((x:any)=>new Date(x.inicio).getTime()<=now&&new Date(x.fin).getTime()>now);
-   if(body.accion==="validar_plan"||body.accion==="enviar"){
+   if(["validar_plan","enviar","programar"].includes(body.accion)){
      if(requested!==stamp)return respond({ok:false,error:"La validación o envío debe usar la fecha actual."},400);
      if([c.data,cs.data,g.data,p.data].some(a=>(a||[]).length>=1000))
        return respond({ok:false,error:"Audiencia parcialmente cargada: paginación requerida."},503);
@@ -273,6 +290,32 @@ Deno.serve(async req=>{
      if(placeholders.some(p=>!["nombre","hechas","total","pendientes","dias_cobro","aviso_cobro","promocion"].includes(p)))
        return respond({ok:false,error:"El mensaje contiene variables no permitidas."},400);
      const promoId=v.tipo==="promo"?body.plan.promocion_id:null;
+     if(body.accion==="programar"){
+       const time=String(body.programada_at||"");
+       if(!/^\d{4}-\d{2}-\d{2}T/.test(time))return respond({ok:false,error:"Fecha y hora de programación inválidas."},400);
+       const runAt=Date.parse(time),now=Date.now();
+       if(!Number.isFinite(runAt)||runAt<now+120000||runAt>now+90*86400000)
+         return respond({ok:false,error:"Programa entre 2 minutos y 90 días desde hoy."},400);
+       if(v.tipo==="promo"){
+         const pr=promociones.find((p:any)=>p.id===promoId);
+         if(!pr||Date.parse(pr.fin)<=runAt)return respond({ok:false,error:"La promoción vencerá antes de la programación."},400);
+       }
+       const payload={
+         id:v.id_campana,tipo:v.tipo,titulo,mensaje,promocion_id:promoId,
+         agregar_ids:body.plan.agregar_ids||[],excluir_ids:body.plan.excluir_ids||[],
+         programada_at:new Date(runAt).toISOString(),estado:"programada"
+       };
+       const inserted=await sb.from("goxion_comunicacion_agenda").insert(payload).select("id,estado,programada_at").single();
+       if(inserted.error){
+         if(inserted.error.code==="23505"){
+           const old=await sb.from("goxion_comunicacion_agenda").select("id,estado,programada_at").eq("id",v.id_campana).maybeSingle();
+           if(!old.error&&old.data)return respond({ok:true,programada:old.data,repetido:true});
+         }
+         console.error("comunicaciones_programar",inserted.error);
+         return respond({ok:false,error:"No fue posible programar la campaña."},503);
+       }
+       return respond({ok:true,programada:inserted.data,repetido:false,avisos_creados:0});
+     }
      const response=await sb.rpc("goxion_comunicaciones_emitir",{
        p_campana_id:v.id_campana,p_tipo:v.tipo,p_titulo:titulo,p_mensaje:mensaje,
        p_clientes:v.seleccionados.map((x:any)=>x.id),p_promocion_id:promoId
