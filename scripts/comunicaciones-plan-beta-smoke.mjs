@@ -7,7 +7,7 @@ import {stripTypeScriptTypes} from 'node:module';
 const source=readFileSync('docs/edge/comunicaciones-admin-preview.ts','utf8');
 const begin=source.indexOf('const uuidRx='),end=source.indexOf('Deno.serve(async req=>{');
 assert(begin>=0&&end>begin,'Falta el bloque de validación del backend.');
-assert(source.includes('if(body.accion==="validar_plan"){'),'El comando validar_plan está conectado');
+assert(source.includes('["validar_plan","enviar","programar"].includes(body.accion)'),'El enrutador usa el mismo validador para preview, envío y programación');
 assert(source.includes('if(requested!==stamp)'),'La validación requiere fecha real');
 assert(source.includes('length>=1000'),'La validación bloquea datos truncados');
 assert(!/sb\.from\("cliente_notificaciones"\)\.(insert|update|delete|upsert)\(/.test(source),'No permitir escrituras desde el validador de solo lectura');
