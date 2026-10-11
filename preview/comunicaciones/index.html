@@ -98,7 +98,7 @@ details.more{margin-top:16px;border-top:1px solid var(--stroke);padding-top:14px
 "use strict";
 var URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/comunicaciones-admin-preview";
 var tokenKey="GOXION_ADMIN_TOKEN", $=function(id){return document.getElementById(id)};
-var current="missions", data=null, audience=[], templates={
+var current="missions", data=null, audience=[], requestSerial=0, templates={
  missions:{title:"Tus misiones te esperan ✨",message:"Hola {nombre}, llevas {hechas} de {total} misiones completadas. Te faltan {pendientes}. Entra a Mi Espacio para continuar.",tag:"Misiones",link:"Ver misiones →"},
  pay:{title:"Tu próximo cobro",message:"Hola {nombre}, tu fecha de corte está próxima: faltan {dias_cobro} días. Revisa tu estado de cuenta en Mi Espacio.",tag:"Tu cuenta",link:"Ver estado de cuenta →"},
  promo:{title:"Una promoción de GOXION",message:"Hola {nombre}, conoce nuestra promoción {promocion} en el catálogo. Consulta los detalles y condiciones disponibles para tu cuenta.",tag:"Promociones",link:"Ver catálogo →"},
@@ -125,10 +125,11 @@ function templateValue(text,client){
  var values={nombre:client?.nombre||"cliente",hechas:client?.misiones_hechas??0,total:client?.misiones_total??0,pendientes:client?.misiones_pendientes??0,dias_cobro:client?.dias_para_cobro??"—",promocion:pr?.titulo_publico||pr?.nombre||"seleccionada"};
  return String(text).replace(/\{(nombre|hechas|total|pendientes|dias_cobro|promocion)\}/g,function(all,k){return String(values[k])});
 }
+function validPromotion(){return (data?.promociones||[]).some(function(p){return p.id===$("promotion").value})}
 function eligible(c){
  if(current==="missions")return c.misiones_total>0&&c.misiones_pendientes>0;
  if(current==="pay")return c.cobro_oficial===true&&c.cobro_pagado===false&&typeof c.dias_para_cobro==="number"&&c.dias_para_cobro>=0&&c.dias_para_cobro<=7;
- if(current==="promo")return Boolean($("promotion").value);
+ if(current==="promo")return validPromotion();
  return true;
 }
 
@@ -142,7 +143,7 @@ function allowedToAdd(c){
  if(current==="missions")return c.misiones_total>0&&c.misiones_pendientes>0;
  if(current==="pay")return c.cobro_oficial===true&&c.cobro_pagado===false&&
    typeof c.dias_para_cobro==="number"&&Number.isFinite(c.dias_para_cobro)&&c.dias_para_cobro>=0;
- if(current==="promo")return Boolean($("promotion").value);
+ if(current==="promo")return validPromotion();
  return true;
 }
 function eligibilityReason(c){
@@ -240,23 +241,43 @@ function draw(){
  renderRecipients();
 }
 async function load(){
+ var myRequest=++requestSerial,needsLogin=false;
  $("refresh").disabled=true;write("refresh","Actualizando…");$("error").classList.add("hidden");
  var token=localStorage.getItem(tokenKey)||"";
- if(!token){$("auth").classList.remove("hidden");$("workspace").classList.add("hidden");$("refresh").disabled=false;write("refresh","↻ Actualizar");return}
+ if(!token){
+  data=null;audience=[];
+  $("auth").classList.remove("hidden");$("workspace").classList.add("hidden");
+  $("refresh").disabled=false;write("refresh","↻ Actualizar");
+  return;
+ }
  try{
   var res=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion:"resumen"}),cache:"no-store"});
+  if(myRequest!==requestSerial)return;
+  needsLogin=res.status===401||res.status===403;
   var json=await res.json();
+  if(myRequest!==requestSerial)return;
   if(!res.ok||json.ok!==true)throw Error(json.error||"No se pudo consultar la información.");
   data=json;
   $("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
+  var choice=$("promotion").value;
   $("promotion").innerHTML='<option value="">Selecciona una promoción publicada</option>'+(json.promociones||[]).map(function(p){return '<option value="'+escapeHTML(p.id)+'">'+escapeHTML(p.titulo_publico||p.nombre)+'</option>'}).join("");
-  if(current==="promo"&&json.promociones?.length)$("promotion").value=json.promociones[0].id;
+  if(json.promociones?.some(function(p){return p.id===choice}))$("promotion").value=choice;
+  else if(current==="promo"&&json.promociones?.length)$("promotion").value=json.promociones[0].id;
+  else $("promotion").value="";
   var active=(json.automatismos||[]).filter(function(x){return x.estado==="activo"});
   write("existing",active.map(function(x){return "✓ "+x.nombre+" · "+x.owner}).join("   •   "));
   draw();
- }catch(e){write("error",e.message||"No fue posible consultar comunicaciones.");$("error").classList.remove("hidden")}
- finally{$("refresh").disabled=false;write("refresh","↻ Actualizar")}
+ }catch(e){
+  if(myRequest!==requestSerial)return;
+  data=null;audience=[]; // Fail closed: never show a stale recipient roster.
+  $("workspace").classList.add("hidden");
+  if(needsLogin)$("auth").classList.remove("hidden");
+  write("error",e.message||"No fue posible consultar comunicaciones.");$("error").classList.remove("hidden");
+ }finally{
+  if(myRequest===requestSerial){$("refresh").disabled=false;write("refresh","↻ Actualizar")}
+ }
 }
+
 document.querySelectorAll("[data-kind]").forEach(function(b){b.addEventListener("click",function(){choose(b.dataset.kind)})});
 $("promotion").addEventListener("change",function(){$("recipientSearch").value="";draw()});
 $("resetRecipients").addEventListener("click",function(){delete overrides[scopeKey()];$("recipientSearch").value="";draw()});
