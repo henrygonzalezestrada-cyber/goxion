@@ -323,7 +323,9 @@ let clientesDict = {};
                         <div class="gx-service-compact" data-gx-client-key="${key}" data-gx-service-index="${sIdx}" data-gx-service-name="${String(s.nombre||'').replace(/"/g,'&quot;')}">
                             <div class="gx-service-compact-head">
                                 <div class="gx-service-identity">
-                                    <strong>${s.nombre}</strong>
+                                    <button type="button" class="gx-service-title-toggle" aria-expanded="false">
+                                        <strong>${s.nombre}</strong><span class="gx-service-title-chevron" aria-hidden="true">⌄</span>
+                                    </button>
                                     <div class="gx-service-state-row">
                                         <span class="gx-service-live-state ${gxAdminServiceHasAlert(s.nombre) ? 'interrupted' : 'active'}" data-gx-service-live-state>
                                             <i></i>${gxAdminServiceHasAlert(s.nombre) ? 'Temporalmente inactivo' : 'Activo'}
