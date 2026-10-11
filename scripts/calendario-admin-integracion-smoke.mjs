@@ -110,5 +110,12 @@ assert(page.includes('Usar fecha general</button></div>'),"Acción General textu
 assert(page.includes('height:46px;min-height:46px'),"Altura nativa de control estable");
 assert(page.includes('.access-date-row{display:block;'),"Calendario en fila completa");
 assert(page.includes('width:100%;min-width:0;max-width:100%'),"El control debe respetar el ancho en móvil");
+assert(page.includes('class="date-picker-shell"'),"Las fechas usan contenedor visual estable");
+assert(page.includes('class="date-picker-hit"'),"Input nativo táctil sin ocupar el flujo");
+assert(page.includes('opacity:0!important'),"Nativo invisible, área táctil disponible");
+assert(page.includes('overflow:hidden;cursor:pointer'),"El contenedor recorta desbordamientos de Safari");
+assert(page.includes('max-height:46px'),"La tarjeta no crece por las medidas intrínsecas de iOS");
+assert(page.includes('id="unifyDateValue"'),"Unificar fechas comparte el mismo control estable");
+
 
 console.log("GOXION Admin: integración contextual en Servicios, modal y cliente correcto PASS.");
