@@ -5803,3 +5803,13 @@ body.gx-beta-22 .gx-reg-actions .gx-prepare-activation{border-color:rgba(0,242,2
  .gx-calendar-entry-copy strong{font-size:14px}
  .gx-calendar-entry-action{padding:8px 10px}
 }
+
+/* Octubre 2026 · El título abre los detalles: nada técnico siempre visible. */
+.gx-service-title-toggle{display:inline-flex;align-items:center;gap:7px;max-width:100%;
+ border:0!important;background:transparent!important;padding:0!important;margin:0;
+ color:inherit;text-align:left;cursor:pointer;min-width:0}
+.gx-service-title-toggle strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gx-service-title-chevron{font-size:.85rem;color:var(--text-muted);line-height:1;
+ transition:transform .18s ease}
+.gx-service-title-toggle[aria-expanded="true"] .gx-service-title-chevron{transform:rotate(180deg)}
+.gx-service-title-toggle:focus-visible{outline:2px solid var(--neon-blue);outline-offset:4px;border-radius:3px}
