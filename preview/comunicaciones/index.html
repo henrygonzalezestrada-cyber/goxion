@@ -70,7 +70,7 @@ details.more{margin-top:16px;border-top:1px solid var(--stroke);padding-top:14px
   <details class="more" id="editDetails"><summary>Personalizar el mensaje (opcional)</summary>
    <label class="field" for="titleInput">Título<input id="titleInput" maxlength="90"></label>
    <label class="field" for="messageInput">Mensaje<textarea id="messageInput" maxlength="420"></textarea></label>
-   <p style="font-size:10px;color:var(--muted)">Variables disponibles: {nombre}, {hechas}, {total}, {pendientes}, {dias_cobro}, {promocion}.</p>
+   <p style="font-size:10px;color:var(--muted)">Variables disponibles: {nombre}, {hechas}, {total}, {pendientes}, {aviso_cobro}, {promocion}.</p>
    <button class="action" type="button" id="restoreTemplate">Restablecer sugerencia</button>
   </details>
   <details class="more" id="peopleDetails">
@@ -100,7 +100,7 @@ var URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/comunicaciones-ad
 var tokenKey="GOXION_ADMIN_TOKEN", $=function(id){return document.getElementById(id)};
 var current="missions", data=null, audience=[], requestSerial=0, templates={
  missions:{title:"Tus misiones te esperan ✨",message:"Hola {nombre}, llevas {hechas} de {total} misiones completadas. Te faltan {pendientes}. Entra a Mi Espacio para continuar.",tag:"Misiones",link:"Ver misiones →"},
- pay:{title:"Tu próximo cobro",message:"Hola {nombre}, tu fecha de corte está próxima: faltan {dias_cobro} días. Revisa tu estado de cuenta en Mi Espacio.",tag:"Tu cuenta",link:"Ver estado de cuenta →"},
+ pay:{title:"Tu próximo cobro",message:"Hola {nombre}, {aviso_cobro}. Revisa tu estado de cuenta en Mi Espacio.",tag:"Tu cuenta",link:"Ver estado de cuenta →"},
  promo:{title:"Una promoción de GOXION",message:"Hola {nombre}, conoce nuestra promoción {promocion} en el catálogo. Consulta los detalles y condiciones disponibles para tu cuenta.",tag:"Promociones",link:"Ver catálogo →"},
  general:{title:"Novedades de GOXION",message:"Hola {nombre}, tenemos información para compartir contigo. Entra a Mi Espacio para conocer las novedades.",tag:"GOXION",link:"Abrir Mi Espacio →"}
 };
@@ -122,8 +122,10 @@ function choose(kind){
 }
 function templateValue(text,client){
  var pr=(data?.promociones||[]).find(function(p){return p.id===$("promotion").value});
- var values={nombre:client?.nombre||"cliente",hechas:client?.misiones_hechas??0,total:client?.misiones_total??0,pendientes:client?.misiones_pendientes??0,dias_cobro:client?.dias_para_cobro??"—",promocion:pr?.titulo_publico||pr?.nombre||"seleccionada"};
- return String(text).replace(/\{(nombre|hechas|total|pendientes|dias_cobro|promocion)\}/g,function(all,k){return String(values[k])});
+ var days=client?.dias_para_cobro;
+ var aviso=days===0?"tu fecha de corte es hoy":days===1?"falta 1 día para tu próxima fecha de corte":typeof days==="number"?"faltan "+days+" días para tu próxima fecha de corte":"consulta la fecha de tu próximo cobro";
+ var values={nombre:client?.nombre||"cliente",hechas:client?.misiones_hechas??0,total:client?.misiones_total??0,pendientes:client?.misiones_pendientes??0,dias_cobro:days??"—",aviso_cobro:aviso,promocion:pr?.titulo_publico||pr?.nombre||"seleccionada"};
+ return String(text).replace(/\{(nombre|hechas|total|pendientes|dias_cobro|aviso_cobro|promocion)\}/g,function(all,k){return String(values[k])});
 }
 function validPromotion(){return (data?.promociones||[]).some(function(p){return p.id===$("promotion").value})}
 function eligible(c){
@@ -154,7 +156,7 @@ function eligibilityReason(c){
 }
 function recipientLabel(c){
  if(current==="missions")return c.misiones_pendientes+" pendientes";
- if(current==="pay")return "Cobro en "+c.dias_para_cobro+" días";
+ if(current==="pay")return c.dias_para_cobro===0?"Corte hoy":c.dias_para_cobro===1?"Corte mañana":"Cobro en "+c.dias_para_cobro+" días";
  return "Cuenta activa";
 }
 function selectedRecipients(){
