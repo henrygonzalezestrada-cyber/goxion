@@ -9,8 +9,8 @@ const page=readFileSync("preview/calendario-financiero/index.html","utf8");
 assert(admin.includes("32-admin-calendario-beta.js"),"El acceso contextual no está conectado a Admin");
 assert(css.includes(".gx-calendar-entry")&&css.includes(".gx-calendar-dialog"),"La interfaz debe utilizar las superficies de Admin");
 assert(!page.includes("1. Selecciona")&&!page.includes("2. Fechas")&&!page.includes("3. ¿Qué"),"No mostrar un formulario por pasos");
-assert(page.includes("html.embedded #clientPanel{display:none}"),"En el expediente no debe repetirse selector de clientes");
-assert(page.includes('initialClient=query?.get("cliente")'),"El iframe debe recibir el cliente del expediente");
+assert(page.includes("html.embedded header")&&page.includes("html.embedded #clientPanel"),"En el expediente no se repiten encabezados ni selector");
+assert(page.includes('initialClient=param?.get("cliente")'),"El iframe debe recibir el cliente del expediente");
 new vm.Script(module);
 new vm.Script(page.match(/<script>([\s\S]*?)<\/script>/)[1]);
 
