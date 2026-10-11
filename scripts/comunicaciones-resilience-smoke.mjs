@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 
 // No auth keys, sessions or real customer records are needed.
-const html=readFileSync('preview/comunicaciones/index.html','utf8');
+const html=readFileSync('preview/comunicaciones/legacy.html','utf8');
 const js=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert(js,'Inline app missing');
 new vm.Script(js);
