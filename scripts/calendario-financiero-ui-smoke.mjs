@@ -20,7 +20,7 @@ const services=[{id:"netflix",nombre:"Netflix",monto:120,activo:true},
  {id:"disney",nombre:"Disney+",monto:90,activo:true}];
 const financial={fecha_corte:"2026-11-15",periodo:"2026-11-01",total_actual:210,promociones:{total_ahorro:0}};
 async function flush(){for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r))}
-function setup(token){
+function setup(token,clientServices=services,clientFinance=financial){
  const nodes={},calls=[];
  const events={};
  for(const id of ids){
@@ -37,7 +37,7 @@ function setup(token){
    const data=JSON.parse(options.body);calls.push(data);
    const result=data.accion==="listar_calendarios_beta"?{ok:true,clientes:clients}:
     data.accion==="simular_calendario_beta"?{ok:true,cliente:clients[0],
-      calendario:simularCalendario({cliente:clients[0],servicios:services,financiero:financial,
+      calendario:simularCalendario({cliente:clients[0],servicios:clientServices,financiero:clientFinance,
         propuesta:data.datos.propuesta,hoy:"2026-10-11"})}:
     {ok:false,error:"Acción inesperada"};
    return{ok:result.ok,status:result.ok?200:400,json:async()=>result};
@@ -95,4 +95,47 @@ x.nodes.unify.value="2026-11-31";x.nodes.unify.events.change();await flush();
 assert.equal(x.calls.at(-1).datos.propuesta.unificar_dia,31,"El cálculo maneja ancla día 31");
 assert(x.calls.every(c=>["listar_calendarios_beta","simular_calendario_beta"].includes(c.accion)),
  "Ninguna acción registra pagos");
+
+const x2=setup("simulated-token",[
+ {id:"x2",nombre:"ViX Premium (x2)",monto:98,activo:true},
+ {id:"extra",nombre:"Crunchyroll",monto:100,activo:true}
+],{...financial,total_actual:198});
+await flush();
+x2.nodes.client.value="example";
+x2.nodes.client.events.change.call(x2.nodes.client);await flush();
+assert.equal((x2.nodes.services.innerHTML.match(/class="contract-row"/g)||[]).length,2,
+ "Un X2 y un servicio suelto ocupan dos filas, no tres");
+assert(x2.nodes.services.innerHTML.includes("ViX Premium (x2)"));
+assert(x2.nodes.services.innerHTML.includes("$98.00"));
+x2.nodes.services.events.click({target:{closest(selector){
+ if(selector==="[data-manage]")return {getAttribute:()=>"x2"};
+ return null;
+}}});
+assert.equal((x2.nodes.services.innerHTML.match(/class="access-row"/g)||[]).length,2,
+ "El X2 despliega solo dos líneas de fechas en el detalle");
+assert(x2.nodes.services.innerHTML.includes("Acceso 1"));
+assert(x2.nodes.services.innerHTML.includes("Acceso 2"));
+assert(x2.nodes.services.innerHTML.includes("type=\"date\""));
+const changeX2=(id,date)=>{
+ x2.nodes.services.events.change({target:{
+   dataset:{field:"cobertura_hasta"},type:"date",value:date,
+   closest(selector){return selector==="[data-id]"?{dataset:{id}}:null}
+ }});
+};
+changeX2("x2#1","2026-11-06");await flush();
+changeX2("x2#2","2026-11-30");await flush();
+const cfg=x2.calls.at(-1).datos.propuesta.servicios;
+assert.equal(cfg["x2#1"].cobertura_hasta,"2026-11-06");
+assert.equal(cfg["x2#2"].cobertura_hasta,"2026-11-30");
+assert.equal(x2.nodes.total.textContent,"$49.00","Solo el primer acceso X2 vence primero");
+x2.nodes.services.events.click({target:{closest(selector){
+ return selector==="[data-back]"?{}:null;
+}}});
+assert.equal((x2.nodes.services.innerHTML.match(/class="contract-row"/g)||[]).length,2);
+assert(x2.nodes.services.innerHTML.includes("6 nov")&&x2.nodes.services.innerHTML.includes("30 nov"),
+ "Resumen compacto conserva ambas fechas sin duplicar contratación");
+x2.modes[1].events.click();await flush();
+assert.equal(x2.nodes.total.textContent,"$198.00","Pagar todo suma X2 completo y otro servicio");
+assert(x2.calls.every(c=>["listar_calendarios_beta","simular_calendario_beta"].includes(c.accion)));
+
 console.log("GOXION calendario: contratos compactos, calendario por acceso, X2, pago conjunto y cero escrituras PASS.");
