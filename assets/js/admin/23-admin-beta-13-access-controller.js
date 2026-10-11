@@ -166,7 +166,9 @@
                     const repeated=p.items.filter(y=>y.servicio_id===x.servicio_id).length>1;
                     return `<span>${esc(x.servicio)}${repeated?` #${x.ordinal}`:''}</span>`;
                 }).join('');
-                details?.insertAdjacentHTML('beforebegin',`
+                // Almacenar la información técnica DENTRO de Editar acceso.
+                // La lista principal solo muestra nombre, importe y estado.
+                box.insertAdjacentHTML('beforebegin',`
                     <div class="gx-access-visible-summary">
                         <div>
                             <strong>${label} · ${p.items.length} acceso${p.items.length===1?'':'s'}</strong>
@@ -269,6 +271,23 @@
             </div>`;
         });
     }
+
+    // El nombre de la plataforma abre el mismo detalle nativo que «Editar acceso».
+    // Sin nuevos recuadros ni paneles paralelos en el expediente.
+    document.addEventListener('click',event=>{
+        const trigger=event.target.closest?.('.gx-service-title-toggle');
+        if(!trigger)return;
+        const details=trigger.closest('.gx-service-compact')?.querySelector('.gx-service-access-details');
+        if(!details)return;
+        details.open=!details.open;
+        trigger.setAttribute('aria-expanded',String(details.open));
+    });
+    // Permitir que el summary original y el nombre mantengan el mismo estado accesible.
+    document.addEventListener('toggle',event=>{
+        if(!event.target.matches?.('.gx-service-access-details'))return;
+        event.target.closest('.gx-service-compact')?.querySelector('.gx-service-title-toggle')
+            ?.setAttribute('aria-expanded',String(event.target.open));
+    },true);
 
     // ---------- Detección visible por plataforma ----------
     function gxDetectedForPlatform(serviceId){
