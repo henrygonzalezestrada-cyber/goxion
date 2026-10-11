@@ -297,3 +297,14 @@ Al reclamar un mes gratis por referido:
 La prueba con el cliente de regresión confirmó total financiero 0 en el periodo
 beneficiado y conservación del cupón de Misiones pendiente para un periodo
 posterior.
+
+
+## Fase inicial · Calendarios individuales por servicio (11/oct/2026)
+
+Iniciada en **modo sombra, no operativo para cobros**. Se amplió la Edge oficial **estado-financiero** con las acciones protegidas por Admin **listar_calendarios_beta** y **simular_calendario_beta**, ambas exclusivamente de lectura. El motor puro de simulación está versionado en **docs/edge/estado-financiero/calendario-beta.mjs**, la versión de la Edge en **docs/edge/estado-financiero/index.ts** y su laboratorio en **preview/calendario-financiero/index.html**.
+
+La beta agrupa plataformas por su primera fecha no cubierta, simula pago del próximo vencimiento o de todas las plataformas y distribuye pagos parciales por servicio y rango de cobertura. Puede estimar prorrateos al extender cobertura para unificar fechas con días reales del ciclo y anclas de 29/30/31. Nunca reduce cobertura pagada automáticamente.
+
+**Garantía de compatibilidad:** los clientes con calendario general heredado continúan bajo el cálculo oficial actual; no hay cambios en tablas ni escrituras. Cada resultado contiene advertencias cuando la fecha no fue confirmada o cuando existen promociones, lealtad, mora o diferencias con el saldo oficial. Este resultado **no es deuda exigible ni pago acreditado**.
+
+Pruebas: **npm run test:calendario**, incluido en **npm run verify**. Para activar el cobro real hace falta crear obligaciones únicas por servicio/rango, aplicar cada aprobación de pago a obligaciones específicas con idempotencia y reconciliar promociones/descuentos y ajustes a favor. Ver **docs/CALENDARIO_FINANCIERO.md**.
