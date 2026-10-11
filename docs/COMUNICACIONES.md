@@ -2,7 +2,20 @@
 
 > **Regla de integración:** consultar primero [el registro canónico de funciones de GOXION](ADMIN_FUNCTION_REGISTRY.md). Comunicaciones no administra promociones, descuentos, misiones ni incidencias: consume datos de los módulos propietarios. La beta actual puede mostrar opciones redundantes y es solo un laboratorio no aprobado para el Admin oficial.
 
-Estado: **beta de simulación**, 2026-10-09. No altera `admin.html` ni envía notificaciones.
+Estado: **beta de simulación**, 2026-10-10. No altera `admin.html` ni envía notificaciones.
+
+## Interfaz actual · Beta intuitiva (10/oct/2026)
+
+**Esta sección prevalece sobre las descripciones históricas de la beta de segmentación que aparecen más abajo.** Se conservan las fuentes/contratos de Supabase, pero la interfaz de `preview/comunicaciones/index.html` se simplificó: cuatro motivos — **Misiones, Próximo cobro, Promociones y Comunicado** — con audiencia calculada automáticamente, mensaje predeterminado y vista previa personalizada. La personalización del texto y la lista de destinatarios están ocultas en desplegables opcionales. Los automatismos ya activos solo aparecen en un resumen informativo; no son configurables desde Comunicaciones.
+
+- **Misiones:** solo clientes con misiones activas pendientes; muestra cuántos ya recibieron avisos previos. Una nueva campaña debe tener idempotencia propia; esto no envía.
+- **Cobro:** próximos 7 días, cuentas no pagadas y fecha validada por el motor financiero; no se vuelve a calcular monto o vencimiento.
+- **Promociones:** selección directa de promociones publicadas desde Studio; el listado es de **candidatos preliminares**, nunca clientes contractualmente elegibles hasta validar en backend.
+- **Comunicado:** clientes activos devueltos por el endpoint, ya excluidos los suspendidos, cuentas prueba y sin servicios.
+- No existe selector ni formulario duplicado de fallas, cupones o recompensas. La integración futura de incidencias exige una relación estable con el ID del servicio antes de notificar afectados.
+- Sin fecha manual, filtro cruzado o constructor largo en la vista principal. El usuario elige el motivo y GOXION compone el resto.
+- Solo `accion:resumen` en `comunicaciones-admin-preview`; no se guarda ni se envía ninguna campaña, y el botón de envío está deshabilitado.
+- Smoke actualizado: `npm run test:comunicaciones` con escenarios de inicio de sesión, misiones, pagos, promociones, vista previa y protección contra escrituras.
 
 ## Recursos de esta entrega
 
