@@ -125,7 +125,9 @@ Deno.serve(async(req)=>{
       if(cq.error||sq.error||fq.error)throw cq.error||sq.error||fq.error;
       if(!cq.data)return res({ok:false,error:"No existe el cliente."},404);
       if((sq.data||[]).length>=32)return res({ok:false,error:"Demasiados servicios: revisión manual requerida."},400);
-      const hoy=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Merida",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+      const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Merida",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+      const val=(part:string)=>parts.find(x=>x.type===part)?.value||"";
+      const hoy=val("year")+"-"+val("month")+"-"+val("day");
       try{
         const calendario=simularCalendario({
           cliente:cq.data,servicios:sq.data||[],financiero:fq.data,
