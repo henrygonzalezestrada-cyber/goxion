@@ -72,4 +72,43 @@ assert.equal(url.searchParams.get("cliente"),UUID,"Abrir el cliente correcto");
 modal.closeButton.events.click();
 assert.equal(modal.open,false);
 assert.equal(iframe.src,undefined,"Quitar fuente del iframe al cerrar");
+
+// Regresión visual: detalle técnico de X2 oculto hasta abrir la plataforma.
+const accessController=readFileSync("assets/js/admin/23-admin-beta-13-access-controller.js","utf8");
+const serviceTemplate=readFileSync("assets/js/admin/01-01-inline.js","utf8");
+assert(serviceTemplate.includes('class="gx-service-title-toggle"'),"El título del servicio debe abrir el detalle");
+assert(serviceTemplate.includes('<details class="gx-service-access-details">'),"Conservar desplegable técnico nativo");
+assert(serviceTemplate.indexOf('gx-smart-access-box')>serviceTemplate.indexOf('gx-service-access-details'),"Editor dentro de details");
+assert(accessController.includes("box.insertAdjacentHTML('beforebegin',"),"Resumen MÚLTIPLE dentro del desplegable, no en la lista");
+assert(!accessController.includes("details?.insertAdjacentHTML('beforebegin',"),"No mostrar resumen fuera de details");
+const handlers={};
+const listenerStart=accessController.indexOf("document.addEventListener('click',event=>{");
+const listenerEnd=accessController.indexOf("    // ---------- Detección visible por plataforma ----------",listenerStart);
+assert(listenerStart>=0&&listenerEnd>listenerStart,"Debe existir controlador accesible de clic en el nombre");
+vm.runInNewContext(accessController.slice(listenerStart,listenerEnd),{
+  document:{addEventListener(type,handler){handlers[type]=handler}}
+});
+const nativeDetails={open:false};
+const titleButton={expanded:"false",closest(sel){
+ assert.equal(sel,'.gx-service-compact');
+ return {querySelector(q){assert.equal(q,'.gx-service-access-details');return nativeDetails}};
+},setAttribute(key,value){if(key==="aria-expanded")this.expanded=value}};
+const clickEvent={target:{closest(selector){return selector===".gx-service-title-toggle"?titleButton:null}}};
+handlers.click(clickEvent);
+assert.equal(nativeDetails.open,true,"Tocar ViX abre detalle");
+assert.equal(titleButton.expanded,"true");
+handlers.click(clickEvent);
+assert.equal(nativeDetails.open,false,"Tocar ViX nuevamente cierra detalle");
+handlers.toggle({target:{
+ open:true,matches(sel){return sel===".gx-service-access-details"},
+ closest(){return {querySelector(){return titleButton}}}
+}});
+assert.equal(titleButton.expanded,"true","Resumen y nombre del servicio sincronizados");
+// iPhone: calendario no comparte columna con el botón General.
+assert(page.includes('class="access-date-heading"'),"General va arriba del calendario");
+assert(page.includes('Usar fecha general</button></div>'),"Acción General textual y sin superposiciones");
+assert(page.includes('height:46px;min-height:46px'),"Altura nativa de control estable");
+assert(page.includes('.access-date-row{display:block;'),"Calendario en fila completa");
+assert(page.includes('width:100%;min-width:0;max-width:100%'),"El control debe respetar el ancho en móvil");
+
 console.log("GOXION Admin: integración contextual en Servicios, modal y cliente correcto PASS.");
