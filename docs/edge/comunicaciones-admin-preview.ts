@@ -141,10 +141,17 @@ Deno.serve(async req=>{
  try{
    if(!(await verifyAdmin(req.headers.get("X-Admin-Token")||"")))return respond({ok:false,error:"Inicia sesión como administrador para consultar comunicaciones."},401);
    const body=await req.json().catch(()=>({}));
-   if(!["resumen","validar_plan"].includes(body.accion))return respond({ok:false,error:"La beta solo permite consultas y validación; los envíos están deshabilitados."},400);
+   if(!["resumen","validar_plan","enviar","historial"].includes(body.accion))return respond({ok:false,error:"Acción no permitida."},400);
    const url=Deno.env.get("SUPABASE_URL"),key=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
    if(!url||!key)throw new Error("Falta configuración de base de datos");
    const sb=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+   if(body.accion==="historial"){
+     const {data,error}=await sb.from("goxion_comunicacion_campanas")
+       .select("id,tipo,titulo,estado,creados,omitidos,created_at,ejecutada_at")
+       .order("created_at",{ascending:false}).limit(30);
+     if(error)throw error;
+     return respond({ok:true,campanas:data||[]});
+   }
    const [c,s,cs,g,p,alert,promo,history]=await Promise.all([
      sb.from("clientes").select("id,nombre,estado,dia_pago,created_at").limit(5000),
      sb.from("servicios").select("id,nombre,activo").order("nombre").limit(5000),
@@ -247,13 +254,33 @@ Deno.serve(async req=>{
    ];
    const now=Date.now();
    const promociones=(promo.data||[]).filter((x:any)=>new Date(x.inicio).getTime()<=now&&new Date(x.fin).getTime()>now);
-   if(body.accion==="validar_plan"){
-     // Esta operación valida a fecha REAL; no es una simulación futura de envío.
-     if(requested!==stamp)return respond({ok:false,error:"La validación de envío debe utilizar la fecha actual."},400);
-     // PostgREST puede truncar resultados; nunca validar una audiencia parcial como completa.
+   if(body.accion==="validar_plan"||body.accion==="enviar"){
+     if(requested!==stamp)return respond({ok:false,error:"La validación o envío debe usar la fecha actual."},400);
      if([c.data,cs.data,g.data,p.data].some(a=>(a||[]).length>=1000))
-       return respond({ok:false,error:"Audiencia parcialmente cargada. Se requiere paginación segura antes de validar."},503);
-     return await validarPlan(sb,body,clients,promociones);
+       return respond({ok:false,error:"Audiencia parcialmente cargada: paginación requerida."},503);
+     const checked=await validarPlan(sb,body,clients,promociones);
+     if(body.accion==="validar_plan"||!checked.ok)return checked;
+     const v=await checked.json();
+     if(v.ok!==true)return respond(v,checked.status||400);
+     if(body.confirmado!==true||!Number.isInteger(body.confirmacion_cantidad)||
+        body.confirmacion_cantidad!==v.elegibles||v.elegibles<1)
+       return respond({ok:false,error:"Los destinatarios cambiaron o falta confirmar el número exacto. Revisa y confirma nuevamente."},409);
+     const titulo=String(body.titulo||"").trim(),mensaje=String(body.mensaje||"").trim();
+     if(titulo.length<3||titulo.length>90||mensaje.length<6||mensaje.length>420)
+       return respond({ok:false,error:"Título o mensaje fuera de límites."},400);
+     const allText=titulo+" "+mensaje;
+     const placeholders=[...allText.matchAll(/\\{([^{}]{1,50})\\}/g)].map(m=>m[1]);
+     if(placeholders.some(p=>!["nombre","hechas","total","pendientes","dias_cobro","aviso_cobro","promocion"].includes(p)))
+       return respond({ok:false,error:"El mensaje contiene variables no permitidas."},400);
+     const promoId=v.tipo==="promo"?body.plan.promocion_id:null;
+     const response=await sb.rpc("goxion_comunicaciones_emitir",{
+       p_campana_id:v.id_campana,p_tipo:v.tipo,p_titulo:titulo,p_mensaje:mensaje,
+       p_clientes:v.seleccionados.map((x:any)=>x.id),p_promocion_id:promoId
+     });
+     if(response.error){console.error("comunicaciones_emitir",response.error);
+       return respond({ok:false,error:"No fue posible registrar el envío. Consulta el historial y reintenta con el mismo ID de campaña."},503);}
+     return respond({ok:true,modo:"envio_registrado",resultado:response.data,
+       recordatorio:"Notificaciones guardadas en la campana; no son avisos push."});
    }
    return respond({ok:true,modo:"solo_lectura",fecha_local:stamp,fecha_simulada:requested,clientes:clients,
      exclusiones:totals,servicios:(s.data||[]).filter((x:any)=>x.activo),alertas:alert.data||[],
