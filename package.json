@@ -12,6 +12,6 @@
     "test:opiniones:oficial": "node scripts/opiniones-oficial-smoke.mjs",
     "serve:preview": "node scripts/serve-preview.mjs",
     "test:comunicaciones": "node scripts/comunicaciones-beta-smoke.mjs && node scripts/comunicaciones-resilience-smoke.mjs && node scripts/comunicaciones-plan-beta-smoke.mjs && node scripts/comunicaciones-oficial-smoke.mjs",
-    "test:calendario": "node scripts/calendario-financiero-beta-smoke.mjs && node scripts/calendario-financiero-ui-smoke.mjs"
+    "test:calendario": "node scripts/calendario-financiero-beta-smoke.mjs && node scripts/calendario-financiero-ui-smoke.mjs && node scripts/calendario-admin-integracion-smoke.mjs"
   }
 }
