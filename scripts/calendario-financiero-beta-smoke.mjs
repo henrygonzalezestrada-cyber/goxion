@@ -65,4 +65,33 @@ rejects("No acepta fracciones menores al centavo",()=>simularCalendario({...setu
 rejects("No modifica clientes ajenos",()=>simularCalendario({...setup(),propuesta:{servicios:{other:{nuevo_dia:18}}}}));
 rejects("No acepta servicios repetidos",()=>simularCalendario({...setup(),servicios:[netflix,netflix]}));
 rejects("No permite extensión excesiva",()=>prorratearExtension("2026-01-01","2026-03-01",1,10000));
+
+const ytx2={id:"ytx2",nombre:"YouTube Premium (x2)",monto:178,activo:true};
+const vixx2={id:"vixx2",nombre:"ViX Premium (x2)",monto:98,activo:true};
+const x2=simularCalendario({...setup(),servicios:[ytx2,vixx2],financiero:{...fin,total_actual:276},
+ propuesta:{servicios:{
+ "ytx2#1":{cobertura_hasta:"2026-11-05",cobertura_confirmada:true,dia_original:5},
+ "ytx2#2":{cobertura_hasta:"2026-11-20",cobertura_confirmada:true,dia_original:20},
+ "vixx2#1":{cobertura_hasta:"2026-11-15",cobertura_confirmada:true,dia_original:15},
+ "vixx2#2":{cobertura_hasta:"2026-11-25",cobertura_confirmada:true,dia_original:25}
+ }}});
+check("X2 genera unidades independientes",x2.servicios.length,4);
+check("X2 conserva total mensual exacto",x2.total_base_centavos,27600);
+check("X2 reparte YouTube en dos perfiles",x2.servicios.filter(s=>s.cliente_servicio_id==="ytx2").map(s=>s.monto_base_centavos),[8900,8900]);
+check("X2 reparte ViX en dos perfiles",x2.servicios.filter(s=>s.cliente_servicio_id==="vixx2").map(s=>s.monto_base_centavos),[4900,4900]);
+check("X2 usa vencimientos distintos",x2.grupos.map(g=>g.fecha),["2026-11-05","2026-11-15","2026-11-20","2026-11-25"]);
+check("X2 próximo solo cubre una unidad",x2.pago.importe_centavos,8900);
+check("X2 retiene identidad del contrato",x2.servicios[0].cliente_servicio_id,"ytx2");
+check("X2 advierte reparto estimado",x2.advertencias.some(x=>x.includes("X2")),true);
+const join=simularCalendario({...setup(),servicios:[ytx2],financiero:{...fin,total_actual:178},propuesta:{
+ servicios:{"ytx2#1":{cobertura_hasta:"2026-11-05"},"ytx2#2":{cobertura_hasta:"2026-11-20"}},
+ pago:{modo:"todos"}}});
+check("Una transferencia cubre X2 completo",join.pago.importe_centavos,17800);
+check("X2 distinto no equivale a servicio duplicado",join.pago.asignaciones.map(x=>x.servicio_id),["ytx2#1","ytx2#2"]);
+const odd=simularCalendario({...setup(),servicios:[{id:"odd",nombre:"Ejemplo (x2)",monto:79.99,activo:true}],financiero:{...fin,total_actual:79.99}});
+check("Resto de centavos no se pierde en X2",odd.servicios.reduce((sum,s)=>sum+s.monto_base_centavos,0),7999);
+const combo=simularCalendario({...setup(),servicios:[{id:"combo",nombre:"HBO Max + Prime Video",monto:99,activo:true}],financiero:{...fin,total_actual:99}});
+check("Combo de dos marcas no se separa arbitrariamente",combo.servicios.length,1);
+rejects("No permite 2 fechas con ID original de X2",()=>simularCalendario({...setup(),servicios:[ytx2],propuesta:{servicios:{ytx2:{cobertura_hasta:"2026-11-05"}}}}));
+
 console.log("GOXION calendario financiero beta: "+tests.length+" pruebas correctas, cero escrituras.");
