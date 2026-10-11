@@ -181,3 +181,8 @@ Propietario: Gestión → Experiencia → Comunicaciones (comunicaciones.html). 
 **Límite de evidencia:** este mapa agrupa responsabilidades identificadas por inspección de código y base; no equivale a una certificación funcional de cada ruta. Para retirar una capa de compatibilidad o mover escrituras se requiere prueba autenticada de extremo a extremo.
 
 **Principio permanente:** mejoramos el Admin que ya existe; no lo rediseñamos por cuarta vez.
+
+### Calendario por servicio (fase sombra)
+
+El cálculo vive en la **Edge estado-financiero** y su módulo puro de simulación, no en Ayuda ni Index. Entrada Admin solo por beta **preview/calendario-financiero/index.html**. Todos los calendarios existentes siguen heredando el día del cliente; no se han modificado fechas o pagos. Próximo trabajo: obligación y aplicación de pagos por servicio/rango de fechas, integración al flujo aprobado de **acciones-financieras**, después Index y por último ajuste mínimo del texto de Ayuda. Ver **docs/CALENDARIO_FINANCIERO.md**.
+
