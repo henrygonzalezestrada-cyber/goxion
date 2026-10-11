@@ -3,6 +3,15 @@
 **Fase 1: beta de cálculo y aplicación simulada.** 11 de octubre de 2026.
 
 
+## Refinamiento de experiencia · octubre 2026
+
+- La pantalla principal muestra **una fila por contratación**, incluso si contiene dos o más accesos (X2). Nombre e importe aparecen **una sola vez**; se resumen la primera fecha y, cuando aplica, la siguiente fecha distinta.
+- «Fechas ›» abre **un solo detalle contextual** para el contrato seleccionado, con filas compactas «Acceso 1», «Acceso 2» y su fecha. Los demás contratos no generan editores desplegados simultáneamente.
+- Las fechas individuales se editan exclusivamente con **calendario nativo** (`input type=date`); GOXION deriva la ancla del día automáticamente y preserva los cálculos de cobertura. «General» restaura la simulación de fecha heredada de ese acceso.
+- El cambio de día conjunto también usa un **calendario**, aunque el motor conserva la recurrencia mensual por día. El calendario solo elige el día común: no acorta coberturas ya pagadas.
+- El pago «vence primero» y «todo junto», selección avanzada, simulación de abonos, totales y advertencias continúan funcionando. Solo cambia la presentación.
+- No se alteraron ni Finanzas oficial, ni los saldos reales, ni Ayuda o Index. Se actualizaron pruebas de interfaz y X2 y se forzó recarga de la vista en Safari para evitar HTML anterior en caché.
+
 ## Corrección X2 e integración visual Admin · 11/oct/2026
 
 **Problema confirmado en base real:** ViX Premium (x2) ($98) y YouTube Premium (x2) ($178) se almacenan como **una sola fila** de `cliente_servicios`. Por tanto, una fila no siempre equivale a una sola fecha de renovación.
