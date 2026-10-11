@@ -186,3 +186,6 @@ Propietario: Gestión → Experiencia → Comunicaciones (comunicaciones.html). 
 
 El cálculo vive en la **Edge estado-financiero** y su módulo puro de simulación, no en Ayuda ni Index. Entrada Admin solo por beta **preview/calendario-financiero/index.html**. Todos los calendarios existentes siguen heredando el día del cliente; no se han modificado fechas o pagos. Próximo trabajo: obligación y aplicación de pagos por servicio/rango de fechas, integración al flujo aprobado de **acciones-financieras**, después Index y por último ajuste mínimo del texto de Ayuda. Ver **docs/CALENDARIO_FINANCIERO.md**.
 
+
+**Calendarios por perfil X2 (beta):** clientes que poseen una fila `cliente_servicios.nombre` como «YouTube Premium (x2)» ahora pueden simular fechas independientes por perfil, pero el contrato sigue siendo una sola fila y los importes desglosados son estimativos. El acceso de prueba va en el acordeón **Servicios** del expediente Admin; no hay otra navegación principal, ni modificación visual a Ayuda o Index. La Edge oficial `estado-financiero` sigue siendo fuente única.
+
