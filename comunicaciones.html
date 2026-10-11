@@ -84,6 +84,13 @@ details.more{margin-top:16px;border-top:1px solid var(--stroke);padding-top:14px
     <div id="available" class="people" aria-live="polite"></div>
     <p id="recipientHelp" class="recipient-help">GOXION solo permitirá agregar clientes que cumplan las condiciones de este aviso.</p>
    </details>
+  <details class="more" id="schedulePanel"><summary>Programar para otro día (opcional)</summary>
+    <label class="field" for="scheduleAt">Fecha y hora de Mérida (Yucatán)
+      <input type="datetime-local" id="scheduleAt" aria-label="Cuándo enviar">
+    </label>
+    <p style="font-size:11px;color:var(--muted)">GOXION revisará las condiciones al ejecutarse. La comprobación es automática cada 15 minutos.</p>
+    <button type="button" class="mini-button" id="clearSchedule">Quitar programación</button>
+   </details>
   <div class="actions">
    <button id="refresh" class="action" type="button">↻ Actualizar</button>
    <button class="action primary" type="button" id="send">Revisar y enviar →</button>
@@ -113,7 +120,10 @@ var touched=false, campaignId=null, submissionBusy=false, delivered=false;
 var overrides=Object.create(null);
 function escapeHTML(input){return String(input??"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function write(id,text){$(id).textContent=String(text)}
-function changeCampaign(){campaignId=null;delivered=false;$("send").disabled=false;write("deliveryStatus","");$("deliveryStatus").classList.remove("warn");}
+function updateSendText(){
+ if(!submissionBusy&&!delivered)write("send",$("scheduleAt").value?"Revisar y programar →":"Revisar y enviar →");
+}
+function changeCampaign(){campaignId=null;delivered=false;$("send").disabled=false;write("deliveryStatus","");$("deliveryStatus").classList.remove("warn");updateSendText();}
 function choose(kind){
  if(!templates[kind])return;
  current=kind;touched=false;$("recipientSearch").value="";changeCampaign();
@@ -274,6 +284,14 @@ async function enviar(){
  var titulo=$("titleInput").value.trim(),mensaje=$("messageInput").value.trim();
  if(titulo.length<3||mensaje.length<6){write("deliveryStatus","Revisa el título y el mensaje antes de enviarlo.");return;}
  var plan=makePlan();
+ var schedule=$("scheduleAt").value,iso=null;
+ if(schedule){
+   var date=new Date(schedule+":00-06:00");
+   if(!Number.isFinite(date.getTime())||date.getTime()<Date.now()+120000||date.getTime()>Date.now()+90*86400000){
+     write("deliveryStatus","Elige una fecha de 2 minutos a 90 días a partir de ahora (hora de Mérida).");return;
+   }
+   iso=date.toISOString();
+ }
  if(current==="promo"&&!plan.promocion_id){write("deliveryStatus","Selecciona una promoción vigente.");return;}
  submissionBusy=true;$("send").disabled=true;write("send","Validando…");
  write("deliveryStatus","Comprobando destinatarios y avisos previos en Supabase.");
@@ -285,28 +303,40 @@ async function enviar(){
   }
   var message="GOXION validó "+checked.elegibles+" destinatarios.";
   if(checked.omitidos.length)message+=" Excluyó "+checked.omitidos.length+".";
-  message+="\n\n¿Confirmas enviarles este aviso a la campana de Mi Espacio?";
+  if(iso){
+   message+="\\n\\nAl programar, GOXION volverá a comprobar las condiciones antes de enviar.";
+   message+="\\nFecha: "+new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeStyle:"short",timeZone:"America/Merida"}).format(new Date(iso));
+ }else{
+   message+="\\n\\n¿Confirmas enviarles este aviso a la campana de Mi Espacio?";
+ }
   if(!window.confirm(message)){write("deliveryStatus","Envío cancelado. No se enviaron mensajes.");return;}
-  write("deliveryStatus","Registrando avisos confirmados…");
-  var out=await sendRequest({accion:"enviar",plan,confirmado:true,confirmacion_cantidad:checked.elegibles,titulo,mensaje});
+  write("deliveryStatus",iso?"Guardando programación…":"Registrando avisos confirmados…");
+  var out=await sendRequest({accion:iso?"programar":"enviar",programada_at:iso,plan,confirmado:true,confirmacion_cantidad:checked.elegibles,titulo,mensaje});
   var res=out.resultado||{};
   delivered=true;
-  write("deliveryStatus","Campaña registrada: "+(res.creados||0)+" avisos nuevos y "+(res.omitidos||0)+" omitidos. "+(res.repetido?"Es un reintento; no se duplicaron avisos.":""));
+  if(out.programada){
+    write("deliveryStatus","Programación registrada. GOXION evaluará nuevamente a los destinatarios cuando llegue la fecha; todavía no se envió nada.");
+  }else{
+    write("deliveryStatus","Campaña registrada: "+(res.creados||0)+" avisos nuevos y "+(res.omitidos||0)+" omitidos. "+(res.repetido?"Es un reintento; no se duplicaron avisos.":""));
+  }
   await loadHistory();
  }catch(e){
   $("deliveryStatus").classList.add("warn");
   write("deliveryStatus",(e&&e.message)||"No se pudo confirmar el envío. Consulta Historial antes de reintentar.");
  }finally{
-  submissionBusy=false;$("send").disabled=delivered;write("send",delivered?"Envío registrado ✓":"Revisar y enviar →");
+  submissionBusy=false;$("send").disabled=delivered; if(delivered)write("send",iso?"Programación guardada ✓":"Envío registrado ✓");else updateSendText();
  }
 }
 async function loadHistory(){
  try{
   var json=await sendRequest({accion:"historial"});
   var list=json.campanas||[];
-  $("historyList").innerHTML=list.length?list.slice(0,12).map(function(x){
-   return '<div class="history-row"><div><strong>'+escapeHTML(x.titulo)+'</strong><small>'+escapeHTML(new Date(x.created_at).toLocaleDateString("es-MX"))+' · '+escapeHTML(x.tipo)+'</small></div><small>'+Number(x.creados||0)+' entregados · '+Number(x.omitidos||0)+' omitidos</small></div>'
-  }).join(""):'<p class="empty">Aún no hay campañas enviadas.</p>';
+  $("historyList").innerHTML=list.length?list.slice(0,16).map(function(x){
+   var scheduled=x.programada_at,pend=["programada","error"].includes(x.estado);
+   var action=pend?'<button class="mini-button remove" type="button" data-cancel="'+escapeHTML(x.id)+'">Cancelar</button>':'';
+   var desc=scheduled?("Programada: "+new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeStyle:"short",timeZone:"America/Merida"}).format(new Date(scheduled))+" · "+x.estado):(Number(x.creados||0)+" entregados · "+Number(x.omitidos||0)+" omitidos");
+   return '<div class="history-row"><div><strong>'+escapeHTML(x.titulo)+'</strong><small>'+escapeHTML(new Date(x.created_at).toLocaleDateString("es-MX"))+' · '+escapeHTML(x.tipo)+' · '+escapeHTML(desc)+'</small></div>'+action+'</div>';
+  }).join(""):'<p class="empty">Aún no hay campañas registradas.</p>';
  }catch(e){write("historyList","No fue posible consultar el historial.")}
 }
 
@@ -366,6 +396,15 @@ $("messageInput").addEventListener("input",function(){touched=true;changeCampaig
 $("restoreTemplate").addEventListener("click",function(){changeCampaign();touched=false;$("titleInput").value=templates[current].title;$("messageInput").value=templates[current].message;draw()});
 $("refresh").addEventListener("click",function(){changeCampaign();load()});
 $("send").addEventListener("click",enviar);
+$("scheduleAt").addEventListener("change",changeCampaign);
+$("clearSchedule").addEventListener("click",function(){$("scheduleAt").value="";changeCampaign()});
+$("historyList").addEventListener("click",async function(ev){
+ var b=ev.target.closest("[data-cancel]");
+ if(!b||submissionBusy)return;
+ if(!window.confirm("¿Cancelar esta notificación programada?"))return;
+ try{await sendRequest({accion:"cancelar_programada",id:b.dataset.cancel});await loadHistory();write("deliveryStatus","Programación cancelada.");}
+ catch(e){write("deliveryStatus",(e&&e.message)||"No fue posible cancelar.");}
+});
 $("historyPanel").addEventListener("toggle",function(){if($("historyPanel").open)loadHistory()});
 $("showExisting").addEventListener("click",function(){$("existing").classList.toggle("hidden")});
 $("titleInput").value=templates.missions.title;
