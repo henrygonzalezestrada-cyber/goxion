@@ -11,6 +11,6 @@
     "test:opiniones": "node scripts/opiniones-beta-smoke.mjs",
     "test:opiniones:oficial": "node scripts/opiniones-oficial-smoke.mjs",
     "serve:preview": "node scripts/serve-preview.mjs",
-    "test:comunicaciones": "node scripts/comunicaciones-beta-smoke.mjs && node scripts/comunicaciones-resilience-smoke.mjs"
+    "test:comunicaciones": "node scripts/comunicaciones-beta-smoke.mjs && node scripts/comunicaciones-resilience-smoke.mjs && node scripts/comunicaciones-plan-beta-smoke.mjs"
   }
 }
