@@ -277,6 +277,10 @@ $("services").addEventListener("change",function(ev){
    state.dia_original=Number(ev.target.value.slice(-2));
    state.cobertura_confirmada=false;
  }else if(field==="cobertura_confirmada"){
+   if(ev.target.checked&&!state.cobertura_hasta){
+     state.cobertura_hasta=service.fecha_vencimiento;
+     state.dia_original=service.dia_original;
+   }
    state.cobertura_confirmada=ev.target.checked;
  }
  simulate();
