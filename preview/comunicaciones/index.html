@@ -51,7 +51,7 @@
           <div class="field"><label for="category">Categoría</label><select id="category"><option value="missions">Misiones y recompensas</option><option value="promo">Oferta / promoción</option><option value="pay">Cobros y recordatorios</option><option value="general">Comunicado general</option></select></div>
           <div class="field"><label for="deadline">Fecha informativa / límite</label><input id="deadline" type="date" value="2026-10-20"></div>
         </div>
-        <div class="field mt hidden" id="promoHolder"><label for="promotion">Promoción oficial de Studio</label><select id="promotion"><option value="">Selecciona promoción</option></select><small class="caption">No aplica descuentos ni verifica elegibilidad comercial.</small></div><div class="formrow mt"><div class="field"><label for="phase">Escenario</label><select id="phase"><option value="new">Nuevo aviso simulado</option><option value="initial">Repetir aviso inicial</option></select></div><div class="field"><label for="previewDate">Día simulado</label><input id="previewDate" type="date" value="2026-10-16"></div></div><div class="callout mt" id="sourceNotice">Fuente: Misiones oficiales. No crea nuevas misiones ni avisos.</div>
+        <div class="field mt hidden" id="promoHolder"><label for="promotion">Promoción oficial de Studio</label><select id="promotion"><option value="">Selecciona promoción</option></select><small class="caption">No aplica descuentos ni verifica elegibilidad comercial.</small></div><div class="formrow mt"><div class="field"><label for="phase">Escenario</label><select id="phase"><option value="new">Nuevo aviso simulado</option><option value="initial">Repetir aviso inicial</option></select></div><div class="field"><label for="previewDate">Día simulado</label><input id="previewDate" type="date"></div></div><div class="callout mt" id="sourceNotice">Fuente: Misiones oficiales. No crea nuevas misiones ni avisos.</div>
         <div class="field mt"><label for="title">Título de la notificación</label><input id="title" maxlength="90" value="Tus misiones finalizan el {fecha}"><span class="counter" id="titleCount"></span></div>
         <div class="field mt"><label for="message">Mensaje personalizado</label><textarea id="message" maxlength="420" rows="4">Hola {nombre}, tienes {pendientes} misiones pendientes. Llevas {hechas} de {total} completadas. Tienes hasta el {fecha} para terminarlas y reclamar tu recompensa.</textarea><span class="counter" id="messageCount"></span></div>
         <div class="mt">
@@ -207,7 +207,7 @@ function updateSource(){
 function insights(){
  var m=data.clientes.filter(function(c){return c.misiones_pendientes>0}).length;
  var dues=data.clientes.filter(function(c){return c.dias_para_cobro<=7}).length;
- write("metric-clients",data.clientes.length);write("metric-missions",m);write("metric-services",(data.automatismos||[]).filter(function(t){return t.estado==="activo"}).length);write("databaseDate","Corte: "+data.fecha_local);
+ write("metric-clients",data.clientes.length);write("metric-missions",m);write("metric-services",(data.automatismos||[]).filter(function(t){return t.estado==="activo"}).length);write("databaseDate","Datos: "+data.fecha_local+" · Escenario: "+(data.fecha_simulada||data.fecha_local));
  write("businessInsights",m+" clientes con misiones pendientes · "+dues+" con cobro dentro de 7 días · "+data.promociones.length+" promociones activas · "+data.alertas.length+" incidentes registrados como activos.");
  renderAutomations();var selected=data.servicios;
  $("service").innerHTML='<option value="">Selecciona un servicio</option>'+selected.map(function(s){return '<option value="'+safe(s.id)+'">'+safe(s.nombre)+'</option>'}).join("");
@@ -226,7 +226,7 @@ async function load(){
  var token=localStorage.getItem(TOKEN_KEY)||"";
  if(!token){$("auth").classList.remove("hidden");$("workspace").classList.add("hidden");$("refresh").disabled=false;write("refresh","↻ Actualizar");return}
  try{
-  var res=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion:"resumen"}),cache:"no-store"});
+  var res=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion:"resumen",fecha_simulacion:value("previewDate")}),cache:"no-store"});
   var json=await res.json();
   if(!res.ok||json.ok!==true)throw new Error(json.error||"Error de conexión ("+res.status+")");
   data=json;$("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
@@ -241,14 +241,20 @@ function save(){
 function restore(){
  try{var payload=JSON.parse(localStorage.getItem("gx_communications_draft_v1")||"null");if(payload){Object.keys(payload).forEach(function(k){if($(k))set(k,payload[k])});activePreset="";document.querySelectorAll("[data-preset]").forEach(function(x){x.classList.remove("active")})}}catch{}
 }
-names.forEach(function(id){$(id).addEventListener(id==="title"||id==="message"?"input":"change",refresh)});
+names.forEach(function(id){if(id==="previewDate")return;$(id).addEventListener(id==="title"||id==="message"?"input":"change",refresh)});
 $("title").addEventListener("focus",function(){editing="title"});
 $("message").addEventListener("focus",function(){editing="message"});
 $("variables").querySelectorAll("[data-variable]").forEach(function(b){b.addEventListener("click",function(){var el=$(editing);var pos=el.selectionStart??el.value.length;var v=b.dataset.variable;el.value=el.value.slice(0,pos)+v+el.value.slice(pos);el.focus();el.setSelectionRange(pos+v.length,pos+v.length);refresh()})});
 document.querySelectorAll("[data-preset]").forEach(function(b){b.addEventListener("click",function(){preset(b.dataset.preset)})});
 $("refresh").addEventListener("click",load);
+$("previewDate").addEventListener("change",load);
 $("showExcluded").addEventListener("change",function(){if(!data)return;document.querySelectorAll(".person").forEach(function(el){el.classList.toggle("hidden",!$("showExcluded").checked&&!el.querySelector("input").checked)})});
 $("save").addEventListener("click",save);
+if(!value("previewDate")){
+ var parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Merida",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+ var datePart=function(k){return parts.find(function(p){return p.type===k})?.value||""};
+ set("previewDate",datePart("year")+"-"+datePart("month")+"-"+datePart("day"));
+}
 restore();load();
 })();
 </script>
