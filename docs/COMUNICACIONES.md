@@ -1,10 +1,26 @@
 # GOXION · Centro de Comunicaciones Inteligentes
 
-> **Regla de integración:** consultar primero [el registro canónico de funciones de GOXION](ADMIN_FUNCTION_REGISTRY.md). Comunicaciones no administra promociones, descuentos, misiones ni incidencias: consume datos de los módulos propietarios. La beta actual puede mostrar opciones redundantes y es solo un laboratorio no aprobado para el Admin oficial.
+> **Regla de integración:** consultar primero [el registro canónico de funciones de GOXION](ADMIN_FUNCTION_REGISTRY.md). Comunicaciones no administra promociones, descuentos, misiones ni incidencias: consume datos de los módulos propietarios. La interfaz oficial solo reutiliza los módulos propietarios.
 
-Estado: **beta de simulación**, 2026-10-10. No altera `admin.html` ni envía notificaciones.
+Estado: **integrada en Admin oficial**, 2026-10-11. Las secciones antiguas siguientes son antecedentes históricos de la beta.
 
-## Interfaz actual · Beta intuitiva (10/oct/2026)
+## Integración oficial · 11 de octubre de 2026
+
+**Vigente:** Admin → Gestión → Experiencia → Comunicaciones, con interfaz en comunicaciones.html. El enlace anterior de la beta redirige a la pantalla oficial; la versión previa solo permanece archivada para regresión.
+
+**Motor único:** Edge Function comunicaciones-admin-preview (nombre técnico heredado). Acciones autenticadas: resumen, validar_plan, enviar, programar, cancelar_programada e historial. Fuente desplegada versionada en docs/edge/comunicaciones-admin-preview.ts.
+
+- Selecciona el motivo, destinatarios sugeridos, exclusiones/adiciones manuales y mensaje. Al enviar, el servidor recalcula elegibilidad y requiere confirmación explícita del alcance.
+- SQL transaccional goxion_comunicaciones_emitir registra campaña, entregas y avisos de Mi Espacio; clave única y candados por cliente evitan duplicados, con límites de frecuencia de 20 horas para recordatorios y 72 horas para anuncios comerciales.
+- Las campañas programadas están en goxion_comunicacion_agenda. pg_cron ejecuta goxion_comunicaciones_procesar_agenda cada 15 minutos, reevalúa destinatarios, aplica un máximo de tres intentos y permite cancelar antes de emitir.
+- Las nuevas tablas mantienen RLS sin acceso directo para anon/authenticated; permisos de emisión reservados al servidor. El código SQL está en docs/sql/comunicaciones_oficial.sql.
+- Los avisos usan la campana actual: Misiones abre Recompensas, Cobro abre Estado de cuenta y Promoción abre Catálogo. No son push, correo ni WhatsApp.
+- La fecha mencionada en un recordatorio no establece la caducidad real de las misiones; esa regla permanece en el módulo propietario.
+
+**Verificación:** cuatro suites de simulación aprobadas, trabajo cron activo, ejecución vacía del planificador correcta, permisos y RLS comprobados. No se enviaron avisos a clientes durante la instalación. **Pendiente:** prueba manual de interfaz y sesión autenticada en iPhone antes del primer envío real.
+
+---
+## Interfaz histórica · Beta intuitiva (10/oct/2026)
 
 **Esta sección prevalece sobre las descripciones históricas de la beta de segmentación que aparecen más abajo.** Se conservan las fuentes/contratos de Supabase, pero la interfaz de `preview/comunicaciones/index.html` se simplificó: cuatro motivos — **Misiones, Próximo cobro, Promociones y Comunicado** — con audiencia calculada automáticamente, mensaje predeterminado y vista previa personalizada. La personalización del texto y la lista de destinatarios están ocultas en desplegables opcionales. Los automatismos ya activos solo aparecen en un resumen informativo; no son configurables desde Comunicaciones.
 
