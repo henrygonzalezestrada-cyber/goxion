@@ -107,6 +107,6 @@ assert.equal(test.nodes.audienceCount.textContent,'4','Comunicado a activos reci
 test.input('titleInput','Hola {nombre}');
 assert.equal(test.nodes.previewTitle.textContent,'Hola Ana','Edición opcional y segura');
 
-assert.equal(test.calls.length,1,'Cambiar motivo jamás ejecuta llamadas de escritura');
+assert.equal(test.calls.length,2,'Solo hubo consulta inicial y actualización explícita; los cambios de motivo nunca escribieron');
 assert(test.calls.every(x=>JSON.parse(x.opts.body).accion==='resumen'),'Solo lectura');
 console.log('Comunicaciones beta · pruebas OK: quitar/reagregar, búsqueda, acentos, bloqueos, cobros futuros, aislamiento, restaurar y solo lectura');
