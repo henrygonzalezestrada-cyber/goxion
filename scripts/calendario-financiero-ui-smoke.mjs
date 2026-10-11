@@ -63,7 +63,14 @@ x.nodes.client.events.change.call(x.nodes.client);await flush();
 assert.equal(x.calls.at(-1).accion,"simular_calendario_beta");
 assert(x.nodes.groups.innerHTML.includes("15 nov"),"Heredar el día 15 sin modificaciones");
 assert(x.nodes.services.innerHTML.includes("Cambiar fecha"),"Mostrar edición simple por perfil");
-assert(x.nodes.services.innerHTML.includes('Día 1')===false,"El editor avanzado permanece oculto hasta abrir");
+assert(x.nodes.services.innerHTML.includes('Día 1')===false,"El editor se oculta hasta tocar Cambiar fecha");
+x.nodes.services.events.click({target:{closest(selector){
+ if(selector==="[data-edit]")return {getAttribute:()=> "netflix"};
+ return null;
+}}});
+assert(x.nodes.services.innerHTML.includes('Día 1')&&x.nodes.services.innerHTML.includes('Día 31'),
+ "El selector del perfil ofrece todos los días, incluidos 1 a 5");
+assert(x.nodes.services.innerHTML.includes("Próximo vencimiento"),"Edición con lenguaje claro");
 x.modes[1].events.click();await flush();
 assert.equal(x.calls.at(-1).datos.propuesta.pago.modo,"todos");
 assert.equal(x.nodes.total.textContent,"$210.00");
