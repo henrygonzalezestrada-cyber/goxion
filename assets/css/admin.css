@@ -5911,3 +5911,25 @@ body.gx-beta-22 .gx-reg-actions .gx-prepare-activation{border-color:rgba(0,242,2
   align-items:flex-start;flex-direction:column!important;
  }
 }
+
+
+/* Accesos por invitación: la asignación interna es avanzada y opcional. */
+.gx-focus-v3 .gx-service-access-details .gx-invite-group-details{
+  display:block;width:100%;min-width:0;border:0;padding:0;margin:4px 0 0;
+}
+.gx-focus-v3 .gx-service-access-details .gx-invite-group-details>summary{
+  list-style:none;display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 0;min-height:42px;border-top:1px solid rgba(255,255,255,.065);
+  color:#9fdbe5;font-size:12px;font-weight:750;cursor:pointer;
+}
+.gx-focus-v3 .gx-service-access-details .gx-invite-group-details>summary::-webkit-details-marker{display:none}
+.gx-focus-v3 .gx-service-access-details .gx-invite-group-details>summary::after{
+  content:"+";font-size:17px;line-height:1;color:#8c9cae;flex:none;
+}
+.gx-focus-v3 .gx-service-access-details .gx-invite-group-details[open]>summary::after{content:"−"}
+.gx-focus-v3 .gx-service-access-details .gx-invite-group-details .gx-tech-account-side{
+  padding:7px 0 12px;
+}
+.gx-focus-v3 .gx-service-access-details .gx-group-invite-note{
+  color:#899bb1;font-size:11px;line-height:1.45;margin:8px 0 0;
+}
