@@ -64,12 +64,40 @@ function rangoFecha(value,hoy){
  if(diff< -365||diff>550)error("La cobertura introducida queda fuera del rango permitido");
  return value;
 }
+
+export function desglosarUnidades(servicios){
+ if(!Array.isArray(servicios))error("Listado de servicios inválido");
+ const result=[];
+ for(const s of servicios){
+   // X2 es una cantidad dentro de UNA contratación, no dos contratos nuevos.
+   // Un combo entre marcas ("HBO + Prime") permanece en una sola unidad.
+   const m=String(s.nombre||"").match(/\(\s*x([2-9]|1[0-2])\s*\)/i);
+   const n=m?Number(m[1]):1;
+   const cents=dineroACentavos(s.monto);
+   const base=Math.floor(cents/n),rest=cents%n;
+   for(let i=0;i<n;i++){
+     const unitAmount=base+(i<rest?1:0);
+     result.push({
+       ...s,id:n>1?s.id+"#"+(i+1):s.id,
+       cliente_servicio_id:s.id,
+       unidad:i+1,unidades:n,
+       nombre:n>1?String(s.nombre).replace(/\(\s*x\d+\s*\)/i,"").trim()+" · Perfil "+(i+1):s.nombre,
+       monto:unitAmount/100,
+       monto_unidad_centavos:unitAmount,
+       precio_dividido_estimado:n>1
+     });
+   }
+ }
+ return result;
+}
 export function simularCalendario({cliente,servicios,financiero,propuesta={},hoy}){
  if(!cliente||!Array.isArray(servicios)||!hoy)error("Faltan datos del cliente");
  fechaUTC(hoy);
- const activos=servicios.filter(s=>s.activo!==false);
+ const contratos=servicios.filter(s=>s.activo!==false);
+ const activos=desglosarUnidades(contratos);
+ if(activos.length>60)error("Demasiadas unidades en una simulación");
  if(!activos.length)error("El cliente no tiene servicios activos");
- if(activos.length>30)error("Demasiados servicios en una simulación");
+ if(contratos.length>30)error("Demasiados contratos en una simulación");
  const ids=new Set(activos.map(s=>s.id));
  if(ids.size!==activos.length)error("Servicios duplicados");
  const plan=propuesta.servicios||{};
@@ -84,7 +112,7 @@ export function simularCalendario({cliente,servicios,financiero,propuesta={},hoy
  const items=activos.map(s=>{
    const cfg=plan[s.id]||{};
    if(!cfg||typeof cfg!=="object"||Array.isArray(cfg))error("Configuración de servicio inválida");
-   const importe=dineroACentavos(s.monto);
+   const importe=s.monto_unidad_centavos;
    const coberturaExplicita=cfg.cobertura_hasta!=null&&cfg.cobertura_hasta!=="";
    // Única fuente fiable para calendarios distintos: cobertura capturada/confirmada.
    let vence=coberturaExplicita?rangoFecha(iso(fechaUTC(cfg.cobertura_hasta)),hoy)
@@ -100,6 +128,8 @@ export function simularCalendario({cliente,servicios,financiero,propuesta={},hoy
      :prorratearExtension(vence,nuevoVencimiento,ancla,importe);
    return {
      id:s.id,nombre:s.nombre,monto_base_centavos:importe,
+     cliente_servicio_id:s.cliente_servicio_id,unidad:s.unidad,unidades:s.unidades,
+     precio_dividido_estimado:s.precio_dividido_estimado,
      fecha_vencimiento:vence,origen_fecha:coberturaExplicita?"cobertura_declarada":"heredada_del_cliente",
      cobertura_confirmada:cfg.cobertura_confirmada===true&&coberturaExplicita,
      dia_original:ancla,ciclo_siguiente_hasta:siguiente,
@@ -145,6 +175,8 @@ export function simularCalendario({cliente,servicios,financiero,propuesta={},hoy
  const sumaBase=items.reduce((a,b)=>a+b.monto_base_centavos,0);
  const confirmados=items.every(x=>x.cobertura_confirmada);
  const warnings=[];
+ const multiples=items.filter(x=>x.unidades>1);
+ if(multiples.length)warnings.push("Las contrataciones X2 se dividen en perfiles independientes solo para simular; verifica qué precio y cobertura corresponde realmente a cada perfil.");
  if(!confirmados)warnings.push("Las coberturas no confirmadas son hipótesis, no vencimientos comprobados.");
  if(promociones>0)warnings.push("Existen promociones: los importes base NO sustituyen el precio promocional oficial.");
  if(!Number.isFinite(totalOficial)||Math.abs(sumaBase/100-totalOficial)>0.009)
