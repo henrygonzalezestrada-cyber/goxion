@@ -189,3 +189,11 @@ El cálculo vive en la **Edge estado-financiero** y su módulo puro de simulaci�
 
 **Calendarios por perfil X2 (beta):** clientes que poseen una fila `cliente_servicios.nombre` como «YouTube Premium (x2)» ahora pueden simular fechas independientes por perfil, pero el contrato sigue siendo una sola fila y los importes desglosados son estimativos. El acceso de prueba va en el acordeón **Servicios** del expediente Admin; no hay otra navegación principal, ni modificación visual a Ayuda o Index. La Edge oficial `estado-financiero` sigue siendo fuente única.
 
+
+
+### Editar acceso · jerarquía visual unificada (octubre 2026)
+
+Solo se ajustó la presentación del expediente de **Admin → Clientes → Servicios → Editar acceso**. Contrataciones X2 permanecen agrupadas y su detalle técnico aparece al abrir el servicio; se eliminó dentro del editor el recuadro duplicado «MÚLTIPLE» y las explicaciones repetidas. Se sustituyó «1 acceso real» por ninguna cabecera adicional para un único acceso, y los X2 muestran simplemente «2 accesos». Los accesos repetidos se identifican como «Acceso 1» y «Acceso 2».
+
+Los controles existentes de correo, estado del beneficio, perfil/PIN y grupo/licencia conservan sus mismos manejadores de datos y se normalizaron a **46 px**, etiquetas de 11 px y valores de 14 px, exclusivamente con CSS limitado al expediente Admin. Las notas sobre contraseñas personales permanecen en texto compacto. No modifica Supabase, Ayuda, Index, credenciales ni políticas de uso. Validación automatizada: `scripts/calendario-admin-integracion-smoke.mjs`.
+
