@@ -67,20 +67,27 @@ async function request(accion,datos){
  if(!token)throw Error("Debes iniciar sesión en Admin.");
  const response=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},
  body:JSON.stringify({accion,datos}),cache:"no-store"});
- const data=await response.json();if(!response.ok||data.ok!==true)throw Error(data.error||"Error de consulta");
+ const data=await response.json();
+ if(response.status===401||response.status===403){
+   $("workspace").classList.add("hidden");$("auth").classList.remove("hidden");
+   ["services","groups","allocations","adjustments"].forEach(id=>$(id).innerHTML="");
+   result=null;current=null;
+ }
+ if(!response.ok||data.ok!==true)throw Error(data.error||"Error de consulta");
  return data;
 }
 function clear(){
  plan={servicios:{},pago:{modo:"proximo"}};$("unify").value="";$("amount").value="";
+ ["services","groups","allocations","adjustments"].forEach(id=>$(id).innerHTML="");
  $("selected").innerHTML="";setError("");chooseMode("proximo",false);
 }
 function chooseMode(mode,run){
- plan.pago.modo=mode;delete plan.pago.servicios;
+ plan.pago.modo=mode;delete plan.pago.servicios;$("amount").value="";
  document.querySelectorAll("[data-pay]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pay===mode)));
  $("selected").classList.toggle("hidden",mode!=="elegidos");
  if(mode==="elegidos"){
    const services=result?.calendario?.servicios||[];
-   $("selected").innerHTML=services.map(s=>'<label class="checkbox"><input type="checkbox" data-select="'+esc(s.id)+'"> '+esc(s.nombre)+'</label>').join("");
+   $("selected").innerHTML=services.map((s,i)=>'<label class="checkbox"><input type="checkbox" data-select="'+esc(s.id)+'" '+(i===0?"checked":"")+'> '+esc(s.nombre)+'</label>').join("");
  }else $("selected").innerHTML="";
  if(run)simulate();
 }
