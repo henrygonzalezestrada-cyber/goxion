@@ -1,95 +1,128 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Fechas de renovación · Admin</title><link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<title>Fechas de pago · Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#080d1b;--surface:#151b2d;--panel:#101629;--edge:#293550;--muted:#9ba9cb;--txt:#eef3ff;--accent:#80ddeb;--violet:#aa90fc;--good:#7fe1b2;--warn:#ffd291}
-*{box-sizing:border-box}body{margin:0;color:var(--txt);background:radial-gradient(ellipse at 100% 0%,#31264d 0,transparent 34%),var(--bg);font:14px/1.55 system-ui,-apple-system,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
-.wrap{max-width:1050px;margin:0 auto;padding:20px 16px 65px}header{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:38px}.logo{font-size:22px;letter-spacing:2px;font-weight:800}header a{color:#c1d5ff;text-decoration:none;border:1px solid var(--edge);padding:8px 11px;border-radius:10px;font-size:12px}
-h1{font-size:clamp(24px,5vw,37px);line-height:1.12;margin:7px 0 9px}h2{font-size:17px;margin:0 0 6px}p{margin:6px 0}small,.muted{color:var(--muted)}.intro{max-width:720px;color:var(--muted);font-size:13px;margin-bottom:26px}.chip{font-size:10px;font-weight:700;letter-spacing:.5px;border:1px solid #604f87;color:#cbbafa;background:#31234d;border-radius:20px;padding:6px 9px}
-section.panel{background:linear-gradient(140deg,#192039dd,#0d1326f2);border:1px solid var(--edge);border-radius:18px;padding:19px 20px;margin-bottom:13px;box-shadow:0 12px 35px #0003}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.row-start{display:flex;align-items:center;gap:10px}.field{display:block;margin:10px 0 0;font-size:12px;font-weight:600;color:#cbd7ef}.field input,.field select,select.selector{width:100%;display:block;border:1px solid #36425c;background:#0d1425;color:var(--txt);border-radius:11px;padding:11px 12px;margin-top:5px;min-width:0}.field input:focus,.field select:focus{outline:2px solid #9f8df0}
-.service{border:1px solid var(--edge);padding:14px;border-radius:13px;background:#101629;margin:11px 0}.service-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.service h3{font-size:14px;margin:0}.service small{font-size:11px;display:block}.service-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.checkbox{display:flex;align-items:center;gap:7px;color:#c3d0e8;font-size:11px;margin-top:10px}.checkbox input{width:16px;height:16px}.tag{font-size:10px;color:var(--warn)}.tag.good{color:var(--good)}
-button.primary{background:linear-gradient(120deg,#6952b8,#287a9e);border:0;color:white;font-weight:700;padding:12px 17px;border-radius:12px}button.secondary{border:1px solid #435172;background:#1a253d;color:#e4eeff;padding:10px 13px;border-radius:11px}
-.options{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.option{border:1px solid var(--edge);border-radius:11px;background:#11182b;color:#c7d1e9;padding:9px 12px}.option[aria-pressed="true"]{color:white;border-color:#9d7ff6;background:#322855}.group{background:#0c1325;border-radius:13px;padding:14px;margin-top:10px;border:1px solid #2b3452}.group strong{font-size:17px}.group .item{font-size:12px;color:#bac6df;display:flex;justify-content:space-between;padding:5px 0}
-.total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:12px;border-top:1px solid #34405b}.total b{font-size:24px;color:#b3f1fb}
-table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 6px;border-bottom:1px solid #2c3954}td:last-child,th:last-child{text-align:right}.warnings{margin:14px 0;padding:11px 15px;border:1px solid #6f533a;background:#34271966;color:#ffe0b2;border-radius:13px;font-size:12px}.warnings p{margin:6px 0}.error{color:#ffd1d5;border:1px solid #80414c;background:#57213288;padding:12px;border-radius:10px;margin-bottom:13px}.info{color:#b5c7e8;font-size:12px}.hidden{display:none!important}details summary{cursor:pointer;color:#bdc6e3;font-weight:700;font-size:12px}.bottom{margin-top:22px;text-align:center;font-size:11px;color:#8597bb}
-@media(max-width:750px){.grid,.service-grid{grid-template-columns:1fr}.service-grid{gap:0}header{margin-bottom:25px}section.panel{padding:15px}}
-
-/* GOXION ADMIN: este simulador se aloja en Servicios, sin encabezado paralelo ni pasos. */
-body{font-family:Rajdhani,sans-serif;background:#030305;color:#f4f5ff}
-button,input,select{font-family:inherit}
-.wrap{max-width:980px}
-h1{font-size:26px}h2{font-size:17px}
-section.panel{background:rgba(12,12,19,.84);border-color:rgba(255,255,255,.105);box-shadow:none;border-radius:15px}
-.service,.group{background:rgba(11,11,18,.84);border-color:rgba(255,255,255,.11)}
-.service{padding:12px}.service h3{font-size:15px}
-.field{font-size:13px}.field input,.field select,select.selector{background:#0b0b11;border-color:rgba(185,196,245,.20)}
-.option{background:#101019;border-color:rgba(185,196,245,.2)}.option[aria-pressed=true]{background:rgba(188,19,254,.17);border-color:rgba(188,19,254,.55)}
-button.primary{background:linear-gradient(110deg,#773ea6,#3c8394)}
-.total b{color:#a8e7eb}.chip{color:#bdf1f7;background:rgba(0,242,254,.075);border-color:rgba(0,242,254,.20)}
-.gx-calendar-date-row{display:flex;gap:15px;align-items:end;justify-content:space-between}
-.gx-calendar-date-row>.field{flex:1}.gx-calendar-date-row>.checkbox{padding-bottom:12px;white-space:nowrap}
-.gx-date-advanced{margin-top:11px;padding:10px 0 3px;border-top:1px solid rgba(255,255,255,.075)}
-.gx-date-advanced>summary{font-size:12px;color:#9da8cc;list-style:none}
-.gx-date-advanced>summary::before{content:"＋ ";color:#ad8ce8}
-.gx-date-advanced[open]>summary::before{content:"− "}
-html.embedded body{background:transparent;padding:0;margin:0}
-html.embedded .wrap{padding:4px 0 22px;max-width:none}
-html.embedded header,html.embedded .intro,html.embedded h1,html.embedded .bottom,html.embedded #clientPanel{display:none}
-html.embedded section.panel{margin-bottom:10px;padding:14px}
-html.embedded .grid{gap:9px}
-html.embedded #servicesPanel .info{margin-bottom:10px}
-@media(max-width:500px){.gx-calendar-date-row{flex-direction:column;align-items:stretch;gap:2px}.gx-calendar-date-row>.checkbox{padding:0 0 6px}}
-</style></head><body>
-<main class="wrap"><header><span class="chip">SIMULACIÓN · SIN CAMBIOS</span><a href="../../admin.html">← Volver a Admin</a></header>
-<h1>Fechas de renovación</h1><p class="intro">Prueba fechas individuales, pagos conjuntos y ajustes. Los importes y coberturas oficiales permanecen intactos.</p>
-<div id="error" class="error hidden" role="alert"></div>
-<section id="auth" class="panel hidden"><h2>Abre primero tu sesión de Admin</h2><p class="muted">Esta beta consulta únicamente la información autorizada de tu administrador.</p><a href="../../admin.html">Entrar a Admin</a></section>
+:root{color-scheme:dark;--ink:#edf0f9;--quiet:#97a5ba;--line:rgba(255,255,255,.105);--purple:#bd79f7;--cyan:#76e9f3}
+*{box-sizing:border-box}body{margin:0;background:#030305;color:var(--ink);font:500 15px/1.3 Rajdhani,system-ui,sans-serif}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}input,select{min-width:0}p{margin:5px 0}
+.wrap{max-width:740px;margin:auto;padding:18px 14px 40px}
+header{display:flex;align-items:center;justify-content:space-between;margin:3px 0 21px}
+header a{border:1px solid var(--line);text-decoration:none;color:#c5d2e9;border-radius:10px;padding:9px 12px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:18px;margin:0}h3{font-size:15px;margin:0}
+.intro,.note,.sub{color:var(--quiet);font-size:13px}.intro{margin-bottom:18px}.sub{font-size:12px}
+.muted{color:var(--quiet)}.hidden{display:none!important}
+.panel{border:1px solid var(--line);background:rgba(14,14,22,.94);border-radius:17px;padding:15px;margin-bottom:11px}
+.section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.section-title small{font-size:11px;color:#b1bdcd}
+.state{border:1px solid rgba(120,220,235,.27);border-radius:20px;padding:3px 9px;font-size:10px;font-weight:700;color:#a6eaf2;white-space:nowrap}
+.service{border-top:1px solid var(--line);padding:12px 0 10px}
+.service:first-child{border-top:0;padding-top:3px}
+.service-top{display:flex;align-items:center;gap:9px;justify-content:space-between}
+.service-main{min-width:0;flex:1}
+.service-name{font-size:16px;line-height:1.05;font-weight:700}
+.service-meta{font-size:12px;color:var(--quiet);margin-top:4px}
+.service-right{text-align:right;white-space:nowrap}
+.service-price{font-size:17px;font-weight:700}
+.action-link{color:#acdeec;font-weight:700;border:0;background:none;padding:4px 0;font-size:12px}
+.editor{margin:11px 0 2px;padding:12px;border:1px solid rgba(165,125,239,.23);border-radius:13px;background:rgba(131,90,187,.06)}
+.editor-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;font-weight:700}
+.editor-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+label.field{display:block;font-size:12px;color:#c2cade;font-weight:700}
+.field input,.field select,.selector{margin-top:5px;width:100%;height:40px;border-radius:10px;border:1px solid rgba(194,193,219,.19);background:#0b0b12;padding:8px 9px;outline:0}
+.field input:focus,.field select:focus,.selector:focus{border-color:#af80e2}
+.tick{display:flex;align-items:center;gap:7px;color:var(--quiet);font-size:12px;margin-top:10px}
+.tick input{width:15px;height:15px;accent-color:#a177e4}
+.edit-caption{font-size:11px;color:#909fb7;margin-top:8px;line-height:1.35}
+.small-btn{padding:7px 11px;border:1px solid rgba(166,191,217,.20);border-radius:9px;background:rgba(26,30,42,.75);font-size:12px;font-weight:700}
+.pay-choices{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
+.option{min-height:44px;border:1px solid var(--line);background:#10111a;color:#bac5d8;border-radius:12px;font-weight:700;padding:8px}
+.option[aria-pressed="true"]{background:rgba(188,19,254,.16);border-color:rgba(188,19,254,.56);color:#fff}
+.summary{display:flex;justify-content:space-between;align-items:end;border-top:1px solid var(--line);padding:13px 2px 5px}
+.summary b{font-size:28px;font-weight:700;color:#b5f6ff}
+.due{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.due:last-child{border-bottom:0}.due-date{font-size:13px;font-weight:700}.due-detail{font-size:12px;color:var(--quiet)}
+.due-amount{white-space:nowrap;font-size:15px;font-weight:700}
+details.more{border-top:1px solid var(--line);margin-top:11px;padding-top:11px}
+details.more>summary{cursor:pointer;color:#b7c3d9;font-size:13px;font-weight:700;list-style:none}
+details.more>summary::after{content:"＋";float:right;color:#a18cc4}details.more[open]>summary::after{content:"−"}
+.more-body{padding:10px 0 4px}
+.selected-profiles{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}
+.warn-items{color:#b7aa89;font-size:12px;line-height:1.45}
+.warn-items p{margin:6px 0}
+.adjust-item{display:flex;justify-content:space-between;gap:10px;color:#c2c9d9;font-size:12px;padding:7px 0}
+.adjust-item b{white-space:nowrap}
+.alloc-item{display:flex;justify-content:space-between;gap:9px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px}
+.alloc-item:last-child{border-bottom:0}
+.error{background:rgba(120,35,49,.28);border:1px solid rgba(250,132,155,.4);border-radius:11px;color:#ffb8c4;padding:12px;margin-bottom:10px;font-size:13px}
+.alert{font-size:12px;border:1px solid var(--line);padding:10px;border-radius:10px;margin:6px 0}
+.primary{background:linear-gradient(110deg,#73469d,#32768f);border:0;color:white;border-radius:11px;padding:9px 13px;font-weight:700}
+.footer{font-size:11px;color:#7d90ac;margin:12px 0;text-align:center}
+html.embedded body{background:transparent}
+html.embedded .wrap{max-width:none;padding:0 0 10px}
+html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #clientPanel,html.embedded .footer{display:none}
+@media(max-width:520px){.wrap{padding:12px}.panel{padding:12px}.editor-grid{grid-template-columns:1fr 1fr}.selected-profiles{grid-template-columns:1fr}.service-name{font-size:15px}.service-price{font-size:16px}}
+</style></head>
+<body><main class="wrap">
+<header><span class="state">SIMULACIÓN · SIN CAMBIOS</span><a href="../../admin.html">← Admin</a></header>
+<h1>Fechas de renovación</h1><p class="intro">Revisa lo que vence y modifica una fecha solo si hace falta. No se cambian pagos ni contratos reales.</p>
+<div class="error hidden" id="error" role="alert"></div>
+<section class="panel hidden" id="auth"><h2>Abre tu sesión de Admin</h2><p class="sub">Los calendarios se consultan únicamente con acceso administrativo.</p><a href="../../admin.html">Volver a Admin</a></section>
 <div id="workspace" class="hidden">
-<section class="panel" id="clientPanel">
-<div class="row"><h2>Cliente</h2><span id="status" class="chip">SOLO LECTURA</span></div>
-<label class="field" for="client">Cliente<select id="client" class="selector"></select></label>
-<p class="info" id="clientNote">La fecha actual proviene del motor financiero oficial. Para fechas distintas registra la cobertura que ya tiene pagada cada servicio.</p>
-</section>
-<section class="panel" id="servicesPanel"><h2>Servicios y vencimientos</h2><p class="info">Si no escribes fecha, se hereda la fecha general del cliente únicamente como referencia. Para un cálculo confiable, confirma la cobertura vigente de cada plataforma.</p><div id="services"><p class="muted">Selecciona un cliente para ver sus servicios.</p></div>
-<details class="gx-date-advanced"><summary>Unificar fechas (opcional)</summary><label class="field">Día de renovación conjunto<select id="unify" class="selector"><option value="">Sin cambios</option></select></label><p class="info">El ajuste es estimado y no aplica cambios al cliente.</p></details>
-<div class="row" style="margin-top:10px"><span class="muted">Se conserva el calendario original hasta confirmar una modificación en Admin.</span><button id="reset" class="secondary" type="button">↺ Restablecer</button></div>
+<section class="panel" id="clientPanel"><div class="section-title"><h2>Cliente</h2><span class="state" id="status">Solo prueba</span></div>
+<select id="client" class="selector" aria-label="Cliente"></select><p class="sub" id="clientNote">Selecciona un cliente para revisar sus renovaciones.</p></section>
+<section class="panel" id="servicesPanel">
+<div class="section-title"><h2>Servicios</h2><span class="state">Fechas estimadas</span></div>
+<div id="services"><p class="muted">Selecciona un cliente.</p></div>
+<div style="display:flex;justify-content:flex-end"><button type="button" id="reset" class="action-link">↺ Restablecer</button></div>
 </section>
 <section class="panel">
-<h2>Simulación del pago</h2>
-<div class="options" role="group" aria-label="Selección de pago">
-<button class="option" data-pay="proximo" aria-pressed="true">Próximo vencimiento</button>
-<button class="option" data-pay="todos" aria-pressed="false">Todos juntos</button>
-<button class="option" data-pay="elegidos" aria-pressed="false">Plataformas elegidas</button>
+<div class="section-title"><h2>Pago que quieres revisar</h2></div>
+<div class="pay-choices" role="group" aria-label="Pago a simular">
+<button class="option" data-pay="proximo" aria-pressed="true" type="button">Lo que vence primero</button>
+<button class="option" data-pay="todos" aria-pressed="false" type="button">Pagar todo junto</button>
 </div>
-<div id="selected" class="hidden"></div>
-<label class="field">Simular abono parcial (opcional)<input type="number" id="amount" min="0" step="0.01" placeholder="Vacío = importe completo"></label>
-<button id="simulate" class="primary" type="button" style="margin-top:16px">Actualizar cálculo</button>
-</section>
-<section class="panel"><h2>Resultado de la simulación</h2>
-<div id="warnings" class="warnings hidden"></div>
 <div id="groups"></div>
-<div class="total"><span>Importe base seleccionado</span><b id="total">—</b></div>
-<h2 style="margin-top:23px">Aplicación propuesta del pago</h2><p class="info">El pago conjunto se reparte por plataforma y período. La simulación no marca ninguna renovación como pagada.</p>
-<div id="allocations"></div>
-<div id="adjustments"></div>
+<div class="summary"><span>Importe seleccionado <small style="color:var(--quiet)">(estimado)</small></span><b id="total">—</b></div>
+<details class="more" id="extraOptions"><summary>Otras opciones de pago</summary><div class="more-body">
+<button class="option" data-pay="elegidos" aria-pressed="false" type="button">Elegir perfiles</button>
+<div id="selected" class="selected-profiles hidden"></div>
+<label class="field" style="margin-top:10px">Simular otro importe<input type="number" id="amount" min="0" step="0.01" placeholder="Importe exacto si es un abono"></label>
+</div></details>
+<details class="more" id="allocationsDetails"><summary>Cómo se repartiría el pago</summary><div id="allocations" class="more-body"></div></details>
 </section>
-</div>
-<p class="bottom">Motor oficial intacto · Simulador aislado · El importe final y la acreditación requerirán una conciliación aprobada en Admin.</p>
+<section class="panel">
+<details class="more" id="unifyPanel" style="margin-top:0;padding-top:0;border:0"><summary>¿Unificar las fechas?</summary>
+<div class="more-body"><label class="field">Renovar todo el día<select id="unify" class="selector"><option value="">No cambiar fechas</option></select></label>
+<div id="adjustments"></div><p class="sub">La diferencia por días se calcula automáticamente. Aquí solo la estamos simulando.</p>
+</div></details>
+</section>
+<details class="more" id="warningsDetails" style="margin:0 5px 14px"><summary>Información sobre el cálculo</summary><div id="warnings" class="warn-items more-body"></div></details>
+<button type="button" id="simulate" class="primary hidden">Actualizar cálculo</button>
+</div><p class="footer">Simulación privada · No acredita pagos ni modifica fechas oficiales</p>
 </main>
 <script>
 (function(){
 "use strict";
-var API="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-financiero";
-var $=id=>document.getElementById(id);
-var clients=[],current=null,result=null,plan={servicios:{},pago:{modo:"proximo"}},serial=0;
-var query=typeof window!=="undefined"?new URLSearchParams(window.location.search):null;
-var embedded=query?.get("embedded")==="1";
-var initialClient=query?.get("cliente")||"";
+const API="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-financiero";
+const $=id=>document.getElementById(id);
+const param=typeof window!=="undefined"?new URLSearchParams(window.location.search):null;
+const embedded=param?.get("embedded")==="1",initialClient=param?.get("cliente")||"";
 if(embedded)document.documentElement.classList.add("embedded");
-var esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-var mx=c=>(Number(c||0)/100).toLocaleString("es-MX",{style:"currency",currency:"MXN"});
-function setError(m){$("error").textContent=m||"";$("error").classList.toggle("hidden",!m)}
+const esc=x=>String(x??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+const money=c=>(Number(c||0)/100).toLocaleString("es-MX",{style:"currency",currency:"MXN"});
+const niceDate=x=>{
+ if(!x||!/^\d{4}-\d{2}-\d{2}$/.test(x))return "Sin fecha";
+ const [y,m,d]=x.split("-").map(Number);
+ return new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(Date.UTC(y,m-1,d)));
+};
+const choices=()=>document.querySelectorAll("[data-pay]");
+let clients=[],current=null,result=null,serial=0,plan={servicios:{},pago:{modo:"proximo"}},opened=new Set();
+function errorText(x){$("error").textContent=x||"";$("error").classList.toggle("hidden",!x)}
+function clearScreen(){
+ ["services","groups","allocations","adjustments","warnings","selected"].forEach(id=>$(id).innerHTML="");
+ $("total").textContent="—";
+}
 async function request(accion,datos){
  const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
  if(!token)throw Error("Debes iniciar sesión en Admin.");
@@ -97,126 +130,155 @@ async function request(accion,datos){
  body:JSON.stringify({accion,datos}),cache:"no-store"});
  const data=await response.json();
  if(response.status===401||response.status===403){
-   $("workspace").classList.add("hidden");$("auth").classList.remove("hidden");
-   ["services","groups","allocations","adjustments"].forEach(id=>$(id).innerHTML="");
-   result=null;current=null;
+   $("auth").classList.remove("hidden");$("workspace").classList.add("hidden");
+   result=null;current=null;clearScreen();
  }
- if(!response.ok||data.ok!==true)throw Error(data.error||"Error de consulta");
+ if(!response.ok||data.ok!==true)throw Error(data.error||"No fue posible consultar el calendario.");
  return data;
 }
-function clear(){
- plan={servicios:{},pago:{modo:"proximo"}};$("unify").value="";$("amount").value="";
- ["services","groups","allocations","adjustments"].forEach(id=>$(id).innerHTML="");
- $("selected").innerHTML="";setError("");chooseMode("proximo",false);
+function daysOptions(selected,empty){
+ let html=empty?'<option value="">Sin cambios</option>':"";
+ for(let day=1;day<=31;day++)html+='<option value="'+day+'"'+(String(selected)===String(day)?' selected':'')+'>Día '+day+'</option>';
+ return html;
 }
-function chooseMode(mode,run){
- plan.pago.modo=mode;delete plan.pago.servicios;$("amount").value="";
- document.querySelectorAll("[data-pay]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pay===mode)));
+function dayDate(due,day,today){
+ const parts=due.split("-").map(Number),last=new Date(Date.UTC(parts[0],parts[1],0)).getUTCDate();
+ let iso=new Date(Date.UTC(parts[0],parts[1]-1,Math.min(day,last))).toISOString().slice(0,10);
+ if(iso<today){
+   const next=new Date(Date.UTC(parts[0],parts[1],1));
+   const end=new Date(Date.UTC(next.getUTCFullYear(),next.getUTCMonth()+1,0)).getUTCDate();
+   iso=new Date(Date.UTC(next.getUTCFullYear(),next.getUTCMonth(),Math.min(day,end))).toISOString().slice(0,10);
+ }
+ return iso;
+}
+function reset(){
+ serial++;result=null;opened.clear();
+ plan={servicios:{},pago:{modo:"proximo"}};
+ $("amount").value="";$("unify").value="";
+ $("extraOptions").open=false;$("unifyPanel").open=false;$("allocationsDetails").open=false;
+ choices().forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pay==="proximo")));
+ errorText("");clearScreen();
+ if(current)simulate();
+}
+function markPay(mode){
+ plan.pago.modo=mode;delete plan.pago.servicios;delete plan.pago.importe;
+ $("amount").value="";
+ choices().forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pay===mode)));
  $("selected").classList.toggle("hidden",mode!=="elegidos");
  if(mode==="elegidos"){
-   const services=result?.calendario?.servicios||[];
-   $("selected").innerHTML=services.map((s,i)=>'<label class="checkbox"><input type="checkbox" data-select="'+esc(s.id)+'" '+(i===0?"checked":"")+'> '+esc(s.nombre)+'</label>').join("");
- }else $("selected").innerHTML="";
- if(run)simulate();
+   const options=result?.calendario?.servicios||[];
+   $("selected").innerHTML=options.map((s,i)=>'<label class="tick"><input type="checkbox" data-select="'+esc(s.id)+'" '+(i===0?'checked':'')+'>'+esc(s.nombre)+'</label>').join("");
+ }
+ simulate();
 }
-function drawForm(){
- const expanded=new Set(Array.from($("services").querySelectorAll(".service details[open]"))
-   .map(el=>el.closest("[data-id]")?.dataset.id).filter(Boolean));
- const serv=result?.calendario?.servicios||[];
- $("services").innerHTML=serv.map(s=>{
-   const item=plan.servicios[s.id]||{};
-   const flag=s.cobertura_confirmada?'<span class="tag good">Cobertura confirmada</span>':'<span class="tag">Fecha de referencia</span>';
-   return '<div class="service" data-id="'+esc(s.id)+'"><div class="service-head"><div><h3>'+esc(s.nombre)+'</h3><small>'+mx(s.monto_base_centavos)+' por renovación · '+esc(s.fecha_vencimiento)+'</small></div>'+flag+'</div>'+
-    '<div class="gx-calendar-date-row"><label class="field">Cobertura pagada hasta<input type="date" data-field="cobertura_hasta" value="'+esc(item.cobertura_hasta||"")+'"></label>'+
-    '<label class="checkbox"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?"checked":"")+'> Verificada</label></div>'+
-    '<details class="gx-date-advanced"><summary>Ajustar día (opcional)</summary><div class="service-grid">'+
-    '<label class="field">Día original<input type="number" data-field="dia_original" min="1" max="31" placeholder="'+esc(s.dia_original)+'" value="'+esc(item.dia_original??"")+'"></label>'+
-    '<label class="field">Nuevo día<input type="number" data-field="nuevo_dia" min="1" max="31" placeholder="Sin cambio" value="'+esc(item.nuevo_dia??"")+'"></label></div></details></div>';
+function drawServices(){
+ const items=result?.calendario?.servicios||[];
+ $("services").innerHTML=items.map(s=>{
+   const state=plan.servicios[s.id]||{};
+   const expanded=opened.has(s.id);
+   const due=state.cobertura_hasta||s.fecha_vencimiento;
+   return '<div class="service" data-id="'+esc(s.id)+'">'+
+      '<div class="service-top"><div class="service-main"><div class="service-name">'+esc(s.nombre)+'</div>'+
+      '<div class="service-meta">'+(s.cobertura_confirmada?'Fecha comprobada · ':'Próximo vencimiento estimado · ')+esc(niceDate(due))+'</div></div>'+
+      '<div class="service-right"><div class="service-price">'+money(s.monto_base_centavos)+'</div>'+
+      '<button type="button" class="action-link" data-edit="'+esc(s.id)+'">'+(expanded?'Cerrar':'Cambiar fecha')+'</button></div></div>'+
+      (expanded?'<div class="editor"><div class="editor-head"><span>Fecha de este perfil</span><button type="button" class="small-btn" data-use-default="'+esc(s.id)+'">Usar fecha general</button></div>'+
+         '<div class="editor-grid"><label class="field">Renueva cada día<select data-field="dia_de_renovacion">'+daysOptions(state.dia_original??s.dia_original,false)+'</select></label>'+
+         '<label class="field">Próximo vencimiento<input type="date" data-field="cobertura_hasta" value="'+esc(due)+'"></label></div>'+
+         '<label class="tick"><input type="checkbox" data-field="cobertura_confirmada" '+(s.cobertura_confirmada?'checked':'')+'>Ya verifiqué esta fecha</label>'+
+         '<div class="edit-caption">Al cambiar un día, calculamos la próxima fecha. Puedes corregir el mes o día exacto aquí mismo.</div></div>':'')+'</div>';
  }).join("");
- $("services").querySelectorAll(".service details").forEach(el=>{
-   if(expanded.has(el.closest("[data-id]")?.dataset.id))el.open=true;
- });
 }
-function render(){
+function draw(){
  if(!result)return;
- const info=result.calendario;
- drawForm();
- $("warnings").classList.toggle("hidden",!info.advertencias.length);
- $("warnings").innerHTML=info.advertencias.map(x=>"<p>⚠ "+esc(x)+"</p>").join("");
- $("groups").innerHTML=info.grupos.map(g=>
-   '<div class="group"><div class="row"><strong>'+esc(g.fecha)+'</strong><strong>'+mx(g.total_centavos)+'</strong></div>'+
-   g.servicios.map(s=>'<div class="item"><span>'+esc(s.nombre)+'</span><span>'+mx(s.importe_centavos)+'</span></div>').join("")+'</div>'
- ).join("");
- $("total").textContent=mx(info.pago.total_seleccionado_centavos);
- $("allocations").innerHTML='<table><thead><tr><th>Plataforma / ciclo</th><th>Asignado</th><th>Pendiente</th></tr></thead><tbody>'+
-   info.pago.asignaciones.map(a=>'<tr><td>'+esc(a.nombre)+'<br><small>'+esc(a.periodo_desde)+' → '+esc(a.periodo_hasta)+'</small></td><td>'+mx(a.pago_asignado_centavos)+'</td><td>'+mx(a.saldo_centavos)+'</td></tr>').join("")+
-   '</tbody></table>';
- const changed=info.servicios.filter(s=>s.nuevo_dia!=null);
- $("adjustments").innerHTML=changed.length?
-   '<div class="group" style="margin-top:20px"><h2>Ajuste proporcional (estimado)</h2>'+changed.map(s=>
-    '<div class="item"><span>'+esc(s.nombre)+' · '+s.ajuste.dias+' días más · '+esc(s.nueva_fecha)+'</span><strong>'+mx(s.ajuste.centavos)+'</strong></div>').join("")+
-    '<div class="total"><span>Ajuste único estimado</span><b>'+mx(info.ajuste_total_centavos)+'</b></div>'+
-    '<p class="info">Este ajuste no se agrega automáticamente al pago ni altera fechas; requiere confirmación de cobertura y reglas comerciales.</p></div>':"";
+ const cal=result.calendario;
+ drawServices();
+ $("groups").innerHTML=cal.grupos.map(g=>'<div class="due"><div><div class="due-date">'+esc(niceDate(g.fecha))+'</div><div class="due-detail">'+esc(g.servicios.map(s=>s.nombre).join(" · "))+'</div></div><span class="due-amount">'+money(g.total_centavos)+'</span></div>').join("");
+ $("total").textContent=money(cal.pago.importe_centavos);
+ $("allocations").innerHTML=cal.pago.asignaciones.map(a=>
+   '<div class="alloc-item"><div>'+esc(a.nombre)+'<div class="sub">'+esc(niceDate(a.periodo_desde))+' → '+esc(niceDate(a.periodo_hasta))+'</div></div>'+
+   '<div style="text-align:right">'+money(a.pago_asignado_centavos)+(a.saldo_centavos?'<div class="sub">Faltan '+money(a.saldo_centavos)+'</div>':'')+'</div></div>').join("")||'<p class="sub">No se seleccionaron perfiles.</p>';
+ $("warnings").innerHTML=cal.advertencias.length?cal.advertencias.map(s=>'<p>'+esc(s)+'</p>').join(""):'<p>Sin observaciones adicionales.</p>';
+ const changed=cal.servicios.filter(x=>x.nuevo_dia!=null);
+ $("adjustments").innerHTML=changed.length?changed.map(s=>'<div class="adjust-item"><span>'+esc(s.nombre)+' · hasta '+esc(niceDate(s.nueva_fecha))+'</span><b>+'+money(s.ajuste.centavos)+'</b></div>').join("")+
+  '<div class="summary"><span>Ajuste único estimado</span><b>'+money(cal.ajuste_total_centavos)+'</b></div>':"";
 }
 async function simulate(){
  if(!current)return;
  const generation=++serial;
- $("simulate").disabled=true;$("simulate").textContent="Calculando…";
- setError("");
+ $("simulate").disabled=true;errorText("");
  try{
    if(plan.pago.modo==="elegidos"){
-     plan.pago.servicios=Array.from($("selected").querySelectorAll("input:checked")).map(e=>e.dataset.select);
+     plan.pago.servicios=Array.from($("selected").querySelectorAll("input:checked")).map(x=>x.dataset.select);
    }
-   const raw=$("amount").value.trim();
-   if(raw==="")delete plan.pago.importe;else plan.pago.importe=Number(raw);
-   const value=$("unify").value;
-   if(value)plan.unificar_dia=Number(value);else delete plan.unificar_dia;
-   const res=await request("simular_calendario_beta",{cliente_id:current,propuesta:plan});
+   const amount=$("amount").value.trim();
+   if(amount)plan.pago.importe=Number(amount);
+   else delete plan.pago.importe;
+   const unify=$("unify").value;
+   if(unify)plan.unificar_dia=Number(unify);else delete plan.unificar_dia;
+   const data=await request("simular_calendario_beta",{cliente_id:current,propuesta:plan});
    if(generation!==serial)return;
-   result=res;render();
- }catch(e){if(generation===serial)setError(e?.message||"No fue posible calcular el calendario")}
- finally{if(generation===serial){$("simulate").disabled=false;$("simulate").textContent="Actualizar cálculo"}}
+   result=data;draw();
+ }catch(e){if(generation===serial)errorText(e?.message||"No fue posible simular.")}
+ finally{if(generation===serial)$("simulate").disabled=false}
 }
 async function load(){
- const token=localStorage.getItem("GOXION_ADMIN_TOKEN")||"";
- if(!token){$("auth").classList.remove("hidden");return}
+ if(!localStorage.getItem("GOXION_ADMIN_TOKEN")){$("auth").classList.remove("hidden");return}
  try{
-   const data=await request("listar_calendarios_beta",{});
-   clients=data.clientes||[];
+   const d=await request("listar_calendarios_beta",{});
+   clients=d.clientes||[];
    $("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
-   $("client").innerHTML='<option value="">Selecciona un cliente</option>'+clients.map(c=>
-     '<option value="'+esc(c.id)+'">'+esc(c.nombre)+' · '+c.numero_servicios+' servicios</option>').join("");
-   $("unify").innerHTML='<option value="">No unificar</option>'+Array.from({length:31},(_,i)=>'<option value="'+(i+1)+'">Día '+(i+1)+'</option>').join("");
-   $("status").textContent=clients.length+" clientes consultables";
+   $("client").innerHTML='<option value="">Selecciona un cliente</option>'+clients.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nombre)+' · '+c.numero_servicios+' servicios</option>').join("");
+   $("unify").innerHTML=daysOptions(null,true);
+   $("status").textContent="Solo simulación";
    if(embedded&&initialClient){
-     if(clients.some(c=>c.id===initialClient)){
-       $("client").value=initialClient;
-       current=initialClient;clear();simulate();
-     }else setError("Este cliente no está disponible en la consulta de calendarios.");
+      if(clients.some(c=>c.id===initialClient)){$("client").value=initialClient;current=initialClient;reset();}
+      else errorText("No se encontró este cliente en la consulta autorizada.");
    }
- }catch(e){setError(e?.message||"Error");$("auth").classList.remove("hidden")}
+ }catch(e){errorText(e?.message||"No se pudo cargar");$("auth").classList.remove("hidden")}
 }
-$("client").addEventListener("change",function(){
- current=this.value||null;result=null;clear();
- if(current)simulate();
+$("client").addEventListener("change",function(){current=this.value||null;reset()});
+$("services").addEventListener("click",function(ev){
+ const edit=ev.target.closest?.("[data-edit]");
+ if(edit){
+   const id=edit.getAttribute("data-edit");
+   if(opened.has(id))opened.delete(id);else opened.add(id);
+   drawServices();return;
+ }
+ const resetUnit=ev.target.closest?.("[data-use-default]");
+ if(resetUnit){
+   const id=resetUnit.getAttribute("data-use-default");
+   delete plan.servicios[id];simulate();
+ }
 });
-$("services").addEventListener("change",function(e){
- const input=e.target,field=input.dataset.field,container=input.closest("[data-id]");
- if(!container||!field)return;
- const id=container.dataset.id;const item=plan.servicios[id]||(plan.servicios[id]={});
- const value=input.type==="checkbox"?input.checked:input.value;
- if(field==="cobertura_hasta"){if(value)item[field]=value;else delete item[field];if(!value)delete item.cobertura_confirmada}
- else if(field==="cobertura_confirmada")item[field]=value;
- else if(value==="")delete item[field];
- else item[field]=Number(value);
+$("services").addEventListener("change",function(ev){
+ const field=ev.target.dataset.field,container=ev.target.closest?.("[data-id]");
+ if(!field||!container)return;
+ const id=container.dataset.id;
+ const state=plan.servicios[id]||(plan.servicios[id]={});
+ const service=result?.calendario?.servicios.find(s=>s.id===id);
+ if(field==="dia_de_renovacion"){
+   const day=Number(ev.target.value);
+   if(!Number.isInteger(day)||day<1||day>31)return;
+   state.dia_original=day;
+   state.cobertura_hasta=dayDate(state.cobertura_hasta||service.fecha_vencimiento,day,result.calendario.fecha_calculo);
+   state.cobertura_confirmada=false;
+ }else if(field==="cobertura_hasta"){
+   if(!ev.target.value)return;
+   state.cobertura_hasta=ev.target.value;
+   state.dia_original=Number(ev.target.value.slice(-2));
+   state.cobertura_confirmada=false;
+ }else if(field==="cobertura_confirmada"){
+   state.cobertura_confirmada=ev.target.checked;
+ }
  simulate();
 });
 $("unify").addEventListener("change",simulate);
-document.querySelectorAll("[data-pay]").forEach(b=>b.addEventListener("click",()=>chooseMode(b.dataset.pay,true)));
+choices().forEach(b=>b.addEventListener("click",()=>markPay(b.dataset.pay)));
 $("selected").addEventListener("change",simulate);
 $("amount").addEventListener("change",simulate);
+$("reset").addEventListener("click",reset);
 $("simulate").addEventListener("click",simulate);
-$("reset").addEventListener("click",function(){clear();simulate()});
 load();
 })();
 </script></body></html>
