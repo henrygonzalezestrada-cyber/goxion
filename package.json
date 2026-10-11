@@ -10,6 +10,7 @@
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
     "test:opiniones": "node scripts/opiniones-beta-smoke.mjs",
     "test:opiniones:oficial": "node scripts/opiniones-oficial-smoke.mjs",
-    "serve:preview": "node scripts/serve-preview.mjs"
+    "serve:preview": "node scripts/serve-preview.mjs",
+    "test:comunicaciones": "node scripts/comunicaciones-beta-smoke.mjs"
   }
 }
