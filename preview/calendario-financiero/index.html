@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>GOXION · Laboratorio financiero</title>
+<title>Fechas de renovación · Admin</title><link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
 <style>
 :root{color-scheme:dark;--bg:#080d1b;--surface:#151b2d;--panel:#101629;--edge:#293550;--muted:#9ba9cb;--txt:#eef3ff;--accent:#80ddeb;--violet:#aa90fc;--good:#7fe1b2;--warn:#ffd291}
 *{box-sizing:border-box}body{margin:0;color:var(--txt);background:radial-gradient(ellipse at 100% 0%,#31264d 0,transparent 34%),var(--bg);font:14px/1.55 system-ui,-apple-system,sans-serif}button,input,select{font:inherit}button{cursor:pointer}button:disabled{opacity:.55;cursor:wait}
@@ -14,25 +14,49 @@ button.primary{background:linear-gradient(120deg,#6952b8,#287a9e);border:0;color
 .total{display:flex;justify-content:space-between;align-items:center;padding-top:14px;margin-top:12px;border-top:1px solid #34405b}.total b{font-size:24px;color:#b3f1fb}
 table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;padding:9px 6px;border-bottom:1px solid #2c3954}td:last-child,th:last-child{text-align:right}.warnings{margin:14px 0;padding:11px 15px;border:1px solid #6f533a;background:#34271966;color:#ffe0b2;border-radius:13px;font-size:12px}.warnings p{margin:6px 0}.error{color:#ffd1d5;border:1px solid #80414c;background:#57213288;padding:12px;border-radius:10px;margin-bottom:13px}.info{color:#b5c7e8;font-size:12px}.hidden{display:none!important}details summary{cursor:pointer;color:#bdc6e3;font-weight:700;font-size:12px}.bottom{margin-top:22px;text-align:center;font-size:11px;color:#8597bb}
 @media(max-width:750px){.grid,.service-grid{grid-template-columns:1fr}.service-grid{gap:0}header{margin-bottom:25px}section.panel{padding:15px}}
+
+/* GOXION ADMIN: este simulador se aloja en Servicios, sin encabezado paralelo ni pasos. */
+body{font-family:Rajdhani,sans-serif;background:#030305;color:#f4f5ff}
+button,input,select{font-family:inherit}
+.wrap{max-width:980px}
+h1{font-size:26px}h2{font-size:17px}
+section.panel{background:rgba(12,12,19,.84);border-color:rgba(255,255,255,.105);box-shadow:none;border-radius:15px}
+.service,.group{background:rgba(11,11,18,.84);border-color:rgba(255,255,255,.11)}
+.service{padding:12px}.service h3{font-size:15px}
+.field{font-size:13px}.field input,.field select,select.selector{background:#0b0b11;border-color:rgba(185,196,245,.20)}
+.option{background:#101019;border-color:rgba(185,196,245,.2)}.option[aria-pressed=true]{background:rgba(188,19,254,.17);border-color:rgba(188,19,254,.55)}
+button.primary{background:linear-gradient(110deg,#773ea6,#3c8394)}
+.total b{color:#a8e7eb}.chip{color:#bdf1f7;background:rgba(0,242,254,.075);border-color:rgba(0,242,254,.20)}
+.gx-calendar-date-row{display:flex;gap:15px;align-items:end;justify-content:space-between}
+.gx-calendar-date-row>.field{flex:1}.gx-calendar-date-row>.checkbox{padding-bottom:12px;white-space:nowrap}
+.gx-date-advanced{margin-top:11px;padding:10px 0 3px;border-top:1px solid rgba(255,255,255,.075)}
+.gx-date-advanced>summary{font-size:12px;color:#9da8cc;list-style:none}
+.gx-date-advanced>summary::before{content:"＋ ";color:#ad8ce8}
+.gx-date-advanced[open]>summary::before{content:"− "}
+html.embedded body{background:transparent;padding:0;margin:0}
+html.embedded .wrap{padding:4px 0 22px;max-width:none}
+html.embedded header,html.embedded .intro,html.embedded h1,html.embedded .bottom,html.embedded #clientPanel{display:none}
+html.embedded section.panel{margin-bottom:10px;padding:14px}
+html.embedded .grid{gap:9px}
+html.embedded #servicesPanel .info{margin-bottom:10px}
+@media(max-width:500px){.gx-calendar-date-row{flex-direction:column;align-items:stretch;gap:2px}.gx-calendar-date-row>.checkbox{padding:0 0 6px}}
 </style></head><body>
-<main class="wrap"><header><div class="logo">GOXION <span class="chip">BETA FINANCIERA</span></div><a href="../../admin.html">← Admin</a></header>
-<h1>Calendarios por plataforma</h1><p class="intro">Laboratorio de cálculos: prueba fechas separadas, pago de un vencimiento o pago conjunto y ajustes para unificar cortes. No modifica el estado de cuenta oficial ni registra pagos.</p>
+<main class="wrap"><header><span class="chip">SIMULACIÓN · SIN CAMBIOS</span><a href="../../admin.html">← Volver a Admin</a></header>
+<h1>Fechas de renovación</h1><p class="intro">Prueba fechas individuales, pagos conjuntos y ajustes. Los importes y coberturas oficiales permanecen intactos.</p>
 <div id="error" class="error hidden" role="alert"></div>
 <section id="auth" class="panel hidden"><h2>Abre primero tu sesión de Admin</h2><p class="muted">Esta beta consulta únicamente la información autorizada de tu administrador.</p><a href="../../admin.html">Entrar a Admin</a></section>
 <div id="workspace" class="hidden">
-<section class="panel">
-<div class="row"><h2>1. Selecciona un cliente</h2><span id="status" class="chip">SOLO LECTURA</span></div>
+<section class="panel" id="clientPanel">
+<div class="row"><h2>Cliente</h2><span id="status" class="chip">SOLO LECTURA</span></div>
 <label class="field" for="client">Cliente<select id="client" class="selector"></select></label>
 <p class="info" id="clientNote">La fecha actual proviene del motor financiero oficial. Para fechas distintas registra la cobertura que ya tiene pagada cada servicio.</p>
 </section>
-<section class="panel" id="servicesPanel"><h2>2. Fechas de cada plataforma</h2><p class="info">Si no escribes fecha, se hereda la fecha general del cliente únicamente como referencia. Para un cálculo confiable, confirma la cobertura vigente de cada plataforma.</p><div id="services"><p class="muted">Selecciona un cliente para ver sus servicios.</p></div>
-<div class="grid">
-<label class="field">Unificar fecha de corte (simulación)<select id="unify" class="selector"><option value="">No unificar</option></select></label>
-<div class="field"><button id="reset" class="secondary" type="button" style="margin-top:20px;width:100%">Restablecer simulación</button></div>
-</div>
+<section class="panel" id="servicesPanel"><h2>Servicios y vencimientos</h2><p class="info">Si no escribes fecha, se hereda la fecha general del cliente únicamente como referencia. Para un cálculo confiable, confirma la cobertura vigente de cada plataforma.</p><div id="services"><p class="muted">Selecciona un cliente para ver sus servicios.</p></div>
+<details class="gx-date-advanced"><summary>Unificar fechas (opcional)</summary><label class="field">Día de renovación conjunto<select id="unify" class="selector"><option value="">Sin cambios</option></select></label><p class="info">El ajuste es estimado y no aplica cambios al cliente.</p></details>
+<div class="row" style="margin-top:10px"><span class="muted">Se conserva el calendario original hasta confirmar una modificación en Admin.</span><button id="reset" class="secondary" type="button">↺ Restablecer</button></div>
 </section>
 <section class="panel">
-<h2>3. ¿Qué desea pagar?</h2>
+<h2>Simulación del pago</h2>
 <div class="options" role="group" aria-label="Selección de pago">
 <button class="option" data-pay="proximo" aria-pressed="true">Próximo vencimiento</button>
 <button class="option" data-pay="todos" aria-pressed="false">Todos juntos</button>
@@ -59,6 +83,10 @@ table{width:100%;border-collapse:collapse;font-size:12px}td,th{text-align:left;p
 var API="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/estado-financiero";
 var $=id=>document.getElementById(id);
 var clients=[],current=null,result=null,plan={servicios:{},pago:{modo:"proximo"}},serial=0;
+var query=typeof window!=="undefined"?new URLSearchParams(window.location.search):null;
+var embedded=query?.get("embedded")==="1";
+var initialClient=query?.get("cliente")||"";
+if(embedded)document.documentElement.classList.add("embedded");
 var esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 var mx=c=>(Number(c||0)/100).toLocaleString("es-MX",{style:"currency",currency:"MXN"});
 function setError(m){$("error").textContent=m||"";$("error").classList.toggle("hidden",!m)}
@@ -96,11 +124,12 @@ function drawForm(){
  $("services").innerHTML=serv.map(s=>{
    const item=plan.servicios[s.id]||{};
    const flag=s.cobertura_confirmada?'<span class="tag good">Cobertura confirmada</span>':'<span class="tag">Fecha de referencia</span>';
-   return '<div class="service" data-id="'+esc(s.id)+'"><div class="service-head"><div><h3>'+esc(s.nombre)+'</h3><small>'+mx(s.monto_base_centavos)+' al mes · Fecha actual: '+esc(s.fecha_vencimiento)+'</small></div>'+flag+'</div>'+
-    '<div class="service-grid"><label class="field">Cubierto hasta (fecha real)<input type="date" data-field="cobertura_hasta" value="'+esc(item.cobertura_hasta||"")+'"></label>'+
-    '<label class="field">Día original (1–31)<input type="number" data-field="dia_original" min="1" max="31" placeholder="'+esc(s.dia_original)+'" value="'+esc(item.dia_original??"")+'"></label>'+
-    '<label class="field">Nuevo día de corte (opcional)<input type="number" data-field="nuevo_dia" min="1" max="31" placeholder="Sin cambio" value="'+esc(item.nuevo_dia??"")+'"></label></div>'+
-    '<label class="checkbox"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?"checked":"")+'> Ya verifiqué la cobertura pagada de este servicio</label></div>';
+   return '<div class="service" data-id="'+esc(s.id)+'"><div class="service-head"><div><h3>'+esc(s.nombre)+'</h3><small>'+mx(s.monto_base_centavos)+' por renovación · '+esc(s.fecha_vencimiento)+'</small></div>'+flag+'</div>'+
+    '<div class="gx-calendar-date-row"><label class="field">Cobertura pagada hasta<input type="date" data-field="cobertura_hasta" value="'+esc(item.cobertura_hasta||"")+'"></label>'+
+    '<label class="checkbox"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?"checked":"")+'> Verificada</label></div>'+
+    '<details class="gx-date-advanced"><summary>Ajustar día (opcional)</summary><div class="service-grid">'+
+    '<label class="field">Día original<input type="number" data-field="dia_original" min="1" max="31" placeholder="'+esc(s.dia_original)+'" value="'+esc(item.dia_original??"")+'"></label>'+
+    '<label class="field">Nuevo día<input type="number" data-field="nuevo_dia" min="1" max="31" placeholder="Sin cambio" value="'+esc(item.nuevo_dia??"")+'"></label></div></details></div>';
  }).join("");
 }
 function render(){
@@ -154,6 +183,12 @@ async function load(){
      '<option value="'+esc(c.id)+'">'+esc(c.nombre)+' · '+c.numero_servicios+' servicios</option>').join("");
    $("unify").innerHTML='<option value="">No unificar</option>'+Array.from({length:31},(_,i)=>'<option value="'+(i+1)+'">Día '+(i+1)+'</option>').join("");
    $("status").textContent=clients.length+" clientes consultables";
+   if(embedded&&initialClient){
+     if(clients.some(c=>c.id===initialClient)){
+       $("client").value=initialClient;
+       current=initialClient;clear();simulate();
+     }else setError("Este cliente no está disponible en la consulta de calendarios.");
+   }
  }catch(e){setError(e?.message||"Error");$("auth").classList.remove("hidden")}
 }
 $("client").addEventListener("change",function(){
