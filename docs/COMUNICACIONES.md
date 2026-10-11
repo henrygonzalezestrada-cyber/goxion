@@ -51,3 +51,28 @@ Variables en preview: `{nombre}`, `{pendientes}`, `{hechas}`, `{total}`, `{servi
 ## Promoción a oficial
 
 La beta sigue separada de `admin.html`. Una vez aprobada: integrar botón/sección «Comunicaciones» en la navegación administrativa, desplegar API de envío controlado, activar la bitácora y ejecutar smoke tests. El HTML oficial y el centro de notificaciones de clientes no deben reemplazarse.
+
+## Beta de detonaciones 2.0 · 10/oct/2026
+
+Implementación **aislada en `preview/comunicaciones/index.html`**: no añade pestaña a Admin, no modifica otros módulos, no guarda reglas en Supabase ni escribe notificaciones.
+
+- La Edge Function `comunicaciones-admin-preview` **v5**, autenticada por sesión Admin HMAC, admite exclusivamente `accion:resumen` (solo lectura) y una fecha opcional `fecha_simulacion` validada desde hoy hasta 92 días. Cualquier acción de envío es rechazada.
+- La fecha de corte y los días próximos al pago provienen ahora de `goxion_estado_financiero(p_cliente_id,p_hoy)`; no se usa la aproximación `dia_pago` del prototipo. Los estados financieros no verificables quedan fuera del filtro de cobro.
+- Mapa de detonadores ya existentes: pago acreditado, revisión, misiones, beneficio, referido, cancelaciones, accesos. Están marcados como **automáticos**, y el prototipo NO los duplica.
+- Nuevas detonaciones en modo simulación: recordatorio de misiones, próximo cobro, anuncio de una promoción seleccionada en Promotions Studio; no están programadas ni activadas.
+- Incidencias aparecen únicamente como conexión de origen, no como un segundo editor o plantilla. **Falta relacionar alertas con IDs de servicios** antes de enviar avisos segmentados.
+- Deduplicación exploratoria: el escenario «Repetir aviso inicial» identifica `misiones:FECHA:aviso-inicial` por cliente y lo excluye. **No sustituye** una futura llave única y transaccional por campaña y destinatario.
+- Promociones: selección de un objeto real con su campo `notificar_cliente`, que es solo metadato. La audiencia es orientativa hasta invocar las reglas de elegibilidad por cliente desde servidor. No se habilita envío.
+- Regla de misiones: la fecha ingresada sirve para visualizar mensajes, no significa que se haya implementado una caducidad efectiva.
+- El historial de la beta es una muestra de avisos existentes; **no es** bitácora de campañas.
+
+### Pruebas
+
+`npm run test:comunicaciones` ejecuta un smoke de entorno ficticio sin sesiones ni clientes reales. Comprueba ausencia de control de envío activo, exclusión sin login, lectura por `accion:resumen`, estado de automatismos, deduplicación de aviso inicial, fechas oficiales y selección de promoción sin duplicar editor. Complementar antes de producción con smoke autenticado de la Edge, UI real en iOS/WebKit y escenarios financieros.
+
+En consulta SQL de solo lectura se comprobó que el motor financiero respondió a todos los clientes no suspendidos evaluados durante la revisión. **No se hicieron envíos ni se cambiaron beneficios, cobros, promociones o cuentas.**
+
+### Pendiente para una versión productiva
+
+Emisión autorizada con auditoría e idempotencia, registro de campañas/programación, revalidación de destinatarios y elegibilidad comercial, enlaces confiables de incidencias, límites de frecuencia y pruebas end-to-end autenticadas. No implementar nuevas fuentes paralelas.
+
