@@ -2,6 +2,26 @@
 
 **Fase 1: beta de cálculo y aplicación simulada.** 11 de octubre de 2026.
 
+
+## Corrección X2 e integración visual Admin · 11/oct/2026
+
+**Problema confirmado en base real:** ViX Premium (x2) ($98) y YouTube Premium (x2) ($178) se almacenan como **una sola fila** de `cliente_servicios`. Por tanto, una fila no siempre equivale a una sola fecha de renovación.
+
+**Solución beta sin migrar contratos:**
+- `desglosarUnidades()` interpreta la cantidad explícita **`(x2)`** (soporta x2–x12), genera IDs virtuales estables `<cliente_servicio_id>#1` y `#2`, y conserva `cliente_servicio_id` para identificar el contrato original.
+- La fecha pagada, día de origen, ajuste proporcional y elección de pago son **independientes por unidad**.
+- Los centavos del monto contractual se reparten determinísticamente, sin crear dinero ni duplicar cargos (por ejemplo, $178 → $89 + $89, $98 → $49 + $49). El reparto comercial es **estimativo hasta validación**, porque una sola fila no identifica los precios ni las coberturas pactadas de cada perfil.
+- Un combo entre marcas, como «HBO Max + Prime», **no se divide por interpretación del nombre**. Si se requiere una fecha individual dentro de un combo, habrá que modelar su paquete y componentes expresamente.
+- La lista de calendarios cuenta las unidades que contiene X2, aunque la contratación original continúe existiendo como una sola fila. No modifica precios ni fecha en el modelo oficial.
+- No se ejecutan escrituras y `listo_para_acreditar` permanece falso.
+
+**Experiencia visual:** el enlace de prueba vive **dentro de Clientes → Servicios del Admin existente**, como un pequeño acceso «Fechas de renovación · Simular». Un diálogo modal conserva la ficha de cliente y aloja `preview/calendario-financiero/index.html?embedded=1&cliente=<uuid>`, ocultando encabezado, selector de cliente y pasos redundantes. Los detalles avanzados de cada perfil están recogidos de forma opcional. No se tocó el diseño de Ayuda ni Index.
+
+Código de integración: `assets/js/admin/32-admin-calendario-beta.js` y estilos exclusivos en `assets/css/admin.css`.
+Pruebas: `scripts/calendario-financiero-beta-smoke.mjs` (52 casos matemáticos, incluyendo X2), `scripts/calendario-financiero-ui-smoke.mjs` y `scripts/calendario-admin-integracion-smoke.mjs`.
+
+**Siguiente fase, antes de cobros reales:** registro persistente opcional por `cliente_servicio_id + unidad` para coberturas individuales, importe verificable por perfil y aplicación transaccional a cada obligación. Los IDs virtuales X2 NO son todavía líneas comerciales independientes persistidas.
+
 ## Arquitectura
 
 Se extendió la función Edge oficial **estado-financiero** (v5) con dos acciones protegidas por la sesión HMAC de Admin: **listar_calendarios_beta** y **simular_calendario_beta**. No se creó otro motor financiero. Las nuevas rutas son de **solo lectura** y no modifican clientes, servicios, pagos, mora, créditos o períodos existentes.
