@@ -183,13 +183,7 @@
             // Así no conviven el bloque legado (correo/perfil/PIN) y el nuevo bloque técnico.
             box.setAttribute('data-gx-beta-preview','1');
             box.innerHTML=`<div class="gx-beta-access-preview">
-                <div class="gx-beta-access-preview-head">
-                    <div>
-                        <strong>${p.items.length} acceso${p.items.length===1?'':'s'}</strong>
-                        ${p.kind==='combo_legacy'||p.kind==='combo_formal'?`<small>Servicios del paquete</small>`:''}
-                    </div>
-                    <span>Activo</span>
-                </div>
+                ${p.items.length>1?`<div class="gx-beta-access-preview-head"><strong>${p.items.length} accesos</strong></div>`:''}
 
                 ${p.items.map(x=>{
                     const access=(gxAccessModel.accesos||[]).find(a=>
