@@ -37,7 +37,7 @@ function setup(token){
    const data=JSON.parse(options.body);calls.push(data);
    const result=data.accion==="listar_calendarios_beta"?{ok:true,clientes:clients}:
     data.accion==="simular_calendario_beta"?{ok:true,cliente:clients[0],
-      calendario:simularCalendario({cliente:clients[0],servicios,financiero:financial,
+      calendario:simularCalendario({cliente:clients[0],servicios:services,financiero:financial,
         propuesta:data.datos.propuesta,hoy:"2026-10-11"})}:
     {ok:false,error:"Acción inesperada"};
    return{ok:result.ok,status:result.ok?200:400,json:async()=>result};
