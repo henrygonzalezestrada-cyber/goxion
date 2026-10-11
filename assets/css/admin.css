@@ -5767,3 +5767,39 @@ body.gx-beta-22 .gx-reg-actions .gx-prepare-activation{border-color:rgba(0,242,2
 .gx-promo-service-picker{grid-template-columns:1fr}.gx-promo-mechanic-grid{grid-template-columns:1fr 1fr}.gx-promo-studio-actions{grid-template-columns:1fr 1fr!important}
 .gx-promo-studio-actions>span{display:none}.gx-promo-studio-actions button{width:100%}
 }
+
+
+/* Calendarios: beta contextual de Servicios. Hereda ADN de Admin, no de Ayuda/Index. */
+.gx-calendar-entry{display:flex;align-items:center;justify-content:space-between;gap:10px;
+ padding:13px 4px;margin-top:12px;border-top:1px solid rgba(255,255,255,.11)}
+.gx-calendar-entry-copy{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gx-calendar-entry-copy strong{font-size:15px;color:#f2f5ff;font-weight:700}
+.gx-calendar-entry-copy small{font-size:11px;color:#8c9db4;font-weight:600}
+.gx-calendar-entry-action{white-space:nowrap;flex:none;border:1px solid rgba(0,242,254,.27);
+ background:rgba(0,242,254,.06);color:#a1f1f6;padding:9px 13px;
+ border-radius:11px;font-weight:700;font-size:12px;cursor:pointer}
+.gx-calendar-entry-action:active{transform:scale(.97)}
+.gx-calendar-dialog{border:1px solid rgba(0,242,254,.16);border-radius:22px;
+ width:min(740px,calc(100vw - 24px));max-width:none;height:min(91dvh,910px);
+ max-height:none;overflow:hidden;padding:0;color:#f6f7fb;background:#07070d;
+ box-shadow:0 30px 110px rgba(0,0,0,.78)}
+.gx-calendar-dialog::backdrop{background:rgba(0,0,0,.74);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.gx-calendar-dialog-head{height:81px;display:flex;align-items:center;justify-content:space-between;
+ gap:12px;padding:13px 17px;border-bottom:1px solid rgba(255,255,255,.10);
+ background:linear-gradient(165deg,#11111b,#08080e)}
+.gx-calendar-dialog-head>div{display:flex;flex-direction:column;min-width:0}
+.gx-calendar-dialog-head small{font-size:10px;color:#78929d;font-weight:700;letter-spacing:1.2px}
+.gx-calendar-dialog-head strong{font-size:21px;font-weight:700;letter-spacing:.1px;line-height:1.12}
+.gx-calendar-dialog-head span{font-size:12px;color:#a7adc8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gx-calendar-dialog-close{width:35px;height:35px;display:grid;place-items:center;flex:none;
+ color:#c3cbdc;font-size:24px;border:1px solid rgba(255,255,255,.14);
+ background:rgba(255,255,255,.045);border-radius:11px;cursor:pointer}
+.gx-calendar-dialog-content{height:calc(100% - 81px);overflow:hidden;padding:13px}
+.gx-calendar-frame{width:100%;height:100%;border:0;display:block;background:transparent}
+@media(max-width:600px){
+ .gx-calendar-dialog{width:100vw;height:100dvh;border-radius:0;border:0;margin:0}
+ .gx-calendar-dialog-head{height:76px;padding:10px 15px}
+ .gx-calendar-dialog-content{height:calc(100% - 76px);padding:8px 14px 14px}
+ .gx-calendar-entry-copy strong{font-size:14px}
+ .gx-calendar-entry-action{padding:8px 10px}
+}
