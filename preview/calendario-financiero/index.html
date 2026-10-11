@@ -79,13 +79,28 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 .access-date-row{display:block;min-width:0;width:100%;max-width:100%}
 .access-date-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px;font-size:12px;font-weight:700;color:#c2cade;min-width:0}
 .access-date-heading .reset-access{flex:none;background:transparent;border:0;color:#9cdef0;padding:2px 0;font-size:12px;font-weight:700;white-space:nowrap}
-.access-date-row input[type=date]{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:46px;min-height:46px;margin:0;padding:9px 12px;border-radius:11px;border:1px solid rgba(194,193,219,.19);background:#0b0b12;color:var(--ink);font-size:16px;text-align:left;color-scheme:dark}
-.access-date-row input[type=date]:focus{outline:0;border-color:#af80e2}
+/* El input nativo de iOS queda como área táctil, fuera del flujo visual.
+   La tarjeta visible no depende de la altura ni ancho intrínsecos de WebKit. */
+.date-picker-shell{position:relative;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  width:100%;min-width:0;max-width:100%;height:46px;min-height:46px;max-height:46px;
+  margin:0;border:1px solid rgba(194,193,219,.19);border-radius:11px;
+  background:#0b0b12;padding:0 13px;overflow:hidden;cursor:pointer}
+.date-picker-shell:focus-within{border-color:#af80e2}
+.date-picker-label{display:block;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  color:var(--ink);font-size:15px;font-weight:600;line-height:1.2;pointer-events:none}
+.date-picker-glyph{flex:none;color:#9cdef0;font-size:19px;line-height:1;pointer-events:none}
+.date-picker-hit{position:absolute!important;inset:0!important;z-index:2!important;
+  display:block!important;box-sizing:border-box!important;width:100%!important;min-width:0!important;
+  max-width:100%!important;height:100%!important;min-height:0!important;max-height:100%!important;
+  margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+  background:transparent!important;opacity:0!important;cursor:pointer;font-size:16px!important;
+  -webkit-appearance:none;appearance:none;color-scheme:dark}
+
 .access-row .tick{margin-top:7px;font-size:12px}.access-row .tick input{margin:0}
 .edit-caption{padding:11px 0 0;margin:0;line-height:1.35}
 .services-actions{display:flex;justify-content:flex-end;padding-top:5px}
 #unify[type=date]{color-scheme:dark}
-@media(max-width:520px){.contract-row{gap:8px}.contract-side{min-width:74px}.access-date-heading{align-items:center}.access-date-row input[type=date]{width:100%;min-width:0}}
+@media(max-width:520px){.contract-row{gap:8px}.contract-side{min-width:74px}.access-date-heading{align-items:center}.date-picker-shell{width:100%;min-width:0}}
 
 </style></head>
 <body><main class="wrap">
@@ -118,7 +133,7 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 </section>
 <section class="panel">
 <details class="more" id="unifyPanel" style="margin-top:0;padding-top:0;border:0"><summary>¿Unificar las fechas?</summary>
-<div class="more-body"><label class="field">Elegir fecha en calendario<input type="date" id="unify" class="selector" aria-label="Fecha para unificar los días de renovación"></label><p class="sub">Usaremos el día elegido para las próximas renovaciones, sin recortar días ya pagados.</p>
+<div class="more-body"><div class="field">Elegir fecha en calendario</div><label class="date-picker-shell" for="unify"><span class="date-picker-label" id="unifyDateValue">Elegir fecha</span><span class="date-picker-glyph" aria-hidden="true">▦</span><input type="date" id="unify" class="date-picker-hit" aria-label="Fecha para unificar los días de renovación"></label><p class="sub">Usaremos el día elegido para las próximas renovaciones, sin recortar días ya pagados.</p>
 <div id="adjustments"></div><p class="sub">La diferencia por días se calcula automáticamente. Aquí solo la estamos simulando.</p>
 </div></details>
 </section>
@@ -164,7 +179,7 @@ async function request(accion,datos){
 function reset(){
  serial++;result=null;editingContract=null;
  plan={servicios:{},pago:{modo:"proximo"}};
- $("amount").value="";$("unify").value="";
+ $("amount").value="";$("unify").value="";$("unifyDateValue").textContent="Elegir fecha";
  $("extraOptions").open=false;$("unifyPanel").open=false;$("allocationsDetails").open=false;
  choices().forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.pay==="proximo")));
  errorText("");clearScreen();
@@ -221,7 +236,8 @@ function drawServices(){
          '<div class="access-heading"><strong>'+esc(label)+'</strong><span>'+money(item.monto_base_centavos)+'</span></div>'+
          '<div class="access-date-row"><div class="access-date-heading"><span>Fecha de vencimiento</span>'+
          '<button type="button" class="reset-access" data-use-default="'+esc(item.id)+'">Usar fecha general</button></div>'+
-         '<input type="date" data-field="cobertura_hasta" value="'+esc(date)+'" aria-label="Fecha de vencimiento de '+esc(label)+'"></div>'+
+         '<label class="date-picker-shell"><span class="date-picker-label">'+esc(niceDate(date))+'</span><span class="date-picker-glyph" aria-hidden="true">▦</span>'+
+         '<input type="date" class="date-picker-hit" data-field="cobertura_hasta" value="'+esc(date)+'" aria-label="Fecha de vencimiento de '+esc(label)+'"></label></div>'+
          '<label class="tick"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?'checked':'')+'> Fecha verificada</label>'+
          '</div>';
      }).join("")+
@@ -281,7 +297,7 @@ async function load(){
    clients=d.clientes||[];
    $("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
    $("client").innerHTML='<option value="">Selecciona un cliente</option>'+clients.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nombre)+' · '+c.numero_servicios+' servicios</option>').join("");
-   $("unify").value="";
+   $("unify").value="";$("unifyDateValue").textContent="Elegir fecha";
    $("status").textContent="Solo simulación";
    if(embedded&&initialClient){
       if(clients.some(c=>c.id===initialClient)){$("client").value=initialClient;current=initialClient;reset();}
@@ -326,7 +342,10 @@ $("services").addEventListener("change",function(ev){
  }
  simulate();
 });
-$("unify").addEventListener("change",simulate);
+$("unify").addEventListener("change",function(){
+ $("unifyDateValue").textContent=this.value?niceDate(this.value):"Elegir fecha";
+ simulate();
+});
 choices().forEach(b=>b.addEventListener("click",()=>markPay(b.dataset.pay)));
 $("selected").addEventListener("change",simulate);
 $("amount").addEventListener("change",simulate);
