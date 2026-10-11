@@ -34,7 +34,7 @@ function harness(token) {
       id, value:'', textContent:'', innerHTML:'', checked:false, disabled:false, style:{}, handlers:{},
       classList:{add(k){flags.add(k)},remove(k){flags.delete(k)},toggle(k,on){if(on === undefined ? !flags.has(k) : on) flags.add(k);else flags.delete(k)},contains(k){return flags.has(k)}},
       addEventListener(name, fn){this.handlers[name]=fn},
-      querySelectorAll(){return []},
+      querySelectorAll(){return []},appendChild(){},
       focus(){},setSelectionRange(){}
     };
   }
@@ -51,6 +51,7 @@ function harness(token) {
   }));
   const doc={
     getElementById(id){assert(nodes[id], 'Falta elemento '+id);return nodes[id]},
+    createElement(){return {className:'',textContent:'',handlers:{},addEventListener(type,fn){this.handlers[type]=fn}}},
     querySelectorAll(selector){return selector==='[data-preset]'?presets:[]}
   };
   const calls=[],store={getItem(k){return k==='GOXION_ADMIN_TOKEN'?token:null},setItem() {}};
