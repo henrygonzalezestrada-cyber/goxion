@@ -1,6 +1,6 @@
 # GOXION · Mapa canónico de funciones, propietarios y dependencias
 
-Fecha de revisión: 10/oct/2026. **Alcance: documentación únicamente.** No proponer una cuarta reorganización visual. Conservar Inicio, Clientes, Operaciones y Gestión, además del comportamiento aprobado de Admin/Ayuda/Index.
+Fecha de revisión: 11/oct/2026. **Conservamos toda la organización actual.** No proponer una cuarta reorganización visual. Conservar Inicio, Clientes, Operaciones y Gestión, además del comportamiento aprobado de Admin/Ayuda/Index.
 
 Este registro es la primera consulta obligatoria antes de implementar una función nueva. **No todos los nombres repetidos son errores:** algunos son wrappers, adaptadores de compatibilidad, etapas de un motor o triggers. No eliminar nada sin detectar sus consumidores y probar equivalencia.
 
@@ -165,6 +165,10 @@ La beta preview/comunicaciones es **solo un prototipo aislado**, no está integr
 ### Nota de Comunicaciones: selección manual restringida
 
 La beta permite editar la propuesta de destinatarios sin crear otro sistema de clientes. Los cambios se guardan solo en memoria de navegador por motivo/promoción. Para una implementación real, **la API debe recalcular y validar en servidor cada destinatario** (incluidos agregados manualmente) y aplicar suspensión, estado de misión, fecha financiera, elegibilidad de promoción y límites de frecuencia. El cliente jamás podrá saltarse el módulo propietario por haber marcado un botón de «Agregar».
+
+### Comunicaciones oficiales desde octubre de 2026
+
+Propietario: Gestión → Experiencia → Comunicaciones (comunicaciones.html). Edge Function única comunicaciones-admin-preview (nombre heredado), comandos de validación, envío, agenda e historial; SQL goxion_comunicaciones_emitir y goxion_comunicaciones_procesar_agenda; tablas goxion_comunicacion_campanas, goxion_comunicacion_entregas y goxion_comunicacion_agenda. Emite avisos en cliente_notificaciones y utiliza cron cada 15 minutos. Reusa Finanzas, Misiones y Promotions Studio, sin crear motores comerciales paralelos. Véase docs/COMUNICACIONES.md.
 
 ## 7. Fuentes de verificación
 
