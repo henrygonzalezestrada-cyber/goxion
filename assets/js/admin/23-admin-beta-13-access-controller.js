@@ -242,8 +242,9 @@
                             `) : ''}
                         </div>
                         ${access?`
+                            ${isInvite?'<details class="gx-invite-group-details" '+(access.cuenta_id?'open':'')+'><summary>'+(access.cuenta_id?'Grupo vinculado':'Vincular a grupo (opcional)')+'</summary>':''}
                             <div class="gx-tech-account-side">
-                                <span>${isInvite?'Grupo / licencia (opcional)':'Cuenta compartida'}</span>
+                                <span>${isInvite?'Grupo interno de GOXION':'Cuenta compartida'}</span>
                                 <select class="gx-technical-account-select" onchange="gxAssignTechnicalAccess('${esc(access.id)}',this.value,this)">
                                     <option value="">${isInvite?'Sin grupo asignado':'Sin cuenta'}</option>
                                     ${accounts.map(a=>{
@@ -252,8 +253,9 @@
                                         return `<option value="${esc(a.id)}" ${selected?'selected':''} ${full?'disabled':''}>${esc(a.alias)} · ${occ}/${max}${full?' · lleno':''}</option>`;
                                     }).join('')}
                                 </select>
-                                <em class="${isInvite?(inviteState==='activa'?'assigned':'missing'):(current?'assigned':'missing')}">${isInvite?(inviteState==='activa'?'Beneficio activo':'Revisar estado'):(current?'Asignado':'Pendiente')}</em>
+                                ${isInvite?'<p class="gx-group-invite-note">Solo organiza accesos; no activa licencias ni invitaciones en la plataforma.</p>':`<em class="${current?'assigned':'missing'}">${current?'Asignado':'Pendiente'}</em>`}
                             </div>
+                            ${isInvite?'</details>':''}
                         `:`<em class="missing">Revisión</em>`}
                     </div>`;
                 }).join('')}
