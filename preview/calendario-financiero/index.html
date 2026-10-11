@@ -120,6 +120,8 @@ function chooseMode(mode,run){
  if(run)simulate();
 }
 function drawForm(){
+ const expanded=new Set(Array.from($("services").querySelectorAll(".service details[open]"))
+   .map(el=>el.closest("[data-id]")?.dataset.id).filter(Boolean));
  const serv=result?.calendario?.servicios||[];
  $("services").innerHTML=serv.map(s=>{
    const item=plan.servicios[s.id]||{};
@@ -131,6 +133,9 @@ function drawForm(){
     '<label class="field">Día original<input type="number" data-field="dia_original" min="1" max="31" placeholder="'+esc(s.dia_original)+'" value="'+esc(item.dia_original??"")+'"></label>'+
     '<label class="field">Nuevo día<input type="number" data-field="nuevo_dia" min="1" max="31" placeholder="Sin cambio" value="'+esc(item.nuevo_dia??"")+'"></label></div></details></div>';
  }).join("");
+ $("services").querySelectorAll(".service details").forEach(el=>{
+   if(expanded.has(el.closest("[data-id]")?.dataset.id))el.open=true;
+ });
 }
 function render(){
  if(!result)return;
