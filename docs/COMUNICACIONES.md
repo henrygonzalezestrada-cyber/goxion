@@ -31,6 +31,48 @@ En «Editar destinatarios» la lista empieza con **los clientes sugeridos por GO
 Prueba automatizada ampliada: quitar, reincorporar, búsqueda insensible a acentos, añadir cobro futuro, bloquear cliente pagado o misión terminada, aislar selección por motivo, restablecer y confirmar modo solo lectura.
 
 
+
+## Auditoría de robustez de la beta · octubre 2026
+
+**Dictamen:** APTA para continuar en beta de solo lectura; NO apta todavía para envíos reales.
+
+### Simulaciones reproducibles
+
+Pruebas en `scripts/comunicaciones-beta-smoke.mjs` y `scripts/comunicaciones-resilience-smoke.mjs`, ejecutadas contra la interfaz exacta de la beta con datos sintéticos:
+
+| Escenario | Resultado |
+| --- | --- |
+| 0 clientes y 0 promociones | Correcto: 0 destinatarios en todos los motivos |
+| Dos clientes con el mismo nombre | Se distinguen por ID; excluir uno no excluye el otro |
+| Texto hostil/HTML en nombres y títulos | Nombres escapados, vistas previas con `textContent`, sin HTML ejecutado |
+| Cobro pagado, no verificable o vencido | No se puede agregar al público de cobro futuro |
+| Cobro futuro mayor a 7 días, agregado a mano | Admitido con fecha verificada, mensaje adaptado |
+| Hoy, mañana y 30 días antes del corte | Mensajes gramaticalmente correctos |
+| Quitar/reagregar y restablecer personas | Correcto; selección independiente por motivo |
+| 1,200 clientes sintéticos | Contador y operaciones de lista correctos; **no es prueba real de carga móvil** |
+| Token borrado o API 401 | La lista se oculta y se limpia del DOM; requiere inicio de sesión |
+| Error de red | Muestra error y elimina el roster antiguo, no presenta datos obsoletos |
+| Dos actualizaciones respondidas al revés | Ignora respuesta antigua; prevalece última solicitud |
+| Promoción que desaparece después de seleccionarla | Candidatos pasan a cero; no conserva una selección inexistente |
+| Actualización de cliente recién pagado | Se retira de la selección de cobro al refrescar |
+| Cambios de selección y vista previa | Solo consulta `accion:resumen`; botón de enviar sigue bloqueado |
+
+**Correcciones hechas:** control de solicitudes concurrentes y sesión caducada en frontend; limpieza de datos obsoletos; validación de ID de promoción; redacción específica de cobro hoy/mañana/fecha futura. Edge `comunicaciones-admin-preview` **v6**: validación de firma malformada sin fallo 500 y hasta 8 consultas SQL financieras simultáneas. No se alteró Admin oficial ni se insertaron avisos.
+
+**Verificación de Supabase:** existe índice único `ux_cliente_notificaciones_dedupe` en `(cliente_id,dedupe_key)` cuando hay clave; no crea por sí solo las claves futuras. Datos actuales consultados en modo lectura, sin escritura.
+
+### Antes de habilitar envíos reales (obligatorio)
+
+1. **Motor de envío autorizado en backend:** revalidar sesión, clientes suspendidos, cambios de misión/pago/servicios, promociones vigentes y elegibilidad comercial. Nunca confiar en IDs/estado de navegador ni enviar a candidatos preliminares como si fueran elegibles.
+2. **Idempotencia + campañas auditables:** identificador inmutable por campaña/evento/destinatario, restricción única, tabla de campañas/entregas y estados reintentables; evitar múltiples avisos al pulsar dos veces o en reintentos.
+3. **Scheduler real y condiciones de vencimiento:** misiones, cobros, ventanas de aviso, huso `America/Merida`, y reevaluación al ejecutar. La fecha escrita en un mensaje no cierra ninguna misión.
+4. **Control de saturación y fallos:** límites de frecuencia, preferencias/consentimiento comercial, prioridad de transacciones, reintentos sin duplicados, pausado y métricas.
+5. **Prueba de integración real:** sesión Admin válida, navegador iOS/WebKit, campana cliente, apertura del destino del aviso, backend y cortes de conexión. La prueba sintética de 1,200 no mide latencia ni memoria reales.
+6. **Crecimiento:** paginación de lecturas de clientes y contratos en el endpoint; las consultas actuales usan límites y pueden truncarse cuando el conjunto crezca significativamente. Se limitó la concurrencia de RPC, pero no se implementó paginación todavía.
+
+**Recomendación:** no añadir nuevas pestañas ni filtros generales. Conservar «Elegir motivo → sugerencia → editar destinatarios → vista previa»; invertir el siguiente bloque de trabajo en el contrato seguro de envío y registro, no en más interfaz.
+
+
 ## Recursos de esta entrega
 
 - `preview/comunicaciones/index.html`: interfaz responsiva y protegida por sesión administrativa. Borrador local y preview personalizado, filtros combinados, lista exacta de destinatarios y exclusión individual.
