@@ -17,6 +17,20 @@ Estado: **beta de simulación**, 2026-10-10. No altera `admin.html` ni envía no
 - Solo `accion:resumen` en `comunicaciones-admin-preview`; no se guarda ni se envía ninguna campaña, y el botón de envío está deshabilitado.
 - Smoke actualizado: `npm run test:comunicaciones` con escenarios de inicio de sesión, misiones, pagos, promociones, vista previa y protección contra escrituras.
 
+
+### Selección de destinatarios ajustable · Beta (10/oct/2026)
+
+En «Editar destinatarios» la lista empieza con **los clientes sugeridos por GOXION**. El operador puede quitar clientes individualmente, buscarlos por nombre (sin distinguir acentos), reincorporarlos, agregar los permitidos por el motivo y restablecer los sugeridos. El contador y la vista previa se actualizan al instante. Las modificaciones se mantienen **por motivo y promoción** dentro de la sesión visual de la beta, no se escriben en Supabase.
+
+- Misiones: agregar solo cuando hay misiones activas pendientes; no incluir quienes ya completaron todas.
+- Próximo cobro: sugerencia por corte oficial dentro de 7 días, pero permitir agregar manualmente clientes con fecha oficial futura y pago no cubierto, aunque queden más de 7 días; nunca personas ya pagadas o con corte no verificable.
+- Promociones: únicamente clientes en el conjunto activo devuelto por el servidor, con promoción publicada seleccionada; siguen siendo **candidatos preliminares**, no elegibles comercialmente validados.
+- Comunicado: clientes activos autorizados devueltos por servidor; suspensión/cuenta de prueba/sin servicios siguen excluidos.
+- En una futura emisión, la API **no confiará en el array de destinatarios del navegador**: debe revalidar servidor y registrar inclusiones/exclusiones autorizadas, idempotencia y auditoría.
+
+Prueba automatizada ampliada: quitar, reincorporar, búsqueda insensible a acentos, añadir cobro futuro, bloquear cliente pagado o misión terminada, aislar selección por motivo, restablecer y confirmar modo solo lectura.
+
+
 ## Recursos de esta entrega
 
 - `preview/comunicaciones/index.html`: interfaz responsiva y protegida por sesión administrativa. Borrador local y preview personalizado, filtros combinados, lista exacta de destinatarios y exclusión individual.
