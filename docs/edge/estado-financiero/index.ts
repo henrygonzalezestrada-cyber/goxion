@@ -97,13 +97,16 @@ Deno.serve(async(req)=>{
     if(accion==="listar_calendarios_beta"){
       const [cq,sq]=await Promise.all([
         sb.from("clientes").select("id,nombre,dia_pago,estado").order("nombre").limit(300),
-        sb.from("cliente_servicios").select("id,cliente_id").eq("activo",true).limit(900)
+        sb.from("cliente_servicios").select("id,cliente_id,nombre").eq("activo",true).limit(900)
       ]);
       if(cq.error||sq.error)throw cq.error||sq.error;
       if((cq.data||[]).length>=300||(sq.data||[]).length>=900)
         return res({ok:false,error:"Lista incompleta. Necesita paginación antes de consultar."},503);
       const totals=new Map<string,number>();
-      for(const item of sq.data||[])totals.set(item.cliente_id,(totals.get(item.cliente_id)||0)+1);
+      for(const item of sq.data||[]){
+        const n=String(item.nombre||"").match(/\(\s*x([2-9]|1[0-2])\s*\)/i);
+        totals.set(item.cliente_id,(totals.get(item.cliente_id)||0)+(n?Number(n[1]):1));
+      }
       const clientes=(cq.data||[]).filter(c=>(totals.get(c.id)||0)>0).map(c=>({
         id:c.id,nombre:c.nombre,numero_servicios:totals.get(c.id),dia_pago:c.dia_pago,
         estado:c.estado
