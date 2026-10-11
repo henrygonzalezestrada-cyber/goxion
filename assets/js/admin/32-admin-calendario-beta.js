@@ -66,6 +66,8 @@
     if(!body)return;
     // El expediente ya se re-renderiza al actualizar servicios; observamos sin alterar wrappers.
     new MutationObserver(inject).observe(body,{childList:true});
+    const sheet=focus();
+    if(sheet)new MutationObserver(inject).observe(sheet,{attributes:true,attributeFilter:["class","data-gx-client-key"]});
     inject();
   }
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});
