@@ -59,3 +59,12 @@ El cálculo de ajustes todavía no incluye un saldo a favor por un cambio contra
 La segunda fase debe crear, con migración compatible, un calendario opcional por contrato, un registro único de obligación por servicio/rango y una aplicación de pagos asociada al pago aprobado. Solo entonces se conectará Index para pago de uno o varios períodos y Ayuda para indicar exclusivamente **próximo a vencer**. No duplicar CSS ni componentes visuales entre Admin, Ayuda e Index.
 
 **El motor financiero oficial y su fallback permanecen vigentes sin cambios en sus acciones anteriores.**
+
+## Simplificación visual de la beta · 11/oct/2026
+
+Se conserva la ubicación **Admin → Clientes → Servicios → Fechas de renovación → Simular**. La superficie no es otro panel administrativo: usa la tipografía, jerarquía y contenedor del expediente original.
+
+El recorrido visible quedó reducido a **Servicios (fecha e importe), Pago que quieres revisar (vence primero o todo junto), e importe estimado**. Cada perfil X2 se identifica individualmente y presenta solo un enlace **Cambiar fecha**, que expone «Renueva cada día» como selector del 1 al 31 y el próximo vencimiento con calendario; se recalcula automáticamente. «Elegir perfiles», abonos, unificación y detalles de advertencias aparecen únicamente si se abren sus opciones secundarias. No hay formulario de pasos, botón de actualización necesario, selector de otros clientes dentro del expediente ni términos técnicos para operar.
+
+La indicación «próximo vencimiento estimado» es intencional: el calendario de cobertura por perfil aún no se ha confirmado/persistido en el modelo real. Todo continúa en lectura y simulación. **No** se alteran Admin financiero, Ayuda ni Index; se conservan los 52 ensayos de matemáticas y las pruebas de UI e integración en el expediente.
+
