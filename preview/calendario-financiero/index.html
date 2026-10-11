@@ -43,6 +43,7 @@ label.field{display:block;font-size:12px;color:#c2cade;font-weight:700}
 .due{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.06)}
 .due:last-child{border-bottom:0}.due-date{font-size:13px;font-weight:700}.due-detail{font-size:12px;color:var(--quiet)}
 .due-amount{white-space:nowrap;font-size:15px;font-weight:700}
+.due:not(.chosen){opacity:.62}.due-label{font-size:10px;letter-spacing:.1px;color:#9fb9c8;margin-top:3px}.due.chosen .due-label{color:#8ce5cd}
 details.more{border-top:1px solid var(--line);margin-top:11px;padding-top:11px}
 details.more>summary{cursor:pointer;color:#b7c3d9;font-size:13px;font-weight:700;list-style:none}
 details.more>summary::after{content:"＋";float:right;color:#a18cc4}details.more[open]>summary::after{content:"−"}
@@ -193,7 +194,14 @@ function draw(){
  if(!result)return;
  const cal=result.calendario;
  drawServices();
- $("groups").innerHTML=cal.grupos.map(g=>'<div class="due"><div><div class="due-date">'+esc(niceDate(g.fecha))+'</div><div class="due-detail">'+esc(g.servicios.map(s=>s.nombre).join(" · "))+'</div></div><span class="due-amount">'+money(g.total_centavos)+'</span></div>').join("");
+ const included=new Set(cal.pago.asignaciones.map(a=>a.servicio_id));
+ $("groups").innerHTML=cal.grupos.map(g=>{
+   const count=g.servicios.filter(s=>included.has(s.id)).length;
+   const label=!count?"Más adelante":count<g.servicios.length?"Incluido en parte":"Incluido en este pago";
+   return '<div class="due '+(count?'chosen':'')+'"><div><div class="due-date">'+esc(niceDate(g.fecha))+'</div>'+
+     '<div class="due-detail">'+esc(g.servicios.map(s=>s.nombre).join(" · "))+'</div>'+
+     '<div class="due-label">'+label+'</div></div><span class="due-amount">'+money(g.total_centavos)+'</span></div>';
+ }).join("");
  $("total").textContent=money(cal.pago.importe_centavos);
  $("allocations").innerHTML=cal.pago.asignaciones.map(a=>
    '<div class="alloc-item"><div>'+esc(a.nombre)+'<div class="sub">'+esc(niceDate(a.periodo_desde))+' → '+esc(niceDate(a.periodo_hasta))+'</div></div>'+
