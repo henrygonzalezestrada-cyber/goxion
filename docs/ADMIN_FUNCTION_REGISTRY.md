@@ -161,6 +161,11 @@ La base contiene 37 tablas de negocio, 58 funciones SQL y 50 triggers propios. E
 
 La beta preview/comunicaciones es **solo un prototipo aislado**, no está integrada en la navegación aprobada. Puede evolucionar únicamente después de pasar por esta revisión de dependencias.
 
+
+### Nota de Comunicaciones: selección manual restringida
+
+La beta permite editar la propuesta de destinatarios sin crear otro sistema de clientes. Los cambios se guardan solo en memoria de navegador por motivo/promoción. Para una implementación real, **la API debe recalcular y validar en servidor cada destinatario** (incluidos agregados manualmente) y aplicar suspensión, estado de misión, fecha financiera, elegibilidad de promoción y límites de frecuencia. El cliente jamás podrá saltarse el módulo propietario por haber marcado un botón de «Agregar».
+
 ## 7. Fuentes de verificación
 
 - admin.html, ayuda.html e index.html y su orden de scripts.
