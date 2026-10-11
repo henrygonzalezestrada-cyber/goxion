@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a16">
+<title>GOXION · Comunicaciones beta</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#080a16;--glass:rgba(24,29,50,.72);--stroke:rgba(177,198,255,.14);--txt:#f0f3ff;--muted:#a3acc8;--cyan:#5fe3f8;--violet:#aa8aff;--green:#65dfb6}
+*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;background:radial-gradient(ellipse 60% 44% at 99% 0%,rgba(108,65,196,.20),transparent),radial-gradient(ellipse 50% 40% at -15% 75%,rgba(25,145,199,.09),transparent),var(--bg);color:var(--txt);font:14px/1.5 Inter,system-ui,sans-serif}
+button,input,select,textarea{font:inherit}button,select{cursor:pointer}button:disabled{opacity:.5;cursor:not-allowed}a{color:inherit;text-decoration:none}.hidden{display:none!important}
+.shell{max-width:1040px;padding:22px 20px 65px;margin:auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:45px}.brand{display:flex;align-items:center;gap:11px}.logo{width:40px;height:40px;border:1px solid rgba(171,123,255,.4);border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(145,94,235,.26),rgba(18,168,214,.12));font:700 25px Rajdhani;color:white}.brand strong{font:700 23px Rajdhani;letter-spacing:2px}.brand small{display:block;color:#7e9fd8;font-size:10px;letter-spacing:1.4px;text-transform:uppercase}.top-right{display:flex;align-items:center;gap:8px}.tag{padding:6px 10px;border:1px solid rgba(152,137,251,.28);border-radius:30px;background:rgba(140,91,230,.08);font-size:11px;font-weight:600;color:#c9b5ff}.back{border:1px solid var(--stroke);padding:8px 12px;border-radius:11px;font-size:12px;color:#c8d0ee}
+.hero{text-align:center;margin:0 auto 29px;max-width:740px}.eyebrow{color:#9dbafa;text-transform:uppercase;letter-spacing:2px;font:700 12px Rajdhani}.hero h1{font:700 clamp(30px,5vw,45px)/1.06 Rajdhani;margin:8px 0 10px;letter-spacing:.1px}.hero p{color:var(--muted);margin:0;font-size:13px}
+.glass{border:1px solid var(--stroke);border-radius:20px;background:linear-gradient(145deg,rgba(29,34,59,.74),rgba(13,17,33,.82));box-shadow:0 14px 44px rgba(0,0,0,.15);backdrop-filter:blur(15px)}
+.label{font:700 18px Rajdhani;letter-spacing:.35px}.step{display:inline-flex;align-items:center;justify-content:center;height:23px;min-width:23px;border-radius:8px;margin-right:8px;background:rgba(159,119,254,.13);color:#d1c3ff;font:700 12px Rajdhani}
+.choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:15px 0 20px}.choice{padding:18px 13px;text-align:left;background:rgba(24,29,52,.68);border:1px solid var(--stroke);border-radius:17px;color:var(--txt);transition:background .18s,border-color .18s,transform .18s;min-height:137px}.choice:hover{background:rgba(49,48,91,.55)}.choice[aria-pressed=true]{border-color:rgba(147,119,255,.75);background:linear-gradient(140deg,rgba(115,79,222,.2),rgba(19,143,190,.08));box-shadow:inset 0 0 0 1px rgba(169,139,255,.12)}.choice .ico{display:grid;place-items:center;width:35px;height:35px;background:rgba(143,147,255,.11);border-radius:11px;font-size:17px;margin-bottom:13px}.choice strong{display:block;font:700 17px/1.1 Rajdhani}.choice small{display:block;color:var(--muted);font-size:11px;line-height:1.4;margin-top:5px}
+.details{padding:22px 23px;margin-bottom:14px}.summary{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}.summary p{margin:5px 0 0;color:var(--muted);font-size:12px}.audience-pill{border:1px solid rgba(95,227,248,.25);background:rgba(33,158,194,.09);border-radius:16px;min-width:95px;padding:9px 14px;text-align:center;white-space:nowrap}.audience-pill strong{font:700 29px Rajdhani;color:#a7f0fc;display:block;line-height:1}.audience-pill span{font-size:10px;color:#a8cada}
+.hint{display:flex;align-items:flex-start;gap:8px;padding:11px 12px;border:1px solid rgba(159,173,247,.15);border-radius:12px;background:rgba(126,140,202,.05);font-size:11px;color:#bbc7e3;margin-top:17px}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex:none;margin-top:5px}.hint.warn .dot{background:#f3bc67}.hint.warn{border-color:rgba(241,186,104,.2);color:#f1d09b}
+.preview{margin-top:15px;border:1px solid rgba(183,206,255,.13);border-radius:16px;padding:19px;background:rgba(5,9,21,.4)}.notiftop{display:flex;gap:9px;align-items:center;margin-bottom:15px}.notificon{width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:linear-gradient(135deg,#7349bf,#2865ad);font-size:16px}.notiftop strong{display:block;font-size:12px}.notiftop small{display:block;color:#8498c2;font-size:10px}.notif-title{font-weight:700;margin-bottom:6px}.notif-message{color:#c9d3e9;font-size:12px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}.notif-link{display:inline-block;color:var(--cyan);margin-top:14px;font-weight:600;font-size:11px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:13px}.dropdown{border:1px solid var(--stroke);border-radius:10px;background:rgba(7,10,24,.62);color:var(--txt);padding:9px 11px;max-width:100%;min-width:170px;font-size:12px}.dropdown option{background:#1a2136}
+.promo-chooser{margin:0 0 14px;padding:15px 17px}.promo-chooser label{display:block;color:#ccd8f4;font-size:12px;font-weight:600;margin-bottom:7px}.promo-chooser select{width:100%}
+details.more{margin-top:16px;border-top:1px solid var(--stroke);padding-top:14px}details.more summary{list-style:none;cursor:pointer;color:#bdc9e7;font-size:12px;font-weight:600}details.more summary::-webkit-details-marker{display:none}details.more summary::before{content:"＋ ";color:var(--violet)}details.more[open] summary::before{content:"− "}
+.field{display:block;margin-top:13px;font-size:11px;font-weight:600;color:#c5d0ef}.field input,.field textarea{display:block;margin-top:6px;width:100%;border:1px solid var(--stroke);background:rgba(5,8,20,.67);border-radius:12px;padding:10px 12px;color:white;outline:none}.field textarea{min-height:76px;resize:vertical}.field input:focus,.field textarea:focus{border-color:#9b89ff}
+.people{margin-top:9px;display:grid;gap:6px;max-height:270px;overflow:auto}.person{padding:9px 11px;border:1px solid var(--stroke);border-radius:11px;display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:12px;background:rgba(6,9,23,.23)}.person-info{min-width:0;flex:1}.person-info strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}.person small{display:block;color:var(--muted);font-size:10px}.empty{padding:12px;color:var(--muted);font-size:12px}.tiny-count{color:#8fe8fb;font-size:11px;margin-left:5px;font-weight:600}.recipient-toolbar{display:flex;gap:9px;align-items:center;justify-content:space-between;margin-top:15px;color:var(--muted);font-size:11px}.mini-button{border:1px solid var(--stroke);border-radius:9px;padding:6px 11px;font-size:11px;background:rgba(148,163,244,.08);color:#ced8f6;white-space:nowrap}.mini-button:hover{background:rgba(148,163,244,.16)}.mini-button.add{color:#8fe8fb;border-color:rgba(95,227,248,.2)}.mini-button.remove{color:#e1bdc7}.mini-button:disabled{opacity:.38}.recipient-caption{display:block;margin:14px 0 7px;color:#c7d1ec;font-size:11px;font-weight:600}.recipient-caption span{color:#8fe8fb}.recipient-search{display:block;width:100%;border:1px solid var(--stroke);border-radius:12px;background:rgba(6,9,23,.55);color:var(--txt);padding:10px 13px;font-size:12px;outline:none}.recipient-search:focus{border-color:rgba(155,137,255,.65)}.recipient-search::placeholder{color:#7583a8}.recipient-help{font-size:10px;color:#8693b5;line-height:1.5;margin:12px 0 0}
+.actions{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:18px}.action{border:1px solid var(--stroke);border-radius:11px;padding:11px 17px;color:#d5ddf8;background:rgba(149,160,255,.065);font-weight:600;font-size:12px}.action.primary{background:linear-gradient(110deg,#6a49be,#3269b9);border:0;color:white}
+.footer-note{margin-top:15px;font-size:11px;color:#8c98b7;text-align:center}.footer-note strong{color:#b5c2dd}
+.ready{display:flex;align-items:center;gap:10px;padding:14px 16px;margin-top:20px;font-size:11px;color:#adbad9;border:1px solid var(--stroke);border-radius:14px;background:rgba(14,20,38,.48)}.ready strong{color:#dce4ff}.ready button{margin-left:auto;border:0;background:none;color:#9bb9ef;font:600 11px Inter;cursor:pointer;padding:5px}
+.error{border:1px solid rgba(255,127,143,.33);background:rgba(255,95,113,.06);padding:14px;border-radius:12px;color:#ffc7d2;margin-bottom:15px}
+@media(max-width:740px){.choices{grid-template-columns:repeat(2,minmax(0,1fr))}.choice{min-height:120px}.top{margin-bottom:27px}.shell{padding:17px 14px 48px}.details{padding:17px}.hero{text-align:left}.summary{align-items:center}.ready{align-items:flex-start}.ready button{min-width:90px}}
+@media(max-width:390px){.top-right .tag{display:none}.row{align-items:flex-start;flex-direction:column}.dropdown{width:100%}.summary{align-items:start}.audience-pill{min-width:80px;padding:8px}}
+</style>
+</head>
+<body>
+<main class="shell">
+<header class="top">
+ <div class="brand"><div class="logo">G</div><div><strong>GOXION</strong><small>Comunicaciones</small></div></div>
+ <div class="top-right"><span class="tag">BETA · SIMULACIÓN</span><a class="back" href="../../admin.html">← Admin</a></div>
+</header>
+<div class="hero">
+ <div class="eyebrow">Notificaciones inteligentes</div>
+ <h1>¿Qué quieres comunicar?</h1>
+ <p>Elige el motivo. GOXION encuentra a los clientes y prepara el mensaje con la información que ya existe.</p>
+</div>
+<div id="error" class="error hidden" role="alert"></div>
+<div id="auth" class="glass details hidden"><div class="label">Inicia sesión en Admin</div><p>Abre tu Admin habitual, inicia sesión y regresa aquí para consultar la información real.</p><a class="action" href="../../admin.html">Ir a Admin →</a></div>
+<section id="workspace" class="hidden">
+ <div class="label"><span class="step">1</span> Selecciona el motivo</div>
+ <div class="choices" aria-label="Qué comunicar">
+  <button class="choice" data-kind="missions" type="button" aria-pressed="true"><span class="ico">✦</span><strong>Misiones</strong><small>Recordar a quienes les faltan</small></button>
+  <button class="choice" data-kind="pay" type="button" aria-pressed="false"><span class="ico">◷</span><strong>Próximo cobro</strong><small>Recordar a quienes les corresponde</small></button>
+  <button class="choice" data-kind="promo" type="button" aria-pressed="false"><span class="ico">%</span><strong>Promociones</strong><small>Anunciar algo que ya publicaste</small></button>
+  <button class="choice" data-kind="general" type="button" aria-pressed="false"><span class="ico">✉</span><strong>Comunicado</strong><small>Enviar una novedad general</small></button>
+ </div>
+ <div id="promoChooser" class="glass promo-chooser hidden"><label for="promotion">¿Qué promoción deseas anunciar?</label><select class="dropdown" id="promotion"><option value="">Selecciona una promoción publicada</option></select></div>
+ <section class="glass details">
+  <div class="summary">
+   <div><div class="label"><span class="step">2</span> GOXION prepara el aviso</div><p id="audienceSummary">Consultando destinatarios…</p></div>
+   <div class="audience-pill"><strong id="audienceCount">—</strong><span id="audienceLabel">clientes</span></div>
+  </div>
+  <div class="hint" id="contextHint"><span class="dot"></span><span id="contextText">Los clientes suspendidos, de prueba o sin servicios quedan excluidos.</span></div>
+  <div class="preview">
+   <div class="notiftop"><div class="notificon">✦</div><div><strong>GOXION · <span id="previewKind">Misiones</span></strong><small>Así se verá en Mi Espacio</small></div></div>
+   <div class="notif-title" id="previewTitle">Preparando mensaje…</div>
+   <div class="notif-message" id="previewMessage"></div>
+   <div class="notif-link" id="previewAction">Ver misiones →</div>
+  </div>
+  <div class="row" style="margin-top:15px"><span style="font-size:11px;color:var(--muted)">Previsualizar como</span><select id="sample" class="dropdown" aria-label="Cliente de ejemplo"><option value="">Cliente de ejemplo</option></select></div>
+  <details class="more" id="editDetails"><summary>Personalizar el mensaje (opcional)</summary>
+   <label class="field" for="titleInput">Título<input id="titleInput" maxlength="90"></label>
+   <label class="field" for="messageInput">Mensaje<textarea id="messageInput" maxlength="420"></textarea></label>
+   <p style="font-size:10px;color:var(--muted)">Variables disponibles: {nombre}, {hechas}, {total}, {pendientes}, {aviso_cobro}, {promocion}.</p>
+   <button class="action" type="button" id="restoreTemplate">Restablecer sugerencia</button>
+  </details>
+  <details class="more" id="peopleDetails">
+    <summary>Editar destinatarios <span id="recipientBadge" class="tiny-count"></span></summary>
+    <div class="recipient-toolbar"><span id="recipientStatus">Selección sugerida por GOXION</span><button id="resetRecipients" class="mini-button" type="button">Restablecer</button></div>
+    <div class="recipient-caption">Seleccionados <span id="selectedCount">0</span></div>
+    <div id="people" class="people" aria-label="Clientes seleccionados"></div>
+    <label class="recipient-caption" for="recipientSearch">Agregar otros clientes</label>
+    <input id="recipientSearch" class="recipient-search" type="search" placeholder="Buscar por nombre…" autocomplete="off" maxlength="90">
+    <div id="available" class="people" aria-live="polite"></div>
+    <p id="recipientHelp" class="recipient-help">GOXION solo permitirá agregar clientes que cumplan las condiciones de este aviso.</p>
+   </details>
+  <div class="actions">
+   <button id="refresh" class="action" type="button">↻ Actualizar</button>
+   <button class="action primary" disabled type="button" id="send" title="La beta no permite envíos">Enviar aviso →</button>
+  </div>
+  <div class="footer-note"><strong>Modo de prueba:</strong> ningún mensaje se envía ni se programa desde esta beta.</div>
+ </section>
+ <div class="ready"><span style="font-size:17px;color:var(--green)">✓</span><span><strong>Los avisos importantes ya son automáticos.</strong> Pagos, misiones completadas, beneficios y cancelaciones funcionan en Supabase y no se configuran otra vez aquí.</span><button type="button" id="showExisting">Ver cuáles</button></div>
+ <div id="existing" class="hidden" style="font-size:11px;color:var(--muted);padding:12px 15px"></div>
+</section>
+</main>
+<script>
+(function(){
+"use strict";
+var URL="https://hmpevcwodcgbkviarfic.supabase.co/functions/v1/comunicaciones-admin-preview";
+var tokenKey="GOXION_ADMIN_TOKEN", $=function(id){return document.getElementById(id)};
+var current="missions", data=null, audience=[], requestSerial=0, templates={
+ missions:{title:"Tus misiones te esperan ✨",message:"Hola {nombre}, llevas {hechas} de {total} misiones completadas. Te faltan {pendientes}. Entra a Mi Espacio para continuar.",tag:"Misiones",link:"Ver misiones →"},
+ pay:{title:"Tu próximo cobro",message:"Hola {nombre}, {aviso_cobro}. Revisa tu estado de cuenta en Mi Espacio.",tag:"Tu cuenta",link:"Ver estado de cuenta →"},
+ promo:{title:"Una promoción de GOXION",message:"Hola {nombre}, conoce nuestra promoción {promocion} en el catálogo. Consulta los detalles y condiciones disponibles para tu cuenta.",tag:"Promociones",link:"Ver catálogo →"},
+ general:{title:"Novedades de GOXION",message:"Hola {nombre}, tenemos información para compartir contigo. Entra a Mi Espacio para conocer las novedades.",tag:"GOXION",link:"Abrir Mi Espacio →"}
+};
+var touched=false;
+// En beta, la selección manual es local a este navegador y a cada motivo/promoción.
+// La futura API real DEBERÁ revalidar las inclusiones y exclusiones en servidor.
+var overrides=Object.create(null);
+function escapeHTML(input){return String(input??"").replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function write(id,text){$(id).textContent=String(text)}
+function choose(kind){
+ if(!templates[kind])return;
+ current=kind;touched=false;$("recipientSearch").value="";
+ document.querySelectorAll("[data-kind]").forEach(function(b){b.setAttribute("aria-pressed",String(b.dataset.kind===kind))});
+ $("promoChooser").classList.toggle("hidden",kind!=="promo");
+ $("titleInput").value=templates[kind].title;
+ $("messageInput").value=templates[kind].message;
+ $("editDetails").open=false;
+ draw();
+}
+function templateValue(text,client){
+ var pr=(data?.promociones||[]).find(function(p){return p.id===$("promotion").value});
+ var days=client?.dias_para_cobro;
+ var aviso=days===0?"tu fecha de corte es hoy":days===1?"falta 1 día para tu próxima fecha de corte":typeof days==="number"?"faltan "+days+" días para tu próxima fecha de corte":"consulta la fecha de tu próximo cobro";
+ var values={nombre:client?.nombre||"cliente",hechas:client?.misiones_hechas??0,total:client?.misiones_total??0,pendientes:client?.misiones_pendientes??0,dias_cobro:days??"—",aviso_cobro:aviso,promocion:pr?.titulo_publico||pr?.nombre||"seleccionada"};
+ return String(text).replace(/\{(nombre|hechas|total|pendientes|dias_cobro|aviso_cobro|promocion)\}/g,function(all,k){return String(values[k])});
+}
+function validPromotion(){return (data?.promociones||[]).some(function(p){return p.id===$("promotion").value})}
+function eligible(c){
+ if(current==="missions")return c.misiones_total>0&&c.misiones_pendientes>0;
+ if(current==="pay")return c.cobro_oficial===true&&c.cobro_pagado===false&&typeof c.dias_para_cobro==="number"&&c.dias_para_cobro>=0&&c.dias_para_cobro<=7;
+ if(current==="promo")return validPromotion();
+ return true;
+}
+
+function scopeKey(){return current==="promo"?"promo:"+($("promotion").value||"sin_seleccion"):current}
+function scope(){
+ var key=scopeKey();
+ if(!overrides[key])overrides[key]={removed:new Set(),added:new Set()};
+ return overrides[key];
+}
+function allowedToAdd(c){
+ if(current==="missions")return c.misiones_total>0&&c.misiones_pendientes>0;
+ if(current==="pay")return c.cobro_oficial===true&&c.cobro_pagado===false&&
+   typeof c.dias_para_cobro==="number"&&Number.isFinite(c.dias_para_cobro)&&c.dias_para_cobro>=0;
+ if(current==="promo")return validPromotion();
+ return true;
+}
+function eligibilityReason(c){
+ if(current==="missions")return c.misiones_total>0?"Ya completó sus misiones":"Sin misiones pendientes activas";
+ if(current==="pay")return c.cobro_pagado?"Periodo cubierto":"Sin fecha futura de cobro confirmada";
+ if(current==="promo")return "Selecciona una promoción publicada";
+ return "No elegible";
+}
+function recipientLabel(c){
+ if(current==="missions")return c.misiones_pendientes+" pendientes";
+ if(current==="pay")return c.dias_para_cobro===0?"Corte hoy":c.dias_para_cobro===1?"Corte mañana":"Cobro en "+c.dias_para_cobro+" días";
+ return "Cuenta activa";
+}
+function selectedRecipients(){
+ if(!data)return [];
+ var control=scope();
+ return data.clientes.filter(function(c){
+   return allowedToAdd(c)&&!control.removed.has(c.id)&&(eligible(c)||control.added.has(c.id));
+ });
+}
+function removeRecipient(id){
+ if(!data)return;
+ var c=data.clientes.find(function(x){return x.id===id});
+ if(!c)return;
+ var control=scope();
+ control.added.delete(id);control.removed.add(id);
+ draw();
+}
+function addRecipient(id){
+ if(!data)return;
+ var c=data.clientes.find(function(x){return x.id===id});
+ if(!c||!allowedToAdd(c))return; // no omitir condiciones del dominio
+ var control=scope();
+ control.removed.delete(id);
+ if(!eligible(c))control.added.add(id);
+ draw();
+}
+function normalName(s){return String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim()}
+function renderRecipients(){
+ var currentScope=scope(),suggested=data.clientes.filter(eligible),selectedIds=new Set(audience.map(function(c){return c.id}));
+ var removed=suggested.filter(function(c){return currentScope.removed.has(c.id)}).length;
+ var extras=audience.filter(function(c){return !eligible(c)}).length;
+ write("recipientBadge","· "+audience.length);
+ write("selectedCount",audience.length);
+ write("recipientStatus",suggested.length+" sugeridos · "+removed+" quitados"+(extras?" · "+extras+" añadidos":""));
+ $("people").innerHTML=audience.length?audience.map(function(c){
+   return '<div class="person"><span class="person-info"><strong>'+escapeHTML(c.nombre)+
+    '</strong><small>'+escapeHTML(recipientLabel(c))+(eligible(c)?"":" · Añadido manualmente")+
+    '</small></span><button class="mini-button remove" type="button" data-recipient-remove="'+escapeHTML(c.id)+'" aria-label="Quitar a '+escapeHTML(c.nombre)+'">Quitar</button></div>';
+ }).join(""):'<div class="empty">Ningún destinatario seleccionado. Puedes recuperarlos buscándolos abajo o usar Restablecer.</div>';
+ var query=normalName($("recipientSearch").value);
+ var matching=query?data.clientes.filter(function(c){return !selectedIds.has(c.id)&&normalName(c.nombre).includes(query)}).slice(0,25):[];
+ $("available").innerHTML=!query?'<div class="empty">Busca por nombre para agregar a alguien.</div>':
+ !matching.length?'<div class="empty">No hay más clientes con ese nombre dentro de las cuentas disponibles.</div>':
+ matching.map(function(c){
+  var permitted=allowedToAdd(c),reason=permitted?recipientLabel(c):eligibilityReason(c);
+  return '<div class="person"><span class="person-info"><strong>'+escapeHTML(c.nombre)+
+   '</strong><small>'+escapeHTML(reason)+'</small></span><button class="mini-button add" type="button" data-recipient-add="'+escapeHTML(c.id)+
+   '" '+(permitted?"":'disabled title="No cumple los criterios para este aviso"')+' aria-label="Agregar a '+escapeHTML(c.nombre)+'">+ Agregar</button></div>';
+ }).join("");
+ var help={missions:"Solo pueden recibir este aviso clientes con misiones pendientes.",pay:"Puedes agregar a alguien con cobro futuro confirmado, incluso si faltan más de 7 días. Los pagos cubiertos quedan excluidos.",promo:"Estos son candidatos preliminares; la elegibilidad de cada promoción se verificará antes de cualquier envío.",general:"Puedes seleccionar cualquier cliente activo incluido en los datos autorizados."};
+ write("recipientHelp",help[current]);
+}
+
+function draw(){
+ if(!data)return;
+ audience=selectedRecipients();
+ var selected=$("sample").value;
+ $("sample").innerHTML=audience.length?audience.map(function(c){return '<option value="'+escapeHTML(c.id)+'">'+escapeHTML(c.nombre)+'</option>'}).join(""):'<option value="">Sin destinatarios</option>';
+ if(audience.some(function(c){return c.id===selected}))$("sample").value=selected;
+ var client=audience.find(function(c){return c.id===$("sample").value})||audience[0];
+ var tmpl=templates[current];
+ write("audienceCount",audience.length);
+ write("audienceLabel",current==="promo"?"candidatos":"clientes");
+ write("previewKind",tmpl.tag);
+ write("previewTitle",templateValue($("titleInput").value,client));
+ write("previewMessage",templateValue($("messageInput").value,client));
+ write("previewAction",tmpl.link);
+ var count=data.clientes.length,already=audience.filter(function(c){return (c.notificaciones_previas||[]).some(function(n){return n.tipo==="mision_recordatorio"})}).length;
+ var notices={
+  missions:audience.length+" clientes seleccionados con misiones pendientes de "+count+" cuentas activas analizadas.",
+  pay:audience.length+" clientes seleccionados con fecha de cobro confirmada, según Finanzas.",
+  promo:$("promotion").value?audience.length+" candidatos seleccionados por verificar antes de anunciar.":"Selecciona una promoción de Promotions Studio.",
+  general:audience.length+" clientes seleccionados para un comunicado."
+ };
+ write("audienceSummary",notices[current]);
+ var context={
+ missions:"GOXION consulta el avance real. "+already+" de los seleccionados ya recibieron al menos un recordatorio anterior. La deduplicación definitiva se validará antes de enviar.",
+ pay:"Solo se consideran fechas del motor financiero oficial. Las cuentas sin fecha confirmada no aparecen aquí.",
+ promo:"La promoción ya existe en Studio. Estos son candidatos preliminares: todavía falta comprobar elegibilidad, disponibilidad y condiciones por cliente.",
+ general:"GOXION excluye suspendidos, cuentas de prueba y clientes sin servicios activos."
+ };
+ write("contextText",context[current]);
+ $("contextHint").classList.toggle("warn",current==="promo");
+ renderRecipients();
+}
+function forgetRoster(){
+ data=null;audience=[];
+ $("people").innerHTML="";$("available").innerHTML="";
+ $("sample").innerHTML='<option value="">Sin destinatarios</option>';
+ write("existing","");
+}
+async function load(){
+ var myRequest=++requestSerial,needsLogin=false;
+ $("refresh").disabled=true;write("refresh","Actualizando…");$("error").classList.add("hidden");
+ var token=localStorage.getItem(tokenKey)||"";
+ if(!token){
+  forgetRoster();
+  $("auth").classList.remove("hidden");$("workspace").classList.add("hidden");
+  $("refresh").disabled=false;write("refresh","↻ Actualizar");
+  return;
+ }
+ try{
+  var res=await fetch(URL,{method:"POST",headers:{"Content-Type":"application/json","X-Admin-Token":token},body:JSON.stringify({accion:"resumen"}),cache:"no-store"});
+  if(myRequest!==requestSerial)return;
+  needsLogin=res.status===401||res.status===403;
+  var json=await res.json();
+  if(myRequest!==requestSerial)return;
+  if(!res.ok||json.ok!==true)throw Error(json.error||"No se pudo consultar la información.");
+  data=json;
+  $("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
+  var choice=$("promotion").value;
+  $("promotion").innerHTML='<option value="">Selecciona una promoción publicada</option>'+(json.promociones||[]).map(function(p){return '<option value="'+escapeHTML(p.id)+'">'+escapeHTML(p.titulo_publico||p.nombre)+'</option>'}).join("");
+  if(json.promociones?.some(function(p){return p.id===choice}))$("promotion").value=choice;
+  else if(current==="promo"&&json.promociones?.length)$("promotion").value=json.promociones[0].id;
+  else $("promotion").value="";
+  var active=(json.automatismos||[]).filter(function(x){return x.estado==="activo"});
+  write("existing",active.map(function(x){return "✓ "+x.nombre+" · "+x.owner}).join("   •   "));
+  draw();
+ }catch(e){
+  if(myRequest!==requestSerial)return;
+  forgetRoster(); // Fail closed: clear stale customer details from the page.
+  $("workspace").classList.add("hidden");
+  if(needsLogin)$("auth").classList.remove("hidden");
+  write("error",e.message||"No fue posible consultar comunicaciones.");$("error").classList.remove("hidden");
+ }finally{
+  if(myRequest===requestSerial){$("refresh").disabled=false;write("refresh","↻ Actualizar")}
+ }
+}
+
+document.querySelectorAll("[data-kind]").forEach(function(b){b.addEventListener("click",function(){choose(b.dataset.kind)})});
+$("promotion").addEventListener("change",function(){$("recipientSearch").value="";draw()});
+$("resetRecipients").addEventListener("click",function(){delete overrides[scopeKey()];$("recipientSearch").value="";draw()});
+$("recipientSearch").addEventListener("input",renderRecipients);
+$("people").addEventListener("click",function(event){
+ var button=event.target.closest("[data-recipient-remove]");
+ if(button)removeRecipient(button.getAttribute("data-recipient-remove"));
+});
+$("available").addEventListener("click",function(event){
+ var button=event.target.closest("[data-recipient-add]");
+ if(button&&!button.disabled)addRecipient(button.getAttribute("data-recipient-add"));
+});
+$("sample").addEventListener("change",draw);
+$("titleInput").addEventListener("input",function(){touched=true;draw()});
+$("messageInput").addEventListener("input",function(){touched=true;draw()});
+$("restoreTemplate").addEventListener("click",function(){touched=false;$("titleInput").value=templates[current].title;$("messageInput").value=templates[current].message;draw()});
+$("refresh").addEventListener("click",load);
+$("showExisting").addEventListener("click",function(){$("existing").classList.toggle("hidden")});
+$("titleInput").value=templates.missions.title;
+$("messageInput").value=templates.missions.message;
+load();
+})();
+</script>
+</body>
+</html>
