@@ -81,6 +81,26 @@ assert(serviceTemplate.includes('<details class="gx-service-access-details">'),"
 assert(serviceTemplate.indexOf('gx-smart-access-box')>serviceTemplate.indexOf('gx-service-access-details'),"Editor dentro de details");
 assert(accessController.includes("box.insertAdjacentHTML('beforebegin',"),"Resumen MÚLTIPLE dentro del desplegable, no en la lista");
 assert(!accessController.includes("details?.insertAdjacentHTML('beforebegin',"),"No mostrar resumen fuera de details");
+
+assert(accessController.includes("showArchitectureSummary && p.kind!=='multiplicador'"),
+  "X2 no debe repetir el recuadro MÚLTIPLE ni chips dentro de Editar acceso");
+assert(accessController.includes("p.items.length>1?"),
+  "Un acceso sencillo no debe mostrar una cabecera de conteo redundante");
+assert(accessController.includes("gx-tech-invite-help"),
+  "Información de privacidad compacta, no otra sección");
+assert(!accessController.includes("ID técnico listo ·"),
+  "Eliminar subtítulos técnicos repetidos");
+assert(!accessController.includes("Cada acceso es independiente: en un x2"),
+  "No duplicar explicaciones debajo de los accesos");
+const accessStyles=css.slice(css.indexOf("Octubre 2026 · Servicios / Editar acceso"));
+assert(accessStyles.length>3000,"Bloque de estilo de accesos existente");
+for(const needle of [".gx-tech-invite-grid input",".gx-tech-invite-grid select",
+  ".gx-tech-credential-grid input",".gx-technical-account-select",
+  "height:46px!important","font-size:14px!important",
+  ".gx-tech-invite-help","grid-template-columns:minmax(0,1fr)!important"]){
+ assert(accessStyles.includes(needle),"Falta norma visual: "+needle);
+}
+
 const handlers={};
 const listenerStart=accessController.indexOf("document.addEventListener('click',event=>{");
 const listenerEnd=accessController.indexOf("    // ---------- Detección visible por plataforma ----------",listenerStart);
