@@ -63,6 +63,29 @@ html.embedded body{background:transparent}
 html.embedded .wrap{max-width:none;padding:0 0 10px}
 html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #clientPanel,html.embedded .footer{display:none}
 @media(max-width:520px){.wrap{padding:12px}.panel{padding:12px}.editor-grid{grid-template-columns:1fr 1fr}.selected-profiles{grid-template-columns:1fr}.service-name{font-size:15px}.service-price{font-size:16px}}
+
+/* Calendario financiero: una fila por contrato, detalle puntual, sin paneles por acceso. */
+.contract-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);min-width:0}
+.contract-row:first-child{padding-top:4px}.contract-row:last-child{border-bottom:0}
+.contract-info{flex:1;min-width:0}.contract-side{display:flex;align-items:flex-end;flex-direction:column;flex:none;gap:3px}
+.contract-side>strong{font-size:17px;line-height:1.1}.contract-side .action-link{padding:5px 0;min-height:27px}
+.service-meta{line-height:1.35;overflow-wrap:anywhere}
+.detail-heading{padding-bottom:13px;border-bottom:1px solid var(--line)}
+.back-link{display:inline-flex;background:none;border:0;color:var(--cyan);font-size:13px;font-weight:700;padding:2px 0 13px}
+.detail-name{font-size:18px;font-weight:700}.detail-sub{font-size:12px;color:var(--quiet);margin-top:3px}
+.access-row{padding:12px 0;border-bottom:1px solid var(--line)}
+.access-row:last-of-type{border:0}.access-heading{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px;font-size:15px}
+.access-heading>span{color:var(--quiet);font-size:14px}
+.access-date-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:end}
+.access-date-row .field{min-width:0}
+.access-date-row input[type=date]{display:block;width:100%;min-width:0;max-width:100%;font-size:15px;text-align:left;color-scheme:dark}
+.access-date-row .small-btn{height:40px;white-space:nowrap;padding:8px 12px}
+.access-row .tick{margin-top:7px;font-size:12px}.access-row .tick input{margin:0}
+.edit-caption{padding:11px 0 0;margin:0;line-height:1.35}
+.services-actions{display:flex;justify-content:flex-end;padding-top:5px}
+#unify[type=date]{color-scheme:dark}
+@media(max-width:520px){.contract-row{gap:8px}.contract-side{min-width:74px}.access-date-row{grid-template-columns:minmax(0,1fr) 70px;gap:7px}.access-date-row .small-btn{padding:8px 6px}}
+
 </style></head>
 <body><main class="wrap">
 <header><span class="state">SIMULACIÓN · SIN CAMBIOS</span><a href="../../admin.html">← Admin</a></header>
@@ -75,7 +98,7 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 <section class="panel" id="servicesPanel">
 <div class="section-title"><h2>Servicios</h2><span class="state">Solo simulación</span></div>
 <div id="services"><p class="muted">Selecciona un cliente.</p></div>
-<div style="display:flex;justify-content:flex-end"><button type="button" id="reset" class="action-link">↺ Restablecer</button></div>
+<div id="servicesActions" class="services-actions"><button type="button" id="reset" class="action-link">↺ Restablecer simulación</button></div>
 </section>
 <section class="panel">
 <div class="section-title"><h2>Pago que quieres revisar</h2></div>
@@ -94,7 +117,7 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 </section>
 <section class="panel">
 <details class="more" id="unifyPanel" style="margin-top:0;padding-top:0;border:0"><summary>¿Unificar las fechas?</summary>
-<div class="more-body"><label class="field">Renovar todo el día<select id="unify" class="selector"><option value="">No cambiar fechas</option></select></label>
+<div class="more-body"><label class="field">Elegir fecha en calendario<input type="date" id="unify" class="selector" aria-label="Fecha para unificar los días de renovación"></label><p class="sub">Usaremos el día elegido para las próximas renovaciones, sin recortar días ya pagados.</p>
 <div id="adjustments"></div><p class="sub">La diferencia por días se calcula automáticamente. Aquí solo la estamos simulando.</p>
 </div></details>
 </section>
@@ -118,7 +141,7 @@ const niceDate=x=>{
  return new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(Date.UTC(y,m-1,d)));
 };
 const choices=()=>document.querySelectorAll("[data-pay]");
-let clients=[],current=null,result=null,serial=0,plan={servicios:{},pago:{modo:"proximo"}},opened=new Set();
+let clients=[],current=null,result=null,serial=0,plan={servicios:{},pago:{modo:"proximo"}},editingContract=null;
 function errorText(x){$("error").textContent=x||"";$("error").classList.toggle("hidden",!x)}
 function clearScreen(){
  ["services","groups","allocations","adjustments","warnings","selected"].forEach(id=>$(id).innerHTML="");
@@ -137,23 +160,8 @@ async function request(accion,datos){
  if(!response.ok||data.ok!==true)throw Error(data.error||"No fue posible consultar el calendario.");
  return data;
 }
-function daysOptions(selected,empty){
- let html=empty?'<option value="">Sin cambios</option>':"";
- for(let day=1;day<=31;day++)html+='<option value="'+day+'"'+(String(selected)===String(day)?' selected':'')+'>Día '+day+'</option>';
- return html;
-}
-function dayDate(due,day,today){
- const parts=due.split("-").map(Number),last=new Date(Date.UTC(parts[0],parts[1],0)).getUTCDate();
- let iso=new Date(Date.UTC(parts[0],parts[1]-1,Math.min(day,last))).toISOString().slice(0,10);
- if(iso<today){
-   const next=new Date(Date.UTC(parts[0],parts[1],1));
-   const end=new Date(Date.UTC(next.getUTCFullYear(),next.getUTCMonth()+1,0)).getUTCDate();
-   iso=new Date(Date.UTC(next.getUTCFullYear(),next.getUTCMonth(),Math.min(day,end))).toISOString().slice(0,10);
- }
- return iso;
-}
 function reset(){
- serial++;result=null;opened.clear();
+ serial++;result=null;editingContract=null;
  plan={servicios:{},pago:{modo:"proximo"}};
  $("amount").value="";$("unify").value="";
  $("extraOptions").open=false;$("unifyPanel").open=false;$("allocationsDetails").open=false;
@@ -172,23 +180,57 @@ function markPay(mode){
  }
  simulate();
 }
+
+function contractGroups(items){
+ const groups=new Map();
+ for(const item of items){
+   const key=item.cliente_servicio_id||item.id;
+   if(!groups.has(key))groups.set(key,{id:key,items:[],price:0});
+   const g=groups.get(key);
+   g.items.push(item);g.price+=item.monto_base_centavos;
+ }
+ return Array.from(groups.values()).map(g=>{
+   g.items.sort((a,b)=>a.unidad-b.unidad);
+   const raw=g.items[0].nombre||"Servicio";
+   g.name=raw.replace(/\s*[·•]\s*Perfil\s+\d+\s*$/i,"").trim();
+   if(g.items.length>1)g.name+=" (x"+g.items.length+")";
+   return g;
+ });
+}
+function contractSummary(g){
+ const dates=[...new Set(g.items.map(x=>x.fecha_vencimiento))].sort();
+ if(dates.length===1)return "Renueva el "+niceDate(dates[0]);
+ if(dates.length===2)return "Fechas: "+dates.map(niceDate).join(" · ");
+ return dates.length+" fechas · Próxima: "+niceDate(dates[0]);
+}
 function drawServices(){
  const items=result?.calendario?.servicios||[];
- $("services").innerHTML=items.map(s=>{
-   const state=plan.servicios[s.id]||{};
-   const expanded=opened.has(s.id);
-   const due=state.cobertura_hasta||s.fecha_vencimiento;
-   return '<div class="service" data-id="'+esc(s.id)+'">'+
-      '<div class="service-top"><div class="service-main"><div class="service-name">'+esc(s.nombre)+'</div>'+
-      '<div class="service-meta">'+(s.cobertura_confirmada?'Fecha comprobada · ':'Próximo vencimiento estimado · ')+esc(niceDate(due))+'</div></div>'+
-      '<div class="service-right"><div class="service-price">'+money(s.monto_base_centavos)+'</div>'+
-      '<button type="button" class="action-link" data-edit="'+esc(s.id)+'">'+(expanded?'Cerrar':'Cambiar fecha')+'</button></div></div>'+
-      (expanded?'<div class="editor"><div class="editor-head"><span>Fecha de este perfil</span><button type="button" class="small-btn" data-use-default="'+esc(s.id)+'">Usar fecha general</button></div>'+
-         '<div class="editor-grid"><label class="field">Renueva cada día<select data-field="dia_de_renovacion">'+daysOptions(state.dia_original??s.dia_original,false)+'</select></label>'+
-         '<label class="field">Próximo vencimiento<input type="date" data-field="cobertura_hasta" value="'+esc(due)+'"></label></div>'+
-         '<label class="tick"><input type="checkbox" data-field="cobertura_confirmada" '+(s.cobertura_confirmada?'checked':'')+'>Ya verifiqué esta fecha</label>'+
-         '<div class="edit-caption">Al cambiar un día, calculamos la próxima fecha. Puedes corregir el mes o día exacto aquí mismo.</div></div>':'')+'</div>';
- }).join("");
+ const groups=contractGroups(items);
+ const chosen=groups.find(g=>g.id===editingContract);
+ const actions=$("servicesActions");
+ if(actions)actions.classList.toggle("hidden",Boolean(chosen));
+ if(chosen){
+   $("services").innerHTML='<div class="detail-heading"><button type="button" class="back-link" data-back="1" aria-label="Volver a servicios">‹ Servicios</button>'+
+     '<div class="detail-name">'+esc(chosen.name)+'</div><div class="detail-sub">'+money(chosen.price)+' por renovación · '+chosen.items.length+' '+(chosen.items.length===1?'acceso':'accesos')+'</div></div>'+
+     chosen.items.map((item,i)=>{
+       const cfg=plan.servicios[item.id]||{};
+       const date=cfg.cobertura_hasta||item.fecha_vencimiento;
+       const label=chosen.items.length>1?"Acceso "+item.unidad:"Próxima renovación";
+       return '<div class="access-row" data-id="'+esc(item.id)+'">'+
+         '<div class="access-heading"><strong>'+esc(label)+'</strong><span>'+money(item.monto_base_centavos)+'</span></div>'+
+         '<div class="access-date-row"><label class="field">Fecha de vencimiento<input type="date" data-field="cobertura_hasta" value="'+esc(date)+'" aria-label="Fecha de vencimiento de '+esc(label)+'"></label>'+
+         '<button type="button" class="small-btn reset-access" data-use-default="'+esc(item.id)+'">General</button></div>'+
+         '<label class="tick"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?'checked':'')+'> Fecha verificada</label>'+
+         '</div>';
+     }).join("")+
+     '<p class="edit-caption">Elige la fecha desde el calendario. GOXION calcula el día de renovación automáticamente; el cambio todavía es una simulación.</p>';
+   return;
+ }
+ $("services").innerHTML=groups.map(g=>'<div class="contract-row" data-contract="'+esc(g.id)+'">'+
+   '<div class="contract-info"><div class="service-name">'+esc(g.name)+'</div>'+
+   '<div class="service-meta">'+esc(contractSummary(g))+'</div></div>'+
+   '<div class="contract-side"><strong>'+money(g.price)+'</strong>'+
+   '<button type="button" class="action-link" data-manage="'+esc(g.id)+'" aria-label="Gestionar fechas de '+esc(g.name)+'">Fechas ›</button></div></div>').join("");
 }
 function draw(){
  if(!result)return;
@@ -223,7 +265,7 @@ async function simulate(){
    if(amount)plan.pago.importe=Number(amount);
    else delete plan.pago.importe;
    const unify=$("unify").value;
-   if(unify)plan.unificar_dia=Number(unify);else delete plan.unificar_dia;
+   if(unify)plan.unificar_dia=Number(unify.slice(-2));else delete plan.unificar_dia;
    const data=await request("simular_calendario_beta",{cliente_id:current,propuesta:plan});
    if(generation!==serial)return;
    result=data;draw();
@@ -237,7 +279,7 @@ async function load(){
    clients=d.clientes||[];
    $("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
    $("client").innerHTML='<option value="">Selecciona un cliente</option>'+clients.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nombre)+' · '+c.numero_servicios+' servicios</option>').join("");
-   $("unify").innerHTML=daysOptions(null,true);
+   $("unify").value="";
    $("status").textContent="Solo simulación";
    if(embedded&&initialClient){
       if(clients.some(c=>c.id===initialClient)){$("client").value=initialClient;current=initialClient;reset();}
@@ -246,16 +288,18 @@ async function load(){
  }catch(e){errorText(e?.message||"No se pudo cargar");$("auth").classList.remove("hidden")}
 }
 $("client").addEventListener("change",function(){current=this.value||null;reset()});
+
 $("services").addEventListener("click",function(ev){
- const edit=ev.target.closest?.("[data-edit]");
- if(edit){
-   const id=edit.getAttribute("data-edit");
-   if(opened.has(id))opened.delete(id);else opened.add(id);
+ const manage=ev.target.closest?.("[data-manage]");
+ if(manage){
+   editingContract=manage.getAttribute("data-manage");
    drawServices();return;
  }
- const resetUnit=ev.target.closest?.("[data-use-default]");
- if(resetUnit){
-   const id=resetUnit.getAttribute("data-use-default");
+ const back=ev.target.closest?.("[data-back]");
+ if(back){editingContract=null;drawServices();return;}
+ const general=ev.target.closest?.("[data-use-default]");
+ if(general){
+   const id=general.getAttribute("data-use-default");
    delete plan.servicios[id];simulate();
  }
 });
@@ -263,25 +307,20 @@ $("services").addEventListener("change",function(ev){
  const field=ev.target.dataset.field,container=ev.target.closest?.("[data-id]");
  if(!field||!container)return;
  const id=container.dataset.id;
- const state=plan.servicios[id]||(plan.servicios[id]={});
- const service=result?.calendario?.servicios.find(s=>s.id===id);
- if(field==="dia_de_renovacion"){
-   const day=Number(ev.target.value);
-   if(!Number.isInteger(day)||day<1||day>31)return;
-   state.dia_original=day;
-   state.cobertura_hasta=dayDate(state.cobertura_hasta||service.fecha_vencimiento,day,result.calendario.fecha_calculo);
-   state.cobertura_confirmada=false;
- }else if(field==="cobertura_hasta"){
+ const svc=result?.calendario?.servicios?.find(x=>x.id===id);
+ if(!svc)return;
+ const cfg=plan.servicios[id]||(plan.servicios[id]={});
+ if(field==="cobertura_hasta"){
    if(!ev.target.value)return;
-   state.cobertura_hasta=ev.target.value;
-   state.dia_original=Number(ev.target.value.slice(-2));
-   state.cobertura_confirmada=false;
+   cfg.cobertura_hasta=ev.target.value;
+   cfg.dia_original=Number(ev.target.value.slice(-2));
+   cfg.cobertura_confirmada=false;
  }else if(field==="cobertura_confirmada"){
-   if(ev.target.checked&&!state.cobertura_hasta){
-     state.cobertura_hasta=service.fecha_vencimiento;
-     state.dia_original=service.dia_original;
+   if(ev.target.checked&&!cfg.cobertura_hasta){
+     cfg.cobertura_hasta=svc.fecha_vencimiento;
+     cfg.dia_original=svc.dia_original;
    }
-   state.cobertura_confirmada=ev.target.checked;
+   cfg.cobertura_confirmada=ev.target.checked;
  }
  simulate();
 });
