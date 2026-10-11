@@ -143,7 +143,20 @@ function create({token='mock-token',fetcher=async()=>({ok:true,status:200,json:a
  assert.equal(h.el.audienceCount.textContent,'0','Promoción expirada no genera audiencia');
 }
 
-// Caso 10: formato y valores hostiles no escriben en backend, única acción resumen.
+// Caso 10: mensajes claros cuando vence hoy, mañana o en un plazo largo.
+{
+ const people=[person('hoy',{dias_para_cobro:0}),person('manana',{dias_para_cobro:1}),person('lejos',{dias_para_cobro:30})];
+ const h=create({fetcher:async()=>({ok:true,status:200,json:async()=>packageData(people)})});await settle();h.select('pay');
+ assert.equal(h.el.audienceCount.textContent,'2','Cobro en siete días incluye hoy y mañana');
+ h.change('sample','hoy');
+ assert(h.el.previewMessage.textContent.includes('corte es hoy'),'Cobro hoy no debe decir faltan 0 días');
+ h.change('sample','manana');
+ assert(h.el.previewMessage.textContent.includes('falta 1 día'),'Plural correcto de mañana');
+ h.recipient('add','lejos');h.change('sample','lejos');
+ assert(h.el.previewMessage.textContent.includes('faltan 30 días'),'Manual fuera de 7 días indica plazo correcto');
+}
+
+// Caso 11: formato y valores hostiles no escriben en backend, única acción resumen.
 {
  const calls=[];
  const h=create({fetcher:async(u,o)=>{calls.push(JSON.parse(o.body));return{ok:true,status:200,json:async()=>packageData([person('a')])}}});await settle();
@@ -151,4 +164,4 @@ function create({token='mock-token',fetcher=async()=>({ok:true,status:200,json:a
  assert.equal(h.el.previewTitle.textContent,'<script>alert("test")</script>','Se escribe solo en textContent');
  assert.equal(calls.length,1);assert.equal(calls[0].accion,'resumen');
 }
-console.log('Comunicaciones stress · 10 escenarios críticos comprobados.');
+console.log('Comunicaciones stress · 11 escenarios críticos comprobados.');
