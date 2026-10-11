@@ -157,7 +157,7 @@
             const oldVisible=card.querySelector('.gx-access-visible-summary');
             if(oldVisible) oldVisible.remove();
 
-            if(showArchitectureSummary){
+            if(showArchitectureSummary && p.kind!=='multiplicador'){
                 const details=card.querySelector('.gx-service-access-details');
                 const label=p.kind==='combo_legacy'?'COMBO':
                     p.kind==='combo_formal'?'COMBO':
@@ -185,8 +185,8 @@
             box.innerHTML=`<div class="gx-beta-access-preview">
                 <div class="gx-beta-access-preview-head">
                     <div>
-                        <strong>${p.items.length} acceso${p.items.length===1?'':'s'} real${p.items.length===1?'':'es'}</strong>
-                        <small>${p.kind==='combo_legacy'?'Combo existente':p.kind==='combo_formal'?'Combo formal':p.kind==='multiplicador'?'Múltiples accesos de la misma plataforma':p.kind==='individual'?'Acceso individual':'Servicio especial'}</small>
+                        <strong>${p.items.length} acceso${p.items.length===1?'':'s'}</strong>
+                        ${p.kind==='combo_legacy'||p.kind==='combo_formal'?`<small>Servicios del paquete</small>`:''}
                     </div>
                     <span>Activo</span>
                 </div>
@@ -206,8 +206,8 @@
                     const inviteState=access?.estado_invitacion || 'sin_verificar';
                     return `<div class="gx-beta-access-row gx-beta-access-row-live ${isInvite?'gx-invite-access':''}">
                         <div class="gx-tech-access-main">
-                            <strong>${esc(x.servicio)}${repeated?` · acceso ${x.ordinal}`:''}</strong>
-                            <small>${access?`ID técnico listo · ${isInvite?'beneficio en cuenta personal':current?`cuenta ${esc(current.alias)}`:'pendiente de cuenta compartida'}`:'No materializado'}</small>
+                            <strong>${repeated?`Acceso ${x.ordinal}`:esc(x.servicio)}</strong>
+                            <small>${access?(isInvite?'Cuenta personal del cliente':current?`Cuenta: ${esc(current.alias)}`:'Sin cuenta compartida asignada'):'Acceso pendiente de configurar'}</small>
 
                             ${access ? (isInvite ? `
                                 <div class="gx-tech-invite-grid">
@@ -226,9 +226,7 @@
                                         </select>
                                     </label>
                                 </div>
-                                <div class="gx-tech-password-line gx-invite-note">
-                                    <div><span>Acceso personal</span><small>El cliente entra con su propia cuenta. GOXION no almacena ni entrega su contraseña.</small></div>
-                                </div>
+                                <p class="gx-tech-invite-help">Usa su propia cuenta; GOXION no guarda su contraseña.</p>
                             ` : `
                                 <div class="gx-tech-credential-grid">
                                     <label>
@@ -267,7 +265,7 @@
                 }).join('')}
 
                 ${p.issues.length?`<div class="gx-access-diagnostic-note warn">${esc(p.issues.join(' · '))}</div>`:''}
-                ${p.items.length>1?`<div class="gx-access-diagnostic-note">Cada acceso es independiente: en un x2 puedes distribuirlos entre cuentas madre distintas sin cambiar la contratación.</div>`:''}
+
             </div>`;
         });
     }
