@@ -73,6 +73,25 @@ Pruebas en `scripts/comunicaciones-beta-smoke.mjs` y `scripts/comunicaciones-res
 **Recomendación:** no añadir nuevas pestañas ni filtros generales. Conservar «Elegir motivo → sugerencia → editar destinatarios → vista previa»; invertir el siguiente bloque de trabajo en el contrato seguro de envío y registro, no en más interfaz.
 
 
+## Etapa de seguridad del envío · Beta backend v8 (11/oct/2026)
+
+Sin alterar la navegación, interfaz visual, clientes, tablas ni flujos oficiales, se amplió **la función Edge existente** \`comunicaciones-admin-preview\` (no se creó otro motor) con un comando separado \`accion: "validar_plan"\`. La función **sigue siendo de solo lectura**: no dispone de operaciones para crear campañas ni insertar avisos reales.
+
+La validación se realiza desde el servidor con la sesión administrativa actual y requiere:
+- \`plan.tipo\`: \`missions\`, \`pay\`, \`promo\` o \`general\`.
+- \`plan.id_campana\`: UUID del intento/campaña (todavía no persistido).
+- \`plan.agregar_ids\` y \`plan.excluir_ids\`: IDs UUID, máximo 200 por selección, sin solapamiento.
+- \`plan.promocion_id\`: solo para promoción y debe existir, estar vigente/publicada y habilitada para adquisición.
+
+**Validaciones:** reconstruye lista con clientes no suspendidos, no de prueba y con servicio activo; compara progreso **confirmado** de misiones contra la versión actual; toma cobros no cubiertos de \`goxion_estado_financiero\`; verifica en promociones \`goxion_promocion_elegibilidad\` y \`goxion_promocion_disponibilidad\` por cliente; descarta manuales no elegibles; consulta \`cliente_notificaciones\` con \`dedupe_key\` exacta (\`comunicaciones:<id_campana>:<tipo>\`) para evitar proponer duplicados de la misma campaña. Para cobros admite seleccionar manualmente fechas verificadas más lejanas a 7 días. Ante fallo SQL, sin stock o elegibilidad no confirmada se excluye y explica el motivo.
+
+**Bloqueos:** validación de fecha **actual real** exclusivamente; si una consulta base llega al límite de 1,000 registros se rechaza en vez de confiar en datos potencialmente truncados; evita listas de más de 500 evaluados por intento; tokens HMAC obligatorios; la respuesta devuelve \`modo: "validacion_sin_envio"\`, \`envios_realizados: 0\` y \`habilita_envio: false\`.
+
+**Pruebas reproducibles:** \`scripts/comunicaciones-plan-beta-smoke.mjs\` utiliza exactamente el bloque de validación del archivo \`docs/edge/comunicaciones-admin-preview.ts\` (copia versionada de la Edge desplegada) y ensaya 20 escenarios con datos ficticios: exclusiones, pagos cubiertos, manuales que no cumplen reglas, stock no disponible, fallos RPC, duplicados, promoción cerrada, más de 500 clientes e IDs inválidos. Integradas a \`npm run test:comunicaciones\`.
+
+**Pendiente antes de envíos:** autorización de campaña persistida y doble confirmación, bitácora transaccional de destinatarios, reserva de clave/idempotencia de escritura, revalidación al ejecutar, preferencia comercial/frecuencia, programador, paginación completa, prueba autenticada en web/iOS y entrega efectiva en la campana existente. No interpretar una simulación como un mensaje enviado ni usar un UUID nuevo para evadir límites de frecuencia.
+
+
 ## Recursos de esta entrega
 
 - `preview/comunicaciones/index.html`: interfaz responsiva y protegida por sesión administrativa. Borrador local y preview personalizado, filtros combinados, lista exacta de destinatarios y exclusión individual.
