@@ -99,6 +99,14 @@ for(const needle of [".gx-tech-invite-grid input",".gx-tech-invite-grid select",
   "height:46px!important","font-size:14px!important",
   ".gx-tech-invite-help","grid-template-columns:minmax(0,1fr)!important"]){
  assert(accessStyles.includes(needle),"Falta norma visual: "+needle);
+
+assert(accessController.includes('gxUpdateTechnicalAccess('),
+ "La edición de correo/estado conserva su acción existente");
+assert(accessController.includes('gxAssignTechnicalAccess('),
+ "La asignación de grupo o licencia conserva su acción existente");
+assert(accessController.includes('gxOpenTechnicalPassword('),
+ "La gestión de contraseña compartida conserva su acceso");
+
 }
 
 const handlers={};
