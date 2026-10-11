@@ -76,15 +76,16 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 .access-row{padding:12px 0;border-bottom:1px solid var(--line)}
 .access-row:last-of-type{border:0}.access-heading{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:8px;font-size:15px}
 .access-heading>span{color:var(--quiet);font-size:14px}
-.access-date-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:9px;align-items:end}
-.access-date-row .field{min-width:0}
-.access-date-row input[type=date]{display:block;width:100%;min-width:0;max-width:100%;font-size:15px;text-align:left;color-scheme:dark}
-.access-date-row .small-btn{height:40px;white-space:nowrap;padding:8px 12px}
+.access-date-row{display:block;min-width:0;width:100%;max-width:100%}
+.access-date-heading{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:7px;font-size:12px;font-weight:700;color:#c2cade;min-width:0}
+.access-date-heading .reset-access{flex:none;background:transparent;border:0;color:#9cdef0;padding:2px 0;font-size:12px;font-weight:700;white-space:nowrap}
+.access-date-row input[type=date]{display:block;box-sizing:border-box;width:100%;min-width:0;max-width:100%;height:46px;min-height:46px;margin:0;padding:9px 12px;border-radius:11px;border:1px solid rgba(194,193,219,.19);background:#0b0b12;color:var(--ink);font-size:16px;text-align:left;color-scheme:dark}
+.access-date-row input[type=date]:focus{outline:0;border-color:#af80e2}
 .access-row .tick{margin-top:7px;font-size:12px}.access-row .tick input{margin:0}
 .edit-caption{padding:11px 0 0;margin:0;line-height:1.35}
 .services-actions{display:flex;justify-content:flex-end;padding-top:5px}
 #unify[type=date]{color-scheme:dark}
-@media(max-width:520px){.contract-row{gap:8px}.contract-side{min-width:74px}.access-date-row{grid-template-columns:minmax(0,1fr) 70px;gap:7px}.access-date-row .small-btn{padding:8px 6px}}
+@media(max-width:520px){.contract-row{gap:8px}.contract-side{min-width:74px}.access-date-heading{align-items:center}.access-date-row input[type=date]{width:100%;min-width:0}}
 
 </style></head>
 <body><main class="wrap">
@@ -218,8 +219,9 @@ function drawServices(){
        const label=chosen.items.length>1?"Acceso "+item.unidad:"Próxima renovación";
        return '<div class="access-row" data-id="'+esc(item.id)+'">'+
          '<div class="access-heading"><strong>'+esc(label)+'</strong><span>'+money(item.monto_base_centavos)+'</span></div>'+
-         '<div class="access-date-row"><label class="field">Fecha de vencimiento<input type="date" data-field="cobertura_hasta" value="'+esc(date)+'" aria-label="Fecha de vencimiento de '+esc(label)+'"></label>'+
-         '<button type="button" class="small-btn reset-access" data-use-default="'+esc(item.id)+'">General</button></div>'+
+         '<div class="access-date-row"><div class="access-date-heading"><span>Fecha de vencimiento</span>'+
+         '<button type="button" class="reset-access" data-use-default="'+esc(item.id)+'">Usar fecha general</button></div>'+
+         '<input type="date" data-field="cobertura_hasta" value="'+esc(date)+'" aria-label="Fecha de vencimiento de '+esc(label)+'"></div>'+
          '<label class="tick"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?'checked':'')+'> Fecha verificada</label>'+
          '</div>';
      }).join("")+
