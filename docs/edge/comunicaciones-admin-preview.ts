@@ -269,7 +269,7 @@ Deno.serve(async req=>{
      if(titulo.length<3||titulo.length>90||mensaje.length<6||mensaje.length>420)
        return respond({ok:false,error:"Título o mensaje fuera de límites."},400);
      const allText=titulo+" "+mensaje;
-     const placeholders=[...allText.matchAll(/\\{([^{}]{1,50})\\}/g)].map(m=>m[1]);
+     const placeholders=[...allText.matchAll(/\{([^{}]{1,50})\}/g)].map(m=>m[1]);
      if(placeholders.some(p=>!["nombre","hechas","total","pendientes","dias_cobro","aviso_cobro","promocion"].includes(p)))
        return respond({ok:false,error:"El mensaje contiene variables no permitidas."},400);
      const promoId=v.tipo==="promo"?body.plan.promocion_id:null;
