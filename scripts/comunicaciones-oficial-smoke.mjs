@@ -9,7 +9,7 @@ const js=page.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert(js,"Falta el controlador oficial");
 new vm.Script(js);
 assert(admin.includes("window.location.href='./comunicaciones.html'"),"No hay acceso desde Gestión");
-assert(edge.includes('body.accion==="programar"')&&edge.includes('body.accion==="enviar"'),"Faltan acciones de backend");
+assert(edge.includes('"enviar","programar"')&&edge.includes('if(body.accion==="programar")'),"Faltan acciones de backend");
 assert(edge.includes('body.accion==="cancelar_programada"'),"Falta cancelación de programaciones");
 const ids=[...page.matchAll(/\bid="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(new Set(ids).size,ids.length,"IDs repetidos");
