@@ -304,10 +304,10 @@ async function enviar(){
   var message="GOXION validó "+checked.elegibles+" destinatarios.";
   if(checked.omitidos.length)message+=" Excluyó "+checked.omitidos.length+".";
   if(iso){
-   message+="\\n\\nAl programar, GOXION volverá a comprobar las condiciones antes de enviar.";
-   message+="\\nFecha: "+new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeStyle:"short",timeZone:"America/Merida"}).format(new Date(iso));
+   message+="\n\\nAl programar, GOXION volverá a comprobar las condiciones antes de enviar.";
+   message+="\nFecha: "+new Intl.DateTimeFormat("es-MX",{dateStyle:"medium",timeStyle:"short",timeZone:"America/Merida"}).format(new Date(iso));
  }else{
-   message+="\\n\\n¿Confirmas enviarles este aviso a la campana de Mi Espacio?";
+   message+="\n\\n¿Confirmas enviarles este aviso a la campana de Mi Espacio?";
  }
   if(!window.confirm(message)){write("deliveryStatus","Envío cancelado. No se enviaron mensajes.");return;}
   write("deliveryStatus",iso?"Guardando programación…":"Registrando avisos confirmados…");
