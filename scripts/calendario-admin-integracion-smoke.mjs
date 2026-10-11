@@ -109,6 +109,19 @@ assert(accessController.includes('gxOpenTechnicalPassword('),
 
 }
 
+
+assert(accessController.includes('gx-invite-group-details'),"Asociación de grupo dentro del detalle opcional");
+assert(accessController.includes("access.cuenta_id?'open':''"),"Si ya está vinculado, su grupo se muestra abierto");
+assert(accessController.includes("Vincular a grupo (opcional)"),"Etiqueta clara para asociación interna");
+assert(accessController.includes("Solo organiza accesos; no activa licencias ni invitaciones"),
+ "Explicar que la vinculación no activa la licencia externa");
+assert(!accessController.includes("'Beneficio activo':'Revisar estado'"),
+ "La cápsula del beneficio no debe duplicar el estado del selector");
+assert(accessController.includes("'Asignado':'Pendiente'"),
+ "Los estados de las cuentas compartidas se conservan");
+assert(css.includes(".gx-invite-group-details>summary"),
+ "El grupo opcional se pliega sin cambiar el resto de la pantalla");
+
 const handlers={};
 const listenerStart=accessController.indexOf("document.addEventListener('click',event=>{");
 const listenerEnd=accessController.indexOf("    // ---------- Detección visible por plataforma ----------",listenerStart);
