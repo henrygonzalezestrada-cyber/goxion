@@ -56,38 +56,43 @@ assert.equal(no.nodes.auth.classList.contains("hidden"),false);
 const x=setup("simulated-token");await flush();
 assert.equal(x.calls[0].accion,"listar_calendarios_beta");
 assert.equal(x.nodes.workspace.classList.contains("hidden"),false);
-assert(x.nodes.unify.innerHTML.includes('value="1"')&&x.nodes.unify.innerHTML.includes('value="31"'),
- "La unificación ofrece todos los días 1 a 31");
+assert(html.includes('type="date" id="unify"'),"La unificación usa calendario nativo");
 x.nodes.client.value="example";
 x.nodes.client.events.change.call(x.nodes.client);await flush();
 assert.equal(x.calls.at(-1).accion,"simular_calendario_beta");
 assert(x.nodes.groups.innerHTML.includes("15 nov"),"Heredar el día 15 sin modificaciones");
-assert(x.nodes.services.innerHTML.includes("Cambiar fecha"),"Mostrar edición simple por perfil");
-assert(x.nodes.services.innerHTML.includes('Día 1')===false,"El editor se oculta hasta tocar Cambiar fecha");
+
+assert(x.nodes.services.innerHTML.includes("Fechas ›"),"Un acceso compacto por contratación");
+assert(!x.nodes.services.innerHTML.includes('class="access-row"'),"Los controles permanecen fuera de la lista");
+assert.equal((x.nodes.services.innerHTML.match(/class="contract-row"/g)||[]).length,2);
 x.nodes.services.events.click({target:{closest(selector){
- if(selector==="[data-edit]")return {getAttribute:()=> "netflix"};
+ if(selector==="[data-manage]")return {getAttribute:()=> "netflix"};
  return null;
 }}});
-assert(x.nodes.services.innerHTML.includes('Día 1')&&x.nodes.services.innerHTML.includes('Día 31'),
- "El selector del perfil ofrece todos los días, incluidos 1 a 5");
-assert(x.nodes.services.innerHTML.includes("Próximo vencimiento"),"Edición con lenguaje claro");
+assert(x.nodes.services.innerHTML.includes('class="access-row"'),"Abrir detalle del contrato");
+assert(x.nodes.services.innerHTML.includes('type="date"'),"Seleccionar vencimiento directamente con calendario");
+assert(!x.nodes.services.innerHTML.includes("Renueva cada día"),"No mostrar selector de día manual");
+assert.equal((x.nodes.services.innerHTML.match(/class="access-row"/g)||[]).length,1);
 x.modes[1].events.click();await flush();
 assert.equal(x.calls.at(-1).datos.propuesta.pago.modo,"todos");
 assert.equal(x.nodes.total.textContent,"$210.00");
-function change(id,field,value,type="select-one"){
+function change(id,field,value,type="date"){
  const target={dataset:{field},type,value,checked:value===true,
   closest(selector){return selector==="[data-id]"?{dataset:{id}}:null}};
  x.nodes.services.events.change({target});
 }
-change("netflix","dia_de_renovacion","5");
-await flush();
-assert(x.nodes.services.innerHTML.includes("5 nov"),"Día 5 calcula próxima renovación automáticamente");
+change("netflix","cobertura_hasta","2026-11-05");await flush();
+assert.equal(x.calls.at(-1).datos.propuesta.servicios.netflix.dia_original,5,"Deduce día 5 de la fecha elegida");
 assert.equal(x.calls.at(-1).datos.propuesta.servicios.netflix.cobertura_hasta,"2026-11-05");
-change("disney","cobertura_hasta","2026-11-20","date");await flush();
+change("disney","cobertura_hasta","2026-11-20");await flush();
 assert.equal(x.calls.at(-1).datos.propuesta.servicios.disney.dia_original,20);
 assert(x.nodes.groups.innerHTML.includes("20 nov"),"Dos fechas distintas se reflejan");
-x.nodes.unify.value="1";x.nodes.unify.events.change();await flush();
-assert.equal(x.calls.at(-1).datos.propuesta.unificar_dia,1,"El día 1 está disponible");
+x.nodes.services.events.click({target:{closest(selector){if(selector==="[data-back]")return {};return null;}}});
+assert.equal((x.nodes.services.innerHTML.match(/class="contract-row"/g)||[]).length,2,"Volver a servicios compactos");
+x.nodes.unify.value="2026-11-01";x.nodes.unify.events.change();await flush();
+assert.equal(x.calls.at(-1).datos.propuesta.unificar_dia,1,"El calendario permite día 1");
+x.nodes.unify.value="2026-11-31";x.nodes.unify.events.change();await flush();
+assert.equal(x.calls.at(-1).datos.propuesta.unificar_dia,31,"El cálculo maneja ancla día 31");
 assert(x.calls.every(c=>["listar_calendarios_beta","simular_calendario_beta"].includes(c.accion)),
  "Ninguna acción registra pagos");
-console.log("GOXION calendario intuitivo: auth, día 1–31, edición por perfil, pago único/conjunto y cero escrituras PASS.");
+console.log("GOXION calendario: contratos compactos, calendario por acceso, X2, pago conjunto y cero escrituras PASS.");
