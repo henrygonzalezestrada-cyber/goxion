@@ -341,3 +341,10 @@ La RPC bloquea al cliente para serializar operaciones, lee el estado oficial des
 
 
 **Refuerzo de Admin y Safari:** `assets/js/core/financial-actions.js` reutiliza una clave de idempotencia mientras cliente, período y saldo faltante sean iguales; un reintento por pérdida de respuesta o doble toque no crea otro pago. Si cambian cliente, período o saldo, utiliza una clave nueva. `admin.html` actualizó la referencia de caché. Prueba adicional: `scripts/pago-parcial-retry-client-smoke.mjs` (9 casos; total nuevo 47 guardas y simulaciones del flujo atómico). Se mantiene idéntico el diseño de Admin.
+
+
+## B2 · Preparación de imputaciones de pagos aprobados (12/oct/2026)
+
+En Supabase se agregó `goxion_preparar_imputacion_sombra` con clave idempotente, bloqueo de origen/aplicación, comprobante `pagado`, misma cuenta, mismo mes de obligación y protección contra importes duplicados. La función auxiliar `goxion_periodo_pago_canonico` interpreta meses históricos en español (`Julio 2026`, `septiembre de 2026`); no adivina qué perfil fue pagado. Todo se mantiene como **propuesta no acreditable** y se registra en `goxion_b2_auditoria`.
+
+Gateway `acciones-financieras` v8 permite a Admin preparar la propuesta con la acción `preparar_imputacion_sombra` bajo token administrativo; no modifica `pagos`, `clientes`, `pagos_parciales` ni Index. Se realizaron pruebas transaccionales con reversión de pagos aprobados y de períodos incompatibles, y 39 pruebas de código automatizadas; la ruta de parciales anterior superó nuevamente sus 47 casos. La acreditación por acceso/fecha y el nuevo saldo de mora por obligación **aún no están habilitados**.
