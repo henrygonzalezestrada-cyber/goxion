@@ -32,12 +32,13 @@ export function distribuirCentavos(total,pesos,topes=pesos){
  if(total>topes.reduce((a,b)=>a+b,0))throw Error("Descuento excede saldo");
  const applied=pesos.map(()=>0);let remaining=total;
  while(remaining>0){
-  const active=pesos.map((w,i)=>({i,w:topes[i]-applied[i]})).filter(x=>x.w>0);
+  const active=pesos.map((w,i)=>({i,w:Math.max(0,w),cap:topes[i]-applied[i]}))
+    .filter(x=>x.w>0&&x.cap>0);
   const weight=active.reduce((a,x)=>a+x.w,0);
   if(!weight)throw Error("Sin base elegible");
   const quotas=active.map(x=>{
     const raw=remaining*x.w/weight;
-    const floor=Math.min(x.w,Math.floor(raw));
+    const floor=Math.min(x.cap,Math.floor(raw));
     return {...x,floor,fraction:raw-Math.floor(raw)};
   });
   let done=0;
