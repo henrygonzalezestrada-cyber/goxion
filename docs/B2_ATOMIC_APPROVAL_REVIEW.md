@@ -69,3 +69,18 @@ El diagnóstico `202610120011` desglosa ahora siete categorías copiadas de la f
 El único cliente con dos fechas verificadas tiene **9,800 centavos** de precio contractual para los dos accesos y **600 centavos de beneficio** en el total oficial. No autorizar una cuota individual de $49 ni trasladar mecánicamente los $6: la atribución elegible y el efecto sobre puntualidad/vencimiento faltan.
 
 La corrección de permisos del trigger `goxion_auditar_b2_sombra` (`202610120012`) **sí** fue aplicada a la base oficial y verificada: `anon=false`, `authenticated=false`, `service_role=true`; asesor de seguridad sin avisos WARN. El resto del PR es borrador SIN DESPLIEGUE.
+
+
+## Decisión operativa · La cartera de fecha única no debe pasar por B2 (12/oct/2026)
+
+Tras autorización expresa se revisó el padrón de **22 clientes**. La configuración global vigente es: **17 día 15**, una fecha 6 (Nayeli, excepción 6/30), una fecha 16, una 20, una 21 (cuenta suspendida) y una 30. Los clientes con varias plataformas pero un solo día —por ejemplo David— **conservan el pago mensual global y todo el waterfall oficial**: lealtad, promociones, cupones, descuentos y mora se calculan juntos, sin repartir entre servicios.
+
+**Operación real ejecutada y verificada:** `supabase/ops/20261012_sembrar_calendarios_legados_borrador.sql`. Dos fases: ensayo completo `BEGIN/ROLLBACK`, luego ejecución con `COMMIT` y controles de paridad en transacción. Sembró **37 calendarios de un acceso, en borrador, de 19 clientes activos**, derivando día de cobro de `clientes.dia_pago`, fecha propuesta del `periodo_pendiente` oficial, y tarifa del contrato de una única unidad. No indica cobertura pagada: `estado=borrador,verificado_en=NULL`. No crea pagos, mora, imputaciones ni obligaciones. Preservó los **2 calendarios verificados de Nayeli** (6 y 30 nov), saldos oficiales y los 28 pagos anteriores. Total calendario 39 (37 borrador + 2 verificados); auditoría de calendario registra el origen del lote. Se excluyeron suspensión, contratos ya configurados y **3 contratos multiacceso sin un desglose real de precio**, incluidos un combo y X2; estos clientes siguen con fecha y total global intactos y **no quedan bloqueados** por no tener B2.
+
+Verificación posterior: 37 borradores / 19 clientes; 0 marcados verificados por error; 0 fechas discordantes al día original, 0 precios discordantes al contrato; 4 accesos con fecha distinta del 15, preservada de la configuración real; 22/22 `goxion_estado_financiero` oficiales, 0 diferencias, 28 pagos intactos, 0 obligaciones, 0 imputaciones y 0 abonos B2.
+
+El módulo de decisión `docs/edge/estado-financiero/calendario-ruteo.mjs` + 11 pruebas `scripts/calendario-ruteo-smoke.mjs` formaliza dos vías:
+1. **global_heredado**: no hay fechas separadas verificadas, o todas corresponden a la única fecha de corte del cliente. El total global es la fuente única; no se calculan cuotas por acceso y las promos/lealtad/cupones/mora no cambian.
+2. **b2_multifecha_sombra**: al menos dos fechas confirmadas, todas sus unidades identificadas inequívocamente; admite mostrar el calendario pero no exige importes individuales ni permite cobro separado. Si falta verificación o hay un corte confirmado contradictorio, exige revisión.
+
+**Nueva conclusión:** la falta de 37 verificaciones individuales **no bloquea la integración de los clientes de fecha única**. Sí debe cerrarse el motor de aplicación individual para Nayeli y futuros multi-fecha, y el ciclo/beneficios por unidad. No reabrir cálculos globales para forzar una migración innecesaria.
