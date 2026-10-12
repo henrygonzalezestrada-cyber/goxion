@@ -87,3 +87,29 @@ La asignación por accesos es **aritmética, en centavos**, con restos mayores y
 
 **Qué aún falta para B2 / pagos reales:** modelar obligación persistente por `cliente_acceso_id + ciclo`, reglas por período exacto para promociones y cupones de único consumo, créditos y cobertura pagada; recalcular **mora por vencimiento** (no repartir ciegamente mora del corte global); destinar descuentos individuales conforme a sus restricciones; auditar la aprobación de comprobantes y aplicar fondos en transacción SQL idempotente, con bloqueo y no-doble-cobro. Hasta entonces, no permitir «Pagar próximo» o «Todo junto» con importes por servicio en Index.
 
+
+
+## B2 · Fundamentos de obligaciones y abonos en sombra (12/oct/2026)
+
+**Resultado aplicado en Supabase, NO habilitado como cobro:** tres tablas nuevas con políticas RLS activas y permisos exclusivos para `service_role`, migraciones:
+- `supabase/migrations/202610120001_obligaciones_abonos_sombra.sql`: `goxion_obligaciones_sombra` (clave única acceso real + inicio del ciclo), `goxion_abonos_sombra` (propuesta asociada a la obligación y clave idempotente), `goxion_imputaciones_sombra` (propuesta de imputación al pago `pagos` o al abono de `pagos_parciales` existente, sin abonarlo de verdad).
+- `supabase/migrations/202610120002_obligaciones_abonos_hardening.sql`: como máximo una solicitud pendiente/en revisión por obligación; locks de fuente de pago y controles para no imputar más del pago ni del total de obligación; impedir bajar el importe por debajo de propuestas/imputaciones vigentes o desactivar conciliación con movimientos.
+- `supabase/migrations/202610120003_abonos_b2_auditoria.sql`: `goxion_b2_auditoria`, registro de antes/después en obligaciones, propuestas e imputaciones, solo adicionable para el servicio.
+- `docs/edge/estado-financiero/abonos-politica.mjs`: política **pura e informativa** de elegibilidad y saldo proyectado; ni acredita abonos ni condona mora ni cambia la fecha de corte.
+- `scripts/abonos-politica-smoke.mjs`: 15 pruebas; `scripts/abonos-b2-schema-smoke.mjs`: 33 verificaciones de seguridad, exclusividad e invariantes, incorporadas a `npm run verify`.
+
+**Prueba con reversión:** se crearon temporalmente obligación ViX X2, abono y propuesta de imputación de un pago ya existente en una transacción, se comprobaron duplicidad, propiedad, restricciones y auditoría; se ejecutó `ROLLBACK`. Tras las pruebas, el recuento de obligaciones, abonos, imputaciones y auditoría B2 se mantiene **0**. No se insertó ningún cargo real, ni se tocaron pagos oficiales.
+
+### Estado encontrado del pago parcial heredado
+
+El autoservicio de Index **nunca estuvo habilitado**. Sí existen y están centralizados en Admin `GOXION_FINANCIAL_ACTIONS.registerPartialPayment()` y `pactPaymentDate()`:
+- Admin, al revisar un comprobante **incompleto**, introduce el **saldo que falta** y la Edge `acciones-financieras` registra un parcial global para el período en `pagos_parciales`. El saldo pendiente (no la mensualidad completa) es base de mora; el estado permanece incompleto.
+- La fecha pactada es administrativa; retiene el corte original y ajusta el corte operativo sin borrarlo. **No equivale a condonación automática** de mora.
+- En producción la tabla `pagos_parciales` se consultó y no contenía movimientos al inicio de este trabajo. **No hay prueba real de un abono cliente autogestionado**, porque no existe tal función todavía.
+
+### Decisiones de seguridad y siguiente implementación
+
+**Una propuesta del cliente no es un pago aprobado.** Un abono confirmado reduce el saldo restante, pero NO borra automáticamente mora ya devengada; para diferir la fecha operativa debe existir acuerdo aprobado. La política actual preserva el 5% diario con tope 50% donde aplique, calculado por el motor oficial, no lo vuelve a sumar sobre cada componente sombra.
+
+**Pendiente para culminar B2:** materializar obligaciones por ciclo desde saldos y coberturas conciliados, contemplar el destino por servicio de cupones, promociones y lealtad, y pasar la aprobación de abonos al gateway transaccional/idempotente de `acciones-financieras` antes de exponer solicitudes en Index. El camino administrativo de `registrar_pago_parcial` hoy efectúa varias escrituras sucesivas, **no una transacción única**; no reutilizar esa implementación tal cual para pagos por obligación hasta resolver atomicidad y reintentos. No se cambió el flujo existente en producción.
+
