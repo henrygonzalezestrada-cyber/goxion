@@ -39,14 +39,18 @@ export function verificarAtribucionB2({obligaciones,asignaciones=[],financiero}=
   if(financiero.pago_en_revision||financiero.pago_incompleto||
     financiero.esta_pagado_periodo||financiero.estado==="suspendido")
    return error("estado_sin_cobro_individual");
-  const seen=new Set();
+  const seen=new Set(),cycleKeys=new Set();
   for(const ob of obligaciones){
    if(!ob||!ob.id||seen.has(ob.id)||!ob.cliente_servicio_id||!ob.cliente_acceso_id||
-     !iso(ob.fecha_vencimiento)||!iso(ob.ciclo_inicio)||!cents(ob.base_centavos)||
-     !Number.isInteger(ob.calendario_revision)||ob.calendario_revision<1||
-     ob.calendario_estado!=="verificado")
+     !iso(ob.fecha_vencimiento)||!iso(ob.ciclo_inicio)||!iso(ob.cobertura_hasta)||
+     ob.cobertura_hasta!==ob.fecha_vencimiento||
+     ob.ciclo_inicio!==ob.fecha_vencimiento.slice(0,7)+"-01"||
+     !cents(ob.base_centavos)||!Number.isInteger(ob.calendario_revision)||
+     ob.calendario_revision<1||ob.calendario_estado!=="verificado")
      return error("obligacion_sin_identidad_cobertura_o_revision");
-   seen.add(ob.id);
+   const cycleKey=ob.cliente_acceso_id+"|"+ob.ciclo_inicio;
+   if(cycleKeys.has(cycleKey))return error("acceso_ciclo_duplicado");
+   seen.add(ob.id);cycleKeys.add(cycleKey);
   }
   const subtotal=obligaciones.reduce((a,b)=>a+b.base_centavos,0);
   if(subtotal!==fromMoney(financiero.subtotal))
