@@ -65,6 +65,10 @@ export function verificarAtribucionB2({obligaciones,asignaciones=[],financiero}=
   }]));
   const sums=Object.fromEntries([...DESCUENTOS,...CARGOS].map(k=>[k,0]));
   const consumedCoupon=new Set(),sources=new Set();
+  // La incompatibilidad promo/lealtad debe ser independiente del orden
+  // recibido, incluso cuando la lealtad llega antes que la promoción.
+  const accesosPromocionados=new Set(asignaciones
+   .filter(a=>a?.categoria==="promociones").map(a=>a.obligacion_id));
   const ordered=[...asignaciones].sort((a,b)=>
    (DESCUENTOS.includes(a?.categoria)?0:1)-(DESCUENTOS.includes(b?.categoria)?0:1));
   for(const a of ordered){
@@ -84,7 +88,7 @@ export function verificarAtribucionB2({obligaciones,asignaciones=[],financiero}=
     ob._promo=true;
    }
    if(a.categoria==="lealtad"){
-    if(a.lealtad_elegible!==true||ob._promo)
+    if(a.lealtad_elegible!==true||accesosPromocionados.has(a.obligacion_id))
      return error("lealtad_en_acceso_promocionado_o_no_elegible");
    }
    if(a.categoria==="trato_justo"&&a.cliente_servicio_id!==ob.cliente_servicio_id)
