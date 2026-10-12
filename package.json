@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "verify": "node scripts/verify-integrity.mjs && npm run test:comunicaciones && npm run test:calendario",
+    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario",
     "test:smoke": "node scripts/browser-smoke.mjs",
     "test:cart": "node scripts/cart-v2-smoke.mjs",
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
@@ -12,6 +12,7 @@
     "test:opiniones:oficial": "node scripts/opiniones-oficial-smoke.mjs",
     "serve:preview": "node scripts/serve-preview.mjs",
     "test:comunicaciones": "node scripts/comunicaciones-beta-smoke.mjs && node scripts/comunicaciones-resilience-smoke.mjs && node scripts/comunicaciones-plan-beta-smoke.mjs && node scripts/comunicaciones-oficial-smoke.mjs",
-    "test:calendario": "node scripts/calendario-financiero-beta-smoke.mjs && node scripts/calendario-financiero-ui-smoke.mjs && node scripts/calendario-admin-integracion-smoke.mjs && node scripts/admin-access-password-smoke.mjs"
+    "test:calendario": "node scripts/calendario-financiero-beta-smoke.mjs && node scripts/calendario-financiero-ui-smoke.mjs && node scripts/calendario-admin-integracion-smoke.mjs && node scripts/admin-access-password-smoke.mjs",
+    "test:visual-contract": "node scripts/visual-contract-smoke.mjs"
   }
 }
