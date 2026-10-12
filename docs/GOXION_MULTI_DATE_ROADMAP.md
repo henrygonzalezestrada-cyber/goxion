@@ -113,3 +113,12 @@ El autoservicio de Index **nunca estuvo habilitado**. Sí existen y están centr
 
 **Pendiente para culminar B2:** materializar obligaciones por ciclo desde saldos y coberturas conciliados, contemplar el destino por servicio de cupones, promociones y lealtad, y pasar la aprobación de abonos al gateway transaccional/idempotente de `acciones-financieras` antes de exponer solicitudes en Index. El camino administrativo de `registrar_pago_parcial` hoy efectúa varias escrituras sucesivas, **no una transacción única**; no reutilizar esa implementación tal cual para pagos por obligación hasta resolver atomicidad y reintentos. No se cambió el flujo existente en producción.
 
+
+
+### B2 · RPC segura para propuesta de abono (12/oct/2026)
+
+Migración `supabase/migrations/202610120004_solicitar_abono_sombra_rpc.sql`: función `goxion_solicitar_abono_sombra(cliente_id,obligacion_id,monto_centavos,clave_idempotencia,comentario)`. **Únicamente `service_role` puede ejecutarla**; la futura Edge debe verificar el `X-Client-Token` y derivar el ID del propio cliente. Esta RPC comprueba cuenta no suspendida, comprobante fuera de revisión, propiedad del acceso, obligación conciliada, importe menor al saldo y ausencia de solicitudes activas o imputaciones pendientes. Bloquea filas `FOR UPDATE`, admite reintentos con la misma clave sin crear otra solicitud, rechaza uso de una clave con datos diferentes y devuelve `cobrable:false`/`requiere_revision:true`.
+
+Prueba SQL sobre contrato X2 dentro de `BEGIN/ROLLBACK`: primera propuesta, reintento idempotente, clave conflictiva, segundo intento concurrente, intento de otro cliente, pago completo enviado al flujo normal; **todo aprobado**, sin filas persistidas tras reversión. Permisos: `anon=false`, `authenticated=false`, `service_role=true`. En producción no hay pagos parciales registrados; las tablas B2, su auditoría y las nuevas solicitudes siguen vacías.
+
+**Queda pendiente** el endpoint autenticado del cliente, comprobante y operación real de aprobación/transacción que asigne el abono y recalcule mora, promociones, lealtad y saldo por obligación. No se habilitó Index ni se modificó `acciones-financieras`, por lo que las cuotas y descuentos actuales siguen iguales. Un abono solicitado no evita mora ni acredita cobertura hasta que se revise y apruebe; los acuerdos para cambiar el corte requieren autorización.
