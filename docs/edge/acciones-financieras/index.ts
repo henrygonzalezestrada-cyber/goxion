@@ -525,7 +525,7 @@ Deno.serve(async (req) => {
       const saldoCentavos=Math.round(saldoRaw*100);
       const notas=String(data?.notas||"Pago parcial registrado").trim().slice(0,300);
       const clave=String(data?.clave_idempotencia||"").trim();
-      if(!clienteId||!/^([0-9a-f]{8}-){4}[0-9a-f]{12}$/i.test(clienteId)||
+      if(!clienteId||!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clienteId)||
          !/^\d{4}-(0[1-9]|1[0-2])$/.test(periodoEsperado)||
          !Number.isFinite(saldoRaw)||saldoCentavos<=0||
          Math.abs(saldoRaw*100-saldoCentavos)>1e-5){
