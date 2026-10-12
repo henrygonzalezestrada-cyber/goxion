@@ -22,3 +22,6 @@
 ## Continuidad entre chats
 
 Este archivo y los documentos enlazados constituyen la referencia **persistente** del proyecto. En una conversación nueva, indicar: «Abre el repo GOXION, lee AGENTS.md y el contrato visual antes de trabajar». El asistente debe volver a leerlos; los nuevos chats no cargan automáticamente archivos externos.
+
+
+- **Pagos parciales B2:** el cliente todavía NO puede pedir ni acreditar un abono desde Index. Admin sí marca comprobantes incompletos por saldo restante y dispone de acuerdo de fecha. Las nuevas tablas `goxion_obligaciones_sombra`, `goxion_abonos_sombra`, `goxion_imputaciones_sombra` y `goxion_b2_auditoria` son solo de preparación, sin cargos. Una solicitud no evita mora automáticamente; leer `docs/GOXION_MULTI_DATE_ROADMAP.md` antes de cualquier integración.
