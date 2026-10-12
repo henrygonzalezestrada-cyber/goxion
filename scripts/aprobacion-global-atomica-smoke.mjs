@@ -41,6 +41,8 @@ includes(route,'clave_idempotencia',"Clave de reintento recibida");
 includes(client,"approvalRetryKeys","Idempotencia cliente");
 includes(client,"clave_idempotencia,","Cliente propaga clave al gateway");
 includes(legacy,'goxion_aprobar_pago_periodo_atomico',"Ruta legacy reutiliza RPC");
+includes(legacy,'if(!periodo){',"El contrato legacy recupera el período omitido");
+includes(legacy,'select("periodo_pendiente")',"La ruta heredada obtiene período vigente desde DB");
 check(!legacy.includes('const paymentUpdate')&&!legacy.includes('.from("pagos").insert('),
  "Ruta histórica no escribe un recibo en varios pasos");
 
