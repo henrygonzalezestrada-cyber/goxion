@@ -117,8 +117,8 @@ assert(accessController.includes("Solo organiza accesos; no activa licencias ni 
  "Explicar que la vinculación no activa la licencia externa");
 assert(!accessController.includes("'Beneficio activo':'Revisar estado'"),
  "La cápsula del beneficio no debe duplicar el estado del selector");
-assert(accessController.includes("'Asignado':'Pendiente'"),
- "Los estados de las cuentas compartidas se conservan");
+assert(accessController.includes("!current?'<em class=\"missing\">Pendiente</em>':''"),
+ "Conservar Pendiente si falta cuenta y ocultar indicador redundante cuando está asignada");
 assert(css.includes(".gx-invite-group-details>summary"),
  "El grupo opcional se pliega sin cambiar el resto de la pantalla");
 
