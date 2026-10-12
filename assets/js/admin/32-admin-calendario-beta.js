@@ -1,4 +1,4 @@
-// GOXION Admin · Agenda financiera beta, alojada en la sección existente Servicios.
+// GOXION Admin · Fechas persistentes por acceso y simulación de pagos, integradas en Servicios.
 // No envía pagos, no reemplaza gxOpenClientFocus/gxFocusSection, no duplica estado.
 (()=>{
   "use strict";
@@ -26,7 +26,7 @@
       document.body.appendChild(dialog);
       frame=document.createElement("iframe");
       frame.className="gx-calendar-frame";
-      frame.title="Simulador financiero del cliente";
+      frame.title="Fechas de renovación guardadas y cálculo estimado de pagos";
       frame.setAttribute("loading","eager");
       frame.setAttribute("referrerpolicy","same-origin");
       dialog.querySelector(".gx-calendar-dialog-content").appendChild(frame);
@@ -38,7 +38,7 @@
     const url=new URL("./preview/calendario-financiero/index.html",location.href);
     url.searchParams.set("embedded","1");
     url.searchParams.set("cliente",client.id);
-    url.searchParams.set("v","20261011k"); // nueva vista compacta; evita caché en Safari
+    url.searchParams.set("v","20261011m"); // estado de guardado visible; evita caché en Safari
     frame.src=url.toString();
     if(!dialog.open)dialog.showModal();
   }
@@ -53,11 +53,11 @@
     row.dataset.gxCalendarEntry="1";
     const content=document.createElement("div");
     content.className="gx-calendar-entry-copy";
-    content.innerHTML="<strong>Fechas de renovación</strong><small>Cobros individuales, X2 y fechas conjuntas</small>";
+    content.innerHTML="<strong>Fechas de renovación</strong><small>Gestionar fechas por acceso · Pagos estimados</small>";
     const btn=document.createElement("button");
     btn.type="button";
     btn.className="gx-calendar-entry-action";
-    btn.textContent="Simular ›";
+    btn.textContent="Gestionar ›";
     btn.addEventListener("click",openCalendar);
     row.append(content,btn);
     target.appendChild(row);
