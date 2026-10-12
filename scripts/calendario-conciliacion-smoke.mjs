@@ -61,7 +61,7 @@ test("Descuentos parciales y cargos redondean a centavos, no en dólares",()=>{
  assert.deepEqual(distribuirCentavos(1,[4900,4900]),[1,0]);
  assert.deepEqual(distribuirCentavos(3,[1,2]),[1,2]);
  assert.deepEqual(distribuirCentavos(100,[80,20],[100,100]),[80,20]);
- assert.deepEqual(distribuirCentavos(5,[1,1,1]),[2,2,1]);
+ assert.deepEqual(distribuirCentavos(5,[1,1,1],[5,5,5]),[2,2,1]);
 });
 test("Rechazar doble cupón con el mismo beneficio_id",()=>{
  const r=reconciliarCalendarioOficial({calendario:data.calendario,financiero:official({
