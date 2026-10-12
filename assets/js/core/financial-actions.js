@@ -260,6 +260,12 @@
     return normalizeActionPayload(payload);
   }
 
+  // Mantiene la misma clave durante reintentos de una revisión idéntica,
+  // incluidos doble toque y respuesta perdida. Si cambian monto o periodo
+  // se considera una operación diferente.
+  let partialRetryFingerprint = '';
+  let partialRetryKey = '';
+
   async function registerPartialPayment({
     clienteId,
     saldoRestante,
@@ -271,11 +277,17 @@
     const periodo_esperado = String(periodoEsperado || '').trim().slice(0, 7);
     if (!cliente_id || !(saldo_restante > 0)) throw new Error('Cliente o saldo restante inválido.');
     if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(periodo_esperado)) throw new Error('Periodo inválido.');
+    const partialFingerprint = [cliente_id, periodo_esperado, saldo_restante.toFixed(2)].join('|');
+    if (partialRetryFingerprint !== partialFingerprint) {
+      partialRetryFingerprint = partialFingerprint;
+      partialRetryKey = crypto.randomUUID();
+    }
     const payload = await invoke('registrar_pago_parcial', {
       cliente_id,
       saldo_restante,
       notas: String(notas || 'Pago parcial registrado'),
       periodo_esperado,
+      clave_idempotencia: partialRetryKey,
     });
     return normalizeActionPayload(payload);
   }
