@@ -279,3 +279,12 @@ La RPC bloquea al cliente para serializar operaciones, lee el estado oficial des
 **Origen:** solo `pagos.estado='pagado'`; el texto `pagos.periodo` admite formatos históricos en español y se normaliza al primer día del mes con `goxion_periodo_pago_canonico`, sin reescribir la tabla oficial. Cliente y mes deben coincidir con la obligación, los importes no pueden superar comprobante u obligación, y se audita toda propuesta. **Nunca acredita**; respuesta `acreditada:false`. Los parciales continúan limitados a su semántica legacy y no pueden duplicar un pago completo.
 
 **Persistencia:** `goxion_imputaciones_sombra`, clave de idempotencia única y transacción aislada. Conservar la frontera: no habilitar acción en Index/Ayuda ni emitir cobros individualizados hasta resolver cobertura y beneficios por acceso. Pruebas `scripts/imputacion-sombra-b2-smoke.mjs`.
+
+
+### B2 · Gestión técnica de obligaciones (octubre 2026)
+
+**Único propietario administrativo de la operación financiera:** \`docs/edge/acciones-financieras/index.ts\` (Edge \`acciones-financieras\` v10), bajo sesión \`X-Admin-Token\`. Acciones **internas** \`preparar_obligaciones_sombra\`, \`preparar_imputacion_sombra\`, \`confirmar_imputacion_sombra\`, \`resumen_obligacion_sombra\`. No crear un segundo controlador/panel y no enseñar estas acciones al cliente.
+
+Backend: \`goxion_preparar_obligaciones_calendario_sombra\` valida por omisión sin insertar; registra sólo cuando Admin confirma expresamente y todos los accesos, fechas, precios y período cuadran **sin ajustes sin atribuir**. \`goxion_confirmar_imputacion_sombra\` bloquea dinero confirmado por recibo aprobado y verifica versión actual de calendario, sin alterar \`pagos\`, \`pagos_parciales\` o \`clientes\`; \`goxion_resumen_imputacion_sombra\` devuelve saldos **proyectados, no oficiales**. Bloquear cualquier intento de acreditar por acceso cuando existan descuentos, beneficios, cupones, mora o comprobantes parciales pendientes.
+
+Protecciones y pruebas: migraciones \`202610120007\`, \`008\`, \`009\`; \`scripts/confirmar-imputacion-b2-smoke.mjs\` y \`scripts/obligaciones-b2-integracion-smoke.mjs\`, incorporadas a \`npm run verify\`. No hubo aceptación de extremo a extremo sobre comprobante real por limitación de seguridad; el conjunto de tablas B2 sigue vacío y \`mi_estado\` no cambia. **No es momento de integración visual**: primero cerrar aprobación atómica de pago total (hoy \`periodo-cobro\` v3 tiene múltiples escrituras) y atribución individual de lealtad, cupones y mora.
