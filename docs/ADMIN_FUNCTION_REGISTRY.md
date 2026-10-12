@@ -218,3 +218,12 @@ En **Admin → Clientes → Servicios → Editar acceso**, el orden visual del a
 El CSS está aislado al detalle de Servicios en Admin y vence las reglas móviles previas que centraban el botón y apilaban la fila. Perfil, PIN, cuenta, campos de invitación y acciones existentes conservan su semántica. Se eliminaron las redundancias visuales «Cuenta: Cuenta Principal» y «Asignado» cuando el selector ya muestra una cuenta vinculada; «Pendiente» permanece visible cuando falta asignación.
 
 Cobertura permanente: `scripts/admin-access-password-smoke.mjs` incluido en `npm run test:calendario` y `npm run verify`, más validación responsive de 280/320/345/375/390/430/768 px. Mantener en futuras solicitudes la regla de **no sustituir el flujo financiero ni trasladar estilos a Ayuda/Index**. El efecto visual final en Safari real sigue sujeto a comprobación de dispositivo.
+
+
+### Calendarios por acceso — persistencia aislada (fase A, octubre 2026)
+
+**Dueño del cálculo y sesión:** `docs/edge/estado-financiero/index.ts` y `calendario-beta.mjs`. **Dueño de los registros:** `public.goxion_calendario_accesos` con claves reales `cliente_accesos.id`, auditoría `goxion_calendario_auditoria`; migración versionada en `supabase/migrations/202610110001_calendario_accesos_sombra.sql`. **Dueño de la pantalla:** `preview/calendario-financiero/index.html`, montada desde `assets/js/admin/32-admin-calendario-beta.js` en **Clientes → Servicios**.
+
+Acciones bajo `X-Admin-Token`: `listar_calendarios_beta`, `simular_calendario_beta`, **`guardar_calendario_beta`** (usa RPC transaccional `goxion_guardar_calendario_contrato_borrador`). En guardado se exige correspondencia de todos los accesos activos y suma exacta del precio contractual, con auditoría. Las fechas de perfiles X2 pueden diferir aunque haya una sola contratación comercial.
+
+**NO** generar cargos, modificar pagos/pagos_parciales, mover períodos ni mostrar los importes sombra como deuda en Index o Ayuda. Falta conciliación de obligaciones independientes en `acciones-financieras` y lectura del cliente con `X-Client-Token`. Evitar otro panel o controlador financiero paralelo. Pruebas `npm run test:calendario`: 56 casos matemáticos más simulación de interfaz y guardado X2. La operación SQL fue probada con `ROLLBACK` y los calendarios de clientes existentes siguen sin migrar. Ver `docs/GOXION_MULTI_DATE_ROADMAP.md`.
