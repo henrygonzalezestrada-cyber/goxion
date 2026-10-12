@@ -45,3 +45,14 @@ Las cifras en `calendario-conciliacion.mjs` son de **conciliación sombra**. Sin
 ## Entrega visual futura
 
 Cuando las pruebas y la atribución real estén cerradas, Index va primero (baseline `docs/INDEX_CALENDARIO_VISUAL_BASELINE.md`), Ayuda después. Las opciones de selección y abono parcial deben ocupar un bloque compacto en el Index existente, sin otro estado de cuenta ni modal duplicado. No se modificó UI en este PR.
+
+
+## Diagnóstico operativo B2 sin mutaciones (12/oct/2026)
+
+La nueva RPC de sólo lectura `goxion_diagnostico_b2_sombra(cliente, periodo)` y la acción `acciones-financieras.diagnostico_b2_sombra` (exclusiva de Admin) determinan si un cliente puede materializar obligaciones **en sombra**, con razones concretas. Comprueban accesos de contratos activos, revisión/calendario/precio/ciclo, fechas distintas, conciliación con el estado oficial, beneficios/cargos sin atribuir y posibles operaciones B2 anteriores. `aplicable_sombra` **no** significa `cobrable`. Siempre devuelve `cobrable:false`; nunca escribe datos. Pendiente de despliegue, versionado en `202610120011_diagnostico_b2_sombra.sql`.
+
+Pruebas SQL realizadas bajo `BEGIN/ROLLBACK`: 22 diagnósticos reales con datos leídos, nunca modificados; cero listos para obligaciones sombra, cero cobrables. En un cliente ficticio con dos contrataciones de distinta fecha se confirmó: sin calendario no pasa; dos fechas/precios conciliados pasan **solo** a sombra; al unificar fechas se mantiene el cobro legacy. Archivo reproducible `supabase/tests/20261012_diagnostico_b2_reversible.sql`. El gateway cuenta con prueba automática `scripts/diagnostico-b2-smoke.mjs`.
+
+**Inventario correcto de producción:** 22 clientes, 47 accesos persistidos en 21 clientes, 2 calendarios *verificados* correspondientes a un cliente con dos fechas, 28 recibos históricos, cero obligaciones/imputaciones B2. El cliente piloto posee base de dos accesos por **9,800 centavos**; el motor oficial aplica **600 centavos de beneficios**. No debe dividirse ni cobrarse por perfil hasta conocer la atribución documentada de ese beneficio y su vencimiento. El resto de la cartera conserva el período global sin cambios. No masificar la verificación con una fecha presumida.
+
+**Próxima barrera técnica:** vincular la procedencia y elegibilidad de beneficios, cupones, Trato Justo, promociones y mora a cada unidad de cobertura; diseñar la acreditación por obligación *real*, con comprobante aprobado, saldo por fecha, idempotencia y una transacción. Luego piloto con fixtures y finalmente Index.
