@@ -43,6 +43,9 @@ function setup(token,clientServices=services,clientFinance=financial,accesses={}
    else if(data.accion==="simular_calendario_beta"){
      const proposal=data.datos.propuesta||{};
      const combined={...persisted,...(proposal.servicios||{})};
+     for(const [k,cfg] of Object.entries(proposal.servicios||{})){
+       if(cfg?.usar_general===true)delete combined[k];
+     }
      result={ok:true,cliente:clients[0],persistencia:{accesos:accesses},
        calendario:simularCalendario({cliente:clients[0],servicios:clientServices,financiero:clientFinance,
         propuesta:{...proposal,servicios:combined},hoy:"2026-10-11"})};
@@ -172,6 +175,16 @@ assert(x2.nodes.services.innerHTML.includes("Fechas guardadas en Admin"),"Confir
 x2.nodes.reset.events.click();await flush();
 assert(x2.nodes.services.innerHTML.includes("6 nov")&&x2.nodes.services.innerHTML.includes("30 nov"),
  "El servidor conserva fechas tras resetear el simulador");
+x2.nodes.services.events.click({target:{closest(sel){
+ return sel==="[data-manage]"?{getAttribute:()=>"x2"}:null;
+}}});
+x2.nodes.services.events.click({target:{closest(sel){
+ return sel==="[data-use-default]"?{getAttribute:()=>"x2#1"}:null;
+}}});
+await flush();
+assert.equal(x2.calls.at(-1).datos.propuesta.servicios["x2#1"].usar_general,true,
+ "Usar fecha general omite calendario persistido en el cálculo");
+assert(x2.nodes.services.innerHTML.includes("15 nov"),"Se recupera la fecha general sin perder el otro acceso");
 assert(!x2.calls.some(c=>c.accion==="aprobar_pago"||c.accion==="registrar_pago"),
  "El guardado no ejecuta acciones de cobro");
 
