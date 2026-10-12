@@ -1,6 +1,15 @@
 # GOXION · Calendario financiero por servicio
 
-**Fase 1: beta de cálculo y aplicación simulada.** 11 de octubre de 2026.
+## Estado comprobado · 11/oct/2026 (fase A operativa solo en Admin)
+
+**Persistencia por acceso real habilitada y protegida; cobros oficiales intactos.** Se creó `public.goxion_calendario_accesos` con FK a `cliente_accesos.id` (identidad física X2), verificación del contrato/precio, control de fechas y `goxion_calendario_auditoria` con evento por modificación. Migración: `supabase/migrations/202610110001_calendario_accesos_sombra.sql`.
+
+La Edge oficial `estado-financiero` mantiene `mi_estado` y sus acciones existentes. Bajo sesión HMAC de Admin, ahora `simular_calendario_beta` recupera calendarios guardados y `guardar_calendario_beta` los persiste mediante una operación SQL transaccional y auditada. Admin ofrece **Guardar fechas** únicamente cuando el contrato puede relacionarse inequívocamente con accesos técnicos reales. «Usar fecha general» desactiva la cobertura guardada **en la simulación** hasta confirmar un nuevo guardado. Se verificó la operación SQL de guardar X2 dentro de una transacción con `ROLLBACK`, sin datos persistidos de prueba. 56 casos deterministas verifican tarifas iguales/desiguales, fechas y pagos simulados.
+
+**Límite actual crucial:** el guardado registra la configuración, NO crea deuda, NO aplica una transferencia a obligaciones ni acredita pagos. Los montos mostrados siguen siendo base/estimados cuando existen descuentos, promociones, mora o saldo en revisión. En Ayuda e Index se mantiene el estado de cuenta anterior hasta completar la conciliación financiera. No se han migrado automáticamente fechas de clientes. La etapa siguiente sigue siendo modelar obligaciones independientes y su conciliación idempotente en `acciones-financieras` antes de comunicar importes pagables al cliente. La interfaz móvil Safari requiere aceptación visual en dispositivo real.
+
+**Nota histórica:** la documentación inferior describe el origen en modo sombra; las funciones de simulación continúan sin efectuar cargos, aunque ahora existe un guardado administrativo separado.
+
 
 **Siguiente fase:** modelo persistente de obligaciones y pagos antes de exponer fechas a clientes. Ver `docs/GOXION_MULTI_DATE_ROADMAP.md` (backend → Index → Ayuda), y contrato de identidad en `docs/GOXION_VISUAL_CONTRACT.md`. Una prueba de simulación no acredita pagos ni completa visualmente las pantallas.
 
