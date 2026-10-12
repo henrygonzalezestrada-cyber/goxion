@@ -1,5 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.116.0";
 import { simularCalendario } from "./calendario-beta.mjs";
+import { calendarioInformativo } from "./calendario-cliente.mjs";
 
 const cors={
   "Access-Control-Allow-Origin":"*",
@@ -87,6 +88,31 @@ Deno.serve(async(req)=>{
         estado_financiero:await estado(String(client.cliente_id)),
         modo:"oficial"
       });
+    }
+
+    // Fechas confirmadas para el PROPIO cliente: solo informativas.
+    // No calcula saldo, descuentos o mora y NO habilita pagar una obligación individual.
+    if(accion==="mi_calendario"){
+      const client=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
+      if(!client?.cliente_id)return res({ok:false,error:"Sesión de cliente inválida o expirada"},401);
+      const clientId=String(client.cliente_id);
+      const permiso=await exigirClienteActivo(sb,clientId);
+      if(!permiso.ok)return res({ok:false,error:permiso.error},permiso.status);
+      const [contracts,accesses,verified]=await Promise.all([
+        sb.from("cliente_servicios").select("id,nombre,monto").eq("cliente_id",clientId)
+          .eq("activo",true).limit(80),
+        sb.from("cliente_accesos").select("id,cliente_servicio_id,ordinal").eq("cliente_id",clientId)
+          .eq("activo",true).limit(90),
+        sb.from("goxion_calendario_accesos")
+          .select("cliente_acceso_id,cliente_servicio_id,cobertura_hasta,dia_corte,estado,precio_centavos")
+          .eq("cliente_id",clientId).eq("estado","verificado").limit(90)
+      ]);
+      if(contracts.error||accesses.error||verified.error)
+        throw contracts.error||accesses.error||verified.error;
+      const calendario=calendarioInformativo({
+        contratos:contracts.data||[],accesos:accesses.data||[],fechas:verified.data||[]
+      });
+      return res({ok:true,calendario,fuente:"goxion_calendario_accesos",modo:"solo_fechas_sin_cobro"});
     }
 
     const admin=await verify(req.headers.get("X-Admin-Token")||"",adminSecret,"goxion_admin");
