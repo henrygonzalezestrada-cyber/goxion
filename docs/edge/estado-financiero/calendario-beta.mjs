@@ -112,7 +112,8 @@ export function simularCalendario({cliente,servicios,financiero,propuesta={},hoy
  const items=activos.map(s=>{
    const cfg=plan[s.id]||{};
    if(!cfg||typeof cfg!=="object"||Array.isArray(cfg))error("Configuración de servicio inválida");
-   const importe=s.monto_unidad_centavos;
+   const importe=cfg.precio_centavos==null?s.monto_unidad_centavos:Number(cfg.precio_centavos);
+   if(!Number.isInteger(importe)||importe<0)error("Precio del acceso inválido");
    const coberturaExplicita=cfg.cobertura_hasta!=null&&cfg.cobertura_hasta!=="";
    // Única fuente fiable para calendarios distintos: cobertura capturada/confirmada.
    let vence=coberturaExplicita?rangoFecha(iso(fechaUTC(cfg.cobertura_hasta)),hoy)
@@ -129,7 +130,7 @@ export function simularCalendario({cliente,servicios,financiero,propuesta={},hoy
    return {
      id:s.id,nombre:s.nombre,monto_base_centavos:importe,
      cliente_servicio_id:s.cliente_servicio_id,unidad:s.unidad,unidades:s.unidades,
-     precio_dividido_estimado:s.precio_dividido_estimado,
+     precio_dividido_estimado:s.precio_dividido_estimado&&cfg.precio_centavos==null,
      fecha_vencimiento:vence,origen_fecha:coberturaExplicita?"cobertura_declarada":"heredada_del_cliente",
      cobertura_confirmada:cfg.cobertura_confirmada===true&&coberturaExplicita,
      dia_original:ancla,ciclo_siguiente_hasta:siguiente,
@@ -140,6 +141,14 @@ export function simularCalendario({cliente,servicios,financiero,propuesta={},hoy
      fecha_cobro_propuesta:vence
    };
  }).sort((a,b)=>a.fecha_vencimiento.localeCompare(b.fecha_vencimiento)||a.id.localeCompare(b.id));
+ // El precio por unidad puede variar, pero la suma contractual no.
+ const totalContrato=new Map();
+ for(const x of items)totalContrato.set(x.cliente_servicio_id,
+    (totalContrato.get(x.cliente_servicio_id)||0)+x.monto_base_centavos);
+ for(const cs of contratos){
+   if(totalContrato.get(cs.id)!==dineroACentavos(cs.monto))
+     error("El desglose por acceso no coincide con el importe contractual");
+ }
  const grupos=[];
  for(const item of items){
    let group=grupos.find(x=>x.fecha===item.fecha_vencimiento);
