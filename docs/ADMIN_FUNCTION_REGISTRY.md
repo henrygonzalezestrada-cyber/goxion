@@ -227,3 +227,13 @@ Cobertura permanente: `scripts/admin-access-password-smoke.mjs` incluido en `npm
 Acciones bajo `X-Admin-Token`: `listar_calendarios_beta`, `simular_calendario_beta`, **`guardar_calendario_beta`** (usa RPC transaccional `goxion_guardar_calendario_contrato_borrador`). En guardado se exige correspondencia de todos los accesos activos y suma exacta del precio contractual, con auditoría. Las fechas de perfiles X2 pueden diferir aunque haya una sola contratación comercial.
 
 **NO** generar cargos, modificar pagos/pagos_parciales, mover períodos ni mostrar los importes sombra como deuda en Index o Ayuda. Falta conciliación de obligaciones independientes en `acciones-financieras` y lectura del cliente con `X-Client-Token`. Evitar otro panel o controlador financiero paralelo. Pruebas `npm run test:calendario`: 56 casos matemáticos más simulación de interfaz y guardado X2. La operación SQL fue probada con `ROLLBACK` y los calendarios de clientes existentes siguen sin migrar. Ver `docs/GOXION_MULTI_DATE_ROADMAP.md`.
+
+
+### Conciliación por fechas · Lealtad, descuentos, misiones y mora (fase B1 sombra)
+
+El único motor oficial de importes permanece en `public.goxion_estado_financiero`, que consume `goxion_estado_cuenta_core_v1`, `goxion_estado_cuenta`, `goxion_estado_cuenta_beneficios`, `goxion_beneficios_periodo` y `goxion_promociones_periodo`.
+
+Módulo nuevo y puro `docs/edge/estado-financiero/calendario-conciliacion.mjs`: **lee** el total oficial y sus categorías `descuentos.{promociones,lealtad,especiales,trato_justo,programados}`, `cargos.{mora,reactivacion}`; identifica cupones reclamados de misiones **solo** mediante `beneficios_programados` con `origen='misiones'`. Se ejecuta exclusivamente bajo sesión Admin dentro de `simular_calendario_beta`, como `calendario.conciliacion`. Usa reparto determinista de centavos, valida subtotal, promociones, descuentos, cargos y total oficial. No recalcula reglas ni consume beneficios.
+
+**Invariante crítico:** `cobrable:false`, `desglose_de_obligaciones_autorizado:false` y `modo:"conciliacion_sombra"` aun cuando la aritmética cuadre. No crear endpoint cliente con esos importes, no cambiar `pagoActualInfo` ni aprobar un comprobante por el importe sombra; faltan mora por vencimiento, elegibilidad de descuentos/cupones por obligación, cobertura por ciclo y aplicación de pagos idempotente. El resultado de Index/Ayuda no fue modificado. Casos: `scripts/calendario-conciliacion-smoke.mjs` + `scripts/calendario-conciliacion-edge-smoke.mjs`; incluidos en `npm run verify`. Ver `docs/GOXION_MULTI_DATE_ROADMAP.md`.
+
