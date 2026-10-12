@@ -56,3 +56,16 @@ Pruebas SQL realizadas bajo `BEGIN/ROLLBACK`: 22 diagnósticos reales con datos 
 **Inventario correcto de producción:** 22 clientes, 47 accesos persistidos en 21 clientes, 2 calendarios *verificados* correspondientes a un cliente con dos fechas, 28 recibos históricos, cero obligaciones/imputaciones B2. El cliente piloto posee base de dos accesos por **9,800 centavos**; el motor oficial aplica **600 centavos de beneficios**. No debe dividirse ni cobrarse por perfil hasta conocer la atribución documentada de ese beneficio y su vencimiento. El resto de la cartera conserva el período global sin cambios. No masificar la verificación con una fecha presumida.
 
 **Próxima barrera técnica:** vincular la procedencia y elegibilidad de beneficios, cupones, Trato Justo, promociones y mora a cada unidad de cobertura; diseñar la acreditación por obligación *real*, con comprobante aprobado, saldo por fecha, idempotencia y una transacción. Luego piloto con fixtures y finalmente Index.
+
+
+## Prueba integral de imputación B2 en sombra (12/oct/2026)
+
+Archivo versionado: `supabase/tests/20261012_b2_dos_vencimientos_imputacion_reversible.sql`. **Ejecutado y aprobado** contra la estructura real de Supabase con `BEGIN/ROLLBACK`: se prepararon dos vencimientos verificables (días 5 y 25), dos obligaciones ficticias de $49 y $45, un comprobante ficticio previamente aprobado de $94, se preparó y confirmó una imputación por obligación, se reintentó cada fase con la misma clave sin duplicar y se bloqueó una imputación excesiva. Confirmación `acreditada_oficial:false` en ambas, sin cobro ni cambios persistentes.
+
+Inventario de control posterior: 22/22 estados oficiales, `shadow.delta_total=0` en todos, 28 pagos, 2 calendarios verificados en una cuenta, **0 obligaciones, 0 solicitudes, 0 imputaciones y 0 registros de auditoría B2**.
+
+El diagnóstico `202610120011` desglosa ahora siete categorías copiadas de la fuente oficial (promociones, lealtad, especiales, Trato Justo, programados/cupones, mora y reactivación), **sin distribuirlas**: auditoría reversible sobre 22 cuentas encontró 0 divergencias entre las sumas de categorías y los totales de descuentos/cargos. La función nunca presenta los importes como cobrables.
+
+El único cliente con dos fechas verificadas tiene **9,800 centavos** de precio contractual para los dos accesos y **600 centavos de beneficio** en el total oficial. No autorizar una cuota individual de $49 ni trasladar mecánicamente los $6: la atribución elegible y el efecto sobre puntualidad/vencimiento faltan.
+
+La corrección de permisos del trigger `goxion_auditar_b2_sombra` (`202610120012`) **sí** fue aplicada a la base oficial y verificada: `anon=false`, `authenticated=false`, `service_role=true`; asesor de seguridad sin avisos WARN. El resto del PR es borrador SIN DESPLIEGUE.
