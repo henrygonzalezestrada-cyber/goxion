@@ -1,6 +1,6 @@
 # GOXION · Hoja de ruta de renovaciones independientes
 
-**Corte de análisis:** 11/oct/2026. **Etapa real:** motor de simulación en Admin; Ayuda/Index no tienen fechas múltiples reales habilitadas. **No** actualizar el estado de cuenta cliente basándose en IDs virtuales o importes calculados en el navegador.
+**Corte de análisis:** 11/oct/2026. **Etapa real:** persistencia de calendarios por acceso en Admin, cálculos y guardado auditado; Ayuda/Index aún no usan obligaciones financieras separadas. **No** actualizar el estado de cuenta cliente basándose en IDs virtuales o importes calculados en el navegador.
 
 ## Contrato de producto acordado
 
@@ -24,12 +24,15 @@
 
 | Fase | Trabajo | Resultado para validar | Prohibiciones |
 |---|---|---|---|
-| **A. Persistencia y autorización** | Definir obligaciones por **contrato + unidad/perfil**, importe real (no asumido 50/50), próxima fecha, cobertura pagada, recurrencia mensual, cambio y auditoría; migración retrocompatible | Consultas de obligaciones con historial y cobertura coherentes; cliente heredado intacto | No mutar `cliente_servicios` a ciegas, no confiar en nombre `(x2)` como esquema final, no guardar operaciones desde JS |
+| **A. Persistencia y autorización** ✅ estructura y guardado base; aún falta conciliación comercial | Definir obligaciones por **contrato + unidad/perfil**, importe real (no asumido 50/50), próxima fecha, cobertura pagada, recurrencia mensual, cambio y auditoría; migración retrocompatible | Consultas de obligaciones con historial y cobertura coherentes; cliente heredado intacto | No mutar `cliente_servicios` a ciegas, no confiar en nombre `(x2)` como esquema final, no guardar operaciones desde JS |
 | **B. Motor y pagos** | Integrar cálculo a `estado-financiero` y aplicación transaccional/idempotente a `acciones-financieras`; pagos por vencimiento y conjunto, créditos/prorrateo, mora/descuentos, suspensiones | Pruebas de total exacto y no doble cobro con fechas 5/15/30/31, meses cortos, X2, saldo a favor y pago parcial | No permitir pagar un período dos veces ni redondear centavos por separado |
 | **C. Contrato cliente de lectura** | Extender endpoint autenticado **`mi_estado`** u otro contrato autorizado del mismo propietario con próximos vencimientos por obligación | El propio cliente ve SOLO su calendario confirmado, sin datos de otros clientes ni IDs técnicos | Nunca exponer `simular_calendario_beta` administrativo ni leer el catálogo de clientes por URL |
 | **D. Index primero** | Integrar un pequeño resumen de próximos vencimientos y selector de importe sobre la **interfaz Index existente**; flujo de comprobante se conserva | Capturas móvil: una fecha igual que hoy; varias fechas, pago próximo/todo junto sin duplicaciones | No reemplazar hero, fondo, tarjetas, barra fija o métodos de pago; no crear Index por servicio |
 | **E. Ayuda después** | Mostrar en tarjeta principal el próximo importe y fecha; texto «Próximo a vencer» si realmente aplica, acceso a Index actual; evitar cerrar tarjeta al actualizar | Comparación de capturas antes/después; scroll, pestañas y realtime preservados | No implementar segunda calculadora ni rediseñar catálogo, carrito, misiones o registro |
 | **F. Piloto y cierre** | Probar primero con pocos clientes con calendarios dispares y X2; auditar datos y recepción de pagos; aprobar visual y backend | Validación de casos y rollback documentado | No habilitar masivamente por defecto |
+
+
+**Cierre de fase A (implementado):** `goxion_calendario_accesos` vincula cada fecha con `cliente_accesos.id`, guarda estado borrador/verificado y auditoría; la Edge `estado-financiero` incluye `guardar_calendario_beta` bajo token Admin. No se tocaron clientes ni importes históricos y no se ejecutó ningún pago. **Fase B sigue pendiente**: obligaciones, promociones, mora, saldos a favor y aplicación idempotente de pagos aprobados. No saltarse B para mostrar importes reales en Index.
 
 ## Riesgos que no deben ocultarse
 
