@@ -2,6 +2,9 @@
 
 **Fase 1: beta de cálculo y aplicación simulada.** 11 de octubre de 2026.
 
+**Siguiente fase:** modelo persistente de obligaciones y pagos antes de exponer fechas a clientes. Ver `docs/GOXION_MULTI_DATE_ROADMAP.md` (backend → Index → Ayuda), y contrato de identidad en `docs/GOXION_VISUAL_CONTRACT.md`. Una prueba de simulación no acredita pagos ni completa visualmente las pantallas.
+
+
 
 ## Refinamiento de experiencia · octubre 2026
 
