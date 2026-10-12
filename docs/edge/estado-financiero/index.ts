@@ -109,8 +109,13 @@ Deno.serve(async(req)=>{
       ]);
       if(contracts.error||accesses.error||verified.error)
         throw contracts.error||accesses.error||verified.error;
+      const todayParts=new Intl.DateTimeFormat("en-US",{
+        timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit"
+      }).formatToParts(new Date());
+      const part=(type:string)=>todayParts.find(p=>p.type===type)?.value||"";
+      const hoy=part("year")+"-"+part("month")+"-"+part("day");
       const calendario=calendarioInformativo({
-        contratos:contracts.data||[],accesos:accesses.data||[],fechas:verified.data||[]
+        contratos:contracts.data||[],accesos:accesses.data||[],fechas:verified.data||[],hoy
       });
       return res({ok:true,calendario,fuente:"goxion_calendario_accesos",modo:"solo_fechas_sin_cobro"});
     }
