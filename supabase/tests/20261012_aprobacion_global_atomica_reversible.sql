@@ -20,6 +20,15 @@ begin
  then raise exception 'Aprobación o idempotencia fallida';end if;
  select count(*) into v_n from public.pagos where cliente_id=v_cliente and estado='pagado';
  if v_n<>1 then raise exception 'Duplicación de pago';end if;
+ begin
+  perform public.goxion_aprobar_pago_periodo_atomico(v_cliente,'2026-10',v_monto,true,'Nota diferente',v_op);
+  raise exception 'Reutilización de clave con otros datos debería rechazarse';
+ exception when others then
+  get stacked diagnostics v_error=MESSAGE_TEXT;
+  if v_error <> 'Clave de aprobación reutilizada con datos diferentes' then
+   raise exception 'Clave idempotente no protegida: %',v_error;
+  end if;
+ end;
  if (select periodo_pendiente from public.clientes where id=v_cliente) <> '2026-11-01'
  then raise exception 'Ciclo inconsistente';end if;
  begin
