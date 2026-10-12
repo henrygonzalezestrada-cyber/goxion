@@ -66,3 +66,24 @@
 - Validaciones estáticas, motor, integración y Safari real antes de declarar oficial.
 
 **Próxima intervención de código:** empezar **A + B** en una beta/PR limitada al modelo de obligaciones y cálculos, antes de tocar visual de Index o Ayuda.
+
+
+## Fase B1 · Conciliación contable sombra implementada (11/oct/2026)
+
+La Edge `estado-financiero` ahora ejecuta **`reconciliarCalendarioOficial({calendario,financiero})`** dentro de **`simular_calendario_beta`**, bajo sesión Admin. Código versionado: `docs/edge/estado-financiero/calendario-conciliacion.mjs`. No se agregó endpoint ni acceso de cliente a importes estimados.
+
+**Criterio:** el motor SQL `goxion_estado_financiero` sigue siendo la **única fuente de importes**, y los servicios/accessos deben sumar exactamente el subtotal contractual. El reconciliador toma las cantidades ya oficiales de:
+- `descuentos.promociones` y `promociones.total_ahorro`, con bloqueo de acumulación promocional;
+- `descuentos.lealtad` y `lealtad.monto`, niveles 3% y 6%, sin recalcular ni reiniciar racha aquí;
+- `descuentos.especiales` (descuentos especiales activos);
+- `descuentos.trato_justo` (servicios afectados por fallas, con restricciones de stacking);
+- `descuentos.programados` y `beneficios_programados`, incluyendo cupones `origen: misiones`, con verificación de IDs únicos;
+- `cargos.mora` y `cargos.reactivacion`, calculados por SQL a fecha actual;
+- `pago_en_revision`, `pago_incompleto`, `esta_pagado_periodo` y acuerdos de cobro.
+
+La asignación por accesos es **aritmética, en centavos**, con restos mayores y límites por saldo. El resultado tiene `modo:"conciliacion_sombra"`, `cuadrado`, categorías y bloqueos, pero **siempre `cobrable:false`** y `desglose_de_obligaciones_autorizado:false`. Si las fuentes no coinciden, retorna fallo cerrado. Un saldo pagado o parcial nunca se reconvierte en cargo.
+
+**Verificación:** 16 casos de regla (lealtad, descuentos, cupón una sola vez, mora, reactivación, pagos parciales, revisión y pagos ya realizados), 16 guardas de rutas, contraste de la contratación ViX X2 real $98 base → $6 lealtad → $92 oficial y prueba de 22 estados financieros (21 conciliaron contablemente; 1 no tenía servicios; **fixture de fechas sintéticas, no afirmación de que tengan calendarios guardados**). No se han modificado `pagos`, `pagos_parciales`, Index ni Ayuda.
+
+**Qué aún falta para B2 / pagos reales:** modelar obligación persistente por `cliente_acceso_id + ciclo`, reglas por período exacto para promociones y cupones de único consumo, créditos y cobertura pagada; recalcular **mora por vencimiento** (no repartir ciegamente mora del corte global); destinar descuentos individuales conforme a sus restricciones; auditar la aprobación de comprobantes y aplicar fondos en transacción SQL idempotente, con bloqueo y no-doble-cobro. Hasta entonces, no permitir «Pagar próximo» o «Todo junto» con importes por servicio en Index.
+
