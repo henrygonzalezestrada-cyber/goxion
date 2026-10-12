@@ -237,3 +237,11 @@ Módulo nuevo y puro `docs/edge/estado-financiero/calendario-conciliacion.mjs`: 
 
 **Invariante crítico:** `cobrable:false`, `desglose_de_obligaciones_autorizado:false` y `modo:"conciliacion_sombra"` aun cuando la aritmética cuadre. No crear endpoint cliente con esos importes, no cambiar `pagoActualInfo` ni aprobar un comprobante por el importe sombra; faltan mora por vencimiento, elegibilidad de descuentos/cupones por obligación, cobertura por ciclo y aplicación de pagos idempotente. El resultado de Index/Ayuda no fue modificado. Casos: `scripts/calendario-conciliacion-smoke.mjs` + `scripts/calendario-conciliacion-edge-smoke.mjs`; incluidos en `npm run verify`. Ver `docs/GOXION_MULTI_DATE_ROADMAP.md`.
 
+
+
+### Abonos por obligación · frontera B2 (12/oct/2026)
+
+**Función preexistente:** `assets/js/core/financial-actions.js` implementa `registerPartialPayment({clienteId,saldoRestante,periodoEsperado})` y acuerdos `pactPaymentDate()`; el punto de entrada Admin es `assets/js/admin/07-admin-ops-v2.js`/guardias 08. Ese campo es **saldo faltante**, no cantidad propuesta por el cliente. La Edge `acciones-financieras` registra el parcial del período global en `pagos_parciales`; Index no permite aún un abono libre de autoservicio.
+
+**Extensión B2 sin modificar producción:** `goxion_obligaciones_sombra`, `goxion_abonos_sombra`, `goxion_imputaciones_sombra` y `goxion_b2_auditoria`, creadas por las migraciones `202610120001`, `002`, `003`. Única clave obligación: `cliente_acceso_id + ciclo_inicio`. No crear acciones de pago reales desde estas tablas; no borrar mora automáticamente por una propuesta. Seguridad con RLS, permisos service_role, claves de idempotencia y bloqueo de propuestas concurrentes. Tests `npm run test:calendario:abonos` (15 política + 33 estructura), verificación SQL reversible. El problema restante es conectar la aprobación real al gateway transaccional: el `registrar_pago_parcial` heredado escribe en varios pasos. Hasta entonces, NO agregar control nuevo en Index ni un panel administrativo paralelo.
+
