@@ -201,7 +201,7 @@
                     return `<div class="gx-beta-access-row gx-beta-access-row-live ${isInvite?'gx-invite-access':''}">
                         <div class="gx-tech-access-main">
                             <strong>${repeated?`Acceso ${x.ordinal}`:esc(x.servicio)}</strong>
-                            <small>${access?(isInvite?'Cuenta personal del cliente':current?`Cuenta: ${esc(current.alias)}`:'Sin cuenta compartida asignada'):'Acceso pendiente de configurar'}</small>
+                            <small>${access?(isInvite?'Invitación personal':current?'Acceso compartido':'Sin cuenta asignada'):'Acceso pendiente de configurar'}</small>
 
                             ${access ? (isInvite ? `
                                 <div class="gx-tech-invite-grid">
@@ -247,7 +247,7 @@
                                         return `<option value="${esc(a.id)}" ${selected?'selected':''} ${full?'disabled':''}>${esc(a.alias)} · ${occ}/${max}${full?' · lleno':''}</option>`;
                                     }).join('')}
                                 </select>
-                                ${isInvite?'<p class="gx-group-invite-note">Solo organiza accesos; no activa licencias ni invitaciones en la plataforma.</p>':`<em class="${current?'assigned':'missing'}">${current?'Asignado':'Pendiente'}</em>`}
+                                ${isInvite?'<p class="gx-group-invite-note">Solo organiza accesos; no activa licencias ni invitaciones en la plataforma.</p>':(!current?'<em class="missing">Pendiente</em>':'')}
                             </div>
                             ${isInvite?'</details>':`
                                 <div class="gx-tech-password-line">
