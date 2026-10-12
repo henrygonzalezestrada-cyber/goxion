@@ -131,6 +131,35 @@ Deno.serve(async (req) => {
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
     const sb = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
+    // B2: imputación exclusivamente SOMBRA de un pago YA APROBADO.
+    // No modifica pagos, parciales, saldos, cobertura, mora ni lealtad.
+    // Autorización por X-Admin-Token al principio del gateway.
+    if (action === "preparar_imputacion_sombra") {
+      const obligacionId=String(data?.obligacion_id||"").trim();
+      const pagoId=String(data?.pago_id||"").trim();
+      const clave=String(data?.clave_idempotencia||"").trim();
+      const monto=Number(data?.monto_centavos);
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(!uuid.test(obligacionId)||!uuid.test(pagoId)||!uuid.test(clave)||
+        !Number.isSafeInteger(monto)||monto<=0||monto>1_000_000_000){
+        return json({ok:false,error:"Se requiere obligación, pago aprobado, importe en centavos y clave válida",
+          operation_id:operationId},400);
+      }
+      const result=await sb.rpc("goxion_preparar_imputacion_sombra",{
+        p_obligacion_id:obligacionId,p_pago_id:pagoId,
+        p_monto_centavos:monto,p_clave_idempotencia:clave
+      });
+      if(result.error){
+        return json({ok:false,
+          error:result.error.message||"No se pudo preparar la imputación",
+          codigo:"IMPUTACION_NO_VALIDADA",operation_id:clave,
+          acreditada:false},409);
+      }
+      return json({ok:true,accion:action,operation_id:clave,
+        contrato:"goxion-b2-shadow-v1",resultado:result.data,
+        modo:"propuesta_sin_acreditacion",acreditada:false,cobrable:false});
+    }
+
     if (action === "aprobar_pago") {
       const clienteId = String(data?.cliente_id || "").trim();
       const monto = Number(data?.monto ?? 0);
