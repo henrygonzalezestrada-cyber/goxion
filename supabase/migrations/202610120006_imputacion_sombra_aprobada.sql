@@ -8,7 +8,7 @@ create or replace function public.goxion_periodo_pago_canonico(p_texto text)
 returns date language plpgsql immutable set search_path='' as $$
 declare
  v_text text:=lower(btrim(coalesce(p_texto,'')));
- v_match text[]; v_mes int; v_anio int;
+ v_match text[]; v_mes int; v_anio int; v_fecha_original date;
  v_nombres text[]:=array['enero','febrero','marzo','abril','mayo','junio',
                        'julio','agosto','septiembre','octubre','noviembre','diciembre'];
 begin
@@ -16,8 +16,9 @@ begin
    v_anio=left(v_text,4)::int;
    v_mes=substring(v_text,6,2)::int;
    if v_anio between 2020 and 2100 then
-     if length(v_text)=10 and to_char(make_date(v_anio,v_mes,least(substring(v_text,9,2)::int,28)),'YYYY-MM')<>
-         left(v_text,7) then return null;end if;
+     if length(v_text)=10 then
+       v_fecha_original=make_date(v_anio,v_mes,substring(v_text,9,2)::int);
+     end if;
      return make_date(v_anio,v_mes,1);
    end if;
    return null;
