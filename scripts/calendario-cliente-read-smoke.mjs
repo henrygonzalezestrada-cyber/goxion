@@ -10,7 +10,7 @@ const date=(id,fecha,cents=4900,estado="verificado")=>({
  dia_corte:Number(fecha.slice(-2)),precio_centavos:cents,estado
 });
 const base={contratos:[contract],accesos:[a1,a2],
- fechas:[date("a1","2026-11-06"),date("a2","2026-11-30")]};
+ fechas:[date("a1","2026-11-06"),date("a2","2026-11-30")],hoy:"2026-10-11"};
 let cases=0;
 function yes(label,got,expected){
  assert.deepEqual(got,expected,label);cases++;
@@ -38,6 +38,9 @@ yes("Contrato con un acceso faltante no muestra parcial",calendarioInformativo({
  contratos:[contract,{id:"extra",nombre:"Prime Video",monto:45}],
  accesos:[a1,a2],fechas:base.fechas}).disponible,false);
 yes("Sin servicios no muestra calendario",calendarioInformativo({}).disponible,false);
+yes("No llama próximo a un vencimiento pasado",calendarioInformativo({...base,hoy:"2026-11-07"}).disponible,false);
+yes("No permite fecha de consulta inválida",calendarioInformativo({...base,hoy:"2026-02-30"}).disponible,false);
+yes("Una fecha de hoy sí es informativa",calendarioInformativo({...base,hoy:"2026-11-06"}).disponible,true);
 yes("Dos contratos independientes",calendarioInformativo({
  contratos:[{id:"one",nombre:"Netflix",monto:109},{id:"two",nombre:"ViX",monto:49}],
  accesos:[{id:"1",cliente_servicio_id:"one",ordinal:1},{id:"2",cliente_servicio_id:"two",ordinal:1}],
