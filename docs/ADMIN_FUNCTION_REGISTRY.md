@@ -197,3 +197,13 @@ Solo se ajustó la presentación del expediente de **Admin → Clientes → Serv
 
 Los controles existentes de correo, estado del beneficio, perfil/PIN y grupo/licencia conservan sus mismos manejadores de datos y se normalizaron a **46 px**, etiquetas de 11 px y valores de 14 px, exclusivamente con CSS limitado al expediente Admin. Las notas sobre contraseñas personales permanecen en texto compacto. No modifica Supabase, Ayuda, Index, credenciales ni políticas de uso. Validación automatizada: `scripts/calendario-admin-integracion-smoke.mjs`.
 
+
+
+### Regla permanente · Compactación inteligente y auditoría visual de GOXION (octubre 2026)
+
+**Aplicada en Admin → Clientes → Servicios → Editar acceso**: los campos cortos relacionados **Perfil + PIN** comparten una fila proporcional (1.6 : 1), altura uniforme 46 px y separación 10 px, usando la clase `gx-tech-compact-pair`. El CSS está limitado a `.gx-focus-v3 .gx-service-access-details` y conserva sus controladores, validaciones y reglas de negocio. En contenedores de anchura igual o inferior a 245 px, la fila vuelve a una columna; **la condición se basa en el ancho real del editor**, no simplemente en el tamaño de la pantalla. Las invitaciones personales no reciben una fila PIN artificial.
+
+**Criterio para cambios visuales futuros, también en nuevos chats**: compactar campos cortos solo cuando caben con holgura, compartir línea sin sacrificar proporción, labels ni tamaños táctiles; no compactar correos, contraseñas o selectores de longitud variable. Preferir retículas con `minmax(0,...)`, `min-width:0`, alturas coherentes y caída responsive por contenedor. **Antes de entregar**, comprobar en pantalla móvil pequeña y normal (280/320/360/375/390/430 px) y ancho mayor: sin scroll horizontal, solapamiento, truncado inesperado, saltos de altura ni distorsión de controles. Verificar además que no se afecten X2, invitaciones personales, cuentas completas ni funciones de edición.
+
+**No copiar diseños entre aplicaciones**: Admin, Ayuda e Index tienen experiencias visuales y CSS distintos; compartir principios de jerarquía, densidad y pruebas, pero mantener los componentes, proporciones concretas y estilos encapsulados por experiencia. No reestructurar Admin, no volver a crear bloques duplicados para funciones existentes. El test estático forma parte de `scripts/calendario-admin-integracion-smoke.mjs`.
+
