@@ -13,7 +13,7 @@ declare
  v_subtotal bigint;v_total bigint;v_descuentos bigint;v_cargos bigint;
  v_propuestas integer:=0;v_abonos integer:=0;v_obligaciones integer:=0;
  v_motivos text[]:=array[]::text[];
- v_oficial date;
+ v_oficial date;v_ajustes jsonb:='{}'::jsonb;
 begin
  if p_cliente_id is null then raise exception 'Cliente requerido';end if;
  if p_periodo is not null and
@@ -80,6 +80,16 @@ begin
      v_total=round((v_estado->>'total_actual')::numeric*100)::bigint;
      v_descuentos=round(coalesce((v_estado->'descuentos'->>'total')::numeric,0)*100)::bigint;
      v_cargos=round(coalesce((v_estado->'cargos'->>'total')::numeric,0)*100)::bigint;
+     -- Sólo valores OFICIALES; no se distribuye ni calcula un nuevo beneficio.
+     v_ajustes=jsonb_build_object(
+       'promociones_centavos',round(coalesce((v_estado->'descuentos'->>'promociones')::numeric,0)*100)::bigint,
+       'lealtad_centavos',round(coalesce((v_estado->'descuentos'->>'lealtad')::numeric,0)*100)::bigint,
+       'especiales_centavos',round(coalesce((v_estado->'descuentos'->>'especiales')::numeric,0)*100)::bigint,
+       'trato_justo_centavos',round(coalesce((v_estado->'descuentos'->>'trato_justo')::numeric,0)*100)::bigint,
+       'programados_y_cupones_centavos',round(coalesce((v_estado->'descuentos'->>'programados')::numeric,0)*100)::bigint,
+       'mora_centavos',round(coalesce((v_estado->'cargos'->>'mora')::numeric,0)*100)::bigint,
+       'reactivacion_centavos',round(coalesce((v_estado->'cargos'->>'reactivacion')::numeric,0)*100)::bigint
+     );
    exception when others then
      v_motivos=array_append(v_motivos,'importes_financieros_invalidos');
    end;
@@ -136,6 +146,7 @@ begin
    'total_oficial_centavos',v_total,
    'beneficios_oficiales_centavos',v_descuentos,
    'cargos_oficiales_centavos',v_cargos,
+   'ajustes_oficiales_sin_asignar',v_ajustes,
    'obligaciones_b2',v_obligaciones,'imputaciones_b2',v_propuestas,
    'solicitudes_b2',v_abonos
  );
