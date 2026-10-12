@@ -308,3 +308,11 @@ La beta agrupa plataformas por su primera fecha no cubierta, simula pago del pr�
 **Garantía de compatibilidad:** los clientes con calendario general heredado continúan bajo el cálculo oficial actual; no hay cambios en tablas ni escrituras. Cada resultado contiene advertencias cuando la fecha no fue confirmada o cuando existen promociones, lealtad, mora o diferencias con el saldo oficial. Este resultado **no es deuda exigible ni pago acreditado**.
 
 Pruebas: **npm run test:calendario**, incluido en **npm run verify**. Para activar el cobro real hace falta crear obligaciones únicas por servicio/rango, aplicar cada aprobación de pago a obligaciones específicas con idempotencia y reconciliar promociones/descuentos y ajustes a favor. Ver **docs/CALENDARIO_FINANCIERO.md**.
+
+
+## B2 · Hallazgo y protección de pagos parciales (12/oct/2026)
+
+**Verificado en código y Supabase:** Admin ya permite marcar un comprobante **incompleto** e introducir el **saldo restante**. `GOXION_FINANCIAL_ACTIONS.registerPartialPayment()` llama `acciones-financieras/registrar_pago_parcial`, la función comprueba cliente y período, registra saldo y monto abonado en `pagos_parciales` y conserva estado incompleto. `pactPaymentDate()` guarda acuerdos en `acuerdos_cobro` con fecha original y fecha pactada. La mora se determina por la lectura oficial sobre el saldo restante, no se elimina por el mero abono. **Index todavía no ofrece al cliente solicitar abonos libremente.** Durante la revisión, `pagos_parciales` tenía 0 registros.
+
+Se instalaron en Supabase tres **tablas de simulación aisladas** para obligaciones por acceso/ciclo, solicitudes de abono e imputaciones, más auditoría y restricciones de idempotencia. No intervienen en los cobros actuales. Se probaron bajo `BEGIN ... ROLLBACK` con un expediente X2; los cuatro registros nuevos terminaron vacíos. La política `abonos-politica.mjs` evalúa monto, saldo, revisión, mora y acuerdos, **no acredita dinero** ni permite inferir condonaciones. La operación real de `registrar_pago_parcial` tiene escrituras sucesivas y requiere refactorización transaccional antes de reutilizarse para autocobro independiente. Consulta `docs/GOXION_MULTI_DATE_ROADMAP.md`.
+
