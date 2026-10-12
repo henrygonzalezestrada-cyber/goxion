@@ -134,6 +134,28 @@ Deno.serve(async (req) => {
     // B2: imputación exclusivamente SOMBRA de un pago YA APROBADO.
     // No modifica pagos, parciales, saldos, cobertura, mora ni lealtad.
     // Autorización por X-Admin-Token al principio del gateway.
+    // B2: validar todo el calendario del cliente ANTES de materializar
+    // obligaciones de prueba. La escritura requiere confirmación administrativa
+    // explícita y nunca genera deuda/pago/cupón real.
+    if (action === "preparar_obligaciones_sombra") {
+      const clienteId=String(data?.cliente_id||"").trim();
+      const periodo=String(data?.periodo||"").trim();
+      const confirmar=data?.confirmar_materializacion===true;
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(!uuid.test(clienteId)||!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(periodo)){
+        return json({ok:false,error:"Cliente y primer día del período requeridos",
+          codigo:"CALENDARIO_NO_VALIDADO",cobrable:false},400);
+      }
+      const prepared=await sb.rpc("goxion_preparar_obligaciones_calendario_sombra",{
+        p_cliente_id:clienteId,p_periodo:periodo,p_solo_validar:!confirmar
+      });
+      if(prepared.error)return json({ok:false,error:prepared.error.message,
+        codigo:"CALENDARIO_NO_VALIDADO",cobrable:false},409);
+      return json({ok:true,accion:action,resultado:prepared.data,
+        modo:"obligaciones_sombra_no_cobrables",acreditada_oficial:false,
+        cobrable:false,operation_id:operationId});
+    }
+
     // B2: confirmar asignación EN SOMBRA, nunca acreditar en cuenta oficial.
     // Solo sesión administrativa, nunca X-Client-Token.
     if (action === "confirmar_imputacion_sombra") {
