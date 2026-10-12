@@ -134,6 +134,42 @@ Deno.serve(async (req) => {
     // B2: imputación exclusivamente SOMBRA de un pago YA APROBADO.
     // No modifica pagos, parciales, saldos, cobertura, mora ni lealtad.
     // Autorización por X-Admin-Token al principio del gateway.
+    // B2: confirmar asignación EN SOMBRA, nunca acreditar en cuenta oficial.
+    // Solo sesión administrativa, nunca X-Client-Token.
+    if (action === "confirmar_imputacion_sombra") {
+      const imputacionId=String(data?.imputacion_id||"").trim();
+      const clave=String(data?.clave_confirmacion||"").trim();
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(!uuid.test(imputacionId)||!uuid.test(clave)){
+        return json({ok:false,error:"Imputación y clave válidas requeridas",
+          codigo:"IMPUTACION_NO_VALIDADA",acreditada_oficial:false},400);
+      }
+      const result=await sb.rpc("goxion_confirmar_imputacion_sombra",{
+        p_imputacion_id:imputacionId,p_clave_confirmacion:clave
+      });
+      if(result.error)return json({ok:false,
+        error:result.error.message||"No se pudo confirmar la imputación",
+        codigo:"IMPUTACION_NO_VALIDADA",acreditada_oficial:false},409);
+      return json({ok:true,accion:action,
+        contrato:"goxion-b2-shadow-v2",resultado:result.data,
+        modo:"asignacion_sombra_sin_cobro",acreditada_oficial:false,
+        cobrable:false,operation_id:clave});
+    }
+    if (action === "resumen_obligacion_sombra") {
+      const obligacionId=String(data?.obligacion_id||"").trim();
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(!uuid.test(obligacionId)){
+        return json({ok:false,error:"Obligación inválida",acreditada_oficial:false},400);
+      }
+      const result=await sb.rpc("goxion_resumen_imputacion_sombra",{
+        p_obligacion_id:obligacionId
+      });
+      if(result.error)return json({ok:false,error:result.error.message||"Error de conciliación",
+        acreditada_oficial:false},409);
+      return json({ok:true,accion:action,resultado:result.data,
+        modo:"informativo_no_cobrable",acreditada_oficial:false,cobrable:false});
+    }
+
     if (action === "preparar_imputacion_sombra") {
       const obligacionId=String(data?.obligacion_id||"").trim();
       const pagoId=String(data?.pago_id||"").trim();
