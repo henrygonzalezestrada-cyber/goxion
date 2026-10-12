@@ -213,15 +213,27 @@ Deno.serve(async (req) => {
       // Compatibilidad temporal para consumidores administrativos heredados.
       // Esta ruta NO puede insertar pagos por su cuenta ni saltear la RPC atómica.
       const clienteId=String(data?.cliente_id??"").trim();
-      const periodo=String(data?.periodo_esperado??"").trim();
+      // Los consumidores antiguos omitían periodo_esperado. Para no romperlos,
+      // obtener el periodo actual del registro administrativo antes de delegar.
+      // La RPC vuelve a comprobar el mismo valor BAJO LOCK.
+      const explicitPeriod=String(data?.periodo_esperado??"").trim();
       const monto=Number(data?.monto??0);
       const notas=String(data?.notas??"");
       const puntual=data?.puntual!==false;
       const supplied=String(data?.clave_idempotencia??"").trim();
       const validUuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!validUuid.test(clienteId)||!/^[0-9]{4}-(0[1-9]|1[0-2])$/.test(periodo)
+      if (!validUuid.test(clienteId)||
+          (explicitPeriod&&!/^[0-9]{4}-(0[1-9]|1[0-2])$/.test(explicitPeriod))
           ||!Number.isFinite(monto)||monto<0||(supplied&&!validUuid.test(supplied))) {
         return res({ok:false,error:"Cliente, periodo, monto o clave inválidos"},400);
+      }
+      let periodo=explicitPeriod;
+      if(!periodo){
+        const current=await sb.from("clientes").select("periodo_pendiente")
+          .eq("id",clienteId).single();
+        if(current.error||!firstOfMonth(current.data?.periodo_pendiente))
+          return res({ok:false,error:"Período de cobro no verificable"},409);
+        periodo=firstOfMonth(current.data.periodo_pendiente)!.slice(0,7);
       }
       const result=await sb.rpc("goxion_aprobar_pago_periodo_atomico",{
         p_cliente_id:clienteId,p_periodo_esperado:periodo,
