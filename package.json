@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos && npm run test:finanzas:parcial-atomico && npm run test:finanzas:imputacion-sombra && npm run test:finanzas:obligaciones-b2 && npm run test:finanzas:aprobacion-atomica",
+    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos && npm run test:finanzas:parcial-atomico && npm run test:finanzas:imputacion-sombra && npm run test:finanzas:obligaciones-b2 && npm run test:finanzas:aprobacion-atomica && npm run test:finanzas:atribucion",
     "test:smoke": "node scripts/browser-smoke.mjs",
     "test:cart": "node scripts/cart-v2-smoke.mjs",
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
@@ -21,6 +21,7 @@
     "test:finanzas:parcial-atomico": "node scripts/pago-parcial-atomico-smoke.mjs && node scripts/pago-parcial-atomic-contract-smoke.mjs && node scripts/pago-parcial-retry-client-smoke.mjs",
     "test:finanzas:imputacion-sombra": "node scripts/imputacion-sombra-b2-smoke.mjs",
     "test:finanzas:obligaciones-b2": "node scripts/confirmar-imputacion-b2-smoke.mjs && node scripts/obligaciones-b2-integracion-smoke.mjs",
-    "test:finanzas:aprobacion-atomica": "node scripts/aprobacion-global-atomica-smoke.mjs"
+    "test:finanzas:aprobacion-atomica": "node scripts/aprobacion-global-atomica-smoke.mjs",
+    "test:finanzas:atribucion": "node scripts/atribucion-b2-smoke.mjs"
   }
 }
