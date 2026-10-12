@@ -29,7 +29,7 @@ function setup(token,clientServices=services,clientFinance=financial,accesses={}
  for(const id of ids){
    const flags=new Set(["hidden"]);
    nodes[id]={
-     id,value:"",textContent:"",innerHTML:"",disabled:false,open:false,events:{},
+     id,value:"",textContent:"",innerHTML:"",dataset:{},disabled:false,open:false,events:{},
      classList:{add(x){flags.add(x)},remove(x){flags.delete(x)},toggle(x,yes){if(yes??!flags.has(x))flags.add(x);else flags.delete(x)},contains(x){return flags.has(x)}},
      addEventListener(name,fn){this.events[name]=fn},
      querySelectorAll(){return[]}
@@ -46,7 +46,7 @@ function setup(token,clientServices=services,clientFinance=financial,accesses={}
      for(const [k,cfg] of Object.entries(proposal.servicios||{})){
        if(cfg?.usar_general===true)delete combined[k];
      }
-     result={ok:true,cliente:clients[0],persistencia:{accesos:accesses},
+     result={ok:true,cliente:clients[0],persistencia:{accesos:accesses,configuracion:persisted},
        calendario:simularCalendario({cliente:clients[0],servicios:clientServices,financiero:clientFinance,
         propuesta:{...proposal,servicios:combined},hoy:"2026-10-11"})};
    }else if(data.accion==="guardar_calendario_beta"){
@@ -65,7 +65,7 @@ function setup(token,clientServices=services,clientFinance=financial,accesses={}
    querySelectorAll(query){return query==="[data-pay]"?modes:[]},
    documentElement:{classList:{add(name){classNames.add(name)}}}
  };
- vm.runInNewContext(js,{document,localStorage:{getItem(k){return k==="GOXION_ADMIN_TOKEN"?token:null}},fetch},{timeout:1100});
+ vm.runInNewContext(js,{document,localStorage:{getItem(k){return k==="GOXION_ADMIN_TOKEN"?token:null}},fetch,setTimeout:()=>1,clearTimeout:()=>{}},{timeout:1100});
  return {nodes,modes,calls};
 }
 const no=setup("");await flush();
@@ -78,6 +78,7 @@ assert(html.includes('type="date" id="unify"'),"La unificación usa calendario n
 x.nodes.client.value="example";
 x.nodes.client.events.change.call(x.nodes.client);await flush();
 assert.equal(x.calls.at(-1).accion,"simular_calendario_beta");
+assert.equal(x.nodes.calendarStatus.textContent,"Sin fechas guardadas","Nadie parece guardado antes del primer registro");
 assert(x.nodes.groups.innerHTML.includes("15 nov"),"Heredar el día 15 sin modificaciones");
 
 assert(x.nodes.services.innerHTML.includes("Fechas ›"),"Un acceso compacto por contratación");
@@ -171,7 +172,11 @@ assert.equal(saved.datos.unidades.length,2);
 assert.equal(saved.datos.unidades.reduce((n,i)=>n+i.precio_centavos,0),9800);
 assert.deepEqual(saved.datos.unidades.map(x=>x.cobertura_hasta),["2026-11-06","2026-11-30"],
  "Fechas guardadas individualmente por acceso real");
-assert(x2.nodes.services.innerHTML.includes("Fechas guardadas en Admin"),"Confirmar guardado sin cobrar");
+assert(x2.nodes.services.innerHTML.includes("Fechas guardadas correctamente"),"Confirmar guardado sin cobrar");
+assert(x2.nodes.calendarNotice.textContent.includes("guardadas correctamente"),"El éxito debe mostrarse como aviso fijo visible");
+assert.equal(x2.nodes.calendarNotice.classList.contains("hidden"),false,"El aviso aparece incluso si el botón quedó abajo");
+assert.equal(x2.nodes.calendarStatus.textContent,"2 fechas guardadas","La cabecera diferencia persistencia de simulación");
+assert(x2.nodes.calendarStatus.dataset.saved==="true","Estado persistente positivo");
 x2.nodes.reset.events.click();await flush();
 assert(x2.nodes.services.innerHTML.includes("6 nov")&&x2.nodes.services.innerHTML.includes("30 nov"),
  "El servidor conserva fechas tras resetear el simulador");
