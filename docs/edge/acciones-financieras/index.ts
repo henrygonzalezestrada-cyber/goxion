@@ -250,48 +250,35 @@ Deno.serve(async (req) => {
         }, 409);
       }
 
-      const downstream = await callFunction(url, "periodo-cobro", "aprobar_pago_periodo", {
-        cliente_id: clienteId,
-        monto,
-        puntual,
-        notas,
-      }, auth.token);
-
-      if (!downstream.response.ok || downstream.body?.ok !== true) {
-        const retryAfter = downstream.response.headers.get("Retry-After");
+      // El estado previo es informativo: la RPC revalida bajo lock de cliente.
+      const suppliedKey=String(data?.clave_idempotencia||"").trim();
+      if(suppliedKey&&!uuid.test(suppliedKey)){
+        return json({ok:false,error:"Clave idempotente inválida",codigo:"CLAVE_INVALIDA"},400);
+      }
+      const effectiveId=suppliedKey||operationId;
+      const applied=await sb.rpc("goxion_aprobar_pago_periodo_atomico",{
+        p_cliente_id:clienteId,p_periodo_esperado:periodoEsperado,
+        p_monto:monto,p_puntual:puntual,p_notas:notas,p_operation_id:effectiveId
+      });
+      if(applied.error||applied.data?.ok!==true){
+        const stale=/PERIODO_DESACTUALIZADO|ya acreditado|ya cubierto/i.test(applied.error?.message||"");
         return json({
-          ok: false,
-          error: downstream.body?.error || downstream.text || "No fue posible aprobar el pago.",
-          operation_id: operationId,
-          etapa: "periodo-cobro",
-        }, downstream.response.status || 500, retryAfter ? { "Retry-After": retryAfter } : {});
+          ok:false,error:applied.error?.message||"No fue posible aprobar el pago.",
+          operation_id:effectiveId,codigo:stale?"PERIODO_DESACTUALIZADO":"APROBACION_ATOMICA_FALLIDA",
+          etapa:"goxion_aprobar_pago_periodo_atomico"
+        },409);
       }
-
-      const paidPeriod = String(before.data?.periodo || "").slice(0,10);
-      if (paidPeriod) {
-        await sb.from("pagos_parciales")
-          .update({ activo: false, estado: "liquidado", updated_at: new Date().toISOString() })
-          .eq("cliente_id", clienteId).eq("periodo", paidPeriod).eq("activo", true);
-        await sb.from("acuerdos_cobro")
-          .update({ activo: false, estado: "cumplido", updated_at: new Date().toISOString() })
-          .eq("cliente_id", clienteId).eq("periodo", paidPeriod).eq("activo", true);
-      }
-
-      const after = await financialState(sb, clienteId);
+      const after=await financialState(sb,clienteId);
       return json({
-        ok: true,
-        accion: action,
-        operation_id: operationId,
-        contrato: "goxion-financial-actions-v1",
-        version: "1.2",
-        resultado: downstream.body,
-        estado_anterior: before.data || null,
-        estado_financiero: after.error ? null : (after.data || null),
-        estado_financiero_error: after.error ? "No fue posible refrescar el estado después de guardar." : null,
+        ok:true,accion:action,operation_id:effectiveId,
+        contrato:"goxion-financial-actions-v1",version:"1.2",
+        resultado:applied.data,estado_anterior:before.data||null,
+        estado_financiero:after.error?null:(after.data||null),
+        estado_financiero_error:after.error?"No fue posible refrescar el estado después de guardar.":null
       });
     }
 
-    if (action === "trato_justo_guardar") {
+        if (action === "trato_justo_guardar") {
       const clienteId = String(data?.cliente_id || "").trim();
       const servicioId = String(data?.cliente_servicio_id || "").trim();
       const periodo = month(data?.periodo);
