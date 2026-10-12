@@ -64,6 +64,13 @@ run("No apilar promoción y lealtad en un mismo acceso",()=>{
  const r=verificarAtribucionB2({obligaciones:access,asignaciones:a,financiero:f});
  check(r.errores[0],"lealtad_en_acceso_promocionado_o_no_elegible");
 });
+run("No apilar lealtad aunque llegue ANTES que promoción",()=>{
+ const a=[assign("c1","lealtad",300,{origen_id:"leal",lealtad_elegible:true}),
+ assign("c1","promociones",300,{origen_id:"promo-1",periodo_indice:1,contrato_reconciliado:true})];
+ const f=official({descuentos:{promociones:3,lealtad:3,especiales:0,trato_justo:0,programados:0,total:6}});
+ check(verificarAtribucionB2({obligaciones:access,asignaciones:a,financiero:f}).errores[0],
+ "lealtad_en_acceso_promocionado_o_no_elegible");
+});
 run("Trato Justo no va a servicio ajeno",()=>{
  const a=[assign("c1","trato_justo",600,{cliente_servicio_id:"netflix"})];
  const f=official({descuentos:{promociones:0,lealtad:0,especiales:0,trato_justo:6,programados:0,total:6}});
