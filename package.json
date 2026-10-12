@@ -18,6 +18,6 @@
     "test:index-calendario:visual": "node scripts/index-calendario-visual-preflight.mjs",
     "test:calendario:conciliacion": "node scripts/calendario-conciliacion-smoke.mjs && node scripts/calendario-conciliacion-edge-smoke.mjs",
     "test:calendario:abonos": "node scripts/abonos-politica-smoke.mjs && node scripts/abonos-b2-schema-smoke.mjs",
-    "test:finanzas:parcial-atomico": "node scripts/pago-parcial-atomico-smoke.mjs && node scripts/pago-parcial-atomic-contract-smoke.mjs"
+    "test:finanzas:parcial-atomico": "node scripts/pago-parcial-atomico-smoke.mjs && node scripts/pago-parcial-atomic-contract-smoke.mjs && node scripts/pago-parcial-retry-client-smoke.mjs"
   }
 }
