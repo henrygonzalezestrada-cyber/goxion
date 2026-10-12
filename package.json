@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente",
+    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual",
     "test:smoke": "node scripts/browser-smoke.mjs",
     "test:cart": "node scripts/cart-v2-smoke.mjs",
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
@@ -14,6 +14,7 @@
     "test:comunicaciones": "node scripts/comunicaciones-beta-smoke.mjs && node scripts/comunicaciones-resilience-smoke.mjs && node scripts/comunicaciones-plan-beta-smoke.mjs && node scripts/comunicaciones-oficial-smoke.mjs",
     "test:calendario": "node scripts/calendario-financiero-beta-smoke.mjs && node scripts/calendario-financiero-ui-smoke.mjs && node scripts/calendario-admin-integracion-smoke.mjs && node scripts/admin-access-password-smoke.mjs",
     "test:visual-contract": "node scripts/visual-contract-smoke.mjs",
-    "test:calendario:cliente": "node scripts/calendario-cliente-read-smoke.mjs"
+    "test:calendario:cliente": "node scripts/calendario-cliente-read-smoke.mjs",
+    "test:index-calendario:visual": "node scripts/index-calendario-visual-preflight.mjs"
   }
 }
