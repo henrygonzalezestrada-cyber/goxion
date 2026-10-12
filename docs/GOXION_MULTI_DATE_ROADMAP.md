@@ -138,3 +138,16 @@ La RPC bloquea al cliente para serializar operaciones, lee el estado oficial des
 
 
 **Refuerzo de Admin y Safari:** `assets/js/core/financial-actions.js` reutiliza una clave de idempotencia mientras cliente, período y saldo faltante sean iguales; un reintento por pérdida de respuesta o doble toque no crea otro pago. Si cambian cliente, período o saldo, utiliza una clave nueva. `admin.html` actualizó la referencia de caché. Prueba adicional: `scripts/pago-parcial-retry-client-smoke.mjs` (9 casos; total nuevo 47 guardas y simulaciones del flujo atómico). Se mantiene idéntico el diseño de Admin.
+
+
+## B2 · Asociación controlada de pagos aprobados (12/oct/2026)
+
+**Hecho, exclusivamente en sombra:** nueva migración `supabase/migrations/202610120006_imputacion_sombra_aprobada.sql` y gateway `acciones-financieras` **v8**. No se tocaron los 28 pagos previos ni se registró ninguna acreditación B2.
+
+- `goxion_periodo_pago_canonico(text)` convierte **solo meses válidos** de los formatos históricos (por ejemplo `Julio 2026`, `septiembre de 2026`, `octubre de 2026`) a la fecha del primer día del mes. Fecha inválida → `NULL`. **Normalizar el mes no prueba qué perfil se pagó**: la obligación debe elegirse explícitamente y seguir conciliada.
+- Se refuerza el trigger de `goxion_imputaciones_sombra`: exige `pagos.estado='pagado'`, misma cuenta, mes del comprobante igual al del ciclo y topes tanto del pago como de la obligación. Bloqueos `FOR UPDATE` y nueva clave idempotente con índice único. Para parciales, solo considera los vigentes con estado pendiente y bloquea el cruce con un pago completo del mismo período.
+- `goxion_preparar_imputacion_sombra(obligacion_id,pago_id,monto_centavos,clave)` es una RPC transaccional solo para `service_role`. En `docs/edge/acciones-financieras/index.ts`, nueva acción **Admin** `preparar_imputacion_sombra` bajo `X-Admin-Token`, no expuesta a clientes. Devuelve `modo:'propuesta_sin_acreditacion'`, `acreditada:false`.
+- Pruebas `scripts/imputacion-sombra-b2-smoke.mjs` (**39 casos y guardas**) incorporadas a `npm run verify`. Transacciones SQL con `ROLLBACK` probaron asignación de un pago aprobado, repetición de clave, conflicto de importe, límite, auditoría, comprobante inexistente y período incompatible. Recuento B2 tras reversión: **0**.
+- Revalidación de la versión 7 heredada: 47 pruebas de parcial atómico/Idempotencia siguen pasando. La versión 8 conserva aprobar pago total y pago incompleto de Admin sin cambios visuales.
+
+**Límite vigente:** la tabla `goxion_imputaciones_sombra` sigue en estado **propuesta**, jamás marca deuda como pagada ni consume lealtad, cupones o mora. Tampoco crea obligaciones de manera automática: la correspondencia entre ciclos, cobertura pagada y descuentos por acceso sigue pendiente. No llamar `preparar_imputacion_sombra` para acreditar una cuenta, ni habilitar aún en Index. Próximo trabajo: cierre de ciclo y recálculo transaccional de saldo/mora/beneficios con comprobante aprobado, sin facturar pagos históricos nuevamente.
