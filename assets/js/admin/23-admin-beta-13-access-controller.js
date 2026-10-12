@@ -232,13 +232,7 @@
                                         <input type="text" value="${esc(access.perfil_pin||'')}" placeholder="PIN" maxlength="30" onchange="gxUpdateTechnicalAccess('${esc(access.id)}','perfil_pin',this.value,this)">
                                     </label>
                                 </div>
-                                <div class="gx-tech-password-line">
-                                    <div class="gx-tech-password-main">
-                                        <span>Contraseña</span>
-                                        <small>${current?'De la cuenta compartida':'Asigna una cuenta para gestionarla'}</small>
-                                    </div>
-                                    ${current?`<button class="gx-tech-password-action" type="button" aria-label="Gestionar contraseña de ${esc(x.servicio)}" onclick="gxOpenTechnicalPassword('${esc(x.servicio_id)}','${esc(current.id)}',event)">Gestionar</button>`:''}
-                                </div>
+
                             `) : ''}
                         </div>
                         ${access?`
@@ -255,7 +249,15 @@
                                 </select>
                                 ${isInvite?'<p class="gx-group-invite-note">Solo organiza accesos; no activa licencias ni invitaciones en la plataforma.</p>':`<em class="${current?'assigned':'missing'}">${current?'Asignado':'Pendiente'}</em>`}
                             </div>
-                            ${isInvite?'</details>':''}
+                            ${isInvite?'</details>':`
+                                <div class="gx-tech-password-line">
+                                    <div class="gx-tech-password-main">
+                                        <span>Contraseña</span>
+                                        <small>${current?'De la cuenta compartida':'Asigna una cuenta para gestionarla'}</small>
+                                    </div>
+                                    ${current?`<button class="gx-tech-password-action" type="button" aria-label="Gestionar contraseña de ${esc(x.servicio)}" onclick="gxOpenTechnicalPassword('${esc(x.servicio_id)}','${esc(current.id)}',event)">Gestionar</button>`:''}
+                                </div>
+                            `}
                         `:`<em class="missing">Revisión</em>`}
                     </div>`;
                 }).join('')}
