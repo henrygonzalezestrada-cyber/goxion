@@ -3,8 +3,8 @@ import {verificarAtribucionB2} from "../docs/edge/estado-financiero/atribucion-b
 import {readFileSync} from "node:fs";
 let n=0;const run=(name,fn)=>{try{fn();n++}catch(e){throw Error(name+": "+e.message)}};
 const access=[
-{id:"c1",cliente_servicio_id:"vix",cliente_acceso_id:"a1",ciclo_inicio:"2026-10-01",fecha_vencimiento:"2026-10-05",base_centavos:4900,calendario_estado:"verificado",calendario_revision:1},
-{id:"c2",cliente_servicio_id:"vix",cliente_acceso_id:"a2",ciclo_inicio:"2026-10-01",fecha_vencimiento:"2026-10-15",base_centavos:4900,calendario_estado:"verificado",calendario_revision:1}
+{id:"c1",cliente_servicio_id:"vix",cliente_acceso_id:"a1",ciclo_inicio:"2026-10-01",fecha_vencimiento:"2026-10-05",cobertura_hasta:"2026-10-05",base_centavos:4900,calendario_estado:"verificado",calendario_revision:1},
+{id:"c2",cliente_servicio_id:"vix",cliente_acceso_id:"a2",ciclo_inicio:"2026-10-01",fecha_vencimiento:"2026-10-15",cobertura_hasta:"2026-10-15",base_centavos:4900,calendario_estado:"verificado",calendario_revision:1}
 ];
 const official=(over={})=>({
  fuente_financiera:"supabase:goxion_estado_financiero",contrato_financiero:{modo:"oficial"},
@@ -39,6 +39,14 @@ run("Fechas sin verificar no crean importes",()=>{
 run("No duplicar acceso por ID",()=>{
  const r=verificarAtribucionB2({...base,obligaciones:[access[0],access[0]]});
  check(r.coherente,false);
+});
+run("Cobertura distinta del vencimiento no es deuda autorizada",()=>{
+ const r=verificarAtribucionB2({...base,obligaciones:[{...access[0],cobertura_hasta:"2026-10-06"},access[1]]});
+ check(r.errores[0],"obligacion_sin_identidad_cobertura_o_revision");
+});
+run("Un acceso y ciclo no pueden duplicarse con ID nuevo",()=>{
+ const r=verificarAtribucionB2({...base,obligaciones:[access[0],{...access[1],cliente_acceso_id:access[0].cliente_acceso_id}]});
+ check(r.errores[0],"acceso_ciclo_duplicado");
 });
 run("No duplicar fuente y obligación",()=>{
  const r=verificarAtribucionB2({...base,asignaciones:[...base.asignaciones,...base.asignaciones]});
