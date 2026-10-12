@@ -159,4 +159,28 @@ assert(page.includes('max-height:46px'),"La tarjeta no crece por las medidas int
 assert(page.includes('id="unifyDateValue"'),"Unificar fechas comparte el mismo control estable");
 
 
+
+/* Regresión: campos cortos perfil + PIN en una fila, sin afectar invitaciones. */
+assert(accessController.includes('class="gx-tech-credential-grid gx-tech-compact-pair"'),
+ "Perfil y PIN deben compartir únicamente un contenedor compacto");
+const pairStart=accessController.indexOf('class="gx-tech-credential-grid gx-tech-compact-pair"');
+const pairMarkup=accessController.slice(pairStart,pairStart+900);
+assert(pairMarkup.includes('<span>Perfil</span>')&&pairMarkup.includes('<span>PIN</span>'),
+ "El diseño compacto contiene solo Perfil y PIN");
+assert(pairMarkup.includes("'perfil_nombre'")&&pairMarkup.includes("'perfil_pin'"),
+ "Guardar y actualizar ambos campos conserva los mismos controladores");
+assert(accessController.includes('<div class="gx-tech-invite-grid">'),
+ "La rama de invitación personal conserva su diseño independiente");
+const credentialCSS=css.slice(css.indexOf('GOXION ADMIN · Compactación de campos breves'));
+assert(credentialCSS.includes('grid-template-columns:minmax(0,1.6fr) minmax(88px,1fr)!important'),
+ "Retícula de dos columnas 1.6:1 y ancho mínimo del PIN");
+assert(credentialCSS.includes('height:46px!important')&&credentialCSS.includes('min-height:46px!important'),
+ "Controles de Perfil y PIN conservan 46px de altura");
+assert(credentialCSS.includes('@container gx-access-fields (max-width:245px)'),
+ "Aptitud responsive según el ancho real del editor, no todo el viewport");
+assert(credentialCSS.includes('grid-template-columns:minmax(0,1fr)!important'),
+ "La fila se apila automáticamente si el editor no tiene espacio");
+assert(!credentialCSS.includes('.gx-tech-invite-grid'),
+ "No extender la regla compacta a invitaciones personales");
+
 console.log("GOXION Admin: integración contextual en Servicios, modal y cliente correcto PASS.");
