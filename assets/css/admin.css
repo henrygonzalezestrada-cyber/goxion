@@ -5933,3 +5933,37 @@ body.gx-beta-22 .gx-reg-actions .gx-prepare-activation{border-color:rgba(0,242,2
 .gx-focus-v3 .gx-service-access-details .gx-group-invite-note{
   color:#899bb1;font-size:11px;line-height:1.45;margin:8px 0 0;
 }
+
+
+/* GOXION ADMIN · Compactación de campos breves (perfil + PIN).
+   La invitación personal, contraseñas y selectores largos mantienen su layout. */
+.gx-focus-v3 .gx-service-access-details .gx-tech-credential-grid.gx-tech-compact-pair{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.6fr) minmax(88px,1fr)!important;
+  gap:10px!important;
+  align-items:end!important;
+  width:100%;min-width:0;max-width:100%;box-sizing:border-box;
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-compact-pair>label{
+  display:flex;flex-direction:column;min-width:0;max-width:100%;
+  margin:0!important;align-self:stretch;
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-compact-pair>label>span{
+  display:block;min-height:15px;line-height:15px!important;
+  margin:0 0 7px!important;white-space:nowrap;
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-compact-pair>label>input{
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  height:46px!important;min-height:46px!important;max-height:46px!important;
+  box-sizing:border-box;flex:none;align-self:stretch;
+}
+/* Adaptación por espacio real del expediente, no por el tamaño de toda la pantalla. */
+.gx-focus-v3 .gx-service-access-details .gx-tech-access-main:has(>.gx-tech-compact-pair){
+  container-name:gx-access-fields;
+  container-type:inline-size;
+}
+@container gx-access-fields (max-width:245px){
+  .gx-focus-v3 .gx-service-access-details .gx-tech-credential-grid.gx-tech-compact-pair{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+}
