@@ -22,7 +22,7 @@ for(const marker of [
  'class="sticky-area"','class="balance-hero"','class="total-amount"',
  'class="scrollable-content"','class="glass-card card-info"',
  'class="glass-card services-container"','class="actions-group',
- 'class="gx-payment-primary"','class="gx-bank-overlay"'
+ 'gx-payment-primary','class="gx-bank-overlay"'
 ]){
  // El cuerpo de estado de cuenta se renderiza en JS; los modales están en HTML.
  check(page.includes(marker)||html.includes(marker),"Elemento aprobado desapareció: "+marker);
