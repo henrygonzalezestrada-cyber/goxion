@@ -26,7 +26,7 @@ declare
  v_periodo date; v_next date; v_label text; v_pagos int; v_streak int;
  v_new_streak int; v_efecto text; v_monto_centavos bigint;
  v_puntual boolean; v_notas text; v_result jsonb;
- v_financial jsonb;
+ v_financial jsonb; v_oficial_centavos bigint;
 begin
  if p_cliente_id is null or p_operation_id is null or p_periodo_esperado is null
     or p_periodo_esperado !~ '^[0-9]{4}-(0[1-9]|1[0-2])$'
@@ -63,9 +63,19 @@ begin
  end if;
  -- La fuente oficial se consulta bajo el lock. No se permite reabrir un pago ya liquidado.
  v_financial=public.goxion_estado_financiero(p_cliente_id);
- if substring(coalesce(v_financial->>'periodo',''),1,7)<>p_periodo_esperado
+ if v_financial->>'fuente_financiera' is distinct from 'supabase:goxion_estado_financiero'
+    or v_financial->'contrato_financiero'->>'modo' is distinct from 'oficial'
+    or substring(coalesce(v_financial->>'periodo',''),1,7)<>p_periodo_esperado
     or coalesce((v_financial->>'esta_pagado_periodo')::boolean,false) then
-   raise exception 'PERIODO_DESACTUALIZADO o período ya cubierto';
+   raise exception 'PERIODO_DESACTUALIZADO o fuente financiera no cobrable';
+ end if;
+ if v_financial->>'total_actual' is null then
+   raise exception 'No existe un total oficial verificable';
+ end if;
+ v_oficial_centavos=round((v_financial->>'total_actual')::numeric*100);
+ if v_oficial_centavos is null or v_oficial_centavos<0
+    or v_monto_centavos is distinct from v_oficial_centavos then
+   raise exception 'MONTO_DESACTUALIZADO: el pago no coincide con el saldo oficial';
  end if;
  select count(*) into v_pagos from public.pagos
  where cliente_id=p_cliente_id and public.goxion_periodo_pago_canonico(periodo)=v_periodo;
