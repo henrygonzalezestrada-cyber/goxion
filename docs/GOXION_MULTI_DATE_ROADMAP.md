@@ -34,6 +34,19 @@
 
 **Cierre de fase A (implementado):** `goxion_calendario_accesos` vincula cada fecha con `cliente_accesos.id`, guarda estado borrador/verificado y auditoría; la Edge `estado-financiero` incluye `guardar_calendario_beta` bajo token Admin. No se tocaron clientes ni importes históricos y no se ejecutó ningún pago. **Fase B sigue pendiente**: obligaciones, promociones, mora, saldos a favor y aplicación idempotente de pagos aprobados. No saltarse B para mostrar importes reales en Index.
 
+## Avance de la fase C: consulta informativa autenticada (11/oct/2026)
+
+**Implementado en la Edge `estado-financiero` v11, sin cambios de UI en Index o Ayuda:**
+
+- `mi_calendario` acepta únicamente un `X-Client-Token` válido, obtiene el cliente del token y exige cuenta no suspendida. No acepta `cliente_id` suministrado por navegador.
+- Exige cobertura verificada de **todos** los accesos de todas las contrataciones activas, precios base conciliados por contrato, fechas válidas no pasadas e identidad de acceso inequívoca. Si falta algo, devuelve `disponible:false` y **no** presenta un calendario parcial.
+- Responde exclusivamente con fechas, plataforma y ordinales (cuando aplica), en modo `informativo_sin_cobro`. No expone monto individual exigible, ni cobra, ni guarda, ni modifica período, descuentos o saldo oficial.
+- Módulo puro: `docs/edge/estado-financiero/calendario-cliente.mjs`. Prueba `scripts/calendario-cliente-read-smoke.mjs` (27 escenarios/controles) y prueba de preflight visual `scripts/index-calendario-visual-preflight.mjs` (25 comprobaciones).
+- **Situación real**: solo una contratación X2 tiene todas las fechas verificadas; no se propagaron supuestos a otros clientes. Se reconfirmó paridad 22/22 de estados financieros oficiales, 0 divergencias.
+- Index sigue sin consumir esta ruta. Preparación de componentes reales en `docs/INDEX_CALENDARIO_VISUAL_BASELINE.md`, sin activar UI ni nueva opción de pago. El siguiente paso técnico continúa siendo conciliación/aplicación transaccional de obligaciones de la fase B.
+
+**Importante:** fase C aquí se refiere solo a la **lectura informativa**, no a la disponibilidad de importes pagables; por ello las fases B y D completas siguen pendientes. No dar por terminado el flujo de cobros por fechas.
+
 ## Riesgos que no deben ocultarse
 
 - El simulador divide importes X2 de forma aritmética; **esto no demuestra la tarifa real ni su cobertura individual**. Verificación obligatoria antes de persistir.
