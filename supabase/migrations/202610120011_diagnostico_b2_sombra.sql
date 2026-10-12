@@ -133,6 +133,20 @@ begin
  end if;
  return jsonb_build_object(
    'ok',true,'modo','diagnostico_b2_sombra',
+   -- Una cuenta global con 15 u otro día NO depende del calendario B2.
+   -- La preparación de obligaciones separadas es una regla distinta
+   -- a la cobrabilidad de la mensualidad legada (siempre en el motor oficial).
+   'flujo_operativo',case
+     when v_cliente.estado='suspendido' then 'bloqueado_por_suspension'
+     when v_fechas>=2 then 'b2_multifecha_pendiente'
+     when v_fechas=1 and exists(
+       select 1 from public.goxion_calendario_accesos ca
+       where ca.cliente_id=p_cliente_id and ca.estado='verificado'
+         and ca.dia_corte is distinct from (
+           select dia_pago from public.clientes where id=p_cliente_id)
+     ) then 'revisar_fecha_global'
+     else 'cobro_global_heredado'
+   end,
    'cliente_id',p_cliente_id,'periodo',v_periodo,
    'aplicable_sombra',coalesce(array_length(v_motivos,1),0)=0,
    'cobrable',false,'acreditada_oficial',false,
