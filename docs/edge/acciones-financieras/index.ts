@@ -239,7 +239,11 @@ Deno.serve(async (req) => {
       }
 
       const periodoActual = String(before.data?.periodo || "").slice(0, 7);
-      if (periodoActual !== periodoEsperado) {
+      // Si una respuesta se perdió después del COMMIT, la clave existente debe
+      // llegar a SQL para devolver la operación original aun con periodo avanzado.
+      // Una clave NUEVA no salta la guarda: SQL lo rechazará bajo lock.
+      const replayKey=String(data?.clave_idempotencia||"").trim();
+      if (periodoActual !== periodoEsperado && !uuid.test(replayKey)) {
         return json({
           ok: false,
           error: "El periodo de cobro cambió antes de aprobar el pago. Recarga la ficha antes de continuar.",
