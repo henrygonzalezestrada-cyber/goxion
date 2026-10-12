@@ -21,6 +21,11 @@ check(sql.includes("'fecha_unica_conservar_cobro_global'"),'Cliente una fecha se
 check(sql.includes("'calendarios_no_verificados_o_fuera_de_periodo'"),'Guardas de verificación');
 check(sql.includes("'beneficios_mora_o_reactivacion_sin_atribucion'"),'No prorratea beneficios');
 check(sql.includes("'waterfall_financiero_inconsistente'"),'Control de waterfall');
+check(sql.includes("'ajustes_oficiales_sin_asignar'"),'Desglose de categorías oficiales sin cobro');
+for (const category of ['promociones','lealtad','especiales','trato_justo',
+ 'programados_y_cupones','mora','reactivacion']) {
+ check(sql.includes("'"+category+"_centavos'"),'Desglose conserva '+category);
+}
 check(sql.includes("'pago_en_revision_o_parcial'"),'Parciales/revisión no se acreditan');
 check(sql.includes("'movimientos_b2_requieren_conciliacion'"),'No se duplica imputación');
 check(!/insert into public\.|update public\.|delete from public\./i.test(sql),
