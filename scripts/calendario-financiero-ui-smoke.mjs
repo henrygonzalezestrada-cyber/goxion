@@ -10,6 +10,8 @@ assert(js,"Falta controlador de beta");
 new vm.Script(js);
 assert(edge.includes('accion==="simular_calendario_beta"'));
 assert(edge.includes('accion==="listar_calendarios_beta"'));
+assert(edge.includes('accion==="guardar_calendario_beta"'));
+assert(edge.includes('const admin=await verify('),"Las escrituras requieren autenticación Admin");
 assert(!/\.(insert|update|upsert|delete)\(/.test(edge),"La beta debe seguir sin escrituras");
 assert(!html.includes("<h2>1.")&&!html.includes("<h2>2.")&&!html.includes("<h2>3."),"Sin asistente por pasos");
 assert(!html.includes("data-field=\"nuevo_dia\""),"No se muestran términos antiguos");
@@ -20,8 +22,9 @@ const services=[{id:"netflix",nombre:"Netflix",monto:120,activo:true},
  {id:"disney",nombre:"Disney+",monto:90,activo:true}];
 const financial={fecha_corte:"2026-11-15",periodo:"2026-11-01",total_actual:210,promociones:{total_ahorro:0}};
 async function flush(){for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r))}
-function setup(token,clientServices=services,clientFinance=financial){
- const nodes={},calls=[];
+function setup(token,clientServices=services,clientFinance=financial,accesses={}){
+ const nodes={},calls=[],persisted={};
+ const inverse=Object.fromEntries(Object.entries(accesses).map(([k,v])=>[v,k]));
  const events={};
  for(const id of ids){
    const flags=new Set(["hidden"]);
@@ -35,11 +38,23 @@ function setup(token,clientServices=services,clientFinance=financial){
  const modes=["proximo","todos","elegidos"].map(pay=>({dataset:{pay},events:{},setAttribute(k,v){this[k]=v},addEventListener(k,fn){this.events[k]=fn}}));
  const fetch=async(_,options)=>{
    const data=JSON.parse(options.body);calls.push(data);
-   const result=data.accion==="listar_calendarios_beta"?{ok:true,clientes:clients}:
-    data.accion==="simular_calendario_beta"?{ok:true,cliente:clients[0],
-      calendario:simularCalendario({cliente:clients[0],servicios:clientServices,financiero:clientFinance,
-        propuesta:data.datos.propuesta,hoy:"2026-10-11"})}:
-    {ok:false,error:"Acción inesperada"};
+   let result;
+   if(data.accion==="listar_calendarios_beta")result={ok:true,clientes:clients};
+   else if(data.accion==="simular_calendario_beta"){
+     const proposal=data.datos.propuesta||{};
+     const combined={...persisted,...(proposal.servicios||{})};
+     result={ok:true,cliente:clients[0],persistencia:{accesos:accesses},
+       calendario:simularCalendario({cliente:clients[0],servicios:clientServices,financiero:clientFinance,
+        propuesta:{...proposal,servicios:combined},hoy:"2026-10-11"})};
+   }else if(data.accion==="guardar_calendario_beta"){
+     for(const item of data.datos.unidades){
+       const id=inverse[item.acceso_id];
+       if(!id)throw Error("Acceso no encontrado en contrato");
+       persisted[id]={cobertura_hasta:item.cobertura_hasta,dia_original:item.dia_corte,
+         precio_centavos:item.precio_centavos,cobertura_confirmada:item.confirmado};
+     }
+     result={ok:true,guardado:{accesos_guardados:data.datos.unidades.length}};
+   }else result={ok:false,error:"Acción inesperada"};
    return{ok:result.ok,status:result.ok?200:400,json:async()=>result};
  };
  const classNames=new Set();
@@ -100,7 +115,7 @@ assert(x.calls.every(c=>["listar_calendarios_beta","simular_calendario_beta"].in
 const x2=setup("simulated-token",[
  {id:"x2",nombre:"ViX Premium (x2)",monto:98,activo:true},
  {id:"extra",nombre:"Crunchyroll",monto:100,activo:true}
-],{...financial,total_actual:198});
+],{...financial,total_actual:198},{"x2#1":"access-one","x2#2":"access-two","extra":"access-extra"});
 await flush();
 x2.nodes.client.value="example";
 x2.nodes.client.events.change.call(x2.nodes.client);await flush();
@@ -138,5 +153,27 @@ assert(x2.nodes.services.innerHTML.includes("6 nov")&&x2.nodes.services.innerHTM
 x2.modes[1].events.click();await flush();
 assert.equal(x2.nodes.total.textContent,"$198.00","Pagar todo suma X2 completo y otro servicio");
 assert(x2.calls.every(c=>["listar_calendarios_beta","simular_calendario_beta"].includes(c.accion)));
+x2.nodes.services.events.click({target:{closest(sel){
+ return sel==="[data-manage]"?{getAttribute:()=>"x2"}:null;
+}}});
+assert(x2.nodes.services.innerHTML.includes("Guardar fechas"),"Acceso real ofrece guardado");
+x2.nodes.services.events.click({target:{closest(sel){
+ return sel==="[data-save]"?{getAttribute:()=>"x2"}:null;
+}}});
+await flush();
+const saved=x2.calls.find(c=>c.accion==="guardar_calendario_beta");
+assert(saved,"Se envía un solo guardado explícito de contrato");
+assert.equal(saved.datos.contrato_id,"x2");
+assert.equal(saved.datos.unidades.length,2);
+assert.equal(saved.datos.unidades.reduce((n,i)=>n+i.precio_centavos,0),9800);
+assert.deepEqual(saved.datos.unidades.map(x=>x.cobertura_hasta),["2026-11-06","2026-11-30"],
+ "Fechas guardadas individualmente por acceso real");
+assert(x2.nodes.services.innerHTML.includes("Fechas guardadas en Admin"),"Confirmar guardado sin cobrar");
+x2.nodes.reset.events.click();await flush();
+assert(x2.nodes.services.innerHTML.includes("6 nov")&&x2.nodes.services.innerHTML.includes("30 nov"),
+ "El servidor conserva fechas tras resetear el simulador");
+assert(!x2.calls.some(c=>c.accion==="aprobar_pago"||c.accion==="registrar_pago"),
+ "El guardado no ejecuta acciones de cobro");
 
-console.log("GOXION calendario: contratos compactos, calendario por acceso, X2, pago conjunto y cero escrituras PASS.");
+
+console.log("GOXION calendario: X2 compacto, fechas persistidas con token Admin y sin cargos PASS.");
