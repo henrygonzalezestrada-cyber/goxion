@@ -270,3 +270,12 @@ La RPC bloquea al cliente para serializar operaciones, lee el estado oficial des
 
 
 **Refuerzo de Admin y Safari:** `assets/js/core/financial-actions.js` reutiliza una clave de idempotencia mientras cliente, período y saldo faltante sean iguales; un reintento por pérdida de respuesta o doble toque no crea otro pago. Si cambian cliente, período o saldo, utiliza una clave nueva. `admin.html` actualizó la referencia de caché. Prueba adicional: `scripts/pago-parcial-retry-client-smoke.mjs` (9 casos; total nuevo 47 guardas y simulaciones del flujo atómico). Se mantiene idéntico el diseño de Admin.
+
+
+### Imputación financiera B2 de comprobantes aprobados (12/oct/2026)
+
+**Dueño único:** `acciones-financieras`, ahora versión 8 en `docs/edge/acciones-financieras/index.ts`. Su acción `preparar_imputacion_sombra` es exclusivamente administrativa (token `X-Admin-Token`) y usa `goxion_preparar_imputacion_sombra`. No desplazar la aprobación histórica de `aprobar_pago` ni el flujo de `registrar_pago_parcial`.
+
+**Origen:** solo `pagos.estado='pagado'`; el texto `pagos.periodo` admite formatos históricos en español y se normaliza al primer día del mes con `goxion_periodo_pago_canonico`, sin reescribir la tabla oficial. Cliente y mes deben coincidir con la obligación, los importes no pueden superar comprobante u obligación, y se audita toda propuesta. **Nunca acredita**; respuesta `acreditada:false`. Los parciales continúan limitados a su semántica legacy y no pueden duplicar un pago completo.
+
+**Persistencia:** `goxion_imputaciones_sombra`, clave de idempotencia única y transacción aislada. Conservar la frontera: no habilitar acción en Index/Ayuda ni emitir cobros individualizados hasta resolver cobertura y beneficios por acceso. Pruebas `scripts/imputacion-sombra-b2-smoke.mjs`.
