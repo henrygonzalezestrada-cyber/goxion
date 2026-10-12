@@ -102,6 +102,11 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 #unify[type=date]{color-scheme:dark}
 @media(max-width:520px){.contract-row{gap:8px}.contract-side{min-width:74px}.access-date-heading{align-items:center}.date-picker-shell{width:100%;min-width:0}}
 
+.save-calendar-row{display:flex;align-items:center;justify-content:space-between;gap:12px;
+ border-top:1px solid var(--line);padding:14px 0 2px;margin-top:10px}
+.save-calendar-row span{color:var(--quiet);font-size:12px;min-width:0;line-height:1.35}
+.save-calendar-row button{flex:none;height:42px;font-size:13px}
+@media(max-width:365px){.save-calendar-row{align-items:stretch;flex-direction:column}.save-calendar-row button{width:100%}}
 </style></head>
 <body><main class="wrap">
 <header><span class="state">SIMULACIÓN · SIN CAMBIOS</span><a href="../../admin.html">← Admin</a></header>
@@ -157,7 +162,7 @@ const niceDate=x=>{
  return new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(Date.UTC(y,m-1,d)));
 };
 const choices=()=>document.querySelectorAll("[data-pay]");
-let clients=[],current=null,result=null,serial=0,plan={servicios:{},pago:{modo:"proximo"}},editingContract=null;
+let clients=[],current=null,result=null,serial=0,plan={servicios:{},pago:{modo:"proximo"}},editingContract=null,saveMessage="";
 function errorText(x){$("error").textContent=x||"";$("error").classList.toggle("hidden",!x)}
 function clearScreen(){
  ["services","groups","allocations","adjustments","warnings","selected"].forEach(id=>$(id).innerHTML="");
@@ -177,7 +182,7 @@ async function request(accion,datos){
  return data;
 }
 function reset(){
- serial++;result=null;editingContract=null;
+ serial++;result=null;editingContract=null;saveMessage="";
  plan={servicios:{},pago:{modo:"proximo"}};
  $("amount").value="";$("unify").value="";$("unifyDateValue").textContent="Elegir fecha";
  $("extraOptions").open=false;$("unifyPanel").open=false;$("allocationsDetails").open=false;
@@ -241,7 +246,11 @@ function drawServices(){
          '<label class="tick"><input type="checkbox" data-field="cobertura_confirmada" '+(item.cobertura_confirmada?'checked':'')+'> Fecha verificada</label>'+
          '</div>';
      }).join("")+
-     '<p class="edit-caption">Elige la fecha desde el calendario. GOXION calcula el día de renovación automáticamente; el cambio todavía es una simulación.</p>';
+     '<p class="edit-caption">Elige y verifica cada fecha. Guardar no genera cobros ni modifica el estado de cuenta.</p>'+
+     (chosen.items.every(x=>result?.persistencia?.accesos?.[x.id])?
+       '<div class="save-calendar-row"><span>'+esc(saveMessage||"Se conserva cada acceso por separado")+'</span>'+
+       '<button class="primary" type="button" data-save="'+esc(chosen.id)+'">Guardar fechas</button></div>':
+       '<p class="edit-caption">Este contrato necesita revisión de accesos técnicos antes de guardar fechas.</p>');
    return;
  }
  $("services").innerHTML=groups.map(g=>'<div class="contract-row" data-contract="'+esc(g.id)+'">'+
@@ -271,6 +280,32 @@ function draw(){
  $("adjustments").innerHTML=changed.length?changed.map(s=>'<div class="adjust-item"><span>'+esc(s.nombre)+' · hasta '+esc(niceDate(s.nueva_fecha))+'</span><b>+'+money(s.ajuste.centavos)+'</b></div>').join("")+
   '<div class="summary"><span>Ajuste único estimado</span><b>'+money(cal.ajuste_total_centavos)+'</b></div>':"";
 }
+async function guardarContrato(id){
+ if(!result||!current)return;
+ const group=contractGroups(result.calendario.servicios).find(g=>g.id===id);
+ if(!group||!group.items.length)return;
+ const accesoMap=result.persistencia?.accesos||{};
+ const unidades=group.items.map(s=>({
+   acceso_id:accesoMap[s.id],
+   cobertura_hasta:s.fecha_vencimiento,
+   dia_corte:s.dia_original,
+   precio_centavos:s.monto_base_centavos,
+   confirmado:s.cobertura_confirmada===true
+ }));
+ if(unidades.some(x=>!x.acceso_id)){errorText("No se pudo vincular este contrato con sus accesos reales.");return;}
+ const button=$("services").querySelector?.("[data-save]");
+ if(button)button.disabled=true;
+ errorText("");
+ try{
+   const r=await request("guardar_calendario_beta",{contrato_id:id,unidades});
+   if(!r.ok)throw Error("No se guardó la configuración");
+   saveMessage="Fechas guardadas en Admin · Sin cargos";
+   group.items.forEach(x=>delete plan.servicios[x.id]);
+   await simulate();
+ }catch(e){errorText(e?.message||"No fue posible guardar fechas.")}
+ finally{if(button)button.disabled=false;}
+}
+
 async function simulate(){
  if(!current)return;
  const generation=++serial;
@@ -308,6 +343,8 @@ async function load(){
 $("client").addEventListener("change",function(){current=this.value||null;reset()});
 
 $("services").addEventListener("click",function(ev){
+ const save=ev.target.closest?.("[data-save]");
+ if(save){guardarContrato(save.getAttribute("data-save"));return;}
  const manage=ev.target.closest?.("[data-manage]");
  if(manage){
    editingContract=manage.getAttribute("data-manage");
