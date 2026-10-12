@@ -233,11 +233,11 @@
                                     </label>
                                 </div>
                                 <div class="gx-tech-password-line">
-                                    <div>
+                                    <div class="gx-tech-password-main">
                                         <span>Contraseña</span>
-                                        <small>${current?'Se administra una sola vez desde la cuenta compartida':'Asigna una cuenta compartida para administrar la contraseña'}</small>
+                                        <small>${current?'De la cuenta compartida':'Asigna una cuenta para gestionarla'}</small>
                                     </div>
-                                    ${current?`<button type="button" onclick="gxOpenTechnicalPassword('${esc(x.servicio_id)}','${esc(current.id)}',event)">Gestionar contraseña</button>`:''}
+                                    ${current?`<button class="gx-tech-password-action" type="button" aria-label="Gestionar contraseña de ${esc(x.servicio)}" onclick="gxOpenTechnicalPassword('${esc(x.servicio_id)}','${esc(current.id)}',event)">Gestionar</button>`:''}
                                 </div>
                             `) : ''}
                         </div>
@@ -436,25 +436,43 @@
     };
 
     window.gxOpenTechnicalPassword=function(serviceId,accountId,event){
-        event?.preventDefault?.();event?.stopPropagation?.();
-        goAdminTab('tab-ajustes');
-        setTimeout(()=>{
-            const btn=[...document.querySelectorAll('.gx-settings-tabs button')].find(b=>(b.textContent||'').toLowerCase().includes('credenciales'));
+        event?.preventDefault?.();
+        event?.stopPropagation?.();
+        // Credenciales vive en Ajustes, fuera de la ficha flotante de Clientes.
+        // Sin cerrar la ficha, el destino sí cambiaba pero permanecía tapado.
+        if(typeof window.gxCloseClientFocus==='function') window.gxCloseClientFocus();
+        else {
+            const focus=document.getElementById('gx-client-focus');
+            focus?.classList.remove('show');
+            focus?.setAttribute('aria-hidden','true');
+        }
+        // Reutilizar la navegación y carga de credenciales ya integradas.
+        if(typeof window.gxOpenMoreDestination==='function') window.gxOpenMoreDestination('credentials');
+        else {
+            goAdminTab('tab-ajustes');
+            const btn=[...document.querySelectorAll('.gx-settings-tabs button')]
+                .find(x=>(x.textContent||'').toLowerCase().includes('credenciales'));
             window.gxSettingsView?.('credentials',btn);
+        }
+        // Elegir cuenta después de que la vista haya cargado sus selectores;
+        // no modifica ni publica contraseñas: sólo posiciona el formulario.
+        setTimeout(()=>{
+            const svc=document.getElementById('gx-cred-service');
+            const items=Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales:[];
+            const idx=items.findIndex(x=>String(x._id||x.id||'')===String(serviceId));
+            if(svc&&idx>=0&&[...svc.options].some(x=>x.value===String(idx))){
+                svc.value=String(idx);
+                window.gxCredentialServiceChanged?.();
+            }
             setTimeout(()=>{
-                const svc=document.getElementById('gx-cred-service');
-                const list=Array.isArray(configGlobal?.serviciosGlobales)?configGlobal.serviciosGlobales:[];
-                const idx=list.findIndex(s=>String(s._id||s.id||'')===String(serviceId));
-                if(svc&&idx>=0){svc.value=String(idx);window.gxCredentialServiceChanged?.()}
-                setTimeout(()=>{
-                    const acc=document.getElementById('gx-cred-account');
-                    if(acc&&[...acc.options].some(o=>String(o.value)===String(accountId))){
-                        acc.value=String(accountId);window.gxCredentialAccountChanged?.();
-                    }
-                    document.getElementById('gx-cred-password')?.focus();
-                },80);
-            },80);
-        },40);
+                const acc=document.getElementById('gx-cred-account');
+                if(acc&&[...acc.options].some(x=>String(x.value)===String(accountId))){
+                    acc.value=String(accountId);
+                    window.gxCredentialAccountChanged?.();
+                }
+                document.getElementById('gx-cred-password')?.focus({preventScroll:true});
+            },90);
+        },160);
     };
 
     // ---------- Constructor de productos / combos ----------
