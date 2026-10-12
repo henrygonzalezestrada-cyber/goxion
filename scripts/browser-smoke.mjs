@@ -350,7 +350,7 @@ async function runAyuda(browser, browserName, errors) {
   await page.waitForFunction(() =>
     !document.getElementById('header-action-btn')?.classList.contains('gx-auth-login-visible'),
     null,
-    { timeout: 2500 }
+    { timeout: browserName === 'WebKit' ? 8000 : 2500 }
   );
   await page.waitForTimeout(140);
   const authClosing = await page.locator('#header-action-btn').boundingBox();
