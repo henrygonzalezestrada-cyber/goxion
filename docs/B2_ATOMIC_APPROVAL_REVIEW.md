@@ -16,7 +16,13 @@
 
 En Supabase se ejecutó migración envuelta en `BEGIN; ... ROLLBACK;`: definición aceptada, RLS activo en tabla temporal, `anon` sin EXECUTE y los objetos de prueba ausentes después de la reversión. **No se llamó a la aprobación sobre un cliente real.** Posterior lectura: 22/22 estados con contrato oficial, cero desviaciones en `shadow.delta`, 28 pagos históricos, 0 obligaciones/imputaciones B2.
 
-`scripts/aprobacion-global-atomica-smoke.mjs` comprueba contratos, rutas, guardas y simulaciones del gateway; participa en `npm run verify`. Estas simulaciones NO prueban ejecuciones simultáneas reales ni el efecto de triggers en datos reales.
+`scripts/aprobacion-global-atomica-smoke.mjs` comprueba 35 contratos, rutas, guardas y simulaciones del gateway; participa en `npm run verify`.
+
+**Pruebas SQL reversibles adicionales realizadas en Supabase (12/oct):** en una transacción `BEGIN / ROLLBACK` con cliente y servicio exclusivamente ficticios se aprobó una mensualidad: un solo pago, avance exacto de período, reintento con igual clave sin segunda acreditación. En una segunda transacción igualmente reversible se registraron abono parcial y acuerdo de cobro, se rechazó un importe incorrecto y se aprobó el saldo oficial: el pago previo quedó liquidado, el acuerdo cumplido, el recibo fue único y la racha creció exactamente una vez. Ambas transacciones respondieron `OK`, sin persistir los fixtures.
+
+**Matriz de atribución sombra:** `docs/edge/estado-financiero/atribucion-b2.mjs` y `scripts/atribucion-b2-smoke.mjs` comprueban evidencia comercial por obligación, restricciones de promoción/lealtad, cupones únicos, Trato Justo por servicio, mora por saldo/fecha y reactivación; el resultado sigue siendo `cobrable:false` siempre. Esta política conservadora **no sustituye** la imputación transaccional ni prueba elegibilidad real de clientes: exige documentación confirmada desde backend.
+
+Los fixtures **NO** prueban aún ejecuciones simultáneas reales, fallos inyectados a los triggers, todos los beneficios reales ni aplicación independiente B2; la migración no se desplegó.
 
 ## Matriz de aceptación pendiente antes de desplegar
 
