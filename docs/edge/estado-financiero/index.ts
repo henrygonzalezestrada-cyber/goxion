@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.116.0";
 import { simularCalendario } from "./calendario-beta.mjs";
 import { calendarioInformativo } from "./calendario-cliente.mjs";
+import { reconciliarCalendarioOficial } from "./calendario-conciliacion.mjs";
 
 const cors={
   "Access-Control-Allow-Origin":"*",
@@ -261,6 +262,8 @@ Deno.serve(async(req)=>{
           cliente:cq.data,servicios:sq.data||[],financiero:fq.data,
           propuesta,hoy
         });
+        // Solo contabilidad sombra: jamás generar obligación o editar el importe oficial.
+        calendario.conciliacion=reconciliarCalendarioOficial({calendario,financiero:fq.data});
         if(persistencia.preciosDesactualizados.length)
           calendario.advertencias.push("Cambió la tarifa de una contratación: se conservan fechas, pero debe revisarse el desglose de precios antes de cobrar.");
         if(cq.data.estado==="suspendido")calendario.advertencias.push("Cliente suspendido. La simulación no habilita cobro ni reactivación.");
