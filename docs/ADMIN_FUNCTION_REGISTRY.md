@@ -2,6 +2,8 @@
 
 Fecha de revisión: 11/oct/2026. **Conservamos toda la organización actual.** No proponer una cuarta reorganización visual. Conservar Inicio, Clientes, Operaciones y Gestión, además del comportamiento aprobado de Admin/Ayuda/Index.
 
+**Regla de continuidad entre chats y equipos:** además de este registro funcional, consultar `AGENTS.md`, `docs/GOXION_VISUAL_CONTRACT.md` para preservar identidades de Admin/Ayuda/Index y `docs/GOXION_MULTI_DATE_ROADMAP.md` antes de implementar calendarios por perfil. Los cambios visuales pendientes no se consideran cerrados por el mero hecho de pasar pruebas estáticas.
+
 Este registro es la primera consulta obligatoria antes de implementar una función nueva. **No todos los nombres repetidos son errores:** algunos son wrappers, adaptadores de compatibilidad, etapas de un motor o triggers. No eliminar nada sin detectar sus consumidores y probar equivalencia.
 
 ## 1. Qué módulo es dueño de cada función
