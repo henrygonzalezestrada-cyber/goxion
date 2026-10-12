@@ -222,7 +222,7 @@
                                 </div>
                                 <p class="gx-tech-invite-help">Usa su propia cuenta; GOXION no guarda su contraseña.</p>
                             ` : `
-                                <div class="gx-tech-credential-grid">
+                                <div class="gx-tech-credential-grid gx-tech-compact-pair">
                                     <label>
                                         <span>Perfil</span>
                                         <input type="text" value="${esc(access.perfil_nombre||'')}" placeholder="Ej. David" onchange="gxUpdateTechnicalAccess('${esc(access.id)}','perfil_nombre',this.value,this)">
