@@ -94,4 +94,14 @@ const combo=simularCalendario({...setup(),servicios:[{id:"combo",nombre:"HBO Max
 check("Combo de dos marcas no se separa arbitrariamente",combo.servicios.length,1);
 rejects("No permite 2 fechas con ID original de X2",()=>simularCalendario({...setup(),servicios:[ytx2],propuesta:{servicios:{ytx2:{cobertura_hasta:"2026-11-05"}}}}));
 
+const uneven=simularCalendario({...setup(),servicios:[ytx2],financiero:{...fin,total_actual:178},
+ propuesta:{servicios:{"ytx2#1":{cobertura_hasta:"2026-11-05",cobertura_confirmada:true,precio_centavos:8000},
+ "ytx2#2":{cobertura_hasta:"2026-11-20",cobertura_confirmada:true,precio_centavos:9800}}}});
+check("Tarifas X2 asimétricas preservan importe pactado",uneven.total_base_centavos,17800);
+check("Tarifas X2 reales por acceso",uneven.servicios.map(s=>s.monto_base_centavos),[8000,9800]);
+check("Tarifa comprobada no se etiqueta como división estimada",uneven.servicios.every(s=>s.precio_dividido_estimado===false),true);
+rejects("Precios X2 incompletos no permiten facturación divergente",()=>simularCalendario({...setup(),
+ servicios:[ytx2],financiero:{...fin,total_actual:178},
+ propuesta:{servicios:{"ytx2#1":{precio_centavos:8500},"ytx2#2":{precio_centavos:9500}}}}));
+
 console.log("GOXION calendario financiero beta: "+tests.length+" pruebas correctas, cero escrituras.");
