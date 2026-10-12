@@ -5967,3 +5967,55 @@ body.gx-beta-22 .gx-reg-actions .gx-prepare-activation{border-color:rgba(0,242,2
     grid-template-columns:minmax(0,1fr)!important;
   }
 }
+
+
+/* Admin · Editar acceso · contraseña: jerarquía compacta + acción accesible.
+   Prioridad sobre reglas antiguas que apilaban/centraban el botón en móvil. */
+.gx-focus-v3 .gx-service-access-details .gx-beta-access-row-live .gx-tech-password-line{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:12px!important;
+  align-items:center!important;
+  justify-content:stretch!important;
+  width:100%!important;min-width:0!important;max-width:100%!important;
+  margin:12px 0 0!important;
+  padding:12px 0 0!important;
+  border-top:1px solid rgba(255,255,255,.075);
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-password-main{
+  display:flex;flex-direction:column;align-items:flex-start;gap:3px;
+  min-width:0;max-width:100%;
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-password-main>span{
+  display:block;margin:0!important;color:#c9d4e5;
+  font-size:12px!important;line-height:1.2!important;font-weight:750;
+  letter-spacing:.015em;text-transform:none;
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-password-main>small{
+  display:block;max-width:100%!important;margin:0!important;
+  color:#91a0b8;font-size:11px!important;line-height:1.35!important;
+  overflow-wrap:anywhere;
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-password-line .gx-tech-password-action{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  width:auto!important;max-width:100%!important;min-width:105px!important;
+  height:42px!important;min-height:42px!important;max-height:42px!important;
+  margin:0!important;padding:0 14px!important;
+  flex:0 0 auto!important;
+  border:1px solid rgba(130,117,235,.30)!important;border-radius:11px!important;
+  background:rgba(108,73,172,.11)!important;color:#d8caff!important;
+  font-size:13px!important;line-height:1!important;font-weight:750!important;
+  white-space:nowrap!important;cursor:pointer;pointer-events:auto!important;
+  position:relative;z-index:2;
+}
+.gx-focus-v3 .gx-service-access-details .gx-tech-password-line .gx-tech-password-action:focus-visible{
+  outline:2px solid #70e4f4!important;outline-offset:2px;
+}
+@media(max-width:345px){
+ .gx-focus-v3 .gx-service-access-details .gx-beta-access-row-live .gx-tech-password-line{
+   gap:9px!important;
+ }
+ .gx-focus-v3 .gx-service-access-details .gx-tech-password-line .gx-tech-password-action{
+   min-width:90px!important;padding:0 9px!important;
+ }
+}
