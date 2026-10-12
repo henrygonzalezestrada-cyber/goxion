@@ -107,22 +107,35 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 .save-calendar-row span{color:var(--quiet);font-size:12px;min-width:0;line-height:1.35}
 .save-calendar-row button{flex:none;height:42px;font-size:13px}
 @media(max-width:365px){.save-calendar-row{align-items:stretch;flex-direction:column}.save-calendar-row button{width:100%}}
+
+/* Guardado del calendario (Admin): aviso inequívoco sin empujar el contenido. */
+.calendar-notice{position:fixed;top:calc(env(safe-area-inset-top,0px) + 12px);
+ left:12px;right:12px;z-index:1000;max-width:720px;margin:0 auto;
+ border:1px solid rgba(117,231,201,.52);background:#122a29;
+ color:#d9fff4;box-shadow:0 14px 34px rgba(0,0,0,.55);
+ border-radius:13px;padding:13px 14px;font-size:14px;font-weight:700;line-height:1.35;
+ pointer-events:none;}
+.calendar-notice[data-kind="error"]{border-color:rgba(250,132,155,.52);background:#39202a;color:#ffe1e5}
+.state[data-saved="true"]{color:#b7f6e6;border-color:rgba(104,216,166,.42)}
+.state-quiet{border-color:rgba(160,169,189,.18);color:#95a5b8}
+@media(max-width:360px){.section-title{gap:6px}.state{font-size:10px;padding:3px 7px}.calendar-notice{left:8px;right:8px}}
 </style></head>
 <body><main class="wrap">
-<header><span class="state">SIMULACIÓN · SIN CAMBIOS</span><a href="../../admin.html">← Admin</a></header>
-<h1>Fechas de renovación</h1><p class="intro">Revisa lo que vence y modifica una fecha solo si hace falta. No se cambian pagos ni contratos reales.</p>
+<header><span class="state">FECHAS ADMIN · PAGOS SIMULADOS</span><a href="../../admin.html">← Admin</a></header>
+<h1>Fechas de renovación</h1><p class="intro">Las fechas se guardan en Admin. Los importes de pago todavía son estimaciones y no generan cobros.</p>
 <div class="error hidden" id="error" role="alert"></div>
+<div class="calendar-notice hidden" id="calendarNotice" role="status" aria-live="polite" aria-atomic="true"></div>
 <section class="panel hidden" id="auth"><h2>Abre tu sesión de Admin</h2><p class="sub">Los calendarios se consultan únicamente con acceso administrativo.</p><a href="../../admin.html">Volver a Admin</a></section>
 <div id="workspace" class="hidden">
-<section class="panel" id="clientPanel"><div class="section-title"><h2>Cliente</h2><span class="state" id="status">Solo prueba</span></div>
+<section class="panel" id="clientPanel"><div class="section-title"><h2>Cliente</h2><span class="state" id="status">Fechas de Admin</span></div>
 <select id="client" class="selector" aria-label="Cliente"></select><p class="sub" id="clientNote">Selecciona un cliente para revisar sus renovaciones.</p></section>
 <section class="panel" id="servicesPanel">
-<div class="section-title"><h2>Servicios</h2><span class="state">Solo simulación</span></div>
+<div class="section-title"><h2>Servicios</h2><span class="state" id="calendarStatus">Fechas de Admin</span></div>
 <div id="services"><p class="muted">Selecciona un cliente.</p></div>
 <div id="servicesActions" class="services-actions"><button type="button" id="reset" class="action-link">↺ Restablecer simulación</button></div>
 </section>
 <section class="panel">
-<div class="section-title"><h2>Pago que quieres revisar</h2></div>
+<div class="section-title"><h2>Simulación de pagos</h2><span class="state state-quiet">Sin cobros</span></div>
 <div class="pay-choices" role="group" aria-label="Pago a simular">
 <button class="option" data-pay="proximo" aria-pressed="true" type="button">Lo que vence primero</button>
 <button class="option" data-pay="todos" aria-pressed="false" type="button">Pagar todo junto</button>
@@ -143,8 +156,8 @@ html.embedded header,html.embedded h1,html.embedded .intro,html.embedded #client
 </div></details>
 </section>
 <details class="more" id="warningsDetails" style="margin:0 5px 14px"><summary>Información sobre el cálculo</summary><div id="warnings" class="warn-items more-body"></div></details>
-<button type="button" id="simulate" class="primary hidden">Actualizar cálculo</button>
-</div><p class="footer">Simulación privada · No acredita pagos ni modifica fechas oficiales</p>
+<button type="button" id="simulate" class="primary hidden">Recalcular pago estimado</button>
+</div><p class="footer">Fechas guardadas en Admin · Pagos oficiales aún sin cambios</p>
 </main>
 <script>
 (function(){
@@ -162,7 +175,26 @@ const niceDate=x=>{
  return new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"}).format(new Date(Date.UTC(y,m-1,d)));
 };
 const choices=()=>document.querySelectorAll("[data-pay]");
-let clients=[],current=null,result=null,serial=0,plan={servicios:{},pago:{modo:"proximo"}},editingContract=null,saveMessage="";
+let clients=[],current=null,result=null,serial=0,plan={servicios:{},pago:{modo:"proximo"}},editingContract=null,saveMessage="",noticeTimer=null;
+function showNotice(message,kind="success"){
+ const node=$("calendarNotice");if(!node)return;
+ if(noticeTimer)clearTimeout(noticeTimer);
+ node.textContent=message;node.dataset.kind=kind;
+ node.classList.toggle("hidden",!message);
+ if(message)noticeTimer=setTimeout(()=>node.classList.add("hidden"),6500);
+}
+function syncStatus(){
+ const stored=result?.persistencia?.configuracion||{};
+ const entries=Object.values(stored);
+ const changes=Object.values(plan.servicios||{}).some(v=>v&&typeof v==="object");
+ const count=entries.length;
+ const verified=entries.filter(v=>v.cobertura_confirmada===true).length;
+ const label=changes?"Cambios sin guardar":count>0?count+" fecha"+(count===1?"":"s")+" guardada"+(count===1?"":"s"):"Sin fechas guardadas";
+ $("calendarStatus").textContent=label;
+ $("calendarStatus").dataset.saved=count>0?"true":"false";
+ $("status").textContent=count>0?count+" registrada"+(count===1?"":"s"):"Fechas de Admin";
+ $("status").title=count>0?verified+" verificada"+(verified===1?"":"s")+"; los cobros siguen sin cambios":"";
+}
 function errorText(x){$("error").textContent=x||"";$("error").classList.toggle("hidden",!x)}
 function clearScreen(){
  ["services","groups","allocations","adjustments","warnings","selected"].forEach(id=>$(id).innerHTML="");
@@ -182,7 +214,8 @@ async function request(accion,datos){
  return data;
 }
 function reset(){
- serial++;result=null;editingContract=null;saveMessage="";
+ serial++;result=null;editingContract=null;saveMessage="";showNotice("");
+ $("calendarStatus").textContent="Sin fechas guardadas";
  plan={servicios:{},pago:{modo:"proximo"}};
  $("amount").value="";$("unify").value="";$("unifyDateValue").textContent="Elegir fecha";
  $("extraOptions").open=false;$("unifyPanel").open=false;$("allocationsDetails").open=false;
@@ -248,7 +281,7 @@ function drawServices(){
      }).join("")+
      '<p class="edit-caption">Elige y verifica cada fecha. Guardar no genera cobros ni modifica el estado de cuenta.</p>'+
      (chosen.items.every(x=>result?.persistencia?.accesos?.[x.id])?
-       '<div class="save-calendar-row"><span>'+esc(saveMessage||"Se conserva cada acceso por separado")+'</span>'+
+       '<div class="save-calendar-row"><span>'+esc(saveMessage||(chosen.items.every(x=>result?.persistencia?.configuracion?.[x.id])?"Fechas registradas en Admin":"Registra estas fechas para conservarlas"))+'</span>'+
        '<button class="primary" type="button" data-save="'+esc(chosen.id)+'">Guardar fechas</button></div>':
        '<p class="edit-caption">Este contrato necesita revisión de accesos técnicos antes de guardar fechas.</p>');
    return;
@@ -292,18 +325,25 @@ async function guardarContrato(id){
    precio_centavos:s.monto_base_centavos,
    confirmado:s.cobertura_confirmada===true
  }));
- if(unidades.some(x=>!x.acceso_id)){errorText("No se pudo vincular este contrato con sus accesos reales.");return;}
+ if(unidades.some(x=>!x.acceso_id)){
+  const msg="No se pudo vincular este contrato con sus accesos reales.";
+  errorText(msg);showNotice(msg,"error");return;
+ }
  const button=$("services").querySelector?.("[data-save]");
  if(button)button.disabled=true;
  errorText("");
  try{
    const r=await request("guardar_calendario_beta",{contrato_id:id,unidades});
    if(!r.ok)throw Error("No se guardó la configuración");
-   saveMessage="Fechas guardadas en Admin · Sin cargos";
+   saveMessage="Fechas guardadas correctamente · No se generó ningún cobro";
    group.items.forEach(x=>delete plan.servicios[x.id]);
    await simulate();
- }catch(e){errorText(e?.message||"No fue posible guardar fechas.")}
- finally{if(button)button.disabled=false;}
+   showNotice("✓ Fechas guardadas correctamente en GOXION. Pagos sin cambios.");
+   syncStatus();
+ }catch(e){
+   const message=e?.message||"No fue posible guardar fechas.";
+   errorText(message);showNotice("No se guardaron las fechas: "+message,"error");
+ }finally{if(button)button.disabled=false;}
 }
 
 async function simulate(){
@@ -321,7 +361,7 @@ async function simulate(){
    if(unify)plan.unificar_dia=Number(unify.slice(-2));else delete plan.unificar_dia;
    const data=await request("simular_calendario_beta",{cliente_id:current,propuesta:plan});
    if(generation!==serial)return;
-   result=data;draw();
+   result=data;draw();syncStatus();
  }catch(e){if(generation===serial)errorText(e?.message||"No fue posible simular.")}
  finally{if(generation===serial)$("simulate").disabled=false}
 }
@@ -333,7 +373,7 @@ async function load(){
    $("auth").classList.add("hidden");$("workspace").classList.remove("hidden");
    $("client").innerHTML='<option value="">Selecciona un cliente</option>'+clients.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.nombre)+' · '+c.numero_servicios+' servicios</option>').join("");
    $("unify").value="";$("unifyDateValue").textContent="Elegir fecha";
-   $("status").textContent="Solo simulación";
+   $("status").textContent="Fechas de Admin";
    if(embedded&&initialClient){
       if(clients.some(c=>c.id===initialClient)){$("client").value=initialClient;current=initialClient;reset();}
       else errorText("No se encontró este cliente en la consulta autorizada.");
