@@ -25,3 +25,16 @@ Este archivo y los documentos enlazados constituyen la referencia **persistente*
 
 
 - **Pagos parciales B2:** el cliente todavía NO puede pedir ni acreditar un abono desde Index. Admin sí marca comprobantes incompletos por saldo restante y dispone de acuerdo de fecha. Las nuevas tablas `goxion_obligaciones_sombra`, `goxion_abonos_sombra`, `goxion_imputaciones_sombra` y `goxion_b2_auditoria` son solo de preparación, sin cargos. Una solicitud no evita mora automáticamente; leer `docs/GOXION_MULTI_DATE_ROADMAP.md` antes de cualquier integración.
+
+
+## Paso B2 · Pago parcial administrativo transaccional (12/oct/2026)
+
+**Hecho y desplegado en producción (gateway `acciones-financieras` v7):** se versionó su código en `docs/edge/acciones-financieras/index.ts`, que antes solo estaba desplegado en Supabase. La acción preexistente `registrar_pago_parcial` conserva **el mismo contrato de Admin** (cliente, saldo restante, período esperado, respuesta `resultado.pago_parcial`), pero reemplaza sus tres escrituras sucesivas por `public.goxion_registrar_pago_parcial_atomico`, migración `supabase/migrations/202610120005_pago_parcial_atomico_legacy.sql`.
+
+La RPC bloquea al cliente para serializar operaciones, lee el estado oficial después de adquirir el bloqueo, verifica período y saldo actual, desactiva el parcial anterior, inserta el nuevo y actualiza el estado de revisión **en una sola transacción**. Acepta `operation_id` único (puede ser generado por el gateway o pasarse como `clave_idempotencia`) para devolver un reintento equivalente sin volver a abonar. Un parcial no puede superar el saldo, ni repetir el mismo período activo; los índices únicos complementan las guardas. La función está revocada para `public`/`anon`/`authenticated` y solo la ejecuta `service_role` desde Edge con `X-Admin-Token`.
+
+**Verificaciones alcanzadas:** 19 guardas de código + 19 casos simulados del gateway = 38; la RPC se probó con una transacción que terminó en `ROLLBACK` (idempotencia, saldo, periodo, propiedad), sin registros persistidos. Después del despliegue: 22/22 estados oficiales, 0 divergencias, 28 pagos originales y 0 `pagos_parciales` en producción. Código en GitHub idéntico a Edge v7.
+
+**Limitación que NO debe confundirse con pago B2 habilitado:** esta mejora aplica al *pago parcial del período global* que administra GOXION; no acredita obligaciones por acceso. Tampoco conecta una solicitud de abono de Index ni cambia mora por vencimiento, cupones o descuentos distribuidos. La validación adicional de mora después de un abono aprobado no se pudo ejecutar sobre cuenta real por una restricción de seguridad del entorno; queda como requisito explícito para activar autoservicio. Se conservan sin cambios Index, Ayuda y la aprobación habitual de pago completo.
+
+**Próximo bloque seguro:** completar motor de obligaciones por ciclo con beneficios elegibles, y diseñar flujo autenticado de propuesta/comprobante → revisión de Admin → imputación idempotente de **pago aprobado** → recálculo por vencimiento. No llamar a `goxion_solicitar_abono_sombra` desde la web pública antes de esa integración y validación.
