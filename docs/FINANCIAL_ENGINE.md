@@ -316,3 +316,12 @@ Pruebas: **npm run test:calendario**, incluido en **npm run verify**. Para activ
 
 Se instalaron en Supabase tres **tablas de simulación aisladas** para obligaciones por acceso/ciclo, solicitudes de abono e imputaciones, más auditoría y restricciones de idempotencia. No intervienen en los cobros actuales. Se probaron bajo `BEGIN ... ROLLBACK` con un expediente X2; los cuatro registros nuevos terminaron vacíos. La política `abonos-politica.mjs` evalúa monto, saldo, revisión, mora y acuerdos, **no acredita dinero** ni permite inferir condonaciones. La operación real de `registrar_pago_parcial` tiene escrituras sucesivas y requiere refactorización transaccional antes de reutilizarse para autocobro independiente. Consulta `docs/GOXION_MULTI_DATE_ROADMAP.md`.
 
+
+
+### B2 · RPC segura para propuesta de abono (12/oct/2026)
+
+Migración `supabase/migrations/202610120004_solicitar_abono_sombra_rpc.sql`: función `goxion_solicitar_abono_sombra(cliente_id,obligacion_id,monto_centavos,clave_idempotencia,comentario)`. **Únicamente `service_role` puede ejecutarla**; la futura Edge debe verificar el `X-Client-Token` y derivar el ID del propio cliente. Esta RPC comprueba cuenta no suspendida, comprobante fuera de revisión, propiedad del acceso, obligación conciliada, importe menor al saldo y ausencia de solicitudes activas o imputaciones pendientes. Bloquea filas `FOR UPDATE`, admite reintentos con la misma clave sin crear otra solicitud, rechaza uso de una clave con datos diferentes y devuelve `cobrable:false`/`requiere_revision:true`.
+
+Prueba SQL sobre contrato X2 dentro de `BEGIN/ROLLBACK`: primera propuesta, reintento idempotente, clave conflictiva, segundo intento concurrente, intento de otro cliente, pago completo enviado al flujo normal; **todo aprobado**, sin filas persistidas tras reversión. Permisos: `anon=false`, `authenticated=false`, `service_role=true`. En producción no hay pagos parciales registrados; las tablas B2, su auditoría y las nuevas solicitudes siguen vacías.
+
+**Queda pendiente** el endpoint autenticado del cliente, comprobante y operación real de aprobación/transacción que asigne el abono y recalcule mora, promociones, lealtad y saldo por obligación. No se habilitó Index ni se modificó `acciones-financieras`, por lo que las cuotas y descuentos actuales siguen iguales. Un abono solicitado no evita mora ni acredita cobertura hasta que se revise y apruebe; los acuerdos para cambiar el corte requieren autorización.
