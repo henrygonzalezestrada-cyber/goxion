@@ -1,5 +1,14 @@
 # GOXION · Calendario financiero por servicio
 
+## Actualización fase B1 · conciliación contable sin cobros (11/oct/2026)
+
+La función `estado-financiero` **v12** ya incluye `calendario-conciliacion.mjs`, importado solamente por la ruta Admin `simular_calendario_beta`. El campo `calendario.conciliacion` presenta la conciliación contable del calendario persistido contra el estado oficial: promociones, lealtad (3%/6%), descuentos especiales, cupones de misiones (`beneficios_programados.origen='misiones'`), trato justo, mora, reactivación, pagos parciales y estados de revisión. Cada ajuste se obtiene **del SQL oficial**, sin conceder un segundo descuento por perfil ni calcular moras nuevas como obligación real.
+
+La distribución provisional usa **centavos y restos mayores**. Una suma que cuadra es solamente contable: el resultado responde siempre `cobrable:false`, `desglose_de_obligaciones_autorizado:false`, `modo:"conciliacion_sombra"`; fechas/clientes no verificados fallan cerrados. Para mora individual, cupones consumidos por obligación, cobertura real y aprobación idempotente faltan la fase B2 y su esquema transaccional.
+
+Pruebas: 16 escenarios de waterfall (incluye cupón de misiones, lealtad, descuento especial, mora, reactivación, pagos parciales y pagados), 16 guardas de Edge, 56 de calendario previo, 27 de cliente, 25 de Index estructural; paridad oficial 22/22, cero diferencias, ninguna migración nueva de pagos ni cambios en Index/Ayuda. Ejemplo real verificado en lectura: ViX X2 = $98 base − $6 lealtad = $92 oficial; dos fechas conservadas, pero no se habilitó cobro por perfil. Referencia completa en `docs/GOXION_MULTI_DATE_ROADMAP.md`.
+
+
 ## Estado comprobado · 11/oct/2026 (fase A operativa solo en Admin)
 
 **Persistencia por acceso real habilitada y protegida; cobros oficiales intactos.** Se creó `public.goxion_calendario_accesos` con FK a `cliente_accesos.id` (identidad física X2), verificación del contrato/precio, control de fechas y `goxion_calendario_auditoria` con evento por modificación. Migración: `supabase/migrations/202610110001_calendario_accesos_sombra.sql`.
