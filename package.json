@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion",
+    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos",
     "test:smoke": "node scripts/browser-smoke.mjs",
     "test:cart": "node scripts/cart-v2-smoke.mjs",
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
@@ -16,6 +16,7 @@
     "test:visual-contract": "node scripts/visual-contract-smoke.mjs",
     "test:calendario:cliente": "node scripts/calendario-cliente-read-smoke.mjs",
     "test:index-calendario:visual": "node scripts/index-calendario-visual-preflight.mjs",
-    "test:calendario:conciliacion": "node scripts/calendario-conciliacion-smoke.mjs && node scripts/calendario-conciliacion-edge-smoke.mjs"
+    "test:calendario:conciliacion": "node scripts/calendario-conciliacion-smoke.mjs && node scripts/calendario-conciliacion-edge-smoke.mjs",
+    "test:calendario:abonos": "node scripts/abonos-politica-smoke.mjs && node scripts/abonos-b2-schema-smoke.mjs"
   }
 }
