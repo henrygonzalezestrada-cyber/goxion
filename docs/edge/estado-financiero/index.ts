@@ -113,6 +113,80 @@ Deno.serve(async(req)=>{
       }));
       return res({ok:true,modo:"simulacion_sin_escrituras",clientes});
     }
+    // Relación real entre contrato y acceso técnico. No inventar otra clave para X2.
+    async function accesosDeCliente(clienteId:string){
+      const r=await sb.from("cliente_accesos")
+        .select("id,cliente_id,cliente_servicio_id,servicio_id,ordinal,activo")
+        .eq("cliente_id",clienteId).eq("activo",true).limit(90);
+      if(r.error)throw r.error;
+      if((r.data||[]).length>=90)throw new Error("Demasiados accesos: revisión requerida");
+      return r.data||[];
+    }
+    function idsSimulados(contratos:any[],accesos:any[]){
+      const mapa=new Map<string,string>();
+      const porContrato=new Map<string,any[]>();
+      for(const a of accesos){
+        const list=porContrato.get(a.cliente_servicio_id)||[];
+        list.push(a);porContrato.set(a.cliente_servicio_id,list);
+      }
+      for(const c of contratos){
+        const list=(porContrato.get(c.id)||[]).sort((a,b)=>a.ordinal-b.ordinal);
+        const x=String(c.nombre||"").match(/\(\s*x([2-9]|1[0-2])\s*\)/i);
+        const multiple=x?Number(x[1]):1;
+        if(multiple!==list.length)continue; // Nunca mapear combos de dos plataformas como X2.
+        if(multiple>1 && new Set(list.map(a=>a.ordinal)).size!==list.length)continue;
+        for(let i=0;i<list.length;i++){
+          const a=list[i];
+          mapa.set(a.id,multiple>1?c.id+"#"+(i+1):c.id);
+        }
+      }
+      return mapa;
+    }
+    async function obtenerConfiguracion(clienteId:string,contratos:any[],accesos:any[]){
+      const q=await sb.from("goxion_calendario_accesos")
+        .select("cliente_acceso_id,cliente_servicio_id,cobertura_hasta,dia_corte,precio_centavos,estado,revision")
+        .eq("cliente_id",clienteId).limit(90);
+      if(q.error)throw q.error;
+      const mapa=idsSimulados(contratos,accesos);
+      const byAccess=new Map(accesos.map(a=>[a.id,a]));
+      const configuracion:Record<string,any>={};
+      const disponibles:Record<string,string>={};
+      for(const [accessId,id] of mapa)disponibles[id]=accessId;
+      for(const item of q.data||[]){
+        const id=mapa.get(item.cliente_acceso_id);
+        if(!id||!byAccess.has(item.cliente_acceso_id))continue;
+        configuracion[id]={
+          cobertura_hasta:item.cobertura_hasta,dia_original:item.dia_corte,
+          cobertura_confirmada:item.estado==="verificado",
+          precio_centavos:item.precio_centavos,
+          revision:item.revision
+        };
+      }
+      return {configuracion,disponibles};
+    }
+
+    if(accion==="guardar_calendario_beta"){
+      const contratoId=String(datos?.contrato_id||"");
+      const unidades=datos?.unidades;
+      if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(contratoId))
+        return res({ok:false,error:"Contrato inválido"},400);
+      if(!Array.isArray(unidades)||unidades.length<1||unidades.length>30)
+        return res({ok:false,error:"Los accesos del contrato son obligatorios"},400);
+      const q=await sb.from("cliente_servicios").select("id,cliente_id,activo").eq("id",contratoId).maybeSingle();
+      if(q.error)throw q.error;
+      if(!q.data||q.data.activo!==true)return res({ok:false,error:"Contrato inactivo o inexistente"},404);
+      const cq=await sb.from("clientes").select("estado").eq("id",q.data.cliente_id).maybeSingle();
+      if(cq.error)throw cq.error;
+      if(cq.data?.estado==="suspendido")return res({ok:false,error:"No configurar fechas de un cliente suspendido"},403);
+      if(JSON.stringify(unidades).length>10000)return res({ok:false,error:"Datos de calendario excesivos"},400);
+      const actor="admin:"+String(admin.sub||admin.user_id||admin.id||"sesion").slice(0,100);
+      const save=await sb.rpc("goxion_guardar_calendario_contrato_borrador",{
+        p_cliente_servicio_id:contratoId,p_unidades:unidades,p_actor:actor
+      });
+      if(save.error)return res({ok:false,error:"No se pudo guardar: "+save.error.message},400);
+      return res({ok:true,modo:"calendario_persistido_sin_cobro",guardado:save.data});
+    }
+
     if(accion==="simular_calendario_beta"){
       const clienteId=String(datos?.cliente_id||"").trim();
       if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(clienteId))
@@ -128,17 +202,31 @@ Deno.serve(async(req)=>{
       if(cq.error||sq.error||fq.error)throw cq.error||sq.error||fq.error;
       if(!cq.data)return res({ok:false,error:"No existe el cliente."},404);
       if((sq.data||[]).length>=32)return res({ok:false,error:"Demasiados servicios: revisión manual requerida."},400);
+      const accesos=await accesosDeCliente(clienteId);
+      const persistencia=await obtenerConfiguracion(clienteId,sq.data||[],accesos);
+      const propuestaOriginal=datos.propuesta||{};
+      const combinados:Record<string,any>={...persistencia.configuracion};
+      for(const [id,valor] of Object.entries(propuestaOriginal.servicios||{})){
+        // Un restablecimiento de fecha general omite el registro persistido SOLO en simulación.
+        if((valor as any)?.usar_general===true){delete combinados[id];continue;}
+        combinados[id]={...(combinados[id]||{}),...(valor as object)};
+      }
+      const propuesta={...propuestaOriginal,servicios:combinados};
       const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Merida",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
       const val=(part:string)=>parts.find(x=>x.type===part)?.value||"";
       const hoy=val("year")+"-"+val("month")+"-"+val("day");
       try{
         const calendario=simularCalendario({
           cliente:cq.data,servicios:sq.data||[],financiero:fq.data,
-          propuesta:datos.propuesta||{},hoy
+          propuesta,hoy
         });
         if(cq.data.estado==="suspendido")calendario.advertencias.push("Cliente suspendido. La simulación no habilita cobro ni reactivación.");
-        return res({ok:true,modo:"sombra_sin_escrituras",cliente:{id:cq.data.id,nombre:cq.data.nombre},
-          calendario});
+        return res({ok:true,modo:"sombra_sin_cobros",cliente:{id:cq.data.id,nombre:cq.data.nombre},
+          calendario,persistencia:{
+            configuracion:persistencia.configuracion,
+            accesos:persistencia.disponibles,
+            guardado_disponible:true
+          }});
       }catch(error){
         return res({ok:false,error:error instanceof Error?error.message:"Propuesta inválida"},400);
       }
