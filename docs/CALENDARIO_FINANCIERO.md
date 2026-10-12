@@ -89,3 +89,9 @@ El recorrido visible quedó reducido a **Servicios (fecha e importe), Pago que q
 
 La indicación «próximo vencimiento estimado» es intencional: el calendario de cobertura por perfil aún no se ha confirmado/persistido en el modelo real. Todo continúa en lectura y simulación. **No** se alteran Admin financiero, Ayuda ni Index; se conservan los 52 ensayos de matemáticas y las pruebas de UI e integración en el expediente.
 
+
+## Confirmación de guardado visible en Admin · 11/oct/2026
+
+Comprobación directa de Supabase: para una contratación ViX Premium X2 se registraron dos calendarios reales distintos (6 y 30 de noviembre de 2026), con estado `verificado` e historial de creación/actualización. El guardado **sí funcionaba**, pero la página todavía mostraba la etiqueta ambigua «Solo simulación» y el mensaje de éxito quedaba debajo de los campos, potencialmente fuera de la vista.
+
+La entrada contextual ahora dice **Gestionar**, el estado superior indica **N fechas guardadas** (o **Cambios sin guardar**) y al completar `guardar_calendario_beta` aparece un aviso fijo de éxito con `aria-live`. En caso de error aparece un aviso de falla. Los cálculos de pago se presentan por separado como **Simulación de pagos · Sin cobros**. La etiqueta de guardado refleja registros persistidos, no confirma una obligación financiera ni una transacción de pago. Se agregaron verificaciones de guardado, recarga, aviso de éxito y estados de la cabecera.
