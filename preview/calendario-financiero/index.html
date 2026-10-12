@@ -355,7 +355,8 @@ $("services").addEventListener("click",function(ev){
  const general=ev.target.closest?.("[data-use-default]");
  if(general){
    const id=general.getAttribute("data-use-default");
-   delete plan.servicios[id];simulate();
+   plan.servicios[id]={usar_general:true};saveMessage="";
+   simulate();
  }
 });
 $("services").addEventListener("change",function(ev){
