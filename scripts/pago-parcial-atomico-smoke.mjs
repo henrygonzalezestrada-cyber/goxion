@@ -55,8 +55,10 @@ test("Solo rol del gateway tiene permiso para la RPC",
  migration.includes("to service_role"));
 test("No se activaron los importes de obligaciones sombra en el pago legacy",
  !scope.includes("goxion_obligaciones_sombra")&&!scope.includes("goxion_imputaciones_sombra"));
-test("No altera por este cambio la aprobación de pago completo",
- edge.includes('if (action === "aprobar_pago")')&&edge.includes('"aprobar_pago_periodo"'));
+test("Pago completo usa su propia RPC atómica y no la antigua ruta multiescritura",
+ edge.includes('if (action === "aprobar_pago")')&&
+ edge.includes('"goxion_aprobar_pago_periodo_atomico"')&&
+ !edge.includes('"periodo-cobro", "aprobar_pago_periodo"'));
 test("No altera acuerdos pactados",
  edge.includes('if (action === "pactar_fecha_pago")')&&edge.includes("fecha_corte"));
 console.log("GOXION pagos parciales atómicos: "+count+" guardas PASS");
