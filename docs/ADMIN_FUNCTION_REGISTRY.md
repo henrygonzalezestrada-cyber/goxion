@@ -207,3 +207,12 @@ Los controles existentes de correo, estado del beneficio, perfil/PIN y grupo/lic
 
 **No copiar diseños entre aplicaciones**: Admin, Ayuda e Index tienen experiencias visuales y CSS distintos; compartir principios de jerarquía, densidad y pruebas, pero mantener los componentes, proporciones concretas y estilos encapsulados por experiencia. No reestructurar Admin, no volver a crear bloques duplicados para funciones existentes. El test estático forma parte de `scripts/calendario-admin-integracion-smoke.mjs`.
 
+
+
+### Contraseña de cuenta compartida · cierre de regresión (octubre 2026)
+
+En **Admin → Clientes → Servicios → Editar acceso**, el orden visual del acceso compartido es: perfil + PIN (fila compacta), cuenta compartida y contraseña (acción **Gestionar** alineada a la derecha del título). No se crean nuevas secciones ni opciones de credenciales. La ficha del cliente es un overlay; antes el botón cambiaba la pestaña subyacente a Ajustes pero dejaba el overlay abierto, aparentando no funcionar. La acción corregida **cierra primero la ficha, reutiliza la ruta existente Ajustes → Credenciales y selecciona la plataforma/cuenta madre en el formulario existente**. No publica ni modifica ninguna contraseña al tocar Gestionar.
+
+El CSS está aislado al detalle de Servicios en Admin y vence las reglas móviles previas que centraban el botón y apilaban la fila. Perfil, PIN, cuenta, campos de invitación y acciones existentes conservan su semántica. Se eliminaron las redundancias visuales «Cuenta: Cuenta Principal» y «Asignado» cuando el selector ya muestra una cuenta vinculada; «Pendiente» permanece visible cuando falta asignación.
+
+Cobertura permanente: `scripts/admin-access-password-smoke.mjs` incluido en `npm run test:calendario` y `npm run verify`, más validación responsive de 280/320/345/375/390/430/768 px. Mantener en futuras solicitudes la regla de **no sustituir el flujo financiero ni trasladar estilos a Ayuda/Index**. El efecto visual final en Safari real sigue sujeto a comprobación de dispositivo.
