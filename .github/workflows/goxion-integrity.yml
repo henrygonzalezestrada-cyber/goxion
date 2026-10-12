@@ -36,17 +36,13 @@ jobs:
         run: npm run test:opiniones
 
       - name: Opiniones oficiales · flujo seguro simulado
-        if: ${{ !cancelled() }}
         run: npm run test:opiniones:oficial
 
       - name: Browser smoke
-        if: ${{ !cancelled() }}
         run: npm run test:smoke
 
       - name: Realtime beta browser smoke (mock data)
-        if: ${{ !cancelled() }}
         run: npm run test:realtime
 
       - name: Cart guest and member checkout
-        if: ${{ !cancelled() }}
         run: npm run test:cart
