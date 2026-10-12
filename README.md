@@ -10,6 +10,10 @@ Aplicación web de GOXION para clientes, soporte y administración.
 
 Sitio oficial: https://henrygonzalezestrada-cyber.github.io/goxion/
 
+## Contratos de continuidad visual y financiera
+
+Antes de cualquier nueva tarea en Admin, Ayuda o Index, leer [AGENTS.md](AGENTS.md) y el [contrato visual GOXION](docs/GOXION_VISUAL_CONTRACT.md). Para fechas independientes, leer también la [hoja de ruta financiera](docs/GOXION_MULTI_DATE_ROADMAP.md). Estos documentos hacen explícitos los criterios acordados y evitan depender del contexto de un chat anterior; el autor debe consultar los archivos reales antes de editar.
+
 ## Estructura
 
 ```text
