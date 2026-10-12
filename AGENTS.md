@@ -5,6 +5,7 @@
 1. `docs/GOXION_VISUAL_CONTRACT.md` — identidad de Admin, Ayuda/Mi Espacio e Index, retículas y QA responsive.
 2. `docs/ADMIN_FUNCTION_REGISTRY.md` — funciones existentes, propietarios, flujos y prohibiciones de duplicación.
 3. `docs/CALENDARIO_FINANCIERO.md` y `docs/GOXION_MULTI_DATE_ROADMAP.md` cuando el trabajo se refiera a fechas, obligaciones o pagos.
+   - Para modificar el estado de cuenta, consultar también `docs/INDEX_CALENDARIO_VISUAL_BASELINE.md` y los módulos reales de Index.
 4. Los HTML/CSS/JS **reales del módulo que se va a modificar**, antes de decidir componentes o estilos.
 5. `README.md` y `package.json` para el flujo de revisión y pruebas.
 
