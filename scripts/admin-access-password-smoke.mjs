@@ -30,7 +30,7 @@ const document={
 };
 const context={
  window,document,configGlobal:{serviciosGlobales:[{id:"netflix"},{id:"disney"}]},
- setTimeout:fn=>fn(),goAdminTab:()=>{throw Error("No se debe activar navegación duplicada")},
+ setTimeout:fn=>fn(),goAdminTab:tab=>events.push("tab-"+tab),
 };
 vm.runInNewContext(handler,context);
 let prevented=false,stopped=false;
@@ -48,7 +48,7 @@ assert(!handler.includes("gxPublishCredential("),"Nunca publicar contraseña des
 
 // Ruta de respaldo y ausencia de cuenta: no debe bloquear ni ejecutar escrituras.
 events.length=0; delete window.gxOpenMoreDestination;
-context.goAdminTab=tab=>events.push("tab-"+tab);
+
 window.gxSettingsView=view=>events.push("view-"+view);
 window.gxOpenTechnicalPassword("disney","missing",{
  preventDefault(){},stopPropagation(){}
