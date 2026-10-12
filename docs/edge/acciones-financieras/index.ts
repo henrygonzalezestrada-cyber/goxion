@@ -131,6 +131,29 @@ Deno.serve(async (req) => {
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
     const sb = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
+    // B2: preflight de preparación ANTES de mover o facturar cualquier acceso.
+    // Sólo Admin. Es lectura SQL sin efecto financiero; incluso si pasa, NO cobra.
+    if (action === "diagnostico_b2_sombra") {
+      const clienteId=String(data?.cliente_id||"").trim();
+      const periodo=String(data?.periodo||"").trim();
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuid.test(clienteId)||
+        (periodo&&!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(periodo))) {
+        return json({ok:false,error:"Cliente o período no válido",
+          codigo:"DIAGNOSTICO_B2_PARAMETROS_INVALIDOS",cobrable:false},400);
+      }
+      const check=await sb.rpc("goxion_diagnostico_b2_sombra",{
+        p_cliente_id:clienteId,p_periodo:periodo||null
+      });
+      if (check.error||check.data?.ok!==true) {
+        return json({ok:false,error:check.error?.message||"Diagnóstico no disponible",
+          codigo:"DIAGNOSTICO_B2_NO_VERIFICADO",cobrable:false},409);
+      }
+      return json({ok:true,accion:action,resultado:check.data,
+        modo:"diagnostico_b2_sombra",cobrable:false,
+        acreditada_oficial:false,operation_id:operationId});
+    }
+
     // B2: imputación exclusivamente SOMBRA de un pago YA APROBADO.
     // No modifica pagos, parciales, saldos, cobertura, mora ni lealtad.
     // Autorización por X-Admin-Token al principio del gateway.
