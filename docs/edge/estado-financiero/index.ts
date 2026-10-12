@@ -162,7 +162,17 @@ Deno.serve(async(req)=>{
           revision:item.revision
         };
       }
-      return {configuracion,disponibles};
+      const preciosDesactualizados:string[]=[];
+      for(const contrato of contratos){
+        const claves=Object.keys(configuracion).filter(id=>id===contrato.id||id.startsWith(contrato.id+"#"));
+        if(!claves.length)continue;
+        const total=claves.reduce((sum,id)=>sum+Number(configuracion[id].precio_centavos||0),0);
+        if(total!==Math.round(Number(contrato.monto)*100)){
+          preciosDesactualizados.push(contrato.id);
+          for(const id of claves)delete configuracion[id].precio_centavos;
+        }
+      }
+      return {configuracion,disponibles,preciosDesactualizados};
     }
 
     if(accion==="guardar_calendario_beta"){
@@ -220,6 +230,8 @@ Deno.serve(async(req)=>{
           cliente:cq.data,servicios:sq.data||[],financiero:fq.data,
           propuesta,hoy
         });
+        if(persistencia.preciosDesactualizados.length)
+          calendario.advertencias.push("Cambió la tarifa de una contratación: se conservan fechas, pero debe revisarse el desglose de precios antes de cobrar.");
         if(cq.data.estado==="suspendido")calendario.advertencias.push("Cliente suspendido. La simulación no habilita cobro ni reactivación.");
         return res({ok:true,modo:"sombra_sin_cobros",cliente:{id:cq.data.id,nombre:cq.data.nombre},
           calendario,persistencia:{
