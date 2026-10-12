@@ -20,7 +20,7 @@ const montoContrato = value => {
    ? Math.round(n*100):null;
 };
 
-export function calendarioInformativo({contratos=[],accesos=[],fechas=[]}={}){
+export function calendarioInformativo({contratos=[],accesos=[],fechas=[],hoy=null}={}){
  const none=reason=>({
    disponible:false,modo:"informativo_sin_cobro",razon:reason,
    fecha_proxima:null,fechas:[],multiple:false,
@@ -28,6 +28,7 @@ export function calendarioInformativo({contratos=[],accesos=[],fechas=[]}={}){
  });
  if(!Array.isArray(contratos)||!Array.isArray(accesos)||!Array.isArray(fechas))
    return none("datos_incompletos");
+ if(hoy!==null&&!fechaReal(hoy))return none("fecha_consulta_invalida");
  if(!contratos.length)return none("sin_servicios");
  if(contratos.length>=80||accesos.length>=90||fechas.length>=90)
    return none("limite_de_seguridad");
@@ -61,7 +62,8 @@ export function calendarioInformativo({contratos=[],accesos=[],fechas=[]}={}){
    for(const access of rows){
      const f=byAccess.get(access.id);
      if(!f||f.cliente_servicio_id!==c.id||f.estado!=="verificado"||
-       !fechaReal(f.cobertura_hasta)||!Number.isInteger(Number(f.dia_corte))||
+       !fechaReal(f.cobertura_hasta)||(hoy!==null&&f.cobertura_hasta<hoy)||
+       !Number.isInteger(Number(f.dia_corte))||
        Number(f.dia_corte)<1||Number(f.dia_corte)>31)
        return none("faltan_fechas_verificadas");
      const cents=numCentavos(f.precio_centavos);
