@@ -9,7 +9,7 @@ create or replace function public.goxion_preparar_obligaciones_calendario_sombra
 declare
  v_cliente record; v_estado jsonb;v_total_contratado bigint;
  v_total_accesos bigint;v_count int;v_validos int;v_days int;
- v_fechas_distintas int;v_official_period date;v_subtotal bigint;
+ v_fechas_distintas int;v_contratos_verificados int;v_official_period date;v_subtotal bigint;
  v_disc bigint;v_fees bigint;v_total bigint;v_saved int:=0;
  v_ya_pagado boolean;v_revisando boolean;v_partial boolean;
  v_note text;
@@ -40,13 +40,13 @@ begin
              and cal.precio_centavos is not null
              and cal.revision>0),
         coalesce(sum(cal.precio_centavos),0)::bigint,
-        count(distinct cal.cobertura_hasta)
- into v_days,v_validos,v_total_accesos,v_fechas_distintas
+        count(distinct cal.cobertura_hasta),count(distinct a.cliente_servicio_id)
+ into v_days,v_validos,v_total_accesos,v_fechas_distintas,v_contratos_verificados
  from public.cliente_accesos a
  join public.cliente_servicios cs on cs.id=a.cliente_servicio_id and cs.activo
  left join public.goxion_calendario_accesos cal on cal.cliente_acceso_id=a.id
  where a.cliente_id=p_cliente_id and a.activo;
- if v_days=0 or v_days>80 or v_validos<>v_days
+ if v_days=0 or v_days>80 or v_contratos_verificados<>v_count or v_validos<>v_days
    or v_total_accesos<>v_total_contratado then
   return jsonb_build_object('ok',true,'aplicable',false,
    'motivo','calendario_incompleto_o_precio_no_conciliado','cobrable',false);
@@ -91,6 +91,13 @@ begin
     'importe_base_centavos',v_subtotal,'cobrable',false);
  end if;
 
+ -- Bloquear las revisiones de calendario durante la materialización:
+ -- una fecha que cambia concurrentemente no puede entrar como obligación actual.
+ perform 1 from public.goxion_calendario_accesos cal
+ join public.cliente_accesos a on a.id=cal.cliente_acceso_id
+ where a.cliente_id=p_cliente_id and a.activo
+ for share of cal;
+
  -- Siempre aceptar sólo datos verificados, con revisión immutable atada
  -- a cada obligación. El trigger/índice evitan reasignar ciclos existentes.
  if exists(
@@ -121,6 +128,10 @@ begin
  where a.cliente_id=p_cliente_id and a.activo
  on conflict (cliente_acceso_id,ciclo_inicio) do nothing;
  get diagnostics v_saved=row_count;
+ if (select count(*) from public.goxion_obligaciones_sombra
+     where cliente_id=p_cliente_id and ciclo_inicio=p_periodo)<>v_days then
+   raise exception 'El número de obligaciones del ciclo es inconsistente';
+ end if;
  return jsonb_build_object('ok',true,'aplicable',true,
   'solo_validacion',false,'accesos',v_days,'nuevas_obligaciones',v_saved,
   'importe_base_centavos',v_subtotal,'cobrable',false,
