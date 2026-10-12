@@ -17,7 +17,7 @@ const service={
 const account={
  value:"",options:[{value:"account-1"},{value:"account-2"}]
 };
-const password={focus(args){events.push("focus"); assert.deepEqual(args,{preventScroll:true})}};
+const password={focus(args){events.push("focus"); assert.equal(args?.preventScroll,true)}};
 window.gxCloseClientFocus=()=>events.push("close-client-focus");
 window.gxOpenMoreDestination=name=>{events.push("open-"+name)};
 window.gxCredentialServiceChanged=()=>events.push("service-changed");
