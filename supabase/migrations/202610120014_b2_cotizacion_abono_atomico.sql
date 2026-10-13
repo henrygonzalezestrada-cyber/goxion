@@ -49,7 +49,8 @@ begin
  from public.goxion_b2_cargos b where b.ciclo_id=v_ciclo.id
  ) q;
  return jsonb_build_object('ok',true,'modo','b2_multifecha',
-  'cobrable',false,'solo_cotizacion',true,'cliente_id',p_cliente_id,
+  'cobrable',true,'solo_cotizacion',true,'requiere_aprobacion_admin',true,
+  'cliente_id',p_cliente_id,
   'periodo',p_periodo,'lealtad_global_perdida',v_descartado,
   'cargos',v_res,
   'total_pendiente_centavos',(
