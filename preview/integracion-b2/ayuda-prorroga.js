@@ -188,7 +188,7 @@
        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
      '<h2 id="gx-prorroga-title">Un poco más de tiempo.</h2>'+
      '<p>Elige cuándo pagar. Mantendrás tu lealtad y evitarás mora si cumples el acuerdo.</p>'+
-     '<label class="gx-prorroga-field">Nueva fecha de pago<input type="date" data-gx-day min="'+
+     '<label class="gx-prorroga-field"><span>Nueva fecha de pago</span><input type="date" data-gx-day min="'+
        plus(state.fecha_original,1)+'" max="'+state.fecha_maxima+'" value="'+init+'" aria-describedby="gx-prorroga-date-error"></label>'+
      '<span id="gx-prorroga-date-error" class="gx-prorroga-date-error" role="alert" aria-live="polite" hidden></span>'+
      '<div class="gx-prorroga-line"><span>Fecha original</span><strong data-gx-old></strong></div>'+
