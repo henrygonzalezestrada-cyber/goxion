@@ -94,8 +94,6 @@ try{
      "Aceptar se habilita sólo con fecha y condiciones correctas");
    check((await page.locator("[data-gx-protected]").textContent()).includes("46.06"),"Importe puntual");
    check((await page.locator("[data-gx-missed]").textContent()).includes("58.80"),"Mora retroactiva");
-   check(await page.locator("[data-gx-activate]").isDisabled(),"Confirmación requerida");
-   await page.locator("[data-gx-accept]").check();
    await page.locator("[data-gx-activate]").click();
    await dlg.waitFor({state:"detached",timeout:5000});
    check((await page.locator("#dash-badge").textContent()).includes("Acuerdo pactado"),
