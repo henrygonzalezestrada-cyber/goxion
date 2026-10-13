@@ -33,3 +33,11 @@ Cuando el cliente acepte una prórroga **válida** desde Mi Espacio, la aprobaci
 4. Activación gradual y reversible, cuentas existentes intactas. Admin/Discord corresponde a etapa independiente posterior, no condiciona el cierre visual de las betas.
 
 Este documento es un registro de decisiones, no evidencia de que Admin/Discord se haya integrado.
+
+## Últimos retoques para aprobación visual (13/oct)
+
+- Estado `Acuerdo pactado`: **reutilizar literalmente** las clases oficiales `time-badge badge-ok` dentro de `#dash-badge`; no diseñar un estado de texto plano ni otro badge independiente. Conservar iconografía discreta, relleno traslúcido, borde nativo y fuente negrita de GOXION.
+- Monto rosado de incumplimiento: prohibido el degradado de fondo rectangular en `.gx-prorroga-risk` porque genera un corte de luz en el borde izquierdo. Fondo transparente, `overflow: visible` y halo elíptico interior con difuminado que termina ANTES de los bordes; importe, mora y lealtad mantienen alineación y aire editorial.
+- Validación automática en Chromium y Safari/WebKit 320/390/768 px: comprobar `.time-badge.badge-ok.gx-prorroga-state`, peso 700, cápsula presente también tras recarga, que el halo no tenga recorte rectangular y que el acuerdo siga sin exigir Admin.
+
+**Pendientes para oficial (no confundirse con aprobación de diseño):** conciliación B2 real de promociones, cupones y descuentos especiales; acreditación atómica de pagos por obligación; validación de la modalidad de prórroga con el cliente real opt-in; eventual fallo de Integrity en `main` y apagado gradual. Admin/Discord siguen en Issue #98.
