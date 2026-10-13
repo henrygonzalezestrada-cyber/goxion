@@ -32,8 +32,14 @@ for(const engine of [chromium,webkit]){
    await page.locator("[data-gx-activate]").click();
    await dialog.waitFor({state:"detached",timeout:4000});
    assert.equal(await page.locator(".gx-prorroga-entry").count(),0);count++;
-   assert.match(await page.locator(".gx-prorroga-active").innerText(),/ACUERDO PACTADO/);count++;
+   assert.equal(await page.locator(".gx-prorroga-active").count(),0,"No duplicar la fecha en otro bloque");count++;
    assert.match(await page.locator("#dash-date").textContent(),/20 de octubre/);count++;
+   assert.equal(await page.locator("#dash-date-label").textContent(),"Nueva fecha de pago");count++;
+   assert.equal(await page.locator("#dash-badge").textContent(),"Acuerdo pactado");count++;
+   assert.equal(await page.locator(".gx-account-capsule").count(),1);count++;
+   assert.equal(await page.locator("#dash-billing-card .gx-prorroga-entry").count(),0);count++;
+   assert.equal(await page.locator("#dash-billing-card .gx-prorroga-active").count(),0);count++;
+   assert.equal(await page.locator("#dash-billing-card").getByText("Nivel de lealtad").count(),0);count++;
    assert.deepEqual(errors,[],"Errores "+engine.name()+" "+width);count++;
    await page.close();
   }
