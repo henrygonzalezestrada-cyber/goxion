@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos && npm run test:finanzas:parcial-atomico && npm run test:finanzas:imputacion-sombra && npm run test:finanzas:obligaciones-b2 && npm run test:finanzas:aprobacion-atomica && npm run test:finanzas:atribucion && npm run test:finanzas:diagnostico-b2 && npm run test:finanzas:enrutamiento && npm run test:finanzas:lealtad-multifecha && npm run test:finanzas:mora-multifecha && npm run test:index:b2 && npm run test:finanzas:prorroga",
+    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos && npm run test:finanzas:parcial-atomico && npm run test:finanzas:imputacion-sombra && npm run test:finanzas:obligaciones-b2 && npm run test:finanzas:aprobacion-atomica && npm run test:finanzas:atribucion && npm run test:finanzas:diagnostico-b2 && npm run test:finanzas:enrutamiento && npm run test:finanzas:lealtad-multifecha && npm run test:finanzas:mora-multifecha && npm run test:index:b2 && npm run test:finanzas:prorroga && npm run test:finanzas:comprobante-b2",
     "test:smoke": "node scripts/browser-smoke.mjs",
     "test:cart": "node scripts/cart-v2-smoke.mjs",
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
@@ -30,6 +30,7 @@
     "test:index:b2": "node scripts/index-b2-beta-smoke.mjs",
     "test:index:b2:browser": "node scripts/index-b2-browser-smoke.mjs",
     "test:finanzas:prorroga": "node scripts/prorroga-policy-smoke.mjs",
-    "test:ayuda:prorroga:browser": "node scripts/ayuda-prorroga-browser-smoke.mjs"
+    "test:ayuda:prorroga:browser": "node scripts/ayuda-prorroga-browser-smoke.mjs",
+    "test:finanzas:comprobante-b2": "node scripts/b2-comprobante-ledger-smoke.mjs"
   }
 }
