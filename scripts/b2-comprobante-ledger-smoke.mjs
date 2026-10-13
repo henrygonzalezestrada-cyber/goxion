@@ -104,4 +104,19 @@ const apply=[{charge:"a",amount:4606,expected:4606},{charge:"b",amount:4606,expe
   {allowPartial:true,reason:"Autorización excepcional documentada"});
  check(r.ok&&state.charges.a.due===2106,"Excepción Admin conserva saldo restante");
 }
+
+// Gateway beta sólo Admin: no autoriza pagos por acceso sin recibo.
+const gateway=readFileSync("docs/edge/acciones-financieras-b2-beta/index.ts","utf8");
+check(gateway.includes('if(action==="b2_aprobar_comprobante")'),"Acción de comprobante Admin existe");
+check(gateway.includes('if(action==="b2_aprobar_abono"){')&&
+  gateway.includes('codigo:"B2_REQUIERE_COMPROBANTE"'),"Prohibida ruta directa sin prueba");
+check(gateway.includes('if (!auth.ok)') &&
+  gateway.indexOf('if (!auth.ok)') < gateway.indexOf('if(action==="b2_aprobar_comprobante")'),
+  "Token Admin se valida antes de acreditación");
+check(gateway.includes('rpc("goxion_b2_aprobar_comprobante"'),"Aprobación delega a SQL transaccional");
+check(gateway.includes('confirmar_aprobacion!==true'),"Aprobación explícita de Admin");
+check(gateway.includes('new Set(rows.map((r:any)=>String(r.operation_id))).size!==rows.length'),
+  "Evita reutilizar operation IDs entre cargos");
+check(gateway.includes('acreditada_b2:false,operation_id:key'),"Error nunca simula acreditación");
+
 console.log("GOXION B2 comprobantes: "+checks+" verificaciones de contrato + modelo transaccional PASS (sin acreditación real)");
