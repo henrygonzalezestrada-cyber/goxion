@@ -49,6 +49,25 @@
   if(row.abono_pagado_centavos>0)return "Abonado "+money(row.abono_pagado_centavos);
   return "Lealtad "+(row.descuento_centavos>0?"aplicada":"sin descuento");
  }
+ function updateServiceMarker(){
+  const items=Array.from(document.querySelectorAll(".services-container .service-item"));
+  for(const item of items)item.querySelector(".gx-b2-service-flag")?.remove();
+  const due=pending()[0];
+  if(!due)return;
+  const normal=x=>String(x||"").toLocaleLowerCase("es")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+  const target=normal(due.servicio);
+  if(!target || target==="servicio contratado")return;
+  // Sólo identificar si hay coincidencia inequívoca con el contrato activo.
+  const matches=items.filter(item=>normal(item.querySelector(".service-name")?.textContent)
+    .includes(target));
+  if(matches.length!==1)return;
+  const label=document.createElement("small");
+  label.className="gx-b2-service-flag";
+  label.textContent=due.mora_centavos>0?
+    "VENCIDO · Perfil "+due.ordinal:"PRÓXIMO · Perfil "+due.ordinal+" · "+date(due.vence);
+  matches[0].querySelector(".service-name")?.appendChild(label);
+ }
  function updateHeader(){
   const quote=store.quote;
   if(!quote)return;
@@ -198,6 +217,7 @@
    selected=null;mode="proximo";alternativesOpen=false;store.makeDemo(button.dataset.b2Scenario);
   }));
   updateHeader();
+  updateServiceMarker();
  }
  function installHandlers(){
   if(installed||typeof window.abrirModalPago!=="function")return;
