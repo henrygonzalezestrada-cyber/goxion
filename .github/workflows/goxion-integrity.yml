@@ -22,14 +22,14 @@ jobs:
         with:
           node-version: 22
 
-      - name: Verify repository integrity
-        run: npm run verify
-
       - name: Install browser test
         run: npm install --no-save playwright
 
       - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
+
+      - name: Verify repository integrity
+        run: npm run verify
 
       # Run the changed beta first so iPhone regressions surface immediately.
       - name: Opiniones 2.0 beta (local-only)
