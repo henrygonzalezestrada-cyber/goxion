@@ -115,11 +115,13 @@
    const init=plus(state.fecha_original,3);
    dialog.innerHTML='<div class="gx-prorroga-sheet">'+
      '<div class="gx-prorroga-kicker">FLEXIBILIDAD GOXION</div>'+
-     '<button class="gx-prorroga-close" type="button" data-gx-close aria-label="Cerrar">×</button>'+
+     '<button class="gx-prorroga-close" type="button" data-gx-close aria-label="Cerrar">'+
+       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
      '<h2 id="gx-prorroga-title">Un poco más de tiempo.</h2>'+
      '<p>Elige cuándo pagar. Mantendrás tu lealtad y evitarás mora si cumples el acuerdo.</p>'+
      '<label class="gx-prorroga-field">Nueva fecha de pago<input type="date" data-gx-day min="'+
-       plus(state.fecha_original,1)+'" max="'+state.fecha_maxima+'" value="'+init+'"></label>'+
+       plus(state.fecha_original,1)+'" max="'+state.fecha_maxima+'" value="'+init+'" aria-describedby="gx-prorroga-date-error"></label>'+
+     '<span id="gx-prorroga-date-error" class="gx-prorroga-date-error" role="alert" aria-live="polite" hidden></span>'+
      '<div class="gx-prorroga-line"><span>Fecha original</span><strong data-gx-old></strong></div>'+
      '<div class="gx-prorroga-line"><span>Acuerdo propuesto</span><strong data-gx-new></strong></div>'+
      '<div class="gx-prorroga-line gx-prorroga-main"><span>Si pagas en la nueva fecha</span><strong data-gx-protected></strong></div>'+
@@ -135,22 +137,66 @@
    document.body.appendChild(dialog);
    const day=dialog.querySelector("[data-gx-day]"),btn=dialog.querySelector("[data-gx-activate]");
    const confirm=dialog.querySelector("[data-gx-accept]"),status=dialog.querySelector(".gx-prorroga-result");
-   let quote=null;
+   let quote=null,requestSerial=0;
+   const dateError=dialog.querySelector("#gx-prorroga-date-error");
+   const minDate=plus(state.fecha_original,1);
+   const maxDate=state.fecha_maxima;
+   const validDate=value=>{
+     if(!/^\\d{4}-\\d{2}-\\d{2}$/.test(value))return false;
+     const parsed=new Date(value+"T00:00:00Z");
+     return Number.isFinite(parsed.getTime())&&parsed.toISOString().slice(0,10)===value&&
+       value>=minDate&&value<=maxDate;
+   };
+   const quoteFields=["data-gx-protected","data-gx-missed","data-gx-mora",
+     "data-gx-loyalty","data-gx-new"];
+   const clearQuote=()=>{
+     quoteFields.forEach(name=>{
+       const el=dialog.querySelector("["+name+"]");
+       if(el)el.textContent="—";
+     });
+   };
+   const showDateError=error=>{
+     const invalid=Boolean(error);
+     day.classList.toggle("is-invalid",invalid);
+     day.setAttribute("aria-invalid",String(invalid));
+     dateError.hidden=!invalid;
+     dateError.textContent=error||"";
+     if(invalid)clearQuote();
+   };
    const update=async()=>{
-     status.textContent="Calculando importe…";btn.disabled=true;quote=null;
+     const thisRequest=++requestSerial;
+     btn.disabled=true;quote=null;
+     if(!validDate(day.value)){
+       status.textContent="";
+       showDateError("Elige una fecha entre el "+label(minDate)+
+         " y el "+label(maxDate)+". El límite es de 5 días.");
+       return;
+     }
+     showDateError("");
+     status.textContent="Calculando importe…";
      try{
        const data=await action("cotizar_prorroga_auto",{
          cargo_id:state.cargo_id,fecha_pactada:day.value});
-       quote=data.cotizacion;renderQuote(dialog,quote);
+       if(thisRequest!==requestSerial||!validDate(day.value))return;
+       quote=data.cotizacion;
+       if(quote.fecha_pactada!==day.value)throw Error("La fecha calculada cambió. Vuelve a elegirla.");
+       renderQuote(dialog,quote);
        status.textContent="";btn.disabled=!confirm.checked;
-     }catch(e){status.textContent=e.message;}
+     }catch(e){
+       if(thisRequest!==requestSerial)return;
+       clearQuote();status.textContent=e.message;
+     }
    };
    dialog.querySelector("[data-gx-close]").addEventListener("click",()=>dialog.close());
    dialog.addEventListener("close",()=>{confirmKey=null;dialog.remove();});
+   day.addEventListener("input",update);
    day.addEventListener("change",update);
-   confirm.addEventListener("change",()=>btn.disabled=!confirm.checked||!quote);
+   confirm.addEventListener("change",()=>btn.disabled=!confirm.checked||!quote||!validDate(day.value));
    btn.addEventListener("click",async()=>{
-     if(!quote||!confirm.checked)return;
+     if(!quote||!confirm.checked||!validDate(day.value)||
+       quote.fecha_pactada!==day.value){
+       await update();return;
+     }
      btn.disabled=true;status.textContent="Confirmando tu acuerdo…";
      if(!confirmKey)confirmKey=crypto.randomUUID();
      try{
