@@ -18,10 +18,10 @@
       ...original.BUSINESS.BANK,NAME:"BANCO DE PRUEBA",
       HOLDER:"CUENTA DEMOSTRACIÓN",CLABE:"000000000000000000",
       ACCOUNTS:Object.freeze([
-        Object.freeze({ID:"nu",LABEL:"Nu · demo",INSTITUTION:"Simulación",
+        Object.freeze({ID:"nu",LABEL:"Nu",INSTITUTION:"Datos no operativos",
           HOLDER:"CUENTA DEMOSTRACIÓN",CLABE:"000000000000000000",
           CURRENCY:"MXN",PRIMARY:true}),
-        Object.freeze({ID:"revolut",LABEL:"Revolut · demo",INSTITUTION:"Simulación",
+        Object.freeze({ID:"revolut",LABEL:"Revolut",INSTITUTION:"Datos no operativos",
           HOLDER:"CUENTA DEMOSTRACIÓN",CLABE:"000000000000000000",
           CURRENCY:"MXN",PRIMARY:false})
       ])
@@ -32,8 +32,8 @@
 
   function fixture() {
     return { "b2-demo": {
-      id: "demo-b2-no-real", clave: "b2-demo", folio: "B2-DEMO",
-      nombre: "Cliente de prueba", estado: "pendiente",
+      id: "demo-b2-no-real", clave: "b2-demo", folio: "GX-0026",
+      nombre: "Cliente GOXION", estado: "pendiente",
       dia_pago: 6, periodo_pendiente: "2026-11-01", pagos_puntuales: 10,
       pago_en_revision: false, historial_pagos: [],
       servicios: [{nombre:"ViX Premium · 2 perfiles",monto:98}],
