@@ -47,6 +47,38 @@ BEGIN
  select (item->>'total_centavos')::int into b
  from jsonb_array_elements(quote->'cargos') item where item->>'cargo_id'=y.id::text;
  if a is null or b is null or a<=0 or b<=0 then raise exception 'Cotización inválida';end if;
+ -- La función de reportar heredada SIN evidencia está cerrada.
+ reject_ok=false;
+ begin
+  perform public.goxion_b2_registrar_comprobante(
+    cid,cy,a+b,'texto/libre/discord',rep_op);
+ exception when others then
+  if sqlerrm like 'B2_REPORTE_REQUIERE_EVIDENCIA_AUTENTICADA%'
+   then reject_ok=true;else raise;end if;
+ end;
+ if not reject_ok then raise exception 'Registro sin evidencia quedó accesible';end if;
+ -- Ni montos inventados ni archivos que aún no se cargaron son aceptables.
+ reject_ok=false;
+ begin
+  perform public.goxion_b2_registrar_comprobante_seguro(
+    cid,cy,a+b,cid::text||'/'||rep_op::text||'-notyet.png',
+    rep_op,array[x.id,y.id]);
+ exception when others then
+  if sqlerrm like 'COMPROBANTE_ARCHIVO_NO_VERIFICADO%'
+   then reject_ok=true;else raise;end if;
+ end;
+ if not reject_ok then raise exception 'Se aceptó evidencia inexistente';end if;
+ reject_ok=false;
+ begin
+  perform public.goxion_b2_registrar_comprobante_seguro(
+    cid,cy,a+b+100,
+    cid::text||'/'||rep_op::text||'-notyet.png',
+    rep_op,array[x.id,y.id]);
+ exception when others then
+  if sqlerrm like 'COMPROBANTE_ARCHIVO_NO_VERIFICADO%'
+   then reject_ok=true;else raise;end if;
+ end;
+ if not reject_ok then raise exception 'Faltó rechazo de archivo o importe';end if;
  file_ref=cid::text||'/'||rep_op::text||'-55aaccee10ef011a.png';
  -- Simula SÓLO el índice de evidencia privada en transacción reversible;
  -- la existencia de bytes reales se probará desde Edge/storage, no aquí.
