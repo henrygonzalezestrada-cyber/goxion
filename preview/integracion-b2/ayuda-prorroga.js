@@ -145,7 +145,9 @@
      if(dateTitle&&dateTitle.textContent!=="Nueva fecha de pago")
        dateTitle.textContent="Nueva fecha de pago";
      const badge=card.querySelector("#dash-badge");
-     const badgeMarkup='<span class="gx-prorroga-state">Acuerdo pactado</span>';
+     // Reutiliza la cápsula real del dashboard, no una etiqueta beta.
+     // badge-ok hereda tipografía, radio, contraste y fondo de GOXION.
+     const badgeMarkup='<div class="time-badge badge-ok gx-prorroga-state">🤝 Acuerdo pactado</div>';
      if(badge&&badge.innerHTML!==badgeMarkup)badge.innerHTML=badgeMarkup;
      return;
    }
