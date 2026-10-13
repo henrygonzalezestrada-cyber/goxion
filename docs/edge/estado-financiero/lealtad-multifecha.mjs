@@ -45,6 +45,16 @@ export function calcularMultifechaLealtad({
     return fail('aprobaciones_invalidas_o_duplicadas');
   paid.set(p.acceso_id,p);
  }
+ // La pérdida de lealtad es GLOBAL desde el primer vencimiento incumplido.
+ // Al consultar después del vencimiento, ninguno de los accesos todavía
+ // pendientes debe conservar un descuento que la cuenta ya perdió.
+ // No modificar retroactivamente un recibo ya aprobado.
+ const incumplimientoExistente=accesos.some(a=>{
+  const pago=paid.get(a?.id);
+  return validDate(a?.fecha_vencimiento)&&(
+   (pago&&pago.fecha_aprobacion>a.fecha_vencimiento)||
+   (!pago&&hoy>a.fecha_vencimiento));
+ });
  for(const a of accesos){
   if(!a?.id||used.has(a.id)||!a.contrato_id){
    return fail('acceso_sin_identidad_unica');
@@ -60,9 +70,10 @@ export function calcularMultifechaLealtad({
   if(a.tiene_promocion||a.tiene_cupon||a.tiene_trato_justo||
      a.tiene_descuento_especial||a.tiene_reactivacion)
     return fail('beneficio_debe_atribuirse_antes_de_simular');
-  const d=money(base,porcentaje);
-  const due=base-d;
   const payment=paid.get(a.id);
+  const porcentajeAcceso=payment?porcentaje:(incumplimientoExistente?0:porcentaje);
+  const d=money(base,porcentajeAcceso);
+  const due=base-d;
   if(payment&&payment.monto_aprobado_centavos!==due)
    return fail('comprobante_distinto_al_importe_del_acceso');
   const lateDays=Math.max(0,days(a.fecha_vencimiento,hoy));
@@ -70,7 +81,7 @@ export function calcularMultifechaLealtad({
   out.push({
    acceso_id:a.id,contrato_id:a.contrato_id,
    fecha_vencimiento:a.fecha_vencimiento,
-   monto_base_centavos:base,porcentaje_lealtad:porcentaje,
+   monto_base_centavos:base,porcentaje_lealtad:porcentajeAcceso,
    descuento_lealtad_centavos:d,
    subtotal_centavos:due,mora_proyectada_centavos:mora,
    total_proyectado_centavos:payment?0:due+mora,
@@ -97,6 +108,7 @@ export function calcularMultifechaLealtad({
   lealtad_global:{racha_inicial:lealtad.racha,
    racha_resultante_solo_al_cierre:rachaProyectada,
    pierde_beneficio_siguiente_ciclo:incumplimiento,
+   pierde_beneficio_en_accesos_pendientes:incumplimiento,
    racha_puede_incrementar:periodoPuntual,
    incremento_maximo_del_ciclo:periodoPuntual?1:0},
   unidades:out.sort((a,b)=>a.fecha_vencimiento.localeCompare(b.fecha_vencimiento)||a.acceso_id.localeCompare(b.acceso_id)),
