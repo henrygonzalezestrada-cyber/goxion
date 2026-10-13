@@ -254,7 +254,7 @@ Deno.serve(async (req) => {
       if(requirePeriod&&!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(periodo))
         return json({ok:false,error:"Período B2 inválido",codigo:"B2_PERIODO_INVALIDO"},400);
       const actor="admin:b2-gateway";
-      let rpc="",args:Record<string,unknown>={p_cliente_id:clienteId};
+      let rpc="",args={p_cliente_id:clienteId};
       if(action==="b2_activar_cliente"){
         if(data?.confirmar_activacion!==true)return json({ok:false,
           error:"Se requiere confirmar la activación del régimen multifecha",
