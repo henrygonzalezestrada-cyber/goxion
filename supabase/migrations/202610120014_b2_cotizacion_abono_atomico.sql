@@ -72,7 +72,7 @@ declare
  v_lealtad_perdida boolean;v_daydelta int;v_cobro_mora int;
  v_principal_pago int;v_mora_pago int;v_total int;
  v_estado text;v_streak int;v_label text;v_fin int;v_sum bigint;
- v_res jsonb;v_fechas int;
+ v_res jsonb;v_fechas int;v_siguiente jsonb:=null;v_error_siguiente text:=null;
 begin
  if p_cliente_id is null or p_cargo_id is null or p_operation_id is null
   or p_monto_centavos is null or p_monto_centavos<=0
@@ -212,12 +212,23 @@ begin
   where cal.cliente_id=p_cliente_id and cal.estado='verificado'
     and exists(select 1 from public.goxion_b2_cargos b
      where b.ciclo_id=v_ciclo.id and b.cliente_acceso_id=cal.cliente_acceso_id);
+  -- Preparar automáticamente el siguiente ciclo con fechas renovadas.
+  -- Si el mes nuevo trae promociones/cupones sin conciliar, no deshacer
+  -- una liquidación legítima: dejarlo pendiente de revisión por Admin.
+  begin
+    v_siguiente=public.goxion_b2_iniciar_ciclo(
+      p_cliente_id,(v_ciclo.periodo+interval '1 month')::date);
+  exception when others then
+    get stacked diagnostics v_error_siguiente=MESSAGE_TEXT;
+  end;
  end if;
  return jsonb_build_object('ok',true,'repetida',false,'operation_id',p_operation_id,
   'cargo_id',p_cargo_id,'monto_centavos',p_monto_centavos,
   'saldo_restante_centavos',v_total-p_monto_centavos,
   'mora_aplicada_centavos',v_mora_pago,'principal_aplicado_centavos',v_principal_pago,
   'ciclo_liquidado',v_fin=0,'lealtad_perdida',v_lealtad_perdida,
+  'proximo_ciclo_preparado',coalesce(v_siguiente->>'ok','false')='true',
+  'proximo_ciclo_requiere_revision',v_error_siguiente is not null,
   'acreditada_b2',true,'acreditada_global',v_fin=0);
 end $$;
 revoke all on function public.goxion_b2_aprobar_abono(uuid,uuid,integer,integer,uuid,text)
