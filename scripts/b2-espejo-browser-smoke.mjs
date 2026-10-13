@@ -80,6 +80,16 @@ try{
    check(await page.locator(".gx-prorroga-risk-total").evaluate(el=>
      getComputedStyle(el).textAlign==="left"),
      "Monto de incumplimiento anclado a la izquierda");
+   check(await page.locator(".gx-prorroga-risk").evaluate(el=>{
+     const style=getComputedStyle(el);
+     const glow=getComputedStyle(el,"::before");
+     const rect=el.getBoundingClientRect();
+     const left=Number.parseFloat(glow.left);
+     const width=Number.parseFloat(glow.width);
+     return style.backgroundImage==="none" && style.overflow==="visible" &&
+       glow.content!=="none" && glow.filter.includes("blur") &&
+       left>=18 && left+width<rect.width-12;
+   }),"Resplandor rosa sin degradado rectangular ni clipping en los bordes");
    check(await page.locator(".gx-prorroga-entry").evaluate(el=>
      getComputedStyle(el,"::after").content==="none"),
      "Sin línea decorativa bajo el botón de prórroga");
@@ -136,6 +146,13 @@ try{
      "Al cerrar se libera el scroll, sin dejar la página bloqueada");
    check((await page.locator("#dash-badge").textContent()).includes("Acuerdo pactado"),
      "Acuerdo aprobado sin Admin");
+   check(await page.locator("#dash-badge .time-badge.badge-ok.gx-prorroga-state").count()===1,
+     "Acuerdo encapsulado con las clases nativas GOXION");
+   check(await page.locator("#dash-badge .time-badge").evaluate(el=>{
+     const cs=getComputedStyle(el);
+     return cs.fontWeight==="700" && parseInt(cs.borderRadius,10)>=20 &&
+       cs.borderStyle==="solid" && cs.backgroundColor!=="rgba(0, 0, 0, 0)";
+   }),"Cápsula pactada conserva tipografía, borde, radio y relleno del estado oficial");
    check(await page.locator(".gx-prorroga-entry").count()===0,"Sin segunda prórroga");
    check((await page.locator("#dash-date").textContent()).includes("9 de noviembre"),
      "Fecha acordada sin nueva tarjeta");
