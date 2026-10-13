@@ -16,6 +16,14 @@ for (const engine of [chromium,webkit]){
   await page.locator("#b2-calendar").waitFor({timeout:12000});
   await page.waitForTimeout(120);
   assert.match(await page.locator(".total-amount").innerText(),/\$92\.12/);checks++;
+  assert.equal(await page.locator(".gx-b2-breakdown").count(),1,"Desglose oficial visible");checks++;
+  assert.equal(await page.locator(".services-container + #b2-calendar + .gx-b2-breakdown").count(),1,
+    "Desglose debe seguir al calendario");checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/Subtotal/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/Descuento de lealtad/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$49\.00/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$2\.94/);checks++;
+  assert.match(await page.locator("#b2-selected-total").textContent(),/\$46\.06/);checks++;
   assert.equal(await page.locator(".gx-b2-beta-banner,[data-b2-scenario],.gx-b2-scenario").count(),0,"No debug controls");checks++;
   assert.equal(await page.getByText("CAMBIAR ESCENARIO DE DEMOSTRACIÓN").count(),0);checks++;
   assert.equal(await page.locator(".services-container .gx-b2-service-flag").count(),1);checks++;
@@ -34,6 +42,9 @@ for (const engine of [chromium,webkit]){
   assert.match(await page.locator(".gx-b2-next-tag").textContent(),/PRÓXIMO/);checks++;
   await page.locator('[data-b2-mode="todo"]').click();
   assert.match(await page.locator("#b2-selected-total").textContent(),/\$92\.12/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$98\.00/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$5\.88/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown-context").textContent(),/Todos los servicios/);checks++;
   assert.equal(await page.locator('[data-b2-mode="abono"]').count(),0,"Abono no debe estar en la selección principal");checks++;
   assert.equal(await page.locator("[data-b2-alternatives]").count(),0);checks++;
   await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("prorroga"));
@@ -43,12 +54,22 @@ for (const engine of [chromium,webkit]){
   assert.match(await page.locator(".total-amount").innerText(),/\$107\.80/);checks++;
   assert.equal(await page.locator(".gx-b2-row.is-late").count(),1);checks++;
   await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("vencido"));
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/Mora acumulada/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$2\.45/);checks++;
+  assert.match(await page.locator("#b2-selected-total").textContent(),/\$100\.45/);checks++;
   assert.match(await page.locator(".total-amount").innerText(),/\$100\.45/);checks++;
   await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("primero-pagado"));
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$49\.00/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$2\.94/);checks++;
+  assert.match(await page.locator("#b2-selected-total").textContent(),/\$46\.06/);checks++;
   assert.match(await page.locator(".total-amount").innerText(),/\$46\.06/);checks++;
   await page.locator("#b2-toggle").click();
   assert.equal(await page.locator("#b2-toggle").getAttribute("aria-expanded"),"false");checks++;
   await page.locator("#b2-toggle").click();
+  await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("parcial"));
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/Pagos parciales aprobados/);checks++;
+  assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$20\.00/);checks++;
+  assert.match(await page.locator("#b2-selected-total").textContent(),/\$26\.06/);checks++;
   await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("puntual"));
   await page.locator('[data-b2-mode="proximo"]').click();
   const pay=page.locator(".gx-payment-primary");
