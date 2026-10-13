@@ -119,4 +119,33 @@ check(gateway.includes('new Set(rows.map((r:any)=>String(r.operation_id))).size!
   "Evita reutilizar operation IDs entre cargos");
 check(gateway.includes('acreditada_b2:false,operation_id:key'),"Error nunca simula acreditación");
 
+
+// Evidencia privada: validar contrato de extremo a extremo sin credenciales.
+const privateLedger=readFileSync("supabase/migrations/202610130003_b2_prueba_privada_y_cargos.sql","utf8");
+const receiver=readFileSync("docs/edge/comprobantes-b2-beta/index.ts","utf8");
+check(privateLedger.includes("storage.buckets")&&privateLedger.includes("'goxion-b2-evidencias'"),
+  "Existe almacén privado de evidencia");
+check(privateLedger.includes("false,6291456"),"Bucket no público y máximo 6 MB");
+check(privateLedger.includes("storage.objects")&&privateLedger.includes("COMPROBANTE_ARCHIVO_NO_VERIFICADO"),
+  "SQL no acepta ruta de archivo sin evidencia almacenada");
+check(privateLedger.includes("cargos_solicitados")&&privateLedger.includes("COMPROBANTE_CARGOS_NO_COINCIDEN_CON_SOLICITUD"),
+  "Admin no cambia servicios seleccionados por el cliente");
+check(privateLedger.includes("B2_REPORTE_REQUIERE_EVIDENCIA_AUTENTICADA"),
+  "Firma antigua que aceptaba texto queda cerrada");
+check(receiver.includes('clientIdentity(req.headers.get("X-Client-Token")'),
+  "Reporte exige sesión del cliente derivada del HMAC");
+check(!receiver.includes("X-Admin-Token"),"Cliente no usa token administrativo");
+check(receiver.includes("attachment instanceof File")&&receiver.includes("validImage(bytes,attachment.type)"),
+  "Sólo captura con bytes verificables");
+check(receiver.includes('crypto.subtle.digest("SHA-256",bytes)')&&
+  receiver.includes("clientId+\"/\"+fileName"),
+  "Evidencia privada se identifica por cliente y SHA, no nombre original");
+check(receiver.includes("storage.from(BUCKET).upload")&&receiver.includes("upsert:false"),
+  "Sin archivos reescritos ni subida directa pública");
+check(receiver.includes('rpc("goxion_b2_registrar_comprobante_seguro"'),
+  "El registro SQL está ligado al archivo y a los cargos");
+check(receiver.includes("acreditado:false")&&
+ !receiver.includes('goxion_b2_aprobar_comprobante'),
+  "El reporte cliente no puede acreditar ni aprobar recibos");
+
 console.log("GOXION B2 comprobantes: "+checks+" verificaciones de contrato + modelo transaccional PASS (sin acreditación real)");
