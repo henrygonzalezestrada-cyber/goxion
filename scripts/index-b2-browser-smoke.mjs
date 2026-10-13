@@ -48,7 +48,7 @@ for (const engine of [chromium,webkit]){
   await page.locator("[data-b2-submit]").click();
   assert.match(await page.locator(".gx-b2-confirm-status").textContent(),/simulada/);checks++;
   await page.locator("[data-b2-cancel]").click();
-  assert.equal(await dlg.count(),0);checks++;
+  await dlg.waitFor({state:"detached",timeout:3000});checks++;
   await page.locator('[data-b2-scenario="prorroga"]').click();
   assert.match(await page.locator(".total-amount").innerText(),/\$92\.12/);checks++;
   assert.equal(await page.locator("[data-b2-review]").count(),0);checks++;
