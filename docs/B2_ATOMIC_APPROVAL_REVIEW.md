@@ -154,3 +154,15 @@ El **abono parcial deja de ofrecerse al cliente** en la beta Index y queda como 
 La página oficial `assets/js/index/02-02-inline.js` (función `enviarComprobanteDiscord()`) entrega la imagen mediante `FormData` a Discord. **No existe objeto persistido verificable en la base de datos que vincule el archivo con `cargo_id`**, y la tabla `storage.buckets` de Supabase estaba vacía en la auditoría. Un simple `evidencia_ref` enviado por el navegador NO es prueba auténtica de pago.
 
 **Requisito técnico obligatorio antes de exponer `goxion_b2_registrar_comprobante`:** crear canal seguro de captura con identidad `X-Client-Token`, comprobar tipo/tamaño e integridad de archivo en servidor, persistir evidencia privada o referencia validada, vincular selección exacta de cargos y registrar comprobante con idempotencia. El gateway B2 Admin v3 ya exige recibo existente. La migración no ha abierto el endpoint del cliente; evitar falsas acreditaciones. El envío de Discord actual queda intacto para clientes legados y NO sirve como prueba de imputación B2.
+
+
+### F2 · evidencia privada e identidad por cargo (13/oct)
+
+**Backend adicional instalado (sin interfaz ni clientes reales):**
+- `supabase/migrations/202610130003_b2_prueba_privada_y_cargos.sql` creó el bucket privado `goxion-b2-evidencias` (sin acceso público, 6 MB, imágenes JPEG/PNG/WEBP) y añadió `cargos_solicitados` al comprobante B2.
+- La función de reporte antigua, que recibía un texto de evidencia sin verificar el archivo, queda deliberadamente bloqueada. La nueva RPC `goxion_b2_registrar_comprobante_seguro` comprueba cliente/ciclo opt-in, identidad exacta de cargos no pagados, cotización B2 del servidor, archivo de `storage.objects` en bucket privado y clave idempotente.
+- `goxion_b2_aprobar_comprobante` ahora también comprueba que las obligaciones aprobadas son **exactamente** las elegidas al reportar, para que Admin no pueda cambiar de perfil al acreditar.
+- Se versionó y desplegó `docs/edge/comprobantes-b2-beta/index.ts`, Edge Function separada `comprobantes-b2-beta` **v1**, con HMAC `X-Client-Token`, comprobación MIME + firma de archivo, 6 MB, hash SHA-256, nombre privado por cliente/operación, sin reutilizar nombre original, `upsert:false`, y registro SQL de estado `reportado`; cliente **nunca aprueba**.
+- La prueba SQL reversible se actualizó para incluir fila de índice de evidencia privada ficticia y comprobar rechazo de la función antigua o archivo inexistente. La corrida volvió a responder `B2_COMPROBANTE_ATOMICO_PASS_SIN_COMMIT`. La prueba SQL sólo demuestra validación de fila `storage.objects`; **la subida real binaria con token legítimo todavía requiere prueba controlada end-to-end**. En producción hay 0 archivos, 0 comprobantes, 0 clientes B2 activos.
+
+**F2 aún por cerrar:** pruebas integrales de upload autenticado, atribución/consumo de descuentos y cupones por obligación, compatibilidad de todos los triggers con aprobación por acceso y transición controlada del gateway global oficial. Si alguno falla, el sistema debe rechazar B2 para esa cuenta y conservar el régimen heredado. F3 visual sigue bloqueada.
