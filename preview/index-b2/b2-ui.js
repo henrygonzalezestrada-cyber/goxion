@@ -155,6 +155,8 @@
    anchor.insertAdjacentElement("afterend",card);
   }
   card.classList.toggle("is-open",expanded);
+  card.classList.toggle("has-next",pending().length>0);
+  card.classList.toggle("is-overdue",Boolean(pending()[0]?.mora_centavos>0));
   card.innerHTML=content();
   card.querySelector("#b2-toggle").addEventListener("click",()=>{
    expanded=!expanded;card.classList.toggle("is-open",expanded);
