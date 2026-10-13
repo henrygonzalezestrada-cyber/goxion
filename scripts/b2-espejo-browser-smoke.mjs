@@ -94,6 +94,12 @@ try{
      "Total consolidado");
    check(await page.locator(".gx-b2-beta-banner,[data-b2-scenario]").count()===0,
      "Sin controles de prueba visibles");
+   await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("vencido"));
+   check((await page.locator(".loyalty-icon").textContent()).includes("💔"),
+     "Lealtad perdida utiliza el corazón roto del diseño original");
+   await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("prorroga"));
+   check((await page.locator(".loyalty-icon").textContent()).includes("⭐"),
+     "Estrella GOXION restaurada cuando no hay pérdida de lealtad");
    check(errors.length===0,"Sin errores JS: "+engine.name()+"/"+width+" "+errors.join(" | "));
    await context.close();
   }
