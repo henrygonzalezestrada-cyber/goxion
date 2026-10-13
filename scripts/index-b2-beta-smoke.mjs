@@ -18,9 +18,14 @@ check(html.indexOf("b2-ui.js")>html.indexOf("04-realtime.js"),"Capa visual al fi
 check(html.includes('BETA')&&html.includes("SIN COBROS REALES"),"Aviso persistente");
 check(css.includes("prefers-reduced-motion"),"Reducción de movimiento accesible");
 check(css.includes(".gx-b2-card"),"Estilos separados");
-check(ui.includes("card-info")&&ui.includes('insertAdjacentElement("afterend"'),"Acordeón bajo titular");
+check(ui.includes("services-container")&&ui.includes('insertAdjacentElement("afterend"'),"El calendario se inserta después de los servicios contratados");
 check(ui.includes("gx-b2-reveal")&&ui.includes("aria-expanded"),"Animación y ARIA");
-check(ui.includes('["proximo","Próximo"]')&&ui.includes('["todo","Todo junto"]')&&ui.includes('["abono","Abonar"]'),"Tres opciones");
+check(ui.includes('["proximo","Próximo vencimiento"]')&&ui.includes('["todo","Todo junto"]'),"Solo pago próximo y todo junto en selección principal");
+check(ui.includes("¿No puedes realizar tu pago hoy?")&&ui.includes("data-b2-alternatives"),"Abono separado como opción secundaria");
+check(ui.includes("Mora acumulada en este servicio")&&ui.includes("mora diaria orientativa".replace("mora","Mora")),"Desglose de mora actual y futura");
+check(ui.includes("gx-b2-next-tag")&&ui.includes("PRÓXIMO"),"Distintivo del próximo vencimiento");
+check(css.includes("gxB2NextBeacon")&&css.includes("prefers-reduced-motion"),"Indicador animado accesible");
+check(ui.includes('href="./ayuda.html"'),"Puerta a Mi Espacio sin reescribir Ayuda");
 check(ui.includes("precio")===false||ui.includes("solo_cotizacion")===false,"No recalcula backend por cuenta");
 check(ui.includes("goxion:b2-quote-change"),"Escenarios actualizables");
 check(ui.includes("store.report")&&ui.includes("cargo_ids"),"Datos del reporte por obligación");
