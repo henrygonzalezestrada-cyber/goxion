@@ -247,7 +247,7 @@ begin
 end;
 $function$
 
-
+;
 create or replace function public.goxion_proteger_prorroga_global()
 returns trigger language plpgsql security definer set search_path='' as $$
 declare v_hoy date:=(now() at time zone 'America/Merida')::date;
