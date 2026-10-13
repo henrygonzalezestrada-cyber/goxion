@@ -24,7 +24,7 @@ for (const engine of [chromium,webkit]){
   await page.locator("#b2-toggle").click();
   assert.equal(await page.locator("#b2-toggle").getAttribute("aria-expanded"),"true");checks++;
   assert.equal(await page.locator(".gx-b2-row.is-next").count(),1);checks++;
-  assert.match(await page.locator(".gx-b2-next-tag").innerText(),/PRÓXIMO/);checks++;
+  assert.match(await page.locator(".gx-b2-next-tag").textContent(),/PRÓXIMO/);checks++;
   await page.locator('[data-b2-mode="todo"]').click();
   assert.match(await page.locator("#b2-selected-total").innerText(),/\$92\.12/);checks++;
   assert.equal(await page.locator('[data-b2-mode="abono"]').count(),0,"Abono no debe estar en la selección principal");checks++;
@@ -40,7 +40,7 @@ for (const engine of [chromium,webkit]){
   await page.locator('[data-b2-scenario="vencido"]').click();
   assert.match(await page.locator(".total-amount").innerText(),/\$100\.45/);checks++;
   assert.equal(await page.locator(".gx-b2-row.is-late").count(),1);checks++;
-  assert.match(await page.locator(".gx-b2-next-tag").innerText(),/VENCIDO/);checks++;
+  assert.match(await page.locator(".gx-b2-next-tag").textContent(),/VENCIDO/);checks++;
   await page.locator("[data-b2-alternatives]").click();
   assert.match(await page.locator("[data-b2-mora]").innerText(),/\$2\.45/);checks++;
   assert.match(await page.locator("[data-b2-beneficio]").innerText(),/\$0\.00/);checks++;
