@@ -44,20 +44,18 @@
    if(!card||!card.querySelector(".gx-account-capsule"))return;
    if(!state){existing?.remove();return;}
    if(state.acuerdo?.activo){
+     // La fecha ya es el elemento protagonista: nunca duplicarla en
+     // otro bloque inferior ni repetir las condiciones del diálogo.
      existing?.remove();
-     const anchor=card.querySelector(".gx-account-capsule");
-     let shown=card.querySelector(".gx-prorroga-active");
-     if(!shown){shown=document.createElement("div");
-       shown.className="gx-prorroga-active";anchor.insertAdjacentElement("afterend",shown);}
-     const markup='<span class="gx-prorroga-eyebrow">ACUERDO PACTADO</span>'+
-       '<strong>'+label(state.acuerdo.fecha_pactada)+'</strong>'+
-       '<small>Conservas tu lealtad si pagas dentro del plazo.</small>';
-     if(shown.innerHTML!==markup)shown.innerHTML=markup;
+     card.querySelector(".gx-prorroga-active")?.remove();
      const dateEl=card.querySelector("#dash-date");
-     if(dateEl&&dateEl.textContent!==label(state.acuerdo.fecha_pactada))
-       dateEl.textContent=label(state.acuerdo.fecha_pactada);
+     const agreed=label(state.acuerdo.fecha_pactada);
+     if(dateEl&&dateEl.textContent!==agreed)dateEl.textContent=agreed;
+     const dateTitle=card.querySelector("#dash-date-label");
+     if(dateTitle&&dateTitle.textContent!=="Nueva fecha de pago")
+       dateTitle.textContent="Nueva fecha de pago";
      const badge=card.querySelector("#dash-badge");
-     const badgeMarkup='<span class="gx-prorroga-state">Prórroga activa · Pago protegido</span>';
+     const badgeMarkup='<span class="gx-prorroga-state">Acuerdo pactado</span>';
      if(badge&&badge.innerHTML!==badgeMarkup)badge.innerHTML=badgeMarkup;
      return;
    }
