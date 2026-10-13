@@ -12,7 +12,7 @@
  };
  const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- let mode="proximo",selected=null,partial="20.00",expanded=false,lastAnchor=null;
+ let mode="proximo",selected=null,partial="20.00",expanded=false,alternativesOpen=false,lastAnchor=null;
  let installed=false;
  function rows(){
   return Array.isArray(store.quote?.cargos)?store.quote.cargos.map((x,i)=>({
@@ -21,6 +21,7 @@
    servicio:String(x.servicio||"Servicio contratado"),
    ordinal:Number(x.ordinal||i+1),
    total_centavos:Number(x.total_centavos||0),
+   principal_centavos:Number(x.principal_centavos||0),
    base_centavos:Number(x.base_centavos||0),
    descuento_centavos:Number(x.descuento_centavos||0),
    mora_centavos:Number(x.mora_centavos||0),
@@ -34,7 +35,7 @@
   if(!list.length)return {cargos:[],centavos:0};
   const picked=list.find(x=>x.cargo_id===selected)||list[0];
   if(mode==="todo")return {cargos:list,centavos:list.reduce((s,x)=>s+x.total_centavos,0)};
-  if(mode==="abono"){
+  if(alternativesOpen){
    const exact=Math.round(Number(partial)*100);
    return {cargos:[picked],centavos:Number.isFinite(exact)&&exact>0?
      Math.min(picked.total_centavos,exact):0};
@@ -78,7 +79,14 @@
   const first=due?money(due.total_centavos):"Al corriente";
   const label=due?"Vence "+date(due.vence):"Sin pagos pendientes";
   const chosen=choice();
-  const selectedCharge=chosen.cargos[0];
+  const selectedCharge=pending().find(x=>x.cargo_id===selected)||due;
+  const mora=selectedCharge?.mora_centavos||0;
+  const principal=selectedCharge?.principal_centavos||0;
+  const total=selectedCharge?.total_centavos||0;
+  const abono=Math.max(0,Math.min(total,Math.round(Number(partial)*100)||0));
+  const futuro= Math.round(Math.max(0,principal-Math.min(principal,abono))*.05);
+  const note=store.demo?"<span class=\"gx-b2-sim-badge\">Ejemplo de cálculo</span>":
+    "<span class=\"gx-b2-sim-badge\">Estimación; Admin confirma el importe</span>";
   const scenario=store.demo?'<div class="gx-b2-scenario" role="group" aria-label="Casos de prueba">'+
    '<span>CAMBIAR ESCENARIO DE DEMOSTRACIÓN</span>'+
    [["puntual","Al corriente"],["vencido","Con mora"],["parcial","Con abono"],["primero-pagado","1 pagado"]]
@@ -93,31 +101,50 @@
      '<div class="gx-b2-divider"></div>'+
      list.map(x=>{
       const checked=x.cargo_id===(selected||due?.cargo_id);
+      const next=x.cargo_id===due?.cargo_id&&!x.pagado;
+      const late=x.mora_centavos>0;
       return '<button class="gx-b2-row '+(checked?'is-active ':'')+
-       (x.pagado?'is-done ':'')+(x.mora_centavos>0?'is-late':'')+
+       (x.pagado?'is-done ':'')+(late?'is-late ':'')+(next?'is-next':'')+
        '" type="button" data-b2-cargo="'+esc(x.cargo_id)+'" '+(x.pagado?'disabled':'')+'>'+
        '<span class="gx-b2-mark" aria-hidden="true">'+(x.pagado?'✓':'◷')+'</span>'+
-       '<span class="gx-b2-row-main"><span class="gx-b2-row-title">'+esc(title(x))+'</span>'+
-       '<span class="gx-b2-row-meta">'+esc(date(x.vence))+' · '+esc(status(x))+'</span></span>'+
+       '<span class="gx-b2-row-main"><span class="gx-b2-row-title">'+esc(title(x))+
+       (next?'<span class="gx-b2-next-tag">'+(late?'VENCIDO':'PRÓXIMO')+'</span>':'')+
+       '</span><span class="gx-b2-row-meta">'+esc(date(x.vence))+' · '+esc(status(x))+'</span></span>'+
        '<span class="gx-b2-row-side"><strong>'+money(x.total_centavos)+'</strong><small>'+
          (x.pagado?'Pagado':checked?'Seleccionado':'Pendiente')+'</small></span></button>'
      }).join("")+
      '<div class="gx-b2-group" role="group" aria-label="Forma de pago">'+
-       [["proximo","Próximo"],["todo","Todo junto"],["abono","Abonar"]]
-       .map(pair=>'<button type="button" class="gx-b2-choice" data-b2-mode="'+pair[0]+'" aria-pressed="'+(mode===pair[0])+'">'+pair[1]+'</button>').join("")+
+       [["proximo","Próximo vencimiento"],["todo","Todo junto"]]
+       .map(pair=>'<button type="button" class="gx-b2-choice" data-b2-mode="'+pair[0]+'" aria-pressed="'+(mode===pair[0]&&!alternativesOpen)+'">'+pair[1]+'</button>').join("")+
      '</div>'+
-     (mode==="abono"&&selectedCharge?'<div class="gx-b2-abono">'+
-       '<label for="b2-partial">Abono al perfil seleccionado</label>'+
-       '<input type="number" id="b2-partial" min="0.01" step="0.01" inputmode="decimal" '+
-       'max="'+(selectedCharge.total_centavos/100).toFixed(2)+'" value="'+esc(partial)+'"></div>':"")+
-     '<div class="gx-b2-summary"><span>Importe a reportar</span><strong id="b2-selected-total">'+money(chosen.centavos)+'</strong></div>'+
-     '<p class="gx-b2-foot">La transferencia se reporta para revisión. Un abono reduce el saldo, pero no acredita automáticamente el servicio.</p>'+
+     '<div class="gx-b2-summary"><span>Importe seleccionado</span><strong id="b2-selected-total">'+money(chosen.centavos)+'</strong></div>'+
+     '<p class="gx-b2-foot">El reporte de pago se acredita únicamente después de la revisión de Admin.</p>'+
+     (pending().length?
+       '<button type="button" class="gx-b2-help-toggle" data-b2-alternatives aria-expanded="'+alternativesOpen+
+       '" aria-controls="b2-help">¿No puedes realizar tu pago hoy? <span aria-hidden="true">⌄</span></button>'+
+       '<div class="gx-b2-help" id="b2-help" '+(alternativesOpen?'':'hidden')+'>'+
+        '<div class="gx-b2-help-title">Alternativas para tu pago</div>'+
+        '<p class="gx-b2-foot">Puedes revisar un abono para '+esc(title(selectedCharge))+
+         '. No equivale a liquidar el vencimiento ni detiene automáticamente la pérdida de lealtad.</p>'+
+        '<div class="gx-b2-abono"><label for="b2-partial">Importe del abono</label>'+
+         '<input type="number" id="b2-partial" min="0.01" step="0.01" inputmode="decimal" '+
+         'max="'+(total/100).toFixed(2)+'" value="'+esc(partial)+'"></div>'+
+        '<div class="gx-b2-consequences" aria-live="polite">'+
+         note+
+         '<div><span>Mora acumulada en este servicio</span><strong data-b2-mora>'+money(mora)+'</strong></div>'+
+         '<div><span>Saldo restante tras el abono</span><strong data-b2-restante>'+money(Math.max(0,total-abono))+'</strong></div>'+
+         '<div><span>Mora diaria orientativa después del vencimiento</span><strong data-b2-diaria>'+
+           money(futuro)+'</strong></div>'+
+        '</div>'+
+        '<p class="gx-b2-foot">La mora se genera únicamente después de vencer, al 5% diario sobre el principal que siga pendiente, hasta el tope individual del 50%. La mora acumulada no desaparece con un abono. El beneficio de lealtad se pierde si algún servicio incumple su fecha.</p>'+
+        '<a class="gx-b2-help-link" href="./ayuda.html">Ver mi cuenta y opciones en Mi Espacio <span aria-hidden="true">↗</span></a>'+
+       '</div>':"")+
      (store.quote?.lealtad_global_perdida?
-        '<p class="gx-b2-note">Se perdió la lealtad de la cuenta por incumplir un vencimiento; la mora pertenece solo al servicio atrasado.</p>':"")+
+        '<p class="gx-b2-note">La lealtad se perdió por una fecha incumplida. La mora corresponde solo al servicio vencido.</p>':"")+
      scenario+'</div></div></div>';
  }
  function render(){
-  const anchor=document.querySelector(".card-info");
+  const anchor=document.querySelector(".services-container");
   if(!anchor||!store.quote?.ok||!Array.isArray(store.quote.cargos))return;
   let card=document.getElementById("b2-calendar");
   if(!card){
@@ -139,15 +166,26 @@
    selected=button.dataset.b2Cargo;mode="proximo";render();
   }));
   card.querySelectorAll("[data-b2-mode]").forEach(button=>button.addEventListener("click",()=>{
-   mode=button.dataset.b2Mode;render();
+   mode=button.dataset.b2Mode;alternativesOpen=false;render();
   }));
+  const altBtn=card.querySelector("[data-b2-alternatives]");
+  altBtn?.addEventListener("click",()=>{
+   alternativesOpen=!alternativesOpen;mode="proximo";render();
+  });
   const input=card.querySelector("#b2-partial");
   if(input)input.addEventListener("input",()=>{
    partial=input.value;const v=choice();
    card.querySelector("#b2-selected-total").textContent=money(v.centavos);
+   const sel=pending().find(x=>x.cargo_id===selected)||pending()[0];
+   if(sel){
+    const abono=Math.max(0,Math.min(sel.total_centavos,Math.round(Number(partial)*100)||0));
+    const futuro=Math.round(Math.max(0,sel.principal_centavos-Math.min(sel.principal_centavos,abono))*.05);
+    card.querySelector("[data-b2-restante]").textContent=money(Math.max(0,sel.total_centavos-abono));
+    card.querySelector("[data-b2-diaria]").textContent=money(futuro);
+   }
   });
   card.querySelectorAll("[data-b2-scenario]").forEach(button=>button.addEventListener("click",()=>{
-   selected=null;mode="proximo";store.makeDemo(button.dataset.b2Scenario);
+   selected=null;mode="proximo";alternativesOpen=false;store.makeDemo(button.dataset.b2Scenario);
   }));
   updateHeader();
  }
@@ -200,7 +238,7 @@
  function init(){
   installHandlers();
   if(!store.quote)return;
-  const anchor=document.querySelector(".card-info");
+  const anchor=document.querySelector(".services-container");
   if(anchor && anchor!==lastAnchor){lastAnchor=anchor;render();}
  }
  const observer=new MutationObserver(init);
