@@ -160,35 +160,10 @@
      '</div>'+
      '<div class="gx-b2-summary"><span>Importe seleccionado</span><strong id="b2-selected-total">'+money(chosen.centavos)+'</strong></div>'+
      '<p class="gx-b2-foot">El reporte de pago se acredita únicamente después de la revisión de Admin.</p>'+
-     (pending().length?
-       (pactable?
-        '<button type="button" class="gx-b2-help-toggle" data-b2-alternatives aria-expanded="'+alternativesOpen+
-        '" aria-controls="b2-help">¿No puedes pagar en tu fecha? <span aria-hidden="true">Explorar prórroga ↗</span></button>'+
-        '<div class="gx-b2-help" id="b2-help" '+(alternativesOpen?'':'hidden')+'>'+
-         '<div class="gx-b2-help-title">Solicitar una prórroga</div>'+
-         '<p class="gx-b2-foot">Sin pagar hoy: solicita hasta cinco días adicionales y conserva tu lealtad si Admin la aprueba y cumples la nueva fecha.</p>'+
-         '<div class="gx-b2-abono"><label for="b2-pact-date">Nueva fecha solicitada</label>'+
-          '<input type="date" id="b2-pact-date" min="'+firstDate+'" max="'+lastDate+
-          '" value="'+pactDate+'"></div>'+
-         '<div class="gx-b2-consequences" aria-live="polite">'+
-          '<div><span>Pago hasta la fecha aprobada</span><strong data-b2-on-time>'+
-          money(projection?.original||0)+'</strong></div>'+
-          '<div class="gx-b2-warning-row"><span>Si incumples: total al día siguiente</span><strong data-b2-missed>'+
-          money(projection?.missed||0)+'</strong></div>'+
-          '<p class="gx-b2-fineprint" data-b2-explain>Incluye '+money(projection?.mora||0)+
-          ' de mora desde el vencimiento original y '+money(projection?.lealtad||0)+
-          ' de lealtad perdida.</p>'+
-         '</div>'+
-         '<p class="gx-b2-foot">La solicitud no cambia tu fecha hasta que Admin la apruebe. Solo una por período; no disponible si ya venciste.</p>'+
-         '<button class="gx-b2-request" type="button" data-b2-review>Revisar condiciones</button>'+
-         '<a class="gx-b2-help-link" href="./ayuda.html">Consultar Mi Espacio ↗</a>'+
-        '</div>':
-        '<p class="gx-b2-foot gx-b2-prorrogated">'+
-         (selectedCharge?.prorroga_estado==="aprobada"?
-          'Tu prórroga está aprobada hasta el '+esc(date(selectedCharge.fecha_pactada))+
-          '. Si incumples, la mora se contará desde el vencimiento original y perderás la lealtad.':
-          'Este vencimiento ya no admite una prórroga automática. Consulta Mi Espacio para recibir ayuda.')+
-        '</p>'):"")+
+     (due?.prorroga_estado==="aprobada"?
+       '<p class="gx-b2-foot gx-b2-prorrogated">Acuerdo pactado hasta el '+
+         esc(date(due.fecha_pactada))+
+         '. Mantendrás tu lealtad si cumples en esa fecha.</p>':"")+
      (store.quote?.lealtad_global_perdida?
         '<p class="gx-b2-note">La lealtad se perdió por una fecha incumplida. La mora corresponde solo al servicio vencido.</p>':"")+
      scenario+'</div></div></div>';
@@ -220,88 +195,11 @@
   card.querySelectorAll("[data-b2-mode]").forEach(button=>button.addEventListener("click",()=>{
    mode=button.dataset.b2Mode;alternativesOpen=false;render();
   }));
-  const altBtn=card.querySelector("[data-b2-alternatives]");
-  altBtn?.addEventListener("click",()=>{
-   alternativesOpen=!alternativesOpen;mode="proximo";render();
-  });
-  const dateInput=card.querySelector("#b2-pact-date");
-  dateInput?.addEventListener("change",()=>{
-   pactDate=dateInput.value;render();
-  });
-  card.querySelector("[data-b2-review]")?.addEventListener("click",()=>{
-   const picked=pending().find(x=>x.cargo_id===selected)||pending()[0];
-   proposal=protect(picked,pactDate);
-   if(!proposal)return;
-   confirmProposal();
-  });
   card.querySelectorAll("[data-b2-scenario]").forEach(button=>button.addEventListener("click",()=>{
    selected=null;pactDate="";mode="proximo";alternativesOpen=false;store.makeDemo(button.dataset.b2Scenario);
   }));
   updateHeader();
   updateServiceMarker();
- }
- function confirmProposal(){
-  if(!proposal)return;
-  document.getElementById("gx-b2-confirm")?.remove();
-  const dlg=document.createElement("dialog");
-  dlg.id="gx-b2-confirm";dlg.className="gx-b2-confirm";
-  dlg.setAttribute("aria-labelledby","gx-b2-confirm-title");
-  dlg.innerHTML='<div class="gx-b2-confirm-content">'+
-    '<div class="gx-b2-dialog-eyebrow">Antes de solicitar</div>'+
-    '<h2 id="gx-b2-confirm-title">Tu nueva fecha de pago</h2>'+
-    '<p class="gx-b2-confirm-intro">Esta prórroga solo tendrá efecto si GOXION la aprueba.</p>'+
-    '<div class="gx-b2-confirm-line"><span>Vencimiento original</span><strong>'+esc(date(proposal.access.vence))+'</strong></div>'+
-    '<div class="gx-b2-confirm-line"><span>Fecha solicitada</span><strong>'+esc(date(proposal.chosen))+'</strong></div>'+
-    '<div class="gx-b2-confirm-total"><span>Pagando en la nueva fecha</span><strong>'+
-        money(proposal.original)+'</strong></div>'+
-    '<div class="gx-b2-confirm-alert">'+
-      '<span>Si no pagas, desde el día siguiente:</span>'+
-      '<strong>'+money(proposal.missed)+'</strong>'+
-      '<p>Mora retroactiva '+money(proposal.mora)+
-      ' + pérdida de lealtad '+money(proposal.lealtad)+
-      '. La mora se cuenta desde el vencimiento original, no desde la fecha pactada.</p>'+
-    '</div>'+
-    '<label class="gx-b2-terms"><input type="checkbox" id="gx-b2-accept">'+
-      '<span>Entiendo que incumplir activa los recargos retroactivos y cancela la lealtad de mi cuenta.</span></label>'+
-    '<div class="gx-b2-confirm-actions">'+
-      '<button type="button" data-b2-cancel>Regresar</button>'+
-      '<button type="button" data-b2-submit disabled>Solicitar prórroga</button>'+
-    '</div><div class="gx-b2-confirm-status" aria-live="polite"></div></div>';
-  document.body.appendChild(dlg);
-  dlg.querySelector("[data-b2-cancel]").addEventListener("click",()=>dlg.close());
-  dlg.addEventListener("close",()=>dlg.remove());
-  const checkbox=dlg.querySelector("#gx-b2-accept");
-  const submit=dlg.querySelector("[data-b2-submit]");
-  checkbox.addEventListener("change",()=>submit.disabled=!checkbox.checked);
-  submit.addEventListener("click",async()=>{
-   if(!checkbox.checked)return;
-   submit.disabled=true;
-   const status=dlg.querySelector(".gx-b2-confirm-status");
-   if(store.demo){
-    status.textContent="Solicitud simulada. No se envió nada a Admin.";
-    return;
-   }
-   status.textContent="Validando solicitud…";
-   try{
-    const core=window.GOXION_CORE;
-    const token=localStorage.getItem(core.STORAGE.CLIENT_TOKEN);
-    if(!token)throw Error("Vuelve a iniciar sesión en Mi Espacio.");
-    const response=await fetch(core.endpoint("estado-financiero-b2-beta"),{
-     method:"POST",cache:"no-store",
-     headers:{"Content-Type":"application/json","X-Client-Token":token},
-     body:JSON.stringify({accion:"solicitar_prorroga",
-       datos:{cargo_id:proposal.access.cargo_id,fecha_pactada:proposal.chosen,
-         clave_idempotencia:crypto.randomUUID(),motivo:"Solicita prórroga de pago"}})
-    });
-    const data=await response.json();
-    if(!response.ok||!data.ok)throw Error(data.error||"No fue posible registrar la solicitud.");
-    status.textContent="Solicitud recibida. Pendiente de aprobación de Admin.";
-   }catch(e){
-    status.textContent=String(e?.message||"Solicitud no disponible");
-    submit.disabled=false;
-   }
-  });
-  if(typeof dlg.showModal==="function")dlg.showModal();else dlg.setAttribute("open","");
  }
  function installHandlers(){
   if(installed||typeof window.abrirModalPago!=="function")return;
