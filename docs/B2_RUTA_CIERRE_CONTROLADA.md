@@ -17,7 +17,7 @@ Los 319+ checks de interfaz demuestran la navegación y las simulaciones, NO val
 ## F0 · Inventario y protección de producción — CERRADA 13/OCT/2026
 - [x] Identificar archivos propietarios y PR #96, #97 e Issue #98.
 - [x] Separar funciones de backend instaladas, calendario guardado y funciones operativas reales.
-- [ ] Comparar index.html, ayuda.html, admin.html oficiales con las modificaciones propuestas: integrar pequeñas funciones, no copiar la beta sobre el oficial.
+- [x] Comparados `index.html`, `ayuda.html` y `admin.html` en main/PR #96/PR #97: **SHA de los tres archivos idénticos** en las tres referencias. La futura integración inyectará funciones mínimas, no sustituirá archivos completos.
 - [x] GOXION Integrity en main verde (run 38479997185): página Comunicaciones reconocida, Playwright instalado en orden correcto, aserción VM y espera WebKit corregidas, todas las pruebas pasaron.
 - [x] Verificado por SQL en producción: cero cuentas B2 activas, cero ciclos/cargos, 22 clientes y 28 pagos históricos. El esquema aditivo de aprobación atómica no está conectado al gateway operativo; fecha única continúa legacy. Rollback de activación B2 por opt-in.
 **Entrega:** inventario, línea base limpia, estrategia de flag y reversión. **Puerta:** no afectar clientes actuales.
