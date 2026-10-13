@@ -34,7 +34,8 @@ for (const engine of [chromium,webkit]){
   assert.match(await page.locator("#b2-selected-total").innerText(),/\$20\.00/);checks++;
   assert.match(await page.locator("[data-b2-mora]").innerText(),/\$0\.00/);checks++;
   assert.match(await page.locator("[data-b2-restante]").innerText(),/\$26\.06/);checks++;
-  assert.match(await page.locator("[data-b2-diaria]").innerText(),/\$1\.30/);checks++;
+  assert.match(await page.locator("[data-b2-beneficio]").innerText(),/\$2\.94/);checks++;
+  assert.match(await page.locator("[data-b2-diaria]").innerText(),/\$1\.45/);checks++;
   assert.equal(await page.locator(".gx-b2-help-link").getAttribute("href"),"./ayuda.html");checks++;
   await page.locator('[data-b2-scenario="vencido"]').click();
   assert.match(await page.locator(".total-amount").innerText(),/\$100\.45/);checks++;
@@ -42,6 +43,7 @@ for (const engine of [chromium,webkit]){
   assert.match(await page.locator(".gx-b2-next-tag").innerText(),/VENCIDO/);checks++;
   await page.locator("[data-b2-alternatives]").click();
   assert.match(await page.locator("[data-b2-mora]").innerText(),/\$2\.45/);checks++;
+  assert.match(await page.locator("[data-b2-beneficio]").innerText(),/\$0\.00/);checks++;
   assert.match(await page.locator("[data-b2-restante]").innerText(),/\$31\.45/);checks++;
   assert.match(await page.locator("[data-b2-diaria]").innerText(),/\$1\.45/);checks++;
   await page.locator('[data-b2-scenario="primero-pagado"]').click();
