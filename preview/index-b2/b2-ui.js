@@ -83,7 +83,7 @@
    badge.className="time-badge "+(due?.mora_centavos>0?"badge-overdue":due?"badge-ok":"badge-paid");
   }
   const period=document.querySelector(".card-info .info-block.full .value");
-  if(period)period.textContent="Vencimientos independientes · "+(store.quote.periodo||"");
+  if(period)period.textContent="Fechas de pago por servicio";
   const globalBreakdown=document.querySelector(".breakdown-box");
   if(globalBreakdown)globalBreakdown.style.display="none";
   const oldOverdue=document.querySelector(".overdue-incentive-box");
