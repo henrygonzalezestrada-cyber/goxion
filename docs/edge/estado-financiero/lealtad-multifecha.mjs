@@ -7,7 +7,8 @@
 const validDate = s => {
  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(s||'')))return false;
  const [y,m,d]=s.split('-').map(Number);
- return new Date(Date.UTC(y,m-1,d)).toISOString().slice(0,10)===s;
+ const fecha=new Date(Date.UTC(y,m-1,d));
+ return Number.isFinite(fecha.getTime())&&fecha.toISOString().slice(0,10)===s;
 };
 const month = s => s.slice(0,7);
 const cents = n => Number.isSafeInteger(n)&&n>=0&&n<=100000000?n:null;
