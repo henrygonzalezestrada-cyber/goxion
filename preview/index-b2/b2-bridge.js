@@ -10,6 +10,26 @@
   const store = { demo: demo, quote: null, scenario: "puntual", error: "", report: null };
   window.GOXION_B2_PREVIEW = store;
 
+  // En la demostración también sustituimos los DATOS BANCARIOS:
+  // ninguna CLABE real debe mostrarse ni copiarse accidentalmente.
+  if(demo){
+    const original=window.GOXION_CORE;
+    const fakeBank=Object.freeze({
+      ...original.BUSINESS.BANK,NAME:"BANCO DE PRUEBA",
+      HOLDER:"CUENTA DEMOSTRACIÓN",CLABE:"000000000000000000",
+      ACCOUNTS:Object.freeze([
+        Object.freeze({ID:"nu",LABEL:"Nu · demo",INSTITUTION:"Simulación",
+          HOLDER:"CUENTA DEMOSTRACIÓN",CLABE:"000000000000000000",
+          CURRENCY:"MXN",PRIMARY:true}),
+        Object.freeze({ID:"revolut",LABEL:"Revolut · demo",INSTITUTION:"Simulación",
+          HOLDER:"CUENTA DEMOSTRACIÓN",CLABE:"000000000000000000",
+          CURRENCY:"MXN",PRIMARY:false})
+      ])
+    });
+    window.GOXION_CORE=Object.freeze({...original,
+      BUSINESS:Object.freeze({...original.BUSINESS,BANK:fakeBank})});
+  }
+
   function fixture() {
     return { "b2-demo": {
       id: "demo-b2-no-real", clave: "b2-demo", folio: "B2-DEMO",
