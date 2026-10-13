@@ -68,6 +68,17 @@
         total_centavos:5145}),
         charge(2,"30",4900,{descuento_centavos:0})];
     }
+    if(scenario==="prorroga"){
+      rows=[charge(1,"06",4606,{fecha_pactada:"2026-11-09",prorroga_estado:"aprobada"}),
+        charge(2,"30",4606)];
+    }
+    if(scenario==="prorroga-incumplida"){
+      lost=true;
+      rows=[charge(1,"06",4900,{fecha_pactada:"2026-11-09",
+        prorroga_estado:"aprobada",descuento_centavos:0,
+        mora_centavos:980,total_centavos:5880}),charge(2,"30",4900,{
+        descuento_centavos:0})];
+    }
     if(scenario==="parcial"){
       rows=[charge(1,"06",2606,{abono_pagado_centavos:2000}),
         charge(2,"30",4606)];
