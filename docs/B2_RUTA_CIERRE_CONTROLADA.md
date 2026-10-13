@@ -22,11 +22,12 @@ Los 319+ checks de interfaz demuestran la navegación y las simulaciones, NO val
 - [ ] Verificar bloqueo de activación, plan de rollback, respaldo y protección de cartera de día 15.
 **Entrega:** inventario, línea base limpia, estrategia de flag y reversión. **Puerta:** no afectar clientes actuales.
 
-## F1 · Cerrar UX en betas espejo — PENDIENTE DE APROBACIÓN VISUAL
+## F1 · Cerrar UX en betas espejo — APROBADA POR EL USUARIO 13/OCT/2026
 - [x] Flujo aprobado: servicios → calendario → desglose; multifecha con próximo/todo, prórroga únicamente en Ayuda.
 - [x] Modal con cristal, X cian, scroll bloqueado, foco limpio, campo de fecha 1–5 días, monto/desglose y CTA sin línea.
 - [x] Últimos retoques: cápsula nativa time-badge badge-ok para Acuerdo pactado, halo rosa sin recorte de fondo rectangular.
-- [ ] Validación visual definitiva del usuario en iPhone; comprobar de nuevo 280/320/360/375/390/430/768 px, iconos, estados y animaciones.
+- [x] El usuario aprobó explícitamente el bloque visual y los retoques finales de fecha, cápsula, glow y modal el 13/oct/2026.
+- [ ] Verificación adicional de integración real en iPhone/anchos 280/320/360/375/390/430/768 px corresponde a F3, no reabre la aprobación del diseño.
 **Entrega:** enlaces beta y captura de cambios comparados con componentes oficiales. **Puerta:** aprobación explícita visual, NO autorización para pagos reales.
 
 ## F2 · Cierre financiero B2 y operaciones Admin — PENDIENTE CRÍTICO
@@ -76,3 +77,11 @@ El usuario puede decir: «Avanza con F2», «Detente en F3», «Pulamos F1» o �
 5. SIGUIENTE PUERTA: qué debe revisar/aprobar el usuario.
 
 **Referencias:** [PR #96](https://github.com/henrygonzalezestrada-cyber/goxion/pull/96) motor financiero B2; [PR #97](https://github.com/henrygonzalezestrada-cyber/goxion/pull/97) UX espejo; [Issue #98](https://github.com/henrygonzalezestrada-cyber/goxion/issues/98) Admin + Discord.
+
+## Avance verificado de F0/F2 · 13/oct/2026
+- **F1 cerrada por aprobación explícita del usuario**; conservar la beta aprobada sin nuevos rediseños.
+- F0: en `main`, el verificador reconoce `comunicaciones.html`, instala Playwright antes de probar y corrige el test de foco entre VM; WebKit/Ayuda tuvo un timeout de 2,5 s y se aumentó a 6,5 s sin retirar la condición visual. **Esperar ejecución íntegra CI verde antes de cerrar F0.**
+- Supabase: **22 clientes, 28 pagos, 0 B2 activos, 0 cargos/ciclos B2** comprobados antes y después.
+- F2: instalada la migración SQL aditiva `goxion_aprobar_pago_periodo_atomico`, sin conectarla al gateway oficial ni crear operaciones. Se verificó `anon=false`, `authenticated=false`, `service_role=true`, y tabla de operaciones vacía. El cobro global vigente continúa sin cambios.
+- **Bloqueadores que quedan:** enlace comprobante real → obligación por acceso y aprobación atómica sin doble recibo; atribución verificable de beneficios especiales/promociones/cupones/mora; pruebas de extremo a extremo sobre fuente de verdad; y actualización controlada de Admin/Index/Ayuda más adelante en F3.
+- **No activar régimen B2 ni fusionar PR #96/#97 mientras falten estas garantías.**
