@@ -131,8 +131,9 @@
        '" type="button" data-b2-cargo="'+esc(x.cargo_id)+'" '+(x.pagado?'disabled':'')+'>'+
        '<span class="gx-b2-mark" aria-hidden="true">'+(x.pagado?'✓':'◷')+'</span>'+
        '<span class="gx-b2-row-main"><span class="gx-b2-row-title">'+esc(title(x))+
+       '</span><span class="gx-b2-row-meta">'+
        (next?'<span class="gx-b2-next-tag">'+(late?'VENCIDO':'PRÓXIMO')+'</span>':'')+
-       '</span><span class="gx-b2-row-meta">'+esc(date(x.vence))+' · '+esc(status(x))+'</span></span>'+
+       esc(date(x.vence))+' · '+esc(status(x))+'</span></span>'+
        '<span class="gx-b2-row-side"><strong>'+money(x.total_centavos)+'</strong><small>'+
          (x.pagado?'Pagado':checked?'Seleccionado':'Pendiente')+'</small></span></button>'
      }).join("")+
