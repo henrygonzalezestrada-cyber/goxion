@@ -7,15 +7,13 @@
  background:linear-gradient(90deg,transparent,rgba(91,202,243,.7),transparent);
  transition:width .28s ease}
 .gx-prorroga-entry:hover:after{width:70%}
-.gx-prorroga-active{margin:14px auto 0;padding:10px 0 0;
- text-align:center;border-top:1px solid rgba(161,197,226,.15);
- display:flex;flex-direction:column;gap:3px}
-.gx-prorroga-eyebrow{font:600 9px/1.5 Poppins,sans-serif;letter-spacing:1px;color:#8eabe2}
-.gx-prorroga-active strong{font:700 19px/1.4 Poppins,sans-serif;color:#d2f9ff}
-.gx-prorroga-active small{font:400 10px/1.6 Poppins,sans-serif;color:#aabdd2}
-.gx-prorroga-state{display:inline-block;padding:5px 10px;color:#a4f0eb;
- border:1px solid rgba(82,223,216,.18);border-radius:30px;
- background:rgba(11,154,158,.06);font:600 10px Poppins,sans-serif}
+/* El acuerdo usa el distintivo existente debajo de la fecha.
+   Sin segunda tarjeta, fecha repetida, ni nueva cápsula. */
+.gx-prorroga-state{display:inline-block;color:#94e9ed;
+ font:600 11px/1.6 Poppins,sans-serif;letter-spacing:.15px;
+ animation:gxProrrogaStateIn .32s ease-out both}
+@keyframes gxProrrogaStateIn{from{opacity:.3;transform:translateY(3px)}
+ to{opacity:1;transform:translateY(0)}}
 .gx-prorroga-dialog{border:1px solid rgba(161,191,228,.18);border-radius:25px;
  padding:0;width:min(430px,calc(100vw - 24px));max-height:calc(100dvh - 40px);margin:auto;
  color:#f3f6ff;background:linear-gradient(156deg,rgba(22,27,49,.98),rgba(6,9,21,.99) 79%);
@@ -73,5 +71,5 @@
 @media(max-width:360px){.gx-prorroga-sheet{padding:23px 17px 18px}
  .gx-prorroga-risk strong{font-size:24px}
  .gx-prorroga-sheet h2{font-size:21px}}
-@media(prefers-reduced-motion:reduce){.gx-prorroga-dialog[open]{animation:none}
+@media(prefers-reduced-motion:reduce){.gx-prorroga-dialog[open],.gx-prorroga-state{animation:none}
  .gx-prorroga-entry,.gx-prorroga-entry:after,.gx-prorroga-activate{transition:none}}
