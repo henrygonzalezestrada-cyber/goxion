@@ -100,11 +100,6 @@
     "Prórroga hasta "+date(due.fecha_pactada):"Vence "+date(due.vence)):
     "Sin pagos pendientes";
   const chosen=choice();
-  const scenario=store.demo?'<div class="gx-b2-scenario" role="group" aria-label="Casos de prueba">'+
-   '<span>CAMBIAR ESCENARIO DE DEMOSTRACIÓN</span>'+
-   [["puntual","Normal"],["prorroga","Prórroga vigente"],["prorroga-incumplida","Incumplida"],["vencido","Con mora"],["primero-pagado","1 pagado"]]
-    .map(pair=>'<button type="button" data-b2-scenario="'+pair[0]+'" aria-pressed="'+(store.scenario===pair[0])+'">'+pair[1]+'</button>').join("")+
-   '</div>':"";
   return '<button class="gx-b2-toggle" id="b2-toggle" type="button" aria-expanded="'+expanded+'" aria-controls="b2-body">'+
      '<span class="gx-b2-head"><span class="gx-b2-head-copy"><span class="gx-b2-caption">CALENDARIO DE PAGOS</span>'+
        '<strong>'+esc(label)+'</strong></span></span>'+
@@ -138,7 +133,7 @@
          '. Mantendrás tu lealtad si cumples en esa fecha.</p>':"")+
      (store.quote?.lealtad_global_perdida?
         '<p class="gx-b2-note">La lealtad se perdió por una fecha incumplida. La mora corresponde solo al servicio vencido.</p>':"")+
-     scenario+'</div></div></div>';
+     '</div></div></div>';
  }
  function render(){
   const anchor=document.querySelector(".services-container");
@@ -165,9 +160,6 @@
   card.querySelectorAll("[data-b2-mode]").forEach(button=>button.addEventListener("click",()=>{
    mode=button.dataset.b2Mode;render();
   }));
-  card.querySelectorAll("[data-b2-scenario]").forEach(button=>button.addEventListener("click",()=>{
-   selected=null;mode="proximo";store.makeDemo(button.dataset.b2Scenario);
-  }));
   updateHeader();
   updateServiceMarker();
  }
@@ -186,10 +178,6 @@
      cargo_ids:val.cargos.map(x=>x.cargo_id),
      modo:mode,periodo:store.quote.periodo};
    originalModal.call(this,key,period,(val.centavos/100).toFixed(2),folio,nombre);
-   const kicker=document.querySelector(".gx-payment-upload-kicker");
-   if(kicker)kicker.textContent="VISTA PREVIA · NO SE ENVIARÁ";
-   const heading=document.querySelector(".gx-payment-upload-copy p");
-   if(heading)heading.textContent="El comprobante incluiría el vencimiento e importe seleccionados.";
   };
   if(typeof originalBank==="function")window.abrirDatosPago=function(){
    if(store.quote){
@@ -203,16 +191,16 @@
    const val=choice();
    const input=document.getElementById("file-input");
    if(!input?.files?.length){
-    window.mostrarToastPago?.("Selecciona una captura de prueba",true);return;
+    window.mostrarToastPago?.("Selecciona tu comprobante",true);return;
    }
    if(val.centavos<=0)return;
    if(store.demo){
     if(typeof window.gxSetPaymentSubmitState==="function")
      window.gxSetPaymentSubmitState("success");
     else document.getElementById("payment-modal")?.classList.add("is-success");
-    window.mostrarToastPago?.("Simulación completada · No se envió ningún pago");
+    window.mostrarToastPago?.("Esta pantalla es de revisión; no acepta pagos reales");
    }else{
-    window.mostrarToastPago?.("El envío B2 sigue en validación; no se envió el comprobante",true);
+    window.mostrarToastPago?.("El reporte de pago aún no está habilitado aquí",true);
     document.getElementById("payment-modal")?.classList.add("is-error");
    }
   };
