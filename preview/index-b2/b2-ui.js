@@ -39,6 +39,58 @@
   if(mode==="todo")return {cargos:list,centavos:list.reduce((s,x)=>s+x.total_centavos,0)};
   return {cargos:[picked],centavos:picked.total_centavos};
  }
+
+ // Desglose financiero B2: parte SIEMPRE de los cargos seleccionados.
+ // Las cantidades del servidor están en centavos; el residuo concilia
+ // promociones, créditos u otros movimientos sin inventar su concepto.
+ function breakdown(){
+  const selection=choice(),items=selection.cargos;
+  if(!items.length)return null;
+  const sum=key=>items.reduce((acc,row)=>acc+Math.max(0,Number(row[key]||0)),0);
+  const subtotal=sum("base_centavos");
+  const lealtad=sum("descuento_centavos");
+  const mora=sum("mora_centavos");
+  const abonos=sum("abono_pagado_centavos");
+  const ajustes=selection.centavos-(subtotal-lealtad+mora-abonos);
+  return {subtotal,lealtad,mora,abonos,ajustes,total:selection.centavos,
+    titulo:mode==="todo"?"Todos los servicios":
+      title(items[0])};
+ }
+ function updateBreakdown(){
+  const anchor=document.getElementById("b2-calendar");
+  if(!anchor)return;
+  let panel=document.querySelector(".scrollable-content .breakdown-box");
+  if(!panel){
+    panel=document.createElement("section");
+    panel.className="glass-card breakdown-box";
+  }
+  panel.classList.add("gx-b2-breakdown");
+  if(panel.previousElementSibling!==anchor)
+    anchor.insertAdjacentElement("afterend",panel);
+  const b=breakdown();
+  if(!b){
+    panel.hidden=true;
+    return;
+  }
+  panel.hidden=false;
+  panel.style.removeProperty("display");
+  const line=(description,value,type="")=>
+    '<div class="breakdown-line gx-b2-breakdown-line '+type+'">'+
+      '<span>'+esc(description)+'</span><strong>'+esc(value)+'</strong></div>';
+  panel.innerHTML=
+    '<div class="gx-b2-breakdown-caption">DESGLOSE DEL PAGO</div>'+
+    '<div class="gx-b2-breakdown-context">'+esc(b.titulo)+'</div>'+
+    line("Subtotal",money(b.subtotal))+
+    (b.lealtad>0?line("Descuento de lealtad","−"+money(b.lealtad),"discount-line"):"")+
+    (b.abonos>0?line("Pagos parciales aprobados","−"+money(b.abonos),"discount-line"):"")+
+    (b.mora>0?line("Mora acumulada","+"+money(b.mora),"surcharge-line"):"")+
+    (b.ajustes!==0?line("Otros ajustes al saldo",
+      (b.ajustes<0?"−":"+")+money(Math.abs(b.ajustes)),
+      b.ajustes<0?"discount-line":"surcharge-line"):"")+
+    '<div class="gx-b2-breakdown-final">'+
+      '<span>Importe seleccionado</span><strong id="b2-selected-total">'+money(b.total)+'</strong>'+
+    '</div>';
+ }
  function title(row){return row.servicio+" · Perfil "+row.ordinal}
  function status(row){
   if(row.pagado)return "Liquidado";
@@ -84,8 +136,6 @@
   }
   const period=document.querySelector(".card-info .info-block.full .value");
   if(period)period.textContent="Fechas de pago por servicio";
-  const globalBreakdown=document.querySelector(".breakdown-box");
-  if(globalBreakdown)globalBreakdown.style.display="none";
   const oldOverdue=document.querySelector(".overdue-incentive-box");
   if(oldOverdue)oldOverdue.style.display="none";
   const loyalty=document.querySelector(".loyalty-badge .loyalty-desc");
@@ -99,7 +149,6 @@
   const label=due?(due.prorroga_estado==="aprobada"&&due.mora_centavos===0?
     "Prórroga hasta "+date(due.fecha_pactada):"Vence "+date(due.vence)):
     "Sin pagos pendientes";
-  const chosen=choice();
   return '<button class="gx-b2-toggle" id="b2-toggle" type="button" aria-expanded="'+expanded+'" aria-controls="b2-body">'+
      '<span class="gx-b2-head"><span class="gx-b2-head-copy"><span class="gx-b2-caption">CALENDARIO DE PAGOS</span>'+
        '<strong>'+esc(label)+'</strong></span></span>'+
@@ -125,7 +174,6 @@
        [["proximo","Próximo vencimiento"],["todo","Todo junto"]]
        .map(pair=>'<button type="button" class="gx-b2-choice" data-b2-mode="'+pair[0]+'" aria-pressed="'+(mode===pair[0])+'">'+pair[1]+'</button>').join("")+
      '</div>'+
-     '<div class="gx-b2-summary"><span>Importe seleccionado</span><strong id="b2-selected-total">'+money(chosen.centavos)+'</strong></div>'+
      '<p class="gx-b2-foot">El reporte de pago se acredita únicamente después de la revisión de Admin.</p>'+
      (due?.prorroga_estado==="aprobada"?
        '<p class="gx-b2-foot gx-b2-prorrogated">Acuerdo pactado hasta el '+
@@ -161,6 +209,7 @@
    mode=button.dataset.b2Mode;render();
   }));
   updateHeader();
+  updateBreakdown();
   updateServiceMarker();
  }
  function installHandlers(){
