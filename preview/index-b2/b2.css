@@ -100,3 +100,8 @@
  .gx-b2-consequences div{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.gx-b2-card.has-next .gx-b2-ico:after{animation:none!important}}
+
+/* Indicador no intrusivo en el listado oficial de servicios. */
+.gx-b2-service-flag{display:table;width:max-content;max-width:100%;margin-top:5px;padding:3px 7px;
+ border:1px solid rgba(0,242,254,.25);border-radius:6px;background:rgba(0,242,254,.07);
+ color:#94e9f3;font:700 9px/1.35 Poppins,sans-serif;letter-spacing:.3px}
