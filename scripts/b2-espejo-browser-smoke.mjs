@@ -62,6 +62,36 @@ try{
    const dlg=page.locator("#gx-prorroga-dialog");
    await dlg.waitFor();
    check(await dlg.isVisible(),"Modal prórroga nativo");
+   check(await dlg.evaluate(el=>getComputedStyle(el).backdropFilter.includes("blur")),
+     "Prórroga usa cristal translucido con blur real");
+   check(await dlg.locator("[data-gx-close]").evaluate(el=>{
+     const style=getComputedStyle(el);
+     return parseInt(style.borderRadius,10)>=16 && style.backgroundColor==="rgb(0, 242, 254)";
+   }),"La X usa círculo cian y geometría oficial");
+   check(await dlg.locator("[data-gx-close] svg").count()===1,
+     "Cerrar usa SVG original, no X genérica");
+   check(await dlg.locator("[data-gx-close]").evaluate(el=>document.activeElement!==el),
+     "La X no se preselecciona al abrir");
+   const field=page.locator("[data-gx-day]");
+   check(await field.getAttribute("max")==="2026-11-11","Máximo cinco días expresado en el campo");
+   await field.fill("2026-11-20");
+   check(await field.getAttribute("aria-invalid")==="true","Fecha fuera de rango marcada en rojo");
+   check((await page.locator("#gx-prorroga-date-error").textContent()).includes("5 días"),
+     "Límite de cinco días comunicado al cliente");
+   check(await page.locator("[data-gx-activate]").isDisabled(),
+     "Impedir acuerdo fuera del máximo");
+   check(await page.locator("[data-gx-missed]").textContent()==="—",
+     "Eliminar cifra obsoleta tras selección inválida");
+   await page.locator("[data-gx-accept]").check();
+   check(await page.locator("[data-gx-activate]").isDisabled(),
+     "Confirmar condiciones no desbloquea una fecha inválida");
+   await field.fill("2026-11-09");
+   await page.waitForFunction(()=>document.querySelector('[data-gx-missed]')?.textContent?.includes("58.80"));
+   check(await field.getAttribute("aria-invalid")==="false","Fecha válida recupera aspecto normal");
+   check(await page.locator("#gx-prorroga-date-error").isHidden(),
+     "Alerta desaparece tras elegir fecha válida");
+   check(await page.locator("[data-gx-activate]").isEnabled(),
+     "Aceptar se habilita sólo con fecha y condiciones correctas");
    check((await page.locator("[data-gx-protected]").textContent()).includes("46.06"),"Importe puntual");
    check((await page.locator("[data-gx-missed]").textContent()).includes("58.80"),"Mora retroactiva");
    check(await page.locator("[data-gx-activate]").isDisabled(),"Confirmación requerida");
@@ -80,6 +110,7 @@ try{
    await page.waitForURL(/\/preview\/integracion-b2\/index\.html\?/,{timeout:8000});
    await page.locator("#b2-calendar").waitFor({timeout:12000});
    check((await page.locator(".total-amount").textContent()).includes("92.12"),"Index oficial con total B2");
+   check((await page.locator(".time-badge").textContent()).includes("⏳"),"Index conserva emoji de vencimiento");
    check((await page.locator(".loyalty-desc").textContent()).includes("Nivel 2 Activo"),
      "Conservar leyenda de lealtad original");
    check((await page.locator("#b2-toggle").textContent()).includes("Prórroga hasta"),
