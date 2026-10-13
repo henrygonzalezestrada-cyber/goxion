@@ -86,11 +86,28 @@ BEGIN
   raise exception 'No concilió comprobante/cargos/recibo global único';end if;
  d=public.goxion_b2_aprobar_comprobante(cid,r1,j,ap_op,'admin:test',false,'');
  if d->>'repetido'<>'true' then raise exception 'Reintento duplicó acreditación';end if;
+ -- La MISMA clave con otra distribución no es un reintento idéntico.
+ reject_ok=false;
+ begin
+  perform public.goxion_b2_aprobar_comprobante(
+   cid,r1,
+   jsonb_build_array(
+    jsonb_build_object('cargo_id',x.id,'monto_centavos',a,
+      'saldo_esperado_centavos',a,'operation_id',item_op2),
+    jsonb_build_object('cargo_id',y.id,'monto_centavos',b,
+      'saldo_esperado_centavos',b,'operation_id',item_op1)
+   ),
+   ap_op,'admin:test',false,'');
+ exception when others then
+  if sqlerrm like 'COMPROBANTE_IDEMPOTENCIA_INCOMPATIBLE%' then reject_ok=true;
+  else raise;end if;
+ end;
+ if not reject_ok then raise exception 'La misma clave alteró el destino de un recibo';end if;
  reject_ok=false;
  begin
   perform public.goxion_b2_aprobar_comprobante(cid,r1,j,gen_random_uuid(),'admin:test',false,'');
  exception when others then
-  if sqlerrm like 'COMPROBANTE_YA_APROBADO%' then reject_ok=true;
+  if sqlerrm like 'COMPROBANTE_IDEMPOTENCIA_INCOMPATIBLE%' then reject_ok=true;
   else raise;end if;
  end;
  if not reject_ok then raise exception 'Otro operation_id permitió segundo cobro';end if;
