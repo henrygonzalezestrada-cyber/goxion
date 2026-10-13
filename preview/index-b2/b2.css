@@ -1,14 +1,4 @@
 /* GOXION · Index B2 · capa visual beta (no modifica Index oficial) */
-.gx-b2-beta-banner{
-  position:fixed;z-index:90;bottom:calc(8px + env(safe-area-inset-bottom));
-  left:50%;transform:translateX(-50%);max-width:calc(100vw - 26px);
-  padding:7px 12px;border:1px solid rgba(135,191,215,.22);border-radius:30px;
-  background:rgba(7,11,20,.91);box-shadow:0 8px 27px rgba(0,0,0,.42);
-  backdrop-filter:blur(17px);-webkit-backdrop-filter:blur(17px);
-  font:600 9px/1.4 Poppins,sans-serif;letter-spacing:.55px;color:#b0c6dc;
-  text-align:center;white-space:nowrap;pointer-events:none
-}
-
 /* Encabezado editorial: solo título, próxima fecha e importe, sin barras,
    iconos recuadrados, ni puntos previos al texto. */
 .gx-b2-card{
@@ -142,27 +132,12 @@
 }
 .gx-b2-note{margin-top:12px;font-size:10.5px;line-height:1.6;color:#e4b6c4}
 
-/* Solo la demo expone los escenarios, sin contaminar el flujo real. */
-.gx-b2-scenario{margin-top:16px;padding:10px 0 0;
-  border-top:1px dashed rgba(184,201,232,.11);display:flex;gap:5px 12px;flex-wrap:wrap}
-.gx-b2-scenario>span{
-  flex-basis:100%;color:#879cba;font:600 9px/1.4 Poppins,sans-serif;
-  letter-spacing:.35px;margin-bottom:2px
-}
-.gx-b2-scenario button{
-  border:0;border-bottom:1px solid transparent;background:transparent;
-  color:#95a6c1;padding:6px 0;font:600 10px Poppins,sans-serif;
-  cursor:pointer
-}
-.gx-b2-scenario button[aria-pressed="true"]{
-  color:#aaf1f7;border-color:rgba(75,213,242,.5)
-}
 /* Heredar el modal oficial y corregir únicamente el z-index de su X. */
 .gx-payment-v2 #payment-modal .close-modal{position:absolute;z-index:8}
 .gx-payment-v2 .gx-payment-upload-head{position:relative;z-index:1}
 
 .gx-b2-toggle:focus-visible,.gx-b2-choice:focus-visible,
-.gx-b2-row:focus-visible,.gx-b2-scenario button:focus-visible{
+.gx-b2-row:focus-visible{
   outline:2px solid #78ddf2;outline-offset:-2px
 }
 @media(max-width:360px){
@@ -173,7 +148,6 @@
  .gx-b2-row-side strong{font-size:12px}
  .gx-b2-row-title{font-size:11px}
  .gx-b2-choice{font-size:9.5px}
- .gx-b2-beta-banner{font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){
  .gx-b2-reveal,.gx-b2-chevron,.gx-b2-choice,.gx-b2-row{transition:none!important}
