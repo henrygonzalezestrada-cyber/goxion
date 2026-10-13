@@ -103,7 +103,8 @@
     '<div class="gx-b2-reveal" id="b2-body" aria-hidden="'+(!expanded)+'" '+(expanded?'':'inert')+'><div class="gx-b2-clip"><div class="gx-b2-content">'+
      '<div class="gx-b2-divider"></div>'+
      list.map(x=>{
-      const checked=x.cargo_id===(selected||due?.cargo_id);
+      const checked=(mode==="todo"&&!alternativesOpen&&!x.pagado)||
+        x.cargo_id===(selected||due?.cargo_id);
       const next=x.cargo_id===due?.cargo_id&&!x.pagado;
       const late=x.mora_centavos>0;
       return '<button class="gx-b2-row '+(checked?'is-active ':'')+
