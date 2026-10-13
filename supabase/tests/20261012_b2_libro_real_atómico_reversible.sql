@@ -4,6 +4,7 @@ BEGIN;
 DO $fixture$
 DECLARE cid uuid:=gen_random_uuid(); sid uuid;sid2 uuid;cy uuid;
  x record;y record; a int;b int; d jsonb; k1 uuid:=gen_random_uuid();k2 uuid:=gen_random_uuid();
+ v_rechazo boolean:=false;
 BEGIN
  select id into sid from public.servicios where activo order by nombre limit 1;
  select id into sid2 from public.servicios where activo and id<>sid order by nombre limit 1;
@@ -33,6 +34,15 @@ BEGIN
  where j->>'cargo_id'=y.id::text;
  if a<>x.base_centavos+round(x.base_centavos*.35)::int or b<>y.base_centavos then
  raise exception 'Mora independiente no conciliada: A %, B %',a,b;end if;
+ -- Ni Admin heredado ni un request duplicado pueden cobrar globalmente B2.
+ begin
+  insert into public.pagos(cliente_id,periodo,monto,estado,notas,fecha)
+  values(cid,'octubre de 2026',94,'pagado','Doble cargo rechazado',current_date);
+ exception when others then
+   if sqlerrm like 'CLIENTE_MULTIFECHA:%' then v_rechazo=true;
+   else raise;end if;
+ end;
+ if not v_rechazo then raise exception 'La aprobación global B2 quedó desprotegida';end if;
  d=public.goxion_b2_aprobar_abono(cid,x.id,a,a,k1,'fixture');
  if d->>'ok'<>'true' or d->>'ciclo_liquidado'<>'false' then raise exception 'Cierre prematuro %',d;end if;
  d=public.goxion_b2_aprobar_abono(cid,y.id,b,b,k2,'fixture');
