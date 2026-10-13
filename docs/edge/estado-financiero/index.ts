@@ -101,14 +101,15 @@ Deno.serve(async(req)=>{
         .select("activo").eq("cliente_id",clienteId).maybeSingle();
       if(regime.error)throw regime.error;
       const b2=regime.data?.activo===true;
-      let agreement:any=null,candidates:any[]=[];
+      let agreement:any=null,candidates:any[]=[],allCharges:any[]=[];
       if(b2){
         const charges=await sb.from("goxion_b2_cargos")
           .select("id,fecha_vencimiento,periodo,ciclo_id,liquidado")
           .eq("cliente_id",clienteId).eq("periodo",period).eq("liquidado",false)
           .order("fecha_vencimiento",{ascending:true}).limit(60);
         if(charges.error)throw charges.error;
-        candidates=(charges.data||[]).filter(x=>x.fecha_vencimiento===today);
+        allCharges=charges.data||[];
+        candidates=allCharges.filter(x=>x.fecha_vencimiento===today);
         const cycleId=(charges.data||[])[0]?.ciclo_id;
         if(cycleId){
           const prior=await sb.from("goxion_b2_prorrogas")
@@ -130,16 +131,33 @@ Deno.serve(async(req)=>{
         const original=b2?(candidates[0]?.fecha_vencimiento||agreement?.fecha_original||null):
           period?period.slice(0,7)+"-"+String(Math.min(Number(client.data.dia_pago)||15,
               last)).padStart(2,"0"):null;
-        const may=!agreement&&!client.data.pago_en_revision&&
+        let may=!agreement&&!client.data.pago_en_revision&&
           (b2?candidates.length>0:original===today);
+        let maxDate=original?new Date(Date.parse(original+"T00:00:00Z")+
+           5*86400000).toISOString().slice(0,10):null;
+        if(may&&b2){
+          const next=allCharges.find(x=>x.fecha_vencimiento>today);
+          if(next&&next.fecha_vencimiento<=maxDate){
+            maxDate=new Date(Date.parse(next.fecha_vencimiento+"T00:00:00Z")-
+              86400000).toISOString().slice(0,10);
+          }
+          const check=await sb.rpc("goxion_b2_cotizar_ciclo",{
+            p_cliente_id:clienteId,p_periodo:period});
+          may=!check.error&&check.data?.ok===true&&
+            check.data?.lealtad_global_perdida!==true&&maxDate>today;
+        }
+        if(may&&!b2){
+          const financial=await estado(clienteId);
+          may=financial?.esta_pagado_periodo!==true&&
+            financial?.estado!=="pagado"&&financial?.pago_en_revision!==true;
+        }
         return res({ok:true,modo:b2?"b2_multifecha":"global",
           acuerdo:agreement?{fecha_original:agreement.fecha_original,
             fecha_pactada:agreement.fecha_pactada,estado:agreement.estado,
             activo:agreement.estado==="aprobada"||agreement.estado==="activo"}:null,
           puede_solicitar:may,fecha_original:original,
           fecha_servidor:today,cargo_id:b2&&may?candidates[0].id:null,
-          fecha_maxima:original?new Date(Date.parse(original+"T00:00:00Z")+
-            5*86400000).toISOString().slice(0,10):null,
+          fecha_maxima:maxDate,
           requiere_autorizacion_admin:false});
       }
       const chosen=String(datos?.fecha_pactada||"");
