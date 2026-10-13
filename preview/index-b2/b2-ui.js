@@ -84,7 +84,11 @@
   const principal=selectedCharge?.principal_centavos||0;
   const total=selectedCharge?.total_centavos||0;
   const abono=Math.max(0,Math.min(total,Math.round(Number(partial)*100)||0));
-  const futuro= Math.round(Math.max(0,principal-Math.min(principal,abono))*.05);
+  const descuentoEnRiesgo=!store.quote?.lealtad_global_perdida?
+    (selectedCharge?.descuento_centavos||0):0;
+  const principalFuturo=Math.max(0,principal-Math.min(principal,abono))+
+    (Math.max(0,total-abono)>0?descuentoEnRiesgo:0);
+  const futuro=Math.round(principalFuturo*.05);
   const note=store.demo?"<span class=\"gx-b2-sim-badge\">Ejemplo de cálculo</span>":
     "<span class=\"gx-b2-sim-badge\">Estimación; Admin confirma el importe</span>";
   const scenario=store.demo?'<div class="gx-b2-scenario" role="group" aria-label="Casos de prueba">'+
@@ -132,11 +136,12 @@
         '<div class="gx-b2-consequences" aria-live="polite">'+
          note+
          '<div><span>Mora acumulada en este servicio</span><strong data-b2-mora>'+money(mora)+'</strong></div>'+
+         '<div><span>Lealtad en riesgo si vence sin liquidar</span><strong data-b2-beneficio>'+money(descuentoEnRiesgo)+'</strong></div>'+
          '<div><span>Saldo restante tras el abono</span><strong data-b2-restante>'+money(Math.max(0,total-abono))+'</strong></div>'+
          '<div><span>Mora diaria orientativa después del vencimiento</span><strong data-b2-diaria>'+
            money(futuro)+'</strong></div>'+
         '</div>'+
-        '<p class="gx-b2-foot">La mora se genera únicamente después de vencer, al 5% diario sobre el principal que siga pendiente, hasta el tope individual del 50%. La mora acumulada no desaparece con un abono. El beneficio de lealtad se pierde si algún servicio incumple su fecha.</p>'+
+        '<p class="gx-b2-foot">Si vence con saldo, el descuento de lealtad pendiente se retira antes de calcular la mora del 5% diario sobre el principal restante, con tope individual del 50%. Un abono reduce el principal, no elimina la mora acumulada ni evita por sí solo perder la lealtad global.</p>'+
         '<a class="gx-b2-help-link" href="./ayuda.html">Ver mi cuenta y opciones en Mi Espacio <span aria-hidden="true">↗</span></a>'+
        '</div>':"")+
      (store.quote?.lealtad_global_perdida?
@@ -181,7 +186,9 @@
    const sel=pending().find(x=>x.cargo_id===selected)||pending()[0];
    if(sel){
     const abono=Math.max(0,Math.min(sel.total_centavos,Math.round(Number(partial)*100)||0));
-    const futuro=Math.round(Math.max(0,sel.principal_centavos-Math.min(sel.principal_centavos,abono))*.05);
+    const perdida=!store.quote?.lealtad_global_perdida && sel.total_centavos>abono?
+      sel.descuento_centavos:0;
+    const futuro=Math.round((Math.max(0,sel.principal_centavos-Math.min(sel.principal_centavos,abono))+perdida)*.05);
     card.querySelector("[data-b2-restante]").textContent=money(Math.max(0,sel.total_centavos-abono));
     card.querySelector("[data-b2-diaria]").textContent=money(futuro);
    }
