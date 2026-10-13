@@ -15,7 +15,11 @@ check(html.includes('<base href="../../">'),"Assets oficiales reutilizados");
 check(html.includes('src="./assets/js/index/02-02-inline.js"'),"Renderizador oficial no clonado");
 check(html.indexOf("b2-bridge.js")<html.indexOf("02-02-inline.js"),"Bridge antes del render");
 check(html.indexOf("b2-ui.js")>html.indexOf("04-realtime.js"),"Capa visual al final");
-check(html.includes('BETA')&&html.includes("SIN COBROS REALES"),"Aviso persistente");
+check(!html.includes("gx-b2-beta-banner"),"Sin banner visible de demostración");
+check(!ui.includes("data-b2-scenario")&&!ui.includes("CAMBIAR ESCENARIO"),"Sin controles de escenarios visibles");
+check(!css.includes(".gx-b2-scenario")&&!css.includes(".gx-b2-beta-banner"),"Sin espacio ni estilos de controles de prueba");
+check(!ui.includes("VISTA PREVIA · NO SE ENVIARÁ"),"Sin textos de prueba en el formulario");
+check(ui.includes("no acepta pagos reales")&&ui.includes("no está habilitado aquí"),"La beta no permite reportar pagos reales");
 check(css.includes("prefers-reduced-motion"),"Reducción de movimiento accesible");
 check(css.includes(".gx-b2-card"),"Estilos separados");
 check(ui.includes("services-container")&&ui.includes('insertAdjacentElement("afterend"'),"El calendario se inserta después de los servicios contratados");
@@ -54,7 +58,7 @@ const ctx=createContext({
 });
 new Script(bridge).runInContext(ctx);
 const data=await ctx.window.fetch("clientes.json").then(r=>r.json());
-check(data["b2-demo"].nombre==="Cliente de prueba","Sin datos privados");
+check(data["b2-demo"].nombre==="Cliente GOXION","Sin datos privados");
 check(ctx.window.GOXION_CORE.BUSINESS.BANK.CLABE==="000000000000000000",
  "La demo no expone CLABE real");
 let state=ctx.window.GOXION_B2_PREVIEW;
