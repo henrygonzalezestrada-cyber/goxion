@@ -149,3 +149,8 @@ El **abono parcial deja de ofrecerse al cliente** en la beta Index y queda como 
 4. **Estado multiplataforma e instrumentación:** probar estados de revisión/rechazo, carga auténtica, promociones y notificaciones de pago. No habilitar Nayeli ni F3 todavía.
 
 **Decisión conservadora:** mantener PR #96 en borrador, F2 en ejecución, sin activar clientes ni reescribir Index/Ayuda/Admin. CI verde del backend es necesario pero no prueba los puntos 1–4.
+
+### Hallazgo F2 · autenticidad de captura en Index
+La página oficial `assets/js/index/02-02-inline.js` (función `enviarComprobanteDiscord()`) entrega la imagen mediante `FormData` a Discord. **No existe objeto persistido verificable en la base de datos que vincule el archivo con `cargo_id`**, y la tabla `storage.buckets` de Supabase estaba vacía en la auditoría. Un simple `evidencia_ref` enviado por el navegador NO es prueba auténtica de pago.
+
+**Requisito técnico obligatorio antes de exponer `goxion_b2_registrar_comprobante`:** crear canal seguro de captura con identidad `X-Client-Token`, comprobar tipo/tamaño e integridad de archivo en servidor, persistir evidencia privada o referencia validada, vincular selección exacta de cargos y registrar comprobante con idempotencia. El gateway B2 Admin v3 ya exige recibo existente. La migración no ha abierto el endpoint del cliente; evitar falsas acreditaciones. El envío de Discord actual queda intacto para clientes legados y NO sirve como prueba de imputación B2.
