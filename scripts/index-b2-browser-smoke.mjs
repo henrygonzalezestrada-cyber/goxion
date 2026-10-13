@@ -67,6 +67,7 @@ for (const engine of [chromium,webkit]){
   assert.equal(await page.locator("#b2-toggle").getAttribute("aria-expanded"),"false");checks++;
   await page.locator("#b2-toggle").click();
   await page.evaluate(()=>window.GOXION_B2_PREVIEW.makeDemo("parcial"));
+  await page.locator('[data-b2-mode="proximo"]').click();
   assert.match(await page.locator(".gx-b2-breakdown").textContent(),/Pagos parciales aprobados/);checks++;
   assert.match(await page.locator(".gx-b2-breakdown").textContent(),/\$20\.00/);checks++;
   assert.match(await page.locator("#b2-selected-total").textContent(),/\$26\.06/);checks++;
