@@ -23,6 +23,10 @@ check(ui.includes("no acepta pagos reales")&&ui.includes("no está habilitado aq
 check(css.includes("prefers-reduced-motion"),"Reducción de movimiento accesible");
 check(css.includes(".gx-b2-card"),"Estilos separados");
 check(ui.includes("services-container")&&ui.includes('insertAdjacentElement("afterend"'),"El calendario se inserta después de los servicios contratados");
+check(ui.includes("function updateBreakdown()")&&ui.includes("function breakdown()"),"Desglose reintroducido sobre selección multifecha");
+check(!ui.includes('globalBreakdown.style.display="none"'),"Nunca ocultar el subtotal original");
+check(ui.includes("Otros ajustes al saldo")&&ui.includes("Pagos parciales aprobados"),"Conciliación y pagos aplicados en desglose");
+check(ui.includes("updateBreakdown();")&&css.includes(".gx-b2-breakdown"),"Se integra a la tarjeta original de desglose");
 check(ui.includes("gx-b2-reveal")&&ui.includes("aria-expanded"),"Animación y ARIA");
 check(ui.includes('["proximo","Próximo vencimiento"]')&&ui.includes('["todo","Todo junto"]'),"Solo pago próximo y todo junto en selección principal");
 check(!ui.includes('data-b2-mode="abono"')&&!ui.includes('id="b2-partial"'),"Sin abonos como opción habitual");
