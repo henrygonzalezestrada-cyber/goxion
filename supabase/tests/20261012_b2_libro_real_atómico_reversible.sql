@@ -20,9 +20,11 @@ BEGIN
  round(s.monto*100)::int,'verificado',now(),'fixture_rollback',1
  from public.cliente_accesos ac join public.cliente_servicios s on s.id=ac.cliente_servicio_id
  where ac.cliente_id=cid and ac.activo;
- insert into public.goxion_b2_regimen_cliente(cliente_id,activo,periodo_inicio,autorizado_por)
- values(cid,true,'2026-10-01','test_rollback');
+ -- Activación requiere confirmación y concilia el calendario exactamente una vez.
+ d=public.goxion_b2_activar_cliente(cid,'2026-10-01',true,'admin:fixture');
+ if d->>'regimen_activo'<>'true' then raise exception 'Régimen no activado';end if;
  d=public.goxion_b2_iniciar_ciclo(cid,'2026-10-01');
+ if d->>'repetida'<>'true' then raise exception 'Inicialización duplicó el ciclo';end if;
  if d->>'ok'<>'true' then raise exception 'No creó ciclo: %',d;end if;
  cy=(d->>'ciclo_id')::uuid;
  select * into x from public.goxion_b2_cargos where ciclo_id=cy order by fecha_vencimiento asc limit 1;
