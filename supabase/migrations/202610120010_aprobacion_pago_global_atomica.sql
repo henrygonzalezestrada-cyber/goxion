@@ -61,10 +61,12 @@ begin
  -- Régimen B2 activo: el recibo global sólo se permite al cerrar TODAS
  -- las obligaciones por acceso y únicamente por la función B2.
  -- La guarda del trigger de pagos añade defensa incluso ante rutas legacy.
- if exists(select 1 from public.goxion_b2_regimen_cliente reg
-  where reg.cliente_id=p_cliente_id and reg.activo
-   and v_periodo>=reg.periodo_inicio) then
-   raise exception 'CLIENTE_MULTIFECHA: aprobar cada vencimiento, no el mes global';
+ if pg_catalog.to_regclass('public.goxion_b2_regimen_cliente') is not null then
+  if exists(select 1 from public.goxion_b2_regimen_cliente reg
+   where reg.cliente_id=p_cliente_id and reg.activo
+    and v_periodo>=reg.periodo_inicio) then
+    raise exception 'CLIENTE_MULTIFECHA: aprobar cada vencimiento, no el mes global';
+  end if;
  end if;
  if v_cliente.periodo_pendiente is distinct from v_periodo then
    raise exception 'PERIODO_DESACTUALIZADO';
