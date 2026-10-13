@@ -26,6 +26,9 @@ for (const engine of [chromium,webkit]){
   await page.locator("#b2-toggle").click();
   assert.equal(await page.locator("#b2-toggle").getAttribute("aria-expanded"),"true");checks++;
   assert.equal(await page.locator(".gx-b2-row.is-next").count(),1);checks++;
+  assert.equal(await page.locator(".gx-b2-ico,.gx-b2-mark").count(),0,"No mostrar barras ni puntos");checks++;
+  assert.equal(await page.locator(".gx-b2-row.is-next").evaluate(el=>getComputedStyle(el,"::before").content),"none","Sin línea ::before");checks++;
+  assert.equal(await page.locator(".gx-b2-next-tag").evaluate(el=>getComputedStyle(el).borderLeftWidth),"0px","Distintivo sin borde");checks++;
   assert.match(await page.locator(".gx-b2-next-tag").textContent(),/PRÓXIMO/);checks++;
   await page.locator('[data-b2-mode="todo"]').click();
   assert.match(await page.locator("#b2-selected-total").textContent(),/\$92\.12/);checks++;
