@@ -57,6 +57,9 @@ BEGIN
  if d->>'ok'<>'true' or d->>'ciclo_liquidado'<>'false' then raise exception 'Cierre prematuro %',d;end if;
  d=public.goxion_b2_aprobar_abono(cid,y.id,b,b,k2,'fixture');
  if d->>'ok'<>'true' or d->>'ciclo_liquidado'<>'true' then raise exception 'No liquidó %',d;end if;
+ if (select count(*) from public.goxion_b2_ciclos where cliente_id=cid
+  and periodo='2026-11-01')<>1 then
+  raise exception 'No renovó automáticamente el ciclo B2 del mes siguiente';end if;
  if (select count(*) from public.pagos where cliente_id=cid and estado='pagado')<>1 then
  raise exception 'Duplicó comprobante consolidado';end if;
  if (select pagos_puntuales from public.clientes where id=cid)<>0 then
