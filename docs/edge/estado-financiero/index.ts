@@ -80,6 +80,34 @@ Deno.serve(async(req)=>{
       return q.data;
     }
 
+    // Solicitud de prórroga de la PROPIA cuenta. No concede gracia
+    // hasta la aprobación de Admin. Sólo B2 activado, regla validada en SQL.
+    if(accion==="solicitar_prorroga"){
+      const client=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
+      if(!client?.cliente_id)return res({ok:false,error:"Accede nuevamente a Mi Espacio."},401);
+      const clienteId=String(client.cliente_id);
+      const acceso=await exigirClienteActivo(sb,clienteId);
+      if(!acceso.ok)return res({ok:false,error:acceso.error},acceso.status);
+      const id=String(datos?.cargo_id||"").trim();
+      const fecha=String(datos?.fecha_pactada||"").trim();
+      const op=String(datos?.clave_idempotencia||"").trim();
+      const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(!idPattern.test(id)||!idPattern.test(op)||
+        !/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(fecha)){
+        return res({ok:false,error:"Servicio o fecha inválidos."},400);
+      }
+      const q=await sb.rpc("goxion_b2_solicitar_prorroga",{
+        p_cliente_id:clienteId,p_cargo_id:id,p_fecha_pactada:fecha,
+        p_operation_id:op,p_motivo:"Solicita prórroga de pago"
+      });
+      if(q.error||q.data?.ok!==true)return res({
+         ok:false,error:q.error?.message||"Prórroga no disponible para este vencimiento.",
+         codigo:"PRORROGA_NO_ELEGIBLE"},409);
+      return res({ok:true,modo:"solicitud_prorroga",
+        resultado:q.data,requiere_aprobacion_admin:true,
+        lealtad_protegida:false});
+    }
+
     if(accion==="mi_estado"){
       const client=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
       if(!client?.cliente_id)return res({ok:false,error:"Sesión de cliente inválida o expirada"},401);
