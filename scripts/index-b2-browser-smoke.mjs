@@ -38,7 +38,8 @@ for (const engine of [chromium,webkit]){
   const pay=page.locator(".gx-payment-primary");
   await pay.click();
   assert.equal(await page.locator("#payment-modal").getAttribute("aria-hidden"),"false");checks++;
-  assert.match(await page.locator(".gx-payment-upload-kicker").innerText(),/VISTA PREVIA/);checks++;
+  assert.match(await page.locator(".gx-payment-upload-kicker").textContent(),/VISTA PREVIA/);checks++;
+  assert.equal(await page.evaluate(()=>window.GOXION_B2_PREVIEW.report?.monto_centavos),4606);checks++;
   // El formulario de demostración se cierra sin enviar archivos ni solicitudes.
   await page.locator(".close-modal").click();
   assert.equal(await page.locator("#payment-modal").getAttribute("aria-hidden"),"true");checks++;
