@@ -1,0 +1,35 @@
+name: GOXION · B2 Espejo Index y Ayuda
+
+on:
+  push:
+    branches:
+      - feature/b2-espejo-index-ayuda-20261013
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  interfaces-espejo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validar fuente estática
+        run: |
+          node --check preview/integracion-b2/sandbox-guard.js
+          node --check preview/integracion-b2/ayuda-demo.js
+          node --check preview/integracion-b2/ayuda-prorroga.js
+          node --check preview/integracion-b2/index-adapter.js
+          node --check preview/integracion-b2/index-linked-state.js
+      - name: Instalar navegadores
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium webkit
+      - name: Probar Index y Ayuda sobre diseño oficial
+        run: node scripts/b2-espejo-browser-smoke.mjs
