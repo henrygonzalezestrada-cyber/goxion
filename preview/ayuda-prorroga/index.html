@@ -8,7 +8,7 @@
 <base href="../../">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="./assets/css/ayuda.css">
-<link rel="stylesheet" href="./preview/ayuda-prorroga/prorroga-auto.css?v=auto1">
+<link rel="stylesheet" href="./preview/ayuda-prorroga/prorroga-auto.css?v=auto2">
 <style>
 html,body{min-height:100%;background:#030407!important;color:#f6f7ff}
 body{margin:0;overflow-x:hidden!important}
@@ -19,46 +19,33 @@ box-sizing:border-box;position:relative}
 .gx-pr-demo-top span{font-size:10px;letter-spacing:1px;color:#9bb0cf;font-weight:700}
 .gx-pr-demo-head{text-align:center;margin:0 0 25px}
 .gx-pr-demo-head h1{font-size:24px;letter-spacing:-.5px;font-weight:700;margin:0 0 9px}
-.gx-pr-demo-head p{font-size:11px;color:#aebcd0;line-height:1.65;margin:0}
-#dash-billing-card{padding:26px 22px 25px!important;margin:0 0 30px;background:rgba(13,16,31,.7)!important;
+ #dash-billing-card{padding:26px 22px 23px!important;margin:0 0 30px;background:rgba(13,16,31,.7)!important;
  border:1px solid rgba(133,158,200,.14)!important;border-radius:24px!important}
 #dash-date{margin:12px 0 4px;text-align:center;font-weight:700;font-size:29px;letter-spacing:-.5px}
 #dash-badge{text-align:center;margin-bottom:18px}
 #dash-badge>span{color:#a9e2ef;font-size:11px}
+.gx-pr-demo-date-label{text-align:center;font-size:11px;text-transform:uppercase;letter-spacing:1.6px;color:#a9bad0}
 .gx-pr-demo-badge{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));
 font:600 9px Poppins,sans-serif;white-space:nowrap;max-width:calc(100vw - 22px);
 letter-spacing:.4px;background:rgba(6,11,20,.92);border:1px solid rgba(124,151,188,.3);
 border-radius:20px;padding:9px 14px;color:#bad1e6;backdrop-filter:blur(14px);z-index:4}
-.gx-pr-demo-caption{font-size:10px;line-height:1.7;color:#91a4bb;text-align:center;margin-top:15px}
-.gx-pr-demo-line{height:1px;background:linear-gradient(90deg,transparent,rgba(93,108,191,.34),transparent);margin:20px 0}
-.gx-pr-demo-btn{font:600 12px Poppins,sans-serif;color:#f2fbff;border-radius:13px;background:rgba(102,133,199,.09);
-padding:14px;border:1px solid rgba(110,170,226,.16);display:block;width:100%;cursor:pointer}
-.gx-account-capsule{width:100%;max-width:none!important;margin:20px 0 0!important;min-height:48px!important}
+ .gx-account-capsule{width:100%;max-width:none!important;margin:21px 0 0!important;min-height:48px!important}
 </style>
 </head>
 <body>
 <div class="gx-pr-demo-shell">
 <div class="gx-pr-demo-top"><img src="logo2.PNG" alt="GOXION"><span>MI ESPACIO</span></div>
-<div class="gx-pr-demo-head"><h1>Tu espacio, a tu ritmo.</h1>
-<p>Visualización de la nueva prórroga automática, integrada en la tarjeta de fecha de pago.</p></div>
+<div class="gx-pr-demo-head"><h1>Tu espacio, a tu ritmo.</h1></div>
 <div id="dash-billing-card" class="glass-card dash-card">
-<div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#9daac1;text-align:center">
-Tu próxima fecha de corte</div>
+<div id="dash-date-label" class="gx-pr-demo-date-label">Tu próxima fecha de pago</div>
 <div id="dash-date">15 de octubre</div>
 <div id="dash-badge"><span>Tu pago vence hoy</span></div>
-<div class="gx-pr-demo-line"></div>
-<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px">
-<strong>✦ Nivel de lealtad</strong><span style="color:#8fe5f4;font-weight:700">10/10 pagos</span></div>
-<div style="height:5px;background:rgba(185,195,223,.12);border-radius:10px;margin:13px 0">
-<div style="height:5px;background:linear-gradient(90deg,#706cdd,#51d7ef);border-radius:10px;width:100%"></div></div>
-<p style="color:#a7b5c8;font-size:11px;margin:0">Tu nivel máximo está protegido si respetas tu acuerdo.</p>
 <button class="gx-account-capsule" type="button" onclick="alert('Estado de cuenta simulado · No hay pagos reales.')">
 <span class="gx-account-capsule-label">Ver Estado de Cuenta</span>
 <span class="gx-account-capsule-arrow">↗</span></button>
 </div>
-<p class="gx-pr-demo-caption">Al aceptar, la tarjeta cambiará a «Acuerdo pactado» inmediatamente. Prueba cualquier fecha del rango permitido. No se enviarán solicitudes ni se modificarán cuentas.</p>
 </div>
 <div class="gx-pr-demo-badge">GOXION BETA · SIMULACIÓN SIN COBROS REALES</div>
-<script src="./preview/ayuda-prorroga/prorroga-auto.js?v=auto1"></script>
+<script src="./preview/ayuda-prorroga/prorroga-auto.js?v=auto2"></script>
 </body>
 </html>
