@@ -16,6 +16,8 @@ for (const engine of [chromium,webkit]){
   await page.locator("#b2-calendar").waitFor({timeout:12000});
   await page.waitForTimeout(120);
   assert.match(await page.locator(".total-amount").innerText(),/\$92\.12/);checks++;
+  assert.equal(await page.locator(".services-container .gx-b2-service-flag").count(),1);checks++;
+  assert.match(await page.locator(".services-container .gx-b2-service-flag").textContent(),/PRÓXIMO/);checks++;
   const over=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(over<=1,"Overflow "+engine.name()+" "+width+": "+over);checks++;
   assert.equal(await page.evaluate(()=>
@@ -40,6 +42,7 @@ for (const engine of [chromium,webkit]){
   await page.locator('[data-b2-scenario="vencido"]').click();
   assert.match(await page.locator(".total-amount").innerText(),/\$100\.45/);checks++;
   assert.equal(await page.locator(".gx-b2-row.is-late").count(),1);checks++;
+  assert.match(await page.locator(".services-container .gx-b2-service-flag").textContent(),/VENCIDO/);checks++;
   assert.match(await page.locator(".gx-b2-next-tag").textContent(),/VENCIDO/);checks++;
   await page.locator("[data-b2-alternatives]").click();
   assert.match(await page.locator("[data-b2-mora]").textContent(),/\$2\.45/);checks++;
