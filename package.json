@@ -4,7 +4,7 @@
   "version": "2.0.0",
   "type": "module",
   "scripts": {
-    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos && npm run test:finanzas:parcial-atomico && npm run test:finanzas:imputacion-sombra && npm run test:finanzas:obligaciones-b2 && npm run test:finanzas:aprobacion-atomica && npm run test:finanzas:atribucion && npm run test:finanzas:diagnostico-b2 && npm run test:finanzas:enrutamiento && npm run test:finanzas:lealtad-multifecha",
+    "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos && npm run test:finanzas:parcial-atomico && npm run test:finanzas:imputacion-sombra && npm run test:finanzas:obligaciones-b2 && npm run test:finanzas:aprobacion-atomica && npm run test:finanzas:atribucion && npm run test:finanzas:diagnostico-b2 && npm run test:finanzas:enrutamiento && npm run test:finanzas:lealtad-multifecha && npm run test:finanzas:mora-multifecha",
     "test:smoke": "node scripts/browser-smoke.mjs",
     "test:cart": "node scripts/cart-v2-smoke.mjs",
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
@@ -25,6 +25,7 @@
     "test:finanzas:atribucion": "node scripts/atribucion-b2-smoke.mjs",
     "test:finanzas:diagnostico-b2": "node scripts/diagnostico-b2-smoke.mjs",
     "test:finanzas:enrutamiento": "node scripts/calendario-ruteo-smoke.mjs",
-    "test:finanzas:lealtad-multifecha": "node scripts/lealtad-multifecha-smoke.mjs"
+    "test:finanzas:lealtad-multifecha": "node scripts/lealtad-multifecha-smoke.mjs",
+    "test:finanzas:mora-multifecha": "node scripts/mora-multifecha-smoke.mjs"
   }
 }
