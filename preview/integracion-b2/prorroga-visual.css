@@ -138,3 +138,144 @@
  #gx-prorroga-dialog .gx-prorroga-close,
  #gx-prorroga-dialog .gx-prorroga-field input{transition:none}
 }
+
+
+/* Cierre visual de Mi Espacio · 13/oct/2026.
+   No replicar el borde azul de focus por abrir <dialog>.
+   Mantener foco visible al recorrer CONTROLES con teclado. */
+#gx-prorroga-dialog.gx-prorroga-dialog:focus,
+#gx-prorroga-dialog.gx-prorroga-dialog:focus-visible{
+  outline:0!important;
+  outline-offset:0!important;
+}
+#gx-prorroga-dialog.gx-prorroga-dialog{
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-y;
+}
+html:has(#gx-prorroga-dialog[open]),
+body:has(#gx-prorroga-dialog[open]){
+  overscroll-behavior:none;
+}
+#gx-prorroga-dialog .gx-prorroga-field{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1.16fr);
+  align-items:center;
+  gap:9px;
+  padding:11px 0 15px;
+  margin:0 0 5px;
+  flex-wrap:nowrap;
+  box-sizing:border-box;
+  min-height:66px;
+  width:100%;
+}
+#gx-prorroga-dialog .gx-prorroga-field>span{
+  font:600 11.5px/1.45 Poppins,sans-serif;
+  letter-spacing:-.1px;
+  color:#dae2ee;
+}
+#gx-prorroga-dialog .gx-prorroga-field input{
+  display:block;
+  box-sizing:border-box;
+  width:100%;
+  max-width:none;
+  min-width:0;
+  height:47px;
+  margin:0;
+  padding:8px 9px;
+  border-radius:12px;
+  font-size:12px;
+  line-height:1.3;
+  text-align:center;
+  justify-self:stretch;
+  align-self:center;
+  -webkit-appearance:none;
+  appearance:none;
+}
+#gx-prorroga-dialog .gx-prorroga-field input::-webkit-date-and-time-value{
+  text-align:center;
+  min-height:1.3em;
+}
+#gx-prorroga-dialog .gx-prorroga-risk{
+  position:relative;
+  isolation:isolate;
+  border:0;
+  border-top:1px solid rgba(255,121,164,.19);
+  border-bottom:1px solid rgba(255,121,164,.14);
+  border-radius:0;
+  margin:3px 0 0;
+  padding:17px 0 16px;
+  background:
+    radial-gradient(ellipse 58% 67% at 15% 45%,rgba(225,85,142,.095),transparent 90%);
+  text-align:left;
+}
+#gx-prorroga-dialog .gx-prorroga-risk-title{
+  display:block;
+  font:500 11px/1.5 Poppins,sans-serif;
+  color:#e5b5c7;
+  letter-spacing:0;
+  text-align:left;
+}
+#gx-prorroga-dialog .gx-prorroga-risk-total{
+  display:block;
+  width:100%;
+  font:800 clamp(29px,7.4vw,35px)/1.22 Poppins,sans-serif;
+  color:#ffb5cd;
+  letter-spacing:-.9px;
+  font-variant-numeric:tabular-nums;
+  margin:8px 0 14px;
+  text-align:left;
+  text-shadow:0 4px 25px rgba(255,83,143,.10);
+}
+#gx-prorroga-dialog .gx-prorroga-risk-details{
+  width:100%;
+  display:grid;
+  gap:7px;
+}
+#gx-prorroga-dialog .gx-prorroga-risk-details>div{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:baseline;
+  gap:12px;
+  min-width:0;
+  color:#b8afbf;
+  font:500 10px/1.45 Poppins,sans-serif;
+}
+#gx-prorroga-dialog .gx-prorroga-risk-details b{
+  color:#ffcfdf;
+  font-size:11px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+  white-space:nowrap;
+  text-align:right;
+}
+#gx-prorroga-dialog .gx-prorroga-risk-details span{min-width:0}
+#gx-prorroga-dialog .gx-prorroga-terms-copy{
+  margin-top:14px!important;
+}
+#dash-billing-card .gx-prorroga-entry::after,
+#dash-billing-card .gx-prorroga-entry:hover::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+}
+#dash-billing-card .gx-prorroga-entry{
+  text-decoration:none!important;
+  border-bottom:0!important;
+  padding-bottom:9px;
+}
+@media(max-width:370px){
+  #gx-prorroga-dialog .gx-prorroga-field{
+    grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);
+    gap:7px;
+  }
+  #gx-prorroga-dialog .gx-prorroga-field>span{
+    font-size:10.5px;letter-spacing:-.16px;
+  }
+  #gx-prorroga-dialog .gx-prorroga-field input{
+    height:45px;padding:8px 4px;font-size:10.5px;
+  }
+  #gx-prorroga-dialog .gx-prorroga-risk-total{
+    font-size:30px;
+  }
+}
