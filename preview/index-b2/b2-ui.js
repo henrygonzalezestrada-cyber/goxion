@@ -89,7 +89,7 @@
       '<span class="gx-b2-head-copy"><span class="gx-b2-caption">CALENDARIO DE PAGOS</span>'+
        '<strong>'+esc(label)+'</strong></span></span>'+
       '<span class="gx-b2-head-amount">'+first+' <span class="gx-b2-chevron" aria-hidden="true">⌄</span></span></button>'+
-    '<div class="gx-b2-reveal" id="b2-body" aria-hidden="'+(!expanded)+'"><div class="gx-b2-clip"><div class="gx-b2-content">'+
+    '<div class="gx-b2-reveal" id="b2-body" aria-hidden="'+(!expanded)+'" '+(expanded?'':'inert')+'><div class="gx-b2-clip"><div class="gx-b2-content">'+
      '<div class="gx-b2-divider"></div>'+
      list.map(x=>{
       const checked=x.cargo_id===(selected||due?.cargo_id);
@@ -133,6 +133,7 @@
    expanded=!expanded;card.classList.toggle("is-open",expanded);
    card.querySelector("#b2-toggle").setAttribute("aria-expanded",String(expanded));
    card.querySelector("#b2-body").setAttribute("aria-hidden",String(!expanded));
+   card.querySelector("#b2-body").toggleAttribute("inert",!expanded);
   });
   card.querySelectorAll("[data-b2-cargo]").forEach(button=>button.addEventListener("click",()=>{
    selected=button.dataset.b2Cargo;mode="proximo";render();
