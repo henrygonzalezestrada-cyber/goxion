@@ -84,10 +84,9 @@
   const principal=selectedCharge?.principal_centavos||0;
   const total=selectedCharge?.total_centavos||0;
   const abono=Math.max(0,Math.min(total,Math.round(Number(partial)*100)||0));
-  const descuentoEnRiesgo=!store.quote?.lealtad_global_perdida?
+  const descuentoEnRiesgo=!store.quote?.lealtad_global_perdida && total>abono?
     (selectedCharge?.descuento_centavos||0):0;
-  const principalFuturo=Math.max(0,principal-Math.min(principal,abono))+
-    (Math.max(0,total-abono)>0?descuentoEnRiesgo:0);
+  const principalFuturo=Math.max(0,principal-Math.min(principal,abono))+descuentoEnRiesgo;
   const futuro=Math.round(principalFuturo*.05);
   const note=store.demo?"<span class=\"gx-b2-sim-badge\">Ejemplo de cálculo</span>":
     "<span class=\"gx-b2-sim-badge\">Estimación; Admin confirma el importe</span>";
@@ -189,6 +188,7 @@
     const perdida=!store.quote?.lealtad_global_perdida && sel.total_centavos>abono?
       sel.descuento_centavos:0;
     const futuro=Math.round((Math.max(0,sel.principal_centavos-Math.min(sel.principal_centavos,abono))+perdida)*.05);
+    card.querySelector("[data-b2-beneficio]").textContent=money(perdida);
     card.querySelector("[data-b2-restante]").textContent=money(Math.max(0,sel.total_centavos-abono));
     card.querySelector("[data-b2-diaria]").textContent=money(futuro);
    }
