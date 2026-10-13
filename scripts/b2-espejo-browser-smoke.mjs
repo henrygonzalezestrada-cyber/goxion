@@ -62,6 +62,33 @@ try{
    const dlg=page.locator("#gx-prorroga-dialog");
    await dlg.waitFor();
    check(await dlg.isVisible(),"Modal prórroga nativo");
+   check(await page.evaluate(()=>document.body.style.position==="fixed"),
+     "El documento queda congelado detrás del diálogo");
+   check(await dlg.evaluate(el=>getComputedStyle(el).outlineStyle==="none"),
+     "Sin contorno inicial al abrir el diálogo");
+   check(await page.locator(".gx-prorroga-field").evaluate(el=>{
+     const a=el.querySelector("span").getBoundingClientRect();
+     const b=el.querySelector("input").getBoundingClientRect();
+     return Math.abs((a.top+a.bottom)/2-(b.top+b.bottom)/2)<6 && b.left>=a.right-2;
+   }),"Etiqueta y calendario alineados en una misma fila");
+   check(await page.locator(".gx-prorroga-risk-details > div").count()===2,
+     "Mora y lealtad separados en dos filas limpias");
+   check(await page.locator(".gx-prorroga-risk-details").evaluate(el=>{
+     const rows=[...el.children].map(item=>item.querySelector("b").getBoundingClientRect());
+     return rows.length===2&&Math.abs(rows[0].right-rows[1].right)<2;
+   }),"Importes del desglose alineados al borde derecho");
+   check(await page.locator(".gx-prorroga-risk-total").evaluate(el=>
+     getComputedStyle(el).textAlign==="left"),
+     "Monto de incumplimiento anclado a la izquierda");
+   check(await page.locator(".gx-prorroga-entry").evaluate(el=>
+     getComputedStyle(el,"::after").content==="none"),
+     "Sin línea decorativa bajo el botón de prórroga");
+   check(await page.evaluate(()=>{
+     const e=new Event("touchmove",{bubbles:true,cancelable:true});
+     Object.defineProperty(e,"touches",{value:[{clientY:500}]});
+     document.body.dispatchEvent(e);
+     return e.defaultPrevented;
+   }),"El gesto exterior no desplaza el fondo en dispositivos táctiles");
    check(await dlg.evaluate(el=>getComputedStyle(el).backdropFilter.includes("blur")),
      "Prórroga usa cristal translucido con blur real");
    check(await dlg.locator("[data-gx-close]").evaluate(el=>{
@@ -105,6 +132,8 @@ try{
    check((await page.locator("[data-gx-missed]").textContent()).includes("58.80"),"Mora retroactiva");
    await page.locator("[data-gx-activate]").click();
    await dlg.waitFor({state:"detached",timeout:5000});
+   check(await page.evaluate(()=>document.body.style.position!=="fixed"),
+     "Al cerrar se libera el scroll, sin dejar la página bloqueada");
    check((await page.locator("#dash-badge").textContent()).includes("Acuerdo pactado"),
      "Acuerdo aprobado sin Admin");
    check(await page.locator(".gx-prorroga-entry").count()===0,"Sin segunda prórroga");
