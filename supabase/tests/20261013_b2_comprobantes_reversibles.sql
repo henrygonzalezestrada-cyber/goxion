@@ -70,7 +70,7 @@ BEGIN
  begin
   perform public.goxion_b2_aprobar_comprobante(cid,r1,wrong,ap_op,'admin:test',false,'');
  exception when others then
-  if sqlerrm like '%IDEMPOTENCIA%' or sqlerrm like '%operaci%' or sqlerrm like '%duplicad%' then reject_ok=true;
+  if sqlerrm ilike '%operation id reutilizado%' then reject_ok=true;
   else raise;end if;
  end;
  if not reject_ok then raise exception 'No rechazó segundo cargo desactualizado';end if;
