@@ -153,3 +153,51 @@
  .gx-b2-reveal,.gx-b2-chevron,.gx-b2-choice,.gx-b2-row{transition:none!important}
  .gx-b2-row.is-next,.gx-b2-next-tag,.gx-b2-service-flag{animation:none!important}
 }
+
+/* Desglose multifecha: se reutiliza la tarjeta oficial, sin cajas anidadas.
+   Refleja únicamente los accesos elegidos arriba y conserva el estilo GOXION. */
+.gx-b2-breakdown{
+  margin-top:0;margin-bottom:24px;
+  padding:19px 18px 15px!important
+}
+.gx-b2-breakdown[hidden]{display:none!important}
+.gx-b2-breakdown-caption{
+  color:#98accc;font:700 10px/1.4 Poppins,sans-serif;
+  letter-spacing:.75px
+}
+.gx-b2-breakdown-context{
+  color:#cbdcf2;font:500 11px/1.45 Poppins,sans-serif;
+  margin:5px 0 17px
+}
+.gx-b2-breakdown .gx-b2-breakdown-line{
+  align-items:baseline;gap:12px;font-size:12px;
+  margin-bottom:12px;color:#afbfd5;line-height:1.45
+}
+.gx-b2-breakdown .gx-b2-breakdown-line strong{
+  color:#e9f3ff;font-size:12px;font-weight:650;
+  white-space:nowrap
+}
+.gx-b2-breakdown .gx-b2-breakdown-line.discount-line span,
+.gx-b2-breakdown .gx-b2-breakdown-line.discount-line strong{
+  color:#7de4cf
+}
+.gx-b2-breakdown .gx-b2-breakdown-line.surcharge-line span,
+.gx-b2-breakdown .gx-b2-breakdown-line.surcharge-line strong{
+  color:#f1a9bc
+}
+.gx-b2-breakdown-final{
+  border-top:1px solid rgba(172,195,231,.14);
+  margin-top:5px;padding-top:14px;
+  display:flex;justify-content:space-between;align-items:baseline;
+  gap:15px
+}
+.gx-b2-breakdown-final span{font:600 11px/1.45 Poppins,sans-serif;color:#c0cce1}
+.gx-b2-breakdown-final strong{
+  color:#b7f1ff;font:700 21px/1.15 Poppins,sans-serif;
+  letter-spacing:-.3px;white-space:nowrap
+}
+@media(max-width:360px){
+ .gx-b2-breakdown{padding:16px 13px!important}
+ .gx-b2-breakdown-final strong{font-size:18px}
+ .gx-b2-breakdown .gx-b2-breakdown-line{font-size:11px}
+}
