@@ -29,6 +29,7 @@
     "test:finanzas:mora-multifecha": "node scripts/mora-multifecha-smoke.mjs",
     "test:index:b2": "node scripts/index-b2-beta-smoke.mjs",
     "test:index:b2:browser": "node scripts/index-b2-browser-smoke.mjs",
-    "test:finanzas:prorroga": "node scripts/prorroga-policy-smoke.mjs"
+    "test:finanzas:prorroga": "node scripts/prorroga-policy-smoke.mjs",
+    "test:ayuda:prorroga:browser": "node scripts/ayuda-prorroga-browser-smoke.mjs"
   }
 }
