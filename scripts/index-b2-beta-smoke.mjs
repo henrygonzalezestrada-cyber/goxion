@@ -34,7 +34,9 @@ check(bridge.includes('demo: demo')&&bridge.includes("function makeQuote"),"Demo
 let params=new URLSearchParams("?cliente=b2-demo&demo=1");
 const URLClass=URLSearchParams;
 const ctx=createContext({
- window:{GOXION_CORE:{STORAGE:{CLIENT_TOKEN:"client_token"},endpoint:x=>x},
+ window:{GOXION_CORE:{STORAGE:{CLIENT_TOKEN:"client_token"},endpoint:x=>x,
+  BUSINESS:{BANK:{NAME:"Banco",HOLDER:"Titular",CLABE:"123456789012345678",
+    ACCOUNTS:[]}}},
   fetch:async()=>{throw Error("Demo intentó consultar la red");},
   dispatchEvent:()=>{}},
  location:{search:"?cliente=b2-demo&demo=1",pathname:"/preview/index-b2/index.html"},
@@ -45,6 +47,8 @@ const ctx=createContext({
 new Script(bridge).runInContext(ctx);
 const data=await ctx.window.fetch("clientes.json").then(r=>r.json());
 check(data["b2-demo"].nombre==="Cliente de prueba","Sin datos privados");
+check(ctx.window.GOXION_CORE.BUSINESS.BANK.CLABE==="000000000000000000",
+ "La demo no expone CLABE real");
 let state=ctx.window.GOXION_B2_PREVIEW;
 check(state.quote.total_pendiente_centavos===9212,"Demo puntual por perfil 6%");
 state.makeDemo("vencido");
