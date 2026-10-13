@@ -112,6 +112,7 @@
    document.getElementById("gx-prorroga-dialog")?.remove();
    const dialog=document.createElement("dialog");dialog.className="gx-prorroga-dialog";
    dialog.id="gx-prorroga-dialog";dialog.setAttribute("aria-labelledby","gx-prorroga-title");
+   dialog.tabIndex=-1;
    const init=plus(state.fecha_original,3);
    dialog.innerHTML='<div class="gx-prorroga-sheet">'+
      '<div class="gx-prorroga-kicker">FLEXIBILIDAD GOXION</div>'+
@@ -214,6 +215,8 @@
      }catch(e){status.textContent=e.message;btn.disabled=false;}
    });
    dialog.showModal();
+   // No enfocar automáticamente la X ni el calendario (sin aro/teclado inicial).
+   dialog.focus({preventScroll:true});
    await update();
  }
  const observer=new MutationObserver(()=>{const el=document.getElementById("dash-billing-card");
