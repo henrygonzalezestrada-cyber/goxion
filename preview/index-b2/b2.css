@@ -105,3 +105,5 @@
 .gx-b2-service-flag{display:table;width:max-content;max-width:100%;margin-top:5px;padding:3px 7px;
  border:1px solid rgba(0,242,254,.25);border-radius:6px;background:rgba(0,242,254,.07);
  color:#94e9f3;font:700 9px/1.35 Poppins,sans-serif;letter-spacing:.3px}
+
+.gx-b2-row-meta .gx-b2-next-tag{margin:0 6px 0 0}
