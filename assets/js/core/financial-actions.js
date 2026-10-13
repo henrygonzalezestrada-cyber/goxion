@@ -28,6 +28,10 @@
     return json;
   }
 
+  // Reintentos de la misma aprobación reutilizan identidad incluso si se pierde
+  // la respuesta HTTP. Se renueva al cambiar cliente, periodo, monto o notas.
+  const approvalRetryKeys = new Map();
+
   async function approvePayment({
     clienteId,
     monto,
@@ -45,13 +49,17 @@
       throw new Error('Periodo de cobro inválido. Recarga la ficha antes de continuar.');
     }
 
+    const memo = String(notas || 'Aprobado desde Admin');
+    const key = JSON.stringify([cliente_id, periodo_esperado, Math.round(amount * 100),
+      puntual !== false, memo]);
+    if (approvalRetryKeys.size > 64) approvalRetryKeys.clear();
+    if (!approvalRetryKeys.has(key)) approvalRetryKeys.set(key, crypto.randomUUID());
+    const clave_idempotencia = approvalRetryKeys.get(key);
     const payload = await invoke('aprobar_pago', {
-      cliente_id,
-      monto: amount,
-      puntual: puntual !== false,
-      notas: String(notas || 'Aprobado desde Admin'),
-      periodo_esperado,
+      cliente_id, monto: amount, puntual: puntual !== false, notas: memo,
+      periodo_esperado, clave_idempotencia,
     });
+    approvalRetryKeys.delete(key);
 
     return {
       ...(payload.resultado || {}),

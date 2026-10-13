@@ -84,9 +84,28 @@ Deno.serve(async(req)=>{
       const client=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
       if(!client?.cliente_id)return res({ok:false,error:"Sesión de cliente inválida o expirada"},401);
       const acceso=await exigirClienteActivo(sb,String(client.cliente_id));if(!acceso.ok)return res({ok:false,error:acceso.error},acceso.status);
+      const clientId=String(client.cliente_id);
+      const state=await estado(clientId);
+      const opt=await sb.from("goxion_b2_regimen_cliente")
+        .select("activo,periodo_inicio").eq("cliente_id",clientId).maybeSingle();
+      if(opt.error)throw opt.error;
+      if(opt.data?.activo===true){
+        const ciclo=String(state?.periodo||"").slice(0,7)+"-01";
+        const b2=await sb.rpc("goxion_b2_cotizar_ciclo",{
+          p_cliente_id:clientId,p_periodo:ciclo
+        });
+        if(b2.error||b2.data?.ok!==true)return res({
+          ok:false,modo:"b2_sin_estado_cobrable",
+          error:"Calendario financiero pendiente de conciliación; contacta a soporte.",
+          permitir_pago_global:false
+        },409);
+        return res({ok:true,estado_financiero:state,modo:"b2_multifecha",
+          permitir_pago_global:false,calendario_financiero:b2.data,
+          fuente:"goxion_b2_cotizar_ciclo"});
+      }
       return res({
         ok:true,
-        estado_financiero:await estado(String(client.cliente_id)),
+        estado_financiero:state,
         modo:"oficial"
       });
     }
@@ -118,6 +137,25 @@ Deno.serve(async(req)=>{
       const calendario=calendarioInformativo({
         contratos:contracts.data||[],accesos:accesses.data||[],fechas:verified.data||[],hoy
       });
+      // Solo si Admin activó B2: exponer saldo individual verificado
+      // al PROPIO cliente que ya pasó el X-Client-Token firmado.
+      const opt=await sb.from("goxion_b2_regimen_cliente")
+        .select("activo").eq("cliente_id",clientId).maybeSingle();
+      if(opt.error)throw opt.error;
+      if(opt.data?.activo===true){
+        const state=await estado(clientId);
+        const periodo=String(state?.periodo||"").slice(0,7)+"-01";
+        const quote=await sb.rpc("goxion_b2_cotizar_ciclo",{
+          p_cliente_id:clientId,p_periodo:periodo
+        });
+        if(quote.error||quote.data?.ok!==true)return res({
+          ok:false,error:"El calendario de pagos requiere conciliación",
+          modo:"b2_sin_estado_cobrable",permitir_pago_global:false
+        },409);
+        return res({ok:true,calendario,calendario_financiero:quote.data,
+          permitir_pago_global:false,modo:"b2_multifecha",
+          fuente:"goxion_b2_cotizar_ciclo"});
+      }
       return res({ok:true,calendario,fuente:"goxion_calendario_accesos",modo:"solo_fechas_sin_cobro"});
     }
 
