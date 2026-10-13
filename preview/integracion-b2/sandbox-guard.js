@@ -29,7 +29,8 @@
    if(!link)return;
    try{
      const target=new URL(link.href,location.href);
-     if(!["http:","https:"].includes(target.protocol)||target.origin!==location.origin){
+     if(!["http:","https:"].includes(target.protocol)||target.origin!==location.origin||
+       !target.pathname.includes("/preview/integracion-b2/")){
        event.preventDefault();event.stopImmediatePropagation();
      }
    }catch{event.preventDefault()}
@@ -37,8 +38,12 @@
  document.addEventListener("submit",event=>event.preventDefault(),true);
  const originalOpen=window.open.bind(window);
  window.open=function(url,...args){
-  if(/^https?:/i.test(String(url||""))&&new URL(url,location.href).origin!==location.origin)
-   return null;
+  if(/^https?:/i.test(String(url||""))){
+    const destination=new URL(url,location.href);
+    if(destination.origin!==location.origin||
+       !destination.pathname.includes("/preview/integracion-b2/"))
+      return null;
+  }
   return originalOpen(url,...args);
  };
 })();
