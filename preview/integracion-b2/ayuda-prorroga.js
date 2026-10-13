@@ -10,6 +10,74 @@
    return new Intl.DateTimeFormat("es-MX",{day:"numeric",month:"long",timeZone:"UTC"}).format(new Date(Date.UTC(y,m-1,d)));
  };
  const plus=(iso,n)=>new Date(Date.parse(iso+"T00:00:00Z")+n*86400000).toISOString().slice(0,10);
+
+ // iOS Safari mantiene el documento desplazable detrás de <dialog>.
+ // Fijar la página y contener los gestos evita el "rubber band".
+ // Se restaura exactamente el scroll al salir, incluido Escape/cierre.
+ let releaseScroll=null;
+ function lockBehindDialog(dialog){
+   if(releaseScroll)releaseScroll();
+   const html=document.documentElement,body=document.body;
+   const saved={scrollX:window.scrollX,scrollY:window.scrollY,
+     htmlOverflow:html.style.overflow,htmlOverscroll:html.style.overscrollBehavior,
+     bodyPosition:body.style.position,bodyTop:body.style.top,
+     bodyLeft:body.style.left,bodyRight:body.style.right,
+     bodyWidth:body.style.width,bodyOverflow:body.style.overflow,
+     bodyTouch:body.style.touchAction};
+   html.style.overflow="hidden";
+   html.style.overscrollBehavior="none";
+   body.style.position="fixed";
+   body.style.top="-"+saved.scrollY+"px";
+   body.style.left="0";
+   body.style.right="0";
+   body.style.width="100%";
+   body.style.overflow="hidden";
+   let startY=0;
+   const onStart=event=>{
+     if(event.touches.length===1)startY=event.touches[0].clientY;
+   };
+   const onMove=event=>{
+     if(event.touches.length!==1)return;
+     const target=event.target;
+     if(!dialog.contains(target)){event.preventDefault();return}
+     // Únicamente el contenido del diálogo puede desplazarse, y solo
+     // cuando hay desbordamiento y aún puede avanzar en esa dirección.
+     const delta=event.touches[0].clientY-startY;
+     let el=target;
+     while(el&&el!==dialog.parentElement){
+       if(el instanceof Element&&el.scrollHeight>el.clientHeight+1){
+         const canUp=delta>0&&el.scrollTop>0;
+         const canDown=delta<0&&el.scrollTop+el.clientHeight<el.scrollHeight-1;
+         if(canUp||canDown)return;
+       }
+       if(el===dialog)break;
+       el=el.parentElement;
+     }
+     event.preventDefault();
+   };
+   document.addEventListener("touchstart",onStart,{passive:true,capture:true});
+   document.addEventListener("touchmove",onMove,{passive:false,capture:true});
+   let released=false;
+   releaseScroll=()=>{
+     if(released)return;
+     released=true;
+     document.removeEventListener("touchstart",onStart,true);
+     document.removeEventListener("touchmove",onMove,true);
+     html.style.overflow=saved.htmlOverflow;
+     html.style.overscrollBehavior=saved.htmlOverscroll;
+     body.style.position=saved.bodyPosition;
+     body.style.top=saved.bodyTop;
+     body.style.left=saved.bodyLeft;
+     body.style.right=saved.bodyRight;
+     body.style.width=saved.bodyWidth;
+     body.style.overflow=saved.bodyOverflow;
+     body.style.touchAction=saved.bodyTouch;
+     window.scrollTo(saved.scrollX,saved.scrollY);
+     releaseScroll=null;
+   };
+   return releaseScroll;
+ }
+
  let state=null,fetching=false,view=null,activeToken="",confirmKey=null;
  const storageKey="goxion-b2-espejo-pactado";
  const dueDate="2026-11-06";
@@ -120,15 +188,18 @@
        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
      '<h2 id="gx-prorroga-title">Un poco más de tiempo.</h2>'+
      '<p>Elige cuándo pagar. Mantendrás tu lealtad y evitarás mora si cumples el acuerdo.</p>'+
-     '<label class="gx-prorroga-field">Nueva fecha de pago<input type="date" data-gx-day min="'+
+     '<label class="gx-prorroga-field"><span>Nueva fecha de pago</span><input type="date" data-gx-day min="'+
        plus(state.fecha_original,1)+'" max="'+state.fecha_maxima+'" value="'+init+'" aria-describedby="gx-prorroga-date-error"></label>'+
      '<span id="gx-prorroga-date-error" class="gx-prorroga-date-error" role="alert" aria-live="polite" hidden></span>'+
      '<div class="gx-prorroga-line"><span>Fecha original</span><strong data-gx-old></strong></div>'+
      '<div class="gx-prorroga-line"><span>Acuerdo propuesto</span><strong data-gx-new></strong></div>'+
      '<div class="gx-prorroga-line gx-prorroga-main"><span>Si pagas en la nueva fecha</span><strong data-gx-protected></strong></div>'+
-     '<div class="gx-prorroga-risk"><span>Si incumples, al día siguiente deberás</span>'+
-       '<strong data-gx-missed></strong>'+
-       '<small>Mora retroactiva <b data-gx-mora></b> · Lealtad perdida <b data-gx-loyalty></b></small>'+
+     '<div class="gx-prorroga-risk"><span class="gx-prorroga-risk-title">Si incumples, al día siguiente deberás</span>'+
+       '<strong class="gx-prorroga-risk-total" data-gx-missed></strong>'+
+       '<div class="gx-prorroga-risk-details" aria-label="Desglose del incumplimiento">'+
+         '<div><span>Mora retroactiva</span><b data-gx-mora></b></div>'+
+         '<div><span>Lealtad perdida</span><b data-gx-loyalty></b></div>'+
+       '</div>'+
      '</div>'+
      '<p class="gx-prorroga-terms-copy">La mora comienza a contarse desde el vencimiento original. Una prórroga por período y máximo cinco días.</p>'+
      '<label class="gx-prorroga-consent"><input type="checkbox" data-gx-accept>'+
@@ -189,7 +260,7 @@
      }
    };
    dialog.querySelector("[data-gx-close]").addEventListener("click",()=>dialog.close());
-   dialog.addEventListener("close",()=>{confirmKey=null;dialog.remove();});
+   dialog.addEventListener("close",()=>{releaseScroll?.();confirmKey=null;dialog.remove();});
    day.addEventListener("input",update);
    day.addEventListener("change",update);
    confirm.addEventListener("change",()=>btn.disabled=!confirm.checked||!quote||!validDate(day.value));
@@ -214,10 +285,15 @@
        document.dispatchEvent(new CustomEvent("goxion:prorroga-activada",{detail:{demo}}));
      }catch(e){status.textContent=e.message;btn.disabled=false;}
    });
-   dialog.showModal();
-   // No enfocar automáticamente la X ni el calendario (sin aro/teclado inicial).
-   dialog.focus({preventScroll:true});
-   await update();
+   // Montar bloqueo ANTES de abrir el modal para impedir el salto de scroll.
+   const unlock=lockBehindDialog(dialog);
+   try{
+     dialog.showModal();
+     // El foco queda en el contenedor sin aro inicial; teclado sí conserva
+     // el estilo de :focus-visible en controles al navegar.
+     dialog.focus({preventScroll:true});
+     await update();
+   }catch(e){unlock();dialog.remove();throw e;}
  }
  const observer=new MutationObserver(()=>{const el=document.getElementById("dash-billing-card");
    if(el&&el!==view){view=el;activeToken="";refresh();}
