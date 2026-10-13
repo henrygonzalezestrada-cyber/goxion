@@ -241,6 +241,66 @@ Deno.serve(async (req) => {
         modo:"propuesta_sin_acreditacion",acreditada:false,cobrable:false});
     }
 
+    // B2: propietario ÚNICO de activación, cotización y acreditación
+    // individual. Exige sesión Admin comprobada antes de entrar aquí.
+    // Los clientes de fecha única nunca pasan por esta ruta.
+    if (["b2_activar_cliente","b2_cotizar_ciclo",
+         "b2_aprobar_abono","b2_unificar_cliente"].includes(action)) {
+      const clienteId=String(data?.cliente_id||"").trim();
+      const periodo=String(data?.periodo||"").trim();
+      if(!uuid.test(clienteId))return json({ok:false,
+        error:"Cliente inválido",codigo:"B2_CLIENTE_INVALIDO"},400);
+      const requirePeriod=action==="b2_activar_cliente"||action==="b2_cotizar_ciclo";
+      if(requirePeriod&&!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(periodo))
+        return json({ok:false,error:"Período B2 inválido",codigo:"B2_PERIODO_INVALIDO"},400);
+      const actor="admin:b2-gateway";
+      let rpc="",args:Record<string,unknown>={p_cliente_id:clienteId};
+      if(action==="b2_activar_cliente"){
+        if(data?.confirmar_activacion!==true)return json({ok:false,
+          error:"Se requiere confirmar la activación del régimen multifecha",
+          codigo:"B2_CONFIRMACION_OBLIGATORIA"},400);
+        rpc="goxion_b2_activar_cliente";
+        args={...args,p_periodo:periodo,p_confirmado:true,p_actor:actor};
+      }else if(action==="b2_unificar_cliente"){
+        if(data?.confirmar_unificacion!==true)return json({ok:false,
+          error:"Unificar fechas requiere confirmación Admin",
+          codigo:"B2_CONFIRMACION_OBLIGATORIA"},400);
+        rpc="goxion_b2_desactivar_cliente";
+        args={...args,p_confirmado:true,p_actor:actor};
+      }else if(action==="b2_cotizar_ciclo"){
+        rpc="goxion_b2_cotizar_ciclo";
+        // La fecha actual SIEMPRE se obtiene del servidor SQL.
+        args={...args,p_periodo:periodo};
+      }else{
+        const cargoId=String(data?.cargo_id||"").trim();
+        const key=String(data?.clave_idempotencia||"").trim();
+        const monto=Number(data?.monto_centavos);
+        const expected=Number(data?.saldo_esperado_centavos);
+        const nota=String(data?.nota||"").slice(0,400);
+        if(!uuid.test(cargoId)||!uuid.test(key)||!Number.isSafeInteger(monto)||
+          !Number.isSafeInteger(expected)||monto<=0||expected<=0||monto>expected){
+          return json({ok:false,error:"Cargo, monto, saldo y clave no válidos",
+            codigo:"B2_ABONO_INVALIDO"},400);
+        }
+        if(data?.confirmar_aprobacion!==true)return json({ok:false,
+          error:"Admin debe confirmar la aprobación del comprobante individual",
+          codigo:"B2_CONFIRMACION_OBLIGATORIA"},400);
+        rpc="goxion_b2_aprobar_abono";
+        args={...args,p_cargo_id:cargoId,p_monto_centavos:monto,
+          p_saldo_esperado_centavos:expected,p_operation_id:key,p_nota:nota};
+      }
+      const applied=await sb.rpc(rpc,args);
+      if(applied.error||applied.data?.ok!==true)return json({ok:false,
+        error:applied.error?.message||"Operación B2 no disponible",
+        codigo:"B2_CONCILIACION_REQUERIDA",acreditada:false,
+        operation_id:operationId},409);
+      return json({ok:true,accion:action,resultado:applied.data,
+        contrato:"goxion-b2-por-acceso-v1",
+        operation_id:String(data?.clave_idempotencia||operationId),
+        cobrable:action==="b2_cotizar_ciclo"?false:undefined,
+        acreditada_b2:action==="b2_aprobar_abono"?true:false});
+    }
+
     if (action === "aprobar_pago") {
       const clienteId = String(data?.cliente_id || "").trim();
       const monto = Number(data?.monto ?? 0);
