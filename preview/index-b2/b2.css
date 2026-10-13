@@ -46,3 +46,7 @@
 .gx-b2-info-short{font-size:11px;color:#b7c8d9;margin:6px 0 0}
 @media(max-width:360px){.gx-b2-head-amount{font-size:13px}.gx-b2-toggle{padding:13px}.gx-b2-content{padding:0 12px 14px}.gx-b2-choice{font-size:9px}.gx-b2-row-side strong{font-size:12px}.gx-b2-beta-banner{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.gx-b2-reveal,.gx-b2-chevron{transition:none!important}}
+
+/* En iPhone el encabezado del sheet no debe interceptar la X. */
+.gx-payment-v2 #payment-modal .close-modal{position:absolute;z-index:8}
+.gx-payment-v2 .gx-payment-upload-head{position:relative;z-index:1}
