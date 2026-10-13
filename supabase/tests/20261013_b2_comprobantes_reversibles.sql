@@ -9,6 +9,7 @@ DECLARE
  x record;y record; d jsonb; quote jsonb;
  a int;b int;r1 uuid;rep_op uuid:=gen_random_uuid();ap_op uuid:=gen_random_uuid();
  item_op1 uuid:=gen_random_uuid();item_op2 uuid:=gen_random_uuid();
+ file_ref text;
  j jsonb;wrong jsonb;reject_ok boolean:=false;
 BEGIN
  if extract(day from v_hoy)>25 then raise exception 'Fixture solo permitido antes del día 26';end if;
@@ -46,12 +47,17 @@ BEGIN
  select (item->>'total_centavos')::int into b
  from jsonb_array_elements(quote->'cargos') item where item->>'cargo_id'=y.id::text;
  if a is null or b is null or a<=0 or b<=0 then raise exception 'Cotización inválida';end if;
- d=public.goxion_b2_registrar_comprobante(cid,cy,a+b,
-  'fixture/comprobante/'||rep_op::text,rep_op);
+ file_ref=cid::text||'/'||rep_op::text||'-55aaccee10ef011a.png';
+ -- Simula SÓLO el índice de evidencia privada en transacción reversible;
+ -- la existencia de bytes reales se probará desde Edge/storage, no aquí.
+ insert into storage.objects(bucket_id,name,metadata)
+ values('goxion-b2-evidencias',file_ref,'{"mimetype":"image/png","size":128}'::jsonb);
+ d=public.goxion_b2_registrar_comprobante_seguro(cid,cy,a+b,
+  file_ref,rep_op,array[x.id,y.id]);
  r1=(d->>'reporte_id')::uuid;
  if d->>'acreditado'<>'false' then raise exception 'Reporte sin aprobación acreditó';end if;
- d=public.goxion_b2_registrar_comprobante(cid,cy,a+b,
-  'fixture/comprobante/'||rep_op::text,rep_op);
+ d=public.goxion_b2_registrar_comprobante_seguro(cid,cy,a+b,
+  file_ref,rep_op,array[x.id,y.id]);
  if d->>'repetido'<>'true' or (d->>'reporte_id')::uuid<>r1 then
   raise exception 'Reintento del reporte duplicó recibo';end if;
  j=jsonb_build_array(
