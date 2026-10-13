@@ -32,7 +32,6 @@
    body.style.right="0";
    body.style.width="100%";
    body.style.overflow="hidden";
-   body.style.touchAction="none";
    let startY=0;
    const onStart=event=>{
      if(event.touches.length===1)startY=event.touches[0].clientY;
