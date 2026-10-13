@@ -95,6 +95,11 @@
   const previousFetch = window.fetch.bind(window);
   window.fetch = async function (input, init) {
     const url = typeof input === "string" ? input : (input && input.url) || "";
+    if (demo && (/^goxion:\/\//i.test(url)||/discord(?:app)?\.com/i.test(url))) {
+      return new Response(JSON.stringify({ok:false,modo:"demo_sin_envios"}),{
+        status:403,headers:{"Content-Type":"application/json"}
+      });
+    }
     if (!url.includes("clientes.json")) return previousFetch(input,init);
     if (demo) return new Response(JSON.stringify(fixture()), {
       status:200,headers:{"Content-Type":"application/json"}
