@@ -18,16 +18,32 @@ for (const engine of [chromium,webkit]){
   assert.match(await page.locator(".total-amount").innerText(),/\$92\.12/);checks++;
   const over=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(over<=1,"Overflow "+engine.name()+" "+width+": "+over);checks++;
+  assert.equal(await page.evaluate(()=>
+    document.querySelector(".services-container")?.nextElementSibling?.id==="b2-calendar"
+  ),true,"Calendario debe aparecer DESPUÉS de servicios");checks++;
   await page.locator("#b2-toggle").click();
   assert.equal(await page.locator("#b2-toggle").getAttribute("aria-expanded"),"true");checks++;
+  assert.equal(await page.locator(".gx-b2-row.is-next").count(),1);checks++;
+  assert.match(await page.locator(".gx-b2-next-tag").innerText(),/PRÓXIMO/);checks++;
   await page.locator('[data-b2-mode="todo"]').click();
   assert.match(await page.locator("#b2-selected-total").innerText(),/\$92\.12/);checks++;
-  await page.locator('[data-b2-mode="abono"]').click();
+  assert.equal(await page.locator('[data-b2-mode="abono"]').count(),0,"Abono no debe estar en la selección principal");checks++;
+  assert.equal(await page.locator("#b2-help").isVisible(),false);checks++;
+  await page.locator("[data-b2-alternatives]").click();
   await page.locator("#b2-partial").fill("20.00");
   assert.match(await page.locator("#b2-selected-total").innerText(),/\$20\.00/);checks++;
+  assert.match(await page.locator("[data-b2-mora]").innerText(),/\$0\.00/);checks++;
+  assert.match(await page.locator("[data-b2-restante]").innerText(),/\$26\.06/);checks++;
+  assert.match(await page.locator("[data-b2-diaria]").innerText(),/\$1\.30/);checks++;
+  assert.equal(await page.locator(".gx-b2-help-link").getAttribute("href"),"./ayuda.html");checks++;
   await page.locator('[data-b2-scenario="vencido"]').click();
   assert.match(await page.locator(".total-amount").innerText(),/\$100\.45/);checks++;
   assert.equal(await page.locator(".gx-b2-row.is-late").count(),1);checks++;
+  assert.match(await page.locator(".gx-b2-next-tag").innerText(),/VENCIDO/);checks++;
+  await page.locator("[data-b2-alternatives]").click();
+  assert.match(await page.locator("[data-b2-mora]").innerText(),/\$2\.45/);checks++;
+  assert.match(await page.locator("[data-b2-restante]").innerText(),/\$31\.45/);checks++;
+  assert.match(await page.locator("[data-b2-diaria]").innerText(),/\$1\.45/);checks++;
   await page.locator('[data-b2-scenario="primero-pagado"]').click();
   assert.match(await page.locator(".total-amount").innerText(),/\$46\.06/);checks++;
   await page.locator("#b2-toggle").click();
