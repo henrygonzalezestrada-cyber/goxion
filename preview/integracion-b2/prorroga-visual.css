@@ -205,9 +205,33 @@ body:has(#gx-prorroga-dialog[open]){
   border-radius:0;
   margin:3px 0 0;
   padding:17px 0 16px;
-  background:
-    radial-gradient(ellipse 58% 67% at 15% 45%,rgba(225,85,142,.095),transparent 90%);
+  /* El degradado original se cortaba contra el borde izquierdo del
+     bloque y formaba un rectángulo visible en iPhone. */
+  background:transparent;
+  overflow:visible;
   text-align:left;
+}
+/* Halo interno, difuminado por los cuatro lados: no existe pared
+   rectangular de luz al inicio de la sección. */
+#gx-prorroga-dialog .gx-prorroga-risk::before{
+  content:"";
+  position:absolute;
+  pointer-events:none;
+  z-index:0;
+  top:31px;
+  left:28px;
+  width:min(49%,210px);
+  height:84px;
+  border-radius:50%;
+  background:radial-gradient(ellipse at center,
+    rgba(243,91,146,.13) 0%,rgba(236,89,146,.055) 37%,transparent 75%);
+  filter:blur(18px);
+}
+#gx-prorroga-dialog .gx-prorroga-risk-title,
+#gx-prorroga-dialog .gx-prorroga-risk-total,
+#gx-prorroga-dialog .gx-prorroga-risk-details{
+  position:relative;
+  z-index:1;
 }
 #gx-prorroga-dialog .gx-prorroga-risk-title{
   display:block;
@@ -278,4 +302,17 @@ body:has(#gx-prorroga-dialog[open]){
   #gx-prorroga-dialog .gx-prorroga-risk-total{
     font-size:30px;
   }
+}
+
+/* La cápsula vuelve a emplear exactamente la jerarquía nativa
+   time-badge + badge-ok del dashboard, neutralizando el font shorthand
+   de la antigua etiqueta beta. */
+#dash-badge .time-badge.gx-prorroga-state{
+  font-family:inherit;
+  font-size:11px;
+  font-weight:700;
+  line-height:normal;
+  letter-spacing:normal;
+  padding:6px 12px;
+  border-radius:20px;
 }
