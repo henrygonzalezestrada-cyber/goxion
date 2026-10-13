@@ -85,3 +85,17 @@ El usuario puede decir: «Avanza con F2», «Detente en F3», «Pulamos F1» o �
 - F2: instalada la migración SQL aditiva `goxion_aprobar_pago_periodo_atomico`, sin conectarla al gateway oficial ni crear operaciones. Se verificó `anon=false`, `authenticated=false`, `service_role=true`, y tabla de operaciones vacía. El cobro global vigente continúa sin cambios.
 - **Bloqueadores que quedan:** enlace comprobante real → obligación por acceso y aprobación atómica sin doble recibo; atribución verificable de beneficios especiales/promociones/cupones/mora; pruebas de extremo a extremo sobre fuente de verdad; y actualización controlada de Admin/Index/Ayuda más adelante en F3.
 - **No activar régimen B2 ni fusionar PR #96/#97 mientras falten estas garantías.**
+
+
+## Corte F2 · 13/oct/2026 — implementación y prueba transaccional
+
+**F2 todavía abierta — no iniciar F3:** La infraestructura B2 tiene ahora una segunda frontera SQL transaccional por comprobante en PR #96. Se instalaron de modo aditivo:
+- `goxion_aprobar_pago_periodo_atomico` (pago mensual GLOBAL, aún no en gateway oficial).
+- `goxion_b2_comprobantes` + `goxion_b2_comprobante_aplicaciones`; RPCs `goxion_b2_registrar_comprobante` (no acredita) y `goxion_b2_aprobar_comprobante` (Admin acredita 1-N cargos en una sola transacción). Segunda migración almacena `asignaciones_aprobadas` y rechaza cambiar destino/importe con misma clave de aprobación.
+- B2 Admin gateway beta v3 desplegada: `b2_aprobar_comprobante` autenticado y `b2_aprobar_abono` directo bloqueado por `B2_REQUIERE_COMPROBANTE`. **No modifica el gateway oficial.**
+
+**Pruebas ejecutadas en base real con ROLLBACK:** `supabase/tests/20261013_b2_comprobantes_reversibles.sql` pasó doble aplicación de dos servicios, error en segundo revierte el primero, reintento sin duplicación, alteración de asignaciones denegada y un recibo consolidado. `supabase/tests/20261012_aprobacion_global_atomica_reversible.sql` también pasó al adaptar el fixture a la nueva regla de prórroga máximo cinco días. Al finalizar: 22 clientes, 28 recibos, 0 cuentas B2 activas, 0 reportes/aplicaciones/cargos. Solo `service_role` ejecuta RPCs. Pruebas estáticas extra en `scripts/b2-comprobante-ledger-smoke.mjs`.
+
+**Pendientes bloqueantes de F2:** (1) evidencia auténtica de transferencia protegida, que una ruta de cliente autenticada podrá asociar sin confiar en URL libre; (2) **atribución y consumo único por acceso** de promociones, cupones, beneficios y Trato Justo: motor actual rechaza esos casos, no permite reparto arbitrario; (3) aprobación global atómica aún no sustituye la ruta legacy oficial, por lo que falta despliegue y pruebas integrales con respaldo; (4) ciclos/prórrogas y estados financieros en escenario real opt-in controlado; (5) prueba Admin de la nueva ruta B2 con evidencia validada en entorno seguro.
+
+**Prohibido declarar F2 terminada** solo con prueba de recibo ficticio. Mantener clientes de fecha única y sus pagos originales protegidos mientras se trabaja en estos bloqueos. La F1 visual aprobada no necesita cambios.
