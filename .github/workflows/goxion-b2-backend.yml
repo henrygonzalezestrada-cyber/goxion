@@ -41,3 +41,4 @@ jobs:
           npx playwright install --with-deps chromium webkit
       - name: Validar beta Index · Chromium y WebKit
         run: npm run test:index:b2:browser
+          npm run test:ayuda:prorroga:browser
