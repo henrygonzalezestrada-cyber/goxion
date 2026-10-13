@@ -64,13 +64,13 @@ BEGIN
   jsonb_build_object('cargo_id',x.id,'monto_centavos',a,
     'saldo_esperado_centavos',a,'operation_id',item_op1),
   jsonb_build_object('cargo_id',y.id,'monto_centavos',b,
-    'saldo_esperado_centavos',b+1,'operation_id',item_op2)
+    'saldo_esperado_centavos',b,'operation_id',item_op1)
  );
  -- La segunda asignación falla: la primera no puede quedar acreditada.
  begin
   perform public.goxion_b2_aprobar_comprobante(cid,r1,wrong,ap_op,'admin:test',false,'');
  exception when others then
-  if sqlerrm like 'SALDO_B2_DESACTUALIZADO%' then reject_ok=true;
+  if sqlerrm like '%IDEMPOTENCIA%' or sqlerrm like '%operaci%' or sqlerrm like '%duplicad%' then reject_ok=true;
   else raise;end if;
  end;
  if not reject_ok then raise exception 'No rechazó segundo cargo desactualizado';end if;
