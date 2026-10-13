@@ -85,6 +85,15 @@ try{
    await page.locator("[data-gx-accept]").check();
    check(await page.locator("[data-gx-activate]").isDisabled(),
      "Confirmar condiciones no desbloquea una fecha inválida");
+   await field.fill("2026-11-06");
+   check(await field.getAttribute("aria-invalid")==="true",
+     "La fecha original tampoco puede pactarse");
+   await field.fill("2026-11-11");
+   await page.waitForFunction(()=>document.querySelector('[data-gx-missed]')?.textContent?.includes("63.70"));
+   check(await field.getAttribute("aria-invalid")==="false",
+     "El quinto día exacto sí está permitido");
+   check((await page.locator("[data-gx-missed]").textContent()).includes("63.70"),
+     "Cálculo correcto del quinto día");
    await field.fill("2026-11-09");
    await page.waitForFunction(()=>document.querySelector('[data-gx-missed]')?.textContent?.includes("58.80"));
    check(await field.getAttribute("aria-invalid")==="false","Fecha válida recupera aspecto normal");
