@@ -49,13 +49,16 @@
      let shown=card.querySelector(".gx-prorroga-active");
      if(!shown){shown=document.createElement("div");
        shown.className="gx-prorroga-active";anchor.insertAdjacentElement("afterend",shown);}
-     shown.innerHTML='<span class="gx-prorroga-eyebrow">ACUERDO PACTADO</span>'+
+     const markup='<span class="gx-prorroga-eyebrow">ACUERDO PACTADO</span>'+
        '<strong>'+label(state.acuerdo.fecha_pactada)+'</strong>'+
        '<small>Conservas tu lealtad si pagas dentro del plazo.</small>';
+     if(shown.innerHTML!==markup)shown.innerHTML=markup;
      const dateEl=card.querySelector("#dash-date");
-     if(dateEl)dateEl.textContent=label(state.acuerdo.fecha_pactada);
+     if(dateEl&&dateEl.textContent!==label(state.acuerdo.fecha_pactada))
+       dateEl.textContent=label(state.acuerdo.fecha_pactada);
      const badge=card.querySelector("#dash-badge");
-     if(badge)badge.innerHTML='<span class="gx-prorroga-state">Prórroga activa · Pago protegido</span>';
+     const badgeMarkup='<span class="gx-prorroga-state">Prórroga activa · Pago protegido</span>';
+     if(badge&&badge.innerHTML!==badgeMarkup)badge.innerHTML=badgeMarkup;
      return;
    }
    card.querySelector(".gx-prorroga-active")?.remove();
