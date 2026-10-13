@@ -12,8 +12,15 @@ BEGIN
   'B2 6PCT ROLLBACK',6,'pagado','2026-11-01',10);
  insert into public.cliente_servicios(cliente_id,servicio_id,nombre,monto,activo)
  values(cid,sid,'Vix Premium (x2)',98,true);
+ -- La infraestructura crea normalmente un acceso heredado; la segunda
+ -- unidad de X2 se asigna explícitamente por Admin en el fixture.
+ if (select count(*) from public.cliente_accesos where cliente_id=cid and activo)=1 then
+  insert into public.cliente_accesos(cliente_servicio_id,cliente_id,servicio_id,ordinal,activo)
+  select s.id,s.cliente_id,s.servicio_id,2,true from public.cliente_servicios s
+  where s.cliente_id=cid and s.activo;
+ end if;
  if (select count(*) from public.cliente_accesos where cliente_id=cid and activo)<>2 then
-   raise exception 'La prueba requiere dos accesos reales';end if;
+  raise exception 'La prueba requiere dos accesos reales';end if;
  insert into public.goxion_calendario_accesos(cliente_acceso_id,cliente_servicio_id,cliente_id,
  cobertura_hasta,dia_corte,precio_centavos,estado,verificado_en,actualizado_por,revision)
  select a.id,a.cliente_servicio_id,cid,
