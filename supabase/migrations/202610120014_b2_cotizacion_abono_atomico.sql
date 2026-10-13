@@ -182,6 +182,9 @@ begin
     and public.goxion_periodo_pago_canonico(periodo)=v_ciclo.periodo) then
    raise exception 'Pago global ya existe: impedir doble acreditación';
   end if;
+  -- Sólo ESTA transacción puede insertar el recibo global B2.
+  -- El trigger de guardia bloqueará cualquier aprobación mensual paralela.
+  perform pg_catalog.set_config('goxion.b2_recibo_autorizado',v_ciclo.id::text,true);
   -- ÚNICO comprobante consolidado para historial y triggers existentes.
   insert into public.pagos(cliente_id,fecha,periodo,monto,estado,notas,
    puntual,lealtad_efecto,racha_resultado)
@@ -189,6 +192,7 @@ begin
    'B2: liquidación de vencimientos por acceso',
    not v_lealtad_perdida,
    case when v_lealtad_perdida then 'reinicio' else 'sumo' end,v_streak);
+  perform pg_catalog.set_config('goxion.b2_recibo_autorizado','',true);
   update public.clientes set
    pagos_puntuales=v_streak,estado='pagado',pago_en_revision=false,
    periodo_pendiente=(v_ciclo.periodo+interval '1 month')::date,
