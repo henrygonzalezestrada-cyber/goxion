@@ -14,12 +14,12 @@
 
 Los 319+ checks de interfaz demuestran la navegación y las simulaciones, NO validan cobros reales. No llamar completada una fase cuando solo existan pruebas visuales.
 
-## F0 · Inventario y protección de producción — EN CURSO
+## F0 · Inventario y protección de producción — CERRADA 13/OCT/2026
 - [x] Identificar archivos propietarios y PR #96, #97 e Issue #98.
 - [x] Separar funciones de backend instaladas, calendario guardado y funciones operativas reales.
 - [ ] Comparar index.html, ayuda.html, admin.html oficiales con las modificaciones propuestas: integrar pequeñas funciones, no copiar la beta sobre el oficial.
-- [ ] Diagnosticar/solucionar GOXION Integrity en main (incluido HTML huérfano comunicaciones.html y fallos secundarios de scripts) SIN silenciar pruebas.
-- [ ] Verificar bloqueo de activación, plan de rollback, respaldo y protección de cartera de día 15.
+- [x] GOXION Integrity en main verde (run 38479997185): página Comunicaciones reconocida, Playwright instalado en orden correcto, aserción VM y espera WebKit corregidas, todas las pruebas pasaron.
+- [x] Verificado por SQL en producción: cero cuentas B2 activas, cero ciclos/cargos, 22 clientes y 28 pagos históricos. El esquema aditivo de aprobación atómica no está conectado al gateway operativo; fecha única continúa legacy. Rollback de activación B2 por opt-in.
 **Entrega:** inventario, línea base limpia, estrategia de flag y reversión. **Puerta:** no afectar clientes actuales.
 
 ## F1 · Cerrar UX en betas espejo — APROBADA POR EL USUARIO 13/OCT/2026
@@ -80,7 +80,7 @@ El usuario puede decir: «Avanza con F2», «Detente en F3», «Pulamos F1» o �
 
 ## Avance verificado de F0/F2 · 13/oct/2026
 - **F1 cerrada por aprobación explícita del usuario**; conservar la beta aprobada sin nuevos rediseños.
-- F0: en `main`, el verificador reconoce `comunicaciones.html`, instala Playwright antes de probar y corrige el test de foco entre VM; WebKit/Ayuda tuvo un timeout de 2,5 s y se aumentó a 6,5 s sin retirar la condición visual. **Esperar ejecución íntegra CI verde antes de cerrar F0.**
+- F0 CERRADA (Integrity 38479997185): en `main`, el verificador reconoce `comunicaciones.html`, instala Playwright antes de probar y corrige el test de foco entre VM; WebKit/Ayuda tuvo un timeout de 2,5 s y se aumentó a 6,5 s sin retirar la condición visual. **GitHub Actions íntegro terminó en verde.**
 - Supabase: **22 clientes, 28 pagos, 0 B2 activos, 0 cargos/ciclos B2** comprobados antes y después.
 - F2: instalada la migración SQL aditiva `goxion_aprobar_pago_periodo_atomico`, sin conectarla al gateway oficial ni crear operaciones. Se verificó `anon=false`, `authenticated=false`, `service_role=true`, y tabla de operaciones vacía. El cobro global vigente continúa sin cambios.
 - **Bloqueadores que quedan:** enlace comprobante real → obligación por acceso y aprobación atómica sin doble recibo; atribución verificable de beneficios especiales/promociones/cupones/mora; pruebas de extremo a extremo sobre fuente de verdad; y actualización controlada de Admin/Index/Ayuda más adelante en F3.
