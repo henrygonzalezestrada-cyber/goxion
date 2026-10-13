@@ -42,6 +42,13 @@ try{
   for(const width of [320,390,768]){
    const context=await browser.newContext({viewport:{width,height:850}});
    await context.route("https://**/*",route=>route.fulfill({status:200,body:"",contentType:"text/javascript"}));
+   // Estos módulos ESM también forman parte de la interfaz oficial. Dar
+   // un contrato no operativo pero válido evita fallos por CDN sin export.
+   await context.route("https://esm.sh/**",route=>route.fulfill({
+     status:200,contentType:"text/javascript",body:
+       'export const animate=()=>({finished:Promise.resolve(),stop(){},cancel(){},pause(){}});'+
+       'export const createMorph=()=>({to(){},play(){},cancel(){},destroy(){}});'
+   }));
    const page=await context.newPage(),errors=[];
    page.on("pageerror",e=>errors.push(e.message));
    await page.goto(base+"/preview/integracion-b2/ayuda.html?demo=1",{waitUntil:"domcontentloaded"});
