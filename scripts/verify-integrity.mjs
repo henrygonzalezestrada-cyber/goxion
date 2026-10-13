@@ -5,7 +5,9 @@ import { spawnSync } from 'node:child_process';
 const ROOT = process.cwd();
 const failures = [];
 const PAGES = ['index', 'ayuda', 'admin'];
-const ALLOWED_ROOT_HTML = new Set(PAGES.map((page) => page + '.html'));
+// Comunicaciones es una superficie oficial de Gestión enlazada desde Admin.
+// La verificación de su comportamiento permanece en test:comunicaciones.
+const ALLOWED_ROOT_HTML = new Set([...PAGES.map((page) => page + '.html'), 'comunicaciones.html']);
 
 function fail(message) {
   failures.push(message);
