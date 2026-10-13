@@ -22,7 +22,7 @@ check(ui.includes("services-container")&&ui.includes('insertAdjacentElement("aft
 check(ui.includes("gx-b2-reveal")&&ui.includes("aria-expanded"),"Animación y ARIA");
 check(ui.includes('["proximo","Próximo vencimiento"]')&&ui.includes('["todo","Todo junto"]'),"Solo pago próximo y todo junto en selección principal");
 check(ui.includes("¿No puedes pagar en tu fecha?")&&ui.includes("data-b2-alternatives"),"Prórroga como opción secundaria");
-check(ui.includes("gx-b2-confirm-alert")&&ui.includes("mora retroactiva"),"Aviso de mora retroactiva antes de solicitar");
+check(ui.includes("gx-b2-confirm-alert")&&ui.includes("Mora retroactiva"),"Aviso de mora retroactiva antes de solicitar");
 check(ui.includes("gx-b2-terms")&&ui.includes("Solicitar prórroga"),"Confirmación con consentimiento");
 check(ui.includes('type="date"')&&ui.includes("addDays(selectedCharge.vence,5)"),"Selector de fecha máximo cinco días");
 check(!ui.includes('data-b2-mode="abono"')&&!ui.includes('id="b2-partial"'),"Sin abonos como opción habitual");
