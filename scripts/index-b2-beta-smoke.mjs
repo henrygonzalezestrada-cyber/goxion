@@ -25,7 +25,10 @@ check(!ui.includes('data-b2-mode="abono"')&&!ui.includes('id="b2-partial"'),"Sin
 check(!ui.includes("data-b2-review")&&!ui.includes("gx-b2-confirm"),"Index no ofrece solicitudes; sólo refleja acuerdos");
 check(ui.includes("Acuerdo pactado"),"Index muestra acuerdo pactado si existe");
 check(ui.includes("gx-b2-next-tag")&&ui.includes("PRÓXIMO"),"Distintivo del próximo vencimiento");
-check(css.includes("gxB2NextBeacon")&&css.includes("prefers-reduced-motion"),"Indicador animado accesible");
+check(css.includes("gxB2NextSheen")&&css.includes("gxB2TextLight")&&css.includes("prefers-reduced-motion"),"Énfasis premium por iluminación sin iconos");
+check(!ui.includes("gx-b2-ico")&&!ui.includes("gx-b2-mark"),"Sin barras ni puntos delante de los vencimientos");
+check(!css.includes(".gx-b2-row.is-next:before")&&!css.includes(".gx-b2-mark"),"CSS sin bordes iniciales ni marcadores redondos");
+check(css.includes("background-clip:text"),"Distintivo tipográfico sin cápsulas");
 check(ui.includes("solo_cotizacion")===false,"Los términos de la prórroga no acreditan pago");
 check(ui.includes("goxion:b2-quote-change"),"Escenarios actualizables");
 check(ui.includes("store.report")&&ui.includes("cargo_ids"),"Datos del reporte por obligación");
