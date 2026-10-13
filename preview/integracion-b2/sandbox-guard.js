@@ -24,6 +24,17 @@
  if(navigator.sendBeacon) {
   try{navigator.sendBeacon=()=>false}catch(_){}
  }
+ document.addEventListener("click",event=>{
+   const link=event.target.closest?.("a[href]");
+   if(!link)return;
+   try{
+     const target=new URL(link.href,location.href);
+     if(!["http:","https:"].includes(target.protocol)||target.origin!==location.origin){
+       event.preventDefault();event.stopImmediatePropagation();
+     }
+   }catch{event.preventDefault()}
+ },true);
+ document.addEventListener("submit",event=>event.preventDefault(),true);
  const originalOpen=window.open.bind(window);
  window.open=function(url,...args){
   if(/^https?:/i.test(String(url||""))&&new URL(url,location.href).origin!==location.origin)
