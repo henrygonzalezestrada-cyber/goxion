@@ -41,6 +41,7 @@ begin
  if v_ciclo.estado<>'pendiente' or
     v_ciclo.periodo is distinct from v_cliente.periodo_pendiente
  then raise exception 'CICLO_NO_DISPONIBLE';end if;
+ if v_cliente.pago_en_revision then raise exception 'PRORROGA_PAGO_EN_REVISION';end if;
  if v_hoy<>v_cargo.fecha_vencimiento
   or p_fecha_pactada<=v_cargo.fecha_vencimiento
   or p_fecha_pactada>v_cargo.fecha_vencimiento+5
@@ -50,6 +51,14 @@ begin
  if exists(select 1 from public.goxion_b2_prorrogas
   where cliente_id=p_cliente_id and ciclo_id=v_ciclo.id)
  then raise exception 'PRORROGA_USADA_EN_ESTE_CICLO';end if;
+ -- La extensión NO puede solaparse con otro acceso cuyo vencimiento
+ -- todavía está pendiente: sin esto prometería conservar lealtad cuando
+ -- otra fecha se perdería antes.
+ if exists(select 1 from public.goxion_b2_cargos b
+  where b.ciclo_id=v_ciclo.id and b.id<>v_cargo.id and not b.liquidado
+  and b.fecha_vencimiento>v_cargo.fecha_vencimiento
+  and b.fecha_vencimiento<=p_fecha_pactada)
+ then raise exception 'PRORROGA_CRUZA_OTRO_VENCIMIENTO';end if;
  -- Una fecha independiente que ya se venció descalifica la prórroga:
  -- la lealtad global ya se perdió y no puede revivirse.
  if exists(select 1 from public.goxion_b2_cargos b
