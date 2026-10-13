@@ -12,25 +12,7 @@
  };
  const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- let mode="proximo",selected=null,expanded=false,alternativesOpen=false,lastAnchor=null;
- let pactDate="",proposal=null;
- const addDays=(iso,n)=>{
-  const time=Date.parse(iso+"T00:00:00Z");
-  return Number.isFinite(time)?new Date(time+n*86400000).toISOString().slice(0,10):"";
- };
- const dayDiff=(a,b)=>Math.round((Date.parse(b+"T00:00:00Z")-Date.parse(a+"T00:00:00Z"))/86400000);
- const protect=(row,chosen)=>{
-  if(!row||!/^\d{4}-\d{2}-\d{2}$/.test(String(chosen||"")))
-   return null;
-  const delta=dayDiff(row.vence,chosen);
-  if(delta<1||delta>5)return null;
-  const original=row.total_centavos;
-  const subtotal=row.principal_centavos+row.descuento_centavos;
-  const mora=Math.min(Math.round(row.base_centavos*.5),
-    Math.round(subtotal*Math.min(delta+1,10)*.05));
-  return {original,chosen,delta,mora,lealtad:row.descuento_centavos,
-    missed:subtotal+mora,access:row};
- };
+ let mode="proximo",selected=null,expanded=false,lastAnchor=null;
  let installed=false;
  function rows(){
   return Array.isArray(store.quote?.cargos)?store.quote.cargos.map((x,i)=>({
@@ -82,7 +64,8 @@
   const label=document.createElement("small");
   label.className="gx-b2-service-flag";
   label.textContent=due.mora_centavos>0?
-    "VENCIDO · Perfil "+due.ordinal:"PRÓXIMO · Perfil "+due.ordinal+" · "+date(due.vence);
+    "VENCIDO · Perfil "+due.ordinal:"PRÓXIMO A VENCER · Perfil "+due.ordinal+" · "+date(due.vence);
+  label.classList.toggle("is-late",due.mora_centavos>0);
   matches[0].querySelector(".service-name")?.appendChild(label);
  }
  function updateHeader(){
@@ -96,7 +79,7 @@
   if(label)label.textContent="Saldo total por vencimientos";
   if(amount)amount.textContent=money(total);
   if(badge){
-   badge.textContent=due?(due.mora_centavos>0?"⚠️ Mora en un servicio":"◷ Próximo: "+date(due.vence)):"✓ Servicios al corriente";
+   badge.textContent=due?(due.mora_centavos>0?"Servicio vencido · "+date(due.vence):"Próximo pago · "+date(due.vence)):"Servicios al corriente";
    badge.className="time-badge "+(due?.mora_centavos>0?"badge-overdue":due?"badge-ok":"badge-paid");
   }
   const period=document.querySelector(".card-info .info-block.full .value");
@@ -117,36 +100,25 @@
     "Prórroga hasta "+date(due.fecha_pactada):"Vence "+date(due.vence)):
     "Sin pagos pendientes";
   const chosen=choice();
-  const selectedCharge=pending().find(x=>x.cargo_id===selected)||due;
-  const pactable=Boolean(selectedCharge&&
-    !store.quote?.lealtad_global_perdida&&selectedCharge.mora_centavos===0&&
-    selectedCharge.prorroga_estado!=="aprobada");
-  const firstDate=selectedCharge?addDays(selectedCharge.vence,1):"";
-  const lastDate=selectedCharge?addDays(selectedCharge.vence,5):"";
-  if(!pactDate||pactDate<firstDate||pactDate>lastDate)
-    pactDate=selectedCharge?addDays(selectedCharge.vence,3):"";
-  const projection=protect(selectedCharge,pactDate);
   const scenario=store.demo?'<div class="gx-b2-scenario" role="group" aria-label="Casos de prueba">'+
    '<span>CAMBIAR ESCENARIO DE DEMOSTRACIÓN</span>'+
    [["puntual","Normal"],["prorroga","Prórroga vigente"],["prorroga-incumplida","Incumplida"],["vencido","Con mora"],["primero-pagado","1 pagado"]]
     .map(pair=>'<button type="button" data-b2-scenario="'+pair[0]+'" aria-pressed="'+(store.scenario===pair[0])+'">'+pair[1]+'</button>').join("")+
    '</div>':"";
   return '<button class="gx-b2-toggle" id="b2-toggle" type="button" aria-expanded="'+expanded+'" aria-controls="b2-body">'+
-     '<span class="gx-b2-head"><span class="gx-b2-ico" aria-hidden="true"></span>'+
-      '<span class="gx-b2-head-copy"><span class="gx-b2-caption">CALENDARIO DE PAGOS</span>'+
+     '<span class="gx-b2-head"><span class="gx-b2-head-copy"><span class="gx-b2-caption">CALENDARIO DE PAGOS</span>'+
        '<strong>'+esc(label)+'</strong></span></span>'+
       '<span class="gx-b2-head-amount">'+first+' <span class="gx-b2-chevron" aria-hidden="true">⌄</span></span></button>'+
     '<div class="gx-b2-reveal" id="b2-body" aria-hidden="'+(!expanded)+'" '+(expanded?'':'inert')+'><div class="gx-b2-clip"><div class="gx-b2-content">'+
      '<div class="gx-b2-divider"></div>'+
      list.map(x=>{
-      const checked=(mode==="todo"&&!alternativesOpen&&!x.pagado)||
+      const checked=(mode==="todo"&&!x.pagado)||
         x.cargo_id===(selected||due?.cargo_id);
       const next=x.cargo_id===due?.cargo_id&&!x.pagado;
       const late=x.mora_centavos>0;
       return '<button class="gx-b2-row '+(checked?'is-active ':'')+
        (x.pagado?'is-done ':'')+(late?'is-late ':'')+(next?'is-next':'')+
        '" type="button" data-b2-cargo="'+esc(x.cargo_id)+'" '+(x.pagado?'disabled':'')+'>'+
-       '<span class="gx-b2-mark" aria-hidden="true">'+(x.pagado?'✓':'')+'</span>'+
        '<span class="gx-b2-row-main"><span class="gx-b2-row-title">'+esc(title(x))+
        '</span><span class="gx-b2-row-meta">'+
        (next?'<span class="gx-b2-next-tag">'+(late?'VENCIDO':'PRÓXIMO')+'</span>':'')+
@@ -156,7 +128,7 @@
      }).join("")+
      '<div class="gx-b2-group" role="group" aria-label="Forma de pago">'+
        [["proximo","Próximo vencimiento"],["todo","Todo junto"]]
-       .map(pair=>'<button type="button" class="gx-b2-choice" data-b2-mode="'+pair[0]+'" aria-pressed="'+(mode===pair[0]&&!alternativesOpen)+'">'+pair[1]+'</button>').join("")+
+       .map(pair=>'<button type="button" class="gx-b2-choice" data-b2-mode="'+pair[0]+'" aria-pressed="'+(mode===pair[0])+'">'+pair[1]+'</button>').join("")+
      '</div>'+
      '<div class="gx-b2-summary"><span>Importe seleccionado</span><strong id="b2-selected-total">'+money(chosen.centavos)+'</strong></div>'+
      '<p class="gx-b2-foot">El reporte de pago se acredita únicamente después de la revisión de Admin.</p>'+
@@ -180,8 +152,6 @@
    anchor.insertAdjacentElement("afterend",card);
   }
   card.classList.toggle("is-open",expanded);
-  card.classList.toggle("has-next",pending().length>0);
-  card.classList.toggle("is-overdue",Boolean(pending()[0]?.mora_centavos>0));
   card.innerHTML=content();
   card.querySelector("#b2-toggle").addEventListener("click",()=>{
    expanded=!expanded;card.classList.toggle("is-open",expanded);
@@ -190,13 +160,13 @@
    card.querySelector("#b2-body").toggleAttribute("inert",!expanded);
   });
   card.querySelectorAll("[data-b2-cargo]").forEach(button=>button.addEventListener("click",()=>{
-   selected=button.dataset.b2Cargo;pactDate="";mode="proximo";render();
+   selected=button.dataset.b2Cargo;mode="proximo";render();
   }));
   card.querySelectorAll("[data-b2-mode]").forEach(button=>button.addEventListener("click",()=>{
-   mode=button.dataset.b2Mode;alternativesOpen=false;render();
+   mode=button.dataset.b2Mode;render();
   }));
   card.querySelectorAll("[data-b2-scenario]").forEach(button=>button.addEventListener("click",()=>{
-   selected=null;pactDate="";mode="proximo";alternativesOpen=false;store.makeDemo(button.dataset.b2Scenario);
+   selected=null;mode="proximo";store.makeDemo(button.dataset.b2Scenario);
   }));
   updateHeader();
   updateServiceMarker();
