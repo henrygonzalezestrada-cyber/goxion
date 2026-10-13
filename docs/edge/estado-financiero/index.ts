@@ -80,32 +80,103 @@ Deno.serve(async(req)=>{
       return q.data;
     }
 
-    // Solicitud de prórroga de la PROPIA cuenta. No concede gracia
-    // hasta la aprobación de Admin. Sólo B2 activado, regla validada en SQL.
-    if(accion==="solicitar_prorroga"){
-      const client=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
-      if(!client?.cliente_id)return res({ok:false,error:"Accede nuevamente a Mi Espacio."},401);
-      const clienteId=String(client.cliente_id);
-      const acceso=await exigirClienteActivo(sb,clienteId);
-      if(!acceso.ok)return res({ok:false,error:acceso.error},acceso.status);
-      const id=String(datos?.cargo_id||"").trim();
-      const fecha=String(datos?.fecha_pactada||"").trim();
-      const op=String(datos?.clave_idempotencia||"").trim();
-      const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-      if(!idPattern.test(id)||!idPattern.test(op)||
-        !/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/.test(fecha)){
-        return res({ok:false,error:"Servicio o fecha inválidos."},400);
+    // Prórrogas autogestionadas: el token identifica al titular.
+    // Solicitar y pactar sucede en UNA transacción SQL, sin Admin.
+    if(["mi_prorroga","cotizar_prorroga_auto","activar_prorroga_auto"].includes(accion)){
+      const token=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
+      if(!token?.cliente_id)return res({ok:false,error:"Tu sesión ha expirado."},401);
+      const clienteId=String(token.cliente_id);
+      const access=await exigirClienteActivo(sb,clienteId);
+      if(!access.ok)return res({ok:false,error:access.error},access.status);
+      const client=await sb.from("clientes")
+        .select("id,periodo_pendiente,dia_pago,pago_en_revision,estado")
+        .eq("id",clienteId).single();
+      if(client.error||!client.data)return res({ok:false,error:"Cuenta no disponible"},409);
+      const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Merida",
+        year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+      const part=(t:string)=>parts.find(x=>x.type===t)?.value||"";
+      const today=part("year")+"-"+part("month")+"-"+part("day");
+      const period=String(client.data.periodo_pendiente||"").slice(0,10);
+      const regime=await sb.from("goxion_b2_regimen_cliente")
+        .select("activo").eq("cliente_id",clienteId).maybeSingle();
+      if(regime.error)throw regime.error;
+      const b2=regime.data?.activo===true;
+      let agreement:any=null,candidates:any[]=[];
+      if(b2){
+        const charges=await sb.from("goxion_b2_cargos")
+          .select("id,fecha_vencimiento,periodo,ciclo_id,liquidado")
+          .eq("cliente_id",clienteId).eq("periodo",period).eq("liquidado",false)
+          .order("fecha_vencimiento",{ascending:true}).limit(60);
+        if(charges.error)throw charges.error;
+        candidates=(charges.data||[]).filter(x=>x.fecha_vencimiento===today);
+        const cycleId=(charges.data||[])[0]?.ciclo_id;
+        if(cycleId){
+          const prior=await sb.from("goxion_b2_prorrogas")
+            .select("id,fecha_original,fecha_pactada,estado,cargo_id")
+            .eq("cliente_id",clienteId).eq("ciclo_id",cycleId).maybeSingle();
+          if(prior.error)throw prior.error;
+          agreement=prior.data||null;
+        }
+      }else{
+        const prior=await sb.from("acuerdos_cobro")
+          .select("id,fecha_original,fecha_pactada,estado,activo")
+          .eq("cliente_id",clienteId).eq("periodo",period).maybeSingle();
+        if(prior.error)throw prior.error;
+        agreement=prior.data||null;
       }
-      const q=await sb.rpc("goxion_b2_solicitar_prorroga",{
-        p_cliente_id:clienteId,p_cargo_id:id,p_fecha_pactada:fecha,
-        p_operation_id:op,p_motivo:"Solicita prórroga de pago"
-      });
-      if(q.error||q.data?.ok!==true)return res({
-         ok:false,error:q.error?.message||"Prórroga no disponible para este vencimiento.",
-         codigo:"PRORROGA_NO_ELEGIBLE"},409);
-      return res({ok:true,modo:"solicitud_prorroga",
-        resultado:q.data,requiere_aprobacion_admin:true,
-        lealtad_protegida:false});
+      if(accion==="mi_prorroga"){
+        const last=period?new Date(Date.UTC(Number(period.slice(0,4)),
+          Number(period.slice(5,7)),0)).getUTCDate():0;
+        const original=b2?(candidates[0]?.fecha_vencimiento||agreement?.fecha_original||null):
+          period?period.slice(0,7)+"-"+String(Math.min(Number(client.data.dia_pago)||15,
+              last)).padStart(2,"0"):null;
+        const may=!agreement&&!client.data.pago_en_revision&&
+          (b2?candidates.length>0:original===today);
+        return res({ok:true,modo:b2?"b2_multifecha":"global",
+          acuerdo:agreement?{fecha_original:agreement.fecha_original,
+            fecha_pactada:agreement.fecha_pactada,estado:agreement.estado,
+            activo:agreement.estado==="aprobada"||agreement.estado==="activo"}:null,
+          puede_solicitar:may,fecha_original:original,
+          fecha_servidor:today,cargo_id:b2&&may?candidates[0].id:null,
+          fecha_maxima:original?new Date(Date.parse(original+"T00:00:00Z")+
+            5*86400000).toISOString().slice(0,10):null,
+          requiere_autorizacion_admin:false});
+      }
+      const chosen=String(datos?.fecha_pactada||"");
+      const charge=String(datos?.cargo_id||"");
+      const operation=String(datos?.clave_idempotencia||"");
+      const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(chosen)||
+        (b2&&!idPattern.test(charge))||
+        (accion==="activar_prorroga_auto"&&!idPattern.test(operation))||
+        (accion==="activar_prorroga_auto"&&(
+          datos?.acepta_condiciones!==true||datos?.confirma_importe!==true)))
+        return res({ok:false,error:"Fecha, monto o aceptación inválidos"},400);
+      const args={p_cliente_id:clienteId,p_fecha_pactada:chosen,
+        p_cargo_id:b2?charge:null};
+      let quote:any=null;
+      if(accion==="cotizar_prorroga_auto"||!agreement){
+        const calculation=await sb.rpc("goxion_prorroga_auto_cotizar",args);
+        if(calculation.error||calculation.data?.ok!==true)
+          return res({ok:false,error:calculation.error?.message||
+            "La prórroga no cumple las condiciones"},409);
+        quote=calculation.data;
+      }
+      if(accion==="cotizar_prorroga_auto")
+        return res({ok:true,cotizacion:quote,requiere_admin:false});
+      const applied=b2?
+        await sb.rpc("goxion_b2_solicitar_prorroga",{
+          p_cliente_id:clienteId,p_cargo_id:charge,
+          p_fecha_pactada:chosen,p_operation_id:operation,
+          p_motivo:"Solicita prórroga de pago"}):
+        await sb.rpc("goxion_prorroga_auto_global",{
+          p_cliente_id:clienteId,p_fecha_pactada:chosen,
+          p_operation_id:operation});
+      if(applied.error||applied.data?.ok!==true)return res({
+        ok:false,error:applied.error?.message||"No fue posible confirmar el acuerdo",
+        codigo:"PRORROGA_NO_ELEGIBLE"},409);
+      return res({ok:true,estado:"activo",aprobacion:"automatica",
+        acuerdo:applied.data,solicitud_pendiente:false,requiere_admin:false});
     }
 
     if(accion==="mi_estado"){
