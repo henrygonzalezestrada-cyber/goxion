@@ -154,6 +154,13 @@
   }
   const oldOverdue=document.querySelector(".overdue-incentive-box");
   if(oldOverdue)oldOverdue.style.display="none";
+  const loyaltyIcon=document.querySelector(".loyalty-badge .loyalty-icon");
+  if(loyaltyIcon){
+    if(!loyaltyIcon.dataset.gxB2Original)
+      loyaltyIcon.dataset.gxB2Original=loyaltyIcon.textContent;
+    const icon=quote.lealtad_global_perdida?"💔":loyaltyIcon.dataset.gxB2Original;
+    if(loyaltyIcon.textContent!==icon)loyaltyIcon.textContent=icon;
+  }
   const loyalty=document.querySelector(".loyalty-badge .loyalty-desc");
   if(loyalty){
     // Conservar el componente oficial y sus colores/énfasis. Mostrar
