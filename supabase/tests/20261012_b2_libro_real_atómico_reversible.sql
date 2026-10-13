@@ -4,6 +4,7 @@ BEGIN;
 DO $fixture$
 DECLARE cid uuid:=gen_random_uuid(); sid uuid;sid2 uuid;cy uuid;
  x record;y record; a int;b int; d jsonb; k1 uuid:=gen_random_uuid();k2 uuid:=gen_random_uuid();
+ kpar uuid:=gen_random_uuid();
  v_rechazo boolean:=false;
 BEGIN
  select id into sid from public.servicios where activo order by nombre limit 1;
@@ -45,7 +46,14 @@ BEGIN
    else raise;end if;
  end;
  if not v_rechazo then raise exception 'La aprobación global B2 quedó desprotegida';end if;
- d=public.goxion_b2_aprobar_abono(cid,x.id,a,a,k1,'fixture');
+ -- Un abono pequeño sobre el primer vencimiento reduce principal,
+ -- no elimina la mora acumulada ni salda el segundo acceso.
+ d=public.goxion_b2_aprobar_abono(cid,x.id,1000,a,kpar,'parcial');
+ if d->>'principal_aplicado_centavos'<>'1000'
+   or d->>'mora_aplicada_centavos'<>'0'
+   or (d->>'saldo_restante_centavos')::int<>a-1000 then
+   raise exception 'Abono parcial no conservó mora: %',d;end if;
+ d=public.goxion_b2_aprobar_abono(cid,x.id,a-1000,a-1000,k1,'fixture');
  if d->>'ok'<>'true' or d->>'ciclo_liquidado'<>'false' then raise exception 'Cierre prematuro %',d;end if;
  d=public.goxion_b2_aprobar_abono(cid,y.id,b,b,k2,'fixture');
  if d->>'ok'<>'true' or d->>'ciclo_liquidado'<>'true' then raise exception 'No liquidó %',d;end if;
@@ -53,9 +61,9 @@ BEGIN
  raise exception 'Duplicó comprobante consolidado';end if;
  if (select pagos_puntuales from public.clientes where id=cid)<>0 then
  raise exception 'No reinició lealtad global';end if;
- d=public.goxion_b2_aprobar_abono(cid,x.id,a,a,k1,'fixture');
+ d=public.goxion_b2_aprobar_abono(cid,x.id,a-1000,a-1000,k1,'fixture');
  if d->>'repetida'<>'true' then raise exception 'Reintento acreditó de nuevo';end if;
- if (select count(*) from public.goxion_b2_abonos_aprobados where cliente_id=cid)<>2 then
+ if (select count(*) from public.goxion_b2_abonos_aprobados where cliente_id=cid)<>3 then
  raise exception 'Duplicó movimiento B2';end if;
 END $fixture$;
 SELECT 'B2_E2E_PASS_ROLLBACK' AS resultado;
