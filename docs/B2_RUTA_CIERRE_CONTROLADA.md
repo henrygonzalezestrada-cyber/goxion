@@ -99,3 +99,13 @@ El usuario puede decir: «Avanza con F2», «Detente en F3», «Pulamos F1» o �
 **Pendientes bloqueantes de F2:** (1) evidencia auténtica de transferencia protegida, que una ruta de cliente autenticada podrá asociar sin confiar en URL libre; (2) **atribución y consumo único por acceso** de promociones, cupones, beneficios y Trato Justo: motor actual rechaza esos casos, no permite reparto arbitrario; (3) aprobación global atómica aún no sustituye la ruta legacy oficial, por lo que falta despliegue y pruebas integrales con respaldo; (4) ciclos/prórrogas y estados financieros en escenario real opt-in controlado; (5) prueba Admin de la nueva ruta B2 con evidencia validada en entorno seguro.
 
 **Prohibido declarar F2 terminada** solo con prueba de recibo ficticio. Mantener clientes de fecha única y sus pagos originales protegidos mientras se trabaja en estos bloqueos. La F1 visual aprobada no necesita cambios.
+
+
+## F2 · Evidencia B2 protegida y separación de responsabilidades (13/oct)
+
+- **Motor SQL instalado, cero opt-in reales:** bucket privado `goxion-b2-evidencias` (6MB imágenes), `goxion_b2_registrar_comprobante_seguro` exige evidencia real previamente almacenada, cliente, ciclo, selección exacta de cargos y monto de cotización oficial. Reportar no acredita. Firma antigua sin comprobante real quedó desactivada.
+- **Nuevo endpoint F2 separado** `comprobantes-b2-beta` v1: `X-Client-Token` HMAC, verificación de firmas JPEG/PNG/WEBP, tamaño, SHA-256 y nombre de archivo privado por cliente/operación; no toca Index oficial ni envía a Discord.
+- **Admin** `acciones-financieras-b2-beta` v3: exige recibo registrado para acreditar, hace rollback de todos los cargos si falla uno, rechaza clave repetida con datos diferentes y no permite modificar la selección hecha al reportar. Acción directa `b2_aprobar_abono` bloqueada en beta.
+- **Pruebas SQL reversibles** en Supabase: pasa comprobante por dos accesos, fallo segundo revierte primero, reintentos, modificación de reparto rechazada, archivo inexistente rechazado y deshabilitación de firma insegura. Post-ROLLBACK: 22 clientes/28 pagos originales/0 B2 activos/0 objetos de evidencia/cargos.
+- **Cierre aún pendiente**: verificación end-to-end de bytes del archivo con token legítimo y Admin en entorno aislado; atribución al cargo correcto y consumo por ciclo de beneficios con promoción/combos/cupones/descuentos especiales/Trato Justo; renovación y prueba de gateway GLOBAL atómico en producción con estrategia de reversión. F2 no verde, F3 no iniciado.
+- **Pruebas de cero cambios oficiales**: `acciones-financieras` sigue v10, `periodo-cobro` v3, Index/Ayuda originales, pagos legados día 15.
