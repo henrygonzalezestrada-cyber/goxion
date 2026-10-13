@@ -54,7 +54,7 @@ begin
  values(v_cliente,null,'Servicio abono fixture',92,true);
  perform public.goxion_registrar_pago_parcial_atomico(v_cliente,'2026-10',4000,v_parcial,'Abono');
  insert into public.acuerdos_cobro(cliente_id,periodo,fecha_original,fecha_pactada,motivo,activo,estado)
- values(v_cliente,'2026-10-01','2026-10-15','2026-10-22','Prueba',true,'activo');
+ values(v_cliente,'2026-10-01','2026-10-15','2026-10-18','Prueba',true,'activo');
  v_monto=(public.goxion_estado_financiero(v_cliente)->>'total_actual')::numeric;
  begin
   perform public.goxion_aprobar_pago_periodo_atomico(v_cliente,'2026-10',v_monto+1,true,'Prueba',gen_random_uuid());
