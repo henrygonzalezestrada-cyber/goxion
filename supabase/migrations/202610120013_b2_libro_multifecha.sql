@@ -158,7 +158,7 @@ begin
  if v_base_of is distinct from v_base or v_disc<>v_lealtad or v_cargos<>0 then
   raise exception 'Promociones, cupón o mora requieren atribución antes de B2';
  end if;
- v_pct=coalesce((v_fin->'lealtad'->>'porcentaje')::int,0);
+ v_pct=coalesce((v_fin->'lealtad'->>'porcentaje')::numeric,0)::integer;
  v_nivel=coalesce((v_fin->'lealtad'->>'nivel')::int,0);
  if (v_nivel,v_pct) not in ((0,0),(1,3),(2,6)) then
   raise exception 'Nivel de lealtad inconsistente';
