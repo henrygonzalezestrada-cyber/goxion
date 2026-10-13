@@ -241,6 +241,39 @@ Deno.serve(async (req) => {
         modo:"propuesta_sin_acreditacion",acreditada:false,cobrable:false});
     }
 
+    // B2 · Prórrogas administrativas. Solicitud no equivale a aprobación.
+    if (action==="b2_listar_prorrogas") {
+      const clienteId=String(data?.cliente_id||"").trim();
+      if(clienteId&&!uuid.test(clienteId))
+        return json({ok:false,error:"Cliente inválido"},400);
+      let query=sb.from("goxion_b2_prorrogas")
+        .select("id,cliente_id,cargo_id,fecha_original,fecha_pactada,estado,motivo,solicitado_en,revisado_en,revisado_por")
+        .order("solicitado_en",{ascending:false}).limit(100);
+      if(clienteId)query=query.eq("cliente_id",clienteId);
+      else query=query.eq("estado","solicitada");
+      const found=await query;
+      if(found.error)throw found.error;
+      return json({ok:true,accion:action,solicitudes:found.data||[],
+        contrato:"goxion-b2-prorrogas-v1"});
+    }
+    if (action==="b2_resolver_prorroga") {
+      const clienteId=String(data?.cliente_id||"").trim();
+      const id=String(data?.solicitud_id||"").trim();
+      if(!uuid.test(clienteId)||!uuid.test(id)||
+          typeof data?.aprobar!=="boolean"||data?.confirmar_resolucion!==true){
+        return json({ok:false,error:"Confirma la decisión administrativa y la solicitud"},400);
+      }
+      const applied=await sb.rpc("goxion_b2_resolver_prorroga",{
+        p_cliente_id:clienteId,p_solicitud_id:id,
+        p_aprobar:data.aprobar,p_actor:"admin:b2-gateway"
+      });
+      if(applied.error||applied.data?.ok!==true)return json({
+        ok:false,error:applied.error?.message||"No se pudo resolver la prórroga",
+        codigo:"PRORROGA_NO_RESUELTA"},409);
+      return json({ok:true,accion:action,resultado:applied.data,
+        contrato:"goxion-b2-prorrogas-v1"});
+    }
+
     // B2: propietario ÚNICO de activación, cotización y acreditación
     // individual. Exige sesión Admin comprobada antes de entrar aquí.
     // Los clientes de fecha única nunca pasan por esta ruta.
