@@ -131,7 +131,8 @@
   if(label)label.textContent="Saldo total por vencimientos";
   if(amount)amount.textContent=money(total);
   if(badge){
-   badge.textContent=due?(due.mora_centavos>0?"Servicio vencido · "+date(due.vence):"Próximo pago · "+date(due.vence)):"Servicios al corriente";
+   // Reutilizar los símbolos del estado de cuenta oficial, no sustituirlos por etiquetas genéricas.
+   badge.textContent=due?(due.mora_centavos>0?"🚨 Servicio vencido · "+date(due.vence):"⏳ Próximo pago · "+date(due.vence)):"✅ Servicios al corriente";
    badge.className="time-badge "+(due?.mora_centavos>0?"badge-overdue":due?"badge-ok":"badge-paid");
   }
   const period=document.querySelector(".card-info .info-block.full .value");
