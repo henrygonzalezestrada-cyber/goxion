@@ -70,9 +70,36 @@ Deno.serve(async req=>{
    !Number.isSafeInteger(amount)||amount<=0||amount>100_000_000||
    !Array.isArray(ids)||ids.length<1||ids.length>80||
    ids.some((id:unknown)=>!uuid.test(String(id||"")))||
-   new Set(ids).size!==ids.length||
+   new Set(ids.map((id:unknown)=>String(id).toLowerCase())).size!==ids.length||
    !(attachment instanceof File)||attachment.size<12||attachment.size>MAX_BYTES)
    return reply({ok:false,error:"Comprobante, cargos o importes inválidos"},400);
+  // Preflight ANTES de almacenar bytes: ningún cliente sin ciclo B2
+  // elegible puede generar archivos huérfanos mediante intentos inválidos.
+  // El SQL de registro repite TODAS estas verificaciones bajo locks.
+  const requestedIds=ids.map((id:string)=>id.toLowerCase());
+  const cycle=await sb.from("goxion_b2_ciclos")
+   .select("periodo,estado").eq("id",cycleId)
+   .eq("cliente_id",clientId).maybeSingle();
+  if(cycle.error||!cycle.data||cycle.data.estado!=="pendiente")
+   return reply({ok:false,error:"Ciclo B2 no disponible",
+    codigo:"B2_CICLO_NO_DISPONIBLE",acreditado:false},409);
+  const quoted=await sb.rpc("goxion_b2_cotizar_ciclo",{
+   p_cliente_id:clientId,p_periodo:cycle.data.periodo
+  });
+  const quotedRows=quoted.data?.cargos;
+  if(quoted.error||quoted.data?.ok!==true||
+    quoted.data?.cobrable!==true||!Array.isArray(quotedRows))
+   return reply({ok:false,error:"Cotización B2 no disponible",
+    codigo:"B2_COTIZACION_NO_DISPONIBLE",acreditado:false},409);
+  const selected=quotedRows.filter((row:any)=>
+   requestedIds.includes(String(row.cargo_id||"").toLowerCase())&&
+   row.pagado!==true&&Number.isSafeInteger(Number(row.total_centavos))&&
+   Number(row.total_centavos)>0);
+  const expectedAmount=selected.reduce((sum:number,row:any)=>
+   sum+Number(row.total_centavos),0);
+  if(selected.length!==requestedIds.length||expectedAmount!==amount)
+   return reply({ok:false,error:"Cargos o importe desactualizados",
+    codigo:"B2_IMPORTES_NO_CONCILIADOS",acreditado:false},409);
   const bytes=new Uint8Array(await attachment.arrayBuffer());
   const ext=validImage(bytes,attachment.type);
   if(!ext)return reply({ok:false,error:"Solo capturas JPG, PNG o WEBP válidas"},400);
@@ -94,7 +121,7 @@ Deno.serve(async req=>{
   }
   const reported=await sb.rpc("goxion_b2_registrar_comprobante_seguro",{
    p_cliente_id:clientId,p_ciclo_id:cycleId,p_monto_centavos:amount,
-   p_evidencia_ref:path,p_operation_id:opId,p_cargo_ids:ids
+   p_evidencia_ref:path,p_operation_id:opId,p_cargo_ids:requestedIds
   });
   if(reported.error||reported.data?.ok!==true){
    // No se registra un pago cuando SQL no concilia cliente, fecha o importe.
