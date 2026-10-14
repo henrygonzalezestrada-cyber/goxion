@@ -312,6 +312,27 @@ Deno.serve(async (req) => {
 
     // F3 beta · consulta exclusiva Admin de comprobantes por cliente opt-in.
     // Nunca se expone evidencia privada al cliente ni se acredita al listar.
+    // F4: reintento explícito desde la bandeja Admin existente.
+    // La autorización HMAC Admin ya se verificó al entrar al gateway.
+    // No cambia el estado financiero ni vuelve a autorizar prórrogas.
+    if(action==="b2_f4_reintentar_discord"){
+      let delivered:any=null;
+      try{
+        const outbound=await fetch(url+"/functions/v1/b2-f4-discord-beta",{
+          method:"POST",headers:{"Content-Type":"application/json",
+            "X-B2-Dispatch-Key":serviceKey},body:"{}"
+        });
+        delivered=await outbound.json().catch(()=>({}));
+        if(!outbound.ok||delivered?.ok!==true)
+          return json({ok:false,error:"El canal de avisos no está disponible",
+            credito_afectado:false},503);
+      }catch(e){
+        return json({ok:false,error:"La entrega se reintentará automáticamente desde Admin",
+          credito_afectado:false},503);
+      }
+      return json({ok:true,accion:action,resultado:delivered,
+        credito_afectado:false});
+    }
     if(action==="b2_listar_comprobantes"){
       const clienteId=String(data?.cliente_id||"").trim();
       if(!uuid.test(clienteId))
