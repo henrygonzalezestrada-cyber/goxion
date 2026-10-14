@@ -80,13 +80,175 @@ Deno.serve(async(req)=>{
       return q.data;
     }
 
+    // Prórrogas autogestionadas: el token identifica al titular.
+    // Solicitar y pactar sucede en UNA transacción SQL, sin Admin.
+    if(["mi_prorroga","cotizar_prorroga_auto","activar_prorroga_auto"].includes(accion)){
+      const token=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
+      if(!token?.cliente_id)return res({ok:false,error:"Tu sesión ha expirado."},401);
+      const clienteId=String(token.cliente_id);
+      const access=await exigirClienteActivo(sb,clienteId);
+      if(!access.ok)return res({ok:false,error:access.error},access.status);
+      const client=await sb.from("clientes")
+        .select("id,periodo_pendiente,dia_pago,pago_en_revision,estado")
+        .eq("id",clienteId).single();
+      if(client.error||!client.data)return res({ok:false,error:"Cuenta no disponible"},409);
+      const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Merida",
+        year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+      const part=(t:string)=>parts.find(x=>x.type===t)?.value||"";
+      const today=part("year")+"-"+part("month")+"-"+part("day");
+      const period=String(client.data.periodo_pendiente||"").slice(0,10);
+      const regime=await sb.from("goxion_b2_regimen_cliente")
+        .select("activo").eq("cliente_id",clienteId).maybeSingle();
+      if(regime.error)throw regime.error;
+      const b2=regime.data?.activo===true;
+      let agreement:any=null,candidates:any[]=[];
+      if(b2){
+        const charges=await sb.from("goxion_b2_cargos")
+          .select("id,fecha_vencimiento,periodo,ciclo_id,liquidado")
+          .eq("cliente_id",clienteId).eq("periodo",period).eq("liquidado",false)
+          .order("fecha_vencimiento",{ascending:true}).limit(60);
+        if(charges.error)throw charges.error;
+        candidates=(charges.data||[]).filter(x=>x.fecha_vencimiento===today);
+        const cycleId=(charges.data||[])[0]?.ciclo_id;
+        if(cycleId){
+          const prior=await sb.from("goxion_b2_prorrogas")
+            .select("id,fecha_original,fecha_pactada,estado,cargo_id")
+            .eq("cliente_id",clienteId).eq("ciclo_id",cycleId).maybeSingle();
+          if(prior.error)throw prior.error;
+          agreement=prior.data||null;
+        }
+      }else{
+        const prior=await sb.from("acuerdos_cobro")
+          .select("id,fecha_original,fecha_pactada,estado,activo")
+          .eq("cliente_id",clienteId).eq("periodo",period).maybeSingle();
+        if(prior.error)throw prior.error;
+        agreement=prior.data||null;
+      }
+      if(accion==="mi_prorroga"){
+        const last=period?new Date(Date.UTC(Number(period.slice(0,4)),
+          Number(period.slice(5,7)),0)).getUTCDate():0;
+        const original=b2?(candidates[0]?.fecha_vencimiento||agreement?.fecha_original||null):
+          period?period.slice(0,7)+"-"+String(Math.min(Number(client.data.dia_pago)||15,
+              last)).padStart(2,"0"):null;
+        const may=!agreement&&!client.data.pago_en_revision&&
+          (b2?candidates.length>0:original===today);
+        return res({ok:true,modo:b2?"b2_multifecha":"global",
+          acuerdo:agreement?{fecha_original:agreement.fecha_original,
+            fecha_pactada:agreement.fecha_pactada,estado:agreement.estado,
+            activo:agreement.estado==="aprobada"||agreement.estado==="activo"}:null,
+          puede_solicitar:may,fecha_original:original,
+          fecha_servidor:today,cargo_id:b2&&may?candidates[0].id:null,
+          fecha_maxima:original?new Date(Date.parse(original+"T00:00:00Z")+
+            5*86400000).toISOString().slice(0,10):null,
+          requiere_autorizacion_admin:false});
+      }
+      const chosen=String(datos?.fecha_pactada||"");
+      const charge=String(datos?.cargo_id||"");
+      const operation=String(datos?.clave_idempotencia||"");
+      const idPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(chosen)||
+        (b2&&!idPattern.test(charge))||
+        (accion==="activar_prorroga_auto"&&!idPattern.test(operation))||
+        (accion==="activar_prorroga_auto"&&(
+          datos?.acepta_condiciones!==true||datos?.confirma_importe!==true)))
+        return res({ok:false,error:"Fecha, monto o aceptación inválidos"},400);
+      const args={p_cliente_id:clienteId,p_fecha_pactada:chosen,
+        p_cargo_id:b2?charge:null};
+      let quote:any=null;
+      if(accion==="cotizar_prorroga_auto"||!agreement){
+        const calculation=await sb.rpc("goxion_prorroga_auto_cotizar",args);
+        if(calculation.error||calculation.data?.ok!==true)
+          return res({ok:false,error:calculation.error?.message||
+            "La prórroga no cumple las condiciones"},409);
+        quote=calculation.data;
+      }
+      if(accion==="cotizar_prorroga_auto")
+        return res({ok:true,cotizacion:quote,requiere_admin:false});
+      const applied=b2?
+        await sb.rpc("goxion_b2_solicitar_prorroga",{
+          p_cliente_id:clienteId,p_cargo_id:charge,
+          p_fecha_pactada:chosen,p_operation_id:operation,
+          p_motivo:"Solicita prórroga de pago"}):
+        await sb.rpc("goxion_prorroga_auto_global",{
+          p_cliente_id:clienteId,p_fecha_pactada:chosen,
+          p_operation_id:operation});
+      if(applied.error||applied.data?.ok!==true)return res({
+        ok:false,error:applied.error?.message||"No fue posible confirmar el acuerdo",
+        codigo:"PRORROGA_NO_ELEGIBLE"},409);
+      return res({ok:true,estado:"activo",aprobacion:"automatica",
+        acuerdo:applied.data,solicitud_pendiente:false,requiere_admin:false});
+    }
+
     if(accion==="mi_estado"){
       const client=await verify(req.headers.get("X-Client-Token")||"",serviceKey,"goxion_client");
       if(!client?.cliente_id)return res({ok:false,error:"Sesión de cliente inválida o expirada"},401);
       const acceso=await exigirClienteActivo(sb,String(client.cliente_id));if(!acceso.ok)return res({ok:false,error:acceso.error},acceso.status);
+      const clientId=String(client.cliente_id);
+      const state=await estado(clientId);
+      const opt=await sb.from("goxion_b2_regimen_cliente")
+        .select("activo,periodo_inicio").eq("cliente_id",clientId).maybeSingle();
+      if(opt.error)throw opt.error;
+      if(opt.data?.activo===true){
+        const ciclo=String(state?.periodo||"").slice(0,7)+"-01";
+        const b2=await sb.rpc("goxion_b2_cotizar_ciclo",{
+          p_cliente_id:clientId,p_periodo:ciclo
+        });
+        if(b2.error||b2.data?.ok!==true)return res({
+          ok:false,modo:"b2_sin_estado_cobrable",
+          error:"Calendario financiero pendiente de conciliación; contacta a soporte.",
+          permitir_pago_global:false
+        },409);
+        // F3 beta: un perfil real se presenta por contrato/ordinal verificados.
+        // Un ID ambiguo bloquea la cotización en lugar de inventar "Perfil 1".
+        const [cycle,obligations,accesses,contracts,reports]=await Promise.all([
+          sb.from("goxion_b2_ciclos").select("id").eq("cliente_id",clientId)
+            .eq("periodo",ciclo).maybeSingle(),
+          sb.from("goxion_b2_cargos")
+            .select("id,cliente_acceso_id,cliente_servicio_id")
+            .eq("cliente_id",clientId).eq("periodo",ciclo).limit(90),
+          sb.from("cliente_accesos").select("id,ordinal,cliente_servicio_id")
+            .eq("cliente_id",clientId).eq("activo",true).limit(90),
+          sb.from("cliente_servicios").select("id,nombre")
+            .eq("cliente_id",clientId).eq("activo",true).limit(90),
+          sb.from("goxion_b2_comprobantes").select("id,estado")
+            .eq("cliente_id",clientId).eq("ciclo_id",
+              // La fila de ciclo se verifica más abajo; null NO abre el acceso.
+              (await sb.from("goxion_b2_ciclos").select("id")
+                .eq("cliente_id",clientId).eq("periodo",ciclo).maybeSingle()).data?.id||"")
+            .eq("estado","reportado").limit(1)
+        ]);
+        if(cycle.error||obligations.error||accesses.error||contracts.error||reports.error)
+          throw cycle.error||obligations.error||accesses.error||contracts.error||reports.error;
+        const byCharge=new Map((obligations.data||[]).map((item:any)=>[item.id,item]));
+        const byAccess=new Map((accesses.data||[]).map((item:any)=>[item.id,item]));
+        const byContract=new Map((contracts.data||[]).map((item:any)=>[item.id,item]));
+        const quoteRows=Array.isArray(b2.data.cargos)?b2.data.cargos:[];
+        const detailed=quoteRows.map((item:any)=>{
+          const obligation=byCharge.get(item.cargo_id) as any;
+          const access=byAccess.get(obligation?.cliente_acceso_id) as any;
+          const contract=byContract.get(obligation?.cliente_servicio_id) as any;
+          if(!obligation||!access||!contract||
+            access.cliente_servicio_id!==obligation.cliente_servicio_id||
+            item.acceso_id!==access.id||
+            !Number.isInteger(access.ordinal)||access.ordinal<1||
+            !String(contract.nombre||"").trim())return null;
+          return {...item,servicio:String(contract.nombre).slice(0,100),
+            ordinal:access.ordinal,cliente_servicio_id:contract.id};
+        });
+        if(!cycle.data?.id||detailed.some((item:any)=>!item)||
+          detailed.length!==obligations.data?.length)
+          return res({ok:false,modo:"b2_sin_estado_cobrable",
+            error:"La identidad de los perfiles requiere revisión de Admin.",
+            permitir_pago_global:false},409);
+        const quoteReady={...b2.data,ciclo_id:cycle.data.id,cargos:detailed,
+          comprobante_en_revision:(reports.data||[]).length>0};
+        return res({ok:true,estado_financiero:state,modo:"b2_multifecha",
+          permitir_pago_global:false,calendario_financiero:quoteReady,
+          fuente:"goxion_b2_cotizar_ciclo"});
+      }
       return res({
         ok:true,
-        estado_financiero:await estado(String(client.cliente_id)),
+        estado_financiero:state,
         modo:"oficial"
       });
     }
@@ -118,6 +280,25 @@ Deno.serve(async(req)=>{
       const calendario=calendarioInformativo({
         contratos:contracts.data||[],accesos:accesses.data||[],fechas:verified.data||[],hoy
       });
+      // Solo si Admin activó B2: exponer saldo individual verificado
+      // al PROPIO cliente que ya pasó el X-Client-Token firmado.
+      const opt=await sb.from("goxion_b2_regimen_cliente")
+        .select("activo").eq("cliente_id",clientId).maybeSingle();
+      if(opt.error)throw opt.error;
+      if(opt.data?.activo===true){
+        const state=await estado(clientId);
+        const periodo=String(state?.periodo||"").slice(0,7)+"-01";
+        const quote=await sb.rpc("goxion_b2_cotizar_ciclo",{
+          p_cliente_id:clientId,p_periodo:periodo
+        });
+        if(quote.error||quote.data?.ok!==true)return res({
+          ok:false,error:"El calendario de pagos requiere conciliación",
+          modo:"b2_sin_estado_cobrable",permitir_pago_global:false
+        },409);
+        return res({ok:true,calendario,calendario_financiero:quote.data,
+          permitir_pago_global:false,modo:"b2_multifecha",
+          fuente:"goxion_b2_cotizar_ciclo"});
+      }
       return res({ok:true,calendario,fuente:"goxion_calendario_accesos",modo:"solo_fechas_sin_cobro"});
     }
 
