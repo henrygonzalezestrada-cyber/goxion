@@ -3,14 +3,16 @@
  "use strict";
  if(!window.GOXION_B2_ADMIN_MIRROR?.writeLegacyBlocked)return;
  const core=window.GOXION_CORE;
- const pad=v=>String(v||"").padStart(2,"0");
  const localeDate=(value)=>{
   const s=String(value||"");
   return /^\d{4}-\d{2}-\d{2}$/.test(s)?s.slice(8)+"/"+s.slice(5,7)+"/"+s.slice(0,4):"—";
  };
- const meridaToday=()=>new Intl.DateTimeFormat("en-CA",{
-   timeZone:"America/Merida",year:"numeric",month:"2-digit",day:"2-digit"
- }).format(new Date());
+ const meridaToday=()=>{
+  const parts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Merida",
+   year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const part=t=>parts.find(x=>x.type===t)?.value||"00";
+  return part("year")+"-"+part("month")+"-"+part("day");
+ };
  async function action(accion,datos={}){
   const token=localStorage.getItem(core.STORAGE.ADMIN_TOKEN)||"";
   if(!token)throw Error("Sesión Admin no disponible");
