@@ -200,9 +200,12 @@ Deno.serve(async(req)=>{
         },409);
         // F3 beta: un perfil real se presenta por contrato/ordinal verificados.
         // Un ID ambiguo bloquea la cotización en lugar de inventar "Perfil 1".
-        const [cycle,obligations,accesses,contracts,reports]=await Promise.all([
-          sb.from("goxion_b2_ciclos").select("id").eq("cliente_id",clientId)
-            .eq("periodo",ciclo).maybeSingle(),
+        const cycle=await sb.from("goxion_b2_ciclos").select("id")
+          .eq("cliente_id",clientId).eq("periodo",ciclo).maybeSingle();
+        if(cycle.error||!cycle.data?.id)return res({
+          ok:false,modo:"b2_sin_estado_cobrable",
+          error:"Ciclo B2 pendiente de revisión",permitir_pago_global:false},409);
+        const [obligations,accesses,contracts,reports]=await Promise.all([
           sb.from("goxion_b2_cargos")
             .select("id,cliente_acceso_id,cliente_servicio_id")
             .eq("cliente_id",clientId).eq("periodo",ciclo).limit(90),
@@ -211,14 +214,11 @@ Deno.serve(async(req)=>{
           sb.from("cliente_servicios").select("id,nombre")
             .eq("cliente_id",clientId).eq("activo",true).limit(90),
           sb.from("goxion_b2_comprobantes").select("id,estado")
-            .eq("cliente_id",clientId).eq("ciclo_id",
-              // La fila de ciclo se verifica más abajo; null NO abre el acceso.
-              (await sb.from("goxion_b2_ciclos").select("id")
-                .eq("cliente_id",clientId).eq("periodo",ciclo).maybeSingle()).data?.id||"")
+            .eq("cliente_id",clientId).eq("ciclo_id",cycle.data.id)
             .eq("estado","reportado").limit(1)
         ]);
-        if(cycle.error||obligations.error||accesses.error||contracts.error||reports.error)
-          throw cycle.error||obligations.error||accesses.error||contracts.error||reports.error;
+        if(obligations.error||accesses.error||contracts.error||reports.error)
+          throw obligations.error||accesses.error||contracts.error||reports.error;
         const byCharge=new Map((obligations.data||[]).map((item:any)=>[item.id,item]));
         const byAccess=new Map((accesses.data||[]).map((item:any)=>[item.id,item]));
         const byContract=new Map((contracts.data||[]).map((item:any)=>[item.id,item]));
