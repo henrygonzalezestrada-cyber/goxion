@@ -1,0 +1,20 @@
+name: GOXION · Admin B2 activación desde calendario
+on:
+  push:
+    branches:
+      - fix/admin-b2-activar-desde-calendario-20261014
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Sintaxis y acoplamiento de la interfaz
+        run: |
+          node --check preview/calendario-financiero/b2-activacion.js
+          node --input-type=module -e "import fs from 'node:fs'; import assert from 'node:assert/strict'; const html=fs.readFileSync('preview/calendario-financiero/index.html','utf8');const script=fs.readFileSync('preview/calendario-financiero/b2-activacion.js','utf8');const gateway=fs.readFileSync('docs/edge/acciones-financieras-b2-beta/index.ts','utf8');assert(html.includes('b2-activacion.js'));assert(script.includes('b2_estado_activacion'));assert(script.includes('confirmar_activacion:true'));assert(script.includes('perfiles_verificados'));assert(script.includes('GX_B2_NON_EXISTENT')===false);assert(gateway.includes('if(action===\"b2_estado_activacion\")'));assert(gateway.includes('b2_activar_cliente'));console.log('Admin calendario+activación: contratos PASS')"
