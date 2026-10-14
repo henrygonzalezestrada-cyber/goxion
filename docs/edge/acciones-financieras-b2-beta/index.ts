@@ -1,5 +1,8 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.116.0";
 
+// Contrato único de identificadores compartido por todas las acciones B2.
+const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-admin-token, x-client-info, apikey, content-type",
@@ -256,22 +259,51 @@ Deno.serve(async (req) => {
       return json({ok:true,accion:action,solicitudes:found.data||[],
         contrato:"goxion-b2-prorrogas-v1"});
     }
+    // La prórroga ya es 100% automática; jamás autorizar ni rechazar en Admin.
     if (action==="b2_resolver_prorroga") {
+      return json({ok:false,codigo:"PRORROGA_AUTOMATICA_SIN_RESOLUCION_ADMIN",
+        error:"La prórroga elegible se confirma automáticamente desde Mi Espacio",
+        acreditada_b2:false},409);
+    }
+
+    // F2: reutiliza el gateway existente, no crear otro panel financiero.
+    // Los importes provienen siempre de la fuente oficial y los destinos
+    // se verifican transaccionalmente contra sus accesos y calendarios.
+    if(action==="b2_conciliar_atribuciones"||action==="b2_guardar_atribuciones"){
       const clienteId=String(data?.cliente_id||"").trim();
-      const id=String(data?.solicitud_id||"").trim();
-      if(!uuid.test(clienteId)||!uuid.test(id)||
-          typeof data?.aprobar!=="boolean"||data?.confirmar_resolucion!==true){
-        return json({ok:false,error:"Confirma la decisión administrativa y la solicitud"},400);
+      const periodo=String(data?.periodo||"").trim();
+      const guardar=action==="b2_guardar_atribuciones";
+      if(!uuid.test(clienteId)||!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(periodo))
+        return json({ok:false,codigo:"B2_ATRIBUCION_PARAMETROS",
+          error:"Cliente y período válidos requeridos",cobrable:false},400);
+      if(guardar){
+        const rows=Array.isArray(data?.lineas)?data.lineas:[];
+        if(data?.confirmar_atribucion!==true||rows.length>100||
+          rows.some((r:any)=>!["promocion","especial","trato_justo","programado"].includes(r?.fuente)||
+           !uuid.test(String(r?.referencia_id||""))||
+           !uuid.test(String(r?.cliente_acceso_id||""))||
+           !Number.isSafeInteger(r?.monto_centavos)||r.monto_centavos<=0||
+           String(r?.justificacion||"").trim().length<12))
+          return json({ok:false,codigo:"B2_ATRIBUCION_REQUIERE_CONFIRMACION",
+            error:"Confirma origen, acceso, monto y justificación",cobrable:false},400);
+        const saved=await sb.rpc("goxion_b2_guardar_atribuciones",{
+          p_cliente_id:clienteId,p_periodo:periodo,p_lineas:rows,
+          p_actor:"admin:b2-gateway"
+        });
+        if(saved.error||saved.data?.conciliado!==true)
+         return json({ok:false,codigo:"B2_ATRIBUCION_NO_CONCILIADA",
+          error:saved.error?.message||"No fue posible conciliar",
+          cobrable:false},409);
+        return json({ok:true,accion:action,resultado:saved.data,
+          cobrable:false,acreditada_b2:false});
       }
-      const applied=await sb.rpc("goxion_b2_resolver_prorroga",{
-        p_cliente_id:clienteId,p_solicitud_id:id,
-        p_aprobar:data.aprobar,p_actor:"admin:b2-gateway"
+      const reviewed=await sb.rpc("goxion_b2_validar_atribuciones",{
+        p_cliente_id:clienteId,p_periodo:periodo
       });
-      if(applied.error||applied.data?.ok!==true)return json({
-        ok:false,error:applied.error?.message||"No se pudo resolver la prórroga",
-        codigo:"PRORROGA_NO_RESUELTA"},409);
-      return json({ok:true,accion:action,resultado:applied.data,
-        contrato:"goxion-b2-prorrogas-v1"});
+      if(reviewed.error)return json({ok:false,codigo:"B2_ATRIBUCION_NO_DISPONIBLE",
+        error:reviewed.error.message,cobrable:false},409);
+      return json({ok:true,accion:action,resultado:reviewed.data,
+        cobrable:false,acreditada_b2:false});
     }
 
     // F2 · Toda acreditación B2 sale desde un COMPROBANTE reportado.
