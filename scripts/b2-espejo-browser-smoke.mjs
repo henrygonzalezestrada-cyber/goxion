@@ -32,8 +32,11 @@ try{
  }
  check(mirrorIndex.includes("index-adapter.js"),"Index adaptado sin reescribir original");
  check(mirrorAyuda.includes("ayuda-prorroga.js"),"Modal pactado en Ayuda real");
- check(!originalIndex.includes("preview/integracion-b2"),"Index producción intacto");
- check(!originalAyuda.includes("preview/integracion-b2"),"Ayuda producción intacta");
+ check(!originalIndex.includes("preview/integracion-b2"),"Index legacy intacto");
+ // En F5 Mi Espacio monta las animaciones aprobadas, sin cambiar el espejo.
+ check(originalAyuda.includes("17-b2-prorroga-oficial.js") &&
+       originalAyuda.includes("18-b2-index-ruta-oficial.js"),
+   "Ayuda F5 conecta prórroga y navegación opt-in");
  const guard=readFileSync("preview/integracion-b2/sandbox-guard.js","utf8");
  check(guard.includes('method!=="GET"')&&guard.includes("403"),"Espejo no escribe datos");
  for(const engine of [chromium,webkit]){

@@ -1,0 +1,30 @@
+import assert from "node:assert/strict";
+import {readFileSync} from "node:fs";
+const read=p=>readFileSync(p,"utf8");let count=0;
+const check=(value,desc)=>{assert.ok(value,desc);count++};
+const ayuda=read("ayuda.html"),admin=read("admin.html"),index=read("index.html");
+const prorroga=read("assets/js/ayuda/17-b2-prorroga-oficial.js");
+const link=read("assets/js/ayuda/18-b2-index-ruta-oficial.js");
+const adminRouter=read("assets/js/admin/33-b2-f5-review-router.js");
+const betaAdmin=read("preview/integracion-b2/admin.html");
+check(ayuda.includes("17-b2-prorroga-oficial.js"),"Mi Espacio monta prórroga aprobada");
+check(ayuda.includes("18-b2-index-ruta-oficial.js"),"Ayuda enrutamiento opt-in");
+check(ayuda.includes("prorroga-visual.css"),"Se reutiliza diseño aprobado");
+check(!prorroga.includes("b2-demo")&&!prorroga.includes("sessionStorage.setItem"),
+ "No existe fixture demo en prórroga oficial");
+check(prorroga.includes("mi_prorroga")&&prorroga.includes("activar_prorroga_auto"),
+ "Prórroga requiere servidor y token");
+check(link.includes('json.modo==="b2_multifecha"'),"Sólo opt-in B2 va a calendario");
+check(link.includes('json.modo==="b2_sin_estado_cobrable"'),"Saldo sin conciliar bloqueado");
+check(link.includes('return old.apply(this,args)'),"Fecha única conserva Index");
+check(link.includes("X-Client-Token"),"Verificación autenticada del cliente");
+check(admin.includes("33-b2-f5-review-router.js"),"Admin oficial monta router");
+check(adminRouter.includes('result.modo==="global"'),"Pago legacy usa Admin original");
+check(adminRouter.includes('result.modo==="b2_multifecha"'),"B2 usa revisión separada");
+check(adminRouter.includes("X-Admin-Token"),"Admin HMAC real");
+check(betaAdmin.includes("f5-admin-entry.js"),"Modal nativo B2 abre desde Admin");
+check(index.includes("01-index-supabase-layer.js"),"Index oficial permanece intacto");
+check(!read("index.html").includes("b2-bridge.js"),"El Index legado no recibió rutas globales B2");
+check(!read("admin.html").includes("admin-sandbox.js"),"Admin oficial sin restricciones sandbox");
+check(!read("ayuda.html").includes("ayuda-demo.js"),"Ayuda oficial sin fixtures beta");
+console.log("GOXION F5 opt-in release: "+count+" invariantes PASS");
