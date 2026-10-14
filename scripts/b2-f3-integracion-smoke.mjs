@@ -18,8 +18,8 @@ check(guard.includes('given.get("X-Client-Token")===clientToken'),"No token de o
 check(guard.includes('integratedBeta&&method==="POST"'),"B2 opt-in solo POST explícito");
 check(guard.includes('target.origin==="https://hmpevcwodcgbkviarfic.supabase.co"'),"Origen de red restringido");
 check(!guard.includes('"/functions/v1/acciones-financieras-b2-beta"'),"Admin no se habilita desde cliente");
-for(const token of ["store.blocked=true","response.modo==="b2_sin_estado_cobrable",
-  "response.modo===\"oficial\"","quote.ciclo_id","x.servicio","x.ordinal"])
+for(const token of ['store.blocked=true','response.modo==="b2_sin_estado_cobrable"',
+  'response.modo==="oficial"',"quote.ciclo_id","x.servicio","x.ordinal"])
  check(quote.includes(token),"Ruteo: "+token);
 check(quote.includes("store.quote=null;store.blocked=false"),"Fecha única conserva backend anterior");
 check(adapter.includes('descuento_comercial_centavos'),"Sin ajustes comerciales inventados");
