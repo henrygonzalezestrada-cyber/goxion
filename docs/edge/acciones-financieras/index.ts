@@ -131,6 +131,29 @@ Deno.serve(async (req) => {
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
     const sb = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
+    // B2: preflight de preparación ANTES de mover o facturar cualquier acceso.
+    // Sólo Admin. Es lectura SQL sin efecto financiero; incluso si pasa, NO cobra.
+    if (action === "diagnostico_b2_sombra") {
+      const clienteId=String(data?.cliente_id||"").trim();
+      const periodo=String(data?.periodo||"").trim();
+      const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuid.test(clienteId)||
+        (periodo&&!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(periodo))) {
+        return json({ok:false,error:"Cliente o período no válido",
+          codigo:"DIAGNOSTICO_B2_PARAMETROS_INVALIDOS",cobrable:false},400);
+      }
+      const check=await sb.rpc("goxion_diagnostico_b2_sombra",{
+        p_cliente_id:clienteId,p_periodo:periodo||null
+      });
+      if (check.error||check.data?.ok!==true) {
+        return json({ok:false,error:check.error?.message||"Diagnóstico no disponible",
+          codigo:"DIAGNOSTICO_B2_NO_VERIFICADO",cobrable:false},409);
+      }
+      return json({ok:true,accion:action,resultado:check.data,
+        modo:"diagnostico_b2_sombra",cobrable:false,
+        acreditada_oficial:false,operation_id:operationId});
+    }
+
     // B2: imputación exclusivamente SOMBRA de un pago YA APROBADO.
     // No modifica pagos, parciales, saldos, cobertura, mora ni lealtad.
     // Autorización por X-Admin-Token al principio del gateway.
@@ -218,6 +241,99 @@ Deno.serve(async (req) => {
         modo:"propuesta_sin_acreditacion",acreditada:false,cobrable:false});
     }
 
+    // B2 · Prórrogas administrativas. Solicitud no equivale a aprobación.
+    if (action==="b2_listar_prorrogas") {
+      const clienteId=String(data?.cliente_id||"").trim();
+      if(clienteId&&!uuid.test(clienteId))
+        return json({ok:false,error:"Cliente inválido"},400);
+      let query=sb.from("goxion_b2_prorrogas")
+        .select("id,cliente_id,cargo_id,fecha_original,fecha_pactada,estado,motivo,solicitado_en,revisado_en,revisado_por")
+        .order("solicitado_en",{ascending:false}).limit(100);
+      if(clienteId)query=query.eq("cliente_id",clienteId);
+      else query=query.eq("estado","solicitada");
+      const found=await query;
+      if(found.error)throw found.error;
+      return json({ok:true,accion:action,solicitudes:found.data||[],
+        contrato:"goxion-b2-prorrogas-v1"});
+    }
+    if (action==="b2_resolver_prorroga") {
+      const clienteId=String(data?.cliente_id||"").trim();
+      const id=String(data?.solicitud_id||"").trim();
+      if(!uuid.test(clienteId)||!uuid.test(id)||
+          typeof data?.aprobar!=="boolean"||data?.confirmar_resolucion!==true){
+        return json({ok:false,error:"Confirma la decisión administrativa y la solicitud"},400);
+      }
+      const applied=await sb.rpc("goxion_b2_resolver_prorroga",{
+        p_cliente_id:clienteId,p_solicitud_id:id,
+        p_aprobar:data.aprobar,p_actor:"admin:b2-gateway"
+      });
+      if(applied.error||applied.data?.ok!==true)return json({
+        ok:false,error:applied.error?.message||"No se pudo resolver la prórroga",
+        codigo:"PRORROGA_NO_RESUELTA"},409);
+      return json({ok:true,accion:action,resultado:applied.data,
+        contrato:"goxion-b2-prorrogas-v1"});
+    }
+
+    // B2: propietario ÚNICO de activación, cotización y acreditación
+    // individual. Exige sesión Admin comprobada antes de entrar aquí.
+    // Los clientes de fecha única nunca pasan por esta ruta.
+    if (["b2_activar_cliente","b2_cotizar_ciclo",
+         "b2_aprobar_abono","b2_unificar_cliente"].includes(action)) {
+      const clienteId=String(data?.cliente_id||"").trim();
+      const periodo=String(data?.periodo||"").trim();
+      if(!uuid.test(clienteId))return json({ok:false,
+        error:"Cliente inválido",codigo:"B2_CLIENTE_INVALIDO"},400);
+      const requirePeriod=action==="b2_activar_cliente"||action==="b2_cotizar_ciclo";
+      if(requirePeriod&&!/^\d{4}-(0[1-9]|1[0-2])-01$/.test(periodo))
+        return json({ok:false,error:"Período B2 inválido",codigo:"B2_PERIODO_INVALIDO"},400);
+      const actor="admin:b2-gateway";
+      let rpc="",args={p_cliente_id:clienteId};
+      if(action==="b2_activar_cliente"){
+        if(data?.confirmar_activacion!==true)return json({ok:false,
+          error:"Se requiere confirmar la activación del régimen multifecha",
+          codigo:"B2_CONFIRMACION_OBLIGATORIA"},400);
+        rpc="goxion_b2_activar_cliente";
+        args={...args,p_periodo:periodo,p_confirmado:true,p_actor:actor};
+      }else if(action==="b2_unificar_cliente"){
+        if(data?.confirmar_unificacion!==true)return json({ok:false,
+          error:"Unificar fechas requiere confirmación Admin",
+          codigo:"B2_CONFIRMACION_OBLIGATORIA"},400);
+        rpc="goxion_b2_desactivar_cliente";
+        args={...args,p_confirmado:true,p_actor:actor};
+      }else if(action==="b2_cotizar_ciclo"){
+        rpc="goxion_b2_cotizar_ciclo";
+        // La fecha actual SIEMPRE se obtiene del servidor SQL.
+        args={...args,p_periodo:periodo};
+      }else{
+        const cargoId=String(data?.cargo_id||"").trim();
+        const key=String(data?.clave_idempotencia||"").trim();
+        const monto=Number(data?.monto_centavos);
+        const expected=Number(data?.saldo_esperado_centavos);
+        const nota=String(data?.nota||"").slice(0,400);
+        if(!uuid.test(cargoId)||!uuid.test(key)||!Number.isSafeInteger(monto)||
+          !Number.isSafeInteger(expected)||monto<=0||expected<=0||monto>expected){
+          return json({ok:false,error:"Cargo, monto, saldo y clave no válidos",
+            codigo:"B2_ABONO_INVALIDO"},400);
+        }
+        if(data?.confirmar_aprobacion!==true)return json({ok:false,
+          error:"Admin debe confirmar la aprobación del comprobante individual",
+          codigo:"B2_CONFIRMACION_OBLIGATORIA"},400);
+        rpc="goxion_b2_aprobar_abono";
+        args={...args,p_cargo_id:cargoId,p_monto_centavos:monto,
+          p_saldo_esperado_centavos:expected,p_operation_id:key,p_nota:nota};
+      }
+      const applied=await sb.rpc(rpc,args);
+      if(applied.error||applied.data?.ok!==true)return json({ok:false,
+        error:applied.error?.message||"Operación B2 no disponible",
+        codigo:"B2_CONCILIACION_REQUERIDA",acreditada:false,
+        operation_id:operationId},409);
+      return json({ok:true,accion:action,resultado:applied.data,
+        contrato:"goxion-b2-por-acceso-v1",
+        operation_id:String(data?.clave_idempotencia||operationId),
+        cobrable:action==="b2_cotizar_ciclo"?false:undefined,
+        acreditada_b2:action==="b2_aprobar_abono"?true:false});
+    }
+
     if (action === "aprobar_pago") {
       const clienteId = String(data?.cliente_id || "").trim();
       const monto = Number(data?.monto ?? 0);
@@ -239,7 +355,11 @@ Deno.serve(async (req) => {
       }
 
       const periodoActual = String(before.data?.periodo || "").slice(0, 7);
-      if (periodoActual !== periodoEsperado) {
+      // Si una respuesta se perdió después del COMMIT, la clave existente debe
+      // llegar a SQL para devolver la operación original aun con periodo avanzado.
+      // Una clave NUEVA no salta la guarda: SQL lo rechazará bajo lock.
+      const replayKey=String(data?.clave_idempotencia||"").trim();
+      if (periodoActual !== periodoEsperado && !uuid.test(replayKey)) {
         return json({
           ok: false,
           error: "El periodo de cobro cambió antes de aprobar el pago. Recarga la ficha antes de continuar.",
@@ -250,48 +370,35 @@ Deno.serve(async (req) => {
         }, 409);
       }
 
-      const downstream = await callFunction(url, "periodo-cobro", "aprobar_pago_periodo", {
-        cliente_id: clienteId,
-        monto,
-        puntual,
-        notas,
-      }, auth.token);
-
-      if (!downstream.response.ok || downstream.body?.ok !== true) {
-        const retryAfter = downstream.response.headers.get("Retry-After");
+      // El estado previo es informativo: la RPC revalida bajo lock de cliente.
+      const suppliedKey=String(data?.clave_idempotencia||"").trim();
+      if(suppliedKey&&!uuid.test(suppliedKey)){
+        return json({ok:false,error:"Clave idempotente inválida",codigo:"CLAVE_INVALIDA"},400);
+      }
+      const effectiveId=suppliedKey||operationId;
+      const applied=await sb.rpc("goxion_aprobar_pago_periodo_atomico",{
+        p_cliente_id:clienteId,p_periodo_esperado:periodoEsperado,
+        p_monto:monto,p_puntual:puntual,p_notas:notas,p_operation_id:effectiveId
+      });
+      if(applied.error||applied.data?.ok!==true){
+        const stale=/PERIODO_DESACTUALIZADO|ya acreditado|ya cubierto/i.test(applied.error?.message||"");
         return json({
-          ok: false,
-          error: downstream.body?.error || downstream.text || "No fue posible aprobar el pago.",
-          operation_id: operationId,
-          etapa: "periodo-cobro",
-        }, downstream.response.status || 500, retryAfter ? { "Retry-After": retryAfter } : {});
+          ok:false,error:applied.error?.message||"No fue posible aprobar el pago.",
+          operation_id:effectiveId,codigo:stale?"PERIODO_DESACTUALIZADO":"APROBACION_ATOMICA_FALLIDA",
+          etapa:"goxion_aprobar_pago_periodo_atomico"
+        },409);
       }
-
-      const paidPeriod = String(before.data?.periodo || "").slice(0,10);
-      if (paidPeriod) {
-        await sb.from("pagos_parciales")
-          .update({ activo: false, estado: "liquidado", updated_at: new Date().toISOString() })
-          .eq("cliente_id", clienteId).eq("periodo", paidPeriod).eq("activo", true);
-        await sb.from("acuerdos_cobro")
-          .update({ activo: false, estado: "cumplido", updated_at: new Date().toISOString() })
-          .eq("cliente_id", clienteId).eq("periodo", paidPeriod).eq("activo", true);
-      }
-
-      const after = await financialState(sb, clienteId);
+      const after=await financialState(sb,clienteId);
       return json({
-        ok: true,
-        accion: action,
-        operation_id: operationId,
-        contrato: "goxion-financial-actions-v1",
-        version: "1.2",
-        resultado: downstream.body,
-        estado_anterior: before.data || null,
-        estado_financiero: after.error ? null : (after.data || null),
-        estado_financiero_error: after.error ? "No fue posible refrescar el estado después de guardar." : null,
+        ok:true,accion:action,operation_id:effectiveId,
+        contrato:"goxion-financial-actions-v1",version:"1.2",
+        resultado:applied.data,estado_anterior:before.data||null,
+        estado_financiero:after.error?null:(after.data||null),
+        estado_financiero_error:after.error?"No fue posible refrescar el estado después de guardar.":null
       });
     }
 
-    if (action === "trato_justo_guardar") {
+        if (action === "trato_justo_guardar") {
       const clienteId = String(data?.cliente_id || "").trim();
       const servicioId = String(data?.cliente_servicio_id || "").trim();
       const periodo = month(data?.periodo);
