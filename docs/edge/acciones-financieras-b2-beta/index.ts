@@ -256,7 +256,27 @@ Deno.serve(async (req) => {
       else query=query.eq("estado","aprobada");
       const found=await query;
       if(found.error)throw found.error;
-      return json({ok:true,accion:action,solicitudes:found.data||[],
+      const ids=(found.data||[]).map((a:any)=>a.cargo_id);
+      const byCargo=new Map<string,boolean>();
+      if(ids.length){
+        const charges=await sb.from("goxion_b2_cargos")
+          .select("id,liquidado").in("id",ids);
+        if(charges.error)throw charges.error;
+        for(const item of charges.data||[])byCargo.set(item.id,item.liquidado===true);
+      }
+      const agreementIds=(found.data||[]).map((a:any)=>a.id);
+      const fulfilled=new Set<string>();
+      if(agreementIds.length){
+        const events=await sb.from("goxion_b2_f4_eventos")
+          .select("acuerdo_id").eq("tipo","prorroga_cumplida")
+          .in("acuerdo_id",agreementIds);
+        if(events.error)throw events.error;
+        for(const event of events.data||[])fulfilled.add(event.acuerdo_id);
+      }
+      return json({ok:true,accion:action,
+        solicitudes:(found.data||[]).map((a:any)=>({
+          ...a,liquidado:byCargo.get(a.cargo_id)===true,
+          cumplida:fulfilled.has(a.id)})),
         contrato:"goxion-b2-prorrogas-v1"});
     }
     // La prórroga ya es 100% automática; jamás autorizar ni rechazar en Admin.
