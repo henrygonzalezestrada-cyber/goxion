@@ -73,10 +73,41 @@ Deno.serve(async req=>{
    new Set(ids.map((id:unknown)=>String(id).toLowerCase())).size!==ids.length||
    !(attachment instanceof File)||attachment.size<12||attachment.size>MAX_BYTES)
    return reply({ok:false,error:"Comprobante, cargos o importes inválidos"},400);
+  const requestedIds=ids.map((id:string)=>id.toLowerCase());
+  const bytes=new Uint8Array(await attachment.arrayBuffer());
+  const ext=validImage(bytes,attachment.type);
+  if(!ext)return reply({ok:false,error:"Solo capturas JPG, PNG o WEBP válidas"},400);
+  const dig=new Uint8Array(await crypto.subtle.digest("SHA-256",bytes));
+  const sha=[...dig].map(x=>x.toString(16).padStart(2,"0")).join("");
+  // La ruta no contiene ni nombre original ni datos de la cuenta bancaria.
+  const fileName=opId+"-"+sha.slice(0,24)+ext;
+  const path=clientId+"/"+fileName;
+  // Replay seguro ANTES de validar el ciclo actual: una operación que
+  // ya quedó aprobada debe seguir siendo consultable después de renovarse.
+  // La RPC vuelve a exigir huella, destino, cliente, monto y clave idénticos.
+  const existing=await sb.from("goxion_b2_comprobantes")
+   .select("cliente_id").eq("reporte_operation_id",opId).maybeSingle();
+  if(existing.error)
+   return reply({ok:false,error:"No fue posible verificar el reintento",
+    codigo:"B2_REPLAY_NO_DISPONIBLE",acreditado:false},503);
+  if(existing.data){
+   if(existing.data.cliente_id!==clientId)
+    return reply({ok:false,error:"Clave ya utilizada",
+     codigo:"B2_IDEMPOTENCIA_INCOMPATIBLE",acreditado:false},409);
+   const replay=await sb.rpc("goxion_b2_registrar_comprobante_seguro",{
+    p_cliente_id:clientId,p_ciclo_id:cycleId,p_monto_centavos:amount,
+    p_evidencia_ref:path,p_operation_id:opId,p_cargo_ids:requestedIds
+   });
+   if(replay.error||replay.data?.ok!==true)
+    return reply({ok:false,error:"Los datos del reintento no coinciden",
+      codigo:"B2_IDEMPOTENCIA_INCOMPATIBLE",acreditado:false},409);
+   return reply({ok:true,resultado:replay.data,
+    reporte_id:replay.data.reporte_id,estado:replay.data.estado,
+    acreditado:replay.data.acreditado===true});
+  }
   // Preflight ANTES de almacenar bytes: ningún cliente sin ciclo B2
   // elegible puede generar archivos huérfanos mediante intentos inválidos.
   // El SQL de registro repite TODAS estas verificaciones bajo locks.
-  const requestedIds=ids.map((id:string)=>id.toLowerCase());
   const cycle=await sb.from("goxion_b2_ciclos")
    .select("periodo,estado").eq("id",cycleId)
    .eq("cliente_id",clientId).maybeSingle();
@@ -100,14 +131,6 @@ Deno.serve(async req=>{
   if(selected.length!==requestedIds.length||expectedAmount!==amount)
    return reply({ok:false,error:"Cargos o importe desactualizados",
     codigo:"B2_IMPORTES_NO_CONCILIADOS",acreditado:false},409);
-  const bytes=new Uint8Array(await attachment.arrayBuffer());
-  const ext=validImage(bytes,attachment.type);
-  if(!ext)return reply({ok:false,error:"Solo capturas JPG, PNG o WEBP válidas"},400);
-  const dig=new Uint8Array(await crypto.subtle.digest("SHA-256",bytes));
-  const sha=[...dig].map(x=>x.toString(16).padStart(2,"0")).join("");
-  // La ruta no contiene ni nombre original ni datos de la cuenta bancaria.
-  const fileName=opId+"-"+sha.slice(0,24)+ext;
-  const path=clientId+"/"+fileName;
   const uploaded=await sb.storage.from(BUCKET).upload(path,bytes,{
    upsert:false,contentType:attachment.type,cacheControl:"0"
   });
