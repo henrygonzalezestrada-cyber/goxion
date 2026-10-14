@@ -1,0 +1,41 @@
+name: GOXION · B2 F5 Candidato Integrado
+on:
+  push:
+    branches:
+      - release/b2-f5-candidato-20261014
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  motor-y-contratos:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Dependencias
+        run: npm install --no-save
+      - name: Verificar motor financiero completo
+        run: npm run verify
+      - name: Verificar F3 sin producción
+        run: node scripts/b2-f3-integracion-smoke.mjs
+      - name: Verificar F4 sin nuevos paneles
+        run: node scripts/b2-f4-integracion-smoke.mjs
+      - name: Rechazo HTTP sin sesión
+        run: node scripts/b2-f3-http-negative.mjs
+  visual-cerrado:
+    runs-on: ubuntu-latest
+    timeout-minutes: 17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Preparar Chromium y WebKit
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium webkit
+      - name: Conservación de la beta visual aprobada
+        run: node scripts/b2-espejo-browser-smoke.mjs
