@@ -156,3 +156,8 @@ revoke all on function public.goxion_b2_f4_registrar_evento(text,uuid),
 grant execute on function public.goxion_b2_f4_registrar_evento(text,uuid),
  public.goxion_b2_f4_claim_discord(integer),
  public.goxion_b2_f4_finish_discord(uuid,boolean,text) to service_role;
+-- Privar también los entrypoints de triggers, aunque no son RPC invocables.
+revoke all on function public.goxion_b2_f4_evento_prorroga_trigger(),
+ public.goxion_b2_f4_evento_pago_trigger() from public,anon,authenticated;
+grant execute on function public.goxion_b2_f4_evento_prorroga_trigger(),
+ public.goxion_b2_f4_evento_pago_trigger() to service_role;
