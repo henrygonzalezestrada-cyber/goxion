@@ -49,7 +49,8 @@ Deno.serve(async(req:Request)=>{
     "Folio: "+safe(event.folio,35),
     "Vencimiento original: "+date(event.fecha_original),
     "Fecha pactada: "+date(event.fecha_pactada),
-    "Obligación: "+safe(event.cargo_id,40),
+    event.cargo_id?"Obligación: "+safe(event.cargo_id,40):
+      "Esquema: fecha única",
     "Acuerdo: "+safe(event.acuerdo_id,40),
     "Evento: "+safe(event.evento_id,40)
    ].join("\n");
