@@ -73,7 +73,9 @@ BEGIN
  from jsonb_array_elements(q->'cargos') item where item->>'cargo_id'=c1::text;
  select (item->>'total_centavos')::integer into amount_today
  from jsonb_array_elements(qlate->'cargos') item where item->>'cargo_id'=c1::text;
- if amount_extended<>4606 or amount_today<=amount_extended then
+ if amount_extended<>(select base_centavos-descuento_original_centavos
+                          from public.goxion_b2_cargos where id=c1)
+    or amount_today<=amount_extended then
   raise exception 'Mora retroactiva incorrecta: gracia %, vencido %',
     amount_extended,amount_today;end if;
  if (select count(*) from public.goxion_b2_prorrogas where cliente_id=cid)<>1
