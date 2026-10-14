@@ -30,7 +30,7 @@ ok(!dispatcher.includes("X-Client-Token"),"Cliente no puede mandar a Discord");
 ok(client.includes('if(b2&&applied.data?.repetida!==true)'),"Evento solo después de confirmar B2");
 ok(client.includes('EdgeRuntime?.waitUntil'),"Discord sin bloquear respuesta");
 for(const token of ['b2_f4_reintentar_discord','b2_listar_prorrogas',
- 'b2_f4_discord-beta','cumplida:fulfilled.has(a.id)'])
+ 'b2-f4-discord-beta','cumplida:fulfilled.has(a.id)'])
  ok(adminEdge.includes(token),"Admin gateway: "+token);
 for(const token of ['prorrogaPendiente','prorroga_activada','prorroga_cumplida','unreadProrrogas'])
  ok(admin.includes(token),"Bandeja existente: "+token);
