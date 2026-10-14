@@ -225,3 +225,26 @@ Supabase reporta **22 `clientes` y 28 `pagos`**, y **cero** filas en régimen B2
 **Integridad:** 22 clientes, 28 pagos históricos; 0 activaciones, cargos, comprobantes y atribuciones B2 persistidos en la lectura final. De los 22 estados financieros, 22 responden con fuente oficial y delta cero; 17 clientes tienen día de pago 15.
 
 **Lo que F2 aún NO acredita:** (P1) POST real con imagen a Storage usando token HMAC técnico, confirmación y replay HTTP con el gateway Admin; (P1) concurrencia en transacciones COMMIT independientes; (P1) actualizar las pruebas históricas obsoletas; (P1) auditoría cruzada de casos excepcionales y de seguridad tras el nuevo snapshot. No abrir F3 ni fusionar PR #96. Es incorrecto afirmar cierre completo por pasar únicamente fixtures SQL.
+
+
+## F2 · Corte de aceptación para F3 beta (13/oct/2026)
+
+**Cierre del desarrollo SQL y reglas comerciales de F2: APTO PARA INTEGRACIÓN BETA. No equivale a liberación en producción, activación masiva ni fusión de PR.** Las verificaciones HTTP autenticadas de carga binaria y concurrencia con transacciones COMMIT independientes corresponden a la **puerta de aceptación integral**, pendiente antes de liberar el flujo a clientes, y deben realizarse en F3 beta con el gateway y token reales. Estas pruebas no se sustituyen por fixtures SQL ni se declaran superadas.
+
+### Depuración final ejecutada
+
+- Dos pruebas históricas estaban obsoletas por reloj fijo y prórroga administrativa: `20261012_prorroga_b2_reversible.sql` y `20261012_b2_libro_real_atómico_reversible.sql`. Fueron reescritas para la fecha actual del servidor y el contrato de prórroga automática/abono actual; ambas dieron **PASS con BEGIN/ROLLBACK**.
+- La batería de combo de 2 períodos y mora con descuento especial mostró fallas **intermitentes** por ordenar UUID aleatorios y después suponer que el primer UUID era el servicio de $49. Se corrigieron los fixtures para seleccionar accesos por sus contratos/precios, y en mora se alineó también la fecha de vencimiento con el contrato. **Ambas pasaron 4 de 4 repeticiones consecutivas** tras el cambio. No se modificó la fórmula del motor para corregir ese problema de pruebas.
+- El resto de la batería reversible: comprobante completo 1→N y rollback de aplicación fallida; prórroga automática; atribución comercial por acceso; promoción y cupón con consumo único; Trato Justo; promoción no acumulable; combo por meses; cupón porcentual por fecha congelada; mora individual; lealtad 6% y motor global: **PASS** ejecutados de nuevo.
+- El pipeline `GOXION · B2 Backend` terminó en éxito para el commit `6265ba85`, que contiene las dos pruebas históricas modernizadas. Las corridas posteriores para `11870491` y `5b8fe443` estaban **en progreso** en la última consulta: NO afirmar resultado hasta verificar.
+- Supabase después de todas las pruebas: **22 clientes, 28 pagos**, **0** clientes B2 activos, ciclos, cargos, comprobantes y atribuciones B2, 22/22 estados financieros oficiales con delta cero. Asesor de seguridad: solo observaciones INFO de RLS sin políticas para tablas internas, no error nuevo de acceso público.
+
+### Entrega a F3 y criterios estrictos para apertura de producción
+
+1. F3 puede integrar **en beta y sin clientes reales** el registro de atribuciones comerciales mediante `acciones-financieras-b2-beta` v5, el reporte de evidencia privada `comprobantes-b2-beta` v3 y las reglas de lealtad/mora/prórroga aprobadas. No agregar secciones financieras duplicadas.
+2. Prueba real HTTP con token HMAC válido para cliente técnico, subida binaria MIME/firma, revisión Admin, idempotencia por operación después de liquidar y manejo de error de Storage. No está ejecutada porque estas herramientas no proveen una invocación HTTP autenticada con esas credenciales; no fabricar éxito.
+3. Prueba real de dos aprobaciones concurrentes e independientes **con COMMIT/rollback**, incluida carrera por mismo reporte y reintento con clave distinta. No está ejecutada; los fixtures reversibles de SQL no sustituyen dos sesiones simultáneas compartiendo datos confirmados.
+4. Revisar PR #96 actualmente **draft, sin fusionar**, con conflictos de integración (`mergeable=false` en consulta), y no modificar master, Admin/Index/Ayuda oficiales, ni Issue #98 de notificaciones en este corte.
+5. **Puerta de producción CERRADA** hasta completar (2), (3), resolver la integración y obtener aprobación explícita. La marca APTO F3 BETA es un handoff técnico, no un cambio automático de rama ni un lanzamiento.
+
+**Conclusión:** ya no hay bloqueo P0 conocido de reglas de atribución, consumo comercial, descuentos o mora en los escenarios probados. El trabajo de código del motor F2 puede darse por entregado para integración beta, sin convertir la evidencia pendiente de HTTP/concurrencia en una afirmación falsa.
