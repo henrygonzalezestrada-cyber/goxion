@@ -24,6 +24,8 @@ jobs:
           node --check preview/integracion-b2/index-adapter.js
           node --check preview/integracion-b2/ayuda-prorroga.js
           node --check preview/integracion-b2/f3-navigation.js
+          node --check preview/integracion-b2/admin-sandbox.js
+          node --check preview/integracion-b2/admin-b2-f3.js
           node --check preview/index-b2/b2-bridge.js
           node --check scripts/b2-f3-integracion-smoke.mjs
       - name: Contratos de datos, autenticación y no regresión
