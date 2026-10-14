@@ -34,7 +34,9 @@ const expectedTests=[
 "20261013_b2_promocion_cupon_consumo_reversible.sql",
 "20261013_b2_trato_justo_promocion_cupon_reversible.sql",
 "20261013_b2_promocion_no_acumulable_reversible.sql",
-"20261013_b2_combo_dos_periodos_precio_fijo_reversible.sql"
+"20261013_b2_combo_dos_periodos_precio_fijo_reversible.sql",
+"20261013_b2_mora_accesos_beneficio_comercial_reversible.sql",
+"20261013_b2_cupon_snapshot_fecha_pago_reversible.sql"
 ];
 for(const name of expectedTests){
  const source=read("supabase/tests/"+name);
