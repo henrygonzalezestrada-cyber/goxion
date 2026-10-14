@@ -1,0 +1,49 @@
+name: GOXION · B2 F3 Integración Beta
+
+on:
+  push:
+    branches:
+      - feature/b2-f3-integracion-beta-20261013
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contrato-b2-f3:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sintaxis de módulos beta
+        run: |
+          node --check preview/integracion-b2/sandbox-guard.js
+          node --check preview/integracion-b2/index-adapter.js
+          node --check preview/integracion-b2/ayuda-prorroga.js
+          node --check preview/integracion-b2/f3-navigation.js
+          node --check preview/integracion-b2/admin-sandbox.js
+          node --check preview/integracion-b2/admin-b2-f3.js
+          node --check preview/index-b2/b2-bridge.js
+          node --check scripts/b2-f3-integracion-smoke.mjs
+      - name: Contratos de datos, autenticación y no regresión
+        run: node scripts/b2-f3-integracion-smoke.mjs
+      - name: Rechazo HTTP real sin sesión (sin escrituras)
+        run: node scripts/b2-f3-http-negative.mjs
+
+  visual-espejo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Navegadores Chromium y WebKit
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium webkit
+      - name: Contratos visuales aprobados sin operaciones reales
+        run: node scripts/b2-espejo-browser-smoke.mjs

@@ -24,6 +24,8 @@
    principal_centavos:Number(x.principal_centavos||0),
    base_centavos:Number(x.base_centavos||0),
    descuento_centavos:Number(x.descuento_centavos||0),
+   descuento_comercial_centavos:Number(x.descuento_comercial_centavos||0),
+   beneficios_comerciales:Array.isArray(x.beneficios_comerciales)?x.beneficios_comerciales:[],
    mora_centavos:Number(x.mora_centavos||0),
    abono_pagado_centavos:Number(x.abono_pagado_centavos||0),
    fecha_pactada:String(x.fecha_pactada||""),
@@ -49,10 +51,19 @@
   const sum=key=>items.reduce((acc,row)=>acc+Math.max(0,Number(row[key]||0)),0);
   const subtotal=sum("base_centavos");
   const lealtad=sum("descuento_centavos");
+  const comerciales=sum("descuento_comercial_centavos");
   const mora=sum("mora_centavos");
   const abonos=sum("abono_pagado_centavos");
-  const ajustes=selection.centavos-(subtotal-lealtad+mora-abonos);
-  return {subtotal,lealtad,mora,abonos,ajustes,total:selection.centavos,
+  const detalles=new Map();
+  for(const item of items)for(const benefit of item.beneficios_comerciales){
+    const key=String(benefit.fuente)+":"+String(benefit.referencia_id);
+    const previous=detalles.get(key)||{concepto:String(benefit.concepto||"Beneficio GOXION"),monto:0};
+    previous.monto+=Number(benefit.monto_centavos||0);
+    detalles.set(key,previous);
+  }
+  const ajustes=selection.centavos-(subtotal-lealtad-comerciales+mora-abonos);
+  return {subtotal,lealtad,comerciales,detalles:[...detalles.values()],
+    mora,abonos,ajustes,total:selection.centavos,
     titulo:mode==="todo"?"Todos los servicios":
       title(items[0])};
  }
@@ -82,6 +93,10 @@
     '<div class="gx-b2-breakdown-context">'+esc(b.titulo)+'</div>'+
     line("Subtotal",money(b.subtotal))+
     (b.lealtad>0?line("Descuento de lealtad","−"+money(b.lealtad),"discount-line"):"")+
+    (b.detalles.length?b.detalles.map(x=>line(x.concepto,"−"+money(x.monto),
+       "discount-line")).join(""):
+      b.comerciales>0?line("Beneficios comerciales aplicados","−"+money(b.comerciales),
+        "discount-line"):"")+
     (b.abonos>0?line("Pagos parciales aprobados","−"+money(b.abonos),"discount-line"):"")+
     (b.mora>0?line("Mora acumulada","+"+money(b.mora),"surcharge-line"):"")+
     (b.ajustes!==0?line("Otros ajustes al saldo",
@@ -205,7 +220,9 @@
        [["proximo","Próximo vencimiento"],["todo","Todo junto"]]
        .map(pair=>'<button type="button" class="gx-b2-choice" data-b2-mode="'+pair[0]+'" aria-pressed="'+(mode===pair[0])+'">'+pair[1]+'</button>').join("")+
      '</div>'+
-     '<p class="gx-b2-foot">El reporte de pago se acredita únicamente después de la revisión de Admin.</p>'+
+     '<p class="gx-b2-foot">'+(store.quote?.comprobante_en_revision?
+      "Comprobante recibido · pendiente de revisión. Aún no es un pago acreditado.":
+      "El reporte de pago se acredita únicamente después de la revisión de Admin.")+'</p>'+
      (due?.prorroga_estado==="aprobada"?
        '<p class="gx-b2-foot gx-b2-prorrogated">Acuerdo pactado hasta el '+
          esc(date(due.fecha_pactada))+
@@ -216,7 +233,19 @@
  }
  function render(){
   const anchor=document.querySelector(".services-container");
-  if(!anchor||!store.quote?.ok||!Array.isArray(store.quote.cargos))return;
+  if(!anchor)return;
+  document.getElementById("gx-b2-read-block")?.remove();
+  if(store.blocked){
+    const guard=document.createElement("div");
+    guard.id="gx-b2-read-block";
+    guard.className="glass-card gx-b2-card";
+    guard.setAttribute("role","alert");
+    guard.style.cssText="padding:18px;margin:12px 0;line-height:1.6";
+    guard.textContent="Tu calendario B2 requiere verificación. No realices un pago global hasta que se confirme el saldo por servicio.";
+    anchor.insertAdjacentElement("afterend",guard);
+    return;
+  }
+  if(!store.quote?.ok||!Array.isArray(store.quote.cargos))return;
   let card=document.getElementById("b2-calendar");
   if(!card){
    card=document.createElement("section");
@@ -249,7 +278,14 @@
   const originalModal=window.abrirModalPago;
   const originalBank=window.abrirDatosPago;
   window.abrirModalPago=function(key,period,monto,folio,nombre){
+   if(store.blocked){
+    window.mostrarToastPago?.("Saldo B2 sin verificar: no se permite el pago global.",true);
+    return;
+   }
    if(!store.quote)return originalModal.apply(this,arguments);
+   if(store.quote.comprobante_en_revision){
+    window.mostrarToastPago?.("Tu comprobante ya está en revisión.",true);return;
+   }
    const val=choice();
    if(!val.cargos.length||val.centavos<=0){
     window.mostrarToastPago?.("Selecciona un importe válido",true);return;
@@ -260,29 +296,74 @@
    originalModal.call(this,key,period,(val.centavos/100).toFixed(2),folio,nombre);
   };
   if(typeof originalBank==="function")window.abrirDatosPago=function(){
+   if(store.blocked||store.quote?.comprobante_en_revision){
+    window.mostrarToastPago?.("Comprobante o saldo pendiente de revisión.",true);
+    return;
+   }
    if(store.quote){
     const val=choice();if(val.centavos<=0)return;
     try{pagoActualInfo.monto=(val.centavos/100).toFixed(2)}catch(_){}
    }
    return originalBank.apply(this,arguments);
   };
-  window.enviarComprobanteDiscord=function(){
+  window.enviarComprobanteDiscord=async function(){
+   if(store.blocked){
+    window.mostrarToastPago?.("El saldo B2 aún no está conciliado.",true);return;
+   }
    if(!store.quote)return;
    const val=choice();
    const input=document.getElementById("file-input");
    if(!input?.files?.length){
     window.mostrarToastPago?.("Selecciona tu comprobante",true);return;
    }
-   if(val.centavos<=0)return;
+   if(val.centavos<=0||store.quote.comprobante_en_revision)return;
    if(store.demo){
     if(typeof window.gxSetPaymentSubmitState==="function")
      window.gxSetPaymentSubmitState("success");
     else document.getElementById("payment-modal")?.classList.add("is-success");
     window.mostrarToastPago?.("Esta pantalla es de revisión; no acepta pagos reales");
-   }else{
-    window.mostrarToastPago?.("El reporte de pago aún no está habilitado aquí",true);
-    document.getElementById("payment-modal")?.classList.add("is-error");
+    return;
    }
+   const core=window.GOXION_CORE;
+   const token=localStorage.getItem(core?.STORAGE?.CLIENT_TOKEN||"")||"";
+   const cycle=String(store.quote.ciclo_id||"");
+   if(!store.f3||!token||!/^[-0-9a-f]{36}$/i.test(cycle)){
+    window.mostrarToastPago?.("Esta cuenta no tiene habilitado el reporte B2 beta.",true);
+    return;
+   }
+   if(store.submitting)return;
+   const file=input.files[0],ids=val.cargos.map(x=>x.cargo_id);
+   const signature=[cycle,val.centavos,...ids,file.name,file.size,file.lastModified].join("|");
+   let op=store.reportOperation;
+   if(!op||op.signature!==signature)op={signature,id:crypto.randomUUID()};
+   store.reportOperation=op;store.submitting=true;
+   try{
+    const fd=new FormData();
+    fd.set("ciclo_id",cycle);
+    fd.set("monto_centavos",String(val.centavos));
+    fd.set("cargo_ids",JSON.stringify(ids));
+    fd.set("clave_idempotencia",op.id);
+    fd.set("archivo",file);
+    const response=await fetch(core.endpoint("comprobantes-b2-beta"),{
+      method:"POST",headers:{"X-Client-Token":token},
+      body:fd,cache:"no-store"
+    });
+    const json=await response.json().catch(()=>({}));
+    if(!response.ok||json.ok!==true||
+      !json.reporte_id||json.acreditado===true)
+      throw Error(json.error||"El comprobante no fue aceptado; revisa el importe.");
+    store.report={...store.report,reporte_id:json.reporte_id,
+      estado:json.estado,acreditado:false};
+    store.quote.comprobante_en_revision=true;
+    render();
+    if(typeof window.gxSetPaymentSubmitState==="function")
+      window.gxSetPaymentSubmitState("success");
+    else document.getElementById("payment-modal")?.classList.add("is-success");
+    window.mostrarToastPago?.("Comprobante recibido. Esperando validación de Admin.");
+   }catch(error){
+    document.getElementById("payment-modal")?.classList.add("is-error");
+    window.mostrarToastPago?.(error.message||"No fue posible reportar tu pago.",true);
+   }finally{store.submitting=false;}
   };
  }
  function init(){

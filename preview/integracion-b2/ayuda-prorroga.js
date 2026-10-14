@@ -1,6 +1,8 @@
 (function(){
  "use strict";
- const demo=new URLSearchParams(location.search).get("demo")==="1";
+ const params=new URLSearchParams(location.search);
+ const demo=params.get("demo")==="1";
+ const f3=params.get("f3")==="1"&&window.GOXION_B2_MIRROR?.integratedBeta===true;
  const core=window.GOXION_CORE;
  const endpoint=core?.endpoint?.("estado-financiero-b2-beta");
  const money=x=>(Number(x||0)/100).toLocaleString("es-MX",{style:"currency",currency:"MXN"});
@@ -165,7 +167,13 @@
    if(token===activeToken&&state)return;
    if(!token){state=null;activeToken="";controls();return;}
    fetching=true;
-   try{state=await action("mi_prorroga");activeToken=token;controls();}
+   try{
+     state=await action("mi_prorroga");
+     // F3: el espejo no habilita prórrogas del régimen global ni de clientes
+     // que aún no han sido incorporados explícitamente a multifecha B2.
+     if(f3&&state.modo!=="b2_multifecha")state=null;
+     activeToken=token;controls();
+   }
    catch(e){console.warn("GOXION prórroga beta:",e.message);state=null;activeToken="";controls();}
    finally{fetching=false;}
  }

@@ -7,7 +7,10 @@
     history.replaceState(null, "", location.pathname + "?" + params.toString());
   }
   const demo = params.get("demo") === "1" && params.get("cliente") === "b2-demo";
-  const store = { demo: demo, quote: null, scenario: "puntual", error: "", report: null };
+  const f3=params.get("f3")==="1"&&!demo&&
+    window.GOXION_B2_MIRROR?.integratedBeta===true;
+  const store = { demo, f3, quote:null,blocked:false,scenario:"puntual",
+    error:"",report:null,reportOperation:null };
   window.GOXION_B2_PREVIEW = store;
 
   // En la demostración también sustituimos los DATOS BANCARIOS:
@@ -115,27 +118,42 @@
     if (demo) return new Response(JSON.stringify(fixture()), {
       status:200,headers:{"Content-Type":"application/json"}
     });
-    const result = await previousFetch(input,init);
-    if (!result.ok) return result;
+    const result=await previousFetch(input,init);
+    if(!result.ok||!f3)return result;
     const core=window.GOXION_CORE;
     const token=localStorage.getItem(core.STORAGE.CLIENT_TOKEN)||"";
-    if (!token) return result;
+    if(!token)return result;
     try{
       const beta=await previousFetch(core.endpoint("estado-financiero-b2-beta"),{
         method:"POST",cache:"no-store",
         headers:{"Content-Type":"application/json","X-Client-Token":token},
         body:JSON.stringify({accion:"mi_estado",datos:{}})
       });
-      if (!beta.ok) return result;
-      const response=await beta.json();
-      if(response.ok && response.modo==="b2_multifecha" &&
-        Array.isArray(response.calendario_financiero?.cargos)){
-        store.quote=response.calendario_financiero;
+      const response=await beta.json().catch(()=>({}));
+      if(response.modo==="b2_sin_estado_cobrable"){
+        store.blocked=true;store.quote=null;
+        store.error=response.error||"La cuenta B2 requiere revisión.";
+      }else if(beta.ok&&response.ok&&response.modo==="b2_multifecha"){
+        const quote=response.calendario_financiero;
+        if(quote?.ok===true&&quote?.cobrable===true&&
+          /^[0-9a-f-]{36}$/i.test(String(quote.ciclo_id||""))&&
+          Array.isArray(quote.cargos)&&quote.cargos.every(x=>
+            x.cargo_id&&x.acceso_id&&x.servicio&&Number.isInteger(x.ordinal))){
+          store.quote=quote;store.blocked=false;
+        }else{
+          store.blocked=true;store.quote=null;
+          store.error="El ciclo o los perfiles no están conciliados.";
+        }
+      }else if(response.modo==="oficial"){
+        store.quote=null;store.blocked=false;store.error="";
+      }else if(!beta.ok){
+        store.blocked=true;store.error="No fue posible validar B2 con el servidor.";
       }
     }catch(error){
-      // No se altera la ruta global cuando la beta no está disponible.
-      store.error="No se pudo comprobar el calendario beta";
+      store.blocked=true;
+      store.error="No se pudo verificar la cotización B2.";
     }
+    window.dispatchEvent(new CustomEvent("goxion:b2-quote-change"));
     return result;
   };
 })();
