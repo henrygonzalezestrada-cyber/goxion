@@ -30,6 +30,8 @@ jobs:
           node --check scripts/b2-f3-integracion-smoke.mjs
       - name: Contratos de datos, autenticación y no regresión
         run: node scripts/b2-f3-integracion-smoke.mjs
+      - name: Rechazo HTTP real sin sesión (sin escrituras)
+        run: node scripts/b2-f3-http-negative.mjs
 
   visual-espejo:
     runs-on: ubuntu-latest
