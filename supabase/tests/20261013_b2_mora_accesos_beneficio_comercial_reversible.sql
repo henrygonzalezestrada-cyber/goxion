@@ -18,13 +18,20 @@ begin
  insert into public.goxion_calendario_accesos(cliente_acceso_id,cliente_servicio_id,cliente_id,
   cobertura_hasta,dia_corte,precio_centavos,estado,verificado_en,actualizado_por,revision)
  select ac.id,ac.cliente_servicio_id,cid,
-  today_local+row_number()over(order by ac.id)::int-1,
-  extract(day from today_local+row_number()over(order by ac.id)::int-1)::int,
+  case when cs.monto=49 then today_local else today_local+1 end,
+  case when cs.monto=49 then extract(day from today_local)::int
+    else extract(day from today_local+1)::int end,
   round(cs.monto*100)::int,'verificado',now(),'test_b2_attrib',1
  from public.cliente_accesos ac join public.cliente_servicios cs
   on cs.id=ac.cliente_servicio_id where ac.cliente_id=cid and ac.activo;
- select id into a from public.cliente_accesos where cliente_id=cid order by id limit 1;
- select id into b from public.cliente_accesos where cliente_id=cid order by id desc limit 1;
+ -- Fixtures deterministic: bind UUID by contracted amount, never lexical UUID order.
+ select ac.id into a from public.cliente_accesos ac
+ join public.cliente_servicios cs on cs.id=ac.cliente_servicio_id
+ where ac.cliente_id=cid and cs.monto=49 and ac.activo;
+ select ac.id into b from public.cliente_accesos ac
+ join public.cliente_servicios cs on cs.id=ac.cliente_servicio_id
+ where ac.cliente_id=cid and cs.monto=45 and ac.activo;
+ if a is null or b is null or a=b then raise exception 'Fixture ambiguo: accesos por precio';end if;
  insert into public.descuentos_especiales(cliente_id,descripcion,monto,activo)
  values(cid,'Descuento especial de prueba',10,true) returning id into ref;
  f=public.goxion_b2_fuentes_comerciales(cid,period);
