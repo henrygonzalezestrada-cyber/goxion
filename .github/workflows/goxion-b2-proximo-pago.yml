@@ -1,0 +1,20 @@
+name: GOXION · Importe próximo B2
+on:
+  push:
+    branches: [fix/b2-proximo-pago-protagonista-20261014]
+permissions:
+  contents: read
+jobs:
+  monto-proximo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Sintaxis y próximos vencimientos
+        run: |
+          node --check preview/integracion-b2/index-adapter.js
+          node --check assets/js/ayuda/19-b2-proximo-pago.js
+          node scripts/b2-proximo-pago-smoke.mjs
