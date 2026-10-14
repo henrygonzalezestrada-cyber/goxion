@@ -253,7 +253,7 @@ Deno.serve(async (req) => {
         .select("id,cliente_id,cargo_id,fecha_original,fecha_pactada,estado,motivo,solicitado_en,revisado_en,revisado_por")
         .order("solicitado_en",{ascending:false}).limit(100);
       if(clienteId)query=query.eq("cliente_id",clienteId);
-      else query=query.eq("estado","solicitada");
+      else query=query.eq("estado","aprobada");
       const found=await query;
       if(found.error)throw found.error;
       return json({ok:true,accion:action,solicitudes:found.data||[],
@@ -283,6 +283,9 @@ Deno.serve(async (req) => {
            !uuid.test(String(r?.referencia_id||""))||
            !uuid.test(String(r?.cliente_acceso_id||""))||
            !Number.isSafeInteger(r?.monto_centavos)||r.monto_centavos<=0||
+           (r?.bloqueo_lealtad_centavos!==undefined &&
+             (!Number.isSafeInteger(r.bloqueo_lealtad_centavos)||
+               r.bloqueo_lealtad_centavos<0))||
            String(r?.justificacion||"").trim().length<12))
           return json({ok:false,codigo:"B2_ATRIBUCION_REQUIERE_CONFIRMACION",
             error:"Confirma origen, acceso, monto y justificación",cobrable:false},400);
