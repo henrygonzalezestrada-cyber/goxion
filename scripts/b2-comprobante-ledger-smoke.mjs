@@ -147,5 +147,21 @@ check(receiver.includes('rpc("goxion_b2_registrar_comprobante_seguro"'),
 check(receiver.includes("acreditado:false")&&
  !receiver.includes('goxion_b2_aprobar_comprobante'),
   "El reporte cliente no puede acreditar ni aprobar recibos");
+check(receiver.includes('new Set(ids.map((id:unknown)=>String(id).toLowerCase()))'),
+  "Los cargos duplicados también se bloquean con UUID de distinto case");
+check(receiver.includes('select("cliente_id").eq("reporte_operation_id",opId)'),
+  "La Edge detecta la operación idempotente antes de recalcular");
+check(receiver.indexOf('const existing=') <
+  receiver.indexOf('const cycle=await sb.from("goxion_b2_ciclos")'),
+  "Replay de comprobante aprobado se atiende antes del preflight");
+check(receiver.indexOf('const cycle=await sb.from("goxion_b2_ciclos")') <
+  receiver.indexOf('storage.from(BUCKET).upload'),
+  "El upload privado requiere ciclo elegible previamente");
+check(receiver.includes('p_periodo:cycle.data.periodo')&&
+ receiver.includes('B2_IMPORTES_NO_CONCILIADOS'),
+  "Cargos, saldo y cotización SQL se validan antes del upload");
+check(receiver.includes('return reply({ok:true,resultado:replay.data,'),
+  "Idempotencia responde con resultado autoritativo de SQL");
+
 
 console.log("GOXION B2 comprobantes: "+checks+" verificaciones de contrato + modelo transaccional PASS (sin acreditación real)");
