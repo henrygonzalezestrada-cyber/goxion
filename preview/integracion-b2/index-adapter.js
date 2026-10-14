@@ -31,15 +31,31 @@
    fecha_pactada:String(x.fecha_pactada||""),
    prorroga_estado:String(x.prorroga_estado||""),
    pagado:x.pagado===true
-  })).sort((a,b)=>a.vence.localeCompare(b.vence)): [];
+  })).sort((a,b)=>effectiveDue(a).localeCompare(effectiveDue(b))||
+    a.vence.localeCompare(b.vence)||a.cargo_id.localeCompare(b.cargo_id)): [];
+ }
+ // Acuerdo de prórroga vigente desplaza el vencimiento efectivo, nunca el
+ // vencimiento original usado para calcular mora si el acuerdo se incumple.
+ function effectiveDue(row){
+  return row.prorroga_estado==="aprobada"&&row.fecha_pactada&&row.mora_centavos<=0
+   ?row.fecha_pactada:row.vence;
  }
  function pending(){return rows().filter(x=>!x.pagado&&x.total_centavos>0)}
+ function nextPayment(){
+  const list=pending();
+  if(!list.length)return {cargos:[],centavos:0,fecha:""};
+  const fecha=effectiveDue(list[0]);
+  const due=list.filter(x=>effectiveDue(x)===fecha);
+  return {cargos:due,centavos:due.reduce((n,x)=>n+x.total_centavos,0),fecha};
+ }
  function choice(){
   const list=pending();
   if(!list.length)return {cargos:[],centavos:0};
-  const picked=list.find(x=>x.cargo_id===selected)||list[0];
   if(mode==="todo")return {cargos:list,centavos:list.reduce((s,x)=>s+x.total_centavos,0)};
-  return {cargos:[picked],centavos:picked.total_centavos};
+  const specific=list.find(x=>x.cargo_id===selected);
+  if(specific)return {cargos:[specific],centavos:specific.total_centavos};
+  const due=nextPayment();
+  return {cargos:due.cargos,centavos:due.centavos};
  }
 
  // Desglose financiero B2: parte SIEMPRE de los cargos seleccionados.
@@ -65,7 +81,7 @@
   return {subtotal,lealtad,comerciales,detalles:[...detalles.values()],
     mora,abonos,ajustes,total:selection.centavos,
     titulo:mode==="todo"?"Todos los servicios":
-      title(items[0])};
+      items.length>1?items.length+" perfiles · "+date(effectiveDue(items[0])):title(items[0])};
  }
  function updateBreakdown(){
   const anchor=document.getElementById("b2-calendar");
@@ -104,7 +120,10 @@
       b.ajustes<0?"discount-line":"surcharge-line"):"")+
     '<div class="gx-b2-breakdown-final">'+
       '<span>Importe seleccionado</span><strong id="b2-selected-total">'+money(b.total)+'</strong>'+
-    '</div>';
+    '</div>'+
+    (pending().reduce((sum,x)=>sum+x.total_centavos,0)!==b.total?
+      line("Total pendiente del período",
+        money(pending().reduce((sum,x)=>sum+x.total_centavos,0))):"");
  }
  function title(row){return row.servicio+" · Perfil "+row.ordinal}
  function status(row){
@@ -138,16 +157,15 @@
  function updateHeader(){
   const quote=store.quote;
   if(!quote)return;
-  const due=pending()[0];
-  const total=Number(quote.total_pendiente_centavos||0);
+  const next=nextPayment(),due=next.cargos[0];
   const label=document.querySelector(".balance-hero .total-label");
   const amount=document.querySelector(".balance-hero .total-amount");
   const badge=document.querySelector(".balance-hero .time-badge");
-  if(label)label.textContent="Saldo total por vencimientos";
-  if(amount)amount.textContent=money(total);
+  if(label)label.textContent=due?"Próximo pago":"Saldo pendiente";
+  if(amount)amount.textContent=money(next.centavos);
   if(badge){
    // Reutilizar los símbolos del estado de cuenta oficial, no sustituirlos por etiquetas genéricas.
-   badge.textContent=due?(due.mora_centavos>0?"🚨 Servicio vencido · "+date(due.vence):"⏳ Próximo pago · "+date(due.vence)):"✅ Servicios al corriente";
+   badge.textContent=due?(due.mora_centavos>0?"🚨 Servicio vencido · "+date(due.vence):"⏳ Próximo pago · "+date(next.fecha)):"✅ Servicios al corriente";
    badge.className="time-badge "+(due?.mora_centavos>0?"badge-overdue":due?"badge-ok":"badge-paid");
   }
   const period=document.querySelector(".card-info .info-block.full .value");
