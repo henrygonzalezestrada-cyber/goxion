@@ -205,7 +205,7 @@ Deno.serve(async(req)=>{
         if(cycle.error||!cycle.data?.id)return res({
           ok:false,modo:"b2_sin_estado_cobrable",
           error:"Ciclo B2 pendiente de revisión",permitir_pago_global:false},409);
-        const [obligations,accesses,contracts,reports]=await Promise.all([
+        const [obligations,accesses,contracts,reports,attributions,sources]=await Promise.all([
           sb.from("goxion_b2_cargos")
             .select("id,cliente_acceso_id,cliente_servicio_id")
             .eq("cliente_id",clientId).eq("periodo",ciclo).limit(90),
@@ -215,14 +215,26 @@ Deno.serve(async(req)=>{
             .eq("cliente_id",clientId).eq("activo",true).limit(90),
           sb.from("goxion_b2_comprobantes").select("id,estado")
             .eq("cliente_id",clientId).eq("ciclo_id",cycle.data.id)
-            .eq("estado","reportado").limit(1)
+            .eq("estado","reportado").limit(1),
+          sb.from("goxion_b2_atribuciones_comerciales")
+            .select("fuente,referencia_id,cliente_acceso_id,monto_centavos")
+            .eq("cliente_id",clientId).eq("periodo",ciclo).limit(150),
+          sb.rpc("goxion_b2_fuentes_comerciales",{
+            p_cliente_id:clientId,p_periodo:ciclo
+          })
         ]);
-        if(obligations.error||accesses.error||contracts.error||reports.error)
-          throw obligations.error||accesses.error||contracts.error||reports.error;
+        if(obligations.error||accesses.error||contracts.error||
+          reports.error||attributions.error||sources.error)
+          throw obligations.error||accesses.error||contracts.error||
+            reports.error||attributions.error||sources.error;
         const byCharge=new Map((obligations.data||[]).map((item:any)=>[item.id,item]));
         const byAccess=new Map((accesses.data||[]).map((item:any)=>[item.id,item]));
         const byContract=new Map((contracts.data||[]).map((item:any)=>[item.id,item]));
         const quoteRows=Array.isArray(b2.data.cargos)?b2.data.cargos:[];
+        const commercialSources=new Map(
+          (Array.isArray(sources.data?.fuentes)?sources.data.fuentes:[])
+            .map((x:any)=>[x.fuente+":"+x.referencia_id,x])
+        );
         const detailed=quoteRows.map((item:any)=>{
           const obligation=byCharge.get(item.cargo_id) as any;
           const access=byAccess.get(obligation?.cliente_acceso_id) as any;
@@ -232,8 +244,22 @@ Deno.serve(async(req)=>{
             item.acceso_id!==access.id||
             !Number.isInteger(access.ordinal)||access.ordinal<1||
             !String(contract.nombre||"").trim())return null;
+          const benefits=(attributions.data||[])
+            .filter((a:any)=>a.cliente_acceso_id===access.id)
+            .map((a:any)=>{
+              const source=commercialSources.get(a.fuente+":"+a.referencia_id) as any;
+              if(!source||!Number.isSafeInteger(a.monto_centavos)||
+                a.monto_centavos<=0)return null;
+              return {fuente:a.fuente,referencia_id:a.referencia_id,
+                concepto:String(source.concepto||"Beneficio GOXION").slice(0,120),
+                monto_centavos:a.monto_centavos};
+            });
+          if(benefits.some((benefit:any)=>!benefit)||
+            benefits.reduce((sum:number,x:any)=>sum+x.monto_centavos,0)!==
+              Number(item.descuento_comercial_centavos||0))return null;
           return {...item,servicio:String(contract.nombre).slice(0,100),
-            ordinal:access.ordinal,cliente_servicio_id:contract.id};
+            ordinal:access.ordinal,cliente_servicio_id:contract.id,
+            beneficios_comerciales:benefits};
         });
         if(!cycle.data?.id||detailed.some((item:any)=>!item)||
           detailed.length!==obligations.data?.length)
