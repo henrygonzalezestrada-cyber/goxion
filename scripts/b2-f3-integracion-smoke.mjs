@@ -44,4 +44,29 @@ for(const file of ["index.html","ayuda.html","admin.html"]){
  const src=read(file);
  check(!src.includes("preview/integracion-b2/f3-navigation"),"Producción sin scripts F3: "+file);
 }
+
+const adminGuard=read("preview/integracion-b2/admin-sandbox.js");
+const adminAdapter=read("preview/integracion-b2/admin-b2-f3.js");
+const adminPage=read("preview/integracion-b2/admin.html");
+const adminEdge=read("docs/edge/acciones-financieras-b2-beta/index.ts");
+for(const token of ['admin-datos','X-Admin-Token','allowB2','read||b2',
+  'return Promise.resolve(denied())','GOXION_B2_ADMIN_MIRROR']){
+ check(adminGuard.includes(token),"Admin sandbox: "+token);
+}
+for(const token of ['gxOpenPaymentModal','gxPaymentApprove',
+  'b2_listar_comprobantes','b2_ver_evidencia','b2_aprobar_comprobante',
+  'confirmar_aprobacion:true','item.viewed=true','keys.get(report.id)',
+  'gxPaymentReject','gxPaymentIncomplete']){
+ check(adminAdapter.includes(token),"Admin revisión B2: "+token);
+}
+check(adminPage.includes("admin-sandbox.js")&&adminPage.includes("admin-b2-f3.js"),
+  "Admin espejo monta seguridad y aprobación");
+check(adminPage.includes('id="gx-payment-review-card"')&&
+  adminPage.includes('id="gx-payment-modal"'),"Reutiliza revisión nativa, sin otro panel");
+for(const token of ['action==="b2_listar_comprobantes"',
+  'action==="b2_ver_evidencia"','createSignedUrl',".eq(\"cliente_id\",clienteId)",
+  'b2_aprobar_comprobante']){
+ check(adminEdge.includes(token),"Servidor Admin autenticado: "+token);
+}
+
 console.log("F3 Integración beta: "+n+" invariantes PASS");
