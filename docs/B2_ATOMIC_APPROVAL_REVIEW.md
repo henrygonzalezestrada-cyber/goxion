@@ -166,3 +166,45 @@ La página oficial `assets/js/index/02-02-inline.js` (función `enviarComprobant
 - La prueba SQL reversible se actualizó para incluir fila de índice de evidencia privada ficticia y comprobar rechazo de la función antigua o archivo inexistente. La corrida volvió a responder `B2_COMPROBANTE_ATOMICO_PASS_SIN_COMMIT`. La prueba SQL sólo demuestra validación de fila `storage.objects`; **la subida real binaria con token legítimo todavía requiere prueba controlada end-to-end**. En producción hay 0 archivos, 0 comprobantes, 0 clientes B2 activos.
 
 **F2 aún por cerrar:** pruebas integrales de upload autenticado, atribución/consumo de descuentos y cupones por obligación, compatibilidad de todos los triggers con aprobación por acceso y transición controlada del gateway global oficial. Si alguno falla, el sistema debe rechazar B2 para esa cuenta y conservar el régimen heredado. F3 visual sigue bloqueada.
+
+
+## Corte adicional F2 · 13/oct/2026 — comprobantes, prórroga y preflight sin activar clientes
+
+**Estado: F2 PARCIAL, NO liberar F3.** Validación en proyecto Supabase `hmpevcwodcgbkviarfic` y rama financiera PR #96. Ni Index/Ayuda/Admin oficiales ni `acciones-financieras` / `periodo-cobro` se modificaron. Se mantienen 22 clientes, 28 pagos históricos, 0 régimen B2 activo, 0 ciclos/cargos/reportes/aplicaciones/prórrogas reales B2.
+
+### Implementado directamente
+
+1. Migración `202610130004_b2_prorroga_guard_comprobante_en_revision.sql` aplicada: tanto `goxion_prorroga_auto_cotizar` como `goxion_b2_solicitar_prorroga` rechazan un pacto nuevo mientras exista comprobante `reportado` del ciclo B2. No afecta fecha única, ni reemplaza la fuente de verdad SQL.
+2. Migración `202610130005_b2_prorroga_corregir_lectura_revision.sql` aplicada: subsana error efectivo de la RPC de solicitud, que leía `v_cliente.pago_en_revision` sin seleccionar esa columna y lanzaba `record has no field`.
+3. `supabase/tests/20261013_b2_comprobantes_reversibles.sql` endurecido con aserciones reales para bloqueo de prórroga con reporte pendiente y reinicio del flag del rechazo del segundo cargo (evita falso positivo).
+4. `supabase/tests/20261013_b2_prorroga_auto_hoy_reversible.sql` nuevo, basado en fecha local actual del servidor para evitar escenarios históricamente caducados.
+5. `docs/edge/comprobantes-b2-beta/index.ts` desplegado como Edge **v3**, aislado: primero valida token HMAC e imagen; si la operación existe, consulta repetición estricta SQL sin necesitar ciclo abierto ni subir por duplicado; si es nueva, verifica ciclo B2, cotización del servidor, identidad de cargos e importe antes de subir bytes al bucket. SQL sigue revalidando con locks. UUID normalizados antes de comprobar duplicidad.
+6. `scripts/b2-comprobante-ledger-smoke.mjs` extendido con seis aserciones de los nuevos contratos de preflight/replay. Se verificó la igualdad literal código GitHub = versión desplegada y ocho invariantes del despliegue. **No equivale a prueba de upload HTTP.**
+
+### Pruebas SQL ejecutadas, reversibles
+
+| Prueba | Resultado |
+|---|---|
+| `20261013_b2_comprobantes_reversibles.sql` | **PASS**; selección de dos cargos, errores de importe/selección, replay, segunda aplicación fallida revierte primera, comprobante pendiente impide prórroga, todo con ROLLBACK |
+| `20261013_b2_prorroga_auto_hoy_reversible.sql` | **PASS**; aceptación automática el día original, máximo cinco días, una por período, replay, lealtad conservada hasta pacto y pérdida/mora retroactiva al día siguiente, ROLLBACK |
+| `20261012_prorroga_global_reversible.sql` | **PASS**; fecha única, ROLLBACK |
+| `20261012_b2_lealtad_seis_reversible.sql` | **PASS**; 6% por acceso y una racha, ROLLBACK |
+| `20261012_aprobacion_global_atomica_reversible.sql` | **PASS**; aprobación global y transacción reversible |
+| `20261012_prorroga_b2_reversible.sql` | **NO VIGENTE**; usa noviembre 2026 fijo y exige autorización manual, decisión sustituida por prórroga automática; rechaza por fecha original distinta de hoy |
+| `20261012_b2_libro_real_atómico_reversible.sql` | **NO VIGENTE**; cotiza con fecha fija 12/oct y aprueba usando hoy posterior; el bloqueo de saldo obsoleto `SALDO_B2_DESACTUALIZADO` funcionó |
+
+Los dos scripts históricos fallidos no demuestran una regresión B2: deben actualizarse o archivarse expresamente antes de usarlos como puertas automáticas de CI.
+
+### Bloqueos específicos para concluir F2
+
+- **Atribución comercial por obligación (P0).** `goxion_b2_iniciar_ciclo` prohíbe expresamente materializar un ciclo cuando `descuentos.total <> descuentos.lealtad` o `cargos.total <> 0`. Es la barrera correcta, no quitarla. `descuentos_especiales` y `beneficios_programados` son principalmente de nivel cliente, sin `cliente_acceso_id` ni obligación de destino en el libro B2. `goxion_b2_cargos` registra el descuento total de lealtad, pero no dispone de asiento de atribución individual para promociones/combos/cupones/créditos y Trato Justo. No se pueden inventar proporciones de reparto desde navegador o SQL sin un contrato de elegibilidad y origen validado.
+- **Consumo único de beneficios (P0).** El recibo consolidado B2 al cerrar el ciclo inserta `pagos`, cuyos triggers existentes consumen beneficios, promociones, retención y cierran compensaciones. Antes de incorporar descuentos por acceso hay que hacer conciliación exacta y evitar consumir una misma ventaja tanto al acreditar el cargo como al insertar ese recibo; preservar camino global cuando hay una sola fecha.
+- **Prueba binaria extremo a extremo (P1).** Falta ejecutar POST real de captura válida/invalidada con token HMAC de cliente técnico, lectura del reporte, aprobación Admin y reintento tras cambio de ciclo. La prueba SQL reversible simula metadatos `storage.objects`; no demuestra subida de bytes.
+- **Tests antiguos y concurrencia (P1).** Modernizar escenarios con reloj dinámico y medir aprobaciones simultáneas/reintentos tras COMMIT sin tocar clientes existentes.
+- **Activación y F3:** prohibidas en este corte; el gateway oficial permanece heredado. No resolver el bloqueo de la atribución activando a un cliente real.
+
+### Integridad y seguridad posteriores
+
+Supabase reporta **22 `clientes` y 28 `pagos`**, y **cero** filas en régimen B2, ciclos, cargos, comprobantes, aplicaciones, abonos y prórrogas. Las migraciones correctivas son solo `CREATE OR REPLACE FUNCTION` y permisos service_role; los fixtures terminaron en `ROLLBACK`. RLS sigue habilitada; asesor muestra avisos INFO de tablas internas sin políticas públicas, no WARN de estas modificaciones. Se mantiene GOXION B2 cerrado para clientes.
+
+**Siguiente tarea de F2:** trazar la fuente comercial oficial y los triggers consumidores por tipo de beneficio, exigir asignación documental para beneficios a nivel cliente, crear/imputar asientos inmutables por obligación sin duplas, probar promociones apilables/no apilables y consumos/reembolso por ciclo en fixture; solo después efectuar recorrido HTTP de comprobante y plantear la puerta F3.
