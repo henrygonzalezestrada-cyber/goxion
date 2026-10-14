@@ -10,6 +10,14 @@ Aplicación web de GOXION para clientes, soporte y administración.
 
 Sitio oficial: https://henrygonzalezestrada-cyber.github.io/goxion/
 
+## Estado actual y punto de partida de cualquier chat
+
+**GOXION B2 fue integrado con activación individual, calendario por perfil, próximo pago destacado y notificaciones.** El cierre F0–F5 y las lecciones aprendidas se documentan en:
+
+**[Estado oficial, lecciones y continuidad (14/oct/2026)](docs/GOXION_ESTADO_Y_LECCIONES_2026-10-14.md)**.
+
+**Antes de proponer nuevas fases o replicar componentes**, consultar ese reporte y `AGENTS.md`. Las hojas de ruta con fecha anterior conservan el valor histórico, pero no describen necesariamente la versión vigente. La rama `main` es producción; activar B2 para una cuenta requiere confirmación individual desde su calendario de Admin, no solo guardar fechas.
+
 ## Contratos de continuidad visual y financiera
 
 Antes de cualquier nueva tarea en Admin, Ayuda o Index, leer [AGENTS.md](AGENTS.md) y el [contrato visual GOXION](docs/GOXION_VISUAL_CONTRACT.md). Para fechas independientes, leer también la [hoja de ruta financiera](docs/GOXION_MULTI_DATE_ROADMAP.md). Estos documentos hacen explícitos los criterios acordados y evitan depender del contexto de un chat anterior; el autor debe consultar los archivos reales antes de editar.
