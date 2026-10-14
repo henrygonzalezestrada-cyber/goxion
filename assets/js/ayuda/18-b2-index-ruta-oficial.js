@@ -9,6 +9,7 @@
   const token=localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||"")||"";
   const key=String(window.goxionCurrentClientKey||"").trim();
   if(!token||!key)return old.apply(this,args);
+  const memory="goxion_f5_regimen:"+key;
   busy=true;
   try{
    const r=await fetch(window.GOXION_CORE.endpoint("estado-financiero-b2-beta"),{
@@ -18,20 +19,24 @@
    });
    const json=await r.json().catch(()=>({}));
    if(json.modo==="b2_sin_estado_cobrable"){
+    sessionStorage.setItem(memory,"b2");
     alert("El calendario de pagos de tu cuenta necesita revisión. Contacta a soporte; no realices el pago global.");
     return;
    }
    if(r.ok&&json.ok===true&&json.modo==="b2_multifecha"){
+    sessionStorage.setItem(memory,"b2");
     if(!/^[\w-]{2,80}$/.test(key))throw Error("Identidad de cuenta inválida");
     location.href="./preview/integracion-b2/index.html?f3=1&cliente="+encodeURIComponent(key);
     return;
    }
+   if(r.ok&&json.ok===true&&json.modo==="oficial")sessionStorage.setItem(memory,"global");
    // El esquema de fecha única conserva exactamente su Index oficial.
    return old.apply(this,args);
   }catch(error){
    console.warn("GOXION F5: estado financiero no confirmado",String(error).slice(0,120));
    // Fallo cerrado: jamás presentar un cobro global cuando B2 no responde.
-   alert("No pudimos verificar tu calendario financiero. Inténtalo nuevamente o contacta a soporte.");
+   if(sessionStorage.getItem(memory)!=="b2")return old.apply(this,args);
+   alert("No pudimos verificar tu calendario B2. Inténtalo nuevamente o contacta a soporte.");
   }finally{busy=false}
  };
 })();
