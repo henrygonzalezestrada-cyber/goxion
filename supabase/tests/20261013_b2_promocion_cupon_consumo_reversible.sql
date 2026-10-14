@@ -62,6 +62,25 @@ begin
  if (select sum(descuento_original_centavos)
   from public.goxion_b2_cargos where ciclo_id=ciclo)<>504
  then raise exception 'No recalculó lealtad sobre precio promocional';end if;
+ rejected=false;
+ begin
+  update public.goxion_b2_atribuciones_comerciales
+   set monto_centavos=501
+   where cliente_id=cid and periodo=period and referencia_id=beneficio;
+ exception when others then
+  if sqlerrm like 'ATRIBUCION_CICLO_INMUTABLE%' then rejected=true;
+  else raise;end if;
+ end;
+ if not rejected then raise exception 'Edición de cupón posterior al ciclo permitida';end if;
+ rejected=false;
+ begin
+  delete from public.goxion_b2_atribuciones_comerciales
+  where cliente_id=cid and periodo=period and referencia_id=promocion;
+ exception when others then
+  if sqlerrm like 'ATRIBUCION_CICLO_INMUTABLE%' then rejected=true;
+  else raise;end if;
+ end;
+ if not rejected then raise exception 'Eliminar promoción posterior al ciclo permitido';end if;
  f=public.goxion_b2_cotizar_ciclo(cid,period,today_local);
  select coalesce(sum((x.value->>'total_centavos')::int),0),
   array_agg((x.value->>'cargo_id')::uuid)
