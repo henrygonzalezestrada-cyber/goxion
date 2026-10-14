@@ -23,8 +23,14 @@ begin
   round(cs.monto*100)::int,'verificado',now(),'test_b2_attrib',1
  from public.cliente_accesos ac join public.cliente_servicios cs
   on cs.id=ac.cliente_servicio_id where ac.cliente_id=cid and ac.activo;
- select id into a from public.cliente_accesos where cliente_id=cid order by id limit 1;
- select id into b from public.cliente_accesos where cliente_id=cid order by id desc limit 1;
+ -- Fixtures deterministic: bind UUID by contracted amount, never lexical UUID order.
+ select ac.id into a from public.cliente_accesos ac
+ join public.cliente_servicios cs on cs.id=ac.cliente_servicio_id
+ where ac.cliente_id=cid and cs.monto=49 and ac.activo;
+ select ac.id into b from public.cliente_accesos ac
+ join public.cliente_servicios cs on cs.id=ac.cliente_servicio_id
+ where ac.cliente_id=cid and cs.monto=45 and ac.activo;
+ if a is null or b is null or a=b then raise exception 'Fixture ambiguo: accesos por precio';end if;
 
  select cs.id,cs.servicio_id into svc1,platform1
  from public.cliente_accesos ac join public.cliente_servicios cs
