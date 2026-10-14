@@ -92,6 +92,27 @@ BEGIN
   file_ref,rep_op,array[x.id,y.id]);
  if d->>'repetido'<>'true' or (d->>'reporte_id')::uuid<>r1 then
   raise exception 'Reintento del reporte duplicó recibo';end if;
+
+ -- Reporte en revisión: ni pronóstico ni aceptación pueden prometer prórroga.
+ reject_ok=false;
+ begin
+  perform public.goxion_prorroga_auto_cotizar(cid,v_hoy+1,x.id);
+ exception when others then
+  if sqlerrm like 'PRORROGA_PAGO_EN_REVISION_B2%'
+   then reject_ok=true;else raise;end if;
+ end;
+ if not reject_ok then raise exception 'Cotización permitió prórroga con reporte B2 pendiente';end if;
+ reject_ok=false;
+ begin
+  perform public.goxion_b2_solicitar_prorroga(
+   cid,x.id,v_hoy+1,gen_random_uuid(),'Fixture requiere bloquear reporte');
+ exception when others then
+  if sqlerrm like 'PRORROGA_PAGO_EN_REVISION_B2%'
+   then reject_ok=true;else raise;end if;
+ end;
+ if not reject_ok then raise exception 'Acuerdo permitió prórroga con reporte B2 pendiente';end if;
+ if exists(select 1 from public.goxion_b2_prorrogas where cliente_id=cid) then
+  raise exception 'Una prórroga inválida fue persistida';end if;
  j=jsonb_build_array(
   jsonb_build_object('cargo_id',x.id,'monto_centavos',a,
     'saldo_esperado_centavos',a,'operation_id',item_op1),
@@ -105,6 +126,7 @@ BEGIN
     'saldo_esperado_centavos',b,'operation_id',item_op1)
  );
  -- La segunda asignación falla: la primera no puede quedar acreditada.
+ reject_ok=false;
  begin
   perform public.goxion_b2_aprobar_comprobante(cid,r1,wrong,ap_op,'admin:test',false,'');
  exception when others then
