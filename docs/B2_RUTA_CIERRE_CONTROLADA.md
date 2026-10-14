@@ -120,3 +120,19 @@ El usuario puede decir: «Avanza con F2», «Detente en F3», «Pulamos F1» o �
 - **Pruebas SQL con ROLLBACK, todas PASS en escenario vigente:** comprobante 1-N con segunda aplicación fallida, prórroga automática en fecha actual, lealtad B2 6%, prórroga global y aprobación global atómica. Dos scripts fechados el 12/oct quedaron obsoletos; sus fallos se documentan y deben actualizarse antes de CI.
 - **Puerta F2 aún cerrada:** atribuir promociones/combos, cupones, descuentos especiales y personalizados, Trato Justo, créditos, mora y stacking por obligación; comprobar consumos exactamente una vez al emitir recibo global, HTTP real de carga con identidad técnica y concurrencia. `goxion_b2_iniciar_ciclo` sigue rechazando beneficios sin conciliación. No debilitar esa barrera.
 - **F3, F4 y F5 permanecen pendientes.** Issue #98 no se modifica; la notificación Discord/Admin todavía no se implementa.
+
+
+## Actualización de cierre técnico F2 para transferencia F3 beta · 13/oct/2026
+
+Esta sección **sustituye el estado P0 comercial y de pruebas históricas** indicado en el corte anterior, sin modificar el historial de auditoría.
+
+**F0 cerrada; F1 visual aprobada; F2 motor backend APTO PARA INTEGRACIÓN F3 BETA; F3 no iniciada; F4/F5 no iniciadas.** No se autoriza incorporación de clientes, publicación de pantallas oficiales, fusión de PR ni envío de notificaciones.
+
+- En PR #96 se instaló la conciliación comercial real por fuente/acceso y la conservación independiente de promociones, cupones, descuentos especiales, Trato Justo, mora y lealtad, con snapshots de bloqueo de stacking y del período.
+- El único gateway administrativo B2 beta ofrece consulta/confirmación de atribución; no hay aprobación manual de prórrogas. Los disparadores del recibo único verifican consumos comerciales.
+- Se modernizaron `20261012_prorroga_b2_reversible.sql` y `20261012_b2_libro_real_atómico_reversible.sql`, ambos **PASS ROLLBACK**. Los casos de combo y mora intermitentes por ordenar UUID aleatorios fueron corregidos; **4/4** repeticiones exitosas cada uno. El resto de fixtures SQL se revalidó con ROLLBACK.
+- Pipeline GOXION B2 Backend: último commit de código aprobado al momento de corte `6265ba85` **success**; pipelines de correcciones posteriores en progreso al último chequeo. No anticipar resultado.
+- Integridad: 22 clientes, 28 pagos, 0 clientes B2 activados y 0 ciclos/cargos/comprobantes/atribuciones B2. Los estados financieros oficiales siguen conciliando 22/22.
+- **Aceptación técnica F2 ≠ autorización para cobrar:** durante F3 beta deben completarse pruebas reales de carga binaria HTTP con credenciales técnicas y autorización Admin, concurrencia entre dos transacciones COMMIT independientes, y resolver el conflicto de integración de PR #96 (`mergeable=false`). Sin esas evidencias, puerta de producción cerrada.
+
+**Siguiente paso:** iniciar F3 **sólo como integración beta aislada** sobre los diseños ya aprobados, no como una nueva reorganización ni una liberación productiva; usar el documento financiero de PR #96 como contrato de referencia.
