@@ -1,5 +1,14 @@
 # GOXION · Guía para cualquier asistente que trabaje en el repositorio
 
+> **ACTUALIZACIÓN OBLIGATORIA (14/oct/2026):** comenzar por el
+> [reporte oficial de cierre y continuidad B2](docs/GOXION_ESTADO_Y_LECCIONES_2026-10-14.md).
+> F0–F5 y los cierres #102/#103 ya llegaron a `main`: Admin dispone de
+> activación B2 individual desde el calendario, Index destaca el próximo pago
+> y Mi Espacio usa la misma cotización. Los párrafos posteriores escritos
+> el 11–12/oct describen hitos históricos, no tareas que deban reconstruirse.
+> **No suponer que guardar fechas equivale a activar B2.**
+> Verificar estado, Pages, CI y Supabase actuales antes de intervenir.
+
 **Antes de proponer, editar o integrar cambios, leer en este orden:**
 
 1. `docs/GOXION_VISUAL_CONTRACT.md` — identidad de Admin, Ayuda/Mi Espacio e Index, retículas y QA responsive.
@@ -13,7 +22,7 @@
 
 - **Tres experiencias, no una plantilla compartida.** Admin: operaciones; Ayuda: cliente/descubrimiento/Mi Espacio; Index: estado de cuenta/pagos. No copiar estructuras, CSS ni tipografías entre ellas. El motor de negocio sí es compartido.
 - Conservar la arquitectura actual y los flujos aprobados. No reorganizar Admin por cuarta vez ni crear formularios repetidos para operaciones ya existentes.
-- Reusar el motor financiero oficial, seguridad y persistencia del backend. Admin ya puede **guardar fechas por acceso X2** con auditoría, pero el cálculo monetario continúa en **simulación**: no presentarlo como deuda real del cliente ni como cobro acreditable.
+- Reusar el motor financiero oficial, seguridad y persistencia del backend. **Distinguir régimen global de B2 opt-in**: Admin guarda calendarios por perfil, pero solo la activación individual confirmada en el servidor habilita obligaciones reales B2. Las pantallas demo/sombra siguen siendo informativas; el comprobante real requiere autenticación y aprobación Admin. Véase el reporte de continuidad del 14/oct/2026.
 - **Compactación inteligente:** campos cortos relacionados juntos si caben; componentes largos a ancho completo. Ocultar información secundaria detrás de un control explícito. Los cambios de estado nunca deben desorientar ni sacar al usuario de donde estaba.
 - Antes de entregar una interfaz, verificar con pruebas responsive y funcionales. No declarar aprobado un resultado que no se comprobó en Safari real.
 - Corregir el componente dueño del problema y agregar regresión; evitar CSS global de último minuto y duplicación de handlers.
@@ -21,7 +30,7 @@
 
 ## Continuidad entre chats
 
-Este archivo y los documentos enlazados constituyen la referencia **persistente** del proyecto. En una conversación nueva, indicar: «Abre el repo GOXION, lee AGENTS.md y el contrato visual antes de trabajar». El asistente debe volver a leerlos; los nuevos chats no cargan automáticamente archivos externos.
+Este archivo y los documentos enlazados constituyen la referencia **persistente** del proyecto. En una conversación nueva, indicar: «Abre el repo GOXION, lee `docs/GOXION_ESTADO_Y_LECCIONES_2026-10-14.md`, `AGENTS.md` y el contrato visual antes de trabajar». El asistente debe volver a leerlos; los nuevos chats no cargan automáticamente archivos externos.
 
 
 - **Pagos parciales B2:** el cliente todavía NO puede pedir ni acreditar un abono desde Index. Admin sí marca comprobantes incompletos por saldo restante y dispone de acuerdo de fecha. Las nuevas tablas `goxion_obligaciones_sombra`, `goxion_abonos_sombra`, `goxion_imputaciones_sombra` y `goxion_b2_auditoria` son solo de preparación, sin cargos. Una solicitud no evita mora automáticamente; leer `docs/GOXION_MULTI_DATE_ROADMAP.md` antes de cualquier integración.
