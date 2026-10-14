@@ -256,8 +256,53 @@ Deno.serve(async (req) => {
       else query=query.eq("estado","aprobada");
       const found=await query;
       if(found.error)throw found.error;
-      return json({ok:true,accion:action,solicitudes:found.data||[],
-        contrato:"goxion-b2-prorrogas-v1"});
+      const ids=(found.data||[]).map((a:any)=>a.cargo_id);
+      const byCargo=new Map<string,boolean>();
+      if(ids.length){
+        const charges=await sb.from("goxion_b2_cargos")
+          .select("id,liquidado").in("id",ids);
+        if(charges.error)throw charges.error;
+        for(const item of charges.data||[])byCargo.set(item.id,item.liquidado===true);
+      }
+      const agreementIds=(found.data||[]).map((a:any)=>a.id);
+      const fulfilled=new Set<string>();
+      if(agreementIds.length){
+        const events=await sb.from("goxion_b2_f4_eventos")
+          .select("acuerdo_id").eq("tipo","prorroga_cumplida")
+          .in("acuerdo_id",agreementIds);
+        if(events.error)throw events.error;
+        for(const event of events.data||[])fulfilled.add(event.acuerdo_id);
+      }
+      // Mismo expediente y distintivo para el esquema histórico fecha única.
+      let globalQuery=sb.from("acuerdos_cobro")
+        .select("id,cliente_id,fecha_original,fecha_pactada,estado,activo,created_at")
+        .eq("activo",true).order("created_at",{ascending:false}).limit(100);
+      if(clienteId)globalQuery=globalQuery.eq("cliente_id",clienteId);
+      const global=await globalQuery;
+      if(global.error)throw global.error;
+      const globalIds=(global.data||[]).map((a:any)=>a.id);
+      const globalFulfilled=new Set<string>();
+      if(globalIds.length){
+        const v=await sb.from("goxion_b2_f4_eventos")
+          .select("acuerdo_global_id").eq("tipo","prorroga_cumplida")
+          .in("acuerdo_global_id",globalIds);
+        if(v.error)throw v.error;
+        for(const event of v.data||[])globalFulfilled.add(event.acuerdo_global_id);
+      }
+      const historic=(global.data||[]).map((a:any)=>({
+        id:a.id,cliente_id:a.cliente_id,fecha_original:a.fecha_original,
+        fecha_pactada:a.fecha_pactada,estado:a.estado==="cumplido"?"aprobada":
+          a.estado==="activo"?"aprobada":a.estado,
+        solicitado_en:a.created_at,cargo_id:null,origen:"fecha_unica",
+        cumplida:globalFulfilled.has(a.id)||a.estado==="cumplido",
+        liquidado:globalFulfilled.has(a.id)||a.estado==="cumplido"}));
+      const b2Rows=(found.data||[]).map((a:any)=>({
+        ...a,origen:"multifecha",liquidado:byCargo.get(a.cargo_id)===true,
+        cumplida:fulfilled.has(a.id)}));
+      return json({ok:true,accion:action,
+        solicitudes:[...b2Rows,...historic].sort((a:any,b:any)=>
+          String(b.solicitado_en||"").localeCompare(String(a.solicitado_en||""))),
+        contrato:"goxion-b2-prorrogas-v2"});
     }
     // La prórroga ya es 100% automática; jamás autorizar ni rechazar en Admin.
     if (action==="b2_resolver_prorroga") {
@@ -312,6 +357,27 @@ Deno.serve(async (req) => {
 
     // F3 beta · consulta exclusiva Admin de comprobantes por cliente opt-in.
     // Nunca se expone evidencia privada al cliente ni se acredita al listar.
+    // F4: reintento explícito desde la bandeja Admin existente.
+    // La autorización HMAC Admin ya se verificó al entrar al gateway.
+    // No cambia el estado financiero ni vuelve a autorizar prórrogas.
+    if(action==="b2_f4_reintentar_discord"){
+      let delivered:any=null;
+      try{
+        const outbound=await fetch(url+"/functions/v1/b2-f4-discord-beta",{
+          method:"POST",headers:{"Content-Type":"application/json",
+            "X-B2-Dispatch-Key":serviceKey},body:"{}"
+        });
+        delivered=await outbound.json().catch(()=>({}));
+        if(!outbound.ok||delivered?.ok!==true)
+          return json({ok:false,error:"El canal de avisos no está disponible",
+            credito_afectado:false},503);
+      }catch(e){
+        return json({ok:false,error:"La entrega se reintentará automáticamente desde Admin",
+          credito_afectado:false},503);
+      }
+      return json({ok:true,accion:action,resultado:delivered,
+        credito_afectado:false});
+    }
     if(action==="b2_listar_comprobantes"){
       const clienteId=String(data?.cliente_id||"").trim();
       if(!uuid.test(clienteId))

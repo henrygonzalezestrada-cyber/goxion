@@ -1,0 +1,39 @@
+name: GOXION · B2 F4 Notificaciones Beta
+on:
+  push:
+    branches:
+      - feature/b2-f4-notificaciones-20261014
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  eventos-notificaciones:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sintaxis cliente y Admin
+        run: |
+          node --check preview/integracion-b2/admin-f4.js
+          node --check preview/integracion-b2/admin-sandbox.js
+          node --check assets/js/admin/07-admin-ops-v2.js
+          node --check scripts/b2-f4-integracion-smoke.mjs
+      - name: Contratos y protecciones financieras
+        run: node scripts/b2-f4-integracion-smoke.mjs
+  regresion-visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar navegadores de beta
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium webkit
+      - name: Diseño aprobado Index y Mi Espacio
+        run: node scripts/b2-espejo-browser-smoke.mjs

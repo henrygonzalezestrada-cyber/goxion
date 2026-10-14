@@ -15,7 +15,7 @@
   "estado-financiero":["comparar_admin","obtener_admin"]
  };
  const allowB2=["b2_listar_comprobantes","b2_ver_evidencia",
-   "b2_aprobar_comprobante"];
+   "b2_aprobar_comprobante","b2_listar_prorrogas","b2_f4_reintentar_discord"];
  const denied=()=>new Response(JSON.stringify({ok:false,
    error:"Admin F3 beta: esta operación no está habilitada."}),
    {status:403,headers:{"Content-Type":"application/json"}});

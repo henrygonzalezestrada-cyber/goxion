@@ -175,6 +175,22 @@ Deno.serve(async(req)=>{
       if(applied.error||applied.data?.ok!==true)return res({
         ok:false,error:applied.error?.message||"No fue posible confirmar el acuerdo",
         codigo:"PRORROGA_NO_ELEGIBLE"},409);
+      // F4: el evento/Admin se guardó ya en SQL, en la misma transacción.
+      // Discord se despacha DESPUÉS, sin revertir jamás el acuerdo.
+      if(b2&&applied.data?.repetida!==true){
+        try{
+          const task=fetch(url+"/functions/v1/b2-f4-discord-beta",{
+            method:"POST",
+            headers:{"Content-Type":"application/json",
+              "X-B2-Dispatch-Key":serviceKey},
+            body:"{}"
+          }).then(r=>{if(!r.ok)console.warn("B2 F4: entrega diferida",r.status)})
+            .catch(e=>console.warn("B2 F4: entrega diferida",String(e).slice(0,100)));
+          const waitUntil=(globalThis as any).EdgeRuntime?.waitUntil;
+          if(typeof waitUntil==="function")waitUntil(task);
+          else await task;
+        }catch(e){console.warn("B2 F4: aviso pendiente de reintento",String(e).slice(0,100))}
+      }
       return res({ok:true,estado:"activo",aprobacion:"automatica",
         acuerdo:applied.data,solicitud_pendiente:false,requiere_admin:false});
     }

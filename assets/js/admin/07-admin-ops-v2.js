@@ -173,10 +173,14 @@
             else activity.push(item);
         });
 
+        // F4: la confirmación B2 vive en la campana existente.
+        const prorrogaPendiente=activity.filter(n=>
+            n.leida!==true&&["prorroga_activada","prorroga_cumplida"].includes(n.tipo));
         const priority=[
             ...cancellations.filter(n=>!n.leida),
             ...reviews,
             ...support.filter(n=>!n.leida),
+            ...prorrogaPendiente,
             ...overdue,
             ...upcoming
         ];
@@ -199,7 +203,10 @@
 
         const unreadCancellation=model.cancellations.filter(n=>!n.leida).length;
         const unreadSupport=model.support.filter(n=>!n.leida).length;
-        const urgent=model.reviews.length+model.overdue.length+unreadCancellation+unreadSupport;
+        const unreadProrrogas=model.activity.filter(n=>!n.leida&&
+            ["prorroga_activada","prorroga_cumplida"].includes(n.tipo)).length;
+        const urgent=model.reviews.length+model.overdue.length+
+            unreadCancellation+unreadSupport+unreadProrrogas;
 
         const bell=document.getElementById("gx-notification-bell");
         bell?.classList.toggle("has-new",urgent>0);
@@ -212,6 +219,7 @@
             if(model.reviews.length) parts.push(`${model.reviews.length} pago${model.reviews.length===1?'':'s'} por revisar`);
             if(unreadCancellation) parts.push(`${unreadCancellation} cancelación${unreadCancellation===1?'':'es'}`);
             if(unreadSupport) parts.push(`${unreadSupport} soporte${unreadSupport===1?'':'s'}`);
+            if(unreadProrrogas) parts.push(`${unreadProrrogas} acuerdo${unreadProrrogas===1?'':'s'} B2`);
             if(model.overdue.length) parts.push(`${model.overdue.length} vencido${model.overdue.length===1?'':'s'}`);
             summary.textContent=parts.length?parts.join(" · "):"Sin pendientes urgentes. La actividad reciente queda disponible aquí.";
         }
