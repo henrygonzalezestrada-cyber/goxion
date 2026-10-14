@@ -16,17 +16,22 @@ Deno.serve(async(req:Request)=>{
  const origin=Deno.env.get("SUPABASE_URL")||"";
  if(!secret||!origin)return reply({ok:false,error:"Sin configuración"},503);
  const sentKey=req.headers.get("X-B2-Dispatch-Key")||"";
- if(!sentKey||sentKey.length!==secret.length)
-   return reply({ok:false,error:"Autenticación del despachador requerida"},401);
- // La verificación ocurre antes de consultar cualquier fila del outbox.
- const encoded=new TextEncoder();
- const check=async()=>{
-  const h=await crypto.subtle.digest("SHA-256",encoded.encode(secret));
-  const v=await crypto.subtle.digest("SHA-256",encoded.encode(sentKey));
-  return new Uint8Array(h).every((x,i)=>x===new Uint8Array(v)[i]);
- };
- if(!await check())return reply({ok:false,error:"Autenticación inválida"},401);
+ if(!sentKey)return reply({ok:false,error:"Autenticación del despachador requerida"},401);
  const sb=createClient(origin,secret,{auth:{persistSession:false,autoRefreshToken:false}});
+ // Dos llamadas legítimas: Edge interna con service_role, o cron con
+ // token privado de 256 bits generado exclusivamente en PostgreSQL.
+ let authorized=false;
+ if(sentKey.length===secret.length){
+   const encoded=new TextEncoder();
+   const [h,v]=await Promise.all([secret,sentKey].map(x=>
+     crypto.subtle.digest("SHA-256",encoded.encode(x))));
+   authorized=new Uint8Array(h).every((x,i)=>x===new Uint8Array(v)[i]);
+ }
+ if(!authorized&&sentKey.length===64){
+   const result=await sb.rpc("goxion_b2_f4_autorizar_dispatch",{p_token:sentKey});
+   authorized=!result.error&&result.data===true;
+ }
+ if(!authorized)return reply({ok:false,error:"Autenticación inválida"},401);
  const claimed=await sb.rpc("goxion_b2_f4_claim_discord",{p_limit:5});
  if(claimed.error)return reply({ok:false,error:"No se pudo reclamar aviso"},503);
  const items=Array.isArray(claimed.data)?claimed.data:[];
