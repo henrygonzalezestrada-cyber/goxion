@@ -24,11 +24,29 @@
   if(method!=="GET"){
     const given=new Headers(init?.headers||input?.headers||{});
     const clientToken=localStorage.getItem("goxion_client_token")||"";
+    // Las cuatro lecturas del Index original son POST pero NO cobran.
+    // El token es el que expide GOXION; no se permite modo de escritura heredado.
+    let body=null;
+    try{body=typeof init?.body==="string"?JSON.parse(init.body):null}catch{}
+    const readActions=Object.freeze({
+      "/functions/v1/mi-espacio":[""],
+      "/functions/v1/periodo-cobro":["obtener_periodo"],
+      "/functions/v1/trato-justo":["listar_cliente"],
+      "/functions/v1/estado-cuenta-beta":["mi_estado"],
+      "/functions/v1/estado-financiero":["mi_estado"],
+      "/functions/v1/estado-financiero-b2-beta":[
+        "mi_estado","mi_prorroga","cotizar_prorroga_auto","activar_prorroga_auto"]
+    });
+    const action=String(body?.accion||"");
+    const readAllowed=readActions[target.pathname]?.includes(action)===true &&
+      (target.pathname!=="/functions/v1/mi-espacio"||
+        (body===null||Object.keys(body).length===0));
+    const b2Upload=target.pathname==="/functions/v1/comprobantes-b2-beta"&&
+      init?.body instanceof FormData;
     const allowed=integratedBeta&&method==="POST"&&clientToken.length>20&&
       given.get("X-Client-Token")===clientToken&&
       target.origin==="https://hmpevcwodcgbkviarfic.supabase.co"&&
-      ["/functions/v1/estado-financiero-b2-beta",
-       "/functions/v1/comprobantes-b2-beta"].includes(target.pathname);
+      (readAllowed||b2Upload);
     return allowed?nativeFetch(input,init):Promise.resolve(denied());
   }
   if(target.origin!==location.origin
