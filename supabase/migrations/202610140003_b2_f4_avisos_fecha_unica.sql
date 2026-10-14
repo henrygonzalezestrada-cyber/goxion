@@ -79,6 +79,13 @@ declare a record; v_periodo date;
 begin
  if new.estado='pagado' and
    (tg_op='INSERT' or old.estado is distinct from 'pagado') then
+  -- No interpretar períodos legacy salvo que exista una prórroga
+  -- automática real para este cliente: el cobro habitual queda intacto.
+  if not exists(select 1 from public.acuerdos_cobro
+    where cliente_id=new.cliente_id and activo
+    and operation_id is not null
+    and motivo='Prórroga automática confirmada desde Mi Espacio')
+  then return new;end if;
   v_periodo=public.goxion_periodo_pago_canonico(new.periodo);
   for a in select * from public.acuerdos_cobro
    where cliente_id=new.cliente_id and periodo=v_periodo
