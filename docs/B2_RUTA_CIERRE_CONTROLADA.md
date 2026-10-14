@@ -109,3 +109,14 @@ El usuario puede decir: «Avanza con F2», «Detente en F3», «Pulamos F1» o �
 - **Pruebas SQL reversibles** en Supabase: pasa comprobante por dos accesos, fallo segundo revierte primero, reintentos, modificación de reparto rechazada, archivo inexistente rechazado y deshabilitación de firma insegura. Post-ROLLBACK: 22 clientes/28 pagos originales/0 B2 activos/0 objetos de evidencia/cargos.
 - **Cierre aún pendiente**: verificación end-to-end de bytes del archivo con token legítimo y Admin en entorno aislado; atribución al cargo correcto y consumo por ciclo de beneficios con promoción/combos/cupones/descuentos especiales/Trato Justo; renovación y prueba de gateway GLOBAL atómico en producción con estrategia de reversión. F2 no verde, F3 no iniciado.
 - **Pruebas de cero cambios oficiales**: `acciones-financieras` sigue v10, `periodo-cobro` v3, Index/Ayuda originales, pagos legados día 15.
+
+
+## Seguimiento F2 · corte financiero 13/oct/2026 (sin iniciar F3)
+
+- **F0 permanece CERRADA y F1 APROBADA**; no se tocaron Index, Ayuda ni Admin oficiales, ni los archivos visuales del PR #97.
+- **F2 sigue ABIERTA con bloqueo técnico P0 de atribución comercial.** Ver evidencia en [B2_ATOMIC_APPROVAL_REVIEW.md, PR #96](https://github.com/henrygonzalezestrada-cyber/goxion/blob/feature/b2-atomic-full-payment-20261012/docs/B2_ATOMIC_APPROVAL_REVIEW.md).
+- **Supabase verificado:** 22 clientes, 28 recibos históricos, 0 clientes B2 activos y 0 ciclos/cargos/comprobantes/aplicaciones/prórrogas B2; migraciones correctivas de prórroga 004 y 005 instaladas; Edge aislada `comprobantes-b2-beta` v3.
+- **Correcciones:** impedir prórroga con comprobante B2 reportado en revisión; leer correctamente `pago_en_revision`; impedir subida huérfana de archivos cuando no existe ciclo/importe válido; replay estricto de comprobante aunque el ciclo haya cerrado.
+- **Pruebas SQL con ROLLBACK, todas PASS en escenario vigente:** comprobante 1-N con segunda aplicación fallida, prórroga automática en fecha actual, lealtad B2 6%, prórroga global y aprobación global atómica. Dos scripts fechados el 12/oct quedaron obsoletos; sus fallos se documentan y deben actualizarse antes de CI.
+- **Puerta F2 aún cerrada:** atribuir promociones/combos, cupones, descuentos especiales y personalizados, Trato Justo, créditos, mora y stacking por obligación; comprobar consumos exactamente una vez al emitir recibo global, HTTP real de carga con identidad técnica y concurrencia. `goxion_b2_iniciar_ciclo` sigue rechazando beneficios sin conciliación. No debilitar esa barrera.
+- **F3, F4 y F5 permanecen pendientes.** Issue #98 no se modifica; la notificación Discord/Admin todavía no se implementa.
