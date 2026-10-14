@@ -5,7 +5,13 @@
 (function(){
  "use strict";
  if(!/\/preview\/integracion-b2\/(?:index|ayuda)\.html$/.test(location.pathname))return;
- window.GOXION_B2_MIRROR=Object.freeze({demo:true,writeBlocked:true});
+ const params=new URLSearchParams(location.search);
+ const integratedBeta=params.get("f3")==="1"&&
+   params.get("demo")!=="1"&&params.get("cliente")!=="b2-demo";
+ window.GOXION_B2_MIRROR=Object.freeze({demo:!integratedBeta,
+   writeBlocked:!integratedBeta,integratedBeta});
+ // Sólo un token de cliente existente y las dos funciones B2 aprobadas
+ // pueden escribir desde la beta explícita. Todo el resto sigue sellado.
  const nativeFetch=window.fetch.bind(window);
  const denied=()=>new Response(JSON.stringify({ok:false,error:"Espejo visual: operación no disponible."}),{
   status:403,headers:{"Content-Type":"application/json"}
@@ -13,9 +19,18 @@
  window.fetch=function(input,init){
   const url=typeof input==="string"?input:input?.url||"";
   const method=String(init?.method||input?.method||"GET").toUpperCase();
-  if(method!=="GET")return Promise.resolve(denied());
   let target;
   try{target=new URL(url,location.href)}catch{return Promise.resolve(denied());}
+  if(method!=="GET"){
+    const given=new Headers(init?.headers||input?.headers||{});
+    const clientToken=localStorage.getItem("goxion_client_token")||"";
+    const allowed=integratedBeta&&method==="POST"&&clientToken.length>20&&
+      given.get("X-Client-Token")===clientToken&&
+      target.origin==="https://hmpevcwodcgbkviarfic.supabase.co"&&
+      ["/functions/v1/estado-financiero-b2-beta",
+       "/functions/v1/comprobantes-b2-beta"].includes(target.pathname);
+    return allowed?nativeFetch(input,init):Promise.resolve(denied());
+  }
   if(target.origin!==location.origin
     && !["fonts.googleapis.com","fonts.gstatic.com","cdn.jsdelivr.net"].includes(target.hostname))
     return Promise.resolve(denied());
