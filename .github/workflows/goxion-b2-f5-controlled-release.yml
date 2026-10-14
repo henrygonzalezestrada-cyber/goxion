@@ -1,0 +1,42 @@
+name: GOXION · B2 F5 Publicación Controlada
+on:
+  push:
+    branches:
+      - feature/b2-f5-publicacion-controlada-20261014
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  puerta-financiera:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Sintaxis de integraciones F5
+        run: |
+          node --check assets/js/ayuda/17-b2-prorroga-oficial.js
+          node --check assets/js/ayuda/18-b2-index-ruta-oficial.js
+          node --check assets/js/admin/33-b2-f5-review-router.js
+          node --check preview/integracion-b2/f5-admin-entry.js
+      - name: Contratos opt-in y sin demo oficial
+        run: |
+          node scripts/b2-f5-release-smoke.mjs
+          node scripts/b2-f4-integracion-smoke.mjs
+          node scripts/b2-f3-integracion-smoke.mjs
+  visual-aprobado:
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Navegadores
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium webkit
+      - name: Espejo original sin regresiones
+        run: node scripts/b2-espejo-browser-smoke.mjs
