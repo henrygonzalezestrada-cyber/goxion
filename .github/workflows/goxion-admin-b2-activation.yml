@@ -1,0 +1,20 @@
+name: GOXION · Admin B2 activación desde calendario
+on:
+  push:
+    branches:
+      - fix/admin-b2-activar-desde-calendario-20261014
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Sintaxis y acoplamiento de la interfaz
+        run: |
+          node --check preview/calendario-financiero/b2-activacion.js
+          node scripts/admin-b2-activation-smoke.mjs

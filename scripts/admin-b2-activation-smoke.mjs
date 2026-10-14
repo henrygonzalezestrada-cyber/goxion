@@ -1,0 +1,15 @@
+import {readFileSync as read} from "node:fs";
+import assert from "node:assert/strict";
+const html=read("preview/calendario-financiero/index.html","utf8");
+const script=read("preview/calendario-financiero/b2-activacion.js","utf8");
+const edge=read("docs/edge/acciones-financieras-b2-beta/index.ts","utf8");
+assert(html.includes("b2-activacion.js"),"Nuevo control debe montarse en mismo calendario");
+assert(script.includes("b2_estado_activacion"),"Leer elegibilidad autenticada");
+assert(script.includes("b2_activar_cliente"),"Conectar botón con RPC financiero");
+assert(script.includes("confirmar_activacion:true"),"Confirmación explícita");
+assert(script.includes("perfiles_verificados"),"Requisito de cobertura");
+assert(script.includes("regimen_activo"),"Comprobar que se activó");
+assert(edge.includes('if(action==="b2_estado_activacion")'),"Gateway de preflight");
+assert(edge.includes('rpc="goxion_b2_activar_cliente"'),"Activación atómica existente");
+assert(!script.includes("demo-b2"),"Sin identidad simulada");
+console.log("GOXION Admin B2: integración contextual PASS");
