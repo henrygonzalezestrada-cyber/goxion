@@ -134,6 +134,65 @@ Deno.serve(async (req) => {
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
     const sb = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
+    // Vista previa de activación desde el calendario nativo Admin.
+    // Solo lectura; el botón definitivo invoca b2_activar_cliente, cuya
+    // transacción SQL valida precios, lealtad, cobertura y cobros heredados.
+    if(action==="b2_estado_activacion"){
+      const clienteId=String(data?.cliente_id||"").trim();
+      if(!uuid.test(clienteId))
+        return json({ok:false,error:"Cliente inválido"},400);
+      const [client,regime,accesses]=await Promise.all([
+        sb.from("clientes").select("id,estado,periodo_pendiente,pago_en_revision")
+          .eq("id",clienteId).maybeSingle(),
+        sb.from("goxion_b2_regimen_cliente").select("activo,periodo_inicio")
+          .eq("cliente_id",clienteId).maybeSingle(),
+        sb.from("cliente_accesos").select("id,cliente_servicio_id")
+          .eq("cliente_id",clienteId).eq("activo",true).limit(100)
+      ]);
+      if(client.error||regime.error||accesses.error)throw
+        client.error||regime.error||accesses.error;
+      if(!client.data)return json({ok:false,error:"Cuenta inexistente"},404);
+      const periodo=String(client.data.periodo_pendiente||"").slice(0,10);
+      const active=regime.data?.activo===true;
+      const ids=(accesses.data||[]).map((x:any)=>x.id);
+      let registered:any[]=[];
+      if(ids.length){
+        const saved=await sb.from("goxion_calendario_accesos")
+          .select("cliente_acceso_id,cobertura_hasta,precio_centavos,estado,revision")
+          .in("cliente_acceso_id",ids);
+        if(saved.error)throw saved.error;
+        registered=saved.data||[];
+      }
+      const dates=new Set<string>();
+      const byAccess=new Map(registered.map((x:any)=>[x.cliente_acceso_id,x]));
+      const endOfMonth=/^\d{4}-\d{2}-01$/.test(periodo)
+        ?new Date(Date.UTC(Number(periodo.slice(0,4)),
+           Number(periodo.slice(5,7)),0)).toISOString().slice(0,10):"";
+      const valid=ids.filter((id:string)=>{
+        const row:any=byAccess.get(id);
+        if(!row||row.estado!=="verificado"||
+          !Number.isInteger(Number(row.revision))||Number(row.revision)<=0||
+          Number(row.precio_centavos)<=0||
+          row.cobertura_hasta<periodo||row.cobertura_hasta>endOfMonth)return false;
+        dates.add(row.cobertura_hasta);
+        return true;
+      }).length;
+      const reasons:string[]=[];
+      if(client.data.estado==="suspendido")reasons.push("Cuenta suspendida");
+      if(!/^\d{4}-\d{2}-01$/.test(periodo))reasons.push("Período de cobro no conciliado");
+      if(client.data.pago_en_revision===true)reasons.push("Hay un pago en revisión");
+      if(ids.length<2)reasons.push("Se necesitan al menos dos perfiles reales");
+      if(ids.length!==valid)reasons.push("Guarda y verifica todas las fechas del período");
+      if(dates.size<2)reasons.push("Los perfiles deben tener al menos dos fechas distintas");
+      const ready=!active&&reasons.length===0;
+      return json({ok:true,accion:action,modo:active?"b2_activo":"fecha_unica",
+        periodo,regimen_activo:active,perfiles:ids.length,
+        perfiles_verificados:valid,fechas_distintas:dates.size,
+        listo_para_activar:ready,motivos:reasons,
+        aviso:"La confirmación final vuelve a validar precios y beneficios en SQL",
+        operacion_solo_lectura:true});
+    }
+
     // B2: preflight de preparación ANTES de mover o facturar cualquier acceso.
     // Sólo Admin. Es lectura SQL sin efecto financiero; incluso si pasa, NO cobra.
     if (action === "diagnostico_b2_sombra") {
