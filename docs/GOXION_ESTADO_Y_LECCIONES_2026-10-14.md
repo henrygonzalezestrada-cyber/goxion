@@ -13,12 +13,12 @@
 | Bloque | Estado acreditado | Referencia |
 | --- | --- | --- |
 | F0 · Auditoría | Cerrada; inventario y límites de cobro identificados | [Ruta de cierre](B2_RUTA_CIERRE_CONTROLADA.md) |
-| F1 · UX | Diseño visual acordado; conserva ADN propio de cada pantalla | [PR #97](../pull/97), [contrato visual](GOXION_VISUAL_CONTRACT.md) |
-| F2 · Motor | SQL B2 opt-in, obligaciones por perfil, lealtad global, mora por obligación y evidencia privada; protegido por autorización de servidor | [PR histórica #96](../pull/96), [motor financiero](FINANCIAL_ENGINE.md) |
-| F3 · Integración | Index B2, Mi Espacio y revisión Admin con comprobante e idempotencia; validación HTTP positiva y concurrencia en entorno ficticio | [PR #99](../pull/99), [detalle F3](B2_F3_INTEGRACION_BETA.md) |
-| F4 · Avisos | Confirmación automática de prórroga, campana Admin y outbox de Discord con reintento programado | [PR #100](../pull/100), [cierre F4](B2_F4_CIERRE_BETA.md) |
-| F5 · Publicación | Integración selectiva en las páginas oficiales; clientes globales conservan flujo anterior | [PR #101](../pull/101) |
-| Cierre operativo | Activador B2 junto al calendario; conciliación de redondeo; próximo importe en Index y Mi Espacio | [PR #102](../pull/102), [PR #103](../pull/103) |
+| F1 · UX | Diseño visual acordado; conserva ADN propio de cada pantalla | [PR #97](https://github.com/henrygonzalezestrada-cyber/goxion/pull/97), [contrato visual](GOXION_VISUAL_CONTRACT.md) |
+| F2 · Motor | SQL B2 opt-in, obligaciones por perfil, lealtad global, mora por obligación y evidencia privada; protegido por autorización de servidor | [PR histórica #96](https://github.com/henrygonzalezestrada-cyber/goxion/pull/96), [motor financiero](FINANCIAL_ENGINE.md) |
+| F3 · Integración | Index B2, Mi Espacio y revisión Admin con comprobante e idempotencia; validación HTTP positiva y concurrencia en entorno ficticio | [PR #99](https://github.com/henrygonzalezestrada-cyber/goxion/pull/99), [detalle F3](B2_F3_INTEGRACION_BETA.md) |
+| F4 · Avisos | Confirmación automática de prórroga, campana Admin y outbox de Discord con reintento programado | [PR #100](https://github.com/henrygonzalezestrada-cyber/goxion/pull/100), [cierre F4](B2_F4_CIERRE_BETA.md) |
+| F5 · Publicación | Integración selectiva en las páginas oficiales; clientes globales conservan flujo anterior | [PR #101](https://github.com/henrygonzalezestrada-cyber/goxion/pull/101) |
+| Cierre operativo | Activador B2 junto al calendario; conciliación de redondeo; próximo importe en Index y Mi Espacio | [PR #102](https://github.com/henrygonzalezestrada-cyber/goxion/pull/102), [PR #103](https://github.com/henrygonzalezestrada-cyber/goxion/pull/103) |
 
 **Última versión productiva comprobada en este corte:** commit `8944b30ce` (PR #103), GitHub Pages **SUCCESS** y GOXION Integrity **SUCCESS** para ese mismo commit: [Pages](https://github.com/henrygonzalezestrada-cyber/goxion/actions/runs/38640614370), [Integrity](https://github.com/henrygonzalezestrada-cyber/goxion/actions/runs/38640615453). Estos resultados corresponden a código y CI; no sustituyen una aceptación visual humana en Safari para futuros cambios.
 
@@ -117,7 +117,7 @@
 ## 6. Estado pendiente / mantenimiento — sin reabrir B2
 
 1. **Operación ordinaria:** gestionar altas B2 individualmente desde el calendario de Admin, vigilando precios y coberturas. Las cifras anteriores son un **corte**, no una meta.
-2. **Seguimiento de PR históricas:** [#96](../pull/96) y [#95](../pull/95) siguen abiertas; tratarlas como deuda de conciliación documental/código, **no** como autorización para volver a construir F2. Archivar/cerrar solo después de determinar qué archivos faltan realmente en `main`; si no hay un fallo, no bloquear operaciones por ello.
+2. **Seguimiento de PR históricas:** [#96](https://github.com/henrygonzalezestrada-cyber/goxion/pull/96) y [#95](https://github.com/henrygonzalezestrada-cyber/goxion/pull/95) siguen abiertas; tratarlas como deuda de conciliación documental/código, **no** como autorización para volver a construir F2. Archivar/cerrar solo después de determinar qué archivos faltan realmente en `main`; si no hay un fallo, no bloquear operaciones por ello.
 3. **Entrega real de notificaciones:** cron activo, pero en este corte **0 eventos F4 reales**. No afirmar que Discord ya notificó efectivamente una prórroga real; la lógica, cola y pruebas de falla están implementadas. Verificar cuando ocurra el primer acuerdo real.
 4. **Safari real y atención al cliente:** Chromium/WebKit y CI general verdes en el corte; cualquier incidencia reportada mediante captura/video debe corregirse en su componente, sin rehacer todo el diseño.
 5. **Infraestructura QA:** proyecto aislado permanece disponible para pruebas ficticias. Evaluar costo/limpieza conscientemente; no atribuirle actividad de clientes.
