@@ -149,8 +149,8 @@ Deno.serve(async (req) => {
         sb.from("cliente_accesos").select("id,cliente_servicio_id")
           .eq("cliente_id",clienteId).eq("activo",true).limit(100)
       ]);
-      if(client.error||regime.error||accesses.error)throw
-        client.error||regime.error||accesses.error;
+      if(client.error||regime.error||accesses.error)
+        throw (client.error||regime.error||accesses.error);
       if(!client.data)return json({ok:false,error:"Cuenta inexistente"},404);
       const periodo=String(client.data.periodo_pendiente||"").slice(0,10);
       const active=regime.data?.activo===true;
