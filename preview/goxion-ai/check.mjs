@@ -1,4 +1,4 @@
-// GOXION · Goxy F6 · guías reales compartidas y scroll táctil sin bloquear.
+// GOXION · Goxy F7 · puente de IA con guías y scroll F6 preservados.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -35,9 +35,13 @@ assert.ok(!js.includes('gxai-open-icon')&&!js.includes('↗'),'El CTA no debe te
 assert.ok(js.includes('gxai-open-signal')&&css.includes('.gxai-open-balance'),'Conservar el CTA F4');
 assert.ok(!js.includes('<linearGradient'),'No regresar al SVG plano');
 assert.ok(js.includes('event.stopPropagation()')&&js.includes('capture: true'),'No regresar al poke feliz automático');
-assert.ok(!js.includes('fetch(')&&!js.includes('XMLHttpRequest'),'La demo no realiza solicitudes HTTP');
-assert.ok(!html.includes('https://api.'),'No incluir endpoints externos');
-assert.ok(html.includes('mascota.js?v=goxy-f6') && html.includes('goxy-support-knowledge.js?v=goxy-f6'),'Cargar catálogo canónico antes de Goxy F6');
+assert.ok(!js.includes('SUPABASE_SERVICE_ROLE_KEY')&&!js.includes('GROQ_API_KEY'),'Ninguna clave privada en el UI');
+const bridge=readFileSync(join(root,'goxy-ai-client.js'),'utf8');
+assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'Cliente conecta a Edge, no a Groq');
+assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
+assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
+assert.ok(html.includes('goxy-ai-client.js?v=goxy-f7'),'Cargar puente seguro F7');
+assert.ok(html.includes('mascota.js?v=goxy-f7') && html.includes('goxy-support-knowledge.js?v=goxy-f7'),'Cargar F7 con catálogo');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
 assert.ok(!js.includes('sendSmartWA('),'Goxy no debe usar soporte que agrega PIN y credenciales');
@@ -107,6 +111,11 @@ const win={
   getCurrentClientKey:()=>authed?'test-client':'',
   GOXY_ROBOT:{mountAll:()=>mounts++},
   GOXY_SUPPORT:knowledge,
+  GOXY_AI:{
+    status:()=>Promise.resolve({ok:true,configured:false}),
+    ask:()=>Promise.resolve({ok:false,code:'AI_NOT_CONFIGURED',
+      message:'La conexión de IA está preparada, pero falta configurar la clave.'})
+  },
   switchTab:(name)=>switches.push(name),
   matchMedia:()=>({matches:reduced}),
   openAuthSheet:()=>authOpens++,
@@ -271,4 +280,7 @@ mascotButton.fire('pointerdown',pointer(100,110,220));
 mascotButton.fire('pointermove',pointer(180,114,220));
 mascotButton.fire('pointerup',pointer(182,114,220));
 assert.equal(hearts.childElementCount,heartCount);
-console.log('GOXION Goxy F6: scroll pan-y, caricias horizontales, guías oficiales, asesor, cuenta, sesión y chat PASS.');
+assert.ok(js.includes('ai.ask(') && js.includes('chosenGuide') && js.includes('aiController?.abort()'),
+  'La IA usa guía seleccionada y cancela llamadas al cerrar');
+assert.ok(js.includes('AI_NOT_CONFIGURED'), 'Mostrar estado no configurado sin respuesta falsa');
+console.log('GOXION Goxy F7: conexión server-side lista, sin secretos frontend y F6 intacta PASS.');
