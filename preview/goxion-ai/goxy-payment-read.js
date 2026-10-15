@@ -91,21 +91,35 @@
      if(!found)return describe(data,'all');
      chosen=[found];
    }
+   if(mode==='platform'){
+     if(!window.GOXY_SUPPORT?.platforms?.().includes(id))return describe(data,'all');
+     chosen=rows.filter(row=>window.GOXY_SUPPORT.resolveAllPlatforms(row.name).includes(id));
+     if(!chosen.length)return {answer:'No encuentro un cargo pendiente de '+id+
+       ' en el calendario confirmado. Puedes consultar todas las fechas o abrir Index.',
+       choices:[{kind:'pay-all',label:'Ver todos los pagos'},
+         {kind:'pay-open',label:'Abrir estado de cuenta'}]};
+   }
    const dueTotal=chosen.reduce((sum,row)=>sum+row.amount,0);
    const lines=chosen.slice(0,12).map(row=>
      '• '+row.name+' · perfil '+row.ordinal+': '+date(row.due)+' · '+money(row.amount)+
      (row.agreement?' (acuerdo pactado)':''));
    const prefix=mode==='next'?'Tu próximo vencimiento:':
      mode==='one'?'Este es el importe confirmado para ese perfil:':
+     mode==='platform'?'Estos son los pagos de '+id+':':
        'Estos son tus vencimientos confirmados:';
    const extra=chosen.length>12?'\nConsulta los demás perfiles en Index.':'';
    const totalLine=mode==='all'?'Total pendiente del período: ':
-      mode==='next'?'Total de esa fecha: ':'Importe de ese perfil: ';
+      mode==='next'?'Total de esa fecha: ':mode==='platform'?'Total de esta plataforma: ':'Importe de ese perfil: ';
+   const recognized=window.GOXY_SUPPORT;
+   const platforms=[...new Set(rows.flatMap(row=>
+     recognized?.resolveAllPlatforms?.(row.name)||[]))];
    const choices=[{kind:'pay-next',label:'Próximo vencimiento'},
      {kind:'pay-all',label:'Todo junto · '+money(data.total)},
-     ...rows.slice(0,6).map(row=>({kind:'pay-one',chargeId:row.id,
-       label:row.name+' · perfil '+row.ordinal})),
-     {kind:'pay-open',label:'Ir a pagar'}];
+     ...(platforms.length>1?platforms.slice(0,3).map(platform=>({
+       kind:'pay-platform',platform,label:platform+' · total'})):[]),
+     ...rows.slice(0,rows.length<=4?4:2).map(row=>({kind:'pay-one',chargeId:row.id,
+       label:row.name+' · perfil '+row.ordinal+' · '+date(row.due)})),
+     {kind:'pay-open',label:'Realizar mi pago'}];
    return {answer:prefix+'\n'+lines.join('\n')+extra+'\n\n'+totalLine+
      money(dueTotal)+'\nPuedes pagar por fecha o todo junto desde Index; el importe se valida nuevamente antes de reportar tu pago.',
      choices};
