@@ -1,4 +1,4 @@
-/* GOXION · Goxy F7.1 · estado de IA visible y conversación guiada sin pasos ocultos.
+/* GOXION · Goxy F7.2 · priorizar plataformas contratadas sin compartir datos privados.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -23,6 +23,10 @@
     return '<span class="gxai-mascot gxai-canvas-slot" data-mood="idle" role="img" aria-label="Goxy, robot animado con pantalla LED"></span>';
   }
 
+  if (typeof window.GOXY_CLIENT_CONTEXT?.refresh !== 'function') {
+    console.error('[GOXION Goxy] Contexto mínimo de plataformas no cargado.');
+    return;
+  }
   if (typeof window.GOXY_AI?.ask !== 'function') {
     console.error('[GOXION Goxy] No se cargó el puente seguro de IA.');
     return;
@@ -74,6 +78,11 @@
     '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
     '<button class="gxai-ai-start" type="button" disabled>Comprobando…</button>',
     '</div>',
+    '<section class="gxai-my-services" aria-label="Servicios contratados">',
+    '<div class="gxai-my-head"><strong>Tus plataformas</strong><small class="gxai-my-status">Buscando servicios de Mi Espacio…</small></div>',
+    '<div class="gxai-my-list"></div>',
+    '<button class="gxai-my-other" type="button">Explorar otras plataformas</button>',
+    '</section>',
     '<div class="gxai-suggestions">',
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="cuenta">Quiero consultar mi cuenta</button>',
@@ -126,6 +135,50 @@
   const aiTitle = layer.querySelector('.gxai-ai-title');
   const aiDescription = layer.querySelector('.gxai-ai-description');
   const aiStart = layer.querySelector('.gxai-ai-start');
+  const myPanel = layer.querySelector('.gxai-my-services');
+  const myStatus = layer.querySelector('.gxai-my-status');
+  const myList = layer.querySelector('.gxai-my-list');
+  const myOther = layer.querySelector('.gxai-my-other');
+  const clientContext = window.GOXY_CLIENT_CONTEXT;
+  let myPlatforms = [];
+  let myContextReady = false;
+  function renderMyPlatforms(snapshot) {
+    myList.replaceChildren();
+    myContextReady = snapshot?.ok === true;
+    myPlatforms = myContextReady && Array.isArray(snapshot.platforms)
+      ? snapshot.platforms.filter(platform => window.GOXY_SUPPORT.platforms().includes(platform)) : [];
+    if (!myContextReady) {
+      myStatus.textContent = 'No pude consultar tus servicios; las guías siguen disponibles.';
+    } else if (myPlatforms.length === 0) {
+      myStatus.textContent = snapshot.serviceCount > 0
+        ? 'Sin guías específicas para tus servicios actuales.'
+        : 'Aún no tienes plataformas activas.';
+    } else {
+      myStatus.textContent = myPlatforms.length + (myPlatforms.length === 1
+        ? ' plataforma reconocida' : ' plataformas reconocidas');
+      myPlatforms.forEach(platform => {
+        const button = doc.createElement('button');
+        button.type='button';
+        button.className='gxai-my-platform';
+        button.dataset.platform=platform;
+        button.textContent=platform;
+        myList.appendChild(button);
+      });
+    }
+  }
+  function refreshMyPlatforms() {
+    const current=requestId;
+    myStatus.textContent='Buscando servicios de Mi Espacio…';
+    myList.replaceChildren();
+    myPlatforms=[];
+    myContextReady=false;
+    clientContext.refresh().then(snapshot=>{
+      if (!active || current!==requestId || !authenticated())return;
+      renderMyPlatforms(snapshot);
+    }).catch(()=>{
+      if(active && current===requestId)renderMyPlatforms({ok:false});
+    });
+  }
   let aiMode = false;
   function setAIStatus(status, message) {
     aiPanel.setAttribute('data-ai-status', status);
@@ -227,6 +280,7 @@
     aiMode = false;
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
+    refreshMyPlatforms();
     ai.status().then(state => {
       if (!active || statusId !== requestId) return;
       aiConfigured = state.ok===true && state.configured===true;
@@ -260,6 +314,9 @@
     clearChoices();
     chosenPlatform = null;
     chosenGuide = null;
+    myPlatforms=[];
+    myContextReady=false;
+    myList.replaceChildren();
     aiMode = false;
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
@@ -350,6 +407,13 @@
     choices = doc.createElement('div');
     choices.className = 'gxai-choices';
     items.forEach(item => {
+      if(item.kind==='heading'){
+        const heading=doc.createElement('span');
+        heading.className='gxai-choice-heading';
+        heading.textContent=item.label;
+        choices.appendChild(heading);
+        return;
+      }
       const button = doc.createElement('button');
       button.type = 'button';
       button.className = 'gxai-choice';
@@ -362,12 +426,35 @@
     scroll.appendChild(choices);
     scroll.scrollTop = scroll.scrollHeight;
   }
-  const choosePlatformOptions = () => knowledge.platforms().map(platform =>
+  const choosePlatformOptions = names => names.map(platform =>
     ({kind:'platform',platform,label:platform}));
   function showPlatforms() {
     chosenGuide = null;
     aiMode = false;
-    showChoices(choosePlatformOptions());
+    const all=knowledge.platforms();
+    const mine=myPlatforms.filter(platform=>all.includes(platform));
+    if (mine.length) {
+      showChoices([
+        {kind:'heading',label:'Tus plataformas activas'},
+        ...choosePlatformOptions(mine),
+        {kind:'other',label:'Consultar otras plataformas'}
+      ]);
+    } else {
+      showChoices([
+        {kind:'heading',label:'Plataformas disponibles'},
+        ...choosePlatformOptions(all)
+      ]);
+    }
+  }
+  function showOtherPlatforms() {
+    chosenGuide=null;
+    aiMode=false;
+    const others=knowledge.platforms().filter(platform=>!myPlatforms.includes(platform));
+    showChoices([
+      {kind:'heading',label:'Otras plataformas'},
+      ...choosePlatformOptions(others),
+      ...(myPlatforms.length?[{kind:'mine',label:'Volver a mis plataformas'}]:[])
+    ]);
   }
   function showIssues(platform) {
     chosenGuide = null;
@@ -375,7 +462,7 @@
     const issues = knowledge.issues(platform);
     showChoices([
       ...issues.map((issue,index)=>({kind:'issue',platform,issueIndex:index,label:issue.issue})),
-      {kind:'platforms',label:'Ver otras plataformas'},
+      {kind:'platforms',label:'Cambiar plataforma'},
       {kind:'human',label:'Hablar con asesor humano'}
     ]);
   }
@@ -516,6 +603,8 @@
       messageInput.focus({preventScroll:true});
       return;
     }
+    if (type === 'mine') { showPlatforms(); return; }
+    if (type === 'other') { showOtherPlatforms(); return; }
     if (type === 'human') { humanHandoff(); return; }
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'platforms') {
@@ -650,6 +739,19 @@
   closeButton.addEventListener('click', closeChat);
   layer.querySelector('.gxai-backdrop').addEventListener('click', closeChat);
   layer.addEventListener('click', event => {
+    const quick = event.target.closest?.('.gxai-my-platform');
+    if (quick) {
+      if (!active || busy || !authenticated()) return;
+      const platform=quick.dataset.platform;
+      if (!myPlatforms.includes(platform)) return;
+      choiceAction({dataset:{kind:'platform',platform}});
+      return;
+    }
+    const other = event.target.closest?.('.gxai-my-other');
+    if(other) {
+      if(active && !busy && authenticated())showOtherPlatforms();
+      return;
+    }
     const chosen = event.target.closest?.('.gxai-choice');
     if (chosen) { choiceAction(chosen); return; }
     const button = event.target.closest?.('.gxai-suggestion');
@@ -706,6 +808,7 @@
     renderer: 'robot-heads@0.3.0',
     aiConfigured: () => aiConfigured,
     aiMode: () => aiMode,
-    aiStatus: () => aiPanel.getAttribute('data-ai-status')
+    aiStatus: () => aiPanel.getAttribute('data-ai-status'),
+    contractedPlatforms: () => [...myPlatforms]
   });
 })();
