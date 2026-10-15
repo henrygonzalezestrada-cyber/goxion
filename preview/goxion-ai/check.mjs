@@ -108,7 +108,7 @@ class Element {
   }
   querySelectorAll(sel) {
     if(this.name==='support'&&sel==='.gxai-mascot')return [robotHero,robotAvatar];
-    if(this.name==='layer'&&sel==='.gxai-suggestion')return [btnAccess,btnAccount,btnCode,btnError];
+    if(this.name==='layer'&&sel==='.gxai-suggestion')return [btnAccess,btnAccount,btnCode,btnMissions,btnPromos];
     if(this.name==='dialog'&&sel.startsWith('button'))return [closeButton];
     return [];
   }
@@ -121,9 +121,9 @@ const backdrop=new Element('backdrop'),phase=new Element('phase'),composer=new E
 const input=new Element('input'),send=new Element('send'),disclaimer=new Element('disclaimer');
 const aiPanel=new Element('aiPanel'),aiTitle=new Element('aiTitle'),
   aiDescription=new Element('aiDescription'),aiStart=new Element('aiStart');
-const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error');
+const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error'),btnMissions=new Element('missions'),btnPromos=new Element('promos');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
-btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';
+btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';btnMissions.dataset.prompt='misiones';btnPromos.dataset.prompt='promociones';
 let captures=0, humanOpens=0, switches=[];
 mascotButton.setPointerCapture=()=>{captures++;};
 const officialHuman=new Element('human');officialHuman.click=()=>{humanOpens++;};
@@ -148,6 +148,7 @@ const win={
   },
   GOXY_AI:{
     status:()=>Promise.resolve({ok:true,configured:false}),
+    account:()=>Promise.resolve({ok:true,answer:'Lectura de cuenta desde GOXION.',source:'official_account'}),
     ask:()=>Promise.resolve({ok:false,code:'AI_NOT_CONFIGURED',
       message:'La conexión de IA está preparada, pero falta configurar la clave.'})
   },
@@ -280,7 +281,7 @@ assert.ok(currentChoice('human'),'Ofrecer contacto al requerir aprobación');
 
 // Cerrar en mitad de la búsqueda debe cancelar respuesta, timer y estado.
 clickDemo(btnAccount);
-assert.equal(api.chatState(),'thinking');
+assert.equal(api.chatState(),'speaking');
 closeButton.fire('click');
 assert.equal(layer.classList.contains('gxai-visible'),false);
 assert.equal(api.chatState(),'idle');
@@ -400,4 +401,22 @@ assert.equal(sent[1].issueIndex,undefined,'La conversación no exige un índice 
 assert.ok(!('cliente_id' in sent[1]),'No enviar ID de cliente');
 flush();
 closeButton.fire('click');
-console.log('GOXION Goxy F8.1: estado Groq verificado, cupo restante, chat directo y regresiones PASS.');
+// Nueva ruta: consulta de misiones por backend propio sin gastar IA.
+openButton.fire('click');
+flush();
+let askCount=sent.length,accountCount=0;
+win.GOXY_AI.account=async(topic)=>{
+  accountCount++;
+  return {ok:true,source:'official_account',answer:'Misiones verificadas en el servidor: 2 pendientes.',topic};
+};
+clickDemo(btnMissions);
+await Promise.resolve();
+assert.equal(accountCount,1,'Consultar misiones via backend');
+assert.equal(sent.length,askCount,'No gastar IA en misiones');
+assert.ok(scroll.children.some(x=>x.textContent.includes('Misiones verificadas')),'Respuesta real sin Groq');
+flush();
+input.value='Hola';composer.fire('submit');
+assert.equal(sent.length,askCount,'Saludar no consume cuota IA');
+flush();
+closeButton.fire('click');
+console.log('GOXION Goxy F9: guías, cuenta sin IA, saludo sin IA, sesiones y chat PASS.');
