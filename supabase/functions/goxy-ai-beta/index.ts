@@ -57,7 +57,9 @@ function getGuide(platform:unknown,index:unknown){
   return {platform,issue:"Consulta general de soporte",guide:rows.map(row=>
     "SITUACIÓN: "+row.issue+"\nINSTRUCCIONES: "+row.instructions.slice(0,1000)+
     (row.requires_human?"\nREQUIERE ASESOR HUMANO.":"")).join("\n\n").slice(0,4500),
-    human:rows.some(row=>row.requires_human)};
+    // Sólo marcar toda la conversación como obligatoriamente humana cuando
+    // todas las situaciones de esta plataforma lo requieran.
+    human:rows.every(row=>row.requires_human)};
 }
 Deno.serve(async(req:Request)=>{
   const origin=req.headers.get("Origin");
