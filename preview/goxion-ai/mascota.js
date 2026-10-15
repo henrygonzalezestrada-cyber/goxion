@@ -1,4 +1,4 @@
-/* GOXION · Goxy F8.1 · verificación real de Groq y cupo visible en beta.
+/* GOXION · Goxy F9 · soporte primero, IA con memoria y lecturas de cuenta.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -72,7 +72,7 @@
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
     '<div class="gxai-beta-note">GOXY · IA CON SOPORTE REAL</div>',
-    '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Cuando esté activa la IA, podrás conversar sobre tu plataforma sin buscar una guía primero. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
+    '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Puedo ayudarte con tus servicios, misiones, promociones y guías de soporte. Primero revisamos la información oficial; si necesitamos explicar algo más, podemos usar IA. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
     '<div class="gxai-ai-panel" role="status" aria-live="polite">',
     '<span class="gxai-ai-light" aria-hidden="true"></span>',
     '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
@@ -82,7 +82,8 @@
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="cuenta">Quiero consultar mi cuenta</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="codigo">Necesito un código</button>',
-    '<button type="button" class="gxai-suggestion" data-prompt="error">Probar un error</button>',
+    '<button type="button" class="gxai-suggestion" data-prompt="misiones">Mis misiones</button>',
+    '<button type="button" class="gxai-suggestion" data-prompt="promociones">Promociones activas</button>',
     '</div>',
     '</div>',
     '<footer class="gxai-chat-foot">',
@@ -163,6 +164,18 @@
   }
   let aiMode = false;
   let aiEntry = false;
+  // Solo memoria local de esta sesión de chat: nunca localStorage, ni BD.
+  const conversation = [];
+  function resetConversation() { conversation.length = 0; }
+  function keepTurn(userText,assistantText){
+    if(typeof userText!=='string'||typeof assistantText!=='string')return;
+    // Guardar únicamente los turnos de IA ya filtrados, no respuestas privadas.
+    const sensitive=/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu;
+    if(sensitive.test(userText)||sensitive.test(assistantText))return;
+    conversation.push({role:'user',content:userText.slice(0,280)},
+      {role:'assistant',content:assistantText.slice(0,280)});
+    if(conversation.length>6)conversation.splice(0,conversation.length-6);
+  }
   function setAIStatus(status, message) {
     aiPanel.setAttribute('data-ai-status', status);
     aiStart.disabled = status !== 'ready';
@@ -262,6 +275,7 @@
     aiConfigured = false;
     aiMode = false;
     aiEntry = false;
+    resetConversation();
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
     refreshMyPlatforms();
@@ -309,6 +323,7 @@
     myContextReady=false;
     aiMode = false;
     aiEntry = false;
+    resetConversation();
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
@@ -467,6 +482,7 @@
         finish:'error'},null,showPlatforms);
       return;
     }
+    if(chosenPlatform!==platform)resetConversation();
     chosenPlatform = platform;
     chosenGuide = {platform,issueIndex:index};
     aiMode = false;
@@ -503,13 +519,14 @@
     const current=++activeFlow;
     aiController=new AbortController();
     const chosen={...chosenGuide};
-    const reply=await ai.ask({message:text,...chosen,signal:aiController.signal});
+    const reply=await ai.ask({message:text,...chosen,history:[...conversation],signal:aiController.signal});
     if(!active || current!==activeFlow || !authenticated())return;
     aiController=null;
     hideTyping();
     if(reply.ok && typeof reply.answer==='string'){
       chatTransition('speaking');
       bubble(reply.answer,false);
+      keepTurn(text,reply.answer);
       if(Number.isInteger(reply.remaining)){
         disclaimer.textContent = 'Te quedan '+reply.remaining+
           ' consultas IA de tu cupo móvil de 24 h · Nunca compartas códigos ni PIN.';
@@ -528,7 +545,7 @@
       setBusy(false);
       chatTransition('listening');
       showChoices([
-        {kind:'ai',label:'Otra pregunta sobre esta guía'},
+        {kind:'ai',label:'Aclarar con Goxy (IA)'},
         {kind:'human',label:'Hablar con asesor humano'},
         {kind:'issues',platform:chosen.platform,label:'Ver otras situaciones'}
       ]);
@@ -609,6 +626,7 @@
       runDemo({prompt:'Ver plataformas',step:'searching',
         response:'Elige tu plataforma para consultar las soluciones disponibles.',finish:'happy'},null,showPlatforms);
     } else if (type === 'platform' && knowledge.platforms().includes(platform)) {
+      if(chosenPlatform!==platform)resetConversation();
       chosenPlatform = platform;
       if (aiEntry && aiConfigured) {
         aiEntry = false;
