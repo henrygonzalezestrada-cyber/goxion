@@ -1,6 +1,6 @@
-/* GOXION Goxy F7.2 · Contexto mínimo del cliente, solo presentación.
- * Fuentes ya autorizadas de Mi Espacio; el motor IA NUNCA recibe nombres
- * de cliente, folio, correos, perfil, PIN, servicios ni importes.
+/* Goxy F12 · Contexto mínimo por sesión autenticada de Mi Espacio.
+ * Groq jamás recibe datos de la cuenta. El correo de acceso solo aparece
+ * en una ficha visible y consentida antes de abrir WhatsApp.
  */
 (() => {
   'use strict';
@@ -56,7 +56,7 @@
     }catch{return unavailable('load_failed');}
   }
   // F12: rutas a la misma tarjeta OFICIAL de Mi Espacio.
-  // Nunca copiar usuario, PIN, correo o contraseña al chat, IA, logs ni URL.
+  // Nunca entregar códigos, PIN ni contraseñas fuera de su vista oficial.
   function destinations(platform) {
     if(!key() || !token())return [];
     const view=typeof globalClientesData!=='undefined'?globalClientesData:null;
