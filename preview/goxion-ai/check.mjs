@@ -10,11 +10,15 @@ const js = readFileSync(join(root, 'mascota.js'), 'utf8');
 const css = readFileSync(join(root, 'mascota.css'), 'utf8');
 const html = readFileSync(join(root, 'index.html'), 'utf8');
 new Function('window','document','localStorage','performance','setTimeout','clearTimeout',js);
-for (const needle of ['.gxai-face-love','.gxai-face-wink','.gxai-face-surprised','gxai-border-sweep','prefers-reduced-motion','touch-action:none']) {
+for (const needle of ['.gxai-canvas-slot','gxai-border-sweep','prefers-reduced-motion','touch-action:none']) {
   assert.ok(css.includes(needle), 'Falta estilo: '+needle);
 }
 assert.ok(!html.includes('https://api.'), 'Preview no debe llamar una API');
 assert.ok(!js.includes('↗'), 'No dejar flecha en el CTA');
+assert.ok(js.includes('gxai-canvas-slot') && !js.includes('<linearGradient'), 'Usar Canvas original, no el SVG plano.');
+const entry=readFileSync(join(root,'goxy-heads-entry.js'),'utf8');
+assert.ok(entry.includes('from "robot-heads"'), 'Debe importar el motor original.');
+assert.ok(entry.includes('shape:"rectangle"'), 'Debe usar la cabeza rectangular de referencia.');
 
 class Element {
   constructor(name) {
@@ -55,9 +59,10 @@ const doc={
   querySelectorAll:()=>[],addEventListener:()=>{},activeElement:null,
   documentElement:new Element('html'),body:new Element('body')
 };
-let hasToken=true, reduced=false, authOpenCount=0;
+let hasToken=true, reduced=false, authOpenCount=0, mounted=0;
 const win={
   GOXION_CORE:{STORAGE:{CLIENT_TOKEN:'token'}},
+  GOXY_ROBOT:{mountAll:()=>{mounted++;}},
   getCurrentClientKey:()=> 'test-client',
   matchMedia:()=>({matches:reduced}),
   openAuthSheet:()=>{authOpenCount++;},
@@ -70,6 +75,7 @@ new Function('window','document','localStorage','performance','setTimeout','clea
 );
 const layer=section.children.at(-1);
 assert.ok(win.GOXION_AI_BETA, 'Goxy no se inicializó');
+assert.equal(mounted,1,'Canvas original debe montarse después del diálogo');
 const p=(x,y,id=1)=>({isPrimary:true,pointerType:'touch',pointerId:id,button:0,clientX:x,clientY:y});
 
 // Tocar Goxy: expresión, nunca chat.
@@ -111,4 +117,4 @@ mascotButton.fire('pointerdown',p(100,110,4));
 mascotButton.fire('pointermove',p(150,111,4));
 mascotButton.fire('pointerup',p(151,111,4));
 assert.equal(hearts.childElementCount,originalCount);
-console.log('GOXION Goxy F2: 10 contratos estáticos e interactivos PASS (sin navegador ni datos reales).');
+console.log('GOXION Goxy F2: Goxy original Canvas + interacciones F2 PASS (sin navegador ni datos reales).');
