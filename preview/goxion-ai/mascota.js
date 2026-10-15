@@ -1,4 +1,4 @@
-/* GOXION · Goxy F9 · soporte primero, IA con memoria y lecturas de cuenta.
+/* GOXION · Goxy F10 · diálogo útil y teclado Safari adaptable.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -264,6 +264,45 @@
     flowTimers.add(timer);
   }
 
+  // F10 · iOS. En la beta, Goxy vive en un iframe del mismo origen.
+  // Al abrir el teclado Safari reduce el viewport del PADRE pero el iframe
+  // puede conservar 100dvh: medir ambos para colocar el compositor encima.
+  function syncChatViewport() {
+    if (!active) return;
+    try {
+      const parent = window.parent && window.parent !== window ? window.parent : window;
+      const viewport = parent.visualViewport || window.visualViewport;
+      const layoutH = parent.innerHeight || window.innerHeight || 0;
+      if (!viewport || !layoutH) return;
+      const viewH = Math.max(180, Math.min(layoutH, Math.round(viewport.height)));
+      const top = Math.max(0, Math.round(viewport.offsetTop || 0));
+      layer.style.setProperty('--gxai-viewport-height', viewH + 'px');
+      layer.style.setProperty('--gxai-viewport-top', top + 'px');
+      const keyboard = doc.activeElement === messageInput && layoutH - viewH > 100;
+      if (keyboard) layer.classList.add('gxai-keyboard-open');
+      else layer.classList.remove('gxai-keyboard-open');
+      if (keyboard) scroll.scrollTop = scroll.scrollHeight;
+    } catch (_) {
+      // En un origen distinto se conserva el fallback CSS con 100dvh.
+    }
+  }
+  try {
+    const host = window.parent && window.parent !== window ? window.parent : window;
+    host.visualViewport?.addEventListener('resize',syncChatViewport);
+    host.visualViewport?.addEventListener('scroll',syncChatViewport);
+    host.addEventListener?.('resize',syncChatViewport);
+    if (host !== window) window.visualViewport?.addEventListener('resize',syncChatViewport);
+  } catch (_) {}
+  messageInput.addEventListener('focus', () => {
+    syncChatViewport();
+    // iOS anima el teclado después del focus; comprobar al final del cambio.
+    setTimeout(syncChatViewport, 120);
+    setTimeout(syncChatViewport, 360);
+  });
+  messageInput.addEventListener('blur', () => {
+    setTimeout(syncChatViewport, 80);
+    setTimeout(syncChatViewport, 260);
+  });
   function openChat() {
     if (active || !authenticated()) {
       if (!authenticated()) window.openAuthSheet?.();
@@ -305,6 +344,7 @@
     doc.body.style.overflow = 'hidden';
     layer.classList.add('gxai-visible');
     layer.setAttribute('aria-hidden', 'false');
+    syncChatViewport();
     chatTransition('happy');
     const greetingFlow = activeFlow;
     later(greetingFlow, 750, () => { if (!busy) chatTransition('listening'); });
@@ -327,7 +367,9 @@
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
-    layer.classList.remove('gxai-visible');
+    layer.classList.remove('gxai-visible','gxai-keyboard-open');
+    layer.style.setProperty('--gxai-viewport-height','100dvh');
+    layer.style.setProperty('--gxai-viewport-top','0px');
     layer.setAttribute('aria-hidden', 'true');
     doc.documentElement.style.overflow = prevOverflowHtml;
     doc.body.style.overflow = prevOverflowBody;
