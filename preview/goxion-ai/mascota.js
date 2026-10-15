@@ -232,7 +232,7 @@
       aiConfigured = state.ok===true && state.configured===true;
       if (aiConfigured) setAIStatus('ready', 'Goxy puede responder preguntas relacionadas con las guías oficiales.');
       else if (state.ok===true && state.configured===false) setAIStatus('pending',
-        'Falta configurar GROQ_API_KEY en Supabase. Iniciar sesión no activa la IA.');
+        'Falta configurar la clave privada de Groq en Supabase. Iniciar sesión no activa la IA.');
       else setAIStatus('unavailable', state.code==='SESSION_INVALID'
         ? 'La sesión no pudo validarse. Vuelve a ingresar a Mi Espacio.'
         : 'No se pudo comprobar el servidor. Puedes seguir con las guías.');
@@ -437,7 +437,7 @@
       if(reply.code==='AI_NOT_CONFIGURED') {
         aiConfigured=false;
         aiMode=false;
-        setAIStatus('pending','Falta configurar GROQ_API_KEY en Supabase. Las guías permanecen disponibles.');
+        setAIStatus('pending','Falta configurar la clave privada de Groq en Supabase. Las guías permanecen disponibles.');
       }
     }
     later(current,1700,()=>{
@@ -507,7 +507,7 @@
     if (type === 'ai') {
       if (!chosenGuide) return;
       if (!aiConfigured) {
-        bubble('La IA todavía no está habilitada. Iniciar sesión no la activa: requiere configurar GROQ_API_KEY en Supabase. Mientras tanto, sigo aquí con las guías oficiales.',false);
+        bubble('La IA todavía no está habilitada. Iniciar sesión no la activa: requiere configurar la clave privada de Groq en Supabase. Mientras tanto, sigo aquí con las guías oficiales.',false);
         return;
       }
       aiMode = true;
