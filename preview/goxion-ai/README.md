@@ -1,39 +1,40 @@
-# GOXION AI · Goxy · Beta F2 (mascota interactiva)
+# GOXION · Goxy F3 · robot-heads original en beta
 
 ## Objetivo
-Reemplazar temporalmente la cuadrícula de plataformas **solo en una vista previa** de `Ayuda → Soporte` por una mascota real dibujada con SVG, animada mediante CSS y estados JavaScript. El robot se llama **Goxy**. Tocar su cabeza cambia sus gestos; **acariciarlo deslizando un dedo** activa ojitos de amor y corazones. Solo el botón «Hablar con Goxy» abre una ventana de chat demostrativa.
+Se sustituyó el SVG plano de la primera beta por la implementación original de **[robot-heads](https://github.com/fayazara/robot-heads)** (v0.3.0, Fayaz Ahmed, licencia MIT). La cabeza es el modelo **TV rectangular real**, renderizado en **Canvas 2D** con geometría, luces, reflejos, pantalla LED y movimiento; exactamente el tipo de tecnología de la referencia visual.
 
-## Abrir beta
-Una vez que estos archivos de preview estén publicados por GitHub Pages: `https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/`
+La experiencia de GOXION **no se convirtió a React**. Solo el robot tiene un pequeño montaje encapsulado con React, y sus dependencias están incluidas en un archivo JavaScript estático de la beta.
 
-**Importante:** este directorio aislado carga `../../ayuda.html` en un iframe *del mismo origen*, agrega estilos y comportamiento a esa página y abre automáticamente la pestaña Soporte. No sustituye, bifurca ni altera los archivos oficiales.
+## Abrir
+`https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f3`
 
-Acceso: usa **Mi Espacio** e inicia sesión como un cliente real. El bloqueo de Soporte que ya existe sigue funcionando. No se crea un usuario ficticio ni se elude la autorización.
+- Abre `../../ayuda.html` original en iframe **de mismo origen**; no duplica páginas oficiales.
+- Sección Soporte y sesión ya existentes. La capa de bloqueo de clientes sin sesión permanece en su lugar.
+- Reemplaza solo la cuadrícula de plataformas dentro de `smart-support-card`; mantiene FAQ, comentarios, asesor humano, pagos y catálogo existentes.
 
-## Lo que sí incluye
-- Goxy animado con SVG y CSS: parpadeo, leve movimiento, antena luminosa, guiño, sorpresa, cariño, alegría, escucha, pensamiento y habla simulada.
-- Eventos Pointer Events: toque = reacción; desplazamiento de dedo = caricia y corazones; no dispara el chat accidentalmente (incluido iOS con un solo evento de movimiento).
-- Botón «Hablar con Goxy» abre el chat (la mascota ya NO lo abre). El botón tiene un contorno cian-morado con movimiento orbital discreto y puntos pulsantes, sin flecha.
-- Chat modal de ejemplo con cierre por X, fondo y Escape.
-- Ejemplos conversacionales explícitamente marcados como demostración; no envían peticiones a ninguna API.
-- Respeta `prefers-reduced-motion`, navegación por teclado, foco sin halo de selección automática de la X y soporte móvil.
-- Conserva las FAQ, comentarios, contacto humano y funciones anteriores del soporte debajo del bloque nuevo.
-- Conservar los nodos antiguos ocultos evita errores en el renderizador de plataformas existente durante refrescos.
+## Estados y juego
+- **Idle:** cabeza original con LEDs de color blanco frío, parpadeo, giro y antena.
+- **Toque:** gestos feliz/guiño/sorpresa de Goxy. Como robot-heads no incluye literalmente `wink` ni `surprised`, estos eventos se asocian a sus estados nativos `happy` y `listening`. No abre chat.
+- **Deslizar/caricia:** se conserva el detector Pointer Events, con corazones y rubor sobre el robot; el render original muestra su animación `happy`. No abre chat.
+- **Botón «Hablar con Goxy»:** acceso único al chat de demostración, con línea animada discreta. Sin emoji/flecha.
+- **Chat:** estados nativos originales `listening`, `thinking`, `speaking` y `happy`, sin respuestas reales de IA todavía.
+- Respeta `prefers-reduced-motion`, accesibilidad y comportamiento táctil de iPhone.
 
-## Fuera del alcance
-- **Sin IA, Groq, claves API ni conexión al correo.**
-- **Sin consultas ni escritura de datos privados**, sin código de verificación automático.
-- Sin cambios en `ayuda.html`, `admin.html`, `index.html` o motores financieros.
-- Sin garantía de apariencia en Safari iOS físico hasta validación humana en el dispositivo.
-- Las animaciones y expresiones son locales; no graban movimientos ni envían conversaciones.
+## Archivos
+- `index.html`: carga `goxy-heads.bundle.js` desde **la misma carpeta/origen**, antes de `mascota.js`.
+- `goxy-heads.bundle.js`: build estático minificado del paquete real y React. No necesita CDN.
+- `goxy-heads-entry.js`: adaptador React aislado; observa `data-mood` para sincronizar estados.
+- `package.json`: versiones fijadas de `robot-heads@0.3.0`, React y esbuild. Para regenerar, ejecutar `npm install --no-audit --no-fund` y `npm run bundle` dentro de esta carpeta y subir el bundle.
+- `mascota.js`: lógica de caricias, gestos y chat existente, sin cambios de negocio.
+- `mascota.css`: estilos del Canvas y ADN visual GOXION.
+- `check.mjs`: pruebas simuladas de tap, caricia, botón, sesión, movimiento reducido y presencia de adaptador real.
+- `ROBOT_HEADS_LICENSE.txt`: licencia MIT del código integrado.
 
-## Arquitectura
-- `index.html`: envoltorio de prueba de mismo origen sobre `../../ayuda.html`.
-- `mascota.css`: estilo local bajo `#view-soporte`.
-- `mascota.js`: inyección limitada al contenedor `smart-support-card`, estados, navegación y chat.
-- `check.mjs`: contratos estáticos, prueba de interacciones simuladas sin navegador ni datos reales (`node preview/goxion-ai/check.mjs`).
+## Validaciones
+- Bundle se generó con éxito mediante GitHub Actions usando npm; compilador pasó `node --check`.
+- Contratos de interacción y montaje de Goxy probados con JavaScript simulado.
+- **Pendiente revisión en Safari iPhone físico** (reflejos, arrastre de dedo, recorte de antena, rendimiento) antes de aprobar visual.
+- Tests genéricos de GOXION y el flujo completo de autenticación se deben verificar antes de activar la mascota en Soporte oficial.
 
-Estética inspirada en el concepto [robot-heads](https://github.com/fayazara/robot-heads) (MIT, Fayaz Ahmed), **sin reutilizar su código React** para no incorporar librerías, CDNs ni dependencias en GOXION.
-
-## Siguientes fases
-Aprobar primero proporciones/animaciones. Después: API segura para respuestas verificadas, lectura autorizada de Mi Espacio y escalamiento a las notificaciones existentes de Admin.
+## Sin cambios oficiales
+No se modifica `ayuda.html`, `admin.html`, `index.html`, el motor financiero ni Supabase. **No hay llamadas a Groq, API de IA, correo ni solicitudes a Admin** en esta fase.
