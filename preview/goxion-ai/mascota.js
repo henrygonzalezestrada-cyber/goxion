@@ -673,6 +673,13 @@
       !['tengo','necesito','quiero','ayuda','problema','plataforma','servicio','con','para','por','esta','algo'].includes(w));
     return meaningful.length<3;
   }
+  function needsHumanAuthorization(guide) {
+    if(!guide?.requiresHuman)return false;
+    const issue=knowledge.normalize(guide.issue||'');
+    // El flag de contacto humano también aparece en TODAS las guías;
+    // solo algunos procedimientos son autorizaciones exclusivas.
+    return /\b(codigo|verificacion|vincular|invitacion|registrar dispositivo)\b/.test(issue);
+  }
   function escalationFallback(platform) {
     respondFree('Necesito más ayuda',
       'Por ahora no tengo disponible una explicación avanzada. Puedo revisar contigo otra guía de '+platform+
@@ -684,7 +691,7 @@
     if(!knowledge.platforms().includes(platform)||!active||busy||!authenticated())return;
     const guide=Number.isInteger(issueIndex)?knowledge.guide(platform,issueIndex):null;
     // La IA no puede ejecutar autorizaciones: evitar cobros en gestiones humanas.
-    if(guide?.requiresHuman){
+    if(needsHumanAuthorization(guide)){
       respondFree(query,
         'Esta gestión necesita una autorización de GOXION. Ya tenemos el contexto; un asesor debe finalizarla. No me envíes códigos ni contraseñas.',
         [{kind:'human',label:'Continuar con asesor humano'},
@@ -807,7 +814,7 @@
     const index = Number(button.dataset.issueIndex);
     if (type === 'unresolved') {
       const guide=lastGuide && knowledge.guide(lastGuide.platform,lastGuide.issueIndex);
-      if(guide?.requiresHuman){
+      if(needsHumanAuthorization(guide)){
         respondFree('La guía no resolvió mi problema',
           'Esa vinculación requiere una autorización de GOXION. Ya revisaste la guía: lo siguiente es contactar a un asesor, sin compartir el código aquí.',
           [{kind:'human',label:'Contactar asesor'},
