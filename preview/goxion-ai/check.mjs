@@ -1,4 +1,4 @@
-// GOXION · Goxy F7 · puente de IA con guías y scroll F6 preservados.
+// GOXION · Goxy F7.2 · priorización por cliente, F7/F6 intactas.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -12,6 +12,7 @@ const html=readFileSync(join(root,'index.html'),'utf8');
 const entry=readFileSync(join(root,'goxy-heads-entry.js'),'utf8');
 const official=readFileSync(join(root,'../../assets/js/ayuda/data/support-issues.js'),'utf8');
 const adapter=readFileSync(join(root,'goxy-support-knowledge.js'),'utf8');
+const clientContextSrc=readFileSync(join(root,'goxy-client-context.js'),'utf8');
 const knowledgeWindow={};
 new Function('window',official)(knowledgeWindow);
 new Function('window',adapter)(knowledgeWindow);
@@ -22,6 +23,30 @@ assert.ok(knowledge.guide('Netflix',0).instructions.includes('Iniciar Sesión co
 assert.ok(!knowledge.guide('Netflix',0).instructions.includes('<strong>'),'No pasar HTML a chat');
 assert.equal(knowledge.resolvePlatform('Tengo error de Disney+'),'Disney+');
 assert.equal(knowledge.resolvePlatform('Estoy en Prime Video'),'Prime Video');
+assert.deepEqual(knowledge.resolveAllPlatforms('HBO Max + Prime Video'),['Max','Prime Video']);
+let account='test-client';
+const privateView={
+ 'test-client':{servicios:[
+  {nombre:'Netflix Premium',correo_login:'privado@test.invalid',perfil_pin:'3321'},
+  {nombre:'Disney+ Premium'},
+  {nombre:'Combo HBO Max + Prime Video'}]},
+ 'otro-cliente':{servicios:[{nombre:'ViX Premium'}]}
+};
+const clientWindow={
+ GOXY_SUPPORT:knowledge,
+ GOXION_CORE:{getClientToken:()=>account?'fake-token':''},
+ getCurrentClientKey:()=>account,
+ goxionReloadPrivateClientView:async()=>({key:account,cliente:privateView[account]})
+};
+new Function('window','globalClientesData',clientContextSrc)(clientWindow,privateView);
+const current=await clientWindow.GOXY_CLIENT_CONTEXT.refresh();
+assert.deepEqual(current.platforms,['Netflix','Disney+','Max','Prime Video'],'Combos + nombres de plataformas');
+assert.ok(!JSON.stringify(current).includes('privado@test.invalid') &&
+ !JSON.stringify(current).includes('3321'),'Nunca devolver datos personales');
+account='otro-cliente';
+const other=await clientWindow.GOXY_CLIENT_CONTEXT.refresh();
+assert.deepEqual(other.platforms,['ViX'],'Una segunda sesión no hereda servicios');
+account='test-client';
 assert.equal(knowledge.matchIssue('Netflix','Netflix actualizar hogar'),1);
 assert.equal(knowledge.guide('Disney+',500),null,'Nunca inventar situaciones ausentes');
 new Function('window','document','localStorage','performance','setTimeout','clearTimeout',js);
@@ -41,7 +66,8 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f7'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f7-1') && html.includes('goxy-support-knowledge.js?v=goxy-f7'),'Cargar F7.1 con catálogo');
+assert.ok(html.includes('mascota.js?v=goxy-f7-2') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+ html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
 assert.ok(!js.includes('sendSmartWA('),'Goxy no debe usar soporte que agrega PIN y credenciales');
@@ -58,6 +84,7 @@ class Element {
     };
   }
   append(...nodes){nodes.forEach(n=>this.appendChild(n));}
+  replaceChildren(...nodes){this.children=[];nodes.forEach(n=>this.appendChild(n));}
   appendChild(node){this.children.push(node);node.parent=this;return node;}
   remove(){this.isConnected=false;if(this.parent)this.parent.children=this.parent.children.filter(x=>x!==this);}
   get childElementCount(){return this.children.length;}
@@ -75,7 +102,8 @@ class Element {
       '.gxai-chat-scroll':scroll,'.gxai-chat':dialog,'.gxai-close':closeButton,
       '.gxai-backdrop':backdrop,'.gxai-chat-phase':phase,
       '.gxai-composer':composer,'.gxai-message-input':input,'.gxai-send':send,'.gxai-chat-disclaimer':disclaimer,
-      '.gxai-ai-panel':aiPanel,'.gxai-ai-title':aiTitle,'.gxai-ai-description':aiDescription,'.gxai-ai-start':aiStart
+      '.gxai-ai-panel':aiPanel,'.gxai-ai-title':aiTitle,'.gxai-ai-description':aiDescription,'.gxai-ai-start':aiStart,
+      '.gxai-my-services':myPanel,'.gxai-my-status':myStatus,'.gxai-my-list':myList,'.gxai-my-other':myOther
     })[sel]||null;
     return null;
   }
@@ -94,6 +122,8 @@ const backdrop=new Element('backdrop'),phase=new Element('phase'),composer=new E
 const input=new Element('input'),send=new Element('send'),disclaimer=new Element('disclaimer');
 const aiPanel=new Element('aiPanel'),aiTitle=new Element('aiTitle'),
   aiDescription=new Element('aiDescription'),aiStart=new Element('aiStart');
+const myPanel=new Element('myPanel'),myStatus=new Element('myStatus'),
+  myList=new Element('myList'),myOther=new Element('myOther');
 const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
 btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';
@@ -115,6 +145,9 @@ const win={
   getCurrentClientKey:()=>authed?'test-client':'',
   GOXY_ROBOT:{mountAll:()=>mounts++},
   GOXY_SUPPORT:knowledge,
+  GOXY_CLIENT_CONTEXT:{
+   refresh:()=>Promise.resolve({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3})
+  },
   GOXY_AI:{
     status:()=>Promise.resolve({ok:true,configured:false}),
     ask:()=>Promise.resolve({ok:false,code:'AI_NOT_CONFIGURED',
@@ -297,6 +330,11 @@ openButton.fire('click');
 flush();
 await Promise.resolve();
 assert.equal(aiPanel.getAttribute('data-ai-status'),'pending','Clave sin configurar debe aparecer explícitamente');
+assert.deepEqual(api.contractedPlatforms(),['Netflix','Disney+','Prime Video'],'Priorización por cuenta');
+assert.equal(myList.children.length,3,'Chips activos al abrir');
+assert.equal(myList.children[0].textContent,'Netflix');
+layer.fire('click',{target:{closest:selector=>selector==='.gxai-my-other'?myOther:null}});
+assert.ok(currentChoice('platform','Max'),'Otras plataformas debe mostrar Max no contratada');
 assert.equal(aiStart.disabled,true,'Sin clave no permitir entrar a IA');
 closeButton.fire('click');
 
@@ -314,6 +352,8 @@ assert.equal(aiPanel.getAttribute('data-ai-status'),'ready','El panel refleja co
 assert.equal(aiStart.disabled,false,'El usuario puede elegir IA solo tras confirmar estado');
 aiStart.fire('click');
 assert.ok(currentChoice('platform','Netflix'),'Entrada directa guía al catálogo de plataformas');
+assert.ok(!currentChoice('platform','Max'),'Primera lista solo contratadas');
+assert.ok(currentChoice('other'),'Otras plataformas siempre accesible');
 clickChoice(currentChoice('platform','Netflix'));flush();
 clickChoice(currentChoice('issue','Netflix'));flush();
 assert.ok(currentChoice('ai'),'La guía ofrece entrar a IA');
@@ -327,4 +367,4 @@ assert.equal(sent[0].platform,'Netflix','El backend recibe solo plataforma selec
 assert.equal(sent[0].issueIndex,0,'El backend recibe solo ID canónico de guía');
 flush();
 closeButton.fire('click');
-console.log('GOXION Goxy F7.1: estado IA real, bloqueo sin clave, ruta IA funcional y F6 intacta PASS.');
+console.log('GOXION Goxy F7.2: servicios por sesión, combos, IA F7.1 y scroll F6 PASS.');
