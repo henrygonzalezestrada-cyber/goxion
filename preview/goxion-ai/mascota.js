@@ -683,7 +683,11 @@
       : await ai.account(topic,{signal:aiController.signal,message:text});
     if(!active||flow!==activeFlow||!authenticated())return;
     aiController=null;
-    const financial=topic==='payment'?payment.describe(response,paymentMode,chargeId):null;
+    const hinted=topic==='payment'&&paymentMode==='all'
+      ?knowledge.resolvePlatform(text):null;
+    const viewMode=hinted?'platform':paymentMode;
+    const financial=topic==='payment'
+      ?payment.describe(response,viewMode,hinted||chargeId):null;
     const success=topic==='payment'?Boolean(financial):
       response.ok===true&&typeof response.answer==='string';
     if(success){
@@ -1030,11 +1034,11 @@
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'catalog') { closeChat(); window.switchTab?.('catalogo'); return; }
     if (type === 'pay-open') { closeChat(); window.irAlTicket?.(); return; }
-    if (type === 'pay-next' || type === 'pay-all' || type === 'pay-one') {
+    if (type === 'pay-next' || type === 'pay-all' || type === 'pay-one' || type === 'pay-platform') {
       void accountRead('payment',type==='pay-next'?'Mi próximo vencimiento':
         type==='pay-all'?'Todo lo pendiente':'Pago de este perfil',
-        type==='pay-next'?'next':type==='pay-one'?'one':'all',
-        type==='pay-one'?button.dataset.chargeId:null);
+        type==='pay-next'?'next':type==='pay-one'?'one':type==='pay-platform'?'platform':'all',
+        type==='pay-one'?button.dataset.chargeId:type==='pay-platform'?platform:null);
       return;
     }
     if (type === 'platforms') {
