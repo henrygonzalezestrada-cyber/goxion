@@ -370,7 +370,9 @@
       step: 'searching',
       response: 'Voy a ayudarte a localizar la guía oficial. Selecciona una plataforma para continuar.',
       finish: 'happy'
-    }
+    },
+    misiones: { prompt:'Mis misiones',step:'searching',response:'Consultando misiones…',finish:'happy' },
+    promociones: {prompt:'Promociones activas',step:'searching',response:'Consultando catálogo…',finish:'happy' }
   });
   function runDemo(entry, enteredText, onDone) {
     if (!active || busy || !authenticated()) return;
@@ -551,14 +553,71 @@
       ]);
     });
   }
+  // Datos personales SOLO con el backend autenticado de GOXION.
+  // El resultado se presenta al usuario sin enviarse al modelo de Groq.
+  async function accountRead(topic,query) {
+    if(!active || busy || !authenticated())return;
+    const text=String(query||'').trim();
+    clearChoices();
+    bubble(text.slice(0,240),true);
+    setBusy(true);
+    chatTransition('searching');
+    showTyping();
+    const flow=++activeFlow;
+    aiController=new AbortController();
+    const response=await ai.account(topic,{signal:aiController.signal});
+    if(!active || flow!==activeFlow || !authenticated())return;
+    aiController=null;
+    hideTyping();
+    if(response.ok===true && typeof response.answer==='string'){
+      chatTransition('speaking');
+      bubble(response.answer,false);
+    }else if(response.code!=='ABORTED'){
+      chatTransition('error');
+      bubble(response.message||'No pude comprobar ese dato ahora. Consulta Mi Espacio para información oficial.',false);
+    }
+    later(flow,350,()=>{
+      setBusy(false);
+      chatTransition('listening');
+      showChoices([
+        {kind:'account',label:'Abrir Mi Espacio'},
+        {kind:'missions',label:'Mis misiones'},
+        {kind:'promotions',label:'Promociones'},
+        {kind:'payment',label:'Próximo pago'},
+        {kind:'platforms',label:'Soporte de plataformas'}
+      ]);
+    });
+  }
+  function respondFree(text,reply,options=[]) {
+    if(!active || busy || !authenticated())return;
+    clearChoices();bubble(text.slice(0,240),true);bubble(reply,false);
+    chatTransition('speaking');
+    if(options.length)showChoices(options);
+    const id=++activeFlow;
+    later(id,250,()=>chatTransition('listening'));
+  }
+  function accountTopic(text){
+    const normal=knowledge.normalize(text);
+    if(/\b(misiones?|tareas?|retos?|cupon|cupones)\b/.test(normal))return 'missions';
+    if(/\b(promociones?|ofertas?|descuentos? especiales?)\b/.test(normal))return 'promotions';
+    if(/\b(pago|pagar|saldo|corte|vencimient[oa]|fecha de pago|estado de cuenta|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))return 'payment';
+    return null;
+  }
   function handleText(query) {
-    // El modo IA es explícito: después de elegirlo, todo mensaje de esa guía
-    // se envía al backend incluso si menciona el nombre de la plataforma.
-    if (aiMode && chosenGuide) {
-      void askAI(query);
+    // La información que ya administra GOXION y los saludos no consumen IA.
+    const words = knowledge.normalize(query);
+    const topic=accountTopic(query);
+    if(topic){ void accountRead(topic,query); return; }
+    if(/^(hola|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|en que me ayudas)[!?.s]*$/.test(words)) {
+      respondFree(query,chosenPlatform
+        ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
+        : '¡Hola! Puedo consultar tus misiones y promociones, orientarte sobre próximos pagos desde Mi Espacio y resolver dudas de plataformas con guías oficiales. La IA se usa solo cuando necesitamos una explicación adicional.',
+        [{kind:'platforms',label:'Ayuda con plataformas'},
+         {kind:'missions',label:'Mis misiones'},{kind:'payment',label:'Próximo pago'}]);
       return;
     }
-    const words = knowledge.normalize(query);
+    // La IA mantiene un hilo breve solamente si el usuario realmente la eligió.
+    if (aiMode && chosenGuide) {void askAI(query);return;}
     if (/\b(cambiar|otra|elegir|ver)(?: de)? plataformas?\b/.test(words)) {
       chosenPlatform = null;
       runDemo({prompt:query,step:'searching',
@@ -572,10 +631,8 @@
         finish:'happy'},query,()=>showChoices([{kind:'human',label:'Hablar con asesor humano'}]));
       return;
     }
-    if (/\b(pago|pagar|deuda|saldo|vencimiento|factura|mora|prorroga|lealtad|cupon)\b/.test(words) && !platform) {
-      runDemo(questions.cuenta,query,()=>showChoices([
-        {kind:'account',label:'Ir a Mi Espacio'}, {kind:'platforms',label:'Buscar ayuda de plataformas'}
-      ]));
+    if (/\b(deuda|factura)\b/.test(words) && !platform) {
+      void accountRead('payment',query);
       return;
     }
     // Sin haber elegido el modo IA, los mensajes usan guías comprobadas.
@@ -620,6 +677,11 @@
     if (type === 'mine') { showPlatforms(); return; }
     if (type === 'other') { showOtherPlatforms(); return; }
     if (type === 'human') { humanHandoff(); return; }
+    if (type === 'missions' || type==='promotions' || type==='payment'){
+      void accountRead(type==='missions'?'missions':type==='promotions'?'promotions':'payment',
+        type==='missions'?'Mis misiones':type==='promotions'?'Promociones activas':'Mi próximo pago');
+      return;
+    }
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'platforms') {
       chosenPlatform = null;
@@ -776,10 +838,13 @@
     aiEntry = false;
     if (button.dataset.prompt === 'acceso' || button.dataset.prompt === 'codigo') {
       runDemo(entry,null,showPlatforms);
-    } else if (button.dataset.prompt === 'cuenta') {
-      runDemo(entry,null,()=>showChoices([
-        {kind:'account',label:'Ir a Mi Espacio'}, {kind:'platforms',label:'Buscar ayuda de plataformas'}
-      ]));
+    } else if(button.dataset.prompt === 'cuenta'){
+      respondFree('Quiero consultar mi cuenta',
+        'Puedo consultar tus misiones y las promociones publicadas. Para importes y fechas exactas, utiliza el estado de cuenta oficial porque contempla varios vencimientos, mora y prórrogas.',
+        [{kind:'payment',label:'Próximo pago'},{kind:'missions',label:'Mis misiones'},
+         {kind:'promotions',label:'Promociones'},{kind:'account',label:'Abrir Mi Espacio'}]);
+    } else if(button.dataset.prompt==='misiones'||button.dataset.prompt==='promociones'){
+      void accountRead(button.dataset.prompt==='misiones'?'missions':'promotions',entry.prompt);
     } else runDemo(entry);
   });
   // Mensajes libres: guías reales de soporte, sin consultar cuentas ni red.
