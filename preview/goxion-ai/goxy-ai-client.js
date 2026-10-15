@@ -1,4 +1,4 @@
-/* Goxy IA F9 · transporte de conversación efímera y consultas autorizadas.
+/* Goxy IA F10 · contexto de misión y conversación segura.
    All business/auth/rate limits live in Supabase goxy-ai-beta. */
 (() => {
   "use strict";
@@ -38,9 +38,14 @@
     try{return await send({mode:"status"});}
     catch{return {ok:false,configured:false,code:"NETWORK_ERROR"};}
   }
-  async function account(topic,{signal}={}){
+  async function account(topic,{signal,message=''}={}){
     if(!['payment','missions','promotions'].includes(topic))return {ok:false,code:'TOPIC_UNSUPPORTED'};
-    try{return await send({mode:"account",topic},{signal});}
+    try{
+      const text=String(message||'').trim();
+      if(text.length>400 || sensitive.test(text) || /[<>]/.test(text))
+        return {ok:false,code:'SENSITIVE_OR_INVALID_INPUT',message:'Describe la consulta sin datos privados.'};
+      return await send({mode:"account",topic,message:text},{signal});
+    }
     catch(error){
       if(error?.name==='AbortError')return {ok:false,code:'ABORTED'};
       return {ok:false,code:'NETWORK_ERROR',message:'No pude consultar Mi Espacio en este momento.'};
