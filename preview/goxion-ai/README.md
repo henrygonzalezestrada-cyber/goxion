@@ -1,7 +1,7 @@
-# GOXION · Goxy F11 · Asistencia híbrida con escalamiento automático
+# GOXION · Goxy F12 · Recuperación de acceso y ficha WhatsApp consentida
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f11
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f12
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -143,3 +143,16 @@ No se presentan importes ni próxima fecha como cifras calculadas por Goxy. GOXI
 - **Calidad:** se distingue explícitamente entre una *guía con botón de asesor* y una *autorización que solamente puede hacer el asesor*. En el catálogo original todas las guías ofrecen asesor, así que usar ese marcador como veto universal bloquearía por error la IA para todos los problemas.
 
 Pruebas F11: `node preview/goxion-ai/check.mjs` cubre pregunta ambigua, síntoma → IA, seguimiento con memoria, guía con autorización → humano y cero IA, guía técnica → aclaración automática, navegación sin gasto, cuenta sin IA, scroll/caricias y teclado Safari. Verificar en Safari físico antes de pasar a Ayuda oficial.
+
+## F12 · WhatsApp que envía el cliente, sin bandeja en Admin
+El cliente debe pulsar **Confirmar y abrir WhatsApp** y después **Enviar** dentro de WhatsApp. El enlace se prepara desde el número de soporte ya existente en Ayuda, `NUMERO_GOXION`. `wa.me` **no envía notificaciones automáticamente** y Goxy nunca debe anunciar que el mensaje se envió; no existe doble envío a Admin.
+
+- **Acceso sin IA:** cuando una plataforma contratada (ej. ViX) solicita contratar Premium, Goxy comprueba la contratación en Mi Espacio, pide distinguir correo/contraseña frente a QR. Si es QR, pide el tipo de dispositivo (Smart TV, Fire TV, Roku, móvil, PC u otro) antes de preparar la solicitud para el asesor.
+- **Correo o PIN:** los accesos autorizados se consultan en las tarjetas oficiales de Mi Espacio. Goxy lleva a la tarjeta concreta sin pedir, escribir ni copiar al chat el PIN o la contraseña. Si hay actualización de contraseña pendiente, abre el aviso original conservando la confirmación y la regla de una sola vista.
+- **Ficha de WhatsApp:** incluye nombre/ID de cliente de la sesión actual, plataforma afectada, correo de acceso asociado si existe, diagnóstico estructurado, comprobaciones y acción requerida. **El cliente ve el texto íntegro antes de compartirlo**, puede cancelar, y la URL se construye únicamente en el clic de confirmación. Nunca incluir PIN, contraseña, código QR, código alfanumérico, token, ni transcripción completa.
+- **Límite de privacidad:** para el correo de servicio, el consentimiento consiste en la revisión explícita del texto y el clic de confirmación. Ese valor solo procede del estado de Mi Espacio autenticado y no se envía a Groq ni se persiste en registros de Goxy. El WhatsApp oficial recibe el mensaje únicamente cuando el cliente lo envía.
+- Si cambia la sesión después de preparar la ficha, se invalida; las referencias y servicio se comprueban de nuevo antes de abrir el enlace.
+- No se crean tablas ni funciones financieras. **Solo cambia `preview/goxion-ai/`**: Ayuda oficial, Admin, Index, motor financiero B2, cuotas de Groq y servicio de IA continúan intactos.
+
+### Pruebas
+`node preview/goxion-ai/check.mjs` cubre acceso ViX QR, dispositivo, vista previa sin envío automático, cancelación, apertura de WhatsApp solo tras confirmación, datos del cliente correcto, sesión cambiada, rutas a PIN/contraseña oficial y regresiones F11, animaciones y teclado Safari. Queda pendiente una comprobación visual real en iPhone con cliente de prueba y la recepción efectiva en WhatsApp.

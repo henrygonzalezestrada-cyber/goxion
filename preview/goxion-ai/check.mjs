@@ -1,4 +1,4 @@
-// GOXION · Goxy F11 · enrutador local y escalamiento automático sin control manual de IA.
+// GOXION · Goxy F12 · handoff WhatsApp consentido y soporte seguro.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -13,6 +13,8 @@ const entry=readFileSync(join(root,'goxy-heads-entry.js'),'utf8');
 const official=readFileSync(join(root,'../../assets/js/ayuda/data/support-issues.js'),'utf8');
 const adapter=readFileSync(join(root,'goxy-support-knowledge.js'),'utf8');
 const clientContextSrc=readFileSync(join(root,'goxy-client-context.js'),'utf8');
+const accessSrc=readFileSync(join(root,'goxy-access-routing.js'),'utf8');
+const handoffSrc=readFileSync(join(root,'goxy-whatsapp-handoff.js'),'utf8');
 const knowledgeWindow={};
 new Function('window',official)(knowledgeWindow);
 new Function('window',adapter)(knowledgeWindow);
@@ -30,7 +32,9 @@ const privateView={
   {nombre:'Netflix Premium',correo_login:'privado@test.invalid',perfil_pin:'3321'},
   {nombre:'Disney+ Premium'},
   {nombre:'Combo HBO Max + Prime Video'}]},
- 'otro-cliente':{servicios:[{nombre:'ViX Premium'}]}
+ 'otro-cliente':{servicios:[{nombre:'ViX Premium'}]},
+ 'multi-client':{servicios:[{nombre:'ViX Premium',correo_login:'primero@ejemplo.invalid'},
+  {nombre:'ViX Premium',correo_login:'segundo@ejemplo.invalid'}]}
 };
 const clientWindow={
  GOXY_SUPPORT:knowledge,
@@ -46,6 +50,16 @@ assert.ok(!JSON.stringify(current).includes('privado@test.invalid') &&
 account='otro-cliente';
 const other=await clientWindow.GOXY_CLIENT_CONTEXT.refresh();
 assert.deepEqual(other.platforms,['ViX'],'Una segunda sesión no hereda servicios');
+assert.deepEqual(clientWindow.GOXY_CLIENT_CONTEXT.destinations('Netflix'),[],'No heredar servicios de otra sesión');
+account='test-client';
+assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('Netflix').loginEmail,'privado@test.invalid',
+  'Correo asociado a sesión validada');
+assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('ViX'),null,'No leer cuenta distinta');
+account='multi-client';
+assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('ViX'),null,
+ 'Dos accesos de ViX requieren selección');
+assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('ViX',1).loginEmail,
+ 'segundo@ejemplo.invalid','El correo pertenece a la cuenta exacta');
 account='test-client';
 assert.equal(knowledge.matchIssue('Netflix','Netflix actualizar hogar'),1);
 assert.equal(knowledge.guide('Disney+',500),null,'Nunca inventar situaciones ausentes');
@@ -66,8 +80,10 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f10'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f11') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
- html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
+assert.ok(html.includes('mascota.js?v=goxy-f12') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+ html.includes('goxy-client-context.js?v=goxy-f12') &&
+ html.includes('goxy-access-routing.js?v=goxy-f12') &&
+ html.includes('goxy-whatsapp-handoff.js?v=goxy-f12'),'Cargar F12 antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(js.includes('parent.visualViewport') && js.includes('syncChatViewport'),'Leer viewport real padre');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
@@ -145,7 +161,14 @@ const win={
   GOXY_SUPPORT:knowledge,
   GOXY_CLIENT_CONTEXT:{
    local:()=>({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3}),
-   refresh:()=>Promise.resolve({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3})
+   refresh:()=>Promise.resolve({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3}),
+   destinations:p=>p==='Netflix'?[{index:0,label:'Netflix',hasProfile:true,hasLogin:true,hasPendingPassword:true}]:
+     p==='ViX'?[{index:1,label:'ViX · 1',hasProfile:true,hasLogin:true,hasPendingPassword:false},
+     {index:2,label:'ViX · 2',hasProfile:true,hasLogin:true,hasPendingPassword:false}]:[],
+   supportReference:(p,index=null)=>['Netflix','ViX'].includes(p) && (p!=='ViX'||Number.isInteger(index))?{
+     clientId:'test-client',clientName:'Cliente Prueba',platform:p,serviceIndex:p==='Netflix'?0:index,
+     serviceLabel:p==='Netflix'?'Netflix':'ViX · '+index,loginEmail:'acceso@ejemplo.invalid'
+   }:null
   },
   GOXY_AI:{
     status:()=>Promise.resolve({ok:true,configured:false}),
@@ -158,6 +181,21 @@ const win={
   openAuthSheet:()=>authOpens++,
   addEventListener:()=>{}
 };
+const openedWhatsApp=[];
+win.open=url=>{openedWhatsApp.push(url);return {};};
+new Function('window',accessSrc)(win);
+new Function('window','NUMERO_GOXION',handoffSrc)(win,'5219611234567');
+const ticket=win.GOXY_HANDOFF.prepare('ViX',{serviceIndex:1,issue:'App pide Premium',checks:['Solo QR']});
+assert.equal(win.GOXY_HANDOFF.prepare('ViX',{issue:'App pide Premium'}),null,
+ 'No compartir un correo de otra cuenta por selección automática');
+assert.ok(ticket.message.includes('Cliente Prueba') && ticket.message.includes('acceso@ejemplo.invalid'));
+assert.ok(!ticket.message.includes('3321'),'No trasladar PIN a ficha');
+assert.ok(win.GOXY_HANDOFF.url(ticket).startsWith('https://wa.me/5219611234567?text='));
+assert.equal(win.GOXY_ACCESS.inspect('ViX solicita contratar Premium',null,null).stage.type,'premium');
+assert.ok(win.GOXY_ACCESS.inspect('Solo QR','ViX',{type:'premium',platform:'ViX'}).reply.includes('asesor'));
+assert.ok(win.GOXY_ACCESS.routes('Netflix','update').options.some(c=>c.kind==='open-service'&&c.view==='credential'));
+assert.equal(win.GOXY_ACCESS.inspect('Bixby',null,null).options[0].kind,'confirm-vix');
+
 // Safari: el visual viewport del padre se encoge al desplegar el teclado.
 const vv={height:844,offsetTop:0,handlers:{},
   addEventListener(type,fn){this.handlers[type]=fn;}};
@@ -296,13 +334,16 @@ assert.equal(timers.size,0,'No dejar temporizadores después de cerrar');
 flush();
 assert.equal(scroll.children.length,afterCancel,'No aparece respuesta tras cerrar');
 
-// Escalamiento: usar SOLO contacto humano existente, sin PIN, y cerrar chat.
+// Escalamiento: si aún no hay referencia de servicio verificable, no
+// construir ficha ni enviar datos a terceros. Mantener las guías disponibles.
 openButton.fire('click');flush();
 clickDemo(btnAccess);flush();
 clickChoice(currentChoice('platform','Disney+'));flush();
 clickChoice(currentChoice('human'));
-assert.equal(humanOpens,1,'Usar contacto humano oficial existente');
-assert.equal(layer.classList.contains('gxai-visible'),false);
+assert.equal(humanOpens,0,'Nunca abrir WhatsApp sin confirmación');
+assert.equal(layer.classList.contains('gxai-visible'),true);
+assert.ok(currentChoice('account'),'Sin referencia, remitir a Mi Espacio');
+closeButton.fire('click');
 
 // Sesión inválida mientras se procesa: cerrar sin entregar respuesta.
 openButton.fire('click');
@@ -449,4 +490,30 @@ assert.ok(layer.classList.contains('gxai-keyboard-open'),'El input queda sobre e
 doc.activeElement=dialog;vv.height=844;vv.handlers.resize();
 assert.equal(layer.classList.contains('gxai-keyboard-open'),false,'Restaurar altura al ocultar teclado');
 closeButton.fire('click');flush();
-console.log('GOXION Goxy F11: router local, aclaración, escalamiento automático, códigos gratis y Safari PASS.');
+openButton.fire('click');flush();await Promise.resolve();
+input.value='ViX me pide contratar Premium';composer.fire('submit');
+assert.ok(currentChoice('premium-qr'),'Preguntar correo o QR sin gastar IA');
+clickChoice(currentChoice('premium-qr'));
+assert.ok(currentChoice('device'),'Antes de contacto debe preguntar por dispositivo');
+assert.equal(openedWhatsApp.length,0);
+clickChoice(currentChoice('device'));
+assert.ok(currentChoice('human'),'Tras especificar dispositivo permite preparar ficha');
+assert.equal(openedWhatsApp.length,0,'Sin apertura automática');
+clickChoice(currentChoice('human'));
+assert.ok(currentChoice('handoff-service'),'Antes de preparar ficha elegir cuenta afectada');
+clickChoice(currentChoice('handoff-service'));
+assert.ok(currentChoice('send-handoff'),'Ficha presentada para revisión');
+assert.equal(openedWhatsApp.length,0);
+clickChoice(currentChoice('cancel-handoff'));
+assert.equal(openedWhatsApp.length,0,'Cancelar no abre WhatsApp');
+closeButton.fire('click');flush();
+openButton.fire('click');flush();await Promise.resolve();
+clickDemo(btnAccess);flush();
+clickChoice(currentChoice('platform','Netflix'));flush();
+clickChoice(currentChoice('issue','Netflix'));flush();
+clickChoice(currentChoice('human'));
+assert.ok(currentChoice('send-handoff'),'Revisar ficha de Netflix');
+clickChoice(currentChoice('send-handoff'));
+assert.equal(openedWhatsApp.length,1,'Solo confirmar abre WhatsApp');
+assert.ok(openedWhatsApp[0].includes('GOXION')&&!openedWhatsApp[0].includes('3321'));
+console.log('GOXION Goxy F12: WhatsApp bajo consentimiento, ViX QR, rutas de Mi Espacio y Safari PASS.');
