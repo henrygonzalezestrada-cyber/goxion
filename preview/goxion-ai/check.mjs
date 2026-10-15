@@ -1,4 +1,4 @@
-// GOXION · Goxy F7.2 · priorización por cliente, F7/F6 intactas.
+// GOXION · Goxy F7.3 · plataformas únicamente en opciones del chat, F7/F6 intactas.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -66,7 +66,7 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f7'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f7-2') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('mascota.js?v=goxy-f7-3') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
@@ -102,8 +102,7 @@ class Element {
       '.gxai-chat-scroll':scroll,'.gxai-chat':dialog,'.gxai-close':closeButton,
       '.gxai-backdrop':backdrop,'.gxai-chat-phase':phase,
       '.gxai-composer':composer,'.gxai-message-input':input,'.gxai-send':send,'.gxai-chat-disclaimer':disclaimer,
-      '.gxai-ai-panel':aiPanel,'.gxai-ai-title':aiTitle,'.gxai-ai-description':aiDescription,'.gxai-ai-start':aiStart,
-      '.gxai-my-services':myPanel,'.gxai-my-status':myStatus,'.gxai-my-list':myList,'.gxai-my-other':myOther
+      '.gxai-ai-panel':aiPanel,'.gxai-ai-title':aiTitle,'.gxai-ai-description':aiDescription,'.gxai-ai-start':aiStart
     })[sel]||null;
     return null;
   }
@@ -122,8 +121,6 @@ const backdrop=new Element('backdrop'),phase=new Element('phase'),composer=new E
 const input=new Element('input'),send=new Element('send'),disclaimer=new Element('disclaimer');
 const aiPanel=new Element('aiPanel'),aiTitle=new Element('aiTitle'),
   aiDescription=new Element('aiDescription'),aiStart=new Element('aiStart');
-const myPanel=new Element('myPanel'),myStatus=new Element('myStatus'),
-  myList=new Element('myList'),myOther=new Element('myOther');
 const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
 btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';
@@ -146,6 +143,7 @@ const win={
   GOXY_ROBOT:{mountAll:()=>mounts++},
   GOXY_SUPPORT:knowledge,
   GOXY_CLIENT_CONTEXT:{
+   local:()=>({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3}),
    refresh:()=>Promise.resolve({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3})
   },
   GOXY_AI:{
@@ -331,10 +329,21 @@ flush();
 await Promise.resolve();
 assert.equal(aiPanel.getAttribute('data-ai-status'),'pending','Clave sin configurar debe aparecer explícitamente');
 assert.deepEqual(api.contractedPlatforms(),['Netflix','Disney+','Prime Video'],'Priorización por cuenta');
-assert.equal(myList.children.length,3,'Chips activos al abrir');
-assert.equal(myList.children[0].textContent,'Netflix');
-layer.fire('click',{target:{closest:selector=>selector==='.gxai-my-other'?myOther:null}});
-assert.ok(currentChoice('platform','Max'),'Otras plataformas debe mostrar Max no contratada');
+assert.ok(!js.includes('gxai-my-services') && !css.includes('.gxai-my-services'),
+  'Sin tarjeta/caja duplicada al abrir chat');
+assert.ok(!currentChoice('platform','Netflix'),
+  'Al abrir no se fuerza ningún menú adicional sobre el mensaje de bienvenida');
+clickDemo(btnAccess);
+flush();
+assert.ok(currentChoice('platform','Netflix'),'Mostrar plataformas del cliente en la conversación');
+assert.ok(!currentChoice('platform','Max'),'No mezclar otras marcas al inicio');
+assert.ok(currentChoice('other'),'Consultar otras plataformas está junto a los chips en el chat');
+const options=scroll.children.filter(x=>x.className==='gxai-choices'&&x.isConnected);
+assert.equal(options.length,1,'No duplicar menús de plataformas');
+assert.ok(options[0].children.some(x=>x.className==='gxai-choice-heading'&&x.textContent==='Tus plataformas activas'));
+clickChoice(currentChoice('other'));
+assert.ok(currentChoice('platform','Max'),'La opción de otras abre marcas no contratadas');
+assert.ok(currentChoice('mine'),'Volver a mis plataformas tras consultar otras');
 assert.equal(aiStart.disabled,true,'Sin clave no permitir entrar a IA');
 closeButton.fire('click');
 
@@ -367,4 +376,4 @@ assert.equal(sent[0].platform,'Netflix','El backend recibe solo plataforma selec
 assert.equal(sent[0].issueIndex,0,'El backend recibe solo ID canónico de guía');
 flush();
 closeButton.fire('click');
-console.log('GOXION Goxy F7.2: servicios por sesión, combos, IA F7.1 y scroll F6 PASS.');
+console.log('GOXION Goxy F7.3: solo chips del chat, sin tarjeta, IA F7.1 y scroll F6 PASS.');

@@ -1,4 +1,4 @@
-/* GOXION · Goxy F7.2 · priorizar plataformas contratadas sin compartir datos privados.
+/* GOXION · Goxy F7.3 · plataformas en opciones del chat, sin recuadro inicial.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -78,11 +78,6 @@
     '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
     '<button class="gxai-ai-start" type="button" disabled>Comprobando…</button>',
     '</div>',
-    '<section class="gxai-my-services" aria-label="Servicios contratados">',
-    '<div class="gxai-my-head"><strong>Tus plataformas</strong><small class="gxai-my-status">Buscando servicios de Mi Espacio…</small></div>',
-    '<div class="gxai-my-list"></div>',
-    '<button class="gxai-my-other" type="button">Explorar otras plataformas</button>',
-    '</section>',
     '<div class="gxai-suggestions">',
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="cuenta">Quiero consultar mi cuenta</button>',
@@ -135,48 +130,35 @@
   const aiTitle = layer.querySelector('.gxai-ai-title');
   const aiDescription = layer.querySelector('.gxai-ai-description');
   const aiStart = layer.querySelector('.gxai-ai-start');
-  const myPanel = layer.querySelector('.gxai-my-services');
-  const myStatus = layer.querySelector('.gxai-my-status');
-  const myList = layer.querySelector('.gxai-my-list');
-  const myOther = layer.querySelector('.gxai-my-other');
+  // Los servicios solo alimentan las opciones contextuales del CHAT.
+  // No existe una tarjeta separada ni se duplican botones al abrir el modal.
   const clientContext = window.GOXY_CLIENT_CONTEXT;
   let myPlatforms = [];
   let myContextReady = false;
-  function renderMyPlatforms(snapshot) {
-    myList.replaceChildren();
+  function applyMyPlatforms(snapshot) {
     myContextReady = snapshot?.ok === true;
     myPlatforms = myContextReady && Array.isArray(snapshot.platforms)
       ? snapshot.platforms.filter(platform => window.GOXY_SUPPORT.platforms().includes(platform)) : [];
-    if (!myContextReady) {
-      myStatus.textContent = 'No pude consultar tus servicios; las guías siguen disponibles.';
-    } else if (myPlatforms.length === 0) {
-      myStatus.textContent = snapshot.serviceCount > 0
-        ? 'Sin guías específicas para tus servicios actuales.'
-        : 'Aún no tienes plataformas activas.';
-    } else {
-      myStatus.textContent = myPlatforms.length + (myPlatforms.length === 1
-        ? ' plataforma reconocida' : ' plataformas reconocidas');
-      myPlatforms.forEach(platform => {
-        const button = doc.createElement('button');
-        button.type='button';
-        button.className='gxai-my-platform';
-        button.dataset.platform=platform;
-        button.textContent=platform;
-        myList.appendChild(button);
-      });
-    }
   }
   function refreshMyPlatforms() {
-    const current=requestId;
-    myStatus.textContent='Buscando servicios de Mi Espacio…';
-    myList.replaceChildren();
-    myPlatforms=[];
-    myContextReady=false;
-    clientContext.refresh().then(snapshot=>{
-      if (!active || current!==requestId || !authenticated())return;
-      renderMyPlatforms(snapshot);
-    }).catch(()=>{
-      if(active && current===requestId)renderMyPlatforms({ok:false});
+    const current = requestId;
+    myPlatforms = [];
+    myContextReady = false;
+    // Mi Espacio ya tiene la lista en memoria en una sesión normal.
+    // Hidratar de forma síncrona evita enseñar un catálogo ajeno por un instante.
+    try {
+      const local = clientContext.local?.();
+      if (local?.ok) {
+        applyMyPlatforms(local);
+        return;
+      }
+    } catch (_) {}
+    // Solo si falta el estado, usar la lectura autenticada preexistente.
+    clientContext.refresh().then(snapshot => {
+      if (!active || current !== requestId || !authenticated()) return;
+      applyMyPlatforms(snapshot);
+    }).catch(() => {
+      if (active && current === requestId) applyMyPlatforms({ok:false});
     });
   }
   let aiMode = false;
@@ -316,7 +298,6 @@
     chosenGuide = null;
     myPlatforms=[];
     myContextReady=false;
-    myList.replaceChildren();
     aiMode = false;
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
@@ -739,19 +720,6 @@
   closeButton.addEventListener('click', closeChat);
   layer.querySelector('.gxai-backdrop').addEventListener('click', closeChat);
   layer.addEventListener('click', event => {
-    const quick = event.target.closest?.('.gxai-my-platform');
-    if (quick) {
-      if (!active || busy || !authenticated()) return;
-      const platform=quick.dataset.platform;
-      if (!myPlatforms.includes(platform)) return;
-      choiceAction({dataset:{kind:'platform',platform}});
-      return;
-    }
-    const other = event.target.closest?.('.gxai-my-other');
-    if(other) {
-      if(active && !busy && authenticated())showOtherPlatforms();
-      return;
-    }
     const chosen = event.target.closest?.('.gxai-choice');
     if (chosen) { choiceAction(chosen); return; }
     const button = event.target.closest?.('.gxai-suggestion');

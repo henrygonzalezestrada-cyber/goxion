@@ -1,7 +1,7 @@
-# GOXION · Goxy F7.2 · Plataformas contratadas primero + IA con estado visible
+# GOXION · Goxy F7.3 · Plataformas integradas únicamente en la conversación
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7-2
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7-3
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -66,3 +66,11 @@ Documento de arquitectura y pasos de activación: [GOXY F7 Gateway IA Beta](../.
 - La IA permanece pendiente sin `GROQ_API_KEY` en Supabase; estas mejoras **no dependen de esa clave**.
 - Todo queda aislado en `preview/goxion-ai/`: ni `ayuda.html`, ni `mi-espacio`, ni tablas financieras, ni la Edge Function cambian.
 - Validación: `node preview/goxion-ai/check.mjs` prueba combos, deduplicación, cambio de sesión, privacidad, listados propios/otros, gestos Safari, guías y modos de IA.
+
+## Refinamiento F7.3 · solicitado y aprobado como dirección visual
+- Se **retira el recuadro independiente «Tus plataformas»** situado al abrir el chat; no se crea una tarjeta extra ni se repiten opciones.
+- Cuando el cliente pregunta por soporte o selecciona el inicio de una guía, Goxy muestra en la propia conversación el encabezado **«Tus plataformas activas»**, las plataformas detectadas como **cápsulas tradicionales del chat** y **«Consultar otras plataformas»**, siguiendo la presentación F7.2 ya usada dentro del diálogo (captura aprobada como referencia).
+- El catálogo personal continúa cargándose al abrir el chat con la vista de Mi Espacio. Primero se intenta la lectura síncrona ya hidratada, con respaldo de la consulta autenticada previa solamente cuando falta el estado. Sin enviar nombres de clientes, correos, PIN, saldos ni servicios al proveedor de IA.
+- El resto de las plataformas siguen accesibles desde las opciones del chat, con retorno a las contratadas; los estados, el botón y la zona de caricias no cambian.
+- Tests simulados comprueban específicamente que no existe la tarjeta, que solo aparece **un menú contextual** al pedir ayuda y que sigue pudiendo consultarse una plataforma no contratada.
+- F7.3 solo modifica archivos bajo `preview/goxion-ai/`; **el Soporte oficial continúa intacto**.

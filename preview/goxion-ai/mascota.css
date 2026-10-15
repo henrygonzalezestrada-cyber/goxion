@@ -152,16 +152,5 @@
 @media(max-width:380px){#view-soporte .gxai-ai-panel{flex-wrap:wrap}#view-soporte .gxai-ai-start{margin-left:16px;flex:none}}
 @media(prefers-reduced-motion:reduce){#view-soporte .gxai-ai-start{transition:none}}
 
-/* F7.2 · plataformas del cliente actual en primer plano, solo nombres */
-#view-soporte .gxai-my-services{border:1px solid rgba(124,77,255,.19);background:linear-gradient(125deg,rgba(124,77,255,.07),rgba(0,242,254,.025));border-radius:15px;padding:12px 11px;display:flex;flex-direction:column;gap:9px;margin:0 0 4px;min-width:0}
-#view-soporte .gxai-my-head{display:flex;align-items:baseline;justify-content:space-between;gap:7px;flex-wrap:wrap}
-#view-soporte .gxai-my-head strong{color:#e9e5ff;font:600 12px Poppins,sans-serif}
-#view-soporte .gxai-my-status{color:#97a6be;font:400 10px/1.5 Poppins,sans-serif}
-#view-soporte .gxai-my-list{display:flex;flex-wrap:wrap;gap:7px;min-width:0}
-#view-soporte .gxai-my-platform{display:inline-flex;align-items:center;min-height:34px;max-width:100%;padding:7px 12px;border-radius:18px;background:linear-gradient(130deg,rgba(124,77,255,.23),rgba(0,242,254,.09));border:1px solid rgba(161,130,255,.28);color:#f0ecff;font:500 11px/1.35 Poppins,sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
-#view-soporte .gxai-my-platform:active{transform:scale(.98)}
-#view-soporte .gxai-my-platform:focus-visible,#view-soporte .gxai-my-other:focus-visible{outline:2px solid #00f2fe;outline-offset:3px}
-#view-soporte .gxai-my-other{align-self:flex-start;text-align:left;border:0;background:transparent;color:#93daf3;font:500 11px/1.45 Poppins,sans-serif;padding:4px 1px;cursor:pointer}
-#view-soporte .gxai-my-other::after{content:" ›";font-size:15px;vertical-align:middle}
+/* F7.3: las plataformas viven únicamente como opciones dentro del chat. */
 #view-soporte .gxai-choice-heading{display:block;flex-basis:100%;font:600 11px/1.4 Poppins,sans-serif;color:#b7b4d4;letter-spacing:.01em;margin:4px 0 1px}
-@media(prefers-reduced-motion:reduce){#view-soporte .gxai-my-platform:active{transform:none}}
