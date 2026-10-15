@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#030305">
-<title>GOXION · Goxy · Beta F7.3</title>
+<title>GOXION · Goxy · Beta F8</title>
 <style>
 html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#030305}
 iframe{display:block;width:100%;height:100%;border:0;background:#030305}
@@ -24,7 +24,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#030305}
       const doc = frame.contentDocument, win = frame.contentWindow;
       if (!doc || !win || new URL(win.location.href).origin !== location.origin) throw Error('Se requiere el mismo origen.');
       const css = doc.createElement('link');
-      css.rel = 'stylesheet'; css.href = new URL('./mascota.css?v=goxy-f7-3', location.href).href;
+      css.rel = 'stylesheet'; css.href = new URL('./mascota.css?v=goxy-f8', location.href).href;
       doc.head.appendChild(css);
       // Cargar primero el paquete autohospedado con el renderizador original.
       const canvas = doc.createElement('script');
@@ -42,7 +42,7 @@ iframe{display:block;width:100%;height:100%;border:0;background:#030305}
             ai.src = new URL('./goxy-ai-client.js?v=goxy-f7', location.href).href;
             ai.onload = () => {
               const js = doc.createElement('script');
-              js.src = new URL('./mascota.js?v=goxy-f7-3', location.href).href;
+              js.src = new URL('./mascota.js?v=goxy-f8', location.href).href;
               js.onload = () => {
                 try { win.switchTab?.('soporte'); } catch (_) {}
                 splash.style.opacity = '0';
