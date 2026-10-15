@@ -274,7 +274,8 @@
       const viewport = parent.visualViewport || window.visualViewport;
       const layoutH = parent.innerHeight || window.innerHeight || 0;
       if (!viewport || !layoutH) return;
-      const viewH = Math.max(180, Math.min(layoutH, Math.round(viewport.height)));
+      const childH = Number(window.visualViewport?.height) || layoutH;
+      const viewH = Math.max(180, Math.min(layoutH, Math.round(viewport.height), Math.round(childH)));
       const top = Math.max(0, Math.round(viewport.offsetTop || 0));
       layer.style.setProperty('--gxai-viewport-height', viewH + 'px');
       layer.style.setProperty('--gxai-viewport-top', top + 'px');
@@ -652,7 +653,7 @@
     const words = knowledge.normalize(query);
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
-    if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|en que me ayudas|como me ayudas)$/.test(words)) {
+    if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
         ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
         : '¡Hola! Puedo consultar tus misiones y promociones, orientarte sobre próximos pagos desde Mi Espacio y resolver dudas de plataformas con guías oficiales. La IA se usa solo cuando necesitamos una explicación adicional.',
