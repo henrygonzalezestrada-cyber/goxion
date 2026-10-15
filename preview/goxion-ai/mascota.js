@@ -1,4 +1,4 @@
-/* GOXION · Goxy F11 · soporte híbrido con escalamiento automático a IA, sin botón.
+/* GOXION · Goxy F12 · recuperación de acceso y ficha WhatsApp consentida.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -134,6 +134,8 @@
   // Los servicios solo alimentan las opciones contextuales del CHAT.
   // No existe una tarjeta separada ni se duplican botones al abrir el modal.
   const clientContext = window.GOXY_CLIENT_CONTEXT;
+  const accessRouter = window.GOXY_ACCESS;
+  const handoff = window.GOXY_HANDOFF;
   let myPlatforms = [];
   let myContextReady = false;
   function applyMyPlatforms(snapshot) {
@@ -166,6 +168,9 @@
   let aiEntry = false;
   let awaitingSymptom = false;
   let lastGuide = null;
+  let accessStage = null;
+  let caseContext = null;
+  let pendingHandoff = null;
   // Solo memoria local de esta sesión de chat: nunca localStorage, ni BD.
   const conversation = [];
   function resetConversation() { conversation.length = 0; }
@@ -319,6 +324,9 @@
     aiEntry = false;
     awaitingSymptom = false;
     lastGuide = null;
+    accessStage = null;
+    caseContext = null;
+    pendingHandoff = null;
     resetConversation();
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
@@ -370,6 +378,9 @@
     aiEntry = false;
     awaitingSymptom = false;
     lastGuide = null;
+    accessStage = null;
+    caseContext = null;
+    pendingHandoff = null;
     resetConversation();
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
@@ -478,6 +489,8 @@
       button.dataset.kind = item.kind;
       if (item.platform) button.dataset.platform = item.platform;
       if (Number.isInteger(item.issueIndex)) button.dataset.issueIndex = String(item.issueIndex);
+      if (Number.isInteger(item.serviceIndex)) button.dataset.serviceIndex=String(item.serviceIndex);
+      if (item.view) button.dataset.view=item.view;
       choices.appendChild(button);
     });
     scroll.appendChild(choices);
@@ -709,9 +722,28 @@
     messageInput.placeholder='Cuéntame qué ocurre…';
     void askAI(query);
   }
+  function helpWithAccess(query) {
+    const result=accessRouter?.inspect(query,chosenPlatform,accessStage);
+    if(!result?.reply)return false;
+    if(result.platform)chosenPlatform=result.platform;
+    if(Object.hasOwn(result,'stage'))accessStage=result.stage;
+    if(result.stage?.type==='premium')caseContext={
+      issue:'La plataforma solicita contratar Premium pese a estar contratada',
+      checks:['Servicio activo verificado en Mi Espacio','Preguntado tipo de acceso']
+    };
+    if(accessStage===null && result.reply.includes('QR') && result.reply.includes('vincule')){
+      caseContext={
+        issue:'La plataforma solicita acceso por QR y requiere vinculación',
+        checks:['Servicio comprobado en Mi Espacio','Solo código QR disponible']
+      };
+    }
+    respondFree(query,result.reply,result.options||[]);
+    return true;
+  }
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
+    if(helpWithAccess(query))return;
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
@@ -800,12 +832,49 @@
     runDemo(questions.libre,query,showPlatforms);
   }
   function humanHandoff() {
-    if (!active || !authenticated()) return;
-    // Es el botón de contacto humano YA aprobado en Ayuda, sin datos de cliente
-    // adjuntos ni llamada a sendSmartWA, que añadiría perfil/PIN.
-    const official = section.querySelector('.direct-contact-box button');
+    if(!active||!authenticated())return;
+    pendingHandoff=null;
+    if(!chosenPlatform){
+      respondFree('Necesito un asesor','Para preparar tu solicitud necesito saber primero cuál de tus plataformas tiene el problema.',
+        [{kind:'platforms',label:'Elegir plataforma'}]);
+      return;
+    }
+    const guide=lastGuide?knowledge.guide(lastGuide.platform,lastGuide.issueIndex):null;
+    const details=caseContext||{
+      issue:guide?.issue||'Problema de acceso o reproducción',
+      checks:guide?['Guía de soporte consultada','Se requiere intervención de asesor']:['Se solicita revisión de soporte']
+    };
+    const ticket=handoff?.prepare(chosenPlatform,details);
+    if(!ticket){
+      respondFree('Solicitar asistencia','No pude comprobar los datos del servicio en tu sesión. Vuelve a abrir Mi Espacio y prueba de nuevo.',
+        [{kind:'account',label:'Abrir Mi Espacio'}]);
+      return;
+    }
+    pendingHandoff=ticket;
+    clearChoices();
+    bubble('Preparé esta ficha con los datos de tu servicio. Revísala antes de compartirla; no incluye PIN, contraseñas ni códigos:',false);
+    bubble(ticket.message,false);
+    bubble('Si la confirmas, abriré WhatsApp con el mensaje listo. Tú tendrás que pulsar Enviar; todavía no se ha notificado al asesor.',false);
+    showChoices([{kind:'send-handoff',label:'Confirmar y abrir WhatsApp'},
+                 {kind:'cancel-handoff',label:'No compartir ahora'}]);
+  }
+  function openHandoff(){
+    if(!active||!authenticated()||!pendingHandoff)return;
+    const current=clientContext.supportReference?.(pendingHandoff.platform);
+    if(!current || current.clientId!==pendingHandoff.clientId){
+      pendingHandoff=null;
+      bubble('La sesión cambió. Por seguridad prepara la ficha nuevamente.',false);
+      showChoices([{kind:'platforms',label:'Elegir plataforma'}]);
+      return;
+    }
+    const link=handoff?.url(pendingHandoff);
+    if(!link){
+      bubble('No pude preparar el enlace del WhatsApp oficial. Continúa desde Soporte.',false);
+      pendingHandoff=null;
+      return;
+    }
+    window.open(link,'_blank','noopener,noreferrer');
     closeChat();
-    official?.click();
   }
   function choiceAction(button) {
     if (!active || busy || !authenticated()) return;
@@ -826,7 +895,28 @@
         void escalateAutomatically('Ya seguí los pasos disponibles de '+platform+' pero el problema continúa. ¿Qué puedo revisar después?',platform,lastGuide?.issueIndex);
       return;
     }
-    if (type === 'mine') { showPlatforms(); return; }
+    if(type==='send-handoff'){openHandoff();return;}
+    if(type==='cancel-handoff'){
+      pendingHandoff=null;
+      bubble('De acuerdo. No se abrió WhatsApp ni se compartió el caso.',false);
+      showChoices([{kind:'platforms',label:'Volver al soporte'}]);return;
+    }
+    if(type==='confirm-vix'){
+      chosenPlatform='ViX';accessStage=null;
+      respondFree('ViX','Perfecto. ¿Qué problema tienes al entrar a ViX?',
+        [{kind:'issues',platform:'ViX',label:'Ver soluciones de ViX'}]);return;
+    }
+    if(type==='premium-email' || type==='premium-qr'){
+      const answer=type==='premium-email'?'Sí, puedo iniciar con correo y contraseña':'Solamente aparece un código QR';
+      if(helpWithAccess(answer))return;
+    }
+    if(type==='open-service'){
+      const idx=Number(button.dataset.serviceIndex);
+      const view=button.dataset.view;
+      if(Number.isInteger(idx)&&accessRouter?.navigate(idx,view,chosenPlatform,doc))closeChat();
+      return;
+    }
+    if(type==='mine'){showPlatforms();return;}
     if (type === 'other') { showOtherPlatforms(); return; }
     if (type === 'human') { humanHandoff(); return; }
     if (type === 'missions' || type==='promotions' || type==='payment'){
@@ -840,6 +930,11 @@
       runDemo({prompt:'Ver plataformas',step:'searching',
         response:'Elige tu plataforma para consultar las soluciones disponibles.',finish:'happy'},null,showPlatforms);
     } else if (type === 'platform' && knowledge.platforms().includes(platform)) {
+      if(accessStage?.type==='pick'){
+        const mode=accessStage.what;accessStage=null;chosenPlatform=platform;
+        const route=accessRouter.routes(platform,mode);
+        respondFree('Consultar '+platform,route.reply,route.options);return;
+      }
       if(chosenPlatform!==platform)resetConversation();
       chosenPlatform = platform;
       awaitingSymptom = true;
