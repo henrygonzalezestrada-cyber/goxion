@@ -206,6 +206,7 @@ win.parent={innerHeight:844,visualViewport:vv,addEventListener(){}};
 const store={getItem:()=>authed?'fake-token':''};
 const charge=(id,day,ordinal)=>({cargo_id:id,acceso_id:'access-'+id,servicio:'ViX Premium',ordinal,
   vence:'2026-11-'+day,total_centavos:4600,pagado:false});
+let extensionAgreement=false;
 const financialResponse={ok:true,modo:'b2_multifecha',calendario_financiero:{ok:true,cobrable:true,
   ciclo_id:'22222222-2222-2222-2222-222222222222',
   total_pendiente_centavos:9200,cargos:[charge('uno','06',1),charge('dos','30',2)]},
@@ -215,8 +216,9 @@ const financialResponse={ok:true,modo:'b2_multifecha',calendario_financiero:{ok:
 new Function('window','localStorage','fetch',paymentSrc)(win,store,
   async(_url,config)=>({ok:true,json:async()=>
     JSON.parse(config?.body||'{}').accion==='mi_prorroga'?
-    {ok:true,modo:'global',puede_solicitar:true,fecha_original:'2026-10-15',
-      fecha_maxima:'2026-10-20',fecha_servidor:'2026-10-15',acuerdo:null}:
+    {ok:true,modo:'global',puede_solicitar:!extensionAgreement,fecha_original:'2026-10-15',
+      fecha_maxima:'2026-10-20',fecha_servidor:'2026-10-15',
+      acuerdo:extensionAgreement?{fecha_pactada:'2026-10-20',estado:'activo'}:null}:
     financialResponse}));
 win.GOXY_AI.forecast=async date=>({ok:true,mode:'oficial',date,amountCents:38000,
   moraCents:2500,reactivationCents:2000,reactivationConfirmed:true});
@@ -550,19 +552,30 @@ input.value='Si pago hasta el 20 de octubre ¿cuánto mora me genera?';composer.
 await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('380.00')),
  'El importe futuro proviene exclusivamente de forecast, no de fórmula local');
-assert.ok(scroll.children.some(x=>String(x.textContent).includes('reactivación calculada')),
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('cargo del 20%')),
  'Mostrar reactivación solo si backend la confirmó');
 input.value='Cuánto me descuentan con el nivel máximo de lealtad?';composer.fire('submit');
 await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('6% de descuento')),
  'Reglas de lealtad provienen de cotización financiera oficial');
+extensionAgreement=true;
+input.value='Quiero solicitar una prórroga';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('Ya tienes una prórroga registrada')),
+ 'El servidor informa que solo hay una prórroga por período');
+assert.ok(!currentChoice('extend-open'),'No ofrecer activación si acuerdo ya existe');
+extensionAgreement=false;
 assert.equal(win.GOXY_PAYMENT.parseDate('el 31 de octubre'), '2026-10-31',
  'Reconocer fecha escrita en español local'); // Fijado para beta del 15/oct.
 closeButton.fire('click');flush();
 // iPhone: campo >=16px, teclado encoge la capa y se recupera tras cerrar.
 assert.ok(css.includes('font-size:16px!important'),'Evitar zoom de Safari sobre el input');
 assert.ok(css.includes('.gxai-keyboard-open'),'La UI adapta el compositor a teclado abierto');
+win.scrollY=146;let restored=0;
+win.scrollTo=(_x,y)=>{restored=y;win.scrollY=y;};
 openButton.fire('click');flush();
+assert.equal(doc.body.style.position,'fixed','Safari debe impedir el scroll de fondo');
+assert.equal(doc.body.style.top,'-146px','Conservar posición del fondo al bloquearlo');
 assert.equal(layer.style['--gxai-viewport-height'],'844px','Inicialmente cabe en el viewport');
 input.focus();input.fire('focus');
 vv.height=460;vv.handlers.resize();
@@ -571,6 +584,8 @@ assert.ok(layer.classList.contains('gxai-keyboard-open'),'El input queda sobre e
 doc.activeElement=dialog;vv.height=844;vv.handlers.resize();
 assert.equal(layer.classList.contains('gxai-keyboard-open'),false,'Restaurar altura al ocultar teclado');
 closeButton.fire('click');flush();
+assert.equal(doc.body.style.position,'','Restaurar estilos del fondo al cerrar');
+assert.equal(restored,146,'Restablecer desplazamiento original sin saltos');
 openButton.fire('click');flush();await Promise.resolve();
 input.value='ViX me pide contratar Premium';composer.fire('submit');
 assert.ok(currentChoice('premium-qr'),'Preguntar correo o QR sin gastar IA');
