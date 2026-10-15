@@ -143,7 +143,7 @@
     working:   { label: 'Preparando la respuesta…',  face: 'working' },
     speaking:  { label: 'Respondiendo…',             face: 'speaking' },
     happy:     { label: '¡Listo!',                   face: 'happy' },
-    error:     { label: 'Error de demostración',     face: 'error' }
+    error:     { label: 'No pude responder',          face: 'error' }
   });
   function chatTransition(name) {
     if (!active || !Object.prototype.hasOwnProperty.call(phases, name)) return;
