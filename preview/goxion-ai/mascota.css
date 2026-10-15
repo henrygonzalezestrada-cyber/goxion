@@ -220,13 +220,13 @@
 #view-soporte .gxai-chat-layer{
   max-height:none!important;
   overscroll-behavior:none;
-  touch-action:none;
+  touch-action:auto;
 }
 #view-soporte .gxai-chat-layer .gxai-backdrop{
   background:rgba(3,4,10,.965);
   backdrop-filter:blur(16px);
   -webkit-backdrop-filter:blur(16px);
-  touch-action:none;
+  touch-action:auto;
 }
 #view-soporte .gxai-chat-layer .gxai-chat-scroll{
   touch-action:pan-y;
