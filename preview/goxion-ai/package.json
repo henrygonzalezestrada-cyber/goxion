@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "bundle": "esbuild goxy-heads-entry.js --bundle --platform=browser --format=iife --target=es2020 --minify --legal-comments=none --outfile=goxy-heads.bundle.js"
+    "bundle": "esbuild goxy-heads-entry.js --bundle --platform=browser --format=iife --target=es2020 --minify --legal-comments=none --outfile=goxy-heads.bundle.js",
+    "test": "node check.mjs"
   },
   "dependencies": {
     "robot-heads": "0.3.0",
