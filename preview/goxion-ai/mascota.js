@@ -176,6 +176,13 @@
     mood(gesture.state, gesture.state === 'sleeping' ? 2700 : 2100);
     petStatus.textContent = gesture.text;
   }
+  // robot-heads integra poke() en su propio click. Lo detenemos durante
+  // la captura para evitar que siempre sobreescriba los gestos con "happy".
+  // Pointer Events maneja toques/caricias; activación por teclado continúa.
+  heroTrigger.addEventListener('click', (event) => {
+    if (event.detail > 0 && event.target !== heroTrigger) event.stopPropagation();
+  }, { capture: true });
+
   heroTrigger.addEventListener('pointerdown', (event) => {
     if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0) || !authenticated()) return;
     pet.id = event.pointerId;
@@ -262,7 +269,7 @@
   // API local de prueba: cambiar expresión desde consola sin exponer una API financiera.
   window.GOXION_AI_BETA = Object.freeze({
     expression: (state) => {
-      if (['idle','happy','thinking','listening','speaking','wink','surprised','love'].includes(state)) mood(state, state === 'idle' ? 0 : 1600);
+      if (['idle','happy','thinking','searching','listening','speaking','working','sleeping','error','wink','surprised','love'].includes(state)) mood(state, state === 'idle' ? 0 : 1600);
     },
     close: closeChat,
     open: openChat,
