@@ -1,4 +1,4 @@
-/* GOXION · Goxy F4 · expresiones nativas variadas de robot-heads + caricias F2.
+/* GOXION · Goxy F5 · máquina de estados conversacional local y gestos F4.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -55,19 +55,28 @@
     '<header class="gxai-chat-head">',
     '<span class="gxai-avatar" aria-hidden="true">', svg, '</span>',
     '<span class="gxai-heading"><strong id="gxai-chat-title">Goxy · Asistente GOXION</strong>',
-    '<small>Mascota interactiva · Beta visual</small></span>',
+    '<small class="gxai-chat-phase" role="status" aria-live="polite">Listo para escucharte</small></span>',
     '<button class="gxai-close" type="button" aria-label="Cerrar chat">×</button>',
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
-    '<div class="gxai-beta-note">FASE 1 · PRUEBA VISUAL</div>',
-    '<div class="gxai-bubble">¡Hola! 👋 Soy Goxy, tu compañero de soporte. Puedes tocarme o acariciarme para ver mis gestos. Cuando conectemos la IA, también podré ayudarte con tus servicios.</div>',
+    '<div class="gxai-beta-note">FASE 2 · CONVERSACIÓN SIMULADA</div>',
+    '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Ya puedo escucharte y mostrar cuándo pienso, busco, respondo o encuentro un error. Por ahora mis respuestas son simuladas; todavía no consulto tus servicios.</div>',
     '<div class="gxai-suggestions">',
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="cuenta">Quiero consultar mi cuenta</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="codigo">Necesito un código</button>',
+    '<button type="button" class="gxai-suggestion" data-prompt="error">Probar un error</button>',
     '</div>',
     '</div>',
-    '<footer class="gxai-chat-foot">El chat aún no se conecta a la IA ni consulta información privada.<br>Pronto podrás escribir tus preguntas aquí.</footer>',
+    '<footer class="gxai-chat-foot">',
+    '<form class="gxai-composer" aria-label="Conversación de demostración">',
+    '<input class="gxai-message-input" type="text" placeholder="Escribe para probar el chat…" aria-label="Mensaje de prueba" autocomplete="off" maxlength="240">',
+    '<button class="gxai-send" type="submit" aria-label="Enviar mensaje de prueba">',
+    '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
+    '</button>',
+    '</form>',
+    '<div class="gxai-chat-disclaimer">Demostración local · Sin IA, consultas de cuenta ni envíos reales.</div>',
+    '</footer>',
     '</section>'
   ].join('');
   section.appendChild(layer);
@@ -79,11 +88,21 @@
   const heroTrigger = hero.querySelector('.gxai-mascot-button');
   const openButton = hero.querySelector('.gxai-open');
   const closeButton = layer.querySelector('.gxai-close');
+  const chatPhase = layer.querySelector('.gxai-chat-phase');
+  const composer = layer.querySelector('.gxai-composer');
+  const messageInput = layer.querySelector('.gxai-message-input');
+  const sendButton = layer.querySelector('.gxai-send');
+  const suggestions = Array.from(layer.querySelectorAll('.gxai-suggestion'));
   const reactionLayer = hero.querySelector('.gxai-reactions');
   const petStatus = hero.querySelector('.gxai-pet-status');
   const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false;
   let active = false;
-  let transitionTimer = null, interactionTimer = null, requestId = 0;
+  let interactionTimer = null, requestId = 0;
+  let activeFlow = 0;
+  const flowTimers = new Set();
+  let busy = false;
+  let typing = null;
+  let chatState = 'idle';
   let prevOverflowHtml = '', prevOverflowBody = '', previousFocus = null;
 
   function authenticated() {
@@ -100,6 +119,64 @@
     mascots.forEach(el => el.setAttribute('data-mood', state));
     if (timeout) interactionTimer = setTimeout(() => mood(active ? 'listening' : 'idle'), timeout);
   }
+
+  // F5: único propietario de los estados del chat, compatible con la futura IA.
+  // Las fases se activan por eventos de conversación; no requieren llamadas a APIs.
+  const phases = Object.freeze({
+    idle:      { label: 'Listo para escucharte',     face: 'idle' },
+    listening: { label: 'Te escucho',               face: 'listening' },
+    thinking:  { label: 'Analizando tu mensaje…',    face: 'thinking' },
+    searching: { label: 'Buscando una solución…',    face: 'searching' },
+    working:   { label: 'Preparando la respuesta…',  face: 'working' },
+    speaking:  { label: 'Respondiendo…',             face: 'speaking' },
+    happy:     { label: '¡Listo!',                   face: 'happy' },
+    error:     { label: 'Error de demostración',     face: 'error' }
+  });
+  function chatTransition(name) {
+    if (!active || !Object.prototype.hasOwnProperty.call(phases, name)) return;
+    chatState = name;
+    const phase = phases[name];
+    layer.setAttribute('data-chat-state', name);
+    chatPhase.textContent = phase.label;
+    mood(phase.face);
+  }
+  function showTyping() {
+    if (typing) return;
+    typing = doc.createElement('div');
+    typing.className = 'gxai-typing';
+    typing.setAttribute('aria-label', 'Goxy está procesando la demostración');
+    typing.innerHTML = '<i></i><i></i><i></i>';
+    scroll.appendChild(typing);
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+  function hideTyping() {
+    if (!typing) return;
+    typing.remove();
+    typing = null;
+  }
+  function setBusy(value) {
+    busy = value;
+    messageInput.disabled = value;
+    sendButton.disabled = value;
+    suggestions.forEach(button => { button.disabled = value; });
+  }
+  function cancelFlow() {
+    activeFlow++;
+    flowTimers.forEach(timer => clearTimeout(timer));
+    flowTimers.clear();
+    hideTyping();
+    setBusy(false);
+  }
+  function later(flowId, ms, action) {
+    const timer = setTimeout(() => {
+      flowTimers.delete(timer);
+      if (flowId !== activeFlow || !active) return;
+      if (!authenticated()) { closeChat(); return; }
+      action();
+    }, ms);
+    flowTimers.add(timer);
+  }
+
   function openChat() {
     if (active || !authenticated()) {
       if (!authenticated()) window.openAuthSheet?.();
@@ -107,13 +184,16 @@
     }
     previousFocus = doc.activeElement;
     active = true; requestId++;
+    cancelFlow();
     prevOverflowHtml = doc.documentElement.style.overflow;
     prevOverflowBody = doc.body.style.overflow;
     doc.documentElement.style.overflow = 'hidden';
     doc.body.style.overflow = 'hidden';
     layer.classList.add('gxai-visible');
     layer.setAttribute('aria-hidden', 'false');
-    mood('happy', 680);
+    chatTransition('happy');
+    const greetingFlow = activeFlow;
+    later(greetingFlow, 750, () => { if (!busy) chatTransition('listening'); });
     // Foco al diálogo sin preseleccionar el botón X ni abrir el teclado en iOS.
     dialog.setAttribute('tabindex', '-1');
     dialog.focus({preventScroll:true});
@@ -121,7 +201,10 @@
   function closeChat() {
     if (!active) return;
     active = false; requestId++;
-    clearTimeout(transitionTimer);
+    cancelFlow();
+    chatState = 'idle';
+    chatPhase.textContent = phases.idle.label;
+    layer.setAttribute('data-chat-state','idle');
     layer.classList.remove('gxai-visible');
     layer.setAttribute('aria-hidden', 'true');
     doc.documentElement.style.overflow = prevOverflowHtml;
@@ -136,11 +219,62 @@
     scroll.appendChild(node);
     scroll.scrollTop = scroll.scrollHeight;
   }
-  const questions = {
-    acceso: ['Tengo un problema de acceso', 'Ya identifico el tema: acceso a una plataforma. En esta primera beta aún no tengo conexión con la IA; cuando la activemos, podré guiarte paso a paso con tus servicios contratados.'],
-    cuenta: ['Quiero consultar mi cuenta', 'En la siguiente fase podré consultar información autorizada de Mi Espacio. Esta beta no lee saldos, fechas ni datos de tu cuenta.'],
-    codigo: ['Necesito un código', 'Para los códigos de verificación prepararé una solicitud de asistencia humana. Ese envío todavía no está conectado; por ahora puedes usar el botón de asesor humano que ya existe en Soporte.']
-  };
+  const questions = Object.freeze({
+    acceso: {
+      prompt: 'Tengo un problema de acceso',
+      step: 'searching',
+      response: 'Podré guiarte paso a paso cuando conectemos la base verificada de soluciones. Esta prueba no consulta ni modifica accesos.',
+      finish: 'happy'
+    },
+    cuenta: {
+      prompt: 'Quiero consultar mi cuenta',
+      step: 'searching',
+      response: 'En una siguiente fase podré consultar información autorizada de Mi Espacio. Aquí no leo saldos, fechas ni datos personales.',
+      finish: 'happy'
+    },
+    codigo: {
+      prompt: 'Necesito un código',
+      step: 'working',
+      response: 'Cuando esté conectado podré preparar una solicitud para que un asesor atienda los códigos de verificación. Esta prueba NO envió ninguna solicitud.',
+      finish: 'happy'
+    },
+    error: {
+      prompt: 'Quiero probar qué pasa si algo falla',
+      step: 'working',
+      response: 'Este es un error simulado para probar mis gestos. No ocurrió ningún problema con tu cuenta y puedes intentar otra consulta.',
+      finish: 'error'
+    },
+    libre: {
+      step: 'thinking',
+      response: '¡Recibí tu mensaje de prueba! Ya muestro cuándo escucho, pienso y respondo. Todavía no tengo IA ni puedo resolver o consultar tu cuenta.',
+      finish: 'happy'
+    }
+  });
+  function runDemo(entry, enteredText) {
+    if (!active || busy || !authenticated()) return;
+    const query = String(enteredText || entry.prompt || '').trim();
+    if (!query) return;
+    bubble(query.slice(0, 240), true);
+    setBusy(true);
+    chatTransition('thinking');
+    showTyping();
+    const flowId = ++activeFlow;
+    later(flowId, 640, () => chatTransition(entry.step || 'working'));
+    later(flowId, 1460, () => {
+      hideTyping();
+      if (entry.finish !== 'error') chatTransition('speaking');
+      else chatTransition('error');
+      bubble(entry.response, false);
+    });
+    later(flowId, 2450, () => {
+      if (entry.finish === 'happy') chatTransition('happy');
+      else chatTransition('error');
+    });
+    later(flowId, 3900, () => {
+      setBusy(false);
+      chatTransition('listening');
+    });
+  }
 
 
   // Goxy tipo Tamagotchi: un toque provoca gestos, una caricia genera corazones.
@@ -237,17 +371,20 @@
   layer.addEventListener('click', event => {
     const button = event.target.closest('.gxai-suggestion');
     if (!active || !button) return;
-    const key = button.dataset.prompt;
-    const data = questions[key];
-    if (!data) return;
-    bubble(data[0], true);
-    mood('thinking');
-    const current = ++requestId;
-    transitionTimer = setTimeout(() => {
-      if (!active || requestId !== current) return;
-      bubble(data[1], false);
-      mood('speaking', 1200);
-    }, 650);
+    const entry = questions[button.dataset.prompt];
+    if (entry) runDemo(entry);
+  });
+  // Mensajes libres: solo conversación simulada. Nada sale del navegador.
+  composer.addEventListener('submit', event => {
+    event.preventDefault();
+    if (!active || busy || !authenticated()) return;
+    const text = messageInput.value.trim();
+    if (!text) return;
+    messageInput.value = '';
+    runDemo(questions.libre, text);
+  });
+  messageInput.addEventListener('input', () => {
+    if (active && !busy && authenticated()) chatTransition('listening');
   });
   doc.addEventListener('keydown', event => {
     if (!active) return;
@@ -268,6 +405,9 @@
   window.addEventListener('pagehide', closeChat);
   // API local de prueba: cambiar expresión desde consola sin exponer una API financiera.
   window.GOXION_AI_BETA = Object.freeze({
+    chatState: () => chatState,
+    // Mismo contrato de eventos que utilizará el futuro orquestador, sin API.
+    chatEvent: (state) => { if (authenticated() && phases[state] && !busy) chatTransition(state); },
     expression: (state) => {
       if (['idle','happy','thinking','searching','listening','speaking','working','sleeping','error','wink','surprised','love'].includes(state)) mood(state, state === 'idle' ? 0 : 1600);
     },
