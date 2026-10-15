@@ -1,4 +1,4 @@
-/* GOXION · Goxy F6 · guías de soporte canónicas y gestos con scroll vertical.
+/* GOXION · Goxy F7 · IA segura sobre guías oficiales, conservando scroll F6.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -23,6 +23,10 @@
     return '<span class="gxai-mascot gxai-canvas-slot" data-mood="idle" role="img" aria-label="Goxy, robot animado con pantalla LED"></span>';
   }
 
+  if (typeof window.GOXY_AI?.ask !== 'function') {
+    console.error('[GOXION Goxy] No se cargó el puente seguro de IA.');
+    return;
+  }
   if (typeof window.GOXY_SUPPORT?.guide !== 'function') {
     console.error('[GOXION Goxy] No está disponible el catálogo canónico de soporte.');
     return;
@@ -63,7 +67,7 @@
     '<button class="gxai-close" type="button" aria-label="Cerrar chat">×</button>',
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
-    '<div class="gxai-beta-note">FASE 3 · GUÍAS REALES DE SOPORTE</div>',
+    '<div class="gxai-beta-note">FASE 4 · IA CON GUÍAS CONTROLADAS</div>',
     '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Selecciona un tema o escríbeme qué servicio presenta la falla. No compartas contraseñas, códigos ni PIN por aquí.</div>',
     '<div class="gxai-suggestions">',
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
@@ -79,7 +83,7 @@
     '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
     '</button>',
     '</form>',
-    '<div class="gxai-chat-disclaimer">Guías oficiales GOXION · Sin IA, datos privados ni solicitudes automáticas.</div>',
+    '<div class="gxai-chat-disclaimer">Guías oficiales GOXION · IA beta pendiente de configuración. Sin datos privados.</div>',
     '</footer>',
     '</section>'
   ].join('');
@@ -108,6 +112,11 @@
   let typing = null;
   let chatState = 'idle';
   let prevOverflowHtml = '', prevOverflowBody = '', previousFocus = null;
+  let aiController = null;
+  let chosenGuide = null;
+  let aiConfigured = false;
+  const ai = window.GOXY_AI;
+  const disclaimer = layer.querySelector('.gxai-chat-disclaimer');
 
   function authenticated() {
     const tokenKey = window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
@@ -166,6 +175,8 @@
   }
   function cancelFlow() {
     activeFlow++;
+    aiController?.abort();
+    aiController = null;
     flowTimers.forEach(timer => clearTimeout(timer));
     flowTimers.clear();
     hideTyping();
@@ -189,6 +200,17 @@
     previousFocus = doc.activeElement;
     active = true; requestId++;
     cancelFlow();
+    const statusId = requestId;
+    ai.status().then(state => {
+      if (!active || statusId !== requestId) return;
+      aiConfigured = state.ok===true && state.configured===true;
+      disclaimer.textContent = aiConfigured
+        ? 'IA beta disponible · 8 consultas cada 24 h · Nunca compartas códigos, PIN ni contraseñas.'
+        : 'IA pendiente de activación · Guías oficiales y asesor disponibles.';
+    }).catch(() => {
+      if (active && statusId===requestId) disclaimer.textContent =
+        'IA temporalmente no disponible · Puedes consultar las guías.';
+    });
     prevOverflowHtml = doc.documentElement.style.overflow;
     prevOverflowBody = doc.body.style.overflow;
     doc.documentElement.style.overflow = 'hidden';
@@ -208,6 +230,7 @@
     cancelFlow();
     clearChoices();
     chosenPlatform = null;
+    chosenGuide = null;
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
@@ -312,9 +335,11 @@
   const choosePlatformOptions = () => knowledge.platforms().map(platform =>
     ({kind:'platform',platform,label:platform}));
   function showPlatforms() {
+    chosenGuide = null;
     showChoices(choosePlatformOptions());
   }
   function showIssues(platform) {
+    chosenGuide = null;
     const issues = knowledge.issues(platform);
     showChoices([
       ...issues.map((issue,index)=>({kind:'issue',platform,issueIndex:index,label:issue.issue})),
@@ -331,6 +356,7 @@
       return;
     }
     chosenPlatform = platform;
+    chosenGuide = {platform,issueIndex:index};
     // Las instrucciones proceden EXCLUSIVAMENTE de support-issues.js,
     // convertidas a texto. Nunca incluir correo_login, perfil_pin o credenciales.
     const answer = 'Guía GOXION · '+platform+'\n'+guide.issue+'\n\n'+
@@ -339,10 +365,53 @@
       : 'Si todavía necesitas ayuda, puedes hablar con un asesor.');
     runDemo({prompt:guide.issue,step:'searching',response:answer,finish:'happy'},
       null,()=>showChoices([
+        {kind:'ai',label:'Preguntarle a Goxy (IA beta)'},
         {kind:'issues',platform,label:'Otra situación de '+platform},
         {kind:'human',label:'Hablar con asesor humano'},
         {kind:'platforms',label:'Cambiar plataforma'}
       ]));
+  }
+
+  // IA F7: solo se consulta el backend si el usuario seleccionó una guía
+  // canónica. Nunca enviar fichas cliente, PIN ni valores de Mi Espacio.
+  async function askAI(query) {
+    if (!active || busy || !authenticated() || !chosenGuide) return;
+    const text=String(query||'').trim();
+    if (!text || /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu.test(text)) {
+      bubble('Por seguridad no compartas correos, códigos, PIN o datos personales. Describe solamente la falla.',false);
+      chatTransition('error');
+      return;
+    }
+    clearChoices();
+    bubble(text.slice(0,240),true);
+    setBusy(true);
+    chatTransition('thinking');
+    showTyping();
+    const current=++activeFlow;
+    aiController=new AbortController();
+    const chosen={...chosenGuide};
+    const reply=await ai.ask({message:text,...chosen,signal:aiController.signal});
+    if(!active || current!==activeFlow || !authenticated())return;
+    aiController=null;
+    hideTyping();
+    if(reply.ok && typeof reply.answer==='string'){
+      chatTransition('speaking');
+      bubble(reply.answer,false);
+      later(current,950,()=>chatTransition('happy'));
+    }else if(reply.code!=='ABORTED'){
+      chatTransition('error');
+      bubble(reply.message||'Goxy no puede conectarse con la IA todavía. La guía oficial y el asesor siguen disponibles.',false);
+      if(reply.code==='AI_NOT_CONFIGURED')aiConfigured=false;
+    }
+    later(current,1700,()=>{
+      setBusy(false);
+      chatTransition('listening');
+      showChoices([
+        {kind:'ai',label:'Otra pregunta sobre esta guía'},
+        {kind:'human',label:'Hablar con asesor humano'},
+        {kind:'issues',platform:chosen.platform,label:'Ver otras situaciones'}
+      ]);
+    });
   }
   function handleText(query) {
     const words = knowledge.normalize(query);
@@ -363,6 +432,12 @@
       runDemo(questions.cuenta,query,()=>showChoices([
         {kind:'account',label:'Ir a Mi Espacio'}, {kind:'platforms',label:'Buscar ayuda de plataformas'}
       ]));
+      return;
+    }
+    // Si ya existe una guía específica y es una pregunta adicional, Goxy
+    // prueba la IA beta. La opción determinista se conserva al cambiar tema.
+    if (chosenGuide && !platform && !/\b(guia|tema|opciones|plataforma)\b/.test(words)) {
+      void askAI(query);
       return;
     }
     const target = platform || chosenPlatform;
@@ -390,6 +465,12 @@
     const type = button.dataset.kind;
     const platform = button.dataset.platform;
     const index = Number(button.dataset.issueIndex);
+    if (type === 'ai') {
+      if (!chosenGuide) return;
+      bubble(aiConfigured?'Escribe tu pregunta sobre esta guía en el campo inferior.':'La IA está pendiente de activación. Puedes seguir consultando las guías oficiales.',false);
+      if(aiConfigured)messageInput.focus({preventScroll:true});
+      return;
+    }
     if (type === 'human') { humanHandoff(); return; }
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'platforms') {
@@ -572,6 +653,7 @@
     },
     close: closeChat,
     open: openChat,
-    renderer: 'robot-heads@0.3.0'
+    renderer: 'robot-heads@0.3.0',
+    aiConfigured: () => aiConfigured
   });
 })();
