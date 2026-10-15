@@ -193,3 +193,10 @@
 @media(min-width:600px){
   #view-soporte .gxai-chat{max-height:100%}
 }
+
+/* F11 · La IA no es un botón: Goxy decide localmente si necesita asistencia adicional. */
+#view-soporte .gxai-ai-panel .gxai-ai-start{display:none!important}
+#view-soporte .gxai-ai-panel{padding:9px 11px;gap:8px;margin:4px 0 10px}
+#view-soporte .gxai-ai-panel-copy{gap:2px}
+#view-soporte .gxai-ai-title{font-size:10.5px}
+#view-soporte .gxai-ai-description{font-size:9.5px}
