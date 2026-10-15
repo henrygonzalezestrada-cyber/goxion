@@ -64,16 +64,23 @@
    if(result.modo==='oficial'){
      // Calendarios de fecha única siguen sujetos al saldo oficial, no a sumar contratos.
      const state=result.estado_financiero;
-     const amount=Number(state?.total_actual);
-     if(!valid(amount)||!Number.isFinite(amount))return unavailable('legacy_unknown');
-     return {ok:true,mode:'oficial',amount};
+     const pesos=Number(state?.total_actual);
+     const amount=Math.round(pesos*100);
+     if(state?.fuente_financiera!=='supabase:goxion_estado_financiero'||
+       !valid(amount)||!Number.isFinite(pesos)||!iso(state.fecha_corte))
+       return unavailable('legacy_unknown');
+     return {ok:true,mode:'oficial',amount,due:state.fecha_corte,
+       paid:state.esta_pagado_periodo===true};
    }
    return unavailable('unknown_mode');
  }
  function describe(data,mode='all',id=null){
    if(!data?.ok)return {answer:'No pude confirmar el saldo exacto con GOXION en este momento. Puedes revisar tu estado de cuenta oficial antes de realizar cualquier pago.',choices:[{kind:'pay-open',label:'Ver estado de cuenta'}]};
-   if(data.mode==='oficial')return {answer:'Tu estado de cuenta oficial registra '+money(data.amount)+
-     ' como saldo actual. Para confirmar la fecha de renovación y realizar tu pago, abre tu estado de cuenta; este esquema conserva una fecha de pago.',choices:[{kind:'pay-open',label:'Ver estado de cuenta y pagar'}]};
+   if(data.mode==='oficial')return {answer:data.paid
+     ? 'Tu período actual aparece pagado en el estado de cuenta. La fecha de corte registrada es '+date(data.due)+'. Consulta tu estado de cuenta para tu próxima renovación.'
+     : 'Tu próxima fecha de pago registrada es el '+date(data.due)+
+       ' y el importe oficial del período es '+money(data.amount)+'. Puedes abrir Index para revisar el desglose y reportar tu pago.',
+     choices:[{kind:'pay-open',label:data.paid?'Ver estado de cuenta':'Realizar mi pago'}]};
    if(data.inReview)return {answer:'Tu comprobante aparece en revisión. Antes de intentar otro pago, revisa el estado de cuenta para conocer el saldo actualizado.',choices:[{kind:'pay-open',label:'Consultar comprobante'}]};
    const rows=data.rows;
    if(!rows.length)return {answer:'Tu calendario confirmado no tiene importes pendientes en este período.',choices:[{kind:'pay-open',label:'Ver estado de cuenta'}]};
