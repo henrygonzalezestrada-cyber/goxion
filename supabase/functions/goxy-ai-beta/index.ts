@@ -108,6 +108,10 @@ Deno.serve(async(req:Request)=>{
     const payload=await response.json();
     const answer=String(payload?.choices?.[0]?.message?.content||"").trim().slice(0,1500);
     if(!answer)return output(origin,503,{ok:false,code:"EMPTY_ANSWER"});
+    // Rechazo final de enlaces o secretos inventados por el modelo.
+    if(privatePattern.test(answer)||/https?:\/\/|www\./i.test(answer))
+      return output(origin,503,{ok:false,code:"UNSAFE_ANSWER",
+        message:"No puedo validar esa respuesta. Consulta la guía o el asesor humano."});
     return output(origin,200,{ok:true,answer,source:"guia_oficial",
       requires_human:article.human,remaining:take.remaining});
   }catch{return output(origin,503,{ok:false,code:"SERVICE_UNAVAILABLE",
