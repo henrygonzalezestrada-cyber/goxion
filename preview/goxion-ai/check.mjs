@@ -73,7 +73,7 @@ class Element {
     if(this.name==='layer')return ({
       '.gxai-chat-scroll':scroll,'.gxai-chat':dialog,'.gxai-close':closeButton,
       '.gxai-backdrop':backdrop,'.gxai-chat-phase':phase,
-      '.gxai-composer':composer,'.gxai-message-input':input,'.gxai-send':send
+      '.gxai-composer':composer,'.gxai-message-input':input,'.gxai-send':send,'.gxai-chat-disclaimer':disclaimer
     })[sel]||null;
     return null;
   }
@@ -89,7 +89,7 @@ const hearts=new Element('hearts'),petStatus=new Element('petStatus');
 const robotHero=new Element('robotHero'),robotAvatar=new Element('robotAvatar');
 const scroll=new Element('scroll'),dialog=new Element('dialog'),closeButton=new Element('closeButton');
 const backdrop=new Element('backdrop'),phase=new Element('phase'),composer=new Element('composer');
-const input=new Element('input'),send=new Element('send');
+const input=new Element('input'),send=new Element('send'),disclaimer=new Element('disclaimer');
 const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
 btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';
