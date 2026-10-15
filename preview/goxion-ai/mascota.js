@@ -831,9 +831,9 @@
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
+    if(helpWithAccess(query))return;
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
-    if(helpWithAccess(query))return;
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
         ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
@@ -1203,7 +1203,13 @@
     if (!text) return;
     messageInput.value = '';
     if(pendingAI){
-      // El mensaje más reciente reemplaza a la consulta en espera.
+      // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
+      if(accountTopic(text) || (knowledge.resolvePlatform(text) &&
+         knowledge.resolvePlatform(text)!==pendingAI.chosen?.platform)){
+        cancelFlow();
+        handleText(text);
+        return;
+      }
       bubble(text.slice(0,240),true);
       pendingAI.text=text;
       chatPhase.textContent='Recibí tu última pregunta; esperando el turno de IA…';
