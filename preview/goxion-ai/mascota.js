@@ -1,4 +1,4 @@
-/* GOXION · Goxy F8.1 · verificación real de Groq y cupo visible en beta.
+/* GOXION · Goxy F9 · soporte primero, IA con memoria y lecturas de cuenta.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -72,7 +72,7 @@
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
     '<div class="gxai-beta-note">GOXY · IA CON SOPORTE REAL</div>',
-    '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Cuando esté activa la IA, podrás conversar sobre tu plataforma sin buscar una guía primero. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
+    '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Puedo ayudarte con tus servicios, misiones, promociones y guías de soporte. Primero revisamos la información oficial; si necesitamos explicar algo más, podemos usar IA. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
     '<div class="gxai-ai-panel" role="status" aria-live="polite">',
     '<span class="gxai-ai-light" aria-hidden="true"></span>',
     '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
@@ -82,7 +82,8 @@
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="cuenta">Quiero consultar mi cuenta</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="codigo">Necesito un código</button>',
-    '<button type="button" class="gxai-suggestion" data-prompt="error">Probar un error</button>',
+    '<button type="button" class="gxai-suggestion" data-prompt="misiones">Mis misiones</button>',
+    '<button type="button" class="gxai-suggestion" data-prompt="promociones">Promociones activas</button>',
     '</div>',
     '</div>',
     '<footer class="gxai-chat-foot">',
@@ -163,6 +164,18 @@
   }
   let aiMode = false;
   let aiEntry = false;
+  // Solo memoria local de esta sesión de chat: nunca localStorage, ni BD.
+  const conversation = [];
+  function resetConversation() { conversation.length = 0; }
+  function keepTurn(userText,assistantText){
+    if(typeof userText!=='string'||typeof assistantText!=='string')return;
+    // Guardar únicamente los turnos de IA ya filtrados, no respuestas privadas.
+    const sensitive=/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu;
+    if(sensitive.test(userText)||sensitive.test(assistantText))return;
+    conversation.push({role:'user',content:userText.slice(0,280)},
+      {role:'assistant',content:assistantText.slice(0,280)});
+    if(conversation.length>6)conversation.splice(0,conversation.length-6);
+  }
   function setAIStatus(status, message) {
     aiPanel.setAttribute('data-ai-status', status);
     aiStart.disabled = status !== 'ready';
@@ -262,6 +275,7 @@
     aiConfigured = false;
     aiMode = false;
     aiEntry = false;
+    resetConversation();
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
     refreshMyPlatforms();
@@ -309,6 +323,7 @@
     myContextReady=false;
     aiMode = false;
     aiEntry = false;
+    resetConversation();
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
@@ -355,7 +370,9 @@
       step: 'searching',
       response: 'Voy a ayudarte a localizar la guía oficial. Selecciona una plataforma para continuar.',
       finish: 'happy'
-    }
+    },
+    misiones: { prompt:'Mis misiones',step:'searching',response:'Consultando misiones…',finish:'happy' },
+    promociones: {prompt:'Promociones activas',step:'searching',response:'Consultando catálogo…',finish:'happy' }
   });
   function runDemo(entry, enteredText, onDone) {
     if (!active || busy || !authenticated()) return;
@@ -367,18 +384,18 @@
     chatTransition('thinking');
     showTyping();
     const flowId = ++activeFlow;
-    later(flowId, 640, () => chatTransition(entry.step || 'working'));
-    later(flowId, 1460, () => {
+    later(flowId, 220, () => chatTransition(entry.step || 'working'));
+    later(flowId, 680, () => {
       hideTyping();
       if (entry.finish !== 'error') chatTransition('speaking');
       else chatTransition('error');
       bubble(entry.response, false);
     });
-    later(flowId, 2450, () => {
+    later(flowId, 1050, () => {
       if (entry.finish === 'happy') chatTransition('happy');
       else chatTransition('error');
     });
-    later(flowId, 3900, () => {
+    later(flowId, 1330, () => {
       setBusy(false);
       chatTransition('listening');
       if (typeof onDone === 'function') onDone();
@@ -467,6 +484,7 @@
         finish:'error'},null,showPlatforms);
       return;
     }
+    if(chosenPlatform!==platform)resetConversation();
     chosenPlatform = platform;
     chosenGuide = {platform,issueIndex:index};
     aiMode = false;
@@ -503,13 +521,14 @@
     const current=++activeFlow;
     aiController=new AbortController();
     const chosen={...chosenGuide};
-    const reply=await ai.ask({message:text,...chosen,signal:aiController.signal});
+    const reply=await ai.ask({message:text,...chosen,history:[...conversation],signal:aiController.signal});
     if(!active || current!==activeFlow || !authenticated())return;
     aiController=null;
     hideTyping();
     if(reply.ok && typeof reply.answer==='string'){
       chatTransition('speaking');
       bubble(reply.answer,false);
+      keepTurn(text,reply.answer);
       if(Number.isInteger(reply.remaining)){
         disclaimer.textContent = 'Te quedan '+reply.remaining+
           ' consultas IA de tu cupo móvil de 24 h · Nunca compartas códigos ni PIN.';
@@ -528,20 +547,87 @@
       setBusy(false);
       chatTransition('listening');
       showChoices([
-        {kind:'ai',label:'Otra pregunta sobre esta guía'},
+        {kind:'ai',label:'Aclarar con Goxy (IA)'},
         {kind:'human',label:'Hablar con asesor humano'},
         {kind:'issues',platform:chosen.platform,label:'Ver otras situaciones'}
       ]);
     });
   }
+  // Datos personales SOLO con el backend autenticado de GOXION.
+  // El resultado se presenta al usuario sin enviarse al modelo de Groq.
+  async function accountRead(topic,query) {
+    if(!active || busy || !authenticated())return;
+    const text=String(query||'').trim();
+    clearChoices();
+    bubble(text.slice(0,240),true);
+    setBusy(true);
+    chatTransition('searching');
+    showTyping();
+    const flow=++activeFlow;
+    aiController=new AbortController();
+    const response=await ai.account(topic,{signal:aiController.signal});
+    if(!active || flow!==activeFlow || !authenticated())return;
+    aiController=null;
+    hideTyping();
+    if(response.ok===true && typeof response.answer==='string'){
+      chatTransition('speaking');
+      bubble(response.answer,false);
+    }else if(response.code!=='ABORTED'){
+      chatTransition('error');
+      bubble(response.message||'No pude comprobar ese dato ahora. Consulta Mi Espacio para información oficial.',false);
+    }
+    later(flow,350,()=>{
+      setBusy(false);
+      chatTransition('listening');
+      showChoices([
+        {kind:'account',label:'Abrir Mi Espacio'},
+        {kind:'missions',label:'Mis misiones'},
+        {kind:'promotions',label:'Promociones'},
+        {kind:'payment',label:'Próximo pago'},
+        {kind:'platforms',label:'Soporte de plataformas'}
+      ]);
+    });
+  }
+  function respondFree(text,reply,options=[]) {
+    if(!active || busy || !authenticated())return;
+    clearChoices();bubble(text.slice(0,240),true);bubble(reply,false);
+    chatTransition('speaking');
+    if(options.length)showChoices(options);
+    const id=++activeFlow;
+    later(id,250,()=>chatTransition('listening'));
+  }
+  function accountTopic(text){
+    const normal=knowledge.normalize(text);
+    if(/\b(mision(?:es)?|tareas?|retos?|cupon(?:es)?)\b/.test(normal))return 'missions';
+    if(/\b(promocion(?:es)?|ofertas?|descuentos? especiales?)\b/.test(normal))return 'promotions';
+    if(/\b(pago|pagar|saldo|corte|vencimient[oa]|fecha de pago|estado de cuenta|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))return 'payment';
+    return null;
+  }
   function handleText(query) {
-    // El modo IA es explícito: después de elegirlo, todo mensaje de esa guía
-    // se envía al backend incluso si menciona el nombre de la plataforma.
-    if (aiMode && chosenGuide) {
-      void askAI(query);
+    // La información que ya administra GOXION y los saludos no consumen IA.
+    const words = knowledge.normalize(query);
+    const topic=accountTopic(query);
+    if(topic){ void accountRead(topic,query); return; }
+    if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|en que me ayudas|como me ayudas)$/.test(words)) {
+      respondFree(query,chosenPlatform
+        ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
+        : '¡Hola! Puedo consultar tus misiones y promociones, orientarte sobre próximos pagos desde Mi Espacio y resolver dudas de plataformas con guías oficiales. La IA se usa solo cuando necesitamos una explicación adicional.',
+        [{kind:'platforms',label:'Ayuda con plataformas'},
+         {kind:'missions',label:'Mis misiones'},{kind:'payment',label:'Próximo pago'}]);
       return;
     }
-    const words = knowledge.normalize(query);
+    // Una autorización que ya intentó el cliente no se arregla gastando más IA.
+    if(/\b(ya|antes|recien)\b/.test(words) &&
+       /\b(codigo|verificacion|vinculacion|autorizar|enlazar)\b/.test(words) &&
+       /\b(coloque|ingrese|puse|escribi|mande|envie|no funciona|no responde)\b/.test(words)) {
+      respondFree(query,
+        'Entiendo que ya intentaste vincular tu dispositivo. No puedo validar ni autorizar ese código desde aquí: eso requiere un asesor de GOXION. Puedes solicitar ayuda sin compartir el código por el chat.',
+        [{kind:'human',label:'Hablar con asesor humano'},
+         {kind:'platforms',label:'Ver otras guías'}]);
+      return;
+    }
+    // La IA mantiene un hilo breve solamente si el usuario realmente la eligió.
+    if (aiMode && chosenGuide) {void askAI(query);return;}
     if (/\b(cambiar|otra|elegir|ver)(?: de)? plataformas?\b/.test(words)) {
       chosenPlatform = null;
       runDemo({prompt:query,step:'searching',
@@ -555,10 +641,8 @@
         finish:'happy'},query,()=>showChoices([{kind:'human',label:'Hablar con asesor humano'}]));
       return;
     }
-    if (/\b(pago|pagar|deuda|saldo|vencimiento|factura|mora|prorroga|lealtad|cupon)\b/.test(words) && !platform) {
-      runDemo(questions.cuenta,query,()=>showChoices([
-        {kind:'account',label:'Ir a Mi Espacio'}, {kind:'platforms',label:'Buscar ayuda de plataformas'}
-      ]));
+    if (/\b(deuda|factura)\b/.test(words) && !platform) {
+      void accountRead('payment',query);
       return;
     }
     // Sin haber elegido el modo IA, los mensajes usan guías comprobadas.
@@ -603,12 +687,18 @@
     if (type === 'mine') { showPlatforms(); return; }
     if (type === 'other') { showOtherPlatforms(); return; }
     if (type === 'human') { humanHandoff(); return; }
+    if (type === 'missions' || type==='promotions' || type==='payment'){
+      void accountRead(type==='missions'?'missions':type==='promotions'?'promotions':'payment',
+        type==='missions'?'Mis misiones':type==='promotions'?'Promociones activas':'Mi próximo pago');
+      return;
+    }
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'platforms') {
       chosenPlatform = null;
       runDemo({prompt:'Ver plataformas',step:'searching',
         response:'Elige tu plataforma para consultar las soluciones disponibles.',finish:'happy'},null,showPlatforms);
     } else if (type === 'platform' && knowledge.platforms().includes(platform)) {
+      if(chosenPlatform!==platform)resetConversation();
       chosenPlatform = platform;
       if (aiEntry && aiConfigured) {
         aiEntry = false;
@@ -758,10 +848,13 @@
     aiEntry = false;
     if (button.dataset.prompt === 'acceso' || button.dataset.prompt === 'codigo') {
       runDemo(entry,null,showPlatforms);
-    } else if (button.dataset.prompt === 'cuenta') {
-      runDemo(entry,null,()=>showChoices([
-        {kind:'account',label:'Ir a Mi Espacio'}, {kind:'platforms',label:'Buscar ayuda de plataformas'}
-      ]));
+    } else if(button.dataset.prompt === 'cuenta'){
+      respondFree('Quiero consultar mi cuenta',
+        'Puedo consultar tus misiones y las promociones publicadas. Para importes y fechas exactas, utiliza el estado de cuenta oficial porque contempla varios vencimientos, mora y prórrogas.',
+        [{kind:'payment',label:'Próximo pago'},{kind:'missions',label:'Mis misiones'},
+         {kind:'promotions',label:'Promociones'},{kind:'account',label:'Abrir Mi Espacio'}]);
+    } else if(button.dataset.prompt==='misiones'||button.dataset.prompt==='promociones'){
+      void accountRead(button.dataset.prompt==='misiones'?'missions':'promotions',entry.prompt);
     } else runDemo(entry);
   });
   // Mensajes libres: guías reales de soporte, sin consultar cuentas ni red.

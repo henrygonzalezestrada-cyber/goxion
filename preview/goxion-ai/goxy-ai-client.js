@@ -1,4 +1,4 @@
-/* Goxy IA F7 · transport client no secrets.
+/* Goxy IA F9 · transporte de conversación efímera y consultas autorizadas.
    All business/auth/rate limits live in Supabase goxy-ai-beta. */
 (() => {
   "use strict";
@@ -17,13 +17,18 @@
     const body=await res.json().catch(()=>({ok:false,code:"INVALID_RESPONSE"}));
     return {ok:res.ok && body.ok===true,...body};
   }
-  async function ask({message,platform,issueIndex,signal}){
+  async function ask({message,platform,issueIndex,history=[],signal}){
     const text=String(message||"").trim();
     if(!text || text.length>400 || /[<>]/.test(text) || sensitive.test(text))
       return {ok:false,code:"SENSITIVE_OR_INVALID_INPUT",
         message:"Por seguridad, no envíes correos, números de cuenta, PIN ni códigos. Describe solo la falla."};
     try {
-      return await send({mode:"chat",message:text,platform,issueIndex},{signal});
+      const safeHistory=Array.isArray(history)?history.slice(-6).filter(x=>
+        x&&['user','assistant'].includes(x.role)&&
+        typeof x.content==='string'&&x.content.length<=280&&!/[<>]/.test(x.content)&&
+        !sensitive.test(x.content)
+      ).map(x=>({role:x.role,content:x.content})):[];
+      return await send({mode:"chat",message:text,platform,issueIndex,history:safeHistory},{signal});
     }catch(error){
       if(error?.name==="AbortError")return {ok:false,code:"ABORTED"};
       return {ok:false,code:"NETWORK_ERROR",message:"No puedo conectar con la IA. Puedes seguir usando las guías."};
@@ -33,5 +38,13 @@
     try{return await send({mode:"status"});}
     catch{return {ok:false,configured:false,code:"NETWORK_ERROR"};}
   }
-  window.GOXY_AI = Object.freeze({ask,status});
+  async function account(topic,{signal}={}){
+    if(!['payment','missions','promotions'].includes(topic))return {ok:false,code:'TOPIC_UNSUPPORTED'};
+    try{return await send({mode:"account",topic},{signal});}
+    catch(error){
+      if(error?.name==='AbortError')return {ok:false,code:'ABORTED'};
+      return {ok:false,code:'NETWORK_ERROR',message:'No pude consultar Mi Espacio en este momento.'};
+    }
+  }
+  window.GOXY_AI = Object.freeze({ask,status,account});
 })();

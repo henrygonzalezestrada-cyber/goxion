@@ -65,8 +65,8 @@ const bridge=readFileSync(join(root,'goxy-ai-client.js'),'utf8');
 assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'Cliente conecta a Edge, no a Groq');
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
-assert.ok(html.includes('goxy-ai-client.js?v=goxy-f7'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f8-1') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('goxy-ai-client.js?v=goxy-f9'),'Cargar puente seguro F7');
+assert.ok(html.includes('mascota.js?v=goxy-f9') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
@@ -108,7 +108,7 @@ class Element {
   }
   querySelectorAll(sel) {
     if(this.name==='support'&&sel==='.gxai-mascot')return [robotHero,robotAvatar];
-    if(this.name==='layer'&&sel==='.gxai-suggestion')return [btnAccess,btnAccount,btnCode,btnError];
+    if(this.name==='layer'&&sel==='.gxai-suggestion')return [btnAccess,btnAccount,btnCode,btnMissions,btnPromos];
     if(this.name==='dialog'&&sel.startsWith('button'))return [closeButton];
     return [];
   }
@@ -121,9 +121,9 @@ const backdrop=new Element('backdrop'),phase=new Element('phase'),composer=new E
 const input=new Element('input'),send=new Element('send'),disclaimer=new Element('disclaimer');
 const aiPanel=new Element('aiPanel'),aiTitle=new Element('aiTitle'),
   aiDescription=new Element('aiDescription'),aiStart=new Element('aiStart');
-const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error');
+const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error'),btnMissions=new Element('missions'),btnPromos=new Element('promos');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
-btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';
+btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';btnMissions.dataset.prompt='misiones';btnPromos.dataset.prompt='promociones';
 let captures=0, humanOpens=0, switches=[];
 mascotButton.setPointerCapture=()=>{captures++;};
 const officialHuman=new Element('human');officialHuman.click=()=>{humanOpens++;};
@@ -148,6 +148,7 @@ const win={
   },
   GOXY_AI:{
     status:()=>Promise.resolve({ok:true,configured:false}),
+    account:()=>Promise.resolve({ok:true,answer:'Lectura de cuenta desde GOXION.',source:'official_account'}),
     ask:()=>Promise.resolve({ok:false,code:'AI_NOT_CONFIGURED',
       message:'La conexión de IA está preparada, pero falta configurar la clave.'})
   },
@@ -280,7 +281,7 @@ assert.ok(currentChoice('human'),'Ofrecer contacto al requerir aprobación');
 
 // Cerrar en mitad de la búsqueda debe cancelar respuesta, timer y estado.
 clickDemo(btnAccount);
-assert.equal(api.chatState(),'thinking');
+assert.equal(api.chatState(),'speaking');
 closeButton.fire('click');
 assert.equal(layer.classList.contains('gxai-visible'),false);
 assert.equal(api.chatState(),'idle');
@@ -399,5 +400,38 @@ assert.equal(sent[1].platform,'Netflix','Contexto sólo plataforma');
 assert.equal(sent[1].issueIndex,undefined,'La conversación no exige un índice de guía');
 assert.ok(!('cliente_id' in sent[1]),'No enviar ID de cliente');
 flush();
+input.value='¿Y si ya hice eso?';composer.fire('submit');
+await Promise.resolve();
+assert.equal(sent.length,3,'Segunda pregunta usa IA solo cuando el usuario la eligió');
+assert.deepEqual(sent[2].history,[
+  {role:'user',content:'Hola Goxy, mi Netflix se congela ¿qué hago?'},
+  {role:'assistant',content:'Respuesta de prueba desde backend autorizado.'}
+], 'La segunda pregunta conserva el último turno, no información de la cuenta');
+flush();
+input.value='Qué puedes hacer?';composer.fire('submit');
+assert.equal(sent.length,3,'Pregunta de capacidades no debe consumir IA');
+flush();
+input.value='Ya coloqué el código pero no responde';composer.fire('submit');
+assert.equal(sent.length,3,'Autorizar código requiere humano sin gasto adicional de IA');
+assert.ok(currentChoice('human'),'Escalar al asesor sin pedir el código');
+flush();
 closeButton.fire('click');
-console.log('GOXION Goxy F8.1: estado Groq verificado, cupo restante, chat directo y regresiones PASS.');
+// Nueva ruta: consulta de misiones por backend propio sin gastar IA.
+openButton.fire('click');
+flush();
+let askCount=sent.length,accountCount=0;
+win.GOXY_AI.account=async(topic)=>{
+  accountCount++;
+  return {ok:true,source:'official_account',answer:'Misiones verificadas en el servidor: 2 pendientes.',topic};
+};
+clickDemo(btnMissions);
+await Promise.resolve();
+assert.equal(accountCount,1,'Consultar misiones via backend');
+assert.equal(sent.length,askCount,'No gastar IA en misiones');
+assert.ok(scroll.children.some(x=>x.textContent.includes('Misiones verificadas')),'Respuesta real sin Groq');
+flush();
+input.value='Hola';composer.fire('submit');
+assert.equal(sent.length,askCount,'Saludar no consume cuota IA');
+flush();
+closeButton.fire('click');
+console.log('GOXION Goxy F9: guías, cuenta sin IA, saludo sin IA, sesiones y chat PASS.');
