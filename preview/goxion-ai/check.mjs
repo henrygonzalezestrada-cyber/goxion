@@ -322,13 +322,16 @@ assert.equal(timers.size,0,'No dejar temporizadores después de cerrar');
 flush();
 assert.equal(scroll.children.length,afterCancel,'No aparece respuesta tras cerrar');
 
-// Escalamiento: usar SOLO contacto humano existente, sin PIN, y cerrar chat.
+// Escalamiento: si aún no hay referencia de servicio verificable, no
+// construir ficha ni enviar datos a terceros. Mantener las guías disponibles.
 openButton.fire('click');flush();
 clickDemo(btnAccess);flush();
 clickChoice(currentChoice('platform','Disney+'));flush();
 clickChoice(currentChoice('human'));
-assert.equal(humanOpens,1,'Usar contacto humano oficial existente');
-assert.equal(layer.classList.contains('gxai-visible'),false);
+assert.equal(humanOpens,0,'Nunca abrir WhatsApp sin confirmación');
+assert.equal(layer.classList.contains('gxai-visible'),true);
+assert.ok(currentChoice('account'),'Sin referencia, remitir a Mi Espacio');
+closeButton.fire('click');
 
 // Sesión inválida mientras se procesa: cerrar sin entregar respuesta.
 openButton.fire('click');
