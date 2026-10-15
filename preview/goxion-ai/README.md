@@ -1,7 +1,7 @@
-# GOXION · Goxy F6 · Guías reales de soporte + scroll natural
+# GOXION · Goxy F7 · IA segura opcional + guías reales + scroll natural
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f6
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -41,3 +41,10 @@ Flujo: el cliente, ya autenticado, abre el chat → selecciona plataforma → se
 **Aún debe revisarse físicamente en Safari iPhone** que un deslizamiento vertical sobre la cabeza desplaza la página y uno horizontal produce corazones, antes de dar por cerrado el comportamiento táctil.
 
 Próxima fase: orquestador más amplio y backend autorizado para consultas privadas, luego IA con restricciones de uso y escalamiento humano; no asumir permisos por el mero hecho de estar autenticado en JavaScript.
+
+## Fase 4 · Conexión de IA aislada
+Se añadió un puente cliente sin secretos y una nueva Supabase Edge Function `goxy-ai-beta` con validación HMAC del token, validación del estado del cliente, cuota transaccional de 8 preguntas/24 h y protección contra envío accidental de PIN/correos/códigos.
+
+**La IA requiere una clave `GROQ_API_KEY` configurada en Supabase.** Si no existe, Goxy muestra «IA pendiente de activación» y las guías/canal humano siguen funcionando. Las preguntas con IA solo se habilitan al elegir primero una situación oficial; no consulta ni modifica datos privados de Mi Espacio.
+
+Documento de arquitectura y pasos de activación: [GOXY F7 Gateway IA Beta](../../docs/GOXY_F7_GATEWAY_IA_BETA.md).
