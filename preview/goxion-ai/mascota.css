@@ -125,3 +125,12 @@
 #view-soporte .gxai-mascot-button .gxai-canvas-slot,
 #view-soporte .gxai-mascot-button .gxai-canvas-slot>span,
 #view-soporte .gxai-mascot-button canvas{touch-action:pan-y!important}
+
+/* Goxy F6 — opciones del catálogo compartido de soporte. */
+#view-soporte .gxai-choices{display:flex;flex-wrap:wrap;gap:7px;margin:2px 0 8px;align-self:stretch;max-width:100%}
+#view-soporte .gxai-choice{display:inline-flex;align-items:center;justify-content:center;min-height:36px;max-width:100%;border-radius:20px;border:1px solid rgba(124,77,255,.28);background:linear-gradient(115deg,rgba(124,77,255,.11),rgba(0,242,254,.045));color:#e7eafb;font:500 11px/1.4 Poppins,sans-serif;padding:8px 12px;text-align:left;overflow-wrap:anywhere;white-space:normal;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#view-soporte .gxai-choice:hover{border-color:rgba(0,242,254,.42);background:rgba(0,242,254,.095)}
+#view-soporte .gxai-choice:focus-visible{outline:2px solid #00f2fe;outline-offset:3px}
+#view-soporte .gxai-chat-scroll{scrollbar-width:thin;scrollbar-color:rgba(124,77,255,.4) transparent}
+#view-soporte .gxai-typing[aria-label]{pointer-events:none}
+@media(prefers-reduced-motion:reduce){#view-soporte .gxai-choice{transition:none!important}}
