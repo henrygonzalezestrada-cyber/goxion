@@ -1,4 +1,4 @@
-// GOXION · Goxy F12 · handoff WhatsApp consentido y soporte seguro.
+// GOXION · Goxy F13 · pagos oficiales, contexto y cola inteligente de IA.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -15,6 +15,7 @@ const adapter=readFileSync(join(root,'goxy-support-knowledge.js'),'utf8');
 const clientContextSrc=readFileSync(join(root,'goxy-client-context.js'),'utf8');
 const accessSrc=readFileSync(join(root,'goxy-access-routing.js'),'utf8');
 const handoffSrc=readFileSync(join(root,'goxy-whatsapp-handoff.js'),'utf8');
+const paymentSrc=readFileSync(join(root,'goxy-payment-read.js'),'utf8');
 const knowledgeWindow={};
 new Function('window',official)(knowledgeWindow);
 new Function('window',adapter)(knowledgeWindow);
@@ -80,10 +81,11 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f10'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f12') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('mascota.js?v=goxy-f13') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f12') &&
  html.includes('goxy-access-routing.js?v=goxy-f12') &&
- html.includes('goxy-whatsapp-handoff.js?v=goxy-f12'),'Cargar F12 antes del chat');
+ html.includes('goxy-whatsapp-handoff.js?v=goxy-f12') &&
+ html.includes('goxy-payment-read.js?v=goxy-f13'),'Cargar lectura financiera F13 antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(js.includes('parent.visualViewport') && js.includes('syncChatViewport'),'Leer viewport real padre');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
@@ -141,7 +143,7 @@ const aiPanel=new Element('aiPanel'),aiTitle=new Element('aiTitle'),
 const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error'),btnMissions=new Element('missions'),btnPromos=new Element('promos');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
 btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';btnMissions.dataset.prompt='misiones';btnPromos.dataset.prompt='promociones';
-let captures=0, humanOpens=0, switches=[];
+let captures=0, humanOpens=0, switches=[], payNavigation=0;
 mascotButton.setPointerCapture=()=>{captures++;};
 const officialHuman=new Element('human');officialHuman.click=()=>{humanOpens++;};
 const section=new Element('support'),card=new Element('card');
@@ -155,7 +157,7 @@ const doc={
 };
 let authed=true, reduced=false, authOpens=0, mounts=0;
 const win={
-  GOXION_CORE:{STORAGE:{CLIENT_TOKEN:'demo-token'}},
+  GOXION_CORE:{STORAGE:{CLIENT_TOKEN:'demo-token'},endpoint:()=>'/estado-financiero-b2-beta'},
   getCurrentClientKey:()=>authed?'test-client':'',
   GOXY_ROBOT:{mountAll:()=>mounts++},
   GOXY_SUPPORT:knowledge,
@@ -177,6 +179,7 @@ const win={
       message:'La conexión de IA está preparada, pero falta configurar la clave.'})
   },
   switchTab:(name)=>switches.push(name),
+  irAlTicket:()=>payNavigation++,
   matchMedia:()=>({matches:reduced}),
   openAuthSheet:()=>authOpens++,
   addEventListener:()=>{}
@@ -201,6 +204,13 @@ const vv={height:844,offsetTop:0,handlers:{},
   addEventListener(type,fn){this.handlers[type]=fn;}};
 win.parent={innerHeight:844,visualViewport:vv,addEventListener(){}};
 const store={getItem:()=>authed?'fake-token':''};
+const charge=(id,day,ordinal)=>({cargo_id:id,acceso_id:'access-'+id,servicio:'ViX Premium',ordinal,
+  vence:'2026-11-'+day,total_centavos:4600,pagado:false});
+const financialResponse={ok:true,modo:'b2_multifecha',calendario_financiero:{ok:true,cobrable:true,
+  ciclo_id:'22222222-2222-2222-2222-222222222222',
+  total_pendiente_centavos:9200,cargos:[charge('uno','06',1),charge('dos','30',2)]}};
+new Function('window','localStorage','fetch',paymentSrc)(win,store,
+  async()=>({ok:true,json:async()=>financialResponse}));
 const timers=new Map();let nextTimer=0;
 function schedule(fn,ms){const id=++nextTimer;timers.set(id,{fn,ms});return id;}
 function unschedule(id){timers.delete(id);}
@@ -325,7 +335,7 @@ assert.ok(currentChoice('human'),'Ofrecer contacto al requerir aprobación');
 
 // Cerrar en mitad de la búsqueda debe cancelar respuesta, timer y estado.
 clickDemo(btnAccount);
-assert.equal(api.chatState(),'speaking');
+assert.equal(api.chatState(),'thinking');
 closeButton.fire('click');
 assert.equal(layer.classList.contains('gxai-visible'),false);
 assert.equal(api.chatState(),'idle');
@@ -431,7 +441,11 @@ assert.ok(!('cliente_id' in sent[0]),'No filtrar ID cliente a Groq');
 assert.ok(disclaimer.textContent.includes('7'),'Mostrar saldo IA después de respuesta');
 flush();
 input.value='¿Y si ya hice eso?';composer.fire('submit');
-await Promise.resolve();
+assert.equal(api.aiQueued(),true,'Nueva consulta espera sin mostrar error de tasa');
+input.value='En todos los dispositivos';composer.fire('submit');
+assert.equal(api.aiQueued(),true,'Conservar una única pregunta pendiente');
+flush();await Promise.resolve();
+assert.equal(sent[1].message,'En todos los dispositivos','Tras la espera solo enviar último mensaje');
 assert.equal(sent.length,2,'Continuidad de IA solo tras necesitarla');
 assert.deepEqual(sent[1].history,[
   {role:'user',content:'Se congela al reproducir un video'},
@@ -452,7 +466,7 @@ openButton.fire('click');flush();await Promise.resolve();
 input.value='Netflix actualizar hogar';composer.fire('submit');flush();
 assert.ok(currentChoice('unresolved'),'La guía conocida se resuelve gratis primero');
 clickChoice(currentChoice('unresolved'));
-await Promise.resolve();
+flush();await Promise.resolve();
 assert.equal(sent.length,3,'Si Hogar sigue fallando, IA explica diagnóstico');
 assert.equal(sent[2].platform,'Netflix');
 assert.equal(sent[2].issueIndex,1,'Mantener contexto de la guía oficial');
@@ -477,6 +491,42 @@ assert.equal(sent.length,askCount,'Saludar no consume cuota IA');
 input.value='¿Qué puedo hacer?';composer.fire('submit');
 assert.equal(sent.length,askCount,'Explicar capacidades no debe consumir IA');
 flush();
+closeButton.fire('click');
+// F13: consultar importe por perfil desde el estado FINANCIERO real sin gastar Groq.
+openButton.fire('click');flush();await Promise.resolve();
+const initialSent=sent.length;
+input.value='Cuánto tengo que pagar';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.equal(sent.length,initialSent,'Las cuentas jamás consultan Groq');
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('6 de noviembre de 2026')),
+  'Un perfil muestra su vencimiento confirmado');
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('30 de noviembre de 2026')),
+  'Segunda fecha independiente');
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('$92.00')),
+  'Todo junto usa importes ya calculados en backend');
+assert.ok(currentChoice('pay-one'),'Permitir consultar perfiles separados');
+clickChoice(currentChoice('pay-next'));await Promise.resolve();await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('Total de esa fecha: $46.00')),
+  'Próximo cobro no equivale al total de todos los servicios');
+input.value='Cuánto tengo que pagar de ViX';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('Estos son los pagos de ViX')),
+ 'Debe responder por una plataforma, sin confundirla con soporte técnico');
+clickChoice(currentChoice('pay-open'));
+assert.equal(payNavigation,1,'Redirigir a Index oficial existente, sin cobro paralelo');
+openButton.fire('click');flush();
+const beforeCatalog=accountCount;
+win.GOXY_AI.account=async(topic)=>{accountCount++;return {ok:true,
+  answer:topic==='missions'?'La misión "Navega por nuestro catálogo" figura pendiente en tu ronda actual. Sigue las instrucciones de esa misión en Mi Espacio; si requiere una validación, GOXION debe confirmarla allí.':'Consulta oficial.',topic};};
+input.value='Qué tengo que hacer en la misión ver catálogo';composer.fire('submit');
+await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('abre la pestaña Catálogo')),
+ 'Goxy explica acción de misión real, no muestra plataformas de soporte');
+assert.ok(currentChoice('catalog'),'Ofrecer apertura directa del Catálogo');
+input.value='Y qué hago en ver catálogo';composer.fire('submit');
+await Promise.resolve();flush();
+assert.equal(accountCount,beforeCatalog+2,'La referencia de seguimiento conserva el contexto de misión');
+assert.equal(sent.length,initialSent,'Misiones no gastan IA');
 closeButton.fire('click');
 // iPhone: campo >=16px, teclado encoge la capa y se recupera tras cerrar.
 assert.ok(css.includes('font-size:16px!important'),'Evitar zoom de Safari sobre el input');
@@ -516,4 +566,4 @@ assert.ok(currentChoice('send-handoff'),'Revisar ficha de Netflix');
 clickChoice(currentChoice('send-handoff'));
 assert.equal(openedWhatsApp.length,1,'Solo confirmar abre WhatsApp');
 assert.ok(openedWhatsApp[0].includes('GOXION')&&!openedWhatsApp[0].includes('3321'));
-console.log('GOXION Goxy F12: WhatsApp bajo consentimiento, ViX QR, rutas de Mi Espacio y Safari PASS.');
+console.log('GOXION Goxy F13: pagos B2, espera IA, misiones y WhatsApp seguro PASS.');

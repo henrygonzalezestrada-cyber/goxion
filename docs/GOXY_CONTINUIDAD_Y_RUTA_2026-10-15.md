@@ -183,3 +183,21 @@
 ## 10. Texto exacto sugerido para comenzar el próximo chat
 
 > **Continuemos GOXION / Goxy desde el último estado real.** Repositorio `henrygonzalezestrada-cyber/goxion`. Antes de editar, abre y lee COMPLETO `docs/GOXY_CONTINUIDAD_Y_RUTA_2026-10-15.md`, `AGENTS.md`, el contrato visual y los archivos actuales de `preview/goxion-ai/`. Goxy F12 está fusionada mediante PR #120 y publicada **solo en beta**, pero no aprobada aún en Safari físico; Issue #119. El objetivo inmediato es validar/corregir F12 (Premium/QR, múltiples servicios, PIN/contraseña por vistas oficiales y ficha WhatsApp revisable; el CLIENTE pulsa Enviar). NO toques Soporte oficial ni B2. Usa los conectores GitHub/Supabase, implementa tú los cambios, haz QA de regresión y confirma GitHub Pages antes de entregarme la URL. Muéstrame qué queda pendiente sin asumir que mocks equivalen a pruebas reales.
+
+
+---
+
+## 11. Continuación F13 — revisión de capturas y evolución de la beta (15/oct/2026)
+**Contexto:** el usuario probó la beta F12 en Safari y mostró cuatro capturas con: pago que devolvía solo «ve a Mi Espacio»; pregunta sobre la misión «ver catálogo» que terminaba en menú de plataformas; seguimiento de la misión con respuesta demasiado genérica; y consulta técnica rápida que producía «Goxy necesita una pequeña pausa» tras Groq. Solicitó que Goxy se convierta en interfaz de consulta útil y natural, sin reescribir el proyecto.
+
+**Implementación F13 aislada (rama `beta/goxy-f13-pagos-dialogo-cooldown`):**
+- Lectura financiera cliente **solo lectura y autenticada** desde `estado-financiero-b2-beta` / `mi_estado`: fuente oficial compartida por Index/Mi Espacio. B2: fecha efectiva por cargo, nombre y ordinal del perfil, importe exacto en centavos, total pendiente validado contra la cotización, elección próximo/todos/plataforma/perfil. Fecha única: `estado_financiero` con fecha_corte y `total_actual` en pesos. Sin motor nuevo, sin pagos ni cifras extrapoladas.
+- Botón **Realizar mi pago** llama a la función `irAlTicket()` original, no construye rutas manuales ni omite comprobaciones de régimen financiero. No supone pago realizado.
+- Seguimiento contextual de misiones; la misión del catálogo sigue el contrato de la pestaña `catalogo` ya implementado, no una guía de plataforma.
+- Burbujas y opciones con aparición visual progresiva/indicador animado, sin bloquear Safari ni movimiento reducido.
+- Para respuestas Groq, consulta en espera y última pregunta gana; no se obliga a reescribir ni se malgasta solicitud durante la espera de 20 s. Si llega `RATE_LIMIT` transitorio con `retry_after` corto, un reintento programado; si es largo, se muestra fallback gratuito. No modifica la cuota de 8/24 h en servidor.
+- Archivos de ejecución F13: `preview/goxion-ai/goxy-payment-read.js` (nuevo), `mascota.js`, `mascota.css` e `index.html`; ampliar `check.mjs`.
+- Verificación preliminar **PASS**: 179 aserciones ejecutadas sobre el mismo harness JavaScript con DOM simulado en runtime aislado y prueba específica del lector financiero (dos vencimientos de ViX + fecha única); los montos de prueba no son cuentas reales. F12 permanece tal como estaba.
+- **F13 NO está aceptada en Safari físico**. No considerar que las cuatro capturas previas demuestren las nuevas funciones. Antes de cualquier integración oficial, comprobar en sesión real: «próxima mensualidad», «todo junto», «ViX perfil 1/2», fecha única, saldo B2 en revisión, redirección a Index, misión catálogo, último mensaje mientras espera Groq, 8/24 h, cerrar chat/cambiar cliente y privacidad.
+
+**No concluir que la UI oficial cambió:** las modificaciones son de la beta. Documentar PR/merge/Pages/CI al publicarse. Mantener pendiente Issue #119 de aceptación F12. El fallo histórico de CI `Browser smoke` de F12 fue un timeout de splash de Ayuda en WebKit, sin prueba de que Goxy lo originara.

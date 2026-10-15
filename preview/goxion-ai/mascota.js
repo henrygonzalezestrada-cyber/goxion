@@ -136,6 +136,7 @@
   const clientContext = window.GOXY_CLIENT_CONTEXT;
   const accessRouter = window.GOXY_ACCESS;
   const handoff = window.GOXY_HANDOFF;
+  const payment = window.GOXY_PAYMENT;
   let myPlatforms = [];
   let myContextReady = false;
   function applyMyPlatforms(snapshot) {
@@ -171,6 +172,9 @@
   let accessStage = null;
   let caseContext = null;
   let pendingHandoff = null;
+  let lastAccountTopic = null;
+  let pendingAI = null;
+  let lastAIAnswerAt = 0, lastAIAccount = '';
   // Solo memoria local de esta sesión de chat: nunca localStorage, ni BD.
   const conversation = [];
   function resetConversation() { conversation.length = 0; }
@@ -235,7 +239,7 @@
     if (typing) return;
     typing = doc.createElement('div');
     typing.className = 'gxai-typing';
-    typing.setAttribute('aria-label', 'Goxy está procesando la demostración');
+    typing.setAttribute('aria-label', 'Goxy está preparando la respuesta');
     typing.innerHTML = '<i></i><i></i><i></i>';
     scroll.appendChild(typing);
     scroll.scrollTop = scroll.scrollHeight;
@@ -254,6 +258,7 @@
   }
   function cancelFlow() {
     activeFlow++;
+    pendingAI = null;
     aiController?.abort();
     aiController = null;
     flowTimers.forEach(timer => clearTimeout(timer));
@@ -327,6 +332,7 @@
     accessStage = null;
     caseContext = null;
     pendingHandoff = null;
+    lastAccountTopic = null;
     resetConversation();
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
@@ -381,6 +387,7 @@
     accessStage = null;
     caseContext = null;
     pendingHandoff = null;
+    lastAccountTopic = null;
     resetConversation();
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
@@ -400,6 +407,7 @@
     node.textContent = text;
     scroll.appendChild(node);
     scroll.scrollTop = scroll.scrollHeight;
+    return node;
   }
   const questions = Object.freeze({
     acceso: {
@@ -492,6 +500,7 @@
       if (Number.isInteger(item.serviceIndex)) button.dataset.serviceIndex=String(item.serviceIndex);
       if(item.device)button.dataset.device=item.device;
       if (item.view) button.dataset.view=item.view;
+      if (item.chargeId) button.dataset.chargeId=item.chargeId;
       choices.appendChild(button);
     });
     scroll.appendChild(choices);
@@ -577,103 +586,161 @@
 
   // IA F7: solo se consulta el backend si el usuario seleccionó una guía
   // canónica. Nunca enviar fichas cliente, PIN ni valores de Mi Espacio.
-  async function askAI(query) {
-    if (!active || busy || !authenticated() || !chosenGuide) return;
+  // La cuota del servidor es definitiva: esta cola solo gestiona su pausa corta.
+  // Si llega otra pregunta durante la espera, se conserva únicamente la última.
+  function queueAI(text,waitMs,chosen,alreadyShown=false,retryCount=0){
+    if(!active||!authenticated())return;
+    if(!alreadyShown)bubble(text.slice(0,240),true);
+    clearChoices();
+    pendingAI={text,chosen,retryCount,
+      identity:String(window.getCurrentClientKey?.()||'')};
+    chatTransition('thinking');
+    chatPhase.textContent='Preparando tu siguiente consulta…';
+    showTyping();
+    setBusy(false);
+    const flow=++activeFlow;
+    later(flow,Math.min(35000,Math.max(400,waitMs)),()=>{
+      const next=pendingAI;pendingAI=null;
+      if(!next||next.identity!==String(window.getCurrentClientKey?.()||''))return;
+      hideTyping();
+      void askAI(next.text,{alreadyShown:true,overrideGuide:next.chosen,
+        cooldownBypass:true,retryCount:next.retryCount});
+    });
+  }
+  async function askAI(query,options={}){
+    const chosen=options.overrideGuide||chosenGuide;
+    if(!active||busy||!authenticated()||!chosen)return;
     const text=String(query||'').trim();
-    if (!text || /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu.test(text)) {
+    if(!text||/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu.test(text)){
       bubble('Por seguridad no compartas correos, códigos, PIN o datos personales. Describe solamente la falla.',false);
-      chatTransition('error');
+      chatTransition('error');return;
+    }
+    const identity=String(window.getCurrentClientKey?.()||'');
+    const remaining=lastAIAccount===identity?21000-(Date.now()-lastAIAnswerAt):0;
+    if(!options.cooldownBypass&&remaining>0){
+      queueAI(text,remaining,chosen,options.alreadyShown===true,0);
       return;
     }
     clearChoices();
-    bubble(text.slice(0,240),true);
+    if(!options.alreadyShown)bubble(text.slice(0,240),true);
     setBusy(true);
     chatTransition('thinking');
     showTyping();
     const current=++activeFlow;
     aiController=new AbortController();
-    const chosen={...chosenGuide};
     const reply=await ai.ask({message:text,...chosen,history:[...conversation],signal:aiController.signal});
-    if(!active || current!==activeFlow || !authenticated())return;
+    if(!active||current!==activeFlow||!authenticated())return;
     aiController=null;
+    if(reply.code==='RATE_LIMIT'){
+      const seconds=Number(reply.retry_after);
+      if(Number.isFinite(seconds)&&seconds>0&&seconds<=34&&(options.retryCount||0)<1){
+        queueAI(text,(seconds+1)*1000,chosen,true,(options.retryCount||0)+1);
+        return;
+      }
+    }
     hideTyping();
-    if(reply.ok && typeof reply.answer==='string'){
+    if(reply.ok&&typeof reply.answer==='string'){
+      lastAIAnswerAt=Date.now();lastAIAccount=identity;
       chatTransition('speaking');
       bubble(reply.answer,false);
       keepTurn(text,reply.answer);
       if(Number.isInteger(reply.remaining)){
-        disclaimer.textContent = 'Te quedan '+reply.remaining+
+        disclaimer.textContent='Te quedan '+reply.remaining+
           ' consultas IA de tu cupo móvil de 24 h · Nunca compartas códigos ni PIN.';
       }
       later(current,950,()=>chatTransition('happy'));
     }else if(reply.code!=='ABORTED'){
       chatTransition('error');
-      bubble(reply.message||'Goxy no puede conectarse con la IA todavía. La guía oficial y el asesor siguen disponibles.',false);
-      if(reply.code==='AI_NOT_CONFIGURED') {
-        aiConfigured=false;
-        aiMode=false;
+      bubble(reply.code==='RATE_LIMIT'
+        ? 'La asistencia avanzada sigue en pausa. Puedes continuar con las guías y el asesor sin gastar IA.'
+        : reply.message||'Goxy no puede conectar con la IA todavía. Las guías siguen disponibles.',false);
+      if(reply.code==='AI_NOT_CONFIGURED'){
+        aiConfigured=false;aiMode=false;
         setAIStatus('pending','Falta configurar la clave privada de Groq en Supabase. Las guías permanecen disponibles.');
       }
     }
     later(current,1700,()=>{
       setBusy(false);
       chatTransition('listening');
-      showChoices([
-        {kind:'human',label:'Hablar con asesor humano'},
-        {kind:'issues',platform:chosen.platform,label:'Ver otras soluciones'}
-      ]);
+      showChoices([{kind:'human',label:'Hablar con asesor humano'},
+        {kind:'issues',platform:chosen.platform,label:'Ver otras soluciones'}]);
     });
   }
   // Datos personales SOLO con el backend autenticado de GOXION.
   // El resultado se presenta al usuario sin enviarse al modelo de Groq.
-  async function accountRead(topic,query) {
-    if(!active || busy || !authenticated())return;
+  // La lectura B2 proviene del mismo cotizador oficial que Index/Mi Espacio.
+  // Goxy no reproduce descuentos, mora ni precios; sólo presenta el resultado.
+  async function accountRead(topic,query,paymentMode='all',chargeId=null){
+    if(!active||busy||!authenticated())return;
     const text=String(query||'').trim();
-    clearChoices();
-    bubble(text.slice(0,240),true);
-    setBusy(true);
-    chatTransition('searching');
-    showTyping();
+    lastAccountTopic=topic;
+    clearChoices();bubble(text.slice(0,240),true);
+    setBusy(true);chatTransition('searching');showTyping();
     const flow=++activeFlow;
     aiController=new AbortController();
-    const response=await ai.account(topic,{signal:aiController.signal,message:text});
-    if(!active || flow!==activeFlow || !authenticated())return;
+    const response=topic==='payment'
+      ? await payment.read({signal:aiController.signal})
+      : await ai.account(topic,{signal:aiController.signal,message:text});
+    if(!active||flow!==activeFlow||!authenticated())return;
     aiController=null;
-    hideTyping();
-    if(response.ok===true && typeof response.answer==='string'){
+    const hinted=topic==='payment'&&paymentMode==='all'
+      ?knowledge.resolvePlatform(text):null;
+    const viewMode=hinted?'platform':paymentMode;
+    const financial=topic==='payment'
+      ?payment.describe(response,viewMode,hinted||chargeId):null;
+    const success=topic==='payment'?Boolean(financial):
+      response.ok===true&&typeof response.answer==='string';
+    if(success){
       chatTransition('speaking');
-      bubble(response.answer,false);
+      let answer=financial?.answer||response.answer;
+      const catalogQuestion=topic==='missions'&&/\bcatalogo\b/.test(knowledge.normalize(text));
+      const catalogMission=catalogQuestion&&/\bcatalogo\b/.test(knowledge.normalize(answer))&&
+        /figura (?:pendiente|completada)/.test(answer);
+      if(catalogMission){
+        answer=answer.replace('Sigue las instrucciones de esa misión en Mi Espacio; si requiere una validación, GOXION debe confirmarla allí.',
+          'Para realizarla, abre la pestaña Catálogo de Mi Espacio y visita el catálogo. GOXION comprueba el avance de esa misión.');
+      }
+      const reply=bubble(answer,false);
+      reply.classList.add('gxai-delayed-bubble');
+      showChoices(topic==='payment'?financial.choices:[
+        {kind:'account',label:'Abrir Mi Espacio'},
+        ...(catalogMission?[{kind:'catalog',label:'Abrir catálogo'}]:[]),
+        ...(topic==='missions'?[{kind:'promotions',label:'Ver promociones'}]:
+          [{kind:'missions',label:'Mis misiones'}]),
+        {kind:'platforms',label:'Ayuda con mis servicios'}
+      ]);
+      choices?.classList.add('gxai-delayed-choices');
     }else if(response.code!=='ABORTED'){
       chatTransition('error');
       bubble(response.message||'No pude comprobar ese dato ahora. Consulta Mi Espacio para información oficial.',false);
+      showChoices([{kind:'account',label:'Abrir Mi Espacio'}]);
     }
-    later(flow,350,()=>{
-      setBusy(false);
-      chatTransition('listening');
-      showChoices([
-        {kind:'account',label:'Abrir Mi Espacio'},
-        ...(topic==='missions'
-          ? [{kind:'promotions',label:'Ver promociones'}]
-          : topic==='promotions' ? [{kind:'missions',label:'Mis misiones'}] : [
-            {kind:'missions',label:'Mis misiones'},
-            {kind:'promotions',label:'Promociones'}]),
-        {kind:'platforms',label:'Ayuda con mis servicios'}
-      ]);
+    later(flow,560,()=>{
+      hideTyping();setBusy(false);chatTransition('listening');
     });
   }
-  function respondFree(text,reply,options=[]) {
-    if(!active || busy || !authenticated())return;
-    clearChoices();bubble(text.slice(0,240),true);bubble(reply,false);
-    chatTransition('speaking');
-    if(options.length)showChoices(options);
+  function respondFree(text,reply,options=[]){
+    if(!active||busy||!authenticated())return;
+    clearChoices();bubble(text.slice(0,240),true);
+    chatTransition('thinking');showTyping();
+    const message=bubble(reply,false);
+    message.classList.add('gxai-delayed-bubble');
+    if(options.length){
+      showChoices(options);
+      choices?.classList.add('gxai-delayed-choices');
+    }
     const id=++activeFlow;
-    later(id,250,()=>chatTransition('listening'));
+    later(id,520,()=>{hideTyping();chatTransition('speaking');});
+    later(id,850,()=>chatTransition('listening'));
   }
   function accountTopic(text){
     const normal=knowledge.normalize(text);
     if(/\b(mision(?:es)?|tareas?|retos?|cupon(?:es)?)\b/.test(normal))return 'missions';
+    if(lastAccountTopic==='missions'&&/\b(catalogo|referid|encuesta|opinion|comentario)\b/.test(normal))
+      return 'missions';
     if(/\b(promocion(?:es)?|ofertas?|descuentos? especiales?)\b/.test(normal))return 'promotions';
-    if(/\b(pago|pagar|saldo|corte|vencimient[oa]|fecha de pago|estado de cuenta|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))return 'payment';
+    if(/\b(pago|pagar|pague|pagare|debo|deuda|mensualidad(?:es)?|proximo cobro|proxima fecha|cuando vence|vencimient[oa]|fecha de pago|estado de cuenta|saldo|corte|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))
+      return 'payment';
     return null;
   }
   // F11: clasificador LOCAL. Decidir no requiere otra llamada a Groq.
@@ -965,6 +1032,15 @@
       return;
     }
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
+    if (type === 'catalog') { closeChat(); window.switchTab?.('catalogo'); return; }
+    if (type === 'pay-open') { closeChat(); window.irAlTicket?.(); return; }
+    if (type === 'pay-next' || type === 'pay-all' || type === 'pay-one' || type === 'pay-platform') {
+      void accountRead('payment',type==='pay-next'?'Mi próximo vencimiento':
+        type==='pay-all'?'Todo lo pendiente':'Pago de este perfil',
+        type==='pay-next'?'next':type==='pay-one'?'one':type==='pay-platform'?'platform':'all',
+        type==='pay-one'?button.dataset.chargeId:type==='pay-platform'?platform:null);
+      return;
+    }
     if (type === 'platforms') {
       chosenPlatform = null;
       runDemo({prompt:'Ver plataformas',step:'searching',
@@ -1116,7 +1192,7 @@
       runDemo(entry,null,showPlatforms);
     } else if(button.dataset.prompt === 'cuenta'){
       respondFree('Quiero consultar mi cuenta',
-        'Puedo consultar tus misiones y las promociones publicadas. Para importes y fechas exactas, utiliza el estado de cuenta oficial porque contempla varios vencimientos, mora y prórrogas.',
+        'Puedo mostrarte los próximos vencimientos, los pagos por perfil y el saldo confirmado. También reviso tus misiones y promociones.',
         [{kind:'payment',label:'Próximo pago'},{kind:'missions',label:'Mis misiones'},
          {kind:'promotions',label:'Promociones'},{kind:'account',label:'Abrir Mi Espacio'}]);
     } else if(button.dataset.prompt==='misiones'||button.dataset.prompt==='promociones'){
@@ -1130,10 +1206,25 @@
     const text = messageInput.value.trim();
     if (!text) return;
     messageInput.value = '';
+    if(pendingAI){
+      // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
+      const local=knowledge.normalize(text);
+      if(accountTopic(text) || /^(hola(?: goxy)?|que puedes hacer|que puedo hacer|que haces|buenos dias|buenas tardes|buenas noches)$/.test(local) ||
+         (knowledge.resolvePlatform(text) &&
+         knowledge.resolvePlatform(text)!==pendingAI.chosen?.platform)){
+        cancelFlow();
+        handleText(text);
+        return;
+      }
+      bubble(text.slice(0,240),true);
+      pendingAI.text=text;
+      chatPhase.textContent='Recibí tu última pregunta; esperando el turno de IA…';
+      return;
+    }
     handleText(text);
   });
   messageInput.addEventListener('input', () => {
-    if (active && !busy && authenticated()) chatTransition('listening');
+    if (active && !busy && !pendingAI && authenticated()) chatTransition('listening');
   });
   doc.addEventListener('keydown', event => {
     if (!active) return;
@@ -1168,6 +1259,7 @@
     aiEntry: () => aiEntry,
     awaitingSymptom: () => awaitingSymptom,
     aiStatus: () => aiPanel.getAttribute('data-ai-status'),
-    contractedPlatforms: () => [...myPlatforms]
+    contractedPlatforms: () => [...myPlatforms],
+    aiQueued: () => Boolean(pendingAI)
   });
 })();
