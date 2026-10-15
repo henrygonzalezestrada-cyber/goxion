@@ -123,8 +123,12 @@ async function accountAnswer(clientId:string,service:string,topic:unknown){
     const now=new Date().toISOString();
     const p=await db("promociones_catalogo?activa=eq.true&select=nombre,inicio,fin,precio_promocional&limit=30",service);
     if(!p.ok)throw Error("promos unavailable");
-    const list=(await p.json()).filter((item:{inicio:string|null;fin:string|null})=>
-      (!item.inicio||item.inicio<=now)&&(!item.fin||item.fin>=now));
+    const time=Date.parse(now);
+    const list=(await p.json()).filter((item:{inicio:string|null;fin:string|null})=>{
+      const start=item.inicio?Date.parse(item.inicio):Number.NEGATIVE_INFINITY;
+      const end=item.fin?Date.parse(item.fin):Number.POSITIVE_INFINITY;
+      return !Number.isNaN(start)&&!Number.isNaN(end)&&start<=time&&end>=time;
+    });
     const names=list.map((r:{nombre:string})=>String(r.nombre||"").slice(0,85))
       .filter(Boolean).slice(0,5);
     return {ok:true,source:"official_catalog",topic,
