@@ -359,8 +359,9 @@ flush();
 await Promise.resolve();
 assert.equal(aiPanel.getAttribute('data-ai-status'),'ready','El panel refleja conexión real');
 assert.equal(aiStart.disabled,false,'El usuario puede elegir IA solo tras confirmar estado');
-aiStart.fire('click');
-assert.ok(currentChoice('platform','Netflix'),'Entrada directa guía al catálogo de plataformas');
+// El camino anterior de guías oficiales sigue disponible sin IA.
+clickDemo(btnAccess);flush();
+assert.ok(currentChoice('platform','Netflix'),'Entrada manual a guías');
 assert.ok(!currentChoice('platform','Max'),'Primera lista solo contratadas');
 assert.ok(currentChoice('other'),'Otras plataformas siempre accesible');
 clickChoice(currentChoice('platform','Netflix'));flush();
