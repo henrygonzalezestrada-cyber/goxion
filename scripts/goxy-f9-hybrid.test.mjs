@@ -85,5 +85,5 @@ test("No se envía respuesta de cuenta a Groq ni se consume cuota",()=>{
   assert.ok(start>0&&end>start);
   const sub=raw.slice(start,end);
   assert.doesNotMatch(sub,/goxy_ai_beta_take_quota|chat\/completions|providerStatus/);
-  assert.match(sub,/accountAnswer\(clientId,service,body.topic\)/);
+  assert.match(sub,/accountAnswer\(clientId,service,body.topic,question\)/);
 });
