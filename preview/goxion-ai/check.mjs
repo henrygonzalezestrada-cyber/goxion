@@ -181,10 +181,12 @@ openButton.fire('click');
 flush();
 clickDemo(btnCode);
 authed=false;
-const oldMessages=scroll.children.length;
 runNext();
 assert.equal(layer.classList.contains('gxai-visible'),false);
-assert.equal(scroll.children.length,oldMessages);
+assert.equal(scroll.children.some(x=>x.name==='div'&&x.isConnected&&x.className==='gxai-typing'),false,'Indicador de carga eliminado al perder sesión');
+const afterExpiry=scroll.children.length;
+flush();
+assert.equal(scroll.children.length,afterExpiry,'No responder después de expirar sesión');
 openButton.fire('click');
 assert.equal(authOpens,1,'Cliente sin sesión debe dirigirse a autenticación');
 
