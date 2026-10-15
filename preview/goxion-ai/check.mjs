@@ -66,7 +66,7 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f7'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f8-1') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('mascota.js?v=goxy-f9') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
@@ -399,6 +399,21 @@ assert.ok(disclaimer.textContent.includes('7'), 'Mostrar al cliente su cupo IA r
 assert.equal(sent[1].platform,'Netflix','Contexto sólo plataforma');
 assert.equal(sent[1].issueIndex,undefined,'La conversación no exige un índice de guía');
 assert.ok(!('cliente_id' in sent[1]),'No enviar ID de cliente');
+flush();
+input.value='¿Y si ya hice eso?';composer.fire('submit');
+await Promise.resolve();
+assert.equal(sent.length,3,'Segunda pregunta usa IA solo cuando el usuario la eligió');
+assert.deepEqual(sent[2].history,[
+  {role:'user',content:'Hola Goxy, mi Netflix se congela ¿qué hago?'},
+  {role:'assistant',content:'Respuesta de prueba desde backend autorizado.'}
+], 'La segunda pregunta conserva el último turno, no información de la cuenta');
+flush();
+input.value='Qué puedes hacer?';composer.fire('submit');
+assert.equal(sent.length,3,'Pregunta de capacidades no debe consumir IA');
+flush();
+input.value='Ya coloqué el código pero no responde';composer.fire('submit');
+assert.equal(sent.length,3,'Autorizar código requiere humano sin gasto adicional de IA');
+assert.ok(currentChoice('human'),'Escalar al asesor sin pedir el código');
 flush();
 closeButton.fire('click');
 // Nueva ruta: consulta de misiones por backend propio sin gastar IA.
