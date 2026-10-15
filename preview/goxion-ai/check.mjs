@@ -138,8 +138,9 @@ function flush(max=30){
   let i=0;while(timers.size&&i++<max)runNext();
   assert.ok(i<=max,'Ciclo infinito de timers');
 }
-new Function('window','document','localStorage','performance','setTimeout','clearTimeout',js)(
-  win,doc,store,{now:()=>2100},schedule,unschedule
+new Function('window','document','localStorage','performance','setTimeout','clearTimeout','AbortController',js)(
+  win,doc,store,{now:()=>2100},schedule,unschedule,
+  class MockAbortController { constructor(){this.signal={aborted:false};} abort(){this.signal.aborted=true;} }
 );
 const layer=section.children.at(-1);
 const api=win.GOXION_AI_BETA;
@@ -291,4 +292,39 @@ assert.ok(js.includes('ai.ask(') && js.includes('chosenGuide') && js.includes('a
 assert.ok(js.includes('AI_NOT_CONFIGURED'), 'Mostrar estado no configurado sin respuesta falsa');
 assert.ok(aiPanel.getAttribute('data-ai-status')==='checking'||aiPanel.getAttribute('data-ai-status')===null,
   'El estado IA se debe manejar por respuesta del servidor, no inventarlo');
-console.log('GOXION Goxy F7.1: estado IA visible, modalidad explícita y F6 intacta PASS.');
+// F7.1: panel muestra estado real tras resolver promesa; sin clave no inventa IA.
+openButton.fire('click');
+flush();
+await Promise.resolve();
+assert.equal(aiPanel.getAttribute('data-ai-status'),'pending','Clave sin configurar debe aparecer explícitamente');
+assert.equal(aiStart.disabled,true,'Sin clave no permitir entrar a IA');
+closeButton.fire('click');
+
+// Con proveedor configurado, la ruta inteligente es deliberada y visible.
+win.GOXY_AI.status=()=>Promise.resolve({ok:true,configured:true});
+const sent=[];
+win.GOXY_AI.ask=async payload=>{
+  sent.push(payload);
+  return {ok:true,answer:'Respuesta de prueba desde backend autorizado.',remaining:7};
+};
+openButton.fire('click');
+flush();
+await Promise.resolve();
+assert.equal(aiPanel.getAttribute('data-ai-status'),'ready','El panel refleja conexión real');
+assert.equal(aiStart.disabled,false,'El usuario puede elegir IA solo tras confirmar estado');
+aiStart.fire('click');
+assert.ok(currentChoice('platform','Netflix'),'Entrada directa guía al catálogo de plataformas');
+clickChoice(currentChoice('platform','Netflix'));flush();
+clickChoice(currentChoice('issue','Netflix'));flush();
+assert.ok(currentChoice('ai'),'La guía ofrece entrar a IA');
+clickChoice(currentChoice('ai'));
+assert.equal(api.aiMode(),true,'El botón debe activar el modo IA');
+input.value='Netflix todavía no abre mi pantalla';
+composer.fire('submit');
+await Promise.resolve();
+assert.equal(sent.length,1,'Una pregunta debe llegar al backend, no volver al menú de plataforma');
+assert.equal(sent[0].platform,'Netflix','El backend recibe solo plataforma seleccionada');
+assert.equal(sent[0].issueIndex,0,'El backend recibe solo ID canónico de guía');
+flush();
+closeButton.fire('click');
+console.log('GOXION Goxy F7.1: estado IA real, bloqueo sin clave, ruta IA funcional y F6 intacta PASS.');
