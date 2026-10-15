@@ -1,0 +1,16 @@
+{
+  "name": "goxion-goxy-robotheads-beta",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "bundle": "esbuild goxy-heads-entry.js --bundle --platform=browser --format=iife --target=es2020 --minify --legal-comments=none --outfile=goxy-heads.bundle.js"
+  },
+  "dependencies": {
+    "robot-heads": "0.3.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.12"
+  }
+}

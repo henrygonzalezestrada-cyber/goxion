@@ -1,7 +1,7 @@
-/* GOXION · Goxy · Fase 2 · mascota interactiva y chat de demostración.
+/* GOXION · Goxy F3 · robot-heads original en Canvas + caricias F2.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
-   Robot original SVG/CSS inspirado en el concepto visual de robot-heads (MIT):
-   https://github.com/fayazara/robot-heads ; no se incorpora código de esa librería. */
+   Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
+   Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
 (() => {
   'use strict';
   const doc = document;
@@ -17,71 +17,16 @@
   while (card.firstChild) original.appendChild(card.firstChild);
   card.classList.add('gxai-card');
 
+  // Render fiel del proyecto original robot-heads, en lugar del SVG plano.
+  // El bundle aislado renderiza un Canvas real dentro de cada ranura.
   function robotSVG() {
-    return [
-      '<svg class="gxai-mascot" data-mood="idle" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300" role="img" aria-label="Goxy, mascota interactiva de GOXION">',
-      '<defs>',
-      '<linearGradient id="gxai-case" x1=".04" y1="0" x2=".93" y2="1"><stop stop-color="#b3a6dc"/><stop offset=".22" stop-color="#7566bd"/><stop offset=".52" stop-color="#263767"/><stop offset=".82" stop-color="#182448"/><stop offset="1" stop-color="#070d21"/></linearGradient>',
-      '<linearGradient id="gxai-bezel" x1="0" x2="1" y1=".2" y2="1"><stop stop-color="#a69ccf"/><stop offset=".25" stop-color="#596da0"/><stop offset=".55" stop-color="#263561"/><stop offset="1" stop-color="#131a39"/></linearGradient>',
-      '<linearGradient id="gxai-glass" x1="0" x2=".72" y1="0" y2="1"><stop stop-color="#0e203c"/><stop offset=".4" stop-color="#060915"/><stop offset="1" stop-color="#03050b"/></linearGradient>',
-      '<linearGradient id="gxai-rim" x1="0" x2="1"><stop stop-color="#7c4dff"/><stop offset=".55" stop-color="#00f2fe"/><stop offset="1" stop-color="#7c4dff"/></linearGradient>',
-      '<radialGradient id="gxai-light"><stop stop-color="#bfffff"/><stop offset=".37" stop-color="#00f2fe"/><stop offset="1" stop-color="#5740cc"/></radialGradient>',
-      '</defs>',
-      '<ellipse cx="161" cy="268" rx="100" ry="12" fill="#00f2fe" opacity=".035"/>',
-      '<g class="gxai-head">',
-      '<path d="M161 54V30" stroke="#93a9db" stroke-width="8" stroke-linecap="round"/>',
-      '<path d="M161 52V28" stroke="#e3d9ff" stroke-width="2" stroke-linecap="round" opacity=".58"/>',
-      '<circle class="gxai-antenna-bulb" cx="161" cy="20" r="12" fill="url(#gxai-light)" stroke="#99e9ff" stroke-width="2"/>',
-      '<rect x="34" y="113" width="35" height="83" rx="16" fill="url(#gxai-bezel)" stroke="#7c4dff" stroke-width="3"/>',
-      '<rect x="251" y="113" width="35" height="83" rx="16" fill="url(#gxai-bezel)" stroke="#00f2fe" stroke-width="3"/>',
-      '<rect class="gxai-ear-led" x="40" y="134" width="5" height="39" rx="2" fill="#8f71ff"/>',
-      '<rect class="gxai-ear-led" x="277" y="134" width="5" height="39" rx="2" fill="#00f2fe"/>',
-      '<path d="M69 84Q79 58 117 55H206Q247 56 255 91L262 204Q262 241 218 249H102Q58 241 56 202Z" fill="url(#gxai-case)" stroke="#909bd6" stroke-width="2.4"/>',
-      '<path d="M83 92Q89 75 125 74H201Q232 74 238 100L243 194Q242 224 213 227H108Q78 225 76 196Z" fill="url(#gxai-bezel)" stroke="#101b37" stroke-width="4"/>',
-      '<path d="M91 103Q97 90 125 88H200Q222 89 226 111L231 186Q231 211 206 213H113Q88 213 87 188Z" fill="url(#gxai-glass)" stroke="url(#gxai-rim)" stroke-width="2.4"/>',
-      '<path d="M98 111Q108 93 137 93H196Q214 93 219 108" stroke="#d3d3ff" stroke-opacity=".16" stroke-width="7" fill="none" stroke-linecap="round"/>',
-      '<path d="M109 103Q143 91 173 95" stroke="white" opacity=".055" stroke-width="5" fill="none" stroke-linecap="round"/>',
-      '<g class="gxai-face gxai-face-idle" fill="none" stroke="#00f2fe" stroke-width="10" stroke-linecap="round">',
-      '<rect class="gxai-eye-idle" x="122" y="140" width="15" height="26" rx="7" fill="#00f2fe" stroke="none"/>',
-      '<rect class="gxai-eye-idle" x="183" y="140" width="15" height="26" rx="7" fill="#00f2fe" stroke="none"/>',
-      '<path d="M145 179Q160 190 175 179" stroke-width="4.5"/>',
-      '</g>',
-      '<g class="gxai-face gxai-face-happy" fill="none" stroke="#00f2fe" stroke-linecap="round">',
-      '<path d="M113 159Q129 129 145 159M176 159Q192 129 208 159" stroke-width="9"/>',
-      '<path d="M140 181Q160 196 180 181" stroke-width="5"/>',
-      '</g>',
-      '<g class="gxai-face gxai-face-thinking" fill="#00f2fe">',
-      '<rect x="124" y="148" width="17" height="9" rx="4"/><rect x="184" y="148" width="17" height="9" rx="4"/>',
-      '<circle cx="145" cy="184" r="3"/><circle cx="160" cy="184" r="4"/><circle cx="176" cy="184" r="3"/>',
-      '</g>',
-      '<g class="gxai-face gxai-face-listening" fill="#00f2fe">',
-      '<rect x="122" y="140" width="15" height="26" rx="7"/><rect x="183" y="140" width="15" height="26" rx="7"/>',
-      '<rect x="144" y="181" width="4" height="8" rx="2"/><rect x="152" y="177" width="4" height="15" rx="2"/><rect x="160" y="174" width="4" height="21" rx="2"/><rect x="168" y="177" width="4" height="15" rx="2"/><rect x="176" y="181" width="4" height="8" rx="2"/>',
-      '</g>',
-      '<g class="gxai-face gxai-face-speaking" fill="#00f2fe">',
-      '<rect x="121" y="139" width="15" height="25" rx="7"/><rect x="184" y="139" width="15" height="25" rx="7"/>',
-      '<ellipse cx="160" cy="184" rx="14" ry="7"/>',
-      '</g>',
-      '<g class="gxai-face gxai-face-wink" fill="none" stroke="#00f2fe" stroke-linecap="round">',
-      '<path d="M114 154Q131 144 145 156" stroke-width="7"/><rect x="183" y="140" width="16" height="26" rx="8" fill="#00f2fe" stroke="none"/>',
-      '<path d="M148 181Q161 189 174 181" stroke-width="4.5"/>',
-      '</g>',
-      '<g class="gxai-face gxai-face-surprised" fill="#00f2fe">',
-      '<circle cx="132" cy="153" r="8"/><circle cx="191" cy="153" r="8"/>',
-      '<ellipse cx="161" cy="185" rx="9" ry="12" fill="none" stroke="#00f2fe" stroke-width="5"/>',
-      '</g>',
-      '<g class="gxai-face gxai-face-love" fill="#00f2fe">',
-      '<path d="M131 164C126 158 113 149 115 141C117 132 127 133 131 139C137 132 148 132 149 141C150 151 138 158 131 164Z"/>',
-      '<path d="M191 164C186 158 173 149 175 141C177 132 187 133 191 139C197 132 208 132 209 141C210 151 198 158 191 164Z"/>',
-      '<path d="M146 181Q161 196 176 181" fill="none" stroke="#00f2fe" stroke-width="4" stroke-linecap="round"/>',
-      '<circle class="gxai-blush" cx="107" cy="177" r="9" fill="#a681ff"/><circle class="gxai-blush" cx="216" cy="177" r="9" fill="#a681ff"/>',
-      '</g>',
-      '<circle cx="82" cy="121" r="3.5" fill="#b5a7ff" opacity=".65"/><circle cx="236" cy="121" r="3.5" fill="#b6eaff" opacity=".65"/>',
-      '</g>',
-      '</svg>'
-    ].join('');
+    return '<span class="gxai-mascot gxai-canvas-slot" data-mood="idle" role="img" aria-label="Goxy, robot animado con pantalla LED"></span>';
   }
 
+  if (typeof window.GOXY_ROBOT?.mountAll !== 'function') {
+    console.error('[GOXION Goxy] El motor original de robot-heads no está disponible.');
+    return;
+  }
   const svg = robotSVG();
   const hero = doc.createElement('div');
   hero.className = 'gxai-hero';
@@ -126,6 +71,7 @@
     '</section>'
   ].join('');
   section.appendChild(layer);
+  window.GOXY_ROBOT.mountAll();
 
   const mascots = Array.from(section.querySelectorAll('.gxai-mascot'));
   const scroll = layer.querySelector('.gxai-chat-scroll');
@@ -308,6 +254,7 @@
       if (['idle','happy','thinking','listening','speaking','wink','surprised','love'].includes(state)) mood(state, state === 'idle' ? 0 : 1600);
     },
     close: closeChat,
-    open: openChat
+    open: openChat,
+    renderer: 'robot-heads@0.3.0'
   });
 })();

@@ -75,3 +75,12 @@
 @media(min-width:600px){#view-soporte .gxai-chat-layer{align-items:center;padding:16px}#view-soporte .gxai-chat{border-radius:24px;max-height:calc(100dvh - 32px)}}
 @media(max-width:360px){#view-soporte #smart-support-card.gxai-card{padding:18px 12px 19px}#view-soporte .gxai-mascot-button{min-height:217px;width:250px}#view-soporte .gxai-mascot{width:229px}#view-soporte .gxai-desc{font-size:11px}#view-soporte .gxai-chat-head{min-height:67px}}
 @media(prefers-reduced-motion:reduce){#view-soporte .gxai-mascot,#view-soporte .gxai-head,#view-soporte .gxai-eye-idle,#view-soporte .gxai-antenna-bulb,#view-soporte .gxai-heart,#view-soporte .gxai-open::before,#view-soporte .gxai-open-signal i{animation:none!important}#view-soporte .gxai-heart{display:none}#view-soporte .gxai-chat,#view-soporte .gxai-chat-layer{transition:none!important}}
+
+/* Goxy F3 — lienzo original: evitar que reglas del SVG anterior deformen Canvas. */
+#view-soporte .gxai-mascot-button{min-height:270px;touch-action:none;overflow:visible}
+#view-soporte .gxai-mascot.gxai-canvas-slot{display:grid;place-items:center;align-content:center;width:272px;height:262px;max-width:100%;max-height:none;animation:none!important;filter:none!important;transform:none!important;overflow:visible;contain:none}
+#view-soporte .gxai-mascot.gxai-canvas-slot>span{flex:none;pointer-events:auto}
+#view-soporte .gxai-mascot-button:hover .gxai-canvas-slot{filter:none!important}
+#view-soporte .gxai-avatar .gxai-mascot.gxai-canvas-slot{width:54px;height:54px;max-width:none;transform:none!important;animation:none!important}
+#view-soporte .gxai-avatar .gxai-mascot.gxai-canvas-slot>span{pointer-events:none}
+@media(max-width:360px){#view-soporte .gxai-mascot-button{min-height:236px}#view-soporte .gxai-mascot.gxai-canvas-slot{width:235px;height:230px}}
