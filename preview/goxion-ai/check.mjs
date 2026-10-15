@@ -209,7 +209,7 @@ runNext();assert.equal(api.chatState(),'error');
 runNext();assert.equal(api.chatState(),'listening');
 
 // Mensaje escrito: contenido solo en DOM, sin peticiones de red.
-input.value='¿Me ayudas a revisar un servicio?';
+input.value='Quiero cambiar de plataforma';
 composer.fire('submit');
 assert.equal(input.value,'');
 assert.equal(api.chatState(),'thinking');
