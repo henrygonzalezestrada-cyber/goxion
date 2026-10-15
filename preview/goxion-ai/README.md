@@ -1,7 +1,7 @@
-# GOXION · Goxy F7 · IA segura opcional + guías reales + scroll natural
+# GOXION · Goxy F7.1 · IA con estado visible + guías reales + scroll natural
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7-1
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -48,3 +48,11 @@ Se añadió un puente cliente sin secretos y una nueva Supabase Edge Function `g
 **La IA requiere una clave `GROQ_API_KEY` configurada en Supabase.** Si no existe, Goxy muestra «IA pendiente de activación» y las guías/canal humano siguen funcionando. Las preguntas con IA solo se habilitan al elegir primero una situación oficial; no consulta ni modifica datos privados de Mi Espacio.
 
 Documento de arquitectura y pasos de activación: [GOXY F7 Gateway IA Beta](../../docs/GOXY_F7_GATEWAY_IA_BETA.md).
+
+## Ajuste F7.1 · Por qué parecía la misma beta
+- La F7 añadió backend, pero ocultó el uso de la IA después de elegir guía y el botón no activaba explícitamente un modo de respuesta.
+- **Ahora se muestra un panel visible en el chat** con estado real del endpoint autenticado: comprobando, disponible, pendiente de clave o error de conexión.
+- Solo cuando el backend confirma `configured:true`, se habilita el botón **Usar IA**. Guía al cliente hacia la plataforma y la situación oficial.
+- Tras elegir la guía, el botón **Preguntar con IA** activa el modo de pregunta para esa guía. Se puede mencionar la plataforma en la pregunta sin rebotar al listado de guías.
+- Si falta `GROQ_API_KEY`, se informa claramente que iniciar sesión no es suficiente y que las guías siguen funcionando. No se simula conversación IA.
+- No se toca `ayuda.html`, Admin, Supabase ni el motor financiero. Se invalidó la caché del CSS/JS en Safari mediante `?v=goxy-f7-1`.
