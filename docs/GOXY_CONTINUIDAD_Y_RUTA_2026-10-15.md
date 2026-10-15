@@ -1,19 +1,19 @@
 # GOXION · Goxy — estado verificado, decisiones, lecciones y ruta de continuidad
 
 > **Documento de traspaso para abrir un CHAT NUEVO sin perder el contexto. Corte: 15 de octubre de 2026, después del merge del PR #120.**
-> **Repositorio:** https://github.com/henrygonzalezestrada-cyber/goxion — rama oficial \`main\`.
+> **Repositorio:** https://github.com/henrygonzalezestrada-cyber/goxion — rama oficial `main`.
 > **Beta actual de Goxy:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f12
 > **IMPORTANTE:** F12 está **fusionada y desplegada en GitHub Pages como BETA AISLADA**, pero **NO aprobada para sustituir el Soporte oficial**. Faltan pruebas reales en Safari y de envío/recepción de WhatsApp. La última ejecución de integridad terminó con fallo en el paso general «Browser smoke». La verificación estática/integridad y otras suites pasaron; **no afirmar que el fallo general fue causado por Goxy sin leer sus logs**.
 >
-> **Principio de fuente de verdad:** repositorio \`main\` + Edge Function realmente desplegada + datos oficiales del backend > este documento fechado > README y planes antiguos > capturas. Revisar antes de afirmar que algo está publicado.
+> **Principio de fuente de verdad:** repositorio `main` + Edge Function realmente desplegada + datos oficiales del backend > este documento fechado > README y planes antiguos > capturas. Revisar antes de afirmar que algo está publicado.
 
 ## 0. Instrucciones inmediatas al próximo asistente
 
-1. Leer este documento COMPLETO; después \`AGENTS.md\`, \`docs/GOXION_ESTADO_Y_LECCIONES_2026-10-14.md\`, \`docs/GOXION_VISUAL_CONTRACT.md\` y \`preview/goxion-ai/README.md\`. Esas referencias no reemplazan la inspección del código vigente.
-2. Confirmar con el conector de **GitHub** el HEAD actual de \`main\`, PR #120, issue #119, últimas ejecuciones de **GOXION · Integrity** y **pages build and deployment**, y código bajo \`preview/goxion-ai/\`. Confirmar con **Supabase** la versión/estado de \`goxy-ai-beta\` antes de intervenir.
+1. Leer este documento COMPLETO; después `AGENTS.md`, `docs/GOXION_ESTADO_Y_LECCIONES_2026-10-14.md`, `docs/GOXION_VISUAL_CONTRACT.md` y `preview/goxion-ai/README.md`. Esas referencias no reemplazan la inspección del código vigente.
+2. Confirmar con el conector de **GitHub** el HEAD actual de `main`, PR #120, issue #119, últimas ejecuciones de **GOXION · Integrity** y **pages build and deployment**, y código bajo `preview/goxion-ai/`. Confirmar con **Supabase** la versión/estado de `goxy-ai-beta` antes de intervenir.
 3. **Continuar desde F12, NO recrear F1–F11.** Última entrega concreta: consentimiento y ficha WhatsApp lista, diagnóstico Premium/QR, enrutamiento a Mi Espacio; todo en **beta solamente**.
 4. Si el usuario pide una corrección o nueva función, **aplicarla directamente al repositorio** con herramientas conectadas; no responder solo con bloques para copiar y pegar cuando el conector GitHub permita editar. Crear rama aislada, hacer pruebas, PR, revisar archivos cambiados y publicar beta únicamente cuando corresponda. Comprobar el despliegue de Pages antes de afirmar que el enlace está actualizado.
-5. **No tocar** \`ayuda.html\` oficial, \`index.html\` de clientes, \`admin.html\`, tablas financieras, acciones B2 ni otras experiencias, salvo autorización explícita y posterior al cierre de beta.
+5. **No tocar** `ayuda.html` oficial, `index.html` de clientes, `admin.html`, tablas financieras, acciones B2 ni otras experiencias, salvo autorización explícita y posterior al cierre de beta.
 6. El siguiente objetivo NO es rediseñar a Goxy: **hacer la aceptación real F12** y corregir cualquier falla de navegación, seguridad, WhatsApp, pantalla/teclado iPhone o claridad del diálogo. El usuario quiere **el cliente pulsa «Enviar»** dentro de WhatsApp; no pidió envíos automáticos mediante WhatsApp Business API.
 7. Cuando se cierre un paso importante, actualizar aquí su resultado real, incluyendo PR/commit, pruebas, capturas, pendientes. No dar por aprobada una fase sin aceptación del usuario.
 
@@ -46,59 +46,59 @@
 
 | Componente | Estado | Evidencia / límite |
 |---|---|---|
-| Fases anteriores hasta F11 | Fusionadas en \`main\` como funciones beta | PR #104, #105, #112–#118; revisiones posteriores prevalecen |
-| **F12**: acceso guiado + ficha WhatsApp con consentimiento | **Fusionada en \`main\`**, beta publicada; **aceptación física pendiente** | [PR #120](https://github.com/henrygonzalezestrada-cyber/goxion/pull/120), merge \`0d926751dcd8a4522395e1ecedac552208d724be\` |
-| GitHub Pages F12 | **SUCCESS** en \`main\` | ejecución \`38811987801\` (la URL \`?v=f12\` debe abrir el nuevo loader) |
-| CI \`GOXION · Integrity\` del merge F12 | **FAILURE** en **Browser smoke** | ejecución \`38811988868\`; «Verify repository integrity», Opiniones beta/oficial, Realtime y Cart pasaron. No atribuir a Goxy sin inspección |
-| Regresión específica de Goxy | **PASS** según PR #120, con DOM simulado | \`node preview/goxion-ai/check.mjs\`; **no sustituye Safari real** |
-| Servicio IA en Supabase | \`goxy-ai-beta\` **ACTIVE, v7** | proyecto ID \`hmpevcwodcgbkviarfic\`; confirmado mediante el conector; Goxy F12 **no cambió** el backend |
-| Proveedor Groq | clave \`GROQ_API_KEY\` configurada por el usuario en Supabase; respuestas reales observadas en pruebas F8 | No leer/exponer clave. Comprobar vigencia/modelo desde status seguro |
-| Autorización producción de Soporte | **NO** | \`ayuda.html\` oficial sigue intacto; Goxy sigue en \`preview/goxion-ai/\` |
-| Ficha WhatsApp | Implementada en beta; **no recepción real comprobada** | \`wa.me\` abre borrador solo con confirmación; el cliente debe enviarlo |
+| Fases anteriores hasta F11 | Fusionadas en `main` como funciones beta | PR #104, #105, #112–#118; revisiones posteriores prevalecen |
+| **F12**: acceso guiado + ficha WhatsApp con consentimiento | **Fusionada en `main`**, beta publicada; **aceptación física pendiente** | [PR #120](https://github.com/henrygonzalezestrada-cyber/goxion/pull/120), merge `0d926751dcd8a4522395e1ecedac552208d724be` |
+| GitHub Pages F12 | **SUCCESS** en `main` | ejecución `38811987801` (la URL `?v=f12` debe abrir el nuevo loader) |
+| CI `GOXION · Integrity` del merge F12 | **FAILURE** en **Browser smoke** | ejecución `38811988868`; «Verify repository integrity», Opiniones beta/oficial, Realtime y Cart pasaron. No atribuir a Goxy sin inspección |
+| Regresión específica de Goxy | **PASS** según PR #120, con DOM simulado | `node preview/goxion-ai/check.mjs`; **no sustituye Safari real** |
+| Servicio IA en Supabase | `goxy-ai-beta` **ACTIVE, v7** | proyecto ID `hmpevcwodcgbkviarfic`; confirmado mediante el conector; Goxy F12 **no cambió** el backend |
+| Proveedor Groq | clave `GROQ_API_KEY` configurada por el usuario en Supabase; respuestas reales observadas en pruebas F8 | No leer/exponer clave. Comprobar vigencia/modelo desde status seguro |
+| Autorización producción de Soporte | **NO** | `ayuda.html` oficial sigue intacto; Goxy sigue en `preview/goxion-ai/` |
+| Ficha WhatsApp | Implementada en beta; **no recepción real comprobada** | `wa.me` abre borrador solo con confirmación; el cliente debe enviarlo |
 | Fechas e importes B2 exactos desde Goxy | **NO IMPLEMENTADO** | dirigir a estado de cuenta oficial; nunca calcular aparte |
 | Extender Goxy a otras áreas | **FUTURO** | idea del usuario, sin tareas aprobadas actualmente |
 
 **Issue de F12:** [#119](https://github.com/henrygonzalezestrada-cyber/goxion/issues/119) sirve como especificación y checklist; su estado debe revisarse antes de cerrarlo (puede seguir abierto aunque el PR #120 esté fusionado).
 
-**Importante:** el archivo \`preview/goxion-ai/README.md\` es acumulativo e incluye párrafos de fases antiguas («IA pendiente» o contacto original). Interpretar cada fase por su fecha y preferir el código actual + este resumen para distinguir lo vigente.
+**Importante:** el archivo `preview/goxion-ai/README.md` es acumulativo e incluye párrafos de fases antiguas («IA pendiente» o contacto original). Interpretar cada fase por su fecha y preferir el código actual + este resumen para distinguir lo vigente.
 
 ## 3. Cronología resumida — qué NO reconstruir
 
 - **F1–F2:** Goxy robot inspirado en robot-heads, comportamiento visual, gesto de tocar, varias expresiones (feliz, sorpresa, guiño, amor, etc.), caricias y corazones. El robot no abre el chat por sí solo; CTA **«Hablar con Goxy»**. Estilos GOXION. Betas aisladas.
-- **F3–F6:** integración gradual de guías oficiales del soporte, animaciones, interacción móvil/Tamagotchi y corrección crítica: deslizar verticalmente sobre Goxy **debe permitir desplazar la página**; la caricia horizontal sí activa reacción. No interceptar touch vertical ni hacer \`setPointerCapture\` agresivo.
+- **F3–F6:** integración gradual de guías oficiales del soporte, animaciones, interacción móvil/Tamagotchi y corrección crítica: deslizar verticalmente sobre Goxy **debe permitir desplazar la página**; la caricia horizontal sí activa reacción. No interceptar touch vertical ni hacer `setPointerCapture` agresivo.
 - **F7–F7.3:** puente seguro a IA y reconocimiento de plataformas contratadas por cliente; atención a combos multimarcas, cambio de sesión y privacidad. Se eliminó la tarjeta duplicada de «Tus plataformas»; conservar SOLO cápsulas dentro del chat, más «Consultar otras plataformas».
-- **F8–F8.1:** \`goxy-ai-beta\` usa Groq de servidor; preguntas por plataforma, sin obligar a seleccionar siempre una guía. Verificación del proveedor/modelo real; indicador de cuota restante después de respuestas.
+- **F8–F8.1:** `goxy-ai-beta` usa Groq de servidor; preguntas por plataforma, sin obligar a seleccionar siempre una guía. Verificación del proveedor/modelo real; indicador de cuota restante después de respuestas.
 - **F9:** soporte híbrido: saludos/guías y lectura autenticada de misiones/promociones sin IA; memoria breve de los turnos de IA; mejor continuidad, derivación de códigos a humano. **No conectar aquí saldos B2 con cálculos nuevos**.
-- **F10:** soluciones concretas por síntoma y misión; campo de escritura de **16 px** (evitar zoom de Safari iPhone), ajuste del modal al \`visualViewport\` del iframe/padre cuando aparece teclado. Mantener input visible, scroll natural.
+- **F10:** soluciones concretas por síntoma y misión; campo de escritura de **16 px** (evitar zoom de Safari iPhone), ajuste del modal al `visualViewport` del iframe/padre cuando aparece teclado. Mantener input visible, scroll natural.
 - **F11:** **desapareció el botón «Usar IA»**. Enrutador local gratuito: pedir contexto si consulta ambigua, primera guía gratuita, Groq solo en necesidad técnica, humano en autorizaciones, no gastar cuota por saludo o código.
 - **F12:** tras aprobación del usuario **«Sí, que el cliente solo pulse enviar»**, se creó recuperación de acceso (Premium, correo/contraseña vs QR, dispositivo), navegación a Mi Espacio y ficha previsualizable. En el clic confirmado abre WhatsApp oficial, donde el usuario pulsa Enviar. PR #120 ya merged. **Aún no aprobada en iPhone**.
 
 ## 4. Mapa real de código y propietarios
 
-### Beta aislada — \`preview/goxion-ai/\`
+### Beta aislada — `preview/goxion-ai/`
 
 | Archivo | Responsabilidad actual |
 |---|---|
-| \`index.html\` | Host beta, iframe **same-origin** de \`../../ayuda.html\`; inyecta CSS, knowledge, contexto, router, ficha, puente AI y mascota, luego cambia a Soporte; caché \`goxy-f12\` |
-| \`mascota.js\` | Robot y chat; animaciones/tacto; clasificación F11, priorización de cuenta, diagnóstico F12, aclaraciones, UI, ficha previa, consentimiento y apertura WhatsApp; historial IA efímero |
-| \`mascota.css\` | Cristal/colores, chat, modal/teclado iPhone, caricias; estilo scoped bajo \`#view-soporte\` |
-| \`goxy-heads-entry.js\` | Render/entrada visual del robot, identidad y gestos originales |
-| \`goxy-support-knowledge.js\` | Adaptador de **una sola fuente oficial**: \`assets/js/ayuda/data/support-issues.js\`; plataformas, búsqueda de guía e instrucciones, sin copiar precios ni credenciales |
-| \`goxy-client-context.js\` | Usa estado autenticado de Mi Espacio: \`globalClientesData\`, \`getCurrentClientKey()\`, \`GOXION_CORE.getClientToken()\`, \`goxionReloadPrivateClientView()\`; lista blanca de marcas, servicios, referencias de tarjeta y **correo de acceso asociado solo para ficha consentida** |
-| \`goxy-access-routing.js\` | Diagnóstico local gratuito de Premium, QR, PIN, contraseña nueva; navegación a las tarjetas originales de Mi Espacio |
-| \`goxy-whatsapp-handoff.js\` | Genera ficha textual **sin PIN/clave/código** y enlace \`https://wa.me/<NUMERO_GOXION>?text=...\`. No envía automáticamente |
-| \`goxy-ai-client.js\` | Puente browser→Edge Function; envía pregunta/guía/historial breve filtrado, o consultas de cuenta con lista blanca; **ninguna clave de Groq en browser** |
-| \`check.mjs\` | Regresiones del robot/chat, sesión, WhatsApp, iOS, guías, IA híbrida (DOM simulado) |
-| \`README.md\` | Manual histórico con secciones F1–F12; leer última sección vigente, no asumir que todo el texto antiguo describe UX actual |
+| `index.html` | Host beta, iframe **same-origin** de `../../ayuda.html`; inyecta CSS, knowledge, contexto, router, ficha, puente AI y mascota, luego cambia a Soporte; caché `goxy-f12` |
+| `mascota.js` | Robot y chat; animaciones/tacto; clasificación F11, priorización de cuenta, diagnóstico F12, aclaraciones, UI, ficha previa, consentimiento y apertura WhatsApp; historial IA efímero |
+| `mascota.css` | Cristal/colores, chat, modal/teclado iPhone, caricias; estilo scoped bajo `#view-soporte` |
+| `goxy-heads-entry.js` | Render/entrada visual del robot, identidad y gestos originales |
+| `goxy-support-knowledge.js` | Adaptador de **una sola fuente oficial**: `assets/js/ayuda/data/support-issues.js`; plataformas, búsqueda de guía e instrucciones, sin copiar precios ni credenciales |
+| `goxy-client-context.js` | Usa estado autenticado de Mi Espacio: `globalClientesData`, `getCurrentClientKey()`, `GOXION_CORE.getClientToken()`, `goxionReloadPrivateClientView()`; lista blanca de marcas, servicios, referencias de tarjeta y **correo de acceso asociado solo para ficha consentida** |
+| `goxy-access-routing.js` | Diagnóstico local gratuito de Premium, QR, PIN, contraseña nueva; navegación a las tarjetas originales de Mi Espacio |
+| `goxy-whatsapp-handoff.js` | Genera ficha textual **sin PIN/clave/código** y enlace `https://wa.me/<NUMERO_GOXION>?text=...`. No envía automáticamente |
+| `goxy-ai-client.js` | Puente browser→Edge Function; envía pregunta/guía/historial breve filtrado, o consultas de cuenta con lista blanca; **ninguna clave de Groq en browser** |
+| `check.mjs` | Regresiones del robot/chat, sesión, WhatsApp, iOS, guías, IA híbrida (DOM simulado) |
+| `README.md` | Manual histórico con secciones F1–F12; leer última sección vigente, no asumir que todo el texto antiguo describe UX actual |
 
 ### Componentes oficiales **solo para reutilizar**, no modificar por inercia
 
-- \`ayuda.html\`, \`assets/js/ayuda/01a-shared-state.js\` y \`assets/js/ayuda/01e-client-dashboard.js\`: Mi Espacio, identificación de cliente, tarjetas por servicio y funciones \`gxToggleServiceCard\` / \`gxServiceView\`, \`gx-credential-notice-* \`, \`gx-service-card-* \`, control oficial **Mostrar PIN** y visualización única de contraseñas actualizadas con confirmación de PIN GOXION.
-- \`NUMERO_GOXION\` proviene del estado oficial de Ayuda (\`GXCORE.BUSINESS.WHATSAPP\`); **no inventar ni hardcodear otro número**. El antiguo \`sendSmartWA()\` adjunta campos no apropiados; no reutilizarlo para Goxy.
-- \`assets/js/ayuda/data/support-issues.js\`: guías oficiales, sin duplicar el catálogo en F12.
-- \`supabase/functions/goxy-ai-beta/index.ts\` y \`knowledge.json\`: servicio independiente, Groq \`openai/gpt-oss-20b\` del lado servidor; valida sesión/estado, filtra mensaje, ofrece status/consultas read-only/chat. Versión activa verificada: **7**.
-- \`supabase/migrations/202610150001_goxy_ia_beta_cuota.sql\`: función de cuota \`goxy_ai_beta_take_quota\`. **8 consultas por cliente durante 24 h móviles**, al menos 20 segundos entre intentos. Límite por cliente GOXION separado de límites globales/tokens del proveedor Groq.
-- \`scripts/goxy-f7-security.test.mjs\`, \`scripts/goxy-f8-context.test.mjs\`, \`scripts/goxy-f8-1-provider.test.mjs\`, \`scripts/goxy-f9-hybrid.test.mjs\`: pruebas de seguridad/contratos de etapas anteriores; incluirlas en regresión cuando se toque backend.
+- `ayuda.html`, `assets/js/ayuda/01a-shared-state.js` y `assets/js/ayuda/01e-client-dashboard.js`: Mi Espacio, identificación de cliente, tarjetas por servicio y funciones `gxToggleServiceCard` / `gxServiceView`, `gx-credential-notice-* `, `gx-service-card-* `, control oficial **Mostrar PIN** y visualización única de contraseñas actualizadas con confirmación de PIN GOXION.
+- `NUMERO_GOXION` proviene del estado oficial de Ayuda (`GXCORE.BUSINESS.WHATSAPP`); **no inventar ni hardcodear otro número**. El antiguo `sendSmartWA()` adjunta campos no apropiados; no reutilizarlo para Goxy.
+- `assets/js/ayuda/data/support-issues.js`: guías oficiales, sin duplicar el catálogo en F12.
+- `supabase/functions/goxy-ai-beta/index.ts` y `knowledge.json`: servicio independiente, Groq `openai/gpt-oss-20b` del lado servidor; valida sesión/estado, filtra mensaje, ofrece status/consultas read-only/chat. Versión activa verificada: **7**.
+- `supabase/migrations/202610150001_goxy_ia_beta_cuota.sql`: función de cuota `goxy_ai_beta_take_quota`. **8 consultas por cliente durante 24 h móviles**, al menos 20 segundos entre intentos. Límite por cliente GOXION separado de límites globales/tokens del proveedor Groq.
+- `scripts/goxy-f7-security.test.mjs`, `scripts/goxy-f8-context.test.mjs`, `scripts/goxy-f8-1-provider.test.mjs`, `scripts/goxy-f9-hybrid.test.mjs`: pruebas de seguridad/contratos de etapas anteriores; incluirlas en regresión cuando se toque backend.
 
 ## 5. Flujos F12 concretos y qué comprobar
 
@@ -119,7 +119,7 @@
 1. Sólo cliente autenticado; referencia al servicio y, si hay varias cuentas, selección explícita.
 2. Preparar resumen con datos verificables: **cliente, referencia, plataforma, servicio afectado, correo de acceso asociado, síntoma, dispositivo y comprobaciones**. No copiar transcripción libre completa ni inventar acciones intentadas.
 3. Vista previa visible para cliente. El cliente elige **«Confirmar y abrir WhatsApp»** o **Cancelar**. Cancelar no abre el enlace.
-4. Revalidar sesión antes del clic. Abrir \`wa.me\` únicamente después de confirmación. **El cliente todavía debe pulsar ENVIAR en WhatsApp**: un enlace no notifica automáticamente. Jamás decir «enviado» solo por abrir la app.
+4. Revalidar sesión antes del clic. Abrir `wa.me` únicamente después de confirmación. **El cliente todavía debe pulsar ENVIAR en WhatsApp**: un enlace no notifica automáticamente. Jamás decir «enviado» solo por abrir la app.
 5. Confirmar que llega al WhatsApp de GOXION y permite responder rápido sin volver a preguntar correo y contexto. No crear bandeja Admin para esa notificación: el usuario decidió WhatsApp por practicidad.
 6. Auditar uso de identificador y correo: son datos de contacto de un servicio, no deben compartirse **sin mostrar íntegramente la ficha**; revisar que ninguna referencia/secreto extra escape por error.
 
@@ -127,25 +127,25 @@
 
 - **No enviar jamás a Groq ni a WhatsApp:** password, PIN de perfil, PIN GOXION, códigos QR, tokens, códigos de verificación, datos financieros confidenciales, historial completo o credenciales de terceros. Si la aplicación requiere ver un secreto, que sea exclusivamente dentro del control oficial de Mi Espacio.
 - **Goxy no autoriza**, no cambia contraseñas, no inicia sesión por el usuario, no realiza cobros ni modifica obligaciones. Consulta y guía con scopes limitados.
-- El cliente y plataforma deben venir de **sesión autenticada**; no recibir \`cliente_id\` libre desde UI en funciones privilegiadas.
+- El cliente y plataforma deben venir de **sesión autenticada**; no recibir `cliente_id` libre desde UI en funciones privilegiadas.
 - Cambiar de cliente o cerrar sesión debe invalidar contexto y ficha anterior. Conservar historial de IA solamente en memoria efímera del chat actual, filtrado; no persistir conversaciones privadas.
-- El mensaje \`wa.me\` prellenado viaja en URL hacia WhatsApp tras consentimiento explícito; minimizar campos al mínimo necesario. Confirmar que el número corresponde al soporte oficial vigente.
+- El mensaje `wa.me` prellenado viaja en URL hacia WhatsApp tras consentimiento explícito; minimizar campos al mínimo necesario. Confirmar que el número corresponde al soporte oficial vigente.
 - No activar IA para decidir si se necesita IA: **la clasificación es gratis, local o determinista del backend**.
 - El estado de cuenta B2 tiene **calendarios multifecha, abonos, lealtad, promociones, mora y prórrogas**. Goxy todavía NO devuelve automáticamente montos/fechas exactos; remite a **Mi Espacio → Ver estado de cuenta**. Cuando se programe lectura, **reusar el proyector financiero oficial**, nunca recálculos independientes.
-- No exponer \`GROQ_API_KEY\` en GitHub, clientes, chat o consola pública. Solo secreto de Edge Function de Supabase; jamás enviar claves al asistente.
+- No exponer `GROQ_API_KEY` en GitHub, clientes, chat o consola pública. Solo secreto de Edge Function de Supabase; jamás enviar claves al asistente.
 - Si se necesita envío WhatsApp automático en el futuro, requerirá **WhatsApp Business Platform/proveedor, opt-in, backend y controles**; el usuario decidió expresamente **NO necesitarlo ahora**.
 
 ## 7. QA móvil y fallos históricos que no se deben repetir
 
 1. **Safari zoom:** input de 12 px causaba zoom al enfocar. F10 lo dejó **≥16 px**; no retroceder.
-2. **Teclado tapa el composer:** dentro de iframe la altura \`100dvh\` no siempre refleja el teclado; Goxy sincroniza con \`parent.visualViewport\`. Validar Safari físico, cierre teclado, orientación, chat largo, safe area, scroll y no scroll lateral.
-3. **Caricias bloquean scroll:** mantener \`touch-action:pan-y\` y clasificación de caricias **horizontales**; no bloquear gestos verticales.
+2. **Teclado tapa el composer:** dentro de iframe la altura `100dvh` no siempre refleja el teclado; Goxy sincroniza con `parent.visualViewport`. Validar Safari físico, cierre teclado, orientación, chat largo, safe area, scroll y no scroll lateral.
+3. **Caricias bloquean scroll:** mantener `touch-action:pan-y` y clasificación de caricias **horizontales**; no bloquear gestos verticales.
 4. **Tarjeta duplicada «Tus plataformas»:** eliminada en F7.3. Sólo cápsulas propias en el diálogo y opción para otras.
 5. **Guías repetitivas/IA sin memoria:** F9 conserva contexto de pocos turnos IA y prioriza diagnóstico útil. No reintroducir respuestas genéricas ni obligar a activar un modo IA.
 6. **Contactar humano demasiado pronto:** tener el botón de asesor en toda guía **no significa** que toda guía requiera autorización. Escalar sin IA solo acciones que un humano debe ejecutar (vinculaciones, autorizaciones); guías técnicas pueden requerir explicación de IA.
-7. **Despliegue viejo por caché:** incrementos \`?v=fN\` y query de assets. **No confundir merge en \`main\` con actualización de Pages**. Verificar workflow Pages finalizado y que \`index.html\` refiera la versión correcta.
+7. **Despliegue viejo por caché:** incrementos `?v=fN` y query de assets. **No confundir merge en `main` con actualización de Pages**. Verificar workflow Pages finalizado y que `index.html` refiera la versión correcta.
 8. **Falsos éxitos:** pruebas con mocks NO prueban Groq real, WhatsApp recibido ni Safari físico. Resaltar pendientes reales.
-9. **CI genérico:** algunas ejecuciones fallaron en \`Browser smoke\` mientras QA específico Goxy/integridad pasaba. No ocultarlo ni culpar a Goxy sin logs.
+9. **CI genérico:** algunas ejecuciones fallaron en `Browser smoke` mientras QA específico Goxy/integridad pasaba. No ocultarlo ni culpar a Goxy sin logs.
 10. **Evitar tres días por una corrección:** primero inspeccionar módulo dueño, guías reales, estado de sesión, contrato visual y tests. Cambios atómicos en rama beta, revisar diff, pruebas focalizadas, PR y feedback del usuario; no reinventar un motor ni rediseñar toda Ayuda/Admin.
 
 ## 8. Próxima ruta de ejecución (orden sugerido)
@@ -164,11 +164,11 @@
 - [ ] Construir catálogo adicional de diagnósticos frecuentes desde casos reales (sesiones cerradas, QR, apps que piden Premium, errores de reproducción) con un paso útil y pregunta de confirmación; sin reglas genéricas que bloqueen toda IA.
 - [ ] Ofrecer **cupo de pruebas aislado** para admins/testers, sin gastar las 8 preguntas de clientes ni debilitar producción. Diseñar con cuota separada y autorización, no reinicios manuales improvisados de consumo histórico.
 - [ ] Medir porcentaje de consultas resueltas sin Groq, escaladas, rechazadas por cuota y necesitadas de humano **sin guardar PII ni conversaciones sensibles**.
-- [ ] En caso de reporte de clave/modelo, volver a verificar \`status\` seguro del backend; no afirmar que IA funciona únicamente porque existe el secreto.
+- [ ] En caso de reporte de clave/modelo, volver a verificar `status` seguro del backend; no afirmar que IA funciona únicamente porque existe el secreto.
 
 ### P2 — Información oficial más amplia, solo lectura
-- [ ] Integrar la **misma** lectura/proyección B2 que alimenta el próximo cobro en Index/Mi Espacio: importe, fecha próxima, calendarios multifecha, descuentos, mora y acuerdo. No usar \`total mensual\` cuando el cobro próximo es individual.
-- [ ] Misiones y promos: fortalecer elegibilidad, vigencia y contexto particular del cliente; ya existe lectura básica en \`goxy-ai-beta\` sin Groq.
+- [ ] Integrar la **misma** lectura/proyección B2 que alimenta el próximo cobro en Index/Mi Espacio: importe, fecha próxima, calendarios multifecha, descuentos, mora y acuerdo. No usar `total mensual` cuando el cobro próximo es individual.
+- [ ] Misiones y promos: fortalecer elegibilidad, vigencia y contexto particular del cliente; ya existe lectura básica en `goxy-ai-beta` sin Groq.
 - [ ] Otras tareas y ubicaciones de Goxy: el usuario anunció idea futura, **esperar requisitos específicos** antes de diseñar.
 
 ## 9. Instrucciones de estilo y trabajo con el usuario
@@ -182,4 +182,4 @@
 
 ## 10. Texto exacto sugerido para comenzar el próximo chat
 
-> **Continuemos GOXION / Goxy desde el último estado real.** Repositorio \`henrygonzalezestrada-cyber/goxion\`. Antes de editar, abre y lee COMPLETO \`docs/GOXY_CONTINUIDAD_Y_RUTA_2026-10-15.md\`, \`AGENTS.md\`, el contrato visual y los archivos actuales de \`preview/goxion-ai/\`. Goxy F12 está fusionada mediante PR #120 y publicada **solo en beta**, pero no aprobada aún en Safari físico; Issue #119. El objetivo inmediato es validar/corregir F12 (Premium/QR, múltiples servicios, PIN/contraseña por vistas oficiales y ficha WhatsApp revisable; el CLIENTE pulsa Enviar). NO toques Soporte oficial ni B2. Usa los conectores GitHub/Supabase, implementa tú los cambios, haz QA de regresión y confirma GitHub Pages antes de entregarme la URL. Muéstrame qué queda pendiente sin asumir que mocks equivalen a pruebas reales.
+> **Continuemos GOXION / Goxy desde el último estado real.** Repositorio `henrygonzalezestrada-cyber/goxion`. Antes de editar, abre y lee COMPLETO `docs/GOXY_CONTINUIDAD_Y_RUTA_2026-10-15.md`, `AGENTS.md`, el contrato visual y los archivos actuales de `preview/goxion-ai/`. Goxy F12 está fusionada mediante PR #120 y publicada **solo en beta**, pero no aprobada aún en Safari físico; Issue #119. El objetivo inmediato es validar/corregir F12 (Premium/QR, múltiples servicios, PIN/contraseña por vistas oficiales y ficha WhatsApp revisable; el CLIENTE pulsa Enviar). NO toques Soporte oficial ni B2. Usa los conectores GitHub/Supabase, implementa tú los cambios, haz QA de regresión y confirma GitHub Pages antes de entregarme la URL. Muéstrame qué queda pendiente sin asumir que mocks equivalen a pruebas reales.
