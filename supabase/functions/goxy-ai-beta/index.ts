@@ -61,6 +61,24 @@ function getGuide(platform:unknown,index:unknown){
     // todas las situaciones de esta plataforma lo requieran.
     human:rows.every(row=>row.requires_human)};
 }
+// F8.1: verifica el proveedor sin consumir tokens de conversación ni
+// revelar claves. Se consulta el catálogo de modelos con timeout estricto.
+async function providerStatus(key:string):Promise<{ready:boolean;code:string}>{
+  const abort=new AbortController(),timer=setTimeout(()=>abort.abort(),4500);
+  try{
+    const response=await fetch("https://api.groq.com/openai/v1/models",{
+      method:"GET",signal:abort.signal,headers:{"Authorization":"Bearer "+key}
+    });
+    if(response.status===401 || response.status===403)return {ready:false,code:"AI_KEY_REJECTED"};
+    if(!response.ok)return {ready:false,code:"AI_PROVIDER_UNAVAILABLE"};
+    const body=await response.json();
+    const ready=Array.isArray(body?.data)&&body.data.some(
+      (row:{id:string;active?:boolean})=>row.id===MODEL&&row.active!==false
+    );
+    return {ready,code:ready?"AI_READY":"MODEL_NOT_AVAILABLE"};
+  }catch{return {ready:false,code:"AI_PROVIDER_UNAVAILABLE"};}
+  finally{clearTimeout(timer);}
+}
 Deno.serve(async(req:Request)=>{
   const origin=req.headers.get("Origin");
   if(origin!==SITE)return output(origin,403,{ok:false,code:"ORIGIN_DENIED"});
@@ -82,7 +100,12 @@ Deno.serve(async(req:Request)=>{
     const body=await req.json().catch(()=>null);
     if(!body||typeof body!=="object"||Array.isArray(body))return output(origin,400,{ok:false,code:"BAD_REQUEST"});
     const key=Deno.env.get("GROQ_API_KEY");
-    if(body.mode==="status")return output(origin,200,{ok:true,configured:!!key,model:key?MODEL:null});
+    if(body.mode==="status"){
+      if(!key)return output(origin,200,{ok:true,configured:false,providerReady:false,code:"AI_NOT_CONFIGURED"});
+      const provider=await providerStatus(key);
+      return output(origin,200,{ok:true,configured:true,providerReady:provider.ready,
+        code:provider.code,model:provider.ready?MODEL:null});
+    }
     if(body.mode!=="chat")return output(origin,400,{ok:false,code:"MODE_UNSUPPORTED"});
     if(!safe(body.message))return output(origin,422,{ok:false,code:"SENSITIVE_OR_INVALID_INPUT",
       message:"Por seguridad no compartas códigos, contraseñas, PIN ni correos. Describe solo la falla."});
@@ -116,7 +139,7 @@ Deno.serve(async(req:Request)=>{
     try{response=await fetch("https://api.groq.com/openai/v1/chat/completions",{
       method:"POST",signal:abort.signal,
       headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json"},
-      body:JSON.stringify({model:MODEL,temperature:0.2,max_completion_tokens:420,
+      body:JSON.stringify({model:MODEL,temperature:0.2,reasoning_effort:"low",include_reasoning:false,max_completion_tokens:520,
         messages:[{role:"system",content:system},{role:"user",content:body.message.trim()}]})
     });}catch{return output(origin,503,{ok:false,code:"AI_TIMEOUT",
       message:"La IA no responde ahora. Puedes consultar la guía o contactar a un asesor."});

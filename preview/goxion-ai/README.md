@@ -1,7 +1,7 @@
-# GOXION · Goxy F8 · Conversación inteligente directa por plataforma
+# GOXION · Goxy F8.1 · Verificación del proveedor y consultas restantes
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f8
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f8-1
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -85,3 +85,13 @@ Documento de arquitectura y pasos de activación: [GOXY F7 Gateway IA Beta](../.
 - Activación única por administrador: generar clave en GroqCloud y guardarla directamente en **Supabase → Edge Functions → Secrets** bajo `GROQ_API_KEY`; no enviarla por ChatGPT ni subirla a GitHub. El cambio surte efecto automáticamente sin volver a publicar la Edge Function. Después validar respuesta real en la beta y auditar límites/privacidad antes de integrarla al Soporte oficial.
 
 **Estado:** Edge Function `goxy-ai-beta` versión 3 desplegada; proveedor no comprobado aún con una clave real. No afirmar que una consulta fue respondida con IA hasta esa prueba de extremo a extremo.
+
+## F8.1 · Activación verificada y cupo visible
+- Tras iniciar sesión, Goxy pregunta al backend si **Groq acepta la clave y ofrece el modelo configurado** mediante el endpoint de modelos. Este chequeo no genera respuestas ni consume la cuota de preguntas de GOXION.
+- Si la clave es incorrecta, el modelo no está disponible o Groq falla, el chat comunica que la IA aún no está operativa, en lugar de anunciarla disponible únicamente por existir un secreto.
+- Al obtener una respuesta real, el pie existente del chat muestra **consultas de IA restantes dentro de las 24 horas móviles**, sin añadir tarjetas ni cajas dentro de otras.
+- El backend usa `reasoning_effort: low` con GPT-OSS 20B para limitar uso innecesario de razonamiento y deja una respuesta corta.
+- **Cuota sin cambios**: 8 llamadas por cliente en una ventana móvil de 24 h, mínimo 20 segundos entre llamadas. Las guías oficiales y el asesor permanecen disponibles sin consumir preguntas de IA.
+- El proveedor también impone sus límites compartidos por organización/proyecto (solicitudes y tokens); ver `https://console.groq.com/docs/rate-limits`. No es correcto multiplicar el límite individual e interpretarlo como capacidad garantizada.
+- Pruebas: `node --test scripts/goxy-f8-1-provider.test.mjs`, `node preview/goxion-ai/check.mjs`, las regresiones de F7 y F8.
+- Pendiente **prueba real desde una sesión de cliente** para confirmar que la clave recién guardada genera una respuesta; las herramientas actuales permiten leer/desplegar Edge Functions, no leer Secret values ni suplantar una sesión.
