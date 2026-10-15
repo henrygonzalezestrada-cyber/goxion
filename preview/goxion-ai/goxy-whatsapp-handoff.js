@@ -6,7 +6,7 @@
     return String(value||'').replace(/[<>\u0000-\u001f]/g,' ').replace(/\s+/g,' ').trim().slice(0,max);
   }
   function prepare(platform,details={}){
-    const reference=ctx.supportReference?.(platform);
+    const reference=ctx.supportReference?.(platform,details.serviceIndex);
     if(!reference)return null;
     // SOLO diagnóstico estructurado; nunca incluir el texto íntegro del chat.
     const issue=short(details.issue||'Solicitud de ayuda con el acceso',180);
@@ -17,13 +17,14 @@
       'Cliente: '+short(reference.clientName||'Cliente GOXION',70),
       'GOXION ID: '+short(reference.clientId,70),
       'Plataforma: '+service,
+      'Servicio afectado: '+short(reference.serviceLabel||service,95),
       'Correo de acceso asociado: '+(reference.loginEmail||'No disponible en Mi Espacio'),
       'Problema: '+issue,
       'Comprobaciones: '+(check.length?check.join(' / '):'Consulta inicial'),
       'Acción solicitada: revisión de acceso con asesor',
       'El cliente confirmó compartir este resumen con soporte.'
     ].join('\n');
-    return {platform:service,clientId:reference.clientId,message};
+    return {platform:service,serviceIndex:reference.serviceIndex,clientId:reference.clientId,message};
   }
   function url(ticket){
     if(!ticket?.message)return null;
