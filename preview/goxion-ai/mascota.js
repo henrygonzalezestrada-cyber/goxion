@@ -737,7 +737,7 @@
         checks:['Servicio comprobado en Mi Espacio','Solo código QR disponible']
       };
     }
-    respondFree(query,result.reply,result.options||[]);
+    respondFree(query,result.reply,result.options||(result.handoff?[{kind:'human',label:'Preparar solicitud a soporte'}]:[]));
     return true;
   }
   function handleText(query) {
