@@ -1,7 +1,7 @@
-# GOXION · Goxy F8.1 · Verificación del proveedor y consultas restantes
+# GOXION · Goxy F9 · Soporte híbrido, memoria de chat y cuenta segura
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f8-1
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f9
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -95,3 +95,27 @@ Documento de arquitectura y pasos de activación: [GOXY F7 Gateway IA Beta](../.
 - El proveedor también impone sus límites compartidos por organización/proyecto (solicitudes y tokens); ver `https://console.groq.com/docs/rate-limits`. No es correcto multiplicar el límite individual e interpretarlo como capacidad garantizada.
 - Pruebas: `node --test scripts/goxy-f8-1-provider.test.mjs`, `node preview/goxion-ai/check.mjs`, las regresiones de F7 y F8.
 - Pendiente **prueba real desde una sesión de cliente** para confirmar que la clave recién guardada genera una respuesta; las herramientas actuales permiten leer/desplegar Edge Functions, no leer Secret values ni suplantar una sesión.
+
+## F9 · Arquitectura híbrida para evitar respuestas repetidas y cuotas desperdiciadas
+**Motivación:** el usuario probó el flujo ViX con consultas "Ya coloqué el código pero no responde" y "Qué puedes hacer". El contador se descontó dos veces aunque las respuestas fueron genéricas. La causa era que el backend enviaba al modelo únicamente la pregunta actual y un prompt que impedía conversaciones naturales, sin herramientas privadas.
+
+### Orquestación actual
+1. **Sin IA:** saludo/capacidades y pasos de guías existentes. El render de guías tarda ~1,3 segundos en vez de simular una búsqueda de casi 4 segundos.
+2. **Sin IA, con servidor autenticado:** tareas/misiones activas del propio cliente (fuente `gamificacion` + `cliente_misiones_progreso`) y promociones públicas activas (fechas de `promociones_catalogo`). Nunca se envían al proveedor; no se registran conversaciones ni se descuenta la cuota de Groq.
+3. **Intervención humana sin IA:** códigos de vinculación ya introducidos que requieren autorización, contraseñas y gestiones que Goxy no puede ejecutar. Solo se reutiliza el contacto humano de Ayuda, nunca las credenciales.
+4. **Groq opcional:** preguntas adicionales sobre plataforma/guía cuando el cliente elige ese modo. Historial en memoria de hasta tres pares (6 mensajes), filtrado y acotado, no persistido; se borra al cerrar el chat o cambiar de plataforma. El prompt conserva el contexto y pide una aclaración útil antes de repetir un saludo genérico.
+
+### Estado financiero: límite deliberado
+No se presentan importes ni próxima fecha como cifras calculadas por Goxy. GOXION B2 utiliza calendario individual/multifecha, abonos, promociones, mora y prórrogas. Las tablas `goxion_b2_cargos` no están materializadas para la mayoría de las cuentas, de modo que extraer un total con cálculos nuevos sería potencialmente erróneo. Mientras no exista un **lector de proyección oficial compartido con Index/Ayuda**, el botón abre Mi Espacio → Ver estado de cuenta. No se altera ni reescribe el motor de cobro para F9.
+
+### Privacidad y seguridad
+- `mode:account` validado en `goxy-ai-beta`: firma HMAC, expiración, cliente activo y lista blanca de temas. Solo consultas SELECT de su propio registro/ catálogo público; nunca acciones financieras, PIN, usuario, correo ni claves.
+- `mode:chat` reutiliza cuota de 8/24 h y espera de 20 s; no es un límite global de todos los clientes. Groq aplica su propia cuota de proveedor de forma agregada.
+- `history` se filtra en cliente **y servidor**, máximo 6 mensajes, sin roles `system` introducidos desde navegador ni secuencias de datos confidenciales.
+- La interfaz oficial de Soporte, Index, Admin, tabla financiera y otras Edge Functions **no se modifican**.
+
+### QA
+- `node preview/goxion-ai/check.mjs`: gestos, caricias con scroll, guías, contrato de IA, memoria breve, consulta de misiones sin IA y código humano sin IA.
+- `node --test scripts/goxy-f9-hybrid.test.mjs`: estado de misiones y progreso, vigencia de ofertas, retorno financiero sin inventar, sanitización del historial, cero consumo IA en consultas propias.
+- En beta, probar texto normal y una cuenta de prueba con misiones; validar que la cuota de IA no baje hasta pulsar IA expresamente.
+- Próximo hito: integrar con lectura del **mismo cálculo oficial de próximo vencimiento y monto** cuando esté disponible como función read-only validada.
