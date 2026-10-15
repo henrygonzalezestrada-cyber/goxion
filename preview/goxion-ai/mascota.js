@@ -856,7 +856,7 @@
     // Sin plataforma elegida, no consumir IA intentando adivinarla.
     runDemo(questions.libre,query,showPlatforms);
   }
-  function humanHandoff() {
+  function humanHandoff(serviceIndex=null) {
     if(!active||!authenticated())return;
     pendingHandoff=null;
     if(!chosenPlatform){
@@ -864,12 +864,18 @@
         [{kind:'platforms',label:'Elegir plataforma'}]);
       return;
     }
+    const accounts=clientContext.destinations?.(chosenPlatform)||[];
+    if(accounts.length>1 && !Number.isInteger(serviceIndex)){
+      bubble('Veo más de un acceso de '+chosenPlatform+'. ¿Cuál es el que presenta el problema?',false);
+      showChoices(accounts.map(c=>({kind:'handoff-service',serviceIndex:c.index,label:c.label})));
+      return;
+    }
     const guide=lastGuide?knowledge.guide(lastGuide.platform,lastGuide.issueIndex):null;
     const details=caseContext||{
       issue:guide?.issue||'Problema de acceso o reproducción',
       checks:guide?['Guía de soporte consultada','Se requiere intervención de asesor']:['Se solicita revisión de soporte']
     };
-    const ticket=handoff?.prepare(chosenPlatform,details);
+    const ticket=handoff?.prepare(chosenPlatform,{...details,serviceIndex});
     if(!ticket){
       respondFree('Solicitar asistencia','No pude comprobar los datos del servicio en tu sesión. Vuelve a abrir Mi Espacio y prueba de nuevo.',
         [{kind:'account',label:'Abrir Mi Espacio'}]);
@@ -885,7 +891,7 @@
   }
   function openHandoff(){
     if(!active||!authenticated()||!pendingHandoff)return;
-    const current=clientContext.supportReference?.(pendingHandoff.platform);
+    const current=clientContext.supportReference?.(pendingHandoff.platform,pendingHandoff.serviceIndex);
     if(!current || current.clientId!==pendingHandoff.clientId){
       pendingHandoff=null;
       bubble('La sesión cambió. Por seguridad prepara la ficha nuevamente.',false);
@@ -922,6 +928,11 @@
     }
     if(type==='device'){
       recordDevice('Estoy en '+button.dataset.device,button.dataset.device);
+      return;
+    }
+    if(type==='handoff-service'){
+      const selected=Number(button.dataset.serviceIndex);
+      if(Number.isInteger(selected))humanHandoff(selected);
       return;
     }
     if(type==='send-handoff'){openHandoff();return;}
