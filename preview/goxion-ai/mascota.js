@@ -1208,7 +1208,9 @@
     messageInput.value = '';
     if(pendingAI){
       // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
-      if(accountTopic(text) || (knowledge.resolvePlatform(text) &&
+      const local=knowledge.normalize(text);
+      if(accountTopic(text) || /^(hola(?: goxy)?|que puedes hacer|que puedo hacer|que haces|buenos dias|buenas tardes|buenas noches)$/.test(local) ||
+         (knowledge.resolvePlatform(text) &&
          knowledge.resolvePlatform(text)!==pendingAI.chosen?.platform)){
         cancelFlow();
         handleText(text);
