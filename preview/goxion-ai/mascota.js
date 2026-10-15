@@ -1,4 +1,4 @@
-/* GOXION · Goxy F5 · máquina de estados conversacional local y gestos F4.
+/* GOXION · Goxy F6 · guías de soporte canónicas y gestos con scroll vertical.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -23,6 +23,10 @@
     return '<span class="gxai-mascot gxai-canvas-slot" data-mood="idle" role="img" aria-label="Goxy, robot animado con pantalla LED"></span>';
   }
 
+  if (typeof window.GOXY_SUPPORT?.guide !== 'function') {
+    console.error('[GOXION Goxy] No está disponible el catálogo canónico de soporte.');
+    return;
+  }
   if (typeof window.GOXY_ROBOT?.mountAll !== 'function') {
     console.error('[GOXION Goxy] El motor original de robot-heads no está disponible.');
     return;
@@ -59,8 +63,8 @@
     '<button class="gxai-close" type="button" aria-label="Cerrar chat">×</button>',
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
-    '<div class="gxai-beta-note">FASE 2 · CONVERSACIÓN SIMULADA</div>',
-    '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Ya puedo escucharte y mostrar cuándo pienso, busco, respondo o encuentro un error. Por ahora mis respuestas son simuladas; todavía no consulto tus servicios.</div>',
+    '<div class="gxai-beta-note">FASE 3 · GUÍAS REALES DE SOPORTE</div>',
+    '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Selecciona un tema o escríbeme qué servicio presenta la falla. No compartas contraseñas, códigos ni PIN por aquí.</div>',
     '<div class="gxai-suggestions">',
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="cuenta">Quiero consultar mi cuenta</button>',
@@ -75,7 +79,7 @@
     '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
     '</button>',
     '</form>',
-    '<div class="gxai-chat-disclaimer">Demostración local · Sin IA, consultas de cuenta ni envíos reales.</div>',
+    '<div class="gxai-chat-disclaimer">Guías oficiales GOXION · Sin IA, datos privados ni solicitudes automáticas.</div>',
     '</footer>',
     '</section>'
   ].join('');
@@ -202,6 +206,8 @@
     if (!active) return;
     active = false; requestId++;
     cancelFlow();
+    clearChoices();
+    chosenPlatform = null;
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
@@ -223,19 +229,19 @@
     acceso: {
       prompt: 'Tengo un problema de acceso',
       step: 'searching',
-      response: 'Podré guiarte paso a paso cuando conectemos la base verificada de soluciones. Esta prueba no consulta ni modifica accesos.',
+      response: 'Te ayudo. Selecciona la plataforma con la falla para mostrarte las situaciones y guías registradas en GOXION.',
       finish: 'happy'
     },
     cuenta: {
       prompt: 'Quiero consultar mi cuenta',
       step: 'searching',
-      response: 'En una siguiente fase podré consultar información autorizada de Mi Espacio. Aquí no leo saldos, fechas ni datos personales.',
+      response: 'Para ver tus servicios, saldos o próximo pago exacto, utiliza Mi Espacio y el estado de cuenta oficial. Todavía no puedo consultar información personal desde este chat.',
       finish: 'happy'
     },
     codigo: {
       prompt: 'Necesito un código',
-      step: 'working',
-      response: 'Cuando esté conectado podré preparar una solicitud para que un asesor atienda los códigos de verificación. Esta prueba NO envió ninguna solicitud.',
+      step: 'searching',
+      response: 'Selecciona tu plataforma y te mostraré sus pasos de acceso. Cuando haga falta revisar un código o autorizar un dispositivo, te dirigiré al asesor humano; este chat no recibe códigos.',
       finish: 'happy'
     },
     error: {
@@ -245,12 +251,12 @@
       finish: 'error'
     },
     libre: {
-      step: 'thinking',
-      response: '¡Recibí tu mensaje de prueba! Ya muestro cuándo escucho, pienso y respondo. Todavía no tengo IA ni puedo resolver o consultar tu cuenta.',
+      step: 'searching',
+      response: 'Voy a ayudarte a localizar la guía oficial. Selecciona una plataforma para continuar.',
       finish: 'happy'
     }
   });
-  function runDemo(entry, enteredText) {
+  function runDemo(entry, enteredText, onDone) {
     if (!active || busy || !authenticated()) return;
     const query = String(enteredText || entry.prompt || '').trim();
     if (!query) return;
@@ -273,7 +279,128 @@
     later(flowId, 3900, () => {
       setBusy(false);
       chatTransition('listening');
+      if (typeof onDone === 'function') onDone();
     });
+  }
+
+  // F6: navegación por las guías existentes, sin duplicar ni editar sus textos.
+  const knowledge = window.GOXY_SUPPORT;
+  let chosenPlatform = null;
+  let choices = null;
+  function clearChoices() {
+    if (choices) { choices.remove(); choices = null; }
+  }
+  function showChoices(items) {
+    clearChoices();
+    if (!active || !authenticated() || !items.length) return;
+    choices = doc.createElement('div');
+    choices.className = 'gxai-choices';
+    items.forEach(item => {
+      const button = doc.createElement('button');
+      button.type = 'button';
+      button.className = 'gxai-choice';
+      button.textContent = item.label;
+      button.dataset.kind = item.kind;
+      if (item.platform) button.dataset.platform = item.platform;
+      if (Number.isInteger(item.issueIndex)) button.dataset.issueIndex = String(item.issueIndex);
+      choices.appendChild(button);
+    });
+    scroll.appendChild(choices);
+    scroll.scrollTop = scroll.scrollHeight;
+  }
+  const choosePlatformOptions = () => knowledge.platforms().map(platform =>
+    ({kind:'platform',platform,label:platform}));
+  function showPlatforms() {
+    showChoices(choosePlatformOptions());
+  }
+  function showIssues(platform) {
+    const issues = knowledge.issues(platform);
+    showChoices([
+      ...issues.map((issue,index)=>({kind:'issue',platform,issueIndex:index,label:issue.issue})),
+      {kind:'platforms',label:'Ver otras plataformas'},
+      {kind:'human',label:'Hablar con asesor humano'}
+    ]);
+  }
+  function showGuide(platform, index) {
+    const guide = knowledge.guide(platform,index);
+    if (!guide) {
+      runDemo({prompt:'Consultar guía',step:'searching',
+        response:'No encontré esa guía actualizada. Puedes elegir otra situación o hablar directamente con un asesor.',
+        finish:'error'},null,showPlatforms);
+      return;
+    }
+    chosenPlatform = platform;
+    // Las instrucciones proceden EXCLUSIVAMENTE de support-issues.js,
+    // convertidas a texto. Nunca incluir correo_login, perfil_pin o credenciales.
+    const answer = 'Guía GOXION · '+platform+'\n'+guide.issue+'\n\n'+
+      guide.instructions+'\n\n'+(guide.requiresHuman
+      ? 'Para códigos, correos de autorización o revisiones de cuenta, continúa con un asesor humano. No compartas esos datos en este chat.'
+      : 'Si todavía necesitas ayuda, puedes hablar con un asesor.');
+    runDemo({prompt:guide.issue,step:'searching',response:answer,finish:'happy'},
+      null,()=>showChoices([
+        {kind:'issues',platform,label:'Otra situación de '+platform},
+        {kind:'human',label:'Hablar con asesor humano'},
+        {kind:'platforms',label:'Cambiar plataforma'}
+      ]));
+  }
+  function handleText(query) {
+    const words = knowledge.normalize(query);
+    const platform = knowledge.resolvePlatform(query);
+    if (/\b(asesor|humano|whatsapp|persona)\b/.test(words)) {
+      runDemo({prompt:query,step:'working',
+        response:'Puedes continuar con el asesor humano de GOXION. Se abrirá el contacto oficial cuando pulses el botón; aquí no se envió ningún mensaje.',
+        finish:'happy'},query,()=>showChoices([{kind:'human',label:'Hablar con asesor humano'}]));
+      return;
+    }
+    if (/\b(pago|pagar|deuda|saldo|vencimiento|factura|mora|prorroga|lealtad|cupon)\b/.test(words) && !platform) {
+      runDemo(questions.cuenta,query,()=>showChoices([
+        {kind:'account',label:'Ir a Mi Espacio'}, {kind:'platforms',label:'Buscar ayuda de plataformas'}
+      ]));
+      return;
+    }
+    const target = platform || chosenPlatform;
+    if (target) {
+      const index = knowledge.matchIssue(target,query);
+      if (index !== null) { showGuide(target,index); return; }
+      chosenPlatform = target;
+      runDemo({prompt:query,step:'searching',
+        response:'Encontré las guías disponibles para '+target+'. ¿Cuál de estas situaciones se parece a tu problema?',finish:'happy'},query,
+        ()=>showIssues(target));
+      return;
+    }
+    runDemo(questions.libre,query,showPlatforms);
+  }
+  function humanHandoff() {
+    if (!active || !authenticated()) return;
+    // Es el botón de contacto humano YA aprobado en Ayuda, sin datos de cliente
+    // adjuntos ni llamada a sendSmartWA, que añadiría perfil/PIN.
+    const official = section.querySelector('.direct-contact-box button');
+    closeChat();
+    official?.click();
+  }
+  function choiceAction(button) {
+    if (!active || busy || !authenticated()) return;
+    const type = button.dataset.kind;
+    const platform = button.dataset.platform;
+    const index = Number(button.dataset.issueIndex);
+    if (type === 'human') { humanHandoff(); return; }
+    if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
+    if (type === 'platforms') {
+      chosenPlatform = null;
+      runDemo({prompt:'Ver plataformas',step:'searching',
+        response:'Elige tu plataforma para consultar las soluciones disponibles.',finish:'happy'},null,showPlatforms);
+    } else if (type === 'platform' && knowledge.platforms().includes(platform)) {
+      chosenPlatform = platform;
+      runDemo({prompt:platform,step:'searching',
+        response:'Estas son las situaciones de soporte registradas para '+platform+':',finish:'happy'},null,()=>showIssues(platform));
+    } else if (type === 'issues' && knowledge.platforms().includes(platform)) {
+      chosenPlatform = platform;
+      runDemo({prompt:'Ver otras situaciones',step:'searching',
+        response:'¿Qué situación necesitas revisar de '+platform+'?',finish:'happy'},null,()=>showIssues(platform));
+    } else if (type === 'issue' && knowledge.platforms().includes(platform) &&
+               Number.isInteger(index) && index >= 0) {
+      showGuide(platform,index);
+    }
   }
 
 
@@ -385,19 +512,28 @@
   closeButton.addEventListener('click', closeChat);
   layer.querySelector('.gxai-backdrop').addEventListener('click', closeChat);
   layer.addEventListener('click', event => {
-    const button = event.target.closest('.gxai-suggestion');
+    const chosen = event.target.closest?.('.gxai-choice');
+    if (chosen) { choiceAction(chosen); return; }
+    const button = event.target.closest?.('.gxai-suggestion');
     if (!active || !button) return;
     const entry = questions[button.dataset.prompt];
-    if (entry) runDemo(entry);
+    if (!entry) return;
+    if (button.dataset.prompt === 'acceso' || button.dataset.prompt === 'codigo') {
+      runDemo(entry,null,showPlatforms);
+    } else if (button.dataset.prompt === 'cuenta') {
+      runDemo(entry,null,()=>showChoices([
+        {kind:'account',label:'Ir a Mi Espacio'}, {kind:'platforms',label:'Buscar ayuda de plataformas'}
+      ]));
+    } else runDemo(entry);
   });
-  // Mensajes libres: solo conversación simulada. Nada sale del navegador.
+  // Mensajes libres: guías reales de soporte, sin consultar cuentas ni red.
   composer.addEventListener('submit', event => {
     event.preventDefault();
     if (!active || busy || !authenticated()) return;
     const text = messageInput.value.trim();
     if (!text) return;
     messageInput.value = '';
-    runDemo(questions.libre, text);
+    handleText(text);
   });
   messageInput.addEventListener('input', () => {
     if (active && !busy && authenticated()) chatTransition('listening');
