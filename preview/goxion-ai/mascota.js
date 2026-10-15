@@ -279,7 +279,7 @@
 
   // Goxy tipo Tamagotchi: un toque provoca gestos, una caricia genera corazones.
   // La ventana del chat SOLO se abre mediante el botón «Hablar con Goxy».
-  const pet = { id: null, lastX: 0, lastY: 0, distance: 0, stroking: false, lastHeart: 0, taps: 0 };
+  const pet = { id: null, startX: 0, startY: 0, lastX: 0, lastY: 0, distance: 0, stroking: false, scrolling: false, lastHeart: 0, taps: 0 };
   function makeHeart() {
     if (reducedMotion() || reactionLayer.childElementCount >= 9) return;
     const heart = doc.createElement('span');
@@ -320,19 +320,28 @@
   heroTrigger.addEventListener('pointerdown', (event) => {
     if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0) || !authenticated()) return;
     pet.id = event.pointerId;
-    pet.lastX = event.clientX; pet.lastY = event.clientY;
-    pet.distance = 0; pet.stroking = false; pet.lastHeart = 0;
-    try { heroTrigger.setPointerCapture(event.pointerId); } catch (_) {}
-    event.preventDefault();
+    pet.startX = pet.lastX = event.clientX;
+    pet.startY = pet.lastY = event.clientY;
+    pet.distance = 0; pet.stroking = false; pet.scrolling = false; pet.lastHeart = 0;
+    // iOS: no capturar ni cancelar pointerdown. Safari debe conservar pan-y.
+    // La caricia se reconoce solo después de una intención HORIZONTAL clara.
   });
   heroTrigger.addEventListener('pointermove', (event) => {
     if (pet.id !== event.pointerId) return;
-    const step = Math.hypot(event.clientX - pet.lastX, event.clientY - pet.lastY);
+    if (pet.scrolling) return;
+    const dx = event.clientX - pet.startX;
+    const dy = event.clientY - pet.startY;
     pet.lastX = event.clientX; pet.lastY = event.clientY;
-    // Un gesto rápido puede llegar como un solo evento de movimiento en iOS.
-    // Contamos su recorrido para no confundir una caricia veloz con un toque.
-    pet.distance += Math.min(step, 180);
-    if (pet.distance >= 24) pet.stroking = true;
+    // Los arrastres verticales pertenecen al scroll, incluso sobre la cabeza.
+    // Hasta distinguir la dirección no consumimos el gesto.
+    if (!pet.stroking && Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx) * 1.15) {
+      pet.scrolling = true;
+      return;
+    }
+    // El recorrido horizontal, no el diagonal o vertical, activa el cariño.
+    if (!pet.stroking && Math.abs(dx) >= 24 && Math.abs(dx) >= Math.abs(dy) * 1.2) {
+      pet.stroking = true;
+    }
     if (!pet.stroking) return;
     const now = performance.now();
     if (now - pet.lastHeart > 230) {
@@ -344,21 +353,28 @@
   });
   heroTrigger.addEventListener('pointerup', (event) => {
     if (pet.id !== event.pointerId) return;
-    // También detecta el último desplazamiento si Safari no envió pointermove.
-    pet.distance += Math.min(Math.hypot(event.clientX - pet.lastX, event.clientY - pet.lastY), 180);
-    if (pet.distance >= 24) pet.stroking = true;
+    // Si Safari solo envió el último evento, clasificar dirección antes de actuar.
+    const dx = event.clientX - pet.startX;
+    const dy = event.clientY - pet.startY;
+    if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx) * 1.15) pet.scrolling = true;
+    if (!pet.scrolling && !pet.stroking && Math.abs(dx) >= 24 && Math.abs(dx) >= Math.abs(dy) * 1.2) pet.stroking = true;
+    if (pet.scrolling) {
+      pet.id = null; pet.stroking = false; pet.scrolling = false;
+      return;
+    }
     if (pet.stroking) {
       mood('love', 2400);
       makeHeart();
       petStatus.textContent = '¡Goxy te manda mucho cariño!';
-    } else if (pet.distance < 16) {
+    } else if (Math.hypot(dx, dy) < 16) {
       playfulTap();
     }
-    pet.id = null; pet.stroking = false;
+    pet.id = null; pet.stroking = false; pet.scrolling = false;
   });
   heroTrigger.addEventListener('pointercancel', () => {
-    pet.id = null; pet.stroking = false;
-    mood('idle');
+    pet.id = null; pet.stroking = false; pet.scrolling = false;
+    // En scroll nativo, Safari dispara pointercancel: no impedir el movimiento.
+    mood(active ? 'listening' : 'idle');
   });
   // Eventos click sintetizados por teclado: no abrir el chat, también hacen gestos.
   heroTrigger.addEventListener('click', (event) => {
