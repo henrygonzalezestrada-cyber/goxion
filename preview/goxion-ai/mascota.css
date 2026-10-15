@@ -1,0 +1,55 @@
+/* GOXION AI · beta mascota F1. Scope EXCLUSIVO: #view-soporte */
+#view-soporte #smart-support-card.gxai-card{position:relative;overflow:visible;padding:22px 18px 23px;text-align:center;border:1px solid rgba(124,77,255,.27);background:rgba(8,8,12,.32);isolation:isolate;}
+#view-soporte .gxai-original[hidden]{display:none!important;}
+#view-soporte .gxai-kicker{font-size:10px;font-weight:600;letter-spacing:.13em;color:#95a4bd;text-transform:uppercase;}
+#view-soporte .gxai-hero{position:relative;display:flex;flex-direction:column;align-items:center;gap:0}
+#view-soporte .gxai-mascot-button{border:0;background:transparent;cursor:pointer;position:relative;display:grid;place-items:center;width:min(100%,290px);min-height:259px;margin:3px auto 0;padding:3px 0;outline-offset:3px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+#view-soporte .gxai-mascot-button::before{content:"";position:absolute;inset:33px 16px 15px;border-radius:50%;background:radial-gradient(ellipse,rgba(124,77,255,.15),rgba(0,242,254,.05) 45%,transparent 70%);filter:blur(19px);pointer-events:none}
+#view-soporte .gxai-mascot-button:focus-visible,#view-soporte .gxai-open:focus-visible,#view-soporte .gxai-close:focus-visible,#view-soporte .gxai-suggestion:focus-visible,#view-soporte .gxai-backdrop:focus-visible{outline:2px solid #00f2fe;outline-offset:4px}
+#view-soporte .gxai-mascot{position:relative;display:block;width:min(100%,272px);max-height:259px;overflow:visible;filter:drop-shadow(0 17px 22px rgba(0,0,0,.48));animation:gxai-float 4.8s ease-in-out infinite;transform-origin:50% 65%;transition:filter .3s}
+#view-soporte .gxai-mascot-button:hover .gxai-mascot{filter:drop-shadow(0 16px 19px rgba(124,77,255,.23))}
+#view-soporte .gxai-head{transform-origin:50% 57%;animation:gxai-nod 7s ease-in-out infinite}
+#view-soporte .gxai-led,#view-soporte .gxai-ear-led{filter:drop-shadow(0 0 5px rgba(0,242,254,.6))}
+#view-soporte .gxai-antenna-bulb{animation:gxai-beacon 3.2s ease-in-out infinite}
+#view-soporte .gxai-face{transition:opacity .22s ease;transform-origin:50% 57%}
+#view-soporte .gxai-face:not(.gxai-face-idle){opacity:0}
+#view-soporte .gxai-mascot[data-mood="happy"] .gxai-face-idle,#view-soporte .gxai-mascot[data-mood="thinking"] .gxai-face-idle,#view-soporte .gxai-mascot[data-mood="listening"] .gxai-face-idle,#view-soporte .gxai-mascot[data-mood="speaking"] .gxai-face-idle{opacity:0}
+#view-soporte .gxai-mascot[data-mood="happy"] .gxai-face-happy,#view-soporte .gxai-mascot[data-mood="thinking"] .gxai-face-thinking,#view-soporte .gxai-mascot[data-mood="listening"] .gxai-face-listening,#view-soporte .gxai-mascot[data-mood="speaking"] .gxai-face-speaking{opacity:1}
+#view-soporte .gxai-mascot[data-mood="thinking"] .gxai-head{animation:gxai-think 2.1s ease-in-out infinite}
+#view-soporte .gxai-mascot[data-mood="happy"] .gxai-head{animation:gxai-cheer .6s ease-out 1}
+#view-soporte .gxai-mascot[data-mood="listening"] .gxai-antenna-bulb{filter:drop-shadow(0 0 12px #00f2fe)}
+#view-soporte .gxai-eye-idle{transform-origin:center;animation:gxai-blink 6.2s ease-in-out infinite}
+#view-soporte .gxai-title{font-size:clamp(21px,5.8vw,27px);font-weight:700;line-height:1.22;color:#fff;letter-spacing:-.03em;margin:2px auto 8px}
+#view-soporte .gxai-title span{background:linear-gradient(105deg,#a88aff,#00f2fe);color:transparent;background-clip:text;-webkit-background-clip:text}
+#view-soporte .gxai-desc{font-size:12px;line-height:1.65;color:#95a4bd;max-width:305px;margin:0 auto 16px}
+#view-soporte .gxai-open{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 auto;min-height:44px;max-width:310px;width:100%;border-radius:30px;border:1px solid rgba(0,242,254,.32);background:linear-gradient(115deg,rgba(124,77,255,.16),rgba(0,242,254,.07));color:#fff;font:600 12px Poppins,sans-serif;cursor:pointer;transition:background .2s,border-color .2s}
+#view-soporte .gxai-open:hover{border-color:rgba(0,242,254,.65);background:linear-gradient(115deg,rgba(124,77,255,.22),rgba(0,242,254,.13))}
+#view-soporte .gxai-open svg{flex:none}
+#view-soporte .gxai-chat-layer{position:fixed;inset:0;z-index:6000;display:flex;align-items:flex-end;justify-content:center;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .26s,visibility .26s}
+#view-soporte .gxai-chat-layer.gxai-visible{opacity:1;visibility:visible;pointer-events:auto}
+#view-soporte .gxai-backdrop{position:absolute;inset:0;background:rgba(3,3,5,.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:0;width:100%;cursor:default}
+#view-soporte .gxai-chat{position:relative;display:flex;flex-direction:column;overflow:hidden;width:min(100%,560px);height:min(78dvh,670px);min-height:350px;background:linear-gradient(165deg,rgba(20,18,33,.98),rgba(7,9,17,.99));border:1px solid rgba(124,77,255,.32);border-radius:24px 24px 0 0;box-shadow:0 -20px 60px rgba(0,0,0,.45);transform:translateY(35px) scale(.98);transition:transform .33s cubic-bezier(.22,.8,.23,1);overscroll-behavior:contain}
+#view-soporte .gxai-visible .gxai-chat{transform:translateY(0) scale(1)}
+#view-soporte .gxai-chat-head{display:flex;align-items:center;gap:11px;min-height:76px;padding:11px 17px;border-bottom:1px solid rgba(255,255,255,.08);flex:none}
+#view-soporte .gxai-avatar{width:54px;height:54px;display:grid;place-items:center;flex:none}
+#view-soporte .gxai-avatar .gxai-mascot{width:68px;max-height:none;animation:none;transform:scale(.8);transform-origin:center}
+#view-soporte .gxai-heading{min-width:0;flex:1;text-align:left}
+#view-soporte .gxai-heading strong{font-size:14px;display:block;color:#fff}
+#view-soporte .gxai-heading small{font-size:10px;display:block;color:#95a4bd;margin-top:2px}
+#view-soporte .gxai-close{display:grid;place-items:center;width:34px;height:34px;border-radius:100%;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;flex:none;font:400 21px/1 sans-serif}
+#view-soporte .gxai-chat-scroll{flex:1;overflow-y:auto;min-height:0;padding:17px;display:flex;flex-direction:column;gap:12px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+#view-soporte .gxai-bubble{font:400 12px/1.6 Poppins,sans-serif;max-width:92%;padding:11px 14px;border-radius:16px;align-self:flex-start;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.055);color:#e4e8f3;text-align:left;white-space:pre-line;overflow-wrap:anywhere}
+#view-soporte .gxai-bubble.gxai-me{background:rgba(124,77,255,.21);border-color:rgba(124,77,255,.25);align-self:flex-end;color:#fff}
+#view-soporte .gxai-suggestions{display:flex;flex-wrap:wrap;gap:7px}
+#view-soporte .gxai-suggestion{min-height:36px;border-radius:20px;border:1px solid rgba(0,242,254,.19);background:rgba(0,242,254,.055);color:#dce8fb;padding:8px 11px;font:500 11px Poppins,sans-serif;cursor:pointer}
+#view-soporte .gxai-chat-foot{border-top:1px solid rgba(255,255,255,.07);padding:12px 17px calc(12px + env(safe-area-inset-bottom));font:400 10px/1.5 Poppins,sans-serif;color:#95a4bd;text-align:center;flex:none}
+#view-soporte .gxai-beta-note{display:inline-block;border:1px solid rgba(124,77,255,.22);color:#b7a2ff;border-radius:20px;padding:3px 9px;font-size:10px;margin-bottom:8px}
+@keyframes gxai-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes gxai-nod{0%,36%,75%,100%{transform:rotate(0)}48%{transform:rotate(-3deg)}60%{transform:rotate(2deg)}}
+@keyframes gxai-think{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes gxai-cheer{0%,100%{transform:translateY(0) rotate(0)}45%{transform:translateY(-13px) rotate(5deg)}}
+@keyframes gxai-blink{0%,44%,46%,93%,95%,100%{transform:scaleY(1)}45%,94%{transform:scaleY(.1)}}
+@keyframes gxai-beacon{0%,100%{opacity:.75}50%{opacity:1;filter:drop-shadow(0 0 9px #00f2fe)}}
+@media(min-width:600px){#view-soporte .gxai-chat-layer{align-items:center;padding:16px}#view-soporte .gxai-chat{border-radius:24px;max-height:calc(100dvh - 32px)}}
+@media(max-width:360px){#view-soporte #smart-support-card.gxai-card{padding:18px 12px 19px}#view-soporte .gxai-mascot-button{min-height:217px;width:250px}#view-soporte .gxai-mascot{width:229px}#view-soporte .gxai-desc{font-size:11px}#view-soporte .gxai-chat-head{min-height:67px}}
+@media(prefers-reduced-motion:reduce){#view-soporte .gxai-mascot,#view-soporte .gxai-head,#view-soporte .gxai-eye-idle,#view-soporte .gxai-antenna-bulb{animation:none!important}#view-soporte .gxai-chat,#view-soporte .gxai-chat-layer{transition:none!important}}
