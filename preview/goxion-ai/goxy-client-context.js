@@ -55,5 +55,31 @@
       return extract(snapshot?.cliente);
     }catch{return unavailable('load_failed');}
   }
-  window.GOXY_CLIENT_CONTEXT=Object.freeze({local,refresh});
+  // F12: rutas a la misma tarjeta OFICIAL de Mi Espacio.
+  // Nunca copiar usuario, PIN, correo o contraseña al chat, IA, logs ni URL.
+  function destinations(platform) {
+    if(!key() || !token())return [];
+    const view=typeof globalClientesData!=='undefined'?globalClientesData:null;
+    const current=view && Object.prototype.hasOwnProperty.call(view,key())?view[key()]:null;
+    if(!Array.isArray(current?.servicios))return [];
+    const allowed=support.platforms();
+    if(!allowed.includes(platform))return [];
+    return current.servicios.flatMap((service,index)=>{
+      if(!service || service.activo===false)return [];
+      const labels=[service.nombre,...(Array.isArray(service.accesos)
+        ? service.accesos.map(x=>x?.servicio):[])].filter(x=>typeof x==='string');
+      if(!labels.some(label=>support.resolveAllPlatforms(label).includes(platform)))return [];
+      // Métadatos mínimos no secretos, solo sesión autorizada.
+      const accesses=Array.isArray(service.accesos)?service.accesos.filter(a=>
+        support.resolveAllPlatforms(a?.servicio||service.nombre).includes(platform)): [];
+      const hasProfile=Boolean(service.perfil_pin||service.perfil_nombre||
+        accesses.some(a=>a.perfil_pin||a.perfil_nombre));
+      const hasLogin=Boolean(service.correo_login || accesses.some(a=>a.correo));
+      const hasPendingPassword=service.credencial_pendiente?.estado==='pendiente' &&
+        support.resolveAllPlatforms(service.credencial_pendiente.plataforma||service.nombre).includes(platform);
+      return [{index,label:platform+(current.servicios.length>1?' · servicio '+(index+1):''),
+        hasProfile,hasLogin,hasPendingPassword}];
+    });
+  }
+  window.GOXY_CLIENT_CONTEXT=Object.freeze({local,refresh,destinations});
 })();
