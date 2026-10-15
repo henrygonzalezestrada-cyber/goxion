@@ -586,51 +586,84 @@
 
   // IA F7: solo se consulta el backend si el usuario seleccionó una guía
   // canónica. Nunca enviar fichas cliente, PIN ni valores de Mi Espacio.
-  async function askAI(query) {
-    if (!active || busy || !authenticated() || !chosenGuide) return;
+  // La cuota del servidor es definitiva: esta cola solo gestiona su pausa corta.
+  // Si llega otra pregunta durante la espera, se conserva únicamente la última.
+  function queueAI(text,waitMs,chosen,alreadyShown=false,retryCount=0){
+    if(!active||!authenticated())return;
+    if(!alreadyShown)bubble(text.slice(0,240),true);
+    clearChoices();
+    pendingAI={text,chosen,retryCount,
+      identity:String(window.getCurrentClientKey?.()||'')};
+    chatTransition('thinking');
+    chatPhase.textContent='Preparando tu siguiente consulta…';
+    showTyping();
+    setBusy(false);
+    const flow=++activeFlow;
+    later(flow,Math.min(35000,Math.max(400,waitMs)),()=>{
+      const next=pendingAI;pendingAI=null;
+      if(!next||next.identity!==String(window.getCurrentClientKey?.()||''))return;
+      hideTyping();
+      void askAI(next.text,{alreadyShown:true,overrideGuide:next.chosen,
+        cooldownBypass:true,retryCount:next.retryCount});
+    });
+  }
+  async function askAI(query,options={}){
+    const chosen=options.overrideGuide||chosenGuide;
+    if(!active||busy||!authenticated()||!chosen)return;
     const text=String(query||'').trim();
-    if (!text || /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu.test(text)) {
+    if(!text||/\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b|\b(?:\d[\s.-]?){9,16}\b|\b\d{4,8}\b/iu.test(text)){
       bubble('Por seguridad no compartas correos, códigos, PIN o datos personales. Describe solamente la falla.',false);
-      chatTransition('error');
+      chatTransition('error');return;
+    }
+    const identity=String(window.getCurrentClientKey?.()||'');
+    const remaining=lastAIAccount===identity?21000-(Date.now()-lastAIAnswerAt):0;
+    if(!options.cooldownBypass&&remaining>0){
+      queueAI(text,remaining,chosen,options.alreadyShown===true,0);
       return;
     }
     clearChoices();
-    bubble(text.slice(0,240),true);
+    if(!options.alreadyShown)bubble(text.slice(0,240),true);
     setBusy(true);
     chatTransition('thinking');
     showTyping();
     const current=++activeFlow;
     aiController=new AbortController();
-    const chosen={...chosenGuide};
     const reply=await ai.ask({message:text,...chosen,history:[...conversation],signal:aiController.signal});
-    if(!active || current!==activeFlow || !authenticated())return;
+    if(!active||current!==activeFlow||!authenticated())return;
     aiController=null;
+    if(reply.code==='RATE_LIMIT'){
+      const seconds=Number(reply.retry_after);
+      if(Number.isFinite(seconds)&&seconds>0&&seconds<=34&&(options.retryCount||0)<1){
+        queueAI(text,(seconds+1)*1000,chosen,true,(options.retryCount||0)+1);
+        return;
+      }
+    }
     hideTyping();
-    if(reply.ok && typeof reply.answer==='string'){
+    if(reply.ok&&typeof reply.answer==='string'){
+      lastAIAnswerAt=Date.now();lastAIAccount=identity;
       chatTransition('speaking');
       bubble(reply.answer,false);
       keepTurn(text,reply.answer);
       if(Number.isInteger(reply.remaining)){
-        disclaimer.textContent = 'Te quedan '+reply.remaining+
+        disclaimer.textContent='Te quedan '+reply.remaining+
           ' consultas IA de tu cupo móvil de 24 h · Nunca compartas códigos ni PIN.';
       }
       later(current,950,()=>chatTransition('happy'));
     }else if(reply.code!=='ABORTED'){
       chatTransition('error');
-      bubble(reply.message||'Goxy no puede conectarse con la IA todavía. La guía oficial y el asesor siguen disponibles.',false);
-      if(reply.code==='AI_NOT_CONFIGURED') {
-        aiConfigured=false;
-        aiMode=false;
+      bubble(reply.code==='RATE_LIMIT'
+        ? 'La asistencia avanzada sigue en pausa. Puedes continuar con las guías y el asesor sin gastar IA.'
+        : reply.message||'Goxy no puede conectar con la IA todavía. Las guías siguen disponibles.',false);
+      if(reply.code==='AI_NOT_CONFIGURED'){
+        aiConfigured=false;aiMode=false;
         setAIStatus('pending','Falta configurar la clave privada de Groq en Supabase. Las guías permanecen disponibles.');
       }
     }
     later(current,1700,()=>{
       setBusy(false);
       chatTransition('listening');
-      showChoices([
-        {kind:'human',label:'Hablar con asesor humano'},
-        {kind:'issues',platform:chosen.platform,label:'Ver otras soluciones'}
-      ]);
+      showChoices([{kind:'human',label:'Hablar con asesor humano'},
+        {kind:'issues',platform:chosen.platform,label:'Ver otras soluciones'}]);
     });
   }
   // Datos personales SOLO con el backend autenticado de GOXION.
