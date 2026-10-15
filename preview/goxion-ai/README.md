@@ -1,5 +1,7 @@
 # GOXION · Goxy F12 · Recuperación de acceso y ficha WhatsApp consentida
 
+> **Documento canónico para nuevos chats y próximos cambios:** [GOXY_CONTINUIDAD_Y_RUTA_2026-10-15.md](../../docs/GOXY_CONTINUIDAD_Y_RUTA_2026-10-15.md). Contiene estado comprobado del PR #120, CI, reglas aprobadas, seguridad, fases anteriores, QA F12 pendiente y pasos de continuidad. **No confundir merge/despliegue beta con aceptación en iPhone ni con Soporte oficial.**
+
 ## Vista beta
 https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f12
 
