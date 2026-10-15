@@ -636,6 +636,7 @@
       chatTransition('error');return;
     }
     const identity=String(window.getCurrentClientKey?.()||'');
+    const loginToken=localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'';
     const remaining=lastAIAccount===identity?21000-(Date.now()-lastAIAnswerAt):0;
     if(!options.cooldownBypass&&remaining>0){
       queueAI(text,remaining,chosen,options.alreadyShown===true,0);
@@ -650,6 +651,10 @@
     aiController=new AbortController();
     const reply=await ai.ask({message:text,...chosen,history:[...conversation],signal:aiController.signal});
     if(!active||current!==activeFlow||!authenticated())return;
+    if(identity!==String(window.getCurrentClientKey?.()||'')||
+      loginToken!==(localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'')){
+      closeChat();return;
+    }
     aiController=null;
     if(reply.code==='RATE_LIMIT'){
       const seconds=Number(reply.retry_after);
@@ -693,6 +698,8 @@
   async function accountRead(topic,query,paymentMode='all',chargeId=null){
     if(!active||busy||!authenticated())return;
     const text=String(query||'').trim();
+    const identity=String(window.getCurrentClientKey?.()||'');
+    const loginToken=localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'';
     lastAccountTopic=topic;
     if(topic==='forecast' && !(chargeId||payment.parseDate(text))){
       respondFree(text,'Claro, puedo calcular cuánto pagarías en una fecha futura usando el motor oficial. ¿Qué día tienes en mente? Por ejemplo: «el 31 de octubre» o «en 5 días».',
@@ -711,6 +718,10 @@
       {signal:aiController.signal});
     else response=await ai.account(topic,{signal:aiController.signal,message:text});
     if(!active||flow!==activeFlow||!authenticated())return;
+    if(identity!==String(window.getCurrentClientKey?.()||'')||
+       loginToken!==(localStorage.getItem(window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||'')||'')){
+      closeChat();return;
+    }
     aiController=null;
     const hinted=topic==='payment'&&paymentMode==='all'?knowledge.resolvePlatform(text):null;
     const viewMode=hinted?'platform':paymentMode;
