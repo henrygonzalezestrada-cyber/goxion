@@ -662,6 +662,43 @@
     if(/\b(pago|pagar|saldo|corte|vencimient[oa]|fecha de pago|estado de cuenta|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))return 'payment';
     return null;
   }
+  // F11: clasificador LOCAL. Decidir no requiere otra llamada a Groq.
+  // Solo escalar cuando hay plataforma, síntomas suficientes y ninguna
+  // acción bloqueada por control humano. La cuota se consume únicamente
+  // dentro de askAI(), no en la clasificación ni en las guías.
+  function isVague(text) {
+    const words=knowledge.normalize(text);
+    if (/\b(no abre|no carga|no funciona|se congela|pantalla negra|error|sin sonido|no reproduce|no inicia sesion|se cierra|bloquea|falla al)\b/.test(words))return false;
+    const meaningful=words.split(' ').filter(w=>w.length>2 &&
+      !['tengo','necesito','quiero','ayuda','problema','plataforma','servicio','con','para','por','esta','algo'].includes(w));
+    return meaningful.length<3;
+  }
+  function escalationFallback(platform) {
+    respondFree('Necesito más ayuda',
+      'Por ahora no tengo disponible una explicación avanzada. Puedo revisar contigo otra guía de '+platform+
+      ' o enviarte con un asesor para continuar.',
+      [{kind:'issues',platform,label:'Consultar otra solución'},
+       {kind:'human',label:'Hablar con asesor humano'}]);
+  }
+  function escalateAutomatically(query,platform,issueIndex) {
+    if(!knowledge.platforms().includes(platform)||!active||busy||!authenticated())return;
+    const guide=Number.isInteger(issueIndex)?knowledge.guide(platform,issueIndex):null;
+    // La IA no puede ejecutar autorizaciones: evitar cobros en gestiones humanas.
+    if(guide?.requiresHuman){
+      respondFree(query,
+        'Esta gestión necesita una autorización de GOXION. Ya tenemos el contexto; un asesor debe finalizarla. No me envíes códigos ni contraseñas.',
+        [{kind:'human',label:'Continuar con asesor humano'},
+         {kind:'issues',platform,label:'Ver otras soluciones'}]);
+      return;
+    }
+    if(!aiConfigured){escalationFallback(platform);return;}
+    aiMode=true;
+    awaitingSymptom=false;
+    chosenPlatform=platform;
+    chosenGuide=Number.isInteger(issueIndex)?{platform,issueIndex}:{platform};
+    messageInput.placeholder='Cuéntame qué ocurre…';
+    void askAI(query);
+  }
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
@@ -695,8 +732,7 @@
          {kind:'platforms',label:'Ver otras guías'}]);
       return;
     }
-    // La IA mantiene un hilo breve solamente si el usuario realmente la eligió.
-    if (aiMode && chosenGuide) {void askAI(query);return;}
+    // Acciones de navegación o consulta nunca gastan IA, aun tras una explicación.
     if (/\b(cambiar|otra|elegir|ver)(?: de)? plataformas?\b/.test(words)) {
       chosenPlatform = null;
       runDemo({prompt:query,step:'searching',
@@ -704,6 +740,10 @@
       return;
     }
     const platform = knowledge.resolvePlatform(query);
+    if(platform && chosenPlatform && platform!==chosenPlatform){
+      aiMode=false;awaitingSymptom=false;lastGuide=null;chosenGuide=null;
+      resetConversation();
+    }
     if (/\b(asesor|humano|whatsapp|persona)\b/.test(words)) {
       runDemo({prompt:query,step:'working',
         response:'Puedes continuar con el asesor humano de GOXION. Se abrirá el contacto oficial cuando pulses el botón; aquí no se envió ningún mensaje.',
@@ -714,18 +754,39 @@
       void accountRead('payment',query);
       return;
     }
-    // Sin haber elegido el modo IA, los mensajes usan guías comprobadas.
-    // La selección explícita evita respuestas externas inesperadas.
+    // La IA solo continúa después de una escalada real, no como modo elegido.
     const target = platform || chosenPlatform;
     if (target) {
+      const samePlatform = lastGuide?.platform===target;
       const index = knowledge.matchIssue(target,query);
-      if (index !== null) { showGuide(target,index); return; }
-      chosenPlatform = target;
-      runDemo({prompt:query,step:'searching',
-        response:'Encontré las guías disponibles para '+target+'. ¿Cuál de estas situaciones se parece a tu problema?',finish:'happy'},query,
-        ()=>showIssues(target));
+      const failed=/\b(ya|hice|intente|probe|sigue|todavia|aun|no sirvio|no resolvio|no funciona|mismo problema)\b/.test(words);
+      if(samePlatform && lastGuide && failed){
+        escalateAutomatically(query,target,lastGuide.issueIndex);
+        return;
+      }
+      if (index !== null && !aiMode) {showGuide(target,index);return;}
+      if (aiMode && chosenGuide?.platform===target) {
+        void askAI(query);
+        return;
+      }
+      chosenPlatform=target;
+      if (isVague(query) && !awaitingSymptom) {
+        awaitingSymptom=true;
+        respondFree(query,
+          'Entiendo, revisemos '+target+'. ¿Qué sucede exactamente: no abre, aparece un error, no reproduce o falla al iniciar sesión? Cuéntame el síntoma sin enviar datos privados.',
+          [{kind:'issues',platform:target,label:'Ver problemas conocidos'}]);
+        return;
+      }
+      if(isVague(query) && awaitingSymptom){
+        respondFree(query,
+          'Para poder ayudarte necesito un detalle más: ¿qué ves en la pantalla y en qué momento sucede?',
+          [{kind:'issues',platform:target,label:'Ver guías disponibles'}]);
+        return;
+      }
+      escalateAutomatically(query,target,samePlatform?lastGuide?.issueIndex:undefined);
       return;
     }
+    // Sin plataforma elegida, no consumir IA intentando adivinarla.
     runDemo(questions.libre,query,showPlatforms);
   }
   function humanHandoff() {
