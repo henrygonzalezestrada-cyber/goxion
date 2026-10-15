@@ -136,6 +136,7 @@
   const clientContext = window.GOXY_CLIENT_CONTEXT;
   const accessRouter = window.GOXY_ACCESS;
   const handoff = window.GOXY_HANDOFF;
+  const payment = window.GOXY_PAYMENT;
   let myPlatforms = [];
   let myContextReady = false;
   function applyMyPlatforms(snapshot) {
@@ -171,6 +172,9 @@
   let accessStage = null;
   let caseContext = null;
   let pendingHandoff = null;
+  let lastAccountTopic = null;
+  let pendingAI = null;
+  let lastAIAnswerAt = 0, lastAIAccount = '';
   // Solo memoria local de esta sesión de chat: nunca localStorage, ni BD.
   const conversation = [];
   function resetConversation() { conversation.length = 0; }
@@ -235,7 +239,7 @@
     if (typing) return;
     typing = doc.createElement('div');
     typing.className = 'gxai-typing';
-    typing.setAttribute('aria-label', 'Goxy está procesando la demostración');
+    typing.setAttribute('aria-label', 'Goxy está preparando la respuesta');
     typing.innerHTML = '<i></i><i></i><i></i>';
     scroll.appendChild(typing);
     scroll.scrollTop = scroll.scrollHeight;
@@ -254,6 +258,7 @@
   }
   function cancelFlow() {
     activeFlow++;
+    pendingAI = null;
     aiController?.abort();
     aiController = null;
     flowTimers.forEach(timer => clearTimeout(timer));
@@ -327,6 +332,7 @@
     accessStage = null;
     caseContext = null;
     pendingHandoff = null;
+    lastAccountTopic = null;
     resetConversation();
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
@@ -381,6 +387,7 @@
     accessStage = null;
     caseContext = null;
     pendingHandoff = null;
+    lastAccountTopic = null;
     resetConversation();
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
@@ -400,6 +407,7 @@
     node.textContent = text;
     scroll.appendChild(node);
     scroll.scrollTop = scroll.scrollHeight;
+    return node;
   }
   const questions = Object.freeze({
     acceso: {
@@ -492,6 +500,7 @@
       if (Number.isInteger(item.serviceIndex)) button.dataset.serviceIndex=String(item.serviceIndex);
       if(item.device)button.dataset.device=item.device;
       if (item.view) button.dataset.view=item.view;
+      if (item.chargeId) button.dataset.chargeId=item.chargeId;
       choices.appendChild(button);
     });
     scroll.appendChild(choices);
@@ -1168,6 +1177,7 @@
     aiEntry: () => aiEntry,
     awaitingSymptom: () => awaitingSymptom,
     aiStatus: () => aiPanel.getAttribute('data-ai-status'),
-    contractedPlatforms: () => [...myPlatforms]
+    contractedPlatforms: () => [...myPlatforms],
+    aiQueued: () => Boolean(pendingAI)
   });
 })();
