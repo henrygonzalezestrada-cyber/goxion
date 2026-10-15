@@ -1,7 +1,7 @@
-# GOXION · Goxy F7.3 · Plataformas integradas únicamente en la conversación
+# GOXION · Goxy F8 · Conversación inteligente directa por plataforma
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7-3
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f8
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -74,3 +74,14 @@ Documento de arquitectura y pasos de activación: [GOXY F7 Gateway IA Beta](../.
 - El resto de las plataformas siguen accesibles desde las opciones del chat, con retorno a las contratadas; los estados, el botón y la zona de caricias no cambian.
 - Tests simulados comprueban específicamente que no existe la tarjeta, que solo aparece **un menú contextual** al pedir ayuda y que sigue pudiendo consultarse una plataforma no contratada.
 - F7.3 solo modifica archivos bajo `preview/goxion-ai/`; **el Soporte oficial continúa intacto**.
+
+## F8 · Conversación directa, con controles de seguridad
+- Con el servidor de IA activado, el cliente pulsa **Usar IA → ViX/Netflix/otra plataforma → escribe su consulta**. Se elimina el paso obligatorio de escoger primero una situación específica. No se sustituye el flujo de guías manuales, que permanece disponible.
+- El servidor valida la marca contra las nueve plataformas con soporte registrado y construye un contexto limitado **exclusivamente con artículos aprobados**. También conserva el modo anterior que recibe una guía concreta, para asegurar compatibilidad.
+- Si falta la clave privada `GROQ_API_KEY`, el panel informa «IA pendiente de activación»; no fabrica respuestas ni realiza solicitudes al proveedor. Una sesión de cliente no equivale a una cuenta en Groq.
+- El cliente nunca envía a Groq información financiera, identidades, correos, PIN, números de cuenta ni credenciales. El modelo solo recibe plataforma, artículos públicos y pregunta filtrada; gestión de códigos y autorizaciones se deriva a humano.
+- Control servidor: validación HMAC de sesión GOXION, estado del cliente, quota de 8/24 h y 20 segundos entre llamadas. Conversaciones no se almacenan.
+- Pruebas: `node preview/goxion-ai/check.mjs`, `node scripts/goxy-f8-context.test.mjs`, `node --test scripts/goxy-f7-security.test.mjs`, `node scripts/goxy-knowledge-sync.mjs`.
+- Activación única por administrador: generar clave en GroqCloud y guardarla directamente en **Supabase → Edge Functions → Secrets** bajo `GROQ_API_KEY`; no enviarla por ChatGPT ni subirla a GitHub. El cambio surte efecto automáticamente sin volver a publicar la Edge Function. Después validar respuesta real en la beta y auditar límites/privacidad antes de integrarla al Soporte oficial.
+
+**Estado:** Edge Function `goxy-ai-beta` versión 3 desplegada; proveedor no comprobado aún con una clave real. No afirmar que una consulta fue respondida con IA hasta esa prueba de extremo a extremo.
