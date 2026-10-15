@@ -109,9 +109,12 @@ async function accountAnswer(clientId:string,service:string,topic:unknown){
     const completed=new Set((await p.json()).map((v:{mision_index:number})=>v.mision_index));
     const pending=tasks.map((task,index)=>({index,task:publicTask(task)}))
       .filter(item=>!completed.has(item.index)).map(item=>item.task).filter(Boolean).slice(0,5);
+    const done=Math.min(tasks.length,completed.size);
+    const open=tasks.length-done;
     return {ok:true,source:"official_account",topic,
-      answer:"Tienes "+tasks.length+" misiones de esta ronda: "+completed.size+
-        " completadas y "+Math.max(0,tasks.length-completed.size)+" pendientes."+
+      answer:"En tu ronda actual tienes "+tasks.length+" misiones: "+done+
+        (done===1?" completada y ":" completadas y ")+open+
+        (open===1?" pendiente.":" pendientes.")+
         (pending.length?" Pendientes: "+pending.join("; ")+".":"")+
         (gam.cupon_reclamado?" Tu cupón ya figura reclamado.":" Puedes revisar los detalles y reclamar tu cupón en Mi Espacio."),
       openAccount:true};
