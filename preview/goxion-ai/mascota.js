@@ -598,8 +598,8 @@
   }
   function accountTopic(text){
     const normal=knowledge.normalize(text);
-    if(/\b(misiones?|tareas?|retos?|cupon|cupones)\b/.test(normal))return 'missions';
-    if(/\b(promociones?|ofertas?|descuentos? especiales?)\b/.test(normal))return 'promotions';
+    if(/\b(mision(?:es)?|tareas?|retos?|cupon(?:es)?)\b/.test(normal))return 'missions';
+    if(/\b(promocion(?:es)?|ofertas?|descuentos? especiales?)\b/.test(normal))return 'promotions';
     if(/\b(pago|pagar|saldo|corte|vencimient[oa]|fecha de pago|estado de cuenta|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))return 'payment';
     return null;
   }
