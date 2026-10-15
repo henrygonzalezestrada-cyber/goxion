@@ -55,8 +55,8 @@ function getGuide(platform:unknown,index:unknown){
     return {platform,issue:row.issue,guide:row.instructions.slice(0,1800),human:row.requires_human};
   }
   return {platform,issue:"Consulta general de soporte",guide:rows.map(row=>
-    "SITUACIÓN: "+row.issue+"\\nINSTRUCCIONES: "+row.instructions.slice(0,1000)+
-    (row.requires_human?"\\nREQUIERE ASESOR HUMANO.":"")).join("\\n\\n").slice(0,4500),
+    "SITUACIÓN: "+row.issue+"\nINSTRUCCIONES: "+row.instructions.slice(0,1000)+
+    (row.requires_human?"\nREQUIERE ASESOR HUMANO.":"")).join("\n\n").slice(0,4500),
     human:rows.some(row=>row.requires_human)};
 }
 Deno.serve(async(req:Request)=>{
