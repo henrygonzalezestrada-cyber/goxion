@@ -83,20 +83,29 @@
   }
   // Resumen de contacto para derivación explícitamente autorizada por cliente.
   // No copiar claves, PIN, códigos, perfiles ni otros campos de Mi Espacio.
-  function supportReference(platform){
+  function supportReference(platform,serviceIndex=null){
     if(!key() || !token() || !support.platforms().includes(platform))return null;
     const store=typeof globalClientesData!=='undefined'?globalClientesData:null;
     const account=store && Object.prototype.hasOwnProperty.call(store,key())?store[key()]:null;
     if(!account || !Array.isArray(account.servicios))return null;
-    const idx=destinations(platform).map(x=>x.index);
-    const service=account.servicios.find((_,i)=>idx.includes(i));
+    const choices=destinations(platform);
+    const chosen=Number.isInteger(serviceIndex)
+      ?choices.find(x=>x.index===serviceIndex)
+      :choices.length===1?choices[0]:null;
+    // Si hay varias cuentas del mismo servicio, nunca seleccionar la primera a ciegas.
+    if(!chosen)return null;
+    const service=account.servicios[chosen.index];
     if(!service)return null;
-    const email=String(service.correo_login||'').trim();
+    const accesses=Array.isArray(service.accesos)?service.accesos.filter(x=>
+      support.resolveAllPlatforms(x?.servicio||service.nombre).includes(platform)):[];
+    const email=String(service.correo_login||accesses.find(x=>x?.correo)?.correo||'').trim();
     return {
       clientId:key().slice(0,70),
       clientName:String(account.nombre||'').trim().slice(0,65),
       platform,
-      // El correo se utiliza sólo para la vista previa consentida, nunca en IA.
+      serviceIndex:chosen.index,
+      serviceLabel:chosen.label,
+      // El correo se utiliza sólo en la vista previa que aprueba el cliente.
       loginEmail:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)?email.slice(0,110):''
     };
   }
