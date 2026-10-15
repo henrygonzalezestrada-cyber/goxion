@@ -41,7 +41,7 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f7'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f7') && html.includes('goxy-support-knowledge.js?v=goxy-f7'),'Cargar F7 con catálogo');
+assert.ok(html.includes('mascota.js?v=goxy-f7-1') && html.includes('goxy-support-knowledge.js?v=goxy-f7'),'Cargar F7.1 con catálogo');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
 assert.ok(!js.includes('sendSmartWA('),'Goxy no debe usar soporte que agrega PIN y credenciales');
@@ -64,6 +64,7 @@ class Element {
   addEventListener(type,fn){(this.handlers[type] ||= []).push(fn);}
   fire(type,props={}){this.handlers[type]?.forEach(fn=>fn({preventDefault(){},stopPropagation(){},...props}));}
   setAttribute(name,value){this.attrs[name]=value;}
+  getAttribute(name){return this.attrs[name]??null;}
   focus(){doc.activeElement=this;}
   querySelector(sel) {
     if(this.name==='hero')return ({
@@ -73,7 +74,8 @@ class Element {
     if(this.name==='layer')return ({
       '.gxai-chat-scroll':scroll,'.gxai-chat':dialog,'.gxai-close':closeButton,
       '.gxai-backdrop':backdrop,'.gxai-chat-phase':phase,
-      '.gxai-composer':composer,'.gxai-message-input':input,'.gxai-send':send,'.gxai-chat-disclaimer':disclaimer
+      '.gxai-composer':composer,'.gxai-message-input':input,'.gxai-send':send,'.gxai-chat-disclaimer':disclaimer,
+      '.gxai-ai-panel':aiPanel,'.gxai-ai-title':aiTitle,'.gxai-ai-description':aiDescription,'.gxai-ai-start':aiStart
     })[sel]||null;
     return null;
   }
@@ -90,6 +92,8 @@ const robotHero=new Element('robotHero'),robotAvatar=new Element('robotAvatar');
 const scroll=new Element('scroll'),dialog=new Element('dialog'),closeButton=new Element('closeButton');
 const backdrop=new Element('backdrop'),phase=new Element('phase'),composer=new Element('composer');
 const input=new Element('input'),send=new Element('send'),disclaimer=new Element('disclaimer');
+const aiPanel=new Element('aiPanel'),aiTitle=new Element('aiTitle'),
+  aiDescription=new Element('aiDescription'),aiStart=new Element('aiStart');
 const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
 btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';
@@ -140,6 +144,8 @@ new Function('window','document','localStorage','performance','setTimeout','clea
 const layer=section.children.at(-1);
 const api=win.GOXION_AI_BETA;
 assert.ok(api,'Goxy no inició');assert.equal(mounts,1,'Render original no montó');
+assert.ok(js.includes('setAIStatus')&&js.includes('aiMode = true'),'Mostrar estado y activar modo explícito IA');
+assert.ok(js.includes("if (aiMode && chosenGuide)"),'Modo IA debe usar la guía incluso cuando el texto menciona la plataforma');
 const pointer=(x,y,id=1)=>({isPrimary:true,pointerType:'touch',pointerId:id,clientX:x,clientY:y,button:0});
 const clickDemo=button=>layer.fire('click',{target:{closest:selector=>selector==='.gxai-suggestion'?button:null}});
 const clickChoice=button=>layer.fire('click',{target:{closest:selector=>selector==='.gxai-choice'?button:null}});
@@ -283,4 +289,6 @@ assert.equal(hearts.childElementCount,heartCount);
 assert.ok(js.includes('ai.ask(') && js.includes('chosenGuide') && js.includes('aiController?.abort()'),
   'La IA usa guía seleccionada y cancela llamadas al cerrar');
 assert.ok(js.includes('AI_NOT_CONFIGURED'), 'Mostrar estado no configurado sin respuesta falsa');
-console.log('GOXION Goxy F7: conexión server-side lista, sin secretos frontend y F6 intacta PASS.');
+assert.ok(aiPanel.getAttribute('data-ai-status')==='checking'||aiPanel.getAttribute('data-ai-status')===null,
+  'El estado IA se debe manejar por respuesta del servidor, no inventarlo');
+console.log('GOXION Goxy F7.1: estado IA visible, modalidad explícita y F6 intacta PASS.');
