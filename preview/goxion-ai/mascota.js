@@ -1,4 +1,4 @@
-/* GOXION · Goxy F7.3 · plataformas en opciones del chat, sin recuadro inicial.
+/* GOXION · Goxy F8 · IA conversacional por plataforma sin pasos innecesarios.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -71,8 +71,8 @@
     '<button class="gxai-close" type="button" aria-label="Cerrar chat">×</button>',
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
-    '<div class="gxai-beta-note">FASE 4 · IA CON GUÍAS CONTROLADAS</div>',
-    '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Para usar la IA, comprueba primero su estado y elige una guía. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
+    '<div class="gxai-beta-note">GOXY · IA CON SOPORTE REAL</div>',
+    '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Cuando esté activa la IA, podrás conversar sobre tu plataforma sin buscar una guía primero. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
     '<div class="gxai-ai-panel" role="status" aria-live="polite">',
     '<span class="gxai-ai-light" aria-hidden="true"></span>',
     '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
@@ -162,6 +162,7 @@
     });
   }
   let aiMode = false;
+  let aiEntry = false;
   function setAIStatus(status, message) {
     aiPanel.setAttribute('data-ai-status', status);
     aiStart.disabled = status !== 'ready';
@@ -260,6 +261,7 @@
     cancelFlow();
     aiConfigured = false;
     aiMode = false;
+    aiEntry = false;
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
     refreshMyPlatforms();
@@ -299,6 +301,7 @@
     myPlatforms=[];
     myContextReady=false;
     aiMode = false;
+    aiEntry = false;
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
@@ -440,6 +443,7 @@
   function showIssues(platform) {
     chosenGuide = null;
     aiMode = false;
+    aiEntry = false;
     const issues = knowledge.issues(platform);
     showChoices([
       ...issues.map((issue,index)=>({kind:'issue',platform,issueIndex:index,label:issue.issue})),
@@ -448,6 +452,7 @@
     ]);
   }
   function showGuide(platform, index) {
+    aiEntry = false;
     const guide = knowledge.guide(platform,index);
     if (!guide) {
       runDemo({prompt:'Consultar guía',step:'searching',
@@ -594,6 +599,17 @@
         response:'Elige tu plataforma para consultar las soluciones disponibles.',finish:'happy'},null,showPlatforms);
     } else if (type === 'platform' && knowledge.platforms().includes(platform)) {
       chosenPlatform = platform;
+      if (aiEntry && aiConfigured) {
+        aiEntry = false;
+        aiMode = true;
+        chosenGuide = {platform};
+        clearChoices();
+        bubble('¡Perfecto! Ya podemos conversar sobre '+platform+'. ¿Qué necesitas saber? Me basaré en las guías oficiales y te avisaré si necesitas un asesor.',false);
+        messageInput.placeholder = 'Pregunta sobre '+platform+'…';
+        chatTransition('listening');
+        // No abrir el teclado sin tocarlo; mantiene el comportamiento Safari.
+        return;
+      }
       runDemo({prompt:platform,step:'searching',
         response:'Estas son las situaciones de soporte registradas para '+platform+':',finish:'happy'},null,()=>showIssues(platform));
     } else if (type === 'issues' && knowledge.platforms().includes(platform)) {
@@ -714,7 +730,8 @@
   openButton.addEventListener('click', openChat);
   aiStart.addEventListener('click', () => {
     if (!active || !authenticated() || !aiConfigured || busy) return;
-    bubble('Primero elige una plataforma y una situación. Así puedo responder sin inventar soluciones.',false);
+    aiEntry = true;
+    bubble('Elige una de tus plataformas o consulta otras. Puedes preguntarme directamente sin seleccionar un problema.',false);
     showPlatforms();
   });
   closeButton.addEventListener('click', closeChat);
@@ -726,6 +743,8 @@
     if (!active || !button) return;
     const entry = questions[button.dataset.prompt];
     if (!entry) return;
+    // Los accesos a guías mantienen el recorrido manual aprobado.
+    aiEntry = false;
     if (button.dataset.prompt === 'acceso' || button.dataset.prompt === 'codigo') {
       runDemo(entry,null,showPlatforms);
     } else if (button.dataset.prompt === 'cuenta') {
@@ -776,6 +795,7 @@
     renderer: 'robot-heads@0.3.0',
     aiConfigured: () => aiConfigured,
     aiMode: () => aiMode,
+    aiEntry: () => aiEntry,
     aiStatus: () => aiPanel.getAttribute('data-ai-status'),
     contractedPlatforms: () => [...myPlatforms]
   });
