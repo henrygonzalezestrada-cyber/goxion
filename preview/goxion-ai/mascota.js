@@ -607,7 +607,7 @@
     showTyping();
     const flow=++activeFlow;
     aiController=new AbortController();
-    const response=await ai.account(topic,{signal:aiController.signal});
+    const response=await ai.account(topic,{signal:aiController.signal,message:text});
     if(!active || flow!==activeFlow || !authenticated())return;
     aiController=null;
     hideTyping();
@@ -623,10 +623,12 @@
       chatTransition('listening');
       showChoices([
         {kind:'account',label:'Abrir Mi Espacio'},
-        {kind:'missions',label:'Mis misiones'},
-        {kind:'promotions',label:'Promociones'},
-        {kind:'payment',label:'Próximo pago'},
-        {kind:'platforms',label:'Soporte de plataformas'}
+        ...(topic==='missions'
+          ? [{kind:'promotions',label:'Ver promociones'}]
+          : topic==='promotions' ? [{kind:'missions',label:'Mis misiones'}] : [
+            {kind:'missions',label:'Mis misiones'},
+            {kind:'promotions',label:'Promociones'}]),
+        {kind:'platforms',label:'Ayuda con mis servicios'}
       ]);
     });
   }
@@ -656,6 +658,16 @@
         : '¡Hola! Puedo consultar tus misiones y promociones, orientarte sobre próximos pagos desde Mi Espacio y resolver dudas de plataformas con guías oficiales. La IA se usa solo cuando necesitamos una explicación adicional.',
         [{kind:'platforms',label:'Ayuda con plataformas'},
          {kind:'missions',label:'Mis misiones'},{kind:'payment',label:'Próximo pago'}]);
+      return;
+    }
+    // Diagnóstico de códigos sin gastar IA ni solicitar el valor del código.
+    if(/\b(codigo|vincular|enlazar|verificacion)\b/.test(words) &&
+        /\b(no acepta|no funciona|no responde|rechaza|incorrecto|caducado|expirado)\b/.test(words)){
+      respondFree(query,
+        (chosenPlatform ? 'Sobre '+chosenPlatform+': ' : '')+
+        'Entiendo que el código no está funcionando. ¿La pantalla indica «incorrecto», «caducado» o muestra otro mensaje? No escribas el código aquí. Si necesitas que GOXION autorice o vincule el dispositivo, esa acción la realizará un asesor.',
+        [{kind:'human',label:'Solicitar ayuda a un asesor'},
+         {kind:'platforms',label:'Revisar guías de acceso'}]);
       return;
     }
     // Una autorización que ya intentó el cliente no se arregla gastando más IA.
