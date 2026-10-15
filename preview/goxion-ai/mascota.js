@@ -831,9 +831,9 @@
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
-    if(helpWithAccess(query))return;
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
+    if(helpWithAccess(query))return;
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
         ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
@@ -1028,6 +1028,15 @@
       return;
     }
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
+    if (type === 'catalog') { closeChat(); window.switchTab?.('catalogo'); return; }
+    if (type === 'pay-open') { closeChat(); window.irAlTicket?.(); return; }
+    if (type === 'pay-next' || type === 'pay-all' || type === 'pay-one') {
+      void accountRead('payment',type==='pay-next'?'Mi próximo vencimiento':
+        type==='pay-all'?'Todo lo pendiente':'Pago de este perfil',
+        type==='pay-next'?'next':type==='pay-one'?'one':'all',
+        type==='pay-one'?button.dataset.chargeId:null);
+      return;
+    }
     if (type === 'platforms') {
       chosenPlatform = null;
       runDemo({prompt:'Ver plataformas',step:'searching',
@@ -1179,7 +1188,7 @@
       runDemo(entry,null,showPlatforms);
     } else if(button.dataset.prompt === 'cuenta'){
       respondFree('Quiero consultar mi cuenta',
-        'Puedo consultar tus misiones y las promociones publicadas. Para importes y fechas exactas, utiliza el estado de cuenta oficial porque contempla varios vencimientos, mora y prórrogas.',
+        'Puedo mostrarte los próximos vencimientos, los pagos por perfil y el saldo confirmado. También reviso tus misiones y promociones.',
         [{kind:'payment',label:'Próximo pago'},{kind:'missions',label:'Mis misiones'},
          {kind:'promotions',label:'Promociones'},{kind:'account',label:'Abrir Mi Espacio'}]);
     } else if(button.dataset.prompt==='misiones'||button.dataset.prompt==='promociones'){
@@ -1193,10 +1202,17 @@
     const text = messageInput.value.trim();
     if (!text) return;
     messageInput.value = '';
+    if(pendingAI){
+      // El mensaje más reciente reemplaza a la consulta en espera.
+      bubble(text.slice(0,240),true);
+      pendingAI.text=text;
+      chatPhase.textContent='Recibí tu última pregunta; esperando el turno de IA…';
+      return;
+    }
     handleText(text);
   });
   messageInput.addEventListener('input', () => {
-    if (active && !busy && authenticated()) chatTransition('listening');
+    if (active && !busy && !pendingAI && authenticated()) chatTransition('listening');
   });
   doc.addEventListener('keydown', event => {
     if (!active) return;
