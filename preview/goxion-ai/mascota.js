@@ -122,6 +122,7 @@
   let typing = null;
   let chatState = 'idle';
   let prevOverflowHtml = '', prevOverflowBody = '', previousFocus = null;
+  let pageFreeze = null;
   let aiController = null;
   let chosenGuide = null;
   let aiConfigured = false;
@@ -286,8 +287,9 @@
       const viewport = parent.visualViewport || window.visualViewport;
       const layoutH = parent.innerHeight || window.innerHeight || 0;
       if (!viewport || !layoutH) return;
-      const childH = Number(window.visualViewport?.height) || layoutH;
-      const viewH = Math.max(180, Math.min(layoutH, Math.round(viewport.height), Math.round(childH)));
+      // El viewport del iframe puede encogerse POR SEGUNDA vez en Safari.
+      // El padre ya representa el teclado real: no aplicar una doble reducción.
+      const viewH = Math.max(220, Math.min(layoutH, Math.round(viewport.height)));
       const top = Math.max(0, Math.round(viewport.offsetTop || 0));
       layer.style.setProperty('--gxai-viewport-height', viewH + 'px');
       layer.style.setProperty('--gxai-viewport-top', top + 'px');
@@ -361,6 +363,15 @@
     prevOverflowBody = doc.body.style.overflow;
     doc.documentElement.style.overflow = 'hidden';
     doc.body.style.overflow = 'hidden';
+    // iOS permite desplazamiento elástico aunque overflow sea hidden.
+    // Inmovilizar el body conservando su posición real y restaurarlo al cerrar.
+    const pageY = Number(window.scrollY)||0;
+    pageFreeze={pageY,position:doc.body.style.position,top:doc.body.style.top,
+      width:doc.body.style.width,overscroll:doc.documentElement.style.overscrollBehavior};
+    doc.body.style.position='fixed';
+    doc.body.style.top='-'+pageY+'px';
+    doc.body.style.width='100%';
+    doc.documentElement.style.overscrollBehavior='none';
     layer.classList.add('gxai-visible');
     layer.setAttribute('aria-hidden', 'false');
     syncChatViewport();
@@ -398,6 +409,14 @@
     layer.setAttribute('aria-hidden', 'true');
     doc.documentElement.style.overflow = prevOverflowHtml;
     doc.body.style.overflow = prevOverflowBody;
+    if(pageFreeze){
+      doc.body.style.position=pageFreeze.position||'';
+      doc.body.style.top=pageFreeze.top||'';
+      doc.body.style.width=pageFreeze.width||'';
+      doc.documentElement.style.overscrollBehavior=pageFreeze.overscroll||'';
+      window.scrollTo?.(0,pageFreeze.pageY);
+      pageFreeze=null;
+    }
     mood('idle');
     if (previousFocus?.isConnected) previousFocus.focus({preventScroll:true});
   }
@@ -501,6 +520,7 @@
       if(item.device)button.dataset.device=item.device;
       if (item.view) button.dataset.view=item.view;
       if (item.chargeId) button.dataset.chargeId=item.chargeId;
+      if (item.date) button.dataset.date=item.date;
       choices.appendChild(button);
     });
     scroll.appendChild(choices);
@@ -674,35 +694,43 @@
     if(!active||busy||!authenticated())return;
     const text=String(query||'').trim();
     lastAccountTopic=topic;
+    if(topic==='forecast' && !(chargeId||payment.parseDate(text))){
+      respondFree(text,'Claro, puedo calcular cuánto pagarías en una fecha futura usando el motor oficial. ¿Qué día tienes en mente? Por ejemplo: «el 31 de octubre» o «en 5 días».',
+        [{kind:'forecast-date',label:'Elegir fecha en calendario'}]);
+      return;
+    }
     clearChoices();bubble(text.slice(0,240),true);
     setBusy(true);chatTransition('searching');showTyping();
     const flow=++activeFlow;
     aiController=new AbortController();
-    const response=topic==='payment'
-      ? await payment.read({signal:aiController.signal})
-      : await ai.account(topic,{signal:aiController.signal,message:text});
+    let response;
+    if(topic==='payment')response=await payment.read({signal:aiController.signal});
+    else if(topic==='extension')response=await payment.extension({signal:aiController.signal});
+    else if(topic==='loyalty')response=await payment.loyalty({signal:aiController.signal});
+    else if(topic==='forecast')response=await ai.forecast(chargeId||payment.parseDate(text),
+      {signal:aiController.signal});
+    else response=await ai.account(topic,{signal:aiController.signal,message:text});
     if(!active||flow!==activeFlow||!authenticated())return;
     aiController=null;
-    const hinted=topic==='payment'&&paymentMode==='all'
-      ?knowledge.resolvePlatform(text):null;
+    const hinted=topic==='payment'&&paymentMode==='all'?knowledge.resolvePlatform(text):null;
     const viewMode=hinted?'platform':paymentMode;
-    const financial=topic==='payment'
-      ?payment.describe(response,viewMode,hinted||chargeId):null;
-    const success=topic==='payment'?Boolean(financial):
-      response.ok===true&&typeof response.answer==='string';
+    const financial=topic==='payment'?payment.describe(response,viewMode,hinted||chargeId):
+      topic==='extension'?payment.extensionDescribe(response):
+      topic==='loyalty'?payment.loyaltyDescribe(response):
+      topic==='forecast'?payment.forecastDescribe(response):null;
+    const success=Boolean(financial)||(response.ok===true&&typeof response.answer==='string');
     if(success){
       chatTransition('speaking');
       let answer=financial?.answer||response.answer;
       const catalogQuestion=topic==='missions'&&/\bcatalogo\b/.test(knowledge.normalize(text));
       const catalogMission=catalogQuestion&&/\bcatalogo\b/.test(knowledge.normalize(answer))&&
         /figura (?:pendiente|completada)/.test(answer);
-      if(catalogMission){
-        answer=answer.replace('Sigue las instrucciones de esa misión en Mi Espacio; si requiere una validación, GOXION debe confirmarla allí.',
-          'Para realizarla, abre la pestaña Catálogo de Mi Espacio y visita el catálogo. GOXION comprueba el avance de esa misión.');
-      }
+      if(catalogMission)answer=answer.replace(
+        'Sigue las instrucciones de esa misión en Mi Espacio; si requiere una validación, GOXION debe confirmarla allí.',
+        'Para realizarla, abre la pestaña Catálogo de Mi Espacio y visita el catálogo. GOXION comprueba el avance de esa misión.');
       const reply=bubble(answer,false);
       reply.classList.add('gxai-delayed-bubble');
-      showChoices(topic==='payment'?financial.choices:[
+      showChoices(financial?financial.choices:[
         {kind:'account',label:'Abrir Mi Espacio'},
         ...(catalogMission?[{kind:'catalog',label:'Abrir catálogo'}]:[]),
         ...(topic==='missions'?[{kind:'promotions',label:'Ver promociones'}]:
@@ -715,9 +743,7 @@
       bubble(response.message||'No pude comprobar ese dato ahora. Consulta Mi Espacio para información oficial.',false);
       showChoices([{kind:'account',label:'Abrir Mi Espacio'}]);
     }
-    later(flow,560,()=>{
-      hideTyping();setBusy(false);chatTransition('listening');
-    });
+    later(flow,560,()=>{hideTyping();setBusy(false);chatTransition('listening');});
   }
   function respondFree(text,reply,options=[]){
     if(!active||busy||!authenticated())return;
@@ -733,13 +759,28 @@
     later(id,520,()=>{hideTyping();chatTransition('speaking');});
     later(id,850,()=>chatTransition('listening'));
   }
+  // F14: la intención financiera tiene prioridad sobre el menú de plataformas.
+  // Una respuesta elíptica ("¿y si no puedo pagarlo?") conserva el contexto.
   function accountTopic(text){
     const normal=knowledge.normalize(text);
     if(/\b(mision(?:es)?|tareas?|retos?|cupon(?:es)?)\b/.test(normal))return 'missions';
-    if(lastAccountTopic==='missions'&&/\b(catalogo|referid|encuesta|opinion|comentario)\b/.test(normal))
+    if(lastAccountTopic==='missions' && /\b(catalogo|referid|encuesta|opinion|comentario)\b/.test(normal))
       return 'missions';
     if(/\b(promocion(?:es)?|ofertas?|descuentos? especiales?)\b/.test(normal))return 'promotions';
-    if(/\b(pago|pagar|pague|pagare|debo|deuda|mensualidad(?:es)?|proximo cobro|proxima fecha|cuando vence|vencimient[oa]|fecha de pago|estado de cuenta|saldo|corte|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))
+    if(/\b(lealtad|nivel maximo|nivel 2|programa goxion|racha de pagos)\b/.test(normal))
+      return 'loyalty';
+    if(/\b(cuanto|cuantos|si|hasta|para|en)\b/.test(normal) &&
+      /\b(mora|recargo|interes|tard|fecha|dia|dias|mes|pagari|pago|pagar|pague)\b/.test(normal) &&
+      (/\b(si|hasta|tard|despues|mora|recargo|interes)\b/.test(normal) &&
+      /\b(pago|pagar|pagari|fecha|dia|dias|mora|recargo)\b/.test(normal)))return 'forecast';
+    if(lastAccountTopic==='forecast' && (payment.parseDate(text) ||
+      /\b(fecha|dia|dias|manana)\b/.test(normal)))return 'forecast';
+    if(/\b(prorroga|plazo|aplazar|posponer|extender|diferir|no puedo pagar|no podre pagar|no voy a poder pagar|sin dinero|no me alcanza|no llego|pagarlo|pagarla|pagarles|pagar hasta)\b/.test(normal))
+      return 'extension';
+    if(lastAccountTopic==='payment' &&
+      /\b(y si no|y si|no puedo|no podre|me atraso|despues|hasta)\b/.test(normal))
+      return 'extension';
+    if(/\b(pago|pagar|pague|pagare|debo|deuda|mensualidad(?:es)?|proximo cobro|proxima fecha|cuando vence|vencimient[oa]|fecha de pago|estado de cuenta|saldo|corte|mora|cuanto debo|cuanto voy a pagar)\b/.test(normal))
       return 'payment';
     return null;
   }
@@ -835,9 +876,9 @@
   function handleText(query) {
     // La información que ya administra GOXION y los saludos no consumen IA.
     const words = knowledge.normalize(query);
-    if(helpWithAccess(query))return;
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
+    if(helpWithAccess(query))return;
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
         ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
@@ -974,6 +1015,29 @@
     window.open(link,'_blank','noopener,noreferrer');
     closeChat();
   }
+  function showForecastDate(){
+    clearChoices();
+    if(!active||!authenticated())return;
+    const first=payment.localDay(),max=payment.addDays(first,45);
+    const panel=doc.createElement('div');panel.className='gxai-date-panel';
+    const label=doc.createElement('label');
+    label.textContent='¿Qué día planeas pagar?';
+    const input=doc.createElement('input');
+    input.type='date';input.className='gxai-date-input';
+    input.min=first;input.max=max;input.value=payment.addDays(first,1);
+    const button=doc.createElement('button');
+    button.type='button';button.className='gxai-choice';button.textContent='Calcular importe';
+    button.addEventListener('click',()=>{
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(input.value)||
+        input.value<first||input.value>max){
+        chatPhase.textContent='Elige una fecha válida hasta 45 días adelante';return;
+      }
+      panel.remove();
+      void accountRead('forecast','Si pago el '+input.value,undefined,input.value);
+    });
+    label.appendChild(input);panel.appendChild(label);panel.appendChild(button);
+    scroll.appendChild(panel);scroll.scrollTop=scroll.scrollHeight;
+  }
   function choiceAction(button) {
     if (!active || busy || !authenticated()) return;
     const type = button.dataset.kind;
@@ -1034,6 +1098,17 @@
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'catalog') { closeChat(); window.switchTab?.('catalogo'); return; }
     if (type === 'pay-open') { closeChat(); window.irAlTicket?.(); return; }
+    if (type === 'extend-open') {
+      closeChat();window.switchTab?.('inicio');
+      // Solo se abre el control oficial y únicamente si aún está visible.
+      setTimeout(()=>doc.querySelector('.gx-prorroga-entry')?.click(),160);
+      return;
+    }
+    if (type === 'forecast-date') {showForecastDate();return;}
+    if (type === 'forecast-check' && button.dataset.date){
+      void accountRead('forecast','Si pago el '+button.dataset.date,undefined,button.dataset.date);
+      return;
+    }
     if (type === 'pay-next' || type === 'pay-all' || type === 'pay-one' || type === 'pay-platform') {
       void accountRead('payment',type==='pay-next'?'Mi próximo vencimiento':
         type==='pay-all'?'Todo lo pendiente':'Pago de este perfil',
