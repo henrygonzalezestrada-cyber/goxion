@@ -1,5 +1,7 @@
 # GOXION · Guía para cualquier asistente que trabaje en el repositorio
 
+> **CONTINUIDAD Goxy (15/oct/2026):** para cualquier trabajo del asistente Goxy leer **antes de editar** [estado F12 y ruta entre chats](docs/GOXY_CONTINUIDAD_Y_RUTA_2026-10-15.md). F12 está fusionada/publicada **solo en beta** (PR #120), no aprobada en Safari físico, y la prueba general Browser smoke de CI quedó con fallo. No reconstruir fases F1–F11 ni trasladar al Soporte oficial sin aprobación.
+
 > **ACTUALIZACIÓN OBLIGATORIA (14/oct/2026):** comenzar por el
 > [reporte oficial de cierre y continuidad B2](docs/GOXION_ESTADO_Y_LECCIONES_2026-10-14.md).
 > F0–F5 y los cierres #102/#103 ya llegaron a `main`: Admin dispone de
