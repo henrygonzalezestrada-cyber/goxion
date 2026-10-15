@@ -1,4 +1,4 @@
-/* GOXION · Goxy F10 · diálogo útil y teclado Safari adaptable.
+/* GOXION · Goxy F11 · soporte híbrido con escalamiento automático a IA, sin botón.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -72,11 +72,11 @@
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
     '<div class="gxai-beta-note">GOXY · IA CON SOPORTE REAL</div>',
-    '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Puedo ayudarte con tus servicios, misiones, promociones y guías de soporte. Primero revisamos la información oficial; si necesitamos explicar algo más, podemos usar IA. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
+    '<div class="gxai-bubble">¡Hola! Soy Goxy. 🤖 Cuéntame qué necesitas: revisar misiones, promociones o solucionar un problema con tus plataformas. Si hace falta, buscaré una explicación adicional automáticamente. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
     '<div class="gxai-ai-panel" role="status" aria-live="polite">',
     '<span class="gxai-ai-light" aria-hidden="true"></span>',
     '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
-    '<button class="gxai-ai-start" type="button" disabled>Comprobando…</button>',
+    '<button class="gxai-ai-start" type="button" disabled tabindex="-1" aria-hidden="true">Asistencia automática</button>',
     '</div>',
     '<div class="gxai-suggestions">',
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
@@ -164,6 +164,8 @@
   }
   let aiMode = false;
   let aiEntry = false;
+  let awaitingSymptom = false;
+  let lastGuide = null;
   // Solo memoria local de esta sesión de chat: nunca localStorage, ni BD.
   const conversation = [];
   function resetConversation() { conversation.length = 0; }
@@ -183,9 +185,9 @@
       status === 'pending' ? 'IA pendiente de activación' :
       status === 'checking' ? 'Comprobando conexión…' : 'No pude verificar la IA';
     aiDescription.textContent = message;
-    aiStart.textContent = status === 'ready' ? 'Usar IA' : status === 'checking' ? 'Comprobando…' : 'Solo guías';
+    aiStart.textContent = 'Automático';
     disclaimer.textContent = status === 'ready'
-      ? 'IA beta: 8 preguntas/24 h · No compartas información privada.'
+      ? 'Asistencia adicional automática · Hasta 8 consultas IA/24 h.'
       : 'Las guías oficiales y el asesor humano siguen disponibles.';
   }
 
@@ -315,6 +317,8 @@
     aiConfigured = false;
     aiMode = false;
     aiEntry = false;
+    awaitingSymptom = false;
+    lastGuide = null;
     resetConversation();
     setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
@@ -323,7 +327,7 @@
       if (!active || statusId !== requestId) return;
       aiConfigured = state.ok===true && state.configured===true && state.providerReady===true;
       if (aiConfigured) setAIStatus('ready',
-        'Clave y modelo verificados con Groq. Ya puedes probar una conversación.');
+        'Tengo ayuda adicional disponible y la utilizaré si las guías no son suficientes.');
       else if (state.ok===true && state.configured===false) setAIStatus('pending',
         'Falta configurar la clave privada de Groq en Supabase. Iniciar sesión no activa la IA.');
       else if (state.ok===true && state.configured===true) setAIStatus('unavailable',
@@ -364,6 +368,8 @@
     myContextReady=false;
     aiMode = false;
     aiEntry = false;
+    awaitingSymptom = false;
+    lastGuide = null;
     resetConversation();
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
@@ -482,6 +488,8 @@
   function showPlatforms() {
     chosenGuide = null;
     aiMode = false;
+    awaitingSymptom = false;
+    lastGuide = null;
     const all=knowledge.platforms();
     const mine=myPlatforms.filter(platform=>all.includes(platform));
     if (mine.length) {
@@ -500,6 +508,8 @@
   function showOtherPlatforms() {
     chosenGuide=null;
     aiMode=false;
+    awaitingSymptom=false;
+    lastGuide=null;
     const others=knowledge.platforms().filter(platform=>!myPlatforms.includes(platform));
     showChoices([
       {kind:'heading',label:'Otras plataformas'},
@@ -511,6 +521,8 @@
     chosenGuide = null;
     aiMode = false;
     aiEntry = false;
+    awaitingSymptom = false;
+    lastGuide = null;
     const issues = knowledge.issues(platform);
     showChoices([
       ...issues.map((issue,index)=>({kind:'issue',platform,issueIndex:index,label:issue.issue})),
@@ -530,6 +542,8 @@
     if(chosenPlatform!==platform)resetConversation();
     chosenPlatform = platform;
     chosenGuide = {platform,issueIndex:index};
+    lastGuide = {platform,issueIndex:index,requiresHuman:guide.requiresHuman};
+    awaitingSymptom = false;
     aiMode = false;
     // Las instrucciones proceden EXCLUSIVAMENTE de support-issues.js,
     // convertidas a texto. Nunca incluir correo_login, perfil_pin o credenciales.
@@ -539,7 +553,7 @@
       : 'Si todavía necesitas ayuda, puedes hablar con un asesor.');
     runDemo({prompt:guide.issue,step:'searching',response:answer,finish:'happy'},
       null,()=>showChoices([
-        {kind:'ai',label:aiConfigured ? 'Preguntar con IA · '+platform : 'IA pendiente de activación'},
+        {kind:'unresolved',platform,label:'Ya intenté esto y sigo con el problema'},
         {kind:'issues',platform,label:'Otra situación de '+platform},
         {kind:'human',label:'Hablar con asesor humano'},
         {kind:'platforms',label:'Cambiar plataforma'}
@@ -590,7 +604,7 @@
       setBusy(false);
       chatTransition('listening');
       showChoices([
-        {kind:'ai',label:'Aclarar con Goxy (IA)'},
+        {kind:'unresolved',platform:chosen.platform,label:'Necesito más ayuda con este problema'},
         {kind:'human',label:'Hablar con asesor humano'},
         {kind:'issues',platform:chosen.platform,label:'Ver otras situaciones'}
       ]);
@@ -727,16 +741,18 @@
     const type = button.dataset.kind;
     const platform = button.dataset.platform;
     const index = Number(button.dataset.issueIndex);
-    if (type === 'ai') {
-      if (!chosenGuide) return;
-      if (!aiConfigured) {
-        bubble('La IA todavía no está habilitada. Iniciar sesión no la activa: requiere configurar la clave privada de Groq en Supabase. Mientras tanto, sigo aquí con las guías oficiales.',false);
+    if (type === 'unresolved') {
+      const guide=lastGuide && knowledge.guide(lastGuide.platform,lastGuide.issueIndex);
+      if(guide?.requiresHuman){
+        respondFree('La guía no resolvió mi problema',
+          'Esa vinculación requiere una autorización de GOXION. Ya revisaste la guía: lo siguiente es contactar a un asesor, sin compartir el código aquí.',
+          [{kind:'human',label:'Contactar asesor'},
+           {kind:'issues',platform:lastGuide.platform,label:'Otra solución'}]);
         return;
       }
-      aiMode = true;
-      messageInput.placeholder = 'Pregunta sobre '+chosenGuide.platform+'…';
-      bubble('Modo IA activado para '+chosenGuide.platform+'. Escribe una pregunta relacionada con esta guía; las respuestas se generan en el servidor.',false);
-      messageInput.focus({preventScroll:true});
+      const platform=button.dataset.platform||chosenPlatform;
+      if(platform && knowledge.platforms().includes(platform))
+        void escalateAutomatically('Ya seguí los pasos disponibles de '+platform+' pero el problema continúa. ¿Qué puedo revisar después?',platform,lastGuide?.issueIndex);
       return;
     }
     if (type === 'mine') { showPlatforms(); return; }
@@ -755,17 +771,10 @@
     } else if (type === 'platform' && knowledge.platforms().includes(platform)) {
       if(chosenPlatform!==platform)resetConversation();
       chosenPlatform = platform;
-      if (aiEntry && aiConfigured) {
-        aiEntry = false;
-        aiMode = true;
-        chosenGuide = {platform};
-        clearChoices();
-        bubble('¡Perfecto! Ya podemos conversar sobre '+platform+'. ¿Qué necesitas saber? Me basaré en las guías oficiales y te avisaré si necesitas un asesor.',false);
-        messageInput.placeholder = 'Pregunta sobre '+platform+'…';
-        chatTransition('listening');
-        // No abrir el teclado sin tocarlo; mantiene el comportamiento Safari.
-        return;
-      }
+      awaitingSymptom = true;
+      chosenGuide = null;
+      lastGuide = null;
+      aiMode = false;
       runDemo({prompt:platform,step:'searching',
         response:'Estas son las situaciones de soporte registradas para '+platform+':',finish:'happy'},null,()=>showIssues(platform));
     } else if (type === 'issues' && knowledge.platforms().includes(platform)) {
@@ -884,12 +893,8 @@
     if (event.detail === 0) playfulTap();
   });
   openButton.addEventListener('click', openChat);
-  aiStart.addEventListener('click', () => {
-    if (!active || !authenticated() || !aiConfigured || busy) return;
-    aiEntry = true;
-    bubble('Elige una de tus plataformas o consulta otras. Puedes preguntarme directamente sin seleccionar un problema.',false);
-    showPlatforms();
-  });
+  // No hay interruptor de IA para el cliente: el enrutador decide localmente
+  // cuándo una aclaración del modelo realmente aporta valor.
   closeButton.addEventListener('click', closeChat);
   layer.querySelector('.gxai-backdrop').addEventListener('click', closeChat);
   layer.addEventListener('click', event => {
@@ -955,6 +960,7 @@
     aiConfigured: () => aiConfigured,
     aiMode: () => aiMode,
     aiEntry: () => aiEntry,
+    awaitingSymptom: () => awaitingSymptom,
     aiStatus: () => aiPanel.getAttribute('data-ai-status'),
     contractedPlatforms: () => [...myPlatforms]
   });
