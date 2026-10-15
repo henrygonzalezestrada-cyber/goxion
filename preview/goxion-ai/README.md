@@ -1,7 +1,7 @@
-# GOXION · Goxy F9 · Soporte híbrido, memoria de chat y cuenta segura
+# GOXION · Goxy F10 · Conversación útil + teclado móvil adaptable
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f9
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f10
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -119,3 +119,13 @@ No se presentan importes ni próxima fecha como cifras calculadas por Goxy. GOXI
 - `node --test scripts/goxy-f9-hybrid.test.mjs`: estado de misiones y progreso, vigencia de ofertas, retorno financiero sin inventar, sanitización del historial, cero consumo IA en consultas propias.
 - En beta, probar texto normal y una cuenta de prueba con misiones; validar que la cuota de IA no baje hasta pulsar IA expresamente.
 - Próximo hito: integrar con lectura del **mismo cálculo oficial de próximo vencimiento y monto** cuando esté disponible como función read-only validada.
+
+## F10 · Hallazgos de video Safari 15-oct 12:29
+- El video aún enseñaba mensajes F8.1, pese a que F9 había sido fusionada: sin despliegue confirmado de Pages posterior. **No atribuir al código F9 comportamientos de una versión antigua publicada.** Invalidación de caché del HTML/JS/CSS con `?v=f10`.
+- El iPhone hace zoom al enfocar porque `.gxai-message-input` tenía **12 px**. Ahora usa **16 px** sin tocar los inputs globales de GOXION.
+- En Safari dentro de un iframe, abrir el teclado reduce `parent.visualViewport.height` pero no necesariamente el `100dvh` del documento hijo; por eso el compositor quedaba debajo del teclado. El modal adopta las medidas del `visualViewport` visible (padre o hijo), se reajusta en `resize/scroll/focus/blur`, limita el alto y minimiza el pie mientras hay teclado. Al cerrar el chat, se restablece el estado y los estilos. No se cambia el CSS global de Ayuda.
+- Para preguntas **«¿Qué puedo hacer?»** y «¿Qué puedo hacer con la misión de referidos?» se usa respuesta gratuita/contexto oficial, no se vuelve automáticamente al menú de plataformas ni se gasta Groq. Se consulta la misión por texto dentro de las tareas vigentes del cliente y se señala si está pendiente/completada, sin inventar condiciones o compartir datos privados.
+- Cuando un código es rechazado, el bot diferencia el síntoma y pregunta por el **mensaje de error**, pero jamás pide, recibe o valida el código. Solo la autorización final se escala al asesor.
+- El prompt de Groq sigue usando únicamente guías autorizadas, pero prioriza un diagnóstico claro y contexto de la conversación por encima de respuestas de rechazo genéricas.
+- El importe de vencimiento permanece reservado al cálculo financiero de Mi Espacio; F10 no duplica el motor B2.
+- Validación: prueba mock de chat y viewport del iPhone PASS; seis pruebas de la capa autenticada PASS; Edge Function beta v7 ACTIVE. **Revisión real con Safari en iPhone pendiente**, igual que la comprobación final del proveedor con el nuevo prompt.

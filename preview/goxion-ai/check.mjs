@@ -65,10 +65,11 @@ const bridge=readFileSync(join(root,'goxy-ai-client.js'),'utf8');
 assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'Cliente conecta a Edge, no a Groq');
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
-assert.ok(html.includes('goxy-ai-client.js?v=goxy-f9'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f9') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('goxy-ai-client.js?v=goxy-f10'),'Cargar puente seguro F7');
+assert.ok(html.includes('mascota.js?v=goxy-f10') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
+assert.ok(js.includes('parent.visualViewport') && js.includes('syncChatViewport'),'Leer viewport real padre');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
 assert.ok(!js.includes('sendSmartWA('),'Goxy no debe usar soporte que agrega PIN y credenciales');
 
@@ -157,6 +158,10 @@ const win={
   openAuthSheet:()=>authOpens++,
   addEventListener:()=>{}
 };
+// Safari: el visual viewport del padre se encoge al desplegar el teclado.
+const vv={height:844,offsetTop:0,handlers:{},
+  addEventListener(type,fn){this.handlers[type]=fn;}};
+win.parent={innerHeight:844,visualViewport:vv,addEventListener(){}};
 const store={getItem:()=>authed?'fake-token':''};
 const timers=new Map();let nextTimer=0;
 function schedule(fn,ms){const id=++nextTimer;timers.set(id,{fn,ms});return id;}
@@ -432,6 +437,20 @@ assert.ok(scroll.children.some(x=>x.textContent.includes('Misiones verificadas')
 flush();
 input.value='Hola';composer.fire('submit');
 assert.equal(sent.length,askCount,'Saludar no consume cuota IA');
+input.value='¿Qué puedo hacer?';composer.fire('submit');
+assert.equal(sent.length,askCount,'Explicar capacidades no debe consumir IA');
 flush();
 closeButton.fire('click');
-console.log('GOXION Goxy F9: guías, cuenta sin IA, saludo sin IA, sesiones y chat PASS.');
+// iPhone: campo >=16px, teclado encoge la capa y se recupera tras cerrar.
+assert.ok(css.includes('font-size:16px!important'),'Evitar zoom de Safari sobre el input');
+assert.ok(css.includes('.gxai-keyboard-open'),'La UI adapta el compositor a teclado abierto');
+openButton.fire('click');flush();
+assert.equal(layer.style['--gxai-viewport-height'],'844px','Inicialmente cabe en el viewport');
+input.focus();input.fire('focus');
+vv.height=460;vv.handlers.resize();
+assert.equal(layer.style['--gxai-viewport-height'],'460px','Al abrir teclado, utilizar altura visible');
+assert.ok(layer.classList.contains('gxai-keyboard-open'),'El input queda sobre el teclado');
+doc.activeElement=dialog;vv.height=844;vv.handlers.resize();
+assert.equal(layer.classList.contains('gxai-keyboard-open'),false,'Restaurar altura al ocultar teclado');
+closeButton.fire('click');flush();
+console.log('GOXION Goxy F10: charla, misiones, Safari zoom y teclado adaptable PASS.');

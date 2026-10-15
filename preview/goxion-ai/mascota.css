@@ -154,3 +154,42 @@
 
 /* F7.3: las plataformas viven únicamente como opciones dentro del chat. */
 #view-soporte .gxai-choice-heading{display:block;flex-basis:100%;font:600 11px/1.4 Poppins,sans-serif;color:#b7b4d4;letter-spacing:.01em;margin:4px 0 1px}
+
+/* F10 · Safari iOS: la capa usa el visual viewport disponible, no el 100vh del iframe.
+ * El teclado puede reducir el viewport PADRE sin redimensionar el iframe.
+ */
+#view-soporte .gxai-chat-layer{
+  top:var(--gxai-viewport-top,0px);
+  bottom:auto;
+  height:var(--gxai-viewport-height,100dvh);
+  min-height:0;
+  max-height:100dvh;
+}
+#view-soporte .gxai-chat{
+  height:min(78%,670px);
+  max-height:100%;
+  min-height:0;
+}
+#view-soporte .gxai-message-input{
+  font-size:16px!important; /* Safari NO hace zoom del viewport al enfocar >=16px */
+  line-height:1.35!important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+#view-soporte .gxai-chat-layer.gxai-keyboard-open .gxai-chat{
+  height:100%;
+  max-height:100%;
+  min-height:0;
+  border-radius:18px 18px 0 0;
+  transform:none!important;
+  transition:none!important;
+}
+#view-soporte .gxai-chat-layer.gxai-keyboard-open .gxai-chat-foot{
+  padding-bottom:8px;
+}
+#view-soporte .gxai-chat-layer.gxai-keyboard-open .gxai-chat-disclaimer{
+  display:none;
+}
+@media(min-width:600px){
+  #view-soporte .gxai-chat{max-height:100%}
+}

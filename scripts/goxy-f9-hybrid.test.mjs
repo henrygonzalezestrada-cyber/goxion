@@ -6,7 +6,8 @@ const raw=readFileSync("supabase/functions/goxy-ai-beta/index.ts","utf8");
 const from=raw.indexOf("function publicTask("),to=raw.indexOf("Deno.serve(",from);
 assert.ok(from>=0&&to>from,"Funciones reutilizables F9 en gateway");
 const src=raw.slice(from,to).replace("raw:string):string","raw)")
-  .replace("clientId:string,service:string,topic:unknown","clientId,service,topic")
+  .replace('clientId:string,service:string,topic:unknown,question=""','clientId,service,topic,question=""')
+  .replace("tasks:string[],question:string","tasks,question")
   .replaceAll("(item:{inicio:string|null;fin:string|null})","(item)")
   .replaceAll("(r:{nombre:string})","(r)")
   .replaceAll("(v:{mision_index:number})","(v)")
@@ -37,6 +38,19 @@ test("Misiones consultadas sin llamar a Groq y sin enlaces privados",async()=>{
   assert.match(answer.answer,/Compartir enlace/);
   assert.doesNotMatch(answer.answer,/ejemplo.invalid/);
   assert.equal(answer.source,"official_account");
+  assert.deepEqual(calls.map(p=>p.split("?")[0]),["gamificacion","cliente_misiones_progreso"]);
+});
+test("Resuelve misión de referidos sin gastar IA ni inventar requisitos",async()=>{
+  const {accountAnswer,calls}=mock({
+    missions:{misiones_activas:true,misiones_version:3,
+      tareas:"Invitar a un amigo [MANUAL]\\nCompletar encuesta [MANUAL]",cupon_reclamado:false},
+    progress:[],promos:[]
+  });
+  const response=await accountAnswer("client-id","service","missions",
+    "¿Qué debo hacer con mi misión de referidos?");
+  assert.match(response.answer,/Invitar a un amigo/);
+  assert.match(response.answer,/pendiente/);
+  assert.doesNotMatch(response.answer,/para recibir tu premio de \$|asegurado/);
   assert.deepEqual(calls.map(p=>p.split("?")[0]),["gamificacion","cliente_misiones_progreso"]);
 });
 test("Promociones usan ventana de vigencia y catálogo público",async()=>{
@@ -71,5 +85,5 @@ test("No se envía respuesta de cuenta a Groq ni se consume cuota",()=>{
   assert.ok(start>0&&end>start);
   const sub=raw.slice(start,end);
   assert.doesNotMatch(sub,/goxy_ai_beta_take_quota|chat\/completions|providerStatus/);
-  assert.match(sub,/accountAnswer\(clientId,service,body.topic\)/);
+  assert.match(sub,/accountAnswer\(clientId,service,body.topic,question\)/);
 });
