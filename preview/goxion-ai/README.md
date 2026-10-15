@@ -1,48 +1,43 @@
-# GOXION · Goxy F5 · estados conversacionales con animaciones reales
+# GOXION · Goxy F6 · Guías reales de soporte + scroll natural
 
-## Objetivo
-Se sustituyó el SVG plano de la primera beta por la implementación original de **[robot-heads](https://github.com/fayazara/robot-heads)** (v0.3.0, Fayaz Ahmed, licencia MIT). La cabeza es el modelo **TV rectangular real**, renderizado en **Canvas 2D** con geometría, luces, reflejos, pantalla LED y movimiento; exactamente el tipo de tecnología de la referencia visual.
+## Vista beta
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f6
 
-La experiencia de GOXION **no se convirtió a React**. Solo el robot tiene un pequeño montaje encapsulado con React, y sus dependencias están incluidas en un archivo JavaScript estático de la beta.
+## Correción táctil solicitada
+- **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
+- Ya no se realiza `setPointerCapture()` ni `preventDefault()` en `pointerdown`.
+- El corazón solo se activa al mover el dedo claramente **en horizontal** (al menos 24 px y predominio sobre vertical). Los desplazamientos verticales no cuentan como toques ni caricias, tampoco cuando Safari los entrega en el último evento.
+- Se conserva la interacción de toques, teclas, las siete expresiones de F4 y las animaciones originales.
 
-## Abrir
-`https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f5`
+## Fase 3 · Guías de ayuda reales (sin IA)
+La **fuente única** es `assets/js/ayuda/data/support-issues.js`, cargada ya por `ayuda.html`. No hay ninguna copia de textos en la beta ni se modifica ese archivo.
 
-- Abre `../../ayuda.html` original en iframe **de mismo origen**; no duplica páginas oficiales.
-- Sección Soporte y sesión ya existentes. La capa de bloqueo de clientes sin sesión permanece en su lugar.
-- Reemplaza solo la cuadrícula de plataformas dentro de `smart-support-card`; mantiene FAQ, comentarios, asesor humano, pagos y catálogo existentes.
+Flujo: el cliente, ya autenticado, abre el chat → selecciona plataforma → selecciona situación → Goxy muestra **los pasos realmente definidos por GOXION** → ofrece el **contacto humano preexistente** si se necesita autorización.
 
-## Estados y juego
-- **Idle:** cabeza original con LEDs de color blanco frío, parpadeo, giro y antena.
-- **Toque:** ciclo de siete gestos distintos del motor original: `happy`, `searching`, `listening`, `working`, `thinking`, `speaking` y `sleeping`; sin repetir el mismo estado consecutivamente. Se intercepta el `poke()` nativo del componente para que no imponga siempre `happy`. No abre chat.
-- **Deslizar/caricia:** se conserva el detector Pointer Events, con corazones y rubor sobre el robot; el render original muestra su animación `happy`. No abre chat.
-- **Botón «Hablar con Goxy»:** acceso único al chat de demostración; se eliminó el globo de conversación (y sigue sin flecha). Conserva su cápsula, línea animada cian/morado, tres puntos pulsantes y centrado del texto.
-- **Chat F5:** usa el render original con máquina de estados explícita `idle`, `listening`, `thinking`, `searching`, `working`, `speaking`, `happy`, `error`. Cada etapa muestra la expresión LED correspondiente, una etiqueta discreta bajo Goxy y, mientras procesa, tres puntos de carga.
-- **Pruebas guiadas:** acceso, información de cuenta, solicitud de códigos y un error simulado. Nada crea tickets ni consulta cuentas.
-- **Mensajes escritos:** campo de prueba (máximo 240 caracteres), respuesta de demostración local; no se usa IA ni almacenamiento externo. No abre el teclado automáticamente al entrar.
-- **Flujo seguro:** evita conversaciones superpuestas; cancela temporizadores, animaciones de carga y respuestas pendientes cuando se cierra el chat, se cambia de vista o caduca la sesión.
-- Respeta `prefers-reduced-motion`, accesibilidad y comportamiento táctil de iPhone.
+- Plataformas con guías actuales: Netflix, Disney+, Max, Prime Video, YouTube, ViX, Crunchyroll, Microsoft y Google One.
+- Goxy entiende los nombres de plataformas y temas comunes en el mensaje escrito (p. ej., «Netflix actualizar hogar»). Si el problema es ambiguo, muestra opciones; nunca inventa guías no disponibles.
+- La guía se convierte a **texto plano** para no inyectar etiquetas HTML en la conversación.
+- **No solicita ni guarda** correos de acceso, contraseñas, PIN, códigos de verificación ni datos personales. No usa `sendSmartWA()`, ya que la implementación anterior adjunta información de la cuenta.
+- Para una intervención humana, el usuario debe tocar `Hablar con asesor humano`; se reusa el botón oficial `.direct-contact-box button` en Ayuda. No se crea una segunda integración con WhatsApp ni un ticket fantasma.
+- Ante consultas de pagos, mora, cupones y saldo, explica que deben consultarse en **Mi Espacio** y ofrece ir a la vista ya existente. No hace cálculos financieros.
+- Siguen funcionando los estados `listening`, `thinking`, `searching`, `speaking`, `happy`, `error`. La prueba del error sigue siendo simulada.
 
-## Archivos
-- `index.html`: carga `goxy-heads.bundle.js` desde **la misma carpeta/origen**, antes de `mascota.js`.
-- `goxy-heads.bundle.js`: build estático minificado del paquete real y React. No necesita CDN.
-- `goxy-heads-entry.js`: adaptador React aislado; observa `data-mood` para sincronizar estados.
-- `package.json`: versiones fijadas de `robot-heads@0.3.0`, React y esbuild. Para regenerar, ejecutar `npm install --no-audit --no-fund` y `npm run bundle` dentro de esta carpeta y subir el bundle.
-- `mascota.js`: lógica de caricias, gestos y chat existente, sin cambios de negocio.
-- `mascota.css`: estilos del Canvas y ADN visual GOXION.
-- `check.mjs`: prueba simulada de los siete gestos F4, estados F5, error, redacción de mensaje local, cancelación, pérdida de sesión, motion reducido y CTA.
-- `ROBOT_HEADS_LICENSE.txt`: licencia MIT del código integrado.
+## Arquitectura y seguridad
+- Todo permanece **exclusivamente en `preview/goxion-ai/`**; no se modifica el Soporte oficial, Admin, Index, Supabase ni motor financiero.
+- Nuevo `goxy-support-knowledge.js` es un adaptador de solo lectura a `window.GOXION_DATA.supportIssues`; se carga después de `ayuda.html` y antes de `mascota.js`.
+- `mascota.js` mantiene un solo orquestador de estados y añade opciones dinámicas de plataforma, problema y derivación, sin duplicar el soporte anterior.
+- Sesión de Mi Espacio sigue siendo requisito; la validación de backend será indispensable **antes de permitir a Goxy consultar datos privados**.
+- Sin IA, claves API, escrituras, recolección de códigos ni peticiones de red nuevas.
 
-## Validaciones
-- Bundle se generó con éxito mediante GitHub Actions usando npm; compilador pasó `node --check`.
-- Contratos de interacción probados con JavaScript simulado: toques y caricias F4; apertura y saludo, estados de búsqueda y respuesta, error, entrada local, cancelación al cerrar, expiración de sesión, movimiento reducido.
-- **Pendiente revisión en Safari iPhone físico** (reflejos, arrastre de dedo, recorte de antena, rendimiento) antes de aprobar visual.
-- Tests genéricos de GOXION y el flujo completo de autenticación se deben verificar antes de activar la mascota en Soporte oficial.
+## QA y continuidad
+`node preview/goxion-ai/check.mjs` (o `npm test` desde esa carpeta) comprueba:
 
-## Sin cambios oficiales
-No se modifica `ayuda.html`, `admin.html`, `index.html`, el motor financiero ni Supabase. **No hay llamadas a Groq, API de IA, correo ni solicitudes a Admin** en esta fase.
+- Scroll vertical vs caricia horizontal, sin capturar ni bloquear el puntero.
+- Guías reales de Netflix/Disney+/Prime, instrucciones convertidas a texto, no inventar situaciones.
+- Selección de marca → problema → guía → derivación oficial.
+- «Cambiar de plataforma», texto libre y acceso a Mi Espacio.
+- Estados anteriores F5, cancelación de respuestas, pérdida de sesión, foco y accesibilidad.
 
-## Próxima fase
-Cuando F5 esté aprobada en Safari, construir el **orquestador seguro de soporte** con base de problemas verificados por plataforma. Sólo entonces enlazar funciones autorizadas del cliente a través de backend, sin exponer contraseñas, PIN ni claves en JavaScript. La IA gratuita se integrará después, con límites de uso y un procedimiento claro de escalamiento humano.
+**Aún debe revisarse físicamente en Safari iPhone** que un deslizamiento vertical sobre la cabeza desplaza la página y uno horizontal produce corazones, antes de dar por cerrado el comportamiento táctil.
 
-**No usar estas respuestas simuladas para decisiones reales del cliente.** F5 únicamente demuestra la experiencia y los estados de Goxy.
+Próxima fase: orquestador más amplio y backend autorizado para consultas privadas, luego IA con restricciones de uso y escalamiento humano; no asumir permisos por el mero hecho de estar autenticado en JavaScript.

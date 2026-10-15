@@ -1,4 +1,4 @@
-// GOXION · Goxy F5 · contratos y simulaciones sin clientes reales ni red.
+// GOXION · Goxy F6 · guías reales compartidas y scroll táctil sin bloquear.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -10,11 +10,25 @@ const js=readFileSync(join(root,'mascota.js'),'utf8');
 const css=readFileSync(join(root,'mascota.css'),'utf8');
 const html=readFileSync(join(root,'index.html'),'utf8');
 const entry=readFileSync(join(root,'goxy-heads-entry.js'),'utf8');
+const official=readFileSync(join(root,'../../assets/js/ayuda/data/support-issues.js'),'utf8');
+const adapter=readFileSync(join(root,'goxy-support-knowledge.js'),'utf8');
+const knowledgeWindow={};
+new Function('window',official)(knowledgeWindow);
+new Function('window',adapter)(knowledgeWindow);
+const knowledge=knowledgeWindow.GOXY_SUPPORT;
+assert.ok(knowledge.platforms().includes('Netflix') && knowledge.platforms().includes('Disney+'),'Usar las guías oficiales de Ayuda');
+assert.equal(knowledge.guide('Netflix',0).requiresHuman,true,'Código requiere agente humano');
+assert.ok(knowledge.guide('Netflix',0).instructions.includes('Iniciar Sesión con Código'),'Conservar pasos canónicos');
+assert.ok(!knowledge.guide('Netflix',0).instructions.includes('<strong>'),'No pasar HTML a chat');
+assert.equal(knowledge.resolvePlatform('Tengo error de Disney+'),'Disney+');
+assert.equal(knowledge.resolvePlatform('Estoy en Prime Video'),'Prime Video');
+assert.equal(knowledge.matchIssue('Netflix','Netflix actualizar hogar'),1);
+assert.equal(knowledge.guide('Disney+',500),null,'Nunca inventar situaciones ausentes');
 new Function('window','document','localStorage','performance','setTimeout','clearTimeout',js);
 const inline=html.match(/<script>([\s\S]*?)<\/script>/)?.[1];
 assert.ok(inline, 'loader HTML no encontrado');
 new Function(inline);
-for(const required of ['.gxai-canvas-slot','gxai-border-sweep','prefers-reduced-motion','touch-action:none','.gxai-typing','.gxai-composer','.gxai-chat-phase','gxai-message-input'])
+for(const required of ['.gxai-canvas-slot','gxai-border-sweep','prefers-reduced-motion','touch-action:pan-y','.gxai-typing','.gxai-composer','.gxai-chat-phase','gxai-message-input'])
   assert.ok(css.includes(required), 'Falta CSS '+required);
 assert.ok(entry.includes('from "robot-heads"')&&entry.includes('shape:"rectangle"'), 'Usar renderer MIT original');
 assert.ok(!js.includes('gxai-open-icon')&&!js.includes('↗'),'El CTA no debe tener el globo ni flecha');
@@ -23,7 +37,10 @@ assert.ok(!js.includes('<linearGradient'),'No regresar al SVG plano');
 assert.ok(js.includes('event.stopPropagation()')&&js.includes('capture: true'),'No regresar al poke feliz automático');
 assert.ok(!js.includes('fetch(')&&!js.includes('XMLHttpRequest'),'La demo no realiza solicitudes HTTP');
 assert.ok(!html.includes('https://api.'),'No incluir endpoints externos');
-assert.ok(html.includes('mascota.js?v=goxy-f5'),'Versionar la beta F5');
+assert.ok(html.includes('mascota.js?v=goxy-f6') && html.includes('goxy-support-knowledge.js?v=goxy-f6'),'Cargar catálogo canónico antes de Goxy F6');
+assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
+assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
+assert.ok(!js.includes('sendSmartWA('),'Goxy no debe usar soporte que agrega PIN y credenciales');
 
 class Element {
   constructor(name) {
@@ -72,9 +89,11 @@ const input=new Element('input'),send=new Element('send');
 const btnAccess=new Element('access'),btnAccount=new Element('account'),btnCode=new Element('code'),btnError=new Element('error');
 btnAccess.dataset.prompt='acceso';btnAccount.dataset.prompt='cuenta';
 btnCode.dataset.prompt='codigo';btnError.dataset.prompt='error';
-mascotButton.setPointerCapture=()=>{};
+let captures=0, humanOpens=0, switches=[];
+mascotButton.setPointerCapture=()=>{captures++;};
+const officialHuman=new Element('human');officialHuman.click=()=>{humanOpens++;};
 const section=new Element('support'),card=new Element('card');
-section.querySelector=()=>null;
+section.querySelector=(sel)=>sel==='.direct-contact-box button'?officialHuman:null;
 let created=0;
 const doc={
   createElement(name){created++;return new Element(created===2?'hero':created===3?'layer':name);},
@@ -87,6 +106,8 @@ const win={
   GOXION_CORE:{STORAGE:{CLIENT_TOKEN:'demo-token'}},
   getCurrentClientKey:()=>authed?'test-client':'',
   GOXY_ROBOT:{mountAll:()=>mounts++},
+  GOXY_SUPPORT:knowledge,
+  switchTab:(name)=>switches.push(name),
   matchMedia:()=>({matches:reduced}),
   openAuthSheet:()=>authOpens++,
   addEventListener:()=>{}
@@ -112,6 +133,11 @@ const api=win.GOXION_AI_BETA;
 assert.ok(api,'Goxy no inició');assert.equal(mounts,1,'Render original no montó');
 const pointer=(x,y,id=1)=>({isPrimary:true,pointerType:'touch',pointerId:id,clientX:x,clientY:y,button:0});
 const clickDemo=button=>layer.fire('click',{target:{closest:selector=>selector==='.gxai-suggestion'?button:null}});
+const clickChoice=button=>layer.fire('click',{target:{closest:selector=>selector==='.gxai-choice'?button:null}});
+const currentChoice=(kind,platform)=>scroll.children
+  .filter(x=>x.className==='gxai-choices'&&x.isConnected)
+  .flatMap(x=>x.children)
+  .find(x=>x.dataset.kind===kind && (!platform || x.dataset.platform===platform));
 function doTap(i){mascotButton.fire('pointerdown',pointer(100,110,100+i));mascotButton.fire('pointerup',pointer(100,110,100+i));}
 doTap(0);
 const cycle=['happy','searching','listening','working','thinking','speaking','sleeping'];
@@ -119,6 +145,18 @@ const seen=[robotHero.attrs['data-mood']];
 for(let i=1;i<cycle.length;i++){doTap(i);seen.push(robotHero.attrs['data-mood']);}
 assert.deepEqual(seen,cycle,'Los siete toques deben ser distintos');
 assert.equal(layer.classList.contains('gxai-visible'),false,'Tocar no abre chat');
+// Regresión del reporte: arrastrar VERTICAL sobre el robot no es una caricia,
+// no genera corazones ni captura el pointer; la página conserva pan-y.
+const heartsBeforeScroll=hearts.childElementCount;
+const moodBeforeScroll=robotHero.attrs['data-mood'];
+let downPrevented=false;
+mascotButton.fire('pointerdown',{...pointer(100,110,301),preventDefault:()=>{downPrevented=true;}});
+mascotButton.fire('pointermove',pointer(102,200,301));
+mascotButton.fire('pointerup',pointer(104,265,301));
+assert.equal(downPrevented,false,'No prevenir scroll vertical al tocar');
+assert.equal(captures,0,'No capturar pointer: Safari debe hacer scroll');
+assert.equal(hearts.childElementCount,heartsBeforeScroll,'Scroll vertical no genera corazones');
+assert.equal(robotHero.attrs['data-mood'],moodBeforeScroll,'Scroll vertical no cambia expresión');
 mascotButton.fire('pointerdown',pointer(100,110,202));
 mascotButton.fire('pointermove',pointer(151,112,202));
 mascotButton.fire('pointerup',pointer(155,113,202));
@@ -148,6 +186,19 @@ runNext();assert.equal(api.chatState(),'happy');
 runNext();assert.equal(api.chatState(),'listening');
 assert.equal(input.disabled,false);
 assert.equal(btnCode.disabled,false);
+assert.ok(currentChoice('platform','Netflix'),'Al elegir acceso, ofrecer plataformas canónicas');
+// Flujo real: elegir Netflix -> temas -> guía original -> opciones humano.
+clickChoice(currentChoice('platform','Netflix'));
+flush();
+assert.ok(currentChoice('issue','Netflix'),'Ver temas oficiales de Netflix');
+const issueChoice=currentChoice('issue','Netflix');
+assert.equal(issueChoice.dataset.issueIndex,'0');
+clickChoice(issueChoice);
+flush();
+assert.ok(scroll.children.some(x=>typeof x.textContent==='string' &&
+  x.textContent.includes('Iniciar Sesión con Código') &&
+  x.textContent.includes('correo que nosotros administramos')),'Mostrar instrucciones reales sin inventar');
+assert.ok(currentChoice('human'),'Dejar claro cuándo requiere un asesor');
 
 // Flujo de error simulado: ojos X y regreso a escucha.
 clickDemo(btnError);
@@ -158,12 +209,27 @@ runNext();assert.equal(api.chatState(),'error');
 runNext();assert.equal(api.chatState(),'listening');
 
 // Mensaje escrito: contenido solo en DOM, sin peticiones de red.
-input.value='¿Me ayudas a revisar un servicio?';
+input.value='Quiero cambiar de plataforma';
 composer.fire('submit');
 assert.equal(input.value,'');
 assert.equal(api.chatState(),'thinking');
 flush();
 assert.equal(api.chatState(),'listening');
+assert.ok(currentChoice('platform','Prime Video'),'Mensaje genérico ofrece plataformas');
+
+// Navegación a Mi Espacio sin inventar montos.
+clickDemo(btnAccount); flush();
+const accountAction=currentChoice('account');
+assert.ok(accountAction,'Ofrecer entrada a estado de cuenta autorizado');
+clickChoice(accountAction);
+assert.equal(layer.classList.contains('gxai-visible'),false);
+assert.equal(switches.at(-1),'inicio','Volver al Mi Espacio existente, no crear vista duplicada');
+openButton.fire('click');flush();
+// Un mensaje libre con plataforma + problema debe usar la guía real directamente.
+input.value='Netflix actualizar hogar';composer.fire('submit');
+flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('Tu TV pide Actualizar Hogar')),'Guía directa por texto');
+assert.ok(currentChoice('human'),'Ofrecer contacto al requerir aprobación');
 
 // Cerrar en mitad de la búsqueda debe cancelar respuesta, timer y estado.
 clickDemo(btnAccount);
@@ -175,6 +241,14 @@ const afterCancel=scroll.children.length;
 assert.equal(timers.size,0,'No dejar temporizadores después de cerrar');
 flush();
 assert.equal(scroll.children.length,afterCancel,'No aparece respuesta tras cerrar');
+
+// Escalamiento: usar SOLO contacto humano existente, sin PIN, y cerrar chat.
+openButton.fire('click');flush();
+clickDemo(btnAccess);flush();
+clickChoice(currentChoice('platform','Disney+'));flush();
+clickChoice(currentChoice('human'));
+assert.equal(humanOpens,1,'Usar contacto humano oficial existente');
+assert.equal(layer.classList.contains('gxai-visible'),false);
 
 // Sesión inválida mientras se procesa: cerrar sin entregar respuesta.
 openButton.fire('click');
@@ -197,4 +271,4 @@ mascotButton.fire('pointerdown',pointer(100,110,220));
 mascotButton.fire('pointermove',pointer(180,114,220));
 mascotButton.fire('pointerup',pointer(182,114,220));
 assert.equal(hearts.childElementCount,heartCount);
-console.log('GOXION Goxy F5: estados de chat, error, cancelación, sesión, gestos F4 y CTA PASS (datos simulados).');
+console.log('GOXION Goxy F6: scroll pan-y, caricias horizontales, guías oficiales, asesor, cuenta, sesión y chat PASS.');
