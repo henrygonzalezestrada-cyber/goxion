@@ -81,5 +81,24 @@
         hasProfile,hasLogin,hasPendingPassword}];
     });
   }
-  window.GOXY_CLIENT_CONTEXT=Object.freeze({local,refresh,destinations});
+  // Resumen de contacto para derivación explícitamente autorizada por cliente.
+  // No copiar claves, PIN, códigos, perfiles ni otros campos de Mi Espacio.
+  function supportReference(platform){
+    if(!key() || !token() || !support.platforms().includes(platform))return null;
+    const store=typeof globalClientesData!=='undefined'?globalClientesData:null;
+    const account=store && Object.prototype.hasOwnProperty.call(store,key())?store[key()]:null;
+    if(!account || !Array.isArray(account.servicios))return null;
+    const idx=destinations(platform).map(x=>x.index);
+    const service=account.servicios.find((_,i)=>idx.includes(i));
+    if(!service)return null;
+    const email=String(service.correo_login||'').trim();
+    return {
+      clientId:key().slice(0,70),
+      clientName:String(account.nombre||'').trim().slice(0,65),
+      platform,
+      // El correo se utiliza sólo para la vista previa consentida, nunca en IA.
+      loginEmail:/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)?email.slice(0,110):''
+    };
+  }
+  window.GOXY_CLIENT_CONTEXT=Object.freeze({local,refresh,destinations,supportReference});
 })();
