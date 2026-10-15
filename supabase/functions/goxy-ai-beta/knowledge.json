@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "source": "assets/js/ayuda/data/support-issues.js",
+  "guides": {
+    "Netflix": [
+      {
+        "id": 0,
+        "issue": "🔑 Solicitar Código de Acceso",
+        "instructions": "1. En tu pantalla selecciona 'Iniciar Sesión con Código'.\n2. Al hacerlo, el sistema enviará un código al correo que nosotros administramos.\n3. Abajo indícanos el correo exacto que aparece en tu pantalla y envíanos la solicitud. Te responderemos con el código al instante.",
+        "requires_human": true
+      },
+      {
+        "id": 1,
+        "issue": "📺 Tu TV pide Actualizar Hogar",
+        "instructions": "1. Selecciona 'Actualizar Hogar' en tu TV.\n2. La pantalla enviará un correo de confirmación a nuestra bandeja.\n3. Ingresa abajo el correo que aparece en pantalla y envíanos tu solicitud para autorizar tu TV.",
+        "requires_human": true
+      },
+      {
+        "id": 2,
+        "issue": "⚠️ Límite de Pantallas",
+        "instructions": "Recuerda que cada perfil equivale a 1 pantalla. Si te marca límite, revisa que no tengas otra TV usándolo al mismo tiempo. Si el problema persiste, indícanos el nombre de tu perfil para revisarlo.",
+        "requires_human": true
+      }
+    ],
+    "Disney+": [
+      {
+        "id": 0,
+        "issue": "🔑 Código de Verificación",
+        "instructions": "1. Ingresa a la app y presiona 'Continuar' con el correo asignado.\n2. La plataforma enviará un código de 6 dígitos a nuestra bandeja de entrada.\n3. Escribe el correo aquí abajo para indicarnos que ya lo solicitaste y te lo enviaremos.",
+        "requires_human": true
+      },
+      {
+        "id": 1,
+        "issue": "🏠 Mensaje de 'Hogar Principal'",
+        "instructions": "Selecciona 'Actualizar Hogar' en tu dispositivo. Eso nos enviará una solicitud de autorización al correo maestro. Escríbelo abajo para proceder.",
+        "requires_human": true
+      }
+    ],
+    "Max": [
+      {
+        "id": 0,
+        "issue": "🔑 Iniciar Sesión con Código",
+        "instructions": "1. Selecciona 'Iniciar Sesión con un Código' en tu TV.\n2. Aparecerán 6 letras/números en tu pantalla.\n3. Como nosotros manejamos la plataforma, escribe ese código abajo para que nosotros lo vinculemos manually.",
+        "requires_human": true
+      },
+      {
+        "id": 1,
+        "issue": "❌ Contraseña Incorrecta",
+        "instructions": "Asegúrate de no haber dejado espacios al copiar los datos. Si no te deja entrar, indícanos el correo de la cuenta para enviarte la contraseña actualizada.",
+        "requires_human": true
+      }
+    ],
+    "Prime Video": [
+      {
+        "id": 0,
+        "issue": "📺 Registrar Dispositivo",
+        "instructions": "1. Abre Prime Video y presiona 'Identifícate'.\n2. Mostrará un código de registro en pantalla.\n3. Escríbelo abajo para que nosotros enlacemos tu dispositivo desde nuestro panel maestro.",
+        "requires_human": true
+      }
+    ],
+    "YouTube": [
+      {
+        "id": 0,
+        "issue": "📩 No me llegó la invitación",
+        "instructions": "Verifica tu carpeta de SPAM en Gmail. Recuerda que no debes estar en otro grupo familiar activo. Si no está, compártenos tu correo para reenviarla.",
+        "requires_human": true
+      }
+    ],
+    "ViX": [
+      {
+        "id": 0,
+        "issue": "🔑 Vincular TV o Iniciar Sesión",
+        "instructions": "Selecciona 'Iniciar Sesión'. Envíanos el código alfanumérico que aparece en tu pantalla de TV para enlazarlo desde nuestra base de datos.",
+        "requires_human": true
+      }
+    ],
+    "Crunchyroll": [
+      {
+        "id": 0,
+        "issue": "🔑 Vincular Consola o TV",
+        "instructions": "Dirígete a 'Activar dispositivo' en tu consola o TV. Aparecerá un código, escríbelo aquí para que nosotros autoricemos la cuenta.",
+        "requires_human": true
+      }
+    ],
+    "Microsoft": [
+      {
+        "id": 0,
+        "issue": "💻 Reenviar Invitación familiar",
+        "instructions": "Indícanos el correo personal (Outlook/Hotmail) con el que te uniste para verificar y enviarte el enlace nuevamente.",
+        "requires_human": true
+      }
+    ],
+    "Google One": [
+      {
+        "id": 0,
+        "issue": "☁️ Espacio no reflejado",
+        "instructions": "Asegúrate de haber aceptado la invitación de familia en tu Gmail. Indícanos tu correo si sigues sin ver los beneficios.",
+        "requires_human": true
+      }
+    ]
+  }
+}
