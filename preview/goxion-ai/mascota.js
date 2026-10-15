@@ -384,18 +384,18 @@
     chatTransition('thinking');
     showTyping();
     const flowId = ++activeFlow;
-    later(flowId, 640, () => chatTransition(entry.step || 'working'));
-    later(flowId, 1460, () => {
+    later(flowId, 220, () => chatTransition(entry.step || 'working'));
+    later(flowId, 680, () => {
       hideTyping();
       if (entry.finish !== 'error') chatTransition('speaking');
       else chatTransition('error');
       bubble(entry.response, false);
     });
-    later(flowId, 2450, () => {
+    later(flowId, 1050, () => {
       if (entry.finish === 'happy') chatTransition('happy');
       else chatTransition('error');
     });
-    later(flowId, 3900, () => {
+    later(flowId, 1330, () => {
       setBusy(false);
       chatTransition('listening');
       if (typeof onDone === 'function') onDone();
