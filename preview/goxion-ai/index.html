@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#030305">
-<title>GOXION · Goxy · Beta F2</title>
+<title>GOXION · Goxy · Beta F3</title>
 <style>
 html,body{margin:0;width:100%;height:100%;height:100dvh;overflow:hidden;background:#030305}
 iframe{display:block;width:100%;height:100%;border:0;background:#030305}
@@ -24,16 +24,23 @@ iframe{display:block;width:100%;height:100%;border:0;background:#030305}
       const doc = frame.contentDocument, win = frame.contentWindow;
       if (!doc || !win || new URL(win.location.href).origin !== location.origin) throw Error('Se requiere el mismo origen.');
       const css = doc.createElement('link');
-      css.rel = 'stylesheet'; css.href = new URL('./mascota.css?v=goxy-f2', location.href).href;
+      css.rel = 'stylesheet'; css.href = new URL('./mascota.css?v=goxy-f3', location.href).href;
       doc.head.appendChild(css);
-      const js = doc.createElement('script');
-      js.src = new URL('./mascota.js?v=goxy-f2', location.href).href;
-      js.onload = () => {
-        try { win.switchTab?.('soporte'); } catch (_) {}
-        splash.style.opacity = '0';
+      // Cargar primero el paquete autohospedado con el renderizador original.
+      const canvas = doc.createElement('script');
+      canvas.src = new URL('./goxy-heads.bundle.js?v=goxy-f3', location.href).href;
+      canvas.onload = () => {
+        const js = doc.createElement('script');
+        js.src = new URL('./mascota.js?v=goxy-f3', location.href).href;
+        js.onload = () => {
+          try { win.switchTab?.('soporte'); } catch (_) {}
+          splash.style.opacity = '0';
+        };
+        js.onerror = () => { splash.textContent = 'No fue posible iniciar Goxy. Actualiza la página.'; };
+        doc.body.appendChild(js);
       };
-      js.onerror = () => { splash.textContent = 'No se pudo abrir la beta. Actualiza la página.'; };
-      doc.body.appendChild(js);
+      canvas.onerror = () => { splash.textContent = 'No se pudo cargar el motor animado de Goxy.'; };
+      doc.body.appendChild(canvas);
     } catch (_) {
       splash.textContent = 'Esta beta debe abrirse desde el mismo dominio de GOXION.';
     }
