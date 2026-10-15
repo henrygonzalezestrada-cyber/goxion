@@ -32,7 +32,9 @@ const privateView={
   {nombre:'Netflix Premium',correo_login:'privado@test.invalid',perfil_pin:'3321'},
   {nombre:'Disney+ Premium'},
   {nombre:'Combo HBO Max + Prime Video'}]},
- 'otro-cliente':{servicios:[{nombre:'ViX Premium'}]}
+ 'otro-cliente':{servicios:[{nombre:'ViX Premium'}]},
+ 'multi-client':{servicios:[{nombre:'ViX Premium',correo_login:'primero@ejemplo.invalid'},
+  {nombre:'ViX Premium',correo_login:'segundo@ejemplo.invalid'}]}
 };
 const clientWindow={
  GOXY_SUPPORT:knowledge,
@@ -53,6 +55,12 @@ account='test-client';
 assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('Netflix').loginEmail,'privado@test.invalid',
   'Correo asociado a sesión validada');
 assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('ViX'),null,'No leer cuenta distinta');
+account='multi-client';
+assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('ViX'),null,
+ 'Dos accesos de ViX requieren selección');
+assert.equal(clientWindow.GOXY_CLIENT_CONTEXT.supportReference('ViX',1).loginEmail,
+ 'segundo@ejemplo.invalid','El correo pertenece a la cuenta exacta');
+account='test-client';
 assert.equal(knowledge.matchIssue('Netflix','Netflix actualizar hogar'),1);
 assert.equal(knowledge.guide('Disney+',500),null,'Nunca inventar situaciones ausentes');
 new Function('window','document','localStorage','performance','setTimeout','clearTimeout',js);
@@ -155,9 +163,11 @@ const win={
    local:()=>({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3}),
    refresh:()=>Promise.resolve({ok:true,platforms:['Netflix','Disney+','Prime Video'],serviceCount:3}),
    destinations:p=>p==='Netflix'?[{index:0,label:'Netflix',hasProfile:true,hasLogin:true,hasPendingPassword:true}]:
-     p==='ViX'?[{index:1,label:'ViX',hasProfile:true,hasLogin:true,hasPendingPassword:false}]:[],
-   supportReference:p=>['Netflix','ViX'].includes(p)?{
-     clientId:'test-client',clientName:'Cliente Prueba',platform:p,loginEmail:'acceso@ejemplo.invalid'
+     p==='ViX'?[{index:1,label:'ViX · 1',hasProfile:true,hasLogin:true,hasPendingPassword:false},
+     {index:2,label:'ViX · 2',hasProfile:true,hasLogin:true,hasPendingPassword:false}]:[],
+   supportReference:(p,index=null)=>['Netflix','ViX'].includes(p) && (p!=='ViX'||Number.isInteger(index))?{
+     clientId:'test-client',clientName:'Cliente Prueba',platform:p,serviceIndex:p==='Netflix'?0:index,
+     serviceLabel:p==='Netflix'?'Netflix':'ViX · '+index,loginEmail:'acceso@ejemplo.invalid'
    }:null
   },
   GOXY_AI:{
@@ -175,7 +185,9 @@ const openedWhatsApp=[];
 win.open=url=>{openedWhatsApp.push(url);return {};};
 new Function('window',accessSrc)(win);
 new Function('window','NUMERO_GOXION',handoffSrc)(win,'5219611234567');
-const ticket=win.GOXY_HANDOFF.prepare('ViX',{issue:'App pide Premium',checks:['Solo QR']});
+const ticket=win.GOXY_HANDOFF.prepare('ViX',{serviceIndex:1,issue:'App pide Premium',checks:['Solo QR']});
+assert.equal(win.GOXY_HANDOFF.prepare('ViX',{issue:'App pide Premium'}),null,
+ 'No compartir un correo de otra cuenta por selección automática');
 assert.ok(ticket.message.includes('Cliente Prueba') && ticket.message.includes('acceso@ejemplo.invalid'));
 assert.ok(!ticket.message.includes('3321'),'No trasladar PIN a ficha');
 assert.ok(win.GOXY_HANDOFF.url(ticket).startsWith('https://wa.me/5219611234567?text='));
@@ -488,6 +500,8 @@ clickChoice(currentChoice('device'));
 assert.ok(currentChoice('human'),'Tras especificar dispositivo permite preparar ficha');
 assert.equal(openedWhatsApp.length,0,'Sin apertura automática');
 clickChoice(currentChoice('human'));
+assert.ok(currentChoice('handoff-service'),'Antes de preparar ficha elegir cuenta afectada');
+clickChoice(currentChoice('handoff-service'));
 assert.ok(currentChoice('send-handoff'),'Ficha presentada para revisión');
 assert.equal(openedWhatsApp.length,0);
 clickChoice(currentChoice('cancel-handoff'));
