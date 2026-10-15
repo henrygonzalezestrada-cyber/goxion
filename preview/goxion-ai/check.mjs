@@ -492,7 +492,7 @@ closeButton.fire('click');
 openButton.fire('click');flush();await Promise.resolve();
 const initialSent=sent.length;
 input.value='Cuánto tengo que pagar';composer.fire('submit');
-await Promise.resolve();flush();
+await Promise.resolve();await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
 assert.equal(sent.length,initialSent,'Las cuentas jamás consultan Groq');
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('6 de noviembre de 2026')),
   'Un perfil muestra su vencimiento confirmado');
@@ -501,7 +501,7 @@ assert.ok(scroll.children.some(x=>String(x.textContent).includes('30 de noviembr
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('$92.00')),
   'Todo junto usa importes ya calculados en backend');
 assert.ok(currentChoice('pay-one'),'Permitir consultar perfiles separados');
-clickChoice(currentChoice('pay-next'));await Promise.resolve();flush();
+clickChoice(currentChoice('pay-next'));await Promise.resolve();await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('Total de esa fecha: $46.00')),
   'Próximo cobro no equivale al total de todos los servicios');
 clickChoice(currentChoice('pay-open'));
