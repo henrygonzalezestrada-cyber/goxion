@@ -40,7 +40,7 @@
     svg,
     '<span class="gxai-reactions" aria-hidden="true"></span>',
     '</button>',
-    '<div class="gxai-touch-hint">Tócalo o acarícialo</div>',
+    '<div class="gxai-touch-hint">Tócalo o acarícialo de lado a lado</div>',
     '<span class="gxai-pet-status" role="status" aria-live="polite"></span>',
     '<h2 class="gxai-title">¿Necesitas <span>ayuda?</span></h2>',
     '<p class="gxai-desc">¿Tienes algún problema con tus plataformas o algo que te gustaría saber? Estoy aquí para ayudarte.</p>',
@@ -74,7 +74,7 @@
     '</div>',
     '<footer class="gxai-chat-foot">',
     '<form class="gxai-composer" aria-label="Conversación de demostración">',
-    '<input class="gxai-message-input" type="text" placeholder="Escribe para probar el chat…" aria-label="Mensaje de prueba" autocomplete="off" maxlength="240">',
+    '<input class="gxai-message-input" type="text" placeholder="Cuéntame qué problema tienes…" aria-label="Mensaje de prueba" autocomplete="off" maxlength="240">',
     '<button class="gxai-send" type="submit" aria-label="Enviar mensaje de prueba">',
     '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
     '</button>',
@@ -260,6 +260,7 @@
     if (!active || busy || !authenticated()) return;
     const query = String(enteredText || entry.prompt || '').trim();
     if (!query) return;
+    clearChoices();
     bubble(query.slice(0, 240), true);
     setBusy(true);
     chatTransition('thinking');
