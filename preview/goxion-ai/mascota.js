@@ -181,9 +181,9 @@
   function setAIStatus(status, message) {
     aiPanel.setAttribute('data-ai-status', status);
     aiStart.disabled = status !== 'ready';
-    aiTitle.textContent = status === 'ready' ? 'IA disponible' :
-      status === 'pending' ? 'IA pendiente de activación' :
-      status === 'checking' ? 'Comprobando conexión…' : 'No pude verificar la IA';
+    aiTitle.textContent = status === 'ready' ? 'Asistencia inteligente lista' :
+      status === 'pending' ? 'Guías de soporte disponibles' :
+      status === 'checking' ? 'Preparando tu asistencia…' : 'Asistencia adicional no disponible';
     aiDescription.textContent = message;
     aiStart.textContent = 'Automático';
     disclaimer.textContent = status === 'ready'
@@ -490,6 +490,7 @@
     aiMode = false;
     awaitingSymptom = false;
     lastGuide = null;
+    messageInput.placeholder = 'Cuéntame qué problema tienes…';
     const all=knowledge.platforms();
     const mine=myPlatforms.filter(platform=>all.includes(platform));
     if (mine.length) {
@@ -604,9 +605,8 @@
       setBusy(false);
       chatTransition('listening');
       showChoices([
-        {kind:'unresolved',platform:chosen.platform,label:'Necesito más ayuda con este problema'},
         {kind:'human',label:'Hablar con asesor humano'},
-        {kind:'issues',platform:chosen.platform,label:'Ver otras situaciones'}
+        {kind:'issues',platform:chosen.platform,label:'Ver otras soluciones'}
       ]);
     });
   }
@@ -691,7 +691,10 @@
          {kind:'issues',platform,label:'Ver otras soluciones'}]);
       return;
     }
-    if(!aiConfigured){escalationFallback(platform);return;}
+    if(!aiConfigured){
+      escalationFallback(platform);
+      return;
+    }
     aiMode=true;
     awaitingSymptom=false;
     chosenPlatform=platform;
