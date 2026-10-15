@@ -251,7 +251,9 @@
       ', el motor financiero proyecta '+money(value.amountCents)+
       ' de saldo pendiente, incluyendo '+money(value.moraCents)+' de mora.';
    if(value.reactivationConfirmed && valid(value.reactivationCents))
-     answer+=' La reactivación calculada sería '+money(value.reactivationCents)+'.';
+     answer+=value.reactivationCents>0
+       ? ' Además, el motor aplicaría '+money(value.reactivationCents)+' de reactivación (cargo del 20% según la política para atrasos de más de 15 días).'
+       : ' Para esa fecha, el motor no proyecta cargo de reactivación.';
    else answer+=' El cargo por reactivación no está confirmado en esta simulación B2; no puedo asegurarte que sea cero.';
    if(value.loyaltyAtRisk)answer+=' La lealtad también podría perderse por incumplimiento.';
    answer+=' Es una simulación, no un importe definitivo: puede cambiar si hay abonos, prórrogas o ajustes.';
