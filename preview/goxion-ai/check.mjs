@@ -65,8 +65,8 @@ const bridge=readFileSync(join(root,'goxy-ai-client.js'),'utf8');
 assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'Cliente conecta a Edge, no a Groq');
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
-assert.ok(html.includes('goxy-ai-client.js?v=goxy-f9'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f9') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('goxy-ai-client.js?v=goxy-f10'),'Cargar puente seguro F7');
+assert.ok(html.includes('mascota.js?v=goxy-f10') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(js.includes('parent.visualViewport') && js.includes('syncChatViewport'),'Leer viewport real padre');
