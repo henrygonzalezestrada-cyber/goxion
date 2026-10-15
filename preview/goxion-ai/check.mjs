@@ -441,7 +441,11 @@ assert.ok(!('cliente_id' in sent[0]),'No filtrar ID cliente a Groq');
 assert.ok(disclaimer.textContent.includes('7'),'Mostrar saldo IA después de respuesta');
 flush();
 input.value='¿Y si ya hice eso?';composer.fire('submit');
+assert.equal(api.aiQueued(),true,'Nueva consulta espera sin mostrar error de tasa');
+input.value='En todos los dispositivos';composer.fire('submit');
+assert.equal(api.aiQueued(),true,'Conservar una única pregunta pendiente');
 flush();await Promise.resolve();
+assert.equal(sent[1].message,'En todos los dispositivos','Tras la espera solo enviar último mensaje');
 assert.equal(sent.length,2,'Continuidad de IA solo tras necesitarla');
 assert.deepEqual(sent[1].history,[
   {role:'user',content:'Se congela al reproducir un video'},
@@ -504,6 +508,10 @@ assert.ok(currentChoice('pay-one'),'Permitir consultar perfiles separados');
 clickChoice(currentChoice('pay-next'));await Promise.resolve();await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('Total de esa fecha: $46.00')),
   'Próximo cobro no equivale al total de todos los servicios');
+input.value='Cuánto tengo que pagar de ViX';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('Estos son los pagos de ViX')),
+ 'Debe responder por una plataforma, sin confundirla con soporte técnico');
 clickChoice(currentChoice('pay-open'));
 assert.equal(payNavigation,1,'Redirigir a Index oficial existente, sin cobro paralelo');
 openButton.fire('click');flush();
