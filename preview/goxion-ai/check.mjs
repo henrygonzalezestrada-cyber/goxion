@@ -1,4 +1,4 @@
-// GOXION · Goxy F13 · pagos oficiales, contexto y cola inteligente de IA.
+// GOXION · Goxy F14 · prórrogas, proyección oficial y Safari corregido.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -80,12 +80,12 @@ const bridge=readFileSync(join(root,'goxy-ai-client.js'),'utf8');
 assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'Cliente conecta a Edge, no a Groq');
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
-assert.ok(html.includes('goxy-ai-client.js?v=goxy-f10'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f13') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('goxy-ai-client.js?v=goxy-f14'),'Cargar puente seguro F7');
+assert.ok(html.includes('mascota.js?v=goxy-f14') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f12') &&
  html.includes('goxy-access-routing.js?v=goxy-f12') &&
  html.includes('goxy-whatsapp-handoff.js?v=goxy-f12') &&
- html.includes('goxy-payment-read.js?v=goxy-f13'),'Cargar lectura financiera F13 antes del chat');
+ html.includes('goxy-payment-read.js?v=goxy-f14'),'Cargar lectura financiera F13 antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(js.includes('parent.visualViewport') && js.includes('syncChatViewport'),'Leer viewport real padre');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
@@ -206,11 +206,22 @@ win.parent={innerHeight:844,visualViewport:vv,addEventListener(){}};
 const store={getItem:()=>authed?'fake-token':''};
 const charge=(id,day,ordinal)=>({cargo_id:id,acceso_id:'access-'+id,servicio:'ViX Premium',ordinal,
   vence:'2026-11-'+day,total_centavos:4600,pagado:false});
+let extensionAgreement=false;
 const financialResponse={ok:true,modo:'b2_multifecha',calendario_financiero:{ok:true,cobrable:true,
   ciclo_id:'22222222-2222-2222-2222-222222222222',
-  total_pendiente_centavos:9200,cargos:[charge('uno','06',1),charge('dos','30',2)]}};
+  total_pendiente_centavos:9200,cargos:[charge('uno','06',1),charge('dos','30',2)]},
+  estado_financiero:{fuente_financiera:'supabase:goxion_estado_financiero',
+    reglas:{lealtad:[{nivel:1,pagos:4,porcentaje:3},{nivel:2,pagos:9,porcentaje:6}]},
+    lealtad:{nivel:1,porcentaje:3,monto:7}}};
 new Function('window','localStorage','fetch',paymentSrc)(win,store,
-  async()=>({ok:true,json:async()=>financialResponse}));
+  async(_url,config)=>({ok:true,json:async()=>
+    JSON.parse(config?.body||'{}').accion==='mi_prorroga'?
+    {ok:true,modo:'global',puede_solicitar:!extensionAgreement,fecha_original:'2026-10-15',
+      fecha_maxima:'2026-10-20',fecha_servidor:'2026-10-15',
+      acuerdo:extensionAgreement?{fecha_pactada:'2026-10-20',estado:'activo'}:null}:
+    financialResponse}));
+win.GOXY_AI.forecast=async date=>({ok:true,mode:'oficial',date,amountCents:38000,
+  moraCents:2500,reactivationCents:2000,reactivationConfirmed:true});
 const timers=new Map();let nextTimer=0;
 function schedule(fn,ms){const id=++nextTimer;timers.set(id,{fn,ms});return id;}
 function unschedule(id){timers.delete(id);}
@@ -528,10 +539,43 @@ await Promise.resolve();flush();
 assert.equal(accountCount,beforeCatalog+2,'La referencia de seguimiento conserva el contexto de misión');
 assert.equal(sent.length,initialSent,'Misiones no gastan IA');
 closeButton.fire('click');
+// F14 · Seguimiento de pagos: no caer al catálogo de plataformas.
+openButton.fire('click');flush();await Promise.resolve();
+input.value='Mi próximo pago';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+input.value='Y si no puedo pagarlo?';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('puedes solicitar una prórroga')),
+ '«Y si no puedo pagarlo» debe consultar prórroga y no elegir plataforma');
+assert.ok(currentChoice('extend-open'),'Ofrecer prórroga solo si la elegibilidad oficial lo permite');
+input.value='Si pago hasta el 20 de octubre ¿cuánto mora me genera?';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('380.00')),
+ 'El importe futuro proviene exclusivamente de forecast, no de fórmula local');
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('cargo del 20%')),
+ 'Mostrar reactivación solo si backend la confirmó');
+input.value='Cuánto me descuentan con el nivel máximo de lealtad?';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('6% de descuento')),
+ 'Reglas de lealtad provienen de cotización financiera oficial');
+extensionAgreement=true;
+input.value='Quiero solicitar una prórroga';composer.fire('submit');
+await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('Ya tienes una prórroga registrada')),
+ 'El servidor informa que solo hay una prórroga por período');
+assert.ok(!currentChoice('extend-open'),'No ofrecer activación si acuerdo ya existe');
+extensionAgreement=false;
+assert.equal(win.GOXY_PAYMENT.parseDate('el 31 de octubre'), '2026-10-31',
+ 'Reconocer fecha escrita en español local'); // Fijado para beta del 15/oct.
+closeButton.fire('click');flush();
 // iPhone: campo >=16px, teclado encoge la capa y se recupera tras cerrar.
 assert.ok(css.includes('font-size:16px!important'),'Evitar zoom de Safari sobre el input');
 assert.ok(css.includes('.gxai-keyboard-open'),'La UI adapta el compositor a teclado abierto');
+win.scrollY=146;let restored=0;
+win.scrollTo=(_x,y)=>{restored=y;win.scrollY=y;};
 openButton.fire('click');flush();
+assert.equal(doc.body.style.position,'fixed','Safari debe impedir el scroll de fondo');
+assert.equal(doc.body.style.top,'-146px','Conservar posición del fondo al bloquearlo');
 assert.equal(layer.style['--gxai-viewport-height'],'844px','Inicialmente cabe en el viewport');
 input.focus();input.fire('focus');
 vv.height=460;vv.handlers.resize();
@@ -540,6 +584,8 @@ assert.ok(layer.classList.contains('gxai-keyboard-open'),'El input queda sobre e
 doc.activeElement=dialog;vv.height=844;vv.handlers.resize();
 assert.equal(layer.classList.contains('gxai-keyboard-open'),false,'Restaurar altura al ocultar teclado');
 closeButton.fire('click');flush();
+assert.equal(doc.body.style.position,'','Restaurar estilos del fondo al cerrar');
+assert.equal(restored,146,'Restablecer desplazamiento original sin saltos');
 openButton.fire('click');flush();await Promise.resolve();
 input.value='ViX me pide contratar Premium';composer.fire('submit');
 assert.ok(currentChoice('premium-qr'),'Preguntar correo o QR sin gastar IA');
@@ -566,4 +612,4 @@ assert.ok(currentChoice('send-handoff'),'Revisar ficha de Netflix');
 clickChoice(currentChoice('send-handoff'));
 assert.equal(openedWhatsApp.length,1,'Solo confirmar abre WhatsApp');
 assert.ok(openedWhatsApp[0].includes('GOXION')&&!openedWhatsApp[0].includes('3321'));
-console.log('GOXION Goxy F13: pagos B2, espera IA, misiones y WhatsApp seguro PASS.');
+console.log('GOXION Goxy F14: prórroga, proyección, lealtad, iOS y F13 PASS.');

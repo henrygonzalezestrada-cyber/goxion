@@ -201,3 +201,24 @@
 - **F13 NO está aceptada en Safari físico**. No considerar que las cuatro capturas previas demuestren las nuevas funciones. Antes de cualquier integración oficial, comprobar en sesión real: «próxima mensualidad», «todo junto», «ViX perfil 1/2», fecha única, saldo B2 en revisión, redirección a Index, misión catálogo, último mensaje mientras espera Groq, 8/24 h, cerrar chat/cambiar cliente y privacidad.
 
 **No concluir que la UI oficial cambió:** las modificaciones son de la beta. Documentar PR/merge/Pages/CI al publicarse. Mantener pendiente Issue #119 de aceptación F12. El fallo histórico de CI `Browser smoke` de F12 fue un timeout de splash de Ayuda en WebKit, sin prueba de que Goxy lo originara.
+
+---
+
+## 12. Goxy F14 — intención financiera, pronóstico oficial e iOS (15/oct/2026)
+**Origen:** feedback con 2 capturas y video de ~108 segundos en Safari iPhone. Después de la consulta «próximo pago: 15 de octubre, $353», al preguntar «Y si no puedo pagarlo?» Goxy desplegaba plataformas de soporte. Con teclado activo, el chat se veía demasiado pequeño y permitía mover el fondo.
+
+**Acuerdos vigentes:**
+- Goxy debe explicar la prórroga, comprobar `mi_prorroga` del cliente y mostrar cuándo procede o cuándo ya se utilizó. No puede prometer disponibilidad sin leer el servidor; una por cliente/período, únicamente el día de vencimiento original y máximo +5 días, con consecuencias de incumplimiento.
+- Debe responder qué pasaría si el cliente paga en una fecha futura con una **simulación del motor** y no con reglas sueltas. El 20% tras más de 15 días corresponde a **reactivación**, no a «cancelación». Requiere proyección confirmada; fechas de un período distinto pueden bloquearse.
+- El nivel máximo de lealtad es el definido por las reglas oficiales (6% a nueve pagos puntuales, cuando elegible), no un descuento sobre cualquier promoción.
+- Reducir el desplazamiento del fondo y adaptar el chat al teclado del iPhone sin bloquear su scroll interno.
+
+**Cambios F14 aislados:**
+- Rama `beta/goxy-f14-finanzas-chat-ios-20261015`: `mascota.js`, `mascota.css`, `goxy-payment-read.js`, `goxy-ai-client.js`, `index.html`, `check.mjs`, Goxy Edge `supabase/functions/goxy-ai-beta/index.ts`. No toca `ayuda.html`, Index, Admin ni motores SQL.
+- `goxy-ai-beta` v8 ya desplegada como beta en Supabase, con nueva lectura `mode:"forecast"` read-only tras HMAC y cuenta activa. Los RPC oficiales permiten `p_hoy`: `goxion_estado_financiero` para fecha única y `goxion_b2_cotizar_ciclo` para régimen B2. Se verifica fecha hasta 45 días adelante, cotización y período, sin IDs libres ni claves en navegador, sin escrituras ni consumo de cuota Groq.
+- Para B2 la cotización no devuelve reactivación como partida: informar que está **sin confirmar**, no inferir 20% ni cero. Para fecha única, mostrar la reactivación únicamente si `cargos.reactivacion` viene validada del proyector oficial.
+- El usuario permanece en Goxy para explicaciones; para activar prórroga se invoca la UI oficial de Mi Espacio y para pagos el `irAlTicket()` original. Goxy nunca activa acuerdos ni cobra.
+- Detectar mensajes elípticos en el contexto de pagos (especialmente «Y si no puedo pagarlo?»), pedidos de simulación futura y lealtad. Reutilizar límites de visibilidad F12, no compartir PINs ni datos con Groq.
+- Bloqueo restaurable del scroll de fondo en Safari mediante `body` fijo; modalidad teclado usa viewport visual del padre sin doble reducción; el scroll del chat permanece vertical.
+- Pruebas locales con **191 aserciones** en DOM simulado PASS: escenarios elegible/usada, fecha futurible, lealtad, bloqueo y restauración del scroll, regresiones F13 y WhatsApp F12. No hay aún confirmación física ni comparación con saldos reales.
+- **Próxima aceptación:** pruebas en Safari real con cliente de una fecha (pago 15/Oct) y B2 varias fechas: preguntas sobre prórroga, fecha futura (en mismo mes y cruzando), valor máximo de lealtad, teclado y desplazamiento. Cuando el usuario lo apruebe, marcar F14 cerrada. **No fusionar Soporte oficial sin aprobación explícita.**

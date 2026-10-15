@@ -172,6 +172,81 @@ function recentHistory(raw:unknown):Array<{role:"user"|"assistant";content:strin
   }).map(row=>({role:row.role,content:String(row.content).trim()}));
 }
 
+// F14: pronóstico únicamente de LECTURA. Reutiliza los RPC oficiales con p_hoy,
+// nunca ejecuta un cobro ni inventa porcentajes o credenciales.
+const isoDate=/^\d{4}-\d{2}-\d{2}$/;
+const cents=(raw:unknown):number|null=>{
+  const n=Number(raw);
+  if(!Number.isFinite(n)||n<0||n>10000000)return null;
+  const value=Math.round(n*100);
+  return Number.isSafeInteger(value)?value:null;
+};
+async function forecast(clientId:string,service:string,target:unknown){
+  const todayParts=new Intl.DateTimeFormat("en-US",{timeZone:"America/Merida",
+    year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date());
+  const part=(name:string)=>todayParts.find(x=>x.type===name)?.value||"";
+  const today=part("year")+"-"+part("month")+"-"+part("day");
+  if(typeof target!=="string"||!isoDate.test(target)||
+    !Number.isFinite(Date.parse(target+"T00:00:00Z"))||
+    new Date(target+"T00:00:00Z").toISOString().slice(0,10)!==target)
+    return {ok:false,code:"INVALID_DATE",message:"Elige una fecha válida."};
+  const days=Math.round((Date.parse(target+"T00:00:00Z")-Date.parse(today+"T00:00:00Z"))/86400000);
+  if(days<0||days>45)return {ok:false,code:"DATE_OUT_OF_RANGE",
+    message:"Puedo proyectar una fecha desde hoy hasta 45 días adelante, dentro del período actual."};
+  const rpc=async(name:string,args:Record<string,unknown>)=>{
+    const res=await db("rpc/"+name,service,{method:"POST",
+      headers:{"Content-Type":"application/json"},body:JSON.stringify(args)});
+    if(!res.ok)throw Error("unavailable");
+    return res.json();
+  };
+  const current=await rpc("goxion_estado_financiero",{p_cliente_id:clientId});
+  if(current?.fuente_financiera!=="supabase:goxion_estado_financiero"||
+     typeof current.periodo!=="string")throw Error("unverified");
+  const period=current.periodo.slice(0,7);
+  const regime=await db("goxion_b2_regimen_cliente?cliente_id=eq."+clientId+
+    "&select=activo&limit=1",service);
+  if(!regime.ok)throw Error("regime");
+  const rows=await regime.json();
+  if(Array.isArray(rows)&&rows[0]?.activo===true){
+    // El mismo cotizador read-only de Index acepta p_hoy; no se recomputan moras.
+    const args={p_cliente_id:clientId,p_periodo:period+"-01"};
+    const nowQuote=await rpc("goxion_b2_cotizar_ciclo",args);
+    const future=await rpc("goxion_b2_cotizar_ciclo",{...args,p_hoy:target});
+    if(nowQuote?.ok!==true||future?.ok!==true||
+      nowQuote.cobrable!==true||future.cobrable!==true||
+      !Array.isArray(future.cargos)||future.cargos.length>90||
+      String(future.periodo||"").slice(0,7)!==period)
+      return {ok:false,code:"FORECAST_UNVERIFIED",
+        message:"No puedo verificar la proyección del calendario. Revisa Index para el importe vigente."};
+    let amount=0,mora=0;
+    for(const row of future.cargos){
+      if(!Number.isSafeInteger(Number(row.total_centavos))||
+        !Number.isSafeInteger(Number(row.mora_centavos))||
+        Number(row.total_centavos)<0||Number(row.mora_centavos)<0)
+        throw Error("invalid amounts");
+      if(row.pagado===true)continue;
+      amount+=Number(row.total_centavos);
+      mora+=Number(row.mora_centavos);
+    }
+    if(amount!==Number(future.total_pendiente_centavos)||!Number.isSafeInteger(amount)||
+       !Number.isSafeInteger(mora))throw Error("unverified sum");
+    return {ok:true,mode:"b2",date:target,amountCents:amount,moraCents:mora,
+      loyaltyAtRisk:future.lealtad_global_perdida===true,reactivationConfirmed:false,
+      note:"Proyección del ciclo vigente suponiendo que no se registra otro pago. La reactivación futura no está desglosada en el cotizador B2; no se incluye ni se da por descartada."};
+  }
+  const projected=await rpc("goxion_estado_financiero",{
+    p_cliente_id:clientId,p_hoy:target});
+  if(projected?.fuente_financiera!=="supabase:goxion_estado_financiero"||
+    String(projected.periodo||"").slice(0,7)!==period)
+    return {ok:false,code:"PERIOD_CHANGE",
+      message:"La fecha consultada cruza otro período. No puedo darte un monto fiable sin la próxima cotización oficial."};
+  const amount=cents(projected.total_actual),fee=cents(projected.cargos?.mora),
+    react=cents(projected.cargos?.reactivacion);
+  if(amount===null||fee===null||react===null)throw Error("bad currency");
+  return {ok:true,mode:"oficial",date:target,amountCents:amount,
+    moraCents:fee,reactivationCents:react,reactivationConfirmed:true,
+    note:"Proyección del motor oficial para esta fecha y período, suponiendo que no se registra otro pago. El importe definitivo se recalcula al pagar."};
+}
 Deno.serve(async(req:Request)=>{
   const origin=req.headers.get("Origin");
   if(origin!==SITE)return output(origin,403,{ok:false,code:"ORIGIN_DENIED"});
@@ -198,6 +273,15 @@ Deno.serve(async(req:Request)=>{
       const provider=await providerStatus(key);
       return output(origin,200,{ok:true,configured:true,providerReady:provider.ready,
         code:provider.code,model:provider.ready?MODEL:null});
+    }
+    if(body.mode==="forecast"){
+      try{
+        const prediction=await forecast(clientId,service,body.date);
+        return output(origin,prediction.ok?200:422,prediction);
+      }catch{
+        return output(origin,503,{ok:false,code:"FORECAST_UNAVAILABLE",
+          message:"No pude verificar la simulación con el motor oficial ahora. Revisa Index para el saldo actual."});
+      }
     }
     if(body.mode==="account"){
       if(!["payment","missions","promotions"].includes(body.topic))
