@@ -200,3 +200,16 @@
 #view-soporte .gxai-ai-panel-copy{gap:2px}
 #view-soporte .gxai-ai-title{font-size:10.5px}
 #view-soporte .gxai-ai-description{font-size:9.5px}
+
+/* F13 · Respuestas locales con pausa visual amable, sin retrasar la lectura real. */
+#view-soporte .gxai-typing{min-height:40px;min-width:62px;gap:6px;padding:9px 15px;box-shadow:0 4px 18px rgba(65,43,110,.12)}
+#view-soporte .gxai-typing i{width:7px;height:7px;box-shadow:0 0 8px rgba(130,198,230,.24);animation:gxai-typing-bob 1.16s ease-in-out infinite}
+#view-soporte .gxai-typing i:nth-child(2){animation-delay:.15s}
+#view-soporte .gxai-typing i:nth-child(3){animation-delay:.3s}
+#view-soporte .gxai-delayed-bubble{animation:gxai-reply-arrive .3s .35s ease-out both}
+#view-soporte .gxai-delayed-choices{animation:gxai-reply-arrive .26s .53s ease-out both}
+@keyframes gxai-reply-arrive{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){
+ #view-soporte .gxai-delayed-bubble,
+ #view-soporte .gxai-delayed-choices{animation:none!important}
+}
