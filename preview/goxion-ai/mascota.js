@@ -345,7 +345,7 @@
   }
   function handleText(query) {
     const words = knowledge.normalize(query);
-    if (/\b(cambiar|otra|elegir|ver) plataformas?\b/.test(words)) {
+    if (/\b(cambiar|otra|elegir|ver)(?: de)? plataformas?\b/.test(words)) {
       chosenPlatform = null;
       runDemo({prompt:query,step:'searching',
         response:'Claro, elige la plataforma que necesitas revisar.',finish:'happy'},query,showPlatforms);
