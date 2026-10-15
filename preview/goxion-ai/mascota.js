@@ -1,4 +1,4 @@
-/* GOXION · Goxy F7 · IA segura sobre guías oficiales, conservando scroll F6.
+/* GOXION · Goxy F7.1 · estado de IA visible y conversación guiada sin pasos ocultos.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -68,7 +68,12 @@
     '</header>',
     '<div class="gxai-chat-scroll" role="log" aria-live="polite">',
     '<div class="gxai-beta-note">FASE 4 · IA CON GUÍAS CONTROLADAS</div>',
-    '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Selecciona un tema o escríbeme qué servicio presenta la falla. No compartas contraseñas, códigos ni PIN por aquí.</div>',
+    '<div class="gxai-bubble">¡Hola! 🤖 Puedo guiarte con las instrucciones oficiales de tus plataformas. Para usar la IA, comprueba primero su estado y elige una guía. Nunca compartas contraseñas, códigos ni PIN aquí.</div>',
+    '<div class="gxai-ai-panel" role="status" aria-live="polite">',
+    '<span class="gxai-ai-light" aria-hidden="true"></span>',
+    '<div class="gxai-ai-panel-copy"><strong class="gxai-ai-title">Comprobando IA…</strong><small class="gxai-ai-description">Verificando la conexión segura con Goxy.</small></div>',
+    '<button class="gxai-ai-start" type="button" disabled>Comprobando…</button>',
+    '</div>',
     '<div class="gxai-suggestions">',
     '<button type="button" class="gxai-suggestion" data-prompt="acceso">Tengo un problema de acceso</button>',
     '<button type="button" class="gxai-suggestion" data-prompt="cuenta">Quiero consultar mi cuenta</button>',
@@ -117,6 +122,23 @@
   let aiConfigured = false;
   const ai = window.GOXY_AI;
   const disclaimer = layer.querySelector('.gxai-chat-disclaimer');
+  const aiPanel = layer.querySelector('.gxai-ai-panel');
+  const aiTitle = layer.querySelector('.gxai-ai-title');
+  const aiDescription = layer.querySelector('.gxai-ai-description');
+  const aiStart = layer.querySelector('.gxai-ai-start');
+  let aiMode = false;
+  function setAIStatus(status, message) {
+    aiPanel.setAttribute('data-ai-status', status);
+    aiStart.disabled = status !== 'ready';
+    aiTitle.textContent = status === 'ready' ? 'IA disponible' :
+      status === 'pending' ? 'IA pendiente de activación' :
+      status === 'checking' ? 'Comprobando conexión…' : 'No pude verificar la IA';
+    aiDescription.textContent = message;
+    aiStart.textContent = status === 'ready' ? 'Usar IA' : status === 'checking' ? 'Comprobando…' : 'Solo guías';
+    disclaimer.textContent = status === 'ready'
+      ? 'IA beta: 8 preguntas/24 h · No compartas información privada.'
+      : 'Las guías oficiales y el asesor humano siguen disponibles.';
+  }
 
   function authenticated() {
     const tokenKey = window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN;
@@ -169,6 +191,7 @@
   }
   function setBusy(value) {
     busy = value;
+    aiStart.disabled = value || !aiConfigured;
     messageInput.disabled = value;
     sendButton.disabled = value;
     suggestions.forEach(button => { button.disabled = value; });
@@ -200,16 +223,22 @@
     previousFocus = doc.activeElement;
     active = true; requestId++;
     cancelFlow();
+    aiConfigured = false;
+    aiMode = false;
+    setAIStatus('checking', 'Verificando el servicio de IA con tu sesión de Mi Espacio.');
     const statusId = requestId;
     ai.status().then(state => {
       if (!active || statusId !== requestId) return;
       aiConfigured = state.ok===true && state.configured===true;
-      disclaimer.textContent = aiConfigured
-        ? 'IA beta disponible · 8 consultas cada 24 h · Nunca compartas códigos, PIN ni contraseñas.'
-        : 'IA pendiente de activación · Guías oficiales y asesor disponibles.';
+      if (aiConfigured) setAIStatus('ready', 'Goxy puede responder preguntas relacionadas con las guías oficiales.');
+      else if (state.ok===true && state.configured===false) setAIStatus('pending',
+        'Falta configurar GROQ_API_KEY en Supabase. Iniciar sesión no activa la IA.');
+      else setAIStatus('unavailable', state.code==='SESSION_INVALID'
+        ? 'La sesión no pudo validarse. Vuelve a ingresar a Mi Espacio.'
+        : 'No se pudo comprobar el servidor. Puedes seguir con las guías.');
     }).catch(() => {
-      if (active && statusId===requestId) disclaimer.textContent =
-        'IA temporalmente no disponible · Puedes consultar las guías.';
+      if (active && statusId===requestId) setAIStatus('unavailable',
+        'No fue posible conectar con el servidor de IA. Las guías siguen disponibles.');
     });
     prevOverflowHtml = doc.documentElement.style.overflow;
     prevOverflowBody = doc.body.style.overflow;
@@ -231,6 +260,7 @@
     clearChoices();
     chosenPlatform = null;
     chosenGuide = null;
+    aiMode = false;
     chatState = 'idle';
     chatPhase.textContent = phases.idle.label;
     layer.setAttribute('data-chat-state','idle');
@@ -336,10 +366,12 @@
     ({kind:'platform',platform,label:platform}));
   function showPlatforms() {
     chosenGuide = null;
+    aiMode = false;
     showChoices(choosePlatformOptions());
   }
   function showIssues(platform) {
     chosenGuide = null;
+    aiMode = false;
     const issues = knowledge.issues(platform);
     showChoices([
       ...issues.map((issue,index)=>({kind:'issue',platform,issueIndex:index,label:issue.issue})),
@@ -357,6 +389,7 @@
     }
     chosenPlatform = platform;
     chosenGuide = {platform,issueIndex:index};
+    aiMode = false;
     // Las instrucciones proceden EXCLUSIVAMENTE de support-issues.js,
     // convertidas a texto. Nunca incluir correo_login, perfil_pin o credenciales.
     const answer = 'Guía GOXION · '+platform+'\n'+guide.issue+'\n\n'+
@@ -365,7 +398,7 @@
       : 'Si todavía necesitas ayuda, puedes hablar con un asesor.');
     runDemo({prompt:guide.issue,step:'searching',response:answer,finish:'happy'},
       null,()=>showChoices([
-        {kind:'ai',label:'Preguntarle a Goxy (IA beta)'},
+        {kind:'ai',label:aiConfigured ? 'Preguntar con IA · '+platform : 'IA pendiente de activación'},
         {kind:'issues',platform,label:'Otra situación de '+platform},
         {kind:'human',label:'Hablar con asesor humano'},
         {kind:'platforms',label:'Cambiar plataforma'}
@@ -401,7 +434,11 @@
     }else if(reply.code!=='ABORTED'){
       chatTransition('error');
       bubble(reply.message||'Goxy no puede conectarse con la IA todavía. La guía oficial y el asesor siguen disponibles.',false);
-      if(reply.code==='AI_NOT_CONFIGURED')aiConfigured=false;
+      if(reply.code==='AI_NOT_CONFIGURED') {
+        aiConfigured=false;
+        aiMode=false;
+        setAIStatus('pending','Falta configurar GROQ_API_KEY en Supabase. Las guías permanecen disponibles.');
+      }
     }
     later(current,1700,()=>{
       setBusy(false);
@@ -414,6 +451,12 @@
     });
   }
   function handleText(query) {
+    // El modo IA es explícito: después de elegirlo, todo mensaje de esa guía
+    // se envía al backend incluso si menciona el nombre de la plataforma.
+    if (aiMode && chosenGuide) {
+      void askAI(query);
+      return;
+    }
     const words = knowledge.normalize(query);
     if (/\b(cambiar|otra|elegir|ver)(?: de)? plataformas?\b/.test(words)) {
       chosenPlatform = null;
@@ -434,12 +477,8 @@
       ]));
       return;
     }
-    // Si ya existe una guía específica y es una pregunta adicional, Goxy
-    // prueba la IA beta. La opción determinista se conserva al cambiar tema.
-    if (chosenGuide && !platform && !/\b(guia|tema|opciones|plataforma)\b/.test(words)) {
-      void askAI(query);
-      return;
-    }
+    // Sin haber elegido el modo IA, los mensajes usan guías comprobadas.
+    // La selección explícita evita respuestas externas inesperadas.
     const target = platform || chosenPlatform;
     if (target) {
       const index = knowledge.matchIssue(target,query);
@@ -467,8 +506,14 @@
     const index = Number(button.dataset.issueIndex);
     if (type === 'ai') {
       if (!chosenGuide) return;
-      bubble(aiConfigured?'Escribe tu pregunta sobre esta guía en el campo inferior.':'La IA está pendiente de activación. Puedes seguir consultando las guías oficiales.',false);
-      if(aiConfigured)messageInput.focus({preventScroll:true});
+      if (!aiConfigured) {
+        bubble('La IA todavía no está habilitada. Iniciar sesión no la activa: requiere configurar GROQ_API_KEY en Supabase. Mientras tanto, sigo aquí con las guías oficiales.',false);
+        return;
+      }
+      aiMode = true;
+      messageInput.placeholder = 'Pregunta sobre '+chosenGuide.platform+'…';
+      bubble('Modo IA activado para '+chosenGuide.platform+'. Escribe una pregunta relacionada con esta guía; las respuestas se generan en el servidor.',false);
+      messageInput.focus({preventScroll:true});
       return;
     }
     if (type === 'human') { humanHandoff(); return; }
@@ -597,6 +642,11 @@
     if (event.detail === 0) playfulTap();
   });
   openButton.addEventListener('click', openChat);
+  aiStart.addEventListener('click', () => {
+    if (!active || !authenticated() || !aiConfigured || busy) return;
+    bubble('Primero elige una plataforma y una situación. Así puedo responder sin inventar soluciones.',false);
+    showPlatforms();
+  });
   closeButton.addEventListener('click', closeChat);
   layer.querySelector('.gxai-backdrop').addEventListener('click', closeChat);
   layer.addEventListener('click', event => {
@@ -654,6 +704,8 @@
     close: closeChat,
     open: openChat,
     renderer: 'robot-heads@0.3.0',
-    aiConfigured: () => aiConfigured
+    aiConfigured: () => aiConfigured,
+    aiMode: () => aiMode,
+    aiStatus: () => aiPanel.getAttribute('data-ai-status')
   });
 })();
