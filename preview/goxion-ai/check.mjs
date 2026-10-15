@@ -1,4 +1,4 @@
-// GOXION · Goxy F2 · prueba de unidad sin APIs, clientes ni red.
+// GOXION · Goxy F4 · prueba de unidad sin APIs, clientes ni red.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -15,6 +15,10 @@ for (const needle of ['.gxai-canvas-slot','gxai-border-sweep','prefers-reduced-m
 }
 assert.ok(!html.includes('https://api.'), 'Preview no debe llamar una API');
 assert.ok(!js.includes('↗'), 'No dejar flecha en el CTA');
+assert.ok(!js.includes('gxai-open-icon'), 'No debe quedar el globo de chat en el CTA');
+assert.ok(js.includes('gxai-open-signal') && css.includes('gxai-border-sweep'), 'Conservar los puntos y el borde animado');
+assert.ok(js.includes('gxai-open-balance') && css.includes('.gxai-open-balance'), 'Conservar el centrado del texto sin icono');
+assert.ok(js.includes("event.stopPropagation()") && js.includes("capture: true"), 'Evitar el poke feliz de robot-heads que oculta otras expresiones');
 assert.ok(js.includes('gxai-canvas-slot') && !js.includes('<linearGradient'), 'Usar Canvas original, no el SVG plano.');
 const entry=readFileSync(join(root,'goxy-heads-entry.js'),'utf8');
 assert.ok(entry.includes('from "robot-heads"'), 'Debe importar el motor original.');
@@ -84,6 +88,19 @@ mascotButton.fire('pointerup',p(100,110));
 assert.equal(bigMascot.attrs['data-mood'],'happy');
 assert.equal(layer.classList.contains('gxai-visible'),false);
 
+// Todos los estados del ciclo de gestos deben ser NATIVOS y perceptiblemente
+// diferentes; los aliases wink/surprised repetían expresiones en F3.
+const nativeCycle = ['happy','searching','listening','working','thinking','speaking','sleeping'];
+const seen = [bigMascot.attrs['data-mood']];
+for (let i=1; i<nativeCycle.length; i++) {
+  mascotButton.fire('pointerdown',p(100,110,20+i));
+  mascotButton.fire('pointerup',p(100,110,20+i));
+  seen.push(bigMascot.attrs['data-mood']);
+}
+assert.equal(seen.join(','),nativeCycle.join(','),'Ciclo F4 debe alternar 7 animaciones distintas');
+assert.equal(new Set(seen).size,7,'Los gestos nunca deben repetirse antes de completar ciclo');
+assert.equal(layer.classList.contains('gxai-visible'),false,'Los gestos no deben abrir chat');
+
 // Caricia lenta y caricia de un único fotograma (iOS) ⇒ corazones.
 mascotButton.fire('pointerdown',p(100,110,2));
 mascotButton.fire('pointermove',p(157,112,2));
@@ -97,7 +114,7 @@ assert.equal(bigMascot.attrs['data-mood'],'love');
 
 // Teclado también hace gesto; solo CTA abre chat.
 mascotButton.fire('click',{detail:0});
-assert.equal(bigMascot.attrs['data-mood'],'wink');
+assert.equal(bigMascot.attrs['data-mood'],'happy','Teclado reinicia el ciclo, sin abrir chat');
 chatButton.fire('click');
 assert.equal(layer.classList.contains('gxai-visible'),true);
 assert.equal(doc.activeElement,dialog);
@@ -117,4 +134,4 @@ mascotButton.fire('pointerdown',p(100,110,4));
 mascotButton.fire('pointermove',p(150,111,4));
 mascotButton.fire('pointerup',p(151,111,4));
 assert.equal(hearts.childElementCount,originalCount);
-console.log('GOXION Goxy F2: Goxy original Canvas + interacciones F2 PASS (sin navegador ni datos reales).');
+console.log('GOXION Goxy F4: 7 expresiones nativas, CTA sin globo, caricias, sesión y apertura única del chat PASS (pruebas simuladas).');

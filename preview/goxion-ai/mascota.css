@@ -37,7 +37,7 @@
 #view-soporte .gxai-open:hover,#view-soporte .gxai-open:focus-visible{box-shadow:0 5px 21px rgba(124,77,255,.12),0 0 15px rgba(0,242,254,.09)}
 #view-soporte .gxai-open:hover .gxai-open-inner{background:linear-gradient(110deg,rgba(31,18,62,.98),rgba(8,29,43,.99))}
 #view-soporte .gxai-open:active{transform:scale(.985)}
-#view-soporte .gxai-open-icon{flex:none;opacity:.75}
+#view-soporte .gxai-open-balance{display:inline-block;flex:none;width:16px;height:16px;visibility:hidden}
 #view-soporte .gxai-open-signal{display:inline-flex;align-items:center;gap:3px;flex:none;min-width:18px;height:16px;justify-content:center}
 #view-soporte .gxai-open-signal i{width:3px;height:3px;border-radius:50%;background:#00f2fe;opacity:.35;animation:gxai-signal-dot 1.9s ease-in-out infinite}
 #view-soporte .gxai-open-signal i:nth-child(2){animation-delay:.23s;background:#9c83ff}

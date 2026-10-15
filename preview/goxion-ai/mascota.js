@@ -1,4 +1,4 @@
-/* GOXION · Goxy F3 · robot-heads original en Canvas + caricias F2.
+/* GOXION · Goxy F4 · expresiones nativas variadas de robot-heads + caricias F2.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -42,7 +42,7 @@
     '<p class="gxai-desc">¿Tienes algún problema con tus plataformas o algo que te gustaría saber? Estoy aquí para ayudarte.</p>',
     '<button class="gxai-open" type="button" aria-label="Abrir conversación con Goxy">',
     '<span class="gxai-open-inner"><span class="gxai-open-signal" aria-hidden="true"><i></i><i></i><i></i></span>',
-    '<span class="gxai-open-copy">Hablar con Goxy</span><svg class="gxai-open-icon" aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M21 11.5a8.5 8.5 0 0 1-8.5 8.5 9 9 0 0 1-4-.95L3 21l1.95-5.5A8.5 8.5 0 1 1 21 11.5Z"/><path d="M9 12h.01M12 12h.01M15 12h.01"/></svg></span></button>'
+    '<span class="gxai-open-copy">Hablar con Goxy</span><span class="gxai-open-balance" aria-hidden="true"></span></span></button>'
   ].join('');
   card.append(hero, original);
 
@@ -160,11 +160,29 @@
   }
   function playfulTap() {
     if (!authenticated()) return;
-    const gestures = ['happy', 'wink', 'surprised', 'happy'];
-    const state = gestures[pet.taps++ % gestures.length];
-    mood(state, 1600);
-    petStatus.textContent = state === 'wink' ? 'Goxy te guiñó un ojo' : state === 'surprised' ? 'Goxy está sorprendido' : 'Goxy se alegró de verte';
+    // Usar siete estados NATIVOS y distintos de robot-heads.
+    // Antes wink→happy y surprised→listening podían parecer el mismo gesto.
+    // Orden rotativo sin repetición consecutiva: cada toque revela otro comportamiento.
+    const gestures = [
+      { state: 'happy', text: 'Goxy se alegró de verte' },
+      { state: 'searching', text: 'Goxy mira a su alrededor' },
+      { state: 'listening', text: 'Goxy te presta atención' },
+      { state: 'working', text: 'Goxy está muy concentrado' },
+      { state: 'thinking', text: 'Goxy tiene una idea' },
+      { state: 'speaking', text: 'Goxy te saluda' },
+      { state: 'sleeping', text: 'Shhh… Goxy está dormitando' }
+    ];
+    const gesture = gestures[pet.taps++ % gestures.length];
+    mood(gesture.state, gesture.state === 'sleeping' ? 2700 : 2100);
+    petStatus.textContent = gesture.text;
   }
+  // robot-heads integra poke() en su propio click. Lo detenemos durante
+  // la captura para evitar que siempre sobreescriba los gestos con "happy".
+  // Pointer Events maneja toques/caricias; activación por teclado continúa.
+  heroTrigger.addEventListener('click', (event) => {
+    if (event.detail > 0 && event.target !== heroTrigger) event.stopPropagation();
+  }, { capture: true });
+
   heroTrigger.addEventListener('pointerdown', (event) => {
     if (!event.isPrimary || (event.pointerType === 'mouse' && event.button !== 0) || !authenticated()) return;
     pet.id = event.pointerId;
@@ -251,7 +269,7 @@
   // API local de prueba: cambiar expresión desde consola sin exponer una API financiera.
   window.GOXION_AI_BETA = Object.freeze({
     expression: (state) => {
-      if (['idle','happy','thinking','listening','speaking','wink','surprised','love'].includes(state)) mood(state, state === 'idle' ? 0 : 1600);
+      if (['idle','happy','thinking','searching','listening','speaking','working','sleeping','error','wink','surprised','love'].includes(state)) mood(state, state === 'idle' ? 0 : 1600);
     },
     close: closeChat,
     open: openChat,
