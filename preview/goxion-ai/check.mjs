@@ -1,4 +1,4 @@
-// GOXION · Goxy F7.3 · plataformas únicamente en opciones del chat, F7/F6 intactas.
+// GOXION · Goxy F8 · conversación directa por plataforma, F7.3 y scroll intactos.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -66,7 +66,7 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f7'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f7-3') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('mascota.js?v=goxy-f8') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
@@ -376,4 +376,26 @@ assert.equal(sent[0].platform,'Netflix','El backend recibe solo plataforma selec
 assert.equal(sent[0].issueIndex,0,'El backend recibe solo ID canónico de guía');
 flush();
 closeButton.fire('click');
-console.log('GOXION Goxy F7.3: solo chips del chat, sin tarjeta, IA F7.1 y scroll F6 PASS.');
+// F8: cliente entra a IA y pregunta sin navegar previamente por temas.
+openButton.fire('click');
+flush();
+await Promise.resolve();
+assert.equal(api.aiStatus(),'ready','Estado AI confirmado');
+aiStart.fire('click');
+assert.equal(api.aiEntry(),true,'Entrada explícita IA pendiente de seleccionar plataforma');
+assert.ok(currentChoice('platform','Netflix'),'Primero plataformas contratadas');
+assert.ok(currentChoice('other'),'Consultar otras sin salir del chat');
+clickChoice(currentChoice('platform','Netflix'));
+assert.equal(api.aiMode(),true,'Elegir plataforma entra directamente a conversación IA');
+assert.equal(api.aiEntry(),false,'Desactivar navegación de selección tras elegir');
+assert.ok(!currentChoice('issue','Netflix'),'No exigir elegir un tema de soporte');
+input.value='Hola Goxy, mi Netflix se congela ¿qué hago?';
+composer.fire('submit');
+await Promise.resolve();
+assert.equal(sent.length,2,'Se envió nueva consulta directa al gateway');
+assert.equal(sent[1].platform,'Netflix','Contexto sólo plataforma');
+assert.equal(sent[1].issueIndex,undefined,'La conversación no exige un índice de guía');
+assert.ok(!('cliente_id' in sent[1]),'No enviar ID de cliente');
+flush();
+closeButton.fire('click');
+console.log('GOXION Goxy F8: chat IA directo por plataforma, guía manual F7.3, caricias y privacidad PASS.');
