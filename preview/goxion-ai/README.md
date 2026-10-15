@@ -1,7 +1,7 @@
-# GOXION · Goxy F10 · Conversación útil + teclado móvil adaptable
+# GOXION · Goxy F11 · Asistencia híbrida con escalamiento automático
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f10
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f11
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -129,3 +129,17 @@ No se presentan importes ni próxima fecha como cifras calculadas por Goxy. GOXI
 - El prompt de Groq sigue usando únicamente guías autorizadas, pero prioriza un diagnóstico claro y contexto de la conversación por encima de respuestas de rechazo genéricas.
 - El importe de vencimiento permanece reservado al cálculo financiero de Mi Espacio; F10 no duplica el motor B2.
 - Validación: prueba mock de chat y viewport del iPhone PASS; seis pruebas de la capa autenticada PASS; Edge Function beta v7 ACTIVE. **Revisión real con Safari en iPhone pendiente**, igual que la comprobación final del proveedor con el nuevo prompt.
+
+## F11 · IA automática sin botón visible
+**Decisión de producto:** «Usar IA» era una herramienta de prueba, no un paso que debe hacer el cliente. El cliente escribe en un único chat de Goxy y un **enrutador determinista del navegador** clasifica antes de consultar Groq. El enrutador no usa tokens, no envía contexto privado y no genera costos del modelo.
+
+- **Gratuito, inmediato:** saludo, capacidades, misiones, promociones, próximas fechas (remisión al estado de cuenta oficial), guías conocidas, selección de servicio y autorización/códigos que corresponden a un asesor. Los códigos nunca se solicitan.
+- **Falta contexto:** si el usuario escribe «Tengo un problema con Netflix», Goxy pregunta por el síntoma y muestra opción para consultar guías, sin descontar preguntas ni abrir la IA.
+- **Guía conocida:** primero se presenta la guía oficial sin IA. La cápsula «Ya intenté esto y sigo con el problema» activa diagnóstico adicional automáticamente solo si es realmente una cuestión técnica. Los procedimientos que precisan autorizar códigos pasan a humano sin llamada a Groq.
+- **Falla no cubierta:** si hay plataforma conocida y el usuario describe un problema concreto (por ejemplo «Se congela al reproducir»), Goxy puede consultar automáticamente Groq; la conversación posterior conserva su historia breve. No existe botón para habilitar IA.
+- **Si la IA está desconectada o se agota:** sigue disponible la solución gratuita y el asesor; no se inventan respuestas ni se cargan costos adicionales.
+- **Visual y velocidad:** Goxy conserva los tres puntos de análisis en búsquedas y llamadas reales. Las respuestas locales no esperan a la IA solo para simular procesamiento. Estado de asistencia avanzado reducido; CTA de IA oculta y no enfocable.
+- **Seguridad/cupos:** se conservan token HMAC, validación de cliente en backend, las ocho consultas por cliente/24h, pausa de 20 s, lista blanca de plataformas y filtrado de mensajes e historial en servidor. No se tocó el motor financiero ni el Soporte oficial.
+- **Calidad:** se distingue explícitamente entre una *guía con botón de asesor* y una *autorización que solamente puede hacer el asesor*. En el catálogo original todas las guías ofrecen asesor, así que usar ese marcador como veto universal bloquearía por error la IA para todos los problemas.
+
+Pruebas F11: `node preview/goxion-ai/check.mjs` cubre pregunta ambigua, síntoma → IA, seguimiento con memoria, guía con autorización → humano y cero IA, guía técnica → aclaración automática, navegación sin gasto, cuenta sin IA, scroll/caricias y teclado Safari. Verificar en Safari físico antes de pasar a Ayuda oficial.

@@ -1,4 +1,4 @@
-// GOXION · Goxy F8 · conversación directa por plataforma, F7.3 y scroll intactos.
+// GOXION · Goxy F11 · enrutador local y escalamiento automático sin control manual de IA.
 // Ejecutar: node preview/goxion-ai/check.mjs
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -66,7 +66,7 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f10'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f10') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('mascota.js?v=goxy-f11') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f7-2'),'Cargar F7.2 y contexto antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(js.includes('parent.visualViewport') && js.includes('syncChatViewport'),'Leer viewport real padre');
@@ -182,8 +182,9 @@ new Function('window','document','localStorage','performance','setTimeout','clea
 const layer=section.children.at(-1);
 const api=win.GOXION_AI_BETA;
 assert.ok(api,'Goxy no inició');assert.equal(mounts,1,'Render original no montó');
-assert.ok(js.includes('setAIStatus')&&js.includes('aiMode = true'),'Mostrar estado y activar modo explícito IA');
-assert.ok(js.includes("if (aiMode && chosenGuide)"),'Modo IA debe usar la guía incluso cuando el texto menciona la plataforma');
+assert.ok(js.includes('setAIStatus')&&js.includes('escalateAutomatically'),'Enrutador automático con estado verificado');
+assert.ok(css.includes('.gxai-ai-panel .gxai-ai-start{display:none!important}'),
+  'No mostrar botón manual de IA al cliente');
 const pointer=(x,y,id=1)=>({isPrimary:true,pointerType:'touch',pointerId:id,clientX:x,clientY:y,button:0});
 const clickDemo=button=>layer.fire('click',{target:{closest:selector=>selector==='.gxai-suggestion'?button:null}});
 const clickChoice=button=>layer.fire('click',{target:{closest:selector=>selector==='.gxai-choice'?button:null}});
@@ -353,74 +354,69 @@ assert.ok(currentChoice('mine'),'Volver a mis plataformas tras consultar otras')
 assert.equal(aiStart.disabled,true,'Sin clave no permitir entrar a IA');
 closeButton.fire('click');
 
-// Con proveedor configurado, la ruta inteligente es deliberada y visible.
+// F11: sin botón. Primero guías gratuitas, preguntar síntomas, luego IA.
 win.GOXY_AI.status=()=>Promise.resolve({ok:true,configured:true,providerReady:true});
 const sent=[];
 win.GOXY_AI.ask=async payload=>{
   sent.push(payload);
   return {ok:true,answer:'Respuesta de prueba desde backend autorizado.',remaining:7};
 };
-openButton.fire('click');
-flush();
+openButton.fire('click');flush();
 await Promise.resolve();
-assert.equal(aiPanel.getAttribute('data-ai-status'),'ready','El panel refleja conexión real');
-assert.equal(aiStart.disabled,false,'El usuario puede elegir IA solo tras confirmar estado');
-// El camino anterior de guías oficiales sigue disponible sin IA.
+assert.equal(api.aiStatus(),'ready','Proveedor realmente disponible');
+assert.equal(aiStart.disabled,false,'Estado interno listo sin botón visible');
 clickDemo(btnAccess);flush();
-assert.ok(currentChoice('platform','Netflix'),'Entrada manual a guías');
-assert.ok(!currentChoice('platform','Max'),'Primera lista solo contratadas');
-assert.ok(currentChoice('other'),'Otras plataformas siempre accesible');
 clickChoice(currentChoice('platform','Netflix'));flush();
 clickChoice(currentChoice('issue','Netflix'));flush();
-assert.ok(currentChoice('ai'),'La guía ofrece entrar a IA');
-clickChoice(currentChoice('ai'));
-assert.equal(api.aiMode(),true,'El botón debe activar el modo IA');
-input.value='Netflix todavía no abre mi pantalla';
-composer.fire('submit');
-await Promise.resolve();
-assert.equal(sent.length,1,'Una pregunta debe llegar al backend, no volver al menú de plataforma');
-assert.equal(sent[0].platform,'Netflix','El backend recibe solo plataforma seleccionada');
-assert.equal(sent[0].issueIndex,0,'El backend recibe solo ID canónico de guía');
+assert.ok(currentChoice('unresolved'),'Ofrecer seguimiento si la guía no resolvió');
+assert.ok(!currentChoice('ai'),'No ofrecer un botón para gastar IA');
+clickChoice(currentChoice('unresolved'));
+assert.equal(sent.length,0,'Autorización de código se deriva a humano sin gastar IA');
+assert.ok(currentChoice('human'),'Ofrecer asesor al requerir vinculación');
+flush();closeButton.fire('click');
+
+// La primera consulta imprecisa pide UN síntoma antes de usar Groq.
+openButton.fire('click');flush();await Promise.resolve();
+input.value='Tengo un problema con Netflix';composer.fire('submit');
+assert.equal(sent.length,0,'Consulta vaga no gasta IA');
+assert.equal(api.awaitingSymptom(),true,'Falta síntoma concreto: pedir aclaración');
 flush();
-closeButton.fire('click');
-// F8: cliente entra a IA y pregunta sin navegar previamente por temas.
-openButton.fire('click');
-flush();
+input.value='Se congela al reproducir un video';composer.fire('submit');
 await Promise.resolve();
-assert.equal(api.aiStatus(),'ready','Estado IA confirmado por proveedor');
-aiStart.fire('click');
-assert.equal(api.aiEntry(),true,'Entrada explícita IA pendiente de seleccionar plataforma');
-assert.ok(currentChoice('platform','Netflix'),'Primero plataformas contratadas');
-assert.ok(currentChoice('other'),'Consultar otras sin salir del chat');
-clickChoice(currentChoice('platform','Netflix'));
-assert.equal(api.aiMode(),true,'Elegir plataforma entra directamente a conversación IA');
-assert.equal(api.aiEntry(),false,'Desactivar navegación de selección tras elegir');
-assert.ok(!currentChoice('issue','Netflix'),'No exigir elegir un tema de soporte');
-input.value='Hola Goxy, mi Netflix se congela ¿qué hago?';
-composer.fire('submit');
-await Promise.resolve();
-assert.equal(sent.length,2,'Se envió nueva consulta directa al gateway');
-assert.ok(disclaimer.textContent.includes('7'), 'Mostrar al cliente su cupo IA restante');
-assert.equal(sent[1].platform,'Netflix','Contexto sólo plataforma');
-assert.equal(sent[1].issueIndex,undefined,'La conversación no exige un índice de guía');
-assert.ok(!('cliente_id' in sent[1]),'No enviar ID de cliente');
+assert.equal(sent.length,1,'Síntoma nuevo sin guía se escala automáticamente');
+assert.equal(sent[0].platform,'Netflix','Contexto de plataforma preservado');
+assert.equal(sent[0].issueIndex,undefined,'No obligar a elegir guía antes de IA');
+assert.ok(!('cliente_id' in sent[0]),'No filtrar ID cliente a Groq');
+assert.ok(disclaimer.textContent.includes('7'),'Mostrar saldo IA después de respuesta');
 flush();
 input.value='¿Y si ya hice eso?';composer.fire('submit');
 await Promise.resolve();
-assert.equal(sent.length,3,'Segunda pregunta usa IA solo cuando el usuario la eligió');
-assert.deepEqual(sent[2].history,[
-  {role:'user',content:'Hola Goxy, mi Netflix se congela ¿qué hago?'},
+assert.equal(sent.length,2,'Continuidad de IA solo tras necesitarla');
+assert.deepEqual(sent[1].history,[
+  {role:'user',content:'Se congela al reproducir un video'},
   {role:'assistant',content:'Respuesta de prueba desde backend autorizado.'}
-], 'La segunda pregunta conserva el último turno, no información de la cuenta');
+], 'La IA conserva únicamente conversación de soporte, no cuenta');
 flush();
 input.value='Qué puedes hacer?';composer.fire('submit');
-assert.equal(sent.length,3,'Pregunta de capacidades no debe consumir IA');
+assert.equal(sent.length,2,'Capacidades de Goxy no gastan IA');
 flush();
 input.value='Ya coloqué el código pero no responde';composer.fire('submit');
-assert.equal(sent.length,3,'Autorizar código requiere humano sin gasto adicional de IA');
-assert.ok(currentChoice('human'),'Escalar al asesor sin pedir el código');
-flush();
-closeButton.fire('click');
+assert.equal(sent.length,2,'Código ya ingresado NO consume otra consulta');
+assert.ok(currentChoice('human'),'Escalar al asesor sin recibir códigos');
+flush();closeButton.fire('click');
+
+// Otro problema técnico conocido (Hogar) puede aclararse; tener botón humano
+// en la guía no debe bloquear toda la IA como ocurre con los códigos.
+openButton.fire('click');flush();await Promise.resolve();
+input.value='Netflix actualizar hogar';composer.fire('submit');flush();
+assert.ok(currentChoice('unresolved'),'La guía conocida se resuelve gratis primero');
+clickChoice(currentChoice('unresolved'));
+await Promise.resolve();
+assert.equal(sent.length,3,'Si Hogar sigue fallando, IA explica diagnóstico');
+assert.equal(sent[2].platform,'Netflix');
+assert.equal(sent[2].issueIndex,1,'Mantener contexto de la guía oficial');
+flush();closeButton.fire('click');
+
 // Nueva ruta: consulta de misiones por backend propio sin gastar IA.
 openButton.fire('click');
 flush();
@@ -453,4 +449,4 @@ assert.ok(layer.classList.contains('gxai-keyboard-open'),'El input queda sobre e
 doc.activeElement=dialog;vv.height=844;vv.handlers.resize();
 assert.equal(layer.classList.contains('gxai-keyboard-open'),false,'Restaurar altura al ocultar teclado');
 closeButton.fire('click');flush();
-console.log('GOXION Goxy F10: charla, misiones, Safari zoom y teclado adaptable PASS.');
+console.log('GOXION Goxy F11: router local, aclaración, escalamiento automático, códigos gratis y Safari PASS.');
