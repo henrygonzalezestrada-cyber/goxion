@@ -1,7 +1,7 @@
-# GOXION AI · Beta visual F1
+# GOXION AI · Goxy · Beta F2 (mascota interactiva)
 
 ## Objetivo
-Reemplazar temporalmente la cuadrícula de plataformas **solo en una vista previa** de `Ayuda → Soporte` por una mascota real dibujada con SVG, animada mediante CSS y estados JavaScript. Al tocarla se abre una ventana de chat demostrativa.
+Reemplazar temporalmente la cuadrícula de plataformas **solo en una vista previa** de `Ayuda → Soporte` por una mascota real dibujada con SVG, animada mediante CSS y estados JavaScript. El robot se llama **Goxy**. Tocar su cabeza cambia sus gestos; **acariciarlo deslizando un dedo** activa ojitos de amor y corazones. Solo el botón «Hablar con Goxy» abre una ventana de chat demostrativa.
 
 ## Abrir beta
 Una vez que estos archivos de preview estén publicados por GitHub Pages: `https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/`
@@ -11,8 +11,10 @@ Una vez que estos archivos de preview estén publicados por GitHub Pages: `https
 Acceso: usa **Mi Espacio** e inicia sesión como un cliente real. El bloqueo de Soporte que ya existe sigue funcionando. No se crea un usuario ficticio ni se elude la autorización.
 
 ## Lo que sí incluye
-- Mascota animada por CSS/SVG, con parpadeo, leve movimiento, antena luminosa, alegría, escucha, pensamiento y habla simulada.
-- Botón y mascota abren el mismo chat modal, con cierre por X, fondo y Escape.
+- Goxy animado con SVG y CSS: parpadeo, leve movimiento, antena luminosa, guiño, sorpresa, cariño, alegría, escucha, pensamiento y habla simulada.
+- Eventos Pointer Events: toque = reacción; desplazamiento de dedo = caricia y corazones; no dispara el chat accidentalmente (incluido iOS con un solo evento de movimiento).
+- Botón «Hablar con Goxy» abre el chat (la mascota ya NO lo abre). El botón tiene un contorno cian-morado con movimiento orbital discreto y puntos pulsantes, sin flecha.
+- Chat modal de ejemplo con cierre por X, fondo y Escape.
 - Ejemplos conversacionales explícitamente marcados como demostración; no envían peticiones a ninguna API.
 - Respeta `prefers-reduced-motion`, navegación por teclado, foco sin halo de selección automática de la X y soporte móvil.
 - Conserva las FAQ, comentarios, contacto humano y funciones anteriores del soporte debajo del bloque nuevo.
@@ -23,12 +25,13 @@ Acceso: usa **Mi Espacio** e inicia sesión como un cliente real. El bloqueo de 
 - **Sin consultas ni escritura de datos privados**, sin código de verificación automático.
 - Sin cambios en `ayuda.html`, `admin.html`, `index.html` o motores financieros.
 - Sin garantía de apariencia en Safari iOS físico hasta validación humana en el dispositivo.
+- Las animaciones y expresiones son locales; no graban movimientos ni envían conversaciones.
 
 ## Arquitectura
 - `index.html`: envoltorio de prueba de mismo origen sobre `../../ayuda.html`.
 - `mascota.css`: estilo local bajo `#view-soporte`.
 - `mascota.js`: inyección limitada al contenedor `smart-support-card`, estados, navegación y chat.
-- `check.mjs`: revisión estática y de sintaxis.
+- `check.mjs`: contratos estáticos, prueba de interacciones simuladas sin navegador ni datos reales (`node preview/goxion-ai/check.mjs`).
 
 Estética inspirada en el concepto [robot-heads](https://github.com/fayazara/robot-heads) (MIT, Fayaz Ahmed), **sin reutilizar su código React** para no incorporar librerías, CDNs ni dependencias en GOXION.
 
