@@ -1,4 +1,4 @@
-/* GOXION · Goxy F8 · IA conversacional por plataforma sin pasos innecesarios.
+/* GOXION · Goxy F8.1 · verificación real de Groq y cupo visible en beta.
    Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
    Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
    Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
@@ -267,10 +267,17 @@
     refreshMyPlatforms();
     ai.status().then(state => {
       if (!active || statusId !== requestId) return;
-      aiConfigured = state.ok===true && state.configured===true;
-      if (aiConfigured) setAIStatus('ready', 'Goxy puede responder preguntas relacionadas con las guías oficiales.');
+      aiConfigured = state.ok===true && state.configured===true && state.providerReady===true;
+      if (aiConfigured) setAIStatus('ready',
+        'Clave y modelo verificados con Groq. Ya puedes probar una conversación.');
       else if (state.ok===true && state.configured===false) setAIStatus('pending',
         'Falta configurar la clave privada de Groq en Supabase. Iniciar sesión no activa la IA.');
+      else if (state.ok===true && state.configured===true) setAIStatus('unavailable',
+        state.code==='AI_KEY_REJECTED'
+          ? 'Groq rechazó la clave. Revisa el secreto configurado en Supabase.'
+          : state.code==='MODEL_NOT_AVAILABLE'
+          ? 'El modelo seleccionado no está disponible para esta clave.'
+          : 'La clave está guardada, pero no se pudo verificar Groq. Intenta de nuevo después.');
       else setAIStatus('unavailable', state.code==='SESSION_INVALID'
         ? 'La sesión no pudo validarse. Vuelve a ingresar a Mi Espacio.'
         : 'No se pudo comprobar el servidor. Puedes seguir con las guías.');
@@ -503,6 +510,10 @@
     if(reply.ok && typeof reply.answer==='string'){
       chatTransition('speaking');
       bubble(reply.answer,false);
+      if(Number.isInteger(reply.remaining)){
+        disclaimer.textContent = 'Te quedan '+reply.remaining+
+          ' consultas IA de tu cupo móvil de 24 h · Nunca compartas códigos ni PIN.';
+      }
       later(current,950,()=>chatTransition('happy'));
     }else if(reply.code!=='ABORTED'){
       chatTransition('error');
