@@ -134,3 +134,20 @@
 #view-soporte .gxai-chat-scroll{scrollbar-width:thin;scrollbar-color:rgba(124,77,255,.4) transparent}
 #view-soporte .gxai-typing[aria-label]{pointer-events:none}
 @media(prefers-reduced-motion:reduce){#view-soporte .gxai-choice{transition:none!important}}
+
+/* Goxy F7.1 — estado del cerebro: visible en el chat, sin alterar el ADN de F6. */
+#view-soporte .gxai-ai-panel{display:flex;align-items:center;gap:9px;padding:12px 10px;margin:7px 0 12px;border-radius:14px;border:1px solid rgba(124,77,255,.22);background:linear-gradient(120deg,rgba(124,77,255,.12),rgba(0,242,254,.04));min-width:0}
+#view-soporte .gxai-ai-light{width:7px;height:7px;flex:none;border-radius:100%;background:#95a4bd;box-shadow:0 0 7px rgba(149,164,189,.28)}
+#view-soporte .gxai-ai-panel-copy{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0;line-height:1.4}
+#view-soporte .gxai-ai-title{font-size:11px;font-weight:600;color:#eaf0ff;letter-spacing:.01em}
+#view-soporte .gxai-ai-description{font-size:10px;font-weight:400;color:#a4b3cd;line-height:1.45}
+#view-soporte .gxai-ai-start{flex:none;border:1px solid rgba(0,242,254,.24);border-radius:20px;padding:9px 12px;color:#e7f8fc;background:linear-gradient(115deg,rgba(124,77,255,.18),rgba(0,242,254,.08));font:600 10px Poppins,sans-serif;cursor:pointer;white-space:nowrap;transition:border-color .2s ease,background .2s ease}
+#view-soporte .gxai-ai-start:not(:disabled):hover{border-color:rgba(0,242,254,.7)}
+#view-soporte .gxai-ai-start:disabled{opacity:.5;cursor:default}
+#view-soporte .gxai-ai-start:focus-visible{outline:2px solid #00f2fe;outline-offset:3px}
+#view-soporte .gxai-ai-panel[data-ai-status="ready"]{border-color:rgba(0,242,254,.37)}
+#view-soporte .gxai-ai-panel[data-ai-status="ready"] .gxai-ai-light{background:#00f2fe;box-shadow:0 0 10px rgba(0,242,254,.55)}
+#view-soporte .gxai-ai-panel[data-ai-status="pending"] .gxai-ai-light{background:#bba5f6;box-shadow:0 0 8px rgba(124,77,255,.38)}
+#view-soporte .gxai-ai-panel[data-ai-status="unavailable"] .gxai-ai-light{background:#f3ab9d;box-shadow:0 0 8px rgba(243,171,157,.26)}
+@media(max-width:380px){#view-soporte .gxai-ai-panel{flex-wrap:wrap}#view-soporte .gxai-ai-start{margin-left:16px;flex:none}}
+@media(prefers-reduced-motion:reduce){#view-soporte .gxai-ai-start{transition:none}}
