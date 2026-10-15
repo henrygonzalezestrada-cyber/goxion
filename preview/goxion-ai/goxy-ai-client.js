@@ -51,5 +51,17 @@
       return {ok:false,code:'NETWORK_ERROR',message:'No pude consultar Mi Espacio en este momento.'};
     }
   }
-  window.GOXY_AI = Object.freeze({ask,status,account});
+  // Consulta determinista al motor financiero del backend; nunca pasa por Groq
+  // y nunca consume el cupo de 8 preguntas.
+  async function forecast(date,{signal}={}){
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(String(date||'')))
+      return {ok:false,code:'INVALID_DATE',message:'Selecciona una fecha válida.'};
+    try{return await send({mode:'forecast',date},{signal});}
+    catch(error){
+      if(error?.name==='AbortError')return {ok:false,code:'ABORTED'};
+      return {ok:false,code:'NETWORK_ERROR',
+        message:'No fue posible consultar el cálculo oficial ahora.'};
+    }
+  }
+  window.GOXY_AI = Object.freeze({ask,status,account,forecast});
 })();
