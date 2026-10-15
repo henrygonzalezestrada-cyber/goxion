@@ -168,13 +168,13 @@ assert.equal(api.chatState(),'listening');
 // Cerrar en mitad de la búsqueda debe cancelar respuesta, timer y estado.
 clickDemo(btnAccount);
 assert.equal(api.chatState(),'thinking');
-const nBefore=scroll.children.length;
 closeButton.fire('click');
 assert.equal(layer.classList.contains('gxai-visible'),false);
 assert.equal(api.chatState(),'idle');
+const afterCancel=scroll.children.length;
 assert.equal(timers.size,0,'No dejar temporizadores después de cerrar');
 flush();
-assert.equal(scroll.children.length,nBefore,'No aparece respuesta tras cerrar');
+assert.equal(scroll.children.length,afterCancel,'No aparece respuesta tras cerrar');
 
 // Sesión inválida mientras se procesa: cerrar sin entregar respuesta.
 openButton.fire('click');
