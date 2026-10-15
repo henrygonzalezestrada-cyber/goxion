@@ -348,7 +348,7 @@ assert.equal(aiStart.disabled,true,'Sin clave no permitir entrar a IA');
 closeButton.fire('click');
 
 // Con proveedor configurado, la ruta inteligente es deliberada y visible.
-win.GOXY_AI.status=()=>Promise.resolve({ok:true,configured:true});
+win.GOXY_AI.status=()=>Promise.resolve({ok:true,configured:true,providerReady:true});
 const sent=[];
 win.GOXY_AI.ask=async payload=>{
   sent.push(payload);
@@ -381,7 +381,7 @@ closeButton.fire('click');
 openButton.fire('click');
 flush();
 await Promise.resolve();
-assert.equal(api.aiStatus(),'ready','Estado AI confirmado');
+assert.equal(api.aiStatus(),'ready','Estado IA confirmado por proveedor');
 aiStart.fire('click');
 assert.equal(api.aiEntry(),true,'Entrada explícita IA pendiente de seleccionar plataforma');
 assert.ok(currentChoice('platform','Netflix'),'Primero plataformas contratadas');
@@ -394,9 +394,10 @@ input.value='Hola Goxy, mi Netflix se congela ¿qué hago?';
 composer.fire('submit');
 await Promise.resolve();
 assert.equal(sent.length,2,'Se envió nueva consulta directa al gateway');
+assert.ok(disclaimer.textContent.includes('7'), 'Mostrar al cliente su cupo IA restante');
 assert.equal(sent[1].platform,'Netflix','Contexto sólo plataforma');
 assert.equal(sent[1].issueIndex,undefined,'La conversación no exige un índice de guía');
 assert.ok(!('cliente_id' in sent[1]),'No enviar ID de cliente');
 flush();
 closeButton.fire('click');
-console.log('GOXION Goxy F8: chat IA directo por plataforma, guía manual F7.3, caricias y privacidad PASS.');
+console.log('GOXION Goxy F8.1: estado Groq verificado, cupo restante, chat directo y regresiones PASS.');
