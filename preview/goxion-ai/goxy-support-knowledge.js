@@ -34,6 +34,14 @@
     }
     return list.find(k => clean.includes(' '+normalize(k)+' ')) || null;
   }
+  // Detecta varios servicios dentro de un combo, sin mirar credenciales.
+  function resolveAllPlatforms(text) {
+    const normalized = ' ' + normalize(text) + ' ';
+    return platforms().filter(brand => {
+      const variants = [...(aliases[brand] || []),brand];
+      return variants.some(alias => normalized.includes(' ' + normalize(alias) + ' '));
+    });
+  }
   function issues(brand) {
     return platforms().includes(brand) ? data()[brand] : [];
   }
@@ -72,5 +80,5 @@
     if (scored.length!==1 && scored[0]?.score===scored[1]?.score) return null;
     return scored[0]?.index ?? null;
   }
-  window.GOXY_SUPPORT = Object.freeze({platforms,resolvePlatform,issues,guide,matchIssue,normalize});
+  window.GOXY_SUPPORT = Object.freeze({platforms,resolvePlatform,resolveAllPlatforms,issues,guide,matchIssue,normalize});
 })();
