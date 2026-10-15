@@ -489,6 +489,7 @@ assert.equal(sent.length,askCount,'Explicar capacidades no debe consumir IA');
 flush();
 closeButton.fire('click');
 // F13: consultar importe por perfil desde el estado FINANCIERO real sin gastar Groq.
+openButton.fire('click');flush();await Promise.resolve();
 const initialSent=sent.length;
 input.value='Cuánto tengo que pagar';composer.fire('submit');
 await Promise.resolve();flush();
@@ -506,8 +507,17 @@ assert.ok(scroll.children.some(x=>String(x.textContent).includes('Total de esa f
 clickChoice(currentChoice('pay-open'));
 assert.equal(payNavigation,1,'Redirigir a Index oficial existente, sin cobro paralelo');
 openButton.fire('click');flush();
+const beforeCatalog=accountCount;
+win.GOXY_AI.account=async(topic)=>{accountCount++;return {ok:true,
+  answer:topic==='missions'?'La misión "Navega por nuestro catálogo" figura pendiente en tu ronda actual. Sigue las instrucciones de esa misión en Mi Espacio; si requiere una validación, GOXION debe confirmarla allí.':'Consulta oficial.',topic};};
 input.value='Qué tengo que hacer en la misión ver catálogo';composer.fire('submit');
 await Promise.resolve();flush();
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('abre la pestaña Catálogo')),
+ 'Goxy explica acción de misión real, no muestra plataformas de soporte');
+assert.ok(currentChoice('catalog'),'Ofrecer apertura directa del Catálogo');
+input.value='Y qué hago en ver catálogo';composer.fire('submit');
+await Promise.resolve();flush();
+assert.equal(accountCount,beforeCatalog+2,'La referencia de seguimiento conserva el contexto de misión');
 assert.equal(sent.length,initialSent,'Misiones no gastan IA');
 closeButton.fire('click');
 // iPhone: campo >=16px, teclado encoge la capa y se recupera tras cerrar.
