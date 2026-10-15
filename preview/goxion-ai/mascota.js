@@ -490,6 +490,7 @@
       if (item.platform) button.dataset.platform = item.platform;
       if (Number.isInteger(item.issueIndex)) button.dataset.issueIndex = String(item.issueIndex);
       if (Number.isInteger(item.serviceIndex)) button.dataset.serviceIndex=String(item.serviceIndex);
+      if(item.device)button.dataset.device=item.device;
       if (item.view) button.dataset.view=item.view;
       choices.appendChild(button);
     });
@@ -722,7 +723,26 @@
     messageInput.placeholder='Cuéntame qué ocurre…';
     void askAI(query);
   }
+  function recordDevice(query,device){
+    const accepted=['Smart TV','Fire TV','Roku','Celular o tableta','Computadora','Otro dispositivo'];
+    if(!accepted.includes(device))return false;
+    accessStage=null;
+    caseContext=caseContext||{issue:'Problema de acceso',checks:[]};
+    caseContext.checks=[...caseContext.checks,'Dispositivo: '+device];
+    respondFree(query,'Gracias. Ya tengo la plataforma, el problema y el dispositivo. Puedo preparar ahora tu solicitud para que el asesor no vuelva a preguntarte lo mismo.',
+      [{kind:'human',label:'Preparar ficha para WhatsApp'},
+       {kind:'account',label:'Revisar Mi Espacio'}]);
+    return true;
+  }
   function helpWithAccess(query) {
+    if(accessStage?.type==='device'){
+      const n=knowledge.normalize(query);
+      const device=/roku/.test(n)?'Roku':/fire tv/.test(n)?'Fire TV':
+        /smart tv|televisor|android tv|pantalla/.test(n)?'Smart TV':
+        /celular|movil|telefono|tablet/.test(n)?'Celular o tableta':
+        /computadora|laptop|pc/.test(n)?'Computadora':null;
+      if(device)return recordDevice(query,device);
+    }
     const result=accessRouter?.inspect(query,chosenPlatform,accessStage);
     if(!result?.reply)return false;
     if(result.platform)chosenPlatform=result.platform;
@@ -737,7 +757,12 @@
         checks:['Servicio comprobado en Mi Espacio','Solo código QR disponible']
       };
     }
-    respondFree(query,result.reply,result.options||(result.handoff?[{kind:'human',label:'Preparar solicitud a soporte'}]:[]));
+    if(result.handoff){
+      accessStage={type:'device'};
+      respondFree(query,result.reply+' Para preparar el caso, ¿en qué dispositivo intentas entrar?',
+        ['Smart TV','Fire TV','Roku','Celular o tableta','Computadora','Otro dispositivo']
+          .map(device=>({kind:'device',device,label:device})));
+    }else respondFree(query,result.reply,result.options||[]);
     return true;
   }
   function handleText(query) {
@@ -893,6 +918,10 @@
       const platform=button.dataset.platform||chosenPlatform;
       if(platform && knowledge.platforms().includes(platform))
         void escalateAutomatically('Ya seguí los pasos disponibles de '+platform+' pero el problema continúa. ¿Qué puedo revisar después?',platform,lastGuide?.issueIndex);
+      return;
+    }
+    if(type==='device'){
+      recordDevice('Estoy en '+button.dataset.device,button.dataset.device);
       return;
     }
     if(type==='send-handoff'){openHandoff();return;}
