@@ -231,8 +231,9 @@
     if (pet.id !== event.pointerId) return;
     const step = Math.hypot(event.clientX - pet.lastX, event.clientY - pet.lastY);
     pet.lastX = event.clientX; pet.lastY = event.clientY;
-    if (step > 65) return; // Saltos ajenos a una caricia no activan corazones.
-    pet.distance += step;
+    // Un gesto rápido puede llegar como un solo evento de movimiento en iOS.
+    // Contamos su recorrido para no confundir una caricia veloz con un toque.
+    pet.distance += Math.min(step, 180);
     if (pet.distance >= 24) pet.stroking = true;
     if (!pet.stroking) return;
     const now = performance.now();
@@ -245,6 +246,9 @@
   });
   heroTrigger.addEventListener('pointerup', (event) => {
     if (pet.id !== event.pointerId) return;
+    // También detecta el último desplazamiento si Safari no envió pointermove.
+    pet.distance += Math.min(Math.hypot(event.clientX - pet.lastX, event.clientY - pet.lastY), 180);
+    if (pet.distance >= 24) pet.stroking = true;
     if (pet.stroking) {
       mood('love', 2400);
       makeHeart();
