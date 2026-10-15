@@ -437,6 +437,8 @@ assert.ok(scroll.children.some(x=>x.textContent.includes('Misiones verificadas')
 flush();
 input.value='Hola';composer.fire('submit');
 assert.equal(sent.length,askCount,'Saludar no consume cuota IA');
+input.value='¿Qué puedo hacer?';composer.fire('submit');
+assert.equal(sent.length,askCount,'Explicar capacidades no debe consumir IA');
 flush();
 closeButton.fire('click');
 // iPhone: campo >=16px, teclado encoge la capa y se recupera tras cerrar.
