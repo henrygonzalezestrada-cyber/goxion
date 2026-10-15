@@ -668,54 +668,75 @@
   }
   // Datos personales SOLO con el backend autenticado de GOXION.
   // El resultado se presenta al usuario sin enviarse al modelo de Groq.
-  async function accountRead(topic,query) {
-    if(!active || busy || !authenticated())return;
+  // La lectura B2 proviene del mismo cotizador oficial que Index/Mi Espacio.
+  // Goxy no reproduce descuentos, mora ni precios; sólo presenta el resultado.
+  async function accountRead(topic,query,paymentMode='all',chargeId=null){
+    if(!active||busy||!authenticated())return;
     const text=String(query||'').trim();
-    clearChoices();
-    bubble(text.slice(0,240),true);
-    setBusy(true);
-    chatTransition('searching');
-    showTyping();
+    lastAccountTopic=topic;
+    clearChoices();bubble(text.slice(0,240),true);
+    setBusy(true);chatTransition('searching');showTyping();
     const flow=++activeFlow;
     aiController=new AbortController();
-    const response=await ai.account(topic,{signal:aiController.signal,message:text});
-    if(!active || flow!==activeFlow || !authenticated())return;
+    const response=topic==='payment'
+      ? await payment.read({signal:aiController.signal})
+      : await ai.account(topic,{signal:aiController.signal,message:text});
+    if(!active||flow!==activeFlow||!authenticated())return;
     aiController=null;
-    hideTyping();
-    if(response.ok===true && typeof response.answer==='string'){
+    const financial=topic==='payment'?payment.describe(response,paymentMode,chargeId):null;
+    const success=topic==='payment'?Boolean(financial):
+      response.ok===true&&typeof response.answer==='string';
+    if(success){
       chatTransition('speaking');
-      bubble(response.answer,false);
+      let answer=financial?.answer||response.answer;
+      const catalogQuestion=topic==='missions'&&/\bcatalogo\b/.test(knowledge.normalize(text));
+      const catalogMission=catalogQuestion&&/\bcatalogo\b/.test(knowledge.normalize(answer))&&
+        /figura (?:pendiente|completada)/.test(answer);
+      if(catalogMission){
+        answer=answer.replace('Sigue las instrucciones de esa misión en Mi Espacio; si requiere una validación, GOXION debe confirmarla allí.',
+          'Para realizarla, abre la pestaña Catálogo de Mi Espacio y visita el catálogo. GOXION comprueba el avance de esa misión.');
+      }
+      const reply=bubble(answer,false);
+      reply.classList.add('gxai-delayed-bubble');
+      showChoices(topic==='payment'?financial.choices:[
+        {kind:'account',label:'Abrir Mi Espacio'},
+        ...(catalogMission?[{kind:'catalog',label:'Abrir catálogo'}]:[]),
+        ...(topic==='missions'?[{kind:'promotions',label:'Ver promociones'}]:
+          [{kind:'missions',label:'Mis misiones'}]),
+        {kind:'platforms',label:'Ayuda con mis servicios'}
+      ]);
+      choices?.classList.add('gxai-delayed-choices');
     }else if(response.code!=='ABORTED'){
       chatTransition('error');
       bubble(response.message||'No pude comprobar ese dato ahora. Consulta Mi Espacio para información oficial.',false);
+      showChoices([{kind:'account',label:'Abrir Mi Espacio'}]);
     }
-    later(flow,350,()=>{
-      setBusy(false);
-      chatTransition('listening');
-      showChoices([
-        {kind:'account',label:'Abrir Mi Espacio'},
-        ...(topic==='missions'
-          ? [{kind:'promotions',label:'Ver promociones'}]
-          : topic==='promotions' ? [{kind:'missions',label:'Mis misiones'}] : [
-            {kind:'missions',label:'Mis misiones'},
-            {kind:'promotions',label:'Promociones'}]),
-        {kind:'platforms',label:'Ayuda con mis servicios'}
-      ]);
+    later(flow,560,()=>{
+      hideTyping();setBusy(false);chatTransition('listening');
     });
   }
-  function respondFree(text,reply,options=[]) {
-    if(!active || busy || !authenticated())return;
-    clearChoices();bubble(text.slice(0,240),true);bubble(reply,false);
-    chatTransition('speaking');
-    if(options.length)showChoices(options);
+  function respondFree(text,reply,options=[]){
+    if(!active||busy||!authenticated())return;
+    clearChoices();bubble(text.slice(0,240),true);
+    chatTransition('thinking');showTyping();
+    const message=bubble(reply,false);
+    message.classList.add('gxai-delayed-bubble');
+    if(options.length){
+      showChoices(options);
+      choices?.classList.add('gxai-delayed-choices');
+    }
     const id=++activeFlow;
-    later(id,250,()=>chatTransition('listening'));
+    later(id,520,()=>{hideTyping();chatTransition('speaking');});
+    later(id,850,()=>chatTransition('listening'));
   }
   function accountTopic(text){
     const normal=knowledge.normalize(text);
     if(/\b(mision(?:es)?|tareas?|retos?|cupon(?:es)?)\b/.test(normal))return 'missions';
+    if(lastAccountTopic==='missions'&&/\b(catalogo|referid|encuesta|opinion|comentario)\b/.test(normal))
+      return 'missions';
     if(/\b(promocion(?:es)?|ofertas?|descuentos? especiales?)\b/.test(normal))return 'promotions';
-    if(/\b(pago|pagar|saldo|corte|vencimient[oa]|fecha de pago|estado de cuenta|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))return 'payment';
+    if(/\b(pago|pagar|pague|pagare|debo|deuda|mensualidad(?:es)?|proximo cobro|proxima fecha|cuando vence|vencimient[oa]|fecha de pago|estado de cuenta|saldo|corte|mora|prorroga|cuanto debo|cuanto voy a pagar|lealtad)\b/.test(normal))
+      return 'payment';
     return null;
   }
   // F11: clasificador LOCAL. Decidir no requiere otra llamada a Groq.
