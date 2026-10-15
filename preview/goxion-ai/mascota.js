@@ -608,12 +608,22 @@
     const words = knowledge.normalize(query);
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
-    if(/^(hola|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|en que me ayudas)[!?.s]*$/.test(words)) {
+    if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|en que me ayudas|como me ayudas)$/.test(words)) {
       respondFree(query,chosenPlatform
         ? 'Puedo guiarte sobre '+chosenPlatform+', consultar tus misiones y promociones, o enviarte a tu estado de cuenta. Si la guía no basta, te ayudo a aclararla con IA.'
         : '¡Hola! Puedo consultar tus misiones y promociones, orientarte sobre próximos pagos desde Mi Espacio y resolver dudas de plataformas con guías oficiales. La IA se usa solo cuando necesitamos una explicación adicional.',
         [{kind:'platforms',label:'Ayuda con plataformas'},
          {kind:'missions',label:'Mis misiones'},{kind:'payment',label:'Próximo pago'}]);
+      return;
+    }
+    // Una autorización que ya intentó el cliente no se arregla gastando más IA.
+    if(/\b(ya|antes|recien)\b/.test(words) &&
+       /\b(codigo|verificacion|vinculacion|autorizar|enlazar)\b/.test(words) &&
+       /\b(coloque|ingrese|puse|escribi|mande|envie|no funciona|no responde)\b/.test(words)) {
+      respondFree(query,
+        'Entiendo que ya intentaste vincular tu dispositivo. No puedo validar ni autorizar ese código desde aquí: eso requiere un asesor de GOXION. Puedes solicitar ayuda sin compartir el código por el chat.',
+        [{kind:'human',label:'Hablar con asesor humano'},
+         {kind:'platforms',label:'Ver otras guías'}]);
       return;
     }
     // La IA mantiene un hilo breve solamente si el usuario realmente la eligió.
