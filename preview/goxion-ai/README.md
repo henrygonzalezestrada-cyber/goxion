@@ -1,7 +1,7 @@
-# GOXION · Goxy F7.1 · IA con estado visible + guías reales + scroll natural
+# GOXION · Goxy F7.2 · Plataformas contratadas primero + IA con estado visible
 
 ## Vista beta
-https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7-1
+https://henrygonzalezestrada-cyber.github.io/goxion/preview/goxion-ai/?v=f7-2
 
 ## Correción táctil solicitada
 - **Deslizar hacia arriba/abajo sobre Goxy desplaza la página normalmente**. CSS `touch-action:pan-y` también cubre el Canvas generado por robot-heads.
@@ -56,3 +56,13 @@ Documento de arquitectura y pasos de activación: [GOXY F7 Gateway IA Beta](../.
 - Tras elegir la guía, el botón **Preguntar con IA** activa el modo de pregunta para esa guía. Se puede mencionar la plataforma en la pregunta sin rebotar al listado de guías.
 - Si falta `GROQ_API_KEY`, se informa claramente que iniciar sesión no es suficiente y que las guías siguen funcionando. No se simula conversación IA.
 - No se toca `ayuda.html`, Admin, Supabase ni el motor financiero. Se invalidó la caché del CSS/JS en Safari mediante `?v=goxy-f7-1`.
+
+## F7.2 · Contexto mínimo de servicios para orientar primero al cliente
+- Al abrir el chat, **Tus plataformas** se rellena automáticamente con los nombres de plataformas que el cliente tiene activas en Mi Espacio, usando `globalClientesData[getCurrentClientKey()].servicios` en el mismo documento y solo si hay sesión válida.
+- Si el estado de la vista todavía no está disponible, se reusa la función autenticada existente `goxionReloadPrivateClientView()` como respaldo. El objeto privado se proyecta inmediatamente a una **lista de marcas públicas**, sin conservar ni enviar correo, PIN, perfil, nombre, folio, saldos ni accesos.
+- Se detectan todas las marcas de un combo (`HBO Max + Prime Video` → Max y Prime Video), se deduplican y se ordenan de acuerdo con las plataformas registradas en el catálogo de soporte.
+- **Atajos visibles desde que abre el chat**, además de la lista prioritaria al pulsar «Tengo un problema de acceso» o «Usar IA». La opción **«Explorar otras plataformas»** da acceso a las que el cliente no tiene contratadas.
+- Cliente sin servicios o temporalmente sin datos: mensaje claro y navegación por todas las plataformas. No se muestra información de una sesión anterior.
+- La IA permanece pendiente sin `GROQ_API_KEY` en Supabase; estas mejoras **no dependen de esa clave**.
+- Todo queda aislado en `preview/goxion-ai/`: ni `ayuda.html`, ni `mi-espacio`, ni tablas financieras, ni la Edge Function cambian.
+- Validación: `node preview/goxion-ai/check.mjs` prueba combos, deduplicación, cambio de sesión, privacidad, listados propios/otros, gestos Safari, guías y modos de IA.
