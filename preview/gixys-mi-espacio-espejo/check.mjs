@@ -103,7 +103,7 @@ async function exercise(engine,name){
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('gx-mirror-notif-active')),true);
   await page.locator('#gx-client-notif-launch').click();
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'false');
-  assert.equal(await page.locator('.gx-gixy-message').count(),0);
+  await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
   await page.locator('#gx-mirror-heart .pulse-heart').click();
   assert.equal(await page.locator('#loyalty-count').innerText(),'4/4 Pagos');
   await assertMessage('loyalty',/lealtad/i);
@@ -118,14 +118,14 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#gx-mirror-complete-btn .gx-mirror-action-icon').evaluate(el=>getComputedStyle(el).animationName),'gx-mirror-check-pop');
   await page.locator('#gx-mirror-retry').click();
   assert.equal(await page.locator('#gx-mirror-complete-btn').isEnabled(),true);
-  assert.equal(await page.locator('.gx-gixy-message').count(),0);
+  await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
   // Second completion is allowed after the deduplication window; placement rotates.
   await page.waitForTimeout(2600);
   await page.locator('#gx-mirror-complete-btn').click();
   const secondMission=await assertMessage('mission',/recompensa/i);
   assert.notEqual(secondMission.variant,firstMission.variant,'Gixys must vary placement between events');
   await page.locator('.gx-gixy-message__bubble').click();
-  assert.equal(await page.locator('.gx-gixy-message').count(),0);
+  await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
   await page.locator('#gx-mirror-retry').click();
   await page.locator('#gx-mirror-close-missions').click();
   await page.waitForTimeout(900);
