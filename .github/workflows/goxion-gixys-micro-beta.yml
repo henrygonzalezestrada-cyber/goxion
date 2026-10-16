@@ -1,0 +1,27 @@
+name: GOXION · Gixys y Micro · Beta
+on:
+  push:
+    branches:
+      - beta/gixys-microinteracciones-v1-20261016
+    paths:
+      - 'preview/gixys-micro-v1/**'
+      - '.github/workflows/goxion-gixys-micro-beta.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'preview/gixys-micro-v1/**'
+      - '.github/workflows/goxion-gixys-micro-beta.yml'
+  workflow_dispatch:
+jobs:
+  gixys-micro-beta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Beta Gixys y Micro · Chromium / WebKit / 7 tamaños
+        run: node preview/gixys-micro-v1/check.mjs
