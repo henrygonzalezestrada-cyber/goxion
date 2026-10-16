@@ -286,3 +286,103 @@
   .gx-dialog-legacy-head{padding-inline:14px}
   .gx-dialog-legacy-scroll{padding-inline:14px}
 }
+
+/* Componentes secundarios: unificar X respetando sus animaciones y scroll propios.
+ * No duplicar la geometría de los controles en sus CSS locales. */
+#gx-welcome-modal .gx-welcome-close,
+#gx-prorroga-dialog .gx-prorroga-close,
+.gx-rb-modal .gx-rb-close{
+  width:var(--gx-modal-close-size)!important;
+  min-width:var(--gx-modal-close-size)!important;
+  max-width:var(--gx-modal-close-size)!important;
+  height:var(--gx-modal-close-size)!important;
+  min-height:var(--gx-modal-close-size)!important;
+  max-height:var(--gx-modal-close-size)!important;
+  border:0!important;
+  border-radius:50%!important;
+  display:grid!important;
+  place-items:center!important;
+  padding:0!important;
+  background:var(--gx-modal-close-color)!important;
+  color:transparent!important;
+  font-size:0!important;
+  line-height:0!important;
+  box-shadow:0 0 12px rgba(0,242,254,.13)!important;
+  isolation:isolate;
+  z-index:var(--gx-modal-header-z)!important;
+}
+#gx-welcome-modal .gx-welcome-close svg,
+#gx-prorroga-dialog .gx-prorroga-close svg,
+.gx-rb-modal .gx-rb-close svg{display:none!important}
+#gx-welcome-modal .gx-welcome-close::before,
+#gx-welcome-modal .gx-welcome-close::after,
+#gx-prorroga-dialog .gx-prorroga-close::before,
+#gx-prorroga-dialog .gx-prorroga-close::after,
+.gx-rb-modal .gx-rb-close::before,
+.gx-rb-modal .gx-rb-close::after{
+  content:"";
+  display:block;
+  position:absolute;
+  inset:auto;
+  left:50%;
+  top:50%;
+  width:var(--gx-modal-close-icon);
+  height:var(--gx-modal-close-stroke);
+  background:#030305;
+  border:0;
+  border-radius:5px;
+  padding:0;
+  margin:0;
+  pointer-events:none;
+}
+#gx-welcome-modal .gx-welcome-close::before,
+#gx-prorroga-dialog .gx-prorroga-close::before,
+.gx-rb-modal .gx-rb-close::before{
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+#gx-welcome-modal .gx-welcome-close::after,
+#gx-prorroga-dialog .gx-prorroga-close::after,
+.gx-rb-modal .gx-rb-close::after{
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
+#gx-welcome-modal .gx-welcome-close:focus-visible,
+#gx-prorroga-dialog .gx-prorroga-close:focus-visible,
+.gx-rb-modal .gx-rb-close:focus-visible{
+  outline:2px solid #d0ffff!important;outline-offset:3px;
+}
+#gx-welcome-modal .gx-welcome-close:hover,
+#gx-prorroga-dialog .gx-prorroga-close:hover,
+.gx-rb-modal .gx-rb-close:hover{
+  background:var(--gx-modal-close-color)!important;
+  color:transparent!important;
+}
+#gx-welcome-modal .gx-welcome-close:active,
+#gx-prorroga-dialog .gx-prorroga-close:active,
+.gx-rb-modal .gx-rb-close:active{
+  transform:scale(.93)!important;
+}
+/* Prórroga: el título y la X se conservan en el área superior; scroll
+   limitado al propio diálogo, nunca al documento que queda detrás. */
+#gx-prorroga-dialog{
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+/* Opiniones: el área de contenido desplaza debajo del control anclado. */
+.gx-rb-modal .modal-content.gx-rb-shell{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden!important;
+}
+.gx-rb-modal .gx-rb-form{
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.gx-rb-modal .gx-rb-form-head{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:linear-gradient(180deg,rgba(13,14,27,.98),rgba(13,14,27,.96));
+}
