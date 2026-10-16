@@ -98,6 +98,13 @@ async function exercise(engine,name){
   await page.waitForTimeout(450); // la cápsula real hace morph antes de revelar su contador en Safari
   assert.equal(await page.locator('#gx-client-notif-badge').textContent(),'1');
   const badgeSize=await page.locator('#gx-client-notif-badge').evaluate(el=>el.getBoundingClientRect().width);
+  console.log(name+' badge diagnostics',JSON.stringify(await page.locator('#gx-client-notif-badge').evaluate(el=>{
+    const b=el.getBoundingClientRect(),c=getComputedStyle(el),p=el.parentElement?.getBoundingClientRect();
+    return {className:el.parentElement?.className,rect:b.toJSON(),parent:p?.toJSON(),
+      display:c.display,visibility:c.visibility,opacity:c.opacity,width:c.width,
+      minWidth:c.minWidth,maxWidth:c.maxWidth,flex:c.flex,position:c.position,
+      text:el.textContent};
+  })));
   assert(badgeSize>=18,name+': contador no visible tras el morph de la campana');
   await page.waitForTimeout(100);
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('gx-mirror-notif-active')),true);
