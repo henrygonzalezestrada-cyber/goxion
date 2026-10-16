@@ -242,7 +242,8 @@
  }
  function forecastDescribe(value){
    const choices=[{kind:'forecast-date',label:'Elegir otra fecha'},
-     {kind:'pay-open',label:'Ver estado de cuenta'}];
+     {kind:'pay-open',label:'Ver estado de cuenta'},
+     {kind:'terms-open',label:'Consultar reglas de mora y reactivación'}];
    if(!value?.ok)return {answer:value?.message||
       'No pude verificar una proyección oficial para esa fecha. Tu estado de cuenta muestra el saldo vigente.',choices};
    if(!valid(value.amountCents)||!valid(value.moraCents))
@@ -254,7 +255,7 @@
      answer+=value.reactivationCents>0
        ? ' Además, el motor aplicaría '+money(value.reactivationCents)+' de reactivación (cargo del 20% según la política para atrasos de más de 15 días).'
        : ' Para esa fecha, el motor no proyecta cargo de reactivación.';
-   else answer+=' El cargo por reactivación no está confirmado en esta simulación B2; no puedo asegurarte que sea cero.';
+   else answer+=' En GOXION, los términos contemplan un cargo administrativo del 20% sobre el saldo adeudado cuando un servicio supera los 15 días de atraso sin reporte o requiere reactivación. Esta cotización B2 todavía NO calcula ese cargo por separado. Por seguridad, no lo sumaré como deuda confirmada: si se cumplen esas condiciones, el total podría aumentar. Puedes revisar las reglas antes de pagar.';
    if(value.loyaltyAtRisk)answer+=' La lealtad también podría perderse por incumplimiento.';
    answer+=' Es una simulación, no un importe definitivo: puede cambiar si hay abonos, prórrogas o ajustes.';
    return {answer,choices};
