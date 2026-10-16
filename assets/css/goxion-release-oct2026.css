@@ -1,0 +1,51 @@
+/* GOXION · Actualización de Mi Espacio octubre 2026 · Solo sesión cliente */
+.gx-release-overlay[hidden]{display:none!important}
+.gx-release-overlay{
+ position:fixed;inset:0;z-index:7200;
+ display:flex;align-items:center;justify-content:center;
+ padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));
+ box-sizing:border-box;background:rgba(2,3,10,.88);
+ -webkit-backdrop-filter:blur(17px);backdrop-filter:blur(17px);
+}
+.gx-release-sheet{
+ position:relative;width:min(100%,480px);max-height:min(84dvh,730px);
+ display:flex;flex-direction:column;overflow:hidden;
+ border-radius:25px;
+ border:1px solid rgba(139,111,249,.31);
+ background:linear-gradient(160deg,rgba(27,19,47,.99),rgba(9,12,25,.99) 63%,rgba(5,17,29,.99));
+ box-shadow:0 24px 76px rgba(0,0,0,.55),0 0 39px rgba(124,77,255,.06);
+ color:#f3f4ff;font-family:Poppins,system-ui,sans-serif;
+}
+.gx-release-head{position:relative;padding:26px 24px 16px;flex:none}
+.gx-release-head::before{content:"";position:absolute;top:-75px;right:-75px;width:200px;height:200px;
+ border-radius:100%;background:radial-gradient(circle,rgba(115,76,240,.28),transparent 68%);pointer-events:none}
+.gx-release-kicker{display:flex;align-items:center;gap:8px;color:#62e7fa;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.gx-release-signal{width:7px;height:7px;flex:none;border-radius:50%;background:#00e7f5;box-shadow:0 0 11px rgba(0,231,245,.54)}
+.gx-release-title{margin:11px 38px 7px 0;color:#fff;font-size:clamp(23px,6vw,30px);font-weight:750;line-height:1.15;letter-spacing:-.045em}
+.gx-release-title em{font-style:normal;background:linear-gradient(105deg,#b39dff,#6bedf5);color:transparent;-webkit-background-clip:text;background-clip:text}
+.gx-release-intro{margin:0;color:#c4c4d5;font-size:12px;line-height:1.7;max-width:370px}
+.gx-release-close{position:absolute;z-index:1;right:19px;top:20px;display:grid;place-items:center;
+ width:34px;height:34px;padding:0;border:0;border-radius:50%;background:#00dce9;color:#051017;
+ font:600 23px/1 system-ui,sans-serif;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.gx-release-close:focus-visible,.gx-release-primary:focus-visible{outline:2px solid #60f1ff;outline-offset:3px}
+.gx-release-content{padding:0 23px 7px;overflow-y:auto;min-height:0;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.gx-release-item{display:grid;grid-template-columns:22px minmax(0,1fr);gap:12px;padding:15px 0;
+ border-top:1px solid rgba(180,169,255,.12)}
+.gx-release-item-mark{display:flex;align-items:flex-start;justify-content:center;padding-top:2px;
+ font:700 16px/1.3 Poppins,system-ui,sans-serif;color:#79eaf5}
+.gx-release-item:nth-child(even) .gx-release-item-mark{color:#b89aff}
+.gx-release-item strong{display:block;margin-bottom:4px;font-size:12.5px;line-height:1.4;font-weight:650;color:#f4f3ff}
+.gx-release-item p{margin:0;color:#b7b8ca;font-size:11.5px;line-height:1.65}
+.gx-release-foot{display:flex;flex-direction:column;gap:8px;padding:14px 23px calc(17px + env(safe-area-inset-bottom));
+ flex:none;border-top:1px solid rgba(180,169,255,.14);background:rgba(7,9,20,.76)}
+.gx-release-primary{display:flex;align-items:center;justify-content:center;width:100%;min-height:44px;
+ border:1px solid rgba(0,234,250,.27);border-radius:23px;
+ background:linear-gradient(110deg,#532b9a,#103d56);color:#fff;
+ font:650 12px/1.3 Poppins,system-ui,sans-serif;cursor:pointer}
+.gx-release-foot small{color:#939bb1;text-align:center;font:400 10px/1.45 Poppins,system-ui,sans-serif}
+body.gx-release-body-lock{overflow:hidden!important}
+@media(max-height:630px){.gx-release-head{padding:16px 20px 12px}.gx-release-title{font-size:22px}
+ .gx-release-content{padding-inline:19px}.gx-release-item{padding:10px 0}
+ .gx-release-foot{padding:11px 19px calc(10px + env(safe-area-inset-bottom))}}
+@media(prefers-reduced-motion:no-preference){.gx-release-sheet{animation:gx-release-enter .28s cubic-bezier(.2,.8,.2,1) both}
+ @keyframes gx-release-enter{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}}

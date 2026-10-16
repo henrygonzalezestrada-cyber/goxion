@@ -6,6 +6,7 @@
   "scripts": {
     "verify": "node scripts/verify-integrity.mjs && npm run test:visual-contract && npm run test:comunicaciones && npm run test:calendario && npm run test:calendario:cliente && npm run test:index-calendario:visual && npm run test:calendario:conciliacion && npm run test:calendario:abonos && npm run test:finanzas:parcial-atomico && npm run test:finanzas:imputacion-sombra && npm run test:finanzas:obligaciones-b2",
     "test:smoke": "node scripts/browser-smoke.mjs",
+    "test:goxy:oficial": "node preview/goxion-ai/check.mjs && node scripts/goxy-official-launch-smoke.mjs",
     "test:cart": "node scripts/cart-v2-smoke.mjs",
     "test:realtime": "node scripts/realtime-notifications-smoke.mjs",
     "test:opiniones": "node scripts/opiniones-beta-smoke.mjs",
