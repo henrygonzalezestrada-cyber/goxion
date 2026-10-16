@@ -3,7 +3,6 @@
  * This is a VISUAL snapshot; tests enforce the absence of client traffic.
  */
 import fs from 'node:fs';
-import path from 'node:path';
 const official=fs.readFileSync('ayuda.html','utf8');
 const start='<div class="view-section" id="view-dashboard">';
 const finish='<div class="view-section" id="view-catalogo">';
@@ -52,7 +51,7 @@ ${nav}
 ${dashboard}
 </div>
 <div class="gx-mirror-toast" id="gx-mirror-toast" role="status" aria-live="polite" hidden></div>
-<script>window.animarMisionesCompletadasEnSecuencia=()=>{};<\/script>
+<script>window.animarMisionesCompletadasEnSecuencia=()=>{};</script>
 <script src="../../assets/js/ayuda/05-gamification-shared-morph-js.js"></script>
 <script src="./companions.js?v=1"></script>
 <script src="./mirror.js?v=1" defer></script>
