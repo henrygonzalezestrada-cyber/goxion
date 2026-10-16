@@ -1,7 +1,6 @@
-/* GOXION · Goxy F12 · recuperación de acceso y ficha WhatsApp consentida.
-   Vive únicamente en preview/goxion-ai/. No usa API, no escribe datos ni envía mensajes.
-   Render original MIT © Fayaz Ahmed empaquetado en goxy-heads.bundle.js.
-   Mantiene controles y lógica F2 sin tocar la IA ni datos del cliente. */
+/* GOXION · Goxy F17 · asistente oficial compartido con preview/goxion-ai.
+   Archivo único para beta y producción; nunca duplicar motores o listeners.
+   Render MIT robot-heads empaquetado localmente; finanzas y acceso bajo backend. */
 (() => {
   'use strict';
   const doc = document;
@@ -87,13 +86,13 @@
     '</div>',
     '</div>',
     '<footer class="gxai-chat-foot">',
-    '<form class="gxai-composer" aria-label="Conversación de demostración">',
-    '<input class="gxai-message-input" type="text" placeholder="Cuéntame qué problema tienes…" aria-label="Mensaje de prueba" autocomplete="off" maxlength="240">',
-    '<button class="gxai-send" type="submit" aria-label="Enviar mensaje de prueba">',
+    '<form class="gxai-composer" aria-label="Conversación con Goxy">',
+    '<input class="gxai-message-input" type="text" placeholder="Cuéntame qué problema tienes…" aria-label="Tu mensaje a Goxy" autocomplete="off" maxlength="240">',
+    '<button class="gxai-send" type="submit" aria-label="Enviar mensaje">',
     '<svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 14-8-4 16-3-6-7-2Zm7 2 7-10"/></svg>',
     '</button>',
     '</form>',
-    '<div class="gxai-chat-disclaimer">Guías oficiales GOXION · IA beta pendiente de configuración. Sin datos privados.</div>',
+    '<div class="gxai-chat-disclaimer">Asistencia GOXION · Nunca compartas contraseñas, códigos ni PIN.</div>',
     '</footer>',
     '</section>'
   ].join('');
@@ -1370,7 +1369,7 @@
     if (btn.dataset.goxionTab !== 'soporte') btn.addEventListener('click', closeChat);
   });
   window.addEventListener('pagehide', closeChat);
-  // API local de prueba: cambiar expresión desde consola sin exponer una API financiera.
+  // Interfaz local para navegación y pruebas sin exponer APIs financieras.
   window.GOXION_AI_BETA = Object.freeze({
     chatState: () => chatState,
     // Mismo contrato de eventos que utilizará el futuro orquestador, sin API.
