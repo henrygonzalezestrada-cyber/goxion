@@ -92,6 +92,7 @@ async function exercise(engine,name){
     return m;
   }
   await page.locator('#gx-client-notif-launch').click();
+  console.log(name+' placement diagnostics',JSON.stringify(await page.evaluate(()=>window.GX_MIRROR_PLACEMENT_DEBUG)));
   await assertMessage('notification',/novedad/i);
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'true');
   await page.waitForTimeout(450); // la cápsula real hace morph antes de revelar su contador en Safari
