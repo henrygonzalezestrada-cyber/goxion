@@ -1,18 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import {createRoot} from 'react-dom/client';
 import {BotAvatar} from 'bot-avatars';
-import SpringCheck from './vendor/SpringCheck.jsx';
 import PulseHeart from './vendor/PulseHeart.jsx';
-import BellToggle from './vendor/BellToggle.jsx';
 
-const h=React.createElement;
 const settings={
   hexagon:{name:'Hex',role:'Misiones',color:'#8663ff'},
   square:{name:'Square',role:'Notificaciones',color:'#04c8ee'},
   circle:{name:'Circle',role:'Lealtad',color:'#9c6aff'}
 };
 
-function Gixy({kind,material,state='default',size=92,seed}){
+function Gixy({kind,material,state='default',size=104,seed}){
   const conf=settings[kind];
   return <div className="gixy-float" data-avatar={kind}>
     <BotAvatar type={kind} face="eyes" state={state} size={size} color={conf.color}
@@ -39,17 +36,21 @@ function Mission({material}){
   return <article className="glass stage" data-scene="mission">
     <div className="kicker-row"><span>MISIONES</span><small>01 / PROGRESO</small></div>
     <Gixy kind="hexagon" seed={0.19} state={active?'working':'default'} material={material}/>
-    <div className="scene-copy"><h2>Un paso más cerca</h2><p>Una pequeña acción puede sentirse especial.</p></div>
-    <div className="metric"><span>Progreso de ejemplo</span><strong>{done?'3/3':'2/3'}</strong></div>
+    <div className="scene-copy"><h2>Un paso más cerca</h2><p>Tu recompensa está casi lista.</p></div>
+    <div className="metric"><span>Tu progreso de prueba</span><strong>{done?'3/3':'2/3'}</strong></div>
     <div className="progress" role="progressbar" aria-label="Progreso ficticio de misiones"
       aria-valuemin="0" aria-valuemax="3" aria-valuenow={done?3:2}><span style={{width:done?'100%':'66.667%'}}/></div>
     <div className="component-slot mission-component">
-      <SpringCheck label={done?'Misión completada':'Completar misión'} checked={done}
-        onChange={setDone} fontSize={14} boxSize={30} boxRadius={10} bounce={.27}
-        color="#f0f3ff" fillColor="#00f2fe" checkColor="#030305" strike="none"
-        ariaLabel="Cambiar estado ficticio de una misión"/>
+      <button type="button" id="mission-btn" className={'action-btn'+(done?' is-complete':'')}
+        disabled={done} onClick={()=>setDone(true)} aria-label="Completar misión ficticia">
+        <span className="action-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M5 12.5 10 17l9-10"/></svg>
+        </span>
+        <span>{done?'Misión de prueba completada':'Completar misión de prueba'}</span>
+      </button>
     </div>
-    <p className="under-action">{done?'¡Listo! Gixy Hex también lo celebra.':'Toca la casilla para probar la animación original.'}</p>
+    {done&&<button className="quiet-btn" type="button" onClick={()=>setDone(false)}>Repetir animación</button>}
+    <p className="under-action">{done?'¡Listo! Gixy Hex también celebra.':'El mismo check elástico de la primera beta.'}</p>
   </article>;
 }
 
@@ -72,21 +73,44 @@ function Loyalty({material}){
 }
 
 function Notification({material}){
-  const [notified,setNotified]=useState(false);
-  const active=useReaction(notified);
+  const [step,setStep]=useState(0); // 0: sin aviso, 1: nuevo, 2: leído.
+  const [dismissed,setDismissed]=useState(false);
+  const [ringing,setRinging]=useState(false);
+  const active=useReaction(step===1);
+  const next=()=>{
+    if(step===0){setStep(1);setDismissed(false);setRinging(true);}
+    else if(step===1){setStep(2);setRinging(false);setDismissed(true);}
+  };
+  const reset=()=>{setStep(0);setDismissed(false);setRinging(false);};
   return <article className="glass stage" data-scene="notification">
     <div className="kicker-row"><span>NOTIFICACIONES</span><small>03 / AVISOS</small></div>
     <Gixy kind="square" seed={0.79} state={active?'working':'default'} material={material}/>
-    <div className="scene-copy"><h2>Avisos con intención</h2><p>La campana responde con su propia física.</p></div>
-    <div className="notification-state" role="status">{notified?'1 aviso de prueba recibido':'Todo al día'}</div>
-    <div className="component-slot">
-      <BellToggle pressed={notified} onChange={setNotified} offLabel="Probar aviso"
-        onLabel="Aviso recibido" count={notified?1:0} badge clapper waves
-        color="#edf2ff" background="#252532" onColor="#04181c" onBackground="#87f5fb"
-        badgeColor="#7c4dff" size="md" ringAmplitude={17} ringPasses={5}
-        ringDuration={820} revealBounce={0.12} label="Simular llegada de notificación"/>
+    <div className="scene-copy"><h2>Avisos con intención</h2><p>Regresa la campana que te gustó de la primera beta.</p></div>
+    <div className="notification-display">
+      <button type="button" className={'bell'+(step===1?' has-news':'')+(ringing?' is-ringing':'')}
+        onClick={next} onAnimationEnd={()=>setRinging(false)}
+        aria-label={step===0?'Simular recepción de un aviso':step===1?'Marcar aviso como leído':'Aviso ya leído'}
+        disabled={step===2} aria-expanded={step===1}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 9h18c0-1-3-2-3-9ZM10 21h4"/>
+        </svg><i aria-hidden="true"/>
+      </button>
+      <div><strong role="status">{step===0?'Todo al día':step===1?'1 aviso sin leer':'Aviso leído'}</strong>
+        <p>{step===0?'Prueba la llegada de un aviso.':step===1?'Tienes una notificación nueva.':'Todo está actualizado.'}</p>
+      </div>
     </div>
-    <p className="under-action">Control interactivo de laboratorio, no una suscripción real.</p>
+    {step===1&&!dismissed&&<div className="notification-toast" role="status">
+      <span className="toast-dot"/><span>Tu recompensa tiene novedades.</span>
+      <button type="button" onClick={()=>setDismissed(true)} aria-label="Descartar aviso de prueba">×</button>
+    </div>}
+    <div className="component-slot">
+      <button type="button" className={'action-btn notification-action'+(step===2?' is-complete':'')}
+        disabled={step===2} onClick={next}>
+        {step===0?'Probar llegada de un aviso':step===1?'Marcar aviso como leído':'Aviso de prueba atendido'}
+      </button>
+    </div>
+    {step!==0&&<button className="quiet-btn" type="button" onClick={reset}>Repetir animación</button>}
+    <p className="under-action">Animación original de la primera beta; datos simulados.</p>
   </article>;
 }
 
@@ -113,28 +137,28 @@ function Studio({material}){
 }
 
 function App(){
-  const [material,setMaterial]=useState('fabric');
+  const [material,setMaterial]=useState('plastic');
   return <div className="page">
     <header className="brandbar">
       <div className="wordmark"><div className="orbits" aria-hidden="true"><i/><i/></div><strong>GOXION</strong></div>
-      <div className="beta">LABORATORIO V3</div>
+      <div className="beta">LABORATORIO V4</div>
     </header>
     <div className="intro"><div className="eyebrow">GOXION · EXPERIENCIA INTERACTIVA</div>
       <h1>Esta vez,<br/><em>el movimiento es real.</em></h1>
-      <p>El mismo motor de avatares y las microinteracciones originales, adaptados a nuestros colores y a un entorno aislado de prueba.</p>
+      <p>Motor original de Gixys con acabado Plastic y los movimientos de checklist y campana que aprobaste en la primera beta.</p>
       <div className="disclaimer"><span className="disc-led"/>Solo demostración visual · Sin datos ni cambios en clientes</div>
     </div>
     <div className="material-bar"><span>Material de los Gixys</span><div className="control-row">
-      <button type="button" className={'pill'+(material==='fabric'?' chosen':'')} aria-pressed={material==='fabric'} onClick={()=>setMaterial('fabric')}>Suave / Fabric</button>
-      <button type="button" className={'pill'+(material==='plastic'?' chosen':'')} aria-pressed={material==='plastic'} onClick={()=>setMaterial('plastic')}>Brillante / Plastic</button>
+      <button type="button" className={'pill'+(material==='fabric'?' chosen':'')} aria-pressed={material==='fabric'} onClick={()=>setMaterial('fabric')}>Suave / Fabric (comparar)</button>
+      <button type="button" className={'pill'+(material==='plastic'?' chosen':'')} aria-pressed={material==='plastic'} onClick={()=>setMaterial('plastic')}>Plastic · predeterminado</button>
     </div></div>
     <section className="scenes" aria-label="Componentes interactivos reales">
       <Mission material={material}/><Loyalty material={material}/><Notification material={material}/>
     </section>
     <Studio material={material}/>
-    <footer>GOXION · Beta separada de Mi Espacio · Motion original de Libraries.dev y React Bits</footer>
+    <footer>GOXION · Beta separada de Mi Espacio · Gixys originales de Libraries.dev · corazón Pulse Heart de React Bits</footer>
   </div>;
 }
 const root=document.getElementById('root');
 createRoot(root).render(<App/>);
-window.GOXION_ORIGINAL_BETA={renderer:'bot-avatars@0.2.2',components:['SpringCheck','PulseHeart','BellToggle'],isolated:true};
+window.GOXION_ORIGINAL_BETA={renderer:'bot-avatars@0.2.2',defaultMaterial:'plastic',components:['MissionCheckV1','PulseHeart','BellV1'],isolated:true};
