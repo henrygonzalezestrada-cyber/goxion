@@ -52,7 +52,7 @@ function choosePosition(kind,node,variant,box){
     [12,Math.max(17,Math.min(vh-height-16,a.bottom+7))]
   ];
   // Nearby gaps are preferred; if dense, scan clear space without covering controls.
-  for(let top=12;top<=vh-height-12;top+=24){
+  for(let top=12;top<=vh-height-12;top+=7){
     if(Math.abs(top-(a.top+a.height/2))>390)continue;
     for(const left of [12,(vw-width)/2,vw-width-12]){
       anchors.push([left,top]);
@@ -124,7 +124,7 @@ function GixyMessage({kind,serial,onClose}){
     data-kind={kind} data-variant={seq} data-placement={pos?.slot??'hidden'}
     style={{left:pos?.left??0,top:pos?.top??0,visibility:ready?'visible':'hidden'}}>
     <span className="gx-gixy-message__avatar" aria-hidden="true">
-      <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={63} face="eyes"
+      <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={57} face="eyes"
         shading="plastic" state="working" turn={1} speed={.92} depth={.74}
         jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
     </span>
