@@ -37,7 +37,7 @@ function LoyaltyHeart(){
 let ready=false;
 function mount(){
   if(ready||!window.GOXION_GIXYS_MIRROR)return;
-  const mapping=[['gx-mirror-hex','hexagon','mission'],['gx-mirror-circle','circle','loyalty'],['gx-mirror-square','square','notification']];
+  const mapping=[['gx-mirror-hex','hexagon','mission'],['gx-mirror-hex-expanded','hexagon','mission'],['gx-mirror-circle','circle','loyalty'],['gx-mirror-square','square','notification']];
   for(const [id,kind,trigger] of mapping){
     const root=document.getElementById(id);
     if(!root)return;
