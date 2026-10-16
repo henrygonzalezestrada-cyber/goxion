@@ -889,6 +889,15 @@
     const words = knowledge.normalize(query);
     const topic=accountTopic(query);
     if(topic){ void accountRead(topic,query); return; }
+    // Una pregunta comercial no es una falla de acceso ni gasta Groq.
+    const platformOffer=knowledge.resolvePlatform(query);
+    if(platformOffer && /\b(si contrato|si contratara|quiero contratar|quiero adquirir|cuanto pagaria|cuanto cuesta|cuanto sale|cuanto saldria|precio|costo|mensual|contratacion|contratar)\b/.test(words) &&
+       !/\b(me pide contratar|me sale contratar|para iniciar sesion|para entrar|premium|iniciar sesion|acceso|error)\b/.test(words)){
+      respondFree(query,'Puedo ayudarte a cotizar '+platformOffer+'. El precio final depende de la modalidad, la disponibilidad y las promociones vigentes. Para darte la tarifa correcta y no inventar un importe, abre Catálogo: ahí puedes ver el plan y su precio antes de contratar.',
+        [{kind:'catalog',label:'Ver planes y precios'},
+         {kind:'promotions',label:'Promociones disponibles'}]);
+      return;
+    }
     if(helpWithAccess(query))return;
     if(/^(hola(?: goxy)?|buenos dias|buenas tardes|buenas noches|hey|que puedes hacer|que puedo hacer|que haces|en que me ayudas|en que me puedes ayudar|como me ayudas|me puedes ayudar)$/.test(words)) {
       respondFree(query,chosenPlatform
@@ -1295,7 +1304,10 @@
     if(pendingAI){
       // Consultas gratuitas y cambio de plataforma siguen disponibles sin esperar IA.
       const local=knowledge.normalize(text);
-      if(accountTopic(text) || /^(hola(?: goxy)?|que puedes hacer|que puedo hacer|que haces|buenos dias|buenas tardes|buenas noches)$/.test(local) ||
+      if(accountTopic(text) ||
+        /\b(contrasena|password|clave de acceso|clave de inicio)\b/.test(local) ||
+        (/\b(contrato|contratar|cotizar|cuanto cuesta|cuanto pagaria|precio|costo|mensual)\b/.test(local)&&knowledge.resolvePlatform(text)) ||
+        /^(hola(?: goxy)?|que puedes hacer|que puedo hacer|que haces|buenos dias|buenas tardes|buenas noches)$/.test(local) ||
          (knowledge.resolvePlatform(text) &&
          knowledge.resolvePlatform(text)!==pendingAI.chosen?.platform)){
         cancelFlow();
