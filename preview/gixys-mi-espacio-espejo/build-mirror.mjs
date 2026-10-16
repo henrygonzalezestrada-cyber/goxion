@@ -10,7 +10,7 @@ const i=official.indexOf(start),j=official.indexOf(finish,i);
 if(i<0||j<i)throw Error('Official dashboard anchors changed: update mirror source mapping');
 let dashboard=official.slice(i,j);
 dashboard=dashboard.replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*')/gi,'');
-dashboard=dashboard.replace(/<script\b[^>]*>[\s\S]*?</script>/gi,'');
+dashboard=dashboard.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi,'');
 if(/<(script|iframe|form)\b/i.test(dashboard))throw Error('Unsafe executable element found in dashboard');
 const navStart='<div class="glass-card tab-container" id="goxion-main-nav">';
 const ns=official.indexOf(navStart),ne=official.indexOf('<div class="view-section" id="view-inicio">',ns);
