@@ -78,6 +78,11 @@ function choosePosition(kind,node,variant,box){
     const score=overlap*15+distance*.24+preference*3.8;
     if(!best||score<best.score)best={left,top,score,overlap,distance,slot:i,width,height};
   });
+  window.GX_MIRROR_PLACEMENT_DEBUG={
+    kind,best,anchor:{left:a.left,top:a.top,right:a.right,bottom:a.bottom},
+    stage:{width,height},viewport:{width:vw,height:vh},
+    obstacles:obstacles.map(r=>({left:r.left,top:r.top,right:r.right,bottom:r.bottom}))
+  };
   if(!best||best.overlap>50||best.distance>415)return null; // Never sacrifice important content to show a mascot.
   return best;
 }
