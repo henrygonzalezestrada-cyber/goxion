@@ -148,3 +148,20 @@ body.gx-mirror-body .gx-mirror-expanded-head strong{padding-top:0!important}
 @media(prefers-reduced-motion:reduce){
  .gx-gixy-message,.gx-gixy-message.is-visible{transition:none!important;animation:none!important}
 }
+
+/* WebKit: the existing icon+counter morph must preserve a tappable counter width. */
+body.gx-mirror-body #gx-client-notif-launch.gx-has-new > #gx-client-notif-badge{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:relative!important;
+  width:24px!important;
+  min-width:24px!important;
+  max-width:24px!important;
+  flex:0 0 24px!important;
+  padding:0!important;
+  margin:0!important;
+  opacity:1!important;
+  visibility:visible!important;
+  transform:none!important;
+}
