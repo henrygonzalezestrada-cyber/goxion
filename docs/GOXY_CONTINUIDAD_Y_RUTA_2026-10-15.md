@@ -233,3 +233,11 @@ La política publicada en `ayuda.html` en la sección Garantía Comercial contem
 Se ajustó F15 en beta: el detector reconoce preguntas amplias de contraseña y redirige a notificación de vista única o asesor según elegibilidad de datos; pregunta de precio abre Catálogo sin Groq; date picker y CTA ahora usan grid vertical para evitar el desborde con fecha nativa iOS; strings F15 evitan caché de Safari. QA de 200 aserciones de DOM simulado pasó. Siguen intactos los bloques oficiales, controles de privacidad y cuotas del servidor.
 
 **Pendiente:** confirmar visualmente en Safari real y la ausencia de pausas en las consultas locales; no integrar soporte oficial sin aceptación. Todo lo aprobado en F14 se conserva. No modificar el motor B2 para «resolver» un texto de Goxy: preparar primero la integración contable si se exige la cantidad exacta.
+
+---
+
+## 14. F16 · Una fila con fecha y CTA, visual proporcionado (15/oct/2026)
+El usuario envió captura de F15 y pidió **no entregar código para aplicación manual**, sino aplicar el cambio directamente a GitHub, respetando el ritmo visual del chat: pregunta arriba y dos controles alineados en una sola fila, con campo de fecha más ancho y botón compacto. Causa: reglas CSS contrapuestas acumuladas de F14 y F15 y `label` con picker anidado que ocupaba una columna completa.
+- Rama `beta/goxy-f16-date-row-framing-20261015`: CSS de calendario consolidado y DOM del panel reorganizado; grid asimétrico 1.6:1, alturas iguales 46 px, separación vertical de 9 px, márgenes compactos, título independiente accesible por `htmlFor`, selector nativo iOS intacto, ajuste móvil ≤360 px. Solo archivos de beta, pruebas y documentación.
+- Verificación: 212 aserciones simuladas PASS del harness de Goxy. Inspección adicional de geometría/render de referencia en Chromium 320/355/375/390/430 px con fila compartida, sin desbordamiento horizontal ni solape del texto. No se afirma prueba real en Safari/iPhone hasta recibir validación del usuario.
+- No tocar lógica financiera, UI oficiales o fuentes de pagos. Evitar superponer nuevos bloques CSS para el mismo selector cuando se corrija un encuadre; sustituir reglas contradictorias y validar a varios anchos antes de entregar.
