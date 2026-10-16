@@ -380,6 +380,8 @@ function goxionViewModelAdapter(data) {
                     // Sesión válida: reconstruimos y reactivamos Mi Espacio.
                     renderDashboard(savedKey);
                     switchTab("inicio");
+                    // Anuncio solo tras recuperar y validar el cliente real.
+                    window.dispatchEvent(new Event("goxion:client-ready"));
                 } else {
                     // Token inexistente/expirado: volvemos limpiamente a la vista pública.
                     const headerText = document.getElementById("header-btn-text");
@@ -473,6 +475,7 @@ function goxionViewModelAdapter(data) {
                 setTimeout(() => {
                     closeAuthSheet();
                     switchTab("inicio");
+                    window.dispatchEvent(new Event("goxion:client-ready"));
                     loginBtn.disabled = false;
                     setTimeout(() => setLoginState("", "Validar acceso"), 220);
                 }, 470);
@@ -491,6 +494,7 @@ function goxionViewModelAdapter(data) {
         };
 
         cerrarSesion = function() {
+            window.dispatchEvent(new Event("goxion:client-logout"));
             localStorage.removeItem(TOKEN_KEY);
             window.goxionCurrentClientKey = "";
             actualizarBloqueoSoporte();
