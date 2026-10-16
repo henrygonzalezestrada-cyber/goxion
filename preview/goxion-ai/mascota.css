@@ -251,52 +251,85 @@
   padding-top:7px;
   padding-bottom:6px;
 }
-/* F16 · Fecha futura: título independiente y dos acciones asimétricas en una sola
-   fila. CSS consolidado: no mantener reglas F14/F15 contradictorias.
-   Diseño válido incluso a 320 CSS px y con el picker nativo iOS. */
+/* F17 · Safari iOS date input: isolate intrinsic native control inside an
+   absolutely positioned touch target. The visible date is our own centered
+   text, not WebKit's overflowing inner date field. ONE source of CSS truth. */
 #view-soporte .gxai-date-panel{
   align-self:stretch;
   display:grid;
-  grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);
-  column-gap:9px;
-  row-gap:9px;
-  align-items:stretch;
+  grid-template-columns:minmax(0,1.57fr) minmax(0,1fr);
+  column-gap:10px;
+  row-gap:10px;
+  align-items:center;
   width:100%;
   max-width:100%;
   min-width:0;
   box-sizing:border-box;
-  padding:6px 2px 8px;
+  padding:8px 2px 7px;
   margin:0;
 }
 #view-soporte .gxai-date-panel > label{
   grid-column:1 / -1;
-  display:block;
   width:100%;
+  min-width:0;
   margin:0;
-  padding:0 1px;
+  padding:0 1px 2px;
   box-sizing:border-box;
-  color:#e6e7f6;
   text-align:left;
+  color:#e6e7f6;
   font:600 12px/1.45 Poppins,sans-serif;
 }
-#view-soporte .gxai-date-panel > .gxai-date-input{
+#view-soporte .gxai-date-panel > .gxai-date-slot{
   grid-column:1;
-  display:block;
+  position:relative;
+  display:grid;
+  place-items:center;
+  isolation:isolate;
+  overflow:hidden;
   width:100%;
   max-width:100%;
   min-width:0;
-  box-sizing:border-box;
   height:46px;
-  min-height:46px;
+  box-sizing:border-box;
   margin:0;
-  padding:0 9px;
+  padding:0 7px;
   border-radius:16px;
   border:1px solid rgba(124,77,255,.33);
   background:rgba(255,255,255,.07);
-  color:#f2f8ff;
-  font:500 16px/1 Poppins,sans-serif;
+}
+#view-soporte .gxai-date-slot .gxai-date-visible{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
   text-align:center;
+  pointer-events:none;
+  color:#f2f8ff;
+  font:500 14px/1.2 Poppins,sans-serif;
+  letter-spacing:-.02em;
+}
+#view-soporte .gxai-date-slot > .gxai-date-input{
+  position:absolute;
+  z-index:1;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  min-width:0;
+  min-height:0;
+  max-width:100%;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  opacity:0;
+  cursor:pointer;
   color-scheme:dark;
+  -webkit-appearance:auto;
+  appearance:auto;
+}
+#view-soporte .gxai-date-slot:focus-within{
+  border-color:rgba(0,242,254,.68);
 }
 #view-soporte .gxai-date-panel > .gxai-choice{
   grid-column:2;
@@ -306,23 +339,21 @@
   min-width:0;
   max-width:100%;
   width:100%;
-  box-sizing:border-box;
   height:46px;
   min-height:46px;
+  box-sizing:border-box;
   margin:0;
-  padding:0 7px;
+  padding:0 6px;
   border-radius:16px;
   white-space:nowrap;
+  overflow:hidden;
   overflow-wrap:normal;
   text-align:center;
-  font:600 clamp(10.5px, 3vw, 12px)/1.2 Poppins,sans-serif;
-  letter-spacing:-.015em;
+  font:600 11.5px/1.2 Poppins,sans-serif;
+  letter-spacing:-.02em;
 }
 @media(max-width:360px){
-  #view-soporte .gxai-date-panel{
-    grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
-    column-gap:7px;
-  }
-  #view-soporte .gxai-date-panel > .gxai-date-input{padding-inline:5px}
-  #view-soporte .gxai-date-panel > .gxai-choice{padding-inline:5px}
+  #view-soporte .gxai-date-panel{column-gap:7px}
+  #view-soporte .gxai-date-panel > .gxai-choice{font-size:10.5px;padding-inline:4px}
+  #view-soporte .gxai-date-slot .gxai-date-visible{font-size:13px}
 }
