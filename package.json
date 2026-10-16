@@ -21,6 +21,7 @@
     "test:calendario:abonos": "node scripts/abonos-politica-smoke.mjs && node scripts/abonos-b2-schema-smoke.mjs",
     "test:finanzas:parcial-atomico": "node scripts/pago-parcial-atomico-smoke.mjs && node scripts/pago-parcial-atomic-contract-smoke.mjs && node scripts/pago-parcial-retry-client-smoke.mjs",
     "test:finanzas:imputacion-sombra": "node scripts/imputacion-sombra-b2-smoke.mjs",
-    "test:finanzas:obligaciones-b2": "node scripts/confirmar-imputacion-b2-smoke.mjs && node scripts/obligaciones-b2-integracion-smoke.mjs"
+    "test:finanzas:obligaciones-b2": "node scripts/confirmar-imputacion-b2-smoke.mjs && node scripts/obligaciones-b2-integracion-smoke.mjs",
+    "test:modales:estandar": "node scripts/modal-header-standard-smoke.mjs"
   }
 }

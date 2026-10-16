@@ -42,6 +42,7 @@
 <!-- Goxy F17: componentes probados; una sola fuente compartida con la beta -->
 <link rel="stylesheet" href="./preview/goxion-ai/mascota.css?v=official-f17">
 <link rel="stylesheet" href="./assets/css/goxion-release-oct2026.css?v=launch1">
+<link rel="stylesheet" href="./assets/css/goxion-modal-headers.css?v=standard-v1">
 </head>
 <body class="no-scroll">
 <div id="splash-screen" onclick="hideSplash()">
@@ -575,9 +576,10 @@
 <button class="cart-btn" onclick="enviarPedido()">Ver mi carrito →</button>
 </div>
 <div class="modal" id="modal-terminos">
-<div class="glass-card modal-content">
-<span class="close-btn" onclick="closeModal('modal-terminos')">×</span>
-<div class="modal-title">GOXION - Términos y Condiciones</div>
+<div class="glass-card modal-content gx-standard-legacy-modal">
+<div class="gx-dialog-legacy-head"><div class="modal-title">GOXION - Términos y Condiciones</div><button type="button" class="close-btn" aria-label="Cerrar terminos" onclick="closeModal('modal-terminos')">×</button></div>
+<div class="gx-dialog-legacy-scroll">
+
 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Al hacer uso de cualquiera de los servicios ofrecidos, el usuario acepta de manera íntegra las condiciones establecidas en este instrumento.</p>
 <ul class="terms-list">
 <li><strong>1. Confidencialidad de Credenciales</strong> Las contraseñas y enlaces de acceso son estrictamente personales e intransferibles. Queda prohibida su reventa o divulgación a terceros no autorizados.</li>
@@ -588,10 +590,13 @@
 </ul>
 </div>
 </div>
+</div>
+
 <div class="modal" id="modal-garantia">
-<div class="glass-card modal-content">
-<span class="close-btn" onclick="closeModal('modal-garantia')">×</span>
-<div class="modal-title">Garantía, Satisfacción y Trato Justo</div>
+<div class="glass-card modal-content gx-standard-legacy-modal">
+<div class="gx-dialog-legacy-head"><div class="modal-title">Garantía, Satisfacción y Trato Justo</div><button type="button" class="close-btn" aria-label="Cerrar garantia" onclick="closeModal('modal-garantia')">×</button></div>
+<div class="gx-dialog-legacy-scroll">
+
 <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 15px;">Respaldamos la calidad de nuestra plataforma mediante reglas de compensación clara y penalizaciones proporcionales:</p>
 <table>
 <tr><th>Concepto</th><th>Regla Aplicable</th><th>Límite Máximo</th></tr>
@@ -601,10 +606,13 @@
 </table>
 </div>
 </div>
+</div>
+
 <div class="modal" id="modal-lealtad">
-<div class="glass-card modal-content">
-<span class="close-btn" onclick="closeModal('modal-lealtad')">×</span>
-<div class="modal-title">Programa de Fidelidad</div>
+<div class="glass-card modal-content gx-standard-legacy-modal">
+<div class="gx-dialog-legacy-head"><div class="modal-title">Programa de Fidelidad</div><button type="button" class="close-btn" aria-label="Cerrar lealtad" onclick="closeModal('modal-lealtad')">×</button></div>
+<div class="gx-dialog-legacy-scroll">
+
 <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">La puntualidad tiene recompensas en GOXION. Mantén tus pagos al día y obtén beneficios automatizados.</p>
 <table>
 <tr><th>Nivel</th><th>Meta</th><th>Beneficio</th></tr>
@@ -614,10 +622,13 @@
 <p style="color: var(--danger-red); font-size: 12px; margin-top: 15px;">⚠️ <strong>Importante:</strong> Un pago atrasado o sin reporte previo reinicia tu racha de pagos a cero.</p>
 </div>
 </div>
+</div>
+
 <div class="modal" id="modal-referidos">
-<div class="glass-card modal-content">
-<span class="close-btn" onclick="closeModal('modal-referidos')">×</span>
-<div class="modal-title">🎁 Invita y Gana tu Mensualidad</div>
+<div class="glass-card modal-content gx-standard-legacy-modal">
+<div class="gx-dialog-legacy-head"><div class="modal-title">🎁 Invita y Gana tu Mensualidad</div><button type="button" class="close-btn" aria-label="Cerrar referidos" onclick="closeModal('modal-referidos')">×</button></div>
+<div class="gx-dialog-legacy-scroll">
+
 <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 15px;">El cliente actual podrá obtener un descuento del 100% en una mensualidad de su servicio actual por cada nuevo cliente que concrete una compra bajo estas bases:</p>
 <ul class="terms-list">
 <li><strong>1. Requisitos para el Referido</strong> Debe ser un cliente nuevo. Adquirir un mínimo de dos (2) perfiles y mantener ambos perfiles activos y pagados durante un periodo mínimo de tres (3) meses consecutivos.</li>
@@ -626,15 +637,19 @@
 </ul>
 </div>
 </div>
+</div>
+
 <div class="modal" id="modal-feedback">
-<div class="glass-card modal-content" style="text-align: center;">
-<span class="close-btn" onclick="closeModal('modal-feedback')">×</span>
+<div class="glass-card modal-content gx-standard-legacy-modal" style="text-align: center;">
+<div class="gx-dialog-legacy-head"><div class="modal-title">Déjanos tu comentario</div><button type="button" class="close-btn" aria-label="Cerrar feedback" onclick="closeModal('modal-feedback')">×</button></div>
+<div class="gx-dialog-legacy-scroll">
 <div style="font-size: 38px; margin-bottom: 10px;">💬</div>
-<div class="modal-title">Déjanos tu comentario</div>
+
 <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 15px;">Tu opinión nos ayuda a mejorar. ¿Qué te gustaría decirnos?</p>
 <textarea class="input-smart" id="feedback-text" placeholder="Escribe aquí tu comentario, sugerencia o experiencia..." rows="4" style="resize: none;"></textarea>
 <button class="btn-primary" id="btn-send-feedback" onclick="enviarFeedback()">Enviar Comentario</button>
 <p id="feedback-success" style="color: var(--success-green); font-size: 13px; font-weight: 700; margin-top: 15px; display: none;">¡Feedback enviado con éxito! Gracias.</p>
+</div>
 </div>
 </div>
 
