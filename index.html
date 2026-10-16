@@ -7,6 +7,7 @@
   <title>GOXION - Resumen de Cuenta</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./assets/css/index.css">
+<link rel="stylesheet" href="./assets/css/goxion-modal-headers.css?v=standard-v1">
 
 
 
@@ -33,28 +34,30 @@
 <!-- GOXION PAY · SELECTOR DE CUENTA · FLUJO OFICIAL V2 -->
 <div class="gx-bank-overlay" id="bank-modal" onclick="cerrarDatosPago(event)" aria-hidden="true">
     <section class="gx-bank-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-bank-title">
-        <button class="gx-bank-close" type="button" onclick="cerrarDatosPago(event, true)" aria-label="Cerrar datos de transferencia">×</button>
-
-        <div class="gx-bank-kicker">PAGO POR TRANSFERENCIA</div>
-        <div class="gx-bank-heading">
+        <div class="gx-bank-static-head gx-dialog-static-head">
+          <div class="gx-bank-head-copy">
+            <div class="gx-bank-kicker">PAGO POR TRANSFERENCIA</div>
+            <div class="gx-bank-heading">
             <h3 id="gx-bank-title">Transfiere <strong id="gx-bank-amount">$0.00</strong></h3>
             <p>Elige una cuenta.</p>
+            </div>
+          </div>
+          <button class="gx-bank-close" type="button" onclick="cerrarDatosPago(event, true)" aria-label="Cerrar datos de transferencia">×</button>
         </div>
-
+        <div class="gx-bank-scroll gx-dialog-scroll">
         <div class="gx-bank-list" id="gx-bank-list"></div>
         <div class="gx-wallet-meta">
             <div class="gx-wallet-dots" id="gx-wallet-dots" aria-hidden="true"></div>
             <span>Desliza · toca una tarjeta para ver sus datos</span>
         </div>
-
+        </div>
     </section>
 </div>
 
 <!-- MODAL DE PAGO PARA SUBIR COMPROBANTE -->
 <div class="modal-overlay" id="payment-modal" onclick="cerrarModalPago(event)" aria-hidden="true">
     <div class="modal-content gx-payment-upload-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-payment-upload-title">
-        <button class="close-modal" type="button" onclick="cerrarModalPago(event, true)" aria-label="Cerrar comprobante">×</button>
-
+        <div class="gx-payment-static-head gx-dialog-static-head">
         <div class="gx-payment-legacy-head">
             <div style="font-size:38px;margin-bottom:5px;">🧾</div>
             <h3 style="color:#fff;font-size:18px;font-weight:800;margin-bottom:5px;">Validar Pago</h3>
@@ -68,7 +71,9 @@
                 <p>Selecciona la captura de tu transferencia.</p>
             </div>
         </div>
-
+        <button class="close-modal" type="button" onclick="cerrarModalPago(event, true)" aria-label="Cerrar comprobante">×</button>
+        </div>
+        <div class="gx-payment-scroll gx-dialog-scroll">
         <div class="upload-area" id="upload-area">
             <input type="file" id="file-input" accept="image/*" onchange="mostrarPreview(this)">
             <div class="upload-icon" aria-hidden="true">
@@ -112,6 +117,7 @@
                 <small class="gx-submit-subtitle">Se enviará para validación</small>
             </span>
         </button>
+        </div>
     </div>
 </div>
 
