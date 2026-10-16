@@ -68,3 +68,13 @@ body.gx-mirror-body .gx-account-capsule{opacity:.7}
   body.gx-mirror-body .gx-mirror-mission-action.is-complete path,
   body.gx-mirror-body #gx-client-notif-launch.gx-ringing .gx-client-notif-bell{animation:none!important}
 }
+body.gx-mirror-body .gx-mirror-expanded-head{position:relative;min-height:78px}
+body.gx-mirror-body .gx-mirror-expanded-companion{display:none;position:absolute;right:0;top:-8px;width:73px;height:75px;pointer-events:none;z-index:2}
+body.gx-mirror-body .gx-mirror-expanded-companion canvas{pointer-events:none!important}
+@media(max-width:530px){
+  body.gx-mirror-body .gx-mirror-mission-companion{display:none}
+  body.gx-mirror-body .gx-mirror-expanded-companion{display:block}
+  body.gx-mirror-body .gx-mirror-expanded-head{text-align:left;padding-right:77px}
+  body.gx-mirror-body .gx-mirror-expanded-head .gx-gamif-shared-emoji{display:none}
+  body.gx-mirror-body .gx-mirror-expanded-head strong{padding-top:11px}
+}
