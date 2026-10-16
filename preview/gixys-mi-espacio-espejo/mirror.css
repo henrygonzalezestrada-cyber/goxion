@@ -78,3 +78,10 @@ body.gx-mirror-body .gx-mirror-expanded-companion canvas{pointer-events:none!imp
   body.gx-mirror-body .gx-mirror-expanded-head .gx-gamif-shared-emoji{display:none}
   body.gx-mirror-body .gx-mirror-expanded-head strong{padding-top:11px}
 }
+
+/* QA final: Hex acompaña dentro del detalle (morph oficial), jamás cubre la tarjeta compacta. */
+body.gx-mirror-body .gx-mirror-mission-companion{display:none!important}
+body.gx-mirror-body .gx-mirror-expanded-companion{display:block!important}
+body.gx-mirror-body .gx-mirror-expanded-head{padding-right:78px;text-align:left}
+body.gx-mirror-body .gx-mirror-expanded-head .gx-gamif-shared-emoji{display:none}
+body.gx-mirror-body .gx-mirror-expanded-head strong{padding-top:11px}
