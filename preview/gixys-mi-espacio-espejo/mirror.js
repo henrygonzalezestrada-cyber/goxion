@@ -45,6 +45,7 @@ document.addEventListener("gx-mirror:loyalty-toggle",event=>{
   count.textContent=done?"4/4 Pagos":"3/4 Pagos";
   bar.style.width=done?"100%":"75%";
   copy.textContent=done?"Nivel 1 alcanzado · Simulación":"A un pago puntual del siguiente nivel. (Demostración)";
+  document.body.classList.toggle("gx-mirror-loyalty-active",done);
   emit("loyalty",done);
 });
 const ref=$("referral-section-container");
@@ -95,6 +96,7 @@ function triggerNotice(){
     triggerNotice.timer=setTimeout(()=>bell.classList.remove("gx-ringing"),900);
     notes("Nuevo aviso de ejemplo · toca la campana para marcarlo leído");
   }else notes("Aviso de ejemplo leído");
+  document.body.classList.toggle("gx-mirror-notif-active",notice===1);
   emit("notification",notice===1);
 }
 bell.addEventListener("click",triggerNotice);displayNotice();
@@ -102,6 +104,7 @@ const services=$("dash-services"),history=$("dash-history");
 if(services)services.innerHTML='<p class="gx-mirror-muted">Los servicios reales no se cargan en esta beta.</p>';
 if(history)history.innerHTML='<p class="gx-mirror-muted">El historial real permanece protegido y no se consulta.</p>';
 $("dash-onboarding-card")?.setAttribute("hidden","");
+billing?.querySelector(".gx-account-capsule")?.addEventListener("click",()=>notes("La consulta real de tu estado de cuenta está desactivada en esta beta."));
 window.GOXION_GIXYS_MIRROR=Object.freeze({isolated:true,source:"ayuda.html",noBackend:true,version:"Fase 2 beta"});
 document.dispatchEvent(new Event("gx-mirror-ready"));
 })().catch(error=>{
