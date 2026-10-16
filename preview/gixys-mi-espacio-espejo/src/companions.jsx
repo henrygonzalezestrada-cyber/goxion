@@ -51,6 +51,13 @@ function choosePosition(kind,node,variant,box){
     [vw-width-12,Math.max(17,Math.min(vh-height-16,a.top-42))],
     [12,Math.max(17,Math.min(vh-height-16,a.bottom+7))]
   ];
+  // Nearby gaps are preferred; if dense, scan clear space without covering controls.
+  for(let top=12;top<=vh-height-12;top+=24){
+    if(Math.abs(top-(a.top+a.height/2))>390)continue;
+    for(const left of [12,(vw-width)/2,vw-width-12]){
+      anchors.push([left,top]);
+    }
+  }
   const shifts=[[-8,0],[9,-7],[1,9],[-5,5],[7,4]];
   const [sx,sy]=shifts[variant%shifts.length];
   const ignored=node;
@@ -71,7 +78,7 @@ function choosePosition(kind,node,variant,box){
     const score=overlap*15+distance*.24+preference*3.8;
     if(!best||score<best.score)best={left,top,score,overlap,distance,slot:i,width,height};
   });
-  if(!best||best.overlap>50)return null; // Never sacrifice important content to show a mascot.
+  if(!best||best.overlap>50||best.distance>415)return null; // Never sacrifice important content to show a mascot.
   return best;
 }
 function GixyMessage({kind,serial,onClose}){
