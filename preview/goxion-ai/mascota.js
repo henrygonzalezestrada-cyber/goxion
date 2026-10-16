@@ -1118,6 +1118,7 @@
     if (type === 'account') { closeChat(); window.switchTab?.('inicio'); return; }
     if (type === 'catalog') { closeChat(); window.switchTab?.('catalogo'); return; }
     if (type === 'pay-open') { closeChat(); window.irAlTicket?.(); return; }
+    if (type === 'terms-open') { closeChat(); window.openModal?.('modal-garantia'); return; }
     if (type === 'extend-open') {
       closeChat();window.switchTab?.('inicio');
       // Solo se abre el control oficial y únicamente si aún está visible.
