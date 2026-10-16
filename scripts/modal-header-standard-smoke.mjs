@@ -24,9 +24,9 @@ async function check(browser,name){
     const filler=document.createElement("div");
     filler.style.height="1000px";filler.style.flex="0 0 1000px";scroll.append(filler);
     const y=head.getBoundingClientRect().y;scroll.scrollTop=130;
-    const close=head.querySelector("button"),rect=close.getBoundingClientRect();
+    const close=head.querySelector("button"),style=getComputedStyle(close);
     return {scroll:scroll.scrollTop,shift:Math.abs(head.getBoundingClientRect().y-y),
-      width:rect.width,height:rect.height,color:getComputedStyle(close).backgroundColor,
+      width:parseFloat(style.width),height:parseFloat(style.height),color:style.backgroundColor,
       icon:getComputedStyle(close,"::before").width};
    });
   });
@@ -58,8 +58,8 @@ async function check(browser,name){
       el.querySelector(".close-btn"),
       notification.querySelector(".gx-client-notif-close")
    ];
-   const metrics=controls.map(b=>({width:b.getBoundingClientRect().width,
-      height:b.getBoundingClientRect().height,
+   const metrics=controls.map(b=>({width:parseFloat(getComputedStyle(b).width),
+      height:parseFloat(getComputedStyle(b).height),
       color:getComputedStyle(b).backgroundColor,
       icon:getComputedStyle(b,"::before").width}));
    return {titleCount:document.querySelectorAll(".gx-dialog-legacy-head .modal-title").length,
