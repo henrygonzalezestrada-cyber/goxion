@@ -1044,10 +1044,33 @@
     const label=doc.createElement('label');
     label.textContent='¿Qué día planeas pagar?';
     label.htmlFor='gxai-forecast-date';
+    // Safari iOS dibuja el texto interno de input[type=date] fuera de su
+    // caja visible y fuerza un ancho intrínseco pese a min-width:0.
+    // El control nativo sigue siendo el área táctil real, pero su apariencia
+    // queda debajo de un rótulo estable y perfectamente centrado.
+    const dateSlot=doc.createElement('div');
+    dateSlot.className='gxai-date-slot';
+    const visualDate=doc.createElement('span');
+    visualDate.className='gxai-date-visible';
+    visualDate.setAttribute('aria-hidden','true');
     const input=doc.createElement('input');
     input.id='gxai-forecast-date';
     input.type='date';input.className='gxai-date-input';
+    input.setAttribute('aria-label','Fecha prevista para realizar tu pago');
     input.min=first;input.max=max;input.value=payment.addDays(first,1);
+    const updateDateLabel=()=>{
+      const dateValue=/^\\d{4}-\\d{2}-\\d{2}$/.test(input.value)?input.value:null;
+      if(!dateValue){visualDate.textContent='Seleccionar fecha';return;}
+      const [year,month,day]=dateValue.split('-').map(Number);
+      visualDate.textContent=new Intl.DateTimeFormat('es-MX',{
+        day:'numeric',month:'short',year:'numeric',timeZone:'UTC'
+      }).format(new Date(Date.UTC(year,month-1,day))).replaceAll('.','');
+    };
+    input.addEventListener('input',updateDateLabel);
+    input.addEventListener('change',updateDateLabel);
+    updateDateLabel();
+    dateSlot.appendChild(visualDate);
+    dateSlot.appendChild(input);
     const button=doc.createElement('button');
     button.type='button';button.className='gxai-choice';button.textContent='Calcular importe';
     button.addEventListener('click',()=>{
@@ -1058,9 +1081,9 @@
       panel.remove();
       void accountRead('forecast','Si pago el '+input.value,undefined,input.value);
     });
-    // El título ocupa la primera fila; input y CTA comparten la segunda.
-    // No anidar el picker dentro del label: evita que Safari lo fuerce ancho completo.
-    panel.appendChild(label);panel.appendChild(input);panel.appendChild(button);
+    // Título arriba; controles alineados abajo. Input nativo flotante dentro
+    // de la caja evita el sobreancho intrínseco en Safari sin perder el picker.
+    panel.appendChild(label);panel.appendChild(dateSlot);panel.appendChild(button);
     scroll.appendChild(panel);scroll.scrollTop=scroll.scrollHeight;
   }
   function choiceAction(button) {
