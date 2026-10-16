@@ -557,7 +557,7 @@ assert.ok(scroll.children.some(x=>String(x.textContent).includes('cargo del 20%'
 // F16: pregunta arriba; fecha y CTA como hermanos en la MISMA fila.
 assert.ok(currentChoice('forecast-date'),'Proyección permite otra fecha');
 clickChoice(currentChoice('forecast-date'));
-const datePanel=scroll.children.find(x=>x.classList.contains('gxai-date-panel'));
+const datePanel=scroll.children.find(x=>x.className==='gxai-date-panel'&&x.isConnected);
 assert.ok(datePanel,'Panel de selección de fecha visible');
 assert.deepEqual(datePanel.children.map(x=>x.name),['label','input','button'],
  'Título independiente y dos campos en una fila, sin anidar picker en label');
