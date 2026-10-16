@@ -17,6 +17,25 @@ async function testBrowser(engine,name){
    await page.route("**/fonts.gstatic.com/**",r=>r.abort());
    await page.goto(base+"/preview/gixys-micro-v1/index.html",{waitUntil:"domcontentloaded",timeout:20000});
    await page.waitForFunction(()=>!!window.GOXION_GIXY_LAB);
+   assert.equal(await page.locator(".scene .gixy-float").count(),3, name+" "+width+": Gixys deben flotar sobre tarjetas");
+   assert.equal(await page.locator(".scene .gixy-slot").count(),0, name+" "+width+": siguen ocupando una columna dedicada");
+   assert.equal(await page.locator("#notification-btn .action-icon").count(),0, name+" "+width+": icono ambiguo permanece");
+   const quality=await page.evaluate(()=>{
+     const heart=getComputedStyle(document.querySelector(".heart-wrap")).color;
+     const cards=[...document.querySelectorAll(".scene")].map(card=>{
+       const avatar=card.querySelector(".gixy-float canvas").getBoundingClientRect();
+       const elements=[...card.querySelectorAll(".scene-info h2,.scene-info p,.mission-top,.progress,.loyalty-line,.notification-display,.action-btn")];
+       const collisions=elements.filter(n=>{
+         const b=n.getBoundingClientRect();
+         return Math.max(0,Math.min(b.right,avatar.right)-Math.max(b.left,avatar.left))>3 &&
+                Math.max(0,Math.min(b.bottom,avatar.bottom)-Math.max(b.top,avatar.top))>3;
+       }).map(n=>n.className||n.tagName);
+       return {card:card.dataset.scene,collisions};
+     });
+     return {heart,cards};
+   });
+   assert.equal(quality.heart,"rgb(255, 77, 109)",name+" "+width+": el corazón cambió de rojo");
+   assert(quality.cards.every(c=>c.collisions.length===0),name+" "+width+": Gixy cubre contenido: "+JSON.stringify(quality.cards));
    assert.equal(await page.locator("canvas[data-gixy]").count(),6,`${name} ${width}: Gixys incompletos`);
    const metrics=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,inner:innerWidth,alpha:[...document.querySelectorAll("canvas[data-gixy]")].map(c=>c.getContext("2d").getImageData(120,120,1,1).data[3])}));
    assert(metrics.scroll<=metrics.inner+1,`${name} ${width}: hay desplazamiento lateral (${metrics.scroll}/${metrics.inner})`);

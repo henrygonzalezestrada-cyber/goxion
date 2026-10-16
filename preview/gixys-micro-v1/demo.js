@@ -61,6 +61,7 @@
     resetButton("loyalty",false);
   });
   const bell=$("bell-btn"),toast=$("notification-toast");
+  // El botón existe solo en esta beta; en GOXION real lo sustituye el evento de la campana.
   const hideToast=()=>{toast.hidden=true;};
   function renderNotification(){
     const pending=notificationStep===1;
@@ -68,7 +69,7 @@
     bell.setAttribute("aria-expanded",String(pending));
     $("notification-state").textContent=pending?"1 aviso sin leer":notificationStep===2?"Aviso leído":"Todo al día";
     $("notification-subtitle").textContent=pending?"Tu nueva notificación está lista.":notificationStep===2?"Todo está actualizado.":"Prueba un aviso nuevo y su lectura.";
-    $("notification-action-text").textContent=pending?"Marcar aviso como leído":notificationStep===2?"Aviso de prueba atendido":"Simular notificación";
+    $("notification-action-text").textContent=pending?"Marcar aviso como leído":notificationStep===2?"Aviso de prueba atendido":"Probar llegada de un aviso";
     $("notification-btn").classList.toggle("is-complete",notificationStep===2);
     $("notification-btn").disabled=notificationStep===2;
     resetButton("notification",notificationStep!==0);

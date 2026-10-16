@@ -41,3 +41,13 @@
 6. El fallo previo de Browser smoke de Soporte está documentado en [issue #128](https://github.com/henrygonzalezestrada-cyber/goxion/issues/128); es un problema independiente de esta beta.
 
 **La fase 2 (integración en Ayuda oficial) NO está autorizada por la existencia de esta beta.**
+## V2 · Correcciones aprobadas para evaluar (16/oct/2026)
+
+- Gixys **sin boca** en ningún estado: expresiones con ojos, párpados, miradas y postura.
+- Cuerpo con iluminación móvil, giro en profundidad, compresión, inclinación y salto; imitamos el comportamiento de la referencia sin instalar React ni cambiar Goxy. No afirmar fidelidad idéntica a la biblioteca hasta inspección física.
+- En los tres escenarios los Gixys son **capas flotantes absolutas** sobre una zona lateral libre, no parte de una fila de contenido; el espacio de texto se calcula para que no se solapen.
+- Corazón de lealtad restaurado a rojo rosa `#ff4d6d` original de Pulse Heart; conserva sus latidos.
+- Botón del laboratorio dice «Probar llegada de un aviso» y deja de usar el símbolo confuso. En producción será un evento real, no un botón extra.
+- Pruebas extendidas: 7 anchos, no solapamiento, color del corazón, 3 overlays y los flujos existentes. Pendiente aceptación visual real en Safari.
+
+**No se habilitó ninguna integración productiva con clientes.**
