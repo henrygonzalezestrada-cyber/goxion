@@ -69,13 +69,13 @@
   content:"";
   display:block;
   position:absolute;
+  inset:auto;
   left:50%;
   top:50%;
   width:var(--gx-modal-close-icon);
   height:var(--gx-modal-close-stroke);
   margin:0;
   padding:0;
-  inset:auto;
   border:0;
   border-radius:5px;
   background:#030305;
