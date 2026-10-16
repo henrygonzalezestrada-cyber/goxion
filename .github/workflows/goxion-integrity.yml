@@ -31,10 +31,6 @@ jobs:
       - name: Verify repository integrity
         run: npm run verify
 
-      - name: GOXION · Encabezados inmóviles y X global (Chromium/WebKit)
-        if: ${{ !cancelled() }}
-        run: npm run test:modales:estandar
-
       # Release Goxy must stay independent from legacy browser-smoke failures.
       - name: Goxy F17 oficial + aviso por cliente autenticado
         if: ${{ !cancelled() }}
@@ -59,3 +55,15 @@ jobs:
       - name: Cart guest and member checkout
         if: ${{ !cancelled() }}
         run: npm run test:cart
+
+  modal-headers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - name: GOXION · Encabezados inmóviles y X global (Chromium/WebKit)
+        run: npm run test:modales:estandar
