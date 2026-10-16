@@ -1039,10 +1039,13 @@
     clearChoices();
     if(!active||!authenticated())return;
     const first=payment.localDay(),max=payment.addDays(first,45);
+    scroll.querySelector?.('.gxai-date-panel')?.remove();
     const panel=doc.createElement('div');panel.className='gxai-date-panel';
     const label=doc.createElement('label');
     label.textContent='¿Qué día planeas pagar?';
+    label.htmlFor='gxai-forecast-date';
     const input=doc.createElement('input');
+    input.id='gxai-forecast-date';
     input.type='date';input.className='gxai-date-input';
     input.min=first;input.max=max;input.value=payment.addDays(first,1);
     const button=doc.createElement('button');
@@ -1055,7 +1058,9 @@
       panel.remove();
       void accountRead('forecast','Si pago el '+input.value,undefined,input.value);
     });
-    label.appendChild(input);panel.appendChild(label);panel.appendChild(button);
+    // El título ocupa la primera fila; input y CTA comparten la segunda.
+    // No anidar el picker dentro del label: evita que Safari lo fuerce ancho completo.
+    panel.appendChild(label);panel.appendChild(input);panel.appendChild(button);
     scroll.appendChild(panel);scroll.scrollTop=scroll.scrollHeight;
   }
   function choiceAction(button) {

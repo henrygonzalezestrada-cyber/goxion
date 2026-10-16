@@ -81,7 +81,8 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f14'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f15') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('mascota.css?v=goxy-f16'),'Cargar estilos nuevos F16 en Safari sin caché');
+assert.ok(html.includes('mascota.js?v=goxy-f16') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f12') &&
  html.includes('goxy-access-routing.js?v=goxy-f15') &&
  html.includes('goxy-whatsapp-handoff.js?v=goxy-f12') &&
@@ -554,6 +555,20 @@ assert.ok(scroll.children.some(x=>String(x.textContent).includes('380.00')),
  'El importe futuro proviene exclusivamente de forecast, no de fórmula local');
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('cargo del 20%')),
  'Mostrar reactivación solo si backend la confirmó');
+// F16: pregunta arriba; fecha y CTA como hermanos en la MISMA fila.
+assert.ok(currentChoice('forecast-date'),'Proyección permite otra fecha');
+clickChoice(currentChoice('forecast-date'));
+const datePanel=scroll.children.find(x=>x.className==='gxai-date-panel'&&x.isConnected);
+assert.ok(datePanel,'Panel de selección de fecha visible');
+assert.deepEqual(datePanel.children.map(x=>x.name),['label','input','button'],
+ 'Título independiente y dos campos en una fila, sin anidar picker en label');
+assert.equal(datePanel.children[0].textContent,'¿Qué día planeas pagar?');
+assert.equal(datePanel.children[0].htmlFor,'gxai-forecast-date',
+ 'Asociación accesible del título con la fecha');
+assert.equal(datePanel.children[1].id,'gxai-forecast-date');
+assert.equal(datePanel.children[1].type,'date','Conservar picker nativo iOS');
+assert.equal(datePanel.children[2].textContent,'Calcular importe','Conservar CTA original');
+datePanel.remove();
 input.value='Cuánto me descuentan con el nivel máximo de lealtad?';composer.fire('submit');
 await Promise.resolve();await Promise.resolve();await Promise.resolve();flush();
 assert.ok(scroll.children.some(x=>String(x.textContent).includes('6% de descuento')),
@@ -588,8 +603,16 @@ assert.equal(doc.body.style.position,'','Restaurar estilos del fondo al cerrar')
 assert.equal(restored,146,'Restablecer desplazamiento original sin saltos');
 openButton.fire('click');flush();await Promise.resolve();
 // F15: preguntas comerciales y acceso protegido siempre son gratuitas.
-assert.ok(css.includes('grid-template-columns:minmax(0,1fr)'),
- 'Picker y botón usan una columna estable en pantallas pequeñas');
+const calendarCss=css.slice(css.indexOf('/* F16 · Fecha futura:'));
+assert.ok(calendarCss.includes('grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)'),
+ 'Fecha y botón asimétricos en una sola fila');
+assert.ok(calendarCss.includes('grid-column:1 / -1') &&
+ calendarCss.includes('grid-column:1;') && calendarCss.includes('grid-column:2;'),
+ 'Pregunta primera fila y acciones distribuidas a izquierda y derecha');
+assert.equal(calendarCss.split('#view-soporte .gxai-date-panel{').length-1,2,
+ 'Solo definición base más ajuste compacto a 360px; sin reglas de F14/F15 en conflicto');
+assert.ok(calendarCss.includes('height:46px')&&
+ calendarCss.includes('white-space:nowrap'),'Alturas alineadas y CTA en una línea');
 const beforeFree=sent.length;
 input.value='Si contrato Disney cuánto pagaría mensual?';composer.fire('submit');
 assert.equal(sent.length,beforeFree,'Consultar precio no debe usar Groq');
@@ -634,4 +657,4 @@ assert.ok(currentChoice('send-handoff'),'Revisar ficha de Netflix');
 clickChoice(currentChoice('send-handoff'));
 assert.equal(openedWhatsApp.length,1,'Solo confirmar abre WhatsApp');
 assert.ok(openedWhatsApp[0].includes('GOXION')&&!openedWhatsApp[0].includes('3321'));
-console.log('GOXION Goxy F15: reglas 20%, contraseña, precio y calendario alineado PASS.');
+console.log('GOXION Goxy F16: fecha y botón equilibrados en una fila + regresiones F15 PASS.');
