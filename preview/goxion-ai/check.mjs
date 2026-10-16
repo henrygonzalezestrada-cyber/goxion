@@ -587,6 +587,28 @@ closeButton.fire('click');flush();
 assert.equal(doc.body.style.position,'','Restaurar estilos del fondo al cerrar');
 assert.equal(restored,146,'Restablecer desplazamiento original sin saltos');
 openButton.fire('click');flush();await Promise.resolve();
+// F15: preguntas comerciales y acceso protegido siempre son gratuitas.
+assert.ok(css.includes('grid-template-columns:minmax(0,1fr)'),
+ 'Picker y botón usan una columna estable en pantallas pequeñas');
+const beforeFree=sent.length;
+input.value='Si contrato Disney cuánto pagaría mensual?';composer.fire('submit');
+assert.equal(sent.length,beforeFree,'Consultar precio no debe usar Groq');
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('precio final depende')),
+ 'Precio comercial sin inventar tarifa por modalidad o promociones');
+assert.ok(currentChoice('catalog'),'Ver precios en catálogo oficial');
+input.value='Cuál es la contraseña de ViX?';composer.fire('submit');
+assert.equal(sent.length,beforeFree,'Pedir contraseña no utiliza Groq ni cuota');
+assert.ok(scroll.children.some(x=>String(x.textContent).includes('solo se muestran una vez')),
+ 'Ruta oficial explica política de vista única, nunca revela secreto');
+assert.ok(currentChoice('human'),'Sin contraseña nueva pendiente ofrecer asesor real');
+const b2Policy=win.GOXY_PAYMENT.forecastDescribe({ok:true,mode:'b2',
+ date:'2026-11-30',amountCents:12250,moraCents:2450,
+ reactivationConfirmed:false});
+assert.ok(b2Policy.answer.includes('20%')&&
+ b2Policy.answer.includes('no lo sumaré como deuda confirmada'),
+ 'Regla administrativa condicionada, no cargo imaginario');
+assert.ok(b2Policy.choices.some(x=>x.kind==='terms-open'),
+ 'Acceso desde Goxy a términos y garantías publicados');
 input.value='ViX me pide contratar Premium';composer.fire('submit');
 assert.ok(currentChoice('premium-qr'),'Preguntar correo o QR sin gastar IA');
 clickChoice(currentChoice('premium-qr'));
@@ -612,4 +634,4 @@ assert.ok(currentChoice('send-handoff'),'Revisar ficha de Netflix');
 clickChoice(currentChoice('send-handoff'));
 assert.equal(openedWhatsApp.length,1,'Solo confirmar abre WhatsApp');
 assert.ok(openedWhatsApp[0].includes('GOXION')&&!openedWhatsApp[0].includes('3321'));
-console.log('GOXION Goxy F14: prórroga, proyección, lealtad, iOS y F13 PASS.');
+console.log('GOXION Goxy F15: reglas 20%, contraseña, precio y calendario alineado PASS.');
