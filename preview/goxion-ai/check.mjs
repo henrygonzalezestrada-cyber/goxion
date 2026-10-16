@@ -81,11 +81,11 @@ assert.ok(bridge.includes('goxy-ai-beta') && !bridge.includes('GROQ_API_KEY'),'C
 assert.ok(!bridge.includes('api.groq.com'),'Nunca conectar Groq desde el navegador');
 assert.ok(!html.includes('https://api.groq.com'),'El loader no conecta el proveedor');
 assert.ok(html.includes('goxy-ai-client.js?v=goxy-f14'),'Cargar puente seguro F7');
-assert.ok(html.includes('mascota.js?v=goxy-f14') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
+assert.ok(html.includes('mascota.js?v=goxy-f15') && html.includes('goxy-support-knowledge.js?v=goxy-f7-2') &&
  html.includes('goxy-client-context.js?v=goxy-f12') &&
- html.includes('goxy-access-routing.js?v=goxy-f12') &&
+ html.includes('goxy-access-routing.js?v=goxy-f15') &&
  html.includes('goxy-whatsapp-handoff.js?v=goxy-f12') &&
- html.includes('goxy-payment-read.js?v=goxy-f14'),'Cargar lectura financiera F13 antes del chat');
+ html.includes('goxy-payment-read.js?v=goxy-f15'),'Cargar lectura financiera F13 antes del chat');
 assert.ok(!css.includes('touch-action:none'),'No bloquear scroll con touch-action none');
 assert.ok(js.includes('parent.visualViewport') && js.includes('syncChatViewport'),'Leer viewport real padre');
 assert.ok(!js.includes('heroTrigger.setPointerCapture'),'No capturar dedo al inicio del gesto');
