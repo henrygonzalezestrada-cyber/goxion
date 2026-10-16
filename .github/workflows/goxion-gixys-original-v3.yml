@@ -42,7 +42,7 @@ jobs:
           test -s "$root/BellToggle.jsx"
       - name: Bundle original sources into a single isolated preview
         run: |
-          npx esbuild preview/gixys-original-v3/src/app.jsx --bundle --minify --jsx=automatic --platform=browser --format=esm --target=es2020 --outdir=preview/gixys-original-v3 --entry-names=app --legal-comments=end-of-file
+          npx esbuild preview/gixys-original-v3/src/app.jsx --bundle --minify --jsx=automatic --platform=browser --format=esm --target=es2020 --outdir=preview/gixys-original-v3 --entry-names=app --legal-comments=eof
           test -s preview/gixys-original-v3/app.js
           test -s preview/gixys-original-v3/app.css
       - name: Install browser engines
