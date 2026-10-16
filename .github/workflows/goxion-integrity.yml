@@ -31,6 +31,10 @@ jobs:
       - name: Verify repository integrity
         run: npm run verify
 
+      - name: GOXION · Encabezados inmóviles y X global (Chromium/WebKit)
+        if: ${{ !cancelled() }}
+        run: npm run test:modales:estandar
+
       # Release Goxy must stay independent from legacy browser-smoke failures.
       - name: Goxy F17 oficial + aviso por cliente autenticado
         if: ${{ !cancelled() }}
