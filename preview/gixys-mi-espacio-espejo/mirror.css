@@ -111,14 +111,14 @@ body.gx-mirror-body .gx-mirror-expanded-head strong{padding-top:0!important}
 #gx-gixys-message-root{position:relative;z-index:1000}
 .gx-gixy-message{
   position:fixed;display:flex;align-items:center;justify-content:flex-start;
-  width:min(216px,calc(100vw - 20px));min-height:74px;max-height:105px;
+  width:min(216px,calc(100vw - 20px));min-height:61px;max-height:93px;
   gap:3px;z-index:10010;pointer-events:none;isolation:isolate;
   opacity:0;transform:translate3d(0,5px,0) scale(.97);
   transition:opacity .25s cubic-bezier(.2,.85,.3,1),transform .32s cubic-bezier(.16,1,.3,1);
   contain:layout style
 }
 .gx-gixy-message.is-visible{opacity:1;transform:translate3d(0,0,0) scale(1)}
-.gx-gixy-message__avatar{display:block;width:65px;height:68px;flex:0 0 65px;pointer-events:none}
+.gx-gixy-message__avatar{display:block;width:59px;height:61px;flex:0 0 59px;pointer-events:none}
 .gx-gixy-message__avatar canvas{pointer-events:none!important;display:block}
 .gx-gixy-message__bubble{
   position:relative;display:flex;align-items:center;justify-content:center;
@@ -141,8 +141,8 @@ body.gx-mirror-body .gx-mirror-expanded-head strong{padding-top:0!important}
   outline:2px solid #00f2fe;outline-offset:3px
 }
 @media(max-width:350px){
- .gx-gixy-message{width:min(202px,calc(100vw - 20px));min-height:72px}
- .gx-gixy-message__avatar{width:62px;flex-basis:62px}
+ .gx-gixy-message{width:min(194px,calc(100vw - 20px));min-height:61px}
+ .gx-gixy-message__avatar{width:58px;flex-basis:58px}
  .gx-gixy-message__bubble{font-size:10px;padding:7px 9px}
 }
 @media(prefers-reduced-motion:reduce){
