@@ -66,7 +66,7 @@ async function check(browser,name){
       scroll:content.scrollTop,headShift:Math.abs(head.getBoundingClientRect().y-y),
       notifShift:Math.abs(nh.getBoundingClientRect().y-ny),metrics};
   });
-  assert.equal(help.titleCount,5);
+  assert.ok(help.titleCount>=4&&help.titleCount<=5,name+" · faltan encabezados; Opiniones 2.0 sustituye el feedback antiguo");
   assert.ok(help.scroll>0 && help.headShift<1,name+" · legal modal title moves");
   assert.ok(help.notifShift<1,name+" · notifications title moves");
   for(const b of help.metrics){
