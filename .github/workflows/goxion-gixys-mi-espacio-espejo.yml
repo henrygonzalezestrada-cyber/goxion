@@ -1,0 +1,57 @@
+name: GOXION · Gixys · Mi Espacio Espejo
+on:
+  push:
+    branches:
+      - beta/gixys-mi-espacio-espejo-20261016
+    paths:
+      - 'preview/gixys-mi-espacio-espejo/**'
+      - '.github/workflows/goxion-gixys-mi-espacio-espejo.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install exact companion engine and test dependencies
+        run: npm install --no-save --no-package-lock react@18.3.1 react-dom@18.3.1 bot-avatars@0.2.2 @hugeicons/core-free-icons esbuild@0.25.10 playwright
+      - name: Install pinned Pulse Heart original (not any replacement)
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="preview/gixys-mi-espacio-espejo/src/vendor"
+          mkdir -p "$root"
+          sha="d9085a5d6cb62a1c7512d8fa05a4f966736b575c"
+          for ext in jsx css; do
+            curl -fsSL --retry 3 --retry-delay 2 "https://raw.githubusercontent.com/DavidHDev/react-bits/${sha}/src/content/Micro/PulseHeart/PulseHeart.${ext}" -o "$root/PulseHeart.${ext}"
+          done
+          test -s "$root/PulseHeart.jsx"
+      - name: Build the SAME official dashboard markup with no client runtime
+        run: node preview/gixys-mi-espacio-espejo/build-mirror.mjs
+      - name: Bundle the approved Plastic Gixy renderer and Pulse Heart
+        run: |
+          npx esbuild preview/gixys-mi-espacio-espejo/src/companions.jsx --bundle --minify --jsx=automatic --platform=browser --format=iife --target=es2020 --outdir=preview/gixys-mi-espacio-espejo --entry-names=companions --legal-comments=eof
+          test -s preview/gixys-mi-espacio-espejo/companions.js
+          test -s preview/gixys-mi-espacio-espejo/companions.css
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Validate the mirror: isolation, 7 widths, no overlaps, interactions
+        run: node preview/gixys-mi-espacio-espejo/check.mjs
+      - name: Commit only tested preview files
+        if: success()
+        shell: bash
+        run: |
+          git add preview/gixys-mi-espacio-espejo/index.html preview/gixys-mi-espacio-espejo/companions.js preview/gixys-mi-espacio-espejo/companions.css
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build(beta): espejo visual de Mi Espacio con QA PASS [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
