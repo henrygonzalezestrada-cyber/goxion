@@ -30,7 +30,7 @@
       <article class="glass scene" data-scene="mission" aria-labelledby="mission-title">
         <div class="scene-top"><span class="tag">MISIONES</span><span class="scene-kicker">01 / COMPLETAR</span></div>
         <div class="scene-main"><div class="scene-info"><h2 id="mission-title">Un paso más cerca</h2><p>Tu recompensa está casi lista.</p></div>
-          <div class="gixy-slot"><canvas class="gixy" data-gixy="hexagon" data-color="#7861fa" width="240" height="240" role="img" aria-label="Gixy Hex, acompañante de misiones" tabindex="0"></canvas><span class="gixy-name">Gixy Hex</span></div>
+          <div class="gixy-slot"><canvas class="gixy" data-gixy="hexagon" data-color="#7861fa" width="240" height="240" role="button" aria-label="Tocar a Gixy Hex, acompañante de misiones" tabindex="0"></canvas><span class="gixy-name">Gixy Hex</span></div>
         </div>
         <div class="mission-top"><span>Tu progreso</span><strong id="mission-count">2 de 3</strong></div>
         <div class="progress" role="progressbar" aria-label="Progreso de prueba de misiones" aria-valuemin="0" aria-valuemax="3" aria-valuenow="2" id="mission-progress"><span id="mission-fill" style="width:66.666%"></span></div>
@@ -42,7 +42,7 @@
       <article class="glass scene" data-scene="loyalty" aria-labelledby="loyalty-title">
         <div class="scene-top"><span class="tag">LEALTAD</span><span class="scene-kicker">02 / AVANZAR</span></div>
         <div class="scene-main"><div class="scene-info"><h2 id="loyalty-title">Tu constancia cuenta</h2><p>Un avance que merece sentirse.</p></div>
-          <div class="gixy-slot"><canvas class="gixy" data-gixy="circle" data-color="#7c66f7" width="240" height="240" role="img" aria-label="Gixy Circle, acompañante de lealtad" tabindex="0"></canvas><span class="gixy-name">Gixy Circle</span></div>
+          <div class="gixy-slot"><canvas class="gixy" data-gixy="circle" data-color="#7c66f7" width="240" height="240" role="button" aria-label="Tocar a Gixy Circle, acompañante de lealtad" tabindex="0"></canvas><span class="gixy-name">Gixy Circle</span></div>
         </div>
         <div class="loyalty-line"><span class="heart-wrap" id="loyalty-heart" aria-hidden="true"><svg viewBox="0 0 36 36"><path d="M18 30S4.5 22.5 4.5 13.5C4.5 6.7 13.2 4.5 18 11c4.8-6.5 13.5-4.3 13.5 2.5C31.5 22.5 18 30 18 30Z"/></svg></span><span><strong id="loyalty-count">3/4 pagos puntuales</strong><small id="loyalty-state">A un pago del nivel 1</small></span></div>
         <div class="progress" role="progressbar" aria-label="Progreso de prueba de lealtad" aria-valuemin="0" aria-valuemax="4" aria-valuenow="3" id="loyalty-progress"><span id="loyalty-fill" style="width:75%"></span></div>
@@ -53,7 +53,7 @@
       <article class="glass scene" data-scene="notification" aria-labelledby="notification-title">
         <div class="scene-top"><span class="tag">NOTIFICACIONES</span><span class="scene-kicker">03 / REACCIONAR</span></div>
         <div class="scene-main"><div class="scene-info"><h2 id="notification-title">Avisos con intención</h2><p>Movimiento solo cuando sucede algo.</p></div>
-          <div class="gixy-slot"><canvas class="gixy" data-gixy="square" data-color="#42bfe8" width="240" height="240" role="img" aria-label="Gixy Square, acompañante de avisos" tabindex="0"></canvas><span class="gixy-name">Gixy Square</span></div>
+          <div class="gixy-slot"><canvas class="gixy" data-gixy="square" data-color="#42bfe8" width="240" height="240" role="button" aria-label="Tocar a Gixy Square, acompañante de avisos" tabindex="0"></canvas><span class="gixy-name">Gixy Square</span></div>
         </div>
         <div class="notification-display"><button type="button" id="bell-btn" class="bell" aria-label="Mostrar aviso de prueba" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 9h18c0-1-3-2-3-9ZM10 21h4"/></svg><i id="bell-indicator"></i></button><div><strong id="notification-state">Todo al día</strong><p id="notification-subtitle">Prueba un aviso nuevo y su lectura.</p></div></div>
         <div id="notification-toast" class="notification-toast" role="status" aria-live="polite" hidden><span class="toast-dot"></span><span>Tu recompensa tiene novedades.</span><button type="button" id="toast-dismiss" aria-label="Descartar aviso de prueba">×</button></div>
@@ -65,9 +65,9 @@
     <section class="glass lab" aria-labelledby="lab-title">
       <div class="lab-heading"><div><p class="eyebrow">FASE 1 · PERSONALIDAD</p><h2 id="lab-title">Conoce a los Gixys</h2><p>Tres formas de una misma familia. Toca un Gixy para verlo celebrar, o cambia su estado.</p></div><span class="lab-label">PRUEBA INTERACTIVA</span></div>
       <div class="roster">
-        <div class="roster-gixy"><canvas class="gixy gixy-large" data-gixy="hexagon" data-color="#7861fa" width="280" height="280" role="img" aria-label="Gixy Hex interactivo" tabindex="0"></canvas><strong>Hex</strong><small>Misiones</small></div>
-        <div class="roster-gixy"><canvas class="gixy gixy-large" data-gixy="square" data-color="#42bfe8" width="280" height="280" role="img" aria-label="Gixy Square interactivo" tabindex="0"></canvas><strong>Square</strong><small>Avisos</small></div>
-        <div class="roster-gixy"><canvas class="gixy gixy-large" data-gixy="circle" data-color="#7c66f7" width="280" height="280" role="img" aria-label="Gixy Circle interactivo" tabindex="0"></canvas><strong>Circle</strong><small>Lealtad</small></div>
+        <div class="roster-gixy"><canvas class="gixy gixy-large" data-gixy="hexagon" data-color="#7861fa" width="280" height="280" role="button" aria-label="Tocar a Gixy Hex interactivo" tabindex="0"></canvas><strong>Hex</strong><small>Misiones</small></div>
+        <div class="roster-gixy"><canvas class="gixy gixy-large" data-gixy="square" data-color="#42bfe8" width="280" height="280" role="button" aria-label="Tocar a Gixy Square interactivo" tabindex="0"></canvas><strong>Square</strong><small>Avisos</small></div>
+        <div class="roster-gixy"><canvas class="gixy gixy-large" data-gixy="circle" data-color="#7c66f7" width="280" height="280" role="button" aria-label="Tocar a Gixy Circle interactivo" tabindex="0"></canvas><strong>Circle</strong><small>Lealtad</small></div>
       </div>
       <div class="control-row" role="group" aria-label="Estado de los Gixys"><button class="state-btn is-selected" data-state="idle" type="button" aria-pressed="true">Reposo</button><button class="state-btn" data-state="working" type="button" aria-pressed="false">Activo</button><button class="state-btn" data-state="sleeping" type="button" aria-pressed="false">Descanso</button></div>
       <p class="lab-note">Estilo preliminar: luces y formas GOXION, sin copiar el motor de Goxy. Los Gixys no usan IA ni acceden a información privada.</p>
