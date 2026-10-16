@@ -9,7 +9,7 @@ const settings={
   circle:{name:'Circle',role:'Lealtad',color:'#9c6aff'}
 };
 
-function Gixy({kind,material,state='default',size=104,seed}){
+function Gixy({kind,material,state='default',size=92,seed}){
   const conf=settings[kind];
   return <div className="gixy-float" data-avatar={kind}>
     <BotAvatar type={kind} face="eyes" state={state} size={size} color={conf.color}
