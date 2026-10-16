@@ -1059,7 +1059,7 @@
     input.setAttribute('aria-label','Fecha prevista para realizar tu pago');
     input.min=first;input.max=max;input.value=payment.addDays(first,1);
     const updateDateLabel=()=>{
-      const dateValue=/^\\d{4}-\\d{2}-\\d{2}$/.test(input.value)?input.value:null;
+      const dateValue=/^\d{4}-\d{2}-\d{2}$/.test(input.value)?input.value:null;
       if(!dateValue){visualDate.textContent='Seleccionar fecha';return;}
       const [year,month,day]=dateValue.split('-').map(Number);
       visualDate.textContent=new Intl.DateTimeFormat('es-MX',{
