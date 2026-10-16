@@ -15,7 +15,7 @@ async function testBrowser(engine,name){
    page.on("request",req=>{if(/supabase|discord|wa\.me|groq/i.test(req.url()))unsafe.push(req.url());});
    await page.route("**/fonts.googleapis.com/**",r=>r.abort());
    await page.route("**/fonts.gstatic.com/**",r=>r.abort());
-   await page.goto(base+"/preview/gixys-micro-v1/",{waitUntil:"domcontentloaded",timeout:20000});
+   await page.goto(base+"/preview/gixys-micro-v1/index.html",{waitUntil:"domcontentloaded",timeout:20000});
    await page.waitForFunction(()=>!!window.GOXION_GIXY_LAB);
    assert.equal(await page.locator("canvas[data-gixy]").count(),6,`${name} ${width}: Gixys incompletos`);
    const metrics=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,inner:innerWidth,alpha:[...document.querySelectorAll("canvas[data-gixy]")].map(c=>c.getContext("2d").getImageData(120,120,1,1).data[3])}));
@@ -53,7 +53,7 @@ async function testBrowser(engine,name){
   const reduced=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
   await reduced.route("**/fonts.googleapis.com/**",r=>r.abort());
   await reduced.route("**/fonts.gstatic.com/**",r=>r.abort());
-  await reduced.goto(base+"/preview/gixys-micro-v1/");
+  await reduced.goto(base+"/preview/gixys-micro-v1/index.html");
   assert.equal(await reduced.evaluate(()=>matchMedia("(prefers-reduced-motion: reduce)").matches),true);
   await reduced.locator("#mission-btn").click();
   assert.equal(await reduced.locator("#mission-count").innerText(),"3 de 3");
