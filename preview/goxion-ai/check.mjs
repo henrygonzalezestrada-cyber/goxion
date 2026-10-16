@@ -608,7 +608,7 @@ assert.ok(calendarCss.includes('grid-template-columns:minmax(0,1.6fr) minmax(0,1
 assert.ok(calendarCss.includes('grid-column:1 / -1') &&
  calendarCss.includes('grid-column:1;') && calendarCss.includes('grid-column:2;'),
  'Pregunta primera fila y acciones distribuidas a izquierda y derecha');
-assert.equal((calendarCss.match(/#view-soporte \\.gxai-date-panel\\{/g)||[]).length,2,
+assert.equal(calendarCss.split('#view-soporte .gxai-date-panel{').length-1,2,
  'Solo definición base más ajuste compacto a 360px; sin reglas de F14/F15 en conflicto');
 assert.ok(calendarCss.includes('height:46px')&&
  calendarCss.includes('white-space:nowrap'),'Alturas alineadas y CTA en una línea');
