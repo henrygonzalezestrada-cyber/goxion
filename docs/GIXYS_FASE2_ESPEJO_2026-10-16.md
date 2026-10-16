@@ -34,3 +34,18 @@ Ruta: `preview/gixys-mi-espacio-espejo/`.
 4. No instalar un segundo sistema de navegación, acciones de cobro o asistentes inteligentes.
 5. Evitar overlays persistentes encima de importes, progreso, cabecera, X o controles.
 6. La calidad y fluidez de la biblioteca es criterio de aprobación, no solamente pasar test técnicos.
+
+
+## Observaciones del usuario tras probar video iPhone (16/oct/2026) — próximas fases
+
+**Importante: no se solicita modificar esta beta espejo por estas observaciones.** La prueba confirma que el motor Plastic y las apariciones contextuales se ven bien; el objetivo siguiente no es agregar más adornos, sino utilidad.
+
+1. **Corazón de lealtad:** PulseHeart está desalineado respecto a «Nivel de Lealtad» en el espejo actual. Corregir la retícula, centrado horizontal/vertical, medidas y respiración en la **integración real**, después de revisar el encabezado propietario y su comportamiento responsive. No imponer estilos ad hoc en la beta.
+2. **Hex / Misiones:** no debe aparecer por abrir el panel de misiones. Debe reaccionar **después de la confirmación de una misión completada** (o después de completar el conjunto), y mostrar un mensaje acorde al progreso actualizado. Ejemplo tras completar una tarea cuando restan dos: «¡Solo te faltan dos misiones para conseguir tu recompensa!». Una aparición breve; no mascota permanente.
+3. **Propósito funcional de los Gixys:** pequeños acompañantes especializados de Goxy. Deben **orientar y motivar a través de mensajes contextuales breves** (globos de diálogo ligeros junto al avatar), en lugar de aparecer por animar. Goxy mantiene las conversaciones, soporte experto e IA; los Gixys no crean un segundo chat, no tienen boca y no reproducen voz automáticamente.
+4. **Áreas:** Hex → hitos de misiones, tareas pendientes, recompensa confirmada; Circle → avance real de lealtad, pérdida/conservación verificada de beneficio; Square → novedades o alertas reales. Animación original aprobada + mensaje puntual, se ocultan tras una lectura razonable o cierre, no bloquean X, acciones, importes, indicadores ni scroll. Evitar repetición intrusiva de lo mismo en la misma sesión y respetar motion reducido.
+5. **Mensajes financieros/promocionales veraces:** los Gixys nunca calculan su propia fecha, monto, % o aplicación de cupones. Deben consultar el estado oficial seguro y las condiciones reales antes de indicar «se aplicará en este período», «se mantiene siempre», etc. Si no hay certeza, decir «Consulta cómo se aplicará tu cupón» o indicar el estado conocido. No inventar descuentos ni afirmar automatismos inexistentes.
+6. **Ubicación:** no envolver ni al avatar ni a la campana en un recuadro nuevo; solución flotante y por evento con globos de diálogo discretos sin entorpecer la jerarquía existente.
+7. **Paso siguiente propuesto:** diseñar/probar en beta espejo una **capa de mensajes y disparadores deterministas** con escenarios sintéticos (hito de misión, beneficio de lealtad confirmado, notificación). A continuación validar en iPhone y solamente entonces enlazar eventos reales de los controladores existentes en una rama de integración, sin modificar cálculos ni persistencia.
+
+El video de prueba del usuario muestra el corazón en conflicto con el texto «Nivel de Lealtad», y a Hex presente antes de completar la misión: ambas observaciones se consideran deuda explícita de UX, no aceptación tácita de esa ubicación.
