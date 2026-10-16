@@ -1,0 +1,62 @@
+name: GOXION · Gixys Original v3 · Quality Gate
+on:
+  push:
+    branches:
+      - beta/gixys-render-original-reactbits-20261016
+    paths:
+      - 'preview/gixys-original-v3/src/**'
+      - 'preview/gixys-original-v3/index.html'
+      - 'preview/gixys-original-v3/styles.css'
+      - 'preview/gixys-original-v3/check.mjs'
+      - '.github/workflows/goxion-gixys-original-v3.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  original-renderer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install source renderer and actual component dependencies
+        run: npm install --no-save --no-package-lock react@18.3.1 react-dom@18.3.1 bot-avatars@0.2.2 motion@12 @hugeicons/core-free-icons @hugeicons/react esbuild@0.25.10 playwright
+      - name: Retrieve pinned original React Bits components (source, not rewritten)
+        shell: bash
+        run: |
+          set -euo pipefail
+          root="preview/gixys-original-v3/src/vendor"
+          mkdir -p "$root"
+          sha="d9085a5d6cb62a1c7512d8fa05a4f966736b575c"
+          for name in SpringCheck PulseHeart BellToggle; do
+            for ext in jsx css; do
+              curl -fsSL --retry 3 --retry-delay 2 "https://raw.githubusercontent.com/DavidHDev/react-bits/${sha}/src/content/Micro/${name}/${name}.${ext}" -o "$root/${name}.${ext}"
+            done
+          done
+          test -s "$root/SpringCheck.jsx"
+          test -s "$root/PulseHeart.jsx"
+          test -s "$root/BellToggle.jsx"
+      - name: Bundle original sources into a single isolated preview
+        run: |
+          npx esbuild preview/gixys-original-v3/src/app.jsx --bundle --minify --jsx=automatic --platform=browser --format=esm --target=es2020 --outdir=preview/gixys-original-v3 --entry-names=app --legal-comments=end-of-file
+          test -s preview/gixys-original-v3/app.js
+          test -s preview/gixys-original-v3/app.css
+      - name: Install browser engines
+        run: npx playwright install --with-deps chromium webkit
+      - name: Quality gate · same real engine + same real micro components
+        run: node preview/gixys-original-v3/check.mjs
+      - name: Commit only tested static bundle back to isolated branch
+        if: success()
+        shell: bash
+        run: |
+          git add preview/gixys-original-v3/app.js preview/gixys-original-v3/app.css
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build(beta): renderer original y React Bits comprobados [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
