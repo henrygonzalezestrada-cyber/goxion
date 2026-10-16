@@ -241,3 +241,11 @@ El usuario envió captura de F15 y pidió **no entregar código para aplicación
 - Rama `beta/goxy-f16-date-row-framing-20261015`: CSS de calendario consolidado y DOM del panel reorganizado; grid asimétrico 1.6:1, alturas iguales 46 px, separación vertical de 9 px, márgenes compactos, título independiente accesible por `htmlFor`, selector nativo iOS intacto, ajuste móvil ≤360 px. Solo archivos de beta, pruebas y documentación.
 - Verificación: 212 aserciones simuladas PASS del harness de Goxy. Inspección adicional de geometría/render de referencia en Chromium 320/355/375/390/430 px con fila compartida, sin desbordamiento horizontal ni solape del texto. No se afirma prueba real en Safari/iPhone hasta recibir validación del usuario.
 - No tocar lógica financiera, UI oficiales o fuentes de pagos. Evitar superponer nuevos bloques CSS para el mismo selector cuando se corrija un encuadre; sustituir reglas contradictorias y validar a varios anchos antes de entregar.
+
+---
+
+## 15. F17 · Arreglar causa raíz de date input Safari sin más prueba-y-error (15/oct/2026)
+**Captura F16:** aunque grid declaraba dos columnas 1.6:1 y pasaban los tests DOM, WebKit expandía el campo de fecha nativo y montaba su borde sobre el CTA, con texto verticalmente desalineado. Esta falla explica por qué cambios de porcentajes/espaciados F14–F16 no resolvieron el problema. El usuario pidió frenar el retrabajo estético.
+
+**Ruta correcta F17:** campo nativo `input[type=date]` absoluto dentro de `gxai-date-slot` limitado por su grid y overflow hidden, con rótulo de fecha visible en `span` centrado mediante CSS grid/place-items. El picker sigue siendo nativo y es el propio input quien recibe interacción, sin `showPicker()` programático ni simular fechas. `input/change` actualizan rótulo; `label/aria-label` mantiene accesibilidad. Mantener título arriba y CTA a la derecha, controles de 46px y margen horizontal explícito, con caché F17.
+**QA:** 219 aserciones simuladas PASS sobre fuentes de rama, + verificación geométrica real en Chromium a 320/355/375/390/430px con separación 7–10px, altura igual, centraje de rótulo y ausencia de scroll horizontal. No afirmar prueba real Safari iPhone hasta verificación del usuario. No cambiar cálculos SQL/Edge, cobros, Admin, Ayuda ni Index.
