@@ -95,26 +95,29 @@ function GixyMessage({kind,serial,onClose}){
   useLayoutEffect(()=>{
     let raf=0;
     const locate=()=>{
-      cancelAnimationFrame(raf);
-      raf=requestAnimationFrame(()=>{
-        if(!stage.current)return;
-        const b=stage.current.getBoundingClientRect();
-        const p=choosePosition(kind,stage.current,seq,b);
-        setPos(p);
-        setReady(Boolean(p));
-      });
+      if(!stage.current)return;
+      const b=stage.current.getBoundingClientRect();
+      const p=choosePosition(kind,stage.current,seq,b);
+      setPos(p);
+      setReady(Boolean(p));
     };
+    const schedule=()=>{
+      cancelAnimationFrame(raf);
+      raf=requestAnimationFrame(locate);
+    };
+    // Initial placement must happen synchronously before paint; background
+    // WebKit/Chromium can throttle requestAnimationFrame before a page is visible.
     locate();
-    window.addEventListener('resize',locate,{passive:true});
-    window.addEventListener('scroll',locate,{passive:true,capture:true});
-    window.visualViewport?.addEventListener('resize',locate,{passive:true});
-    window.visualViewport?.addEventListener('scroll',locate,{passive:true});
+    window.addEventListener('resize',schedule,{passive:true});
+    window.addEventListener('scroll',schedule,{passive:true,capture:true});
+    window.visualViewport?.addEventListener('resize',schedule,{passive:true});
+    window.visualViewport?.addEventListener('scroll',schedule,{passive:true});
     return ()=>{
       cancelAnimationFrame(raf);
-      window.removeEventListener('resize',locate);
-      window.removeEventListener('scroll',locate,true);
-      window.visualViewport?.removeEventListener('resize',locate);
-      window.visualViewport?.removeEventListener('scroll',locate);
+      window.removeEventListener('resize',schedule);
+      window.removeEventListener('scroll',schedule,true);
+      window.visualViewport?.removeEventListener('resize',schedule);
+      window.visualViewport?.removeEventListener('scroll',schedule);
     };
   },[kind,serial,seq]);
   return <div ref={stage} className={'gx-gixy-message gx-gixy-message--'+kind+(ready?' is-visible':'')}
