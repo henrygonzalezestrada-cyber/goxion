@@ -9,7 +9,7 @@
    const cards=ctx.destinations?.(platform)||[];
    if(!cards.length)return {reply:'No encuentro '+platform+' en los servicios activos de Mi Espacio. Confirma la contratación antes de volver a pagar.',options:support};
    const good=cards.filter(c=>what==='pin'?c.hasProfile:what==='update'?c.hasPendingPassword:c.hasLogin);
-   if(!good.length)return {reply:what==='update'?'No hay una contraseña nueva pendiente de consultar para '+platform+'. Si no logras entrar, un asesor puede revisar el acceso.':'No encuentro ese dato disponible en la tarjeta de '+platform+'. Puedes revisar Mi Espacio o contactar a soporte.',options:support};
+   if(!good.length)return {reply:what==='update'?'Por seguridad no puedo mostrar la contraseña de '+platform+' en este chat. Las contraseñas nuevas solo se muestran una vez desde el aviso de Mi Espacio; ahora no aparece ninguna actualización pendiente. Si ya la consultaste o necesitas recuperar el acceso, un asesor de GOXION te ayudará a gestionarlo.':'No encuentro ese dato disponible en la tarjeta de '+platform+'. Puedes revisar Mi Espacio o contactar a soporte.',options:what==='update'?[{kind:'human',label:'Solicitar ayuda para el acceso'},{kind:'account',label:'Revisar Mi Espacio'}]:support};
    const label=what==='update'?'Abrir aviso de contraseña nueva':what==='pin'?'Consultar perfil y PIN':'Consultar correo de acceso';
    return {reply:what==='update'
      ?'Hay una contraseña actualizada pendiente. Se consulta exclusivamente en Mi Espacio, con su confirmación y visualización única. No aparecerá aquí.'
@@ -21,9 +21,9 @@
    const n=norm(input),found=k.resolvePlatform(input)||platform;
    if(/\bbixby\b/.test(n) && !platform)return {reply:'¿Te refieres a ViX, la plataforma de streaming, o a Bixby del teléfono?',options:[{kind:'confirm-vix',label:'ViX'},{kind:'platforms',label:'Otra plataforma'}]};
    const pin=/\b(pin|perfil|nombre de usuario)\b/.test(n)&&/\b(olvide|olvido|consultar|mostrar|donde|cual|recuperar|no recuerdo)\b/.test(n);
-   const pw=/\b(contrasena|password|clave de acceso)\b/.test(n)&&/\b(nueva|cambio|cambiaron|actualizada|olvide|consultar|recuperar|no recuerdo)\b/.test(n);
+   const pw=/\b(contrasena|password|clave de acceso|clave de inicio)\b/.test(n) && !/\b(premium|contratar|suscripcion|comprar|precio|costo)\b/.test(n);
    if(pin||pw){
-     if(!found)return {reply:'¿De qué plataforma necesitas consultar esos datos?',stage:{type:'pick',what:pin?'pin':'update'},options:[{kind:'platforms',label:'Elegir plataforma'}]};
+     if(!found)return {reply:pin?'¿De qué plataforma necesitas consultar tu perfil o PIN?':'Puedo orientarte con el acceso, pero por seguridad nunca muestro contraseñas aquí. ¿De qué plataforma necesitas ayuda?',stage:{type:'pick',what:pin?'pin':'update'},options:[{kind:'platforms',label:'Elegir plataforma'}]};
      return {...routes(found,pin?'pin':'update'),platform:found,stage:null};
    }
    if(stage?.type==='premium'&&found){

@@ -222,3 +222,14 @@
 - Bloqueo restaurable del scroll de fondo en Safari mediante `body` fijo; modalidad teclado usa viewport visual del padre sin doble reducción; el scroll del chat permanece vertical.
 - Pruebas locales con **191 aserciones** en DOM simulado PASS: escenarios elegible/usada, fecha futurible, lealtad, bloqueo y restauración del scroll, regresiones F13 y WhatsApp F12. No hay aún confirmación física ni comparación con saldos reales.
 - **Próxima aceptación:** pruebas en Safari real con cliente de una fecha (pago 15/Oct) y B2 varias fechas: preguntas sobre prórroga, fecha futura (en mismo mes y cruzando), valor máximo de lealtad, teclado y desplazamiento. Cuando el usuario lo apruebe, marcar F14 cerrada. **No fusionar Soporte oficial sin aprobación explícita.**
+
+---
+
+## 13. GOXY F15 — tres capturas posteriores a F14 (15/oct/2026)
+Feedback real: el simulador B2 de mora explicó `$122.50` y `$24.50` pero no pudo informar el 20%; un selector de fecha estaba descuadrado (el botón se montaba sobre el calendario); y dos consultas gratuitas («si contrato Disney cuánto pagaría» / «cuál es la contraseña de ViX») consumieron ruta IA y mostraron pausa repetida. El usuario confirmó que todo lo demás de F14 se siente más fluido y está bien.
+
+La política publicada en `ayuda.html` en la sección Garantía Comercial contempla: mora 5% diario máx. 50%; baja/cancelación por 15 días de inactividad sin reporte con 20% administrativo sobre saldo adeudado. El Index actual usa condición `diasAtraso>15 || suspendido` y la etiqueta «reactivación». Sin embargo el RPC `goxion_b2_cotizar_ciclo` todavía NO expone la reactivación en B2: **no prometer una cifra ni sumarla a la deuda ficticiamente**. F15 muestra explicación condicional clara y acción de abrir los términos; para dar importe exacto se necesitará fuente financiera compartida con importe de reactivación por cargo.
+
+Se ajustó F15 en beta: el detector reconoce preguntas amplias de contraseña y redirige a notificación de vista única o asesor según elegibilidad de datos; pregunta de precio abre Catálogo sin Groq; date picker y CTA ahora usan grid vertical para evitar el desborde con fecha nativa iOS; strings F15 evitan caché de Safari. QA de 200 aserciones de DOM simulado pasó. Siguen intactos los bloques oficiales, controles de privacidad y cuotas del servidor.
+
+**Pendiente:** confirmar visualmente en Safari real y la ausencia de pausas en las consultas locales; no integrar soporte oficial sin aceptación. Todo lo aprobado en F14 se conserva. No modificar el motor B2 para «resolver» un texto de Goxy: preparar primero la integración contable si se exige la cantidad exacta.
