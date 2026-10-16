@@ -42,7 +42,7 @@ jobs:
           test -s preview/gixys-mi-espacio-espejo/companions.css
       - name: Install browser engines
         run: npx playwright install --with-deps chromium webkit
-      - name: Validate the mirror: isolation, 7 widths, no overlaps, interactions
+      - name: 'Validate the mirror: isolation, 7 widths, no overlaps, interactions'
         run: node preview/gixys-mi-espacio-espejo/check.mjs
       - name: Commit only tested preview files
         if: success()
