@@ -1,0 +1,288 @@
+/* GOXION · Encabezado fijo universal (oct 2026)
+ * ADN visual: botón de Accede a tu espacio; texto+X inmóviles,
+ * solo el cuerpo del diálogo puede desplazarse bajo su encabezado.
+ * Usar este mismo archivo en Index y Ayuda, NO duplicar reglas por módulo.
+ */
+:root{
+  --gx-modal-close-size:34px;
+  --gx-modal-close-icon:16px;
+  --gx-modal-close-stroke:2.5px;
+  --gx-modal-close-color:#00f2fe;
+  --gx-modal-header-z:7;
+}
+/* Exactamente la misma forma, trazo, color y superficie táctil. */
+.gx-auth-inline-close,
+#gx-cart-dialog .gx-cart-close,
+.gx-client-notif-close,
+#view-soporte .gxai-close,
+.gx-bank-close,
+.gx-payment-v2 #payment-modal .close-modal,
+.gx-release-close,
+.gx-standard-legacy-modal .close-btn{
+  box-sizing:border-box;
+  width:var(--gx-modal-close-size);
+  min-width:var(--gx-modal-close-size);
+  max-width:var(--gx-modal-close-size);
+  height:var(--gx-modal-close-size);
+  min-height:var(--gx-modal-close-size);
+  max-height:var(--gx-modal-close-size);
+  flex:0 0 var(--gx-modal-close-size);
+  border:0;
+  border-radius:50%;
+  padding:0;
+  display:grid;
+  place-items:center;
+  background:var(--gx-modal-close-color);
+  color:transparent;
+  font-size:0;
+  line-height:0;
+  cursor:pointer;
+  position:relative;
+  isolation:isolate;
+  z-index:calc(var(--gx-modal-header-z) + 2);
+  box-shadow:0 0 12px rgba(0,242,254,.13);
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .18s ease;
+}
+/* No depender de la fuente o glifo × de cada pantalla. */
+.gx-auth-inline-close svg,
+#gx-cart-dialog .gx-cart-close svg,
+.gx-client-notif-close svg{
+  display:none;
+}
+.gx-auth-inline-close::before,
+.gx-auth-inline-close::after,
+#gx-cart-dialog .gx-cart-close::before,
+#gx-cart-dialog .gx-cart-close::after,
+.gx-client-notif-close::before,
+.gx-client-notif-close::after,
+#view-soporte .gxai-close::before,
+#view-soporte .gxai-close::after,
+.gx-bank-close::before,
+.gx-bank-close::after,
+.gx-payment-v2 #payment-modal .close-modal::before,
+.gx-payment-v2 #payment-modal .close-modal::after,
+.gx-release-close::before,
+.gx-release-close::after,
+.gx-standard-legacy-modal .close-btn::before,
+.gx-standard-legacy-modal .close-btn::after{
+  content:"";
+  display:block;
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:var(--gx-modal-close-icon);
+  height:var(--gx-modal-close-stroke);
+  margin:0;
+  padding:0;
+  inset:auto;
+  border:0;
+  border-radius:5px;
+  background:#030305;
+  pointer-events:none;
+  transform-origin:center;
+  box-shadow:none;
+}
+.gx-auth-inline-close::before,
+#gx-cart-dialog .gx-cart-close::before,
+.gx-client-notif-close::before,
+#view-soporte .gxai-close::before,
+.gx-bank-close::before,
+.gx-payment-v2 #payment-modal .close-modal::before,
+.gx-release-close::before,
+.gx-standard-legacy-modal .close-btn::before{
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+.gx-auth-inline-close::after,
+#gx-cart-dialog .gx-cart-close::after,
+.gx-client-notif-close::after,
+#view-soporte .gxai-close::after,
+.gx-bank-close::after,
+.gx-payment-v2 #payment-modal .close-modal::after,
+.gx-release-close::after,
+.gx-standard-legacy-modal .close-btn::after{
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
+.gx-auth-inline-close:active,
+#gx-cart-dialog .gx-cart-close:active,
+.gx-client-notif-close:active,
+#view-soporte .gxai-close:active,
+.gx-bank-close:active,
+.gx-payment-v2 #payment-modal .close-modal:active,
+.gx-release-close:active,
+.gx-standard-legacy-modal .close-btn:active{
+  transform:scale(.93);
+}
+.gx-auth-inline-close:focus-visible,
+#gx-cart-dialog .gx-cart-close:focus-visible,
+.gx-client-notif-close:focus-visible,
+#view-soporte .gxai-close:focus-visible,
+.gx-bank-close:focus-visible,
+.gx-payment-v2 #payment-modal .close-modal:focus-visible,
+.gx-release-close:focus-visible,
+.gx-standard-legacy-modal .close-btn:focus-visible{
+  outline:2px solid #d0ffff;
+  outline-offset:3px;
+}
+/* Los encabezados están fuera de la región scroll; se pintan sobre la misma. */
+.gx-dialog-static-head,
+.gx-client-notif-head,
+#view-soporte .gxai-chat-head,
+.gx-release-head,
+.gx-dialog-legacy-head{
+  position:relative;
+  z-index:var(--gx-modal-header-z);
+  flex:0 0 auto;
+  isolation:isolate;
+}
+.gx-dialog-scroll,
+.gx-dialog-legacy-scroll{
+  min-height:0;
+  min-width:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+/* INDEX · encabezado de transferencia y carrusel totalmente independientes. */
+.gx-bank-sheet{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.gx-bank-static-head{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding:3px 0 13px;
+  background:linear-gradient(160deg,rgba(16,22,29,.93),rgba(10,12,21,.89));
+  border-radius:14px 14px 0 0;
+}
+.gx-bank-head-copy{flex:1;min-width:0}
+.gx-bank-static-head .gx-bank-close{
+  top:auto;
+  right:auto;
+  margin:0;
+  flex:none;
+  align-self:flex-start;
+}
+.gx-bank-static-head .gx-bank-kicker{padding-right:0}
+.gx-bank-static-head .gx-bank-heading{padding-right:0}
+.gx-bank-scroll{flex:1 1 auto;padding:5px 0 0}
+/* INDEX · encabezado de recibos, contenido y archivo por debajo. */
+.gx-payment-v2 #payment-modal .gx-payment-upload-sheet{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+.gx-payment-static-head{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  padding:0 0 14px;
+  background:linear-gradient(145deg,rgba(20,24,34,.87),rgba(13,15,25,.83));
+  border-radius:14px 14px 0 0;
+}
+.gx-payment-static-head .gx-payment-upload-head{
+  flex:1;
+  min-width:0;
+  padding-right:0;
+}
+.gx-payment-static-head .close-modal{
+  flex:none;
+  top:auto!important;
+  right:auto!important;
+  margin:0;
+}
+.gx-payment-scroll{flex:1 1 auto;padding:4px 1px 0}
+/* Ayuda · notificaciones: el encabezado y acciones quedan fuera de la lista. */
+.gx-client-notif-sheet{
+  display:flex;
+  flex-direction:column;
+}
+.gx-client-notif-sheet .gx-client-notif-handle{flex:none}
+.gx-client-notif-sheet .gx-client-notif-head{
+  flex:none;
+  background:linear-gradient(180deg,rgba(9,15,25,.94),rgba(9,14,24,.87));
+}
+.gx-client-notif-sheet .gx-client-notif-close{justify-self:end}
+.gx-client-notif-sheet .gx-client-notif-list{
+  min-height:0;
+  flex:1 1 auto;
+}
+/* GOXY · el título, estado y cerrar son un mismo encabezado inmóvil. */
+#view-soporte .gxai-chat-head{
+  flex:none;
+  background:linear-gradient(170deg,rgba(20,18,33,.98),rgba(14,13,26,.97));
+}
+#view-soporte .gxai-chat-scroll{
+  min-height:0;
+  overscroll-behavior:contain;
+}
+/* Inicio de sesión y activación: el título queda fijo al desplazar el formulario. */
+.gx-auth-inline-content{
+  overflow:hidden;
+}
+.gx-auth-inline-content .gx-auth-stage{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.gx-auth-inline-content .gx-auth-login-head{
+  position:sticky;
+  top:0;
+  z-index:5;
+  background:linear-gradient(180deg,rgba(7,9,15,.98),rgba(7,9,15,.96));
+}
+.gx-auth-inline-content > .gx-auth-inline-close{
+  position:absolute;
+  top:0;
+  right:0;
+  z-index:15;
+}
+/* Modal de novedades · encabezado y cierre siempre visibles. */
+.gx-release-sheet .gx-release-head{
+  flex:none;
+  background:linear-gradient(160deg,rgba(27,19,47,.99),rgba(13,14,28,.96));
+}
+.gx-release-sheet .gx-release-content{
+  min-height:0;
+  overscroll-behavior:contain;
+}
+/* Modales informativos de Ayuda: título+X permanecen juntos y fijos. */
+.modal .gx-standard-legacy-modal{
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  padding:0;
+}
+.gx-dialog-legacy-head{
+  display:flex;
+  gap:10px;
+  justify-content:space-between;
+  align-items:center;
+  min-height:66px;
+  padding:17px 20px 12px;
+  background:linear-gradient(155deg,rgba(22,17,39,.97),rgba(11,14,24,.96));
+  border-bottom:1px solid rgba(255,255,255,.075);
+}
+.gx-dialog-legacy-head .modal-title{
+  min-width:0;
+  margin:0;
+  padding:0;
+  border:0;
+  font-size:16px;
+  line-height:1.3;
+}
+.gx-dialog-legacy-head .close-btn{
+  flex:none;
+}
+.gx-dialog-legacy-scroll{
+  flex:1 1 auto;
+  padding:17px 20px 22px;
+}
+@media(max-width:360px){
+  .gx-dialog-legacy-head{padding-inline:14px}
+  .gx-dialog-legacy-scroll{padding-inline:14px}
+}
