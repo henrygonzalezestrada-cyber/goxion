@@ -85,3 +85,15 @@ body.gx-mirror-body .gx-mirror-expanded-companion{display:block!important}
 body.gx-mirror-body .gx-mirror-expanded-head{padding-right:78px;text-align:left}
 body.gx-mirror-body .gx-mirror-expanded-head .gx-gamif-shared-emoji{display:none}
 body.gx-mirror-body .gx-mirror-expanded-head strong{padding-top:11px}
+
+/* Safari/WebKit beta: badge interno de la cápsula existente conserva ancho
+   durante el morph. No se crea ningún contenedor alrededor de la campana. */
+body.gx-mirror-body #gx-client-notif-launch.gx-has-new #gx-client-notif-badge{
+  display:grid!important;
+  flex:0 0 22px!important;
+  min-width:22px!important;
+  width:22px!important;
+  max-width:34px!important;
+  opacity:1!important;
+  overflow:visible;
+}
