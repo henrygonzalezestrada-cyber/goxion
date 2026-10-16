@@ -296,8 +296,7 @@
   color:#f2f8ff;
   font:500 16px/1 Poppins,sans-serif;
   text-align:center;
-  -webkit-appearance:none;
-  appearance:none;
+  color-scheme:dark;
 }
 #view-soporte .gxai-date-panel > .gxai-choice{
   grid-column:2;
