@@ -239,7 +239,6 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
  },[full,reduced,glyphs.length]);
  useLayoutEffect(()=>{
   let raf=0;
-  if(kind==='loyalty')document.body.classList.add('gx-loyalty-speaking');
   const place=()=>{
    if(!scene.current)return;
    setLayout(selectPlace(kind,scene.current,serial,scene.current.getBoundingClientRect()));
@@ -256,7 +255,6 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
    window.removeEventListener('scroll',schedule,true);
    window.visualViewport?.removeEventListener('resize',schedule);
    window.visualViewport?.removeEventListener('scroll',schedule);
-   if(kind==='loyalty')document.body.classList.remove('gx-loyalty-speaking');
   };
  },[kind,serial]);
  useEffect(()=>()=>clearTimeout(reactionTimer.current),[]);
