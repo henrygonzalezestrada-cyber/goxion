@@ -100,7 +100,6 @@ async function exercise(engine,name){
     return m;
   }
   await page.locator('#gx-client-notif-launch').click();
-  console.log(name+' scene positions',JSON.stringify(await page.evaluate(()=>window.GOXION_GIXY_PLACEMENT_TRACE)));
   await assertMessage('notification',/novedad/i);
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'true');
   await page.waitForFunction(()=>{
