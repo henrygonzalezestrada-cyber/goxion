@@ -24,6 +24,7 @@ const protectedSelectors=[
  '#gamif-expanded-coupon .mission-item .gx-mission-text',
  '#gamif-expanded-coupon .mission-item .mission-checkbox',
  '#gamif-expanded-coupon .gx-mirror-mission-action',
+ '#gamif-expanded-coupon .btn-primary',
  '#gamif-expanded-coupon .gx-mirror-retry'
 ];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -38,7 +39,7 @@ const slots={
 const contexts={
  notification:['#gx-client-notif-launch','#goxion-main-nav','#dynamic-greeting-text'],
  loyalty:['#loyalty-msg','#dash-billing-card','.gx-mirror-loyalty-label'],
- mission:['#gamif-expanded-coupon .gx-mirror-expanded-head','#gx-mirror-complete-btn']
+ mission:['#gamif-expanded-coupon .gx-mirror-expanded-head','#gamif-expanded-coupon .gx-gamif-expanded-head','#gx-mirror-complete-btn','.gx-gamif-card-mission']
 };
 const isShown=el=>{
  const r=el.getBoundingClientRect(),style=getComputedStyle(el);
