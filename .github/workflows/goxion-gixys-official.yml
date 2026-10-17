@@ -45,6 +45,8 @@ jobs:
           npx esbuild assets/js/ayuda/21-gixys-official.src.jsx --bundle --minify --jsx=automatic --platform=browser --format=iife --target=es2020 --outfile=assets/js/ayuda/21-gixys-official.bundle.js --legal-comments=eof
           test -s assets/js/ayuda/21-gixys-official.bundle.js
           test -s assets/js/ayuda/21-gixys-official.bundle.css
+          mv assets/js/ayuda/21-gixys-official.bundle.css assets/css/gixys-pulseheart.css
+          test -s assets/css/gixys-pulseheart.css
       - name: Install Chromium and WebKit
         run: npx playwright install --with-deps chromium webkit
       - name: Verify no fake loyalty/discounts, no layout shift, and real event handling
@@ -58,7 +60,7 @@ jobs:
             echo "Newer change in branch; do not publish stale bundle."
             exit 0
           fi
-          git add assets/js/ayuda/21-gixys-official.bundle.js assets/js/ayuda/21-gixys-official.bundle.css
+          git add assets/js/ayuda/21-gixys-official.bundle.js assets/css/gixys-pulseheart.css
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
