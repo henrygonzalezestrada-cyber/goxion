@@ -779,3 +779,5 @@ body.gx-gixys-official .gx-gixys-official-loyalty-label #gx-mirror-heart .pulse-
 body.gx-gixys-official .gx-gixys-official-loyalty-label #gx-mirror-heart .pulse-heart__heart{width:28px!important;height:28px!important;flex:0 0 28px!important}
 /* The approved layer remains non-layout-affecting; the live payment card never expands. */
 html[data-gx-gixys] #gx-gixys-message-root{position:fixed!important;inset:0!important;width:0!important;height:0!important;pointer-events:none!important;z-index:10010!important}
+
+/* Loaded after gixys-pulseheart.css so the approved 44px touch target wins. */
