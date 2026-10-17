@@ -97,7 +97,7 @@ async function exercise(engine,name){
   await page.waitForFunction(()=>{
     const badge=document.getElementById('gx-client-notif-badge');
     return badge?.textContent==='1'&&badge.getBoundingClientRect().width>=18;
-  },{timeout:2500}); // wait for the real WebKit morph, not a fixed clock
+  },null,{timeout:2500}); // wait for the real WebKit morph, not a fixed clock
   assert.equal(await page.locator('#gx-client-notif-badge').textContent(),'1');
   const badgeSize=await page.locator('#gx-client-notif-badge').evaluate(el=>el.getBoundingClientRect().width);
   assert(badgeSize>=18,name+': contador no visible tras el morph de la campana');
