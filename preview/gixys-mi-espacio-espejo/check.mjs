@@ -51,6 +51,8 @@ async function exercise(engine,name){
   assert.equal(await page.locator('.gx-mirror-note').count(),1);
   // Guard against every layout shift: fixed-position Gixys may float over
   // empty space, but may NEVER change the location of a real dashboard card.
+  await page.evaluate(()=>document.fonts.ready);
+  await page.waitForTimeout(850); // stabilize official dashboard before diffing event geometry
   const baseline=await page.evaluate(()=>{
     const selectors=['#dash-billing-card','#loyalty-msg',
       '#dash-billing-card .gx-account-capsule','#gx-mirror-mission-card'];
