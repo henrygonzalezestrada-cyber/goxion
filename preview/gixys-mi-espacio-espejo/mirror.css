@@ -433,3 +433,86 @@ body.gx-mirror-body.gx-loyalty-speaking #loyalty-msg{
   transition:none!important;animation:none!important;
  }
 }
+
+
+/* V7: fixed word wrapping before writing, no reflow while each character appears.
+   Glass expands at word boundaries with discreet width/height interpolation. */
+.gx-gixy-message__bubble{
+  padding:0!important;
+  min-height:31px!important;max-height:74px!important;
+  max-width:136px!important;
+  width:var(--gx-bubble-width,36px)!important;
+  height:var(--gx-bubble-height,32px)!important;
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  transition:width .18s cubic-bezier(.27,.82,.38,1),
+    height .21s cubic-bezier(.27,.82,.38,1)!important;
+  font:600 10.5px/1.36 Poppins,system-ui,-apple-system,sans-serif!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__written{
+  display:block!important;
+  white-space:pre-wrap!important;
+  word-break:normal!important;overflow-wrap:normal!important;
+  hyphens:none!important;
+  flex:1 1 auto!important;
+  box-sizing:border-box!important;
+  padding:7px 9px!important;
+  margin:0!important;
+  animation:none!important;
+  font:inherit!important;
+  line-height:1.36!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__sr{
+  position:absolute!important;width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;white-space:nowrap!important;
+}
+.gx-gixy-message__avatar:disabled{opacity:1!important;cursor:default!important}
+.gx-gixy-message__bubble::after{pointer-events:none}
+/* Three-part secret: appears after the third DIFFERENT companion, never on
+   the first tap. This is a self-contained fictitious preview only. */
+.gx-gixys-secret{
+  position:fixed;z-index:10020;
+  left:50%;bottom:calc(22px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);box-sizing:border-box;
+  width:min(315px,calc(100vw - 36px));
+  padding:17px 18px 15px;
+  border:1px solid rgba(134,194,240,.21);
+  border-radius:19px;
+  background:linear-gradient(140deg,rgba(38,28,66,.97),rgba(12,27,48,.97));
+  color:#eff6ff;
+  box-shadow:0 18px 55px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.09);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  animation:gx-secret-reveal .45s cubic-bezier(.2,1,.35,1) both;
+}
+.gx-gixys-secret__top{
+  color:#a9b9da;font-size:10px;letter-spacing:.085em;
+  font-weight:700;display:flex;align-items:center;justify-content:space-between;
+}
+.gx-gixys-secret__top span{color:#7ce9e7;letter-spacing:0}
+.gx-gixys-secret__award{
+  margin-top:7px;color:#fff;
+  font-size:29px;font-weight:800;letter-spacing:-.045em;line-height:1.25;
+}
+.gx-gixys-secret__award small{
+  display:inline-block;color:#8fe9ec;font-size:10px;
+  vertical-align:middle;font-weight:600;letter-spacing:0;
+}
+.gx-gixys-secret p{
+  color:#c1cbe0;font:500 11px/1.5 Poppins,system-ui,sans-serif;
+  margin:9px 0 10px;
+}
+.gx-gixys-secret button{
+  font:700 11px Poppins,system-ui,sans-serif;
+  display:block;width:100%;min-height:38px;border-radius:11px;
+  border:1px solid rgba(100,210,222,.25);
+  background:rgba(1,192,207,.13);color:#c4fcfc;
+}
+.gx-gixys-progress[hidden]{display:none!important}
+@keyframes gx-secret-reveal{
+  from{opacity:0;transform:translate3d(-50%,13px,0) scale(.975)}
+  to{opacity:1;transform:translate3d(-50%,0,0) scale(1)}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixy-message__bubble{transition:none!important}
+ .gx-gixys-secret{animation:none!important}
+}
