@@ -1,8 +1,8 @@
-name: GOXION · Gixys · Escena Premium
+name: GOXION · Gixys · Movimiento Refinado
 on:
   push:
     branches:
-      - beta/gixys-escena-premium-interactiva-20261016
+      - beta/gixys-fino-lealtad-frases-20261016
     paths:
       - 'preview/gixys-mi-espacio-espejo/**'
       - '.github/workflows/goxion-gixys-mi-espacio-espejo.yml'
