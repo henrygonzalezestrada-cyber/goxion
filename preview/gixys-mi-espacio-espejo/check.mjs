@@ -92,19 +92,14 @@ async function exercise(engine,name){
     return m;
   }
   await page.locator('#gx-client-notif-launch').click();
-  console.log(name+' placement diagnostics',JSON.stringify(await page.evaluate(()=>window.GX_MIRROR_PLACEMENT_DEBUG)));
   await assertMessage('notification',/novedad/i);
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'true');
-  await page.waitForTimeout(450); // la cápsula real hace morph antes de revelar su contador en Safari
+  await page.waitForFunction(()=>{
+    const badge=document.getElementById('gx-client-notif-badge');
+    return badge?.textContent==='1'&&badge.getBoundingClientRect().width>=18;
+  },{timeout:2500}); // wait for the real WebKit morph, not a fixed clock
   assert.equal(await page.locator('#gx-client-notif-badge').textContent(),'1');
   const badgeSize=await page.locator('#gx-client-notif-badge').evaluate(el=>el.getBoundingClientRect().width);
-  console.log(name+' badge diagnostics',JSON.stringify(await page.locator('#gx-client-notif-badge').evaluate(el=>{
-    const b=el.getBoundingClientRect(),c=getComputedStyle(el),p=el.parentElement?.getBoundingClientRect();
-    return {className:el.parentElement?.className,rect:b.toJSON(),parent:p?.toJSON(),
-      display:c.display,visibility:c.visibility,opacity:c.opacity,width:c.width,
-      minWidth:c.minWidth,maxWidth:c.maxWidth,flex:c.flex,position:c.position,
-      text:el.textContent};
-  })));
   assert(badgeSize>=18,name+': contador no visible tras el morph de la campana');
   await page.waitForTimeout(100);
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('gx-mirror-notif-active')),true);
@@ -131,6 +126,8 @@ async function exercise(engine,name){
   await page.locator('#gx-mirror-complete-btn').click();
   const secondMission=await assertMessage('mission',/recompensa/i);
   assert.notEqual(secondMission.variant,firstMission.variant,'Gixys must vary placement between events');
+  assert(Math.abs(secondMission.x-firstMission.x)+Math.abs(secondMission.y-firstMission.y)>=3,
+    name+': Gixy positions must actually vary while staying safe');
   await page.locator('.gx-gixy-message__bubble').click();
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
   await page.locator('#gx-mirror-retry').click();
