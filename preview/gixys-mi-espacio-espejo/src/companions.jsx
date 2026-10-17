@@ -275,6 +275,11 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
    <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
     shading="plastic" state={(reacting||typing)?'working':'default'} turn={1} speed={.72}
     depth={.74} jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
+   <span className="gx-gixy-joy" key={text+'-'+touches} aria-hidden="true">
+    {['✦','♥','✧','✦','♥','·','✧','✦'].map((symbol,i)=>
+     <span key={i} className={'gx-gixy-joy__piece gx-gixy-joy__piece--'+i}
+      style={{'--i':i}}>{symbol}</span>)}
+   </span>
   </button>
   <button className="gx-gixy-message__bubble" type="button"
    aria-label="Cerrar mensaje de un Gixy" onClick={()=>onDismiss('fade')}
@@ -343,7 +348,17 @@ function Messages(){
  return <>
   {current?<GixyMessage key={current.serial} {...current} onDismiss={dismiss}
    onEngage={onEngage} onTouch={onTouch} onTextComplete={onTextComplete}/>:null}
-  {reward?<div className="gx-gixys-secret" role="status" aria-live="polite">
+  {reward?<div className="glass-card gx-gixys-secret" role="status" aria-live="polite">
+   <span className="gx-gixys-secret__aura" aria-hidden="true"></span>
+   <span className="gx-gixys-secret__confetti" aria-hidden="true">
+    {Array.from({length:30},(_,i)=><i key={i} style={{
+     '--dx':((i%10)-4.5)*(13+(i%3)*5)+'px',
+     '--dy':(-42-(Math.floor(i/10)*22)-(i%4)*5)+'px',
+     '--rot':(i%2?420:-360)+'deg',
+     '--delay':((i%7)*45)+'ms',
+     '--tone':i%3===0?'#04dbee':i%3===1?'#9368ff':'#ff6caa'
+    }}/>)}
+   </span>
    <div className="gx-gixys-secret__top">SECRETO DE LOS GIXYS <span>3/3</span></div>
    <div className="gx-gixys-secret__award">5 % OFF <small>de demostración</small></div>
    <p>¡Encontraste a los tres! Este cupón es ficticio: no se generó ni aplicó un descuento real.</p>
@@ -357,7 +372,7 @@ function LoyaltyHeart(){
   return <PulseHeart liked={liked} onChange={next=>{
     setLiked(next);
     document.dispatchEvent(new CustomEvent('gx-mirror:loyalty-toggle',{detail:{value:next}}));
-  }} showCount={false} size={35} corner={24} likedColor="#ff4d6d"
+  }} showCount={false} size={30} corner={22} likedColor="#ff4d6d"
     idleColor="#ff4d6d" pillColor="transparent" textColor="#fff" duration={560}
     dotSize={.3} overshoot={1.7} label="Probar avance de lealtad"/>;
 }
