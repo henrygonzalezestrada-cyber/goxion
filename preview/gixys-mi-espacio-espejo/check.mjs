@@ -68,7 +68,10 @@ async function exercise(engine,name){
       const stage=document.querySelector('.gx-gixy-message');
       const r=stage.getBoundingClientRect();
       const els=['#gx-client-notif-launch','.app-logo','#goxion-main-nav',
-        '#dash-date','#dash-badge','#loyalty-count','#loyalty-bar','#loyalty-msg',
+        '#dash-date','#dash-badge','#loyalty-count','#loyalty-bar',
+        // While Circle speaks, its existing helper line is deliberately
+        // blank and expanded, so it is not content being obscured.
+        ...(stage?.dataset.kind==='loyalty'?[]:['#loyalty-msg']),
         '#gamif-expanded-coupon .mission-item .gx-mission-text',
         '#gamif-expanded-coupon .mission-item .mission-checkbox',
         '#gamif-expanded-coupon .gx-mirror-mission-action']
