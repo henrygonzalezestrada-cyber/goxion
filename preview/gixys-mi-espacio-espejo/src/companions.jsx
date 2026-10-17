@@ -9,7 +9,7 @@ import PulseHeart from './vendor/PulseHeart.jsx';
 const palette={hexagon:'#8663ff',square:'#04c8ee',circle:'#9c6aff'};
 const hints={
   mission:{kind:'hexagon',anchor:'#gamif-expanded-coupon',text:'¡Terminaste tus misiones! Revisa tu recompensa.'},
-  loyalty:{kind:'circle',anchor:'#dash-billing-card',text:'¡Avanzaste en lealtad! Consulta tu nuevo nivel.'},
+  loyalty:{kind:'circle',anchor:'#loyalty-msg',text:'¡Tu lealtad avanzó de nivel!'},
   notification:{kind:'square',anchor:'#gx-client-notif-launch',text:'¡Tienes una novedad! Consulta tu campana.'}
 };
 
@@ -48,6 +48,17 @@ function selectPlace(kind,node,sequence,dimensions){
  const vw=document.documentElement.clientWidth,vh=innerHeight;
  const w=Math.min(dimensions.width||202,vw-22),h=dimensions.height||74;
  if(w<140||h>vh-24)return null;
+ // Lealtad: su espacio es la propia línea explicativa, que se expande
+ // durante el consejo. Esto impide que Circle salte hasta las tarjetas inferiores.
+ if(kind==='loyalty'){
+  const row=document.querySelector('#loyalty-msg');
+  if(!row||!isShown(row))return null;
+  const r=row.getBoundingClientRect();
+  const left=clamp(Math.round(r.left+3),12,Math.max(12,vw-w-12));
+  const top=Math.round(r.top+3);
+  if(top<14||top+h>vh-16)return null;
+  return {left,top,width:w,height:h,slot:sequence%3,collision:0,sourceIdx:0,score:0};
+ }
  const obstacles=protectedSelectors.flatMap(s=>[...document.querySelectorAll(s)])
    .filter(el=>el!==node&&isShown(el))
    .map(el=>el.getBoundingClientRect())
@@ -82,16 +93,38 @@ function selectPlace(kind,node,sequence,dimensions){
  });
  return best;
 }
-function GixyMessage({kind,serial,phase,onDismiss}){
+
+const sayings={
+ mission:[
+  'En GOXION, cada logro cuenta.',
+  'Un pequeño paso también es una victoria.',
+  'Lo bueno se construye paso a paso.'
+ ],
+ loyalty:[
+  'En GOXION, la constancia tiene premio.',
+  'Tu confianza nos inspira a mejorar.',
+  'Los buenos momentos también se renuevan.'
+ ],
+ notification:[
+  'GOXION: siempre un paso adelante.',
+  'Las buenas noticias merecen su momento.',
+  'Lo importante, siempre a tu alcance.'
+ ]
+};
+function GixyMessage({kind,serial,phase,onDismiss,onEngage}){
  const cfg=hints[kind],scene=useRef(null),avatar=useRef(null);
- const hits=useRef(0),[layout,setLayout]=useState(null),[touches,setTouches]=useState(0);
+ const [layout,setLayout]=useState(null);
+ const [touches,setTouches]=useState(0);
+ const [text,setText]=useState(cfg.text);
+ const [quote,setQuote]=useState(false);
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
  useLayoutEffect(()=>{
   let raf=0;
-  function place(){
+  if(kind==='loyalty')document.body.classList.add('gx-loyalty-speaking');
+  const place=()=>{
    if(!scene.current)return;
    setLayout(selectPlace(kind,scene.current,serial,scene.current.getBoundingClientRect()));
-  }
+  };
   const schedule=()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(place);};
   place();
   window.addEventListener('resize',schedule,{passive:true});
@@ -104,45 +137,44 @@ function GixyMessage({kind,serial,phase,onDismiss}){
    window.removeEventListener('scroll',schedule,true);
    window.visualViewport?.removeEventListener('resize',schedule);
    window.visualViewport?.removeEventListener('scroll',schedule);
+   if(kind==='loyalty')document.body.classList.remove('gx-loyalty-speaking');
   };
  },[kind,serial]);
  function play(){
   if(phase!=='shown'||!layout)return;
-  hits.current+=1;setTouches(hits.current);
-  const n=hits.current;
-  if(n>=4){onDismiss('hop');return;}
+  const n=touches+1;
+  setTouches(n);
+  setText(sayings[kind][(n-1)%sayings[kind].length]);
+  setQuote(true);
+  onEngage();
   if(reduced)return;
-  const dir=n%2?1:-1,amplitude=n===1?10:n===2?16:19;
-  // Contained wall rebounds: never send the avatar over a payment or navigation action.
+  // A single quiet nod, no cartoony rotations, impacts or oversized squash.
+  const direction=n%2?1:-1;
   avatar.current?.getAnimations?.().forEach(a=>a.cancel());
   avatar.current?.animate([
-   {transform:'translate3d(0,0,0) rotate(0deg) scale(1)',offset:0},
-   {transform:'translate3d('+(dir*amplitude)+'px,-'+(5+n*2)+'px,0) rotate('+(dir*15)+'deg) scale(.92,1.09)',offset:.24},
-   {transform:'translate3d('+(dir*-7)+'px,2px,0) rotate('+(dir*-9)+'deg) scale(1.12,.93)',offset:.49},
-   {transform:'translate3d('+(dir*4)+'px,-3px,0) rotate('+(dir*4)+'deg) scale(.97,1.04)',offset:.7},
-   {transform:'translate3d(0,0,0) rotate(0deg) scale(1)',offset:1}
-  ],{duration:550+70*n,easing:'cubic-bezier(.19,.94,.26,1)'});
+   {transform:'translate3d(0,0,0) rotate(0deg)',offset:0},
+   {transform:'translate3d('+(direction*5)+'px,-5px,0) rotate('+(direction*5)+'deg)',offset:.32},
+   {transform:'translate3d('+(direction*-2)+'px,1px,0) rotate('+(direction*-2)+'deg)',offset:.7},
+   {transform:'translate3d(0,0,0) rotate(0deg)',offset:1}
+  ],{duration:470,easing:'cubic-bezier(.16,.88,.28,1)'});
  }
  const visible=Boolean(layout),leaving=phase!=='shown';
- return <div ref={scene}
-   className={'gx-gixy-message'+(visible?' is-visible':'')+(leaving?' is-leaving':'')+
-    (phase==='hop'?' is-hopping':'')}
-   data-kind={kind} data-variant={serial%5} data-placement={layout?.slot??'hidden'}
-   data-touch-count={touches} data-phase={phase}
-   style={{left:layout?.left??0,top:layout?.top??0,visibility:visible?'visible':'hidden'}}>
-   <button className="gx-gixy-message__avatar" type="button" ref={avatar}
-     onClick={play} disabled={leaving} aria-label={'Jugar con Gixy '+kind}
-     title="Toca a Gixy para hacerlo rebotar">
-     <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
-      shading="plastic" state="working" turn={1} speed={.92} depth={.74}
-      jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
-   </button>
-   <button className="gx-gixy-message__bubble" type="button"
-     onClick={()=>onDismiss('fade')}
-     aria-label={'Cerrar consejo de Gixy: '+cfg.text}>
-     <span role="status" aria-live="polite">{cfg.text}</span>
-   </button>
-  </div>;
+ return <div ref={scene} className={'gx-gixy-message'+(visible?' is-visible':'')+(leaving?' is-leaving':'')}
+  data-kind={kind} data-variant={serial%5} data-placement={layout?.slot??'hidden'}
+  data-touch-count={touches} data-phase={phase} data-quote={quote?'true':'false'}
+  style={{left:layout?.left??0,top:layout?.top??0,visibility:visible?'visible':'hidden'}}>
+  <button className="gx-gixy-message__avatar" type="button" ref={avatar}
+   onClick={play} disabled={leaving} aria-label={'Tocar a Gixy '+kind}
+   title="Toca para escuchar una frase de GOXION">
+   <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
+    shading="plastic" state="default" turn={1} speed={.82} depth={.74}
+    jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
+  </button>
+  <button className="gx-gixy-message__bubble" type="button" onClick={()=>onDismiss('fade')}
+   aria-label="Cerrar mensaje de Gixy">
+   <span key={kind+'-'+touches} role="status" aria-live="polite">{text}</span>
+  </button>
+ </div>;
 }
 function Messages(){
  const [current,setCurrent]=useState(null);
@@ -153,27 +185,31 @@ function Messages(){
   clearTimers();
   const exitingKind=currentKind.current;
   setCurrent(c=>c&&c.kind===exitingKind?{...c,phase:mode}:c);
-  timers.current.exit=setTimeout(()=>{currentKind.current=null;setCurrent(null);},mode==='hop'?690:390);
+  timers.current.exit=setTimeout(()=>{currentKind.current=null;setCurrent(null);},430);
+ };
+ const engage=()=>{
+  clearTimeout(timers.current.shown);
+  timers.current.shown=setTimeout(()=>dismiss('fade'),3900);
  };
  useEffect(()=>{
-  const handlers=Object.keys(hints).map(kind=>{
-   const listener=e=>{
-    if(!e.detail?.active){if(currentKind.current===kind)dismiss('fade');return;}
+  const listeners=Object.keys(hints).map(kind=>{
+   const listener=event=>{
+    if(!event.detail?.active){if(currentKind.current===kind)dismiss();return;}
     const now=Date.now();
     if(now-(last.current[kind]||0)<2500)return;
-    last.current[kind]=now;
-    clearTimers();
+    last.current[kind]=now;clearTimers();
     count.current++;
     currentKind.current=kind;
     setCurrent({kind,serial:count.current,phase:'shown'});
-    timers.current.shown=setTimeout(()=>dismiss('hop'),5000);
+    timers.current.shown=setTimeout(()=>dismiss(),4900);
    };
    document.addEventListener('gx-mirror:'+kind,listener);
    return ()=>document.removeEventListener('gx-mirror:'+kind,listener);
   });
-  return ()=>{handlers.forEach(fn=>fn());clearTimers();};
+  return ()=>{listeners.forEach(unlisten=>unlisten());clearTimers();};
  },[]);
- return current?<GixyMessage key={current.serial} {...current} onDismiss={dismiss}/>:null;
+ return current?<GixyMessage key={current.serial} {...current}
+  onDismiss={dismiss} onEngage={engage}/>:null;
 }
 function LoyaltyHeart(){
   const [liked,setLiked]=useState(false);
@@ -196,7 +232,7 @@ function mount(){
   mounted=true;
   window.GOXION_GIXYS_ESPEJO_ENGINE=Object.freeze({
     renderer:'bot-avatars@0.2.2',shading:'plastic',
-    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','ContextualMessagesV1'],
+    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','ContextualMessagesV2','BrandSayingsV1'],
     noBackend:true
   });
 }
