@@ -34,10 +34,12 @@ async function exercise(browserName,launcher){
    });
    await page.locator('#gx-mirror-heart .pulse-heart').waitFor({timeout:3000});
    assert.equal(await page.locator('#loyalty-count').textContent(),'3/4 Pagos');
+   await page.evaluate(()=>document.fonts.ready);
+   await page.waitForTimeout(500);
    const area=await page.evaluate(()=>{
     const ids=['dash-billing-card','loyalty-msg','referral-section-container'];
     return Object.fromEntries(ids.map(id=>{const r=document.getElementById(id).getBoundingClientRect();
-      return [id,{top:r.top,height:r.height}]}));
+      return [id,{top:r.top+window.scrollY,height:r.height}]}));
    });
    await page.locator('#gx-mirror-heart .pulse-heart').click();
    await page.locator('.gx-gixy-message[data-kind="loyalty"]').waitFor({timeout:2500});
@@ -49,7 +51,7 @@ async function exercise(browserName,launcher){
    });
    for(const id of Object.keys(area))for(const dim of ['top','height'])
     assert(Math.abs(area[id][dim]-after[id][dim])<1.5,
-      browserName+' '+width+': Gixy moves '+id+'.'+dim);
+      browserName+' '+width+': Gixy moves '+id+'.'+dim+' baseline='+JSON.stringify(area)+' after='+JSON.stringify(after));
    assert.equal(await page.locator('#loyalty-count').textContent(),'3/4 Pagos',
       'Heart must not simulate actual loyalty payments');
    await page.evaluate(()=>{
