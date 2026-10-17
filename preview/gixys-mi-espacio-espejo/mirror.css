@@ -292,3 +292,9 @@ body.gx-mirror-body #gx-client-notif-launch.gx-has-new > #gx-client-notif-badge{
  .gx-gixy-message__avatar{width:52px!important;min-width:52px!important;flex-basis:52px!important}
  .gx-gixy-message__bubble{font-size:10px!important}
 }
+
+/* The synthetic beta disclaimer yields temporarily to the notification scene
+   so the Gixy can emerge beside the existing bell without obscuring information. */
+body.gx-mirror-body:has(.gx-gixy-message[data-kind="notification"]) .gx-mirror-note{
+ opacity:0;visibility:hidden;transition:opacity .2s ease
+}
