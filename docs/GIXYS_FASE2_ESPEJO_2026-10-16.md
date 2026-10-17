@@ -49,3 +49,7 @@ Ruta: `preview/gixys-mi-espacio-espejo/`.
 7. **Paso siguiente propuesto:** diseñar/probar en beta espejo una **capa de mensajes y disparadores deterministas** con escenarios sintéticos (hito de misión, beneficio de lealtad confirmado, notificación). A continuación validar en iPhone y solamente entonces enlazar eventos reales de los controladores existentes en una rama de integración, sin modificar cálculos ni persistencia.
 
 El video de prueba del usuario muestra el corazón en conflicto con el texto «Nivel de Lealtad», y a Hex presente antes de completar la misión: ambas observaciones se consideran deuda explícita de UX, no aceptación tácita de esa ubicación.
+
+## Siguiente trabajo activo: Fase 3 (diálogos breves y posiciones variables)
+
+La continuidad técnica y las reglas que el usuario acaba de solicitar se encuentran en [`GIXYS_FASE3_DIALOGOS_CONTEXTO_2026-10-16.md`](GIXYS_FASE3_DIALOGOS_CONTEXTO_2026-10-16.md). Rama `beta/gixys-dialogos-contextuales-20261016`, PR #134. **La Fase 3 sigue siendo beta espejo, no integración oficial.** No editar los cálculos de pagos/cupones. Validar Safari iPhone antes de aprobar.
