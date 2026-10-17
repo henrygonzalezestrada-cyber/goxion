@@ -267,3 +267,7 @@ body.gx-mirror-body #gx-client-notif-launch.gx-has-new > #gx-client-notif-badge{
   }
   .gx-gixy-message.is-leaving{opacity:0}
 }
+
+/* Keep the hop visible until the avatar actually exits; the speech fades first. */
+.gx-gixy-message.is-hopping{opacity:1!important;transform:translate3d(0,0,0) scale(1)!important;transition:none!important}
+.gx-gixy-message.is-hopping .gx-gixy-message__avatar{pointer-events:none!important}
