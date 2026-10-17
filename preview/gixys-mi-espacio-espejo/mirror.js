@@ -27,7 +27,7 @@ if(row){
   const label=row.firstElementChild;
   if(label){
     label.classList.add("gx-mirror-loyalty-label");
-    label.innerHTML='<span id="gx-mirror-heart" aria-label="Corazón animado de lealtad"></span><span>Nivel de Lealtad</span>';
+    label.innerHTML='<span id="gx-mirror-heart" aria-label="Corazón animado de lealtad"></span><span class="gx-mirror-loyalty-name">Nivel de Lealtad</span>';
   }
   count.textContent="3/4 Pagos";
 }
