@@ -1,4 +1,4 @@
-import React, {useEffect,useLayoutEffect,useRef,useState} from 'react';
+import React, {useEffect,useLayoutEffect,useMemo,useRef,useState} from 'react';
 import {createRoot} from 'react-dom/client';
 import {BotAvatar} from 'bot-avatars';
 import PulseHeart from './vendor/PulseHeart.jsx';
@@ -94,93 +94,113 @@ function selectPlace(kind,node,sequence,dimensions){
  return best;
 }
 
+
+/* They are all Gixys; geometry is an internal renderer detail, not a name. */
 const sayings={
  mission:[
-  '¡Soy Hex, del equipo de Goxy!',
-  'Goxy dice: cada logro cuenta.',
-  'Con Goxy, los pequeños pasos importan.',
-  'Goxy nos enseñó a celebrar contigo.',
-  'Somos los Gixys. ¡Vamos contigo!',
-  'En GOXION, los logros se comparten.'
+  '¡Somos los Gixys, el equipo de Goxy!',
+  'Goxy dice que cada logro merece alegría.',
+  'Creo que soy Gixy dos... ¿o tres? ¡Ups!',
+  'Goxy nos pidió cuidar cada pequeño logro.',
+  'En GOXION, hasta los píxeles celebran.'
  ],
  loyalty:[
-  'Goxy nos enseñó a cuidar tu confianza.',
-  'Soy Circle, del pequeño equipo de Goxy.',
-  'Para Goxy, cada detalle cuenta.',
-  'En GOXION, tu constancia nos inspira.',
-  'Goxy y los Gixys te acompañamos.',
-  'Tu confianza nos hace mejores.'
+  'Goxy nos enseñó que la confianza vale oro.',
+  '¡Soy Gixy! ¿Qué número? No lo recuerdo.',
+  'La constancia también tiene superpoderes.',
+  'Goxy nos dejó a cargo de las sonrisas.',
+  'Tres Gixys y una misión: acompañarte.'
  ],
  notification:[
-  '¡Square, del equipo de Goxy, presente!',
-  'Goxy nos pidió estar atentos.',
-  'Somos los ojos curiosos de Goxy.',
-  'En GOXION, nada importante se pierde.',
-  'Goxy y sus Gixys están contigo.',
-  'Un buen aviso merece tu atención.'
+  '¡Uno de los Gixys reportándose!',
+  'Goxy nos dijo que estuviéramos atentos.',
+  '¿Soy Gixy tres? Eso dice mi calculadora.',
+  'Tenemos noticias. ¡Sin hacer ruido!',
+  'Con Goxy, siempre hay algo nuevo.'
  ]
 };
-// 42 ms por carácter: lectura suave, no teletipo apresurado.
-// One exclusive timeout chain per phrase; changing or dismissing the message
-// cancels all pending characters and prevents overlapping animations.
-const WRITE_MS=42;
-function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
- const cfg=hints[kind],scene=useRef(null),avatar=useRef(null),metric=useRef(null);
+const WRITE_MS=39;
+const MAX_LINE=102;
+// Keep line boundaries stable BEFORE typing, never reflow on each letter.
+function wrapSpeech(message){
+ const canvas=document.createElement('canvas');
+ const ctx=canvas.getContext('2d');
+ if(ctx)ctx.font='600 10.5px Poppins,system-ui,sans-serif';
+ const size=t=>ctx?ctx.measureText(t).width:t.length*5.7;
+ const lines=[''];
+ for(const word of message.split(/\s+/)){
+  const index=lines.length-1;
+  const next=lines[index]?(lines[index]+' '+word):word;
+  if(lines[index]&&size(next)>MAX_LINE&&lines.length<4)lines.push(word);
+  else lines[index]=next;
+ }
+ return lines.join('\n');
+}
+function measureSpeech(visible,full){
+ const ctx=document.createElement('canvas').getContext('2d');
+ if(ctx)ctx.font='600 10.5px Poppins,system-ui,sans-serif';
+ const size=t=>ctx?ctx.measureText(t).width:t.length*5.7;
+ const shownLines=visible.split('\n');
+ const lastIndex=shownLines.length-1;
+ const lineStart=visible.lastIndexOf('\n')+1;
+ const remainder=full.slice(lineStart);
+ const consumed=shownLines[lastIndex]||'';
+ // Reserve width for the word currently being typed, so the glass grows at
+ // WORD boundaries instead of jittering each pixel on each keystroke.
+ const nextSpace=remainder.indexOf(' ',consumed.length);
+ const nextBreak=remainder.indexOf('\n',consumed.length);
+ const end=[nextSpace,nextBreak].filter(v=>v>=0).sort((a,b)=>a-b)[0];
+ const reserved=remainder.slice(0,end===undefined?remainder.length:end);
+ const width=Math.max(0,...shownLines.map(size),size(reserved));
+ const height=Math.min(74,Math.ceil(17+14.3*shownLines.length));
+ return {width:Math.min(136,Math.max(36,Math.ceil(width+19))),height:Math.max(32,height)};
+}
+function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouch}){
+ const cfg=hints[kind],scene=useRef(null),lock=useRef(true);
  const textVersion=useRef(0),writeTimer=useRef(null),unlockTimer=useRef(null);
- const reactTimer=useRef(null),touchLock=useRef(true);
- const doneRef=useRef(onTextComplete);doneRef.current=onTextComplete;
+ const reactionTimer=useRef(null),done=useRef(onTextComplete),touchRef=useRef(onTouch);
+ done.current=onTextComplete;touchRef.current=onTouch;
  const [layout,setLayout]=useState(null);
  const [touches,setTouches]=useState(0);
  const [text,setText]=useState(cfg.text);
  const [charsShown,setCharsShown]=useState(0);
  const [typing,setTyping]=useState(true);
- const [readyForTouch,setReadyForTouch]=useState(false);
- const [speechSize,setSpeechSize]=useState({width:34,height:34});
+ const [ready,setReady]=useState(false);
  const [reacting,setReacting]=useState(false);
- const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
- const letters=[...text];
- const written=letters.slice(0,charsShown).join('');
+ const reduced=matchMedia('(prefers-reduced-motion:reduce)').matches;
+ const full=useMemo(()=>wrapSpeech(text),[text]);
+ const glyphs=useMemo(()=>[...full],[full]);
+ const written=glyphs.slice(0,charsShown).join('');
+ const speechSize=useMemo(()=>measureSpeech(written,full),[written,full]);
  useEffect(()=>{
   const version=++textVersion.current;
   clearTimeout(writeTimer.current);clearTimeout(unlockTimer.current);
-  touchLock.current=true;setReadyForTouch(false);setCharsShown(0);setTyping(true);
-  const glyphs=[...text];
+  lock.current=true;setReady(false);setCharsShown(0);setTyping(true);
   if(reduced){
-   setCharsShown(glyphs.length);setTyping(false);
-   touchLock.current=false;setReadyForTouch(true);doneRef.current?.();
-   return;
+   setCharsShown(glyphs.length);setTyping(false);setReady(true);lock.current=false;
+   done.current?.();return;
   }
   let cursor=0;
-  function write(){
-   if(textVersion.current!==version)return;
+  const tick=()=>{
+   if(version!==textVersion.current)return;
    cursor=Math.min(cursor+1,glyphs.length);
    setCharsShown(cursor);
    if(cursor<glyphs.length){
-    writeTimer.current=setTimeout(write,WRITE_MS);
+    writeTimer.current=setTimeout(tick,glyphs[cursor-1]==='\n'?80:WRITE_MS);
    }else{
     setTyping(false);
-    doneRef.current?.();
+    done.current?.();
     unlockTimer.current=setTimeout(()=>{
-     if(textVersion.current===version){touchLock.current=false;setReadyForTouch(true);}
-    },240);
+     if(version===textVersion.current){lock.current=false;setReady(true);}
+    },220);
    }
-  }
-  writeTimer.current=setTimeout(write,190);
+  };
+  writeTimer.current=setTimeout(tick,170);
   return ()=>{
    textVersion.current++;
    clearTimeout(writeTimer.current);clearTimeout(unlockTimer.current);
   };
- },[text,kind,reduced]);
- // Bubble dimensions are driven by the actual visible letters, not total text.
- // Width and height use numeric transitions, including when a word wraps.
- useLayoutEffect(()=>{
-  const el=metric.current;
-  if(!el)return;
-  const box=el.getBoundingClientRect();
-  const width=clamp(Math.ceil(box.width),32,132);
-  const height=clamp(Math.ceil(box.height),34,64);
-  setSpeechSize(old=>old.width===width&&old.height===height?old:{width,height});
- },[written]);
+ },[full,reduced,glyphs.length]);
  useLayoutEffect(()=>{
   let raf=0;
   if(kind==='loyalty')document.body.classList.add('gx-loyalty-speaking');
@@ -203,41 +223,35 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
    if(kind==='loyalty')document.body.classList.remove('gx-loyalty-speaking');
   };
  },[kind,serial]);
- useEffect(()=>()=>{clearTimeout(reactTimer.current);},[]);
+ useEffect(()=>()=>clearTimeout(reactionTimer.current),[]);
  function play(){
-  // The lock is synchronous; taps during writing/reaction cannot queue or
-  // cancel half-written bubbles. Same phrase cannot be started twice.
-  if(phase!=='shown'||!layout||touchLock.current)return;
-  touchLock.current=true;
-  // Lock and reset in the SAME React commit as the new phrase. Otherwise
-  // a tap could briefly expose the previous "typing=false" state with blank text.
-  setTyping(true);setReadyForTouch(false);setCharsShown(0);
-  const n=touches+1;
-  setTouches(n);setText(sayings[kind][(n-1)%sayings[kind].length]);
+  if(phase!=='shown'||!layout||lock.current)return;
+  lock.current=true;setReady(false);setTyping(true);setCharsShown(0);
+  const n=touches+1;setTouches(n);
+  const next=touchRef.current?.(kind,n);
+  setText(next||sayings[kind][(n-1)%sayings[kind].length]);
   setReacting(true);
-  clearTimeout(reactTimer.current);
-  reactTimer.current=setTimeout(()=>setReacting(false),610);
+  clearTimeout(reactionTimer.current);
+  reactionTimer.current=setTimeout(()=>setReacting(false),480);
   onEngage();
  }
- const visible=Boolean(layout),leaving=phase!=='shown';
- return <div ref={scene}
-  className={'gx-gixy-message'+(visible?' is-visible':'')+(leaving?' is-leaving':'')}
+ const visible=Boolean(layout);
+ return <div ref={scene} className={'gx-gixy-message'+(visible?' is-visible':'')+(phase!=='shown'?' is-leaving':'')}
   data-kind={kind} data-variant={serial%5} data-placement={layout?.slot??'hidden'}
-  data-touch-count={touches} data-phase={phase}
-  data-typing={typing?'true':'false'} data-visible-chars={charsShown}
-  data-write-ms={WRITE_MS}
+  data-touch-count={touches} data-phase={phase} data-typing={typing?'true':'false'}
+  data-visible-chars={charsShown} data-write-ms={WRITE_MS}
   style={{left:layout?.left??0,top:layout?.top??0,visibility:visible?'visible':'hidden'}}>
-  <button className="gx-gixy-message__avatar" type="button" ref={avatar}
-   onClick={play} disabled={leaving||!readyForTouch} aria-label={'Tocar a Gixy '+kind+' para otra frase'}
-   title={typing?'Gixy está hablando':'Toca para escuchar otra frase de Goxy'}>
+  <button className="gx-gixy-message__avatar" type="button"
+   disabled={phase!=='shown'||!ready} onClick={play}
+   aria-label="Tocar a un Gixy para una sorpresa"
+   title={typing?'Un Gixy está hablando':'Toca a un Gixy'}>
    <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
     shading="plastic" state={reacting?'working':'default'} turn={1} speed={.82}
     depth={.74} jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
   </button>
   <button className="gx-gixy-message__bubble" type="button"
-   onClick={()=>onDismiss('fade')} aria-label={'Cerrar consejo: '+text}
+   aria-label="Cerrar mensaje de un Gixy" onClick={()=>onDismiss('fade')}
    style={{'--gx-bubble-width':speechSize.width+'px','--gx-bubble-height':speechSize.height+'px'}}>
-   <span className="gx-gixy-message__measure" ref={metric} aria-hidden="true">{written||'\u00a0'}</span>
    <span className="gx-gixy-message__written" aria-hidden="true">{written}</span>
    <span className="gx-gixy-message__sr" role="status" aria-live="polite">{text}</span>
   </button>
@@ -245,46 +259,71 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
 }
 function Messages(){
  const [current,setCurrent]=useState(null);
- const timers=useRef({shown:null,exit:null}),currentKind=useRef(null),last=useRef({}),count=useRef(0);
+ const [reward,setReward]=useState(false);
+ const [found,setFound]=useState(0);
+ const timers=useRef({shown:null,exit:null,reward:null}),currentKind=useRef(null);
+ const last=useRef({}),count=useRef(0),met=useRef(new Set());
+ const awaitingReward=useRef(false),alreadyAwarded=useRef(false);
  const clearTimers=()=>{clearTimeout(timers.current.shown);clearTimeout(timers.current.exit);};
  const dismiss=(mode='fade')=>{
   if(!currentKind.current)return;
   clearTimers();
-  const exitingKind=currentKind.current;
-  setCurrent(c=>c&&c.kind===exitingKind?{...c,phase:mode}:c);
+  const old=currentKind.current;
+  setCurrent(c=>c&&c.kind===old?{...c,phase:mode}:c);
   timers.current.exit=setTimeout(()=>{
-   // An older exit must not remove a newer event that replaced it.
-   if(currentKind.current===exitingKind){currentKind.current=null;setCurrent(null);}
-  },430);
+   if(currentKind.current===old){currentKind.current=null;setCurrent(null);}
+  },400);
  };
- const engage=()=>{
+ const onEngage=()=>{
   clearTimeout(timers.current.shown);
-  timers.current.shown=setTimeout(()=>dismiss(),8700);
+  timers.current.shown=setTimeout(()=>dismiss(),9000);
  };
- const textComplete=()=>{
+ const onTouch=(kind,n)=>{
+  if(!met.current.has(kind)&&!alreadyAwarded.current){
+   met.current.add(kind);setFound(met.current.size);
+   if(met.current.size===1)return 'Goxy dejó un secreto entre nosotros tres...';
+   if(met.current.size===2)return '¡Dos saludos! Te falta encontrar al otro Gixy.';
+   awaitingReward.current=true;
+   return '¡Nos encontraste! Goxy guardó una sorpresa.';
+  }
+  return sayings[kind][(n-1)%sayings[kind].length];
+ };
+ const onTextComplete=()=>{
   clearTimeout(timers.current.shown);
-  timers.current.shown=setTimeout(()=>dismiss(),2900);
+  timers.current.shown=setTimeout(()=>dismiss(),3300);
+  if(awaitingReward.current&&!alreadyAwarded.current){
+   awaitingReward.current=false;alreadyAwarded.current=true;
+   setReward(true);
+   clearTimeout(timers.current.reward);
+   timers.current.reward=setTimeout(()=>setReward(false),10000);
+  }
  };
  useEffect(()=>{
-  const listeners=Object.keys(hints).map(kind=>{
-   const listener=event=>{
+  const unsubs=Object.keys(hints).map(kind=>{
+   const handler=event=>{
     if(!event.detail?.active){if(currentKind.current===kind)dismiss();return;}
-    const now=Date.now();
-    if(now-(last.current[kind]||0)<2500)return;
-    last.current[kind]=now;clearTimers();
-    count.current++;
+    const now=Date.now();if(now-(last.current[kind]||0)<2500)return;
+    last.current[kind]=now;clearTimers();count.current++;
     currentKind.current=kind;
     setCurrent({kind,serial:count.current,phase:'shown'});
-    // Watchdog even if text animation or tab visibility stalls.
-    timers.current.shown=setTimeout(()=>dismiss(),10000);
+    timers.current.shown=setTimeout(()=>dismiss(),11000); // watchdog for stalled tabs
    };
-   document.addEventListener('gx-mirror:'+kind,listener);
-   return ()=>document.removeEventListener('gx-mirror:'+kind,listener);
+   document.addEventListener('gx-mirror:'+kind,handler);
+   return ()=>document.removeEventListener('gx-mirror:'+kind,handler);
   });
-  return ()=>{listeners.forEach(unlisten=>unlisten());clearTimers();};
+  return ()=>{unsubs.forEach(fn=>fn());clearTimers();clearTimeout(timers.current.reward);};
  },[]);
- return current?<GixyMessage key={current.serial} {...current}
-  onDismiss={dismiss} onEngage={engage} onTextComplete={textComplete}/>:null;
+ return <>
+  {current?<GixyMessage key={current.serial} {...current} onDismiss={dismiss}
+   onEngage={onEngage} onTouch={onTouch} onTextComplete={onTextComplete}/>:null}
+  {reward?<div className="gx-gixys-secret" role="status" aria-live="polite">
+   <div className="gx-gixys-secret__top">SECRETO DE LOS GIXYS <span>3/3</span></div>
+   <div className="gx-gixys-secret__award">5 % OFF <small>de demostración</small></div>
+   <p>¡Encontraste a los tres! Este cupón es ficticio: no se generó ni aplicó un descuento real.</p>
+   <button type="button" onClick={()=>setReward(false)} aria-label="Cerrar recompensa de demostración">Entendido</button>
+  </div>:null}
+  <span className="gx-gixys-progress" data-found={found} hidden aria-hidden="true">{found}/3</span>
+ </>;
 }
 function LoyaltyHeart(){
   const [liked,setLiked]=useState(false);
@@ -307,7 +346,7 @@ function mount(){
   mounted=true;
   window.GOXION_GIXYS_ESPEJO_ENGINE=Object.freeze({
     renderer:'bot-avatars@0.2.2',shading:'plastic',
-    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','TypewriterBubbleV1','GoxyFamilySayingsV1'],
+    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','StableTypewriterV2','SharedGixyPersonality','EasterEggDemo5'],
     noBackend:true
   });
 }

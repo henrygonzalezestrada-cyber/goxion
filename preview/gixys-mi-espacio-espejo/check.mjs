@@ -102,6 +102,14 @@ async function exercise(engine,name){
     });
     assert.match(visual.motion,/gx-gixy-quiet-speech/,name+': premium restrained entrance missing');
     assert.match(visual.bg,/gradient/,name+': premium glass speech surface missing');
+    // Stable writing never scrambles or wraps mid-word as characters arrive.
+    const lines=await bubble.locator('.gx-gixy-message__written').evaluate(el=>({
+      whiteSpace:getComputedStyle(el).whiteSpace,
+      scrollHeight:el.scrollHeight,clientHeight:el.clientHeight,
+      text:el.textContent
+    }));
+    assert.equal(lines.whiteSpace,'pre-wrap',name+': explicit line boundaries lost');
+    assert(lines.scrollHeight<=lines.clientHeight+2,name+': typed content clipped or reflowing');
     assert(m.visible,name+': Gixy oculto, no hay zona libre para '+kind);
     assert(m.overlap<51,name+': Gixy tapa información '+JSON.stringify(m));
     assert(m.x>=0&&m.right<=m.clientWidth+2,name+': Gixy fuera de pantalla');
@@ -123,11 +131,19 @@ async function exercise(engine,name){
     for(let k=0;k<14;k++)a.dispatchEvent(new MouseEvent('click',{bubbles:true}));});
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'0');
   await assertMessage('notification',/novedad/i);
+  assert(!/\bHex\b|\bSquare\b|\bCircle\b/i.test(
+    await page.locator('.gx-gixy-message__written').innerText()),
+    name+': individual names must not appear in Gixy dialog');
   const bubbleAfter=await page.locator('.gx-gixy-message__bubble').evaluate(el=>({
     w:parseFloat(getComputedStyle(el).width),h:parseFloat(getComputedStyle(el).height)}));
   assert(bubbleAfter.w>bubbleEarly.w+20,name+': bubble did not expand with written text');
   assert(bubbleAfter.h>=34,name+': bubble collapsed vertically');
-  await page.locator('.gx-gixy-message__avatar').isEnabled();
+  await page.locator('.gx-gixy-message__avatar').click();
+  assert.equal(await page.locator('.gx-gixys-progress').getAttribute('data-found'),'1');
+  assert.equal(await page.locator('.gx-gixys-secret').count(),0,
+    name+': demo coupon was given away after first hello');
+  await page.waitForFunction(()=>document.querySelector('.gx-gixy-message')?.dataset.typing==='false',null,{timeout:7500});
+  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy/i);
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'true');
   await page.waitForFunction(()=>{
     const badge=document.getElementById('gx-client-notif-badge');
@@ -154,8 +170,10 @@ async function exercise(engine,name){
   assert(local.dy<10&&local.inside&&!local.coversButton,
     name+': Circle fuera de su sección o encima del cobro: '+JSON.stringify(local));
   await page.locator('.gx-gixy-message__avatar').click();
-  await page.waitForFunction(()=>document.querySelector('.gx-gixy-message')?.dataset.typing==='false',null,{timeout:7000});
-  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy/i);
+  assert.equal(await page.locator('.gx-gixys-progress').getAttribute('data-found'),'2');
+  assert.equal(await page.locator('.gx-gixys-secret').count(),0);
+  await page.waitForFunction(()=>document.querySelector('.gx-gixy-message')?.dataset.typing==='false',null,{timeout:7500});
+  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/dos saludos/i);
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'1');
 
   await page.locator('#gx-mirror-mission-card').click();
@@ -168,11 +186,17 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#gx-mirror-complete-btn').isDisabled(),true);
   assert.equal(await page.locator('#gx-mirror-complete-btn .gx-mirror-action-icon').evaluate(el=>getComputedStyle(el).animationName),'gx-mirror-check-pop');
   await page.locator('.gx-gixy-message__avatar').click();
+  assert.equal(await page.locator('.gx-gixys-progress').getAttribute('data-found'),'3');
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'1');
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-typing'),'true');
   assert.equal(await page.locator('.gx-gixy-message__avatar').isDisabled(),true);
   await page.waitForFunction(()=>document.querySelector('.gx-gixy-message')?.dataset.typing==='false',null,{timeout:7000});
   assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy/i);
+  await page.locator('.gx-gixys-secret').waitFor({state:'visible',timeout:3000});
+  assert.match(await page.locator('.gx-gixys-secret').innerText(),/5 % OFF/i);
+  assert.match(await page.locator('.gx-gixys-secret').innerText(),/demostración|ficticio/i);
+  await page.locator('.gx-gixys-secret button').click();
+  assert.equal(await page.locator('.gx-gixys-secret').count(),0);
   await page.locator('.gx-gixy-message__avatar').waitFor({state:'visible'});
   await page.locator('#gx-mirror-retry').click();
   assert.equal(await page.locator('#gx-mirror-complete-btn').isEnabled(),true);
@@ -198,7 +222,7 @@ async function exercise(engine,name){
   }
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'shown');
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'3');
-  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy|GOXION|Gixys/i);
+  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy|GOXION|Gixys|Gixy/i);
   await page.locator('.gx-gixy-message__bubble').click();
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'fade');
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});

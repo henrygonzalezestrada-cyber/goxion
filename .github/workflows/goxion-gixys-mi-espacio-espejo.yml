@@ -1,8 +1,8 @@
-name: GOXION · Gixys · Escritura Premium
+name: GOXION · Gixys · Secreto V7
 on:
   push:
     branches:
-      - beta/gixys-typewriter-dialogos-20261016
+      - beta/gixys-easteregg-typing-v7-20261016
     paths:
       - 'preview/gixys-mi-espacio-espejo/**'
       - '.github/workflows/goxion-gixys-mi-espacio-espejo.yml'
