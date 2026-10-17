@@ -134,6 +134,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
  const [text,setText]=useState(cfg.text);
  const [charsShown,setCharsShown]=useState(0);
  const [typing,setTyping]=useState(true);
+ const [readyForTouch,setReadyForTouch]=useState(false);
  const [speechSize,setSpeechSize]=useState({width:34,height:34});
  const [reacting,setReacting]=useState(false);
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -142,11 +143,11 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
  useEffect(()=>{
   const version=++textVersion.current;
   clearTimeout(writeTimer.current);clearTimeout(unlockTimer.current);
-  touchLock.current=true;setCharsShown(0);setTyping(true);
+  touchLock.current=true;setReadyForTouch(false);setCharsShown(0);setTyping(true);
   const glyphs=[...text];
   if(reduced){
    setCharsShown(glyphs.length);setTyping(false);
-   touchLock.current=false;doneRef.current?.();
+   touchLock.current=false;setReadyForTouch(true);doneRef.current?.();
    return;
   }
   let cursor=0;
@@ -160,7 +161,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
     setTyping(false);
     doneRef.current?.();
     unlockTimer.current=setTimeout(()=>{
-     if(textVersion.current===version)touchLock.current=false;
+     if(textVersion.current===version){touchLock.current=false;setReadyForTouch(true);}
     },240);
    }
   }
@@ -224,7 +225,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
   data-write-ms={WRITE_MS}
   style={{left:layout?.left??0,top:layout?.top??0,visibility:visible?'visible':'hidden'}}>
   <button className="gx-gixy-message__avatar" type="button" ref={avatar}
-   onClick={play} disabled={leaving||typing} aria-label={'Tocar a Gixy '+kind+' para otra frase'}
+   onClick={play} disabled={leaving||!readyForTouch} aria-label={'Tocar a Gixy '+kind+' para otra frase'}
    title={typing?'Gixy está hablando':'Toca para escuchar otra frase de Goxy'}>
    <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
     shading="plastic" state={reacting?'working':'default'} turn={1} speed={.82}
