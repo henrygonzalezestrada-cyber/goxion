@@ -298,3 +298,74 @@ body.gx-mirror-body #gx-client-notif-launch.gx-has-new > #gx-client-notif-badge{
 body.gx-mirror-body:has(.gx-gixy-message[data-kind="notification"]) .gx-mirror-note{
  opacity:0;visibility:hidden;transition:opacity .2s ease
 }
+
+
+/* V5 · Quiet-luxury refinement: restrained microgestures, crisp typography.
+   Replaces the arcade bounce and giant spin exit WITHOUT replacing BotAvatar. */
+body.gx-mirror-body.gx-loyalty-speaking #loyalty-msg{
+ color:transparent!important;
+ min-height:67px!important;
+ transition:min-height .26s cubic-bezier(.2,.8,.24,1);
+}
+.gx-gixy-message{
+ opacity:0!important;
+ transform:translate3d(0,4px,0) scale(.985)!important;
+ transition:opacity .32s cubic-bezier(.2,.8,.2,1),
+   transform .32s cubic-bezier(.2,.8,.2,1)!important;
+}
+.gx-gixy-message.is-visible:not(.is-leaving){
+ opacity:1!important;transform:translate3d(0,0,0) scale(1)!important;
+}
+.gx-gixy-message.is-leaving{
+ opacity:0!important;transform:translate3d(0,-6px,0) scale(.985)!important;
+}
+.gx-gixy-message__avatar{
+ animation:gx-gixy-gentle-arrival .4s cubic-bezier(.2,.8,.2,1) both!important;
+}
+.gx-gixy-message__bubble{
+ background:linear-gradient(120deg,rgba(30,34,59,.96),rgba(18,27,43,.96))!important;
+ border:1px solid rgba(144,164,206,.19)!important;
+ box-shadow:0 8px 22px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.07)!important;
+ border-radius:14px 14px 14px 6px!important;
+ font-size:10.8px!important;line-height:1.36!important;
+ padding:8px 9px!important;
+ backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+ animation:gx-gixy-quiet-speech .36s .065s cubic-bezier(.18,.88,.27,1) both!important;
+}
+.gx-gixy-message__bubble::before{
+ background:rgba(28,33,54,.96)!important;
+}
+.gx-gixy-message__bubble span{
+ display:block;animation:gx-gixy-quote-appear .25s ease-out both
+}
+.gx-gixy-message.is-leaving .gx-gixy-message__bubble{
+ animation:gx-gixy-quiet-out .24s ease-in forwards!important
+}
+.gx-gixy-message[data-kind="loyalty"]{
+ z-index:10011!important;
+}
+@keyframes gx-gixy-gentle-arrival{
+ 0%{opacity:0;transform:translate3d(0,6px,0) scale(.87)}
+ 68%{opacity:1;transform:translate3d(0,-2px,0) scale(1.025)}
+ 100%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes gx-gixy-quiet-speech{
+ 0%{opacity:0;transform:translate3d(-9px,3px,0) scale(.91);filter:blur(1px)}
+ 100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+}
+@keyframes gx-gixy-quote-appear{
+ 0%{opacity:0;transform:translate3d(0,3px,0)}
+ 100%{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes gx-gixy-quiet-out{
+ 0%{opacity:1;transform:translate3d(0,0,0)}
+ 100%{opacity:0;transform:translate3d(-5px,-3px,0)}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixy-message,.gx-gixy-message.is-visible,.gx-gixy-message.is-leaving,
+ .gx-gixy-message__avatar,.gx-gixy-message__bubble,.gx-gixy-message__bubble span{
+  transition:none!important;animation:none!important;filter:none!important;
+  transform:none!important
+ }
+ .gx-gixy-message.is-leaving{opacity:0!important}
+}

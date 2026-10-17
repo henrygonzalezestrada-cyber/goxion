@@ -68,7 +68,10 @@ async function exercise(engine,name){
       const stage=document.querySelector('.gx-gixy-message');
       const r=stage.getBoundingClientRect();
       const els=['#gx-client-notif-launch','.app-logo','#goxion-main-nav',
-        '#dash-date','#dash-badge','#loyalty-count','#loyalty-bar','#loyalty-msg',
+        '#dash-date','#dash-badge','#loyalty-count','#loyalty-bar',
+        // While Circle speaks, its existing helper line is deliberately
+        // blank and expanded, so it is not content being obscured.
+        ...(stage?.dataset.kind==='loyalty'?[]:['#loyalty-msg']),
         '#gamif-expanded-coupon .mission-item .gx-mission-text',
         '#gamif-expanded-coupon .mission-item .mission-checkbox',
         '#gamif-expanded-coupon .gx-mirror-mission-action']
@@ -92,7 +95,7 @@ async function exercise(engine,name){
       const styles=getComputedStyle(el);
       return {motion:styles.animationName,bg:styles.backgroundImage,border:styles.borderRadius};
     });
-    assert.match(visual.motion,/gx-speech-from-avatar/,name+': original Gixy speech entrance missing');
+    assert.match(visual.motion,/gx-gixy-quiet-speech/,name+': premium restrained entrance missing');
     assert.match(visual.bg,/gradient/,name+': premium glass speech surface missing');
     assert(m.visible,name+': Gixy oculto, no hay zona libre para '+kind);
     assert(m.overlap<51,name+': Gixy tapa información '+JSON.stringify(m));
@@ -119,6 +122,19 @@ async function exercise(engine,name){
   await page.locator('#gx-mirror-heart .pulse-heart').click();
   assert.equal(await page.locator('#loyalty-count').innerText(),'4/4 Pagos');
   await assertMessage('loyalty',/lealtad/i);
+  const local=await page.evaluate(()=>{
+    const circle=document.querySelector('.gx-gixy-message[data-kind="loyalty"]').getBoundingClientRect();
+    const info=document.querySelector('#loyalty-msg').getBoundingClientRect();
+    const payment=document.querySelector('#dash-billing-card .gx-account-capsule')?.getBoundingClientRect();
+    return {dy:Math.abs(circle.top-info.top),inside:circle.bottom<=info.bottom+8,
+      coversButton:payment?!(circle.bottom<=payment.top||circle.top>=payment.bottom):false};
+  });
+  assert(local.dy<10&&local.inside&&!local.coversButton,
+    name+': Circle fuera de su sección o encima del cobro: '+JSON.stringify(local));
+  await page.locator('.gx-gixy-message__avatar').click();
+  assert.match(await page.locator('.gx-gixy-message__bubble').innerText(),/constancia/i);
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'1');
+
   await page.locator('#gx-mirror-mission-card').click();
   await page.waitForTimeout(1200);
   // Hex must NOT appear merely because the missions panel was opened.
@@ -130,9 +146,10 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#gx-mirror-complete-btn .gx-mirror-action-icon').evaluate(el=>getComputedStyle(el).animationName),'gx-mirror-check-pop');
   await page.locator('.gx-gixy-message__avatar').click();
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'1');
-  const bounce=await page.locator('.gx-gixy-message__avatar').evaluate(el=>
+  assert.match(await page.locator('.gx-gixy-message__bubble').innerText(),/GOXION/i);
+  const subtle=await page.locator('.gx-gixy-message__avatar').evaluate(el=>
     el.getAnimations().some(a=>a.playState==='running'));
-  assert(bounce,name+': touch did not trigger elastic bounce');
+  assert(subtle,name+': brief touch acknowledgement missing');
   await page.locator('#gx-mirror-retry').click();
   assert.equal(await page.locator('#gx-mirror-complete-btn').isEnabled(),true);
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
@@ -143,11 +160,13 @@ async function exercise(engine,name){
   assert.notEqual(secondMission.variant,firstMission.variant,'Gixys must vary placement between events');
   assert(Math.abs(secondMission.x-firstMission.x)+Math.abs(secondMission.y-firstMission.y)>=3,
     name+': Gixy positions must actually vary while staying safe');
-  // On repeated taps the creature bounces off invisible corners and hops away.
+  // Multiple taps rotate concise brand sayings; no forced launch or arcade spin.
   for(let i=0;i<4;i++)await page.locator('.gx-gixy-message__avatar').click();
-  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'hop');
-  assert.match(await page.locator('.gx-gixy-message__avatar').evaluate(el=>getComputedStyle(el).animationName),
-    /gx-avatar-hop-out/,name+': jump-out missing');
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'shown');
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'4');
+  assert.match(await page.locator('.gx-gixy-message__bubble').innerText(),/GOXION/i);
+  await page.locator('.gx-gixy-message__bubble').click();
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'fade');
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
   await page.locator('#gx-mirror-retry').click();
   await page.locator('#gx-mirror-close-missions').click();
