@@ -14,7 +14,7 @@ const hints={
 };
 
 const protectedSelectors=[
- '#gx-client-notif-launch','.gx-header-actions > *','.app-logo','#goxion-main-nav .tab-btn',
+ '#gx-client-notif-launch','.gx-header-actions > *','.app-logo','#goxion-main-nav',
  '#dynamic-greeting-text','#dash-date','#dash-badge',
  '#loyalty-count','#loyalty-msg','.gx-mirror-loyalty-label','#loyalty-bar',
  '.gx-gamif-card-mission .gamif-title','.gx-gamif-card-mission .gx-gamif-card-status',
@@ -36,7 +36,7 @@ const slots={
  mission:[['above','right',-4],['below','right',9],['above','left',5]]
 };
 const contexts={
- notification:['#gx-client-notif-launch','#dynamic-greeting-text'],
+ notification:['#gx-client-notif-launch','#goxion-main-nav','#dynamic-greeting-text'],
  loyalty:['#dash-billing-card','.gx-mirror-loyalty-label'],
  mission:['#gamif-expanded-coupon .gx-mirror-expanded-head','#gx-mirror-complete-btn']
 };
