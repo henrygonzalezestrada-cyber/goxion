@@ -32,6 +32,17 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#dash-billing-card').count(),1);
   assert.equal(await page.locator('.gx-gamif-card-mission').count(),1);
   assert.equal(await page.locator('#gx-mirror-heart .pulse-heart').count(),1);
+  const heartGeometry=await page.evaluate(()=>{
+    const h=document.querySelector('#gx-mirror-heart').getBoundingClientRect();
+    const label=document.querySelector('.gx-mirror-loyalty-name').getBoundingClientRect();
+    const count=document.querySelector('#loyalty-count').getBoundingClientRect();
+    const row=document.querySelector('.gx-mirror-loyalty-label').parentElement.getBoundingClientRect();
+    return {dy:Math.abs((h.top+h.height/2)-(label.top+label.height/2)),
+      overlap:Math.max(0,Math.min(h.right,count.right)-Math.max(h.left,count.left)),
+      inside:h.top>=row.top-2&&h.bottom<=row.bottom+2};
+  });
+  assert(heartGeometry.dy<=3&&heartGeometry.overlap<1&&heartGeometry.inside,
+    name+': heart not centered in loyalty row: '+JSON.stringify(heartGeometry));
   // Gixys never appear just by opening Mi Espacio; a meaningful event is required.
   assert.equal(await page.locator('.gx-gixy-message').count(),0);
   assert.equal(await page.locator('#gx-mirror-hex canvas').count(),0);
@@ -110,6 +121,8 @@ async function exercise(engine,name){
     }));
     assert.equal(lines.whiteSpace,'pre-wrap',name+': explicit line boundaries lost');
     assert(lines.scrollHeight<=lines.clientHeight+2,name+': typed content clipped or reflowing');
+    assert(!lines.text.split('\n').some(line=>/^(que|de|y|a|el)$/i.test(line.trim())),
+      name+': orphan word in speech: '+lines.text);
     assert(m.visible,name+': Gixy oculto, no hay zona libre para '+kind);
     assert(m.overlap<51,name+': Gixy tapa información '+JSON.stringify(m));
     assert(m.x>=0&&m.right<=m.clientWidth+2,name+': Gixy fuera de pantalla');
@@ -119,6 +132,9 @@ async function exercise(engine,name){
   }
   await page.locator('#gx-client-notif-launch').click();
   await page.locator('.gx-gixy-message[data-kind="notification"]').waitFor({timeout:3000});
+  assert.equal(await page.locator('.gx-gixy-joy__piece').count(),8,'Missing sparks/hearts');
+  assert.match(await page.locator('.gx-gixy-joy__piece').first().evaluate(el=>getComputedStyle(el).animationName),
+    /gx-gixy-spark-flight/,name+': particle effect missing');
   const bubbleEarly=await page.evaluate(()=>{
     const g=document.querySelector('.gx-gixy-message');
     return {chars:Number(g.dataset.visibleChars),typing:g.dataset.typing,
@@ -194,6 +210,15 @@ async function exercise(engine,name){
   assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy/i);
   await page.locator('.gx-gixys-secret').waitFor({state:'visible',timeout:3000});
   assert.match(await page.locator('.gx-gixys-secret').innerText(),/5 % OFF/i);
+  assert.equal(await page.locator('.gx-gixys-secret.glass-card').count(),1);
+  assert.equal(await page.locator('.gx-gixys-secret__confetti i').count(),30);
+  const appearance=await page.locator('.gx-gixys-secret').evaluate(el=>({
+    blur:getComputedStyle(el).backdropFilter,fill:getComputedStyle(el).backgroundImage
+  }));
+  assert.match(appearance.blur,/blur/,name+': award not glass');
+  assert.match(appearance.fill,/gradient/,name+': award not GOXION style');
+  assert.match(await page.locator('.gx-gixys-secret__confetti i').first().evaluate(el=>getComputedStyle(el).animationName),
+    /gx-gixys-confetti/,name+': confetti missing');
   assert.match(await page.locator('.gx-gixys-secret').innerText(),/demostración|ficticio/i);
   await page.locator('.gx-gixys-secret button').click();
   assert.equal(await page.locator('.gx-gixys-secret').count(),0);

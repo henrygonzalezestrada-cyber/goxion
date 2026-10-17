@@ -1,12 +1,15 @@
-name: GOXION · Gixys · Secreto V7
+name: GOXION · Gixys · Alegria V8
 on:
   push:
     branches:
-      - beta/gixys-easteregg-typing-v7-20261016
+      - beta/gixys-gusto-ojos-confeti-v8-20261016
     paths:
       - 'preview/gixys-mi-espacio-espejo/**'
       - '.github/workflows/goxion-gixys-mi-espacio-espejo.yml'
   workflow_dispatch:
+concurrency:
+  group: gixys-mirror-${{ github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: write
 jobs:
@@ -48,6 +51,12 @@ jobs:
         if: success()
         shell: bash
         run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          remote_sha="$(git rev-parse FETCH_HEAD)"
+          if [ "$remote_sha" != "$GITHUB_SHA" ]; then
+            echo "A newer beta commit superseded this build; skip stale files."
+            exit 0
+          fi
           git add preview/gixys-mi-espacio-espejo/index.html preview/gixys-mi-espacio-espejo/companions.js preview/gixys-mi-espacio-espejo/companions.css
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
