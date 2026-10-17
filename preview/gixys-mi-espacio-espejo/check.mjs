@@ -69,7 +69,8 @@ async function exercise(engine,name){
       const r=stage.getBoundingClientRect();
       const els=['#gx-client-notif-launch','.app-logo','#goxion-main-nav',
         '#dash-date','#dash-badge','#loyalty-count','#loyalty-bar','#loyalty-msg',
-        '#gamif-expanded-coupon .mission-item',
+        '#gamif-expanded-coupon .mission-item .gx-mission-text',
+        '#gamif-expanded-coupon .mission-item .mission-checkbox',
         '#gamif-expanded-coupon .gx-mirror-mission-action']
         .flatMap(q=>[...document.querySelectorAll(q)]).filter(el=>el.offsetParent!==null);
       const overlap=els.reduce((sum,el)=>{
