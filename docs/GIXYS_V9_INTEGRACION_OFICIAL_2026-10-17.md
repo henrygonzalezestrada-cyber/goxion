@@ -22,3 +22,6 @@ Quitar de `ayuda.html` las tres inclusiones (dos CSS + un script) o revertir exc
 
 ## Estado
 Visual V9 aprobado. QA de integración superado en Chromium/WebKit. La integración oficial se realiza con el easter egg financiero deshabilitado.
+
+## Corrección de preflight de integridad
+El CSS emitido automáticamente por esbuild se traslada a `assets/css/gixys-pulseheart.css` y se carga antes de `assets/css/gixys-official.css`. No dejar un `href` a `assets/js/ayuda/` dentro del encabezado: el contrato de integridad lo interpreta como archivo de JavaScript anterior al runtime. El artefacto viejo `21-gixys-official.bundle.css` fue retirado. El JS oficial mantiene su ubicación tras el runtime y motor financiero. Esta corrección se comprobó con QA de integración posterior a la compilación.
