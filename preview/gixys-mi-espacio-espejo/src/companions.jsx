@@ -15,7 +15,7 @@ const hints={
 
 const protectedSelectors=[
  '#gx-client-notif-launch','.gx-header-actions > *','.app-logo','#goxion-main-nav',
- '#dynamic-greeting-text','#dash-date','#dash-badge',
+ '.gx-mirror-note','#dynamic-greeting-text','#dash-date','#dash-badge',
  '#loyalty-count','#loyalty-msg','.gx-mirror-loyalty-label','#loyalty-bar',
  '.gx-gamif-card-mission .gamif-title','.gx-gamif-card-mission .gx-gamif-card-status',
  '.gx-gamif-progress','#gamif-expanded-coupon .btn-gamif-close',
@@ -66,6 +66,8 @@ function selectPlace(kind,node,sequence,dimensions){
    let left=align==='right'?area.right-w:align==='left'?area.left:area.left+(area.width-w)/2;
    let top=direction==='above'?area.top-h-9:area.bottom+9;
    left+=delta+[-7,8,0,5,-4][sequence%5];top+=(sequence%2?3:-3);
+   // The actual header has a narrow protected gap: stay below the bell and above the menu.
+   if(kind==='notification'&&sourceIdx===0)top=area.bottom+3;
    left=clamp(Math.round(left),11,Math.max(11,vw-w-11));
    if(top<12||top+h>vh-14)return;
    top=Math.round(top);
