@@ -32,9 +32,11 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#dash-billing-card').count(),1);
   assert.equal(await page.locator('.gx-gamif-card-mission').count(),1);
   assert.equal(await page.locator('#gx-mirror-heart .pulse-heart').count(),1);
-  assert.equal(await page.locator('#gx-mirror-hex canvas').count(),1);
-  assert.equal(await page.locator('#gx-mirror-circle canvas').count(),1);
-  assert.equal(await page.locator('#gx-mirror-square canvas').count(),1);
+  // Gixys never appear just by opening Mi Espacio; a meaningful event is required.
+  assert.equal(await page.locator('.gx-gixy-message').count(),0);
+  assert.equal(await page.locator('#gx-mirror-hex canvas').count(),0);
+  assert.equal(await page.locator('#gx-mirror-circle canvas').count(),0);
+  assert.equal(await page.locator('#gx-mirror-square canvas').count(),0);
   assert.equal(await page.locator('.gx-mirror-note').count(),1);
   assert.equal(await page.locator('#gx-client-notif-launch').count(),1);
   assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage)),[],name+': beta accessed persistence');
@@ -42,7 +44,7 @@ async function exercise(engine,name){
     await page.setViewportSize({width,height:844});
     await page.waitForTimeout(150);
     const m=await page.evaluate(()=>{
-      const visible=[...document.querySelectorAll('#gx-mirror-hex canvas,#gx-mirror-circle canvas,#gx-mirror-square canvas')].map(c=>({
+      const visible=[...document.querySelectorAll('.gx-gixy-message__avatar canvas')].map(c=>({
         width:c.width,css:c.getBoundingClientRect().width
       }));
       const card=document.getElementById('gx-mirror-mission-card');
@@ -57,9 +59,45 @@ async function exercise(engine,name){
     assert(m.visible.every(v=>v.width/Math.max(1,v.css)>=1.5),name+' '+width+': blurry canvas: '+JSON.stringify(m.visible));
   }
   await page.setViewportSize({width:390,height:844});
+  async function assertMessage(kind,phrase){
+    await page.locator('.gx-gixy-message[data-kind="'+kind+'"]').waitFor({timeout:3000});
+    const bubble=page.locator('.gx-gixy-message__bubble');
+    assert.match(await bubble.innerText(),phrase);
+    const m=await page.evaluate(()=>{
+      const stage=document.querySelector('.gx-gixy-message');
+      const r=stage.getBoundingClientRect();
+      const els=['#gx-client-notif-launch','.app-logo','#goxion-main-nav',
+        '#dash-date','#dash-badge','#loyalty-count','#loyalty-bar','#loyalty-msg',
+        '#gamif-expanded-coupon .mission-item',
+        '#gamif-expanded-coupon .gx-mirror-mission-action']
+        .flatMap(q=>[...document.querySelectorAll(q)]).filter(el=>el.offsetParent!==null);
+      const overlap=els.reduce((sum,el)=>{
+        const b=el.getBoundingClientRect();
+        return sum+Math.max(0,Math.min(b.right,r.right)-Math.max(b.left,r.left))*
+          Math.max(0,Math.min(b.bottom,r.bottom)-Math.max(b.top,r.top));
+      },0);
+      const avatar=stage.querySelector('canvas');
+      return {visible:getComputedStyle(stage).visibility==='visible',
+        clientWidth:document.documentElement.clientWidth,
+        scrollWidth:document.documentElement.scrollWidth,
+        x:r.left,y:r.top,right:r.right,bottom:r.bottom,overlap,
+        ratio:avatar?avatar.width/Math.max(1,avatar.getBoundingClientRect().width):0,
+        message:stage.dataset.kind,variant:stage.dataset.variant};
+    });
+    assert(m.visible,name+': Gixy oculto, no hay zona libre para '+kind);
+    assert(m.overlap<51,name+': Gixy tapa información '+JSON.stringify(m));
+    assert(m.x>=0&&m.right<=m.clientWidth+2,name+': Gixy fuera de pantalla');
+    assert(m.ratio>=1.5,name+': render Canvas borroso');
+    assert(m.scrollWidth<=m.clientWidth+2,name+': scroll horizontal al aparecer');
+    return m;
+  }
   await page.locator('#gx-client-notif-launch').click();
+  await assertMessage('notification',/novedad/i);
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'true');
-  await page.waitForTimeout(450); // la cápsula real hace morph antes de revelar su contador en Safari
+  await page.waitForFunction(()=>{
+    const badge=document.getElementById('gx-client-notif-badge');
+    return badge?.textContent==='1'&&badge.getBoundingClientRect().width>=18;
+  },null,{timeout:2500}); // wait for the real WebKit morph, not a fixed clock
   assert.equal(await page.locator('#gx-client-notif-badge').textContent(),'1');
   const badgeSize=await page.locator('#gx-client-notif-badge').evaluate(el=>el.getBoundingClientRect().width);
   assert(badgeSize>=18,name+': contador no visible tras el morph de la campana');
@@ -67,16 +105,32 @@ async function exercise(engine,name){
   assert.equal(await page.locator('body').evaluate(el=>el.classList.contains('gx-mirror-notif-active')),true);
   await page.locator('#gx-client-notif-launch').click();
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'false');
+  await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
   await page.locator('#gx-mirror-heart .pulse-heart').click();
   assert.equal(await page.locator('#loyalty-count').innerText(),'4/4 Pagos');
+  await assertMessage('loyalty',/lealtad/i);
   await page.locator('#gx-mirror-mission-card').click();
   await page.waitForTimeout(1200);
+  // Hex must NOT appear merely because the missions panel was opened.
+  assert.equal(await page.locator('.gx-gixy-message[data-kind="mission"]').count(),0);
   await page.locator('#gx-mirror-complete-btn').click();
+  const firstMission=await assertMessage('mission',/misiones/i);
   assert.equal(await page.locator('#gx-mirror-mission-status').innerText(),'Recompensa lista · Simulación');
   assert.equal(await page.locator('#gx-mirror-complete-btn').isDisabled(),true);
   assert.equal(await page.locator('#gx-mirror-complete-btn .gx-mirror-action-icon').evaluate(el=>getComputedStyle(el).animationName),'gx-mirror-check-pop');
   await page.locator('#gx-mirror-retry').click();
   assert.equal(await page.locator('#gx-mirror-complete-btn').isEnabled(),true);
+  await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
+  // Second completion is allowed after the deduplication window; placement rotates.
+  await page.waitForTimeout(2600);
+  await page.locator('#gx-mirror-complete-btn').click();
+  const secondMission=await assertMessage('mission',/recompensa/i);
+  assert.notEqual(secondMission.variant,firstMission.variant,'Gixys must vary placement between events');
+  assert(Math.abs(secondMission.x-firstMission.x)+Math.abs(secondMission.y-firstMission.y)>=3,
+    name+': Gixy positions must actually vary while staying safe');
+  await page.locator('.gx-gixy-message__bubble').click();
+  await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
+  await page.locator('#gx-mirror-retry').click();
   await page.locator('#gx-mirror-close-missions').click();
   await page.waitForTimeout(900);
   assert.deepEqual(errors,[],name+': javascript runtime errors');
