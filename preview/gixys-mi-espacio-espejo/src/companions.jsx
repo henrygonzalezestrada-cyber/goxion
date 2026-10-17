@@ -372,7 +372,7 @@ function LoyaltyHeart(){
   return <PulseHeart liked={liked} onChange={next=>{
     setLiked(next);
     document.dispatchEvent(new CustomEvent('gx-mirror:loyalty-toggle',{detail:{value:next}}));
-  }} showCount={false} size={30} corner={22} likedColor="#ff4d6d"
+  }} showCount={false} size={28} corner={22} likedColor="#ff4d6d"
     idleColor="#ff4d6d" pillColor="transparent" textColor="#fff" duration={560}
     dotSize={.3} overshoot={1.7} label="Probar avance de lealtad"/>;
 }
