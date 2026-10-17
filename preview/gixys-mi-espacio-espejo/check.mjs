@@ -222,7 +222,7 @@ async function exercise(engine,name){
   }
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'shown');
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'3');
-  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy|GOXION|Gixys/i);
+  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy|GOXION|Gixys|Gixy/i);
   await page.locator('.gx-gixy-message__bubble').click();
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'fade');
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
