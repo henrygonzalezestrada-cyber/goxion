@@ -369,3 +369,67 @@ body.gx-mirror-body.gx-loyalty-speaking #loyalty-msg{
  }
  .gx-gixy-message.is-leaving{opacity:0!important}
 }
+
+
+/* V6 · Typewriter speech: the glass capsule expands with the letters.
+   The scene footprint stays inside the vetted safe-zone, so no new collisions. */
+.gx-gixy-message__bubble{
+ flex:0 0 auto!important;
+ box-sizing:border-box!important;
+ width:var(--gx-bubble-width,34px)!important;
+ min-width:32px!important;
+ max-width:132px!important;
+ height:var(--gx-bubble-height,34px)!important;
+ min-height:30px!important;
+ max-height:64px!important;
+ overflow:visible!important;
+ padding:0!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:flex-start!important;
+ transition:width .13s cubic-bezier(.25,.82,.35,1),
+            height .17s cubic-bezier(.25,.82,.35,1)!important;
+ font-size:10.45px!important;
+ line-height:1.36!important;
+}
+.gx-gixy-message__bubble::after{pointer-events:none!important}
+.gx-gixy-message__bubble .gx-gixy-message__measure{
+ position:absolute!important;top:0;left:0;
+ width:max-content;max-width:132px;
+ height:auto;box-sizing:border-box;
+ border:1px solid transparent;
+ padding:8px 9px!important;
+ margin:0;display:inline-block!important;
+ opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+ white-space:normal!important;overflow-wrap:break-word;
+ font:inherit;line-height:inherit;
+ animation:none!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__written{
+ position:relative;display:block!important;
+ box-sizing:border-box;width:100%;
+ padding:8px 9px!important;
+ margin:0!important;
+ color:inherit;overflow-wrap:break-word;
+ line-height:1.36;
+ animation:none!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__sr{
+ position:absolute!important;
+ width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;
+ overflow:hidden!important;
+ clip:rect(0,0,0,0)!important;
+ white-space:nowrap!important;
+ border:0!important;
+ animation:none!important;
+}
+.gx-gixy-message__avatar:disabled{
+ opacity:1!important;cursor:default!important;
+}
+.gx-gixy-message[data-typing="true"] .gx-gixy-message__bubble{cursor:default}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixy-message__bubble{
+  transition:none!important;animation:none!important;
+ }
+}
