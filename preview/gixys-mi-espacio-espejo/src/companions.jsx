@@ -24,7 +24,6 @@ const protectedSelectors=[
  '#gamif-expanded-coupon .mission-item .gx-mission-text',
  '#gamif-expanded-coupon .mission-item .mission-checkbox',
  '#gamif-expanded-coupon .gx-mirror-mission-action',
- '#gamif-expanded-coupon .btn-primary',
  '#gamif-expanded-coupon .gx-mirror-retry'
 ];
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -39,7 +38,7 @@ const slots={
 const contexts={
  notification:['#gx-client-notif-launch','#goxion-main-nav','#dynamic-greeting-text'],
  loyalty:['#loyalty-msg','#dash-billing-card','.gx-mirror-loyalty-label'],
- mission:['#gamif-expanded-coupon .gx-mirror-expanded-head','#gamif-expanded-coupon .gx-gamif-expanded-head','#gx-mirror-complete-btn','.gx-gamif-card-mission']
+ mission:['#gamif-expanded-coupon .gx-mirror-expanded-head','#gx-mirror-complete-btn']
 };
 const isShown=el=>{
  const r=el.getBoundingClientRect(),style=getComputedStyle(el);
@@ -192,8 +191,8 @@ function measureSpeech(visible,full){
  const height=Math.min(75,Math.ceil(17+14.3*shownLines.length));
  return {width:Math.min(144,Math.max(36,Math.ceil(width+19))),height:Math.max(32,height)};
 }
-function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouch,official=false}){
- const cfg=official?{...hints[kind],text:{mission:'¡Tus misiones están completas!',loyalty:'Tu constancia merece celebrarse.',notification:'¡Tienes una novedad en GOXION!'}[kind]}:hints[kind],scene=useRef(null),lock=useRef(true);
+function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouch}){
+ const cfg=hints[kind],scene=useRef(null),lock=useRef(true);
  const textVersion=useRef(0),writeTimer=useRef(null),unlockTimer=useRef(null);
  const reactionTimer=useRef(null),done=useRef(onTextComplete),touchRef=useRef(onTouch);
  done.current=onTextComplete;touchRef.current=onTouch;
@@ -297,7 +296,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
   </button>
  </div>;
 }
-function Messages({official=false}){
+function Messages(){
  const [current,setCurrent]=useState(null);
  const [reward,setReward]=useState(false);
  const [found,setFound]=useState(0);
@@ -319,7 +318,6 @@ function Messages({official=false}){
   timers.current.shown=setTimeout(()=>dismiss(),9000);
  };
  const onTouch=(kind,n)=>{
-  if(official)return sayings[kind][(n-1)%sayings[kind].length];
   if(!met.current.has(kind)&&!alreadyAwarded.current){
    met.current.add(kind);setFound(met.current.size);
    if(met.current.size===1)return 'Goxy dejó un secreto entre nosotros tres...';
@@ -355,9 +353,9 @@ function Messages({official=false}){
   return ()=>{unsubs.forEach(fn=>fn());clearTimers();clearTimeout(timers.current.reward);};
  },[]);
  return <>
-  {current?<GixyMessage key={current.serial} {...current} official={official} onDismiss={dismiss}
+  {current?<GixyMessage key={current.serial} {...current} onDismiss={dismiss}
    onEngage={onEngage} onTouch={onTouch} onTextComplete={onTextComplete}/>:null}
-  {!official&&reward?<div className="glass-card gx-gixys-secret gx-gixys-secret--v9"
+  {reward?<div className="glass-card gx-gixys-secret gx-gixys-secret--v9"
      role="status" aria-live="polite" data-celebration="aurora">
    <span className="gx-gixys-secret__aura" aria-hidden="true"></span>
    <div className="gx-gixys-secret__halo" aria-hidden="true">
@@ -410,7 +408,3 @@ function mount(){
 }
 document.addEventListener('gx-mirror-ready',mount);
 if(document.readyState!=='loading')mount();
-
-// Production shares the exact approved beta renderer but supplies only authenticated
-// server-confirmed events. The fictitious 5% game is never mounted in production.
-export {Messages};
