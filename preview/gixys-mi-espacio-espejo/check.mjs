@@ -49,6 +49,38 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#gx-mirror-circle canvas').count(),0);
   assert.equal(await page.locator('#gx-mirror-square canvas').count(),0);
   assert.equal(await page.locator('.gx-mirror-note').count(),1);
+  // Guard against every layout shift: fixed-position Gixys may float over
+  // empty space, but may NEVER change the location of a real dashboard card.
+  await page.evaluate(()=>document.fonts.ready);
+  await page.waitForTimeout(850); // stabilize official dashboard before diffing event geometry
+  const baseline=await page.evaluate(()=>{
+    const selectors=['#dash-billing-card','#loyalty-msg',
+      '#dash-billing-card .gx-account-capsule','#gx-mirror-mission-card'];
+    const snap=()=>Object.fromEntries(selectors.map(sel=>{
+      const el=document.querySelector(sel),r=el?.getBoundingClientRect();
+      return [sel,r?{x:r.x,y:r.y,width:r.width,height:r.height}:null];
+    }));
+    window.__gixysBaseline=snap();
+    return window.__gixysBaseline;
+  });
+  const assertNoShift=async stage=>{
+    const current=await page.evaluate(()=>Object.fromEntries(
+      Object.keys(window.__gixysBaseline).map(sel=>{
+        const r=document.querySelector(sel)?.getBoundingClientRect();
+        return [sel,r?{x:r.x,y:r.y,width:r.width,height:r.height}:null];
+      })));
+    // A mission morph deliberately changes the mission panel, not the Gixy.
+    for(const sel of Object.keys(baseline)){
+      if(stage==='mission'&&sel==='#gx-mirror-mission-card')continue;
+      const a=baseline[sel],z=current[sel];
+      if(!a||!z)continue;
+      for(const k of ['x','y','width','height'])
+        assert(Math.abs(z[k]-a[k])<=1.5,
+          name+': Gixy displaced dashboard '+sel+'.'+k+
+          ' at '+stage+': '+a[k]+' -> '+z[k]);
+    }
+  };
+
   assert.equal(await page.locator('#gx-client-notif-launch').count(),1);
   assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage)),[],name+': beta accessed persistence');
   for(const width of [280,320,360,375,390,430,768]){
@@ -132,6 +164,7 @@ async function exercise(engine,name){
   }
   await page.locator('#gx-client-notif-launch').click();
   await page.locator('.gx-gixy-message[data-kind="notification"]').waitFor({timeout:3000});
+  await assertNoShift('notification');
   assert.equal(await page.locator('.gx-gixy-joy__piece').count(),8,'Missing sparks/hearts');
   assert.match(await page.locator('.gx-gixy-joy__piece').first().evaluate(el=>getComputedStyle(el).animationName),
     /gx-gixy-spark-flight/,name+': particle effect missing');
@@ -176,15 +209,24 @@ async function exercise(engine,name){
   await page.locator('#gx-mirror-heart .pulse-heart').click();
   assert.equal(await page.locator('#loyalty-count').innerText(),'4/4 Pagos');
   await assertMessage('loyalty',/lealtad/i);
+  await assertNoShift('loyalty');
   const local=await page.evaluate(()=>{
     const circle=document.querySelector('.gx-gixy-message[data-kind="loyalty"]').getBoundingClientRect();
-    const info=document.querySelector('#loyalty-msg').getBoundingClientRect();
-    const payment=document.querySelector('#dash-billing-card .gx-account-capsule')?.getBoundingClientRect();
-    return {dy:Math.abs(circle.top-info.top),inside:circle.bottom<=info.bottom+8,
-      coversButton:payment?!(circle.bottom<=payment.top||circle.top>=payment.bottom):false};
+    const card=document.querySelector('#dash-billing-card').getBoundingClientRect();
+    const root=document.querySelector('#gx-gixys-message-root');
+    const message=document.querySelector('#loyalty-msg');
+    const css=getComputedStyle(root);
+    const rect=message.getBoundingClientRect();
+    return {fixed:css.position==='fixed',w:root.getBoundingClientRect().width,
+      messageVisible:getComputedStyle(message).color!=='rgba(0, 0, 0, 0)',
+      distance:Math.min(Math.abs(circle.top-card.bottom),Math.abs(circle.bottom-card.top)),
+      top:circle.top,bottom:circle.bottom,width:circle.width,
+      messageHeight:rect.height};
   });
-  assert(local.dy<10&&local.inside&&!local.coversButton,
-    name+': Circle fuera de su sección o encima del cobro: '+JSON.stringify(local));
+  assert(local.fixed&&local.w===0&&local.messageVisible,
+    name+': loyalty changes page flow or hides real text: '+JSON.stringify(local));
+  assert(local.top>=0&&local.bottom<=844,
+    name+': loyalty stage escaped viewport: '+JSON.stringify(local));
   await page.locator('.gx-gixy-message__avatar').click();
   assert.equal(await page.locator('.gx-gixys-progress').getAttribute('data-found'),'2');
   assert.equal(await page.locator('.gx-gixys-secret').count(),0);
@@ -210,17 +252,29 @@ async function exercise(engine,name){
   assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy/i);
   await page.locator('.gx-gixys-secret').waitFor({state:'visible',timeout:3000});
   assert.match(await page.locator('.gx-gixys-secret').innerText(),/5 % OFF/i);
-  assert.equal(await page.locator('.gx-gixys-secret.glass-card').count(),1);
-  assert.equal(await page.locator('.gx-gixys-secret__confetti i').count(),30);
+  assert.equal(await page.locator('.gx-gixys-secret--v9.glass-card').count(),1);
+  assert.equal(await page.locator('.gx-gixys-secret__confetti').count(),0,
+    name+': cheap paper confetti should be removed');
+  assert.equal(await page.locator('.gx-gixys-secret__light').count(),14);
+  assert.equal(await page.locator('.gx-gixys-secret__ring').count(),2);
   const appearance=await page.locator('.gx-gixys-secret').evaluate(el=>({
     blur:getComputedStyle(el).backdropFilter,fill:getComputedStyle(el).backgroundImage
   }));
   assert.match(appearance.blur,/blur/,name+': award not glass');
   assert.match(appearance.fill,/gradient/,name+': award not GOXION style');
-  assert.match(await page.locator('.gx-gixys-secret__confetti i').first().evaluate(el=>getComputedStyle(el).animationName),
-    /gx-gixys-confetti/,name+': confetti missing');
+  assert.match(await page.locator('.gx-gixys-secret__amount').evaluate(el=>getComputedStyle(el).animationName),
+    /gx-award-aurora-reveal|gx-award-amount-reveal/,
+    name+': missing Colorion-inspired Aurora prize text animation');
   assert.match(await page.locator('.gx-gixys-secret').innerText(),/demostración|ficticio/i);
-  await page.locator('.gx-gixys-secret button').click();
+  const awardButton=await page.locator('.gx-gixys-secret button').evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    return {tapTarget:document.elementFromPoint(r.left+r.width/2,r.top+r.height/2),
+      button:el,interactive:getComputedStyle(el).pointerEvents};
+  });
+  assert(awardButton.interactive==='auto'&&
+    (awardButton.tapTarget===awardButton.button||awardButton.button.contains(awardButton.tapTarget)),
+    name+': award dismissal is hidden behind another layer');
+  await page.locator('.gx-gixys-secret button').click({timeout:3000});
   assert.equal(await page.locator('.gx-gixys-secret').count(),0);
   await page.locator('.gx-gixy-message__avatar').waitFor({state:'visible'});
   await page.locator('#gx-mirror-retry').click();

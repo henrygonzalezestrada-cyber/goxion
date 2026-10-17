@@ -1,8 +1,8 @@
-name: GOXION · Gixys · Alegria V8
+name: GOXION · Gixys · Floating Aurora V9
 on:
   push:
     branches:
-      - beta/gixys-gusto-ojos-confeti-v8-20261016
+      - beta/gixys-overlay-award-aurora-v9-20261017
     paths:
       - 'preview/gixys-mi-espacio-espejo/**'
       - '.github/workflows/goxion-gixys-mi-espacio-espejo.yml'

@@ -37,7 +37,7 @@ const slots={
 };
 const contexts={
  notification:['#gx-client-notif-launch','#goxion-main-nav','#dynamic-greeting-text'],
- loyalty:['#dash-billing-card','.gx-mirror-loyalty-label'],
+ loyalty:['#loyalty-msg','#dash-billing-card','.gx-mirror-loyalty-label'],
  mission:['#gamif-expanded-coupon .gx-mirror-expanded-head','#gx-mirror-complete-btn']
 };
 const isShown=el=>{
@@ -48,17 +48,6 @@ function selectPlace(kind,node,sequence,dimensions){
  const vw=document.documentElement.clientWidth,vh=innerHeight;
  const w=Math.min(dimensions.width||202,vw-22),h=dimensions.height||74;
  if(w<140||h>vh-24)return null;
- // Lealtad: su espacio es la propia línea explicativa, que se expande
- // durante el consejo. Esto impide que Circle salte hasta las tarjetas inferiores.
- if(kind==='loyalty'){
-  const row=document.querySelector('#loyalty-msg');
-  if(!row||!isShown(row))return null;
-  const r=row.getBoundingClientRect();
-  const left=clamp(Math.round(r.left+3),12,Math.max(12,vw-w-12));
-  const top=Math.round(r.top+3);
-  if(top<14||top+h>vh-16)return null;
-  return {left,top,width:w,height:h,slot:sequence%3,collision:0,sourceIdx:0,score:0};
- }
  const obstacles=protectedSelectors.flatMap(s=>[...document.querySelectorAll(s)])
    .filter(el=>el!==node&&isShown(el))
    .map(el=>el.getBoundingClientRect())
@@ -91,6 +80,26 @@ function selectPlace(kind,node,sequence,dimensions){
    if(!best||score<best.score)best={...candidate,score};
   });
  });
+ // The scene lives in a fixed portal. In a dense loyalty dashboard there may
+ // be no 60px vacant block around the tiny helper line; dock a compact scene
+ // in the viewport instead of creating room by expanding the payment card.
+ if(!best&&kind==='loyalty'){
+  const card=document.querySelector('#dash-billing-card');
+  if(card&&isShown(card)){
+   const area=card.getBoundingClientRect();
+   const tries=[
+    {left:clamp(Math.round(area.right-w-6),12,vw-w-12),top:Math.round(area.bottom+9)},
+    {left:clamp(Math.round(area.left+9),12,vw-w-12),top:Math.round(area.top-h-10)},
+    {left:clamp(Math.round(area.right-w-9),12,vw-w-12),top:Math.round(vh-h-18)}
+   ];
+   const viable=tries.map((v,i)=>{
+    const r=bounds(v.left,v.top,w,h);
+    return {...v,collision:obstacles.reduce((sum,o)=>sum+overlap(r,o),0),slot:i,sourceIdx:3};
+   }).filter(v=>v.top>=12&&v.top+h<=vh-14);
+   viable.sort((a,b)=>a.collision-b.collision);
+   if(viable.length&&viable[0].collision<=50)best=viable[0];
+  }
+ }
  return best;
 }
 
@@ -230,7 +239,6 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
  },[full,reduced,glyphs.length]);
  useLayoutEffect(()=>{
   let raf=0;
-  if(kind==='loyalty')document.body.classList.add('gx-loyalty-speaking');
   const place=()=>{
    if(!scene.current)return;
    setLayout(selectPlace(kind,scene.current,serial,scene.current.getBoundingClientRect()));
@@ -247,7 +255,6 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
    window.removeEventListener('scroll',schedule,true);
    window.visualViewport?.removeEventListener('resize',schedule);
    window.visualViewport?.removeEventListener('scroll',schedule);
-   if(kind==='loyalty')document.body.classList.remove('gx-loyalty-speaking');
   };
  },[kind,serial]);
  useEffect(()=>()=>clearTimeout(reactionTimer.current),[]);
@@ -348,19 +355,26 @@ function Messages(){
  return <>
   {current?<GixyMessage key={current.serial} {...current} onDismiss={dismiss}
    onEngage={onEngage} onTouch={onTouch} onTextComplete={onTextComplete}/>:null}
-  {reward?<div className="glass-card gx-gixys-secret" role="status" aria-live="polite">
+  {reward?<div className="glass-card gx-gixys-secret gx-gixys-secret--v9"
+     role="status" aria-live="polite" data-celebration="aurora">
    <span className="gx-gixys-secret__aura" aria-hidden="true"></span>
-   <span className="gx-gixys-secret__confetti" aria-hidden="true">
-    {Array.from({length:30},(_,i)=><i key={i} style={{
-     '--dx':((i%10)-4.5)*(13+(i%3)*5)+'px',
-     '--dy':(-42-(Math.floor(i/10)*22)-(i%4)*5)+'px',
-     '--rot':(i%2?420:-360)+'deg',
-     '--delay':((i%7)*45)+'ms',
-     '--tone':i%3===0?'#04dbee':i%3===1?'#9368ff':'#ff6caa'
-    }}/>)}
-   </span>
+   <div className="gx-gixys-secret__halo" aria-hidden="true">
+    <i className="gx-gixys-secret__ring gx-gixys-secret__ring--a"/>
+    <i className="gx-gixys-secret__ring gx-gixys-secret__ring--b"/>
+    {Array.from({length:14},(_,i)=><i key={i} className="gx-gixys-secret__light"
+       style={{
+        '--angle':(i*360/14)+'deg',
+        '--flight':(48+(i%4)*9)+'px',
+        '--delay':(i%5)*34+'ms',
+        '--hue':i%3===0?'#71eefa':i%3===1?'#a993ff':'#ffc1ed'
+       }}/>)}
+   </div>
    <div className="gx-gixys-secret__top">SECRETO DE LOS GIXYS <span>3/3</span></div>
-   <div className="gx-gixys-secret__award">5 % OFF <small>de demostración</small></div>
+   <div className="gx-gixys-secret__unlocked">¡LOGRO DESBLOQUEADO!</div>
+   <div className="gx-gixys-secret__award">
+     <span className="gx-gixys-secret__amount">5 % OFF</span>
+     <small>de demostración</small>
+   </div>
    <p>¡Encontraste a los tres! Este cupón es ficticio: no se generó ni aplicó un descuento real.</p>
    <button type="button" onClick={()=>setReward(false)} aria-label="Cerrar recompensa de demostración">Entendido</button>
   </div>:null}
@@ -388,7 +402,7 @@ function mount(){
   mounted=true;
   window.GOXION_GIXYS_ESPEJO_ENGINE=Object.freeze({
     renderer:'bot-avatars@0.2.2',shading:'plastic',
-    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','BalancedTypewriterV3','GixysNativeJoy','EasterEggDemo5','CelebrationConfetti'],
+    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','BalancedTypewriterV3','GixysNativeJoy','EasterEggDemo5','ColorionAuroraAward'],
     noBackend:true
   });
 }

@@ -702,3 +702,169 @@ body.gx-mirror-body #gx-mirror-heart .pulse-heart__heart{
   min-width:28px!important;min-height:28px!important;
   flex:0 0 28px!important;
 }
+
+
+/* V9 — Non-displacing companion stage.
+   The Gixy portal has no impact on the layout, including the loyalty helper.
+   We never add minimum height, hide the actual loyalty text, or push payment
+   and mission controls around to make room. */
+html[data-gx-mirror] #gx-gixys-message-root{
+ position:fixed!important;inset:0!important;z-index:10010!important;
+ width:0!important;height:0!important;
+ margin:0!important;padding:0!important;pointer-events:none!important;
+ overflow:visible!important;contain:none!important;
+}
+body.gx-mirror-body.gx-loyalty-speaking #loyalty-msg,
+body.gx-mirror-body #loyalty-msg{
+ min-height:0!important;
+ color:var(--text-muted)!important;
+ transition:none!important;
+}
+html[data-gx-mirror] .gx-gixy-message{
+ position:fixed!important;
+ pointer-events:none!important;
+ contain:layout style;
+}
+html[data-gx-mirror] .gx-gixy-message__avatar,
+html[data-gx-mirror] .gx-gixy-message__bubble{
+ pointer-events:auto!important;
+}
+html[data-gx-mirror] .gx-gixy-message__avatar:disabled{pointer-events:none!important}
+
+/* V9 award — borrowed Colorion "Borealis Aurora" gradient text technique,
+   reinterpreted with fixed GOXION ink (purple/cyan) and a one-shot reveal.
+   No falling rectangles; a restrained halo and radial light fragments. */
+body.gx-mirror-body .gx-gixys-secret--v9.glass-card{
+ overflow:hidden!important;
+ padding:22px 21px 17px!important;
+ border-radius:20px!important;
+ background:linear-gradient(155deg,rgba(37,31,65,.94),rgba(15,23,41,.95) 64%,rgba(11,32,47,.91))!important;
+ border:1px solid rgba(180,192,248,.20)!important;
+ box-shadow:0 20px 62px rgba(0,0,0,.42),
+  0 0 0 1px rgba(124,102,210,.045),inset 0 1px rgba(255,255,255,.1)!important;
+ backdrop-filter:blur(24px)!important;
+ -webkit-backdrop-filter:blur(24px)!important;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__aura{
+ z-index:0;
+ background:radial-gradient(ellipse at 49% 18%,rgba(112,85,219,.22),transparent 72%)!important;
+}
+.gx-gixys-secret--v9 > :not(.gx-gixys-secret__aura):not(.gx-gixys-secret__halo){
+ position:relative;z-index:2
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__halo{
+ position:absolute;inset:0;overflow:hidden;z-index:1;pointer-events:none;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__ring{
+ display:block;position:absolute;top:40%;left:50%;
+ width:132px;height:132px;border-radius:50%;margin:-66px;
+ border:1px solid rgba(138,191,247,.42);
+ box-shadow:0 0 18px rgba(118,112,225,.15);
+ opacity:0;pointer-events:none;
+ animation:gx-award-ring 1.1s cubic-bezier(.13,.6,.3,1) both;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__ring--b{
+ border-color:rgba(128,240,232,.31);
+ animation-delay:.16s
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__light{
+ position:absolute;top:40%;left:50%;
+ width:3px;height:12px;border-radius:6px;
+ margin:-4px 0 0 -2px;
+ background:var(--hue);
+ box-shadow:0 0 10px var(--hue);
+ opacity:0;
+ transform-origin:50% 50%;
+ animation:gx-award-light-flight 1.35s cubic-bezier(.19,.72,.28,1) var(--delay) both;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__light:nth-of-type(3n){
+ height:5px;width:5px;border-radius:50%;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__unlocked{
+ margin-top:12px;
+ color:#d0c5ff;
+ font:700 10px/1.4 Poppins,system-ui,sans-serif;
+ letter-spacing:.13em;
+ animation:gx-award-line-reveal .7s cubic-bezier(.18,.9,.25,1) both;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__award{
+ display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+ margin-top:5px!important;
+ animation:none!important;opacity:1!important;text-shadow:none!important;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__amount{
+ font:800 33px/1.15 Poppins,system-ui,sans-serif;
+ letter-spacing:-.048em;
+ color:#f1edff;
+ display:inline-block;
+ animation:gx-award-amount-reveal .72s cubic-bezier(.17,.95,.34,1) both;
+}
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+ .gx-gixys-secret--v9 .gx-gixys-secret__amount{
+  background:linear-gradient(100deg,#eeeaff 10%,#9b88ed 28%,#91ecef 43%,#e7e3ff 58%,#9485dd 80%,#eeeaff 100%) 0 0 / 300% 100%;
+  background-clip:text;-webkit-background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  animation:gx-award-aurora-reveal 3.3s cubic-bezier(.17,.95,.34,1) both;
+ }
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__award small{
+ font-weight:600!important;color:#9facc4!important;font-size:9.5px!important
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__top{
+ font-size:9.6px!important;
+ color:#aebad0!important;
+}
+.gx-gixys-secret--v9 p{margin-top:12px!important}
+@keyframes gx-award-ring{
+ 0%{opacity:0;transform:scale(.33)}
+ 24%{opacity:.67}
+ 100%{opacity:0;transform:scale(2.15)}
+}
+@keyframes gx-award-light-flight{
+ 0%{opacity:0;transform:rotate(var(--angle)) translateY(0) scale(.5)}
+ 20%{opacity:1}
+ 65%{opacity:.75}
+ 100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-1 * var(--flight))) scale(.5)}
+}
+@keyframes gx-award-line-reveal{
+ from{opacity:0;transform:translate3d(0,5px,0);letter-spacing:.2em}
+ to{opacity:1;transform:translate3d(0,0,0);letter-spacing:.13em}
+}
+@keyframes gx-award-amount-reveal{
+ from{opacity:0;transform:translate3d(0,9px,0) scale(.94)}
+ to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes gx-award-aurora-reveal{
+ 0%{opacity:0;transform:translate3d(0,9px,0) scale(.94);background-position:0% 50%}
+ 20%{opacity:1}
+ 100%{opacity:1;transform:translate3d(0,0,0) scale(1);background-position:100% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixys-secret--v9 .gx-gixys-secret__ring,
+ .gx-gixys-secret--v9 .gx-gixys-secret__light{
+  display:none!important;animation:none!important
+ }
+ .gx-gixys-secret--v9 .gx-gixys-secret__amount,
+ .gx-gixys-secret--v9 .gx-gixys-secret__unlocked{
+  opacity:1!important;transform:none!important;
+  animation:none!important
+ }
+}
+
+
+/* Interactive award remains at a fixed location while internal light/ink
+   animate; a moving card is not a premium interaction target. */
+body.gx-mirror-body .gx-gixys-secret--v9.glass-card{
+ animation:none!important;
+ transition:none!important;
+ transform:translateX(-50%)!important;
+}
+
+
+/* Portal itself ignores input, but award and its dismissal remain tappable. */
+body.gx-mirror-body .gx-gixys-secret--v9.glass-card,
+body.gx-mirror-body .gx-gixys-secret--v9.glass-card button{
+ pointer-events:auto!important;
+ touch-action:manipulation;
+}
