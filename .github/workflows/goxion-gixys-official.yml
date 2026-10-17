@@ -1,0 +1,69 @@
+name: GOXION · Gixys Official Integration
+on:
+  push:
+    branches:
+      - feature/gixys-oficial-seguro-20261017
+    paths:
+      - 'ayuda.html'
+      - 'assets/css/gixys-official.css'
+      - 'assets/js/ayuda/21-gixys-official.src.jsx'
+      - 'preview/gixys-mi-espacio-espejo/src/companions.jsx'
+      - 'preview/gixys-oficial-qa/**'
+      - 'scripts/qa-gixys-official.mjs'
+      - '.github/workflows/goxion-gixys-official.yml'
+  workflow_dispatch:
+concurrency:
+  group: goxion-gixys-official-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: write
+jobs:
+  official-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install original Gixys and QA dependencies
+        run: npm install --no-save --no-package-lock react@18.3.1 react-dom@18.3.1 bot-avatars@0.2.2 @hugeicons/core-free-icons esbuild@0.25.10 playwright
+      - name: Pin the approved original PulseHeart implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          dir="preview/gixys-mi-espacio-espejo/src/vendor"
+          mkdir -p "$dir"
+          sha="d9085a5d6cb62a1c7512d8fa05a4f966736b575c"
+          for ext in jsx css; do
+            curl -fsSL --retry 3 "https://raw.githubusercontent.com/DavidHDev/react-bits/${sha}/src/content/Micro/PulseHeart/PulseHeart.${ext}" -o "$dir/PulseHeart.${ext}"
+          done
+      - name: Bundle exact V9 approved components with production-only event adapter
+        run: |
+          npx esbuild assets/js/ayuda/21-gixys-official.src.jsx --bundle --minify --jsx=automatic --platform=browser --format=iife --target=es2020 --outfile=assets/js/ayuda/21-gixys-official.bundle.js --legal-comments=eof
+          test -s assets/js/ayuda/21-gixys-official.bundle.js
+          test -s assets/js/ayuda/21-gixys-official.bundle.css
+          mv assets/js/ayuda/21-gixys-official.bundle.css assets/css/gixys-pulseheart.css
+          test -s assets/css/gixys-pulseheart.css
+      - name: Install Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify no fake loyalty/discounts, no layout shift, and real event handling
+        run: node scripts/qa-gixys-official.mjs
+      - name: Commit only test-passed compiled assets
+        if: success()
+        shell: bash
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          if [ "$(git rev-parse FETCH_HEAD)" != "$GITHUB_SHA" ]; then
+            echo "Newer change in branch; do not publish stale bundle."
+            exit 0
+          fi
+          git add assets/js/ayuda/21-gixys-official.bundle.js assets/css/gixys-pulseheart.css
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build(gixys): V9 official bundle validated Chromium WebKit [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

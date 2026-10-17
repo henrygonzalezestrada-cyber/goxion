@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="es-MX"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="stylesheet" href="../../assets/css/ayuda.css">
+<link rel="stylesheet" href="../../assets/css/gixys-official.css">
+<style>
+body{background:#030305;color:white;font-family:Poppins,system-ui;margin:0;min-height:100dvh}
+#view-dashboard{display:block;width:min(490px,calc(100% - 40px));margin:15px auto}
+#dash-billing-card{padding:22px 18px;background:rgba(35,28,55,.66)}
+#goxion-main-nav{height:45px;margin:15px auto;width:min(490px,calc(100% - 40px))}
+.app-header{height:70px;max-width:530px;margin:auto;display:flex;align-items:center;justify-content:space-between}
+#gx-client-notif-launch{width:50px;height:50px;display:block;border:0;background:transparent;color:white}
+#referral-section-container{margin-top:25px}
+#gamif-expanded-coupon{margin-top:15px}
+</style></head><body>
+<header class="app-header"><strong>GOXION</strong><button id="gx-client-notif-launch" type="button">🔔<span id="gx-client-notif-badge">0</span></button></header>
+<nav id="goxion-main-nav"></nav>
+<div class="view-section active" id="view-dashboard">
+<h1 id="dynamic-greeting-text">Hola Cliente 👋</h1>
+<div class="glass-card dash-card" id="dash-billing-card">
+ <div id="dash-date" style="font-size:23px">15 de octubre</div>
+ <div id="dash-badge">Próximo a vencer</div>
+ <div style="height:15px"></div>
+ <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:13px;font-weight:700">⭐ Nivel de Lealtad</div><div id="loyalty-count" style="font-size:11px">3/4 Pagos</div></div>
+ <div class="loyalty-progress-bg"><div id="loyalty-bar" class="loyalty-progress-fill" style="width:75%"></div></div>
+ <div id="loyalty-msg" style="font-size:11px">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
+ <button class="gx-account-capsule" type="button">Ver Estado de Cuenta</button>
+</div>
+<div id="referral-section-container">
+ <div class="gx-gamif-card-mission"><div class="gamif-title">Tu progreso</div><div class="gx-gamif-card-status">2 de 3 completadas</div><div class="gx-gamif-progress" data-progress="67"></div></div>
+ <div id="gamif-expanded-coupon"><div class="gx-gamif-expanded-head"><strong>Misiones</strong></div></div>
+</div>
+</div>
+<script src="../../assets/js/ayuda/21-gixys-official.bundle.js"></script>
+</body></html>

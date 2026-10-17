@@ -1,0 +1,783 @@
+/* GOXION Gixys V9 official: sourced from visually approved beta PR #140.
+ * Only unique gx-gixy* selectors and scoped body rules affect official.
+ * No fake discount behavior in live sessions. */
+/* Fase 3 beta · Gixys útiles por evento. Sin áreas ni cajas fijas reservadas. */
+body.gx-gixys-official .gx-mirror-mission-companion,
+body.gx-gixys-official .gx-mirror-expanded-companion,
+body.gx-gixys-official .gx-mirror-loyalty-companion,
+body.gx-gixys-official #gx-mirror-square{display:none!important}
+body.gx-gixys-official .gx-mirror-expanded-head{
+  padding-right:0!important;text-align:center!important;min-height:0
+}
+body.gx-gixys-official .gx-mirror-expanded-head strong{padding-top:0!important}
+#gx-gixys-message-root{position:relative;z-index:1000}
+.gx-gixy-message{
+  position:fixed;display:flex;align-items:center;justify-content:flex-start;
+  width:min(216px,calc(100vw - 20px));min-height:61px;max-height:93px;
+  gap:3px;z-index:10010;pointer-events:none;isolation:isolate;
+  opacity:0;transform:translate3d(0,5px,0) scale(.97);
+  transition:opacity .25s cubic-bezier(.2,.85,.3,1),transform .32s cubic-bezier(.16,1,.3,1);
+  contain:layout style
+}
+.gx-gixy-message.is-visible{opacity:1;transform:translate3d(0,0,0) scale(1)}
+.gx-gixy-message__avatar{display:block;width:59px;height:61px;flex:0 0 59px;pointer-events:none}
+.gx-gixy-message__avatar canvas{pointer-events:none!important;display:block}
+.gx-gixy-message__bubble{
+  position:relative;display:flex;align-items:center;justify-content:center;
+  flex:1 1 auto;min-width:0;max-width:148px;min-height:49px;
+  border:1px solid rgba(168,186,255,.20);border-radius:15px 15px 15px 7px;
+  padding:9px 11px;
+  background:rgba(17,19,33,.94);
+  color:#f2f5ff;box-shadow:0 9px 24px rgba(0,0,0,.29);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  font:600 10.5px/1.44 Poppins,system-ui,-apple-system,sans-serif;
+  text-align:left;letter-spacing:.01em;
+  pointer-events:auto;cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.gx-gixy-message__bubble::before{
+  content:"";position:absolute;left:-4px;bottom:13px;width:8px;height:8px;
+  background:rgba(17,19,33,.94);border-left:1px solid rgba(168,186,255,.20);
+  border-bottom:1px solid rgba(168,186,255,.20);transform:rotate(45deg);
+}
+.gx-gixy-message__bubble:focus-visible{
+  outline:2px solid #00f2fe;outline-offset:3px
+}
+@media(max-width:350px){
+ .gx-gixy-message{width:min(194px,calc(100vw - 20px));min-height:61px}
+ .gx-gixy-message__avatar{width:58px;flex-basis:58px}
+ .gx-gixy-message__bubble{font-size:10px;padding:7px 9px}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixy-message,.gx-gixy-message.is-visible{transition:none!important;animation:none!important}
+}
+
+/* WebKit: the existing icon+counter morph must preserve a tappable counter width. */
+body.gx-gixys-official #gx-client-notif-launch.gx-has-new > #gx-client-notif-badge{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  position:relative!important;
+  width:24px!important;
+  min-width:24px!important;
+  max-width:24px!important;
+  flex:0 0 24px!important;
+  padding:0!important;
+  margin:0!important;
+  opacity:1!important;
+  visibility:visible!important;
+  transform:none!important;
+}
+
+
+/* V4 SCENE / GOXION · pre-approved anchored slots, premium speech and playful Gixy.
+   A deliberately short-lived, fixed overlay: never a new box inside Mi Espacio. */
+.gx-gixy-message{
+  width:207px!important;max-width:calc(100vw - 22px)!important;
+  height:76px!important;min-height:76px!important;max-height:76px!important;
+  gap:4px!important;align-items:center!important;overflow:visible!important;
+  opacity:0;transform:translate3d(0,7px,0) scale(.96);
+  transition:opacity .26s ease,transform .4s cubic-bezier(.2,1,.35,1);
+  will-change:opacity,transform;
+}
+.gx-gixy-message.is-visible{opacity:1;transform:translate3d(0,0,0) scale(1)}
+.gx-gixy-message.is-leaving{opacity:0;transform:translate3d(0,-7px,0) scale(.95)}
+.gx-gixy-message__avatar{
+  appearance:none;-webkit-appearance:none;
+  position:relative;width:61px!important;height:67px!important;
+  min-width:61px!important;flex:0 0 61px!important;
+  display:grid;place-items:center;border:0!important;
+  border-radius:50%;padding:0!important;margin:0!important;
+  background:transparent!important;box-shadow:none!important;
+  pointer-events:auto!important;touch-action:manipulation;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transform-origin:50% 63%;
+  animation:gx-avatar-hello .57s cubic-bezier(.15,1.3,.25,1) both;
+}
+.gx-gixy-message__avatar canvas{pointer-events:none!important}
+.gx-gixy-message__avatar:focus-visible{
+  outline:2px solid #00f2fe;outline-offset:1px
+}
+.gx-gixy-message__bubble{
+  position:relative!important;flex:1 1 auto!important;
+  width:auto;max-width:none!important;min-height:51px;
+  padding:10px 10px 10px 12px!important;border-radius:16px 16px 16px 6px!important;
+  border:1px solid rgba(172,182,255,.22)!important;
+  background:linear-gradient(125deg,rgba(49,40,79,.93),rgba(19,25,46,.94) 58%,rgba(8,28,44,.92))!important;
+  color:#f4f7ff!important;
+  font:600 11px/1.4 Poppins,system-ui,-apple-system,sans-serif!important;
+  box-shadow:0 12px 27px rgba(0,0,0,.29),0 2px 15px rgba(124,77,255,.12),
+   inset 0 1px 0 rgba(255,255,255,.075)!important;
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  letter-spacing:0!important;word-break:normal;hyphens:none;
+  transform-origin:0% 78%;
+  animation:gx-speech-from-avatar .52s .09s cubic-bezier(.17,1.25,.29,1) both;
+  pointer-events:auto;
+}
+.gx-gixy-message__bubble::before{
+  left:-4px!important;bottom:13px!important;
+  background:rgba(37,39,68,.96)!important;
+  border-left-color:rgba(172,182,255,.20)!important;
+  border-bottom-color:rgba(172,182,255,.20)!important;
+}
+.gx-gixy-message__bubble::after{
+  content:"";position:absolute;inset:1px;border-radius:inherit;
+  pointer-events:none;
+  background:radial-gradient(ellipse 80px 28px at 12% 3%,rgba(255,255,255,.10),transparent 85%);
+}
+.gx-gixy-message.is-leaving .gx-gixy-message__bubble{
+  animation:gx-speech-dissolve .34s ease-in forwards
+}
+.gx-gixy-message.is-hopping .gx-gixy-message__avatar{
+  animation:gx-avatar-hop-out .67s cubic-bezier(.2,.7,.16,1) forwards!important
+}
+.gx-gixy-message.is-hopping .gx-gixy-message__bubble{
+  animation:gx-speech-dissolve .25s ease-in forwards
+}
+@keyframes gx-avatar-hello{
+  0%{transform:translate3d(0,14px,0) scale(.59) rotate(-12deg);opacity:0}
+  52%{transform:translate3d(0,-7px,0) scale(1.13) rotate(5deg);opacity:1}
+  76%{transform:translate3d(0,3px,0) scale(.95) rotate(-2deg)}
+  100%{transform:translate3d(0,0,0) scale(1) rotate(0)}
+}
+@keyframes gx-speech-from-avatar{
+  0%{opacity:0;filter:blur(5px);transform:translate3d(-25px,6px,0) scale(.27,.64)}
+  55%{opacity:1;filter:blur(0);transform:translate3d(0,-1px,0) scale(1.035,1.025)}
+  100%{opacity:1;filter:blur(0);transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes gx-speech-dissolve{
+  0%{opacity:1;filter:blur(0);transform:translate3d(0,0,0) scale(1)}
+  100%{opacity:0;filter:blur(4px);transform:translate3d(-8px,-6px,0) scale(.85)}
+}
+@keyframes gx-avatar-hop-out{
+  0%{opacity:1;transform:translate3d(0,0,0) scale(1) rotate(0)}
+  18%{opacity:1;transform:translate3d(-8px,8px,0) scale(1.18,.72) rotate(-13deg)}
+  40%{opacity:1;transform:translate3d(13px,-24px,0) scale(.94,1.18) rotate(35deg)}
+  70%{opacity:.6;transform:translate3d(39px,-68px,0) scale(.8) rotate(132deg)}
+  100%{opacity:0;transform:translate3d(76px,-104px,0) scale(.55) rotate(220deg)}
+}
+@media(max-width:350px){
+  .gx-gixy-message{width:193px!important}
+  .gx-gixy-message__avatar{width:56px!important;height:63px!important;min-width:56px!important;flex-basis:56px!important}
+  .gx-gixy-message__bubble{font-size:10.5px!important;padding:8px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-gixy-message,.gx-gixy-message.is-visible,.gx-gixy-message.is-leaving,
+  .gx-gixy-message__avatar,.gx-gixy-message__bubble,
+  .gx-gixy-message.is-hopping .gx-gixy-message__avatar,
+  .gx-gixy-message.is-hopping .gx-gixy-message__bubble{
+    animation:none!important;transition:none!important;filter:none!important;
+    transform:none!important
+  }
+  .gx-gixy-message.is-leaving{opacity:0}
+}
+
+/* Keep the hop visible until the avatar actually exits; the speech fades first. */
+.gx-gixy-message.is-hopping{opacity:1!important;transform:translate3d(0,0,0) scale(1)!important;transition:none!important}
+.gx-gixy-message.is-hopping .gx-gixy-message__avatar{pointer-events:none!important}
+
+/* Geometry validated against the actual GOXION dashboard (Safari 390px):
+   the ~65px gap between greeting and billing can host a compact guide. */
+.gx-gixy-message{
+  width:190px!important;max-width:calc(100vw - 22px)!important;
+  min-height:59px!important;height:59px!important;max-height:59px!important;
+  gap:3px!important
+}
+.gx-gixy-message__avatar{
+  width:53px!important;height:57px!important;min-width:53px!important;
+  flex:0 0 53px!important
+}
+.gx-gixy-message__bubble{
+  min-height:46px!important;padding:7px 8px 7px 10px!important;
+  font-size:10.3px!important;line-height:1.36!important
+}
+@media(max-width:350px){
+ .gx-gixy-message{width:184px!important}
+ .gx-gixy-message__avatar{width:52px!important;min-width:52px!important;flex-basis:52px!important}
+ .gx-gixy-message__bubble{font-size:10px!important}
+}
+
+/* The synthetic beta disclaimer yields temporarily to the notification scene
+   so the Gixy can emerge beside the existing bell without obscuring information. */
+body.gx-gixys-official:has(.gx-gixy-message[data-kind="notification"]) .gx-mirror-note{
+ opacity:0;visibility:hidden;transition:opacity .2s ease
+}
+
+
+/* V5 · Quiet-luxury refinement: restrained microgestures, crisp typography.
+   Replaces the arcade bounce and giant spin exit WITHOUT replacing BotAvatar. */
+body.gx-gixys-official.gx-loyalty-speaking #loyalty-msg{
+ color:transparent!important;
+ min-height:67px!important;
+ transition:min-height .26s cubic-bezier(.2,.8,.24,1);
+}
+.gx-gixy-message{
+ opacity:0!important;
+ transform:translate3d(0,4px,0) scale(.985)!important;
+ transition:opacity .32s cubic-bezier(.2,.8,.2,1),
+   transform .32s cubic-bezier(.2,.8,.2,1)!important;
+}
+.gx-gixy-message.is-visible:not(.is-leaving){
+ opacity:1!important;transform:translate3d(0,0,0) scale(1)!important;
+}
+.gx-gixy-message.is-leaving{
+ opacity:0!important;transform:translate3d(0,-6px,0) scale(.985)!important;
+}
+.gx-gixy-message__avatar{
+ animation:gx-gixy-gentle-arrival .4s cubic-bezier(.2,.8,.2,1) both!important;
+}
+.gx-gixy-message__bubble{
+ background:linear-gradient(120deg,rgba(30,34,59,.96),rgba(18,27,43,.96))!important;
+ border:1px solid rgba(144,164,206,.19)!important;
+ box-shadow:0 8px 22px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.07)!important;
+ border-radius:14px 14px 14px 6px!important;
+ font-size:10.8px!important;line-height:1.36!important;
+ padding:8px 9px!important;
+ backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+ animation:gx-gixy-quiet-speech .36s .065s cubic-bezier(.18,.88,.27,1) both!important;
+}
+.gx-gixy-message__bubble::before{
+ background:rgba(28,33,54,.96)!important;
+}
+.gx-gixy-message__bubble span{
+ display:block;animation:gx-gixy-quote-appear .25s ease-out both
+}
+.gx-gixy-message.is-leaving .gx-gixy-message__bubble{
+ animation:gx-gixy-quiet-out .24s ease-in forwards!important
+}
+.gx-gixy-message[data-kind="loyalty"]{
+ z-index:10011!important;
+}
+@keyframes gx-gixy-gentle-arrival{
+ 0%{opacity:0;transform:translate3d(0,6px,0) scale(.87)}
+ 68%{opacity:1;transform:translate3d(0,-2px,0) scale(1.025)}
+ 100%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes gx-gixy-quiet-speech{
+ 0%{opacity:0;transform:translate3d(-9px,3px,0) scale(.91);filter:blur(1px)}
+ 100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:blur(0)}
+}
+@keyframes gx-gixy-quote-appear{
+ 0%{opacity:0;transform:translate3d(0,3px,0)}
+ 100%{opacity:1;transform:translate3d(0,0,0)}
+}
+@keyframes gx-gixy-quiet-out{
+ 0%{opacity:1;transform:translate3d(0,0,0)}
+ 100%{opacity:0;transform:translate3d(-5px,-3px,0)}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixy-message,.gx-gixy-message.is-visible,.gx-gixy-message.is-leaving,
+ .gx-gixy-message__avatar,.gx-gixy-message__bubble,.gx-gixy-message__bubble span{
+  transition:none!important;animation:none!important;filter:none!important;
+  transform:none!important
+ }
+ .gx-gixy-message.is-leaving{opacity:0!important}
+}
+
+
+/* V6 · Typewriter speech: the glass capsule expands with the letters.
+   The scene footprint stays inside the vetted safe-zone, so no new collisions. */
+.gx-gixy-message__bubble{
+ flex:0 0 auto!important;
+ box-sizing:border-box!important;
+ width:var(--gx-bubble-width,34px)!important;
+ min-width:32px!important;
+ max-width:132px!important;
+ height:var(--gx-bubble-height,34px)!important;
+ min-height:30px!important;
+ max-height:64px!important;
+ overflow:visible!important;
+ padding:0!important;
+ display:flex!important;
+ align-items:center!important;
+ justify-content:flex-start!important;
+ transition:width .13s cubic-bezier(.25,.82,.35,1),
+            height .17s cubic-bezier(.25,.82,.35,1)!important;
+ font-size:10.45px!important;
+ line-height:1.36!important;
+}
+.gx-gixy-message__bubble::after{pointer-events:none!important}
+.gx-gixy-message__bubble .gx-gixy-message__measure{
+ position:absolute!important;top:0;left:0;
+ width:max-content;max-width:132px;
+ height:auto;box-sizing:border-box;
+ border:1px solid transparent;
+ padding:8px 9px!important;
+ margin:0;display:inline-block!important;
+ opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+ white-space:normal!important;overflow-wrap:break-word;
+ font:inherit;line-height:inherit;
+ animation:none!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__written{
+ position:relative;display:block!important;
+ box-sizing:border-box;width:100%;
+ padding:8px 9px!important;
+ margin:0!important;
+ color:inherit;overflow-wrap:break-word;
+ line-height:1.36;
+ animation:none!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__sr{
+ position:absolute!important;
+ width:1px!important;height:1px!important;
+ padding:0!important;margin:-1px!important;
+ overflow:hidden!important;
+ clip:rect(0,0,0,0)!important;
+ white-space:nowrap!important;
+ border:0!important;
+ animation:none!important;
+}
+.gx-gixy-message__avatar:disabled{
+ opacity:1!important;cursor:default!important;
+}
+.gx-gixy-message[data-typing="true"] .gx-gixy-message__bubble{cursor:default}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixy-message__bubble{
+  transition:none!important;animation:none!important;
+ }
+}
+
+
+/* V7: fixed word wrapping before writing, no reflow while each character appears.
+   Glass expands at word boundaries with discreet width/height interpolation. */
+.gx-gixy-message__bubble{
+  padding:0!important;
+  min-height:31px!important;max-height:74px!important;
+  max-width:136px!important;
+  width:var(--gx-bubble-width,36px)!important;
+  height:var(--gx-bubble-height,32px)!important;
+  display:flex!important;align-items:center!important;justify-content:flex-start!important;
+  transition:width .18s cubic-bezier(.27,.82,.38,1),
+    height .21s cubic-bezier(.27,.82,.38,1)!important;
+  font:600 10.5px/1.36 Poppins,system-ui,-apple-system,sans-serif!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__written{
+  display:block!important;
+  white-space:pre-wrap!important;
+  word-break:normal!important;overflow-wrap:normal!important;
+  hyphens:none!important;
+  flex:1 1 auto!important;
+  box-sizing:border-box!important;
+  padding:7px 9px!important;
+  margin:0!important;
+  animation:none!important;
+  font:inherit!important;
+  line-height:1.36!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__sr{
+  position:absolute!important;width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;white-space:nowrap!important;
+}
+.gx-gixy-message__avatar:disabled{opacity:1!important;cursor:default!important}
+.gx-gixy-message__bubble::after{pointer-events:none}
+/* Three-part secret: appears after the third DIFFERENT companion, never on
+   the first tap. This is a self-contained fictitious preview only. */
+.gx-gixys-secret{
+  position:fixed;z-index:10020;
+  left:50%;bottom:calc(22px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);box-sizing:border-box;
+  width:min(315px,calc(100vw - 36px));
+  padding:17px 18px 15px;
+  border:1px solid rgba(134,194,240,.21);
+  border-radius:19px;
+  background:linear-gradient(140deg,rgba(38,28,66,.97),rgba(12,27,48,.97));
+  color:#eff6ff;
+  box-shadow:0 18px 55px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.09);
+  backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  animation:gx-secret-reveal .45s cubic-bezier(.2,1,.35,1) both;
+}
+.gx-gixys-secret__top{
+  color:#a9b9da;font-size:10px;letter-spacing:.085em;
+  font-weight:700;display:flex;align-items:center;justify-content:space-between;
+}
+.gx-gixys-secret__top span{color:#7ce9e7;letter-spacing:0}
+.gx-gixys-secret__award{
+  margin-top:7px;color:#fff;
+  font-size:29px;font-weight:800;letter-spacing:-.045em;line-height:1.25;
+}
+.gx-gixys-secret__award small{
+  display:inline-block;color:#8fe9ec;font-size:10px;
+  vertical-align:middle;font-weight:600;letter-spacing:0;
+}
+.gx-gixys-secret p{
+  color:#c1cbe0;font:500 11px/1.5 Poppins,system-ui,sans-serif;
+  margin:9px 0 10px;
+}
+.gx-gixys-secret button{
+  font:700 11px Poppins,system-ui,sans-serif;
+  display:block;width:100%;min-height:38px;border-radius:11px;
+  border:1px solid rgba(100,210,222,.25);
+  background:rgba(1,192,207,.13);color:#c4fcfc;
+}
+.gx-gixys-progress[hidden]{display:none!important}
+@keyframes gx-secret-reveal{
+  from{opacity:0;transform:translate3d(-50%,13px,0) scale(.975)}
+  to{opacity:1;transform:translate3d(-50%,0,0) scale(1)}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixy-message__bubble{transition:none!important}
+ .gx-gixys-secret{animation:none!important}
+}
+
+
+/* V8: polished mobile typography, lively eyes from the ORIGINAL 3D engine,
+   restrained particles, cohesive glass reward and geometrically centered heart. */
+body.gx-gixys-official .gx-gixys-official-loyalty-label{
+  display:inline-flex!important;align-items:center!important;justify-content:flex-start;
+  gap:6px!important;min-height:32px!important;max-width:100%;
+  white-space:nowrap;line-height:1!important;
+}
+body.gx-gixys-official .gx-gixys-official-loyalty-name{
+  display:inline-flex;align-items:center;line-height:1.2;
+  font-size:12px;min-height:30px;letter-spacing:0;
+}
+body.gx-gixys-official #gx-mirror-heart{
+  display:grid!important;place-items:center!important;
+  width:30px!important;min-width:30px!important;max-width:30px!important;
+  height:30px!important;min-height:30px!important;
+  margin:0!important;padding:0!important;flex:0 0 30px!important;
+  line-height:0!important;vertical-align:middle!important;
+}
+body.gx-gixys-official #gx-mirror-heart > *{
+  display:flex!important;align-items:center!important;justify-content:center!important;
+  width:30px!important;height:30px!important;
+  min-width:30px!important;min-height:30px!important;
+  margin:0!important;transform-origin:50% 50%;
+}
+body.gx-gixys-official #gx-mirror-heart .pulse-heart{
+  width:30px!important;height:30px!important;
+  flex:0 0 30px!important;margin:0!important;
+  align-self:center!important;
+}
+body.gx-gixys-official #dash-billing-card #loyalty-count{
+  flex:0 0 auto!important;white-space:nowrap;
+  line-height:1.2!important;align-self:center;
+}
+@media(max-width:390px){
+  body.gx-gixys-official .gx-gixys-official-loyalty-name{font-size:11px}
+  body.gx-gixys-official .gx-gixys-official-loyalty-label{gap:4px!important}
+}
+.gx-gixy-message{
+  width:202px!important;min-width:202px!important;max-width:calc(100vw - 22px)!important;
+}
+.gx-gixy-message__bubble{
+  max-width:144px!important;
+  font-size:10.5px!important;
+}
+.gx-gixy-message__bubble .gx-gixy-message__written{
+  font-size:10.5px!important;line-height:1.36!important;
+  white-space:pre-wrap!important;word-break:normal!important;
+  letter-spacing:0!important;
+}
+/* Particles are drawn on top of the native glossy avatar, never replacing it. */
+.gx-gixy-message__avatar{overflow:visible!important;isolation:isolate}
+.gx-gixy-joy{
+  position:absolute;inset:0;
+  overflow:visible;z-index:3;pointer-events:none;
+  opacity:1;
+}
+.gx-gixy-joy__piece{
+  --px:0px;
+  position:absolute;top:38%;left:47%;
+  font-family:system-ui,sans-serif;font-size:11px;line-height:1;
+  opacity:0;pointer-events:none;
+  color:rgba(216,246,255,.92);
+  filter:drop-shadow(0 0 2px rgba(178,138,255,.6));
+}
+.gx-gixy-joy__piece--1,.gx-gixy-joy__piece--4{
+  color:#ff729e;font-size:9px;
+}
+.gx-gixy-joy__piece--2,.gx-gixy-joy__piece--6{
+  color:#ba9cff;font-size:12px;
+}
+.gx-gixy-joy__piece--3,.gx-gixy-joy__piece--7{color:#82eff7}
+.gx-gixy-message[data-typing="true"] .gx-gixy-joy__piece{
+  animation:gx-gixy-spark-flight .9s cubic-bezier(.18,.78,.33,1) both;
+  animation-delay:calc(var(--i) * 35ms);
+}
+.gx-gixy-joy__piece--0{--sx:-20px;--sy:-22px}
+.gx-gixy-joy__piece--1{--sx:25px;--sy:-19px}
+.gx-gixy-joy__piece--2{--sx:-27px;--sy:4px}
+.gx-gixy-joy__piece--3{--sx:31px;--sy:3px}
+.gx-gixy-joy__piece--4{--sx:-10px;--sy:-29px}
+.gx-gixy-joy__piece--5{--sx:14px;--sy:-28px}
+.gx-gixy-joy__piece--6{--sx:-24px;--sy:17px}
+.gx-gixy-joy__piece--7{--sx:25px;--sy:16px}
+@keyframes gx-gixy-spark-flight{
+  0%{opacity:0;transform:translate3d(0,0,0) scale(.45) rotate(0)}
+  28%{opacity:.9}
+  75%{opacity:.8}
+  100%{opacity:0;transform:translate3d(var(--sx),var(--sy),0) scale(.8) rotate(36deg)}
+}
+/* Reward is the same glass material and typography as Mi Espacio, not a
+   separate branded theme. Color is concentrated in the reveal and confetti. */
+body.gx-gixys-official .gx-gixys-secret.glass-card{
+  isolation:isolate;
+  border:1px solid rgba(160,188,245,.22)!important;
+  background:linear-gradient(145deg,rgba(37,31,60,.91),rgba(16,23,43,.94))!important;
+  box-shadow:0 17px 43px rgba(0,0,0,.37),inset 0 1px rgba(255,255,255,.08)!important;
+  backdrop-filter:blur(21px)!important;-webkit-backdrop-filter:blur(21px)!important;
+  padding:19px 20px 17px!important;border-radius:20px!important;
+  font-family:Poppins,system-ui,sans-serif!important;
+  overflow:visible;
+}
+.gx-gixys-secret__aura{
+  position:absolute;inset:-1px;z-index:-1;pointer-events:none;
+  border-radius:inherit;
+  background:radial-gradient(ellipse 130px 90px at 51% -5%,rgba(152,94,255,.26),transparent 90%);
+}
+.gx-gixys-secret__top{
+  font-size:10px!important;letter-spacing:.075em!important;
+  color:#b3bad1!important;
+}
+.gx-gixys-secret__award{
+  margin-top:10px!important;font-size:31px!important;
+  color:#f6fbff!important;letter-spacing:-.025em!important;
+  text-shadow:0 0 18px rgba(132,137,255,.26);
+  animation:gx-secret-trophy .6s cubic-bezier(.15,1.35,.28,1) both;
+}
+.gx-gixys-secret__award small{color:#75e5e9!important;font-size:10px!important}
+.gx-gixys-secret p{color:#c2c7dc!important;line-height:1.65!important}
+.gx-gixys-secret button{
+  border-radius:12px!important;min-height:40px!important;
+  background:linear-gradient(100deg,rgba(100,69,190,.25),rgba(14,186,214,.16))!important;
+  border:1px solid rgba(78,219,234,.27)!important;
+  color:#e3fbff!important;
+}
+.gx-gixys-secret__confetti{
+  position:absolute;inset:0;pointer-events:none;z-index:4;
+  border-radius:inherit;overflow:hidden;
+}
+.gx-gixys-secret__confetti i{
+  position:absolute;left:50%;top:49%;
+  display:block;width:5px;height:9px;
+  background:var(--tone);border-radius:1.3px;
+  box-shadow:0 0 5px var(--tone);
+  opacity:0;will-change:transform,opacity;
+  animation:gx-gixys-confetti 1.22s cubic-bezier(.22,.7,.28,1) var(--delay) both;
+}
+.gx-gixys-secret__confetti i:nth-child(3n){width:4px;height:4px;border-radius:50%}
+.gx-gixys-secret__confetti i:nth-child(4n){width:3px;height:11px}
+@keyframes gx-gixys-confetti{
+  0%{opacity:0;transform:translate3d(0,22px,0) scale(.5) rotate(0)}
+  18%{opacity:1}
+  59%{opacity:1;transform:translate3d(var(--dx),var(--dy),0) rotate(var(--rot))}
+  100%{opacity:0;transform:translate3d(calc(var(--dx) * 1.16),calc(var(--dy) + 58px),0) rotate(calc(var(--rot) + 80deg))}
+}
+@keyframes gx-secret-trophy{
+  0%{opacity:0;transform:scale(.79) translateY(7px)}
+  61%{opacity:1;transform:scale(1.045)}
+  100%{opacity:1;transform:scale(1)}
+}
+@media(prefers-reduced-motion:reduce){
+  .gx-gixy-joy__piece,.gx-gixys-secret__confetti i,
+  .gx-gixys-secret__award{animation:none!important;opacity:0!important}
+  .gx-gixys-secret__award{opacity:1!important}
+}
+
+
+/* PulseHeart internally pads its icon and has a 44px touch minimum on iOS.
+   Preserve the accessible hit target; center the 28px glyph within the row. */
+body.gx-gixys-official .gx-gixys-official-loyalty-label{min-height:44px!important;gap:5px!important}
+body.gx-gixys-official .gx-gixys-official-loyalty-name{min-height:44px!important}
+body.gx-gixys-official #gx-mirror-heart{
+  width:44px!important;min-width:44px!important;max-width:44px!important;
+  height:44px!important;min-height:44px!important;
+  flex:0 0 44px!important;
+}
+body.gx-gixys-official #gx-mirror-heart > *,
+body.gx-gixys-official #gx-mirror-heart .pulse-heart{
+  width:44px!important;min-width:44px!important;
+  height:44px!important;min-height:44px!important;
+}
+body.gx-gixys-official #gx-mirror-heart .pulse-heart__pill{
+  padding:8px!important;
+  padding-inline-end:8px!important;
+  margin:0!important;
+  background:transparent!important;
+  width:44px!important;height:44px!important;
+  box-sizing:border-box!important;
+  display:flex!important;align-items:center!important;justify-content:center!important;
+}
+body.gx-gixys-official #gx-mirror-heart .pulse-heart__heart{
+  width:28px!important;height:28px!important;
+  min-width:28px!important;min-height:28px!important;
+  flex:0 0 28px!important;
+}
+
+
+/* V9 — Non-displacing companion stage.
+   The Gixy portal has no impact on the layout, including the loyalty helper.
+   We never add minimum height, hide the actual loyalty text, or push payment
+   and mission controls around to make room. */
+html[data-gx-gixys] #gx-gixys-message-root{
+ position:fixed!important;inset:0!important;z-index:10010!important;
+ width:0!important;height:0!important;
+ margin:0!important;padding:0!important;pointer-events:none!important;
+ overflow:visible!important;contain:none!important;
+}
+body.gx-gixys-official.gx-loyalty-speaking #loyalty-msg,
+body.gx-gixys-official #loyalty-msg{
+ min-height:0!important;
+ color:var(--text-muted)!important;
+ transition:none!important;
+}
+html[data-gx-gixys] .gx-gixy-message{
+ position:fixed!important;
+ pointer-events:none!important;
+ contain:layout style;
+}
+html[data-gx-gixys] .gx-gixy-message__avatar,
+html[data-gx-gixys] .gx-gixy-message__bubble{
+ pointer-events:auto!important;
+}
+html[data-gx-gixys] .gx-gixy-message__avatar:disabled{pointer-events:none!important}
+
+/* V9 award — borrowed Colorion "Borealis Aurora" gradient text technique,
+   reinterpreted with fixed GOXION ink (purple/cyan) and a one-shot reveal.
+   No falling rectangles; a restrained halo and radial light fragments. */
+body.gx-gixys-official .gx-gixys-secret--v9.glass-card{
+ overflow:hidden!important;
+ padding:22px 21px 17px!important;
+ border-radius:20px!important;
+ background:linear-gradient(155deg,rgba(37,31,65,.94),rgba(15,23,41,.95) 64%,rgba(11,32,47,.91))!important;
+ border:1px solid rgba(180,192,248,.20)!important;
+ box-shadow:0 20px 62px rgba(0,0,0,.42),
+  0 0 0 1px rgba(124,102,210,.045),inset 0 1px rgba(255,255,255,.1)!important;
+ backdrop-filter:blur(24px)!important;
+ -webkit-backdrop-filter:blur(24px)!important;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__aura{
+ z-index:0;
+ background:radial-gradient(ellipse at 49% 18%,rgba(112,85,219,.22),transparent 72%)!important;
+}
+.gx-gixys-secret--v9 > :not(.gx-gixys-secret__aura):not(.gx-gixys-secret__halo){
+ position:relative;z-index:2
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__halo{
+ position:absolute;inset:0;overflow:hidden;z-index:1;pointer-events:none;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__ring{
+ display:block;position:absolute;top:40%;left:50%;
+ width:132px;height:132px;border-radius:50%;margin:-66px;
+ border:1px solid rgba(138,191,247,.42);
+ box-shadow:0 0 18px rgba(118,112,225,.15);
+ opacity:0;pointer-events:none;
+ animation:gx-award-ring 1.1s cubic-bezier(.13,.6,.3,1) both;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__ring--b{
+ border-color:rgba(128,240,232,.31);
+ animation-delay:.16s
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__light{
+ position:absolute;top:40%;left:50%;
+ width:3px;height:12px;border-radius:6px;
+ margin:-4px 0 0 -2px;
+ background:var(--hue);
+ box-shadow:0 0 10px var(--hue);
+ opacity:0;
+ transform-origin:50% 50%;
+ animation:gx-award-light-flight 1.35s cubic-bezier(.19,.72,.28,1) var(--delay) both;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__light:nth-of-type(3n){
+ height:5px;width:5px;border-radius:50%;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__unlocked{
+ margin-top:12px;
+ color:#d0c5ff;
+ font:700 10px/1.4 Poppins,system-ui,sans-serif;
+ letter-spacing:.13em;
+ animation:gx-award-line-reveal .7s cubic-bezier(.18,.9,.25,1) both;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__award{
+ display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+ margin-top:5px!important;
+ animation:none!important;opacity:1!important;text-shadow:none!important;
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__amount{
+ font:800 33px/1.15 Poppins,system-ui,sans-serif;
+ letter-spacing:-.048em;
+ color:#f1edff;
+ display:inline-block;
+ animation:gx-award-amount-reveal .72s cubic-bezier(.17,.95,.34,1) both;
+}
+@supports ((background-clip:text) or (-webkit-background-clip:text)){
+ .gx-gixys-secret--v9 .gx-gixys-secret__amount{
+  background:linear-gradient(100deg,#eeeaff 10%,#9b88ed 28%,#91ecef 43%,#e7e3ff 58%,#9485dd 80%,#eeeaff 100%) 0 0 / 300% 100%;
+  background-clip:text;-webkit-background-clip:text;
+  color:transparent;
+  -webkit-text-fill-color:transparent;
+  animation:gx-award-aurora-reveal 3.3s cubic-bezier(.17,.95,.34,1) both;
+ }
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__award small{
+ font-weight:600!important;color:#9facc4!important;font-size:9.5px!important
+}
+.gx-gixys-secret--v9 .gx-gixys-secret__top{
+ font-size:9.6px!important;
+ color:#aebad0!important;
+}
+.gx-gixys-secret--v9 p{margin-top:12px!important}
+@keyframes gx-award-ring{
+ 0%{opacity:0;transform:scale(.33)}
+ 24%{opacity:.67}
+ 100%{opacity:0;transform:scale(2.15)}
+}
+@keyframes gx-award-light-flight{
+ 0%{opacity:0;transform:rotate(var(--angle)) translateY(0) scale(.5)}
+ 20%{opacity:1}
+ 65%{opacity:.75}
+ 100%{opacity:0;transform:rotate(var(--angle)) translateY(calc(-1 * var(--flight))) scale(.5)}
+}
+@keyframes gx-award-line-reveal{
+ from{opacity:0;transform:translate3d(0,5px,0);letter-spacing:.2em}
+ to{opacity:1;transform:translate3d(0,0,0);letter-spacing:.13em}
+}
+@keyframes gx-award-amount-reveal{
+ from{opacity:0;transform:translate3d(0,9px,0) scale(.94)}
+ to{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes gx-award-aurora-reveal{
+ 0%{opacity:0;transform:translate3d(0,9px,0) scale(.94);background-position:0% 50%}
+ 20%{opacity:1}
+ 100%{opacity:1;transform:translate3d(0,0,0) scale(1);background-position:100% 50%}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-gixys-secret--v9 .gx-gixys-secret__ring,
+ .gx-gixys-secret--v9 .gx-gixys-secret__light{
+  display:none!important;animation:none!important
+ }
+ .gx-gixys-secret--v9 .gx-gixys-secret__amount,
+ .gx-gixys-secret--v9 .gx-gixys-secret__unlocked{
+  opacity:1!important;transform:none!important;
+  animation:none!important
+ }
+}
+
+
+/* Interactive award remains at a fixed location while internal light/ink
+   animate; a moving card is not a premium interaction target. */
+body.gx-gixys-official .gx-gixys-secret--v9.glass-card{
+ animation:none!important;
+ transition:none!important;
+ transform:translateX(-50%)!important;
+}
+
+
+/* Portal itself ignores input, but award and its dismissal remain tappable. */
+body.gx-gixys-official .gx-gixys-secret--v9.glass-card,
+body.gx-gixys-official .gx-gixys-secret--v9.glass-card button{
+ pointer-events:auto!important;
+ touch-action:manipulation;
+}
+
+body.gx-gixys-official .gx-gixys-official-loyalty-label{display:inline-flex!important;align-items:center!important;gap:5px!important;min-width:0;max-width:100%;font-weight:700;white-space:nowrap;line-height:1.1;min-height:44px}
+body.gx-gixys-official .gx-gixys-official-loyalty-name{font-size:12px;line-height:1.2;font-weight:700;color:inherit}
+body.gx-gixys-official .gx-gixys-official-loyalty-label #gx-mirror-heart{display:grid!important;place-items:center!important;height:44px;width:44px;flex:0 0 44px;min-width:44px}
+body.gx-gixys-official .gx-gixys-official-loyalty-label #gx-mirror-heart button{width:44px;height:44px;min-width:44px;min-height:44px}
+body.gx-gixys-official .gx-gixys-official-loyalty-label #gx-mirror-heart .pulse-heart__pill{padding:8px!important;padding-inline-end:8px!important;box-sizing:border-box!important;width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:transparent!important}
+body.gx-gixys-official .gx-gixys-official-loyalty-label #gx-mirror-heart .pulse-heart__heart{width:28px!important;height:28px!important;flex:0 0 28px!important}
+/* The approved layer remains non-layout-affecting; the live payment card never expands. */
+html[data-gx-gixys] #gx-gixys-message-root{position:fixed!important;inset:0!important;width:0!important;height:0!important;pointer-events:none!important;z-index:10010!important}
+
+/* Loaded after gixys-pulseheart.css so the approved 44px touch target wins. */
