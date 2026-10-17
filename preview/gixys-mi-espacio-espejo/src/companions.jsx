@@ -232,7 +232,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
   </button>
   <button className="gx-gixy-message__bubble" type="button"
    onClick={()=>onDismiss('fade')} aria-label={'Cerrar consejo: '+text}
-   style={{width:speechSize.width+'px',height:speechSize.height+'px'}}>
+   style={{'--gx-bubble-width':speechSize.width+'px','--gx-bubble-height':speechSize.height+'px'}}>
    <span className="gx-gixy-message__measure" ref={metric} aria-hidden="true">{written||'\u00a0'}</span>
    <span className="gx-gixy-message__written" aria-hidden="true">{written}</span>
    <span className="gx-gixy-message__sr" role="status" aria-live="polite">{text}</span>
