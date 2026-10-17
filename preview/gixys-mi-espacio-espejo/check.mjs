@@ -43,6 +43,7 @@ async function exercise(engine,name){
   for(const width of [280,320,360,375,390,430,768]){
     await page.setViewportSize({width,height:844});
     await page.waitForTimeout(150);
+    await page.waitForTimeout(450); // evaluate settled placement, not the entrance spring frame
     const m=await page.evaluate(()=>{
       const visible=[...document.querySelectorAll('.gx-gixy-message__avatar canvas')].map(c=>({
         width:c.width,css:c.getBoundingClientRect().width
@@ -68,7 +69,8 @@ async function exercise(engine,name){
       const r=stage.getBoundingClientRect();
       const els=['#gx-client-notif-launch','.app-logo','#goxion-main-nav',
         '#dash-date','#dash-badge','#loyalty-count','#loyalty-bar','#loyalty-msg',
-        '#gamif-expanded-coupon .mission-item',
+        '#gamif-expanded-coupon .mission-item .gx-mission-text',
+        '#gamif-expanded-coupon .mission-item .mission-checkbox',
         '#gamif-expanded-coupon .gx-mirror-mission-action']
         .flatMap(q=>[...document.querySelectorAll(q)]).filter(el=>el.offsetParent!==null);
       const overlap=els.reduce((sum,el)=>{
@@ -84,6 +86,14 @@ async function exercise(engine,name){
         ratio:avatar?avatar.width/Math.max(1,avatar.getBoundingClientRect().width):0,
         message:stage.dataset.kind,variant:stage.dataset.variant};
     });
+    assert(Number((await page.locator('.gx-gixy-message').getAttribute('data-placement')))<=2,
+      name+': location outside 3 approved contextual slots');
+    const visual=await page.locator('.gx-gixy-message__bubble').evaluate(el=>{
+      const styles=getComputedStyle(el);
+      return {motion:styles.animationName,bg:styles.backgroundImage,border:styles.borderRadius};
+    });
+    assert.match(visual.motion,/gx-speech-from-avatar/,name+': original Gixy speech entrance missing');
+    assert.match(visual.bg,/gradient/,name+': premium glass speech surface missing');
     assert(m.visible,name+': Gixy oculto, no hay zona libre para '+kind);
     assert(m.overlap<51,name+': Gixy tapa información '+JSON.stringify(m));
     assert(m.x>=0&&m.right<=m.clientWidth+2,name+': Gixy fuera de pantalla');
@@ -118,6 +128,11 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#gx-mirror-mission-status').innerText(),'Recompensa lista · Simulación');
   assert.equal(await page.locator('#gx-mirror-complete-btn').isDisabled(),true);
   assert.equal(await page.locator('#gx-mirror-complete-btn .gx-mirror-action-icon').evaluate(el=>getComputedStyle(el).animationName),'gx-mirror-check-pop');
+  await page.locator('.gx-gixy-message__avatar').click();
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'1');
+  const bounce=await page.locator('.gx-gixy-message__avatar').evaluate(el=>
+    el.getAnimations().some(a=>a.playState==='running'));
+  assert(bounce,name+': touch did not trigger elastic bounce');
   await page.locator('#gx-mirror-retry').click();
   assert.equal(await page.locator('#gx-mirror-complete-btn').isEnabled(),true);
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
@@ -128,13 +143,18 @@ async function exercise(engine,name){
   assert.notEqual(secondMission.variant,firstMission.variant,'Gixys must vary placement between events');
   assert(Math.abs(secondMission.x-firstMission.x)+Math.abs(secondMission.y-firstMission.y)>=3,
     name+': Gixy positions must actually vary while staying safe');
-  await page.locator('.gx-gixy-message__bubble').click();
+  // On repeated taps the creature bounces off invisible corners and hops away.
+  for(let i=0;i<4;i++)await page.locator('.gx-gixy-message__avatar').click();
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'hop');
+  assert.match(await page.locator('.gx-gixy-message__avatar').evaluate(el=>getComputedStyle(el).animationName),
+    /gx-avatar-hop-out/,name+': jump-out missing');
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
   await page.locator('#gx-mirror-retry').click();
   await page.locator('#gx-mirror-close-missions').click();
   await page.waitForTimeout(900);
   assert.deepEqual(errors,[],name+': javascript runtime errors');
   assert.deepEqual(privateCalls,[],name+': attempt to access private endpoints');
+  assert.equal(await page.locator('.gx-gixy-message').count(),0,'Gixy should be gone after its exit');
   await page.close();
   const reduced=await browser.newPage({viewport:{width:390,height:844},reducedMotion:'reduce'});
   await reduced.route('**/fonts.googleapis.com/**',r=>r.abort());

@@ -1,8 +1,8 @@
-name: GOXION · Gixys · Diálogos Contextuales
+name: GOXION · Gixys · Escena Premium
 on:
   push:
     branches:
-      - beta/gixys-dialogos-contextuales-20261016
+      - beta/gixys-escena-premium-interactiva-20261016
     paths:
       - 'preview/gixys-mi-espacio-espejo/**'
       - '.github/workflows/goxion-gixys-mi-espacio-espejo.yml'
