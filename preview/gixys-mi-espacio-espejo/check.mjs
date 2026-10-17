@@ -62,8 +62,13 @@ async function exercise(engine,name){
   await page.setViewportSize({width:390,height:844});
   async function assertMessage(kind,phrase){
     await page.locator('.gx-gixy-message[data-kind="'+kind+'"]').waitFor({timeout:3000});
+    await page.waitForFunction(()=>{
+      const el=document.querySelector('.gx-gixy-message');
+      return el?.dataset.typing==='false';
+    },null,{timeout:7000});
     const bubble=page.locator('.gx-gixy-message__bubble');
-    assert.match(await bubble.innerText(),phrase);
+    assert.match(await bubble.locator('.gx-gixy-message__written').innerText(),phrase);
+    await page.locator('.gx-gixy-message__avatar').waitFor({state:'visible'});
     const m=await page.evaluate(()=>{
       const stage=document.querySelector('.gx-gixy-message');
       const r=stage.getBoundingClientRect();
@@ -105,7 +110,24 @@ async function exercise(engine,name){
     return m;
   }
   await page.locator('#gx-client-notif-launch').click();
+  await page.locator('.gx-gixy-message[data-kind="notification"]').waitFor({timeout:3000});
+  const bubbleEarly=await page.evaluate(()=>{
+    const g=document.querySelector('.gx-gixy-message');
+    return {chars:Number(g.dataset.visibleChars),typing:g.dataset.typing,
+      w:parseFloat(getComputedStyle(g.querySelector('.gx-gixy-message__bubble')).width),
+      disabled:g.querySelector('.gx-gixy-message__avatar').disabled};
+  });
+  assert(bubbleEarly.typing==='true'&&bubbleEarly.disabled,name+': typewriter lock not activated');
+  // Hammer the disabled target while writing: never create a second phrase.
+  await page.evaluate(()=>{const a=document.querySelector('.gx-gixy-message__avatar');
+    for(let k=0;k<14;k++)a.dispatchEvent(new MouseEvent('click',{bubbles:true}));});
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'0');
   await assertMessage('notification',/novedad/i);
+  const bubbleAfter=await page.locator('.gx-gixy-message__bubble').evaluate(el=>({
+    w:parseFloat(getComputedStyle(el).width),h:parseFloat(getComputedStyle(el).height)}));
+  assert(bubbleAfter.w>bubbleEarly.w+20,name+': bubble did not expand with written text');
+  assert(bubbleAfter.h>=34,name+': bubble collapsed vertically');
+  await page.locator('.gx-gixy-message__avatar').isEnabled();
   assert.equal(await page.locator('#gx-client-notif-launch').getAttribute('aria-expanded'),'true');
   await page.waitForFunction(()=>{
     const badge=document.getElementById('gx-client-notif-badge');
@@ -132,7 +154,8 @@ async function exercise(engine,name){
   assert(local.dy<10&&local.inside&&!local.coversButton,
     name+': Circle fuera de su sección o encima del cobro: '+JSON.stringify(local));
   await page.locator('.gx-gixy-message__avatar').click();
-  assert.match(await page.locator('.gx-gixy-message__bubble').innerText(),/constancia/i);
+  await page.waitForFunction(()=>document.querySelector('.gx-gixy-message')?.dataset.typing==='false',null,{timeout:7000});
+  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy/i);
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'1');
 
   await page.locator('#gx-mirror-mission-card').click();
@@ -146,10 +169,11 @@ async function exercise(engine,name){
   assert.equal(await page.locator('#gx-mirror-complete-btn .gx-mirror-action-icon').evaluate(el=>getComputedStyle(el).animationName),'gx-mirror-check-pop');
   await page.locator('.gx-gixy-message__avatar').click();
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'1');
-  assert.match(await page.locator('.gx-gixy-message__bubble').innerText(),/GOXION/i);
-  const subtle=await page.locator('.gx-gixy-message__avatar').evaluate(el=>
-    el.getAnimations().some(a=>a.playState==='running'));
-  assert(subtle,name+': brief touch acknowledgement missing');
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-typing'),'true');
+  assert.equal(await page.locator('.gx-gixy-message__avatar').isDisabled(),true);
+  await page.waitForFunction(()=>document.querySelector('.gx-gixy-message')?.dataset.typing==='false',null,{timeout:7000});
+  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy/i);
+  await page.locator('.gx-gixy-message__avatar').waitFor({state:'visible'});
   await page.locator('#gx-mirror-retry').click();
   assert.equal(await page.locator('#gx-mirror-complete-btn').isEnabled(),true);
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});
@@ -160,11 +184,21 @@ async function exercise(engine,name){
   assert.notEqual(secondMission.variant,firstMission.variant,'Gixys must vary placement between events');
   assert(Math.abs(secondMission.x-firstMission.x)+Math.abs(secondMission.y-firstMission.y)>=3,
     name+': Gixy positions must actually vary while staying safe');
-  // Multiple taps rotate concise brand sayings; no forced launch or arcade spin.
-  for(let i=0;i<4;i++)await page.locator('.gx-gixy-message__avatar').click();
+  // Repeated touches after each completed sentence work; incomplete phrases
+  // cannot be overwritten or queued by impatient tapping.
+  for(let i=0;i<3;i++){
+    await page.locator('.gx-gixy-message__avatar').click({timeout:2500});
+    assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-typing'),'true');
+    await page.evaluate(()=>{
+      const a=document.querySelector('.gx-gixy-message__avatar');
+      for(let t=0;t<5;t++)a.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+    });
+    await page.waitForFunction(()=>document.querySelector('.gx-gixy-message')?.dataset.typing==='false',null,{timeout:7000});
+    await page.waitForFunction(()=>!document.querySelector('.gx-gixy-message__avatar')?.disabled,null,{timeout:2000});
+  }
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'shown');
-  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'4');
-  assert.match(await page.locator('.gx-gixy-message__bubble').innerText(),/GOXION/i);
+  assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-touch-count'),'3');
+  assert.match(await page.locator('.gx-gixy-message__written').innerText(),/Goxy|GOXION|Gixys/i);
   await page.locator('.gx-gixy-message__bubble').click();
   assert.equal(await page.locator('.gx-gixy-message').getAttribute('data-phase'),'fade');
   await page.locator('.gx-gixy-message').waitFor({state:'detached',timeout:2000});

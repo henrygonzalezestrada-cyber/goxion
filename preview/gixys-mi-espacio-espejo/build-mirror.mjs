@@ -29,8 +29,8 @@ const html=String.raw`<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/css/ayuda.css">
 <link rel="stylesheet" href="../../assets/css/realtime-client-notifications.css">
-<link rel="stylesheet" href="./companions.css?v=5">
-<link rel="stylesheet" href="./mirror.css?v=5">
+<link rel="stylesheet" href="./companions.css?v=6">
+<link rel="stylesheet" href="./mirror.css?v=6">
 </head>
 <body class="gx-mirror-body" data-visual-only="true">
 <header class="app-header" style="width:100%;max-width:580px;padding-left:20px;padding-right:20px;margin:0 auto 10px">
@@ -53,8 +53,8 @@ ${dashboard}
 <div class="gx-mirror-toast" id="gx-mirror-toast" role="status" aria-live="polite" hidden></div>
 <script>window.animarMisionesCompletadasEnSecuencia=()=>{};</script>
 <script src="../../assets/js/ayuda/05-gamification-shared-morph-js.js"></script>
-<script src="./companions.js?v=5"></script>
-<script src="./mirror.js?v=5" defer></script>
+<script src="./companions.js?v=6"></script>
+<script src="./mirror.js?v=6" defer></script>
 </body></html>`;
 // The vendor source is not inserted as an inline script: only approved static assets execute.
 fs.writeFileSync('preview/gixys-mi-espacio-espejo/index.html',html);

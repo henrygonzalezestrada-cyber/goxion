@@ -96,28 +96,91 @@ function selectPlace(kind,node,sequence,dimensions){
 
 const sayings={
  mission:[
-  'En GOXION, cada logro cuenta.',
-  'Un pequeño paso también es una victoria.',
-  'Lo bueno se construye paso a paso.'
+  '¡Soy Hex, del equipo de Goxy!',
+  'Goxy dice: cada logro cuenta.',
+  'Con Goxy, los pequeños pasos importan.',
+  'Goxy nos enseñó a celebrar contigo.',
+  'Somos los Gixys. ¡Vamos contigo!',
+  'En GOXION, los logros se comparten.'
  ],
  loyalty:[
-  'En GOXION, la constancia tiene premio.',
-  'Tu confianza nos inspira a mejorar.',
-  'Los buenos momentos también se renuevan.'
+  'Goxy nos enseñó a cuidar tu confianza.',
+  'Soy Circle, del pequeño equipo de Goxy.',
+  'Para Goxy, cada detalle cuenta.',
+  'En GOXION, tu constancia nos inspira.',
+  'Goxy y los Gixys te acompañamos.',
+  'Tu confianza nos hace mejores.'
  ],
  notification:[
-  'GOXION: siempre un paso adelante.',
-  'Las buenas noticias merecen su momento.',
-  'Lo importante, siempre a tu alcance.'
+  '¡Square, del equipo de Goxy, presente!',
+  'Goxy nos pidió estar atentos.',
+  'Somos los ojos curiosos de Goxy.',
+  'En GOXION, nada importante se pierde.',
+  'Goxy y sus Gixys están contigo.',
+  'Un buen aviso merece tu atención.'
  ]
 };
-function GixyMessage({kind,serial,phase,onDismiss,onEngage}){
- const cfg=hints[kind],scene=useRef(null),avatar=useRef(null);
+// 42 ms por carácter: lectura suave, no teletipo apresurado.
+// One exclusive timeout chain per phrase; changing or dismissing the message
+// cancels all pending characters and prevents overlapping animations.
+const WRITE_MS=42;
+function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
+ const cfg=hints[kind],scene=useRef(null),avatar=useRef(null),metric=useRef(null);
+ const textVersion=useRef(0),writeTimer=useRef(null),unlockTimer=useRef(null);
+ const reactTimer=useRef(null),touchLock=useRef(true);
+ const doneRef=useRef(onTextComplete);doneRef.current=onTextComplete;
  const [layout,setLayout]=useState(null);
  const [touches,setTouches]=useState(0);
  const [text,setText]=useState(cfg.text);
- const [quote,setQuote]=useState(false);
+ const [charsShown,setCharsShown]=useState(0);
+ const [typing,setTyping]=useState(true);
+ const [readyForTouch,setReadyForTouch]=useState(false);
+ const [speechSize,setSpeechSize]=useState({width:34,height:34});
+ const [reacting,setReacting]=useState(false);
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const letters=[...text];
+ const written=letters.slice(0,charsShown).join('');
+ useEffect(()=>{
+  const version=++textVersion.current;
+  clearTimeout(writeTimer.current);clearTimeout(unlockTimer.current);
+  touchLock.current=true;setReadyForTouch(false);setCharsShown(0);setTyping(true);
+  const glyphs=[...text];
+  if(reduced){
+   setCharsShown(glyphs.length);setTyping(false);
+   touchLock.current=false;setReadyForTouch(true);doneRef.current?.();
+   return;
+  }
+  let cursor=0;
+  function write(){
+   if(textVersion.current!==version)return;
+   cursor=Math.min(cursor+1,glyphs.length);
+   setCharsShown(cursor);
+   if(cursor<glyphs.length){
+    writeTimer.current=setTimeout(write,WRITE_MS);
+   }else{
+    setTyping(false);
+    doneRef.current?.();
+    unlockTimer.current=setTimeout(()=>{
+     if(textVersion.current===version){touchLock.current=false;setReadyForTouch(true);}
+    },240);
+   }
+  }
+  writeTimer.current=setTimeout(write,190);
+  return ()=>{
+   textVersion.current++;
+   clearTimeout(writeTimer.current);clearTimeout(unlockTimer.current);
+  };
+ },[text,kind,reduced]);
+ // Bubble dimensions are driven by the actual visible letters, not total text.
+ // Width and height use numeric transitions, including when a word wraps.
+ useLayoutEffect(()=>{
+  const el=metric.current;
+  if(!el)return;
+  const box=el.getBoundingClientRect();
+  const width=clamp(Math.ceil(box.width),32,132);
+  const height=clamp(Math.ceil(box.height),34,64);
+  setSpeechSize(old=>old.width===width&&old.height===height?old:{width,height});
+ },[written]);
  useLayoutEffect(()=>{
   let raf=0;
   if(kind==='loyalty')document.body.classList.add('gx-loyalty-speaking');
@@ -140,39 +203,43 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage}){
    if(kind==='loyalty')document.body.classList.remove('gx-loyalty-speaking');
   };
  },[kind,serial]);
+ useEffect(()=>()=>{clearTimeout(reactTimer.current);},[]);
  function play(){
-  if(phase!=='shown'||!layout)return;
+  // The lock is synchronous; taps during writing/reaction cannot queue or
+  // cancel half-written bubbles. Same phrase cannot be started twice.
+  if(phase!=='shown'||!layout||touchLock.current)return;
+  touchLock.current=true;
+  // Lock and reset in the SAME React commit as the new phrase. Otherwise
+  // a tap could briefly expose the previous "typing=false" state with blank text.
+  setTyping(true);setReadyForTouch(false);setCharsShown(0);
   const n=touches+1;
-  setTouches(n);
-  setText(sayings[kind][(n-1)%sayings[kind].length]);
-  setQuote(true);
+  setTouches(n);setText(sayings[kind][(n-1)%sayings[kind].length]);
+  setReacting(true);
+  clearTimeout(reactTimer.current);
+  reactTimer.current=setTimeout(()=>setReacting(false),610);
   onEngage();
-  if(reduced)return;
-  // A single quiet nod, no cartoony rotations, impacts or oversized squash.
-  const direction=n%2?1:-1;
-  avatar.current?.getAnimations?.().forEach(a=>a.cancel());
-  avatar.current?.animate([
-   {transform:'translate3d(0,0,0) rotate(0deg)',offset:0},
-   {transform:'translate3d('+(direction*5)+'px,-5px,0) rotate('+(direction*5)+'deg)',offset:.32},
-   {transform:'translate3d('+(direction*-2)+'px,1px,0) rotate('+(direction*-2)+'deg)',offset:.7},
-   {transform:'translate3d(0,0,0) rotate(0deg)',offset:1}
-  ],{duration:470,easing:'cubic-bezier(.16,.88,.28,1)'});
  }
  const visible=Boolean(layout),leaving=phase!=='shown';
- return <div ref={scene} className={'gx-gixy-message'+(visible?' is-visible':'')+(leaving?' is-leaving':'')}
+ return <div ref={scene}
+  className={'gx-gixy-message'+(visible?' is-visible':'')+(leaving?' is-leaving':'')}
   data-kind={kind} data-variant={serial%5} data-placement={layout?.slot??'hidden'}
-  data-touch-count={touches} data-phase={phase} data-quote={quote?'true':'false'}
+  data-touch-count={touches} data-phase={phase}
+  data-typing={typing?'true':'false'} data-visible-chars={charsShown}
+  data-write-ms={WRITE_MS}
   style={{left:layout?.left??0,top:layout?.top??0,visibility:visible?'visible':'hidden'}}>
   <button className="gx-gixy-message__avatar" type="button" ref={avatar}
-   onClick={play} disabled={leaving} aria-label={'Tocar a Gixy '+kind}
-   title="Toca para escuchar una frase de GOXION">
+   onClick={play} disabled={leaving||!readyForTouch} aria-label={'Tocar a Gixy '+kind+' para otra frase'}
+   title={typing?'Gixy está hablando':'Toca para escuchar otra frase de Goxy'}>
    <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
-    shading="plastic" state="default" turn={1} speed={.82} depth={.74}
-    jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
+    shading="plastic" state={reacting?'working':'default'} turn={1} speed={.82}
+    depth={.74} jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
   </button>
-  <button className="gx-gixy-message__bubble" type="button" onClick={()=>onDismiss('fade')}
-   aria-label="Cerrar mensaje de Gixy">
-   <span key={kind+'-'+touches} role="status" aria-live="polite">{text}</span>
+  <button className="gx-gixy-message__bubble" type="button"
+   onClick={()=>onDismiss('fade')} aria-label={'Cerrar consejo: '+text}
+   style={{'--gx-bubble-width':speechSize.width+'px','--gx-bubble-height':speechSize.height+'px'}}>
+   <span className="gx-gixy-message__measure" ref={metric} aria-hidden="true">{written||'\u00a0'}</span>
+   <span className="gx-gixy-message__written" aria-hidden="true">{written}</span>
+   <span className="gx-gixy-message__sr" role="status" aria-live="polite">{text}</span>
   </button>
  </div>;
 }
@@ -185,11 +252,18 @@ function Messages(){
   clearTimers();
   const exitingKind=currentKind.current;
   setCurrent(c=>c&&c.kind===exitingKind?{...c,phase:mode}:c);
-  timers.current.exit=setTimeout(()=>{currentKind.current=null;setCurrent(null);},430);
+  timers.current.exit=setTimeout(()=>{
+   // An older exit must not remove a newer event that replaced it.
+   if(currentKind.current===exitingKind){currentKind.current=null;setCurrent(null);}
+  },430);
  };
  const engage=()=>{
   clearTimeout(timers.current.shown);
-  timers.current.shown=setTimeout(()=>dismiss('fade'),3900);
+  timers.current.shown=setTimeout(()=>dismiss(),8700);
+ };
+ const textComplete=()=>{
+  clearTimeout(timers.current.shown);
+  timers.current.shown=setTimeout(()=>dismiss(),2900);
  };
  useEffect(()=>{
   const listeners=Object.keys(hints).map(kind=>{
@@ -201,7 +275,8 @@ function Messages(){
     count.current++;
     currentKind.current=kind;
     setCurrent({kind,serial:count.current,phase:'shown'});
-    timers.current.shown=setTimeout(()=>dismiss(),4900);
+    // Watchdog even if text animation or tab visibility stalls.
+    timers.current.shown=setTimeout(()=>dismiss(),10000);
    };
    document.addEventListener('gx-mirror:'+kind,listener);
    return ()=>document.removeEventListener('gx-mirror:'+kind,listener);
@@ -209,7 +284,7 @@ function Messages(){
   return ()=>{listeners.forEach(unlisten=>unlisten());clearTimers();};
  },[]);
  return current?<GixyMessage key={current.serial} {...current}
-  onDismiss={dismiss} onEngage={engage}/>:null;
+  onDismiss={dismiss} onEngage={engage} onTextComplete={textComplete}/>:null;
 }
 function LoyaltyHeart(){
   const [liked,setLiked]=useState(false);
@@ -232,7 +307,7 @@ function mount(){
   mounted=true;
   window.GOXION_GIXYS_ESPEJO_ENGINE=Object.freeze({
     renderer:'bot-avatars@0.2.2',shading:'plastic',
-    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','ContextualMessagesV2','BrandSayingsV1'],
+    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','TypewriterBubbleV1','GoxyFamilySayingsV1'],
     noBackend:true
   });
 }
