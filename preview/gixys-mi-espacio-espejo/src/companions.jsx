@@ -120,21 +120,48 @@ const sayings={
  ]
 };
 const WRITE_MS=39;
-const MAX_LINE=102;
-// Keep line boundaries stable BEFORE typing, never reflow on each letter.
+const MAX_LINE=121;
+// Balanced pre-layout: prefer three readable lines over four cramped ones.
+// Never leave "que", "de", "y", etc. alone at the end of a short sentence.
 function wrapSpeech(message){
- const canvas=document.createElement('canvas');
- const ctx=canvas.getContext('2d');
+ const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
  if(ctx)ctx.font='600 10.5px Poppins,system-ui,sans-serif';
- const size=t=>ctx?ctx.measureText(t).width:t.length*5.7;
- const lines=[''];
- for(const word of message.split(/\s+/)){
-  const index=lines.length-1;
-  const next=lines[index]?(lines[index]+' '+word):word;
-  if(lines[index]&&size(next)>MAX_LINE&&lines.length<4)lines.push(word);
-  else lines[index]=next;
+ const size=t=>ctx?ctx.measureText(t).width:[...t].length*5.7;
+ const words=message.trim().split(/\s+/);
+ if(words.length<2)return message;
+ let best=null;
+ const limit=MAX_LINE;
+ const memo=new Map();
+ function divide(i,remaining){
+  if(i===words.length)return {cost:0,lines:[]};
+  if(remaining===0)return null;
+  const key=i+'|'+remaining;
+  if(memo.has(key))return memo.get(key);
+  let winner=null;
+  for(let e=i+1;e<=words.length;e++){
+   const line=words.slice(i,e).join(' '),len=size(line);
+   if(len>limit&&e>i+1)break;
+   const next=divide(e,remaining-1);
+   if(!next)continue;
+   const short=words[e-1].replace(/[¡!¿?.,;:]/g,'').length;
+   const isLast=e===words.length;
+   const orphan=e===i+1&&short<=4;
+   const trailing=short<=3&&!isLast;
+   const ragged=(limit-Math.min(limit,len))/limit;
+   const score=next.cost+ragged*ragged*13
+    +(orphan?110:0)+(trailing?48:0)
+    +(isLast&&len<limit*.28?65:0)+(len>limit?80:0)+9;
+   if(!winner||score<winner.cost)winner={cost:score,lines:[line,...next.lines]};
+  }
+  memo.set(key,winner);
+  return winner;
  }
- return lines.join('\n');
+ for(const n of [3,4]){
+  memo.clear();
+  const solution=divide(0,n);
+  if(solution&&(!best||solution.cost<best.cost))best=solution;
+ }
+ return best?.lines.join('\n')||message;
 }
 function measureSpeech(visible,full){
  const ctx=document.createElement('canvas').getContext('2d');
@@ -152,8 +179,8 @@ function measureSpeech(visible,full){
  const end=[nextSpace,nextBreak].filter(v=>v>=0).sort((a,b)=>a-b)[0];
  const reserved=remainder.slice(0,end===undefined?remainder.length:end);
  const width=Math.max(0,...shownLines.map(size),size(reserved));
- const height=Math.min(74,Math.ceil(17+14.3*shownLines.length));
- return {width:Math.min(136,Math.max(36,Math.ceil(width+19))),height:Math.max(32,height)};
+ const height=Math.min(75,Math.ceil(17+14.3*shownLines.length));
+ return {width:Math.min(144,Math.max(36,Math.ceil(width+19))),height:Math.max(32,height)};
 }
 function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouch}){
  const cfg=hints[kind],scene=useRef(null),lock=useRef(true);
@@ -232,7 +259,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
   setText(next||sayings[kind][(n-1)%sayings[kind].length]);
   setReacting(true);
   clearTimeout(reactionTimer.current);
-  reactionTimer.current=setTimeout(()=>setReacting(false),480);
+  reactionTimer.current=setTimeout(()=>setReacting(false),1850);
   onEngage();
  }
  const visible=Boolean(layout);
@@ -246,7 +273,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
    aria-label="Tocar a un Gixy para una sorpresa"
    title={typing?'Un Gixy está hablando':'Toca a un Gixy'}>
    <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
-    shading="plastic" state={reacting?'working':'default'} turn={1} speed={.82}
+    shading="plastic" state={(reacting||typing)?'working':'default'} turn={1} speed={.72}
     depth={.74} jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
   </button>
   <button className="gx-gixy-message__bubble" type="button"
@@ -346,7 +373,7 @@ function mount(){
   mounted=true;
   window.GOXION_GIXYS_ESPEJO_ENGINE=Object.freeze({
     renderer:'bot-avatars@0.2.2',shading:'plastic',
-    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','StableTypewriterV2','SharedGixyPersonality','EasterEggDemo5'],
+    components:['PulseHeart','OfficialMorphV1','OfficialBellV1','BalancedTypewriterV3','GixysNativeJoy','EasterEggDemo5','CelebrationConfetti'],
     noBackend:true
   });
 }
