@@ -30,13 +30,13 @@ const intersection=(a,b)=>Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b
 const rect=(left,top,width,height)=>({left,top,right:left+width,bottom:top+height});
 function choosePosition(kind,node,variant,box){
   const cfg=hints[kind],anchor=document.querySelector(cfg.anchor);
-  if(!anchor||!anchor.isConnected){window.GX_MIRROR_PLACEMENT_DEBUG={reason:'missing-anchor',kind};return null;}
+  if(!anchor||!anchor.isConnected)return null;
   const viewport=window.visualViewport;
   // Browser viewport coordinates match getBoundingClientRect(); safe areas are conservative.
   const vw=Math.min(document.documentElement.clientWidth,viewport?.width||innerWidth);
   const vh=Math.min(innerHeight,viewport?.height||innerHeight);
   const a=anchor.getBoundingClientRect();
-  if(a.bottom<0||a.top>vh-5){window.GX_MIRROR_PLACEMENT_DEBUG={reason:'anchor-outside-view',kind,anchor:{top:a.top,bottom:a.bottom,left:a.left,right:a.right},vh,vw,scrollY:window.scrollY};return null;}
+  if(a.bottom<0||a.top>vh-5)return null;
   const width=Math.min(box.width||212,vw-20);
   const height=box.height||86;
   const anchors=[
@@ -78,11 +78,6 @@ function choosePosition(kind,node,variant,box){
     const score=overlap*15+distance*.24+preference*3.8;
     if(!best||score<best.score)best={left,top,score,overlap,distance,slot:i,width,height};
   });
-  window.GX_MIRROR_PLACEMENT_DEBUG={
-    kind,best,anchor:{left:a.left,top:a.top,right:a.right,bottom:a.bottom},
-    stage:{width,height},viewport:{width:vw,height:vh},
-    obstacles:obstacles.map(r=>({left:r.left,top:r.top,right:r.right,bottom:r.bottom}))
-  };
   if(!best||best.overlap>50||best.distance>415)return null; // Never sacrifice important content to show a mascot.
   return best;
 }
