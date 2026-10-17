@@ -271,3 +271,24 @@ body.gx-mirror-body #gx-client-notif-launch.gx-has-new > #gx-client-notif-badge{
 /* Keep the hop visible until the avatar actually exits; the speech fades first. */
 .gx-gixy-message.is-hopping{opacity:1!important;transform:translate3d(0,0,0) scale(1)!important;transition:none!important}
 .gx-gixy-message.is-hopping .gx-gixy-message__avatar{pointer-events:none!important}
+
+/* Geometry validated against the actual GOXION dashboard (Safari 390px):
+   the ~65px gap between greeting and billing can host a compact guide. */
+.gx-gixy-message{
+  width:190px!important;max-width:calc(100vw - 22px)!important;
+  min-height:59px!important;height:59px!important;max-height:59px!important;
+  gap:3px!important
+}
+.gx-gixy-message__avatar{
+  width:53px!important;height:57px!important;min-width:53px!important;
+  flex:0 0 53px!important
+}
+.gx-gixy-message__bubble{
+  min-height:46px!important;padding:7px 8px 7px 10px!important;
+  font-size:10.3px!important;line-height:1.36!important
+}
+@media(max-width:350px){
+ .gx-gixy-message{width:184px!important}
+ .gx-gixy-message__avatar{width:52px!important;min-width:52px!important;flex-basis:52px!important}
+ .gx-gixy-message__bubble{font-size:10px!important}
+}
