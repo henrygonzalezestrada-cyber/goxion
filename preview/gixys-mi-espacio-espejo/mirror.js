@@ -32,7 +32,7 @@ if(row){
   count.textContent="3/4 Pagos";
 }
 bar.style.width="75%";
-copy.textContent="A un pago puntual del siguiente nivel. (Demostración)";
+copy.textContent="A un pago de tu siguiente nivel.";
 if(billing){
   const anchor=document.createElement("span");
   anchor.className="gx-mirror-loyalty-companion";
@@ -44,7 +44,7 @@ document.addEventListener("gx-mirror:loyalty-toggle",event=>{
   const done=Boolean(event.detail?.value);
   count.textContent=done?"4/4 Pagos":"3/4 Pagos";
   bar.style.width=done?"100%":"75%";
-  copy.textContent=done?"Nivel 1 alcanzado · Simulación":"A un pago puntual del siguiente nivel. (Demostración)";
+  copy.textContent=done?"Nivel 1 alcanzado · Simulación":"A un pago de tu siguiente nivel.";
   document.body.classList.toggle("gx-mirror-loyalty-active",done);
   emit("loyalty",done);
 });
