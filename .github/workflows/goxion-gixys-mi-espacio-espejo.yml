@@ -1,8 +1,8 @@
-name: GOXION · Gixys · Movimiento Refinado
+name: GOXION · Gixys · Escritura Premium
 on:
   push:
     branches:
-      - beta/gixys-fino-lealtad-frases-20261016
+      - beta/gixys-typewriter-dialogos-20261016
     paths:
       - 'preview/gixys-mi-espacio-espejo/**'
       - '.github/workflows/goxion-gixys-mi-espacio-espejo.yml'
