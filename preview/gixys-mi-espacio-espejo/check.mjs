@@ -266,16 +266,15 @@ async function exercise(engine,name){
     /gx-award-aurora-reveal|gx-award-amount-reveal/,
     name+': missing Colorion-inspired Aurora prize text animation');
   assert.match(await page.locator('.gx-gixys-secret').innerText(),/demostración|ficticio/i);
-  for(let tick=0;tick<5;tick++){
-    console.log(name+' AWARD_BOX '+tick+' '+JSON.stringify(await page.evaluate(()=>{
-      const el=document.querySelector('.gx-gixys-secret'),btn=el.querySelector('button'),root=document.querySelector('#gx-gixys-message-root');
-      const info=e=>{const r=e.getBoundingClientRect(),st=getComputedStyle(e);return {x:r.x,y:r.y,w:r.width,h:r.height,animation:st.animationName,transform:st.transform,position:st.position}};
-      return {panel:info(el),btn:info(btn),root:info(root),
-        animations:el.getAnimations({subtree:true}).slice(0,8).map(a=>({name:a.effect?.target?.className||'',state:a.playState}))};
-    })));
-    await page.waitForTimeout(320);
-  }
-  await page.locator('.gx-gixys-secret button').click({timeout:3500,force:true});
+  const awardButton=await page.locator('.gx-gixys-secret button').evaluate(el=>{
+    const r=el.getBoundingClientRect();
+    return {tapTarget:document.elementFromPoint(r.left+r.width/2,r.top+r.height/2),
+      button:el,interactive:getComputedStyle(el).pointerEvents};
+  });
+  assert(awardButton.interactive==='auto'&&
+    (awardButton.tapTarget===awardButton.button||awardButton.button.contains(awardButton.tapTarget)),
+    name+': award dismissal is hidden behind another layer');
+  await page.locator('.gx-gixys-secret button').click({timeout:3000});
   assert.equal(await page.locator('.gx-gixys-secret').count(),0);
   await page.locator('.gx-gixy-message__avatar').waitFor({state:'visible'});
   await page.locator('#gx-mirror-retry').click();
