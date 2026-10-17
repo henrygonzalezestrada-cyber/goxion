@@ -851,3 +851,12 @@ body.gx-mirror-body .gx-gixys-secret--v9.glass-card{
   animation:none!important
  }
 }
+
+
+/* Interactive award remains at a fixed location while internal light/ink
+   animate; a moving card is not a premium interaction target. */
+body.gx-mirror-body .gx-gixys-secret--v9.glass-card{
+ animation:none!important;
+ transition:none!important;
+ transform:translateX(-50%)!important;
+}
