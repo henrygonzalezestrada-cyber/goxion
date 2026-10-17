@@ -43,6 +43,7 @@ async function exercise(engine,name){
   for(const width of [280,320,360,375,390,430,768]){
     await page.setViewportSize({width,height:844});
     await page.waitForTimeout(150);
+    await page.waitForTimeout(450); // evaluate settled placement, not the entrance spring frame
     const m=await page.evaluate(()=>{
       const visible=[...document.querySelectorAll('.gx-gixy-message__avatar canvas')].map(c=>({
         width:c.width,css:c.getBoundingClientRect().width
