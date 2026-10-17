@@ -14,14 +14,15 @@ const hints={
 };
 
 const protectedSelectors=[
- '#gx-client-notif-launch','.gx-header-actions','.app-logo','#goxion-main-nav',
- '.gx-mirror-note','#dynamic-greeting-text','#dash-date','#dash-badge',
+ '#gx-client-notif-launch','.gx-header-actions > *','.app-logo','#goxion-main-nav .tab-btn',
+ '#dynamic-greeting-text','#dash-date','#dash-badge',
  '#loyalty-count','#loyalty-msg','.gx-mirror-loyalty-label','#loyalty-bar',
  '.gx-gamif-card-mission .gamif-title','.gx-gamif-card-mission .gx-gamif-card-status',
  '.gx-gamif-progress','#gamif-expanded-coupon .btn-gamif-close',
  '#gamif-expanded-coupon .gx-mirror-expanded-head strong',
  '#gamif-expanded-coupon .gx-mirror-expanded-head p',
- '#gamif-expanded-coupon .mission-item',
+ '#gamif-expanded-coupon .mission-item .gx-mission-text',
+ '#gamif-expanded-coupon .mission-item .mission-checkbox',
  '#gamif-expanded-coupon .gx-mirror-mission-action',
  '#gamif-expanded-coupon .gx-mirror-retry'
 ];
@@ -36,8 +37,8 @@ const slots={
 };
 const contexts={
  notification:['#gx-client-notif-launch','#dynamic-greeting-text'],
- loyalty:['#dash-billing-card'],
- mission:['#gamif-expanded-coupon .gx-mirror-expanded-head']
+ loyalty:['#dash-billing-card','.gx-mirror-loyalty-label'],
+ mission:['#gamif-expanded-coupon .gx-mirror-expanded-head','#gx-mirror-complete-btn']
 };
 const isShown=el=>{
  const r=el.getBoundingClientRect(),style=getComputedStyle(el);
@@ -52,26 +53,32 @@ function selectPlace(kind,node,sequence,dimensions){
    .map(el=>el.getBoundingClientRect())
    .filter(r=>r.right>=0&&r.left<=vw&&r.bottom>=0&&r.top<=vh)
    .map(r=>bounds(r.left-2,r.top-2,r.width+4,r.height+4));
- const source=contexts[kind].map(selector=>document.querySelector(selector)).find(el=>{
-   if(!el||!isShown(el))return false;
-   const r=el.getBoundingClientRect();return r.bottom>4&&r.top<vh-4;
+
+ let best=null;
+ contexts[kind].forEach((selector,sourceIdx)=>{
+  const source=document.querySelector(selector);
+  if(!source||!isShown(source))return;
+  const area=source.getBoundingClientRect();
+  if(area.bottom<4||area.top>vh-4)return;
+  const order=[sequence%3,(sequence+1)%3,(sequence+2)%3];
+  order.forEach((idx,priority)=>{
+   const [direction,align,delta]=slots[kind][idx];
+   let left=align==='right'?area.right-w:align==='left'?area.left:area.left+(area.width-w)/2;
+   let top=direction==='above'?area.top-h-9:area.bottom+9;
+   left+=delta+[-7,8,0,5,-4][sequence%5];top+=(sequence%2?3:-3);
+   left=clamp(Math.round(left),11,Math.max(11,vw-w-11));
+   if(top<12||top+h>vh-14)return;
+   top=Math.round(top);
+   const box=bounds(left,top,w,h);
+   const collision=obstacles.reduce((n,o)=>n+overlap(box,o),0);
+   if(collision>40)return;
+   const candidate={left,top,width:w,height:h,slot:idx,collision,priority,sourceIdx};
+   // Context always wins over a more distant fallback.
+   const score=sourceIdx*12+priority*3+collision*.06;
+   if(!best||score<best.score)best={...candidate,score};
+  });
  });
- if(!source)return null;
- const area=source.getBoundingClientRect();
- const order=[sequence%3,(sequence+1)%3,(sequence+2)%3];
- const choices=order.map((idx,orderIndex)=>{
-  const [direction,align,delta]=slots[kind][idx];
-  let left=align==='right'?area.right-w:align==='left'?area.left:area.left+(area.width-w)/2;
-  let top=direction==='above'?area.top-h-9:area.bottom+9;
-  left+=delta+[-7,8,0,5,-4][sequence%5];top+=(sequence%2?3:-3);
-  left=clamp(Math.round(left),11,Math.max(11,vw-w-11));
-  if(top<14||top+h>vh-16)return null;
-  top=Math.round(top);
-  const r=bounds(left,top,w,h);
-  const collision=obstacles.reduce((n,o)=>n+overlap(r,o),0);
-  return {left,top,width:w,height:h,slot:idx,collision,orderIndex};
- }).filter(Boolean).filter(p=>p.collision<=24);
- return choices.sort((a,b)=>a.orderIndex-b.orderIndex||a.collision-b.collision)[0]||null;
+ return best;
 }
 function GixyMessage({kind,serial,phase,onDismiss}){
  const cfg=hints[kind],scene=useRef(null),avatar=useRef(null);
