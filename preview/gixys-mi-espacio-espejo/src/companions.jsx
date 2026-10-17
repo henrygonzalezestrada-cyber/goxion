@@ -191,8 +191,8 @@ function measureSpeech(visible,full){
  const height=Math.min(75,Math.ceil(17+14.3*shownLines.length));
  return {width:Math.min(144,Math.max(36,Math.ceil(width+19))),height:Math.max(32,height)};
 }
-function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouch}){
- const cfg=hints[kind],scene=useRef(null),lock=useRef(true);
+function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouch,official=false}){
+ const cfg=official?{...hints[kind],text:{mission:'¡Tus misiones están completas!',loyalty:'Tu constancia merece celebrarse.',notification:'¡Tienes una novedad en GOXION!'}[kind]}:hints[kind],scene=useRef(null),lock=useRef(true);
  const textVersion=useRef(0),writeTimer=useRef(null),unlockTimer=useRef(null);
  const reactionTimer=useRef(null),done=useRef(onTextComplete),touchRef=useRef(onTouch);
  done.current=onTextComplete;touchRef.current=onTouch;
@@ -296,7 +296,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
   </button>
  </div>;
 }
-function Messages(){
+function Messages({official=false}){
  const [current,setCurrent]=useState(null);
  const [reward,setReward]=useState(false);
  const [found,setFound]=useState(0);
@@ -318,6 +318,7 @@ function Messages(){
   timers.current.shown=setTimeout(()=>dismiss(),9000);
  };
  const onTouch=(kind,n)=>{
+  if(official)return sayings[kind][(n-1)%sayings[kind].length];
   if(!met.current.has(kind)&&!alreadyAwarded.current){
    met.current.add(kind);setFound(met.current.size);
    if(met.current.size===1)return 'Goxy dejó un secreto entre nosotros tres...';
@@ -353,9 +354,9 @@ function Messages(){
   return ()=>{unsubs.forEach(fn=>fn());clearTimers();clearTimeout(timers.current.reward);};
  },[]);
  return <>
-  {current?<GixyMessage key={current.serial} {...current} onDismiss={dismiss}
+  {current?<GixyMessage key={current.serial} {...current} official={official} onDismiss={dismiss}
    onEngage={onEngage} onTouch={onTouch} onTextComplete={onTextComplete}/>:null}
-  {reward?<div className="glass-card gx-gixys-secret gx-gixys-secret--v9"
+  {!official&&reward?<div className="glass-card gx-gixys-secret gx-gixys-secret--v9"
      role="status" aria-live="polite" data-celebration="aurora">
    <span className="gx-gixys-secret__aura" aria-hidden="true"></span>
    <div className="gx-gixys-secret__halo" aria-hidden="true">
@@ -408,3 +409,7 @@ function mount(){
 }
 document.addEventListener('gx-mirror-ready',mount);
 if(document.readyState!=='loading')mount();
+
+// Production shares the exact approved beta renderer but supplies only authenticated
+// server-confirmed events. The fictitious 5% game is never mounted in production.
+export {Messages};
