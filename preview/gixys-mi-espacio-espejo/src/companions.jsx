@@ -209,6 +209,9 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete}){
   // cancel half-written bubbles. Same phrase cannot be started twice.
   if(phase!=='shown'||!layout||touchLock.current)return;
   touchLock.current=true;
+  // Lock and reset in the SAME React commit as the new phrase. Otherwise
+  // a tap could briefly expose the previous "typing=false" state with blank text.
+  setTyping(true);setReadyForTouch(false);setCharsShown(0);
   const n=touches+1;
   setTouches(n);setText(sayings[kind][(n-1)%sayings[kind].length]);
   setReacting(true);
