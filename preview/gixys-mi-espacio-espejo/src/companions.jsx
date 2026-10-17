@@ -55,7 +55,6 @@ function selectPlace(kind,node,sequence,dimensions){
    .map(r=>bounds(r.left-2,r.top-2,r.width+4,r.height+4));
 
  let best=null;
- const trace=[];
  contexts[kind].forEach((selector,sourceIdx)=>{
   const source=document.querySelector(selector);
   if(!source||!isShown(source))return;
@@ -68,11 +67,10 @@ function selectPlace(kind,node,sequence,dimensions){
    let top=direction==='above'?area.top-h-9:area.bottom+9;
    left+=delta+[-7,8,0,5,-4][sequence%5];top+=(sequence%2?3:-3);
    left=clamp(Math.round(left),11,Math.max(11,vw-w-11));
-   if(top<12||top+h>vh-14){trace.push({selector,idx,top,edge:'out',vh,h});return;}
+   if(top<12||top+h>vh-14)return;
    top=Math.round(top);
    const box=bounds(left,top,w,h);
    const collision=obstacles.reduce((n,o)=>n+overlap(box,o),0);
-   trace.push({selector,idx,left,top,collision,viewport:vw});
    if(collision>40)return;
    const candidate={left,top,width:w,height:h,slot:idx,collision,priority,sourceIdx};
    // Context always wins over a more distant fallback.
@@ -80,7 +78,6 @@ function selectPlace(kind,node,sequence,dimensions){
    if(!best||score<best.score)best={...candidate,score};
   });
  });
- window.GOXION_GIXY_PLACEMENT_TRACE={kind,best,trace,vw,vh,w,h,protect:obstacles};
  return best;
 }
 function GixyMessage({kind,serial,phase,onDismiss}){
@@ -134,7 +131,7 @@ function GixyMessage({kind,serial,phase,onDismiss}){
    <button className="gx-gixy-message__avatar" type="button" ref={avatar}
      onClick={play} disabled={leaving} aria-label={'Jugar con Gixy '+kind}
      title="Toca a Gixy para hacerlo rebotar">
-     <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={57} face="eyes"
+     <BotAvatar type={cfg.kind} color={palette[cfg.kind]} size={50} face="eyes"
       shading="plastic" state="working" turn={1} speed={.92} depth={.74}
       jumpSpin={1} jumpEvery={8} interactive={false} theme="dark"/>
    </button>
