@@ -105,3 +105,33 @@ html[data-gx-b2-index-demo="true"] .header{position:relative;min-height:30px}
 @media(max-width:359px){.gx-b2-calendar-row{gap:6px}.gx-b2-calendar-row-main small{font-size:9px}
 .gx-b2-calendar-row-side strong{font-size:11px}.gx-b2-mode{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.gx-b2-calendar-chevron{transition:none!important}}
+
+/* E1/B2 polish: compact, continuous progress instead of paragraph-heavy tracking. */
+.gx-b2-proof{overflow:hidden;position:relative}
+.gx-b2-proof-heading{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+.gx-b2-proof-symbol{width:35px;height:35px;border-radius:50%;flex:0 0 35px;display:grid;place-items:center;
+ background:rgba(0,242,254,.09);color:var(--neon-blue);font-size:19px;font-weight:700;
+ box-shadow:inset 0 0 0 1px rgba(0,242,254,.14)}
+.gx-b2-proof--correction .gx-b2-proof-symbol{background:rgba(255,187,71,.09);color:#ffca7a;
+ box-shadow:inset 0 0 0 1px rgba(255,187,71,.17)}
+.gx-b2-proof--approved .gx-b2-proof-symbol{background:rgba(0,242,254,.13)}
+.gx-b2-proof-heading-copy{display:flex;flex-direction:column;gap:4px;min-width:0}
+.gx-b2-proof-eyebrow{margin:0!important;font-size:9px;letter-spacing:1.1px}
+.gx-b2-proof-title{font-size:16px}
+.gx-b2-proof-progress{height:5px;background:rgba(255,255,255,.08);border-radius:999px;
+ overflow:hidden;position:relative}
+.gx-b2-proof-progress-fill{display:block;width:var(--gx-b2-progress);height:100%;
+ border-radius:inherit;background:linear-gradient(90deg,#7550e8 0%,#25c6f3 80%,#a8faff 100%);
+ box-shadow:0 0 12px rgba(0,242,254,.28);transform-origin:left;
+ animation:gx-b2-fill .7s cubic-bezier(.18,.75,.22,1) both}
+.gx-b2-proof--correction .gx-b2-proof-progress-fill{background:linear-gradient(90deg,#7855d7,#d99c53);
+ box-shadow:0 0 10px rgba(217,156,83,.12)}
+.gx-b2-proof-steps{display:flex;justify-content:space-between;gap:8px;margin-top:11px}
+.gx-b2-proof-steps span{font-size:10px;color:var(--text-muted);line-height:1.4}
+.gx-b2-proof-steps .is-complete{color:var(--neon-blue)}
+.gx-b2-proof-steps .is-active{color:#d9d1ff;font-weight:700}
+.gx-b2-proof-steps .is-alert{color:#ffca7a;font-weight:700}
+.gx-b2-proof .gx-b2-proof-hint{font-size:11px;line-height:1.55;margin:15px 0 0;
+ color:var(--text-muted)}
+@keyframes gx-b2-fill{from{transform:scaleX(.04);opacity:.5}to{transform:scaleX(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.gx-b2-proof-progress-fill{animation:none!important}}
