@@ -9,8 +9,8 @@ const official=readFileSync('ayuda.html','utf8');
 assert(!html.includes('id="gx-smart-focus"'),'Redundant priority card must not exist');
 assert(html.includes('id="gx-smart-notif-button"'),'Missing real Ayuda bell class');
 assert(html.includes('class="gx-client-notif-sheet"'),'Missing Ayuda notification sheet');
-assert(html.includes('src="./notice-demo.js?v=e1b1v5"'),'Missing isolated animation');
-assert(html.includes('src="./mission-mirror.js?v=e1b1v5"'),'Missing native mission mirror');
+assert(html.includes('src="./notice-demo.js?v=e1b1v6"'),'Missing isolated animation');
+assert(html.includes('src="./mission-mirror.js?v=e1b1v6"'),'Missing native mission mirror');
 assert(html.includes('id="gx-smart-toggle"'),'Missing mirror control');
 assert(html.includes('id="gx-smart-lab"')&&html.includes('hidden>'),'Lab must start collapsed');
 assert(html.includes('id="gx-smart-card-heading"'),'Missing contextual heading in original card');
@@ -162,10 +162,19 @@ async function exercise(name,engine){
    assert.equal(await page.locator('.gx-smart-notice-stream-halo').count(),1);
    assert.equal(await signal.evaluate(el=>el.parentElement.tagName),'BODY',
     'Motion layer must not affect card layout');
-   const d=await page.locator('.gx-smart-notice-stream-line').getAttribute('d');
-   assert(/^M .* C /.test(d),'Flight must follow a cubic Bézier, not a straight line');
+   const skin=page.locator('.gx-smart-notice-stream-line');
+   const d=await skin.getAttribute('d');
+   assert(/^M .* L .* Z$/.test(d),'Organic ribbon must have a filled, tapered silhouette; got '+JSON.stringify(d?.slice(0,120)));
+   assert.equal(await page.locator('.gx-smart-notice-stream-sheen').count(),1,
+    'Ribbon should include a restrained internal highlight');
    assert.equal(await page.locator('.gx-smart-notice-flight,.gx-smart-notice-spark').count(),0,
     'No flying capsules or generic dots');
+   await page.waitForFunction(previous=>{
+    const current=document.querySelector('.gx-smart-notice-stream-line')?.getAttribute('d');
+    return Boolean(current)&&current!==previous;
+   },d,{timeout:900,polling:50}); // Do not poll via rAF: headless WebKit may suspend it.
+   const d2=await skin.getAttribute('d');
+   assert.notEqual(d,d2,'Ribbon geometry must evolve every frame instead of sliding a fixed line');
    await page.waitForTimeout(1390);
    assert.equal(await page.locator('.gx-smart-notice-surface').count(),0,'Transient notice must clear');
    assert.equal(await signal.count(),0,'Signal layer must be removed after delivery');
@@ -189,7 +198,7 @@ async function exercise(name,engine){
    assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B1: 6 widths x 9 states, native Ayuda capsules/missions + optical stream → bell PASS');
+  console.log(name+' E1/B1: 6 widths x 9 states, native Ayuda capsules/missions + elastic silk ribbon → bell PASS');
  }finally{await browser.close()}
 }
 try{await ready();await exercise('Chromium',chromium);await exercise('WebKit',webkit);console.log('E1/B1 BETA PASS');}
