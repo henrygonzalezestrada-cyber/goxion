@@ -108,3 +108,7 @@ Etapas globales: **E1 — claridad/autoservicio (1,3,5)**; **E2 — personalizac
 - Módulo de misión aislado en \`preview/experiencia-mi-espacio-inteligente/mission-mirror.js\`; no toca gamificación productiva ni backend. Este comportamiento **no aprueba automáticamente** los Gixys ni la siguiente etapa.
 
 **Para cerrar B1:** evaluar V4 como espejo completo en Safari iPhone, percepción del vuelo, legibilidad de estados, apertura/cierre de misiones, no reflow, no scroll horizontal y respeto de controles originales. Aprobación de este bloque ≠ autorización de publicación de paquete (Issue #142).
+
+
+## 10. E1/B1 V5 · ÚNICO cambio solicitado, animación del aviso (18/oct) — PENDIENTE DE VALIDACIÓN
+Feedback visual: usuario **aprueba todo lo demás de V4** (cápsulas originales, misión, tarjeta, campana, jerarquía), pero rechaza que **una cápsula física** viaje hacia la campana. No reabrir áreas aceptadas. La propuesta V5 sustituye exclusivamente el proyectil por una **estela óptica de dos capas** (filamento fino + halo sutil) que recorre una trayectoria Bézier desde el texto del aviso a la campana; se absorbe con el mismo efecto nativo de notificaciones, sin dejar un objeto ni rastro permanente. En beta únicamente, sin alterar pago, estados, misión, Gixys, Admin o Ayuda oficial. Contemplar \`prefers-reduced-motion\`, tarjeta fuera de pantalla y cancelación de animación al cambiar escenario. No considerar B1 aprobado hasta revisión visual de V5 en iPhone.
