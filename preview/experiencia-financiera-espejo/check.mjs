@@ -95,7 +95,8 @@ async function run(name,engine){
    assert(collapsed.amountCenter<collapsed.badgeCenter,
     name+' '+width+' amount must sit LEFT of the badge');
    assert(collapsed.badgeLeft>=collapsed.amountRight+2,
-    name+' '+width+' compact badge should not overlap the amount');
+    name+' '+width+' compact badge should not overlap the amount. Geometry: '+
+     JSON.stringify({expanded,collapsed}));
    assert(collapsed.badgeCenter-collapsed.amountCenter<Math.min(165,collapsed.vw*.64),
     name+' '+width+' compact amount/status split too far apart');
    assert(collapsed.badgeLeft>=-2&&collapsed.amountRight<=collapsed.vw+2,
