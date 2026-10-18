@@ -73,98 +73,147 @@ function recordNotice(item){
  bell.classList.add('gx-ringing');
  delay(()=>bell.classList.remove('gx-ringing'),900);
 }
+/* GOXION E1/B1 V6 · Optical handoff with a physically shaped, moving ribbon.
+ * No UI tokens, no particle swarms and no 2D dashed lines.
+ * Only the source-to-bell transition changes; no app/session interactions.
+ */
 function bellImpact(item){
  recordNotice(item);
- const ring=bell.querySelector('.gx-client-notif-bell');
- if(!ring||window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ if(window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ // The bell receives the stream by briefly compressing, not exploding.
  const ripple=document.createElement('span');
  ripple.className='gx-smart-notice-impact';
  ripple.setAttribute('aria-hidden','true');
  bell.append(ripple);
- const animation=ripple.animate([
-  {transform:'translate(-50%,-50%) scale(.3)',opacity:.78},
-  {transform:'translate(-50%,-50%) scale(1.6)',opacity:0}
- ],{duration:480,easing:'cubic-bezier(.13,.8,.3,1)',fill:'forwards'});
- effects.push(animation);
- animation.finished.then(()=>ripple.remove(),()=>ripple.remove());
- delay(()=>ripple.remove(),520);
+ const ringAnim=ripple.animate([
+  {transform:'translate(-50%,-50%) scale(1.08)',opacity:0,offset:0},
+  {transform:'translate(-50%,-50%) scale(.82)',opacity:.55,offset:.3},
+  {transform:'translate(-50%,-50%) scale(.24)',opacity:0,offset:1}
+ ],{duration:490,easing:'cubic-bezier(.22,.85,.23,1)',fill:'forwards'});
+ effects.push(ringAnim);
+ ringAnim.finished.then(()=>ripple.remove(),()=>ripple.remove());
+ const response=bell.animate([
+  {transform:'scale(1)',offset:0},
+  {transform:'scale(.975)',offset:.20},
+  {transform:'scale(1.045)',offset:.56},
+  {transform:'scale(1)',offset:1}
+ ],{duration:530,easing:'cubic-bezier(.2,.73,.29,1)'});
+ effects.push(response);
+ delay(()=>ripple.remove(),550);
 }
-/* A meaningful signal, not a flying token, capsule, icon or particle.
- * A short ribbon of light flows out of the notice and is absorbed by the
- * ORIGINAL Ayuda bell. WAAPI moves only painted SVG dashes in a fixed layer.
- */
 function lightStream(card,item){
- const destination=bell.getBoundingClientRect(),origin=card.getBoundingClientRect();
+ const bellIcon=bell.querySelector('.gx-client-notif-icon');
+ const target=(bellIcon||bell).getBoundingClientRect();
+ const origin=card.getBoundingClientRect();
  const source=card.querySelector('.gx-smart-notice-title')?.getBoundingClientRect()||origin;
  const vw=window.innerWidth,vh=window.innerHeight;
- const visible=origin.bottom>0&&origin.top<vh&&destination.bottom>0&&destination.top<vh;
- if(!visible||typeof document.createElementNS!=='function'){
+ // Avoid disconnected visuals if the notification surface was scrolled away.
+ const onscreen=origin.bottom>0&&origin.top<vh&&target.bottom>0&&target.top<vh;
+ if(!onscreen||typeof window.requestAnimationFrame!=='function'){
   bellImpact(item);return;
  }
- const fromX=source.left+source.width/2,fromY=source.top+Math.min(source.height/2,36);
- const toX=destination.left+destination.width/2,toY=destination.top+destination.height/2;
- const deltaX=toX-fromX,gap=Math.max(32,Math.abs(fromY-toY));
- const up=Math.min(116,gap*.42),down=Math.min(98,gap*.28);
- const c1x=fromX+deltaX*.11,c1y=fromY-up;
- const c2x=toX-deltaX*.27,c2y=toY+down;
+ const x0=source.left+source.width*.5,y0=source.top+Math.min(source.height*.52,39);
+ const x3=target.left+target.width*.5,y3=target.top+target.height*.5;
+ const dx=x3-x0,span=Math.max(70,Math.abs(y3-y0));
+ const points=[
+  {x:x0,y:y0},
+  {x:x0+dx*.04,y:y0-Math.min(94,span*.32)},
+  {x:x3-dx*.29,y:y3+Math.min(100,span*.30)},
+  {x:x3,y:y3}
+ ];
+ const bezier=t=>{
+  const a=1-t,aa=a*a,tt=t*t;
+  return{x:aa*a*points[0].x+3*aa*t*points[1].x+3*a*tt*points[2].x+tt*t*points[3].x,
+   y:aa*a*points[0].y+3*aa*t*points[1].y+3*a*tt*points[2].y+tt*t*points[3].y};
+ };
+ const tangent=t=>{
+  const a=1-t;
+  const dx=3*a*a*(points[1].x-points[0].x)+6*a*t*(points[2].x-points[1].x)+3*t*t*(points[3].x-points[2].x);
+  const dy=3*a*a*(points[1].y-points[0].y)+6*a*t*(points[2].y-points[1].y)+3*t*t*(points[3].y-points[2].y);
+  const norm=Math.max(1,Math.hypot(dx,dy));
+  return{x:-dy/norm,y:dx/norm};
+ };
  const ns='http://www.w3.org/2000/svg';
  const svg=document.createElementNS(ns,'svg');
- svg.setAttribute('class','gx-smart-notice-stream');
+ svg.classList.add('gx-smart-notice-stream');
  svg.setAttribute('viewBox','0 0 '+vw+' '+vh);
- svg.setAttribute('width',String(vw));
- svg.setAttribute('height',String(vh));
+ svg.setAttribute('width',String(vw));svg.setAttribute('height',String(vh));
  svg.setAttribute('aria-hidden','true');
  svg.style.width=vw+'px';svg.style.height=vh+'px';
  const defs=document.createElementNS(ns,'defs');
- const gradient=document.createElementNS(ns,'linearGradient');
- const id='gx-notice-signal-'+Date.now();
- gradient.setAttribute('id',id);gradient.setAttribute('gradientUnits','userSpaceOnUse');
- gradient.setAttribute('x1',String(fromX));gradient.setAttribute('y1',String(fromY));
- gradient.setAttribute('x2',String(toX));gradient.setAttribute('y2',String(toY));
- for(const [offset,color,opacity] of [['0%','#a488ff','0.7'],['52%','#b6d5ff','1'],['100%','#65f1f5','1']]){
-  const stop=document.createElementNS(ns,'stop');
-  stop.setAttribute('offset',offset);
-  stop.setAttribute('stop-color',color);
-  stop.setAttribute('stop-opacity',opacity);
-  gradient.append(stop);
+ const grad=document.createElementNS(ns,'linearGradient');
+ const key='gx-ribbon-'+Date.now();
+ grad.setAttribute('id',key);grad.setAttribute('gradientUnits','userSpaceOnUse');
+ grad.setAttribute('x1',String(x0));grad.setAttribute('y1',String(y0));
+ grad.setAttribute('x2',String(x3));grad.setAttribute('y2',String(y3));
+ for(const [offset,color,opacity] of [
+  ['0%','#9981fa','.56'],['31%','#b8a8ff','.78'],
+  ['68%','#e3f8ff','.96'],['100%','#65e6ec','.90']
+ ]){
+  const st=document.createElementNS(ns,'stop');
+  st.setAttribute('offset',offset);st.setAttribute('stop-color',color);
+  st.setAttribute('stop-opacity',opacity);grad.append(st);
  }
- defs.append(gradient);svg.append(defs);
- const d='M '+fromX.toFixed(2)+' '+fromY.toFixed(2)+
-  ' C '+c1x.toFixed(2)+' '+c1y.toFixed(2)+
-  ', '+c2x.toFixed(2)+' '+c2y.toFixed(2)+
-  ', '+toX.toFixed(2)+' '+toY.toFixed(2);
- const makePath=(cls,width,opacity)=>{
-  const path=document.createElementNS(ns,'path');
-  path.setAttribute('class',cls);path.setAttribute('d',d);
-  path.setAttribute('fill','none');path.setAttribute('stroke','url(#'+id+')');
-  path.setAttribute('stroke-width',String(width));
-  path.setAttribute('stroke-linecap','round');
-  path.setAttribute('opacity',String(opacity));
-  svg.append(path);return path;
+ const filter=document.createElementNS(ns,'filter');filter.id=key+'-soft';
+ filter.setAttribute('x','-65%');filter.setAttribute('y','-65%');
+ filter.setAttribute('width','230%');filter.setAttribute('height','230%');
+ const blur=document.createElementNS(ns,'feGaussianBlur');
+ blur.setAttribute('stdDeviation','4.2');filter.append(blur);
+ defs.append(grad,filter);svg.append(defs);
+ const draw=(cls,fill)=>{
+  const path=document.createElementNS(ns,'path');path.setAttribute('class',cls);
+  path.setAttribute('fill',fill);svg.append(path);return path;
  };
- const halo=makePath('gx-smart-notice-stream-halo',7,.24);
- const filament=makePath('gx-smart-notice-stream-line',2.1,.94);
- document.body.append(svg);
- if(typeof filament.animate!=='function'){
-  svg.remove();bellImpact(item);return;
- }
- const length=filament.getTotalLength();
- const segment=Math.min(66,Math.max(28,length*.15));
- const duration=1040;
- for(const [part,opacity] of [[halo,.24],[filament,.94]]){
-  part.style.strokeDasharray=segment+' '+(length+segment+3);
-  part.style.strokeDashoffset=String(segment);
-  // A short moving beam with a soft tail; no full-screen neon trail.
-  const animation=part.animate([
-   {strokeDashoffset:segment,opacity:0,offset:0},
-   {strokeDashoffset:segment-length*.13,opacity:opacity,offset:.19},
-   {strokeDashoffset:-length*.68,opacity:opacity,offset:.73},
-   {strokeDashoffset:-length,opacity:0,offset:1}
-  ],{duration,easing:'cubic-bezier(.24,.62,.28,1)',fill:'forwards'});
-  effects.push(animation);
- }
- delay(()=>bellImpact(item),980);
- delay(()=>svg.remove(),duration+80);
+ const halo=draw('gx-smart-notice-stream-halo','url(#'+key+')');
+ halo.setAttribute('filter','url(#'+key+'-soft)');
+ const skin=draw('gx-smart-notice-stream-line','url(#'+key+')');
+ const sheen=draw('gx-smart-notice-stream-sheen','none');
+ sheen.setAttribute('stroke','rgba(242,252,255,.68)');
+ sheen.setAttribute('stroke-width','.75');sheen.setAttribute('stroke-linecap','round');
+ const bloom=document.createElement('span');
+ bloom.className='gx-smart-notice-origin-bloom';bloom.setAttribute('aria-hidden','true');
+ bloom.style.left=x0+'px';bloom.style.top=y0+'px';
+ document.body.append(svg,bloom);
+ const duration=1170,begin=performance.now();
+ const ease=t=>1-Math.pow(1-t,3)*(1+3*t); // ease both ends, faster in the middle
+ const clamp=v=>Math.max(0,Math.min(1,v));
+ const f=n=>n.toFixed(2);
+ let raf=0,delivered=false;
+ const render=now=>{
+  if(!svg.isConnected)return;
+  const time=clamp((now-begin)/duration),head=ease(time);
+  const tail=Math.max(0,head-.19);
+  const widen=(1-clamp((time-.68)/.32));
+  // The slight shifting in the body is what makes the light feel supple.
+  const center=t=>{
+   const p=bezier(t),n=tangent(t);
+   const wobble=4.7*Math.sin(Math.PI*t)*Math.sin(t*7.2+time*5.3)*widen;
+   return{x:p.x+n.x*wobble,y:p.y+n.y*wobble};
+  };
+  const left=[],right=[],spine=[];
+  for(let i=0;i<=18;i++){
+   const u=i/18,t=tail+(head-tail)*u,p=center(t),normal=tangent(t);
+   const width=(2.8+1.6*(1-head))*Math.pow(Math.sin(Math.PI*u),.66);
+   left.push(f(p.x+normal.x*width)+' '+f(p.y+normal.y*width));
+   right.unshift(f(p.x-normal.x*width)+' '+f(p.y-normal.y*width));
+   if(i>=3&&i<=16)spine.push(f(p.x-normal.x*width*.16)+' '+f(p.y-normal.y*width*.16));
+  }
+  const polygon='M '+left.join(' L ')+' L '+right.join(' L ')+' Z';
+  skin.setAttribute('d',polygon);halo.setAttribute('d',polygon);
+  sheen.setAttribute('d','M '+spine.join(' L '));
+  const reveal=clamp((time-.035)/.13),vanish=clamp((1-time)/.15);
+  svg.style.opacity=String(Math.min(reveal,vanish)*.94);
+  const shape=1+.05*Math.sin(Math.PI*time);
+  skin.setAttribute('opacity',String(shape));
+  halo.setAttribute('opacity','.35');
+  if(time>=.89&&!delivered){delivered=true;bellImpact(item)}
+  if(time<1)raf=requestAnimationFrame(render);else{svg.remove();bloom.remove()}
+ };
+ raf=requestAnimationFrame(render);
+ effects.push({cancel:()=>{cancelAnimationFrame(raf);svg.remove();bloom.remove()}});
+ delay(()=>bloom.remove(),510);
+ // Browser tab throttling fallback: always deliver the notice even if RAF stalls.
+ delay(()=>{if(!delivered){delivered=true;bellImpact(item)}svg.remove();bloom.remove()},duration+150);
 }
 
 function preview(){
