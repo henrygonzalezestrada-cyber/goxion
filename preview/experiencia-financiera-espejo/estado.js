@@ -242,8 +242,56 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  history.replaceState(null,'',url.pathname+url.search);
  refresh();
 });
+/* Index remaster R1–R3: true scroll-coupled morph of the *existing*
+ * sticky-area/balance-hero. No cloned headers, duplicate status layer or
+ * artificial sticky container. Derives size/position from visible scroll
+ * and uses a damped response so the motion settles instead of snapping.
+ */
+function setupHeaderMorph(){
+ const root=document.documentElement,hero=$('gx-b2-hero');
+ const reduced=matchMedia('(prefers-reduced-motion:reduce)');
+ let value=0,goal=0,frame=0;
+ const clamp=n=>Math.max(0,Math.min(1,n));
+ const px=n=>Math.round(n)+'px';
+ function paint(){
+  const p=value,w=Math.max(200,hero.clientWidth||240);
+  root.style.setProperty('--gx-rm-hero-h',px(130-87*p));
+  root.style.setProperty('--gx-rm-amount-size',px(52-26*p));
+  root.style.setProperty('--gx-rm-amount-shift',px(w*.225*p));
+  root.style.setProperty('--gx-rm-badge-shift',px(-w*.245*p));
+  root.style.setProperty('--gx-rm-badge-top',px(90-81*p));
+  root.style.setProperty('--gx-rm-amount-top',px(22-15*p));
+  root.style.setProperty('--gx-rm-badge-max',(96-49*p).toFixed(2)+'%');
+  root.style.setProperty('--gx-rm-badge-size',px(12-2*p));
+  root.style.setProperty('--gx-rm-label-opacity',String(clamp(1-p*3)));
+  root.style.setProperty('--gx-rm-header-gap',px(15-8*p));
+  root.style.setProperty('--gx-rm-header-size',px(14-3*p));
+  root.style.setProperty('--gx-rm-header-bottom',px(20-8*p));
+  root.style.setProperty('--gx-rm-header-pad',px(15-5*p));
+  root.style.setProperty('--gx-rm-progress',p.toFixed(3));
+  root.dataset.gxRmCompact=String(p>.95);
+ }
+ function tick(){
+  frame=0;
+  value+= (goal-value)*.23;
+  if(Math.abs(goal-value)<.003)value=goal;
+  paint();
+  if(value!==goal)frame=requestAnimationFrame(tick);
+ }
+ function request(){
+  goal=clamp(window.scrollY/172);
+  if(reduced.matches){cancelAnimationFrame(frame);frame=0;value=goal;paint();return}
+  if(!frame)frame=requestAnimationFrame(tick);
+ }
+ window.addEventListener('scroll',request,{passive:true});
+ window.addEventListener('resize',()=>{paint();request()},{passive:true});
+ if(reduced.addEventListener)reduced.addEventListener('change',request);
+ request();paint();
+ return {progress:()=>value, target:()=>goal};
+}
+const morphController=setupHeaderMorph();
 refresh();
 window.GOXION_E1B2_INDEX=Object.freeze({isolated:true,noBackend:true,
  getScenario:()=>key,getMode:()=>mode,getSelection:()=>current(),
- next:()=>fx.next(quote())});
+ next:()=>fx.next(quote()), getMorphProgress:()=>morphController.progress()});
 })();
