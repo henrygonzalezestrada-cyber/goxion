@@ -80,12 +80,18 @@ async function run(name,engine){
      assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$94.00');
     }
     if(scenario==='review'){
-     assert((await page.locator('#gx-b2-proof').innerText()).includes('No necesitas enviarlo otra vez'));
+     assert((await page.locator('#gx-b2-proof').innerText()).includes('No lo envíes de nuevo.'));
+     assert.equal(await page.locator('#gx-b2-progress-bar').count(),0);
+     assert.equal(await page.locator('.gx-b2-progress-steps .gx-b2-progress-step').count(),3);
+     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill').evaluate(el=>getComputedStyle(el).width!=='0px'),true);
      assert.equal(await page.locator('#gx-b2-action').count(),0,
       'Do not ask customer to pay again when already reviewing');
     }
     if(scenario==='correction'){
-     assert.match(await page.locator('#gx-b2-proof').textContent(),/corrige los datos/i);
+     assert.match(await page.locator('#gx-b2-proof').textContent(),/Revisa el comprobante/i);
+     assert.equal(await page.locator('#gx-b2-proof').getAttribute('data-phase'),'correction');
+     assert.equal(await page.locator('.gx-b2-progress-step.is-action').count(),1);
+     assert.equal(await page.locator('.gx-b2-progress-fill').getAttribute('style'),'--gx-b2-progress:50%');
      assert.equal(await page.locator('#gx-b2-action').textContent(),'Consultar observación');
     }
     if(scenario==='extension'){
@@ -95,6 +101,9 @@ async function run(name,engine){
     if(scenario==='first_paid'){
      assert.match(await page.locator('#gx-b2-services').textContent(),/Liquidado/);
      assert.match(await page.locator('#gx-b2-proof').textContent(),/Pago validado/);
+     assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuenow'),'1');
+     assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuemax'),'2');
+     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill').getAttribute('style'),'--gx-b2-progress:100%');
     }
     if(scenario==='partial'){
      assert.match(await page.locator('#gx-b2-breakdown').textContent(),/Abono ya aprobado/);
@@ -117,6 +126,8 @@ async function run(name,engine){
    await page.locator('#gx-b2-demo-submit').click();
    assert.equal(await page.locator('#gx-b2-demo-modal').evaluate(el=>el.hidden),true);
    assert.equal(await page.locator('#gx-b2-hero-badge').textContent(),'Comprobante recibido · Sin acreditar');
+   assert.equal(await page.locator('.gx-b2-progress-step.is-done').count(),1);
+   assert.equal(await page.locator('.gx-b2-progress-step.is-current').count(),1);
    assert.equal(await page.locator('#gx-b2-action').count(),0);
    assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage)),[]);
    assert.deepEqual(leaks,[]);assert.deepEqual(errors,[]);
