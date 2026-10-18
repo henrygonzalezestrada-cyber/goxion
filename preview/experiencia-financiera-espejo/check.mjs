@@ -56,6 +56,42 @@ async function run(name,engine){
     'Hero must not replace next due with entire period');
    await page.locator('[data-charge="b"]').click();
    assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$49.00');
+   // Scroll morph is a real relocation of the same DOM nodes, not a cloned hero.
+   // Height temporarily reduced so even desktop-width scenarios can scroll.
+   const expanded=await page.evaluate(()=>{
+    const a=document.querySelector('#gx-b2-hero-amount');
+    const hero=document.querySelector('#gx-b2-hero');
+    return {font:parseFloat(getComputedStyle(a).fontSize),height:hero.getBoundingClientRect().height};
+   });
+   await page.setViewportSize({width,height:550});
+   await page.evaluate(()=>window.scrollTo(0,330));
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.getMorphProgress?.()>.90,null,
+    {timeout:6000,polling:50});
+   const collapsed=await page.evaluate(()=>{
+    const a=document.querySelector('#gx-b2-hero-amount').getBoundingClientRect();
+    const b=document.querySelector('#gx-b2-hero-badge').getBoundingClientRect();
+    return {
+     font:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-amount')).fontSize),
+     height:document.querySelector('#gx-b2-hero').getBoundingClientRect().height,
+     amountCenter:a.left+a.width/2,badgeCenter:b.left+b.width/2,
+     badgeLeft:b.left,badgeRight:b.right,amountRight:a.right,
+     vw:document.documentElement.clientWidth,
+     stickyTop:document.querySelector('#gx-b2-sticky').getBoundingClientRect().top
+    };
+   });
+   assert(collapsed.font<expanded.font-17,name+' '+width+' amount did not morph');
+   assert(collapsed.height<expanded.height-70,name+' '+width+' sticky height did not compress');
+   assert(collapsed.badgeCenter<collapsed.amountCenter,name+' '+width+' badge did not move left');
+   assert(collapsed.badgeLeft>=-2&&collapsed.amountRight<=collapsed.vw+2,
+    name+' '+width+' collapsed header overflows horizontally');
+   assert(Math.abs(collapsed.stickyTop)<4,name+' '+width+' sticky header left viewport');
+   assert.equal(await page.locator('#gx-b2-sticky').count(),1,'No duplicate sticky headers');
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()<.08,null,
+    {timeout:6000,polling:50});
+   await page.setViewportSize({width,height:844});
+   assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00');
+
    await page.locator('#gx-b2-lab-toggle').click();
    const scenarios=[
     ['same_day','$94.00'],
@@ -86,6 +122,13 @@ async function run(name,engine){
      assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill').evaluate(el=>getComputedStyle(el).width!=='0px'),true);
      assert.equal(await page.locator('#gx-b2-action').count(),0,
       'Do not ask customer to pay again when already reviewing');
+     assert.equal((await page.locator('#gx-b2-actions').textContent()).trim(),'',
+      'Do not repeat review status under timeline');
+     assert(await page.locator('#gx-b2-proof').evaluate(el=>el.nextElementSibling?.classList.contains('card-info')),
+      'Tracker must appear near balance, not after all ledger cards');
+     assert(await page.locator('#gx-b2-proof').evaluate(el=>getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)'),
+      'Tracker should read as part of page, not one more glass card');
+
     }
     if(scenario==='correction'){
      assert.match(await page.locator('#gx-b2-proof').textContent(),/Revisa el comprobante/i);
@@ -95,7 +138,7 @@ async function run(name,engine){
      assert.equal(await page.locator('#gx-b2-action').textContent(),'Consultar observación');
     }
     if(scenario==='extension'){
-     assert.match(await page.locator('#gx-b2-hero-badge').textContent(),/21 de octubre/i);
+     assert.match(await page.locator('#gx-b2-hero-badge').textContent(),/21 oct/i);
      assert.equal(await page.locator('#gx-b2-breakdown .surcharge-line').count(),0);
     }
     if(scenario==='first_paid'){
@@ -125,7 +168,7 @@ async function run(name,engine){
    assert.equal(await page.locator('#gx-b2-demo-modal').evaluate(el=>el.hidden),false);
    await page.locator('#gx-b2-demo-submit').click();
    assert.equal(await page.locator('#gx-b2-demo-modal').evaluate(el=>el.hidden),true);
-   assert.equal(await page.locator('#gx-b2-hero-badge').textContent(),'Comprobante recibido · Sin acreditar');
+   assert.equal(await page.locator('#gx-b2-hero-badge').textContent(),'En revisión');
    assert.equal(await page.locator('.gx-b2-progress-step.is-done').count(),1);
    assert.equal(await page.locator('.gx-b2-progress-step.is-current').count(),1);
    assert.equal(await page.locator('#gx-b2-action').count(),0);
@@ -133,7 +176,7 @@ async function run(name,engine){
    assert.deepEqual(leaks,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B2 · 7 widths × 12 synthetic states, Ayuda↔Index, next/all, proof, backend blocked PASS');
+  console.log(name+' E1/B2 R3 · 7 widths × 12 states; scroll morph, ledger, approvals and backend isolation PASS');
  }finally{await browser.close()}
 }
 try{await ready();await run('Chromium',chromium);await run('WebKit',webkit);console.log('E1/B2 BETA PASS')}
