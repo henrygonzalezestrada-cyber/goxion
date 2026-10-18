@@ -87,7 +87,9 @@ async function run(name,engine){
    const expanded=await page.evaluate(()=>{
     const a=document.querySelector('#gx-b2-hero-amount');
     const hero=document.querySelector('#gx-b2-hero');
-    return {font:parseFloat(getComputedStyle(a).fontSize),height:hero.getBoundingClientRect().height};
+    return {font:parseFloat(getComputedStyle(a).fontSize),height:hero.getBoundingClientRect().height,
+     amountTop:parseFloat(getComputedStyle(a).top),
+     badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top)};
    });
    await page.setViewportSize({width,height:550});
    await page.evaluate(()=>window.scrollTo(0,330));
@@ -99,12 +101,23 @@ async function run(name,engine){
     return {
      font:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-amount')).fontSize),
      height:document.querySelector('#gx-b2-hero').getBoundingClientRect().height,
+     amountTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-amount')).top),
+     badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top),
+     labelOpacity:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-label')).opacity),
      amountCenter:a.left+a.width/2,badgeCenter:b.left+b.width/2,
      badgeLeft:b.left,badgeRight:b.right,amountRight:a.right,
      vw:document.documentElement.clientWidth,
      stickyTop:document.querySelector('#gx-b2-sticky').getBoundingClientRect().top
     };
    });
+   // The label is initially visible, and only its vacated space gets
+   // reclaimed. The approved expanded state remains pixel-for-pixel aligned.
+   assert.equal(expanded.amountTop,17,name+' '+width+' expanded amount moved');
+   assert.equal(expanded.badgeTop,80,name+' '+width+' expanded badge moved');
+   assert(collapsed.labelOpacity<.05,name+' '+width+' label should be gone');
+   assert(collapsed.amountTop<=1,name+' '+width+' hidden label leaves empty space above amount');
+   assert(collapsed.badgeTop<=3,name+' '+width+' hidden label leaves empty space above badge');
+   assert(collapsed.height<=38,name+' '+width+' hidden label reserves excess hero height');
    assert(collapsed.font<expanded.font-17,name+' '+width+' amount did not morph');
    assert(collapsed.height<expanded.height-58,name+' '+width+' sticky height did not compress');
    
@@ -232,7 +245,7 @@ async function run(name,engine){
    assert.deepEqual(leaks,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B2 R5 · 7 widths × 12 states; Animate UI native, Ayuda glass, scroll morph and financial invariants PASS');
+  console.log(name+' E1/B2 R5.1 · 7 widths × 12 states; label-space morph, Animate UI and financial invariants PASS');
  }finally{await browser.close()}
 }
 try{await ready();await run('Chromium',chromium);await run('WebKit',webkit);console.log('E1/B2 BETA PASS')}
