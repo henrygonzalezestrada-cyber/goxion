@@ -31,7 +31,7 @@ function bellCount(on){
 }
 function reset(){
  clearTimers();
- document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-flight').forEach(n=>n.remove());
+ document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-stream').forEach(n=>n.remove());
  bell.classList.remove('gx-ringing');bellCount(false);stored=null;
  hideSheet();
  const code=window.GOXION_SMART_BETA?.getScenario();
@@ -89,37 +89,82 @@ function bellImpact(item){
  animation.finished.then(()=>ripple.remove(),()=>ripple.remove());
  delay(()=>ripple.remove(),520);
 }
-function capsuleFlight(card,item){
+/* A meaningful signal, not a flying token, capsule, icon or particle.
+ * A short ribbon of light flows out of the notice and is absorbed by the
+ * ORIGINAL Ayuda bell. WAAPI moves only painted SVG dashes in a fixed layer.
+ */
+function lightStream(card,item){
  const destination=bell.getBoundingClientRect(),origin=card.getBoundingClientRect();
- // Never cross a screen from a scrolled-off card: state still reaches the bell.
- const visible=origin.bottom>0&&origin.top<innerHeight&&destination.bottom>0&&destination.top<innerHeight;
- if(!visible||typeof document.body.animate==='undefined'&&typeof Element.prototype.animate!=='function'){
+ const source=card.querySelector('.gx-smart-notice-title')?.getBoundingClientRect()||origin;
+ const vw=window.innerWidth,vh=window.innerHeight;
+ const visible=origin.bottom>0&&origin.top<vh&&destination.bottom>0&&destination.top<vh;
+ if(!visible||typeof document.createElementNS!=='function'){
   bellImpact(item);return;
  }
- const x=origin.left+origin.width*.5,y=origin.top+Math.min(origin.height*.35,100);
- const targetX=destination.left+destination.width*.5,targetY=destination.top+destination.height*.5;
- const dx=targetX-x,dy=targetY-y;
- const flight=document.createElement('span');flight.className='gx-smart-notice-flight';
- flight.setAttribute('aria-hidden','true');
- flight.style.left=x+'px';flight.style.top=y+'px';
- const core=document.createElement('span');core.className='gx-smart-notice-flight-core';
- const mark=document.createElement('span');mark.className='gx-smart-notice-flight-mark';
- core.append(mark);flight.append(core);document.body.append(flight);
- // Ease along a bent path. Native transform/opacity only (no moving blur filters).
- const bend=dx>=0?Math.min(64,Math.max(18,Math.abs(dx)*.19)):
-  -Math.min(64,Math.max(18,Math.abs(dx)*.19));
- const keyframes=[
-  {transform:'translate(-50%,-50%) translate(0px,0px) scale(1)',opacity:.0,offset:0},
-  {transform:'translate(-50%,-50%) translate('+dx*.08+'px,'+dy*.12+'px) scale(1.04)',opacity:1,offset:.12},
-  {transform:'translate(-50%,-50%) translate('+(dx*.48+bend)+'px,'+(dy*.32-18)+'px) scale(.82)',opacity:1,offset:.48},
-  {transform:'translate(-50%,-50%) translate('+(dx*.88)+'px,'+(dy*.79-9)+'px) scale(.52)',opacity:.95,offset:.84},
-  {transform:'translate(-50%,-50%) translate('+dx+'px,'+dy+'px) scale(.16)',opacity:0,offset:1}
- ];
- const animation=flight.animate(keyframes,{duration:1120,easing:'cubic-bezier(.18,.65,.19,1)',fill:'forwards'});
- effects.push(animation);
- animation.finished.then(()=>flight.remove(),()=>flight.remove());
- delay(()=>flight.remove(),1200);
- delay(()=>bellImpact(item),1040);
+ const fromX=source.left+source.width/2,fromY=source.top+Math.min(source.height/2,36);
+ const toX=destination.left+destination.width/2,toY=destination.top+destination.height/2;
+ const deltaX=toX-fromX,gap=Math.max(32,Math.abs(fromY-toY));
+ const up=Math.min(116,gap*.42),down=Math.min(98,gap*.28);
+ const c1x=fromX+deltaX*.11,c1y=fromY-up;
+ const c2x=toX-deltaX*.27,c2y=toY+down;
+ const ns='http://www.w3.org/2000/svg';
+ const svg=document.createElementNS(ns,'svg');
+ svg.setAttribute('class','gx-smart-notice-stream');
+ svg.setAttribute('viewBox','0 0 '+vw+' '+vh);
+ svg.setAttribute('width',String(vw));
+ svg.setAttribute('height',String(vh));
+ svg.setAttribute('aria-hidden','true');
+ svg.style.width=vw+'px';svg.style.height=vh+'px';
+ const defs=document.createElementNS(ns,'defs');
+ const gradient=document.createElementNS(ns,'linearGradient');
+ const id='gx-notice-signal-'+Date.now();
+ gradient.setAttribute('id',id);gradient.setAttribute('gradientUnits','userSpaceOnUse');
+ gradient.setAttribute('x1',String(fromX));gradient.setAttribute('y1',String(fromY));
+ gradient.setAttribute('x2',String(toX));gradient.setAttribute('y2',String(toY));
+ for(const [offset,color,opacity] of [['0%','#a488ff','0.7'],['52%','#b6d5ff','1'],['100%','#65f1f5','1']]){
+  const stop=document.createElementNS(ns,'stop');
+  stop.setAttribute('offset',offset);
+  stop.setAttribute('stop-color',color);
+  stop.setAttribute('stop-opacity',opacity);
+  gradient.append(stop);
+ }
+ defs.append(gradient);svg.append(defs);
+ const d='M '+fromX.toFixed(2)+' '+fromY.toFixed(2)+
+  ' C '+c1x.toFixed(2)+' '+c1y.toFixed(2)+
+  ', '+c2x.toFixed(2)+' '+c2y.toFixed(2)+
+  ', '+toX.toFixed(2)+' '+toY.toFixed(2);
+ const makePath=(cls,width,opacity)=>{
+  const path=document.createElementNS(ns,'path');
+  path.setAttribute('class',cls);path.setAttribute('d',d);
+  path.setAttribute('fill','none');path.setAttribute('stroke','url(#'+id+')');
+  path.setAttribute('stroke-width',String(width));
+  path.setAttribute('stroke-linecap','round');
+  path.setAttribute('opacity',String(opacity));
+  svg.append(path);return path;
+ };
+ const halo=makePath('gx-smart-notice-stream-halo',7,.24);
+ const filament=makePath('gx-smart-notice-stream-line',2.1,.94);
+ document.body.append(svg);
+ if(typeof filament.animate!=='function'){
+  svg.remove();bellImpact(item);return;
+ }
+ const length=filament.getTotalLength();
+ const segment=Math.min(66,Math.max(28,length*.15));
+ const duration=1040;
+ for(const [part,opacity] of [[halo,.24],[filament,.94]]){
+  part.style.strokeDasharray=segment+' '+(length+segment+3);
+  part.style.strokeDashoffset=String(segment);
+  // A short moving beam with a soft tail; no full-screen neon trail.
+  const animation=part.animate([
+   {strokeDashoffset:segment,opacity:0,offset:0},
+   {strokeDashoffset:segment-length*.13,opacity:opacity,offset:.19},
+   {strokeDashoffset:-length*.68,opacity:opacity,offset:.73},
+   {strokeDashoffset:-length,opacity:0,offset:1}
+  ],{duration,easing:'cubic-bezier(.24,.62,.28,1)',fill:'forwards'});
+  effects.push(animation);
+ }
+ delay(()=>bellImpact(item),980);
+ delay(()=>svg.remove(),duration+80);
 }
 
 function preview(){
@@ -130,7 +175,7 @@ function preview(){
  }
  if(!active||!card||card.hidden)return;
  clearTimers();
- document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-flight').forEach(n=>n.remove());
+ document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-stream').forEach(n=>n.remove());
  hideSheet();bellCount(false);stored=null;
  const surface=document.createElement('div');surface.className='gx-smart-notice-surface';
  surface.setAttribute('role','status');surface.setAttribute('aria-live','polite');
@@ -147,7 +192,7 @@ function preview(){
  delay(()=>{
   surface.classList.add('gx-smart-notice-leaving');
   if(reduced)bellImpact(notice);
-  else capsuleFlight(card,notice);
+  else lightStream(card,notice);
   delay(()=>surface.remove(),reduced?90:480);
  },reduced?2250:2800);
 }
