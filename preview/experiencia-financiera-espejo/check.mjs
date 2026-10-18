@@ -87,8 +87,12 @@ async function run(name,engine){
     name+' '+width+' chevron must morph path, never rotate SVG');
    await page.locator('#gx-b2-calendar-toggle').click();
    assert.equal(await page.locator('#gx-b2-calendar-toggle').getAttribute('aria-expanded'),'true');
-   assert.equal(await page.locator('#gx-b2-calendar-toggle .gx-chevron-motion')
-    .evaluate(el=>getComputedStyle(el).color),'rgb(155, 145, 255)');
+   // CSS uses the same 250ms color transition as Ayuda; wait for it
+   // to complete rather than sampling cyan on the first animation frame.
+   await page.waitForFunction(()=>{
+    const el=document.querySelector('#gx-b2-calendar-toggle .gx-chevron-motion');
+    return Boolean(el&&getComputedStyle(el).color==='rgb(155, 145, 255)');
+   },null,{timeout:2500,polling:50});
    await page.waitForFunction(down=>{
     const el=document.querySelector('#gx-b2-calendar-toggle .gx-morph-chevron path');
     return Boolean(el&&el.getAttribute('d')!==down);
