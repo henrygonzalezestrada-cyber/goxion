@@ -48,6 +48,9 @@ async function run(name,engine){
    await page.locator('#gx-b2-loyalty-mark .gx-aui-loyalty-orbit').waitFor({timeout:4000});
    assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00');
    assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$45.00');
+   if(name==='Chromium'&&width===390){
+    console.log('GX_R5_SHOT_MULTI='+(await page.screenshot({type:'png',fullPage:true})).toString('base64'));
+   }
    assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuenow'),'3');
    assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuemax'),'4');
    assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-aui-loyalty-orbit').count(),1);
@@ -147,6 +150,9 @@ async function run(name,engine){
     }
     if(scenario==='review'){
      await page.locator('#gx-b2-proof .gx-aui-proof-review').waitFor({timeout:5000});
+     if(name==='Chromium'&&width===390){
+      console.log('GX_R5_SHOT_REVIEW='+(await page.screenshot({type:'png',fullPage:true})).toString('base64'));
+     }
      assert.match(await page.locator('#gx-b2-proof').innerText(),/No lo envíes de nuevo/i);
      assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-track').count(),1);
      assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-indicator').count(),1);
@@ -185,6 +191,10 @@ async function run(name,engine){
     }
     if(scenario==='overdue'){
      assert.match(await page.locator('#gx-b2-breakdown').textContent(),/\$2\.25/);
+     if(name==='Chromium'&&width===390){
+      await page.locator('#gx-b2-loyalty-mark .gx-aui-heart-crack svg').waitFor();
+      console.log('GX_R5_SHOT_LOST='+(await page.screenshot({type:'png',fullPage:true})).toString('base64'));
+     }
      assert.equal(await page.locator('#gx-b2-loyalty-panel').getAttribute('data-loyalty-state'),'lost');
      await page.locator('#gx-b2-loyalty-mark .gx-aui-heart-crack svg').waitFor({timeout:4000});
      assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-aui-heart-crack svg').count(),1);
