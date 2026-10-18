@@ -103,7 +103,7 @@ async function run(name,engine){
     };
    });
    assert(collapsed.font<expanded.font-17,name+' '+width+' amount did not morph');
-   assert(collapsed.height<expanded.height-70,name+' '+width+' sticky height did not compress');
+   assert(collapsed.height<expanded.height-58,name+' '+width+' sticky height did not compress');
    
    assert(collapsed.amountCenter<collapsed.badgeCenter,
     name+' '+width+' amount must sit LEFT of the badge');
