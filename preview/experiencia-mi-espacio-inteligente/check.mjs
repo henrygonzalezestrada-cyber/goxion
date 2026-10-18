@@ -141,6 +141,11 @@ async function exercise(name,engine){
     assert(m.selector.height<290,name+' '+width+' '+key+': laboratory controls too tall');
    }
    await page.selectOption('#gx-smart-scenario','review');
+   // Mission inspection can scroll the document. Return to the natural
+   // dashboard view before asserting an ON-SCREEN source → bell animation;
+   // off-screen source must instead use the safe, motion-free handoff.
+   await page.evaluate(()=>window.scrollTo({top:0,left:0,behavior:'instant'}));
+   await page.waitForTimeout(90);
    const before=await page.locator('#dash-billing-card').boundingBox();
    assert(await page.locator('#gx-smart-preview-alert').isEnabled(),'Review notice enabled');
    await page.locator('#gx-smart-preview-alert').click();
