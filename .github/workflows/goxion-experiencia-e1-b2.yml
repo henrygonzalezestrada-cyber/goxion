@@ -6,7 +6,7 @@ on:
       - 'preview/experiencia-financiera-espejo/**'
       - '.github/workflows/goxion-experiencia-e1-b2.yml'
   push:
-    branches: [beta/e1b2-claridad-financiera-espejo-20261018, beta/e1b2-index-animate-ui-native-20261018]
+    branches: [beta/e1b2-claridad-financiera-espejo-20261018, beta/e1b2-index-animate-ui-native-20261018, beta/e1b2-calendar-morphicons-final-20261018]
     paths:
       - 'preview/experiencia-financiera-espejo/**'
       - '.github/workflows/goxion-experiencia-e1-b2.yml'
@@ -28,7 +28,7 @@ jobs:
         with:
           node-version: 22
       - name: Install browser runner + genuine Animate UI v2 dependencies
-        run: npm install --no-save --no-package-lock --ignore-scripts playwright react@19 react-dom@19 motion@14 @animate-ui/react@2.0.0 @base-ui/react@1.8.0 lucide-react esbuild@0.25
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright react@19 react-dom@19 motion@14 @animate-ui/react@2.0.0 @base-ui/react@1.8.0 lucide-react esbuild@0.25 morphicons@1.5.0
       - name: Build self-contained Animate UI island (no external runtime CDN)
         run: npx esbuild preview/experiencia-financiera-espejo/animate-ui-native.entry.jsx --bundle --format=iife --platform=browser --target=es2020 --minify --outfile=preview/experiencia-financiera-espejo/animate-ui-native.bundle.js
       - name: Regenerate Ayuda original mirror
