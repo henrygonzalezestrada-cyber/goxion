@@ -947,3 +947,59 @@ html[data-gx-animate-ui="native-r5"] #gx-b2-loyalty-mark::before{
   transition:none!important;animation:none!important;
  }
 }
+
+
+/* E1/B2 FINAL — 1:1 Ayuda calendar Morphicons
+ * Source: assets/css/ayuda.css, gx-chevron-motion / gx-morph-chevron,
+ * backed by assets/js/ayuda/09-morphicons-production-script.mjs.
+ * No CSS rotation; Morphicons transforms the path with snappy spring.
+ */
+html[data-gx-b2-index-demo="true"] .gx-b2-calendar-toggle .gx-b2-calendar-chevron.gx-chevron-motion{
+ flex:0 0 28px!important;
+ width:28px!important;
+ min-width:28px!important;
+ height:22px!important;
+ min-height:22px!important;
+ padding:0!important;
+ margin:0!important;
+ display:grid!important;
+ place-items:center!important;
+ overflow:visible!important;
+ border:0!important;
+ border-radius:0!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ color:#62ecff!important;
+ font-size:0!important;
+ line-height:0!important;
+ transform:none!important;
+ transition:color .25s ease,filter .25s ease;
+ filter:drop-shadow(0 0 4px rgba(0,242,254,.12));
+}
+html[data-gx-b2-index-demo="true"] .gx-b2-calendar-toggle[aria-expanded="true"] .gx-b2-calendar-chevron.gx-chevron-motion{
+ color:#9b91ff!important;
+ filter:drop-shadow(0 0 4px rgba(155,145,255,.13));
+ transform:none!important;
+}
+html[data-gx-b2-index-demo="true"] .gx-b2-calendar-toggle .gx-chevron-svg.gx-morph-chevron{
+ width:21px!important;
+ height:21px!important;
+ display:block!important;
+ overflow:visible;
+ transform:none!important;
+ transform-origin:50% 50%;
+ transition:none!important;
+}
+html[data-gx-b2-index-demo="true"] .gx-b2-calendar-toggle .gx-chevron-svg.gx-morph-chevron path{
+ fill:none!important;
+ stroke:currentColor!important;
+ stroke-width:2.45!important;
+ stroke-linecap:round!important;
+ stroke-linejoin:round!important;
+ vector-effect:non-scaling-stroke;
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-b2-index-demo="true"] .gx-b2-calendar-toggle .gx-b2-calendar-chevron.gx-chevron-motion{
+  transition:none!important;
+ }
+}
