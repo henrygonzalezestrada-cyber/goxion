@@ -11,13 +11,13 @@ html=html.replace('data-gx-smart-beta="true"','data-gx-smart-beta="true" data-gx
  .replace('GOXION · Mi Espacio · Espejo E1/B1','GOXION · Mi Espacio · Espejo E1/B2')
  .replace(/(href|src)="\.\/(priority-engine\.js|smart-demo\.js|notice-demo\.js|mission-mirror\.js|smart\.css)(\?v=[^"]+)?"/g,
   (_,prop,file,version)=>prop+'="../experiencia-mi-espacio-inteligente/'+file+(version||'')+'"')
- .replace('</head>','<link rel="stylesheet" href="./ayuda-b2.css?v=e1b2v1">\n</head>')
+ .replace('</head>','<link rel="stylesheet" href="./ayuda-b2.css?v=e1b2v2">\n</head>')
  .replace('</body></html>',
- '<script src="./fixtures.js?v=e1b2v1" defer></script>\n'+
- '<script src="./ayuda-b2.js?v=e1b2v1" defer></script>\n</body></html>');
+ '<script src="./fixtures.js?v=e1b2v2" defer></script>\n'+
+ '<script src="./ayuda-b2.js?v=e1b2v2" defer></script>\n</body></html>');
 html=html.replace('Solo se reproduce con eventos importantes simulados. Sin iniciar sesión ni efectuar cobros.',
  'Prueba el estado de cuenta tocando la cápsula principal. Datos ficticios, sin cobros ni cargas reales.');
-if(!html.includes('src="./ayuda-b2.js?v=e1b2v1"')||html.includes('src="./smart-demo.js"'))
+if(!html.includes('src="./ayuda-b2.js?v=e1b2v2"')||html.includes('src="./smart-demo.js"'))
  throw Error('Enlace de recursos para espejo B2 inválido');
 fs.mkdirSync('preview/experiencia-financiera-espejo',{recursive:true});
 fs.writeFileSync('preview/experiencia-financiera-espejo/index.html',html);
