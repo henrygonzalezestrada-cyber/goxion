@@ -174,20 +174,19 @@ function lightStream(card,item){
  bloom.className='gx-smart-notice-origin-bloom';bloom.setAttribute('aria-hidden','true');
  bloom.style.left=x0+'px';bloom.style.top=y0+'px';
  document.body.append(svg,bloom);
- const duration=1170,begin=performance.now();
- const ease=t=>1-Math.pow(1-t,3)*(1+3*t); // ease both ends, faster in the middle
+ const duration=1170,begin=Date.now();
+ const ease=t=>1-Math.pow(1-t,3)*(1+3*t); // natural launch and deceleration
  const clamp=v=>Math.max(0,Math.min(1,v));
  const f=n=>n.toFixed(2);
- let raf=0,watchdog=0,delivered=false;
- // rAF drives the visible animation at refresh rate. If WebKit suspends
- // frames while changing focus/scroll, a short watchdog advances the same
- // geometry using real elapsed time instead of leaving a frozen graphic.
- const scheduleFrame=()=>{
-  raf=requestAnimationFrame(now=>{clearTimeout(watchdog);render(now)});
-  watchdog=window.setTimeout(()=>{cancelAnimationFrame(raf);render(performance.now())},52);
- };
- const render=now=>{
+ let raf=0,ticker=0,lastPaint=0,delivered=false;
+ // Prefer native display frames; Safari/WebKit can temporarily suspend rAF.
+ // An independent ~30 fps timer advances the same silhouette from the wall
+ // clock, so a background/layout transition cannot freeze the visible ribbon.
+ const render=()=>{
   if(!svg.isConnected)return;
+  const now=Date.now();
+  if(now-lastPaint<14)return; // avoid duplicate work from rAF + safety timer
+  lastPaint=now;
   const time=clamp((now-begin)/duration),head=ease(time);
   const tail=Math.max(0,head-.19);
   const widen=(1-clamp((time-.68)/.32));
@@ -214,11 +213,19 @@ function lightStream(card,item){
   skin.setAttribute('opacity',String(shape));
   halo.setAttribute('opacity','.35');
   if(time>=.89&&!delivered){delivered=true;bellImpact(item)}
-  if(time<1)scheduleFrame();else{clearTimeout(watchdog);svg.remove();bloom.remove()}
+  if(time>=1){
+   cancelAnimationFrame(raf);clearInterval(ticker);
+   svg.remove();bloom.remove();
+  }
  };
- // Always paint a first frame before waiting for browser frame scheduling.
- render(begin+1);
- effects.push({cancel:()=>{cancelAnimationFrame(raf);clearTimeout(watchdog);svg.remove();bloom.remove()}});
+ const rafLoop=()=>{
+  render();
+  if(svg.isConnected)raf=requestAnimationFrame(rafLoop);
+ };
+ render();
+ raf=requestAnimationFrame(rafLoop);
+ ticker=window.setInterval(render,33);
+ effects.push({cancel:()=>{cancelAnimationFrame(raf);clearInterval(ticker);svg.remove();bloom.remove()}});
  delay(()=>bloom.remove(),510);
  // Browser tab throttling fallback: always deliver the notice even if RAF stalls.
  delay(()=>{if(!delivered){delivered=true;bellImpact(item)}svg.remove();bloom.remove()},duration+150);
