@@ -141,39 +141,61 @@ function breakdown(){
  * The HERO owns the status; this area only shows the event timeline.
  * Stages are milestones, never a percentage of approval probability.
  */
+/* A sculpted luminous route with real semantic stops — NOT elapsed-time
+ * progress or a probability of approval. Current status belongs only in hero.
+ * No duplicate large card, redundant notification or second CTA.
+ */
 function proof(){
  const Q=quote(),panel=$('gx-b2-proof'),phase=Q.proof;
  panel.hidden=!phase;
- if(!phase){panel.innerHTML='';return}
+ if(!phase){panel.innerHTML='';panel.removeAttribute('data-phase');return}
+ if(panel.dataset.phase===phase&&panel.querySelector('.gx-r4-journey'))return;
  const states={
-  review:{label:'Seguimiento del comprobante',title:'',
-   message:'Ya lo tenemos. No lo envíes de nuevo.',
-   fill:'50%',steps:['Recibido','Revisión','Aprobación']},
-  correction:{label:'Seguimiento del comprobante',title:'',
-   message:'Revisa el comprobante para continuar.',
-   fill:'50%',steps:['Recibido','Revisión','Corregir']},
-  approved:{label:'Pago validado',title:'Pago validado',
-   message:'Este pago ya se aplicó; la siguiente fecha sigue vigente.',
-   fill:'100%',steps:['Recibido','Revisado','Aprobado']}
+  review:{message:'Ya lo recibimos. No lo envíes nuevamente.',
+   fill:50,steps:['Recibido','Revisión','Aprobación']},
+  correction:{message:'Revisa la observación para continuar.',
+   fill:50,steps:['Recibido','Revisado','Corregir']},
+  approved:{message:'Pago aplicado; próximo vencimiento sin cambios.',
+   fill:100,steps:['Recibido','Revisado','Aprobado']}
  };
  const copy=states[phase];if(!copy){panel.hidden=true;return}
+ const symbol=(index)=>{
+  const content=index===0
+   ?'<path d="M6.4 3.6h11.2v16.8l-2.7-1.9-2.9 1.9-2.9-1.9-2.7 1.9z"/><path d="M9.2 9h5.6M9.2 12.7h4.2"/>'
+   :index===1
+   ?'<path d="M4.5 9V5.5H8M16 5.5h3.5V9M19.5 15v3.5H16M8 18.5H4.5V15"/><circle cx="12" cy="12" r="2.6"/>'
+   :phase==='correction'
+   ?'<path d="M12 4 21 20H3L12 4Z"/><path d="M12 10v4M12 17v.1"/>'
+   :'<path d="m5.5 12.5 4.5 4.3 8.7-9.6"/>';
+  return '<svg viewBox="0 0 24 24" class="gx-r4-station-symbol" aria-hidden="true">'+content+'</svg>';
+ };
  const stages=copy.steps.map((label,i)=>{
   const state=phase==='approved'?'is-done':
    phase==='review'?(i===0?'is-done':i===1?'is-current':''):
    (i<2?'is-done':i===2?'is-action':'');
-  return '<span class="gx-b2-progress-step '+state+'"><span class="gx-b2-progress-dot" aria-hidden="true"></span>'+
-   '<span>'+label+'</span></span>';
+  return '<span class="gx-b2-progress-step '+state+'" data-station="'+i+'">'+
+   '<span class="gx-r4-station-shell">'+symbol(i)+'</span>'+
+   '<span class="gx-r4-station-label">'+label+'</span></span>';
  }).join('');
  panel.dataset.phase=phase;
- panel.setAttribute('aria-label',copy.label);
- panel.innerHTML=(copy.title?'<div class="gx-b2-proof-done-line">'+
-   '<span class="gx-b2-proof-symbol" aria-hidden="true">✓</span>'+
-   '<strong class="gx-b2-proof-title">'+copy.title+'</strong></div>':'')+
-  '<div class="gx-b2-proof-track" role="group" aria-label="Etapas del comprobante">'+
-   '<div class="gx-b2-progress-rail" aria-hidden="true">'+
-   '<span class="gx-b2-progress-fill" style="--gx-b2-progress:'+copy.fill+'"></span></div>'+
+ panel.setAttribute('aria-label','Recorrido del comprobante');
+ // The path bends subtly between stations. The illuminated section ends
+ // at the current milestone, and never reaches approval prematurely.
+ const curve='M100 29 C171 29 190 10 300 29 S429 29 500 29';
+ panel.innerHTML=
+  '<div class="gx-r4-journey"><div class="gx-r4-journey-heading">'+
+   '<span>RECORRIDO DE TU PAGO</span>'+
+   '<span class="gx-r4-journey-mark" aria-hidden="true"><i></i><i></i><i></i></span></div>'+
+   '<div class="gx-b2-proof-track" role="group" aria-label="Etapas de recepción y validación">'+
+   '<svg class="gx-b2-progress-rail" viewBox="0 0 600 65" preserveAspectRatio="none" aria-hidden="true">'+
+   '<defs><linearGradient id="gx-r4-route-gradient" x1="0%" y1="50%" x2="100%" y2="50%">'+
+   '<stop offset="0%" stop-color="#8a74fa"/><stop offset="52%" stop-color="#b8a8ff"/>'+
+   '<stop offset="100%" stop-color="'+(phase==='correction'?'#efb773':phase==='approved'?'#72f1c7':'#7bdbf4')+'"/></linearGradient></defs>'+
+   '<path class="gx-r4-route-back" d="'+curve+'"/>'+
+   '<path class="gx-r4-route-halo" d="'+curve+'" pathLength="100" style="--gx-r4-journey-end:'+copy.fill+'"/>'+
+   '<path class="gx-b2-progress-fill" d="'+curve+'" pathLength="100" style="--gx-b2-progress:'+copy.fill+'%;--gx-r4-journey-end:'+copy.fill+'"/></svg>'+
    '<div class="gx-b2-progress-steps">'+stages+'</div></div>'+
-  '<p class="gx-b2-proof-caption">'+copy.message+'</p>';
+   '<p class="gx-b2-proof-caption">'+copy.message+'</p></div>';
 }
 /* Loyalty is rendered only from EXPLICIT, synthetic visual metadata.
  * Neither money owed nor number of services says how many punctual payments
