@@ -29,13 +29,15 @@ function status(row){
 let priorAmount=null;
 function hero(){
  const Q=quote(),next=fx.next(Q),phase=Q.proof,blocked=!Q.trusted;
+ const shortDate=iso=>new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',timeZone:'UTC'})
+  .format(new Date(iso+'T00:00:00Z'));
  let caption='Próximo pago',badge=next.date?fx.date(next.date):'Al corriente';
  let cls='badge-ok',tone='due';
  if(blocked){caption='Saldo por confirmar';badge='Sin cotización';cls='badge-overdue';tone='blocked'}
  else if(phase==='review'){caption='Importe pendiente';badge='En revisión';cls='badge-review';tone='review'}
  else if(phase==='correction'){caption='Importe pendiente';badge='Acción necesaria';cls='badge-overdue';tone='correction'}
- else if(active().some(c=>c.mora>0)){caption='Importe vencido';badge='Venció · '+fx.date(next.date);cls='badge-overdue';tone='overdue'}
- else if(active().some(c=>c.extension)){badge='Acuerdo · '+fx.date(next.date);cls='badge-ok';tone='extension'}
+ else if(active().some(c=>c.mora>0)){caption='Importe vencido';badge='Venció · '+shortDate(next.date);cls='badge-overdue';tone='overdue'}
+ else if(active().some(c=>c.extension)){badge='Prórroga · '+shortDate(next.date);cls='badge-ok';tone='extension'}
  else if(!next.date){caption='Saldo pendiente';badge='Al corriente';cls='badge-paid';tone='clear'}
  const root=document.documentElement;
  root.dataset.gxB2Tone=tone;
