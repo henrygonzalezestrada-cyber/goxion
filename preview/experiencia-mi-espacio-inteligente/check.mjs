@@ -7,6 +7,11 @@ const dir='preview/experiencia-mi-espacio-inteligente/';
 const html=readFileSync(dir+'index.html','utf8');
 const official=readFileSync('ayuda.html','utf8');
 assert(!html.includes('id="gx-smart-focus"'),'Redundant priority card must not exist');
+assert(html.includes('id="gx-smart-notif-button"'),'Missing real Ayuda bell class');
+assert(html.includes('class="gx-client-notif-sheet"'),'Missing Ayuda notification sheet');
+assert(html.includes('src="./notice-demo.js?v=e1b1v3"'),'Missing isolated animation');
+assert(html.includes('id="gx-smart-toggle"'),'Missing mirror control');
+assert(html.includes('id="gx-smart-lab"')&&html.includes('hidden>'),'Lab must start collapsed');
 assert(html.includes('id="gx-smart-card-heading"'),'Missing contextual heading in original card');
 assert(html.includes('id="gx-smart-card-description"'),'Missing contextual description');
 assert(html.includes('id="dash-billing-card"')&&html.includes('id="referral-section-container"'));
@@ -66,7 +71,12 @@ async function exercise(name,engine){
    await page.route('**/fonts.googleapis.com/**',r=>r.abort());
    await page.route('**/fonts.gstatic.com/**',r=>r.abort());
    await page.goto(base,{waitUntil:'domcontentloaded'});
-   await page.waitForFunction(()=>window.GOXION_SMART_BETA?.isolated===true,{timeout:5500});
+   await page.waitForFunction(()=>window.GOXION_SMART_BETA?.isolated===true&&window.GOXION_SMART_NOTICE?.isolated===true,{timeout:5500});
+   assert(await page.locator('#gx-smart-lab').evaluate(el=>el.hidden),'La vista espejo debe iniciar limpia');
+   assert.equal(await page.locator('#gx-smart-container #gx-smart-lab').count(),0,'Laboratorio no puede ocupar flujo Mi Espacio');
+   assert.equal(await page.locator('#gx-smart-notif-button.gx-client-notif-launch').count(),1);
+   await page.locator('#gx-smart-toggle').click();
+   assert(!(await page.locator('#gx-smart-lab').evaluate(el=>el.hidden)),'El laboratorio debe abrirse');
    assert.equal(await page.locator('#gx-smart-focus').count(),0,
     'No debe existir una tarjeta superior de notificaciones prioritarias');
    assert.equal(await page.locator('#dash-billing-card').count(),1);
@@ -110,19 +120,38 @@ async function exercise(name,engine){
     assert(m.scroll<=m.width+2,name+' '+width+' '+key+': overflow '+m.scroll+'/'+m.width);
     assert(m.selector.width>190&&m.selector.left>=-1&&m.selector.right<=m.width+1,
       name+' '+width+' '+key+': selector outside viewport');
-    assert(m.selector.height<82,name+' '+width+' '+key+': scenario selector too tall');
+    assert(m.selector.height<290,name+' '+width+' '+key+': laboratory controls too tall');
    }
    await page.selectOption('#gx-smart-scenario','review');
+   const before=await page.locator('#dash-billing-card').boundingBox();
+   assert(await page.locator('#gx-smart-preview-alert').isEnabled(),'Review notice enabled');
+   await page.locator('#gx-smart-preview-alert').click();
+   assert.equal(await page.locator('.gx-smart-notice-surface').count(),1,'Overlay must be inside original card');
+   assert.equal(await page.locator('.gx-smart-notice-surface').evaluate(el=>el.parentElement.id),'dash-billing-card');
+   assert.equal(await page.locator('#gx-smart-card-heading').textContent(),'ESTADO DE TU COMPROBANTE','Underlying state must persist');
+   await page.waitForTimeout(3800);
+   assert.equal(await page.locator('.gx-smart-notice-surface').count(),0,'Transient notice must clear');
+   assert(await page.locator('#gx-smart-notif-button').evaluate(el=>el.classList.contains('gx-has-new')),'Notice must arrive at bell');
+   const after=await page.locator('#dash-billing-card').boundingBox();
+   assert(Math.abs(before.y-after.y)<1&&Math.abs(before.height-after.height)<1,
+    name+' '+width+': notice altered dashboard layout');
+   await page.locator('#gx-smart-notif-button').click();
+   assert(await page.locator('#gx-smart-notif-sheet').evaluate(el=>el.classList.contains('show')),
+    'Notification sheet must open');
+   assert.match(await page.locator('#gx-smart-notif-list').innerText(),/comprobante está en revisión/i);
+   await page.locator('#gx-smart-notif-close').click();
+   assert(!(await page.locator('#gx-smart-notif-sheet').evaluate(el=>el.classList.contains('show'))));
    await page.locator('#dash-billing-card .gx-account-capsule').click();
    assert.match(await page.locator('#gx-smart-toast').innerText(),/comprobante es ficticio/i);
    await page.selectOption('#gx-smart-scenario','new');
+   assert(!(await page.locator('#gx-smart-preview-alert').isEnabled()),'No fabricated notice when no event');
    await page.locator('#dash-onboarding-card button').click();
    assert.match(await page.locator('#gx-smart-toast').innerText(),/deshabilitado/i);
    assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage)),[]);
    assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B1: 6 widths x 9 customer states, no backend/overflow PASS');
+  console.log(name+' E1/B1: 6 widths x 9 synthetic customer states + notice → bell + sheet, no backend/overflow PASS');
  }finally{await browser.close()}
 }
 try{await ready();await exercise('Chromium',chromium);await exercise('WebKit',webkit);console.log('E1/B1 BETA PASS');}
