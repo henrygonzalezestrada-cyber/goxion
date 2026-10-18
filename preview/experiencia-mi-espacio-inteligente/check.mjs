@@ -6,7 +6,9 @@ import {chromium,webkit} from 'playwright';
 const dir='preview/experiencia-mi-espacio-inteligente/';
 const html=readFileSync(dir+'index.html','utf8');
 const official=readFileSync('ayuda.html','utf8');
-assert(html.includes('id="gx-smart-focus"'),'Focus not built');
+assert(!html.includes('id="gx-smart-focus"'),'Redundant priority card must not exist');
+assert(html.includes('id="gx-smart-card-heading"'),'Missing contextual heading in original card');
+assert(html.includes('id="gx-smart-card-description"'),'Missing contextual description');
 assert(html.includes('id="dash-billing-card"')&&html.includes('id="referral-section-container"'));
 assert(html.includes(official.slice(official.indexOf('id="view-dashboard"'),official.indexOf('id="view-dashboard"')+45)));
 assert(!/(?:localStorage|sessionStorage|X-Client-Token|supabase-js|goxy-ai|estado-financiero-b2-beta)/i.test(html),
@@ -43,15 +45,15 @@ const server=spawn(process.execPath,['scripts/serve-preview.mjs'],{env:{...proce
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function ready(){for(let i=0;i<65;i++){try{if((await fetch(base)).ok)return}catch{}await sleep(130)}throw Error('server unavailable')}
 const expectations={
- upcoming:{code:'soon',title:'Tu próximo pago se acerca',amount:'$89.00'},
- multi:{code:'soon',title:'Tu próximo pago se acerca',amount:'$45.00'},
- review:{code:'review',title:'Tu comprobante está en revisión'},
- correction:{code:'correction',title:'Hay una observación en tu comprobante'},
- overdue:{code:'overdue',title:'Un servicio necesita revisión'},
- extension:{code:'extension',title:'Tu nueva fecha está registrada'},
- mission:{code:'mission',title:'Te falta poco para completar tus misiones'},
- clear:{code:'clear',title:'Tu espacio está al corriente'},
- new:{code:'onboard',title:'Tu espacio ya está listo'}
+ upcoming:{code:'soon',heading:'PRÓXIMO VENCIMIENTO',hero:'20 de octubre',amount:'$89.00'},
+ multi:{code:'soon',heading:'PRÓXIMO VENCIMIENTO',hero:'20 de octubre',amount:'$45.00'},
+ review:{code:'review',heading:'ESTADO DE TU COMPROBANTE',hero:'En revisión',badge:'Comprobante recibido'},
+ correction:{code:'correction',heading:'COMPROBANTE CON OBSERVACIÓN',hero:'Requiere corrección'},
+ overdue:{code:'overdue',heading:'PAGO PENDIENTE',hero:'16 de octubre'},
+ extension:{code:'extension',heading:'ACUERDO PACTADO',hero:'21 de octubre'},
+ mission:{code:'mission',heading:'TU PRÓXIMA FECHA DE PAGO',hero:'20 de noviembre'},
+ clear:{code:'clear',heading:'ESTADO DE TUS SERVICIOS',hero:'Al corriente'},
+ new:{code:'onboard',heading:null,hero:null}
 };
 async function exercise(name,engine){
  const browser=await engine.launch({headless:true});
@@ -65,38 +67,57 @@ async function exercise(name,engine){
    await page.route('**/fonts.gstatic.com/**',r=>r.abort());
    await page.goto(base,{waitUntil:'domcontentloaded'});
    await page.waitForFunction(()=>window.GOXION_SMART_BETA?.isolated===true,{timeout:5500});
-   assert.equal(await page.locator('#gx-smart-focus').count(),1);
+   assert.equal(await page.locator('#gx-smart-focus').count(),0,
+    'No debe existir una tarjeta superior de notificaciones prioritarias');
    assert.equal(await page.locator('#dash-billing-card').count(),1);
-   assert.equal(await page.locator('.gx-gixy-message').count(),0,'Gixys approved beta must remain independent');
+   assert.equal(await page.locator('#gx-smart-card-heading').count(),1);
+   assert.equal(await page.locator('.gx-gixy-message').count(),0,
+    'La beta Gixys aprobada permanece independiente');
    for(const [key,expect] of Object.entries(expectations)){
     await page.selectOption('#gx-smart-scenario',key);
-    const code=await page.locator('#gx-smart-focus').getAttribute('data-code');
-    assert.equal(code,expect.code,name+' '+width+' '+key);
-    assert.equal(await page.locator('#gx-smart-title').textContent(),expect.title);
-    if(expect.amount)assert((await page.locator('.gx-smart-focus').textContent()).includes(expect.amount));
+    assert.equal(await page.locator('#dash-billing-card').getAttribute('data-code'),expect.code,name+' '+width+' '+key);
+    const isHidden=await page.locator('#dash-billing-card').evaluate(el=>el.hidden);
+    assert.equal(isHidden,key==='new',name+' '+width+': card visibility '+key);
+    if(expect.heading){
+     assert.equal(await page.locator('#gx-smart-card-heading').textContent(),expect.heading);
+     assert.equal(await page.locator('#dash-date').textContent(),expect.hero);
+    }
+    if(expect.amount)assert((await page.locator('.gx-account-capsule-label').textContent()).includes(expect.amount));
     if(key==='multi'){
      const sched=await page.locator('.gx-smart-schedule__row').allTextContents();
      assert.equal(sched.length,2);assert(sched[0].includes('45')&&sched[1].includes('49'));
      assert(!(await page.locator('.gx-account-capsule-label').textContent()).includes('94'));
     }
     if(key==='review'||key==='correction'){
-     assert(!/pagar ahora|realizar otro pago/i.test(await page.locator('#gx-smart-action').textContent()));
+     assert.equal(await page.locator('.gx-account-capsule-label').textContent(),'Consultar comprobante');
+     assert(!/corte|octubre|pago próximo/i.test(await page.locator('#dash-billing-card').textContent()),
+       'Comprobante en revisión no debe anunciar una fecha ajena al estado');
+     assert(!(await page.locator('#gx-smart-card-description').evaluate(el=>el.hidden)),
+       'Falta explicación de comprobante');
     }
     if(key==='extension')assert((await page.locator('.gx-smart-schedule').textContent()).includes('Pactado'));
+    if(key==='mission'){
+     assert.equal(await page.locator('#gx-smart-mission-card').count(),1);
+     assert.match(await page.locator('#gx-smart-mission-card').textContent(),/2 de 3/);
+     assert(!/misiones/i.test(await page.locator('#gx-smart-card-heading').textContent()),
+       'No usar tarjeta financiera como recordatorio de misiones');
+    }
+    if(key==='clear')assert(!/corte/i.test(await page.locator('#dash-billing-card').textContent()));
     const m=await page.evaluate(()=>({width:document.documentElement.clientWidth,
      scroll:document.documentElement.scrollWidth,
-     focus:document.getElementById('gx-smart-focus').getBoundingClientRect(),
-     control:document.querySelector('#gx-smart-scenario').getBoundingClientRect()}));
+     card:document.getElementById('dash-billing-card').getBoundingClientRect(),
+     selector:document.querySelector('.gx-smart-lab').getBoundingClientRect()}));
     assert(m.scroll<=m.width+2,name+' '+width+' '+key+': overflow '+m.scroll+'/'+m.width);
-    assert(m.focus.width>190&&m.focus.left>=-1&&m.focus.right<=m.width+1,
-      name+' '+width+' '+key+': focus outside viewport');
+    assert(m.selector.width>190&&m.selector.left>=-1&&m.selector.right<=m.width+1,
+      name+' '+width+' '+key+': selector outside viewport');
+    assert(m.selector.height<82,name+' '+width+' '+key+': scenario selector too tall');
    }
-   await page.selectOption('#gx-smart-scenario','mission');
-   await page.locator('#gx-smart-action').click();
-   assert.equal(await page.locator('#gx-smart-mission-card').count(),1);
+   await page.selectOption('#gx-smart-scenario','review');
+   await page.locator('#dash-billing-card .gx-account-capsule').click();
+   assert.match(await page.locator('#gx-smart-toast').innerText(),/comprobante es ficticio/i);
    await page.selectOption('#gx-smart-scenario','new');
-   await page.locator('#gx-smart-action').click();
-   assert.match(await page.locator('#gx-smart-toast').innerText(),/laboratorio|protegido|deshabilitado/i);
+   await page.locator('#dash-onboarding-card button').click();
+   assert.match(await page.locator('#gx-smart-toast').innerText(),/deshabilitado/i);
    assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage)),[]);
    assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
    await page.close();

@@ -42,33 +42,66 @@ function render(key){
  if(!Object.hasOwn(cases,key))return;
  current=key;
  const state=cases[key],priority=window.GOXION_SMART_PRIORITY.evaluate(state,now);
- const box=$('gx-smart-focus');
- box.dataset.tone=priority.tone;
- box.dataset.code=priority.code;
- box.dataset.target=priority.target;
- stamp('gx-smart-eyebrow',priority.kicker);
- stamp('gx-smart-type',priority.code==='review'?'EN REVISIÓN':priority.code==='extension'?'PRÓRROGA':
-   priority.code==='mission'?'TUS MISIONES':priority.code==='clear'?'SIN URGENCIAS':'PRIORIDAD');
- stamp('gx-smart-title',priority.title);
- stamp('gx-smart-description',priority.description);
- stamp('gx-smart-action-label',priority.action);
- const onboard=$('dash-onboarding-card');
+ // One single contextual card: preserve the original billing hierarchy,
+ // update the existing heading + hero + badge + account action in place.
  const billing=$('dash-billing-card');
+ const onboard=$('dash-onboarding-card');
  if(onboard)onboard.hidden=priority.code!=='onboard';
  if(billing)billing.hidden=priority.code==='onboard';
+ if(billing){
+  billing.dataset.code=priority.code;
+  billing.dataset.tone=priority.tone;
+  billing.dataset.target=priority.target;
+ }
  const top=priority.next;
- stamp('dash-date',top?window.GOXION_SMART_PRIORITY.niceDate(top.date):
-   priority.code==='review'||priority.code==='correction'?'Comprobante registrado':'Al corriente');
+ const headerByCode={
+  correction:'COMPROBANTE CON OBSERVACIÓN',
+  review:'ESTADO DE TU COMPROBANTE',
+  overdue:'PAGO PENDIENTE',
+  today:'VENCIMIENTO DE HOY',
+  extension:'ACUERDO PACTADO',
+  soon:'PRÓXIMO VENCIMIENTO',
+  mission:'TU PRÓXIMA FECHA DE PAGO',
+  clear:'ESTADO DE TUS SERVICIOS',
+  onboard:'PRIMEROS PASOS'
+ };
+ stamp('gx-smart-card-heading',headerByCode[priority.code]||'ESTADO DE TU CUENTA');
+ const plainHero={
+  review:'En revisión',correction:'Requiere corrección',
+  clear:'Al corriente',onboard:'Sin servicios'
+ };
+ // A financial date is never displayed as the hero of an unrelated state.
+ const mainValue=Object.hasOwn(plainHero,priority.code)?plainHero[priority.code]:
+  top?window.GOXION_SMART_PRIORITY.niceDate(top.date):'Sin pagos pendientes';
+ stamp('dash-date',mainValue);
  const badge=$('dash-badge');
- if(badge){badge.textContent=priority.code==='review'?'⏳ En revisión':priority.code==='extension'?'Acuerdo pactado':
-   priority.code==='overdue'?'Revisar vencimiento':priority.code==='correction'?'Requiere corrección':
-   priority.code==='clear'?'✓ Sin pagos pendientes':'Datos de demostración';
-   badge.classList.toggle('gx-smart-badge-alert',['correction','overdue'].includes(priority.code));
+ const badgeByCode={
+  correction:'Revisa tu comprobante',overdue:'Servicio con fecha vencida',
+  review:'Comprobante recibido',today:'Vence hoy',
+  extension:'Nueva fecha registrada',soon:'Pago próximo',
+  mission:'Sin urgencia de pago',clear:'✓ Sin pagos pendientes',
+  onboard:'Sin servicios'
+ };
+ if(badge){
+  badge.textContent=badgeByCode[priority.code]||'Estado actualizado';
+  badge.classList.toggle('gx-smart-badge-alert',['correction','overdue'].includes(priority.code));
+ }
+ const detail=$('gx-smart-card-description');
+ if(detail){
+  const explain=['correction','overdue','review','extension','today'].includes(priority.code);
+  detail.hidden=!explain;
+  detail.textContent=explain?priority.description:'';
  }
  const account=billing?.querySelector('.gx-account-capsule-label');
- if(account)account.textContent=top?
-   ('Próximo pago · '+top.amount):['review','correction'].includes(priority.code)?
-   'Consultar comprobante': 'Ver Estado de Cuenta';
+ if(account)account.textContent=
+  ['review','correction'].includes(priority.code)?'Consultar comprobante':
+  priority.code==='clear'?'Ver estado de cuenta':
+  top?'Próximo pago · '+top.amount:'Ver Estado de Cuenta';
+ if(billing){
+  const capsule=billing.querySelector('.gx-account-capsule');
+  if(capsule)capsule.setAttribute('aria-label',
+    ['review','correction'].includes(priority.code)?'Consultar estado del comprobante':'Ver Estado de Cuenta');
+ }
  stamp('loyalty-count','3/4 Pagos');
  const bar=$('loyalty-bar');if(bar)bar.style.width='75%';
  stamp('loyalty-msg','A un pago puntual del siguiente nivel. (Simulación)');
@@ -91,7 +124,7 @@ function render(key){
  const schedule=billing?.querySelector('.gx-smart-schedule')||el('div','gx-smart-schedule');
  schedule.replaceChildren();
  if(billing&&!schedule.isConnected)billing.append(schedule);
- const wantsRows=priority.schedule.length>1||priority.code==='extension'||priority.code==='review';
+ const wantsRows=priority.schedule.length>1||priority.code==='extension';
  schedule.hidden=!wantsRows;
  if(wantsRows){
    schedule.append(el('div','gx-smart-schedule__title','CALENDARIO DE EJEMPLO'));
@@ -123,27 +156,15 @@ function render(key){
  document.dispatchEvent(new CustomEvent('gx-smart-case-rendered',{detail:{scenario:key,code:priority.code}}));
 }
 $('gx-smart-scenario')?.addEventListener('change',event=>render(event.target.value));
-$('gx-smart-action')?.addEventListener('click',()=>{
- const target=$('gx-smart-focus')?.dataset.target;
- if(target==='catalog')return notice('Catálogo protegido: este laboratorio no realiza contrataciones.');
- const id=target==='missions'?'gx-smart-mission-card':
-  target==='review'?'dash-billing-card':'dash-billing-card';
- const node=$(id);if(node&&!node.hidden){
-  node.scrollIntoView({behavior:'smooth',block:'center'});
-  node.classList.remove('gx-smart-highlight');
-  void node.offsetWidth;node.classList.add('gx-smart-highlight');
-  setTimeout(()=>node.classList.remove('gx-smart-highlight'),1250);
- }
- notice(target==='review'?'Solo demostración: ninguna solicitud ni comprobante fue enviado.':
- 'Información de ejemplo. La consulta y el pago reales están deshabilitados.');
-});
 document.querySelectorAll('#goxion-main-nav .tab-btn').forEach(btn=>{
  btn.classList.toggle('active',btn.id==='btn-tab-inicio');
  btn.addEventListener('click',()=>notice('Navegación de ejemplo: esta beta muestra solo Mi Espacio.'));
 });
 $('btn-tab-inicio')?.setAttribute('aria-current','page');
 $('dash-billing-card')?.querySelector('.gx-account-capsule')?.addEventListener('click',()=>
- notice('No existe ningún pago ni consulta financiera en esta beta.'));
+ notice(['review','correction'].includes(window.GOXION_SMART_BETA.getPriority().code)?
+ 'El comprobante es ficticio. En producción consultarías su estado sin duplicar el pago.':
+ 'No existe ningún pago ni consulta financiera en esta beta.'));
 $('dash-onboarding-card')?.querySelector('button')?.addEventListener('click',()=>
  notice('Catálogo deshabilitado en el laboratorio.'));
 $('view-dashboard')?.classList.add('active');

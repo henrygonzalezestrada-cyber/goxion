@@ -1,8 +1,8 @@
-name: GOXION · Experiencia E1 B1 · Mi Espacio inteligente Beta
+name: GOXION · Experiencia E1 B1 · Mi Espacio contextual V2 Beta
 on:
   push:
     branches:
-      - beta/experiencia-e1-b1-mi-espacio-inteligente-20261017
+      - beta/e1b1-prioridad-en-tarjeta-v2-20261017
     paths:
       - 'preview/experiencia-mi-espacio-inteligente/**'
       - '.github/workflows/goxion-experiencia-e1-b1.yml'

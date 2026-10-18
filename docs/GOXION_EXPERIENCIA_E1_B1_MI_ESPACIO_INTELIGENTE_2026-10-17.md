@@ -37,3 +37,12 @@ El cliente encuentra **una única indicación relevante** según su situación, 
 No afirmar que las pruebas pasaron hasta que CI confirme éxito.
 
 **Bloque 1 EN REVISIÓN DEL USUARIO; no fusionar esta beta con una integración oficial, ni tratar su aprobación como permiso de producción.**
+
+## Feedback y corrección V2 · 17/oct
+- «TU PRIORIDAD» en una segunda tarjeta fue confuso y redundante: parece el centro de notificaciones. **Se descarta ese bloque extra**. La función real es una prioridad contextual, no crear nuevas notificaciones.
+- «Tu próxima fecha de corte» no debe verse en situaciones ajenas al cobro: **se sustituye** el encabezado y el valor principal de la tarjeta financiera existente según el contexto.
+- Regla visual: aprovechar el propio bloque original de Mi Espacio; sin cajas dentro de cajas, tarjetas redundantes ni scroll extra. El selector de escenarios se reduce a una línea y existe solo en laboratorio, no en producción.
+- En pago próximo, mostrar fecha real de próximo vencimiento. En comprobante en revisión, mostrar ESTADO DE TU COMPROBANTE / En revisión. En comprobante observado, COMPROBANTE CON OBSERVACIÓN / Requiere corrección. En prórroga, ACUERDO PACTADO / nueva fecha. En servicios al corriente, ESTADO DE TUS SERVICIOS / Al corriente. En misiones pendientes, orientar desde el módulo de Misiones sin convertir el recuadro financiero en un bloque de misiones.
+- Reutilizar el botón existente (estado de cuenta o consultar comprobante), sin otro CTA encima. Las notificaciones no forman parte de esta beta: las conserva su centro real.
+- El importe multifecha se calcula solo para la siguiente fecha, sin sumar otro período ni hacer cobros; todos los valores son ficticios.
+- No modificar Gixys V9, Goxy, ayudas oficiales, pagos, backend ni datos. Beta V2 pendiente de aprobación visual del usuario; no autorización de producción.

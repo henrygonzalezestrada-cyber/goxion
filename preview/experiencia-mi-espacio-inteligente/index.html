@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/css/ayuda.css">
 <link rel="stylesheet" href="../../assets/css/realtime-client-notifications.css">
-<link rel="stylesheet" href="./smart.css?v=e1b1">
+<link rel="stylesheet" href="./smart.css?v=e1b1v2">
 </head>
 <body class="gx-smart-body" data-visual-only="true">
 <header class="app-header" style="width:100%;max-width:580px;padding-left:20px;padding-right:20px;margin:0 auto 10px">
@@ -34,7 +34,7 @@
 <option value="clear">Todo al corriente</option>
 <option value="new">Cliente sin servicios</option>
 </select><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></div>
-<p class="gx-smart-lab__note">Cambia el escenario y observa cómo Mi Espacio prioriza la información, sin mover ni duplicar los módulos existentes.</p>
+
 </section>
 <div class="glass-card tab-container" id="goxion-main-nav">
 <button class="tab-btn active" data-goxion-tab="inicio" id="btn-tab-inicio" type="button">
@@ -55,12 +55,6 @@
 <div class="dash-greeting-box" id="dash-greeting-container">
 <h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
 </div>
-<section class="gx-smart-focus" id="gx-smart-focus" aria-live="polite" aria-label="Lo importante de tu espacio">
-<div class="gx-smart-focus__top"><span class="gx-smart-focus__dot" aria-hidden="true"></span><span id="gx-smart-eyebrow">TU PRIORIDAD</span><span class="gx-smart-focus__type" id="gx-smart-type">INFORMACIÓN</span></div>
-<h2 id="gx-smart-title">Revisando tu situación</h2>
-<p id="gx-smart-description">Mostramos solamente la acción más relevante.</p>
-<button type="button" class="gx-smart-focus__action" id="gx-smart-action"><span id="gx-smart-action-label">Ver detalles</span><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h13m-6-6 6 6-6 6"/></svg></button>
-</section>
 <div id="dash-payment-review-alert"></div>
 <div class="glass-card dash-card gx-new-client-card" id="dash-onboarding-card" hidden>
     <div class="gx-new-client-kicker">PRIMEROS PASOS</div>
@@ -76,9 +70,9 @@
     </button>
 </div>
 <div class="glass-card dash-card" id="dash-billing-card" style="background: rgba(0,0,0,0.3);">
-<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
+<div id="gx-smart-card-heading" class="gx-smart-card-heading">PRÓXIMO VENCIMIENTO</div>
 <div class="dash-date" id="dash-date">Cargando...</div>
-<div id="dash-badge" style="text-align: center;"></div>
+<div id="dash-badge" style="text-align: center;"></div><p id="gx-smart-card-description" class="gx-smart-card-description" hidden></p>
 <hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;"/>
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
@@ -115,6 +109,6 @@
 
 </div>
 <div class="gx-smart-toast" id="gx-smart-toast" role="status" aria-live="polite" hidden></div>
-<script src="./priority-engine.js?v=e1b1"></script>
-<script src="./smart-demo.js?v=e1b1" defer></script>
+<script src="./priority-engine.js?v=e1b1v2"></script>
+<script src="./smart-demo.js?v=e1b1v2" defer></script>
 </body></html>
