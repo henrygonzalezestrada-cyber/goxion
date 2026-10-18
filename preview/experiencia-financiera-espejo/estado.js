@@ -21,30 +21,48 @@ function status(row){
  if(row.extension)return 'Prórroga pactada · '+fx.date(row.extension);
  if(row.abono>0)return 'Abono aprobado · '+fx.money(row.abono);
  if(row.mora>0)return 'Mora confirmada · '+fx.money(row.mora);
- if(quote().proof==='review')return 'Comprobante en revisión';
- if(quote().proof==='correction')return 'Comprobante con observación';
+ // Evidence review is represented once, in the compact hero + proof tracker.
+ // Do not repeat it in every service row.
  return 'Pendiente';
 }
+/* One factual state in the badge. Calendar/proof do not repeat it. */
+let priorAmount=null;
 function hero(){
- const Q=quote(),next=fx.next(Q),proof=Q.proof,blocked=!Q.trusted;
- let caption='Próximo pago',badge=next.date?'Próximo vencimiento · '+fx.date(next.date):'Sin pagos pendientes';
- let cls='badge-ok';
- if(blocked){caption='Saldo no confirmado';badge='Verificación pendiente';cls='badge-overdue'}
- else if(proof==='review'){caption='Importe en revisión';badge='Comprobante recibido · Sin acreditar';cls='badge-review'}
- else if(proof==='correction'){caption='Importe pendiente';badge='Comprobante con observación';cls='badge-overdue'}
- else if(active().some(c=>c.mora>0)){badge='Servicio vencido · '+fx.date(next.date);cls='badge-overdue'}
- else if(active().some(c=>c.extension)){badge='Acuerdo pactado · '+fx.date(next.date);cls='badge-ok'}
- else if(!next.date){caption='Saldo pendiente';badge='Servicios al corriente';cls='badge-paid'}
+ const Q=quote(),next=fx.next(Q),phase=Q.proof,blocked=!Q.trusted;
+ let caption='Próximo pago',badge=next.date?fx.date(next.date):'Al corriente';
+ let cls='badge-ok',tone='due';
+ if(blocked){caption='Saldo por confirmar';badge='Sin cotización';cls='badge-overdue';tone='blocked'}
+ else if(phase==='review'){caption='Importe pendiente';badge='En revisión';cls='badge-review';tone='review'}
+ else if(phase==='correction'){caption='Importe pendiente';badge='Acción necesaria';cls='badge-overdue';tone='correction'}
+ else if(active().some(c=>c.mora>0)){caption='Importe vencido';badge='Venció · '+fx.date(next.date);cls='badge-overdue';tone='overdue'}
+ else if(active().some(c=>c.extension)){badge='Acuerdo · '+fx.date(next.date);cls='badge-ok';tone='extension'}
+ else if(!next.date){caption='Saldo pendiente';badge='Al corriente';cls='badge-paid';tone='clear'}
+ const root=document.documentElement;
+ root.dataset.gxB2Tone=tone;
  $('gx-b2-hero-label').textContent=caption;
- $('gx-b2-hero-amount').textContent=blocked?'—':fx.money(next.amount);
- $('gx-b2-hero-badge').textContent=badge;
- $('gx-b2-hero-badge').className='time-badge '+cls;
+ const amount=$('gx-b2-hero-amount'),value=blocked?'—':fx.money(next.amount);
+ const ink=amount.querySelector('.gx-b2-number-ink');
+ if(ink){
+  if(ink.textContent!==value){
+   ink.textContent=value;
+   if(priorAmount!==null&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
+    ink.getAnimations().forEach(a=>a.cancel());
+    ink.animate([{opacity:.4,transform:'translateY(7px) scale(.97)'},
+      {opacity:1,transform:'translateY(0) scale(1)'}],
+      {duration:420,easing:'cubic-bezier(.2,.78,.24,1)'});
+   }
+  }
+ }else amount.innerHTML='<span class="gx-b2-number-ink">'+value+'</span>';
+ priorAmount=value;
+ const badgeNode=$('gx-b2-hero-badge');
+ badgeNode.textContent=badge;
+ badgeNode.className='time-badge '+cls;
+ badgeNode.title=badge;
  $('gx-b2-period').textContent=Q.period+' · Ejemplo';
  $('gx-b2-loyalty').textContent=active().some(c=>c.loyalty>0)?
-  'Lealtad aplicada al importe.':
-  'Tus beneficios se reflejan en el total.';
+  'Lealtad incluida en el importe.':'Beneficios incluidos en el saldo.';
  $('gx-b2-back').href='./index.html?escenario='+encodeURIComponent(
-  Object.hasOwn(fx.mapping,key)?key: key==='first_paid'||key==='partial'||key==='same_day'?'multi':'upcoming');
+  Object.hasOwn(fx.mapping,key)?key:key==='first_paid'||key==='partial'||key==='same_day'?'multi':'upcoming');
 }
 function services(){
  const Q=quote(),el=$('gx-b2-services');
@@ -72,8 +90,10 @@ function calendar(){
  const guard=$('gx-b2-calendar');
  guard.hidden=!Q.trusted||!Q.cargos.length;
  if(guard.hidden)return;
- $('gx-b2-next-date').textContent=N.date?'Próximo: '+fx.date(N.date):
-   'Todos los servicios liquidados';
+ const dates=new Set(fx.pending(Q).map(c=>fx.due(c)));
+ $('gx-b2-next-date').textContent=dates.size?
+  dates.size===1?(fx.pending(Q).length>1?'Un vencimiento · varios servicios':'Una fecha pendiente'):
+   dates.size+' fechas pendientes':'Sin pagos pendientes';
  $('gx-b2-calendar-toggle').setAttribute('aria-expanded',String(open));
  $('gx-b2-calendar-body').hidden=!open;
  list.innerHTML=Q.cargos.slice().sort((a,b)=>fx.due(a).localeCompare(fx.due(b))).map(c=>{
@@ -105,8 +125,7 @@ function breakdown(){
  const line=(label,value,cls='')=>'<div class="breakdown-line '+cls+'"><span>'+label+'</span><span>'+value+'</span></div>';
  target.innerHTML='<div class="gx-b2-breakdown-title">DESGLOSE DEL PAGO</div>'+
   '<p class="gx-b2-selection-desc">'+safe(mode==='all'?'Todos los pendientes':
-   mode==='single'?rows[0].name+' · '+fx.date(fx.due(rows[0])):
-   'Próximo vencimiento · '+fx.date(fx.due(rows[0])))+'</p>'+
+   mode==='single'?rows[0].name:'Detalle del importe próximo')+'</p>'+
   line('Subtotal',fx.money(base))+
   (loyalty?line('Descuento de lealtad','−'+fx.money(loyalty),'discount-line'):'')+
   (commercial?line('Beneficios comerciales','−'+fx.money(commercial),'discount-line'):'')+
