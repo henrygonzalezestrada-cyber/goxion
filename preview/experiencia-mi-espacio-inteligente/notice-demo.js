@@ -178,7 +178,14 @@ function lightStream(card,item){
  const ease=t=>1-Math.pow(1-t,3)*(1+3*t); // ease both ends, faster in the middle
  const clamp=v=>Math.max(0,Math.min(1,v));
  const f=n=>n.toFixed(2);
- let raf=0,delivered=false;
+ let raf=0,watchdog=0,delivered=false;
+ // rAF drives the visible animation at refresh rate. If WebKit suspends
+ // frames while changing focus/scroll, a short watchdog advances the same
+ // geometry using real elapsed time instead of leaving a frozen graphic.
+ const scheduleFrame=()=>{
+  raf=requestAnimationFrame(now=>{clearTimeout(watchdog);render(now)});
+  watchdog=window.setTimeout(()=>{cancelAnimationFrame(raf);render(performance.now())},52);
+ };
  const render=now=>{
   if(!svg.isConnected)return;
   const time=clamp((now-begin)/duration),head=ease(time);
@@ -207,12 +214,11 @@ function lightStream(card,item){
   skin.setAttribute('opacity',String(shape));
   halo.setAttribute('opacity','.35');
   if(time>=.89&&!delivered){delivered=true;bellImpact(item)}
-  if(time<1)raf=requestAnimationFrame(render);else{svg.remove();bloom.remove()}
+  if(time<1)scheduleFrame();else{clearTimeout(watchdog);svg.remove();bloom.remove()}
  };
- // Paint the first geometry synchronously. WebKit can defer the first RAF
- // when the document has just changed focus/scroll, leaving an empty SVG path.
+ // Always paint a first frame before waiting for browser frame scheduling.
  render(begin+1);
- effects.push({cancel:()=>{cancelAnimationFrame(raf);svg.remove();bloom.remove()}});
+ effects.push({cancel:()=>{cancelAnimationFrame(raf);clearTimeout(watchdog);svg.remove();bloom.remove()}});
  delay(()=>bloom.remove(),510);
  // Browser tab throttling fallback: always deliver the notice even if RAF stalls.
  delay(()=>{if(!delivered){delivered=true;bellImpact(item)}svg.remove();bloom.remove()},duration+150);
