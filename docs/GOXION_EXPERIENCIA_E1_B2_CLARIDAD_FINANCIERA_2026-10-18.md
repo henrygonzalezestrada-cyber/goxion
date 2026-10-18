@@ -35,3 +35,24 @@ En V2:
 - Recursos de preview versionados en e1b2v2, transparencia de demo intacta, reduced motion, sin tocar index.css ni el Index real, backend ni datos de clientes.
 
 **Criterios de QA nuevos:** se comprueban las tres etapas, la distinción revisión/corrección/aprobación, el contador 1/2, imports fiables, laboratorios ocultos y ausencia de llamadas privadas. Aún requiere prueba/aceptación visual del propietario en iPhone; únicamente tras su aceptación se cerrará E1/B2.
+
+## Index Remaster · R1 + R2 + R3 integradas (18/oct/2026)
+**Decisión del propietario:** unificar auditoría R1, remaster R2 y beta R3 en una entrega; R4 será solo el pulido visual final. E1/B1 V6 sigue aprobado, E1/B2 aún no.
+
+### R1 — auditoría y dueños
+- Index oficial no es HTML estático: index.html carga assets/css/index.css y assets/js/index/02-02-inline.js, que genera .sticky-area, .balance-hero, .scrollable-content, .card-info, servicios, desglose, lealtad y acciones. No montar un segundo encabezado: reutilizar el existente.
+- B2 multifecha real usa preview/integracion-b2/index.html con b2-bridge.js/index-adapter.js, cotizaciones confiables, calendarios por cargo, selección próximo/todo/individual y prueba/aprobación de comprobantes; NO tocar esa lógica o recalcular moras, descuentos, prórrogas, lealtad ni abonos en el remaster.
+- El video del propietario evidenció duplicación de revisión/recibido/observación en cabecera, calendario, tarjeta de comprobante y nota inferior. También exceso de superficies de cristal y hero sobredimensionado al desplazar.
+
+### R2 — diseño en espejo sin cambiar negocio
+- Una sola .sticky-area y un solo importe real del caso simulado: scroll gradual comprime el hero de 130 a 43 px, el importe de 52 a 26 px, mueve la cápsula a la izquierda y la cantidad a la derecha, preservando gradiente oscuro, sticky, safe-area y reduced-motion. No crear header flotante duplicado.
+- Estado principal único en cápsula breve; progreso de comprobante se ubica inmediatamente debajo del hero y solo ilustra etapas. «En revisión» no vuelve a aparecer como advertencia repetida al final; «Requiere corrección» no se presenta como aprobado; el importe siguiente sigue independiente del total del periodo.
+- Identidad y lealtad pasan a filas con separadores finos; servicios conservan una superficie cristal, calendario y desglose son flujo continuo sin cajas anidadas. Se mantienen CTA, control expandible y acciones de selección.
+- Transiciones intencionales: scroll acoplado con inercia discreta, actualización del número sin interferir con su posición, aparición breve del resultado desglosado, timeline de comprobante sobrio sin pulsos eternos. No copiar estilos de Admin.
+
+### R3 — beta protegida y pruebas
+- Solo vista aislada preview/experiencia-financiera-espejo/estado.html, estado.css, estado.js y check.mjs + este documento. Fixtures falsos en centavos, sin sesiones, información privada, banco, backend ni cobros. Ayuda B1 intacta.
+- QA dedicada en Chromium y WebKit: siete anchos 280/320/360/375/390/430/768, doce estados incluyendo fechas múltiples e iguales, parcial confirmado, mora, prórroga, revisión/observación, aprobado, sin saldo, sin servicios; exactitud de importes/selecciones, no overflow, scroll morph real reversible, cero cambios de backend. Safari físico a confirmar por el dueño.
+- Index oficial, flujo bancario Nu/Revolut/CLABE, modal/upload seguro y motor B2 quedan intactos. Cualquier futura integración oficial exige auditoría de esos puntos sobre código dinámico antes de aplicar el diseño.
+
+**R4 pendiente:** revisión visual final del dueño (morph, estado y ledger) y solo correcciones de acabado. No fusionar estas mejoras en Index/Ayuda oficial hasta aprobación del paquete y autorización final del Issue #142.
