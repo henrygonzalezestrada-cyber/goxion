@@ -277,7 +277,13 @@ function setupHeaderMorph(){
  const px=n=>Math.round(n)+'px';
  function paint(){
   const p=value,w=Math.max(200,hero.clientWidth||240);
-  root.style.setProperty('--gx-rm-hero-h',px(116-73*p));
+  // Once "Próximo pago / Importe pendiente" fades out, its former space
+  // should NOT remain between "Estado de Cuenta" and the amount/status.
+  // Smoothly reclaim 7px only AFTER the label starts disappearing. The
+  // baseline expanded layout and the rest of the accepted R5 morph stay.
+  const fadeProgress=clamp((p-.25)/.5);
+  const freedLabelSpace=7*fadeProgress*fadeProgress*(3-2*fadeProgress);
+  root.style.setProperty('--gx-rm-hero-h',px(116-73*p-freedLabelSpace));
   root.style.setProperty('--gx-rm-amount-size',px(52-26*p));
   // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
   // and the status on the RIGHT. Measure actual content to avoid oversized
@@ -294,8 +300,8 @@ function setupHeaderMorph(){
   const paired=Math.min(1,p*1.1);
   root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*paired));
   root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*paired));
-  root.style.setProperty('--gx-rm-badge-top',px(80-71*p));
-  root.style.setProperty('--gx-rm-amount-top',px(17-10*p));
+  root.style.setProperty('--gx-rm-badge-top',px(80-71*p-freedLabelSpace));
+  root.style.setProperty('--gx-rm-amount-top',px(17-10*p-freedLabelSpace));
   root.style.setProperty('--gx-rm-badge-max',(96-49*p).toFixed(2)+'%');
   root.style.setProperty('--gx-rm-badge-size',px(12-2*p));
   root.style.setProperty('--gx-rm-label-opacity',String(clamp(1-p*3)));
