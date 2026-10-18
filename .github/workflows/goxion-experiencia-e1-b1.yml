@@ -1,0 +1,49 @@
+name: GOXION · Experiencia E1 B1 · Mi Espacio inteligente Beta
+on:
+  push:
+    branches:
+      - beta/experiencia-e1-b1-mi-espacio-inteligente-20261017
+    paths:
+      - 'preview/experiencia-mi-espacio-inteligente/**'
+      - '.github/workflows/goxion-experiencia-e1-b1.yml'
+  workflow_dispatch:
+concurrency:
+  group: gx-e1-b1-${{ github.ref }}
+  cancel-in-progress: true
+permissions:
+  contents: write
+jobs:
+  smart-dashboard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install UI test runner
+        run: npm install --no-save --no-package-lock playwright
+      - name: Build mirror of the actual dashboard (no account data)
+        run: node preview/experiencia-mi-espacio-inteligente/build.mjs
+      - name: Browser dependencies
+        run: npx playwright install --with-deps chromium webkit
+      - name: Verify priority decisions and responsive, isolated demo
+        run: node preview/experiencia-mi-espacio-inteligente/check.mjs
+      - name: Publish checked preview only (never official)
+        if: success()
+        shell: bash
+        run: |
+          git fetch -q origin "$GITHUB_REF_NAME"
+          if [ "$(git rev-parse FETCH_HEAD)" != "$GITHUB_SHA" ]; then
+            echo "Newer beta commit exists. Do not overwrite it."
+            exit 0
+          fi
+          git add preview/experiencia-mi-espacio-inteligente/index.html
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build(beta): Mi Espacio E1 B1 verificado [skip ci]"
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi
