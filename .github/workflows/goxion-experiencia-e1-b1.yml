@@ -1,8 +1,15 @@
-name: GOXION · Experiencia E1 B1 · Mi Espacio contextual V2 Beta
+name: GOXION · Experiencia E1 B1 · Mi Espacio espejo V3 Beta
 on:
   push:
     branches:
       - beta/e1b1-prioridad-en-tarjeta-v2-20261017
+      - beta/experiencia-e1b1-aviso-campana-espejo-20261017
+    paths:
+      - 'preview/experiencia-mi-espacio-inteligente/**'
+      - '.github/workflows/goxion-experiencia-e1-b1.yml'
+  pull_request:
+    branches:
+      - main
     paths:
       - 'preview/experiencia-mi-espacio-inteligente/**'
       - '.github/workflows/goxion-experiencia-e1-b1.yml'
@@ -32,7 +39,7 @@ jobs:
       - name: Verify priority decisions and responsive, isolated demo
         run: node preview/experiencia-mi-espacio-inteligente/check.mjs
       - name: Publish checked preview only (never official)
-        if: success()
+        if: success() && github.event_name == 'push'
         shell: bash
         run: |
           git fetch -q origin "$GITHUB_REF_NAME"

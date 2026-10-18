@@ -77,3 +77,20 @@ Etapas globales: **E1 — claridad/autoservicio (1,3,5)**; **E2 — personalizac
 > «Continuemos GOXION desde `docs/GOXION_EXPERIENCIA_CLIENTE_CONTINUIDAD_MAESTRA_2026-10-17.md` y el Issue #142. Estamos en E1/B1. Revisa el código y PR #143 y mis últimos comentarios sobre la tarjeta dinámica, sin añadir otro bloque. Trabaja directamente en GitHub sobre una beta, comprueba QA/Pages y envíame el enlace; nada a oficial hasta aprobación del paquete completo.»
 
 **Límites de verdad:** esta guía registra decisiones conversacionales y hechos GitHub verificados a la fecha, no garantiza conectores disponibles en otras sesiones ni sustituye verificar el HEAD y los despliegues futuros. **El último feedback sobre la tarjeta no está implementado aquí; es el trabajo pendiente.**
+
+
+## 8. Regla nueva del propietario · Validación en espejo al CERRAR CADA bloque (17/oct)
+**Nueva aprobación explícita de método de trabajo**: desarrollar la mejora en beta aislada; antes de pedir cierre visual de **cada** bloque, ofrecer una **vista espejo de la versión oficial de Ayuda/Mi Espacio**, con la estructura/navegación/clases/tipografía y proporciones reales, sin scripts de sesión ni datos productivos. **Una maqueta suelta nunca basta para cerrar un bloque**.
+
+- El laboratorio de estados debe ser **separado de la interfaz que evaluará el cliente**: oculto por defecto y activable con control compacto propio de beta. Mostrar el diseño sin controles de depuración, y permitir abrirlos para recorrer estados ficticios.
+- El espejo debe extraer estructura real de \`ayuda.html\` cuando sea posible y cargar **solo CSS de Ayuda**; jamás dar estética operativa de Admin a la experiencia cliente. Preservar campana, tarjetas, lealtad, servicios, jerarquía Poppins, comportamiento responsive y safe areas.
+- **Prohibidos visuales genéricos, textos de relleno, widgets tipo dashboard administrativo, cajas adicionales, degradados decorativos que compitan y animaciones que parezcan una plantilla generada por IA.** Las microinteracciones deben tener propósito, continuidad y física sobria; respetar el ADN real de Ayuda.
+- No basta con validar la pieza sola: probarla integrada con las áreas vecinas, encabezado, campana, estado de cuenta, misiones y Gixys cuando corresponda. Sin desplazar contenido ni tapar controles. Safari físico: pendiente de revisión del propietario hasta que lo confirme.
+- Pruebas por bloque: 280/320/360/375/390/430/768px, Chromium/WebKit, ausencia de scroll horizontal/reflow, sin solicitudes privadas ni persistencia en demo, reduced motion, teclado/cierre/foco, casos excepcionales.
+- La aprobación en espejo **aprueba ese bloque**, pero NO autoriza el lanzamiento. Todas las fases siguen bloqueadas para producción hasta integración completa, QA global y autorización final (Issue #142).
+
+### E1/B1 · variante V3 para revisión, NO aprobada
+- La notificación importante **no es una segunda tarjeta ni un cálculo del motor**. Se muestra temporalmente como una capa dentro de \`#dash-billing-card\`; se desvanece y comunica mediante un pequeño trayecto visual su registro en la **campana existente de Ayuda**. Debajo permanece el encabezado/fecha/CTA legítimos de ese escenario.
+- Únicamente escenarios de evento importante simulado (revisión/observación/vencido/acuerdo) permiten reproducir el aviso; no inventar urgencias en «al corriente», «misión incompleta», «sin servicios» ni «pago futuro». En la futura oficial **solo eventos auténticos persistidos** pueden activar esto; no derivarlos del mero render, texto o recarga.
+- La campana y la hoja de ejemplo reutilizan \`gx-client-notif-*\` de Ayuda, sin backend, leído real ni envío. No sustituir el sistema de notificaciones. El laboratorio es flotante, oculto inicialmente, de modo que se puede evaluar la composición de Mi Espacio casi idéntica a Ayuda oficial.
+- La propuesta sigue pendiente de aceptación humana. Si el efecto compite con una acción de pago/revisión o se percibe redundante, reducirlo o suprimirlo en ese contexto.
