@@ -56,3 +56,17 @@ En V2:
 - Index oficial, flujo bancario Nu/Revolut/CLABE, modal/upload seguro y motor B2 quedan intactos. Cualquier futura integración oficial exige auditoría de esos puntos sobre código dinámico antes de aplicar el diseño.
 
 **R4 pendiente:** revisión visual final del dueño (morph, estado y ledger) y solo correcciones de acabado. No fusionar estas mejoras en Index/Ayuda oficial hasta aprobación del paquete y autorización final del Issue #142.
+
+## R4 — último pulido visual solicitado · 18/oct/2026
+El propietario aprobó la dirección visual R1–R3 y **el morph del importe**; pidió cerrar R4 como una sola beta antes de decidir la aprobación del Bloque 2.
+
+### Correcciones finales acotadas
+- **Morph de cabecera:** conservar el movimiento ya aprobado y recolocar el precio **a la izquierda** y la cápsula del estado **a la derecha** durante el scroll compacto. Ambos deben formar un par de tamaño contenido, con separación pequeña calculada por ancho real del texto y sin desbordarse a 280 px. La versión expandida conserva precio grande y cápsula inferior como en Index.
+- **Seguimiento del comprobante:** mantenerlo arriba sin tarjeta extra y representar recepción → análisis → decisión con un único recorrido de luz curva y tres estaciones vectoriales. El trazo se completa hasta la etapa REAL, no representa tiempo ni probabilidad; revisión solo hasta el centro, observación mantiene el último nodo en ámbar sin aprobación y aprobado ilumina el recorrido completo. Textos muy breves; no repetir estado arriba, dentro y abajo.
+- **Restaurar dos tarjetas útiles:** identidad (titular, folio y periodo) y desglose conciliado se muestran de nuevo en cristal premium ligero. Calendario continúa integrado con divisores finos y funcionalidad intacta; NO regresar a cajas anidadas en cada sección.
+- **Lealtad protagonista:** un SVG vectorial de estrella dorada en un halo suave rodeado por anillo con llenado animado en relación con la racha explícita de ejemplo (3 de 4, 7 de 9, etc.). Mostrar una cifra de racha solo si viene de **un estado confiable explícito**; la beta usa metadatos SIMULADOS en fixtures.js, separados del dinero y claramente etiquetados como ilustrativos. Cuando la racha se pierde, sustituir la estrella por corazón roto vectorial y motivo breve; NO mostrar progreso circular. Si no hay estado de racha, ocultar todo el indicador. La integración oficial tendrá que vincularlo con el dueño de lealtad del servidor; nunca inferir pagos puntuales de servicios, recargos, abonos o porcentajes.
+- Animaciones suaves, sin pulso agresivo ni cápsulas extra. Respetar reduced-motion y desplazamiento reversible. Mantener los 12 escenarios financieros y 7 anchos en Chromium + WebKit; agregar verificaciones del orden y proximidad precio/cápsula, las dos tarjetas recuperadas, ruta con SVG curvo, rama de racha perdida, ausencia de progreso inventado y accesibilidad ARIA del anillo.
+
+### Resguardos de alcance
+- Solo archivos dentro de preview/experiencia-financiera-espejo/ y esta nota. **Index, Ayuda, Admin, Supabase, endpoints financieros, pagos, comprobantes reales y Goxy/Gixys no se tocan**.
+- El Bloque 2 permanece **PENDIENTE DE OK DEL PROPIETARIO** sobre esta beta R4; B1 V6 sigue aprobado. Sin despliegue global hasta Issue #142 y autorización expresa.
