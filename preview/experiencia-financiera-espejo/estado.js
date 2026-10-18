@@ -137,23 +137,27 @@ function breakdown(){
 /* Compact status with semantic stage progress. Never treat "received" as
  * approved, and never imply a percentage chance of approval.
  */
+/* Review tracker is placed directly below the sticky balance.
+ * The HERO owns the status; this area only shows the event timeline.
+ * Stages are milestones, never a percentage of approval probability.
+ */
 function proof(){
  const Q=quote(),panel=$('gx-b2-proof'),phase=Q.proof;
  panel.hidden=!phase;
  if(!phase){panel.innerHTML='';return}
  const states={
-  review:{label:'EN REVISIÓN',title:'Comprobante recibido',
+  review:{label:'Seguimiento del comprobante',title:'',
    message:'Ya lo tenemos. No lo envíes de nuevo.',
    fill:'50%',steps:['Recibido','Revisión','Aprobación']},
-  correction:{label:'REQUIERE CORRECCIÓN',title:'Hay una observación',
+  correction:{label:'Seguimiento del comprobante',title:'',
    message:'Revisa el comprobante para continuar.',
    fill:'50%',steps:['Recibido','Revisión','Corregir']},
-  approved:{label:'APROBADO',title:'Pago validado',
-   message:'Este pago ya se aplicó. Tu siguiente fecha sigue vigente.',
+  approved:{label:'Pago validado',title:'Pago validado',
+   message:'Este pago ya se aplicó; la siguiente fecha sigue vigente.',
    fill:'100%',steps:['Recibido','Revisado','Aprobado']}
  };
  const copy=states[phase];if(!copy){panel.hidden=true;return}
- const steps=copy.steps.map((label,i)=>{
+ const stages=copy.steps.map((label,i)=>{
   const state=phase==='approved'?'is-done':
    phase==='review'?(i===0?'is-done':i===1?'is-current':''):
    (i<2?'is-done':i===2?'is-action':'');
@@ -161,20 +165,20 @@ function proof(){
    '<span>'+label+'</span></span>';
  }).join('');
  panel.dataset.phase=phase;
- panel.innerHTML='<div class="gx-b2-proof-top">'+
-   '<div><small class="gx-b2-proof-eyebrow">'+copy.label+'</small>'+
-   '<strong class="gx-b2-proof-title">'+copy.title+'</strong></div>'+
-   '<span class="gx-b2-proof-symbol" aria-hidden="true">'+
-   (phase==='approved'?'✓':phase==='correction'?'!':'⌁')+'</span></div>'+
-  '<div class="gx-b2-proof-track" role="group" aria-label="Etapas de revisión del comprobante">'+
-   '<div class="gx-b2-progress-rail" aria-hidden="true"><span class="gx-b2-progress-fill" style="--gx-b2-progress:'+copy.fill+'"></span></div>'+
-   '<div class="gx-b2-progress-steps">'+steps+'</div></div>'+
+ panel.setAttribute('aria-label',copy.label);
+ panel.innerHTML=(copy.title?'<div class="gx-b2-proof-done-line">'+
+   '<span class="gx-b2-proof-symbol" aria-hidden="true">✓</span>'+
+   '<strong class="gx-b2-proof-title">'+copy.title+'</strong></div>':'')+
+  '<div class="gx-b2-proof-track" role="group" aria-label="Etapas del comprobante">'+
+   '<div class="gx-b2-progress-rail" aria-hidden="true">'+
+   '<span class="gx-b2-progress-fill" style="--gx-b2-progress:'+copy.fill+'"></span></div>'+
+   '<div class="gx-b2-progress-steps">'+stages+'</div></div>'+
   '<p class="gx-b2-proof-caption">'+copy.message+'</p>';
 }
 function actions(){
  const Q=quote(),el=$('gx-b2-actions'),hasPending=fx.pending(Q).length>0;
  if(!Q.trusted){el.innerHTML='<p class="gx-b2-pay-explain">Saldo sin confirmar. Pago bloqueado.</p>';return}
- if(Q.proof==='review'){el.innerHTML='<p class="gx-b2-pay-explain">En revisión. No envíes otro comprobante.</p>';return}
+ if(Q.proof==='review'){el.innerHTML='';return} // Message belongs only to proof timeline.
  if(!hasPending){el.innerHTML='<p class="gx-b2-pay-explain">Estás al corriente.</p>';return}
  if(Q.proof==='correction'){
   el.innerHTML='<button type="button" class="btn gx-b2-secondary" id="gx-b2-action">Consultar observación</button>';
