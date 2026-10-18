@@ -155,3 +155,290 @@ html[data-gx-b2-index-demo="true"] .header{position:relative;min-height:30px}
  .gx-b2-calendar-chevron{transition:none!important}
  .gx-b2-progress-fill,.gx-b2-service-progress-track span{animation:none!important;transform:none!important}
 }
+
+
+/* ================================================================
+   E1/B2 · INDEX REMASTER R1+R2+R3 — ONLY THE ISOLATED CLIENT MIRROR
+   Motion follows scroll through computed CSS variables. No cloned
+   sticky header, payment logic, new widgets, or Admin styling.
+   Original index.css owns brand, modal, CTA and base typography.
+   ================================================================ */
+html[data-gx-index-remaster="r3"]{
+ --gx-rm-hero-h:130px;--gx-rm-amount-size:52px;
+ --gx-rm-amount-top:22px;--gx-rm-badge-top:90px;
+ --gx-rm-amount-shift:0px;--gx-rm-badge-shift:0px;
+ --gx-rm-badge-max:96%;--gx-rm-badge-size:12px;
+ --gx-rm-header-gap:15px;--gx-rm-header-size:14px;
+ --gx-rm-header-bottom:20px;--gx-rm-header-pad:15px;
+ --gx-rm-label-opacity:1;--gx-rm-progress:0;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-sticky{
+ padding:max(var(--gx-rm-header-pad), env(safe-area-inset-top,0px))
+   20px 11px;
+ margin-bottom:var(--gx-rm-header-bottom);
+ background:
+   linear-gradient(180deg,rgba(3,3,5,.90),rgba(3,3,5,.77) 70%,rgba(3,3,5,.65));
+ backdrop-filter:blur(25px) saturate(1.2);
+ -webkit-backdrop-filter:blur(25px) saturate(1.2);
+ will-change:auto;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-sticky::after{
+ background:linear-gradient(to bottom,rgba(3,3,5,.66),transparent);
+ bottom:-27px;height:27px;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-sticky .header{
+ min-height:29px;margin-bottom:var(--gx-rm-header-gap);
+}
+html[data-gx-index-remaster="r3"] #gx-b2-sticky .header-title{
+ font-size:var(--gx-rm-header-size);
+ letter-spacing:1.7px;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-hero{
+ position:relative;
+ height:var(--gx-rm-hero-h);
+ display:block;
+ text-align:center;
+ min-width:0;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-hero .total-label{
+ position:absolute;top:0;left:0;right:0;
+ opacity:var(--gx-rm-label-opacity);
+ margin:0;
+ pointer-events:none;
+ line-height:18px;
+ font-size:10px;letter-spacing:1.5px;
+ white-space:nowrap;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-hero .total-amount{
+ position:absolute;
+ top:var(--gx-rm-amount-top);
+ left:50%;margin:0;
+ font-size:var(--gx-rm-amount-size);
+ font-weight:800;
+ line-height:1.12;
+ letter-spacing:-.043em;
+ width:max-content;
+ max-width:59%;
+ white-space:nowrap;
+ font-variant-numeric:tabular-nums;
+ transform:translateX(-50%) translateX(var(--gx-rm-amount-shift));
+ transform-origin:center;
+ will-change:transform;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-hero .gx-b2-number-ink{
+ display:inline-block;transform-origin:center;white-space:nowrap;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
+ position:absolute;
+ top:var(--gx-rm-badge-top);
+ left:50%;
+ transform:translateX(-50%) translateX(var(--gx-rm-badge-shift));
+ margin:0;display:inline-flex;align-items:center;justify-content:center;
+ width:max-content;max-width:var(--gx-rm-badge-max);
+ padding:6px 10px;
+ font-size:var(--gx-rm-badge-size);
+ line-height:1.2;
+ white-space:nowrap;
+ overflow:hidden;text-overflow:ellipsis;
+ font-weight:700;
+ letter-spacing:.01em;
+ will-change:transform;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-hero .badge-review{
+ border-color:rgba(132,99,254,.30);
+ background:rgba(124,77,255,.09);
+ box-shadow:0 0 17px rgba(124,77,255,.065);
+}
+html[data-gx-index-remaster="r3"] #gx-b2-hero .badge-overdue{
+ box-shadow:0 0 17px rgba(255,70,103,.065);
+}
+html[data-gx-index-remaster="r3"] .scrollable-content{
+ min-width:0;
+ padding-top:4px;
+}
+/* Account identity stays visible, but not in its own heavy glass card. */
+html[data-gx-index-remaster="r3"] .card-info{
+ background:transparent!important;box-shadow:none!important;
+ border:0!important;
+ border-bottom:1px solid rgba(145,171,218,.095)!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ padding:7px 1px 16px!important;
+ margin-bottom:22px!important;
+ column-gap:14px;row-gap:12px;
+}
+html[data-gx-index-remaster="r3"] .card-info .info-block .value{font-size:13px}
+html[data-gx-index-remaster="r3"] .card-info .info-block .label{font-size:9px}
+html[data-gx-index-remaster="r3"] .card-info .info-block.full{
+ border-top:1px solid rgba(255,255,255,.055);
+ margin-top:0;padding-top:10px;
+}
+html[data-gx-index-remaster="r3"] .section-title{
+ margin-bottom:11px;
+ letter-spacing:1.5px;
+}
+/* One tangible glass surface: contracted services. */
+html[data-gx-index-remaster="r3"] .services-container{
+ background:rgba(9,15,27,.27);
+ border:1px solid rgba(142,176,230,.095);
+ box-shadow:0 8px 24px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.028);
+ padding:6px 15px;
+ border-radius:18px;
+ margin-bottom:21px;
+}
+html[data-gx-index-remaster="r3"] .services-container .service-item{
+ padding:12px 0;
+ font-size:12px;
+ border-bottom-color:rgba(182,197,236,.075);
+}
+html[data-gx-index-remaster="r3"] .services-container .service-name{
+ font-size:12px;line-height:1.45;
+}
+html[data-gx-index-remaster="r3"] .services-container .service-price{
+ font-size:12px;white-space:nowrap;
+}
+html[data-gx-index-remaster="r3"] .gx-b2-service-progress{
+ margin:6px 0 10px;
+ padding-top:10px;
+}
+/* Date and breakdown form one uninterrupted ledger, not nested cards. */
+html[data-gx-index-remaster="r3"] #gx-b2-calendar,
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown{
+ background:transparent!important;
+ border:none!important;
+ box-shadow:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ border-radius:0!important;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-calendar{
+ padding:0!important;margin:0!important;
+ overflow:visible;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-calendar-toggle{
+ min-height:62px;
+ padding:10px 1px 12px;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-calendar-toggle small{
+ color:#9ca7c6;font-size:9px;letter-spacing:1.35px;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-calendar-toggle strong{
+ font-size:12px;color:#f5f7ff;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-calendar-body{
+ padding:3px 0 14px;
+ border-top:1px solid rgba(142,175,220,.13);
+}
+html[data-gx-index-remaster="r3"] .gx-b2-calendar-row{
+ padding:12px 4px;
+ border-bottom:1px solid rgba(151,176,216,.075);
+ transition:background-color .22s ease,padding-left .22s ease;
+}
+html[data-gx-index-remaster="r3"] .gx-b2-calendar-row.is-active{
+ background:linear-gradient(90deg,rgba(0,242,254,.035),transparent 67%);
+ padding-left:9px;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown{
+ padding:20px 1px 13px!important;
+ margin:0 0 17px!important;
+ border-top:1px solid rgba(142,175,220,.13)!important;
+ border-bottom:1px solid rgba(142,175,220,.105)!important;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown .gx-b2-selection-desc{
+ font-size:11px;margin-bottom:13px;color:#cbd5e9;font-weight:600;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown .breakdown-line{
+ font-size:12px;margin-bottom:11px;gap:10px;line-height:1.5;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown .breakdown-line span:last-child{
+ white-space:nowrap;text-align:right;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown .gx-b2-selected-final{
+ margin-top:11px;padding-top:12px;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown .gx-b2-selected-final strong{
+ font-size:18px;line-height:1.15;letter-spacing:-.025em;
+ animation:gx-rm-ledger-in .36s cubic-bezier(.18,.78,.24,1) both;
+}
+@keyframes gx-rm-ledger-in{
+ from{opacity:.45;transform:translateY(4px)}
+ to{opacity:1;transform:translateY(0)}
+}
+/* Status lives once: hero pill + nearby process line, no extra card. */
+html[data-gx-index-remaster="r3"] #gx-b2-proof{
+ margin:0 0 21px!important;
+ padding:4px 3px 19px!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ border:0!important;
+ border-bottom:1px solid rgba(157,185,224,.115)!important;
+ border-radius:0!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ overflow:visible;
+ animation:gx-rm-proof-arrive .48s cubic-bezier(.18,.75,.25,1) both;
+}
+@keyframes gx-rm-proof-arrive{
+ from{opacity:.55;transform:translateY(7px)}
+ to{opacity:1;transform:translateY(0)}
+}
+html[data-gx-index-remaster="r3"] #gx-b2-proof .gx-b2-proof-track{margin-top:10px}
+html[data-gx-index-remaster="r3"] #gx-b2-proof .gx-b2-proof-caption{
+ text-align:left;
+ margin-top:15px;
+ color:#b5c3d9;
+ font-size:11px;line-height:1.5;
+}
+html[data-gx-index-remaster="r3"] .gx-b2-proof-done-line{
+ display:flex;align-items:center;gap:8px;margin-bottom:18px;
+}
+html[data-gx-index-remaster="r3"] .gx-b2-proof-done-line .gx-b2-proof-symbol{
+ width:25px;height:25px;font-size:14px;color:var(--success-neon);
+ border-color:rgba(0,255,157,.24);background:rgba(0,255,157,.07);
+}
+html[data-gx-index-remaster="r3"] .gx-b2-proof-done-line .gx-b2-proof-title{
+ font-size:13px;font-weight:650;color:#f0fff9;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-proof[data-phase="review"] .gx-b2-progress-step.is-current .gx-b2-progress-dot{
+ animation:gx-rm-current-reveal .64s cubic-bezier(.19,.73,.24,1) .4s both;
+}
+@keyframes gx-rm-current-reveal{
+ from{box-shadow:0 0 0 0 rgba(0,242,254,.26)}
+ to{box-shadow:0 0 0 3px rgba(0,242,254,.13)}
+}
+/* Loyalty is context, not a competing promotional card. */
+html[data-gx-index-remaster="r3"] .loyalty-badge{
+ padding:11px 1px 12px!important;
+ background:transparent!important;
+ border:none!important;
+ box-shadow:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ margin-bottom:17px!important;gap:12px;
+}
+html[data-gx-index-remaster="r3"] .loyalty-badge .loyalty-icon{
+ font-size:23px;filter:drop-shadow(0 0 9px rgba(124,77,255,.18))
+}
+html[data-gx-index-remaster="r3"] .loyalty-badge .loyalty-title{font-size:9px}
+html[data-gx-index-remaster="r3"] .loyalty-badge .loyalty-desc{
+ font-size:11px;line-height:1.48;
+}
+html[data-gx-index-remaster="r3"] #gx-b2-actions:empty{display:none}
+html[data-gx-index-remaster="r3"] .gx-payment-primary{transform:translateZ(0)}
+/* Browser-safe targets on small phones. Avoid cutting off money or pills. */
+@media(max-width:359px){
+ html[data-gx-index-remaster="r3"] #gx-b2-hero .total-amount{
+  letter-spacing:-.05em;
+ }
+ html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
+  padding:5px 7px;
+ }
+ html[data-gx-index-remaster="r3"] .card-info .info-block .value{
+  font-size:12px;word-break:normal;overflow-wrap:anywhere;
+ }
+ html[data-gx-index-remaster="r3"] .gx-b2-calendar-row{gap:7px}
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-index-remaster="r3"] #gx-b2-proof,
+ html[data-gx-index-remaster="r3"] #gx-b2-breakdown .gx-b2-selected-final strong,
+ html[data-gx-index-remaster="r3"] .gx-b2-progress-step.is-current .gx-b2-progress-dot{
+  animation:none!important;
+ }
+ html[data-gx-index-remaster="r3"] .gx-b2-calendar-row{transition:none!important}
+}
