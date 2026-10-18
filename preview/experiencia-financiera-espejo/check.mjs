@@ -83,9 +83,10 @@ async function run(name,engine){
      assert((await page.locator('#gx-b2-proof').innerText()).includes('No necesitas enviarlo otra vez'));
      assert.equal(await page.locator('#gx-b2-action').count(),0,
       'Do not ask customer to pay again when already reviewing');
+     assert.equal(await page.locator('#gx-b2-proof [role="progressbar"]').getAttribute('aria-valuenow'),'56');
     }
     if(scenario==='correction'){
-     assert.match(await page.locator('#gx-b2-proof').textContent(),/corrige los datos/i);
+     assert.match(await page.locator('#gx-b2-proof').textContent(),/Requiere corrección/i);
      assert.equal(await page.locator('#gx-b2-action').textContent(),'Consultar observación');
     }
     if(scenario==='extension'){
