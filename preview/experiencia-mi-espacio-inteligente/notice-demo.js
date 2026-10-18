@@ -209,7 +209,9 @@ function lightStream(card,item){
   if(time>=.89&&!delivered){delivered=true;bellImpact(item)}
   if(time<1)raf=requestAnimationFrame(render);else{svg.remove();bloom.remove()}
  };
- raf=requestAnimationFrame(render);
+ // Paint the first geometry synchronously. WebKit can defer the first RAF
+ // when the document has just changed focus/scroll, leaving an empty SVG path.
+ render(begin+1);
  effects.push({cancel:()=>{cancelAnimationFrame(raf);svg.remove();bloom.remove()}});
  delay(()=>bloom.remove(),510);
  // Browser tab throttling fallback: always deliver the notice even if RAF stalls.
