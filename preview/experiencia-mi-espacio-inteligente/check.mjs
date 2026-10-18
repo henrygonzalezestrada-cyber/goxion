@@ -172,7 +172,7 @@ async function exercise(name,engine){
    await page.waitForFunction(previous=>{
     const current=document.querySelector('.gx-smart-notice-stream-line')?.getAttribute('d');
     return Boolean(current)&&current!==previous;
-   },d,{timeout:700});
+   },d,{timeout:900,polling:50}); // Do not poll via rAF: headless WebKit may suspend it.
    const d2=await skin.getAttribute('d');
    assert.notEqual(d,d2,'Ribbon geometry must evolve every frame instead of sliding a fixed line');
    await page.waitForTimeout(1390);
