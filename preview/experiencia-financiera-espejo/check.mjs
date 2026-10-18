@@ -13,7 +13,7 @@ assert(ayuda.includes('data-gx-smart-beta="true" data-gx-b2-preview="true"'));
 assert(ayuda.includes('../experiencia-mi-espacio-inteligente/smart.css?v=e1b1v6'));
 assert(ayuda.includes('src="./ayuda-b2.js?v=e1b2v2"'));
 assert(index.includes('../../assets/css/index.css'));
-assert(index.includes('animate-ui-native.bundle.js?v=e1b2r5v1'));
+assert(index.includes('animate-ui-native.bundle.js?v=e1b2r5v3'));
 assert(index.includes('data-gx-animate-ui="native-r5"'));
 assert(!/cdn.jsdelivr|esm.sh|unpkg.com/i.test(index),'No external React runtime/CDN');
 assert(index.includes('class="sticky-area"')&&index.includes('class="balance-hero"'));
@@ -71,6 +71,41 @@ async function run(name,engine){
     .evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(8, 8, 12, 0.25)');
 
    assert.equal(await page.locator('#gx-b2-calendar-body').evaluate(el=>el.hidden),true);
+   // The *actual* Ayuda Morphicons 1.5.0 DOM driver animates this path,
+   // not a rotated Unicode glyph or a guessed CSS chevron.
+   assert.equal(await page.evaluate(()=>window.GOXION_CALENDAR_MORPH?.installed),true);
+   assert.equal(await page.evaluate(()=>window.GOXION_CALENDAR_MORPH?.library),'morphicons@1.5.0');
+   assert.equal(await page.locator('#gx-b2-calendar-toggle .gx-morph-chevron path').count(),1);
+   assert.equal(await page.locator('#gx-b2-calendar-toggle .gx-chevron-motion')
+     .getAttribute('data-gx-morphicons-host'),'1');
+   const downPath=await page.locator('#gx-b2-calendar-toggle .gx-morph-chevron path').getAttribute('d');
+   const iconStyle=await page.locator('#gx-b2-calendar-toggle .gx-morph-chevron')
+     .evaluate(el=>({width:el.getBoundingClientRect().width,
+      transform:getComputedStyle(el).transform}));
+   assert(Math.abs(iconStyle.width-21)<1,name+' '+width+' Ayuda icon size changed');
+   assert(['none','matrix(1, 0, 0, 1, 0, 0)'].includes(iconStyle.transform),
+    name+' '+width+' chevron must morph path, never rotate SVG');
+   await page.locator('#gx-b2-calendar-toggle').click();
+   assert.equal(await page.locator('#gx-b2-calendar-toggle').getAttribute('aria-expanded'),'true');
+   // CSS uses the same 250ms color transition as Ayuda; wait for it
+   // to complete rather than sampling cyan on the first animation frame.
+   await page.waitForFunction(()=>{
+    const el=document.querySelector('#gx-b2-calendar-toggle .gx-chevron-motion');
+    return Boolean(el&&getComputedStyle(el).color==='rgb(155, 145, 255)');
+   },null,{timeout:2500,polling:50});
+   await page.waitForFunction(down=>{
+    const el=document.querySelector('#gx-b2-calendar-toggle .gx-morph-chevron path');
+    return Boolean(el&&el.getAttribute('d')!==down);
+   },downPath,{timeout:5000,polling:50});
+   const openPath=await page.locator('#gx-b2-calendar-toggle .gx-morph-chevron path').getAttribute('d');
+   assert.notEqual(openPath,downPath,'Opening must morph the glyph path');
+   await page.locator('#gx-b2-calendar-toggle').click();
+   assert.equal(await page.locator('#gx-b2-calendar-toggle').getAttribute('aria-expanded'),'false');
+   assert.equal(await page.locator('#gx-b2-calendar-body').evaluate(el=>el.hidden),true);
+   await page.waitForFunction(open=>{
+    const el=document.querySelector('#gx-b2-calendar-toggle .gx-morph-chevron path');
+    return Boolean(el&&el.getAttribute('d')!==open);
+   },openPath,{timeout:5000,polling:50});
    await page.locator('#gx-b2-calendar-toggle').click();
    assert.equal(await page.locator('#gx-b2-calendar-row').count(),0);
    assert.equal(await page.locator('[data-charge]').count(),2);
@@ -245,7 +280,7 @@ async function run(name,engine){
    assert.deepEqual(leaks,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B2 R5.1 · 7 widths × 12 states; label-space morph, Animate UI and financial invariants PASS');
+  console.log(name+' E1/B2 FINAL · 7 widths × 12 states; Ayuda Morphicons path morph, R5 UI and financial invariants PASS');
  }finally{await browser.close()}
 }
 try{await ready();await run('Chromium',chromium);await run('WebKit',webkit);console.log('E1/B2 BETA PASS')}

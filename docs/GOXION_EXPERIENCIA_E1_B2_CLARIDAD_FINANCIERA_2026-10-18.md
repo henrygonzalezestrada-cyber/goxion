@@ -92,3 +92,16 @@ Propietario: el morph funciona y gusta, pero señala aire entre «Estado de cuen
 El propietario aprobó **toda la estética y funcionamiento de R5** y solicitó un solo ajuste preciso: cuando desaparece la subetiqueta del importe (“Próximo pago”/“Importe pendiente”), el monto y la cápsula deben aprovechar mejor el espacio debajo de “Estado de Cuenta”. No cambiar el tamaño del importe, su distribución horizontal, los estados, Animate UI, cristal, tarjetas, lealtad ni la lógica financiera.
 
 Se añade únicamente una recuperación progresiva de hasta **7 px** cuando el subtítulo desaparece durante el scroll. El estado expandido permanece idéntico; el ajuste desplaza **monto y cápsula juntos** y reduce la reserva de altura del hero, sin crear saltos ni dejar otro espacio vacío. Se prueba la geometría de ambos estados en Chromium y WebKit, siete anchos y doce escenarios; el equipo financiero original sigue intacto. R5.1 beta pendiente de la última aprobación del propietario; **nada en Index oficial** hasta cierre global autorizado por Issue #142.
+
+
+## Cierre visual E1/B2 · Flecha real de Ayuda (18/oct/2026)
+
+Tras aprobar explícitamente el remaster Index R5 y la mejora R5.1 del espacio del encabezado, el propietario pidió una sola última corrección: **sustituir la flecha de «Calendario de pagos» por la misma flecha transformable de Ayuda**; confirmó «Así es» y su intención de dar por concluido el Bloque 2 con ella.
+
+### Fuente exacta y contrato
+- Source of truth: `assets/js/ayuda/09-morphicons-production-script.mjs` y `assets/css/ayuda.css`. El icono no gira por CSS: **Morphicons 1.5.0** transforma el trazo SVG mismo con `createMorph(path, initial, {reducedMotion:"user"})`, y transición `morphTo(icon,"snappy")`.
+- Formas idénticas a Ayuda: abajo `M6 9l6 6 6-6` y arriba `M6 15l6-6 6 6`, viewBox `0 0 24 24`, tamaño 21×21, stroke 2.45 redondeado, cian `#62ecff` cerrado y violeta `#9b91ff` abierto. La apertura/cierre sigue controlada por `aria-expanded` del botón original; no cambia el calendario ni su lógica.
+- Se incorpora el mismo paquete `morphicons@1.5.0/dom` al bundle estático **solo del preview**; sin CDN nuevo, sin reescribir Animate UI ni crear un icono aproximado. Las pruebas validan el morph real del path, acceso por teclado/lector, cero rotación falsa, ida y vuelta en múltiples anchos.
+- **No tocar más nada**: conservados R5.1, precios, fechas múltiples, comprobantes, descuentos, mora, lealtad, identidad, cristal, scroll y CTA. Ningún cambio en `index.html` oficial ni `ayuda.html`, Admin o motor B2.
+
+**Hito:** E1/B2 aprobado visualmente por el propietario sujeto a completar esta corrección comprobada. Se registra el cierre al pasar QA Chromium + WebKit y publicar únicamente el espejo. **Aprobación visual no significa lanzamiento oficial**: el embargo del paquete integral sigue bajo Issue #142.

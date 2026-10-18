@@ -19,6 +19,7 @@ import { Clock } from './animate-ui-src/icons/clock';
 import { CircleCheck } from './animate-ui-src/icons/circle-check';
 import { CircleX } from './animate-ui-src/icons/circle-x';
 import { FileCheck } from './animate-ui-src/icons/file-check';
+import { createMorph } from 'morphicons/dom';
 
 const e=React.createElement;
 const statusDefinitions=Object.freeze({
@@ -112,4 +113,35 @@ window.GOXION_ANIMATEUI_NATIVE=Object.freeze({
   state,key:state?.state==='lost'?'lost':state?.count+'/'+state?.target
  })),
 });
+/**
+ * THE SAME Morphicons DOM implementation used in Ayuda:
+ * assets/js/ayuda/09-morphicons-production-script.mjs
+ * Identical paths, spring preset and reducedMotion policy; no rotation.
+ * The existing billing calendar remains controlled by estado.js.
+ */
+function installAyudaCalendarChevron(){
+ const button=document.getElementById('gx-b2-calendar-toggle');
+ const host=button?.querySelector('.gx-chevron-motion');
+ const path=host?.querySelector('.gx-morph-chevron path');
+ if(!button||!host||!path)throw new Error('Missing calendar Morphicons host');
+ const DOWN='M6 9l6 6 6-6';
+ const UP='M6 15l6-6 6 6';
+ const getOpen=()=>button.getAttribute('aria-expanded')==='true';
+ let lastOpen=getOpen();
+ const morph=createMorph(path,lastOpen?UP:DOWN,{reducedMotion:'user'});
+ host.dataset.gxMorphiconsHost='1';
+ const observer=new MutationObserver(()=>{
+  const open=getOpen();
+  if(open===lastOpen)return; // calendar refresh is not a toggle
+  lastOpen=open;
+  morph.morphTo(open?UP:DOWN,'snappy');
+ });
+ observer.observe(button,{attributes:true,attributeFilter:['aria-expanded']});
+ window.GOXION_CALENDAR_MORPH=Object.freeze({
+  installed:true,library:'morphicons@1.5.0',origin:'Ayuda',
+  spring:'snappy',isOpen:getOpen
+ });
+}
+installAyudaCalendarChevron();
+
 window.dispatchEvent(new Event('gx-animate-ui-ready'));
