@@ -145,61 +145,26 @@ function breakdown(){
  * progress or a probability of approval. Current status belongs only in hero.
  * No duplicate large card, redundant notification or second CTA.
  */
+/* R5: The visual state is rendered by real Animate UI/Motion React.
+ * The existing financial engine remains the only owner of proof state.
+ * No homemade SVG stations and no duplicate status information.
+ */
 function proof(){
- const Q=quote(),panel=$('gx-b2-proof'),phase=Q.proof;
+ const phase=quote().proof||null, panel=$('gx-b2-proof');
  panel.hidden=!phase;
- if(!phase){panel.innerHTML='';panel.removeAttribute('data-phase');return}
- if(panel.dataset.phase===phase&&panel.querySelector('.gx-r4-journey'))return;
- const states={
-  review:{message:'Ya lo recibimos. No lo envíes de nuevo.',
-   fill:50,steps:['Recibido','Revisión','Aprobación']},
-  correction:{message:'Revisa la observación para continuar.',
-   fill:50,steps:['Recibido','Revisado','Corregir']},
-  approved:{message:'Pago aplicado; próximo vencimiento sin cambios.',
-   fill:100,steps:['Recibido','Revisado','Aprobado']}
- };
- const copy=states[phase];if(!copy){panel.hidden=true;return}
- const symbol=(index)=>{
-  const content=index===0
-   ?'<path d="M6.4 3.6h11.2v16.8l-2.7-1.9-2.9 1.9-2.9-1.9-2.7 1.9z"/><path d="M9.2 9h5.6M9.2 12.7h4.2"/>'
-   :index===1
-   ?'<path d="M4.5 9V5.5H8M16 5.5h3.5V9M19.5 15v3.5H16M8 18.5H4.5V15"/><circle cx="12" cy="12" r="2.6"/>'
-   :phase==='correction'
-   ?'<path d="M12 4 21 20H3L12 4Z"/><path d="M12 10v4M12 17v.1"/>'
-   :'<path d="m5.5 12.5 4.5 4.3 8.7-9.6"/>';
-  return '<svg viewBox="0 0 24 24" class="gx-r4-station-symbol" aria-hidden="true">'+content+'</svg>';
- };
- const stages=copy.steps.map((label,i)=>{
-  const state=phase==='approved'?'is-done':
-   phase==='review'?(i===0?'is-done':i===1?'is-current':''):
-   (i<2?'is-done':i===2?'is-action':'');
-  return '<span class="gx-b2-progress-step '+state+'" data-station="'+i+'">'+
-   '<span class="gx-r4-station-shell">'+symbol(i)+'</span>'+
-   '<span class="gx-r4-station-label">'+label+'</span></span>';
- }).join('');
- panel.dataset.phase=phase;
- panel.setAttribute('aria-label','Recorrido del comprobante');
- // The path bends subtly between stations. The illuminated section ends
- // at the current milestone, and never reaches approval prematurely.
- const curve='M100 29 C171 29 190 10 300 29 S429 29 500 29';
- panel.innerHTML=
-  '<div class="gx-r4-journey"><div class="gx-r4-journey-heading">'+
-   '<span>'+(phase==='approved'?'Pago validado':'RECORRIDO DE TU PAGO')+'</span>'+
-   '<span class="gx-r4-journey-mark" aria-hidden="true"><i></i><i></i><i></i></span></div>'+
-   '<div class="gx-b2-proof-track" role="group" aria-label="Etapas de recepción y validación">'+
-   '<svg class="gx-b2-progress-rail" viewBox="0 0 600 65" preserveAspectRatio="none" aria-hidden="true">'+
-   '<defs><linearGradient id="gx-r4-route-gradient" x1="0%" y1="50%" x2="100%" y2="50%">'+
-   '<stop offset="0%" stop-color="#8a74fa"/><stop offset="52%" stop-color="#b8a8ff"/>'+
-   '<stop offset="100%" stop-color="'+(phase==='correction'?'#efb773':phase==='approved'?'#72f1c7':'#7bdbf4')+'"/></linearGradient></defs>'+
-   '<path class="gx-r4-route-back" d="'+curve+'"/>'+
-   '<path class="gx-r4-route-halo" d="'+curve+'" pathLength="100" style="--gx-r4-journey-end:'+copy.fill+'"/>'+
-   '<path class="gx-b2-progress-fill" d="'+curve+'" pathLength="100" style="--gx-b2-progress:'+copy.fill+'%;--gx-r4-journey-end:'+copy.fill+'"/></svg>'+
-   '<div class="gx-b2-progress-steps">'+stages+'</div></div>'+
-   '<p class="gx-b2-proof-caption">'+copy.message+'</p></div>';
+ if(phase)panel.dataset.phase=phase;
+ else panel.removeAttribute('data-phase');
+ const ui=window.GOXION_ANIMATEUI_NATIVE;
+ if(!ui?.renderProof)throw new Error('Animate UI native preview bundle unavailable');
+ ui.renderProof(phase);
 }
 /* Loyalty is rendered only from EXPLICIT, synthetic visual metadata.
  * Neither money owed nor number of services says how many punctual payments
  * a real client has made. Official UI must use trusted engine state.
+ */
+/* Only explicit fake loyalty milestones are used in this beta.
+ * The Animate UI Star is the real upstream animated Lucide component.
+ * HeartCrack is the genuine Lucide icon, not a home-drawn emoji/SVG.
  */
 function loyalty(){
  const Q=quote(),panel=$('gx-b2-loyalty-panel');
@@ -207,54 +172,31 @@ function loyalty(){
  const caption=$('gx-b2-loyalty-caption'),description=$('gx-b2-loyalty');
  const state=Q.trusted&&Q.cargos.length?Q.loyaltyDemo:null;
  panel.hidden=!state;
- if(!state){mark.innerHTML='';return}
- const lost=state.state==='lost';
- const signature=lost?'lost':state.count+'/'+state.target;
- const changed=panel.dataset.loyaltySignature!==signature;
- panel.dataset.loyaltySignature=signature;
- panel.dataset.loyaltyState=lost?'lost':'active';
- panel.setAttribute('aria-label',lost?'Racha de lealtad reiniciada':'Racha de pagos puntuales simulada');
- if(lost){
-  title.textContent='RACHA REINICIADA';
-  caption.textContent='Tu lealtad perdió su avance';
-  description.textContent=state.reason;
-  mark.setAttribute('role','img');
-  mark.setAttribute('aria-label','Corazón roto: racha reiniciada');
+ if(!state){
+  mark.removeAttribute('role');mark.removeAttribute('aria-label');
   for(const k of ['aria-valuemin','aria-valuemax','aria-valuenow'])mark.removeAttribute(k);
-  if(changed)mark.innerHTML=
-   '<svg class="gx-r4-heart" viewBox="0 0 100 100" aria-hidden="true">'+
-   '<defs><linearGradient id="gx-r4-heart-shade" x1="0" y1="0" x2="1" y2="1">'+
-   '<stop offset="0" stop-color="#ff8f9d"/><stop offset="1" stop-color="#ad315d"/></linearGradient></defs>'+
-   '<path d="M47 78C35 68 16 54 16 36c0-13 10-21 21-21 6 0 12 3 15 8l-10 17 12 8-10 18 3 12Z" fill="url(#gx-r4-heart-shade)"/>'+
-   '<path d="M53 78C66 68 84 54 84 36c0-13-10-21-21-21-5 0-9 2-12 5l8 19-10 10 8 13-4 16Z" fill="url(#gx-r4-heart-shade)"/>'+
-   '<path d="M50 23 42 40 54 49 44 66" fill="none" stroke="#0b0b17" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  return;
+ }else{
+  const lost=state.state==='lost';
+  panel.dataset.loyaltyState=lost?'lost':'active';
+  title.textContent=lost?'RACHA REINICIADA':'TU LEALTAD';
+  caption.textContent=lost?'Perdiste tu avance':state.count+' de '+state.target+' pagos puntuales';
+  description.textContent=lost?state.reason:'Racha ilustrativa · siguiente beneficio';
+  if(lost){
+   mark.setAttribute('role','img');
+   mark.setAttribute('aria-label','Racha reiniciada: corazón roto');
+   for(const k of ['aria-valuemin','aria-valuemax','aria-valuenow'])mark.removeAttribute(k);
+  }else{
+   mark.setAttribute('role','progressbar');
+   mark.setAttribute('aria-label','Racha ilustrativa: '+state.count+' de '+state.target+' pagos puntuales');
+   mark.setAttribute('aria-valuemin','0');
+   mark.setAttribute('aria-valuemax',String(state.target));
+   mark.setAttribute('aria-valuenow',String(state.count));
+  }
  }
- const n=state.count,m=state.target,percent=Math.round(100*n/m);
- title.textContent='TU LEALTAD';
- caption.textContent=n+' de '+m+' pagos puntuales';
- description.textContent='Racha ilustrativa · siguiente beneficio';
- mark.setAttribute('role','progressbar');
- mark.setAttribute('aria-label','Racha de ejemplo: '+n+' de '+m+' pagos puntuales');
- mark.setAttribute('aria-valuemin','0');
- mark.setAttribute('aria-valuemax',String(m));
- mark.setAttribute('aria-valuenow',String(n));
- if(!changed)return;
- mark.innerHTML=
-  '<svg class="gx-r4-loyalty-orbit" viewBox="0 0 100 100" aria-hidden="true">'+
-  '<defs><linearGradient id="gx-r4-star-light" x1=".12" y1=".06" x2=".84" y2="1">'+
-  '<stop offset="0" stop-color="#fdf8d2"/><stop offset=".40" stop-color="#f8c86f"/>'+
-  '<stop offset="1" stop-color="#d79037"/></linearGradient>'+
-  '<linearGradient id="gx-r4-loyalty-trace" x1="0" y1="0" x2="1" y2="1">'+
-  '<stop offset="0" stop-color="#6e68f5"/><stop offset=".45" stop-color="#b29dff"/>'+
-  '<stop offset="1" stop-color="#ffe2a2"/></linearGradient></defs>'+
-  '<circle cx="50" cy="50" r="41" class="gx-r4-loyalty-back"/>'+
-  '<circle cx="50" cy="50" r="41" class="gx-r4-loyalty-ring" pathLength="100" style="--gx-r4-loyalty-fill:'+percent+'"/>'+
-  '<circle cx="50" cy="50" r="30" class="gx-r4-star-field"/>'+
-  '<path d="M50 25.7 57.6 41.8 75.3 44.4 62.7 56.8 65.6 74.4 50 66.1 34.4 74.4 37.3 56.8 24.7 44.4 42.4 41.8Z" class="gx-r4-loyalty-star"/>'+
-  '<path d="M46.5 39.5 50 32 53.5 39.5" class="gx-r4-star-glint"/></svg>';
+ const ui=window.GOXION_ANIMATEUI_NATIVE;
+ if(!ui?.renderLoyalty)throw new Error('Animate UI native preview bundle unavailable');
+ ui.renderLoyalty(state);
 }
-
 function actions(){
  const Q=quote(),el=$('gx-b2-actions'),hasPending=fx.pending(Q).length>0;
  if(!Q.trusted){el.innerHTML='<p class="gx-b2-pay-explain">Saldo sin confirmar. Pago bloqueado.</p>';return}
