@@ -22,7 +22,7 @@ import { FileCheck } from './animate-ui-src/icons/file-check';
 
 const e=React.createElement;
 const statusDefinitions=Object.freeze({
- review:{name:'Recibimos tu comprobante',hint:'Estamos verificando la operación.',progress:66,
+ review:{name:'Recibimos tu comprobante',hint:'No lo envíes de nuevo.',progress:66,
    icon:Clock,tone:'review',steps:['Recibido','Validando','Resultado'],completed:1},
  correction:{name:'Hay una observación',hint:'Revisa los datos antes de enviarlo otra vez.',progress:66,
    icon:CircleX,tone:'correction',steps:['Recibido','Revisado','Corregir'],completed:1},
