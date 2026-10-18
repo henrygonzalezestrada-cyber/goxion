@@ -41,19 +41,31 @@ function hero(){
  $('gx-b2-hero-badge').className='time-badge '+cls;
  $('gx-b2-period').textContent=Q.period+' · Ejemplo';
  $('gx-b2-loyalty').textContent=active().some(c=>c.loyalty>0)?
-  'Descuento de lealtad incluido en los importes mostrados (simulación).':
-  'Los beneficios dependen de las reglas y de la cotización oficial.';
+  'Lealtad aplicada al importe.':
+  'Tus beneficios se reflejan en el total.';
  $('gx-b2-back').href='./index.html?escenario='+encodeURIComponent(
   Object.hasOwn(fx.mapping,key)?key: key==='first_paid'||key==='partial'||key==='same_day'?'multi':'upcoming');
 }
 function services(){
  const Q=quote(),el=$('gx-b2-services');
- if(!Q.trusted){el.innerHTML='<p class="gx-b2-services-note">No podemos confirmar el importe. Evita realizar un pago hasta consultar un saldo verificado.</p>';return}
- if(!Q.cargos.length){el.innerHTML='<p class="gx-b2-services-note">Todavía no tienes servicios contratados en este ejemplo.</p>';return}
+ if(!Q.trusted){el.innerHTML='<p class="gx-b2-services-note">Saldo por confirmar. No realices el pago todavía.</p>';return}
+ if(!Q.cargos.length){el.innerHTML='<p class="gx-b2-services-note">Sin servicios contratados.</p>';return}
+ const completed=Q.cargos.filter(c=>c.paid).length;
  el.innerHTML=Q.cargos.map(c=>'<div class="service-item">'+
   '<span class="service-name">'+safe(c.name)+'</span>'+
   '<span class="service-price">'+(c.paid?'Liquidado':fx.money(c.total))+'</span>'+
  '</div>').join('');
+ // The bar is a count of fully paid services, not a probability, deadline
+ // or partial-payment percentage. No new financial calculations.
+ if(completed>0&&completed<Q.cargos.length){
+  const portion=Math.round(completed/Q.cargos.length*100);
+  el.insertAdjacentHTML('beforeend','<div class="gx-b2-service-progress" role="group" aria-label="Servicios liquidados">'+
+   '<div class="gx-b2-service-progress-head"><span>Servicios liquidados</span><strong>'+
+   completed+' de '+Q.cargos.length+'</strong></div>'+
+   '<div class="gx-b2-service-progress-track" role="progressbar" aria-label="Servicios liquidados" '+
+   'aria-valuemin="0" aria-valuemax="'+Q.cargos.length+'" aria-valuenow="'+completed+'">'+
+   '<span style="--gx-b2-fill:'+portion+'%"></span></div></div>');
+ }
 }
 function calendar(){
  const Q=quote(),N=fx.next(Q),list=$('gx-b2-calendar-list');
@@ -103,32 +115,48 @@ function breakdown(){
   '<div class="gx-b2-selected-final"><span>Importe seleccionado</span><strong id="gx-b2-selected-total">'+fx.money(total)+'</strong></div>'+
   (fx.total(fx.pending(Q))!==total?line('Total pendiente del período',fx.money(fx.total(fx.pending(Q)))):'');
 }
+/* Compact status with semantic stage progress. Never treat "received" as
+ * approved, and never imply a percentage chance of approval.
+ */
 function proof(){
- const Q=quote(),panel=$('gx-b2-proof');
- const phase=Q.proof;
+ const Q=quote(),panel=$('gx-b2-proof'),phase=Q.proof;
  panel.hidden=!phase;
- if(!phase)return;
- const copy=phase==='review'
-  ?{label:'RECIBIDO · EN REVISIÓN',title:'Ya tenemos tu comprobante',
-    message:'Está pendiente de validación. Reportarlo no significa que el pago esté acreditado. No necesitas enviarlo otra vez.'}
-  :phase==='correction'
-  ?{label:'REQUIERE CORRECCIÓN',title:'Se detectó una observación',
-    message:'El comprobante aún no se acredita. Revisa el movimiento y corrige los datos señalados antes de reenviar.'}
-  :{label:'APROBADO',title:'Pago validado',
-    message:'El abono del primer servicio se aplicó en este ejemplo. El siguiente servicio conserva su fecha y saldo independientes.'};
- panel.innerHTML='<small class="gx-b2-proof-eyebrow">'+copy.label+'</small>'+
-  '<strong class="gx-b2-proof-title">'+copy.title+'</strong>'+
-  '<p>'+copy.message+'</p>'+
-  '<div class="gx-b2-proof-track">'+
-   '<span class="is-done">Recibido</span><span class="'+(phase==='review'?'is-current':'is-done')+'">Revisión</span>'+
-   '<span class="'+(phase==='approved'?'is-done':phase==='correction'?'is-current':'')+'">'+
-   (phase==='correction'?'Corregir':'Validación')+'</span></div>';
+ if(!phase){panel.innerHTML='';return}
+ const states={
+  review:{label:'EN REVISIÓN',title:'Comprobante recibido',
+   message:'Ya lo tenemos. No lo envíes de nuevo.',
+   fill:'50%',steps:['Recibido','Revisión','Aprobación']},
+  correction:{label:'REQUIERE CORRECCIÓN',title:'Hay una observación',
+   message:'Revisa el comprobante para continuar.',
+   fill:'50%',steps:['Recibido','Revisión','Corregir']},
+  approved:{label:'APROBADO',title:'Pago validado',
+   message:'Este pago ya se aplicó. Tu siguiente fecha sigue vigente.',
+   fill:'100%',steps:['Recibido','Revisado','Aprobado']}
+ };
+ const copy=states[phase];if(!copy){panel.hidden=true;return}
+ const steps=copy.steps.map((label,i)=>{
+  const state=phase==='approved'?'is-done':
+   phase==='review'?(i===0?'is-done':i===1?'is-current':''):
+   (i<2?'is-done':i===2?'is-action':'');
+  return '<span class="gx-b2-progress-step '+state+'"><span class="gx-b2-progress-dot" aria-hidden="true"></span>'+
+   '<span>'+label+'</span></span>';
+ }).join('');
+ panel.dataset.phase=phase;
+ panel.innerHTML='<div class="gx-b2-proof-top">'+
+   '<div><small class="gx-b2-proof-eyebrow">'+copy.label+'</small>'+
+   '<strong class="gx-b2-proof-title">'+copy.title+'</strong></div>'+
+   '<span class="gx-b2-proof-symbol" aria-hidden="true">'+
+   (phase==='approved'?'✓':phase==='correction'?'!':'⌁')+'</span></div>'+
+  '<div class="gx-b2-proof-track" role="group" aria-label="Etapas de revisión del comprobante">'+
+   '<div class="gx-b2-progress-rail" aria-hidden="true"><span class="gx-b2-progress-fill" style="--gx-b2-progress:'+copy.fill+'"></span></div>'+
+   '<div class="gx-b2-progress-steps">'+steps+'</div></div>'+
+  '<p class="gx-b2-proof-caption">'+copy.message+'</p>';
 }
 function actions(){
  const Q=quote(),el=$('gx-b2-actions'),hasPending=fx.pending(Q).length>0;
- if(!Q.trusted){el.innerHTML='<p class="gx-b2-pay-explain">No hay saldo confirmado. El reporte de pago está bloqueado en este ejemplo.</p>';return}
- if(Q.proof==='review'){el.innerHTML='<p class="gx-b2-pay-explain">Comprobante en revisión. No se solicita otro depósito ni un segundo comprobante.</p>';return}
- if(!hasPending){el.innerHTML='<p class="gx-b2-pay-explain">No hay importes pendientes en este ejemplo.</p>';return}
+ if(!Q.trusted){el.innerHTML='<p class="gx-b2-pay-explain">Saldo sin confirmar. Pago bloqueado.</p>';return}
+ if(Q.proof==='review'){el.innerHTML='<p class="gx-b2-pay-explain">En revisión. No envíes otro comprobante.</p>';return}
+ if(!hasPending){el.innerHTML='<p class="gx-b2-pay-explain">Estás al corriente.</p>';return}
  if(Q.proof==='correction'){
   el.innerHTML='<button type="button" class="btn gx-b2-secondary" id="gx-b2-action">Consultar observación</button>';
  }else{
@@ -150,8 +178,8 @@ function openDemo(){
  lastFocus=document.activeElement;
  $('gx-b2-modal-title').textContent=review?'Comprobante con observación':'Sube tu comprobante';
  $('gx-b2-modal-desc').textContent=review
-  ?'En este escenario debes corregir la evidencia antes de volver a reportarla. No se acreditó un pago.'
-  :'En producción elegirías una captura y el sistema la enviaría para validación, no para acreditación automática.';
+  ?'Revisa la observación y corrige tu comprobante. Aún no está aprobado.'
+  :'Adjunta tu comprobante para revisión. Se acredita al aprobarlo.';
  $('gx-b2-modal-amount').textContent=fx.money(current().total);
  $('gx-b2-demo-submit').hidden=review;
  dialog.hidden=false;dialog.classList.add('show');dialog.setAttribute('aria-hidden','false');
