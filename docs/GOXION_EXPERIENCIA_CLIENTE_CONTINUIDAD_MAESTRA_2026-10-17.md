@@ -94,3 +94,17 @@ Etapas globales: **E1 — claridad/autoservicio (1,3,5)**; **E2 — personalizac
 - Únicamente escenarios de evento importante simulado (revisión/observación/vencido/acuerdo) permiten reproducir el aviso; no inventar urgencias en «al corriente», «misión incompleta», «sin servicios» ni «pago futuro». En la futura oficial **solo eventos auténticos persistidos** pueden activar esto; no derivarlos del mero render, texto o recarga.
 - La campana y la hoja de ejemplo reutilizan \`gx-client-notif-*\` de Ayuda, sin backend, leído real ni envío. No sustituir el sistema de notificaciones. El laboratorio es flotante, oculto inicialmente, de modo que se puede evaluar la composición de Mi Espacio casi idéntica a Ayuda oficial.
 - La propuesta sigue pendiente de aceptación humana. Si el efecto compite con una acción de pago/revisión o se percibe redundante, reducirlo o suprimirlo en ese contexto.
+
+
+## 9. Corrección E1/B1 V4 solicitada tras probar el espejo (17/oct) · AÚN SIN APROBACIÓN
+**Feedback concreto del propietario:** le agrada el enfoque, pero el movimiento hacia notificaciones se percibe rudimentario, «Misión pendiente» parece no hacer nada, y las cápsulas de estados no están visibles. Se exige calidad visual coherente con Ayuda; puede consultarse React Bits, bot-avatars y Colorion para referencias, **sin instalar piezas genéricas ni copiar estética de Admin**.
+
+**Causas encontradas en V3:** la animación desplazaba un punto luminoso casi lineal; la beta deshabilitaba explícitamente el botón de aviso cuando el escenario era misión, a pesar de presentar tarjeta de progreso; y \`smart-demo.js\` escribía texto plano en \`#dash-badge\` en vez de generar las cápsulas nativas \`time-badge badge-*\` del cliente. Además, sustituyó la gamificación real por una tarjeta genérica \`gx-smart-mission\`.
+
+**V4 en beta, por validar en iPhone real:**
+- Vuelo de una **microcápsula GOXION** (no un punto luminoso), con trayectoria curva transformada, salida de la tarjeta, llegada a la campana con feedback/ringing nativo y limpieza completa. Respetar \`prefers-reduced-motion\`, scroll y cancelación al cambiar escenario.
+- Los estados de la tarjeta recuperan las **cápsulas originales** de Ayuda: \`badge-ok\`, \`badge-review\`, \`badge-today\`, \`badge-overdue\`; prórroga conserva \`gx-prorroga-state\`. No crear componentes nuevos para reemplazarlas.
+- «Misión pendiente» **no es una notificación prioritaria**: el control se convierte en «Ver misión pendiente», abre las tarjetas auténticas de gamificación \`gamification-grid/gx-gamif-card\` y su expansión \`gamif-expanded-container\`, con tareas sintéticas. No inventar cupones, completaciones o alertas; el pago sigue representándose donde corresponde. La beta conserva referidos como tarjeta vecina, como sucede en Ayuda.
+- Módulo de misión aislado en \`preview/experiencia-mi-espacio-inteligente/mission-mirror.js\`; no toca gamificación productiva ni backend. Este comportamiento **no aprueba automáticamente** los Gixys ni la siguiente etapa.
+
+**Para cerrar B1:** evaluar V4 como espejo completo en Safari iPhone, percepción del vuelo, legibilidad de estados, apertura/cierre de misiones, no reflow, no scroll horizontal y respeto de controles originales. Aprobación de este bloque ≠ autorización de publicación de paquete (Issue #142).
