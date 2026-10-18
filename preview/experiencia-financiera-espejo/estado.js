@@ -346,8 +346,12 @@ function setupHeaderMorph(){
   const moneyWidth=amount.getBoundingClientRect().width;
   const statusWidth=badge.getBoundingClientRect().width;
   const gap=10;
-  root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*p));
-  root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*p));
+  // Horizontal separation settles slightly BEFORE the vertical compression:
+  // at ~92% scroll the two labels share one row already, so delaying the
+  // separation until 100% creates a 1px collision on 280px devices.
+  const paired=Math.min(1,p*1.1);
+  root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*paired));
+  root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*paired));
   root.style.setProperty('--gx-rm-badge-top',px(90-81*p));
   root.style.setProperty('--gx-rm-amount-top',px(22-15*p));
   root.style.setProperty('--gx-rm-badge-max',(96-49*p).toFixed(2)+'%');
