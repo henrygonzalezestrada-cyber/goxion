@@ -1,0 +1,4 @@
+/* E1/B2: nothing changes in Ayuda's approved V6; state of account
+   stays in Index, reached via the existing original account capsule. */
+html[data-gx-b2-preview="true"] #gx-smart-container{overflow:visible}
+html[data-gx-b2-preview="true"] #dash-billing-card .gx-account-capsule{cursor:pointer}
