@@ -9,7 +9,8 @@ const official=readFileSync('ayuda.html','utf8');
 assert(!html.includes('id="gx-smart-focus"'),'Redundant priority card must not exist');
 assert(html.includes('id="gx-smart-notif-button"'),'Missing real Ayuda bell class');
 assert(html.includes('class="gx-client-notif-sheet"'),'Missing Ayuda notification sheet');
-assert(html.includes('src="./notice-demo.js?v=e1b1v3"'),'Missing isolated animation');
+assert(html.includes('src="./notice-demo.js?v=e1b1v4"'),'Missing isolated animation');
+assert(html.includes('src="./mission-mirror.js?v=e1b1v4"'),'Missing native mission mirror');
 assert(html.includes('id="gx-smart-toggle"'),'Missing mirror control');
 assert(html.includes('id="gx-smart-lab"')&&html.includes('hidden>'),'Lab must start collapsed');
 assert(html.includes('id="gx-smart-card-heading"'),'Missing contextual heading in original card');
@@ -71,7 +72,7 @@ async function exercise(name,engine){
    await page.route('**/fonts.googleapis.com/**',r=>r.abort());
    await page.route('**/fonts.gstatic.com/**',r=>r.abort());
    await page.goto(base,{waitUntil:'domcontentloaded'});
-   await page.waitForFunction(()=>window.GOXION_SMART_BETA?.isolated===true&&window.GOXION_SMART_NOTICE?.isolated===true,{timeout:5500});
+   await page.waitForFunction(()=>window.GOXION_SMART_BETA?.isolated===true&&window.GOXION_SMART_NOTICE?.isolated===true&&window.GOXION_SMART_MISSIONS?.isolated===true,{timeout:5500});
    assert(await page.locator('#gx-smart-lab').evaluate(el=>el.hidden),'La vista espejo debe iniciar limpia');
    assert.equal(await page.locator('#gx-smart-container #gx-smart-lab').count(),0,'Laboratorio no puede ocupar flujo Mi Espacio');
    assert.equal(await page.locator('#gx-smart-notif-button.gx-client-notif-launch').count(),1);
@@ -93,6 +94,12 @@ async function exercise(name,engine){
      assert.equal(await page.locator('#dash-date').textContent(),expect.hero);
     }
     if(expect.amount)assert((await page.locator('.gx-account-capsule-label').textContent()).includes(expect.amount));
+    if(key!=='new'){
+     assert.equal(await page.locator('#dash-badge .time-badge').count(),1,
+      name+' '+width+' '+key+': native Ayuda status capsule missing');
+    }
+    if(key==='review')assert.equal(await page.locator('#dash-badge .badge-review').count(),1);
+    if(key==='extension')assert.equal(await page.locator('#dash-badge .time-badge.badge-ok.gx-prorroga-state').count(),1);
     if(key==='multi'){
      const sched=await page.locator('.gx-smart-schedule__row').allTextContents();
      assert.equal(sched.length,2);assert(sched[0].includes('45')&&sched[1].includes('49'));
@@ -107,8 +114,19 @@ async function exercise(name,engine){
     }
     if(key==='extension')assert((await page.locator('.gx-smart-schedule').textContent()).includes('Pactado'));
     if(key==='mission'){
-     assert.equal(await page.locator('#gx-smart-mission-card').count(),1);
+     assert.equal(await page.locator('#gx-smart-mission-card.gx-gamif-card-mission').count(),1);
      assert.match(await page.locator('#gx-smart-mission-card').textContent(),/2 de 3/);
+     assert(await page.locator('#gx-smart-preview-alert').isEnabled(),'Mission must have meaningful action');
+     assert.equal(await page.locator('#gx-smart-preview-alert').textContent(),'Ver misión pendiente'); 
+     await page.locator('#gx-smart-preview-alert').click();
+     assert(!(await page.locator('#gamif-expanded-coupon').evaluate(el=>el.hidden)),
+      'Mission demo must open original Ayuda expanded section');
+     assert.equal(await page.locator('#gamif-expanded-coupon .mission-item').count(),3);
+     assert.equal(await page.locator('#gx-smart-notif-button.gx-has-new').count(),0,
+      'Pending mission must not fabricate urgent notification');
+     await page.locator('#gamif-expanded-coupon .btn-gamif-close').click();
+     assert(await page.locator('#gamif-grid').isVisible(),
+      'Original cards must be restored after mission closes');
      assert(!/misiones/i.test(await page.locator('#gx-smart-card-heading').textContent()),
        'No usar tarjeta financiera como recordatorio de misiones');
     }
@@ -129,8 +147,10 @@ async function exercise(name,engine){
    assert.equal(await page.locator('.gx-smart-notice-surface').count(),1,'Overlay must be inside original card');
    assert.equal(await page.locator('.gx-smart-notice-surface').evaluate(el=>el.parentElement.id),'dash-billing-card');
    assert.equal(await page.locator('#gx-smart-card-heading').textContent(),'ESTADO DE TU COMPROBANTE','Underlying state must persist');
-   await page.waitForTimeout(3800);
+   await page.waitForTimeout(4300);
    assert.equal(await page.locator('.gx-smart-notice-surface').count(),0,'Transient notice must clear');
+   assert.equal(await page.locator('.gx-smart-notice-flight').count(),0,'Travel capsule must be removed');
+   assert.equal(await page.locator('.gx-smart-notice-spark').count(),0,'No generic point trajectory');
    assert(await page.locator('#gx-smart-notif-button').evaluate(el=>el.classList.contains('gx-has-new')),'Notice must arrive at bell');
    const after=await page.locator('#dash-billing-card').boundingBox();
    assert(Math.abs(before.y-after.y)<1&&Math.abs(before.height-after.height)<1,
@@ -151,7 +171,7 @@ async function exercise(name,engine){
    assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B1: 6 widths x 9 synthetic customer states + notice → bell + sheet, no backend/overflow PASS');
+  console.log(name+' E1/B1: 6 widths x 9 states, native Ayuda capsules/missions + curved travel → bell PASS');
  }finally{await browser.close()}
 }
 try{await ready();await exercise('Chromium',chromium);await exercise('WebKit',webkit);console.log('E1/B1 BETA PASS');}

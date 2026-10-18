@@ -83,8 +83,17 @@ function render(key){
   onboard:'Sin servicios'
  };
  if(badge){
-  badge.textContent=badgeByCode[priority.code]||'Estado actualizado';
-  badge.classList.toggle('gx-smart-badge-alert',['correction','overdue'].includes(priority.code));
+  // Exact GOXION/Ayuda native capsules; do not flatten to bare text.
+  const badgeNative={
+   correction:'badge-overdue',overdue:'badge-overdue',review:'badge-review',
+   today:'badge-today',extension:'badge-ok',soon:'badge-ok',
+   mission:'badge-ok',clear:'badge-ok',onboard:'badge-ok'
+  };
+  const chip=el('span','time-badge '+(badgeNative[priority.code]||'badge-ok'),
+   badgeByCode[priority.code]||'Estado actualizado');
+  if(priority.code==='extension')chip.classList.add('gx-prorroga-state');
+  badge.replaceChildren(chip);
+  badge.classList.remove('gx-smart-badge-alert');
  }
  const detail=$('gx-smart-card-description');
  if(detail){
@@ -105,22 +114,9 @@ function render(key){
  stamp('loyalty-count','3/4 Pagos');
  const bar=$('loyalty-bar');if(bar)bar.style.width='75%';
  stamp('loyalty-msg','A un pago puntual del siguiente nivel. (Simulación)');
- const m=state.missions||{active:false,done:0,total:0};
- const ref=$('referral-section-container');
- if(ref){
-   ref.replaceChildren();
-   if(m.active){
-    const mission=el('div','gx-smart-mission');
-    mission.id='gx-smart-mission-card';
-    const label=el('span','gx-smart-mission__eyebrow','MISIONES GOXION');
-    const title=el('strong','',m.done>=m.total?'¡Completaste tus misiones!':'Tu progreso');
-    const detail=el('span','gx-smart-mission__counter',m.done+' de '+m.total+' completadas');
-    const progress=el('div','gx-smart-mission__progress');
-    const fill=el('span');fill.style.width=(100*m.done/m.total)+'%';progress.append(fill);
-    mission.append(label,title,detail,progress);
-    ref.append(mission);
-   }
- }
+ // The genuine Ayuda gamification surface is built by mission-mirror.js.
+ // No generic substitute, duplicate cards, or fake completion on this route.
+ $('referral-section-container')?.replaceChildren();
  const schedule=billing?.querySelector('.gx-smart-schedule')||el('div','gx-smart-schedule');
  schedule.replaceChildren();
  if(billing&&!schedule.isConnected)billing.append(schedule);

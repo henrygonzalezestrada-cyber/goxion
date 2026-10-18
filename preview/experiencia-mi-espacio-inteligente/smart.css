@@ -188,11 +188,35 @@ body.gx-smart-body #dash-billing-card{
  background:linear-gradient(90deg,rgba(124,77,255,.7),#00f2fe);box-shadow:0 0 9px rgba(0,242,254,.25)}
 .gx-smart-notice-visible .gx-smart-notice-track{animation:gx-notice-progress 2.8s linear forwards}
 @keyframes gx-notice-progress{to{width:100%}}
-.gx-smart-notice-spark{
- position:fixed;z-index:10015;width:9px;height:9px;border-radius:50%;
- background:#8eeefa;box-shadow:0 0 0 3px rgba(93,201,239,.17),0 0 18px #68d9e8;
- pointer-events:none;
+/* Source-to-destination morph: a small GOXION capsule, NOT a glowing dot.
+   Uses compositor transforms; never animates blur or layout. */
+.gx-smart-notice-flight{
+ position:fixed;z-index:10015;pointer-events:none;display:grid;place-items:center;
+ width:70px;height:29px;will-change:transform,opacity;
 }
+.gx-smart-notice-flight-core{
+ position:relative;width:66px;height:27px;display:grid;place-items:center;
+ border-radius:999px;
+ border:1px solid rgba(0,242,254,.48);
+ background:linear-gradient(125deg,rgba(49,32,96,.93),rgba(8,49,64,.96));
+ box-shadow:inset 0 1px 0 rgba(255,255,255,.15),0 5px 20px rgba(0,0,0,.25);
+}
+.gx-smart-notice-flight-mark{
+ display:block;width:14px;height:14px;border-radius:50%;
+ border:1.75px solid #a6eff7;box-sizing:border-box;
+ background:radial-gradient(circle,rgba(0,242,254,.22) 0 35%,transparent 36%);
+}
+.gx-smart-notice-flight-mark::after{
+ content:'';position:absolute;width:4px;height:4px;left:calc(50% - 2px);
+ top:calc(50% - 2px);border-radius:50%;background:#a6eff7;
+}
+body.gx-smart-body #gx-smart-notif-button{position:relative;overflow:visible}
+.gx-smart-notice-impact{
+ position:absolute;z-index:2;pointer-events:none;left:50%;top:50%;
+ width:42px;height:42px;border-radius:50%;
+ border:1px solid rgba(0,242,254,.57);box-shadow:0 0 8px rgba(0,242,254,.16);
+}
+
 body.gx-smart-body .gx-client-notif-sheet{font-family:Poppins,system-ui,sans-serif}
 body.gx-smart-body #gx-smart-notif-list .gx-client-notif-item{min-height:78px}
 @media(max-width:359px){
@@ -204,5 +228,46 @@ body.gx-smart-body #gx-smart-notif-list .gx-client-notif-item{min-height:78px}
 @media(prefers-reduced-motion:reduce){
  .gx-smart-notice-surface{transition:none!important;filter:none!important;transform:none!important}
  .gx-smart-notice-visible .gx-smart-notice-track{animation:none!important;width:100%}
- .gx-smart-notice-spark{display:none!important}
+ .gx-smart-notice-flight,.gx-smart-notice-impact{display:none!important}
+}
+
+
+/* V4 · Restored Ayuda's exact status capsules and native gamification.
+   The lab must not replace customer components with generic demo tiles. */
+body.gx-smart-body #dash-badge{min-height:28px;display:flex;justify-content:center;align-items:center}
+body.gx-smart-body #dash-badge .time-badge{font-weight:700;letter-spacing:0;line-height:1.3}
+body.gx-smart-body #dash-badge .gx-prorroga-state{font-weight:800}
+body.gx-smart-body #gamif-grid[hidden],
+body.gx-smart-body .gamif-expanded-container[hidden]{display:none!important}
+body.gx-smart-body .gamif-expanded-container:not([hidden]){display:block!important}
+body.gx-smart-body .gx-gamif-card{
+ cursor:pointer;font-family:Poppins,system-ui,sans-serif;width:100%;
+}
+body.gx-smart-body .gx-gamif-card:focus-visible,
+body.gx-smart-body .btn-gamif-close:focus-visible,
+body.gx-smart-body .gx-smart-mission-guide:focus-visible{
+ outline:2px solid var(--neon-blue);outline-offset:3px
+}
+.gx-smart-mission-cue{animation:gx-smart-cue 1.15s cubic-bezier(.2,.8,.2,1) 1 both}
+@keyframes gx-smart-cue{
+ 0%,100%{box-shadow:0 14px 34px rgba(0,0,0,.28)}
+ 50%{box-shadow:0 14px 34px rgba(0,0,0,.28),0 0 0 2px rgba(0,242,254,.22)}
+}
+.gx-smart-gamif-summary{text-align:center;margin:6px 0 21px;color:var(--text-main)}
+.gx-smart-gamif-summary .gx-gamif-shared-emoji{font-size:29px;margin:0 0 9px}
+.gx-smart-gamif-summary-title{display:block;font:800 16px/1.4 Poppins,system-ui,sans-serif}
+.gx-smart-gamif-summary-copy{font:400 11px/1.55 Poppins,system-ui,sans-serif;
+ color:var(--text-muted);margin:7px auto 12px!important;max-width:300px;text-align:center}
+.gx-smart-mission-row{cursor:default}
+.gx-smart-mission-row .gx-mission-text{flex:1;min-width:0}
+.gx-smart-mission-pending{font:700 9px/1.3 Poppins,system-ui,sans-serif;color:var(--neon-blue)}
+.gx-smart-mission-guide{
+ border:1px solid rgba(0,242,254,.28);border-radius:999px;width:100%;min-height:44px;
+ background:rgba(0,242,254,.09);color:#ddfaff;
+ font:700 11px/1.3 Poppins,system-ui,sans-serif;cursor:pointer;padding:10px 12px;
+ margin:14px 0 0;
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-smart-mission-cue{animation:none!important}
+ .gx-smart-notice-flight,.gx-smart-notice-impact{display:none!important}
 }
