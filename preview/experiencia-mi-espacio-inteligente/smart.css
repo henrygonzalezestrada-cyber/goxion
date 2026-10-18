@@ -188,18 +188,31 @@ body.gx-smart-body #dash-billing-card{
  background:linear-gradient(90deg,rgba(124,77,255,.7),#00f2fe);box-shadow:0 0 9px rgba(0,242,254,.25)}
 .gx-smart-notice-visible .gx-smart-notice-track{animation:gx-notice-progress 2.8s linear forwards}
 @keyframes gx-notice-progress{to{width:100%}}
-/* V5 · Optical handoff: a small moving ribbon of light, no token,
-   capsule, sphere, flying notification icon or generic neon projectile.
-   SVG lives outside the card; no box, resize, touch capture or reflow. */
+/* V6 · Silk/refraction motif: a living, tapered ribbon, not a vector line.
+   JS samples the curve and changes its silhouette on each animation frame.
+   Subtle two-layer glow, an internal highlight and no persistent ornament. */
 .gx-smart-notice-stream{
  position:fixed;top:0;left:0;z-index:10015;
- pointer-events:none;overflow:hidden;
- display:block;max-width:none!important;
- contain:strict;
+ pointer-events:none;overflow:hidden;display:block;max-width:none!important;
+ contain:layout paint;isolation:isolate;
 }
-.gx-smart-notice-stream path{
- fill:none;stroke-linecap:round;stroke-linejoin:round;
- will-change:stroke-dashoffset,opacity;
+.gx-smart-notice-stream path{pointer-events:none}
+.gx-smart-notice-stream-line{opacity:.96}
+.gx-smart-notice-stream-halo{opacity:.32}
+.gx-smart-notice-stream-sheen{opacity:.64;mix-blend-mode:screen}
+.gx-smart-notice-origin-bloom{
+ position:fixed;z-index:10014;width:105px;height:65px;
+ transform:translate(-50%,-50%) scale(.84);
+ pointer-events:none;border-radius:50%;
+ background:radial-gradient(ellipse at center,
+ rgba(194,173,255,.20) 0%,rgba(122,128,253,.085) 32%,transparent 70%);
+ filter:blur(6px);opacity:0;
+ animation:gx-smart-source-bloom .52s cubic-bezier(.15,.8,.2,1) both;
+}
+@keyframes gx-smart-source-bloom{
+ 0%{opacity:0;transform:translate(-50%,-50%) scale(.73)}
+ 26%{opacity:.78}
+ 100%{opacity:0;transform:translate(-50%,-50%) scale(1.32)}
 }
 body.gx-smart-body #gx-smart-notif-button{position:relative;overflow:visible}
 .gx-smart-notice-impact{
@@ -219,7 +232,7 @@ body.gx-smart-body #gx-smart-notif-list .gx-client-notif-item{min-height:78px}
 @media(prefers-reduced-motion:reduce){
  .gx-smart-notice-surface{transition:none!important;filter:none!important;transform:none!important}
  .gx-smart-notice-visible .gx-smart-notice-track{animation:none!important;width:100%}
- .gx-smart-notice-stream,.gx-smart-notice-impact{display:none!important}
+ .gx-smart-notice-stream,.gx-smart-notice-impact,.gx-smart-notice-origin-bloom{display:none!important}
 }
 
 
@@ -260,5 +273,5 @@ body.gx-smart-body .gx-smart-mission-guide:focus-visible{
 }
 @media(prefers-reduced-motion:reduce){
  .gx-smart-mission-cue{animation:none!important}
- .gx-smart-notice-stream,.gx-smart-notice-impact{display:none!important}
+ .gx-smart-notice-stream,.gx-smart-notice-impact,.gx-smart-notice-origin-bloom{display:none!important}
 }
