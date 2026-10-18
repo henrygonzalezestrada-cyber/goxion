@@ -341,10 +341,11 @@ function setupHeaderMorph(){
   // and the status on the RIGHT. Measure actual content to avoid oversized
   // empty space on wide screens or overlap on a 280px iPhone viewport.
   const amount=$('gx-b2-hero-amount'),badge=$('gx-b2-hero-badge');
-  const font=parseFloat(getComputedStyle(amount).fontSize)||52;
-  const moneyWidth=Math.min(w*.46,amount.scrollWidth*(26/font));
-  const statusWidth=Math.min(w*.455,badge.scrollWidth);
-  const gap=w<245?8:11;
+  // Read the true post-layout border boxes; scrollWidth can underreport
+  // the absolutely-positioned amount when WebKit clamps max-content.
+  const moneyWidth=amount.getBoundingClientRect().width;
+  const statusWidth=badge.getBoundingClientRect().width;
+  const gap=10;
   root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*p));
   root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*p));
   root.style.setProperty('--gx-rm-badge-top',px(90-81*p));
