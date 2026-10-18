@@ -164,12 +164,15 @@ async function exercise(name,engine){
     'Motion layer must not affect card layout');
    const skin=page.locator('.gx-smart-notice-stream-line');
    const d=await skin.getAttribute('d');
-   assert(/^M .* L .* Z$/.test(d),'Organic ribbon must have a filled, tapered silhouette');
+   assert(/^M .* L .* Z$/.test(d),'Organic ribbon must have a filled, tapered silhouette; got '+JSON.stringify(d?.slice(0,120)));
    assert.equal(await page.locator('.gx-smart-notice-stream-sheen').count(),1,
     'Ribbon should include a restrained internal highlight');
    assert.equal(await page.locator('.gx-smart-notice-flight,.gx-smart-notice-spark').count(),0,
     'No flying capsules or generic dots');
-   await page.waitForTimeout(100);
+   await page.waitForFunction(previous=>{
+    const current=document.querySelector('.gx-smart-notice-stream-line')?.getAttribute('d');
+    return Boolean(current)&&current!==previous;
+   },d,{timeout:700});
    const d2=await skin.getAttribute('d');
    assert.notEqual(d,d2,'Ribbon geometry must evolve every frame instead of sliding a fixed line');
    await page.waitForTimeout(1390);
