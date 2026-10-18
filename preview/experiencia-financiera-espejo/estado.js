@@ -104,25 +104,27 @@ function breakdown(){
   (fx.total(fx.pending(Q))!==total?line('Total pendiente del período',fx.money(fx.total(fx.pending(Q)))):'');
 }
 function proof(){
- const Q=quote(),panel=$('gx-b2-proof');
- const phase=Q.proof;
+ const Q=quote(),panel=$('gx-b2-proof'),phase=Q.proof;
  panel.hidden=!phase;
  if(!phase)return;
- const copy=phase==='review'
-  ?{label:'RECIBIDO · EN REVISIÓN',title:'Ya tenemos tu comprobante',
-    message:'Está pendiente de validación. Reportarlo no significa que el pago esté acreditado. No necesitas enviarlo otra vez.'}
-  :phase==='correction'
-  ?{label:'REQUIERE CORRECCIÓN',title:'Se detectó una observación',
-    message:'El comprobante aún no se acredita. Revisa el movimiento y corrige los datos señalados antes de reenviar.'}
-  :{label:'APROBADO',title:'Pago validado',
-    message:'El abono del primer servicio se aplicó en este ejemplo. El siguiente servicio conserva su fecha y saldo independientes.'};
- panel.innerHTML='<small class="gx-b2-proof-eyebrow">'+copy.label+'</small>'+
-  '<strong class="gx-b2-proof-title">'+copy.title+'</strong>'+
-  '<p>'+copy.message+'</p>'+
-  '<div class="gx-b2-proof-track">'+
-   '<span class="is-done">Recibido</span><span class="'+(phase==='review'?'is-current':'is-done')+'">Revisión</span>'+
-   '<span class="'+(phase==='approved'?'is-done':phase==='correction'?'is-current':'')+'">'+
-   (phase==='correction'?'Corregir':'Validación')+'</span></div>';
+ const states={
+  review:{eyebrow:'COMPROBANTE RECIBIDO',title:'En revisión',detail:'Ya lo recibimos. No necesitas enviarlo otra vez.',pct:56,tone:'review'},
+  correction:{eyebrow:'ATENCIÓN NECESARIA',title:'Requiere corrección',detail:'Revisa la observación para continuar.',pct:56,tone:'correction'},
+  approved:{eyebrow:'PAGO CONFIRMADO',title:'Pago validado',detail:'El siguiente servicio conserva su fecha.',pct:100,tone:'approved'}
+ };
+ const c=states[phase];
+ panel.className='glass-card gx-b2-proof gx-b2-proof--'+c.tone;
+ panel.innerHTML='<div class="gx-b2-proof-heading"><span class="gx-b2-proof-symbol" aria-hidden="true">'+
+  (phase==='approved'?'✓':phase==='correction'?'!':'↗')+'</span>'+
+  '<span class="gx-b2-proof-heading-copy"><small class="gx-b2-proof-eyebrow">'+c.eyebrow+'</small>'+
+  '<strong class="gx-b2-proof-title">'+c.title+'</strong></span></div>'+
+  '<div class="gx-b2-proof-progress" role="progressbar" aria-label="Progreso del comprobante" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+c.pct+'">'+
+  '<span class="gx-b2-proof-progress-fill" style="--gx-b2-progress:'+c.pct+'%"></span></div>'+
+  '<div class="gx-b2-proof-steps" aria-hidden="true"><span class="is-complete">Recibido</span>'+
+  '<span class="'+(phase==='approved'?'is-complete':'is-active')+'">Revisión</span>'+
+  '<span class="'+(phase==='approved'?'is-complete':phase==='correction'?'is-alert':'')+'">'+
+  (phase==='correction'?'Corregir':'Validado')+'</span></div>'+
+  '<p class="gx-b2-proof-hint">'+c.detail+'</p>';
 }
 function actions(){
  const Q=quote(),el=$('gx-b2-actions'),hasPending=fx.pending(Q).length>0;
