@@ -13,6 +13,9 @@ assert(ayuda.includes('data-gx-smart-beta="true" data-gx-b2-preview="true"'));
 assert(ayuda.includes('../experiencia-mi-espacio-inteligente/smart.css?v=e1b1v6'));
 assert(ayuda.includes('src="./ayuda-b2.js?v=e1b2v2"'));
 assert(index.includes('../../assets/css/index.css'));
+assert(index.includes('animate-ui-native.bundle.js?v=e1b2r5v1'));
+assert(index.includes('data-gx-animate-ui="native-r5"'));
+assert(!/cdn.jsdelivr|esm.sh|unpkg.com/i.test(index),'No external React runtime/CDN');
 assert(index.includes('class="sticky-area"')&&index.includes('class="balance-hero"'));
 assert(index.includes('class="glass-card services-container"'));
 assert(!/supabase|clientes\.json|discord|X-Client-Token/i.test(index));
@@ -41,18 +44,28 @@ async function run(name,engine){
     'Ayuda should use the FIRST obligation, not whole period');
    await page.locator('#dash-billing-card .gx-account-capsule').click();
    await page.waitForURL('**/experiencia-financiera-espejo/estado.html?escenario=multi',{timeout:5000});
-   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.isolated,{timeout:5000});
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.isolated&&window.GOXION_ANIMATEUI_NATIVE?.actualReactComponents,{timeout:7000});
+   await page.locator('#gx-b2-loyalty-mark .gx-aui-loyalty-orbit').waitFor({timeout:4000});
    assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00');
    assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$45.00');
    assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuenow'),'3');
    assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuemax'),'4');
-   assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-r4-loyalty-ring')
-     .evaluate(el=>el.style.getPropertyValue('--gx-r4-loyalty-fill')),'75');
+   assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-aui-loyalty-orbit').count(),1);
+   assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-aui-loyalty-star svg').count(),1,
+    'Real Animate UI animated Star must mount');
+   assert.equal(await page.evaluate(()=>window.GOXION_ANIMATEUI_NATIVE.version),'2.0.0');
    assert.equal(await page.locator('.card-info').evaluate(el=>getComputedStyle(el).borderTopWidth),'1px');
-   assert(await page.locator('.card-info').evaluate(el=>getComputedStyle(el).backgroundImage.includes('linear-gradient')),
-    'The native identity / folio card must regain its premium glass surface');
-   assert(await page.locator('#gx-b2-breakdown').evaluate(el=>getComputedStyle(el).backgroundImage.includes('linear-gradient')),
-    'The ledger must regain its readable premium glass surface');
+   assert.equal(await page.locator('.card-info')
+    .evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(8, 8, 12, 0.25)',
+    'Identity glass should reuse exact neutral Ayuda value, not a blue gradient');
+   assert.equal(await page.locator('#gx-b2-breakdown')
+    .evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(8, 8, 12, 0.25)',
+    'Ledger glass should reuse exact neutral Ayuda value');
+   assert(await page.locator('.card-info')
+    .evaluate(el=>getComputedStyle(el).backdropFilter.includes('blur(10px)')),
+    'Glass must refract content underneath through actual backdrop-filter');
+   assert.equal(await page.locator('#gx-b2-services')
+    .evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(8, 8, 12, 0.25)');
 
    assert.equal(await page.locator('#gx-b2-calendar-body').evaluate(el=>el.hidden),true);
    await page.locator('#gx-b2-calendar-toggle').click();
@@ -133,32 +146,25 @@ async function run(name,engine){
      assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$94.00');
     }
     if(scenario==='review'){
-     assert((await page.locator('#gx-b2-proof').innerText()).includes('No lo envíes de nuevo.'));
-     assert.equal(await page.locator('#gx-b2-progress-bar').count(),0);
-     assert.equal(await page.locator('.gx-b2-progress-steps .gx-b2-progress-step').count(),3);
-     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill')
-      .evaluate(el=>el.getAttribute('d').includes('C')&&el.getAttribute('d').includes('S')),true,
-      'Premium route must be curved, not a generic straight bar');
-     assert.equal(await page.locator('#gx-b2-proof .gx-r4-station-shell').count(),3);
-     assert.equal(await page.locator('#gx-b2-action').count(),0,
-      'Do not ask customer to pay again when already reviewing');
-     assert.equal((await page.locator('#gx-b2-actions').textContent()).trim(),'',
-      'Do not repeat review status under timeline');
+     await page.locator('#gx-b2-proof .gx-aui-proof-review').waitFor({timeout:5000});
+     assert.match(await page.locator('#gx-b2-proof').innerText(),/No lo envíes de nuevo/i);
+     assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-track').count(),1);
+     assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-indicator').count(),1);
+     assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-labels span').count(),3);
+     assert.equal(await page.locator('#gx-b2-proof .gx-aui-proof-icon svg').count(),1);
+     assert.equal(await page.locator('#gx-b2-proof .gx-r4-station-shell').count(),0,
+      'No old custom SVG/handmade milestone stations');
+     assert.equal(await page.locator('#gx-b2-action').count(),0);
+     assert.equal((await page.locator('#gx-b2-actions').textContent()).trim(),'');
      assert(await page.locator('#gx-b2-proof').evaluate(el=>el.nextElementSibling?.classList.contains('card-info')),
-      'Tracker must appear near balance, not after all ledger cards');
-     assert(await page.locator('#gx-b2-proof').evaluate(el=>getComputedStyle(el).backgroundColor==='rgba(0, 0, 0, 0)'),
-      'Tracker should read as part of page, not one more glass card');
-
+      'Proof experience must sit under hero');
+     assert.equal(await page.locator('#gx-b2-proof').evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(0, 0, 0, 0)');
     }
     if(scenario==='correction'){
-     assert.match(await page.locator('#gx-b2-proof').textContent(),/Revisa la observación/i);
+     await page.locator('#gx-b2-proof .gx-aui-proof-correction').waitFor({timeout:5000});
+     assert.match(await page.locator('#gx-b2-proof').innerText(),/Revisa los datos/i);
      assert.equal(await page.locator('#gx-b2-proof').getAttribute('data-phase'),'correction');
-     assert.equal(await page.locator('.gx-b2-progress-step.is-action').count(),1);
-     assert.equal(await page.locator('.gx-b2-progress-fill')
-      .evaluate(el=>el.style.getPropertyValue('--gx-r4-journey-end')),'50');
-     assert.equal(await page.locator('#gx-b2-proof .gx-r4-journey-rail').count(),0);
-     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill')
-      .evaluate(el=>el.tagName.toLowerCase()),'path');
+     assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-indicator').count(),1);
      assert.equal(await page.locator('#gx-b2-action').textContent(),'Consultar observación');
     }
     if(scenario==='extension'){
@@ -166,12 +172,12 @@ async function run(name,engine){
      assert.equal(await page.locator('#gx-b2-breakdown .surcharge-line').count(),0);
     }
     if(scenario==='first_paid'){
+     await page.locator('#gx-b2-proof .gx-aui-proof-approved').waitFor({timeout:5000});
      assert.match(await page.locator('#gx-b2-services').textContent(),/Liquidado/);
-     assert.match(await page.locator('#gx-b2-proof').textContent(),/Pago validado/);
+     assert.match(await page.locator('#gx-b2-proof').textContent(),/Comprobante validado/);
      assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuenow'),'1');
      assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuemax'),'2');
-     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill')
-      .evaluate(el=>el.style.getPropertyValue('--gx-r4-journey-end')),'100');
+     assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-indicator').count(),1);
     }
     if(scenario==='partial'){
      assert.match(await page.locator('#gx-b2-breakdown').textContent(),/Abono ya aprobado/);
@@ -180,8 +186,10 @@ async function run(name,engine){
     if(scenario==='overdue'){
      assert.match(await page.locator('#gx-b2-breakdown').textContent(),/\$2\.25/);
      assert.equal(await page.locator('#gx-b2-loyalty-panel').getAttribute('data-loyalty-state'),'lost');
-     assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-r4-heart').count(),1);
-     assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-r4-loyalty-ring').count(),0);
+     await page.locator('#gx-b2-loyalty-mark .gx-aui-heart-crack svg').waitFor({timeout:4000});
+     assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-aui-heart-crack svg').count(),1);
+     assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-aui-loyalty-orbit').count(),0,
+      'Broken heart must have no loyalty ring');
      assert.match(await page.locator('#gx-b2-loyalty-panel').textContent(),/Racha reiniciada/i);
     }
     if(scenario==='unavailable'){
@@ -207,14 +215,14 @@ async function run(name,engine){
    await page.locator('#gx-b2-demo-submit').click();
    assert.equal(await page.locator('#gx-b2-demo-modal').evaluate(el=>el.hidden),true);
    assert.equal(await page.locator('#gx-b2-hero-badge').textContent(),'En revisión');
-   assert.equal(await page.locator('.gx-b2-progress-step.is-done').count(),1);
-   assert.equal(await page.locator('.gx-b2-progress-step.is-current').count(),1);
+   await page.locator('#gx-b2-proof .gx-aui-proof-review').waitFor({timeout:5000});
+   assert.equal(await page.locator('.gx-aui-progress-labels span').count(),3);
    assert.equal(await page.locator('#gx-b2-action').count(),0);
    assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage)),[]);
    assert.deepEqual(leaks,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B2 R4 · 7 widths × 12 states; compact amount left, milestone journey, restored cards and loyalty PASS');
+  console.log(name+' E1/B2 R5 · 7 widths × 12 states; Animate UI native, Ayuda glass, scroll morph and financial invariants PASS');
  }finally{await browser.close()}
 }
 try{await ready();await run('Chromium',chromium);await run('WebKit',webkit);console.log('E1/B2 BETA PASS')}
