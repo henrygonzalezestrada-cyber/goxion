@@ -259,8 +259,16 @@ function setupHeaderMorph(){
   const p=value,w=Math.max(200,hero.clientWidth||240);
   root.style.setProperty('--gx-rm-hero-h',px(130-87*p));
   root.style.setProperty('--gx-rm-amount-size',px(52-26*p));
-  root.style.setProperty('--gx-rm-amount-shift',px(w*.225*p));
-  root.style.setProperty('--gx-rm-badge-shift',px(-w*.245*p));
+  // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
+  // and the status on the RIGHT. Measure actual content to avoid oversized
+  // empty space on wide screens or overlap on a 280px iPhone viewport.
+  const amount=$('gx-b2-hero-amount'),badge=$('gx-b2-hero-badge');
+  const font=parseFloat(getComputedStyle(amount).fontSize)||52;
+  const moneyWidth=Math.min(w*.46,amount.scrollWidth*(26/font));
+  const statusWidth=Math.min(w*.455,badge.scrollWidth);
+  const gap=w<245?8:11;
+  root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*p));
+  root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*p));
   root.style.setProperty('--gx-rm-badge-top',px(90-81*p));
   root.style.setProperty('--gx-rm-amount-top',px(22-15*p));
   root.style.setProperty('--gx-rm-badge-max',(96-49*p).toFixed(2)+'%');
