@@ -7,6 +7,12 @@ on:
     paths:
       - 'preview/experiencia-mi-espacio-inteligente/**'
       - '.github/workflows/goxion-experiencia-e1-b1.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'preview/experiencia-mi-espacio-inteligente/**'
+      - '.github/workflows/goxion-experiencia-e1-b1.yml'
   workflow_dispatch:
 concurrency:
   group: gx-e1-b1-${{ github.ref }}
@@ -33,7 +39,7 @@ jobs:
       - name: Verify priority decisions and responsive, isolated demo
         run: node preview/experiencia-mi-espacio-inteligente/check.mjs
       - name: Publish checked preview only (never official)
-        if: success()
+        if: success() && github.event_name == 'push'
         shell: bash
         run: |
           git fetch -q origin "$GITHUB_REF_NAME"
