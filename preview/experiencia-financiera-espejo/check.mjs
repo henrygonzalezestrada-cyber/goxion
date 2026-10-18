@@ -110,6 +110,8 @@ async function run(name,engine){
     assert(rect.full<=rect.vw+2,name+' '+width+' '+scenario+' horizontal overflow '+rect.full+'/'+rect.vw);
    }
    await page.selectOption('#gx-b2-scenario','upcoming');
+   await page.locator('#gx-b2-lab-toggle').click(); // Close floating QA overlay before customer action.
+   assert(await page.locator('#gx-b2-lab').evaluate(el=>el.hidden));
    await page.locator('#gx-b2-action').click();
    assert.equal(await page.locator('#gx-b2-demo-modal').evaluate(el=>el.hidden),false);
    await page.locator('#gx-b2-demo-submit').click();
