@@ -330,7 +330,7 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
 function setupHeaderMorph(){
  const root=document.documentElement,hero=$('gx-b2-hero');
  const reduced=matchMedia('(prefers-reduced-motion:reduce)');
- let value=0,goal=0,frame=0;
+ let value=0,goal=0,frame=0,watchdog=0;
  const clamp=n=>Math.max(0,Math.min(1,n));
  const px=n=>Math.round(n)+'px';
  function paint(){
@@ -364,17 +364,33 @@ function setupHeaderMorph(){
   root.style.setProperty('--gx-rm-progress',p.toFixed(3));
   root.dataset.gxRmCompact=String(p>.95);
  }
+ // Safari can defer rAF during scroll-to-top. An independently scheduled
+ // watchdog runs the SAME damped frame only when rAF has not fired. It does
+ // not alter timing on normal 60/120Hz displays and is cancelled at rest.
+ function schedule(){
+  if(frame)cancelAnimationFrame(frame);
+  clearTimeout(watchdog);
+  frame=requestAnimationFrame(tick);
+  watchdog=window.setTimeout(()=>{
+   if(frame)cancelAnimationFrame(frame);
+   frame=0;watchdog=0;tick();
+  },62);
+ }
  function tick(){
   frame=0;
   value+= (goal-value)*.23;
   if(Math.abs(goal-value)<.003)value=goal;
   paint();
-  if(value!==goal)frame=requestAnimationFrame(tick);
+  if(value!==goal)schedule();
+  else{clearTimeout(watchdog);watchdog=0}
  }
  function request(){
   goal=clamp(window.scrollY/172);
-  if(reduced.matches){cancelAnimationFrame(frame);frame=0;value=goal;paint();return}
-  if(!frame)frame=requestAnimationFrame(tick);
+  if(reduced.matches){
+   cancelAnimationFrame(frame);clearTimeout(watchdog);
+   frame=0;watchdog=0;value=goal;paint();return;
+  }
+  if(!frame&&!watchdog)schedule();
  }
  window.addEventListener('scroll',request,{passive:true});
  window.addEventListener('resize',()=>{paint();request()},{passive:true});
