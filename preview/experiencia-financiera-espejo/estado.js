@@ -61,8 +61,6 @@ function hero(){
  badgeNode.className='time-badge '+cls;
  badgeNode.title=badge;
  $('gx-b2-period').textContent=Q.period+' · Ejemplo';
- $('gx-b2-loyalty').textContent=active().some(c=>c.loyalty>0)?
-  'Lealtad incluida en el importe.':'Beneficios incluidos en el saldo.';
  $('gx-b2-back').href='./index.html?escenario='+encodeURIComponent(
   Object.hasOwn(fx.mapping,key)?key:key==='first_paid'||key==='partial'||key==='same_day'?'multi':'upcoming');
 }
@@ -177,6 +175,64 @@ function proof(){
    '<div class="gx-b2-progress-steps">'+stages+'</div></div>'+
   '<p class="gx-b2-proof-caption">'+copy.message+'</p>';
 }
+/* Loyalty is rendered only from EXPLICIT, synthetic visual metadata.
+ * Neither money owed nor number of services says how many punctual payments
+ * a real client has made. Official UI must use trusted engine state.
+ */
+function loyalty(){
+ const Q=quote(),panel=$('gx-b2-loyalty-panel');
+ const mark=$('gx-b2-loyalty-mark'),title=$('gx-b2-loyalty-title');
+ const caption=$('gx-b2-loyalty-caption'),description=$('gx-b2-loyalty');
+ const state=Q.trusted&&Q.cargos.length?Q.loyaltyDemo:null;
+ panel.hidden=!state;
+ if(!state){mark.innerHTML='';return}
+ const lost=state.state==='lost';
+ const signature=lost?'lost':state.count+'/'+state.target;
+ const changed=panel.dataset.loyaltySignature!==signature;
+ panel.dataset.loyaltySignature=signature;
+ panel.dataset.loyaltyState=lost?'lost':'active';
+ panel.setAttribute('aria-label',lost?'Racha de lealtad reiniciada':'Racha de pagos puntuales simulada');
+ if(lost){
+  title.textContent='RACHA REINICIADA';
+  caption.textContent='Tu lealtad perdió su avance';
+  description.textContent=state.reason;
+  mark.setAttribute('role','img');
+  mark.setAttribute('aria-label','Corazón roto: racha reiniciada');
+  for(const k of ['aria-valuemin','aria-valuemax','aria-valuenow'])mark.removeAttribute(k);
+  if(changed)mark.innerHTML=
+   '<svg class="gx-r4-heart" viewBox="0 0 100 100" aria-hidden="true">'+
+   '<defs><linearGradient id="gx-r4-heart-shade" x1="0" y1="0" x2="1" y2="1">'+
+   '<stop offset="0" stop-color="#ff8f9d"/><stop offset="1" stop-color="#ad315d"/></linearGradient></defs>'+
+   '<path d="M47 78C35 68 16 54 16 36c0-13 10-21 21-21 6 0 12 3 15 8l-10 17 12 8-10 18 3 12Z" fill="url(#gx-r4-heart-shade)"/>'+
+   '<path d="M53 78C66 68 84 54 84 36c0-13-10-21-21-21-5 0-9 2-12 5l8 19-10 10 8 13-4 16Z" fill="url(#gx-r4-heart-shade)"/>'+
+   '<path d="M50 23 42 40 54 49 44 66" fill="none" stroke="#0b0b17" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return;
+ }
+ const n=state.count,m=state.target,percent=Math.round(100*n/m);
+ title.textContent='TU LEALTAD';
+ caption.textContent=n+' de '+m+' pagos puntuales';
+ description.textContent='Racha ilustrativa · siguiente beneficio';
+ mark.setAttribute('role','progressbar');
+ mark.setAttribute('aria-label','Racha de ejemplo: '+n+' de '+m+' pagos puntuales');
+ mark.setAttribute('aria-valuemin','0');
+ mark.setAttribute('aria-valuemax',String(m));
+ mark.setAttribute('aria-valuenow',String(n));
+ if(!changed)return;
+ mark.innerHTML=
+  '<svg class="gx-r4-loyalty-orbit" viewBox="0 0 100 100" aria-hidden="true">'+
+  '<defs><linearGradient id="gx-r4-star-light" x1=".12" y1=".06" x2=".84" y2="1">'+
+  '<stop offset="0" stop-color="#fdf8d2"/><stop offset=".40" stop-color="#f8c86f"/>'+
+  '<stop offset="1" stop-color="#d79037"/></linearGradient>'+
+  '<linearGradient id="gx-r4-loyalty-trace" x1="0" y1="0" x2="1" y2="1">'+
+  '<stop offset="0" stop-color="#6e68f5"/><stop offset=".45" stop-color="#b29dff"/>'+
+  '<stop offset="1" stop-color="#ffe2a2"/></linearGradient></defs>'+
+  '<circle cx="50" cy="50" r="41" class="gx-r4-loyalty-back"/>'+
+  '<circle cx="50" cy="50" r="41" class="gx-r4-loyalty-ring" pathLength="100" style="--gx-r4-loyalty-fill:'+percent+'"/>'+
+  '<circle cx="50" cy="50" r="30" class="gx-r4-star-field"/>'+
+  '<path d="M50 25.7 57.6 41.8 75.3 44.4 62.7 56.8 65.6 74.4 50 66.1 34.4 74.4 37.3 56.8 24.7 44.4 42.4 41.8Z" class="gx-r4-loyalty-star"/>'+
+  '<path d="M46.5 39.5 50 32 53.5 39.5" class="gx-r4-star-glint"/></svg>';
+}
+
 function actions(){
  const Q=quote(),el=$('gx-b2-actions'),hasPending=fx.pending(Q).length>0;
  if(!Q.trusted){el.innerHTML='<p class="gx-b2-pay-explain">Saldo sin confirmar. Pago bloqueado.</p>';return}
@@ -193,7 +249,7 @@ function actions(){
  $('gx-b2-action')?.addEventListener('click',()=>openDemo());
 }
 function refresh(){
- hero();services();calendar();breakdown();proof();actions();
+ hero();services();calendar();breakdown();proof();loyalty();actions();
  $('gx-b2-scenario').value=key;
 }
 function openDemo(){
