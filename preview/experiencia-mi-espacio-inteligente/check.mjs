@@ -147,10 +147,23 @@ async function exercise(name,engine){
    assert.equal(await page.locator('.gx-smart-notice-surface').count(),1,'Overlay must be inside original card');
    assert.equal(await page.locator('.gx-smart-notice-surface').evaluate(el=>el.parentElement.id),'dash-billing-card');
    assert.equal(await page.locator('#gx-smart-card-heading').textContent(),'ESTADO DE TU COMPROBANTE','Underlying state must persist');
-   await page.waitForTimeout(4300);
+   await page.waitForTimeout(3130);
+   // New motion exists ONLY while the event travels; it is a curved, two-layer
+   // signal path, not a floating capsule/dot. Its source and destination are in
+   // viewport coordinates, and it never inserts an element into the dashboard.
+   const signal=page.locator('.gx-smart-notice-stream');
+   assert.equal(await signal.count(),1,'Notice needs a transient optical path');
+   assert.equal(await page.locator('.gx-smart-notice-stream-line').count(),1);
+   assert.equal(await page.locator('.gx-smart-notice-stream-halo').count(),1);
+   assert.equal(await signal.evaluate(el=>el.parentElement.tagName),'BODY',
+    'Motion layer must not affect card layout');
+   const d=await page.locator('.gx-smart-notice-stream-line').getAttribute('d');
+   assert(/^M .* C /.test(d),'Flight must follow a cubic Bézier, not a straight line');
+   assert.equal(await page.locator('.gx-smart-notice-flight,.gx-smart-notice-spark').count(),0,
+    'No flying capsules or generic dots');
+   await page.waitForTimeout(1390);
    assert.equal(await page.locator('.gx-smart-notice-surface').count(),0,'Transient notice must clear');
-   assert.equal(await page.locator('.gx-smart-notice-flight').count(),0,'Travel capsule must be removed');
-   assert.equal(await page.locator('.gx-smart-notice-spark').count(),0,'No generic point trajectory');
+   assert.equal(await signal.count(),0,'Signal layer must be removed after delivery');
    assert(await page.locator('#gx-smart-notif-button').evaluate(el=>el.classList.contains('gx-has-new')),'Notice must arrive at bell');
    const after=await page.locator('#dash-billing-card').boundingBox();
    assert(Math.abs(before.y-after.y)<1&&Math.abs(before.height-after.height)<1,
@@ -171,7 +184,7 @@ async function exercise(name,engine){
    assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B1: 6 widths x 9 states, native Ayuda capsules/missions + curved travel → bell PASS');
+  console.log(name+' E1/B1: 6 widths x 9 states, native Ayuda capsules/missions + optical stream → bell PASS');
  }finally{await browser.close()}
 }
 try{await ready();await exercise('Chromium',chromium);await exercise('WebKit',webkit);console.log('E1/B1 BETA PASS');}
