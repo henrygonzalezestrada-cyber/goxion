@@ -23,3 +23,15 @@ Escenarios: pago sencillo, fechas distintas, vencimiento compartido, primer serv
 - Comprobar: primera cuota no confunde con total, segunda obligación aparece al liquidar primera, estado de comprobante se entiende, saldo no verificado bloquea, prórroga no presenta mora inventada.
 - QA automatizada Chromium/WebKit y ausencia de efectos secundarios. **La prueba de navegador no equivale a aceptación de calidad visual en el iPhone real.**
 - La beta puede ajustarse y cerrarse visualmente sin lanzar producción. El Issue #142 conserva el embargo de despliegue conjunto de todas las mejoras hasta instrucción final expresa.
+
+
+## Revisión E1/B2 · V2 · Feedback 18/oct/2026
+El propietario probó la primera beta, confirmó que **todo funciona**, pero **NO aprobó el bloque** por textos excesivos que dan sensación de maqueta genérica. Solicitó animaciones con sentido, como barras de progreso. Mantener importes, estados, rutas y cálculos ficticios actuales; mejorar solo comunicación visual. **No reabrir E1/B1 V6, ya aprobado.**
+
+En V2:
+- Estado del comprobante compacto con línea/timeline de tres etapas (recibido → revisión → aprobación). En revisión, la barra solo avanza hasta la etapa actual: **no promete ni simula aprobación**. Observado mantiene la etapa de corrección destacada con ámbar, sin marcarla completada. Aprobado solo cuando el escenario está realmente validado. Barras representan etapas de revisión, no duración o probabilidad.
+- Mensajes cortos: recibido «Ya lo tenemos. No lo envíes de nuevo.»; observado «Revisa el comprobante para continuar.»; aprobado «Este pago ya se aplicó. Tu siguiente fecha sigue vigente.» La jerarquía comunica con tipografía y animación breve, evitando párrafos artificiales.
+- Un indicador de servicios liquidados aparece **solo** cuando existe al menos uno pagado y otro pendiente. Numerador/denominador exactos: p.ej. 1 de 2. No confundir con porcentaje de pago parcial ni con lealtad. No se crea tarjeta extra.
+- Recursos de preview versionados en e1b2v2, transparencia de demo intacta, reduced motion, sin tocar index.css ni el Index real, backend ni datos de clientes.
+
+**Criterios de QA nuevos:** se comprueban las tres etapas, la distinción revisión/corrección/aprobación, el contador 1/2, imports fiables, laboratorios ocultos y ausencia de llamadas privadas. Aún requiere prueba/aceptación visual del propietario en iPhone; únicamente tras su aceptación se cerrará E1/B2.
