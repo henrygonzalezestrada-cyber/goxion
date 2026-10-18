@@ -765,3 +765,185 @@ html[data-gx-index-remaster="r3"] #gx-b2-loyalty-panel[data-loyalty-state="lost"
   animation:none!important;
  }
 }
+
+
+/* =============================================================
+   R5 · ACTUAL Animate UI 2 + Motion React island
+   No hand-drawn milestone/heart/star. The UI layout follows the
+   component's original React/Motion behavior, not CSS recreations.
+   Neutral Ayuda opacity values, scoped to this B2 preview only.
+   ============================================================= */
+html[data-gx-animate-ui="native-r5"] .card-info,
+html[data-gx-animate-ui="native-r5"] #gx-b2-breakdown,
+html[data-gx-animate-ui="native-r5"] #gx-b2-services{
+ background:rgba(8,8,12,.25)!important; /* exact Ayuda --card-glass */
+ border:1px solid rgba(255,255,255,.08)!important;
+ border-radius:20px!important;
+ box-shadow:0 10px 30px rgba(0,0,0,.4)!important;
+ backdrop-filter:blur(10px)!important;
+ -webkit-backdrop-filter:blur(10px)!important;
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-breakdown{
+ padding:19px 17px 17px!important;
+}
+html[data-gx-animate-ui="native-r5"] .card-info{
+ padding:16px 18px!important;
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-services{
+ padding:6px 15px!important;
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-sticky{
+ margin-bottom:var(--gx-rm-header-bottom)!important;
+ padding: max(var(--gx-rm-header-pad),env(safe-area-inset-top,0px)) 20px 5px!important;
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-sticky .header{
+ margin-bottom:var(--gx-rm-header-gap)!important;
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-main-content{padding-top:1px!important}
+html[data-gx-animate-ui="native-r5"] #gx-b2-hero .total-amount{font-variant-numeric:tabular-nums}
+
+/* Animate UI's original icon components + the original animated Progress
+   primitive. No separate box enclosing individual states. */
+html[data-gx-animate-ui="native-r5"] #gx-b2-proof{
+ padding:2px 2px 18px!important;
+ border:0!important;border-radius:0!important;
+ border-bottom:1px solid rgba(255,255,255,.10)!important;
+ background:transparent!important;
+ box-shadow:none!important;
+ backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
+ animation:none!important;
+ margin:0 0 18px!important;
+ overflow:visible;
+}
+.gx-aui-proof{
+ --gx-aui-status:#b9acf9;
+ --gx-aui-status-glow:rgba(170,141,255,.23);
+ display:flex;flex-direction:column;gap:14px;
+ min-width:0;
+}
+.gx-aui-proof-correction{
+ --gx-aui-status:#e6b47f;
+ --gx-aui-status-glow:rgba(226,151,90,.18);
+}
+.gx-aui-proof-approved{
+ --gx-aui-status:#82e2c6;
+ --gx-aui-status-glow:rgba(105,235,192,.17);
+}
+.gx-aui-proof-head{
+ display:flex;align-items:center;gap:13px;min-width:0;
+}
+.gx-aui-proof-icon{
+ width:41px;height:41px;flex:0 0 41px;
+ color:var(--gx-aui-status);
+ display:grid;place-items:center;
+ filter:drop-shadow(0 0 11px var(--gx-aui-status-glow));
+}
+.gx-aui-proof-icon svg{
+ width:29px;height:29px;
+ fill:none;
+ stroke-linecap:round;
+ stroke-linejoin:round;
+}
+.gx-aui-proof-words{
+ display:flex;min-width:0;flex-direction:column;
+ gap:3px;
+}
+.gx-aui-proof-eyebrow{
+ color:#9eacc6;
+ font-size:9px;letter-spacing:1.4px;font-weight:700;
+}
+.gx-aui-proof-name{
+ color:#f2f2f6;font-size:13px;font-weight:700;line-height:1.38;
+}
+.gx-aui-proof-hint{
+ color:#aab4c7;font-size:10.5px;line-height:1.52;
+}
+.gx-aui-progress{
+ width:100%;
+ display:block;
+}
+.gx-aui-progress-track{
+ position:relative;display:block;height:5px;width:100%;
+ background:rgba(255,255,255,.10);
+ border-radius:999px;overflow:hidden;
+ box-shadow:inset 0 1px 2px rgba(0,0,0,.15);
+}
+.gx-aui-progress-indicator{
+ position:relative;display:block;height:100%;
+ background:linear-gradient(90deg,#7863cb 0%,var(--gx-aui-status) 92%);
+ border-radius:inherit;
+ box-shadow:0 0 9px var(--gx-aui-status-glow);
+}
+.gx-aui-progress-labels{
+ display:flex;justify-content:space-between;align-items:center;
+ gap:5px;color:rgba(155,172,196,.64);
+ font-size:9px;letter-spacing:.05em;font-weight:550;
+}
+.gx-aui-progress-labels span.is-reached{color:#d4d2ee}
+.gx-aui-progress-labels span.is-attention{color:#ebb784}
+@media(max-width:320px){
+ .gx-aui-proof-head{gap:10px}
+ .gx-aui-progress-labels{font-size:8px}
+}
+/* Star is upstream Animate UI icon (not an invented 5-point SVG).
+   Ring is a Motion circle, with spring 100/30 as Animate UI Progress. */
+.gx-aui-loyalty-jewel{
+ position:relative;
+ width:77px;height:77px;
+ display:grid;place-items:center;
+ isolation:isolate;
+}
+.gx-aui-loyalty-orbit{
+ position:absolute;inset:0;width:100%;height:100%;
+ overflow:visible;
+ transform:rotate(-90deg);
+}
+.gx-aui-loyalty-back,
+.gx-aui-loyalty-fill{
+ fill:none;stroke-width:3.5;
+}
+.gx-aui-loyalty-back{stroke:rgba(205,192,244,.15)}
+.gx-aui-loyalty-fill{
+ stroke:#a895e6;
+ stroke-linecap:round;
+ filter:drop-shadow(0 0 2px rgba(189,158,241,.3));
+}
+.gx-aui-loyalty-star{
+ position:relative;
+ color:#f0cc86;
+ display:grid;place-items:center;
+ filter:drop-shadow(0 0 8px rgba(222,167,102,.16));
+}
+.gx-aui-loyalty-star svg{
+ stroke-width:1.65;stroke-linejoin:round;
+}
+.gx-aui-heart-crack{
+ display:grid;place-items:center;
+ color:#cb8996;
+ filter:drop-shadow(0 0 5px rgba(222,119,147,.11));
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-loyalty-panel{
+ background:transparent!important;
+ border:0!important;
+ border-bottom:1px solid rgba(255,255,255,.08)!important;
+ border-radius:0!important;
+ box-shadow:none!important;
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-loyalty-panel[hidden]{display:none!important}
+html[data-gx-animate-ui="native-r5"] #gx-b2-loyalty-mark{
+ width:77px;height:77px;flex-basis:77px;
+}
+html[data-gx-animate-ui="native-r5"] #gx-b2-loyalty-mark::before{
+ display:none;
+}
+@media(max-width:320px){
+ html[data-gx-animate-ui="native-r5"] #gx-b2-loyalty-mark{
+  width:69px;height:69px;flex-basis:69px;
+ }
+ .gx-aui-loyalty-jewel{width:69px;height:69px}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-aui-proof,.gx-aui-loyalty-jewel,.gx-aui-heart-crack{
+  transition:none!important;animation:none!important;
+ }
+}

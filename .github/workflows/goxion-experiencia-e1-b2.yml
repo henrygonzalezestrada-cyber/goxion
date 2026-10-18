@@ -6,7 +6,7 @@ on:
       - 'preview/experiencia-financiera-espejo/**'
       - '.github/workflows/goxion-experiencia-e1-b2.yml'
   push:
-    branches: [beta/e1b2-claridad-financiera-espejo-20261018]
+    branches: [beta/e1b2-claridad-financiera-espejo-20261018, beta/e1b2-index-animate-ui-native-20261018]
     paths:
       - 'preview/experiencia-financiera-espejo/**'
       - '.github/workflows/goxion-experiencia-e1-b2.yml'
@@ -19,7 +19,7 @@ permissions:
 jobs:
   financial-mirror:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
         with:
@@ -27,8 +27,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - name: Install browser runner
-        run: npm install --no-save --no-package-lock playwright
+      - name: Install browser runner + genuine Animate UI v2 dependencies
+        run: npm install --no-save --no-package-lock --ignore-scripts playwright react@19 react-dom@19 motion@14 @animate-ui/react@2.0.0 @base-ui/react@1.8.0 lucide-react esbuild@0.25
+      - name: Build self-contained Animate UI island (no external runtime CDN)
+        run: npx esbuild preview/experiencia-financiera-espejo/animate-ui-native.entry.jsx --bundle --format=iife --platform=browser --target=es2020 --minify --outfile=preview/experiencia-financiera-espejo/animate-ui-native.bundle.js
       - name: Regenerate Ayuda original mirror
         run: node preview/experiencia-mi-espacio-inteligente/build.mjs
       - name: Regenerate E1 B2 Ayuda mirror from approved B1
@@ -46,7 +48,7 @@ jobs:
             echo "A newer beta commit exists; refusing stale build"
             exit 0
           fi
-          git add preview/experiencia-financiera-espejo/index.html
+          git add preview/experiencia-financiera-espejo/index.html preview/experiencia-financiera-espejo/animate-ui-native.bundle.js
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

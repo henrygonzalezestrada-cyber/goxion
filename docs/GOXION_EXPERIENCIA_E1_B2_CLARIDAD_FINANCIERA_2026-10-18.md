@@ -70,3 +70,20 @@ El propietario aprobó la dirección visual R1–R3 y **el morph del importe**; 
 ### Resguardos de alcance
 - Solo archivos dentro de preview/experiencia-financiera-espejo/ y esta nota. **Index, Ayuda, Admin, Supabase, endpoints financieros, pagos, comprobantes reales y Goxy/Gixys no se tocan**.
 - El Bloque 2 permanece **PENDIENTE DE OK DEL PROPIETARIO** sobre esta beta R4; B1 V6 sigue aprobado. Sin despliegue global hasta Issue #142 y autorización expresa.
+
+## R5 — segunda revisión visual del remaster · 18/oct/2026
+Propietario: el morph funciona y gusta, pero señala aire entre «Estado de cuenta» y el contenido, dos tarjetas con tinte azul incorrecto, recorrido de estados de pago insatisfactorio y estrella/corazón poco profesionales; pidió investigar animate-ui.com y **usar los componentes reales sin imitarlos**.
+
+### Auditoría de referencias y compatibilidad
+- Animate UI: https://animate-ui.com/docs ; componentes originales React 19 + Motion, copiados desde el registro de icons v2 `imskyleen/animate-ui` en `apps/v2/registry/icons/{star,clock,circle-check,circle-x,file-check}/index.tsx` sin cambios. Componentes montados en isla independiente dentro de una página vanilla. *No copiar visualmente un icono CSS inventado.*
+- Progreso: usar el **Progress.Root/Track/Indicator real** de `@animate-ui/react/primitives/base-ui/progress` con transiciones spring de su API y estados semánticos de la cotización; revisión 2/3 ≠ porcentaje de aprobación. No usar nodos curvos/estaciones dibujadas propias.
+- Lealtad: `Star` original Animate UI animado con Motion y anillo vectorial Motion asociado a avances *explícitos* ficticios; cuando hay pérdida mostrar `HeartCrack` genuino de lucide-react (porque Animate UI no tiene ese icono en su catálogo), sin dibujarlo a mano ni usar emoji. El ícono de pérdida no representa porcentaje.
+- Licencia original MIT + Commons Clause y procedencia están en `preview/experiencia-financiera-espejo/animate-ui-src/NOTICE.md`; no redistribuir módulos como componentes individuales vendibles, solo embebidos en esta web.
+- Index NO es React: se mantiene la página base `assets/css/index.css` y su `estado.js` vanilla, y solo se monta `animate-ui-native.bundle.js` compilado para las dos secciones visibles. Bundle independiente, autopublicado, sin CDN de React o peticiones externas ni migración de negocio a React.
+- Cristal de Ayuda AUTÉNTICO: `assets/css/ayuda.css` define `--card-glass: rgba(8,8,12,.25)` + `backdrop-filter: blur(10px)` + `border:1px solid rgba(255,255,255,.08)` + sombra `0 10px 30px rgba(0,0,0,.4)` + radio `20px`. Solo se trasladan esas variables a las tarjetas de identidad, servicios y desglose; la transparencia produce interacción con las luces del fondo a través del blur, NO se aplica un tinte azul ni se copia toda la hoja de Ayuda.
+- Encabezado: mantener el morph R3–R4 aprobado, pero reducir alto expandido y separación entre título/importe/resto en su mismo DOM; no hacer una nueva barra flotante.
+
+### Integración y QA
+- No tocar Index oficial, Ayuda oficial, motor de pagos B2, Supabase, credenciales ni datos personales. Las cifras son fixtures sintéticos conciliados en centavos; su racha es metadato de ejemplo, no inferencia financiera.
+- El workflow de beta instala React/Motion/@animate-ui/react, compila la isla **autocontenida** y comprueba 7 anchos × 12 estados en Chromium/WebKit antes de guardar el bundle como recurso estático. No se publica una beta sin pasar las dos suites.
+- Bloque 1 V6 aprobado; Bloque 2 **aún pendiente de aprobación visual**. Esta es una nueva iteración específica de R4, no una fase funcional o un cambio de negocio. No activar oficial hasta autorización final (Issue #142).
