@@ -40,6 +40,27 @@ const cases={
  new:{...common,title:'Sin servicios',cargos:[]},
  unavailable:{...common,title:'Saldo no confirmado',trusted:false,cargos:[]}
 };
+/* Visual-only loyalty milestones: deliberately explicit test fixtures.
+ * NEVER derive a streak from amounts, number of platforms or paid invoices;
+ * official UI must use an authorized loyalty state or hide the widget. */
+const loyaltyExamples=Object.freeze({
+ upcoming:{count:2,target:4},multi:{count:3,target:4},
+ same_day:{count:3,target:4},review:{count:3,target:4},
+ correction:{count:3,target:4},partial:{count:2,target:4},
+ extension:{count:7,target:9},first_paid:{count:5,target:9},
+ clear:{count:4,target:9},mission:{count:1,target:4},
+ overdue:{state:'lost',reason:'Racha reiniciada por incumplimiento de la fecha de pago.'}
+});
+for(const [key,value] of Object.entries(loyaltyExamples)){
+ if(value.state==='lost'){
+  if(typeof value.reason!=='string')throw new Error('Missing loss explanation');
+ }else if(!Number.isInteger(value.count)||!Number.isInteger(value.target)||
+   ![4,9].includes(value.target)||value.count<0||value.count>value.target){
+  throw new Error('Invalid synthetic loyalty fixture: '+key);
+ }
+ cases[key].loyaltyDemo=Object.freeze(value);
+}
+
 const mapping=Object.freeze({upcoming:'upcoming',multi:'multi',review:'review',
  correction:'correction',overdue:'overdue',extension:'extension',
  mission:'mission',clear:'clear',new:'new'});

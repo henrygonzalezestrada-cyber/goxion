@@ -44,6 +44,16 @@ async function run(name,engine){
    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.isolated,{timeout:5000});
    assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00');
    assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$45.00');
+   assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuenow'),'3');
+   assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuemax'),'4');
+   assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-r4-loyalty-ring')
+     .evaluate(el=>el.style.getPropertyValue('--gx-r4-loyalty-fill')),'75');
+   assert.equal(await page.locator('.card-info').evaluate(el=>getComputedStyle(el).borderTopWidth),'1px');
+   assert(await page.locator('.card-info').evaluate(el=>getComputedStyle(el).backgroundImage.includes('linear-gradient')),
+    'The native identity / folio card must regain its premium glass surface');
+   assert(await page.locator('#gx-b2-breakdown').evaluate(el=>getComputedStyle(el).backgroundImage.includes('linear-gradient')),
+    'The ledger must regain its readable premium glass surface');
+
    assert.equal(await page.locator('#gx-b2-calendar-body').evaluate(el=>el.hidden),true);
    await page.locator('#gx-b2-calendar-toggle').click();
    assert.equal(await page.locator('#gx-b2-calendar-row').count(),0);
@@ -81,7 +91,14 @@ async function run(name,engine){
    });
    assert(collapsed.font<expanded.font-17,name+' '+width+' amount did not morph');
    assert(collapsed.height<expanded.height-70,name+' '+width+' sticky height did not compress');
-   assert(collapsed.badgeCenter<collapsed.amountCenter,name+' '+width+' badge did not move left');
+   
+   assert(collapsed.amountCenter<collapsed.badgeCenter,
+    name+' '+width+' amount must sit LEFT of the badge');
+   assert(collapsed.badgeLeft>=collapsed.amountRight+2,
+    name+' '+width+' compact badge should not overlap the amount. Geometry: '+
+     JSON.stringify({expanded,collapsed}));
+   assert(collapsed.badgeCenter-collapsed.amountCenter<Math.min(165,collapsed.vw*.64),
+    name+' '+width+' compact amount/status split too far apart');
    assert(collapsed.badgeLeft>=-2&&collapsed.amountRight<=collapsed.vw+2,
     name+' '+width+' collapsed header overflows horizontally');
    assert(Math.abs(collapsed.stickyTop)<4,name+' '+width+' sticky header left viewport');
@@ -119,7 +136,10 @@ async function run(name,engine){
      assert((await page.locator('#gx-b2-proof').innerText()).includes('No lo envíes de nuevo.'));
      assert.equal(await page.locator('#gx-b2-progress-bar').count(),0);
      assert.equal(await page.locator('.gx-b2-progress-steps .gx-b2-progress-step').count(),3);
-     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill').evaluate(el=>getComputedStyle(el).width!=='0px'),true);
+     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill')
+      .evaluate(el=>el.getAttribute('d').includes('C')&&el.getAttribute('d').includes('S')),true,
+      'Premium route must be curved, not a generic straight bar');
+     assert.equal(await page.locator('#gx-b2-proof .gx-r4-station-shell').count(),3);
      assert.equal(await page.locator('#gx-b2-action').count(),0,
       'Do not ask customer to pay again when already reviewing');
      assert.equal((await page.locator('#gx-b2-actions').textContent()).trim(),'',
@@ -131,10 +151,14 @@ async function run(name,engine){
 
     }
     if(scenario==='correction'){
-     assert.match(await page.locator('#gx-b2-proof').textContent(),/Revisa el comprobante/i);
+     assert.match(await page.locator('#gx-b2-proof').textContent(),/Revisa la observación/i);
      assert.equal(await page.locator('#gx-b2-proof').getAttribute('data-phase'),'correction');
      assert.equal(await page.locator('.gx-b2-progress-step.is-action').count(),1);
-     assert.equal(await page.locator('.gx-b2-progress-fill').getAttribute('style'),'--gx-b2-progress:50%');
+     assert.equal(await page.locator('.gx-b2-progress-fill')
+      .evaluate(el=>el.style.getPropertyValue('--gx-r4-journey-end')),'50');
+     assert.equal(await page.locator('#gx-b2-proof .gx-r4-journey-rail').count(),0);
+     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill')
+      .evaluate(el=>el.tagName.toLowerCase()),'path');
      assert.equal(await page.locator('#gx-b2-action').textContent(),'Consultar observación');
     }
     if(scenario==='extension'){
@@ -146,18 +170,32 @@ async function run(name,engine){
      assert.match(await page.locator('#gx-b2-proof').textContent(),/Pago validado/);
      assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuenow'),'1');
      assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuemax'),'2');
-     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill').getAttribute('style'),'--gx-b2-progress:100%');
+     assert.equal(await page.locator('#gx-b2-proof .gx-b2-progress-fill')
+      .evaluate(el=>el.style.getPropertyValue('--gx-r4-journey-end')),'100');
     }
     if(scenario==='partial'){
      assert.match(await page.locator('#gx-b2-breakdown').textContent(),/Abono ya aprobado/);
      assert.match(await page.locator('#gx-b2-breakdown').textContent(),/\$20\.00/);
     }
-    if(scenario==='overdue')assert.match(await page.locator('#gx-b2-breakdown').textContent(),/\$2\.25/);
+    if(scenario==='overdue'){
+     assert.match(await page.locator('#gx-b2-breakdown').textContent(),/\$2\.25/);
+     assert.equal(await page.locator('#gx-b2-loyalty-panel').getAttribute('data-loyalty-state'),'lost');
+     assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-r4-heart').count(),1);
+     assert.equal(await page.locator('#gx-b2-loyalty-mark .gx-r4-loyalty-ring').count(),0);
+     assert.match(await page.locator('#gx-b2-loyalty-panel').textContent(),/Racha reiniciada/i);
+    }
     if(scenario==='unavailable'){
      assert.equal(await page.locator('#gx-b2-action').count(),0);
      assert.match(await page.locator('#gx-b2-actions').textContent(),/bloqueado/);
+     assert.equal(await page.locator('#gx-b2-loyalty-panel').evaluate(el=>el.hidden),true,
+      'Never fabricate a loyalty streak without trusted state');
     }
     if(['clear','new'].includes(scenario))assert.equal(await page.locator('#gx-b2-action').count(),0);
+    if(scenario==='new')assert.equal(await page.locator('#gx-b2-loyalty-panel').evaluate(el=>el.hidden),true);
+    if(scenario==='extension'){
+     assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuenow'),'7');
+     assert.equal(await page.locator('#gx-b2-loyalty-mark').getAttribute('aria-valuemax'),'9');
+    }
     const rect=await page.evaluate(()=>({vw:document.documentElement.clientWidth,full:document.documentElement.scrollWidth}));
     assert(rect.full<=rect.vw+2,name+' '+width+' '+scenario+' horizontal overflow '+rect.full+'/'+rect.vw);
    }
@@ -176,7 +214,7 @@ async function run(name,engine){
    assert.deepEqual(leaks,[]);assert.deepEqual(errors,[]);
    await page.close();
   }
-  console.log(name+' E1/B2 R3 · 7 widths × 12 states; scroll morph, ledger, approvals and backend isolation PASS');
+  console.log(name+' E1/B2 R4 · 7 widths × 12 states; compact amount left, milestone journey, restored cards and loyalty PASS');
  }finally{await browser.close()}
 }
 try{await ready();await run('Chromium',chromium);await run('WebKit',webkit);console.log('E1/B2 BETA PASS')}

@@ -61,8 +61,6 @@ function hero(){
  badgeNode.className='time-badge '+cls;
  badgeNode.title=badge;
  $('gx-b2-period').textContent=Q.period+' · Ejemplo';
- $('gx-b2-loyalty').textContent=active().some(c=>c.loyalty>0)?
-  'Lealtad incluida en el importe.':'Beneficios incluidos en el saldo.';
  $('gx-b2-back').href='./index.html?escenario='+encodeURIComponent(
   Object.hasOwn(fx.mapping,key)?key:key==='first_paid'||key==='partial'||key==='same_day'?'multi':'upcoming');
 }
@@ -143,40 +141,120 @@ function breakdown(){
  * The HERO owns the status; this area only shows the event timeline.
  * Stages are milestones, never a percentage of approval probability.
  */
+/* A sculpted luminous route with real semantic stops — NOT elapsed-time
+ * progress or a probability of approval. Current status belongs only in hero.
+ * No duplicate large card, redundant notification or second CTA.
+ */
 function proof(){
  const Q=quote(),panel=$('gx-b2-proof'),phase=Q.proof;
  panel.hidden=!phase;
- if(!phase){panel.innerHTML='';return}
+ if(!phase){panel.innerHTML='';panel.removeAttribute('data-phase');return}
+ if(panel.dataset.phase===phase&&panel.querySelector('.gx-r4-journey'))return;
  const states={
-  review:{label:'Seguimiento del comprobante',title:'',
-   message:'Ya lo tenemos. No lo envíes de nuevo.',
-   fill:'50%',steps:['Recibido','Revisión','Aprobación']},
-  correction:{label:'Seguimiento del comprobante',title:'',
-   message:'Revisa el comprobante para continuar.',
-   fill:'50%',steps:['Recibido','Revisión','Corregir']},
-  approved:{label:'Pago validado',title:'Pago validado',
-   message:'Este pago ya se aplicó; la siguiente fecha sigue vigente.',
-   fill:'100%',steps:['Recibido','Revisado','Aprobado']}
+  review:{message:'Ya lo recibimos. No lo envíes de nuevo.',
+   fill:50,steps:['Recibido','Revisión','Aprobación']},
+  correction:{message:'Revisa la observación para continuar.',
+   fill:50,steps:['Recibido','Revisado','Corregir']},
+  approved:{message:'Pago aplicado; próximo vencimiento sin cambios.',
+   fill:100,steps:['Recibido','Revisado','Aprobado']}
  };
  const copy=states[phase];if(!copy){panel.hidden=true;return}
+ const symbol=(index)=>{
+  const content=index===0
+   ?'<path d="M6.4 3.6h11.2v16.8l-2.7-1.9-2.9 1.9-2.9-1.9-2.7 1.9z"/><path d="M9.2 9h5.6M9.2 12.7h4.2"/>'
+   :index===1
+   ?'<path d="M4.5 9V5.5H8M16 5.5h3.5V9M19.5 15v3.5H16M8 18.5H4.5V15"/><circle cx="12" cy="12" r="2.6"/>'
+   :phase==='correction'
+   ?'<path d="M12 4 21 20H3L12 4Z"/><path d="M12 10v4M12 17v.1"/>'
+   :'<path d="m5.5 12.5 4.5 4.3 8.7-9.6"/>';
+  return '<svg viewBox="0 0 24 24" class="gx-r4-station-symbol" aria-hidden="true">'+content+'</svg>';
+ };
  const stages=copy.steps.map((label,i)=>{
   const state=phase==='approved'?'is-done':
    phase==='review'?(i===0?'is-done':i===1?'is-current':''):
    (i<2?'is-done':i===2?'is-action':'');
-  return '<span class="gx-b2-progress-step '+state+'"><span class="gx-b2-progress-dot" aria-hidden="true"></span>'+
-   '<span>'+label+'</span></span>';
+  return '<span class="gx-b2-progress-step '+state+'" data-station="'+i+'">'+
+   '<span class="gx-r4-station-shell">'+symbol(i)+'</span>'+
+   '<span class="gx-r4-station-label">'+label+'</span></span>';
  }).join('');
  panel.dataset.phase=phase;
- panel.setAttribute('aria-label',copy.label);
- panel.innerHTML=(copy.title?'<div class="gx-b2-proof-done-line">'+
-   '<span class="gx-b2-proof-symbol" aria-hidden="true">✓</span>'+
-   '<strong class="gx-b2-proof-title">'+copy.title+'</strong></div>':'')+
-  '<div class="gx-b2-proof-track" role="group" aria-label="Etapas del comprobante">'+
-   '<div class="gx-b2-progress-rail" aria-hidden="true">'+
-   '<span class="gx-b2-progress-fill" style="--gx-b2-progress:'+copy.fill+'"></span></div>'+
+ panel.setAttribute('aria-label','Recorrido del comprobante');
+ // The path bends subtly between stations. The illuminated section ends
+ // at the current milestone, and never reaches approval prematurely.
+ const curve='M100 29 C171 29 190 10 300 29 S429 29 500 29';
+ panel.innerHTML=
+  '<div class="gx-r4-journey"><div class="gx-r4-journey-heading">'+
+   '<span>'+(phase==='approved'?'Pago validado':'RECORRIDO DE TU PAGO')+'</span>'+
+   '<span class="gx-r4-journey-mark" aria-hidden="true"><i></i><i></i><i></i></span></div>'+
+   '<div class="gx-b2-proof-track" role="group" aria-label="Etapas de recepción y validación">'+
+   '<svg class="gx-b2-progress-rail" viewBox="0 0 600 65" preserveAspectRatio="none" aria-hidden="true">'+
+   '<defs><linearGradient id="gx-r4-route-gradient" x1="0%" y1="50%" x2="100%" y2="50%">'+
+   '<stop offset="0%" stop-color="#8a74fa"/><stop offset="52%" stop-color="#b8a8ff"/>'+
+   '<stop offset="100%" stop-color="'+(phase==='correction'?'#efb773':phase==='approved'?'#72f1c7':'#7bdbf4')+'"/></linearGradient></defs>'+
+   '<path class="gx-r4-route-back" d="'+curve+'"/>'+
+   '<path class="gx-r4-route-halo" d="'+curve+'" pathLength="100" style="--gx-r4-journey-end:'+copy.fill+'"/>'+
+   '<path class="gx-b2-progress-fill" d="'+curve+'" pathLength="100" style="--gx-b2-progress:'+copy.fill+'%;--gx-r4-journey-end:'+copy.fill+'"/></svg>'+
    '<div class="gx-b2-progress-steps">'+stages+'</div></div>'+
-  '<p class="gx-b2-proof-caption">'+copy.message+'</p>';
+   '<p class="gx-b2-proof-caption">'+copy.message+'</p></div>';
 }
+/* Loyalty is rendered only from EXPLICIT, synthetic visual metadata.
+ * Neither money owed nor number of services says how many punctual payments
+ * a real client has made. Official UI must use trusted engine state.
+ */
+function loyalty(){
+ const Q=quote(),panel=$('gx-b2-loyalty-panel');
+ const mark=$('gx-b2-loyalty-mark'),title=$('gx-b2-loyalty-title');
+ const caption=$('gx-b2-loyalty-caption'),description=$('gx-b2-loyalty');
+ const state=Q.trusted&&Q.cargos.length?Q.loyaltyDemo:null;
+ panel.hidden=!state;
+ if(!state){mark.innerHTML='';return}
+ const lost=state.state==='lost';
+ const signature=lost?'lost':state.count+'/'+state.target;
+ const changed=panel.dataset.loyaltySignature!==signature;
+ panel.dataset.loyaltySignature=signature;
+ panel.dataset.loyaltyState=lost?'lost':'active';
+ panel.setAttribute('aria-label',lost?'Racha de lealtad reiniciada':'Racha de pagos puntuales simulada');
+ if(lost){
+  title.textContent='RACHA REINICIADA';
+  caption.textContent='Tu lealtad perdió su avance';
+  description.textContent=state.reason;
+  mark.setAttribute('role','img');
+  mark.setAttribute('aria-label','Corazón roto: racha reiniciada');
+  for(const k of ['aria-valuemin','aria-valuemax','aria-valuenow'])mark.removeAttribute(k);
+  if(changed)mark.innerHTML=
+   '<svg class="gx-r4-heart" viewBox="0 0 100 100" aria-hidden="true">'+
+   '<defs><linearGradient id="gx-r4-heart-shade" x1="0" y1="0" x2="1" y2="1">'+
+   '<stop offset="0" stop-color="#ff8f9d"/><stop offset="1" stop-color="#ad315d"/></linearGradient></defs>'+
+   '<path d="M47 78C35 68 16 54 16 36c0-13 10-21 21-21 6 0 12 3 15 8l-10 17 12 8-10 18 3 12Z" fill="url(#gx-r4-heart-shade)"/>'+
+   '<path d="M53 78C66 68 84 54 84 36c0-13-10-21-21-21-5 0-9 2-12 5l8 19-10 10 8 13-4 16Z" fill="url(#gx-r4-heart-shade)"/>'+
+   '<path d="M50 23 42 40 54 49 44 66" fill="none" stroke="#0b0b17" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return;
+ }
+ const n=state.count,m=state.target,percent=Math.round(100*n/m);
+ title.textContent='TU LEALTAD';
+ caption.textContent=n+' de '+m+' pagos puntuales';
+ description.textContent='Racha ilustrativa · siguiente beneficio';
+ mark.setAttribute('role','progressbar');
+ mark.setAttribute('aria-label','Racha de ejemplo: '+n+' de '+m+' pagos puntuales');
+ mark.setAttribute('aria-valuemin','0');
+ mark.setAttribute('aria-valuemax',String(m));
+ mark.setAttribute('aria-valuenow',String(n));
+ if(!changed)return;
+ mark.innerHTML=
+  '<svg class="gx-r4-loyalty-orbit" viewBox="0 0 100 100" aria-hidden="true">'+
+  '<defs><linearGradient id="gx-r4-star-light" x1=".12" y1=".06" x2=".84" y2="1">'+
+  '<stop offset="0" stop-color="#fdf8d2"/><stop offset=".40" stop-color="#f8c86f"/>'+
+  '<stop offset="1" stop-color="#d79037"/></linearGradient>'+
+  '<linearGradient id="gx-r4-loyalty-trace" x1="0" y1="0" x2="1" y2="1">'+
+  '<stop offset="0" stop-color="#6e68f5"/><stop offset=".45" stop-color="#b29dff"/>'+
+  '<stop offset="1" stop-color="#ffe2a2"/></linearGradient></defs>'+
+  '<circle cx="50" cy="50" r="41" class="gx-r4-loyalty-back"/>'+
+  '<circle cx="50" cy="50" r="41" class="gx-r4-loyalty-ring" pathLength="100" style="--gx-r4-loyalty-fill:'+percent+'"/>'+
+  '<circle cx="50" cy="50" r="30" class="gx-r4-star-field"/>'+
+  '<path d="M50 25.7 57.6 41.8 75.3 44.4 62.7 56.8 65.6 74.4 50 66.1 34.4 74.4 37.3 56.8 24.7 44.4 42.4 41.8Z" class="gx-r4-loyalty-star"/>'+
+  '<path d="M46.5 39.5 50 32 53.5 39.5" class="gx-r4-star-glint"/></svg>';
+}
+
 function actions(){
  const Q=quote(),el=$('gx-b2-actions'),hasPending=fx.pending(Q).length>0;
  if(!Q.trusted){el.innerHTML='<p class="gx-b2-pay-explain">Saldo sin confirmar. Pago bloqueado.</p>';return}
@@ -193,7 +271,7 @@ function actions(){
  $('gx-b2-action')?.addEventListener('click',()=>openDemo());
 }
 function refresh(){
- hero();services();calendar();breakdown();proof();actions();
+ hero();services();calendar();breakdown();proof();loyalty();actions();
  $('gx-b2-scenario').value=key;
 }
 function openDemo(){
@@ -252,15 +330,28 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
 function setupHeaderMorph(){
  const root=document.documentElement,hero=$('gx-b2-hero');
  const reduced=matchMedia('(prefers-reduced-motion:reduce)');
- let value=0,goal=0,frame=0;
+ let value=0,goal=0,frame=0,watchdog=0;
  const clamp=n=>Math.max(0,Math.min(1,n));
  const px=n=>Math.round(n)+'px';
  function paint(){
   const p=value,w=Math.max(200,hero.clientWidth||240);
   root.style.setProperty('--gx-rm-hero-h',px(130-87*p));
   root.style.setProperty('--gx-rm-amount-size',px(52-26*p));
-  root.style.setProperty('--gx-rm-amount-shift',px(w*.225*p));
-  root.style.setProperty('--gx-rm-badge-shift',px(-w*.245*p));
+  // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
+  // and the status on the RIGHT. Measure actual content to avoid oversized
+  // empty space on wide screens or overlap on a 280px iPhone viewport.
+  const amount=$('gx-b2-hero-amount'),badge=$('gx-b2-hero-badge');
+  // Read the true post-layout border boxes; scrollWidth can underreport
+  // the absolutely-positioned amount when WebKit clamps max-content.
+  const moneyWidth=amount.getBoundingClientRect().width;
+  const statusWidth=badge.getBoundingClientRect().width;
+  const gap=10;
+  // Horizontal separation settles slightly BEFORE the vertical compression:
+  // at ~92% scroll the two labels share one row already, so delaying the
+  // separation until 100% creates a 1px collision on 280px devices.
+  const paired=Math.min(1,p*1.1);
+  root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*paired));
+  root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*paired));
   root.style.setProperty('--gx-rm-badge-top',px(90-81*p));
   root.style.setProperty('--gx-rm-amount-top',px(22-15*p));
   root.style.setProperty('--gx-rm-badge-max',(96-49*p).toFixed(2)+'%');
@@ -273,17 +364,33 @@ function setupHeaderMorph(){
   root.style.setProperty('--gx-rm-progress',p.toFixed(3));
   root.dataset.gxRmCompact=String(p>.95);
  }
+ // Safari can defer rAF during scroll-to-top. An independently scheduled
+ // watchdog runs the SAME damped frame only when rAF has not fired. It does
+ // not alter timing on normal 60/120Hz displays and is cancelled at rest.
+ function schedule(){
+  if(frame)cancelAnimationFrame(frame);
+  clearTimeout(watchdog);
+  frame=requestAnimationFrame(tick);
+  watchdog=window.setTimeout(()=>{
+   if(frame)cancelAnimationFrame(frame);
+   frame=0;watchdog=0;tick();
+  },62);
+ }
  function tick(){
   frame=0;
   value+= (goal-value)*.23;
   if(Math.abs(goal-value)<.003)value=goal;
   paint();
-  if(value!==goal)frame=requestAnimationFrame(tick);
+  if(value!==goal)schedule();
+  else{clearTimeout(watchdog);watchdog=0}
  }
  function request(){
   goal=clamp(window.scrollY/172);
-  if(reduced.matches){cancelAnimationFrame(frame);frame=0;value=goal;paint();return}
-  if(!frame)frame=requestAnimationFrame(tick);
+  if(reduced.matches){
+   cancelAnimationFrame(frame);clearTimeout(watchdog);
+   frame=0;watchdog=0;value=goal;paint();return;
+  }
+  if(!frame&&!watchdog)schedule();
  }
  window.addEventListener('scroll',request,{passive:true});
  window.addEventListener('resize',()=>{paint();request()},{passive:true});
