@@ -1,4 +1,4 @@
-/* GOXION · Experiencia E1/B1. Mirror extracted from Ayuda official.
+/* GOXION · Experiencia E1/B1. Published as one isolated reviewable beta. Mirror extracted from Ayuda official.
  * No sessions, billing runtime, orders or real user data.
  */
 import fs from 'node:fs';
