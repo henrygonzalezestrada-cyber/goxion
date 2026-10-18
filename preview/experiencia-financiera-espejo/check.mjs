@@ -13,7 +13,7 @@ assert(ayuda.includes('data-gx-smart-beta="true" data-gx-b2-preview="true"'));
 assert(ayuda.includes('../experiencia-mi-espacio-inteligente/smart.css?v=e1b1v6'));
 assert(ayuda.includes('src="./ayuda-b2.js?v=e1b2v2"'));
 assert(index.includes('../../assets/css/index.css'));
-assert(index.includes('animate-ui-native.bundle.js?v=e1b2r5v1'));
+assert(index.includes('animate-ui-native.bundle.js?v=e1b2r5v3'));
 assert(index.includes('data-gx-animate-ui="native-r5"'));
 assert(!/cdn.jsdelivr|esm.sh|unpkg.com/i.test(index),'No external React runtime/CDN');
 assert(index.includes('class="sticky-area"')&&index.includes('class="balance-hero"'));
