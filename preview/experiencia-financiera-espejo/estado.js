@@ -151,7 +151,7 @@ function proof(){
  if(!phase){panel.innerHTML='';panel.removeAttribute('data-phase');return}
  if(panel.dataset.phase===phase&&panel.querySelector('.gx-r4-journey'))return;
  const states={
-  review:{message:'Ya lo recibimos. No lo envíes nuevamente.',
+  review:{message:'Ya lo recibimos. No lo envíes de nuevo.',
    fill:50,steps:['Recibido','Revisión','Aprobación']},
   correction:{message:'Revisa la observación para continuar.',
    fill:50,steps:['Recibido','Revisado','Corregir']},
@@ -184,7 +184,7 @@ function proof(){
  const curve='M100 29 C171 29 190 10 300 29 S429 29 500 29';
  panel.innerHTML=
   '<div class="gx-r4-journey"><div class="gx-r4-journey-heading">'+
-   '<span>RECORRIDO DE TU PAGO</span>'+
+   '<span>'+(phase==='approved'?'Pago validado':'RECORRIDO DE TU PAGO')+'</span>'+
    '<span class="gx-r4-journey-mark" aria-hidden="true"><i></i><i></i><i></i></span></div>'+
    '<div class="gx-b2-proof-track" role="group" aria-label="Etapas de recepción y validación">'+
    '<svg class="gx-b2-progress-rail" viewBox="0 0 600 65" preserveAspectRatio="none" aria-hidden="true">'+
