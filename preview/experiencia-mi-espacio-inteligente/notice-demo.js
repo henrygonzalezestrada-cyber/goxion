@@ -31,13 +31,17 @@ function bellCount(on){
 }
 function reset(){
  clearTimers();
- document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-spark').forEach(n=>n.remove());
+ document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-flight').forEach(n=>n.remove());
  bell.classList.remove('gx-ringing');bellCount(false);stored=null;
  hideSheet();
  const code=window.GOXION_SMART_BETA?.getScenario();
  active=examples[code]||null;
- play.disabled=!active;
- play.title=active?'Reproduce una actualización ficticia en la tarjeta existente':'Este estado no tiene un aviso prioritario que reproducir';
+ const mission=code==='mission';
+ play.disabled=!active&&!mission;
+ play.textContent=mission?'Ver misión pendiente':'Reproducir aviso importante';
+ play.title=mission?'Abre la sección de Misiones original de Ayuda':active?
+  'Reproduce una actualización ficticia en la tarjeta existente':
+  'No se fabrica un aviso cuando no hay un evento importante';
 }
 function showSheet(){
  if(sheet.classList.contains('show'))return;
@@ -69,27 +73,64 @@ function recordNotice(item){
  bell.classList.add('gx-ringing');
  delay(()=>bell.classList.remove('gx-ringing'),900);
 }
-function sparkTravel(card){
- const destination=bell.getBoundingClientRect(),origin=card.getBoundingClientRect();
- const x=origin.left+origin.width*.5,y=origin.top+Math.min(origin.height*.32,95);
- const dx=destination.left+destination.width*.5-x,dy=destination.top+destination.height*.5-y;
- const point=document.createElement('span');point.className='gx-smart-notice-spark';
- point.style.left=x+'px';point.style.top=y+'px';document.body.append(point);
- if(typeof point.animate==='function'){
-  const animation=point.animate([
-   {transform:'translate(-50%,-50%) scale(.65)',opacity:0},
-   {transform:'translate(-50%,-50%) scale(1.1)',opacity:1,offset:.16},
-   {transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+dy+'px)) scale(.25)',opacity:.7}
-  ],{duration:760,easing:'cubic-bezier(.22,.72,.22,1)',fill:'forwards'});
-  effects.push(animation);animation.finished.then(()=>point.remove(),()=>point.remove());
- }else point.remove();
- delay(()=>point.remove(),900);
+function bellImpact(item){
+ recordNotice(item);
+ const ring=bell.querySelector('.gx-client-notif-bell');
+ if(!ring||window.matchMedia('(prefers-reduced-motion:reduce)').matches)return;
+ const ripple=document.createElement('span');
+ ripple.className='gx-smart-notice-impact';
+ ripple.setAttribute('aria-hidden','true');
+ bell.append(ripple);
+ const animation=ripple.animate([
+  {transform:'translate(-50%,-50%) scale(.3)',opacity:.78},
+  {transform:'translate(-50%,-50%) scale(1.6)',opacity:0}
+ ],{duration:480,easing:'cubic-bezier(.13,.8,.3,1)',fill:'forwards'});
+ effects.push(animation);
+ animation.finished.then(()=>ripple.remove(),()=>ripple.remove());
+ delay(()=>ripple.remove(),520);
 }
+function capsuleFlight(card,item){
+ const destination=bell.getBoundingClientRect(),origin=card.getBoundingClientRect();
+ // Never cross a screen from a scrolled-off card: state still reaches the bell.
+ const visible=origin.bottom>0&&origin.top<innerHeight&&destination.bottom>0&&destination.top<innerHeight;
+ if(!visible||typeof document.body.animate==='undefined'&&typeof Element.prototype.animate!=='function'){
+  bellImpact(item);return;
+ }
+ const x=origin.left+origin.width*.5,y=origin.top+Math.min(origin.height*.35,100);
+ const targetX=destination.left+destination.width*.5,targetY=destination.top+destination.height*.5;
+ const dx=targetX-x,dy=targetY-y;
+ const flight=document.createElement('span');flight.className='gx-smart-notice-flight';
+ flight.setAttribute('aria-hidden','true');
+ flight.style.left=x+'px';flight.style.top=y+'px';
+ const core=document.createElement('span');core.className='gx-smart-notice-flight-core';
+ const mark=document.createElement('span');mark.className='gx-smart-notice-flight-mark';
+ core.append(mark);flight.append(core);document.body.append(flight);
+ // Ease along a bent path. Native transform/opacity only (no moving blur filters).
+ const bend=dx>=0?Math.min(64,Math.max(18,Math.abs(dx)*.19)):
+  -Math.min(64,Math.max(18,Math.abs(dx)*.19));
+ const keyframes=[
+  {transform:'translate(-50%,-50%) translate(0px,0px) scale(1)',opacity:.0,offset:0},
+  {transform:'translate(-50%,-50%) translate('+dx*.08+'px,'+dy*.12+'px) scale(1.04)',opacity:1,offset:.12},
+  {transform:'translate(-50%,-50%) translate('+(dx*.48+bend)+'px,'+(dy*.32-18)+'px) scale(.82)',opacity:1,offset:.48},
+  {transform:'translate(-50%,-50%) translate('+(dx*.88)+'px,'+(dy*.79-9)+'px) scale(.52)',opacity:.95,offset:.84},
+  {transform:'translate(-50%,-50%) translate('+dx+'px,'+dy+'px) scale(.16)',opacity:0,offset:1}
+ ];
+ const animation=flight.animate(keyframes,{duration:1120,easing:'cubic-bezier(.18,.65,.19,1)',fill:'forwards'});
+ effects.push(animation);
+ animation.finished.then(()=>flight.remove(),()=>flight.remove());
+ delay(()=>flight.remove(),1200);
+ delay(()=>bellImpact(item),1040);
+}
+
 function preview(){
  const card=$('dash-billing-card');
+ if(window.GOXION_SMART_BETA?.getScenario()==='mission'){
+  window.GOXION_SMART_MISSIONS?.open?.();
+  return;
+ }
  if(!active||!card||card.hidden)return;
  clearTimers();
- document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-spark').forEach(n=>n.remove());
+ document.querySelectorAll('.gx-smart-notice-surface,.gx-smart-notice-flight').forEach(n=>n.remove());
  hideSheet();bellCount(false);stored=null;
  const surface=document.createElement('div');surface.className='gx-smart-notice-surface';
  surface.setAttribute('role','status');surface.setAttribute('aria-live','polite');
@@ -105,9 +146,9 @@ function preview(){
  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
  delay(()=>{
   surface.classList.add('gx-smart-notice-leaving');
-  if(!reduced)sparkTravel(card);
-  delay(()=>surface.remove(),reduced?90:540);
-  delay(()=>recordNotice(notice),reduced?0:620);
+  if(reduced)bellImpact(notice);
+  else capsuleFlight(card,notice);
+  delay(()=>surface.remove(),reduced?90:480);
  },reduced?2250:2800);
 }
 trigger.addEventListener('click',()=>{
