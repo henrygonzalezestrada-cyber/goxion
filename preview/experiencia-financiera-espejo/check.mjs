@@ -11,7 +11,7 @@ const ayuda=fs.readFileSync(folder+'index.html','utf8');
 const index=fs.readFileSync(folder+'estado.html','utf8');
 assert(ayuda.includes('data-gx-smart-beta="true" data-gx-b2-preview="true"'));
 assert(ayuda.includes('../experiencia-mi-espacio-inteligente/smart.css?v=e1b1v6'));
-assert(ayuda.includes('src="./ayuda-b2.js?v=e1b2v1"'));
+assert(ayuda.includes('src="./ayuda-b2.js?v=e1b2v2"'));
 assert(index.includes('../../assets/css/index.css'));
 assert(index.includes('class="sticky-area"')&&index.includes('class="balance-hero"'));
 assert(index.includes('class="glass-card services-container"'));
