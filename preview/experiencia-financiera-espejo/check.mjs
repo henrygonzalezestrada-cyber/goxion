@@ -93,7 +93,7 @@ async function run(name,engine){
    });
    await page.setViewportSize({width,height:550});
    await page.evaluate(()=>window.scrollTo(0,330));
-   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.getMorphProgress?.()>.90,null,
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.getMorphProgress?.()>.992,null,
     {timeout:6000,polling:50});
    const collapsed=await page.evaluate(()=>{
     const a=document.querySelector('#gx-b2-hero-amount').getBoundingClientRect();
