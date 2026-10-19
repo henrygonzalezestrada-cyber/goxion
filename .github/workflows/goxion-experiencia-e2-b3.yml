@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - beta/e2b3-goxy-gixys-context-espejo-20261018
+      - beta/e2b3-prioridades-goxy-handoff-20261018
     paths:
       - 'preview/experiencia-b3-goxy-gixys/**'
       - '.github/workflows/goxion-experiencia-e2-b3.yml'
@@ -15,7 +16,7 @@ concurrency:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    timeout-minutes: 18
+    timeout-minutes: 22
     steps:
       - uses: actions/checkout@v4
         with:
@@ -41,7 +42,7 @@ jobs:
             echo "Newer commit superseded this build."
             exit 0
           fi
-          git add preview/experiencia-b3-goxy-gixys/index.html preview/experiencia-b3-goxy-gixys/b3-mirror.js
+          git add preview/experiencia-b3-goxy-gixys/index.html preview/experiencia-b3-goxy-gixys/b3-mirror.js preview/experiencia-b3-goxy-gixys/b3-notice.js preview/experiencia-b3-goxy-gixys/b3-notice.css
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
