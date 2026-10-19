@@ -112,6 +112,13 @@ document.addEventListener('gx-mirror-ready',()=>{
   }else if(kind==='mission'){
    $('gx-mirror-mission-card')?.click();
    setTimeout(()=>{
+    // WebKit can retain the previous bill-card scroll position after
+    // several priority previews. Bring the native V9 mission anchor into
+    // view BEFORE firing completion, so its Gixy has a valid placement.
+    const expanded=$('gamif-expanded-coupon');
+    const anchor=expanded?.getBoundingClientRect().height>0
+      ?expanded:$('gx-mirror-mission-card');
+    anchor?.scrollIntoView({behavior:'instant',block:'center'});
     const b=$('gx-mirror-complete-btn');
     if(b&&!b.disabled)b.click();
    },1250);
