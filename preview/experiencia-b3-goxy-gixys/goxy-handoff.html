@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es-MX">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#030305">
+<title>GOXION · Abrir Goxy en Soporte</title>
+<style>
+html,body{margin:0;width:100%;height:100%;height:100dvh;background:#030305;overflow:hidden}
+iframe{height:100%;width:100%;border:0;display:block;background:#030305}
+#gx-b3-opening{position:fixed;inset:0;display:grid;place-items:center;background:#030305;
+font:600 12px/1.5 Poppins,system-ui,sans-serif;color:#b6c8e6;pointer-events:none;transition:opacity .22s ease}
+</style></head>
+<body>
+<iframe id="gx-b3-support" src="../../ayuda.html" title="GOXION · Goxy en Soporte"></iframe>
+<div id="gx-b3-opening" role="status">Abriendo Soporte de GOXION…</div>
+<script>
+(()=>{
+ const frame=document.getElementById('gx-b3-support'),splash=document.getElementById('gx-b3-opening');
+ frame.addEventListener('load',()=>{
+  try{
+   const win=frame.contentWindow,doc=frame.contentDocument;
+   if(new URL(win.location.href).origin!==location.origin)throw Error('Different origin');
+   // Goxy F17 belongs to official Ayuda; never inject another assistant.
+   // Only select its existing support tab within an explicit user-opened view.
+   const activate=()=>{
+    if(typeof win.switchTab==='function')win.switchTab('soporte');
+    else doc.getElementById('btn-tab-soporte')?.click();
+    splash.style.opacity='0';
+   };
+   activate();
+  }catch(_){
+   splash.textContent='Para hablar con Goxy abre Ayuda y entra en Soporte.';
+   splash.style.opacity='1';
+  }
+ });
+})();
+</script></body></html>

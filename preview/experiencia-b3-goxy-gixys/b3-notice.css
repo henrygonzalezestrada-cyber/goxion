@@ -1,0 +1,277 @@
+/* GOXION · E1 B1 Mi Espacio inteligente — isolated demo.
+ * Native layout maintained; just one focus surface, no boxes-in-boxes.
+ */
+html[data-gx-smart-beta] body{overflow-x:clip!important}
+body.gx-smart-body{min-height:100dvh;background:#030305;color:#f5f6fe;font-family:Poppins,system-ui,sans-serif}
+body.gx-smart-body .bg{pointer-events:none}
+body.gx-smart-body .app-header{display:flex!important;align-items:center;justify-content:space-between;gap:10px}
+body.gx-smart-body .app-header .app-logo{max-height:53px;object-fit:contain}
+.gx-smart-header-actions{display:flex;align-items:center;gap:10px}
+.gx-smart-bell{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;color:#bef1f8;background:rgba(92,225,240,.08)}
+.gx-smart-bell svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.5;fill:none;stroke-linecap:round}
+.gx-smart-auth{font-size:11px;white-space:nowrap;border-radius:18px;padding:9px 12px;color:#e4eafb;border:1px solid rgba(132,178,230,.21);background:rgba(24,33,57,.65)}
+body.gx-smart-body #gx-smart-container{padding-bottom:50px}
+.gx-smart-demo-note{display:flex;align-items:center;justify-content:center;gap:7px;margin:2px 0 14px;color:#a9bbd0;font:500 9px/1.5 Poppins,system-ui,sans-serif;text-align:center;letter-spacing:.015em}
+.gx-smart-demo-led{width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:#62dcca;box-shadow:0 0 9px rgba(48,227,220,.35)}
+.gx-smart-lab{margin:0 0 15px;padding:13px 15px 12px;background:linear-gradient(130deg,rgba(45,41,84,.5),rgba(14,36,56,.43));border:1px solid rgba(140,170,217,.14);border-radius:17px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.gx-smart-lab__heading{display:flex;align-items:center;justify-content:space-between;gap:9px;margin:0 0 10px;font:700 9px/1.3 Poppins,system-ui,sans-serif;color:#c2d1e4;letter-spacing:.095em}
+.gx-smart-lab__mark{color:#82cedf;font-weight:600;letter-spacing:.05em;font-size:8px}
+.gx-smart-select-wrap{position:relative;width:100%}
+.gx-smart-select-wrap select{box-sizing:border-box;appearance:none;-webkit-appearance:none;display:block;width:100%;height:42px;min-height:42px;border-radius:12px;border:1px solid rgba(125,184,228,.28);background:rgba(7,16,34,.78);color:#f3f6ff;font:600 12px/1.3 Poppins,system-ui,sans-serif;padding:0 39px 0 13px;outline:none}
+.gx-smart-select-wrap select:focus-visible{border-color:#67dce9;box-shadow:0 0 0 2px rgba(100,231,243,.13)}
+.gx-smart-select-wrap svg{position:absolute;right:13px;top:13px;width:17px;height:17px;stroke:#8dcede;stroke-width:2;fill:none;pointer-events:none}
+.gx-smart-lab__note{color:#a2adc7;font:400 9.5px/1.6 Poppins,system-ui,sans-serif;margin:8px 0 0!important}
+body.gx-smart-body #view-dashboard{display:block!important}
+body.gx-smart-body #dash-payment-review-alert{min-height:0!important}
+body.gx-smart-body #dash-billing-card{transition:none!important}
+body.gx-smart-body #dash-badge{font-size:10px;line-height:1.5;color:#b2c9d9}
+body.gx-smart-body #dash-badge.gx-smart-badge-alert{color:#ffb0a7}
+.gx-smart-schedule{padding:13px 1px 1px;margin:15px 0 0;border-top:1px solid rgba(191,210,250,.13)}
+.gx-smart-schedule[hidden]{display:none!important}
+.gx-smart-schedule__title{color:#94baca;font:600 9px/1.3 Poppins,system-ui,sans-serif;letter-spacing:.1em;margin-bottom:8px}
+.gx-smart-schedule__row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:7px 1px;border-bottom:1px solid rgba(199,213,255,.075)}
+.gx-smart-schedule__row:last-child{border-bottom:0}
+.gx-smart-schedule__row span{color:#b6c3d9;font-size:10px;line-height:1.4}
+.gx-smart-schedule__row strong{color:#e4eafc;font:600 10px/1.4 Poppins,system-ui,sans-serif;text-align:right;max-width:64%}
+.gx-smart-mission{padding:16px 17px;margin:0 0 20px;border:1px solid rgba(143,162,212,.16);border-radius:17px;background:rgba(28,30,51,.62);display:grid;gap:6px;color:#eef2ff}
+.gx-smart-mission__eyebrow{color:#8adbea;letter-spacing:.11em;font:700 9px/1.3 Poppins,system-ui,sans-serif}
+.gx-smart-mission strong{font-size:14px;line-height:1.4}
+.gx-smart-mission__counter{font-size:10px;color:#b4bdd4}
+.gx-smart-mission__progress{height:5px;width:100%;border-radius:8px;background:rgba(139,151,207,.15);overflow:hidden;margin:3px 0 0}
+.gx-smart-mission__progress span{display:block;height:100%;background:linear-gradient(90deg,#8c6eff,#72e5e9);border-radius:inherit;transition:width .25s}
+.gx-smart-services{display:grid;gap:9px;margin:9px 0 16px}
+.gx-smart-services p{color:#aab8cf;font-size:11px;line-height:1.5}
+.gx-smart-services__row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:11px 12px;border:1px solid rgba(151,178,236,.12);border-radius:12px;background:rgba(35,40,64,.4)}
+.gx-smart-services__row strong{font:700 11px/1.4 Poppins,system-ui,sans-serif}
+.gx-smart-services__row span{font-size:10px;color:#afbed6;text-align:right}
+.gx-smart-history-note{font-size:11px;color:#8f9fb9;margin:0 0 20px}
+.gx-smart-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));width:max-content;max-width:calc(100vw - 36px);box-sizing:border-box;text-align:center;z-index:10010;padding:12px 16px;border:1px solid rgba(103,221,232,.23);border-radius:14px;background:rgba(24,32,54,.96);backdrop-filter:blur(18px);color:#eaf8ff;font:500 11px/1.5 Poppins,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.36)}
+.gx-smart-toast[hidden]{display:none!important}
+.gx-smart-highlight{animation:gx-smart-highlight 1.1s ease-out}
+@keyframes gx-smart-highlight{0%,100%{outline:0 solid transparent}35%{outline:2px solid rgba(102,232,241,.66);outline-offset:3px}}
+@media(max-width:374px){
+.gx-smart-services__row{gap:7px}
+.gx-smart-services__row span{font-size:9px}
+.gx-smart-schedule__row strong{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+.gx-smart-mission__progress span{transition:none!important}
+.gx-smart-highlight{animation:none!important;outline:1px solid rgba(102,232,241,.4)}
+}
+
+
+/* E1/B1 V2: prioritize INSIDE the existing billing card. No duplicate
+   "lo importante" panel; header changes with the scenario. */
+.gx-smart-lab{
+ display:flex;align-items:center;gap:10px;
+ padding:8px 10px;margin:0 0 12px;
+ min-height:49px;
+ background:rgba(28,30,52,.49);border:1px solid rgba(140,170,217,.14);
+ border-radius:13px;box-shadow:none;
+ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.gx-smart-lab__heading{margin:0;flex:0 0 auto;display:block;font-size:9px;white-space:nowrap;letter-spacing:.03em}
+.gx-smart-lab__mark{display:none}
+.gx-smart-select-wrap{flex:1 1 auto;min-width:0}
+.gx-smart-select-wrap select{height:37px;min-height:37px;font-size:11px}
+.gx-smart-select-wrap svg{top:10px}
+.gx-smart-card-heading{
+ font:600 10px/1.5 Poppins,system-ui,sans-serif;
+ color:#9cabc4;letter-spacing:.115em;text-align:center;text-transform:uppercase;
+ margin:0 0 7px;max-width:100%;overflow-wrap:anywhere;
+}
+body.gx-smart-body #dash-billing-card{
+ border-color:rgba(140,164,216,.16);
+}
+body.gx-smart-body #dash-billing-card #dash-date{
+ overflow-wrap:break-word;max-width:100%;
+ line-height:1.18;letter-spacing:-.025em;
+}
+body.gx-smart-body #dash-billing-card[data-code="review"] #dash-date,
+body.gx-smart-body #dash-billing-card[data-code="correction"] #dash-date,
+body.gx-smart-body #dash-billing-card[data-code="clear"] #dash-date{
+ font-size:clamp(20px,6vw,29px);letter-spacing:-.025em;
+}
+body.gx-smart-body #dash-billing-card[data-tone="review"] .gx-smart-card-heading{color:#b9bdf5}
+body.gx-smart-body #dash-billing-card[data-tone="danger"] .gx-smart-card-heading,
+body.gx-smart-body #dash-billing-card[data-tone="attention"] .gx-smart-card-heading{color:#f4b39d}
+body.gx-smart-body #dash-billing-card[data-tone="agreement"] .gx-smart-card-heading{color:#c9b0ff}
+body.gx-smart-body #dash-billing-card[data-tone="calm"] .gx-smart-card-heading{color:#8fddbd}
+.gx-smart-card-description{
+ font:400 10.7px/1.55 Poppins,system-ui,sans-serif;
+ color:#b7c2d6;text-align:center;
+ margin:10px auto 0!important;max-width:370px;
+}
+.gx-smart-card-description[hidden]{display:none!important}
+@media(max-width:359px){
+ .gx-smart-lab{gap:7px;padding:8px}
+ .gx-smart-lab__heading{font-size:8px}
+ .gx-smart-select-wrap select{font-size:10px;padding-inline-start:9px}
+ .gx-smart-card-heading{font-size:9px;letter-spacing:.09em}
+}
+
+
+/* E1/B1 V3 · Espejo de Ayuda: no reservar altura para el laboratorio.
+   La campana y la hoja reutilizan las clases oficiales del cliente, NO Admin. */
+body.gx-smart-body .gx-smart-header-actions{margin-left:auto;gap:8px;display:flex;align-items:center}
+body.gx-smart-body .gx-smart-auth{display:flex;min-height:42px;height:42px;padding:0 15px;font-size:11px;
+ background:rgba(0,242,254,.08);border:1px solid rgba(0,242,254,.25);
+ color:var(--text-main);box-sizing:border-box;white-space:nowrap;pointer-events:none}
+body.gx-smart-body .gx-smart-auth .gx-auth-pill-label{font:700 11px/1.3 Poppins,system-ui,sans-serif}
+body.gx-smart-body #gx-smart-container{padding-bottom:85px}
+body.gx-smart-body .gx-smart-lab[hidden]{display:none!important}
+body.gx-smart-body .gx-smart-lab{
+ position:fixed;z-index:10012;bottom:calc(72px + env(safe-area-inset-bottom,0px));
+ left:max(12px,calc((100vw - 560px)/2));width:min(360px,calc(100vw - 24px));
+ max-height:min(70dvh,450px);overflow:auto;overscroll-behavior:contain;
+ display:flex;flex-direction:column;align-items:stretch;gap:9px;
+ box-sizing:border-box;padding:15px 16px 14px;margin:0;
+ border-radius:19px;border:1px solid rgba(172,208,244,.18);
+ background:linear-gradient(150deg,rgba(27,25,49,.97),rgba(10,22,38,.97));
+ -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);
+ box-shadow:0 14px 42px rgba(0,0,0,.52);
+}
+.gx-smart-lab-trigger{
+ position:fixed;bottom:calc(14px + env(safe-area-inset-bottom,0px));
+ left:max(12px,calc((100vw - 560px)/2));z-index:10012;
+ min-height:42px;padding:0 16px;display:inline-flex;gap:8px;align-items:center;
+ border-radius:999px;border:1px solid rgba(123,209,232,.24);
+ background:rgba(11,18,31,.92);color:rgba(232,243,252,.87);
+ font:600 10px/1 Poppins,system-ui,sans-serif;letter-spacing:.015em;
+ -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+ box-shadow:0 9px 24px rgba(0,0,0,.28);cursor:pointer;
+}
+.gx-smart-lab-led{width:6px;height:6px;border-radius:50%;background:#70d9e9;box-shadow:0 0 9px rgba(112,217,233,.2)}
+.gx-smart-lab-trigger:focus-visible,.gx-smart-notice-test:focus-visible{outline:2px solid #00f2fe;outline-offset:3px}
+.gx-smart-lab-title{margin:0 0 3px!important;color:rgba(245,249,255,.88);font:700 10px/1.35 Poppins,system-ui,sans-serif;letter-spacing:.08em}
+.gx-smart-lab-title span{color:#a5b4cb;font-weight:400;letter-spacing:.015em}
+.gx-smart-lab .gx-smart-lab__heading{margin:2px 0 0;font-size:10px;white-space:normal;color:#b9c9dd;letter-spacing:0;text-transform:none}
+.gx-smart-lab .gx-smart-select-wrap{width:100%;flex:auto}
+.gx-smart-lab .gx-smart-select-wrap select{min-height:43px;height:43px}
+.gx-smart-lab .gx-smart-select-wrap svg{top:13px}
+.gx-smart-notice-test{
+ width:100%;min-height:42px;border-radius:999px;
+ border:1px solid rgba(0,242,254,.25);background:rgba(0,242,254,.1);
+ color:#e2fdff;font:700 11px/1.3 Poppins,system-ui,sans-serif;
+ padding:10px 12px;cursor:pointer;
+}
+.gx-smart-notice-test:disabled{opacity:.42;cursor:not-allowed;border-color:rgba(140,164,216,.18);background:rgba(140,164,216,.06)}
+.gx-smart-lab-foot{margin:0!important;color:#9daec5;font:400 9px/1.5 Poppins,system-ui,sans-serif}
+body.gx-smart-body #dash-billing-card{
+ position:relative;isolation:isolate;transform:translateZ(0);
+}
+/* Aviso ocupa la MISMA tarjeta y no participa del flujo: 0px de reflow. */
+.gx-smart-notice-surface{
+ position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;
+ overflow:hidden;border-radius:inherit;padding:26px 24px;box-sizing:border-box;
+ background:radial-gradient(ellipse at 20% 0%,rgba(118,70,216,.24),transparent 70%),
+ linear-gradient(140deg,rgba(8,14,29,.98),rgba(24,24,47,.98) 55%,rgba(9,28,42,.98));
+ -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+ opacity:0;filter:blur(4px);transform:translateY(7px) scale(.987);
+ transition:opacity .44s ease,filter .44s ease,transform .52s cubic-bezier(.2,.8,.2,1);
+ pointer-events:auto;
+}
+.gx-smart-notice-surface.gx-smart-notice-visible{
+ opacity:1;filter:blur(0);transform:translateY(0) scale(1);
+}
+.gx-smart-notice-surface.gx-smart-notice-leaving{
+ opacity:0;filter:blur(5px);transform:translateY(-7px) scale(.966);pointer-events:none;
+}
+.gx-smart-notice-inner{width:100%;max-width:360px;text-align:center;display:flex;flex-direction:column;gap:9px;align-items:center}
+.gx-smart-notice-eyebrow{
+ color:#80dfea;font:700 9px/1.3 Poppins,system-ui,sans-serif;letter-spacing:.125em;text-transform:uppercase;
+}
+.gx-smart-notice-title{color:#f5f6ff;font:700 clamp(17px,4.8vw,22px)/1.26 Poppins,system-ui,sans-serif;
+ letter-spacing:-.025em;text-wrap:balance;overflow-wrap:break-word}
+.gx-smart-notice-desc{max-width:290px;margin:0!important;color:#becbdd;font:400 11px/1.55 Poppins,system-ui,sans-serif;text-wrap:pretty}
+.gx-smart-notice-track{position:absolute;left:0;bottom:0;width:0;height:2px;
+ background:linear-gradient(90deg,rgba(124,77,255,.7),#00f2fe);box-shadow:0 0 9px rgba(0,242,254,.25)}
+.gx-smart-notice-visible .gx-smart-notice-track{animation:gx-notice-progress 2.8s linear forwards}
+@keyframes gx-notice-progress{to{width:100%}}
+/* V6 · Silk/refraction motif: a living, tapered ribbon, not a vector line.
+   JS samples the curve and changes its silhouette on each animation frame.
+   Subtle two-layer glow, an internal highlight and no persistent ornament. */
+.gx-smart-notice-stream{
+ position:fixed;top:0;left:0;z-index:10015;
+ pointer-events:none;overflow:hidden;display:block;max-width:none!important;
+ contain:layout paint;isolation:isolate;
+}
+.gx-smart-notice-stream path{pointer-events:none}
+.gx-smart-notice-stream-line{opacity:.96}
+.gx-smart-notice-stream-halo{opacity:.32}
+.gx-smart-notice-stream-sheen{opacity:.64;mix-blend-mode:screen}
+.gx-smart-notice-origin-bloom{
+ position:fixed;z-index:10014;width:105px;height:65px;
+ transform:translate(-50%,-50%) scale(.84);
+ pointer-events:none;border-radius:50%;
+ background:radial-gradient(ellipse at center,
+ rgba(194,173,255,.20) 0%,rgba(122,128,253,.085) 32%,transparent 70%);
+ filter:blur(6px);opacity:0;
+ animation:gx-smart-source-bloom .52s cubic-bezier(.15,.8,.2,1) both;
+}
+@keyframes gx-smart-source-bloom{
+ 0%{opacity:0;transform:translate(-50%,-50%) scale(.73)}
+ 26%{opacity:.78}
+ 100%{opacity:0;transform:translate(-50%,-50%) scale(1.32)}
+}
+body.gx-smart-body #gx-smart-notif-button{position:relative;overflow:visible}
+.gx-smart-notice-impact{
+ position:absolute;z-index:2;pointer-events:none;left:50%;top:50%;
+ width:42px;height:42px;border-radius:50%;
+ border:1px solid rgba(0,242,254,.57);box-shadow:0 0 8px rgba(0,242,254,.16);
+}
+
+body.gx-smart-body .gx-client-notif-sheet{font-family:Poppins,system-ui,sans-serif}
+body.gx-smart-body #gx-smart-notif-list .gx-client-notif-item{min-height:78px}
+@media(max-width:359px){
+ .gx-smart-notice-surface{padding:18px 16px}
+ .gx-smart-notice-title{font-size:17px}
+ .gx-smart-notice-desc{font-size:10px}
+ .gx-smart-lab-title{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-smart-notice-surface{transition:none!important;filter:none!important;transform:none!important}
+ .gx-smart-notice-visible .gx-smart-notice-track{animation:none!important;width:100%}
+ .gx-smart-notice-stream,.gx-smart-notice-impact,.gx-smart-notice-origin-bloom{display:none!important}
+}
+
+
+/* V4 · Restored Ayuda's exact status capsules and native gamification.
+   The lab must not replace customer components with generic demo tiles. */
+body.gx-smart-body #dash-badge{min-height:28px;display:flex;justify-content:center;align-items:center}
+body.gx-smart-body #dash-badge .time-badge{font-weight:700;letter-spacing:0;line-height:1.3}
+body.gx-smart-body #dash-badge .gx-prorroga-state{font-weight:800}
+body.gx-smart-body #gamif-grid[hidden],
+body.gx-smart-body .gamif-expanded-container[hidden]{display:none!important}
+body.gx-smart-body .gamif-expanded-container:not([hidden]){display:block!important}
+body.gx-smart-body .gx-gamif-card{
+ cursor:pointer;font-family:Poppins,system-ui,sans-serif;width:100%;
+}
+body.gx-smart-body .gx-gamif-card:focus-visible,
+body.gx-smart-body .btn-gamif-close:focus-visible,
+body.gx-smart-body .gx-smart-mission-guide:focus-visible{
+ outline:2px solid var(--neon-blue);outline-offset:3px
+}
+.gx-smart-mission-cue{animation:gx-smart-cue 1.15s cubic-bezier(.2,.8,.2,1) 1 both}
+@keyframes gx-smart-cue{
+ 0%,100%{box-shadow:0 14px 34px rgba(0,0,0,.28)}
+ 50%{box-shadow:0 14px 34px rgba(0,0,0,.28),0 0 0 2px rgba(0,242,254,.22)}
+}
+.gx-smart-gamif-summary{text-align:center;margin:6px 0 21px;color:var(--text-main)}
+.gx-smart-gamif-summary .gx-gamif-shared-emoji{font-size:29px;margin:0 0 9px}
+.gx-smart-gamif-summary-title{display:block;font:800 16px/1.4 Poppins,system-ui,sans-serif}
+.gx-smart-gamif-summary-copy{font:400 11px/1.55 Poppins,system-ui,sans-serif;
+ color:var(--text-muted);margin:7px auto 12px!important;max-width:300px;text-align:center}
+.gx-smart-mission-row{cursor:default}
+.gx-smart-mission-row .gx-mission-text{flex:1;min-width:0}
+.gx-smart-mission-pending{font:700 9px/1.3 Poppins,system-ui,sans-serif;color:var(--neon-blue)}
+.gx-smart-mission-guide{
+ border:1px solid rgba(0,242,254,.28);border-radius:999px;width:100%;min-height:44px;
+ background:rgba(0,242,254,.09);color:#ddfaff;
+ font:700 11px/1.3 Poppins,system-ui,sans-serif;cursor:pointer;padding:10px 12px;
+ margin:14px 0 0;
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-smart-mission-cue{animation:none!important}
+ .gx-smart-notice-stream,.gx-smart-notice-impact,.gx-smart-notice-origin-bloom{display:none!important}
+}

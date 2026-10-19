@@ -78,28 +78,8 @@ $("gx-mirror-close-missions").addEventListener("click",()=>{
   if(typeof window.closeGamif==="function")window.closeGamif();
 });
 $("view-dashboard")?.classList.add("active");
-const bell=$("gx-client-notif-launch"),badgeCount=$("gx-client-notif-badge");
-let notice=0;
-function displayNotice(){
-  bell.classList.toggle("gx-has-new",notice===1);
-  bell.setAttribute("aria-expanded",String(notice===1));
-  badgeCount.textContent=notice===1?"1":"0";
-  bell.setAttribute("aria-label",notice===0?"Simular una notificación":notice===1?"Marcar aviso como leído":"Simular nuevo aviso");
-}
-function triggerNotice(){
-  notice=notice===1?2:1;
-  displayNotice();
-  bell.classList.remove("gx-ringing");
-  if(notice===1){
-    void bell.offsetWidth;bell.classList.add("gx-ringing");
-    clearTimeout(triggerNotice.timer);
-    triggerNotice.timer=setTimeout(()=>bell.classList.remove("gx-ringing"),900);
-    notes("Nuevo aviso de ejemplo · toca la campana para marcarlo leído");
-  }else notes("Aviso de ejemplo leído");
-  document.body.classList.toggle("gx-mirror-notif-active",notice===1);
-  emit("notification",notice===1);
-}
-bell.addEventListener("click",triggerNotice);displayNotice();
+// Native B1 V6 notification and bell now own the priority journey.
+document.addEventListener('gx-b3:notice-read',()=>emit('notification',false));
 const services=$("dash-services"),history=$("dash-history");
 if(services)services.innerHTML='<p class="gx-mirror-muted">Los servicios reales no se cargan en esta beta.</p>';
 if(history)history.innerHTML='<p class="gx-mirror-muted">El historial real permanece protegido y no se consulta.</p>';
