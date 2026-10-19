@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import {spawn} from 'node:child_process';
 import {chromium,webkit} from 'playwright';
 const port=4217,root='http://127.0.0.1:'+port+'/preview/experiencia-b3-goxy-gixys/';
@@ -35,6 +36,9 @@ async function verify(engine,name){
   assert.equal(await page.locator('#gx-smart-notif-sheet').count(),1);
   assert.equal(await page.locator('.gx-smart-notice-surface').count(),0);
   assert.equal(await page.locator('#gx-smart-toggle').evaluate(el=>el.hidden),true);
+  assert.equal(await page.evaluate(()=>window.GOXION_GIXYS_ESPEJO_ENGINE.smoothPortalScrollV3),true);
+  const source=fs.readFileSync('preview/experiencia-b3-goxy-gixys/src/companions.jsx','utf8');
+  assert(source.includes("circle:'#ff83ab'")&&source.includes("hexagon:'#8663ff'"));
   for(const width of [280,320,360,375,390,430,768]){
    await page.setViewportSize({width,height:844});
    await page.waitForTimeout(100);
@@ -42,6 +46,16 @@ async function verify(engine,name){
     scroll:document.documentElement.scrollWidth,bills:document.querySelectorAll('#dash-billing-card').length}));
    assert(dim.scroll<=dim.width+2,name+' '+width+' horizontal overflow '+JSON.stringify(dim));
    assert.equal(dim.bills,1);
+   const positions=await page.evaluate(()=>{
+     const h=document.getElementById('dynamic-greeting-text'),b=document.getElementById('dash-billing-card');
+     const original=h.innerHTML;
+     h.innerHTML='¡Hola, Cliente! 👋';const one=b.getBoundingClientRect().top;
+     h.innerHTML='¡Hola,<span style="display:block">Cliente! 👋</span>';
+     const two=b.getBoundingClientRect().top;
+     h.innerHTML=original;return {one,two};
+   });
+   assert(Math.abs(positions.one-positions.two)<1,
+      name+' '+width+' two-line greeting moved card: '+JSON.stringify(positions));
   }
   await page.setViewportSize({width:390,height:844});
   // A malicious/early event must not summon a Gixy.
@@ -85,6 +99,26 @@ async function verify(engine,name){
     assert.deepEqual(await page.evaluate(()=>window.__goxyOpened),
      ['./goxy-handoff.html','_blank','noopener,noreferrer']);
     assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action .gx-b3-goxy-cta').count(),1);
+    const diff=await page.locator('.gx-gixy-message[data-kind="notification"]')
+     .evaluate(el=>Math.abs(el.querySelector('.gx-b3-goxy-cta').getBoundingClientRect().left-
+       el.querySelector('.gx-gixy-message__bubble').getBoundingClientRect().left));
+    assert(diff<3,code+' Goxy CTA starts away from bubble: '+diff);
+    await page.evaluate(()=>window.__b3Canvas=document.querySelector(
+      '.gx-gixy-message[data-kind="notification"] canvas'));
+    await page.evaluate(()=>window.scrollBy(0,150));
+    await page.waitForTimeout(250);
+    assert.equal(await page.evaluate(()=>document.querySelector(
+      '.gx-gixy-message[data-kind="notification"] canvas')===window.__b3Canvas),true,
+      'Scroll must not remount the Plastic avatar');
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.waitForFunction(()=>{
+      const el=document.querySelector('.gx-gixy-message[data-kind="notification"] .gx-gixy-message__avatar');
+      return !!el&&!el.disabled;
+    },null,{timeout:9000});
+    await page.locator('.gx-gixy-message[data-kind="notification"] .gx-gixy-message__avatar').click();
+    await page.waitForTimeout(260);
+    assert.equal(await page.locator('.gx-b3-goxy-cta').count(),0,
+      'Engaging with a Gixy must remove the Goxy button');
    }else{
     assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action').count(),0);
    }
@@ -119,7 +153,7 @@ async function verify(engine,name){
   assert.deepEqual(privateRequests,[],name+' beta requested private APIs');
   assert.deepEqual(errors,[],name+' browser errors: '+errors.join(', '));
   await page.close();
-  console.log(name+' E2/B3 V2 PASS · B1 original ribbon, 4 prioritized/2 ordinary, V9, selective Goxy CTA, 7 widths');
+  console.log(name+' E2/B3 V3 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
  }finally{await browser.close()}
 }
 try{await ready();await verify(chromium,'Chromium');await verify(webkit,'WebKit');console.log('GOXION E2/B3 COMPLETE BETA PASS')}

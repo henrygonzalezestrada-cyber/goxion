@@ -7,13 +7,14 @@ let html=fs.readFileSync(src+'index.html','utf8');
 for(const [a,b] of [
  ['./companions.css?v=9','../gixys-mi-espacio-espejo/companions.css?v=9'],
  ['./mirror.css?v=9','../gixys-mi-espacio-espejo/mirror.css?v=9'],
- ['./companions.js?v=9','../gixys-mi-espacio-espejo/companions.js?v=9'],
+ ['./companions.js?v=9','./companions-v3.js?v=3'],
  ['./mirror.js?v=9','./b3-mirror.js?v=1']
 ]){
  if(!html.includes(a))throw Error('V9 asset moved: '+a);
  html=html.replace(a,b);
 }
 html=html.replace('data-gx-mirror="true"','data-gx-mirror="true" data-gx-b3="true"');
+html=html.replace('</head>','<link rel="stylesheet" href="./companions-v3.css?v=3"></head>');
 html=html.replace('<title>GOXION · Mi Espacio · Beta espejo</title>','<title>GOXION · Goxy y Gixys · Bloque 3</title>');
 // Import the EXACT E1/B1 V6 notice stylesheet and script; no recreated ribbon.
 fs.copyFileSync('preview/experiencia-mi-espacio-inteligente/smart.css',dst+'b3-notice.css');

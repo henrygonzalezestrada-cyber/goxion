@@ -73,3 +73,75 @@ html[data-gx-b3="true"] #gx-smart-toggle[hidden]{display:none!important}
 @media(prefers-reduced-motion:reduce){
  html[data-gx-b3="true"] .gx-b3-goxy-cta{animation:none;opacity:1}
 }
+
+
+/* =====================================================
+   B3 V3 FINAL POLISH (mirror-scoped, NO official Ayuda)
+   ===================================================== */
+
+/* 1. Reserve identical room for one- and two-line greetings.
+   Only the headline content fades/changes, never the billing position.
+   Desktop and mobile share a fixed two-line envelope, with optical
+   centering and comfortable but not excessive top/bottom breathing room. */
+html[data-gx-b3="true"] #dash-greeting-container.dash-greeting-box{
+ box-sizing:border-box!important;
+ height:79px!important;min-height:79px!important;max-height:79px!important;
+ margin:5px 0 15px!important;
+ padding:4px 5px!important;
+ display:grid!important;place-items:center!important;
+ overflow:visible!important;
+}
+html[data-gx-b3="true"] #dynamic-greeting-text{
+ width:100%;max-width:100%;
+ margin:0!important;
+ font-size:clamp(22px,6.7vw,30px)!important;
+ line-height:1.22!important;
+ text-align:center;
+ text-wrap:balance;
+ overflow-wrap:break-word;
+}
+/* 2. Keep the original V9 3D avatar mounted throughout movement:
+   B3 V3 only modifies the fixed portal's top style directly in rAF.
+   Repositioning is smooth; an absent/off-screen anchor fades rather
+   than jumping to another arbitrary slot while someone is scrolling. */
+html[data-gx-b3="true"] .gx-gixy-message{
+ transition:top .13s linear,
+   opacity .23s cubic-bezier(.2,.85,.3,1),
+   transform .32s cubic-bezier(.16,1,.3,1)!important;
+ will-change:top,opacity;
+}
+html[data-gx-b3="true"] .gx-gixy-message.gx-b3-out-of-view{
+ opacity:0!important;pointer-events:none!important;
+}
+/* 3. CTA is aligned with the *speech bubble*, not the full avatar + bubble.
+   It leaves with the original Gixy on touch/dismiss; no floating ghost. */
+html[data-gx-b3="true"] .gx-gixy-message .gx-b3-goxy-cta{
+ box-sizing:border-box!important;
+ left:62px!important;right:auto!important;
+ width:calc(100% - 65px)!important;max-width:148px!important;min-width:0!important;
+ top:calc(100% + 5px);
+ min-height:35px!important;padding:8px 10px!important;
+ display:flex;align-items:center;justify-content:center;text-align:center;
+ line-height:1.25;border-radius:13px!important;
+ background:rgba(12,20,37,.9)!important;
+}
+/* Viewport collision handler still moves the CTA above the avatar. */
+html[data-gx-b3="true"] .gx-gixy-message .gx-b3-goxy-cta--above{
+ top:auto!important;bottom:calc(100% + 5px)!important;
+}
+html[data-gx-b3="true"] .gx-b3-notice-action .gx-b3-goxy-cta{
+ left:auto!important;right:auto!important;width:auto!important;
+ min-width:137px!important;max-width:100%!important;
+ border-radius:13px!important;
+}
+/* 4. The two purple figures are not one color anymore:
+   mission is the original deep violet, loyalty is a distinct warm rose.
+   Shape, eyes, face and Plastic renderer stay exactly as V9. */
+@media (max-width:350px){
+ html[data-gx-b3="true"] .gx-gixy-message .gx-b3-goxy-cta{
+  left:61px!important;width:calc(100% - 63px)!important;
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-b3="true"] .gx-gixy-message{transition:none!important;will-change:auto}
+}

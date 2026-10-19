@@ -11,7 +11,7 @@ if(document.documentElement.dataset.gxB3!=='true')return;
 const $=id=>document.getElementById(id);
 const allowed=['notification','loyalty','mission'];
 const active=new Set(),counts={notification:0,loyalty:0,mission:0};
-let helpContext=null;
+let helpContext=null,ignoredHelpEvent=null;
 const guards={
  notification:()=>$('gx-client-notif-badge')?.textContent?.trim()==='1'
    &&Boolean(helpContext?.goxy),
@@ -53,10 +53,15 @@ function btn(){
  return el;
 }
 function attachHelp(){
- if(!helpContext?.goxy||!active.has('notification'))return;
+ if(!helpContext?.goxy||!active.has('notification')||
+    ignoredHelpEvent===helpContext.id)return;
  const msg=document.querySelector('#gx-gixys-message-root .gx-gixy-message[data-kind="notification"].is-visible');
- if(!msg||msg.querySelector('.gx-b3-goxy-cta'))return;
+ if(!msg||msg.dataset.phase!=='shown'||msg.querySelector('.gx-b3-goxy-cta'))return;
  const action=btn();
+ // Align to the actual V9 bubble offset (including its native internal
+ // spacing), not an estimated 59px avatar + 3px gap. Works at 280px too.
+ const bubble=msg.querySelector('.gx-gixy-message__bubble');
+ if(bubble)action.style.setProperty('left',bubble.offsetLeft+'px','important');
  // Sit alongside the existing V9 bubble rather than replacing its React
  // tree, plastic renderer or click-to-play behavior.
  const y=msg.getBoundingClientRect().bottom;
@@ -64,14 +69,25 @@ function attachHelp(){
  msg.append(action);
 }
 const observer=new MutationObserver(attachHelp);
-observer.observe(document.body,{subtree:true,childList:true});
+observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','data-phase']});
+// The customer engaged with or dismissed the Gixy: remove BOTH contextual
+// buttons and never recreate them for the same event.
+const disengage=event=>{
+ if(event.detail?.kind!=='notification'||!helpContext)return;
+ ignoredHelpEvent=helpContext.id;
+ document.querySelectorAll('.gx-b3-goxy-cta').forEach(el=>el.remove());
+ document.querySelectorAll('.gx-b3-notice-action').forEach(el=>el.remove());
+};
+document.addEventListener('gx-b3:gixy-engaged',disengage);
+document.addEventListener('gx-b3:gixy-dismissed',disengage);
 document.addEventListener('gx-b3:priority-reset',()=>{
- helpContext=null;emit('notification',false);
+ ignoredHelpEvent=null;helpContext=null;emit('notification',false);
  document.querySelectorAll('.gx-b3-goxy-cta').forEach(n=>n.remove());
 });
 document.addEventListener('gx-b3:priority-delivered',event=>{
  const detail=event.detail;
  if(!detail?.important)return;
+ ignoredHelpEvent=null;
  helpContext=detail.goxy?{code:detail.code,id:detail.id,goxy:true}:null;
  // Routine receipt or extension: B1's ribbon may run once, but no Gixy.
  if(!detail.gixy)return;
@@ -87,7 +103,7 @@ document.addEventListener('gx-b3:priority-delivered',event=>{
  emit('notification',true);
  attachHelp();
 });
-function resetHelp(){helpContext=null;emit('notification',false)}
+function resetHelp(){ignoredHelpEvent=null;helpContext=null;emit('notification',false)}
 document.addEventListener('gx-b3:notice-read',resetHelp);
 window.GOXION_B3_ROUTER=Object.freeze({
  isolated:true,production:false,version:'E2/B3 v2',
