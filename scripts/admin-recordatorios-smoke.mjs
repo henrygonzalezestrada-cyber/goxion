@@ -70,4 +70,15 @@ h=app({mode:"b2_multifecha",quote:{ok:true,periodo:period+"-01",cargos:[protecte
 await h.api.refresh();
 await h.api.verifyClient("test");
 assert.equal(h.api.status(h.client),"agreed","B2 acuerdo único no aparece vencido");
-console.log("Recordatorios Admin: 9 controles OK (global, prórroga, B2, seguridad).");
+// Flujo simplificado: texto únicamente; nunca crear ni descargar imagen.
+assert.ok(!source.includes("fileFromCanvas")&&!source.includes('toDataURL("image/png")'),
+  "El recordatorio ya no debe generar capturas ni imágenes");
+assert.match(h.api.messageFor(h.client),/Mi Espacio GOXION/,
+  "El texto conserva el acceso al portal del cliente");
+assert.match(h.api.messageFor(h.client),/ayuda.html/,
+  "El enlace siempre apunta a Ayuda");
+assert.equal(h.api.phoneFor({...h.client,telefono_normalizado:"961 123 4567"}),"529611234567",
+  "Normaliza el teléfono mexicano existente");
+assert.equal(h.api.phoneFor({...h.client,telefono_normalizado:""}),"",
+  "Sin teléfono se activa la selección manual de destinatario");
+console.log("Recordatorios Admin: 14 controles OK (estado, B2, texto y WhatsApp).");
