@@ -132,36 +132,42 @@ async function verify(engine,name){
     await page.waitForFunction(()=>document.querySelector('.gx-gixy-message[data-kind="notification"]')?.classList.contains('gx-b3-scroll-following'),null,{timeout:2000});
     assert((await page.locator('.gx-gixy-message[data-kind="notification"]').evaluate(el=>getComputedStyle(el).transitionProperty)).includes('top'),
       'V3 smooth scroll must resume after V9 entrance');
-    await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta').waitFor({timeout:4500});
-    const supports=await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta')
-      .evaluate(el=>getComputedStyle(el).pointerEvents);
-    assert.equal(supports,'auto');
+    await page.waitForTimeout(80);
     const nearCTA=await page.evaluate(()=>{
-      const message=document.querySelector('.gx-gixy-message[data-kind="notification"]');
-      const action=message?.querySelector('.gx-b3-goxy-cta');
+      const msg=document.querySelector('.gx-gixy-message[data-kind="notification"]');
+      const action=msg?.querySelector('.gx-b3-goxy-cta');
+      const bubble=msg?.querySelector('.gx-gixy-message__bubble');
       const nav=document.querySelector('#goxion-main-nav');
-      if(!message||!action||!nav)return null;
-      const a=action.getBoundingClientRect(),n=nav.getBoundingClientRect();
-      return {near:message.classList.contains('gx-b3-near-bell'),
-        action:{left:a.left,right:a.right,top:a.top,bottom:a.bottom},
-        nav:{top:n.top,bottom:n.bottom}};
+      if(!msg||!bubble||!nav)return null;
+      const rect=el=>{const r=el.getBoundingClientRect();
+        return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}};
+      return {near:msg.classList.contains('gx-b3-near-bell'),
+        mode:msg.dataset.ctaMode,action:action?rect(action):null,
+        bubble:rect(bubble),nav:rect(nav)};
     });
-    assert(nearCTA?.near,'CTA must accompany the bell-local Gixy');
-    assert(nearCTA.action.bottom<=nearCTA.nav.top-2,
-      'Goxy action covers navigation: '+JSON.stringify(nearCTA));
-    assert(nearCTA.action.right<=page.viewportSize().width-8,
-      'Goxy action extends beyond viewport: '+JSON.stringify(nearCTA));
+    assert(nearCTA?.near,'Keep Gixy close to the bell');
+    assert(['floating','inline-only'].includes(nearCTA.mode));
+    assert.equal(Boolean(nearCTA.action),nearCTA.mode==='floating',
+      'No ghost floating button: '+JSON.stringify(nearCTA));
+    if(nearCTA.action){
+      assert(nearCTA.action.left>=nearCTA.bubble.right+2,
+        'Goxy CTA overlaps the bubble: '+JSON.stringify(nearCTA));
+      assert(nearCTA.action.bottom<=nearCTA.nav.top-2,
+        'Goxy CTA overlaps navigation: '+JSON.stringify(nearCTA));
+      assert(nearCTA.action.right<=page.viewportSize().width-8,
+        'Goxy CTA overflows viewport: '+JSON.stringify(nearCTA));
+    }
     await page.evaluate(()=>{window.__goxyOpened=null;window.open=(...args)=>{
      window.__goxyOpened=args;return null
     }});
-    await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta').click();
+    const detail=page.locator('#gx-smart-notif-list .gx-b3-notice-action .gx-b3-goxy-cta');
+    assert.equal(await detail.count(),1,'Goxy must remain reachable in notice details');
+    if(nearCTA.action)
+      await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta').click();
+    else
+      await detail.evaluate(el=>el.click());
     assert.deepEqual(await page.evaluate(()=>window.__goxyOpened),
      ['./goxy-handoff.html','_blank','noopener,noreferrer']);
-    assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action .gx-b3-goxy-cta').count(),1);
-    const diff=await page.locator('.gx-gixy-message[data-kind="notification"]')
-     .evaluate(el=>Math.abs(el.querySelector('.gx-b3-goxy-cta').getBoundingClientRect().left-
-       el.querySelector('.gx-gixy-message__bubble').getBoundingClientRect().left));
-    assert(diff<3,code+' Goxy CTA starts away from bubble: '+diff);
     await page.evaluate(()=>window.__b3Canvas=document.querySelector(
       '.gx-gixy-message[data-kind="notification"] canvas'));
     await page.evaluate(()=>window.scrollBy(0,150));
@@ -212,7 +218,7 @@ async function verify(engine,name){
   assert.deepEqual(privateRequests,[],name+' beta requested private APIs');
   assert.deepEqual(errors,[],name+' browser errors: '+errors.join(', '));
   await page.close();
-  console.log(name+' E2/B3 V5 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
+  console.log(name+' E2/B3 V6 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
  }finally{await browser.close()}
 }
 try{await ready();await verify(chromium,'Chromium');await verify(webkit,'WebKit');console.log('GOXION E2/B3 COMPLETE BETA PASS')}
