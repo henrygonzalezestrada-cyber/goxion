@@ -118,7 +118,7 @@ h=await checked({client:{...todayClient,pago_en_revision:true},hour:12});
 assert.equal(h.api.status(h.client),"normal","Comprobante en revisión no debe recibir aviso");
 h=await checked({client:{...todayClient,estado_cuenta:{...todayClient.estado_cuenta,estado:"pagado"}},hour:12});
 assert.equal(h.api.status(h.client),"normal","Pago confirmado elimina aviso");
-h=await checked({client:{...todayClient,estado_cuenta:{...todayClient.estado_cuenta,estado:"por_vencer"},dia_pago:Number(today.slice(8))+1},hour:12});
+h=await checked({client:{...todayClient,estado_cuenta:{...todayClient.estado_cuenta,estado:"por_vencer",dia_pago:Number(today.slice(8))+1},dia_pago:Number(today.slice(8))+1},hour:12});
 assert.equal(h.api.status(h.client),"normal","Próximo vencimiento no se trata como hoy");
 const dueCharge=charge(today,{cargo_id:"due",total_centavos:4600});
 const futureProrrogated=charge(today,{cargo_id:"prorroga",prorroga_estado:"aprobada",fecha_pactada:offset(2),total_centavos:4600});
