@@ -2,7 +2,7 @@
 **Entorno:** ficticio, aislado, autenticación de demo por cookie aleatoria `HttpOnly`. Esta beta NO llama a Supabase, no cobra, no registra cupones ni toca datos de clientes.
 
 ## Experiencia que se prueba
-La página usa el espejo de Mi Espacio construido con **el HTML/CSS oficial de Ayuda** y los **Gixys Plastic V7** ya aprobados; conserva la animación de aviso importante E1/B1 y acceso existente a Goxy. Añade datos realistas ficticios (2 perfiles individuales, 1 combo promocional y 1 cuenta completa), historial ficticio y un estado de cuenta navegable. La pestaña Catálogo muestra servicios de prueba. La pestaña Soporte conserva el handoff aprobado a Goxy; no se autentica ni lee un cliente.
+La página usa el espejo de Mi Espacio construido con **el HTML/CSS oficial de Ayuda** y los **Gixys Plastic V7** ya aprobados; conserva la animación de aviso importante E1/B1 y acceso existente a Goxy. Añade datos realistas ficticios (2 perfiles individuales, 1 combo promocional y 1 cuenta completa), historial ficticio y un estado de cuenta navegable. La pestaña Catálogo muestra servicios de prueba. La pestaña Soporte y el botón «Preguntar a Goxy» abren Ayuda oficial en otra pestaña por decisión explícita del usuario, ya que Railway tiene un origen separado; no se transfiere ningún dato del expediente ficticio. En la beta no se autentica ni lee un cliente.
 
 Abrir el botón **«Simular mi cuenta»** y realizar las acciones en orden deseado:
 1. Recibir aviso prioritario → tocar Gixy de la campana.
