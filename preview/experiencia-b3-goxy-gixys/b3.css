@@ -1,0 +1,31 @@
+/* Beta-only controller. Official Ayuda and Gixys V9 CSS remain unchanged. */
+html[data-gx-b3="true"] .gx-b3-lab{
+ position:fixed;right:max(12px,env(safe-area-inset-right));bottom:calc(12px + env(safe-area-inset-bottom));
+ z-index:10030;max-width:min(325px,calc(100vw - 24px));
+ color:#e8f0ff;font-family:Poppins,system-ui,sans-serif;
+}
+.gx-b3-lab-toggle{
+ border:1px solid rgba(126,176,220,.22);background:rgba(9,16,31,.9);
+ color:#e6f1ff;min-height:42px;padding:10px 15px;border-radius:28px;
+ backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+ box-shadow:0 8px 28px rgba(0,0,0,.24);
+ font:700 11px/1.25 Poppins,system-ui,sans-serif;cursor:pointer;
+}
+.gx-b3-lab-toggle span{color:#76d9eb;margin-left:6px}
+.gx-b3-controls{
+ margin-top:8px;padding:15px;border-radius:17px;box-shadow:0 14px 36px rgba(0,0,0,.3);
+ border:1px solid rgba(192,185,244,.17);
+ background:rgba(8,8,12,.82);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);
+}
+.gx-b3-controls[hidden]{display:none!important}
+.gx-b3-heading{font-size:12px;font-weight:750;color:#e9ddff}
+.gx-b3-controls p{font-size:10px;line-height:1.45;color:#acbcd1;margin:7px 0 12px}
+.gx-b3-buttons{display:grid;grid-template-columns:1fr;gap:7px}
+.gx-b3-buttons button,.gx-b3-reset{
+ border:1px solid rgba(172,194,237,.17);border-radius:11px;
+ min-height:39px;background:rgba(255,255,255,.045);color:#ecf1ff;
+ font:600 11px Poppins,system-ui,sans-serif;text-align:left;padding:9px 11px;cursor:pointer
+}
+.gx-b3-buttons button:active,.gx-b3-reset:active{transform:scale(.98)}
+.gx-b3-reset{display:block;border:0;background:transparent;color:#aebbd8;margin-top:8px;min-height:30px;padding:4px 0}
+@media(prefers-reduced-motion:reduce){.gx-b3-lab *{animation:none!important;transition:none!important}}
