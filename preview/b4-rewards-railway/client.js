@@ -148,6 +148,12 @@ function adjustRewardOverlay(){
  if(btn)btn.setAttribute('aria-label','Cerrar premio del espejo');
 }
 async function doAction(action){
+ // Never leave the scenario drawer covering Gixys or their speech balloons.
+ if(['notification','milestone','mission'].includes(action)){
+  const tray=$('gx-b3-controls'),toggle=$('gx-b3-toggle');
+  if(tray)tray.hidden=true;
+  toggle?.setAttribute('aria-expanded','false');
+ }
  if(action==='statement'){showAccount();return}
  if(action==='close-statement'){closeAccount();return}
  if(action==='home'){catalogue(false);return}
