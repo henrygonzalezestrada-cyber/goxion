@@ -25,6 +25,9 @@ function httpClient(){
  }
 }
 async function apiChecks(){
+ const redirect=await fetch(base+'/preview/experiencia-b3-goxy-gixys/goxy-handoff.html',{redirect:'manual'});
+ assert.equal(redirect.status,302);
+ assert.equal(redirect.headers.get('location'),'https://henrygonzalezestrada-cyber.github.io/goxion/ayuda.html');
  const x=httpClient(),y=httpClient();
  let s=await x.get();
  assert.equal(s.streak,3);
