@@ -231,6 +231,8 @@
         if(!actual||!["overdue","missed"].includes(effectiveStatus(actual))){
           applyCards();throw new Error("El estado del cliente cambió. Actualiza su cuenta antes de continuar.");
         }
+        if(window.gxLoadRegistrationState&&(!window.gxRegistrationState?.clientes?.length))
+          await window.gxLoadRegistrationState(false);
         prepareReminder(key,b2Context(actual));
       }catch(err){alert(err?.message||"No se pudo preparar el recordatorio.");}
       finally{button.disabled=false;button.textContent="↗ Enviar recordatorio";}
