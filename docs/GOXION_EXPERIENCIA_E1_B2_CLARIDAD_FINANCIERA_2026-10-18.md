@@ -105,3 +105,17 @@ Tras aprobar explícitamente el remaster Index R5 y la mejora R5.1 del espacio d
 - **No tocar más nada**: conservados R5.1, precios, fechas múltiples, comprobantes, descuentos, mora, lealtad, identidad, cristal, scroll y CTA. Ningún cambio en `index.html` oficial ni `ayuda.html`, Admin o motor B2.
 
 **Hito:** E1/B2 aprobado visualmente por el propietario sujeto a completar esta corrección comprobada. Se registra el cierre al pasar QA Chromium + WebKit y publicar únicamente el espejo. **Aprobación visual no significa lanzamiento oficial**: el embargo del paquete integral sigue bajo Issue #142.
+
+## CIERRE DEFINITIVO DEL BLOQUE 2 · VALIDACIÓN EXPRESA DEL PROPIETARIO · 18/oct/2026
+
+**ESTADO VIGENTE: E1/B2 APROBADO Y CERRADO VISUALMENTE.** Los encabezados y secciones anteriores que describen este bloque como «pendiente» o «en desarrollo» son solo historial del proceso y quedan reemplazados por este cierre.
+
+Después de R5 y R5.1, el propietario aceptó el remaster salvo la flecha del calendario. Se incorporó **Morphicons original de Ayuda** en PR #156, sin alterar ningún otro elemento aprobado. Validaciones: Chromium + WebKit en siete anchos y doce escenarios (run `39175987051`: **SUCCESS**); GitHub Pages (run `39176373530`: **SUCCESS**). A continuación el propietario confirmó expresamente: «Super, con eso damos por cerrado este bloque».
+
+**Qué se congela:** morph sticky del precio, jerarquía R5.1, estados visuales nativos Animate UI, montos y calendario interactivo, chevrón Morphicons idéntico a Ayuda, cristal neutro, tarjetas de identidad y desglose, lealtad expresiva, distinción próximo período/total/multifecha y ausencia de duplicación de estado. No reabrir ni reescribir diseños sin petición del propietario. La estrella/anillo de racha en la beta usa datos explícitos **ficticios** y deberá conectarse a estado de lealtad validado por servidor durante futura integración global, nunca inferirse.
+
+**Entrega aprobada:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-financiera-espejo/estado.html?escenario=multi&v=final-chevron · PR #156.
+
+**No equivale a autorización de producción.** Ni Index oficial, ni Ayuda oficial, ni Admin ni motor financiero B2 se han modificado como parte de este cierre. El conjunto se integra solo al completar y aprobar E2/B3, E2/B4, E3/B5, auditoría global y autorización final expresamente solicitada (Issue #142).
+
+**Próxima etapa:** E2/B3, Goxy inteligencia central y Gixys asistentes contextuales. Gixys V9 sigue congelada como beta previamente aprobada; reaprovechar sin rediseño.
