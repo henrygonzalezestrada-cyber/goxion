@@ -41,6 +41,7 @@ mirror=mirror.replace(old,'const emit=(key,active)=>window.GOXION_B3_ROUTER.emit
 const oldNav='btn.addEventListener("click",()=>notes("Esta beta muestra únicamente Mi Espacio. Catálogo y Soporte siguen sin cambios."));';
 if(!mirror.includes(oldNav))throw Error('V9 navigation changed');
 mirror=mirror.replace(oldNav,'btn.addEventListener("click",()=>{if(btn.id==="btn-tab-soporte")window.GOXION_B3_ROUTER.handoff();else notes("La beta conserva Catálogo sin modificaciones.");});');
+mirror=mirror.replace('fetch("./missions-demo.html"','fetch("../gixys-mi-espacio-espejo/missions-demo.html"');
 mirror=mirror.replace('version:"Fase 2 beta"','version:"E2/B3 V1 · Gixys V9 intacta"');
 fs.writeFileSync(dst+'b3-mirror.js',mirror);
 console.log('B3 mirror generated from V9: only event routing and beta lab added');
