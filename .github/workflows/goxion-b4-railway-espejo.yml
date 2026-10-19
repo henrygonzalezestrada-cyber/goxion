@@ -1,0 +1,37 @@
+name: GOXION · E2 B4 · Railway espejo funcional
+on:
+  push:
+    branches:
+      - beta/e2b4-railway-espejo-funcional-20261019
+      - beta/e2b4-railway-espejo-oficial-v2-20261019
+    paths:
+      - 'preview/b4-rewards-railway/**'
+      - '.github/workflows/goxion-b4-railway-espejo.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: goxion-e2b4-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 19
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Lint JavaScript and isolated backend
+        run: |
+          node --check preview/b4-rewards-railway/server.mjs
+          node --check preview/b4-rewards-railway/client.js
+          node --check preview/b4-rewards-railway/check.mjs
+      - name: Install test runner
+        run: npm install --no-save --no-package-lock playwright
+      - name: Verify fictional financial API before installing browsers
+        run: GX_B4_API_ONLY=1 node preview/b4-rewards-railway/check.mjs
+      - name: Install independent test browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Run complete B4 functional and browser regressions
+        run: node preview/b4-rewards-railway/check.mjs
