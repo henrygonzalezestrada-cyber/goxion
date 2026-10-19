@@ -26,9 +26,11 @@ jobs:
           node --check preview/b4-rewards-railway/server.mjs
           node --check preview/b4-rewards-railway/client.js
           node --check preview/b4-rewards-railway/check.mjs
-      - name: Install independent test browser
-        run: |
-          npm install --no-save --no-package-lock playwright
-          npx playwright install --with-deps chromium webkit
+      - name: Install test runner
+        run: npm install --no-save --no-package-lock playwright
+      - name: Verify fictional financial API before installing browsers
+        run: GX_B4_API_ONLY=1 node preview/b4-rewards-railway/check.mjs
+      - name: Install independent test browsers
+        run: npx playwright install --with-deps chromium webkit
       - name: Run complete B4 functional and browser regressions
         run: node preview/b4-rewards-railway/check.mjs
