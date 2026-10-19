@@ -80,7 +80,11 @@ async function apiChecks(){
 async function browserChecks(engine,name){
  const browser=await engine.launch({headless:true});
  try{
-  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true});
+  // Chromium exercises full animations; Safari/WebKit additionally validates
+  // the system accessibility setting for reduced motion, which unlocks Gixy
+  // dialogue immediately. Native full-motion V7 WebKit has separate QA.
+  const context=await browser.newContext({viewport:{width:390,height:844},hasTouch:true,
+    reducedMotion:name==='WebKit'?'reduce':'no-preference'});
   const page=await context.newPage(),errors=[],privateRequests=[];
   page.on('pageerror',e=>errors.push(e.message));
   page.on('request',r=>{if(/supabase.co|discord.com|goxy-ai-beta|auth\/v1|rest\/v1/i.test(r.url()))
