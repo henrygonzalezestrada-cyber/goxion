@@ -105,6 +105,13 @@ html[data-gx-b3="true"] #dynamic-greeting-text{
    first positioning. Removing the override restores V9 opacity/scale and
    native avatar/bubble arrival, with no initial slide from the page top.
    Keep the V3 rAF DOM-only scroll follower: no React/canvas remount. */
+/* Retain V3's accepted 130ms scroll easing AFTER first paint while keeping
+   original V9 opacity/transform timing on entry. */
+html[data-gx-b3="true"] .gx-gixy-message.gx-b3-scroll-following{
+ transition:top .13s linear,opacity .32s cubic-bezier(.2,.8,.2,1),
+   transform .32s cubic-bezier(.2,.8,.2,1)!important;
+ will-change:top,opacity;
+}
 html[data-gx-b3="true"] .gx-gixy-message.gx-b3-out-of-view{
  opacity:0!important;pointer-events:none!important;
 }
