@@ -437,6 +437,7 @@ const n = (v, fallback = 0) => {
                     _key: key,
                     folio: c.folio || "",
                     nombre: c.nombre || key,
+                    telefono_normalizado: c.telefono_normalizado || "",
                     usuario_acceso: c.usuario_acceso || c.usuario || c.correo_acceso || "",
                     codigo: "",
                     pagos_puntuales: n(c.pagos_puntuales, 0),

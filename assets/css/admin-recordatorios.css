@@ -1,0 +1,36 @@
+/* GOXION Admin · Cobros vencidos y prórrogas, aislado de Index y Ayuda */
+.client-card.gx-reminder-overdue,
+.client-card.gx-reminder-missed {border-color:rgba(255,109,140,.28)!important;background:linear-gradient(145deg,#151019,#0a0a0f)!important}
+.client-card.gx-reminder-agreed {border-color:rgba(167,127,255,.35)!important;background:linear-gradient(145deg,#151020,#0b0a14)!important}
+.client-card.gx-reminder-agreed .gx-client-name-line h3{color:#c1a8ff!important}
+.client-card.gx-reminder-agreed .gx-client-payment-primary .gx-client-payment-dot {background:#b48cff!important;box-shadow:0 0 8px rgba(166,127,255,.35)}
+.client-card.gx-reminder-agreed .gx-client-payment-primary strong {color:#d3bdff!important}
+.client-card.gx-reminder-agreed .client-status-badge{border-color:rgba(178,138,255,.34)!important;background:rgba(157,121,242,.13)!important;color:#d2beff!important;animation:none!important}
+.client-card.gx-reminder-missed .gx-client-payment-primary strong{color:#ffa2b6!important}
+.client-card.gx-reminder-overdue .gx-client-preview-meta .loyalty,
+.client-card.gx-reminder-missed .gx-client-preview-meta .loyalty{display:none!important}
+.client-card.gx-reminder-due,
+.client-card.gx-reminder-last-call {border-color:rgba(255,177,77,.25)!important;background:linear-gradient(145deg,#17131a,#0a0a0f)!important}
+.client-card.gx-reminder-due .gx-client-payment-primary strong{color:#f5d49b!important}
+.client-card.gx-reminder-last-call .gx-client-payment-primary strong{color:#ffe0a8!important}
+.client-card.gx-reminder-due .gx-client-payment-primary .gx-client-payment-dot,
+.client-card.gx-reminder-last-call .gx-client-payment-primary .gx-client-payment-dot{background:#ffbd67;box-shadow:0 0 8px rgba(255,173,76,.35)}
+.client-card.gx-reminder-due .client-status-badge,
+.client-card.gx-reminder-last-call .client-status-badge{color:#ffd79b!important;border-color:rgba(255,180,84,.3)!important;background:rgba(255,177,76,.09)!important}
+.client-card.gx-reminder-due .gx-reminder-action,
+.client-card.gx-reminder-last-call .gx-reminder-action {color:#ffdeb2;background:linear-gradient(100deg,rgba(242,155,64,.13),rgba(201,135,60,.08));border-color:rgba(255,176,90,.3)}
+.client-card.gx-reminder-last-call .gx-reminder-action{border-color:rgba(255,200,115,.5)}
+.gx-reminder-action {display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:37px;margin-top:7px;padding:6px 12px;border:1px solid rgba(255,125,156,.34);border-radius:10px;color:#ffcad6;background:linear-gradient(100deg,rgba(226,66,111,.15),rgba(161,59,136,.08));font:700 .73rem Rajdhani,sans-serif;letter-spacing:.025em;cursor:pointer}
+.gx-reminder-action:disabled{opacity:.6;cursor:wait}
+.gx-reminder-action:active{transform:scale(.994)}
+.gx-reminder-no-phone-dialog{box-sizing:border-box;border:1px solid rgba(128,145,177,.27);border-radius:20px;max-width:min(420px,calc(100vw - 24px));width:100%;padding:0;background:linear-gradient(145deg,#11121f,#090a12);color:#fff;box-shadow:0 23px 80px rgba(0,0,0,.8)}
+.gx-reminder-no-phone-dialog::backdrop{background:rgba(0,0,0,.79);backdrop-filter:blur(9px)}
+.gx-reminder-no-phone-sheet{padding:20px 18px 18px}
+.gx-reminder-no-phone-sheet header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.gx-reminder-no-phone-sheet small{display:block;color:#76d8e9;font:700 .68rem Rajdhani,sans-serif;letter-spacing:.06em}
+.gx-reminder-no-phone-sheet h2{margin:3px 0 0;font:700 1.23rem Rajdhani,sans-serif}
+.gx-reminder-no-phone-sheet p{color:#bec5d8;font:500 .89rem/1.35 Rajdhani,sans-serif;margin:10px 0 17px}
+.gx-reminder-no-phone-close{flex:none;width:38px;height:38px;border-radius:50%;border:0;background:#5be5f5;color:#09151b;font:700 1.45rem Rajdhani,sans-serif;cursor:pointer}
+.gx-reminder-no-phone-actions{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.gx-reminder-no-phone-actions button{font:700 .82rem Rajdhani,sans-serif;min-height:44px;border-radius:11px;padding:9px 13px;border:1px solid rgba(163,171,209,.18);color:#dfe5f1;background:rgba(255,255,255,.06);cursor:pointer}
+.gx-reminder-no-phone-actions .gx-reminder-no-phone-share{background:linear-gradient(105deg,#53dbe9,#93b6fd);color:#09131d;border:0;flex:1}
