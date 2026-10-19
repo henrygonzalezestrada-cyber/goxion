@@ -148,21 +148,10 @@ html[data-gx-b3="true"] .gx-b3-notice-action .gx-b3-goxy-cta{
  html[data-gx-b3="true"] .gx-gixy-message{transition:none!important;will-change:auto}
 }
 
-/* B3 V5 — only the notification Gixy: bell-local scene. The original
-   V9 face/entrance and V3 scroll-follow remain untouched. On phones with
-   enough horizontal room, the existing Goxy action rests beside the speech
-   bubble rather than covering the native navigation below the bell. */
-html[data-gx-b3="true"] .gx-gixy-message.gx-b3-near-bell[data-cta-mode="floating"] .gx-b3-goxy-cta{
- left:calc(100% + 4px)!important;right:auto!important;
- top:12px!important;bottom:auto!important;
- width:137px!important;min-width:110px!important;max-width:none!important;
+/* V7: retain the original V3 compact button below its bubble.
+   Because the Gixy now stands at the bell, make a small temporary gap
+   before navigation only during the Gixy's notification; all other
+   layouts, Gixys, and the approved CTA visual stay unchanged. */
+html[data-gx-b3="true"]:has(.gx-gixy-message[data-kind="notification"].gx-b3-near-bell.is-visible:not(.is-leaving)) .gx-mirror-note{
+ margin-bottom:57px!important;
 }
-@media(max-width:360px){
- html[data-gx-b3="true"] .gx-gixy-message.gx-b3-near-bell[data-cta-mode="floating"] .gx-b3-goxy-cta{
-  width:110px!important;
-  padding:7px 6px!important;
- }
-}
-
-/* V6: never cover the bubble when a resize invalidates the floating CTA. */
-html[data-gx-b3="true"] .gx-gixy-message.gx-b3-near-bell[data-cta-mode="inline-only"] > .gx-b3-goxy-cta{display:none!important}
