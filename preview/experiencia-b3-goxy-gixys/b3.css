@@ -100,16 +100,11 @@ html[data-gx-b3="true"] #dynamic-greeting-text{
  text-wrap:balance;
  overflow-wrap:break-word;
 }
-/* 2. Keep the original V9 3D avatar mounted throughout movement:
-   B3 V3 only modifies the fixed portal's top style directly in rAF.
-   Repositioning is smooth; an absent/off-screen anchor fades rather
-   than jumping to another arbitrary slot while someone is scrolling. */
-html[data-gx-b3="true"] .gx-gixy-message{
- transition:top .13s linear,
-   opacity .23s cubic-bezier(.2,.85,.3,1),
-   transform .32s cubic-bezier(.16,1,.3,1)!important;
- will-change:top,opacity;
-}
+/* 2. B3 V4: restore the EXACT approved V9 entrance from mirror.css.
+   V3's "transition:top" also moved the scene from provisional top:0 on
+   first positioning. Removing the override restores V9 opacity/scale and
+   native avatar/bubble arrival, with no initial slide from the page top.
+   Keep the V3 rAF DOM-only scroll follower: no React/canvas remount. */
 html[data-gx-b3="true"] .gx-gixy-message.gx-b3-out-of-view{
  opacity:0!important;pointer-events:none!important;
 }
