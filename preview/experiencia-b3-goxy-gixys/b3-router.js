@@ -63,9 +63,14 @@ document.addEventListener('gx-mirror-ready',()=>{
    const heart=$('gx-mirror-heart')?.querySelector('.pulse-heart');
    if(heart&&!guards.loyalty())heart.click();
   }else if(kind==='mission'){
-   const b=$('gx-mirror-complete-btn');
-   if(b&&!b.disabled)b.click();
-   $('gx-mirror-mission-card')?.scrollIntoView({behavior:'smooth',block:'center'});
+   // Reuse V9's *actual* mission expansion before resolving the event.
+   // This supplies its approved contextual anchor and ensures the Gixy
+   // never has to float over a closed/invisible mission panel.
+   $('gx-mirror-mission-card')?.click();
+   window.setTimeout(()=>{
+    const action=$('gx-mirror-complete-btn');
+    if(action&&!action.disabled)action.click();
+   },1250);
   }
  }));
 });
