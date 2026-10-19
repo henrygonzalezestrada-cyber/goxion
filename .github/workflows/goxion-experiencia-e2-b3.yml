@@ -8,6 +8,7 @@ on:
       - beta/e2b3-v4-entrada-original-gixys-20261018
       - beta/e2b3-v5-gixy-campana-20261019
       - beta/e2b3-v6-cta-safe-20261019
+      - beta/e2b3-v7-restaurar-cta-inferior-20261019
     paths:
       - 'preview/experiencia-b3-goxy-gixys/**'
       - '.github/workflows/goxion-experiencia-e2-b3.yml'
