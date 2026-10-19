@@ -64,6 +64,19 @@ html=html.replace(insertion,hiddenB1+'\n'+noticeUI+'\n'+
  '<script src="./b3-policy.js?v=2" defer></script>\n'+
  '<script src="./b3-notice.js?v=2" defer></script>\n'+
  '<script src="./b3-router.js?v=2" defer></script>');
+html=html.replace(
+ '<button type="button" data-gx-b3-test="notification">Aviso recibido</button>',
+ [
+ '<div class="gx-b3-group-label">Avisos prioritarios · Bloque 1</div>',
+ '<button type="button" data-gx-b3-priority="correction">Comprobante con observación</button>',
+ '<button type="button" data-gx-b3-priority="overdue">Pago vencido</button>',
+ '<button type="button" data-gx-b3-priority="review">Comprobante en revisión</button>',
+ '<button type="button" data-gx-b3-priority="extension">Prórroga registrada</button>',
+ '<div class="gx-b3-group-label">Avisos ordinarios</div>',
+ '<button type="button" data-gx-b3-priority="soon">Pago próximo (sin animación)</button>',
+ '<button type="button" data-gx-b3-priority="clear">Sin novedades (sin animación)</button>'
+ ].join('\\n')
+);
 html=html.replace('<script src="./b3-mirror.js?v=1" defer></script>','<script src="./b3-mirror.js?v=2" defer></script>');
 /* Use V6's ACTUAL 1,170ms silk-stream draw and the same notification sheet
  * handoff: source is copied, never redrawn or reimplemented from screenshots.
