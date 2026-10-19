@@ -67,7 +67,7 @@ function selectPlace(kind,node,sequence,dimensions){
    const ctaWidth=vw<=360?110:137,ctaGap=4;
    const maxLeft=vw-w-ctaWidth-ctaGap-11;
    const left=Math.min(Math.round(b.right-w+3),maxLeft);
-   const top=Math.ceil(Math.max(b.bottom+8,head.bottom+3));
+   const top=Math.ceil(Math.max(b.bottom+7,head.bottom-2));
    if(left>=11&&top>=12&&top+h+4<=Math.min(n.top,vh-10)){
     const sceneBox=bounds(left,top,w,h);
     const ctaBox=bounds(left+w+ctaGap,top+12,ctaWidth,35);
