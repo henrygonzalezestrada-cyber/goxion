@@ -163,6 +163,9 @@ const server=http.createServer(async(req,res)=>{
     '<link rel="stylesheet" href="/preview/b4-rewards-railway/client.css?v=2">'+
     '<link rel="stylesheet" href="/preview/b4-rewards-railway/official.css?v=1"></head>');
    html=html.replace('</body>',
+    '<script src="/preview/b4-rewards-railway/official-structure.js?v=1" defer></script>'+ 
+    '<script src="/assets/js/ayuda/05-gamification-shared-morph-js.js" defer></script>'+
+    '<script src="/assets/js/ayuda/06-wave-background.js" defer></script>'+
     '<script src="/preview/experiencia-b3-goxy-gixys/companions-v3.js?v=7" defer></script>'+
     '<script src="/preview/experiencia-mi-espacio-inteligente/priority-engine.js?v=e1b1v6" defer></script>'+
     '<script src="/preview/experiencia-b3-goxy-gixys/b3-policy.js?v=2" defer></script>'+
