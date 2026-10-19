@@ -96,6 +96,11 @@ async function browserChecks(engine,name){
   assert.equal(await page.locator('#view-inicio').count(),1);
   assert.equal(await page.locator('#view-catalogo').count(),1);
   assert.equal(await page.locator('#view-soporte').count(),1);
+  await page.locator('#header-action-btn').click();
+  assert.equal(await page.locator('#header-action-btn.gx-b4-auth-open').count(),1,
+    'Native Ayuda login card should be inspectable without real auth');
+  await page.locator('.gx-auth-inline-close').click();
+  assert.equal(await page.locator('#header-action-btn.gx-b4-auth-open').count(),0);
   assert.equal(await page.locator('#gx-promo-showcase').count(),1);
   assert.equal(await page.locator('#support-platforms-grid .gx-b4-support-choice').count(),4);
   assert.equal(await page.locator('#dash-billing-card').count(),1);
