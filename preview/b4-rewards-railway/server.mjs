@@ -52,7 +52,7 @@ function quote(state,period=state.period){
    secretEligible,appliesCoupon:secret>0};
  // A payment is immutable: never show a higher balance when a one-use
  // coupon was consumed or a mission benefit becomes unavailable afterward.
- const confirmed=s.payments.find(p=>p.index===period);
+ const confirmed=state.payments.find(p=>p.index===period);
  return confirmed?{...result,paid:true,total:confirmed.total,secret:confirmed.secret,
    loyalty:confirmed.loyalty,mission:confirmed.mission,personal:confirmed.personal,
    loyaltyLevel:confirmed.loyaltyLevel,appliesCoupon:confirmed.secret>0}:result;
