@@ -142,6 +142,13 @@ function serve(req,res,url){
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url||'/', 'http://localhost');
  if(url.pathname==='/health'){json(res,200,{ok:true,demo:true,store:'isolated'});return}
+ // Railway is not the production origin. A same-origin iframe would try to
+ // load private Ayuda inside the demo. On explicit Goxy click, send the user
+ // to real Ayuda instead; never forward mock account data.
+ if(url.pathname==='/preview/experiencia-b3-goxy-gixys/goxy-handoff.html'){
+   res.writeHead(302,{location:'https://henrygonzalezestrada-cyber.github.io/goxion/ayuda.html',
+     'cache-control':'no-store'});res.end();return;
+ }
  if(url.pathname==='/'||url.pathname==='/espejo'||url.pathname==='/preview/experiencia-b3-goxy-gixys/'){
    res.writeHead(302,{location:'/preview/experiencia-b3-goxy-gixys/index.html'});res.end();return;
  }
