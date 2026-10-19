@@ -142,5 +142,12 @@ async function browserChecks(engine,name){
  }finally{await browser.close()}
 }
 await ready();
-try{await apiChecks();await browserChecks(chromium,'Chromium');await browserChecks(webkit,'WebKit')}
-finally{child.kill()}
+try{
+ await apiChecks();
+ if(process.env.GX_B4_API_ONLY!=='1'){
+  await browserChecks(chromium,'Chromium');
+  await browserChecks(webkit,'WebKit');
+ }
+}catch(err){
+ console.error('[B4 TEST SERVER LOG] '+last.slice(-4000));throw err;
+}finally{child.kill()}
