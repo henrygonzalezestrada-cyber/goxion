@@ -119,7 +119,7 @@ const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=u
  '.woff':'font/woff','.webp':'image/webp','.ico':'image/x-icon'};
 function serve(req,res,url){
  let rel;try{rel=decodeURIComponent(url.pathname).replace(/^\/+/,'');}catch{return json(res,400,{ok:false})}
- if(!(/^(preview|assets)\//.test(rel)||['logo2.PNG','logo.PNG','favicon.ico'].includes(rel))){
+ if(!(/^(preview|assets|logos|fonts)\//.test(rel)||['logo2.PNG','logo.PNG','favicon.ico','Logo individual.png'].includes(rel))){
    res.writeHead(404);res.end('Not found');return;
  }
  const file=path.resolve(root,rel);
@@ -142,6 +142,41 @@ function serve(req,res,url){
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url||'/', 'http://localhost');
  if(url.pathname==='/health'){json(res,200,{ok:true,demo:true,store:'isolated'});return}
+ // Full markup/styles are read from the untouched CURRENT official Ayuda.
+ // Strip ALL production scripts and DOM inline handlers before serving:
+ // session, financial, Supabase, purchases and notification writes stay inert.
+ if((url.pathname==='/espejo-oficial'||url.pathname==='/espejo-oficial.html')&&req.method==='GET'){
+   let html=fs.readFileSync(path.join(root,'ayuda.html'),'utf8');
+   html=html.replace(/<script\b[^>]*>[\s\S]*?<\/script\s*>/gi,'')
+     .replace(/\s+on[a-z]+\s*=\s*"[^"]*"/gi,'')
+     .replace(/\s+on[a-z]+\s*=\s*'[^']*'/gi,'');
+   html=html.replace('<html ','<html data-gx-mirror="true" data-gx-b3="true" data-gx-b4-official="true" ');
+   html=html.replace('<body class="no-scroll">','<body class="gx-official-mirror gx-smart-body" data-visual-only="true">');
+   html=html.replace('</head>',
+    '<base href="/"><meta name="robots" content="noindex,nofollow">'+
+    '<meta http-equiv="Content-Security-Policy" content="default-src \u0027self\u0027 https://fonts.googleapis.com https://fonts.gstatic.com data: blob:; connect-src \u0027self\u0027; img-src \u0027self\u0027 data:; font-src \u0027self\u0027 https://fonts.gstatic.com; style-src \u0027self\u0027 \u0027unsafe-inline\u0027 https://fonts.googleapis.com; script-src \u0027self\u0027;">'+
+    '<link rel="stylesheet" href="/preview/gixys-mi-espacio-espejo/companions.css?v=9">'+
+    '<link rel="stylesheet" href="/preview/gixys-mi-espacio-espejo/mirror.css?v=9">'+
+    '<link rel="stylesheet" href="/preview/experiencia-b3-goxy-gixys/companions-v3.css?v=3">'+
+    '<link rel="stylesheet" href="/preview/experiencia-b3-goxy-gixys/b3-notice.css?v=2">'+
+    '<link rel="stylesheet" href="/preview/experiencia-b3-goxy-gixys/b3.css?v=7">'+
+    '<link rel="stylesheet" href="/preview/b4-rewards-railway/client.css?v=2">'+
+    '<link rel="stylesheet" href="/preview/b4-rewards-railway/official.css?v=1"></head>');
+   html=html.replace('</body>',
+    '<script src="/preview/experiencia-b3-goxy-gixys/companions-v3.js?v=7" defer></script>'+
+    '<script src="/preview/experiencia-mi-espacio-inteligente/priority-engine.js?v=e1b1v6" defer></script>'+
+    '<script src="/preview/experiencia-b3-goxy-gixys/b3-policy.js?v=2" defer></script>'+
+    '<script src="/preview/experiencia-b3-goxy-gixys/b3-notice.js?v=2" defer></script>'+
+    '<script src="/preview/experiencia-b3-goxy-gixys/b3-router.js?v=7" defer></script>'+
+    '<script src="/preview/b4-rewards-railway/official-adapter.js?v=1" defer></script>'+
+    '<script src="/preview/b4-rewards-railway/client.js?v=2" defer></script>'+
+    '</body>');
+   html=html.replace('<title>GOXION - Ecosistema Central</title>',
+    '<title>GOXION · Ayuda oficial · Espejo integral de prueba</title>');
+   res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store',
+    'x-content-type-options':'nosniff'});res.end(html);return;
+ }
+
  // Railway is not the production origin. A same-origin iframe would try to
  // load private Ayuda inside the demo. On explicit Goxy click, send the user
  // to real Ayuda instead; never forward mock account data.
@@ -149,7 +184,10 @@ const server=http.createServer(async(req,res)=>{
    res.writeHead(302,{location:'https://henrygonzalezestrada-cyber.github.io/goxion/ayuda.html',
      'cache-control':'no-store'});res.end();return;
  }
- if(url.pathname==='/'||url.pathname==='/espejo'||url.pathname==='/preview/experiencia-b3-goxy-gixys/'){
+ if(url.pathname==='/'||url.pathname==='/espejo'){
+   res.writeHead(302,{location:'/espejo-oficial'});res.end();return;
+ }
+ if(url.pathname==='/espejo-visual'||url.pathname==='/preview/experiencia-b3-goxy-gixys/'){
    res.writeHead(302,{location:'/preview/experiencia-b3-goxy-gixys/index.html'});res.end();return;
  }
  if(url.pathname.startsWith('/api/b4/')){
