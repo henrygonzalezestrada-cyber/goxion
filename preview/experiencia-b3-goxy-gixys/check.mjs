@@ -98,7 +98,18 @@ async function verify(engine,name){
         placement:document.querySelector('.gx-gixy-message[data-kind="notification"]')?.dataset.placement,
         noteVisibility:getComputedStyle(document.querySelector('.gx-mirror-note')).visibility};
     });
-    console.log('B3 BELL GIXY GEOMETRY '+name+' '+code+' '+JSON.stringify(geometry));
+    // A notification must appear close to its own bell, not the greeting.
+    // The optional Goxy action must remain fully tappable without covering nav.
+    if(geometry.gixy && geometry.bell && page.viewportSize().width>=320){
+      assert.equal(await page.locator('.gx-gixy-message[data-kind="notification"]').evaluate(el=>el.classList.contains('gx-b3-near-bell')),true,
+        name+' '+code+' should choose the bell-local slot: '+JSON.stringify(geometry));
+      assert(geometry.gixy.top>=geometry.bell.bottom+2 &&
+        geometry.gixy.top<=geometry.bell.bottom+28,
+        name+' '+code+' Gixy too far from bell: '+JSON.stringify(geometry));
+      assert(geometry.gixy.bottom+4<=geometry.nav.top,
+        name+' '+code+' Gixy overlaps navigation: '+JSON.stringify(geometry));
+    }
+    console.log('B3 V5 BELL DISTANCE '+name+' '+code+' '+(geometry.gixy.top-geometry.bell.bottom)+'px');
     // B3 V4 restores the exact V9 arrival, without a top:0 slide.
     const entrance=await page.locator('.gx-gixy-message[data-kind="notification"]')
       .evaluate(el=>{
@@ -125,6 +136,21 @@ async function verify(engine,name){
     const supports=await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta')
       .evaluate(el=>getComputedStyle(el).pointerEvents);
     assert.equal(supports,'auto');
+    const nearCTA=await page.evaluate(()=>{
+      const message=document.querySelector('.gx-gixy-message[data-kind="notification"]');
+      const action=message?.querySelector('.gx-b3-goxy-cta');
+      const nav=document.querySelector('#goxion-main-nav');
+      if(!message||!action||!nav)return null;
+      const a=action.getBoundingClientRect(),n=nav.getBoundingClientRect();
+      return {near:message.classList.contains('gx-b3-near-bell'),
+        action:{left:a.left,right:a.right,top:a.top,bottom:a.bottom},
+        nav:{top:n.top,bottom:n.bottom}};
+    });
+    assert(nearCTA?.near,'CTA must accompany the bell-local Gixy');
+    assert(nearCTA.action.bottom<=nearCTA.nav.top-2,
+      'Goxy action covers navigation: '+JSON.stringify(nearCTA));
+    assert(nearCTA.action.right<=page.viewportSize().width-8,
+      'Goxy action extends beyond viewport: '+JSON.stringify(nearCTA));
     await page.evaluate(()=>{window.__goxyOpened=null;window.open=(...args)=>{
      window.__goxyOpened=args;return null
     }});
@@ -186,7 +212,7 @@ async function verify(engine,name){
   assert.deepEqual(privateRequests,[],name+' beta requested private APIs');
   assert.deepEqual(errors,[],name+' browser errors: '+errors.join(', '));
   await page.close();
-  console.log(name+' E2/B3 V4 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
+  console.log(name+' E2/B3 V5 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
  }finally{await browser.close()}
 }
 try{await ready();await verify(chromium,'Chromium');await verify(webkit,'WebKit');console.log('GOXION E2/B3 COMPLETE BETA PASS')}
