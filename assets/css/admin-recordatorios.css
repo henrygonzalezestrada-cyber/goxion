@@ -1,0 +1,31 @@
+/* GOXION Admin · Cobros vencidos y prórrogas, aislado de Index y Ayuda */
+.client-card.gx-reminder-overdue,
+.client-card.gx-reminder-missed {border-color:rgba(255,109,140,.28)!important;background:linear-gradient(145deg,#151019,#0a0a0f)!important}
+.client-card.gx-reminder-agreed {border-color:rgba(167,127,255,.35)!important;background:linear-gradient(145deg,#151020,#0b0a14)!important}
+.client-card.gx-reminder-agreed .gx-client-name-line h3{color:#c1a8ff!important}
+.client-card.gx-reminder-agreed .gx-client-payment-primary .gx-client-payment-dot {background:#b48cff!important;box-shadow:0 0 8px rgba(166,127,255,.35)}
+.client-card.gx-reminder-agreed .gx-client-payment-primary strong {color:#d3bdff!important}
+.client-card.gx-reminder-agreed .client-status-badge{border-color:rgba(178,138,255,.34)!important;background:rgba(157,121,242,.13)!important;color:#d2beff!important;animation:none!important}
+.client-card.gx-reminder-missed .gx-client-payment-primary strong{color:#ffa2b6!important}
+.client-card.gx-reminder-overdue .gx-client-preview-meta .loyalty,
+.client-card.gx-reminder-missed .gx-client-preview-meta .loyalty{display:none!important}
+.gx-reminder-action {display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%;min-height:37px;margin-top:7px;padding:6px 12px;border:1px solid rgba(255,125,156,.34);border-radius:10px;color:#ffcad6;background:linear-gradient(100deg,rgba(226,66,111,.15),rgba(161,59,136,.08));font:700 .73rem Rajdhani,sans-serif;letter-spacing:.025em;cursor:pointer}
+.gx-reminder-action:disabled{opacity:.6;cursor:wait}
+.gx-reminder-action:active{transform:scale(.994)}
+.gx-reminder-dialog{box-sizing:border-box;border:1px solid rgba(128,145,177,.27);border-radius:21px;max-width:min(465px,calc(100vw - 24px));width:100%;max-height:min(95dvh,900px);overflow:auto;padding:0;background:linear-gradient(145deg,#10111d,#09090f);color:#fff;box-shadow:0 23px 80px rgba(0,0,0,.8)}
+.gx-reminder-dialog::backdrop{background:rgba(0,0,0,.81);backdrop-filter:blur(11px)}
+.gx-reminder-sheet{padding:18px 17px 19px}
+.gx-reminder-sheet header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px;position:sticky;top:-18px;background:linear-gradient(170deg,#11111e,#0d0e18);z-index:1;padding:4px 0 9px}
+.gx-reminder-sheet header h2{font:700 1.24rem Rajdhani,sans-serif;margin:3px 0 0;color:#fff}
+.gx-reminder-sheet header small{font:700 .65rem Rajdhani,sans-serif;letter-spacing:.075em;color:#81dcec}
+.gx-reminder-close{flex:none;width:38px;height:38px;border-radius:50%;border:1px solid rgba(114,206,232,.23);background:#5be5f5;color:#071319;font:700 1.55rem Rajdhani,sans-serif;cursor:pointer}
+.gx-reminder-view{display:flex;justify-content:center;border-radius:14px;background:rgba(255,255,255,.025);padding:8px;max-height:43dvh;overflow:auto}
+.gx-reminder-view img{width:auto;max-width:100%;height:auto;max-height:42dvh;border-radius:10px;object-fit:contain}
+.gx-reminder-destination{margin:12px 0 5px;font:600 .84rem Rajdhani,sans-serif;color:#e2e8fa}
+.gx-reminder-hint{margin:0 0 14px;font:500 .75rem/1.3 Rajdhani,sans-serif;color:#a2abc2}
+.gx-reminder-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.gx-reminder-actions button{font:700 .82rem/1.13 Rajdhani,sans-serif;padding:11px 7px;min-height:43px;border-radius:11px;background:rgba(255,255,255,.055);border:1px solid rgba(150,160,199,.18);color:#e4e9fb;cursor:pointer}
+.gx-reminder-actions .gx-reminder-share{grid-column:1/-1;background:linear-gradient(105deg,#5ce0ef,#8eb7ff);color:#09141f;border-color:transparent}
+.gx-reminder-actions .gx-reminder-wa{grid-column:1/-1;border-color:rgba(60,209,157,.4);color:#b5f0d3;background:rgba(29,155,113,.12)}
+.gx-reminder-modal-open{overflow:hidden!important}
+@media(max-width:340px){.gx-reminder-sheet{padding:14px 12px}.gx-reminder-view{max-height:39dvh}.gx-reminder-view img{max-height:38dvh}}
