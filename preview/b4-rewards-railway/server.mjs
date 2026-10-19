@@ -74,6 +74,11 @@ function act(s,type,body){
        audit(s,'reward_reserved',{startPeriod});
      }
    }
+ }else if(type==='milestone'){
+   if(s.streak<4){
+     s.streak=4;s.events.loyalty=true;
+     audit(s,'historical_payment_approved',{milestone:4});
+   }
  }else if(type==='pay'){
    if(s.paid.includes(s.period))throw Error('Este período de prueba ya está pagado');
    const q=quote(s);
