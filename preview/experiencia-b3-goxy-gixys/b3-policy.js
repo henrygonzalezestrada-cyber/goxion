@@ -44,7 +44,7 @@
   eligible:code=>Boolean(codes[code]?.important&&!events.has('demo:'+code)),
   replay:code=>{
    const decision=codes[code];
-   if(!decision)return false;
+   if(!decision||inProgress)return false;
    current=code;
    // Remove stale context immediately. Never keep assistance from an old
    // notification after changing scenarios.
@@ -61,7 +61,7 @@
     return false;
    }
    const id='demo:'+code;
-   if(events.has(id)||inProgress)return false;
+   if(events.has(id))return false;
    events.add(id);currentEvent=id;inProgress=true;
    document.dispatchEvent(new Event('gx-smart-case-rendered'));
    window.GOXION_SMART_NOTICE?.preview();
