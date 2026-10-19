@@ -8,6 +8,7 @@
   var AGREEMENTS_URL=CORE&&CORE.endpoint("acciones-financieras-b2-beta");
   var SPACE_URL="https://henrygonzalezestrada-cyber.github.io/goxion/ayuda.html";
   var agreements=[], verified=false, loadedAt=0, pending=null, modal=null, shareFile=null, shareMessage="", objectUrl="";
+  var b2Modes=new Map(),b2Requested=new Set(),b2Busy=0,b2QueueTimer=0;
   var DAY=/^\d{4}-\d{2}-\d{2}$/;
   function today(){
     return new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
@@ -47,8 +48,89 @@
     })();
     return pending;
   }
+  async function adminAction(action,data){
+    var token=CORE&&CORE.STORAGE?localStorage.getItem(CORE.STORAGE.ADMIN_TOKEN):"";
+    if(!token)throw new Error("Sesión administrativa no disponible.");
+    var response=await fetch(AGREEMENTS_URL,{method:"POST",cache:"no-store",
+      headers:{"Content-Type":"application/json","X-Admin-Token":token},
+      body:JSON.stringify({accion:action,datos:data||{}})});
+    var result=await response.json().catch(function(){return {};});
+    if(!response.ok||result.ok!==true)throw new Error(result.error||"No se pudo confirmar la cotización B2.");
+    return result;
+  }
+  async function inspectB2(c,force){
+    var id=clientId(c),period=currentPeriod(c);
+    if(!/^[0-9a-f-]{36}$/i.test(id)||!period)return;
+    if(!force&&b2Requested.has(id))return;
+    b2Requested.add(id);
+    try{
+      var status=await adminAction("b2_listar_comprobantes",{cliente_id:id});
+      if(status.modo!=="b2_multifecha"){
+        b2Modes.set(id,{mode:"global"});
+        applyCards();return;
+      }
+      b2Modes.set(id,{mode:"unverified"});
+      var quote=await adminAction("b2_cotizar_ciclo",{cliente_id:id,periodo:period+"-01"});
+      if(!quote.resultado||quote.resultado.ok!==true||!Array.isArray(quote.resultado.cargos))
+        throw new Error("Cotización B2 incompleta.");
+      b2Modes.set(id,{mode:"b2",quote:quote.resultado,period:period});
+    }catch(error){
+      if(b2Modes.get(id)?.mode!=="global")b2Modes.set(id,{mode:"unverified"});
+      console.warn("GOXION · cotización B2 no verificada",String(error?.message||error));
+    }
+    applyCards();
+  }
+  function queueB2(){
+    if(b2QueueTimer)return;
+    b2QueueTimer=setTimeout(function(){
+      b2QueueTimer=0;
+      if(!verified||b2Busy>=3)return;
+      var items=Object.values(typeof clientesDict!=="undefined"?clientesDict:{}).filter(function(c){
+        return !!c?.estado_cuenta && !b2Requested.has(clientId(c)) && /^[0-9a-f-]{36}$/i.test(clientId(c));
+      });
+      items.slice(0,3-b2Busy).forEach(function(c){
+        b2Busy++;
+        inspectB2(c,false).finally(function(){b2Busy--;queueB2();});
+      });
+    },250);
+  }
+  function b2Model(c){
+    var b=b2Modes.get(clientId(c));
+    if(b?.mode!=="b2"||b.period!==currentPeriod(c))return null;
+    var rows=b.quote.cargos.map(function(x){
+      var protectedDue=x.prorroga_estado==="aprobada"&&DAY.test(String(x.fecha_pactada||""))&&Number(x.mora_centavos||0)<=0;
+      var due=protectedDue?x.fecha_pactada:String(x.vence||"");
+      return Object.assign({},x,{effective_due:due});
+    }).filter(function(x){return x.pagado!==true&&Number(x.total_centavos||0)>0;});
+    var now=today();
+    var late=rows.filter(function(x){return DAY.test(x.effective_due)&&x.effective_due<now;});
+    var agreed=rows.filter(function(x){
+      return x.prorroga_estado==="aprobada"&&DAY.test(String(x.fecha_pactada||""))&&x.fecha_pactada>=now&&Number(x.mora_centavos||0)<=0;
+    });
+    var missed=late.some(function(x){return DAY.test(String(x.fecha_pactada||""))&&x.fecha_pactada<now;});
+    return {rows:rows,late:late,agreed:agreed,missed:missed,period:b.quote.periodo};
+  }
+  function b2Context(c){
+    var model=b2Model(c);if(!model||!model.late.length)return c;
+    var sum=function(field){return model.late.reduce(function(n,x){return n+Number(x[field]||0);},0);};
+    var earliest=model.late.map(function(x){return x.effective_due;}).sort()[0];
+    var lateDays=Math.max(0,Math.floor((Date.parse(today()+"T12:00:00")-Date.parse(earliest+"T12:00:00"))/86400000));
+    var mora=sum("mora_centavos")/100;
+    var total=sum("total_centavos")/100;
+    return Object.assign({},c,{estado_cuenta:{
+      estado:"vencido",periodo_label:c.estado_cuenta?.periodo_label||currentPeriod(c),
+      dias_atraso:lateDays,total_actual:total,subtotal:sum("base_centavos")/100,
+      descuentos:{total:Math.max(0,(sum("descuento_centavos")+sum("descuento_comercial_centavos"))/100)},
+      cargos:{mora:mora,total:Math.max(mora,(sum("total_centavos")-sum("principal_centavos"))/100)}
+    }});
+  }
   function agreementFor(c){
     if(!verified||!c)return null;
+    var b2=b2Model(c);
+    if(b2){
+      var agreed=b2.agreed[0];
+      return agreed?{kind:"active",record:{id:String(agreed.cargo_id||""),fecha_pactada:agreed.fecha_pactada}}:null;
+    }
     var id=clientId(c),period=currentPeriod(c),now=today();
     var candidates=agreements.filter(function(a){
       return String(a.cliente_id)===id &&
@@ -64,6 +146,14 @@
   function effectiveStatus(c){
     var ec=c?.estado_cuenta;
     if(!verified||!ec)return "unverified";
+    var b=b2Modes.get(clientId(c));
+    if(b?.mode==="unverified")return "unverified";
+    if(b?.mode==="b2"){
+      var model=b2Model(c);
+      if(!model)return "unverified";
+      if(model.late.length)return model.missed?"missed":"overdue";
+      return model.agreed.length?"agreed":"normal";
+    }
     if(c.estado==="suspendido"||c.pago_en_revision||ec.estado==="revision"||ec.estado==="pagado"||ec.esta_pagado_periodo===true)return "normal";
     var a=agreementFor(c);
     if(a?.kind==="active")return "agreed";
@@ -85,12 +175,17 @@
       card.dataset.gxReminderOriginalSecondary=secondary?.textContent||"";
       card.dataset.gxReminderOriginalBadge=badge?.textContent||"";
     }
-    var signature=[status,a?.record?.id||"",String(c.estado_cuenta?.total_actual||"")].join("|");
+    var ctx=b2Context(c);
+    var signature=[status,a?.record?.id||"",String(ctx.estado_cuenta?.total_actual||"")].join("|");
     if(card.dataset.gxReminderSignature===signature)return;
     card.dataset.gxReminderSignature=signature;
     text(primary,card.dataset.gxReminderOriginalPrimary);
     text(secondary,card.dataset.gxReminderOriginalSecondary);
     text(badge,card.dataset.gxReminderOriginalBadge);
+    if(!Object.prototype.hasOwnProperty.call(card.dataset,"gxReminderOriginalAmount")){
+      card.dataset.gxReminderOriginalAmount=card.querySelector(".gx-client-money strong")?.textContent||"";
+    }
+    text(card.querySelector(".gx-client-money strong"),card.dataset.gxReminderOriginalAmount);
     card.classList.remove("gx-reminder-agreed","gx-reminder-overdue","gx-reminder-missed","gx-reminder-unverified");
     card.querySelector(".gx-reminder-action")?.remove();
     if(status==="unverified"){
@@ -107,6 +202,7 @@
     }
     if(status!=="overdue"&&status!=="missed")return;
     card.classList.add(status==="missed"?"gx-reminder-missed":"gx-reminder-overdue");
+    if(b2Model(c))text(card.querySelector(".gx-client-money strong"),money(ctx.estado_cuenta.total_actual));
     if(status==="missed"){
       text(card.querySelector(".gx-client-payment-primary strong"),"Prórroga incumplida");
       text(card.querySelector(".client-status-badge"),"ACUERDO INCUMPLIDO");
@@ -123,10 +219,11 @@
       try{
         if(!(await updateAgreements(true)))throw new Error("No se pudo comprobar si existe una prórroga vigente.");
         var actual=getClient(key);
+        if(actual)await inspectB2(actual,true);
         if(!actual||!["overdue","missed"].includes(effectiveStatus(actual))){
           applyCards();throw new Error("El estado del cliente cambió. Actualiza su cuenta antes de continuar.");
         }
-        prepareReminder(key,actual);
+        prepareReminder(key,b2Context(actual));
       }catch(err){alert(err?.message||"No se pudo preparar el recordatorio.");}
       finally{button.disabled=false;button.textContent="↗ Enviar recordatorio";}
     });
@@ -292,7 +389,7 @@
   function setup(){
     var base=window.renderizarClientes;
     if(typeof base==="function"){
-      window.renderizarClientes=function(dic){var result=base.apply(this,arguments);applyCards();return result;};
+      window.renderizarClientes=function(dic){var result=base.apply(this,arguments);applyCards();queueB2();return result;};
     }
     var container=document.getElementById("clients-container");
     if(container){
@@ -303,7 +400,7 @@
         queueMicrotask(function(){scheduled=false;applyCards();});
       }).observe(container,{childList:true,subtree:true});
     }
-    updateAgreements(false);
+    updateAgreements(false).then(function(){queueB2();});
     applyCards();
     window.addEventListener("focus",function(){updateAgreements(true);});
     document.addEventListener("visibilitychange",function(){if(!document.hidden)updateAgreements(true);});
