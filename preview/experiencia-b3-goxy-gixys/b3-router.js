@@ -14,7 +14,7 @@ const guards={
   $('gx-client-notif-badge')?.textContent?.trim()==='1',
  loyalty:()=>/^4\/4\b/.test($('loyalty-count')?.textContent?.trim()||''),
  mission:()=>Boolean($('gx-mirror-complete-btn')?.disabled &&
-  $('gx-mirror-mission-action')?.classList.contains('is-complete'))
+  $('gx-mirror-complete-btn')?.classList.contains('is-complete'))
 };
 function emit(kind,value){
  if(!allowed.includes(kind)||typeof value!=='boolean')return false;
