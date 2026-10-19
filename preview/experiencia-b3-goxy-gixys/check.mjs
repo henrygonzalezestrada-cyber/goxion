@@ -88,6 +88,17 @@ async function verify(engine,name){
     code+' Gixy mismatch: extra/absent character');
    if(wantsGixy){
     await page.locator('.gx-gixy-message[data-kind="notification"].is-visible').waitFor({timeout:6000});
+    const geometry=await page.evaluate(()=>{
+      const box=s=>{const r=document.querySelector(s)?.getBoundingClientRect();
+        return r?{left:Math.round(r.left),top:Math.round(r.top),right:Math.round(r.right),bottom:Math.round(r.bottom),
+          width:Math.round(r.width),height:Math.round(r.height)}:null};
+      return {gixy:box('.gx-gixy-message[data-kind="notification"]'),bell:box('#gx-client-notif-launch'),
+        header:box('.app-header'),logo:box('.app-logo'),notice:box('.gx-mirror-note'),
+        nav:box('#goxion-main-nav'),greeting:box('#dynamic-greeting-text'),
+        placement:document.querySelector('.gx-gixy-message[data-kind="notification"]')?.dataset.placement,
+        noteVisibility:getComputedStyle(document.querySelector('.gx-mirror-note')).visibility};
+    });
+    console.log('B3 BELL GIXY GEOMETRY '+name+' '+code+' '+JSON.stringify(geometry));
     // B3 V4 restores the exact V9 arrival, without a top:0 slide.
     const entrance=await page.locator('.gx-gixy-message[data-kind="notification"]')
       .evaluate(el=>{
