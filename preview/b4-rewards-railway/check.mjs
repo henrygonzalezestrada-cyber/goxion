@@ -164,7 +164,7 @@ async function browserChecks(engine,name){
   assert.equal(await page.locator('.gx-gixys-secret--v9').count(),0,'no new reward on refresh');
   await page.locator('.gx-account-capsule').click();
   await page.locator('#gx-b4-account-sheet:not([hidden])').waitFor({timeout:2000});
-  assert((await page.locator('#gx-b4-account-lines').textContent()).includes('Cupón secreto Gixys 5%'));
+  assert((await page.locator('#gx-b4-account-lines').textContent()).includes('Cupón Gixys: 5% × $158.00'));
   await page.locator('#gx-b4-payment-in-statement').click();
   await page.waitForFunction(()=>window.GOXION_B4_MIRROR.getState()?.coupon?.status==='used',{timeout:4500});
   assert.equal((await page.evaluate(()=>window.GOXION_B4_MIRROR.getState().quote.paid)),true);
