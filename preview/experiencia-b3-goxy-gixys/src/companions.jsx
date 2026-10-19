@@ -240,16 +240,22 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
  useLayoutEffect(()=>{
   // V9 re-rendered the whole React avatar on every scroll. B3 V3 locks the
   // accepted anchor/slot, and updates ONLY the portal's native DOM position.
-  let frame=0,placement=null;
+  let frame=0,placement=null,arrivalTimer=0;
   const choose=()=>{
    const el=scene.current;if(!el)return;
    const found=selectPlace(kind,el,serial,el.getBoundingClientRect());
-   if(!found){placement=null;setLayout(null);return}
+   if(!found){placement=null;clearTimeout(arrivalTimer);el.classList.remove('gx-b3-scroll-following');setLayout(null);return}
+   const firstPlacement=!placement;
    const source=found.sourceIdx===3
      ?document.querySelector('#dash-billing-card')
      :document.querySelector(contexts[kind][found.sourceIdx]);
    placement={...found,source,anchorTop:source?.getBoundingClientRect().top??0};
    setLayout(found);
+   // Re-enable the V3 scroll easing only once V9's first position has painted.
+   if(firstPlacement){
+    clearTimeout(arrivalTimer);
+    arrivalTimer=setTimeout(()=>el.classList.add('gx-b3-scroll-following'),100);
+   }
   };
   const follow=()=>{
    frame=0;
@@ -270,6 +276,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
   window.visualViewport?.addEventListener('resize',relayout,{passive:true});
   window.visualViewport?.addEventListener('scroll',queue,{passive:true});
   return ()=>{
+   clearTimeout(arrivalTimer);
    cancelAnimationFrame(frame);
    window.removeEventListener('resize',relayout);
    window.removeEventListener('scroll',queue,true);
