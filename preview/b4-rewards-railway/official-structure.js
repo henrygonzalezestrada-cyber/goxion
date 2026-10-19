@@ -4,6 +4,8 @@
 'use strict';
 if(document.documentElement.dataset.gxB4Official!=='true')return;
 const $=id=>document.getElementById(id);
+// Original V9 mirror stub for production-only Mission counter updates.
+window.animarMisionesCompletadasEnSecuencia=()=>{};
 document.body.classList.remove('no-scroll');
 document.body.classList.add('gx-official-mirror');
 const splash=$('splash-screen');if(splash)splash.style.display='none';
