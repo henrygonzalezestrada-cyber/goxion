@@ -16,7 +16,7 @@ const charge=(date,values={})=>({cargo_id:"test-"+date,vence:date,servicio:"ViX"
   pagado:false,total_centavos:4600,principal_centavos:4600,base_centavos:4600,
   mora_centavos:0,descuento_centavos:0,descuento_comercial_centavos:0,
   abono_pagado_centavos:0,prorroga_estado:"",fecha_pactada:"",...values});
-function app({records=[],client=base,mode="global",quote=null,fail=false}={}){
+function app({records=[],client=base,mode="global",quote=null,fail=false,hour=null}={}){
   const clients={test:structuredClone(client)};
   const calls=[];
   const win={GOXION_CORE:{endpoint:name=>"/functions/"+name,STORAGE:{ADMIN_TOKEN:"token"}},
@@ -35,8 +35,12 @@ function app({records=[],client=base,mode="global",quote=null,fail=false}={}){
           :{ok:false,error:"Acción no prevista"};
     return {ok:true,json:async()=>payload};
   }
+  const clockDate=hour===null?Date:class extends Date{
+    constructor(...args){super(...(args.length?args:[today+"T"+String(hour).padStart(2,"0")+":00:00-06:00"]));}
+    static now(){return Date.parse(today+"T"+String(hour).padStart(2,"0")+":00:00-06:00");}
+  };
   const sandbox={window:win,document:doc,clientesDict:clients,fetch:fetchMock,
-    localStorage:{getItem:()=> "test-admin-token"},Intl,Date,console,URL};
+    localStorage:{getItem:()=> "test-admin-token"},Intl,Date:clockDate,console,URL};
   runInNewContext(source,sandbox,{timeout:3000});
   return {api:win.GOXION_ADMIN_REMINDERS,client:clients.test,calls};
 }
@@ -82,6 +86,54 @@ h=app({mode:"b2_multifecha",quote:{ok:true,periodo:period+"-01",cargos:[protecte
 await h.api.refresh();
 await h.api.verifyClient("test");
 assert.equal(h.api.status(h.client),"agreed","B2 acuerdo único no aparece vencido");
+
+// Tres recordatorios adaptados a la fecha y hora local de Chiapas.
+const todayClient={...base,nombre:"José Antonio",dia_pago:Number(today.slice(8)),
+  estado_cuenta:{...base.estado_cuenta,estado:"vence_hoy",dias_atraso:0,
+    dia_pago:Number(today.slice(8)),cargos:{mora:0,total:0},total_actual:276}};
+async function checked(options){
+  const candidate=app(options);
+  await candidate.api.refresh();
+  await candidate.api.verifyClient("test");
+  return candidate;
+}
+h=await checked({client:todayClient,hour:12});
+assert.equal(h.api.status(h.client),"due","Primer aviso durante el día de pago");
+const dueMessage=h.api.messageFor(h.client,"due");
+assert.match(dueMessage,/Hola, José/,"Saludo personalizado");
+assert.match(dueMessage,/\$276\.00/,"Importe personalizado");
+assert.match(dueMessage,/capturas de pantalla enviadas por WhatsApp/,"No aceptamos captura como reporte");
+assert.match(dueMessage,/Soporte antes de pagar/,"Soporte para diferencias en saldo");
+assert.match(dueMessage,/credenciales de acceso/,"Credenciales por soporte");
+assert.match(dueMessage,/ayuda\.html/,"Enlace a Mi Espacio");
+h=await checked({client:todayClient,hour:20});
+assert.equal(h.api.status(h.client),"last_call","Últimas horas a partir de las 18:00");
+const closingMessage=h.api.messageFor(h.client,"last_call");
+assert.match(closingMessage,/Aún estás a tiempo/);
+assert.match(closingMessage,/\$276\.00/);
+assert.doesNotMatch(closingMessage,/tu fecha de pago ya pasó/i);
+h=await checked({client:todayClient,records:[agreement(offset(2))],hour:20});
+assert.equal(h.api.status(h.client),"agreed","Prórroga activa bloquea avisos del día");
+h=await checked({client:{...todayClient,pago_en_revision:true},hour:12});
+assert.equal(h.api.status(h.client),"normal","Comprobante en revisión no debe recibir aviso");
+h=await checked({client:{...todayClient,estado_cuenta:{...todayClient.estado_cuenta,estado:"pagado"}},hour:12});
+assert.equal(h.api.status(h.client),"normal","Pago confirmado elimina aviso");
+h=await checked({client:{...todayClient,estado_cuenta:{...todayClient.estado_cuenta,estado:"por_vencer"},dia_pago:Number(today.slice(8))+1},hour:12});
+assert.equal(h.api.status(h.client),"normal","Próximo vencimiento no se trata como hoy");
+const dueCharge=charge(today,{cargo_id:"due",total_centavos:4600});
+const futureProrrogated=charge(today,{cargo_id:"prorroga",prorroga_estado:"aprobada",fecha_pactada:offset(2),total_centavos:4600});
+h=await checked({client:todayClient,mode:"b2_multifecha",quote:{ok:true,periodo:period+"-01",cargos:[dueCharge,futureProrrogated]},hour:12});
+assert.equal(h.api.status(h.client),"due","B2 con un cargo hoy y otro prorrogado");
+assert.equal(h.api.quoteForReminder(h.client,"due").estado_cuenta.total_actual,46,"B2 cotiza solo lo que vence hoy");
+h=await checked({client:todayClient,mode:"b2_multifecha",quote:{ok:true,periodo:period+"-01",cargos:[futureProrrogated]},hour:12});
+assert.equal(h.api.status(h.client),"agreed","Solo prórroga activa no genera recordatorio");
+const todayAgreed=charge(today,{cargo_id:"pactado",prorroga_estado:"aprobada",fecha_pactada:today});
+h=await checked({client:todayClient,mode:"b2_multifecha",quote:{ok:true,periodo:period+"-01",cargos:[todayAgreed]},hour:20});
+assert.equal(h.api.status(h.client),"agreed","El día pactado no activa avisos ordinarios sin acuerdo especial");
+h=await checked({client:todayClient,mode:"b2_multifecha",quote:{ok:true,periodo:period+"-01",cargos:[overdue,dueCharge]},hour:12});
+assert.equal(h.api.status(h.client),"overdue","Un saldo ya vencido mantiene prioridad de cobro");
+assert.equal(h.api.quoteForReminder(h.client,"overdue").estado_cuenta.total_actual,51.5,"No mezcla otros cargos en recordatorio vencido");
+
 // Flujo simplificado: texto únicamente; nunca crear ni descargar imagen.
 assert.ok(!source.includes("fileFromCanvas")&&!source.includes('toDataURL("image/png")'),
   "El recordatorio ya no debe generar capturas ni imágenes");
@@ -93,4 +145,4 @@ assert.equal(h.api.phoneFor({...h.client,telefono_normalizado:"961 123 4567"}),"
   "Normaliza el teléfono mexicano existente");
 assert.equal(h.api.phoneFor({...h.client,telefono_normalizado:""}),"",
   "Sin teléfono se activa la selección manual de destinatario");
-console.log("Recordatorios Admin: 14 controles OK (estado, B2, texto y WhatsApp).");
+console.log("Recordatorios Admin: 30 controles OK (vencido, día, tarde, B2, prórroga, WhatsApp).");
