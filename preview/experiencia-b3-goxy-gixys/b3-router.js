@@ -58,6 +58,10 @@ function attachHelp(){
  const msg=document.querySelector('#gx-gixys-message-root .gx-gixy-message[data-kind="notification"].is-visible');
  if(!msg||msg.dataset.phase!=='shown'||msg.querySelector('.gx-b3-goxy-cta'))return;
  const action=btn();
+ // Align to the actual V9 bubble offset (including its native internal
+ // spacing), not an estimated 59px avatar + 3px gap. Works at 280px too.
+ const bubble=msg.querySelector('.gx-gixy-message__bubble');
+ if(bubble)action.style.setProperty('left',bubble.offsetLeft+'px','important');
  // Sit alongside the existing V9 bubble rather than replacing its React
  // tree, plastic renderer or click-to-play behavior.
  const y=msg.getBoundingClientRect().bottom;
