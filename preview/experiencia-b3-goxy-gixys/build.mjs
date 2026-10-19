@@ -7,7 +7,7 @@ let html=fs.readFileSync(src+'index.html','utf8');
 for(const [a,b] of [
  ['./companions.css?v=9','../gixys-mi-espacio-espejo/companions.css?v=9'],
  ['./mirror.css?v=9','../gixys-mi-espacio-espejo/mirror.css?v=9'],
- ['./companions.js?v=9','./companions-v3.js?v=6'],
+ ['./companions.js?v=9','./companions-v3.js?v=7'],
  ['./mirror.js?v=9','./b3-mirror.js?v=1']
 ]){
  if(!html.includes(a))throw Error('V9 asset moved: '+a);
@@ -19,7 +19,7 @@ html=html.replace('<title>GOXION · Mi Espacio · Beta espejo</title>','<title>G
 // Import the EXACT E1/B1 V6 notice stylesheet and script; no recreated ribbon.
 fs.copyFileSync('preview/experiencia-mi-espacio-inteligente/smart.css',dst+'b3-notice.css');
 html=html.replace('</head>',
- '<link rel="stylesheet" href="./b3-notice.css?v=2"><link rel="stylesheet" href="./b3.css?v=6"></head>');
+ '<link rel="stylesheet" href="./b3-notice.css?v=2"><link rel="stylesheet" href="./b3.css?v=7"></head>');
 html=html.replace('class="gx-mirror-body"','class="gx-mirror-body gx-smart-body"');
 html=html.replace('<button id="gx-client-notif-launch"',
  '<button id="gx-client-notif-launch" aria-haspopup="dialog"');
@@ -64,7 +64,7 @@ html=html.replace(insertion,hiddenB1+'\n'+noticeUI+'\n'+
  '<script src="../experiencia-mi-espacio-inteligente/priority-engine.js?v=e1b1v6"></script>\n'+
  '<script src="./b3-policy.js?v=2" defer></script>\n'+
  '<script src="./b3-notice.js?v=2" defer></script>\n'+
- '<script src="./b3-router.js?v=6" defer></script>');
+ '<script src="./b3-router.js?v=7" defer></script>');
 html=html.replace(
  '<button type="button" data-gx-b3-test="notification">Aviso recibido</button>',
  [
