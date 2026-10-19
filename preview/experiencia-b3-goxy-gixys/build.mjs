@@ -19,7 +19,7 @@ html=html.replace('<title>GOXION · Mi Espacio · Beta espejo</title>','<title>G
 // Import the EXACT E1/B1 V6 notice stylesheet and script; no recreated ribbon.
 fs.copyFileSync('preview/experiencia-mi-espacio-inteligente/smart.css',dst+'b3-notice.css');
 html=html.replace('</head>',
- '<link rel="stylesheet" href="./b3-notice.css?v=2"><link rel="stylesheet" href="./b3.css?v=2"></head>');
+ '<link rel="stylesheet" href="./b3-notice.css?v=2"><link rel="stylesheet" href="./b3.css?v=4"></head>');
 html=html.replace('class="gx-mirror-body"','class="gx-mirror-body gx-smart-body"');
 html=html.replace('<button id="gx-client-notif-launch"',
  '<button id="gx-client-notif-launch" aria-haspopup="dialog"');
