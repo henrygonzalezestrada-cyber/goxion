@@ -1,13 +1,13 @@
 /* GOXION Admin · Recordatorios inteligentes (solo lectura del motor de cobro).
  * El estado financiero y las prorrogas se consultan a los endpoints existentes.
- * Compartir archivos via Web Share no puede preseleccionar el chat de WhatsApp.
+ * Abre WhatsApp con texto prellenado; no adjunta ni descarga archivos.
  */
 (function(){
   "use strict";
   var CORE=window.GOXION_CORE;
   var AGREEMENTS_URL=CORE&&CORE.endpoint("acciones-financieras-b2-beta");
   var SPACE_URL="https://henrygonzalezestrada-cyber.github.io/goxion/ayuda.html";
-  var agreements=[], verified=false, loadedAt=0, pending=null, modal=null, shareFile=null, shareMessage="", objectUrl="";
+  var agreements=[], verified=false, loadedAt=0, pending=null, noPhoneDialog=null;
   var b2Modes=new Map(),b2Requested=new Set(),b2Busy=0,b2QueueTimer=0;
   var DAY=/^\d{4}-\d{2}-\d{2}$/;
   function today(){
@@ -155,7 +155,7 @@
     var ec=c?.estado_cuenta;
     if(!verified||!ec)return "unverified";
     var b=b2Modes.get(clientId(c));
-    if(b?.mode==="unverified")return "unverified";
+    if((/^[0-9a-f-]{36}$/i).test(clientId(c))&&(!b||b.mode==="unverified"))return "unverified";
     if(b?.mode==="b2"){
       var model=b2Model(c);
       if(!model)return "unverified";
@@ -229,21 +229,17 @@
     button.type="button";button.className="gx-reminder-action";
     button.setAttribute("aria-label","Enviar recordatorio a "+String(c.nombre||"cliente"));
     button.textContent="↗ Enviar recordatorio";
-    button.addEventListener("click",async function(event){
+    button.addEventListener("click",function(event){
       event.preventDefault();event.stopPropagation();
-      button.disabled=true;button.textContent="Verificando…";
-      try{
-        if(!(await updateAgreements(true)))throw new Error("No se pudo comprobar si existe una prórroga vigente.");
-        var actual=getClient(key);
-        if(actual)await inspectB2(actual,true);
-        if(!actual||!["overdue","missed"].includes(effectiveStatus(actual))){
-          applyCards();throw new Error("El estado del cliente cambió. Actualiza su cuenta antes de continuar.");
-        }
-        if(window.gxLoadRegistrationState&&(!window.gxRegistrationState?.clientes?.length))
-          await window.gxLoadRegistrationState(false);
-        prepareReminder(key,b2Context(actual));
-      }catch(err){alert(err?.message||"No se pudo preparar el recordatorio.");}
-      finally{button.disabled=false;button.textContent="↗ Enviar recordatorio";}
+      var actual=getClient(key);
+      if(!actual||!["overdue","missed"].includes(effectiveStatus(actual))){
+        applyCards();
+        alert("El estado financiero de este cliente ya no permite enviar el recordatorio. Actualiza Admin.");
+        return;
+      }
+      // Solo datos financieros previamente validados por el servidor.
+      var context=b2Context(actual);
+      openReminder(context);
     });
     footer.insertAdjacentElement("afterend",button);
   }
@@ -254,166 +250,83 @@
     var id=clientId(c);
     var state=window.gxRegistrationState;
     var identity=state?.clientes?.find(function(row){return String(row.id)===id;});
-    var raw=String(identity?.telefono_normalizado||c?.telefono_normalizado||"").replace(/\D/g,"");
+    var raw=String(identity ? (identity.telefono_normalizado||"") : (c?.telefono_normalizado||"")).replace(/\D/g,"");
     if(raw.length===10)raw="52"+raw;
     if(raw.length===13&&raw.startsWith("521"))raw="52"+raw.slice(3);
     return /^52\d{10}$/.test(raw)?raw:"";
   }
   function messageFor(c){
-    var ec=c.estado_cuenta,days=Number(ec.dias_atraso||0);
+    var ec=c.estado_cuenta,days=Number(ec.dias_atraso||0),mora=amount(ec.cargos?.mora);
     var lines=[
       "¡Hola, "+String(c.nombre||"")+"! 👋🏻💜",
       "",
       "Esperamos que te encuentres muy bien. 😊",
       "",
-      "Queremos recordarte que tu fecha de pago ya pasó y actualmente tu cuenta presenta un saldo pendiente de *"+money(ec.total_actual)+"*, incluyendo los recargos que correspondan.",
+      "Queremos recordarte que tu fecha de pago ya pasó y actualmente tu cuenta presenta un saldo pendiente de *"+money(ec.total_actual)+"*."
+    ];
+    if(days>0)lines.push("Tu pago lleva "+days+" día"+(days===1?"":"s")+" de atraso.");
+    if(mora>0)lines.push("Este importe incluye *"+money(mora)+"* de recargos generados por el atraso.");
+    lines.push(
       "",
-      "Te invitamos a ingresar a *Mi Espacio GOXION* para consultar tu estado de cuenta actualizado:",
+      "Te invitamos a ingresar a *Mi Espacio GOXION*, donde puedes consultar tu estado de cuenta actualizado:",
       "🔗 "+SPACE_URL,
       "",
-      "✨ *¡Queremos ayudarte a que no pagues de más!* Te recomendamos estar pendiente de tus próximas fechas de pago para evitar cargos adicionales.",
+      "✨ *¡Queremos ayudarte a que no pagues de más!* Te recomendamos estar pendiente de tus próximas fechas de pago para evitar recargos adicionales.",
       "",
-      "Sabemos que a veces las fechas se nos pasan. ¡Gracias por formar parte de GOXION! 💜"
-    ];
-    if(days>0)lines.splice(4,0,"Tu pago lleva "+days+" día"+(days===1?"":"s")+" de atraso.");
+      "Sabemos que a veces las fechas se nos pueden pasar. ¡Gracias por seguir formando parte de GOXION! 💜"
+    );
     return lines.join("\n");
   }
-  function round(ctx,x,y,w,h,r){
-    r=Math.min(r,w/2,h/2);
-    ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);
-    ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);
-    ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);
-    ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);
-    ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();
+  function getNoPhoneDialog(){
+    if(noPhoneDialog)return noPhoneDialog;
+    noPhoneDialog=document.createElement("dialog");
+    noPhoneDialog.className="gx-reminder-no-phone-dialog";
+    noPhoneDialog.setAttribute("aria-labelledby","gx-reminder-no-phone-title");
+    noPhoneDialog.innerHTML=
+      '<div class="gx-reminder-no-phone-sheet">'+
+        '<header><div><small>GOXION · RECORDATORIOS</small><h2 id="gx-reminder-no-phone-title">Sin número registrado</h2></div>'+
+        '<button type="button" class="gx-reminder-no-phone-close" aria-label="Cerrar">×</button></header>'+
+        '<p>Este cliente aún no tiene un número de WhatsApp guardado. Puedes seleccionar su conversación desde WhatsApp y enviar el mensaje preparado.</p>'+
+        '<div class="gx-reminder-no-phone-actions">'+
+          '<button type="button" class="gx-reminder-no-phone-cancel">Cancelar</button>'+
+          '<button type="button" class="gx-reminder-no-phone-share">Elegir contacto en WhatsApp ↗</button>'+
+        '</div>'+
+      '</div>';
+    document.body.appendChild(noPhoneDialog);
+    var close=function(){noPhoneDialog.close();};
+    noPhoneDialog.querySelector(".gx-reminder-no-phone-close").addEventListener("click",close);
+    noPhoneDialog.querySelector(".gx-reminder-no-phone-cancel").addEventListener("click",close);
+    noPhoneDialog.addEventListener("click",function(e){if(e.target===noPhoneDialog)close();});
+    return noPhoneDialog;
   }
-  function block(ctx,x,y,w,h,r,fill,stroke){
-    round(ctx,x,y,w,h,r);ctx.fillStyle=fill;ctx.fill();
-    if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=2;ctx.stroke();}
-  }
-  function label(ctx,str,x,y,size,color,weight){
-    ctx.textAlign="left";ctx.textBaseline="alphabetic";
-    ctx.font=(weight||"500")+" "+size+"px Poppins, Arial, sans-serif";
-    ctx.fillStyle=color;ctx.fillText(String(str),x,y);
-  }
-  function fit(ctx,value,width){
-    var str=String(value||"");
-    while(str.length>1&&ctx.measureText(str).width>width)str=str.slice(0,-2)+"…";
-    return str;
-  }
-  function paint(c){
-    var ec=c.estado_cuenta;
-    var items=(Array.isArray(ec.desglose)?ec.desglose:[]).map(function(x){
-      return {name:String(x.concepto||"Ajuste"),value:Number(x.monto||0)};
-    });
-    if(!items.length){
-      items=[
-        {name:"Subtotal",value:amount(ec.subtotal)},
-        {name:"Descuentos",value:-amount(ec.descuentos?.total)},
-        {name:"Mora",value:amount(ec.cargos?.mora)},
-        {name:"Otros cargos",value:Math.max(0,amount(ec.cargos?.total)-amount(ec.cargos?.mora))}
-      ].filter(function(x){return x.name==="Subtotal"||Math.abs(x.value)>.001;});
+  function shareWithoutPhone(message){
+    var url="https://api.whatsapp.com/send?text="+encodeURIComponent(message);
+    if(typeof navigator.share!=="function"){
+      window.open(url,"_blank","noopener,noreferrer");
+      return;
     }
-    items=items.slice(0,7);
-    var bottom=760+Math.max(274,126+items.length*51);
-    var footer=bottom+32;
-    var canvas=document.createElement("canvas");
-    canvas.width=1000;canvas.height=footer+154;
-    var ctx=canvas.getContext("2d");if(!ctx)throw new Error("No se pudo crear la imagen.");
-    var bg=ctx.createLinearGradient(0,0,1000,1220);
-    bg.addColorStop(0,"#101021");bg.addColorStop(.5,"#080910");bg.addColorStop(1,"#080813");
-    ctx.fillStyle=bg;ctx.fillRect(0,0,1000,canvas.height);
-    var glow=ctx.createRadialGradient(790,80,15,790,80,720);
-    glow.addColorStop(0,"rgba(105,46,209,.27)");glow.addColorStop(1,"rgba(105,46,209,0)");
-    ctx.fillStyle=glow;ctx.fillRect(0,0,1000,800);
-    block(ctx,48,44,904,canvas.height-92,40,"rgba(15,16,27,.96)","rgba(121,130,178,.33)");
-    block(ctx,76,76,848,94,20,"rgba(115,96,202,.11)");
-    label(ctx,"G O X I O N",103,133,32,"#e9eafa","700");
-    label(ctx,"ESTADO DE CUENTA",644,132,20,"#92a0b4","700");
-    label(ctx,"CLIENTE",110,246,18,"#7e8aab","600");
-    ctx.font="700 53px Poppins, Arial, sans-serif";
-    label(ctx,fit(ctx,c.nombre,770),110,313,53,"#ffffff","700");
-    label(ctx,String(c.folio||"").toUpperCase(),111,351,19,"#7f94b5","600");
-    block(ctx,108,401,246,58,29,"rgba(232,73,115,.12)","rgba(255,125,163,.35)");
-    label(ctx,"PAGO VENCIDO",137,441,22,"#ff96ad","700");
-    label(ctx,"TOTAL PENDIENTE",111,536,23,"#a9b4cd","600");
-    var total=amount(ec.total_actual);
-    label(ctx,money(total),105,647,94,"#69e4f6","700");
-    var days=Number(ec.dias_atraso||0);
-    label(ctx,(days>0?"Vencido hace "+days+" día"+(days===1?"":"s"):"Pago vencido")+" · "+String(ec.periodo_label||currentPeriod(c)),111,699,22,"#b3b4cb","500");
-    block(ctx,85,760,830,bottom-760,24,"rgba(26,28,45,.94)","rgba(140,158,211,.16)");
-    label(ctx,"DESGLOSE DEL COBRO",116,808,22,"#e9eafa","700");
-    var ypos=852;
-    items.forEach(function(row){
-      ctx.font="500 23px Poppins, Arial, sans-serif";
-      label(ctx,fit(ctx,row.name,525),116,ypos,23,"#a9b4cd","500");
-      var value=(row.value<0?"−":"")+money(Math.abs(row.value));
-      ctx.font="600 23px Poppins, Arial, sans-serif";
-      var width=ctx.measureText(value).width;
-      label(ctx,value,887-width,ypos,23,row.value<0?"#9ff0c4":/mora/i.test(row.name)?"#ff9bb0":"#f1f4ff","600");
-      ypos+=51;
+    // navigator.share debe ejecutarse directamente en un toque del usuario (Safari iOS).
+    navigator.share({text:message}).catch(function(error){
+      if(error?.name==="AbortError")return;
+      // Solo una alternativa; no se promete que WhatsApp esté instalado.
+      window.location.href=url;
     });
-    ctx.strokeStyle="rgba(139,155,190,.23)";ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(103,footer);ctx.lineTo(897,footer);ctx.stroke();
-    label(ctx,"Consulta tu información siempre actualizada en Mi Espacio",110,footer+39,20,"#b5bfd5","500");
-    label(ctx,"GOXION · Resumen generado para tu consulta",110,footer+77,17,"#78879d","500");
-    return canvas;
   }
-  function fileFromCanvas(canvas,c){
-    var data=canvas.toDataURL("image/png").split(",")[1];
-    var bin=atob(data),bytes=new Uint8Array(bin.length);
-    for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
-    var slug=String(c.folio||"estado-cuenta").replace(/[^a-z0-9_-]/gi,"-").slice(0,35);
-    return new File([bytes],"GOXION-"+slug+".png",{type:"image/png"});
-  }
-  function ensureModal(){
-    if(modal)return modal;
-    modal=document.createElement("dialog");
-    modal.className="gx-reminder-dialog";
-    modal.setAttribute("aria-label","Compartir recordatorio de cobro");
-    modal.innerHTML='<div class="gx-reminder-sheet"><header><div><small>GOXION · COBRO INTELIGENTE</small><h2 tabindex="-1">Recordatorio preparado</h2></div><button type="button" class="gx-reminder-close" aria-label="Cerrar">×</button></header><div class="gx-reminder-view"><img alt="Imagen del estado de cuenta que se compartirá"></div><p class="gx-reminder-destination"></p><p class="gx-reminder-hint">WhatsApp permite compartir la imagen, pero la selección automática del chat junto al archivo depende del teléfono y del navegador.</p><div class="gx-reminder-actions"><button type="button" class="gx-reminder-share">Compartir imagen y mensaje</button><button type="button" class="gx-reminder-wa">Abrir WhatsApp con mensaje</button><button type="button" class="gx-reminder-copy">Copiar mensaje</button><button type="button" class="gx-reminder-save">Guardar imagen</button></div></div>';
-    document.body.appendChild(modal);
-    modal.querySelector(".gx-reminder-close").addEventListener("click",function(){modal.close();});
-    modal.addEventListener("click",function(e){if(e.target===modal)modal.close();});
-    modal.addEventListener("close",function(){document.body.classList.remove("gx-reminder-modal-open");if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl="";}});
-    modal.querySelector(".gx-reminder-share").addEventListener("click",async function(){
-      if(!shareFile)return;
-      if(typeof navigator.share!=="function"||!navigator.canShare?.({files:[shareFile]})){
-        alert("Este dispositivo no permite compartir archivos desde el navegador. Usa Guardar imagen y Abrir WhatsApp.");
-        return;
-      }
-      try{await navigator.share({files:[shareFile],text:shareMessage,title:"GOXION · Estado de cuenta"});}
-      catch(e){if(e?.name!=="AbortError")alert("No se pudo compartir el archivo. Puedes guardarlo y abrir WhatsApp por separado.");}
-    });
-    modal.querySelector(".gx-reminder-copy").addEventListener("click",async function(){
-      try{await navigator.clipboard.writeText(shareMessage);text(this,"✓ Mensaje copiado");}
-      catch(e){alert("No fue posible copiar automáticamente el texto.");}
-    });
-    modal.querySelector(".gx-reminder-save").addEventListener("click",function(){
-      if(!shareFile)return;
-      var url=URL.createObjectURL(shareFile),a=document.createElement("a");
-      a.href=url;a.download=shareFile.name;document.body.appendChild(a);a.click();a.remove();
-      setTimeout(function(){URL.revokeObjectURL(url);},1500);
-    });
-    return modal;
-  }
-  function prepareReminder(key,c){
-    var box=ensureModal();
-    shareMessage=messageFor(c);shareFile=fileFromCanvas(paint(c),c);
-    var phone=phoneFor(c);
-    var whatsapp="https://wa.me/"+phone+"?text="+encodeURIComponent(shareMessage);
-    var wa=box.querySelector(".gx-reminder-wa");
-    wa.textContent=phone?"Abrir WhatsApp del cliente":"Elegir contacto en WhatsApp";
-    wa.onclick=function(){
-      window.open(phone?whatsapp:"https://api.whatsapp.com/send?text="+encodeURIComponent(shareMessage),"_blank","noopener,noreferrer");
+  function openReminder(c){
+    var message=messageFor(c),phone=phoneFor(c);
+    if(phone){
+      // Una pulsación: abre exactamente el chat registrado con el mensaje listo.
+      window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(message),
+        "_blank","noopener,noreferrer");
+      return;
+    }
+    var dialog=getNoPhoneDialog();
+    var share=dialog.querySelector(".gx-reminder-no-phone-share");
+    share.onclick=function(){
+      dialog.close();
+      shareWithoutPhone(message);
     };
-    text(box.querySelector(".gx-reminder-destination"),phone?"WhatsApp registrado: +"+phone:"Sin número registrado: selecciona el contacto al compartir.");
-    if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl="";}
-    objectUrl=URL.createObjectURL(shareFile);
-    box.querySelector("img").src=objectUrl;
-    text(box.querySelector(".gx-reminder-copy"),"Copiar mensaje");
-    document.body.classList.add("gx-reminder-modal-open");
-    if(!box.open)box.showModal();
-    box.querySelector("h2")?.focus({preventScroll:true});
+    if(!dialog.open)dialog.showModal();
   }
   function setup(){
     var base=window.renderizarClientes;
@@ -438,7 +351,9 @@
     refresh:function(){return updateAgreements(true);},
     verifyClient:function(key){return inspectB2(getClient(key),true);},
     status:effectiveStatus,
-    quoteForReminder:b2Context
+    quoteForReminder:b2Context,
+    messageFor:messageFor,
+    phoneFor:phoneFor
   };
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});
   else setup();
