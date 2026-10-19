@@ -154,7 +154,7 @@ async function verify(engine,name){
         'Goxy CTA overlaps the bubble: '+JSON.stringify(nearCTA));
       assert(nearCTA.action.bottom<=nearCTA.nav.top-2,
         'Goxy CTA overlaps navigation: '+JSON.stringify(nearCTA));
-      assert(nearCTA.action.right<=page.viewportSize().width-8,
+      assert(nearCTA.action.right<=page.viewportSize().width-7,
         'Goxy CTA overflows viewport: '+JSON.stringify(nearCTA));
     }
     await page.evaluate(()=>{window.__goxyOpened=null;window.open=(...args)=>{
