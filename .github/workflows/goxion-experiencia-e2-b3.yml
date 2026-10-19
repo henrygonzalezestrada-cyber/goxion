@@ -1,0 +1,50 @@
+name: GOXION · Experiencia E2 B3 · Goxy y Gixys contextuales
+on:
+  push:
+    branches:
+      - beta/e2b3-goxy-gixys-context-espejo-20261018
+    paths:
+      - 'preview/experiencia-b3-goxy-gixys/**'
+      - '.github/workflows/goxion-experiencia-e2-b3.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: goxion-e2b3-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser runner
+        run: npm install --no-save --no-package-lock playwright
+      - name: Build separate mirror from original accepted Gixys V9
+        run: node preview/experiencia-b3-goxy-gixys/build.mjs
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium webkit
+      - name: Test original scenes, B3 policy, seven widths and privacy
+        run: node preview/experiencia-b3-goxy-gixys/check.mjs
+      - name: Commit tested preview artifacts only
+        if: success()
+        shell: bash
+        run: |
+          git fetch -q origin "${GITHUB_REF_NAME}"
+          remote_sha="$(git rev-parse FETCH_HEAD)"
+          if [ "$remote_sha" != "$GITHUB_SHA" ]; then
+            echo "Newer commit superseded this build."
+            exit 0
+          fi
+          git add preview/experiencia-b3-goxy-gixys/index.html preview/experiencia-b3-goxy-gixys/b3-mirror.js
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "build(beta E2/B3): verified mirror from V9 [skip ci]"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi

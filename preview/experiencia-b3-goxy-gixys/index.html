@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="es-MX" data-gx-mirror="true" data-gx-b3="true">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow"><meta name="theme-color" content="#030305">
+<title>GOXION · Goxy y Gixys · Bloque 3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/ayuda.css">
+<link rel="stylesheet" href="../../assets/css/realtime-client-notifications.css">
+<link rel="stylesheet" href="../gixys-mi-espacio-espejo/companions.css?v=9">
+<link rel="stylesheet" href="../gixys-mi-espacio-espejo/mirror.css?v=9">
+<link rel="stylesheet" href="./b3.css?v=1"></head>
+<body class="gx-mirror-body" data-visual-only="true">
+<header class="app-header" style="width:100%;max-width:580px;padding-left:20px;padding-right:20px;margin:0 auto 10px">
+<img alt="GOXION" class="app-logo" src="../../logo2.PNG">
+<div class="gx-header-actions">
+<button id="gx-client-notif-launch" class="gx-client-notif-launch" type="button" aria-label="Probar notificación" aria-expanded="false">
+<span class="gx-client-notif-icon" aria-hidden="true"><svg class="gx-client-notif-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path class="gx-client-notif-clapper" d="M10 21h4"></path></svg></span>
+<span id="gx-client-notif-badge" class="gx-client-notif-badge">0</span>
+</button>
+<span class="header-action-btn gx-auth-root gx-client-session-active gx-mirror-auth"><span class="gx-auth-pill-label"><span id="header-btn-text">Mi Espacio</span></span></span>
+</div>
+<span class="gx-mirror-square" id="gx-mirror-square" data-gx-kind="square" aria-hidden="true"></span>
+</header>
+<div aria-hidden="true" class="bg"></div>
+<div class="container" id="gx-mirror-container">
+<div class="gx-mirror-note" role="note"><span class="gx-mirror-led"></span> BETA ESPEJO · Datos de demostración, sin acceso a cuentas reales</div>
+<div class="glass-card tab-container" id="goxion-main-nav">
+<button class="tab-btn active" data-goxion-tab="inicio" id="btn-tab-inicio" type="button">
+<span class="gx-nav-icon" id="tab-inicio-icon">🏠</span>
+<span class="gx-nav-label" id="tab-inicio-text">Inicio</span>
+</button>
+<button class="tab-btn" data-goxion-tab="catalogo" id="btn-tab-catalogo" type="button">
+<span class="gx-nav-icon">🛒</span>
+<span class="gx-nav-label">Catálogo</span>
+</button>
+<button class="tab-btn" data-goxion-tab="soporte" id="btn-tab-soporte" type="button">
+<span class="gx-nav-icon">🛠️</span>
+<span class="gx-nav-label">Soporte</span>
+</button>
+</div>
+
+<div class="view-section" id="view-dashboard">
+<div class="dash-greeting-box" id="dash-greeting-container">
+<h1 id="dynamic-greeting-text">¡Hola, <span id="dash-name">Cliente</span>! 👋</h1>
+</div>
+<div id="dash-payment-review-alert"></div>
+<div class="glass-card dash-card gx-new-client-card" id="dash-onboarding-card" hidden>
+    <div class="gx-new-client-kicker">PRIMEROS PASOS</div>
+    <h2>Tu espacio ya está listo</h2>
+    <p class="gx-new-client-copy">Aún no tienes servicios contratados. Explora el catálogo y elige el primero para comenzar a disfrutar GOXION.</p>
+    <div class="gx-new-client-benefit">
+        <span class="gx-new-client-benefit-value">−10%</span>
+        <span class="gx-new-client-benefit-copy"><strong>Bienvenida disponible</strong><small>En tu primera alta de perfiles individuales. Sin promociones, combos ni cuentas completas.</small></span>
+    </div>
+    <button type="button" class="gx-new-client-cta">
+        <span>Explorar catálogo</span>
+        <svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg>
+    </button>
+</div>
+<div class="glass-card dash-card" id="dash-billing-card" style="background: rgba(0,0,0,0.3);">
+<div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); text-align: center;">Tu próxima fecha de corte</div>
+<div class="dash-date" id="dash-date">Cargando...</div>
+<div id="dash-badge" style="text-align: center;"></div>
+<hr style="border: 0; border-top: 1px dashed rgba(255,255,255,0.1); margin: 20px 0;"/>
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<div style="font-size: 13px; font-weight: 700;">⭐ Nivel de Lealtad</div>
+<div id="loyalty-count" style="font-size: 11px; color: var(--neon-blue); font-weight: 700;">0 Pagos</div>
+</div>
+<div class="loyalty-progress-bg">
+<div class="loyalty-progress-fill" id="loyalty-bar"></div>
+</div>
+<div id="loyalty-msg" style="font-size: 11px; color: var(--text-muted); text-align: left;">Acumula 4 pagos seguidos para obtener 3% de descuento.</div>
+<button aria-label="Ver Estado de Cuenta" class="gx-account-capsule" type="button">
+<span aria-hidden="true" class="gx-account-capsule-icon">
+<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" viewbox="0 0 24 24">
+<path d="M6 3.75h9.4L18 6.35V20.25H6z"></path>
+<path d="M15.25 3.75v3h2.75"></path>
+<path d="M9 11h6M9 14.5h6M9 18h4"></path>
+</svg>
+</span>
+<span class="gx-account-capsule-label">Ver Estado de Cuenta</span>
+<span class="gx-account-capsule-arrow"><svg class="gx-nav-arrow gx-nav-arrow-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.9 10.8h10.45l-3.55-3.55a1.1 1.1 0 0 1 1.56-1.56l5.43 5.43a1.1 1.1 0 0 1 0 1.56l-5.43 5.43a1.1 1.1 0 0 1-1.56-1.56l3.55-3.55H4.9a1.1 1.1 0 0 1 0-2.2Z"></path></svg></span>
+</button>
+</div>
+<div class="gx-gamification-mid" id="referral-section-container"></div>
+<div class="gx-dashboard-section-head">
+<div class="section-title">Tus servicios</div>
+<div class="gx-dashboard-section-subtitle">Administra tus accesos, soporte y movimientos desde aquí.</div>
+</div>
+<div class="gx-services-stack" id="dash-services"></div>
+<div class="gx-dashboard-section-head gx-history-head">
+<div class="section-title">Historial de pagos</div>
+<div class="gx-dashboard-section-subtitle">Aquí verás tus pagos registrados y el avance de tu constancia.</div>
+</div>
+<div id="dash-history"></div>
+</div>
+
+</div>
+<div class="gx-mirror-toast" id="gx-mirror-toast" role="status" aria-live="polite" hidden></div>
+<script>window.animarMisionesCompletadasEnSecuencia=()=>{};</script>
+<script src="../../assets/js/ayuda/05-gamification-shared-morph-js.js"></script>
+<script src="../gixys-mi-espacio-espejo/companions.js?v=9"></script>
+<div class="gx-b3-lab" id="gx-b3-lab">
+<button class="gx-b3-lab-toggle" type="button" id="gx-b3-toggle" aria-expanded="false" aria-controls="gx-b3-controls">Probar situaciones <span aria-hidden="true">⌄</span></button>
+<div class="gx-b3-controls" id="gx-b3-controls" hidden>
+<div class="gx-b3-heading">Goxy coordina · Gixys acompañan</div>
+<p>Eventos ficticios. Sin pagos, cupones ni notificaciones reales.</p>
+<div class="gx-b3-buttons">
+<button type="button" data-gx-b3-test="notification">Aviso recibido</button>
+<button type="button" data-gx-b3-test="loyalty">Lealtad alcanzada</button>
+<button type="button" data-gx-b3-test="mission">Misión completada</button>
+</div><button type="button" class="gx-b3-reset" data-gx-b3-test="reset">Reiniciar prueba</button>
+</div></div>
+<script src="./b3-router.js?v=1" defer></script>
+<script src="./b3-mirror.js?v=1" defer></script>
+</body></html>
