@@ -13,6 +13,18 @@
   function today(){
     return new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Mexico_City",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
   }
+  // A partir de las 18:00 (hora Chiapas/CDMX) se usa el aviso breve de cierre.
+  function isClosingHours(){
+    var hour=Number(new Intl.DateTimeFormat("en-GB",{timeZone:"America/Mexico_City",hour:"2-digit",hourCycle:"h23"}).format(new Date()));
+    return hour>=18;
+  }
+  function normalizedDay(c){
+    var period=currentPeriod(c),parts=/^(\d{4})-(\d{2})$/.exec(period),day=Number(c?.estado_cuenta?.dia_pago??c?.dia_pago??0);
+    if(!parts||!Number.isInteger(day)||day<1||day>31)return "";
+    var year=Number(parts[1]),month=Number(parts[2]);
+    var daysInMonth=new Date(Date.UTC(year,month,0)).getUTCDate();
+    return period+"-"+String(Math.min(day,daysInMonth)).padStart(2,"0");
+  }
   function money(n){return "$"+Number(n||0).toLocaleString("es-MX",{minimumFractionDigits:2,maximumFractionDigits:2});}
   function amount(v){var n=Number(v);return Number.isFinite(n)?Math.max(0,n):0;}
   function getClient(key){return typeof clientesDict!=="undefined"?clientesDict[key]:null;}
@@ -104,16 +116,19 @@
     }).filter(function(x){return x.pagado!==true&&Number(x.total_centavos||0)>0;});
     var now=today();
     var late=rows.filter(function(x){return DAY.test(x.effective_due)&&x.effective_due<now;});
+    var dueToday=rows.filter(function(x){return DAY.test(x.effective_due)&&x.effective_due===now;});
     var agreed=rows.filter(function(x){
       return x.prorroga_estado==="aprobada"&&DAY.test(String(x.fecha_pactada||""))&&x.fecha_pactada>=now&&Number(x.mora_centavos||0)<=0;
     });
     var missed=late.some(function(x){return DAY.test(String(x.fecha_pactada||""))&&x.fecha_pactada<now;});
-    return {rows:rows,late:late,agreed:agreed,missed:missed,period:b.quote.periodo};
+    return {rows:rows,late:late,dueToday:dueToday,agreed:agreed,missed:missed,period:b.quote.periodo};
   }
-  function b2Context(c){
-    var model=b2Model(c);if(!model||!model.late.length)return c;
-    var sum=function(field){return model.late.reduce(function(n,x){return n+Number(x[field]||0);},0);};
-    var earliest=model.late.map(function(x){return x.effective_due;}).sort()[0];
+  function b2Context(c,kind){
+    var model=b2Model(c);
+    var chosen=kind==="due"||kind==="last_call"?model?.dueToday:model?.late;
+    if(!model||!chosen?.length)return c;
+    var sum=function(field){return chosen.reduce(function(n,x){return n+Number(x[field]||0);},0);};
+    var earliest=chosen.map(function(x){return x.effective_due;}).sort()[0];
     var lateDays=Math.max(0,Math.floor((Date.parse(today()+"T12:00:00")-Date.parse(earliest+"T12:00:00"))/86400000));
     var mora=sum("mora_centavos")/100,abonos=sum("abono_pagado_centavos")/100;
     var total=sum("total_centavos")/100,base=sum("base_centavos")/100;
@@ -127,7 +142,7 @@
       {concepto:"Otros ajustes",monto:ajustes}
     ].filter(function(x){return x.concepto==="Subtotal"||Math.abs(x.monto)>.001;});
     return Object.assign({},c,{estado_cuenta:{
-      estado:"vencido",periodo_label:c.estado_cuenta?.periodo_label||currentPeriod(c),
+      estado:kind==="due"||kind==="last_call"?"vence_hoy":"vencido",periodo_label:c.estado_cuenta?.periodo_label||currentPeriod(c),
       dias_atraso:lateDays,total_actual:total,subtotal:base,desglose:breakdown,
       descuentos:{total:desc},cargos:{mora:mora,total:mora}
     }});
@@ -159,8 +174,11 @@
     if(b?.mode==="b2"){
       var model=b2Model(c);
       if(!model)return "unverified";
+      if(c.estado==="suspendido"||c.pago_en_revision||ec.estado==="revision"||b.quote?.comprobante_en_revision===true)return "normal";
       if(model.late.length)return model.missed?"missed":"overdue";
-      return model.agreed.length?"agreed":"normal";
+      if(model.agreed.length)return "agreed";
+      if(model.dueToday.length)return isClosingHours()?"last_call":"due";
+      return "normal";
     }
     if(c.estado==="suspendido"||c.pago_en_revision||ec.estado==="revision"||ec.estado==="pagado"||ec.esta_pagado_periodo===true)return "normal";
     var a=agreementFor(c);
@@ -168,6 +186,12 @@
     if(String(ec.estado).toLowerCase()==="vencido"&&amount(ec.total_actual)>0){
       return a?.kind==="lapsed"?"missed":"overdue";
     }
+    // Vencimiento único: estado del motor + fecha oficial del periodo.
+    var due=normalizedDay(c),financial=String(ec.estado||"").toLowerCase();
+    var eligible=["vence_hoy","por_vencer","pendiente","incompleto"].includes(financial);
+    if(eligible&&amount(ec.total_actual)>0&&
+       (financial==="vence_hoy"||due===today())&&
+       (!due||due===today()))return isClosingHours()?"last_call":"due";
     return "normal";
   }
   function text(node,textValue){if(node)node.textContent=textValue;}
@@ -183,7 +207,7 @@
       card.dataset.gxReminderOriginalSecondary=secondary?.textContent||"";
       card.dataset.gxReminderOriginalBadge=badge?.textContent||"";
     }
-    var ctx=b2Context(c);
+    var ctx=b2Context(c,status);
     var signature=[status,a?.record?.id||"",String(ctx.estado_cuenta?.total_actual||"")].join("|");
     if(card.dataset.gxReminderSignature===signature)return;
     card.dataset.gxReminderSignature=signature;
@@ -194,7 +218,7 @@
       card.dataset.gxReminderOriginalAmount=card.querySelector(".gx-client-money strong")?.textContent||"";
     }
     text(card.querySelector(".gx-client-money strong"),card.dataset.gxReminderOriginalAmount);
-    card.classList.remove("gx-reminder-agreed","gx-reminder-overdue","gx-reminder-missed","gx-reminder-unverified");
+    card.classList.remove("gx-reminder-agreed","gx-reminder-overdue","gx-reminder-missed","gx-reminder-unverified","gx-reminder-due","gx-reminder-last-call");
     card.querySelector(".gx-reminder-action")?.remove();
     if(status==="unverified"){
       card.classList.add("gx-reminder-unverified");
@@ -216,9 +240,18 @@
       card.querySelector(".gx-client-brief .gx-client-preview-meta")?.setAttribute("data-gx-agreed","true");
       return;
     }
-    if(status!=="overdue"&&status!=="missed")return;
-    card.classList.add(status==="missed"?"gx-reminder-missed":"gx-reminder-overdue");
+    if(!["overdue","missed","due","last_call"].includes(status))return;
+    var overdue=status==="overdue"||status==="missed";
+    var cls=status==="missed"?"gx-reminder-missed":
+      status==="overdue"?"gx-reminder-overdue":
+      status==="last_call"?"gx-reminder-last-call":"gx-reminder-due";
+    card.classList.add(cls);
     if(b2Model(c))text(card.querySelector(".gx-client-money strong"),money(ctx.estado_cuenta.total_actual));
+    if(status==="due"||status==="last_call"){
+      text(primary,status==="last_call"?"Últimas horas para pagar":"Hoy es día de pago");
+      text(secondary,"Vence hoy · "+(ctx.estado_cuenta?.periodo_label||currentPeriod(c)));
+      text(badge,"VENCE HOY");
+    }
     if(status==="missed"){
       text(card.querySelector(".gx-client-payment-primary strong"),"Prórroga incumplida");
       text(card.querySelector(".client-status-badge"),"ACUERDO INCUMPLIDO");
@@ -228,18 +261,19 @@
     var button=document.createElement("button");
     button.type="button";button.className="gx-reminder-action";
     button.setAttribute("aria-label","Enviar recordatorio a "+String(c.nombre||"cliente"));
-    button.textContent="↗ Enviar recordatorio";
+    button.textContent=status==="last_call"?"↗ Último aviso":
+      status==="due"?"↗ Recordar pago":"↗ Enviar recordatorio";
     button.addEventListener("click",function(event){
       event.preventDefault();event.stopPropagation();
       var actual=getClient(key);
-      if(!actual||!["overdue","missed"].includes(effectiveStatus(actual))){
+      var active=actual&&effectiveStatus(actual);
+      if(!["overdue","missed","due","last_call"].includes(active)){
         applyCards();
-        alert("El estado financiero de este cliente ya no permite enviar el recordatorio. Actualiza Admin.");
+        alert("Este cobro ya no requiere recordatorio. Actualiza Admin si cambió el estado.");
         return;
       }
-      // Solo datos financieros previamente validados por el servidor.
-      var context=b2Context(actual);
-      openReminder(context);
+      // Monto correspondiente exclusivamente a las obligaciones del aviso.
+      openReminder(b2Context(actual,active),active);
     });
     footer.insertAdjacentElement("afterend",button);
   }
@@ -255,10 +289,34 @@
     if(raw.length===13&&raw.startsWith("521"))raw="52"+raw.slice(3);
     return /^52\d{10}$/.test(raw)?raw:"";
   }
-  function messageFor(c){
+  function messageFor(c,kind){
     var ec=c.estado_cuenta,days=Number(ec.dias_atraso||0),mora=amount(ec.cargos?.mora);
+    var name=String(c.nombre||"").trim().split(/\s+/)[0]||"";
+    var greeting="¡Hola"+(name?", "+name:"")+"! 👋🏻💜";
+    if(kind==="due")return [
+      greeting,"",
+      "Hoy es tu fecha de pago en *GOXION*. Tu saldo a pagar es de *"+money(ec.total_actual)+"*. ✨","",
+      "Pagar puntualmente te ayuda a conservar tu beneficio de lealtad, cuando está vigente, y a evitar cargos por mora.","",
+      "*Para que tu pago sea válido, toma en cuenta lo siguiente:*","",
+      "✅ Reporta tu pago directamente desde la app web de GOXION.",
+      "💳 Si el monto de tu estado de cuenta no coincide con tus servicios contratados, repórtalo desde Soporte antes de pagar.",
+      "📲 No se aceptan capturas de pantalla enviadas por WhatsApp como reporte de pago.",
+      "⭐ Para conservar tu beneficio de lealtad, el pago debe quedar reportado desde la plataforma dentro del plazo.",
+      "🔑 Si necesitas nuevamente tus credenciales de acceso, puedes solicitarlas por este medio.","",
+      "Ingresa a *Mi Espacio* para consultar tu estado de cuenta y reportar tu pago:",
+      "🌐 "+SPACE_URL,"",
+      "Pagar puntual siempre te conviene más: conservas tus beneficios y evitas cargos adicionales. 💜"
+    ].join("\n");
+    if(kind==="last_call")return [
+      greeting,"",
+      "*Aún estás a tiempo. ⏳* Hoy vence tu pago de *"+money(ec.total_actual)+"* en GOXION.",
+      "Realiza tu pago antes de terminar el día para evitar cargos por mora y mantener tu lealtad, cuando esté vigente.","",
+      "Una vez pagado, repórtalo desde *Mi Espacio* para que quede registrado:",
+      "🌐 "+SPACE_URL,"",
+      "No se aceptan capturas por WhatsApp como reporte de pago. El registro debe hacerse desde la plataforma. 💜"
+    ].join("\n");
     var lines=[
-      "¡Hola, "+String(c.nombre||"")+"! 👋🏻💜",
+      greeting,
       "",
       "Esperamos que te encuentres muy bien. 😊",
       "",
@@ -312,8 +370,8 @@
       window.location.href=url;
     });
   }
-  function openReminder(c){
-    var message=messageFor(c),phone=phoneFor(c);
+  function openReminder(c,kind){
+    var message=messageFor(c,kind),phone=phoneFor(c);
     if(phone){
       // Una pulsación: abre exactamente el chat registrado con el mensaje listo.
       window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(message),
@@ -344,6 +402,8 @@
     }
     updateAgreements(false).then(function(){queueB2();});
     applyCards();
+    // El botón se actualiza sin refrescar la pestaña al llegar las 18:00 o cambiar de día.
+    setInterval(function(){applyCards();},60000);
     window.addEventListener("focus",function(){updateAgreements(true);});
     document.addEventListener("visibilitychange",function(){if(!document.hidden)updateAgreements(true);});
   }
@@ -353,6 +413,7 @@
     status:effectiveStatus,
     quoteForReminder:b2Context,
     messageFor:messageFor,
+    isClosingHours:isClosingHours,
     phoneFor:phoneFor
   };
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});
