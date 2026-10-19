@@ -53,6 +53,7 @@ document.addEventListener('gx-mirror-ready',()=>{
  $('btn-tab-soporte')?.setAttribute('title','Goxy está en Soporte oficial. Abrir en una nueva pestaña');
  document.querySelectorAll('[data-gx-b3-test]').forEach(btn=>btn.addEventListener('click',()=>{
   const kind=btn.dataset.gxB3Test;
+  tray.hidden=true;toggle.setAttribute('aria-expanded','false');
   if(kind==='reset'){location.reload();return}
   if(kind==='notification'){
    const bell=$('gx-client-notif-launch');
