@@ -77,9 +77,20 @@
     var key=card.dataset.clientKey,c=getClient(key);
     if(!c)return;
     var status=effectiveStatus(c),a=agreementFor(c);
+    var primary=card.querySelector(".gx-client-payment-primary strong");
+    var secondary=card.querySelector(".gx-client-payment-primary small");
+    var badge=card.querySelector(".client-status-badge");
+    if(!Object.prototype.hasOwnProperty.call(card.dataset,"gxReminderOriginalPrimary")){
+      card.dataset.gxReminderOriginalPrimary=primary?.textContent||"";
+      card.dataset.gxReminderOriginalSecondary=secondary?.textContent||"";
+      card.dataset.gxReminderOriginalBadge=badge?.textContent||"";
+    }
     var signature=[status,a?.record?.id||"",String(c.estado_cuenta?.total_actual||"")].join("|");
     if(card.dataset.gxReminderSignature===signature)return;
     card.dataset.gxReminderSignature=signature;
+    text(primary,card.dataset.gxReminderOriginalPrimary);
+    text(secondary,card.dataset.gxReminderOriginalSecondary);
+    text(badge,card.dataset.gxReminderOriginalBadge);
     card.classList.remove("gx-reminder-agreed","gx-reminder-overdue","gx-reminder-missed","gx-reminder-unverified");
     card.querySelector(".gx-reminder-action")?.remove();
     if(status==="unverified"){
