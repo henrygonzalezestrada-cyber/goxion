@@ -142,32 +142,30 @@ async function verify(engine,name){
       const rect=el=>{const r=el.getBoundingClientRect();
         return {left:r.left,right:r.right,top:r.top,bottom:r.bottom}};
       return {near:msg.classList.contains('gx-b3-near-bell'),
-        mode:msg.dataset.ctaMode,action:action?rect(action):null,
+        action:action?rect(action):null,
         bubble:rect(bubble),nav:rect(nav)};
     });
-    assert(nearCTA?.near,'Keep Gixy close to the bell');
-    assert(['floating','inline-only'].includes(nearCTA.mode));
-    assert.equal(Boolean(nearCTA.action),nearCTA.mode==='floating',
-      'No ghost floating button: '+JSON.stringify(nearCTA));
-    if(nearCTA.action){
-      assert(nearCTA.action.left>=nearCTA.bubble.right+2,
-        'Goxy CTA overlaps the bubble: '+JSON.stringify(nearCTA));
-      assert(nearCTA.action.bottom<=nearCTA.nav.top-2,
-        'Goxy CTA overlaps navigation: '+JSON.stringify(nearCTA));
-      assert(nearCTA.action.right<=page.viewportSize().width-7,
-        'Goxy CTA overflows viewport: '+JSON.stringify(nearCTA));
-    }
+    assert(nearCTA?.near,'Keep Gixy close to bell');
+    assert(nearCTA.action,'Goxy CTA should appear under the bubble');
+    assert(Math.abs(nearCTA.action.left-nearCTA.bubble.left)<3,
+      'CTA not aligned with speech bubble: '+JSON.stringify(nearCTA));
+    assert(nearCTA.action.top>=nearCTA.bubble.bottom-5,
+      'CTA not below speech bubble: '+JSON.stringify(nearCTA));
+    assert(nearCTA.action.right<=nearCTA.bubble.left+151,
+      'CTA is oversized: '+JSON.stringify(nearCTA));
+    assert(nearCTA.action.right<=page.viewportSize().width-8,
+      'CTA extends out of viewport: '+JSON.stringify(nearCTA));
+    assert(nearCTA.action.bottom<=nearCTA.nav.top-5,
+      'CTA overlaps navigation: '+JSON.stringify(nearCTA));
+    assert(nearCTA.action.bottom-nearCTA.action.top<=42,
+      'CTA height differs from V3: '+JSON.stringify(nearCTA));
     await page.evaluate(()=>{window.__goxyOpened=null;window.open=(...args)=>{
      window.__goxyOpened=args;return null
     }});
-    const detail=page.locator('#gx-smart-notif-list .gx-b3-notice-action .gx-b3-goxy-cta');
-    assert.equal(await detail.count(),1,'Goxy must remain reachable in notice details');
-    if(nearCTA.action)
-      await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta').click();
-    else
-      await detail.evaluate(el=>el.click());
+    await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta').click();
     assert.deepEqual(await page.evaluate(()=>window.__goxyOpened),
      ['./goxy-handoff.html','_blank','noopener,noreferrer']);
+    assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action .gx-b3-goxy-cta').count(),1);
     await page.evaluate(()=>window.__b3Canvas=document.querySelector(
       '.gx-gixy-message[data-kind="notification"] canvas'));
     await page.evaluate(()=>window.scrollBy(0,150));
@@ -218,7 +216,7 @@ async function verify(engine,name){
   assert.deepEqual(privateRequests,[],name+' beta requested private APIs');
   assert.deepEqual(errors,[],name+' browser errors: '+errors.join(', '));
   await page.close();
-  console.log(name+' E2/B3 V6 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
+  console.log(name+' E2/B3 V7 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
  }finally{await browser.close()}
 }
 try{await ready();await verify(chromium,'Chromium');await verify(webkit,'WebKit');console.log('GOXION E2/B3 COMPLETE BETA PASS')}
