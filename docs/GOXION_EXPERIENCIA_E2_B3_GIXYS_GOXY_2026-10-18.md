@@ -34,3 +34,17 @@ Concepto aprobado por el propietario: integrar en una beta, sin reabrir B1, B2 n
 - **QA:** Chrome/WebKit, siete anchos, cuatro escenarios prioritarios y dos ordinarios; verificaciones de aparición/deduplicación, ausencia de Gixy en estados no urgentes, CTA contextual, Gixys V9 sin modificaciones, privacidad y no desbordamiento.
 
 Estado: Beta integrada pendiente de aprobación visual del usuario. Bloques 1 y 2 aprobados, pero ninguna modificación funcional se incorpora a Ayuda/Index oficial. Continúa barrera de lanzamiento Issue #142.
+
+## B3 V3 · Pulido final solicitado: desplazamiento, Goxy, paleta y saludo
+
+El propietario revisó V2 desde iPhone y aprobó el concepto; pidió únicamente corregir cuatro detalles observados en la grabación de 18/oct: Gixys trabados al desplazarse, CTA «Preguntar a Goxy» desalineada y persistente cuando el cliente toca al Gixy, similitud entre los dos morados y salto vertical del contenido por saludo de una o dos líneas.
+
+**Implementación estrictamente beta:**
+- El motor V9 no se edita. Se conserva el mismo source Plastic/avatar y PulseHeart original, se compila un *fork local de escena* dentro de B3 (`src/companions.jsx` → `companions-v3.js`). Antes V9 llamaba a `setLayout` en cada evento `scroll`, repintando React+canvas. Ahora se calcula el anclaje al mostrar el personaje y solo se mueve la posición de su DOM en `requestAnimationFrame`, sin re-render de avatar por scroll. Al salir el ancla de pantalla el Gixy se desvanece y regresa al volver; no cambia de lado intempestivamente.
+- La CTA se alinea al comienzo real de la burbuja y se integra en su ancho. Tras tocar al Gixy o cerrar su mensaje, un evento específico bloquea la CTA flotante y retira también la de la notificación; el observador no puede recrearla para ese evento. Para un evento nuevo podrá volver a ofrecer ayuda.
+- Paleta V9 original de misión violeta `#8663ff` y notificación cian `#04c8ee` intactos. Solo el Gixy de lealtad pasa de morado `#9c6aff` a coral rosado `#ff83ab`, manteniendo el modelo Plastic y expresiones.
+- Saludo con **alto constante de 79px**, texto centrado y escalado responsivo, independientemente de una o dos líneas; margen vertical uniforme, sin empujar tarjeta, lealtad, misiones ni contenido.
+- Pruebas B3 específicas sobre Chromium y WebKit: continuidad visual en siete anchos, saludo 1/2 líneas sin variación del inicio de tarjeta, color diferenciado, canvas sin remount al hacer scroll, CTA alineada y desaparición al tocar, y todos los estados/contextos previos.
+- No hay modificaciones a páginas oficiales, B1/B2, motor financiero, Supabase ni la V9 aprobada. Mantener barrera global de Issue #142.
+
+**Estado:** beta V3 por validar y revisar visualmente en iPhone. No declarar cierre del Bloque 3 sin visto bueno del propietario.
