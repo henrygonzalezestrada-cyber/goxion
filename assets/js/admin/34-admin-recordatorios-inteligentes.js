@@ -116,7 +116,10 @@
     }).filter(function(x){return x.pagado!==true&&Number(x.total_centavos||0)>0;});
     var now=today();
     var late=rows.filter(function(x){return DAY.test(x.effective_due)&&x.effective_due<now;});
-    var dueToday=rows.filter(function(x){return DAY.test(x.effective_due)&&x.effective_due===now;});
+    // Un acuerdo vigente no activa el recordatorio estándar del día original.
+    var dueToday=rows.filter(function(x){
+      return DAY.test(x.effective_due)&&x.effective_due===now&&x.prorroga_estado!=="aprobada";
+    });
     var agreed=rows.filter(function(x){
       return x.prorroga_estado==="aprobada"&&DAY.test(String(x.fecha_pactada||""))&&x.fecha_pactada>=now&&Number(x.mora_centavos||0)<=0;
     });
@@ -176,8 +179,8 @@
       if(!model)return "unverified";
       if(c.estado==="suspendido"||c.pago_en_revision||ec.estado==="revision"||b.quote?.comprobante_en_revision===true)return "normal";
       if(model.late.length)return model.missed?"missed":"overdue";
-      if(model.agreed.length)return "agreed";
       if(model.dueToday.length)return isClosingHours()?"last_call":"due";
+      if(model.agreed.length)return "agreed";
       return "normal";
     }
     if(c.estado==="suspendido"||c.pago_en_revision||ec.estado==="revision"||ec.estado==="pagado"||ec.esta_pagado_periodo===true)return "normal";
