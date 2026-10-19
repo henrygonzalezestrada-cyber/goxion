@@ -5,6 +5,7 @@
 'use strict';
 if(!document.documentElement.hasAttribute('data-gx-b3'))return;
 const $=id=>document.getElementById(id);
+const fullOfficial=document.documentElement.dataset.gxB4Official==='true';
 const peso=n=>'$'+(n/100).toLocaleString('es-MX',{minimumFractionDigits:2,maximumFractionDigits:2});
 const esc=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let state=null,op=false,heartCelebrated=false,panelReady=false,lastReward=false;
@@ -34,8 +35,8 @@ function receipt(q){
  moneyLine('Subtotal',peso(q.original))+
  (q.loyalty?moneyLine('Lealtad '+q.loyaltyLevel+'%', '-'+peso(q.loyalty),'gx-b4-green'):'')+
  (q.mission?moneyLine('Cupón de Misiones','-'+peso(q.mission),'gx-b4-green'):'')+
- (q.personal?moneyLine('Descuento especial','-'+peso(q.personal),'gx-b4-green'):'')+
- (has?moneyLine('Cupón secreto Gixys 5%','-'+peso(q.secret),'gx-b4-cyan'):'')+
+ (q.personal?moneyLine('Descuento especial ficticio (aparte del 5%)','-'+peso(q.personal),'gx-b4-green'):'')+
+ (has?moneyLine('Cupón Gixys: 5% × '+peso(q.baseEligible),'−'+peso(q.secret),'gx-b4-cyan'):'')+
  '<div class="gx-b4-price-line gx-b4-total"><span>Total del período</span><strong>'+peso(q.total)+'</strong></div></div>'+
  '<p class="gx-b4-foot">Importes ficticios calculados por la API de pruebas. No son saldos ni cotizaciones oficiales.</p>';
 }
@@ -126,6 +127,10 @@ function closeAccount(){
  document.body.classList.remove('gx-b4-sheet-open');
 }
 function catalogue(show){
+ if(fullOfficial&&window.GOXION_B4_OFFICIAL_NAV){
+  window.GOXION_B4_OFFICIAL_NAV.view(show?'catalogo':'dashboard');
+  return;
+ }
  const dash=$('view-dashboard'),catalog=$('gx-b4-catalogue');
  if(!dash||!catalog)return;
  dash.style.display=show?'none':'block';catalog.hidden=!show;
@@ -158,6 +163,7 @@ async function doAction(action){
   toggle?.setAttribute('aria-expanded','false');
  }
  if(action==='statement'){showAccount();return}
+ if(action==='welcome'){window.GOXION_B4_OFFICIAL_NAV?.view('inicio');return}
  if(action==='close-statement'){closeAccount();return}
  if(action==='home'){catalogue(false);return}
  if(action==='notification'){
@@ -229,12 +235,17 @@ function boot(){
    '<button data-b4-action="next" type="button">Avanzar al siguiente período</button>'+
    '<button data-b4-action="promo" type="button">Probar promoción en Netflix</button>'+
    '<button data-b4-action="statement" type="button">Ver estado de cuenta</button>'+
+   (fullOfficial?'<button data-b4-action="welcome" type="button">Ver pantalla de bienvenida oficial</button>':'')+
    '<button data-b4-action="reset" type="button" class="gx-b4-muted">Reiniciar datos de demostración</button>';
   controls.append(content);
  }
  const account=document.createElement('section');account.id='gx-b4-account';
- account.className='glass-card gx-b4-account';
- const target=$('dash-billing-card');target?.insertAdjacentElement('afterend',account);
+ account.className=fullOfficial?'gx-b4-account gx-b4-account--embedded':'glass-card gx-b4-account';
+ const target=$('dash-billing-card');
+ if(fullOfficial&&target){
+  const capsule=target.querySelector('.gx-account-capsule');
+  if(capsule)capsule.insertAdjacentElement('beforebegin',account);else target.append(account);
+ }else target?.insertAdjacentElement('afterend',account);
  const sheet=document.createElement('section');sheet.id='gx-b4-account-sheet';
  sheet.className='gx-b4-sheet';sheet.hidden=true;sheet.setAttribute('role','dialog');
  sheet.setAttribute('aria-label','Estado de cuenta de demostración');sheet.setAttribute('aria-modal','true');
@@ -245,6 +256,7 @@ function boot(){
  '<p id="gx-b4-coupon-summary" class="gx-b4-note"></p>'+
  '<button id="gx-b4-payment-in-statement" class="gx-b4-primary" data-b4-action="pay" type="button">Confirmar pago simulado</button></div>';
  document.body.append(sheet);
+ if(!fullOfficial){
  const catalog=document.createElement('section');
  catalog.id='gx-b4-catalogue';catalog.className='gx-b4-catalogue';catalog.hidden=true;
  const container=$('gx-mirror-container');
@@ -254,13 +266,16 @@ function boot(){
  '</strong><small>'+(s.type==='profile'?'Perfil individual':'Oferta o cuenta completa')+
  '</small></div><span>'+peso(s.price)+'</span></div>').join('')+'</div>'+
  '<button data-b4-action="home" type="button" class="gx-b4-primary">Volver a Mi Espacio</button>';
+ }
  document.addEventListener('click',e=>{
   const b=e.target.closest('[data-b4-action]');
   if(!b)return;
   e.preventDefault();e.stopPropagation();void doAction(b.dataset.b4Action);
  },true);
+ if(!fullOfficial){
  $('btn-tab-catalogo')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();catalogue(true)},true);
  $('btn-tab-inicio')?.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();catalogue(false)},true);
+ }
  document.querySelector('.gx-account-capsule')?.addEventListener('click',e=>{
   e.preventDefault();e.stopImmediatePropagation();showAccount();
  },true);
