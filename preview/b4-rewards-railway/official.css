@@ -116,3 +116,33 @@ html[data-gx-b4-official="true"] #dash-billing-card{overflow:visible}
  html[data-gx-b4-official="true"] .gx-mirror-note{font-size:8px;padding:6px 8px}
  html[data-gx-b4-official="true"] .gx-b4-official-product-button{font-size:9px}
 }
+
+/* Read-only original official access form, disabled from submitting credentials. */
+html[data-gx-b4-official="true"] #gx-b4-auth-overlay{
+ position:fixed;inset:0;background:rgba(2,5,13,.75);
+ backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);z-index:11990
+}
+html[data-gx-b4-official="true"] #header-action-btn.gx-b4-auth-open{
+ position:fixed!important;z-index:12000!important;
+ left:50%!important;top:max(12px,env(safe-area-inset-top))!important;
+ transform:translateX(-50%)!important;
+ width:min(450px,calc(100vw - 24px))!important;
+ min-height:min(560px,calc(100dvh - 24px))!important;
+ max-height:calc(100dvh - 24px)!important;overflow:auto!important;
+ border-radius:24px!important;
+ background:rgba(14,18,34,.98)!important;
+ border:1px solid rgba(133,182,228,.24)!important;
+ padding:22px 18px!important;
+ box-shadow:0 24px 80px rgba(0,0,0,.55)!important
+}
+html[data-gx-b4-official="true"] #header-action-btn.gx-b4-auth-open .gx-auth-pill-label{
+ display:none!important
+}
+html[data-gx-b4-official="true"] #header-action-btn.gx-b4-auth-open .gx-auth-inline-content{
+ position:relative!important;inset:auto!important;opacity:1!important;
+ visibility:visible!important;pointer-events:auto!important;display:flex!important;
+ width:100%!important;height:auto!important
+}
+html[data-gx-b4-official="true"] #header-action-btn.gx-b4-auth-open .gx-auth-stage-login{
+ display:block!important
+}
