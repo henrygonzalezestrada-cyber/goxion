@@ -41,7 +41,7 @@ function handoff(){
  // Soporte. No fake assistant, no account data, no context in query params.
  // Official integration may pass a server-authorized context ID via the
  // genuine session bridge, never from this synthetic preview.
- window.open('../goxion-ai/','_blank','noopener,noreferrer');
+ window.open('./goxy-handoff.html','_blank','noopener,noreferrer');
  return true;
 }
 function btn(){
