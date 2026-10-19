@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - beta/e2b4-railway-espejo-funcional-20261019
+      - beta/e2b4-railway-espejo-oficial-v2-20261019
     paths:
       - 'preview/b4-rewards-railway/**'
       - '.github/workflows/goxion-b4-railway-espejo.yml'
