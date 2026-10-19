@@ -146,3 +146,10 @@ html[data-gx-b4-official="true"] #header-action-btn.gx-b4-auth-open .gx-auth-inl
 html[data-gx-b4-official="true"] #header-action-btn.gx-b4-auth-open .gx-auth-stage-login{
  display:block!important
 }
+
+/* Header is a stacking context in official CSS. Raise it only while the
+ * demo login is open so the close control is never behind the scrim. */
+html[data-gx-b4-official="true"] body.gx-b4-auth-visible .app-header{
+ position:relative!important;z-index:12005!important;overflow:visible!important;
+ isolation:auto!important;transform:none!important
+}
