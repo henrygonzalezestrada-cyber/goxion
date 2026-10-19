@@ -57,7 +57,7 @@ function selectPlace(kind,node,sequence,dimensions){
  // Notification alone uses the short space directly below the bell.
  // Formerly the generic collision scorer rejected that slot because of the
  // adjacent header, then placed the Gixy by the greeting ~266px lower.
- // A side-by-side Goxy CTA prevents the action from obscuring the nav.
+ // Prefer the bell-local Gixy even if the separate Goxy CTA cannot fit.
  if(kind==='notification'){
   const bell=document.querySelector('#gx-client-notif-launch');
   const nav=document.querySelector('#goxion-main-nav');
@@ -65,15 +65,17 @@ function selectPlace(kind,node,sequence,dimensions){
   if(bell&&nav&&header&&isShown(bell)&&isShown(nav)){
    const b=bell.getBoundingClientRect(),n=nav.getBoundingClientRect(),head=header.getBoundingClientRect();
    const ctaWidth=vw<=360?110:137,ctaGap=4;
-   const maxLeft=vw-w-ctaWidth-ctaGap-11;
-   const left=Math.min(Math.round(b.right-w+3),maxLeft);
+   const sceneLeft=clamp(Math.round(b.right-w+3),11,Math.max(11,vw-w-11));
    const top=Math.ceil(Math.max(b.bottom+7,head.bottom-2));
-   if(left>=11&&top>=12&&top+h+4<=Math.min(n.top,vh-10)){
-    const sceneBox=bounds(left,top,w,h);
-    const ctaBox=bounds(left+w+ctaGap,top+12,ctaWidth,35);
-    const blocked=obstacles.some(o=>overlap(sceneBox,o)>40||overlap(ctaBox,o)>40);
-    if(!blocked)return {left,top,width:w,height:h,slot:0,sourceIdx:0,
-      collision:0,priority:0,score:-1,nearBell:true};
+   if(top>=12&&top+h+4<=Math.min(n.top,vh-10)){
+    const free=r=>!obstacles.some(o=>overlap(r,o)>40);
+    const alongside=Math.min(sceneLeft,vw-w-ctaWidth-ctaGap-11);
+    const floatingCta=alongside>=11&&free(bounds(alongside,top,w,h))
+      &&free(bounds(alongside+w+ctaGap,top+12,ctaWidth,35));
+    if(floatingCta||free(bounds(sceneLeft,top,w,h)))
+     return {left:floatingCta?alongside:sceneLeft,top,width:w,height:h,
+      slot:0,sourceIdx:0,collision:0,priority:0,score:-1,
+      nearBell:true,floatingCta};
    }
   }
  }
@@ -322,7 +324,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
  }
  const visible=Boolean(layout);
  return <div ref={scene} className={'gx-gixy-message'+(visible?' is-visible':'')+(layout?.nearBell?' gx-b3-near-bell':'')+(phase!=='shown'?' is-leaving':'')}
-  data-kind={kind} data-variant={serial%5} data-placement={layout?.slot??'hidden'}
+  data-kind={kind} data-variant={serial%5} data-placement={layout?.slot??'hidden'} data-cta-mode={layout?.floatingCta?'floating':'inline-only'}
   data-touch-count={touches} data-phase={phase} data-typing={typing?'true':'false'}
   data-visible-chars={charsShown} data-write-ms={WRITE_MS}
   style={{left:layout?.left??0,top:layout?.top??0,visibility:visible?'visible':'hidden'}}>

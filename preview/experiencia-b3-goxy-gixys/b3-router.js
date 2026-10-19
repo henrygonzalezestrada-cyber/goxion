@@ -56,20 +56,25 @@ function attachHelp(){
  if(!helpContext?.goxy||!active.has('notification')||
     ignoredHelpEvent===helpContext.id)return;
  const msg=document.querySelector('#gx-gixys-message-root .gx-gixy-message[data-kind="notification"].is-visible');
- if(!msg||msg.dataset.phase!=='shown'||msg.querySelector('.gx-b3-goxy-cta'))return;
- const action=btn();
- // Align to the actual V9 bubble offset (including its native internal
- // spacing), not an estimated 59px avatar + 3px gap. Works at 280px too.
- const bubble=msg.querySelector('.gx-gixy-message__bubble');
- if(bubble)action.style.setProperty('left',bubble.offsetLeft+'px','important');
- // Sit alongside the existing V9 bubble rather than replacing its React
- // tree, plastic renderer or click-to-play behavior.
+ if(!msg||msg.dataset.phase!=='shown')return;
+ const existing=msg.querySelector('.gx-b3-goxy-cta');
+ // If the Gixy fits but the button does not, keep Goxy in the notice sheet.
+ if(msg.classList.contains('gx-b3-near-bell')&&msg.dataset.ctaMode!=='floating'){
+  existing?.remove();
+  return;
+ }
+ if(existing)return;
+ const action=btn(),bubble=msg.querySelector('.gx-gixy-message__bubble');
+ // V5's inline !important left overrode the correct side-by-side CSS.
+ if(bubble&&!msg.classList.contains('gx-b3-near-bell'))
+  action.style.setProperty('left',bubble.offsetLeft+'px','important');
  const y=msg.getBoundingClientRect().bottom;
- if(y+43>innerHeight)action.classList.add('gx-b3-goxy-cta--above');
+ if(!msg.classList.contains('gx-b3-near-bell')&&y+43>innerHeight)
+  action.classList.add('gx-b3-goxy-cta--above');
  msg.append(action);
 }
 const observer=new MutationObserver(attachHelp);
-observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','data-phase']});
+observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['class','data-phase','data-cta-mode']});
 // The customer engaged with or dismissed the Gixy: remove BOTH contextual
 // buttons and never recreate them for the same event.
 const disengage=event=>{
