@@ -153,5 +153,5 @@ html[data-gx-b3="true"] .gx-b3-notice-action .gx-b3-goxy-cta{
    before navigation only during the Gixy's notification; all other
    layouts, Gixys, and the approved CTA visual stay unchanged. */
 html[data-gx-b3="true"]:has(.gx-gixy-message[data-kind="notification"].gx-b3-near-bell.is-visible:not(.is-leaving)) .gx-mirror-note{
- margin-bottom:57px!important;
+ margin-bottom:63px!important;
 }
