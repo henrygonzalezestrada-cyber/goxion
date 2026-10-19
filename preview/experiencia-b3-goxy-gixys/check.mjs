@@ -83,7 +83,7 @@ async function verify(engine,name){
     }});
     await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta').click();
     assert.deepEqual(await page.evaluate(()=>window.__goxyOpened),
-     ['../goxion-ai/','_blank','noopener,noreferrer']);
+     ['./goxy-handoff.html','_blank','noopener,noreferrer']);
     assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action .gx-b3-goxy-cta').count(),1);
    }else{
     assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action').count(),0);
@@ -109,6 +109,13 @@ async function verify(engine,name){
    assert.equal(await page.locator('.gx-gixy-message[data-kind="'+kind+'"] .gx-b3-goxy-cta').count(),0,
     'Celebrations should never offer an irrelevant Goxy CTA');
   }
+  const direct=await fetch(root+'goxy-handoff.html');
+  assert.equal(direct.status,200);
+  const wrapper=await direct.text();
+  assert(wrapper.includes('src="../../ayuda.html"'),'Must reuse the real official Goxy in Ayuda');
+  assert(wrapper.includes("switchTab('soporte')"),'Direct handoff must actually select Soporte');
+  assert(!/supabase\.co|clientId=|access_token=|pin=/i.test(wrapper),
+   'Do not transmit client secrets or invent a chatbot');
   assert.deepEqual(privateRequests,[],name+' beta requested private APIs');
   assert.deepEqual(errors,[],name+' browser errors: '+errors.join(', '));
   await page.close();
