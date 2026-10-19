@@ -115,13 +115,21 @@
     var sum=function(field){return model.late.reduce(function(n,x){return n+Number(x[field]||0);},0);};
     var earliest=model.late.map(function(x){return x.effective_due;}).sort()[0];
     var lateDays=Math.max(0,Math.floor((Date.parse(today()+"T12:00:00")-Date.parse(earliest+"T12:00:00"))/86400000));
-    var mora=sum("mora_centavos")/100;
-    var total=sum("total_centavos")/100;
+    var mora=sum("mora_centavos")/100,abonos=sum("abono_pagado_centavos")/100;
+    var total=sum("total_centavos")/100,base=sum("base_centavos")/100;
+    var desc=(sum("descuento_centavos")+sum("descuento_comercial_centavos"))/100;
+    var ajustes=Math.round((total-(base-desc+mora-abonos))*100)/100;
+    var breakdown=[
+      {concepto:"Subtotal",monto:base},
+      {concepto:"Descuentos",monto:-desc},
+      {concepto:"Abonos aprobados",monto:-abonos},
+      {concepto:"Mora",monto:mora},
+      {concepto:"Otros ajustes",monto:ajustes}
+    ].filter(function(x){return x.concepto==="Subtotal"||Math.abs(x.monto)>.001;});
     return Object.assign({},c,{estado_cuenta:{
       estado:"vencido",periodo_label:c.estado_cuenta?.periodo_label||currentPeriod(c),
-      dias_atraso:lateDays,total_actual:total,subtotal:sum("base_centavos")/100,
-      descuentos:{total:Math.max(0,(sum("descuento_centavos")+sum("descuento_comercial_centavos"))/100)},
-      cargos:{mora:mora,total:Math.max(mora,(sum("total_centavos")-sum("principal_centavos"))/100)}
+      dias_atraso:lateDays,total_actual:total,subtotal:base,desglose:breakdown,
+      descuentos:{total:desc},cargos:{mora:mora,total:mora}
     }});
   }
   function agreementFor(c){
@@ -283,16 +291,31 @@
     return str;
   }
   function paint(c){
-    var ec=c.estado_cuenta,canvas=document.createElement("canvas");
-    canvas.width=1000;canvas.height=1220;
+    var ec=c.estado_cuenta;
+    var items=(Array.isArray(ec.desglose)?ec.desglose:[]).map(function(x){
+      return {name:String(x.concepto||"Ajuste"),value:Number(x.monto||0)};
+    });
+    if(!items.length){
+      items=[
+        {name:"Subtotal",value:amount(ec.subtotal)},
+        {name:"Descuentos",value:-amount(ec.descuentos?.total)},
+        {name:"Mora",value:amount(ec.cargos?.mora)},
+        {name:"Otros cargos",value:Math.max(0,amount(ec.cargos?.total)-amount(ec.cargos?.mora))}
+      ].filter(function(x){return x.name==="Subtotal"||Math.abs(x.value)>.001;});
+    }
+    items=items.slice(0,7);
+    var bottom=760+Math.max(274,126+items.length*51);
+    var footer=bottom+32;
+    var canvas=document.createElement("canvas");
+    canvas.width=1000;canvas.height=footer+154;
     var ctx=canvas.getContext("2d");if(!ctx)throw new Error("No se pudo crear la imagen.");
     var bg=ctx.createLinearGradient(0,0,1000,1220);
     bg.addColorStop(0,"#101021");bg.addColorStop(.5,"#080910");bg.addColorStop(1,"#080813");
-    ctx.fillStyle=bg;ctx.fillRect(0,0,1000,1220);
+    ctx.fillStyle=bg;ctx.fillRect(0,0,1000,canvas.height);
     var glow=ctx.createRadialGradient(790,80,15,790,80,720);
     glow.addColorStop(0,"rgba(105,46,209,.27)");glow.addColorStop(1,"rgba(105,46,209,0)");
     ctx.fillStyle=glow;ctx.fillRect(0,0,1000,800);
-    block(ctx,48,44,904,1128,40,"rgba(15,16,27,.96)","rgba(121,130,178,.33)");
+    block(ctx,48,44,904,canvas.height-92,40,"rgba(15,16,27,.96)","rgba(121,130,178,.33)");
     block(ctx,76,76,848,94,20,"rgba(115,96,202,.11)");
     label(ctx,"G O X I O N",103,133,32,"#e9eafa","700");
     label(ctx,"ESTADO DE CUENTA",644,132,20,"#92a0b4","700");
@@ -307,27 +330,22 @@
     label(ctx,money(total),105,647,94,"#69e4f6","700");
     var days=Number(ec.dias_atraso||0);
     label(ctx,(days>0?"Vencido hace "+days+" día"+(days===1?"":"s"):"Pago vencido")+" · "+String(ec.periodo_label||currentPeriod(c)),111,699,22,"#b3b4cb","500");
-    block(ctx,85,760,830,274,24,"rgba(26,28,45,.94)","rgba(140,158,211,.16)");
+    block(ctx,85,760,830,bottom-760,24,"rgba(26,28,45,.94)","rgba(140,158,211,.16)");
     label(ctx,"DESGLOSE DEL COBRO",116,808,22,"#e9eafa","700");
-    var items=[
-      ["Subtotal",amount(ec.subtotal),false],
-      ["Descuentos",amount(ec.descuentos?.total),true],
-      ["Mora",amount(ec.cargos?.mora),false],
-      ["Otros cargos",Math.max(0,amount(ec.cargos?.total)-amount(ec.cargos?.mora)),false]
-    ].filter(function(row){return row[0]==="Subtotal"||row[1]>0;});
     var ypos=852;
     items.forEach(function(row){
-      label(ctx,row[0],116,ypos,23,"#a9b4cd","500");
-      var value=(row[2]?"−":"")+money(row[1]);
+      ctx.font="500 23px Poppins, Arial, sans-serif";
+      label(ctx,fit(ctx,row.name,525),116,ypos,23,"#a9b4cd","500");
+      var value=(row.value<0?"−":"")+money(Math.abs(row.value));
       ctx.font="600 23px Poppins, Arial, sans-serif";
       var width=ctx.measureText(value).width;
-      label(ctx,value,887-width,ypos,23,row[2]?"#9ff0c4":row[0]==="Mora"?"#ff9bb0":"#f1f4ff","600");
+      label(ctx,value,887-width,ypos,23,row.value<0?"#9ff0c4":/mora/i.test(row.name)?"#ff9bb0":"#f1f4ff","600");
       ypos+=51;
     });
     ctx.strokeStyle="rgba(139,155,190,.23)";ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(103,1066);ctx.lineTo(897,1066);ctx.stroke();
-    label(ctx,"Consulta tu información siempre actualizada en Mi Espacio",110,1105,20,"#b5bfd5","500");
-    label(ctx,"GOXION · Resumen generado para tu consulta",110,1143,17,"#78879d","500");
+    ctx.beginPath();ctx.moveTo(103,footer);ctx.lineTo(897,footer);ctx.stroke();
+    label(ctx,"Consulta tu información siempre actualizada en Mi Espacio",110,footer+39,20,"#b5bfd5","500");
+    label(ctx,"GOXION · Resumen generado para tu consulta",110,footer+77,17,"#78879d","500");
     return canvas;
   }
   function fileFromCanvas(canvas,c){
@@ -405,7 +423,12 @@
     window.addEventListener("focus",function(){updateAgreements(true);});
     document.addEventListener("visibilitychange",function(){if(!document.hidden)updateAgreements(true);});
   }
-  window.GOXION_ADMIN_REMINDERS={refresh:function(){return updateAgreements(true);},status:effectiveStatus};
+  window.GOXION_ADMIN_REMINDERS={
+    refresh:function(){return updateAgreements(true);},
+    verifyClient:function(key){return inspectB2(getClient(key),true);},
+    status:effectiveStatus,
+    quoteForReminder:b2Context
+  };
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});
   else setup();
 })();
