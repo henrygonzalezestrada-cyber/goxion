@@ -99,6 +99,26 @@ async function verify(engine,name){
     assert.deepEqual(await page.evaluate(()=>window.__goxyOpened),
      ['./goxy-handoff.html','_blank','noopener,noreferrer']);
     assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action .gx-b3-goxy-cta').count(),1);
+    const diff=await page.locator('.gx-gixy-message[data-kind="notification"]')
+     .evaluate(el=>Math.abs(el.querySelector('.gx-b3-goxy-cta').getBoundingClientRect().left-
+       el.querySelector('.gx-gixy-message__bubble').getBoundingClientRect().left));
+    assert(diff<3,code+' Goxy CTA starts away from bubble: '+diff);
+    await page.evaluate(()=>window.__b3Canvas=document.querySelector(
+      '.gx-gixy-message[data-kind="notification"] canvas'));
+    await page.evaluate(()=>window.scrollBy(0,150));
+    await page.waitForTimeout(250);
+    assert.equal(await page.evaluate(()=>document.querySelector(
+      '.gx-gixy-message[data-kind="notification"] canvas')===window.__b3Canvas),true,
+      'Scroll must not remount the Plastic avatar');
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.waitForFunction(()=>{
+      const el=document.querySelector('.gx-gixy-message[data-kind="notification"] .gx-gixy-message__avatar');
+      return !!el&&!el.disabled;
+    },null,{timeout:9000});
+    await page.locator('.gx-gixy-message[data-kind="notification"] .gx-gixy-message__avatar').click();
+    await page.waitForTimeout(260);
+    assert.equal(await page.locator('.gx-b3-goxy-cta').count(),0,
+      'Engaging with a Gixy must remove the Goxy button');
    }else{
     assert.equal(await page.locator('#gx-smart-notif-list .gx-b3-notice-action').count(),0);
    }
