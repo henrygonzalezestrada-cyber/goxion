@@ -137,12 +137,13 @@ function adjustRewardOverlay(){
  const small=award.querySelector('.gx-gixys-secret__award small');
  const info=award.querySelector('p');
  const btn=award.querySelector('button');
- if(small)small.textContent='Solo en este espejo de pruebas';
+ if(small&&small.textContent!=='Solo en este espejo de pruebas')small.textContent='Solo en este espejo de pruebas';
  if(info&&state){
   const c=state.coupon;
-  info.textContent=c?'¡Encontraste a los tres! Tu cupón de prueba está '+(c.status==='reserved'
+  const copy=c?'¡Encontraste a los tres! Tu cupón de prueba está '+(c.status==='reserved'
    ?'guardado para un período elegible.':'utilizado en un período simulado.') :
    '¡Encontraste a los tres! GOXION está verificando tu cupón de prueba...';
+  if(info.textContent!==copy)info.textContent=copy;
  }
  if(btn)btn.setAttribute('aria-label','Cerrar premio del espejo');
 }
