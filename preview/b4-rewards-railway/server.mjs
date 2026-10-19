@@ -47,9 +47,15 @@ function quote(state,period=state.period){
  const secretEligible=Boolean(state.coupon&&state.coupon.status==='reserved'
    &&period>=state.coupon.startPeriod&&baseEligible>0);
  const secret=secretEligible?Math.min(round(baseEligible,5),Math.max(0,baseEligible-loy-mission-personal)):0;
- return {period,label:periodName(period),paid,items,original,baseEligible,eligibleCount:items.filter(s=>s.eligible).length,
+ const result={period,label:periodName(period),paid,items,original,baseEligible,eligibleCount:items.filter(s=>s.eligible).length,
    loyaltyLevel:level,loyalty:loy,mission,personal,secret,total:Math.max(0,original-loy-mission-personal-secret),
    secretEligible,appliesCoupon:secret>0};
+ // A payment is immutable: never show a higher balance when a one-use
+ // coupon was consumed or a mission benefit becomes unavailable afterward.
+ const confirmed=s.payments.find(p=>p.index===period);
+ return confirmed?{...result,paid:true,total:confirmed.total,secret:confirmed.secret,
+   loyalty:confirmed.loyalty,mission:confirmed.mission,personal:confirmed.personal,
+   loyaltyLevel:confirmed.loyaltyLevel,appliesCoupon:confirmed.secret>0}:result;
 }
 function snapshot(s){return {demo:true,version:'E2/B4 Railway v1',period:s.period,streak:s.streak,
  events:s.events,touched:s.touched,coupon:s.coupon,missionCoupon:s.missionCoupon,missionUsed:s.missionUsed,
@@ -87,8 +93,9 @@ function act(s,type,body){
      s.coupon.status='used';s.coupon.appliedPeriod=s.period;s.coupon.usedAt=new Date().toISOString();
    }
    if(q.mission)s.missionUsed=true;
-   s.payments.push({period:q.label,total:q.total,secret:q.secret,loyalty:q.loyalty,
-     mission:q.mission,paidAt:new Date().toISOString()});
+   s.payments.push({index:s.period,period:q.label,total:q.total,secret:q.secret,
+     loyalty:q.loyalty,loyaltyLevel:q.loyaltyLevel,mission:q.mission,personal:q.personal,
+     paidAt:new Date().toISOString()});
    const prev=s.streak;s.streak=Math.min(10,s.streak+1);
    if((prev<4&&s.streak===4)||(prev<9&&s.streak===9))s.events.loyalty=true;
    audit(s,'payment_confirmed',{period:s.period,couponUsed:q.appliesCoupon,levelUnlocked:prev<4&&s.streak>=4});
@@ -97,6 +104,7 @@ function act(s,type,body){
    if(s.period>=5)throw Error('Fin de los períodos simulados');
    s.period++;audit(s,'period_changed',{period:s.period});
  }else if(type==='promo'){
+   if(s.paid.includes(s.period))throw Error('No se modifica una promoción de un período ya pagado');
    s.netflixPromo=Boolean(body.active);audit(s,'promo_toggled',{active:s.netflixPromo});
  }else throw Error('Operación no permitida');
  return s;
