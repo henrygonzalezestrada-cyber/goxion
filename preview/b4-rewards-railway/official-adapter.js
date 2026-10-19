@@ -33,18 +33,33 @@ function view(name='dashboard'){
 window.GOXION_B4_OFFICIAL_NAV=Object.freeze({view});
 window.switchTab=tab=>view(tab==='inicio'?'dashboard':tab);
 const logo=($('header-action-btn'));
+function closeDemoAuth(){
+ const root=$('header-action-btn');
+ root?.classList.remove('gx-b4-auth-open');
+ root?.setAttribute('aria-expanded','false');
+ document.querySelector('#gx-b4-auth-overlay')?.remove();
+ document.body.classList.remove('gx-b4-auth-visible');
+}
 if(logo){
  logo.classList.add('gx-client-session-active','gx-mirror-auth');
  const title=$('header-btn-text');if(title)title.textContent='Mi Espacio';
  logo.addEventListener('click',ev=>{
   if(ev.target.closest('input,button'))return;
-  logo.setAttribute('aria-expanded',logo.getAttribute('aria-expanded')==='true'?'false':'true');
+  const open=!logo.classList.contains('gx-b4-auth-open');
+  if(!open){closeDemoAuth();return}
+  logo.classList.add('gx-b4-auth-open');logo.setAttribute('aria-expanded','true');
+  document.body.classList.add('gx-b4-auth-visible');
+  const scrim=document.createElement('div');scrim.id='gx-b4-auth-overlay';
+  scrim.addEventListener('click',closeDemoAuth);document.body.append(scrim);
  },true);
 }
+document.querySelector('.gx-auth-inline-close')?.addEventListener('click',e=>{
+ e.preventDefault();e.stopPropagation();closeDemoAuth();
+},true);
 const login=$('btn-login-submit');
 if(login)login.addEventListener('click',ev=>{
  ev.preventDefault();ev.stopPropagation();
- $('header-action-btn')?.setAttribute('aria-expanded','false');
+ closeDemoAuth();
  view('dashboard');demo('Sesión de ejemplo: no se verifican credenciales ni contraseñas.');
 },true);
 const eye=$('gx-pin-eye-btn');
