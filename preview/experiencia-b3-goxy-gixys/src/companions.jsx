@@ -54,6 +54,29 @@ function selectPlace(kind,node,sequence,dimensions){
    .filter(r=>r.right>=0&&r.left<=vw&&r.bottom>=0&&r.top<=vh)
    .map(r=>bounds(r.left-2,r.top-2,r.width+4,r.height+4));
 
+ // Notification alone uses the short space directly below the bell.
+ // Formerly the generic collision scorer rejected that slot because of the
+ // adjacent header, then placed the Gixy by the greeting ~266px lower.
+ // A side-by-side Goxy CTA prevents the action from obscuring the nav.
+ if(kind==='notification'){
+  const bell=document.querySelector('#gx-client-notif-launch');
+  const nav=document.querySelector('#goxion-main-nav');
+  const header=document.querySelector('.app-header');
+  if(bell&&nav&&header&&isShown(bell)&&isShown(nav)){
+   const b=bell.getBoundingClientRect(),n=nav.getBoundingClientRect(),head=header.getBoundingClientRect();
+   const ctaWidth=vw<=360?110:137,ctaGap=4;
+   const maxLeft=vw-w-ctaWidth-ctaGap-11;
+   const left=Math.min(Math.round(b.right-w+3),maxLeft);
+   const top=Math.ceil(Math.max(b.bottom+7,head.bottom-2));
+   if(left>=11&&top>=12&&top+h+4<=Math.min(n.top,vh-10)){
+    const sceneBox=bounds(left,top,w,h);
+    const ctaBox=bounds(left+w+ctaGap,top+12,ctaWidth,35);
+    const blocked=obstacles.some(o=>overlap(sceneBox,o)>40||overlap(ctaBox,o)>40);
+    if(!blocked)return {left,top,width:w,height:h,slot:0,sourceIdx:0,
+      collision:0,priority:0,score:-1,nearBell:true};
+   }
+  }
+ }
  let best=null;
  contexts[kind].forEach((selector,sourceIdx)=>{
   const source=document.querySelector(selector);
@@ -298,7 +321,7 @@ function GixyMessage({kind,serial,phase,onDismiss,onEngage,onTextComplete,onTouc
   onEngage();
  }
  const visible=Boolean(layout);
- return <div ref={scene} className={'gx-gixy-message'+(visible?' is-visible':'')+(phase!=='shown'?' is-leaving':'')}
+ return <div ref={scene} className={'gx-gixy-message'+(visible?' is-visible':'')+(layout?.nearBell?' gx-b3-near-bell':'')+(phase!=='shown'?' is-leaving':'')}
   data-kind={kind} data-variant={serial%5} data-placement={layout?.slot??'hidden'}
   data-touch-count={touches} data-phase={phase} data-typing={typing?'true':'false'}
   data-visible-chars={charsShown} data-write-ms={WRITE_MS}
