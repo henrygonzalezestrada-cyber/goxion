@@ -5,6 +5,7 @@ on:
       - beta/e2b3-goxy-gixys-context-espejo-20261018
       - beta/e2b3-prioridades-goxy-handoff-20261018
       - beta/e2b3-v3-pulido-movimiento-greeting-20261018
+      - beta/e2b3-v4-entrada-original-gixys-20261018
     paths:
       - 'preview/experiencia-b3-goxy-gixys/**'
       - '.github/workflows/goxion-experiencia-e2-b3.yml'
