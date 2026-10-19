@@ -4,6 +4,7 @@ on:
     branches:
       - beta/e2b3-goxy-gixys-context-espejo-20261018
       - beta/e2b3-prioridades-goxy-handoff-20261018
+      - beta/e2b3-v3-pulido-movimiento-greeting-20261018
     paths:
       - 'preview/experiencia-b3-goxy-gixys/**'
       - '.github/workflows/goxion-experiencia-e2-b3.yml'
@@ -16,7 +17,7 @@ concurrency:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    timeout-minutes: 22
+    timeout-minutes: 24
     steps:
       - uses: actions/checkout@v4
         with:
@@ -25,9 +26,24 @@ jobs:
         with:
           node-version: 22
       - name: Install browser runner
-        run: npm install --no-save --no-package-lock playwright
+        run: npm install --no-save --no-package-lock react@18.3.1 react-dom@18.3.1 bot-avatars@0.2.2 @hugeicons/core-free-icons esbuild@0.25.10 playwright
       - name: Build separate mirror from original accepted Gixys V9
         run: node preview/experiencia-b3-goxy-gixys/build.mjs
+      - name: Download PINNED original PulseHeart source used by V9
+        shell: bash
+        run: |
+          set -euo pipefail
+          folder="preview/experiencia-b3-goxy-gixys/src/vendor"
+          mkdir -p "$folder"
+          sha="d9085a5d6cb62a1c7512d8fa05a4f966736b575c"
+          for ext in jsx css; do
+            curl -fsSL --retry 3 --retry-delay 2 "https://raw.githubusercontent.com/DavidHDev/react-bits/${sha}/src/content/Micro/PulseHeart/PulseHeart.${ext}" -o "$folder/PulseHeart.${ext}"
+          done
+      - name: Compile isolated V9 Plastic renderer with V3 scroll polish
+        run: |
+          npx esbuild preview/experiencia-b3-goxy-gixys/src/companions.jsx --bundle --minify --jsx=automatic --platform=browser --format=iife --target=es2020 --outfile=preview/experiencia-b3-goxy-gixys/companions-v3.js --legal-comments=eof
+          test -s preview/experiencia-b3-goxy-gixys/companions-v3.js
+          test -s preview/experiencia-b3-goxy-gixys/companions-v3.css
       - name: Install browsers
         run: npx playwright install --with-deps chromium webkit
       - name: Test original scenes, B3 policy, seven widths and privacy
@@ -42,7 +58,7 @@ jobs:
             echo "Newer commit superseded this build."
             exit 0
           fi
-          git add preview/experiencia-b3-goxy-gixys/index.html preview/experiencia-b3-goxy-gixys/b3-mirror.js preview/experiencia-b3-goxy-gixys/b3-notice.js preview/experiencia-b3-goxy-gixys/b3-notice.css
+          git add preview/experiencia-b3-goxy-gixys/index.html preview/experiencia-b3-goxy-gixys/b3-mirror.js preview/experiencia-b3-goxy-gixys/b3-notice.js preview/experiencia-b3-goxy-gixys/b3-notice.css preview/experiencia-b3-goxy-gixys/companions-v3.js preview/experiencia-b3-goxy-gixys/companions-v3.css
           if ! git diff --cached --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
