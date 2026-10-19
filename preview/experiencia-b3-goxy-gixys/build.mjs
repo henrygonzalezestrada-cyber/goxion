@@ -75,7 +75,7 @@ html=html.replace(
  '<div class="gx-b3-group-label">Avisos ordinarios</div>',
  '<button type="button" data-gx-b3-priority="soon">Pago próximo (sin animación)</button>',
  '<button type="button" data-gx-b3-priority="clear">Sin novedades (sin animación)</button>'
- ].join('\\n')
+ ].join('\n')
 );
 html=html.replace('<script src="./b3-mirror.js?v=1" defer></script>','<script src="./b3-mirror.js?v=2" defer></script>');
 /* Use V6's ACTUAL 1,170ms silk-stream draw and the same notification sheet
@@ -88,7 +88,7 @@ notice=notice.replaceAll("'gx-smart-notif-button'","'gx-client-notif-launch'")
 const delivered=" bellCount(true);\n bell.classList.remove('gx-ringing');";
 if(!notice.includes(delivered))throw Error('B1 bell impact hook has changed');
 notice=notice.replace(delivered,
- " bellCount(true);\\n document.dispatchEvent(new CustomEvent('gx-b3:notice-delivered',{detail:{code:window.GOXION_SMART_BETA?.getScenario()}}));\\n bell.classList.remove('gx-ringing');");
+ " bellCount(true);\n document.dispatchEvent(new CustomEvent('gx-b3:notice-delivered',{detail:{code:window.GOXION_SMART_BETA?.getScenario()}}));\n bell.classList.remove('gx-ringing');");
 const read="if(stored){list.querySelector('.gx-client-notif-item')?.classList.remove('unread');bellCount(false)}";
 if(!notice.includes(read))throw Error('B1 read hook has changed');
 notice=notice.replace(read,
@@ -110,8 +110,8 @@ const start=mirror.indexOf('const bell=$("gx-client-notif-launch"),badgeCount=$(
 const stop=mirror.indexOf('const services=$("dash-services"),history=$("dash-history");',start);
 if(start<0||stop<0)throw Error('V9 notification event wiring changed');
 mirror=mirror.slice(0,start)+
- "// Native B1 V6 notification and bell now own the priority journey.\\n"+
- "document.addEventListener('gx-b3:notice-read',()=>emit('notification',false));\\n"+
+ "// Native B1 V6 notification and bell now own the priority journey.\n"+
+ "document.addEventListener('gx-b3:notice-read',()=>emit('notification',false));\n"+
  mirror.slice(stop);
 
 fs.writeFileSync(dst+'b3-mirror.js',mirror);
