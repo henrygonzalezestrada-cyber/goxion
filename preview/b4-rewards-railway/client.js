@@ -84,7 +84,10 @@ function render(){
   if(action==='notification')b.disabled=state.events.notification;
   if(action==='pay')b.disabled=nowPaid;
   if(action==='next')b.disabled=!nowPaid||state.period>=5;
-  if(action==='promo')b.textContent=state.netflixPromo?'Quitar promoción de Netflix':'Probar promoción en Netflix';
+  if(action==='promo'){
+   b.disabled=nowPaid;
+   b.textContent=state.netflixPromo?'Quitar promoción de Netflix':'Probar promoción en Netflix';
+  }
  }
  const paymentButton=$('gx-b4-payment-in-statement');if(paymentButton)paymentButton.disabled=nowPaid;
  const cap=$('gx-b4-coupon-summary');if(cap)cap.textContent=stats;
