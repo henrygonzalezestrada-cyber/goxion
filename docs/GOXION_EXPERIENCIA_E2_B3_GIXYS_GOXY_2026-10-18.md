@@ -21,3 +21,16 @@ La verificación de eventos por DOM es EXCLUSIVAMENTE de esta demostración fict
 
 ## Criterios de aceptación
 Workflow E2/B3 ejecuta test sobre Chromium/WebKit, anchos 280–768, ausencia de scroll lateral y peticiones privadas, aparición contextual, deduplicación, retorno a Goxy solo voluntario y conservación del motor V9. Tras éxito, publicar una beta espejo y pedir la evaluación visual del propietario. El paquete completo sigue bloqueado para producción por Issue #142.
+
+
+## E2/B3 V2 — Coordinación de avisos prioritarios y entrega voluntaria a Goxy
+Concepto aprobado por el propietario: integrar en una beta, sin reabrir B1, B2 ni la V9, la comunicación contextual y el botón hacia Goxy.
+
+- **Animación auténtica:** utiliza el motor de prioridades original E1/B1 y copia sin reinterpretar su notice-demo.js V6 + smart.css. build.mjs solo adapta los IDs de campana para encadenar la tarjeta, cinta óptica y campana previamente aprobadas.
+- **Prioridades de la beta:** comprobante con observación (100), vencido (90), revisión (85) y prórroga (70). Solo esos eventos ejecutan la animación de tarjeta. Avisos ordinarios y mensajes de tranquilidad no interrumpen Mi Espacio.
+- **Gixy selectivo:** tras el impacto en la campana, solo corrección y vencido presentan al Gixy de notificaciones ya diseñado en V9, con el botón 'Preguntar a Goxy' junto a su burbuja y también desde el detalle de la notificación. Revisiones y acuerdos quedan registrados sin Gixy adicional. Lealtad y misiones preservan sus celebraciones sin CTA de soporte.
+- **Goxy auténtico:** el botón solo responde al clic del cliente y abre el wrapper de Goxy ya existente en preview/goxion-ai, donde Ayuda cambia a Soporte. No instala otra IA ni envía datos de cuentas por URL. Un contexto real autenticado NO se transfiere todavía: requiere backend con destinatario, ID de evento, estado de servidor y permiso de lectura.
+- **No repetir:** un ID ficticio de evento ya consumido no vuelve a animar ni a crear otro Gixy al volver a cargar un mismo escenario de prueba en esa sesión. Sin cobros, cupones ni mensajes reales.
+- **QA:** Chrome/WebKit, siete anchos, cuatro escenarios prioritarios y dos ordinarios; verificaciones de aparición/deduplicación, ausencia de Gixy en estados no urgentes, CTA contextual, Gixys V9 sin modificaciones, privacidad y no desbordamiento.
+
+Estado: Beta integrada pendiente de aprobación visual del usuario. Bloques 1 y 2 aprobados, pero ninguna modificación funcional se incorpora a Ayuda/Index oficial. Continúa barrera de lanzamiento Issue #142.
