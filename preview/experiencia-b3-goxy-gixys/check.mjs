@@ -88,6 +88,28 @@ async function verify(engine,name){
     code+' Gixy mismatch: extra/absent character');
    if(wantsGixy){
     await page.locator('.gx-gixy-message[data-kind="notification"].is-visible').waitFor({timeout:6000});
+    // B3 V4 restores the exact V9 arrival, without a top:0 slide.
+    const entrance=await page.locator('.gx-gixy-message[data-kind="notification"]')
+      .evaluate(el=>{
+        const tracking=el.classList.contains('gx-b3-scroll-following');
+        if(tracking)el.classList.remove('gx-b3-scroll-following');
+        const transitions=getComputedStyle(el).transitionProperty.split(',').map(s=>s.trim());
+        if(tracking)el.classList.add('gx-b3-scroll-following');
+        return {
+          transitions,
+          avatar:getComputedStyle(el.querySelector('.gx-gixy-message__avatar')).animationName,
+          bubble:getComputedStyle(el.querySelector('.gx-gixy-message__bubble')).animationName
+        };
+      });
+    assert(!entrance.transitions.includes('top'),
+      'Do not animate initial position from top:0: '+JSON.stringify(entrance));
+    assert(entrance.avatar.includes('gx-gixy-gentle-arrival'),
+      'Restore native V9 Gixy entrance: '+JSON.stringify(entrance));
+    assert(entrance.bubble.includes('gx-gixy-quiet-speech'),
+      'Restore native V9 bubble entrance: '+JSON.stringify(entrance));
+    await page.waitForFunction(()=>document.querySelector('.gx-gixy-message[data-kind="notification"]')?.classList.contains('gx-b3-scroll-following'),null,{timeout:2000});
+    assert((await page.locator('.gx-gixy-message[data-kind="notification"]').evaluate(el=>getComputedStyle(el).transitionProperty)).includes('top'),
+      'V3 smooth scroll must resume after V9 entrance');
     await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta').waitFor({timeout:4500});
     const supports=await page.locator('.gx-gixy-message[data-kind="notification"] .gx-b3-goxy-cta')
       .evaluate(el=>getComputedStyle(el).pointerEvents);
@@ -153,7 +175,7 @@ async function verify(engine,name){
   assert.deepEqual(privateRequests,[],name+' beta requested private APIs');
   assert.deepEqual(errors,[],name+' browser errors: '+errors.join(', '));
   await page.close();
-  console.log(name+' E2/B3 V3 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
+  console.log(name+' E2/B3 V4 PASS · smooth native portal, stable greeting, distinctive Gixys, seven widths');
  }finally{await browser.close()}
 }
 try{await ready();await verify(chromium,'Chromium');await verify(webkit,'WebKit');console.log('GOXION E2/B3 COMPLETE BETA PASS')}
