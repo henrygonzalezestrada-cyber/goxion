@@ -99,6 +99,16 @@ async function browserChecks(engine,name){
   assert.equal(await page.locator('#gx-promo-showcase').count(),1);
   assert.equal(await page.locator('#support-platforms-grid .gx-b4-support-choice').count(),4);
   assert.equal(await page.locator('#dash-billing-card').count(),1);
+  await page.locator('#btn-tab-catalogo').click();
+  assert.equal(await page.locator('#view-catalogo').isVisible(),true,
+    'Native official catalogue tab must navigate');
+  assert.equal(await page.locator('#catalog-container .gx-b4-official-product').count(),4);
+  await page.locator('#btn-tab-soporte').click();
+  assert.equal(await page.locator('#view-soporte').isVisible(),true,
+    'Native official support tab must navigate');
+  await page.locator('#btn-tab-inicio').click();
+  assert.equal(await page.locator('#view-dashboard').isVisible(),true,
+    'Native official Mi Espacio tab must navigate');
   assert.equal(await page.locator('#gx-gixys-message-root').count(),1);
   const banner=await page.locator('#gx-b4-account').textContent();
   assert(banner.includes('Espejo funcional'));
