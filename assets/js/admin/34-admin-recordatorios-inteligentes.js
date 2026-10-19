@@ -202,6 +202,14 @@
     }
     if(status==="agreed"){
       card.classList.add("gx-reminder-agreed");
+      var quote=b2Model(c);
+      if(quote?.rows?.length){
+        var ordered=quote.rows.slice().sort(function(x,y){return x.effective_due.localeCompare(y.effective_due);});
+        var first=ordered[0].effective_due;
+        var nextAmount=ordered.filter(function(x){return x.effective_due===first;})
+          .reduce(function(sum,x){return sum+Number(x.total_centavos||0);},0);
+        text(card.querySelector(".gx-client-money strong"),money(nextAmount/100));
+      }
       text(card.querySelector(".gx-client-payment-primary strong"),"Acuerdo pactado");
       text(card.querySelector(".gx-client-payment-primary small"),"Nueva fecha · "+dateLabel(a.record.fecha_pactada));
       text(card.querySelector(".client-status-badge"),"PRÓRROGA ACTIVA");
@@ -362,7 +370,7 @@
     modal=document.createElement("dialog");
     modal.className="gx-reminder-dialog";
     modal.setAttribute("aria-label","Compartir recordatorio de cobro");
-    modal.innerHTML='<div class="gx-reminder-sheet"><header><div><small>GOXION · COBRO INTELIGENTE</small><h2>Recordatorio preparado</h2></div><button type="button" class="gx-reminder-close" aria-label="Cerrar">×</button></header><div class="gx-reminder-view"><img alt="Imagen del estado de cuenta que se compartirá"></div><p class="gx-reminder-destination"></p><p class="gx-reminder-hint">WhatsApp permite compartir la imagen, pero la selección automática del chat junto al archivo depende del teléfono y del navegador.</p><div class="gx-reminder-actions"><button type="button" class="gx-reminder-share">Compartir imagen y mensaje</button><button type="button" class="gx-reminder-wa">Abrir WhatsApp con mensaje</button><button type="button" class="gx-reminder-copy">Copiar mensaje</button><button type="button" class="gx-reminder-save">Guardar imagen</button></div></div>';
+    modal.innerHTML='<div class="gx-reminder-sheet"><header><div><small>GOXION · COBRO INTELIGENTE</small><h2 tabindex="-1">Recordatorio preparado</h2></div><button type="button" class="gx-reminder-close" aria-label="Cerrar">×</button></header><div class="gx-reminder-view"><img alt="Imagen del estado de cuenta que se compartirá"></div><p class="gx-reminder-destination"></p><p class="gx-reminder-hint">WhatsApp permite compartir la imagen, pero la selección automática del chat junto al archivo depende del teléfono y del navegador.</p><div class="gx-reminder-actions"><button type="button" class="gx-reminder-share">Compartir imagen y mensaje</button><button type="button" class="gx-reminder-wa">Abrir WhatsApp con mensaje</button><button type="button" class="gx-reminder-copy">Copiar mensaje</button><button type="button" class="gx-reminder-save">Guardar imagen</button></div></div>';
     document.body.appendChild(modal);
     modal.querySelector(".gx-reminder-close").addEventListener("click",function(){modal.close();});
     modal.addEventListener("click",function(e){if(e.target===modal)modal.close();});
@@ -405,6 +413,7 @@
     text(box.querySelector(".gx-reminder-copy"),"Copiar mensaje");
     document.body.classList.add("gx-reminder-modal-open");
     if(!box.open)box.showModal();
+    box.querySelector("h2")?.focus({preventScroll:true});
   }
   function setup(){
     var base=window.renderizarClientes;
