@@ -91,6 +91,13 @@ async function browserChecks(engine,name){
   await page.waitForFunction(()=>window.GOXION_B4_MIRROR?.getState()?.demo
    &&window.GOXION_B3_ROUTER?.isolated,{timeout:22000});
   await page.waitForSelector('#gx-b4-account');
+  // The page is built from official ayuda.html, not a hand-drawn V9 subset.
+  assert.equal(await page.locator('html[data-gx-b4-official="true"]').count(),1);
+  assert.equal(await page.locator('#view-inicio').count(),1);
+  assert.equal(await page.locator('#view-catalogo').count(),1);
+  assert.equal(await page.locator('#view-soporte').count(),1);
+  assert.equal(await page.locator('#gx-promo-showcase').count(),1);
+  assert.equal(await page.locator('#support-platforms-grid .gx-b4-support-choice').count(),4);
   assert.equal(await page.locator('#dash-billing-card').count(),1);
   assert.equal(await page.locator('#gx-gixys-message-root').count(),1);
   const banner=await page.locator('#gx-b4-account').textContent();
@@ -141,6 +148,13 @@ async function browserChecks(engine,name){
   const s=await page.evaluate(()=>window.GOXION_B4_MIRROR.getState());
   assert.deepEqual(s.touched,['notification','loyalty','mission']);
   assert.equal(s.quote.secret,790);assert.equal(s.quote.loyalty,474);
+  await page.locator('.gx-account-capsule').click();
+  await page.locator('#gx-b4-account-sheet:not([hidden])').waitFor();
+  const financialBreakdown=await page.locator('#gx-b4-account-lines').textContent();
+  assert(financialBreakdown.includes('5% × $158.00'), 'must show base $158 x 5%');
+  assert(financialBreakdown.includes('−$7.90'), '5% secret must deduct $7.90');
+  assert(financialBreakdown.includes('Descuento especial ficticio'), 'separate $5 special');
+  await page.locator('#gx-b4-account-sheet [data-b4-action="close-statement"]').last().click();
   // The original Aurora gift remains, but its copy states demo truthfully.
   await page.locator('.gx-gixys-secret--v9').waitFor({timeout:8000});
   const gift=await page.locator('.gx-gixys-secret--v9').textContent();
