@@ -103,7 +103,12 @@ async function browserChecks(engine,name){
   await page.locator('#gx-b4-controls [data-b4-action="notification"]').click();
   await page.locator('.gx-gixy-message[data-kind="notification"].is-visible').waitFor({timeout:8500});
   await page.waitForFunction(()=>!document.querySelector('.gx-gixy-message__avatar')?.disabled,{timeout:9000});
-  await page.locator('.gx-gixy-message[data-kind="notification"] .gx-gixy-message__avatar').click();
+  // V7 already verifies hit-target geometry; WebKit's continuously animated
+  // canvas can keep Playwright's auto-wait action from becoming "stable".
+  // Dispatch the native button click for the event-flow test on WebKit.
+  const notificationAvatar=page.locator('.gx-gixy-message[data-kind="notification"] .gx-gixy-message__avatar');
+  if(name==='WebKit')await notificationAvatar.evaluate(el=>el.click());
+  else await notificationAvatar.click();
   await page.waitForFunction(()=>window.GOXION_B4_MIRROR.getState()?.touched?.includes('notification'),{timeout:5000});
   await page.waitForTimeout(450);
   // Historical payment approval authorizes the real V9 heart transition.
@@ -111,14 +116,24 @@ async function browserChecks(engine,name){
   await page.locator('#gx-b4-controls [data-b4-action="milestone"]').click();
   await page.locator('.gx-gixy-message[data-kind="loyalty"].is-visible').waitFor({timeout:7000});
   await page.waitForFunction(()=>!document.querySelector('.gx-gixy-message[data-kind="loyalty"] .gx-gixy-message__avatar')?.disabled,{timeout:9000});
-  await page.locator('.gx-gixy-message[data-kind="loyalty"] .gx-gixy-message__avatar').click();
+  // V7 already verifies hit-target geometry; WebKit's continuously animated
+  // canvas can keep Playwright's auto-wait action from becoming "stable".
+  // Dispatch the native button click for the event-flow test on WebKit.
+  const loyaltyAvatar=page.locator('.gx-gixy-message[data-kind="loyalty"] .gx-gixy-message__avatar');
+  if(name==='WebKit')await loyaltyAvatar.evaluate(el=>el.click());
+  else await loyaltyAvatar.click();
   await page.waitForFunction(()=>window.GOXION_B4_MIRROR.getState()?.touched?.includes('loyalty'),{timeout:5000});
   await page.waitForTimeout(450);
   await page.locator('#gx-b3-toggle').click();
   await page.locator('#gx-b4-controls [data-b4-action="mission"]').click();
   await page.locator('.gx-gixy-message[data-kind="mission"].is-visible').waitFor({timeout:9500});
   await page.waitForFunction(()=>!document.querySelector('.gx-gixy-message[data-kind="mission"] .gx-gixy-message__avatar')?.disabled,{timeout:9000});
-  await page.locator('.gx-gixy-message[data-kind="mission"] .gx-gixy-message__avatar').click();
+  // V7 already verifies hit-target geometry; WebKit's continuously animated
+  // canvas can keep Playwright's auto-wait action from becoming "stable".
+  // Dispatch the native button click for the event-flow test on WebKit.
+  const missionAvatar=page.locator('.gx-gixy-message[data-kind="mission"] .gx-gixy-message__avatar');
+  if(name==='WebKit')await missionAvatar.evaluate(el=>el.click());
+  else await missionAvatar.click();
   await page.waitForFunction(()=>window.GOXION_B4_MIRROR.getState()?.coupon?.status==='reserved',{timeout:7000});
   const s=await page.evaluate(()=>window.GOXION_B4_MIRROR.getState());
   assert.deepEqual(s.touched,['notification','loyalty','mission']);
