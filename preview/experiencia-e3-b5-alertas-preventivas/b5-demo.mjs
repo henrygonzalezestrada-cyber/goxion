@@ -198,6 +198,10 @@ function resolve(){
 function openSheet(){
  const overlay=$('gx-smart-notif-overlay'),sheet=$('gx-smart-notif-sheet');
  if(!overlay||!sheet)return;
+ // Never let the demo Admin controls sit above the native bell sheet.
+ $('gx-b3-controls').hidden=true;
+ $('gx-b3-toggle')?.setAttribute('aria-expanded','false');
+ document.body.classList.add('gx-b5-notif-open');
  overlay.classList.add('show');overlay.setAttribute('aria-hidden','false');
  sheet.inert=false;sheet.classList.add('show');sheet.setAttribute('aria-hidden','false');
  $('gx-client-notif-launch')?.setAttribute('aria-expanded','true');
@@ -257,6 +261,12 @@ function init(){
  // we intercept its click BEFORE its fixture-only handler, and show the
  // existing sheet rather than creating a second notification surface.
  $('gx-client-notif-launch').addEventListener('click',interceptBell,true);
+ const nativeSheet=$('gx-smart-notif-sheet');
+ if(nativeSheet){
+  new MutationObserver(()=>{
+   if(!nativeSheet.classList.contains('show'))document.body.classList.remove('gx-b5-notif-open');
+  }).observe(nativeSheet,{attributes:true,attributeFilter:['class']});
+ }
  render();
  window.GOXION_B5_DEMO=Object.freeze({
   isolated:true,production:false,view:()=>({incident,clientId:chosen,
