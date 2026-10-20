@@ -22,6 +22,9 @@ jobs:
         run: |
           node --check preview/experiencia-e3-b5-alertas-preventivas/policy.mjs
           node --check preview/experiencia-e3-b5-alertas-preventivas/check.mjs
+          node --check preview/experiencia-e3-b5-alertas-preventivas/b5-demo.mjs
+          node --check preview/experiencia-e3-b5-alertas-preventivas/b5-router.js
+          node --check preview/experiencia-e3-b5-alertas-preventivas/server.mjs
           node preview/experiencia-e3-b5-alertas-preventivas/check.mjs
       - name: Install isolated browsers
         run: |
