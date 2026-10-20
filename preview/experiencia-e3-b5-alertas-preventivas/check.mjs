@@ -94,4 +94,14 @@ test('No produce envío, campaña real ni descuento compensatorio',()=>{
   assert.equal(plan.deliverable,false);
   assert(!('send' in plan)&&!('discount' in plan));
 });
+test('La alerta legada de Admin no autoriza notificar por nombre',()=>{
+  const legacy={activa:true,plataforma:'ViX Premium',falla:'presentando intermitencias temporales',mensaje:''};
+  const result=previewAffectedClients({incident:legacy,clients});
+  assert.equal(result.recipients.length,0);
+  assert.equal(result.reason,'incidencia_no_confirmada');
+});
+test('La alerta global legada no significa toda la audiencia confirmada',()=>{
+  const legacy={activa:true,plataforma:'Todos los servicios',falla:'en mantenimiento programado'};
+  assert.equal(previewAffectedClients({incident:legacy,clients}).recipients.length,0);
+});
 console.log('E3/B5 · '+checks+' políticas de audiencia PASS · exclusivamente datos ficticios');
