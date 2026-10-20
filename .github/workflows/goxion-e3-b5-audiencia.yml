@@ -1,0 +1,25 @@
+name: GOXION · E3 B5 · Audiencia de incidentes (aislado)
+on:
+  push:
+    branches:
+      - beta/e3b5-alertas-afectados-20261019
+    paths:
+      - 'preview/experiencia-e3-b5-alertas-preventivas/**'
+      - '.github/workflows/goxion-e3-b5-audiencia.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate no-send policy
+        run: |
+          node --check preview/experiencia-e3-b5-alertas-preventivas/policy.mjs
+          node --check preview/experiencia-e3-b5-alertas-preventivas/check.mjs
+          node preview/experiencia-e3-b5-alertas-preventivas/check.mjs
