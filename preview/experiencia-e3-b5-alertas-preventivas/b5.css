@@ -96,3 +96,5 @@ html[data-gx-b3] .gx-b5-notif-recap strong{color:#9ddbe7}
 @media(prefers-reduced-motion:reduce){
  html[data-gx-b3] #gx-b5-banner{transition:none}
 }
+
+html[data-gx-b3] #gx-b3-controls .gx-b3-buttons[hidden],html[data-gx-b3] #gx-b3-controls .gx-b3-reset[hidden]{display:none!important}
