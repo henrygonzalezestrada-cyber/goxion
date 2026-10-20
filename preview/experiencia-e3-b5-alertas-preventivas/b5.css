@@ -98,3 +98,6 @@ html[data-gx-b3] .gx-b5-notif-recap strong{color:#9ddbe7}
 }
 
 html[data-gx-b3] #gx-b3-controls .gx-b3-buttons[hidden],html[data-gx-b3] #gx-b3-controls .gx-b3-reset[hidden]{display:none!important}
+
+html[data-gx-b3] body.gx-b5-notif-open #gx-b3-lab{pointer-events:none!important}
+html[data-gx-b3] #gx-smart-notif-sheet.show{z-index:11050!important}
