@@ -1,0 +1,103 @@
+/* E3/B5 — only preview controls and the existing Ayuda alert-banner surface.
+ * Official Ayuda/Index/Admin/B3 styles remain unchanged.
+ */
+html[data-gx-b3] #gx-b5-banner[hidden],
+html[data-gx-b3] #gx-b5-panel[hidden]{display:none!important}
+html[data-gx-b3] #gx-b5-banner{
+ display:flex;align-items:flex-start;gap:11px;
+ margin:3px 0 14px;padding:14px 15px;
+ border-radius:16px;border:1px solid rgba(248,182,88,.23);
+ background:rgba(81,56,32,.24);backdrop-filter:blur(17px);
+ color:#f4f0e9;line-height:1.5
+}
+html[data-gx-b3] #gx-b5-banner .gx-b5-banner-mark{font-size:18px;line-height:1.4}
+html[data-gx-b3] #gx-b5-banner strong{
+ display:block;font:750 12px/1.5 Poppins,system-ui,sans-serif
+}
+html[data-gx-b3] #gx-b5-banner small{
+ display:block;color:#dbd4cd;font:500 10px/1.55 Poppins,system-ui,sans-serif
+}
+html[data-gx-b3] .gx-b5-account-preview{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+ margin:4px 0 10px;padding:7px 10px;border-radius:12px;
+ background:rgba(100,93,146,.11);border:1px solid rgba(145,155,200,.14)
+}
+html[data-gx-b3] .gx-b5-account-preview label{
+ font:700 10px Poppins,system-ui,sans-serif;color:#c7d1e5
+}
+html[data-gx-b3] .gx-b5-account-preview select{
+ appearance:none;border-radius:9px;padding:8px 20px 8px 9px;
+ border:1px solid rgba(138,172,223,.18);
+ background:#172036;color:#eef8ff;min-width:0;max-width:60%;
+ font:600 10px Poppins,system-ui,sans-serif
+}
+html[data-gx-b3] .gx-b5-account-preview select:focus-visible,
+html[data-gx-b3] #gx-b5-controls button:focus-visible,
+html[data-gx-b3] #gx-b5-controls select:focus-visible{
+ outline:2px solid #5beaf1;outline-offset:2px
+}
+html[data-gx-b3] #gx-b5-controls{display:grid;gap:9px}
+html[data-gx-b3] #gx-b5-controls label{
+ display:grid;gap:5px;color:#c8d4e6;
+ font:600 10px/1.45 Poppins,system-ui,sans-serif
+}
+html[data-gx-b3] #gx-b5-controls select,
+html[data-gx-b3] #gx-b5-controls textarea{
+ border-radius:11px;padding:10px 11px;
+ border:1px solid rgba(159,179,216,.18);
+ background:rgba(18,25,44,.98);color:#eef5ff;
+ font:500 11px/1.35 Poppins,system-ui,sans-serif;width:100%;
+ min-width:0
+}
+html[data-gx-b3] #gx-b5-controls textarea{resize:vertical;min-height:43px;max-height:88px}
+html[data-gx-b3] #gx-b5-controls .gx-b5-buttons{
+ display:grid;grid-template-columns:1fr 1fr;gap:8px
+}
+html[data-gx-b3] #gx-b5-controls button{
+ min-height:43px;padding:9px;border-radius:11px;
+ border:1px solid rgba(77,217,237,.29);
+ background:rgba(34,99,134,.26);color:#f1fcff;
+ font:700 10px/1.35 Poppins,system-ui,sans-serif;cursor:pointer
+}
+html[data-gx-b3] #gx-b5-controls button.gx-b5-resolve{
+ background:rgba(255,255,255,.055);border-color:rgba(181,192,223,.2)
+}
+html[data-gx-b3] #gx-b5-controls button:disabled{opacity:.4;cursor:not-allowed}
+html[data-gx-b3] .gx-b5-status{
+ padding:7px 0;font:600 10px/1.55 Poppins,system-ui,sans-serif;
+ color:#b2bbcf
+}
+html[data-gx-b3] .gx-b5-status strong{color:#a2e8ed}
+html[data-gx-b3] .gx-b5-example-tag{
+ margin:10px 0 5px;font:700 9px/1.45 Poppins,system-ui,sans-serif;
+ color:#c4b3fa;letter-spacing:.2px
+}
+html[data-gx-b3] .gx-b5-service-state{
+ display:flex;align-items:center;justify-content:space-between;
+ gap:10px;padding:10px 12px;margin-bottom:7px;border-radius:12px;
+ background:rgba(39,47,75,.2);border:1px solid rgba(154,185,221,.11)
+}
+html[data-gx-b3] .gx-b5-service-state strong{
+ font:650 11px/1.4 Poppins,system-ui,sans-serif
+}
+html[data-gx-b3] .gx-b5-service-state small{
+ color:#a6dfbf;font:650 9px/1.35 Poppins,system-ui,sans-serif;text-align:right
+}
+html[data-gx-b3] .gx-b5-service-state small.is-interrupted{color:#f4cb83}
+html[data-gx-b3] .gx-b5-notif-recap{
+ border-top:1px solid rgba(160,180,216,.14);padding-top:9px;margin-top:6px;
+ color:#c4cce0;font:500 9px/1.55 Poppins,system-ui,sans-serif
+}
+html[data-gx-b3] .gx-b5-notif-recap strong{color:#9ddbe7}
+@media(max-width:330px){
+ html[data-gx-b3] .gx-b5-account-preview{flex-wrap:wrap}
+ html[data-gx-b3] .gx-b5-account-preview select{max-width:100%;width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-b3] #gx-b5-banner{transition:none}
+}
+
+html[data-gx-b3] #gx-b3-controls .gx-b3-buttons[hidden],html[data-gx-b3] #gx-b3-controls .gx-b3-reset[hidden]{display:none!important}
+
+html[data-gx-b3] body.gx-b5-notif-open #gx-b3-lab{pointer-events:none!important}
+html[data-gx-b3] #gx-smart-notif-sheet.show{z-index:11050!important}
