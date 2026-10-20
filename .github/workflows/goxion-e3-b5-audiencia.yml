@@ -23,3 +23,9 @@ jobs:
           node --check preview/experiencia-e3-b5-alertas-preventivas/policy.mjs
           node --check preview/experiencia-e3-b5-alertas-preventivas/check.mjs
           node preview/experiencia-e3-b5-alertas-preventivas/check.mjs
+      - name: Install isolated browsers
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium webkit
+      - name: Verify banner, original bell and service targeting
+        run: node preview/experiencia-e3-b5-alertas-preventivas/check-browser.mjs
