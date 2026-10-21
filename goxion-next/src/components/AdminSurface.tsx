@@ -1,0 +1,2196 @@
+import { AnimatePresence, motion } from 'motion/react';
+import { ClientOperationalTools, NewClientModal } from './AdminClientTools';
+import { AdminBillingCycleTools } from './AdminBillingCycleTools';
+import { AdminAccessAssignments } from './AdminAccessAssignments';
+import { AdminClientAdvancedTools } from './AdminClientAdvancedTools';
+import { AdminRegistrationCenter } from './AdminRegistrationCenter';
+import { AdminInfrastructureMaintenance } from './AdminInfrastructureMaintenance';
+import { AdminGlobalSettings } from './AdminGlobalSettings';
+import { AdminAccessArchitecture } from './AdminAccessArchitecture';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
+import {
+  AdminAccountState,
+  AdminCatalogService,
+  AdminClient,
+  AdminData,
+  AdminNotification,
+  Benefit,
+  Cancellation,
+  FairDeal,
+  Promotion,
+  adminAction,
+  adminOperation,
+  benefitAction,
+  billingPeriodAction,
+  cancellationAction,
+  credentialAction,
+  fairDealAction,
+  getAdminToken,
+  loadAdminBundle,
+  loginAdmin,
+  logoutAdmin,
+  motherAccountAction,
+  promotionAction,
+} from '../lib/admin-api';
+
+type Tab = 'home' | 'clients' | 'operations' | 'management';
+type Bundle = Awaited<ReturnType<typeof loadAdminBundle>>;
+
+const money = (value: unknown) =>
+  new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: 'MXN',
+    maximumFractionDigits: 2,
+  }).format(Number(value || 0));
+
+const shortDate = (value: unknown) => {
+  const text = String(value || '');
+  if (!text) return '—';
+  const date = new Date(text);
+  return Number.isNaN(date.getTime())
+    ? text
+    : new Intl.DateTimeFormat('es-MX', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      }).format(date);
+};
+
+const normalize = (value: unknown) =>
+  String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+
+function clientState(client: AdminClient, states: AdminAccountState[]) {
+  const central = states.find((item) => String(item.cliente_id) === client.id);
+  if (client.estado === 'suspendido') return 'suspendido';
+  if (central?.estado) return central.estado;
+  if (client.pago_en_revision) return 'revision';
+  return client.estado || 'pendiente';
+}
+
+function stateLabel(state: string) {
+  const map: Record<string, string> = {
+    pagado: 'Pagado',
+    revision: 'En revisión',
+    suspendido: 'Suspendido',
+    vencido: 'Vencido',
+    vence_hoy: 'Vence hoy',
+    por_vencer: 'Por vencer',
+    incompleto: 'Incompleto',
+    pendiente: 'Pendiente',
+  };
+  return map[state] || state;
+}
+
+function LoginPanel({ onLogin }: { onLogin: () => Promise<unknown> }) {
+  const [user, setUser] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!user.trim() || !password) {
+      setError('Ingresa usuario y contraseña.');
+      return;
+    }
+    setBusy(true);
+    setError('');
+    try {
+      await loginAdmin(user.trim(), password);
+      await onLogin();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'No fue posible iniciar sesión.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <main className="gx-admin-login">
+      <div className="gx-admin-bg-orb a" />
+      <div className="gx-admin-bg-orb b" />
+      <motion.form
+        className="gx-admin-login-card"
+        onSubmit={submit}
+        initial={{ opacity: 0, y: 15, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+      >
+        <div className="gx-admin-login-mark">G</div>
+        <span className="gx-admin-eyebrow">GOXION // ADMIN</span>
+        <h1>Centro de operaciones</h1>
+        <p>Acceso restringido al panel administrativo.</p>
+        <label>
+          <span>Usuario</span>
+          <input
+            autoComplete="username"
+            value={user}
+            onChange={(event) => setUser(event.target.value)}
+            disabled={busy}
+          />
+        </label>
+        <label>
+          <span>Contraseña</span>
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            disabled={busy}
+          />
+        </label>
+        <button type="submit" disabled={busy}>
+          {busy ? 'Validando…' : 'Entrar a Admin'}
+        </button>
+        {error && <div className="gx-admin-login-error">{error}</div>}
+      </motion.form>
+    </main>
+  );
+}
+
+function FinancePanel({ bundle }: { bundle: Bundle }) {
+  const data = bundle.core;
+  const activeClients = new Set(
+    data.clientes
+      .filter((client) => client.estado !== 'suspendido')
+      .map((client) => client.id),
+  );
+  const income = data.cliente_servicios
+    .filter(
+      (service) =>
+        service.activo !== false &&
+        service.cliente_id &&
+        activeClients.has(service.cliente_id),
+    )
+    .reduce((sum, service) => sum + Number(service.monto || 0), 0);
+  const costs = data.catalogo
+    .filter((service) => service.activo !== false)
+    .reduce(
+      (sum, service) =>
+        sum + Number(service.costo || 0) * Math.max(1, Number(service.cuentas || 1)),
+      0,
+    );
+  const profit = income - costs;
+  const margin = income > 0 ? (profit / income) * 100 : 0;
+
+  return (
+    <details className="gx-admin-business" open>
+      <summary>
+        <div>
+          <span className="gx-admin-eyebrow">NEGOCIO</span>
+          <strong>Finanzas y panorama</strong>
+        </div>
+        <span>⌄</span>
+      </summary>
+      <div className="gx-admin-business-body">
+        <div className="gx-admin-kpis">
+          <div>
+            <small>Ingresos</small>
+            <strong>{money(income)}</strong>
+            <span>Brutos mensuales</span>
+          </div>
+          <div>
+            <small>Costos</small>
+            <strong>{money(costs)}</strong>
+            <span>Inversión mensual</span>
+          </div>
+          <div>
+            <small>Ganancia</small>
+            <strong className={profit < 0 ? 'bad' : 'good'}>{money(profit)}</strong>
+            <span>Neta estimada</span>
+          </div>
+          <div>
+            <small>Margen</small>
+            <strong>{margin.toFixed(1)}%</strong>
+            <span>Rentabilidad</span>
+          </div>
+        </div>
+      </div>
+    </details>
+  );
+}
+
+function HomeView({
+  bundle,
+  go,
+}: {
+  bundle: Bundle;
+  go: (tab: Tab, focus?: string) => void;
+}) {
+  const data = bundle.core;
+  const states = bundle.accountStates;
+  const dueToday = states.filter((item) => item.estado === 'vence_hoy');
+  const overdue = states.filter((item) =>
+    ['vencido', 'incompleto'].includes(String(item.estado)),
+  );
+  const reviews = data.clientes.filter(
+    (client) =>
+      client.pago_en_revision ||
+      String(client.pago_revision_estado || '').toLowerCase() === 'revision',
+  );
+  const support = data.notificaciones.filter(
+    (item) => !item.leida && item.tipo === 'soporte',
+  );
+  const payments = data.notificaciones.filter(
+    (item) =>
+      !item.leida &&
+      (item.tipo === 'pagos' ||
+        item.tipo === 'pago' ||
+        item.titulo?.toLowerCase().includes('comprobante')),
+  );
+  const cancellations = bundle.cancellations.filter((item) =>
+    ['solicitada', 'aprobada'].includes(String(item.estado || '')),
+  );
+  const registrationCount =
+    Number(bundle.registrations?.resumen?.foco_rojo || 0) +
+    Number(bundle.registrations?.resumen?.nuevos_pendientes || 0);
+  const totalDecisions =
+    reviews.length + cancellations.length + support.length + registrationCount;
+
+  const nextPayments = [...states]
+    .filter((item) => !['pagado', 'revision'].includes(String(item.estado)))
+    .sort((a, b) => {
+      const da = Number(a.dias_para_corte || 0) - Number(a.dias_atraso || 0);
+      const db = Number(b.dias_para_corte || 0) - Number(b.dias_atraso || 0);
+      return da - db;
+    })
+    .slice(0, 6);
+
+  return (
+    <div className="gx-admin-view">
+      <section className="gx-admin-heading">
+        <div>
+          <span className="gx-admin-eyebrow">HOY EN GOXION</span>
+          <h1>Qué requiere tu atención</h1>
+          <p>Primero cobros, revisiones y solicitudes. Lo demás queda a un toque.</p>
+        </div>
+      </section>
+
+      <div className="gx-admin-priority-grid">
+        <button type="button" className="today" onClick={() => go('clients', 'today')}>
+          <span>HOY</span>
+          <strong>{dueToday.length}</strong>
+          <small>Cobran hoy</small>
+        </button>
+        <button type="button" className="overdue" onClick={() => go('clients', 'overdue')}>
+          <span>COBRO</span>
+          <strong>{overdue.length}</strong>
+          <small>Vencidos</small>
+        </button>
+        <button type="button" className="review" onClick={() => go('operations', 'payments')}>
+          <span>VALIDAR</span>
+          <strong>{reviews.length || payments.length}</strong>
+          <small>En revisión</small>
+        </button>
+        <button type="button" className="requests" onClick={() => go('operations')}>
+          <span>MI ESPACIO</span>
+          <strong>{support.length + cancellations.length + registrationCount}</strong>
+          <small>Solicitudes</small>
+        </button>
+      </div>
+
+      <section className="gx-admin-decision-center">
+        <div className="gx-admin-decision-head">
+          <div>
+            <span className="gx-admin-eyebrow">AUTOMATIZACIÓN</span>
+            <h2>Tu veredicto</h2>
+            <p>Solo lo que necesita una decisión tuya.</p>
+          </div>
+          <span>{totalDecisions} pendientes</span>
+        </div>
+        <div className="gx-admin-decision-grid">
+          <button type="button" onClick={() => go('operations', 'payments')}>
+            <span>Pagos</span>
+            <strong>{reviews.length}</strong>
+            <small>Por validar</small>
+          </button>
+          <button type="button" onClick={() => go('operations', 'cancellations')}>
+            <span>Cancelaciones</span>
+            <strong>{cancellations.length}</strong>
+            <small>Esperan resolución</small>
+          </button>
+          <button type="button" onClick={() => go('operations', 'support')}>
+            <span>Soporte</span>
+            <strong>{support.length}</strong>
+            <small>Solicitudes nuevas</small>
+          </button>
+          <button type="button" onClick={() => go('operations', 'registrations')}>
+            <span>Registros</span>
+            <strong>{registrationCount}</strong>
+            <small>Por revisar</small>
+          </button>
+        </div>
+      </section>
+
+      <section className="gx-admin-upcoming">
+        <div className="gx-admin-section-head">
+          <div>
+            <span className="gx-admin-eyebrow">COBRO</span>
+            <h2>Próximos vencimientos</h2>
+          </div>
+        </div>
+        <div className="gx-admin-upcoming-list">
+          {nextPayments.map((item) => (
+            <article key={String(item.cliente_id)}>
+              <div>
+                <strong>{item.nombre || item.folio || 'Cliente'}</strong>
+                <small>{item.estado_label || stateLabel(String(item.estado || ''))}</small>
+              </div>
+              <div>
+                <b>{money(item.total_actual)}</b>
+                <span>{item.fecha_corte ? shortDate(item.fecha_corte) : '—'}</span>
+              </div>
+            </article>
+          ))}
+          {!nextPayments.length && <div className="gx-admin-empty">No hay cobros pendientes.</div>}
+        </div>
+      </section>
+
+      <FinancePanel bundle={bundle} />
+    </div>
+  );
+}
+
+function ClientEditor({
+  client,
+  state,
+  data,
+  period,
+  onClose,
+  onMutation,
+}: {
+  client: AdminClient;
+  state?: AdminAccountState;
+  data: AdminData;
+  period?: {
+    id?: string;
+    folio?: string;
+    nombre?: string;
+    periodo_pendiente?: string;
+    estado?: string;
+    estado_guardado?: string;
+    ciclo_cobro_manual?: boolean;
+    corte_aplicado?: boolean;
+  };
+  onClose: () => void;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const [name, setName] = useState(client.nombre || '');
+  const [folio, setFolio] = useState(client.folio || '');
+  const [day, setDay] = useState(String(client.dia_pago || 15));
+  const [status, setStatus] = useState(client.estado || 'pendiente');
+  const services = data.cliente_servicios.filter(
+    (service) => service.cliente_id === client.id && service.activo !== false,
+  );
+
+  const save = () =>
+    onMutation(
+      () =>
+        adminAction('editar_cliente', {
+          cliente_id: client.id,
+          nombre: name.trim(),
+          folio: folio.trim(),
+          dia_pago: Number(day || 15),
+          estado: status,
+        }),
+      'Cliente actualizado.',
+    );
+
+  const adjustLoyalty = (delta: number) =>
+    onMutation(
+      () => adminAction('ajustar_lealtad', { cliente_id: client.id, delta }),
+      'Lealtad actualizada.',
+    );
+
+  return (
+    <motion.div
+      className="gx-admin-sheet-overlay"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onMouseDown={(event) => {
+        if (event.currentTarget === event.target) onClose();
+      }}
+    >
+      <motion.section
+        className="gx-admin-client-sheet"
+        initial={{ opacity: 0, y: 22, scale: 0.99 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 12 }}
+      >
+        <header>
+          <div>
+            <span className="gx-admin-eyebrow">CLIENTE</span>
+            <h2>{client.nombre}</h2>
+            <p>{client.folio || 'Sin folio'} · {state?.estado_label || client.estado}</p>
+          </div>
+          <button type="button" onClick={onClose}>×</button>
+        </header>
+
+        <div className="gx-admin-client-overview">
+          <div>
+            <small>Mensualidad</small>
+            <strong>{money(state?.subtotal || services.reduce((s, x) => s + Number(x.monto || 0), 0))}</strong>
+          </div>
+          <div>
+            <small>Total actual</small>
+            <strong>{money(state?.total_actual)}</strong>
+          </div>
+          <div>
+            <small>Lealtad</small>
+            <strong>Nivel {Number(state?.lealtad?.nivel || 0)}</strong>
+          </div>
+          <div>
+            <small>Racha</small>
+            <strong>{Number(client.pagos_puntuales || 0)}</strong>
+          </div>
+        </div>
+
+        <div className="gx-admin-client-form">
+          <label>
+            <span>Nombre</span>
+            <input value={name} onChange={(event) => setName(event.target.value)} />
+          </label>
+          <label>
+            <span>Folio</span>
+            <input value={folio} onChange={(event) => setFolio(event.target.value)} />
+          </label>
+          <label>
+            <span>Día de cobro</span>
+            <input type="number" min={1} max={31} value={day} onChange={(event) => setDay(event.target.value)} />
+          </label>
+          <label>
+            <span>Estado</span>
+            <select value={status} onChange={(event) => setStatus(event.target.value)}>
+              <option value="pendiente">Pendiente</option>
+              <option value="pagado">Pagado</option>
+              <option value="suspendido">Suspendido</option>
+            </select>
+          </label>
+          <button type="button" className="primary" onClick={() => void save()}>
+            Guardar cambios
+          </button>
+        </div>
+
+        <section className="gx-admin-sheet-section">
+          <div className="gx-admin-section-head">
+            <div><span className="gx-admin-eyebrow">LEALTAD</span><h3>Racha puntual</h3></div>
+          </div>
+          <div className="gx-admin-loyalty-control">
+            <button type="button" onClick={() => void adjustLoyalty(-1)}>−</button>
+            <strong>{Number(client.pagos_puntuales || 0)}</strong>
+            <button type="button" onClick={() => void adjustLoyalty(1)}>＋</button>
+          </div>
+        </section>
+
+        <AdminBillingCycleTools
+          client={client}
+          period={period}
+          onMutation={onMutation}
+        />
+
+        <ClientOperationalTools
+          client={client}
+          data={data}
+          onMutation={onMutation}
+        />
+
+        <AdminClientAdvancedTools
+          client={client}
+          data={data}
+          onMutation={onMutation}
+        />
+      </motion.section>
+    </motion.div>
+  );
+}
+
+function ClientsView({
+  bundle,
+  focus,
+  onMutation,
+}: {
+  bundle: Bundle;
+  focus?: string;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState(
+    focus === 'today' ? 'today' : focus === 'overdue' ? 'overdue' : 'all',
+  );
+  const [selected, setSelected] = useState<AdminClient | null>(null);
+  const [creating, setCreating] = useState(false);
+  const data = bundle.core;
+
+  const rows = useMemo(() => {
+    const q = normalize(query);
+    return data.clientes
+      .map((client) => ({
+        client,
+        state: bundle.accountStates.find(
+          (item) => String(item.cliente_id) === client.id,
+        ),
+        bucket: clientState(client, bundle.accountStates),
+      }))
+      .filter((row) => {
+        if (q) {
+          const text = normalize(
+            (row.client.nombre || '') + ' ' + (row.client.folio || ''),
+          );
+          if (!text.includes(q)) return false;
+        }
+        if (filter === 'all') return true;
+        if (filter === 'today') return row.bucket === 'vence_hoy';
+        if (filter === 'overdue')
+          return ['vencido', 'incompleto'].includes(row.bucket);
+        if (filter === 'revision') return row.bucket === 'revision';
+        if (filter === 'pagado') return row.bucket === 'pagado';
+        if (filter === 'suspendido') return row.bucket === 'suspendido';
+        return row.bucket === filter;
+      })
+      .sort((a, b) => {
+        const aLate = Number(a.state?.dias_atraso || 0);
+        const bLate = Number(b.state?.dias_atraso || 0);
+        if (aLate !== bLate) return bLate - aLate;
+        return String(a.client.nombre || '').localeCompare(
+          String(b.client.nombre || ''),
+          'es',
+        );
+      });
+  }, [bundle.accountStates, data.clientes, filter, query]);
+
+  return (
+    <div className="gx-admin-view">
+      <section className="gx-admin-heading">
+        <div>
+          <span className="gx-admin-eyebrow">CRM OPERATIVO</span>
+          <h1>Clientes</h1>
+          <p>Busca, filtra y entra directo a lo que necesitas.</p>
+        </div>
+        <button
+          type="button"
+          className="gx-admin-primary-action"
+          onClick={() => setCreating(true)}
+        >
+          ＋ Nuevo cliente
+        </button>
+      </section>
+
+      <div className="gx-admin-client-toolbar">
+        <label>
+          <span>⌕</span>
+          <input
+            placeholder="Buscar nombre, folio…"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+        </label>
+        <div className="gx-admin-filter-pills">
+          {[
+            ['all', 'Todos'],
+            ['revision', 'Revisión'],
+            ['pendiente', 'Pendientes'],
+            ['pagado', 'Pagados'],
+            ['suspendido', 'Suspendidos'],
+          ].map(([id, label]) => (
+            <button
+              type="button"
+              key={id}
+              className={filter === id ? 'active' : ''}
+              onClick={() => setFilter(id)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="gx-admin-client-list">
+        {rows.map(({ client, state, bucket }) => (
+          <motion.button
+            layout
+            type="button"
+            key={client.id}
+            className="gx-admin-client-row"
+            onClick={() => setSelected(client)}
+          >
+            <span className={'gx-admin-client-state ' + bucket} />
+            <div>
+              <strong>{client.nombre || 'Cliente'}</strong>
+              <small>{client.folio || 'Sin folio'} · Día {client.dia_pago || 15}</small>
+            </div>
+            <div>
+              <b>{money(state?.total_actual)}</b>
+              <span>{state?.estado_label || stateLabel(bucket)}</span>
+            </div>
+            <i>→</i>
+          </motion.button>
+        ))}
+        {!rows.length && <div className="gx-admin-empty">No hay clientes con este filtro.</div>}
+      </div>
+
+      <AnimatePresence>
+        {selected && (
+          <ClientEditor
+            client={selected}
+            state={bundle.accountStates.find(
+              (item) => String(item.cliente_id) === selected.id,
+            )}
+            data={data}
+            period={bundle.periods?.periodos?.find(
+              (item) => String(item.id) === selected.id,
+            )}
+            onClose={() => setSelected(null)}
+            onMutation={onMutation}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {creating && (
+          <NewClientModal
+            onClose={() => setCreating(false)}
+            onMutation={onMutation}
+          />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function PaymentDecisions({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const rows = bundle.core.clientes.filter(
+    (client) =>
+      client.pago_en_revision ||
+      ['revision', 'incompleto'].includes(
+        String(client.pago_revision_estado || '').toLowerCase(),
+      ),
+  );
+
+  return (
+    <div className="gx-admin-ops-list">
+      {rows.map((client) => {
+        const state = bundle.accountStates.find(
+          (item) => String(item.cliente_id) === client.id,
+        );
+        const amount = Number(state?.total_actual || state?.subtotal || 0);
+        return (
+          <article key={client.id} className="gx-admin-decision-card">
+            <div className="gx-admin-decision-card-head">
+              <div>
+                <strong>{client.nombre}</strong>
+                <small>{client.folio || 'Sin folio'} · {state?.periodo_label || 'Periodo actual'}</small>
+              </div>
+              <b>{money(amount)}</b>
+            </div>
+            {client.pago_revision_mensaje && (
+              <p>{client.pago_revision_mensaje}</p>
+            )}
+            <div className="gx-admin-decision-actions">
+              <button
+                type="button"
+                className="success"
+                onClick={() => {
+                  const punctual = Number(state?.dias_atraso || 0) <= 0;
+                  const periodLabel = state?.periodo_label || 'el periodo pendiente';
+                  if (
+                    !window.confirm(
+                      '¿Confirmas que verificaste el comprobante?\n\n' +
+                        'El pago se aplicará a ' +
+                        periodLabel +
+                        (punctual
+                          ? ' y contará para la racha puntual.'
+                          : ' y la racha se reiniciará por atraso.') +
+                        '\n\nMonto: ' +
+                        money(amount),
+                    )
+                  )
+                    return;
+
+                  void onMutation(
+                    () =>
+                      billingPeriodAction('aprobar_pago_periodo', {
+                        cliente_id: client.id,
+                        monto: amount,
+                        notas: 'Aprobado desde Admin Next',
+                        puntual: punctual,
+                      }),
+                    'Pago aplicado al periodo correspondiente.',
+                  );
+                }}
+              >
+                Aprobar
+              </button>
+              <button
+                type="button"
+                className="warning"
+                onClick={() => {
+                  const raw = window.prompt('Monto faltante:', '0');
+                  if (raw === null) return;
+                  void onMutation(
+                    () =>
+                      adminOperation('pago_incompleto', {
+                        cliente_id: client.id,
+                        monto_faltante: Number(raw || 0),
+                        mensaje: 'El pago está incompleto.',
+                      }),
+                    'Pago marcado como incompleto.',
+                  );
+                }}
+              >
+                Incompleto
+              </button>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => {
+                  if (!window.confirm('¿Rechazar este comprobante?')) return;
+                  void onMutation(
+                    () =>
+                      adminOperation('rechazar_pago', {
+                        cliente_id: client.id,
+                        mensaje: 'El comprobante fue rechazado.',
+                      }),
+                    'Comprobante rechazado.',
+                  );
+                }}
+              >
+                Rechazar
+              </button>
+            </div>
+          </article>
+        );
+      })}
+      {!rows.length && <div className="gx-admin-empty">No hay pagos pendientes de decisión.</div>}
+    </div>
+  );
+}
+
+function CancellationDecisions({
+  rows,
+  onMutation,
+}: {
+  rows: Cancellation[];
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const open = rows.filter((item) =>
+    ['solicitada', 'aprobada'].includes(String(item.estado || '')),
+  );
+
+  return (
+    <div className="gx-admin-ops-list">
+      {open.map((item) => (
+        <article key={String(item.id)} className="gx-admin-decision-card">
+          <div className="gx-admin-decision-card-head">
+            <div>
+              <strong>{item.servicio_nombre || 'Servicio'}</strong>
+              <small>{String(item.estado || 'solicitada')}</small>
+            </div>
+            <span className="gx-admin-badge">{String(item.estado || '')}</span>
+          </div>
+          {item.motivo && <p>{item.motivo}</p>}
+          <div className="gx-admin-decision-actions">
+            {item.estado === 'solicitada' && (
+              <>
+                <button
+                  type="button"
+                  className="success"
+                  onClick={() =>
+                    void onMutation(
+                      () =>
+                        cancellationAction('resolver', {
+                          solicitud_id: item.id,
+                          decision: 'aprobada',
+                          fecha_efectiva: new Date().toISOString().slice(0, 10),
+                        }),
+                      'Cancelación aprobada.',
+                    )
+                  }
+                >
+                  Aprobar
+                </button>
+                <button
+                  type="button"
+                  className="danger"
+                  onClick={() =>
+                    void onMutation(
+                      () =>
+                        cancellationAction('resolver', {
+                          solicitud_id: item.id,
+                          decision: 'rechazada',
+                        }),
+                      'Cancelación rechazada.',
+                    )
+                  }
+                >
+                  Rechazar
+                </button>
+              </>
+            )}
+            {item.estado === 'aprobada' && (
+              <button
+                type="button"
+                className="danger"
+                onClick={() => {
+                  if (!window.confirm('Esto desactivará el servicio. ¿Continuar?')) return;
+                  void onMutation(
+                    () =>
+                      cancellationAction('hacer_efectiva', {
+                        solicitud_id: item.id,
+                      }),
+                    'Cancelación aplicada.',
+                  );
+                }}
+              >
+                Hacer efectiva
+              </button>
+            )}
+          </div>
+        </article>
+      ))}
+      {!open.length && <div className="gx-admin-empty">No hay cancelaciones pendientes.</div>}
+    </div>
+  );
+}
+
+function NotificationsPanel({
+  notifications,
+  onMutation,
+}: {
+  notifications: AdminNotification[];
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const unread = notifications.filter((item) => !item.leida);
+  return (
+    <div className="gx-admin-notifications">
+      {notifications.slice(0, 40).map((item) => (
+        <article className={item.leida ? '' : 'unread'} key={item.id}>
+          <span />
+          <div>
+            <strong>{item.titulo || item.tipo || 'Notificación'}</strong>
+            <p>{item.mensaje || ''}</p>
+            <small>{shortDate(item.created_at)}</small>
+          </div>
+        </article>
+      ))}
+      {unread.length > 0 && (
+        <button
+          type="button"
+          className="gx-admin-mark-read"
+          onClick={() =>
+            void onMutation(
+              () =>
+                adminOperation('marcar_notificaciones_leidas', {
+                  ids: unread.map((item) => item.id),
+                }),
+              'Notificaciones marcadas como leídas.',
+            )
+          }
+        >
+          Marcar todo como leído
+        </button>
+      )}
+    </div>
+  );
+}
+
+function OperationsView({
+  bundle,
+  focus,
+  onMutation,
+}: {
+  bundle: Bundle;
+  focus?: string;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const [section, setSection] = useState(focus || 'payments');
+  const registrationRows = bundle.registrations?.solicitudes || [];
+  const support = bundle.core.notificaciones.filter((item) => item.tipo === 'soporte');
+
+  return (
+    <div className="gx-admin-view">
+      <section className="gx-admin-heading">
+        <div>
+          <span className="gx-admin-eyebrow">BANDEJA OPERATIVA</span>
+          <h1>Operaciones</h1>
+          <p>Decisiones reales, agrupadas por flujo.</p>
+        </div>
+      </section>
+
+      <div className="gx-admin-ops-tabs">
+        {[
+          ['payments', 'Pagos'],
+          ['cancellations', 'Cancelaciones'],
+          ['support', 'Soporte'],
+          ['registrations', 'Registros'],
+          ['notifications', 'Actividad'],
+        ].map(([id, label]) => (
+          <button
+            type="button"
+            key={id}
+            className={section === id ? 'active' : ''}
+            onClick={() => setSection(id)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {section === 'payments' && <PaymentDecisions bundle={bundle} onMutation={onMutation} />}
+      {section === 'cancellations' && (
+        <CancellationDecisions rows={bundle.cancellations} onMutation={onMutation} />
+      )}
+      {section === 'registrations' && (
+        <AdminRegistrationCenter
+          rows={registrationRows}
+          clients={(bundle.registrations?.clientes || []) as Array<{
+            id?: string;
+            nombre?: string;
+            folio?: string;
+            usuario_acceso?: string;
+            telefono_normalizado?: string | null;
+            origen_cliente?: string;
+            promo_nuevo_elegible?: boolean;
+          }>}
+          onMutation={onMutation}
+        />
+      )}
+      {section === 'support' && (
+        <NotificationsPanel notifications={support} onMutation={onMutation} />
+      )}
+      {section === 'notifications' && (
+        <NotificationsPanel
+          notifications={bundle.core.notificaciones}
+          onMutation={onMutation}
+        />
+      )}
+    </div>
+  );
+}
+
+function CatalogManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const services = bundle.core.catalogo;
+  const clientServices = bundle.core.cliente_servicios.filter(
+    (x) => x.activo !== false,
+  );
+  const [editing, setEditing] = useState<AdminCatalogService | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [name, setName] = useState('');
+  const [tag, setTag] = useState('');
+  const [benefitsText, setBenefitsText] = useState('');
+  const [price, setPrice] = useState('');
+  const [cost, setCost] = useState('');
+  const [accounts, setAccounts] = useState('1');
+  const [limit, setLimit] = useState('5');
+  const [active, setActive] = useState(true);
+
+  const sold = (service: AdminCatalogService) => {
+    const serviceName = normalize(service.nombre);
+    return clientServices.reduce((count, row) => {
+      const rowName = normalize(row.nombre);
+      let match = false;
+      if (serviceName.includes('netflix')) match = rowName.includes('netflix');
+      else if (serviceName.includes('disney')) match = rowName.includes('disney');
+      else if (serviceName.includes('max') || serviceName.includes('hbo'))
+        match = rowName.includes('max') || rowName.includes('hbo');
+      else if (serviceName.includes('prime'))
+        match = rowName.includes('prime') || rowName.includes('amazon');
+      else if (serviceName.includes('youtube')) match = rowName.includes('youtube');
+      else if (serviceName.includes('vix')) match = rowName.includes('vix');
+      else if (serviceName.includes('crunchy')) match = rowName.includes('crunchy');
+      else if (serviceName.includes('microsoft') || serviceName.includes('365'))
+        match = rowName.includes('microsoft') || rowName.includes('365');
+      else if (serviceName.includes('google'))
+        match = rowName.includes('google') || rowName.includes('one');
+      if (!match) return count;
+      const quantity = rowName.match(/\(x\s*(\d+)\)/)?.[1];
+      return count + Math.max(1, Number(quantity || 1));
+    }, 0);
+  };
+
+  const openEditor = (service?: AdminCatalogService) => {
+    const current = service || null;
+    setEditing(current);
+    setCreating(true);
+    setName(current?.nombre || '');
+    setTag(current?.etiqueta || '');
+    setBenefitsText(
+      Array.isArray(current?.beneficios)
+        ? current!.beneficios!.join('\n')
+        : String(current?.beneficios || ''),
+    );
+    setPrice(String(current?.precio ?? ''));
+    setCost(String(current?.costo ?? ''));
+    setAccounts(String(current?.cuentas ?? 1));
+    setLimit(String(current?.limite ?? 5));
+    setActive(current?.activo !== false);
+  };
+
+  const save = async () => {
+    if (!name.trim()) {
+      window.alert('Escribe el nombre del servicio.');
+      return;
+    }
+    if (!Number.isFinite(Number(price)) || Number(price) < 0) {
+      window.alert('Revisa el precio de venta.');
+      return;
+    }
+
+    const payload = {
+      nombre: name.trim(),
+      etiqueta: tag.trim(),
+      beneficios: benefitsText.trim(),
+      precio: Number(price || 0),
+      costo: Number(cost || 0),
+      cuentas: Math.max(1, Number(accounts || 1)),
+      limite: Math.max(1, Number(limit || 1)),
+      activo: active,
+    };
+
+    if (editing?.id) {
+      await onMutation(
+        () =>
+          adminAction('editar_servicio_catalogo', {
+            id: editing.id,
+            ...payload,
+          }),
+        'Servicio actualizado.',
+      );
+    } else {
+      await onMutation(
+        () => adminAction('crear_servicio_catalogo', payload),
+        'Servicio creado.',
+      );
+    }
+
+    setCreating(false);
+    setEditing(null);
+  };
+
+  const toggleActive = async (service: AdminCatalogService) => {
+    const next = service.activo === false;
+    if (
+      !next &&
+      !window.confirm(
+        'El servicio dejará de mostrarse como activo en el catálogo. Las contrataciones existentes no se eliminan. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        adminAction('editar_servicio_catalogo', {
+          id: service.id,
+          activo: next,
+        }),
+      next ? 'Servicio reactivado.' : 'Servicio desactivado.',
+    );
+  };
+
+  const syncPrice = async (service: AdminCatalogService) => {
+    if (
+      !window.confirm(
+        'Se actualizará la mensualidad de todas las contrataciones cuyo nombre coincida con ' +
+          String(service.nombre || 'este servicio') +
+          ' a ' +
+          money(service.precio) +
+          '.\n\n¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        adminAction('sincronizar_precio', {
+          nombre: service.nombre || '',
+          precio: Number(service.precio || 0),
+        }),
+      'Precio sincronizado con clientes.',
+    );
+  };
+
+  const deleteService = async (service: AdminCatalogService) => {
+    const linked = clientServices.some(
+      (row) => String(row.servicio_id || '') === String(service.id),
+    );
+
+    if (service.activo !== false) {
+      window.alert('Primero desactiva el servicio. El borrado físico queda reservado para mantenimiento.');
+      return;
+    }
+    if (linked) {
+      window.alert(
+        'Este servicio todavía tiene contrataciones activas vinculadas. No se puede borrar físicamente; mantenlo desactivado.',
+      );
+      return;
+    }
+
+    if (
+      !window.confirm(
+        'MANTENIMIENTO\n\nEl servicio está inactivo y no tiene contrataciones activas vinculadas. ¿Eliminarlo definitivamente del catálogo?',
+      )
+    )
+      return;
+    if (!window.confirm('Confirma por segunda vez: eliminar servicio del catálogo.'))
+      return;
+
+    await onMutation(
+      () =>
+        adminAction('eliminar_servicio_catalogo', {
+          id: service.id,
+        }),
+      'Servicio eliminado del catálogo.',
+    );
+  };
+
+  return (
+    <div className="gx-admin-management-block">
+      <div className="gx-admin-management-head">
+        <div>
+          <span className="gx-admin-eyebrow">INVENTARIO</span>
+          <h3>Catálogo y disponibilidad</h3>
+        </div>
+        <button type="button" onClick={() => openEditor()}>
+          ＋ Servicio
+        </button>
+      </div>
+
+      <div className="gx-admin-management-list">
+        {services.map((service) => {
+          const capacity =
+            Number(service.cuentas || 0) * Number(service.limite || 0);
+          const used = sold(service);
+          const available =
+            service.stock_manual === null || service.stock_manual === undefined
+              ? Math.max(0, capacity - used)
+              : Math.max(0, Number(service.stock_manual));
+
+          return (
+            <article
+              key={service.id}
+              className={service.activo === false ? 'inactive' : ''}
+            >
+              <div>
+                <strong>{service.nombre}</strong>
+                <small>
+                  {service.etiqueta || 'Sin etiqueta'} ·{' '}
+                  {service.activo === false ? 'Inactivo' : 'Activo'}
+                </small>
+              </div>
+
+              <div className="gx-admin-catalog-numbers">
+                <span>
+                  Venta <b>{money(service.precio)}</b>
+                </span>
+                <span>
+                  Costo <b>{money(service.costo)}</b>
+                </span>
+                <span>
+                  Disp.{' '}
+                  <b className={available <= 1 ? 'bad' : 'good'}>
+                    {available}
+                  </b>
+                </span>
+              </div>
+
+              <div className="gx-admin-catalog-actions">
+                <button type="button" onClick={() => openEditor(service)}>
+                  Editar
+                </button>
+                <button type="button" onClick={() => void syncPrice(service)}>
+                  Sincronizar precio
+                </button>
+                <button
+                  type="button"
+                  className={service.activo === false ? 'success' : 'warning'}
+                  onClick={() => void toggleActive(service)}
+                >
+                  {service.activo === false ? 'Reactivar' : 'Desactivar'}
+                </button>
+                {service.activo === false &&
+                  !clientServices.some(
+                    (row) =>
+                      String(row.servicio_id || '') === String(service.id),
+                  ) && (
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={() => void deleteService(service)}
+                    >
+                      Eliminar
+                    </button>
+                  )}
+              </div>
+            </article>
+          );
+        })}
+        {!services.length && (
+          <div className="gx-admin-empty">No hay servicios configurados.</div>
+        )}
+      </div>
+
+      <AnimatePresence>
+        {creating && (
+          <motion.div
+            className="gx-admin-inline-editor gx-admin-catalog-editor"
+            initial={{ opacity: 0, y: 7 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+          >
+            <div className="gx-admin-inline-editor-head">
+              <strong>{editing ? 'Editar servicio' : 'Nuevo servicio'}</strong>
+              <button
+                type="button"
+                onClick={() => {
+                  setCreating(false);
+                  setEditing(null);
+                }}
+              >
+                ×
+              </button>
+            </div>
+
+            <label>
+              <span>Nombre</span>
+              <input value={name} onChange={(e) => setName(e.target.value)} />
+            </label>
+
+            <label>
+              <span>Etiqueta</span>
+              <input value={tag} onChange={(e) => setTag(e.target.value)} />
+            </label>
+
+            <label>
+              <span>Beneficios</span>
+              <textarea
+                rows={4}
+                value={benefitsText}
+                onChange={(e) => setBenefitsText(e.target.value)}
+              />
+            </label>
+
+            <div className="gx-admin-form-pair">
+              <label>
+                <span>Precio venta</span>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Costo</span>
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={cost}
+                  onChange={(e) => setCost(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <div className="gx-admin-form-pair">
+              <label>
+                <span>Cuentas</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={accounts}
+                  onChange={(e) => setAccounts(e.target.value)}
+                />
+              </label>
+              <label>
+                <span>Límite por cuenta</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={limit}
+                  onChange={(e) => setLimit(e.target.value)}
+                />
+              </label>
+            </div>
+
+            {editing && (
+              <label className="gx-admin-check-row">
+                <input
+                  type="checkbox"
+                  checked={active}
+                  onChange={(e) => setActive(e.target.checked)}
+                />
+                <span>Servicio activo</span>
+              </label>
+            )}
+
+            <div className="gx-admin-rule-note">
+              Cambiar el precio del catálogo no modifica automáticamente las
+              mensualidades ya contratadas. Usa “Sincronizar precio” sólo cuando
+              quieras aplicar ese cambio a clientes existentes.
+            </div>
+
+            <button
+              type="button"
+              className="primary"
+              onClick={() => void save()}
+            >
+              {editing ? 'Guardar cambios' : 'Crear servicio'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function PromotionsManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const promotions = bundle.promotions?.promociones || [];
+  const services = bundle.promotions?.servicios || bundle.core.catalogo;
+  const [editing, setEditing] = useState<Promotion | null>(null);
+  const [creating, setCreating] = useState(false);
+  const [serviceId, setServiceId] = useState('');
+  const [name, setName] = useState('Promoción especial');
+  const [price, setPrice] = useState('');
+  const [periods, setPeriods] = useState('1');
+  const [start, setStart] = useState('');
+  const [end, setEnd] = useState('');
+  const [countdown, setCountdown] = useState(false);
+  const [flash, setFlash] = useState(false);
+
+  const open = (promo?: Promotion) => {
+    const p = promo || null;
+    setEditing(p);
+    setCreating(true);
+    setServiceId(String(p?.servicio_id || services[0]?.id || ''));
+    setName(p?.nombre || 'Promoción especial');
+    setPrice(p?.precio_promocional ? String(p.precio_promocional) : '');
+    setPeriods(String(p?.duracion_periodos || 1));
+    setStart(p?.inicio ? String(p.inicio).slice(0, 16) : '');
+    setEnd(p?.fin ? String(p.fin).slice(0, 16) : '');
+    setCountdown(p?.mostrar_contador === true);
+    setFlash(p?.oferta_flash === true);
+  };
+
+  const save = async () => {
+    await onMutation(
+      () =>
+        promotionAction('guardar', {
+          id: editing?.id,
+          servicio_id: serviceId,
+          nombre: name,
+          precio_promocional: Number(price),
+          duracion_periodos: Number(periods),
+          inicio: start,
+          fin: end,
+          mostrar_precio_anterior: true,
+          mostrar_contador: countdown,
+          oferta_flash: flash,
+          activa: true,
+        }),
+      'Promoción guardada.',
+    );
+    setCreating(false);
+    setEditing(null);
+  };
+
+
+  const togglePromotion = async (promo: Promotion) => {
+    if (!promo.id) return;
+    const next = promo.activa !== true;
+    await onMutation(
+      () =>
+        promotionAction('cambiar_estado', {
+          id: promo.id,
+          activa: next,
+        }),
+      next ? 'Promoción activada.' : 'Promoción pausada.',
+    );
+  };
+
+  const removePromotion = async (promo: Promotion) => {
+    if (!promo.id) return;
+    if (
+      !window.confirm(
+        '¿Eliminar esta promoción?\n\nSi ya fue usada por clientes, GOXION la conservará como historial y sólo la desactivará.',
+      )
+    )
+      return;
+    await onMutation(
+      () => promotionAction('eliminar', { id: promo.id }),
+      'Promoción retirada.',
+    );
+  };
+
+  return (
+    <div className="gx-admin-management-block">
+      <div className="gx-admin-management-head">
+        <div>
+          <span className="gx-admin-eyebrow">CEREBRO COMERCIAL</span>
+          <h3>Promociones del catálogo</h3>
+        </div>
+        <button type="button" onClick={() => open()}>＋ Nueva</button>
+      </div>
+
+      <div className="gx-admin-promo-list">
+        {promotions.map((promo) => (
+          <article key={String(promo.id)}>
+            <div>
+              <strong>{promo.servicio?.nombre || promo.nombre}</strong>
+              <small>{promo.nombre} · {promo.duracion_periodos || 1} periodo(s)</small>
+            </div>
+            <div>
+              <b>{money(promo.precio_promocional)}</b>
+              <span>{promo.estado_visual || (promo.activa ? 'activa' : 'inactiva')}</span>
+              <button type="button" onClick={() => open(promo)}>Editar</button>
+              <button
+                type="button"
+                className={promo.activa ? 'warning' : 'success'}
+                onClick={() => void togglePromotion(promo)}
+              >
+                {promo.activa ? 'Pausar' : 'Activar'}
+              </button>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => void removePromotion(promo)}
+              >
+                Retirar
+              </button>
+            </div>
+          </article>
+        ))}
+        {!promotions.length && <div className="gx-admin-empty">No hay promociones configuradas.</div>}
+      </div>
+
+      <AnimatePresence>
+        {creating && (
+          <motion.div className="gx-admin-inline-editor" initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="gx-admin-inline-editor-head">
+              <strong>{editing ? 'Editar promoción' : 'Nueva promoción'}</strong>
+              <button type="button" onClick={() => setCreating(false)}>×</button>
+            </div>
+            <label><span>Plataforma</span><select value={serviceId} onChange={(e) => setServiceId(e.target.value)}>{services.map((s) => <option key={s.id} value={s.id}>{s.nombre}</option>)}</select></label>
+            <label><span>Nombre interno</span><input value={name} onChange={(e) => setName(e.target.value)} /></label>
+            <div className="gx-admin-form-pair">
+              <label><span>Precio promo</span><input type="number" value={price} onChange={(e) => setPrice(e.target.value)} /></label>
+              <label><span>Duración</span><select value={periods} onChange={(e) => setPeriods(e.target.value)}>{[1,2,3,4,6,12].map((x)=><option key={x} value={x}>{x} periodo{x===1?'':'s'}</option>)}</select></label>
+            </div>
+            <div className="gx-admin-form-pair">
+              <label><span>Inicio</span><input type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} /></label>
+              <label><span>Fin</span><input type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} /></label>
+            </div>
+            <div className="gx-admin-checks">
+              <label><input type="checkbox" checked={countdown} onChange={(e)=>setCountdown(e.target.checked)} /> Contador</label>
+              <label><input type="checkbox" checked={flash} onChange={(e)=>setFlash(e.target.checked)} /> Oferta flash</label>
+            </div>
+            <button type="button" className="primary" onClick={() => void save()}>Guardar promoción</button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function BenefitsManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const [clientId, setClientId] = useState(bundle.core.clientes[0]?.id || '');
+  const [concept, setConcept] = useState('Descuento programado');
+  const [value, setValue] = useState('');
+  const [periods, setPeriods] = useState('1');
+
+  const create = async () => {
+    await onMutation(
+      () =>
+        benefitAction('crear_manual', {
+          cliente_id: clientId,
+          concepto: concept,
+          tipo: 'monto',
+          valor: Number(value),
+          periodos_total: Number(periods),
+        }),
+      'Beneficio programado.',
+    );
+  };
+
+  return (
+    <div className="gx-admin-management-block">
+      <div className="gx-admin-management-head">
+        <div><span className="gx-admin-eyebrow">BENEFICIOS</span><h3>Descuentos programados</h3></div>
+        <span>{bundle.benefits.length} registrados</span>
+      </div>
+      <div className="gx-admin-benefit-form">
+        <label><span>Cliente</span><select value={clientId} onChange={(e)=>setClientId(e.target.value)}>{bundle.core.clientes.map((c)=><option key={c.id} value={c.id}>{c.nombre}</option>)}</select></label>
+        <label><span>Concepto</span><input value={concept} onChange={(e)=>setConcept(e.target.value)} /></label>
+        <div className="gx-admin-form-pair">
+          <label><span>Monto</span><input type="number" value={value} onChange={(e)=>setValue(e.target.value)} /></label>
+          <label><span>Periodos</span><input type="number" min={1} max={36} value={periods} onChange={(e)=>setPeriods(e.target.value)} /></label>
+        </div>
+        <button type="button" className="primary" onClick={() => void create()}>Programar descuento</button>
+      </div>
+      <div className="gx-admin-benefit-list">
+        {bundle.benefits.slice(0, 30).map((benefit: Benefit) => (
+          <article key={String(benefit.id)}>
+            <div><strong>{benefit.concepto || 'Beneficio'}</strong><small>{benefit.origen || 'manual'} · {benefit.estado_visual || benefit.estado}</small></div>
+            <div><b>−{benefit.tipo === 'porcentaje' ? String(benefit.valor || 0)+'%' : money(benefit.valor)}</b>{benefit.activo !== false && <button type="button" onClick={() => void onMutation(()=>benefitAction('cancelar',{id:benefit.id}),'Beneficio cancelado.')}>Cancelar</button>}</div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function InfrastructureManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const access = bundle.accessModel;
+  const accounts = bundle.motherAccounts?.cuentas || [];
+  const credentials = bundle.credentials?.credenciales || [];
+  const pendingDeliveries = (bundle.credentials?.entregas || []).filter(
+    (item) => String(item.estado) === 'pendiente',
+  );
+  const activeAccesses = access?.accesos || [];
+  const services = (access?.servicios || bundle.core.catalogo).filter(
+    (item) => item.activo !== false,
+  );
+
+  const [serviceId, setServiceId] = useState(String(services[0]?.id || ''));
+  const [alias, setAlias] = useState('Cuenta 1');
+  const [email, setEmail] = useState('');
+  const [limit, setLimit] = useState('5');
+  const [credentialAccount, setCredentialAccount] = useState('');
+  const [password, setPassword] = useState('');
+
+  const createAccount = async () => {
+    await onMutation(
+      () =>
+        motherAccountAction('crear', {
+          servicio_id: serviceId,
+          alias,
+          correo_login: email,
+          limite_perfiles: Number(limit),
+        }),
+      'Cuenta madre creada.',
+    );
+    setEmail('');
+  };
+
+  const publishCredential = async () => {
+    const account = accounts.find(
+      (item) => String(item.id) === credentialAccount,
+    );
+    const clientIds = Array.from(
+      new Set(
+        (account?.clientes || [])
+          .map((item) => String(item.cliente_id || ''))
+          .filter(Boolean),
+      ),
+    );
+    if (!account || !clientIds.length) {
+      window.alert('La cuenta seleccionada no tiene clientes asignados.');
+      return;
+    }
+    if (password.length < 4) {
+      window.alert('Escribe la nueva contraseña.');
+      return;
+    }
+    if (
+      !window.confirm(
+        'La contraseña se publicará como entrega segura de una sola vista para los clientes asignados. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        credentialAction('publicar', {
+          cuenta_id: credentialAccount,
+          password,
+          cliente_ids: clientIds,
+        }),
+      'Credencial publicada de forma segura.',
+    );
+    setPassword('');
+  };
+
+  return (
+    <div className="gx-admin-management-block">
+      <div className="gx-admin-management-head">
+        <div>
+          <span className="gx-admin-eyebrow">ARQUITECTURA</span>
+          <h3>Accesos y credenciales</h3>
+        </div>
+      </div>
+
+      <div className="gx-admin-infra-kpis">
+        <div><strong>{accounts.length}</strong><span>Cuentas madre</span></div>
+        <div><strong>{activeAccesses.length}</strong><span>Accesos activos</span></div>
+        <div><strong>{credentials.length}</strong><span>Versiones credencial</span></div>
+        <div><strong>{pendingDeliveries.length}</strong><span>Entregas pendientes</span></div>
+      </div>
+
+      <section className="gx-admin-subpanel">
+        <div className="gx-admin-section-head">
+          <div><span className="gx-admin-eyebrow">CUENTAS MADRE</span><h3>Capacidad y asignación</h3></div>
+        </div>
+        <div className="gx-admin-account-list">
+          {accounts.map((account) => (
+            <article key={String(account.id)}>
+              <div>
+                <strong>{String(account.alias || 'Cuenta')}</strong>
+                <small>{String(account.correo_login || '')}</small>
+              </div>
+              <div>
+                <b>{Number(account.ocupados || 0)}/{Number(account.limite_perfiles || 0)}</b>
+                <span>{Number(account.disponibles || 0)} libres</span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="gx-admin-inline-editor gx-admin-account-editor">
+          <strong>Nueva cuenta madre</strong>
+          <label>
+            <span>Plataforma</span>
+            <select value={serviceId} onChange={(e) => setServiceId(e.target.value)}>
+              {services.map((service) => (
+                <option key={service.id} value={service.id}>{service.nombre}</option>
+              ))}
+            </select>
+          </label>
+          <div className="gx-admin-form-pair">
+            <label><span>Alias</span><input value={alias} onChange={(e)=>setAlias(e.target.value)} /></label>
+            <label><span>Límite</span><input type="number" min={1} max={99} value={limit} onChange={(e)=>setLimit(e.target.value)} /></label>
+          </div>
+          <label><span>Correo / login</span><input value={email} onChange={(e)=>setEmail(e.target.value)} /></label>
+          <button type="button" className="primary" onClick={() => void createAccount()}>
+            Crear cuenta
+          </button>
+        </div>
+      </section>
+
+      <AdminAccessAssignments
+        model={access}
+        accounts={accounts}
+        onMutation={onMutation}
+      />
+
+      <AdminInfrastructureMaintenance
+        accounts={accounts}
+        credentials={bundle.credentials}
+        onMutation={onMutation}
+      />
+
+      <AdminAccessArchitecture
+        model={access}
+        accounts={accounts}
+        onMutation={onMutation}
+      />
+
+      <section className="gx-admin-subpanel">
+        <div className="gx-admin-section-head">
+          <div><span className="gx-admin-eyebrow">ENTREGA SEGURA</span><h3>Publicar nueva contraseña</h3></div>
+        </div>
+        <div className="gx-admin-inline-editor">
+          <label>
+            <span>Cuenta madre</span>
+            <select
+              value={credentialAccount}
+              onChange={(e) => setCredentialAccount(e.target.value)}
+            >
+              <option value="">Selecciona una cuenta</option>
+              {accounts
+                .filter((account) => account.activo !== false)
+                .map((account) => (
+                  <option key={String(account.id)} value={String(account.id)}>
+                    {String(account.alias || 'Cuenta')} · {String(account.correo_login || '')}
+                  </option>
+                ))}
+            </select>
+          </label>
+          <label>
+            <span>Nueva contraseña</span>
+            <input
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </label>
+          <div className="gx-admin-rule-note">
+            La contraseña se guarda en Vault y cada cliente sólo podrá verla una vez después de confirmar su PIN.
+          </div>
+          <button type="button" className="primary" onClick={() => void publishCredential()}>
+            Publicar a clientes asignados
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function FairDealManagement({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const rows = bundle.fairDeals;
+  const active = rows.filter((item) => item.activo !== false);
+  const services = bundle.core.catalogo.filter((item) => item.activo !== false);
+  const [serviceId, setServiceId] = useState(String(services[0]?.id || ''));
+  const [days, setDays] = useState('1');
+  const [period, setPeriod] = useState(new Date().toISOString().slice(0, 7) + '-01');
+  const [reason, setReason] = useState('Falla técnica');
+  const [onlyAffected, setOnlyAffected] = useState(true);
+  const [individualClientId, setIndividualClientId] = useState(
+    String(bundle.core.clientes[0]?.id || ''),
+  );
+  const individualServices = useMemo(
+    () =>
+      bundle.core.cliente_servicios.filter(
+        (row) =>
+          row.activo !== false &&
+          String(row.cliente_id || '') === individualClientId,
+      ),
+    [bundle.core.cliente_servicios, individualClientId],
+  );
+  const [individualServiceId, setIndividualServiceId] = useState(
+    String(
+      bundle.core.cliente_servicios.find(
+        (row) =>
+          row.activo !== false &&
+          String(row.cliente_id || '') ===
+            String(bundle.core.clientes[0]?.id || ''),
+      )?.id || '',
+    ),
+  );
+
+  const eligibleClientIds = useMemo(() => {
+    const selected = bundle.core.cliente_servicios.filter(
+      (row) =>
+        row.activo !== false &&
+        String(row.servicio_id || '') === serviceId,
+    );
+    const ids = new Set(selected.map((row) => String(row.cliente_id || '')).filter(Boolean));
+    return [...ids];
+  }, [bundle.core.cliente_servicios, serviceId]);
+
+  const apply = async () => {
+    if (!eligibleClientIds.length) {
+      window.alert('No hay clientes activos con ese servicio.');
+      return;
+    }
+    const service = services.find((item) => String(item.id) === serviceId);
+    if (
+      !window.confirm(
+        'Se aplicará Trato Justo a ' +
+          eligibleClientIds.length +
+          ' cliente(s) de ' +
+          String(service?.nombre || 'este servicio') +
+          '. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        fairDealAction('guardar_compensaciones_masivas', {
+          cliente_ids: eligibleClientIds,
+          servicio_id: serviceId,
+          servicio_nombre: service?.nombre || '',
+          periodo: period,
+          dias_falla: Number(days),
+          motivo: reason,
+          solo_afectados: onlyAffected,
+        }),
+      'Compensaciones de Trato Justo guardadas.',
+    );
+  };
+
+  const applyIndividual = async () => {
+    if (!individualClientId || !individualServiceId) {
+      window.alert('Selecciona cliente y servicio.');
+      return;
+    }
+
+    const client = bundle.core.clientes.find(
+      (item) => item.id === individualClientId,
+    );
+    const service = individualServices.find(
+      (item) => item.id === individualServiceId,
+    );
+
+    if (
+      !window.confirm(
+        'Se aplicará Trato Justo individual a ' +
+          String(client?.nombre || 'este cliente') +
+          ' por ' +
+          String(service?.nombre || 'el servicio seleccionado') +
+          ': ' +
+          Number(days || 1) * 5 +
+          '% para ' +
+          period.slice(0, 7) +
+          '. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        fairDealAction('guardar_compensacion', {
+          cliente_id: individualClientId,
+          cliente_servicio_id: individualServiceId,
+          periodo: period,
+          dias_falla: Number(days),
+          motivo: reason,
+        }),
+      'Compensación individual guardada.',
+    );
+  };
+
+
+  const removeCompensation = async (item: FairDeal) => {
+    if (!item.id) return;
+    if (
+      !window.confirm(
+        'Se retirará esta compensación de Trato Justo y GOXION recalculará el descuento activo del cliente. ¿Continuar?',
+      )
+    )
+      return;
+
+    await onMutation(
+      () =>
+        fairDealAction('eliminar_compensacion', {
+          id: item.id,
+        }),
+      'Compensación retirada.',
+    );
+  };
+
+  return (
+    <div className="gx-admin-management-block">
+      <div className="gx-admin-management-head">
+        <div><span className="gx-admin-eyebrow">TRATO JUSTO</span><h3>Compensaciones del periodo</h3></div>
+        <span>{active.length} activas</span>
+      </div>
+
+      <div className="gx-admin-inline-editor">
+        <label>
+          <span>Servicio afectado</span>
+          <select value={serviceId} onChange={(e)=>setServiceId(e.target.value)}>
+            {services.map((service)=>(
+              <option key={service.id} value={service.id}>{service.nombre}</option>
+            ))}
+          </select>
+        </label>
+        <div className="gx-admin-form-pair">
+          <label><span>Periodo</span><input type="month" value={period.slice(0,7)} onChange={(e)=>setPeriod(e.target.value + '-01')} /></label>
+          <label><span>Días de falla</span><input type="number" min={1} max={10} value={days} onChange={(e)=>setDays(e.target.value)} /></label>
+        </div>
+        <label><span>Motivo</span><input value={reason} onChange={(e)=>setReason(e.target.value)} /></label>
+        <label className="gx-admin-check-row">
+          <input type="checkbox" checked={onlyAffected} onChange={(e)=>setOnlyAffected(e.target.checked)} />
+          <span>Aplicar sólo a clientes que tienen este servicio activo</span>
+        </label>
+        <div className="gx-admin-rule-note">
+          {Number(days || 0) * 5}% de compensación · {eligibleClientIds.length} cliente(s) elegibles.
+        </div>
+        <button type="button" className="primary" onClick={() => void apply()}>
+          Aplicar compensación masiva
+        </button>
+      </div>
+
+      <div className="gx-admin-inline-editor gx-admin-fair-individual">
+        <strong>Compensación individual</strong>
+        <label>
+          <span>Cliente</span>
+          <select
+            value={individualClientId}
+            onChange={(event) => {
+              const id = event.target.value;
+              setIndividualClientId(id);
+              const first = bundle.core.cliente_servicios.find(
+                (row) =>
+                  row.activo !== false &&
+                  String(row.cliente_id || '') === id,
+              );
+              setIndividualServiceId(String(first?.id || ''));
+            }}
+          >
+            {bundle.core.clientes.map((client) => (
+              <option key={client.id} value={client.id}>
+                {client.nombre || 'Cliente'} · {client.folio || 'sin folio'}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          <span>Servicio contratado</span>
+          <select
+            value={individualServiceId}
+            onChange={(event) => setIndividualServiceId(event.target.value)}
+          >
+            <option value="">Selecciona servicio</option>
+            {individualServices.map((service) => (
+              <option key={service.id} value={service.id}>
+                {service.nombre || 'Servicio'} · {money(service.monto)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="gx-admin-rule-note">
+          Usa los mismos días, periodo y motivo configurados arriba. GOXION calcula
+          automáticamente 5% por día sobre la mensualidad de ese servicio.
+        </div>
+        <button
+          type="button"
+          className="primary"
+          disabled={!individualServiceId}
+          onClick={() => void applyIndividual()}
+        >
+          Aplicar a este cliente
+        </button>
+      </div>
+
+      <div className="gx-admin-benefit-list">
+        {active.slice(0, 30).map((item) => (
+          <article key={String(item.id)}>
+            <div>
+              <strong>{item.motivo || 'Compensación'}</strong>
+              <small>{item.periodo} · {item.dias_falla || 0} día(s)</small>
+            </div>
+            <div>
+              <b>−{money(item.monto)}</b>
+              <span>{Number(item.porcentaje || 0)}%</span>
+              <button
+                type="button"
+                className="danger"
+                onClick={() => void removeCompensation(item)}
+              >
+                Retirar
+              </button>
+            </div>
+          </article>
+        ))}
+        {!active.length && <div className="gx-admin-empty">No hay compensaciones activas.</div>}
+      </div>
+    </div>
+  );
+}
+
+function ManagementView({
+  bundle,
+  onMutation,
+}: {
+  bundle: Bundle;
+  onMutation: (work: () => Promise<unknown>, success: string) => Promise<void>;
+}) {
+  const [section, setSection] = useState('catalog');
+  return (
+    <div className="gx-admin-view">
+      <section className="gx-admin-heading">
+        <div>
+          <span className="gx-admin-eyebrow">GESTIÓN</span>
+          <h1>Configura GOXION</h1>
+          <p>Catálogo, promociones, beneficios y arquitectura de acceso.</p>
+        </div>
+      </section>
+      <div className="gx-admin-ops-tabs">
+        {[
+          ['catalog', 'Catálogo'],
+          ['promotions', 'Promociones'],
+          ['benefits', 'Beneficios'],
+          ['access', 'Accesos'],
+          ['fairdeal', 'Trato Justo'],
+          ['settings', 'Ajustes'],
+        ].map(([id,label])=>(
+          <button type="button" key={id} className={section===id?'active':''} onClick={()=>setSection(id)}>{label}</button>
+        ))}
+      </div>
+      {section === 'catalog' && <CatalogManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'promotions' && <PromotionsManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'benefits' && <BenefitsManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'access' && <InfrastructureManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'fairdeal' && <FairDealManagement bundle={bundle} onMutation={onMutation} />}
+      {section === 'settings' && (
+        <AdminGlobalSettings data={bundle.core} onMutation={onMutation} />
+      )}
+    </div>
+  );
+}
+
+export function AdminSurface() {
+  const [bundle, setBundle] = useState<Bundle | null>(null);
+  const [tab, setTab] = useState<Tab>('home');
+  const [focus, setFocus] = useState('');
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>(
+    getAdminToken() ? 'loading' : 'ready',
+  );
+  const [message, setMessage] = useState('');
+
+  const refresh = async () => {
+    setStatus('loading');
+    try {
+      const next = await loadAdminBundle();
+      setBundle(next);
+      setStatus('ready');
+      return next;
+    } catch (error) {
+      setBundle(null);
+      setStatus('error');
+      setMessage(error instanceof Error ? error.message : 'No fue posible cargar Admin.');
+      logoutAdmin();
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    if (getAdminToken()) void refresh().catch(() => {});
+  }, []);
+
+  const mutate = async (
+    work: () => Promise<unknown>,
+    success: string,
+  ) => {
+    setMessage('Procesando…');
+    try {
+      await work();
+      await refresh();
+      setMessage(success);
+      window.setTimeout(() => setMessage(''), 2200);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'No fue posible completar la acción.');
+    }
+  };
+
+  const go = (next: Tab, nextFocus = '') => {
+    setTab(next);
+    setFocus(nextFocus);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const signOut = () => {
+    logoutAdmin();
+    setBundle(null);
+    setTab('home');
+    setFocus('');
+    setStatus('ready');
+  };
+
+  if (!getAdminToken() || !bundle) {
+    if (getAdminToken() && status === 'loading') {
+      return (
+        <main className="gx-admin-loading">
+          <span />
+          <strong>Sincronizando centro de operaciones…</strong>
+        </main>
+      );
+    }
+    return <LoginPanel onLogin={refresh} />;
+  }
+
+  const unread = bundle.core.notificaciones.filter((item) => !item.leida).length;
+
+  return (
+    <main className="gx-admin-next-shell">
+      <header className="gx-admin-topbar">
+        <div className="gx-admin-brand">
+          <span>G</span>
+          <div>
+            <strong>GOXION</strong>
+            <small>CENTRO DE OPERACIONES</small>
+          </div>
+        </div>
+        <div className="gx-admin-top-actions">
+          <button type="button" className="gx-admin-bell" onClick={() => go('operations','notifications')}>
+            🔔
+            {unread > 0 && <i>{unread > 99 ? '99+' : unread}</i>}
+          </button>
+          <span className="gx-admin-sync"><i />Sincronizado</span>
+          <span className="gx-admin-live"><i />LIVE</span>
+          <button type="button" className="gx-admin-logout" onClick={signOut}>⏻</button>
+        </div>
+      </header>
+
+      <nav className="gx-admin-nav">
+        {[
+          ['home','⌂','Inicio'],
+          ['clients','👥','Clientes'],
+          ['operations','◎','Operaciones'],
+          ['management','⌘','Gestión'],
+        ].map(([id,icon,label])=>(
+          <button
+            type="button"
+            key={id}
+            className={tab===id?'active':''}
+            onClick={()=>go(id as Tab)}
+          >
+            {tab===id && <motion.span layoutId="gx-admin-nav-highlight" />}
+            <i>{icon}</i><b>{label}</b>
+          </button>
+        ))}
+      </nav>
+
+      <section className="gx-admin-content">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={tab + ':' + focus}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.2 }}
+          >
+            {tab === 'home' && <HomeView bundle={bundle} go={go} />}
+            {tab === 'clients' && <ClientsView bundle={bundle} focus={focus} onMutation={mutate} />}
+            {tab === 'operations' && <OperationsView bundle={bundle} focus={focus} onMutation={mutate} />}
+            {tab === 'management' && <ManagementView bundle={bundle} onMutation={mutate} />}
+          </motion.div>
+        </AnimatePresence>
+      </section>
+
+      <AnimatePresence>
+        {message && (
+          <motion.div
+            className="gx-admin-toast"
+            initial={{ opacity: 0, y: 7, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: 7, x: '-50%' }}
+          >
+            {message}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </main>
+  );
+}
