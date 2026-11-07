@@ -1006,3 +1006,59 @@ html[data-gx-b2-index-demo="true"] .gx-b2-calendar-toggle .gx-chevron-svg.gx-mor
   transition:none!important;
  }
 }
+
+
+/* ================================================================
+   R6 · JERARQUÍA Y AGRUPACIÓN · preview scope only
+   Solo peso, color y ritmo de espacios. Sin reordenar el DOM, sin
+   secciones nuevas, sin wrappers nuevos, sin duplicar información,
+   sin tocar el morph (R5.2 intacto) ni los desenfoques (blur 25px
+   y gradiente translúcido del sticky, a propósito).
+   ================================================================
+   Ritmo: 21px entre grupos grandes, 11px dentro de cada grupo.
+   El orden del DOM es fijo (proof → identidad → servicios →
+   calendario → desglose → lealtad → acciones → nota demo), así
+   que los cuatro intentos se expresan por proximidad en ese flujo,
+   no moviendo bloques:
+     · apertura: tira de estado del comprobante (proof, solo cuando
+       hay algo que mostrar) separada 21px de la identidad;
+     · identidad: tarjeta Titular/Folio/Período, 21px debajo;
+     · ¿Qué tengo? título Servicios (11px) + servicios, 21px debajo;
+     · ¿Cuánto y cuándo? calendario (0) + desglose (11px entre
+       ambos, mismo grupo), 21px debajo;
+     · Confianza + ¿Cómo pago? lealtad, 21px, acciones (CTA),
+       21px, nota demo.
+   La separación hero→contenido sigue siendo el --gx-rm-header-bottom
+   del morph (20px): un píxel fuera del ritmo de 21px, dejado así a
+   propósito para no tocar R5.2.
+   Jerarquía: solo el importe grita (52px, tabular-nums, color del
+   escenario, ya aprobado). Los títulos de sección bajan a 10px/800 con tracking y
+   gris azulado; los valores secundarios dejan el blanco puro y pasan
+   a #b5c3d9, y los rótulos a #9ca7c6. El folio conserva su acento
+   morado inline (la regla de color no usa !important, a propósito);
+   el total del desglose conserva su cian 18px y la fila activa del
+   calendario su cian, porque son el segundo importe y la selección.
+   ================================================================ */
+html[data-gx-index-remaster="r3"] #gx-b2-proof{margin-bottom:21px!important}
+html[data-gx-index-remaster="r3"] .card-info{margin-bottom:21px!important}
+html[data-gx-index-remaster="r3"] .section-title{margin-bottom:11px!important}
+html[data-gx-index-remaster="r3"] .services-container{margin-bottom:21px!important}
+html[data-gx-index-remaster="r3"] #gx-b2-calendar{margin-bottom:0!important}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown{margin:11px 0 21px!important}
+html[data-gx-index-remaster="r3"] #gx-b2-loyalty-panel{margin-top:0!important;margin-bottom:21px!important}
+html[data-gx-index-remaster="r3"] #gx-b2-actions{margin-bottom:21px!important}
+html[data-gx-index-remaster="r3"] .gx-b2-demo-copy{margin-top:0!important}
+/* El importe ya es el único que grita: 52px, tabular-nums, color del
+   escenario. Se reafirma para que ningún ajuste posterior lo apague. */
+html[data-gx-index-remaster="r3"] #gx-b2-hero .total-amount{font-variant-numeric:tabular-nums}
+html[data-gx-index-remaster="r3"] .section-title{
+ font-size:10px;font-weight:800;
+ letter-spacing:1.5px;color:#9ca7c6;
+}
+html[data-gx-index-remaster="r3"] .card-info .info-block .label{color:#9ca7c6}
+html[data-gx-index-remaster="r3"] .card-info .info-block .value{color:#b5c3d9}
+html[data-gx-index-remaster="r3"] .services-container .service-price{color:#b5c3d9}
+html[data-gx-index-remaster="r3"] .gx-b2-calendar-row-side strong{color:#b5c3d9}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown .breakdown-line span:last-child{color:#b5c3d9}
+html[data-gx-index-remaster="r3"] #gx-b2-breakdown .gx-b2-breakdown-title{color:#9ca7c6}
+html[data-gx-index-remaster="r3"] .gx-b2-proof-eyebrow{color:#9ca7c6}
