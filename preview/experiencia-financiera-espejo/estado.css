@@ -1144,7 +1144,7 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
       solo al cargar y al cambiar el valor; se cancela con el scroll.
    2. Ambiente: la lava YA se mueve sola en index.css (lavaFluid
       10–14 s); R8 no la duplica. Lo vivo aquí es solo:
-        · glow líquido del badge (R9, sustituye al barrido);
+        · glow líquido del badge (R10, sustituye al barrido);
         · respiración del anillo de lealtad (escala 1→1.025, 5 s).
       Nada de tilt ni movimientos bruscos; nada compite con el
       importe protagonista. Todo se pausa si la pestaña no está
@@ -1158,26 +1158,51 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
    morado #7c4dff (o cian si el principal ya es morado) y se mueve
    lento, como dos semilíquidos.
    ================================================================ */
-/* 2b · R9 · Glow líquido de la píldora de estado. El gradiente vive
-   en la propia píldora (background-image sobre el fondo base) y
-   mezcla el color principal del estado con otro líquido: cian
-   #00f2fe + morado #7c4dff en el estado normal, morado + cian en
-   revisión, rojo + morado en vencido, verde + morado en pagado.
-   Al cambiar el estado cambia la clase y con ella el color
-   principal del glow; la transición .25 s de R7 suaviza el cambio
-   de color/borde/sombra. Solo se anima background-position (9 s,
-   ida y vuelta, sin parpadeo): dos líquidos que se mezclan lento.
-   Sin ::after, sin blur, sin halo detrás del precio. */
+/* R10 · Sin anclaje de scroll en el preview. El morph es
+   scroll-acoplado: su geometría se deriva del scrollY, así que el
+   scrollY debe ser la fuente de verdad y nadie debe moverlo por
+   detrás. El anclaje de scroll del navegador hacía justo eso:
+   cuando el hero cambiaba de alto al compactarse, empujaba el
+   scrollY (medido: soltar en 120 px lo arrastraba a 83 px antes
+   de que el asentamiento evaluara, y el snap elegía el extremo
+   equivocado; también oscilaba ±50 px durante el asentamiento).
+   Con overflow-anchor:none el scrollY se queda donde el cliente
+   lo dejó, el asentamiento evalúa el extremo correcto y aterriza
+   sin oscilar. Solo afecta a este preview; no toca el Index
+   oficial ni ningún otro scroll. En Safari la propiedad se ignora
+   (no la implementa), sin efecto adverso. */
+/* 2b · R10 · Glow líquido de la píldora de estado, más visible.
+   R9 se notaba poco: un solo degradado lineal con alphas ~.20 y un
+   halo tenue. Henry lo imagina como dos cosas brillantes que se
+   entremezclan sin unirse del todo (azul y amarillo revueltos, por
+   ejemplo), pero acorde al tono, sin colores chillantes. Aquí son
+   DOS manchas radiales — una de cada líquido del estado — que
+   derivan en direcciones opuestas y se cruzan por el centro sin
+   fundirse: en el cruce se suman con blend screen y el brillo
+   sube, como dos semilíquidos que se quieren mezclar. Los colores
+   son los mismos de R9 por estado (cian+morado normal, morado+cian
+   revisión, rojo+morado vencido, verde+morado pagado), solo sube
+   la intensidad (alphas .50 en el centro de cada mancha, halo
+   exterior .38/.22) y el movimiento es de 8 s, lento, sin parpadeo:
+   solo background-position, sin transform del texto. El texto
+   sigue legible: las manchas viven en el fondo, detrás del texto,
+   y se apagan con prefers-reduced-motion (queda el degradado
+   estático) y con la pestaña oculta (pausa). */
+html[data-gx-index-remaster="r3"]{overflow-anchor:none}
 html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
  --gx-pill-a-rgb:0,242,254;--gx-pill-b-rgb:124,77,255;
- background-image:linear-gradient(115deg,
-  rgba(var(--gx-pill-a-rgb),.20),
-  rgba(var(--gx-pill-b-rgb),.17) 55%,
-  rgba(var(--gx-pill-a-rgb),.20));
- background-size:220% 220%;
- animation:gx-r9-liquid 9s ease-in-out infinite alternate;
- box-shadow:0 0 14px rgba(var(--gx-pill-a-rgb),.15),
-  0 0 26px rgba(var(--gx-pill-b-rgb),.09);
+ background-image:
+  radial-gradient(42% 95% at 22% 50%,rgba(var(--gx-pill-a-rgb),.50),rgba(var(--gx-pill-a-rgb),0) 72%),
+  radial-gradient(42% 95% at 78% 50%,rgba(var(--gx-pill-b-rgb),.50),rgba(var(--gx-pill-b-rgb),0) 72%),
+  linear-gradient(115deg,
+   rgba(var(--gx-pill-a-rgb),.22),
+   rgba(var(--gx-pill-b-rgb),.20) 55%,
+   rgba(var(--gx-pill-a-rgb),.22));
+ background-size:180% 180%,180% 180%,220% 220%;
+ background-blend-mode:screen;
+ animation:gx-r10-liquid 8s ease-in-out infinite alternate;
+ box-shadow:0 0 18px rgba(var(--gx-pill-a-rgb),.38),
+  0 0 36px rgba(var(--gx-pill-b-rgb),.22);
 }
 html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-review{
  --gx-pill-a-rgb:124,77,255;--gx-pill-b-rgb:0,242,254;
@@ -1188,7 +1213,15 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-overdue{
 html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-paid{
  --gx-pill-a-rgb:0,255,157;--gx-pill-b-rgb:124,77,255;
 }
-@keyframes gx-r9-liquid{from{background-position:0% 50%}to{background-position:100% 50%}}
+/* Las dos manchas derivan en sentidos opuestos y a mitad del ciclo
+   se cruzan por el centro (50%: una en 55% y la otra en 45%): ahí
+   se entremezclan y el brillo sube por el blend screen, sin llegar
+   a fundirse en un solo color; luego cada una vuelve a su lado. */
+@keyframes gx-r10-liquid{
+ 0%{background-position:0% 50%,100% 50%,0% 50%}
+ 50%{background-position:55% 32%,45% 68%,50% 50%}
+ 100%{background-position:100% 50%,0% 50%,100% 50%}
+}
 /* 2c · Respiración del anillo de lealtad: solo escala del wrapper. */
 html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{
  animation:gx-r8-breathe 5s ease-in-out infinite alternate;

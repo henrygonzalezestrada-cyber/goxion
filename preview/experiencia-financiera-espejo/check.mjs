@@ -75,16 +75,20 @@ async function run(name,engine){
    // agradó y se comportaba extraño al contraer): no debe quedar
    // ::before con animación detrás del importe. El glow vive ahora
    // en la píldora de estado: gradiente líquido que mezcla el
-   // color principal con otro (gx-r9-liquid) y respiración de
+   // color principal con otro (gx-r10-liquid) y respiración de
    // lealtad, solo transform/opacity/background-position.
    assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').animationName),'none',
     'R9 '+name+' '+width+' hero glow must be gone');
    assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').content),'none',
     'R9 '+name+' '+width+' hero must have no ::before layer left');
-   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).animationName),'gx-r9-liquid',
-    'R9 '+name+' '+width+' badge must carry the liquid glow');
+   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).animationName),'gx-r10-liquid',
+    'R10 '+name+' '+width+' badge must carry the liquid glow');
    assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('linear-gradient'),
-    'R9 '+name+' '+width+' badge liquid glow must be a gradient');
+    'R10 '+name+' '+width+' badge liquid glow must be a gradient');
+   assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('radial-gradient'),
+    'R10 '+name+' '+width+' badge glow must have two radial liquid blobs');
+   assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundBlendMode.split(',').map(s=>s.trim()))).every(m=>m==='screen'),
+    'R10 '+name+' '+width+' badge blobs must mix with screen blend');
    assert.equal(await page.locator('#gx-b2-loyalty-mark').evaluate(el=>getComputedStyle(el).animationName),'gx-r8-breathe',
     'R8 '+name+' '+width+' loyalty mark must breathe');
    // R8 · conteo a mitad de camino: al cambiar de escenario el texto
@@ -190,6 +194,43 @@ async function run(name,engine){
    await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$94.00',null,{timeout:5000});
    await page.locator('[data-charge="b"]').click();
    await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$49.00',null,{timeout:5000});
+   // R10 · la píldora nunca se enciman en el precio al cambiar de
+   // escenario con la página ya desplazada y asentada. Causa raíz
+   // medida en la captura de Henry ($79.00, "Acción necesaria"):
+   // el morph solo repintaba con scroll/resize, así que al cambiar
+   // el texto de la píldora sin desplazar, los desplazamientos del
+   // par quedaban calculados con el ancho de la píldora ANTERIOR
+   // ("En revisión", 77 px) y la nueva (106 px) se encimaba ~5 px
+   // en el precio. refresh() repinta ahora al cambiar el contenido:
+   // con la página desplazada, cambiar de escenario y NO desplazar
+   // debe dejar el desplazamiento del importe calculado con el
+   // ancho REAL de la píldora nueva (tolerancia de redondeo 2 px)
+   // y sin solape en ningún escenario.
+   await page.locator('#gx-b2-lab-toggle').click();
+   for(const scenario of ['correction','review','extension','overdue','first_paid','multi']){
+    await page.selectOption('#gx-b2-scenario',scenario);
+    await nap(1300);
+    const pair=await page.evaluate(()=>{
+     const r=s=>{const b=document.querySelector(s).getBoundingClientRect();
+      return {l:b.left,r:b.right,t:b.top,b:b.bottom,w:b.width}};
+     const a=r('#gx-b2-hero-amount'),b=r('#gx-b2-hero-badge');
+     const cs=getComputedStyle(document.documentElement);
+     const p=window.GOXION_E1B2_INDEX.getMorphProgress();
+     const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
+     return {p:+p.toFixed(3),gap:+(b.l-a.r).toFixed(1),
+      vOverlap:+(Math.min(a.b,b.b)-Math.max(a.t,b.t)).toFixed(1),
+      hOverlap:+(Math.min(a.r,b.r)-Math.max(a.l,b.l)).toFixed(1),
+      badgeW:+b.w.toFixed(1),
+      shiftA:parseFloat(cs.getPropertyValue('--gx-rm-amount-shift'))||0,
+      expectedShift:+-((b.w+10)/2*smooth((p-.05)/.30)).toFixed(1),
+      badge:document.querySelector('#gx-b2-hero-badge').textContent};
+    });
+    assert(pair.vOverlap<=0||pair.hOverlap<=0,
+     'R10 '+name+' '+width+' '+scenario+' badge must not overlap amount after scenario change without scrolling. Geometry: '+JSON.stringify(pair));
+    assert(Math.abs(pair.shiftA-pair.expectedShift)<=2,
+     'R10 '+name+' '+width+' '+scenario+' amount shift must use the CURRENT badge width, not the previous one. Geometry: '+JSON.stringify(pair));
+   }
+   await page.locator('#gx-b2-lab-toggle').click();
    // R7 · acomodo: a mitad de scroll el precio ya viajó, el par ya está
    // separado (gap 10) y el badge nunca atraviesa el importe. Se mide
    // bajando desde arriba: el anclaje de scroll mueve el scrollY real,
@@ -230,6 +271,29 @@ async function run(name,engine){
    assert(mid.emptyBand<=16,'R7 '+name+' '+width+' hero must hug content, no empty band. Geometry: '+JSON.stringify(mid));
    assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).transitionProperty)).includes('background-color'),
     'R7 '+name+' '+width+' badge color must transition, not switch instantly');
+   // R10 · asentamiento al soltar: si el cliente suelta a mitad de
+   // scroll, el morph termina de acomodarse al extremo más cercano
+   // (expandido o compacto) en vez de quedarse la píldora a medias.
+   // El ancla compacta es min(172, máximo desplazamiento de la
+   // página). Se suelta a 120 px (mitad alta) y a 30 px (mitad baja)
+   // y se exige terminar en el extremo correspondiente, sin tocar
+   // el morph por su cuenta (el scrollY es el que se mueve).
+   for(const [from,expect] of [[120,'compact'],[30,'expanded']]){
+    await page.evaluate(yy=>window.scrollTo(0,yy),from);
+    await nap(2600);
+    const settled=await page.evaluate(()=>{
+     const maxScroll=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+     return {y:window.scrollY,anchor:Math.min(172,maxScroll),
+      p:window.GOXION_E1B2_INDEX.getMorphProgress()};
+    });
+    if(expect==='compact'){
+     assert(Math.abs(settled.y-settled.anchor)<=4,
+      'R10 '+name+' '+width+' releasing mid-scroll must settle to the compact end. Settled: '+JSON.stringify(settled));
+    }else{
+     assert(settled.y<=4,
+      'R10 '+name+' '+width+' releasing low must settle to the expanded end. Settled: '+JSON.stringify(settled));
+    }
+   }
    await page.evaluate(()=>window.scrollTo(0,0));
    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()<.01,null,
     {timeout:6000,polling:50});
