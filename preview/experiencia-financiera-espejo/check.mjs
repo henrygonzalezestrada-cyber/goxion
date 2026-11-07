@@ -113,10 +113,50 @@ async function run(name,engine){
    await page.locator('[data-mode="all"]').click();
    assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$94.00',
     'Total of period must be secondary and different from next due');
+   // R7 · pulso de importe al cambiar Próximo ↔ Todo junto: valores
+   // exactos, sin conteo. La animación WAAPI (no la CSS del libro)
+   // es la que debe existir sobre el total seleccionado.
+   assert(await page.locator('#gx-b2-selected-total').evaluate(el=>
+     el.getAnimations().some(a=>!(a instanceof CSSAnimation))),
+    'R7 '+name+' '+width+' selected total must pulse on exact value change');
    assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00',
     'Hero must not replace next due with entire period');
    await page.locator('[data-charge="b"]').click();
    assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$49.00');
+   // R7 · acomodo: a mitad de scroll el precio ya viajó, el par ya está
+   // separado (gap 10) y el badge nunca atraviesa el importe. Se mide
+   // bajando desde arriba: el anclaje de scroll mueve el scrollY real,
+   // así que se busca la banda de progreso 0.35–0.60 probando
+   // posiciones hasta entrar en ella.
+   let mid=null;
+   for(const y of [120,150,100,170,90]){
+    await page.evaluate(yy=>window.scrollTo(0,yy),y);
+    try{
+     await page.waitForFunction(()=>{const p=window.GOXION_E1B2_INDEX.getMorphProgress();return p>=.35&&p<=.6},{timeout:3000,polling:50});
+     mid=await page.evaluate(()=>{
+      const r=s=>{const b=document.querySelector(s).getBoundingClientRect();
+       return {l:b.left,r:b.right,t:b.top,b:b.bottom,w:b.width,h:b.height}};
+      const a=r('#gx-b2-hero-amount'),b=r('#gx-b2-hero-badge'),h=r('#gx-b2-hero');
+      return {p:+window.GOXION_E1B2_INDEX.getMorphProgress().toFixed(3),
+       gap:+(b.l-a.r).toFixed(1),
+       vOverlap:+(Math.min(a.b,b.b)-Math.max(a.t,b.t)).toFixed(1),
+       emptyBand:+(h.b-Math.max(a.b,b.b)).toFixed(1),
+       amountFont:+parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-amount')).fontSize).toFixed(1),
+       heroH:+h.h.toFixed(1)};
+     });
+     break;
+    }catch{}
+   }
+   assert(mid,'R7 '+name+' '+width+' morph did not reach mid-scroll band');
+   assert(mid.gap>=8,'R7 '+name+' '+width+' compact pair must be separated mid-scroll. Geometry: '+JSON.stringify(mid));
+   assert(mid.amountFont<=32,'R7 '+name+' '+width+' price must travel first. Geometry: '+JSON.stringify(mid));
+   assert(mid.vOverlap<=0||mid.gap>=0,'R7 '+name+' '+width+' badge must never cross the amount. Geometry: '+JSON.stringify(mid));
+   assert(mid.emptyBand<=16,'R7 '+name+' '+width+' hero must hug content, no empty band. Geometry: '+JSON.stringify(mid));
+   assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).transitionProperty)).includes('background-color'),
+    'R7 '+name+' '+width+' badge color must transition, not switch instantly');
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()<.01,null,
+    {timeout:6000,polling:50});
    // Scroll morph is a real relocation of the same DOM nodes, not a cloned hero.
    // Height temporarily reduced so even desktop-width scenarios can scroll.
    const expanded=await page.evaluate(()=>{
@@ -270,6 +310,18 @@ async function run(name,engine){
    assert(await page.locator('#gx-b2-lab').evaluate(el=>el.hidden));
    await page.locator('#gx-b2-action').click();
    assert.equal(await page.locator('#gx-b2-demo-modal').evaluate(el=>el.hidden),false);
+   // R7 · hoja de reporte con entrada de resorte + blur, y copiar CLABE
+   // con icono que se transforma a check, sin toast genérico.
+   assert.equal(await page.locator('#gx-b2-demo-modal .gx-b2-demo-modal').evaluate(el=>getComputedStyle(el).animationName),'gx-r7-sheet-in',
+    'R7 '+name+' '+width+' report sheet must enter with spring + blur');
+   await page.locator('#gx-b2-copy-clabe').click();
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-copy-clabe').classList.contains('is-copied'),null,{timeout:3000});
+   assert.equal(await page.locator('#gx-b2-copy-state').textContent(),'Copiado');
+   // La transición del icono dura .25 s: esperar a que llegue a 1 en
+   // vez de muestrear el valor inicial del cambio de estilo.
+   await page.waitForFunction(()=>getComputedStyle(document.querySelector('#gx-b2-copy-clabe .gx-b2-copy-check')).opacity==='1',null,{timeout:3000,polling:50});
+   assert.equal(await page.locator('#gx-b2-copy-clabe').evaluate(el=>getComputedStyle(el.querySelector('.gx-b2-copy-check')).opacity),'1');
+   assert.equal(await page.locator('[role="status"],[role="alert"]').count(),0,'R7 copy must not show a generic toast');
    await page.locator('#gx-b2-demo-submit').click();
    assert.equal(await page.locator('#gx-b2-demo-modal').evaluate(el=>el.hidden),true);
    assert.equal(await page.locator('#gx-b2-hero-badge').textContent(),'En revisión');

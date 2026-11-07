@@ -1062,3 +1062,74 @@ html[data-gx-index-remaster="r3"] .gx-b2-calendar-row-side strong{color:#b5c3d9}
 html[data-gx-index-remaster="r3"] #gx-b2-breakdown .breakdown-line span:last-child{color:#b5c3d9}
 html[data-gx-index-remaster="r3"] #gx-b2-breakdown .gx-b2-breakdown-title{color:#9ca7c6}
 html[data-gx-index-remaster="r3"] .gx-b2-proof-eyebrow{color:#9ca7c6}
+
+/* ================================================================
+   R7 · ANIMACIONES PREMIUM + ACOMODO DEL MORPH · preview scope only
+   Solo transform/opacity, misma curva del morph, reduced-motion
+   respetado. Sin secciones nuevas, sin duplicar información, sin
+   tocar el blur 25px ni el cristal del sticky, sin tocar el motor
+   financiero ni los importes exactos de los fixtures.
+   ================================================================
+   1. Pulso de importe (JS, estado.js): escala 1.04→1 en 300 ms con
+      cubic-bezier(.2,.78,.24,1) al cambiar el valor exacto — hero y
+      total seleccionado (Próximo ↔ Todo junto). Nunca conteo.
+   2. Badge: el cambio de color entre estados (ok/revisión/vencido/
+      pagado) pasa de instantáneo a transición suave de .25 s, solo
+      en propiedades de color. El transform lo sigue moviendo el
+      morph por JS y NO se transiciona.
+   3. Fila activa del calendario: se conserva el lavado cian y el
+      chevron Morphicons (sin rotar). Sin cambios en R7; verificado
+      por check.mjs.
+   4. Hoja de reporte: la hoja del modal entra con resorte
+      (translateY 16px + escala .97 + blur 3px → nítida) en .45 s.
+   5. Copiar CLABE de ejemplo: el icono se transforma a check (sin
+      toast). La CLABE es ficticia (ceros) y vive solo en la hoja.
+   6. Acomodo del morph: vive en estado.js (curvas pp/pb/paired y
+      alto del hero derivado del contenido medido). Sin Block 3.
+   ================================================================ */
+/* 2 · El badge cambia de color con transición suave, no de golpe. */
+html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
+ transition:background-color .25s ease,border-color .25s ease,
+  box-shadow .25s ease,color .25s ease;
+}
+/* 4 · Hoja de reporte: entrada de resorte + blur. La animación manda
+   sobre la transición de index.css mientras dura; al terminar queda
+   en translateY(0) scale(1) sin salto, igual que el estado final. */
+html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
+ animation:gx-r7-sheet-in .45s cubic-bezier(.2,.9,.25,1.12) both;
+}
+@keyframes gx-r7-sheet-in{
+ from{opacity:.55;transform:translateY(16px) scale(.97);filter:blur(3px)}
+ to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}
+}
+/* 5 · CLABE de ejemplo dentro de la hoja existente (no es sección
+   nueva): fila compacta con el número ficticio y el botón copiar. */
+.gx-b2-clabe{display:flex;align-items:center;justify-content:space-between;gap:12px;
+ border-top:1px solid rgba(255,255,255,.08);margin-top:16px;padding-top:15px;text-align:left}
+.gx-b2-clabe-text{display:flex;flex-direction:column;gap:3px;min-width:0}
+.gx-b2-clabe-text span{font-size:9px;letter-spacing:1.4px;font-weight:800;color:var(--neon-blue)}
+.gx-b2-clabe-text strong{font-size:15px;font-weight:700;letter-spacing:.04em;color:#f2f2f6;
+ font-variant-numeric:tabular-nums;white-space:nowrap}
+.gx-b2-clabe-text small{font-size:9px;color:var(--text-muted)}
+.gx-b2-copy{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;min-height:40px;
+ padding:0 12px;border-radius:12px;border:1px solid rgba(0,242,254,.28);
+ background:rgba(0,242,254,.06);color:var(--neon-blue);
+ font:700 11px/1 Poppins,system-ui,sans-serif;cursor:pointer;
+ transition:border-color .25s ease,background-color .25s ease,color .25s ease}
+.gx-b2-copy:focus-visible{outline:2px solid var(--neon-blue);outline-offset:2px}
+.gx-b2-copy-icons{position:relative;width:17px;height:17px;flex:0 0 17px}
+.gx-b2-copy-icons svg{position:absolute;inset:0;width:17px;height:17px;
+ fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+ transition:opacity .25s cubic-bezier(.2,.8,.2,1),transform .25s cubic-bezier(.2,.8,.2,1)}
+.gx-b2-copy-check{opacity:0;transform:scale(.5)}
+.gx-b2-copy.is-copied{border-color:rgba(0,255,157,.4);background:rgba(0,255,157,.07);
+ color:var(--success-neon)}
+.gx-b2-copy.is-copied .gx-b2-copy-icon{opacity:0;transform:scale(.5)}
+.gx-b2-copy.is-copied .gx-b2-copy-check{opacity:1;transform:scale(1)}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge,
+ .gx-b2-copy,.gx-b2-copy-icons svg{transition:none!important}
+ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
+  animation:none!important;
+ }
+}
