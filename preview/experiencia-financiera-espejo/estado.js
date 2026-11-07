@@ -485,12 +485,30 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  * extremos 116/36 px, badge top 80→2 px, barra compacta en p≈0.35,
  * gap 10 px, blur 25 px. La corrección R10 (sin solape) y el
  * asentamiento al soltar se conservan; la píldora sigue SIN glow.
+ *
+ * R14 · encabezado compacto en 3 zonas (2026-11-07): con todo
+ * centrado el encabezado compacto se sentía desperdiciado, así que
+ * en p≈1 el par deja de ser un grupo centrado y se reparte: precio
+ * a la IZQUIERDA, píldora al CENTRO y botón "Mi Espacio" a la
+ * DERECHA (mismo alto que la píldora, cian con texto oscuro).
+ * Segunda fase del morph: hasta p≈0.75 todo sigue igual que R12
+ * (par centrado); de 0.75→1 el precio desliza a la izquierda, la
+ * píldora vuelve al centro y el botón entra con opacidad. El estado
+ * expandido (p=0) queda idéntico, centrado. La píldora se ajusta
+ * con max-width calculado (nunca se encima del precio ni del botón,
+ * con ellipsis si el texto es largo y la pantalla estrecha).
+ * El botón solo tiene pointer-events en compacto y lleva a
+ * ayuda.html, el mismo destino que usa el Index oficial ("Ir a Mi
+ * Espacio", assets/js/index/01-index-supabase-layer.js:263).
  */
 function setupHeaderMorph(){
  const root=document.documentElement;
  const reduced=matchMedia('(prefers-reduced-motion:reduce)');
  let value=0,goal=0,frame=0,watchdog=0,lastTick=0,lastScroll=0;
  let measureKey='',moneyWidth=0,statusWidth=0,amountH=0,badgeH=0,lastPainted=null,heroRestH=0;
+ /* R14 · anchos de layout del hero y del botón compacto (para la
+  * fila de 3 zonas en compacto). Se miden solo al remediar. */
+ let heroW=0,btnW=0;
  /* R10 · asentamiento al soltar (ver maybeSnap): cuando el cliente
   * suelta a mitad de scroll, el morph termina de acomodarse al
   * extremo más cercano. NUNCA se fuerza el valor del morph por su
@@ -549,6 +567,9 @@ function setupHeaderMorph(){
   const pp=smooth(p/.45);
   const pb=smooth((p-.30)/.45);
   const paired=smooth((p-.05)/.30);
+  /* R14 · segunda fase del morph (0.75→1): el par centrado se
+   * reparte en 3 zonas. Hasta p≈0.75 nada cambia (spread 0). */
+  const spread=smooth((p-.75)/.25);
   const freedLabelSpace=7*smooth((p-.10)/.35);
   const amountSize=52-26*pp;
   const badgeSize=12-2*pb;
@@ -594,6 +615,12 @@ function setupHeaderMorph(){
    statusWidth=Math.max(badge.getBoundingClientRect().width,badge.scrollWidth);
    amountH=amount.offsetHeight;
    badgeH=badge.offsetHeight;
+   /* R14 · anchos de layout para la fila compacta de 3 zonas: el
+    * hero (la fila vive dentro de él) y el botón (opacity 0 pero
+    * medible: offsetWidth no depende de la opacidad). */
+   heroW=$('gx-b2-hero').offsetWidth;
+   const btn=$('gx-b2-space-btn');
+   btnW=btn?btn.offsetWidth:0;
   }
   // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
   // and the status on the RIGHT. Measure actual content to avoid oversized
@@ -614,12 +641,39 @@ function setupHeaderMorph(){
   // toca (V(p) ≠ V0 ahí). El desplazamiento del contenido es V−V0:
   // en reposo 0, en compacto ≈ −78 px.
   if(heroRestH===0||(p<.02&&remeasured))heroRestH=heroVH;
+  /* R14 · fila compacta de 3 zonas (solo con spread>0). El precio
+   * desliza del par centrado a la izquierda del hero: su centro
+   * queda a la mitad de su ancho visual desde el borde izquierdo.
+   * La píldora vuelve del desplazamiento del par al centro exacto
+   * del hero (shift 0). El botón entra con opacidad = spread y
+   * comparte la parte superior y el alto visuales de la píldora
+   * (la dy ya compensa el scale sobre el centro, así que la parte
+   * superior visual ES badgeTop y el alto visual ES badgeH×scale).
+   * La píldora se ajusta con max-width calculado: cabe entre el
+   * precio y el botón con 8 px de aire por lado, con ellipsis si
+   * el texto es largo y la pantalla estrecha; a 280 px se recorta,
+   * a 390 px cabe entera. Con spread 0 el tope vuelve a 96%. */
+  const amountVW=moneyWidth*amountScale;
+  const amountShiftBase=-(statusWidth*badgeScale+gap)*.5*paired;
+  const amountShiftLeft=-(heroW/2-amountVW/2);
+  const amountShift=amountShiftBase+(amountShiftLeft-amountShiftBase)*spread;
+  const badgeShiftBase=(moneyWidth*amountScale+gap)*.5*paired;
+  const badgeShift=badgeShiftBase*(1-spread);
+  if(spread>0){
+   const avail=heroW-2*Math.max(amountVW,btnW)-16;
+   root.style.setProperty('--gx-rm-badge-max',px(Math.max(40,avail)));
+  }else{
+   root.style.setProperty('--gx-rm-badge-max','96%');
+  }
+  root.style.setProperty('--gx-rm-space',spread.toFixed(3));
+  root.style.setProperty('--gx-rm-space-top',px(badgeTop));
+  root.style.setProperty('--gx-rm-space-h',px(badgeH*badgeScale));
   root.style.setProperty('--gx-rm-amount-scale',amountScale.toFixed(4));
   root.style.setProperty('--gx-rm-amount-dy',px(amountTop-17-amountH*(1-amountScale)/2));
-  root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth*badgeScale+gap)*.5*paired));
+  root.style.setProperty('--gx-rm-amount-shift',px(amountShift));
   root.style.setProperty('--gx-rm-badge-scale',badgeScale.toFixed(4));
   root.style.setProperty('--gx-rm-badge-dy',px(badgeTop-80-badgeH*(1-badgeScale)/2));
-  root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth*amountScale+gap)*.5*paired));
+  root.style.setProperty('--gx-rm-badge-shift',px(badgeShift));
   root.style.setProperty('--gx-rm-content-shift',px(heroVH-heroRestH));
   root.style.setProperty('--gx-rm-clip',px(116-heroVH));
   root.style.setProperty('--gx-rm-title-scale',((14-3*p)/14).toFixed(4));

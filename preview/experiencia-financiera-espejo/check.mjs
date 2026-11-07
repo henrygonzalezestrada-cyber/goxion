@@ -215,12 +215,24 @@ async function run(name,engine){
      const cs=getComputedStyle(document.documentElement);
      const p=window.GOXION_E1B2_INDEX.getMorphProgress();
      const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t)};
+     // R14 · en compacto el desplazamiento del importe ya no es el
+     // del par centrado (eso era R7/R12): de p 0.75→1 el precio
+     // desliza a la izquierda del hero. El esperado mezcla el par
+     // centrado con el borde izquierdo según el spread, con el
+     // ancho NATURAL de la píldora (scrollWidth × scale: el rect
+     // ya viene recortado por el max-width R14).
+     const heroW=document.querySelector('#gx-b2-hero').getBoundingClientRect().width;
+     const badgeScale=parseFloat(cs.getPropertyValue('--gx-rm-badge-scale'))||1;
+     const badgeNatural=document.querySelector('#gx-b2-hero-badge').scrollWidth*badgeScale;
+     const base=-((badgeNatural+10)/2)*smooth((p-.05)/.30);
+     const left=-(heroW/2-a.w/2);
+     const spread=smooth((p-.75)/.25);
      return {p:+p.toFixed(3),gap:+(b.l-a.r).toFixed(1),
       vOverlap:+(Math.min(a.b,b.b)-Math.max(a.t,b.t)).toFixed(1),
       hOverlap:+(Math.min(a.r,b.r)-Math.max(a.l,b.l)).toFixed(1),
       badgeW:+b.w.toFixed(1),
       shiftA:parseFloat(cs.getPropertyValue('--gx-rm-amount-shift'))||0,
-      expectedShift:+-((b.w+10)/2*smooth((p-.05)/.30)).toFixed(1),
+      expectedShift:+(base+(left-base)*spread).toFixed(1),
       badge:document.querySelector('#gx-b2-hero-badge').textContent};
     });
     assert(pair.vOverlap<=0||pair.hOverlap<=0,
@@ -365,6 +377,7 @@ async function run(name,engine){
     const br=document.querySelector('#gx-b2-hero-badge').getBoundingClientRect();
     const cs=getComputedStyle(document.documentElement);
     const c=getComputedStyle(document.querySelector('#gx-b2-sticky')).clipPath;
+    const btn=document.querySelector('#gx-b2-space-btn');
     return {font:parseFloat(getComputedStyle(a).fontSize),height:hr.height,
      stickyH:document.querySelector('#gx-b2-sticky').getBoundingClientRect().height,
      amountH:+ar.height.toFixed(1),
@@ -372,8 +385,17 @@ async function run(name,engine){
      contentShift:parseFloat(cs.getPropertyValue('--gx-rm-content-shift'))||0,
      clipBottom:parseFloat((c.match(/[\d.]+/g)||['0','0','0'])[2])||0,
      amountTop:parseFloat(getComputedStyle(a).top),
-     badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top)};
+     badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top),
+     // R14 · en expandido el botón "Mi Espacio" no debe verse.
+     btnOpacity:parseFloat(getComputedStyle(btn).opacity),
+     btnText:btn.textContent,btnHref:btn.getAttribute('href')};
    });
+   // R14 · el botón compacto existe, dice "Mi Espacio" y lleva a
+   // ayuda.html (el destino oficial de "Ir a Mi Espacio"), pero en
+   // expandido no se ve.
+   assert.equal(expanded.btnText,'Mi Espacio','R14 '+name+' '+width+' compact button must say Mi Espacio');
+   assert(expanded.btnHref.endsWith('ayuda.html'),'R14 '+name+' '+width+' compact button must lead to Mi Espacio (ayuda.html). Href: '+expanded.btnHref);
+   assert(expanded.btnOpacity<.05,'R14 '+name+' '+width+' space button must be hidden in expanded state. Opacity: '+expanded.btnOpacity);
    await page.setViewportSize({width,height:550});
    await page.evaluate(()=>window.scrollTo(0,330));
    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.getMorphProgress?.()>.992,null,
@@ -382,6 +404,7 @@ async function run(name,engine){
     const a=document.querySelector('#gx-b2-hero-amount').getBoundingClientRect();
     const b=document.querySelector('#gx-b2-hero-badge').getBoundingClientRect();
     const hero=document.querySelector('#gx-b2-hero').getBoundingClientRect();
+    const s=document.querySelector('#gx-b2-space-btn').getBoundingClientRect();
     const cs=getComputedStyle(document.documentElement);
     const c=getComputedStyle(document.querySelector('#gx-b2-sticky')).clipPath;
     return {
@@ -399,6 +422,11 @@ async function run(name,engine){
      labelOpacity:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-label')).opacity),
      amountCenter:a.left+a.width/2,badgeCenter:b.left+b.width/2,
      badgeLeft:b.left,badgeRight:b.right,amountRight:a.right,
+     amountLeft:+a.left.toFixed(1),badgeH:+b.height.toFixed(1),
+     heroLeft:+hero.left.toFixed(1),heroRight:+hero.right.toFixed(1),
+     heroCenter:+((hero.left+hero.right)/2).toFixed(1),
+     btn:{l:+s.left.toFixed(1),r:+s.right.toFixed(1),h:+s.height.toFixed(1),
+      o:parseFloat(getComputedStyle(document.querySelector('#gx-b2-space-btn')).opacity)},
      vw:document.documentElement.clientWidth,
      stickyTop:document.querySelector('#gx-b2-sticky').getBoundingClientRect().top
     };
@@ -426,11 +454,25 @@ async function run(name,engine){
    
    assert(collapsed.amountCenter<collapsed.badgeCenter,
     name+' '+width+' amount must sit LEFT of the badge');
-   assert(collapsed.badgeLeft>=collapsed.amountRight+2,
-    name+' '+width+' compact badge should not overlap the amount. Geometry: '+
-     JSON.stringify({expanded,collapsed}));
-   assert(collapsed.badgeCenter-collapsed.amountCenter<Math.min(165,collapsed.vw*.64),
-    name+' '+width+' compact amount/status split too far apart');
+   // R14 · fila compacta de 3 zonas (reemplaza el par centrado de
+   // R7/R12: la separación precio↔píldora ya no es el gap del par,
+   // es el ancho de la fila). Precio a la izquierda del hero,
+   // píldora centrada en el hero, botón "Mi Espacio" a la derecha,
+   // 8 px de aire entre zonas y el mismo alto en píldora y botón.
+   assert(Math.abs(collapsed.amountLeft-collapsed.heroLeft)<=2,
+    'R14 '+name+' '+width+' amount must sit at the hero left edge in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(Math.abs(collapsed.badgeCenter-collapsed.heroCenter)<=3,
+    'R14 '+name+' '+width+' badge must be centered in the hero in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(collapsed.badgeLeft>=collapsed.amountRight+8,
+    'R14 '+name+' '+width+' compact badge must clear the amount by 8px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(collapsed.btn.l>=collapsed.badgeRight+8,
+    'R14 '+name+' '+width+' space button must clear the badge by 8px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(Math.abs(collapsed.btn.r-collapsed.heroRight)<=2,
+    'R14 '+name+' '+width+' space button must sit at the hero right edge. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(Math.abs(collapsed.btn.h-collapsed.badgeH)<=2,
+    'R14 '+name+' '+width+' space button must match the badge height. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(collapsed.btn.o>.95,
+    'R14 '+name+' '+width+' space button must be visible in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(collapsed.badgeLeft>=-2&&collapsed.amountRight<=collapsed.vw+2,
     name+' '+width+' collapsed header overflows horizontally');
    assert(Math.abs(collapsed.stickyTop)<4,name+' '+width+' sticky header left viewport');
