@@ -89,8 +89,12 @@ function hero(){
  if(blocked){caption='Saldo por confirmar';badge='Sin cotización';cls='badge-overdue';tone='blocked'}
  else if(phase==='review'){caption='Importe pendiente';badge='En revisión';cls='badge-review';tone='review'}
  else if(phase==='correction'){caption='Importe pendiente';badge='Acción necesaria';cls='badge-overdue';tone='correction'}
- else if(active().some(c=>c.mora>0)){caption='Importe vencido';badge='Venció · '+shortDate(next.date);cls='badge-overdue';tone='overdue'}
- else if(active().some(c=>c.extension)){badge='Prórroga · '+shortDate(next.date);cls='badge-ok';tone='extension'}
+ /* R13 · la píldora se deriva del cargo PRÓXIMO (next), no de
+  * cualquier pendiente: antes bastaba que algún cargo del período
+  * tuviera mora para que la píldora dijera "vencido" aunque el
+  * próximo pago estuviera al corriente. */
+ else if(next.rows.some(c=>c.mora>0)){caption='Importe vencido';badge='Venció · '+shortDate(next.date);cls='badge-overdue';tone='overdue'}
+ else if(next.rows.some(c=>c.extension)){badge='Prórroga · '+shortDate(next.date);cls='badge-ok';tone='extension'}
  else if(!next.date){caption='Saldo pendiente';badge='Al corriente';cls='badge-paid';tone='clear'}
  const root=document.documentElement;
  root.dataset.gxB2Tone=tone;
@@ -161,8 +165,13 @@ function calendar(){
  list.innerHTML=Q.cargos.slice().sort((a,b)=>fx.due(a).localeCompare(fx.due(b))).map(c=>{
   const isActive=(mode==='all'&&!c.paid)||(mode==='single'&&selected===c.id)||
     (mode==='next'&&fx.next(Q).rows.some(r=>r.id===c.id));
+  /* R13 · cada fila lleva su estado propio, derivado de la
+   * cotización del cargo (mora / prórroga / abono), no solo de la
+   * selección: la fila activa ya era por cotización, pero el estado
+   * del cargo no tenía clase. Sin cambiar textos ni estructura. */
+  const stateCls=c.paid?'':c.mora>0?'is-overdue ':c.extension?'is-extension ':c.abono>0?'is-partial ':'';
   const effective=fx.due(c),displayDate=fx.date(effective);
-  return '<button class="gx-b2-calendar-row '+(isActive?'is-active ':'')+(c.paid?'is-paid':'')+
+  return '<button class="gx-b2-calendar-row '+(isActive?'is-active ':'')+stateCls+(c.paid?'is-paid':'')+
     '" type="button" data-charge="'+safe(c.id)+'" '+(c.paid?'disabled':'')+'>'+
     '<span class="gx-b2-calendar-row-main"><strong>'+safe(c.name)+'</strong>'+
     '<small>'+safe(displayDate)+' · '+safe(status(c))+'</small></span>'+
@@ -302,12 +311,30 @@ function actions(){
 }
 function refresh(){
  hero();services();calendar();breakdown();proof();loyalty();actions();
+ /* R13 · si la hoja está abierta, su importe se re-sincroniza con
+  * la selección viva en cada refresh (ver syncModalAmount). */
+ if(!$('gx-b2-demo-modal').hidden)syncModalAmount();
  /* R10 · hero() pudo cambiar el texto de la píldora (o del importe)
   * sin que hubiera scroll: repintar el morph aquí para que los
   * desplazamientos del par compacto se midan con los anchos reales
   * del texto nuevo, no con los de la píldora anterior. */
  morphController.repaint();
  $('gx-b2-scenario').value=key;
+}
+/* R13 · importe vivo de la hoja de reporte: lo que muestra y lo
+ * que se reporta se construye SIEMPRE desde la selección viva
+ * (current(): Próximo / Todo junto / un cargo), nunca desde un
+ * valor capturado al abrir. Se llama al abrir y en cada refresh()
+ * con la hoja abierta, y el botón de envío lleva el importe y los
+ * cargos en data-* para que el reporte use la cotización viva del
+ * momento de enviar. La CLABE sigue siendo la ficticia de
+ * demostración; al integrar a la oficial se liga a los datos
+ * reales de Nu (ver doc R13). */
+function syncModalAmount(){
+ const sel=current(),btn=$('gx-b2-demo-submit'),amount=$('gx-b2-modal-amount');
+ if(amount)amount.textContent=fx.money(sel.total);
+ if(btn){btn.dataset.amountCents=String(sel.total);
+  btn.dataset.cargoIds=JSON.stringify(sel.rows.map(r=>r.id));}
 }
 function openDemo(){
  const Q=quote(),review=Q.proof==='correction';
@@ -318,7 +345,7 @@ function openDemo(){
  $('gx-b2-modal-desc').textContent=review
   ?'Revisa la observación y corrige tu comprobante. Aún no está aprobado.'
   :'Adjunta tu comprobante para revisión. Se acredita al aprobarlo.';
- $('gx-b2-modal-amount').textContent=fx.money(current().total);
+ syncModalAmount();
  $('gx-b2-demo-submit').hidden=review;
  dialog.hidden=false;dialog.classList.add('show');dialog.setAttribute('aria-hidden','false');
  document.documentElement.classList.add('gx-b2-modal-open');
@@ -388,6 +415,9 @@ $('gx-b2-demo-modal').addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('gx-b2-demo-modal').hidden)closeDemo()});
 $('gx-b2-demo-submit').addEventListener('click',()=>{
+ /* R13 · el envío reporta la selección viva del momento de enviar,
+  * no la de la apertura: se re-sincroniza antes de cerrar. */
+ syncModalAmount();
  closeDemo();key='review';mode='next';selected=null;open=false;
  const url=new URL(location.href);url.searchParams.set('escenario',key);
  history.replaceState(null,'',url.pathname+url.search);
@@ -672,6 +702,12 @@ function setupHeaderMorph(){
    * máximo alejaría del final del morph en vez de acercar. */
   const anchor=Math.min(172,maxScroll);
   const y=window.scrollY;
+  /* R13 · el snap solo vive en la zona del morph (0–172 px). Antes,
+   * soltar en cualquier punto bajo de la página (scrollY >> 172)
+   * asentaba a 172 y la página regresaba al centro como un resorte,
+   * tapando los botones de pago de abajo. Fuera de la zona del
+   * morph, no tocar el scroll para nada. */
+  if(y>anchor)return;
   const target=y<anchor/2?0:anchor;
   if(Math.abs(y-target)<4)return;
   animateSnap(target);
