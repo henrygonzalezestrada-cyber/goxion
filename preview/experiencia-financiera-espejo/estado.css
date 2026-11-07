@@ -1133,3 +1133,60 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
   animation:none!important;
  }
 }
+
+/* ================================================================
+   R8 · CONTEO DEL IMPORTE + AMBIENTE VIVO · preview scope only
+   Solo transform/opacity, intensidad baja, reduced-motion
+   respetado. Sin secciones nuevas, sin duplicar información, sin
+   tocar el morph (R5.2/R7 intacto), el blur 25px ni el cristal.
+   ================================================================
+   1. Conteo (JS, estado.js): 700 ms ease-out hasta el valor exacto,
+      solo al cargar y al cambiar el valor; se cancela con el scroll.
+   2. Ambiente: la lava YA se mueve sola en index.css (lavaFluid
+      10–14 s); R8 no la duplica. Lo vivo aquí es solo:
+        · respiración del glow del hero (opacidad .55→.75, 6 s);
+        · brillo tenue del badge (un barrido cada 7 s, sin parpadeo);
+        · respiración del anillo de lealtad (escala 1→1.025, 5 s).
+      Nada de tilt ni movimientos bruscos; nada compite con el
+      importe protagonista. Todo se pausa si la pestaña no está
+      visible (html.gx-r8-paused, JS) y se apaga con
+      prefers-reduced-motion.
+   ================================================================ */
+/* 2a · Glow del hero: capa detrás del importe, solo opacidad. */
+html[data-gx-index-remaster="r3"] #gx-b2-hero::before{
+ content:"";position:absolute;inset:0;pointer-events:none;
+ background:radial-gradient(ellipse 60% 55% at 50% 42%,
+  rgba(0,242,254,.14),rgba(124,77,255,.07) 55%,transparent 75%);
+ opacity:.55;animation:gx-r8-glow 6s ease-in-out infinite alternate;
+}
+@keyframes gx-r8-glow{from{opacity:.55}to{opacity:.75}}
+/* 2b · Brillo del badge: un barrido tenue cada 7 s. El ::after es
+   absoluto, así que no mueve el layout del badge ni su texto. */
+html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge::after{
+ content:"";position:absolute;top:0;bottom:0;left:0;width:45%;
+ pointer-events:none;
+ background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);
+ transform:translateX(-220%);opacity:0;
+ animation:gx-r8-sheen 7s ease-in-out infinite;
+}
+@keyframes gx-r8-sheen{
+ 0%{transform:translateX(-220%);opacity:0}
+ 18%{opacity:1}
+ 45%{transform:translateX(320%);opacity:0}
+ 100%{transform:translateX(320%);opacity:0}
+}
+/* 2c · Respiración del anillo de lealtad: solo escala del wrapper. */
+html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{
+ animation:gx-r8-breathe 5s ease-in-out infinite alternate;
+}
+@keyframes gx-r8-breathe{from{transform:scale(1)}to{transform:scale(1.025)}}
+/* Pausa cuando la pestaña no está visible (JS: visibilitychange). */
+html.gx-r8-paused #gx-b2-hero::before,
+html.gx-r8-paused #gx-b2-hero .time-badge::after,
+html.gx-r8-paused #gx-b2-loyalty-mark{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-index-remaster="r3"] #gx-b2-hero::before,
+ html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge::after,
+ html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{animation:none!important}
+ html[data-gx-index-remaster="r3"] #gx-b2-hero::before{opacity:.45}
+}
