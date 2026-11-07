@@ -304,6 +304,50 @@ async function run(name,engine){
    await page.evaluate(()=>window.scrollTo(0,0));
    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()<.01,null,
     {timeout:6000,polling:50});
+   // R13 · el snap solo vive en la zona del morph: bajar al final
+   // de la página y soltar NO debe regresar al centro (antes el
+   // snap asentaba a 172 px desde cualquier scrollY y la página
+   // volvía como un resorte, tapando los botones de pago). Solo
+   // en 390 px para no encarecer la corrida.
+   if(width===390){
+    const bottom=await page.evaluate(()=>{
+     window.scrollTo(0,document.documentElement.scrollHeight);
+     return window.scrollY;
+    });
+    await nap(2600);
+    const stayed=await page.evaluate(()=>window.scrollY);
+    assert(stayed>=bottom-4,'R13 '+name+' '+width+' releasing at page bottom must stay down, not snap back to 172. Bottom: '+bottom+' stayed: '+stayed);
+    // R13 · importe vivo de la hoja: en multi, Próximo $45.00 y
+    // Todo junto $94.00, y el botón de envío lleva la selección
+    // viva en data-*.
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.locator('#gx-b2-calendar-toggle').click();
+    await page.locator('[data-mode="all"]').click();
+    await page.locator('#gx-b2-action').click();
+    assert.equal(await page.locator('#gx-b2-modal-amount').textContent(),'$94.00',
+     'R13 '+name+' '+width+' report sheet must show the live Todo junto total');
+    assert.equal(await page.locator('#gx-b2-demo-submit').getAttribute('data-amount-cents'),'9400',
+     'R13 '+name+' '+width+' report submit must carry the live total');
+    await page.locator('#gx-b2-close').click();
+    // R13 · fila con mora lleva su clase de estado (overdue
+    // tiene mora en el primer cargo: $47.25). Se cambia de
+    // escenario por evento, sin depender del estado del panel.
+    await page.evaluate(()=>{const s=document.querySelector('#gx-b2-scenario');
+     s.value='overdue';s.dispatchEvent(new Event('change',{bubbles:true}))});
+    await page.locator('#gx-b2-calendar-toggle').click();
+    assert.equal(await page.locator('.gx-b2-calendar-row.is-overdue').count(),1,
+     'R13 '+name+' '+width+' overdue charge row must carry its state class');
+    assert((await page.locator('#gx-b2-hero-badge').textContent()).includes('Venció'),
+     'R13 '+name+' '+width+' badge must derive from the next charge state');
+    await page.evaluate(()=>{const s=document.querySelector('#gx-b2-scenario');
+     s.value='multi';s.dispatchEvent(new Event('change',{bubbles:true}))});
+    // R13 · dejar la página en reposo (scroll 0): el clic en el
+    // botón de acción baja la página para enfocar, y la sección
+    // siguiente mide el estado expandido asumiendo scroll 0.
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()<.01,null,
+     {timeout:6000,polling:50});
+   }
    // Scroll morph is a real relocation of the same DOM nodes, not a cloned hero.
    // Height temporarily reduced so even desktop-width scenarios can scroll.
    // R12 · solo-transform: el alto del hero y del sticky son FIJOS

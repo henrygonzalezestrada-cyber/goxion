@@ -32,6 +32,12 @@ html[data-gx-b2-index-demo="true"] .header{position:relative;min-height:30px}
  text-align:left;font-family:Poppins,system-ui,sans-serif;cursor:pointer;width:100%}
 .gx-b2-calendar-row.is-active .gx-b2-calendar-row-side strong{color:var(--neon-blue)}
 .gx-b2-calendar-row.is-paid{opacity:.64;cursor:default}
+/* R13 · el estado de cada cargo se ve en su fila (derivado de la
+ * cotización: mora / prórroga / abono), sin tocar textos ni
+ * estructura: solo el tinte de la etiqueta lateral. */
+.gx-b2-calendar-row.is-overdue .gx-b2-calendar-row-side small{color:#ff7a9c}
+.gx-b2-calendar-row.is-extension .gx-b2-calendar-row-side small{color:var(--neon-blue)}
+.gx-b2-calendar-row.is-partial .gx-b2-calendar-row-side small{color:#5eeab0}
 .gx-b2-calendar-row-main{min-width:0;display:flex;flex-direction:column;gap:5px}
 .gx-b2-calendar-row-main strong{font-size:12px;font-weight:700}
 .gx-b2-calendar-row-main small{font-size:10px;color:var(--text-muted);line-height:1.5}
