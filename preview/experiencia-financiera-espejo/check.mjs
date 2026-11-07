@@ -46,8 +46,9 @@ async function run(name,engine){
    await page.waitForURL('**/experiencia-financiera-espejo/estado.html?escenario=multi',{timeout:5000});
    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.isolated&&window.GOXION_ANIMATEUI_NATIVE?.actualReactComponents,{timeout:7000});
    await page.locator('#gx-b2-loyalty-mark .gx-aui-loyalty-orbit').waitFor({timeout:4000});
-   assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00');
-   assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$45.00');
+   // R8 · el importe suma al cargar (700 ms): esperar al valor exacto.
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-hero-amount').textContent==='$45.00',null,{timeout:5000});
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total')?.textContent==='$45.00',null,{timeout:5000});
    if(name==='Chromium'&&width===390){
     console.log('GX_R5_SHOT_MULTI='+(await page.screenshot({type:'png',fullPage:true})).toString('base64'));
    }
@@ -70,6 +71,33 @@ async function run(name,engine){
    assert.equal(await page.locator('#gx-b2-services')
     .evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(8, 8, 12, 0.25)');
 
+   // R8 · ambiente vivo: glow del hero, brillo del badge y respiración
+   // de lealtad existen y son solo transform/opacity (keyframes R8).
+   assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').animationName),'gx-r8-glow',
+    'R8 '+name+' '+width+' hero glow must breathe');
+   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el,'::after').animationName),'gx-r8-sheen',
+    'R8 '+name+' '+width+' badge sheen must exist');
+   assert.equal(await page.locator('#gx-b2-loyalty-mark').evaluate(el=>getComputedStyle(el).animationName),'gx-r8-breathe',
+    'R8 '+name+' '+width+' loyalty mark must breathe');
+   // R8 · conteo a mitad de camino: al cambiar de escenario el texto
+   // pasa por valores intermedios exactos (nunca falsos ni $45.72
+   // a mitad de morph) y termina en el valor exacto.
+   await page.locator('#gx-b2-lab-toggle').click();
+   await page.selectOption('#gx-b2-scenario','upcoming');
+   await page.waitForFunction(()=>{
+    const t=document.querySelector('#gx-b2-hero-amount').textContent;
+    const v=parseFloat(t.replace(/[^0-9.]/g,''));
+    return t!=='$45.00'&&t!=='$89.00'&&v>45&&v<89;
+   },null,{timeout:5000,polling:50});
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-hero-amount').textContent==='$89.00',null,{timeout:5000});
+   // R8 · cancelar con scroll: al desplazar, el conteo se corta y el
+   // valor exacto queda de inmediato, sin números a medias.
+   await page.selectOption('#gx-b2-scenario','multi');
+   await page.evaluate(()=>window.scrollTo(0,120));
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-hero-amount').textContent==='$45.00',null,{timeout:3000});
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()<.01,null,{timeout:6000,polling:50});
+   await page.locator('#gx-b2-lab-toggle').click();
    assert.equal(await page.locator('#gx-b2-calendar-body').evaluate(el=>el.hidden),true);
    // The *actual* Ayuda Morphicons 1.5.0 DOM driver animates this path,
    // not a rotated Unicode glyph or a guessed CSS chevron.
@@ -111,18 +139,24 @@ async function run(name,engine){
    assert.equal(await page.locator('[data-charge]').count(),2);
    assert.match(await page.locator('#gx-b2-calendar-list').innerText(),/6 de noviembre/i);
    await page.locator('[data-mode="all"]').click();
-   assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$94.00',
-    'Total of period must be secondary and different from next due');
+   // R8 · el total seleccionado suma hasta $94.00 (700 ms) y aterriza
+   // con el pulso R7; esperar al valor exacto antes de afirmar.
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$94.00',null,{timeout:5000});
    // R7 · pulso de importe al cambiar Próximo ↔ Todo junto: valores
-   // exactos, sin conteo. La animación WAAPI (no la CSS del libro)
-   // es la que debe existir sobre el total seleccionado.
-   assert(await page.locator('#gx-b2-selected-total').evaluate(el=>
-     el.getAnimations().some(a=>!(a instanceof CSSAnimation))),
-    'R7 '+name+' '+width+' selected total must pulse on exact value change');
+   // exactos. La animación WAAPI (no la CSS del libro) es la que
+   // debe existir sobre el total seleccionado; el pulso corre al
+   // terminar el conteo R8 (300 ms), así que se espera a verlo
+   // aparecer en vez de muestrear un instante fijo (los frames
+   // rAF pueden ir lentos en headless y el pulso aún no habría
+   // arrancado al muestrear).
+   await page.waitForFunction(()=>{
+    const el=document.querySelector('#gx-b2-selected-total');
+    return el.getAnimations().some(a=>!(a instanceof CSSAnimation));
+   },null,{timeout:3000,polling:50});
    assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00',
     'Hero must not replace next due with entire period');
    await page.locator('[data-charge="b"]').click();
-   assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$49.00');
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$49.00',null,{timeout:5000});
    // R7 · acomodo: a mitad de scroll el precio ya viajó, el par ya está
    // separado (gap 10) y el badge nunca atraviesa el importe. Se mide
    // bajando desde arriba: el anclaje de scroll mueve el scrollY real,
@@ -229,12 +263,12 @@ async function run(name,engine){
    ];
    for(const [scenario,expected] of scenarios){
     await page.selectOption('#gx-b2-scenario',scenario);
-    assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),expected,
-     name+' '+width+' '+scenario);
+    // R8 · cada cambio de escenario suma hasta el valor exacto.
+    await page.waitForFunction(exp=>document.querySelector('#gx-b2-hero-amount').textContent===exp,expected,{timeout:5000});
     if(scenario==='same_day'){
      await page.locator('#gx-b2-calendar-toggle').click();
      assert.equal(await page.locator('[data-charge]').count(),2);
-     assert.equal(await page.locator('#gx-b2-selected-total').textContent(),'$94.00');
+     await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$94.00',null,{timeout:5000});
     }
     if(scenario==='review'){
      await page.locator('#gx-b2-proof .gx-aui-proof-review').waitFor({timeout:5000});

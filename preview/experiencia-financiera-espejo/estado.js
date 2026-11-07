@@ -26,7 +26,60 @@ function status(row){
  return 'Pendiente';
 }
 /* One factual state in the badge. Calendar/proof do not repeat it. */
-let priorAmount=null;
+let priorAmount=null,priorCents=null;
+/* R8 · conteo animado del importe (count-up) y pulso R7.
+ * El conteo solo corre al cargar y cuando cambia el valor exacto
+ * (cambio de escenario o Próximo ↔ Todo junto): 700 ms con
+ * ease-out cúbico, de centavos exactos a centavos exactos, y
+ * termina SIEMPRE en el valor exacto del escenario. Nunca corre
+ * durante el morph de scroll ni con la barra compacta: si el
+ * usuario empieza a desplazar, se cancela y deja el valor exacto
+ * (ver request() en setupHeaderMorph). Con reduced-motion no hay
+ * conteo: el valor exacto se pone de inmediato. tabular-nums ya
+ * está en CSS (R6), así que los dígitos no bailan al sumar.
+ * Al terminar el conteo se conserva el pulso R7 (1.04→1, 300 ms)
+ * como aterrizaje; es la única animación WAAPI sobre el número. */
+const reducedMotion=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
+function pulseInk(el){
+ el.getAnimations().forEach(a=>a.cancel());
+ el.animate([{opacity:.55,transform:'scale(1.04)'},
+  {opacity:1,transform:'scale(1)'}],
+  {duration:300,easing:'cubic-bezier(.2,.78,.24,1)'});
+}
+function makeCounter(){
+ let raf=0,el=null,to=0,done=null;
+ return {
+  start(node,fromCents,toCents,onDone){
+   if(raf)cancelAnimationFrame(raf);
+   el=node;to=toCents;done=onDone||null;
+   const t0=performance.now(),dur=700;
+   const step=now=>{
+    const t=Math.min(1,(now-t0)/dur);
+    const eased=1-Math.pow(1-t,3);
+    const cents=Math.round(fromCents+(toCents-fromCents)*eased);
+    if(el.isConnected)el.textContent=fx.money(cents);
+    if(t<1){raf=requestAnimationFrame(step)}
+    else{raf=0;const d=done;done=null;if(d)d()}
+   };
+   raf=requestAnimationFrame(step);
+  },
+  cancel(settle){
+   if(raf)cancelAnimationFrame(raf);
+   raf=0;
+   if(settle&&el?.isConnected){
+    el.getAnimations().forEach(a=>a.cancel());
+    el.textContent=fx.money(to);
+   }
+   el=null;done=null;
+  }
+ };
+}
+const heroCounter=makeCounter(),selectedCounter=makeCounter();
+/* R8 · ambiente vivo: se pausa cuando la pestaña no está visible,
+ * para no gastar batería ni animar lo que nadie mira. */
+document.addEventListener('visibilitychange',()=>{
+ document.documentElement.classList.toggle('gx-r8-paused',document.hidden);
+});
 function hero(){
  const Q=quote(),next=fx.next(Q),phase=Q.proof,blocked=!Q.trusted;
  const shortDate=iso=>new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'short',timeZone:'UTC'})
@@ -43,22 +96,28 @@ function hero(){
  root.dataset.gxB2Tone=tone;
  $('gx-b2-hero-label').textContent=caption;
  const amount=$('gx-b2-hero-amount'),value=blocked?'—':fx.money(next.amount);
- const ink=amount.querySelector('.gx-b2-number-ink');
- if(ink){
-  if(ink.textContent!==value){
-   ink.textContent=value;
-   if(priorAmount!==null&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
-    ink.getAnimations().forEach(a=>a.cancel());
-    /* R7 · pulso de importe: escala 1.04→1 en 300 ms con la misma
-     * curva del morph. El texto ya es el valor exacto del escenario
-     * ($45.00/$94.00 en la demo); nunca se cuentan valores falsos. */
-    ink.animate([{opacity:.55,transform:'scale(1.04)'},
-      {opacity:1,transform:'scale(1)'}],
-      {duration:300,easing:'cubic-bezier(.2,.78,.24,1)'});
-   }
+ /* R8 · conteo: el primer pintado crea el span en $0.00 y suma hasta
+  * el valor exacto; los cambios posteriores suman desde el valor
+  * anterior. Si el morph está activo (barra en movimiento o
+  * compacta) el valor exacto se pone directo, sin contar: contar
+  * mientras el precio viaja fue el bug del espejo viejo, donde a
+  * mitad de morph se veían $45.72 / $86.16 como si fueran reales. */
+ let ink=amount.querySelector('.gx-b2-number-ink');
+ if(!ink){
+  amount.innerHTML='<span class="gx-b2-number-ink">'+(blocked?'—':fx.money(0))+'</span>';
+  ink=amount.querySelector('.gx-b2-number-ink');
+ }
+ if(blocked){
+  heroCounter.cancel(false);ink.textContent=value;priorAmount=value;priorCents=null;
+ }else if(ink.textContent!==value){
+  if(reducedMotion()||morphController.progress()>0.02){
+   heroCounter.cancel(false);ink.textContent=value;
+  }else{
+   const from=priorCents===null?0:priorCents;
+   heroCounter.start(ink,from,next.amount,()=>pulseInk(ink));
   }
- }else amount.innerHTML='<span class="gx-b2-number-ink">'+value+'</span>';
- priorAmount=value;
+  priorAmount=value;priorCents=next.amount;
+ }else priorCents=next.amount;
  const badgeNode=$('gx-b2-hero-badge');
  badgeNode.textContent=badge;
  badgeNode.className='time-badge '+cls;
@@ -140,12 +199,20 @@ function breakdown(){
   '<div class="gx-b2-selected-final"><span>Importe seleccionado</span><strong id="gx-b2-selected-total">'+fx.money(total)+'</strong></div>'+
   (fx.total(fx.pending(Q))!==total?line('Total pendiente del período',fx.money(fx.total(fx.pending(Q)))):'');
  const strong=$('gx-b2-selected-total');
- if(strong&&priorSelectedTotal!==null&&priorSelectedTotal!==total&&
-    !matchMedia('(prefers-reduced-motion:reduce)').matches){
-  strong.getAnimations().forEach(a=>a.cancel());
-  strong.animate([{opacity:.55,transform:'scale(1.04)'},
-    {opacity:1,transform:'scale(1)'}],
-    {duration:300,easing:'cubic-bezier(.2,.78,.24,1)'});
+ /* R8 · conteo del total seleccionado (Próximo ↔ Todo junto o al
+  * elegir un cargo): suma 700 ms hasta el valor exacto y aterriza
+  * con el pulso R7. En el primer pintado suma desde $0.00, igual
+  * que el hero. Con morph activo o reduced-motion, valor exacto
+  * directo, sin contar ni pulsar. */
+ if(strong){
+  if(priorSelectedTotal===null){
+   if(reducedMotion()||morphController.progress()>0.02)strong.textContent=fx.money(total);
+   else selectedCounter.start(strong,0,total,()=>pulseInk(strong));
+  }else if(priorSelectedTotal!==total){
+   if(reducedMotion()||morphController.progress()>0.02){
+    selectedCounter.cancel(false);strong.textContent=fx.money(total);
+   }else selectedCounter.start(strong,priorSelectedTotal,total,()=>pulseInk(strong));
+  }
  }
  priorSelectedTotal=total;
 }
@@ -342,6 +409,13 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  * badge entra con retraso (0.30→0.75); el alto del hero se deriva
  * del contenido medido para no dejar banda vacía. Sin Block 3
  * (morph solo-transform): no hizo falta, el defecto era el mapeo.
+ *
+ * R8 · conteo + ambiente (2026-11-07): el conteo del importe vive
+ * en hero()/breakdown() (700 ms hasta el valor exacto, solo en
+ * reposo) y se cancela en request() al desplazar, para que nunca
+ * se vean valores intermedios como si fueran reales a mitad de
+ * morph. El ambiente vivo es solo CSS (estado.css, sección R8) y
+ * se pausa con la pestaña oculta.
  */
 function setupHeaderMorph(){
  const root=document.documentElement;
@@ -457,6 +531,10 @@ function setupHeaderMorph(){
  }
  function request(){
   goal=clamp(window.scrollY/172);
+  /* R8 · si el usuario empieza a desplazar, el conteo se cancela y
+   * deja el valor exacto: contar mientras el precio viaja fue el
+   * bug del espejo viejo ($45.72 / $86.16 a mitad de morph). */
+  if(window.scrollY>0){heroCounter.cancel(true);selectedCounter.cancel(true)}
   lastScroll=performance.now();
   if(reduced.matches){
    cancelAnimationFrame(frame);clearTimeout(watchdog);
