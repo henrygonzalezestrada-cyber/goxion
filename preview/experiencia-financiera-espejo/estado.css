@@ -188,6 +188,10 @@ html[data-gx-index-remaster="r3"]{
  --gx-rm-title-scale:1;
  --gx-rm-content-shift:0px;--gx-rm-clip:0px;
  --gx-rm-label-opacity:1;--gx-rm-progress:0;
+ /* R14 · botón compacto "Mi Espacio": 0 en expandido, 1 en
+  * compacto (lo escribe paint() con el spread 0.75→1); su parte
+  * superior y su alto son los visuales de la píldora compacta. */
+ --gx-rm-space:0;--gx-rm-space-top:2px;--gx-rm-space-h:22px;
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky{
  padding:max(var(--gx-rm-header-pad), env(safe-area-inset-top,0px))
@@ -1298,3 +1302,45 @@ html.gx-r8-paused #gx-b2-loyalty-mark{animation-play-state:paused!important}
    de todos modos (vive fuera de la caja) y el fundido ahora está
    en el degradado de fondo del sticky (últimos 27 px visibles). */
 html[data-gx-index-remaster="r3"] #gx-b2-sticky::after{display:none}
+
+/* ================================================================
+   R14 · ENCABEZADO COMPACTO EN 3 ZONAS · preview scope only
+   El problema: con todo centrado, el encabezado compacto se
+   sentía desperdiciado. En compacto (p≈1) la fila se reparte:
+   precio a la IZQUIERDA, píldora al CENTRO y botón "Mi Espacio"
+   a la DERECHA. El estado expandido queda idéntico, centrado.
+   El botón es cian #00f2fe con texto OSCURO (blanco sobre cian
+   se lee mal) y el mismo alto que la píldora compacta; entra con
+   el spread del morph (0.75→1) y solo tiene pointer-events en
+   compacto (dataset gxRmCompact, que paint() pone con p>.95).
+   Destino: ayuda.html, el mismo que usa el Index oficial para
+   "Ir a Mi Espacio". Sin glow, sin secciones nuevas, blur 25 px
+   y cristal intactos; el morph sigue siendo solo-transform (R12)
+   y el asentamiento solo vive en la zona del morph (R10/R13).
+   ================================================================ */
+html[data-gx-index-remaster="r3"] #gx-b2-hero .gx-b2-space-btn{
+ position:absolute;
+ top:var(--gx-rm-space-top,2px);
+ right:0;
+ height:var(--gx-rm-space-h,22px);
+ display:inline-flex;align-items:center;justify-content:center;
+ padding:0 12px;
+ font-size:11px;line-height:1.2;font-weight:800;letter-spacing:.01em;
+ font-family:inherit;white-space:nowrap;text-decoration:none;
+ color:#02141b;
+ background:#00f2fe;
+ border:1px solid rgba(2,20,27,.25);
+ border-radius:999px;
+ opacity:var(--gx-rm-space,0);
+ transform:translateX(calc((1 - var(--gx-rm-space,0)) * 12px));
+ pointer-events:none;
+ will-change:transform,opacity;
+}
+html[data-gx-rm-compact="true"] #gx-b2-hero .gx-b2-space-btn{
+ pointer-events:auto;
+}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-index-remaster="r3"] #gx-b2-hero .gx-b2-space-btn{
+  transform:none;
+ }
+}
