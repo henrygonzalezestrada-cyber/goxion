@@ -199,20 +199,26 @@ function breakdown(){
   '<div class="gx-b2-selected-final"><span>Importe seleccionado</span><strong id="gx-b2-selected-total">'+fx.money(total)+'</strong></div>'+
   (fx.total(fx.pending(Q))!==total?line('Total pendiente del período',fx.money(fx.total(fx.pending(Q)))):'');
  const strong=$('gx-b2-selected-total');
- /* R8 · conteo del total seleccionado (Próximo ↔ Todo junto o al
-  * elegir un cargo): suma 700 ms hasta el valor exacto y aterriza
-  * con el pulso R7. En el primer pintado suma desde $0.00, igual
-  * que el hero. Con morph activo o reduced-motion, valor exacto
-  * directo, sin contar ni pulsar. */
+ /* R9 · causa raíz del bug de Todo junto: el conteo del total
+  * seleccionado estaba supeditado a morphController.progress()<=0.02,
+  * la misma guarda del importe del hero. En el iPhone el botón
+  * "Todo junto" está bajo el pliegue, dentro del calendario, así
+  * que al pulsarlo la página YA está desplazada (en la repro, con
+  * scrollIntoView el progreso llega a 1) y el total saltaba directo
+  * a $94.00 sin contar: en scroll 0 sí sumaba ($45→$55→…→$94) y
+  * desplazado todos los muestreos eran $94.00. La guarda era para
+  * el hero, que viaja con el morph (contarlo a mitad de morph fue
+  * el bug $45.72 del espejo viejo); el total seleccionado vive en
+  * el desglose, bajo el hero, y NO viaja con el morph, así que
+  * contarlo con la página desplazada es seguro. Se quita la guarda
+  * solo aquí; el hero la conserva. Si el usuario desplaza DURANTE
+  * el conteo, el conteo sigue hasta el valor exacto: el total no
+  * viaja con el morph, así que no aparecen valores falsos a mitad
+  * de camino. Con reduced-motion, valor exacto directo, sin contar. */
  if(strong){
-  if(priorSelectedTotal===null){
-   if(reducedMotion()||morphController.progress()>0.02)strong.textContent=fx.money(total);
-   else selectedCounter.start(strong,0,total,()=>pulseInk(strong));
-  }else if(priorSelectedTotal!==total){
-   if(reducedMotion()||morphController.progress()>0.02){
-    selectedCounter.cancel(false);strong.textContent=fx.money(total);
-   }else selectedCounter.start(strong,priorSelectedTotal,total,()=>pulseInk(strong));
-  }
+  if(reducedMotion()){selectedCounter.cancel(false);strong.textContent=fx.money(total)}
+  else if(priorSelectedTotal===null)selectedCounter.start(strong,0,total,()=>pulseInk(strong));
+  else if(priorSelectedTotal!==total)selectedCounter.start(strong,priorSelectedTotal,total,()=>pulseInk(strong));
  }
  priorSelectedTotal=total;
 }
@@ -531,10 +537,15 @@ function setupHeaderMorph(){
  }
  function request(){
   goal=clamp(window.scrollY/172);
-  /* R8 · si el usuario empieza a desplazar, el conteo se cancela y
-   * deja el valor exacto: contar mientras el precio viaja fue el
-   * bug del espejo viejo ($45.72 / $86.16 a mitad de morph). */
-  if(window.scrollY>0){heroCounter.cancel(true);selectedCounter.cancel(true)}
+  /* R8 · si el usuario empieza a desplazar, el conteo del hero se
+   * cancela y deja el valor exacto: contar mientras el precio viaja
+   * fue el bug del espejo viejo ($45.72 / $86.16 a mitad de morph).
+   * R9 · el total seleccionado NO se cancela aquí: vive en el
+   * desglose, no viaja con el morph, y cancelarlo mataba el conteo
+   * que arranca al tocar Próximo/Todo junto justo después de
+   * desplazar — el scrollend del desplazamiento llegaba ~50 ms
+   * después del toque y lo asentaba en el valor final sin contar. */
+  if(window.scrollY>0){heroCounter.cancel(true)}
   lastScroll=performance.now();
   if(reduced.matches){
    cancelAnimationFrame(frame);clearTimeout(watchdog);
