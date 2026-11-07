@@ -71,12 +71,20 @@ async function run(name,engine){
    assert.equal(await page.locator('#gx-b2-services')
     .evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(8, 8, 12, 0.25)');
 
-   // R8 · ambiente vivo: glow del hero, brillo del badge y respiración
-   // de lealtad existen y son solo transform/opacity (keyframes R8).
-   assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').animationName),'gx-r8-glow',
-    'R8 '+name+' '+width+' hero glow must breathe');
-   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el,'::after').animationName),'gx-r8-sheen',
-    'R8 '+name+' '+width+' badge sheen must exist');
+   // R9 · el glow del hero se quitó por completo (a Henry no le
+   // agradó y se comportaba extraño al contraer): no debe quedar
+   // ::before con animación detrás del importe. El glow vive ahora
+   // en la píldora de estado: gradiente líquido que mezcla el
+   // color principal con otro (gx-r9-liquid) y respiración de
+   // lealtad, solo transform/opacity/background-position.
+   assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').animationName),'none',
+    'R9 '+name+' '+width+' hero glow must be gone');
+   assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').content),'none',
+    'R9 '+name+' '+width+' hero must have no ::before layer left');
+   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).animationName),'gx-r9-liquid',
+    'R9 '+name+' '+width+' badge must carry the liquid glow');
+   assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('linear-gradient'),
+    'R9 '+name+' '+width+' badge liquid glow must be a gradient');
    assert.equal(await page.locator('#gx-b2-loyalty-mark').evaluate(el=>getComputedStyle(el).animationName),'gx-r8-breathe',
     'R8 '+name+' '+width+' loyalty mark must breathe');
    // R8 · conteo a mitad de camino: al cambiar de escenario el texto
@@ -155,6 +163,31 @@ async function run(name,engine){
    },null,{timeout:3000,polling:50});
    assert.equal(await page.locator('#gx-b2-hero-amount').textContent(),'$45.00',
     'Hero must not replace next due with entire period');
+   // R9 · regresión del bug de Todo junto: el conteo del total
+   // seleccionado debe correr también con la página desplazada.
+   // Causa raíz (dos capas): la guarda progress()>0.02 en
+   // breakdown() lo suprimía siempre que se había desplazado para
+   // llegar al control (en iPhone, siempre); y aunque se quitara,
+   // request() cancelaba el conteo al llegar el scrollend del
+   // desplazamiento (~50 ms después del toque). Desplazar, volver
+   // a Próximo y a Todo junto: en ambos casos pasa por intermedios
+   // y aterriza exacto.
+   await page.evaluate(()=>document.querySelector('[data-mode="all"]').scrollIntoView({block:'center'}));
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()>.02,null,{timeout:5000,polling:50});
+   await page.locator('[data-mode="next"]').click();
+   await page.waitForFunction(()=>{
+    const t=document.querySelector('#gx-b2-selected-total').textContent;
+    const v=parseFloat(t.replace(/[^0-9.]/g,''));
+    return t!=='$94.00'&&t!=='$45.00'&&v>45&&v<94;
+   },null,{timeout:5000,polling:50});
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$45.00',null,{timeout:5000});
+   await page.locator('[data-mode="all"]').click();
+   await page.waitForFunction(()=>{
+    const t=document.querySelector('#gx-b2-selected-total').textContent;
+    const v=parseFloat(t.replace(/[^0-9.]/g,''));
+    return t!=='$94.00'&&t!=='$45.00'&&v>45&&v<94;
+   },null,{timeout:5000,polling:50});
+   await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$94.00',null,{timeout:5000});
    await page.locator('[data-charge="b"]').click();
    await page.waitForFunction(()=>document.querySelector('#gx-b2-selected-total').textContent==='$49.00',null,{timeout:5000});
    // R7 · acomodo: a mitad de scroll el precio ya viajó, el par ya está
@@ -162,6 +195,15 @@ async function run(name,engine){
    // bajando desde arriba: el anclaje de scroll mueve el scrollY real,
    // así que se busca la banda de progreso 0.35–0.60 probando
    // posiciones hasta entrar en ella.
+   // R9 · partir de arriba (scroll 0, progreso <0.01): la regresión R9
+   // deja la página desplazada (progreso ≈1) y al bajar desde ahí el
+   // anclaje empuja el scrollY real 10–16 px por encima de lo pedido,
+   // así que el progreso se asienta siempre por encima de 0.60 y la
+   // banda no se alcanza nunca. Desde reposo se entra desde abajo,
+   // como en R8.
+   await page.evaluate(()=>window.scrollTo(0,0));
+   await page.waitForFunction(()=>window.GOXION_E1B2_INDEX.getMorphProgress()<.01,null,
+    {timeout:6000,polling:50});
    let mid=null;
    for(const y of [120,150,100,170,90]){
     await page.evaluate(yy=>window.scrollTo(0,yy),y);

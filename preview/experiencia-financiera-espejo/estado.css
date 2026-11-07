@@ -1144,49 +1144,60 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
       solo al cargar y al cambiar el valor; se cancela con el scroll.
    2. Ambiente: la lava YA se mueve sola en index.css (lavaFluid
       10–14 s); R8 no la duplica. Lo vivo aquí es solo:
-        · respiración del glow del hero (opacidad .55→.75, 6 s);
-        · brillo tenue del badge (un barrido cada 7 s, sin parpadeo);
+        · glow líquido del badge (R9, sustituye al barrido);
         · respiración del anillo de lealtad (escala 1→1.025, 5 s).
       Nada de tilt ni movimientos bruscos; nada compite con el
       importe protagonista. Todo se pausa si la pestaña no está
       visible (html.gx-r8-paused, JS) y se apaga con
       prefers-reduced-motion.
+   R9 · QUITADO el glow del hero (2a): a Henry no le agradó, se
+   comportaba extraño al contraer. La capa #gx-b2-hero::before y
+   gx-r8-glow se eliminan por completo, sin restos. El brillo del
+   badge (2b) se sustituye por el glow líquido R9 (ver abajo): el
+   gradiente mezcla el color principal de cada estado con el
+   morado #7c4dff (o cian si el principal ya es morado) y se mueve
+   lento, como dos semilíquidos.
    ================================================================ */
-/* 2a · Glow del hero: capa detrás del importe, solo opacidad. */
-html[data-gx-index-remaster="r3"] #gx-b2-hero::before{
- content:"";position:absolute;inset:0;pointer-events:none;
- background:radial-gradient(ellipse 60% 55% at 50% 42%,
-  rgba(0,242,254,.14),rgba(124,77,255,.07) 55%,transparent 75%);
- opacity:.55;animation:gx-r8-glow 6s ease-in-out infinite alternate;
+/* 2b · R9 · Glow líquido de la píldora de estado. El gradiente vive
+   en la propia píldora (background-image sobre el fondo base) y
+   mezcla el color principal del estado con otro líquido: cian
+   #00f2fe + morado #7c4dff en el estado normal, morado + cian en
+   revisión, rojo + morado en vencido, verde + morado en pagado.
+   Al cambiar el estado cambia la clase y con ella el color
+   principal del glow; la transición .25 s de R7 suaviza el cambio
+   de color/borde/sombra. Solo se anima background-position (9 s,
+   ida y vuelta, sin parpadeo): dos líquidos que se mezclan lento.
+   Sin ::after, sin blur, sin halo detrás del precio. */
+html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
+ --gx-pill-a-rgb:0,242,254;--gx-pill-b-rgb:124,77,255;
+ background-image:linear-gradient(115deg,
+  rgba(var(--gx-pill-a-rgb),.20),
+  rgba(var(--gx-pill-b-rgb),.17) 55%,
+  rgba(var(--gx-pill-a-rgb),.20));
+ background-size:220% 220%;
+ animation:gx-r9-liquid 9s ease-in-out infinite alternate;
+ box-shadow:0 0 14px rgba(var(--gx-pill-a-rgb),.15),
+  0 0 26px rgba(var(--gx-pill-b-rgb),.09);
 }
-@keyframes gx-r8-glow{from{opacity:.55}to{opacity:.75}}
-/* 2b · Brillo del badge: un barrido tenue cada 7 s. El ::after es
-   absoluto, así que no mueve el layout del badge ni su texto. */
-html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge::after{
- content:"";position:absolute;top:0;bottom:0;left:0;width:45%;
- pointer-events:none;
- background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);
- transform:translateX(-220%);opacity:0;
- animation:gx-r8-sheen 7s ease-in-out infinite;
+html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-review{
+ --gx-pill-a-rgb:124,77,255;--gx-pill-b-rgb:0,242,254;
 }
-@keyframes gx-r8-sheen{
- 0%{transform:translateX(-220%);opacity:0}
- 18%{opacity:1}
- 45%{transform:translateX(320%);opacity:0}
- 100%{transform:translateX(320%);opacity:0}
+html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-overdue{
+ --gx-pill-a-rgb:255,51,102;--gx-pill-b-rgb:124,77,255;
 }
+html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-paid{
+ --gx-pill-a-rgb:0,255,157;--gx-pill-b-rgb:124,77,255;
+}
+@keyframes gx-r9-liquid{from{background-position:0% 50%}to{background-position:100% 50%}}
 /* 2c · Respiración del anillo de lealtad: solo escala del wrapper. */
 html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{
  animation:gx-r8-breathe 5s ease-in-out infinite alternate;
 }
 @keyframes gx-r8-breathe{from{transform:scale(1)}to{transform:scale(1.025)}}
 /* Pausa cuando la pestaña no está visible (JS: visibilitychange). */
-html.gx-r8-paused #gx-b2-hero::before,
-html.gx-r8-paused #gx-b2-hero .time-badge::after,
+html.gx-r8-paused #gx-b2-hero .time-badge,
 html.gx-r8-paused #gx-b2-loyalty-mark{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){
- html[data-gx-index-remaster="r3"] #gx-b2-hero::before,
- html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge::after,
+ html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge,
  html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{animation:none!important}
- html[data-gx-index-remaster="r3"] #gx-b2-hero::before{opacity:.45}
 }
