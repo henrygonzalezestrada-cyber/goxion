@@ -302,6 +302,11 @@ function actions(){
 }
 function refresh(){
  hero();services();calendar();breakdown();proof();loyalty();actions();
+ /* R10 · hero() pudo cambiar el texto de la píldora (o del importe)
+  * sin que hubiera scroll: repintar el morph aquí para que los
+  * desplazamientos del par compacto se midan con los anchos reales
+  * del texto nuevo, no con los de la píldora anterior. */
+ morphController.repaint();
  $('gx-b2-scenario').value=key;
 }
 function openDemo(){
@@ -422,12 +427,39 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  * se vean valores intermedios como si fueran reales a mitad de
  * morph. El ambiente vivo es solo CSS (estado.css, sección R8) y
  * se pausa con la pestaña oculta.
+ *
+ * R10 · píldora, asentamiento y glow (2026-11-07): 1) si la píldora
+ * cambia de texto sin scroll (cambio de escenario/estado), refresh()
+ * repinta el morph para medir los anchos nuevos (antes quedaban los
+ * desplazamientos de la píldora anterior y la nueva se encimaba en
+ * el precio); la medida usa además piso scrollWidth y el tope de
+ * ancho se fija antes de medir. 2) Al soltar a mitad de scroll, el
+ * scrollY se asienta suave al extremo más cercano (0 o máximo) y el
+ * morph lo sigue; nunca se fuerza el valor del morph por su cuenta.
+ * 3) El glow líquido de la píldora (estado.css) sube de intensidad:
+ * dos manchas radiales que se entremezclan con blend screen.
  */
 function setupHeaderMorph(){
  const root=document.documentElement;
  const reduced=matchMedia('(prefers-reduced-motion:reduce)');
  let value=0,goal=0,frame=0,watchdog=0,lastTick=0,lastScroll=0;
  let measureKey='',moneyWidth=0,statusWidth=0,amountH=0,badgeH=0,lastPainted=null;
+ /* R10 · asentamiento al soltar (ver maybeSnap): cuando el cliente
+  * suelta a mitad de scroll, el morph termina de acomodarse al
+  * extremo más cercano. NUNCA se fuerza el valor del morph por su
+  * cuenta (R5.2 documentó que eso provoca un salto al siguiente
+  * evento de scroll): se mueve el scrollY con scrollTo suave y el
+  * morph, que sigue acoplado al scrollY, lo sigue sin saltar. */
+ let snapTimer=0,snapping=false,snapRaf=0,snapDeadline=0,touching=false;
+ /* R10 · el asentamiento mueve el scrollY con una animación propia
+  * por frames (ver animateSnap), no con el scrollTo suave del
+  * navegador: mientras la página se desliza, el hero cambia de
+  * alto (el morph es scroll-acoplado) y el anclaje de scroll del
+  * navegador compensa ese cambio empujando el scrollY; con el
+  * scrollTo suave eso dejaba el aterrizaje a medias (medido: soltar
+  * en 30 px terminaba en 61 px, no en 0). Al re-leer el scrollY
+  * real en cada frame, cualquier compensación se absorbe en el
+  * paso siguiente y el aterrizaje cae exacto en el extremo. */
  const clamp=n=>Math.max(0,Math.min(1,n));
  const smooth=t=>{t=clamp(t);return t*t*(3-2*t)};
  const px=n=>Math.round(n)+'px';
@@ -477,12 +509,22 @@ function setupHeaderMorph(){
   lastPainted=p;
   root.style.setProperty('--gx-rm-amount-size',px(amountSize));
   root.style.setProperty('--gx-rm-badge-size',px(badgeSize));
+  /* R10 · el tope de ancho de la píldora se fija ANTES de medir (en R9
+   * se fijaba después, así que la medida usaba el tope del pintado
+   * anterior: al subir, el tope viejo y más chico podía recortar la
+   * medida y achicar los desplazamientos). */
+  root.style.setProperty('--gx-rm-badge-max',(96-49*pb).toFixed(2)+'%');
   if(key!==measureKey){
    measureKey=key;
    // Read the true post-layout border boxes; scrollWidth can underreport
    // the absolutely-positioned amount when WebKit clamps max-content.
-   moneyWidth=amount.getBoundingClientRect().width;
-   statusWidth=badge.getBoundingClientRect().width;
+   // R10 · el piso scrollWidth protege la medida cuando un max-width
+   // recorta la caja (importe con max-width 59% a 280 px, píldora con
+   // su tope %): scrollWidth devuelve el ancho natural del contenido
+   // aunque la caja esté recortada, así que el desplazamiento del par
+   // se calcula con el ancho real y nunca con uno recortado.
+   moneyWidth=Math.max(amount.getBoundingClientRect().width,amount.scrollWidth);
+   statusWidth=Math.max(badge.getBoundingClientRect().width,badge.scrollWidth);
    amountH=amount.getBoundingClientRect().height;
    badgeH=badge.getBoundingClientRect().height;
   }
@@ -500,7 +542,6 @@ function setupHeaderMorph(){
   root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*paired));
   root.style.setProperty('--gx-rm-badge-top',px(badgeTop));
   root.style.setProperty('--gx-rm-amount-top',px(amountTop));
-  root.style.setProperty('--gx-rm-badge-max',(96-49*pb).toFixed(2)+'%');
   root.style.setProperty('--gx-rm-label-opacity',String(clamp(1-p*3)));
   root.style.setProperty('--gx-rm-header-gap',px(9-3*p));
   root.style.setProperty('--gx-rm-header-size',px(14-3*p));
@@ -547,18 +588,126 @@ function setupHeaderMorph(){
    * después del toque y lo asentaba en el valor final sin contar. */
   if(window.scrollY>0){heroCounter.cancel(true)}
   lastScroll=performance.now();
+  /* R10 · los eventos de scroll que produce el propio asentamiento
+   * (snapping) no vuelven a armar el temporizador: si no, el snap
+   * se re-dispararía a sí mismo. */
+  if(!snapping&&!touching)armSnap();
   if(reduced.matches){
    cancelAnimationFrame(frame);clearTimeout(watchdog);
    frame=0;watchdog=0;value=goal;lastTick=0;paint();return;
   }
   if(!frame&&!watchdog)schedule();
  }
+ /* R10 · asentamiento al soltar. Si el cliente suelta a mitad, la
+  * píldora (y todo el par compacto) termina de llegar al extremo
+  * más cercano: expandido (scroll 0) o compacto (scroll 172 px, o
+  * el máximo de la página si es menor). El morph no se toca: al
+  * mover el scrollY, el morph lo sigue.
+  * No se asienta si el modal de reporte está abierto, si el dedo
+  * sigue en pantalla, ni si ya está a menos de 4 px del extremo
+  * (eso también corta cualquier rebote: tras asentar, el progreso
+  * ya no está a mitad). Con reduced-motion el salto es instantáneo.
+  * Si el navegador no dispara scrollend (Safari viejo), el
+  * temporizador de 250 ms sin eventos hace lo mismo. */
+ const SNAP_IDLE_MS=250;
+ function armSnap(){
+  clearTimeout(snapTimer);
+  snapTimer=setTimeout(maybeSnap,SNAP_IDLE_MS);
+ }
+ function maybeSnap(){
+  clearTimeout(snapTimer);snapTimer=0;
+  if(snapping||touching)return;
+  if(document.documentElement.classList.contains('gx-b2-modal-open'))return;
+  const maxScroll=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+  if(maxScroll<8)return;
+  /* El extremo compacto del morph es 172 px, no el máximo de la
+   * página: si la página desplaza más (viewport bajo), asentar al
+   * máximo alejaría del final del morph en vez de acercar. */
+  const anchor=Math.min(172,maxScroll);
+  const y=window.scrollY;
+  const target=y<anchor/2?0:anchor;
+  if(Math.abs(y-target)<4)return;
+  animateSnap(target);
+ }
+ /* R10 · animación propia del asentamiento. Cada frame lee el
+  * scrollY real y avanza un cuarto de la distancia que falta: si
+  * el anclaje de scroll empuja el scrollY por el cambio de alto
+  * del hero, el paso siguiente lo tiene en cuenta y el aterrizaje
+  * converge al extremo en vez de quedarse a medias. El objetivo
+  * efectivo se recalcula en cada frame (el máximo desplazamiento
+  * cambia mientras el hero se compacta o se expande) y hay un
+  * plazo de 1 s que fuerza el aterrizaje exacto. Con
+  * reduced-motion el salto es instantáneo. Si el cliente vuelve a
+  * tocar o a rodar la rueda, la animación se cancela y manda él.
+  * Arranca tras 250 ms sin eventos de scroll (ver onScrollEnd):
+  * ese silencio es lo que distingue "soltó a mitad" de "sigue
+  * desplazando o acaba de mover la página por otro lado". */
+ function cancelSnap(){
+  if(snapRaf)cancelAnimationFrame(snapRaf);
+  snapRaf=0;snapping=false;
+ }
+ function animateSnap(target){
+  cancelSnap();
+  snapping=true;
+  if(reduced.matches){window.scrollTo(0,target);snapping=false;return}
+  snapDeadline=performance.now()+1000;
+  /* Si algo que no es la animación mueve el scrollY más de 24 px
+   * (el cliente vuelve a desplazar, o un scrollTo programático),
+   * la animación cede y manda ese desplazamiento. Con
+   * overflow-anchor:none (R10, estado.css) el anclaje de scroll
+   * ya no empuja el scrollY por su cuenta, así que un salto así
+   * solo puede venir de fuera, no del propio asentamiento. */
+  let prevY=window.scrollY;
+  const step=()=>{
+   snapRaf=0;
+   const y=window.scrollY;
+   if(Math.abs(y-prevY)>24){snapping=false;return}
+   const maxScroll=Math.max(0,document.documentElement.scrollHeight-window.innerHeight);
+   const eff=Math.min(target,maxScroll);
+   const d=eff-y;
+   if(Math.abs(d)<1||performance.now()>snapDeadline){
+    window.scrollTo(0,eff);snapping=false;return;
+   }
+   window.scrollTo(0,y+d*.25);
+   prevY=window.scrollY;
+   snapRaf=requestAnimationFrame(step);
+  };
+  snapRaf=requestAnimationFrame(step);
+ }
+ function onScrollEnd(){
+  /* El asentamiento arranca por el temporizador de inactividad
+   * (250 ms sin eventos de scroll), no de inmediato en scrollend:
+   * un scrollTo programático que llega justo después del anterior
+   * (o el cliente que cambia de idea y vuelve a desplazar) debe
+   * ganar antes de que el snap arranque, y no pelear con él. El
+   * scrollend solo adelanta el asentamiento si el último evento de
+   * scroll ya quedó atrás hace más de 200 ms. Mientras la
+   * animación corre, ella es dueña de la bandera: el scrollend de
+   * sus propios pasos no re-dispara otro asentamiento. */
+  if(snapping)return;
+  if(performance.now()-lastScroll>200)maybeSnap();
+ }
  window.addEventListener('scroll',request,{passive:true});
  window.addEventListener('scrollend',request,{passive:true});
+ window.addEventListener('scrollend',onScrollEnd,{passive:true});
+ window.addEventListener('touchstart',()=>{touching=true;clearTimeout(snapTimer);cancelSnap()},{passive:true});
+ window.addEventListener('touchend',()=>{touching=false;armSnap()},{passive:true});
+ window.addEventListener('wheel',()=>{cancelSnap()},{passive:true});
  window.addEventListener('resize',()=>{paint();request()},{passive:true});
  if(reduced.addEventListener)reduced.addEventListener('change',request);
  request();paint();
- return {progress:()=>value, target:()=>goal};
+ return {progress:()=>value, target:()=>goal,
+  /* R10 · repintar cuando el contenido del hero cambia (cambio de
+   * escenario o de estado del comprobante): paint() solo corría con
+   * scroll/resize, así que si la píldora cambiaba de texto con la
+   * página ya desplazada y asentada, los desplazamientos del par
+   * quedaban calculados con el ancho de la píldora ANTERIOR y la
+   * nueva píldora se encimaba en el precio (medido en la captura
+   * de Henry: "Acción necesaria" con desplazamiento de "En
+   * revisión", 15 px corto). Al invalidar la clave de medida, el
+   * repintado mide los anchos reales del texto nuevo y corrige los
+   * desplazamientos sin tocar el progreso ni mover el scroll. */
+  repaint(){measureKey='';paint()}};
 }
 const morphController=setupHeaderMorph();
 refresh();
