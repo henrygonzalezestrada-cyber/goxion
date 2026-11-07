@@ -268,15 +268,43 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  * sticky-area/balance-hero. No cloned headers, duplicate status layer or
  * artificial sticky container. Derives size/position from visible scroll
  * and uses a damped response so the motion settles instead of snapping.
+ *
+ * R5.2 · fluidez (2026-11-06): MISMA geometría, MISMO diseño, solo el
+ * movimiento es más regular. El amortiguamiento anterior era fijo por
+ * frame (.23), así que a 120 Hz el morph corría el doble de rápido que
+ * a 60 Hz y a 30 Hz (iOS en ahorro de energía) se arrastraba. Ahora la
+ * constante de tiempo es de 64 ms — exactamente la sensación aprobada
+ * a 60 Hz — y el paso se normaliza por el delta real entre frames, así
+ * que se siente igual a 60, 120 o 30 Hz. La medida de anchos
+ * (getBoundingClientRect) solo se repite cuando cambia el texto, el
+ * tamaño o el viewport: antes se forzaba un layout síncrono en cada
+ * frame durante el scroll. Y al soltar el scroll, tras 120 ms sin
+ * eventos, el morph acelera su asentamiento al estado de reposo que
+ * marca el scroll, en vez de quedarse flotando en la cola exponencial.
+ * NO se asienta a 0/1 por su cuenta: el morph sigue acoplado al
+ * scrollY, y forzarlo a un extremo sin mover el scroll provocaría un
+ * salto al siguiente evento de scroll.
  */
 function setupHeaderMorph(){
- const root=document.documentElement,hero=$('gx-b2-hero');
+ const root=document.documentElement;
  const reduced=matchMedia('(prefers-reduced-motion:reduce)');
- let value=0,goal=0,frame=0,watchdog=0;
+ let value=0,goal=0,frame=0,watchdog=0,lastTick=0,lastScroll=0;
+ let measureKey='',moneyWidth=0,statusWidth=0,lastPainted=null;
  const clamp=n=>Math.max(0,Math.min(1,n));
  const px=n=>Math.round(n)+'px';
+ // Time constant of the approved 60 Hz feel: one 16.7 ms frame with the
+ // old fixed .23 step is 1-exp(-16.7/TAU) = .23  →  TAU ≈ 64 ms.
+ const TAU=64,SETTLE_TAU=26,IDLE_MS=120;
  function paint(){
-  const p=value,w=Math.max(200,hero.clientWidth||240);
+  const p=value;
+  const amountSize=52-26*p;
+  const amount=$('gx-b2-hero-amount'),badge=$('gx-b2-hero-badge');
+  // Re-measure only when something that changes the widths changed.
+  // Reading border boxes every frame forced a synchronous layout per
+  // frame while scrolling; the key covers text, size bucket and viewport.
+  const key=amount.textContent+'|'+badge.textContent+'|'+Math.round(amountSize)+'|'+window.innerWidth;
+  if(Math.abs(p-(lastPainted??-1))<.0004&&key===measureKey)return;
+  lastPainted=p;
   // Once "Próximo pago / Importe pendiente" fades out, its former space
   // should NOT remain between "Estado de Cuenta" and the amount/status.
   // Smoothly reclaim 7px only AFTER the label starts disappearing. The
@@ -284,15 +312,17 @@ function setupHeaderMorph(){
   const fadeProgress=clamp((p-.25)/.5);
   const freedLabelSpace=7*fadeProgress*fadeProgress*(3-2*fadeProgress);
   root.style.setProperty('--gx-rm-hero-h',px(116-73*p-freedLabelSpace));
-  root.style.setProperty('--gx-rm-amount-size',px(52-26*p));
+  root.style.setProperty('--gx-rm-amount-size',px(amountSize));
+  if(key!==measureKey){
+   measureKey=key;
+   // Read the true post-layout border boxes; scrollWidth can underreport
+   // the absolutely-positioned amount when WebKit clamps max-content.
+   moneyWidth=amount.getBoundingClientRect().width;
+   statusWidth=badge.getBoundingClientRect().width;
+  }
   // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
   // and the status on the RIGHT. Measure actual content to avoid oversized
   // empty space on wide screens or overlap on a 280px iPhone viewport.
-  const amount=$('gx-b2-hero-amount'),badge=$('gx-b2-hero-badge');
-  // Read the true post-layout border boxes; scrollWidth can underreport
-  // the absolutely-positioned amount when WebKit clamps max-content.
-  const moneyWidth=amount.getBoundingClientRect().width;
-  const statusWidth=badge.getBoundingClientRect().width;
   const gap=10;
   // Horizontal separation settles slightly BEFORE the vertical compression:
   // at ~92% scroll the two labels share one row already, so delaying the
@@ -324,23 +354,31 @@ function setupHeaderMorph(){
    frame=0;watchdog=0;tick();
   },62);
  }
- function tick(){
+ function tick(ts){
   frame=0;
-  value+= (goal-value)*.23;
+  const now=typeof ts==='number'?ts:performance.now();
+  const dt=lastTick?Math.min(100,Math.max(0,now-lastTick)):16.7;
+  lastTick=now;
+  // Once the finger leaves, settle decisively to the rest state the
+  // scroll already dictates instead of hovering in the exponential tail.
+  const tau=(now-lastScroll)>IDLE_MS?SETTLE_TAU:TAU;
+  value+=(goal-value)*(1-Math.exp(-dt/tau));
   if(Math.abs(goal-value)<.003)value=goal;
   paint();
   if(value!==goal)schedule();
-  else{clearTimeout(watchdog);watchdog=0}
+  else{clearTimeout(watchdog);watchdog=0;lastTick=0}
  }
  function request(){
   goal=clamp(window.scrollY/172);
+  lastScroll=performance.now();
   if(reduced.matches){
    cancelAnimationFrame(frame);clearTimeout(watchdog);
-   frame=0;watchdog=0;value=goal;paint();return;
+   frame=0;watchdog=0;value=goal;lastTick=0;paint();return;
   }
   if(!frame&&!watchdog)schedule();
  }
  window.addEventListener('scroll',request,{passive:true});
+ window.addEventListener('scrollend',request,{passive:true});
  window.addEventListener('resize',()=>{paint();request()},{passive:true});
  if(reduced.addEventListener)reduced.addEventListener('change',request);
  request();paint();

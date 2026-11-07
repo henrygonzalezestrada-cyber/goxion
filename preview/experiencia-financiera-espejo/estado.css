@@ -209,6 +209,9 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .total-label{
  font-size:10px;letter-spacing:1.5px;
  white-space:nowrap;
 }
+/* R5.2 · fluidez: el par importe/cápsula viaja en su propia capa de
+   composición (translateZ(0) junto al will-change existente) para que
+   el cambio de transform no repinte en iOS. Sin cambio de geometría. */
 html[data-gx-index-remaster="r3"] #gx-b2-hero .total-amount{
  position:absolute;
  top:var(--gx-rm-amount-top);
@@ -221,7 +224,7 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .total-amount{
  max-width:59%;
  white-space:nowrap;
  font-variant-numeric:tabular-nums;
- transform:translateX(-50%) translateX(var(--gx-rm-amount-shift));
+ transform:translateX(-50%) translateX(var(--gx-rm-amount-shift)) translateZ(0);
  transform-origin:center;
  will-change:transform;
 }
@@ -232,7 +235,7 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
  position:absolute;
  top:var(--gx-rm-badge-top);
  left:50%;
- transform:translateX(-50%) translateX(var(--gx-rm-badge-shift));
+ transform:translateX(-50%) translateX(var(--gx-rm-badge-shift)) translateZ(0);
  margin:0;display:inline-flex;align-items:center;justify-content:center;
  width:max-content;max-width:var(--gx-rm-badge-max);
  padding:6px 10px;
