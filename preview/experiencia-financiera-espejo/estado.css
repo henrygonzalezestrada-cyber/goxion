@@ -1144,7 +1144,8 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
       solo al cargar y al cambiar el valor; se cancela con el scroll.
    2. Ambiente: la lava YA se mueve sola en index.css (lavaFluid
       10–14 s); R8 no la duplica. Lo vivo aquí es solo:
-        · glow líquido del badge (R10, sustituye al barrido);
+        · glow del badge: QUITADO en R11 (ver 2b); la píldora
+          queda plana, como el original;
         · respiración del anillo de lealtad (escala 1→1.025, 5 s).
       Nada de tilt ni movimientos bruscos; nada compite con el
       importe protagonista. Todo se pausa si la pestaña no está
@@ -1153,10 +1154,9 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
    R9 · QUITADO el glow del hero (2a): a Henry no le agradó, se
    comportaba extraño al contraer. La capa #gx-b2-hero::before y
    gx-r8-glow se eliminan por completo, sin restos. El brillo del
-   badge (2b) se sustituye por el glow líquido R9 (ver abajo): el
-   gradiente mezcla el color principal de cada estado con el
-   morado #7c4dff (o cian si el principal ya es morado) y se mueve
-   lento, como dos semilíquidos.
+   badge (2b) se sustituyó por el glow líquido R9/R10 y se quitó
+   por completo en R11 (ver 2b): la píldora queda plana, como el
+   original, sin gradiente ni halo.
    ================================================================ */
 /* R10 · Sin anclaje de scroll en el preview. El morph es
    scroll-acoplado: su geometría se deriva del scrollY, así que el
@@ -1171,66 +1171,34 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
    sin oscilar. Solo afecta a este preview; no toca el Index
    oficial ni ningún otro scroll. En Safari la propiedad se ignora
    (no la implementa), sin efecto adverso. */
-/* 2b · R10 · Glow líquido de la píldora de estado, más visible.
-   R9 se notaba poco: un solo degradado lineal con alphas ~.20 y un
-   halo tenue. Henry lo imagina como dos cosas brillantes que se
-   entremezclan sin unirse del todo (azul y amarillo revueltos, por
-   ejemplo), pero acorde al tono, sin colores chillantes. Aquí son
-   DOS manchas radiales — una de cada líquido del estado — que
-   derivan en direcciones opuestas y se cruzan por el centro sin
-   fundirse: en el cruce se suman con blend screen y el brillo
-   sube, como dos semilíquidos que se quieren mezclar. Los colores
-   son los mismos de R9 por estado (cian+morado normal, morado+cian
-   revisión, rojo+morado vencido, verde+morado pagado), solo sube
-   la intensidad (alphas .50 en el centro de cada mancha, halo
-   exterior .38/.22) y el movimiento es de 8 s, lento, sin parpadeo:
-   solo background-position, sin transform del texto. El texto
-   sigue legible: las manchas viven en el fondo, detrás del texto,
-   y se apagan con prefers-reduced-motion (queda el degradado
-   estático) y con la pestaña oculta (pausa). */
 html[data-gx-index-remaster="r3"]{overflow-anchor:none}
+/* 2b · R11 · Glow de la píldora QUITADO por completo (decisión de
+   Henry, 2026-11-07: le gustó R10 pero descarta el efecto glow).
+   Se eliminan las dos manchas radiales de R10 (gx-r10-liquid), el
+   gradiente líquido de R9 y el halo exterior: la píldora vuelve a
+   ser plana y limpia como el original, antes de los cambios de
+   glow — fondo translúcido simple por estado (index.css:
+   badge-ok/review/overdue/paid), borde por estado, texto legible
+   y transición de color .25s de R7. Sin animación ni gradiente:
+   background-image y box-shadow se fuerzan a none aquí para que
+   ningún resto de R9/R10 ni halo heredado quede sobre la píldora.
+   La corrección R10 de la píldora encimada (repaint + piso
+   scrollWidth) y el asentamiento al soltar NO se tocan: se quedan.
+   El glow del hero sigue quitado desde R9. */
 html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
- --gx-pill-a-rgb:0,242,254;--gx-pill-b-rgb:124,77,255;
- background-image:
-  radial-gradient(42% 95% at 22% 50%,rgba(var(--gx-pill-a-rgb),.50),rgba(var(--gx-pill-a-rgb),0) 72%),
-  radial-gradient(42% 95% at 78% 50%,rgba(var(--gx-pill-b-rgb),.50),rgba(var(--gx-pill-b-rgb),0) 72%),
-  linear-gradient(115deg,
-   rgba(var(--gx-pill-a-rgb),.22),
-   rgba(var(--gx-pill-b-rgb),.20) 55%,
-   rgba(var(--gx-pill-a-rgb),.22));
- background-size:180% 180%,180% 180%,220% 220%;
- background-blend-mode:screen;
- animation:gx-r10-liquid 8s ease-in-out infinite alternate;
- box-shadow:0 0 18px rgba(var(--gx-pill-a-rgb),.38),
-  0 0 36px rgba(var(--gx-pill-b-rgb),.22);
-}
-html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-review{
- --gx-pill-a-rgb:124,77,255;--gx-pill-b-rgb:0,242,254;
-}
-html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-overdue{
- --gx-pill-a-rgb:255,51,102;--gx-pill-b-rgb:124,77,255;
-}
-html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge.badge-paid{
- --gx-pill-a-rgb:0,255,157;--gx-pill-b-rgb:124,77,255;
-}
-/* Las dos manchas derivan en sentidos opuestos y a mitad del ciclo
-   se cruzan por el centro (50%: una en 55% y la otra en 45%): ahí
-   se entremezclan y el brillo sube por el blend screen, sin llegar
-   a fundirse en un solo color; luego cada una vuelve a su lado. */
-@keyframes gx-r10-liquid{
- 0%{background-position:0% 50%,100% 50%,0% 50%}
- 50%{background-position:55% 32%,45% 68%,50% 50%}
- 100%{background-position:100% 50%,0% 50%,100% 50%}
+ background-image:none;
+ animation:none;
+ box-shadow:none;
 }
 /* 2c · Respiración del anillo de lealtad: solo escala del wrapper. */
 html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{
  animation:gx-r8-breathe 5s ease-in-out infinite alternate;
 }
 @keyframes gx-r8-breathe{from{transform:scale(1)}to{transform:scale(1.025)}}
-/* Pausa cuando la pestaña no está visible (JS: visibilitychange). */
-html.gx-r8-paused #gx-b2-hero .time-badge,
+/* Pausa cuando la pestaña no está visible (JS: visibilitychange).
+   R11: la píldora ya no anima nada, así que solo se pausa el
+   anillo de lealtad. */
 html.gx-r8-paused #gx-b2-loyalty-mark{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){
- html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge,
  html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{animation:none!important}
 }

@@ -71,24 +71,22 @@ async function run(name,engine){
    assert.equal(await page.locator('#gx-b2-services')
     .evaluate(el=>getComputedStyle(el).backgroundColor),'rgba(8, 8, 12, 0.25)');
 
-   // R9 · el glow del hero se quitó por completo (a Henry no le
-   // agradó y se comportaba extraño al contraer): no debe quedar
-   // ::before con animación detrás del importe. El glow vive ahora
-   // en la píldora de estado: gradiente líquido que mezcla el
-   // color principal con otro (gx-r10-liquid) y respiración de
-   // lealtad, solo transform/opacity/background-position.
+   // R11 · el glow de la píldora se quitó por completo (decisión
+   // de Henry: le gustó R10 pero descarta el efecto glow). La
+   // píldora vuelve a ser plana como el original, antes de los
+   // cambios de glow: sin animación, sin gradiente líquido y sin
+   // halo. Solo queda la respiración de lealtad (R8) y la
+   // transición de color .25s de R7.
    assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').animationName),'none',
     'R9 '+name+' '+width+' hero glow must be gone');
    assert.equal(await page.locator('#gx-b2-hero').evaluate(el=>getComputedStyle(el,'::before').content),'none',
     'R9 '+name+' '+width+' hero must have no ::before layer left');
-   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).animationName),'gx-r10-liquid',
-    'R10 '+name+' '+width+' badge must carry the liquid glow');
-   assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('linear-gradient'),
-    'R10 '+name+' '+width+' badge liquid glow must be a gradient');
-   assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('radial-gradient'),
-    'R10 '+name+' '+width+' badge glow must have two radial liquid blobs');
-   assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundBlendMode.split(',').map(s=>s.trim()))).every(m=>m==='screen'),
-    'R10 '+name+' '+width+' badge blobs must mix with screen blend');
+   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).animationName),'none',
+    'R11 '+name+' '+width+' badge must carry no animation (glow removed)');
+   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).backgroundImage),'none',
+    'R11 '+name+' '+width+' badge must have no liquid gradient left');
+   assert.equal(await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).boxShadow),'none',
+    'R11 '+name+' '+width+' badge must have no glow halo left');
    assert.equal(await page.locator('#gx-b2-loyalty-mark').evaluate(el=>getComputedStyle(el).animationName),'gx-r8-breathe',
     'R8 '+name+' '+width+' loyalty mark must breathe');
    // R8 · conteo a mitad de camino: al cambiar de escenario el texto
