@@ -439,12 +439,28 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  * R11 (2026-11-07): el glow líquido de la píldora se quita por
  * completo por decisión de Henry (estado.css 2b); la píldora queda
  * plana como el original. Los puntos 1) y 2) se conservan intactos.
+ *
+ * R12 · morph solo-transform (Block 3, 2026-11-07): por fin se hace.
+ * El alto del hero es FIJO (116 px en CSS) y nunca se escribe desde
+ * JS: el documento no se mueve al compactar y el scrollY deja de
+ * realimentarse, que era el tirón en Safari con impulso. El precio
+ * viaja y se encoge solo con transform (scale .5 = 52→26 px, la
+ * fuente se queda en 52 px; la píldora scale .833 = 12→10 px) y la
+ * subida vertical es translateY. Como la caja ya no se encoge, lo
+ * que se encoge es lo VISIBLE: el contenido sube con transform
+ * (V−V0, ≈ −78 px en compacto) y el sticky se recorta con clip-path
+ * (116−V), así que en compacto se ve exactamente lo mismo que en
+ * R11 — mismo par, mismo contenido justo debajo, mismo fundido — sin
+ * tocar el layout en ningún frame. La geometría visual es idéntica:
+ * extremos 116/36 px, badge top 80→2 px, barra compacta en p≈0.35,
+ * gap 10 px, blur 25 px. La corrección R10 (sin solape) y el
+ * asentamiento al soltar se conservan; la píldora sigue SIN glow.
  */
 function setupHeaderMorph(){
  const root=document.documentElement;
  const reduced=matchMedia('(prefers-reduced-motion:reduce)');
  let value=0,goal=0,frame=0,watchdog=0,lastTick=0,lastScroll=0;
- let measureKey='',moneyWidth=0,statusWidth=0,amountH=0,badgeH=0,lastPainted=null;
+ let measureKey='',moneyWidth=0,statusWidth=0,amountH=0,badgeH=0,lastPainted=null,heroRestH=0;
  /* R10 · asentamiento al soltar (ver maybeSnap): cuando el cliente
   * suelta a mitad de scroll, el morph termina de acomodarse al
   * extremo más cercano. NUNCA se fuerza el valor del morph por su
@@ -454,13 +470,15 @@ function setupHeaderMorph(){
  let snapTimer=0,snapping=false,snapRaf=0,snapDeadline=0,touching=false;
  /* R10 · el asentamiento mueve el scrollY con una animación propia
   * por frames (ver animateSnap), no con el scrollTo suave del
-  * navegador: mientras la página se desliza, el hero cambia de
-  * alto (el morph es scroll-acoplado) y el anclaje de scroll del
-  * navegador compensa ese cambio empujando el scrollY; con el
-  * scrollTo suave eso dejaba el aterrizaje a medias (medido: soltar
-  * en 30 px terminaba en 61 px, no en 0). Al re-leer el scrollY
-  * real en cada frame, cualquier compensación se absorbe en el
-  * paso siguiente y el aterrizaje cae exacto en el extremo. */
+  * navegador: con el scrollTo suave el aterrizaje quedaba a medias
+  * (medido: soltar en 30 px terminaba en 61 px, no en 0). Al re-leer
+  * el scrollY real en cada frame, cualquier compensación se absorbe
+  * en el paso siguiente y el aterrizaje cae exacto en el extremo.
+  * R12 · con el hero de alto fijo, el anclaje de scroll ya no tiene
+  * nada que compensar durante el morph (la altura del documento no
+  * cambia), así que el asentamiento es aún más fiable; la animación
+  * por frames se conserva porque también absorbe scrolls
+  * programáticos que lleguen a mitad. */
  const clamp=n=>Math.max(0,Math.min(1,n));
  const smooth=t=>{t=clamp(t);return t*t*(3-2*t)};
  const px=n=>Math.round(n)+'px';
@@ -485,12 +503,18 @@ function setupHeaderMorph(){
    *  · badge con retraso: empieza en p≈0.30 y llega en p≈0.75;
    *  · la etiqueta se desvanece 0→0.33, solapada con el viaje del
    *    precio, y su hueco de 7 px se reclama en 0.10→0.45;
-   *  · el alto del hero ya no es 116-73p: se deriva del contenido real
-   *    (fondo de la pieza más baja + 8–14 px), así que no queda banda
-   *    vacía debajo del contenido a mitad de scroll.
-   * NO es el morph solo-transform (Block 3): el defecto era el mapeo
-   * de tiempos, no layout contra transform; cambiar la maquinaria
-   * habría tocado la geometría aprobada sin necesidad. Se conserva
+   *  · R12: el alto del hero ya NO se deriva del contenido: la caja
+   *    es fija (116 px) y lo que se encoge es lo visible. La altura
+   *    visual del par (fondo de la pieza más baja + 8–14 px, extremos
+   *    ~114/36 px) sigue calculándose igual, pero ahora solo sirve
+   *    para dos cosas que NO tocan el layout: subir el contenido con
+   *    transform y recortar el sticky con clip-path (estado.css R12).
+   *    Así no queda banda vacía debajo del contenido a mitad de
+   *    scroll ni en compacto.
+   * Block 3 (morph solo-transform) HECHO en R12: el defecto original
+   * era el mapeo de tiempos (R7), pero el tirón con impulso en Safari
+   * venía de que el alto del hero movía el documento y realimentaba
+   * el scrollY. Ahora solo transform/opacity/clip-path. Se conserva
    * tau 64 ms, scrollY/172, un solo precio exacto y el blur 25 px. */
   const pp=smooth(p/.45);
   const pb=smooth((p-.30)/.45);
@@ -508,14 +532,22 @@ function setupHeaderMorph(){
    Math.round(badgeSize)+'|'+window.innerWidth;
   if(Math.abs(p-(lastPainted??-1))<.0004&&key===measureKey)return;
   lastPainted=p;
-  root.style.setProperty('--gx-rm-amount-size',px(amountSize));
-  root.style.setProperty('--gx-rm-badge-size',px(badgeSize));
-  /* R10 · el tope de ancho de la píldora se fija ANTES de medir (en R9
-   * se fijaba después, así que la medida usaba el tope del pintado
-   * anterior: al subir, el tope viejo y más chico podía recortar la
-   * medida y achicar los desplazamientos). */
-  root.style.setProperty('--gx-rm-badge-max',(96-49*pb).toFixed(2)+'%');
-  if(key!==measureKey){
+  /* R12 · solo-transform: el tamaño y la posición ya NO se animan con
+   * font-size/top (propiedades de layout) sino con transform. La
+   * fuente del importe se queda en 52 px y la de la píldora en 12 px;
+   * el encogido es scale (52→26 es scale .5; 12→10 es scale .833) y
+   * el viaje es translate. El alto del hero es fijo (116 px en CSS)
+   * y nunca se escribe: el documento no se mueve al compactar y el
+   * scrollY deja de realimentarse. El desplazamiento del par se
+   * calcula con los anchos VISUALES (ancho de layout × scale), y la
+   * subida vertical (dy) compensa que el scale se hace sobre el
+   * centro: visualTop = layoutTop + dy + layoutH·(1−scale)/2.
+   * --gx-rm-badge-max ya NO se encoge: a 12 px fijos, bajarlo al 47%
+   * recortaría el texto con ellipsis (antes la fuente bajaba a 10 px
+   * y cabía); con 96% fijo el par cabe igual en 280–390 px. */
+  const amountScale=amountSize/52,badgeScale=badgeSize/12;
+  const remeasured=key!==measureKey;
+  if(remeasured){
    measureKey=key;
    // Read the true post-layout border boxes; scrollWidth can underreport
    // the absolutely-positioned amount when WebKit clamps max-content.
@@ -524,30 +556,44 @@ function setupHeaderMorph(){
    // su tope %): scrollWidth devuelve el ancho natural del contenido
    // aunque la caja esté recortada, así que el desplazamiento del par
    // se calcula con el ancho real y nunca con uno recortado.
+   // R12 · getBoundingClientRect ya NO sirve para medir: con scale,
+   // el rect es el tamaño visual (layout × scale). Los anchos se
+   // miden con scrollWidth (layout, sin transform) y los altos con
+   // offsetHeight (layout, sin transform); lo visual es layout × scale.
    moneyWidth=Math.max(amount.getBoundingClientRect().width,amount.scrollWidth);
    statusWidth=Math.max(badge.getBoundingClientRect().width,badge.scrollWidth);
-   amountH=amount.getBoundingClientRect().height;
-   badgeH=badge.getBoundingClientRect().height;
+   amountH=amount.offsetHeight;
+   badgeH=badge.offsetHeight;
   }
   // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
   // and the status on the RIGHT. Measure actual content to avoid oversized
   // empty space on wide screens or overlap on a 280px iPhone viewport.
+  // R12 · los desplazamientos usan anchos visuales (layout × scale).
   const gap=10;
   const amountTop=17-10*pp-freedLabelSpace;
   const badgeTop=80-71*pb-freedLabelSpace;
-  // El alto abraza al contenido: la pieza más baja + 8 px en expandido
-  // y +7 px en compacto. En los extremos da 116 px y 36 px, como R5.2.
-  const heroH=Math.round(Math.max(amountTop+amountH,badgeTop+badgeH)+8-pb);
-  root.style.setProperty('--gx-rm-hero-h',px(heroH));
-  root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*paired));
-  root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*paired));
-  root.style.setProperty('--gx-rm-badge-top',px(badgeTop));
-  root.style.setProperty('--gx-rm-amount-top',px(amountTop));
+  const amountVH=amountH*amountScale,badgeVH=badgeH*badgeScale;
+  // La altura VISUAL del hero (lo que ocupa el par): la pieza más baja
+  // + 8 px en expandido y +7 px en compacto. En los extremos da ~114 px
+  // y 36 px, como R5.2/R7. Ya no es la altura de la caja (fija en
+  // 116 px): es lo que el contenido ocupa y lo que se usa para subir
+  // el contenido y recortar el sticky (ver abajo).
+  const heroVH=Math.round(Math.max(amountTop+amountVH,badgeTop+badgeVH)+8-pb);
+  // V0: la altura visual en reposo. Se fija en el primer pintado y se
+  // re-deriva si cambia el contenido con p≈0; a mitad de morph no se
+  // toca (V(p) ≠ V0 ahí). El desplazamiento del contenido es V−V0:
+  // en reposo 0, en compacto ≈ −78 px.
+  if(heroRestH===0||(p<.02&&remeasured))heroRestH=heroVH;
+  root.style.setProperty('--gx-rm-amount-scale',amountScale.toFixed(4));
+  root.style.setProperty('--gx-rm-amount-dy',px(amountTop-17-amountH*(1-amountScale)/2));
+  root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth*badgeScale+gap)*.5*paired));
+  root.style.setProperty('--gx-rm-badge-scale',badgeScale.toFixed(4));
+  root.style.setProperty('--gx-rm-badge-dy',px(badgeTop-80-badgeH*(1-badgeScale)/2));
+  root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth*amountScale+gap)*.5*paired));
+  root.style.setProperty('--gx-rm-content-shift',px(heroVH-heroRestH));
+  root.style.setProperty('--gx-rm-clip',px(116-heroVH));
+  root.style.setProperty('--gx-rm-title-scale',((14-3*p)/14).toFixed(4));
   root.style.setProperty('--gx-rm-label-opacity',String(clamp(1-p*3)));
-  root.style.setProperty('--gx-rm-header-gap',px(9-3*p));
-  root.style.setProperty('--gx-rm-header-size',px(14-3*p));
-  root.style.setProperty('--gx-rm-header-bottom',px(10-3*p));
-  root.style.setProperty('--gx-rm-header-pad',px(11-3*p));
   root.style.setProperty('--gx-rm-progress',p.toFixed(3));
   root.dataset.gxRmCompact=String(p>.95);
  }

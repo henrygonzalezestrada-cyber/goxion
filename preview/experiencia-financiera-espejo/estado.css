@@ -164,23 +164,50 @@ html[data-gx-b2-index-demo="true"] .header{position:relative;min-height:30px}
    Original index.css owns brand, modal, CTA and base typography.
    ================================================================ */
 html[data-gx-index-remaster="r3"]{
- --gx-rm-hero-h:130px;--gx-rm-amount-size:52px;
- --gx-rm-amount-top:22px;--gx-rm-badge-top:90px;
+ /* R12 · solo-transform: la geometría del header/hero es FIJA (valores
+  * de reposo) y el morph solo mueve transform/clip-path. El alto del
+  * hero es 116 px siempre; el importe se queda en 52 px y la píldora
+  * en 12 px (el encogido es scale en JS). --gx-rm-badge-max ya no se
+  * encoge (a 12 px fijos, encogerlo recortaría el texto con ellipsis).
+  * El header también queda fijo en sus valores de reposo; el título
+  * se encoge con scale (--gx-rm-title-scale). */
+ --gx-rm-amount-size:52px;
+ --gx-rm-amount-top:17px;--gx-rm-badge-top:80px;
  --gx-rm-amount-shift:0px;--gx-rm-badge-shift:0px;
+ --gx-rm-amount-scale:1;--gx-rm-badge-scale:1;
+ --gx-rm-amount-dy:0px;--gx-rm-badge-dy:0px;
  --gx-rm-badge-max:96%;--gx-rm-badge-size:12px;
- --gx-rm-header-gap:15px;--gx-rm-header-size:14px;
- --gx-rm-header-bottom:20px;--gx-rm-header-pad:15px;
+ --gx-rm-header-gap:9px;--gx-rm-header-size:14px;
+ --gx-rm-header-bottom:10px;--gx-rm-header-pad:11px;
+ --gx-rm-title-scale:1;
+ --gx-rm-content-shift:0px;--gx-rm-clip:0px;
  --gx-rm-label-opacity:1;--gx-rm-progress:0;
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky{
  padding:max(var(--gx-rm-header-pad), env(safe-area-inset-top,0px))
    20px 11px;
  margin-bottom:var(--gx-rm-header-bottom);
+ /* R12 · el fondo se desvanece en los últimos 27 px de la zona
+  * VISIBLE (antes del recorte), no de la caja: como el clip-path
+  * recorta el ::after, el fundido vive ahora en el propio fondo.
+  * Las paradas se miden desde el borde visible (100% − clip), así
+  * que el fundido siempre cae en los últimos 27 px que se ven. */
  background:
-   linear-gradient(180deg,rgba(3,3,5,.90),rgba(3,3,5,.77) 70%,rgba(3,3,5,.65));
+   linear-gradient(180deg,rgba(3,3,5,.90),
+     rgba(3,3,5,.77) calc(100% - var(--gx-rm-clip,0px) - 54px),
+     rgba(3,3,5,.65) calc(100% - var(--gx-rm-clip,0px) - 27px),
+     rgba(3,3,5,0) calc(100% - var(--gx-rm-clip,0px)));
  backdrop-filter:blur(25px) saturate(1.2);
  -webkit-backdrop-filter:blur(25px) saturate(1.2);
  will-change:auto;
+ /* R12 · solo-transform: el sticky se recorta VISUALMENTE (clip-path,
+  * sin layout): su caja sigue midiendo lo mismo, pero lo que se ve
+  * termina donde termina el par compacto; el contenido, subido con
+  * transform, queda justo debajo, nítido. Sin clip, la caja fija
+  * dejaría una banda vacía de cristal de 80 px en compacto. El clip
+  * no rompe el sticky (no es overflow) ni el backdrop-filter. */
+ clip-path:inset(0 0 var(--gx-rm-clip,0px) 0);
+ -webkit-clip-path:inset(0 0 var(--gx-rm-clip,0px) 0);
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky::after{
  background:linear-gradient(to bottom,rgba(3,3,5,.66),transparent);
@@ -192,10 +219,15 @@ html[data-gx-index-remaster="r3"] #gx-b2-sticky .header{
 html[data-gx-index-remaster="r3"] #gx-b2-sticky .header-title{
  font-size:var(--gx-rm-header-size);
  letter-spacing:1.7px;
+ /* R12 · el título se encoge con scale (14→11 px visuales), no con
+  * font-size: su caja de layout no cambia y el header no se mueve. */
+ transform:scale(var(--gx-rm-title-scale,1));
+ transform-origin:center;
+ will-change:transform;
 }
 html[data-gx-index-remaster="r3"] #gx-b2-hero{
  position:relative;
- height:var(--gx-rm-hero-h);
+ height:116px; /* R12 · FIJO: el morph ya no anima la altura del hero. */
  display:block;
  text-align:center;
  min-width:0;
@@ -211,7 +243,9 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .total-label{
 }
 /* R5.2 · fluidez: el par importe/cápsula viaja en su propia capa de
    composición (translateZ(0) junto al will-change existente) para que
-   el cambio de transform no repinte en iOS. Sin cambio de geometría. */
+   el cambio de transform no repinte en iOS. Sin cambio de geometría.
+   R12 · el viaje y el encogido son SOLO transform: translateY(dy) +
+   scale; font-size y top quedan fijos (52 px / 17 px). */
 html[data-gx-index-remaster="r3"] #gx-b2-hero .total-amount{
  position:absolute;
  top:var(--gx-rm-amount-top);
@@ -224,7 +258,7 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .total-amount{
  max-width:59%;
  white-space:nowrap;
  font-variant-numeric:tabular-nums;
- transform:translateX(-50%) translateX(var(--gx-rm-amount-shift)) translateZ(0);
+ transform:translateX(-50%) translateX(var(--gx-rm-amount-shift)) translateY(var(--gx-rm-amount-dy)) scale(var(--gx-rm-amount-scale)) translateZ(0);
  transform-origin:center;
  will-change:transform;
 }
@@ -235,7 +269,7 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
  position:absolute;
  top:var(--gx-rm-badge-top);
  left:50%;
- transform:translateX(-50%) translateX(var(--gx-rm-badge-shift)) translateZ(0);
+ transform:translateX(-50%) translateX(var(--gx-rm-badge-shift)) translateY(var(--gx-rm-badge-dy)) scale(var(--gx-rm-badge-scale)) translateZ(0);
  margin:0;display:inline-flex;align-items:center;justify-content:center;
  width:max-content;max-width:var(--gx-rm-badge-max);
  padding:6px 10px;
@@ -258,6 +292,12 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero .badge-overdue{
 html[data-gx-index-remaster="r3"] .scrollable-content{
  min-width:0;
  padding-top:4px;
+ /* R12 · el contenido sube SOLO con transform (V−V0, ≈ −78 px en
+  * compacto): ocupa el hueco que deja el par al compactarse, así
+  * que visualmente queda justo debajo del precio, como en R11, sin
+  * que el documento cambie de alto ni el scrollY se realimente. */
+ transform:translateY(var(--gx-rm-content-shift,0px));
+ will-change:transform;
 }
 /* Account identity stays visible, but not in its own heavy glass card. */
 html[data-gx-index-remaster="r3"] .card-info{
@@ -1085,7 +1125,8 @@ html[data-gx-index-remaster="r3"] .gx-b2-proof-eyebrow{color:#9ca7c6}
    5. Copiar CLABE de ejemplo: el icono se transforma a check (sin
       toast). La CLABE es ficticia (ceros) y vive solo en la hoja.
    6. Acomodo del morph: vive en estado.js (curvas pp/pb/paired y
-      alto del hero derivado del contenido medido). Sin Block 3.
+      alto del hero derivado del contenido medido). Sin Block 3 en
+      R7; el Block 3 (solo-transform) se hace en R12 (ver final).
    ================================================================ */
 /* 2 · El badge cambia de color con transición suave, no de golpe. */
 html[data-gx-index-remaster="r3"] #gx-b2-hero .time-badge{
@@ -1170,7 +1211,11 @@ html[data-gx-b2-index-demo="true"] #gx-b2-demo-modal.show .gx-b2-demo-modal{
    lo dejó, el asentamiento evalúa el extremo correcto y aterriza
    sin oscilar. Solo afecta a este preview; no toca el Index
    oficial ni ningún otro scroll. En Safari la propiedad se ignora
-   (no la implementa), sin efecto adverso. */
+   (no la implementa), sin efecto adverso.
+   R12 · con el hero de alto fijo, el anclaje ya no tiene nada que
+   compensar durante el morph (el alto del documento no cambia);
+   la regla se conserva como cinturón para los cambios de escenario
+   (que sí cambian la altura del contenido). */
 html[data-gx-index-remaster="r3"]{overflow-anchor:none}
 /* 2b · R11 · Glow de la píldora QUITADO por completo (decisión de
    Henry, 2026-11-07: le gustó R10 pero descarta el efecto glow).
@@ -1202,3 +1247,48 @@ html.gx-r8-paused #gx-b2-loyalty-mark{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){
  html[data-gx-index-remaster="r3"] #gx-b2-loyalty-mark{animation:none!important}
 }
+
+/* ================================================================
+   R12 · MORPH SOLO-TRANSFORM (Block 3) · preview scope only
+   El problema: el morph animaba la altura del hero en JS y eso
+   movía el documento y realimentaba el scrollY — con impulso en
+   Safari el desplazamiento se sentía con tirones. La solución no
+   es "forzar" nada: la caja queda fija y solo se mueve lo visible.
+   Qué cambia (todo transform/opacity/clip-path, cero layout):
+     · hero: altura fija 116 px, nunca se escribe desde JS;
+     · importe: font-size fijo 52 px, top fijo 17 px; encoge con
+       scale (.5 → 26 px visuales) y viaja con translateY(dy) +
+       translateX(shift). La dy compensa el scale sobre el centro;
+     · píldora: font-size fijo 12 px, top fijo 80 px; scale .833
+       (→ 10 px) + translate. --gx-rm-badge-max queda fijo en 96%
+       (a 12 px, encogerlo recortaría el texto con ellipsis);
+     · título "ESTADO DE CUENTA": scale (14→11 px visuales);
+     · header (gaps, paddings, margin-bottom): fijos en reposo;
+     · contenido (.scrollable-content): sube con translateY(V−V0,
+       ≈ −78 px en compacto) y queda justo debajo del par, como
+       en R11, sin que el documento cambie de alto;
+     · sticky: se recorta con clip-path (116−V px por abajo) para
+       que lo que se VE termine donde termina el par. Sin clip,
+       la caja fija dejaría 80 px de banda vacía de cristal.
+   Qué se preserva, pixel a pixel en lo visual: extremos del par
+   (~114/36 px de alto visual, badge top 80→2 px), barra compacta
+   en p≈0.35, gap 10 px, curvas pp/pb/paired de R7, tau 64 ms,
+   scrollY/172, conteo R8/R9, pulso R7, respiración de lealtad R8,
+   corrección R10 (píldora sin solape: repaint + piso scrollWidth,
+   ahora con medidas de layout, no de rect escalado), asentamiento
+   R10 al soltar (ahora más fiable: nada mueve el scrollY por
+   detrás), píldora SIN glow (R11, plana original), blur 25 px y
+   cristal del sticky, fundido inferior (ahora en el fondo, ver
+   arriba: el clip-path recorta el ::after, así que se apaga aquí
+   y el fundido vive en el degradado del sticky).
+   Compromiso honesto: la caja del sticky sigue midiendo 176 px
+   en layout (el recorte es solo visual). En compacto el usuario
+   ve exactamente lo mismo que en R11; lo que cambia es que el
+   scroll ya no "empuja" el contenido 80 px al compactar: el
+   contenido sube por transform y el scroll avanza 1:1. El alto
+   total de la página ya no cambia con el morph.
+   ================================================================ */
+/* El ::after de fundido queda apagado: el clip-path lo recortaría
+   de todos modos (vive fuera de la caja) y el fundido ahora está
+   en el degradado de fondo del sticky (últimos 27 px visibles). */
+html[data-gx-index-remaster="r3"] #gx-b2-sticky::after{display:none}

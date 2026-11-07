@@ -252,21 +252,30 @@ async function run(name,engine){
       const r=s=>{const b=document.querySelector(s).getBoundingClientRect();
        return {l:b.left,r:b.right,t:b.top,b:b.bottom,w:b.width,h:b.height}};
       const a=r('#gx-b2-hero-amount'),b=r('#gx-b2-hero-badge'),h=r('#gx-b2-hero');
+      // R12 · el alto del hero es FIJO (116 px) y el importe ya no
+      // cambia de font-size (52 px fijos, encoge con scale): lo que
+      // se mide es lo VISUAL — alto del rect del importe, y la banda
+      // vacía bajo el par, que ahora se calcula con el recorte del
+      // sticky (clip-path): fondo visual del hero = top + (116 − clip).
+      const clip=getComputedStyle(document.querySelector('#gx-b2-sticky')).clipPath;
+      const clipBottom=parseFloat((clip.match(/[\d.]+/g)||['0','0','0'])[2])||0;
       return {p:+window.GOXION_E1B2_INDEX.getMorphProgress().toFixed(3),
        gap:+(b.l-a.r).toFixed(1),
        vOverlap:+(Math.min(a.b,b.b)-Math.max(a.t,b.t)).toFixed(1),
-       emptyBand:+(h.b-Math.max(a.b,b.b)).toFixed(1),
-       amountFont:+parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-amount')).fontSize).toFixed(1),
-       heroH:+h.h.toFixed(1)};
+       emptyBand:+((h.t+(116-clipBottom))-Math.max(a.b,b.b)).toFixed(1),
+       amountH:+a.h.toFixed(1),
+       heroH:+h.h.toFixed(1),
+       clipBottom:+clipBottom.toFixed(1)};
      });
      break;
     }catch{}
    }
    assert(mid,'R7 '+name+' '+width+' morph did not reach mid-scroll band');
    assert(mid.gap>=8,'R7 '+name+' '+width+' compact pair must be separated mid-scroll. Geometry: '+JSON.stringify(mid));
-   assert(mid.amountFont<=32,'R7 '+name+' '+width+' price must travel first. Geometry: '+JSON.stringify(mid));
+   assert(mid.amountH<=40,'R12 '+name+' '+width+' price must shrink by transform (visual height), not font-size. Geometry: '+JSON.stringify(mid));
    assert(mid.vOverlap<=0||mid.gap>=0,'R7 '+name+' '+width+' badge must never cross the amount. Geometry: '+JSON.stringify(mid));
    assert(mid.emptyBand<=16,'R7 '+name+' '+width+' hero must hug content, no empty band. Geometry: '+JSON.stringify(mid));
+   assert(Math.abs(mid.heroH-116)<=1,'R12 '+name+' '+width+' hero layout height must stay fixed mid-scroll. Geometry: '+JSON.stringify(mid));
    assert((await page.locator('#gx-b2-hero-badge').evaluate(el=>getComputedStyle(el).transitionProperty)).includes('background-color'),
     'R7 '+name+' '+width+' badge color must transition, not switch instantly');
    // R10 · asentamiento al soltar: si el cliente suelta a mitad de
@@ -297,10 +306,27 @@ async function run(name,engine){
     {timeout:6000,polling:50});
    // Scroll morph is a real relocation of the same DOM nodes, not a cloned hero.
    // Height temporarily reduced so even desktop-width scenarios can scroll.
+   // R12 · solo-transform: el alto del hero y del sticky son FIJOS
+   // (la caja ya no se encoge) y el importe ya no cambia de
+   // font-size (52 px fijos, encoge con scale). Lo que se encoge es
+   // lo VISUAL: la huella del par (fondo de la pieza más baja −
+   // top del hero), el alto del rect del importe, y el contenido
+   // sube con transform mientras el sticky se recorta con clip-path.
+   // Por eso las aserciones viejas de "height" y "font" pasan a
+   // medirse en rects y en la huella visual.
    const expanded=await page.evaluate(()=>{
     const a=document.querySelector('#gx-b2-hero-amount');
     const hero=document.querySelector('#gx-b2-hero');
-    return {font:parseFloat(getComputedStyle(a).fontSize),height:hero.getBoundingClientRect().height,
+    const ar=a.getBoundingClientRect(),hr=hero.getBoundingClientRect();
+    const br=document.querySelector('#gx-b2-hero-badge').getBoundingClientRect();
+    const cs=getComputedStyle(document.documentElement);
+    const c=getComputedStyle(document.querySelector('#gx-b2-sticky')).clipPath;
+    return {font:parseFloat(getComputedStyle(a).fontSize),height:hr.height,
+     stickyH:document.querySelector('#gx-b2-sticky').getBoundingClientRect().height,
+     amountH:+ar.height.toFixed(1),
+     footprint:+(Math.max(ar.bottom,br.bottom)-hr.top).toFixed(1),
+     contentShift:parseFloat(cs.getPropertyValue('--gx-rm-content-shift'))||0,
+     clipBottom:parseFloat((c.match(/[\d.]+/g)||['0','0','0'])[2])||0,
      amountTop:parseFloat(getComputedStyle(a).top),
      badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top)};
    });
@@ -311,9 +337,19 @@ async function run(name,engine){
    const collapsed=await page.evaluate(()=>{
     const a=document.querySelector('#gx-b2-hero-amount').getBoundingClientRect();
     const b=document.querySelector('#gx-b2-hero-badge').getBoundingClientRect();
+    const hero=document.querySelector('#gx-b2-hero').getBoundingClientRect();
+    const cs=getComputedStyle(document.documentElement);
+    const c=getComputedStyle(document.querySelector('#gx-b2-sticky')).clipPath;
     return {
      font:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-amount')).fontSize),
-     height:document.querySelector('#gx-b2-hero').getBoundingClientRect().height,
+     height:hero.height,
+     stickyH:document.querySelector('#gx-b2-sticky').getBoundingClientRect().height,
+     amountH:+a.height.toFixed(1),
+     footprint:+(Math.max(a.bottom,b.bottom)-hero.top).toFixed(1),
+     amountTopVisual:+(a.top-hero.top).toFixed(1),
+     badgeTopVisual:+(b.top-hero.top).toFixed(1),
+     contentShift:parseFloat(cs.getPropertyValue('--gx-rm-content-shift'))||0,
+     clipBottom:parseFloat((c.match(/[\d.]+/g)||['0','0','0'])[2])||0,
      amountTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-amount')).top),
      badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top),
      labelOpacity:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-label')).opacity),
@@ -328,11 +364,21 @@ async function run(name,engine){
    assert.equal(expanded.amountTop,17,name+' '+width+' expanded amount moved');
    assert.equal(expanded.badgeTop,80,name+' '+width+' expanded badge moved');
    assert(collapsed.labelOpacity<.05,name+' '+width+' label should be gone');
-   assert(collapsed.amountTop<=1,name+' '+width+' hidden label leaves empty space above amount');
-   assert(collapsed.badgeTop<=3,name+' '+width+' hidden label leaves empty space above badge');
-   assert(collapsed.height<=38,name+' '+width+' hidden label reserves excess hero height');
-   assert(collapsed.font<expanded.font-17,name+' '+width+' amount did not morph');
-   assert(collapsed.height<expanded.height-58,name+' '+width+' sticky height did not compress');
+   assert(collapsed.amountTopVisual<=1,name+' '+width+' hidden label leaves empty space above amount');
+   assert(collapsed.badgeTopVisual<=3,name+' '+width+' hidden label leaves empty space above badge');
+   assert(collapsed.footprint<=38,name+' '+width+' visual hero footprint must compress to 36px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(expanded.amountH-collapsed.amountH>=17,name+' '+width+' amount did not morph (visual height). Geometry: '+JSON.stringify({expanded,collapsed}));
+   // R12 · el morph ya no toca el layout: la caja del hero y del
+   // sticky miden lo mismo en reposo y en compacto; lo que se
+   // encoge es la huella visual del par, el contenido sube con
+   // transform y el sticky se recorta con clip-path.
+   assert(Math.abs(collapsed.height-expanded.height)<=1,'R12 '+name+' '+width+' hero layout height must stay fixed. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(Math.abs(collapsed.stickyH-expanded.stickyH)<=1,'R12 '+name+' '+width+' sticky layout height must stay fixed. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(expanded.footprint-collapsed.footprint>=58,'R12 '+name+' '+width+' visual hero footprint must still compress by 58px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert.equal(expanded.font,52,'R12 '+name+' '+width+' amount font-size must stay 52px (scale shrinks it)');
+   assert.equal(collapsed.font,52,'R12 '+name+' '+width+' amount font-size must stay 52px in compact state');
+   assert(collapsed.clipBottom>=70,'R12 '+name+' '+width+' sticky must clip the freed space in compact state. Geometry: '+JSON.stringify(collapsed));
+   assert(collapsed.contentShift<=-70,'R12 '+name+' '+width+' content must rise by transform in compact state. Geometry: '+JSON.stringify(collapsed));
    
    assert(collapsed.amountCenter<collapsed.badgeCenter,
     name+' '+width+' amount must sit LEFT of the badge');
