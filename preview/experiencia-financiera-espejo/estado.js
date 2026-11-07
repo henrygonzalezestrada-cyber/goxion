@@ -49,9 +49,12 @@ function hero(){
    ink.textContent=value;
    if(priorAmount!==null&&!matchMedia('(prefers-reduced-motion:reduce)').matches){
     ink.getAnimations().forEach(a=>a.cancel());
-    ink.animate([{opacity:.4,transform:'translateY(7px) scale(.97)'},
-      {opacity:1,transform:'translateY(0) scale(1)'}],
-      {duration:420,easing:'cubic-bezier(.2,.78,.24,1)'});
+    /* R7 · pulso de importe: escala 1.04→1 en 300 ms con la misma
+     * curva del morph. El texto ya es el valor exacto del escenario
+     * ($45.00/$94.00 en la demo); nunca se cuentan valores falsos. */
+    ink.animate([{opacity:.55,transform:'scale(1.04)'},
+      {opacity:1,transform:'scale(1)'}],
+      {duration:300,easing:'cubic-bezier(.2,.78,.24,1)'});
    }
   }
  }else amount.innerHTML='<span class="gx-b2-number-ink">'+value+'</span>';
@@ -112,12 +115,15 @@ function calendar(){
   selected=btn.dataset.charge;mode='single';refresh();
  }));
 }
+/* R7 · pulso del importe seleccionado: solo cuando el valor exacto
+ * cambia (Próximo ↔ Todo junto, o al elegir un cargo). Sin conteo. */
+let priorSelectedTotal=null;
 function breakdown(){
  const Q=quote(),target=$('gx-b2-breakdown');
- if(!Q.trusted||!fx.pending(Q).length){target.hidden=true;return}
+ if(!Q.trusted||!fx.pending(Q).length){target.hidden=true;priorSelectedTotal=null;return}
  target.hidden=false;
  const {rows,total}=current();
- if(!rows.length){target.hidden=true;return}
+ if(!rows.length){target.hidden=true;priorSelectedTotal=null;return}
  const sum=k=>rows.reduce((n,r)=>n+r[k],0);
  const base=sum('base'),loyalty=sum('loyalty'),commercial=sum('commercial'),
        mora=sum('mora'),abono=sum('abono');
@@ -133,6 +139,15 @@ function breakdown(){
   (abono?line('Abono ya aprobado','−'+fx.money(abono),'discount-line'):'')+
   '<div class="gx-b2-selected-final"><span>Importe seleccionado</span><strong id="gx-b2-selected-total">'+fx.money(total)+'</strong></div>'+
   (fx.total(fx.pending(Q))!==total?line('Total pendiente del período',fx.money(fx.total(fx.pending(Q)))):'');
+ const strong=$('gx-b2-selected-total');
+ if(strong&&priorSelectedTotal!==null&&priorSelectedTotal!==total&&
+    !matchMedia('(prefers-reduced-motion:reduce)').matches){
+  strong.getAnimations().forEach(a=>a.cancel());
+  strong.animate([{opacity:.55,transform:'scale(1.04)'},
+    {opacity:1,transform:'scale(1)'}],
+    {duration:300,easing:'cubic-bezier(.2,.78,.24,1)'});
+ }
+ priorSelectedTotal=total;
 }
 /* Compact status with semantic stage progress. Never treat "received" as
  * approved, and never imply a percentage chance of approval.
@@ -234,8 +249,44 @@ function openDemo(){
 function closeDemo(){
  const el=$('gx-b2-demo-modal');el.classList.remove('show');el.hidden=true;
  el.setAttribute('aria-hidden','true');document.documentElement.classList.remove('gx-b2-modal-open');
+ /* R7: al cerrar, el botón de copiar vuelve a su estado inicial. */
+ const copyBtn=$('gx-b2-copy-clabe');
+ if(copyBtn){clearTimeout(copyClabe._t);copyBtn.classList.remove('is-copied');
+  copyBtn.setAttribute('aria-label','Copiar CLABE de ejemplo');
+  const st=$('gx-b2-copy-state');if(st)st.textContent='Copiar';}
  if(lastFocus?.isConnected)lastFocus.focus({preventScroll:true});
 }
+/* R7 · Copiar CLABE de ejemplo: el icono se transforma a check, sin
+ * toast genérico. CLABE ficticia de demostración (ceros), sin backend
+ * y sin cuenta real; el portapapeles se escribe con fallback legacy.
+ * El estado "Copiado" revierte solo a los 1,8 s. */
+const GX_R7_CLABE_DEMO='012180000000000000';
+function copyClabe(){
+ const btn=$('gx-b2-copy-clabe');if(!btn)return;
+ const done=()=>{
+  btn.classList.add('is-copied');
+  btn.setAttribute('aria-label','CLABE de ejemplo copiada');
+  const st=$('gx-b2-copy-state');if(st)st.textContent='Copiado';
+  clearTimeout(copyClabe._t);
+  copyClabe._t=setTimeout(()=>{
+   btn.classList.remove('is-copied');
+   btn.setAttribute('aria-label','Copiar CLABE de ejemplo');
+   if(st)st.textContent='Copiar';
+  },1800);
+ };
+ const fallback=()=>{
+  const ta=document.createElement('textarea');
+  ta.value=GX_R7_CLABE_DEMO;ta.setAttribute('readonly','');
+  ta.style.cssText='position:fixed;top:0;opacity:0';
+  document.body.appendChild(ta);ta.select();
+  let ok=false;try{ok=document.execCommand('copy')}catch{}
+  ta.remove();if(ok)done();
+ };
+ if(navigator.clipboard?.writeText){
+  navigator.clipboard.writeText(GX_R7_CLABE_DEMO).then(done).catch(fallback);
+ }else fallback();
+}
+$('gx-b2-copy-clabe')?.addEventListener('click',copyClabe);
 $('gx-b2-calendar-toggle').addEventListener('click',()=>{
  open=!open;calendar();
 });
@@ -284,56 +335,92 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  * NO se asienta a 0/1 por su cuenta: el morph sigue acoplado al
  * scrollY, y forzarlo a un extremo sin mover el scroll provocaría un
  * salto al siguiente evento de scroll.
+ *
+ * R7 · acomodo (2026-11-07): mismos extremos, mismo tau, solo los
+ * tiempos de cada pieza (ver paint): el precio viaja primero y
+ * termina en p≈0.45, la separación horizontal termina en p≈0.35 y el
+ * badge entra con retraso (0.30→0.75); el alto del hero se deriva
+ * del contenido medido para no dejar banda vacía. Sin Block 3
+ * (morph solo-transform): no hizo falta, el defecto era el mapeo.
  */
 function setupHeaderMorph(){
  const root=document.documentElement;
  const reduced=matchMedia('(prefers-reduced-motion:reduce)');
  let value=0,goal=0,frame=0,watchdog=0,lastTick=0,lastScroll=0;
- let measureKey='',moneyWidth=0,statusWidth=0,lastPainted=null;
+ let measureKey='',moneyWidth=0,statusWidth=0,amountH=0,badgeH=0,lastPainted=null;
  const clamp=n=>Math.max(0,Math.min(1,n));
+ const smooth=t=>{t=clamp(t);return t*t*(3-2*t)};
  const px=n=>Math.round(n)+'px';
  // Time constant of the approved 60 Hz feel: one 16.7 ms frame with the
  // old fixed .23 step is 1-exp(-16.7/TAU) = .23  →  TAU ≈ 64 ms.
  const TAU=64,SETTLE_TAU=26,IDLE_MS=120;
  function paint(){
   const p=value;
-  const amountSize=52-26*p;
+  /* R7 · acomodo (2026-11-07): MISMA geometría en reposo y MISMO par
+   * compacto al final (gap 10 px, mismo blur), solo cambia CUÁNDO viaja
+   * cada pieza. Medido en Chromium 390 px antes del cambio, el badge
+   * atravesaba el importe a mitad de scroll: a p≈0.2 ya se solapaban
+   * 90 px en horizontal y el rectángulo del badge entraba en la banda
+   * vertical del precio, y a p≈0.43 el solape era de ~50 px — ese es el
+   * "precio flotante" del video. La causa era el mapeo lineal: el badge
+   * subía (80-71p) mientras la separación horizontal (p*1.1) aún no
+   * llegaba al ~0.93 que exige no cruzarse. Ahora cada pieza tiene su
+   * propia curva suavizada sobre p, con los extremos idénticos:
+   *  · precio primero: tamaño 52→26 y subida completos en p≈0.45;
+   *  · separación horizontal completa en p≈0.35, ANTES de que el badge
+   *    pueda entrar en la banda vertical del importe;
+   *  · badge con retraso: empieza en p≈0.30 y llega en p≈0.75;
+   *  · la etiqueta se desvanece 0→0.33, solapada con el viaje del
+   *    precio, y su hueco de 7 px se reclama en 0.10→0.45;
+   *  · el alto del hero ya no es 116-73p: se deriva del contenido real
+   *    (fondo de la pieza más baja + 8–14 px), así que no queda banda
+   *    vacía debajo del contenido a mitad de scroll.
+   * NO es el morph solo-transform (Block 3): el defecto era el mapeo
+   * de tiempos, no layout contra transform; cambiar la maquinaria
+   * habría tocado la geometría aprobada sin necesidad. Se conserva
+   * tau 64 ms, scrollY/172, un solo precio exacto y el blur 25 px. */
+  const pp=smooth(p/.45);
+  const pb=smooth((p-.30)/.45);
+  const paired=smooth((p-.05)/.30);
+  const freedLabelSpace=7*smooth((p-.10)/.35);
+  const amountSize=52-26*pp;
+  const badgeSize=12-2*pb;
   const amount=$('gx-b2-hero-amount'),badge=$('gx-b2-hero-badge');
   // Re-measure only when something that changes the widths changed.
   // Reading border boxes every frame forced a synchronous layout per
   // frame while scrolling; the key covers text, size bucket and viewport.
-  const key=amount.textContent+'|'+badge.textContent+'|'+Math.round(amountSize)+'|'+window.innerWidth;
+  // R7: la altura del hero se deriva de las alturas MEDIDAS (no de una
+  // fórmula), así que la clave también cubre el tamaño del badge.
+  const key=amount.textContent+'|'+badge.textContent+'|'+Math.round(amountSize)+'|'+
+   Math.round(badgeSize)+'|'+window.innerWidth;
   if(Math.abs(p-(lastPainted??-1))<.0004&&key===measureKey)return;
   lastPainted=p;
-  // Once "Próximo pago / Importe pendiente" fades out, its former space
-  // should NOT remain between "Estado de Cuenta" and the amount/status.
-  // Smoothly reclaim 7px only AFTER the label starts disappearing. The
-  // baseline expanded layout and the rest of the accepted R5 morph stay.
-  const fadeProgress=clamp((p-.25)/.5);
-  const freedLabelSpace=7*fadeProgress*fadeProgress*(3-2*fadeProgress);
-  root.style.setProperty('--gx-rm-hero-h',px(116-73*p-freedLabelSpace));
   root.style.setProperty('--gx-rm-amount-size',px(amountSize));
+  root.style.setProperty('--gx-rm-badge-size',px(badgeSize));
   if(key!==measureKey){
    measureKey=key;
    // Read the true post-layout border boxes; scrollWidth can underreport
    // the absolutely-positioned amount when WebKit clamps max-content.
    moneyWidth=amount.getBoundingClientRect().width;
    statusWidth=badge.getBoundingClientRect().width;
+   amountH=amount.getBoundingClientRect().height;
+   badgeH=badge.getBoundingClientRect().height;
   }
   // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
   // and the status on the RIGHT. Measure actual content to avoid oversized
   // empty space on wide screens or overlap on a 280px iPhone viewport.
   const gap=10;
-  // Horizontal separation settles slightly BEFORE the vertical compression:
-  // at ~92% scroll the two labels share one row already, so delaying the
-  // separation until 100% creates a 1px collision on 280px devices.
-  const paired=Math.min(1,p*1.1);
+  const amountTop=17-10*pp-freedLabelSpace;
+  const badgeTop=80-71*pb-freedLabelSpace;
+  // El alto abraza al contenido: la pieza más baja + 8 px en expandido
+  // y +7 px en compacto. En los extremos da 116 px y 36 px, como R5.2.
+  const heroH=Math.round(Math.max(amountTop+amountH,badgeTop+badgeH)+8-pb);
+  root.style.setProperty('--gx-rm-hero-h',px(heroH));
   root.style.setProperty('--gx-rm-amount-shift',px(-(statusWidth+gap)*.5*paired));
   root.style.setProperty('--gx-rm-badge-shift',px((moneyWidth+gap)*.5*paired));
-  root.style.setProperty('--gx-rm-badge-top',px(80-71*p-freedLabelSpace));
-  root.style.setProperty('--gx-rm-amount-top',px(17-10*p-freedLabelSpace));
-  root.style.setProperty('--gx-rm-badge-max',(96-49*p).toFixed(2)+'%');
-  root.style.setProperty('--gx-rm-badge-size',px(12-2*p));
+  root.style.setProperty('--gx-rm-badge-top',px(badgeTop));
+  root.style.setProperty('--gx-rm-amount-top',px(amountTop));
+  root.style.setProperty('--gx-rm-badge-max',(96-49*pb).toFixed(2)+'%');
   root.style.setProperty('--gx-rm-label-opacity',String(clamp(1-p*3)));
   root.style.setProperty('--gx-rm-header-gap',px(9-3*p));
   root.style.setProperty('--gx-rm-header-size',px(14-3*p));
