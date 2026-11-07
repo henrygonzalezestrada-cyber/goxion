@@ -436,8 +436,9 @@ $('gx-b2-demo-submit').addEventListener('click',()=>{
  * ancho se fija antes de medir. 2) Al soltar a mitad de scroll, el
  * scrollY se asienta suave al extremo más cercano (0 o máximo) y el
  * morph lo sigue; nunca se fuerza el valor del morph por su cuenta.
- * 3) El glow líquido de la píldora (estado.css) sube de intensidad:
- * dos manchas radiales que se entremezclan con blend screen.
+ * R11 (2026-11-07): el glow líquido de la píldora se quita por
+ * completo por decisión de Henry (estado.css 2b); la píldora queda
+ * plana como el original. Los puntos 1) y 2) se conservan intactos.
  */
 function setupHeaderMorph(){
  const root=document.documentElement;
