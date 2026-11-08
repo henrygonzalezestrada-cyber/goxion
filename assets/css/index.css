@@ -3345,3 +3345,204 @@ html:not(.gx-payment-v2) .gx-submit-copy{display:block}
         animation:none!important;
     }
 }
+
+/* ================================================================
+   INTEGRACIÓN INDEX R17 · morph del encabezado oficial
+   (port visual de E1/B2 R5.2–R17; el motor financiero no se toca)
+   Solo actúa cuando 05-index-header-morph.js enlaza el hero y
+   pone html[data-gx-index-morph="r17"]. Sin ese flag, la oficial
+   se ve exactamente como antes: si el JS falla, no hay cambio.
+   · Solo-transform (R12): la caja del hero es fija y lo que se
+     mueve es transform/opacity/clip-path; el documento no cambia
+     de alto al compactar y el scrollY no se realimenta.
+   · Blur oficial intacto: 27 px en V2 (::before), 28 px en base.
+     NO se baja a 25 px del preview. Cristal y fundido, intactos.
+   · --gx-rm-cut: en reposo -58 px (la cola de fundido V2 por
+     debajo de la caja queda exacta); en compacto vale el clip.
+     El ::before V2 se acorta con la misma variable para que el
+     fundido siempre termine en el borde visible. El clip-path
+     recorta el sticky sin tocar el layout.
+   · Gap título→precio apretado (R15): margin-bottom del header
+     15→4 px. Píldora 12 px original, sin glow (R11). Sin flecha
+     de retroceso: la oficial no la tiene y no se añade.
+   · Hoja de reporte: NO se toca. La oficial V2 ya entra con
+     resorte (.34s cubic-bezier(.18,.86,.22,1.04)) y su importe
+     ya es vivo (abrirModalPago / adaptador B2). Añadir otra
+     animación pelearía con la suya.
+   · Energía R17: la oficial no tiene pistas de progreso; el
+     equivalente es la fila del próximo pago B2, con una línea
+     de luz en su base cada 2.8 s. En flujo global no hay fila:
+     no hay energía, no se inventa UI nueva.
+   · overflow-anchor:none (R10): el anclaje ya no empuja el
+     scrollY durante el asentamiento.
+   ================================================================ */
+html[data-gx-index-morph="r17"]{
+    --gx-rm-amount-size:52px;
+    --gx-rm-amount-top:16px;--gx-rm-badge-top:80px;
+    --gx-rm-amount-shift:0px;--gx-rm-badge-shift:0px;
+    --gx-rm-amount-scale:1;--gx-rm-badge-scale:1;
+    --gx-rm-amount-dy:0px;--gx-rm-badge-dy:0px;
+    --gx-rm-badge-max:96%;--gx-rm-badge-size:12px;
+    --gx-rm-header-gap:4px;--gx-rm-header-size:14px;
+    --gx-rm-title-scale:1;
+    --gx-rm-content-shift:0px;--gx-rm-clip:0px;--gx-rm-cut:-58px;
+    --gx-rm-label-opacity:1;--gx-rm-progress:0;
+    --gx-rm-space:0;--gx-rm-space-top:2px;--gx-rm-space-h:22px;
+    --gx-rm-title-fade:0;--gx-rm-hero-dy:0px;
+    overflow-anchor:none;
+}
+html[data-gx-index-morph="r17"] .sticky-area{
+    /* R12 · recorte solo visual: la caja no cambia y el sticky
+       sigue siendo sticky (clip-path no rompe position:sticky).
+       En reposo el inset es -58 px: la cola de fundido V2 por
+       debajo de la caja se conserva exacta. */
+    clip-path:inset(0 0 var(--gx-rm-cut,-58px) 0);
+    -webkit-clip-path:inset(0 0 var(--gx-rm-cut,-58px) 0);
+}
+/* V2 · el ::before lleva el cristal (blur 27 px) y el fundido:
+   se acorta con el mismo corte para que el fundido termine en
+   el borde visible en todo p, no 58 px por debajo. */
+html[data-gx-index-morph="r17"].gx-payment-v2 .sticky-area::before{
+    bottom:var(--gx-rm-cut,-58px);
+}
+/* Base (sin V2) · el fondo se desvanece en los últimos 27 px de
+   la zona visible, como R12 en el preview; el ::after queda
+   recortado por el clip-path. En reposo cut=-58 y las paradas
+   quedan más allá del 100%: fondo sólido .70, como antes. */
+html[data-gx-index-morph="r17"]:not(.gx-payment-v2) .sticky-area{
+    background:
+        linear-gradient(180deg,rgba(3,3,5,.70),
+            rgba(3,3,5,.70) calc(100% - var(--gx-rm-cut,-58px) - 54px),
+            rgba(3,3,5,.55) calc(100% - var(--gx-rm-cut,-58px) - 27px),
+            rgba(3,3,5,0) calc(100% - var(--gx-rm-cut,-58px)));
+}
+html[data-gx-index-morph="r17"] .sticky-area .header{
+    /* R15 · gap título→precio 15→4 px, en reposo y en compacto. */
+    margin-bottom:var(--gx-rm-header-gap);
+}
+html[data-gx-index-morph="r17"] .sticky-area .header-title{
+    opacity:calc(1 - var(--gx-rm-title-fade,0));
+    /* R12 · el título se encoge con scale (14→11 px visuales),
+       no con font-size: su caja no cambia y el header no se mueve. */
+    transform:scale(var(--gx-rm-title-scale,1));
+    transform-origin:center;
+    will-change:transform;
+}
+/* El banner de suspendido (si existe) se desvanece con el título:
+   pertenece a la zona del encabezado, no a la barra compacta. */
+html[data-gx-index-morph="r17"] .sticky-area .alert-banner{
+    opacity:calc(1 - var(--gx-rm-title-fade,0));
+}
+html[data-gx-index-morph="r17"] .balance-hero{
+    position:relative;
+    height:var(--gx-rm-hero-h,108px); /* FIJO: lo mide el JS en flujo */
+    display:block;
+    text-align:center;
+    min-width:0;
+    /* R16 · el hero SUBE con transform sobre la fila del título
+       ya desvanecida: sin colapsar nada en layout (eso movía el
+       scroll del final, bug R13). */
+    transform:translateY(var(--gx-rm-hero-dy,0px));
+    will-change:transform;
+}
+html[data-gx-index-morph="r17"] .balance-hero .total-label{
+    position:absolute;top:0;left:0;right:0;
+    opacity:var(--gx-rm-label-opacity);
+    margin:0;
+    pointer-events:none;
+    white-space:nowrap;
+}
+/* R5.2 · el par importe/píldora viaja en su propia capa de
+   composición para que el transform no repinte en iOS.
+   R12 · el viaje y el encogido son SOLO transform: font-size y
+   top quedan fijos (52 px / top medido). */
+html[data-gx-index-morph="r17"] .balance-hero .total-amount{
+    position:absolute;
+    top:var(--gx-rm-amount-top);
+    left:50%;margin:0;
+    font-size:var(--gx-rm-amount-size);
+    font-weight:800;
+    line-height:1;
+    width:max-content;
+    max-width:96%;
+    white-space:nowrap;
+    font-variant-numeric:tabular-nums; /* R8: los dígitos no bailan al contar */
+    transform:translateX(-50%) translateX(var(--gx-rm-amount-shift)) translateY(var(--gx-rm-amount-dy)) scale(var(--gx-rm-amount-scale)) translateZ(0);
+    transform-origin:center;
+    will-change:transform;
+}
+html[data-gx-index-morph="r17"] .balance-hero .time-badge{
+    position:absolute;
+    top:var(--gx-rm-badge-top);
+    left:50%;
+    transform:translateX(-50%) translateX(var(--gx-rm-badge-shift)) translateY(var(--gx-rm-badge-dy)) scale(var(--gx-rm-badge-scale)) translateZ(0);
+    margin:0;display:inline-flex;align-items:center;justify-content:center;
+    width:max-content;max-width:var(--gx-rm-badge-max);
+    font-size:var(--gx-rm-badge-size);
+    white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+    will-change:transform;
+}
+html[data-gx-index-morph="r17"] .scrollable-content{
+    /* R12 · el contenido sube SOLO con transform (-clip): queda
+       justo debajo de la barra compacta, sin que el documento
+       cambie de alto ni el scrollY se realimente. */
+    transform:translateY(var(--gx-rm-content-shift,0px));
+    will-change:transform;
+}
+/* R14/R16/R17 · botón "Mi Espacio" en compacto, aislado a la
+   derecha, estilo Ayuda con texto blanco. Lo inyecta el JS en
+   el hero; solo recibe puntero cuando el morph está compacto. */
+html[data-gx-index-morph="r17"] .balance-hero .gx-index-space-btn{
+    position:absolute;
+    top:var(--gx-rm-space-top,2px);
+    right:0;
+    height:auto;
+    display:inline-flex;align-items:center;justify-content:center;
+    padding:8px 14px;
+    font-size:13px;line-height:1.2;font-weight:700;letter-spacing:.01em;
+    font-family:inherit;white-space:nowrap;text-decoration:none;
+    color:#fff;
+    background:rgba(0,242,254,.10);
+    border:1px solid rgba(0,242,254,.35);
+    border-radius:20px;
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    opacity:var(--gx-rm-space,0);
+    transform:translateX(calc((1 - var(--gx-rm-space,0)) * 12px));
+    pointer-events:none;
+    will-change:transform,opacity;
+    z-index:2;
+}
+html[data-gx-rm-compact="true"] .balance-hero .gx-index-space-btn{
+    pointer-events:auto;
+}
+@media(prefers-reduced-motion:reduce){
+    html[data-gx-index-morph="r17"] .balance-hero .gx-index-space-btn{
+        transform:none;
+    }
+}
+/* R17 · ENERGÍA en la fila del próximo pago B2 (equivalente
+   oficial a las pistas de progreso del preview, que aquí no
+   existen): una línea de luz recorre la base de la fila cada
+   2.8 s. Solo background/transform, sin tocar el texto (la
+   línea vive en los 2 px inferiores, bajo el padding). Se pausa
+   con pestaña oculta y se apaga con prefers-reduced-motion. */
+html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after{
+    content:"";
+    position:absolute;left:0;bottom:0;height:2px;width:36%;
+    background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),rgba(0,242,254,.9),transparent);
+    animation:gx-index-energy 2.8s ease-in-out infinite;
+    pointer-events:none;
+}
+@keyframes gx-index-energy{
+    0%{transform:translateX(-120%);opacity:0}
+    12%{opacity:1}
+    55%{transform:translateX(300%);opacity:1}
+    70%,100%{transform:translateX(300%);opacity:0}
+}
+html.gx-r8-paused .gx-b2-row.is-next::after{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+    html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after{animation:none!important}
+}
+
