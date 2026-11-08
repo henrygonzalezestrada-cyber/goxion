@@ -386,6 +386,8 @@ async function run(name,engine){
      clipBottom:parseFloat((c.match(/[\d.]+/g)||['0','0','0'])[2])||0,
      amountTop:parseFloat(getComputedStyle(a).top),
      badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top),
+     // R15 · header apretado: 20 px de alto (antes 29 px).
+     headerH:document.querySelector('#gx-b2-sticky .header').getBoundingClientRect().height,
      // R14 · en expandido el botón "Mi Espacio" no debe verse.
      btnOpacity:parseFloat(getComputedStyle(btn).opacity),
      btnText:btn.textContent,btnHref:btn.getAttribute('href')};
@@ -396,6 +398,10 @@ async function run(name,engine){
    assert.equal(expanded.btnText,'Mi Espacio','R14 '+name+' '+width+' compact button must say Mi Espacio');
    assert(expanded.btnHref.endsWith('ayuda.html'),'R14 '+name+' '+width+' compact button must lead to Mi Espacio (ayuda.html). Href: '+expanded.btnHref);
    assert(expanded.btnOpacity<.05,'R14 '+name+' '+width+' space button must be hidden in expanded state. Opacity: '+expanded.btnOpacity);
+   // R15 · la flecha de retroceso se eliminó del preview (la
+   // oficial no la tiene): no debe existir en ningún estado.
+   assert.equal(await page.locator('#gx-b2-back').count(),0,'R15 '+name+' '+width+' back arrow must be gone, not hidden');
+   assert.equal(expanded.headerH,20,'R15 '+name+' '+width+' header must be 20px tall (gap tightened). Height: '+expanded.headerH);
    await page.setViewportSize({width,height:550});
    await page.evaluate(()=>window.scrollTo(0,330));
    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.getMorphProgress?.()>.992,null,
@@ -428,7 +434,12 @@ async function run(name,engine){
      btn:{l:+s.left.toFixed(1),r:+s.right.toFixed(1),h:+s.height.toFixed(1),
       o:parseFloat(getComputedStyle(document.querySelector('#gx-b2-space-btn')).opacity)},
      vw:document.documentElement.clientWidth,
-     stickyTop:document.querySelector('#gx-b2-sticky').getBoundingClientRect().top
+     stickyTop:document.querySelector('#gx-b2-sticky').getBoundingClientRect().top,
+     // R15 · píldora a su tamaño original en compacto (12 px, sin
+     // scale) y gap título→precio apretado.
+     badgeFont:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).fontSize),
+     badgeScale:parseFloat(cs.getPropertyValue('--gx-rm-badge-scale'))||0,
+     titleGap:+(a.top-document.querySelector('.header-title').getBoundingClientRect().bottom).toFixed(1)
     };
    });
    // The label is initially visible, and only its vacated space gets
@@ -473,6 +484,12 @@ async function run(name,engine){
     'R14 '+name+' '+width+' space button must match the badge height. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(collapsed.btn.o>.95,
     'R14 '+name+' '+width+' space button must be visible in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
+   // R15 · píldora compacta a su tamaño original (12 px, sin
+   // scale .833) y título pegado a la fila del precio: en compacto
+   // el gap título→precio es ~8 px (antes ~22 px) y nada se encima.
+   assert.equal(collapsed.badgeFont,12,'R15 '+name+' '+width+' badge must keep its original 12px in compact state. Font: '+collapsed.badgeFont);
+   assert.equal(collapsed.badgeScale,1,'R15 '+name+' '+width+' badge must not scale down in compact state. Scale: '+collapsed.badgeScale);
+   assert(collapsed.titleGap<=12,'R15 '+name+' '+width+' title must sit close to the price row in compact state. Gap: '+collapsed.titleGap);
    assert(collapsed.badgeLeft>=-2&&collapsed.amountRight<=collapsed.vw+2,
     name+' '+width+' collapsed header overflows horizontally');
    assert(Math.abs(collapsed.stickyTop)<4,name+' '+width+' sticky header left viewport');

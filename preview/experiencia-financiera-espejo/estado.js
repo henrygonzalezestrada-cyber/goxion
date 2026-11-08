@@ -127,8 +127,9 @@ function hero(){
  badgeNode.className='time-badge '+cls;
  badgeNode.title=badge;
  $('gx-b2-period').textContent=Q.period+' · Ejemplo';
- $('gx-b2-back').href='./index.html?escenario='+encodeURIComponent(
-  Object.hasOwn(fx.mapping,key)?key:key==='first_paid'||key==='partial'||key==='same_day'?'multi':'upcoming');
+ /* R15 · la flecha de retroceso se eliminó del preview (la oficial
+  * no la tiene); ya no hay href que actualizar al cambiar de
+  * escenario. */
 }
 function services(){
  const Q=quote(),el=$('gx-b2-services');
@@ -572,7 +573,13 @@ function setupHeaderMorph(){
   const spread=smooth((p-.75)/.25);
   const freedLabelSpace=7*smooth((p-.10)/.35);
   const amountSize=52-26*pp;
-  const badgeSize=12-2*pb;
+  /* R15 · la píldora vuelve a su tamaño ORIGINAL: 12 px siempre,
+   * sin encoger con scale (.833 → 10 px en R12/R14 se veía súper
+   * pequeña y rara). badgeScale queda en 1; la píldora compacta
+   * mide lo mismo que en reposo y el botón "Mi Espacio" sigue a
+   * su mismo alto (badgeH×1). pb sigue usándose para la subida
+   * (badgeTop) y la huella visual, no para el tamaño. */
+  const badgeSize=12;
   const amount=$('gx-b2-hero-amount'),badge=$('gx-b2-hero-badge');
   // Re-measure only when something that changes the widths changed.
   // Reading border boxes every frame forced a synchronous layout per
@@ -586,8 +593,9 @@ function setupHeaderMorph(){
   /* R12 · solo-transform: el tamaño y la posición ya NO se animan con
    * font-size/top (propiedades de layout) sino con transform. La
    * fuente del importe se queda en 52 px y la de la píldora en 12 px;
-   * el encogido es scale (52→26 es scale .5; 12→10 es scale .833) y
-   * el viaje es translate. El alto del hero es fijo (116 px en CSS)
+   * el encogido del importe es scale (52→26 es scale .5) y el viaje
+   * es translate. R15: la píldora YA NO encoge (scale 1, 12 px
+   * siempre, su tamaño original). El alto del hero es fijo (116 px en CSS)
    * y nunca se escribe: el documento no se mueve al compactar y el
    * scrollY deja de realimentarse. El desplazamiento del par se
    * calcula con los anchos VISUALES (ancho de layout × scale), y la
