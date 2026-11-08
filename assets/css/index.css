@@ -3490,48 +3490,55 @@ html[data-gx-index-morph="r17"] .scrollable-content{
     transform:translateY(var(--gx-rm-content-shift,0px));
     will-change:transform;
 }
-/* R14/R16/R17 · botón "Mi Espacio" en compacto, aislado a la
-   derecha, estilo Ayuda con texto blanco. Lo inyecta el JS en
-   el hero; solo recibe puntero cuando el morph está compacto. */
-html[data-gx-index-morph="r17"] .balance-hero .gx-index-space-btn{
+/* R18 · "X" de cierre en compacto: cian sólido #00f2fe con X
+   negra, cuadrada, del alto de la píldora, aislada a la derecha.
+   Sustituye al botón de texto "Mi Espacio" (R14–R17): con la X
+   la píldora gana ~70 px de ancho y hay menos marquee. Lo inyecta
+   el JS en el hero; solo recibe puntero cuando el morph está
+   compacto. Sin backdrop-filter: el cian es sólido y el blur bajo
+   el botón en Safari entorpecía el toque. */
+html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
     position:absolute;
     top:var(--gx-rm-space-top,2px);
     right:0;
-    height:auto;
+    width:30px;height:30px;
     display:inline-flex;align-items:center;justify-content:center;
-    padding:8px 14px;
-    font-size:13px;line-height:1.2;font-weight:700;letter-spacing:.01em;
-    font-family:inherit;white-space:nowrap;text-decoration:none;
-    color:#fff;
-    background:rgba(0,242,254,.10);
-    border:1px solid rgba(0,242,254,.35);
-    border-radius:20px;
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
+    padding:0;
+    font-size:15px;line-height:1;font-weight:800;
+    font-family:inherit;text-decoration:none;
+    color:#000;
+    background:#00f2fe;
+    border:0;
+    border-radius:10px;
     opacity:var(--gx-rm-space,0);
     transform:translateX(calc((1 - var(--gx-rm-space,0)) * 12px));
     pointer-events:none;
     will-change:transform,opacity;
     z-index:2;
 }
-/* El botón recibe puntero en cuanto empieza a verse (spreadH>0),
+/* La X recibe puntero en cuanto empieza a verse (spreadH>0),
    no solo en compacto total: con la puerta en p>.95, un toque
-   justo al aparecer el botón caía en nada y parecía no servir. */
-html[data-gx-rm-space-visible="true"] .balance-hero .gx-index-space-btn{
+   justo al aparecer la X caía en nada y parecía no servir. */
+html[data-gx-rm-space-visible="true"] .balance-hero .gx-index-close-btn{
     pointer-events:auto;
 }
 @media(prefers-reduced-motion:reduce){
-    html[data-gx-index-morph="r17"] .balance-hero .gx-index-space-btn{
+    html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
         transform:none;
     }
 }
-/* R17 · ENERGÍA en la fila del próximo pago B2 (equivalente
-   oficial a las pistas de progreso del preview, que aquí no
-   existen): una línea de luz recorre la base de la fila cada
-   2.8 s. Solo background/transform, sin tocar el texto (la
-   línea vive en los 2 px inferiores, bajo el padding). Se pausa
-   con pestaña oculta y se apaga con prefers-reduced-motion. */
-html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after{
+/* R17/R18 · ENERGÍA en las filas B2 que vencen en la fecha
+   próxima (equivalente oficial a las pistas de progreso del
+   preview, que aquí no existen): una línea de luz recorre la
+   base de cada una cada 2.8 s. La selección no cambia: la fila
+   "Próximo"/Seleccionado sigue siendo una sola (is-next); las
+   demás filas de la misma fecha llevan is-due-next y solo
+   comparten la animación. Solo background/transform, sin tocar
+   el texto (la línea vive en los 2 px inferiores, bajo el
+   padding). Se pausa con pestaña oculta y se apaga con
+   prefers-reduced-motion. */
+html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after,
+html[data-gx-index-morph="r17"] .gx-b2-row.is-due-next::after{
     content:"";
     position:absolute;left:0;bottom:0;height:2px;width:36%;
     background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),rgba(0,242,254,.9),transparent);
@@ -3544,9 +3551,11 @@ html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after{
     55%{transform:translateX(300%);opacity:1}
     70%,100%{transform:translateX(300%);opacity:0}
 }
-html.gx-r8-paused .gx-b2-row.is-next::after{animation-play-state:paused!important}
+html.gx-r8-paused .gx-b2-row.is-next::after,
+html.gx-r8-paused .gx-b2-row.is-due-next::after{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){
-    html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after{animation:none!important}
+    html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after,
+    html[data-gx-index-morph="r17"] .gx-b2-row.is-due-next::after{animation:none!important}
 }
 
 

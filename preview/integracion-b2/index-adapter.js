@@ -275,8 +275,13 @@
         x.cargo_id===(selected||due?.cargo_id);
       const next=x.cargo_id===due?.cargo_id&&!x.pagado;
       const late=x.mora_centavos>0;
+      /* Energía R18: todas las filas no pagadas que vencen en la
+       * misma fecha efectiva que la próxima llevan is-due-next y
+       * comparten la animación. La selección no cambia: la fila
+       * "Próximo"/Seleccionado sigue siendo una sola (is-next). */
+      const dueNext=!!due&&effectiveDue(x)===effectiveDue(due)&&!x.pagado;
       return '<button class="gx-b2-row '+(checked?'is-active ':'')+
-       (x.pagado?'is-done ':'')+(late?'is-late ':'')+(next?'is-next':'')+
+       (x.pagado?'is-done ':'')+(late?'is-late ':'')+(next?'is-next ':'')+(dueNext?'is-due-next':'')+
        '" type="button" data-b2-cargo="'+esc(x.cargo_id)+'" '+(x.pagado?'disabled':'')+'>'+
        '<span class="gx-b2-row-main"><span class="gx-b2-row-title">'+esc(title(x))+
        '</span><span class="gx-b2-row-meta">'+
