@@ -3,11 +3,9 @@
  * No Admin selectors, no visual change to Ayuda or official Index. */
 html[data-gx-b2-index-demo="true"] .container{padding-bottom:100px}
 html[data-gx-b2-index-demo="true"] .header{position:relative;min-height:30px}
-.gx-b2-back{position:absolute;left:0;top:50%;transform:translateY(-50%);text-decoration:none;
- color:var(--text-main);border:1px solid rgba(183,209,241,.17);
- border-radius:50%;width:36px;height:36px;display:grid;place-items:center;
- font:500 28px/1 Poppins,system-ui,sans-serif;background:rgba(255,255,255,.025)}
-.gx-b2-back:focus-visible,.gx-b2-calendar-toggle:focus-visible,.gx-b2-calendar-row:focus-visible,
+/* R15 · la flecha de retroceso (.gx-b2-back) se eliminó del preview:
+ * la oficial no la tiene. Regla borrada, no ocultada. */
+.gx-b2-calendar-toggle:focus-visible,.gx-b2-calendar-row:focus-visible,
 .gx-b2-mode:focus-visible,.gx-b2-lab-trigger:focus-visible,.gx-b2-lab select:focus-visible{
  outline:2px solid var(--neon-blue);outline-offset:3px
 }
@@ -172,8 +170,9 @@ html[data-gx-b2-index-demo="true"] .header{position:relative;min-height:30px}
 html[data-gx-index-remaster="r3"]{
  /* R12 · solo-transform: la geometría del header/hero es FIJA (valores
   * de reposo) y el morph solo mueve transform/clip-path. El alto del
-  * hero es 116 px siempre; el importe se queda en 52 px y la píldora
-  * en 12 px (el encogido es scale en JS). --gx-rm-badge-max ya no se
+  * hero es 116 px siempre; el importe se queda en 52 px (encoge con
+  * scale en JS) y la píldora en 12 px (R15: sin scale, su tamaño
+  * original). --gx-rm-badge-max ya no se
   * encoge (a 12 px fijos, encogerlo recortaría el texto con ellipsis).
   * El header también queda fijo en sus valores de reposo; el título
   * se encoge con scale (--gx-rm-title-scale). */
@@ -183,7 +182,11 @@ html[data-gx-index-remaster="r3"]{
  --gx-rm-amount-scale:1;--gx-rm-badge-scale:1;
  --gx-rm-amount-dy:0px;--gx-rm-badge-dy:0px;
  --gx-rm-badge-max:96%;--gx-rm-badge-size:12px;
- --gx-rm-header-gap:9px;--gx-rm-header-size:14px;
+ /* R15 · gap título→precio apretado: 9→4 px. Es el mismo gap en
+  * reposo y en compacto, así que el título queda más pegado a la
+  * fila del precio en ambos estados, sin tocar tamaños. Junto con
+  * la min-height del header (29→20 px) recorta ~14 px de aire. */
+ --gx-rm-header-gap:4px;--gx-rm-header-size:14px;
  --gx-rm-header-bottom:10px;--gx-rm-header-pad:11px;
  --gx-rm-title-scale:1;
  --gx-rm-content-shift:0px;--gx-rm-clip:0px;
@@ -224,7 +227,9 @@ html[data-gx-index-remaster="r3"] #gx-b2-sticky::after{
  bottom:-27px;height:27px;
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky .header{
- min-height:29px;margin-bottom:var(--gx-rm-header-gap);
+ /* R15 · header más bajo (29→20 px): el título de 14 px cabe
+  * sobrado y se recorta el aire entre título y fila del precio. */
+ min-height:20px;margin-bottom:var(--gx-rm-header-gap);
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky .header-title{
  font-size:var(--gx-rm-header-size);
@@ -1269,9 +1274,10 @@ html.gx-r8-paused #gx-b2-loyalty-mark{animation-play-state:paused!important}
      · importe: font-size fijo 52 px, top fijo 17 px; encoge con
        scale (.5 → 26 px visuales) y viaja con translateY(dy) +
        translateX(shift). La dy compensa el scale sobre el centro;
-     · píldora: font-size fijo 12 px, top fijo 80 px; scale .833
-       (→ 10 px) + translate. --gx-rm-badge-max queda fijo en 96%
-       (a 12 px, encogerlo recortaría el texto con ellipsis);
+     · píldora: font-size fijo 12 px, top fijo 80 px; R15: ya NO
+       lleva scale (en R12 era .833 → 10 px y se veía miniatura).
+       --gx-rm-badge-max queda fijo en 96% en reposo; en compacto
+       lo calcula el spread de R14 entre precio y botón;
      · título "ESTADO DE CUENTA": scale (14→11 px visuales);
      · header (gaps, paddings, margin-bottom): fijos en reposo;
      · contenido (.scrollable-content): sube con translateY(V−V0,
