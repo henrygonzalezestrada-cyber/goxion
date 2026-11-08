@@ -3496,7 +3496,9 @@ html[data-gx-index-morph="r17"] .scrollable-content{
    la píldora gana ~70 px de ancho y hay menos marquee. Lo inyecta
    el JS en el hero; solo recibe puntero cuando el morph está
    compacto. Sin backdrop-filter: el cian es sólido y el blur bajo
-   el botón en Safari entorpecía el toque. */
+   el botón en Safari entorpecía el toque. Redonda (50%): misma
+   jerarquía que las X de las hojas (Notificaciones, Pago por
+   transferencia), que son círculos cian con X negra. */
 html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
     position:absolute;
     top:var(--gx-rm-space-top,2px);
@@ -3509,7 +3511,7 @@ html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
     color:#000;
     background:#00f2fe;
     border:0;
-    border-radius:10px;
+    border-radius:50%;
     opacity:var(--gx-rm-space,0);
     transform:translateX(calc((1 - var(--gx-rm-space,0)) * 12px));
     pointer-events:none;
