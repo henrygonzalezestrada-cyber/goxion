@@ -35,29 +35,25 @@
 .gx-b2-content{padding:0 16px 18px}
 .gx-b2-divider{border-top:1px solid rgba(185,206,244,.09);margin-bottom:9px}
 
-/* Cada acceso comienza directamente por SU NOMBRE. El próximo se distingue
-   con iluminación transversal, no con una raya a la izquierda ni un punto. */
+/* R17-completar (c) · FILAS ABIERTAS, como el calendario del
+   preview: sin recuadro por fila (sin radio ni fondo propio),
+   separadas solo por una línea fina, como
+   .gx-b2-calendar-row del espejo. La fila activa se distingue
+   por el importe en cian y la etiqueta "Seleccionado" (igual
+   que en el preview); la próxima, por la línea de energía R17
+   en su base y la etiqueta VENCIDO/PRÓXIMO. Sin fondos por
+   fila: el brillo que recorría la fila (gxB2NextSheen) se va
+   con el recuadro. */
 .gx-b2-row{
   position:relative;isolation:isolate;display:flex;align-items:center;gap:13px;
-  width:100%;min-width:0;min-height:64px;padding:12px 10px;margin:2px 0;
-  border:0;border-radius:11px;background:transparent;color:#fff;
+  width:100%;min-width:0;min-height:64px;padding:13px 4px;margin:0;
+  border:0;border-bottom:1px solid rgba(255,255,255,.065);border-radius:0;
+  background:transparent;color:#fff;
   text-align:left;cursor:pointer;overflow:hidden;
-  transition:background .28s ease,opacity .28s ease
+  transition:opacity .28s ease
 }
-.gx-b2-row.is-active{
-  background:linear-gradient(104deg,rgba(39,174,211,.09),rgba(113,86,187,.045) 72%,transparent);
-}
-.gx-b2-row.is-next{
-  background:linear-gradient(104deg,
-    rgba(34,151,195,.13) 0%,rgba(108,89,196,.075) 33%,
-    rgba(42,167,197,.095) 58%,rgba(108,89,196,.04) 100%);
-  background-size:235% 100%;
-  animation:gxB2NextSheen 7s ease-in-out infinite alternate
-}
-.gx-b2-row.is-next.is-late{
-  background:linear-gradient(104deg,rgba(202,68,111,.135),rgba(135,75,137,.045) 76%,transparent);
-  animation:none
-}
+.gx-b2-row:last-child{border-bottom:0}
+.gx-b2-row.is-active .gx-b2-row-side strong{color:var(--neon-blue)}
 .gx-b2-row.is-done{opacity:.6;cursor:default}
 .gx-b2-row-main{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}
 .gx-b2-row-title{
@@ -100,9 +96,6 @@
 .gx-b2-service-flag.is-late{
   background:linear-gradient(100deg,#e887ae,#ffb2cb,#f29aaa);
   background-size:220% 100%;background-clip:text;-webkit-background-clip:text
-}
-@keyframes gxB2NextSheen{
-  from{background-position:0% 50%}to{background-position:100% 50%}
 }
 @keyframes gxB2TextLight{
   from{background-position:0% 50%}to{background-position:100% 50%}
@@ -151,7 +144,7 @@
 }
 @media(prefers-reduced-motion:reduce){
  .gx-b2-reveal,.gx-b2-chevron,.gx-b2-choice,.gx-b2-row{transition:none!important}
- .gx-b2-row.is-next,.gx-b2-next-tag,.gx-b2-service-flag{animation:none!important}
+ .gx-b2-next-tag,.gx-b2-service-flag{animation:none!important}
 }
 
 /* Desglose multifecha: se reutiliza la tarjeta oficial, sin cajas anidadas.

@@ -179,6 +179,28 @@
               && String(cliente.pago_revision_estado || "").toLowerCase() === "incompleto");
       const tieneDiferenciaPendiente = pagoIncompleto && montoFaltanteRevision > 0;
 
+      /* R17-completar (a) · fase del seguimiento del comprobante, del
+       * estado vivo del motor. Prioridad: revisión > observación >
+       * validado. "Validado" exige período pagado Y último estado de
+       * revisión aprobado, para no afirmar un comprobante validado
+       * en un período nuevo sin recibo. "Rechazado" es observación:
+       * Admin dejó un mensaje para corregir y reenviar. */
+      const proofPhase = enRevision ? "review"
+        : (pagoIncompleto || reviewState === "rechazado") ? "correction"
+        : (estaPagadoPeriodo && reviewState === "aprobado") ? "approved" : null;
+      const proofHint = proofPhase === "correction"
+        ? String(cliente.pago_revision_mensaje || "").trim() : "";
+      const proofHTML = proofPhase ? gxProofTrackerHTML(proofPhase, proofHint) : "";
+
+      /* R17-completar (b) · lealtad viva para la joya del preview:
+       * objetivo 4 (Nivel 1) o 9 (Nivel 2); el conteo lo pone la
+       * leyenda de la joya, así la descripción ya no repite "X/4". */
+      const loyaltyTarget = racha >= 4 ? 9 : 4;
+      const loyaltyCount = Math.max(0, Math.min(racha, loyaltyTarget));
+      const loyaltyTitle = perdioRacha ? "Racha reiniciada" : "Tu lealtad";
+      const loyaltyCaption = perdioRacha ? "Perdiste tu avance"
+        : `${loyaltyCount} de ${loyaltyTarget} pagos puntuales`;
+
       if (enRevision) {
           badgeClass = "badge-review";
           badgeText = `⏳ Pago en revisión`;
@@ -251,7 +273,7 @@
         const faltantes = 4 - racha;
         mensajeLealtad = perdioRacha 
           ? `<span style="color:var(--danger-red); font-weight:600;">💔 Racha reiniciada a 0 por atraso en el pago.</span>` 
-          : `Progreso: <span class="loyalty-highlight" style="color:var(--text-main);">${racha}/4 pagos</span>. Faltan ${faltantes} pago(s) para subir a Nivel 1.`;
+          : `Te faltan ${faltantes} pago(s) para subir a Nivel 1.`;
       }
 
       if (gxEstadoCuenta) pctDescuento = Number(gxEstadoCuenta.lealtad?.porcentaje || 0) / 100;
@@ -308,12 +330,12 @@
       let btnAccionHTML = "";
 
       if (enRevision) {
-          btnAccionHTML = `
-            <div class="btn-review-state">
-              <span>⏳ <strong>Tu comprobante está en revisión</strong></span>
-              <span style="font-size: 11px; color: var(--text-muted);">El equipo de Goxion actualizará tu estado en breve.</span>
-            </div>
-          `;
+          /* R17-completar (a) · en revisión no hay bloque de acción:
+           * el mensaje vive solo en el seguimiento del comprobante
+           * (igual que en el preview: "Message belongs only to the
+           * proof timeline"). La píldora del hero sigue diciendo
+           * "Pago en revisión" y el botón de pago no aparece. */
+          btnAccionHTML = ``;
       } else if (estaPagadoPeriodo) {
           totalFinal = gxEstadoCuenta ? Number(gxEstadoCuenta.total_actual || 0) : 0;
           labelTotal = gxEstadoCuenta?.total_label || "Saldo Pendiente";
@@ -379,6 +401,7 @@
         </div>
 
         <div class="scrollable-content">
+          ${proofHTML}
           ${(cliente.estado === 'pagado' || enRevision || pagoIncompleto) ? '' : mensajeAtrasoHTML}
 
           <div class="glass-card card-info">
@@ -406,10 +429,11 @@
 
           ${breakdownHTML}
 
-          <div class="glass-card loyalty-badge">
-            <div class="loyalty-icon">⭐</div>
+          <div class="glass-card loyalty-badge gx-index-loyalty" data-loyalty-state="${perdioRacha ? "lost" : "active"}">
+            ${gxLoyaltyMarkHTML(loyaltyCount, loyaltyTarget, perdioRacha)}
             <div class="loyalty-content">
-              <div class="loyalty-title">Programa Goxion</div>
+              <div class="loyalty-title">${loyaltyTitle}</div>
+              <div class="gx-index-loyalty-caption">${loyaltyCaption}</div>
               <div class="loyalty-desc">${mensajeLealtad}</div>
             </div>
           </div>
@@ -493,6 +517,90 @@
       .replace(/>/g,"&gt;")
       .replace(/"/g,"&quot;")
       .replace(/'/g,"&#39;");
+  }
+
+  /* R17-completar · SEGUIMIENTO DEL COMPROBANTE (port vanilla del
+   * preview E1/B2, sin React/Animate UI: la oficial no los carga).
+   * Misma información que el preview: fase, icono animado, nombre,
+   * pista y 3 etapas. La fase la decide SOLO el estado vivo del
+   * motor (pago_en_revision / pago_revision_estado / pago_incompleto
+   * / período pagado); aquí no se calcula nada financiero.
+   * review = comprobante recibido, en revisión.
+   * correction = observación (incompleto o rechazado por Admin).
+   * approved = comprobante validado y período pagado. */
+  function gxProofTrackerHTML(phase, hintOverride) {
+    const defs = {
+      review: { name: "Recibimos tu comprobante", hint: "No lo envíes de nuevo.",
+        progress: 66, steps: ["Recibido", "Validando", "Resultado"], completed: 1,
+        icon: "clock" },
+      correction: { name: "Hay una observación", hint: "Revisa los datos antes de enviarlo otra vez.",
+        progress: 66, steps: ["Recibido", "Revisado", "Corregir"], completed: 1,
+        icon: "x" },
+      approved: { name: "Comprobante validado", hint: "El pago ya fue aplicado.",
+        progress: 100, steps: ["Recibido", "Verificado", "Aplicado"], completed: 3,
+        icon: "check" }
+    };
+    const def = defs[phase];
+    if (!def) return "";
+    const hint = String(hintOverride || "").trim() || def.hint;
+    /* Iconos Lucide, mismas rutas que los componentes Animate UI del
+     * preview (preview/experiencia-financiera-espejo/animate-ui-src/
+     * icons/{clock,circle-x,circle-check}.tsx). El reloj anima su
+     * manecilla con CSS (pausa con pestaña oculta y reduced-motion). */
+    const icons = {
+      clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="12" x2="16" y2="14" class="gx-index-proof-hand"/><line x1="12" y1="6" x2="12" y2="12"/></svg>',
+      x: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+      check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>'
+    };
+    const currentLabel = def.steps[Math.min(def.steps.length - 1, def.completed)];
+    const labels = def.steps.map((label, i) => {
+      const cls = i < def.completed ? "is-reached"
+        : (phase === "correction" && i === 2 ? "is-attention" : "");
+      return '<span class="' + cls + '">' + gxEsc(label) + "</span>";
+    }).join("");
+    return '<section class="gx-index-proof gx-index-proof-' + phase + '" data-phase="' + phase + '" aria-label="Estado del comprobante">' +
+      '<div class="gx-index-proof-head">' +
+        '<div class="gx-index-proof-icon" aria-hidden="true">' + (icons[def.icon] || "") + "</div>" +
+        '<div class="gx-index-proof-words">' +
+          '<span class="gx-index-proof-eyebrow">COMPROBANTE</span>' +
+          '<strong class="gx-index-proof-name">' + gxEsc(def.name) + "</strong>" +
+          '<p class="gx-index-proof-hint">' + gxEsc(hint) + "</p>" +
+        "</div>" +
+      "</div>" +
+      '<div class="gx-index-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + def.progress + '" aria-label="Etapas completadas del comprobante" aria-valuetext="' + def.completed + " de 3 etapas; " + gxEsc(currentLabel) + '">' +
+        '<span class="gx-index-progress-track"><span class="gx-index-progress-indicator" style="width:' + def.progress + '%"></span></span>' +
+      "</div>" +
+      '<div class="gx-index-progress-labels" aria-hidden="true">' + labels + "</div>" +
+    "</section>";
+  }
+
+  /* R17-completar · JOYA DE LEALTAD (port vanilla del preview).
+   * Anillo con una sección por pago del nivel (4 o 9, como los
+   * milestones del preview) y estrella Lucide al centro con
+   * respiración suave. Datos vivos: racha = pagos_efectivos del
+   * motor; el nivel siguiente es 4 (Nivel 1) o 9 (Nivel 2).
+   * Sin racha no hay joya: si no hay estado, se devuelve "". */
+  function gxLoyaltyMarkHTML(count, target, lost) {
+    const C = 2 * Math.PI * 40;
+    const n = Math.max(1, Number(target) || 4);
+    const filled = lost ? 0 : Math.max(0, Math.min(Number(count) || 0, n));
+    const gap = 6;
+    const segLen = Math.max(1, C / n - gap);
+    let segs = "";
+    for (let i = 0; i < n; i++) {
+      segs += '<circle class="gx-index-loyalty-seg' + (i < filled ? " is-filled" : "") + '" cx="50" cy="50" r="40" stroke-dasharray="' + segLen.toFixed(2) + " " + (C - segLen).toFixed(2) + '" stroke-dashoffset="' + (-i * (segLen + gap)).toFixed(2) + '" transform="rotate(-90 50 50)"/>';
+    }
+    const star = '<span class="gx-index-loyalty-star" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg></span>';
+    const a11y = lost
+      ? 'role="img" aria-label="Racha reiniciada"'
+      : 'role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + filled + '" aria-label="Racha: ' + filled + " de " + n + ' pagos puntuales"';
+    return '<div class="gx-index-loyalty-mark' + (lost ? " is-lost" : "") + '" ' + a11y + ">" +
+      '<svg class="gx-index-loyalty-orbit" viewBox="0 0 100 100" aria-hidden="true">' +
+        '<defs><linearGradient id="gx-index-loyalty-grad" x1="0" y1="0" x2="1" y2="1">' +
+          '<stop offset="0" stop-color="#b79bf0"/><stop offset="1" stop-color="#7de4cf"/>' +
+        "</linearGradient></defs>" + segs +
+      "</svg>" + star +
+    "</div>";
   }
 
   function gxFormatoClabe(value) {

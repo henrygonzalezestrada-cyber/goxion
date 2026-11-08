@@ -3546,3 +3546,216 @@ html.gx-r8-paused .gx-b2-row.is-next::after{animation-play-state:paused!importan
     html[data-gx-index-morph="r17"] .gx-b2-row.is-next::after{animation:none!important}
 }
 
+
+/* ================================================================
+   INTEGRACIÓN INDEX R17 · COMPLETAR (2026-11-07)
+   Porta a la oficial lo autorizado en el preview E1/B2 R5.2–R17
+   que PR #184 dejó fuera. Solo datos vivos, sin fixtures, sin
+   secciones nuevas inventadas. Detalle en
+   docs/GOXION_EXPERIENCIA_E1_B2_INTEGRACION_INDEX_R17_COMPLETAR_2026-11-07.md
+   ================================================================ */
+
+/* (a) · SEGUIMIENTO DEL COMPROBANTE. Port vanilla del preview
+   (sin React/Animate UI): la sección es ABIERTA, sin tarjeta
+   glass — solo una línea inferior, como en el preview R5. El
+   hero sigue siendo el dueño del estado; esto solo muestra en
+   qué etapa del proceso está el comprobante. */
+.gx-index-proof{
+    --gx-index-proof-status:#b9acf9;
+    --gx-index-proof-glow:rgba(170,141,255,.23);
+    display:flex;flex-direction:column;gap:14px;min-width:0;
+    padding:2px 2px 18px;
+    margin:0 0 18px;
+    border:0;border-bottom:1px solid rgba(255,255,255,.10);
+    background:transparent;box-shadow:none;
+}
+.gx-index-proof-correction{
+    --gx-index-proof-status:#e6b47f;
+    --gx-index-proof-glow:rgba(226,151,90,.18);
+}
+.gx-index-proof-approved{
+    --gx-index-proof-status:#82e2c6;
+    --gx-index-proof-glow:rgba(105,235,192,.17);
+}
+.gx-index-proof-head{display:flex;align-items:center;gap:13px;min-width:0}
+.gx-index-proof-icon{
+    width:41px;height:41px;flex:0 0 41px;
+    color:var(--gx-index-proof-status);
+    display:grid;place-items:center;
+    filter:drop-shadow(0 0 11px var(--gx-index-proof-glow));
+}
+.gx-index-proof-icon svg{
+    width:29px;height:29px;fill:none;
+    stroke-linecap:round;stroke-linejoin:round;
+}
+/* Reloj animado: la manecilla gira despacio (el preview anima
+   las manecillas del Clock de Animate UI). Pausa con pestaña
+   oculta (html.gx-r8-paused, lo pone el morph) y reduced-motion. */
+.gx-index-proof-hand{
+    transform-box:view-box;transform-origin:12px 12px;
+    animation:gx-index-proof-clock 6s linear infinite;
+}
+@keyframes gx-index-proof-clock{to{transform:rotate(360deg)}}
+html.gx-r8-paused .gx-index-proof-hand{animation-play-state:paused!important}
+.gx-index-proof-words{display:flex;min-width:0;flex-direction:column;gap:3px}
+.gx-index-proof-eyebrow{
+    color:#9eacc6;font-size:9px;letter-spacing:1.4px;font-weight:700;
+}
+.gx-index-proof-name{color:#f2f2f6;font-size:13px;font-weight:700;line-height:1.38}
+.gx-index-proof-hint{color:#aab4c7;font-size:10.5px;line-height:1.52;margin:0}
+.gx-index-progress{display:block;width:100%}
+.gx-index-progress-track{
+    position:relative;display:block;height:5px;width:100%;
+    background:rgba(255,255,255,.10);
+    border-radius:999px;overflow:hidden;
+    box-shadow:inset 0 1px 2px rgba(0,0,0,.15);
+}
+.gx-index-progress-indicator{
+    position:relative;display:block;height:100%;
+    background:linear-gradient(90deg,#7863cb 0%,var(--gx-index-proof-status) 92%);
+    border-radius:inherit;
+    box-shadow:0 0 9px var(--gx-index-proof-glow);
+    transition:width .8s cubic-bezier(.22,.75,.25,1);
+}
+.gx-index-progress-labels{
+    display:flex;justify-content:space-between;align-items:center;
+    gap:5px;color:rgba(155,172,196,.64);
+    font-size:9px;letter-spacing:.05em;font-weight:550;
+}
+.gx-index-progress-labels span.is-reached{color:#d4d2ee}
+.gx-index-progress-labels span.is-attention{color:#ebb784}
+@media(max-width:320px){
+    .gx-index-proof-head{gap:10px}
+    .gx-index-progress-labels{font-size:8px}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-index-proof-hand{animation:none!important}
+    .gx-index-progress-indicator{transition:none}
+}
+
+/* (b) · LEALTAD CON ESTRELLA Y SECCIONES. Port visual del
+   preview: la tarjeta deja de ser glass y queda abierta (solo
+   línea inferior), con la joya de 81 px: anillo con una sección
+   por pago del nivel y estrella Lucide al centro con respiración
+   suave (5.6 s, como el preview). Sin glow líquido en la
+   píldora (R11 sigue vigente: esto no toca la píldora). */
+.loyalty-badge.gx-index-loyalty{
+    min-height:94px;
+    display:flex;align-items:center;gap:16px;
+    margin:7px 0 16px!important;
+    padding:9px 5px 12px!important;
+    background:linear-gradient(93deg,rgba(115,84,198,.065),rgba(7,14,26,0) 78%)!important;
+    border:none!important;
+    border-bottom:1px solid rgba(161,169,217,.10)!important;
+    border-radius:14px!important;
+    box-shadow:none!important;
+    backdrop-filter:none!important;
+    -webkit-backdrop-filter:none!important;
+}
+.gx-index-loyalty-mark{
+    position:relative;width:81px;height:81px;flex:0 0 81px;
+    display:grid;place-items:center;isolation:isolate;border-radius:50%;
+}
+.gx-index-loyalty-mark::before{
+    content:"";position:absolute;inset:9px;border-radius:50%;z-index:-1;
+    background:radial-gradient(circle,rgba(241,191,101,.19) 4%,rgba(129,89,220,.09) 42%,transparent 73%);
+    filter:blur(7px);
+}
+.gx-index-loyalty-orbit{
+    position:absolute;inset:0;width:100%;height:100%;overflow:visible;
+}
+.gx-index-loyalty-seg{
+    fill:none;stroke:rgba(205,192,244,.15);stroke-width:3.5;
+}
+.gx-index-loyalty-seg.is-filled{
+    stroke:url(#gx-index-loyalty-grad);
+    filter:drop-shadow(0 0 2px rgba(189,158,241,.3));
+}
+.gx-index-loyalty-star{
+    position:relative;color:#f0cc86;display:grid;place-items:center;
+    filter:drop-shadow(0 0 8px rgba(222,167,102,.16));
+    animation:gx-index-loyalty-breathe 5.6s ease-in-out 1.2s infinite;
+}
+.gx-index-loyalty-star svg{width:34px;height:34px;stroke-linejoin:round}
+@keyframes gx-index-loyalty-breathe{
+    0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(247,198,100,.23))}
+    50%{transform:scale(1.045);filter:drop-shadow(0 0 6px rgba(247,198,100,.43))}
+}
+.gx-index-loyalty .loyalty-content{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.gx-index-loyalty .loyalty-title{
+    font-size:10px;letter-spacing:1.4px;line-height:1.4;
+    color:#bca6fb;font-weight:800;margin:0;
+}
+.gx-index-loyalty-caption{
+    font:750 13px/1.35 Poppins,system-ui,sans-serif;color:#f0eaff;
+}
+.gx-index-loyalty .loyalty-desc{font-size:10px;line-height:1.55;color:#adbbd2}
+.gx-index-loyalty[data-loyalty-state="lost"] .loyalty-title{color:#eb92a6}
+.gx-index-loyalty[data-loyalty-state="lost"] .gx-index-loyalty-caption{color:#ffcfdb}
+.gx-index-loyalty-mark.is-lost .gx-index-loyalty-star{
+    color:#cb8996;animation:none;
+    filter:drop-shadow(0 0 5px rgba(222,119,147,.11));
+}
+.gx-index-loyalty-mark.is-lost::before{
+    background:radial-gradient(circle,rgba(222,119,147,.16) 4%,rgba(129,89,220,.06) 42%,transparent 73%);
+}
+@media(max-width:320px){
+    .gx-index-loyalty-mark{width:69px;height:69px;flex-basis:69px}
+    .gx-index-loyalty{gap:10px}
+    .gx-index-loyalty .loyalty-desc{font-size:9px}
+}
+@media(prefers-reduced-motion:reduce){
+    .gx-index-loyalty-star{animation:none!important}
+}
+html.gx-r8-paused .gx-index-loyalty-star{animation-play-state:paused!important}
+
+/* (d) · FUNDIDO DEL ENCABEZADO, COMO EL PREVIEW. En el preview
+   el fondo del sticky se desvanece a transparente en los últimos
+   27 px de la zona VISIBLE (paradas ancladas a 100% − clip): el
+   contenido emerge borroso a través de la propia barra, sin línea
+   de corte. En la oficial ese fundido vivía solo DEBAJO de la
+   caja (cola de 58 px del ::before V2 / ::after de 35 px): el
+   borde inferior de la caja quedaba como una línea recta y la
+   barra se veía flotando. Bajo el morph, el fundido pasa al
+   fondo del propio sticky (anclado a --gx-rm-clip, como R12) y
+   las colas se apagan; el blur sigue siendo el oficial (27 px
+   V2 / 28 px base) y el cristal queda intacto. Sin el flag del
+   morph, la oficial se ve exactamente como antes. */
+html[data-gx-index-morph="r17"]:not(.gx-payment-v2) .sticky-area{
+    background:
+        linear-gradient(180deg,rgba(3,3,5,.70),
+            rgba(3,3,5,.70) calc(100% - var(--gx-rm-clip,0px) - 54px),
+            rgba(3,3,5,.55) calc(100% - var(--gx-rm-clip,0px) - 27px),
+            rgba(3,3,5,0) calc(100% - var(--gx-rm-clip,0px)));
+}
+html[data-gx-index-morph="r17"].gx-payment-v2 .sticky-area{
+    background:
+        linear-gradient(180deg,rgba(3,3,5,.76),
+            rgba(3,3,5,.72) calc(100% - var(--gx-rm-clip,0px) - 54px),
+            rgba(3,3,5,.56) calc(100% - var(--gx-rm-clip,0px) - 27px),
+            rgba(3,3,5,0) calc(100% - var(--gx-rm-clip,0px)));
+    -webkit-backdrop-filter:blur(27px) saturate(1.04);
+    backdrop-filter:blur(27px) saturate(1.04);
+}
+html[data-gx-index-morph="r17"].gx-payment-v2 .sticky-area::before{
+    background:transparent;
+    -webkit-backdrop-filter:none;backdrop-filter:none;
+    -webkit-mask-image:none;mask-image:none;
+}
+html[data-gx-index-morph="r17"] .sticky-area::after,
+html[data-gx-index-morph="r17"].gx-payment-v2 .sticky-area::after{display:none}
+
+/* MARQUEE DE LA PÍLDORA. El texto viaja dentro de su propio
+   span; la caja de la píldora no se mueve, no se encima al
+   precio ni se sale de la barra. El JS solo marca el estado en
+   <html> y anima el span con Web Animations (distancia medida);
+   sin overflow no hay marquee. Con el texto recortado, la
+   píldora alinea el texto a la izquierda (con justify-content:
+   center el recorte se comía el INICIO: "🚨 Servicio vencido"
+   se veía "ervicio vencido · 6…"). */
+html[data-gx-index-morph="r17"] .balance-hero .time-badge .gx-rm-badge-text{
+    display:inline-block;white-space:nowrap;will-change:transform;
+}
+html[data-gx-rm-badge-marquee="1"] .balance-hero .time-badge{
+    justify-content:flex-start;text-overflow:clip;
+}
