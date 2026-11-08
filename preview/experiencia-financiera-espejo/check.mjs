@@ -284,7 +284,9 @@ async function run(name,engine){
    }
    assert(mid,'R7 '+name+' '+width+' morph did not reach mid-scroll band');
    assert(mid.gap>=8,'R7 '+name+' '+width+' compact pair must be separated mid-scroll. Geometry: '+JSON.stringify(mid));
-   assert(mid.amountH<=40,'R12 '+name+' '+width+' price must shrink by transform (visual height), not font-size. Geometry: '+JSON.stringify(mid));
+   // R16 · el precio compacto es 34 px (antes 26): a mitad de
+   // morph el alto visual puede llegar a ~41 px (52 px × .70).
+   assert(mid.amountH<=42,'R12 '+name+' '+width+' price must shrink by transform (visual height), not font-size. Geometry: '+JSON.stringify(mid));
    assert(mid.vOverlap<=0||mid.gap>=0,'R7 '+name+' '+width+' badge must never cross the amount. Geometry: '+JSON.stringify(mid));
    assert(mid.emptyBand<=16,'R7 '+name+' '+width+' hero must hug content, no empty band. Geometry: '+JSON.stringify(mid));
    assert(Math.abs(mid.heroH-116)<=1,'R12 '+name+' '+width+' hero layout height must stay fixed mid-scroll. Geometry: '+JSON.stringify(mid));
@@ -388,6 +390,12 @@ async function run(name,engine){
      badgeTop:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).top),
      // R15 · header apretado: 20 px de alto (antes 29 px).
      headerH:document.querySelector('#gx-b2-sticky .header').getBoundingClientRect().height,
+     titleOpacity:parseFloat(getComputedStyle(document.querySelector('.header-title')).opacity),
+     // R16 · la división cabecera/contenido no se remarca: sin
+     // borde ni sombra dura en el sticky (solo el difuminado del
+     // fondo con blur 25 px, glass por desenfoque).
+     stickyBorder:getComputedStyle(document.querySelector('#gx-b2-sticky')).borderBottomWidth,
+     stickyShadow:getComputedStyle(document.querySelector('#gx-b2-sticky')).boxShadow,
      // R14 · en expandido el botón "Mi Espacio" no debe verse.
      btnOpacity:parseFloat(getComputedStyle(btn).opacity),
      btnText:btn.textContent,btnHref:btn.getAttribute('href')};
@@ -402,6 +410,11 @@ async function run(name,engine){
    // oficial no la tiene): no debe existir en ningún estado.
    assert.equal(await page.locator('#gx-b2-back').count(),0,'R15 '+name+' '+width+' back arrow must be gone, not hidden');
    assert.equal(expanded.headerH,20,'R15 '+name+' '+width+' header must be 20px tall (gap tightened). Height: '+expanded.headerH);
+   // R16 · en expandido el título sí se ve y la cabecera no se
+   // remarca con borde ni sombra dura (solo difuminado + blur).
+   assert(expanded.titleOpacity>.95,'R16 '+name+' '+width+' title must be visible in expanded state. Opacity: '+expanded.titleOpacity);
+   assert(expanded.stickyBorder==='0px','R16 '+name+' '+width+' sticky must not mark the header/content cut with a border. Border: '+expanded.stickyBorder);
+   assert(expanded.stickyShadow==='none','R16 '+name+' '+width+' sticky must not mark the cut with a hard shadow. Shadow: '+expanded.stickyShadow);
    await page.setViewportSize({width,height:550});
    await page.evaluate(()=>window.scrollTo(0,330));
    await page.waitForFunction(()=>window.GOXION_E1B2_INDEX?.getMorphProgress?.()>.992,null,
@@ -432,11 +445,16 @@ async function run(name,engine){
      heroLeft:+hero.left.toFixed(1),heroRight:+hero.right.toFixed(1),
      heroCenter:+((hero.left+hero.right)/2).toFixed(1),
      btn:{l:+s.left.toFixed(1),r:+s.right.toFixed(1),h:+s.height.toFixed(1),
-      o:parseFloat(getComputedStyle(document.querySelector('#gx-b2-space-btn')).opacity)},
+      o:parseFloat(getComputedStyle(document.querySelector('#gx-b2-space-btn')).opacity),
+      color:getComputedStyle(document.querySelector('#gx-b2-space-btn')).color,
+      font:parseFloat(getComputedStyle(document.querySelector('#gx-b2-space-btn')).fontSize)},
      vw:document.documentElement.clientWidth,
      stickyTop:document.querySelector('#gx-b2-sticky').getBoundingClientRect().top,
-     // R15 · píldora a su tamaño original en compacto (12 px, sin
-     // scale) y gap título→precio apretado.
+     // R16 · en compacto el título no se muestra (el hero sube
+     // sobre su fila con transform); la píldora sigue a 12 px,
+     // sin scale.
+     titleOpacity:parseFloat(getComputedStyle(document.querySelector('.header-title')).opacity),
+     headerH:document.querySelector('#gx-b2-sticky .header').getBoundingClientRect().height,
      badgeFont:parseFloat(getComputedStyle(document.querySelector('#gx-b2-hero-badge')).fontSize),
      badgeScale:parseFloat(cs.getPropertyValue('--gx-rm-badge-scale'))||0,
      titleGap:+(a.top-document.querySelector('.header-title').getBoundingClientRect().bottom).toFixed(1)
@@ -448,48 +466,64 @@ async function run(name,engine){
    assert.equal(expanded.badgeTop,80,name+' '+width+' expanded badge moved');
    assert(collapsed.labelOpacity<.05,name+' '+width+' label should be gone');
    assert(collapsed.amountTopVisual<=1,name+' '+width+' hidden label leaves empty space above amount');
-   assert(collapsed.badgeTopVisual<=3,name+' '+width+' hidden label leaves empty space above badge');
-   assert(collapsed.footprint<=38,name+' '+width+' visual hero footprint must compress to 36px. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(expanded.amountH-collapsed.amountH>=17,name+' '+width+' amount did not morph (visual height). Geometry: '+JSON.stringify({expanded,collapsed}));
+   // R16 · la huella compacta ya no es 36 px: la sección izquierda
+   // apila precio (34 px) + píldora (12 px), huella ≈ 79 px; el
+   // importe se encoge menos (52→34) y el contenido sube menos.
+   assert(collapsed.footprint<=84,name+' '+width+' visual hero footprint must compress to ~79px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(expanded.amountH-collapsed.amountH>=15,name+' '+width+' amount did not morph (visual height). Geometry: '+JSON.stringify({expanded,collapsed}));
    // R12 · el morph ya no toca el layout: la caja del hero y del
    // sticky miden lo mismo en reposo y en compacto; lo que se
    // encoge es la huella visual del par, el contenido sube con
-   // transform y el sticky se recorta con clip-path.
+   // transform y el sticky se recorta con clip-path. R16 · el hero
+   // sube con transform sobre la fila del título (no se colapsa
+   // nada en layout): el sticky NO se acorta en compacto, o la
+   // página encogería 24 px y el scroll del final se movería
+   // (bug R13, cazado por esta misma suite).
    assert(Math.abs(collapsed.height-expanded.height)<=1,'R12 '+name+' '+width+' hero layout height must stay fixed. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(Math.abs(collapsed.stickyH-expanded.stickyH)<=1,'R12 '+name+' '+width+' sticky layout height must stay fixed. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(expanded.footprint-collapsed.footprint>=58,'R12 '+name+' '+width+' visual hero footprint must still compress by 58px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(expanded.footprint-collapsed.footprint>=30,'R16 '+name+' '+width+' visual hero footprint must still compress by ~35px. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert.equal(expanded.font,52,'R12 '+name+' '+width+' amount font-size must stay 52px (scale shrinks it)');
    assert.equal(collapsed.font,52,'R12 '+name+' '+width+' amount font-size must stay 52px in compact state');
-   assert(collapsed.clipBottom>=70,'R12 '+name+' '+width+' sticky must clip the freed space in compact state. Geometry: '+JSON.stringify(collapsed));
-   assert(collapsed.contentShift<=-70,'R12 '+name+' '+width+' content must rise by transform in compact state. Geometry: '+JSON.stringify(collapsed));
-   
-   assert(collapsed.amountCenter<collapsed.badgeCenter,
-    name+' '+width+' amount must sit LEFT of the badge');
-   // R14 · fila compacta de 3 zonas (reemplaza el par centrado de
-   // R7/R12: la separación precio↔píldora ya no es el gap del par,
-   // es el ancho de la fila). Precio a la izquierda del hero,
-   // píldora centrada en el hero, botón "Mi Espacio" a la derecha,
-   // 8 px de aire entre zonas y el mismo alto en píldora y botón.
+   assert(collapsed.clipBottom>=30,'R16 '+name+' '+width+' sticky must clip the freed space in compact state. Geometry: '+JSON.stringify(collapsed));
+   assert(collapsed.contentShift<=-30,'R16 '+name+' '+width+' content must rise by transform in compact state. Geometry: '+JSON.stringify(collapsed));
+
+   // R16 · encabezado compacto ASIMÉTRICO (reemplaza las 3 zonas
+   // simétricas de R14). Sección izquierda grande: precio de 34 px
+   // arriba, píldora de 12 px apilada debajo, ambas al borde
+   // izquierdo; botón "Mi Espacio" angosto a la derecha, centrado
+   // en ese bloque, estilo Ayuda con texto blanco. El título no se
+   // muestra en compacto y su fila colapsa.
    assert(Math.abs(collapsed.amountLeft-collapsed.heroLeft)<=2,
-    'R14 '+name+' '+width+' amount must sit at the hero left edge in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(Math.abs(collapsed.badgeCenter-collapsed.heroCenter)<=3,
-    'R14 '+name+' '+width+' badge must be centered in the hero in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(collapsed.badgeLeft>=collapsed.amountRight+8,
-    'R14 '+name+' '+width+' compact badge must clear the amount by 8px. Geometry: '+JSON.stringify({expanded,collapsed}));
+    'R16 '+name+' '+width+' amount must sit at the hero left edge in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
+   // R16 · 34 px de fuente × line-height 1.12 ≈ 38 px de alto
+   // visual (antes 26 px × 1.12 ≈ 29 px).
+   assert(collapsed.amountH>=36&&collapsed.amountH<=40,
+    'R16 '+name+' '+width+' compact price must be considerable (~34px visual), not the old 26px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(Math.abs(collapsed.badgeLeft-collapsed.amountLeft)<=2,
+    'R16 '+name+' '+width+' badge must align with the amount left edge in compact state (stacked left block). Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(collapsed.badgeTopVisual>=collapsed.amountTopVisual+collapsed.amountH+2,
+    'R16 '+name+' '+width+' badge must stack BELOW the amount in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(collapsed.btn.l>=collapsed.badgeRight+8,
-    'R14 '+name+' '+width+' space button must clear the badge by 8px. Geometry: '+JSON.stringify({expanded,collapsed}));
+    'R16 '+name+' '+width+' space button must clear the badge by 8px. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(Math.abs(collapsed.btn.r-collapsed.heroRight)<=2,
-    'R14 '+name+' '+width+' space button must sit at the hero right edge. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(Math.abs(collapsed.btn.h-collapsed.badgeH)<=2,
-    'R14 '+name+' '+width+' space button must match the badge height. Geometry: '+JSON.stringify({expanded,collapsed}));
+    'R16 '+name+' '+width+' space button must sit at the hero right edge. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(collapsed.btn.h>=collapsed.badgeH&&collapsed.btn.h<=collapsed.badgeH+8,
+    'R16 '+name+' '+width+' space button must be the badge height or slightly taller (Ayuda pill). Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(collapsed.btn.o>.95,
-    'R14 '+name+' '+width+' space button must be visible in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
+    'R16 '+name+' '+width+' space button must be visible in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert.equal(collapsed.btn.color,'rgb(255, 255, 255)',
+    'R16 '+name+' '+width+' space button must use white type (Ayuda style), not the dark type of R14. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert.equal(collapsed.btn.font,13,
+    'R16 '+name+' '+width+' space button must use Ayuda 13px type. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(collapsed.titleOpacity<.05,
+    'R16 '+name+' '+width+' title must be hidden in compact state (app header). Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert.equal(collapsed.headerH,20,
+    'R16 '+name+' '+width+' title row must keep its 20px layout height in compact state (the hero rises over it by transform instead of collapsing it, so the page height never changes). Geometry: '+JSON.stringify({expanded,collapsed}));
    // R15 · píldora compacta a su tamaño original (12 px, sin
-   // scale .833) y título pegado a la fila del precio: en compacto
-   // el gap título→precio es ~8 px (antes ~22 px) y nada se encima.
+   // scale .833). El gap título→precio ya no aplica en compacto:
+   // el título no se muestra (ver arriba).
    assert.equal(collapsed.badgeFont,12,'R15 '+name+' '+width+' badge must keep its original 12px in compact state. Font: '+collapsed.badgeFont);
    assert.equal(collapsed.badgeScale,1,'R15 '+name+' '+width+' badge must not scale down in compact state. Scale: '+collapsed.badgeScale);
-   assert(collapsed.titleGap<=12,'R15 '+name+' '+width+' title must sit close to the price row in compact state. Gap: '+collapsed.titleGap);
    assert(collapsed.badgeLeft>=-2&&collapsed.amountRight<=collapsed.vw+2,
     name+' '+width+' collapsed header overflows horizontally');
    assert(Math.abs(collapsed.stickyTop)<4,name+' '+width+' sticky header left viewport');

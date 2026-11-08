@@ -509,7 +509,7 @@ function setupHeaderMorph(){
  let measureKey='',moneyWidth=0,statusWidth=0,amountH=0,badgeH=0,lastPainted=null,heroRestH=0;
  /* R14 · anchos de layout del hero y del botón compacto (para la
   * fila de 3 zonas en compacto). Se miden solo al remediar. */
- let heroW=0,btnW=0;
+ let heroW=0,btnW=0,btnH=0;
  /* R10 · asentamiento al soltar (ver maybeSnap): cuando el cliente
   * suelta a mitad de scroll, el morph termina de acomodarse al
   * extremo más cercano. NUNCA se fuerza el valor del morph por su
@@ -569,10 +569,31 @@ function setupHeaderMorph(){
   const pb=smooth((p-.30)/.45);
   const paired=smooth((p-.05)/.30);
   /* R14 · segunda fase del morph (0.75→1): el par centrado se
-   * reparte en 3 zonas. Hasta p≈0.75 nada cambia (spread 0). */
+   * reparte en 3 zonas. Hasta p≈0.75 nada cambia (spread 0).
+   * R16 · esa segunda fase ya NO reparte en 3 zonas simétricas:
+   * la sección izquierda (precio + píldora) se hace GRANDE y
+   * asimétrica y el botón queda angosto a la derecha. El precio
+   * compacto sube de 26 a 34 px visuales (ver amountSize). La
+   * fase 2 se parte en DOS sub-fases para que la píldora nunca
+   * se cruce con el importe ni con el botón en ningún p: primero
+   * BAJA (spreadV, 0.75→0.875) quedándose a la derecha del
+   * precio, y solo cuando ya está debajo DESLIZA a la izquierda
+   * (spreadH, 0.875→1) mientras entra el botón. Si bajara en
+   * diagonal, a p≈0.88 se encimaba ~43 px en el importe (lo
+   * cazó el test R10 en 280 px). El botón se centra en el
+   * IMPORTE, no en el bloque: su franja vertical nunca toca la
+   * de la píldora ya bajada. */
   const spread=smooth((p-.75)/.25);
+  const spreadV=smooth((p-.75)/.125);
+  const spreadH=smooth((p-.875)/.125);
   const freedLabelSpace=7*smooth((p-.10)/.35);
-  const amountSize=52-26*pp;
+  /* R16 · precio compacto de 34 px visuales (52−18): intermedio
+   * entre el reposo (52) y el compacto anterior (26). 34 px sigue
+   * siendo claramente el número protagonista —una app muestra el
+   * saldo grande— sin acercarse al tamaño de portada; a 390 px
+   * "$45.00" mide ~115 px y deja sitio a la píldora apilada y al
+   * botón angosto. El scale es 34/52 ≈ .654. */
+  const amountSize=52-18*pp;
   /* R15 · la píldora vuelve a su tamaño ORIGINAL: 12 px siempre,
    * sin encoger con scale (.833 → 10 px en R12/R14 se veía súper
    * pequeña y rara). badgeScale queda en 1; la píldora compacta
@@ -629,6 +650,7 @@ function setupHeaderMorph(){
    heroW=$('gx-b2-hero').offsetWidth;
    const btn=$('gx-b2-space-btn');
    btnW=btn?btn.offsetWidth:0;
+   btnH=btn?btn.offsetHeight:0;
   }
   // Both elements remain a compact CENTERED PAIR, with amount on the LEFT
   // and the status on the RIGHT. Measure actual content to avoid oversized
@@ -636,8 +658,16 @@ function setupHeaderMorph(){
   // R12 · los desplazamientos usan anchos visuales (layout × scale).
   const gap=10;
   const amountTop=17-10*pp-freedLabelSpace;
-  const badgeTop=80-71*pb-freedLabelSpace;
   const amountVH=amountH*amountScale,badgeVH=badgeH*badgeScale;
+  /* R16 · en compacto la píldora ya NO va al centro ni a la
+   * derecha del precio: se APILA debajo de él, alineada a la
+   * izquierda, dentro de la sección izquierda grande. El top
+   * apilado es amountTop + alto visual del importe + 6 px; se
+   * mezcla con el top del par centrado según spreadV (la bajada),
+   * no según el spread entero: bajar en diagonal cruzaba el
+   * importe a mitad de fase. */
+  const stackedBadgeTop=amountTop+amountVH+6;
+  const badgeTop=(80-71*pb-freedLabelSpace)*(1-spreadV)+stackedBadgeTop*spreadV;
   // La altura VISUAL del hero (lo que ocupa el par): la pieza más baja
   // + 8 px en expandido y +7 px en compacto. En los extremos da ~114 px
   // y 36 px, como R5.2/R7. Ya no es la altura de la caja (fija en
@@ -649,41 +679,64 @@ function setupHeaderMorph(){
   // toca (V(p) ≠ V0 ahí). El desplazamiento del contenido es V−V0:
   // en reposo 0, en compacto ≈ −78 px.
   if(heroRestH===0||(p<.02&&remeasured))heroRestH=heroVH;
-  /* R14 · fila compacta de 3 zonas (solo con spread>0). El precio
-   * desliza del par centrado a la izquierda del hero: su centro
-   * queda a la mitad de su ancho visual desde el borde izquierdo.
-   * La píldora vuelve del desplazamiento del par al centro exacto
-   * del hero (shift 0). El botón entra con opacidad = spread y
-   * comparte la parte superior y el alto visuales de la píldora
-   * (la dy ya compensa el scale sobre el centro, así que la parte
-   * superior visual ES badgeTop y el alto visual ES badgeH×scale).
-   * La píldora se ajusta con max-width calculado: cabe entre el
-   * precio y el botón con 8 px de aire por lado, con ellipsis si
-   * el texto es largo y la pantalla estrecha; a 280 px se recorta,
-   * a 390 px cabe entera. Con spread 0 el tope vuelve a 96%. */
+  /* R16 · encabezado compacto ASIMÉTRICO (reemplaza las 3 zonas
+   * simétricas de R14). Sección izquierda GRANDE: precio (34 px)
+   * arriba y píldora (12 px) apilada debajo, ambas alineadas al
+   * borde izquierdo del hero. El botón "Mi Espacio" queda angosto
+   * a la derecha, centrado verticalmente EN EL IMPORTE (no en el
+   * bloque): su franja vertical nunca se cruza con la de la
+   * píldora ya bajada. La píldora se ajusta con max-width
+   * calculado: cabe entre el borde izquierdo y el botón con 8 px
+   * de aire por lado, con ellipsis si el texto es largo y la
+   * pantalla estrecha; a 280 px se recorta, a 390 px cabe entera.
+   * Con spreadV 0 el tope vuelve a 96% y la píldora sigue en el
+   * par centrado. El botón entra con spreadH (segunda sub-fase),
+   * cuando la píldora ya está debajo. El título "ESTADO DE
+   * CUENTA" se desvanece con spreadV y el hero sube con
+   * transform sobre su fila: en compacto no se muestra, como en
+   * una app; en expandido queda, más discreto. La fila NO
+   * colapsa en layout (ver nota junto a --gx-rm-title-fade): el
+   * hero sube -24·spread y el clip y la subida del contenido lo
+   * compensan; la caja del hero sigue fija y el par sigue siendo
+   * solo-transform. */
   const amountVW=moneyWidth*amountScale;
   const amountShiftBase=-(statusWidth*badgeScale+gap)*.5*paired;
   const amountShiftLeft=-(heroW/2-amountVW/2);
   const amountShift=amountShiftBase+(amountShiftLeft-amountShiftBase)*spread;
-  const badgeShiftBase=(moneyWidth*amountScale+gap)*.5*paired;
-  const badgeShift=badgeShiftBase*(1-spread);
-  if(spread>0){
-   const avail=heroW-2*Math.max(amountVW,btnW)-16;
-   root.style.setProperty('--gx-rm-badge-max',px(Math.max(40,avail)));
+  let badgeMaxW=0;
+  if(spreadV>0){
+   badgeMaxW=Math.max(40,heroW-btnW-16);
+   root.style.setProperty('--gx-rm-badge-max',px(badgeMaxW));
   }else{
    root.style.setProperty('--gx-rm-badge-max','96%');
   }
-  root.style.setProperty('--gx-rm-space',spread.toFixed(3));
-  root.style.setProperty('--gx-rm-space-top',px(badgeTop));
-  root.style.setProperty('--gx-rm-space-h',px(badgeH*badgeScale));
+  const badgeVW=Math.min(statusWidth,badgeMaxW||statusWidth)*badgeScale;
+  const badgeShiftBase=(moneyWidth*amountScale+gap)*.5*paired;
+  const badgeShiftLeft=-(heroW/2-badgeVW/2);
+  const badgeShift=badgeShiftBase*(1-spreadH)+badgeShiftLeft*spreadH;
+  const btnTop=spreadH>0?amountTop+(amountVH-btnH)/2:badgeTop;
+  root.style.setProperty('--gx-rm-space',spreadH.toFixed(3));
+  root.style.setProperty('--gx-rm-space-top',px(btnTop));
+  root.style.setProperty('--gx-rm-space-h',px(btnH));
+  /* R16 · el título se desvanece con spreadV (ya está a 0 cuando
+   * el hero empieza a subir sobre su fila, así no se cruzan).
+   * La fila del título NO colapsa en layout: colapsarla encogía
+   * la página 24 px y el scrollY del final se movía 24 px (el
+   * bug R13, cazado por el test). En su lugar el hero SUBE con
+   * transform (-24·spread) sobre la fila ya desvanecida — solo-
+   * transform, como R12 — y el clip y la subida del contenido
+   * compensan esos 24 px (ver abajo). La altura del sticky y de
+   * la página no cambian nunca. */
+  root.style.setProperty('--gx-rm-title-fade',spreadV.toFixed(3));
   root.style.setProperty('--gx-rm-amount-scale',amountScale.toFixed(4));
   root.style.setProperty('--gx-rm-amount-dy',px(amountTop-17-amountH*(1-amountScale)/2));
   root.style.setProperty('--gx-rm-amount-shift',px(amountShift));
   root.style.setProperty('--gx-rm-badge-scale',badgeScale.toFixed(4));
   root.style.setProperty('--gx-rm-badge-dy',px(badgeTop-80-badgeH*(1-badgeScale)/2));
   root.style.setProperty('--gx-rm-badge-shift',px(badgeShift));
-  root.style.setProperty('--gx-rm-content-shift',px(heroVH-heroRestH));
-  root.style.setProperty('--gx-rm-clip',px(116-heroVH));
+  root.style.setProperty('--gx-rm-hero-dy',px(-24*spread));
+  root.style.setProperty('--gx-rm-content-shift',px(heroVH-heroRestH-24*spread));
+  root.style.setProperty('--gx-rm-clip',px(116-heroVH+24*spread));
   root.style.setProperty('--gx-rm-title-scale',((14-3*p)/14).toFixed(4));
   root.style.setProperty('--gx-rm-label-opacity',String(clamp(1-p*3)));
   root.style.setProperty('--gx-rm-progress',p.toFixed(3));
