@@ -145,7 +145,7 @@ html.gx-20-b2 .services-container{display:none}
 .gx-20-row:active{transform:scale(.98)}
 .gx-payment-v2 .btn-submit-payment:active:not(:disabled){transform:scale(.97)}
 .gx-payment-actions .gx-support-tertiary:active{transform:scale(.97)}
-.gx-payment-primary>*{position:relative;z-index:1}
+.gx-payment-primary>*:not(.gx-20-ripple){position:relative;z-index:1}
 .gx-payment-primary-copy strong{
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%
 }
@@ -162,7 +162,13 @@ html.gx-20-b2 .services-container{display:none}
 @keyframes gx-20-spin{to{transform:rotate(360deg)}}
 
 /* B3 · Ripple (C): nace del punto del toque y se desvanece. Solo
- * transform/opacity; queda detrás del texto (los hijos llevan z-index:1). */
+ * transform/opacity; queda detrás del texto (los hijos llevan z-index:1).
+ * B5 · El ripple DEBE seguir siendo position:absolute (fuera de flujo):
+ * las reglas `>*` de arriba lo volvían relative (misma especificidad,
+ * más tarde en el archivo) y, como hijo en flujo del botón/fila, un
+ * ripple de ~687 px inflaba la fila: la caja de filas medía 719 px en
+ * vez de 73 px y el grupo 914 px en vez de 268 px. Por eso las reglas
+ * `>*` excluyen ahora a .gx-20-ripple con :not(). */
 .gx-20-ripple{
   position:absolute;border-radius:50%;pointer-events:none;z-index:0;
   background:rgba(255,255,255,.22);transform:scale(0);
@@ -170,9 +176,9 @@ html.gx-20-b2 .services-container{display:none}
 }
 @keyframes gx-20-ripple{to{transform:scale(1);opacity:0}}
 .gx-bank-trigger,.btn-submit-payment{overflow:hidden}
-.gx-bank-trigger>*{position:relative;z-index:1}
-.gx-20-row>*{position:relative;z-index:1}
-.btn-submit-payment>*{position:relative;z-index:1}
+.gx-bank-trigger>*:not(.gx-20-ripple){position:relative;z-index:1}
+.gx-20-row>*:not(.gx-20-ripple){position:relative;z-index:1}
+.btn-submit-payment>*:not(.gx-20-ripple){position:relative;z-index:1}
 .gx-20-foot{
   margin:0;padding:4px 18px 18px;
   font-size:12px;line-height:1.55;color:#9aacca
@@ -272,23 +278,26 @@ html[data-gx-index-morph="r17"] .balance-hero .total-label{
   opacity:calc(var(--gx-rm-label-opacity)*var(--gx-rm-label-opacity))
 }
 
-/* B4 · BUG 2 (video 14–17 s): al abrir/cerrar grupos el cambio era
- * instantáneo y el ojo leía las filas "encimándose" al siguiente
- * encabezado. La apertura ahora es animada y el contenido va
- * RECORTADO durante la transición: con overflow:clip las filas no
- * pueden pintarse nunca fuera de la caja del grupo, ni a mitad de
- * la animación. Patrón ::details-content (Safari 18.4+); sin
- * interpolate-size el cambio es instantáneo como hoy, sin regresión. */
+/* B5 · BUG 1 (video 2, Safari físico): al tocar una fila, el grupo
+ * abierto quedaba con un hueco enorme vacío y la fila al fondo.
+ * Causa: la animación de altura de B4 (::details-content con
+ * block-size 0→auto + interpolate-size + content-visibility
+ * discreta). Al tocar la fila, el clic reconstruía el DOM
+ * (render()) y el <details> nuevo nacía con esa transición; en
+ * Safari 26 la transición resolvía el "auto" a una altura enorme
+ * (~700 px) y se quedaba ahí — el hueco aparecía ~0.5 s después
+ * del toque y solo se curaba al volver arriba. El harness de B4
+ * ya había medido 0 solapes reales (el cambio brusco se leía como
+ * encimamiento), así que la animación arreglaba algo que no era
+ * bug. Se quita: el toggle vuelve a ser instantáneo (el
+ * <details> nativo) y solo queda overflow:clip, que sí evita que
+ * las filas se pinten fuera de la caja del grupo. */
 .gx-20-group::details-content{
   overflow:clip;
   block-size:0;
-  transition:block-size .32s ease, content-visibility .32s ease allow-discrete;
 }
 .gx-20-group[open]::details-content{
   block-size:auto;
-}
-@supports (interpolate-size:allow-keywords){
-  .gx-20-group{interpolate-size:allow-keywords}
 }
 
 /* B4 · BUG 3 (video 20–28 s): el "Total de noviembre" se leía doble.
@@ -303,23 +312,13 @@ html[data-gx-index-morph="r17"] .balance-hero .total-label{
   background:rgba(8,8,12,.78)
 }
 
-/* B4 · BUG 4 (video, flecha en "<"): el giro de 180° pasa
- * OBLIGATORIAMENTE por los 90°, donde el chevron apunta a la
- * izquierda. Un giro no puede no pasar por ahí. La corrección es
- * un FLIP vertical (scaleY 1 → -1): la pieza se aplasta a una línea
- * horizontal a mitad de camino y reaparece apuntando arriba; nunca
- * apunta a los lados. El resorte queda en el flip (se estira un
- * poco al asentarse) y el cambio cian→morado se conserva. Más rápido:
- * .30 s en vez de .44 s. */
-.gx-20-chevron-svg{
-  transform:scaleY(1);
-  transition:transform .30s cubic-bezier(.3,1.25,.4,1),
-    color .25s ease,filter .25s ease;
-}
-.gx-20-group[open] .gx-20-chevron-svg{
-  transform:scaleY(-1);color:#b79bf0;
-  filter:drop-shadow(0 0 4px rgba(183,155,240,.18))
-}
+/* B5 · REVERSIÓN DE LA FLECHA (corrección de Henry 2026-11-08):
+ * la flecha que GIRA 180° con resorte (B2/B3) le gustaba MÁS que
+ * el flip vertical de B4. El flip NO era un bug: fue una
+ * "corrección" de algo que no era error. Se elimina el override
+ * del flip y vuelven a mandar las reglas base de arriba
+ * (rotate 0→180°, resorte .44 s, cian→morado). El momento en que
+ * pasa por "<" a mitad del giro es aceptable; no se "arregla". */
 
 /* B4 · VARIANTE ÓRBITA (idea de Henry): la línea de luz ya no pasa
  * solo por debajo del encabezado del grupo próximo/vencido; un brillo
@@ -350,4 +349,160 @@ html:not(.gx-20-energy-sweep)[data-gx-index-morph="r17"] .gx-20-group.is-next > 
 }
 html.gx-r8-paused .gx-20-group.is-next > .gx-20-summary::before{
   animation-play-state:paused!important
+}
+
+/* ============ B5 · TOQUES, LEALTAD Y TARJETAS ============ */
+
+/* B5 · Sin doble-toque zoom ni toques perdidos en iOS: todos los
+ * elementos táctiles del espejo responden al primer toque.
+ * touch-action:manipulation quita la espera del doble-toque y la
+ * ambigüedad toque/desplazamiento. Sin maximum-scale en el
+ * viewport: el zoom de accesibilidad sigue disponible. */
+html.gx-20-b2 button,
+html.gx-20-b2 summary,
+html.gx-20-b2 a,
+html.gx-20-b2 .gx-wallet-card{touch-action:manipulation}
+
+/* B5 · LEALTAD EN UN SOLO SITIO, VISTOSA (propuesta §3.5). La joya
+ * es el único sitio donde vive la lealtad: nunca en filas ni
+ * servicios. Mismo significado (estrella = racha viva, corazón
+ * roto = rota), pero el cambio de estado SE VE. Todo CSS puro +
+ * SVG; con prefers-reduced-motion el cambio es instantáneo pero
+ * con el mismo significado. */
+.gx-20-loyalty-best{
+  margin:2px 0 0;font-size:10px;font-weight:700;color:#f0cc86
+}
+/* Llenado: el segmento nuevo se ilumina en cian y se asienta en el
+ * color del nivel (el adaptador quita .is-new a los .95 s). */
+.gx-index-loyalty-seg.is-new{
+  stroke:#00f2fe;
+  animation:gx-20-seg-fill .9s ease-out
+}
+@keyframes gx-20-seg-fill{
+  0%{opacity:0;filter:drop-shadow(0 0 8px rgba(0,242,254,.9))}
+  55%{opacity:1;filter:drop-shadow(0 0 10px rgba(0,242,254,.7))}
+  100%{opacity:1;filter:drop-shadow(0 0 2px rgba(189,158,241,.3))}
+}
+/* Relleno al volver de una racha rota: el anillo se enciende
+ * segmento a segmento. */
+.gx-20-loyalty-refill .gx-index-loyalty-seg{animation:gx-20-seg-refill .5s ease-out both}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(1){animation-delay:0ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(2){animation-delay:70ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(3){animation-delay:140ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(4){animation-delay:210ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(5){animation-delay:280ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(6){animation-delay:350ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(7){animation-delay:420ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(8){animation-delay:490ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(9){animation-delay:560ms}
+@keyframes gx-20-seg-refill{from{opacity:0}to{opacity:1}}
+/* Celebración de nivel: pulso dorado puntual justo después del
+ * pago acreditado (en demo: al enviar el comprobante; en real:
+ * cuando sube el conteo observado), no al abrir la app. */
+.gx-20-loyalty-celebrate .gx-index-loyalty-mark{animation:gx-20-gold-pulse 1.4s ease-out}
+@keyframes gx-20-gold-pulse{
+  0%{filter:drop-shadow(0 0 0 rgba(240,204,134,0))}
+  25%{filter:drop-shadow(0 0 18px rgba(240,204,134,.85))}
+  100%{filter:drop-shadow(0 0 0 rgba(240,204,134,0))}
+}
+.gx-20-loyalty-celebrate .gx-index-loyalty-star{animation:gx-20-star-pop 1.4s ease-out}
+@keyframes gx-20-star-pop{0%{transform:scale(1)}30%{transform:scale(1.35)}100%{transform:scale(1)}}
+/* Ruptura: los segmentos se vacían con fundido, el anillo pasa a
+ * gris y la estrella se rompe antes de que aparezca el corazón
+ * roto. .gx-20-loyalty-break es el ASPECTO roto (persiste mientras
+ * la racha está rota); .gx-20-loyalty-break-anim es solo la
+ * animación de la transición (una vez). */
+.gx-20-loyalty-break .gx-index-loyalty-seg{opacity:.35;transition:opacity .5s ease}
+.gx-20-loyalty-break .gx-index-loyalty-mark::before{
+  background:radial-gradient(circle,rgba(148,163,184,.16) 4%,rgba(129,89,220,.05) 42%,transparent 73%)
+}
+.gx-20-loyalty-break-anim .gx-index-loyalty-star{animation:gx-20-star-break .45s ease-in forwards}
+@keyframes gx-20-star-break{
+  0%{transform:scale(1) rotate(0);opacity:1}
+  100%{transform:scale(1.6) rotate(20deg);opacity:0}
+}
+.gx-20-loyalty-break-anim .gx-index-loyalty-heart{animation:gx-20-heart-break .6s cubic-bezier(.22,1.35,.34,1)}
+@keyframes gx-20-heart-break{
+  0%{transform:scale(.4) rotate(-14deg);opacity:0}
+  60%{transform:scale(1.12) rotate(3deg);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+  .gx-index-loyalty-seg.is-new,
+  .gx-20-loyalty-refill .gx-index-loyalty-seg,
+  .gx-20-loyalty-celebrate .gx-index-loyalty-mark,
+  .gx-20-loyalty-celebrate .gx-index-loyalty-star,
+  .gx-20-loyalty-break-anim .gx-index-loyalty-star,
+  .gx-20-loyalty-break-anim .gx-index-loyalty-heart{animation:none!important}
+  .gx-20-loyalty-break .gx-index-loyalty-seg{transition:none}
+}
+
+/* B5 · TARJETAS MÁS REALES (pedido de Henry): la sección de
+ * transferencia (Nu / Revolut) se ve como una tarjeta bancaria
+ * real: chip, relieve, marcas y profundidad. SOLO CSS del espejo;
+ * el 02-02-inline.js oficial las pinta y no se toca: ni datos, ni
+ * flip, ni CLABE (en demo sigue siendo ficticia). */
+/* Chip EMV dorado, a la izquierda, como en una tarjeta real. */
+html.gx-20-b2 .gx-wallet-front::before{
+  content:"";position:absolute;left:16px;top:64px;z-index:2;
+  width:40px;height:30px;border-radius:7px;
+  background:
+    linear-gradient(90deg,transparent 44%,rgba(122,74,0,.55) 44% 56%,transparent 56%),
+    linear-gradient(0deg,transparent 42%,rgba(122,74,0,.55) 42% 58%,transparent 58%),
+    linear-gradient(135deg,#f7dc7d 0%,#e3b93c 38%,#c9930a 62%,#f2d06b 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(122,74,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.6),
+    inset 0 -1px 0 rgba(122,74,0,.35),
+    0 1px 3px rgba(0,0,0,.5);
+}
+/* Profundidad: sombra exterior más presente + borde luminoso fino. */
+html.gx-20-b2 .gx-wallet-face{
+  box-shadow:
+    0 20px 44px rgba(0,0,0,.48),
+    0 2px 8px rgba(0,0,0,.35),
+    inset 0 1px 0 rgba(255,255,255,.14),
+    inset 0 0 0 1px rgba(255,255,255,.05);
+}
+html.gx-20-b2 .gx-wallet-card[data-bank="nu"] .gx-wallet-front{
+  box-shadow:
+    0 20px 44px rgba(0,0,0,.48),
+    0 8px 24px rgba(122,8,219,.28),
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 0 0 1px rgba(255,255,255,.05);
+}
+html.gx-20-b2 .gx-wallet-card[data-bank="revolut"] .gx-wallet-front{
+  box-shadow:
+    0 20px 44px rgba(0,0,0,.48),
+    0 8px 24px rgba(24,59,125,.35),
+    inset 0 1px 0 rgba(255,255,255,.16),
+    inset 0 0 0 1px rgba(255,255,255,.05);
+}
+/* Relieve: el número y la marca se leen grabados, no planos. */
+html.gx-20-b2 .gx-wallet-front-bottom strong{
+  text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 1px rgba(255,255,255,.14);
+  letter-spacing:1.4px;
+}
+html.gx-20-b2 .gx-wallet-brand-name{
+  text-shadow:0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.12);
+}
+/* Revolut: su acento ya era un chip en la fila de marca; con el
+ * chip real a la izquierda, el acento pasa a ser un holograma (no
+ * dos chips). Nu conserva su marca de red (Mastercard) arriba a
+ * la derecha. */
+html.gx-20-b2 .gx-wallet-card[data-bank="revolut"] .gx-wallet-card-accent{
+  width:26px;height:26px;margin-top:2px;border-radius:50%;
+  background:conic-gradient(from 210deg,#f6d365,#7de4cf,#b79bf0,#f6d365);
+  border:1px solid rgba(255,255,255,.55);
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.6),0 1px 3px rgba(0,0,0,.35);
+}
+/* Reverso: mismo cuerpo sólido, para que el flip no se sienta hueco. */
+html.gx-20-b2 .gx-wallet-back{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(0,242,254,.10),transparent 33%),
+    radial-gradient(circle at 94% 8%,rgba(124,77,255,.14),transparent 36%),
+    linear-gradient(145deg,rgba(20,22,32,.92),rgba(10,11,18,.94));
+}
+html.gx-20-b2 .gx-wallet-card .gx-bank-clabe{
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.35),inset 0 -1px 0 rgba(255,255,255,.05);
 }

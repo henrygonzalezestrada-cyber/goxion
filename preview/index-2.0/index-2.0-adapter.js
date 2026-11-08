@@ -1,4 +1,4 @@
-/* GOXION · Index 2.0 · adaptador del espejo (B0–B3).
+/* GOXION · Index 2.0 · adaptador del espejo (B0–B5).
  * Sustituye a preview/integracion-b2/index-adapter.js DENTRO del espejo.
  * Reutiliza el motor financiero y el puente demo/real (b2-bridge.js): los
  * importes, la mora y la lealtad vienen del servidor en centavos; aquí solo
@@ -26,7 +26,8 @@
   * selecciona entero. mode "grupo" = el grupo seleccionado (o el próximo
   * si no hay selección); "todo" existe para el chip de B3. */
  let mode="grupo",selectedGroup=null,installed=false,lastAnchor=null,
-  lastNextFecha="";
+  lastNextFecha="",loyaltyLostApplied=false,lastLoyalty=null;
+ const reduceMotion=()=>window.matchMedia("(prefers-reduced-motion: reduce)").matches;
  const openGroups=new Set();
  function rows(){
   return Array.isArray(store.quote?.cargos)?store.quote.cargos.map((x,i)=>({
@@ -204,25 +205,33 @@
    * B2 puede saber antes que se perdió la lealtad (lealtad_global_perdida).
    * Solo se aplica la variante "perdida" cuando la bandera B2 está activa. */
   const loyaltyPanel=document.querySelector(".loyalty-badge.gx-index-loyalty");
-  if(loyaltyPanel)setLoyaltyLost(loyaltyPanel,quote.lealtad_global_perdida===true);
+  if(loyaltyPanel){
+   setLoyaltyLost(loyaltyPanel,quote.lealtad_global_perdida===true);
+   paintLoyalty();
+  }
  }
+ /* B5 · LEALTAD VISTOSA (propuesta §3.5): la joya es el único sitio
+  * donde vive la lealtad. El estado roto se aplica con una
+  * animación de ruptura (la estrella se rompe antes de que aparezca
+  * el corazón) SOLO la primera vez que se rompe; si el render
+  * global repinta el panel con la racha ya rota, se aplica el
+  * mismo estado al instante, sin re-animar. Por eso el "ya
+  * aplicado" vive en el adaptador (loyaltyLostApplied), no en el
+  * panel: el panel se recrea y perdería la marca. */
  function setLoyaltyLost(panel,lost){
   const mark=panel.querySelector(".gx-index-loyalty-mark");
   const titleEl=panel.querySelector(".loyalty-title");
   const caption=panel.querySelector(".gx-index-loyalty-caption");
   const desc=panel.querySelector(".loyalty-desc");
   if(!mark||!titleEl||!caption||!desc)return;
-  if(!panel.dataset.gxB2LoyaltyOriginal){
+  if(!panel.dataset.gxB2LoyaltyOriginal&&!mark.classList.contains("is-lost")){
    panel.dataset.gxB2LoyaltyOriginal=JSON.stringify({
     state:panel.dataset.loyaltyState||"active",
     title:titleEl.textContent,caption:caption.textContent,
     desc:desc.innerHTML,now:mark.getAttribute("aria-valuenow")||"0",
     max:mark.getAttribute("aria-valuemax")||"4"});
   }
-  if(lost){
-   if(panel.dataset.gxB2LoyaltyApplied==="lost")return;
-   panel.dataset.gxB2LoyaltyApplied="lost";
-   panel.dataset.loyaltyState="lost";
+  const applyLostInstant=()=>{
    mark.classList.add("is-lost");
    mark.setAttribute("role","img");
    mark.setAttribute("aria-label","Racha reiniciada");
@@ -230,18 +239,118 @@
    titleEl.textContent="Racha reiniciada";
    caption.textContent="Perdiste tu avance";
    desc.innerHTML='<span style="color:var(--danger-red);font-weight:600;">💔 Racha reiniciada por incumplir una fecha de pago.</span>';
+   showBestLine(panel,bestStreak(panel));
+   lastLoyalty={count:0,target:Number(mark.getAttribute("aria-valuemax")||0)||0};
+  };
+  if(lost){
+   panel.dataset.loyaltyState="lost";
+   panel.classList.add("gx-20-loyalty-break");
+   if(loyaltyLostApplied){
+    if(!mark.classList.contains("is-lost"))applyLostInstant();
+    return;
+   }
+   loyaltyLostApplied=true;
+   if(reduceMotion()||mark.classList.contains("is-lost")){applyLostInstant();return;}
+   panel.classList.add("gx-20-loyalty-break-anim");
+   setTimeout(()=>{
+    applyLostInstant();
+    setTimeout(()=>panel.classList.remove("gx-20-loyalty-break-anim"),700);
+   },380);
   }else{
-   if(panel.dataset.gxB2LoyaltyApplied!=="lost")return;
-   delete panel.dataset.gxB2LoyaltyApplied;
-   const orig=JSON.parse(panel.dataset.gxB2LoyaltyOriginal);
-   panel.dataset.loyaltyState=orig.state;
+   if(!loyaltyLostApplied)return;
+   loyaltyLostApplied=false;
+   const orig=JSON.parse(panel.dataset.gxB2LoyaltyOriginal||"{}");
+   panel.dataset.loyaltyState=orig.state||"active";
+   panel.classList.remove("gx-20-loyalty-break","gx-20-loyalty-break-anim");
+   hideBestLine(panel);
    mark.classList.remove("is-lost");
    mark.setAttribute("role","progressbar");
-   mark.setAttribute("aria-label","Racha: "+orig.now+" de "+orig.max+" pagos puntuales");
+   mark.setAttribute("aria-label","Racha: "+(orig.now||"0")+" de "+(orig.max||"4")+" pagos puntuales");
    const now=Number(orig.now)||0;
    mark.querySelectorAll(".gx-index-loyalty-seg").forEach((s,i)=>s.classList.toggle("is-filled",i<now));
-   titleEl.textContent=orig.title;caption.textContent=orig.caption;desc.innerHTML=orig.desc;
+   if(orig.title)titleEl.textContent=orig.title;
+   if(orig.caption)caption.textContent=orig.caption;
+   if(orig.desc)desc.innerHTML=orig.desc;
   }
+ }
+ /* B5 · Mejor racha anterior, como cifra fija mientras la racha
+  * está rota ("Mejor racha: 10 pagos"). Es el mayor entre la
+  * racha guardada del motor (pagos_guardados), la efectiva y el
+  * conteo que tenía la joya antes de romperse. */
+ function bestStreak(panel){
+  const orig=panel.dataset.gxB2LoyaltyOriginal?JSON.parse(panel.dataset.gxB2LoyaltyOriginal):null;
+  const fromPanel=Number(orig?.now)||0;
+  const q=store.quote?.lealtad||{};
+  const fromQuote=Math.max(Number(q.pagos_guardados)||0,Number(q.pagos_efectivos)||0);
+  return Math.max(fromPanel,fromQuote);
+ }
+ function showBestLine(panel,best){
+  if(!(best>0))return;
+  let line=panel.querySelector(".gx-20-loyalty-best");
+  if(!line){
+   line=document.createElement("p");
+   line.className="gx-20-loyalty-best";
+   panel.querySelector(".loyalty-content")?.appendChild(line);
+  }
+  line.textContent="Mejor racha: "+best+(best===1?" pago":" pagos");
+ }
+ function hideBestLine(panel){panel.querySelector(".gx-20-loyalty-best")?.remove();}
+ /* B5 · La joya reacciona al conteo OBSERVADO: si el motor pinta
+  * más pagos puntuales que la última vez, los segmentos nuevos se
+  * iluminan en cian (is-new) y el conteo sube animado; si sube de
+  * nivel, pulso dorado. La primera pintura no anima (nada de
+  * celebración al abrir la app). Si venía rota, el anillo se
+  * rellena segmento a segmento. */
+ function paintLoyalty(){
+  const panel=document.querySelector(".loyalty-badge.gx-index-loyalty");
+  if(!panel)return;
+  const mark=panel.querySelector(".gx-index-loyalty-mark");
+  if(!mark)return;
+  const lost=mark.classList.contains("is-lost");
+  const target=Number(mark.getAttribute("aria-valuemax")||0)||0;
+  const count=lost?0:(Number(mark.getAttribute("aria-valuenow")||0)||0);
+  if(!lastLoyalty){lastLoyalty={count,target};return;}
+  const prev=lastLoyalty;lastLoyalty={count,target};
+  if(count<=prev.count)return;
+  if(prev.count===0&&!lost){
+   panel.classList.remove("gx-20-loyalty-refill");
+   void panel.offsetWidth;
+   panel.classList.add("gx-20-loyalty-refill");
+   setTimeout(()=>panel.classList.remove("gx-20-loyalty-refill"),1400);
+  }else{
+   mark.querySelectorAll(".gx-index-loyalty-seg").forEach((s,i)=>{
+    if(i>=prev.count&&i<count){
+     s.classList.add("is-new");
+     setTimeout(()=>s.classList.remove("is-new"),950);
+    }
+   });
+  }
+  countUpCaption(panel,prev.count,count,target);
+  if(target>prev.target)celebrateLoyalty();
+ }
+ function countUpCaption(panel,from,to,target){
+  const cap=panel.querySelector(".gx-index-loyalty-caption");
+  if(!cap)return;
+  const fmt=n=>n+" de "+target+" pagos puntuales";
+  if(reduceMotion()||to<=from){cap.textContent=fmt(to);return;}
+  const start=performance.now(),dur=600;
+  const tick=now=>{
+   const p=Math.min(1,(now-start)/dur);
+   cap.textContent=fmt(Math.round(from+(to-from)*(1-Math.pow(1-p,3))));
+   if(p<1)requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+ }
+ /* B5 · Pulso dorado puntual tras el pago acreditado. En demo es
+  * el envío del comprobante (no hay acreditación real); en real
+  * lo dispara el aumento de nivel observado en paintLoyalty. */
+ function celebrateLoyalty(){
+  const panel=document.querySelector(".loyalty-badge.gx-index-loyalty");
+  if(!panel||reduceMotion())return;
+  panel.classList.remove("gx-20-loyalty-celebrate");
+  void panel.offsetWidth;
+  panel.classList.add("gx-20-loyalty-celebrate");
+  setTimeout(()=>panel.classList.remove("gx-20-loyalty-celebrate"),1500);
  }
  /* Seguimiento del comprobante B2: la única señal viva es
   * quote.comprobante_en_revision. Se muestra con el mismo tracker vanilla
@@ -299,6 +408,14 @@
     if(small.textContent!==label)small.textContent=label;
    }
   });
+  /* B5 · El chip "Todo" también se pinta por clases: sin esto, al
+   * tocarlo habría que reconstruir el DOM para que se viera activo
+   * (y volvería el toque perdido del video 2). */
+  const chip=card.querySelector(".gx-20-todo-chip");
+  if(chip){
+   chip.classList.toggle("is-active",mode==="todo");
+   chip.setAttribute("aria-pressed",mode==="todo"?"true":"false");
+  }
   updatePrimaryButton();
  }
  function content(){
@@ -419,14 +536,27 @@
   card.querySelectorAll("[data-gx20-cargo]").forEach(button=>button.addEventListener("click",()=>{
    selectedGroup=button.dataset.gx20Fecha;mode="grupo";
    openGroups.add(selectedGroup);
-   render();
+   /* B5 · BUG 1 (video 2): tocar la fila SOLO pinta la selección.
+    * Antes se llamaba render() y se reconstruía card.innerHTML
+    * bajo el dedo: el <details> nuevo nacía con la transición de
+    * altura de ::details-content y en Safari 26 se quedaba en
+    * ~700 px (el hueco enorme). Sin re-render no hay re-disparo
+    * de animación de altura ni nodo que desaparezca bajo el toque;
+    * el hero no depende de la selección (siempre es el próximo),
+    * así que paintSelection() + el botón principal lo cubren todo. */
+   paintSelection();
   }));
   /* B3 · Chip "Todo": un toque selecciona todos los grupos (pagar todo
    * junto); otro toque vuelve a la selección por grupo (el próximo). */
   card.querySelector(".gx-20-todo-chip")?.addEventListener("click",()=>{
    if(mode==="todo"){mode="grupo";selectedGroup=null;}
    else mode="todo";
-   render();
+   /* B5 · BUG 2 (video 2): el chip cambia de modo con pintado por
+    * clases (paintSelection, que ya pinta su is-active y su
+    * aria-pressed), sin reconstruir el DOM bajo el dedo. Antes
+    * render() sustituía el nodo entre touchstart y click y iOS
+    * cancelaba el toque: a veces no pasaba nada. */
+   paintSelection();
   });
   updateHeader();
   updatePrimaryButton();
@@ -520,6 +650,11 @@
      if(typeof window.gxSetPaymentSubmitState==="function")
       window.gxSetPaymentSubmitState("success");
      else document.getElementById("payment-modal")?.classList.add("is-success");
+     /* B5 · En demo no hay acreditación real: el envío correcto es
+      * el momento visible del pago, así que la joya celebra aquí
+      * (pulso dorado). En real la celebración la dispara el aumento
+      * de nivel observado en paintLoyalty. */
+     celebrateLoyalty();
      window.mostrarToastPago?.("Esta pantalla es de revisión; no acepta pagos reales");
     },650);
     return;
