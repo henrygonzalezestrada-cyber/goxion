@@ -1,11 +1,13 @@
-/* GOXION · Index 2.0 · adaptador del espejo (B0/B1).
+/* GOXION · Index 2.0 · adaptador del espejo (B0–B3).
  * Sustituye a preview/integracion-b2/index-adapter.js DENTRO del espejo.
  * Reutiliza el motor financiero y el puente demo/real (b2-bridge.js): los
  * importes, la mora y la lealtad vienen del servidor en centavos; aquí solo
  * se AGRUPA por fecha efectiva para pintar. Nada se calcula en JS.
- * B1: grupos por fecha con <details> nativo. DESGLOSE DEL PAGO como sección
- * no se toca en este bloque (es B4); la selección por grupo con chip "Todo"
- * y el botón con importe es B3. */
+ * B1: grupos por fecha con <details> nativo. B2: hero de un solo total +
+ * píldora solo con estado relativo + total del mes. B3: selección por grupo,
+ * chip "Todo" (pagar todo junto en un solo reporte), botón principal con el
+ * importe seleccionado y botones A+C. DESGLOSE DEL PAGO como sección no se
+ * toca en este bloque (es B4). */
 (function(){
  "use strict";
  const store=window.GOXION_B2_PREVIEW;
@@ -116,6 +118,28 @@
   return null;
  }
  function title(row){return row.servicio+" · Perfil "+row.ordinal}
+ /* B2 · Estado de la píldora del hero, SOLO relativo y sin fecha: la fecha
+  * vive en el encabezado del grupo próximo. "Vence en 2 días" responde
+  * cuándo; "8 nov" ya está una sola vez en el grupo. */
+ function heroPillState(next){
+  if(!next.cargos.length)return {text:"✅ Servicios al corriente",cls:"badge-paid"};
+  if(next.cargos.some(x=>x.mora_centavos>0))return {text:"🚨 Servicio vencido",cls:"badge-overdue"};
+  if(next.cargos.some(x=>x.prorroga_estado==="aprobada"&&x.fecha_pactada&&x.mora_centavos<=0))
+   return {text:"⏳ En prórroga",cls:"badge-ok"};
+  const days=daysUntil(next.fecha);
+  if(days===null)return {text:"⏳ Por confirmar",cls:"badge-ok"};
+  if(days<0)return {text:"🚨 Servicio vencido",cls:"badge-overdue"};
+  if(days===0)return {text:"⏳ Vence hoy",cls:"badge-ok"};
+  if(days===1)return {text:"⏳ Vence mañana",cls:"badge-ok"};
+  return {text:"⏳ Vence en "+days+" días",cls:"badge-ok"};
+ }
+ /* B2 · Mes del período ("noviembre"), para la línea "Total de noviembre". */
+ function monthName(){
+  const v=store.quote?.periodo||"";
+  if(!/^\d{4}-\d{2}/.test(v))return "del período";
+  return new Intl.DateTimeFormat("es-MX",{month:"long",timeZone:"UTC"})
+   .format(new Date(v.slice(0,7)+"-01T00:00:00Z"));
+ }
  function updateHeader(){
   const quote=store.quote;
   if(!quote)return;
@@ -123,14 +147,14 @@
   const label=document.querySelector(".balance-hero .total-label");
   const amount=document.querySelector(".balance-hero .total-amount");
   const badge=document.querySelector(".balance-hero .time-badge");
-  if(label)label.textContent=due?"Próximo pago":"Saldo pendiente";
+  /* B2 · UNA cifra de acción: el hero es el grupo próximo ("A pagar el
+   * 8 nov · $168.00"), no el total del mes ni un saldo genérico. */
+  if(label)label.textContent=due?"A pagar el "+date(next.fecha):"Saldo pendiente";
   if(amount)amount.textContent=money(next.centavos);
   if(badge){
-   // La píldora se afina en B2 (solo estado relativo, sin fecha repetida);
-   // en B1 se conserva el texto del adaptador B2 para no cambiar el hero
-   // antes de tiempo.
-   badge.textContent=due?(due.mora_centavos>0?"🚨 Servicio vencido · "+date(due.vence):"⏳ Próximo pago · "+date(next.fecha)):"✅ Servicios al corriente";
-   badge.className="time-badge "+(due?.mora_centavos>0?"badge-overdue":due?"badge-ok":"badge-paid");
+   const pill=heroPillState(next);
+   badge.textContent=pill.text;
+   badge.className="time-badge "+pill.cls;
   }
   const period=document.querySelector(".card-info .info-block.full .value");
   if(period){
@@ -211,6 +235,47 @@
   section.dataset.gx20Proof="1";
   content.insertBefore(section,content.firstChild);
  }
+ /* B3 · El botón principal dice SIEMPRE el importe seleccionado
+  * ("Ya realicé mi pago · $168.00" con un grupo, "· $247.00" con Todo).
+  * El render global lo repinta con el texto fijo, así que se repone aquí
+  * en cada render y en cada mutación de #app (con guardia por igualdad,
+  * para no entrar en bucle). No se toca mientras se está enviando (A). */
+ function updatePrimaryButton(){
+  if(!store.quote)return;
+  const primary=document.querySelector(".gx-payment-primary");
+  if(!primary||primary.classList.contains("is-sending"))return;
+  const strong=primary.querySelector(".gx-payment-primary-copy strong");
+  if(!strong)return;
+  const val=choice();
+  const desired=val.centavos>0?"Ya realicé mi pago · "+money(val.centavos):"Ya realicé mi pago";
+  if(strong.textContent!==desired)strong.textContent=desired;
+ }
+ /* B3 · Pintar la selección sobre el DOM existente, sin re-render: tocar el
+  * encabezado de un grupo lo selecciona entero (el grupo es la unidad), y
+  * el <details> nativo sigue abriendo/cerrando por su cuenta. Re-renderizar
+  * en el clic del summary mataría el toggle nativo (el elemento se
+  * recrearía antes de que ocurra), así que aquí solo se tocan clases y
+  * etiquetas. */
+ function paintSelection(){
+  const card=document.getElementById("gx-20-calendar");
+  if(!card||!store.quote)return;
+  const selectedFecha=mode==="todo"?null:(selectedGroup||nextPayment().fecha);
+  card.querySelectorAll("details.gx-20-group").forEach(details=>{
+   details.classList.toggle("is-active",
+     mode==="todo"||details.dataset.gx20Fecha===selectedFecha);
+  });
+  card.querySelectorAll("[data-gx20-cargo]").forEach(button=>{
+   const isActive=mode==="todo"||button.dataset.gx20Fecha===selectedFecha;
+   const done=button.classList.contains("is-done");
+   button.classList.toggle("is-active",isActive&&!done);
+   const small=button.querySelector(".gx-20-row-side small");
+   if(small){
+    const label=done?"Pagado":isActive?"Seleccionado":"Pendiente";
+    if(small.textContent!==label)small.textContent=label;
+   }
+  });
+  updatePrimaryButton();
+ }
  function content(){
   const list=groups(),next=nextPayment();
   const nextFecha=next.fecha;
@@ -219,7 +284,9 @@
   const plural=n=>n===1?"1 servicio":n+" servicios";
   const groupsHTML=list.map(g=>{
    const isNext=g.fecha===nextFecha&&g.centavos>0;
-   const isActive=g.fecha===selectedFecha;
+   /* B3 · En modo "Todo" todos los grupos están seleccionados: sus filas
+    * dicen "Seleccionado" y sus totales van en cian. */
+   const isActive=mode==="todo"||g.fecha===selectedFecha;
    const open=openGroups.has(g.fecha);
    const state=groupState(g);
    const rowsHTML=g.cargos.map(x=>{
@@ -242,11 +309,21 @@
      '</strong><span class="gx-20-sum-meta">'+esc(plural(g.cargos.length))+' · '+
        esc(state)+'</span></span>'+
      '<span class="gx-20-sum-side"><strong class="gx-20-sum-total">'+money(g.centavos)+
-     '</strong><span class="gx-20-chevron" aria-hidden="true">⌄</span></span>'+
+     '</strong><span class="gx-20-chevron" aria-hidden="true">'+
+     '<svg class="gx-20-chevron-svg" viewBox="0 0 24 16" aria-hidden="true">'+
+     '<path d="M3.2 4.2L12 11.3L20.8 4.2"/></svg></span></span>'+
     '</summary>'+
     '<div class="gx-20-rows">'+rowsHTML+'</div>'+
    '</details>';
   }).join("");
+  /* B3 · Total del mes + chip "Todo": una sola línea al final de los grupos.
+   * "Todo" selecciona todos los grupos y paga todo junto en un solo reporte
+   * (Luis: $168 + $79 = $247); sin esto el cliente tendría que hacer dos
+   * pagos separados. Solo cuando hay algo pendiente. */
+  const totalAll=pending().reduce((s,x)=>s+x.total_centavos,0);
+  const totalRow=totalAll>0?
+   '<div class="gx-20-total-row"><span class="gx-20-total-main"><span class="gx-20-total-label">Total de '+esc(monthName())+'</span><strong class="gx-20-total-amount">'+money(totalAll)+'</strong></span>'+
+   '<button class="gx-20-todo-chip'+(mode==="todo"?' is-active':'')+'" type="button" aria-pressed="'+(mode==="todo")+'"><span>Todo</span></button></div>':"";
   const foot=(store.quote?.comprobante_en_revision?
     "Comprobante recibido · pendiente de revisión. Aún no es un pago acreditado.":
     "El reporte de pago se acredita únicamente después de la revisión de Admin.");
@@ -256,7 +333,7 @@
   const lostNote=store.quote?.lealtad_global_perdida?
     '<p class="gx-20-foot gx-20-note">La lealtad se perdió por una fecha incumplida. La mora corresponde solo al servicio vencido.</p>':"";
   return '<div class="gx-20-cal-head"><span class="gx-20-caption">CALENDARIO DE PAGOS</span></div>'+
-   groupsHTML+
+   groupsHTML+totalRow+
    '<p class="gx-20-foot">'+esc(foot)+'</p>'+prorrogated+lostNote;
  }
  function render(){
@@ -304,12 +381,29 @@
     if(details.open)openGroups.add(fecha);else openGroups.delete(fecha);
    });
   });
+  /* B3 · Tocar el encabezado del grupo lo selecciona entero (y el
+   * <details> se abre/cierra como siempre). Solo pinta la selección;
+   * el toggle nativo no se interrumpe. */
+  card.querySelectorAll("summary.gx-20-summary").forEach(summary=>summary.addEventListener("click",()=>{
+   const details=summary.closest("details.gx-20-group");
+   if(!details)return;
+   selectedGroup=details.dataset.gx20Fecha;mode="grupo";
+   paintSelection();
+  }));
   card.querySelectorAll("[data-gx20-cargo]").forEach(button=>button.addEventListener("click",()=>{
    selectedGroup=button.dataset.gx20Fecha;mode="grupo";
    openGroups.add(selectedGroup);
    render();
   }));
+  /* B3 · Chip "Todo": un toque selecciona todos los grupos (pagar todo
+   * junto); otro toque vuelve a la selección por grupo (el próximo). */
+  card.querySelector(".gx-20-todo-chip")?.addEventListener("click",()=>{
+   if(mode==="todo"){mode="grupo";selectedGroup=null;}
+   else mode="todo";
+   render();
+  });
   updateHeader();
+  updatePrimaryButton();
   updateProofTracker();
  }
  function installHandlers(){
@@ -333,7 +427,38 @@
    store.report={monto_centavos:val.centavos,
      cargo_ids:val.cargos.map(x=>x.cargo_id),
      modo:mode,periodo:store.quote.periodo};
-   originalModal.call(this,key,period,(val.centavos/100).toFixed(2),folio,nombre);
+   /* B3 · Botón A: al tocar el primario, se transforma en progreso
+    * ("Abriendo…") y la hoja entra tras la micro-animación (220 ms, dentro
+    * del presupuesto 150–300 ms); con reduced-motion abre al instante. */
+   const primary=document.querySelector(".gx-payment-primary");
+   const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+   const open=()=>originalModal.call(this,key,period,(val.centavos/100).toFixed(2),folio,nombre);
+   if(primary&&!reduce){
+    const strong=primary.querySelector(".gx-payment-primary-copy strong");
+    const small=primary.querySelector(".gx-payment-primary-copy small");
+    primary.classList.add("is-sending");
+    if(strong)strong.textContent="Abriendo…";
+    if(small)small.textContent="Preparamos tu comprobante";
+    setTimeout(open,220);
+   }else open();
+  };
+  /* B3 · Al cerrar la hoja, el primario vuelve a su etiqueta con importe.
+   * cerrarModalPago quita "show" en síncrono cuando sí cierra; si no cierra
+   * (clic fuera del overlay), no se restaura nada. */
+  const originalClose=window.cerrarModalPago;
+  if(typeof originalClose==="function")window.cerrarModalPago=function(e,force){
+   const out=originalClose.apply(this,arguments);
+   const modal=document.getElementById("payment-modal");
+   if(modal&&!modal.classList.contains("show")){
+    const primary=document.querySelector(".gx-payment-primary");
+    if(primary&&primary.classList.contains("is-sending")){
+     primary.classList.remove("is-sending");
+     const small=primary.querySelector(".gx-payment-primary-copy small");
+     if(small)small.textContent="Subir comprobante";
+     updatePrimaryButton();
+    }
+   }
+   return out;
   };
   if(typeof originalBank==="function")window.abrirDatosPago=function(){
    if(store.blocked||store.quote?.comprobante_en_revision){
@@ -358,10 +483,19 @@
    }
    if(val.centavos<=0||store.quote.comprobante_en_revision)return;
    if(store.demo){
+    /* B3 · Botón A en el espejo: el envío se ve transformarse — progreso
+     * (spinner) y luego check — igual que en el flujo real, donde el tiempo
+     * lo pone la red. */
+    const submit=document.getElementById("btn-enviar-comprobante");
+    if(submit?.dataset.state==="loading")return;
     if(typeof window.gxSetPaymentSubmitState==="function")
-     window.gxSetPaymentSubmitState("success");
-    else document.getElementById("payment-modal")?.classList.add("is-success");
-    window.mostrarToastPago?.("Esta pantalla es de revisión; no acepta pagos reales");
+     window.gxSetPaymentSubmitState("loading");
+    setTimeout(()=>{
+     if(typeof window.gxSetPaymentSubmitState==="function")
+      window.gxSetPaymentSubmitState("success");
+     else document.getElementById("payment-modal")?.classList.add("is-success");
+     window.mostrarToastPago?.("Esta pantalla es de revisión; no acepta pagos reales");
+    },650);
     return;
    }
    const core=window.GOXION_CORE;
@@ -405,9 +539,28 @@
     window.mostrarToastPago?.(error.message||"No fue posible reportar tu pago.",true);
    }finally{store.submitting=false;}
   };
+  /* B3 · Botón C: ripple desde el punto del toque en los botones del
+   * espejo (primario, secundario, chip Todo, filas, envío). Solo
+   * transform/opacity; se salta con reduced-motion. */
+  document.addEventListener("pointerdown",e=>{
+   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+   const el=e.target.closest(".gx-payment-primary,.gx-bank-trigger,.gx-20-todo-chip,.gx-20-row,.btn-submit-payment");
+   if(!el||el.disabled)return;
+   const rect=el.getBoundingClientRect();
+   if(rect.width<=0||rect.height<=0)return;
+   const size=Math.max(rect.width,rect.height)*2.2;
+   const rip=document.createElement("span");
+   rip.className="gx-20-ripple";
+   rip.style.width=rip.style.height=Math.ceil(size)+"px";
+   rip.style.left=(e.clientX-rect.left-size/2)+"px";
+   rip.style.top=(e.clientY-rect.top-size/2)+"px";
+   el.appendChild(rip);
+   rip.addEventListener("animationend",()=>rip.remove());
+  },{passive:true});
  }
  function init(){
   installHandlers();
+  updatePrimaryButton();
   if(!store.quote)return;
   const anchor=document.querySelector(".services-container");
   if(anchor && anchor!==lastAnchor){lastAnchor=anchor;render();}
