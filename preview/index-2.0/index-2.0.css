@@ -183,24 +183,28 @@ html.gx-20-b2 .services-container{display:none}
 /* B1 · ENERGÍA en el encabezado del grupo próximo: una sola línea de luz
  * por grupo (no una por fila), cada 2.8 s, con los keyframes oficiales
  * gx-index-energy. Se pausa con pestaña oculta y se apaga con
- * prefers-reduced-motion, igual que la energía de las filas. */
-html[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
+ * prefers-reduced-motion, igual que la energía de las filas.
+ * B4 · El barrido inferior es ahora la ALTERNATIVA (no el defecto): solo
+ * se enciende con la clase gx-20-energy-sweep en <html>; el defecto es
+ * la órbita (§B4). Para volver al barrido: añadir esa clase al <html>. */
+html.gx-20-energy-sweep[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
   content:"";
   position:absolute;left:0;bottom:0;height:2px;width:36%;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),rgba(0,242,254,.9),transparent);
   animation:gx-index-energy 2.8s ease-in-out infinite;
   pointer-events:none
 }
-html.gx-r8-paused .gx-20-group.is-next > .gx-20-summary::after{
+html.gx-20-energy-sweep.gx-r8-paused .gx-20-group.is-next > .gx-20-summary::after{
   animation-play-state:paused!important
 }
 @media(prefers-reduced-motion:reduce){
-  html[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
+  html.gx-20-energy-sweep[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
     animation:none!important
   }
   .gx-20-chevron-svg{transition:none}
   .gx-payment-primary.is-sending .gx-payment-primary-icon::after{animation:none}
   .gx-20-ripple{display:none}
+  .gx-20-group.is-next > .gx-20-summary::before{animation:none!important}
 }
 
 /* B1 · X de cierre al token completo de la hoja de pago
@@ -218,4 +222,132 @@ html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
 }
 html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn:active{
   transform:scale(.90)
+}
+
+/* ================================================================
+   B4 · Desglose dentro del grupo + correcciones del video de Henry
+   (Safari físico, 8 nov 15:24) + variante órbita.
+   Todo es solo espejo: index.css oficial y el morph no se tocan.
+   ================================================================ */
+
+/* B4 · DESGLOSE DEL PAGO como sección desaparece del espejo en B2:
+ * su información ya vive dentro de cada grupo (breakdownHTML del
+ * adaptador). La oficial y el flujo global no se tocan: la clase
+ * gx-20-b2 solo existe cuando hay cotización B2 en el espejo. */
+html.gx-20-b2 .scrollable-content > .breakdown-box{display:none}
+
+/* B4 · Desglose dentro del grupo expandido (propuesta §3.4). Solo las
+ * líneas que apliquen; el total es el mismo número del encabezado. */
+.gx-20-breakdown{
+  padding:6px 18px 14px;
+  border-top:1px solid rgba(255,255,255,.065)
+}
+.gx-20-bd-line{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:5px 0;font-size:13px;line-height:1.4
+}
+.gx-20-bd-line > span{color:#9aacca;font-weight:500;white-space:nowrap}
+.gx-20-bd-line > strong{color:#eaf8ff;font-weight:600;letter-spacing:-.2px;white-space:nowrap}
+.gx-20-bd-line.is-discount > span,.gx-20-bd-line.is-discount > strong{color:#00ff9d}
+.gx-20-bd-line.is-surcharge > span,.gx-20-bd-line.is-surcharge > strong{color:#ff8f8f}
+.gx-20-bd-line.is-total{
+  margin-top:4px;padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.12)
+}
+.gx-20-bd-line.is-total > span{color:#eaf2ff;font-weight:700;font-size:13px}
+.gx-20-bd-line.is-total > strong{color:#eaf8ff;font-weight:800;font-size:15px}
+
+/* B4 · BUG 1 (video 5–8 s): a mitad de morph la etiqueta ("A pagar el
+ * 6 nov") se encimaba al importe. Causa medida en el harness: la
+ * etiqueta se disuelve con la curva paired (0.05→0.35) mientras el
+ * importe sube a su fila; a p≈0.23 el importe ya invade la caja de
+ * la etiqueta (solape 680 px²) y la etiqueta aún está al 35%.
+ * Corrección solo-espejo, sin tocar el morph: la etiqueta sube 3 px
+ * y se aprieta su alto (line-height 1), y su opacidad cae al cuadrado
+ * (a 0.35 → 0.12, invisible antes de que el importe la alcance). En
+ * reposo y en compacto se ve igual que antes (opacidad 1 → 1, 0 → 0). */
+html[data-gx-index-morph="r17"] .balance-hero .total-label{
+  top:-3px;
+  line-height:1;
+  opacity:calc(var(--gx-rm-label-opacity)*var(--gx-rm-label-opacity))
+}
+
+/* B4 · BUG 2 (video 14–17 s): al abrir/cerrar grupos el cambio era
+ * instantáneo y el ojo leía las filas "encimándose" al siguiente
+ * encabezado. La apertura ahora es animada y el contenido va
+ * RECORTADO durante la transición: con overflow:clip las filas no
+ * pueden pintarse nunca fuera de la caja del grupo, ni a mitad de
+ * la animación. Patrón ::details-content (Safari 18.4+); sin
+ * interpolate-size el cambio es instantáneo como hoy, sin regresión. */
+.gx-20-group::details-content{
+  overflow:clip;
+  block-size:0;
+  transition:block-size .32s ease, content-visibility .32s ease allow-discrete;
+}
+.gx-20-group[open]::details-content{
+  block-size:auto;
+}
+@supports (interpolate-size:allow-keywords){
+  .gx-20-group{interpolate-size:allow-keywords}
+}
+
+/* B4 · BUG 3 (video 20–28 s): el "Total de noviembre" se leía doble.
+ * Dos causas: (a) el desglose global seguía pintando Subtotal $98.00
+ * y Total pendiente $92.12 debajo del calendario (eliminado arriba);
+ * (b) con el cristal al 45% una mancha de lava cian brillante detrás
+ * de la tarjeta se leía como texto duplicado sobre el total del mes.
+ * La tarjeta del calendario sube su fondo a .78: el cristal se
+ * conserva (borde, sombra, blur 18px) y el texto ya no compite con
+ * la lava que pasa por detrás. */
+.gx-20-card{
+  background:rgba(8,8,12,.78)
+}
+
+/* B4 · BUG 4 (video, flecha en "<"): el giro de 180° pasa
+ * OBLIGATORIAMENTE por los 90°, donde el chevron apunta a la
+ * izquierda. Un giro no puede no pasar por ahí. La corrección es
+ * un FLIP vertical (scaleY 1 → -1): la pieza se aplasta a una línea
+ * horizontal a mitad de camino y reaparece apuntando arriba; nunca
+ * apunta a los lados. El resorte queda en el flip (se estira un
+ * poco al asentarse) y el cambio cian→morado se conserva. Más rápido:
+ * .30 s en vez de .44 s. */
+.gx-20-chevron-svg{
+  transform:scaleY(1);
+  transition:transform .30s cubic-bezier(.3,1.25,.4,1),
+    color .25s ease,filter .25s ease;
+}
+.gx-20-group[open] .gx-20-chevron-svg{
+  transform:scaleY(-1);color:#b79bf0;
+  filter:drop-shadow(0 0 4px rgba(183,155,240,.18))
+}
+
+/* B4 · VARIANTE ÓRBITA (idea de Henry): la línea de luz ya no pasa
+ * solo por debajo del encabezado del grupo próximo/vencido; un brillo
+ * fino ORBITA alrededor de todo el borde del encabezado (un arco de
+ * ~90° que da la vuelta completa cada 2.8 s, la misma cadencia del
+ * barrido). CSS puro: conic-gradient que gira vía @property, recortado
+ * a solo el borde con máscara. Solo el encabezado del grupo próximo
+ * (is-next), no toda la tarjeta, para no saturar. Sin @property el
+ * arco queda fijo (visible, sin movimiento): no se rompe nada.
+ * ALTERNATIVA: el barrido inferior sigue disponible añadiendo la
+ * clase gx-20-energy-sweep al <html>; con esa clase la órbita se
+ * apaga y vuelve el barrido. */
+@property --gx-20-orbit{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes gx-20-orbit{to{--gx-20-orbit:360deg}}
+html:not(.gx-20-energy-sweep)[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::before{
+  content:"";
+  position:absolute;inset:0;border-radius:4px;pointer-events:none;
+  padding:1.5px;
+  background:conic-gradient(from var(--gx-20-orbit,0deg),
+    transparent 0deg,transparent 262deg,
+    rgba(0,242,254,.9) 312deg,rgba(255,255,255,.95) 340deg,
+    transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;
+  animation:gx-20-orbit 2.8s linear infinite;
+}
+html.gx-r8-paused .gx-20-group.is-next > .gx-20-summary::before{
+  animation-play-state:paused!important
 }
