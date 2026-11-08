@@ -659,62 +659,63 @@ function setupHeaderMorph(){
   const gap=10;
   const amountTop=17-10*pp-freedLabelSpace;
   const amountVH=amountH*amountScale,badgeVH=badgeH*badgeScale;
-  /* R16 · en compacto la píldora ya NO va al centro ni a la
-   * derecha del precio: se APILA debajo de él, alineada a la
-   * izquierda, dentro de la sección izquierda grande. El top
-   * apilado es amountTop + alto visual del importe + 6 px; se
-   * mezcla con el top del par centrado según spreadV (la bajada),
-   * no según el spread entero: bajar en diagonal cruzaba el
-   * importe a mitad de fase. */
-  const stackedBadgeTop=amountTop+amountVH+6;
-  const badgeTop=(80-71*pb-freedLabelSpace)*(1-spreadV)+stackedBadgeTop*spreadV;
+  /* R17 · UNA SOLA BARRA (reemplaza el apilado de R16): en
+   * compacto la píldora NO baja debajo del precio — se queda
+   * en su misma fila, a la derecha del importe, formando un
+   * solo bloque a la izquierda (precio + píldora), como una
+   * barra de búsqueda; el botón queda aislado a la derecha.
+   * El top compacto es el del importe centrado en su fila
+   * (amountTop + (amountVH−badgeVH)/2); se mezcla con el top
+   * del par centrado según el spread entero. La animación y
+   * los tiempos NO cambian: mismo spread 0.75→1 que R16. */
+  const badgeRowTop=amountTop+(amountVH-badgeVH)/2;
+  const badgeTop=(80-71*pb-freedLabelSpace)*(1-spread)+badgeRowTop*spread;
   // La altura VISUAL del hero (lo que ocupa el par): la pieza más baja
   // + 8 px en expandido y +7 px en compacto. En los extremos da ~114 px
-  // y 36 px, como R5.2/R7. Ya no es la altura de la caja (fija en
-  // 116 px): es lo que el contenido ocupa y lo que se usa para subir
-  // el contenido y recortar el sticky (ver abajo).
+  // y, desde R17, ~45 px (una sola fila: importe 34 px + 8 px − 1 px),
+  // antes ~79 px con la píldora apilada de R16 y 36 px en R11.
   const heroVH=Math.round(Math.max(amountTop+amountVH,badgeTop+badgeVH)+8-pb);
   // V0: la altura visual en reposo. Se fija en el primer pintado y se
   // re-deriva si cambia el contenido con p≈0; a mitad de morph no se
   // toca (V(p) ≠ V0 ahí). El desplazamiento del contenido es V−V0:
   // en reposo 0, en compacto ≈ −78 px.
   if(heroRestH===0||(p<.02&&remeasured))heroRestH=heroVH;
-  /* R16 · encabezado compacto ASIMÉTRICO (reemplaza las 3 zonas
-   * simétricas de R14). Sección izquierda GRANDE: precio (34 px)
-   * arriba y píldora (12 px) apilada debajo, ambas alineadas al
-   * borde izquierdo del hero. El botón "Mi Espacio" queda angosto
-   * a la derecha, centrado verticalmente EN EL IMPORTE (no en el
-   * bloque): su franja vertical nunca se cruza con la de la
-   * píldora ya bajada. La píldora se ajusta con max-width
-   * calculado: cabe entre el borde izquierdo y el botón con 8 px
-   * de aire por lado, con ellipsis si el texto es largo y la
-   * pantalla estrecha; a 280 px se recorta, a 390 px cabe entera.
-   * Con spreadV 0 el tope vuelve a 96% y la píldora sigue en el
-   * par centrado. El botón entra con spreadH (segunda sub-fase),
-   * cuando la píldora ya está debajo. El título "ESTADO DE
-   * CUENTA" se desvanece con spreadV y el hero sube con
-   * transform sobre su fila: en compacto no se muestra, como en
-   * una app; en expandido queda, más discreto. La fila NO
-   * colapsa en layout (ver nota junto a --gx-rm-title-fade): el
-   * hero sube -24·spread y el clip y la subida del contenido lo
-   * compensan; la caja del hero sigue fija y el par sigue siendo
-   * solo-transform. */
+  /* R17 · UNA SOLA BARRA: el bloque izquierdo es precio +
+   * píldora en una sola línea (precio a la izquierda, píldora
+   * pegada a su derecha con gap 10); el botón "Mi Espacio"
+   * queda aislado a la derecha, separado del bloque por ≥16 px
+   * (como el círculo con el más al lado de una barra de
+   * búsqueda). La píldora se ajusta con max-width calculado:
+   * cabe entre el importe y el botón; con texto largo y
+   * pantalla estrecha recorta con ellipsis (a 390 px "Acción
+   * necesaria" puede recortarse: importe 34 px + botón no dejan
+   * sitio para la píldora entera — compromiso documentado, el
+   * solape nunca ocurre). Ambos viajan juntos con el mismo
+   * spread que el importe, así el gap de 10 px se conserva en
+   * todo el recorrido y nunca se cruzan. El botón entra con
+   * spreadH (segunda sub-fase) y se centra en la fila del
+   * importe. Título y etiqueta ("Próximo pago") desaparecen
+   * JUNTOS con spreadV (ver --gx-rm-label-opacity abajo). */
   const amountVW=moneyWidth*amountScale;
   const amountShiftBase=-(statusWidth*badgeScale+gap)*.5*paired;
   const amountShiftLeft=-(heroW/2-amountVW/2);
   const amountShift=amountShiftBase+(amountShiftLeft-amountShiftBase)*spread;
   let badgeMaxW=0;
-  if(spreadV>0){
-   badgeMaxW=Math.max(40,heroW-btnW-16);
+  if(spread>0){
+   /* R17 · piso 20 px (no 40): a 280 px el presupuesto es
+    * justo (importe 34 px + botón) y un piso de 40 px
+    * empujaba la píldora ~3 px encima del botón; con 20 px
+    * la píldora se recorta más, pero el solape nunca ocurre. */
+   badgeMaxW=Math.max(20,heroW-btnW-amountVW-26);
    root.style.setProperty('--gx-rm-badge-max',px(badgeMaxW));
   }else{
    root.style.setProperty('--gx-rm-badge-max','96%');
   }
   const badgeVW=Math.min(statusWidth,badgeMaxW||statusWidth)*badgeScale;
   const badgeShiftBase=(moneyWidth*amountScale+gap)*.5*paired;
-  const badgeShiftLeft=-(heroW/2-badgeVW/2);
-  const badgeShift=badgeShiftBase*(1-spreadH)+badgeShiftLeft*spreadH;
-  const btnTop=spreadH>0?amountTop+(amountVH-btnH)/2:badgeTop;
+  const badgeShiftLeftBlock=amountShiftLeft+(amountVW+badgeVW)/2+gap;
+  const badgeShift=badgeShiftBase*(1-spread)+badgeShiftLeftBlock*spread;
+  const btnTop=amountTop+(amountVH-btnH)/2;
   root.style.setProperty('--gx-rm-space',spreadH.toFixed(3));
   root.style.setProperty('--gx-rm-space-top',px(btnTop));
   root.style.setProperty('--gx-rm-space-h',px(btnH));
@@ -738,7 +739,12 @@ function setupHeaderMorph(){
   root.style.setProperty('--gx-rm-content-shift',px(heroVH-heroRestH-24*spread));
   root.style.setProperty('--gx-rm-clip',px(116-heroVH+24*spread));
   root.style.setProperty('--gx-rm-title-scale',((14-3*p)/14).toFixed(4));
-  root.style.setProperty('--gx-rm-label-opacity',String(clamp(1-p*3)));
+  /* R17 · la etiqueta ("Próximo pago") desaparece JUNTO con
+   * el título "ESTADO DE CUENTA": ambas se desvanecen con
+   * spreadV (0.75→0.875), no la etiqueta antes (p≈0.33) como
+   * hasta R16. En compacto no queda ni título ni etiqueta,
+   * solo la barra. */
+  root.style.setProperty('--gx-rm-label-opacity',String(1-spreadV));
   root.style.setProperty('--gx-rm-progress',p.toFixed(3));
   root.dataset.gxRmCompact=String(p>.95);
  }
