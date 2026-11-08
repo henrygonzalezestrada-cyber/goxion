@@ -466,10 +466,11 @@ async function run(name,engine){
    assert.equal(expanded.badgeTop,80,name+' '+width+' expanded badge moved');
    assert(collapsed.labelOpacity<.05,name+' '+width+' label should be gone');
    assert(collapsed.amountTopVisual<=1,name+' '+width+' hidden label leaves empty space above amount');
-   // R16 · la huella compacta ya no es 36 px: la sección izquierda
-   // apila precio (34 px) + píldora (12 px), huella ≈ 79 px; el
-   // importe se encoge menos (52→34) y el contenido sube menos.
-   assert(collapsed.footprint<=84,name+' '+width+' visual hero footprint must compress to ~79px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   // R17 · la huella compacta ya no es 36 px (R11) ni ~79 px
+   // (R16, píldora apilada): una sola fila (importe 34 px),
+   // huella ≈ 45 px; el importe se encoge menos (52→34) y el
+   // contenido sube más.
+   assert(collapsed.footprint<=60,name+' '+width+' visual hero footprint must compress to ~45px (single bar). Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(expanded.amountH-collapsed.amountH>=15,name+' '+width+' amount did not morph (visual height). Geometry: '+JSON.stringify({expanded,collapsed}));
    // R12 · el morph ya no toca el layout: la caja del hero y del
    // sticky miden lo mismo en reposo y en compacto; lo que se
@@ -481,30 +482,33 @@ async function run(name,engine){
    // (bug R13, cazado por esta misma suite).
    assert(Math.abs(collapsed.height-expanded.height)<=1,'R12 '+name+' '+width+' hero layout height must stay fixed. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(Math.abs(collapsed.stickyH-expanded.stickyH)<=1,'R12 '+name+' '+width+' sticky layout height must stay fixed. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(expanded.footprint-collapsed.footprint>=30,'R16 '+name+' '+width+' visual hero footprint must still compress by ~35px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(expanded.footprint-collapsed.footprint>=45,'R17 '+name+' '+width+' visual hero footprint must still compress by ~69px. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert.equal(expanded.font,52,'R12 '+name+' '+width+' amount font-size must stay 52px (scale shrinks it)');
    assert.equal(collapsed.font,52,'R12 '+name+' '+width+' amount font-size must stay 52px in compact state');
    assert(collapsed.clipBottom>=30,'R16 '+name+' '+width+' sticky must clip the freed space in compact state. Geometry: '+JSON.stringify(collapsed));
    assert(collapsed.contentShift<=-30,'R16 '+name+' '+width+' content must rise by transform in compact state. Geometry: '+JSON.stringify(collapsed));
 
-   // R16 · encabezado compacto ASIMÉTRICO (reemplaza las 3 zonas
-   // simétricas de R14). Sección izquierda grande: precio de 34 px
-   // arriba, píldora de 12 px apilada debajo, ambas al borde
-   // izquierdo; botón "Mi Espacio" angosto a la derecha, centrado
-   // en ese bloque, estilo Ayuda con texto blanco. El título no se
-   // muestra en compacto y su fila colapsa.
+   // R17 · UNA SOLA BARRA (reemplaza el apilado de R16 y las
+   // 3 zonas de R14). Bloque izquierdo en una sola línea:
+   // precio de 34 px a la izquierda, píldora de 12 px pegada
+   // a su derecha con gap 10, en la misma fila; botón
+   // "Mi Espacio" aislado a la derecha, separado del bloque
+   // (como el círculo con el más al lado de una barra de
+   // búsqueda), estilo Ayuda con texto blanco. El título no se
+   // muestra en compacto y su fila NO colapsa en layout (R16:
+   // colapsarla movía el scroll del final, bug R13).
    assert(Math.abs(collapsed.amountLeft-collapsed.heroLeft)<=2,
-    'R16 '+name+' '+width+' amount must sit at the hero left edge in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
-   // R16 · 34 px de fuente × line-height 1.12 ≈ 38 px de alto
+    'R17 '+name+' '+width+' amount must sit at the hero left edge in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
+   // R17 · 34 px de fuente × line-height 1.12 ≈ 38 px de alto
    // visual (antes 26 px × 1.12 ≈ 29 px).
    assert(collapsed.amountH>=36&&collapsed.amountH<=40,
-    'R16 '+name+' '+width+' compact price must be considerable (~34px visual), not the old 26px. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(Math.abs(collapsed.badgeLeft-collapsed.amountLeft)<=2,
-    'R16 '+name+' '+width+' badge must align with the amount left edge in compact state (stacked left block). Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(collapsed.badgeTopVisual>=collapsed.amountTopVisual+collapsed.amountH+2,
-    'R16 '+name+' '+width+' badge must stack BELOW the amount in compact state. Geometry: '+JSON.stringify({expanded,collapsed}));
-   assert(collapsed.btn.l>=collapsed.badgeRight+8,
-    'R16 '+name+' '+width+' space button must clear the badge by 8px. Geometry: '+JSON.stringify({expanded,collapsed}));
+    'R17 '+name+' '+width+' compact price must be considerable (~34px visual), not the old 26px. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(Math.abs(collapsed.badgeLeft-collapsed.amountRight-10)<=4,
+    'R17 '+name+' '+width+' badge must sit right of the amount with a 10px gap, same row (single bar). Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(Math.abs((collapsed.badgeTopVisual+collapsed.badgeH/2)-(collapsed.amountTopVisual+collapsed.amountH/2))<=8,
+    'R17 '+name+' '+width+' badge must share the amount row, not stack below it. Geometry: '+JSON.stringify({expanded,collapsed}));
+   assert(collapsed.btn.l>=collapsed.badgeRight+14,
+    'R17 '+name+' '+width+' space button must stand isolated from the left block by 14px. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(Math.abs(collapsed.btn.r-collapsed.heroRight)<=2,
     'R16 '+name+' '+width+' space button must sit at the hero right edge. Geometry: '+JSON.stringify({expanded,collapsed}));
    assert(collapsed.btn.h>=collapsed.badgeH&&collapsed.btn.h<=collapsed.badgeH+8,
@@ -592,6 +596,10 @@ async function run(name,engine){
      assert.match(await page.locator('#gx-b2-proof').textContent(),/Comprobante validado/);
      assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuenow'),'1');
      assert.equal(await page.locator('.gx-b2-service-progress [role="progressbar"]').getAttribute('aria-valuemax'),'2');
+     // R17 · energía en las barras de carga: el segmento que
+     // recorre la pista de progreso de cada servicio.
+     assert((await page.locator('.gx-b2-service-progress-track span').evaluate(el=>getComputedStyle(el,'::after').animationName)).includes('gx-r17-energy'),
+      'R17 '+name+' '+width+' service progress bar must carry the energy sweep');
      assert.equal(await page.locator('#gx-b2-proof .gx-aui-progress-indicator').count(),1);
     }
     if(scenario==='partial'){

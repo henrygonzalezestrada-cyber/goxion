@@ -1390,3 +1390,56 @@ html[data-gx-rm-compact="true"] #gx-b2-hero .gx-b2-space-btn{
   transform:none;
  }
 }
+
+/* ================================================================
+   R17 · UNA SOLA BARRA + ENERGÍA EN LAS BARRAS · preview only
+   1) Barra única (reemplaza el apilado de R16): en compacto el
+   bloque izquierdo es precio (34 px) + píldora (12 px) en UNA
+   SOLA LÍNEA, como una barra de búsqueda; el botón "Mi Espacio"
+   queda aislado a la derecha, separado del bloque (como el
+   círculo con el más al lado de la barra). La geometría vive en
+   estado.js (badgeRowTop, badgeShiftLeftBlock); aquí solo se
+   deja asentado que la píldora sigue plana y sin glow (R11) y
+   que nada cambia de tamaño: 34 px / 12 px, como R16.
+   2) Energía / carga: un segmento brillante recorre las barras
+   de carga del preview —la pista de progreso de cada servicio
+   (.gx-b2-service-progress-track span, la barra viva del
+   laboratorio de animaciones)— como energía que pasa y vuelve
+   a pasar cada 2.8 s, con una pausa entre pasadas para no
+   saturar. Es solo background/transform (nada de layout), con
+   blend de luz sobre el degradado existente. La ruta de prueba
+   (gx-r4-route-halo, SVG) respira al mismo ritmo con un pulso
+   de opacidad, sin tocar su dibujo. Sin glow en la píldora
+   (descartado en R11), sin tocar el hero. Se pausa con la
+   pestaña oculta (html.gx-r8-paused, JS) y se apaga con
+   prefers-reduced-motion.
+   ================================================================ */
+html[data-gx-index-remaster="r3"] .gx-b2-service-progress-track span{
+ position:relative;
+ overflow:hidden;
+}
+html[data-gx-index-remaster="r3"] .gx-b2-service-progress-track span::after{
+ content:"";
+ position:absolute;top:0;bottom:0;left:0;width:36%;
+ background:linear-gradient(90deg,transparent,rgba(255,255,255,.8),rgba(0,242,254,.9),transparent);
+ animation:gx-r17-energy 2.8s ease-in-out infinite;
+}
+@keyframes gx-r17-energy{
+ 0%{transform:translateX(-120%);opacity:0}
+ 12%{opacity:1}
+ 55%{transform:translateX(300%);opacity:1}
+ 70%,100%{transform:translateX(300%);opacity:0}
+}
+html[data-gx-index-remaster="r3"] .gx-r4-route-halo{
+ animation:gx-r17-energy-halo 2.8s ease-in-out infinite;
+}
+@keyframes gx-r17-energy-halo{
+ 0%,100%{opacity:.13}
+ 50%{opacity:.3}
+}
+html.gx-r8-paused .gx-b2-service-progress-track span::after,
+html.gx-r8-paused .gx-r4-route-halo{animation-play-state:paused!important}
+@media(prefers-reduced-motion:reduce){
+ html[data-gx-index-remaster="r3"] .gx-b2-service-progress-track span::after,
+ html[data-gx-index-remaster="r3"] .gx-r4-route-halo{animation:none!important}
+}
