@@ -193,8 +193,13 @@ html[data-gx-index-remaster="r3"]{
  --gx-rm-label-opacity:1;--gx-rm-progress:0;
  /* R14 · botón compacto "Mi Espacio": 0 en expandido, 1 en
   * compacto (lo escribe paint() con el spread 0.75→1); su parte
-  * superior y su alto son los visuales de la píldora compacta. */
+  * superior y su alto son los visuales de la píldora compacta.
+  * R16 · el título se desvanece con spreadV (--gx-rm-title-fade)
+  * y el hero sube -24·spread (--gx-rm-hero-dy) sobre su fila:
+  * en compacto no se muestra el título, como en una app. La fila
+  * NO colapsa en layout (eso movía el scroll del final, bug R13). */
  --gx-rm-space:0;--gx-rm-space-top:2px;--gx-rm-space-h:22px;
+ --gx-rm-title-fade:0;--gx-rm-hero-dy:0px;
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky{
  padding:max(var(--gx-rm-header-pad), env(safe-area-inset-top,0px))
@@ -228,11 +233,16 @@ html[data-gx-index-remaster="r3"] #gx-b2-sticky::after{
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky .header{
  /* R15 · header más bajo (29→20 px): el título de 14 px cabe
-  * sobrado y se recorta el aire entre título y fila del precio. */
+  * sobrado y se recorta el aire entre título y fila del precio.
+  * R16 · la fila NO colapsa: colapsarla encogía la página 24 px
+  * y el scrollY del final se movía (bug R13). El título solo se
+  * desvanece (opacidad con spreadV) y el hero sube con transform
+  * sobre su fila; la altura del header queda en 20 px siempre. */
  min-height:20px;margin-bottom:var(--gx-rm-header-gap);
 }
 html[data-gx-index-remaster="r3"] #gx-b2-sticky .header-title{
  font-size:var(--gx-rm-header-size);
+ opacity:calc(1 - var(--gx-rm-title-fade,0));
  letter-spacing:1.7px;
  /* R12 · el título se encoge con scale (14→11 px visuales), no con
   * font-size: su caja de layout no cambia y el header no se mueve. */
@@ -246,6 +256,12 @@ html[data-gx-index-remaster="r3"] #gx-b2-hero{
  display:block;
  text-align:center;
  min-width:0;
+ /* R16 · el hero SUBE con transform (-24·spread) sobre la fila
+  * del título ya desvanecida: así el compacto no deja 24 px de
+  * aire vacío sin colapsar nada en layout (eso movía el scroll
+  * del final). El clip y la subida del contenido compensan. */
+ transform:translateY(var(--gx-rm-hero-dy,0px));
+ will-change:transform;
 }
 html[data-gx-index-remaster="r3"] #gx-b2-hero .total-label{
  position:absolute;top:0;left:0;right:0;
@@ -1310,33 +1326,57 @@ html.gx-r8-paused #gx-b2-loyalty-mark{animation-play-state:paused!important}
 html[data-gx-index-remaster="r3"] #gx-b2-sticky::after{display:none}
 
 /* ================================================================
-   R14 · ENCABEZADO COMPACTO EN 3 ZONAS · preview scope only
-   El problema: con todo centrado, el encabezado compacto se
-   sentía desperdiciado. En compacto (p≈1) la fila se reparte:
-   precio a la IZQUIERDA, píldora al CENTRO y botón "Mi Espacio"
-   a la DERECHA. El estado expandido queda idéntico, centrado.
-   El botón es cian #00f2fe con texto OSCURO (blanco sobre cian
-   se lee mal) y el mismo alto que la píldora compacta; entra con
-   el spread del morph (0.75→1) y solo tiene pointer-events en
-   compacto (dataset gxRmCompact, que paint() pone con p>.95).
-   Destino: ayuda.html, el mismo que usa el Index oficial para
-   "Ir a Mi Espacio". Sin glow, sin secciones nuevas, blur 25 px
-   y cristal intactos; el morph sigue siendo solo-transform (R12)
-   y el asentamiento solo vive en la zona del morph (R10/R13).
+   R16 · ENCABEZADO COMPACTO TIPO APP, ASIMÉTRICO · preview only
+   R14 repartía en 3 zonas simétricas (precio izq., píldora
+   centro, botón der.) con el botón cian sólido y texto oscuro.
+   Henry: esto es una APP WEB, no una página web — la distribución
+   no tiene que ser simétrica. En compacto (p≈1) la sección
+   izquierda es GRANDE: precio de 34 px visuales arriba y píldora
+   de 12 px apilada debajo, ambas al borde izquierdo; el botón
+   "Mi Espacio" queda ANGOSTO a la derecha, centrado en ese
+   bloque. El título "ESTADO DE CUENTA" no se muestra en compacto
+   (se desvanece y su fila colapsa, ver .header arriba); en
+   expandido queda, más discreto. El estado expandido es idéntico.
+   Botón, estilo tomado de Ayuda (assets/css/ayuda.css):
+   .header-action-btn "Mi Espacio" es 13 px/700, radio 20 px,
+   padding 8px 16px, fondo rgba(0,242,254,.10), borde 1px
+   rgba(0,242,254,.30), texto cian #00f2fe y blur 10 px; los
+   botones secundarios de Ayuda llevan texto #fff sobre fondo
+   translúcido. Aquí el texto es BLANCO (Henry no quiere la
+   tipografía negra de R14): blanco sobre el translúcido oscuro
+   se lee bien y es el tratamiento de Ayuda, no un estilo nuevo.
+   Padding 8px 14px (un poco más angosto que Ayuda para que el
+   botón quede asimétrico). Sin glow, sin secciones nuevas, blur
+   25 px y cristal intactos; el morph sigue siendo solo-transform
+   (R12) y el asentamiento solo vive en la zona del morph (R10/R13).
+   División cabecera/contenido SIN remarcar: index.css no pone
+   borde ni sombra al .sticky-area y el fondo del sticky se
+   desvanece a transparente en los últimos 27 px visibles con
+   backdrop-filter blur 25 px (glass por desenfoque, NO liquid
+   glass); el ::after de fundido está apagado desde R12 porque el
+   clip-path lo recortaría. Lo que se desliza por debajo se
+   transparenta borroso, sin línea de corte.
    ================================================================ */
 html[data-gx-index-remaster="r3"] #gx-b2-hero .gx-b2-space-btn{
  position:absolute;
  top:var(--gx-rm-space-top,2px);
  right:0;
- height:var(--gx-rm-space-h,22px);
+ /* R16 · alto NATURAL (13 px/1.2 + padding 8 px + borde): si la
+  * altura viniera de --gx-rm-space-h, que paint() mide del propio
+  * botón, quedaría trabada en el valor inicial (22 px). La
+  * variable sigue escribiéndose para el centrado en JS, pero el
+  * alto lo decide el contenido, como en Ayuda. */
+ height:auto;
  display:inline-flex;align-items:center;justify-content:center;
- padding:0 12px;
- font-size:11px;line-height:1.2;font-weight:800;letter-spacing:.01em;
+ padding:8px 14px;
+ font-size:13px;line-height:1.2;font-weight:700;letter-spacing:.01em;
  font-family:inherit;white-space:nowrap;text-decoration:none;
- color:#02141b;
- background:#00f2fe;
- border:1px solid rgba(2,20,27,.25);
- border-radius:999px;
+ color:#fff;
+ background:rgba(0,242,254,.10);
+ border:1px solid rgba(0,242,254,.35);
+ border-radius:20px;
+ backdrop-filter:blur(10px);
+ -webkit-backdrop-filter:blur(10px);
  opacity:var(--gx-rm-space,0);
  transform:translateX(calc((1 - var(--gx-rm-space,0)) * 12px));
  pointer-events:none;
