@@ -1,0 +1,130 @@
+/* GOXION · Index 2.0 · capa visual del espejo (preview/index-2.0/).
+ * Solo reglas del espejo; index.css oficial no se modifica durante la beta.
+ * B0: andamio. B1: grupos por fecha + X al token de cierre de la hoja de pago.
+ * ADN: fondo #030305, cian #00f2fe, morado #7c4dff, Poppins, cristal/blur.
+ * La unidad de la pantalla es la fecha de pago, no el servicio: cada dato
+ * aparece una sola vez (propuesta §3). */
+
+/* B1 · En B2, SERVICIOS ACTIVOS se fusiona en los grupos por fecha y no se
+ * pinta dos veces. Solo dentro del espejo (la clase la pone el adaptador 2.0
+ * cuando hay cotización B2); en flujo global la lista se conserva tal cual. */
+html.gx-20-b2 .scrollable-content > .section-title{display:none}
+html.gx-20-b2 .services-container{display:none}
+
+/* B1 · Tarjeta del calendario por fecha. Misma estética de cristal que la
+ * tarjeta B2 (.gx-b2-card): sin recuadros por grupo, solo divisores. */
+.gx-20-card{
+  margin:0 0 25px;padding:0!important;overflow:hidden;
+  border-color:rgba(135,184,236,.14)!important
+}
+.gx-20-cal-head{padding:16px 18px 12px}
+.gx-20-caption{
+  color:#9aacca;font-size:10px;font-weight:650;letter-spacing:.65px
+}
+
+/* B1 · Grupo por fecha: un <details> nativo por fecha efectiva. El encabezado
+ * (summary) ya responde qué vence y cuánto es; dentro, una fila por servicio. */
+.gx-20-group{border-top:1px solid rgba(255,255,255,.065)}
+.gx-20-summary{
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  width:100%;min-height:72px;padding:15px 18px;cursor:pointer;
+  list-style:none;color:inherit
+}
+.gx-20-summary::-webkit-details-marker{display:none}
+.gx-20-summary:focus-visible{outline:2px solid #00f2fe;outline-offset:-2px}
+.gx-20-sum-main{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.gx-20-sum-date{
+  font-size:16px;font-weight:700;letter-spacing:-.2px;color:#eaf2ff;
+  text-transform:capitalize
+}
+.gx-20-sum-meta{
+  font-size:12px;font-weight:500;color:#9aacca;line-height:1.4
+}
+.gx-20-sum-side{
+  display:flex;align-items:center;gap:10px;flex:none
+}
+.gx-20-sum-total{
+  font-size:16px;font-weight:700;letter-spacing:-.2px;color:#eaf8ff
+}
+.gx-20-group.is-active .gx-20-sum-total{color:var(--neon-blue)}
+.gx-20-chevron{
+  display:inline-block;font-size:17px;color:#a2bbd6;line-height:1;
+  transform:rotate(0);transition:transform .3s cubic-bezier(.2,.7,.25,1)
+}
+.gx-20-group[open] .gx-20-chevron{transform:rotate(180deg)}
+
+/* B1 · Filas abiertas, como el calendario B2: sin recuadro por fila,
+ * separadas solo por una línea fina. La fila activa se distingue por el
+ * importe en cian y la etiqueta "Seleccionado" (igual que en el preview). */
+.gx-20-rows{padding:0 18px 8px}
+.gx-20-row{
+  position:relative;isolation:isolate;display:flex;align-items:center;gap:13px;
+  width:100%;min-width:0;min-height:58px;padding:12px 2px;margin:0;
+  border:0;border-bottom:1px solid rgba(255,255,255,.065);border-radius:0;
+  background:transparent;color:#fff;
+  text-align:left;cursor:pointer;overflow:hidden
+}
+.gx-20-row:last-child{border-bottom:0}
+.gx-20-row:focus-visible{outline:2px solid #00f2fe;outline-offset:2px}
+.gx-20-row.is-active .gx-20-row-side strong{color:var(--neon-blue)}
+.gx-20-row.is-done{opacity:.6;cursor:default}
+.gx-20-row-main{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.gx-20-row-title{
+  font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;color:#fff
+}
+.gx-20-row-state{font-size:12px;font-weight:500;color:#9aacca;line-height:1.4}
+.gx-20-row-state.is-late{color:#ff8f8f}
+.gx-20-row-side{
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none
+}
+.gx-20-row-side strong{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.gx-20-row-side small{font-size:11px;font-weight:500;color:#9aacca}
+
+/* B1 · Pie del calendario: el aviso de revisión vive una sola vez, al final
+ * de la tarjeta (no repetido por grupo). */
+.gx-20-foot{
+  margin:0;padding:4px 18px 18px;
+  font-size:12px;line-height:1.55;color:#9aacca
+}
+.gx-20-foot + .gx-20-foot{padding-top:0}
+.gx-20-note{color:#ffb3b3}
+
+/* B1 · ENERGÍA en el encabezado del grupo próximo: una sola línea de luz
+ * por grupo (no una por fila), cada 2.8 s, con los keyframes oficiales
+ * gx-index-energy. Se pausa con pestaña oculta y se apaga con
+ * prefers-reduced-motion, igual que la energía de las filas. */
+html[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
+  content:"";
+  position:absolute;left:0;bottom:0;height:2px;width:36%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),rgba(0,242,254,.9),transparent);
+  animation:gx-index-energy 2.8s ease-in-out infinite;
+  pointer-events:none
+}
+html.gx-r8-paused .gx-20-group.is-next > .gx-20-summary::after{
+  animation-play-state:paused!important
+}
+@media(prefers-reduced-motion:reduce){
+  html[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
+    animation:none!important
+  }
+  .gx-20-chevron{transition:none}
+}
+
+/* B1 · X de cierre al token completo de la hoja de pago
+ * (.gx-payment-v2 #payment-modal .close-modal): 34 px, degradado cian,
+ * X negra #031015, redonda. Solo dentro del espejo; la oficial conserva
+ * su X de 30 px plana hasta que Henry apruebe la 2.0. El morph mide el
+ * botón real, así que la píldora se ajusta sola al nuevo ancho. */
+html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
+  width:34px;height:34px;
+  background:linear-gradient(135deg,#24f0ff,#61dcff);
+  color:#031015;
+  font-size:17px;
+  box-shadow:0 0 18px rgba(0,242,254,.20);
+  border-radius:50%
+}
+html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn:active{
+  transform:scale(.90)
+}
