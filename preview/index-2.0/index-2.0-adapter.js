@@ -118,6 +118,31 @@
   return null;
  }
  function title(row){return row.servicio+" · Perfil "+row.ordinal}
+ /* B4 · Desglose DENTRO del grupo (propuesta §3.4): Subtotal, Lealtad
+  * −$, Mora +$ y Total del grupo. Solo las líneas que apliquen; el
+  * total es el mismo número del encabezado (se explica, no se duplica
+  * en otra sección). Los importes vienen de la cotización en centavos;
+  * aquí solo se suman. Un cargo pagado no aporta: el desglose cubre
+  * solo lo pendiente del grupo. Con abono parcial hace falta la línea
+  * "Abonado −$" para que las cuentas cuadren (Subtotal − Lealtad −
+  * Abonado + Mora = Total); sin ella el total no sumaría. */
+ function breakdownHTML(g){
+  const pend=g.cargos.filter(x=>!x.pagado&&x.total_centavos>0);
+  if(!pend.length)return "";
+  const sum=f=>pend.reduce((s,x)=>s+f(x),0);
+  const subtotal=sum(x=>x.base_centavos),lealtad=sum(x=>x.descuento_centavos),
+   comercial=sum(x=>x.descuento_comercial_centavos),
+   abonado=sum(x=>x.abono_pagado_centavos),mora=sum(x=>x.mora_centavos);
+  const line=(label,shown,cls)=>'<div class="gx-20-bd-line'+(cls?" "+cls:"")+
+   '"><span>'+label+'</span><strong>'+shown+'</strong></div>';
+  let out='<div class="gx-20-breakdown">'+line("Subtotal",money(subtotal));
+  if(lealtad>0)out+=line("Lealtad","−"+money(lealtad),"is-discount");
+  if(comercial>0)out+=line("Descuento","−"+money(comercial),"is-discount");
+  if(abonado>0)out+=line("Abonado","−"+money(abonado),"is-discount");
+  if(mora>0)out+=line("Mora","+"+money(mora),"is-surcharge");
+  out+=line("Total del grupo",money(g.centavos),"is-total")+"</div>";
+  return out;
+ }
  /* B2 · Estado de la píldora del hero, SOLO relativo y sin fecha: la fecha
   * vive en el encabezado del grupo próximo. "Vence en 2 días" responde
   * cuándo; "8 nov" ya está una sola vez en el grupo. */
@@ -314,6 +339,7 @@
      '<path d="M3.2 4.2L12 11.3L20.8 4.2"/></svg></span></span>'+
     '</summary>'+
     '<div class="gx-20-rows">'+rowsHTML+'</div>'+
+    breakdownHTML(g)+
    '</details>';
   }).join("");
   /* B3 · Total del mes + chip "Todo": una sola línea al final de los grupos.
