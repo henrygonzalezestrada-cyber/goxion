@@ -39,14 +39,24 @@
  *    abrirModalPago / el adaptador B2 con la cotización real).
  *  · Energía R17: la oficial no tiene pistas de progreso; el
  *    equivalente fiel es la fila del próximo pago B2
- *    (.gx-b2-row.is-next): una línea de luz recorre su base
+ *    (.gx-b2-row.is-next, y .is-due-next para las demás filas que
+ *    vencen en esa misma fecha): una línea de luz recorre su base
  *    cada 2.8 s. En flujo global no hay fila: no hay energía,
  *    no se inventa UI nueva.
- *  · El botón "Mi Espacio" se inyecta en el hero (la oficial no
- *    lo tiene) con el estilo Ayuda y texto blanco; solo existe
+ *  · La "X" de cierre (R18) se inyecta en el hero (la oficial no
+ *    la tiene) con cian sólido #00f2fe y X negra; solo existe
  *    cuando el morph está enlazado y solo recibe puntero en
  *    compacto. Destino ayuda.html, igual que el enlace "Ir a Mi
- *    Espacio" de la puerta de login oficial.
+ *    Espacio" de la puerta de login oficial. Es un ancla que
+ *    navega sola; el click es respaldo y el pointerup con guardia
+ *    de movimiento cubre el caso iOS en que el clic sintetizado
+ *    se cancela porque la página se desplaza (asentamiento).
+ *  · La geometría se mide con los transforms del morph
+ *    neutralizados (withRestTransforms): medir con
+ *    getBoundingClientRect a mitad de morph leía posiciones
+ *    VISUALES (ya desplazadas) y cada re-bind corrompía la base
+ *    (la píldora caía de la barra, el clip oscilaba y al volver
+ *    arriba el precio quedaba encima de la píldora).
  *  · El conteo R8/R9 solo corre al cargar y cuando el importe
  *    CAMBIA de verdad (lo observa con MutationObserver): si el
  *    re-render de realtime vuelve a pintar el mismo valor, no
@@ -118,7 +128,10 @@ function makeCounter(){
    el=node;to=toCents;done=onDone||null;shown=fromCents;
    const t0=performance.now(),dur=700;
    const step=now=>{
-    const t=Math.min(1,(now-t0)/dur);
+    /* El timestamp del rAF puede preceder a t0 (reloj del frame):
+     * sin el piso en 0, el primer cuadro del conteo salía negativo
+     * ("$-98.71") antes de subir al importe real. */
+    const t=Math.min(1,Math.max(0,(now-t0)/dur));
     const eased=1-Math.pow(1-t,3);
     const cents=Math.round(fromCents+(toCents-fromCents)*eased);
     shown=cents;
@@ -181,7 +194,31 @@ function measureSticky(){
  geo.fadeZone=(hr2.top-sr2.top)-geo.topPad;
  geo.range=Math.max(120,geo.stickyH+geo.marginBottom);
 }
-function remeasureGeometry(){measureFlow();measureSticky();}
+function remeasureGeometry(){withRestTransforms(()=>{measureFlow();measureSticky();});}
+
+/* Medir geometría de LAYOUT, no visual. Si el morph está activo
+ * (p>0), getBoundingClientRect devuelve posiciones ya desplazadas
+ * por los transforms del morph (dy/scale/shift): medir con ellas
+ * corrompía la base en cada re-bind a mitad de morph — la píldora
+ * caía de la barra, el clip oscilaba (88→122 px) y al volver
+ * arriba el precio quedaba encima de la píldora con clip 66 en
+ * reposo. Se neutralizan los transforms del morph durante la
+ * medición y se restauran después. La medición es síncrona: ningún
+ * rAF se intercala y no hay parpadeo. */
+const RM_TRANSFORM_VARS=['--gx-rm-amount-dy','--gx-rm-badge-dy','--gx-rm-hero-dy',
+ '--gx-rm-amount-shift','--gx-rm-badge-shift','--gx-rm-content-shift'];
+const RM_SCALE_VARS=['--gx-rm-amount-scale','--gx-rm-badge-scale'];
+function withRestTransforms(fn){
+ const saved={};
+ for(const k of RM_TRANSFORM_VARS){saved[k]=root.style.getPropertyValue(k);root.style.setProperty(k,'0px');}
+ for(const k of RM_SCALE_VARS){saved[k]=root.style.getPropertyValue(k);root.style.setProperty(k,'1');}
+ if(S.sticky)void S.sticky.offsetHeight;
+ try{fn();}
+ finally{
+  for(const k in saved)root.style.setProperty(k,saved[k]);
+  if(S.sticky)void S.sticky.offsetHeight;
+ }
+}
 
 function handleAmountNode(node){
  const cents=parseCents(node.textContent);
@@ -414,7 +451,7 @@ function paint(){
  root.style.setProperty('--gx-rm-label-opacity',String(1-labelFade));
  root.style.setProperty('--gx-rm-progress',p.toFixed(3));
  root.dataset.gxRmCompact=String(p>.95);
- /* El botón "Mi Espacio" recibe puntero en cuanto empieza a
+ /* La "X" recibe puntero en cuanto empieza a
   * verse (spreadH>0), no solo en compacto total. */
  root.dataset.gxRmSpaceVisible=String(spreadH>0.02);
  updateMarquee();
@@ -541,20 +578,47 @@ function bind(){
  S.amount=amount;S.badge=badge;
  S.content=document.querySelector('.scrollable-content');
  S.banner=sticky.querySelector('.alert-banner');
- measureFlow();
- root.dataset.gxIndexMorph='r17';
- measureSticky();
- let btn=hero.querySelector('.gx-index-space-btn');
+ /* La medición se hace con los transforms neutralizados: si un
+  * re-render cae a mitad de morph, medir con rects visuales
+  * corrompía la base (ver withRestTransforms). */
+ withRestTransforms(()=>{
+  measureFlow();
+  root.dataset.gxIndexMorph='r17';
+  measureSticky();
+ });
+ let btn=hero.querySelector('.gx-index-close-btn');
  if(!btn){
   btn=document.createElement('a');
-  btn.className='gx-index-space-btn';
+  btn.className='gx-index-close-btn';
   btn.href='ayuda.html';
-  btn.textContent='Mi Espacio';
-  /* El ancla ya navega sola; el handler es red de seguridad:
-   * si algo intercepta el clic del ancla, la navegación a
-   * Mi Espacio ocurre igual (en la oficial el botón no
-   * llevaba a ningún lado). */
-  btn.addEventListener('click',()=>{window.location.assign('ayuda.html');});
+  btn.setAttribute('aria-label','Mi Espacio');
+  btn.title='Mi Espacio';
+  btn.textContent='✕';
+  /* El ancla ya navega sola; el click es red de seguridad.
+   * Además, en iOS el clic sintetizado se cancela si la página
+   * se desplaza entre el toque y el clic (el asentamiento mueve
+   * el scroll): el pointerup con guardia de movimiento navega
+   * aunque el clic no llegue. La guardia (>10 px) evita navegar
+   * cuando el gesto era desplazar empezando sobre la X. El
+   * candado navDone evita la doble navegación: pointerup y clic
+   * disparan los dos en un mismo toque y el segundo assign
+   * abortaba la primera navegación (ERR_ABORTED). */
+  let navDone=false;
+  const goSpace=()=>{if(navDone)return;navDone=true;window.location.assign('ayuda.html');};
+  /* preventDefault en el clic: sin él, el pointerup ya navega por
+   * assign y luego el clic dispara ADEMÁS la navegación nativa
+   * del ancla a la misma URL, abortando la primera (ERR_ABORTED
+   * intermitente). Con preventDefault solo queda una navegación:
+   * la de assign (o la del clic si el pointerup no llegó, p. ej.
+   * activación por teclado, que no genera pointer events). */
+  btn.addEventListener('click',e=>{e.preventDefault();goSpace();});
+  btn.addEventListener('pointerdown',e=>{btn._gxDownX=e.clientX;btn._gxDownY=e.clientY;});
+  btn.addEventListener('pointerup',e=>{
+   const dx=e.clientX-(btn._gxDownX??e.clientX),dy=e.clientY-(btn._gxDownY??e.clientY);
+   if(Math.hypot(dx,dy)>10)return;
+   if(document.documentElement.dataset.gxRmSpaceVisible!=='true')return;
+   goSpace();
+  });
   hero.appendChild(btn);
  }
  S.btn=btn;
