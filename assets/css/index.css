@@ -3514,7 +3514,10 @@ html[data-gx-index-morph="r17"] .balance-hero .gx-index-space-btn{
     will-change:transform,opacity;
     z-index:2;
 }
-html[data-gx-rm-compact="true"] .balance-hero .gx-index-space-btn{
+/* El botón recibe puntero en cuanto empieza a verse (spreadH>0),
+   no solo en compacto total: con la puerta en p>.95, un toque
+   justo al aparecer el botón caía en nada y parecía no servir. */
+html[data-gx-rm-space-visible="true"] .balance-hero .gx-index-space-btn{
     pointer-events:auto;
 }
 @media(prefers-reduced-motion:reduce){
@@ -3677,6 +3680,17 @@ html.gx-r8-paused .gx-index-proof-hand{animation-play-state:paused!important}
     animation:gx-index-loyalty-breathe 5.6s ease-in-out 1.2s infinite;
 }
 .gx-index-loyalty-star svg{width:34px;height:34px;stroke-linejoin:round}
+/* Corazón roto (Lucide HeartCrack, mismo icono del preview): solo
+   cuando la racha está rota. La estrella es solo con la lealtad
+   viva; rota se muestra el corazón y la estrella se oculta. El
+   adaptador B2 cambia el estado solo con .is-lost. */
+.gx-index-loyalty-heart{
+    position:relative;color:#cb8996;display:none;place-items:center;
+    filter:drop-shadow(0 0 5px rgba(222,119,147,.11));
+}
+.gx-index-loyalty-heart svg{width:40px;height:40px}
+.gx-index-loyalty-mark.is-lost .gx-index-loyalty-heart{display:grid}
+.gx-index-loyalty-mark.is-lost .gx-index-loyalty-star{display:none}
 @keyframes gx-index-loyalty-breathe{
     0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(247,198,100,.23))}
     50%{transform:scale(1.045);filter:drop-shadow(0 0 6px rgba(247,198,100,.43))}
@@ -3737,10 +3751,35 @@ html[data-gx-index-morph="r17"].gx-payment-v2 .sticky-area{
     -webkit-backdrop-filter:blur(27px) saturate(1.04);
     backdrop-filter:blur(27px) saturate(1.04);
 }
+/* La cola DEBAJO de la caja (58 px en reposo) vuelve a llevar
+ * blur: el fundido del propio sticky cubre la caja, pero el
+ * contenido que pasa por la cola se veía NÍTIDO (sin blur) y
+ * parecía pisar el precio al desplazar. El ::before no pinta
+ * color (el fondo ya lo pone el sticky), solo desenfoca la
+ * cola con la máscara original V2; el clip-path lo recorta
+ * junto con la cola cuando el morph compacta. */
 html[data-gx-index-morph="r17"].gx-payment-v2 .sticky-area::before{
     background:transparent;
-    -webkit-backdrop-filter:none;backdrop-filter:none;
-    -webkit-mask-image:none;mask-image:none;
+    -webkit-backdrop-filter:blur(27px) saturate(1.04);
+    backdrop-filter:blur(27px) saturate(1.04);
+    -webkit-mask-image:linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 58%,
+        rgba(0,0,0,.92) 70%,
+        rgba(0,0,0,.62) 82%,
+        rgba(0,0,0,.22) 93%,
+        transparent 100%
+    );
+    mask-image:linear-gradient(
+        to bottom,
+        #000 0%,
+        #000 58%,
+        rgba(0,0,0,.92) 70%,
+        rgba(0,0,0,.62) 82%,
+        rgba(0,0,0,.22) 93%,
+        transparent 100%
+    );
 }
 html[data-gx-index-morph="r17"] .sticky-area::after,
 html[data-gx-index-morph="r17"].gx-payment-v2 .sticky-area::after{display:none}

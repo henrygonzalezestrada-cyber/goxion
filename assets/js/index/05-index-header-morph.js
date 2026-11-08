@@ -247,8 +247,16 @@ function attachBadgeObserver(){
  if(!badge)return;
  badgeObs=new MutationObserver(()=>{
   if(!S.badge||!S.badge.isConnected)return;
-  /* Escritura propia (wrapBadge): ignorar. Cualquier otro cambio
-   * de texto es externo (render oficial o adaptador B2). */
+  /* El span interno es lo que anima el marquee: si desapareció,
+   * hay que reponerlo SIEMPRE, aunque el texto sea el mismo.
+   * El adaptador B2 escribe badge.textContent en cada render()
+   * con el MISMO texto; ese textContent destruye el span y el
+   * guardado por igualdad (textContent===myBadge) lo dejaba
+   * muerto: sin span no hay marquee y la píldora recorta
+   * centrada ("rvicio vencido · 6…", bug del video de Henry).
+   * Escritura propia (wrapBadge): el span existe y el texto
+   * coincide, se ignora. */
+  if(!S.badge.querySelector('.gx-rm-badge-text')){wrapBadge();repaint();return;}
   if(S.badge.textContent===myBadge)return;
   wrapBadge();
   repaint();
@@ -284,6 +292,13 @@ function updateMarquee(){
   if(badgeAnim){badgeAnim.cancel();badgeAnim=null;}
   return;
  }
+ /* La animación pertenece al span actual: si el span se repuso
+  * (re-render del adaptador/B2), la animación guardada apunta
+  * al span viejo ya desconectado y el guardado por overflow
+  * la dejaría correr en el vacío mientras el span nuevo no se
+  * mueve. También se descarta si quedó cancelada. */
+ if(badgeAnim&&(!badgeAnim.effect||badgeAnim.effect.target!==span||
+   badgeAnim.playState==='idle')){badgeAnim.cancel();badgeAnim=null;}
  if(badgeAnim&&prevOverflow===over)return;
  if(badgeAnim)badgeAnim.cancel();
  /* Ida y vuelta suave con pausa en cada extremo: el texto se
@@ -318,6 +333,15 @@ function paint(){
  const spread=smooth((p-.75)/.25);
  const spreadV=smooth((p-.75)/.125);
  const spreadH=smooth((p-.875)/.125);
+ /* La etiqueta ("Próximo pago") se disuelve con la misma curva
+  * con la que el importe sube a su fila (paired, 0.05→0.35):
+  * desde R17 la etiqueta se desvanecía con spreadV (0.75→0.875)
+  * pero el importe ya sube 17 px a su fila desde p≈0.1, así que
+  * a mitad de morph el precio cubría la etiqueta todavía opaca
+  * ("PRÓXIMO PAGO" tapado por $53.90, video de Henry). En
+  * compacto siguen sin quedar ni título ni etiqueta: el título
+  * se desvanece con spreadV, la etiqueta al subir el importe. */
+ const labelFade=paired;
  const freedLabelSpace=7*smooth((p-.10)/.35);
  const amountSize=52-18*pp; /* R16/R17: compacto 34 px visuales */
  const amountScale=amountSize/52,badgeScale=1; /* R15: píldora 12 px, sin scale */
@@ -387,9 +411,12 @@ function paint(){
  root.style.setProperty('--gx-rm-clip',px(clip));
  root.style.setProperty('--gx-rm-cut',px(cut));
  root.style.setProperty('--gx-rm-title-scale',((14-3*p)/14).toFixed(4));
- root.style.setProperty('--gx-rm-label-opacity',String(1-spreadV));
+ root.style.setProperty('--gx-rm-label-opacity',String(1-labelFade));
  root.style.setProperty('--gx-rm-progress',p.toFixed(3));
  root.dataset.gxRmCompact=String(p>.95);
+ /* El botón "Mi Espacio" recibe puntero en cuanto empieza a
+  * verse (spreadH>0), no solo en compacto total. */
+ root.dataset.gxRmSpaceVisible=String(spreadH>0.02);
  updateMarquee();
 }
 
@@ -407,14 +434,23 @@ function tick(ts){
  const now=typeof ts==='number'?ts:performance.now();
  const dt=lastTick?Math.min(100,Math.max(0,now-lastTick)):16.7;
  lastTick=now;
- const tau=(now-lastScroll)>IDLE_MS?SETTLE_TAU:TAU;
+ /* Durante el asentamiento el morph sigue al scroll con el tau
+  * rápido (26 ms): con el tau normal (64 ms) y el salto del
+  * scroll, el precio quedaba grande mientras el contenido ya
+  * había subido y tapaba el tracker a mitad de morph. */
+ const tau=snapping?SETTLE_TAU:((now-lastScroll)>IDLE_MS?SETTLE_TAU:TAU);
  value+=(goal-value)*(1-Math.exp(-dt/tau));
  if(Math.abs(goal-value)<.003)value=goal;
  paint();
  if(value!==goal)schedule();
  else{clearTimeout(watchdog);watchdog=0;lastTick=0}
 }
-function request(){
+/* arm=false: actualizar el objetivo y repintar SIN armar el
+ * asentamiento. El resize (la barra del navegador en Safari
+ * aparece/desaparece al desplazar) armaba el salto: 250 ms
+ * después la página se iba sola al ancla y el encabezado
+ * "bugueaba". El desplazamiento real sí arma el asentamiento. */
+function request(arm=true){
  if(!S.sticky)return;
  goal=clamp(window.scrollY/geo.range);
  /* R8/R9 · al desplazar, el conteo del hero se cancela y deja el
@@ -422,7 +458,7 @@ function request(){
   * espejo viejo ($45.72 / $86.16 a mitad de morph). */
  if(window.scrollY>0){heroCounter.cancel(true);displayedCents=heroCounter.shown;}
  lastScroll=performance.now();
- if(!snapping&&!touching)armSnap();
+ if(arm&&!snapping&&!touching)armSnap();
  if(reducedMQ.matches){
   cancelAnimationFrame(frame);clearTimeout(watchdog);
   frame=0;watchdog=0;value=goal;lastTick=0;paint();return;
@@ -473,7 +509,10 @@ function animateSnap(target){
   if(Math.abs(d)<1||performance.now()>snapDeadline){
    window.scrollTo(0,eff);snapping=false;return;
   }
-  window.scrollTo(0,y+d*.25);
+  /* Asentamiento más despacio (0.18 por frame, antes 0.25): con
+   * el salto rápido el morph no alcanzaba al scroll y el precio
+   * grande pasaba por encima del tracker a mitad de morph. */
+  window.scrollTo(0,y+d*.18);
   prevY=window.scrollY;
   snapRaf=requestAnimationFrame(step);
  };
@@ -511,6 +550,11 @@ function bind(){
   btn.className='gx-index-space-btn';
   btn.href='ayuda.html';
   btn.textContent='Mi Espacio';
+  /* El ancla ya navega sola; el handler es red de seguridad:
+   * si algo intercepta el clic del ancla, la navegación a
+   * Mi Espacio ocurre igual (en la oficial el botón no
+   * llevaba a ningún lado). */
+  btn.addEventListener('click',()=>{window.location.assign('ayuda.html');});
   hero.appendChild(btn);
  }
  S.btn=btn;
@@ -546,7 +590,12 @@ window.addEventListener('scrollend',onScrollEnd,{passive:true});
 window.addEventListener('touchstart',()=>{touching=true;clearTimeout(snapTimer);cancelSnap()},{passive:true});
 window.addEventListener('touchend',()=>{touching=false;armSnap()},{passive:true});
 window.addEventListener('wheel',()=>{cancelSnap()},{passive:true});
-window.addEventListener('resize',()=>{paint();request()},{passive:true});
+/* El resize (la barra del navegador en Safari aparece/desaparece
+ * al desplazar) NO arma el asentamiento y cancela el temporizador
+ * pendiente: sin esto, 250 ms después del resize la página se
+ * iba sola al ancla y el encabezado "bugueaba" en mitad del
+ * gesto. El siguiente desplazamiento real vuelve a armarlo. */
+window.addEventListener('resize',()=>{clearTimeout(snapTimer);paint();request(false)},{passive:true});
 if(reducedMQ.addEventListener)reducedMQ.addEventListener('change',request);
 bind();
 window.GOXION_INDEX_MORPH=Object.freeze({

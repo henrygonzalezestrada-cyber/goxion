@@ -591,6 +591,13 @@
       segs += '<circle class="gx-index-loyalty-seg' + (i < filled ? " is-filled" : "") + '" cx="50" cy="50" r="40" stroke-dasharray="' + segLen.toFixed(2) + " " + (C - segLen).toFixed(2) + '" stroke-dashoffset="' + (-i * (segLen + gap)).toFixed(2) + '" transform="rotate(-90 50 50)"/>';
     }
     const star = '<span class="gx-index-loyalty-star" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.65" stroke-linejoin="round"><path d="M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z"/></svg></span>';
+    /* Corazón roto Lucide (HeartCrack), el mismo icono del preview
+     * (animate-ui-native.bundle.js, lucide-react): la joya con
+     * estrella es solo cuando la lealtad está viva; rota = corazón
+     * roto, como en la beta. Ambos iconos viven en el DOM y el CSS
+     * muestra uno u otro según .is-lost, así el adaptador B2 puede
+     * cambiar el estado en vivo solo con la clase. */
+    const heart = '<span class="gx-index-loyalty-heart" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12.409 5.824c-.702.792-1.15 1.496-1.415 2.166l2.153 2.156a.5.5 0 0 1 0 .707l-2.293 2.293a.5.5 0 0 0 0 .707L12 15"/><path d="M13.508 20.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5a5.5 5.5 0 0 1 9.591-3.677.6.6 0 0 0 .818.001A5.5 5.5 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5z"/></svg></span>';
     const a11y = lost
       ? 'role="img" aria-label="Racha reiniciada"'
       : 'role="progressbar" aria-valuemin="0" aria-valuemax="' + n + '" aria-valuenow="' + filled + '" aria-label="Racha: ' + filled + " de " + n + ' pagos puntuales"';
@@ -599,7 +606,7 @@
         '<defs><linearGradient id="gx-index-loyalty-grad" x1="0" y1="0" x2="1" y2="1">' +
           '<stop offset="0" stop-color="#b79bf0"/><stop offset="1" stop-color="#7de4cf"/>' +
         "</linearGradient></defs>" + segs +
-      "</svg>" + star +
+      "</svg>" + star + heart +
     "</div>";
   }
 
