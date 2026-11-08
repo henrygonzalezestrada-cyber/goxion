@@ -11,9 +11,18 @@
  *    importe y la píldora, zona del título, alto del sticky.
  *    Medido en Chromium 390 px: hero 108 px, importe top 16,
  *    píldora top 80, sticky 169 px (158 con el gap R15).
- *  · El ancho del importe se mide con Range: en la oficial el
- *    importe es bloque al 100% y scrollWidth miente (da el ancho
- *    del hero); el texto real de "$46.00" mide ~159 px a 52 px.
+ *  · El ancho del importe se mide con scrollWidth (el importe es
+ *    width:max-content bajo el CSS del morph): un Range da el
+ *    ancho VISUAL (ya escalado) y al remediar a mitad de morph el
+ *    ancho se encogería al cuadrado de la escala (bug cazado por
+ *    el test en PR #184). La píldora usa scrollWidth igual que
+ *    el importe; su caja se recorta con --gx-rm-badge-max.
+ *  · Marquee de la píldora (R17-completar): si el texto no cabe
+ *    en la píldora, se desplaza por dentro hasta el final y
+ *    regresa, con la distancia medida; pausa con pestaña oculta
+ *    y con reduced-motion. El texto vive en un span interno que
+ *    el observador de la píldora repone cuando el render oficial
+ *    o el adaptador B2 reescriben textContent.
  *  · El sticky oficial vivo es gx-payment-v2: fondo transparente
  *    con blur 27 px en ::before y cola de fundido de 58 px por
  *    debajo de la caja. El recorte usa --gx-rm-cut, que en reposo
@@ -144,6 +153,36 @@ let lastCents=null,displayedCents=null;
 /* El importe cambió en el DOM (render oficial o adaptador B2).
  * Cuenta solo si el valor cambió de verdad y la página está
  * arriba; si está desplazada o hay reduced-motion, queda exacto. */
+/* Medición de la geometría en flujo (tops del importe/píldora,
+ * alto del hero) y del resto DESPUÉS de activar el CSS (alto del
+ * sticky, zona del título, RANGE). Separadas para remediar sin
+ * re-enlazar: si el texto nuevo cambia el alto del hero, los
+ * tops viejos solaparían el contenido bajo la barra. */
+function measureFlow(){
+ const hr=S.hero.getBoundingClientRect();
+ const cs=getComputedStyle(S.sticky);
+ geo.topPad=parseFloat(cs.paddingTop)||15;
+ geo.heroH=S.hero.offsetHeight;
+ geo.heroW=S.hero.offsetWidth;
+ geo.amountTop=S.amount.getBoundingClientRect().top-hr.top;
+ geo.badgeTop=S.badge.getBoundingClientRect().top-hr.top;
+ geo.amountH=S.amount.offsetHeight;
+ geo.badgeH=S.badge.offsetHeight;
+}
+function measureSticky(){
+ root.style.setProperty('--gx-rm-hero-h',px(geo.heroH));
+ root.style.setProperty('--gx-rm-amount-top',px(geo.amountTop));
+ root.style.setProperty('--gx-rm-badge-top',px(geo.badgeTop));
+ void S.sticky.offsetHeight;
+ const sr2=S.sticky.getBoundingClientRect(),hr2=S.hero.getBoundingClientRect();
+ const cs2=getComputedStyle(S.sticky);
+ geo.stickyH=S.sticky.offsetHeight;
+ geo.marginBottom=parseFloat(cs2.marginBottom)||18;
+ geo.fadeZone=(hr2.top-sr2.top)-geo.topPad;
+ geo.range=Math.max(120,geo.stickyH+geo.marginBottom);
+}
+function remeasureGeometry(){measureFlow();measureSticky();}
+
 function handleAmountNode(node){
  const cents=parseCents(node.textContent);
  if(cents===null)return;
@@ -178,6 +217,92 @@ function attachAmountObserver(){
  amountObs.observe(node,{characterData:true,childList:true,subtree:true});
 }
 
+/* ---- marquee de la píldora (R17-completar) ---- */
+let badgeObs=null,myBadge=null,badgeAnim=null,badgeOverflow=0;
+function badgeTextNode(){
+ return S.badge?S.badge.querySelector('.gx-rm-badge-text'):null;
+}
+/* Envuelve el texto de la píldora en su span interno. El render
+ * oficial y el adaptador B2 escriben badge.textContent, lo que
+ * borraría el span: el observador lo repone (ver abajo). */
+function wrapBadge(){
+ const badge=S.badge;
+ if(!badge)return;
+ const text=badge.textContent;
+ const span=badge.querySelector('.gx-rm-badge-text');
+ if(span){
+  if(span.textContent!==text){myBadge=text;span.textContent=text;}
+  return;
+ }
+ myBadge=text;
+ badge.textContent='';
+ const s=document.createElement('span');
+ s.className='gx-rm-badge-text';
+ s.textContent=text;
+ badge.appendChild(s);
+}
+function attachBadgeObserver(){
+ if(badgeObs)badgeObs.disconnect();
+ const badge=S.badge;
+ if(!badge)return;
+ badgeObs=new MutationObserver(()=>{
+  if(!S.badge||!S.badge.isConnected)return;
+  /* Escritura propia (wrapBadge): ignorar. Cualquier otro cambio
+   * de texto es externo (render oficial o adaptador B2). */
+  if(S.badge.textContent===myBadge)return;
+  wrapBadge();
+  repaint();
+ });
+ badgeObs.observe(badge,{characterData:true,childList:true,subtree:true});
+}
+function stopBadgeMarquee(){
+ if(badgeAnim){badgeAnim.cancel();badgeAnim=null;}
+ badgeOverflow=0;
+ root.removeAttribute('data-gx-rm-badge-marquee');
+ const span=badgeTextNode();
+ if(span)span.style.transform='';
+}
+/* Mide si el texto cabe y arranca/para el marquee. Solo se mueve
+ * el texto DENTRO de la píldora: la caja no cambia, así que no
+ * se encima al precio ni se sale de la barra. */
+function updateMarquee(){
+ const badge=S.badge,span=badgeTextNode();
+ if(!badge||!span){stopBadgeMarquee();return;}
+ const cs=getComputedStyle(badge);
+ const avail=Math.max(0,badge.clientWidth-(parseFloat(cs.paddingLeft)||0)-(parseFloat(cs.paddingRight)||0));
+ const over=Math.max(0,span.scrollWidth-avail);
+ if(over<=4){stopBadgeMarquee();return;}
+ /* El alineado a la izquierda depende SOLO del overflow, no de
+  * la animación: con justify-content:center el recorte se comía
+  * el INICIO del texto ("🚨 Servicio vencido" se veía "ervicio
+  * vencido · 6…"). Con reduced-motion no hay marquee, pero el
+  * texto sí empieza a la izquierda y se lee desde el principio. */
+ root.setAttribute('data-gx-rm-badge-marquee','1');
+ const prevOverflow=badgeOverflow;
+ badgeOverflow=over;
+ if(reducedMQ.matches){
+  if(badgeAnim){badgeAnim.cancel();badgeAnim=null;}
+  return;
+ }
+ if(badgeAnim&&prevOverflow===over)return;
+ if(badgeAnim)badgeAnim.cancel();
+ /* Ida y vuelta suave con pausa en cada extremo: el texto se
+  * desplaza hasta el final y regresa. ~45 ms por px + holds. */
+ const dur=Math.min(9000,Math.max(2400,over*45+1600));
+ badgeAnim=span.animate([
+  {transform:'translateX(0)',offset:0},
+  {transform:'translateX(0)',offset:.22},
+  {transform:'translateX('+(-over)+'px)',offset:.78},
+  {transform:'translateX('+(-over)+'px)',offset:1}
+ ],{duration:dur,easing:'ease-in-out',iterations:Infinity,direction:'alternate'});
+ if(document.hidden)badgeAnim.pause();
+}
+function pauseBadgeMarquee(paused){
+ if(!badgeAnim)return;
+ if(paused)badgeAnim.pause();
+ else badgeAnim.play();
+}
+
 /* ---- morph (R5.2/R7/R10/R12/R13/R14/R15/R17, adaptado) ---- */
 let value=0,goal=0,frame=0,watchdog=0,lastTick=0,lastScroll=0;
 let measureKey='',moneyWidth=0,statusWidth=0,amountH=0,badgeH=0,
@@ -209,6 +334,10 @@ function paint(){
   badgeH=S.badge.offsetHeight;
   heroW=S.hero.offsetWidth;
   if(S.btn){btnW=S.btn.offsetWidth;btnH=S.btn.offsetHeight;}
+  /* R17-completar · si el texto nuevo cambió el alto del hero,
+   * remediar la geometría: con tops viejos el contenido quedaba
+   * solapado bajo la barra. */
+  if(S.hero.offsetHeight!==geo.heroH)remeasureGeometry();
  }
  const amountTop=geo.amountTop-10*pp-freedLabelSpace;
  const amountVH=amountH*amountScale,badgeVH=badgeH*badgeScale;
@@ -261,6 +390,7 @@ function paint(){
  root.style.setProperty('--gx-rm-label-opacity',String(1-spreadV));
  root.style.setProperty('--gx-rm-progress',p.toFixed(3));
  root.dataset.gxRmCompact=String(p>.95);
+ updateMarquee();
 }
 
 function schedule(){
@@ -367,31 +497,14 @@ function bind(){
  const badge=hero?.querySelector('.time-badge');
  if(!sticky||!hero||!amount||!badge)return false;
  if(sticky===S.sticky&&hero===S.hero&&amount===S.amount&&badge===S.badge)return true;
- const sr=sticky.getBoundingClientRect(),hr=hero.getBoundingClientRect();
- const cs=getComputedStyle(sticky);
- geo.topPad=parseFloat(cs.paddingTop)||15;
- geo.heroH=hero.offsetHeight;
- geo.heroW=hero.offsetWidth;
- geo.amountTop=amount.getBoundingClientRect().top-hr.top;
- geo.badgeTop=badge.getBoundingClientRect().top-hr.top;
- geo.amountH=amount.offsetHeight;
- geo.badgeH=badge.offsetHeight;
  S.sticky=sticky;S.hero=hero;S.header=sticky.querySelector('.header');
  S.label=hero.querySelector('.total-label');
  S.amount=amount;S.badge=badge;
  S.content=document.querySelector('.scrollable-content');
  S.banner=sticky.querySelector('.alert-banner');
+ measureFlow();
  root.dataset.gxIndexMorph='r17';
- root.style.setProperty('--gx-rm-hero-h',px(geo.heroH));
- root.style.setProperty('--gx-rm-amount-top',px(geo.amountTop));
- root.style.setProperty('--gx-rm-badge-top',px(geo.badgeTop));
- void sticky.offsetHeight;
- const sr2=sticky.getBoundingClientRect(),hr2=hero.getBoundingClientRect();
- const cs2=getComputedStyle(sticky);
- geo.stickyH=sticky.offsetHeight;
- geo.marginBottom=parseFloat(cs2.marginBottom)||18;
- geo.fadeZone=(hr2.top-sr2.top)-geo.topPad;
- geo.range=Math.max(120,geo.stickyH+geo.marginBottom);
+ measureSticky();
  let btn=hero.querySelector('.gx-index-space-btn');
  if(!btn){
   btn=document.createElement('a');
@@ -403,6 +516,8 @@ function bind(){
  S.btn=btn;
  btnW=btn.offsetWidth;btnH=btn.offsetHeight;
  attachAmountObserver();
+ attachBadgeObserver();
+ wrapBadge();
  measureKey='';lastPainted=null;heroRestH=0;
  handleAmountNode(amount);
  paint();request();
@@ -423,6 +538,7 @@ if(app){
 
 document.addEventListener('visibilitychange',()=>{
  root.classList.toggle('gx-r8-paused',document.hidden);
+ pauseBadgeMarquee(document.hidden);
 });
 window.addEventListener('scroll',request,{passive:true});
 window.addEventListener('scrollend',request,{passive:true});
@@ -437,5 +553,7 @@ window.GOXION_INDEX_MORPH=Object.freeze({
  progress:()=>value,
  repaint,
  bound:()=>!!S.sticky,
+ range:()=>geo.range,
+ marquee:()=>({active:!!badgeAnim,overflow:badgeOverflow}),
 });
 })();

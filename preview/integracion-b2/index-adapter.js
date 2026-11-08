@@ -188,24 +188,75 @@
   }
   const oldOverdue=document.querySelector(".overdue-incentive-box");
   if(oldOverdue)oldOverdue.style.display="none";
-  const loyaltyIcon=document.querySelector(".loyalty-badge .loyalty-icon");
-  if(loyaltyIcon){
-    if(!loyaltyIcon.dataset.gxB2Original)
-      loyaltyIcon.dataset.gxB2Original=loyaltyIcon.textContent;
-    const icon=quote.lealtad_global_perdida?"💔":loyaltyIcon.dataset.gxB2Original;
-    if(loyaltyIcon.textContent!==icon)loyaltyIcon.textContent=icon;
+  /* R17-completar (b) · lealtad perdida B2 sobre la joya nueva
+   * (.gx-index-loyalty): el render global ya pinta la joya con
+   * los datos del motor global; la cotización B2 puede saber
+   * antes que se perdió la lealtad (lealtad_global_perdida).
+   * Solo se aplica la variante "perdida" cuando la bandera B2
+   * está activa; si no, manda lo que pintó el render global. */
+  const loyaltyPanel=document.querySelector(".loyalty-badge.gx-index-loyalty");
+  if(loyaltyPanel)setLoyaltyLost(loyaltyPanel,quote.lealtad_global_perdida===true);
+ }
+ /* R17-completar (b) · aplica/quita la variante "perdida" de la
+  * joya de lealtad. Guarda el estado original la primera vez
+  * para poder restaurarlo si la bandera B2 se apaga. */
+ function setLoyaltyLost(panel,lost){
+  const mark=panel.querySelector(".gx-index-loyalty-mark");
+  const title=panel.querySelector(".loyalty-title");
+  const caption=panel.querySelector(".gx-index-loyalty-caption");
+  const desc=panel.querySelector(".loyalty-desc");
+  if(!mark||!title||!caption||!desc)return;
+  if(!panel.dataset.gxB2LoyaltyOriginal){
+   panel.dataset.gxB2LoyaltyOriginal=JSON.stringify({
+    state:panel.dataset.loyaltyState||"active",
+    title:title.textContent,caption:caption.textContent,
+    desc:desc.innerHTML,now:mark.getAttribute("aria-valuenow")||"0",
+    max:mark.getAttribute("aria-valuemax")||"4"});
   }
-  const loyalty=document.querySelector(".loyalty-badge .loyalty-desc");
-  if(loyalty){
-    // Conservar el componente oficial y sus colores/énfasis. Mostrar
-    // pérdida únicamente en el escenario real de incumplimiento.
-    if(!loyalty.dataset.gxB2Original)
-      loyalty.dataset.gxB2Original=loyalty.innerHTML;
-    const result=quote.lealtad_global_perdida
-      ?'<span style="color:var(--danger-red);font-weight:600;">💔 Racha reiniciada por incumplir una fecha de pago.</span>'
-      :loyalty.dataset.gxB2Original;
-    if(loyalty.innerHTML!==result)loyalty.innerHTML=result;
+  if(lost){
+   if(panel.dataset.gxB2LoyaltyApplied==="lost")return;
+   panel.dataset.gxB2LoyaltyApplied="lost";
+   panel.dataset.loyaltyState="lost";
+   mark.classList.add("is-lost");
+   mark.setAttribute("role","img");
+   mark.setAttribute("aria-label","Racha reiniciada");
+   mark.querySelectorAll(".gx-index-loyalty-seg").forEach(s=>s.classList.remove("is-filled"));
+   title.textContent="Racha reiniciada";
+   caption.textContent="Perdiste tu avance";
+   desc.innerHTML='<span style="color:var(--danger-red);font-weight:600;">💔 Racha reiniciada por incumplir una fecha de pago.</span>';
+  }else{
+   if(panel.dataset.gxB2LoyaltyApplied!=="lost")return;
+   delete panel.dataset.gxB2LoyaltyApplied;
+   const orig=JSON.parse(panel.dataset.gxB2LoyaltyOriginal);
+   panel.dataset.loyaltyState=orig.state;
+   mark.classList.remove("is-lost");
+   mark.setAttribute("role","progressbar");
+   mark.setAttribute("aria-label","Racha: "+orig.now+" de "+orig.max+" pagos puntuales");
+   const now=Number(orig.now)||0;
+   mark.querySelectorAll(".gx-index-loyalty-seg").forEach((s,i)=>s.classList.toggle("is-filled",i<now));
+   title.textContent=orig.title;caption.textContent=orig.caption;desc.innerHTML=orig.desc;
   }
+ }
+ /* R17-completar (a) · seguimiento del comprobante B2. El flujo
+  * B2 no marca pago_en_revision en el cliente (por eso el
+  * comprobante es invisible en Admin normal): la única señal
+  * viva es quote.comprobante_en_revision. Cuando está activa,
+  * el proceso se muestra con el mismo tracker vanilla del
+  * render global (gxProofTrackerHTML); si el global ya pintó
+  * uno, no se duplica. */
+ function updateProofTracker(){
+  const content=document.querySelector(".scrollable-content");
+  if(!content)return;
+  const own=content.querySelector(":scope > .gx-index-proof[data-gx-b2-proof]");
+  if(!store.quote?.comprobante_en_revision){own?.remove();return;}
+  if(content.querySelector(":scope > .gx-index-proof"))return;
+  if(typeof window.gxProofTrackerHTML!=="function")return;
+  const tmp=document.createElement("div");
+  tmp.innerHTML=window.gxProofTrackerHTML("review");
+  const section=tmp.firstElementChild;
+  if(!section)return;
+  section.dataset.gxB2Proof="1";
+  content.insertBefore(section,content.firstChild);
  }
  function content(){
   const list=rows(),due=pending()[0];
@@ -289,6 +340,7 @@
   updateHeader();
   updateBreakdown();
   updateServiceMarker();
+  updateProofTracker();
  }
  function installHandlers(){
   if(installed||typeof window.abrirModalPago!=="function")return;
