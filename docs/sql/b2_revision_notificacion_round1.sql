@@ -8,8 +8,10 @@
 -- funciones security definer con search_path='', triggers AFTER con
 -- drop trigger if exists, y aviso en notificaciones_admin con referencia
 -- con espacio de nombres B2 (b2:reporte:<id>) para idempotencia por reporte.
--- Estado: aplicado en QA (nsvybyvvdpdgbgtvydfb) el 2026-11-08.
--- Pendiente: aplicar en producción con este mismo archivo.
+-- Estado: PENDIENTE de aplicar. Primero en QA (nsvybyvvdpdgbgtvydfb) desde
+-- el editor SQL del dashboard de Supabase, verificar el caso Nayeli
+-- replicado y, solo con el visto bueno de Henry, aplicar en producción
+-- con este mismo archivo (idempotente: CREATE OR REPLACE + DROP IF EXISTS).
 
 create or replace function public.goxion_b2_marcar_revision_al_reportar()
 returns trigger language plpgsql security definer set search_path = '' as $f$
