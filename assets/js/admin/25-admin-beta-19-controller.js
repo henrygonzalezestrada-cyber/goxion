@@ -151,7 +151,76 @@
           <button onclick="enviarMensaje('${String(c.nombre||'').replace(/'/g,"\'")}','${String(key).replace(/'/g,"\'")}')">Mensaje</button>
         </div>
       </section>`;
+    window.gxB2OverviewSync?.(key);
   }
+  /* C1 · Encabezado B2: cuando la sección Cobro B2 ya cargó, el
+   * encabezado de la ficha muestra el resto B2 (total del ciclo y
+   * próxima fecha) en vez del total global con su mora. Los números se
+   * leen de la sección ya pintada por el cargador (01): no se vuelve
+   * a cotizar ni se toca el desglose global de abajo. Si la sección
+   * no cargó, la ficha abierta no es la del cliente o la fecha no se
+   * puede leer, no se toca nada. */
+  const MESES_CORTOS={ene:0,feb:1,mar:2,abr:3,may:4,jun:5,jul:6,ago:7,sep:8,sept:8,oct:9,nov:10,dic:11};
+  function gxB2Fecha(texto,titulo){
+    const m=String(texto||"").trim().match(/^(\d{1,2})\s+([a-záéíóú]+)/i);
+    if(!m)return null;
+    const mes=MESES_CORTOS[m[2].toLowerCase()];
+    if(mes===undefined)return null;
+    const t=String(titulo||"").match(/([A-Za-záéíóú]+)\s+(20\d\d)/);
+    let ano=t?Number(t[2]):new Date().getFullYear();
+    const mesTitulo=t?MESES_CORTOS[t[1].slice(0,3).toLowerCase()]:undefined;
+    if(mesTitulo!==undefined&&mes<mesTitulo)ano+=1;
+    return Date.UTC(ano,mes,Number(m[1]));
+  }
+  window.gxB2OverviewSync=function(key){
+    const f=document.getElementById("gx-client-focus");
+    if(!f||String(f.dataset.gxClientKey||"")!==String(key))return false;
+    const box=document.getElementById("gx-focus-overview");
+    const anchor=Array.from(document.querySelectorAll(".gx-b2-billing")||[])
+      .find(el=>el.dataset&&String(el.dataset.gxB2Key||"")===String(key));
+    if(!box||!anchor||!anchor.dataset.gxB2Loaded)return false;
+    const totalText=anchor.querySelector(".gx-b2-billing-total strong")?.textContent.trim()||"";
+    if(!/^\$\d/.test(totalText))return false;
+    const rows=Array.from(anchor.querySelectorAll(".gx-b2-billing-row"));
+    if(!rows.length)return false;
+    const hero=box.querySelector(".gx-overview-hero");
+    const meta=document.getElementById("gx-focus-meta");
+    if(!hero)return false;
+    const nextRow=rows.find(r=>{const s=r.querySelector(".gx-b2-billing-state");
+      return s&&(s.classList.contains("pending")||s.classList.contains("review"));});
+    const dateText=nextRow?nextRow.querySelector("small")?.textContent.trim()||"":"";
+    const title=anchor.querySelector(".gx-b2-billing-title small")?.textContent||"";
+    const due=nextRow?gxB2Fecha(dateText,title):null;
+    if(nextRow&&due===null)return false;
+    const kicker=hero.querySelector(".gx-overview-kicker");
+    const amount=hero.querySelector("strong");
+    const sub=hero.querySelector("small");
+    const state=hero.querySelector(".gx-overview-state");
+    if(kicker)kicker.textContent="Resto B2";
+    if(amount)amount.textContent=totalText;
+    if(!nextRow){
+      if(sub)sub.textContent="Servicios al corriente";
+      if(meta)meta.textContent="Al corriente · "+totalText;
+      if(state){state.textContent="Al corriente";state.className="gx-overview-state ok";}
+      return true;
+    }
+    if(sub&&dateText)sub.textContent="Próxima fecha · "+dateText;
+    const now=new Date();
+    const today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+    const review=nextRow.querySelector(".gx-b2-billing-state")?.classList.contains("review");
+    if(review){
+      if(meta)meta.textContent="Pago en revisión · "+totalText+(dateText?" · "+dateText:"");
+      if(state){state.textContent="Pago en revisión";state.className="gx-overview-state review";}
+    }else if(due>=today){
+      if(meta)meta.textContent="Por vencer · "+totalText+(dateText?" · "+dateText:"");
+      if(state){state.textContent="Por vencer";state.className="gx-overview-state neutral";}
+    }else{
+      const days=Math.round((today-due)/86400000);
+      if(meta)meta.textContent="Vencido · "+totalText+(dateText?" · "+dateText:"");
+      if(state){state.textContent="Vencido · "+days+"d";state.className="gx-overview-state danger";}
+    }
+    return true;
+  };
   window.gxFocusSection=function(section,btn){const f=document.getElementById('gx-client-focus'),body=document.getElementById('gx-focus-body'),overview=document.getElementById('gx-focus-overview');if(!f||!body)return;document.querySelectorAll('[data-gx-focus-section]').forEach(x=>x.classList.toggle('active',x.dataset.gxFocusSection===section));if(overview)overview.hidden=section!=='summary';body.querySelectorAll('[data-gx-section]').forEach(x=>x.classList.toggle('gx-focus-section-active',x.dataset.gxSection===section));f.dataset.gxFocusSection=section;};
   function setupFocus(key){const f=document.getElementById('gx-client-focus');if(!f?.classList.contains('show'))return;f.classList.add('gx-focus-v3');f.dataset.gxClientKey=key;focusOverview(key);gxFocusSection('summary');}
   const currentOpen=window.gxOpenClientFocus;if(typeof currentOpen==='function')window.gxOpenClientFocus=function(key,...args){const r=currentOpen.call(this,key,...args);setTimeout(()=>setupFocus(key),90);return r;};

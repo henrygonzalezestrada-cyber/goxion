@@ -14,6 +14,12 @@
  const effective=row=>row.prorroga_estado==="aprobada"&&
   row.fecha_pactada&&Number(row.mora_centavos||0)<=0
    ?String(row.fecha_pactada):String(row.vence||"");
+ const daysUntil=fecha=>{
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(fecha||"")))return null;
+  const now=new Date();
+  const today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+  return Math.round((Date.parse(fecha+"T00:00:00Z")-today)/86400000);
+ };
  const nextPayment=quote=>{
   if(quote?.ok!==true||quote?.cobrable!==true||
     !Array.isArray(quote.cargos)||!/^[-0-9a-f]{36}$/i.test(String(quote.ciclo_id||"")))
@@ -22,12 +28,43 @@
     Number.isSafeInteger(Number(x.total_centavos))&&Number(x.total_centavos)>0&&
     /^\d{4}-\d{2}-\d{2}$/.test(effective(x)))
    .sort((a,b)=>effective(a).localeCompare(effective(b)));
-  if(!pending.length)return {amount:0,date:null};
+  if(!pending.length)return {amount:0,date:null,group:[]};
   const date=effective(pending[0]);
-  const amount=pending.filter(x=>effective(x)===date)
-    .reduce((n,x)=>n+Number(x.total_centavos),0);
-  return {amount,date};
+  const group=pending.filter(x=>effective(x)===date);
+  const amount=group.reduce((n,x)=>n+Number(x.total_centavos),0);
+  return {amount,date,group};
  };
+ /* Píldora de la tarjeta desde el próximo cargo B2 (misma regla que el
+  * hero del Index): la fecha que manda es la del cargo, no el corte
+  * global. Solo se usa cuando la cotización B2 está cargada. */
+ const pillState=(quote,next)=>{
+  if(quote?.comprobante_en_revision)return {text:"⏳ Pago en revisión",cls:"badge-review"};
+  if(!next||!next.group||!next.group.length)return {text:"✅ Servicios al corriente",cls:"badge-ok"};
+  if(next.group.some(x=>Number(x.mora_centavos||0)>0))return {text:"🚨 Servicio vencido",cls:"badge-overdue"};
+  if(next.group.some(x=>x.prorroga_estado==="aprobada"&&x.fecha_pactada&&Number(x.mora_centavos||0)<=0))
+   return {text:"⏳ En prórroga",cls:"badge-ok"};
+  const days=daysUntil(next.date);
+  if(days===null)return {text:"⏳ Por confirmar",cls:"badge-ok"};
+  if(days<0)return {text:"🚨 Servicio vencido",cls:"badge-overdue"};
+  if(days===0)return {text:"⏳ Vence hoy",cls:"badge-today"};
+  if(days===1)return {text:"⏳ Vence mañana",cls:"badge-ok"};
+  return {text:"⏳ Vence en "+days+" días",cls:"badge-ok"};
+ };
+ /* Lealtad B2: el motor global pinta la racha efectiva (0/4 cuando el
+  * periodo sigue vencido) sin decir que la racha se perdió ni cuál fue
+  * la mejor. Cuando la cotización B2 dice que la lealtad se perdió
+  * (pago tardío con mora), el mensaje lo explica con la mejor racha
+  * guardada — la misma lectura que el Index ya muestra en producción.
+  * El conteo efectivo no se toca: es el del motor. */
+ function applyLoyalty(quote){
+  if(quote?.lealtad_global_perdida!==true)return;
+  const best=Math.max(Number(quote.lealtad?.pagos_guardados)||0,
+    Number(quote.lealtad?.pagos_efectivos)||0);
+  if(!(best>0))return;
+  const msg=document.getElementById("loyalty-msg");
+  const wanted="Racha reiniciada · Mejor racha: "+best+(best===1?" pago.":" pagos.");
+  if(msg&&msg.textContent!==wanted)msg.textContent=wanted;
+ }
  let latest=null,fetching=false,identity="",currentCard=null,observer=null;
  function apply(){
   const card=document.getElementById("dash-billing-card");
@@ -49,6 +86,12 @@
    dateEl.previousElementSibling?.setAttribute("hidden","");
    dateEl.before(textLabel);
   }
+  const pill=pillState(latest,next);
+  const badgeEl=card.querySelector("#dash-badge");
+  const badge=badgeEl?badgeEl.querySelector(".time-badge"):null;
+  if(badgeEl&&(!badge||badge.textContent!==pill.text||badge.className!=="time-badge "+pill.cls))
+   badgeEl.innerHTML='<div class="time-badge '+pill.cls+'">'+pill.text+'</div>';
+  applyLoyalty(latest);
  }
  function observe(){
   const card=document.getElementById("dash-billing-card");
