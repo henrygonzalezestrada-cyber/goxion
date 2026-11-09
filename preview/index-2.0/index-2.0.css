@@ -144,7 +144,25 @@ html.gx-20-b2 .services-container{display:none}
  * y se come los toques — el clic caía en el encabezado y la hoja no cerraba.
  * Defecto preexistente de la oficial (mismo marcado y mismo CSS); en el
  * espejo se corrige solo con z-index, sin tocar la oficial. */
-.gx-payment-v2 #payment-modal .close-modal{z-index:2}
+/* DETALLES FINALES · X ÚNICA: la X de las hojas (pago y datos) es
+ * el mismo token que la X del encabezado (34 px, redonda, degradado
+ * cian, ✕ negra 17 px/800). Antes las hojas usaban × (U+00D7, fina)
+ * a 21 px y el encabezado ✕ (U+2715) a 17 px: mismo círculo, marca
+ * distinta. El glifo se cambia en el HTML del espejo; aquí la
+ * medida y el peso. El z-index:2 del B2+B3 se conserva: sin él el
+ * encabezado animado se come los toques de la X de la hoja de
+ * pago (defecto preexistente). */
+.gx-payment-v2 #payment-modal .close-modal,
+html.gx-20-b2 .gx-bank-close{
+  width:34px;height:34px;
+  display:grid;place-items:center;padding:0;border:0;border-radius:50%;
+  color:#031015;font-size:17px;font-weight:800;line-height:1;
+  background:linear-gradient(135deg,#24f0ff,#61dcff);
+  box-shadow:0 0 18px rgba(0,242,254,.20);
+  z-index:2;
+}
+.gx-payment-v2 #payment-modal .close-modal:active,
+html.gx-20-b2 .gx-bank-close:active{transform:scale(.90)}
 .gx-payment-primary,.gx-bank-trigger,.gx-20-row{transition:transform .18s ease}
 .gx-payment-primary:active{transform:translateY(1px) scale(.97)}
 .gx-bank-trigger:active{transform:translateY(1px) scale(.97)}
@@ -478,20 +496,26 @@ html.gx-20-b2 .gx-wallet-front-bottom strong{
  * el espejo y el bloque contenedor es el frente (inset:0), igual
  * que la fila del número (bottom:15px). */
 html.gx-20-b2 .gx-wallet-brand-row{position:static}
+/* DETALLES FINALES · LOGO MASTERCARD REAL: DOS círculos solapados,
+ * rojo #EB001B a la izquierda y amarillo #F79E1B a la derecha; el
+ * solape queda en tono intermedio (naranja) con mix-blend-mode:
+ * screen sobre el rojo. El B6 tenía TRES círculos: los dos pseudos
+ * más la sombra (-12 px) del ::after, que pintaba un tercer bulto
+ * entre ambos. Sin sombra, con los colores de marca y con los
+ * centros a 18 px (solape de 10 px): 46 px de ancho total. */
 html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent{
   position:absolute;right:16px;bottom:15px;z-index:2;
-  width:58px;height:30px;margin:0;border:0;border-radius:0;
+  width:46px;height:28px;margin:0;border:0;border-radius:0;
   background:transparent;box-shadow:none;
 }
 html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::before,
 html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::after{
-  content:"";position:absolute;top:1px;width:28px;height:28px;
+  content:"";position:absolute;top:0;width:28px;height:28px;
   border-radius:50%;
 }
-html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::before{left:2px;background:#ff1738}
+html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::before{left:0;background:#EB001B}
 html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::after{
-  right:2px;background:#ff9f19;
-  box-shadow:-12px 0 0 -2px rgba(255,104,20,.74);
+  right:0;background:#F79E1B;mix-blend-mode:screen;box-shadow:none;
 }
 /* Nu: "nu" minúscula arriba a la izquierda (como la tarjeta real),
  * sin subtítulo de institución; "débito" + contactless arriba a la

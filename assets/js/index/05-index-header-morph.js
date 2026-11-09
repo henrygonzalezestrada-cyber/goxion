@@ -228,7 +228,11 @@ function handleAmountNode(node){
   if(window.scrollY===0&&!reducedMQ.matches){
    displayedCents=0;
    myText=money(0);node.textContent=myText;
-   heroCounter.start(node,0,cents,()=>pulseInk(node));
+   /* Al completar el conteo, displayedCents queda en el valor
+    * final: sin esto, el primer cambio posterior contaba desde
+    * $0.00 (displayedCents seguía en 0 aunque el importe ya
+    * mostraba el valor real). */
+   heroCounter.start(node,0,cents,()=>{displayedCents=cents;pulseInk(node);});
   }
   return;
  }
@@ -238,7 +242,10 @@ function handleAmountNode(node){
  if(window.scrollY>0||reducedMQ.matches){displayedCents=cents;return;}
  displayedCents=from;
  myText=money(from);node.textContent=myText;
- heroCounter.start(node,from,cents,()=>pulseInk(node));
+ /* Igual que arriba: al completar, displayedCents queda en el
+  * valor final para que el siguiente cambio cuente desde ahí
+  * y no desde $0.00. */
+ heroCounter.start(node,from,cents,()=>{displayedCents=cents;pulseInk(node);});
 }
 
 function attachAmountObserver(){
