@@ -3490,26 +3490,28 @@ html[data-gx-index-morph="r17"] .scrollable-content{
     transform:translateY(var(--gx-rm-content-shift,0px));
     will-change:transform;
 }
-/* R18 · "X" de cierre en compacto: cian sólido #00f2fe con X
-   negra, cuadrada, del alto de la píldora, aislada a la derecha.
-   Sustituye al botón de texto "Mi Espacio" (R14–R17): con la X
-   la píldora gana ~70 px de ancho y hay menos marquee. Lo inyecta
-   el JS en el hero; solo recibe puntero cuando el morph está
-   compacto. Sin backdrop-filter: el cian es sólido y el blur bajo
-   el botón en Safari entorpecía el toque. Redonda (50%): misma
-   jerarquía que las X de las hojas (Notificaciones, Pago por
-   transferencia), que son círculos cian con X negra. */
+/* R18 · "X" de cierre en compacto: sustituye al botón de texto
+   "Mi Espacio" (R14–R17): con la X la píldora gana ~70 px de ancho
+   y hay menos marquee. Lo inyecta el JS en el hero; solo recibe
+   puntero cuando el morph está compacto. Sin backdrop-filter: el
+   cian es sólido y el blur bajo el botón en Safari entorpecía el
+   toque. PORT 2.0 (2026-11-08): token único de cierre de la app
+   (34 px, redondo, degradado cian, ✕ negra 17 px/800), igual que
+   las X de las hojas de pago y datos; la navegación en tres capas
+   de R18 (ancla + clic + pointerup con guardia) no cambia. El
+   morph mide el botón real, así que la píldora se ajusta sola. */
 html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
     position:absolute;
     top:var(--gx-rm-space-top,2px);
     right:0;
-    width:30px;height:30px;
+    width:34px;height:34px;
     display:inline-flex;align-items:center;justify-content:center;
     padding:0;
-    font-size:15px;line-height:1;font-weight:800;
+    font-size:17px;line-height:1;font-weight:800;
     font-family:inherit;text-decoration:none;
-    color:#000;
-    background:#00f2fe;
+    color:#031015;
+    background:linear-gradient(135deg,#24f0ff,#61dcff);
+    box-shadow:0 0 18px rgba(0,242,254,.20);
     border:0;
     border-radius:50%;
     opacity:var(--gx-rm-space,0);
@@ -3517,6 +3519,9 @@ html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn{
     pointer-events:none;
     will-change:transform,opacity;
     z-index:2;
+}
+html[data-gx-index-morph="r17"] .balance-hero .gx-index-close-btn:active{
+    transform:scale(.90)
 }
 /* La X recibe puntero en cuanto empieza a verse (spreadH>0),
    no solo en compacto total: con la puerta en p>.95, un toque
@@ -3809,3 +3814,571 @@ html[data-gx-index-morph="r17"] .balance-hero .time-badge .gx-rm-badge-text{
 html[data-gx-rm-badge-marquee="1"] .balance-hero .time-badge{
     justify-content:flex-start;text-overflow:clip;
 }
+/* ================================================================
+   INTEGRACION INDEX 2.0 (2026-11-08) · PORT del espejo
+   preview/index-2.0/index-2.0.css (B0-B6 + detalles finales),
+   aprobado por Henry y fusionado a main como PR #194.
+   El espejo NO se toca: esta seccion es la copia oficial.
+   ADN: fondo #030305, cian #00f2fe, morado #7c4dff, Poppins,
+   cristal/blur. La unidad de la pantalla es la fecha de pago,
+   no el servicio: cada dato aparece una sola vez (propuesta §3).
+   PUERTAS:
+   · html.gx-20-b2 = cotizacion B2 con DOS O MAS fechas efectivas
+     (la pone el adaptador B2). Solo ahi se ocultan SERVICIOS
+     ACTIVOS y DESGLOSE y vive el calendario agrupado. En flujo
+     global (una sola fecha) la clase no existe y todo se conserva.
+   · Sin puerta = piezas compartidas (aclaracion de Henry
+     2026-11-09): X unica, tarjetas planas con Mastercard real,
+     icono de copiar, botones A+C, lealtad B5 y conteo. Llegan
+     tambien a los clientes de una sola fecha.
+   NO portado: energia R18 en filas .gx-b2-row (sus filas ya no
+   existen: la energia vive ahora en la orbita del encabezado
+   del grupo proximo; las reglas R18 quedan inertes en este
+   archivo, sin borrar, porque preview/index-b2/b2-ui.js aun
+   las usa). Nada de fixtures, CLABE ficticia ni jixis.
+   ================================================================ */
+
+/* B1 · En B2, SERVICIOS ACTIVOS se fusiona en los grupos por fecha y no se
+ * pinta dos veces. Solo con cotización B2 agrupada (la clase la pone el adaptador 2.0
+ * cuando hay 2+ fechas); en flujo global la lista se conserva tal cual. */
+html.gx-20-b2 .scrollable-content > .section-title{display:none}
+html.gx-20-b2 .services-container{display:none}
+
+/* B1 · Tarjeta del calendario por fecha. Misma estética de cristal que la
+ * tarjeta B2 (.gx-b2-card): sin recuadros por grupo, solo divisores. */
+.gx-20-card{
+  margin:0 0 25px;padding:0!important;overflow:hidden;
+  border-color:rgba(135,184,236,.14)!important
+}
+.gx-20-cal-head{padding:16px 18px 12px}
+.gx-20-caption{
+  color:#9aacca;font-size:10px;font-weight:650;letter-spacing:.65px
+}
+
+/* B1 · Grupo por fecha: un <details> nativo por fecha efectiva. El encabezado
+ * (summary) ya responde qué vence y cuánto es; dentro, una fila por servicio. */
+.gx-20-group{border-top:1px solid rgba(255,255,255,.065)}
+.gx-20-summary{
+  position:relative;overflow:hidden;
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  width:100%;min-height:72px;padding:15px 18px;cursor:pointer;
+  list-style:none;color:inherit
+}
+.gx-20-summary::-webkit-details-marker{display:none}
+.gx-20-summary:focus-visible{outline:2px solid #00f2fe;outline-offset:-2px}
+.gx-20-sum-main{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.gx-20-sum-date{
+  font-size:16px;font-weight:700;letter-spacing:-.2px;color:#eaf2ff;
+  text-transform:capitalize
+}
+.gx-20-sum-meta{
+  font-size:12px;font-weight:500;color:#9aacca;line-height:1.4
+}
+.gx-20-sum-side{
+  display:flex;align-items:center;gap:10px;flex:none
+}
+.gx-20-sum-total{
+  font-size:16px;font-weight:700;letter-spacing:-.2px;color:#eaf8ff
+}
+.gx-20-group.is-active .gx-20-sum-total{color:var(--neon-blue)}
+/* B2+B3 · FLECHA MORPHING (patrón de los acordeones del cliente: un solo
+ * SVG, una sola pieza continua, como el chevron de los catálogos). Al abrir,
+ * la pieza gira 180° con resorte y cambia de cian a morado; nunca se separan
+ * sus lados. En Admin el chevron es solo un giro simple de texto; aquí se
+ * porta el comportamiento morphing (SVG + resorte + cambio de color) con los
+ * colores del Index. */
+.gx-20-chevron{
+  display:inline-grid;place-items:center;flex:none;
+  width:28px;height:22px;color:#00f2fe
+}
+.gx-20-chevron-svg{
+  width:23px;height:15px;display:block;overflow:visible;
+  transform:rotate(0deg);transform-origin:50% 50%;
+  transition:transform .44s cubic-bezier(.22,1.35,.34,1),
+    color .25s ease,filter .25s ease;
+  color:inherit;filter:drop-shadow(0 0 4px rgba(0,242,254,.12))
+}
+.gx-20-chevron-svg path{
+  fill:none;stroke:currentColor;stroke-width:3.2;
+  stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke
+}
+.gx-20-group[open] .gx-20-chevron-svg{
+  transform:rotate(180deg);color:#b79bf0;
+  filter:drop-shadow(0 0 4px rgba(183,155,240,.18))
+}
+
+/* B1 · Filas abiertas, como el calendario B2: sin recuadro por fila,
+ * separadas solo por una línea fina. La fila activa se distingue por el
+ * importe en cian y la etiqueta "Seleccionado" (igual que en el preview). */
+.gx-20-rows{padding:0 18px 8px}
+.gx-20-row{
+  position:relative;isolation:isolate;display:flex;align-items:center;gap:13px;
+  width:100%;min-width:0;min-height:58px;padding:12px 2px;margin:0;
+  border:0;border-bottom:1px solid rgba(255,255,255,.065);border-radius:0;
+  background:transparent;color:#fff;
+  text-align:left;cursor:pointer;overflow:hidden
+}
+.gx-20-row:last-child{border-bottom:0}
+.gx-20-row:focus-visible{outline:2px solid #00f2fe;outline-offset:2px}
+.gx-20-row.is-active .gx-20-row-side strong{color:var(--neon-blue)}
+.gx-20-row.is-done{opacity:.6;cursor:default}
+.gx-20-row-main{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
+.gx-20-row-title{
+  font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;color:#fff
+}
+.gx-20-row-state{font-size:12px;font-weight:500;color:#9aacca;line-height:1.4}
+.gx-20-row-state.is-late{color:#ff8f8f}
+.gx-20-row-side{
+  display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex:none
+}
+.gx-20-row-side strong{font-size:14px;font-weight:700;letter-spacing:-.2px}
+.gx-20-row-side small{font-size:11px;font-weight:500;color:#9aacca}
+
+/* B3 · Total del periodo + chip "Pagar todo": una sola línea al final de
+ * los grupos. "Pagar todo" selecciona todos los grupos y paga todo junto
+ * en un solo reporte (Luis: $168 + $79 = $247); sin esto el cliente
+ * tendría que hacer dos pagos separados. */
+.gx-20-total-row{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px 16px;border-top:1px solid rgba(255,255,255,.065)
+}
+.gx-20-total-main{display:flex;align-items:baseline;gap:8px;min-width:0}
+.gx-20-total-label{font-size:12px;font-weight:600;color:#9aacca;white-space:nowrap}
+.gx-20-total-amount{font-size:16px;font-weight:700;color:#eaf8ff;letter-spacing:-.2px;white-space:nowrap}
+.gx-20-todo-chip{
+  position:relative;overflow:hidden;flex:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  min-height:32px;padding:6px 14px;border-radius:999px;cursor:pointer;
+  border:1px solid rgba(0,242,254,.35);background:rgba(0,242,254,.08);
+  color:#8fefff;font-family:inherit;font-size:12px;font-weight:700;
+  transition:transform .18s ease,background .2s ease,color .2s ease,border-color .2s ease
+}
+.gx-20-todo-chip>span:not(.gx-20-ripple){position:relative;z-index:1}
+.gx-20-todo-chip.is-active{
+  background:linear-gradient(135deg,#24f0ff,#61dcff);border-color:transparent;color:#031015
+}
+.gx-20-todo-chip:focus-visible{outline:2px solid #00f2fe;outline-offset:2px}
+.gx-20-todo-chip:active{transform:scale(.95)}
+@media(max-width:320px){
+  .gx-20-total-label{font-size:11px}
+  .gx-20-total-amount{font-size:15px}
+  /* B6 · "Pagar todo" es más ancho que "Todo": en angosto se compacta
+   * para que la fila no se desborde. */
+  .gx-20-todo-chip{padding:6px 10px;font-size:11px}
+  .gx-20-total-row{padding-left:12px;padding-right:12px}
+}
+
+/* X UNICA (port 2.0, aclaracion Henry 2026-11-08: una sola jerarquia
+ * de X en todo el Index — mismo tamano, forma redonda, mismo cian).
+ * Las hojas ya eran 34 px con degradado en index.css (lineas 1057 y
+ * 1424); lo que faltaba era el glifo: goxion-modal-headers.css lo
+ * tapa (font-size:0) y dibuja la X con dos barras solidas. Este
+ * override (con `html` delante para ganarle en especificidad, sin
+ * tocar el archivo compartido con Ayuda) devuelve el glifo X
+ * (17 px/800) y apaga las barras. OJO: `gx-payment-v2` vive en el
+ * propio <html> (02-02-inline.js lo pone ahi), asi que el selector
+ * es `html.gx-payment-v2 ...` (con punto, no descendiente):
+ * `html .gx-payment-v2 ...` no casa nunca. El z-index:2 SI hace
+ * falta en la ruta B2: su modal es plano (la X es primer hijo de
+ * .modal-content y el encabezado va despues, asi que el encabezado
+ * — con transform de su animacion — pinta ENCIMA de la X y el clic
+ * no llega; verificado por reproduccion: elementFromPoint devuelve
+ * el encabezado y Playwright no puede clicar la X). En la ruta
+ * global la X vive dentro del encabezado estatico flex y ya era
+ * tocable; el z-index ahi no estorba. Bug preexistente de la ruta
+ * B2, no del espejo: la regla V2 (1424) nunca le puso z-index. */
+html.gx-payment-v2 #payment-modal .close-modal,
+html .gx-bank-close{
+  color:#031015;font-size:17px;font-weight:800;line-height:1;
+  background:linear-gradient(135deg,#24f0ff,#61dcff);
+  box-shadow:0 0 18px rgba(0,242,254,.20);
+  z-index:2;
+}
+html .gx-payment-v2 #payment-modal .close-modal::before,
+html .gx-payment-v2 #payment-modal .close-modal::after,
+html .gx-bank-close::before,
+html .gx-bank-close::after{display:none}
+.gx-20-row{transition:transform .18s ease}
+.gx-20-row:active{transform:scale(.98)}
+.gx-payment-primary>*:not(.gx-20-ripple){position:relative;z-index:1}
+.gx-payment-primary-copy strong{
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%
+}
+.gx-payment-primary.is-sending{pointer-events:none}
+.gx-payment-primary.is-sending .gx-payment-primary-icon{position:relative}
+.gx-payment-primary.is-sending .gx-payment-primary-icon svg{opacity:0}
+.gx-payment-primary.is-sending .gx-payment-primary-icon::after{
+  content:"";position:absolute;top:50%;left:50%;width:21px;height:21px;
+  margin:-10.5px 0 0 -10.5px;border-radius:50%;
+  border:2px solid rgba(255,255,255,.35);border-top-color:#fff;
+  animation:gx-20-spin .7s linear infinite
+}
+.gx-payment-primary.is-sending .gx-payment-primary-arrow{opacity:0}
+@keyframes gx-20-spin{to{transform:rotate(360deg)}}
+
+/* B3 · Ripple (C): nace del punto del toque y se desvanece. Solo
+ * transform/opacity; queda detrás del texto (los hijos llevan z-index:1).
+ * B5 · El ripple DEBE seguir siendo position:absolute (fuera de flujo):
+ * las reglas `>*` de arriba lo volvían relative (misma especificidad,
+ * más tarde en el archivo) y, como hijo en flujo del botón/fila, un
+ * ripple de ~687 px inflaba la fila: la caja de filas medía 719 px en
+ * vez de 73 px y el grupo 914 px en vez de 268 px. Por eso las reglas
+ * `>*` excluyen ahora a .gx-20-ripple con :not().
+ * B6 · El mismo agujero vivía en el chip "Pagar todo": la regla
+ * `.gx-20-todo-chip>span` (0,1,1) gana a `.gx-20-ripple` (0,1,0) y el
+ * ripple (un <span>) quedaba relative dentro del chip en flex: el chip
+ * crecía de 61×32 a ~195×148 y empujaba toda la tarjeta hacia abajo —
+ * la elipse gigante del video 3. Por eso también lleva el :not(). */
+.gx-20-ripple{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:0;
+  background:rgba(255,255,255,.22);transform:scale(0);
+  animation:gx-20-ripple .55s ease-out forwards
+}
+@keyframes gx-20-ripple{to{transform:scale(1);opacity:0}}
+.gx-bank-trigger,.btn-submit-payment{overflow:hidden}
+.gx-bank-trigger>*:not(.gx-20-ripple){position:relative;z-index:1}
+.gx-20-row>*:not(.gx-20-ripple){position:relative;z-index:1}
+.btn-submit-payment>*:not(.gx-20-ripple){position:relative;z-index:1}
+.gx-20-foot{
+  margin:0;padding:4px 18px 18px;
+  font-size:12px;line-height:1.55;color:#9aacca
+}
+.gx-20-foot + .gx-20-foot{padding-top:0}
+.gx-20-note{color:#ffb3b3}
+/* B6 · Nota de prórroga DENTRO del grupo (propuesta §3.6): la fecha
+ * pactada ya es la fecha del grupo, así que la nota no la repite. */
+.gx-20-group-note{
+  margin:0;padding:2px 18px 16px;
+  font-size:12px;line-height:1.55;color:#9aacca
+}
+
+/* B1 · ENERGÍA en el encabezado del grupo próximo: una sola línea de luz
+ * por grupo (no una por fila), cada 2.8 s, con los keyframes oficiales
+ * gx-index-energy. Se pausa con pestaña oculta y se apaga con
+ * prefers-reduced-motion, igual que la energía de las filas.
+ * B4 · El barrido inferior es ahora la ALTERNATIVA (no el defecto): solo
+ * se enciende con la clase gx-20-energy-sweep en <html>; el defecto es
+ * la órbita (§B4). Para volver al barrido: añadir esa clase al <html>. */
+html.gx-20-energy-sweep[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
+  content:"";
+  position:absolute;left:0;bottom:0;height:2px;width:36%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),rgba(0,242,254,.9),transparent);
+  animation:gx-index-energy 2.8s ease-in-out infinite;
+  pointer-events:none
+}
+html.gx-20-energy-sweep.gx-r8-paused .gx-20-group.is-next > .gx-20-summary::after{
+  animation-play-state:paused!important
+}
+@media(prefers-reduced-motion:reduce){
+  html.gx-20-energy-sweep[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::after{
+    animation:none!important
+  }
+  .gx-20-chevron-svg{transition:none}
+  .gx-payment-primary.is-sending .gx-payment-primary-icon::after{animation:none}
+  .gx-20-ripple{display:none}
+  .gx-20-group.is-next > .gx-20-summary::before{animation:none!important}
+}
+
+/* ================================================================
+   B4 · Desglose dentro del grupo + correcciones del video de Henry
+   (Safari físico, 8 nov 15:24) + variante órbita.
+   El morph no se toca (esta sección es solo CSS + adaptador B2).
+   ================================================================ */
+
+/* B4 · DESGLOSE DEL PAGO como sección desaparece en B2 agrupado:
+ * su información ya vive dentro de cada grupo (breakdownHTML del
+ * adaptador). La oficial y el flujo global no se tocan: la clase
+ * gx-20-b2 solo existe con cotización B2 de 2+ fechas. */
+html.gx-20-b2 .scrollable-content > .breakdown-box{display:none}
+
+/* B4 · Desglose dentro del grupo expandido (propuesta §3.4). Solo las
+ * líneas que apliquen; el total es el mismo número del encabezado. */
+.gx-20-breakdown{
+  padding:6px 18px 14px;
+  border-top:1px solid rgba(255,255,255,.065)
+}
+.gx-20-bd-line{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  padding:5px 0;font-size:13px;line-height:1.4
+}
+.gx-20-bd-line > span{color:#9aacca;font-weight:500;white-space:nowrap}
+.gx-20-bd-line > strong{color:#eaf8ff;font-weight:600;letter-spacing:-.2px;white-space:nowrap}
+.gx-20-bd-line.is-discount > span,.gx-20-bd-line.is-discount > strong{color:#00ff9d}
+.gx-20-bd-line.is-surcharge > span,.gx-20-bd-line.is-surcharge > strong{color:#ff8f8f}
+.gx-20-bd-line.is-total{
+  margin-top:4px;padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.12)
+}
+.gx-20-bd-line.is-total > span{color:#eaf2ff;font-weight:700;font-size:13px}
+.gx-20-bd-line.is-total > strong{color:#eaf8ff;font-weight:800;font-size:15px}
+
+/* B4 · BUG 1 (video 5–8 s): a mitad de morph la etiqueta ("A pagar el
+ * 6 nov") se encimaba al importe. Causa medida en el harness: la
+ * etiqueta se disuelve con la curva paired (0.05→0.35) mientras el
+ * importe sube a su fila; a p≈0.23 el importe ya invade la caja de
+ * la etiqueta (solape 680 px²) y la etiqueta aún está al 35%.
+ * Corrección solo-CSS, sin tocar el morph: la etiqueta sube 3 px
+ * y se aprieta su alto (line-height 1), y su opacidad cae al cuadrado
+ * (a 0.35 → 0.12, invisible antes de que el importe la alcance). En
+ * reposo y en compacto se ve igual que antes (opacidad 1 → 1, 0 → 0). */
+html[data-gx-index-morph="r17"] .balance-hero .total-label{
+  top:-3px;
+  line-height:1;
+  opacity:calc(var(--gx-rm-label-opacity)*var(--gx-rm-label-opacity))
+}
+
+/* B5 · BUG 1 (video 2, Safari físico): al tocar una fila, el grupo
+ * abierto quedaba con un hueco enorme vacío y la fila al fondo.
+ * Causa: la animación de altura de B4 (::details-content con
+ * block-size 0→auto + interpolate-size + content-visibility
+ * discreta). Al tocar la fila, el clic reconstruía el DOM
+ * (render()) y el <details> nuevo nacía con esa transición; en
+ * Safari 26 la transición resolvía el "auto" a una altura enorme
+ * (~700 px) y se quedaba ahí — el hueco aparecía ~0.5 s después
+ * del toque y solo se curaba al volver arriba. El harness de B4
+ * ya había medido 0 solapes reales (el cambio brusco se leía como
+ * encimamiento), así que la animación arreglaba algo que no era
+ * bug. Se quita: el toggle vuelve a ser instantáneo (el
+ * <details> nativo) y solo queda overflow:clip, que sí evita que
+ * las filas se pinten fuera de la caja del grupo. */
+.gx-20-group::details-content{
+  overflow:clip;
+  block-size:0;
+}
+.gx-20-group[open]::details-content{
+  block-size:auto;
+}
+
+/* B4 · BUG 3 (video 20–28 s): el "Total de noviembre" se leía doble.
+ * Dos causas: (a) el desglose global seguía pintando Subtotal $98.00
+ * y Total pendiente $92.12 debajo del calendario (eliminado arriba);
+ * (b) con el cristal al 45% una mancha de lava cian brillante detrás
+ * de la tarjeta se leía como texto duplicado sobre el total del mes.
+ * La tarjeta del calendario sube su fondo a .78: el cristal se
+ * conserva (borde, sombra, blur 18px) y el texto ya no compite con
+ * la lava que pasa por detrás. */
+.gx-20-card{
+  background:rgba(8,8,12,.78)
+}
+
+/* B5 · REVERSIÓN DE LA FLECHA (corrección de Henry 2026-11-08):
+ * la flecha que GIRA 180° con resorte (B2/B3) le gustaba MÁS que
+ * el flip vertical de B4. El flip NO era un bug: fue una
+ * "corrección" de algo que no era error. Se elimina el override
+ * del flip y vuelven a mandar las reglas base de arriba
+ * (rotate 0→180°, resorte .44 s, cian→morado). El momento en que
+ * pasa por "<" a mitad del giro es aceptable; no se "arregla". */
+
+/* B4 · VARIANTE ÓRBITA (idea de Henry): la línea de luz ya no pasa
+ * solo por debajo del encabezado del grupo próximo/vencido; un brillo
+ * fino ORBITA alrededor de todo el borde del encabezado (un arco de
+ * ~90° que da la vuelta completa cada 2.8 s, la misma cadencia del
+ * barrido). CSS puro: conic-gradient que gira vía @property, recortado
+ * a solo el borde con máscara. Solo el encabezado del grupo próximo
+ * (is-next), no toda la tarjeta, para no saturar. Sin @property el
+ * arco queda fijo (visible, sin movimiento): no se rompe nada.
+ * ALTERNATIVA: el barrido inferior sigue disponible añadiendo la
+ * clase gx-20-energy-sweep al <html>; con esa clase la órbita se
+ * apaga y vuelve el barrido. */
+@property --gx-20-orbit{syntax:"<angle>";initial-value:0deg;inherits:false}
+@keyframes gx-20-orbit{to{--gx-20-orbit:360deg}}
+html:not(.gx-20-energy-sweep)[data-gx-index-morph="r17"] .gx-20-group.is-next > .gx-20-summary::before{
+  content:"";
+  position:absolute;inset:0;border-radius:4px;pointer-events:none;
+  padding:1.5px;
+  background:conic-gradient(from var(--gx-20-orbit,0deg),
+    transparent 0deg,transparent 262deg,
+    rgba(0,242,254,.9) 312deg,rgba(255,255,255,.95) 340deg,
+    transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  -webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+  mask-composite:exclude;
+  animation:gx-20-orbit 2.8s linear infinite;
+}
+html.gx-r8-paused .gx-20-group.is-next > .gx-20-summary::before{
+  animation-play-state:paused!important
+}
+
+/* ============ B5 · TOQUES, LEALTAD Y TARJETAS ============ */
+
+/* B5 · Sin doble-toque zoom ni toques perdidos en iOS: todos los
+ * elementos táctiles de la ruta B2 responden al primer toque.
+ * touch-action:manipulation quita la espera del doble-toque y la
+ * ambigüedad toque/desplazamiento. Sin maximum-scale en el
+ * viewport: el zoom de accesibilidad sigue disponible. */
+html.gx-20-b2 button,
+html.gx-20-b2 summary,
+html.gx-20-b2 a,
+html.gx-20-b2 .gx-wallet-card{touch-action:manipulation}
+
+/* B5 · LEALTAD EN UN SOLO SITIO, VISTOSA (propuesta §3.5). La joya
+ * es el único sitio donde vive la lealtad: nunca en filas ni
+ * servicios. Mismo significado (estrella = racha viva, corazón
+ * roto = rota), pero el cambio de estado SE VE. Todo CSS puro +
+ * SVG; con prefers-reduced-motion el cambio es instantáneo pero
+ * con el mismo significado. */
+.gx-20-loyalty-best{
+  margin:2px 0 0;font-size:10px;font-weight:700;color:#f0cc86
+}
+/* Llenado: el segmento nuevo se ilumina en cian y se asienta en el
+ * color del nivel (el adaptador quita .is-new a los .95 s). */
+.gx-index-loyalty-seg.is-new{
+  stroke:#00f2fe;
+  animation:gx-20-seg-fill .9s ease-out
+}
+@keyframes gx-20-seg-fill{
+  0%{opacity:0;filter:drop-shadow(0 0 8px rgba(0,242,254,.9))}
+  55%{opacity:1;filter:drop-shadow(0 0 10px rgba(0,242,254,.7))}
+  100%{opacity:1;filter:drop-shadow(0 0 2px rgba(189,158,241,.3))}
+}
+/* Relleno al volver de una racha rota: el anillo se enciende
+ * segmento a segmento. */
+.gx-20-loyalty-refill .gx-index-loyalty-seg{animation:gx-20-seg-refill .5s ease-out both}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(1){animation-delay:0ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(2){animation-delay:70ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(3){animation-delay:140ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(4){animation-delay:210ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(5){animation-delay:280ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(6){animation-delay:350ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(7){animation-delay:420ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(8){animation-delay:490ms}
+.gx-20-loyalty-refill .gx-index-loyalty-seg:nth-child(9){animation-delay:560ms}
+@keyframes gx-20-seg-refill{from{opacity:0}to{opacity:1}}
+/* Celebración de nivel: pulso dorado puntual justo después del
+ * pago acreditado (en demo: al enviar el comprobante; en real:
+ * cuando sube el conteo observado), no al abrir la app. */
+.gx-20-loyalty-celebrate .gx-index-loyalty-mark{animation:gx-20-gold-pulse 1.4s ease-out}
+@keyframes gx-20-gold-pulse{
+  0%{filter:drop-shadow(0 0 0 rgba(240,204,134,0))}
+  25%{filter:drop-shadow(0 0 18px rgba(240,204,134,.85))}
+  100%{filter:drop-shadow(0 0 0 rgba(240,204,134,0))}
+}
+.gx-20-loyalty-celebrate .gx-index-loyalty-star{animation:gx-20-star-pop 1.4s ease-out}
+@keyframes gx-20-star-pop{0%{transform:scale(1)}30%{transform:scale(1.35)}100%{transform:scale(1)}}
+/* Ruptura: los segmentos se vacían con fundido, el anillo pasa a
+ * gris y la estrella se rompe antes de que aparezca el corazón
+ * roto. .gx-20-loyalty-break es el ASPECTO roto (persiste mientras
+ * la racha está rota); .gx-20-loyalty-break-anim es solo la
+ * animación de la transición (una vez). */
+.gx-20-loyalty-break .gx-index-loyalty-seg{opacity:.35;transition:opacity .5s ease}
+.gx-20-loyalty-break .gx-index-loyalty-mark::before{
+  background:radial-gradient(circle,rgba(148,163,184,.16) 4%,rgba(129,89,220,.05) 42%,transparent 73%)
+}
+.gx-20-loyalty-break-anim .gx-index-loyalty-star{animation:gx-20-star-break .45s ease-in forwards}
+@keyframes gx-20-star-break{
+  0%{transform:scale(1) rotate(0);opacity:1}
+  100%{transform:scale(1.6) rotate(20deg);opacity:0}
+}
+.gx-20-loyalty-break-anim .gx-index-loyalty-heart{animation:gx-20-heart-break .6s cubic-bezier(.22,1.35,.34,1)}
+@keyframes gx-20-heart-break{
+  0%{transform:scale(.4) rotate(-14deg);opacity:0}
+  60%{transform:scale(1.12) rotate(3deg);opacity:1}
+  100%{transform:scale(1) rotate(0);opacity:1}
+}
+@media (prefers-reduced-motion:reduce){
+  .gx-index-loyalty-seg.is-new,
+  .gx-20-loyalty-refill .gx-index-loyalty-seg,
+  .gx-20-loyalty-celebrate .gx-index-loyalty-mark,
+  .gx-20-loyalty-celebrate .gx-index-loyalty-star,
+  .gx-20-loyalty-break-anim .gx-index-loyalty-star,
+  .gx-20-loyalty-break-anim .gx-index-loyalty-heart{animation:none!important}
+  .gx-20-loyalty-break .gx-index-loyalty-seg{transition:none}
+}
+
+/* B6 · TARJETAS PLANAS Y FIELES A LAS CAPTURAS (pedido de Henry):
+ * se quita todo lo del B5 (chip EMV dorado, relieve, holograma,
+ * profundidad): las tarjetas reales de sus capturas de Apple Wallet
+ * no tienen chip y son planas — se reconocen por el diseño, no por
+ * el relieve. Solo CSS; el 02-02-inline.js oficial las pinta y no
+ * se toca salvo el icono de copiar: ni datos, ni flip, ni CLABE. Los colores son
+ * los ya registrados en GOXION (Nu morado, Revolut azul oscuro);
+ * el azul vivo de la captura de Revolut NO se usa. */
+/* Sin orbe ni brillo: frente plano y mate. (En index.css oficial
+ * no existe ::before en el frente: el chip EMV dorado era solo
+ * del espejo B5 y ya no existe en ningun lado.) */
+.gx-wallet-orb{display:none}
+.gx-wallet-front::after{display:none}
+/* Plano: marca y número sin sombra de grabado. */
+.gx-wallet-brand-name{text-shadow:none}
+.gx-wallet-front-bottom strong{
+  text-shadow:none;letter-spacing:.5px;font-size:15px}
+/* La marca de red (Mastercard) va abajo a la derecha, junto al
+ * número; arriba a la derecha va la etiqueta del tipo de tarjeta.
+ * La fila de marca es position:relative en el oficial, así que
+ * sería el bloque contenedor del acento y bottom:15px caería
+ * arriba (la fila mide ~46 px): por eso la fila pasa a static en
+ * el port y el bloque contenedor es el frente (inset:0), igual
+ * que la fila del número (bottom:15px). */
+.gx-wallet-brand-row{position:static}
+/* DETALLES FINALES · LOGO MASTERCARD REAL: DOS círculos solapados,
+ * rojo #EB001B a la izquierda y amarillo #F79E1B a la derecha; el
+ * solape queda en tono intermedio (naranja) con mix-blend-mode:
+ * screen sobre el rojo. El B6 tenía TRES círculos: los dos pseudos
+ * más la sombra (-12 px) del ::after, que pintaba un tercer bulto
+ * entre ambos. Sin sombra, con los colores de marca y con los
+ * centros a 18 px (solape de 10 px): 46 px de ancho total.
+ * OJO: las reglas viejas de la tarjeta usan [data-bank="nu"] /
+ * [data-bank="revolut"] (especificidad 0,3,x) con los colores
+ * viejos #ff1738/#ff9f19 y la sombra del tercer círculo; una regla
+ * genérica (0,2,x) PIERDE contra ellas aunque venga después. Por
+ * eso estas cuatro van con `html.gx-payment-v2` delante (la clase
+ * vive en <html> en todo el Index): 0,3,x, y ganan por orden. */
+html.gx-payment-v2 .gx-wallet-card .gx-wallet-card-accent{
+  position:absolute;right:16px;bottom:15px;z-index:2;
+  width:46px;height:28px;margin:0;border:0;border-radius:0;
+  background:transparent;box-shadow:none;
+}
+html.gx-payment-v2 .gx-wallet-card .gx-wallet-card-accent::before,
+html.gx-payment-v2 .gx-wallet-card .gx-wallet-card-accent::after{
+  content:"";position:absolute;top:0;width:28px;height:28px;
+  border-radius:50%;
+}
+html.gx-payment-v2 .gx-wallet-card .gx-wallet-card-accent::before{left:0;background:#EB001B}
+html.gx-payment-v2 .gx-wallet-card .gx-wallet-card-accent::after{
+  right:0;background:#F79E1B;mix-blend-mode:screen;box-shadow:none;
+}
+/* Nu: "nu" minúscula arriba a la izquierda (como la tarjeta real),
+ * sin subtítulo de institución; "débito" + contactless arriba a la
+ * derecha. La fila es static, así que el ::after se posiciona
+ * contra el frente (padding 16px): right:16px y top:18px. */
+.gx-wallet-card[data-bank="nu"] .gx-wallet-brand-name{
+  text-transform:lowercase;letter-spacing:-1.7px;
+}
+.gx-wallet-brand-row small{display:none}
+.gx-wallet-card[data-bank="nu"] .gx-wallet-brand-row::after{
+  content:"débito";position:absolute;right:16px;top:18px;
+  padding-right:21px;font-size:12px;font-weight:600;
+  color:rgba(255,255,255,.85);letter-spacing:.2px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 9a7 7 0 0 1 0 6'/%3E%3Cpath d='M10.5 6.5a11 11 0 0 1 0 11'/%3E%3Cpath d='M14 4a15 15 0 0 1 0 16'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right center;
+  background-size:15px 15px;
+}
+/* Revolut: marca como está y "VIRTUAL" arriba a la derecha. El
+ * color es el ya registrado en GOXION (azul oscuro), NO el azul
+ * de la captura de Apple Wallet. */
+.gx-wallet-card[data-bank="revolut"] .gx-wallet-brand-row::after{
+  content:"VIRTUAL";position:absolute;right:16px;top:19px;
+  font-size:11px;font-weight:700;letter-spacing:1.6px;
+  color:rgba(255,255,255,.75);
+}
+/* Abajo solo queda el número: sin "Cuenta de transferencia" ni
+ * "Toca para ver datos" (el flip sigue siendo tocar la tarjeta). */
+.gx-wallet-front-bottom span,
+.gx-wallet-front-bottom small{display:none}
+/* Reverso: mismo cuerpo sólido (B5), para que el flip no se sienta hueco. */
+.gx-wallet-back{
+  background:
+    radial-gradient(circle at 10% 0%,rgba(0,242,254,.10),transparent 33%),
+    radial-gradient(circle at 94% 8%,rgba(124,77,255,.14),transparent 36%),
+    linear-gradient(145deg,rgba(20,22,32,.92),rgba(10,11,18,.94));
+}
+.gx-wallet-card .gx-bank-clabe{
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.35),inset 0 -1px 0 rgba(255,255,255,.05);
+}
+/* Icono de copiar (Lucide): el rectángulo frontal es de 14×14
+ * (perímetro 56); el dasharray oficial (40) le dejaría un hueco
+ * en el trazo, así que aquí es 56. El morphing a check sigue
+ * siendo el oficial. */
+.gx-copy-front{stroke-dasharray:56}

@@ -1,3 +1,26 @@
+/* GOXION · Index oficial · adaptador B2 (Index 2.0, port 2026-11-08).
+ * PORT del espejo preview/index-2.0/index-2.0-adapter.js (B0-B6 + detalles
+ * finales), aprobado por Henry y fusionado a main como PR #194. El espejo
+ * NO se toca: este archivo es la copia oficial que vive en la ruta B2
+ * (preview/integracion-b2/index.html), a donde Ayuda F5 envia a los
+ * clientes multifecha reales. La oficial index.html NO carga este
+ * adaptador (ni b2-bridge.js): el flujo global de una sola fecha no
+ * tiene cotizacion B2 y conserva su aspecto actual.
+ * Reutiliza el motor financiero y el puente demo/real (b2-bridge.js): los
+ * importes, la mora y la lealtad vienen del servidor en centavos; aquí solo
+ * se AGRUPA por fecha efectiva para pintar. Nada se calcula en JS.
+ * ALCANCE (aclaracion de Henry 2026-11-09): la distribucion 2.0 (grupos
+ * por fecha, "Pagar todo", "Total del periodo", calendario) aplica solo
+ * cuando la cotizacion trae DOS O MAS fechas efectivas distintas (o
+ * algun cargo sin fecha, caso borde "Por confirmar"). Con una sola
+ * fecha no hay calendario: se conservan SERVICIOS ACTIVOS y
+ * DESGLOSE globales, sin calendario; el adaptador sigue activo (guarda
+ * de saldo sin verificar, hero, pildora, seguimiento del comprobante,
+ * lealtad, botones A+C y conteo), porque sin el la ruta B2 perderia su
+ * proteccion de reporte por cargo. Las piezas compartidas (X unica,
+ * tarjetas planas, Mastercard real, icono de copiar) viven en
+ * assets/css/index.css y en 02-02-inline.js y llegan tambien al flujo
+ * global. */
 (function(){
  "use strict";
  const store=window.GOXION_B2_PREVIEW;
@@ -12,8 +35,13 @@
  };
  const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({
   "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
- let mode="proximo",selected=null,expanded=false,lastAnchor=null;
- let installed=false;
+ /* B1 · Selección por grupo (decisión de Henry): tocar un grupo lo
+  * selecciona entero. mode "grupo" = el grupo seleccionado (o el próximo
+  * si no hay selección); "todo" existe para el chip de B3. */
+ let mode="grupo",selectedGroup=null,installed=false,lastAnchor=null,
+  lastNextFecha="",loyaltyLostApplied=false,lastLoyalty=null;
+ const reduceMotion=()=>window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+ const openGroups=new Set();
  function rows(){
   return Array.isArray(store.quote?.cargos)?store.quote.cargos.map((x,i)=>({
    cargo_id:String(x.cargo_id||""),
@@ -48,130 +76,185 @@
   const due=list.filter(x=>effectiveDue(x)===fecha);
   return {cargos:due,centavos:due.reduce((n,x)=>n+x.total_centavos,0),fecha};
  }
+ /* B1 · Grupos por fecha efectiva: un grupo por fecha, con sus cargos
+  * dentro. El total del grupo suma solo lo pendiente (un cargo pagado no
+  * aporta importe, propuesta §3.4). */
+ function groups(){
+  const out=[];
+  for(const row of rows()){
+   const fecha=effectiveDue(row);
+   let g=out.find(x=>x.fecha===fecha);
+   if(!g){g={fecha,cargos:[],centavos:0};out.push(g);}
+   g.cargos.push(row);
+   if(!row.pagado)g.centavos+=row.total_centavos;
+  }
+  return out;
+ }
  function choice(){
   const list=pending();
-  if(!list.length)return {cargos:[],centavos:0};
-  if(mode==="todo")return {cargos:list,centavos:list.reduce((s,x)=>s+x.total_centavos,0)};
-  const specific=list.find(x=>x.cargo_id===selected);
-  if(specific)return {cargos:[specific],centavos:specific.total_centavos};
+  if(!list.length)return {cargos:[],centavos:0,fecha:"",todo:false};
+  if(mode==="todo")return {cargos:list,centavos:list.reduce((s,x)=>s+x.total_centavos,0),fecha:"",todo:true};
+  const fecha=selectedGroup||nextPayment().fecha;
+  const items=list.filter(x=>effectiveDue(x)===fecha);
+  if(items.length)return {cargos:items,centavos:items.reduce((s,x)=>s+x.total_centavos,0),fecha,todo:false};
   const due=nextPayment();
-  return {cargos:due.cargos,centavos:due.centavos};
+  return {cargos:due.cargos,centavos:due.centavos,fecha:due.fecha,todo:false};
  }
-
- // Desglose financiero B2: parte SIEMPRE de los cargos seleccionados.
- // Las cantidades del servidor están en centavos; el residuo concilia
- // promociones, créditos u otros movimientos sin inventar su concepto.
- function breakdown(){
-  const selection=choice(),items=selection.cargos;
-  if(!items.length)return null;
-  const sum=key=>items.reduce((acc,row)=>acc+Math.max(0,Number(row[key]||0)),0);
-  const subtotal=sum("base_centavos");
-  const lealtad=sum("descuento_centavos");
-  const comerciales=sum("descuento_comercial_centavos");
-  const mora=sum("mora_centavos");
-  const abonos=sum("abono_pagado_centavos");
-  const detalles=new Map();
-  for(const item of items)for(const benefit of item.beneficios_comerciales){
-    const key=String(benefit.fuente)+":"+String(benefit.referencia_id);
-    const previous=detalles.get(key)||{concepto:String(benefit.concepto||"Beneficio GOXION"),monto:0};
-    previous.monto+=Number(benefit.monto_centavos||0);
-    detalles.set(key,previous);
-  }
-  const ajustes=selection.centavos-(subtotal-lealtad-comerciales+mora-abonos);
-  return {subtotal,lealtad,comerciales,detalles:[...detalles.values()],
-    mora,abonos,ajustes,total:selection.centavos,
-    titulo:mode==="todo"?"Todos los servicios":
-      items.length>1?items.length+" perfiles · "+date(effectiveDue(items[0])):title(items[0])};
+ /* B1 · Estado del grupo, en palabras (propuesta §3.4). La fecha vive solo
+  * en el encabezado; la prórroga aprobada define la fecha efectiva del
+  * grupo y se nombra una sola vez. */
+ function daysUntil(fecha){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(String(fecha||"")))return null;
+  const now=new Date();
+  const today=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());
+  return Math.round((Date.parse(fecha+"T00:00:00Z")-today)/86400000);
  }
- function updateBreakdown(){
-  const anchor=document.getElementById("b2-calendar");
-  if(!anchor)return;
-  let panel=document.querySelector(".scrollable-content .breakdown-box");
-  if(!panel){
-    panel=document.createElement("section");
-    panel.className="glass-card breakdown-box";
-  }
-  panel.classList.add("gx-b2-breakdown");
-  if(panel.previousElementSibling!==anchor)
-    anchor.insertAdjacentElement("afterend",panel);
-  const b=breakdown();
-  if(!b){
-    panel.hidden=true;
-    return;
-  }
-  panel.hidden=false;
-  panel.style.removeProperty("display");
-  const line=(description,value,type="")=>
-    '<div class="breakdown-line gx-b2-breakdown-line '+type+'">'+
-      '<span>'+esc(description)+'</span><strong>'+esc(value)+'</strong></div>';
-  panel.innerHTML=
-    '<div class="gx-b2-breakdown-caption">DESGLOSE DEL PAGO</div>'+
-    '<div class="gx-b2-breakdown-context">'+esc(b.titulo)+'</div>'+
-    line("Subtotal",money(b.subtotal))+
-    (b.lealtad>0?line("Descuento de lealtad","−"+money(b.lealtad),"discount-line"):"")+
-    (b.detalles.length?b.detalles.map(x=>line(x.concepto,"−"+money(x.monto),
-       "discount-line")).join(""):
-      b.comerciales>0?line("Beneficios comerciales aplicados","−"+money(b.comerciales),
-        "discount-line"):"")+
-    (b.abonos>0?line("Pagos parciales aprobados","−"+money(b.abonos),"discount-line"):"")+
-    (b.mora>0?line("Mora acumulada","+"+money(b.mora),"surcharge-line"):"")+
-    (b.ajustes!==0?line("Otros ajustes al saldo",
-      (b.ajustes<0?"−":"+")+money(Math.abs(b.ajustes)),
-      b.ajustes<0?"discount-line":"surcharge-line"):"")+
-    '<div class="gx-b2-breakdown-final">'+
-      '<span>Importe seleccionado</span><strong id="b2-selected-total">'+money(b.total)+'</strong>'+
-    '</div>'+
-    (pending().reduce((sum,x)=>sum+x.total_centavos,0)!==b.total?
-      line("Total pendiente del período",
-        money(pending().reduce((sum,x)=>sum+x.total_centavos,0))):"");
+ function groupState(g){
+  if(g.cargos.length&&g.cargos.every(x=>x.pagado))return "Pagado";
+  const prorrogado=g.cargos.find(x=>x.prorroga_estado==="aprobada"&&
+    x.fecha_pactada&&x.mora_centavos<=0);
+  if(prorrogado)return "Prórroga hasta "+date(prorrogado.fecha_pactada);
+  if(g.cargos.some(x=>x.mora_centavos>0))return "Vencido";
+  const days=daysUntil(g.fecha);
+  if(days===null)return "Por confirmar";
+  if(days<0)return "Vencido";
+  if(days===0)return "Vence hoy";
+  if(days===1)return "Vence mañana";
+  return "Vence en "+days+" días";
+ }
+ /* B1 · Estado de la fila, SOLO si difiere del grupo. Sin fecha en las
+  * filas y sin "Lealtad sin descuento": la lealtad es un dato de la cuenta,
+  * vive solo en su módulo (y, si descuenta, como línea dentro del grupo en B4). */
+ function rowState(row){
+  if(row.pagado)return {text:"Pagado",late:false};
+  if(row.mora_centavos>0)return {text:"Mora "+money(row.mora_centavos),late:true};
+  if(row.abono_pagado_centavos>0)return {text:"Abonado "+money(row.abono_pagado_centavos),late:false};
+  return null;
  }
  function title(row){return row.servicio+" · Perfil "+row.ordinal}
- function status(row){
-  if(row.pagado)return "Liquidado";
-  if(row.mora_centavos>0)return "Mora "+money(row.mora_centavos);
-  if(row.prorroga_estado==="aprobada")
-    return "Prórroga "+date(row.fecha_pactada)+(row.mora_centavos>0?" · incumplida":" · protegida");
-  if(row.abono_pagado_centavos>0)return "Abonado "+money(row.abono_pagado_centavos);
-  return "Lealtad "+(row.descuento_centavos>0?"aplicada":"sin descuento");
+ /* B4 · Desglose DENTRO del grupo (propuesta §3.4): Subtotal, Lealtad
+  * −$, Mora +$ y Total del grupo. Solo las líneas que apliquen; el
+  * total es el mismo número del encabezado (se explica, no se duplica
+  * en otra sección). Los importes vienen de la cotización en centavos;
+  * aquí solo se suman. Un cargo pagado no aporta: el desglose cubre
+  * solo lo pendiente del grupo. Con abono parcial hace falta la línea
+  * "Abonado −$" para que las cuentas cuadren (Subtotal − Lealtad −
+  * Abonado + Mora = Total); sin ella el total no sumaría. */
+ function breakdownHTML(g){
+  const pend=g.cargos.filter(x=>!x.pagado&&x.total_centavos>0);
+  if(!pend.length)return "";
+  const sum=f=>pend.reduce((s,x)=>s+f(x),0);
+  const subtotal=sum(x=>x.base_centavos),lealtad=sum(x=>x.descuento_centavos),
+   comercial=sum(x=>x.descuento_comercial_centavos),
+   abonado=sum(x=>x.abono_pagado_centavos),mora=sum(x=>x.mora_centavos);
+  const line=(label,shown,cls)=>'<div class="gx-20-bd-line'+(cls?" "+cls:"")+
+   '"><span>'+label+'</span><strong>'+shown+'</strong></div>';
+  let out='<div class="gx-20-breakdown">'+line("Subtotal",money(subtotal));
+  if(lealtad>0)out+=line("Lealtad","−"+money(lealtad),"is-discount");
+  if(comercial>0)out+=line("Descuento","−"+money(comercial),"is-discount");
+  if(abonado>0)out+=line("Abonado","−"+money(abonado),"is-discount");
+  if(mora>0)out+=line("Mora","+"+money(mora),"is-surcharge");
+  out+=line("Total del grupo",money(g.centavos),"is-total")+"</div>";
+  return out;
  }
- function updateServiceMarker(){
-  const items=Array.from(document.querySelectorAll(".services-container .service-item"));
-  for(const item of items)item.querySelector(".gx-b2-service-flag")?.remove();
-  const due=pending()[0];
-  if(!due)return;
-  const normal=x=>String(x||"").toLocaleLowerCase("es")
-    .normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
-  const target=normal(due.servicio);
-  if(!target || target==="servicio contratado")return;
-  // Sólo identificar si hay coincidencia inequívoca con el contrato activo.
-  const matches=items.filter(item=>normal(item.querySelector(".service-name")?.textContent)
-    .includes(target));
-  if(matches.length!==1)return;
-  const label=document.createElement("small");
-  label.className="gx-b2-service-flag";
-  label.textContent=due.mora_centavos>0?
-    "VENCIDO · Perfil "+due.ordinal:"PRÓXIMO A VENCER · Perfil "+due.ordinal+" · "+date(due.vence);
-  label.classList.toggle("is-late",due.mora_centavos>0);
-  matches[0].querySelector(".service-name")?.appendChild(label);
+ /* B2 · Estado de la píldora del hero, SOLO relativo y sin fecha: la fecha
+  * vive en el encabezado del grupo próximo. "Vence en 2 días" responde
+  * cuándo; "8 nov" ya está una sola vez en el grupo. */
+ function heroPillState(next){
+  if(!next.cargos.length)return {text:"✅ Servicios al corriente",cls:"badge-paid"};
+  if(next.cargos.some(x=>x.mora_centavos>0))return {text:"🚨 Servicio vencido",cls:"badge-overdue"};
+  if(next.cargos.some(x=>x.prorroga_estado==="aprobada"&&x.fecha_pactada&&x.mora_centavos<=0))
+   return {text:"⏳ En prórroga",cls:"badge-ok"};
+  const days=daysUntil(next.fecha);
+  if(days===null)return {text:"⏳ Por confirmar",cls:"badge-ok"};
+  if(days<0)return {text:"🚨 Servicio vencido",cls:"badge-overdue"};
+  if(days===0)return {text:"⏳ Vence hoy",cls:"badge-ok"};
+  if(days===1)return {text:"⏳ Vence mañana",cls:"badge-ok"};
+  return {text:"⏳ Vence en "+days+" días",cls:"badge-ok"};
  }
- function updateHeader(){
+ /* DETALLES FINALES · CONTEO AL CAMBIAR DE SELECCIÓN. El morph
+  * oficial solo cuenta al cargar y cuando la página está arriba
+  * (scrollY===0): al tocar "Pagar todo" desplazado, el importe
+  * cambiaba de golpe. Aquí el importe grande CUENTA desde el valor
+  * anterior hasta el nuevo con la misma animación del conteo
+  * oficial (700 ms, ease-out cúbico, centavos exactos, formato
+  * $0.00). Arriba NO se cuenta aquí: se pone el valor final y el
+  * morph lo cuenta solo (si se contara en los dos sitios, el
+  * importe contaría dos veces). Con reduced-motion, cambio
+  * instantáneo. Si el usuario desplaza a mitad de conteo, se
+  * cancela y queda el valor exacto, igual que el morph. La barra
+  * compacta no se toca: es el mismo nodo .total-amount, el morph
+  * lo sigue como hoy. */
+ let heroCountRaf=0,heroCountTo=0,heroCountShown=null;
+ function parseAmountCents(text){
+  const m=String(text||"").replace(/[^0-9.]/g,"");
+  if(!m)return null;
+  const v=Math.round(parseFloat(m)*100);
+  return Number.isFinite(v)?v:null;
+ }
+ function cancelHeroCount(settle){
+  if(!heroCountRaf)return;
+  cancelAnimationFrame(heroCountRaf);heroCountRaf=0;
+  if(settle){
+   const amount=document.querySelector(".balance-hero .total-amount");
+   if(amount)amount.textContent=money(heroCountTo);
+   heroCountShown=heroCountTo;
+  }
+ }
+ function animateHeroAmount(amount,from,to){
+  cancelHeroCount(false);
+  heroCountTo=to;heroCountShown=from;
+  if(reduceMotion()||from===to){amount.textContent=money(to);heroCountShown=to;return;}
+  const t0=performance.now(),dur=700;
+  const step=now=>{
+   const t=Math.min(1,Math.max(0,(now-t0)/dur));
+   const eased=1-Math.pow(1-t,3);
+   const cents=Math.round(from+(to-from)*eased);
+   heroCountShown=cents;
+   if(amount.isConnected)amount.textContent=money(cents);
+   if(t<1){heroCountRaf=requestAnimationFrame(step);}
+   else{heroCountRaf=0;heroCountShown=to;if(amount.isConnected)amount.textContent=money(to);}
+  };
+  heroCountRaf=requestAnimationFrame(step);
+ }
+ function updateHeader(animate){
   const quote=store.quote;
   if(!quote)return;
-  const next=nextPayment(),due=next.cargos[0];
+  const next=nextPayment(),sel=choice();
   const label=document.querySelector(".balance-hero .total-label");
   const amount=document.querySelector(".balance-hero .total-amount");
   const badge=document.querySelector(".balance-hero .time-badge");
-  if(label)label.textContent=due?"Próximo pago":"Saldo pendiente";
-  if(amount)amount.textContent=money(next.centavos);
+  /* B6 · El hero ES lo que se va a pagar y sigue a la selección: el
+   * grupo próximo por defecto ("A pagar el 6 nov · $46.06"),
+   * "A pagar todo el periodo" con pagar-todo, y la fecha y el
+   * importe del grupo elegido al tocar otro grupo. Sin fecha no se
+   * inventa una ("Saldo pendiente"); sin pendientes, "Sin pagos
+   * pendientes". La píldora sigue al grupo seleccionado (en "todo",
+   * al más próximo) y, si hay comprobante en revisión, dice
+   * "Pago en revisión" en vez del estado del vencimiento. */
+  if(label)label.textContent=sel.todo?"A pagar todo el periodo"
+   :sel.cargos.length&&sel.fecha?"A pagar el "+date(sel.fecha)
+   :sel.cargos.length?"Saldo pendiente":"Sin pagos pendientes";
+  if(amount){
+   if(!animate){cancelHeroCount(false);amount.textContent=money(sel.centavos);heroCountShown=sel.centavos;}
+   else{
+    const from=(heroCountShown!==null?heroCountShown:parseAmountCents(amount.textContent));
+    if(from===null||from===sel.centavos||window.scrollY===0){
+     /* Sin cambio, sin valor previo, o arriba: valor exacto y el
+      * morph cuenta solo si toca (su observador ve el cambio). */
+     cancelHeroCount(false);amount.textContent=money(sel.centavos);heroCountShown=sel.centavos;
+    }else animateHeroAmount(amount,from,sel.centavos);
+   }
+  }
   if(badge){
-   // Reutilizar los símbolos del estado de cuenta oficial, no sustituirlos por etiquetas genéricas.
-   badge.textContent=due?(due.mora_centavos>0?"🚨 Servicio vencido · "+date(due.vence):"⏳ Próximo pago · "+date(next.fecha)):"✅ Servicios al corriente";
-   badge.className="time-badge "+(due?.mora_centavos>0?"badge-overdue":due?"badge-ok":"badge-paid");
+   const pill=quote.comprobante_en_revision
+    ?{text:"⏳ Pago en revisión",cls:"badge-review"}
+    :heroPillState(sel.todo?next:sel);
+   badge.textContent=pill.text;
+   badge.className="time-badge "+pill.cls;
   }
   const period=document.querySelector(".card-info .info-block.full .value");
   if(period){
-    // Conservar la fila ORIGINAL "Periodo facturado" y su jerarquía:
-    // sólo cambian los valores, no el componente ni sus estilos.
     const value=quote.periodo||"";
     const month=/^\d{4}-\d{2}/.test(value)
       ?new Intl.DateTimeFormat("es-MX",{month:"long",year:"numeric",timeZone:"UTC"})
@@ -179,75 +262,174 @@
       :"Período vigente";
     const dueDates=new Set((quote.cargos||[]).map(x=>x.vence).filter(Boolean)).size;
     const dueLabel=dueDates===1?"1 fecha de pago":dueDates+" fechas de pago";
-    const label=period.firstElementChild;
+    const labelEl=period.firstElementChild;
     const desired=month.charAt(0).toUpperCase()+month.slice(1);
     if(period.firstChild?.nodeType===3&&period.firstChild.textContent!==desired+" ")
       period.firstChild.textContent=desired+" ";
-    if(label&&label.textContent!==dueLabel)
-      label.textContent=dueLabel;
+    if(labelEl&&labelEl.textContent!==dueLabel)
+      labelEl.textContent=dueLabel;
   }
   const oldOverdue=document.querySelector(".overdue-incentive-box");
   if(oldOverdue)oldOverdue.style.display="none";
-  /* R17-completar (b) · lealtad perdida B2 sobre la joya nueva
-   * (.gx-index-loyalty): el render global ya pinta la joya con
-   * los datos del motor global; la cotización B2 puede saber
-   * antes que se perdió la lealtad (lealtad_global_perdida).
-   * Solo se aplica la variante "perdida" cuando la bandera B2
-   * está activa; si no, manda lo que pintó el render global. */
+  /* Lealtad perdida B2 sobre la joya nueva (.gx-index-loyalty): el render
+   * global ya pinta la joya con los datos del motor global; la cotización
+   * B2 puede saber antes que se perdió la lealtad (lealtad_global_perdida).
+   * Solo se aplica la variante "perdida" cuando la bandera B2 está activa. */
   const loyaltyPanel=document.querySelector(".loyalty-badge.gx-index-loyalty");
-  if(loyaltyPanel)setLoyaltyLost(loyaltyPanel,quote.lealtad_global_perdida===true);
+  if(loyaltyPanel){
+   setLoyaltyLost(loyaltyPanel,quote.lealtad_global_perdida===true);
+   paintLoyalty();
+  }
  }
- /* R17-completar (b) · aplica/quita la variante "perdida" de la
-  * joya de lealtad. Guarda el estado original la primera vez
-  * para poder restaurarlo si la bandera B2 se apaga. */
+ /* B5 · LEALTAD VISTOSA (propuesta §3.5): la joya es el único sitio
+  * donde vive la lealtad. El estado roto se aplica con una
+  * animación de ruptura (la estrella se rompe antes de que aparezca
+  * el corazón) SOLO la primera vez que se rompe; si el render
+  * global repinta el panel con la racha ya rota, se aplica el
+  * mismo estado al instante, sin re-animar. Por eso el "ya
+  * aplicado" vive en el adaptador (loyaltyLostApplied), no en el
+  * panel: el panel se recrea y perdería la marca. */
  function setLoyaltyLost(panel,lost){
   const mark=panel.querySelector(".gx-index-loyalty-mark");
-  const title=panel.querySelector(".loyalty-title");
+  const titleEl=panel.querySelector(".loyalty-title");
   const caption=panel.querySelector(".gx-index-loyalty-caption");
   const desc=panel.querySelector(".loyalty-desc");
-  if(!mark||!title||!caption||!desc)return;
-  if(!panel.dataset.gxB2LoyaltyOriginal){
+  if(!mark||!titleEl||!caption||!desc)return;
+  if(!panel.dataset.gxB2LoyaltyOriginal&&!mark.classList.contains("is-lost")){
    panel.dataset.gxB2LoyaltyOriginal=JSON.stringify({
     state:panel.dataset.loyaltyState||"active",
-    title:title.textContent,caption:caption.textContent,
+    title:titleEl.textContent,caption:caption.textContent,
     desc:desc.innerHTML,now:mark.getAttribute("aria-valuenow")||"0",
     max:mark.getAttribute("aria-valuemax")||"4"});
   }
-  if(lost){
-   if(panel.dataset.gxB2LoyaltyApplied==="lost")return;
-   panel.dataset.gxB2LoyaltyApplied="lost";
-   panel.dataset.loyaltyState="lost";
+  const applyLostInstant=()=>{
    mark.classList.add("is-lost");
    mark.setAttribute("role","img");
    mark.setAttribute("aria-label","Racha reiniciada");
    mark.querySelectorAll(".gx-index-loyalty-seg").forEach(s=>s.classList.remove("is-filled"));
-   title.textContent="Racha reiniciada";
+   titleEl.textContent="Racha reiniciada";
    caption.textContent="Perdiste tu avance";
    desc.innerHTML='<span style="color:var(--danger-red);font-weight:600;">💔 Racha reiniciada por incumplir una fecha de pago.</span>';
+   showBestLine(panel,bestStreak(panel));
+   lastLoyalty={count:0,target:Number(mark.getAttribute("aria-valuemax")||0)||0};
+  };
+  if(lost){
+   panel.dataset.loyaltyState="lost";
+   panel.classList.add("gx-20-loyalty-break");
+   if(loyaltyLostApplied){
+    if(!mark.classList.contains("is-lost"))applyLostInstant();
+    return;
+   }
+   loyaltyLostApplied=true;
+   if(reduceMotion()||mark.classList.contains("is-lost")){applyLostInstant();return;}
+   panel.classList.add("gx-20-loyalty-break-anim");
+   setTimeout(()=>{
+    applyLostInstant();
+    setTimeout(()=>panel.classList.remove("gx-20-loyalty-break-anim"),700);
+   },380);
   }else{
-   if(panel.dataset.gxB2LoyaltyApplied!=="lost")return;
-   delete panel.dataset.gxB2LoyaltyApplied;
-   const orig=JSON.parse(panel.dataset.gxB2LoyaltyOriginal);
-   panel.dataset.loyaltyState=orig.state;
+   if(!loyaltyLostApplied)return;
+   loyaltyLostApplied=false;
+   const orig=JSON.parse(panel.dataset.gxB2LoyaltyOriginal||"{}");
+   panel.dataset.loyaltyState=orig.state||"active";
+   panel.classList.remove("gx-20-loyalty-break","gx-20-loyalty-break-anim");
+   hideBestLine(panel);
    mark.classList.remove("is-lost");
    mark.setAttribute("role","progressbar");
-   mark.setAttribute("aria-label","Racha: "+orig.now+" de "+orig.max+" pagos puntuales");
+   mark.setAttribute("aria-label","Racha: "+(orig.now||"0")+" de "+(orig.max||"4")+" pagos puntuales");
    const now=Number(orig.now)||0;
    mark.querySelectorAll(".gx-index-loyalty-seg").forEach((s,i)=>s.classList.toggle("is-filled",i<now));
-   title.textContent=orig.title;caption.textContent=orig.caption;desc.innerHTML=orig.desc;
+   if(orig.title)titleEl.textContent=orig.title;
+   if(orig.caption)caption.textContent=orig.caption;
+   if(orig.desc)desc.innerHTML=orig.desc;
   }
  }
- /* R17-completar (a) · seguimiento del comprobante B2. El flujo
-  * B2 no marca pago_en_revision en el cliente (por eso el
-  * comprobante es invisible en Admin normal): la única señal
-  * viva es quote.comprobante_en_revision. Cuando está activa,
-  * el proceso se muestra con el mismo tracker vanilla del
-  * render global (gxProofTrackerHTML); si el global ya pintó
-  * uno, no se duplica. */
+ /* B5 · Mejor racha anterior, como cifra fija mientras la racha
+  * está rota ("Mejor racha: 10 pagos"). Es el mayor entre la
+  * racha guardada del motor (pagos_guardados), la efectiva y el
+  * conteo que tenía la joya antes de romperse. */
+ function bestStreak(panel){
+  const orig=panel.dataset.gxB2LoyaltyOriginal?JSON.parse(panel.dataset.gxB2LoyaltyOriginal):null;
+  const fromPanel=Number(orig?.now)||0;
+  const q=store.quote?.lealtad||{};
+  const fromQuote=Math.max(Number(q.pagos_guardados)||0,Number(q.pagos_efectivos)||0);
+  return Math.max(fromPanel,fromQuote);
+ }
+ function showBestLine(panel,best){
+  if(!(best>0))return;
+  let line=panel.querySelector(".gx-20-loyalty-best");
+  if(!line){
+   line=document.createElement("p");
+   line.className="gx-20-loyalty-best";
+   panel.querySelector(".loyalty-content")?.appendChild(line);
+  }
+  line.textContent="Mejor racha: "+best+(best===1?" pago":" pagos");
+ }
+ function hideBestLine(panel){panel.querySelector(".gx-20-loyalty-best")?.remove();}
+ /* B5 · La joya reacciona al conteo OBSERVADO: si el motor pinta
+  * más pagos puntuales que la última vez, los segmentos nuevos se
+  * iluminan en cian (is-new) y el conteo sube animado; si sube de
+  * nivel, pulso dorado. La primera pintura no anima (nada de
+  * celebración al abrir la app). Si venía rota, el anillo se
+  * rellena segmento a segmento. */
+ function paintLoyalty(){
+  const panel=document.querySelector(".loyalty-badge.gx-index-loyalty");
+  if(!panel)return;
+  const mark=panel.querySelector(".gx-index-loyalty-mark");
+  if(!mark)return;
+  const lost=mark.classList.contains("is-lost");
+  const target=Number(mark.getAttribute("aria-valuemax")||0)||0;
+  const count=lost?0:(Number(mark.getAttribute("aria-valuenow")||0)||0);
+  if(!lastLoyalty){lastLoyalty={count,target};return;}
+  const prev=lastLoyalty;lastLoyalty={count,target};
+  if(count<=prev.count)return;
+  if(prev.count===0&&!lost){
+   panel.classList.remove("gx-20-loyalty-refill");
+   void panel.offsetWidth;
+   panel.classList.add("gx-20-loyalty-refill");
+   setTimeout(()=>panel.classList.remove("gx-20-loyalty-refill"),1400);
+  }else{
+   mark.querySelectorAll(".gx-index-loyalty-seg").forEach((s,i)=>{
+    if(i>=prev.count&&i<count){
+     s.classList.add("is-new");
+     setTimeout(()=>s.classList.remove("is-new"),950);
+    }
+   });
+  }
+  countUpCaption(panel,prev.count,count,target);
+  if(target>prev.target)celebrateLoyalty();
+ }
+ function countUpCaption(panel,from,to,target){
+  const cap=panel.querySelector(".gx-index-loyalty-caption");
+  if(!cap)return;
+  const fmt=n=>n+" de "+target+" pagos puntuales";
+  if(reduceMotion()||to<=from){cap.textContent=fmt(to);return;}
+  const start=performance.now(),dur=600;
+  const tick=now=>{
+   const p=Math.min(1,(now-start)/dur);
+   cap.textContent=fmt(Math.round(from+(to-from)*(1-Math.pow(1-p,3))));
+   if(p<1)requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+ }
+ /* B5 · Pulso dorado puntual tras el pago acreditado. En demo es
+  * el envío del comprobante (no hay acreditación real); en real
+  * lo dispara el aumento de nivel observado en paintLoyalty. */
+ function celebrateLoyalty(){
+  const panel=document.querySelector(".loyalty-badge.gx-index-loyalty");
+  if(!panel||reduceMotion())return;
+  panel.classList.remove("gx-20-loyalty-celebrate");
+  void panel.offsetWidth;
+  panel.classList.add("gx-20-loyalty-celebrate");
+  setTimeout(()=>panel.classList.remove("gx-20-loyalty-celebrate"),1500);
+ }
+ /* Seguimiento del comprobante B2: la única señal viva es
+  * quote.comprobante_en_revision. Se muestra con el mismo tracker vanilla
+  * del render global; si el global ya pintó uno, no se duplica. */
  function updateProofTracker(){
   const content=document.querySelector(".scrollable-content");
   if(!content)return;
-  const own=content.querySelector(":scope > .gx-index-proof[data-gx-b2-proof]");
+  const own=content.querySelector(":scope > .gx-index-proof[data-gx-20-proof]");
   if(!store.quote?.comprobante_en_revision){own?.remove();return;}
   if(content.querySelector(":scope > .gx-index-proof"))return;
   if(typeof window.gxProofTrackerHTML!=="function")return;
@@ -255,96 +437,229 @@
   tmp.innerHTML=window.gxProofTrackerHTML("review");
   const section=tmp.firstElementChild;
   if(!section)return;
-  section.dataset.gxB2Proof="1";
+  section.dataset.gx20Proof="1";
   content.insertBefore(section,content.firstChild);
  }
+ /* B6 · El botón principal ya NO lleva el importe: el hero y la
+  * barra compacta ya lo muestran (eso triplicaba el total: precio
+  * grande + "Total del periodo" + importe en el botón). El texto es
+  * fijo ("Ya realicé mi pago"); el render global lo repinta igual,
+  * así que aquí solo se repone tras el envío (A) o tras una
+  * mutación de #app. No se toca mientras se está enviando (A). */
+ function updatePrimaryButton(){
+  if(!store.quote)return;
+  const primary=document.querySelector(".gx-payment-primary");
+  if(!primary||primary.classList.contains("is-sending"))return;
+  const strong=primary.querySelector(".gx-payment-primary-copy strong");
+  if(!strong)return;
+  const desired="Ya realicé mi pago";
+  if(strong.textContent!==desired)strong.textContent=desired;
+ }
+ /* B3 · Pintar la selección sobre el DOM existente, sin re-render: tocar el
+  * encabezado de un grupo lo selecciona entero (el grupo es la unidad), y
+  * el <details> nativo sigue abriendo/cerrando por su cuenta. Re-renderizar
+  * en el clic del summary mataría el toggle nativo (el elemento se
+  * recrearía antes de que ocurra), así que aquí solo se tocan clases y
+  * etiquetas. */
+ function paintSelection(){
+  const card=document.getElementById("gx-20-calendar");
+  if(!card||!store.quote)return;
+  const selectedFecha=mode==="todo"?null:(selectedGroup||nextPayment().fecha);
+  card.querySelectorAll("details.gx-20-group").forEach(details=>{
+   details.classList.toggle("is-active",
+     mode==="todo"||details.dataset.gx20Fecha===selectedFecha);
+  });
+  card.querySelectorAll("[data-gx20-cargo]").forEach(button=>{
+   const isActive=mode==="todo"||button.dataset.gx20Fecha===selectedFecha;
+   const done=button.classList.contains("is-done");
+   button.classList.toggle("is-active",isActive&&!done);
+   const small=button.querySelector(".gx-20-row-side small");
+   if(small){
+    const label=done?"Pagado":isActive?"Seleccionado":"Pendiente";
+    if(small.textContent!==label)small.textContent=label;
+   }
+  });
+  /* B5 · El chip "Pagar todo" también se pinta por clases: sin esto, al
+   * tocarlo habría que reconstruir el DOM para que se viera activo
+   * (y volvería el toque perdido del video 2). */
+  const chip=card.querySelector(".gx-20-todo-chip");
+  if(chip){
+   chip.classList.toggle("is-active",mode==="todo");
+   chip.setAttribute("aria-pressed",mode==="todo"?"true":"false");
+  }
+  updatePrimaryButton();
+  /* B6 · El hero sigue a la selección: tocar un grupo, una fila o
+   * "Pagar todo" cambia la etiqueta, el importe y la píldora.
+   * DETALLES FINALES · con animate=true el importe grande CUENTA
+   * desde el valor anterior (ver updateHeader). */
+  updateHeader(true);
+ }
  function content(){
-  const list=rows(),due=pending()[0];
-  const first=due?money(due.total_centavos):"Al corriente";
-  const label=due?(due.prorroga_estado==="aprobada"&&due.mora_centavos===0?
-    "Prórroga hasta "+date(due.fecha_pactada):"Vence "+date(due.vence)):
-    "Sin pagos pendientes";
-  return '<button class="gx-b2-toggle" id="b2-toggle" type="button" aria-expanded="'+expanded+'" aria-controls="b2-body">'+
-     '<span class="gx-b2-head"><span class="gx-b2-head-copy"><span class="gx-b2-caption">CALENDARIO DE PAGOS</span>'+
-       '<strong>'+esc(label)+'</strong></span></span>'+
-      '<span class="gx-b2-head-amount">'+first+' <span class="gx-b2-chevron" aria-hidden="true">⌄</span></span></button>'+
-    '<div class="gx-b2-reveal" id="b2-body" aria-hidden="'+(!expanded)+'" '+(expanded?'':'inert')+'><div class="gx-b2-clip"><div class="gx-b2-content">'+
-     '<div class="gx-b2-divider"></div>'+
-     list.map(x=>{
-      const checked=(mode==="todo"&&!x.pagado)||
-        x.cargo_id===(selected||due?.cargo_id);
-      const next=x.cargo_id===due?.cargo_id&&!x.pagado;
-      const late=x.mora_centavos>0;
-      /* Energía R18: todas las filas no pagadas que vencen en la
-       * misma fecha efectiva que la próxima llevan is-due-next y
-       * comparten la animación. La selección no cambia: la fila
-       * "Próximo"/Seleccionado sigue siendo una sola (is-next). */
-      const dueNext=!!due&&effectiveDue(x)===effectiveDue(due)&&!x.pagado;
-      return '<button class="gx-b2-row '+(checked?'is-active ':'')+
-       (x.pagado?'is-done ':'')+(late?'is-late ':'')+(next?'is-next ':'')+(dueNext?'is-due-next':'')+
-       '" type="button" data-b2-cargo="'+esc(x.cargo_id)+'" '+(x.pagado?'disabled':'')+'>'+
-       '<span class="gx-b2-row-main"><span class="gx-b2-row-title">'+esc(title(x))+
-       '</span><span class="gx-b2-row-meta">'+
-       (next?'<span class="gx-b2-next-tag">'+(late?'VENCIDO':'PRÓXIMO')+'</span>':'')+
-       esc(date(x.vence))+' · '+esc(status(x))+'</span></span>'+
-       '<span class="gx-b2-row-side"><strong>'+money(x.total_centavos)+'</strong><small>'+
-         (x.pagado?'Pagado':checked?'Seleccionado':'Pendiente')+'</small></span></button>'
-     }).join("")+
-     '<div class="gx-b2-group" role="group" aria-label="Forma de pago">'+
-       [["proximo","Próximo vencimiento"],["todo","Todo junto"]]
-       .map(pair=>'<button type="button" class="gx-b2-choice" data-b2-mode="'+pair[0]+'" aria-pressed="'+(mode===pair[0])+'">'+pair[1]+'</button>').join("")+
-     '</div>'+
-     '<p class="gx-b2-foot">'+(store.quote?.comprobante_en_revision?
-      "Comprobante recibido · pendiente de revisión. Aún no es un pago acreditado.":
-      "El reporte de pago se acredita únicamente después de la revisión de Admin.")+'</p>'+
-     (due?.prorroga_estado==="aprobada"?
-       '<p class="gx-b2-foot gx-b2-prorrogated">Acuerdo pactado hasta el '+
-         esc(date(due.fecha_pactada))+
-         '. Mantendrás tu lealtad si cumples en esa fecha.</p>':"")+
-     (store.quote?.lealtad_global_perdida?
-        '<p class="gx-b2-note">La lealtad se perdió por una fecha incumplida. La mora corresponde solo al servicio vencido.</p>':"")+
-     '</div></div></div>';
+  const list=groups(),next=nextPayment();
+  const nextFecha=next.fecha;
+  const selectedFecha=selectedGroup||nextFecha;
+  const plural=n=>n===1?"1 servicio":n+" servicios";
+  const groupsHTML=list.map(g=>{
+   const isNext=g.fecha===nextFecha&&g.centavos>0;
+   /* B3 · En modo "Todo" todos los grupos están seleccionados: sus filas
+    * dicen "Seleccionado" y sus totales van en cian. */
+   const isActive=mode==="todo"||g.fecha===selectedFecha;
+   const open=openGroups.has(g.fecha);
+   const state=groupState(g);
+   const rowsHTML=g.cargos.map(x=>{
+    const st=rowState(x);
+    const side=x.pagado?"Pagado":isActive?"Seleccionado":"Pendiente";
+    return '<button class="gx-20-row '+(isActive&&!x.pagado?'is-active ':'')+
+     (x.pagado?'is-done':'')+'" type="button" data-gx20-cargo="'+esc(x.cargo_id)+
+     '" data-gx20-fecha="'+esc(g.fecha)+'" '+(x.pagado?'disabled':'')+'>'+
+     '<span class="gx-20-row-main"><span class="gx-20-row-title">'+esc(title(x))+
+     '</span>'+(st?'<span class="gx-20-row-state'+(st.late?' is-late':'')+'">'+
+       esc(st.text)+'</span>':'')+'</span>'+
+     '<span class="gx-20-row-side"><strong>'+money(x.total_centavos)+'</strong><small>'+
+       side+'</small></span></button>';
+   }).join("");
+   /* B6 · Nota de prórroga DENTRO del grupo (propuesta §3.6): la fecha
+    * pactada ya ES la fecha del grupo, así que la nota no la repite. */
+   const prorrogaNote=g.cargos.some(x=>x.prorroga_estado==="aprobada"&&
+     x.fecha_pactada&&x.mora_centavos<=0)
+    ?'<p class="gx-20-group-note">Mantendrás tu lealtad si cumples en esa fecha.</p>':"";
+   return '<details class="gx-20-group '+(isNext?'is-next ':'')+
+    (isActive?'is-active':'')+'" data-gx20-fecha="'+esc(g.fecha)+'"'+
+    (open?' open':'')+'>'+
+    '<summary class="gx-20-summary">'+
+     '<span class="gx-20-sum-main"><strong class="gx-20-sum-date">'+esc(date(g.fecha))+
+     '</strong><span class="gx-20-sum-meta">'+esc(plural(g.cargos.length))+' · '+
+       esc(state)+'</span></span>'+
+     '<span class="gx-20-sum-side"><strong class="gx-20-sum-total">'+money(g.centavos)+
+     '</strong><span class="gx-20-chevron" aria-hidden="true">'+
+     '<svg class="gx-20-chevron-svg" viewBox="0 0 24 16" aria-hidden="true">'+
+     '<path d="M3.2 4.2L12 11.3L20.8 4.2"/></svg></span></span>'+
+    '</summary>'+
+    '<div class="gx-20-rows">'+rowsHTML+'</div>'+
+    breakdownHTML(g)+prorrogaNote+
+   '</details>';
+  }).join("");
+  /* B6 · Total del periodo + chip "Pagar todo": una sola línea al final
+   * de los grupos. "Pagar todo" selecciona todos los grupos y paga
+   * todo junto en un solo reporte (Luis: $168 + $79 = $247); sin esto
+   * el cliente tendría que hacer dos pagos separados. Solo cuando
+   * hay algo pendiente. */
+  const totalAll=pending().reduce((s,x)=>s+x.total_centavos,0);
+  const totalRow=totalAll>0?
+   '<div class="gx-20-total-row"><span class="gx-20-total-main"><span class="gx-20-total-label">Total del periodo</span><strong class="gx-20-total-amount">'+money(totalAll)+'</strong></span>'+
+   '<button class="gx-20-todo-chip'+(mode==="todo"?' is-active':'')+'" type="button" aria-pressed="'+(mode==="todo")+'"><span>Pagar todo</span></button></div>':"";
+  const foot=(store.quote?.comprobante_en_revision?
+    "Comprobante recibido · pendiente de revisión. Aún no es un pago acreditado.":
+    "El reporte de pago se acredita únicamente después de la revisión de Admin.");
+  const lostNote=store.quote?.lealtad_global_perdida?
+    '<p class="gx-20-foot gx-20-note">La lealtad se perdió por una fecha incumplida. La mora corresponde solo al servicio vencido.</p>':"";
+  return '<div class="gx-20-cal-head"><span class="gx-20-caption">CALENDARIO DE PAGOS</span></div>'+
+   groupsHTML+totalRow+
+   '<p class="gx-20-foot">'+esc(foot)+'</p>'+lostNote;
  }
  function render(){
   const anchor=document.querySelector(".services-container");
   if(!anchor)return;
-  document.getElementById("gx-b2-read-block")?.remove();
+  document.getElementById("gx-20-read-block")?.remove();
   if(store.blocked){
+    document.getElementById("gx-20-calendar")?.remove();
+    document.documentElement.classList.remove("gx-20-b2");
     const guard=document.createElement("div");
-    guard.id="gx-b2-read-block";
-    guard.className="glass-card gx-b2-card";
+    guard.id="gx-20-read-block";
+    guard.className="glass-card gx-20-card";
     guard.setAttribute("role","alert");
     guard.style.cssText="padding:18px;margin:12px 0;line-height:1.6";
     guard.textContent="Tu calendario B2 requiere verificación. No realices un pago global hasta que se confirme el saldo por servicio.";
     anchor.insertAdjacentElement("afterend",guard);
     return;
   }
-  if(!store.quote?.ok||!Array.isArray(store.quote.cargos))return;
-  let card=document.getElementById("b2-calendar");
+  if(!store.quote?.ok||!Array.isArray(store.quote.cargos)){
+    document.getElementById("gx-20-calendar")?.remove();
+    document.documentElement.classList.remove("gx-20-b2");
+    return;
+  }
+  /* PORT 2.0 · La distribucion agrupada aplica solo con DOS O MAS fechas
+   * efectivas distintas (aclaracion de Henry 2026-11-09). Con una sola
+   * fecha no hay calendario: SERVICIOS ACTIVOS y DESGLOSE globales se
+   * conservan (la clase gx-20-b2, que los oculta, no se pone) y el
+   * adaptador sigue activo para el resto (hero, pildora, tracker,
+   * lealtad, botones, conteo y guarda de saldo). Las fechas se cuentan
+   * sobre TODOS los cargos, no solo los pendientes: pagar el primer
+   * grupo no debe hacer desaparecer el calendario a mitad de mes. */
+  const distinctDates=new Set(rows().map(effectiveDue)).size;
+  const hasUndated=rows().some(r=>!/^\d{4}-\d{2}-\d{2}$/.test(effectiveDue(r)));
+  /* Agrupado salvo que TODOS los cargos compartan una sola fecha
+   * valida. Un cargo sin fecha tambien agrupa: el caso borde B6
+   * "Por confirmar" es un grupo, no la lista global. */
+  const grouped=distinctDates>=2||hasUndated;
+  if(!grouped){
+   document.getElementById("gx-20-calendar")?.remove();
+   document.documentElement.classList.remove("gx-20-b2");
+   updateHeader();
+   updatePrimaryButton();
+   updateProofTracker();
+   return;
+  }
+  /* B1 · En B2, SERVICIOS ACTIVOS no se pinta (el CSS oficial lo oculta
+   * solo cuando esta clase está puesta); en flujo global no hay cotización
+   * B2 y la lista se conserva tal cual. */
+  document.documentElement.classList.add("gx-20-b2");
+  const next=nextPayment();
+  /* El grupo próximo nace abierto. Si la cotización cambia y el próximo es
+   * otra fecha, esa fecha se abre; un grupo que el cliente cerró a mano no
+   * se reabre solo por un re-render (lastNextFecha solo cambia con el próximo). */
+  if(next.fecha&&next.fecha!==lastNextFecha){openGroups.add(next.fecha);lastNextFecha=next.fecha;}
+  let card=document.getElementById("gx-20-calendar");
   if(!card){
    card=document.createElement("section");
-   card.id="b2-calendar";
-   card.className="glass-card gx-b2-card";
-   card.setAttribute("aria-label","Calendario de pagos por servicio");
+   card.id="gx-20-calendar";
+   card.className="glass-card gx-20-card";
+   card.setAttribute("aria-label","Calendario de pagos por fecha");
    anchor.insertAdjacentElement("afterend",card);
   }
-  card.classList.toggle("is-open",expanded);
   card.innerHTML=content();
-  card.querySelector("#b2-toggle").addEventListener("click",()=>{
-   expanded=!expanded;card.classList.toggle("is-open",expanded);
-   card.querySelector("#b2-toggle").setAttribute("aria-expanded",String(expanded));
-   card.querySelector("#b2-body").setAttribute("aria-hidden",String(!expanded));
-   card.querySelector("#b2-body").toggleAttribute("inert",!expanded);
+  card.querySelectorAll("details.gx-20-group").forEach(details=>{
+   details.addEventListener("toggle",()=>{
+    const fecha=details.dataset.gx20Fecha;
+    if(details.open)openGroups.add(fecha);else openGroups.delete(fecha);
+   });
   });
-  card.querySelectorAll("[data-b2-cargo]").forEach(button=>button.addEventListener("click",()=>{
-   selected=button.dataset.b2Cargo;mode="proximo";render();
+  /* B3 · Tocar el encabezado del grupo lo selecciona entero (y el
+   * <details> se abre/cierra como siempre). Solo pinta la selección;
+   * el toggle nativo no se interrumpe. */
+  card.querySelectorAll("summary.gx-20-summary").forEach(summary=>summary.addEventListener("click",()=>{
+   const details=summary.closest("details.gx-20-group");
+   if(!details)return;
+   selectedGroup=details.dataset.gx20Fecha;mode="grupo";
+   paintSelection();
   }));
-  card.querySelectorAll("[data-b2-mode]").forEach(button=>button.addEventListener("click",()=>{
-   mode=button.dataset.b2Mode;render();
+  card.querySelectorAll("[data-gx20-cargo]").forEach(button=>button.addEventListener("click",()=>{
+   selectedGroup=button.dataset.gx20Fecha;mode="grupo";
+   openGroups.add(selectedGroup);
+   /* B5 · BUG 1 (video 2): tocar la fila SOLO pinta la selección.
+    * Antes se llamaba render() y se reconstruía card.innerHTML
+    * bajo el dedo: el <details> nuevo nacía con la transición de
+    * altura de ::details-content y en Safari 26 se quedaba en
+    * ~700 px (el hueco enorme). Sin re-render no hay re-disparo
+    * de animación de altura ni nodo que desaparezca bajo el toque;
+    * paintSelection() pinta la selección y actualiza el hero y el
+    * botón principal, que es todo lo que depende de ella. */
+   paintSelection();
   }));
+  /* B3 · Chip "Pagar todo": un toque selecciona todos los grupos (pagar
+   * todo junto); otro toque vuelve a la selección por grupo (el próximo). */
+  card.querySelector(".gx-20-todo-chip")?.addEventListener("click",()=>{
+   if(mode==="todo"){mode="grupo";selectedGroup=null;}
+   else mode="todo";
+   /* B5 · BUG 2 (video 2): el chip cambia de modo con pintado por
+    * clases (paintSelection, que ya pinta su is-active y su
+    * aria-pressed), sin reconstruir el DOM bajo el dedo. Antes
+    * render() sustituía el nodo entre touchstart y click y iOS
+    * cancelaba el toque: a veces no pasaba nada. */
+   paintSelection();
+  });
   updateHeader();
-  updateBreakdown();
-  updateServiceMarker();
+  updatePrimaryButton();
   updateProofTracker();
  }
  function installHandlers(){
@@ -368,7 +683,38 @@
    store.report={monto_centavos:val.centavos,
      cargo_ids:val.cargos.map(x=>x.cargo_id),
      modo:mode,periodo:store.quote.periodo};
-   originalModal.call(this,key,period,(val.centavos/100).toFixed(2),folio,nombre);
+   /* B3 · Botón A: al tocar el primario, se transforma en progreso
+    * ("Abriendo…") y la hoja entra tras la micro-animación (220 ms, dentro
+    * del presupuesto 150–300 ms); con reduced-motion abre al instante. */
+   const primary=document.querySelector(".gx-payment-primary");
+   const reduce=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+   const open=()=>originalModal.call(this,key,period,(val.centavos/100).toFixed(2),folio,nombre);
+   if(primary&&!reduce){
+    const strong=primary.querySelector(".gx-payment-primary-copy strong");
+    const small=primary.querySelector(".gx-payment-primary-copy small");
+    primary.classList.add("is-sending");
+    if(strong)strong.textContent="Abriendo…";
+    if(small)small.textContent="Preparamos tu comprobante";
+    setTimeout(open,220);
+   }else open();
+  };
+  /* B3 · Al cerrar la hoja, el primario vuelve a su etiqueta.
+   * cerrarModalPago quita "show" en síncrono cuando sí cierra; si no cierra
+   * (clic fuera del overlay), no se restaura nada. */
+  const originalClose=window.cerrarModalPago;
+  if(typeof originalClose==="function")window.cerrarModalPago=function(e,force){
+   const out=originalClose.apply(this,arguments);
+   const modal=document.getElementById("payment-modal");
+   if(modal&&!modal.classList.contains("show")){
+    const primary=document.querySelector(".gx-payment-primary");
+    if(primary&&primary.classList.contains("is-sending")){
+     primary.classList.remove("is-sending");
+     const small=primary.querySelector(".gx-payment-primary-copy small");
+     if(small)small.textContent="Subir comprobante";
+     updatePrimaryButton();
+    }
+   }
+   return out;
   };
   if(typeof originalBank==="function")window.abrirDatosPago=function(){
    if(store.blocked||store.quote?.comprobante_en_revision){
@@ -393,10 +739,24 @@
    }
    if(val.centavos<=0||store.quote.comprobante_en_revision)return;
    if(store.demo){
+    /* B3 · Botón A en el espejo: el envío se ve transformarse — progreso
+     * (spinner) y luego check — igual que en el flujo real, donde el tiempo
+     * lo pone la red. */
+    const submit=document.getElementById("btn-enviar-comprobante");
+    if(submit?.dataset.state==="loading")return;
     if(typeof window.gxSetPaymentSubmitState==="function")
-     window.gxSetPaymentSubmitState("success");
-    else document.getElementById("payment-modal")?.classList.add("is-success");
-    window.mostrarToastPago?.("Esta pantalla es de revisión; no acepta pagos reales");
+     window.gxSetPaymentSubmitState("loading");
+    setTimeout(()=>{
+     if(typeof window.gxSetPaymentSubmitState==="function")
+      window.gxSetPaymentSubmitState("success");
+     else document.getElementById("payment-modal")?.classList.add("is-success");
+     /* B5 · En demo no hay acreditación real: el envío correcto es
+      * el momento visible del pago, así que la joya celebra aquí
+      * (pulso dorado). En real la celebración la dispara el aumento
+      * de nivel observado en paintLoyalty. */
+     celebrateLoyalty();
+     window.mostrarToastPago?.("Esta pantalla es de revisión; no acepta pagos reales");
+    },650);
     return;
    }
    const core=window.GOXION_CORE;
@@ -440,9 +800,28 @@
     window.mostrarToastPago?.(error.message||"No fue posible reportar tu pago.",true);
    }finally{store.submitting=false;}
   };
+  /* B3 · Botón C: ripple desde el punto del toque en los botones del
+   * espejo (primario, secundario, chip Pagar todo, filas, envío). Solo
+   * transform/opacity; se salta con reduced-motion. */
+  document.addEventListener("pointerdown",e=>{
+   if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+   const el=e.target.closest(".gx-payment-primary,.gx-bank-trigger,.gx-20-todo-chip,.gx-20-row,.btn-submit-payment");
+   if(!el||el.disabled)return;
+   const rect=el.getBoundingClientRect();
+   if(rect.width<=0||rect.height<=0)return;
+   const size=Math.max(rect.width,rect.height)*2.2;
+   const rip=document.createElement("span");
+   rip.className="gx-20-ripple";
+   rip.style.width=rip.style.height=Math.ceil(size)+"px";
+   rip.style.left=(e.clientX-rect.left-size/2)+"px";
+   rip.style.top=(e.clientY-rect.top-size/2)+"px";
+   el.appendChild(rip);
+   rip.addEventListener("animationend",()=>rip.remove());
+  },{passive:true});
  }
  function init(){
   installHandlers();
+  updatePrimaryButton();
   if(!store.quote)return;
   const anchor=document.querySelector(".services-container");
   if(anchor && anchor!==lastAnchor){lastAnchor=anchor;render();}
@@ -450,5 +829,11 @@
  const observer=new MutationObserver(init);
  observer.observe(document.getElementById("app"),{childList:true,subtree:true});
  window.addEventListener("goxion:b2-quote-change",render);
+ /* DETALLES FINALES · Si el usuario desplaza a mitad del conteo
+  * del hero, el conteo se cancela y queda el valor exacto (igual
+  * que el morph con su propio contador). No se cancela en
+  * touchstart: un segundo toque a mitad de conteo debe arrancar
+  * desde el valor intermedio, no saltar al final. */
+ window.addEventListener("scroll",()=>cancelHeroCount(true),{passive:true});
  init();
 })();
