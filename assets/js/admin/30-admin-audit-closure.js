@@ -7,6 +7,37 @@
   }
   const money=v=>Number(v||0).toLocaleString("es-MX",{minimumFractionDigits:0,maximumFractionDigits:2});
 
+  // Guard C2 (auditoría 2026-11-08): no aprobar por vía global un ciclo B2
+  // ya medio pagado. Admin no tiene los cargos B2 cargados en la ficha
+  // (estado_cuenta es solo el modelo global), así que se consulta el mismo
+  // listado que usa el router F5: b2_listar_comprobantes. Si el cliente es
+  // B2 y existe un comprobante APROBADO en el periodo de la ficha, el cobro
+  // ya se está liquidando por la ruta B2 (F3); aprobar el total global
+  // cobraría dos veces. Si el listado no se puede verificar (sin sesión,
+  // sin gateway, error de red o 409), se mantiene el flujo anterior: el
+  // modal F5 sigue protegiendo su propia ruta y la vía global no cambia
+  // para clientes de fecha única. Devuelve el mensaje de bloqueo o null.
+  async function gxAdminB2GuardBloqueaGlobal(clienteId, period){
+    try{
+      const core = window.GOXION_CORE;
+      const token = core && core.STORAGE ? localStorage.getItem(core.STORAGE.ADMIN_TOKEN || "") : "";
+      const url = core && typeof core.endpoint === "function" ? core.endpoint("acciones-financieras-b2-beta") : "";
+      if(!token || !url) return null;
+      const r = await fetch(url, {method:"POST", cache:"no-store",
+        headers:{"Content-Type":"application/json", "X-Admin-Token":token},
+        body:JSON.stringify({accion:"b2_listar_comprobantes", datos:{cliente_id:String(clienteId || "")}})});
+      const j = await r.json().catch(() => ({}));
+      if(!r.ok || j?.ok !== true || j?.modo !== "b2_multifecha") return null;
+      const aprobado = (j.comprobantes || []).find(x => x && x.estado === "aprobado" && String(x.periodo || "").slice(0, 7) === String(period || ""));
+      if(!aprobado) return null;
+      const monto = (Number(aprobado.monto_reportado_centavos || 0) / 100).toFixed(2);
+      return "Este cobro ya tiene un pago B2 aplicado en este periodo ($" + monto + " acreditados por comprobante). No lo marques como pagado por la vía global: se cobraría dos veces. Revisa el cobro B2 en la ficha (ruta de revisión de comprobantes).";
+    }catch(e){
+      console.warn("Guard C2: no se pudo verificar el régimen B2", String(e && e.message || e).slice(0, 120));
+      return null;
+    }
+  }
+
   window.gxAdminQuickMarkPaid=async function(){
     const {key,c}=currentClient();
     if(!c?._id)return alert("No pude identificar el espacio.");
@@ -18,11 +49,13 @@
     if(!(amount>=0)||!/^\d{4}-\d{2}$/.test(period))return alert("Recarga la ficha antes de registrar el pago.");
     const timing=typeof gxPaymentTiming==="function"?gxPaymentTiming({...c,estado:"pendiente",pago_en_revision:false}):{type:"none"};
     const punctual=timing.type!=="overdue";
+    const bloqueoB2=await gxAdminB2GuardBloqueaGlobal(c._id, period);
+    if(bloqueoB2) return alert(bloqueoB2);
     if(!confirm(`Marcar como pagado desde Admin\n\nCliente: ${c.nombre||"Cliente"}\nPeriodo: ${period}\nMonto: $${money(amount)}\nLealtad: ${punctual?"puntual":"fuera de fecha"}\n\nUsará el mismo motor financiero que la aprobación normal. ¿Continuar?`))return;
     try{
       if(typeof window.GOXION_FINANCIAL_ACTIONS?.approvePayment!=="function")throw new Error("Motor financiero no disponible.");
       const r=await window.GOXION_FINANCIAL_ACTIONS.approvePayment({
-        clienteId:c._id,monto:amount,puntual,
+        clienteId:c._id,monto:amount,punctual,
         notas:"Pago registrado manualmente desde Admin",
         periodoEsperado:period
       });
