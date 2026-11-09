@@ -22,9 +22,35 @@
             body:JSON.stringify({accion,datos}),
             cache:"no-store"
         });
-        const j=await r.json().catch(()=>({}));
-        if(!r.ok||j?.ok!==true)throw new Error(j?.error||`HTTP ${r.status}`);
+        const text=await r.text().catch(()=> "");
+        let j={};
+        try{ j=text?JSON.parse(text):{}; }catch{}
+        if(!r.ok||j?.ok!==true){
+            const err=new Error(j?.error||`HTTP ${r.status}`);
+            // Observabilidad (mismo patrón PR #198, C4): el error lleva el
+            // estatus HTTP, el código del servidor y el cuerpo completo,
+            // para que el alert y la consola los muestren. El mensaje no
+            // cambia: los demás llamados siguen igual. Nunca el token.
+            err.gxHttpStatus=r.status;
+            err.gxCodigo=String(j?.codigo||"");
+            err.gxCuerpo=text;
+            throw err;
+        }
         return j;
+    }
+
+    // Observabilidad (mismo patrón PR #198, C4): el alert muestra el estatus
+    // HTTP + el código/error del servidor, y el cuerpo completo queda en
+    // consola. Nunca se registra el token.
+    function alertErrorAdmin(accion,titulo,e){
+        const estatus=(e && typeof e.gxHttpStatus==="number")?e.gxHttpStatus:null;
+        const codigo=String(e?.gxCodigo||"").slice(0,80);
+        const detalle=String(e?.message||e||"").slice(0,200);
+        console.warn("[GOXION Admin · "+accion+"] HTTP "+(estatus??"?")+(codigo?" · "+codigo:"")+" · cuerpo: "+String(e?.gxCuerpo??e?.message??e??""));
+        if(estatus===401) return alert("❌ Tu sesión de Admin expiró. Vuelve a iniciar sesión e inténtalo de nuevo.");
+        const linea="El servidor devolvió"+(estatus!==null?" HTTP "+estatus:" un error")+(codigo?" · "+codigo:"")+".";
+        const detalleLinea=(detalle && detalle!==codigo && !/^HTTP \d+/.test(detalle))?"\n"+detalle:"";
+        alert("❌ "+titulo+"\n\n"+linea+detalleLinea);
     }
 
     // =====================================================
@@ -81,8 +107,7 @@
             await loadCancellations();
             if(typeof inicializarPanel==="function")await inicializarPanel();
         }catch(e){
-            console.error(e);
-            alert("No se pudo procesar la cancelación.\n\n"+(e?.message||e));
+            alertErrorAdmin("resolver cancelación","No se pudo procesar la cancelación.",e);
         }
     };
 
@@ -94,8 +119,7 @@
             await loadCancellations();
             alert("✓ Cancelación efectiva. El servicio quedó desactivado.");
         }catch(e){
-            console.error(e);
-            alert("No se pudo hacer efectiva la cancelación.\n\n"+(e?.message||e));
+            alertErrorAdmin("hacer efectiva la cancelación","No se pudo hacer efectiva la cancelación.",e);
         }
     };
 
