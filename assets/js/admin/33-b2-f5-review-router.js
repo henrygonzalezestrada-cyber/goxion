@@ -23,11 +23,9 @@
    const result=await response.json().catch(()=>({}));
    if(response.ok&&result.ok===true&&result.modo==="b2_multifecha"){
     sessionStorage.setItem(memory,"b2");
-    const link=new URL("./preview/integracion-b2/admin.html",location.href);
-    link.searchParams.set("cliente",String(key));
-    link.searchParams.set("f3","1");
-    location.href=link.toString();
-    return;
+    // La revisión F3 vive en el Admin oficial (35): se abre el modal aquí
+    // mismo, sin navegar al espejo (su sandbox bloquea b2_cotizar_ciclo).
+    return original.call(this,key,...args);
    }
    if(response.ok&&result.ok===true&&result.modo==="global"){
     sessionStorage.setItem(memory,"global");
