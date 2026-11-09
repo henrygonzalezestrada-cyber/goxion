@@ -834,40 +834,88 @@ let clientesDict = {};
             return Number.isNaN(d.getTime()) ? String(v || "—") : d.toLocaleDateString("es-MX", {day:"numeric", month:"short"});
         };
         const periodo = String(c?.estado_cuenta?.periodo || c?.periodo_pendiente || "").slice(0, 7);
-        const callGateway = (accion, datos) => fetch(url, {method:"POST", cache:"no-store",
-            headers:{"Content-Type":"application/json", "X-Admin-Token":token},
-            body:JSON.stringify({accion, datos})}).then(r => r.json().catch(() => ({})));
-        return callGateway("b2_listar_comprobantes", {cliente_id:id}).then(listado => {
-            if(!listado || listado.ok !== true || listado.modo !== "b2_multifecha"){ anchor.remove(); return false; }
+        // Observabilidad C4: cada respuesta del gateway deja su estatus HTTP y
+        // su código/error en consola (nunca el token). El mensaje que ve Henry
+        // distingue sesión expirada (401) de fallo del servidor (400/409/500),
+        // de respuesta 200 sin los datos esperados y de fallo de red. Los
+        // fallos del iPhone de Henry (nov 2026) devolvieron HTTP 200: la causa
+        // estaba en el contenido de la respuesta o en el cliente, no en la
+        // sesión. Por eso un 200 con cuerpo inesperado registra el cuerpo
+        // completo y muestra su propio mensaje, y un error al dibujar las
+        // filas también se registra y se muestra aparte. Antes, todos esos
+        // casos mostraban el mismo texto genérico, y el paso 1 borraba la
+        // sección en silencio sin explicar nada.
+        const codigoDe = b => String((b && (b.codigo || b.error || (b.resultado && (b.resultado.codigo || b.resultado.error)))) || "").slice(0, 80);
+        const registra = (accion, res) => {
+            const codigo = codigoDe(res && res.body);
+            console.warn("[GOXION Admin · Cobro B2] " + accion + " → HTTP " + (res ? res.status : "?") + (codigo ? " · " + codigo : ""));
+        };
+        const pintaError = texto => {
+            anchor.innerHTML = `<div class="gx-b2-billing-error">${esc(texto)}</div>`;
+            delete anchor.dataset.gxB2Loaded;
+            return false;
+        };
+        const mensajeSesion = () => pintaError("Tu sesión de Admin expiró. Vuelve a iniciar sesión para ver el cobro B2.");
+        const mensajeServidor = res => pintaError("No se pudo cargar el cobro B2. El servidor devolvió un error" + (codigoDe(res && res.body) ? " (" + codigoDe(res && res.body) + ")" : "") + ".");
+        const mensajeRespuesta = (accion, res) => {
+            try { console.warn("[GOXION Admin · Cobro B2] " + accion + " → HTTP 200 con cuerpo inesperado: " + JSON.stringify(res && res.body).slice(0, 1000)); } catch (e) {}
+            return pintaError("No se pudo cargar el cobro B2. El servidor respondió sin los datos del cobro" + (codigoDe(res && res.body) ? " (" + codigoDe(res && res.body) + ")" : "") + ".");
+        };
+        const callGateway = (accion, datos) => {
+            const intento = () => fetch(url, {method:"POST", cache:"no-store",
+                headers:{"Content-Type":"application/json", "X-Admin-Token":token},
+                body:JSON.stringify({accion, datos})})
+                .then(r => r.json().catch(() => ({})).then(body => ({status:r.status, body:body || {}})));
+            return intento().catch(() => {
+                console.warn("[GOXION Admin · Cobro B2] " + accion + ": fallo de red, reintentando una vez…");
+                return intento();
+            });
+        };
+        const cargar = () => callGateway("b2_listar_comprobantes", {cliente_id:id}).then(res => {
+            const listado = res && res.body;
+            registra("b2_listar_comprobantes", res);
+            if(res && res.status === 401) return mensajeSesion();
+            if(!listado || listado.ok !== true){
+                if(res && res.status === 200) return mensajeRespuesta("b2_listar_comprobantes", res);
+                return mensajeServidor(res);
+            }
+            if(listado.modo !== "b2_multifecha"){ anchor.remove(); return false; }
             const enRevision = new Set((listado.comprobantes || [])
                 .filter(r => r && r.estado === "reportado")
                 .flatMap(r => Array.isArray(r.cargos_solicitados) ? r.cargos_solicitados : [])
                 .map(x => String(x)));
-            return callGateway("b2_cotizar_ciclo", {cliente_id:id, periodo: periodo + "-01"}).then(cotizado => {
+            return callGateway("b2_cotizar_ciclo", {cliente_id:id, periodo: periodo + "-01"}).then(res2 => {
+                const cotizado = res2 && res2.body;
+                registra("b2_cotizar_ciclo", res2);
+                if(res2 && res2.status === 401) return mensajeSesion();
                 const cargos = cotizado && cotizado.resultado && cotizado.resultado.ok === true && Array.isArray(cotizado.resultado.cargos)
                     ? cotizado.resultado.cargos : null;
                 if(!cargos){
-                    anchor.innerHTML = `<div class="gx-b2-billing-error">No se pudo cargar el cobro B2.</div>`;
-                    delete anchor.dataset.gxB2Loaded;
-                    return false;
+                    if(res2 && res2.status === 200) return mensajeRespuesta("b2_cotizar_ciclo", res2);
+                    return mensajeServidor(res2);
                 }
-                const filas = cargos.map(x => {
-                    const due = (x.prorroga_estado === "aprobada" && x.fecha_pactada && Number(x.mora_centavos || 0) <= 0) ? x.fecha_pactada : x.vence;
-                    const estado = x.pagado === true ? ["Liquidado", "paid"]
-                        : enRevision.has(String(x.cargo_id || "")) ? ["En revisión", "review"] : ["Pendiente", "pending"];
-                    return {due, servicio: String(x.servicio || "Servicio contratado"), cents: Number(x.total_centavos || 0), estado};
-                }).sort((a, b) => String(a.due).localeCompare(String(b.due)));
-                const total = filas.reduce((n, f) => n + f.cents, 0);
-                const etiquetaPeriodo = typeof gxPeriodLabel === "function" ? gxPeriodLabel(periodo + "-01") : periodo;
-                anchor.innerHTML = `<div class="gx-b2-billing-title"><small>Cobro B2 — ${esc(etiquetaPeriodo)}</small><strong>${filas.length} fecha${filas.length === 1 ? "" : "s"}</strong></div>` +
-                    filas.map(f => `<div class="gx-b2-billing-row"><div><small>${esc(fechaCorta(f.due))}</small><strong>${esc(f.servicio)}</strong></div><strong>${money(f.cents)}</strong><span class="gx-b2-billing-state ${f.estado[1]}">${f.estado[0]}</span></div>`).join("") +
-                    `<div class="gx-b2-billing-total"><small>Total del ciclo</small><strong>${money(total)}</strong></div>`;
-                return true;
+                try {
+                    const filas = cargos.map(x => {
+                        const due = (x.prorroga_estado === "aprobada" && x.fecha_pactada && Number(x.mora_centavos || 0) <= 0) ? x.fecha_pactada : x.vence;
+                        const estado = x.pagado === true ? ["Liquidado", "paid"]
+                            : enRevision.has(String(x.cargo_id || "")) ? ["En revisión", "review"] : ["Pendiente", "pending"];
+                        return {due, servicio: String(x.servicio || "Servicio contratado"), cents: Number(x.total_centavos || 0), estado};
+                    }).sort((a, b) => String(a.due).localeCompare(String(b.due)));
+                    const total = filas.reduce((n, f) => n + f.cents, 0);
+                    const etiquetaPeriodo = typeof gxPeriodLabel === "function" ? gxPeriodLabel(periodo + "-01") : periodo;
+                    anchor.innerHTML = `<div class="gx-b2-billing-title"><small>Cobro B2 — ${esc(etiquetaPeriodo)}</small><strong>${filas.length} fecha${filas.length === 1 ? "" : "s"}</strong></div>` +
+                        filas.map(f => `<div class="gx-b2-billing-row"><div><small>${esc(fechaCorta(f.due))}</small><strong>${esc(f.servicio)}</strong></div><strong>${money(f.cents)}</strong><span class="gx-b2-billing-state ${f.estado[1]}">${f.estado[0]}</span></div>`).join("") +
+                        `<div class="gx-b2-billing-total"><small>Total del ciclo</small><strong>${money(total)}</strong></div>`;
+                    return true;
+                } catch (e) {
+                    console.warn("[GOXION Admin · Cobro B2] error al dibujar el cobro: " + (e && e.message ? String(e.message) : String(e)));
+                    return pintaError("No se pudo mostrar el cobro B2. Los datos llegaron, pero no se pudieron dibujar. Inténtalo de nuevo.");
+                }
             });
-        }).catch(() => {
-            anchor.innerHTML = `<div class="gx-b2-billing-error">No se pudo cargar el cobro B2.</div>`;
-            delete anchor.dataset.gxB2Loaded;
-            return false;
+        });
+        return cargar().catch(() => {
+            console.warn("[GOXION Admin · Cobro B2] fallo de red al cargar el cobro (reintento agotado)");
+            return pintaError("No se pudo cargar el cobro B2. Revisa tu conexión e inténtalo de nuevo.");
         });
     }
     window.gxCargarCobroB2 = gxCargarCobroB2;
