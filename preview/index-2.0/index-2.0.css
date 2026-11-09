@@ -1,6 +1,8 @@
 /* GOXION · Index 2.0 · capa visual del espejo (preview/index-2.0/).
  * Solo reglas del espejo; index.css oficial no se modifica durante la beta.
  * B0: andamio. B1: grupos por fecha + X al token de cierre de la hoja de pago.
+ * B6: el hero sigue a la selección, "Total del periodo", chip "Pagar todo",
+ * tarjetas planas fieles a las capturas, corrección del ripple del chip.
  * ADN: fondo #030305, cian #00f2fe, morado #7c4dff, Poppins, cristal/blur.
  * La unidad de la pantalla es la fecha de pago, no el servicio: cada dato
  * aparece una sola vez (propuesta §3). */
@@ -102,10 +104,10 @@ html.gx-20-b2 .services-container{display:none}
 .gx-20-row-side strong{font-size:14px;font-weight:700;letter-spacing:-.2px}
 .gx-20-row-side small{font-size:11px;font-weight:500;color:#9aacca}
 
-/* B3 · Total del mes + chip "Todo": una sola línea al final de los grupos.
- * "Todo" selecciona todos los grupos y paga todo junto en un solo reporte
- * (Luis: $168 + $79 = $247); sin esto el cliente tendría que hacer dos
- * pagos separados. */
+/* B3 · Total del periodo + chip "Pagar todo": una sola línea al final de
+ * los grupos. "Pagar todo" selecciona todos los grupos y paga todo junto
+ * en un solo reporte (Luis: $168 + $79 = $247); sin esto el cliente
+ * tendría que hacer dos pagos separados. */
 .gx-20-total-row{
   display:flex;align-items:center;justify-content:space-between;gap:12px;
   padding:14px 18px 16px;border-top:1px solid rgba(255,255,255,.065)
@@ -121,7 +123,7 @@ html.gx-20-b2 .services-container{display:none}
   color:#8fefff;font-family:inherit;font-size:12px;font-weight:700;
   transition:transform .18s ease,background .2s ease,color .2s ease,border-color .2s ease
 }
-.gx-20-todo-chip>span{position:relative;z-index:1}
+.gx-20-todo-chip>span:not(.gx-20-ripple){position:relative;z-index:1}
 .gx-20-todo-chip.is-active{
   background:linear-gradient(135deg,#24f0ff,#61dcff);border-color:transparent;color:#031015
 }
@@ -130,6 +132,10 @@ html.gx-20-b2 .services-container{display:none}
 @media(max-width:320px){
   .gx-20-total-label{font-size:11px}
   .gx-20-total-amount{font-size:15px}
+  /* B6 · "Pagar todo" es más ancho que "Todo": en angosto se compacta
+   * para que la fila no se desborde. */
+  .gx-20-todo-chip{padding:6px 10px;font-size:11px}
+  .gx-20-total-row{padding-left:12px;padding-right:12px}
 }
 
 /* B3 · La X de la hoja de pago era intocable en el espejo: el encabezado
@@ -168,7 +174,12 @@ html.gx-20-b2 .services-container{display:none}
  * más tarde en el archivo) y, como hijo en flujo del botón/fila, un
  * ripple de ~687 px inflaba la fila: la caja de filas medía 719 px en
  * vez de 73 px y el grupo 914 px en vez de 268 px. Por eso las reglas
- * `>*` excluyen ahora a .gx-20-ripple con :not(). */
+ * `>*` excluyen ahora a .gx-20-ripple con :not().
+ * B6 · El mismo agujero vivía en el chip "Pagar todo": la regla
+ * `.gx-20-todo-chip>span` (0,1,1) gana a `.gx-20-ripple` (0,1,0) y el
+ * ripple (un <span>) quedaba relative dentro del chip en flex: el chip
+ * crecía de 61×32 a ~195×148 y empujaba toda la tarjeta hacia abajo —
+ * la elipse gigante del video 3. Por eso también lleva el :not(). */
 .gx-20-ripple{
   position:absolute;border-radius:50%;pointer-events:none;z-index:0;
   background:rgba(255,255,255,.22);transform:scale(0);
@@ -185,6 +196,12 @@ html.gx-20-b2 .services-container{display:none}
 }
 .gx-20-foot + .gx-20-foot{padding-top:0}
 .gx-20-note{color:#ffb3b3}
+/* B6 · Nota de prórroga DENTRO del grupo (propuesta §3.6): la fecha
+ * pactada ya es la fecha del grupo, así que la nota no la repite. */
+.gx-20-group-note{
+  margin:0;padding:2px 18px 16px;
+  font-size:12px;line-height:1.55;color:#9aacca
+}
 
 /* B1 · ENERGÍA en el encabezado del grupo próximo: una sola línea de luz
  * por grupo (no una por fila), cada 2.8 s, con los keyframes oficiales
@@ -437,66 +454,74 @@ html.gx-20-b2 .gx-wallet-card{touch-action:manipulation}
   .gx-20-loyalty-break .gx-index-loyalty-seg{transition:none}
 }
 
-/* B5 · TARJETAS MÁS REALES (pedido de Henry): la sección de
- * transferencia (Nu / Revolut) se ve como una tarjeta bancaria
- * real: chip, relieve, marcas y profundidad. SOLO CSS del espejo;
- * el 02-02-inline.js oficial las pinta y no se toca: ni datos, ni
- * flip, ni CLABE (en demo sigue siendo ficticia). */
-/* Chip EMV dorado, a la izquierda, como en una tarjeta real. */
-html.gx-20-b2 .gx-wallet-front::before{
-  content:"";position:absolute;left:16px;top:64px;z-index:2;
-  width:40px;height:30px;border-radius:7px;
-  background:
-    linear-gradient(90deg,transparent 44%,rgba(122,74,0,.55) 44% 56%,transparent 56%),
-    linear-gradient(0deg,transparent 42%,rgba(122,74,0,.55) 42% 58%,transparent 58%),
-    linear-gradient(135deg,#f7dc7d 0%,#e3b93c 38%,#c9930a 62%,#f2d06b 100%);
-  box-shadow:
-    inset 0 0 0 1px rgba(122,74,0,.5),
-    inset 0 1px 0 rgba(255,255,255,.6),
-    inset 0 -1px 0 rgba(122,74,0,.35),
-    0 1px 3px rgba(0,0,0,.5);
-}
-/* Profundidad: sombra exterior más presente + borde luminoso fino. */
-html.gx-20-b2 .gx-wallet-face{
-  box-shadow:
-    0 20px 44px rgba(0,0,0,.48),
-    0 2px 8px rgba(0,0,0,.35),
-    inset 0 1px 0 rgba(255,255,255,.14),
-    inset 0 0 0 1px rgba(255,255,255,.05);
-}
-html.gx-20-b2 .gx-wallet-card[data-bank="nu"] .gx-wallet-front{
-  box-shadow:
-    0 20px 44px rgba(0,0,0,.48),
-    0 8px 24px rgba(122,8,219,.28),
-    inset 0 1px 0 rgba(255,255,255,.16),
-    inset 0 0 0 1px rgba(255,255,255,.05);
-}
-html.gx-20-b2 .gx-wallet-card[data-bank="revolut"] .gx-wallet-front{
-  box-shadow:
-    0 20px 44px rgba(0,0,0,.48),
-    0 8px 24px rgba(24,59,125,.35),
-    inset 0 1px 0 rgba(255,255,255,.16),
-    inset 0 0 0 1px rgba(255,255,255,.05);
-}
-/* Relieve: el número y la marca se leen grabados, no planos. */
+/* B6 · TARJETAS PLANAS Y FIELES A LAS CAPTURAS (pedido de Henry):
+ * se quita todo lo del B5 (chip EMV dorado, relieve, holograma,
+ * profundidad): las tarjetas reales de sus capturas de Apple Wallet
+ * no tienen chip y son planas — se reconocen por el diseño, no por
+ * el relieve. SOLO CSS del espejo; el 02-02-inline.js oficial las
+ * pinta y no se toca: ni datos, ni flip, ni CLABE. Los colores son
+ * los ya registrados en GOXION (Nu morado, Revolut azul oscuro);
+ * el azul vivo de la captura de Revolut NO se usa. */
+/* Sin chip EMV (B5), sin orbe, sin brillo: frente plano y mate. */
+html.gx-20-b2 .gx-wallet-front::before{display:none}
+html.gx-20-b2 .gx-wallet-orb{display:none}
+html.gx-20-b2 .gx-wallet-front::after{display:none}
+/* Plano: marca y número sin sombra de grabado. */
+html.gx-20-b2 .gx-wallet-brand-name{text-shadow:none}
 html.gx-20-b2 .gx-wallet-front-bottom strong{
-  text-shadow:0 1px 0 rgba(0,0,0,.55),0 -1px 1px rgba(255,255,255,.14);
-  letter-spacing:1.4px;
+  text-shadow:none;letter-spacing:.5px;font-size:15px}
+/* La marca de red (Mastercard) va abajo a la derecha, junto al
+ * número; arriba a la derecha va la etiqueta del tipo de tarjeta.
+ * La fila de marca es position:relative en el oficial, así que
+ * sería el bloque contenedor del acento y bottom:15px caería
+ * arriba (la fila mide ~46 px): por eso la fila pasa a static en
+ * el espejo y el bloque contenedor es el frente (inset:0), igual
+ * que la fila del número (bottom:15px). */
+html.gx-20-b2 .gx-wallet-brand-row{position:static}
+html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent{
+  position:absolute;right:16px;bottom:15px;z-index:2;
+  width:58px;height:30px;margin:0;border:0;border-radius:0;
+  background:transparent;box-shadow:none;
 }
-html.gx-20-b2 .gx-wallet-brand-name{
-  text-shadow:0 2px 4px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.12);
+html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::before,
+html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::after{
+  content:"";position:absolute;top:1px;width:28px;height:28px;
+  border-radius:50%;
 }
-/* Revolut: su acento ya era un chip en la fila de marca; con el
- * chip real a la izquierda, el acento pasa a ser un holograma (no
- * dos chips). Nu conserva su marca de red (Mastercard) arriba a
- * la derecha. */
-html.gx-20-b2 .gx-wallet-card[data-bank="revolut"] .gx-wallet-card-accent{
-  width:26px;height:26px;margin-top:2px;border-radius:50%;
-  background:conic-gradient(from 210deg,#f6d365,#7de4cf,#b79bf0,#f6d365);
-  border:1px solid rgba(255,255,255,.55);
-  box-shadow:inset 0 1px 2px rgba(255,255,255,.6),0 1px 3px rgba(0,0,0,.35);
+html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::before{left:2px;background:#ff1738}
+html.gx-20-b2 .gx-wallet-card .gx-wallet-card-accent::after{
+  right:2px;background:#ff9f19;
+  box-shadow:-12px 0 0 -2px rgba(255,104,20,.74);
 }
-/* Reverso: mismo cuerpo sólido, para que el flip no se sienta hueco. */
+/* Nu: "nu" minúscula arriba a la izquierda (como la tarjeta real),
+ * sin subtítulo de institución; "débito" + contactless arriba a la
+ * derecha. La fila es static, así que el ::after se posiciona
+ * contra el frente (padding 16px): right:16px y top:18px. */
+html.gx-20-b2 .gx-wallet-card[data-bank="nu"] .gx-wallet-brand-name{
+  text-transform:lowercase;letter-spacing:-1.7px;
+}
+html.gx-20-b2 .gx-wallet-brand-row small{display:none}
+html.gx-20-b2 .gx-wallet-card[data-bank="nu"] .gx-wallet-brand-row::after{
+  content:"débito";position:absolute;right:16px;top:18px;
+  padding-right:21px;font-size:12px;font-weight:600;
+  color:rgba(255,255,255,.85);letter-spacing:.2px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M7 9a7 7 0 0 1 0 6'/%3E%3Cpath d='M10.5 6.5a11 11 0 0 1 0 11'/%3E%3Cpath d='M14 4a15 15 0 0 1 0 16'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right center;
+  background-size:15px 15px;
+}
+/* Revolut: marca como está y "VIRTUAL" arriba a la derecha. El
+ * color es el ya registrado en GOXION (azul oscuro), NO el azul
+ * de la captura de Apple Wallet. */
+html.gx-20-b2 .gx-wallet-card[data-bank="revolut"] .gx-wallet-brand-row::after{
+  content:"VIRTUAL";position:absolute;right:16px;top:19px;
+  font-size:11px;font-weight:700;letter-spacing:1.6px;
+  color:rgba(255,255,255,.75);
+}
+/* Abajo solo queda el número: sin "Cuenta de transferencia" ni
+ * "Toca para ver datos" (el flip sigue siendo tocar la tarjeta). */
+html.gx-20-b2 .gx-wallet-front-bottom span,
+html.gx-20-b2 .gx-wallet-front-bottom small{display:none}
+/* Reverso: mismo cuerpo sólido (B5), para que el flip no se sienta hueco. */
 html.gx-20-b2 .gx-wallet-back{
   background:
     radial-gradient(circle at 10% 0%,rgba(0,242,254,.10),transparent 33%),
@@ -506,3 +531,8 @@ html.gx-20-b2 .gx-wallet-back{
 html.gx-20-b2 .gx-wallet-card .gx-bank-clabe{
   box-shadow:inset 0 1px 3px rgba(0,0,0,.35),inset 0 -1px 0 rgba(255,255,255,.05);
 }
+/* Icono de copiar (Lucide): el rectángulo frontal es de 14×14
+ * (perímetro 56); el dasharray oficial (40) le dejaría un hueco
+ * en el trazo, así que aquí es 56. El morphing a check sigue
+ * siendo el oficial. */
+html.gx-20-b2 .gx-copy-front{stroke-dasharray:56}

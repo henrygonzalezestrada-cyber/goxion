@@ -1,13 +1,16 @@
-/* GOXION · Index 2.0 · adaptador del espejo (B0–B5).
+/* GOXION · Index 2.0 · adaptador del espejo (B0–B6).
  * Sustituye a preview/integracion-b2/index-adapter.js DENTRO del espejo.
  * Reutiliza el motor financiero y el puente demo/real (b2-bridge.js): los
  * importes, la mora y la lealtad vienen del servidor en centavos; aquí solo
  * se AGRUPA por fecha efectiva para pintar. Nada se calcula en JS.
  * B1: grupos por fecha con <details> nativo. B2: hero de un solo total +
  * píldora solo con estado relativo + total del mes. B3: selección por grupo,
- * chip "Todo" (pagar todo junto en un solo reporte), botón principal con el
+ * chip "Pagar todo" (pagar todo junto en un solo reporte), botón principal con el
  * importe seleccionado y botones A+C. DESGLOSE DEL PAGO como sección no se
- * toca en este bloque (es B4). */
+ * toca en este bloque (es B4). B6: el hero sigue a la selección, el botón
+ * principal pierde el importe, "Total del periodo", chip "Pagar todo",
+ * nota de prórroga dentro del grupo, píldora "Pago en revisión" y
+ * corrección del ripple del chip (elipse gigante del video 3). */
 (function(){
  "use strict";
  const store=window.GOXION_B2_PREVIEW;
@@ -79,13 +82,13 @@
  }
  function choice(){
   const list=pending();
-  if(!list.length)return {cargos:[],centavos:0};
-  if(mode==="todo")return {cargos:list,centavos:list.reduce((s,x)=>s+x.total_centavos,0)};
+  if(!list.length)return {cargos:[],centavos:0,fecha:"",todo:false};
+  if(mode==="todo")return {cargos:list,centavos:list.reduce((s,x)=>s+x.total_centavos,0),fecha:"",todo:true};
   const fecha=selectedGroup||nextPayment().fecha;
   const items=list.filter(x=>effectiveDue(x)===fecha);
-  if(items.length)return {cargos:items,centavos:items.reduce((s,x)=>s+x.total_centavos,0)};
+  if(items.length)return {cargos:items,centavos:items.reduce((s,x)=>s+x.total_centavos,0),fecha,todo:false};
   const due=nextPayment();
-  return {cargos:due.cargos,centavos:due.centavos};
+  return {cargos:due.cargos,centavos:due.centavos,fecha:due.fecha,todo:false};
  }
  /* B1 · Estado del grupo, en palabras (propuesta §3.4). La fecha vive solo
   * en el encabezado; la prórroga aprobada define la fecha efectiva del
@@ -159,26 +162,29 @@
   if(days===1)return {text:"⏳ Vence mañana",cls:"badge-ok"};
   return {text:"⏳ Vence en "+days+" días",cls:"badge-ok"};
  }
- /* B2 · Mes del período ("noviembre"), para la línea "Total de noviembre". */
- function monthName(){
-  const v=store.quote?.periodo||"";
-  if(!/^\d{4}-\d{2}/.test(v))return "del período";
-  return new Intl.DateTimeFormat("es-MX",{month:"long",timeZone:"UTC"})
-   .format(new Date(v.slice(0,7)+"-01T00:00:00Z"));
- }
  function updateHeader(){
   const quote=store.quote;
   if(!quote)return;
-  const next=nextPayment(),due=next.cargos[0];
+  const next=nextPayment(),sel=choice();
   const label=document.querySelector(".balance-hero .total-label");
   const amount=document.querySelector(".balance-hero .total-amount");
   const badge=document.querySelector(".balance-hero .time-badge");
-  /* B2 · UNA cifra de acción: el hero es el grupo próximo ("A pagar el
-   * 8 nov · $168.00"), no el total del mes ni un saldo genérico. */
-  if(label)label.textContent=due?"A pagar el "+date(next.fecha):"Saldo pendiente";
-  if(amount)amount.textContent=money(next.centavos);
+  /* B6 · El hero ES lo que se va a pagar y sigue a la selección: el
+   * grupo próximo por defecto ("A pagar el 6 nov · $46.06"),
+   * "A pagar todo el periodo" con pagar-todo, y la fecha y el
+   * importe del grupo elegido al tocar otro grupo. Sin fecha no se
+   * inventa una ("Saldo pendiente"); sin pendientes, "Sin pagos
+   * pendientes". La píldora sigue al grupo seleccionado (en "todo",
+   * al más próximo) y, si hay comprobante en revisión, dice
+   * "Pago en revisión" en vez del estado del vencimiento. */
+  if(label)label.textContent=sel.todo?"A pagar todo el periodo"
+   :sel.cargos.length&&sel.fecha?"A pagar el "+date(sel.fecha)
+   :sel.cargos.length?"Saldo pendiente":"Sin pagos pendientes";
+  if(amount)amount.textContent=money(sel.centavos);
   if(badge){
-   const pill=heroPillState(next);
+   const pill=quote.comprobante_en_revision
+    ?{text:"⏳ Pago en revisión",cls:"badge-review"}
+    :heroPillState(sel.todo?next:sel);
    badge.textContent=pill.text;
    badge.className="time-badge "+pill.cls;
   }
@@ -369,19 +375,19 @@
   section.dataset.gx20Proof="1";
   content.insertBefore(section,content.firstChild);
  }
- /* B3 · El botón principal dice SIEMPRE el importe seleccionado
-  * ("Ya realicé mi pago · $168.00" con un grupo, "· $247.00" con Todo).
-  * El render global lo repinta con el texto fijo, así que se repone aquí
-  * en cada render y en cada mutación de #app (con guardia por igualdad,
-  * para no entrar en bucle). No se toca mientras se está enviando (A). */
+ /* B6 · El botón principal ya NO lleva el importe: el hero y la
+  * barra compacta ya lo muestran (eso triplicaba el total: precio
+  * grande + "Total del periodo" + importe en el botón). El texto es
+  * fijo ("Ya realicé mi pago"); el render global lo repinta igual,
+  * así que aquí solo se repone tras el envío (A) o tras una
+  * mutación de #app. No se toca mientras se está enviando (A). */
  function updatePrimaryButton(){
   if(!store.quote)return;
   const primary=document.querySelector(".gx-payment-primary");
   if(!primary||primary.classList.contains("is-sending"))return;
   const strong=primary.querySelector(".gx-payment-primary-copy strong");
   if(!strong)return;
-  const val=choice();
-  const desired=val.centavos>0?"Ya realicé mi pago · "+money(val.centavos):"Ya realicé mi pago";
+  const desired="Ya realicé mi pago";
   if(strong.textContent!==desired)strong.textContent=desired;
  }
  /* B3 · Pintar la selección sobre el DOM existente, sin re-render: tocar el
@@ -408,7 +414,7 @@
     if(small.textContent!==label)small.textContent=label;
    }
   });
-  /* B5 · El chip "Todo" también se pinta por clases: sin esto, al
+  /* B5 · El chip "Pagar todo" también se pinta por clases: sin esto, al
    * tocarlo habría que reconstruir el DOM para que se viera activo
    * (y volvería el toque perdido del video 2). */
   const chip=card.querySelector(".gx-20-todo-chip");
@@ -417,11 +423,13 @@
    chip.setAttribute("aria-pressed",mode==="todo"?"true":"false");
   }
   updatePrimaryButton();
+  /* B6 · El hero sigue a la selección: tocar un grupo, una fila o
+   * "Pagar todo" cambia la etiqueta, el importe y la píldora. */
+  updateHeader();
  }
  function content(){
   const list=groups(),next=nextPayment();
   const nextFecha=next.fecha;
-  const due=pending()[0];
   const selectedFecha=selectedGroup||nextFecha;
   const plural=n=>n===1?"1 servicio":n+" servicios";
   const groupsHTML=list.map(g=>{
@@ -443,6 +451,11 @@
      '<span class="gx-20-row-side"><strong>'+money(x.total_centavos)+'</strong><small>'+
        side+'</small></span></button>';
    }).join("");
+   /* B6 · Nota de prórroga DENTRO del grupo (propuesta §3.6): la fecha
+    * pactada ya ES la fecha del grupo, así que la nota no la repite. */
+   const prorrogaNote=g.cargos.some(x=>x.prorroga_estado==="aprobada"&&
+     x.fecha_pactada&&x.mora_centavos<=0)
+    ?'<p class="gx-20-group-note">Mantendrás tu lealtad si cumples en esa fecha.</p>':"";
    return '<details class="gx-20-group '+(isNext?'is-next ':'')+
     (isActive?'is-active':'')+'" data-gx20-fecha="'+esc(g.fecha)+'"'+
     (open?' open':'')+'>'+
@@ -456,28 +469,26 @@
      '<path d="M3.2 4.2L12 11.3L20.8 4.2"/></svg></span></span>'+
     '</summary>'+
     '<div class="gx-20-rows">'+rowsHTML+'</div>'+
-    breakdownHTML(g)+
+    breakdownHTML(g)+prorrogaNote+
    '</details>';
   }).join("");
-  /* B3 · Total del mes + chip "Todo": una sola línea al final de los grupos.
-   * "Todo" selecciona todos los grupos y paga todo junto en un solo reporte
-   * (Luis: $168 + $79 = $247); sin esto el cliente tendría que hacer dos
-   * pagos separados. Solo cuando hay algo pendiente. */
+  /* B6 · Total del periodo + chip "Pagar todo": una sola línea al final
+   * de los grupos. "Pagar todo" selecciona todos los grupos y paga
+   * todo junto en un solo reporte (Luis: $168 + $79 = $247); sin esto
+   * el cliente tendría que hacer dos pagos separados. Solo cuando
+   * hay algo pendiente. */
   const totalAll=pending().reduce((s,x)=>s+x.total_centavos,0);
   const totalRow=totalAll>0?
-   '<div class="gx-20-total-row"><span class="gx-20-total-main"><span class="gx-20-total-label">Total de '+esc(monthName())+'</span><strong class="gx-20-total-amount">'+money(totalAll)+'</strong></span>'+
-   '<button class="gx-20-todo-chip'+(mode==="todo"?' is-active':'')+'" type="button" aria-pressed="'+(mode==="todo")+'"><span>Todo</span></button></div>':"";
+   '<div class="gx-20-total-row"><span class="gx-20-total-main"><span class="gx-20-total-label">Total del periodo</span><strong class="gx-20-total-amount">'+money(totalAll)+'</strong></span>'+
+   '<button class="gx-20-todo-chip'+(mode==="todo"?' is-active':'')+'" type="button" aria-pressed="'+(mode==="todo")+'"><span>Pagar todo</span></button></div>':"";
   const foot=(store.quote?.comprobante_en_revision?
     "Comprobante recibido · pendiente de revisión. Aún no es un pago acreditado.":
     "El reporte de pago se acredita únicamente después de la revisión de Admin.");
-  const prorrogated=due?.prorroga_estado==="aprobada"&&due.mora_centavos===0?
-    '<p class="gx-20-foot">Acuerdo pactado hasta el '+esc(date(due.fecha_pactada))+
-    '. Mantendrás tu lealtad si cumples en esa fecha.</p>':"";
   const lostNote=store.quote?.lealtad_global_perdida?
     '<p class="gx-20-foot gx-20-note">La lealtad se perdió por una fecha incumplida. La mora corresponde solo al servicio vencido.</p>':"";
   return '<div class="gx-20-cal-head"><span class="gx-20-caption">CALENDARIO DE PAGOS</span></div>'+
    groupsHTML+totalRow+
-   '<p class="gx-20-foot">'+esc(foot)+'</p>'+prorrogated+lostNote;
+   '<p class="gx-20-foot">'+esc(foot)+'</p>'+lostNote;
  }
  function render(){
   const anchor=document.querySelector(".services-container");
@@ -542,12 +553,12 @@
     * altura de ::details-content y en Safari 26 se quedaba en
     * ~700 px (el hueco enorme). Sin re-render no hay re-disparo
     * de animación de altura ni nodo que desaparezca bajo el toque;
-    * el hero no depende de la selección (siempre es el próximo),
-    * así que paintSelection() + el botón principal lo cubren todo. */
+    * paintSelection() pinta la selección y actualiza el hero y el
+    * botón principal, que es todo lo que depende de ella. */
    paintSelection();
   }));
-  /* B3 · Chip "Todo": un toque selecciona todos los grupos (pagar todo
-   * junto); otro toque vuelve a la selección por grupo (el próximo). */
+  /* B3 · Chip "Pagar todo": un toque selecciona todos los grupos (pagar
+   * todo junto); otro toque vuelve a la selección por grupo (el próximo). */
   card.querySelector(".gx-20-todo-chip")?.addEventListener("click",()=>{
    if(mode==="todo"){mode="grupo";selectedGroup=null;}
    else mode="todo";
@@ -561,6 +572,31 @@
   updateHeader();
   updatePrimaryButton();
   updateProofTracker();
+ }
+ /* B6 · Icono de copiar (Lucide "copy"): el oficial pinta dos
+  * rectángulos solapados que se leen raro; se sustituyen por la
+  * construcción limpia de Lucide (página trasera abierta +
+  * rectángulo frontal), con las MISMAS clases (.gx-copy-back /
+  * .gx-copy-front / .gx-copy-check) para que el morphing oficial
+  * a check al copiar siga funcionando. Solo se toca el SVG dentro
+  * del espejo; el oficial no se modifica. Una sola vez por SVG. */
+ function polishCopyIcons(){
+  document.querySelectorAll(".gx-copy-icon svg:not([data-gx20-copy])").forEach(svg=>{
+   const back=svg.querySelector(".gx-copy-back"),
+     front=svg.querySelector(".gx-copy-front");
+   if(!back||!front)return;
+   svg.dataset.gx20Copy="1";
+   const ns="http://www.w3.org/2000/svg";
+   const mk=(tag,attrs)=>{
+    const el=document.createElementNS(ns,tag);
+    for(const k in attrs)el.setAttribute(k,attrs[k]);
+    return el;
+   };
+   svg.replaceChild(mk("path",{class:"gx-copy-back",
+    d:"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"}),back);
+   svg.replaceChild(mk("rect",{class:"gx-copy-front",
+    x:"8",y:"8",width:"14",height:"14",rx:"2"}),front);
+  });
  }
  function installHandlers(){
   if(installed||typeof window.abrirModalPago!=="function")return;
@@ -598,7 +634,7 @@
     setTimeout(open,220);
    }else open();
   };
-  /* B3 · Al cerrar la hoja, el primario vuelve a su etiqueta con importe.
+  /* B3 · Al cerrar la hoja, el primario vuelve a su etiqueta.
    * cerrarModalPago quita "show" en síncrono cuando sí cierra; si no cierra
    * (clic fuera del overlay), no se restaura nada. */
   const originalClose=window.cerrarModalPago;
@@ -625,7 +661,11 @@
     const val=choice();if(val.centavos<=0)return;
     try{pagoActualInfo.monto=(val.centavos/100).toFixed(2)}catch(_){}
    }
-   return originalBank.apply(this,arguments);
+   const out=originalBank.apply(this,arguments);
+   /* B6 · Las tarjetas se pintan al abrir la hoja (renderCuentasPago
+    * corre dentro de abrirDatosPago): aquí se les cambia el icono. */
+   polishCopyIcons();
+   return out;
   };
   window.enviarComprobanteDiscord=async function(){
    if(store.blocked){
@@ -701,7 +741,7 @@
    }finally{store.submitting=false;}
   };
   /* B3 · Botón C: ripple desde el punto del toque en los botones del
-   * espejo (primario, secundario, chip Todo, filas, envío). Solo
+   * espejo (primario, secundario, chip Pagar todo, filas, envío). Solo
    * transform/opacity; se salta con reduced-motion. */
   document.addEventListener("pointerdown",e=>{
    if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;
@@ -722,6 +762,7 @@
  function init(){
   installHandlers();
   updatePrimaryButton();
+  polishCopyIcons();
   if(!store.quote)return;
   const anchor=document.querySelector(".services-container");
   if(anchor && anchor!==lastAnchor){lastAnchor=anchor;render();}
