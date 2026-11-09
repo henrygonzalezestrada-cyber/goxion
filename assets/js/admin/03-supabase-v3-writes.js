@@ -23,7 +23,15 @@
             try { body = text ? JSON.parse(text) : {}; } catch {}
 
             if (!r.ok || body?.ok !== true) {
-                throw new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+                const err = new Error(body?.error || `HTTP ${r.status}: ${text || "Respuesta vacía"}`);
+                // Observabilidad (mismo patrón PR #198, C4): el error lleva el
+                // estatus HTTP, el código del servidor y el cuerpo completo,
+                // para que el alert y la consola los muestren. El mensaje no
+                // cambia: los demás llamados siguen igual. Nunca el token.
+                err.gxHttpStatus = r.status;
+                err.gxCodigo = String(body?.codigo || "");
+                err.gxCuerpo = text;
+                throw err;
             }
             return body;
         }
@@ -274,7 +282,17 @@
                 // No ocultamos el error; primero re-sincronizamos la ficha para
                 // evitar que un nodo viejo haga parecer que el servicio sigue ahí.
                 try { await recargar(key); } catch {}
-                errorUI("No se pudo quitar el servicio.", e);
+                // Observabilidad (mismo patrón PR #198, C4): el alert muestra
+                // el estatus HTTP + el código/error del servidor, y el cuerpo
+                // completo queda en consola. Nunca se registra el token.
+                const estatus = (e && typeof e.gxHttpStatus === "number") ? e.gxHttpStatus : null;
+                const codigo = String(e?.gxCodigo || "").slice(0, 80);
+                const detalle = String(e?.message || e || "").slice(0, 200);
+                console.warn("[GOXION Admin · Quitar servicio] HTTP " + (estatus ?? "?") + (codigo ? " · " + codigo : "") + " · cuerpo: " + String(e?.gxCuerpo ?? e?.message ?? e ?? ""));
+                if (estatus === 401) return alert("❌ Tu sesión de Admin expiró. Vuelve a iniciar sesión e inténtalo de nuevo.");
+                const linea = "El servidor devolvió" + (estatus !== null ? " HTTP " + estatus : " un error") + (codigo ? " · " + codigo : "") + ".";
+                const detalleLinea = (detalle && detalle !== codigo && !/^HTTP \d+/.test(detalle)) ? "\n" + detalle : "";
+                alert("❌ No se pudo quitar el servicio.\n\n" + linea + detalleLinea);
             }
         };
 
