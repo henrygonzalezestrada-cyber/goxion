@@ -1136,6 +1136,23 @@ details.gx-client-ops-context{
 .gx-billing-status.overdue strong{color:#ff7998}
 .gx-billing-status.paid strong{color:#72ffd4}
 
+.gx-b2-billing{margin:2px 0 8px}
+.gx-b2-billing-title{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:2px 0 7px}
+.gx-b2-billing-title small{display:block;color:var(--text-muted);font-size:.52rem;font-weight:800;text-transform:uppercase}
+.gx-b2-billing-title strong{font-size:.75rem}
+.gx-b2-billing-row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 10px;border:1px solid rgba(255,255,255,.07);border-radius:11px;background:rgba(255,255,255,.022);margin-bottom:6px}
+.gx-b2-billing-row>div{min-width:0}
+.gx-b2-billing-row small{display:block;color:var(--text-muted);font-size:.52rem;font-weight:800;text-transform:uppercase}
+.gx-b2-billing-row strong{display:block;margin-top:2px;font-size:.75rem}
+.gx-b2-billing-row .gx-b2-billing-state{font-size:.68rem;font-weight:800;white-space:nowrap}
+.gx-b2-billing-state.review{color:#d097ff}
+.gx-b2-billing-state.paid{color:#72ffd4}
+.gx-b2-billing-state.pending{color:var(--text-muted)}
+.gx-b2-billing-total{display:flex;justify-content:space-between;align-items:center;padding:9px 10px;border-top:1px solid rgba(255,255,255,.07);margin-top:2px}
+.gx-b2-billing-total small{color:var(--text-muted);font-size:.52rem;font-weight:800;text-transform:uppercase}
+.gx-b2-billing-total strong{font-size:.75rem}
+.gx-b2-billing-loading,.gx-b2-billing-error{font-size:.72rem;color:var(--text-muted);padding:6px 2px}
+
 .gx-billing-admin{
     border-top:1px solid rgba(255,255,255,.055);
 }

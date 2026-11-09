@@ -676,6 +676,8 @@ let clientesDict = {};
 
                             ${gxBillingBreakdownHTML}
 
+                            <div class="gx-b2-billing" data-gx-b2-key="${key}" data-gx-b2-cliente="${cliente._id || cliente.id || ''}"></div>
+
                             <details class="gx-billing-admin">
                                 <summary><span>Administrar ciclo</span><em>${cliente.ciclo_cobro_manual?'Manual':'Automático'}</em></summary>
                                 <div class="gx-billing-admin-body">
@@ -804,6 +806,71 @@ let clientesDict = {};
             container.appendChild(card);
         });
     }
+
+    // Cobro B2 en la ficha (solo lectura, Admin): si el cliente es B2, lista
+    // los cargos de su ciclo con fecha, servicio, importe y estado. El total
+    // global de arriba se conserva como resumen; esto no toca dia_pago ni
+    // periodo_pendiente ni el motor financiero. Se carga perezoso al abrir la
+    // ficha (gxOpenClientFocusBase) para no pedir la cotización de todos los
+    // clientes en cada render. La marca "cargado" vive en el nodo, así que un
+    // re-render vuelve a cargar con datos frescos.
+    function gxCargarCobroB2(key){
+        const c = typeof clientesDict !== "undefined" ? clientesDict[key] : null;
+        const id = String(c?._id || c?.id || "");
+        const anchor = Array.from(document.querySelectorAll(".gx-b2-billing") || [])
+            .find(el => el.dataset && String(el.dataset.gxB2Key || "") === String(key));
+        if(!c || !anchor || anchor.dataset.gxB2Loaded) return Promise.resolve(false);
+        if(!/^[0-9a-f-]{36}$/i.test(id)){ anchor.remove(); return Promise.resolve(false); }
+        const core = window.GOXION_CORE;
+        const token = (core && core.STORAGE ? localStorage.getItem(core.STORAGE.ADMIN_TOKEN || "") : "") || "";
+        const url = core && typeof core.endpoint === "function" ? core.endpoint("acciones-financieras-b2-beta") : "";
+        if(!token || !url){ anchor.remove(); return Promise.resolve(false); }
+        anchor.dataset.gxB2Loaded = "1";
+        anchor.innerHTML = `<div class="gx-b2-billing-loading">Cargando cobro B2…</div>`;
+        const esc = s => String(s ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+        const money = n => "$" + (Number(n || 0) / 100).toFixed(2);
+        const fechaCorta = v => {
+            const d = new Date(String(v || "") + "T12:00:00");
+            return Number.isNaN(d.getTime()) ? String(v || "—") : d.toLocaleDateString("es-MX", {day:"numeric", month:"short"});
+        };
+        const periodo = String(c?.estado_cuenta?.periodo || c?.periodo_pendiente || "").slice(0, 7);
+        const callGateway = (accion, datos) => fetch(url, {method:"POST", cache:"no-store",
+            headers:{"Content-Type":"application/json", "X-Admin-Token":token},
+            body:JSON.stringify({accion, datos})}).then(r => r.json().catch(() => ({})));
+        return callGateway("b2_listar_comprobantes", {cliente_id:id}).then(listado => {
+            if(!listado || listado.ok !== true || listado.modo !== "b2_multifecha"){ anchor.remove(); return false; }
+            const enRevision = new Set((listado.comprobantes || [])
+                .filter(r => r && r.estado === "reportado")
+                .flatMap(r => Array.isArray(r.cargos_solicitados) ? r.cargos_solicitados : [])
+                .map(x => String(x)));
+            return callGateway("b2_cotizar_ciclo", {cliente_id:id, periodo: periodo + "-01"}).then(cotizado => {
+                const cargos = cotizado && cotizado.resultado && cotizado.resultado.ok === true && Array.isArray(cotizado.resultado.cargos)
+                    ? cotizado.resultado.cargos : null;
+                if(!cargos){
+                    anchor.innerHTML = `<div class="gx-b2-billing-error">No se pudo cargar el cobro B2.</div>`;
+                    delete anchor.dataset.gxB2Loaded;
+                    return false;
+                }
+                const filas = cargos.map(x => {
+                    const due = (x.prorroga_estado === "aprobada" && x.fecha_pactada && Number(x.mora_centavos || 0) <= 0) ? x.fecha_pactada : x.vence;
+                    const estado = x.pagado === true ? ["Liquidado", "paid"]
+                        : enRevision.has(String(x.cargo_id || "")) ? ["En revisión", "review"] : ["Pendiente", "pending"];
+                    return {due, servicio: String(x.servicio || "Servicio contratado"), cents: Number(x.total_centavos || 0), estado};
+                }).sort((a, b) => String(a.due).localeCompare(String(b.due)));
+                const total = filas.reduce((n, f) => n + f.cents, 0);
+                const etiquetaPeriodo = typeof gxPeriodLabel === "function" ? gxPeriodLabel(periodo + "-01") : periodo;
+                anchor.innerHTML = `<div class="gx-b2-billing-title"><small>Cobro B2 — ${esc(etiquetaPeriodo)}</small><strong>${filas.length} fecha${filas.length === 1 ? "" : "s"}</strong></div>` +
+                    filas.map(f => `<div class="gx-b2-billing-row"><div><small>${esc(fechaCorta(f.due))}</small><strong>${esc(f.servicio)}</strong></div><strong>${money(f.cents)}</strong><span class="gx-b2-billing-state ${f.estado[1]}">${f.estado[0]}</span></div>`).join("") +
+                    `<div class="gx-b2-billing-total"><small>Total del ciclo</small><strong>${money(total)}</strong></div>`;
+                return true;
+            });
+        }).catch(() => {
+            anchor.innerHTML = `<div class="gx-b2-billing-error">No se pudo cargar el cobro B2.</div>`;
+            delete anchor.dataset.gxB2Loaded;
+            return false;
+        });
+    }
+    window.gxCargarCobroB2 = gxCargarCobroB2;
 
     function copiarInfo(nombre, key) {
         const link = `https://henrygonzalezestrada-cyber.github.io/goxion/index.html?cliente=${key}`;
