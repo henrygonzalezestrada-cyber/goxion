@@ -162,7 +162,52 @@
   if(days===1)return {text:"⏳ Vence mañana",cls:"badge-ok"};
   return {text:"⏳ Vence en "+days+" días",cls:"badge-ok"};
  }
- function updateHeader(){
+ /* DETALLES FINALES · CONTEO AL CAMBIAR DE SELECCIÓN. El morph
+  * oficial solo cuenta al cargar y cuando la página está arriba
+  * (scrollY===0): al tocar "Pagar todo" desplazado, el importe
+  * cambiaba de golpe. Aquí el importe grande CUENTA desde el valor
+  * anterior hasta el nuevo con la misma animación del conteo
+  * oficial (700 ms, ease-out cúbico, centavos exactos, formato
+  * $0.00). Arriba NO se cuenta aquí: se pone el valor final y el
+  * morph lo cuenta solo (si se contara en los dos sitios, el
+  * importe contaría dos veces). Con reduced-motion, cambio
+  * instantáneo. Si el usuario desplaza a mitad de conteo, se
+  * cancela y queda el valor exacto, igual que el morph. La barra
+  * compacta no se toca: es el mismo nodo .total-amount, el morph
+  * lo sigue como hoy. */
+ let heroCountRaf=0,heroCountTo=0,heroCountShown=null;
+ function parseAmountCents(text){
+  const m=String(text||"").replace(/[^0-9.]/g,"");
+  if(!m)return null;
+  const v=Math.round(parseFloat(m)*100);
+  return Number.isFinite(v)?v:null;
+ }
+ function cancelHeroCount(settle){
+  if(!heroCountRaf)return;
+  cancelAnimationFrame(heroCountRaf);heroCountRaf=0;
+  if(settle){
+   const amount=document.querySelector(".balance-hero .total-amount");
+   if(amount)amount.textContent=money(heroCountTo);
+   heroCountShown=heroCountTo;
+  }
+ }
+ function animateHeroAmount(amount,from,to){
+  cancelHeroCount(false);
+  heroCountTo=to;heroCountShown=from;
+  if(reduceMotion()||from===to){amount.textContent=money(to);heroCountShown=to;return;}
+  const t0=performance.now(),dur=700;
+  const step=now=>{
+   const t=Math.min(1,Math.max(0,(now-t0)/dur));
+   const eased=1-Math.pow(1-t,3);
+   const cents=Math.round(from+(to-from)*eased);
+   heroCountShown=cents;
+   if(amount.isConnected)amount.textContent=money(cents);
+   if(t<1){heroCountRaf=requestAnimationFrame(step);}
+   else{heroCountRaf=0;heroCountShown=to;if(amount.isConnected)amount.textContent=money(to);}
+  };
+  heroCountRaf=requestAnimationFrame(step);
+ }
+ function updateHeader(animate){
   const quote=store.quote;
   if(!quote)return;
   const next=nextPayment(),sel=choice();
@@ -180,7 +225,17 @@
   if(label)label.textContent=sel.todo?"A pagar todo el periodo"
    :sel.cargos.length&&sel.fecha?"A pagar el "+date(sel.fecha)
    :sel.cargos.length?"Saldo pendiente":"Sin pagos pendientes";
-  if(amount)amount.textContent=money(sel.centavos);
+  if(amount){
+   if(!animate){cancelHeroCount(false);amount.textContent=money(sel.centavos);heroCountShown=sel.centavos;}
+   else{
+    const from=(heroCountShown!==null?heroCountShown:parseAmountCents(amount.textContent));
+    if(from===null||from===sel.centavos||window.scrollY===0){
+     /* Sin cambio, sin valor previo, o arriba: valor exacto y el
+      * morph cuenta solo si toca (su observador ve el cambio). */
+     cancelHeroCount(false);amount.textContent=money(sel.centavos);heroCountShown=sel.centavos;
+    }else animateHeroAmount(amount,from,sel.centavos);
+   }
+  }
   if(badge){
    const pill=quote.comprobante_en_revision
     ?{text:"⏳ Pago en revisión",cls:"badge-review"}
@@ -424,8 +479,10 @@
   }
   updatePrimaryButton();
   /* B6 · El hero sigue a la selección: tocar un grupo, una fila o
-   * "Pagar todo" cambia la etiqueta, el importe y la píldora. */
-  updateHeader();
+   * "Pagar todo" cambia la etiqueta, el importe y la píldora.
+   * DETALLES FINALES · con animate=true el importe grande CUENTA
+   * desde el valor anterior (ver updateHeader). */
+  updateHeader(true);
  }
  function content(){
   const list=groups(),next=nextPayment();
@@ -770,5 +827,11 @@
  const observer=new MutationObserver(init);
  observer.observe(document.getElementById("app"),{childList:true,subtree:true});
  window.addEventListener("goxion:b2-quote-change",render);
+ /* DETALLES FINALES · Si el usuario desplaza a mitad del conteo
+  * del hero, el conteo se cancela y queda el valor exacto (igual
+  * que el morph con su propio contador). No se cancela en
+  * touchstart: un segundo toque a mitad de conteo debe arrancar
+  * desde el valor intermedio, no saltar al final. */
+ window.addEventListener("scroll",()=>cancelHeroCount(true),{passive:true});
  init();
 })();
