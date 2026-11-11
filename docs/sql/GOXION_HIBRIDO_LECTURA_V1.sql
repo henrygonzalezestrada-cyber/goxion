@@ -30,7 +30,8 @@ declare
   v_total bigint;
   v_sumado bigint;
   v_cantidad integer;
-  v_modo_contable text;
+  v_plan jsonb;
+  v_estado_transicion text;
 begin
   if p_cliente_id is null or p_hoy is null then
     raise exception 'Cliente y fecha son obligatorios';
@@ -50,60 +51,37 @@ begin
       'cobrable',false,'requiere_revision',true,'version','hibrido-lectura-v1');
   end if;
 
-  -- Derivar modo operativo de obligaciones potenciales, no del flag B2.
-  -- Contar únicamente accesos vigentes y fechas del mes verificadas.
-  select count(distinct a.id)::integer,
-         count(distinct a.id) filter (
-           where cal.estado='verificado'
-             and cal.revision>0 and cal.precio_centavos>0
-             and cal.cobertura_hasta>=v_periodo
-             and cal.cobertura_hasta<(v_periodo+interval '1 month')::date
-         )::integer,
-         count(distinct cal.cobertura_hasta) filter (
-           where cal.estado='verificado'
-             and cal.revision>0 and cal.precio_centavos>0
-             and cal.cobertura_hasta>=v_periodo
-             and cal.cobertura_hasta<(v_periodo+interval '1 month')::date
-         )::integer
-  into v_activos,v_calendarios_validos,v_fechas
-  from public.cliente_accesos a
-  join public.cliente_servicios s
-    on s.id=a.cliente_servicio_id and s.activo and s.cliente_id=p_cliente_id
-  left join public.goxion_calendario_accesos cal
-    on cal.cliente_acceso_id=a.id
-  where a.cliente_id=p_cliente_id and a.activo;
+  -- Única decisión de transición: no repetir reglas de régimen en la lectura.
+  v_plan := public.goxion_hibrido_plan_transicion_v1(p_cliente_id,p_hoy);
+  if v_plan->>'ok' is distinct from 'true' then
+    return jsonb_build_object('ok',false,'codigo','PLAN_TRANSICION_NO_CONCILIADO',
+      'cobrable',false,'requiere_revision',true,'version','hibrido-lectura-v1',
+      'plan_transicion',v_plan);
+  end if;
+  v_modo:=v_plan->>'modo_deducido';
+  v_estado_transicion:=v_plan->>'codigo';
+  v_activos:=(v_plan->>'accesos_activos')::int;
+  v_calendarios_validos:=(v_plan->>'calendarios_verificados')::int;
+  v_fechas:=(v_plan->>'fechas_distintas')::int;
+  v_regimen_activo:=(v_plan->>'b2_activo')::boolean;
+  v_ciclo_existe:=(v_plan->>'ciclo_b2_actual')::boolean;
+  v_historico_pendiente:=(v_plan->>'deuda_b2_historica')::boolean;
 
-  v_modo := case
-    when v_activos=0 then 'sin_accesos'
-    when v_activos<>v_calendarios_validos then 'calendario_pendiente'
-    when v_fechas>=2 then 'multifecha'
-    else 'fecha_unica' end;
-
-  select coalesce(r.activo,false) into v_regimen_activo
-    from public.goxion_b2_regimen_cliente r
-   where r.cliente_id=p_cliente_id;
-  v_regimen_activo := coalesce(v_regimen_activo,false);
-
-  select exists (
-    select 1 from public.goxion_b2_ciclos c
-     where c.cliente_id=p_cliente_id and c.periodo=v_periodo
-  ) into v_ciclo_existe;
-
-  -- Un cierre del régimen no borra deuda de ciclos anteriores.
-  select exists (
-    select 1 from public.goxion_b2_cargos cargo
-     where cargo.cliente_id=p_cliente_id
-       and cargo.periodo<>v_periodo
-       and not cargo.liquidado
-       and (cargo.principal_pendiente_centavos>0 or cargo.mora_pendiente_centavos>0)
-  ) into v_historico_pendiente;
-
-  if not v_regimen_activo and not v_ciclo_existe and v_historico_pendiente then
+  -- Cualquier obligación histórica sin liquidar necesita conciliación explícita.
+  -- El total del ciclo actual no pretende sumar meses anteriores.
+  if v_historico_pendiente then
     return jsonb_build_object('ok',false,'codigo','B2_HISTORICO_PENDIENTE',
+      'periodo',v_periodo,'modo_actual',v_modo,'fuente_saldo','obligaciones_b2',
+      'cobrable',false,'requiere_revision',true,'version','hibrido-lectura-v1',
+      'plan_transicion',v_plan);
+  end if;
+  -- Detectar doble contabilización entre recibos del mismo período.
+  if v_estado_transicion in
+    ('CONFLICTO_PAGO_GLOBAL_B2','CONFLICTO_REVISION_GLOBAL_B2') then
+    return jsonb_build_object('ok',false,'codigo',v_estado_transicion,
       'periodo',v_periodo,'modo_actual',v_modo,
-      'fuente_saldo','obligaciones_b2',
-      'cobrable',false,'requiere_revision',true,
-      'version','hibrido-lectura-v1');
+      'cobrable',false,'requiere_revision',true,'version','hibrido-lectura-v1',
+      'plan_transicion',v_plan);
   end if;
 
   -- El historial B2 manda incluso si el calendario actual ha cambiado.
@@ -152,8 +130,9 @@ begin
       'modo_actual',v_modo,'regimen_contable','obligaciones_b2',
       'fechas_distintas',v_fechas,'accesos_activos',v_activos,
       'calendarios_verificados',v_calendarios_validos,
-      'transicion_pendiente',v_modo<>'multifecha',
-      'requiere_revision',v_modo<>'multifecha',
+      'transicion_pendiente',v_estado_transicion<>'ESTABLE_MULTIFECHA',
+      'requiere_revision',v_estado_transicion<>'ESTABLE_MULTIFECHA',
+      'plan_transicion',v_plan,
       'fuente_saldo','obligaciones_b2',
       'total_pendiente_centavos',v_total,
       'total_actual',round(v_total::numeric/100,2),
@@ -183,8 +162,9 @@ begin
     'regimen_contable','global_legacy','fuente_saldo','global_legacy',
     'fechas_distintas',v_fechas,'accesos_activos',v_activos,
     'calendarios_verificados',v_calendarios_validos,
-    'transicion_pendiente',v_modo='multifecha',
-    'requiere_revision',v_modo='multifecha',
+    'transicion_pendiente',v_estado_transicion<>'ESTABLE_FECHA_UNICA',
+    'requiere_revision',v_estado_transicion<>'ESTABLE_FECHA_UNICA',
+    'plan_transicion',v_plan,
     'total_pendiente_centavos',v_total,'total_actual',round(v_total::numeric/100,2),
     'obligaciones',jsonb_build_array(jsonb_build_object(
        'tipo','saldo_global_heredado','total_centavos',v_total)),
