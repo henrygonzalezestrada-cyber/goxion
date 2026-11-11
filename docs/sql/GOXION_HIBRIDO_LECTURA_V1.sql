@@ -23,6 +23,7 @@ declare
   v_fechas integer := 0;
   v_regimen_activo boolean := false;
   v_ciclo_existe boolean := false;
+  v_historico_pendiente boolean := false;
   v_modo text;
   v_estado jsonb;
   v_cargos jsonb;
@@ -88,6 +89,23 @@ begin
      where c.cliente_id=p_cliente_id and c.periodo=v_periodo
   ) into v_ciclo_existe;
 
+  -- Un cierre del régimen no borra deuda de ciclos anteriores.
+  select exists (
+    select 1 from public.goxion_b2_cargos cargo
+     where cargo.cliente_id=p_cliente_id
+       and cargo.periodo<>v_periodo
+       and not cargo.liquidado
+       and (cargo.principal_pendiente_centavos>0 or cargo.mora_pendiente_centavos>0)
+  ) into v_historico_pendiente;
+
+  if not v_regimen_activo and not v_ciclo_existe and v_historico_pendiente then
+    return jsonb_build_object('ok',false,'codigo','B2_HISTORICO_PENDIENTE',
+      'periodo',v_periodo,'modo_actual',v_modo,
+      'fuente_saldo','obligaciones_b2',
+      'cobrable',false,'requiere_revision',true,
+      'version','hibrido-lectura-v1');
+  end if;
+
   -- El historial B2 manda incluso si el calendario actual ha cambiado.
   -- Nunca convertir un ciclo ya materializado en una nueva deuda global.
   if v_regimen_activo or v_ciclo_existe then
@@ -135,7 +153,7 @@ begin
       'fechas_distintas',v_fechas,'accesos_activos',v_activos,
       'calendarios_verificados',v_calendarios_validos,
       'transicion_pendiente',v_modo<>'multifecha',
-      'requiere_revision',v_modo='calendario_pendiente' or v_modo='sin_accesos',
+      'requiere_revision',v_modo<>'multifecha',
       'fuente_saldo','obligaciones_b2',
       'total_pendiente_centavos',v_total,
       'total_actual',round(v_total::numeric/100,2),
