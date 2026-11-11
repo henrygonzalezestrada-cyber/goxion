@@ -38,3 +38,25 @@ Resultado de 8 casos: **4 B2 conciliados, 2 globales conciliados y 2 sin ciclo B
 - Un cambio de fecha/recuento de accesos cambia el modo sin generar una mensualidad paralela.
 - Historial inmutable, centavos exactos, límites de descuento/mora y control de permisos.
 - Pruebas SQL y funcionales tanto en aislado como en modo solo lectura de producción antes de desplegar.
+
+
+## Etapa 2 completada en entorno aislado: plan de transición, sin escrituras
+
+- `docs/sql/GOXION_HIBRIDO_TRANSICIONES_V1.sql` reúne el **reductor determinista de estado** `goxion_hibrido_decidir_transicion_v1` y el planificador `goxion_hibrido_plan_transicion_v1`.
+- La consulta híbrida ahora reutiliza ese plan. No hay una segunda lógica de detección de régimen en el lector.
+- Señales verificadas: número de accesos, calendario/precio conciliados, B2 activo, existencia de ciclo, deuda del ciclo y de otros períodos, recibos globales aprobados, en revisión y parciales heredados.
+- Entrada a multifecha: exige conciliación; si ya existe pago global/abono/revisión, **bloquea migración automática** para evitar doble crédito/deuda.
+- Salida a fecha única: si hay obligaciones B2 abiertas, las conserva; si el ciclo está liquidado, **solo propone** transición para próximo ciclo (no muta el actual).
+- Si existe conflicto entre recibo global y B2 en el mismo mes, o un saldo B2 de otro período, el lector **falla cerrado**: no devuelve saldo alternativo.
+- Distinción de **días de corte contractuales** vs **fechas de vencimiento efectivas**: 30 y 31 siguen representando dos cortes en febrero aunque ambos venzan el 28. El RPC existente de activación B2 requiere dos vencimientos reales; cuando coinciden, el plan marca `MULTIFECHA_CORTES_COINCIDENTES_REQUIERE_ADAPTACION` y no activa nada.
+- `supabase/tests/goxion_hibrido_transiciones_v1_regresion.sql`: 20 escenarios de transición más una aserción de febrero 30/31 y paridad sobre las 8 cuentas del entorno aislado.
+- Los dos scripts de regresión SQL pasaron tras la integración. Todas las funciones nuevas conservan `cobrable=false` / `ejecutable=false` y permisos exclusivos del rol de servicio.
+
+## Seguridad predespliegue
+
+- `docs/sql/GOXION_B2_RESTRINGIR_DESACTIVACION.sql`: limita RPC `goxion_b2_desactivar_cliente` a `service_role`, sin modificar su código ni ejecutar desactivaciones. Instalado y comprobado **solo en el proyecto aislado**: `anon=false`, `authenticated=false`, `service_role=true`.
+- **Producción aún no recibió ese cambio** y la alerta debe tratarse como pendiente antes de desplegar el futuro motor.
+
+## No confundir con entrega final
+
+Esta versión resuelve **diagnóstico, clasificación y planificación** de transiciones, no ejecuta cambios de régimen ni movimientos de dinero. Todavía son necesarias: una RPC autorizada de aplicación transaccional con idempotencia, los casos de promociones/Trato Justo/mora y cancelaciones con crédito, y reconciliación de pagos en el ciclo de transición. La funcionalidad de producción no debe cambiar por fusionar el PR de borrador.
