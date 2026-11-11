@@ -15,6 +15,8 @@ declare
   v_fin jsonb;
   v_plan jsonb;
   v_servicios jsonb := '[]'::jsonb;
+  v_lista_vigentes jsonb := '[]'::jsonb;
+  v_lista_historica jsonb := '[]'::jsonb;
   v_vigentes int := 0;
   v_cancelados int := 0;
   v_cancelaciones_efectivas int := 0;
@@ -74,6 +76,13 @@ begin
   into v_servicios,v_vigentes,v_cancelados,v_cancelaciones_efectivas,v_anomalias
   from public.cliente_servicios s where s.cliente_id=p_cliente_id;
 
+  -- Dos colecciones listas para Admin, sin reutilizar servicios cancelados
+  -- en operaciones sobre contrataciones vigentes.
+  select coalesce(jsonb_agg(j.value) filter(where j.value->>'estado'='vigente'),'[]'::jsonb),
+         coalesce(jsonb_agg(j.value) filter(where j.value->>'estado'='historico'),'[]'::jsonb)
+  into v_lista_vigentes,v_lista_historica
+  from jsonb_array_elements(v_servicios) as j;
+
   select count(*)::int into v_accesos_activos
   from public.cliente_accesos a
   join public.cliente_servicios s on s.id=a.cliente_servicio_id
@@ -102,6 +111,8 @@ begin
     'accesos_vigentes',v_accesos_activos,
     'inconsistencias_contratacion',v_anomalias,
     'contrataciones',v_servicios,
+    'contrataciones_vigentes',v_lista_vigentes,
+    'contrataciones_historicas',v_lista_historica,
     'plan_transicion',v_plan,
     'requiere_revision',v_anomalias>0
       or coalesce((v_fin->>'requiere_revision')::boolean,true)
