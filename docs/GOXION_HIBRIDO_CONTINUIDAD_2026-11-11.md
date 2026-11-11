@@ -60,3 +60,26 @@ Resultado de 8 casos: **4 B2 conciliados, 2 globales conciliados y 2 sin ciclo B
 ## No confundir con entrega final
 
 Esta versión resuelve **diagnóstico, clasificación y planificación** de transiciones, no ejecuta cambios de régimen ni movimientos de dinero. Todavía son necesarias: una RPC autorizada de aplicación transaccional con idempotencia, los casos de promociones/Trato Justo/mora y cancelaciones con crédito, y reconciliación de pagos en el ciclo de transición. La funcionalidad de producción no debe cambiar por fusionar el PR de borrador.
+
+
+## Etapa 3 · Contrato operativo único de lectura para Admin y Ayuda
+
+- Implementado e instalado **solo en Supabase B2 aislado**: `docs/sql/GOXION_HIBRIDO_RESUMEN_OPERATIVO_V1.sql` con RPC `goxion_hibrido_resumen_operativo_v1(uuid,date)`.
+- No inventa ni vuelve a calcular dinero. Obtiene el saldo de `goxion_hibrido_estado_financiero_v1`, el cual conserva una sola fuente por ciclo: B2 o legado, nunca ambos simultáneamente.
+- Separa `contrataciones_vigentes` y `contrataciones_historicas` basándose en `cliente_servicios.activo`. Una cancelación solo se considera efectiva cuando la solicitud dice `estado='efectiva'` y `fecha_efectiva<=fecha_consulta`; aprobar no significa desactivar.
+- Conserva para consulta los cargos B2 asociados a contratos históricos, aunque sus accesos estén inactivos. No borrar, reasignar ni liquidar obligaciones automáticamente.
+- Detecta inconsistencias entre cancelaciones efectivas y accesos todavía activos; exige conciliación en lugar de ocultar el problema.
+- Devuelve `total_pendiente_centavos=null` cuando el lector financiero no concilia: nunca sustituye una cifra B2 por un total de contratos ni por el cálculo antiguo.
+- Respuesta `cobrable=false`, `publicable=false`. La RPC no incluye credenciales, PIN ni correos privados; `SECURITY INVOKER`, privilegios solo `service_role`.
+- Regresión `supabase/tests/goxion_hibrido_resumen_operativo_v1_regresion.sql` validada con 8 cuentas de prueba: 6 estados de saldo conciliados, 2 pendientes de conciliación; 2 contratos históricos conservados y 13 vigentes en total.
+- Se cotejaron en producción **en consultas solo lectura** dos casos de referencia: uno con abono B2 ya liquidado y divergencia entre el saldo principal y el B2; otro con dos cancelaciones efectivas y un servicio activo. No se publicaron identificadores ni importes particulares en el repositorio público.
+
+### Siguiente barrera para despliegue
+
+Este contrato aún no está conectado a Admin/Ayuda/Index; no debe emplearse para autorizar cobros. Falta:
+1. Motor **transaccional** único para altas/bajas por fecha, aplicación idempotente de abonos y reconciliación de promociones, mora, prórrogas y devoluciones.
+2. Aprobación de compatibilidad del contrato y sustitución controlada de consumidores de solo lectura, sin cambiar DOM/CSS.
+3. Pruebas de concurrencia, un ciclo siguiente después de cancelación, casos de fecha 30/31, y autorización de despliegue.
+4. Corregir en producción la ejecución anónima de `goxion_b2_desactivar_cliente` antes del lanzamiento.
+
+No se han modificado producción ni `main`. El PR #202 sigue como borrador.
