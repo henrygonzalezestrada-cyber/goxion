@@ -1,3 +1,5 @@
+> **ACTUALIZACIÓN DE CONTINUIDAD — 11/nov/2026:** descubrimos que el repositorio privado `goxion-motor` ya contiene las versiones desplegadas por Muse de `goxion_b2_aprobar_abono` y `goxion_b2_desactivar_cliente`, incluida conversión automática de fecha al cerrar ciclo. **No volver a programar esa operación paralelamente.** El código híbrido de las etapas experimentales y sus tests se trasladaron del PR público #202 a la rama privada `work/hibrido-conciliacion-20261111`, ver [PR privado #1](https://github.com/henrygonzalezestrada-cyber/goxion-motor/pull/1). Los paths `docs/sql/GOXION_...` y `supabase/tests/goxion_hibrido_...` citados más abajo se encuentran ahora **en el repositorio privado**, no en este público. Este PR público conserva **solo documentación**. Ninguna de estas nuevas funciones está desplegada en producción. El SQL histórico sigue siendo accesible en commits anteriores del PR público; no contenía credenciales ni datos de clientes.
+
 # GOXION · Motor financiero híbrido · inicio de consolidación (11/nov/2026)
 
 ## Objetivo aprobado
@@ -83,3 +85,11 @@ Este contrato aún no está conectado a Admin/Ayuda/Index; no debe emplearse par
 4. Corregir en producción la ejecución anónima de `goxion_b2_desactivar_cliente` antes del lanzamiento.
 
 No se han modificado producción ni `main`. El PR #202 sigue como borrador.
+
+## Cierre de transferencia entre repositorios
+
+- **Fuente del motor:** repositorio privado [goxion-motor](https://github.com/henrygonzalezestrada-cyber/goxion-motor) y su [PR #1 (borrador)](https://github.com/henrygonzalezestrada-cyber/goxion-motor/pull/1).
+- **Fuente de interfaces y continuidad:** repositorio público `goxion`, este documento y [ADMIN_REFERENCIAS_GITHUB_2026-11-11.md](ADMIN_REFERENCIAS_GITHUB_2026-11-11.md).
+- **Fase F3 de lectura**: el puente híbrido privado `goxion_hibrido_estado_compatibilidad_v1` se probó en QA contra ocho cuentas: cuatro B2, dos legacy, dos bloqueadas por falta de ciclo. Cada lectura declara `cobrable=false` y `publicable=false`. Se verificó contra las versiones ya desplegadas por Muse; no se tocó producción.
+- **Fase transaccional**: reutilizar la aprobación B2 existente, cuyos cierres de ciclo y conversiones ya están programados. Falta QA de transacciones reales con rollback, permisos, promociones, mora y aprobación final antes de conectarlo a clientes.
+- **Próximo trabajo visual**: solo después de liberar el motor, estudiar Admin con las cinco referencias de GitHub documentadas, sin usar un framework nuevo como prerequisito.
