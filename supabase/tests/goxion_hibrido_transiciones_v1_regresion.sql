@@ -68,31 +68,21 @@ begin
      raise exception 'El plan autoriza cobro/escritura sin aprobación';
    end if;
    if v_plan->>'ok'='true' then
-     if v_plan->>'codigo' is distinct from
-       case
-         when v_plan->>'cortes_coinciden_en_periodo'='true'
-           and public.goxion_hibrido_decidir_transicion_v1(
-             v_plan->>'modo_deducido',
-             (v_plan->>'b2_activo')::boolean,
-             (v_plan->>'ciclo_b2_actual')::boolean,
-             (v_plan->>'deuda_b2_actual')::boolean,
-             (v_plan->>'deuda_b2_historica')::boolean,
-             (v_plan->>'pago_global_confirmado')::boolean,
-             (v_plan->>'pago_global_en_revision')::boolean,
-             (v_plan->>'parcial_heredado_activo')::boolean
-           )='CANDIDATA_ALTA_MULTIFECHA'
-         then 'MULTIFECHA_CORTES_COINCIDENTES_REQUIERE_ADAPTACION'
-         else public.goxion_hibrido_decidir_transicion_v1(
-         v_plan->>'modo_deducido',
-         (v_plan->>'b2_activo')::boolean,
-         (v_plan->>'ciclo_b2_actual')::boolean,
-         (v_plan->>'deuda_b2_actual')::boolean,
-         (v_plan->>'deuda_b2_historica')::boolean,
-         (v_plan->>'pago_global_confirmado')::boolean,
-         (v_plan->>'pago_global_en_revision')::boolean,
-         (v_plan->>'parcial_heredado_activo')::boolean
-       )
-       end then
+     v_actual:=public.goxion_hibrido_decidir_transicion_v1(
+       v_plan->>'modo_deducido',
+       (v_plan->>'b2_activo')::boolean,
+       (v_plan->>'ciclo_b2_actual')::boolean,
+       (v_plan->>'deuda_b2_actual')::boolean,
+       (v_plan->>'deuda_b2_historica')::boolean,
+       (v_plan->>'pago_global_confirmado')::boolean,
+       (v_plan->>'pago_global_en_revision')::boolean,
+       (v_plan->>'parcial_heredado_activo')::boolean
+     );
+     if v_plan->>'cortes_coinciden_en_periodo'='true'
+       and v_actual='CANDIDATA_ALTA_MULTIFECHA' then
+       v_actual:='MULTIFECHA_CORTES_COINCIDENTES_REQUIERE_ADAPTACION';
+     end if;
+     if v_plan->>'codigo' is distinct from v_actual then
        raise exception 'El plan no coincide con el reductor puro';
      end if;
      v_decisiones:=v_decisiones+1;
