@@ -33,6 +33,16 @@ begin
   if p_b2_activo and not p_ciclo_actual then
     return 'CICLO_B2_NO_PREPARADO';
   end if;
+  -- Nunca considerar estable un B2 con pago global del mismo ciclo.
+  if p_b2_activo and p_ciclo_actual and p_global_pagado then
+    return 'CONFLICTO_PAGO_GLOBAL_B2';
+  end if;
+  if p_b2_activo and p_ciclo_actual and (p_global_revision or p_parcial_heredado) then
+    return 'CONFLICTO_REVISION_GLOBAL_B2';
+  end if;
+  if p_b2_activo and p_ciclo_actual and p_deuda_historica then
+    return 'B2_HISTORICO_PENDIENTE_CON_CICLO';
+  end if;
   if p_modo='sin_accesos' then
     return case when p_deuda_actual or p_deuda_historica
       then 'SIN_ACCESOS_CON_DEUDA' else 'SIN_ACCESOS' end;
