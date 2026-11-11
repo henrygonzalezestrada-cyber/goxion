@@ -33,6 +33,21 @@ begin
       raise exception 'Servicios históricos o vigentes faltantes';
     end if;
 
+    if jsonb_array_length(v_res->'contrataciones_vigentes')
+        is distinct from (v_res->>'servicios_vigentes')::int
+      or jsonb_array_length(v_res->'contrataciones_historicas')
+        is distinct from (v_res->>'servicios_historicos')::int then
+      raise exception 'Las listas operativas no coinciden con los estados de servicio';
+    end if;
+    if exists (
+      select 1 from jsonb_array_elements(v_res->'contrataciones_vigentes') x
+      where x.value->>'activo'<>'true'
+    ) or exists (
+      select 1 from jsonb_array_elements(v_res->'contrataciones_historicas') x
+      where x.value->>'activo'<>'false'
+    ) then
+      raise exception 'Contrato cancelado mezclado entre servicios vigentes';
+    end if;
     if v_fin->>'ok'='true' then
       if (v_res->>'total_pendiente_centavos')::bigint
         is distinct from (v_fin->>'total_pendiente_centavos')::bigint then
