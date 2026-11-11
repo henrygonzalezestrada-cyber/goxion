@@ -91,6 +91,7 @@ declare
   v_accesos int := 0;
   v_verificados int := 0;
   v_fechas int := 0;
+  v_vencimientos int := 0;
   v_precios_inconsistentes int := 0;
   v_regimen boolean := false;
   v_ciclo boolean := false;
@@ -122,6 +123,13 @@ begin
              and cal.cobertura_hasta <
                (v_cliente.periodo_pendiente+interval '1 month')::date
          )::int,
+         count(distinct cal.dia_corte) filter (
+           where cal.estado='verificado' and cal.verificado_en is not null
+             and cal.revision>0 and cal.precio_centavos>0
+             and cal.cobertura_hasta>=v_cliente.periodo_pendiente
+             and cal.cobertura_hasta <
+               (v_cliente.periodo_pendiente+interval '1 month')::date
+         )::int,
          count(distinct cal.cobertura_hasta) filter (
            where cal.estado='verificado' and cal.verificado_en is not null
              and cal.revision>0 and cal.precio_centavos>0
@@ -129,7 +137,7 @@ begin
              and cal.cobertura_hasta <
                (v_cliente.periodo_pendiente+interval '1 month')::date
          )::int
-    into v_accesos,v_verificados,v_fechas
+    into v_accesos,v_verificados,v_fechas,v_vencimientos
   from public.cliente_accesos a
   join public.cliente_servicios s
     on s.id=a.cliente_servicio_id and s.cliente_id=p_cliente_id and s.activo
@@ -190,13 +198,22 @@ begin
     v_modo,v_regimen,v_ciclo,v_deuda_actual,v_deuda_historica,
     v_global_pagado,v_revision,v_parcial
   );
+  -- Los cortes 30 y 31 coinciden físicamente en febrero, pero siguen siendo
+  -- dos fechas contractuales. B2 actual exige dos vencimientos efectivos al
+  -- materializar, por lo que NO se autoriza una alta hasta resolver esa regla.
+  if v_decision='CANDIDATA_ALTA_MULTIFECHA' and v_vencimientos<2 then
+    v_decision:='MULTIFECHA_CORTES_COINCIDENTES_REQUIERE_ADAPTACION';
+  end if;
 
   return jsonb_build_object(
     'ok',true,'codigo',v_decision,'version','hibrido-transiciones-v1',
     'cliente_id',p_cliente_id,'periodo',v_cliente.periodo_pendiente,
     'fecha_consulta',p_hoy,'modo_deducido',v_modo,
     'accesos_activos',v_accesos,'calendarios_verificados',v_verificados,
-    'fechas_distintas',v_fechas,'contratos_con_precio_discrepante',v_precios_inconsistentes,
+    'fechas_distintas',v_fechas,'dias_corte_distintos',v_fechas,
+    'vencimientos_efectivos_distintos',v_vencimientos,
+    'cortes_coinciden_en_periodo',(v_fechas>1 and v_vencimientos<2),
+    'contratos_con_precio_discrepante',v_precios_inconsistentes,
     'b2_activo',v_regimen,'ciclo_b2_actual',v_ciclo,
     'deuda_b2_actual',v_deuda_actual,'deuda_b2_historica',v_deuda_historica,
     'pago_global_confirmado',v_global_pagado,
