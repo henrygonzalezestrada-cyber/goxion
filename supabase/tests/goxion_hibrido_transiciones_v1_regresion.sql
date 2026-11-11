@@ -45,6 +45,21 @@ begin
    v_pasos:=v_pasos+1;
  end loop;
 
+ -- Febrero: 30 y 31 son cortes contractuales distintos, aunque ambas
+ -- obligaciones terminen venciendo el día 28. No cambiar modo por meses cortos.
+ if (
+   select count(distinct dia_corte) from (
+     values (30, date '2027-02-28'),(31,date '2027-02-28')
+   ) as fechas(dia_corte,fecha_efectiva)
+ )<>2 or (
+   select count(distinct fecha_efectiva) from (
+     values (30, date '2027-02-28'),(31,date '2027-02-28')
+   ) as fechas(dia_corte,fecha_efectiva)
+ )<>1 then
+   raise exception 'Regresión febrero 30/31';
+ end if;
+ v_pasos:=v_pasos+1;
+
  -- El reductor integrado debe emitir exactamente la misma decisión.
  for v in select c.id from public.clientes c loop
    v_cuentas:=v_cuentas+1;
@@ -54,7 +69,20 @@ begin
    end if;
    if v_plan->>'ok'='true' then
      if v_plan->>'codigo' is distinct from
-       public.goxion_hibrido_decidir_transicion_v1(
+       case
+         when v_plan->>'cortes_coinciden_en_periodo'='true'
+           and public.goxion_hibrido_decidir_transicion_v1(
+             v_plan->>'modo_deducido',
+             (v_plan->>'b2_activo')::boolean,
+             (v_plan->>'ciclo_b2_actual')::boolean,
+             (v_plan->>'deuda_b2_actual')::boolean,
+             (v_plan->>'deuda_b2_historica')::boolean,
+             (v_plan->>'pago_global_confirmado')::boolean,
+             (v_plan->>'pago_global_en_revision')::boolean,
+             (v_plan->>'parcial_heredado_activo')::boolean
+           )='CANDIDATA_ALTA_MULTIFECHA'
+         then 'MULTIFECHA_CORTES_COINCIDENTES_REQUIERE_ADAPTACION'
+         else public.goxion_hibrido_decidir_transicion_v1(
          v_plan->>'modo_deducido',
          (v_plan->>'b2_activo')::boolean,
          (v_plan->>'ciclo_b2_actual')::boolean,
@@ -63,7 +91,8 @@ begin
          (v_plan->>'pago_global_confirmado')::boolean,
          (v_plan->>'pago_global_en_revision')::boolean,
          (v_plan->>'parcial_heredado_activo')::boolean
-       ) then
+       )
+       end then
        raise exception 'El plan no coincide con el reductor puro';
      end if;
      v_decisiones:=v_decisiones+1;
