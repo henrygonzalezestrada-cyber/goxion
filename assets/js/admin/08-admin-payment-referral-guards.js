@@ -10,6 +10,9 @@
 
     const oldOpenPayment = window.gxOpenPaymentModalBase;
     window.gxOpenPaymentModal = function(key, monto) {
+        const c = typeof clientesDict !== "undefined" ? clientesDict?.[key] : null;
+        if(c?.finanzas_requieren_revision)
+            return alert("Saldo financiero pendiente de conciliación. No se puede aprobar un pago global.");
         const modal = document.getElementById("gx-payment-modal");
         if(!modal) return alert("No se pudo abrir la revisión de pago. Recarga esta versión del Admin.");
         return oldOpenPayment ? oldOpenPayment(key, monto) : undefined;
@@ -45,6 +48,8 @@
         if(!foundKey) return alert("No pude identificar al cliente en revisión. Cierra y vuelve a abrir la revisión.");
 
         const c = clientesDict[foundKey];
+        if(c?.finanzas_requieren_revision)
+            return alert("No se puede registrar un parcial sin saldo financiero conciliado.");
         const amount = Number(document.getElementById("gx-missing-amount")?.value || 0);
         const msg = document.getElementById("gx-payment-note")?.value.trim() || `Detectamos un pago incompleto${amount>0?` por $${amount}`:""}.`;
         try {
