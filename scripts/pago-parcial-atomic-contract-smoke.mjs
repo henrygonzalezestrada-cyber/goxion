@@ -22,7 +22,7 @@ async function scenario(input={},opts={}){
   rpc:async (name,args)=>{
    calls.push({name,args});
    return opts.dbError?{error:{message:opts.dbError}}:
-    {data:{pago_parcial:{id:"pay-1"},monto_pagado:40,
+    {data:{ok:true,pago_parcial:{id:"pay-1"},monto_pagado:40,
            saldo_restante:60,repetida:opts.repeated===true}};
   }
  };
@@ -41,8 +41,10 @@ test("Retorno exitoso",x.result.ok,true);
 test("Versión financiera nueva",x.result.version,"1.3");
 test("Sin monto doble en respuesta",x.result.resultado.saldo_restante,60);
 test("Exactamente una transacción de DB",x.calls.length,1);
-test("RPC nueva",x.calls[0].name,"goxion_registrar_pago_parcial_atomico");
+test("RPC nueva",x.calls[0].name,"goxion_motor_admin_mensual_v1");
 test("Monto en centavos",x.calls[0].args.p_saldo_restante_centavos,6000);
+test("Período mensual",x.calls[0].args.p_periodo,"2026-11-01");
+test("Sin pago final en parcial",x.calls[0].args.p_monto_centavos,null);
 test("Idempotencia de operación",x.calls[0].args.p_operation_id,idem);
 x=await scenario({}, {repeated:true});
 test("Repetición reconocida sin fallar",x.result.resultado.repetida,true);
