@@ -1,0 +1,727 @@
+/* ============================================================
+   GOXION // ADMIN — Rediseño (ESPEJO)
+   preview/admin-rediseno/admin-rediseno.css
+   Identidad NUEVA y fresca para Admin (decisión Henry 2026-11-11).
+   Solo capa visual del espejo: no toca admin.css ni el motor.
+   Animaciones: especificación §6 de la propuesta (Emil Kowalski).
+   - Easing único entradas: cubic-bezier(0.23,1,0.32,1)
+   - Solo transform / opacity. Nunca width/height/margin/padding/top/left.
+   - Nunca `transition: all`. Presión táctil scale(0.97), 100-160 ms.
+   - Salidas más rápidas que las entradas (300 ms → 200 ms).
+   ============================================================ */
+
+body[data-gx2-rediseno]{
+  --gx2-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --gx2-ease-in: cubic-bezier(0.55, 0, 0.55, 1);
+  --gx2-bg: #030305;
+  --gx2-surface: #0b0b11;
+  --gx2-surface-2: #101019;
+  --gx2-line: rgba(255, 255, 255, .09);
+  --gx2-line-strong: rgba(255, 255, 255, .16);
+  --gx2-cyan: #00f2fe;
+  --gx2-violet: #bc13fe;
+  --gx2-amber: #ffb224;
+  --gx2-green: #34d399;
+  --gx2-red: #ff5c7a;
+  --gx2-text: #f4f4f6;
+  --gx2-muted: #9aa3b2;
+  --gx2-radius-card: 20px;
+  --gx2-radius-ctrl: 14px;
+  /* Altura medida del encabezado sticky (topbar + segmentada + paddings):
+     132 px en teléfono, 137 px en tablet, 141 px en escritorio. Los
+     paneles sticky que cuelgan de él (buscador, Ajustes) usan esta var. */
+  --gx2-head-h: 132px;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--gx2-bg);
+  color: var(--gx2-text);
+}
+
+/* Tipografía: Rajdhani solo display y cifras; cuerpo sans del sistema (§7.1) */
+body[data-gx2-rediseno] h1,
+body[data-gx2-rediseno] h2,
+body[data-gx2-rediseno] .gx2-amount,
+body[data-gx2-rediseno] .gx-home-priority strong,
+body[data-gx2-rediseno] .gx-decision-grid strong,
+body[data-gx2-rediseno] .gx-kpi-card strong,
+body[data-gx2-rediseno] .gx2-seg span{
+  font-family: Rajdhani, system-ui, sans-serif;
+}
+body[data-gx2-rediseno] .gx-home-priority strong,
+body[data-gx2-rediseno] .gx-decision-grid strong,
+body[data-gx2-rediseno] .gx-kpi-card strong,
+body[data-gx2-rediseno] .gx2-amount{
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sin scroll horizontal; el shell ya no reserva espacio a la barra inferior */
+body[data-gx2-rediseno] .gx-admin-shell{ overflow-x: clip; }
+body[data-gx2-rediseno] .gx2-hidden{ display: none !important; }
+body[data-gx2-rediseno] .gx-desktop-nav,
+body[data-gx2-rediseno] .gx-mobile-nav{ display: none !important; }
+
+/* ---------- Encabezado compacto sticky + pestañas segmentadas ---------- */
+body[data-gx2-rediseno] .gx2-sticky-head{
+  position: sticky;
+  top: 0;
+  z-index: 5000;
+  margin: 0 -10px;
+  padding: max(0px, env(safe-area-inset-top)) 10px 0;
+  background: linear-gradient(180deg, rgba(3, 3, 5, .94), rgba(3, 3, 5, .86));
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--gx2-line);
+}
+body[data-gx2-rediseno] .gx-topbar{
+  position: static;
+  top: auto;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 10px 2px 6px;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+body[data-gx2-rediseno] .gx2-mirror-tag{
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 6px;
+  padding: 2px 7px;
+  border: 1px solid rgba(188, 19, 254, .55);
+  border-radius: 999px;
+  color: #e3b8ff;
+  background: rgba(188, 19, 254, .14);
+  font-family: system-ui, sans-serif;
+  font-size: .56rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  white-space: nowrap;
+}
+body[data-gx2-rediseno] .gx2-segmented{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 5px;
+  margin: 0 0 8px;
+  background: rgba(255, 255, 255, .045);
+  border: 1px solid var(--gx2-line);
+  border-radius: 16px;
+}
+body[data-gx2-rediseno] .gx2-seg{
+  position: relative;
+  min-height: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--gx2-muted);
+  cursor: pointer;
+  padding: 5px 2px;
+  transition: background-color .2s var(--gx2-ease-out), color .2s var(--gx2-ease-out), transform .12s linear;
+}
+body[data-gx2-rediseno] .gx2-seg i{
+  font-style: normal;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+body[data-gx2-rediseno] .gx2-seg span{
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+body[data-gx2-rediseno] .gx2-seg.active{
+  color: #fff;
+  background: linear-gradient(135deg, rgba(0, 242, 254, .18), rgba(188, 19, 254, .18));
+  box-shadow: inset 0 0 0 1px rgba(0, 242, 254, .28);
+}
+body[data-gx2-rediseno] .gx2-seg.active::after{
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 4px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gx2-cyan);
+  transform: scaleX(1);
+  transition: transform .25s var(--gx2-ease-out);
+}
+body[data-gx2-rediseno] .gx2-seg:not(.active)::after{
+  content: "";
+  position: absolute;
+  left: 22%;
+  right: 22%;
+  bottom: 4px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--gx2-cyan);
+  transform: scaleX(0);
+  transition: transform .25s var(--gx2-ease-out);
+}
+body[data-gx2-rediseno] .gx2-seg-badge{
+  position: absolute;
+  top: 3px;
+  right: calc(50% - 30px);
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--gx2-red);
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: .62rem;
+  font-weight: 800;
+  line-height: 18px;
+  text-align: center;
+}
+
+/* ---------- Presión táctil global (scale 0.97, 100-160 ms) ---------- */
+body[data-gx2-rediseno] button:active,
+body[data-gx2-rediseno] .gx2-seg:active,
+body[data-gx2-rediseno] .gx-home-priority:active,
+body[data-gx2-rediseno] .gx-decision-grid button:active,
+body[data-gx2-rediseno] .filter-pill:active{
+  transform: scale(.97);
+  transition: transform .12s linear;
+}
+
+/* ---------- Entrada de pestaña (250 ms, translateY 8px + opacidad) ---------- */
+@keyframes gx2TabIn{
+  from{ opacity: 0; transform: translateY(8px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+@keyframes gx2FadeIn{
+  from{ opacity: 0; }
+  to{ opacity: 1; }
+}
+@keyframes gx2SheetIn{
+  from{ transform: translateY(100%); }
+  to{ transform: translateY(0); }
+}
+@keyframes gx2CardIn{
+  from{ opacity: 0; transform: translateY(8px) scale(.98); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes gx2Pop{
+  0%{ transform: scale(1); }
+  40%{ transform: scale(1.35); }
+  100%{ transform: scale(1); }
+}
+@keyframes gx2SkPulse{
+  0%, 100%{ opacity: .55; }
+  50%{ opacity: 1; }
+}
+@keyframes gx2LivePulse{
+  0%, 100%{ opacity: .55; }
+  50%{ opacity: 1; }
+}
+body[data-gx2-rediseno] .tab-content.active{
+  animation: gx2TabIn .25s var(--gx2-ease-out);
+}
+body[data-gx2-rediseno] .gx2-pop{ animation: gx2Pop .15s ease-out; }
+
+/* ---------- Inicio: prioridades 2-up, importes protagonistas ---------- */
+body[data-gx2-rediseno] .gx-home-priority-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+body[data-gx2-rediseno] .gx-home-priority{
+  min-height: 84px;
+  padding: 12px;
+  border-radius: var(--gx2-radius-card);
+  text-align: left;
+}
+body[data-gx2-rediseno] .gx-home-priority strong{
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.05;
+}
+body[data-gx2-rediseno] .gx-home-priority.today strong{ color: var(--gx2-cyan); }
+body[data-gx2-rediseno] .gx-home-priority.overdue strong{ color: var(--gx2-red); }
+body[data-gx2-rediseno] .gx-home-priority small{
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+/* Centro de decisión: protagonista */
+body[data-gx2-rediseno] .gx-decision-center{
+  border: 1px solid rgba(0, 242, 254, .22);
+  border-radius: var(--gx2-radius-card);
+  background: linear-gradient(180deg, rgba(0, 242, 254, .06), rgba(188, 19, 254, .05));
+  padding: 14px;
+}
+body[data-gx2-rediseno] .gx-decision-total{
+  font-family: Rajdhani, system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--gx2-cyan);
+}
+body[data-gx2-rediseno] .gx-decision-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 10px;
+}
+body[data-gx2-rediseno] .gx-decision-grid button{
+  min-height: 78px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  padding: 12px;
+  border-radius: var(--gx2-radius-card);
+  text-align: left;
+}
+body[data-gx2-rediseno] .gx-decision-grid button strong{
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+}
+body[data-gx2-rediseno] .gx-decision-grid button[data-gx2-decision].gx2-filter-on{
+  outline: 2px solid var(--gx2-cyan);
+  outline-offset: -2px;
+  background: rgba(0, 242, 254, .1);
+}
+
+/* ---------- Bandeja de decisiones (feed) ---------- */
+body[data-gx2-rediseno] .gx2-decision-feed{ margin-top: 16px; }
+body[data-gx2-rediseno] .gx2-feed-head{
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+body[data-gx2-rediseno] .gx2-feed-head h2{ margin: 2px 0 0; }
+body[data-gx2-rediseno] .gx2-feed-all{
+  border: 0;
+  background: transparent;
+  color: var(--gx2-cyan);
+  font-size: .78rem;
+  font-weight: 800;
+  white-space: nowrap;
+  padding: 8px 2px;
+  cursor: pointer;
+}
+body[data-gx2-rediseno] .gx2-feed-filter-label{
+  color: var(--gx2-muted);
+  font-size: .74rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+body[data-gx2-rediseno] .gx2-feed-card{
+  background: var(--gx2-surface);
+  border: 1px solid var(--gx2-line);
+  border-radius: var(--gx2-radius-card);
+  padding: 13px 14px;
+  margin-bottom: 9px;
+}
+body[data-gx2-rediseno] .gx2-feed-kind{
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: .62rem;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+}
+body[data-gx2-rediseno] .gx2-feed-kind.review{ color: #031014; background: var(--gx2-cyan); }
+body[data-gx2-rediseno] .gx2-feed-kind.overdue{ color: #fff; background: var(--gx2-red); }
+body[data-gx2-rediseno] .gx2-feed-kind.cancellation{ color: #fff; background: var(--gx2-violet); }
+body[data-gx2-rediseno] .gx2-feed-kind.support{ color: #031014; background: var(--gx2-green); }
+body[data-gx2-rediseno] .gx2-feed-kind.activity{ color: var(--gx2-muted); background: rgba(255, 255, 255, .08); }
+body[data-gx2-rediseno] .gx2-feed-title{
+  display: block;
+  font-size: .95rem;
+  font-weight: 800;
+  margin: 8px 0 2px;
+}
+body[data-gx2-rediseno] .gx2-feed-msg{
+  margin: 0 0 8px;
+  color: var(--gx2-muted);
+  font-size: .82rem;
+  line-height: 1.4;
+}
+body[data-gx2-rediseno] .gx2-feed-foot{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+body[data-gx2-rediseno] .gx2-feed-amount{
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+body[data-gx2-rediseno] .gx2-feed-client{
+  display: block;
+  color: var(--gx2-muted);
+  font-size: .72rem;
+  font-weight: 700;
+  margin-top: 2px;
+}
+body[data-gx2-rediseno] .gx2-feed-actions{
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+body[data-gx2-rediseno] .gx2-feed-actions button{
+  min-height: 44px;
+  padding: 0 13px;
+  border-radius: 12px;
+  border: 1px solid var(--gx2-line-strong);
+  background: rgba(255, 255, 255, .05);
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+body[data-gx2-rediseno] .gx2-feed-actions button.primary{
+  border-color: rgba(0, 242, 254, .4);
+  background: rgba(0, 242, 254, .12);
+  color: var(--gx2-cyan);
+}
+body[data-gx2-rediseno] .gx2-feed-actions button.danger{
+  border-color: rgba(255, 92, 122, .4);
+  background: transparent;
+  color: var(--gx2-red);
+}
+body[data-gx2-rediseno] .gx2-feed-empty{
+  padding: 18px 14px;
+  border: 1px dashed var(--gx2-line-strong);
+  border-radius: var(--gx2-radius-card);
+  color: var(--gx2-muted);
+  font-size: .85rem;
+  text-align: center;
+}
+/* Entrada escalonada del feed: 300 ms, stagger ~40 ms, máx. 6 tarjetas */
+body[data-gx2-rediseno] #gx-decision-feed:not(.gx2-no-enter) > .gx2-feed-card,
+body[data-gx2-rediseno] #gx-mobile-ops-list:not(.gx2-no-enter) > .gx-mobile-op-item{
+  animation: gx2CardIn .3s var(--gx2-ease-out) both;
+  animation-delay: calc(var(--gx2-i, 0) * 40ms);
+}
+
+/* ---------- Skeleton screens (pulso de opacidad, sin shimmer) ---------- */
+body[data-gx2-rediseno] .gx2-sk-caption{
+  color: var(--gx2-muted);
+  font-size: .72rem;
+  font-weight: 700;
+  margin: 2px 0 8px;
+}
+body[data-gx2-rediseno] .gx2-skeleton-card{
+  display: grid;
+  gap: 8px;
+  padding: 13px 14px;
+  margin-bottom: 9px;
+  border: 1px solid var(--gx2-line);
+  border-radius: var(--gx2-radius-card);
+  background: rgba(255, 255, 255, .02);
+}
+body[data-gx2-rediseno] .gx2-sk-line{
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, .09);
+  animation: gx2SkPulse 1.2s ease-in-out infinite;
+}
+body[data-gx2-rediseno] .gx2-sk-w35{ width: 35%; }
+body[data-gx2-rediseno] .gx2-sk-w40{ width: 40%; }
+body[data-gx2-rediseno] .gx2-sk-w45{ width: 45%; }
+body[data-gx2-rediseno] .gx2-sk-w60{ width: 60%; }
+body[data-gx2-rediseno] .gx2-sk-w70{ width: 70%; }
+body[data-gx2-rediseno] .gx2-sk-w75{ width: 75%; }
+body[data-gx2-rediseno] .gx2-sk-w80{ width: 80%; }
+body[data-gx2-rediseno] .gx2-sk-w85{ width: 85%; }
+body[data-gx2-rediseno] .gx2-sk-w90{ width: 90%; }
+
+/* ---------- Próximos vencimientos: ver más ---------- */
+body[data-gx2-rediseno] #gx2-upcoming-more{ margin-top: 8px; }
+body[data-gx2-rediseno] .gx2-more-btn{
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--gx2-line-strong);
+  border-radius: var(--gx2-radius-ctrl);
+  background: rgba(255, 255, 255, .04);
+  color: var(--gx2-cyan);
+  font-size: .82rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* ---------- Hojas inferiores: un solo sistema (§7.3) ---------- */
+/* Ficha: misma entrada, easing Kowalski (300-350 ms, ease-out fuerte) */
+body[data-gx2-rediseno] .gx-focus-sheet{
+  animation-name: gx2SheetIn;
+  animation-duration: .32s;
+  animation-timing-function: var(--gx2-ease-out);
+}
+body[data-gx2-rediseno] .gx-focus-backdrop{
+  animation: gx2FadeIn .2s ease-out;
+}
+/* Modal de pago: ya es hoja inferior; se le añade la entrada animada */
+body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-sheet{
+  animation: gx2SheetIn .32s var(--gx2-ease-out);
+}
+body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-backdrop{
+  animation: gx2FadeIn .2s ease-out;
+}
+/* Cajón de notificaciones: en teléfono es hoja inferior; en escritorio, cajón lateral */
+@media (max-width: 840px){
+  body[data-gx2-rediseno] .gx-notification-drawer{
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: min(92dvh, 92vh);
+    border-left: 0;
+    border-top: 1px solid rgba(0, 242, 254, .16);
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -22px 70px rgba(0, 0, 0, .58);
+    transform: translateY(105%);
+    transition: transform .3s var(--gx2-ease-out);
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
+  }
+  body[data-gx2-rediseno] .gx-notification-drawer.show{
+    transform: translateY(0);
+  }
+  body[data-gx2-rediseno] .gx-notification-drawer::before{
+    content: "";
+    display: block;
+    width: 46px;
+    height: 5px;
+    margin: 2px auto 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .18);
+    flex-shrink: 0;
+  }
+  body[data-gx2-rediseno] .gx-notification-overlay{
+    animation: gx2FadeIn .2s ease-out;
+  }
+}
+@media (min-width: 841px){
+  body[data-gx2-rediseno] .gx-notification-drawer{
+    transition: transform .3s var(--gx2-ease-out);
+  }
+}
+/* El resto de overlays no cambian de comportamiento; solo respiran igual */
+body[data-gx2-rediseno] .gx-client-focus,
+body[data-gx2-rediseno] .gx-payment-modal{
+  overscroll-behavior: contain;
+}
+
+/* ---------- Operaciones y Gestión: pestañas reales en todas las pantallas ----------
+   En la oficial, .gx-mobile-workspace se oculta en escritorio y los chips de
+   Operaciones/Gestión activan secciones vacías. En el espejo son secciones
+   reales también en escritorio (corrección, no solo cosmética). */
+@media (min-width: 841px){
+  body[data-gx2-rediseno] .gx-main .tab-content.gx-mobile-workspace.active{
+    display: block !important;
+  }
+}
+body[data-gx2-rediseno] .gx-mobile-op-item{
+  border-radius: var(--gx2-radius-card);
+}
+body[data-gx2-rediseno] .gx-mobile-ops-filters{
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+body[data-gx2-rediseno] .gx-mobile-ops-filters button{
+  min-height: 44px;
+  padding: 0 13px;
+  border-radius: 999px;
+}
+
+/* Gestión: filas con objetivo táctil cómodo */
+body[data-gx2-rediseno] .gx-management-row{
+  border-radius: var(--gx2-radius-card);
+  padding: 13px 14px;
+}
+body[data-gx2-rediseno] .gx-management-row-actions button{
+  min-height: 44px;
+}
+
+/* ---------- Clientes: buscador sticky bajo el encabezado ---------- */
+body[data-gx2-rediseno] .gx-command-panel{
+  top: calc(var(--gx2-head-h) + 6px);
+}
+body[data-gx2-rediseno] .gx2-refresh{
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--gx2-line-strong);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .04);
+  color: var(--gx2-cyan);
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+body[data-gx2-rediseno] .gx2-refresh.wide{
+  width: auto;
+  padding: 0 14px;
+  font-size: .82rem;
+}
+body[data-gx2-rediseno] .gx-client-toolbar{
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+body[data-gx2-rediseno] .gx-client-toolbar .gx-search-wrap{ flex: 1; min-width: 0; }
+
+/* ---------- Ajustes: un solo "Guardar ajustes", encabezado sticky ---------- */
+body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading{
+  position: sticky;
+  top: calc(var(--gx2-head-h) + 6px);
+  z-index: 200;
+  background: linear-gradient(180deg, rgba(3, 3, 5, .94), rgba(3, 3, 5, .86));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-radius: 0 0 14px 14px;
+  padding: 8px 4px;
+  margin-left: -4px;
+  margin-right: -4px;
+}
+body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading h1{ font-size: 1.35rem; }
+body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading p{ display: none; }
+
+/* ---------- LIVE ambiental (2 s, opacidad) + punto de campana ---------- */
+body[data-gx2-rediseno] .status-dot{
+  animation: gx2LivePulse 2s ease-in-out infinite;
+}
+
+/* ---------- Indicador pull-to-refresh ---------- */
+body[data-gx2-rediseno] .gx2-ptr{
+  position: fixed;
+  top: max(8px, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 9000;
+  transform: translate(-50%, -140%);
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 242, 254, .3);
+  background: rgba(7, 7, 11, .94);
+  color: var(--gx2-cyan);
+  font-size: .78rem;
+  font-weight: 800;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
+  transition: transform .25s var(--gx2-ease-out);
+  pointer-events: none;
+  white-space: nowrap;
+}
+body[data-gx2-rediseno] .gx2-ptr.show{
+  transform: translate(-50%, 0);
+}
+
+/* ---------- Móvil: encabezado compacto, sin espacio de barra inferior ---------- */
+@media (max-width: 840px){
+  body[data-gx2-rediseno] .gx-admin-shell{
+    padding: 10px 10px calc(14px + env(safe-area-inset-bottom));
+  }
+  body[data-gx2-rediseno] .gx2-mirror-tag{ display: none; }
+  body[data-gx2-rediseno] .gx-brand-sub{ display: none; }
+  body[data-gx2-rediseno] .gx-save-state{
+    display: flex !important;
+    font-size: .64rem;
+  }
+  body[data-gx2-rediseno] .gx-topbar{ padding: 8px 2px 5px; }
+  body[data-gx2-rediseno] .gx-topbar .status{ font-size: .66rem; }
+  body[data-gx2-rediseno] .gx2-segmented{ margin-bottom: 6px; }
+  body[data-gx2-rediseno] .gx-command-panel{ top: calc(var(--gx2-head-h) + 4px); }
+  body[data-gx2-rediseno] .gx-kpi-strip{ grid-template-columns: 1fr 1fr; }
+  body[data-gx2-rediseno] .gx-client-stats{ grid-template-columns: 1fr 1fr; }
+  body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading h1{ font-size: 1.2rem; }
+}
+@media (max-width: 360px){
+  body[data-gx2-rediseno] .gx-save-state{ font-size: .58rem; }
+  body[data-gx2-rediseno] .gx2-seg span{ font-size: .66rem; }
+}
+/* Teléfonos estrechos (<=420 px): el estado de guardado no cabe junto a
+   la campana, LIVE y salir (la barra rebosaba 12 px a 390 px). Se oculta
+   aquí como en la oficial; el punto LIVE sigue señalando la conexión y el
+   estado reaparece a partir de 421 px, donde sí cabe. */
+@media (max-width: 420px){
+  body[data-gx2-rediseno] .gx-save-state{ display: none !important; }
+}
+
+/* ---------- Escritorio: mismo producto, más columnas ---------- */
+@media (min-width: 841px){
+  body[data-gx2-rediseno]{ --gx2-head-h: 137px; }
+  body[data-gx2-rediseno] .gx2-sticky-head{
+    /* El shell usa padding clamp(16px,2vw,32px) en escritorio; se compensa
+       para que el encabezado llegue de borde a borde. */
+    margin-left: calc(-1 * clamp(16px, 2vw, 32px));
+    margin-right: calc(-1 * clamp(16px, 2vw, 32px));
+    padding-left: clamp(16px, 2vw, 32px);
+    padding-right: clamp(16px, 2vw, 32px);
+  }
+  body[data-gx2-rediseno] .gx2-segmented{
+    max-width: 620px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  body[data-gx2-rediseno] .gx-decision-grid{
+    grid-template-columns: repeat(4, 1fr);
+  }
+  body[data-gx2-rediseno] .gx2-decision-feed,
+  body[data-gx2-rediseno] .gx-upcoming-section{
+    max-width: 760px;
+  }
+  body[data-gx2-rediseno] .gx-home-priority-grid{
+    max-width: 760px;
+  }
+  body[data-gx2-rediseno] .gx-decision-center{
+    max-width: 760px;
+  }
+  body[data-gx2-rediseno] .gx-business-panel{
+    max-width: 760px;
+  }
+}
+
+/* Escritorio >=1280: la oficial usa una rejilla de 2 columnas (la barra
+   lateral de navegación ocupa la columna 1, 210 px). El espejo no tiene
+   barra lateral: el shell vuelve a bloque y el encabezado segmentado ocupa
+   todo el ancho. Sin esto, el encabezado caía en la columna estrecha y el
+   contenido quedaba desplazado a la derecha. */
+@media (min-width: 1280px){
+  body[data-gx2-rediseno]{ --gx2-head-h: 141px; }
+  body[data-gx2-rediseno] .gx-admin-shell{ display: block; }
+  body[data-gx2-rediseno] .gx-main{ margin-inline: auto; }
+}
+
+/* ---------- Movimiento reducido: opacidad y color sí, desplazamiento no ---------- */
+@media (prefers-reduced-motion: reduce){
+  body[data-gx2-rediseno] .tab-content.active{
+    animation: gx2FadeIn .2s ease-out;
+  }
+  body[data-gx2-rediseno] #gx-decision-feed:not(.gx2-no-enter) > .gx2-feed-card,
+  body[data-gx2-rediseno] #gx-mobile-ops-list:not(.gx2-no-enter) > .gx-mobile-op-item{
+    animation: gx2FadeIn .2s ease-out;
+  }
+  body[data-gx2-rediseno] .gx-focus-sheet,
+  body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-sheet{
+    animation: gx2FadeIn .2s ease-out;
+  }
+  body[data-gx2-rediseno] .gx-notification-drawer{
+    transition: opacity .2s ease-out;
+  }
+  body[data-gx2-rediseno] .gx2-sk-line,
+  body[data-gx2-rediseno] .status-dot{
+    animation: none;
+  }
+  body[data-gx2-rediseno] button:active{
+    transform: none;
+  }
+}
