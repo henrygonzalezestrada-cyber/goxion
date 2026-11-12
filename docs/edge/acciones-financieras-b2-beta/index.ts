@@ -122,7 +122,11 @@ Deno.serve(async (req) => {
     const url = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const adminSecret = Deno.env.get("ADMIN_SESSION_SECRET");
-    if (!url || !serviceKey || !adminSecret) throw new Error("Configuración interna incompleta");
+    if (!url || !serviceKey || !adminSecret)
+      throw new Error("Configuración interna incompleta");
+    const sb = createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
 
     const auth = await validAdmin(req, adminSecret);
     if (!auth.ok) {
@@ -132,7 +136,7 @@ Deno.serve(async (req) => {
     const payload = await req.json().catch(() => ({}));
     const action = String(payload?.accion || "").trim();
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
-    const sb = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    // sb se creó antes de validar el token para leer la configuración privada QA.
 
     // Vista previa de activación desde el calendario nativo Admin.
     // Solo lectura; el botón definitivo invoca b2_activar_cliente, cuya
@@ -515,7 +519,7 @@ Deno.serve(async (req) => {
         data?.confirmar_aprobacion!==true)
         return json({ok:false,codigo:"COMPROBANTE_B2_VALIDACION",
           error:"Revisa comprobante, asignaciones, importes y confirmación"},400);
-      const applied=await sb.rpc("goxion_b2_aprobar_comprobante",{
+      const applied=await sb.rpc("goxion_motor_aprobar_comprobante_v1",{
         p_cliente_id:clienteId,p_reporte_id:reporteId,
         p_asignaciones:rows,p_operation_id:key,
         p_actor:"admin:b2-gateway",p_excepcion_parcial:excepcional,
@@ -542,7 +546,7 @@ Deno.serve(async (req) => {
     // individual. Exige sesión Admin comprobada antes de entrar aquí.
     // Los clientes de fecha única nunca pasan por esta ruta.
     if (["b2_activar_cliente","b2_cotizar_ciclo",
-         "b2_aprobar_abono","b2_unificar_cliente"].includes(action)) {
+         "b2_unificar_cliente"].includes(action)) {
       const clienteId=String(data?.cliente_id||"").trim();
       const periodo=String(data?.periodo||"").trim();
       if(!uuid.test(clienteId))return json({ok:false,
@@ -569,22 +573,8 @@ Deno.serve(async (req) => {
         // La fecha actual SIEMPRE se obtiene del servidor SQL.
         args={...args,p_periodo:periodo};
       }else{
-        const cargoId=String(data?.cargo_id||"").trim();
-        const key=String(data?.clave_idempotencia||"").trim();
-        const monto=Number(data?.monto_centavos);
-        const expected=Number(data?.saldo_esperado_centavos);
-        const nota=String(data?.nota||"").slice(0,400);
-        if(!uuid.test(cargoId)||!uuid.test(key)||!Number.isSafeInteger(monto)||
-          !Number.isSafeInteger(expected)||monto<=0||expected<=0||monto>expected){
-          return json({ok:false,error:"Cargo, monto, saldo y clave no válidos",
-            codigo:"B2_ABONO_INVALIDO"},400);
-        }
-        if(data?.confirmar_aprobacion!==true)return json({ok:false,
-          error:"Admin debe confirmar la aprobación del comprobante individual",
-          codigo:"B2_CONFIRMACION_OBLIGATORIA"},400);
-        rpc="goxion_b2_aprobar_abono";
-        args={...args,p_cargo_id:cargoId,p_monto_centavos:monto,
-          p_saldo_esperado_centavos:expected,p_operation_id:key,p_nota:nota};
+        return json({ok:false,codigo:"B2_REQUIERE_COMPROBANTE",
+          error:"Los cargos B2 solo se acreditan mediante comprobante validado"},409);
       }
       const applied=await sb.rpc(rpc,args);
       if(applied.error||applied.data?.ok!==true)return json({ok:false,
@@ -595,7 +585,7 @@ Deno.serve(async (req) => {
         contrato:"goxion-b2-por-acceso-v1",
         operation_id:String(data?.clave_idempotencia||operationId),
         cobrable:action==="b2_cotizar_ciclo"?false:undefined,
-        acreditada_b2:action==="b2_aprobar_abono"?true:false});
+        acreditada_b2:false});
     }
 
     if (action === "aprobar_pago") {
@@ -640,16 +630,26 @@ Deno.serve(async (req) => {
         return json({ok:false,error:"Clave idempotente inválida",codigo:"CLAVE_INVALIDA"},400);
       }
       const effectiveId=suppliedKey||operationId;
-      const applied=await sb.rpc("goxion_aprobar_pago_periodo_atomico",{
-        p_cliente_id:clienteId,p_periodo_esperado:periodoEsperado,
-        p_monto:monto,p_puntual:puntual,p_notas:notas,p_operation_id:effectiveId
+      const montoCentavos=Math.round(monto*100);
+      if(!uuid.test(clienteId)||!Number.isSafeInteger(montoCentavos)||
+         montoCentavos<=0||Math.abs(monto*100-montoCentavos)>0.00001){
+        return json({ok:false,codigo:"MOTOR_V1_IMPORTE_INVALIDO",
+          error:"Importe no válido para aprobación"},400);
+      }
+      // Admin sigue validando la sesión HMAC arriba; la RPC protegida
+      // revalida período, importe y obligación BAJO LOCK en una transacción.
+      const applied=await sb.rpc("goxion_motor_admin_mensual_v1",{
+        p_cliente_id:clienteId,p_periodo:periodoEsperado+"-01",
+        p_operation_id:effectiveId,p_monto_centavos:montoCentavos,
+        p_saldo_restante_centavos:null,p_puntual:puntual,
+        p_nota:notas,p_actor:"admin:b2-gateway"
       });
       if(applied.error||applied.data?.ok!==true){
         const stale=/PERIODO_DESACTUALIZADO|ya acreditado|ya cubierto/i.test(applied.error?.message||"");
         return json({
           ok:false,error:applied.error?.message||"No fue posible aprobar el pago.",
           operation_id:effectiveId,codigo:stale?"PERIODO_DESACTUALIZADO":"APROBACION_ATOMICA_FALLIDA",
-          etapa:"goxion_aprobar_pago_periodo_atomico"
+          etapa:"goxion_motor_admin_mensual_v1"
         },409);
       }
       const after=await financialState(sb,clienteId);
@@ -997,15 +997,22 @@ Deno.serve(async (req) => {
       // calcular y verifica período/saldo bajo bloqueo en UNA transacción SQL.
       const before=await financialState(sb,clienteId);
       if(before.error)return json({ok:false,error:"No fue posible validar el estado financiero previo.",operation_id:effectiveId},409);
-      const applied=await sb.rpc("goxion_registrar_pago_parcial_atomico",{
-        p_cliente_id:clienteId,p_periodo_esperado:periodoEsperado,
+      const applied=await sb.rpc("goxion_motor_admin_mensual_v1",{
+        p_cliente_id:clienteId,p_periodo:periodoEsperado+"-01",
+        p_operation_id:effectiveId,p_monto_centavos:null,
         p_saldo_restante_centavos:saldoCentavos,
-        p_operation_id:effectiveId,p_notas:notas
+        p_puntual:true,p_nota:notas,p_actor:"admin:b2-gateway"
       });
-      if(applied.error){
-        const outdated=String(applied.error.message||"").includes("PERIODO_DESACTUALIZADO");
-        return json({ok:false,error:outdated?"El periodo cambió. Recarga la ficha antes de continuar.":applied.error.message,
-          codigo:outdated?"PERIODO_DESACTUALIZADO":"PARCIAL_NO_APLICADO",
+      if(applied.error||applied.data?.ok!==true){
+        const message=String(applied.error?.message||"");
+        const periodoCambio=/PERIODO_DESACTUALIZADO/i.test(message);
+        const saldoCambio=!periodoCambio&&/DESACTUALIZADO/i.test(message);
+        return json({ok:false,
+          error:periodoCambio?"El periodo cambió. Recarga la ficha antes de continuar.":
+            saldoCambio?"El saldo cambió. Actualiza el importe antes de registrar el abono.":
+            (message||"El motor no confirmó el abono."),
+          codigo:periodoCambio?"PERIODO_DESACTUALIZADO":
+            saldoCambio?"SALDO_DESACTUALIZADO":"PARCIAL_NO_APLICADO",
           operation_id:effectiveId},409);
       }
       const after=await financialState(sb,clienteId);
