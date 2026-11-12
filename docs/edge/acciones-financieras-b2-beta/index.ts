@@ -134,34 +134,6 @@ Deno.serve(async (req) => {
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
     const sb = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
-    // Sincronización híbrida post-verificación de calendario (backend).
-    // Admin ya se autenticó mediante X-Admin-Token en la cabecera.
-    // NO se ejecuta al consultar el estado: lo invoca la operación
-    // autorizada que confirma cambios de calendario/contratación.
-    // La RPC utiliza las operaciones existentes de B2 y bloquea alta
-    // si existen pagos heredados, calendarios incompletos o deuda previa.
-    if(action==="b2_sincronizar_regimen"){
-      const clienteId=String(data?.cliente_id||"").trim();
-      if(!uuid.test(clienteId))
-        return json({ok:false,codigo:"B2_CLIENTE_INVALIDO",
-          error:"Cliente inválido"},400);
-      const sync=await sb.rpc("goxion_hibrido_sincronizar_regimen_v1",{
-        p_cliente_id:clienteId,p_actor:"admin:calendario-verificado"
-      });
-      if(sync.error) return json({ok:false,
-        codigo:"B2_SINCRONIZACION_RECHAZADA",
-        error:sync.error.message||"No fue posible conciliar el calendario.",
-        acreditada_b2:false,cobrable:false},409);
-      const accepted=sync.data?.ok===true;
-      return json({ok:accepted,
-        accion:action,resultado:sync.data,
-        codigo:sync.data?.codigo||"SINCRONIZACION_SIN_RESULTADO",
-        contrato:"goxion-hibrido-sync-v1",
-        cobrable:false,acreditada_b2:false,
-        requiere_revision:sync.data?.requiere_revision===true
-      },accepted?200:409);
-    }
-
     // Vista previa de activación desde el calendario nativo Admin.
     // Solo lectura; el botón definitivo invoca b2_activar_cliente, cuya
     // transacción SQL valida precios, lealtad, cobertura y cobros heredados.
