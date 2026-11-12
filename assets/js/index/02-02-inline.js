@@ -73,6 +73,8 @@
 
       const hoy = new Date();
       const gxEstadoCuenta = cliente.estado_cuenta || null;
+      const gxSaldoBloqueado = gxEstadoCuenta?.ok === false &&
+        gxEstadoCuenta?.fuente_financiera === 'supabase:goxion_hibrido_contrato_unico_v1';
       const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
       // Periodo persistente: no cambia solo porque inició un mes nuevo.
@@ -329,7 +331,11 @@
 
       let btnAccionHTML = "";
 
-      if (enRevision) {
+      if (gxSaldoBloqueado) {
+          // Nunca presentar cero ni abrir comprobante con saldo no conciliado.
+          labelTotal = 'Saldo en revisión';
+          btnAccionHTML = '';
+      } else if (enRevision) {
           /* R17-completar (a) · en revisión no hay bloque de acción:
            * el mensaje vive solo en el seguimiento del comprobante
            * (igual que en el preview: "Message belongs only to the
@@ -395,7 +401,7 @@
 
           <div class="balance-hero">
               <div class="total-label">${labelTotal}</div>
-              <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">$${totalFinal.toFixed(2)}</div>
+              <div class="total-amount" style="color: ${uiColor}; text-shadow: 0 0 25px ${uiColor}50;">${gxSaldoBloqueado ? "Importe por conciliar" : "$" + totalFinal.toFixed(2)}</div>
               <div class="time-badge ${badgeClass}">${gxEstadoCuenta?.estado_label ? `${gxEstadoCuenta.estado==='pagado'?'✅':gxEstadoCuenta.estado==='revision'?'⏳':gxEstadoCuenta.estado==='incompleto'?'⚠️':gxEstadoCuenta.estado==='vencido'?'🚨':'⏳'} ${gxEstadoCuenta.estado_label}` : badgeText}</div>
           </div>
         </div>
