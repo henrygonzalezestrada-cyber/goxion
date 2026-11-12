@@ -237,10 +237,10 @@ Deno.serve(async(req)=>{
           sb.from("goxion_b2_cargos")
             .select("id,cliente_acceso_id,cliente_servicio_id")
             .eq("cliente_id",clientId).eq("periodo",ciclo).limit(90),
-          sb.from("cliente_accesos").select("id,ordinal,cliente_servicio_id")
-            .eq("cliente_id",clientId).eq("activo",true).limit(90),
-          sb.from("cliente_servicios").select("id,nombre")
-            .eq("cliente_id",clientId).eq("activo",true).limit(90),
+          sb.from("cliente_accesos").select("id,ordinal,cliente_servicio_id,activo")
+            .eq("cliente_id",clientId).limit(90),
+          sb.from("cliente_servicios").select("id,nombre,activo")
+            .eq("cliente_id",clientId).limit(90),
           sb.from("goxion_b2_comprobantes").select("id,estado")
             .eq("cliente_id",clientId).eq("ciclo_id",cycle.data.id)
             .eq("estado","reportado").limit(1),
@@ -287,6 +287,7 @@ Deno.serve(async(req)=>{
               Number(item.descuento_comercial_centavos||0))return null;
           return {...item,servicio:String(contract.nombre).slice(0,100),
             ordinal:access.ordinal,cliente_servicio_id:contract.id,
+            historico:access.activo===false||contract.activo===false,
             beneficios_comerciales:benefits};
         });
         if(!cycle.data?.id||detailed.some((item:any)=>!item)||
