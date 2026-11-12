@@ -457,11 +457,22 @@ Deno.serve(async(req)=>{
       if(cq.data?.estado==="suspendido")return res({ok:false,error:"No configurar fechas de un cliente suspendido"},403);
       if(JSON.stringify(unidades).length>10000)return res({ok:false,error:"Datos de calendario excesivos"},400);
       const actor="admin:"+String(admin.sub||admin.user_id||admin.id||"sesion").slice(0,100);
-      const save=await sb.rpc("goxion_guardar_calendario_contrato_borrador",{
+      // Una única transacción de calendario: guarda borradores como antes.
+      // Al confirmar perfiles, intenta sincronizar el régimen con la
+      // activación B2 existente (no factura ni acredita aquí).
+      const save=await sb.rpc("goxion_hibrido_guardar_calendario_confirmado_v1",{
         p_cliente_servicio_id:contratoId,p_unidades:unidades,p_actor:actor
       });
-      if(save.error)return res({ok:false,error:"No se pudo guardar: "+save.error.message},400);
-      return res({ok:true,modo:"calendario_persistido_sin_cobro",guardado:save.data});
+      if(save.error)return res({ok:false,
+        error:"No se pudo guardar: "+save.error.message},400);
+      const sync=save.data?.sincronizacion||null;
+      return res({ok:true,
+        modo:"calendario_guardado_sin_acreditacion",
+        guardado:save.data,
+        sincronizacion:sync,
+        requiere_revision:sync?.requiere_revision===true,
+        permitir_pago_global:false,
+        cobrable:false});
     }
 
     if(accion==="simular_calendario_beta"){
