@@ -222,7 +222,7 @@ for (const absolute of walk(jsRoot)) {
 }
 
 
-// Index phase 2A: prefer the unified financial engine with a safe legacy fallback.
+// Index: prefer the authoritative hybrid contract and fail closed on invalid data.
 {
   const indexLayerPath = join(ROOT, 'assets', 'js', 'index', '01-index-supabase-layer.js');
   const source = existsSync(indexLayerPath) ? readFileSync(indexLayerPath, 'utf8') : '';
@@ -236,8 +236,9 @@ for (const absolute of walk(jsRoot)) {
   if (!source.includes('GOXION_FINANCIAL.selectCompatibleState')) {
     fail('Index financiero: selector no delega al motor compartido.');
   }
-  if (!source.includes('legacy-fallback')) {
-    fail('Index financiero: falta fallback legacy seguro.');
+  if (!source.includes('hybrid-blocked') ||
+      !source.includes('true // Contrato híbrido obligatorio')) {
+    fail('Index financiero: debe exigir contrato híbrido y bloquear el fallback legado.');
   }
   if (!source.includes('__GOXION_INDEX_FINANCE_AUDIT')) {
     fail('Index financiero: falta auditoría silenciosa de paridad.');

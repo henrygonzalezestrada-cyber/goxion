@@ -14,15 +14,19 @@ window.gxSelectIndexFinancialState = function(legacyState, financialState, expec
         return window.GOXION_FINANCIAL.selectCompatibleState(
             legacyState,
             financialState,
-            expectedClientId
+            expectedClientId,
+            true // Contrato híbrido obligatorio; jamás fallback al V1
         );
     }
 
     const legacy = legacyState && typeof legacyState === "object" ? legacyState : null;
     return {
-        state: legacy,
+        state: {ok:false,estado:"revision",estado_label:"Conciliación requerida",
+            total_actual:null,subtotal:null,total_label:"Importe por conciliar",
+            requiere_revision:true,cobrable:false,publicable:false,
+            permitir_pago_global:false},
         audit: {
-            source: legacy ? "legacy-fallback" : "none",
+            source: "hybrid-blocked",
             financial_valid: false,
             compared: false,
             differences: [],

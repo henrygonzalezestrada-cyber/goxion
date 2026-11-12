@@ -428,6 +428,9 @@
     // ---------- Payment review ----------
     window.gxOpenPaymentModalBase=function(key,monto){
         const c=clientesDict?.[key];if(!c)return;
+        if(c.finanzas_requieren_revision)return alert("Conciliación financiera requerida antes de aprobar pagos.");
+        if(c?.estado_cuenta?.modo_cobro==="b2")
+            return alert("Esta cuenta se cobra por vencimiento B2. Abre la revisión del comprobante individual.");
         paymentCtx={key,monto:Number(monto ?? c?.estado_cuenta?.total_actual ?? ((c.servicios||[]).reduce((s,x)=>s+Number(x.monto||0),0)))};
         document.getElementById("gx-payment-client-name").textContent=c.nombre;
         document.getElementById("gx-payment-client-meta").textContent=`${c.folio} · ${gxPeriodLabel(c.periodo_pendiente)} · Esperado $${paymentCtx.monto} · Día ${c.dia_pago||15}`;
@@ -447,6 +450,10 @@
     window.gxClosePaymentModal=()=>{document.getElementById("gx-payment-modal")?.classList.remove("show");paymentCtx=null};
     async function paymentAction(type){
         if(!paymentCtx)return;const c=clientesDict[paymentCtx.key],note=document.getElementById("gx-payment-note").value.trim();
+        if(c?.finanzas_requieren_revision)
+            return alert("Saldo no conciliado. No se modificó ningún pago.");
+        if(c?.estado_cuenta?.modo_cobro==="b2")
+            return alert("Pago global bloqueado: utiliza el comprobante B2 del vencimiento.");
         let successMessage="";
         try{
             if(type==="approve"){

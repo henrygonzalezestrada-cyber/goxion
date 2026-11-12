@@ -490,9 +490,12 @@
 
             const accountLabel=document.querySelector('.gx-account-capsule-label');
             if(accountLabel) {
-                accountLabel.textContent = gxEstadoCuenta
-                    ? `${gxEstadoCuenta.total_label || 'Estado de cuenta'} · $${Number(gxEstadoCuenta.total_actual || 0).toFixed(2)}`
-                    : 'Ver Estado de Cuenta';
+                accountLabel.textContent = gxEstadoCuenta?.ok === false &&
+                    gxEstadoCuenta?.fuente_financiera === 'supabase:goxion_hibrido_contrato_unico_v1'
+                    ? 'Importe por conciliar'
+                    : (gxEstadoCuenta
+                    ? `${gxEstadoCuenta.total_label || 'Estado de cuenta'} · ${Number(gxEstadoCuenta.total_actual || 0).toFixed(2)}`
+                    : 'Ver Estado de Cuenta');
             }
 
             let historyHTML = '';

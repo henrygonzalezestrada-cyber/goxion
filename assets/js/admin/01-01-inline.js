@@ -359,8 +359,13 @@ let clientesDict = {};
             } else { clientServicesHTML = `<div style="font-size:0.85rem; color:var(--text-muted); text-align:center; padding: 10px 0;">Sin servicios activos asignados</div>`; }
 
             const gxEstadoCuenta = cliente.estado_cuenta || null;
+            // Un saldo no conciliado no equivale a cero ni a la suma de servicios.
+            const gxFinanzasBloqueadas = cliente.finanzas_requieren_revision === true;
             const gxSubtotalReal = gxEstadoCuenta ? Number(gxEstadoCuenta.subtotal || 0) : Number(subtotal || 0);
-            const gxCobroActual = gxEstadoCuenta ? Number(gxEstadoCuenta.total_actual || 0) : Number(subtotal || 0);
+            const gxCobroActual = gxFinanzasBloqueadas ? 0
+                : (gxEstadoCuenta ? Number(gxEstadoCuenta.total_actual || 0) : Number(subtotal || 0));
+            const gxCobroTexto = gxFinanzasBloqueadas
+                ? "Importe por conciliar" : "$" + gxCobroActual.toFixed(2);
             const gxDescuentosTotal = gxEstadoCuenta ? Number(gxEstadoCuenta.descuentos?.total || 0) : 0;
             const gxCargosTotal = gxEstadoCuenta ? Number(gxEstadoCuenta.cargos?.total || 0) : 0;
             const gxBillingBreakdown = Array.isArray(gxEstadoCuenta?.desglose) ? gxEstadoCuenta.desglose : [];
@@ -372,7 +377,7 @@ let clientesDict = {};
                         const sign = value > 0 && item?.tipo === 'cargo' ? '+' : '';
                         return `<div class="${cls}"><span>${item?.concepto || 'Ajuste'}</span><strong>${sign}$${Math.abs(value).toFixed(2)}${value < 0 ? ' OFF' : ''}</strong></div>`;
                     }).join('')}
-                    <div class="total"><span>${gxEstadoCuenta?.total_label || 'Total actual'}</span><strong>$${gxCobroActual.toFixed(2)}</strong></div>
+                    <div class="total"><span>${gxEstadoCuenta?.total_label || 'Total actual'}</span><strong>${gxCobroTexto}</strong></div>
                 </div>` : '';
 
             let descuentosHTML = `
@@ -636,7 +641,7 @@ let clientesDict = {};
                             <div><strong>${paymentPrimary}</strong><small>${paymentSecondary}</small></div>
                         </div>
                     </div>
-                    <div class="gx-client-money gx-client-money-live"><strong>$${gxCobroActual.toFixed(2)}</strong><span>cobro actual${gxEstadoCuenta && gxCobroActual !== gxSubtotalReal ? ` · base $${gxSubtotalReal.toFixed(2)}` : ''}</span></div>
+                    <div class="gx-client-money gx-client-money-live"><strong>${gxCobroTexto}</strong><span>cobro actual${gxEstadoCuenta && gxCobroActual !== gxSubtotalReal ? ` · base $${gxSubtotalReal.toFixed(2)}` : ''}</span></div>
                 </div>
                 <div class="gx-client-brief" onclick="toggleClientDetails('${key}')">
                     <div class="gx-service-brief">${servicesBrief}</div>
@@ -658,7 +663,7 @@ let clientesDict = {};
                         <div class="gx-payment-priority-icon">💳</div>
                         <div class="gx-payment-priority-copy">
                             <strong>Pago pendiente de revisión</strong>
-                            <small>Hay un comprobante esperando tu decisión · esperado $${gxCobroActual.toFixed(2)}</small>
+                            <small>Hay un comprobante esperando tu decisión · esperado ${gxCobroTexto}</small>
                         </div>
                         <button type="button" onclick="gxOpenPaymentModal('${key}', ${gxCobroActual})">Revisar ahora</button>
                     </div>` : ''}
@@ -670,7 +675,7 @@ let clientesDict = {};
                         <div class="gx-accordion-content">
                             <div class="gx-billing-primary">
                                 <div><small>Próximo vencimiento</small><strong>${dueText}</strong></div>
-                                <div><small>Cobro actual</small><strong>$${gxCobroActual.toFixed(2)}</strong><span class="gx-billing-base-note">Base mensual $${gxSubtotalReal.toFixed(2)}</span></div>
+                                <div><small>Cobro actual</small><strong>${gxCobroTexto}</strong><span class="gx-billing-base-note">${gxFinanzasBloqueadas ? "Base pendiente de conciliación" : "Base mensual $" + gxSubtotalReal.toFixed(2)}</span></div>
                                 <div class="gx-billing-status ${paymentClass}"><small>Estado</small><strong>${gxEstadoCuenta?.estado_label || (gxBillingBucketNow==='suspendido'?'Suspendido':gxBillingStateNow==='pagado'?'Pagado':gxBillingStateNow==='revision'?'En revisión':gxBillingStateNow==='vencido'?'Vencido':gxBillingStateNow==='incompleto'?'Pago incompleto':'Pendiente')}</strong></div>
                             </div>
 

@@ -106,18 +106,23 @@ async function runIndex(browser, browserName, errors) {
     };
     const financial = {
       cliente_id:'c1',
-      fuente_financiera:'supabase:goxion_estado_financiero',
-      contrato_financiero:{version:'1.1',modo:'oficial'},
+      fuente_financiera:'supabase:goxion_hibrido_contrato_unico_v1',
+      contrato_financiero:{version:'2.0',modo:'oficial'},
+      fuente_saldo:'obligaciones_b2',
+      ok:true,
+      publicable:true,
       periodo:'2026-09-01',
       estado:'pendiente',
       subtotal:200,
       total_actual:210,
+      total_pendiente_centavos:21000,
       lealtad:{pagos_efectivos:4,nivel:1},
       cargos:{mora:10,reactivacion:0}
     };
     const changed = {
       ...financial,
-      total_actual:215
+      total_actual:215,
+      total_pendiente_centavos:21500
     };
 
     return {
@@ -128,22 +133,27 @@ async function runIndex(browser, browserName, errors) {
     };
   });
 
-  if (cases.preferred.audit.source !== 'financial-v1' || cases.preferred.audit.matches !== true) {
-    errors.push(`${label}: no prefirió motor financiero válido o paridad incorrecta.`);
+  if (cases.preferred.audit.source !== 'hybrid-official' ||
+      cases.preferred.audit.matches !== true ||
+      cases.preferred.state?.total_pendiente_centavos !== 21000) {
+    errors.push(`${label}: no prefirió el contrato híbrido oficial conciliado.`);
   }
-  if (cases.malformed.audit.source !== 'legacy-fallback') {
-    errors.push(`${label}: no hizo fallback ante estado financiero inválido.`);
+  if (cases.malformed.audit.source !== 'hybrid-blocked' ||
+      cases.malformed.state?.total_actual !== null ||
+      cases.malformed.state?.permitir_pago_global !== false) {
+    errors.push(`${label}: un contrato inválido no bloqueó el saldo antiguo.`);
   }
-  if (cases.wrongClient.audit.source !== 'legacy-fallback') {
-    errors.push(`${label}: aceptó estado financiero de otro cliente.`);
+  if (cases.wrongClient.audit.source !== 'hybrid-blocked' ||
+      cases.wrongClient.state?.total_actual !== null) {
+    errors.push(`${label}: aceptó un contrato financiero de otro cliente.`);
   }
   if (
     cases.diff.audit.matches !== false ||
-    cases.diff.audit.source !== 'legacy-variance-fallback' ||
-    Number(cases.diff.state?.total_actual || 0) !== 210 ||
+    cases.diff.audit.source !== 'hybrid-official' ||
+    Number(cases.diff.state?.total_actual || 0) !== 215 ||
     !cases.diff.audit.differences.some(x => x.field === 'total_actual')
   ) {
-    errors.push(`${label}: diferencia financiera no activó fallback seguro/auditoría.`);
+    errors.push(`${label}: la diferencia válida B2 cayó indebidamente al global.`);
   }
 
   await page.close();

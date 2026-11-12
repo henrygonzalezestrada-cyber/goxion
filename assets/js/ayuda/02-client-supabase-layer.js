@@ -120,10 +120,15 @@ const LOGIN_URL = GXCORE.endpoint("login-goxion");
                 ? window.GOXION_FINANCIAL.selectCompatibleState(
                     legacyEstadoCuenta,
                     financialEstadoCuenta,
-                    data?.cliente?.id || ""
+                    data?.cliente?.id || "",
+                    true // Sin fallback al saldo global heredado
                   )
-                : { state: legacyEstadoCuenta, audit: {
-                    source: legacyEstadoCuenta ? "legacy-fallback" : "none",
+                : { state: {
+                    ok:false, estado:"revision", total_actual:null,
+                    total_label:"Importe por conciliar",requiere_revision:true,
+                    cobrable:false,publicable:false,permitir_pago_global:false
+                  }, audit: {
+                    source: "hybrid-blocked",
                     financial_valid:false,
                     compared:false,
                     matches:null,
