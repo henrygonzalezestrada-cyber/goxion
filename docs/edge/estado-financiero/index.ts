@@ -74,23 +74,9 @@ Deno.serve(async(req)=>{
     const accion=String(body?.accion||"mi_estado");
     const datos=body?.datos||{};
 
-    // ÚNICA entrada de estado al activar GOXION_HIBRIDO_LECTURA=1.
-    // Las funciones comerciales antiguas permanecen para calcular beneficios,
-    // pero el saldo visible de cuentas B2 proviene del ledger de obligaciones.
-    // Si el contrato no concilia, FALLAR CERRADO (no volver a deuda global).
-    // Por defecto se mantiene la ruta vigente hasta verificar QA end-to-end.
-    const hibridoLectura=Deno.env.get("GOXION_HIBRIDO_LECTURA")==="1";
     async function estado(clienteId:string){
-      const rpc=hibridoLectura
-        ?"goxion_hibrido_contrato_unico_v1":"goxion_estado_financiero";
-      const q=await sb.rpc(rpc,{p_cliente_id:clienteId});
+      const q=await sb.rpc("goxion_estado_financiero",{p_cliente_id:clienteId});
       if(q.error)throw q.error;
-      if(hibridoLectura &&
-        (q.data?.ok!==true || q.data?.cobrable!==false ||
-         q.data?.publicable!==true ||
-         q.data?.fuente_financiera!=="supabase:goxion_hibrido_contrato_unico_v1" ||
-         !["obligaciones_b2","global_legacy"].includes(String(q.data?.fuente_saldo||""))))
-        throw new Error("Estado financiero pendiente de conciliación");
       return q.data;
     }
 
@@ -239,10 +225,10 @@ Deno.serve(async(req)=>{
           sb.from("goxion_b2_cargos")
             .select("id,cliente_acceso_id,cliente_servicio_id")
             .eq("cliente_id",clientId).eq("periodo",ciclo).limit(90),
-          sb.from("cliente_accesos").select("id,ordinal,cliente_servicio_id,activo")
-            .eq("cliente_id",clientId).limit(90),
-          sb.from("cliente_servicios").select("id,nombre,activo")
-            .eq("cliente_id",clientId).limit(90),
+          sb.from("cliente_accesos").select("id,ordinal,cliente_servicio_id")
+            .eq("cliente_id",clientId).eq("activo",true).limit(90),
+          sb.from("cliente_servicios").select("id,nombre")
+            .eq("cliente_id",clientId).eq("activo",true).limit(90),
           sb.from("goxion_b2_comprobantes").select("id,estado")
             .eq("cliente_id",clientId).eq("ciclo_id",cycle.data.id)
             .eq("estado","reportado").limit(1),
@@ -289,7 +275,6 @@ Deno.serve(async(req)=>{
               Number(item.descuento_comercial_centavos||0))return null;
           return {...item,servicio:String(contract.nombre).slice(0,100),
             ordinal:access.ordinal,cliente_servicio_id:contract.id,
-            historico:access.activo===false||contract.activo===false,
             beneficios_comerciales:benefits};
         });
         if(!cycle.data?.id||detailed.some((item:any)=>!item)||
@@ -460,22 +445,11 @@ Deno.serve(async(req)=>{
       if(cq.data?.estado==="suspendido")return res({ok:false,error:"No configurar fechas de un cliente suspendido"},403);
       if(JSON.stringify(unidades).length>10000)return res({ok:false,error:"Datos de calendario excesivos"},400);
       const actor="admin:"+String(admin.sub||admin.user_id||admin.id||"sesion").slice(0,100);
-      // Una única transacción de calendario: guarda borradores como antes.
-      // Al confirmar perfiles, intenta sincronizar el régimen con la
-      // activación B2 existente (no factura ni acredita aquí).
-      const save=await sb.rpc("goxion_hibrido_guardar_calendario_confirmado_v1",{
+      const save=await sb.rpc("goxion_guardar_calendario_contrato_borrador",{
         p_cliente_servicio_id:contratoId,p_unidades:unidades,p_actor:actor
       });
-      if(save.error)return res({ok:false,
-        error:"No se pudo guardar: "+save.error.message},400);
-      const sync=save.data?.sincronizacion||null;
-      return res({ok:true,
-        modo:"calendario_guardado_sin_acreditacion",
-        guardado:save.data,
-        sincronizacion:sync,
-        requiere_revision:sync?.requiere_revision===true,
-        permitir_pago_global:false,
-        cobrable:false});
+      if(save.error)return res({ok:false,error:"No se pudo guardar: "+save.error.message},400);
+      return res({ok:true,modo:"calendario_persistido_sin_cobro",guardado:save.data});
     }
 
     if(accion==="simular_calendario_beta"){
@@ -570,8 +544,7 @@ Deno.serve(async(req)=>{
           diferencias,
           delta_abs_total:Math.round(deltaAbs*100)/100
         },
-        fuente:hibridoLectura
-          ?"supabase:goxion_hibrido_contrato_unico_v1":"supabase:goxion_estado_financiero",
+        fuente:"supabase:goxion_estado_financiero",
         modo:"oficial"
       });
     }
