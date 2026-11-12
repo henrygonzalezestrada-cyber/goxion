@@ -30,7 +30,7 @@
     return json;
   }
 
-  function selectCompatibleState(legacyState, financialState, expectedClientId = "") {
+  function selectCompatibleState(legacyState, financialState, expectedClientId = "", requireHybrid = false) {
     const legacy = legacyState && typeof legacyState === 'object' ? legacyState : null;
     const financial = financialState && typeof financialState === 'object' ? financialState : null;
     const expectedId = String(expectedClientId || '').trim();
@@ -46,6 +46,20 @@
       /^\d{4}-\d{2}/.test(String(financial.periodo || '')) &&
       (!expectedId || !financial.cliente_id || String(financial.cliente_id) === expectedId)
     );
+
+    // Cuando se publica el contrato único, es la fuente autoritativa.
+    // Nunca preferir un saldo heredado sólo porque discrepa con B2.
+    const cents = Number(financial?.total_pendiente_centavos);
+    const validHybrid = Boolean(financial && financial.ok === true &&
+      financial.fuente_financiera === 'supabase:goxion_hibrido_contrato_unico_v1' &&
+      financial.contrato_financiero?.modo === 'oficial' &&
+      financial.publicable === true &&
+      ['obligaciones_b2','global_legacy'].includes(financial.fuente_saldo) &&
+      Number.isSafeInteger(cents) && cents >= 0 &&
+      money(financial.total_actual) &&
+      Math.abs(Number(financial.total_actual)*100-cents)<0.5 &&
+      /^\\d{4}-\\d{2}/.test(String(financial.periodo || '')) &&
+      (!expectedId || String(financial.cliente_id || '') === expectedId));
 
     const fields = [
       ['periodo', value => String(value || ''), state => state?.periodo],
@@ -75,18 +89,29 @@
 
     const compared = Boolean(legacy && financial);
     const matches = compared ? differences.length === 0 : null;
-    const useFinancial = validFinancial && (!legacy || matches === true);
-    const state = useFinancial ? financial : legacy;
-
+    const useFinancial = validHybrid || (!requireHybrid && validFinancial && (!legacy || matches === true));
+    // En modo oficial híbrido, si la cotización no concilia se informa
+    // revisión, jamás una deuda alternativa ni se habilita cobro.
+    const blockedState = {
+      ok:false, cliente_id:expectedId, estado:'revision',
+      estado_label:'Conciliación requerida',total_actual:null,
+      subtotal:null,total_label:'Importe en revisión',
+      fuente_financiera:'supabase:goxion_hibrido_contrato_unico_v1',
+      fuente_saldo:'sin_conciliar',requiere_revision:true,
+      permitir_pago_global:false,cobrable:false,publicable:false
+    };
+    const state = useFinancial ? financial
+      : (requireHybrid ? blockedState : legacy);
     return {
       state,
       audit: {
-        source: useFinancial
-          ? 'financial-v1'
+        source: validHybrid ? 'hybrid-official'
+          : (requireHybrid ? 'hybrid-blocked'
+          : (useFinancial ? 'financial-v1'
           : (validFinancial && legacy && matches === false
             ? 'legacy-variance-fallback'
-            : (legacy ? 'legacy-fallback' : 'none')),
-        financial_valid: validFinancial,
+            : (legacy ? 'legacy-fallback' : 'none')))),
+        financial_valid: validHybrid || validFinancial,
         compared,
         matches,
         differences
