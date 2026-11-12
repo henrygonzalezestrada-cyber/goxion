@@ -75,7 +75,7 @@ Deno.serve(async(req)=>{
     const datos=body?.datos||{};
 
     // Lanzamiento controlado: cambia la FUENTE de lectura, nunca acredita pagos.
-    const hibridoLectura=true; // Release: fuente autoritativa habilitada, revertir redeplegando v13
+    const hibridoLectura=true; // Release validada en QA, rollback mediante backup v13
     async function estado(clienteId:string){
       const rpc=hibridoLectura
         ?"goxion_hibrido_contrato_unico_v1":"goxion_estado_financiero";
@@ -232,17 +232,11 @@ Deno.serve(async(req)=>{
       if(cq.data?.estado==="suspendido")return res({ok:false,error:"No configurar fechas de un cliente suspendido"},403);
       if(JSON.stringify(unidades).length>10000)return res({ok:false,error:"Datos de calendario excesivos"},400);
       const actor="admin:"+String(admin.sub||admin.user_id||admin.id||"sesion").slice(0,100);
-      // Sin flag conservar SIN CAMBIOS el guardado que está en producción.
-      // Con el contrato activo, confirmar calendario sincroniza el B2
-      // dentro de la transacción autorizada, nunca en una lectura.
-      const save=await sb.rpc(hibridoLectura
-        ?"goxion_hibrido_guardar_calendario_confirmado_v1"
-        :"goxion_guardar_calendario_contrato_borrador",{
+      // Borrador=no activa. Confirmación=sincroniza B2 con bloqueo SQL.
+      const save=await sb.rpc("goxion_hibrido_guardar_calendario_confirmado_v1",{
         p_cliente_servicio_id:contratoId,p_unidades:unidades,p_actor:actor
       });
       if(save.error)return res({ok:false,error:"No se pudo guardar: "+save.error.message},400);
-      if(!hibridoLectura)
-        return res({ok:true,modo:"calendario_persistido_sin_cobro",guardado:save.data});
       const sync=save.data?.sincronizacion||null;
       return res({ok:true,modo:"calendario_guardado_sin_acreditacion",
         guardado:save.data,sincronizacion:sync,
