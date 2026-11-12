@@ -74,9 +74,21 @@ Deno.serve(async(req)=>{
     const accion=String(body?.accion||"mi_estado");
     const datos=body?.datos||{};
 
+    // ÚNICA entrada de estado al activar GOXION_HIBRIDO_LECTURA=1.
+    // Las funciones comerciales antiguas permanecen para calcular beneficios,
+    // pero el saldo visible de cuentas B2 proviene del ledger de obligaciones.
+    // Si el contrato no concilia, FALLAR CERRADO (no volver a deuda global).
+    // Por defecto se mantiene la ruta vigente hasta verificar QA end-to-end.
+    const hibridoLectura=Deno.env.get("GOXION_HIBRIDO_LECTURA")==="1";
     async function estado(clienteId:string){
-      const q=await sb.rpc("goxion_estado_financiero",{p_cliente_id:clienteId});
+      const rpc=hibridoLectura
+        ?"goxion_hibrido_contrato_unico_v1":"goxion_estado_financiero";
+      const q=await sb.rpc(rpc,{p_cliente_id:clienteId});
       if(q.error)throw q.error;
+      if(hibridoLectura &&
+        (q.data?.ok!==true || q.data?.cobrable!==false ||
+         !["obligaciones_b2","global_legacy"].includes(String(q.data?.fuente_saldo||""))))
+        throw new Error("Estado financiero pendiente de conciliación");
       return q.data;
     }
 
@@ -544,7 +556,8 @@ Deno.serve(async(req)=>{
           diferencias,
           delta_abs_total:Math.round(deltaAbs*100)/100
         },
-        fuente:"supabase:goxion_estado_financiero",
+        fuente:hibridoLectura
+          ?"supabase:goxion_hibrido_contrato_unico_v1":"supabase:goxion_estado_financiero",
         modo:"oficial"
       });
     }
