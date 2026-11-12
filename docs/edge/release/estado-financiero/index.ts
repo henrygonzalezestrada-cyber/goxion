@@ -75,7 +75,7 @@ Deno.serve(async(req)=>{
     const datos=body?.datos||{};
 
     // Lanzamiento controlado: cambia la FUENTE de lectura, nunca acredita pagos.
-    const hibridoLectura=Deno.env.get("GOXION_HIBRIDO_LECTURA")==="1";
+    const hibridoLectura=true; // Release: fuente autoritativa habilitada, revertir redeplegando v13
     async function estado(clienteId:string){
       const rpc=hibridoLectura
         ?"goxion_hibrido_contrato_unico_v1":"goxion_estado_financiero";
