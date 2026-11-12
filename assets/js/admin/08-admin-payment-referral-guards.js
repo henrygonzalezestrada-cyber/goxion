@@ -68,7 +68,10 @@
             c.estado="pendiente"; c.pago_en_revision=false; c.pago_revision_estado="incompleto"; c.pago_revision_mensaje=msg; c.pago_revision_monto_faltante=amount;
             gxClosePaymentModal(); gxCloseClientFocus(); filtrarClientes(); gxUpdateOperationsSummary();
             alert("⚠️ Pago marcado como incompleto.");
-        } catch(e) { alert("No se pudo procesar el pago.\n\n"+e.message); }
+        } catch(e) {
+            const detalle=window.GOXION_FINANCIAL_ACTIONS?.describeError?.(e) || "No se pudo confirmar el pago. Revisa el historial antes de reintentarlo.\nCódigo: FIN-INTERNO-500";
+            alert("No se pudo procesar el pago.\n\n"+detalle);
+        }
     };
 
     window.gxResetReferral = async function(key) {

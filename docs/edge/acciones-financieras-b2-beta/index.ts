@@ -136,7 +136,7 @@ Deno.serve(async (req) => {
     const payload = await req.json().catch(() => ({}));
     const action = String(payload?.accion || "").trim();
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
-    // sb se creó antes de validar el token para leer la configuración privada QA.
+    // Cliente Supabase autorizado exclusivamente desde el gateway Admin.
 
     // Vista previa de activación desde el calendario nativo Admin.
     // Solo lectura; el botón definitivo invoca b2_activar_cliente, cuya
@@ -189,7 +189,11 @@ Deno.serve(async (req) => {
       if(ids.length!==valid)reasons.push("Guarda y verifica todas las fechas del período");
       if(dates.size<2)reasons.push("Los perfiles deben tener al menos dos fechas distintas");
       const ready=!active&&reasons.length===0;
-      return json({ok:true,accion:action,modo:active?"b2_activo":"fecha_unica",
+      const codigo=active?"B2_YA_ACTIVO":ready?"B2_LISTO_PARA_ACTIVAR":
+        reasons.includes("Hay un pago en revisión")?"FIN-REVISION-409":
+        "FIN-CALENDARIO-409";
+      return json({ok:true,accion:action,codigo,
+        modo:active?"b2_activo":"fecha_unica",
         periodo,regimen_activo:active,perfiles:ids.length,
         perfiles_verificados:valid,fechas_distintas:dates.size,
         listo_para_activar:ready,motivos:reasons,

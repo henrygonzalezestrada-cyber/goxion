@@ -1,5 +1,9 @@
 # GOXION · Guía para cualquier asistente que trabaje en el repositorio
 
+> **OBLIGATORIO DESDE 12/NOV/2026 — CAMBIOS LIMPIOS:** leer [Política de sustitución y retiro](docs/ENGINEERING_HYGIENE_POLICY.md) y [Catálogo de errores financieros](docs/FINANCIAL_ERROR_CATALOG.md) antes de modificar Admin, pagos, calendarios, Supabase o Edge. Ninguna modificación queda terminada si el código viejo sigue siendo una segunda ruta ejecutable, quedan mensajes crudos SQL para el usuario o el nombre beta se promovió a producción sin plan de migración. Guardar respaldo, probar y retirar/identificar el legado en el mismo PR.
+>
+> **Fuente productiva vigente:** GOXION usa el motor de obligaciones V1 `goxion_motor.aprobar_con_efectos_v1` mediante `acciones-financieras` y `acciones-financieras-b2-beta` (este segundo nombre es un alias **ACTIVO HEREDADO**, no un entorno de pruebas). Los escritores globales anteriores están revocados para `service_role`. Los textos de este archivo que mencionan Edge v7, pagos B2 `sombra` o "próximo bloque" del 12/oct son **historial**, no instrucciones actuales. No restaurarlos por accidente.
+
 > **CONTINUIDAD Goxy (15/oct/2026):** para cualquier trabajo del asistente Goxy leer **antes de editar** [estado F12 y ruta entre chats](docs/GOXY_CONTINUIDAD_Y_RUTA_2026-10-15.md). F12 está fusionada/publicada **solo en beta** (PR #120), no aprobada en Safari físico, y la prueba general Browser smoke de CI quedó con fallo. No reconstruir fases F1–F11 ni trasladar al Soporte oficial sin aprobación.
 
 > **ACTUALIZACIÓN OBLIGATORIA (14/oct/2026):** comenzar por el

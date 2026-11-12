@@ -906,6 +906,15 @@ for (const absolute of walk(jsRoot)) {
   if(!client.includes('gx-rb-consent')||!client.includes('openFeedbackModal'))fail('Opiniones beta: faltan consentimiento o formulario');
 }
 
+// Toda sustitución financiera mantiene códigos comprensibles para Admin.
+const errorCatalogSmoke=spawnSync(process.execPath,['scripts/admin-financial-errors-smoke.mjs'],{
+  cwd:ROOT,encoding:'utf8',timeout:15000
+});
+if(errorCatalogSmoke.status!==0){
+  fail('Diagnóstico financiero de Admin: '+
+    String(errorCatalogSmoke.stderr||errorCatalogSmoke.stdout||'no ejecutado').slice(0,900));
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));

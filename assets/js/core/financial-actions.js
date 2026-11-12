@@ -4,6 +4,78 @@
   const core = window.GOXION_CORE;
   if (!core) throw new Error('GOXION_CORE no disponible antes de acciones financieras.');
 
+  // Error comprensible para Admin + referencia estable para diagnóstico técnico.
+  // No mostrar directamente variables SQL ni mensajes internos del servidor.
+  // Códigos y pasos: docs/FINANCIAL_ERROR_CATALOG.md.
+  const PAYMENT_DIAGNOSTICS = [
+    {
+      test: /record ["']v_parcial["'] is not assigned yet|MOTOR_ADMIN_PARCIAL_AUDITORIA_INCOMPLETA/i,
+      code: 'FIN-PARCIAL-001',
+      message: 'Falló la preparación del registro de pago parcial en el servidor.',
+      next: 'Actualiza la ficha y verifica si el pago aparece registrado antes de volver a aprobar.'
+    },
+    {
+      test: /MOTOR_ADMIN_PAGO_FINAL_MONTO_DESACTUALIZADO|MONTO_MENSUAL_DESACTUALIZADO|SALDO_DESACTUALIZADO|PAGO_FINAL_MONTO_DESACTUALIZADO|PARCIAL_DESACTUALIZADO/i,
+      code: 'FIN-SALDO-409',
+      message: 'El importe del pago ya no coincide con el saldo financiero actual.',
+      next: 'Actualiza la ficha del cliente y revisa el monto exacto antes de aprobar.'
+    },
+    {
+      test: /PERIODO_DESACTUALIZADO|PERIODO_NO_CONCILIADO|PERIODO_INCORRECTO|FUERA_DE_FECHA/i,
+      code: 'FIN-PERIODO-409',
+      message: 'El período de cobro cambió o la cotización corresponde a otra fecha.',
+      next: 'Recarga la ficha y comprueba el período pendiente.'
+    },
+    {
+      test: /COMPROBANTE_NO_EXISTE|COMPROBANTE_B2_NO_APROBADO|COMPROBANTE_B2_VALIDACION|B2_REQUIERE_COMPROBANTE/i,
+      code: 'FIN-COMPROBANTE-409',
+      message: 'El comprobante no se pudo validar para este cargo.',
+      next: 'Revisa evidencia, cliente, período, asignaciones y monto del comprobante.'
+    },
+    {
+      test: /EN_REVISION|PAGO_EN_REVISION|COMPROBANTE.*REVISION|REVISION_PENDIENTE/i,
+      code: 'FIN-REVISION-409',
+      message: 'Hay un comprobante pendiente de revisión para esta cuenta.',
+      next: 'Resuelve su revisión antes de activar otro régimen o registrar un pago competidor.'
+    },
+    {
+      test: /CALENDARIOS_VERIFICADOS_INSUFICIENTES|Calendarios verificados insuficientes|MULTIFECHA_NO_ACTIVADO|CANDIDATA_ALTA_MULTIFECHA/i,
+      code: 'FIN-CALENDARIO-409',
+      message: 'Todavía no existen accesos con al menos dos fechas individuales verificadas.',
+      next: 'Guarda los servicios y accesos reales, confirma fechas distintas y vuelve a revisar la elegibilidad.'
+    },
+    {
+      test: /COTIZACION_INVALIDA|NO_CONCILIADO|REQUIERE_CONCILIACION|MOTOR_V1_.*DESACTUALIZADO|DESGLOSE_OBLIGACIONES_DESACTUALIZADO/i,
+      code: 'FIN-CONCILIACION-409',
+      message: 'No se pudo conciliar el saldo con las obligaciones del cliente.',
+      next: 'No fuerces el pago. Verifica el desglose en Admin y solicita revisión técnica.'
+    },
+    {
+      test: /SESSION|SESION|Sesión administrativa|401|403|NO_AUTORIZAD/i,
+      code: 'FIN-AUTORIZACION-401',
+      message: 'La sesión de Admin no está autorizada o expiró.',
+      next: 'Vuelve a iniciar sesión y repite la consulta antes de aprobar.'
+    },
+    {
+      test: /Clave.*inválida|MONTO_INVALIDO|Importe de pago inválido|Falta cliente|Captura el monto faltante|saldo restante inválido/i,
+      code: 'FIN-DATOS-400',
+      message: 'Falta un dato obligatorio o uno de los valores capturados no es válido.',
+      next: 'Revisa el cliente, período, importe y clave de operación.'
+    }
+  ];
+
+  function describePaymentError(error) {
+    const raw = String(error?.message || '');
+    const backendCode = String(error?.code || '');
+    const diagnostic = PAYMENT_DIAGNOSTICS.find(item => item.test.test(raw) || item.test.test(backendCode));
+    const code = diagnostic?.code || (Number(error?.status) === 401 ? 'FIN-AUTORIZACION-401' : 'FIN-INTERNO-500');
+    const message = diagnostic?.message || 'No se pudo confirmar el pago por un error que necesita revisión técnica.';
+    const next = diagnostic?.next || 'Actualiza la ficha y revisa el historial. No repitas el cobro sin confirmar primero si se registró.';
+    const operationId = String(error?.operationId || '').trim();
+    return message + '\n\nQué hacer: ' + next + '\n\nCódigo: ' + code +
+      (operationId ? '\nOperación: ' + operationId : '');
+  }
+
   async function invoke(action, data = {}) {
     const token = core.getAdminToken();
     if (!token) throw new Error('Sesión administrativa no disponible.');
@@ -327,6 +399,7 @@
 
   window.GOXION_FINANCIAL_ACTIONS = Object.freeze({
     CONTRACT_VERSION: '1.2',
+    describeError: describePaymentError,
     approvePayment,
     saveFairDeal,
     deleteFairDeal,

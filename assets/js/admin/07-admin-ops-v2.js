@@ -497,7 +497,10 @@
             if(refreshKey && typeof gxReloadAdminClient==='function') await gxReloadAdminClient(refreshKey);
             else {filtrarClientes();gxUpdateOperationsSummary();}
             alert(successMessage);
-        }catch(e){alert("No se pudo procesar el pago.\n\n"+e.message)}
+        }catch(e){
+            const detalle=window.GOXION_FINANCIAL_ACTIONS?.describeError?.(e) || "No se pudo confirmar el pago. Revisa el historial antes de reintentarlo.\nCódigo: FIN-INTERNO-500";
+            alert("No se pudo procesar el pago.\n\n"+detalle);
+        }
     }
     window.gxPaymentApprove=()=>paymentAction("approve");
     
