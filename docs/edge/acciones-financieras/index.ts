@@ -119,7 +119,11 @@ Deno.serve(async (req) => {
     const url = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const adminSecret = Deno.env.get("ADMIN_SESSION_SECRET");
-    if (!url || !serviceKey || !adminSecret) throw new Error("Configuración interna incompleta");
+    if (!url || !serviceKey || !adminSecret)
+      throw new Error("Configuración interna incompleta");
+    const sb = createClient(url, serviceKey, {
+      auth: { persistSession: false, autoRefreshToken: false }
+    });
 
     const auth = await validAdmin(req, adminSecret);
     if (!auth.ok) {
@@ -129,7 +133,7 @@ Deno.serve(async (req) => {
     const payload = await req.json().catch(() => ({}));
     const action = String(payload?.accion || "").trim();
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
-    const sb = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
+    // El cliente ya se creó arriba para validar la sesión privada de QA.
 
     // B2: imputación exclusivamente SOMBRA de un pago YA APROBADO.
     // No modifica pagos, parciales, saldos, cobertura, mora ni lealtad.
@@ -239,7 +243,11 @@ Deno.serve(async (req) => {
       }
 
       const periodoActual = String(before.data?.periodo || "").slice(0, 7);
-      if (periodoActual !== periodoEsperado) {
+      // Si el período ya avanzó, SOLO una clave idempotente puede llegar a
+      // SQL y demostrar que se trata de la misma operación ya confirmada.
+      if (periodoActual !== periodoEsperado &&
+          !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+            String(data?.clave_idempotencia||"").trim())) {
         return json({
           ok: false,
           error: "El periodo de cobro cambió antes de aprobar el pago. Recarga la ficha antes de continuar.",
@@ -250,44 +258,33 @@ Deno.serve(async (req) => {
         }, 409);
       }
 
-      const downstream = await callFunction(url, "periodo-cobro", "aprobar_pago_periodo", {
-        cliente_id: clienteId,
-        monto,
-        puntual,
-        notas,
-      }, auth.token);
-
-      if (!downstream.response.ok || downstream.body?.ok !== true) {
-        const retryAfter = downstream.response.headers.get("Retry-After");
-        return json({
-          ok: false,
-          error: downstream.body?.error || downstream.text || "No fue posible aprobar el pago.",
-          operation_id: operationId,
-          etapa: "periodo-cobro",
-        }, downstream.response.status || 500, retryAfter ? { "Retry-After": retryAfter } : {});
-      }
-
-      const paidPeriod = String(before.data?.periodo || "").slice(0,10);
-      if (paidPeriod) {
-        await sb.from("pagos_parciales")
-          .update({ activo: false, estado: "liquidado", updated_at: new Date().toISOString() })
-          .eq("cliente_id", clienteId).eq("periodo", paidPeriod).eq("activo", true);
-        await sb.from("acuerdos_cobro")
-          .update({ activo: false, estado: "cumplido", updated_at: new Date().toISOString() })
-          .eq("cliente_id", clienteId).eq("periodo", paidPeriod).eq("activo", true);
-      }
-
-      const after = await financialState(sb, clienteId);
-      return json({
-        ok: true,
-        accion: action,
-        operation_id: operationId,
-        contrato: "goxion-financial-actions-v1",
-        version: "1.2",
-        resultado: downstream.body,
-        estado_anterior: before.data || null,
-        estado_financiero: after.error ? null : (after.data || null),
-        estado_financiero_error: after.error ? "No fue posible refrescar el estado después de guardar." : null,
+      const suppliedKey=String(data?.clave_idempotencia||"").trim();
+      const uuidPattern=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if(suppliedKey&&!uuidPattern.test(suppliedKey))
+        return json({ok:false,codigo:"CLAVE_INVALIDA",error:"Clave de operación inválida"},400);
+      const effectiveId=suppliedKey||operationId;
+      const montoCentavos=Math.round(monto*100);
+      if(!uuidPattern.test(clienteId)||!Number.isSafeInteger(montoCentavos)||
+         montoCentavos<=0||Math.abs(monto*100-montoCentavos)>0.00001)
+        return json({ok:false,codigo:"MONTO_INVALIDO",error:"Importe de pago inválido"},400);
+      // El SQL V6 bloquea el cliente, comprueba período, saldo, recibo y
+      // avanza la mensualidad en UNA transacción, sin downstream periodo-cobro.
+      const applied=await sb.rpc("goxion_motor_admin_mensual_v1",{
+        p_cliente_id:clienteId,p_periodo:periodoEsperado+"-01",
+        p_operation_id:effectiveId,p_monto_centavos:montoCentavos,
+        p_saldo_restante_centavos:null,p_puntual:puntual,
+        p_nota:notas,p_actor:"admin:b2-gateway"
+      });
+      if(applied.error||applied.data?.ok!==true)
+        return json({ok:false,codigo:"MOTOR_UNICO_APROBACION_FALLIDA",
+          error:applied.error?.message||"El motor único no confirmó el pago",
+          operation_id:effectiveId},409);
+      const after=await financialState(sb,clienteId);
+      return json({ok:true,accion:action,operation_id:effectiveId,
+        contrato:"goxion-motor-unico-v1",
+        resultado:applied.data,estado_anterior:before.data||null,
+        estado_financiero:after.error?null:(after.data||null),
+        estado_financiero_error:after.error?"No fue posible refrescar el saldo":null
       });
     }
 
@@ -626,15 +623,22 @@ Deno.serve(async (req) => {
       // calcular y verifica período/saldo bajo bloqueo en UNA transacción SQL.
       const before=await financialState(sb,clienteId);
       if(before.error)return json({ok:false,error:"No fue posible validar el estado financiero previo.",operation_id:effectiveId},409);
-      const applied=await sb.rpc("goxion_registrar_pago_parcial_atomico",{
-        p_cliente_id:clienteId,p_periodo_esperado:periodoEsperado,
+      const applied=await sb.rpc("goxion_motor_admin_mensual_v1",{
+        p_cliente_id:clienteId,p_periodo:periodoEsperado+"-01",
+        p_operation_id:effectiveId,p_monto_centavos:null,
         p_saldo_restante_centavos:saldoCentavos,
-        p_operation_id:effectiveId,p_notas:notas
+        p_puntual:true,p_nota:notas,p_actor:"admin:b2-gateway"
       });
-      if(applied.error){
-        const outdated=String(applied.error.message||"").includes("PERIODO_DESACTUALIZADO");
-        return json({ok:false,error:outdated?"El periodo cambió. Recarga la ficha antes de continuar.":applied.error.message,
-          codigo:outdated?"PERIODO_DESACTUALIZADO":"PARCIAL_NO_APLICADO",
+      if(applied.error||applied.data?.ok!==true){
+        const msg=String(applied.error?.message||"");
+        const periodo=msg.includes("PERIODO_DESACTUALIZADO");
+        const saldo=!periodo&&msg.includes("DESACTUALIZADO");
+        return json({ok:false,
+          error:periodo?"El período cambió. Actualiza la ficha.":
+            saldo?"El importe cambió. Actualiza el saldo antes de cobrar.":
+            msg||"El motor único no confirmó el abono.",
+          codigo:periodo?"PERIODO_DESACTUALIZADO":
+            saldo?"SALDO_DESACTUALIZADO":"PARCIAL_NO_APLICADO",
           operation_id:effectiveId},409);
       }
       const after=await financialState(sb,clienteId);
