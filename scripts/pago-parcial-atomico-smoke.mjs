@@ -20,8 +20,8 @@ check("Parcial se acredita exclusivamente por el motor V1",
  scope.includes('sb.rpc("goxion_motor_admin_mensual_v1"') &&
  !scope.includes('goxion_registrar_pago_parcial_atomico'));
 check("Una RPC, sin escrituras directas múltiples",
- (scope.match(/sb\\.rpc\\(/g)||[]).length===1 &&
- !/\\.from\\(["'](?:pagos|pagos_parciales|clientes)["']\\)\\.(?:insert|update|delete|upsert)/.test(scope));
+ (scope.match(/sb\.rpc\(/g)||[]).length===1 &&
+ !/\.from\(["'](?:pagos|pagos_parciales|clientes)["']\)\.(?:insert|update|delete|upsert)/.test(scope));
 check("Cliente, periodo, saldo en centavos e idempotencia",
  ["p_cliente_id:clienteId",'p_periodo:periodoEsperado+"-01"',
  "p_saldo_restante_centavos:saldoCentavos","p_operation_id:effectiveId",
@@ -49,7 +49,7 @@ check("Client UI usa la ruta original con token Admin",
  admin.includes("invoke('registrar_pago_parcial'"));
 check("El pago completo comparte el mismo escritor",
  edge.includes('if (action === "aprobar_pago")')&&
- (edge.match(/sb\\.rpc\\("goxion_motor_admin_mensual_v1"/g)||[]).length===2 &&
+ (edge.match(/sb\.rpc\("goxion_motor_admin_mensual_v1"/g)||[]).length===2 &&
  !edge.includes('callFunction(url, "periodo-cobro", "aprobar_pago_periodo"'));
 check("Acuerdos y fecha pactada se mantienen en su acción",
  edge.includes('if (action === "pactar_fecha_pago")')&&edge.includes("fecha_corte"));
