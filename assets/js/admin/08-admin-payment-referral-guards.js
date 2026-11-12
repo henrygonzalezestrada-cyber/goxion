@@ -13,6 +13,8 @@
         const c = typeof clientesDict !== "undefined" ? clientesDict?.[key] : null;
         if(c?.finanzas_requieren_revision)
             return alert("Saldo financiero pendiente de conciliación. No se puede aprobar un pago global.");
+        if(c?.estado_cuenta?.modo_cobro==="b2")
+            return alert("Cuenta multifecha: aprobar cada cargo desde su comprobante B2.");
         const modal = document.getElementById("gx-payment-modal");
         if(!modal) return alert("No se pudo abrir la revisión de pago. Recarga esta versión del Admin.");
         return oldOpenPayment ? oldOpenPayment(key, monto) : undefined;
@@ -50,6 +52,8 @@
         const c = clientesDict[foundKey];
         if(c?.finanzas_requieren_revision)
             return alert("No se puede registrar un parcial sin saldo financiero conciliado.");
+        if(c?.estado_cuenta?.modo_cobro==="b2")
+            return alert("Cuenta multifecha: registrar abono solo desde el comprobante B2.");
         const amount = Number(document.getElementById("gx-missing-amount")?.value || 0);
         const msg = document.getElementById("gx-payment-note")?.value.trim() || `Detectamos un pago incompleto${amount>0?` por $${amount}`:""}.`;
         try {
