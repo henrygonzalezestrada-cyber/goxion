@@ -58,7 +58,7 @@
       Number.isSafeInteger(cents) && cents >= 0 &&
       money(financial.total_actual) &&
       Math.abs(Number(financial.total_actual)*100-cents)<0.5 &&
-      /^\\d{4}-\\d{2}/.test(String(financial.periodo || '')) &&
+      /^\d{4}-\d{2}/.test(String(financial.periodo || '')) &&
       (!expectedId || String(financial.cliente_id || '') === expectedId));
 
     const fields = [
