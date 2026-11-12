@@ -87,6 +87,8 @@ Deno.serve(async(req)=>{
       if(q.error)throw q.error;
       if(hibridoLectura &&
         (q.data?.ok!==true || q.data?.cobrable!==false ||
+         q.data?.publicable!==true ||
+         q.data?.fuente_financiera!=="supabase:goxion_hibrido_contrato_unico_v1" ||
          !["obligaciones_b2","global_legacy"].includes(String(q.data?.fuente_saldo||""))))
         throw new Error("Estado financiero pendiente de conciliación");
       return q.data;
