@@ -51,7 +51,8 @@ function render(data){
  msg.textContent=active?"Activo · Selección por perfil habilitada":
   unsaved()?"Guarda los cambios de fechas antes de activar":
   ready?data.perfiles_verificados+" perfiles verificados · Listo para activar":
-  (data.motivos||[]).join(" · ")||"Completa la configuración de fechas";
+  "Bloqueado ("+(data.codigo||"FIN-CALENDARIO-409")+"): "+
+   ((data.motivos||[]).join(" · ")||"Completa la configuración de fechas");
  if(!ready)close();
 }
 async function refresh(){
