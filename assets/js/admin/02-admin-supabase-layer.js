@@ -189,7 +189,9 @@ const n = (v, fallback = 0) => {
                 console.warn("Estado de cuenta central no disponible temporalmente:", e);
             }
 
-            try {
+            // Cuando admin-datos entrega el contrato oficial, no volver a pedir
+            // una comparación heredada que pueda sobrescribir ese saldo.
+            if (!Array.isArray(json.estados_financieros)) try {
                 const financialBatch = await (window.GOXION_FINANCIAL?.adminCompare?.() ?? Promise.resolve(null));
                 if (financialBatch?.ok === true) {
                     json.estados_financieros = Array.isArray(financialBatch.estados)
@@ -378,9 +380,11 @@ const n = (v, fallback = 0) => {
             const estadosFinancierosGlobal = getArray(root, "estados_financieros");
             const estadoFinancieroPorCliente = new Map(
                 estadosFinancierosGlobal
-                    .filter(x => x && !x.error)
-                    .map(x => [String(x?.cliente_id || ""), x])
+                    .filter(x => x && x.cliente_id)
+                    .map(x => [String(x.cliente_id), x])
             );
+            const hybridBatch = root.estado_financiero_fuente ===
+                "supabase:goxion_hibrido_contrato_unico_v1";
             const financeAudits = {};
             const periodosCobro = getArray(root, "periodos_cobro");
             const periodoPorCliente = new Map(
@@ -453,7 +457,8 @@ const n = (v, fallback = 0) => {
                     pago_revision_monto_faltante: n(c.pago_revision_monto_faltante, 0),
                     pago_revision_updated_at: c.pago_revision_updated_at || null,
                     historial_pagos: pagos.map(adaptarPago),
-                    servicios: servicios.map(adaptarServicioCliente),
+                    servicios: servicios.filter(x => x?.activo !== false).map(adaptarServicioCliente),
+                    servicios_historicos: servicios.filter(x => x?.activo === false).map(adaptarServicioCliente),
                     descuentos_especiales: descuentos.map(adaptarDescuento),
                     beneficios_programados: beneficiosProgramadosGlobal.filter(x => String(x?.cliente_id || "") === String(id)),
                     trato_justo_compensaciones: tratoJusto,
@@ -469,7 +474,8 @@ const n = (v, fallback = 0) => {
                     ? window.GOXION_FINANCIAL.selectCompatibleState(
                         legacyEstadoCuenta,
                         financialEstadoCuenta,
-                        String(id)
+                        String(id),
+                        hybridBatch
                       )
                     : { state: legacyEstadoCuenta, audit: {
                         source: legacyEstadoCuenta ? "legacy-fallback" : "none",
@@ -480,6 +486,8 @@ const n = (v, fallback = 0) => {
                       } };
 
                 nuevoDict[key].estado_cuenta = selection.state;
+                nuevoDict[key].finanzas_requieren_revision =
+                    hybridBatch && selection.audit?.source === "hybrid-blocked";
                 financeAudits[String(id)] = {
                     key,
                     nombre:c.nombre || key,
