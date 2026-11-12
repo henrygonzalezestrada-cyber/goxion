@@ -1,74 +1,284 @@
 /* ============================================================
-   GOXION // ADMIN — Rediseño (ESPEJO)
+   GOXION // ADMIN — Rediseño v2 (ESPEJO)
    preview/admin-rediseno/admin-rediseno.css
-   Identidad NUEVA y fresca para Admin (decisión Henry 2026-11-11).
+   Identidad NUEVA "Papel": clara, cálida, otro producto a primera
+   vista. Decisión Henry 2026-11-11 (romper la regla) + corrección
+   2026-11-12 00:12: NO las mismas animaciones — siguiente nivel.
    Solo capa visual del espejo: no toca admin.css ni el motor.
-   Animaciones: especificación §6 de la propuesta (Emil Kowalski).
-   - Easing único entradas: cubic-bezier(0.23,1,0.32,1)
-   - Solo transform / opacity. Nunca width/height/margin/padding/top/left.
-   - Nunca `transition: all`. Presión táctil scale(0.97), 100-160 ms.
-   - Salidas más rápidas que las entradas (300 ms → 200 ms).
+   Vanilla CSS/JS. Solo transform / opacity. Nunca width/height/
+   margin/padding/top/left. Nunca `transition: all`.
+   Animaciones: especificación v2 (sistema diferenciado, springs
+   linear() con fallback cubic-bezier, stagger con presupuesto).
    ============================================================ */
 
+/* ---------- 0. RE-SKIN DE VARIABLES DE admin.css ----------
+   admin.css define su paleta en :root y la usa con var() en
+   cientos de reglas (texto 106×, acentos 56×). Sobrescribir las
+   variables bajo el scope del espejo re-tiñe todo lo que las usa.
+   Los fondos con rgba(255,255,255) hardcodeados se cubren aparte
+   en la sección 1 (light skin). */
 body[data-gx2-rediseno]{
-  --gx2-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-  --gx2-ease-in: cubic-bezier(0.55, 0, 0.55, 1);
-  --gx2-bg: #030305;
-  --gx2-surface: #0b0b11;
-  --gx2-surface-2: #101019;
-  --gx2-line: rgba(255, 255, 255, .09);
-  --gx2-line-strong: rgba(255, 255, 255, .16);
-  --gx2-cyan: #00f2fe;
-  --gx2-violet: #bc13fe;
-  --gx2-amber: #ffb224;
-  --gx2-green: #34d399;
-  --gx2-red: #ff5c7a;
-  --gx2-text: #f4f4f6;
-  --gx2-muted: #9aa3b2;
+  --bg-color: #f3f0e8;        /* papel cálido (era #030305) */
+  --card-bg: #ffffff;         /* superficie (era #0a0a0f) */
+  --text-main: #1b1812;       /* tinta (era #ffffff) */
+  --text-muted: #6e6759;      /* gris cálido (era #8892b0) */
+  --neon-blue: #0b6e4f;       /* acento primario: verde (era cian) */
+  --neon-green: #0e9f6e;      /* vivo/éxito */
+  --neon-purple: #6d28d9;     /* cancelaciones */
+  --neon-red: #d92d20;        /* vencido/peligro */
+  --neon-yellow: #b45309;     /* urgencia/ámbar */
+  --gx-line: rgba(27, 24, 18, .14);
+  --gx-shadow: 0 1px 2px rgba(27, 24, 18, .05), 0 10px 28px rgba(27, 24, 18, .07);
+
+  /* Tokens v2 propios */
+  --gx2-bg: #f3f0e8;
+  --gx2-surface: #ffffff;
+  --gx2-surface-2: #eae6d9;   /* arena: segmentada, chips */
+  --gx2-ink: #1b1812;
+  --gx2-muted: #6e6759;
+  --gx2-faint: #a39c89;
+  --gx2-line: #e2dccb;
+  --gx2-line-strong: #cfc7b0;
+  --gx2-green: #0b6e4f;
+  --gx2-green-bright: #0e9f6e;
+  --gx2-green-soft: #e3f2ea;
+  --gx2-amber: #b45309;
+  --gx2-amber-soft: #fdf0dc;
+  --gx2-red: #d92d20;
+  --gx2-red-soft: #fdecea;
+  --gx2-violet: #6d28d9;
+  --gx2-violet-soft: #f1eafe;
+  --gx2-shadow: 0 1px 2px rgba(27, 24, 18, .05), 0 10px 28px rgba(27, 24, 18, .07);
+  --gx2-shadow-sm: 0 1px 2px rgba(27, 24, 18, .06);
   --gx2-radius-card: 20px;
   --gx2-radius-ctrl: 14px;
-  /* Altura medida del encabezado sticky (topbar + segmentada + paddings):
-     132 px en teléfono, 137 px en tablet, 141 px en escritorio. Los
-     paneles sticky que cuelgan de él (buscador, Ajustes) usan esta var. */
+  /* Tokens de animación v2 (especificación del investigador) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-expo-2: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-back-soft: cubic-bezier(0.34, 1.2, 0.64, 1);
+  --spring-soft: linear(0, 0.18, 0.42, 0.72, 0.95, 1.06, 1.04, 1.01, 0.99, 1);
+  --spring-bounce: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.4%, 1.024 16%, 1.109 18.8%, 1.134 20.6%, 1.114 22.3%, 1.037 24.4%, 1.003 25.9%, 0.983 27.4%, 0.99 29%, 1.003 32.4%, 1);
+  /* Altura medida del encabezado sticky (topbar + segmentada + paddings) */
   --gx2-head-h: 132px;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   background: var(--gx2-bg);
-  color: var(--gx2-text);
+  color: var(--gx2-ink);
 }
-
-/* Tipografía: Rajdhani solo display y cifras; cuerpo sans del sistema (§7.1) */
+/* admin.css pone Rajdhani en * (universal). El espejo hereda sistema
+   y reserva Sora para display y cifras. */
+body[data-gx2-rediseno] *{ font-family: inherit; }
 body[data-gx2-rediseno] h1,
 body[data-gx2-rediseno] h2,
-body[data-gx2-rediseno] .gx2-amount,
+body[data-gx2-rediseno] h3,
+body[data-gx2-rediseno] .gx2-display,
 body[data-gx2-rediseno] .gx-home-priority strong,
 body[data-gx2-rediseno] .gx-decision-grid strong,
 body[data-gx2-rediseno] .gx-kpi-card strong,
-body[data-gx2-rediseno] .gx2-seg span{
-  font-family: Rajdhani, system-ui, sans-serif;
+body[data-gx2-rediseno] .gx2-amount,
+body[data-gx2-rediseno] .gx2-feed-amount,
+body[data-gx2-rediseno] .gx-brand-name{
+  font-family: "Sora", system-ui, sans-serif;
 }
 body[data-gx2-rediseno] .gx-home-priority strong,
 body[data-gx2-rediseno] .gx-decision-grid strong,
 body[data-gx2-rediseno] .gx-kpi-card strong,
-body[data-gx2-rediseno] .gx2-amount{
+body[data-gx2-rediseno] .gx2-amount,
+body[data-gx2-rediseno] .gx2-feed-amount{
   font-variant-numeric: tabular-nums;
 }
 
-/* Sin scroll horizontal; el shell ya no reserva espacio a la barra inferior */
-body[data-gx2-rediseno] .gx-admin-shell{ overflow-x: clip; }
+/* ---------- 1. LIGHT SKIN: superficies oscuras de admin.css ----------
+   admin.css pinta ~100 selectores con rgba(255,255,255) y hex
+   oscuros hardcodeados. Esta lista los vuelve superficie clara.
+   Verificación por captura: lo que siga oscuro se añade aquí. */
+body[data-gx2-rediseno] .gx-admin-shell{ background: var(--gx2-bg); overflow-x: clip; }
 body[data-gx2-rediseno] .gx2-hidden{ display: none !important; }
 body[data-gx2-rediseno] .gx-desktop-nav,
 body[data-gx2-rediseno] .gx-mobile-nav{ display: none !important; }
+body[data-gx2-rediseno] .panel,
+body[data-gx2-rediseno] .gx-panel-modern,
+body[data-gx2-rediseno] .gx-business-panel,
+body[data-gx2-rediseno] .gx-home-priority,
+body[data-gx2-rediseno] .gx-mobile-op-item,
+body[data-gx2-rediseno] .gx-next-payment,
+body[data-gx2-rediseno] .gx-notif-item,
+body[data-gx2-rediseno] .gx-management-row,
+body[data-gx2-rediseno] .gx-accordion,
+body[data-gx2-rediseno] .gx-action-card,
+body[data-gx2-rediseno] .gx-mission-builder,
+body[data-gx2-rediseno] .gx-tag-library,
+body[data-gx2-rediseno] .gx-setting-row,
+body[data-gx2-rediseno] .gx-service-compact,
+body[data-gx2-rediseno] .gx-cred-recipient,
+body[data-gx2-rediseno] .gx-loyalty-client-row,
+body[data-gx2-rediseno] .gx-tj-bulk-row,
+body[data-gx2-rediseno] .gx-platform-detected-row,
+body[data-gx2-rediseno] .gx-beta-access-row,
+body[data-gx2-rediseno] .gx-catalog-platform-row,
+body[data-gx2-rediseno] .gx-client-services-list,
+body[data-gx2-rediseno] .gx-b2-billing-row,
+body[data-gx2-rediseno] .gx-billing-primary > div,
+body[data-gx2-rediseno] .gx-cycle-mode-row,
+body[data-gx2-rediseno] .gx-embedded-block > div,
+body[data-gx2-rediseno] .gx-help-details,
+body[data-gx2-rediseno] .gx-product-component,
+body[data-gx2-rediseno] .gx-ref-auto-services,
+body[data-gx2-rediseno] .gx-access-diagnostic-grid > div,
+body[data-gx2-rediseno] .gx-access-diagnostic-note,
+body[data-gx2-rediseno] .gx-access-loading-note,
+body[data-gx2-rediseno] .gx-cred-history-counts span,
+body[data-gx2-rediseno] .gx-credential-stats > div,
+body[data-gx2-rediseno] .gx-loyalty-preview > div,
+body[data-gx2-rediseno] .gx-tj-bulk-preview > div,
+body[data-gx2-rediseno] .gx-client-request.highlight,
+body[data-gx2-rediseno] .gx-catalog-mobile-editor,
+body[data-gx2-rediseno] .gx-tag-chip,
+body[data-gx2-rediseno] .gx-notif-service,
+body[data-gx2-rediseno] .gx-notif-compact,
+body[data-gx2-rediseno] .gx-op-icon,
+body[data-gx2-rediseno] .gx-dock-loyalty,
+body[data-gx2-rediseno] .gx-dock-action,
+body[data-gx2-rediseno] .gx-more-grid > button,
+body[data-gx2-rediseno] .gx-client-secondary-tools button,
+body[data-gx2-rediseno] .gx-client-quick-menu button:active,
+body[data-gx2-rediseno] .gx-pin-actions button,
+body[data-gx2-rediseno] .gx-pin-editor button,
+body[data-gx2-rediseno] .gx-pin-reveal-actions button,
+body[data-gx2-rediseno] .gx-notification-toolbar button,
+body[data-gx2-rediseno] .gx-credentials-selection-head button,
+body[data-gx2-rediseno] .gx-loyalty-selection-actions button,
+body[data-gx2-rediseno] .gx-tj-bulk-selection-actions button,
+body[data-gx2-rediseno] .gx-management-row-actions button,
+body[data-gx2-rediseno] .gx-mobile-ops-filters button,
+body[data-gx2-rediseno] .gx-notif-filter,
+body[data-gx2-rediseno] .filter-pill,
+body[data-gx2-rediseno] .gx-tj-cancel,
+body[data-gx2-rediseno] .gx-tj-head button,
+body[data-gx2-rediseno] .gx-tj-service,
+body[data-gx2-rediseno] .gx-tj-bulk-days button,
+body[data-gx2-rediseno] .gx-calendar-dialog-close,
+body[data-gx2-rediseno] .gx-catalog-editor-back,
+body[data-gx2-rediseno] .gx-promo-editor-head > button,
+body[data-gx2-rediseno] .gx-benefit-actions button,
+body[data-gx2-rediseno] .gx-benefit-close,
+body[data-gx2-rediseno] .gx-beta-19-5 .gx-loyalty-inline-actions button,
+body[data-gx2-rediseno] .loyalty-btn,
+body[data-gx2-rediseno] .gx-platform-assign-toolbar .secondary,
+body[data-gx2-rediseno] .client-details-toggle,
+body[data-gx2-rediseno] .gx-notification-bell,
+body[data-gx2-rediseno] .gx-icon-action,
+body[data-gx2-rediseno] .gx-focus-back,
+body[data-gx2-rediseno] .gx-focus-close,
+body[data-gx2-rediseno] .gx-business-mini-grid button,
+body[data-gx2-rediseno] .gx-credential-search,
+body[data-gx2-rediseno] .gx-loyalty-search,
+body[data-gx2-rediseno] .gx-tj-bulk-search,
+body[data-gx2-rediseno] .gx-search-wrap,
+body[data-gx2-rediseno] .gx-cred-password-field button,
+body[data-gx2-rediseno] .gx-client-folio,
+body[data-gx2-rediseno] .gx-client-preview-meta span,
+body[data-gx2-rediseno] .gx-client-round-status,
+body[data-gx2-rediseno] .gx-focus-summary span,
+body[data-gx2-rediseno] .gx-focus-summary .gx-focus-metric,
+body[data-gx2-rediseno] .gx-benefit-brief > span:not(.gx-open-client),
+body[data-gx2-rediseno] .gx-admin-live-breakdown{
+  background: var(--gx2-surface);
+  border-color: var(--gx2-line);
+  color: var(--gx2-ink);
+  box-shadow: none;
+}
+/* Hojas, cajones y modales: superficie clara */
+body[data-gx2-rediseno] .gx-focus-sheet,
+body[data-gx2-rediseno] .gx-payment-sheet,
+body[data-gx2-rediseno] .gx-registration-sheet,
+body[data-gx2-rediseno] .gx-activation-delivery-sheet,
+body[data-gx2-rediseno] .gx-benefit-sheet,
+body[data-gx2-rediseno] .gx-product-builder-sheet,
+body[data-gx2-rediseno] .gx-tj-modal,
+body[data-gx2-rediseno] .gx-selection-modal,
+body[data-gx2-rediseno] .gx-notification-drawer,
+body[data-gx2-rediseno] .gx-promo-preview-card{
+  background: var(--gx2-surface);
+  color: var(--gx2-ink);
+  border-color: var(--gx2-line);
+}
+/* Tablas: claras */
+body[data-gx2-rediseno] .catalog-table,
+body[data-gx2-rediseno] .catalog-table tr,
+body[data-gx2-rediseno] #tab-catalogo .catalog-table tr{
+  background: var(--gx2-surface);
+  color: var(--gx2-ink);
+  border-color: var(--gx2-line);
+}
+body[data-gx2-rediseno] .catalog-table thead th{ color: var(--gx2-muted); }
+/* Formularios: claros */
+body[data-gx2-rediseno] input,
+body[data-gx2-rediseno] select,
+body[data-gx2-rediseno] textarea{
+  background: var(--gx2-surface);
+  color: var(--gx2-ink);
+  border-color: var(--gx2-line-strong);
+}
+body[data-gx2-rediseno] input::placeholder,
+body[data-gx2-rediseno] textarea::placeholder{ color: var(--gx2-faint); }
+/* Texto principal: tinta (admin.css pone #fff en varios sitios) */
+body[data-gx2-rediseno] h1,
+body[data-gx2-rediseno] h2,
+body[data-gx2-rediseno] h3,
+body[data-gx2-rediseno] .gx-main{ color: var(--gx2-ink); }
+body[data-gx2-rediseno] a{ color: var(--gx2-green); }
+/* Botón primario: verde sólido (era degradado cian con glow) */
+body[data-gx2-rediseno] .gx-primary-action{
+  background: var(--gx2-green);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(11, 110, 79, .28);
+}
+body[data-gx2-rediseno] .gx-secondary-action{
+  background: var(--gx2-surface);
+  border: 1px solid var(--gx2-line-strong);
+  color: var(--gx2-ink);
+  box-shadow: none;
+}
+/* Tirador de hoja: barra visible sobre superficie clara */
+body[data-gx2-rediseno] .gx-focus-handle,
+body[data-gx2-rediseno] .gx-notification-drawer::before{
+  background: #d8d2c2;
+}
 
-/* ---------- Encabezado compacto sticky + pestañas segmentadas ---------- */
+/* ---------- 2. ICONOS SVG (sistema propio v2) ---------- */
+body[data-gx2-rediseno] .gx2-ic{
+  width: 1.15em;
+  height: 1.15em;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vertical-align: -.18em;
+}
+body[data-gx2-rediseno] .gx2-ic-wrap{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: -.18em;
+}
+body[data-gx2-rediseno] .gx2-ic-wrap .gx2-ic{ width: 1em; height: 1em; }
+
+/* ---------- 3. ENCABEZADO compacto sticky ---------- */
 body[data-gx2-rediseno] .gx2-sticky-head{
   position: sticky;
   top: 0;
   z-index: 5000;
   margin: 0 -10px;
   padding: max(0px, env(safe-area-inset-top)) 10px 0;
-  background: linear-gradient(180deg, rgba(3, 3, 5, .94), rgba(3, 3, 5, .86));
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  background: rgba(243, 240, 232, .88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--gx2-line);
 }
 body[data-gx2-rediseno] .gx-topbar{
@@ -82,28 +292,61 @@ body[data-gx2-rediseno] .gx-topbar{
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
+body[data-gx2-rediseno] .gx-brand-mark{
+  background: var(--gx2-green);
+  color: #fff;
+  box-shadow: none;
+  font-family: "Sora", system-ui, sans-serif;
+  font-weight: 800;
+}
+body[data-gx2-rediseno] .gx-brand-name{ color: var(--gx2-ink); }
+body[data-gx2-rediseno] .gx-brand-sub{ color: var(--gx2-muted); }
 body[data-gx2-rediseno] .gx2-mirror-tag{
   display: inline-block;
   vertical-align: middle;
   margin-left: 6px;
   padding: 2px 7px;
-  border: 1px solid rgba(188, 19, 254, .55);
+  border: 1px solid rgba(109, 40, 217, .4);
   border-radius: 999px;
-  color: #e3b8ff;
-  background: rgba(188, 19, 254, .14);
+  color: var(--gx2-violet);
+  background: var(--gx2-violet-soft);
   font-family: system-ui, sans-serif;
   font-size: .56rem;
   font-weight: 800;
   letter-spacing: 1px;
   white-space: nowrap;
 }
+body[data-gx2-rediseno] .gx-notification-bell{
+  background: var(--gx2-surface);
+  border: 1px solid var(--gx2-line);
+  color: var(--gx2-ink);
+  box-shadow: var(--gx2-shadow-sm);
+}
+body[data-gx2-rediseno] .gx-save-state{ color: var(--gx2-muted); }
+body[data-gx2-rediseno] .gx-save-dot{ background: var(--gx2-green-bright); }
+body[data-gx2-rediseno] .status{
+  color: var(--gx2-green);
+  border-color: rgba(11, 110, 79, .3);
+  background: var(--gx2-green-soft);
+}
+body[data-gx2-rediseno] .status-dot{
+  background: var(--gx2-green-bright);
+  animation: gx2LivePulse 1.5s ease-in-out infinite;
+}
+body[data-gx2-rediseno] .gx-icon-action.danger{
+  background: var(--gx2-surface);
+  border: 1px solid var(--gx2-line);
+  color: var(--gx2-red);
+}
+
+/* ---------- 4. NAVEGACIÓN: pestañas segmentadas sticky ---------- */
 body[data-gx2-rediseno] .gx2-segmented{
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 4px;
   padding: 5px;
   margin: 0 0 8px;
-  background: rgba(255, 255, 255, .045);
+  background: var(--gx2-surface-2);
   border: 1px solid var(--gx2-line);
   border-radius: 16px;
 }
@@ -114,53 +357,35 @@ body[data-gx2-rediseno] .gx2-seg{
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1px;
+  gap: 2px;
   border: 0;
   border-radius: 12px;
   background: transparent;
   color: var(--gx2-muted);
   cursor: pointer;
   padding: 5px 2px;
-  transition: background-color .2s var(--gx2-ease-out), color .2s var(--gx2-ease-out), transform .12s linear;
+  transition: background-color .2s var(--ease-out), color .2s var(--ease-out), transform .12s linear;
 }
-body[data-gx2-rediseno] .gx2-seg i{
-  font-style: normal;
-  font-size: 1.05rem;
-  line-height: 1;
-}
+body[data-gx2-rediseno] .gx2-seg .gx2-ic{ width: 20px; height: 20px; }
 body[data-gx2-rediseno] .gx2-seg span{
   font-size: .72rem;
   font-weight: 700;
   letter-spacing: .2px;
 }
 body[data-gx2-rediseno] .gx2-seg.active{
-  color: #fff;
-  background: linear-gradient(135deg, rgba(0, 242, 254, .18), rgba(188, 19, 254, .18));
-  box-shadow: inset 0 0 0 1px rgba(0, 242, 254, .28);
+  color: var(--gx2-green);
+  background: var(--gx2-surface);
+  box-shadow: var(--gx2-shadow-sm);
 }
 body[data-gx2-rediseno] .gx2-seg.active::after{
   content: "";
   position: absolute;
-  left: 22%;
-  right: 22%;
-  bottom: 4px;
+  left: 26%;
+  right: 26%;
+  bottom: 3px;
   height: 3px;
   border-radius: 999px;
-  background: var(--gx2-cyan);
-  transform: scaleX(1);
-  transition: transform .25s var(--gx2-ease-out);
-}
-body[data-gx2-rediseno] .gx2-seg:not(.active)::after{
-  content: "";
-  position: absolute;
-  left: 22%;
-  right: 22%;
-  bottom: 4px;
-  height: 3px;
-  border-radius: 999px;
-  background: var(--gx2-cyan);
-  transform: scaleX(0);
-  transition: transform .25s var(--gx2-ease-out);
+  background: var(--gx2-green);
 }
 body[data-gx2-rediseno] .gx2-seg-badge{
   position: absolute;
@@ -179,120 +404,88 @@ body[data-gx2-rediseno] .gx2-seg-badge{
   text-align: center;
 }
 
-/* ---------- Presión táctil global (scale 0.97, 100-160 ms) ---------- */
-body[data-gx2-rediseno] button:active,
-body[data-gx2-rediseno] .gx2-seg:active,
-body[data-gx2-rediseno] .gx-home-priority:active,
-body[data-gx2-rediseno] .gx-decision-grid button:active,
-body[data-gx2-rediseno] .filter-pill:active{
-  transform: scale(.97);
-  transition: transform .12s linear;
+/* ---------- 5. INICIO: héroe "Decide ahora" (tira compacta) ----------
+   El centro de decisión ya no es una tarjeta grande: es una tira
+   con el total a la izquierda y las 4 categorías como chips
+   deslizables. El feed es el protagonista. */
+body[data-gx2-rediseno] .gx-page-heading{ margin: 14px 2px 10px; }
+body[data-gx2-rediseno] .gx-page-heading h1{
+  font-size: 1.65rem;
+  letter-spacing: -.5px;
 }
-
-/* ---------- Entrada de pestaña (250 ms, translateY 8px + opacidad) ---------- */
-@keyframes gx2TabIn{
-  from{ opacity: 0; transform: translateY(8px); }
-  to{ opacity: 1; transform: translateY(0); }
+body[data-gx2-rediseno] .gx-eyebrow{
+  color: var(--gx2-green);
+  font-size: .64rem;
+  letter-spacing: 1.4px;
 }
-@keyframes gx2FadeIn{
-  from{ opacity: 0; }
-  to{ opacity: 1; }
-}
-@keyframes gx2SheetIn{
-  from{ transform: translateY(100%); }
-  to{ transform: translateY(0); }
-}
-@keyframes gx2CardIn{
-  from{ opacity: 0; transform: translateY(8px) scale(.98); }
-  to{ opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes gx2Pop{
-  0%{ transform: scale(1); }
-  40%{ transform: scale(1.35); }
-  100%{ transform: scale(1); }
-}
-@keyframes gx2SkPulse{
-  0%, 100%{ opacity: .55; }
-  50%{ opacity: 1; }
-}
-@keyframes gx2LivePulse{
-  0%, 100%{ opacity: .55; }
-  50%{ opacity: 1; }
-}
-body[data-gx2-rediseno] .tab-content.active{
-  animation: gx2TabIn .25s var(--gx2-ease-out);
-}
-body[data-gx2-rediseno] .gx2-pop{ animation: gx2Pop .15s ease-out; }
-
-/* ---------- Inicio: prioridades 2-up, importes protagonistas ---------- */
-body[data-gx2-rediseno] .gx-home-priority-grid{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-body[data-gx2-rediseno] .gx-home-priority{
-  min-height: 84px;
-  padding: 12px;
-  border-radius: var(--gx2-radius-card);
-  text-align: left;
-}
-body[data-gx2-rediseno] .gx-home-priority strong{
-  display: block;
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1.05;
-}
-body[data-gx2-rediseno] .gx-home-priority.today strong{ color: var(--gx2-cyan); }
-body[data-gx2-rediseno] .gx-home-priority.overdue strong{ color: var(--gx2-red); }
-body[data-gx2-rediseno] .gx-home-priority small{
-  font-size: .78rem;
-  font-weight: 700;
-}
-
-/* Centro de decisión: protagonista */
+body[data-gx2-rediseno] .gx-page-heading p{ color: var(--gx2-muted); }
 body[data-gx2-rediseno] .gx-decision-center{
-  border: 1px solid rgba(0, 242, 254, .22);
+  border: 1px solid var(--gx2-line);
   border-radius: var(--gx2-radius-card);
-  background: linear-gradient(180deg, rgba(0, 242, 254, .06), rgba(188, 19, 254, .05));
+  background: var(--gx2-surface);
+  box-shadow: var(--gx2-shadow);
   padding: 14px;
 }
+body[data-gx2-rediseno] .gx-decision-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+body[data-gx2-rediseno] .gx-decision-head h2{ font-size: 1.15rem; }
+body[data-gx2-rediseno] .gx-decision-head p{ display: none; }
 body[data-gx2-rediseno] .gx-decision-total{
-  font-family: Rajdhani, system-ui, sans-serif;
-  font-size: 1.5rem;
-  font-weight: 700;
+  font-family: "Sora", system-ui, sans-serif;
+  font-size: 1.9rem;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
-  color: var(--gx2-cyan);
+  color: var(--gx2-green);
+  white-space: nowrap;
 }
 body[data-gx2-rediseno] .gx-decision-grid{
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
   gap: 8px;
-  margin-top: 10px;
+  margin-top: 12px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
+body[data-gx2-rediseno] .gx-decision-grid::-webkit-scrollbar{ display: none; }
 body[data-gx2-rediseno] .gx-decision-grid button{
-  min-height: 78px;
+  flex: 0 0 auto;
+  min-width: 96px;
+  min-height: 64px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
   gap: 1px;
-  padding: 12px;
-  border-radius: var(--gx2-radius-card);
+  padding: 10px 12px;
+  border-radius: var(--gx2-radius-ctrl);
+  border: 1px solid var(--gx2-line);
+  background: var(--gx2-bg);
   text-align: left;
+  color: var(--gx2-ink);
+}
+body[data-gx2-rediseno] .gx-decision-grid button span{
+  font-size: .72rem;
+  font-weight: 800;
+  color: var(--gx2-muted);
 }
 body[data-gx2-rediseno] .gx-decision-grid button strong{
-  font-size: 1.7rem;
-  font-weight: 700;
+  font-size: 1.45rem;
+  font-weight: 800;
   line-height: 1;
+  color: var(--gx2-ink);
 }
 body[data-gx2-rediseno] .gx-decision-grid button[data-gx2-decision].gx2-filter-on{
-  outline: 2px solid var(--gx2-cyan);
+  outline: 2px solid var(--gx2-green);
   outline-offset: -2px;
-  background: rgba(0, 242, 254, .1);
+  background: var(--gx2-green-soft);
 }
 
-/* ---------- Bandeja de decisiones (feed) ---------- */
-body[data-gx2-rediseno] .gx2-decision-feed{ margin-top: 16px; }
+/* ---------- 6. FEED DE DECISIONES (la pantalla inicial) ---------- */
+body[data-gx2-rediseno] .gx2-decision-feed{ margin-top: 18px; }
 body[data-gx2-rediseno] .gx2-feed-head{
   display: flex;
   align-items: flex-end;
@@ -300,11 +493,11 @@ body[data-gx2-rediseno] .gx2-feed-head{
   gap: 10px;
   margin-bottom: 4px;
 }
-body[data-gx2-rediseno] .gx2-feed-head h2{ margin: 2px 0 0; }
+body[data-gx2-rediseno] .gx2-feed-head h2{ margin: 2px 0 0; font-size: 1.25rem; }
 body[data-gx2-rediseno] .gx2-feed-all{
   border: 0;
   background: transparent;
-  color: var(--gx2-cyan);
+  color: var(--gx2-green);
   font-size: .78rem;
   font-weight: 800;
   white-space: nowrap;
@@ -318,14 +511,31 @@ body[data-gx2-rediseno] .gx2-feed-filter-label{
   margin: 0 0 10px;
 }
 body[data-gx2-rediseno] .gx2-feed-card{
+  position: relative;
   background: var(--gx2-surface);
   border: 1px solid var(--gx2-line);
   border-radius: var(--gx2-radius-card);
-  padding: 13px 14px;
-  margin-bottom: 9px;
+  box-shadow: var(--gx2-shadow);
+  padding: 14px 14px 14px 18px;
+  margin-bottom: 10px;
+  overflow: hidden;
 }
+body[data-gx2-rediseno] .gx2-feed-card::before{
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--gx2-green);
+}
+body[data-gx2-rediseno] .gx2-feed-card.overdue::before{ background: var(--gx2-red); }
+body[data-gx2-rediseno] .gx2-feed-card.cancellation::before{ background: var(--gx2-violet); }
+body[data-gx2-rediseno] .gx2-feed-card.support::before{ background: var(--gx2-amber); }
 body[data-gx2-rediseno] .gx2-feed-kind{
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   padding: 3px 9px;
   border-radius: 999px;
   font-size: .62rem;
@@ -333,22 +543,23 @@ body[data-gx2-rediseno] .gx2-feed-kind{
   letter-spacing: .6px;
   text-transform: uppercase;
 }
-body[data-gx2-rediseno] .gx2-feed-kind.review{ color: #031014; background: var(--gx2-cyan); }
-body[data-gx2-rediseno] .gx2-feed-kind.overdue{ color: #fff; background: var(--gx2-red); }
-body[data-gx2-rediseno] .gx2-feed-kind.cancellation{ color: #fff; background: var(--gx2-violet); }
-body[data-gx2-rediseno] .gx2-feed-kind.support{ color: #031014; background: var(--gx2-green); }
-body[data-gx2-rediseno] .gx2-feed-kind.activity{ color: var(--gx2-muted); background: rgba(255, 255, 255, .08); }
+body[data-gx2-rediseno] .gx2-feed-kind.review{ color: var(--gx2-green); background: var(--gx2-green-soft); }
+body[data-gx2-rediseno] .gx2-feed-kind.overdue{ color: var(--gx2-red); background: var(--gx2-red-soft); }
+body[data-gx2-rediseno] .gx2-feed-kind.cancellation{ color: var(--gx2-violet); background: var(--gx2-violet-soft); }
+body[data-gx2-rediseno] .gx2-feed-kind.support{ color: var(--gx2-amber); background: var(--gx2-amber-soft); }
+body[data-gx2-rediseno] .gx2-feed-kind.activity{ color: var(--gx2-muted); background: var(--gx2-surface-2); }
 body[data-gx2-rediseno] .gx2-feed-title{
   display: block;
-  font-size: .95rem;
+  font-size: .98rem;
   font-weight: 800;
   margin: 8px 0 2px;
+  color: var(--gx2-ink);
 }
 body[data-gx2-rediseno] .gx2-feed-msg{
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   color: var(--gx2-muted);
-  font-size: .82rem;
-  line-height: 1.4;
+  font-size: .84rem;
+  line-height: 1.45;
 }
 body[data-gx2-rediseno] .gx2-feed-foot{
   display: flex;
@@ -357,17 +568,17 @@ body[data-gx2-rediseno] .gx2-feed-foot{
   gap: 10px;
 }
 body[data-gx2-rediseno] .gx2-feed-amount{
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 1.8rem;
+  font-weight: 800;
   line-height: 1;
-  color: #fff;
+  color: var(--gx2-ink);
 }
 body[data-gx2-rediseno] .gx2-feed-client{
   display: block;
   color: var(--gx2-muted);
   font-size: .72rem;
   font-weight: 700;
-  margin-top: 2px;
+  margin-top: 3px;
 }
 body[data-gx2-rediseno] .gx2-feed-actions{
   display: flex;
@@ -379,183 +590,136 @@ body[data-gx2-rediseno] .gx2-feed-actions button{
   padding: 0 13px;
   border-radius: 12px;
   border: 1px solid var(--gx2-line-strong);
-  background: rgba(255, 255, 255, .05);
-  color: #fff;
+  background: var(--gx2-surface);
+  color: var(--gx2-ink);
   font-size: .8rem;
   font-weight: 800;
   cursor: pointer;
 }
 body[data-gx2-rediseno] .gx2-feed-actions button.primary{
-  border-color: rgba(0, 242, 254, .4);
-  background: rgba(0, 242, 254, .12);
-  color: var(--gx2-cyan);
+  border-color: transparent;
+  background: var(--gx2-green);
+  color: #fff;
 }
 body[data-gx2-rediseno] .gx2-feed-actions button.danger{
-  border-color: rgba(255, 92, 122, .4);
+  border-color: rgba(217, 45, 32, .4);
   background: transparent;
   color: var(--gx2-red);
 }
+/* Estado vacío DISEÑADO (no recuadro punteado): icono + título + cuerpo */
 body[data-gx2-rediseno] .gx2-feed-empty{
-  padding: 18px 14px;
-  border: 1px dashed var(--gx2-line-strong);
-  border-radius: var(--gx2-radius-card);
-  color: var(--gx2-muted);
-  font-size: .85rem;
-  text-align: center;
-}
-/* Entrada escalonada del feed: 300 ms, stagger ~40 ms, máx. 6 tarjetas */
-body[data-gx2-rediseno] #gx-decision-feed:not(.gx2-no-enter) > .gx2-feed-card,
-body[data-gx2-rediseno] #gx-mobile-ops-list:not(.gx2-no-enter) > .gx-mobile-op-item{
-  animation: gx2CardIn .3s var(--gx2-ease-out) both;
-  animation-delay: calc(var(--gx2-i, 0) * 40ms);
-}
-
-/* ---------- Skeleton screens (pulso de opacidad, sin shimmer) ---------- */
-body[data-gx2-rediseno] .gx2-sk-caption{
-  color: var(--gx2-muted);
-  font-size: .72rem;
-  font-weight: 700;
-  margin: 2px 0 8px;
-}
-body[data-gx2-rediseno] .gx2-skeleton-card{
-  display: grid;
-  gap: 8px;
-  padding: 13px 14px;
-  margin-bottom: 9px;
+  padding: 26px 18px 22px;
   border: 1px solid var(--gx2-line);
   border-radius: var(--gx2-radius-card);
-  background: rgba(255, 255, 255, .02);
+  background: var(--gx2-surface);
+  box-shadow: var(--gx2-shadow);
+  color: var(--gx2-muted);
+  font-size: .88rem;
+  text-align: center;
 }
-body[data-gx2-rediseno] .gx2-sk-line{
+body[data-gx2-rediseno] .gx2-feed-empty .gx2-ic{
+  width: 34px;
+  height: 34px;
+  color: var(--gx2-green);
+  margin-bottom: 8px;
+}
+body[data-gx2-rediseno] .gx2-feed-empty strong{
   display: block;
-  height: 12px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, .09);
-  animation: gx2SkPulse 1.2s ease-in-out infinite;
+  font-family: "Sora", system-ui, sans-serif;
+  font-size: 1.02rem;
+  color: var(--gx2-ink);
+  margin-bottom: 3px;
 }
-body[data-gx2-rediseno] .gx2-sk-w35{ width: 35%; }
-body[data-gx2-rediseno] .gx2-sk-w40{ width: 40%; }
-body[data-gx2-rediseno] .gx2-sk-w45{ width: 45%; }
-body[data-gx2-rediseno] .gx2-sk-w60{ width: 60%; }
-body[data-gx2-rediseno] .gx2-sk-w70{ width: 70%; }
-body[data-gx2-rediseno] .gx2-sk-w75{ width: 75%; }
-body[data-gx2-rediseno] .gx2-sk-w80{ width: 80%; }
-body[data-gx2-rediseno] .gx2-sk-w85{ width: 85%; }
-body[data-gx2-rediseno] .gx2-sk-w90{ width: 90%; }
+body[data-gx2-rediseno] .gx2-feed-empty p{ margin: 0; line-height: 1.45; }
 
-/* ---------- Próximos vencimientos: ver más ---------- */
+/* ---------- 7. COBRAR: hoy/vencidos + próximos vencimientos ---------- */
+body[data-gx2-rediseno] .gx2-cobrar{ margin-top: 20px; }
+body[data-gx2-rediseno] .gx2-cobrar > .gx-section-head{ margin-bottom: 8px; }
+body[data-gx2-rediseno] .gx-home-priority-grid{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+body[data-gx2-rediseno] .gx-home-priority{
+  min-height: 88px;
+  padding: 13px;
+  border-radius: var(--gx2-radius-card);
+  border: 1px solid var(--gx2-line);
+  background: var(--gx2-surface);
+  box-shadow: var(--gx2-shadow);
+  text-align: left;
+  color: var(--gx2-ink);
+}
+body[data-gx2-rediseno] .gx-home-priority strong{
+  display: block;
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1.05;
+}
+body[data-gx2-rediseno] .gx-home-priority.today strong{ color: var(--gx2-green); }
+body[data-gx2-rediseno] .gx-home-priority.overdue strong{ color: var(--gx2-red); }
+body[data-gx2-rediseno] .gx-home-priority span{
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--gx2-muted);
+}
+body[data-gx2-rediseno] .gx-home-priority small{
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--gx2-muted);
+}
+body[data-gx2-rediseno] .gx-upcoming-section{ margin-top: 14px; }
+body[data-gx2-rediseno] .gx-next-payment{
+  border-radius: var(--gx2-radius-ctrl);
+  padding: 11px 12px;
+}
 body[data-gx2-rediseno] #gx2-upcoming-more{ margin-top: 8px; }
 body[data-gx2-rediseno] .gx2-more-btn{
   width: 100%;
   min-height: 44px;
   border: 1px solid var(--gx2-line-strong);
   border-radius: var(--gx2-radius-ctrl);
-  background: rgba(255, 255, 255, .04);
-  color: var(--gx2-cyan);
+  background: var(--gx2-surface);
+  color: var(--gx2-green);
   font-size: .82rem;
   font-weight: 800;
   cursor: pointer;
 }
 
-/* ---------- Hojas inferiores: un solo sistema (§7.3) ---------- */
-/* Ficha: misma entrada, easing Kowalski (300-350 ms, ease-out fuerte) */
-body[data-gx2-rediseno] .gx-focus-sheet{
-  animation-name: gx2SheetIn;
-  animation-duration: .32s;
-  animation-timing-function: var(--gx2-ease-out);
-}
-body[data-gx2-rediseno] .gx-focus-backdrop{
-  animation: gx2FadeIn .2s ease-out;
-}
-/* Modal de pago: ya es hoja inferior; se le añade la entrada animada */
-body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-sheet{
-  animation: gx2SheetIn .32s var(--gx2-ease-out);
-}
-body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-backdrop{
-  animation: gx2FadeIn .2s ease-out;
-}
-/* Cajón de notificaciones: en teléfono es hoja inferior; en escritorio, cajón lateral */
-@media (max-width: 840px){
-  body[data-gx2-rediseno] .gx-notification-drawer{
-    top: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: min(92dvh, 92vh);
-    border-left: 0;
-    border-top: 1px solid rgba(0, 242, 254, .16);
-    border-radius: 26px 26px 0 0;
-    box-shadow: 0 -22px 70px rgba(0, 0, 0, .58);
-    transform: translateY(105%);
-    transition: transform .3s var(--gx2-ease-out);
-    padding-bottom: max(14px, env(safe-area-inset-bottom));
-    overscroll-behavior: contain;
-  }
-  body[data-gx2-rediseno] .gx-notification-drawer.show{
-    transform: translateY(0);
-  }
-  body[data-gx2-rediseno] .gx-notification-drawer::before{
-    content: "";
-    display: block;
-    width: 46px;
-    height: 5px;
-    margin: 2px auto 8px;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, .18);
-    flex-shrink: 0;
-  }
-  body[data-gx2-rediseno] .gx-notification-overlay{
-    animation: gx2FadeIn .2s ease-out;
-  }
-}
-@media (min-width: 841px){
-  body[data-gx2-rediseno] .gx-notification-drawer{
-    transition: transform .3s var(--gx2-ease-out);
-  }
-}
-/* El resto de overlays no cambian de comportamiento; solo respiran igual */
-body[data-gx2-rediseno] .gx-client-focus,
-body[data-gx2-rediseno] .gx-payment-modal{
-  overscroll-behavior: contain;
-}
-
-/* ---------- Operaciones y Gestión: pestañas reales en todas las pantallas ----------
-   En la oficial, .gx-mobile-workspace se oculta en escritorio y los chips de
-   Operaciones/Gestión activan secciones vacías. En el espejo son secciones
-   reales también en escritorio (corrección, no solo cosmética). */
-@media (min-width: 841px){
-  body[data-gx2-rediseno] .gx-main .tab-content.gx-mobile-workspace.active{
-    display: block !important;
-  }
-}
-body[data-gx2-rediseno] .gx-mobile-op-item{
+/* ---------- 8. PANORAMA (plegado): negocio + estado de clientes ---------- */
+body[data-gx2-rediseno] .gx-business-panel{
+  margin-top: 20px;
+  border: 1px solid var(--gx2-line);
   border-radius: var(--gx2-radius-card);
+  background: var(--gx2-surface);
+  box-shadow: var(--gx2-shadow);
 }
-body[data-gx2-rediseno] .gx-mobile-ops-filters{
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-body[data-gx2-rediseno] .gx-mobile-ops-filters button{
-  min-height: 44px;
-  padding: 0 13px;
-  border-radius: 999px;
-}
-
-/* Gestión: filas con objetivo táctil cómodo */
-body[data-gx2-rediseno] .gx-management-row{
+body[data-gx2-rediseno] .gx-business-panel summary{ list-style: none; }
+body[data-gx2-rediseno] .gx-business-panel summary::-webkit-details-marker{ display: none; }
+body[data-gx2-rediseno] .gx-kpi-strip{ gap: 8px; }
+body[data-gx2-rediseno] .gx-kpi-card{
+  border: 1px solid var(--gx2-line);
   border-radius: var(--gx2-radius-card);
-  padding: 13px 14px;
+  background: var(--gx2-bg);
+  box-shadow: none;
+  padding: 12px;
 }
-body[data-gx2-rediseno] .gx-management-row-actions button{
-  min-height: 44px;
-}
+body[data-gx2-rediseno] .gx-kpi-card strong{ color: var(--gx2-ink); }
+body[data-gx2-rediseno] .gx-kpi-card small{ color: var(--gx2-muted); }
+body[data-gx2-rediseno] .gx-kpi-blue strong{ color: var(--gx2-green); }
+body[data-gx2-rediseno] .gx-kpi-red strong{ color: var(--gx2-red); }
+body[data-gx2-rediseno] .gx-kpi-green strong{ color: var(--gx2-green-bright); }
+body[data-gx2-rediseno] .gx-kpi-purple strong{ color: var(--gx2-violet); }
+body[data-gx2-rediseno] .gx-client-stats > div strong{ color: var(--gx2-ink); }
+body[data-gx2-rediseno] .gx-client-stats > div span{ color: var(--gx2-muted); }
 
-/* ---------- Clientes: buscador sticky bajo el encabezado ---------- */
+/* ---------- 9. CLIENTES / OPERACIONES / GESTIÓN ---------- */
 body[data-gx2-rediseno] .gx-command-panel{
   top: calc(var(--gx2-head-h) + 6px);
+  background: rgba(243, 240, 232, .92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 body[data-gx2-rediseno] .gx2-refresh{
   flex-shrink: 0;
@@ -563,8 +727,8 @@ body[data-gx2-rediseno] .gx2-refresh{
   height: 44px;
   border: 1px solid var(--gx2-line-strong);
   border-radius: 12px;
-  background: rgba(255, 255, 255, .04);
-  color: var(--gx2-cyan);
+  background: var(--gx2-surface);
+  color: var(--gx2-green);
   font-size: 1.05rem;
   font-weight: 800;
   cursor: pointer;
@@ -580,13 +744,75 @@ body[data-gx2-rediseno] .gx-client-toolbar{
   align-items: stretch;
 }
 body[data-gx2-rediseno] .gx-client-toolbar .gx-search-wrap{ flex: 1; min-width: 0; }
+body[data-gx2-rediseno] .gx-search-wrap{
+  border: 1px solid var(--gx2-line-strong);
+  background: var(--gx2-surface);
+}
+body[data-gx2-rediseno] .gx-mobile-op-item{
+  border: 1px solid var(--gx2-line);
+  border-radius: var(--gx2-radius-card);
+  box-shadow: var(--gx2-shadow);
+}
+body[data-gx2-rediseno] .gx-mobile-ops-filters{
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+body[data-gx2-rediseno] .gx-mobile-ops-filters button{
+  min-height: 44px;
+  padding: 0 13px;
+  border-radius: 999px;
+  border: 1px solid var(--gx2-line-strong);
+  background: var(--gx2-surface);
+  color: var(--gx2-ink);
+}
+body[data-gx2-rediseno] .gx-mobile-ops-filters button.active{
+  background: var(--gx2-green);
+  border-color: transparent;
+  color: #fff;
+}
+body[data-gx2-rediseno] .gx-management-row{
+  border: 1px solid var(--gx2-line);
+  border-radius: var(--gx2-radius-card);
+  box-shadow: var(--gx2-shadow);
+  padding: 14px;
+}
+body[data-gx2-rediseno] .gx-management-row-main > span{
+  background: var(--gx2-surface-2);
+  color: var(--gx2-green);
+  border-radius: 12px;
+}
+body[data-gx2-rediseno] .gx-management-row-actions button{
+  min-height: 44px;
+  border: 1px solid var(--gx2-line-strong);
+  background: var(--gx2-surface);
+  color: var(--gx2-ink);
+}
+body[data-gx2-rediseno] .filter-pill{
+  border: 1px solid var(--gx2-line-strong);
+  background: var(--gx2-surface);
+  color: var(--gx2-ink);
+}
+body[data-gx2-rediseno] .filter-pill.active{
+  background: var(--gx2-green);
+  border-color: transparent;
+  color: #fff;
+}
+body[data-gx2-rediseno] .filter-pill.active b{ color: #fff; }
+/* Operaciones y Gestión: pestañas reales en todas las pantallas */
+@media (min-width: 841px){
+  body[data-gx2-rediseno] .gx-main .tab-content.gx-mobile-workspace.active{
+    display: block !important;
+  }
+}
 
-/* ---------- Ajustes: un solo "Guardar ajustes", encabezado sticky ---------- */
+/* ---------- 10. AJUSTES: un solo "Guardar ajustes", encabezado sticky ---------- */
 body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading{
   position: sticky;
   top: calc(var(--gx2-head-h) + 6px);
   z-index: 200;
-  background: linear-gradient(180deg, rgba(3, 3, 5, .94), rgba(3, 3, 5, .86));
+  background: rgba(243, 240, 232, .94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-radius: 0 0 14px 14px;
@@ -596,13 +822,117 @@ body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading{
 }
 body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading h1{ font-size: 1.35rem; }
 body[data-gx2-rediseno] #tab-ajustes > .gx-page-heading p{ display: none; }
-
-/* ---------- LIVE ambiental (2 s, opacidad) + punto de campana ---------- */
-body[data-gx2-rediseno] .status-dot{
-  animation: gx2LivePulse 2s ease-in-out infinite;
+body[data-gx2-rediseno] .gx-settings-tabs button{
+  background: var(--gx2-surface);
+  border: 1px solid var(--gx2-line);
+  color: var(--gx2-muted);
+}
+body[data-gx2-rediseno] .gx-settings-tabs button.active{
+  background: var(--gx2-green);
+  border-color: transparent;
+  color: #fff;
 }
 
-/* ---------- Indicador pull-to-refresh ---------- */
+/* ---------- 11. HOJAS INFERIORES: un solo sistema ----------
+   Ficha, pago, notificaciones, registro, activación, beneficios,
+   producto y Trato Justo suben desde abajo con tirador. Entrada con
+   curva de cajón iOS; salida al 60% con estado `closing`. */
+body[data-gx2-rediseno] .gx-client-focus,
+body[data-gx2-rediseno] .gx-payment-modal{
+  overscroll-behavior: contain;
+}
+body[data-gx2-rediseno] .gx-focus-backdrop,
+body[data-gx2-rediseno] .gx-payment-backdrop,
+body[data-gx2-rediseno] .gx-notification-overlay,
+body[data-gx2-rediseno] .gx-registration-backdrop,
+body[data-gx2-rediseno] .gx-activation-delivery-backdrop,
+body[data-gx2-rediseno] .gx-benefit-modal-backdrop,
+body[data-gx2-rediseno] .gx-product-builder-backdrop,
+body[data-gx2-rediseno] .gx-tj-backdrop{
+  background: rgba(27, 24, 18, .45);
+}
+@media (max-width: 840px){
+  body[data-gx2-rediseno] .gx-notification-drawer{
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: min(92dvh, 92vh);
+    border-left: 0;
+    border-top: 1px solid var(--gx2-line);
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -22px 70px rgba(27, 24, 18, .25);
+    transform: translateY(105%);
+    transition: transform .5s var(--ease-drawer);
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    overscroll-behavior: contain;
+  }
+  body[data-gx2-rediseno] .gx-notification-drawer.show{
+    transform: translateY(0);
+  }
+  body[data-gx2-rediseno] .gx-notification-drawer::before{
+    content: "";
+    display: block;
+    width: 46px;
+    height: 5px;
+    margin: 2px auto 8px;
+    border-radius: 999px;
+    background: #d8d2c2;
+    flex-shrink: 0;
+  }
+}
+@media (min-width: 841px){
+  body[data-gx2-rediseno] .gx-notification-drawer{
+    transition: transform .5s var(--ease-drawer);
+  }
+}
+/* La hoja entra por translateY con curva de cajón; el arrastre (JS)
+   pone transform inline y la clase .gx2-dragging quita la transición */
+body[data-gx2-rediseno] .gx-focus-sheet.gx2-dragging,
+body[data-gx2-rediseno] .gx-payment-sheet.gx2-dragging,
+body[data-gx2-rediseno] .gx-notification-drawer.gx2-dragging{
+  transition: none !important;
+}
+body[data-gx2-rediseno] .gx-focus-sheet.gx2-closing,
+body[data-gx2-rediseno] .gx-payment-sheet.gx2-closing{
+  transition: transform .3s var(--ease-drawer) !important;
+  transform: translateY(105%) !important;
+}
+
+/* ---------- 12. TOAST DE REALTIME: banda bajo el encabezado ----------
+   El toast de 31-admin-realtime.js se crea con estilos inline
+   (fixed, top 18px, derecha) y tapaba el encabezado en el v1.
+   Aquí se reubica como banda fina BAJO el encabezado sticky:
+   estado de sesión inline, nunca superpuesto al header. */
+body[data-gx2-rediseno] #gx-realtime-admin-toast{
+  position: fixed !important;
+  top: calc(var(--gx2-head-h) + 8px) !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: auto !important;
+  max-width: 640px !important;
+  margin: 0 auto !important;
+  padding: 10px 14px !important;
+  border-radius: 14px !important;
+  background: var(--gx2-surface) !important;
+  border: 1px solid var(--gx2-line-strong) !important;
+  border-left: 4px solid var(--gx2-green) !important;
+  box-shadow: var(--gx2-shadow) !important;
+  color: var(--gx2-ink) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: opacity .22s ease, transform .32s var(--ease-back) !important;
+}
+body[data-gx2-rediseno] #gx-realtime-admin-toast strong{
+  color: var(--gx2-ink) !important;
+  font-family: "Sora", system-ui, sans-serif !important;
+}
+body[data-gx2-rediseno] #gx-realtime-admin-toast small{
+  color: var(--gx2-muted) !important;
+}
+
+/* ---------- 13. Indicador pull-to-refresh ---------- */
 body[data-gx2-rediseno] .gx2-ptr{
   position: fixed;
   top: max(8px, env(safe-area-inset-top));
@@ -611,13 +941,13 @@ body[data-gx2-rediseno] .gx2-ptr{
   transform: translate(-50%, -140%);
   padding: 9px 16px;
   border-radius: 999px;
-  border: 1px solid rgba(0, 242, 254, .3);
-  background: rgba(7, 7, 11, .94);
-  color: var(--gx2-cyan);
+  border: 1px solid var(--gx2-line-strong);
+  background: var(--gx2-surface);
+  color: var(--gx2-green);
   font-size: .78rem;
   font-weight: 800;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, .5);
-  transition: transform .25s var(--gx2-ease-out);
+  box-shadow: var(--gx2-shadow);
+  transition: transform .25s var(--ease-out);
   pointer-events: none;
   white-space: nowrap;
 }
@@ -625,7 +955,211 @@ body[data-gx2-rediseno] .gx2-ptr.show{
   transform: translate(-50%, 0);
 }
 
-/* ---------- Móvil: encabezado compacto, sin espacio de barra inferior ---------- */
+/* ---------- 14. SISTEMA DE ANIMACIÓN v2 (explícito) ----------
+   Sistema diferenciado, NO una curva para todo (corrección Henry
+   2026-11-12). Cada animación nombra elemento, valores y patrón.
+   Solo transform / opacity. Salida = 65-75% de la entrada.
+   linear() spring con fallback cubic-bezier declarado ANTES. */
+
+/* Keyframes */
+@keyframes gx2TabIn{
+  from{ opacity: 0; transform: translateY(12px); }
+  to{ opacity: 1; transform: translateY(0); }
+}
+@keyframes gx2TabOut{
+  from{ opacity: 1; transform: translateY(0); }
+  to{ opacity: 0; transform: translateY(-8px); }
+}
+@keyframes gx2FadeIn{
+  from{ opacity: 0; }
+  to{ opacity: 1; }
+}
+@keyframes gx2CardIn{
+  from{ opacity: 0; transform: translateY(14px) scale(.97); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes gx2SheetIn{
+  from{ transform: translateY(100%); }
+  to{ transform: translateY(0); }
+}
+@keyframes gx2SheetOut{
+  from{ transform: translateY(0); }
+  to{ transform: translateY(105%); }
+}
+@keyframes gx2Pop{
+  0%{ transform: scale(1); }
+  40%{ transform: scale(1.18); }
+  100%{ transform: scale(1); }
+}
+@keyframes gx2CheckPop{
+  0%{ transform: scale(1); }
+  35%{ transform: scale(1.35); }
+  60%{ transform: scale(.9); }
+  80%{ transform: scale(1.08); }
+  100%{ transform: scale(1); }
+}
+@keyframes gx2Particle{
+  0%{ opacity: 1; transform: translate(-50%, -50%) rotate(var(--gx2-a, 0deg)) translateY(0) scale(1); }
+  100%{ opacity: 0; transform: translate(-50%, -50%) rotate(var(--gx2-a, 0deg)) translateY(-26px) scale(.2); }
+}
+@keyframes gx2SkPulse{
+  0%, 100%{ opacity: .55; }
+  50%{ opacity: 1; }
+}
+@keyframes gx2Shimmer{
+  from{ transform: translateX(-100%); }
+  to{ transform: translateX(100%); }
+}
+@keyframes gx2LivePulse{
+  0%, 100%{ opacity: .5; }
+  50%{ opacity: 1; }
+}
+@keyframes gx2Shake{
+  0%, 100%{ transform: translateX(0); }
+  20%{ transform: translateX(-6px); }
+  40%{ transform: translateX(6px); }
+  60%{ transform: translateX(-4px); }
+  80%{ transform: translateX(4px); }
+}
+@keyframes gx2ToastIn{
+  from{ opacity: 0; transform: translateY(-6px) scale(.98); }
+  to{ opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Entrada de sección: héroe primero (420 ms expo), tarjetas 360 ms
+   expo con stagger de presupuesto (JS pone --gx2-d en ms) */
+body[data-gx2-rediseno] .tab-content.active{
+  animation: gx2TabIn .3s var(--ease-expo) both;
+  animation-delay: 60ms;
+}
+body[data-gx2-rediseno] .tab-content.gx2-leaving{
+  animation: gx2TabOut .16s var(--ease-out) both;
+}
+body[data-gx2-rediseno] .gx2-hero-in{
+  animation: gx2TabIn .42s var(--ease-expo) both;
+}
+body[data-gx2-rediseno] #gx-decision-feed:not(.gx2-no-enter) > .gx2-feed-card,
+body[data-gx2-rediseno] #gx-mobile-ops-list:not(.gx2-no-enter) > .gx-mobile-op-item{
+  animation: gx2CardIn .36s var(--ease-expo) both;
+  animation-delay: var(--gx2-d, 0ms);
+}
+/* Decisión destacada (veredicto): muelle real linear() + fallback */
+body[data-gx2-rediseno] .gx-decision-center.gx2-spring-in{
+  animation: gx2CardIn .5s var(--ease-back) both;
+  animation: gx2CardIn .5s var(--spring-soft) both;
+}
+/* Presión táctil en DOS fases: bajar rápido (90 ms lineal),
+   soltar con muelle (240 ms spring). La transición vive en la
+   clase base; :active solo acorta la duración y baja la escala. */
+body[data-gx2-rediseno] button,
+body[data-gx2-rediseno] .gx2-seg,
+body[data-gx2-rediseno] .gx-home-priority,
+body[data-gx2-rediseno] .gx-decision-grid button,
+body[data-gx2-rediseno] .filter-pill{
+  transition: transform .24s var(--ease-back), background-color .2s var(--ease-out), color .2s var(--ease-out), opacity .2s var(--ease-out);
+  transition: transform .24s var(--spring-soft), background-color .2s var(--ease-out), color .2s var(--ease-out), opacity .2s var(--ease-out);
+}
+body[data-gx2-rediseno] button:active,
+body[data-gx2-rediseno] .gx2-seg:active,
+body[data-gx2-rediseno] .gx-home-priority:active,
+body[data-gx2-rediseno] .gx-decision-grid button:active,
+body[data-gx2-rediseno] .filter-pill:active{
+  transform: scale(.95);
+  transition-duration: .09s;
+  transition-timing-function: linear;
+}
+body[data-gx2-rediseno] .gx2-seg:active,
+body[data-gx2-rediseno] .gx-home-priority:active,
+body[data-gx2-rediseno] .gx-decision-grid button:active,
+body[data-gx2-rediseno] .filter-pill:active{
+  transform: scale(.97);
+}
+/* Pop de badge (280 ms ease-back) y check-pop al aprobar (420 ms) */
+body[data-gx2-rediseno] .gx2-pop{ animation: gx2Pop .28s var(--ease-back); }
+body[data-gx2-rediseno] .gx2-check-pop{ animation: gx2CheckPop .42s var(--ease-back); }
+body[data-gx2-rediseno] .gx2-particle{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gx2-green-bright);
+  pointer-events: none;
+  animation: gx2Particle .52s var(--ease-out) both;
+}
+/* Shake de error (400 ms, solo en error real) */
+body[data-gx2-rediseno] .gx2-shake{ animation: gx2Shake .4s var(--ease-in-out); }
+
+/* Skeleton: pulso + barrido sutil; morph a contenido (160 ms fuera,
+   contenido 360 ms expo + 80 ms de desfase) */
+body[data-gx2-rediseno] .gx2-sk-caption{
+  color: var(--gx2-muted);
+  font-size: .72rem;
+  font-weight: 700;
+  margin: 2px 0 8px;
+}
+body[data-gx2-rediseno] .gx2-skeleton-card{
+  position: relative;
+  display: grid;
+  gap: 8px;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--gx2-line);
+  border-radius: var(--gx2-radius-card);
+  background: var(--gx2-surface);
+  overflow: hidden;
+  transition: opacity .16s var(--ease-out);
+}
+body[data-gx2-rediseno] .gx2-skeleton-card::after{
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(100deg, transparent 30%, rgba(27, 24, 18, .05) 50%, transparent 70%);
+  transform: translateX(-100%);
+  animation: gx2Shimmer 1.6s linear infinite;
+  pointer-events: none;
+}
+body[data-gx2-rediseno] .gx2-skeleton-card.gx2-morph-out{
+  opacity: 0;
+}
+body[data-gx2-rediseno] .gx2-sk-line{
+  display: block;
+  height: 12px;
+  border-radius: 6px;
+  background: var(--gx2-surface-2);
+  animation: gx2SkPulse 1.2s ease-in-out infinite;
+}
+body[data-gx2-rediseno] .gx2-sk-w35{ width: 35%; }
+body[data-gx2-rediseno] .gx2-sk-w40{ width: 40%; }
+body[data-gx2-rediseno] .gx2-sk-w45{ width: 45%; }
+body[data-gx2-rediseno] .gx2-sk-w60{ width: 60%; }
+body[data-gx2-rediseno] .gx2-sk-w70{ width: 70%; }
+body[data-gx2-rediseno] .gx2-sk-w75{ width: 75%; }
+body[data-gx2-rediseno] .gx2-sk-w80{ width: 80%; }
+body[data-gx2-rediseno] .gx2-sk-w85{ width: 85%; }
+body[data-gx2-rediseno] .gx2-sk-w90{ width: 90%; }
+
+/* Hojas: entrar con curva de cajón iOS (500 ms grande / 320 ms
+   pequeña), salir al 60% (300 ms). Fondo atenúa 200 ms. */
+body[data-gx2-rediseno] .gx-focus-sheet{
+  animation-name: gx2SheetIn;
+  animation-duration: .5s;
+  animation-timing-function: var(--ease-drawer);
+}
+body[data-gx2-rediseno] .gx-focus-backdrop,
+body[data-gx2-rediseno] .gx-payment-backdrop,
+body[data-gx2-rediseno] .gx-notification-overlay{
+  animation: gx2FadeIn .2s ease-out;
+}
+body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-sheet{
+  animation: gx2SheetIn .32s var(--ease-drawer);
+}
+body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-backdrop{
+  animation: gx2FadeIn .2s ease-out;
+}
+
+/* ---------- 15. Móvil / escritorio ---------- */
 @media (max-width: 840px){
   body[data-gx2-rediseno] .gx-admin-shell{
     padding: 10px 10px calc(14px + env(safe-area-inset-bottom));
@@ -647,21 +1181,18 @@ body[data-gx2-rediseno] .gx2-ptr.show{
 @media (max-width: 360px){
   body[data-gx2-rediseno] .gx-save-state{ font-size: .58rem; }
   body[data-gx2-rediseno] .gx2-seg span{ font-size: .66rem; }
+  body[data-gx2-rediseno] .gx-decision-grid button{ min-width: 88px; }
 }
-/* Teléfonos estrechos (<=420 px): el estado de guardado no cabe junto a
-   la campana, LIVE y salir (la barra rebosaba 12 px a 390 px). Se oculta
-   aquí como en la oficial; el punto LIVE sigue señalando la conexión y el
-   estado reaparece a partir de 421 px, donde sí cabe. */
+/* Teléfonos estrechos (<=420 px): el estado de guardado no cabe junto
+   a la campana, LIVE y salir. Se oculta aquí como en la oficial; el
+   punto LIVE sigue señalando la conexión. */
 @media (max-width: 420px){
   body[data-gx2-rediseno] .gx-save-state{ display: none !important; }
 }
-
-/* ---------- Escritorio: mismo producto, más columnas ---------- */
+/* Escritorio: mismo producto, más columnas */
 @media (min-width: 841px){
   body[data-gx2-rediseno]{ --gx2-head-h: 137px; }
   body[data-gx2-rediseno] .gx2-sticky-head{
-    /* El shell usa padding clamp(16px,2vw,32px) en escritorio; se compensa
-       para que el encabezado llegue de borde a borde. */
     margin-left: calc(-1 * clamp(16px, 2vw, 32px));
     margin-right: calc(-1 * clamp(16px, 2vw, 32px));
     padding-left: clamp(16px, 2vw, 32px);
@@ -672,56 +1203,103 @@ body[data-gx2-rediseno] .gx2-ptr.show{
     margin-left: auto;
     margin-right: auto;
   }
-  body[data-gx2-rediseno] .gx-decision-grid{
-    grid-template-columns: repeat(4, 1fr);
-  }
   body[data-gx2-rediseno] .gx2-decision-feed,
-  body[data-gx2-rediseno] .gx-upcoming-section{
-    max-width: 760px;
-  }
-  body[data-gx2-rediseno] .gx-home-priority-grid{
-    max-width: 760px;
-  }
-  body[data-gx2-rediseno] .gx-decision-center{
-    max-width: 760px;
-  }
+  body[data-gx2-rediseno] .gx-upcoming-section,
+  body[data-gx2-rediseno] .gx2-cobrar,
+  body[data-gx2-rediseno] .gx-home-priority-grid,
+  body[data-gx2-rediseno] .gx-decision-center,
   body[data-gx2-rediseno] .gx-business-panel{
     max-width: 760px;
   }
+  body[data-gx2-rediseno] .gx-decision-grid{
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    overflow-x: visible;
+  }
+  body[data-gx2-rediseno] .gx-decision-grid button{ min-width: 0; }
 }
-
-/* Escritorio >=1280: la oficial usa una rejilla de 2 columnas (la barra
-   lateral de navegación ocupa la columna 1, 210 px). El espejo no tiene
-   barra lateral: el shell vuelve a bloque y el encabezado segmentado ocupa
-   todo el ancho. Sin esto, el encabezado caía en la columna estrecha y el
-   contenido quedaba desplazado a la derecha. */
+/* Escritorio >=1280: la oficial usa una rejilla de 2 columnas (la
+   barra lateral ocupa la columna 1, 210 px). El espejo no tiene
+   barra lateral: el shell vuelve a bloque. */
 @media (min-width: 1280px){
   body[data-gx2-rediseno]{ --gx2-head-h: 141px; }
   body[data-gx2-rediseno] .gx-admin-shell{ display: block; }
   body[data-gx2-rediseno] .gx-main{ margin-inline: auto; }
 }
 
-/* ---------- Movimiento reducido: opacidad y color sí, desplazamiento no ---------- */
+/* ---------- 16. Movimiento reducido: opacidad sí, desplazamiento no ---------- */
 @media (prefers-reduced-motion: reduce){
-  body[data-gx2-rediseno] .tab-content.active{
-    animation: gx2FadeIn .2s ease-out;
-  }
+  body[data-gx2-rediseno] .tab-content.active,
+  body[data-gx2-rediseno] .gx2-hero-in,
   body[data-gx2-rediseno] #gx-decision-feed:not(.gx2-no-enter) > .gx2-feed-card,
-  body[data-gx2-rediseno] #gx-mobile-ops-list:not(.gx2-no-enter) > .gx-mobile-op-item{
-    animation: gx2FadeIn .2s ease-out;
-  }
+  body[data-gx2-rediseno] #gx-mobile-ops-list:not(.gx2-no-enter) > .gx-mobile-op-item,
   body[data-gx2-rediseno] .gx-focus-sheet,
   body[data-gx2-rediseno] .gx-payment-modal.show .gx-payment-sheet{
     animation: gx2FadeIn .2s ease-out;
+    animation-delay: 0ms;
   }
   body[data-gx2-rediseno] .gx-notification-drawer{
     transition: opacity .2s ease-out;
   }
   body[data-gx2-rediseno] .gx2-sk-line,
+  body[data-gx2-rediseno] .gx2-skeleton-card::after,
   body[data-gx2-rediseno] .status-dot{
     animation: none;
   }
   body[data-gx2-rediseno] button:active{
     transform: none;
   }
+}
+
+/* ---------- 17. Parche v2 (JS) ---------- */
+/* Píldora de tipo del feed: icono pequeño, en línea con el texto */
+body[data-gx2-rediseno] .gx2-feed-kind .gx2-ic{
+  width: 13px;
+  height: 13px;
+}
+/* Los botones de acción del feed son el ancla de las partículas
+   del check-pop: necesitan posición relativa (sin tocar su layout) */
+body[data-gx2-rediseno] .gx2-feed-actions button{ position: relative; }
+/* El tirador de las hojas no debe iniciar scroll al arrastrar */
+body[data-gx2-rediseno] .gx-focus-handle{ touch-action: none; }
+/* Cierre por arrastre del cajón de notificaciones en teléfono */
+body[data-gx2-rediseno] .gx-notification-drawer.gx2-closing{
+  transition: transform .3s var(--ease-drawer) !important;
+  transform: translateY(105%) !important;
+}
+
+/* ---------- 18. Parche v2b (revisión visual headless) ---------- */
+/* Total de "Tu veredicto": admin.css lo pinta como píldora oscura
+   neón; en Papel es una píldora verde suave, no un resto oscuro */
+body[data-gx2-rediseno] .gx-decision-total{
+  background: var(--gx2-green-soft) !important;
+  border-color: transparent !important;
+  color: var(--gx2-green) !important;
+  padding: 6px 14px !important;
+  border-radius: 999px !important;
+  font-size: 1.1rem !important;
+  min-height: 0 !important;
+}
+/* Chip "Registros": admin.css le pone gradiente oscuro !important
+   y rosa !important; en Papel es un chip de arena como los demás */
+body[data-gx2-rediseno] .gx-decision-grid button.gx-decision-registration{
+  background: var(--gx2-bg) !important;
+  border-color: var(--gx2-line) !important;
+}
+body[data-gx2-rediseno] .gx-decision-grid button.gx-decision-registration strong{
+  color: var(--gx2-ink) !important;
+}
+body[data-gx2-rediseno] .gx-decision-grid button.gx-decision-registration span,
+body[data-gx2-rediseno] .gx-decision-grid button.gx-decision-registration small{
+  color: var(--gx2-muted) !important;
+}
+/* Teléfono: los 4 chips del héroe en 2×2, nada escondido tras
+   un scroll horizontal; en escritorio siguen en 1 fila de 4 */
+@media (max-width: 840px){
+  body[data-gx2-rediseno] .gx-decision-grid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow-x: visible;
+  }
+  body[data-gx2-rediseno] .gx-decision-grid button{ min-width: 0; }
 }

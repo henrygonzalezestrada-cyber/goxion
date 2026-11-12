@@ -8,7 +8,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <title>GOXION // ADMIN · Rediseño</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="./assets/css/admin.css?v=20261011j">
 <link rel="stylesheet" href="./assets/css/admin-recordatorios.css?v=20261019c">
 <link rel="stylesheet" href="./preview/admin-rediseno/admin-rediseno.css?v=red-1">
@@ -35,39 +35,72 @@
 <link rel="stylesheet" href="./assets/css/opiniones.css?v=20261009a">
 </head>
 <body data-gx-version="admin-beta-19-4" data-gx2-rediseno="1">
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<defs>
+<symbol id="gx2-ic-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></symbol>
+<symbol id="gx2-ic-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="gx2-ic-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></symbol>
+<symbol id="gx2-ic-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></symbol>
+<symbol id="gx2-ic-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+<symbol id="gx2-ic-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></symbol>
+<symbol id="gx2-ic-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></symbol>
+<symbol id="gx2-ic-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></symbol>
+<symbol id="gx2-ic-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18"/><path d="M6 6l12 12"/></symbol>
+<symbol id="gx2-ic-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></symbol>
+<symbol id="gx2-ic-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></symbol>
+<symbol id="gx2-ic-chevron-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></symbol>
+<symbol id="gx2-ic-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="gx2-ic-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+<symbol id="gx2-ic-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+<symbol id="gx2-ic-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/></symbol>
+<symbol id="gx2-ic-power" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><path d="M12 2v10"/></symbol>
+<symbol id="gx2-ic-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="gx2-ic-message" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="gx2-ic-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></symbol>
+<symbol id="gx2-ic-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></symbol>
+<symbol id="gx2-ic-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="gx2-ic-key" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2"/><path d="M7.61 17.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78z"/><path d="M15.5 7.5l3 3L22 7l-3-3"/></symbol>
+<symbol id="gx2-ic-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2L12 2z"/></symbol>
+<symbol id="gx2-ic-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+<symbol id="gx2-ic-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></symbol>
+<symbol id="gx2-ic-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><path d="M22 6l-10 7L2 6"/></symbol>
+<symbol id="gx2-ic-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></symbol>
+<symbol id="gx2-ic-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></symbol>
+<symbol id="gx2-ic-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M10 11v6"/><path d="M14 11v6"/></symbol>
+<symbol id="gx2-ic-check-square" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></symbol>
+<symbol id="gx2-ic-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+<symbol id="gx2-ic-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></symbol>
+<symbol id="gx2-ic-arrow-up-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></symbol>
+<symbol id="gx2-ic-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+<symbol id="gx2-ic-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="gx2-ic-flask" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v6L4.5 18a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 8V2"/><path d="M8.5 2h7"/><path d="M7 15h10"/></symbol>
+</defs>
+</svg>
 <div class="gx-admin-shell">
 <div class="gx2-sticky-head">
 <header class="gx-topbar">
-<div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION <span class="gx2-mirror-tag">ESPEJO · REDISEÑO</span></div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
+<div class="gx-brand-block"><div class="gx-brand-mark">G</div><div><div class="gx-brand-name">GOXION <span class="gx2-mirror-tag">ESPEJO · REDISEÑO v2</span></div><div class="gx-brand-sub">CENTRO DE OPERACIONES</div></div></div>
 <div class="gx-top-actions">
 <button aria-label="Notificaciones" class="gx-notification-bell" id="gx-notification-bell" onclick="gxToggleNotifications()">
-<span>🔔</span><i id="gx-notification-badge"></i>
-</button><div class="gx-save-state" id="gx-save-state"><span class="gx-save-dot"></span><span>Sincronizado</span></div><div class="status"><div class="status-dot"></div> LIVE</div><button class="gx-icon-action danger" onclick="cerrarSesion()">⏻</button></div>
+<span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-bell"/></svg></span><i id="gx-notification-badge"></i>
+</button><div class="gx-save-state" id="gx-save-state"><span class="gx-save-dot"></span><span>Sincronizado</span></div><div class="status"><div class="status-dot"></div> LIVE</div><button class="gx-icon-action danger" onclick="cerrarSesion()" aria-label="Cerrar sesión"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-power"/></svg></button></div>
 </header>
-<nav class="gx2-segmented" aria-label="Secciones de Admin"><button class="gx2-seg active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)"><i>⌂</i><span>Inicio</span></button><button class="gx2-seg" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)"><i>👥</i><span>Clientes</span></button><button class="gx2-seg" data-admin-target="tab-operaciones" onclick="goAdminTab('tab-operaciones',this)"><i>◎</i><span>Operaciones</span><b class="gx2-seg-badge" id="gx2-nav-ops-badge" hidden>0</b></button><button class="gx2-seg" data-admin-target="tab-gestion" onclick="goAdminTab('tab-gestion',this)"><i>⌘</i><span>Gestión</span></button></nav>
+<nav class="gx2-segmented" aria-label="Secciones de Admin"><button class="gx2-seg active" data-admin-target="tab-resumen" onclick="goAdminTab('tab-resumen',this)"><i><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-home"/></svg></i><span>Inicio</span></button><button class="gx2-seg" data-admin-target="tab-clientes" onclick="goAdminTab('tab-clientes',this)"><i><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-users"/></svg></i><span>Clientes</span></button><button class="gx2-seg" data-admin-target="tab-operaciones" onclick="goAdminTab('tab-operaciones',this)"><i><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-layers"/></svg></i><span>Operaciones</span><b class="gx2-seg-badge" id="gx2-nav-ops-badge" hidden>0</b></button><button class="gx2-seg" data-admin-target="tab-gestion" onclick="goAdminTab('tab-gestion',this)"><i><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-sliders"/></svg></i><span>Gestión</span></button></nav>
 </div>
 <main class="gx-main">
 <section class="tab-content active" id="tab-resumen">
-<div class="gx-page-heading">
+<div class="gx-page-heading gx2-hero-in">
 <div>
-<div class="gx-eyebrow">Hoy en GOXION</div>
-<h1>Qué requiere tu atención</h1>
-<p>Primero cobros, revisiones y solicitudes. Lo demás queda a un toque.</p>
+<div class="gx-eyebrow">Decide ahora</div>
+<h1>Decide ahora</h1>
+<p>Lo urgente primero: pagos por validar, cancelaciones y solicitudes. Lo demás queda a un toque.</p>
 </div>
-</div>
-<div class="gx-home-priority-grid">
-<button class="gx-home-priority today" onclick="gxShowClientTiming('today')">
-<span>HOY</span><strong id="gx-count-due-today">0</strong><small>Cobran hoy</small>
-</button>
-<button class="gx-home-priority overdue" onclick="gxShowClientTiming('overdue')">
-<span>COBRO</span><strong id="gx-count-overdue-home">0</strong><small>Vencidos</small>
-</button>
 </div>
 <span class="gx2-hidden" aria-hidden="true"><strong id="gx-count-review">0</strong><strong id="gx-count-requests">0</strong></span>
-<section class="gx-decision-center" id="gx-decision-center">
+<section class="gx-decision-center gx2-spring-in" id="gx-decision-center">
 <div class="gx-decision-head">
 <div>
-<span class="gx-eyebrow">Automatización</span>
+<span class="gx-eyebrow">Decisiones</span>
 <h2>Tu veredicto</h2>
 <p>Solo lo que necesita una decisión tuya. El resto puede seguir su flujo automático.</p>
 </div>
@@ -91,7 +124,7 @@
 <section class="gx2-decision-feed" id="gx2-decision-feed-section" aria-label="Bandeja de decisiones">
 <div class="gx2-feed-head">
 <div><span class="gx-eyebrow">Bandeja de decisiones</span><h2>Qué decides ahora</h2></div>
-<button class="gx2-feed-all" type="button" onclick="goAdminTab('tab-operaciones')">Ver todas en Operaciones →</button>
+<button class="gx2-feed-all" type="button" onclick="goAdminTab('tab-operaciones')">Ver todas en Operaciones <svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-arrow-right"/></svg></button>
 </div>
 <p class="gx2-feed-filter-label" id="gx2-feed-filter-label">Prioridad · lo urgente primero</p>
 <div id="gx-decision-feed" aria-live="polite">
@@ -101,6 +134,16 @@
 <div class="gx2-skeleton-card" aria-hidden="true"><i class="gx2-sk-line gx2-sk-w75"></i><i class="gx2-sk-line gx2-sk-w35"></i><i class="gx2-sk-line gx2-sk-w85"></i></div>
 </div>
 </section>
+<section class="gx2-cobrar" aria-label="Cobrar">
+<div class="gx-section-head"><div><span class="gx-eyebrow">Cobrar</span><h2>Cobrar</h2></div></div>
+<div class="gx-home-priority-grid">
+<button class="gx-home-priority today" onclick="gxShowClientTiming('today')">
+<span>HOY</span><strong id="gx-count-due-today">0</strong><small>Cobran hoy</small>
+</button>
+<button class="gx-home-priority overdue" onclick="gxShowClientTiming('overdue')">
+<span>COBRO</span><strong id="gx-count-overdue-home">0</strong><small>Vencidos</small>
+</button>
+</div>
 <section class="gx-upcoming-section">
 <div class="gx-section-head">
 <div><span class="gx-eyebrow">Cobro</span><h2>Próximos vencimientos</h2></div>
@@ -113,7 +156,8 @@
 </div>
 <div id="gx2-upcoming-more"></div>
 </section>
-<details class="gx-business-panel" id="gx-business-panel" open="">
+</section>
+<details class="gx-business-panel" id="gx-business-panel">
 <summary>
 <div><span class="gx-eyebrow">Negocio</span><strong>Finanzas y panorama</strong></div>
 <em>Ver</em>
@@ -140,30 +184,36 @@
 </div>
 </div>
 </details>
+
+
+
+
+
+
 </section>
 <section class="tab-content" id="tab-clientes">
-<div class="gx-page-heading"><div><div class="gx-eyebrow">CRM operativo</div><h1>Clientes</h1><p id="gx-client-page-subtitle">Busca, filtra y entra directo a lo que necesitas.</p></div><button class="gx-primary-action" onclick="agregarNuevoCliente()">＋ Nuevo cliente</button></div>
+<div class="gx-page-heading"><div><div class="gx-eyebrow">CRM operativo</div><h1>Clientes</h1><p id="gx-client-page-subtitle">Busca, filtra y entra directo a lo que necesitas.</p></div><button class="gx-primary-action" onclick="agregarNuevoCliente()"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg> Nuevo cliente</button></div>
 <div class="gx-command-panel" id="gx-client-command-panel">
 <div class="gx-client-toolbar">
-<div class="gx-search-wrap"><span>⌕</span><input class="search-bar" id="search-input" oninput="filtrarClientes()" placeholder="Buscar nombre, folio..." type="text"/></div>
+<div class="gx-search-wrap"><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-search"/></svg></span><input class="search-bar" id="search-input" oninput="filtrarClientes()" placeholder="Buscar nombre, folio..." type="text"/></div>
 <button aria-controls="gx-filter-drawer" aria-expanded="false" class="gx-filter-toggle" id="gx-filter-toggle" onclick="gxToggleClientFilters()" type="button">
-<span class="gx-filter-icon">⌁</span>
+<span class="gx-filter-icon"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-filter"/></svg></span>
 <span class="gx-filter-toggle-copy"><strong>Filtros</strong><small id="gx-filter-summary">Todos · Prioridad</small></span>
 <b hidden="" id="gx-filter-active-count">0</b>
 </button>
-<button class="gx2-refresh" type="button" onclick="gx2RefreshClients()" title="Actualizar lista" aria-label="Actualizar lista">↻</button>
+<button class="gx2-refresh" type="button" onclick="gx2RefreshClients()" title="Actualizar lista" aria-label="Actualizar lista"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-refresh"/></svg></button>
 </div>
 <div aria-hidden="true" class="gx-filter-drawer" id="gx-filter-drawer">
 <div class="filter-pills-container gx-status-pills">
 <button class="filter-pill active" data-status-filter="all" onclick="setStatusFilter('all',this)">Todos <b id="pill-all">0</b></button>
-<button class="filter-pill" data-status-filter="revision" onclick="setStatusFilter('revision',this)">🔔 Revisión <b id="pill-review">0</b></button>
+<button class="filter-pill" data-status-filter="revision" onclick="setStatusFilter('revision',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-bell"/></svg> Revisión <b id="pill-review">0</b></button>
 <button class="filter-pill" data-status-filter="pendiente" onclick="setStatusFilter('pendiente',this)">Pendientes <b id="pill-pending">0</b></button>
 <button class="filter-pill" data-status-filter="pagado" onclick="setStatusFilter('pagado',this)">Pagados <b id="pill-paid">0</b></button>
 <button class="filter-pill" data-status-filter="suspendido" onclick="setStatusFilter('suspendido',this)">Suspendidos <b id="pill-suspended">0</b></button>
 </div>
 <div class="gx-filter-tools">
 <label class="gx-filter-sort"><span>Orden</span><select class="custom-select" id="sort-by" onchange="filtrarClientes();gxUpdateFilterSummary()"><option selected="" value="priority">Prioridad de cobro</option><option value="date">Día de cobro</option><option value="name">Nombre A–Z</option><option value="loyalty">Lealtad</option></select></label>
-<button class="gx-secondary-action gx-filter-clear" onclick="gxClearClientFilters()">↺ Limpiar</button>
+<button class="gx-secondary-action gx-filter-clear" onclick="gxClearClientFilters()"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-refresh"/></svg> Limpiar</button>
 </div>
 </div>
 </div>
@@ -176,7 +226,7 @@
 <section class="tab-content" id="tab-catalogo">
 <div class="gx-page-heading">
 <div><div class="gx-eyebrow">Inventario</div><h1>Catálogo</h1><p>Selecciona una plataforma para administrar sus datos.</p></div>
-<button class="gx-primary-action desktop-only" onclick="addGlobalService()">＋ Servicio</button>
+<button class="gx-primary-action desktop-only" onclick="addGlobalService()"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg> Servicio</button>
 </div><div class="gx-catalog-mode-switch"><button class="active" data-gx-catalog-mode="services" onclick="gxOpenCatalogMode('services',this)">Servicios</button><button data-gx-catalog-mode="promotions" onclick="gxOpenCatalogMode('promotions',this)">Promociones</button></div>
 <div class="gx-catalog-mode-view active" id="gx-catalog-services-view"><div class="gx-catalog-mobile" id="gx-catalog-mobile">
 <div class="gx-catalog-mobile-toolbar">
@@ -184,7 +234,7 @@
 <span class="gx-eyebrow">Plataformas</span>
 <strong id="gx-catalog-mobile-count">0 servicios</strong>
 </div>
-<button onclick="gxAddCatalogServiceMobile()" type="button">＋</button>
+<button onclick="gxAddCatalogServiceMobile()" type="button" aria-label="Agregar servicio"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg></button>
 </div>
 <div class="gx-catalog-mobile-list" id="gx-catalog-mobile-list"></div>
 <div class="gx-catalog-mobile-editor" hidden="" id="gx-catalog-mobile-editor"></div>
@@ -208,8 +258,8 @@
 <p>Configura precios temporales, porcentajes, combos y add-ons desde una sola fuente. Ayuda consumirá estas reglas en su bloque visual dedicado.</p>
 </div>
 <div class="gx-promo-studio-hero-actions">
-<button class="gx-secondary-action" onclick="gxPromoLoad()" type="button">↻ Actualizar</button>
-<button class="gx-primary-action" onclick="gxPromoOpenEditor()" type="button">＋ Nueva promoción</button>
+<button class="gx-secondary-action" onclick="gxPromoLoad()" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-refresh"/></svg> Actualizar</button>
+<button class="gx-primary-action" onclick="gxPromoOpenEditor()" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg> Nueva promoción</button>
 </div>
 </div>
 
@@ -229,7 +279,7 @@
 </div>
 
 <div class="gx-promo-studio-toolbar">
-<label class="gx-promo-search"><span>⌕</span><input id="gx-promo-search" oninput="gxPromoRender()" placeholder="Buscar promoción o plataforma..." type="search"/></label>
+<label class="gx-promo-search"><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-search"/></svg></span><input id="gx-promo-search" oninput="gxPromoRender()" placeholder="Buscar promoción o plataforma..." type="search"/></label>
 <select id="gx-promo-filter-mechanic" onchange="gxPromoRender()">
 <option value="">Todas las mecánicas</option>
 <option value="precio_fijo">Precio temporal</option>
@@ -256,7 +306,7 @@
 <h3 id="gx-promo-editor-title">Nueva promoción</h3>
 <p id="gx-promo-editor-subtitle">Define la mecánica y GOXION adapta el resto del formulario.</p>
 </div>
-<button onclick="gxPromoCloseEditor()" type="button">×</button>
+<button onclick="gxPromoCloseEditor()" type="button" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
 </div>
 <input id="gx-promo-id" type="hidden"/>
 <input id="gx-promo-mechanic" type="hidden" value="precio_fijo"/>
@@ -280,7 +330,7 @@
 <div class="gx-promo-mechanic-grid">
 <button data-gx-promo-mechanic="precio_fijo" onclick="gxPromoSetMechanic('precio_fijo',this)" type="button"><b>$</b><span><strong>Precio temporal</strong><small>$99 durante 3 meses</small></span></button>
 <button data-gx-promo-mechanic="porcentaje" onclick="gxPromoSetMechanic('porcentaje',this)" type="button"><b>%</b><span><strong>Porcentaje</strong><small>30% OFF</small></span></button>
-<button data-gx-promo-mechanic="combo" onclick="gxPromoSetMechanic('combo',this)" type="button"><b>＋</b><span><strong>Combo</strong><small>2 o más plataformas</small></span></button>
+<button data-gx-promo-mechanic="combo" onclick="gxPromoSetMechanic('combo',this)" type="button"><b><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg></b><span><strong>Combo</strong><small>2 o más plataformas</small></span></button>
 <button data-gx-promo-mechanic="addon" onclick="gxPromoSetMechanic('addon',this)" type="button"><b>↗</b><span><strong>Add-on</strong><small>Contrata X y suma Y</small></span></button>
 </div>
 <div class="gx-promo-mechanic-fields" id="gx-promo-mechanic-fields"></div>
@@ -335,7 +385,7 @@
 <label><input id="gx-promo-acquisition" onchange="gxPromoAcquisitionChanged()" type="checkbox"/><span><strong>Adquisición habilitada</strong><small>Permite que una oferta elegible pueda contratarse</small></span></label>
 <label><input checked="" id="gx-promo-active" type="checkbox"/><span><strong>Habilitada</strong><small>Puede quedar programada por fecha</small></span></label>
 </div>
-<div class="gx-promo-acquisition-lock" id="gx-promo-acquisition-note"><b>⌁</b><span><strong>Publicación y contratación separadas</strong><small>Puedes publicar una campaña sólo para mostrarla. La adquisición únicamente se habilita cuando Publicada también está activa.</small></span></div>
+<div class="gx-promo-acquisition-lock" id="gx-promo-acquisition-note"><b><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-info"/></svg></b><span><strong>Publicación y contratación separadas</strong><small>Puedes publicar una campaña sólo para mostrarla. La adquisición únicamente se habilita cuando Publicada también está activa.</small></span></div>
 </section>
 
 </div>
@@ -358,7 +408,7 @@
 </section></section>
 <section class="tab-content" id="tab-ajustes">
 <div class="gx-page-heading"><div><div class="gx-eyebrow">Configuración</div><h1>Ajustes &amp; automatizaciones</h1><p>Misiones, experiencia del cliente y alertas globales.</p></div><button class="gx-primary-action" onclick="gxSaveSettings()">Guardar ajustes</button></div>
-<div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)">🎯 Misiones</button><button onclick="gxSettingsView('loyalty',this)">✦ Lealtad</button><button onclick="gxSettingsView('fairdeal',this)">🛡 Trato Justo</button><button onclick="gxSettingsView('accounts',this)">✉ Cuentas</button><button onclick="gxSettingsView('credentials',this)">🔐 Credenciales</button><button onclick="gxSettingsView('app',this)">✨ App</button><button onclick="gxSettingsView('alerts',this)">⚠️ Alertas</button></div>
+<div class="gx-settings-tabs"><button class="active" onclick="gxSettingsView('missions',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-target"/></svg> Misiones</button><button onclick="gxSettingsView('loyalty',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-star"/></svg> Lealtad</button><button onclick="gxSettingsView('fairdeal',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-shield"/></svg> Trato Justo</button><button onclick="gxSettingsView('accounts',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-mail"/></svg> Cuentas</button><button onclick="gxSettingsView('credentials',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-lock"/></svg> Credenciales</button><button onclick="gxSettingsView('app',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-spark"/></svg> App</button><button onclick="gxSettingsView('alerts',this)"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-alert"/></svg> Alertas</button></div>
 <div class="gx-settings-view active" data-settings-view="missions">
 <div class="panel gx-panel-modern">
 <div class="gx-panel-title-row">
@@ -376,7 +426,7 @@
 <strong>Misiones de la plantilla</strong>
 <small>Arrastra no hace falta: usa + y elimina las que no necesites.</small>
 </div>
-<button class="gx-secondary-action" onclick="gxAddMissionRow()" type="button">＋ Crear misión</button>
+<button class="gx-secondary-action" onclick="gxAddMissionRow()" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg> Crear misión</button>
 </div>
 <div class="gx-mission-builder-list" id="gx-mission-builder-list"></div>
 </div>
@@ -387,9 +437,9 @@
 <div class="gx-tag-library-grid" id="gx-tag-library-grid"></div>
 </div>
 <div class="gx-action-grid">
-<button class="gx-action-card primary" onclick="gxMissionBuilderApply('todos')"><b>✓</b><span>Aplicar a todos</span></button>
-<button class="gx-action-card" onclick="gxMissionBuilderSelectClients()"><b>☑</b><span>Seleccionar clientes</span></button>
-<button class="gx-action-card danger" onclick="borrarMisionesMasivas()"><b>⌫</b><span>Borrar de todos</span></button>
+<button class="gx-action-card primary" onclick="gxMissionBuilderApply('todos')"><b><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-check"/></svg></b><span>Aplicar a todos</span></button>
+<button class="gx-action-card" onclick="gxMissionBuilderSelectClients()"><b><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-check-square"/></svg></b><span>Seleccionar clientes</span></button>
+<button class="gx-action-card danger" onclick="borrarMisionesMasivas()"><b><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-trash"/></svg></b><span>Borrar de todos</span></button>
 </div>
 </div>
 </div>
@@ -433,7 +483,7 @@
 </div>
 </div>
 <div class="gx-loyalty-search">
-<span>⌕</span>
+<span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-search"/></svg></span>
 <input id="gx-loyalty-search" oninput="gxRenderLoyaltyClientList()" placeholder="Buscar cliente..." type="text"/>
 </div>
 <div class="gx-loyalty-preview">
@@ -476,7 +526,7 @@
 <div>
 <button onclick="gxTJMassStep(-1)" type="button">−</button>
 <strong id="gx-tj-bulk-days">1</strong>
-<button onclick="gxTJMassStep(1)" type="button">＋</button>
+<button onclick="gxTJMassStep(1)" type="button" aria-label="Agregar paso"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg></button>
 </div>
 <small>5% por día · máximo 50%</small>
 </div>
@@ -503,7 +553,7 @@
 </div>
 </div>
 <div class="gx-tj-bulk-search">
-<span>⌕</span>
+<span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-search"/></svg></span>
 <input id="gx-tj-bulk-search" oninput="gxRenderTJMassList()" placeholder="Buscar cliente..." type="text"/>
 </div>
 <div class="gx-tj-bulk-preview">
@@ -547,7 +597,7 @@
 <h3>Estado de accesos</h3>
 <p>Contrataciones, accesos reales y pendientes en una sola vista.</p>
 </div>
-<button onclick="gxRunAccessDiagnostic()" type="button">↻ Diagnosticar</button>
+<button onclick="gxRunAccessDiagnostic()" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-refresh"/></svg> Diagnosticar</button>
 </div>
 <div class="gx-access-diagnostic-grid">
 <div><small>Contrataciones</small><strong id="gx-access-d-contracts">—</strong></div>
@@ -597,7 +647,7 @@
 <div class="gx-empty-inline">Cargando cuentas…</div>
 </div>
 <details class="gx-account-create">
-<summary><span>＋ Nueva cuenta madre</span><em>Agregar</em></summary>
+<summary><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg> Nueva cuenta madre</span><em>Agregar</em></summary>
 <div class="gx-account-create-grid">
 <label><span>Nombre corto</span><input id="gx-account-new-alias" placeholder="Cuenta 1" type="text"/></label>
 <label class="wide"><span>Correo / login</span><input id="gx-account-new-email" placeholder="cuenta@correo.com" type="text"/></label>
@@ -634,7 +684,7 @@
 <span>Nueva contraseña</span>
 <div>
 <input autocomplete="new-password" id="gx-cred-password" placeholder="Escribe la nueva contraseña" type="password"/>
-<button onclick="gxToggleCredentialPassword()" type="button">👁</button>
+<button onclick="gxToggleCredentialPassword()" type="button" aria-label="Mostrar contraseña"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-eye"/></svg></button>
 </div>
 </label>
 </div>
@@ -649,7 +699,7 @@
 </div>
 </div>
 <div class="gx-credential-search">
-<span>⌕</span>
+<span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-search"/></svg></span>
 <input id="gx-cred-search" oninput="gxRenderCredentialRecipients()" placeholder="Buscar cliente..." type="text"/>
 </div>
 <div class="gx-credential-stats">
@@ -698,7 +748,7 @@
 <section class="tab-content gx-mobile-workspace" id="tab-operaciones">
 <div class="gx-page-heading">
 <div><div class="gx-eyebrow">Bandeja operativa</div><h1>Operaciones</h1><p>Todo lo que requiere una decisión o seguimiento.</p></div>
-<button class="gx2-refresh" type="button" onclick="gx2RefreshOps()" title="Actualizar bandeja" aria-label="Actualizar bandeja">↻ Actualizar</button>
+<button class="gx2-refresh" type="button" onclick="gx2RefreshOps()" title="Actualizar bandeja" aria-label="Actualizar bandeja"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-refresh"/></svg> Actualizar</button>
 </div>
 <div class="gx-mobile-ops-filters" id="gx-mobile-ops-filters">
 <button class="active" data-gx-mobile-ops="priority" onclick="gxSetMobileOpsFilter('priority',this)">Prioridad</button>
@@ -720,30 +770,30 @@
 </div>
 <div class="gx-management-stack">
 <section class="gx-management-row">
-<div class="gx-management-row-main"><span>▦</span><div><strong>Catálogo</strong><small>Productos, precios, inventario y ofertas.</small></div></div>
+<div class="gx-management-row-main"><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-grid"/></svg></span><div><strong>Catálogo</strong><small>Productos, precios, inventario y ofertas.</small></div></div>
 <div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('catalog')">Servicios</button><button onclick="gxOpenManagementDestination('promotions')">Promociones</button></div>
 </section>
 <section class="gx-management-row">
-<div class="gx-management-row-main"><span>✦</span><div><strong>Beneficios</strong><small>Lealtad, compensaciones y misiones.</small></div></div>
+<div class="gx-management-row-main"><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-star"/></svg></span><div><strong>Beneficios</strong><small>Lealtad, compensaciones y misiones.</small></div></div>
 <div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('loyalty')">Lealtad</button><button onclick="gxOpenManagementDestination('fairdeal')">Trato Justo</button><button onclick="gxOpenManagementDestination('missions')">Misiones</button></div>
 </section>
 <section class="gx-management-row">
-<div class="gx-management-row-main"><span>⌁</span><div><strong>Accesos</strong><small>Cuentas madre, ocupación y credenciales.</small></div></div>
+<div class="gx-management-row-main"><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-key"/></svg></span><div><strong>Accesos</strong><small>Cuentas madre, ocupación y credenciales.</small></div></div>
 <div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('accounts')">Cuentas</button><button onclick="gxOpenManagementDestination('credentials')">Credenciales</button></div>
 </section>
 <section class="gx-management-row">
-<div class="gx-management-row-main"><span>◇</span><div><strong>Experiencia</strong><small>Qué ve el cliente y qué incidencias están activas.</small></div></div>
+<div class="gx-management-row-main"><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-spark"/></svg></span><div><strong>Experiencia</strong><small>Qué ve el cliente y qué incidencias están activas.</small></div></div>
 <div class="gx-management-row-actions"><button onclick="gxOpenManagementDestination('app')">App</button><button onclick="gxOpenOpinionsAdmin()">Opiniones</button><button onclick="gxOpenManagementDestination('alerts')">Incidencias</button><button onclick="window.location.href='./comunicaciones.html'">Comunicaciones</button></div>
 </section>
 <section class="gx-management-row">
-<div class="gx-management-row-main"><span>◎</span><div><strong>Sistema</strong><small>Registro, elegibilidad y controles internos.</small></div></div>
+<div class="gx-management-row-main"><span><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-sliders"/></svg></span><div><strong>Sistema</strong><small>Registro, elegibilidad y controles internos.</small></div></div>
 <div class="gx-management-row-actions"><button onclick="gxOpenRegistrationControl()">Registro</button></div>
 </section>
 </div>
 </section>
 </main>
 </div>
-<div aria-hidden="true" class="gx-client-focus" id="gx-client-focus"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()">‹</button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong><small id="gx-focus-meta">—</small></div><button class="gx-focus-close" onclick="gxCloseClientFocus()">×</button></header><div class="gx-focus-summary" id="gx-focus-summary" hidden></div><nav class="gx-focus-nav gx-focus-nav-v195" id="gx-focus-nav"><button class="active" data-gx-focus-section="billing" onclick="gxFocusSection('billing',this)">Cobro</button><button data-gx-focus-section="services" onclick="gxFocusSection('services',this)">Servicios</button><button data-gx-focus-section="benefits" onclick="gxFocusSection('benefits',this)">Beneficios</button><button data-gx-focus-section="account" onclick="gxFocusSection('account',this)">Cuenta</button></nav><div class="gx-focus-overview" id="gx-focus-overview"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
+<div aria-hidden="true" class="gx-client-focus" id="gx-client-focus"><div class="gx-focus-backdrop" onclick="gxCloseClientFocus()"></div><section class="gx-focus-sheet"><div class="gx-focus-handle"></div><header class="gx-focus-header"><button class="gx-focus-back" onclick="gxCloseClientFocus()" aria-label="Volver"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-chevron-left"/></svg></button><div class="gx-focus-identity"><span id="gx-focus-folio">Cliente</span><strong id="gx-focus-name">—</strong><small id="gx-focus-meta">—</small></div><button class="gx-focus-close" onclick="gxCloseClientFocus()" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button></header><div class="gx-focus-summary" id="gx-focus-summary" hidden></div><nav class="gx-focus-nav gx-focus-nav-v195" id="gx-focus-nav"><button class="active" data-gx-focus-section="billing" onclick="gxFocusSection('billing',this)">Cobro</button><button data-gx-focus-section="services" onclick="gxFocusSection('services',this)">Servicios</button><button data-gx-focus-section="benefits" onclick="gxFocusSection('benefits',this)">Beneficios</button><button data-gx-focus-section="account" onclick="gxFocusSection('account',this)">Cuenta</button></nav><div class="gx-focus-overview" id="gx-focus-overview"></div><div class="gx-focus-body" id="gx-focus-body"></div></section></div>
 <div aria-hidden="true" class="gx-registration-control" id="gx-registration-control">
 <div class="gx-registration-backdrop" onclick="gxCloseRegistrationControl()"></div>
 <section class="gx-registration-sheet">
@@ -753,7 +803,7 @@
 <h2>Registro &amp; activación</h2>
 <p>Valida nuevas altas, prepara códigos temporales de 24 h y evita duplicados antes de crear Mi Espacio.</p>
 </div>
-<button onclick="gxCloseRegistrationControl()" type="button">×</button>
+<button onclick="gxCloseRegistrationControl()" type="button" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
 </header>
 <div class="gx-registration-kpis">
 <div class="new"><span>Nuevos</span><strong id="gx-reg-kpi-new">0</strong><small>Listos para aprobar</small></div>
@@ -777,7 +827,7 @@
 <section class="gx-activation-delivery-sheet">
 <header>
 <div><span class="gx-eyebrow">Código creado</span><h3 id="gx-activation-delivery-name">Cliente</h3><p>Este código se muestra una sola vez. Al regenerarlo, el anterior deja de funcionar.</p></div>
-<button onclick="gxCloseActivationDelivery()" type="button">×</button>
+<button onclick="gxCloseActivationDelivery()" type="button" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
 </header>
 <div class="gx-activation-credential-grid">
 <div><span>GOXION ID</span><strong id="gx-activation-delivery-user">@usuario</strong></div>
@@ -795,12 +845,12 @@
 <aside aria-hidden="true" class="gx-notification-drawer" id="gx-notification-drawer">
 <div class="gx-notification-drawer-head">
 <div><span class="gx-eyebrow">Actividad</span><h3>Notificaciones</h3></div>
-<button class="gx-focus-close" onclick="gxToggleNotifications(false)" type="button">×</button>
+<button class="gx-focus-close" onclick="gxToggleNotifications(false)" type="button" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
 </div>
 <div class="gx-notification-toolbar">
 <div class="gx-notif-summary" id="gx-notification-summary">Pagos, solicitudes y actividad de Mi Espacio.</div>
-<button class="gx-notif-read" onclick="gxMarkAllNotificationsRead()" title="Marcar como atendidas las visibles" type="button">✓</button>
-<button class="gx-notif-refresh" onclick="gxRefreshNotifications()" title="Actualizar" type="button">↻</button>
+<button class="gx-notif-read" onclick="gxMarkAllNotificationsRead()" title="Marcar como atendidas las visibles" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-check"/></svg></button>
+<button class="gx-notif-refresh" onclick="gxRefreshNotifications()" title="Actualizar" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-refresh"/></svg></button>
 </div>
 <div class="gx-notification-filter-row" id="gx-notification-filters">
 <button class="gx-notif-filter active" data-gx-notif-filter="all" onclick="gxSetNotificationFilter('all',this)" type="button">Prioridad <b id="gx-notif-count-all">0</b></button>
@@ -825,13 +875,13 @@
 <h3 id="gx-payment-client-name">Cliente</h3>
 <small id="gx-payment-client-meta"></small>
 </div>
-<button class="gx-focus-close" onclick="gxClosePaymentModal()" type="button">×</button>
+<button class="gx-focus-close" onclick="gxClosePaymentModal()" type="button" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
 </header>
 <div class="gx-payment-review-card" id="gx-payment-review-card"></div>
 <div class="gx-payment-actions">
-<button class="gx-payment-action approve" onclick="gxPaymentApprove()" type="button">✓ Aprobar</button>
-<button class="gx-payment-action incomplete" onclick="gxPreparePaymentIncomplete()" type="button">⚠ Pago incompleto</button>
-<button class="gx-payment-action reject" onclick="gxPaymentReject()" type="button">✕ Rechazar</button>
+<button class="gx-payment-action approve" onclick="gxPaymentApprove()" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-check"/></svg> Aprobar</button>
+<button class="gx-payment-action incomplete" onclick="gxPreparePaymentIncomplete()" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-alert"/></svg> Pago incompleto</button>
+<button class="gx-payment-action reject" onclick="gxPaymentReject()" type="button"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg> Rechazar</button>
 </div>
 <div class="gx-payment-extra">
 <label class="gx-inline-check"><input checked="" id="gx-payment-punctual" type="checkbox"/><span>Contar como pago puntual para Lealtad</span></label>
@@ -872,8 +922,8 @@
 <div class="gx-tj-backdrop" onclick="gxCloseTratoJusto()"></div>
 <section aria-modal="true" class="gx-tj-modal" role="dialog">
 <header class="gx-tj-head">
-<div><span>GARANTÍA GOXION</span><strong>🛡 Trato Justo</strong></div>
-<button onclick="gxCloseTratoJusto()" type="button">×</button>
+<div><span>GARANTÍA GOXION</span><strong><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-shield"/></svg> Trato Justo</strong></div>
+<button onclick="gxCloseTratoJusto()" type="button" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
 </header>
 <div class="gx-tj-body">
 <div class="gx-tj-service">
@@ -932,7 +982,7 @@
 <div aria-hidden="true" class="gx-product-builder" id="gx-product-builder">
 <div class="gx-product-builder-backdrop" onclick="gxCloseProductBuilder(event)"></div>
 <section aria-labelledby="gx-product-builder-title" aria-modal="true" class="gx-product-builder-sheet" role="dialog">
-<button aria-label="Cerrar" class="gx-product-builder-close" onclick="gxCloseProductBuilder(event)" type="button">×</button>
+<button aria-label="Cerrar" class="gx-product-builder-close" onclick="gxCloseProductBuilder(event)" type="button" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
 <span class="gx-eyebrow">Catálogo inteligente</span>
 <h2 id="gx-product-builder-title">Nuevo producto</h2>
 <p class="gx-product-builder-copy">Escribe un servicio normal o usa <strong> + </strong> entre plataformas. GOXION propondrá la composición y tú la confirmas antes de guardar.</p>
@@ -941,13 +991,13 @@
 <input id="gx-product-name" oninput="gxProductNameChanged()" placeholder="Ej. ViX + Netflix" type="text"/>
 </label>
 <div class="gx-product-detection" id="gx-product-detection">
-<i>◇</i><div><strong>Esperando nombre</strong><span>Disney+ no se interpreta como combo; solo se detecta el signo + separado por espacios.</span></div>
+<i><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-info"/></svg></i><div><strong>Esperando nombre</strong><span>Disney+ no se interpreta como combo; solo se detecta el signo + separado por espacios.</span></div>
 </div>
 <div class="gx-product-components" id="gx-product-components"></div>
 <div class="gx-product-manual-row">
 <select id="gx-product-component-select"></select>
 <input aria-label="Cantidad" id="gx-product-component-qty" max="20" min="1" type="number" value="1"/>
-<button onclick="gxAddManualProductComponent()" type="button">＋</button>
+<button onclick="gxAddManualProductComponent()" type="button" aria-label="Agregar componente"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-plus"/></svg></button>
 </div>
 <div class="gx-product-builder-grid">
 <label class="gx-product-builder-field"><span>Precio de venta</span><input id="gx-product-price" min="0" step="0.01" type="number" value="0"/></label>
@@ -982,7 +1032,7 @@
   <section class="gx-benefit-sheet" role="dialog" aria-modal="true" aria-labelledby="gx-benefit-title">
     <header>
       <div><span class="gx-eyebrow">Cobro inteligente</span><h2 id="gx-benefit-title">Programar descuento</h2><p id="gx-benefit-client">Cliente</p></div>
-      <button type="button" class="gx-benefit-close" onclick="gxCloseBenefitModal()">×</button>
+      <button type="button" class="gx-benefit-close" onclick="gxCloseBenefitModal()" aria-label="Cerrar"><svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-x"/></svg></button>
     </header>
     <input type="hidden" id="gx-benefit-key">
     <div class="gx-benefit-form">

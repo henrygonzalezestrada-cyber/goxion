@@ -1,5 +1,5 @@
 /* ============================================================
-   GOXION // ADMIN — Rediseño (ESPEJO)
+   GOXION // ADMIN — Rediseño v2 (ESPEJO)
    preview/admin-rediseno/admin-rediseno.js
    SOLO espejo. No modifica los 43 scripts oficiales: los envuelve
    (mismo patrón de wrappers que usa Admin) o lee sus globales.
@@ -7,8 +7,11 @@
      14-admin-mobile-controller.js (misma fuente de datos, mismas
      acciones, sin duplicar lógica de negocio). Si 14 cambia, este
      fork debe revisarse (ver README del espejo).
-   - Conteo animado, pop de badge, campana como hoja inferior,
-     "ver más" en próximos vencimientos, refrescos y pull-to-refresh.
+   - v2: contadores easeOutExpo desde el valor anterior (nunca
+     desde 0), morph skeleton→contenido, stagger con presupuesto
+     de 500 ms, arrastre de hojas, check-pop + partículas,
+     intercambiador de iconos para contenido dinámico, cambio de
+     pestaña con solape de 60 ms.
    ============================================================ */
 (function(){
 "use strict";
@@ -80,6 +83,8 @@ function gx2FeedRowsForFilter(rows){
 }
 
 const GX2_LABELS = { review: "Pago", overdue: "Vencido", cancellation: "Cancelación", support: "Soporte", activity: "Actividad" };
+const GX2_KIND_ICON = { review: "doc", overdue: "alert", cancellation: "x", support: "message", activity: "clock" };
+const gx2Icon = name => `<svg class="gx2-ic" aria-hidden="true"><use href="#gx2-ic-${name}"/></svg>`;
 
 function gx2RenderFeed(){
   const feed = $("gx-decision-feed");
@@ -88,25 +93,42 @@ function gx2RenderFeed(){
     /* Sin capa de datos (sin sesión Admin o sin red), los esqueletos no
        deben quedarse para siempre: a los 4 s se muestra el estado real. */
     if (Date.now() - gx2BootAt > 4000){
-      feed.innerHTML = `<div class="gx2-feed-empty">Sin sesión Admin: inicia sesión para cargar las decisiones.</div>`;
+      feed.innerHTML = `<div class="gx2-feed-empty">${gx2Icon("lock")}<strong>Sin sesión Admin</strong><p>Inicia sesión para cargar las decisiones. Tus pendientes aparecerán aquí.</p></div>`;
       feed.classList.add("gx2-no-enter");
     }
     return;
   }
-  const rows = gx2FeedRowsForFilter(gx2BuildDecisionRows()).slice(0, 8);
-  const total = gx2FeedRowsForFilter(gx2BuildDecisionRows()).length;
+  /* Morph skeleton → contenido: los esqueletos se atenúan 160 ms
+     y luego entran las tarjetas (360 ms expo + 80 ms de desfase). */
+  if (!reduced && feed.querySelector(".gx2-skeleton-card")){
+    feed.querySelectorAll(".gx2-skeleton-card, .gx2-sk-caption").forEach(el => el.classList.add("gx2-morph-out"));
+    setTimeout(gx2RenderFeedNow, 160);
+    return;
+  }
+  gx2RenderFeedNow();
+}
+
+function gx2RenderFeedNow(){
+  const feed = $("gx-decision-feed");
+  if (!feed) return;
+  const all = gx2FeedRowsForFilter(gx2BuildDecisionRows());
+  const rows = all.slice(0, 8);
+  const total = all.length;
   if (!rows.length){
-    feed.innerHTML = `<div class="gx2-feed-empty">Nada pendiente en esta categoría. Al corriente.</div>`;
+    feed.innerHTML = `<div class="gx2-feed-empty">${gx2Icon("check")}<strong>Al corriente</strong><p>Nada pendiente en esta categoría. Cuando llegue algo, aparecerá aquí.</p></div>`;
     feed.classList.add("gx2-no-enter");
     return;
   }
+  /* Stagger con presupuesto: total 500 ms, tarjeta 360 ms →
+     desfase = (500−360)÷(n−1) por tarjeta. */
+  const stagger = rows.length > 1 ? 140 / (rows.length - 1) : 0;
   feed.innerHTML = rows.map((x, i) => {
     const safeId = String(x.id || "").replace(/'/g, "");
     const safeKey = String(x.key || "").replace(/'/g, "");
     const amount = (x.category === "review" || x.category === "overdue") && x.amount != null
       ? `<span class="gx2-feed-amount">${money0(x.amount)}</span>` : "";
-    return `<article class="gx2-feed-card ${x.category}" style="--gx2-i:${Math.min(i, 5)}">
-      <span class="gx2-feed-kind ${x.category}">${GX2_LABELS[x.category] || "Actividad"}</span>
+    return `<article class="gx2-feed-card ${x.category}" style="--gx2-d:${Math.round(i * stagger)}ms">
+      <span class="gx2-feed-kind ${x.category}">${gx2Icon(GX2_KIND_ICON[x.category] || "clock")}${GX2_LABELS[x.category] || "Actividad"}</span>
       <strong class="gx2-feed-title">${esc(x.title)}</strong>
       <p class="gx2-feed-msg">${esc(x.message)}</p>
       <div class="gx2-feed-foot">
@@ -166,8 +188,11 @@ window.gx2ToggleUpcomingMore = function(){
 };
 
 /* ---------------------------------------------------------------
-   CONTEO ANIMADO (600-800 ms, ease-out) — solo en la primera
-   pintura con datos. Los cambios por Realtime no se animan.
+   CONTEO ANIMADO (easeOutExpo: 600 ms si Δ < $20, 900 ms si
+   Δ ≥ $20) — desde el valor anterior, nunca desde 0; sin
+   animación si Δ < $1; máximo 1 animación a la vez por contador.
+   Si el código oficial escribe durante la animación, al terminar
+   se respeta su valor (no se pisa con el texto viejo).
    --------------------------------------------------------------- */
 const GX2_COUNT_TARGETS = [
   { id: "kpi-ingresos", kind: "money" }, { id: "kpi-costos", kind: "money" },
@@ -179,37 +204,48 @@ function gx2ParseNumber(text){
   const m = String(text || "").replace(/,/g, "").match(/-?\d+(\.\d+)?/);
   return m ? Number(m[0]) : 0;
 }
-function gx2AnimateCount(el, from, to, kind, finalText){
-  if (reduced || from === to){ el.textContent = finalText; return; }
-  const start = performance.now(), dur = 700;
-  const fmt = v => kind === "money" ? `$${v.toFixed(2)}`
-    : kind === "percent" ? `${v.toFixed(1)}%`
-    : kind === "suffixed" ? `${Math.round(v)}${Math.round(v) === 1 ? " pendiente" : " pendientes"}`
-    : `${Math.round(v)}`;
-  function frame(now){
-    const t = Math.min(1, (now - start) / dur);
-    const eased = 1 - Math.pow(1 - t, 3);
-    el.textContent = fmt(from + (to - from) * eased);
-    if (t < 1) requestAnimationFrame(frame);
-    else el.textContent = finalText;
-  }
-  requestAnimationFrame(frame);
-}
 function gx2WatchCounts(){
   GX2_COUNT_TARGETS.forEach(({ id, kind }) => {
     const el = $(id);
     if (!el) return;
-    let done = false;
-    const initial = el.textContent;
-    const obs = new MutationObserver(() => {
-      if (done) return;
+    let last = gx2ParseNumber(el.textContent);
+    let rafId = 0, animating = false, first = true, lastWritten = el.textContent;
+    const fmt = v => kind === "money" ? `$${v.toFixed(2)}`
+      : kind === "percent" ? `${v.toFixed(1)}%`
+      : kind === "suffixed" ? `${Math.round(v)}${Math.round(v) === 1 ? " pendiente" : " pendientes"}`
+      : `${Math.round(v)}`;
+    const animate = (from, to, finalText) => {
+      if (reduced || from === to){ el.textContent = finalText; last = to; return; }
+      cancelAnimationFrame(rafId);
+      animating = true;
+      const start = performance.now(), dur = Math.abs(to - from) >= 20 ? 900 : 600;
+      const frame = now => {
+        const t = Math.min(1, (now - start) / dur);
+        const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+        lastWritten = fmt(from + (to - from) * eased);
+        el.textContent = lastWritten;
+        if (t < 1) rafId = requestAnimationFrame(frame);
+        else {
+          animating = false;
+          if (el.textContent === lastWritten) el.textContent = finalText;
+          last = gx2ParseNumber(el.textContent);
+        }
+      };
+      rafId = requestAnimationFrame(frame);
+    };
+    new MutationObserver(() => {
+      if (animating) return;
       const current = el.textContent;
-      if (current === initial) return;
-      done = true;
-      obs.disconnect();
-      gx2AnimateCount(el, gx2ParseNumber(initial), gx2ParseNumber(current), kind, current);
-    });
-    obs.observe(el, { childList: true, characterData: true, subtree: true });
+      const to = gx2ParseNumber(current);
+      if (first){
+        first = false;
+        if (last === 0){ last = to; return; } /* nunca contar desde 0 */
+        animate(last, to, current);
+        return;
+      }
+      if (Math.abs(to - last) < 1){ last = to; return; } /* Δ < $1: directo */
+      animate(last, to, current);
+    }).observe(el, { childList: true, characterData: true, subtree: true });
   });
 }
 
@@ -223,10 +259,31 @@ document.addEventListener("click", e => {
   const t = e.target.closest("button");
   if (!t) return;
   const oc = t.getAttribute("onclick") || "";
-  if (/gxPaymentApprove|gxMarkNotificationRead|gxDeleteNotification|gxPaymentIncomplete|gxPaymentReject|gxConfirmIncomplete|gxOpenDecision/.test(oc)
-      || t.closest("#gx-decision-feed") || t.closest("#gx-mobile-ops-list"))
+  const isDecision = /gxPaymentApprove|gxMarkNotificationRead|gxDeleteNotification|gxPaymentIncomplete|gxPaymentReject|gxConfirmIncomplete|gxOpenDecision/.test(oc)
+      || t.closest("#gx-decision-feed") || t.closest("#gx-mobile-ops-list");
+  if (isDecision){
     gx2DecidedAt = Date.now();
+    gx2CheckPop(t);
+  }
 }, true);
+
+/* Check-pop + partículas al aprobar/atender: el botón hace pop
+   (420 ms ease-back) y suelta 6 partículas verdes (520 ms). Solo
+   el primer toque que cambia estado; los toques repetidos en
+   560 ms no vuelven a disparar. */
+function gx2CheckPop(btn){
+  if (!btn || reduced || btn.querySelector(".gx2-particle")) return;
+  btn.classList.add("gx2-check-pop");
+  setTimeout(() => btn.classList.remove("gx2-check-pop"), 450);
+  if (getComputedStyle(btn).position === "static") btn.style.position = "relative";
+  for (let i = 0; i < 6; i++){
+    const p = document.createElement("span");
+    p.className = "gx2-particle";
+    p.style.setProperty("--gx2-a", `${i * 60}deg`);
+    btn.appendChild(p);
+    setTimeout(() => p.remove(), 560);
+  }
+}
 
 function gx2Pop(el){
   if (!el || reduced) return;
@@ -277,6 +334,91 @@ function gx2WatchBadges(){
     return undefined;
   };
 })();
+
+/* ---------------------------------------------------------------
+   CAMBIO DE PESTAÑA: la saliente se atenúa 160 ms y la entrante
+   empieza 60 ms después (solape de 60 ms, expo 300 ms). Sin
+   solape en movimiento reducido.
+   --------------------------------------------------------------- */
+(function wrapTabs(){
+  const install = () => {
+    const prev = window.goAdminTab;
+    if (typeof prev !== "function" || prev.__gx2Wrapped) return false;
+    const wrapped = function(id, btn){
+      const current = document.querySelector(".tab-content.active");
+      if (current && current.id !== id && !reduced){
+        current.classList.add("gx2-leaving");
+        setTimeout(() => {
+          prev.call(this, id, btn);
+          current.classList.remove("gx2-leaving");
+        }, 60);
+      } else prev.call(this, id, btn);
+    };
+    wrapped.__gx2Wrapped = true;
+    window.goAdminTab = wrapped;
+    return true;
+  };
+  if (!install()) document.addEventListener("DOMContentLoaded", install);
+})();
+
+/* ---------------------------------------------------------------
+   ARRASTRE DE HOJAS (solo teléfono): tirar hacia abajo con
+   resistencia 0.55; soltar a >120 px o >0.5 px/ms cierra la hoja
+   (salida 300 ms); si no, vuelve con muelle 320 ms. El cierre usa
+   siempre la función oficial (gxCloseClientFocus,
+   gxClosePaymentModal, gxToggleNotifications(false)). El arrastre
+   solo arranca desde el tirador o desde los 28 px superiores de
+   la hoja, nunca desde botones o campos.
+   --------------------------------------------------------------- */
+function gx2AttachSheetDrag(sheet, closeFn, handleSel){
+  if (!sheet || reduced) return;
+  let startY = 0, startT = 0, dy = 0, dragging = false;
+  const handle = handleSel ? sheet.querySelector(handleSel) : null;
+  const hitZone = e => {
+    if (window.innerWidth > 840) return false;
+    if (e.target.closest("button, input, select, textarea, a")) return false;
+    if (handle && handle.contains(e.target)) return true;
+    const r = sheet.getBoundingClientRect();
+    return e.clientY - r.top <= 28;
+  };
+  sheet.addEventListener("pointerdown", e => {
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (!hitZone(e)) return;
+    dragging = true; startY = e.clientY; startT = performance.now(); dy = 0;
+    try { sheet.setPointerCapture(e.pointerId); } catch (_) {}
+  });
+  sheet.addEventListener("pointermove", e => {
+    if (!dragging) return;
+    dy = Math.max(0, e.clientY - startY);
+    if (dy > 0){
+      sheet.classList.add("gx2-dragging");
+      sheet.style.transform = `translateY(${dy * 0.55}px)`;
+    }
+  });
+  const finish = () => {
+    if (!dragging) return;
+    dragging = false;
+    const dt = Math.max(1, performance.now() - startT);
+    const v = dy / dt;
+    sheet.classList.remove("gx2-dragging");
+    if (dy > 120 || v > 0.5){
+      sheet.classList.add("gx2-closing");
+      sheet.style.transform = "translateY(105%)";
+      setTimeout(() => {
+        sheet.classList.remove("gx2-closing");
+        sheet.style.transform = "";
+        closeFn();
+      }, 300);
+    } else if (dy > 0){
+      sheet.style.transition = "transform .32s var(--spring-soft)";
+      sheet.style.transform = "";
+      setTimeout(() => { sheet.style.transition = ""; }, 340);
+    }
+    dy = 0;
+  };
+  sheet.addEventListener("pointerup", finish);
+  sheet.addEventListener("pointercancel", finish);
+}
 
 /* ---------------------------------------------------------------
    REFRESCOS VISIBLES (siempre hay botón; el gesto es secundario)
@@ -342,12 +484,100 @@ window.gx2RefreshOps = function(){
 })();
 
 /* ---------------------------------------------------------------
+   INTERCAMBIADOR DE ICONOS (contenido dinámico de los 43 scripts
+   oficiales): los glifos emoji/símbolo que 06/07/08/09/10/23/28/34
+   inyectan (⛔ 🔔 ✓ ⚠ ◷ 🧪 ⚠️ ⏳ 👁) se sustituyen por el mismo
+   SVG del sprite. Observador con debounce de 150 ms, solo en los
+   contenedores que mutaron; idempotente (el SVG es un elemento,
+   no texto, así que una segunda pasada no lo vuelve a tocar).
+   --------------------------------------------------------------- */
+const GX2_GLYPH_ICON = { "⛔": "alert", "🔔": "bell", "✓": "check", "⚠": "alert", "◷": "clock", "🧪": "flask", "⏳": "clock", "👁": "eye" };
+const GX2_GLYPH_RE = /[⛔🔔✓⚠◷🧪⏳👁]/;
+function gx2SwapIconsIn(root){
+  if (!root || root.nodeType !== 1) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode(node){
+      if (!GX2_GLYPH_RE.test(node.nodeValue)) return NodeFilter.FILTER_REJECT;
+      const p = node.parentElement;
+      if (!p || p.closest("script, style, input, textarea, select")) return NodeFilter.FILTER_REJECT;
+      return NodeFilter.FILTER_ACCEPT;
+    }
+  });
+  const nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(node => {
+    const frag = document.createDocumentFragment();
+    let rest = node.nodeValue, m;
+    while ((m = GX2_GLYPH_RE.exec(rest))){
+      if (m.index > 0) frag.appendChild(document.createTextNode(rest.slice(0, m.index)));
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "gx2-ic");
+      svg.setAttribute("aria-hidden", "true");
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttribute("href", `#gx2-ic-${GX2_GLYPH_ICON[m[0]]}`);
+      svg.appendChild(use);
+      frag.appendChild(svg);
+      rest = rest.slice(m.index + m[0].length);
+    }
+    if (rest) frag.appendChild(document.createTextNode(rest));
+    node.parentNode.replaceChild(frag, node);
+  });
+}
+(function gx2WatchIcons(){
+  const scopeIds = ["gx-focus-overview", "gx-focus-body", "clients-container",
+    "gx-mobile-ops-list", "gx-notification-list", "gx-next-payments-list",
+    "gx-catalog-mobile-list", "gx-promo-list"];
+  const dirty = new Set();
+  let timer = 0;
+  const flush = () => {
+    timer = 0;
+    dirty.forEach(id => gx2SwapIconsIn($(id)));
+    dirty.clear();
+  };
+  const queue = id => {
+    dirty.add(id);
+    if (!timer) timer = setTimeout(flush, 150);
+  };
+  scopeIds.forEach(id => {
+    const el = $(id);
+    if (!el) return;
+    new MutationObserver(() => queue(id)).observe(el, { childList: true, subtree: true, characterData: true });
+    gx2SwapIconsIn(el);
+  });
+  setTimeout(() => scopeIds.forEach(id => gx2SwapIconsIn($(id))), 1500);
+})();
+
+/* ---------------------------------------------------------------
    INICIO: re-render del feed tras cada resumen, "ver más" en
    próximos vencimientos y primera pintura.
    --------------------------------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   gx2WatchCounts();
   gx2WatchBadges();
+  /* Arrastre de hojas (ficha de cliente, pago, notificaciones). */
+  const focusSheet = document.querySelector(".gx-focus-sheet");
+  if (focusSheet) gx2AttachSheetDrag(focusSheet, () => { if (typeof window.gxCloseClientFocus === "function") window.gxCloseClientFocus(); }, ".gx-focus-handle");
+  const paySheet = document.querySelector(".gx-payment-sheet");
+  if (paySheet) gx2AttachSheetDrag(paySheet, () => { if (typeof window.gxClosePaymentModal === "function") window.gxClosePaymentModal(); }, ".gx-focus-handle");
+  const drawer = $("gx-notification-drawer");
+  if (drawer) gx2AttachSheetDrag(drawer, () => { if (typeof window.gxToggleNotifications === "function") window.gxToggleNotifications(false); }, null);
+  /* Stagger de la bandeja de Operaciones en la primera pintura. */
+  const opsList = $("gx-mobile-ops-list");
+  if (opsList){
+    let opsStaggerDone = false, opsTimer = 0;
+    new MutationObserver(() => {
+      if (opsStaggerDone) return;
+      clearTimeout(opsTimer);
+      opsTimer = setTimeout(() => {
+        const items = [...opsList.children].filter(el => el.classList.contains("gx-mobile-op-item"));
+        if (!items.length) return;
+        opsStaggerDone = true;
+        const stagger = items.length > 1 ? 140 / (items.length - 1) : 0;
+        items.forEach((el, i) => el.style.setProperty("--gx2-d", `${Math.round(i * stagger)}ms`));
+        setTimeout(() => opsList.classList.add("gx2-no-enter"), 500);
+      }, 150);
+    }).observe(opsList, { childList: true, subtree: false });
+  }
   const upcoming = $("gx-next-payments-list");
   if (upcoming){
     new MutationObserver(gx2ApplyUpcomingMore)

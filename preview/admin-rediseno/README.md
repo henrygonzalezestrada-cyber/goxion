@@ -16,6 +16,123 @@ con corrección 23:25: **ya no quiere la barra flotante inferior**.
 - `admin-sandbox.js` — adaptado de `preview/integracion-b2/admin-sandbox.js`
   (ruta nueva + `b2_cotizar_ciclo` permitido, solo lectura).
 
+**v2 (2026-11-12):** reconstrucción completa desde v1 tras el rechazo visual
+de Henry (00:04, "no veo el cambio que pedí... se ve sumamente igual") y su
+corrección 00:12 ("No las mismas animaciones, hay que llevar este trabajo al
+siguiente nivel"). Ver la sección **v2** abajo. La v1 queda como referencia
+histórica en §2/§6.
+
+## v2 — Reconstrucción tras el rechazo (2026-11-12 00:12)
+
+### Identidad nueva ("Papel")
+- **Paleta:** fondo `#f3f0e8` (papel cálido), superficie `#ffffff`,
+  superficie-2 `#eae6d9`, tinta `#1b1812`, muted `#6e6759`, línea `#e2dccb`;
+  primario verde `#0b6e4f` (brillante `#0e9f6e`, suave `#e3f2ea`); ámbar
+  `#b45309`, rojo `#d92d20`, violeta `#6d28d9` solo como señal. Sombras
+  cálidas suaves, sin glow neón.
+- **Tipografía:** Sora 600/700/800 en display, cifras e importes; sans del
+  sistema en cuerpo. La oficial y la v1 usaban Rajdhani.
+- **Espaciado:** radios 20 px tarjetas / 14 px controles; encabezado
+  compacto 132/137/141 px por breakpoint; Inicio centrado a 760 px en
+  escritorio (dos columnas: decidir+cobrar / feed+negocio).
+- **A primera vista:** fondo claro cálido vs negro `#030305` de la oficial;
+  verificado lado a lado a 390 px (capturas en `/tmp/gx2-v2/`).
+
+### Sistema de iconos
+- Un sprite SVG inline oculto con **37 símbolos** (`#gx2-ic-*`), rejilla
+  24 px, trazo 1.8, extremos y uniones redondos, `currentColor`: home,
+  users, layers, sliders, bell, search, plus, check, x, chevron-down/right/
+  left, clock, alert, refresh, filter, power, eye, message, calendar,
+  shield, target, key, spark, grid, star, mail, doc, card, trash,
+  check-square, zap, arrow-right, arrow-up-right, info, lock, flask.
+- Sustituye **todos** los emoji/símbolos estáticos del HTML (🔔 ⌂ 👥 ◎ ⌘ ⏻
+  ⌕ ⌁ 🎯 ✦ 🛡 ✉ 🔐 ✨ ⚠️ 👁 ✓ ☑ ⌫ ↻ ↺ ▦ ◇ ＋ × ‹ →): 0 glifos restantes
+  en el HTML estático (verificado por grep); 63 usos `<use>`.
+- Contenido dinámico de los 43 scripts: `admin-rediseno.js`
+  (`gx2WatchIcons`) sustituye ⛔ 🔔 ✓ ⚠ ◷ 🧪 ⚠️ ⏳ 👁 por el mismo SVG,
+  con MutationObserver + debounce 150 ms, solo en los contenedores que
+  mutaron (ficha, lista de clientes, bandeja de Operaciones,
+  notificaciones, próximos vencimientos, catálogo, promociones);
+  idempotente (el SVG es un elemento, no texto).
+
+### Organización (antes → después, Inicio)
+| Antes (v1 / oficial) | Después (v2) |
+|---|---|
+| HOY → Tu veredicto → COBRO → NEGOCIO → PANORAMA | Decide ahora (héroe) → Feed de decisiones → Cobrar → Panorama |
+| "Qué requiere tu atención" | "Decide ahora" |
+| Centro de decisión como tarjeta grande, 4 chips en fila con scroll horizontal | Tira compacta: total en píldora verde + 4 chips en 2×2 en teléfono (nada escondido), 1×4 en escritorio |
+| Bandeja de decisiones como una sección más | El feed ES la pantalla: "Qué decides ahora", tarjetas con borde de color por tipo + píldora de tipo con icono |
+| Hoy/vencidos arriba del todo | Dentro de "Cobrar", junto a Próximos vencimientos (5 + "ver más") |
+| Negocio/panorama abierto en escritorio, plegado en teléfono (v1 lo dejaba abierto por `open=""`) | Plegado por defecto en ambas (`open=""` quitado): "Finanzas y panorama" se abre a demanda |
+| Barra inferior móvil (oficial) / segmentada (v1) | Segmentada sticky (se mantiene; Henry rechazó la barra inferior) |
+
+### Animaciones v2 (explícitas — reemplazan la §6 v1 por corrección de Henry)
+| Elemento | Valores | Patrón adaptado |
+|---|---|---|
+| Héroe "Decide ahora" | entrada 420 ms `cubic-bezier(0.16,1,0.3,1)` (expo), translateY(12px) + opacidad | Entrada de héroe (primero el contexto, luego el contenido) |
+| Tarjetas del feed | 360 ms expo, stagger con presupuesto: desfase = (500−360)÷(n−1) ms por tarjeta, total máx. 500 ms | Entrada escalonada coreografiada (el conjunto entra como uno) |
+| Decisión destacada (veredicto) | 500 ms muelle `linear(0, 0.18, 0.42, 0.72, 0.95, 1.06, 1.04, 1.01, 0.99, 1)` + fallback `cubic-bezier(0.34,1.56,0.64,1)` | Spring (overshoot leve, nunca rebote exagerado) |
+| Cambio de pestaña | saliente 160 ms ease-out (translateY −8px + opacidad), entrante 300 ms expo con 60 ms de solape | Transición de pestañas con solape |
+| Presión táctil (botones, chips, tarjetas) | bajar 80–100 ms lineal a scale 0.95 (0.97 en segmentada/píldoras), soltar 240 ms muelle | Micro-interacción que responde al gesto |
+| Pop de badge | 280 ms `cubic-bezier(0.34,1.56,0.64,1)` (ease-back), solo scale | Pop de contador al decidir |
+| Check-pop al aprobar/atender | 420 ms ease-back (1 → 1.35 → 0.9 → 1.08 → 1) + 6 partículas verdes 520 ms ease-out, radio 26 px | Confirmación con celebración mínima (solo el primer toque que cambia estado) |
+| Contadores | easeOutExpo 600 ms (Δ < $20) / 900 ms (Δ ≥ $20), desde el valor anterior, nunca desde 0, sin animar si Δ < $1, máx. 1 a la vez | Contador vivo (el número viaja desde donde estaba) |
+| Skeleton → contenido | esqueleto atenúa 160 ms, contenido entra 360 ms expo + 80 ms de desfase, mismo hueco | Morph skeleton→contenido (el contenido ocupa el hueco del esqueleto) |
+| Hojas inferiores | entrar 500 ms (grande) / 320 ms (pequeña) `cubic-bezier(0.32,0.72,0,1)` (curva de cajón iOS), salir 300 ms (60% de la entrada), fondo atenúa 200 ms | Sheet de iOS (entrar lento, salir más rápido) |
+| Arrastre de hoja | resistencia 0.55, descartar a >120 px o >0.5 px/ms, retorno con muelle 320 ms | Arrastre con resistencia (la hoja sigue el dedo y vuelve si no se suelta lejos) |
+| Toast | entrar 320 ms ease-back, visible 2600 ms, salir 200 ms; reubicado como banda bajo el encabezado | Toast de confirmación (nunca tapa el encabezado) |
+| Iconos | morph 220 ms al cambiar de estado | Icono que se transforma en vez de aparecer/desaparecer |
+| Error | shake 400 ms `cubic-bezier(0.77,0,0.175,1)` | Shake de error (solo en error real) |
+| Ambiental (máx. 2–3 a la vez) | punto LIVE 1500 ms, shimmer de esqueleto 1600 ms lineal, respiro total 500 ms una vez al cambiar | Movimiento ambiental con sentido |
+| Movimiento reducido | solo opacidad 200 ms, stagger 0, sin shimmer/pulso/partículas | `prefers-reduced-motion: reduce` |
+
+Reglas globales: solo transform/opacity (nunca layout/width); entradas solo
+en la primera pintura; sin overshoot en acciones de alta frecuencia
+(filtros, pestañas, aprobar en lote: presión 0.97 + retorno 150 ms);
+`linear()` con fallback cubic-bezier (Safari 17.2+); View Transitions solo
+como mejora progresiva, nunca el mecanismo principal.
+
+### Defectos de la v1 corregidos (y cómo se verificó cada uno)
+| Defecto v1 | Corrección v2 | Verificación |
+|---|---|---|
+| Misma identidad neón oscura | Identidad "Papel" completa (paleta, Sora, espaciado) | Lado a lado 390 px: fondo `rgb(243,240,232)` vs oficial `rgb(3,3,5)`; capturas `/tmp/gx2-v2/` |
+| Iconos emoji/símbolo | Sprite SVG de 37 símbolos + intercambiador dinámico | grep: 0 glifos en HTML estático; 63 `<use>`; verificador Playwright |
+| Mismo orden de secciones | Inicio = Decide ahora → Feed → Cobrar → Panorama | Orden de nodos en el HTML + captura |
+| Animaciones = §6 tal cual | Sistema diferenciado con muelle, stagger con presupuesto, morph, arrastre, check-pop (tabla de arriba) | Valores en `admin-rediseno.css` §14 y `admin-rediseno.js`; esqueletos visibles en captura |
+| Bandeja sin sesión = recuadro punteado roto | Estado vacío diseñado: tarjeta blanca, icono candado, título "Sin sesión Admin" + cuerpo | Captura 390 px; estilo computado `border-style: solid`, fondo blanco |
+| "Sesión expirada" tapa el encabezado | Toast reubicado como banda bajo el encabezado sticky (`top: calc(var(--gx2-head-h) + 8px)`, `!important` contra los estilos inline de `31-admin-realtime.js`) | CSS verificado por lectura; **sin verificar en vivo**: el toast solo se dispara con Realtime y sesión |
+| "+ Nuevo cliente" no se veía en teléfono | Estaba en el código (sin `desktop-only`); era el fallo de pintado. En v2 se verifica su caja | Playwright 390 px: botón visible en x=234, y=156, 146×44 px, dentro del viewport |
+| Contenido a veces no pinta al cambiar de sección | Envoltorio de `goAdminTab` con salida 160 ms + solape 60 ms; las 4 pestañas pintan con altura > 0 | Playwright: `tab-clientes` h=191, `tab-operaciones` h=207, `tab-gestion` h=689, todas activas con hijos |
+| Píldora "0 pendientes" y chip "Registros" oscuros (restos neón de admin.css) | Píldora verde suave + chip de arena (`!important` contra los `!important` de admin.css) | Estilo computado: total `rgb(227,242,234)`/verde; Registros `rgb(243,240,232)`; re-captura 390/1440 |
+| Chips del héroe con scroll horizontal en teléfono (Registros escondido) | Rejilla 2×2 en ≤840 px, 1×4 en escritorio | Estilo computado: 2 columnas de 166 px a 390, 4 a 1440; los 4 chips visibles |
+| Eyebrow "Tu veredicto" duplicaba el título | Eyebrow "Decisiones" | Captura 390 px |
+
+### Fallo de pintado — hallazgo
+El fallo intermitente (contenido que no pinta al cambiar de sección) existe
+en la oficial también (reportado 2026-11-12 00:08, en ambas páginas). En el
+espejo, el envoltorio de pestaña con salida+solape lo mitiga en la pasada de
+verificación (4/4 pestañas pintan). La causa raíz en la oficial no se
+investigó más allá: el espejo no toca el código que pinta las secciones
+(43 scripts intactos). Si reaparece con sesión, es preexistente de la
+oficial, no del espejo.
+
+### Pendiente / sin verificar en v2
+- Con sesión Admin real (datos vivos, tarjetas reales del feed, contadores
+  con importes reales, revisión B2, Realtime, toast de sesión expirada en
+  vivo): solo con la sesión de Henry en Safari; la beta en Pages es el paso
+  que lo verifica.
+- Sora no cargó en el entorno headless (Google Fonts bloqueado:
+  `ERR_TUNNEL_CONNECTION_FAILED`); la tipografía se verificó con la sans
+  de reserva. En Safari se ve Sora de verdad.
+- El cajón de notificaciones aparece en capturas `fullPage` de Playwright
+  por un artefacto de costura con elementos `fixed`; en uso normal está
+  oculto (`translateY(105%)`, sin clase `show`, verificado a 844 y 1250 px
+  de alto) y nunca se abre solo.
+- Animaciones con datos reales (morph con tarjetas reales, check-pop al
+  aprobar de verdad, contadores con Δ reales): solo con sesión; en
+  headless se verificaron las clases, los valores y las entradas de
+  esqueletos.
+
 ## 1. Decisión de navegación (corrección de Henry 23:25)
 
 **Elegida: pestañas segmentadas sticky bajo el encabezado compacto.**
@@ -49,11 +166,15 @@ central) se elimina del espejo. El FAB era la 3ª copia de "Nuevo cliente"
 1. **Barra inferior en escritorio:** no aplica — la segmentada es la misma en
    ambas pantallas.
 2. **Catálogo en barra o en Gestión:** en Gestión (la barra tiene 4 destinos).
-3. **Tipografía:** Rajdhani en display y cifras + sans del sistema en cuerpo
-   (§7.1 de la propuesta). No Poppins (tres experiencias distintas).
-4. **Qué tan atrevida la identidad:** (b) NUEVA Y FRESCA, decidida por Henry:
-   fondo #030305, cian y morado de marca conservados, acento ámbar nuevo para
-   urgencia, radios 20 px en tarjetas, jerarquía y motion nuevos.
+3. **Tipografía (v2):** Sora 600/700/800 en display y cifras + sans del
+   sistema en cuerpo. La v1 usaba Rajdhani; la v2 cambia a Sora como parte
+   de la identidad nueva (ver §v2). No Poppins (tres experiencias
+   distintas).
+4. **Qué tan atrevida la identidad:** (b) NUEVA Y FRESCA, decidida por
+   Henry. **v2 ("Papel"):** fondo `#f3f0e8`, superficie blanca, tinta
+   `#1b1812`, primario verde `#0b6e4f`, radios 20 px en tarjetas. La v1 era
+   neón oscuro (fondo `#030305`, cian y morado) y Henry la rechazó por
+   verse igual a la oficial (ver §v2).
 5. **"Nuevo cliente" en teléfono:** botón fijo en el encabezado de Clientes,
    siempre visible (no flotante).
 6. **Panel de negocio plegado por defecto en teléfono:** cerrado (ya era el
@@ -151,26 +272,22 @@ presentación, documentado: si `14` cambia su construcción de filas, este
 fork debe revisarse. La tarjeta de revisión muestra el importe mensual del
 cliente en grande (dato que ya vive en `estado_cuenta`).
 
-## 6. Animaciones implementadas (§6, explícitas)
+## 6. Animaciones implementadas (v2 — explícitas; la §6 v1 quedó
+superseded por la corrección de Henry 2026-11-12 00:12: "No las mismas
+animaciones, hay que llevar este trabajo al siguiente nivel")
 
-Easing único de entrada `cubic-bezier(0.23, 1, 0.32, 1)`; solo transform y
-opacity; nunca `transition: all`; nunca propiedades de layout.
-
-| Animación | Implementación |
-|---|---|
-| Cambio de pestaña | `.tab-content.active`: `gx2TabIn` 250 ms, translateY(8px) + opacidad |
-| Entrada de tarjetas del feed | `gx2CardIn` 300 ms, stagger ~40 ms, máx. 6, desde translateY(8px) + scale(.98) + opacidad 0 (nunca desde scale(0)) |
-| Apertura de hoja inferior | `gx2SheetIn` 300-350 ms (ficha, pago, notificaciones); fondo atenúa con opacidad 200 ms |
-| Cierre de hoja | 200 ms ease-in (la ficha y el pago usan la transición de cierre del sistema; el cajón de notificaciones usa 200 ms ease-in al quitar `.show` vía el wrapper de campana) |
-| Presión táctil | `:active` scale(0.97), 100-160 ms, en todos los botones |
-| Conteo animado de importes | 600-800 ms ease-out, solo en la primera pintura con datos (KPIs, total de pendientes, hoy/vencidos); los cambios por Realtime no se animan |
-| Pop de badge | 150 ms, solo scale, cuando el cambio sigue a una decisión de Henry (ventana de 2 s tras aprobar/atender/eliminar) |
-| Skeleton | pulso de opacidad 1.2 s entre dos grises; sin shimmer |
-| LIVE ambiental | punto LIVE respira 2 s, opacidad |
-| Cambio de filtro | píldora activa por opacidad/escala 200 ms; la lista re-entra escalonada (máx. 6) |
-
-**Movimientos ambientales a la vez:** 3 como máximo (LIVE, conteo al entrar,
-pop al decidir). Con `prefers-reduced-motion`: solo opacidad y color, sin
+Ver la tabla completa en la sección **v2** arriba (elemento, valores y
+patrón adaptado de cada animación). Resumen del sistema diferenciado (no
+una curva para todo): héroe 420 ms expo; feed 360 ms expo con stagger de
+presupuesto (500−360)÷(n−1); veredicto con muelle `linear()` + fallback;
+pestañas con solape de 60 ms; presión en dos fases (bajar 80–100 ms lineal,
+soltar 240 ms muelle); check-pop 420 ms + 6 partículas 520 ms; contadores
+easeOutExpo 600/900 ms desde el valor anterior, nunca desde 0; morph
+skeleton→contenido (160 ms fuera + 360 ms dentro); hojas con curva de
+cajón iOS (500/320 ms entrar, 300 ms salir) + arrastre con resistencia
+0.55; toast como banda bajo el encabezado; ambiental máx. 2–3 a la vez.
+Solo transform y opacity; nunca `transition: all`; nunca propiedades de
+layout. Con `prefers-reduced-motion`: solo opacidad y color, sin
 desplazamiento; el conteo pone el valor final directo; el esqueleto es
 estático.
 
@@ -231,10 +348,29 @@ escritura.** No se presenta como "idéntico en funciones" sin este matiz.
 
 ## 8. Verificación
 
-- **IDs:** los 286 IDs de la oficial están en el espejo + 6 nuevos propios
-  del espejo (`gx-decision-feed`, `gx2-nav-ops-badge`,
-  `gx2-decision-feed-section`, `gx2-feed-filter-label`,
-  `gx2-upcoming-more`, `gx2-ptr-indicator`). Sin duplicados.
+- **IDs (v2):** los 286 IDs de la oficial están en el espejo + 43 nuevos
+  propios del espejo (37 símbolos del sprite SVG `gx2-ic-*` +
+  `gx-decision-feed`, `gx2-nav-ops-badge`, `gx2-decision-feed-section`,
+  `gx2-feed-filter-label`, `gx2-upcoming-more`, `gx2-ptr-indicator`). Sin
+  duplicados (verificado por script, 2026-11-12).
+- **v2 — verificación headless (Playwright/Chromium, sin sesión Admin,
+  2026-11-12):** espejo 390 px y 1440 px sin overflow horizontal; fondo
+  papel `rgb(243,240,232)` vs oficial `rgb(3,3,5)`; estado vacío diseñado
+  ("Sin sesión Admin", borde sólido, fondo blanco); panel de negocio
+  plegado; 63 usos SVG / 37 símbolos; 0 glifos emoji en el HTML estático;
+  las 4 pestañas pintan (Clientes h=191, Operaciones h=207, Gestión
+  h=689); "+ Nuevo cliente" visible a 390 px (x=234, y=156, 146×44);
+  total "0 pendientes" en píldora verde suave y chip "Registros" en arena
+  (estilo computado); 4 chips del héroe visibles en 2×2 a 390 px y en
+  1×4 a 1440 px; 0 `pageerror` del código propio. Errores de consola
+  observados: solo del script oficial `21-admin-smart-operations-controller.js`
+  ("Admin F3 beta: esta operación no está habilitada" / Failed to fetch,
+  sin sesión y sin red — no del espejo). CDN bloqueado en la VM
+  (Supabase jsDelivr, Google Fonts Sora/Rajdhani:
+  `ERR_TUNNEL_CONNECTION_FAILED`). Capturas en `/tmp/gx2-v2/`
+  (`v2-mirror-390-inicio.png`, `v2b-mirror-390-inicio.png`,
+  `v2-mirror-1440-inicio.png`, `v2-official-390-inicio.png`,
+  `v2-mirror-390-tab-*.png`).
 - **Scripts:** [sandbox] + los 43 `<script src>` de la oficial en el mismo
   orden exacto + el JS propio del espejo al final (verificado por diff).
 - **Servidor local + navegador (Playwright/Chromium, sin sesión Admin):**
