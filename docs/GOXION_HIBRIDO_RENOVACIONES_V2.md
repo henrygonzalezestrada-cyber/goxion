@@ -34,7 +34,7 @@
 - Cancelar Disney+ para el próximo periodo preserva su cobertura actual y deja inalterados los demás cargos.
 - Repetir alta, baja, comprobante, aprobación y reversión: importes y número de comprobantes constantes.
 - Los dos clientes B2 actualmente activos conservan saldo, mora, historial y operación en Index.
-- Conciliación 21/21 clientes, 24/24 obligaciones, 40 pagos existentes, 0 diferencias antes y después; ninguna prueba deja escrituras definitivas.
+- Conciliación contra un snapshot tomado justo antes y después del despliegue; no fijar en código el número histórico de pagos. En la verificación SQL del 12/nov hay 21 clientes y 41 pagos (incluido el comprobante recientemente aprobado del Cliente Prueba). Ninguna prueba deja escrituras definitivas.
 
 ## Criterio de promoción a oficial
 
