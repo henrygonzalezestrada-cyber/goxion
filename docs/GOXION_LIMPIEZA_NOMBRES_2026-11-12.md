@@ -22,7 +22,7 @@ No realizar una eliminación masiva. Para cada ruta: buscar consumidores, verifi
 
 ## Verificaciones de esta auditoría
 
-- Producción: 21 clientes, 40 pagos; 2 regímenes B2 activos; funciones de pago antiguas sin permiso de ejecución para `service_role`.
+- Producción (conteo SQL exacto): 21 clientes, **41 pagos** (el último del Cliente Prueba, generado antes de esta rama), 2 regímenes B2 activos; 0 grupos duplicados por cliente/periodo entre pagos con estado `pagado`; funciones de pago antiguas sin permiso de ejecución para `service_role`.
 - PR #204 y PR #205 fusionados; la política de higiene ya existe en `main`.
 - Producción: **51 Edge activas**, de las cuales **23 terminan en `-beta`** y una usa el sufijo `-preview`. **La limpieza de nombres no está concluida**.
 - Auditoría de funciones SQL `public`: **0 funciones activas contienen el identificador `QA_ADM_`**. El código histórico fuera de `public` y las funciones Edge requieren auditoría independiente.
