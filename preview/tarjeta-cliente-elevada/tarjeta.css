@@ -1,0 +1,410 @@
+/* ============================================================
+   Tarjeta de cliente elevada — espejo (solo visualización)
+   Piel: la del Admin oficial (admin.css :root) — misma piel, otro acomodo.
+   Fondo #030305 · tarjeta #0a0a0f · verde #00ff9d · morado #bc13fe
+   cian #00f2fe · rojo #ff003c · ámbar #f8e800 · muted #8892b0
+   Rajdhani (con sans del sistema de reserva; en headless no carga el CDN).
+   ============================================================ */
+:root{
+  --bg:#030305;
+  --card:#0a0a0f;
+  --card-2:rgba(15,15,22,.94);
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.14);
+  --green:#00ff9d;
+  --purple:#bc13fe;
+  --blue:#00f2fe;
+  --red:#ff003c;
+  --yellow:#f8e800;
+  --text:#ffffff;
+  --muted:#8892b0;
+  --muted-2:#cbd3e2;
+  /* Sistema "Asentamiento": todo entra y se asienta, nada rebota.
+     ease-out fuerte de Emil Kowalski; solo transform y opacity. */
+  --ease:cubic-bezier(0.23,1,0.32,1);
+  --press:120ms;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{scrollbar-color:rgba(255,255,255,.2) transparent}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Rajdhani',system-ui,-apple-system,'Segoe UI',sans-serif;
+  padding:14px 14px max(28px,env(safe-area-inset-bottom));
+  overflow-x:hidden;max-width:560px;margin:0 auto;
+  min-height:100vh;min-height:100dvh;
+}
+.ic{width:18px;height:18px;flex:none}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer}
+button:active{transform:scale(0.97);transition:transform var(--press) linear}
+button:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+
+/* ---------- Encabezado ---------- */
+.gx-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:2px 2px 14px}
+.gx-head-mark{font-size:1.25rem;font-weight:700;letter-spacing:.04em;display:block;line-height:1.1}
+.gx-head-mark em{font-style:normal;color:var(--purple)}
+.gx-head-sub{display:block;color:var(--muted);font-size:.82rem;font-weight:600;margin-top:2px}
+.gx-pill-demo{
+  display:inline-flex;align-items:center;gap:5px;flex:none;
+  padding:5px 9px;border-radius:999px;font-size:.66rem;font-weight:700;letter-spacing:.05em;
+  color:var(--yellow);border:1px solid rgba(248,232,0,.4);background:rgba(248,232,0,.08);
+}
+.gx-pill-demo .ic{width:13px;height:13px}
+
+/* ---------- Nota demo / lista ---------- */
+.gx-demo-note{
+  color:var(--muted);font-size:.86rem;font-weight:600;line-height:1.45;
+  border:1px dashed var(--line-2);border-radius:12px;padding:10px 12px;margin-bottom:16px;
+}
+.gx-list-head{display:flex;align-items:baseline;justify-content:space-between;padding:0 2px 10px}
+.gx-list-head h1{font-size:1.3rem;font-weight:700}
+.gx-count{color:var(--muted);font-size:.8rem;font-weight:700}
+.gx-client-list{display:flex;flex-direction:column;gap:14px}
+.gx-foot-note{color:var(--muted);font-size:.8rem;font-weight:600;line-height:1.5;padding:16px 2px 0}
+
+/* ---------- Tarjeta cerrada (mismo orden aprobado) ---------- */
+.client-card{
+  border:1px solid var(--line);border-left:3px solid var(--st,#8892b0);
+  border-radius:17px;overflow:hidden;cursor:pointer;
+  background:linear-gradient(145deg,rgba(18,18,26,.96),rgba(10,10,15,.97));
+  box-shadow:0 8px 24px rgba(0,0,0,.22);
+  /* Entrada: translateY(8px) + opacidad, 300 ms ease-out, stagger 50 ms */
+  opacity:0;transform:translateY(8px);
+  animation:gx-card-in 300ms var(--ease) forwards;
+  animation-delay:calc(var(--i,0)*50ms);
+  transition:box-shadow 200ms var(--ease);
+}
+@keyframes gx-card-in{to{opacity:1;transform:translateY(0)}}
+.client-card:hover{box-shadow:0 10px 28px rgba(0,0,0,.38)}
+.client-card:active{transform:scale(0.985)}
+.client-card[data-st="por-vencer"]{--st:var(--blue)}
+.client-card[data-st="pagado"]{--st:var(--green)}
+.client-card[data-st="en-revision"]{--st:var(--purple)}
+.client-card[data-st="vencido"]{--st:var(--red)}
+
+.gx-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:13px 13px 0}
+.gx-card-name{font-size:1.08rem;font-weight:700;line-height:1.15}
+.gx-card-folio{
+  display:inline-block;margin-top:4px;padding:2px 7px;border-radius:999px;
+  background:rgba(255,255,255,.05);color:var(--muted);font-size:.64rem;font-weight:700;letter-spacing:.04em;
+}
+.gx-badge{
+  flex:none;padding:4px 9px;border-radius:999px;font-size:.66rem;font-weight:700;letter-spacing:.04em;
+  color:var(--st);border:1px solid var(--st);background:color-mix(in srgb,var(--st) 10%,transparent);
+}
+@supports not (color:color-mix(in srgb,red 10%,transparent)){
+  .gx-badge{background:rgba(255,255,255,.05)}
+}
+
+/* 2. La cifra correcta: una sola vez por tarjeta */
+.gx-money{padding:10px 13px 0;text-align:left}
+.gx-money-figure{font-size:1.9rem;font-weight:700;line-height:1;letter-spacing:.01em}
+.gx-money-figure small{font-size:.95rem;color:var(--muted);font-weight:600}
+.gx-money-line{color:var(--muted);font-size:.78rem;font-weight:600;margin-top:5px}
+.gx-money-line b{color:var(--muted-2);font-weight:700}
+
+/* 3. Frase + fecha: una sola vez */
+.gx-phrase{display:flex;align-items:center;gap:6px;padding:10px 13px 0;color:var(--muted-2);font-size:.86rem;font-weight:600}
+.gx-phrase .ic{width:15px;height:15px;color:var(--st)}
+.gx-phrase time{color:var(--muted);font-weight:700}
+
+/* 4. Señales de pendiente (solo si las hay) */
+.gx-pending{display:flex;flex-direction:column;gap:6px;padding:10px 13px 0}
+.gx-pending-item{
+  display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:11px;
+  font-size:.82rem;font-weight:600;line-height:1.3;
+  background:rgba(255,0,60,.08);border:1px solid rgba(255,0,60,.28);color:#ffd7de;
+}
+.gx-pending-item .ic{width:16px;height:16px;color:var(--red);flex:none}
+.gx-pending-item--review{background:rgba(188,19,254,.09);border-color:rgba(188,19,254,.35);color:#ecd9ff}
+.gx-pending-item--review .ic{color:var(--purple)}
+.gx-pending-item b{font-weight:700}
+.gx-pending-item .gx-pending-act{margin-left:auto;flex:none;color:var(--blue);font-weight:700;font-size:.76rem}
+
+/* 5. Servicios con estado + progreso real */
+.gx-services{padding:12px 13px 0}
+.gx-services-title{color:var(--muted);font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+.gx-service-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid rgba(255,255,255,.05);font-size:.88rem;font-weight:600}
+.gx-service-row:first-of-type{border-top:0}
+.gx-dot{width:8px;height:8px;border-radius:50%;flex:none;background:var(--green)}
+.gx-dot--off{background:var(--yellow)}
+.gx-dot--review{background:var(--purple)}
+.gx-service-row .gx-service-amount{margin-left:auto;color:var(--muted-2);font-weight:700}
+.gx-service-state{color:var(--muted);font-size:.76rem;font-weight:700}
+.gx-progress{display:flex;flex-wrap:wrap;gap:6px;padding:10px 13px 0}
+.gx-chip{
+  display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:999px;
+  background:rgba(255,255,255,.05);color:var(--muted);font-size:.68rem;font-weight:700;
+}
+.gx-chip .ic{width:13px;height:13px}
+.gx-chip b{color:var(--text);font-weight:700}
+.gx-chip--live{color:var(--green)}
+.gx-chip--live .gx-bar{width:34px;height:4px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+.gx-chip--live .gx-bar i{display:block;height:100%;background:var(--green);transform-origin:left;transform:scaleX(var(--p,0))}
+
+/* 6. WhatsApp siempre a la mano (una sola entrada por vista) */
+.gx-card-wa{
+  display:flex;align-items:center;justify-content:center;gap:8px;width:calc(100% - 26px);
+  margin:12px 13px 13px;padding:10px;border-radius:12px;
+  background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.35);
+  color:var(--green);font-size:.9rem;font-weight:700;
+  transition:background 160ms var(--ease);
+}
+.gx-card-wa:hover{background:rgba(0,255,157,.16)}
+
+/* ---------- Hoja inferior (ficha) ---------- */
+.gx-backdrop{
+  position:fixed;inset:0;background:rgba(3,3,5,.6);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  opacity:0;transition:opacity 200ms var(--ease);z-index:40;
+}
+.gx-backdrop[hidden]{display:none}
+.gx-backdrop.gx-open{opacity:1}
+
+.gx-sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:50;
+  max-width:560px;margin:0 auto;
+  max-height:92vh;max-height:92dvh;
+  display:flex;flex-direction:column;
+  background:rgba(11,11,16,.98);
+  border:1px solid var(--line-2);border-bottom:0;border-radius:20px 20px 0 0;
+  box-shadow:0 -12px 40px rgba(0,0,0,.5);
+  /* Entrada de hoja: translateY(24px) + opacidad, 320 ms; salida 240 ms (más rápida) */
+  transform:translateY(24px);opacity:0;visibility:hidden;
+  transition:transform 320ms var(--ease),opacity 320ms var(--ease),visibility 0s 320ms;
+}
+.gx-sheet[hidden]{display:none}
+.gx-sheet.gx-open{
+  transform:translateY(0);opacity:1;visibility:visible;
+  transition:transform 320ms var(--ease),opacity 320ms var(--ease),visibility 0s 0s;
+}
+.gx-sheet.gx-closing{
+  transform:translateY(24px);opacity:0;
+  transition:transform 240ms var(--ease),opacity 240ms var(--ease),visibility 0s 240ms;
+}
+.gx-sheet-grip{width:40px;height:4px;border-radius:99px;background:rgba(255,255,255,.22);margin:8px auto 2px;flex:none}
+.gx-sheet-head{display:flex;align-items:flex-start;gap:8px;padding:6px 12px 10px;border-bottom:1px solid var(--line)}
+.gx-icon-btn{
+  flex:none;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  border:1px solid var(--line);color:var(--muted-2);
+  transition:background 160ms var(--ease);
+}
+.gx-icon-btn:hover{background:rgba(255,255,255,.06)}
+.gx-sheet-id{flex:1;min-width:0}
+.gx-sheet-folio{color:var(--muted);font-size:.68rem;font-weight:700;letter-spacing:.04em}
+.gx-sheet-id h2{font-size:1.18rem;font-weight:700;line-height:1.15;margin-top:1px}
+.gx-sheet-meta{color:var(--muted);font-size:.82rem;font-weight:600;margin-top:2px}
+.gx-sheet-meta b{color:var(--st,var(--muted-2));font-weight:700}
+.gx-wa-btn{
+  flex:none;display:inline-flex;align-items:center;gap:6px;padding:9px 12px;border-radius:999px;
+  background:rgba(0,255,157,.1);border:1px solid rgba(0,255,157,.35);
+  color:var(--green);font-size:.82rem;font-weight:700;
+}
+.gx-wa-btn .ic{width:15px;height:15px}
+
+/* Navegación de la ficha: desplaza, nunca oculta (anti pintado intermitente) */
+.gx-sheet-nav{
+  display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--line);
+  overflow-x:auto;scrollbar-width:none;flex:none;
+  background:rgba(11,11,16,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+}
+.gx-sheet-nav::-webkit-scrollbar{display:none}
+.gx-sheet-nav button{
+  flex:none;padding:7px 12px;border-radius:999px;font-size:.8rem;font-weight:700;
+  color:var(--muted);border:1px solid var(--line);
+  transition:color 160ms var(--ease),border-color 160ms var(--ease),background 160ms var(--ease);
+}
+.gx-sheet-nav button.gx-active{color:var(--bg);background:var(--blue);border-color:var(--blue)}
+.gx-sheet-body{overflow-y:auto;padding:14px 14px max(26px,env(safe-area-inset-bottom));scroll-behavior:smooth}
+
+/* Cascada por prioridad: Atención lidera, el resto sigue (60 ms entre secciones) */
+.gx-section{
+  opacity:0;transform:translateY(10px);
+  animation:gx-section-in 300ms var(--ease) forwards;
+  animation-delay:calc(var(--d,0ms) + 80ms);
+}
+@keyframes gx-section-in{to{opacity:1;transform:translateY(0)}}
+.gx-section + .gx-section{margin-top:20px}
+.gx-section h3{
+  display:flex;align-items:center;gap:7px;font-size:.95rem;font-weight:700;
+  padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:10px;
+}
+.gx-section h3 .ic{width:16px;height:16px;color:var(--blue)}
+.gx-section h3 .gx-count-badge{
+  margin-left:auto;font-size:.68rem;font-weight:700;color:var(--red);
+  background:rgba(255,0,60,.12);border:1px solid rgba(255,0,60,.35);
+  padding:2px 8px;border-radius:999px;
+}
+/* La banda de Atención pulsa UNA vez al abrir (opacidad, un ciclo, 600 ms) */
+.gx-section--atencion.gx-pulse h3 .gx-count-badge{animation:gx-once 600ms var(--ease) 1}
+@keyframes gx-once{0%{opacity:.4}50%{opacity:1}100%{opacity:1}}
+
+.gx-att-item{
+  display:flex;gap:10px;align-items:flex-start;padding:11px;border-radius:13px;
+  border:1px solid rgba(255,0,60,.28);background:rgba(255,0,60,.07);margin-bottom:8px;
+}
+.gx-att-item--review{border-color:rgba(188,19,254,.35);background:rgba(188,19,254,.08)}
+.gx-att-item--config{border-color:rgba(248,232,0,.35);background:rgba(248,232,0,.06)}
+.gx-att-item .ic{width:18px;height:18px;margin-top:1px;flex:none;color:var(--red)}
+.gx-att-item--review .ic{color:var(--purple)}
+.gx-att-item--config .ic{color:var(--yellow)}
+.gx-att-body{flex:1;min-width:0}
+.gx-att-body b{display:block;font-size:.92rem;font-weight:700}
+.gx-att-body p{color:var(--muted);font-size:.82rem;font-weight:600;line-height:1.4;margin-top:2px}
+.gx-att-actions{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.gx-empty{
+  display:flex;gap:9px;align-items:flex-start;padding:12px;border-radius:13px;
+  border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--muted);
+  font-size:.86rem;font-weight:600;line-height:1.45;
+}
+.gx-empty .ic{width:17px;height:17px;flex:none;color:var(--green);margin-top:1px}
+
+/* Cobro: UNA sola cifra */
+.gx-cobro-hero{padding:4px 2px 10px}
+.gx-cobro-hero .gx-money-figure{font-size:2.2rem}
+.gx-cobro-hero .gx-money-label{color:var(--muted);font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+/* Asentamiento de la cifra al abrir la ficha: scale 1.04 → 1, 240 ms (sin conteo) */
+.gx-sheet.gx-open .gx-cobro-hero .gx-money-figure{animation:gx-settle 240ms var(--ease) 120ms backwards}
+@keyframes gx-settle{from{opacity:.4;transform:scale(1.04)}to{opacity:1;transform:scale(1)}}
+.gx-breakdown{border:1px solid var(--line);border-radius:13px;overflow:hidden;margin-bottom:12px}
+.gx-break-row{display:flex;justify-content:space-between;gap:10px;padding:9px 12px;font-size:.88rem;font-weight:600;border-top:1px solid rgba(255,255,255,.05)}
+.gx-break-row:first-child{border-top:0}
+.gx-break-row span:first-child{color:var(--muted)}
+.gx-break-row b{font-weight:700}
+.gx-break-row--total{background:rgba(255,255,255,.04)}
+.gx-break-row--total span:first-child{color:var(--text)}
+.gx-cycle{margin-bottom:12px}
+.gx-cycle-title{color:var(--muted);font-size:.7rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.gx-cycle-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:6px;font-size:.86rem;font-weight:600}
+.gx-cycle-row time{color:var(--muted);font-weight:700;flex:none}
+.gx-cycle-row b{margin-left:auto}
+.gx-cycle-state{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:999px;flex:none}
+.gx-cycle-state--done{color:var(--green);background:rgba(0,255,157,.1)}
+.gx-cycle-state--todo{color:var(--blue);background:rgba(0,242,254,.1)}
+
+.gx-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 14px;border-radius:12px;font-size:.9rem;font-weight:700;
+  transition:background 160ms var(--ease),transform var(--press) linear;
+}
+.gx-btn .ic{width:16px;height:16px}
+.gx-btn--primary{background:var(--green);color:#04150c;width:100%}
+.gx-btn--primary:hover{background:#4dffb6}
+.gx-btn--ok{background:var(--green);color:#04150c}
+.gx-btn--warn{background:rgba(248,232,0,.14);border:1px solid rgba(248,232,0,.45);color:var(--yellow)}
+.gx-btn--danger{background:rgba(255,0,60,.12);border:1px solid rgba(255,0,60,.45);color:#ff8ba0}
+.gx-btn--ghost{color:var(--muted);width:100%}
+.gx-btn--sm{padding:7px 11px;font-size:.8rem;border-radius:10px}
+.gx-btn--line{border:1px solid var(--line-2);color:var(--muted-2)}
+.gx-btn--line:hover{background:rgba(255,255,255,.05)}
+.gx-btn--done{background:rgba(0,255,157,.14);border:1px solid rgba(0,255,157,.4);color:var(--green)}
+.gx-btn.is-done{pointer-events:none}
+
+.gx-sub-title{color:var(--muted);font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;margin:14px 0 7px}
+.gx-disc-row{display:flex;align-items:center;gap:9px;padding:9px 12px;border:1px solid var(--line);border-radius:11px;margin-bottom:6px;font-size:.86rem;font-weight:600}
+.gx-disc-row .ic{width:15px;height:15px;color:var(--green);flex:none}
+.gx-disc-row b{margin-left:auto}
+.gx-disc-row small{color:var(--muted);font-weight:600}
+
+/* Servicios en la ficha */
+.gx-svc{border:1px solid var(--line);border-radius:13px;padding:11px 12px;margin-bottom:8px}
+.gx-svc-head{display:flex;align-items:center;gap:8px}
+.gx-svc-head b{font-size:.94rem;font-weight:700}
+.gx-svc-head .gx-service-amount{margin-left:auto;color:var(--muted-2);font-weight:700;font-size:.88rem}
+.gx-svc-sub{color:var(--muted);font-size:.8rem;font-weight:600;margin-top:3px}
+.gx-svc-actions{margin-top:9px}
+
+/* Beneficios: una sola lista */
+.gx-ben-list{display:flex;flex-direction:column;gap:8px}
+.gx-ben-row{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;border:1px solid var(--line);border-radius:13px}
+.gx-ben-row .ic{width:17px;height:17px;flex:none;margin-top:1px;color:var(--blue)}
+.gx-ben-row b{display:block;font-size:.9rem;font-weight:700}
+.gx-ben-row p{color:var(--muted);font-size:.8rem;font-weight:600;line-height:1.4;margin-top:2px}
+.gx-ben-row .gx-ben-val{margin-left:auto;flex:none;font-weight:700;font-size:.88rem;color:var(--green)}
+.gx-ben-ctrl{display:inline-flex;gap:4px;margin-top:8px}
+.gx-ben-ctrl button{
+  width:28px;height:28px;border-radius:8px;border:1px solid var(--line-2);
+  display:grid;place-items:center;color:var(--muted-2);
+  transition:background 160ms var(--ease);
+}
+.gx-ben-ctrl button:hover{background:rgba(255,255,255,.06)}
+.gx-ben-ctrl .ic{width:14px;height:14px}
+
+/* Cuenta y accesos: el único sitio de claves */
+.gx-field{display:block;margin-bottom:10px}
+.gx-field > span{display:block;color:var(--muted);font-size:.74rem;font-weight:700;margin-bottom:4px}
+.gx-field input[type="text"]{
+  width:100%;padding:10px 12px;border-radius:11px;border:1px solid var(--line-2);
+  background:rgba(255,255,255,.04);color:var(--text);font-family:inherit;font-size:.92rem;font-weight:600;
+}
+.gx-field input[type="text"]:focus{outline:2px solid var(--blue);outline-offset:1px}
+.gx-pin-box{
+  display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid var(--line);
+  border-radius:13px;margin-bottom:8px;
+}
+.gx-pin-box .ic{width:17px;height:17px;color:var(--purple);flex:none}
+.gx-pin-box b{font-size:.92rem;font-weight:700}
+.gx-pin-box p{color:var(--muted);font-size:.78rem;font-weight:600}
+.gx-pin-box .gx-pin-actions{margin-left:auto;display:flex;gap:6px;flex:none}
+.gx-cred{border:1px solid var(--line);border-radius:13px;padding:11px 12px;margin-bottom:8px}
+.gx-cred.flash{animation:gx-flash 900ms var(--ease) 1}
+@keyframes gx-flash{0%{border-color:var(--blue);background:rgba(0,242,254,.08)}100%{border-color:var(--line);background:transparent}}
+.gx-cred-head{display:flex;align-items:center;gap:8px}
+.gx-cred-head b{font-size:.92rem;font-weight:700}
+.gx-cred-head .gx-service-state{margin-left:auto}
+.gx-cred-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;margin-top:9px;font-size:.84rem;font-weight:600}
+.gx-cred-grid div span{display:block;color:var(--muted);font-size:.7rem;font-weight:700}
+.gx-cred-grid div b{font-weight:700}
+.gx-cred-actions{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- Modal de revisión ---------- */
+.gx-modal-backdrop{
+  position:fixed;inset:0;background:rgba(3,3,5,.65);z-index:60;
+  opacity:0;transition:opacity 200ms var(--ease);
+}
+.gx-modal-backdrop[hidden]{display:none}
+.gx-modal-backdrop.gx-open{opacity:1}
+.gx-modal{
+  position:fixed;left:12px;right:12px;bottom:12px;z-index:61;max-width:480px;margin:0 auto;
+  background:rgba(13,13,19,.98);border:1px solid var(--line-2);border-radius:18px;
+  padding:16px;box-shadow:0 -8px 40px rgba(0,0,0,.55);
+  transform:translateY(16px);opacity:0;visibility:hidden;
+  transition:transform 300ms var(--ease),opacity 300ms var(--ease),visibility 0s 300ms;
+}
+.gx-modal[hidden]{display:none}
+.gx-modal.gx-open{
+  transform:translateY(0);opacity:1;visibility:visible;
+  transition:transform 300ms var(--ease),opacity 300ms var(--ease),visibility 0s 0s;
+}
+.gx-modal h3{font-size:1.12rem;font-weight:700}
+.gx-review-sub{color:var(--muted);font-size:.84rem;font-weight:600;margin-top:3px}
+.gx-review-amount{font-size:1.7rem;font-weight:700;padding:12px 0 4px}
+.gx-check-row{display:flex;align-items:center;gap:9px;padding:10px 0;font-size:.88rem;font-weight:600;cursor:pointer}
+.gx-check-row input{width:18px;height:18px;accent-color:var(--green)}
+.gx-review-actions{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.gx-review-actions .gx-btn{width:100%}
+
+/* ---------- Toast: banda bajo el encabezado, nunca lo tapa ---------- */
+.gx-toast{
+  position:fixed;top:calc(14px + 46px);left:14px;right:14px;max-width:480px;margin:0 auto;z-index:70;
+  padding:11px 14px;border-radius:12px;font-size:.86rem;font-weight:600;line-height:1.4;
+  background:rgba(13,13,19,.97);border:1px solid var(--blue);color:var(--text);
+  box-shadow:0 8px 28px rgba(0,0,0,.5);
+  opacity:0;transform:translateY(-6px);
+  transition:opacity 220ms var(--ease),transform 220ms var(--ease),visibility 0s 220ms;
+  visibility:hidden;
+}
+.gx-toast[hidden]{display:none}
+.gx-toast.gx-show{opacity:1;transform:translateY(0);visibility:visible;transition:opacity 220ms var(--ease),transform 220ms var(--ease),visibility 0s 0s}
+
+/* ---------- Escritorio: la lista se mantiene centrada, teléfono primero ---------- */
+@media (min-width:700px){
+  body{padding-top:22px}
+  .gx-client-list{gap:16px}
+}
+
+/* Movimiento reducido: solo opacidad */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms !important;animation-delay:0ms !important;transition-duration:200ms !important}
+  .client-card,.gx-section{opacity:1;transform:none}
+  .gx-sheet-body{scroll-behavior:auto}
+}
