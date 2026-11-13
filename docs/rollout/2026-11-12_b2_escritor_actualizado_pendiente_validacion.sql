@@ -198,5 +198,4 @@ begin
  return jsonb_build_object('ok',true,'ciclo_id',v_ciclo.id,'accesos',v_creados,
   'porcentaje_lealtad',v_pct,'repetida',false,'modo','b2_por_acceso',
   'cobrable',false,'advertencia','Ciclo creado, aún no hay pagos aprobados');
-end $function$
-
+end $function$;
