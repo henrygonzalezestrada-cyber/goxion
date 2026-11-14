@@ -78,6 +78,15 @@ async function run(type,name){
         const t=await page.locator('#dossier-content').innerText();
         assert(t.includes('Acceso 1')&&t.includes('Acceso 2')&&t.includes('15 NOV')&&t.includes('23 NOV'),label+' B2 illustration');
         assert.equal((t.match(/YouTube Premium/g)||[]).length,1,label+' duplicated service header');
+        const access=await page.locator('.access-line').first().evaluate(el=>{
+          const label=el.querySelector('.access-label').getBoundingClientRect();
+          const date=el.querySelector('.access-date').getBoundingClientRect();
+          return {labelWidth:label.width,labelHeight:label.height,labelRight:label.right,dateLeft:date.left};
+        });
+        assert(access.labelWidth>=100,label+' access label column collapsed: '+access.labelWidth);
+        assert(access.labelHeight<=43,label+' access label is broken into excessive lines: '+access.labelHeight);
+        assert(access.labelRight<=access.dateLeft+1,label+' access label overlaps date');
+
         await verifyLayout(page,label,'services');
         if(name==='chromium'&&(width===390||width===1280))await page.screenshot({path:'artifacts/admin-v3/dossier-'+width+'.png',fullPage:true});
         await page.locator('#client-back').click();
