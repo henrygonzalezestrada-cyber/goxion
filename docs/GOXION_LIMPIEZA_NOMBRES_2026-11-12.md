@@ -1,12 +1,12 @@
 # GOXION · Inventario de normalización de nombres (12/nov/2026)
 
-**Estado:** auditoría parcial verificada en producción y GitHub; no constituye autorización para borrar. Política: `docs/ENGINEERING_HYGIENE_POLICY.md`.
+**Estado:** auditoría parcial verificada en producción y GitHub; **13/nov/2026:** proyección y escritor de renovaciones desplegados, alias de ruta B2 todavía activo. No constituye autorización para borrar. Política: `docs/ENGINEERING_HYGIENE_POLICY.md`.
 
 | Componente | Estado comprobado | Tratamiento |
 |---|---|---|
 | Motor de obligaciones y aprobación V1 | OFICIAL, en producción; PR #204 | Fuente única de aprobación, sin nuevo escritor |
 | `acciones-financieras` | OFICIAL, activa (v12) | Conservar |
-| `acciones-financieras-b2-beta` | **ACTIVO, nombre heredado** (v12), consumido desde Admin | Migrar consumidores a un nombre canónico después de pruebas y mantener alias temporal; **no borrar** |
+| `acciones-financieras-b2-beta` | **ACTIVO, nombre heredado** (v13 tras despliegue de 13/nov/2026), consumido desde Admin | Migrar consumidores a un nombre canónico después de pruebas y mantener alias temporal; **no borrar** |
 | `estado-financiero-b2-beta` | ACTIVO, nombre heredado (v8) | Auditar consumidores Index/Admin y distinguir alias de motor |
 | `comprobantes-b2-beta` | ACTIVO, nombre heredado (v4) | No eliminar; tiene comprobantes reales |
 | `periodo-cobro-beta`, `admin-operaciones-beta` | ACTIVOS, herencia; escritores antiguos bloqueados por release V1 | Confirmar consumidores; alias no debe acreditar dinero |
