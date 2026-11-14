@@ -8,6 +8,8 @@ Este registro es la primera consulta obligatoria antes de implementar una funci�
 
 **Actualización 13/nov/2026 · quitar servicios con B2:** el botón existente `removeClientService` en `assets/js/admin/03-supabase-v3-writes.js` invoca `admin-acciones → quitar_servicio_cliente` con confirmación. **El propietario de la operación** es la RPC privada `public.goxion_cancelar_servicio_admin_v1`: marca el contrato inactivo (sin borrarlo), audita/retiro de ciclos *proyectados sin pago* y delega la unificación a `goxion_b2_desactivar_cliente` o la nueva generación a `goxion_b2_iniciar_ciclo`. Las operaciones con dinero o comprobante devuelven `409`. No existe segundo aprobador; pagos y recibos quedan en motor V1. Véase `docs/rollback/2026-11-13_cancelacion_servicio_b2.md`.
 
+**Cancelaciones efectivas (14/nov/2026 UTC):** el único propietario es `public.goxion_hacer_efectiva_cancelacion_admin_v1` mediante la Edge oficial `cancelaciones-admin`, fuente `docs/edge/cancelaciones-admin/index.ts`. El botón `gxMakeCancellationEffective` debe recargar y reconstruir la ficha desde `gxReloadAdminClient`; las solicitudes aprobadas siguen activas hasta hacerse efectivas. Véase `docs/CANCELACION_EFECTIVA_OFICIAL.md`. Nunca se escriben por separado solicitud y contrato ni se crean motores de cobro.
+
 ## 1. Qué módulo es dueño de cada función
 
 | Necesidad | Dónde se configura (sin duplicar) | Datos y rutas existentes | Qué debe hacer otra sección |
