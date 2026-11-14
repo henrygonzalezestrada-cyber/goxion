@@ -210,9 +210,9 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
 .segment span{margin-left:3px}
 .clients-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
 /* Typed semantic tokens allow color-morphing on the same card element. */
-@property --state-ink{syntax:"<color>";inherits:false;initial-value:#368765}
-@property --state-surface{syntax:"<color>";inherits:false;initial-value:#eaf9f0}
-@property --state-border{syntax:"<color>";inherits:false;initial-value:#cfe9d9}
+@property --state-ink{syntax:"<color>";inherits:true;initial-value:#368765}
+@property --state-surface{syntax:"<color>";inherits:true;initial-value:#eaf9f0}
+@property --state-border{syntax:"<color>";inherits:true;initial-value:#cfe9d9}
 /* Main operational element: data-determined state colors and micro-motion. */
 .client-livebar{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
