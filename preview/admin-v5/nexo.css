@@ -182,9 +182,9 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
 .searchbox svg{height:18px;width:18px}
 .searchbox input{width:100%;height:47px;border:0;outline:0;font-size:12px;background:none;color:var(--ink)}
 .searchbox input::placeholder{color:#a2b3a9}
-.segments{display:flex;align-items:center;gap:4px;max-width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;background:#e8efe9;padding:4px;min-height:47px}
+.segments{display:flex;align-items:center;gap:4px;max-width:100%;overflow-x:auto;scrollbar-width:none;border-radius:12px;background:#e8efe9;padding:4px;min-height:52px}
 .segments::-webkit-scrollbar{display:none}
-.segment{flex:none;white-space:nowrap;min-height:39px;padding:8px 12px;border-radius:9px;border:0;background:transparent;font-size:11px;font-weight:800;color:#7c9787;transition:background .16s,box-shadow .16s,color .16s}
+.segment{flex:none;white-space:nowrap;min-height:44px;padding:8px 12px;border-radius:9px;border:0;background:transparent;font-size:11px;font-weight:800;color:#7c9787;transition:background .16s,box-shadow .16s,color .16s}
 .segment:hover{color:#396b51}
 .segment.is-active{background:#fff;color:#267152;box-shadow:0 2px 8px rgba(29,68,49,.07)}
 .segment span{margin-left:3px}
