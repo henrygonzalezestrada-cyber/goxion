@@ -1,7 +1,9 @@
 import {readFileSync as read} from "node:fs";
 import assert from "node:assert/strict";
 
-const migration=read("supabase/migrations/202611130001_b2_renovacion_proyectada_v2.sql","utf8");
+const historical=read("supabase/migrations/202611130001_b2_renovacion_proyectada_v2.sql","utf8");
+const migration=read("supabase/migrations/202611140002_b2_vencimiento_recurrente_v2.sql","utf8");
+assert.match(historical,/goxion_b2_proxima_renovacion/);
 const writerBoundary=migration.indexOf("CREATE OR REPLACE FUNCTION public.goxion_b2_iniciar_ciclo");
 assert.ok(writerBoundary>0,"Falta el único escritor oficial");
 const projection=migration.slice(0,writerBoundary);
@@ -10,7 +12,6 @@ const edge=read("docs/edge/acciones-financieras-b2-beta/index.ts","utf8");
 const registry=read("docs/GOXION_LIMPIEZA_NOMBRES_2026-11-12.md","utf8");
 const design=read("docs/GOXION_HIBRIDO_RENOVACIONES_V2.md","utf8");
 
-assert.match(projection,/create or replace function public\.goxion_b2_proxima_renovacion\(/i);
 assert.match(projection,/create or replace function public\.goxion_b2_vencimiento_periodo\(/i);
 assert.match(projection,/create or replace function public\.goxion_b2_previsualizar_renovaciones\(/i);
 assert.match(projection,/language sql immutable strict security invoker/i);
@@ -46,4 +47,4 @@ assert.match(registry,/ACTIVO, nombre heredado/);
 assert.match(registry,/HISTÓRICAS/);
 assert.match(design,/Cancelar no es borrar el pasado/);
 assert.match(design,/Un solo propietario de reglas/);
-console.log("GOXION híbrido: contrato, proyección y guardas de migración PASS");
+console.log("GOXION híbrido: migraciones históricas, recurrencia, contrato y guardas PASS");
