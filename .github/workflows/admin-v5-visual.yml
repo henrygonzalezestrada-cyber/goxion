@@ -6,6 +6,12 @@ on:
       - 'preview/admin-v5/**'
       - 'scripts/admin-v5-qa.mjs'
       - '.github/workflows/admin-v5-visual.yml'
+  push:
+    branches: [design/admin-v5-fusion-v22-v28-20261114]
+    paths:
+      - 'preview/admin-v5/**'
+      - 'scripts/admin-v5-qa.mjs'
+      - '.github/workflows/admin-v5-visual.yml'
   workflow_dispatch:
 jobs:
   responsive-qa:
