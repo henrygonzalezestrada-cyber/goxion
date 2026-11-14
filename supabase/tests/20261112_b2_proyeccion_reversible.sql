@@ -18,6 +18,15 @@ begin
  if f<>'2028-03-31' then raise exception 'Bisiesto incorrecto: %',f;end if;
  f=public.goxion_b2_proxima_renovacion('2027-01-29'::date,31::smallint);
  if f<>'2027-01-31' then raise exception 'Corte dentro de mes incorrecto: %',f;end if;
+ -- El calendario B2 puede avanzar al vencimiento del mismo mes al liquidarse.
+ f=public.goxion_b2_vencimiento_periodo('2026-11-15'::date,15::smallint,'2026-12-01'::date);
+ if f<>'2026-12-15' then raise exception 'Ciclo diciembre incorrecto: %',f;end if;
+ f=public.goxion_b2_vencimiento_periodo('2026-11-15'::date,15::smallint,'2027-01-01'::date);
+ if f<>'2027-01-15' then raise exception 'Ciclo enero recicló diciembre: %',f;end if;
+ f=public.goxion_b2_vencimiento_periodo('2027-01-15'::date,15::smallint,'2027-01-01'::date);
+ if f<>'2027-01-15' then raise exception 'Calendario avanzado al vencimiento enero se bloqueó: %',f;end if;
+ f=public.goxion_b2_vencimiento_periodo('2027-02-20'::date,20::smallint,'2027-01-01'::date);
+ if f is not null then raise exception 'Cobertura futura creó cargo anticipado: %',f;end if;
  if has_function_privilege('anon','public.goxion_b2_previsualizar_renovaciones(uuid,date)','EXECUTE')
    or has_function_privilege('authenticated','public.goxion_b2_previsualizar_renovaciones(uuid,date)','EXECUTE')
  then raise exception 'La vista privada no debe poder llamarse sin service_role';end if;
