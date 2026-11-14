@@ -82,7 +82,7 @@ async function scenarios(browserType,name){
   const browser=await browserType.launch({headless:true});
   try{
     for(const width of widths){
-      const label=name+' '+width+'px',page=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:1,reducedMotion:'reduce'});
+      const label=name+' '+width+'px',page=await browser.newPage({viewport:{width,height:844},deviceScaleFactor:1,reducedMotion:[390,1440].includes(width)?'no-preference':'reduce'});
       const jsErrors=[];page.on('pageerror',e=>jsErrors.push(e.message));
       const capture=name==='Chromium'&&[320,390,1440].includes(width);
       try{
@@ -110,7 +110,12 @@ async function scenarios(browserType,name){
         assert((await valeria.locator('.customer-state-note').innerText()).includes('días vencido'),label+' late note');
         await geometry(page,label+' changed state');
         if(capture)await page.screenshot({path:'artifacts/admin-v5/clients-overdue-'+width+'.png',fullPage:true});
-        for(let turn=0;turn<3;turn++)await page.locator('#advance-demo-date').click();
+        await page.locator('#advance-demo-date').click();
+        await page.waitForFunction(()=>document.getElementById('demo-date-label').textContent==='28 NOV');
+        await page.locator('#advance-demo-date').click();
+        await page.waitForFunction(()=>document.querySelector('.customer-card[data-id="GX-1056"]')?.dataset.state==='late');
+        assert.equal(await page.locator('.customer-card[data-id="GX-1056"]').getAttribute('data-state'),'late',label+' paid client expires in demo');
+        await page.locator('#advance-demo-date').click();
         await page.waitForFunction(()=>document.getElementById('demo-date-label').textContent==='14 NOV');
         assert.equal(await valeria.getAttribute('data-state'),'due',label+' back to initial state');
         await page.locator('#search-client').fill('Sofia');
