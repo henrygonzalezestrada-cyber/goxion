@@ -149,6 +149,12 @@ async function scenarios(browserType,name){
         if(capture)await page.screenshot({path:'artifacts/admin-v5/services-'+width+'.png',fullPage:true});
         await page.locator('.back-link').click();
         await waitRoute(page,'#/clientes');
+        await page.locator('a.customer-card[href*="GX-1048"]').click();
+        await waitRoute(page,'#/clientes/GX-1048/resumen');
+        assert((await page.locator('#dossier-head').innerText()).includes('Mateo Díaz'),label+' opening another client after returning');
+        await geometry(page,label+' second dossier');
+        await page.locator('.back-link').click();
+        await waitRoute(page,'#/clientes');
         await visit(page,'operaciones');
         assert.equal(await page.locator('.operation-row').count(),3,label+' pending ops');
         await page.locator('[data-ops-filter="solicitudes"]').click();
