@@ -73,7 +73,7 @@ async function run(type,name){
         assert.equal(await page.locator('.queue-entry').count(),3,label+' queue size');
         assert.equal(await page.locator('.date-entry').count(),4,label+' agenda count');
         await dimensions(page,label,'home');
-        const photo=name==='chromium'&&[280,390,1440].includes(width);
+        const photo=name==='Chromium'&&[280,390,1440].includes(width);
         if(photo)await page.screenshot({path:'artifacts/admin-v4/inicio-'+width+'.png',fullPage:true});
         await page.locator('a[data-nav="clientes"]:visible').first().click();
         await waitHash(page,'#/clientes');
