@@ -1,7 +1,7 @@
 import { readFileSync as read } from "node:fs";
 import assert from "node:assert/strict";
 
-const sql=read("supabase/migrations/202611130002_cancelar_servicio_b2_sin_borrar_historial.sql","utf8");
+const sql=read("supabase/migrations/202611140003_cancelar_servicio_b2_sin_borrar_historial.sql","utf8");
 const tests=read("supabase/tests/20261113_b2_cancelacion_segura_reversible.sql","utf8");
 const edge=read("docs/edge/admin-acciones/index.ts","utf8");
 const ui=read("assets/js/admin/03-supabase-v3-writes.js","utf8");
