@@ -1,7 +1,6 @@
 -- GOXION · corte de transición por cobertura y próxima renovación
 -- Único escritor B2 vigente: goxion_b2_iniciar_ciclo. No acreditar pagos aquí.
 -- Revisar docs/rollback/2026-11-13_b2_renovaciones_v2.md para reversión.
--- El corte mensual usa goxion_b2_vencimiento_periodo para no congelar vencimientos.
 
 create or replace function public.goxion_b2_proxima_renovacion(
   p_cobertura_hasta date, p_dia_corte smallint
@@ -30,30 +29,6 @@ revoke all on function public.goxion_b2_proxima_renovacion(date,smallint)
  from public, anon, authenticated;
 grant execute on function public.goxion_b2_proxima_renovacion(date,smallint) to service_role;
 
--- El calendario B2 AVANZA a la siguiente fecha al cerrar un pago; igualdad
--- entre fecha guardada y vencimiento del ciclo significa renovación exigible.
--- Para ciclos recurrentes se calcula el vencimiento del período solicitado,
--- NO la primera renovación histórica (que quedaría congelada en diciembre).
-create or replace function public.goxion_b2_vencimiento_periodo(
- p_cobertura_hasta date,p_dia_corte smallint,p_periodo date
-) returns date
-language sql immutable strict security invoker
-set search_path = ''
-as $periodo$
- with meta as (
-  select (p_periodo + least(p_dia_corte::int,
-    extract(day from (p_periodo+interval '1 month - 1 day')::date)::int)-1)::date as vence
- )
- select case when p_dia_corte between 1 and 31
-   and p_periodo=date_trunc('month',p_periodo)::date
-   and vence>=p_cobertura_hasta then vence else null end
- from meta
-$periodo$;
-revoke all on function public.goxion_b2_vencimiento_periodo(date,smallint,date)
- from public, anon, authenticated;
-grant execute on function public.goxion_b2_vencimiento_periodo(date,smallint,date)
- to service_role;
-
 create or replace function public.goxion_b2_previsualizar_renovaciones(
   p_cliente_id uuid, p_periodo date
 ) returns jsonb
@@ -74,7 +49,7 @@ begin
      (cal.estado='verificado' and cal.revision>0
        and cal.precio_centavos>0 and cal.cobertura_hasta is not null
        and cal.dia_corte between 1 and 31) as verificada,
-     public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo)
+     public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte)
        as siguiente_vencimiento
    from public.cliente_accesos a
    join public.cliente_servicios s on s.id=a.cliente_servicio_id
@@ -168,11 +143,11 @@ begin
  if v_cliente.pago_en_revision then raise exception 'Comprobante global en revisión';end if;
  select count(*),count(*) filter(where cal.estado='verificado'
    and cal.precio_centavos>0 and cal.revision>0
-   and public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo)>=p_periodo
-   and public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo)<(p_periodo+interval '1 month')::date),
- count(distinct public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo)) filter(
-  where public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo)>=p_periodo
-    and public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo)<(p_periodo+interval '1 month')::date),
+   and public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte)>=p_periodo
+   and public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte)<(p_periodo+interval '1 month')::date),
+ count(distinct public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte)) filter(
+  where public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte)>=p_periodo
+    and public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte)<(p_periodo+interval '1 month')::date),
  coalesce(sum(cal.precio_centavos),0)::bigint
  into v_n,v_ver,v_fechas,v_base
  from public.cliente_accesos a
@@ -234,11 +209,11 @@ begin
   descuento_original_centavos,descuento_vigente_centavos,
   principal_pendiente_centavos,mora_calculada_hasta)
  select v_ciclo.id,p_cliente_id,a.cliente_servicio_id,a.id,
-  p_periodo,public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo),cal.revision,cal.precio_centavos,
+  p_periodo,public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte),cal.revision,cal.precio_centavos,
   round(cal.precio_centavos*v_pct::numeric/100)::int,
   round(cal.precio_centavos*v_pct::numeric/100)::int,
   cal.precio_centavos-round(cal.precio_centavos*v_pct::numeric/100)::int,
-  public.goxion_b2_vencimiento_periodo(cal.cobertura_hasta,cal.dia_corte,p_periodo)
+  public.goxion_b2_proxima_renovacion(cal.cobertura_hasta,cal.dia_corte)
  from public.cliente_accesos a
  join public.cliente_servicios s on s.id=a.cliente_servicio_id and s.activo
  join public.goxion_calendario_accesos cal on cal.cliente_acceso_id=a.id
