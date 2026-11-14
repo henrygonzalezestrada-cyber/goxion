@@ -57,7 +57,7 @@
       return '<a class="date-entry" href="'+clientHref(d.id,"servicios")+'" aria-label="Consultar '+escape(d.service)+' de '+escape(c.name)+', '+escape(d.day)+' de noviembre">'+
         '<span class="date-mark"><strong>'+escape(d.day)+'</strong><small>'+escape(d.mon)+'</small></span>'+
         '<span class="date-info"><strong>'+escape(c.name)+'</strong><small>'+escape(d.service)+'</small><span>Acceso de muestra</span></span>'+
-        '<span class="date-amount">'+escape(currency(c.amount))+'</span></a>';
+        '<span class="date-amount" aria-hidden="true">'+icon('arrow')+'</span></a>';
     }).join("");
   }
   function matchesClient(c){
@@ -125,7 +125,9 @@
         '<p class="dossier-description">Ningún PIN, contraseña o token real se incorpora a este prototipo.</p>';
     }
     const body=$("dossier-body");body.innerHTML=output;
-    body.classList.remove("state-change");void body.offsetHeight;body.classList.add("state-change");
+    if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches && body.animate){
+      body.animate([{opacity:.75,transform:"translateY(4px)"},{opacity:1,transform:"translateY(0)"}],{duration:190,easing:"ease-out"});
+    }
   }
   function renderOps() {
     const list=ops.filter(o=>state.opsFilter==="pendientes"?o.open:o.type===state.opsFilter);
