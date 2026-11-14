@@ -1,0 +1,34 @@
+name: GOXION V5 Visual QA
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'preview/admin-v5/**'
+      - 'scripts/admin-v5-qa.mjs'
+      - '.github/workflows/admin-v5-visual.yml'
+  push:
+    branches: [design/admin-v5-fusion-v22-v28-20261114, design/admin-v5-2-distill-20261114]
+    paths:
+      - 'preview/admin-v5/**'
+      - 'scripts/admin-v5-qa.mjs'
+      - '.github/workflows/admin-v5-visual.yml'
+  workflow_dispatch:
+jobs:
+  responsive-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - name: Validar flujo visual tamaños y X2
+        run: node scripts/admin-v5-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: goxion-nexo-v5-screenshots
+          path: artifacts/admin-v5/
+          if-no-files-found: ignore
