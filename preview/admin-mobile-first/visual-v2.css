@@ -11,7 +11,7 @@
   -webkit-font-smoothing:antialiased;
 }
 *{box-sizing:border-box}
-html{scrollbar-gutter:stable;scroll-behavior:auto}
+html{scroll-behavior:auto}
 body{min-width:280px;margin:0;overflow-x:clip}
 button,input{font:inherit}
 button{cursor:pointer}
