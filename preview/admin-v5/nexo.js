@@ -107,17 +107,45 @@
     });
   }
   function advanceDate(){
-    const before=new Map(customers.map(c=>[c.id,statusFor(c).key]));
+    const previous=new Map(customers.map(c=>[c.id,statusFor(c)]));
     state.demoDay=(state.demoDay+1)%demoDates.length;
-    const render=()=>renderCustomers();
-    if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches && document.startViewTransition){
-      document.startViewTransition(render);
-    }else render();
-    const changed=customers.filter(c=>before.get(c.id)!==statusFor(c).key).map(c=>c.name);
-    const announcement=el("status-announcement");
-    announcement.textContent="Fecha de muestra: "+demoDateLabel()+". "+(changed.length?"Cambió el estado visual de "+changed.join(", ")+".":"Estados actualizados.");
-    if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
-      el("advance-demo-date").animate([{transform:"scale(.96)"},{transform:"scale(1)"}],{duration:190,easing:"ease-out"});
+    const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Update the live card surface in-place. Do not stack full-screen
+    // view transitions when a user taps through several sample dates quickly.
+    if(state.clientFilter!=="todos"){
+      renderCustomers();
+    }else{
+      customers.forEach(c=>{
+        const card=Array.from(document.querySelectorAll(".customer-card")).find(node=>node.dataset.id===c.id);
+        if(!card)return;
+        const status=statusFor(c),old=previous.get(c.id);
+        const changed=old.key!==status.key||old.note!==status.note||old.name!==status.name;
+        card.dataset.state=status.key;
+        card.setAttribute("aria-label","Abrir expediente de "+c.name+", "+status.name);
+        const tag=card.querySelector(".status-tag"),note=card.querySelector(".customer-state-note");
+        tag.className="status-tag "+status.key;
+        tag.textContent=status.name;
+        note.textContent=status.note;
+        if(changed&&!reduced){
+          for(const target of [tag,note]){
+            target.getAnimations().forEach(animation=>animation.cancel());
+            target.animate([{opacity:.3,transform:"translateY(4px)"},{opacity:1,transform:"translateY(0)"}],
+              {duration:280,easing:"cubic-bezier(.2,.72,.22,1)"});
+          }
+        }
+      });
+      el("demo-date-label").textContent=demoDateLabel();
+    }
+    const changed=customers.filter(c=>{
+      const old=previous.get(c.id),current=statusFor(c);
+      return old.key!==current.key||old.name!==current.name;
+    }).map(c=>c.name);
+    el("status-announcement").textContent="Fecha de muestra: "+demoDateLabel()+". "+
+      (changed.length?"Cambió el estado visual de "+changed.join(", ")+".":"Estados actualizados.");
+    if(!reduced){
+      const btn=el("advance-demo-date");
+      btn.getAnimations().forEach(a=>a.cancel());
+      btn.animate([{transform:"scale(.96)"},{transform:"scale(1)"}],{duration:180,easing:"ease-out"});
     }
   }
   function renderDossier(c,view){
@@ -217,10 +245,16 @@
     }
     lastRoute=currentKey+"/"+next.tab;
   }
+  let activeViewTransition=null;
   function changeRoute(){
     const reduced=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if(!reduced&&typeof document.startViewTransition==="function"){
-      document.startViewTransition(()=>applyRoute());
+      if(activeViewTransition)activeViewTransition.skipTransition();
+      const transition=document.startViewTransition(()=>applyRoute());
+      activeViewTransition=transition;
+      const finished=transition.finished.catch(()=>{});
+      window.__goxionTransitionFinished=finished;
+      finished.then(()=>{if(activeViewTransition===transition)activeViewTransition=null;});
     }else applyRoute();
   }
   document.addEventListener("click",event=>{
