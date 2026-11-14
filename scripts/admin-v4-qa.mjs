@@ -38,7 +38,25 @@ async function dimensions(page,label,stage){
   if(result.actionMin!==null)assert(result.actionMin>=43,label+' '+stage+' actionable row below 44px');
 }
 async function waitHash(page,hash){
-  await page.waitForFunction(h=>window.location.hash===h,hash);
+  await page.waitForFunction(h=>{
+    if(window.location.hash!==h)return false;
+    const route=h.split("/").filter(Boolean);
+    const view=route[1];
+    const section=document.getElementById('screen-'+view);
+    if(!section || section.hidden)return false;
+    if(view==='clientes'){
+      const directory=document.getElementById('client-directory');
+      const detail=document.getElementById('client-detail');
+      const hasId=route.length>=3;
+      if(hasId && (!directory.hidden||detail.hidden))return false;
+      if(!hasId && (directory.hidden||!detail.hidden))return false;
+      if(hasId && route[3]){
+        const selected=document.querySelector('[data-detail-tab="'+route[3]+'"].selected');
+        if(!selected)return false;
+      }
+    }
+    return true;
+  },hash);
 }
 async function run(type,name){
   const browser=await type.launch({headless:true});
