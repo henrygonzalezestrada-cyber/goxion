@@ -30,6 +30,8 @@ revoke all on function public.goxion_b2_proxima_renovacion(date,smallint)
  from public, anon, authenticated;
 grant execute on function public.goxion_b2_proxima_renovacion(date,smallint) to service_role;
 
+-- El calendario B2 AVANZA a la siguiente fecha al cerrar un pago; igualdad
+-- entre fecha guardada y vencimiento del ciclo significa renovación exigible.
 -- Para ciclos recurrentes se calcula el vencimiento del período solicitado,
 -- NO la primera renovación histórica (que quedaría congelada en diciembre).
 create or replace function public.goxion_b2_vencimiento_periodo(
@@ -44,7 +46,7 @@ as $periodo$
  )
  select case when p_dia_corte between 1 and 31
    and p_periodo=date_trunc('month',p_periodo)::date
-   and vence>p_cobertura_hasta then vence else null end
+   and vence>=p_cobertura_hasta then vence else null end
  from meta
 $periodo$;
 revoke all on function public.goxion_b2_vencimiento_periodo(date,smallint,date)
