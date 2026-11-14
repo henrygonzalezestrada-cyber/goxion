@@ -18,12 +18,14 @@ async function dimensions(page,label,stage){
   const result=await page.evaluate(()=>{
     const r=(el)=>{const x=el.getBoundingClientRect();return {left:x.left,right:x.right,top:x.top,bottom:x.bottom,width:x.width,height:x.height}};
     const shown=(el)=>el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
-    const nav=[...document.querySelectorAll('.bottom-item,.rail-item')].filter(shown).map(r);
+    const navElements=[...document.querySelectorAll('.bottom-item,.rail-item')].filter(shown);
+    const nav=navElements.map(r);
+    const selected=navElements.filter(el=>el.classList.contains("selected")).map(el=>el.dataset.nav);
     const actionRows=[...document.querySelectorAll('.screen:not([hidden]) .queue-entry,.screen:not([hidden]) .operation-item,.screen:not([hidden]) .folio,.screen:not([hidden]) .date-entry')].filter(shown).map(r);
     const active=document.querySelector('.screen:not([hidden])');
     const logo=document.querySelector(window.innerWidth<=830?'.wordmark img':'.rail-logo img');
     return {width:window.innerWidth,documentWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,
-      nav,actionMin:actionRows.length?Math.min(...actionRows.map(x=>x.height)):null,
+      nav,selected,actionMin:actionRows.length?Math.min(...actionRows.map(x=>x.height)):null,
       logoLoaded:logo.complete&&logo.naturalWidth>0,
       active:active?.id||null};
   });
@@ -31,11 +33,18 @@ async function dimensions(page,label,stage){
   assert(result.documentWidth<=result.width+1,label+' '+stage+' horizontal overflow '+result.documentWidth+' > '+result.width);
   assert(result.bodyWidth<=result.width+1,label+' '+stage+' body overflow '+result.bodyWidth);
   assert.equal(result.nav.length,4,label+' '+stage+' nav count');
+  assert.deepEqual(result.selected,[result.active.replace('screen-','')],label+' '+stage+' wrong active navigation');
   for(const n of result.nav){
     assert(n.height>=44,label+' '+stage+' nav smaller than 44px');
     assert(n.left>=-1&&n.right<=result.width+1,label+' '+stage+' nav outside viewport');
   }
   if(result.actionMin!==null)assert(result.actionMin>=43,label+' '+stage+' actionable row below 44px');
+}
+async function settle(page){
+  await page.evaluate(async()=>{
+    const moving=document.getAnimations();
+    await Promise.all(moving.map(anim=>anim.finished.catch(()=>{})));
+  });
 }
 async function waitHash(page,hash){
   await page.waitForFunction(h=>{
@@ -57,6 +66,7 @@ async function waitHash(page,hash){
     }
     return true;
   },hash);
+  await settle(page);
 }
 async function run(type,name){
   const browser=await type.launch({headless:true});
@@ -70,6 +80,7 @@ async function run(type,name){
         const res=await page.goto(url,{waitUntil:'domcontentloaded'});
         assert(res?.ok(),label+': HTML failed');
         await page.locator('.queue-entry').first().waitFor();
+        await settle(page);
         assert.equal(await page.locator('.queue-entry').count(),3,label+' queue size');
         assert.equal(await page.locator('.date-entry').count(),4,label+' agenda count');
         await dimensions(page,label,'home');
