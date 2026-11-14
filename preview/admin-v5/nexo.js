@@ -32,7 +32,7 @@
   ];
 
   const demoDates=["2026-11-14","2026-11-15","2026-11-18","2026-11-28","2026-11-29"];
-  const state={clientQuery:"",clientFilter:"todos",opsFilter:"pendientes",demoDay:0};
+  const state={clientQuery:"",clientFilter:"todos",opsFilter:"pendientes",demoDay:0,selectedCustomer:null};
   const renewalDays={"GX-1042":"2026-11-15","GX-1048":"2026-11-16","GX-1056":"2026-11-28","GX-1061":"2026-11-10"};
   const toDay=(iso)=>Math.floor(Date.parse(iso+"T12:00:00Z")/86400000);
   const statusFor=(c)=>{
@@ -88,7 +88,7 @@
     });
     el("clients-grid").innerHTML=filtered.map(c=>{
       const status=statusFor(c);
-      return '<a class="customer-card" href="'+hrefClient(c.id)+'" data-id="'+escape(c.id)+'" data-state="'+status.key+'" aria-label="Abrir expediente de '+escape(c.name)+', '+status.name+'">'+
+      return '<a class="customer-card" href="'+hrefClient(c.id)+'" data-id="'+escape(c.id)+'" data-state="'+status.key+'"'+(state.selectedCustomer===c.id?' style="view-transition-name:active-customer"':'')+' aria-label="Abrir expediente de '+escape(c.name)+', '+status.name+'">'+
         '<span class="customer-head"><span class="customer-avatar">'+escape(c.initials)+'</span>'+
         '<span class="customer-name"><strong>'+escape(c.name)+'</strong><small>'+escape(c.id)+'</small></span>'+
         '<span class="status-tag '+status.key+'">'+status.name+'</span></span>'+
@@ -224,6 +224,11 @@
     }else applyRoute();
   }
   document.addEventListener("click",event=>{
+    const card=event.target.closest("a.customer-card");
+    if(card){
+      state.selectedCustomer=card.dataset.id;
+      card.style.viewTransitionName="active-customer";
+    }
     const c=event.target.closest("[data-client-filter]");
     if(c){state.clientFilter=c.dataset.clientFilter;renderCustomers();return;}
     const o=event.target.closest("[data-ops-filter]");
@@ -235,6 +240,16 @@
     if(e.key==="Escape"){const now=route();if(now.page==="clientes"&&now.id)location.hash="#/clientes";}
   });
   window.addEventListener("hashchange",changeRoute);
+  const capsule=document.querySelector(".header-shell");
+  let scrolling=false;
+  window.addEventListener("scroll",()=>{
+    if(scrolling)return;
+    scrolling=true;
+    requestAnimationFrame(()=>{
+      capsule.classList.toggle("is-scrolled",window.scrollY>18);
+      scrolling=false;
+    });
+  },{passive:true});
   renderHome();renderCustomers();renderOperations();
   if(!location.hash)history.replaceState(null,"","#/inicio");
   applyRoute(true);
