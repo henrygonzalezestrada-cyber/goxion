@@ -1,8 +1,11 @@
 import {readFileSync as read} from "node:fs";
 import assert from "node:assert/strict";
 
-const projection=read("docs/rollout/2026-11-12_b2_proyeccion_solo_lectura.sql","utf8");
-const writer=read("docs/rollout/2026-11-12_b2_escritor_actualizado_pendiente_validacion.sql","utf8");
+const migration=read("supabase/migrations/202611130001_b2_renovacion_proyectada_v2.sql","utf8");
+const writerBoundary=migration.indexOf("CREATE OR REPLACE FUNCTION public.goxion_b2_iniciar_ciclo");
+assert.ok(writerBoundary>0,"Falta el único escritor oficial");
+const projection=migration.slice(0,writerBoundary);
+const writer=migration.slice(writerBoundary);
 const edge=read("docs/edge/acciones-financieras-b2-beta/index.ts","utf8");
 const registry=read("docs/GOXION_LIMPIEZA_NOMBRES_2026-11-12.md","utf8");
 const design=read("docs/GOXION_HIBRIDO_RENOVACIONES_V2.md","utf8");
