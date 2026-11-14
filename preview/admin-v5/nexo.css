@@ -401,16 +401,15 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
 @media(max-width:760px){
   .app{display:block;min-height:100dvh}
   .side{display:none}
-  .topbar{height:65px;position:sticky;top:0;z-index:30;padding-inline:17px;background:rgba(11,50,39,.96);color:white;border-bottom:0;box-shadow:0 4px 19px rgba(0,56,33,.1)}
-  .topbar:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:linear-gradient(90deg,#91eeb5,#b4aafa,#87d8de)}
-  .brand>span{color:#fff;font-size:19px}
-  .brand small{color:#b6d8c6}
+  .header-shell{height:73px;padding:10px 13px 0}
+  .topbar{width:100%;height:53px;padding:7px 11px;gap:8px;background:rgba(249,255,251,.79);box-shadow:0 7px 23px rgba(21,77,54,.17)}
   .brand img{height:35px;width:35px}
-  .topbar-center{display:none}
+  .brand-text strong{font-size:16px}
+  .brand-text small{font-size:9px}
+  .topbar-center,.capsule-divider{display:none}
   .topbar-right{margin-left:auto}
-  .demo-indicator{background:rgba(202,253,229,.14);color:#c5f2d9;border:1px solid rgba(228,255,240,.12);font-size:9px}
-  .admin-avatar{height:34px;width:34px}
-  .main{padding:22px 16px calc(117px + env(safe-area-inset-bottom));max-width:760px}
+  .demo-indicator{font-size:9px;padding:7px 9px}
+  .main{padding:7px 16px calc(117px + env(safe-area-inset-bottom));max-width:760px}
   .home-grid{grid-template-columns:repeat(6,minmax(0,1fr));gap:13px}
   .focus-panel,.renewal-panel{grid-column:span 6}
   .focus-panel{min-height:272px;padding:21px}
@@ -446,8 +445,19 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
   .module-card{min-height:132px}
   .page-head-number{display:none}
 }
+@media(max-width:600px){
+  .dossier-overview{grid-template-columns:1fr;gap:10px}
+  .dossier-insight{min-height:80px;display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:5px 12px;padding:12px 15px}
+  .insight-kicker{grid-column:1}
+  .insight-date{font-size:23px;grid-column:1;grid-row:2}
+  .insight-state{grid-column:2;grid-row:1}
+  .insight-link{grid-column:2;grid-row:2;margin:0}
+  .customer-services{margin-top:10px;margin-bottom:9px}
+  .client-livebar{padding-bottom:10px;gap:6px}
+  .customer-card{min-height:191px}
+}
 @media(max-width:440px){
-  .main{padding-inline:14px;padding-top:18px}
+  .main{padding-inline:14px;padding-top:7px}
   .page-head h1{font-size:33px}
   .small-hello{font-size:10.5px}
   .focus-panel{min-height:264px;padding:18px 18px 16px;border-radius:21px}
@@ -469,14 +479,14 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
   .searchbox{flex-basis:100%;max-width:none;min-width:0}
   .segments{width:100%}
   .segment{font-size:10.5px;padding:8px 11px}
-  .customer-card{padding:15px;min-height:208px}
-  .customer-name strong{font-size:14px}
-  .status-tag{font-size:9px;padding:6px 7px}
-  .dossier-head{padding:14px;gap:11px}
-  .dossier-profile{height:50px;width:50px;border-radius:15px;font-size:16px}
-  .dossier-head-copy h2{font-size:21px}
+  .customer-card{padding:13px 14px 11px;min-height:188px}
+  .customer-name strong{font-size:13px}
+  .status-tag{font-size:9px;padding:5px 7px}
+  .dossier-head{padding:12px 13px;gap:9px}
+  .dossier-profile{height:45px;width:45px;border-radius:14px;font-size:15px}
+  .dossier-head-copy h2{font-size:20px}
   .dossier-statgrid{gap:6px}
-  .dossier-stat{padding:12px 9px}
+  .dossier-stat{padding:11px 9px}
   .dossier-stat strong{font-size:19px}
   .dossier-stat small{font-size:9px}
   .dossier-tabs a{font-size:10px}
@@ -487,10 +497,13 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
 }
 @media(max-width:340px){
   .main{padding-inline:11px}
-  .topbar{padding-inline:11px}
-  .brand>span{font-size:16px}
-  .demo-indicator{font-size:8px;padding:7px}
-  .admin-avatar{display:none}
+  .header-shell{padding-inline:9px;height:68px;padding-top:8px}
+  .topbar{padding:6px 9px;height:51px}
+  .brand img{width:32px;height:32px}
+  .brand-text strong{font-size:14px}
+  .brand-text small{font-size:8px}
+  .demo-indicator{font-size:8px;padding:6px 7px;gap:5px}
+  .demo-spark{width:5px;height:5px}
   .focus-main{gap:8px}
   .focus-number{font-size:51px}
   .focus-main h2{font-size:16px}
@@ -506,9 +519,9 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
   .mini-main strong{font-size:29px}
   .mini-main span{font-size:8.5px}
   .mini-foot{font-size:9px}
-  .customer-avatar{width:38px;height:38px}
+  .customer-avatar{display:none}
   .customer-head{gap:7px}
-  .customer-name strong{font-size:12.5px}
+  .customer-name strong{font-size:13px}
   .status-tag{font-size:8px}
   .dossier-stat{padding:9px 7px}
   .dossier-stat strong{font-size:16px}
@@ -516,10 +529,18 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
   .access-date{font-size:10px}
   .mobile-nav{left:7px;right:7px}
 }
+/* Shared-element navigation: the tapped customer card becomes the dossier identity. */
+.dossier-head{view-transition-name:active-customer}
+@keyframes nexo-route-old{to{opacity:0;transform:translateY(-5px);filter:blur(2px)}}
+@keyframes nexo-route-new{from{opacity:0;transform:translateY(9px);filter:blur(2px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+::view-transition-old(root){animation:170ms ease-in both nexo-route-old}
+::view-transition-new(root){animation:260ms cubic-bezier(.2,.78,.22,1) both nexo-route-new}
+::view-transition-group(active-customer){animation-duration:340ms;animation-timing-function:cubic-bezier(.15,.8,.25,1)}
 @media(hover:hover){
   .side-link:not(.is-selected):hover{transform:translateY(-1px)}
   .mobile-link:not(.is-selected):hover{background:rgba(255,255,255,.09)}
 }
 @media(prefers-reduced-motion:reduce){
   *,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  ::view-transition-old(root),::view-transition-new(root),::view-transition-group(active-customer){animation:none!important}
 }
