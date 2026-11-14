@@ -41,7 +41,7 @@
     const diff=target-day;
     if(c.state==="review")return {key:"review",name:"En revisión",note:"Pago por validar",priority:"Revisar"};
     if(c.state==="current" && diff>=0)return {key:"current",name:"Al corriente",note:"Sin alertas",priority:"Estable"};
-    if(diff<0)return {key:"late",name:"Vencido",note:Math.abs(diff)===1?"1 día vencido":Math.abs(diff)+" días vencido",priority:"Atención"};
+    if(diff<0)return {key:"late",name:"Vencido",note:Math.abs(diff)===1?"Venció ayer":"Venció hace "+Math.abs(diff)+" días",priority:"Atención"};
     if(diff===0)return {key:"due",name:"Vence hoy",note:"Hoy",priority:"Prioridad"};
     if(diff<=3)return {key:"due",name:"Por vencer",note:diff===1?"Mañana":"En "+diff+" días",priority:"Próximo"};
     return {key:"current",name:"Al corriente",note:"En "+diff+" días",priority:"Estable"};
