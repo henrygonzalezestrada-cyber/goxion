@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#102d29">
+  <meta name="description" content="GOXION Admin, estudio visual V5: fusión V22 + V28. Datos de muestra; sin acceso a sistemas productivos.">
+  <title>GOXION Admin · Concepto Nexo V5</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="nexo.css?v=50">
+  <script defer src="nexo.js?v=50"></script>
+</head>
+<body>
+  <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="ic-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="11" width="7" height="10" rx="1.5"/><rect x="3" y="14" width="8" height="7" rx="1.5"/></symbol>
+    <symbol id="ic-people" viewBox="0 0 24 24"><circle cx="9" cy="7.5" r="3"/><path d="M3 20v-2.4c0-3.1 2.5-4.9 6-4.9s6 1.8 6 4.9V20H3ZM17 4.8c3 1 3 5.6 0 6.6M17.4 14c2.4.6 3.6 2 3.6 4.6V20"/></symbol>
+    <symbol id="ic-inbox" viewBox="0 0 24 24"><path d="M4 4h16l2 10v6H2v-6L4 4Z"/><path d="M2.4 14h5.4l2.3 3.2h3.8l2.3-3.2h5.4"/></symbol>
+    <symbol id="ic-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.2"/><circle cx="16" cy="17" r="2.2"/></symbol>
+    <symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M7 3v4M17 3v4M3 11h18"/></symbol>
+    <symbol id="ic-arrow" viewBox="0 0 24 24"><path d="M4 12h16M14 6l6 6-6 6"/></symbol>
+    <symbol id="ic-back" viewBox="0 0 24 24"><path d="M20 12H4m6-6-6 6 6 6"/></symbol>
+    <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5.5 5.5"/></symbol>
+    <symbol id="ic-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="ic-check" viewBox="0 0 24 24"><path d="m4 12 5 5L20 6"/></symbol>
+    <symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2.5"/></symbol>
+    <symbol id="ic-activity" viewBox="0 0 24 24"><path d="M3 12h4l3-7 4 14 3-7h4"/></symbol>
+    <symbol id="ic-wallet" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="3"/><path d="M3 9h18M16 14h2"/></symbol>
+    <symbol id="ic-life" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="m5.7 5.7 4 4m4.6 4.6 4 4m0-12.6-4 4m-4.6 4.6-4 4"/></symbol>
+    <symbol id="ic-x" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5 5 19"/></symbol>
+    <symbol id="ic-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="ic-spark" viewBox="0 0 24 24"><path d="m12 2 2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4L12 2Z"/></symbol>
+    <symbol id="ic-shield" viewBox="0 0 24 24"><path d="m12 2 8 4v7c0 4.5-3.5 7.5-8 9-4.5-1.5-8-4.5-8-9V6l8-4Z"/><path d="m8.5 12 2.6 2.7 4.9-5.3"/></symbol>
+  </svg>
+
+  <a class="skip-to-content" href="#main">Saltar al contenido</a>
+  <div class="app">
+    <aside class="side" aria-label="Navegación de GOXION Admin">
+      <a href="#/inicio" class="side-mark" aria-label="GOXION, ir al inicio">
+        <img src="../../Logo%20individual.png" alt="" width="46" height="46">
+      </a>
+      <div class="side-links">
+        <a href="#/inicio" data-nav="inicio" class="side-link is-selected" aria-current="page" title="Inicio"><svg aria-hidden="true"><use href="#ic-grid"/></svg><span>Inicio</span></a>
+        <a href="#/clientes" data-nav="clientes" class="side-link" title="Clientes"><svg aria-hidden="true"><use href="#ic-people"/></svg><span>Clientes</span></a>
+        <a href="#/operaciones" data-nav="operaciones" class="side-link" title="Operaciones"><svg aria-hidden="true"><use href="#ic-inbox"/></svg><span>Operaciones</span><i class="side-notice" aria-hidden="true"></i></a>
+        <a href="#/gestion" data-nav="gestion" class="side-link" title="Gestión"><svg aria-hidden="true"><use href="#ic-settings"/></svg><span>Gestión</span></a>
+      </div>
+      <div class="side-last"><span class="side-online"></span><span>V5</span></div>
+    </aside>
+    <div class="app-main">
+      <header class="topbar">
+        <a class="brand" href="#/inicio">
+          <img src="../../Logo%20individual.png" width="38" height="38" alt="">
+          <span>GOXION <small>Admin</small></span>
+        </a>
+        <div class="topbar-center"><span class="topbar-dot"></span> Panel de gestión</div>
+        <div class="topbar-right"><span class="demo-indicator">Modo demo</span><span class="admin-avatar" aria-label="Perfil administrador de muestra">A</span></div>
+      </header>
+
+      <main id="main" class="main" tabindex="-1">
+        <section class="screen" id="screen-inicio" aria-labelledby="heading-inicio">
+          <div class="page-head">
+            <div class="page-head-main"><span class="small-hello">Tu espacio de trabajo</span><h1 id="heading-inicio">Todo fluye<span class="period">.</span></h1><p>Lo importante está aquí, sin tener que buscarlo.</p></div>
+            <div class="date-tag"><svg aria-hidden="true"><use href="#ic-calendar"/></svg><span>Sábado 14 noviembre</span></div>
+          </div>
+
+          <div class="home-grid">
+            <section class="focus-panel" aria-labelledby="focus-title">
+              <div class="focus-top"><span class="focus-label"><span class="tiny-wave"></span> Prioridad de hoy</span><span class="focus-decoration" aria-hidden="true"><svg><use href="#ic-spark"/></svg></span></div>
+              <div class="focus-main"><span class="focus-number">03</span><div><h2 id="focus-title">Asuntos por atender</h2><p>Un pago, una cancelación y un caso de soporte requieren seguimiento.</p></div></div>
+              <div class="focus-tasks"><span><i class="task-color payment"></i> Pago</span><span><i class="task-color cancellation"></i> Baja</span><span><i class="task-color support"></i> Soporte</span></div>
+              <a href="#/operaciones" class="focus-button">Ir a pendientes <svg aria-hidden="true"><use href="#ic-arrow"/></svg></a>
+            </section>
+
+            <section class="renewal-panel" aria-labelledby="renewal-title">
+              <div class="panel-title-line"><div><span class="panel-mini">Tu agenda</span><h2 id="renewal-title">Renovaciones cercanas</h2></div><span class="panel-count">4 accesos</span></div>
+              <div id="home-renewals" class="renewal-timeline"></div>
+              <a href="#/clientes" class="panel-footer-link">Explorar expedientes <svg aria-hidden="true"><use href="#ic-arrow"/></svg></a>
+            </section>
+
+            <a href="#/clientes" class="mini-panel mint-panel">
+              <div class="mini-top"><span class="mini-label">Tus clientes</span><span class="mini-icon"><svg aria-hidden="true"><use href="#ic-people"/></svg></span></div>
+              <div class="mini-main"><strong>04</strong><span>expedientes de muestra</span></div>
+              <div class="mini-foot">Consultar fichas <svg aria-hidden="true"><use href="#ic-arrow"/></svg></div>
+            </a>
+
+            <a href="#/operaciones" class="mini-panel apricot-panel">
+              <div class="mini-top"><span class="mini-label">Solicitudes</span><span class="mini-icon"><svg aria-hidden="true"><use href="#ic-inbox"/></svg></span></div>
+              <div class="mini-main"><strong>02</strong><span>en seguimiento</span></div>
+              <div class="mini-foot">Ver solicitudes <svg aria-hidden="true"><use href="#ic-arrow"/></svg></div>
+            </a>
+
+            <section class="rhythm-panel" aria-labelledby="rhythm-title">
+              <div class="rhythm-header"><div><span class="panel-mini">Distribución de accesos</span><h2 id="rhythm-title">Próximas fechas</h2></div><span class="rhythm-caption">Noviembre</span></div>
+              <div class="rhythm-bars" id="rhythm-bars" aria-label="Accesos por fecha de la muestra"></div>
+              <p>Un calendario útil, no otro cálculo financiero.</p>
+            </section>
+          </div>
+
+          <p class="data-notice"><svg aria-hidden="true"><use href="#ic-shield"/></svg> Vista exploratoria con datos ficticios. Ninguna acción afecta clientes, pagos o servicios reales.</p>
+        </section>
+
+        <section class="screen" id="screen-clientes" aria-labelledby="heading-clientes" hidden>
+          <div id="directory">
+            <div class="page-head compact-page-head"><div class="page-head-main"><span class="small-hello">Personas y suscripciones</span><h1 id="heading-clientes">Clientes<span class="period">.</span></h1><p>Estado, servicios y fechas con contexto.</p></div><span class="page-head-number" id="client-count">04 <small>expedientes</small></span></div>
+            <div class="search-tools">
+              <label for="search-client" class="searchbox"><svg aria-hidden="true"><use href="#ic-search"/></svg><input id="search-client" type="search" autocomplete="off" placeholder="Buscar por nombre o folio" aria-label="Buscar clientes"></label>
+              <div class="segments" role="group" aria-label="Estado de los clientes">
+                <button type="button" class="segment is-active" data-client-filter="todos" aria-pressed="true">Todos</button>
+                <button type="button" class="segment" data-client-filter="atencion" aria-pressed="false">Por atender</button>
+                <button type="button" class="segment" data-client-filter="corriente" aria-pressed="false">Al corriente</button>
+              </div>
+            </div>
+            <div id="clients-grid" class="clients-grid" aria-live="polite"></div>
+            <p id="clients-empty" class="empty-message" hidden>No encontramos ese cliente en la muestra.</p>
+          </div>
+
+          <article id="dossier" class="dossier" hidden aria-label="Expediente del cliente">
+            <a href="#/clientes" class="back-link"><svg aria-hidden="true"><use href="#ic-back"/></svg> Volver a clientes</a>
+            <div id="dossier-head" class="dossier-head"></div>
+            <nav class="dossier-tabs" aria-label="Vistas del expediente">
+              <a href="#/clientes/GX-1042/resumen" data-detail="resumen">Resumen</a>
+              <a href="#/clientes/GX-1042/servicios" data-detail="servicios">Servicios</a>
+              <a href="#/clientes/GX-1042/beneficios" data-detail="beneficios">Beneficios</a>
+              <a href="#/clientes/GX-1042/cuenta" data-detail="cuenta">Cuenta</a>
+            </nav>
+            <div class="dossier-content" id="dossier-content" aria-live="polite"></div>
+          </article>
+        </section>
+
+        <section class="screen" id="screen-operaciones" aria-labelledby="heading-operaciones" hidden>
+          <div class="page-head compact-page-head"><div class="page-head-main"><span class="small-hello">Seguimiento y decisiones</span><h1 id="heading-operaciones">Operaciones<span class="period">.</span></h1><p>Revisa cada situación sin perder el hilo.</p></div><span class="page-head-number">03 <small>pendientes</small></span></div>
+          <div class="segments ops-segments" role="group" aria-label="Tipo de operación">
+            <button class="segment is-active" data-ops-filter="pendientes" aria-pressed="true">Pendientes <span>3</span></button>
+            <button class="segment" data-ops-filter="pagos" aria-pressed="false">Pagos</button>
+            <button class="segment" data-ops-filter="solicitudes" aria-pressed="false">Solicitudes</button>
+            <button class="segment" data-ops-filter="actividad" aria-pressed="false">Actividad</button>
+          </div>
+          <div class="ops-workspace">
+            <div class="ops-list-wrap"><div class="ops-title-row"><h2 id="ops-list-title">Por atender</h2><span id="ops-count">3 asuntos</span></div><div id="operations-list" class="operations-list"></div></div>
+            <aside class="ops-side"><span class="ops-side-icon"><svg aria-hidden="true"><use href="#ic-life"/></svg></span><h3>Todo en su lugar</h3><p>Cada solicitud abre el mismo expediente del cliente. El prototipo no duplica aprobaciones, cancelaciones ni cobros.</p><div class="ops-note">La baja solo se completa cuando se hace efectiva en el sistema original.</div></aside>
+          </div>
+          <p class="data-notice"><svg aria-hidden="true"><use href="#ic-shield"/></svg> Esta bandeja es una demostración visual. Los estados y botones reales permanecen en GOXION Admin.</p>
+        </section>
+
+        <section class="screen" id="screen-gestion" aria-labelledby="heading-gestion" hidden>
+          <div class="page-head compact-page-head"><div class="page-head-main"><span class="small-hello">Mapa del ecosistema</span><h1 id="heading-gestion">Gestión<span class="period">.</span></h1><p>Las herramientas que mantienen GOXION funcionando.</p></div></div>
+          <div class="management-grid">
+            <article class="module-card module-first"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-wallet"/></svg></span><div><h2>Servicios y catálogo</h2><p>Precios, disponibilidad, promociones e inventario.</p></div><span class="module-index">01</span></article>
+            <article class="module-card module-second"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-people"/></svg></span><div><h2>Cuentas y accesos</h2><p>Suscripciones, perfiles y asignaciones.</p></div><span class="module-index">02</span></article>
+            <article class="module-card module-third"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-spark"/></svg></span><div><h2>Beneficios</h2><p>Programa de lealtad, misiones y Trato Justo.</p></div><span class="module-index">03</span></article>
+            <article class="module-card module-fourth"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-life"/></svg></span><div><h2>Experiencia</h2><p>Opiniones, soporte y comunicación con clientes.</p></div><span class="module-index">04</span></article>
+          </div>
+          <p class="data-notice"><svg aria-hidden="true"><use href="#ic-shield"/></svg> Índice ilustrativo: todavía no hay controles de gestión conectados.</p>
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="Navegación móvil">
+      <a href="#/inicio" data-nav="inicio" class="mobile-link is-selected" aria-current="page"><svg aria-hidden="true"><use href="#ic-grid"/></svg><span>Inicio</span></a>
+      <a href="#/clientes" data-nav="clientes" class="mobile-link"><svg aria-hidden="true"><use href="#ic-people"/></svg><span>Clientes</span></a>
+      <a href="#/operaciones" data-nav="operaciones" class="mobile-link"><svg aria-hidden="true"><use href="#ic-inbox"/></svg><span>Operaciones</span><i class="nav-dot" aria-hidden="true"></i></a>
+      <a href="#/gestion" data-nav="gestion" class="mobile-link"><svg aria-hidden="true"><use href="#ic-settings"/></svg><span>Gestión</span></a>
+    </nav>
+  </div>
+</body>
+</html>
