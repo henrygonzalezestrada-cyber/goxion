@@ -140,3 +140,22 @@ Datos, pagos, fechas, clientes y estados totalmente **ficticios**. El prototipo 
 - **No se han tocado** `admin.html`, `assets/css/admin.css`, controladores, B2/V1 ni Supabase.
 
 **Prueba exigida:** ejecutar de nuevo el QA de Chromium/WebKit a 280–1440 px después del cambio, y luego solicitar revisión Safari físico. No promover la V3.1 hasta aprobación visual y plan de integración.
+
+
+## V3.2 — 14/nov/2026 · Corrección tras rechazo de la órbita
+
+**Feedback del propietario:** la V3.1 agregó básicamente una tarjeta enorme y una órbita de animación que no mejoraron realmente la experiencia. La V3.1 NO fue aprobada. Cambiar el estilo en toda la experiencia, sin inflar Inicio ni repetir una capa decorativa.
+
+**Dirección:** `GOXION Signal / Control Surface`. Se sustituye la anterior identidad por una composición útil más gráfica y activa, orientada a decisiones:
+- Inicio: **eliminar completamente** la escena orbital `.signal-stage` y sus animaciones. Nueva **franja compacta** `.dispatch-bar` con 3 asuntos, su clasificación y acción real de navegación a Operaciones. Dos accesos de resumen ahora son botones, no indicadores estáticos.
+- Cola: filas con codificación contextual de pagos/solicitudes, etiquetas discretas y flechas animadas al interactuar.
+- Clientes: fichas compactas con estados semánticos, textura visual geométrica mínima, jerarquía tipográfica reforzada y affordance inequívoca «Ver expediente».
+- Operaciones: clasificación visible antes del asunto, botones/flechas contextuales y bandeja con estados por tipo.
+- Servicios: fechas individuales como una pequeña línea de tiempo, sin contenedores duplicados, y un solo encabezado para contrato X2.
+- Navegación: barrita superior de marca, 4 destinos y dock táctil integrado en móvil. Selección y toque se reflejan visualmente.
+- Movimiento: entrada de sección 260 ms, confirmación de navegación y hover/tap de los componentes; solo el **pequeño indicador de pendientes** respira lentamente. Con `prefers-reduced-motion` desactivado.
+- Código limpio: **reemplazo total** del único `preview/admin-v3/studio.css`; sin herencia de `studio.css` V3.1 ni hojas adicionales superpuestas.
+- Se mantienen fuentes de datos de prueba locales, sin APIs, sin escrituras y sin reproducciones de B2/V1.
+- Unidades 280–1440 px; CI visual de Chromium y WebKit debe repetirse y observar sus capturas antes de mostrar al propietario.
+
+**En producción siguen intactos:** `admin.html`, `assets/css/admin.css`, `assets/js/admin/*`, backend financiero/cancelaciones, Index y Ayuda. La publicación de `preview/admin-v3/` en Pages será únicamente un escaparate de prueba, no integración.
