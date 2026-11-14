@@ -226,6 +226,7 @@
   document.addEventListener("click",event=>{
     const card=event.target.closest("a.customer-card");
     if(card){
+      document.querySelectorAll(".customer-card").forEach(node=>{node.style.viewTransitionName="none";});
       state.selectedCustomer=card.dataset.id;
       card.style.viewTransitionName="active-customer";
     }
