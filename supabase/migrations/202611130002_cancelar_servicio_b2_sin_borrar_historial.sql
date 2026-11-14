@@ -16,6 +16,7 @@ declare
  v_prev_ciclo uuid;v_regimen jsonb;v_creado jsonb;
  v_activas int;v_fechas int;v_dia smallint;v_total integer;
  v_retirados integer:=0;v_num_ciclos int;v_num_no_pagados int;
+ v_reg_activo boolean:=false;
 begin
  if p_cliente_servicio_id is null or p_confirmado is distinct from true
    or length(btrim(coalesce(p_actor,'')))<3 or length(p_actor)>120 then
@@ -46,7 +47,8 @@ begin
  end if;
  select * into v_reg from public.goxion_b2_regimen_cliente
  where cliente_id=v_cliente_id for update;
- if found and v_reg.activo is true then
+ v_reg_activo=coalesce(v_reg.activo,false);
+ if v_reg_activo then
    -- Se permite cancelar solo el ciclo pendiente del periodo actual,
    -- conservando todos los ciclos LIQUIDADOS de meses anteriores.
    select count(*) into v_num_ciclos from public.goxion_b2_ciclos
@@ -122,7 +124,7 @@ begin
  end if;
  -- El trigger estándar de cliente_servicios sincroniza los accesos.
  -- Al quedar una fecha real, volver al motor mensual único sin doble cargo.
- if v_reg.activo is true then
+ if v_reg_activo then
    select count(distinct cal.dia_corte)::int,
           min(cal.dia_corte)::smallint,
           count(distinct a.id)::int
@@ -167,7 +169,7 @@ begin
    (accion,antes,cliente_id,despues,entidad,entidad_id,ocurrido_en)
  values('actualizar',
    jsonb_build_object('servicio',to_jsonb(v_servicio),
-       'regimen_b2',coalesce(v_reg.activo,false)),
+       'regimen_b2',v_reg_activo),
    v_cliente_id,
    jsonb_build_object('servicio_activo',false,
      'servicio_id',p_cliente_servicio_id,
@@ -183,7 +185,7 @@ begin
    'fechas_activas',v_fechas,
    'servicios_activos',v_activas,
    'regimen_activo',coalesce((v_regimen->>'regimen_activo')::boolean,
-      coalesce(v_reg.activo,false) and v_fechas>1),
+      v_reg_activo and v_fechas>1),
    'codigo','SERVICIO_CANCELADO_CON_HISTORIAL');
 end $cancelar$;
 
