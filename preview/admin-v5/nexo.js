@@ -1,6 +1,6 @@
 "use strict";
 /**
- * GOXION NEXO V5 — DEMOSTRACIÓN SIN BACKEND
+ * GOXION NEXO V5.1 — DEMOSTRACIÓN SIN BACKEND
  * Registros, fechas, productos, estados y montos ficticios.
  * Cero lecturas/escrituras a Admin, B2, Edge o Supabase.
  */
@@ -31,7 +31,22 @@
     {id:"op-4",kind:"activity",category:"actividad",title:"Cambio de servicio registrado",detail:"Movimiento histórico ilustrativo.",customer:"GX-1056",tag:"Actividad",open:false}
   ];
 
-  const state={clientQuery:"",clientFilter:"todos",opsFilter:"pendientes"};
+  const demoDates=["2026-11-14","2026-11-15","2026-11-18","2026-11-28","2026-11-29"];
+  const state={clientQuery:"",clientFilter:"todos",opsFilter:"pendientes",demoDay:0};
+  const renewalDays={"GX-1042":"2026-11-15","GX-1048":"2026-11-16","GX-1056":"2026-11-28","GX-1061":"2026-11-10"};
+  const toDay=(iso)=>Math.floor(Date.parse(iso+"T12:00:00Z")/86400000);
+  const statusFor=(c)=>{
+    const day=toDay(demoDates[state.demoDay]);
+    const target=toDay(renewalDays[c.id]);
+    const diff=target-day;
+    if(c.state==="review")return {key:"review",name:"En revisión",note:"Pago por validar",priority:"Revisar"};
+    if(c.state==="current")return {key:"current",name:"Al corriente",note:"Sin alertas",priority:"Estable"};
+    if(diff<0)return {key:"late",name:"Vencido",note:Math.abs(diff)===1?"1 día vencido":Math.abs(diff)+" días vencido",priority:"Atención"};
+    if(diff===0)return {key:"due",name:"Vence hoy",note:"Hoy",priority:"Prioridad"};
+    if(diff<=3)return {key:"due",name:"Por vencer",note:diff===1?"Mañana":"En "+diff+" días",priority:"Próximo"};
+    return {key:"current",name:"Al corriente",note:"En "+diff+" días",priority:"Estable"};
+  };
+  const demoDateLabel=()=>demoDates[state.demoDay].slice(8)+" NOV";
   const el=(id)=>document.getElementById(id);
   const svg=(name)=>'<svg aria-hidden="true"><use href="#ic-'+name+'"></use></svg>';
   const escape=(s)=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -67,31 +82,49 @@
   function renderCustomers(){
     const query=normalize(state.clientQuery);
     const filtered=customers.filter(c=>{
-      if(state.clientFilter==="atencion"&&c.state==="current")return false;
-      if(state.clientFilter==="corriente"&&c.state!=="current")return false;
+      if(state.clientFilter==="atencion"&&statusFor(c).key==="current")return false;
+      if(state.clientFilter==="corriente"&&statusFor(c).key!=="current")return false;
       return !query||normalize(c.name).includes(query)||normalize(c.id).includes(query);
     });
-    el("clients-grid").innerHTML=filtered.map(c=>
-      '<a class="customer-card" href="'+hrefClient(c.id)+'" data-state="'+escape(c.state)+'" aria-label="Abrir expediente de '+escape(c.name)+'">'+
-      '<span class="customer-head"><span class="customer-avatar">'+escape(c.initials)+'</span>'+
-      '<span class="customer-name"><strong>'+escape(c.name)+'</strong><small>'+escape(c.id)+'</small></span>'+
-      '<span class="status-tag '+escape(c.state)+'">'+escape(c.status)+'</span></span>'+
-      '<span class="customer-services">'+c.services.map(s=>'<span class="service-chip">'+escape(s.name)+(s.accesses.length>1?' <em>×'+s.accesses.length+'</em>':'')+'</span>').join("")+'</span>'+
-      '<span class="customer-bottom"><span><small>Próxima fecha</small><strong>'+escape(c.next)+'</strong></span>'+
-      '<span class="customer-price"><small>Importe demo</small><strong>'+money(c.total)+'</strong></span></span>'+
-      '<span class="customer-foot"><span>Ver expediente</span>'+svg("arrow")+'</span></a>'
-    ).join("");
+    el("clients-grid").innerHTML=filtered.map(c=>{
+      const status=statusFor(c);
+      return '<a class="customer-card" href="'+hrefClient(c.id)+'" data-id="'+escape(c.id)+'" data-state="'+status.key+'" aria-label="Abrir expediente de '+escape(c.name)+', '+status.name+'">'+
+        '<span class="customer-head"><span class="customer-avatar">'+escape(c.initials)+'</span>'+
+        '<span class="customer-name"><strong>'+escape(c.name)+'</strong><small>'+escape(c.id)+'</small></span>'+
+        '<span class="status-tag '+status.key+'">'+status.name+'</span></span>'+
+        '<span class="customer-services">'+c.services.map(s=>'<span class="service-chip">'+escape(s.name)+(s.accesses.length>1?' <em>×'+s.accesses.length+'</em>':'')+'</span>').join("")+'</span>'+
+        '<span class="customer-bottom"><span class="customer-date"><small>PRÓXIMA FECHA</small><strong>'+escape(c.next)+'</strong><em class="customer-state-note">'+status.note+'</em></span>'+
+        '<span class="customer-price"><small>IMPORTE DEMO</small><strong>'+money(c.total)+'</strong></span></span>'+
+        '<span class="customer-foot"><span>Ver expediente</span>'+svg("arrow")+'</span></a>';
+    }).join("");
     el("clients-empty").hidden=filtered.length>0;
     el("client-count").innerHTML=String(filtered.length).padStart(2,"0")+' <small>'+(filtered.length===1?"expediente":"expedientes")+'</small>';
+    el("demo-date-label").textContent=demoDateLabel();
     document.querySelectorAll("[data-client-filter]").forEach(b=>{
       const active=b.dataset.clientFilter===state.clientFilter;
       b.classList.toggle("is-active",active);
       b.setAttribute("aria-pressed",String(active));
     });
   }
+  function advanceDate(){
+    const before=new Map(customers.map(c=>[c.id,statusFor(c).key]));
+    state.demoDay=(state.demoDay+1)%demoDates.length;
+    const render=()=>renderCustomers();
+    if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches && document.startViewTransition){
+      document.startViewTransition(render);
+    }else render();
+    const changed=customers.filter(c=>before.get(c.id)!==statusFor(c).key).map(c=>c.name);
+    const announcement=el("status-announcement");
+    announcement.textContent="Fecha de muestra: "+demoDateLabel()+". "+(changed.length?"Cambió el estado visual de "+changed.join(", ")+".":"Estados actualizados.");
+    if(!window.matchMedia("(prefers-reduced-motion: reduce)").matches){
+      el("advance-demo-date").animate([{transform:"scale(.96)"},{transform:"scale(1)"}],{duration:190,easing:"ease-out"});
+    }
+  }
   function renderDossier(c,view){
+    const status=statusFor(c);
     el("dossier-head").innerHTML='<span class="dossier-profile">'+escape(c.initials)+'</span>'+
-      '<div class="dossier-head-copy"><small>'+escape(c.id)+' · EXPEDIENTE DEMO</small><h2>'+escape(c.name)+'</h2><p>'+escape(plainServices(c))+'</p></div>';
+      '<div class="dossier-head-copy"><small>'+escape(c.id)+' · EXPEDIENTE</small><h2>'+escape(c.name)+'</h2><p>'+escape(plainServices(c))+'</p></div>'+
+      '<span class="dossier-status '+status.key+'">'+status.name+'</span>';
     document.querySelectorAll("[data-detail]").forEach(a=>{
       const on=a.dataset.detail===view;
       a.href=hrefClient(c.id,a.dataset.detail);
@@ -100,38 +133,39 @@
     });
     let content="";
     if(view==="resumen"){
-      content='<div class="dossier-statgrid">'+
+      content='<div class="dossier-overview">'+
+        '<div class="dossier-summary-main">'+
+        '<div class="dossier-statgrid">'+
         '<div class="dossier-stat"><small>Próxima fecha</small><strong>'+escape(c.next)+'</strong></div>'+
-        '<div class="dossier-stat"><small>Importe ilustrativo</small><strong>'+money(c.total)+'</strong></div>'+
-        '<div class="dossier-stat"><small>Accesos de muestra</small><strong>'+totalAccess(c)+'</strong></div></div>'+
-        '<h3 class="dossier-section-title">Situación del cliente</h3>'+
-        facts("Estado","Situación visual, no calculada por el backend.",c.status)+
-        facts("Servicios","Contratos comerciales visibles una sola vez.",c.services.length+' servicios')+
-        facts("Calendario","Fechas individuales de los accesos.",totalAccess(c)+' accesos')+
-        '<a class="detail-action" href="#/operaciones">Consultar operaciones '+svg("arrow")+'</a>'+
-        '<p class="detail-message">Las cifras y fechas son ficticias. La V5 no modifica el motor de pagos ni la cobertura de servicios.</p>';
+        '<div class="dossier-stat"><small>Importe demo</small><strong>'+money(c.total)+'</strong></div>'+
+        '<div class="dossier-stat"><small>Accesos</small><strong>'+totalAccess(c)+'</strong></div></div>'+
+        '<h3 class="dossier-section-title">Vista rápida</h3>'+
+        facts("Estado", "Situación de muestra",status.name)+
+        facts("Servicios", "Contratos activos en el ejemplo",c.services.length+" servicios")+
+        '</div>'+
+        '<aside class="dossier-insight"><span class="insight-kicker">SIGUIENTE FECHA</span><strong class="insight-date">'+escape(c.next)+'</strong>'+
+        '<span class="insight-state '+status.key+'">'+status.note+'</span>'+
+        '<a class="insight-link" href="'+hrefClient(c.id,"servicios")+'">Ver fechas de accesos '+svg("arrow")+'</a></aside>'+
+        '</div>';
     } else if(view==="servicios"){
-      content='<h3 class="dossier-section-title">Servicios contratados</h3>'+
+      content='<div class="section-title-row"><h3 class="dossier-section-title">Servicios</h3><span>'+c.services.length+' contratados</span></div>'+
         '<div class="service-units">'+c.services.map(s=>
-          '<section class="service-unit"><div class="service-unit-top"><div><h3>'+escape(s.name)+'</h3><p>Servicio comercial · información ficticia</p></div>'+
+          '<section class="service-unit"><div class="service-unit-top"><div><h3>'+escape(s.name)+'</h3></div>'+
           '<span class="access-count">'+s.accesses.length+' '+(s.accesses.length===1?"acceso":"accesos")+'</span></div>'+
           '<div class="access-list">'+s.accesses.map(a=>
             '<div class="access-row"><span class="access-label"><i class="access-marker" aria-hidden="true"></i><span><strong>'+escape(a.name)+'</strong><small>'+escape(a.description)+'</small></span></span>'+
             '<time class="access-date">'+escape(a.date)+'</time></div>'
           ).join("")+'</div></section>'
-        ).join("")+'</div>'+
-        '<p class="detail-message">En un servicio X2 se muestra un único contrato con dos accesos y fechas propias. La lógica B2 real no se ha reproducido aquí.</p>';
+        ).join("")+'</div>';
     } else if(view==="beneficios"){
       content='<h3 class="dossier-section-title">Beneficios</h3>'+
-        facts("Programa de lealtad","Elegibilidad de muestra, sin cómputo de puntos.",c.benefit)+
-        facts("Misiones y compensaciones","Las decisiones permanecen en sus módulos reales.","Sin datos demo")+
-        '<p class="detail-message">No se han conectado beneficios, descuentos ni saldos reales.</p>';
+        facts("Lealtad","Elegibilidad de muestra",c.benefit)+
+        facts("Misiones","Gestionadas en el Admin oficial","Sin datos demo");
     } else {
-      content='<h3 class="dossier-section-title">Cuenta y permisos</h3>'+
-        facts("Identificador","Folio creado exclusivamente para esta demostración.",c.id)+
-        facts("Acceso","Los permisos dependen del Admin oficial.","Protegido")+
-        facts("Credenciales","Nunca se cargan contraseñas ni tokens aquí.","No disponibles")+
-        '<p class="detail-message">La ficha es una muestra visual; no cambia asignaciones, acceso ni perfiles.</p>';
+      content='<h3 class="dossier-section-title">Cuenta</h3>'+
+        facts("Folio","Identificador de demostración",c.id)+
+        facts("Permisos","Administrados por el sistema original","Protegidos")+
+        facts("Credenciales","Nunca se muestran en el prototipo","Privadas");
     }
     el("dossier-content").innerHTML=content;
   }
@@ -196,6 +230,7 @@
     if(o){state.opsFilter=o.dataset.opsFilter;renderOperations();}
   });
   el("search-client").addEventListener("input",e=>{state.clientQuery=e.target.value;renderCustomers();});
+  el("advance-demo-date").addEventListener("click",advanceDate);
   document.addEventListener("keydown",e=>{
     if(e.key==="Escape"){const now=route();if(now.page==="clientes"&&now.id)location.hash="#/clientes";}
   });
