@@ -145,59 +145,58 @@ Deno.serve(async (req) => {
       const clienteId=String(data?.cliente_id||"").trim();
       if(!uuid.test(clienteId))
         return json({ok:false,error:"Cliente inválido"},400);
-      const [client,regime,accesses]=await Promise.all([
+      // El periodo global solo identifica el mes de transición.
+      // Las fechas individuales se calculan desde la cobertura abonada.
+      const [client,regime]=await Promise.all([
         sb.from("clientes").select("id,estado,periodo_pendiente,pago_en_revision")
           .eq("id",clienteId).maybeSingle(),
         sb.from("goxion_b2_regimen_cliente").select("activo,periodo_inicio")
-          .eq("cliente_id",clienteId).maybeSingle(),
-        sb.from("cliente_accesos").select("id,cliente_servicio_id")
-          .eq("cliente_id",clienteId).eq("activo",true).limit(100)
+          .eq("cliente_id",clienteId).maybeSingle()
       ]);
-      if(client.error||regime.error||accesses.error)
-        throw (client.error||regime.error||accesses.error);
+      if(client.error||regime.error)throw (client.error||regime.error);
       if(!client.data)return json({ok:false,error:"Cuenta inexistente"},404);
       const periodo=String(client.data.periodo_pendiente||"").slice(0,10);
       const active=regime.data?.activo===true;
-      const ids=(accesses.data||[]).map((x:any)=>x.id);
-      let registered:any[]=[];
-      if(ids.length){
-        const saved=await sb.from("goxion_calendario_accesos")
-          .select("cliente_acceso_id,cobertura_hasta,precio_centavos,estado,revision")
-          .in("cliente_acceso_id",ids);
-        if(saved.error)throw saved.error;
-        registered=saved.data||[];
-      }
-      const dates=new Set<string>();
-      const byAccess=new Map(registered.map((x:any)=>[x.cliente_acceso_id,x]));
-      const endOfMonth=/^\d{4}-\d{2}-01$/.test(periodo)
-        ?new Date(Date.UTC(Number(periodo.slice(0,4)),
-           Number(periodo.slice(5,7)),0)).toISOString().slice(0,10):"";
-      const valid=ids.filter((id:string)=>{
-        const row:any=byAccess.get(id);
-        if(!row||row.estado!=="verificado"||
-          !Number.isInteger(Number(row.revision))||Number(row.revision)<=0||
-          Number(row.precio_centavos)<=0||
-          row.cobertura_hasta<periodo||row.cobertura_hasta>endOfMonth)return false;
-        dates.add(row.cobertura_hasta);
-        return true;
-      }).length;
+      if(!/^\d{4}-\d{2}-01$/.test(periodo))
+        return json({ok:true,accion:action,codigo:"FIN-PERIODO-409",
+          modo:active?"b2_activo":"fecha_unica",periodo,
+          regimen_activo:active,perfiles:0,perfiles_verificados:0,
+          perfiles_exigibles_en_periodo:0,fechas_distintas:0,
+          listo_para_activar:false,motivos:["Período de cobro no conciliado"],
+          operacion_solo_lectura:true});
+      // RPC de proyección: la misma fuente SQL que usa el escritor B2.
+      // No inferir vencimientos desde JS ni convertir cobertura pagada en deuda.
+      const projected=await sb.rpc("goxion_b2_previsualizar_renovaciones",{
+        p_cliente_id:clienteId,p_periodo:periodo
+      });
+      if(projected.error||projected.data?.ok!==true)
+        throw projected.error||new Error("No se pudo proyectar el calendario");
+      const p=projected.data;
+      const n=Number(p.perfiles||0),verified=Number(p.perfiles_verificados||0);
+      const exigibles=Number(p.exigibles_en_periodo||0),distinct=Number(p.fechas_distintas||0);
       const reasons:string[]=[];
       if(client.data.estado==="suspendido")reasons.push("Cuenta suspendida");
-      if(!/^\d{4}-\d{2}-01$/.test(periodo))reasons.push("Período de cobro no conciliado");
       if(client.data.pago_en_revision===true)reasons.push("Hay un pago en revisión");
-      if(ids.length<2)reasons.push("Se necesitan al menos dos perfiles reales");
-      if(ids.length!==valid)reasons.push("Guarda y verifica todas las fechas del período");
-      if(dates.size<2)reasons.push("Los perfiles deben tener al menos dos fechas distintas");
+      if(n<2)reasons.push("Se necesitan al menos dos perfiles reales");
+      if(n!==verified)reasons.push("Guarda y verifica los calendarios de todos los accesos");
+      if(Number(p.atrasados||0)>0)
+        reasons.push("Hay renovaciones anteriores sin conciliar; no se omitirán cobros");
+      if(Number(p.cubiertos_periodos_futuros||0)>0)
+        reasons.push("Hay servicios con cobertura pagada más allá de este período");
+      if(n!==exigibles)
+        reasons.push("No todos los accesos tienen renovación exigible en este período");
+      if(distinct<2)
+        reasons.push("Se requieren al menos dos vencimientos distintos en este período");
       const ready=!active&&reasons.length===0;
       const codigo=active?"B2_YA_ACTIVO":ready?"B2_LISTO_PARA_ACTIVAR":
-        reasons.includes("Hay un pago en revisión")?"FIN-REVISION-409":
-        "FIN-CALENDARIO-409";
+        reasons.includes("Hay un pago en revisión")?"FIN-REVISION-409":"FIN-CALENDARIO-409";
       return json({ok:true,accion:action,codigo,
         modo:active?"b2_activo":"fecha_unica",
-        periodo,regimen_activo:active,perfiles:ids.length,
-        perfiles_verificados:valid,fechas_distintas:dates.size,
+        periodo,regimen_activo:active,perfiles:n,
+        perfiles_verificados:verified,perfiles_exigibles_en_periodo:exigibles,
+        fechas_distintas:distinct,renovaciones_previstas:p.renovaciones||[],
         listo_para_activar:ready,motivos:reasons,
-        aviso:"La confirmación final vuelve a validar precios y beneficios en SQL",
+        aviso:"La confirmación final vuelve a validar precios, periodos y beneficios en SQL",
         operacion_solo_lectura:true});
     }
 

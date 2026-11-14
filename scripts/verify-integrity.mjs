@@ -915,6 +915,15 @@ if(errorCatalogSmoke.status!==0){
     String(errorCatalogSmoke.stderr||errorCatalogSmoke.stdout||'no ejecutado').slice(0,900));
 }
 
+// Fuente SQL única para cobertura pagada vs. próxima renovación; pruebas contractuales.
+const hybridContractSmoke=spawnSync(process.execPath,['scripts/hibrido-renovaciones-contract-smoke.mjs'],{
+  cwd:ROOT,encoding:'utf8',timeout:15000
+});
+if(hybridContractSmoke.status!==0){
+  fail('Contrato de renovaciones del motor híbrido: '+
+    String(hybridContractSmoke.stderr||hybridContractSmoke.stdout||'no ejecutado').slice(0,900));
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));

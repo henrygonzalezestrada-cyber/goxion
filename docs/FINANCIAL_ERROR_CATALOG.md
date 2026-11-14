@@ -9,7 +9,7 @@ El mensaje de pantalla debe tener **explicación en español + qué hacer + cód
 | `FIN-PERIODO-409` | Período o fecha de snapshot cambiaron. | Recargar estado, comprobar `periodo_pendiente` y liquidación anterior. |
 | `FIN-COMPROBANTE-409` | El comprobante no concilia con su cargo o su evidencia. | Revisar carga de evidencia, cliente, cargo, importe y estado `reportado/aprobado`. |
 | `FIN-REVISION-409` | Existe revisión pendiente de un pago global. | Resolverla antes de cambiar a B2; no crear un cargo paralelo. |
-| `FIN-CALENDARIO-409` | Falta una segunda unidad real con fecha distinta y calendario confirmado. | Verificar `cliente_servicios`, `cliente_accesos` y `goxion_calendario_accesos`; no deducir dos fechas desde una única fecha. |
+| `FIN-CALENDARIO-409` | Calendarios insuficientes **o** fechas de cobertura abonada confundidas con próximos vencimientos del periodo. | Verificar accesos activos, cobertura pagada, `dia_corte`, próxima renovación, periodo global y pagos existentes. No cambiar coberturas para forzar el botón; usar la proyección SQL del motor híbrido cuando el corte controlado esté desplegado. |
 | `FIN-CONCILIACION-409` | Suma, base, descuento, mora o vencimiento difieren del motor oficial. | Detener aprobación y comparar contrato/obligaciones; no forzar el saldo. |
 | `FIN-AUTORIZACION-401` | Sesión administrativa expirada o no autorizada. | Volver a iniciar sesión; nunca pedir ni enviar tokens a soporte. |
 | `FIN-DATOS-400` | Campos inválidos o incompletos. | Revisar cliente, importe, período y datos de la operación. |
