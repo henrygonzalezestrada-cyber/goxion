@@ -924,6 +924,15 @@ if(hybridContractSmoke.status!==0){
     String(hybridContractSmoke.stderr||hybridContractSmoke.stdout||'no ejecutado').slice(0,900));
 }
 
+// La eliminación administrativa de servicios debe conservar historia y evitar 500 en B2.
+const serviceCancellationSmoke=spawnSync(process.execPath,['scripts/admin-service-cancellation-smoke.mjs'],{
+  cwd:ROOT,encoding:'utf8',timeout:15000
+});
+if(serviceCancellationSmoke.status!==0){
+  fail('Cancelación de servicios sin pérdida financiera: '+
+    String(serviceCancellationSmoke.stderr||serviceCancellationSmoke.stdout||'no ejecutado').slice(0,900));
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));

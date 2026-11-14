@@ -270,13 +270,13 @@
             const c = cli(key);
             const s = c?.servicios?.[serviceIndex];
             if (!s) return;
-            if (!confirm(`¿Quitar "${s.nombre}" de este cliente?`)) return;
+            if (!confirm(`¿Quitar "${s.nombre}" de este cliente?\n\nSe conservarán los pagos anteriores. Los cargos todavía no cobrados se recalcularán automáticamente.`)) return;
 
             const serviceId = s.id || s._id;
             if (!serviceId) return alert("❌ Este servicio no tiene ID de Supabase. Recarga el Admin antes de eliminarlo.");
 
             try {
-                await accion("quitar_servicio_cliente", { id: serviceId });
+                await accion("quitar_servicio_cliente", { id: serviceId, confirmado: true });
                 await recargar(key);
             } catch (e) {
                 // No ocultamos el error; primero re-sincronizamos la ficha para

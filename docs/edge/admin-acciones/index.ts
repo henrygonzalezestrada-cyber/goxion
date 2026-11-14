@@ -719,23 +719,62 @@ Deno.serve(async (req) => {
       accion ===
       "quitar_servicio_cliente"
     ) {
-      const id =
-        String(datos.id ?? "").trim();
-
-      const { error } =
-        await supabase
-          .from(
-            "cliente_servicios"
-          )
-          .delete()
-          .eq("id", id);
-
-      if (error) throw error;
-
-      return responder({
-        ok: true,
-        accion,
+      // El usuario ya confirmó desde Admin: no borrar físicamente el contrato
+      // con historial, pues cargos B2 y obligaciones V1 referencian su ID.
+      const id = String(datos.id ?? "").trim();
+      const confirmado=datos.confirmado===true;
+      if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id))
+        return responder({ok:false,codigo:"FIN-SERVICIO-400",
+          error:"Selecciona un servicio válido para quitarlo."},400);
+      if (!confirmado)
+        return responder({ok:false,codigo:"FIN-SERVICIO-CONFIRMACION-400",
+          error:"Confirma la cancelación del servicio desde Admin."},400);
+      const rpc=await supabase.rpc("goxion_cancelar_servicio_admin_v1",{
+        p_cliente_servicio_id:id,
+        p_confirmado:true,
+        p_actor:"admin:gestion_servicios"
       });
+      if (rpc.error){
+        const raw=String(rpc.error.message||"");
+        const dictionary:Record<string,{codigo:string;mensaje:string}> ={
+          SERVICIO_B2_CICLO_CON_MOVIMIENTOS:{
+            codigo:"FIN-SERVICIO-COMPROMETIDO-409",
+            mensaje:"Hay pagos, comprobantes, prórrogas o beneficios asociados al ciclo. No se modificó el servicio: revisa las obligaciones y programa la cancelación para el siguiente periodo."},
+          SERVICIO_B2_CICLO_NO_VIRGEN:{
+            codigo:"FIN-SERVICIO-COMPROMETIDO-409",
+            mensaje:"El ciclo tiene movimientos financieros; hay que conciliarlo antes de cambiar los servicios."},
+          SERVICIO_PAGO_EN_REVISION:{
+            codigo:"FIN-REVISION-409",
+            mensaje:"Resuelve primero el comprobante que está en revisión."},
+          SERVICIO_ULTIMO_REQUIERE_GESTION_CUENTA:{
+            codigo:"FIN-SERVICIO-ULTIMO-409",
+            mensaje:"Para quitar el último servicio utiliza la gestión de cuenta o suspensión, sin perder su historial."},
+          SERVICIO_B2_CICLOS_DIFERENTES_EN_REVISION:{
+            codigo:"FIN-SERVICIO-CICLOS-409",
+            mensaje:"Hay ciclos B2 pendientes de distintos periodos. Revisa las obligaciones antes de cancelar."},
+          SERVICIO_CALENDARIO_RESTANTE_INCOMPLETO:{
+            codigo:"FIN-CALENDARIO-409",
+            mensaje:"Guarda y verifica primero las fechas de los servicios que permanecerán activos."},
+          SERVICIO_NO_EXISTE:{
+            codigo:"FIN-SERVICIO-404",
+            mensaje:"No existe el servicio. Actualiza la ficha antes de repetir la operación."}
+        };
+        const key=Object.keys(dictionary).find(k=>raw.includes(k));
+        if (key){
+          return responder({ok:false,codigo:dictionary[key].codigo,
+            error:dictionary[key].mensaje},key==="SERVICIO_NO_EXISTE"?404:409);
+        }
+        console.error("[admin-acciones:quitar_servicio_cliente] RPC no completada",{
+          codigo:rpc.error.code||"RPC_ERROR"
+        });
+        return responder({ok:false,codigo:"FIN-SERVICIO-409",
+          error:"No se quitó el servicio porque su estado financiero requiere revisión. No se modificaron pagos ni coberturas."},409);
+      }
+      if (rpc.data?.ok!==true)
+        return responder({ok:false,codigo:"FIN-SERVICIO-409",
+          error:"No se pudo confirmar la cancelación. Vuelve a consultar la ficha."},409);
+      return responder({ok:true,accion,codigo:"SERVICIO_CANCELADO_CON_HISTORIAL",
+        resultado:rpc.data});
     }
 
     // ======================================

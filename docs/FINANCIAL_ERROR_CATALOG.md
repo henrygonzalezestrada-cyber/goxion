@@ -10,6 +10,9 @@ El mensaje de pantalla debe tener **explicación en español + qué hacer + cód
 | `FIN-COMPROBANTE-409` | El comprobante no concilia con su cargo o su evidencia. | Revisar carga de evidencia, cliente, cargo, importe y estado `reportado/aprobado`. |
 | `FIN-REVISION-409` | Existe revisión pendiente de un pago global. | Resolverla antes de cambiar a B2; no crear un cargo paralelo. |
 | `FIN-CALENDARIO-409` | Calendarios insuficientes **o** fechas de cobertura abonada confundidas con próximos vencimientos del periodo. | Verificar accesos activos, cobertura pagada, `dia_corte`, próxima renovación, periodo global y pagos existentes. No cambiar coberturas para forzar el botón; usar la proyección SQL del motor híbrido cuando el corte controlado esté desplegado. |
+| `FIN-SERVICIO-COMPROMETIDO-409` | Intento de cancelar un contrato mientras su ciclo B2 ya tiene comprobantes, abonos, prórrogas, eventos o beneficios asociados. | No repetir ni borrar filas. Resolver el compromiso financiero o programar cancelación futura; usar el motor oficial. |
+| `FIN-SERVICIO-ULTIMO-409` | Se pretende quitar el último servicio del cliente. | Gestionar la suspensión o baja de cuenta conservando historial. |
+| `FIN-SERVICIO-CICLOS-409` | Hay obligaciones pendientes en distintos periodos B2. | Conciliar primero todos los ciclos; no eliminar su historial. |
 | `FIN-CONCILIACION-409` | Suma, base, descuento, mora o vencimiento difieren del motor oficial. | Detener aprobación y comparar contrato/obligaciones; no forzar el saldo. |
 | `FIN-AUTORIZACION-401` | Sesión administrativa expirada o no autorizada. | Volver a iniciar sesión; nunca pedir ni enviar tokens a soporte. |
 | `FIN-DATOS-400` | Campos inválidos o incompletos. | Revisar cliente, importe, período y datos de la operación. |
