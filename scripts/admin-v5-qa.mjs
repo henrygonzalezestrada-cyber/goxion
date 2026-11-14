@@ -107,7 +107,7 @@ async function scenarios(browserType,name){
         await page.locator('#advance-demo-date').click();
         await page.waitForFunction(()=>document.querySelector('.customer-card[data-id="GX-1042"]')?.dataset.state==='late');
         assert.equal(await valeria.locator('.status-tag').innerText(),'Vencido',label+' dynamic late state label');
-        assert((await valeria.locator('.customer-state-note').innerText()).includes('días vencido'),label+' late note');
+        assert((await valeria.locator('.customer-state-note').innerText()).includes('Venció hace'),label+' late note');
         await geometry(page,label+' changed state');
         if(capture)await page.screenshot({path:'artifacts/admin-v5/clients-overdue-'+width+'.png',fullPage:true});
         await page.locator('#advance-demo-date').click();
