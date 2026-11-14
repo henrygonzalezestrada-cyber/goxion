@@ -50,7 +50,7 @@ async function geometry(page,tag){
     const capsuleRadius=getComputedStyle(document.querySelector('.topbar')).borderTopLeftRadius;
     const cards=[...document.querySelectorAll('.customer-card')].filter(shown);
     const cardBounds=cards.map(box);
-    const cardStateData=cards.map(x=>({state:x.dataset.state,color:getComputedStyle(x).getPropertyValue('--state-ink').trim()}));
+    const cardStateData=cards.map(x=>({state:x.dataset.state,color:getComputedStyle(x).getPropertyValue('--state-ink').trim(),tagColor:getComputedStyle(x.querySelector('.status-tag')).color,stripeColor:getComputedStyle(x,'::before').backgroundColor}));
     return {vw:innerWidth,documentWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,
       nav:nav.map(box),active:nav.filter(x=>x.classList.contains('is-selected')).map(x=>x.dataset.nav),
       screen:document.querySelector('.screen:not([hidden])')?.id||null,
@@ -71,7 +71,11 @@ async function geometry(page,tag){
   for(const b of d.cardBounds)assert(b.l>=-1&&b.r<=d.vw+1,tag+' customer card outside screen');
   if(d.cardStateData.length>1){
     const colors=new Set(d.cardStateData.map(c=>c.color));
+    const labelColors=new Set(d.cardStateData.map(c=>c.tagColor));
+    const stripeColors=new Set(d.cardStateData.map(c=>c.stripeColor));
     assert(colors.size>1,tag+' customers have no state-distinct colors');
+    assert(labelColors.size>1,tag+' status badges failed to inherit state colors');
+    assert(stripeColors.size>1,tag+' side signals failed to inherit state colors');
   }
   assert.deepEqual(d.active,[d.screen.replace('screen-','')],tag+' active nav');
   if(d.rowMin!==null)assert(d.rowMin>=42,tag+' clickable row below touch target '+d.rowMin);
