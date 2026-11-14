@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="es" data-project="goxion-turno">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#1d2540">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="GOXION Turno, estudio visual V4 del Admin. Datos ficticios, sin acceso al sistema real.">
+  <title>GOXION Turno — Estudio visual V4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./turno.css">
+  <script defer src="./turno.js"></script>
+</head>
+<body>
+  <svg class="symbols" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="ico-home" viewBox="0 0 24 24"><path d="M3.5 10 12 3.5 20.5 10V21h-17zM9 21v-7h6v7"/></symbol>
+    <symbol id="ico-clients" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.3"/><path d="M2.7 20v-2.3c0-3.3 2.8-5.1 6.3-5.1s6.3 1.8 6.3 5.1V20zM17 6c2.8.1 3.8 3.8 1.4 5.2M17.6 13.4c2.5.5 3.7 2.1 3.7 4.5V20"/></symbol>
+    <symbol id="ico-work" viewBox="0 0 24 24"><path d="M4 5h16l2 10v6H2v-6zM2.2 15h5.7l2.2 3h3.8l2.2-3h5.7"/></symbol>
+    <symbol id="ico-gear" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.2"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.2"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.2"/></symbol>
+    <symbol id="ico-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 5l7 7-7 7"/></symbol>
+    <symbol id="ico-back" viewBox="0 0 24 24"><path d="M20 12H5m6-7-7 7 7 7"/></symbol>
+    <symbol id="ico-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6.5"/><path d="m15 15 6 6"/></symbol>
+    <symbol id="ico-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M7.5 3v5M16.5 3v5M3.5 11h17"/></symbol>
+    <symbol id="ico-check" viewBox="0 0 24 24"><path d="m4 12 5 5 11-11"/></symbol>
+    <symbol id="ico-close" viewBox="0 0 24 24"><path d="M5 5 19 19M19 5 5 19"/></symbol>
+    <symbol id="ico-spark" viewBox="0 0 24 24"><path d="M12 2.5 14.2 9.8 21.5 12l-7.3 2.2L12 21.5l-2.2-7.3L2.5 12l7.3-2.2z"/></symbol>
+    <symbol id="ico-ticket" viewBox="0 0 24 24"><path d="M3 5h18v5a2 2 0 0 0 0 4v5H3v-5a2 2 0 0 0 0-4zM10 5v2M10 10v4M10 17v2"/></symbol>
+    <symbol id="ico-shield" viewBox="0 0 24 24"><path d="M12 2 20 6v6c0 5-3.5 8-8 10-4.5-2-8-5-8-10V6zM8 12l3 3 5-6"/></symbol>
+    <symbol id="ico-chat" viewBox="0 0 24 24"><path d="M4 4h16v13H9l-5 4zM8 10h8M8 13h5"/></symbol>
+  </svg>
+  <a class="skip-link" href="#main">Saltar al contenido</a>
+  <div class="shell">
+    <aside class="rail" aria-label="Navegación principal de GOXION Admin">
+      <a class="rail-logo" href="#/inicio" aria-label="GOXION, abrir Inicio"><img src="../../Logo%20individual.png" alt="" width="52" height="52"></a>
+      <div class="rail-items" id="rail-nav">
+        <a class="rail-item selected" href="#/inicio" data-nav="inicio" aria-current="page" title="Inicio"><svg aria-hidden="true"><use href="#ico-home"/></svg><span>Inicio</span></a>
+        <a class="rail-item" href="#/clientes" data-nav="clientes" title="Clientes"><svg aria-hidden="true"><use href="#ico-clients"/></svg><span>Clientes</span></a>
+        <a class="rail-item" href="#/operaciones" data-nav="operaciones" title="Operaciones"><svg aria-hidden="true"><use href="#ico-work"/></svg><span>Operaciones</span><i class="nav-alert" aria-hidden="true"></i></a>
+        <a class="rail-item" href="#/gestion" data-nav="gestion" title="Gestión"><svg aria-hidden="true"><use href="#ico-gear"/></svg><span>Gestión</span></a>
+      </div>
+      <div class="rail-tail"><span class="rail-edition">Estudio V4</span><span class="rail-indicator"></span></div>
+    </aside>
+    <div class="bodyframe">
+      <header class="masthead">
+        <a class="wordmark" href="#/inicio" aria-label="GOXION, volver a Inicio">
+          <img src="../../Logo%20individual.png" alt="" width="38" height="38">
+          <span class="wordmark-type">GOXION <small>Admin</small></span>
+        </a>
+        <span class="masthead-status"><i></i> Modo demostración</span>
+        <span class="masthead-side">Sin datos reales</span>
+      </header>
+      <main class="main" id="main" tabindex="-1">
+        <section class="screen" id="screen-inicio" aria-labelledby="title-inicio">
+          <div class="screen-titlebar home-titlebar">
+            <div><h1 id="title-inicio">Tu mesa<span class="stop">.</span></h1><p>Lo que hay que resolver, antes de todo lo demás.</p></div>
+            <div class="edition-stamp"><span>GOXION</span><strong>Turno</strong><small>Una sola mesa de trabajo</small></div>
+          </div>
+          <div class="priority-band">
+            <div class="priority-count" aria-label="3 asuntos pendientes"><strong>3</strong><span>pendientes</span></div>
+            <p>Hay un pago por revisar, una cancelación aprobada y un caso de soporte esperando.</p>
+            <a class="priority-action" href="#/operaciones">Atender ahora <svg aria-hidden="true"><use href="#ico-arrow"/></svg></a>
+          </div>
+          <div class="home-columns">
+            <section class="queue-panel" aria-labelledby="queue-title">
+              <div class="panel-head"><h2 id="queue-title">En tu bandeja</h2><a href="#/operaciones">Ver todos</a></div>
+              <div id="home-queue" class="queue"></div>
+            </section>
+            <section class="dates-panel" aria-labelledby="dates-title">
+              <div class="panel-head"><h2 id="dates-title">Próximas fechas</h2><span class="panel-muted">Por acceso</span></div>
+              <div id="date-track" class="date-track"></div>
+              <a class="all-dates" href="#/clientes">Ver clientes y sus servicios <svg aria-hidden="true"><use href="#ico-arrow"/></svg></a>
+            </section>
+          </div>
+          <p class="footnote">Datos de ejemplo. Los pagos, calendarios y cancelaciones reales no están conectados a esta demostración.</p>
+        </section>
+
+        <section class="screen" id="screen-clientes" aria-labelledby="title-clientes" hidden>
+          <div id="client-directory">
+            <div class="screen-titlebar">
+              <div><h1 id="title-clientes">Clientes<span class="stop">.</span></h1><p>Un vistazo claro a quién necesita atención y por qué.</p></div>
+              <div class="directory-count" id="directory-total">4 <span>expedientes</span></div>
+            </div>
+            <div class="directory-tools">
+              <label class="search-field" for="client-search"><svg aria-hidden="true"><use href="#ico-search"/></svg><input type="search" id="client-search" name="buscar" placeholder="Nombre o folio…" autocomplete="off"></label>
+              <div class="filterbar" role="group" aria-label="Filtrar clientes">
+                <button type="button" class="filter selected" data-client-filter="todos" aria-pressed="true">Todos</button>
+                <button type="button" class="filter" data-client-filter="atencion" aria-pressed="false">Necesitan atención</button>
+                <button type="button" class="filter" data-client-filter="corriente" aria-pressed="false">Al corriente</button>
+              </div>
+            </div>
+            <div class="client-list" id="client-list" aria-live="polite"></div>
+            <p class="empty" id="client-empty" hidden>No hay clientes que coincidan. Prueba otro nombre o cambia el filtro.</p>
+          </div>
+          <article class="dossier" id="client-detail" hidden aria-label="Expediente de cliente">
+            <a class="return-link" href="#/clientes"><svg aria-hidden="true"><use href="#ico-back"/></svg> Regresar a clientes</a>
+            <div class="dossier-intro" id="dossier-intro"></div>
+            <nav class="dossier-tabs" aria-label="Secciones del expediente">
+              <a href="#/clientes/GX-1042/resumen" data-detail-tab="resumen">Resumen</a>
+              <a href="#/clientes/GX-1042/servicios" data-detail-tab="servicios">Servicios</a>
+              <a href="#/clientes/GX-1042/beneficios" data-detail-tab="beneficios">Beneficios</a>
+              <a href="#/clientes/GX-1042/cuenta" data-detail-tab="cuenta">Cuenta</a>
+            </nav>
+            <div class="dossier-body" id="dossier-body" aria-live="polite"></div>
+          </article>
+        </section>
+
+        <section class="screen" id="screen-operaciones" aria-labelledby="title-operaciones" hidden>
+          <div class="screen-titlebar">
+            <div><h1 id="title-operaciones">Operaciones<span class="stop">.</span></h1><p>Tus decisiones, ordenadas por tipo y urgencia.</p></div>
+            <div class="directory-count">3 <span>por resolver</span></div>
+          </div>
+          <div class="ops-filters filterbar" role="group" aria-label="Filtrar operaciones">
+            <button class="filter selected" data-ops-filter="pendientes" aria-pressed="true">Pendientes <b>3</b></button>
+            <button class="filter" data-ops-filter="pagos" aria-pressed="false">Pagos</button>
+            <button class="filter" data-ops-filter="solicitudes" aria-pressed="false">Solicitudes</button>
+            <button class="filter" data-ops-filter="actividad" aria-pressed="false">Actividad</button>
+          </div>
+          <div class="operations-meta"><strong id="ops-label">Pendientes</strong><span id="ops-counter">3 asuntos</span></div>
+          <div class="operations-list" id="operations-list" aria-live="polite"></div>
+          <p class="footnote">Abrir un asunto muestra su expediente. Aprobar, cancelar y cobrar son funciones del Admin oficial, no de este prototipo.</p>
+        </section>
+
+        <section class="screen" id="screen-gestion" aria-labelledby="title-gestion" hidden>
+          <div class="screen-titlebar">
+            <div><h1 id="title-gestion">Gestión<span class="stop">.</span></h1><p>Herramientas del sistema original, en un solo mapa.</p></div>
+          </div>
+          <div class="management" aria-label="Mapa ilustrativo de herramientas">
+            <article class="module"><span class="module-symbol"><svg aria-hidden="true"><use href="#ico-ticket"/></svg></span><div><h2>Catálogo y servicios</h2><p>Productos, precios, promociones e inventario.</p></div><span class="module-foot">Catálogo</span></article>
+            <article class="module"><span class="module-symbol"><svg aria-hidden="true"><use href="#ico-shield"/></svg></span><div><h2>Cuentas y accesos</h2><p>Perfiles, asignaciones y credenciales protegidas.</p></div><span class="module-foot">Accesos</span></article>
+            <article class="module"><span class="module-symbol"><svg aria-hidden="true"><use href="#ico-spark"/></svg></span><div><h2>Beneficios</h2><p>Lealtad, misiones y Trato Justo.</p></div><span class="module-foot">Fidelidad</span></article>
+            <article class="module"><span class="module-symbol"><svg aria-hidden="true"><use href="#ico-chat"/></svg></span><div><h2>Experiencia</h2><p>Incidencias, opiniones y comunicación.</p></div><span class="module-foot">Soporte</span></article>
+          </div>
+          <p class="footnote">Esta vista es informativa: las herramientas permanecen en el Admin oficial.</p>
+        </section>
+      </main>
+    </div>
+    <nav class="bottom-nav" aria-label="Navegación móvil">
+      <a href="#/inicio" class="bottom-item selected" data-nav="inicio" aria-current="page"><svg aria-hidden="true"><use href="#ico-home"/></svg><span>Inicio</span></a>
+      <a href="#/clientes" class="bottom-item" data-nav="clientes"><svg aria-hidden="true"><use href="#ico-clients"/></svg><span>Clientes</span></a>
+      <a href="#/operaciones" class="bottom-item" data-nav="operaciones"><svg aria-hidden="true"><use href="#ico-work"/></svg><span>Operaciones</span><i aria-hidden="true"></i></a>
+      <a href="#/gestion" class="bottom-item" data-nav="gestion"><svg aria-hidden="true"><use href="#ico-gear"/></svg><span>Gestión</span></a>
+    </nav>
+  </div>
+</body>
+</html>
