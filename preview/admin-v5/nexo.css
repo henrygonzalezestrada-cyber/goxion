@@ -212,6 +212,10 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
 .segment.is-active{background:#fff;color:#267152;box-shadow:0 2px 8px rgba(29,68,49,.07)}
 .segment span{margin-left:3px}
 .clients-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+/* Typed semantic tokens allow color-morphing on the same card element. */
+@property --state-ink{syntax:"<color>";inherits:false;initial-value:#368765}
+@property --state-surface{syntax:"<color>";inherits:false;initial-value:#eaf9f0}
+@property --state-border{syntax:"<color>";inherits:false;initial-value:#cfe9d9}
 /* Main operational element: data-determined state colors and micro-motion. */
 .client-livebar{
   display:flex;align-items:center;justify-content:space-between;gap:10px;
@@ -238,7 +242,7 @@ svg{fill:none;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-
   min-width:0;min-height:197px;border-radius:19px;padding:16px 17px 13px;
   background:linear-gradient(122deg,var(--state-surface) 0%,#fff 74%);
   border:1px solid var(--state-border);box-shadow:0 4px 18px rgba(34,78,54,.035);
-  transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .24s,background-color .24s;
+  transition:--state-ink .34s ease,--state-surface .34s ease,--state-border .34s ease,transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s,border-color .24s;
 }
 .customer-card:before{content:"";position:absolute;top:17px;bottom:17px;left:0;width:3px;border-radius:0 3px 3px 0;background:var(--state-ink)}
 .customer-card[data-state="due"]{--state-ink:#b77b34;--state-surface:#fff1e4;--state-border:#f1ddc4}
