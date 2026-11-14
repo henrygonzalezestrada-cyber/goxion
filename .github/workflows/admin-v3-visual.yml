@@ -1,0 +1,30 @@
+name: GOXION Admin V3 · QA visual
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'preview/admin-v3/**'
+      - 'scripts/admin-v3-qa.mjs'
+      - '.github/workflows/admin-v3-visual.yml'
+  workflow_dispatch:
+jobs:
+  design-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Instalar Playwright
+        run: npm install --no-save playwright
+      - name: Instalar Chromium y WebKit
+        run: npx playwright install --with-deps chromium webkit
+      - name: QA de 280 a 1440 px
+        run: node scripts/admin-v3-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: goxion-admin-v3-screenshots
+          path: artifacts/admin-v3/
+          if-no-files-found: ignore
