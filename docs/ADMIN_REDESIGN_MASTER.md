@@ -122,3 +122,21 @@ Datos, pagos, fechas, clientes y estados totalmente **ficticios**. El prototipo 
 - [ ] Integración gradual de componentes UI contra sus propietarios actuales, pruebas de regresión y rollback; no fusionar por ser una demo atractiva.
 
 **Siguiente paso:** completar QA, publicar el preview independiente en Pages y recibir feedback visual concreto.  
+
+
+## V3.1 — ajuste artístico autorizado · 14/nov/2026
+
+**Feedback:** la V3 anterior era demasiado fina y aburrida. La dirección editorial/ledger queda como base de orden, pero no como identidad final. El propietario quiere más animaciones, elementos distintivos y energía visual sin sacrificar márgenes, claridad ni funciones.
+
+**Dirección nueva: GOXION Pulse.** No es una V4 ni una nueva implementación de Admin. Se sustituyeron decisiones visuales dentro de `preview/admin-v3/index.html` y su único `studio.css`, sin introducir una hoja superpuesta ni un motor funcional.
+
+- Tipografía con más carácter: Space Grotesk en titulares, DM Sans en texto y Plex Mono para cifras.
+- Identidad cromática del logo oficial: violeta intenso y cian contenidos sobre fondo operativo claro y shell oscuro.
+- Inicio con **un único bloque de foco** para los 3 pendientes ficticios; conserva acciones reales de navegación dentro del demo. Los indicadores secundarios pasan a dos, evitando repetir la cifra prioritaria.
+- Señal orbital y línea cromática como distintivos; animación lenta solo ornamental, sin alterar información.
+- Navegación móvil inferior integrada, oscura, y menú lateral en escritorio. Marcadores de sección claros y accesibles.
+- Motion con propósito: entrada de sección, transición táctil, respuesta hover, iluminación de un estado pendiente. Preferencia de movimiento reducido desactiva todo el movimiento.
+- Se conservan filtros, expedientes, servicios X2, fechas independientes ilustrativas y todos los límites de seguridad del prototipo.
+- **No se han tocado** `admin.html`, `assets/css/admin.css`, controladores, B2/V1 ni Supabase.
+
+**Prueba exigida:** ejecutar de nuevo el QA de Chromium/WebKit a 280–1440 px después del cambio, y luego solicitar revisión Safari físico. No promover la V3.1 hasta aprobación visual y plan de integración.
