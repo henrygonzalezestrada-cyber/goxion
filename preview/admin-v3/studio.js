@@ -79,7 +79,7 @@
   function renderHome(){
     byId('home-queue').innerHTML=operations.filter(op=>op.open).map((op,i)=>{
       const c=client(op.clientId);
-      return '<button type="button" class="activity-row" data-open-client="'+h(c.id)+'"><span class="activity-rank">0'+(i+1)+'</span><span><span class="activity-title">'+h(op.title)+'</span><span class="activity-detail">'+h(c.name)+' · '+h(op.desc)+'</span><span class="activity-meta">'+h(op.typeLabel)+'</span></span><svg class="activity-tail" aria-hidden="true"><use href="#i-chevron"></use></svg></button>';
+      return '<button type="button" class="activity-row" data-kind="'+h(op.type)+'" data-open-client="'+h(c.id)+'" style="--item-index:'+i+'"><span class="activity-rank">0'+(i+1)+'</span><span class="activity-main"><span class="activity-title">'+h(op.title)+'</span><span class="activity-detail">'+h(c.name)+' · '+h(op.desc)+'</span><span class="activity-meta">'+h(op.typeLabel)+'</span></span><span class="activity-tail">'+icon('arrow')+'</span></button>';
     }).join('');
     byId('agenda-list').innerHTML=[clients[0],clients[1],clients[2]].map(c=>{
       const [day,month]=c.nextDate.split(' ');
@@ -96,10 +96,10 @@
     byId('client-grid').innerHTML=shown.map(c=>{
       const idx=clients.indexOf(c)+1;
       return '<button type="button" class="client-card" data-open-client="'+h(c.id)+'" data-state="'+h(c.state)+'" aria-label="Abrir expediente de '+h(c.name)+'">'+
-        '<span class="client-top"><span class="client-number">'+h(c.id)+' / 0'+idx+'</span><span class="client-state '+h(c.state)+'">'+h(c.stateLabel)+'</span></span>'+
-        '<span><span class="client-name">'+h(c.name)+'</span><span class="client-description">'+h(names(c))+'</span></span>'+
-        '<span class="client-facts"><span><span class="fact-label">PRÓXIMO VENCIMIENTO</span><span class="fact-value">'+h(c.nextDate)+'</span></span><span><span class="fact-label">IMPORTE ILUSTRATIVO</span><span class="fact-value fact-money">'+money(c.amount)+'</span></span></span>'+
-        '<span class="client-open">Abrir expediente '+icon('arrow')+'</span></button>';
+        '<span class="client-top"><span class="client-number"><span class="client-hash">#</span> '+h(c.id)+' / 0'+idx+'</span><span class="client-state '+h(c.state)+'">'+h(c.stateLabel)+'</span></span>'+
+        '<span class="client-main"><span class="client-name">'+h(c.name)+'</span><span class="client-description">'+h(names(c))+'</span></span>'+
+        '<span class="client-facts"><span><span class="fact-label">PRÓXIMO CORTE</span><span class="fact-value">'+h(c.nextDate)+'</span></span><span><span class="fact-label">IMPORTE DEMO</span><span class="fact-value fact-money">'+money(c.amount)+'</span></span></span>'+
+        '<span class="client-open">VER EXPEDIENTE <span class="client-open-icon">'+icon('arrow')+'</span></span></button>';
     }).join('');
     byId('client-results').textContent=shown.length+' '+(shown.length===1?'resultado':'resultados');
     byId('clients-empty').hidden=shown.length>0;
@@ -156,7 +156,7 @@
     } else if(state.detail==='services') {
       markup='<h3 class="detail-section-title">Servicios y próximas fechas</h3><div class="service-list">'+
         c.services.map(s=>'<article class="service-unit"><div class="service-head"><div><strong>'+h(s.name)+'</strong><p>Contrato de muestra · sin edición activa</p></div><span class="service-count">'+s.accesses.length+' '+(s.accesses.length===1?'ACCESO':'ACCESOS')+'</span></div>'+
-          '<div class="access-list">'+s.accesses.map((a,i)=>'<div class="access-line"><span class="access-label">'+h(a.name)+'<small>'+h(a.coverage)+'</small></span><time class="access-date">'+h(a.date)+'</time></div>').join('')+'</div></article>').join('')+
+          '<div class="access-list">'+s.accesses.map((a,i)=>'<div class="access-line"><span class="access-point" aria-hidden="true"></span><span class="access-label">'+h(a.name)+'<small>'+h(a.coverage)+'</small></span><time class="access-date">'+h(a.date)+'</time></div>').join('')+'</div></article>').join('')+
         '</div><p class="detail-note">La representación de X2 comparte el mismo apartado Servicios. En producción, el calendario B2, la cobertura y las fechas vendrán del motor y controladores existentes; este prototipo no los reproduce.</p>';
     } else if(state.detail==='benefits') {
       markup='<h3 class="detail-section-title">Beneficios del cliente</h3>'+
@@ -182,7 +182,7 @@
       '<button type="button" class="detail-route" data-clear-op-client style="margin:15px 0">Ver todas las operaciones '+icon('arrow')+'</button>':'';
     const rows=shown.length?shown.map((op,i)=>{
       const c=client(op.clientId);
-      return '<button class="ops-row" type="button" data-open-client="'+h(c.id)+'"><span class="ops-index">0'+(i+1)+'</span><span><strong class="ops-title">'+h(op.title)+'</strong><span class="ops-meta">'+h(c.name)+' · '+h(op.desc)+'</span><span class="ops-kind">'+h(op.typeLabel)+'</span></span><span class="ops-right">Abrir ficha</span><svg class="ops-arrow" aria-hidden="true"><use href="#i-chevron"></use></svg></button>';
+      return '<button class="ops-row" type="button" data-op-kind="'+h(op.type)+'" data-open-client="'+h(c.id)+'" style="--item-index:'+i+'"><span class="ops-index">0'+(i+1)+'</span><span class="ops-copy"><span class="ops-kind">'+h(op.typeLabel)+'</span><strong class="ops-title">'+h(op.title)+'</strong><span class="ops-meta">'+h(c.name)+' · '+h(op.desc)+'</span></span><span class="ops-right">Ver expediente</span><span class="ops-arrow">'+icon('arrow')+'</span></button>';
     }).join(''):'<p class="ops-zero">No hay movimientos de esta clase en la muestra.</p>';
     byId('ops-list').innerHTML=reset+rows;
     document.querySelectorAll('[data-op-filter]').forEach(b=>{
