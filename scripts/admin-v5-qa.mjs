@@ -15,7 +15,11 @@ async function wait(){
   throw Error('Local preview server not ready');
 }
 async function settled(page){
-  await page.evaluate(async()=>{await Promise.all(document.getAnimations().map(a=>a.finished.catch(()=>{})));});
+  await page.evaluate(async()=>{
+    if(window.__goxionTransitionFinished)await window.__goxionTransitionFinished.catch(()=>{});
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    await Promise.all(document.getAnimations().map(a=>a.finished.catch(()=>{})));
+  });
 }
 async function waitRoute(page,to){
   await page.waitForFunction((hash)=>{
@@ -109,6 +113,7 @@ async function scenarios(browserType,name){
         assert.equal(await valeria.locator('.status-tag').innerText(),'Vencido',label+' dynamic late state label');
         assert((await valeria.locator('.customer-state-note').innerText()).includes('Venció hace'),label+' late note');
         await geometry(page,label+' changed state');
+        await settled(page);
         if(capture)await page.screenshot({path:'artifacts/admin-v5/clients-overdue-'+width+'.png',fullPage:true});
         await page.locator('#advance-demo-date').click();
         await page.waitForFunction(()=>document.getElementById('demo-date-label').textContent==='28 NOV');
