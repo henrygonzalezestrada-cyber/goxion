@@ -50,3 +50,33 @@ Los archivos `admin.html`, Index, Ayuda, controladores B2, V1, Edge y datos sigu
 ## Decisión pendiente
 
 Esta variante no debe reemplazar al Admin sin aprobación visual en iPhone, auditoría de integridad, mapa de controladores existentes, PRs de integración gradual y rollback.
+
+
+## V5.1 — pulido aprobado de la dirección visual (14/nov/2026)
+
+Se conserva la identidad V22/V28 adoptada en V5. Se refina la experiencia; no se reescribe el producto.
+
+### Header
+- Se sustituye la franja superior por una cápsula flotante semitransparente estilo Liquid Glass, con blur, borde y reflejos cuidados.
+- Logo oficial + texto **Producción Admin**, acompañado de **Vista demo** para distinguir esta simulación del Admin real.
+- La cápsula reacciona discretamente al desplazamiento y se mantiene dentro del ancho de 280 px.
+
+### Tarjetas — foco operativo
+- Resumen visible: nombre, folio, estado, servicios (incluido multiplicador X2), próxima fecha, aviso temporal e importe.
+- Los estados tienen códigos semánticos: vencido = rosa cálido; por vencer = durazno; en revisión = lavanda; al corriente = menta. Texto y contraste se modifican junto al color.
+- Altura compactada. Las fichas no intentan ser el expediente entero.
+- **Simulador de prueba sin backend:** el control Cambiar fecha recorre 14, 15, 18, 28 y 29 de noviembre de 2026. El estado de GX-1042 cambia de Por vencer a Vence hoy y luego Vencido. Un anuncio accesible indica el resultado.
+- **No es tiempo real de producción**: al integrar deberá obtener estados, fechas y montos del motor canónico GOXION, nunca de cálculos paralelos implementados por esta demo.
+
+### Expediente
+- Cabecera condensada, estado visible y pestañas Resumen, Servicios, Beneficios y Cuenta.
+- Resumen de tres datos clave más estado/servicios y enlace directo a accesos, con distribución adaptativa para reducir scroll.
+- B2 X2 conserva un servicio comercial único, con dos accesos y fechas distintas; sin controladores financieros nuevos.
+
+### Microinteracciones y QA
+- View Transitions con fallback y transición de elemento compartido tarjeta-expediente; el encabezado de vidrio responde suavemente al scroll.
+- Estados animados al cambiar fecha de prueba, sin loops decorativos. Preferencia de movimiento reducido respetada.
+- Pruebas Chromium/WebKit 280–1440 px con revisión de cápsula, filtros, estados y desbordamientos; Safari físico pendiente.
+
+### Aislamiento
+No se editan admin.html, código real de Admin, B2, pagos, cancelaciones, Index, Ayuda, Supabase ni Edge. PR de diseño sigue en borrador; no aprobar integración sin comprobaciones reales.
