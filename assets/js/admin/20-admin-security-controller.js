@@ -112,13 +112,37 @@
     };
 
     window.gxMakeCancellationEffective=async function(requestId){
-        if(!confirm("¿Hacer efectiva esta cancelación ahora?\n\nEl servicio del cliente se desactivará. Los cargos o deudas ya existentes no se borrarán."))return;
+        if(!confirm("¿Hacer efectiva esta cancelación ahora?\n\nEl servicio desaparecerá de los activos en Mi Espacio y Admin. Se conservará el historial financiero."))return;
+        // La única fuente de verdad es Supabase. El panel de enfoque mantiene
+        // nodos de fichas anteriores; recargarlos sin cerrar el enfoque deja
+        // visible un servicio ya inactivo aunque el backend sí haya actualizado.
+        let effective=false;
         try{
-            await adminApi(CANCEL_URL,"hacer_efectiva",{solicitud_id:requestId});
-            if(typeof inicializarPanel==="function")await inicializarPanel();
-            await loadCancellations();
-            alert("✓ Cancelación efectiva. El servicio quedó desactivado.");
+            const r=await adminApi(CANCEL_URL,"hacer_efectiva",{solicitud_id:requestId});
+            effective=true;
+            const clienteId=String(r?.solicitud?.cliente_id||"");
+            const servicioId=String(r?.solicitud?.cliente_servicio_id||"");
+            const focusOpen=document.getElementById("gx-client-focus")?.classList.contains("show")===true;
+            const key=Object.keys(clientesDict||{}).find(k=>String(clientesDict[k]?._id||"")===clienteId)||null;
+            try{
+                // Reusar recargar() existente: cierra enfoque, consulta admin-datos,
+                // vuelve a crear tarjetas y reabre la ficha con información NUEVA.
+                if(typeof window.gxReloadAdminClient==="function")
+                    await window.gxReloadAdminClient(focusOpen?key:null);
+                else if(typeof inicializarPanel==="function")await inicializarPanel();
+                const actualizado=Object.values(clientesDict||{}).find(c=>String(c?._id||"")===clienteId);
+                if(!actualizado)throw new Error("El cliente aún no aparece en la recarga");
+                if((actualizado.servicios||[]).some(s=>String(s?.id||s?._id||"")===servicioId))
+                    throw new Error("El servicio sigue apareciendo entre los activos");
+                await loadCancellations();
+                alert("✓ Cancelación efectiva. El servicio se retiró de los activos en Admin y Mi Espacio; el historial se conserva.");
+            }catch(refreshError){
+                console.warn("[GOXION] Cancelación confirmada pero UI no sincronizada",refreshError);
+                await loadCancellations().catch(()=>{});
+                alert("✓ La cancelación quedó efectiva en Supabase, pero no se pudo actualizar esta ficha. Recarga Admin para ver la lista correcta.");
+            }
         }catch(e){
+            if(effective)throw e;
             alertErrorAdmin("hacer efectiva la cancelación","No se pudo hacer efectiva la cancelación.",e);
         }
     };
