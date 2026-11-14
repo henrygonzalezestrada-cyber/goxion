@@ -116,7 +116,7 @@ Datos, pagos, fechas, clientes y estados totalmente **ficticios**. El prototipo 
 ### Pruebas y promoción
 
 - [x] Inspección estática HTML/CSS/JS: JS parseable, IDs únicos, SVG existentes y sin llamadas al backend.
-- [ ] GitHub Actions con Playwright Chromium + WebKit a 280, 320, 360, 375, 390, 430, 600, 768, 881, 1024, 1280 y 1440 px (capturas, overflow, navegación, filtros, detalle B2).
+- [x] GitHub Actions `GOXION Admin V3 · QA visual` PASS (run 43564728808): 24 escenarios en Chromium + WebKit a 280, 320, 360, 375, 390, 430, 600, 768, 881, 1024, 1280 y 1440 px; capturas, overflow, navegación, filtros y detalle X2.
 - [ ] Revisión visual de capturas y prueba Safari en iPhone real.
 - [ ] Aprobación visual de V3 por el propietario.
 - [ ] Integración gradual de componentes UI contra sus propietarios actuales, pruebas de regresión y rollback; no fusionar por ser una demo atractiva.
