@@ -41,17 +41,34 @@ async function geometry(page,tag){
     const nav=[...document.querySelectorAll('.side-link,.mobile-link')].filter(shown);
     const row=[...document.querySelectorAll('.screen:not([hidden]) .focus-button,.screen:not([hidden]) .renewal-item,.screen:not([hidden]) .mini-panel,.screen:not([hidden]) .customer-card,.screen:not([hidden]) .operation-row,.screen:not([hidden]) .segment')].filter(shown);
     const logo=document.querySelector(innerWidth<=760?'.brand img':'.side-mark img');
+    const capsule=document.querySelector('.topbar').getBoundingClientRect();
+    const capsuleShell=document.querySelector('.header-shell');
+    const capsuleRadius=getComputedStyle(document.querySelector('.topbar')).borderTopLeftRadius;
+    const cards=[...document.querySelectorAll('.customer-card')].filter(shown);
+    const cardBounds=cards.map(box);
+    const cardStateData=cards.map(x=>({state:x.dataset.state,color:getComputedStyle(x).getPropertyValue('--state-ink').trim()}));
     return {vw:innerWidth,documentWidth:document.documentElement.scrollWidth,bodyWidth:document.body.scrollWidth,
       nav:nav.map(box),active:nav.filter(x=>x.classList.contains('is-selected')).map(x=>x.dataset.nav),
       screen:document.querySelector('.screen:not([hidden])')?.id||null,
       rowMin:row.length?Math.min(...row.map(el=>el.getBoundingClientRect().height)):null,
       logoLoaded:logo.complete&&logo.naturalWidth>0,
-      color:getComputedStyle(document.querySelector('.focus-panel')).backgroundColor};
+      color:getComputedStyle(document.querySelector('.focus-panel')).backgroundColor,
+      capsule:box(document.querySelector('.topbar')),capsuleRadius,capsuleHeight:capsule.height,shellPosition:getComputedStyle(capsuleShell).position,
+      cardBounds,cardStateData};
   });
   assert(d.logoLoaded,tag+' official brand image unavailable');
   assert(d.documentWidth<=d.vw+1,tag+' document horizontal overflow '+d.documentWidth+' > '+d.vw);
   assert(d.bodyWidth<=d.vw+1,tag+' body horizontal overflow '+d.bodyWidth);
   assert.equal(d.nav.length,4,tag+' number of destinations');
+  assert(d.capsule.l>=-1&&d.capsule.r<=d.vw+1,tag+' glass capsule outside viewport');
+  assert(d.capsule.h>=49&&d.capsule.h<=59,tag+' glass capsule wrong height: '+d.capsule.h);
+  assert(d.capsuleRadius!=='0px',tag+' glass capsule lost rounded corners');
+  assert(d.shellPosition==='sticky',tag+' floating capsule is not sticky');
+  for(const b of d.cardBounds)assert(b.l>=-1&&b.r<=d.vw+1,tag+' customer card outside screen');
+  if(d.cardStateData.length>1){
+    const colors=new Set(d.cardStateData.map(c=>c.color));
+    assert(colors.size>1,tag+' customers have no state-distinct colors');
+  }
   assert.deepEqual(d.active,[d.screen.replace('screen-','')],tag+' active nav');
   if(d.rowMin!==null)assert(d.rowMin>=42,tag+' clickable row below touch target '+d.rowMin);
   for(let i=0;i<d.nav.length;i++){
@@ -81,6 +98,21 @@ async function scenarios(browserType,name){
         assert.equal(await page.locator('.customer-card').count(),4,label+' customers');
         await geometry(page,label+' customers');
         if(capture)await page.screenshot({path:'artifacts/admin-v5/clients-'+width+'.png',fullPage:true});
+        const valeria=page.locator('.customer-card[data-id="GX-1042"]');
+        assert.equal(await valeria.getAttribute('data-state'),'due',label+' initial due state');
+        assert((await valeria.locator('.customer-state-note').innerText()).includes('Mañana'),label+' due note');
+        await page.locator('#advance-demo-date').click();
+        await page.waitForFunction(()=>document.getElementById('demo-date-label').textContent==='15 NOV');
+        assert.equal(await valeria.getAttribute('data-state'),'due',label+' due today');
+        await page.locator('#advance-demo-date').click();
+        await page.waitForFunction(()=>document.querySelector('.customer-card[data-id="GX-1042"]')?.dataset.state==='late');
+        assert.equal(await valeria.locator('.status-tag').innerText(),'Vencido',label+' dynamic late state label');
+        assert((await valeria.locator('.customer-state-note').innerText()).includes('días vencido'),label+' late note');
+        await geometry(page,label+' changed state');
+        if(capture)await page.screenshot({path:'artifacts/admin-v5/clients-overdue-'+width+'.png',fullPage:true});
+        for(let turn=0;turn<3;turn++)await page.locator('#advance-demo-date').click();
+        await page.waitForFunction(()=>document.getElementById('demo-date-label').textContent==='14 NOV');
+        assert.equal(await valeria.getAttribute('data-state'),'due',label+' back to initial state');
         await page.locator('#search-client').fill('Sofia');
         assert.equal(await page.locator('.customer-card').count(),1,label+' name search without accents');
         await page.locator('#search-client').fill('');
