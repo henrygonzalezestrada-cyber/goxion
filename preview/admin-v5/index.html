@@ -5,12 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#eaf4ef">
   <meta name="description" content="GOXION Admin, estudio visual V5: fusión V22 + V28. Datos de muestra; sin acceso a sistemas productivos.">
-  <title>GOXION Admin V5.1 · Nexo</title>
+  <title>GOXION Admin V5.2 · Nexo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="nexo.css?v=511">
-  <script defer src="nexo.js?v=51"></script>
+  <link rel="stylesheet" href="nexo.css?v=52">
+  <script defer src="nexo.js?v=52"></script>
 </head>
 <body>
   <svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -46,7 +46,7 @@
         <a href="#/operaciones" data-nav="operaciones" class="side-link" title="Operaciones"><svg aria-hidden="true"><use href="#ic-inbox"/></svg><span>Operaciones</span><i class="side-notice" aria-hidden="true"></i></a>
         <a href="#/gestion" data-nav="gestion" class="side-link" title="Gestión"><svg aria-hidden="true"><use href="#ic-settings"/></svg><span>Gestión</span></a>
       </div>
-      <div class="side-last"><span class="side-online"></span><span>V5</span></div>
+      <div class="side-last"><span class="side-online"></span><span>V5.2</span></div>
     </aside>
     <div class="app-main">
       <div class="header-shell">
@@ -62,44 +62,38 @@
       <main id="main" class="main" tabindex="-1">
         <section class="screen" id="screen-inicio" aria-labelledby="heading-inicio">
           <div class="page-head">
-            <div class="page-head-main"><span class="small-hello">Panel de hoy</span><h1 id="heading-inicio">Todo fluye<span class="period">.</span></h1></div>
+            <div class="page-head-main"><span class="small-hello">Centro operativo</span><h1 id="heading-inicio">Hoy en GOXION<span class="period">.</span></h1></div>
             <div class="date-tag"><svg aria-hidden="true"><use href="#ic-calendar"/></svg><span>Sábado 14 noviembre</span></div>
           </div>
 
           <div class="home-grid">
             <section class="focus-panel" aria-labelledby="focus-title">
-              <div class="focus-top"><span class="focus-label"><span class="tiny-wave"></span> Prioridad de hoy</span><span class="focus-decoration" aria-hidden="true"><svg><use href="#ic-spark"/></svg></span></div>
-              <div class="focus-main"><span class="focus-number">03</span><div><h2 id="focus-title">Por atender</h2><p>Pago · Cancelación · Soporte</p></div></div>
+              <div class="focus-main"><span class="focus-number">03</span><div><h2 id="focus-title">Por atender</h2></div></div>
               <div class="focus-tasks"><span><i class="task-color payment"></i> Pago</span><span><i class="task-color cancellation"></i> Baja</span><span><i class="task-color support"></i> Soporte</span></div>
               <a href="#/operaciones" class="focus-button">Ir a pendientes <svg aria-hidden="true"><use href="#ic-arrow"/></svg></a>
             </section>
 
             <section class="renewal-panel" aria-labelledby="renewal-title">
-              <div class="panel-title-line"><div><span class="panel-mini">Tu agenda</span><h2 id="renewal-title">Renovaciones cercanas</h2></div><span class="panel-count">4 accesos</span></div>
+              <div class="panel-title-line"><div><h2 id="renewal-title">Fechas de acceso</h2></div><span class="panel-count">4 próximas</span></div>
               <div id="home-renewals" class="renewal-timeline"></div>
               <a href="#/clientes" class="panel-footer-link">Explorar expedientes <svg aria-hidden="true"><use href="#ic-arrow"/></svg></a>
             </section>
 
             <a href="#/clientes" class="mini-panel mint-panel">
-              <div class="mini-top"><span class="mini-label">Tus clientes</span><span class="mini-icon"><svg aria-hidden="true"><use href="#ic-people"/></svg></span></div>
+              <div class="mini-top"><span class="mini-label">Directorio</span></div>
               <div class="mini-main"><strong>04</strong><span>clientes</span></div>
-              <div class="mini-foot">Consultar fichas <svg aria-hidden="true"><use href="#ic-arrow"/></svg></div>
+              <div class="mini-foot">Abrir clientes <svg aria-hidden="true"><use href="#ic-arrow"/></svg></div>
             </a>
 
-            <a href="#/operaciones" class="mini-panel apricot-panel">
-              <div class="mini-top"><span class="mini-label">Solicitudes</span><span class="mini-icon"><svg aria-hidden="true"><use href="#ic-inbox"/></svg></span></div>
+            <a href="#/operaciones/solicitudes" class="mini-panel apricot-panel">
+              <div class="mini-top"><span class="mini-label">En seguimiento</span></div>
               <div class="mini-main"><strong>02</strong><span>solicitudes</span></div>
-              <div class="mini-foot">Ver solicitudes <svg aria-hidden="true"><use href="#ic-arrow"/></svg></div>
+              <div class="mini-foot">Abrir bandeja <svg aria-hidden="true"><use href="#ic-arrow"/></svg></div>
             </a>
 
-            <section class="rhythm-panel" aria-labelledby="rhythm-title">
-              <div class="rhythm-header"><div><span class="panel-mini">Distribución de accesos</span><h2 id="rhythm-title">Próximas fechas</h2></div><span class="rhythm-caption">Noviembre</span></div>
-              <div class="rhythm-bars" id="rhythm-bars" aria-label="Accesos por fecha de la muestra"></div>
-              
-            </section>
           </div>
 
-          <p class="data-notice"><svg aria-hidden="true"><use href="#ic-shield"/></svg> Vista exploratoria con datos ficticios. Ninguna acción afecta clientes, pagos o servicios reales.</p>
+          
         </section>
 
         <section class="screen" id="screen-clientes" aria-labelledby="heading-clientes" hidden>
@@ -114,7 +108,7 @@
               </div>
             </div>
             <div class="client-livebar">
-              <div class="livebar-context"><span class="livebar-light" aria-hidden="true"></span><span>Estado de clientes · <strong id="demo-date-label">14 NOV</strong></span><span class="livebar-hint">Simulación visual</span></div>
+              <div class="livebar-context"><span class="livebar-light" aria-hidden="true"></span><span>Estado de clientes · <strong id="demo-date-label">14 NOV</strong></span></div>
               <button type="button" id="advance-demo-date" class="demo-date-btn" aria-label="Cambiar la fecha de ejemplo para comprobar el estado y los colores de las tarjetas"><svg aria-hidden="true"><use href="#ic-calendar"/></svg> Cambiar fecha <span aria-hidden="true">↗</span></button>
             </div>
             <p id="status-announcement" class="visually-hidden" role="status" aria-live="polite"></p>
@@ -136,7 +130,7 @@
         </section>
 
         <section class="screen" id="screen-operaciones" aria-labelledby="heading-operaciones" hidden>
-          <div class="page-head compact-page-head"><div class="page-head-main"><span class="small-hello">Seguimiento</span><h1 id="heading-operaciones">Operaciones<span class="period">.</span></h1></div><span class="page-head-number">03 <small>pendientes</small></span></div>
+          <div class="page-head compact-page-head"><div class="page-head-main"><span class="small-hello">Seguimiento</span><h1 id="heading-operaciones">Operaciones<span class="period">.</span></h1></div></div>
           <div class="segments ops-segments" role="group" aria-label="Tipo de operación">
             <button class="segment is-active" data-ops-filter="pendientes" aria-pressed="true">Pendientes <span>3</span></button>
             <button class="segment" data-ops-filter="pagos" aria-pressed="false">Pagos</button>
@@ -144,21 +138,20 @@
             <button class="segment" data-ops-filter="actividad" aria-pressed="false">Actividad</button>
           </div>
           <div class="ops-workspace">
-            <div class="ops-list-wrap"><div class="ops-title-row"><h2 id="ops-list-title">Por atender</h2><span id="ops-count">3 asuntos</span></div><div id="operations-list" class="operations-list"></div></div>
-            <aside class="ops-side"><span class="ops-side-icon"><svg aria-hidden="true"><use href="#ic-life"/></svg></span><h3>Todo en su lugar</h3><p>Cada solicitud abre el mismo expediente del cliente. El prototipo no duplica aprobaciones, cancelaciones ni cobros.</p><div class="ops-note">La baja solo se completa cuando se hace efectiva en el sistema original.</div></aside>
+            <div class="ops-list-wrap"><div id="operations-list" class="operations-list"></div></div>
           </div>
-          <p class="data-notice"><svg aria-hidden="true"><use href="#ic-shield"/></svg> Esta bandeja es una demostración visual. Los estados y botones reales permanecen en GOXION Admin.</p>
+          
         </section>
 
         <section class="screen" id="screen-gestion" aria-labelledby="heading-gestion" hidden>
           <div class="page-head compact-page-head"><div class="page-head-main"><span class="small-hello">Herramientas</span><h1 id="heading-gestion">Gestión<span class="period">.</span></h1></div></div>
           <div class="management-grid">
-            <article class="module-card module-first"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-wallet"/></svg></span><div><h2>Servicios y catálogo</h2><p>Precios, disponibilidad, promociones e inventario.</p></div><span class="module-index">01</span></article>
-            <article class="module-card module-second"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-people"/></svg></span><div><h2>Cuentas y accesos</h2><p>Suscripciones, perfiles y asignaciones.</p></div><span class="module-index">02</span></article>
-            <article class="module-card module-third"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-spark"/></svg></span><div><h2>Beneficios</h2><p>Programa de lealtad, misiones y Trato Justo.</p></div><span class="module-index">03</span></article>
-            <article class="module-card module-fourth"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-life"/></svg></span><div><h2>Experiencia</h2><p>Opiniones, soporte y comunicación con clientes.</p></div><span class="module-index">04</span></article>
+            <article class="module-card module-first"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-wallet"/></svg></span><div><h2>Servicios y catálogo</h2><p>Precios, disponibilidad, promociones e inventario.</p></div></article>
+            <article class="module-card module-second"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-people"/></svg></span><div><h2>Cuentas y accesos</h2><p>Suscripciones, perfiles y asignaciones.</p></div></article>
+            <article class="module-card module-third"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-spark"/></svg></span><div><h2>Beneficios</h2><p>Programa de lealtad, misiones y Trato Justo.</p></div></article>
+            <article class="module-card module-fourth"><span class="module-symbol"><svg aria-hidden="true"><use href="#ic-life"/></svg></span><div><h2>Experiencia</h2><p>Opiniones, soporte y comunicación con clientes.</p></div></article>
           </div>
-          <p class="data-notice"><svg aria-hidden="true"><use href="#ic-shield"/></svg> Índice ilustrativo: todavía no hay controles de gestión conectados.</p>
+          
         </section>
       </main>
     </div>
