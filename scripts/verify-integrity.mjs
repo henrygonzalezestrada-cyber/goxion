@@ -933,6 +933,16 @@ if(serviceCancellationSmoke.status!==0){
     String(serviceCancellationSmoke.stderr||serviceCancellationSmoke.stdout||'no ejecutado').slice(0,900));
 }
 
+// Solicitud efectiva + contrato inactivo deben ser un cambio atómico y
+// refrescar la ficha enfocada en Admin; sin escritores duplicados en Edge.
+const cancellationEffectiveSmoke=spawnSync(process.execPath,['scripts/admin-effective-cancellation-smoke.mjs'],{
+  cwd:ROOT,encoding:'utf8',timeout:15000
+});
+if(cancellationEffectiveSmoke.status!==0){
+  fail('Cancelación efectiva y sincronización de Admin: '+
+    String(cancellationEffectiveSmoke.stderr||cancellationEffectiveSmoke.stdout||'no ejecutado').slice(0,900));
+}
+
 if (failures.length) {
   console.error('\nGOXION · verificación fallida\n');
   failures.forEach((item) => console.error('• ' + item));
