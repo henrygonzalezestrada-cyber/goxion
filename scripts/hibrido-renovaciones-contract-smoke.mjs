@@ -11,6 +11,7 @@ const registry=read("docs/GOXION_LIMPIEZA_NOMBRES_2026-11-12.md","utf8");
 const design=read("docs/GOXION_HIBRIDO_RENOVACIONES_V2.md","utf8");
 
 assert.match(projection,/create or replace function public\.goxion_b2_proxima_renovacion\(/i);
+assert.match(projection,/create or replace function public\.goxion_b2_vencimiento_periodo\(/i);
 assert.match(projection,/create or replace function public\.goxion_b2_previsualizar_renovaciones\(/i);
 assert.match(projection,/language sql immutable strict security invoker/i);
 assert.match(projection,/language plpgsql stable security invoker/i);
@@ -32,7 +33,7 @@ assert.match(preflight,/if\(client\.data\.pago_en_revision===true\)/);
 assert.match(preflight,/operacion_solo_lectura:true/);
 
 assert.match(writer,/create or replace function public\.goxion_b2_iniciar_ciclo/i);
-assert.ok((writer.match(/goxion_b2_proxima_renovacion/g)||[]).length>=4,
+assert.ok((writer.match(/goxion_b2_vencimiento_periodo/g)||[]).length>=4,
   "El mismo cálculo se usa en elegibilidad y materialización");
 assert.match(writer,/goxion_b2_validar_atribuciones/);
 assert.match(writer,/goxion_estado_financiero/);
