@@ -1,6 +1,6 @@
 # GOXION · Contrato V2 de renovaciones híbridas por acceso
 
-**Estado:** propuesta técnica en rama de trabajo; NO desplegada ni oficial.  
+**Estado:** corte de renovaciones por cobertura **desplegado en producción el 13/nov/2026** (SQL y Edge B2). La gestión dinámica de altas y bajas durante un ciclo B2 activo sigue **pendiente**, no anunciar V2 completa.  
 **Origen:** incidente FIN-CALENDARIO-409 en Cliente Prueba (12/nov/2026).  
 **Fuente contable:** motor único V1; nunca introducir un segundo escritor.
 
@@ -21,11 +21,11 @@
 
 ## Implementación por cortes seguros
 
-**Corte A — Proyección/diagnóstico (solo lectura):** RPC `goxion_b2_previsualizar_renovaciones` con accesos activos, cobertura, próxima renovación, verificación y vencimientos fuera del periodo; permisos exclusivamente `service_role`. Sin cambios en `pagos`, recibos, saldos o régímenes.
+**Corte A — DESPLEGADO, proyección/diagnóstico (solo lectura):** RPC `goxion_b2_previsualizar_renovaciones` con accesos activos, cobertura, próxima renovación, verificación y vencimientos fuera del periodo; permisos exclusivamente `service_role`. Sin cambios en `pagos`, recibos, saldos o régímenes.
 
-**Corte B — Transición B2 atómica:** cambiar juntos la prevalidación Edge y el escritor SQL `goxion_b2_iniciar_ciclo` para usar la misma proyección. No activar hasta pasar regresiones de los dos clientes B2 ya activos y del caso Cliente Prueba. El escritor debe seguir reconciliando subtotal oficial y detectar pagos ya aplicados. Necesita una migración generada con Supabase CLI; no pegar SQL provisional sin pruebas.
+**Corte B — DESPLEGADO, transición B2 atómica:** cambiar juntos la prevalidación Edge y el escritor SQL `goxion_b2_iniciar_ciclo` para usar la misma proyección. El cambio se instaló tras prueba reversible de Cliente Prueba y comparación de las cotizaciones existentes de Luis/Nayeli; **no se ha aprobado una activación real de Cliente Prueba ni una prueba de pago real en Safari**. El escritor debe seguir reconciliando subtotal oficial y detectar pagos ya aplicados. Fuente canónica versionada: `supabase/migrations/202611130001_b2_renovacion_proyectada_v2.sql`, desplegada vía Supabase MCP tras pruebas reversibles.
 
-**Corte C — Altas y bajas posteriores a la transición:** contratos por unidad con `fecha_efectiva`, `cobertura_pagada_hasta`, `fin_al_renovar`, historial de revisiones e idempotencia; materializar solo cargos futuros exigibles. Cancelación conserva cobertura y recibos. No activar en Index una modalidad nueva hasta que Admin y el motor coincidan.
+**Corte C — PENDIENTE, altas y bajas posteriores a la transición:** contratos por unidad con `fecha_efectiva`, `cobertura_pagada_hasta`, `fin_al_renovar`, historial de revisiones e idempotencia; materializar solo cargos futuros exigibles. Cancelación conserva cobertura y recibos. No activar en Index una modalidad nueva hasta que Admin y el motor coincidan.
 
 ## Pruebas de aceptación
 
@@ -38,4 +38,4 @@
 
 ## Criterio de promoción a oficial
 
-No afirmar «corregido en producción» hasta que **SQL + Edge + Admin/Index/Ayuda** coincidan, pruebas reversibles pasen, rollback esté documentado y alias antiguos se retiren o se mantengan como compatibilidad con fecha de caducidad. El corte A puede publicarse solo, pero no desbloquea activación por sí mismo.
+No afirmar «corregido en producción» hasta que **SQL + Edge + Admin/Index/Ayuda** coincidan, pruebas reversibles pasen, rollback esté documentado y alias antiguos se retiren o se mantengan como compatibilidad con fecha de caducidad. El corte A y el escritor B están desplegados; **faltan pruebas reales de flujo Admin**, alta/baja en B2 activo y normalización del alias Edge antes del cierre completo.
