@@ -154,6 +154,10 @@ function renderOperationDetail(o,filter){const host=$('ops-detail');const has=!!
 }
 function renderOperations(filter='pendientes',opId=null){const f=opFilters.some(x=>x[0]===filter)?filter:'pendientes';const list=opsFiltered(f);const selected=operations.find(o=>o.id===opId&&(list.includes(o)||(f==='pendientes'&&ui.reviewed.has(o.id))));
  $('ops-filters').innerHTML=opFilters.map(([k,label])=>'<a class="op-filter '+(f===k?'is-active':'')+'" href="#/operaciones/'+k+'" '+(f===k?'aria-current="page"':'')+'>'+label+'</a>').join('');
+ const filterRail=$('ops-filters'),activeFilter=filterRail.querySelector('.is-active');
+ if(activeFilter&&filterRail.scrollWidth>filterRail.clientWidth){
+   filterRail.scrollLeft=Math.max(0,activeFilter.offsetLeft-filterRail.offsetLeft-(filterRail.clientWidth-activeFilter.clientWidth)/2);
+ }
  
  updateNumber('ops-head-count',opsFiltered('pendientes').length+' por resolver');
  $('ops-list').innerHTML=list.map(o=>'<a class="ops-item '+(selected===o?'is-selected':'')+'" data-kind="'+o.kind+'" href="#/operaciones/'+f+'/'+o.id+'" aria-label="Ver detalle: '+safe(o.title)+' de '+safe(nameForOp(o))+'"><span class="op-dot"></span><span class="op-text"><strong>'+safe(o.title)+(o.amount?' · '+cash(o.amount):'')+'</strong><small>'+safe(nameForOp(o))+' · '+safe(o.next)+'</small></span><span class="op-meta"><small>'+safe(o.when)+'</small>'+icon('right')+'</span></a>').join('')||'<p class="empty">Sin movimientos en esta categoría.</p>';
