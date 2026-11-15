@@ -42,3 +42,6 @@ main:focus{outline:none}
 /* Brand icon graceful fallback for offline testing; official PNG when available. */
 .brand.logo-fallback .brand-fallback{display:grid;place-items:center;height:35px;width:35px;border-radius:12px;background:linear-gradient(135deg,#1fcade,#9550c5 57%,#ef75b7);color:#fff;font:800 22px var(--syne);box-shadow:0 2px 8px #6f61ce36}.rail-brand.logo-fallback span{display:block}.rail-brand.logo-fallback img,.brand.logo-fallback img{display:none}
 .filter,.op-filter{min-height:44px}.date-step{min-height:44px}
+.stage-short{display:none}
+@media(max-width:360px){.stage-long{display:none}.stage-short{display:inline}.header-stage{padding:7px 8px}.glassbar{min-width:0}.brand{min-width:0}.brand-words b{font-size:13px}.brand-words small{font-size:8px}}
+@media(max-width:340px){.home-type h1{font-size:39px;letter-spacing:-.08em}.lead-stage-date{font-size:88px}.client-state{white-space:normal;max-width:117px;text-align:center}}
