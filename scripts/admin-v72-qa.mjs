@@ -67,9 +67,12 @@ async function run(browserType,name){
     if(shot)await page.screenshot({path:"artifacts/admin-v72/home-"+width+".png",fullPage:true});
     await page.locator(".metric-coral").click();await route(page,"#/operaciones/cancelaciones");
     assert.equal(await page.locator(".ops-item").count(),2,tag+" cancellation filter");
+    assert.equal(await page.locator(".operation-layout").evaluate(el=>el.classList.contains("with-detail")),false,tag+" no empty detail pane");
+    if(width>760)assert.equal(await page.locator(".ops-detail").isVisible(),false,tag+" hide empty desktop pane");
     await geometry(page,tag+" cancellations");
     await page.locator(".ops-item").first().click();await route(page,"#/operaciones/cancelaciones/op-c1");
     assert(await page.locator("#ops-detail").isVisible(),tag+" operation detail");
+    assert.equal(await page.locator(".operation-layout").evaluate(el=>el.classList.contains("with-detail")),true,tag+" layout switches to detail");
     assert((await page.locator("#ops-detail").innerText()).includes("hacer efectiva"),tag+" effective cancellation distinction");
     const followup=page.locator("#ops-detail [data-followup='op-c1']");
     assert.equal(await followup.count(),1,tag+" one-tap operational follow-up");
