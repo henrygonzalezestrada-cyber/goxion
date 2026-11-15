@@ -126,7 +126,7 @@ function show(first=false){const route=parse(),key=route.page+'/'+(route.one||''
  priorRoute=key;
 }
 let activeTransition=null;
-function navChange(){if(!matchMedia('(prefers-reduced-motion:reduce)').matches&&document.startViewTransition){activeTransition?.skipTransition();const t=document.startViewTransition(()=>show());activeTransition=t;const finished=t.finished.catch(()=>{});window.__goxionV7TransitionFinished=finished;finished.finally(()=>{if(activeTransition===t)activeTransition=null})}else show();}
+function navChange(){const next=parse(),fromDetail=priorRoute.startsWith('clientes/GX-')&&next.page==='clientes'&&!next.one,toDetail=priorRoute==='clientes/'&&next.page==='clientes'&&!!next.one;const morph=(fromDetail||toDetail)&&!matchMedia('(prefers-reduced-motion:reduce)').matches&&!!document.startViewTransition;if(morph){activeTransition?.skipTransition();const t=document.startViewTransition(()=>show());activeTransition=t;const finished=t.finished.catch(()=>{});window.__goxionV7TransitionFinished=finished;finished.finally(()=>{if(activeTransition===t)activeTransition=null})}else{activeTransition?.skipTransition();window.__goxionV7TransitionFinished=Promise.resolve();show()}}
 function goBack(){const route=parse();if(route.page==='operaciones'&&route.two){location.hash='#/operaciones/'+route.one;return true}if(route.page==='clientes'&&route.one){location.hash='#/clientes';return true}return false}
 function events(){document.addEventListener('click',e=>{
  const f=e.target.closest('[data-filter]');if(f){ui.clientFilter=f.dataset.filter;renderClients()}
