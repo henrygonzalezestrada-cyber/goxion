@@ -125,7 +125,7 @@ function show(first=false){const route=parse(),key=route.page+'/'+(route.one||''
  priorRoute=key;
 }
 let activeTransition=null;
-function navChange(){if(!matchMedia('(prefers-reduced-motion:reduce)').matches&&document.startViewTransition){activeTransition?.skipTransition();const t=document.startViewTransition(()=>show());activeTransition=t;t.finished.catch(()=>{}).finally(()=>{if(activeTransition===t)activeTransition=null})}else show();}
+function navChange(){if(!matchMedia('(prefers-reduced-motion:reduce)').matches&&document.startViewTransition){activeTransition?.skipTransition();const t=document.startViewTransition(()=>show());activeTransition=t;const finished=t.finished.catch(()=>{});window.__goxionV7TransitionFinished=finished;finished.finally(()=>{if(activeTransition===t)activeTransition=null})}else show();}
 function goBack(){const route=parse();if(route.page==='operaciones'&&route.two){location.hash='#/operaciones/'+route.one;return true}if(route.page==='clientes'&&route.one){location.hash='#/clientes';return true}return false}
 function events(){document.addEventListener('click',e=>{
  const f=e.target.closest('[data-filter]');if(f){ui.clientFilter=f.dataset.filter;renderClients()}
