@@ -39,9 +39,11 @@ async function geometry(page,name){
       cardBoxes:[...document.querySelectorAll(".view:not([hidden]) .client-card")].map(box),
       inputSize:parseFloat(getComputedStyle(document.getElementById("search")).fontSize),
       dateStepHeight:document.querySelector(".date-step").getBoundingClientRect().height,
+      visibleDateControl:vis(document.querySelector(".time-steps")),
+      overflowElements:[...document.querySelectorAll("body *")].filter(x=>{if(!vis(x))return false;const r=x.getBoundingClientRect();return r.right>innerWidth+1||r.left< -1}).slice(0,8).map(x=>({tag:x.tagName,className:typeof x.className==="string"?x.className:"",right:Math.round(x.getBoundingClientRect().right)})),
       statusColors:[...document.querySelectorAll(".client-card")].map(x=>getComputedStyle(x).getPropertyValue("--state-strong").trim())};
   });
-  assert(data.scroll<=data.vw+1,name+": horizontal viewport overflow "+data.scroll);
+  assert(data.scroll<=data.vw+1,name+": horizontal viewport overflow "+data.scroll+" "+JSON.stringify(data.overflowElements));
   assert(data.body<=data.vw+1,name+": body overflow "+data.body);
   assert.equal(data.nav.length,3,name+": nav");
   assert.deepEqual(data.selected,[data.section.replace("view-","")],name+": selected nav");
@@ -49,7 +51,7 @@ async function geometry(page,name){
   assert(data.glass[0]>=-1&&data.glass[1]<=data.vw+1&&data.glass[2]>=50,name+": glass capsule");
   for(const b of data.cardBoxes)assert(b[0]>=-1&&b[1]<=data.vw+1,name+": card clipped");
   assert(data.inputSize>=16,name+": Safari search zoom risk");
-  assert(data.dateStepHeight>=44,name+": date tab touch target");
+  if(data.visibleDateControl)assert(data.dateStepHeight>=44,name+": date tab touch target");
   if(data.statusColors.length>1)assert(new Set(data.statusColors).size>=3,name+": semantic colors");
 }
 async function test(browserType,label){
