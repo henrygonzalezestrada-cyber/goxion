@@ -35,7 +35,7 @@ const notifications=[
  {id:'n2',title:'Pago por verificar',description:'Mateo Díaz · comprobante recibido',href:'#/operaciones/pagos/op-p1',read:false},
  {id:'n3',title:'Soporte pendiente',description:'Emilio Rojas · espera respuesta',href:'#/operaciones/soporte/op-s1',read:false}
 ];
-const ui={demoIndex:0,clientFilter:'todos',query:'',noticeOpen:false,lastPage:'',lastDetail:'',selectedClient:null,reviewed:new Set()};
+const ui={demoIndex:0,clientFilter:'todos',query:'',noticeOpen:false,lastPage:'',lastDetail:'',selectedClient:null,reviewed:new Set(),autoRead:new Set()};
 const tabNames={resumen:'Resumen',servicios:'Servicios',beneficios:'Beneficios',cuenta:'Cuenta'};
 const opFilters=[['pendientes','Pendientes'],['cancelaciones','Cancelaciones'],['pagos','Pagos'],['registros','Registros'],['ingresos','Ingresos'],['egresos','Egresos'],['soporte','Soporte'],['actividad','Actividad']];
 const clientFilters=[['todos','Todos'],['atencion','Atención'],['porvencer','Por vencer'],['corriente','Al corriente']];
@@ -116,6 +116,7 @@ function renderHome(){
  updateNumber('priority-count',homeOps.length);
 
  $('home-priorities').innerHTML=homeOps.map(o=>'<a class="home-row" href="#/operaciones/'+o.kind+'/'+o.id+'"><span class="home-row-icon">'+icon(o.kind==='cancelaciones'?'clock':o.kind==='pagos'?'wallet':'brief')+'</span><span class="home-row-content"><strong>'+safe(o.title)+'</strong><small>'+safe(o.client?findClient(o.client)?.name:'')+' · '+safe(o.next)+'</small></span><span class="row-action">'+icon('right')+'</span></a>').join('');
+ if(!homeOps.length)$('home-priorities').innerHTML='<p class="followup-empty">Todos los seguimientos de muestra están revisados.</p>';
  $('recent-list').innerHTML=[operations.find(o=>o.id==='op-r1'),operations.find(o=>o.id==='op-i1'),operations.find(o=>o.id==='op-e1')].map(o=>'<a class="home-row" href="#/operaciones/'+o.kind+'/'+o.id+'"><span class="home-row-content"><strong>'+safe(o.title)+(o.amount?' · '+cash(o.amount):'')+'</strong><small>'+safe(o.customerName)+' · '+safe(o.when)+'</small></span><span class="row-action">'+icon('right')+'</span></a>').join('');
  const entries=[{id:'GX-1042',d:'15',service:'Google One · Acceso 1'},{id:'GX-1048',d:'16',service:'Spotify · Acceso 1'},{id:'GX-1042',d:'23',service:'Google One · Acceso 2'},{id:'GX-1056',d:'28',service:'YouTube Premium'}];
  const visibleEntries=entries.filter(x=>day('2026-11-'+x.d)>=day(currentDate()));
@@ -154,7 +155,7 @@ function renderOperationDetail(o,filter){const host=$('ops-detail');const has=!!
 function renderOperations(filter='pendientes',opId=null){const f=opFilters.some(x=>x[0]===filter)?filter:'pendientes';const list=opsFiltered(f);const selected=operations.find(o=>o.id===opId&&(list.includes(o)||(f==='pendientes'&&ui.reviewed.has(o.id))));
  $('ops-filters').innerHTML=opFilters.map(([k,label])=>'<a class="op-filter '+(f===k?'is-active':'')+'" href="#/operaciones/'+k+'" '+(f===k?'aria-current="page"':'')+'>'+label+'</a>').join('');
  $('ops-list-name').textContent=opFilters.find(x=>x[0]===f)[1];$('ops-list-count').textContent=list.length+' '+(list.length===1?'movimiento':'movimientos');
- $('ops-head-count').textContent=opsFiltered('pendientes').length+' por resolver';
+ updateNumber('ops-head-count',opsFiltered('pendientes').length+' por resolver');
  $('ops-list').innerHTML=list.map(o=>'<a class="ops-item '+(selected===o?'is-selected':'')+'" data-kind="'+o.kind+'" href="#/operaciones/'+f+'/'+o.id+'" aria-label="Ver detalle: '+safe(o.title)+' de '+safe(nameForOp(o))+'"><span class="op-dot"></span><span class="op-text"><strong>'+safe(o.title)+(o.amount?' · '+cash(o.amount):'')+'</strong><small>'+safe(nameForOp(o))+' · '+safe(o.next)+'</small></span><span class="op-meta"><small>'+safe(o.when)+'</small>'+icon('right')+'</span></a>').join('')||'<p class="empty">Sin movimientos en esta categoría.</p>';
  renderOperationDetail(selected||null,f);
 }
@@ -215,8 +216,17 @@ function events(){document.addEventListener('click',e=>{
  if(follow){
   const id=follow.dataset.followup,record=operations.find(o=>o.id===id&&o.priority<=2);
   if(record){
-   if(ui.reviewed.has(id))ui.reviewed.delete(id);
-   else{ui.reviewed.add(id);notifications.filter(n=>n.href.endsWith('/'+id)).forEach(n=>n.read=true);}
+   if(ui.reviewed.has(id)){
+     ui.reviewed.delete(id);
+     notifications.filter(n=>n.href.endsWith('/'+id)).forEach(n=>{
+       if(ui.autoRead.has(n.id)){n.read=false;ui.autoRead.delete(n.id)}
+     });
+   }else{
+     ui.reviewed.add(id);
+     notifications.filter(n=>n.href.endsWith('/'+id)).forEach(n=>{
+       if(!n.read){n.read=true;ui.autoRead.add(n.id)}
+     });
+   }
    const route=parse();renderHome();
    if(route.page==='operaciones'){
     renderOperations(route.one||'pendientes',route.two||null);
