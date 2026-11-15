@@ -66,7 +66,9 @@ async function run(browserType,name){
     await geometry(page,tag+" home");
     if(shot)await page.screenshot({path:"artifacts/admin-v72/home-"+width+".png",fullPage:true});
     await page.locator(".metric-coral").click();await route(page,"#/operaciones/cancelaciones");
-    assert.equal(await page.locator(".ops-item").count(),2,tag+" cancellation filter");
+    const opCount=await page.locator(".ops-item").count();
+    if(opCount!==2)console.error("DIAGNOSTICO V72",tag,JSON.stringify(jsErrors),"filters:",await page.locator("#ops-filters").innerText(),"list:",(await page.locator("#ops-list").innerText()).slice(0,300),"head:",await page.locator("#ops-head-count").innerText());
+    assert.equal(opCount,2,tag+" cancellation filter");
     assert.equal(await page.locator(".operation-layout").evaluate(el=>el.classList.contains("with-detail")),false,tag+" no empty detail pane");
     if(width>760)assert.equal(await page.locator(".ops-detail").isVisible(),false,tag+" hide empty desktop pane");
     await geometry(page,tag+" cancellations");
