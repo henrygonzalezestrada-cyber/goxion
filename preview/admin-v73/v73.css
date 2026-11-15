@@ -397,3 +397,6 @@ html,body{background:#080a12;color:#e5edfb}
 @media(prefers-reduced-motion:reduce){
  .client-card,.ops-item,.metric{animation:none!important}
 }
+
+/* Relative positioning stabilizes active-tab centering within its horizontal rail. */
+.ops-filters{position:relative}
