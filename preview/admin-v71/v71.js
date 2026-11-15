@@ -163,17 +163,27 @@ function show(first=false){const route=parse(),key=route.page+'/'+(route.one||''
 }
 let activeTransition=null;
 function navChange(){
+ const next=parse(),oldPage=priorRoute.split('/')[0];
  const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
- if(!reduced&&document.startViewTransition){
-   activeTransition?.skipTransition();
+ const clientMorph=oldPage==='clientes'&&next.page==='clientes'&&
+   ((priorRoute.includes('GX-')&&!next.one)||(!priorRoute.includes('GX-')&&!!next.one));
+ activeTransition?.skipTransition();
+ if(clientMorph&&!reduced&&document.startViewTransition){
    const transition=document.startViewTransition(()=>show());
    activeTransition=transition;
    window.__goxionV71TransitionFinished=transition.finished.catch(()=>{});
    window.__goxionV71TransitionFinished.finally(()=>{if(activeTransition===transition)activeTransition=null});
- }else{
-   activeTransition?.skipTransition();
-   window.__goxionV71TransitionFinished=Promise.resolve();
-   show();
+   return;
+ }
+ show();
+ window.__goxionV71TransitionFinished=Promise.resolve();
+ if(!reduced&&next.page!==oldPage&&oldPage){
+   const view=$('view-'+next.page);
+   view.getAnimations().forEach(animation=>animation.cancel());
+   const order=['inicio','clientes','operaciones','gestion'];
+   const direction=order.indexOf(next.page)>=order.indexOf(oldPage)?1:-1;
+   view.animate([{opacity:.7,transform:'translateX('+(direction*12)+'px)'},{opacity:1,transform:'translateX(0)'}],
+     {duration:260,easing:'cubic-bezier(.17,.78,.22,1)'});
  }
 }
 function goBack(){const route=parse();if(route.page==='operaciones'&&route.two){location.hash='#/operaciones/'+route.one;return true}if(route.page==='clientes'&&route.one){location.hash='#/clientes';return true}return false}
