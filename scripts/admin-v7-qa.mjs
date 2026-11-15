@@ -16,7 +16,8 @@ async function route(page,hash){
    if(location.hash!==expected)return false;
    const p=expected.replace("#/","").split("/"),view=document.getElementById("view-"+p[0]);
    if(!view||view.hidden)return false;
-   if(p[0]==="clientes"){const directory=document.getElementById("client-directory"),detail=document.getElementById("client-detail");if(!!p[1]!==!!directory.hidden)return false;if(!!p[1]!==!detail.hidden)return false}
+   if(p[0]==="clientes"){const directory=document.getElementById("client-directory"),detail=document.getElementById("client-detail");if(!!p[1]!==!!directory.hidden)return false;if(!!p[1]!==!detail.hidden)return false;if(p[2]&&!document.querySelector('.detail-tab.is-active[href*="'+p[2]+'"]'))return false}
+   if(p[0]==="operaciones"&&p[2]&&!document.getElementById("ops-detail").classList.contains("has-detail"))return false;
    return true;
  },hash);
  await settle(page);
