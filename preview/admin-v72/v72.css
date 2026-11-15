@@ -173,3 +173,11 @@ main{min-width:0}.view{min-width:0}.page-intro{display:flex;align-items:end;just
  .operation-layout:not(.with-detail)>.ops-detail{display:none}
  .operation-layout.with-detail{max-width:none}
 }
+
+/* Contextual operation details: stronger contrast than subdued list metadata. */
+.ops-detail-top h2{color:#1b3d49}
+.ops-detail-top small{color:#426675}
+.ops-detail-content .detail-line span{color:#436774;font-size:12px}
+.ops-detail-content .detail-line b{color:#254451}
+.ops-context{color:#3d616d;font-size:12px}
+.followup-work small{color:#456974}
