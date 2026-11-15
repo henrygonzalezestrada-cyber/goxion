@@ -80,6 +80,9 @@ async function run(browserType,name){
     assert.equal(await page.locator('.client-card[data-id="GX-1042"]').getAttribute("data-state"),"late",tag+" overdue state");
     assert((await page.locator('.client-card[data-id="GX-1042"] .client-date-label').innerText()).includes("VENCIÓ"),tag+" date label");
     if(shot)await page.screenshot({path:"artifacts/admin-v7/overdue-"+width+".png",fullPage:true});
+    await page.locator("a[data-nav='inicio']:visible").first().click();await route(page,"#/inicio");
+    assert.equal(await page.locator(".upcoming").count(),2,tag+" upcoming dates update with sample time");
+    await page.locator("a[data-nav='clientes']:visible").first().click();await route(page,"#/clientes");
     await page.locator("[data-filter='atencion']").click();
     assert.equal(await page.locator(".client-card").count(),3,tag+" attention filter");
     await page.locator("[data-filter='todos']").click();
