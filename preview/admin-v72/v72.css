@@ -167,3 +167,10 @@ main{min-width:0}.view{min-width:0}.page-intro{display:flex;align-items:end;just
 @media(prefers-reduced-motion:reduce){
  .followup-toggle{transition:none!important}
 }
+
+/* Show the work queue, not an empty secondary pane. Detail opens on demand. */
+@media(min-width:761px){
+ .operation-layout:not(.with-detail){grid-template-columns:minmax(0,1fr);max-width:980px}
+ .operation-layout:not(.with-detail)>.ops-detail{display:none}
+ .operation-layout.with-detail{max-width:none}
+}
