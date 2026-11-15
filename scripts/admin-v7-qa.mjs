@@ -10,7 +10,7 @@ mkdirSync("artifacts/admin-v7",{recursive:true});
 const server=spawn(process.execPath,["scripts/serve-preview.mjs"],{stdio:"ignore",env:{...process.env,PORT:String(port)}});
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function ready(){for(let i=0;i<100;i++){try{const r=await fetch(url);if(r.ok)return}catch{}await sleep(120)}throw Error("Preview HTTP unavailable")}
-async function settle(page){await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,2200))]);await Promise.all(document.getAnimations().map(a=>a.finished.catch(()=>{})));await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))})}
+async function settle(page){await page.evaluate(async()=>{await Promise.race([document.fonts.ready,new Promise(r=>setTimeout(r,2200))]);if(window.__goxionV7TransitionFinished)await window.__goxionV7TransitionFinished.catch(()=>{});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));await Promise.all(document.getAnimations().map(a=>a.finished.catch(()=>{})));await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)))})}
 async function route(page,hash){
  await page.waitForFunction(expected=>{
    if(location.hash!==expected)return false;
