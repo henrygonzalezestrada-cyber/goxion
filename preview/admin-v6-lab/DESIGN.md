@@ -10,7 +10,7 @@ Se estudió nuevamente la guía oficial de Anthropic Frontend Design; Impeccable
 
 ### Diseño como sistema
 
-- **Identidad visual:** azul-petróleo nocturno, cian, violeta GOXION, menta, durazno y rosa por estado. Syne para títulos; DM Sans para controles.
+- **Identidad visual:** azul-petróleo nocturno, cian, violeta GOXION, menta, durazno y rosa por estado. Bricolage Grotesque para títulos; DM Sans para controles.
 - **Firma visual:** el próximo acceso tiene una fecha tipográfica que ocupa el lugar de un widget de métricas; es contenido operativo.
 - **Liquid Glass:** exclusivamente para cápsula superior y navegación móvil; no cada superficie.
 - **Tarjetas:** nombre, folio, servicios (X2 una sola vez), estado, corte y monto sin avatares duplicados, sin tres íconos para el mismo estado.
@@ -28,3 +28,12 @@ Se estudió nuevamente la guía oficial de Anthropic Frontend Design; Impeccable
 
 ## Prueba
 `preview/admin-v6-lab/index.html` es autocontenida salvo sus dos archivos de estilo y lógica. El logotipo se toma de la URL pública original y hay sustituto visual de cortesía si falla la carga.
+
+## Revisión de calidad ejecutada
+
+- La primera ejecución remota detectó overflow a 280 px y medición indebida de un control oculto; ambos se corrigieron.
+- La segunda ejecución llegó a 22/24; se redujo tipografía exclusivamente para 280 px.
+- La siguiente ejecución superó 24/24, pero la **revisión visual** detectó que Syne resultaba demasiado ancha para titulares y precios. La reemplazamos con Bricolage Grotesque, más proporcionada. *Ese hallazgo no habría sido capturado por las pruebas funcionales.*
+- La prueba remota con Bricolage Grotesque volvió a aprobar **24/24 en Chromium y WebKit** en la ejecución 43674882541; las nuevas capturas renderizadas de Home, Clientes, Vencidos, Servicios y Operaciones fueron revisadas después del cambio.
+- GitHub Pages publicó el laboratorio dentro de `preview/admin-v6-lab/` como ruta independiente. La rama y el PR continúan como demostración y borrador, sin modificar productivo.
+- No se ha probado la interfaz en Safari físico del propietario y no hay conexión con estados reales. La suite general de integridad del repositorio sigue siendo un requisito independiente para cualquier integración futura.
