@@ -1,0 +1,33 @@
+name: GOXION Admin V7 - QA Operativo
+on:
+  push:
+    branches: [design/admin-v7-operativo-20261115]
+    paths:
+      - 'preview/admin-v7/**'
+      - 'scripts/admin-v7-qa.mjs'
+      - '.github/workflows/admin-v7-visual.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'preview/admin-v7/**'
+      - 'scripts/admin-v7-qa.mjs'
+      - '.github/workflows/admin-v7-visual.yml'
+  workflow_dispatch:
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/admin-v7-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GOXION-V7-screenshots
+          path: artifacts/admin-v7/
+          if-no-files-found: ignore
