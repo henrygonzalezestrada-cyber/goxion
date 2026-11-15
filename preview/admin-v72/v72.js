@@ -154,7 +154,7 @@ function renderOperationDetail(o,filter){const host=$('ops-detail');const has=!!
 }
 function renderOperations(filter='pendientes',opId=null){const f=opFilters.some(x=>x[0]===filter)?filter:'pendientes';const list=opsFiltered(f);const selected=operations.find(o=>o.id===opId&&(list.includes(o)||(f==='pendientes'&&ui.reviewed.has(o.id))));
  $('ops-filters').innerHTML=opFilters.map(([k,label])=>'<a class="op-filter '+(f===k?'is-active':'')+'" href="#/operaciones/'+k+'" '+(f===k?'aria-current="page"':'')+'>'+label+'</a>').join('');
- $('ops-list-name').textContent=opFilters.find(x=>x[0]===f)[1];$('ops-list-count').textContent=list.length+' '+(list.length===1?'movimiento':'movimientos');
+ 
  updateNumber('ops-head-count',opsFiltered('pendientes').length+' por resolver');
  $('ops-list').innerHTML=list.map(o=>'<a class="ops-item '+(selected===o?'is-selected':'')+'" data-kind="'+o.kind+'" href="#/operaciones/'+f+'/'+o.id+'" aria-label="Ver detalle: '+safe(o.title)+' de '+safe(nameForOp(o))+'"><span class="op-dot"></span><span class="op-text"><strong>'+safe(o.title)+(o.amount?' · '+cash(o.amount):'')+'</strong><small>'+safe(nameForOp(o))+' · '+safe(o.next)+'</small></span><span class="op-meta"><small>'+safe(o.when)+'</small>'+icon('right')+'</span></a>').join('')||'<p class="empty">Sin movimientos en esta categoría.</p>';
  renderOperationDetail(selected||null,f);
