@@ -45,3 +45,5 @@ main:focus{outline:none}
 .stage-short{display:none}
 @media(max-width:360px){.stage-long{display:none}.stage-short{display:inline}.header-stage{padding:7px 8px}.glassbar{min-width:0}.brand{min-width:0}.brand-words b{font-size:13px}.brand-words small{font-size:8px}}
 @media(max-width:340px){.home-type h1{font-size:39px;letter-spacing:-.08em}.lead-stage-date{font-size:88px}.client-state{white-space:normal;max-width:117px;text-align:center}}
+
+@media(max-width:340px){.home-type h1{font-size:34px;letter-spacing:-.075em}.clients-head h1,.ops-top h1{font-size:34px;letter-spacing:-.065em}}
