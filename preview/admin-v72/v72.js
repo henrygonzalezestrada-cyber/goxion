@@ -142,7 +142,7 @@ function renderDossier(c,tab){const v=status(c);const count=c.services.reduce((n
 }
 function opsFiltered(filter){return operations.filter(o=>filter==='pendientes'?(o.priority<=2&&!ui.reviewed.has(o.id)):filter==='actividad'?true:o.kind===filter).sort((a,b)=>a.priority-b.priority)}
 function nameForOp(o){return o.client?findClient(o.client)?.name:o.customerName}
-function renderOperationDetail(o,filter){const host=$('ops-detail');const has=!!o;host.classList.toggle('has-detail',has);
+function renderOperationDetail(o,filter){const host=$('ops-detail');const has=!!o;host.classList.toggle('has-detail',has);document.querySelector('.operation-layout')?.classList.toggle('with-detail',has);
  if(!has){host.innerHTML='<div class="ops-detail-empty">'+icon('brief')+'<b>Selecciona un movimiento</b><span>Consulta detalles y ve al expediente sin salir de Operaciones.</span></div>';document.querySelector('.ops-sheet-backdrop')?.remove();return;}
  host.innerHTML='<div class="ops-detail-top"><div><small>OPERACIÓN · DEMO</small><h2>'+safe(o.title)+'</h2></div><a href="#/operaciones/'+filter+'" class="icon-mini" aria-label="Cerrar detalle">'+icon('close')+'</a></div>'+ 
  '<div class="ops-detail-content"><div class="detail-line"><span>Persona o concepto</span><b>'+safe(nameForOp(o))+'</b></div><div class="detail-line"><span>Estado del seguimiento</span><b>'+(ui.reviewed.has(o.id)?'Revisado en demo':safe(o.status))+'</b></div><div class="detail-line"><span>Siguiente paso</span><b>'+safe(o.next)+'</b></div>'+ 
