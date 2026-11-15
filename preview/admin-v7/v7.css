@@ -24,3 +24,8 @@ main{min-width:0}.view{min-width:0}.page-intro{display:flex;align-items:end;just
 @media(max-width:390px){.frame{padding-inline:12px}.page-intro h1{font-size:22px}.metric-label{font-size:11px}.metric-value.money{font-size:21px}.metric-value{font-size:25px}.metric-meta{font-size:9.5px}.panel-head h2{font-size:15px}.panel-head p{font-size:10.5px}.person-name{font-size:14px}.client-state{font-size:9.5px}.upcoming{padding:8px}.up-date{width:38px;height:42px;font-size:16px}.up-info strong{font-size:10px}.up-info small{font-size:9px}}
 @media(max-width:330px){.frame{padding-inline:9px}.headbrand small{font-size:8px}.brand-symbol{width:30px;height:30px}.brand-symbol img{height:30px;width:30px}.headbrand b{font-size:13px}.metric{min-height:113px;padding:11px}.metric-value.money{font-size:19px}.metric-meta{font-size:9px}.metric-label{font-size:10.5px}.upcoming-list{grid-template-columns:1fr}.upcoming{min-height:50px}.client-card{padding:11px}.client-state{font-size:9px}.person-name{font-size:13px}.client-date-value{font-size:16px}.client-money b{font-size:17px}.filter,.op-filter{padding-inline:10px}.detail-tab{font-size:10.5px;padding:9px 7px}.ops-item{gap:8px}.op-meta b{font-size:9px}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+/* Compact summaries: detail affordance shares the existing row. */
+.client-card{position:relative;min-height:142px}
+.client-money{padding-right:20px}
+.client-footer{position:absolute;right:13px;bottom:15px;min-height:16px;margin:0;pointer-events:none}
+@media(max-width:760px){.client-card{min-height:139px}.ops-detail{bottom:calc(83px + env(safe-area-inset-bottom));max-height:calc(100dvh - 105px)}}
