@@ -126,6 +126,7 @@ async function run(browserType,name){
     assert.equal(await page.locator("#priority-count").innerText(),"4",tag+" undo restores priorities");
     assert.equal(await page.locator("#ops-head-count").innerText(),"4 por resolver",tag+" undo restores operations");
     assert.equal(await page.locator("#notification-count").innerText(),"3",tag+" undo restores auto-read notice");
+    await settle(page);
     if(shot)await page.screenshot({path:"artifacts/admin-v74/operation-detail-"+width+".png",fullPage:true});
     await page.locator("#ops-detail a[aria-label='Cerrar detalle']").click();await route(page,"#/operaciones/cancelaciones");
     await page.locator("a.op-filter[href*='ingresos']").click();await route(page,"#/operaciones/ingresos");
@@ -180,6 +181,12 @@ async function run(browserType,name){
     assert.equal(await page.locator(".contract").count(),2,tag+" commercial services");
     assert.equal(await page.locator(".contract").first().locator(".access").count(),2,tag+" X2 access count");
     assert.deepEqual(await page.locator(".contract").first().locator("time").allTextContents(),["15 NOV","23 NOV"],tag+" X2 independent access dates");
+    const secondAccess=await page.locator(".contract").first().locator(".access").nth(1).evaluate(el=>({
+      background:getComputedStyle(el).backgroundImage,color:getComputedStyle(el).color,
+      label:getComputedStyle(el.querySelector("b")).color
+    }));
+    assert(secondAccess.background.includes("gradient"),tag+" X2 second access is not a white legacy tile");
+    assert.equal(secondAccess.color,"rgb(237, 244, 255)",tag+" X2 access text readable on dark");
     await geometry(page,tag+" dossier");
     if(shot)await page.screenshot({path:"artifacts/admin-v74/services-"+width+".png",fullPage:true});
     await page.locator("a[data-nav='inicio']:visible").first().click();await route(page,"#/inicio");
