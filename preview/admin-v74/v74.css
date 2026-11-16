@@ -604,3 +604,30 @@ body{
  #detail-content{animation:none!important;filter:none!important}
  .ops-actionbar :is(.followup-toggle,.ops-open-client){transition:none!important}
 }
+
+
+/* Visual QA found a second legacy light-theme leak:
+   nth-child(even) overrode the generic .access dark background. */
+.contract .access:nth-child(even){
+ background:linear-gradient(125deg,#292840,#242f48);
+ color:#edf4ff;
+ border:1px solid #564e75;
+ box-shadow:inset 0 1px rgba(238,222,255,.075);
+}
+.contract .access:nth-child(even) b{color:#f0edff}
+.contract .access:nth-child(even) time{color:#98eff8}
+/* Parent sheet already performs a clip/scale morph. Do not fade the children
+   a second time: compounded opacity made the detail unreadable in captures. */
+.ops-detail.has-detail .ops-detail-content,
+.ops-detail.has-detail .ops-detail-top h2{
+ animation:none!important;
+ opacity:1!important;transform:none!important;filter:none!important;
+}
+@media(prefers-reduced-motion:reduce){
+ .ops-detail.has-detail,
+ .ops-detail.has-detail .ops-detail-content,
+ .ops-detail.has-detail .ops-detail-top h2,
+ .notifications:not([hidden]){
+  animation:none!important;opacity:1!important;transform:none!important;filter:none!important;
+ }
+}
