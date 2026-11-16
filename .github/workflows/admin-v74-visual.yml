@@ -1,0 +1,33 @@
+name: GOXION Admin V7.4 - QA Depth & Morph
+on:
+  push:
+    branches: [design/admin-v7-4-depth-morph-20261115]
+    paths:
+      - 'preview/admin-v74/**'
+      - 'scripts/admin-v74-qa.mjs'
+      - '.github/workflows/admin-v74-visual.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'preview/admin-v74/**'
+      - 'scripts/admin-v74-qa.mjs'
+      - '.github/workflows/admin-v74-visual.yml'
+  workflow_dispatch:
+jobs:
+  responsive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/admin-v74-qa.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: GOXION-V74-depth-morph-screenshots
+          path: artifacts/admin-v74/
+          if-no-files-found: ignore
