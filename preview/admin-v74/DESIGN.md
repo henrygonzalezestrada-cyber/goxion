@@ -27,3 +27,9 @@ Se pulió la transición compartida entre tarjeta y expediente usando View Trans
 - Comprobar el morph de hoja y pestañas; accesibilidad de foco y movimiento reducido.
 
 Todo es visual y solo afecta `preview/admin-v74/`, la QA y el workflow. No se alteran `admin.html`, Index, Ayuda, Supabase, Edge, motor B2, pagos ni cancelaciones reales. Los datos son ficticios.
+
+## Hallazgos de revisión visual posterior a primera QA
+
+1. **Acceso 2 de Google One todavía claro:** la regla heredada `.access:nth-child(even){background:#f3f0fd}` era más específica que el estilo oscuro `.access{background:...}`. Se corrigió con `.contract .access:nth-child(even)` en fondo azul/violeta oscuro y texto contrastante; añadido test WebKit/Chromium para detectar la regresión.
+2. **Doble animación de transparencia:** el panel de Operaciones hacía morph y sus hijos también aplicaban un fade, provocando texto momentáneamente apagado. Se retiraron animaciones redundantes de sus hijos, conservando el morph del panel como una sola transición. En reduced-motion se eliminan ambos efectos.
+3. **Capturas fieles:** la prueba espera a que finalicen las animaciones tras pulsar el seguimiento antes de capturar el detalle; así las capturas reflejan el estado estable, no un frame intermedio.
