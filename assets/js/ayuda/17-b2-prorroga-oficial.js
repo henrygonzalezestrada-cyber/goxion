@@ -118,7 +118,7 @@
    // Únicamente habilita solicitar revisión al equipo GOXION.
    const review=!automatic&&!state.acuerdo&&
      /^\d{4}-\d{2}-\d{2}$/.test(String(manualDue||""))&&
-     manualDue<state.fecha_servidor;
+     manualDue<state.fecha_servidor&&state.fecha_servidor<=plus(manualDue,3);
    if(!automatic&&!review){existing?.remove();return;}
    const btn=existing||document.createElement("button");
    btn.type="button";
@@ -130,7 +130,7 @@
  }
  async function openReviewDialog(){
    if(!state||!manualDue||!state.fecha_servidor||
-     manualDue>=state.fecha_servidor||state.acuerdo)return;
+     manualDue>=state.fecha_servidor||state.fecha_servidor>plus(manualDue,3)||state.acuerdo)return;
    document.getElementById("gx-prorroga-dialog")?.remove();
    const dialog=document.createElement("dialog");
    dialog.className="gx-prorroga-dialog";
@@ -138,15 +138,16 @@
    dialog.setAttribute("aria-labelledby","gx-prorroga-title");
    dialog.tabIndex=-1;
    const first=plus(state.fecha_servidor,1);
+   const last=plus(manualDue,7);
    dialog.innerHTML='<div class="gx-prorroga-sheet">'+
      '<div class="gx-prorroga-kicker">SOLICITUD DE PRÓRROGA</div>'+
      '<button class="gx-prorroga-close" type="button" data-gx-close aria-label="Cerrar">'+
        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
      '<h2 id="gx-prorroga-title">Propón una nueva fecha de pago.</h2>'+
-     '<p>Tu pago ya venció. Podemos revisar una solicitud excepcional, pero la nueva fecha necesita autorización.</p>'+
+     '<p>Tu pago ya venció. Puedes solicitar revisión hasta el tercer día de atraso. La fecha máxima es siete días después del vencimiento original y requiere autorización.</p>'+
      '<div class="gx-prorroga-line"><span>Fecha de vencimiento</span><strong data-gx-old></strong></div>'+
      '<label class="gx-prorroga-field"><span>¿Cuándo podrías pagar?</span>'+
-       '<input type="date" data-gx-day required min="'+first+'" value="'+first+'"></label>'+
+       '<input type="date" data-gx-day required min="'+first+'" max="'+last+'" value="'+first+'"></label>'+
      '<label class="gx-prorroga-field"><span>Motivo (opcional)</span>'+
        '<input type="text" data-gx-reason maxlength="180" placeholder="Cuéntanos brevemente qué pasó"></label>'+
      '<p class="gx-prorroga-terms-copy">Enviar la solicitud no modifica el vencimiento, los recargos ni el estado de tu servicio. Te avisaremos si la prórroga es autorizada.</p>'+
@@ -165,8 +166,9 @@
      const parsed=new Date(chosen+"T00:00:00Z");
      if(!/^\d{4}-\d{2}-\d{2}$/.test(chosen)||
        !Number.isFinite(parsed.getTime())||
-       parsed.toISOString().slice(0,10)!==chosen||chosen<=state.fecha_servidor){
-       result.textContent="Selecciona una fecha futura válida.";return;
+       parsed.toISOString().slice(0,10)!==chosen||chosen<=state.fecha_servidor||
+       chosen>plus(manualDue,7)||state.fecha_servidor>plus(manualDue,3)){
+       result.textContent="Selecciona una fecha futura, como máximo siete días después del vencimiento original.";return;
      }
      if(typeof window.notificarAdmin!=="function"){
        result.textContent="No fue posible conectar con Soporte. Inténtalo nuevamente.";return;
@@ -174,7 +176,7 @@
      btn.disabled=true;
      result.textContent="Enviando tu solicitud…";
      const motivo=String(reason.value||"").replace(/[<>\r\n]/g," ").trim().slice(0,180);
-     const mensaje="El cliente solicita revisión de una prórroga de pago.\n"+
+     const mensaje="El cliente solicita revisión de una prórroga de pago (dentro de los tres días posteriores al vencimiento).\n"+
        "Vencimiento original: "+manualDue+"\n"+
        "Nueva fecha propuesta: "+chosen+"\n"+
        "Motivo: "+(motivo||"No indicado")+"\n"+
