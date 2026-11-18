@@ -1,5 +1,5 @@
 # B2 · Plan de integración de políticas v2 (sin activación de consentimiento)
-Estado: preparación técnica; **no desplegado**.
+Estado: **motor B2 desplegado parcialmente** en Supabase y Ayuda oficial (18/nov/2026 UTC).
 
 ## Hallazgos comprobados en Supabase
 - Edge Function activa `estado-financiero-b2-beta` utiliza RPC de prórroga.
@@ -29,3 +29,16 @@ Estado: preparación técnica; **no desplegado**.
 Popup obligatorio, registro de consentimiento, rechazo y notificaciones persistentes: siguiente bloque solicitado por el usuario.
 
 **Advertencia:** no publicar nuevas reglas de prórroga solo en frontend mientras las RPC de producción sigan aplicando +5 días y solo día 0.
+
+## Avances desplegados y comprobados (18/nov/2026 UTC)
+- Migración `b2_politicas_v2_prorrogas_mora_lealtad` aplicada correctamente en Supabase. Las 9 funciones SQL modificadas están almacenadas en `docs/sql/B2_POLITICAS_V2_CAMBIO_PROPUESTO.sql` y el snapshot de reversión en `docs/sql/B2_PRE_POLITICAS_V2_SNAPSHOT.sql`.
+- Restricción de fecha pactada en `goxion_b2_prorrogas` ampliada hasta original+10 días y unicidad por ciclo eliminada; permanece unicidad por cargo/operación.
+- Edge Function `estado-financiero-b2-beta` desplegada como versión 9, con elegibilidad 0–3, selección de cargos individuales y revisión de comprobantes por cargo.
+- `assets/js/ayuda/17-b2-prorroga-oficial.js` y `ayuda.html` actualizados en `main` con mensajes, 10 días y versión de caché actualizada. También se actualizaron los resúmenes de pagos/garantía/lealtad de los modales existentes, **sin activar pantalla de consentimiento**.
+- Pruebas en transacción con `ROLLBACK`: cotización a día+7 aceptada, día+11 rechazado, solicitud aprobada, idempotencia, racha perdida, descuento del cargo cancelado y saldo de otros cargos intacto. Prueba de cotización en vivo, **de solo lectura**, devolvió `quote_ok=true`, `descuento_no_aplica=true`, `dias_desde_original=7`.
+- No se crearon ni alteraron prórrogas reales durante las pruebas; la tabla contenía 0 prórrogas antes y después de los ensayos.
+
+## Pendiente de este bloque / QA funcional
+- Probar sesión autenticada completa con la cuenta de prueba: selección de cargo, cuota mostrada, confirmación efectiva, pago/recibo aprobado y reinicio de lealtad. Esa prueba **no** se ha ejecutado aún de extremo a extremo.
+- Revisar con especial atención la lógica de cancelaciones y baja día 11, limpieza de servicios en Admin y cálculo de Garantía de Continuidad por causa atribuible a GOXION y reporte verificable. El motor de prórroga no sustituye esos flujos.
+- Consentimiento versionado y notificaciones persistentes quedan para el siguiente bloque por petición expresa del usuario.
