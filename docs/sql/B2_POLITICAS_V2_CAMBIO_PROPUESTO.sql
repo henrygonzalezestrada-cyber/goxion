@@ -56,12 +56,14 @@ begin
  if v_ciclo.estado<>'pendiente' or
     v_ciclo.periodo is distinct from v_cliente.periodo_pendiente
  then raise exception 'CICLO_NO_DISPONIBLE';end if;
- if v_cliente.pago_en_revision then raise exception 'PRORROGA_PAGO_EN_REVISION';end if;
+ -- La revisión global no bloquea otro cargo B2 independiente.
  -- Un comprobante B2 reportado y todavía pendiente congela la fecha.
  -- Es el mismo ciclo: no prometer nueva fecha mientras Admin revisa cobro.
  if exists(select 1 from public.goxion_b2_comprobantes r
    where r.cliente_id=p_cliente_id and r.ciclo_id=v_ciclo.id
-   and r.estado='reportado')
+   and r.estado='reportado'
+   and (coalesce(cardinality(r.cargos_solicitados),0)=0
+     or p_cargo_id=any(r.cargos_solicitados)))
  then raise exception 'PRORROGA_PAGO_EN_REVISION_B2';end if;
  if v_hoy<v_cargo.fecha_vencimiento or v_hoy>v_cargo.fecha_vencimiento+3
   or p_fecha_pactada<=v_cargo.fecha_vencimiento
@@ -228,7 +230,7 @@ begin
   raise exception 'PRORROGA_FECHA_INVALIDA';end if;
  select id,periodo_pendiente,dia_pago,estado,pago_en_revision
  into v_cliente from public.clientes where id=p_cliente_id;
- if not found or v_cliente.estado='suspendido' or v_cliente.pago_en_revision then
+ if not found or v_cliente.estado='suspendido' then
   raise exception 'PRORROGA_CUENTA_NO_DISPONIBLE';end if;
  if p_cargo_id is not null then
   select b.* into v_cargo from public.goxion_b2_cargos b
@@ -239,7 +241,9 @@ begin
   v_original=v_cargo.fecha_vencimiento;v_periodo=v_cargo.periodo;
   if exists(select 1 from public.goxion_b2_comprobantes r
    where r.cliente_id=p_cliente_id and r.ciclo_id=v_cargo.ciclo_id
-   and r.estado='reportado')
+   and r.estado='reportado'
+   and (coalesce(cardinality(r.cargos_solicitados),0)=0
+     or p_cargo_id=any(r.cargos_solicitados)))
   then raise exception 'PRORROGA_PAGO_EN_REVISION_B2';end if;
   if exists(select 1 from public.goxion_b2_prorrogas where cargo_id=v_cargo.id)
    then raise exception 'PRORROGA_YA_UTILIZADA_EN_CARGO';end if;
@@ -252,6 +256,7 @@ begin
     round(v_al_dia*0.05)::int*least(10,greatest(0,p_fecha_pactada-v_original+1)));
   v_incumplimiento=v_al_dia+v_mora;
  else
+  if v_cliente.pago_en_revision then raise exception 'PRORROGA_PAGO_EN_REVISION';end if;
   if exists(select 1 from public.goxion_b2_regimen_cliente
    where cliente_id=p_cliente_id and activo) then
    raise exception 'PRORROGA_REQUIERE_ACCESO';end if;
