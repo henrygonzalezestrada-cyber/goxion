@@ -159,7 +159,7 @@ Deno.serve(async(req)=>{
           if(target.error)throw target.error;
           if(target.data){
             acuerdoLiquidado=target.data.liquidado===true;
-            if(!acuerdoLiquidado&&/^\\d{4}-\\d{2}-\\d{2}$/.test(String(agreement.fecha_pactada||""))){
+            if(!acuerdoLiquidado&&/^\d{4}-\d{2}-\d{2}$/.test(String(agreement.fecha_pactada||""))){
               const nextDay=new Date(Date.parse(agreement.fecha_pactada+
                 "T00:00:00Z")+86400000).toISOString().slice(0,10);
               const estimation=await sb.rpc("goxion_b2_cotizar_ciclo",{
