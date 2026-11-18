@@ -111,18 +111,26 @@ Deno.serve(async(req)=>{
         const current=charges.data||[];
         const cycleId=current[0]?.ciclo_id;
         let agreements:any[]=[];
+        let proofs:any[]=[];
         if(cycleId){
           const prior=await sb.from("goxion_b2_prorrogas")
             .select("id,fecha_original,fecha_pactada,estado,cargo_id")
             .eq("cliente_id",clienteId).eq("ciclo_id",cycleId);
           if(prior.error)throw prior.error;
           agreements=prior.data||[];
+          const pending=await sb.from('goxion_b2_comprobantes')
+            .select('cargos_solicitados').eq('cliente_id',clienteId)
+            .eq('ciclo_id',cycleId).eq('estado','reportado');
+          if(pending.error)throw pending.error;
+          proofs=pending.data||[];
         }
         const used=new Set(agreements.map(x=>x.cargo_id));
         const addDays=(iso:string,n:number)=>new Date(
           Date.parse(iso+"T00:00:00Z")+n*86400000).toISOString().slice(0,10);
         candidates=current.filter(x=>x.fecha_vencimiento<=today&&
-          today<=addDays(x.fecha_vencimiento,3)&&!used.has(x.id));
+          today<=addDays(x.fecha_vencimiento,3)&&!used.has(x.id)&&
+          !proofs.some(p=>!Array.isArray(p.cargos_solicitados)||
+            p.cargos_solicitados.length===0||p.cargos_solicitados.includes(x.id)));
         agreement=candidates.length===0?
           (agreements.find(x=>x.estado==="aprobada")||agreements[0]||null):null;
       }else{
@@ -138,8 +146,9 @@ Deno.serve(async(req)=>{
         const original=b2?(candidates[0]?.fecha_vencimiento||agreement?.fecha_original||null):
           period?period.slice(0,7)+"-"+String(Math.min(Number(client.data.dia_pago)||15,
               last)).padStart(2,"0"):null;
-        const may=!agreement&&!client.data.pago_en_revision&&
-          (b2?candidates.length>0:(original!==null&&original<=today&&today<=new Date(Date.parse(original+'T00:00:00Z')+3*86400000).toISOString().slice(0,10)));
+        const may=!agreement&&(b2?candidates.length>0:
+          (!client.data.pago_en_revision&&original!==null&&original<=today&&
+          today<=new Date(Date.parse(original+'T00:00:00Z')+3*86400000).toISOString().slice(0,10)));
         return res({ok:true,modo:b2?"b2_multifecha":"global",
           acuerdo:agreement?{fecha_original:agreement.fecha_original,
             fecha_pactada:agreement.fecha_pactada,estado:agreement.estado,
