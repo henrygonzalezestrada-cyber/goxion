@@ -91,14 +91,14 @@
    if(!r.ok||!data.ok)throw Error(data.error||"No fue posible completar la operación.");
    return data;
  }
+ let manualDue=null;
  function controls(){
    const card=document.getElementById("dash-billing-card");
    const existing=card?.querySelector(".gx-prorroga-entry");
-   if(!card||!card.querySelector(".gx-account-capsule"))return;
+   const capsule=card?.querySelector(".gx-account-capsule");
+   if(!card||!capsule)return;
    if(!state){existing?.remove();return;}
    if(state.acuerdo?.activo){
-     // La fecha ya es el elemento protagonista: nunca duplicarla en
-     // otro bloque inferior ni repetir las condiciones del diálogo.
      existing?.remove();
      card.querySelector(".gx-prorroga-active")?.remove();
      const dateEl=card.querySelector("#dash-date");
@@ -108,33 +108,135 @@
      if(dateTitle&&dateTitle.textContent!=="Nueva fecha de pago")
        dateTitle.textContent="Nueva fecha de pago";
      const badge=card.querySelector("#dash-badge");
-     // Reutiliza la cápsula real del dashboard, no una etiqueta beta.
-     // badge-ok hereda tipografía, radio, contraste y fondo de GOXION.
      const badgeMarkup='<div class="time-badge badge-ok gx-prorroga-state">🤝 Acuerdo pactado</div>';
      if(badge&&badge.innerHTML!==badgeMarkup)badge.innerHTML=badgeMarkup;
      return;
    }
    card.querySelector(".gx-prorroga-active")?.remove();
-   if(state.puede_solicitar&&!existing){
-     const btn=document.createElement("button");btn.type="button";
-     btn.className="gx-prorroga-entry";btn.textContent="¿No puedes realizar tu pago hoy?";
-     btn.addEventListener("click",openDialog);
-     card.querySelector(".gx-account-capsule").insertAdjacentElement("afterend",btn);
-   } else if(!state.puede_solicitar){existing?.remove();}
+   const automatic=state.puede_solicitar===true;
+   // Los días 1-3 son elegibles desde el backend; la revisión queda como contingencia.
+   const review=!automatic&&!state.acuerdo&&
+     /^\d{4}-\d{2}-\d{2}$/.test(String(manualDue||""))&&
+     manualDue<state.fecha_servidor&&state.fecha_servidor<=plus(manualDue,3);
+   if(!automatic&&!review){existing?.remove();return;}
+   const btn=existing||document.createElement("button");
+   btn.type="button";
+   btn.className="gx-prorroga-entry";
+   const caption=automatic?"¿No puedes realizar tu pago hoy?":"Solicitar prórroga de pago";
+   if(btn.textContent!==caption)btn.textContent=caption;
+   btn.onclick=review?openReviewDialog:openDialog;
+   if(!existing)capsule.insertAdjacentElement("afterend",btn);
+ }
+ async function openReviewDialog(){
+   if(!state||!manualDue||!state.fecha_servidor||
+     manualDue>=state.fecha_servidor||state.fecha_servidor>plus(manualDue,3)||state.acuerdo)return;
+   document.getElementById("gx-prorroga-dialog")?.remove();
+   const dialog=document.createElement("dialog");
+   dialog.className="gx-prorroga-dialog";
+   dialog.id="gx-prorroga-dialog";
+   dialog.setAttribute("aria-labelledby","gx-prorroga-title");
+   dialog.tabIndex=-1;
+   const first=plus(state.fecha_servidor,1);
+   const last=plus(manualDue,10);
+   dialog.innerHTML='<div class="gx-prorroga-sheet">'+
+     '<div class="gx-prorroga-kicker">SOLICITUD DE PRÓRROGA</div>'+
+     '<button class="gx-prorroga-close" type="button" data-gx-close aria-label="Cerrar">'+
+       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
+     '<h2 id="gx-prorroga-title">Propón una nueva fecha de pago.</h2>'+
+     '<p>Tu pago ya venció. Puedes solicitar revisión hasta el tercer día de atraso. La fecha máxima es diez días después del vencimiento original y requiere autorización.</p>'+
+     '<div class="gx-prorroga-line"><span>Fecha de vencimiento</span><strong data-gx-old></strong></div>'+
+     '<label class="gx-prorroga-field"><span>¿Cuándo podrías pagar?</span>'+
+       '<input type="date" data-gx-day required min="'+first+'" max="'+last+'" value="'+first+'"></label>'+
+     '<label class="gx-prorroga-field"><span>Motivo (opcional)</span>'+
+       '<input type="text" data-gx-reason maxlength="180" placeholder="Cuéntanos brevemente qué pasó"></label>'+
+     '<p class="gx-prorroga-terms-copy">Enviar la solicitud no modifica el vencimiento, los recargos ni el estado de tu servicio. Te avisaremos si la prórroga es autorizada.</p>'+
+     '<button class="gx-prorroga-activate" type="button" data-gx-submit>Enviar solicitud para revisión</button>'+
+     '<div class="gx-prorroga-result" role="status" aria-live="polite"></div></div>';
+   document.body.appendChild(dialog);
+   dialog.querySelector("[data-gx-old]").textContent=label(manualDue);
+   const day=dialog.querySelector("[data-gx-day]");
+   const reason=dialog.querySelector("[data-gx-reason]");
+   const btn=dialog.querySelector("[data-gx-submit]");
+   const result=dialog.querySelector(".gx-prorroga-result");
+   dialog.querySelector("[data-gx-close]").addEventListener("click",()=>dialog.close());
+   dialog.addEventListener("close",()=>{releaseScroll?.();dialog.remove()});
+   btn.addEventListener("click",async()=>{
+     const chosen=String(day.value||"");
+     const parsed=new Date(chosen+"T00:00:00Z");
+     if(!/^\d{4}-\d{2}-\d{2}$/.test(chosen)||
+       !Number.isFinite(parsed.getTime())||
+       parsed.toISOString().slice(0,10)!==chosen||chosen<=state.fecha_servidor||
+       chosen>plus(manualDue,10)||state.fecha_servidor>plus(manualDue,3)){
+       result.textContent="Selecciona una fecha futura, como máximo diez días después del vencimiento original.";return;
+     }
+     if(typeof window.notificarAdmin!=="function"){
+       result.textContent="No fue posible conectar con Soporte. Inténtalo nuevamente.";return;
+     }
+     btn.disabled=true;
+     result.textContent="Enviando tu solicitud…";
+     const motivo=String(reason.value||"").replace(/[<>\r\n]/g," ").trim().slice(0,180);
+     const mensaje="El cliente solicita revisión de una prórroga de pago (dentro de los tres días posteriores al vencimiento).\n"+
+       "Vencimiento original: "+manualDue+"\n"+
+       "Nueva fecha propuesta: "+chosen+"\n"+
+       "Motivo: "+(motivo||"No indicado")+"\n"+
+       "Pendiente de autorización. NO modificar pagos ni vencimientos automáticamente.";
+     try{
+       await window.notificarAdmin("soporte","📅 Prórroga de pago · Por revisar",
+         mensaje,"00f2fe","PRORROGA-"+manualDue);
+       btn.textContent="Solicitud enviada";
+       result.textContent="Recibimos tu solicitud. Revisaremos la fecha propuesta y te confirmaremos si fue autorizada.";
+     }catch(error){
+       btn.disabled=false;
+       result.textContent="No se pudo registrar la solicitud. Inténtalo nuevamente o comunícate con Soporte.";
+     }
+   });
+   const unlock=lockBehindDialog(dialog);
+   try{dialog.showModal();dialog.focus({preventScroll:true})}
+   catch(error){unlock();dialog.remove();throw error}
  }
  async function refresh(){
    if(fetching)return;
    const token=demo?"demo":localStorage.getItem(core?.STORAGE?.CLIENT_TOKEN||"")||"";
    if(token===activeToken&&state)return;
-   if(!token){state=null;activeToken="";controls();return;}
+   if(!token){state=null;manualDue=null;activeToken="";controls();return;}
    fetching=true;
    try{
-     state=await action("mi_prorroga");
-     // El servidor determina la elegibilidad de fecha única o multifecha.
-     activeToken=token;controls();
-   }
-   catch(e){console.warn("GOXION prórroga beta:",e.message);state=null;activeToken="";controls();}
-   finally{fetching=false;}
+     const current=await action("mi_prorroga");
+     let overdue=null;
+     if(!current.acuerdo&&current.modo==="global"&&
+       /^\d{4}-\d{2}-\d{2}$/.test(String(current.fecha_original||""))&&
+       current.fecha_original<current.fecha_servidor)
+       overdue=current.fecha_original;
+     if(!current.acuerdo&&current.modo==="b2_multifecha"&&
+       current.puede_solicitar!==true){
+       // No inferir B2 de la fecha global: leer obligaciones verificadas.
+       try{
+         const details=await action("mi_estado");
+         const quote=details.calendario_financiero;
+         if(details.modo==="b2_multifecha"&&quote?.cobrable===true&&
+           quote?.comprobante_en_revision!==true&&Array.isArray(quote.cargos)){
+           const late=quote.cargos.filter(row=>row.pagado!==true&&
+             Number(row.total_centavos)>0&&
+             /^\d{4}-\d{2}-\d{2}$/.test(String(row.vence||""))&&
+             row.vence<current.fecha_servidor&&
+             !(row.prorroga_estado==="aprobada"&&
+               row.fecha_pactada>=current.fecha_servidor))
+             .sort((a,b)=>String(a.vence).localeCompare(String(b.vence)));
+           overdue=late[0]?.vence||null;
+         }
+       }catch(error){
+         console.warn("GOXION: no se confirmó vencimiento B2",String(error).slice(0,120));
+       }
+     }
+     if(token!==localStorage.getItem(core?.STORAGE?.CLIENT_TOKEN||""))return;
+     state=current;
+     manualDue=overdue;
+     activeToken=token;
+     controls();
+   }catch(error){
+     console.warn("GOXION prórroga:",error.message);
+     state=null;manualDue=null;activeToken="";controls();
+   }finally{fetching=false;}
  }
  function renderQuote(dialog,quote){
    dialog.querySelector("[data-gx-protected]").textContent=money(quote.importe_pactado_centavos);
@@ -150,15 +252,17 @@
    const dialog=document.createElement("dialog");dialog.className="gx-prorroga-dialog";
    dialog.id="gx-prorroga-dialog";dialog.setAttribute("aria-labelledby","gx-prorroga-title");
    dialog.tabIndex=-1;
-   const init=plus(state.fecha_original,3);
+   const minAvailable=state.fecha_servidor>state.fecha_original?
+     plus(state.fecha_servidor,1):plus(state.fecha_original,1);
+   const init=minAvailable;
    dialog.innerHTML='<div class="gx-prorroga-sheet">'+
      '<div class="gx-prorroga-kicker">FLEXIBILIDAD GOXION</div>'+
      '<button class="gx-prorroga-close" type="button" data-gx-close aria-label="Cerrar">'+
        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
      '<h2 id="gx-prorroga-title">Un poco más de tiempo.</h2>'+
-     '<p>Elige cuándo pagar. Mantendrás tu lealtad y evitarás mora si cumples el acuerdo.</p>'+
+     '<p>Elige cuándo pagar. No habrá mora si cumples el acuerdo, pero la prórroga interrumpe tu racha y el descuento de lealtad.</p>'+
      '<label class="gx-prorroga-field"><span>Nueva fecha de pago</span><input type="date" data-gx-day min="'+
-       plus(state.fecha_original,1)+'" max="'+state.fecha_maxima+'" value="'+init+'" aria-describedby="gx-prorroga-date-error"></label>'+
+       minAvailable+'" max="'+state.fecha_maxima+'" value="'+init+'" aria-describedby="gx-prorroga-date-error"></label>'+
      '<span id="gx-prorroga-date-error" class="gx-prorroga-date-error" role="alert" aria-live="polite" hidden></span>'+
      '<div class="gx-prorroga-line"><span>Fecha original</span><strong data-gx-old></strong></div>'+
      '<div class="gx-prorroga-line"><span>Acuerdo propuesto</span><strong data-gx-new></strong></div>'+
@@ -167,10 +271,10 @@
        '<strong class="gx-prorroga-risk-total" data-gx-missed></strong>'+
        '<div class="gx-prorroga-risk-details" aria-label="Desglose del incumplimiento">'+
          '<div><span>Mora retroactiva</span><b data-gx-mora></b></div>'+
-         '<div><span>Lealtad perdida</span><b data-gx-loyalty></b></div>'+
+         '<div><span>Lealtad no aplicable al acuerdo</span><b data-gx-loyalty></b></div>'+
        '</div>'+
      '</div>'+
-     '<p class="gx-prorroga-terms-copy">La mora comienza a contarse desde el vencimiento original. Una prórroga por período y máximo cinco días.</p>'+
+     '<p class="gx-prorroga-terms-copy">La mora comienza a contarse desde el vencimiento original. La prórroga se concede por servicio, hasta diez días después del vencimiento original. El descuento de lealtad no se conserva, aunque pagues a tiempo en la nueva fecha.</p>'+
      '<label class="gx-prorroga-consent"><input type="checkbox" data-gx-accept>'+
        '<span>Comprendo y acepto las condiciones del acuerdo.</span></label>'+
      '<button class="gx-prorroga-activate" type="button" data-gx-activate disabled>Aceptar y pactar fecha</button>'+
@@ -180,7 +284,7 @@
    const confirm=dialog.querySelector("[data-gx-accept]"),status=dialog.querySelector(".gx-prorroga-result");
    let quote=null,requestSerial=0;
    const dateError=dialog.querySelector("#gx-prorroga-date-error");
-   const minDate=plus(state.fecha_original,1);
+   const minDate=minAvailable;
    const maxDate=state.fecha_maxima;
    const validDate=value=>{
      if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
@@ -210,7 +314,7 @@
      if(!validDate(day.value)){
        status.textContent="";
        showDateError("Elige una fecha entre el "+label(minDate)+
-         " y el "+label(maxDate)+". El límite es de 5 días.");
+         " y el "+label(maxDate)+". El límite es de 10 días desde el vencimiento original.");
        return;
      }
      showDateError("");
