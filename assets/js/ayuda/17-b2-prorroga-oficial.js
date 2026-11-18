@@ -103,10 +103,13 @@
      card.querySelector(".gx-prorroga-active")?.remove();
      const dateEl=card.querySelector("#dash-date");
      const agreed=label(state.acuerdo.fecha_pactada);
+     const incumplido=state.fecha_servidor>state.acuerdo.fecha_pactada;
+     const pronostico=state.acuerdo.pronostico_incumplimiento;
      if(dateEl&&dateEl.textContent!==agreed)dateEl.textContent=agreed;
      const dateTitle=card.querySelector("#dash-date-label");
-     if(dateTitle&&dateTitle.textContent!=="Nueva fecha de pago")
-       dateTitle.textContent="Nueva fecha de pago";
+     const dateCaption=incumplido?"Acuerdo vencido":"Nueva fecha de pago";
+     if(dateTitle&&dateTitle.textContent!==dateCaption)
+       dateTitle.textContent=dateCaption;
      let warning=card.querySelector(".gx-prorroga-active-warning");
      if(!warning){
        warning=document.createElement("p");
@@ -114,11 +117,20 @@
        warning.style.cssText="font-size:12px;line-height:1.55;opacity:.83;margin:10px 14px 14px";
        capsule.insertAdjacentElement("afterend",warning);
      }
-     warning.textContent="Paga a más tardar el "+agreed+
-       ". Desde el "+label(plus(state.acuerdo.fecha_pactada,1))+
-       " este acceso puede retirarse por incumplimiento, después de revisar pagos y comprobantes. La mora se calculará desde el vencimiento original.";
+     const importe=pronostico&&Number.isSafeInteger(pronostico.total_centavos)?
+       " Si no se registra tu pago, el saldo estimado al primer día de incumplimiento será "+
+       money(pronostico.total_centavos)+" (incluye "+
+       money(pronostico.mora_centavos)+" de mora).":"";
+     warning.textContent=incumplido?
+       "La fecha pactada del "+agreed+" ya pasó. Este servicio está sujeto a retiro "+
+       "después de verificar los pagos y comprobantes pendientes."+importe:
+       "Paga a más tardar el "+agreed+". Si incumples, desde el "+
+       label(plus(state.acuerdo.fecha_pactada,1))+
+       " este acceso puede retirarse tras verificar pagos y comprobantes."+importe;
      const badge=card.querySelector("#dash-badge");
-     const badgeMarkup='<div class="time-badge badge-ok gx-prorroga-state">🤝 Acuerdo pactado</div>';
+     const badgeMarkup=incumplido?
+       '<div class="time-badge gx-prorroga-state">⚠️ Acuerdo vencido</div>':
+       '<div class="time-badge badge-ok gx-prorroga-state">🤝 Acuerdo pactado</div>';
      if(badge&&badge.innerHTML!==badgeMarkup)badge.innerHTML=badgeMarkup;
      return;
    }
@@ -369,6 +381,8 @@
        controls();status.textContent="Acuerdo activado correctamente.";
        dialog.close();
        document.dispatchEvent(new CustomEvent("goxion:prorroga-activada",{detail:{demo}}));
+       activeToken="";
+       refresh().catch(e=>console.warn("Actualización de prórroga:",String(e).slice(0,100)));
      }catch(e){status.textContent=e.message;btn.disabled=false;}
    });
    // Montar bloqueo ANTES de abrir el modal para impedir el salto de scroll.
