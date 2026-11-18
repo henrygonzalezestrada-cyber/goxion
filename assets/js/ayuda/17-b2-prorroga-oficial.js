@@ -97,7 +97,7 @@
    const existing=card?.querySelector(".gx-prorroga-entry");
    const capsule=card?.querySelector(".gx-account-capsule");
    if(!card||!capsule)return;
-   if(!state){existing?.remove();return;}
+   if(!state){existing?.remove();card.querySelector(".gx-prorroga-active-warning")?.remove();return;}
    if(state.acuerdo?.activo){
      existing?.remove();
      card.querySelector(".gx-prorroga-active")?.remove();
@@ -107,12 +107,23 @@
      const dateTitle=card.querySelector("#dash-date-label");
      if(dateTitle&&dateTitle.textContent!=="Nueva fecha de pago")
        dateTitle.textContent="Nueva fecha de pago";
+     let warning=card.querySelector(".gx-prorroga-active-warning");
+     if(!warning){
+       warning=document.createElement("p");
+       warning.className="gx-prorroga-active-warning";
+       warning.style.cssText="font-size:12px;line-height:1.55;opacity:.83;margin:10px 14px 14px";
+       capsule.insertAdjacentElement("afterend",warning);
+     }
+     warning.textContent="Paga a más tardar el "+agreed+
+       ". Desde el "+label(plus(state.acuerdo.fecha_pactada,1))+
+       " este acceso puede retirarse por incumplimiento, después de revisar pagos y comprobantes. La mora se calculará desde el vencimiento original.";
      const badge=card.querySelector("#dash-badge");
      const badgeMarkup='<div class="time-badge badge-ok gx-prorroga-state">🤝 Acuerdo pactado</div>';
      if(badge&&badge.innerHTML!==badgeMarkup)badge.innerHTML=badgeMarkup;
      return;
    }
    card.querySelector(".gx-prorroga-active")?.remove();
+   card.querySelector(".gx-prorroga-active-warning")?.remove();
    const automatic=state.puede_solicitar===true;
    // Los días 1-3 son elegibles desde el backend; la revisión queda como contingencia.
    const review=!automatic&&!state.acuerdo&&
@@ -245,6 +256,8 @@
    dialog.querySelector("[data-gx-loyalty]").textContent=money(quote.lealtad_en_riesgo_centavos);
    dialog.querySelector("[data-gx-old]").textContent=label(quote.fecha_original);
    dialog.querySelector("[data-gx-new]").textContent=label(quote.fecha_pactada);
+   dialog.querySelector("[data-gx-agreed-day]").textContent=label(quote.fecha_pactada);
+   dialog.querySelector("[data-gx-next-day]").textContent=label(plus(quote.fecha_pactada,1));
  }
  async function openDialog(){
    if(!state?.puede_solicitar)return;
@@ -267,14 +280,14 @@
      '<div class="gx-prorroga-line"><span>Fecha original</span><strong data-gx-old></strong></div>'+
      '<div class="gx-prorroga-line"><span>Acuerdo propuesto</span><strong data-gx-new></strong></div>'+
      '<div class="gx-prorroga-line gx-prorroga-main"><span>Si pagas en la nueva fecha</span><strong data-gx-protected></strong></div>'+
-     '<div class="gx-prorroga-risk"><span class="gx-prorroga-risk-title">Si incumples, al día siguiente deberás</span>'+
+     '<div class="gx-prorroga-risk"><span class="gx-prorroga-risk-title">Si incumples el acuerdo, tu saldo estimado al día siguiente será</span>'+
        '<strong class="gx-prorroga-risk-total" data-gx-missed></strong>'+
        '<div class="gx-prorroga-risk-details" aria-label="Desglose del incumplimiento">'+
          '<div><span>Mora retroactiva</span><b data-gx-mora></b></div>'+
-         '<div><span>Lealtad no aplicable al acuerdo</span><b data-gx-loyalty></b></div>'+
+         '<div><span>Descuento de lealtad retirado (ya incluido)</span><b data-gx-loyalty></b></div>'+
        '</div>'+
      '</div>'+
-     '<p class="gx-prorroga-terms-copy">La mora comienza a contarse desde el vencimiento original. La prórroga se concede por servicio, hasta diez días después del vencimiento original. El descuento de lealtad no se conserva, aunque pagues a tiempo en la nueva fecha.</p>'+
+     '<p class="gx-prorroga-terms-copy"><strong>Aviso importante:</strong> Si el pago no queda acreditado el <strong data-gx-agreed-day></strong>, a partir del <strong data-gx-next-day></strong> el acceso de este servicio podrá retirarse, previa verificación de comprobantes y pagos pendientes. Para recuperarlo deberás cubrir el saldo vencido y la mora aplicable (sin cargo administrativo adicional). El descuento de lealtad se pierde desde que aceptas la prórroga.</p>'+
      '<label class="gx-prorroga-consent"><input type="checkbox" data-gx-accept>'+
        '<span>Comprendo y acepto las condiciones del acuerdo.</span></label>'+
      '<button class="gx-prorroga-activate" type="button" data-gx-activate disabled>Aceptar y pactar fecha</button>'+
