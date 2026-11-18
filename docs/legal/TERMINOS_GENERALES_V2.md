@@ -18,7 +18,7 @@
 ## 3. Cancelaciones y retiro
 **3.1. Cancelación voluntaria.** El cliente podrá solicitarla por canales oficiales; se informará su fecha efectiva y el tratamiento de periodos pagados, saldos y reembolsos que correspondan. No afectará otros servicios independientes.
 
-**3.2. Retiro por impago.** Desde el **día 11 posterior al vencimiento**, y tras verificar pagos, prórrogas e incidencias y comunicar la situación, GOXION podrá retirar **únicamente el servicio vencido** que continúe impagado.
+**3.2. Retiro por impago o prórroga incumplida.** Sin prórroga, desde el **día 11 posterior al vencimiento original** GOXION podrá retirar únicamente el servicio impagado. **Si existe una prórroga aprobada**, desde el **día siguiente a la fecha pactada** ese acceso estará sujeto a suspensión o retiro por incumplimiento, previa verificación de pagos, comprobantes e incidencias pendientes. La reconexión requerirá cubrir el saldo vencido y los recargos aplicables, sin cargo administrativo adicional del 20%; se informará el importe exacto antes de cobrar. Nunca se retirarán por esta causa otros servicios al corriente.
 
 **3.3. Retiro por uso indebido.** Procederá ante incumplimiento grave comprobado de las condiciones de acceso y seguridad, conforme al apartado 1.3.
 
