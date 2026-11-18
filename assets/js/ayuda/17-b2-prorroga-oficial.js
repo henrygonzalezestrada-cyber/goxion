@@ -114,8 +114,7 @@
    }
    card.querySelector(".gx-prorroga-active")?.remove();
    const automatic=state.puede_solicitar===true;
-   // Un atraso nunca activa una prórroga financiera automática.
-   // Únicamente habilita solicitar revisión al equipo GOXION.
+   // Los días 1-3 son elegibles desde el backend; la revisión queda como contingencia.
    const review=!automatic&&!state.acuerdo&&
      /^\d{4}-\d{2}-\d{2}$/.test(String(manualDue||""))&&
      manualDue<state.fecha_servidor&&state.fecha_servidor<=plus(manualDue,3);
@@ -138,13 +137,13 @@
    dialog.setAttribute("aria-labelledby","gx-prorroga-title");
    dialog.tabIndex=-1;
    const first=plus(state.fecha_servidor,1);
-   const last=plus(manualDue,7);
+   const last=plus(manualDue,10);
    dialog.innerHTML='<div class="gx-prorroga-sheet">'+
      '<div class="gx-prorroga-kicker">SOLICITUD DE PRÓRROGA</div>'+
      '<button class="gx-prorroga-close" type="button" data-gx-close aria-label="Cerrar">'+
        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
      '<h2 id="gx-prorroga-title">Propón una nueva fecha de pago.</h2>'+
-     '<p>Tu pago ya venció. Puedes solicitar revisión hasta el tercer día de atraso. La fecha máxima es siete días después del vencimiento original y requiere autorización.</p>'+
+     '<p>Tu pago ya venció. Puedes solicitar revisión hasta el tercer día de atraso. La fecha máxima es diez días después del vencimiento original y requiere autorización.</p>'+
      '<div class="gx-prorroga-line"><span>Fecha de vencimiento</span><strong data-gx-old></strong></div>'+
      '<label class="gx-prorroga-field"><span>¿Cuándo podrías pagar?</span>'+
        '<input type="date" data-gx-day required min="'+first+'" max="'+last+'" value="'+first+'"></label>'+
@@ -167,8 +166,8 @@
      if(!/^\d{4}-\d{2}-\d{2}$/.test(chosen)||
        !Number.isFinite(parsed.getTime())||
        parsed.toISOString().slice(0,10)!==chosen||chosen<=state.fecha_servidor||
-       chosen>plus(manualDue,7)||state.fecha_servidor>plus(manualDue,3)){
-       result.textContent="Selecciona una fecha futura, como máximo siete días después del vencimiento original.";return;
+       chosen>plus(manualDue,10)||state.fecha_servidor>plus(manualDue,3)){
+       result.textContent="Selecciona una fecha futura, como máximo diez días después del vencimiento original.";return;
      }
      if(typeof window.notificarAdmin!=="function"){
        result.textContent="No fue posible conectar con Soporte. Inténtalo nuevamente.";return;
@@ -253,15 +252,17 @@
    const dialog=document.createElement("dialog");dialog.className="gx-prorroga-dialog";
    dialog.id="gx-prorroga-dialog";dialog.setAttribute("aria-labelledby","gx-prorroga-title");
    dialog.tabIndex=-1;
-   const init=plus(state.fecha_original,3);
+   const minAvailable=state.fecha_servidor>state.fecha_original?
+     plus(state.fecha_servidor,1):plus(state.fecha_original,1);
+   const init=minAvailable;
    dialog.innerHTML='<div class="gx-prorroga-sheet">'+
      '<div class="gx-prorroga-kicker">FLEXIBILIDAD GOXION</div>'+
      '<button class="gx-prorroga-close" type="button" data-gx-close aria-label="Cerrar">'+
        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6L18 18M18 6L6 18"/></svg></button>'+
      '<h2 id="gx-prorroga-title">Un poco más de tiempo.</h2>'+
-     '<p>Elige cuándo pagar. Mantendrás tu lealtad y evitarás mora si cumples el acuerdo.</p>'+
+     '<p>Elige cuándo pagar. No habrá mora si cumples el acuerdo, pero la prórroga interrumpe tu racha y el descuento de lealtad.</p>'+
      '<label class="gx-prorroga-field"><span>Nueva fecha de pago</span><input type="date" data-gx-day min="'+
-       plus(state.fecha_original,1)+'" max="'+state.fecha_maxima+'" value="'+init+'" aria-describedby="gx-prorroga-date-error"></label>'+
+       minAvailable+'" max="'+state.fecha_maxima+'" value="'+init+'" aria-describedby="gx-prorroga-date-error"></label>'+
      '<span id="gx-prorroga-date-error" class="gx-prorroga-date-error" role="alert" aria-live="polite" hidden></span>'+
      '<div class="gx-prorroga-line"><span>Fecha original</span><strong data-gx-old></strong></div>'+
      '<div class="gx-prorroga-line"><span>Acuerdo propuesto</span><strong data-gx-new></strong></div>'+
@@ -270,10 +271,10 @@
        '<strong class="gx-prorroga-risk-total" data-gx-missed></strong>'+
        '<div class="gx-prorroga-risk-details" aria-label="Desglose del incumplimiento">'+
          '<div><span>Mora retroactiva</span><b data-gx-mora></b></div>'+
-         '<div><span>Lealtad perdida</span><b data-gx-loyalty></b></div>'+
+         '<div><span>Lealtad no aplicable al acuerdo</span><b data-gx-loyalty></b></div>'+
        '</div>'+
      '</div>'+
-     '<p class="gx-prorroga-terms-copy">La mora comienza a contarse desde el vencimiento original. Una prórroga por período y máximo cinco días.</p>'+
+     '<p class="gx-prorroga-terms-copy">La mora comienza a contarse desde el vencimiento original. La prórroga se concede por servicio, hasta diez días después del vencimiento original. El descuento de lealtad no se conserva, aunque pagues a tiempo en la nueva fecha.</p>'+
      '<label class="gx-prorroga-consent"><input type="checkbox" data-gx-accept>'+
        '<span>Comprendo y acepto las condiciones del acuerdo.</span></label>'+
      '<button class="gx-prorroga-activate" type="button" data-gx-activate disabled>Aceptar y pactar fecha</button>'+
@@ -283,7 +284,7 @@
    const confirm=dialog.querySelector("[data-gx-accept]"),status=dialog.querySelector(".gx-prorroga-result");
    let quote=null,requestSerial=0;
    const dateError=dialog.querySelector("#gx-prorroga-date-error");
-   const minDate=plus(state.fecha_original,1);
+   const minDate=minAvailable;
    const maxDate=state.fecha_maxima;
    const validDate=value=>{
      if(!/^\d{4}-\d{2}-\d{2}$/.test(value))return false;
@@ -313,7 +314,7 @@
      if(!validDate(day.value)){
        status.textContent="";
        showDateError("Elige una fecha entre el "+label(minDate)+
-         " y el "+label(maxDate)+". El límite es de 5 días.");
+         " y el "+label(maxDate)+". El límite es de 10 días desde el vencimiento original.");
        return;
      }
      showDateError("");
