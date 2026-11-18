@@ -42,3 +42,13 @@ Popup obligatorio, registro de consentimiento, rechazo y notificaciones persiste
 - Probar sesión autenticada completa con la cuenta de prueba: selección de cargo, cuota mostrada, confirmación efectiva, pago/recibo aprobado y reinicio de lealtad. Esa prueba **no** se ha ejecutado aún de extremo a extremo.
 - Revisar con especial atención la lógica de cancelaciones y baja día 11, limpieza de servicios en Admin y cálculo de Garantía de Continuidad por causa atribuible a GOXION y reporte verificable. El motor de prórroga no sustituye esos flujos.
 - Consentimiento versionado y notificaciones persistentes quedan para el siguiente bloque por petición expresa del usuario.
+
+## Validación con cliente de prueba y correcciones posteriores
+- La cuenta de prueba Luis tiene una prórroga aprobada para el **25/nov/2026** sobre un cargo vigente; su ciclo noviembre conserva otros **dos cargos liquidados e inactivos** como historial, condición legítima tras bajas.
+- Error observado: el lector F5 de Ayuda mostraba `b2_sin_estado_cobrable` porque la función `mi_estado` exigía que todo cargo del ciclo perteneciera a un acceso **activo**, incluso si estaba pagado y cancelado.
+- Corrección desplegada: `estado-financiero-b2-beta` **v10** admite registros históricos pagados, los separa en `cargos_historicos`, y conserva en `cargos` solo accesos vigentes. Un cargo pendiente e inactivo **continúa bloqueado** para evitar ocultar adeudos sin conciliación. Se comprueba que la suma de activos coincide con el motor B2.
+- Validación read-only Luis: 3 cargos del ciclo, 2 históricos pagados, 1 vigente; saldo de cargo vigente **7900 centavos** igual a total del motor. No se borraron pagos ni obligaciones.
+- API v11: `mi_prorroga` devuelve `pronostico_incumplimiento` para el cargo pactado, calculado por la cotización oficial B2 en el día posterior a la fecha acordada. Para Luis, **26/nov/2026: total estimado 11850 centavos**, incluidos **3950 centavos** de mora, sujeto a no recibir pagos/ajustes.
+- Ayuda en `main` muestra fecha de riesgo, estimación y aviso de acceso sujeto a retiro, además de distinguir **Acuerdo pactado** de **Acuerdo vencido**.
+- La suspensión automática todavía no está activada: debe verificarse conciliación de comprobantes, acceso técnico, contrato y ruta de reconexión antes de causar bajas reales. El criterio normativo de prórroga incumplida se incorporó al borrador legal v2, pendiente de publicación de consentimiento.
+- Próxima prueba: repetir apertura de ruta al ticket con sesión de Luis, verificar ausencia del aviso y confirmar que no aparecen cargos históricos como servicios actuales.
