@@ -83,12 +83,10 @@
    const body=existing?.querySelector(".gx-dialog-legacy-scroll");
    if(!existing||!body)return null;
    const title=existing.querySelector(".modal-title");
-   if(title)title.textContent="GOXION · Centro de documentos";
+   if(title)title.textContent="Documentos y políticas";
    body.replaceChildren();
    const shell=el("section","gx-legal-reader");shell.setAttribute("aria-label","Documentos de GOXION");
    const head=el("div","gx-legal-reader-head");
-   head.append(el("small","gx-legal-eyebrow","VERSIÓN 2.0 · CONSULTA CUANDO QUIERAS"));
-   head.append(el("p","", "Lee los términos completos y las bases particulares. El documento se puede desplazar de principio a fin."));
    const nav=el("nav","gx-legal-reader-tabs");nav.setAttribute("aria-label","Seleccionar documento");
    for(const [key,item] of Object.entries(DOCS)){
      const button=el("button","",item.title);button.type="button";button.dataset.legalDoc=key;
@@ -144,30 +142,28 @@
  function hubMount(){
    const dash=document.getElementById("view-dashboard");
    if(!dash||document.getElementById("gx-legal-hub"))return;
-   const box=el("section","gx-legal-hub");box.id="gx-legal-hub";
-   const title=el("div","gx-legal-hub-copy");
-   title.append(el("strong","","Tus documentos GOXION"));
-   title.append(el("small","","Términos, referidos y cupones · disponibles para consultar"));
-   const links=el("div","gx-legal-hub-links");
-   for(const [key,item] of Object.entries(DOCS)){
-     const b=el("button","",item.title);b.type="button";
-     b.addEventListener("click",()=>openDocument(key));links.append(b);
-   }
-   const state=el("div","gx-legal-status");state.id="gx-legal-status";
-   box.append(title,links,state);
-   const greet=dash.querySelector(".dash-greeting-box");
-   if(greet)greet.insertAdjacentElement("afterend",box);
-   else dash.prepend(box);
+   // Pie secundario del feed: después del historial, nunca entre saludo y pagos.
+   const box=el("div","gx-legal-hub");box.id="gx-legal-hub";
+   const link=el("button","gx-legal-hub-open");
+   link.type="button";
+   link.setAttribute("aria-label","Consultar documentos y políticas");
+   const icon=el("span","gx-legal-hub-icon");icon.setAttribute("aria-hidden","true");icon.textContent="⌁";
+   const copy=el("span","gx-legal-hub-label","Documentos y políticas");
+   const arrow=el("span","gx-legal-hub-arrow","›");arrow.setAttribute("aria-hidden","true");
+   link.append(icon,copy,arrow);
+   link.addEventListener("click",()=>openDocument("terminos"));
+   const status=el("div","gx-legal-status");status.id="gx-legal-status";
+   box.append(link,status);
+   dash.append(box);
  }
  function showState(){
    const root=document.getElementById("gx-legal-status");if(!root)return;
    root.replaceChildren();
    if(!serverState?.habilitado)return;
    const status=String(serverState.estado||"pendiente");
-   const label=status==="aceptado"?"Versión 2.0 aceptada":
-     status==="rechazado"?"Versión 2.0 rechazada":"Actualización pendiente de decisión";
-   root.append(el("span","",label));
-   const button=el("button","gx-legal-review","Revisar mi decisión");
+   const label=status==="aceptado"?"Términos 2.0 aceptados":
+     status==="rechazado"?"Términos 2.0 rechazados":"Términos 2.0 · pendiente";
+   const button=el("button","gx-legal-review",label);
    button.type="button";button.addEventListener("click",()=>void openConsent(true));
    root.append(button);
  }
