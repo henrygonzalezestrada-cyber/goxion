@@ -162,7 +162,7 @@ Deno.serve(async(req)=>{
         if(ex.error)throw ex.error;existentes=ex.data||[];
       }
       const exMap=new Map(existentes.map((x:any)=>[String(x.cliente_servicio_id),x]));
-      // Antes de escribir N compensaciones, comprobar N incidencias GOXION verificadas.
+      // Incidencias verificadas: vínculo opcional para trazabilidad, nunca condición para operar Admin.
       const proofIds=await sb.from("goxion_garantia_incidencias")
         .select("id,cliente_servicio_id,dias_completos_verificados").eq("periodo",periodo)
         .eq("estado","validada").eq("origen","goxion")
@@ -173,8 +173,6 @@ Deno.serve(async(req)=>{
         if(Number(entry.dias_completos_verificados)>=dias)
           proofMap.set(String(entry.cliente_servicio_id),entry);
       }
-      if(servicios.some((service:any)=>!proofMap.has(String(service.id))))
-        return res({ok:false,error:"Antes del descuento masivo debes validar un reporte de causa GOXION por cada servicio afectado"},409);
 
       const porcentaje=dias*5;
       let creadas=0,actualizadas=0,totalCompensacion=0;
@@ -182,7 +180,7 @@ Deno.serve(async(req)=>{
 
       for(const s of servicios){
         const base=n(s.monto),monto=Math.round(base*(porcentaje/100)*100)/100;
-        const payload={cliente_id:String(s.cliente_id),cliente_servicio_id:String(s.id),periodo,dias_falla:dias,porcentaje,monto,motivo,incidencia_id:proofMap.get(String(s.id)).id,activo:true,updated_at:new Date().toISOString()};
+        const payload={cliente_id:String(s.cliente_id),cliente_servicio_id:String(s.id),periodo,dias_falla:dias,porcentaje,monto,motivo,...(proofMap.has(String(s.id))?{incidencia_id:proofMap.get(String(s.id)).id}:{}),activo:true,updated_at:new Date().toISOString()};
         const ex=exMap.get(String(s.id));
         const r=ex?.id
           ?await sb.from("trato_justo_compensaciones").update(payload).eq("id",ex.id).select().single()
@@ -207,20 +205,31 @@ Deno.serve(async(req)=>{
       const clienteId=String(d.cliente_id||""),servicioId=String(d.cliente_servicio_id||"");
       const incidenciaId=String(d.incidencia_id||"");
       const periodo=firstMonth(d.periodo),dias=Math.max(1,Math.min(10,Math.trunc(n(d.dias_falla,1)))),motivo=String(d.motivo||"Garantía de Continuidad").trim()||"Garantía de Continuidad";
-      if(!clienteId||!servicioId||!periodo||!/^[0-9a-f-]{36}$/i.test(incidenciaId))
-        return res({ok:false,error:"Se requiere incidencia verificada para aplicar la garantía"},400);
-      const proof=await sb.from("goxion_garantia_incidencias").select("id,cliente_id,cliente_servicio_id,periodo,estado,origen,dias_completos_verificados")
-        .eq("id",incidenciaId).single();
-      if(proof.error||!proof.data||String(proof.data.cliente_id)!==clienteId||
-        String(proof.data.cliente_servicio_id)!==servicioId||
-        String(proof.data.periodo)!==periodo||
-        proof.data.estado!=="validada"||proof.data.origen!=="goxion"||
-        dias>Number(proof.data.dias_completos_verificados))
-        return res({ok:false,error:"La incidencia no acredita esta compensación, servicio o cantidad de días"},409);
+      if(!clienteId||!servicioId||!periodo)
+        return res({ok:false,error:"Cliente, servicio o periodo inválido"},400);
+      // El reporte del cliente es OPCIONAL: se puede atender por WhatsApp,
+      // presencialmente o desde Admin. Solo se comprueba cuando el operador
+      // decide asociar voluntariamente un expediente existente.
+      let incidenciaVerificada:string|null=null;
+      if(incidenciaId){
+        if(!/^[0-9a-f-]{36}$/i.test(incidenciaId))
+          return res({ok:false,error:"Referencia de incidencia inválida"},400);
+        const proof=await sb.from("goxion_garantia_incidencias")
+          .select("id,cliente_id,cliente_servicio_id,periodo,estado,origen,dias_completos_verificados")
+          .eq("id",incidenciaId).maybeSingle();
+        if(proof.error)throw proof.error;
+        if(!proof.data||String(proof.data.cliente_id)!==clienteId||
+          String(proof.data.cliente_servicio_id)!==servicioId||
+          String(proof.data.periodo)!==periodo||proof.data.estado!=="validada"||
+          proof.data.origen!=="goxion"||
+          dias>Number(proof.data.dias_completos_verificados))
+          return res({ok:false,error:"El expediente proporcionado no corresponde a esta compensación"},409);
+        incidenciaVerificada=incidenciaId;
+      }
       const sq=await sb.from("cliente_servicios").select("id,cliente_id,nombre,monto,activo").eq("id",servicioId).single();if(sq.error)throw sq.error;if(String(sq.data.cliente_id)!==clienteId)return res({ok:false,error:"El servicio no pertenece al cliente"},400);
       const base=n(sq.data.monto),porcentaje=dias*5,monto=Math.round(base*(porcentaje/100)*100)/100;
       const ex=await sb.from("trato_justo_compensaciones").select("id").eq("cliente_servicio_id",servicioId).eq("periodo",periodo).maybeSingle();if(ex.error)throw ex.error;
-      const payload={cliente_id:clienteId,cliente_servicio_id:servicioId,periodo,dias_falla:dias,porcentaje,monto,motivo,incidencia_id:incidenciaId,activo:true,updated_at:new Date().toISOString()};
+      const payload={cliente_id:clienteId,cliente_servicio_id:servicioId,periodo,dias_falla:dias,porcentaje,monto,motivo,...(incidenciaVerificada?{incidencia_id:incidenciaVerificada}:{}),activo:true,updated_at:new Date().toISOString()};
       const r=ex.data?.id?await sb.from("trato_justo_compensaciones").update(payload).eq("id",ex.data.id).select().single():await sb.from("trato_justo_compensaciones").insert(payload).select().single();if(r.error)throw r.error;
       const total=await recalc(clienteId);
       return res({ok:true,compensacion:r.data,total_periodo:total,servicio:{nombre:sq.data.nombre,monto:base}});
