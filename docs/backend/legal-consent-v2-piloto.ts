@@ -54,7 +54,7 @@ Deno.serve(async(req)=>{
    const q=await sb.from("goxion_legal_decisiones")
     .select("decision,registrado_en,id")
     .eq("cliente_id",clienteId).eq("version",VERSION)
-    .order("registrado_en",{ascending:false}).order("id",{ascending:false})
+    .order("secuencia",{ascending:false})
     .limit(1).maybeSingle();
    if(q.error)throw q.error;
    return q.data||null;
