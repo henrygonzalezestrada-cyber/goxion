@@ -296,7 +296,7 @@ Deno.serve(async (req) => {
       const motivo = String(data?.motivo || "Falla técnica").trim() || "Falla técnica";
       const incidenciaId=String(data?.incidencia_id||"").trim();
 
-      if (!clienteId || !servicioId || !periodo || !incidenciaId) {
+      if (!clienteId || !servicioId || !periodo) {
         return json({ ok: false, error: "Cliente, servicio o periodo inválido", operation_id: operationId }, 400);
       }
 
