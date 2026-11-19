@@ -86,7 +86,6 @@
    if(title)title.textContent="Documentos y políticas";
    body.replaceChildren();
    const shell=el("section","gx-legal-reader");shell.setAttribute("aria-label","Documentos de GOXION");
-   const head=el("div","gx-legal-reader-head");
    const nav=el("nav","gx-legal-reader-tabs");nav.setAttribute("aria-label","Seleccionar documento");
    for(const [key,item] of Object.entries(DOCS)){
      const button=el("button","",item.title);button.type="button";button.dataset.legalDoc=key;
@@ -98,7 +97,7 @@
    const direct=el("a","gx-legal-direct","Abrir el documento en página completa");
    direct.target="_blank";direct.rel="noopener";direct.href="./assets/legal/lector.html?doc=terminos";
    footer.append(direct);
-   shell.append(head,nav,content,footer);body.append(shell);
+   shell.append(nav,content,footer);body.append(shell);
    reader={body,nav,content,direct};
    const ref=document.getElementById("modal-referidos")?.querySelector(".gx-dialog-legacy-scroll");
    if(ref&&!document.getElementById("gx-legal-referrals-link")){
@@ -147,10 +146,9 @@
    const link=el("button","gx-legal-hub-open");
    link.type="button";
    link.setAttribute("aria-label","Consultar documentos y políticas");
-   const icon=el("span","gx-legal-hub-icon");icon.setAttribute("aria-hidden","true");icon.textContent="⌁";
    const copy=el("span","gx-legal-hub-label","Documentos y políticas");
    const arrow=el("span","gx-legal-hub-arrow","›");arrow.setAttribute("aria-hidden","true");
-   link.append(icon,copy,arrow);
+   link.append(copy,arrow);
    link.addEventListener("click",()=>openDocument("terminos"));
    const status=el("div","gx-legal-status");status.id="gx-legal-status";
    box.append(link,status);
