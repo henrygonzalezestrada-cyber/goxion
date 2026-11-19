@@ -9,9 +9,9 @@
  const TOKEN_KEY=CORE?.STORAGE?.CLIENT_TOKEN||"goxion_client_token";
  const API=CORE?.endpoint?.("legal-consent-v2")||"";
  const DOCS={
-   terminos:{title:"Términos y Condiciones",url:"./docs/legal/TERMINOS_GENERALES_V2.md"},
-   referidos:{title:"Bases de referidos",url:"./docs/legal/BASES_REFERIDOS_V2.md"},
-   cupones:{title:"Cupones y promociones",url:"./docs/legal/BASES_CUPONES_PROMOCIONES_V2.md"}
+   terminos:{title:"Términos y Condiciones",url:"./assets/legal/terminos-v2.txt"},
+   referidos:{title:"Bases de referidos",url:"./assets/legal/referidos-v2.txt"},
+   cupones:{title:"Cupones y promociones",url:"./assets/legal/cupones-v2.txt"}
  };
  const cache=new Map();
  let currentDoc="terminos",reader=null,dialog=null,serverState=null,activeToken="";
@@ -319,13 +319,14 @@
      };
      retryTimer=setTimeout(offer,1100);
    }catch(error){
+     activeToken="";
      console.warn("GOXION: estado legal no verificado",String(error?.message||error).slice(0,130));
    }
  }
  function logout(){
    clearTimeout(retryTimer);openQueued=false;activeToken="";
    serverState=null;pendingOperation=null;showState();
-   if(dialog?.element.open&&!busy)dialog.element.close();
+   if(dialog?.element.open)dialog.element.close();
  }
  function setup(){
    readerMount();hubMount();
