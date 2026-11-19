@@ -186,6 +186,7 @@
    const d=document.createElement("dialog");
    d.id="gx-legal-consent";d.className="gx-legal-consent";
    d.setAttribute("aria-labelledby","gx-legal-consent-title");
+   d.setAttribute("tabindex","-1");
    d.innerHTML=[
      '<div class="gx-legal-panel gx-legal-intro" data-gx-panel="intro">',
        '<button class="gx-legal-close" type="button" data-gx-close aria-label="Cerrar aviso"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg></button>',
@@ -239,7 +240,9 @@
        panel.hidden=panel.dataset.gxPanel!==mode;
      }
      d.dataset.mode=mode;
-     const focusTarget=mode==="intro"?d.querySelector("[data-gx-open-reader]"):
+     // No preseleccionar el botón principal al abrir en iPhone: provoca aro azul.
+     // En lectura y confirmación sí mantenemos foco útil para teclado.
+     const focusTarget=mode==="intro"?d:
        mode==="read"?d.querySelector("[data-gx-back]"):
          d.querySelector("[data-gx-cancel-reject]");
      focusTarget?.focus({preventScroll:true});
