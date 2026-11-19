@@ -1,5 +1,5 @@
 # GOXION — Bases del Programa de Referidos
-**Versión propuesta 2.0 · Vigencia por anunciar**
+**Versión 2.0 · Bases disponibles para consulta desde el 19 de noviembre de 2026**
 
 ## 1. Participación
 El programa es opcional y está dirigido a clientes activos de GOXION. La persona referida debe ser **cliente nuevo**, no una contratación adicional de un cliente existente. GOXION podrá verificar la elegibilidad y prevenir registros duplicados o fraudulentos.
