@@ -81,9 +81,16 @@
 .gx-legal-intro{padding:28px 28px 22px;position:relative}
 .gx-legal-close{
   position:absolute;right:17px;top:13px;display:grid;place-items:center;
-  height:34px;width:34px;border:0;border-radius:50%;background:transparent;
-  color:#a9acb7;font:inherit;font-size:24px;font-weight:300;cursor:pointer;
+  height:34px;width:34px;padding:0;flex:none;
+  border:1px solid rgba(0,242,254,.38);border-radius:50%;
+  background:rgba(0,242,254,.1);color:var(--neon-blue,#00f2fe);
+  font:inherit;cursor:pointer;transition:background .2s ease,border-color .2s ease,transform .18s ease;
+  -webkit-tap-highlight-color:transparent;
 }
+.gx-legal-title-accent{color:var(--neon-blue,#00f2fe)}
+.gx-legal-close svg{display:block;width:16px;height:16px}
+.gx-legal-close:hover{background:rgba(0,242,254,.19);border-color:rgba(0,242,254,.62)}
+.gx-legal-close:active{transform:scale(.92)}
 .gx-legal-intro h2,.gx-legal-confirm h2{
   max-width:330px;margin:10px 30px 10px 0;
   font-size:clamp(22px,5.5vw,26px);font-weight:710;line-height:1.23;
@@ -94,19 +101,48 @@
 }
 .gx-legal-read-cta{
   width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-  min-height:49px;margin-top:24px;border:0;border-radius:11px;
-  background:#dbd8ee;color:#201f2b;font:inherit;font-size:13px;font-weight:670;
-  cursor:pointer;transition:background .18s,transform .18s;
+  min-height:49px;margin-top:24px;padding:0 16px;
+  border:0;border-radius:15px;
+  color:#fff;font:inherit;font-size:13px;font-weight:690;
+  cursor:pointer;transition:transform .18s ease,box-shadow .2s ease;
 }
-.gx-legal-read-cta:hover{background:#eceaf9}
 .gx-legal-read-cta:active{transform:scale(.985)}
-.gx-legal-read-cta span{font-size:16px;font-weight:400}
+.gx-legal-cta-copy,.gx-legal-cta-arrow{position:relative;z-index:1}
+.gx-legal-cta-arrow{display:inline-flex;align-items:center;justify-content:center;transition:transform .18s ease}
+.gx-legal-read-cta:active .gx-legal-cta-arrow{transform:translateX(2px)}
+.gx-legal-read-cta:hover .gx-legal-cta-arrow{transform:translateX(3px)}
+.gx-legal-motion{
+  position:relative;isolation:isolate;overflow:hidden;
+  background:linear-gradient(105deg,#7c4dff 0%,#684ff0 14%,#4c5ff2 30%,#3479f2 45%,#20a3ec 61%,#00c9df 77%,#326eea 90%,#7c4dff 100%);
+  background-size:260% 100%;
+  animation:gxAccountGradientFlow 6.2s ease-in-out infinite;
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.20),0 8px 22px rgba(65,72,202,.16);
+  -webkit-tap-highlight-color:transparent;
+}
+.gx-legal-motion::after{
+  content:"";position:absolute;z-index:0;top:0;bottom:0;left:-55%;width:38%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+  transform:skewX(-22deg);opacity:0;pointer-events:none;
+  animation:gxAccountSoftSweep 6.2s ease-in-out infinite;
+}
+.gx-legal-motion:active{transform:scale(.985)}
+.gx-legal-motion:disabled{animation:none;box-shadow:none}
+.gx-legal-motion:disabled::after{animation:none;opacity:0}
 .gx-legal-intro-actions{display:flex;justify-content:space-between;gap:14px;margin-top:17px}
 .gx-legal-intro-actions button{
   background:none;border:0;padding:6px 1px;color:#a9acb8;
   font:inherit;font-size:12px;font-weight:510;cursor:pointer;
 }
 .gx-legal-intro-actions [data-gx-reject]{color:#d0d1de}
+.gx-legal-intro-actions button,.gx-legal-reject,.gx-legal-confirm-back{
+  transition:color .18s ease,transform .18s ease,border-color .18s ease;
+}
+.gx-legal-intro-actions button:active,.gx-legal-reject:active,.gx-legal-confirm-back:active{
+  transform:scale(.965);
+}
+.gx-legal-intro-actions button:hover{color:#00f2fe}
+.gx-legal-reject:hover{border-color:rgba(0,242,254,.4)}
 .gx-legal-intro-error,.gx-legal-confirm-error{
   min-height:0;margin:6px 0 0;color:#edb6b5;font-size:11px;line-height:1.4;
 }
@@ -159,7 +195,7 @@
   flex:1;min-height:46px;border-radius:10px;font:inherit;font-size:13px;font-weight:640;cursor:pointer;
 }
 .gx-legal-reject{border:1px solid rgba(255,255,255,.21);background:transparent;color:#e1e0ea}
-.gx-legal-accept{border:1px solid #d6d4e8;background:#d6d4e8;color:#211e2b}
+.gx-legal-accept{border:0;border-radius:12px;color:#fff}
 .gx-legal-accept:disabled{opacity:.35;cursor:not-allowed}
 .gx-legal-consent-feedback{font-size:11px;color:#e1a5a5;margin:7px 0 0;line-height:1.4}
 .gx-legal-consent-feedback:empty{display:none}
@@ -167,9 +203,11 @@
 /* Rechazo explícito, en la misma tarjeta, sin otro modal encimado. */
 .gx-legal-confirm{padding:24px 26px 26px}
 .gx-legal-confirm h2{margin:22px 0 10px}
+.gx-legal-confirm>p strong{color:#f0f1f7;font-weight:700}
+.gx-legal-confirm-note{font-size:11.5px!important;margin-top:10px!important;color:#999eae!important}
 .gx-legal-confirm-action{
-  width:100%;min-height:48px;margin-top:24px;border:1px solid rgba(235,221,225,.8);
-  background:#ddd2d7;color:#291d25;border-radius:11px;
+  width:100%;min-height:48px;margin-top:22px;border:0;
+  border-radius:12px;color:#fff;
   font:inherit;font-size:13px;font-weight:650;cursor:pointer;
 }
 .gx-legal-consent button:focus-visible{
@@ -191,5 +229,7 @@
 }
 @media(prefers-reduced-motion:reduce){
   .gx-legal-panel{animation:none}
-  .gx-legal-read-cta{transition:none}
+  .gx-legal-motion,.gx-legal-motion::after{animation:none}
+  .gx-legal-close,.gx-legal-read-cta,.gx-legal-cta-arrow,.gx-legal-intro-actions button,
+  .gx-legal-reject,.gx-legal-confirm-back{transition:none}
 }
