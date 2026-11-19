@@ -1,5 +1,5 @@
 # GOXION — Términos y Condiciones Generales de Servicio
-**Versión propuesta 2.0 · Entrada en vigor pendiente de anuncio**
+**Versión 2.0 · Actualización publicada para consulta y aceptación individual a partir del 19 de noviembre de 2026**
 
 ## 1. Contratación y uso
 **1.1. Servicios.** Cada contratación identifica modalidad, precio, periodo, fecha de pago y condiciones específicas. Las plataformas de terceros conservan sus propias condiciones de funcionamiento.
@@ -13,12 +13,12 @@
 
 **2.2. Mora.** El saldo vencido y exigible de cada servicio podrá generar **5% diario simple**, desde el día siguiente al vencimiento y hasta un **50% máximo** (diez días), sujeto a la normativa aplicable. El estado de cuenta mostrará importe y recargos separados, sin intereses sobre intereses.
 
-**2.3. Prórroga.** Se podrá solicitar desde el día del vencimiento (día 0) y durante los **tres días naturales posteriores** (días 1–3). La fecha pactada no superará el **día 10 posterior al vencimiento original**. La solicitud requiere confirmación; no es una aprobación automática. Una prórroga aprobada y cumplida exime de mora por ese retraso, pero **no conserva la racha ni el descuento de lealtad**: se paga la tarifa normal sin ese descuento. Si se incumple, podrá calcularse la mora procedente desde la fecha original, hasta el tope del 50%. Las solicitudes y comprobantes pendientes se revisarán antes de cualquier retiro.
+**2.3. Prórroga.** Se podrá solicitar desde el día del vencimiento (día 0) y durante los **tres días naturales posteriores** (días 1–3). La fecha pactada no superará el **día 10 posterior al vencimiento original**. La prórroga solo tiene efecto cuando el sistema confirma su activación; la solicitud no equivale a un acuerdo vigente si no se recibe esa confirmación. Una prórroga aprobada y cumplida exime de mora por ese retraso, pero **no conserva la racha ni el descuento de lealtad**: se paga la tarifa normal sin ese descuento. Si se incumple, podrá calcularse la mora procedente desde la fecha original, hasta el tope del 50%. Las solicitudes y comprobantes pendientes se revisarán antes de cualquier retiro.
 
 ## 3. Cancelaciones y retiro
 **3.1. Cancelación voluntaria.** El cliente podrá solicitarla por canales oficiales; se informará su fecha efectiva y el tratamiento de periodos pagados, saldos y reembolsos que correspondan. No afectará otros servicios independientes.
 
-**3.2. Retiro por impago o prórroga incumplida.** Sin prórroga, desde el **día 11 posterior al vencimiento original** GOXION podrá retirar únicamente el servicio impagado. **Si existe una prórroga aprobada**, desde el **día siguiente a la fecha pactada** ese acceso estará sujeto a suspensión o retiro por incumplimiento, previa verificación de pagos, comprobantes e incidencias pendientes. La reconexión requerirá cubrir el saldo vencido y los recargos aplicables, sin cargo administrativo adicional del 20%; se informará el importe exacto antes de cobrar. Nunca se retirarán por esta causa otros servicios al corriente.
+**3.2. Retiro por impago o prórroga incumplida.** Sin prórroga, desde el **día 11 posterior al vencimiento original** GOXION podrá retirar únicamente el servicio impagado. **Si existe una prórroga aprobada**, desde el **día siguiente a la fecha pactada** ese acceso podrá ser retirado **manualmente por Administración** por incumplimiento, previa verificación de pagos, comprobantes e incidencias pendientes. No se ejecutan retiros automáticos desde Mi Espacio. La reconexión requerirá cubrir el saldo vencido y los recargos aplicables, sin cargo administrativo adicional del 20%; se informará el importe exacto antes de cobrar. Nunca se retirarán por esta causa otros servicios al corriente.
 
 **3.3. Retiro por uso indebido.** Procederá ante incumplimiento grave comprobado de las condiciones de acceso y seguridad, conforme al apartado 1.3.
 
@@ -27,7 +27,7 @@
 ## 4. Garantía de Continuidad y Trato Justo
 **4.1. Cobertura.** Compensación comercial por interrupciones completas **atribuibles a la gestión de GOXION**, por ejemplo, una falta de renovación o pago a cargo de GOXION. Las caídas globales, mantenimiento o decisiones de plataformas externas fuera de su control no generan automáticamente esta compensación comercial.
 
-**4.2. Aviso y verificación.** El cliente deberá comunicar la falla oportunamente mediante Mi Espacio o un canal oficial, para permitir su investigación. Se computarán los días de afectación **verificables**; los periodos no reportados y no acreditables no generan automáticamente compensación.
+**4.2. Aviso y verificación.** El cliente deberá comunicar la falla oportunamente por los canales oficiales disponibles, incluyendo Soporte en Mi Espacio, WhatsApp o contacto directo con GOXION, para permitir su investigación. No es obligatorio reportar exclusivamente desde Mi Espacio. Se computarán los días de afectación **verificables**; los periodos no reportados y no acreditables no generan automáticamente compensación.
 
 **4.3. Compensación.** **5% de la cuota del servicio afectado por día completo** de interrupción cubierta, hasta **50% máximo** en concepto de descuento comercial. Si no es posible restablecerlo, se ofrecerá solución equivalente aceptada, devolución proporcional o saldo a favor voluntario cuando corresponda. No habrá doble compensación por los mismos días ni se limitarán derechos legales del consumidor.
 
@@ -45,6 +45,6 @@
 Los clientes pueden consultar estado de cuenta, comprobantes, solicitudes y reportar incidencias en Mi Espacio y los canales oficiales. GOXION conservará los registros necesarios para la atención y aclaración.
 
 ## 8. Actualización y consentimiento
-Se comunicarán versión, cambios relevantes y fecha de entrada en vigor. Cuando se requiera, el cliente decidirá expresamente si acepta o rechaza. Si acepta, podrá continuar y renovar bajo las condiciones aplicables. Si rechaza, los periodos ya contratados seguirán hasta su conclusión y no se renovarán bajo condiciones rechazadas; conservará un medio razonable para consultar comprobantes, historial, garantías y soporte. Se registrará la versión, cuenta, fecha y hora de la decisión. No se aplicarán cambios retroactivos perjudiciales.
+Se comunicarán versión, cambios relevantes y fecha de entrada en vigor. El cliente podrá decidir expresamente si acepta o rechaza esta versión cuando se le presente el aviso en Mi Espacio. Si acepta, podrá continuar y renovar bajo las condiciones aplicables. Si rechaza, los periodos ya contratados se respetarán hasta su conclusión. GOXION deberá gestionar cualquier renovación futura antes de aplicarle condiciones rechazadas; el cliente conservará el acceso razonable a comprobantes, historial, garantías y soporte. Se registrará la versión, cuenta, fecha y hora de la decisión. No se aplicarán cambios retroactivos perjudiciales.
 
-**Documento preparado para publicación coordinada con el motor financiero y el consentimiento versionado; no vigente hasta su activación anunciada.**
+**La decisión de aceptación o rechazo se registra por versión y cuenta. Las condiciones previamente contratadas no se alteran de forma retroactiva.**
