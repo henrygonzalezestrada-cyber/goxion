@@ -1,5 +1,5 @@
 # GOXION — Bases de Cupones, Promociones y Bonificaciones
-**Versión propuesta 2.0 · Vigencia por anunciar**
+**Versión 2.0 · Bases disponibles para consulta desde el 19 de noviembre de 2026**
 
 ## 1. Alcance
 Las promociones, cupones, descuentos especiales y bonificaciones son beneficios opcionales. Cada campaña indicará **importe o porcentaje**, servicios elegibles, vigencia, requisitos, usos disponibles y restricciones.
