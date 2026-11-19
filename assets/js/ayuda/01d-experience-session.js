@@ -122,7 +122,7 @@
 
         function hideSplash() {
             const splash = document.getElementById('splash-screen');
-            if (!splash) return;
+            if (!splash || splash.style.visibility === 'hidden') return;
             // Idempotente: una segunda llamada también debe liberar el scroll.
             splash.style.opacity = '0';
             splash.style.pointerEvents = 'none';
