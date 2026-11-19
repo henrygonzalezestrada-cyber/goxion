@@ -58,6 +58,7 @@
   var splash=document.getElementById("splash-screen");
   if(!splash)return;
   function liberar(){
+    if(splash.style.visibility==="hidden")return;
     splash.style.opacity="0";
     splash.style.pointerEvents="none";
     splash.style.visibility="hidden";
@@ -711,7 +712,7 @@
 <script src="./assets/js/ayuda/01a-shared-state.js"></script>
 <script src="./assets/js/ayuda/01b-welcome-registration.js"></script>
 <script src="./assets/js/ayuda/01c-rewards-referrals.js"></script>
-<script src="./assets/js/ayuda/01d-experience-session.js"></script>
+<script src="./assets/js/ayuda/01d-experience-session.js?v=splash-fix-20261118"></script>
 <script src="./assets/js/ayuda/01e-client-dashboard.js"></script>
 <script src="./assets/js/ayuda/01f-catalog-orders.js?v=cart2"></script>
 <script src="./assets/js/ayuda/01g-support-runtime.js"></script>
