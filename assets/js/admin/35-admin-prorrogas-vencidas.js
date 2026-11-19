@@ -165,6 +165,15 @@
    return running;
  }
  function setup(){
+   // Refrescar de inmediato al completar login o reconstruir clientes.
+   var prev=window.renderizarClientes;
+   if(typeof prev==="function"){
+     window.renderizarClientes=function(){
+       var result=prev.apply(this,arguments);
+       queueMicrotask(function(){void load(true);});
+       return result;
+     };
+   }
    locate();void load(true);
    setInterval(function(){if(!document.hidden)void load(false);},60000);
    window.addEventListener("focus",function(){void load(true);});
