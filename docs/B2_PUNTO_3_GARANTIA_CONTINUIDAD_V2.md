@@ -1,5 +1,5 @@
 # GOXION · Punto 3 — Garantía de Continuidad y Trato Justo
-**Estado: integración preparada; sin activación financiera de nuevas reglas.**
+**Estado: esquema de expedientes desplegado y verificado; API y UI en preparación, sin activación financiera de nuevas reglas.**
 
 ## Auditoría del sistema oficial
 - Ya existe `trato_justo_compensaciones` con clave única por servicio y mes, `dias_falla` de 0 a 10 y `porcentaje` máximo 50. Actualmente hay **8 registros históricos y 0 activos**.
@@ -18,7 +18,9 @@
 
 ## Preparado
 - `docs/sql/GOXION_GARANTIA_CONTINUIDAD_V2_PREPARACION.sql`: expediente por servicio, fecha server, atribución, evidencia y días completos verificados; RLS habilitada y acceso restringido a funciones autenticadas con `service_role`. Enlace opcional a la compensación, preservando históricos.
-- SQL comprobado en Supabase con transacción revertida (`ROLLBACK`), sin cambios permanentes ni compensaciones nuevas.
+- SQL comprobado primero con `ROLLBACK` y después aplicado como migración `goxion_garantia_continuidad_incidentes_v2` en Supabase. Comprobación: cero incidencias, columna de vinculación existente, RLS activa y sin lectura directa por `anon` ni `authenticated`.
+- Archivos de API preparados **solo en rama**, sin desplegar: `docs/backend/trato-justo-v4-incidencias.ts`, `docs/backend/acciones-financieras-v13-garantia.ts` y `docs/frontend/financial-actions-garantia-v2.js`. Exigen incidente validado de causa GOXION antes de descuentos individuales o masivos.
+- Las funciones oficiales `trato-justo` y `acciones-financieras` mantienen la versión anterior mientras se integra la captura y aprobación completa, para no cortar la operación financiera existente.
 
 ## Secuencia pendiente para finalizar el punto 3
 1. API privada `reportar_incidencia` con sesión cliente y selección de servicio propio.
