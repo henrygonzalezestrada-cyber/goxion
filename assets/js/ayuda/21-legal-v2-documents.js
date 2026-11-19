@@ -185,70 +185,123 @@
  }
  function createConsent(){
    if(dialog)return dialog;
-   const d=document.createElement("dialog");d.id="gx-legal-consent";d.className="gx-legal-consent";
+   const d=document.createElement("dialog");
+   d.id="gx-legal-consent";d.className="gx-legal-consent";
    d.setAttribute("aria-labelledby","gx-legal-consent-title");
-   d.setAttribute("aria-describedby","gx-legal-consent-description");
    d.innerHTML=[
-     '<div class="gx-legal-consent-layout">',
-     '<header class="gx-legal-consent-head">',
-     '<div class="gx-legal-kicker">GOXION · ACTUALIZACIÓN DE DOCUMENTOS</div>',
-     '<h2 id="gx-legal-consent-title">Términos y Condiciones <span>2.0</span></h2>',
-     '<p id="gx-legal-consent-description">Revisamos nuestras reglas de pago, prórrogas, mora, lealtad y garantía. Lee el documento completo y elige expresamente si deseas aceptarlo o rechazarlo.</p>',
-     '</header>',
-     '<div class="gx-legal-consent-scroll" tabindex="0" role="region" aria-label="Términos y Condiciones completos">',
-     '<article class="gx-legal-prose gx-legal-consent-article"></article>',
-     '<div class="gx-legal-end" aria-hidden="true">FIN DEL DOCUMENTO · VERSIÓN 2.0</div>',
+     '<div class="gx-legal-panel gx-legal-intro" data-gx-panel="intro">',
+       '<button class="gx-legal-close" type="button" data-gx-close aria-label="Cerrar">×</button>',
+       '<h2 id="gx-legal-consent-title">Actualizamos los términos.</h2>',
+       '<p class="gx-legal-intro-copy">Consulta la versión 2.0 antes de decidir.</p>',
+       '<button type="button" class="gx-legal-read-cta" data-gx-open-reader>Leer términos <span aria-hidden="true">↗</span></button>',
+       '<div class="gx-legal-intro-actions">',
+         '<button type="button" data-gx-reject>Rechazar</button>',
+         '<button type="button" data-gx-later>Ahora no</button>',
+       '</div>',
+       '<p class="gx-legal-intro-error" role="status" aria-live="polite"></p>',
      '</div>',
-     '<footer class="gx-legal-consent-footer">',
-     '<p class="gx-legal-scroll-hint">Desplázate hasta el final para habilitar la aceptación.</p>',
-     '<label class="gx-legal-check"><input type="checkbox" data-gx-read disabled/> <span>He leído los Términos y Condiciones de la versión 2.0.</span></label>',
-     '<div class="gx-legal-consent-actions">',
-     '<button type="button" class="gx-legal-reject" data-gx-reject>Rechazar</button>',
-     '<button type="button" class="gx-legal-accept" data-gx-accept disabled>Aceptar términos</button>',
+     '<div class="gx-legal-panel gx-legal-read" data-gx-panel="read" hidden>',
+       '<header class="gx-legal-read-head">',
+         '<button type="button" data-gx-back aria-label="Volver al aviso">← <span>Volver</span></button>',
+         '<span>Versión 2.0</span>',
+       '</header>',
+       '<div class="gx-legal-consent-scroll" role="region" aria-label="Documento completo">',
+         '<article class="gx-legal-prose gx-legal-consent-article"></article>',
+         '<div class="gx-legal-end" aria-hidden="true">Fin del documento</div>',
+       '</div>',
+       '<footer class="gx-legal-read-foot">',
+         '<p class="gx-legal-scroll-hint">Lee hasta el final para aceptar.</p>',
+         '<label class="gx-legal-check"><input type="checkbox" data-gx-read disabled> <span>He leído los términos de la versión 2.0.</span></label>',
+         '<div class="gx-legal-consent-actions">',
+           '<button type="button" class="gx-legal-reject" data-gx-reject>Rechazar</button>',
+           '<button type="button" class="gx-legal-accept" data-gx-accept disabled>Aceptar</button>',
+         '</div>',
+         '<p class="gx-legal-consent-feedback" role="status" aria-live="polite"></p>',
+       '</footer>',
      '</div>',
-     '<p class="gx-legal-disclaimer">Puedes consultar los documentos después desde Mi Espacio. Rechazar no cancela los periodos ya pagados.</p>',
-     '<div class="gx-legal-consent-feedback" role="status" aria-live="polite"></div>',
-     '<div class="gx-legal-reject-confirm" hidden>',
-     '<strong>¿Confirmas que rechazas estos términos?</strong>',
-     '<p>Registraremos tu decisión. Tus servicios ya pagados no se cancelan; cualquier renovación posterior deberá aclararse con GOXION.</p>',
-     '<div><button type="button" data-gx-cancel-reject>Volver</button><button type="button" data-gx-confirm-reject>Confirmar rechazo</button></div>',
-     '</div>',
-     '<button type="button" class="gx-legal-later" data-gx-later>Ahora no · cerrar aviso</button>',
-     '</footer></div>'
+     '<div class="gx-legal-panel gx-legal-confirm" data-gx-panel="confirm" hidden>',
+       '<button type="button" class="gx-legal-confirm-back" data-gx-cancel-reject>← Volver</button>',
+       '<h2>¿Rechazar esta versión?</h2>',
+       '<p>Se respetarán los periodos ya pagados. Las renovaciones futuras tendrán que aclararse con GOXION.</p>',
+       '<button type="button" class="gx-legal-confirm-action" data-gx-confirm-reject>Confirmar rechazo</button>',
+       '<p class="gx-legal-confirm-error" role="status" aria-live="polite"></p>',
+     '</div>'
    ].join("");
    document.body.append(d);
+   const read=d.querySelector('[data-gx-panel="read"]');
    const scroll=d.querySelector(".gx-legal-consent-scroll");
    const checkbox=d.querySelector("[data-gx-read]");
    const accept=d.querySelector("[data-gx-accept]");
    const feedback=d.querySelector(".gx-legal-consent-feedback");
-   let checksumOk=false,scrolled=false;
-   const ready=()=>{
-     accept.disabled=!(checksumOk&&scrolled&&checkbox.checked&&!busy);
-   };
+   const introError=d.querySelector(".gx-legal-intro-error");
+   const confirmError=d.querySelector(".gx-legal-confirm-error");
+   let checksumOk=false,scrolled=false,returnMode="intro",lastFocus=null;
+   function showPanel(mode){
+     for(const panel of d.querySelectorAll("[data-gx-panel]")){
+       panel.hidden=panel.dataset.gxPanel!==mode;
+     }
+     d.dataset.mode=mode;
+     const focusTarget=mode==="intro"?d.querySelector("[data-gx-open-reader]"):
+       mode==="read"?d.querySelector("[data-gx-back]"):
+         d.querySelector("[data-gx-cancel-reject]");
+     focusTarget?.focus({preventScroll:true});
+   }
+   const ready=()=>{accept.disabled=!(checksumOk&&scrolled&&checkbox.checked&&!busy);};
    const checkScroll=()=>{
      if(!checksumOk)return;
-     if(scroll.scrollTop+scroll.clientHeight>=scroll.scrollHeight-18){
+     if(scroll.scrollHeight-scroll.scrollTop-scroll.clientHeight<=22){
        scrolled=true;checkbox.disabled=false;
-       d.querySelector(".gx-legal-scroll-hint").textContent="Lectura completa · puedes marcar la casilla y decidir.";
+       d.querySelector(".gx-legal-scroll-hint").textContent="Puedes confirmar tu lectura.";
        ready();
      }
    };
+   async function enterReader(){
+     if(busy)return;
+     showPanel("read");
+     checkbox.checked=false;checkbox.disabled=true;scrolled=false;checksumOk=false;ready();
+     scroll.scrollTop=0;
+     feedback.textContent="";
+     try{
+       const content=await loadInto("terminos",read.querySelector(".gx-legal-consent-article"));
+       checksumOk=await verifySha(content,serverState?.documento_sha256);
+       if(!checksumOk)throw Error("No se pudo verificar este documento. Inténtalo más tarde.");
+       checkScroll();
+     }catch(error){
+       checksumOk=false;ready();
+       feedback.textContent=String(error?.message||error);
+     }
+   }
    scroll.addEventListener("scroll",checkScroll,{passive:true});
    checkbox.addEventListener("change",ready);
-   const rejectBox=d.querySelector(".gx-legal-reject-confirm");
-   d.querySelector("[data-gx-reject]").addEventListener("click",()=>{
-     if(busy)return;rejectBox.hidden=false;d.querySelector("[data-gx-confirm-reject]").focus();
-   });
-   d.querySelector("[data-gx-cancel-reject]").addEventListener("click",()=>{rejectBox.hidden=true;d.querySelector("[data-gx-reject]").focus();});
+   d.querySelector("[data-gx-open-reader]").addEventListener("click",()=>void enterReader());
+   d.querySelector("[data-gx-back]").addEventListener("click",()=>showPanel("intro"));
+   d.querySelectorAll("[data-gx-reject]").forEach(button=>button.addEventListener("click",()=>{
+     if(busy)return;
+     returnMode=d.dataset.mode==="read"?"read":"intro";
+     confirmError.textContent="";showPanel("confirm");
+   }));
+   d.querySelector("[data-gx-cancel-reject]").addEventListener("click",()=>showPanel(returnMode));
    d.querySelector("[data-gx-confirm-reject]").addEventListener("click",()=>void decide("rechazado"));
    accept.addEventListener("click",()=>{if(!accept.disabled)void decide("aceptado");});
    d.querySelector("[data-gx-later]").addEventListener("click",()=>{if(!busy)d.close();});
-   d.addEventListener("cancel",e=>{if(busy)e.preventDefault();});
-   d.addEventListener("close",()=>{checkbox.checked=false;rejectBox.hidden=true;feedback.textContent="";});
-   dialog={element:d,scroll,content:d.querySelector(".gx-legal-consent-article"),
-     checkbox,accept,feedback,reset:()=>{checksumOk=false;scrolled=false;checkbox.checked=false;
-       checkbox.disabled=true;scroll.scrollTop=0;ready();},
-     verified:ok=>{checksumOk=ok;checkScroll();ready();}};
+   d.querySelector("[data-gx-close]").addEventListener("click",()=>{if(!busy)d.close();});
+   d.addEventListener("cancel",event=>{if(busy)event.preventDefault();});
+   d.addEventListener("close",()=>{
+     checkbox.checked=false;feedback.textContent="";introError.textContent="";confirmError.textContent="";
+     const previous=lastFocus;lastFocus=null;previous?.focus?.({preventScroll:true});
+   });
+   dialog={
+     element:d,scroll,checkbox,accept,feedback,introError,confirmError,
+     setMode:showPanel,ready,verified:()=>checksumOk&&scrolled&&checkbox.checked,
+     reset:()=>{
+       checksumOk=false;scrolled=false;
+       checkbox.checked=false;checkbox.disabled=true;scroll.scrollTop=0;
+       ready();feedback.textContent="";introError.textContent="";confirmError.textContent="";
+       d.querySelector(".gx-legal-scroll-hint").textContent="Lee hasta el final para aceptar.";
+       showPanel("intro");
+     },
+     saveFocus:()=>{lastFocus=document.activeElement;}
+   };
    return dialog;
  }
  function alreadyBlocked(){
@@ -262,39 +315,34 @@
    if(!serverState?.habilitado||busy||!token())return;
    const dlg=createConsent();if(dlg.element.open)return;
    if(!manual&&alreadyBlocked())return;
-   dlg.reset();dlg.feedback.textContent="";
-   dlg.element.showModal();
-   dlg.feedback.textContent="Cargando texto y verificando la versión…";
-   try{
-     const text=await loadInto("terminos",dlg.content);
-     const valid=await verifySha(text,serverState.documento_sha256);
-     if(!valid)throw Error("El documento no coincide con la versión registrada. No es posible aceptarlo todavía.");
-     dlg.verified(true);dlg.feedback.textContent="";
-   }catch(error){
-     dlg.verified(false);dlg.feedback.textContent=String(error?.message||error);
-   }
+   dlg.saveFocus();dlg.reset();dlg.element.showModal();
+   // Intro deliberadamente compacto; el documento se muestra solo si el cliente lo solicita.
+   dlg.setMode("intro");
  }
  async function decide(value){
    if(busy)return;
    const dlg=createConsent();
-   if(value==="aceptado"&&dlg.accept.disabled)return;
-   const current=token();
-   if(!current)return;
+   if(value==="aceptado"&&!dlg.verified())return;
+   const current=token();if(!current)return;
    const opId=pendingOperation?.value===value?pendingOperation.id:crypto.randomUUID();
    pendingOperation={value,id:opId};
-   busy=true;dlg.feedback.textContent="Guardando tu decisión…";
-   for(const b of dlg.element.querySelectorAll("button"))b.disabled=true;
+   busy=true;
+   const feedback=value==="rechazado"?dlg.confirmError:dlg.feedback;
+   feedback.textContent="Guardando tu decisión…";
+   const controls=[...dlg.element.querySelectorAll("button,input")];
+   const original=controls.map(node=>node.disabled);
+   controls.forEach(node=>{node.disabled=true;});
    try{
      const updated=await api("decidir",{decision:value,operation_id:opId},current);
-     if(current!==token())throw Error("La sesión cambió");
+     if(current!==token())throw Error("La sesión cambió. Inicia sesión otra vez.");
      serverState={...serverState,...updated};
      pendingOperation=null;showState();dlg.element.close();
      window.GOXION_CLIENT_NOTIFICATIONS?.refresh?.();
-   }catch(error){dlg.feedback.textContent=String(error?.message||error);}
+   }catch(error){feedback.textContent=String(error?.message||error);}
    finally{
      busy=false;
-     for(const b of dlg.element.querySelectorAll("button"))b.disabled=false;
-     dlg.accept.disabled=!(dlg.checkbox.checked&&!dlg.checkbox.disabled);
+     controls.forEach((node,index)=>{node.disabled=original[index];});
+     dlg.ready();
    }
  }
  async function checkSession(){
