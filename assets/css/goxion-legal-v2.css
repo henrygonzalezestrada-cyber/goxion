@@ -1,0 +1,77 @@
+/* GOXION · lector legal v2, se integra en el modal existente.
+ * Sin cambiar el diseño general de Ayuda.
+ */
+#modal-terminos .gx-standard-legacy-modal{width:min(760px,calc(100vw - 26px));max-height:90dvh}
+#modal-terminos .gx-dialog-legacy-scroll{overflow-y:auto;overscroll-behavior:contain;max-height:calc(90dvh - 96px)}
+.gx-legal-reader{padding:6px 0 22px}
+.gx-legal-reader-head p{color:var(--text-muted,#a6a9b8);font-size:12px;line-height:1.6;margin:10px 0 17px}
+.gx-legal-eyebrow,.gx-legal-kicker{color:#b1a8f0;letter-spacing:.13em;font-size:10px;font-weight:700}
+.gx-legal-reader-tabs{display:flex;gap:15px;overflow-x:auto;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:10px;scrollbar-width:thin}
+.gx-legal-reader-tabs button{flex:0 0 auto;min-height:36px;color:#b3b7c4;background:transparent;border:0;border-bottom:2px solid transparent;cursor:pointer;padding:6px 0;font:inherit;font-size:12px;font-weight:650}
+.gx-legal-reader-tabs button[aria-current="page"]{color:#f5f5fa;border-color:#b1a8f0}
+.gx-legal-prose{color:#d5d8e0;font-size:13px;line-height:1.76;overflow-wrap:anywhere}
+.gx-legal-prose h1{color:#f5f5fb;font-size:clamp(21px,4.4vw,29px);line-height:1.24;letter-spacing:-.02em;margin:23px 0 14px}
+.gx-legal-prose h2{color:#edeef4;font-size:17px;font-weight:750;line-height:1.33;margin:25px 0 10px}
+.gx-legal-prose h3{color:#f2f3f7;font-size:15px;margin:19px 0 8px}
+.gx-legal-prose p{margin:10px 0}
+.gx-legal-prose strong{color:#f5f5fa;font-weight:680}
+.gx-legal-prose ul{padding-left:22px}
+.gx-legal-prose li{margin:7px 0}
+.gx-legal-reader-footer{border-top:1px solid rgba(255,255,255,.11);margin-top:24px;padding-top:16px}
+.gx-legal-direct{color:#c9c6fa;font-size:12px;text-decoration:underline;text-underline-offset:3px}
+.gx-legal-inline-link{display:block;color:#c9c6fa;background:transparent;border:0;border-bottom:1px solid currentColor;margin:12px 0;padding:6px 0;cursor:pointer;font:inherit;font-size:12px}
+.gx-legal-loading,.gx-legal-error{color:#b4b8c5;font-size:13px;margin:20px 0}
+.gx-legal-error{color:#f8b0b0}
+.gx-legal-hub{display:grid;gap:11px;margin:12px 0 22px;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.12)}
+.gx-legal-hub-copy{display:grid;gap:3px}
+.gx-legal-hub-copy strong{color:#f3f3f8;font-size:13px}
+.gx-legal-hub-copy small{color:var(--text-muted,#aeb2bf);font-size:11px;line-height:1.4}
+.gx-legal-hub-links{display:flex;gap:9px;overflow-x:auto;scrollbar-width:thin}
+.gx-legal-hub-links button{flex:0 0 auto;background:transparent;border:1px solid rgba(255,255,255,.24);border-radius:100px;color:#e9e9f1;font:inherit;font-size:11px;font-weight:550;padding:9px 12px;cursor:pointer}
+.gx-legal-hub-links button:hover,.gx-legal-hub-links button:focus-visible{border-color:#c7bff8}
+.gx-legal-status{display:flex;align-items:center;justify-content:space-between;gap:9px;color:#c9c6fa;font-size:11px}
+.gx-legal-status:empty{display:none}
+.gx-legal-review{background:transparent;border:0;color:#cfc9ff;font-size:11px;text-decoration:underline;cursor:pointer}
+
+.gx-legal-consent{box-sizing:border-box;width:min(650px,calc(100vw - 22px));height:min(790px,calc(100dvh - 24px));max-width:none;max-height:none;
+ padding:0;border:1px solid rgba(255,255,255,.18);border-radius:20px;background:#11131b;color:#f5f5fa;
+ box-shadow:0 32px 90px #000b;font-family:inherit}
+.gx-legal-consent::backdrop{background:rgba(5,7,13,.77);backdrop-filter:blur(12px)}
+.gx-legal-consent-layout{height:100%;min-height:0;display:flex;flex-direction:column}
+.gx-legal-consent-head{flex:none;padding:24px 26px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.gx-legal-consent-head h2{font-size:clamp(22px,4.6vw,29px);line-height:1.19;margin:9px 0 10px;letter-spacing:-.035em;color:#fff;font-weight:750}
+.gx-legal-consent-head h2 span{color:#b9b1fb}
+.gx-legal-consent-head p{font-size:12px;line-height:1.62;color:#afb4c2;margin:0}
+.gx-legal-consent-scroll{min-height:0;overflow-y:auto;overscroll-behavior:contain;flex:1;padding:10px 26px 24px;scrollbar-width:thin;outline-offset:-3px}
+.gx-legal-consent-scroll .gx-legal-prose{font-size:13px}
+.gx-legal-end{border-top:1px solid rgba(255,255,255,.13);margin-top:25px;padding-top:14px;text-align:center;font-size:10px;letter-spacing:.14em;color:#949bab}
+.gx-legal-consent-footer{flex:none;padding:14px 26px 17px;border-top:1px solid rgba(255,255,255,.14);background:#151720}
+.gx-legal-scroll-hint{color:#bcb5fa;font-size:11px;margin:0 0 10px}
+.gx-legal-check{display:flex;align-items:flex-start;gap:9px;color:#e4e5ec;font-size:12px;line-height:1.45;cursor:pointer}
+.gx-legal-check input{width:17px;height:17px;flex:0 0 17px;accent-color:#bcb3f7;margin:0}
+.gx-legal-consent-actions{display:flex;gap:10px;margin-top:14px}
+.gx-legal-consent-actions button{flex:1;min-height:46px;border-radius:11px;font:inherit;font-size:13px;font-weight:680;cursor:pointer}
+.gx-legal-reject{background:transparent;border:1px solid rgba(255,255,255,.34);color:#e3e5ef}
+.gx-legal-accept{background:#d9d4fc;color:#181521;border:1px solid #d9d4fc}
+.gx-legal-consent-actions button:disabled{opacity:.4;cursor:not-allowed}
+.gx-legal-disclaimer{font-size:11px;color:#9da4b1;line-height:1.45;margin:11px 0 0}
+.gx-legal-consent-feedback{font-size:11px;color:#e7b0ae;margin:6px 0}
+.gx-legal-consent-feedback:empty{display:none}
+.gx-legal-reject-confirm{border-top:1px solid rgba(255,255,255,.13);margin-top:10px;padding-top:11px}
+.gx-legal-reject-confirm[hidden]{display:none}
+.gx-legal-reject-confirm strong{font-size:12px;color:#f3f0fa}
+.gx-legal-reject-confirm p{font-size:11px;line-height:1.6;color:#bbc0ca}
+.gx-legal-reject-confirm div{display:flex;gap:9px}
+.gx-legal-reject-confirm button{border-radius:9px;border:1px solid rgba(255,255,255,.28);padding:11px 12px;font:inherit;font-size:11px;background:transparent;color:#fff;cursor:pointer}
+.gx-legal-reject-confirm button:last-child{background:#dec4c4;color:#2b1c20}
+.gx-legal-later{display:block;margin:10px auto 0;border:0;background:transparent;color:#aeb2bd;font-size:11px;text-decoration:underline;cursor:pointer}
+.gx-legal-consent button:focus-visible,.gx-legal-reader button:focus-visible{outline:2px solid #d3c9ff;outline-offset:2px}
+@media(max-width:540px){
+ .gx-legal-consent{width:calc(100vw - 12px);height:calc(100dvh - 14px);border-radius:16px}
+ .gx-legal-consent-head{padding:20px 17px 13px}
+ .gx-legal-consent-scroll{padding:6px 17px 22px}
+ .gx-legal-consent-footer{padding:13px 17px 15px}
+ .gx-legal-consent-actions button{min-height:48px}
+ .gx-legal-hub-links{gap:6px}
+}
+@media(prefers-reduced-motion:reduce){.gx-legal-consent{scroll-behavior:auto}}
