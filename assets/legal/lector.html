@@ -4,7 +4,7 @@
 <body><header><strong>GOXION <small>· Centro de documentos</small></strong><a href="../../ayuda.html">Volver a Ayuda</a></header><main><nav aria-label="Documentos"><a href="?doc=terminos" data-doc="terminos">Términos generales</a><a href="?doc=referidos" data-doc="referidos">Referidos</a><a href="?doc=cupones" data-doc="cupones">Cupones y promociones</a></nav><article id="documento" aria-live="polite"><p>Cargando documento…</p></article><p class="note">Documentos GOXION · versión 2.0. La aceptación o rechazo se registra únicamente en Mi Espacio cuando se presente el aviso correspondiente.</p></main>
 <script>
 (()=>{'use strict';
-const files={terminos:'../../docs/legal/TERMINOS_GENERALES_V2.md',referidos:'../../docs/legal/BASES_REFERIDOS_V2.md',cupones:'../../docs/legal/BASES_CUPONES_PROMOCIONES_V2.md'};
+const files={terminos:'terminos-v2.txt',referidos:'referidos-v2.txt',cupones:'cupones-v2.txt'};
 const doc=new URLSearchParams(location.search).get('doc')||'terminos',key=Object.hasOwn(files,doc)?doc:'terminos';
 document.querySelectorAll('[data-doc]').forEach(a=>{if(a.dataset.doc===key)a.setAttribute('aria-current','page')});
 const target=document.getElementById('documento');
