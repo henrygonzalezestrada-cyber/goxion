@@ -544,6 +544,11 @@
     if(id)await markOne(id,source);
     closeSheet();
 
+    if(action==="legal"){
+      // El documento continúa disponible después de marcar la notificación.
+      setTimeout(()=>window.GOXION_LEGAL_V2?.openDocument(ref||"terminos"),220);
+      return;
+    }
     if(action==="account"){
       if(typeof window.irAlTicket==="function")window.irAlTicket();
       return;
