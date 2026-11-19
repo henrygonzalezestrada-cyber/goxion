@@ -45,11 +45,29 @@
 <link rel="stylesheet" href="./assets/css/goxion-modal-headers.css?v=standard-v1">
 </head>
 <body class="no-scroll">
-<div id="splash-screen" onclick="hideSplash()">
+<div id="splash-screen">
 <div class="splash-content">
 <img alt="GOXION" class="splash-logo" onerror="this.src='logo2.PNG'" src="Logo individual.png"/>
 </div>
 </div>
+<script>
+/* Rescate de arranque: independiente de window.load y de scripts externos.
+   Si un recurso/CDN nunca termina de cargar, el logo no puede tapar la página indefinidamente. */
+(function(){
+  "use strict";
+  var splash=document.getElementById("splash-screen");
+  if(!splash)return;
+  function liberar(){
+    splash.style.opacity="0";
+    splash.style.pointerEvents="none";
+    splash.style.visibility="hidden";
+    document.body.classList.remove("no-scroll");
+  }
+  splash.addEventListener("click",liberar,{once:true});
+  window.addEventListener("pageshow",function(e){if(e.persisted)liberar();});
+  window.setTimeout(liberar,5500);
+})();
+</script>
 <div class="sticky-client-bar" id="sticky-client-bar">
 <div class="sticky-client-title">Tu Espacio, <span id="sticky-client-name"></span></div>
 </div>
