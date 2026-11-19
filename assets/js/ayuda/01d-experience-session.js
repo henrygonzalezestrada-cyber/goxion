@@ -122,25 +122,39 @@
 
         function hideSplash() {
             const splash = document.getElementById('splash-screen');
-            if (splash.style.opacity === '0') return;
+            if (!splash) return;
+            // Idempotente: una segunda llamada también debe liberar el scroll.
             splash.style.opacity = '0';
-            setTimeout(() => { 
-                splash.style.visibility = 'hidden'; 
-                document.body.classList.remove('no-scroll'); 
+            splash.style.pointerEvents = 'none';
+            setTimeout(() => {
+                splash.style.visibility = 'hidden';
+                document.body.classList.remove('no-scroll');
             }, 600);
         }
 
-        window.addEventListener('load', async () => {
-            // Evita mostrar fugazmente el Inicio público antes de restaurar Mi Espacio.
-            const splashFallback = setTimeout(hideSplash, 4500);
-            try {
-                await cargarDatosYVerificarSesion();
-            } finally {
-                clearTimeout(splashFallback);
-                actualizarBloqueoSoporte();
-                setTimeout(hideSplash, 250);
-            }
-        });
+        // DOMContentLoaded no depende de que terminen imágenes, fuentes ni recursos
+        // externos: evita dejar el splash fijo si window.load se retrasa.
+        let gxRestauracionIniciada = false;
+        function iniciarRestauracionMiEspacio() {
+            if (gxRestauracionIniciada) return;
+            gxRestauracionIniciada = true;
+            const splashFallback = setTimeout(hideSplash, 4200);
+            Promise.resolve().then(() => cargarDatosYVerificarSesion())
+              .catch(error => {
+                  console.warn("GOXION: restauración de sesión no confirmada", String(error).slice(0,120));
+              })
+              .finally(() => {
+                  clearTimeout(splashFallback);
+                  actualizarBloqueoSoporte();
+                  setTimeout(hideSplash, 250);
+              });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', iniciarRestauracionMiEspacio, {once:true});
+        } else {
+            iniciarRestauracionMiEspacio();
+        }
+        window.addEventListener('load', iniciarRestauracionMiEspacio, {once:true});
 
         function actualizarBloqueoSoporte() {
             const overlay = document.getElementById("support-lock-overlay");
