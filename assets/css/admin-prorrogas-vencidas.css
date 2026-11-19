@@ -1,0 +1,39 @@
+/* Alerta operativa, no pantalla paralela. Solo alerta si el servidor la confirma. */
+#gx-extension-red-alerts[hidden],#gx-extension-home-flag[hidden]{display:none!important}
+.gx-extension-home-flag{width:100%;margin:14px 0 5px;display:flex;align-items:center;gap:11px;
+  padding:13px 16px;border-radius:14px;border:1px solid rgba(245,91,91,.45);
+  background:linear-gradient(100deg,rgba(85,23,31,.56),rgba(22,20,27,.84));
+  color:#fff;text-align:left;cursor:pointer;font:inherit}
+.gx-extension-home-flag strong{font-size:14px;line-height:1.3;flex:1}
+.gx-extension-home-flag span:last-child{font-size:12px;color:#ffb5b5}
+.gx-extension-red-dot,.gx-extension-amber-dot{display:block;width:10px;height:10px;flex:0 0 10px;
+  border-radius:50%;background:#ff4e5e;box-shadow:0 0 0 4px rgba(255,78,94,.13)}
+.gx-extension-amber-dot{background:#edb454;box-shadow:0 0 0 4px rgba(237,180,84,.14)}
+.gx-extension-alerts{margin:0 0 19px;display:grid;gap:10px}
+.gx-extension-alerts-head{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-bottom:2px}
+.gx-extension-eyebrow{display:block;color:#ff9ca5;font-size:10px;letter-spacing:.16em;font-weight:750}
+.gx-extension-alerts-head h2{font-size:18px;margin:4px 0 3px;color:#fff}
+.gx-extension-alerts-head p{margin:0;font-size:12px;color:#adb1c0;line-height:1.5}
+.gx-extension-refresh{border:1px solid rgba(255,255,255,.24);border-radius:10px;
+  background:transparent;color:#d7dbe2;padding:9px 12px;font:inherit;font-size:12px;cursor:pointer}
+.gx-extension-alert-card{border:1px solid rgba(255,78,94,.29);border-left:3px solid #ff5a69;
+  border-radius:13px;background:rgba(21,22,30,.8);padding:14px 14px 11px}
+.gx-extension-alert-card.is-review{border-color:rgba(237,180,84,.26);border-left-color:#edb454}
+.gx-extension-alert-client{display:flex;align-items:center;gap:10px}
+.gx-extension-alert-client>div{display:grid;gap:1px;flex:1;min-width:0}
+.gx-extension-alert-client strong{font-size:15px;color:#f3f5fa;overflow-wrap:anywhere}
+.gx-extension-alert-client small{font-size:11px;color:#9fa5b4}
+.gx-extension-open-client{border:1px solid rgba(255,255,255,.2);border-radius:9px;
+  background:rgba(255,255,255,.065);color:#fff;padding:9px 12px;font:inherit;font-size:12px;
+  cursor:pointer;white-space:nowrap}
+.gx-extension-critical{font-size:13px;color:#ffb2b9;font-weight:600;line-height:1.5;margin:12px 0 8px}
+.gx-extension-services{padding:0;margin:9px 0 2px;list-style:none;display:grid;gap:7px}
+.gx-extension-services li{display:grid;gap:3px;padding:9px 11px;border-radius:10px;background:rgba(255,78,94,.06)}
+.gx-extension-services li.is-review{background:rgba(237,180,84,.065)}
+.gx-extension-services strong{font-size:13px;color:#e8ecf4}
+.gx-extension-services span{font-size:12px;color:#b9bfc9;line-height:1.45}
+.gx-extension-error,.gx-extension-note{font-size:12px;color:#f1ba99}
+.gx-extension-home-flag:focus-visible,.gx-extension-open-client:focus-visible,
+.gx-extension-refresh:focus-visible{outline:2px solid #fff;outline-offset:2px}
+@media(max-width:600px){.gx-extension-alerts-head h2{font-size:17px}.gx-extension-home-flag{flex-wrap:wrap}
+ .gx-extension-alert-card{padding:13px 11px}.gx-extension-open-client{padding:9px 10px}}
