@@ -95,6 +95,8 @@
    lastAccess=state;
    blocked=state?.piloto===true&&state?.bloquea_operaciones===true;
    document.body.classList.toggle("gx-legal-rejected-active",blocked&&!state?.restringido);
+   if(blocked&&!state?.restringido&&$("#view-catalogo")?.classList.contains("active"))
+     window.switchTab?.("inicio");
    setActiveWarning(state);
    setLocked(state?.piloto===true&&state?.restringido===true);
    if(prev&&!locked&&state?.fase==="aceptado"&&localStorage.getItem(TOKEN_KEY)){
