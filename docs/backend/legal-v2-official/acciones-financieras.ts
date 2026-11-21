@@ -133,6 +133,49 @@ Deno.serve(async (req) => {
     const payload = await req.json().catch(() => ({}));
     const action = String(payload?.accion || "").trim();
     const data = payload?.datos && typeof payload.datos === "object" ? payload.datos : {};
+    // No nuevas renovaciones tras rechazo. Sí se pueden conciliar comprobantes
+    // existentes ANTES del rechazo y repetir una operación ya confirmada.
+    if(["aprobar_pago","registrar_pago_parcial"].includes(action)&&data?.cliente_id){
+      const target=String(data.cliente_id);
+      const legal=await sb.rpc("goxion_legal_estado_acceso",{p_cliente_id:target});
+      if(legal.error)throw legal.error;
+      if(legal.data?.bloquea_operaciones===true){
+        const latest=await sb.from("goxion_legal_decisiones")
+          .select("decision,registrado_en").eq("cliente_id",target).eq("version","2.0")
+          .order("secuencia",{ascending:false}).limit(1).maybeSingle();
+        if(latest.error)throw latest.error;
+        const rejectedAt=latest.data?.decision==="rechazado"?Date.parse(latest.data.registrado_en):NaN;
+        let previouslyPending=false;
+        if(action==="aprobar_pago"){
+          const [c,prior]=await Promise.all([
+            sb.from("clientes").select("pago_en_revision,pago_revision_updated_at")
+              .eq("id",target).single(),
+            sb.from("goxion_aprobaciones_pago_operaciones").select("operation_id")
+              .eq("cliente_id",target).eq("operation_id",String(data?.clave_idempotencia||operationId))
+              .maybeSingle()
+          ]);
+          if(c.error||prior.error)throw c.error||prior.error;
+          previouslyPending=Boolean(prior.data) ||
+            (c.data?.pago_en_revision===true&&Number.isFinite(rejectedAt)&&
+             Date.parse(c.data?.pago_revision_updated_at||"")<=rejectedAt);
+        }
+        if(action==="b2_aprobar_comprobante"){
+          const proof=await sb.from("goxion_b2_comprobantes")
+            .select("estado,creado_en,aprobado_operation_id")
+            .eq("cliente_id",target).eq("id",String(data?.reporte_id||"")).maybeSingle();
+          if(proof.error)throw proof.error;
+          previouslyPending=Boolean(proof.data)&&(
+            proof.data?.aprobado_operation_id===String(data?.clave_idempotencia||"") ||
+            (proof.data?.estado==="reportado"&&Number.isFinite(rejectedAt)&&
+             Date.parse(proof.data.creado_en)<=rejectedAt)
+          );
+        }
+        if(!previouslyPending)
+          return json({ok:false,codigo:"TERMINOS_RECHAZADOS",
+            error:"No es posible iniciar una renovación o un pago nuevo tras rechazar los términos. Solo se concilian evidencias anteriores al rechazo."},409);
+      }
+    }
+
     // Solo piloto: impedir nuevos contratos/beneficios aun desde rutas de Admin.
     // Conciliaciones, revisión de pagos y bajas NO están bloqueadas.
     if(["promocion_adquirir","promocion_asignar","beneficio_crear","pactar_fecha_pago"].includes(action)){
