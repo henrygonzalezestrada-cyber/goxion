@@ -92,10 +92,12 @@
            confirmacion:"FINALIZAR_SERVICIOS"
          });
          feedback.textContent="Baja interna registrada. Recuerda retirar los accesos externos manualmente.";
-         await load(true);
-         window.dispatchEvent(new Event("goxion:admin-refresh"));
        }catch(err){feedback.textContent=String(err?.message||err);confirm.disabled=false;cancel.disabled=false;}
-       finally{busy=false;}
+       finally{
+         busy=false;
+         void load(true);
+         window.dispatchEvent(new Event("goxion:admin-refresh"));
+       }
      });
      actions.append(cancel,confirm);
    });
