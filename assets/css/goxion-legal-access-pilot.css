@@ -1,0 +1,51 @@
+/* GOXION · Cuenta restringida piloto. Conserva el aspecto de Mi Espacio. */
+#gx-legal-access-shell[hidden]{display:none!important}
+body.gx-legal-locked{overflow:hidden!important;touch-action:auto}
+#gx-legal-access-shell{
+ position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;
+ overflow:auto;overscroll-behavior:contain;padding:calc(22px + env(safe-area-inset-top)) 18px calc(22px + env(safe-area-inset-bottom));
+ background:radial-gradient(ellipse at 50% 22%,rgba(78,47,139,.13),transparent 64%),#08090e;
+ color:#f6f6fb;font-family:inherit
+}
+.gx-legal-lock-card{width:min(420px,100%);margin:auto;padding:30px 25px 24px;text-align:center;
+ background:linear-gradient(153deg,rgba(31,31,43,.96),rgba(16,17,24,.98));
+ border:1px solid rgba(218,215,241,.14);border-radius:23px;box-shadow:0 26px 85px rgba(0,0,0,.36)}
+.gx-legal-lock-emblem{width:52px;height:52px;margin:0 auto 20px;border-radius:18px;
+ display:grid;place-items:center;background:rgba(168,118,255,.11);color:#b68bff;
+ border:1px solid rgba(168,118,255,.18)}
+.gx-legal-lock-emblem svg{width:25px;height:25px}
+.gx-legal-lock-card h2{margin:0 0 11px;color:#fbfaff;letter-spacing:-.035em;line-height:1.18;font-size:24px;font-weight:720}
+.gx-legal-lock-card p{margin:0;color:#b4b5c5;font-size:13px;line-height:1.7}
+.gx-legal-lock-card .gx-legal-lock-help{margin:12px 0 22px;color:#d1cfe0}
+.gx-legal-lock-primary,.gx-legal-lock-exit{
+ width:100%;min-height:47px;border-radius:13px;cursor:pointer;font:inherit;
+ font-size:13px;font-weight:660;transition:transform .18s ease,filter .18s ease}
+.gx-legal-lock-primary{border:0;color:#fff;background:linear-gradient(103deg,#7c4dff,#5563f2 48%,#16abdb);
+ box-shadow:0 8px 20px rgba(90,66,196,.2)}
+.gx-legal-lock-exit{margin-top:11px;border:1px solid rgba(255,255,255,.16);background:transparent;color:#d7d8e2}
+.gx-legal-lock-primary:active,.gx-legal-lock-exit:active{transform:scale(.985)}
+.gx-legal-lock-links{border-top:1px solid rgba(255,255,255,.1);margin-top:23px;padding-top:17px}
+.gx-legal-lock-links button{border:0;background:none;padding:7px 2px;color:#a8adc2;
+ text-decoration:underline;text-underline-offset:4px;cursor:pointer;font:inherit;font-size:11.5px}
+.gx-legal-lock-details[hidden]{display:none!important}
+.gx-legal-lock-details{margin-top:13px;text-align:left;max-height:36dvh;overflow:auto;
+ border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:13px}
+.gx-legal-lock-details h3{font-size:13px;font-weight:690;margin:0 0 10px;color:#e2e3eb}
+.gx-legal-lock-pay{display:flex;align-items:center;justify-content:space-between;gap:10px;
+ padding:9px 0;font-size:11.5px;color:#bcc0d1;border-top:1px solid rgba(255,255,255,.08)}
+.gx-legal-lock-pay strong{font-weight:650;color:#e9eaf2}
+.gx-legal-lock-contact{display:block;margin-top:12px;font-size:11px;color:#8fe5f0;text-align:center;text-decoration:underline;text-underline-offset:3px}
+.gx-legal-pilot-banner[hidden]{display:none!important}
+.gx-legal-pilot-banner{padding:13px 14px;margin:12px 0;border-radius:13px;
+ border:1px solid rgba(160,119,246,.22);background:rgba(110,71,185,.1);
+ color:#d4c8ed;font-size:12px;line-height:1.6}
+.gx-legal-pilot-banner strong{color:#f3ecff;font-weight:700}
+body.gx-legal-rejected-active #btn-tab-catalogo{display:none!important}
+.gx-legal-access-shell button:focus-visible,.gx-legal-lock-card button:focus-visible{outline:2px solid #bba7ed;outline-offset:3px}
+@media(max-width:540px){
+ .gx-legal-lock-card{padding:27px 22px 23px;border-radius:20px}
+ .gx-legal-lock-card h2{font-size:23px}
+}
+@media(prefers-reduced-motion:reduce){
+ .gx-legal-lock-primary,.gx-legal-lock-exit{transition:none}
+}
