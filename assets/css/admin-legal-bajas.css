@@ -1,0 +1,30 @@
+/* GOXION Admin · Alerta legal general para cuentas con términos rechazados; no rediseñar Operaciones. */
+#gx-legal-admin-alert[hidden],#gx-legal-admin-home[hidden]{display:none!important}
+#gx-legal-admin-alert{margin:13px 0 22px;padding:16px 17px;border-radius:17px;
+ background:linear-gradient(120deg,rgba(51,29,35,.54),rgba(25,24,35,.92));
+ border:1px solid rgba(238,111,127,.26);color:#f5f2f5}
+.gx-legal-admin-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.gx-legal-admin-head strong{font-size:15px;line-height:1.35;font-weight:680}
+.gx-legal-admin-head button,.gx-legal-admin-controls button{cursor:pointer;font:inherit}
+.gx-legal-admin-head button{background:none;border:0;color:#b8b6c9;font-size:12px;padding:4px}
+.gx-legal-admin-copy{font-size:12px;color:#bcb3be;line-height:1.65;margin:9px 0 12px}
+.gx-legal-admin-items{margin:10px 0;padding:0 0 0 18px;font-size:12px;color:#f2e5eb;line-height:1.85}
+.gx-legal-admin-controls{display:flex;flex-wrap:wrap;gap:9px;margin-top:16px}
+.gx-legal-admin-controls button{min-height:39px;border-radius:11px;padding:0 15px;font-size:12px;font-weight:640}
+.gx-legal-admin-go{border:1px solid rgba(238,108,124,.48);background:rgba(165,56,68,.17);color:#ffe3e8}
+.gx-legal-admin-controls .gx-legal-admin-yes{background:#db8895;color:#24151a;border:0}
+.gx-legal-admin-controls .gx-legal-admin-no{background:transparent;color:#c4c3ce;border:1px solid rgba(255,255,255,.2)}
+.gx-legal-admin-status{font-size:11.5px;color:#e1bdc6;margin-top:12px}
+#gx-legal-admin-home{margin:12px 0;padding:12px 15px;border:1px solid rgba(238,111,127,.25);
+ border-radius:13px;background:rgba(120,39,52,.13);color:#f1dbe2;
+ display:flex;align-items:center;gap:10px;cursor:pointer;font:inherit;font-size:12.5px;font-weight:640}
+@media(max-width:540px){#gx-legal-admin-alert{padding:15px 14px;margin:10px 0 19px}
+ .gx-legal-admin-controls button{flex:1}}
+
+.gx-legal-admin-client{padding:14px 0;border-top:1px solid rgba(255,255,255,.1)}
+.gx-legal-admin-client:first-of-type{border-top:0}
+.gx-legal-admin-date{font-size:11px;color:#c6b6be;margin:7px 0}
+.gx-legal-admin-review{margin-top:12px;padding:12px;border-radius:12px;border:1px solid rgba(244,202,108,.2);background:rgba(159,123,56,.075)}
+.gx-legal-admin-review strong{font-size:12px;color:#f1e3c8}
+.gx-legal-admin-review p{font-size:12px;color:#c0b6a5;line-height:1.6;margin:6px 0 0}
+.gx-legal-admin-review-names{font-size:11px;line-height:1.7;color:#dbcebb;margin-top:8px}
