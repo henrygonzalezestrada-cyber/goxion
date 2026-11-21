@@ -5,6 +5,10 @@
   const params=new URLSearchParams(location.search);
   if(params.get("avisosBeta")!=="1"||window.GOXION_AVISOS_STACK_BETA)return;
   const KEY="cliente-prueba";
+  const SEEN_KEY="gx-beta-novedades-leidas:v2:"+KEY;
+  const newsSeen=()=>{try{return localStorage.getItem(SEEN_KEY)==="1";}catch(_){return false;}};
+  const rememberNews=()=>{try{localStorage.setItem(SEEN_KEY,"1");}catch(_){}};
+  const resetNews=()=>{try{localStorage.removeItem(SEEN_KEY);}catch(_){}};
   const TOKEN_KEY=window.GOXION_CORE?.STORAGE?.CLIENT_TOKEN||"goxion_client_token";
   const news=[
     {symbol:"✦",title:"Conoce a Goxy, tu asistente",copy:"Ahora puedes conversar con Goxy desde Soporte para resolver dudas, consultar fechas de pago y recibir ayuda con tus servicios. Si necesitas atención humana, prepara tu solicitud contigo."},
@@ -32,10 +36,10 @@
   const closeIcon='<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"></path></svg>';
   function mount(){
     if(overlay)return;
-    launcher=make("button","gx-stack-beta-launcher","Probar avisos apilados");
+    launcher=make("button","gx-stack-beta-launcher","Volver a probar avisos");
     launcher.type="button";
     launcher.hidden=true;
-    launcher.addEventListener("click",()=>show());
+    launcher.addEventListener("click",()=>{resetNews();show();});
     document.body.append(launcher);
     overlay=make("div","gx-stack-beta");
     overlay.id="gx-stack-beta";
@@ -43,10 +47,10 @@
     overlay.setAttribute("aria-label","Demostración de tarjetas apiladas");
     overlay.innerHTML=[
       '<div class="gx-stack-beta-scene">',
-        '<div class="gx-stack-beta-peek" aria-hidden="true"><span>EN ESPERA</span><strong>Novedades · 6 mejoras</strong></div>',
+        '<div class="gx-stack-beta-peek" aria-hidden="true"><strong>Tu Espacio, más inteligente.</strong></div>',
         '<section class="gx-stack-beta-terms" role="dialog" aria-modal="true" aria-labelledby="gx-beta-terms-title">',
           '<div class="gx-stack-beta-headline"><span class="gx-stack-beta-demo">VISTA PREVIA · CLIENTE PRUEBA</span>',
-            '<button class="gx-stack-beta-close" type="button" data-beta-close aria-label="Cerrar simulación">'+closeIcon+'</button></div>',
+            '<button class="gx-stack-beta-close" type="button" data-beta-terms-close aria-label="Posponer términos">'+closeIcon+'</button></div>',
           '<h2 id="gx-beta-terms-title"><span>Actualizamos</span> los términos.</h2>',
           '<p class="gx-stack-beta-copy">Consulta la versión 2.0 antes de decidir.</p>',
           '<button type="button" class="gx-stack-beta-primary" data-beta-accept>Simular aceptación <span aria-hidden="true">→</span></button>',
@@ -58,10 +62,8 @@
         '</section>',
         '<section class="gx-stack-beta-news" role="dialog" aria-modal="true" aria-labelledby="gx-beta-news-title" aria-hidden="true">',
           '<header class="gx-stack-beta-news-header">',
-            '<div class="gx-stack-beta-news-kicker">NOVEDADES DE GOXION <span>· 6 mejoras</span></div>',
-            '<button type="button" class="gx-stack-beta-close" data-beta-done aria-label="Cerrar novedades">'+closeIcon+'</button>',
+              '<button type="button" class="gx-stack-beta-close" data-beta-done aria-label="Cerrar novedades">'+closeIcon+'</button>',
             '<h2 id="gx-beta-news-title">Tu Espacio, <span>más inteligente.</span></h2>',
-            '<p>Más claridad, control y ayuda cuando la necesites. Conoce todas las mejoras:</p>',
           '</header>',
           '<div class="gx-stack-beta-scroll" tabindex="0" role="region" aria-label="Las seis novedades; desplaza para leerlas">',
             news.map((item,i)=>
@@ -69,8 +71,7 @@
             ).join(""),
           '</div>',
           '<footer class="gx-stack-beta-news-footer">',
-            '<div class="gx-stack-beta-progress"><span data-beta-progress>1 de 6</span><span>Desliza para ver todas las novedades</span></div>',
-            '<button type="button" class="gx-stack-beta-primary" data-beta-done>¡Entendido! Explorar Mi Espacio</button>',
+              '<button type="button" class="gx-stack-beta-primary" data-beta-done>¡Entendido! Explorar Mi Espacio</button>',
           '</footer>',
         '</section>',
         '<section class="gx-stack-beta-rejected" role="dialog" aria-modal="true" aria-labelledby="gx-beta-reject-title" aria-hidden="true">',
@@ -86,17 +87,27 @@
     ].join("");
     document.body.append(overlay);
     overlay.addEventListener("click",event=>{
-      const btn=event.target.closest("button");
+      const btn=event.target.closest?.("button");
       if(btn?.hasAttribute("data-beta-accept"))choose("accept");
       if(btn?.hasAttribute("data-beta-reject"))choose("reject");
-      if(btn?.hasAttribute("data-beta-later"))hide();
+      if(btn?.hasAttribute("data-beta-later")||btn?.hasAttribute("data-beta-terms-close"))choose("later");
+      if(btn?.hasAttribute("data-beta-done"))dismissNews();
       if(btn?.hasAttribute("data-beta-close"))hide();
-      if(btn?.hasAttribute("data-beta-done"))hide();
-      if(btn?.hasAttribute("data-beta-restart"))reset();
-      if(event.target===overlay)hide();
+      if(btn?.hasAttribute("data-beta-restart")){resetNews();reset();}
+      if(event.target===overlay){
+        if(stage==="terms")choose("later");
+        else if(stage==="news")dismissNews();
+        else hide();
+      }
     });
     overlay.addEventListener("keydown",event=>{
-      if(event.key==="Escape"){event.preventDefault();hide();return;}
+      if(event.key==="Escape"){
+        event.preventDefault();
+        if(stage==="terms")choose("later");
+        else if(stage==="news")dismissNews();
+        else hide();
+        return;
+      }
       if(event.key!=="Tab")return;
       const active=stage==="news"?$(".gx-stack-beta-news",overlay):
         stage==="rejected"?$(".gx-stack-beta-rejected",overlay):$(".gx-stack-beta-terms",overlay);
@@ -108,20 +119,8 @@
         event.preventDefault();controls[0].focus();
       }
     });
-    const scroll=$(".gx-stack-beta-scroll",overlay),counter=$("[data-beta-progress]",overlay);
-    let scheduled=false;
-    scroll.addEventListener("scroll",()=>{
-      if(scheduled)return;scheduled=true;
-      requestAnimationFrame(()=>{
-        scheduled=false;
-        const items=[...scroll.querySelectorAll(".gx-stack-beta-news-item")];
-        const top=scroll.getBoundingClientRect().top;
-        let idx=0;
-        items.forEach((item,i)=>{if(item.getBoundingClientRect().top<=top+55)idx=i;});
-        counter.textContent=(idx+1)+" de "+items.length;
-      });
-    },{passive:true});
   }
+
   function reset(){
     if(!overlay)return;
     overlay.dataset.stage="terms";stage="terms";
@@ -129,8 +128,8 @@
     $(".gx-stack-beta-rejected",overlay).setAttribute("aria-hidden","true");
     $(".gx-stack-beta-terms",overlay).setAttribute("aria-hidden","false");
     $(".gx-stack-beta-scroll",overlay).scrollTop=0;
-    $("[data-beta-progress]",overlay).textContent="1 de 6";
     $("[data-beta-status]",overlay).textContent="";
+    $(".gx-stack-beta-peek",overlay).hidden=newsSeen();
     $(".gx-stack-beta-terms button",overlay)?.focus({preventScroll:true});
   }
   function show(){
@@ -148,11 +147,14 @@
   }
   function choose(kind){
     if(!open||stage!=="terms")return;
-    if(kind==="accept"){
+    if(kind==="accept"||kind==="later"){
+      if(newsSeen()){hide();return;}
       stage="news";overlay.dataset.stage="news";
       $(".gx-stack-beta-news",overlay).setAttribute("aria-hidden","false");
       $(".gx-stack-beta-terms",overlay).setAttribute("aria-hidden","true");
-      $("[data-beta-status]",overlay).textContent="Novedades disponibles. Desliza para ver las seis mejoras.";
+      $("[data-beta-status]",overlay).textContent=kind==="later"
+        ?"Términos pospuestos; continúa la tarjeta independiente de novedades."
+        :"Novedades disponibles. Desliza para consultar las seis mejoras.";
       setTimeout(()=>{if(open&&stage==="news")$(".gx-stack-beta-scroll",overlay)?.focus({preventScroll:true})},350);
     }else{
       stage="rejected";overlay.dataset.stage="rejected";
@@ -161,6 +163,13 @@
       $("[data-beta-status]",overlay).textContent="Las novedades se retiraron de la cola.";
       setTimeout(()=>{if(open&&stage==="rejected")$("[data-beta-restart]",overlay)?.focus({preventScroll:true})},330);
     }
+  }
+  function dismissNews(){
+    if(stage!=="news")return;
+    // Solo la tarjeta de novedades se marca como vista en esta beta.
+    // Términos, PIN, pagos y el anuncio oficial no se modifican.
+    rememberNews();
+    hide();
   }
   function hide(){
     if(!overlay||!open)return;
