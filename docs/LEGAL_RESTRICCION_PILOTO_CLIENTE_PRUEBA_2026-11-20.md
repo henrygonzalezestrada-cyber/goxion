@@ -1,4 +1,4 @@
-# GOXION — Restricción por rechazo de términos · piloto Cliente Prueba
+> **DOCUMENTO HISTÓRICO.** Esta versión correspondía al piloto o a una etapa previa. El estado oficial y las reglas desplegadas están en [Lanzamiento general del 21/11/2026](./LEGAL_V2_LANZAMIENTO_GENERAL_2026-11-21.md).\n\n# GOXION — Restricción por rechazo de términos · piloto Cliente Prueba
 
 Fecha de despliegue: 20 de noviembre de 2026.
 Ámbito: **exclusivamente Cliente Prueba** (`091e79b7-c60b-4d50-bb98-a047bfc0dbb4`).
