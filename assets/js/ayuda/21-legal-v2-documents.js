@@ -15,7 +15,42 @@
  };
  const cache=new Map();
  let currentDoc="terminos",reader=null,dialog=null,serverState=null,activeToken="";
- let pendingOperation=null,busy=false,openQueued=false,retryTimer=0;
+ let pendingOperation=null,busy=false,openQueued=false,retryTimer=0,remindTimer=0,lastCheckedAt=0;
+ const REMIND_AFTER_MS=24*60*60*1000;
+ const REFRESH_AFTER_MS=15*60*1000;
+ const remindKey=()=>serverState?.cliente_id?"goxion:terminos:2.0:recordar:"+serverState.cliente_id:null;
+ const remindAfter=()=>{
+   const key=remindKey();if(!key)return 0;
+   try{return Number(localStorage.getItem(key)||0)||0;}catch{return 0;}
+ };
+ function scheduleReminder(){
+   clearTimeout(remindTimer);remindTimer=0;
+   if(serverState?.estado!=="pendiente"||!token())return;
+   const remaining=remindAfter()-Date.now();
+   if(remaining>0)remindTimer=setTimeout(()=>{void checkSession();},remaining+500);
+ }
+ function postpone(){
+   const key=remindKey();
+   if(key){try{localStorage.setItem(key,String(Date.now()+REMIND_AFTER_MS));}catch(_){}}
+   openQueued=false;clearTimeout(retryTimer);scheduleReminder();
+ }
+ function tryOffer(){
+   if(serverState?.estado!=="pendiente"||!serverState?.habilitado||!token()||busy||
+      (dialog?.element.open)||openQueued)return;
+   if(remindAfter()>Date.now()){scheduleReminder();return;}
+   openQueued=true;
+   let attempts=0;
+   const offer=()=>{
+     if(!openQueued||!token()||serverState?.estado!=="pendiente")return;
+     if(remindAfter()>Date.now()){openQueued=false;scheduleReminder();return;}
+     if(!alreadyBlocked()&&attempts>=2){
+       openQueued=false;void openConsent();return;
+     }
+     if(++attempts<80)retryTimer=setTimeout(offer,700);
+     else openQueued=false; // Se reintentará al regresar a la pestaña.
+   };
+   retryTimer=setTimeout(offer,1100);
+ }
  const token=()=>{try{return localStorage.getItem(TOKEN_KEY)||"";}catch{return "";}};
  function el(tag,cls,text){
    const n=document.createElement(tag);
@@ -288,6 +323,8 @@
    d.querySelector("[data-gx-close]").addEventListener("click",()=>{if(!busy)d.close();});
    d.addEventListener("cancel",event=>{if(busy)event.preventDefault();});
    d.addEventListener("close",()=>{
+     // Cerrar o "Ahora no" no registra consentimiento: solo posterga 24 h.
+     if(serverState?.estado==="pendiente"&&token())postpone();
      checkbox.checked=false;feedback.textContent="";introError.textContent="";confirmError.textContent="";
      const previous=lastFocus;lastFocus=null;previous?.focus?.({preventScroll:true});
    });
@@ -346,30 +383,45 @@
      dlg.ready();
    }
  }
- async function checkSession(){
-   const current=token();if(!current||current===activeToken)return;
+ async function checkSession({force=false}={}){
+   const current=token();
+   if(!current)return;
+   if(!force&&current===activeToken&&Date.now()-lastCheckedAt<REFRESH_AFTER_MS){
+     tryOffer();return serverState;
+   }
    activeToken=current;
    try{
      const state=await api("estado",{},current);
-     if(current!==token())return;
+     if(current!==token())return null;
+     lastCheckedAt=Date.now();
      serverState=state;showState();
      window.GOXION_CLIENT_NOTIFICATIONS?.refresh?.();
-     if(!state.habilitado||state.estado!=="pendiente")return;
-     openQueued=true;
-     let attempts=0;
-     const offer=()=>{
-       if(!openQueued||current!==token())return;
-       if(!alreadyBlocked()&&attempts>=2){openQueued=false;void openConsent();return;}
-       if(++attempts<80)retryTimer=setTimeout(offer,700);
-     };
-     retryTimer=setTimeout(offer,1100);
+     if(state.habilitado&&state.estado==="pendiente")tryOffer();
+     else{openQueued=false;clearTimeout(retryTimer);clearTimeout(remindTimer);}
+     return state;
    }catch(error){
      activeToken="";
      console.warn("GOXION: estado legal no verificado",String(error?.message||error).slice(0,130));
+     return null;
+   }
+ }
+ async function openNotification(){
+   const current=token();
+   if(!current)return;
+   // Siempre consultar al servidor: un dispositivo diferente pudo ya decidir.
+   const state=await checkSession({force:true});
+   if(current!==token()||!state)return;
+   if(!state.habilitado||state.estado==="aceptado"){
+     openDocument("terminos");
+   }else{
+     // Desde notificaciones la persona puede decidir incluso durante la prórroga
+     // de "Ahora no"; rechazos previos también pueden reconsiderarse.
+     openQueued=false;clearTimeout(retryTimer);
+     await openConsent(true);
    }
  }
  function logout(){
-   clearTimeout(retryTimer);openQueued=false;activeToken="";
+   clearTimeout(retryTimer);clearTimeout(remindTimer);openQueued=false;activeToken="";lastCheckedAt=0;
    serverState=null;pendingOperation=null;showState();
    if(dialog?.element.open)dialog.element.close();
  }
@@ -379,10 +431,17 @@
  }
  window.GOXION_LEGAL_V2=Object.freeze({
    version:VERSION,openDocument,openConsent:()=>void openConsent(true),
-   refresh:()=>{activeToken="";return checkSession();},
+   openNotification,
+   refresh:()=>checkSession({force:true}),
    getState:()=>serverState?.estado||"sin_activar"
  });
- window.addEventListener("goxion:client-ready",()=>void checkSession());
+ window.addEventListener("goxion:client-ready",()=>void checkSession({force:true}));
+ window.addEventListener("focus",()=>{if(!document.hidden)void checkSession({force:true});});
+ document.addEventListener("visibilitychange",()=>{
+   if(!document.hidden)void checkSession({force:true});
+ });
+ // Mientras Mi Espacio permanezca abierto, seguir comprobando la decisión.
+ setInterval(()=>{if(!document.hidden&&token())void checkSession();},10*60*1000);
  window.addEventListener("goxion:client-logout",logout);
  window.addEventListener("storage",ev=>{if(ev.key===TOKEN_KEY){logout();if(token())void checkSession();}});
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});
