@@ -1,5 +1,5 @@
 /* GOXION · Experiencia apilada de novedades: SOLO ?avisosBeta=1 y Cliente Prueba. */
-.gx-stack-beta[hidden],.gx-stack-beta-launcher[hidden]{display:none!important}
+.gx-stack-beta[hidden],.gx-stack-beta-launcher[hidden],.gx-stack-beta-peek[hidden]{display:none!important}
 .gx-stack-beta *, .gx-stack-beta *::before, .gx-stack-beta *::after{box-sizing:border-box}
 .gx-stack-beta{
  position:fixed;inset:0;z-index:10900;display:grid;place-items:center;
@@ -46,14 +46,13 @@ body.gx-stack-beta-active{overflow:hidden!important}
 .gx-stack-beta-peek{position:absolute;z-index:1;left:50%;top:calc(50% + 142px);
  width:calc(min(100%,410px) - 18px);height:64px;
  transform:translateX(-50%) scale(.96);
- padding:34px 17px 10px;display:flex;justify-content:space-between;gap:8px;align-items:end;
+ padding:34px 17px 10px;display:flex;justify-content:flex-start;gap:8px;align-items:end;
  border-radius:0 0 19px 19px;border:1px solid rgba(232,229,255,.12);
  background:linear-gradient(110deg,#20192f,#111924);color:#ece5fd;
  box-shadow:0 15px 30px rgba(0,0,0,.28);
  transition:transform .4s ease,opacity .3s ease;
 }
-.gx-stack-beta-peek span{font-size:9px;letter-spacing:.06em;color:#aea1cb}
-.gx-stack-beta-peek strong{font-size:11px;font-weight:640}
+.gx-stack-beta-peek strong{font-size:11px;font-weight:640;color:#d9cdea}
 .gx-stack-beta-news{
  position:absolute;z-index:2;left:50%;top:50%;height:min(100%,690px);max-height:100%;
  width:min(100%,480px);display:flex;flex-direction:column;
@@ -62,19 +61,18 @@ body.gx-stack-beta-active{overflow:hidden!important}
  opacity:0;pointer-events:none;transform:translate(-50%,calc(-50% + 35px)) scale(.94);
  transition:transform .52s cubic-bezier(.18,.82,.2,1),opacity .32s ease;
 }
-.gx-stack-beta-news-header{position:relative;padding:27px 25px 17px;flex:none;
- border-bottom:1px solid rgba(255,255,255,.08)}
+.gx-stack-beta-news-header{position:relative;padding:26px 25px 8px;flex:none;z-index:2;
+ background:#15151d}
 .gx-stack-beta-news-header .gx-stack-beta-close{position:absolute;top:19px;right:19px}
-.gx-stack-beta-news-kicker{font-size:10px;color:#64e4ed;font-weight:750;letter-spacing:.13em;
- padding-right:48px}
-.gx-stack-beta-news-kicker span{color:#9b9aa9;font-weight:560;letter-spacing:0}
-.gx-stack-beta-news-header h2{margin:14px 45px 9px 0;font-size:clamp(25px,5vw,30px);
- line-height:1.15;letter-spacing:-.038em;font-weight:750}
+.gx-stack-beta-news-header h2{margin:6px 45px 9px 0;font-size:clamp(25px,5vw,30px);
+ line-height:1.17;letter-spacing:-.038em;font-weight:735}
 .gx-stack-beta-news-header h2 span{color:#ad89ff}
-.gx-stack-beta-news-header p{font-size:12px;line-height:1.6;color:#b5b4c4;margin:0}
-.gx-stack-beta-scroll{overflow-y:auto;min-height:0;flex:1;padding:1px 25px 12px;
- overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin;
- scrollbar-color:rgba(158,133,219,.4) transparent}
+.gx-stack-beta-scroll{overflow-y:auto;min-height:0;flex:1;padding:18px 25px 28px;
+ overscroll-behavior:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+ -webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 23px,#000 calc(100% - 35px),transparent 100%);
+ mask-image:linear-gradient(to bottom,transparent 0,#000 23px,#000 calc(100% - 35px),transparent 100%);
+}
+.gx-stack-beta-scroll::-webkit-scrollbar{display:none}
 .gx-stack-beta-news-item{display:grid;grid-template-columns:23px minmax(0,1fr);gap:11px;
  padding:17px 0 16px;border-bottom:1px solid rgba(255,255,255,.08)}
 .gx-stack-beta-news-item:last-child{border-bottom:0}
@@ -82,11 +80,7 @@ body.gx-stack-beta-active{overflow:hidden!important}
 .gx-stack-beta-news-item:nth-child(even) .gx-stack-beta-mark{color:#ba99ff}
 .gx-stack-beta-news-item h3{font-size:13px;line-height:1.5;font-weight:700;color:#f7f5fe;margin:0 0 5px}
 .gx-stack-beta-news-item p{font-size:12px;line-height:1.7;margin:0;color:#b3b5c2}
-.gx-stack-beta-news-footer{flex:none;padding:12px 24px 18px;
- border-top:1px solid rgba(255,255,255,.10);background:#15151d}
-.gx-stack-beta-progress{display:flex;justify-content:space-between;gap:10px;margin-bottom:11px;
- color:#aaa5b7;font-size:10px;line-height:1.4}
-.gx-stack-beta-progress span:first-child{color:#ddd6f2;font-weight:720}
+.gx-stack-beta-news-footer{flex:none;padding:9px 24px 18px;background:#15151d;position:relative;z-index:2}
 .gx-stack-beta-rejected{text-align:center;opacity:0;pointer-events:none}
 .gx-stack-beta-rejected h2{font-size:22px;letter-spacing:-.03em;margin:12px 0 8px}
 .gx-stack-beta-rejected p{font-size:12px;line-height:1.7;color:#b7b7c4;margin:0 0 20px}
