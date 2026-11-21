@@ -22,7 +22,11 @@
   const remember=key=>{
     try{localStorage.setItem(storageKey(key),"1");}catch(_){}
   };
+  // La beta visual de tarjetas apiladas reemplaza el aviso antiguo SOLO en Cliente Prueba.
+  // No se modifica la marca de lectura ni las decisiones reales.
+  const isStackBeta=()=>new URLSearchParams(location.search).get("avisosBeta")==="1"&&readyClient()==="cliente-prueba";
   const blocked=()=>{
+    if(isStackBeta())return true;
     if(document.hidden || document.body.classList.contains("no-scroll"))return true;
     const splash=document.getElementById("splash-screen");
     if(splash && splash.style.visibility!=="hidden")return true;
@@ -116,7 +120,7 @@
   function schedule(){
     clearTimeout(timer);tries=0;
     const key=readyClient();
-    if(!key||acknowledged(key))return;
+    if(isStackBeta()||!key||acknowledged(key))return;
     function next(){
       if(readyClient()!==key)return;
       if(present(key))return;
