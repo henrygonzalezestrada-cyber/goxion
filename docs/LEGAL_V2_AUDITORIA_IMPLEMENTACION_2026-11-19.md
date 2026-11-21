@@ -47,3 +47,12 @@
 4. En notificaciones pulsar «Leer términos»: debe abrir el documento aunque esté aceptado.
 5. Reabrir el diálogo «Revisar mi decisión» para validar el rechazo y registro si se desea; la prueba sobre la cuenta de cliente sí deja decisiones persistidas.
 6. Solo tras aprobación del piloto decidir el despliegue general y la gestión de rechazos en renovaciones.
+
+## Actualización de despliegue general — 20 de noviembre de 2026
+- Se habilitó el consentimiento `2.0` para todas las cuentas autenticadas (21 cuentas registradas al verificar), mediante `legal-consent-v2` **v4**. La aceptación histórica del piloto Luis permanece auditada y conserva su condición de prueba de diseño previamente reabierta.
+- `Ahora no`, la X y Escape no escriben aceptación ni rechazo: posponen **24 horas en el navegador del cliente** (clave separada por cliente y versión). Un nuevo ingreso, la vuelta a la pestaña o la comprobación periódica reactivan el aviso cuando vence ese plazo. En otros dispositivos puede aparecer antes, porque el aplazamiento es local; **la decisión definitiva sí se guarda en Supabase**.
+- Se actualizó la acción del centro de notificaciones (`notificaciones-cliente` **v8**): al tocar el aviso legal o «Revisar actualización», si la decisión está pendiente o rechazada abre el diálogo de aceptar/rechazar; si está aceptada abre el documento para consulta.
+- Aviso persistente: se crea bajo `cliente_notificaciones` con `dedupe_key` al acceder cada cliente, no como envío masivo.
+- Código activo de la interfaz: `assets/js/ayuda/21-legal-v2-documents.js`, `assets/js/ayuda/04-client-notifications-realtime.js` y versiones nuevas de caché en `ayuda.html`.
+- Revisiones efectuadas: sintaxis de JavaScript, conexiones a aviso y notificación, estado activo de Edge Functions, RLS y preservación de decisiones históricas. Falta la comprobación final desde sesiones móviles de distintos clientes.
+- **Advertencia operativa:** el rechazo queda registrado, pero **el bloqueo automático de nuevas contrataciones o renovaciones todavía no está integrado** en Admin. Por ahora GOXION debe respetar esta condición operativamente al renovar servicios. No se afectan periodos pagados.
