@@ -375,6 +375,9 @@
      if(current!==token())throw Error("La sesión cambió. Inicia sesión otra vez.");
      serverState={...serverState,...updated};
      pendingOperation=null;showState();dlg.element.close();
+     window.dispatchEvent(new CustomEvent("goxion:legal-state",{detail:{
+       estado:serverState?.estado||"pendiente",acceso:serverState?.acceso||null
+     }}));
      window.GOXION_CLIENT_NOTIFICATIONS?.refresh?.();
    }catch(error){feedback.textContent=String(error?.message||error);}
    finally{
@@ -395,6 +398,9 @@
      if(current!==token())return null;
      lastCheckedAt=Date.now();
      serverState=state;showState();
+     window.dispatchEvent(new CustomEvent("goxion:legal-state",{detail:{
+       estado:state.estado,acceso:state.acceso||null
+     }}));
      window.GOXION_CLIENT_NOTIFICATIONS?.refresh?.();
      if(state.habilitado&&state.estado==="pendiente")tryOffer();
      else{openQueued=false;clearTimeout(retryTimer);clearTimeout(remindTimer);}
@@ -423,6 +429,9 @@
  function logout(){
    clearTimeout(retryTimer);clearTimeout(remindTimer);openQueued=false;activeToken="";lastCheckedAt=0;
    serverState=null;pendingOperation=null;showState();
+   window.dispatchEvent(new CustomEvent("goxion:legal-state",{detail:{
+     estado:"sin_activar",acceso:null
+   }}));
    if(dialog?.element.open)dialog.element.close();
  }
  function setup(){
@@ -433,7 +442,8 @@
    version:VERSION,openDocument,openConsent:()=>void openConsent(true),
    openNotification,
    refresh:()=>checkSession({force:true}),
-   getState:()=>serverState?.estado||"sin_activar"
+   getState:()=>serverState?.estado||"sin_activar",
+   getAccessState:()=>serverState?.acceso||null
  });
  window.addEventListener("goxion:client-ready",()=>void checkSession({force:true}));
  window.addEventListener("focus",()=>{if(!document.hidden)void checkSession({force:true});});
