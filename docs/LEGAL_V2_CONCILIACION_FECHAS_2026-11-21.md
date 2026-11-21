@@ -1,4 +1,4 @@
-# GOXION · Conciliación de coberturas para reglas legales 2.0
+> **DOCUMENTO HISTÓRICO.** Esta versión correspondía al piloto o a una etapa previa. El estado oficial y las reglas desplegadas están en [Lanzamiento general del 21/11/2026](./LEGAL_V2_LANZAMIENTO_GENERAL_2026-11-21.md).\n\n# GOXION · Conciliación de coberturas para reglas legales 2.0
 Fecha: 21 de noviembre de 2026.
 
 ## Resultado verificado en producción
