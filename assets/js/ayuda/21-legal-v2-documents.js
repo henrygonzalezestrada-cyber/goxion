@@ -17,7 +17,7 @@
  let currentDoc="terminos",reader=null,dialog=null,serverState=null,activeToken="";
  let pendingOperation=null,busy=false,openQueued=false,retryTimer=0,remindTimer=0,lastCheckedAt=0;
  const REMIND_AFTER_MS=24*60*60*1000;
- const REFRESH_AFTER_MS=15*60*1000;
+ const REFRESH_AFTER_MS=30*1000;
  const remindKey=()=>serverState?.cliente_id?"goxion:terminos:2.0:recordar:"+serverState.cliente_id:null;
  const remindAfter=()=>{
    const key=remindKey();if(!key)return 0;
@@ -451,7 +451,7 @@
    if(!document.hidden)void checkSession({force:true});
  });
  // Mientras Mi Espacio permanezca abierto, seguir comprobando la decisión.
- setInterval(()=>{if(!document.hidden&&token())void checkSession();},10*60*1000);
+ setInterval(()=>{if(!document.hidden&&token())void checkSession();},30*1000);
  window.addEventListener("goxion:client-logout",logout);
  window.addEventListener("storage",ev=>{if(ev.key===TOKEN_KEY){logout();if(token())void checkSession();}});
  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",setup,{once:true});
