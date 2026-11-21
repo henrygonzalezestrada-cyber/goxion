@@ -254,6 +254,14 @@ Deno.serve(async (req) => {
         : {};
 
     // Contratación nueva inhabilitada exclusivamente en el piloto legal.
+    if(["guardar_gamificacion","guardar_referido","agregar_descuento"].includes(accion)
+      &&String(datos.cliente_id||"")==="091e79b7-c60b-4d50-bb98-a047bfc0dbb4"){
+      const access=await supabase.rpc("goxion_legal_piloto_estado",{p_cliente_id:String(datos.cliente_id)});
+      if(access.error)throw access.error;
+      if(access.data?.bloquea_operaciones===true)
+        return responder({ok:false,codigo:"TERMINOS_RECHAZADOS",
+          error:"No es posible entregar beneficios nuevos mientras el cliente mantenga el rechazo."},409);
+    }
     if(accion==="agregar_servicio_cliente"&&String(datos.cliente_id||"")==="091e79b7-c60b-4d50-bb98-a047bfc0dbb4"){
       const g=await supabase.rpc("goxion_legal_piloto_estado",{p_cliente_id:String(datos.cliente_id)});
       if(g.error)throw g.error;
