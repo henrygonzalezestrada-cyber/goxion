@@ -130,7 +130,7 @@ Deno.serve(async(req)=>{
         externos:"Retiro en plataformas pendiente de tu gestión manual"});
     }
 
-el operador: ninguna baja se ejecuta desde aquí.
+    // Alerta SOLO LECTURA para el operador: ninguna baja se ejecuta desde aquí.
     // La fecha de incumplimiento y el saldo pertenecen exclusivamente al cargo.
     if(accion==="listar_prorrogas_incumplidas"){
       const hoy=new Intl.DateTimeFormat("sv-SE",{timeZone:"America/Mexico_City",
