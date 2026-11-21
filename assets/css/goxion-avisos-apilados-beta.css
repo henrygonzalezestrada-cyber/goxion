@@ -103,7 +103,16 @@ body.gx-stack-beta-active{overflow:hidden!important}
  background:#252135;color:#e4dff0;border:1px solid rgba(181,154,255,.28);border-radius:18px;
  padding:12px 15px;font:650 11px/1.4 Poppins,system-ui,sans-serif;
  box-shadow:0 11px 28px rgba(0,0,0,.38);cursor:pointer}
-.gx-stack-beta button:focus-visible,.gx-stack-beta-launcher:focus-visible{outline:2px solid #72e8f4;outline-offset:3px}
+/* Safari táctil: jamás dibujar el aro de selección causado por foco programático.
+   Solo el teclado físico obtiene un indicador de foco explícito. */
+.gx-stack-beta:focus{outline:0!important}
+.gx-stack-beta button:focus,.gx-stack-beta .gx-stack-beta-scroll:focus{outline:0!important}
+.gx-stack-beta[data-input="keyboard"] button:focus-visible,
+.gx-stack-beta[data-input="keyboard"] .gx-stack-beta-scroll:focus-visible{
+ outline:2px solid #72e8f4!important;outline-offset:3px;
+}
+.gx-stack-beta-launcher:focus:not(:focus-visible){outline:0}
+.gx-stack-beta-launcher:focus-visible{outline:2px solid #72e8f4;outline-offset:3px}
 @media(max-height:660px){
  .gx-stack-beta-scene{height:min(91dvh,690px)}
  .gx-stack-beta-terms{padding:19px 21px 16px}
