@@ -646,6 +646,25 @@ Deno.serve(async (req) => {
       accion ===
       "editar_servicio_cliente"
     ) {
+      // La baja legal confirmada no permite reactivar un contrato antiguo.
+      // La aceptación futura exige un servicio NUEVO, no revivir el anterior.
+      if(datos.activo===true){
+        const serviceId=String(datos.id||"");
+        const existing=await supabase.from("cliente_servicios")
+          .select("id,cliente_id,activo").eq("id",serviceId).maybeSingle();
+        if(existing.error)throw existing.error;
+        if(existing.data?.cliente_id==="091e79b7-c60b-4d50-bb98-a047bfc0dbb4"&&existing.data?.activo!==true){
+          const legal=await supabase.rpc("goxion_legal_piloto_estado",{p_cliente_id:String(existing.data.cliente_id)});
+          if(legal.error)throw legal.error;
+          const history=await supabase.from("goxion_legal_bajas_piloto")
+            .select("id").eq("cliente_id",String(existing.data.cliente_id))
+            .eq("version","2.0").maybeSingle();
+          if(history.error)throw history.error;
+          if(legal.data?.bloquea_operaciones===true||history.data)
+            return responder({ok:false,codigo:"CONTRATO_HISTORICO_NO_REACTIVABLE",
+              error:"No es posible reactivar un servicio de un contrato anterior. Se requiere una nueva contratación después de aceptar los términos."},409);
+        }
+      }
       const id =
         String(datos.id ?? "").trim();
 
