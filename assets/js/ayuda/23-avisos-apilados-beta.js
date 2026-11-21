@@ -26,6 +26,10 @@
   const safe=()=>isTest()&&!window.GOXION_LEGAL_V2?.getAccessState?.()?.restringido;
   let overlay=null,launcher=null,shown=false,open=false,stage="terms",savedFocus=null,scrollTop=0;
   let tries=0,retry=0;
+  // Movimiento ambiental: no debe competir con la lectura del cliente.
+  let autoFrame=0,autoDelay=0,autoLast=0,loopHeight=0,manualScroll=false;
+  let keyboardInput=false;
+  const reducedMotion=()=>Boolean(window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches);
   const $=(q,root=document)=>root.querySelector(q);
   const make=(tag,cls,txt)=>{
     const el=document.createElement(tag);
@@ -44,6 +48,7 @@
     overlay=make("div","gx-stack-beta");
     overlay.id="gx-stack-beta";
     overlay.hidden=true;
+    overlay.tabIndex=-1;
     overlay.setAttribute("aria-label","Demostración de tarjetas apiladas");
     overlay.innerHTML=[
       '<div class="gx-stack-beta-scene">',
@@ -86,6 +91,15 @@
       '</div>'
     ].join("");
     document.body.append(overlay);
+    // iPhone: no forzar foco sobre botones al abrir la tarjeta.
+    // Los indicadores de foco se reservan para navegación real con teclado.
+    overlay.dataset.input="pointer";
+    overlay.addEventListener("pointerdown",()=>{
+      keyboardInput=false;overlay.dataset.input="pointer";
+    },{passive:true});
+    overlay.addEventListener("touchstart",()=>{
+      keyboardInput=false;overlay.dataset.input="pointer";
+    },{passive:true});
     overlay.addEventListener("click",event=>{
       const btn=event.target.closest?.("button");
       if(btn?.hasAttribute("data-beta-accept"))choose("accept");
@@ -101,6 +115,7 @@
       }
     });
     overlay.addEventListener("keydown",event=>{
+      keyboardInput=true;overlay.dataset.input="keyboard";
       if(event.key==="Escape"){
         event.preventDefault();
         if(stage==="terms")choose("later");
@@ -119,18 +134,94 @@
         event.preventDefault();controls[0].focus();
       }
     });
+    const scroll=$(".gx-stack-beta-scroll",overlay);
+    const claimManual=()=>takeControl();
+    scroll.addEventListener("touchstart",claimManual,{passive:true});
+    scroll.addEventListener("pointerdown",claimManual,{passive:true});
+    scroll.addEventListener("wheel",claimManual,{passive:true});
+    scroll.addEventListener("keydown",event=>{
+      if(["ArrowDown","ArrowUp","PageDown","PageUp","Home","End"," "].includes(event.key))
+        takeControl();
+    });
+  }
+
+  function syncStage(next){
+    stage=next;overlay.dataset.stage=next;
+    for(const name of ["terms","news","rejected"]){
+      const panel=$(".gx-stack-beta-"+name,overlay);
+      const active=name===next;
+      panel.inert=!active;
+      panel.setAttribute("aria-hidden",String(!active));
+    }
+  }
+  function stopAuto(removeDuplicates=true){
+    cancelAnimationFrame(autoFrame);autoFrame=0;
+    clearTimeout(autoDelay);autoDelay=0;autoLast=0;
+    const scroll=overlay&&$(".gx-stack-beta-scroll",overlay);
+    if(removeDuplicates&&scroll){
+      // Misma novedad y mismo desplazamiento visual al pasar al control manual.
+      const position=loopHeight>0?scroll.scrollTop%loopHeight:scroll.scrollTop;
+      scroll.querySelectorAll("[data-beta-duplicate]").forEach(node=>node.remove());
+      scroll.scrollTop=Math.min(position,Math.max(0,scroll.scrollHeight-scroll.clientHeight));
+      loopHeight=0;
+    }
+  }
+  function takeControl(){
+    if(manualScroll||stage!=="news")return;
+    manualScroll=true;
+    stopAuto(true);
+  }
+  function tickAuto(time){
+    if(!open||stage!=="news"||manualScroll||document.hidden||reducedMotion()){
+      autoFrame=0;autoLast=0;return;
+    }
+    const scroll=$(".gx-stack-beta-scroll",overlay);
+    if(!scroll||loopHeight<=0){autoFrame=0;return;}
+    if(autoLast){
+      const step=Math.min(time-autoLast,45)*0.016; // 16 px/s; pequeño y continuo.
+      if(Number.isFinite(step)&&step>0)scroll.scrollTop+=step;
+      if(scroll.scrollTop>=loopHeight)scroll.scrollTop-=loopHeight;
+    }
+    autoLast=time;
+    autoFrame=requestAnimationFrame(tickAuto);
+  }
+  function startAuto(){
+    if(!open||stage!=="news"||manualScroll||document.hidden||reducedMotion())return;
+    const scroll=$(".gx-stack-beta-scroll",overlay);
+    if(!scroll)return;
+    if(!loopHeight){
+      const originals=[...scroll.querySelectorAll(".gx-stack-beta-news-item:not([data-beta-duplicate])")];
+      if(originals.length!==news.length||scroll.scrollHeight<=scroll.clientHeight)return;
+      loopHeight=originals.reduce((sum,item)=>sum+item.getBoundingClientRect().height,0);
+      if(loopHeight<=0)return;
+      // Clones presentacionales: no duplican avisos leídos ni elementos accesibles.
+      for(let round=0;round<2;round++){
+        for(const item of originals){
+          const clone=item.cloneNode(true);
+          clone.setAttribute("aria-hidden","true");
+          clone.dataset.betaDuplicate="true";
+          clone.removeAttribute("data-beta-item");
+          scroll.append(clone);
+        }
+      }
+    }
+    if(!autoFrame){autoLast=0;autoFrame=requestAnimationFrame(tickAuto);}
+  }
+  function scheduleAuto(){
+    if(manualScroll||reducedMotion())return;
+    clearTimeout(autoDelay);
+    autoDelay=setTimeout(()=>{autoDelay=0;startAuto();},1250);
   }
 
   function reset(){
     if(!overlay)return;
-    overlay.dataset.stage="terms";stage="terms";
-    $(".gx-stack-beta-news",overlay).setAttribute("aria-hidden","true");
-    $(".gx-stack-beta-rejected",overlay).setAttribute("aria-hidden","true");
-    $(".gx-stack-beta-terms",overlay).setAttribute("aria-hidden","false");
+    stopAuto(true);manualScroll=false;
+    syncStage("terms");
     $(".gx-stack-beta-scroll",overlay).scrollTop=0;
     $("[data-beta-status]",overlay).textContent="";
     $(".gx-stack-beta-peek",overlay).hidden=newsSeen();
-    $(".gx-stack-beta-terms button",overlay)?.focus({preventScroll:true});
+    // Foco en la superficie sin contorno, nunca preseleccionar un botón.
+    if(open)overlay.focus({preventScroll:true});
   }
   function show(){
     if(open||!safe())return;
@@ -143,25 +234,24 @@
     document.body.classList.add("gx-stack-beta-active");
     overlay.hidden=false;launcher.hidden=true;
     reset();
-    setTimeout(()=>{if(open)$("[data-beta-accept]",overlay)?.focus({preventScroll:true})},120);
   }
   function choose(kind){
     if(!open||stage!=="terms")return;
     if(kind==="accept"||kind==="later"){
       if(newsSeen()){hide();return;}
-      stage="news";overlay.dataset.stage="news";
-      $(".gx-stack-beta-news",overlay).setAttribute("aria-hidden","false");
-      $(".gx-stack-beta-terms",overlay).setAttribute("aria-hidden","true");
+      syncStage("news");manualScroll=false;
+      stopAuto(true);
+      // La transición de tarjeta termina antes de iniciar el scroll ambiental.
+      scheduleAuto();
       $("[data-beta-status]",overlay).textContent=kind==="later"
         ?"Términos pospuestos; continúa la tarjeta independiente de novedades."
         :"Novedades disponibles. Desliza para consultar las seis mejoras.";
-      setTimeout(()=>{if(open&&stage==="news")$(".gx-stack-beta-scroll",overlay)?.focus({preventScroll:true})},350);
+      overlay.focus({preventScroll:true});
     }else{
-      stage="rejected";overlay.dataset.stage="rejected";
-      $(".gx-stack-beta-rejected",overlay).setAttribute("aria-hidden","false");
-      $(".gx-stack-beta-terms",overlay).setAttribute("aria-hidden","true");
+      stopAuto(true);
+      syncStage("rejected");
       $("[data-beta-status]",overlay).textContent="Las novedades se retiraron de la cola.";
-      setTimeout(()=>{if(open&&stage==="rejected")$("[data-beta-restart]",overlay)?.focus({preventScroll:true})},330);
+      overlay.focus({preventScroll:true});
     }
   }
   function dismissNews(){
@@ -173,12 +263,13 @@
   }
   function hide(){
     if(!overlay||!open)return;
+    stopAuto(true);
     open=false;overlay.hidden=true;
     document.body.classList.remove("gx-stack-beta-active");
     if(safe())launcher.hidden=false;
     const focus=savedFocus;savedFocus=null;
-    if(focus?.isConnected&&!focus.closest("#gx-stack-beta"))focus.focus({preventScroll:true});
-    else if(launcher&&!launcher.hidden)launcher.focus({preventScroll:true});
+    if(keyboardInput&&focus?.isConnected&&!focus.closest("#gx-stack-beta"))
+      focus.focus({preventScroll:true});
     window.scrollTo?.(0,scrollTop);
   }
   function cancel(){
@@ -210,7 +301,9 @@
     if(event.key===TOKEN_KEY){if(isTest())launch();else cancel();}
   });
   document.addEventListener("visibilitychange",()=>{
-    if(!document.hidden&&isTest()&&!shown)launch();
+    if(document.hidden){cancelAnimationFrame(autoFrame);autoFrame=0;autoLast=0;return;}
+    if(open&&stage==="news"&&!manualScroll)scheduleAuto();
+    else if(isTest()&&!shown)launch();
   });
   if(document.readyState==="loading"){
     document.addEventListener("DOMContentLoaded",()=>{if(isTest())launch();},{once:true});
