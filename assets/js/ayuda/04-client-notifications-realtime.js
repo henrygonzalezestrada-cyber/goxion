@@ -327,6 +327,10 @@
         if(event.target.closest(".gx-client-notif-item-action"))return;
         const shell=node.closest(".gx-client-notif-swipe");
         if(shell && Number(shell.dataset.gxSuppressClickUntil||0)>Date.now())return;
+        // Tocando el aviso legal también se abre el consentimiento,
+        // sin depender exclusivamente del pequeño botón de acción.
+        const button=node.querySelector(".gx-client-notif-item-action[data-gx-notif-action='legal']");
+        if(button){void goAction(button);return;}
         if(node.classList.contains("unread"))markOne(node.dataset.gxNotifId,node.dataset.gxNotifSource);
       });
     });
@@ -545,8 +549,17 @@
     closeSheet();
 
     if(action==="legal"){
-      // El documento continúa disponible después de marcar la notificación.
-      setTimeout(()=>window.GOXION_LEGAL_V2?.openDocument(ref||"terminos"),220);
+      // Si está pendiente/rechazado, abrir decisión; si ya aceptó, abrir lector.
+      setTimeout(()=>{
+        const legal=window.GOXION_LEGAL_V2;
+        if(!legal?.openNotification){
+          console.warn("GOXION: módulo de términos aún no disponible");
+          return;
+        }
+        Promise.resolve(legal.openNotification()).catch(error=>{
+          console.warn("GOXION: no se pudo verificar la decisión legal",String(error?.message||error).slice(0,130));
+        });
+      },300);
       return;
     }
     if(action==="account"){
