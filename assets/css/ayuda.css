@@ -14312,3 +14312,48 @@ body.gx-promo-morph-open{overflow:hidden!important}
     rotate:0deg!important;
     animation:none!important;
 }
+
+
+/* =========================================================
+   GOXION · MI ESPACIO / ARMONÍA DEL MATERIAL — propuesta
+   ALCANCE EXCLUSIVO: tono y transparencia del relleno.
+   Cristal neutro aprobado en el laboratorio con control al 15%:
+   background rgba(8,8,12,.371). Ese 15% es un control, NO alpha .15.
+
+   No modificar: blur heredado, bordes, sombras, resaltados, acentos
+   de estado, geometría, animación, JS, transiciones y comportamiento.
+   Excluir superficies con promociones y máscaras de efectos.
+   ========================================================= */
+
+/* Misiones / Referidos — tarjeta, estados y copia durante el morph. */
+#view-dashboard #gamif-grid .gx-gamif-card,
+#view-dashboard #gamif-grid .gx-gamif-card.pulse-referral,
+#view-dashboard #gamif-grid .gx-gamif-card.gx-referral-ready,
+#view-dashboard #gamif-grid .gx-gamif-card.pulse-mission,
+.gx-gamif-morph-ghost.gx-gamif-card {
+    background-color: rgba(8, 8, 12, .371) !important;
+}
+
+/* Misiones / Referidos — panel expandido existente. */
+#view-dashboard #gamif-expanded-referral,
+#view-dashboard #gamif-expanded-coupon {
+    background-color: rgba(8, 8, 12, .371) !important;
+}
+
+/* Servicios del cliente — misma familia cromática, sin tocar
+   el contraste/relieve específico de cada estado. */
+#view-dashboard .gx-service-manage-card {
+    background-color: rgba(8, 8, 12, .371);
+}
+
+/* Catálogo ordinario — mini tarjetas sin promociones. */
+#view-catalogo .gx-catalog-mini-card:not(.is-popular-featured):not(.is-popular-soft):not(.is-saving-soft):not(.is-new-featured):not(.is-new-soft) {
+    background-color: rgba(8, 8, 12, .371);
+}
+
+/* Catálogo desplegable — solo su superficie neutral.
+   No tocar las tarjetas promocionales, sus máscaras o bordes
+   animados, ni el contenido expandible o su animación de altura. */
+#view-catalogo #catalog-container .brand-card:not(.has-promo) {
+    background-color: rgba(8, 8, 12, .371);
+}
