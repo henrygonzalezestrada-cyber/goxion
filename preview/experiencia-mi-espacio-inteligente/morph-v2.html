@@ -137,8 +137,8 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .after{margin:54px 6px 0}
 .after h2{font-size:14px;font-weight:700;letter-spacing:-.01em;margin:0 0 6px}
 .after p{font-size:11px;color:#8c9caf;margin:0}
-.demo-toggle{position:fixed;z-index:10;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);border:1px solid rgba(107,209,222,.24);background:rgba(8,18,29,.93);color:#e3f9ff;border-radius:25px;min-height:44px;padding:0 19px;white-space:nowrap;box-shadow:0 10px 30px rgba(0,0,0,.45);font-size:11px;font-weight:600;backdrop-filter:blur(18px)}
-.demo-panel{position:fixed;z-index:10;left:50%;bottom:calc(72px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(370px,calc(100vw - 24px));padding:19px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.97);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px)}
+.demo-toggle{position:relative;display:block;margin:35px auto 8px;border:1px solid rgba(107,209,222,.18);background:rgba(8,18,29,.78);color:#d5eaf3;border-radius:25px;min-height:44px;padding:0 20px;white-space:nowrap;font-size:11px;font-weight:600;backdrop-filter:blur(12px)}
+.demo-panel{position:fixed;z-index:20;left:50%;top:50%;transform:translate(-50%,-50%);width:min(370px,calc(100vw - 24px));max-height:80dvh;overflow-y:auto;overscroll-behavior:contain;padding:19px;border:1px solid rgba(147,175,210,.2);border-radius:23px;background:rgba(12,17,32,.98);box-shadow:0 26px 70px rgba(0,0,0,.5);backdrop-filter:blur(23px)}
 .demo-panel h2{font-size:15px;margin:0 0 5px;letter-spacing:-.02em}
 .demo-panel p{font-size:10px;line-height:1.55;color:#aab7c9;margin:0 0 15px}
 .demo-panel select{width:100%;min-height:45px;border:1px solid rgba(129,161,204,.26);border-radius:13px;background:#151e2f;color:#f4f6ff;padding:0 12px;font-weight:600;font-size:12px}
@@ -192,72 +192,87 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .gxc-heading h2{font-size:15px;letter-spacing:-.025em;line-height:1.25;font-weight:700;margin:0}
 .gxc-heading small{color:#91a3b6;font-size:9px;line-height:1.3;text-align:right}
 /* Propuesta aislada: tres beneficios en fila, un panel expandible. */
-.gxb-wrap{margin:12px 2px 0}
-.gxb-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-.gxb-lab-toggle{display:flex;flex-direction:column;gap:5px;margin:13px 0}
-.gxb-lab-toggle button{min-height:40px;border-radius:13px;border:1px solid rgba(127,208,210,.21);background:rgba(67,142,150,.11);color:#c7e8e8;font-size:10px;font-weight:600}
-.gxb-lab-toggle button[aria-pressed="true"]{background:rgba(90,206,202,.17);border-color:rgba(137,234,220,.35);color:#e3f8f5}
-.gxb-lab-toggle span{font-size:9.5px;color:#92a5b6;line-height:1.4}
+/* GOXION Rewards · movimiento compartido, módulos sin bordes recargados */
+.gxb-wrap{margin:14px 2px 0;position:relative}
+.gxb-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
 .gxc-surface{background:rgba(8,8,12,.371);-webkit-backdrop-filter:blur(11.75px) saturate(1);backdrop-filter:blur(11.75px) saturate(1);border:1px solid rgba(255,255,255,.035);box-shadow:0 15px 36px rgba(0,0,0,.23),inset 0 1px rgba(255,255,255,.05);color:#f4f7ff}
-.gxb-tile{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:106px;padding:12px 10px 11px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:4px;border-radius:19px;text-align:left;transition:background-color .24s,border-color .24s,transform .24s}
-.gxb-tile::before{content:attr(data-watermark);position:absolute;z-index:0;right:8px;top:8px;font-size:30px;line-height:1;opacity:1;pointer-events:none;user-select:none;transform:rotate(-9deg) scale(1);filter:none}
-.gxb-tile > *{position:relative;z-index:1}
-.gxb-tile[data-ready="true"]{border-color:rgba(93,221,218,.22);box-shadow:0 15px 36px rgba(0,0,0,.23),0 0 20px rgba(89,211,219,.08)}
-.gxb-tile[data-ready="true"] .gxb-number{color:#9bf0e8}
-.gxb-tile[data-ready="true"]::before{animation:gxbCelebration 2.3s cubic-bezier(.4,0,.2,1) 2}
-.gxb-tile[data-ready="true"]{animation:gxbMilestoneBreathe 2.3s cubic-bezier(.4,0,.2,1) 2}
-@keyframes gxbCelebration{
- 0%,100%{transform:rotate(-9deg) scale(1);opacity:1}
- 50%{transform:rotate(-5deg) scale(1.13);opacity:1}
+.gxb-tile{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:128px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:3px;text-align:left;padding:14px 12px 14px;border-radius:22px;transition:background .22s,transform .17s,border-color .22s;box-shadow:0 10px 26px rgba(0,0,0,.11);border-color:rgba(255,255,255,.045)}
+.gxb-tile:active{transform:scale(.976)}
+.gxb-tile[data-ready="true"]{border-color:rgba(75,223,202,.24);background:rgba(11,31,32,.48)}
+.gxb-emoji{position:absolute;top:11px;right:11px;display:block;font-size:31px;line-height:1;opacity:1;pointer-events:none;user-select:none;transform:rotate(-8deg);transform-origin:center}
+.gxb-tile[data-ready="true"] .gxb-emoji{animation:gxbCelebrate 2.2s cubic-bezier(.2,.8,.2,1) 2}
+@keyframes gxbCelebrate{0%,100%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(1deg) scale(1.13)}}
+.gxb-label{font-size:11px;font-weight:600;color:#ced8e2;line-height:1.25;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;margin-top:25px}
+.gxb-number{font-weight:700;font-size:clamp(21px,5.9vw,26px);line-height:1.17;letter-spacing:-.045em;font-variant-numeric:tabular-nums;color:#f7fbff}
+.gxb-unit{font-size:10px;line-height:1.35;color:#afbccc;white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+.gxb-mini-progress{display:block;width:100%;height:4px;min-height:4px;flex:0 0 4px;overflow:hidden;border-radius:99px;background:rgba(237,246,255,.10);margin-top:10px}
+.gxb-mini-progress > span{display:block;position:relative;overflow:hidden;height:100%;width:var(--gxb-pct,0%);background:linear-gradient(90deg,#8163ef,#17d8e3);border-radius:inherit;transform-origin:left;transform:scaleX(0);will-change:transform}
+.gxb-wrap.is-visible .gxb-mini-progress > span{transform:scaleX(1);transition:transform .92s cubic-bezier(.16,1,.3,1),width .62s cubic-bezier(.16,1,.3,1)}
+.gxb-mini-progress > span::after,.gxb-meter > span::after{content:"";position:absolute;inset:0;width:46%;opacity:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.64),transparent);transform:translateX(-135%);pointer-events:none}
+.gxb-wrap.is-visible .gxb-mini-progress > span::after{animation:gxbSweep 1.45s 1.05s ease-out 1}
+.gxb-wrap.is-visible .gxb-tile:nth-child(2) .gxb-mini-progress > span::after{animation-delay:1.18s}
+.gxb-wrap.is-visible .gxb-tile:nth-child(3) .gxb-mini-progress > span::after{animation-delay:1.31s}
+@keyframes gxbSweep{0%{opacity:0;transform:translateX(-135%)}25%{opacity:.8}83%{opacity:.58}100%{opacity:0;transform:translateX(315%)}}
+.gxb-panel{position:relative;isolation:isolate;overflow:hidden;min-width:0;min-height:300px;margin:0;border-radius:26px;padding:23px 21px 22px;background:linear-gradient(108deg,rgba(10,12,19,.89),rgba(9,13,19,.79))!important;border:1px solid rgba(150,209,225,.09);box-shadow:0 19px 43px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(12px) saturate(1);backdrop-filter:blur(12px) saturate(1)}
+.gxb-panel::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 91% 99%,rgba(64,199,204,.055),transparent 43%)}
+.gxb-panel-inner{position:relative;z-index:1;min-width:0}
+.gxb-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.gxb-eyebrow{font-size:10px;line-height:1.3;color:#8ec5ca;letter-spacing:.11em;font-weight:700}
+.gxb-panel h3{font-size:clamp(19px,5.3vw,24px);line-height:1.18;letter-spacing:-.043em;font-weight:700;margin:9px 0 0;color:#f7fbff;max-width:92%}
+.gxb-dismiss{min-width:44px;width:44px;height:44px;display:grid;place-items:center;border-radius:99px;border:0;background:rgba(255,255,255,.075);color:#eaf2f9;font-size:22px;line-height:1;flex:0 0 auto}
+.gxb-copy{font-size:12px;line-height:1.55;color:#bfcedb;margin:12px 0 22px;max-width:94%}
+.gxb-metric-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+.gxb-metric-head span{font-size:11px;color:#afbece}
+.gxb-metric-head strong{font-size:13px;font-weight:700;color:#eff9ff;font-variant-numeric:tabular-nums}
+.gxb-meter{height:6px;width:100%;border-radius:99px;background:rgba(231,246,255,.105);overflow:hidden}
+.gxb-meter > span{display:block;position:relative;height:100%;background:linear-gradient(90deg,#8461ee,#04dee8);border-radius:inherit;transform-origin:left}
+.gxb-note{font-size:11px;line-height:1.55;color:#a5b7c6;margin:12px 0 0}
+.gxb-tasks{list-style:none;margin:0;padding:0}
+.gxb-tasks li{min-height:40px;display:flex;align-items:center;justify-content:space-between;gap:9px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.045);font-size:11.5px;color:#d8e2ed}
+.gxb-tasks li:last-child{border:0}
+.gxb-tasks small{font-size:10px;white-space:nowrap;color:#7ddacb}
+.gxb-tasks li[data-status="pending"] small{color:#cfbfdb}
+.gxb-foot{position:relative;z-index:1;display:flex;align-items:center;gap:12px;min-height:62px;margin-top:22px;padding-right:min(25vw,105px)}
+.gxb-action{min-height:44px;border:0;border-radius:22px;background:rgba(255,255,255,.095);padding:10px 17px;color:#9ae5df;font-size:11px;font-weight:700;white-space:normal;text-align:center;line-height:1.35}
+.gxb-rules{border:0;background:transparent;padding:8px 0;color:#a5bed0;font-size:10px;font-weight:600;text-decoration:underline;text-underline-offset:3px;min-height:44px}
+.gxb-foot-action{display:flex;align-items:center;flex-wrap:wrap;gap:4px 13px;max-width:100%}
+.gxb-panel-emoji{position:absolute;z-index:0;bottom:11px;right:11px;display:block;font-size:clamp(100px,28vw,124px);line-height:1;opacity:.34;pointer-events:none;user-select:none;transform:rotate(-12deg);transform-origin:center}
+.gxb-rule-note{position:relative;z-index:1;margin-top:4px;padding:10px 0 0;font-size:10.5px;line-height:1.55;color:#adbecc;border-top:1px solid rgba(255,255,255,.055)}
+.gxb-feedback{min-height:15px;display:block;color:#84d7d4;font-size:10px;font-weight:600;line-height:1.5;margin-top:5px}
+.gxb-preview-label{display:block;font-size:10px;line-height:1.4;color:#899eb3;margin:14px 3px 0}
+.gxb-lab-toggle{display:grid;gap:5px;margin:12px 0 5px}
+.gxb-lab-toggle button{min-height:44px;border-radius:14px;border:1px solid rgba(127,208,210,.21);background:rgba(67,142,150,.11);color:#c7e8e8;font-size:11px;font-weight:600}
+.gxb-lab-toggle button[aria-pressed=true]{background:rgba(90,206,202,.17);border-color:rgba(137,234,220,.35);color:#e3f8f5}
+.gxb-lab-toggle span{font-size:10px;color:#9caec0;line-height:1.4}
+.gxb-panel:focus-visible,.gxb-tile:focus-visible,.gxb-dismiss:focus-visible,.gxb-action:focus-visible,.gxb-rules:focus-visible{outline:2px solid #6de0ef;outline-offset:3px}
+.gxb-morph-surface,.gxb-morph-emoji{position:fixed;z-index:15;pointer-events:none;user-select:none}
+.gxb-morph-surface{border:1px solid rgba(161,208,229,.14);box-shadow:0 16px 34px rgba(0,0,0,.27);background:rgba(11,15,23,.91)}
+.gxb-morph-emoji{display:block;line-height:1;text-align:center;white-space:nowrap;transform-origin:center}
+@media(max-width:380px){
+ .gxb-row{gap:7px}
+ .gxb-tile{min-height:125px;padding:13px 10px 12px;border-radius:19px}
+ .gxb-emoji{font-size:29px;right:8px;top:9px}
+ .gxb-label{font-size:10.5px}
+ .gxb-number{font-size:23px}
+ .gxb-unit{font-size:9.5px}
+ .gxb-panel{padding:20px 18px 20px}
+ .gxb-foot{padding-right:94px;gap:9px}
 }
-@keyframes gxbMilestoneBreathe{
- 0%,100%{box-shadow:0 15px 36px rgba(0,0,0,.23),0 0 0 rgba(89,211,219,0)}
- 50%{box-shadow:0 15px 36px rgba(0,0,0,.23),0 0 23px rgba(89,211,219,.12)}
+@media(max-width:315px){
+ .gxb-row{gap:5px}
+ .gxb-tile{min-height:123px;padding:12px 7px 11px}
+ .gxb-emoji{font-size:25px;right:6px}
+ .gxb-label{font-size:10px}
+ .gxb-number{font-size:21px}
+ .gxb-unit{font-size:9px}
+ .gxb-panel-emoji{font-size:92px;bottom:12px;right:7px}
+ .gxb-foot{padding-right:79px}
 }
-.gxb-tile[aria-expanded=true]{background:rgba(22,26,30,.52);border-color:rgba(110,215,218,.18)}
-.gxb-tile:active{transform:scale(.988)}
-.gxb-label{font-size:10px;font-weight:600;color:#c2d1dc;line-height:1.3;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.gxb-number{font-weight:700;font-size:clamp(18px,5.3vw,23px);line-height:1.2;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
-.gxb-tile[aria-expanded=true] .gxb-number{color:#8de0e4}
-.gxb-unit{font-size:9px;color:#9dabb9;line-height:1.3;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}
-.gxb-mini-progress{width:100%;height:4px;min-height:4px;flex:0 0 4px;overflow:hidden;border-radius:99px;background:rgba(241,247,255,.085);margin-top:8px}
-.gxb-mini-progress > span{display:block;position:relative;height:100%;width:var(--gxb-pct,0%);border-radius:inherit;background:linear-gradient(90deg,#7c4dff,#00e3eb);transform-origin:left center;transform:scaleX(0);will-change:transform}
-.gxb-wrap.is-visible .gxb-mini-progress > span{transform:scaleX(1);transition:transform .98s cubic-bezier(.16,1,.3,1),width .65s cubic-bezier(.16,1,.3,1)}
-.gxb-mini-progress > span::after,.gxb-progress span::after{content:"";position:absolute;inset:0;width:45%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.57),transparent);opacity:0;transform:translateX(-130%);pointer-events:none}
-.gxb-wrap.is-visible .gxb-mini-progress > span::after{animation:gxbSweep 1.6s 1.03s cubic-bezier(.2,.7,.3,1) 1}
-.gxb-wrap.is-visible [data-gxb="referral"] .gxb-mini-progress > span::after{animation-delay:1.18s}
-.gxb-wrap.is-visible [data-gxb="mission"] .gxb-mini-progress > span::after{animation-delay:1.33s}
-@keyframes gxbSweep{0%{transform:translateX(-130%);opacity:0}20%{opacity:.86}80%{opacity:.58}100%{transform:translateX(300%);opacity:0}}
-.gxb-ready-caption{display:block;margin:1px 0 0;color:#91e0dd;font-size:9px;line-height:1.25;font-weight:600}
-.gxb-panel{position:relative;isolation:isolate;overflow:hidden;margin-top:9px;padding:20px 19px 17px;border-radius:22px;min-width:0}
-.gxb-panel::before{content:attr(data-watermark);position:absolute;top:auto;bottom:-15px;right:-10px;z-index:0;pointer-events:none;user-select:none;font-size:clamp(106px,25vw,148px);line-height:1;opacity:.23;transform:rotate(-13deg)}
-.gxb-panel > *{position:relative;z-index:1}
-.gxb-panel.is-opening::before{animation:gxbPanelMark .58s cubic-bezier(.18,.85,.2,1) both}
-@keyframes gxbPanelMark{from{opacity:0;transform:translate(18px,20px) rotate(-20deg) scale(.86)}to{opacity:.23;transform:translate(0,0) rotate(-13deg) scale(1)}}
-.gxb-head{display:flex;align-items:start;justify-content:space-between;gap:12px}
-.gxb-eyebrow{font-size:9px;color:#a8c9cf;font-weight:700;letter-spacing:.09em}
-.gxb-panel h3{font-size:18px;line-height:1.25;letter-spacing:-.035em;margin:7px 0 0}
-.gxb-dismiss{flex:0 0 auto;min-width:36px;height:36px;border-radius:99px;border:0;background:rgba(255,255,255,.08);color:#ecf4f6;font-size:20px}
-.gxb-copy{font-size:11px;line-height:1.6;color:#b7c5d2;margin:10px 0 17px}
-.gxb-progress-header{display:flex;justify-content:space-between;align-items:baseline;gap:9px;font-size:10px;color:#a0afbe;margin-bottom:10px}
-.gxb-progress-header strong{font-size:11px;color:#e1eef5;font-weight:600}
-.gxb-progress{height:4px;border-radius:99px;overflow:hidden;background:rgba(225,240,255,.095)}
-.gxb-progress span{display:block;position:relative;height:100%;background:linear-gradient(90deg,#7c4dff,#00dfe9);border-radius:inherit;transform-origin:left center;overflow:hidden}
-.gxb-note{font-size:10px;line-height:1.55;color:#9aabbb;margin:13px 0 0}
-.gxb-tasks{list-style:none;padding:0;margin:0}
-.gxb-tasks li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px 0;font-size:11px;color:#c9d7e0;border-bottom:1px solid rgba(255,255,255,.055)}
-.gxb-tasks li:last-child{border-bottom:0}
-.gxb-tasks small{font-size:10px;color:#86d9de}
-.gxb-tasks li:last-child small{color:#a6b1c1}
-.gxb-disclaimer{font-size:9px;line-height:1.55;color:#8195a8;margin:13px 0 0}
-.gxb-tile:focus-visible,.gxb-dismiss:focus-visible,.gxc-mini:focus-visible{outline:2px solid #6de0ef;outline-offset:3px}
-@media(max-width:350px){.gxb-row{gap:6px}.gxb-tile{min-height:111px;padding:11px 8px 9px;border-radius:16px}.gxb-tile::before{font-size:24px;right:6px;top:7px}.gxb-label{font-size:9px;padding-top:20px}.gxb-number{font-size:19px}.gxb-unit{font-size:8.5px}.gxb-mini-progress{margin-top:6px}.gxb-panel{padding:18px 15px}.gxb-panel::before{font-size:110px;right:-15px;bottom:-12px}}
 @media(prefers-reduced-motion:reduce){
- .gxb-tile{transition:none!important;animation:none!important}
+ .gxb-tile,.gxb-mini-progress>span{transition:none!important;animation:none!important}
  .gxb-tile:active{transform:none}
- .gxb-tile::before,.gxb-panel::before,.gxb-mini-progress > span::after{animation:none!important}
- .gxb-mini-progress > span{transform:none!important;transition:none!important;will-change:auto}
- .gxb-mini-progress > span::after{opacity:0!important}
+ .gxb-emoji,.gxb-mini-progress>span::after,.gxb-panel-emoji{animation:none!important}
+ .gxb-mini-progress>span{transform:none!important;will-change:auto}
 }
 .gxc-mini-rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:9px}
 .gxc-mini{position:relative;display:grid;grid-template-columns:35px minmax(0,1fr) 16px;gap:9px;align-items:center;padding:10px 9px;min-width:0;min-height:76px;border-radius:16px;text-align:left}
@@ -310,16 +325,33 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 </button>
 </div>
 <div class="glass-test-label">La onda y la luz se desplazan por debajo del cristal</div>
-<section class="gxb-wrap" aria-label="Beneficios de ejemplo">
- <div class="gxb-row" role="group" aria-label="Lealtad, Referidos y Misiones">
-  <button type="button" class="gxb-tile gxc-surface" data-gxb="loyalty" data-watermark="⭐" aria-expanded="false" aria-controls="gxb-panel" aria-label="Lealtad, 3 de 4 pagos"><span class="gxb-label">Lealtad</span><strong class="gxb-number">3/4</strong><span class="gxb-unit">pagos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:75%"></span></span></button>
-  <button type="button" class="gxb-tile gxc-surface" data-gxb="referral" data-watermark="🎁" aria-expanded="false" aria-controls="gxb-panel" aria-label="Referidos, 1 de 3 meses"><span class="gxb-label">Referidos</span><strong class="gxb-number">1/3</strong><span class="gxb-unit">meses</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:33.33%"></span></span></button>
-  <button type="button" class="gxb-tile gxc-surface" data-gxb="mission" data-watermark="🎯" aria-expanded="false" aria-controls="gxb-panel" aria-label="Misiones, 2 de 3 completadas"><span class="gxb-label">Misiones</span><strong class="gxb-number">2/3</strong><span class="gxb-unit">completadas</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:66.67%"></span></span></button>
+<section class="gxb-wrap" aria-label="Tus beneficios, vista de laboratorio">
+ <div class="gxb-row" id="gxb-row" role="group" aria-label="Lealtad, Referidos y Misiones">
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="loyalty" aria-expanded="false" aria-controls="gxb-panel" aria-label="Lealtad, 3 de 4 pagos seguidos, abrir detalle">
+   <span class="gxb-emoji" aria-hidden="true">⭐</span><span class="gxb-label">Lealtad</span><strong class="gxb-number">3/4</strong><span class="gxb-unit">pagos seguidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:75%"></span></span>
+  </button>
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="referral" aria-expanded="false" aria-controls="gxb-panel" aria-label="Referidos, 1 de 3 meses validados, abrir detalle">
+   <span class="gxb-emoji" aria-hidden="true">🎁</span><span class="gxb-label">Referidos</span><strong class="gxb-number">1/3</strong><span class="gxb-unit">meses válidos</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:33.33%"></span></span>
+  </button>
+  <button type="button" class="gxb-tile gxc-surface" data-gxb="mission" aria-expanded="false" aria-controls="gxb-panel" aria-label="Misiones, 2 de 3 completadas, abrir detalle">
+   <span class="gxb-emoji" aria-hidden="true">🎯</span><span class="gxb-label">Misiones</span><strong class="gxb-number">2/3</strong><span class="gxb-unit">completadas</span><span class="gxb-mini-progress" aria-hidden="true"><span style="--gxb-pct:66.67%"></span></span>
+  </button>
  </div>
- <div id="gxb-panel" class="gxb-panel gxc-surface" role="region" aria-label="Detalle del beneficio" hidden>
-  <div class="gxb-head"><div><span id="gxb-eyebrow" class="gxb-eyebrow"></span><h3 id="gxb-title"></h3></div><button id="gxb-dismiss" type="button" class="gxb-dismiss" aria-label="Cerrar detalle">×</button></div>
-  <p id="gxb-copy" class="gxb-copy"></p><div id="gxb-content"></div>
-  <p class="gxb-disclaimer">Datos ficticios para probar el diseño · Sin acciones reales.</p>
+ <div id="gxb-panel" class="gxb-panel gxc-surface" role="region" aria-label="Detalle de beneficio" hidden>
+  <div class="gxb-panel-inner">
+   <div class="gxb-head">
+    <div><span id="gxb-eyebrow" class="gxb-eyebrow"></span><h3 id="gxb-title"></h3></div>
+    <button id="gxb-dismiss" type="button" class="gxb-dismiss" aria-label="Volver a los beneficios">×</button>
+   </div>
+   <p id="gxb-copy" class="gxb-copy"></p>
+   <div id="gxb-content"></div>
+  </div>
+  <div class="gxb-foot">
+   <div class="gxb-foot-action"><button type="button" id="gxb-action" class="gxb-action"></button><button type="button" id="gxb-rules" class="gxb-rules" aria-expanded="false">Condiciones</button></div>
+  </div>
+  <div id="gxb-rule-note" class="gxb-rule-note" hidden></div>
+  <span class="gxb-panel-emoji" id="gxb-panel-emoji" aria-hidden="true">⭐</span>
+  <span id="gxb-feedback" class="gxb-feedback" aria-live="polite"></span>
  </div>
 </section>
 <div class="after"><h2>Tus servicios</h2><p>Consulta tus accesos, beneficios y solicitudes.</p></div>
@@ -337,8 +369,9 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  <p class="gxc-note">En el catálogo desplegable real se conservarán las transformaciones y promociones actuales. Aquí solo se compara el material de las superficies.</p>
 </section>
 </section>
+<button class="demo-toggle" id="demo-toggle" type="button" aria-expanded="false" aria-controls="demo-panel">Probar estados · Laboratorio</button>
+<p class="gxb-preview-label" style="text-align:center">Vista conceptual · Los beneficios utilizan datos de muestra.</p>
 </main>
-<button class="demo-toggle" id="demo-toggle" type="button" aria-expanded="false" aria-controls="demo-panel">Probar estados</button>
 <section class="demo-panel" id="demo-panel" aria-label="Simulador de estados" hidden>
 <h2>Tarjeta dinámica</h2><p>Escenarios ficticios. No se conecta con cuentas, pagos ni notificaciones reales.</p>
 <label for="scenario" class="hint">Situación de prueba</label>
@@ -363,7 +396,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
  <button type="button" data-layout-preset="original" aria-pressed="false">Original</button>
 </div>
 <span class="layout-compare-caption" id="layout-caption">Tarjeta menos alta; acción centrada en la base y lealtad debajo, por separado.</span>
-<div class="gxb-lab-toggle"><button type="button" id="gxb-ready-toggle" aria-pressed="false">Simular recompensa lista · Misiones</button><span>Prueba el efecto de logro y compáralo con el progreso normal.</span></div>
+<div class="gxb-lab-toggle"><button type="button" id="gxb-ready-toggle" aria-pressed="false">Simular recompensa lista · Misiones</button><span>Cambia el estado de la misión sin operar una cuenta real.</span></div><label class="hint" for="gxb-ref-stage">Estado de Referidos</label><select id="gxb-ref-stage" aria-label="Estado de referidos de demostración"><option value="active">Invitado activo · 1/3</option><option value="none">Sin referido · Invitar</option><option value="ready">Beneficio disponible · 3/3</option><option value="claimed">Beneficio reclamado</option></select>
 <div class="glass-material-selector" role="group" aria-label="Comparar materiales de cristal">
   <button type="button" data-material-preset="official" aria-pressed="false">GOXION oficial</button>
   <button type="button" data-material-preset="lab" aria-pressed="false">Laboratorio</button>
@@ -640,85 +673,244 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
 })();
 
 (function(){
+ 'use strict';
+ const root=document.querySelector('.gxb-wrap');
+ const row=document.getElementById('gxb-row');
  const panel=document.getElementById('gxb-panel');
- const tiles=[...document.querySelectorAll('.gxb-tile[data-gxb]')];
- const examples={
-  loyalty:{label:'LEALTAD',title:'Tu constancia suma',copy:'Llevas 3 pagos consecutivos. Falta uno para alcanzar el primer nivel.',detail:'<div class="gxb-progress-header"><span>Próximo nivel</span><strong>4 pagos · 3% OFF</strong></div><div class="gxb-progress" role="progressbar" aria-label="Pagos consecutivos" aria-valuemin="0" aria-valuemax="4" aria-valuenow="3"><span style="width:75%"></span></div><p class="gxb-note">Un pago fuera de la fecha original reinicia la racha, incluso con prórroga. El segundo nivel requiere 9 pagos.</p>'},
-  referral:{label:'REFERIDOS',title:'Tu invitado avanza',copy:'En este ejemplo mantiene 2 servicios activos y 1 de 3 meses validados.',detail:'<div class="gxb-progress-header"><span>Meses validados</span><strong>1 de 3</strong></div><div class="gxb-progress" role="progressbar" aria-label="Meses de referido" aria-valuemin="0" aria-valuemax="3" aria-valuenow="1"><span style="width:33.33%"></span></div><p class="gxb-note">El programa requiere al menos 2 perfiles activos y 3 meses pagados; el mes gratuito corresponde al cuarto mes, según las reglas vigentes.</p>'},
-  mission:{label:'MISIONES',title:'Ya casi lo consigues',copy:'Has completado 2 de 3 actividades de ejemplo.',detail:'<ul class="gxb-tasks"><li><span>Visitar el catálogo</span><small>Completada ✓</small></li><li><span>Enviar un comentario</span><small>Completada ✓</small></li><li><span>Compartir GOXION</span><small>Pendiente</small></li></ul><p class="gxb-note">Las misiones y sus recompensas dependen de las tareas activadas para cada cliente.</p>'},
-  missionReady:{label:'MISIONES',title:'¡Recompensa disponible!',copy:'Completaste las 3 actividades de este ejemplo. Tu próximo paso es revisar el beneficio.',detail:'<div class="gxb-progress-header"><span>Misiones completadas</span><strong>3 de 3 · Lista</strong></div><div class="gxb-progress" role="progressbar" aria-label="Todas las misiones completadas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="3"><span style="width:100%"></span></div><p class="gxb-note">En GOXION real, la acción para reclamar o aplicar un beneficio depende de las condiciones y del estado confirmado de la cuenta.</p>'}
+ const tiles=[...row.querySelectorAll('.gxb-tile')];
+ const close=document.getElementById('gxb-dismiss');
+ const action=document.getElementById('gxb-action');
+ const rules=document.getElementById('gxb-rules');
+ const ruleNote=document.getElementById('gxb-rule-note');
+ const feedback=document.getElementById('gxb-feedback');
+ const expandedEmoji=document.getElementById('gxb-panel-emoji');
+ const readyToggle=document.getElementById('gxb-ready-toggle');
+ const refSelect=document.getElementById('gxb-ref-stage');
+ const prefersReduced=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+ let current=null,busy=false,missionReady=false,refStage='active';
+ const sourceFor=key=>tiles.find(tile=>tile.dataset.gxb===key);
+ const text=id=>document.getElementById(id);
+ const entries={
+  loyalty:{
+   kicker:'LEALTAD',title:'Tu constancia crece',copy:'Un pago más y desbloqueas tu primer beneficio.',
+   detail:'<div class="gxb-metric-head"><span>Racha actual</span><strong>3 de 4 pagos</strong></div><div class="gxb-meter" role="progressbar" aria-label="Racha de pagos" aria-valuemin="0" aria-valuemax="4" aria-valuenow="3"><span style="width:75%"></span></div><p class="gxb-note">Siguiente beneficio · 3% de descuento</p>',
+   action:'Mis niveles',terms:'La racha se calcula con las fechas de pago originales. El segundo nivel requiere 9 pagos consecutivos.',emoji:'⭐'
+  },
+  referral:{
+   kicker:'REFERIDOS',title:'Tu invitado avanza',copy:'2 servicios activos · 1 mes validado.',
+   detail:'<div class="gxb-metric-head"><span>Camino al mes gratis</span><strong>1 de 3 meses</strong></div><div class="gxb-meter" role="progressbar" aria-label="Meses validados" aria-valuemin="0" aria-valuemax="3" aria-valuenow="1"><span style="width:33.33%"></span></div><p class="gxb-note">El beneficio se desbloquea después del tercer mes válido.</p>',
+   action:'Copiar invitación',terms:'Se necesitan al menos 2 servicios activos durante 3 meses válidos. La aplicación del mes gratis depende de las reglas del programa.',emoji:'🎁'
+  },
+  referralNone:{
+   kicker:'REFERIDOS',title:'Invita y gana',copy:'Comparte GOXION para comenzar a obtener beneficios.',
+   detail:'<p class="gxb-note">Cuando tu invitado tenga servicios activos, aquí aparecerá su progreso. No hay meses validados todavía.</p>',
+   action:'Copiar invitación',terms:'La invitación debe estar vinculada a un cliente confirmado. El laboratorio no crea referencias ni inscripciones reales.',emoji:'🫂'
+  },
+  referralReady:{
+   kicker:'REFERIDOS',title:'¡Beneficio desbloqueado!',copy:'Tu invitado cumplió los 3 meses necesarios.',
+   detail:'<div class="gxb-metric-head"><span>Meses validados</span><strong>3 de 3 · Listo</strong></div><div class="gxb-meter" role="progressbar" aria-label="Meses validados" aria-valuemin="0" aria-valuemax="3" aria-valuenow="3"><span style="width:100%"></span></div><p class="gxb-note">Tu mes gratuito está disponible en este escenario ficticio.</p>',
+   action:'Ver beneficio',terms:'La concesión real del mes gratuito se valida antes de aplicarse a una cuenta.',emoji:'🎁'
+  },
+  referralClaimed:{
+   kicker:'REFERIDOS',title:'Beneficio aplicado',copy:'Tu recompensa ya fue registrada en este ejemplo.',
+   detail:'<p class="gxb-note">Cuando una recompensa está reclamada, el estado se mantiene visible para evitar confusiones.</p>',
+   action:'Ver historial',terms:'La confirmación de aplicación y el historial se consultan en los datos reales del cliente.',emoji:'💝'
+  },
+  mission:{
+   kicker:'MISIONES',title:'Una misión pendiente',copy:'Has completado 2 de las 3 actividades.',
+   detail:'<ul class="gxb-tasks"><li><span>Explorar el catálogo</span><small>Hecha ✓</small></li><li><span>Compartir tu opinión</span><small>Hecha ✓</small></li><li data-status="pending"><span>Compartir GOXION</span><small>Pendiente</small></li></ul>',
+   action:'Ver última misión',terms:'Las tareas oficiales pueden implicar visitas, comentarios o acciones verificables. Aquí únicamente se representan visualmente.',emoji:'🎯'
+  },
+  missionReady:{
+   kicker:'MISIONES',title:'¡Recompensa disponible!',copy:'Completaste todas las actividades de esta ronda.',
+   detail:'<div class="gxb-metric-head"><span>Misiones completadas</span><strong>3 de 3 · Listo</strong></div><div class="gxb-meter" role="progressbar" aria-label="Misiones completas" aria-valuemin="0" aria-valuemax="3" aria-valuenow="3"><span style="width:100%"></span></div><p class="gxb-note">Tu siguiente paso es revisar el beneficio ganado.</p>',
+   action:'Ver recompensa',terms:'Este escenario no reclama ni aplica cupones reales. La recompensa se valida con las funciones oficiales.',emoji:'🏆'
+  }
  };
- let current=null,missionReady=false;
- const demoToggle=document.getElementById('gxb-ready-toggle');
- const missionTile=tiles.find(tile=>tile.dataset.gxb==='mission');
- const noMotion=()=>window.matchMedia&&window.matchMedia('(prefers-reduced-motion:reduce)').matches;
- function present(key,tile){
-  const item=key==='mission'&&missionReady?examples.missionReady:examples[key];
-  if(!item)return;
-  const wasClosed=panel.hidden;
-  current=key;
-  document.getElementById('gxb-eyebrow').textContent=item.label;
-  document.getElementById('gxb-title').textContent=item.title;
-  document.getElementById('gxb-copy').textContent=item.copy;
-  document.getElementById('gxb-content').innerHTML=item.detail; // Plantillas estáticas de muestra.
-  panel.dataset.watermark=tile.dataset.watermark;
-  tiles.forEach(button=>button.setAttribute('aria-expanded',String(button===tile)));
-  panel.hidden=false;
-  if(!noMotion()){
-   panel.classList.remove('is-opening');
-   if(wasClosed){
-    void panel.offsetWidth;
-    panel.classList.add('is-opening');
-    if(panel.animate)panel.animate([{opacity:0,transform:'translateY(-9px) scale(.99)'},{opacity:1,transform:'translateY(0) scale(1)'}],{duration:380,easing:'cubic-bezier(.2,.82,.2,1)'});
-   }
-   if(!wasClosed){
-    for(const node of [panel.querySelector('.gxb-head'),panel.querySelector('.gxb-copy'),panel.querySelector('#gxb-content')]){
-     if(node&&node.animate)node.animate([{opacity:.55,transform:'translateY(5px)'},{opacity:1,transform:'translateY(0)'}],{duration:250,easing:'cubic-bezier(.2,.82,.2,1)'});
-    }
-   }
-   const progress=panel.querySelector('.gxb-progress span');
-   if(progress&&progress.animate){
-    progress.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],{duration:920,easing:'cubic-bezier(.16,1,.3,1)'});
-   }
-   const head=panel.querySelector('.gxb-head');
-   if(head&&head.animate&&wasClosed){
-    head.animate([{opacity:.3,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:420,delay:60,easing:'cubic-bezier(.2,.82,.2,1)'});
-   }
+ function selectedEntry(key){
+  if(key==='mission')return missionReady?entries.missionReady:entries.mission;
+  if(key==='referral')return refStage==='none'?entries.referralNone:refStage==='ready'?entries.referralReady:refStage==='claimed'?entries.referralClaimed:entries.referral;
+  return entries.loyalty;
+ }
+ function updatePanel(key){
+  const d=selectedEntry(key);
+  text('gxb-eyebrow').textContent=d.kicker;
+  text('gxb-title').textContent=d.title;
+  text('gxb-copy').textContent=d.copy;
+  text('gxb-content').innerHTML=d.detail; // Plantillas estáticas del laboratorio, sin valores externos.
+  expandedEmoji.textContent=d.emoji;
+  action.textContent=d.action;
+  ruleNote.textContent=d.terms;
+  ruleNote.hidden=true;
+  rules.setAttribute('aria-expanded','false');
+  feedback.textContent='';
+  panel.setAttribute('aria-label',d.kicker+' · '+d.title);
+ }
+ function reducedOrUnsupported(){return prefersReduced()||!Element.prototype.animate}
+ function coordinates(rect){return {left:rect.left+'px',top:rect.top+'px',width:rect.width+'px',height:rect.height+'px'}}
+ function animationFinished(animation){return animation?animation.finished.catch(()=>{}):Promise.resolve()}
+ async function transition(sourceRect,targetRect,startEmoji,endEmoji,opening){
+  if(reducedOrUnsupported())return;
+  let surface=null,floating=null;
+  const animations=[];
+  try{
+   surface=document.createElement('div');
+   surface.className='gxb-morph-surface';
+   Object.assign(surface.style,coordinates(sourceRect),{borderRadius:opening?'20px':'26px'});
+   document.body.appendChild(surface);
+   const from=startEmoji.getBoundingClientRect(),to=endEmoji.getBoundingClientRect();
+   const emojiSize=Math.max(from.width,to.width,35);
+   floating=document.createElement('span');
+   floating.className='gxb-morph-emoji';
+   floating.textContent=startEmoji.textContent;
+   floating.style.fontSize=emojiSize+'px';
+   floating.style.left=(from.left+from.width/2)+'px';
+   floating.style.top=(from.top+from.height/2)+'px';
+   document.body.appendChild(floating);
+   const surfaceAnim=surface.animate([
+     Object.assign({},coordinates(sourceRect),{borderRadius:opening?'20px':'26px',opacity:1}),
+     Object.assign({},coordinates(targetRect),{borderRadius:opening?'26px':'20px',opacity:1})
+   ],{duration:455,easing:'cubic-bezier(.18,.86,.22,1)',fill:'forwards'});
+   animations.push(surfaceAnim);
+   const eAnim=floating.animate([
+     {left:(from.left+from.width/2)+'px',top:(from.top+from.height/2)+'px',opacity:opening?1:.34,transform:'translate(-50%,-50%) rotate('+(opening?-8:-12)+'deg) scale('+(from.width/emojiSize)+')'},
+     {left:(to.left+to.width/2)+'px',top:(to.top+to.height/2)+'px',opacity:opening?.34:1,transform:'translate(-50%,-50%) rotate('+(opening?-12:-8)+'deg) scale('+(to.width/emojiSize)+')'}
+   ],{duration:455,easing:'cubic-bezier(.22,.72,.18,1)',fill:'forwards'});
+   animations.push(eAnim);
+   await Promise.all(animations.map(animationFinished));
+  }finally{
+   animations.forEach(a=>{try{a.cancel()}catch(_){}});
+   if(surface)surface.remove();
+   if(floating)floating.remove();
   }
  }
- function hide(refocus){
-  const selected=tiles.find(t=>t.dataset.gxb===current);
-  current=null;panel.hidden=true;
-  tiles.forEach(t=>t.setAttribute('aria-expanded','false'));
-  if(refocus&&selected)selected.focus({preventScroll:true});
+ function animateContent(){
+  const nodes=[panel.querySelector('.gxb-head'),text('gxb-copy'),text('gxb-content'),panel.querySelector('.gxb-foot')];
+  if(reducedOrUnsupported())return;
+  nodes.forEach((node,index)=>{if(node)node.animate(
+   [{opacity:0,transform:'translateY(9px)'},{opacity:1,transform:'translateY(0)'}],
+   {duration:300,delay:45+index*27,easing:'cubic-bezier(.16,1,.3,1)'}
+  )});
+  const meter=panel.querySelector('.gxb-meter>span');
+  if(meter)meter.animate([{transform:'scaleX(0)'},{transform:'scaleX(1)'}],
+     {duration:850,easing:'cubic-bezier(.16,1,.3,1)'});
  }
- tiles.forEach(tile=>tile.addEventListener('click',()=>{
-  if(current===tile.dataset.gxb){hide(false);return;}
-  present(tile.dataset.gxb,tile);
- }));
- // Conmutar exclusivamente el ejemplo visual de misión lista, sin backend.
- demoToggle.addEventListener('click',()=>{
-  missionReady=!missionReady;
-  demoToggle.setAttribute('aria-pressed',String(missionReady));
-  missionTile.dataset.ready=String(missionReady);
-  missionTile.dataset.watermark=missionReady?'🏆':'🎯';
-  missionTile.querySelector('.gxb-number').textContent=missionReady?'3/3':'2/3';
-  missionTile.querySelector('.gxb-unit').textContent=missionReady?'premio listo':'completadas';
-  missionTile.querySelector('.gxb-mini-progress > span').style.setProperty('--gxb-pct',missionReady?'100%':'66.67%');
-  missionTile.setAttribute('aria-label',missionReady?'Misiones, 3 de 3, recompensa disponible':'Misiones, 2 de 3 completadas');
-  if(current==='mission')present('mission',missionTile);
+ async function open(key){
+  if(busy||current)return;
+  const tile=sourceFor(key);if(!tile)return;
+  busy=true;current=key;
+  const sourceRect=tile.getBoundingClientRect();
+  const sourceEmoji=tile.querySelector('.gxb-emoji');
+  try{
+   updatePanel(key);
+   tiles.forEach(button=>button.setAttribute('aria-expanded',String(button===tile)));
+   row.hidden=true;
+   panel.hidden=false;
+   panel.style.visibility='hidden';
+   panel.style.opacity='0';
+   const targetRect=panel.getBoundingClientRect();
+   const targetEmoji=expandedEmoji;
+   if(!reducedOrUnsupported()){
+    panel.style.visibility='visible'; // La superficie no aparece hasta completar el movimiento.
+    targetEmoji.style.visibility='hidden';
+    await transition(sourceRect,targetRect,sourceEmoji,targetEmoji,true);
+   }
+   panel.style.visibility='';
+   panel.style.opacity='';
+   targetEmoji.style.visibility='';
+   animateContent();
+   close.focus({preventScroll:true});
+  }catch(e){
+   panel.hidden=true;row.hidden=false;current=null;
+   tiles.forEach(button=>button.setAttribute('aria-expanded','false'));
+  }finally{
+   panel.style.opacity='';panel.style.visibility='';expandedEmoji.style.visibility='';
+   busy=false;
+  }
+ }
+ async function collapse(){
+  if(busy||!current)return;
+  busy=true;
+  const key=current;
+  const tile=sourceFor(key);
+  const sourceRect=panel.getBoundingClientRect();
+  const sourceEmoji=expandedEmoji;
+  try{
+   // Se mide la fila de destino en su flujo real sin mostrar una segunda tarjeta.
+   panel.hidden=true;
+   row.hidden=false;
+   row.style.visibility='hidden';
+   const targetRect=tile.getBoundingClientRect();
+   const targetEmoji=tile.querySelector('.gxb-emoji');
+   if(!reducedOrUnsupported())await transition(sourceRect,targetRect,sourceEmoji,targetEmoji,false);
+   row.style.visibility='';
+   tiles.forEach(button=>button.setAttribute('aria-expanded','false'));
+   current=null;
+   tile.focus({preventScroll:true});
+  }catch(e){
+   row.style.visibility='';
+   row.hidden=false;panel.hidden=true;current=null;
+  }finally{
+   row.style.visibility='';busy=false;
+  }
+ }
+ tiles.forEach(tile=>tile.addEventListener('click',()=>open(tile.dataset.gxb)));
+ close.addEventListener('click',collapse);
+ panel.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();collapse()}});
+ rules.addEventListener('click',()=>{
+  ruleNote.hidden=!ruleNote.hidden;
+  rules.setAttribute('aria-expanded',String(!ruleNote.hidden));
  });
- // Revelar el progreso una sola vez al entrar a la pantalla.
- const section=document.querySelector('.gxb-wrap');
- if(!noMotion()&&'IntersectionObserver' in window){
+ action.addEventListener('click',async()=>{
+  if(current==='loyalty'){ruleNote.hidden=false;rules.setAttribute('aria-expanded','true');feedback.textContent='Niveles de muestra: 4 pagos y 9 pagos.';return;}
+  if(current==='mission'){
+   if(missionReady){feedback.textContent='Recompensa de demostración. Ningún cupón se aplicó.';return;}
+   feedback.textContent='En la versión oficial, esta acción conduce a la misión pendiente.';return;
+  }
+  if(refStage==='none'||refStage==='active'){
+   const sample='GOXION · Invitación de demostración (sin vínculo a una cuenta)';
+   try{
+    if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(sample);feedback.textContent='Texto de demostración copiado.'}
+    else feedback.textContent='Vista demostrativa: compartir se conecta en la versión oficial.';
+   }catch(_){feedback.textContent='Vista demostrativa: compartir se conecta en la versión oficial.'}
+  }else feedback.textContent='Este beneficio es ficticio; no se modificó ninguna cuenta.';
+ });
+ function syncState(){
+  const m=sourceFor('mission');
+  const r=sourceFor('referral');
+  m.querySelector('.gxb-emoji').textContent=missionReady?'🏆':'🎯';
+  m.querySelector('.gxb-number').textContent=missionReady?'3/3':'2/3';
+  m.querySelector('.gxb-unit').textContent=missionReady?'lista':'completadas';
+  m.querySelector('.gxb-mini-progress>span').style.setProperty('--gxb-pct',missionReady?'100%':'66.67%');
+  m.dataset.ready=String(missionReady);
+  m.setAttribute('aria-label',missionReady?'Misiones, recompensa lista para reclamar, abrir detalle':'Misiones, 2 de 3 completadas, abrir detalle');
+  const referralDetails={
+   none:['🫂','Invita','empieza aquí','0%',false],
+   active:['🎁','1/3','meses válidos','33.33%',false],
+   ready:['🎁','3/3','premio listo','100%',true],
+   claimed:['💝','✓','reclamado','100%',false]
+  }[refStage];
+  r.querySelector('.gxb-emoji').textContent=referralDetails[0];
+  r.querySelector('.gxb-number').textContent=referralDetails[1];
+  r.querySelector('.gxb-unit').textContent=referralDetails[2];
+  r.querySelector('.gxb-mini-progress>span').style.setProperty('--gxb-pct',referralDetails[3]);
+  r.querySelector('.gxb-mini-progress').style.opacity=refStage==='none'?'.22':'';
+  r.dataset.ready=String(referralDetails[4]);
+  r.setAttribute('aria-label','Referidos, '+referralDetails[2]+', abrir detalle');
+  if(current&&!busy){updatePanel(current);animateContent()}
+ }
+ readyToggle.addEventListener('click',()=>{
+  missionReady=!missionReady;readyToggle.setAttribute('aria-pressed',String(missionReady));syncState()
+ });
+ refSelect.addEventListener('change',()=>{refStage=refSelect.value;syncState()});
+ syncState();
+ if(!prefersReduced()&&'IntersectionObserver' in window){
   const observer=new IntersectionObserver(entries=>{
-   if(!entries.some(item=>item.isIntersecting))return;
-   section.classList.add('is-visible');observer.disconnect();
-  },{threshold:.18});
-  observer.observe(section);
- }else section.classList.add('is-visible');
- document.getElementById('gxb-dismiss').addEventListener('click',()=>hide(true));
- panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();hide(true)}});
+   if(!entries.some(entry=>entry.isIntersecting))return;
+   root.classList.add('is-visible');observer.disconnect();
+  },{threshold:.15});
+  observer.observe(root);
+ }else root.classList.add('is-visible');
  document.querySelectorAll('[data-catalog]').forEach(button=>button.addEventListener('click',()=>{
   const dialog=document.getElementById('detail');
   document.getElementById('detail-title').textContent='Catálogo · vista conceptual';
