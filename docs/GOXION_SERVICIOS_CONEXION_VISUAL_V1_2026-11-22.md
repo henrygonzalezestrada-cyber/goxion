@@ -38,6 +38,14 @@ Cuando `combinedNotices` trae más de un evento, la primera novedad conserva la 
 
 **Validación pendiente:** confrontar conteos de `+N` con las novedades que ya se presentan mediante la tarjeta de credencial, y revisar variaciones de varios avisos reales sin perder el foco ni el contenido al refrescar.
 
+## Corrección visual obligatoria · sin líneas decorativas
+
+Tras evaluar el laboratorio, el usuario **rechazó explícitamente** la línea de color que aparecía bajo el logo al abrir Servicios y el copy demasiado extenso en las tarjetas. Se eliminó del laboratorio tanto el separador con gradiente como el separador neutro; no sustituir por otra raya. El color semántico debe vivir **solo en indicador/palabras esenciales**, no en bordes, glow, halos ni encapsulados artificiales.
+
+En esta rama se aplicó `#view-dashboard .gx-service-divider{display:none!important}` y se quitaron bordes decorativos del disclosure de novedades. Los textos oficiales y recorridos de backend aún **no se deben resumir mecánicamente** si son necesarios para consentimiento, seguridad o información contractual: priorizar la vista compacta y usar disclosure/vistas específicas para el detalle completo.
+
+**Bloqueo de aprobación visual:** antes de fusionar el PR, confirmar que el resumen muestra solo logo, nombre y estado; que cada aviso expuesto es breve, sin repetir el estado; y que las instrucciones legales o sensibles permanecen accesibles donde corresponde. No agregar otros contenedores secundarios, ni animaciones ornamentales.
+
 ## Escenarios mínimos antes de fusionar
 
 - Verificar en iPhone/Safari físico 280, 320, 360, 375, 390, 430 y 768px, incluyendo longitudes de textos y `+N`; no cortar notificaciones ni superponer la X.
