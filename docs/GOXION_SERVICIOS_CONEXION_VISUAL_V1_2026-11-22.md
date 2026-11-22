@@ -31,6 +31,13 @@ En la rama, la estructura funcional existente `assets/js/ayuda/01e-client-dashbo
 
 **Límite de esta iteración:** la pantalla oficial sigue usando su DOM y sus handlers de Servicios, aunque los estilos se acerquen al laboratorio. El laboratorio `morph-v2.html` continúa con datos ficticios. **No significa que toda la composición experimental del feed (hero, beneficios, ahorro, navegación) haya sido migrada**, ni que la conectividad haya sido probada aún con una cuenta real.
 
+
+## Novedades múltiples sin saturación
+
+Cuando `combinedNotices` trae más de un evento, la primera novedad conserva la prioridad oficial del servidor y se marca como primaria en el resumen con `+N`. Dentro de la tarjeta abierta aparece un `<details>` accesible llamado «Otras novedades (N)», pero **no duplica** `password` cuando ya hay `credencial_pendiente`: el botón oficial de contraseña de una sola consulta conserva la responsabilidad de esa operación. Los otros resúmenes están escapados y solo se consultan bajo demanda; no se agregan acciones paralelas ni acuses automáticos nuevos.
+
+**Validación pendiente:** confrontar conteos de `+N` con las novedades que ya se presentan mediante la tarjeta de credencial, y revisar variaciones de varios avisos reales sin perder el foco ni el contenido al refrescar.
+
 ## Escenarios mínimos antes de fusionar
 
 - Verificar en iPhone/Safari físico 280, 320, 360, 375, 390, 430 y 768px, incluyendo longitudes de textos y `+N`; no cortar notificaciones ni superponer la X.
