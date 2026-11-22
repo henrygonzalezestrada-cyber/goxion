@@ -1,6 +1,6 @@
-# GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V3
+# GOXION · Navegación superior adaptable + perfil — investigación y laboratorio V4
 
-**Fecha:** 22/nov/2026. **Estado actual:** **V3 IMPLEMENTADA EN LABORATORIO para revisión**, aún **NO aprobada ni publicada en `ayuda.html`**. Las secciones 1–9 contienen el análisis y las V1–V2 históricas; **la sección 10 recoge el comportamiento vigente V3 y prevalece cuando exista contradicción**. Sin cambios en CSS/JS oficial, Edge ni datos de clientes.
+**Fecha:** 22/nov/2026. **Estado actual:** **V4 IMPLEMENTADA EN LABORATORIO para revisión**, aún **NO aprobada ni publicada en `ayuda.html`**. Las secciones 1–10 contienen análisis y versiones históricas; **la sección 11 explica la V4 vigente y reemplaza las decisiones de movimiento lateral de la V3**. Sin cambios en CSS/JS oficial, Edge ni datos de clientes.
 
 ## 1. Brief del usuario (no convertir en instrucciones contradictorias)
 
@@ -89,6 +89,30 @@ Reubicar toda la cápsula expandida justo **sobre** el texto en el encabezado, d
 **Qué se prohibe repetir:** no introducir una `gxn-strip` que englobe la campana/Goxy, no cancelar la expansión del nav al deslizar de regreso, no quitar las cuadrículas adaptadas del Hero ni los materiales/animaciones de Beneficios. La V3 documentada a continuación es el estado válido para continuar. **No se ha modificado la página oficial** `ayuda.html` ni se considera aprobada aún la V3 mediante QA físico en iPhone.
 
 **Laboratorio restaurado:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=4efbd59
+
+---
+
+## 11. V4 · Cápsula centrada, sticky y de tamaño variable (22/nov/2026)
+
+**Nueva decisión del usuario después de restaurar la V3 previa a Muse:** reconsideró el riesgo de hacer viajar la cápsula hacia la esquina y propuso simplificar: tomar las transformaciones del botón activo de la navegación oficial, **mantener la cápsula en el centro**, fijarla arriba al desplazar contenido, reducirla de tamaño, hacer que encabezado/logo/campana/Goxy salgan del viewport de forma normal y **reexpandir la misma cápsula al deslizar el dedo hacia abajo**, sin obligar a volver al inicio. El usuario pidió implementarla en laboratorio, no en producción.
+
+### Implementado — NO oficial
+
+- **HTML:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` commit **`cb19d3ab3750e9e8835fb33000cfdaf2b80ee48d`**. El único `#gxn-nav` pasó a estar inmediatamente después de `#gxn-stage`, como hijo directo de `.shell`. Se eliminaron `#gxn-nav-slot` y `#gxn-nav-target`: ya no se reserva una posición fantasma ni se miden dos destinos. Su estado es `data-mode="expanded"/"compact"`.
+- **CSS:** `adaptive-top-nav.css` commit `2e5007c1d804e8ba989f39447394429a0dbdc668`. La cápsula usa **`position:sticky`** y `top:calc(8px + env(safe-area-inset-top,0px))`, `margin-inline:auto` (centro real, sin cálculo lateral), cristal neutro `rgba(8,8,12,.371)` y `backdrop-filter:blur(11.75px)`. Tamaño en reposo: ancho de `.shell`, alto 76px (74px hasta 355px); compacta **172×60px**, **160×60px** en <=320px. Botones de la navegación oficial con morph del destino seleccionado, círculos **56×56** (54×54 en pequeño) en completo; **46×46** en compacta (44×44 en <=320). Radio circular 50%; área táctil >=44px.
+- **Ritmo del feed:** el encabezado conserva logo, campana y Goxy como en la V3, pero **NO se fija ni se traslada**; se desplaza fuera de la pantalla naturalmente. `#gxn-stage` se reduce a su fila real de 60px; la cápsula ocupa el segundo renglón con `margin-top:9px` y deja 15px antes del saludo. En compacta, el margen inferior aumenta 16px para **compensar la diferencia de altura y preservar el desplazamiento de los demás módulos**. En <=355px se compensa el cambio de 74→60px con margen 29px.
+- **JS:** `adaptive-top-nav.js` commit `876946a90b7e06fc892148203d334364143ad402`. Eliminado todo el motor de `dockGoal`, `spread`, cálculo de coordenadas, reubicación por `transform` y loops de asentamiento. El listener `scroll` pasivo y `requestAnimationFrame` **solo detectan dirección y actualizan un estado**. Después de ~150px al avanzar por la página se compacta; al regresar por el contenido unos 26px se expande; al volver a ~95px se restaura la versión completa. Cambios solo en los extremos; CSS `transition` (~380ms) concluye naturalmente incluso si el gesto termina antes. La navegación nunca altera `scrollY` para completar una transición.
+- **Una identidad, no otro componente:** siguen tres destinos y emojis, la transformación a píldora del ítem activo, Goxy y su menú, campana de prueba, simulador de Catálogo y diálogo de Soporte. En compacta, los tres destinos se mantienen navegables y con blancos circulares reales, sin labels. En expandida, se recupera la etiqueta del destino activo.
+- **No se modificaron** Hero, Lealtad, Referidos, Misiones, Ahorro, Servicios, Historial, Catálogo, sus estados, ni `ayuda.html`, `index.html`, `admin.html`, motor financiero o autenticación.
+
+### Verificación
+
+- **15 comprobaciones estáticas** completadas: un `nav`, tres destinos, IDs únicos, scripts válidos, CSS balanceado, cristal, sticky, objetivos, botones, y subárbol completo del feed sin cambios.
+- **18 pruebas de comportamiento con DOM simulado** completadas: inicio, umbrales, compactación, permanencia, reversa, segundo sentido, regreso arriba, scroll largo, perfil, Goxy, campana, Catálogo y Soporte.
+- **Smoke real de Chromium y WebKit** actualizado en `preview/experiencia-mi-espacio-inteligente/check-adaptive-nav.mjs`, incluyendo 280/320/360/390/430/768 px y comprobación de ancho, redondez, centrado, altura compensada, interacción de menús y scroll. **Todavía no ejecutado en navegador real**; queda pendiente Safari del iPhone antes de aprobar fluidez, sticky y safe area.
+- **Importante:** esta V4 **supersede únicamente la navegación V3**. No se debe recuperar por accidente la V3 de movimiento hacia la esquina, ni la franja oscura de Muse. Las decisiones de diseño aprobadas de los otros módulos siguen vigentes y están protegidas por el expediente maestro.
+
+**Vista V4 anticaché:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=cb19d3a
 
 ---
 
