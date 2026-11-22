@@ -1322,7 +1322,8 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  'use strict';
  const root=document.getElementById('gxs-services'),list=document.getElementById('gxs-list');
  const select=document.getElementById('gxs-demo-case'),counter=document.getElementById('gxs-count');
- if(!root||!list||!select||!counter)return;
+ const quick=document.getElementById('gxs-quick-case'),toggle=document.getElementById('gxs-lab-toggle'),controls=document.getElementById('gxs-lab-controls'),outcome=document.getElementById('gxs-lab-outcome');
+ if(!root||!list||!select||!counter||!quick||!toggle||!controls||!outcome)return;
  const safe=value=>String(value??'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
  const originals=[
   {id:'netflix',name:'Netflix',logo:'../../logos/netflix.PNG',status:'Activo',tone:'active',kind:'profile',email:'mario@example.com',profile:'Perfil 02',pin:'4826'},
@@ -1335,15 +1336,28 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   if(mode==='empty')return [];
   if(mode==='one')return copy.slice(0,1);
   if(mode==='two')return copy.slice(0,2);
+  if(mode==='cancel-effective')return copy.slice(1); // La baja efectiva retira solo Netflix del ejemplo.
   const service=copy[0];
   if(mode==='update'){
    service.status='Nueva contraseña';service.tone='notice';
    service.callout={type:'notice',title:'Actualización disponible',body:'Tienes una nueva contraseña. Para consultarla en GOXION se requiere tu PIN y solo puede verse una vez.'};
    service.primary='Revisar actualización';service.primaryAction='credential';
+  }else if(mode==='pin-update'){
+   service.status='PIN de perfil actualizado';service.tone='notice';service.pin='6951';
+   service.callout={type:'notice',title:'PIN de perfil actualizado',body:'Consulta el nuevo PIN ficticio desde Tus accesos. No es el PIN de seguridad de GOXION.'};
+   service.primary='Mostrar PIN';service.primaryAction='showpin';
   }else if(mode==='cancel'){
-   service.status='Cancelación en revisión';service.tone='pending';
-   service.callout={type:'notice',title:'Solicitud recibida',body:'El servicio continúa activo mientras GOXION revisa la baja. No necesitas volver a solicitarla.'};
+   service.status='Cancelación en revisión';service.tone='pending';service.cancellationPhase='solicitada';
+   service.callout={type:'notice',title:'Solicitud recibida · En revisión',body:'Se registró la solicitud. Netflix continúa activo mientras GOXION revisa la baja. No hace falta solicitarla otra vez.'};
    service.primary='Ver cancelación';service.primaryAction='cancellation';
+  }else if(mode==='cancel-approved'){
+   service.status='Cancelación aprobada';service.tone='pending';service.cancellationPhase='aprobada';
+   service.callout={type:'notice',title:'Autorizada · Baja aún pendiente',body:'La solicitud fue aprobada, pero Netflix continúa disponible hasta la baja efectiva. Los cargos ya generados no cambian.'};
+   service.primary='Ver cancelación';service.primaryAction='cancellation';
+  }else if(mode==='cancel-rejected'){
+   service.status='Cancelación no autorizada';service.tone='attention';service.cancellationPhase='rechazada';
+   service.callout={type:'attention',title:'Solicitud no autorizada',body:'Netflix sigue activo. Si corresponde, el cliente puede solicitar una nueva revisión.'};
+   service.primary='Ver resolución';service.primaryAction='cancellation';
   }else if(mode==='paused'){
    service.status='Temporalmente inactivo';service.tone='attention';
    service.callout={type:'attention',title:'Servicio con incidencia',body:'Consulta el motivo confirmado y comunícate con soporte si necesitas asistencia.'};
@@ -1361,7 +1375,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
  }
  function renderCard(service){
   const el=document.createElement('article');
-  el.className='gxs-card gxc-surface';el.dataset.service=service.id;el.dataset.tone=service.tone;
+  el.className='gxs-card gxc-surface';el.dataset.service=service.id;el.dataset.tone=service.tone;el.dataset.cancellation=service.cancellationPhase||'';
   const details=service.kind==='invitation'
    ? row('Correo personal',service.email,'copy',service.email)+row('Estado',service.invite)
    : row('Correo',service.email,'copy',service.email)+row('Perfil',service.profile)+row('PIN de perfil','••••','pin',service.pin);
@@ -1392,11 +1406,30 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    trigger.setAttribute('aria-expanded',String(active));
    trigger.setAttribute('aria-label',(card.querySelector('.gxs-name')?.textContent||'Servicio')+', '+(card.querySelector('.gxs-status')?.textContent||'')+', '+(active?'cerrar detalles':'abrir detalles'));
    inner.inert=!active;inner.setAttribute('aria-hidden',String(!active));
-   if(!active){const more=card.querySelector('.gxs-more');more.hidden=true}
+   if(!active){
+    const more=card.querySelector('.gxs-more');more.hidden=true;
+    card.querySelectorAll('[data-gxs-action="pin"]').forEach(button=>{
+     const field=button.parentElement.querySelector('[data-gxs-value]');
+     if(field)field.textContent='••••';
+     button.setAttribute('aria-pressed','false');button.textContent='Mostrar';button.setAttribute('aria-label','Mostrar PIN ficticio');
+    });
+   }
   });
  }
  function render(){
   const services=scenario(select.value);list.replaceChildren();
+  quick.value=select.value;
+  const explanations={
+   update:'Nueva contraseña: en la versión oficial requiere el PIN GOXION y solo se revela una vez.',
+   'pin-update':'El PIN del perfil de ejemplo cambió. Abre Netflix y toca Mostrar.',
+   cancel:'Solicitada: Netflix sigue visible mientras se revisa.',
+   'cancel-approved':'Aprobada: Netflix permanece hasta la baja efectiva.',
+   'cancel-rejected':'No autorizada: Netflix sigue activo.',
+   'cancel-effective':'Baja efectiva: Netflix desaparece; los demás servicios permanecen.',
+   invitation:'Invitación pendiente de activar.',
+   paused:'Servicio con incidencia temporal.'
+  };
+  outcome.textContent=explanations[select.value]||'Escenario de prueba: sin cambios reales en servicios, cobros ni accesos.';
   // The summary indicates what matters, not a second repetition of "Tus servicios".
   const attention=services.some(entry=>entry.tone==='attention');
   const notice=services.some(entry=>entry.tone==='notice');
@@ -1438,7 +1471,16 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
    feedback(card,'PIN ilustrativo. El PIN real conserva su protección y comportamiento oficiales.');
    return;
   }
-  if(kind==='copy'){
+  if(kind==='showpin'){card.querySelector('[data-gxs-action="pin"]')?.click();return;}
+   if(kind==='cancellation'){
+    const description={
+     solicitada:'Solicitud recibida y en revisión; Netflix continúa activo.',
+     aprobada:'Aprobada; la baja aún no es efectiva, por eso Netflix sigue visible.',
+     rechazada:'No autorizada; el servicio continúa activo. Puede enviarse una nueva solicitud.'
+    };
+    feedback(card,description[card.dataset.cancellation]||'El estado definitivo depende de la resolución oficial.');return;
+   }
+   if(kind==='copy'){
    const field=action.parentElement.querySelector('[data-gxs-value]');
    if(!field)return;
    const text=field.dataset.gxsValue||'';
@@ -1457,7 +1499,23 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
   feedback(card,messages[kind]||'Esta acción funciona exclusivamente desde Mi Espacio oficial.');
  });
  select.addEventListener('change',render);
- render();
+  toggle.addEventListener('click',()=>{
+   controls.hidden=!controls.hidden;
+   toggle.setAttribute('aria-expanded',String(!controls.hidden));
+   toggle.textContent=controls.hidden?'Probar situaciones':'Ocultar pruebas';
+   if(!controls.hidden)quick.focus({preventScroll:true});
+  });
+  quick.addEventListener('change',()=>{
+   select.value=quick.value;render();
+   const targetId=quick.value==='invitation'?'youtube':(quick.value==='empty'||quick.value==='cancel-effective'?'':'netflix');
+   if(targetId)closeAll(targetId);
+   const target=targetId?list.querySelector('.gxs-card[data-service="'+targetId+'"]'):root;
+   if(target&&typeof target.scrollIntoView==='function'){
+    const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    target.scrollIntoView({behavior:reduced?'auto':'smooth',block:'center'});
+   }
+  });
+  render();
 })();
 </script>
 
