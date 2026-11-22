@@ -4,6 +4,18 @@
 **Estado:** laboratorio interactivo actualizado, pendiente de validación visual final en iPhone/Safari y de aprobación del usuario. **NO integrado en producción.**  
 **Repositorio:** `henrygonzalezestrada-cyber/goxion`.
 
+## Navegación V4 vigente · cápsula centrada y sticky (22/nov/2026)
+
+Después de restaurar la V3 previa a Muse, el usuario reconsideró las complejidades del desplazamiento lateral y solicitó **simplificar**: la cápsula principal del estilo oficial permanece **centrada** y, con `position:sticky`, se fija en la parte superior. Al avanzar se compacta; al deslizar de regreso se amplía sin regresar al inicio. **Ninguna segunda barra ni traslado a una esquina**. Logo, campana y Goxy permanecen en el encabezado normal y salen de la vista con scroll.
+
+**Implementado solo en laboratorio:** HTML `morph-v2.html` commit `cb19d3ab3750e9e8835fb33000cfdaf2b80ee48d`, CSS `adaptive-top-nav.css` `2e5007c1d804e8ba989f39447394429a0dbdc668`, JS `adaptive-top-nav.js` `876946a90b7e06fc892148203d334364143ad402`. Cristal aprobado, tres destinos/emoji/morph oficial, botones circulares de 44px+ y altura compensada para evitar desplazamientos. Motor simplificado a cambios de estado con histéresis; CSS concluye animación si se detiene el dedo. 15 comprobaciones estáticas y 18 de interacción simulada correctas; browser smoke añadido sin ejecutar en Safari real. **No afecta el Hero/beneficios/Servicios/Historial ni `ayuda.html`.**
+
+**Fuente de verdad:** [`GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md`, sección 11](GOXION_NAV_SUPERIOR_ANALISIS_CONCEPTO_2026-11-22.md) y expediente maestro. La V3 inmediatamente debajo es histórica, **reemplazada** para el propósito de la navegación. La V4 no está aprobada visualmente en iPhone.
+
+**URL anticaché:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=cb19d3a
+
+---
+
 ## Último diseño del encabezado · Navegación V3 continua (22/nov/2026)
 
 El usuario revisó el video `ScreenRecording_11-22-2026 17-04-33_1.mp4` y rechazó la interacción en dos etapas de la cápsula V2. V3 **mueve el mismo nodo** `#gxn-nav` continuamente de su posición bajo la cabecera a la esquina del logo, lo encoge, y le permite volver a ensancharse al regresar en scroll. El logo se retira dentro del mismo progreso; **la animación termina de asentarse si se suelta el gesto a la mitad**, sin modificar el scroll real de la página. El origen técnico es `assets/js/index/05-index-header-morph.js` (morph y spring de Index oficial); no se copió su scroll snap financiero.
