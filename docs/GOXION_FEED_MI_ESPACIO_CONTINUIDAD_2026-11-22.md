@@ -6,7 +6,7 @@
 
 ## Abrir primero al continuar en otro chat
 
-- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=22cf678
+- **Laboratorio en GitHub Pages:** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=2b2576c
 - **Fuente de la última iteración:** `preview/experiencia-mi-espacio-inteligente/morph-v2.html` en commit **`22cf678200c163baf28d11d5b94434b58a6eceb2`**. Jerarquía de título y ubicación de X: `d04c58818d883bee63615584a302f0dd76699886`. Los cambios de botón SVG y microsuperficie provienen de `5b034547f69f0f00cf67046b97ea72c1a07afb98`.
 - **Documentación de la tarjeta principal congelada:** `docs/GOXION_MI_ESPACIO_HERO_APROBADA_2026-11-22.md`.
 - **Auditoría visual previa y principios aprendidos:** `docs/GOXION_AUDITORIA_BENEFICIOS_FEED_2026-11-22.md`.
@@ -307,6 +307,9 @@ El usuario expresó conformidad con la jerarquía visual del área de Servicios 
 - La rama de preparación de integración oficial `feature/mi-espacio-servicios-conectados-20261122` / PR borrador `#231` recibió también corrección para ocultar la línea `.gx-service-divider` dentro de `#view-dashboard`, y dejar sin líneas los avisos secundarios. **No fusionar ese PR** hasta validar el laboratorio y funcionalidad real.
 - Comprobación estática: todos los 3 scripts inline válidos; 11 escenarios ejecutados con el generador ficticio, avisos de 37–57 caracteres y novedad secundaria de 46 caracteres; ausencia total de la clase `gxs-line`; X 35/16 intacta. **No se verificó Safari visual/táctil** ni se modificó la producción oficial en `main`.
 
-**Laboratorio vigente (anticaché):** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=22cf678
+**Laboratorio vigente (anticaché):** https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=2b2576c
 
 **Seguimiento:** aplicar esta regla a próximas iteraciones sin reintroducir líneas por estilo, sin ampliar copy por defecto y sin alterar conexiones originales.
+
+
+**Pulido posterior de esta misma corrección:** commit `2b2576c683d2d8b0a534723f5f0eeb3469646ea2`: se retiró además el separador innecesario de «Más opciones», y «1 novedad más» conserva un área táctil de al menos 44px. El diseño permanece sin líneas decorativas ni texto duplicado. Enlace actualizado: https://henrygonzalezestrada-cyber.github.io/goxion/preview/experiencia-mi-espacio-inteligente/morph-v2.html?v=2b2576c.
