@@ -22,19 +22,7 @@ button:focus-visible,select:focus-visible{outline:2px solid #74ebf4;outline-offs
 .ambient:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(3,3,5,.08),rgba(3,3,5,.22) 46%,rgba(3,3,5,.42)),radial-gradient(circle at center,transparent 20%,rgba(3,3,5,.18) 82%,rgba(3,3,5,.42) 100%);pointer-events:none}
 .ambient.gx-wave-fallback:before{content:"";position:absolute;inset:-20%;background:linear-gradient(147deg,transparent 41%,rgba(71,79,239,.2) 49%,rgba(24,216,232,.43) 50%,transparent 56%);filter:blur(14px)}
 .shell{position:relative;z-index:1;width:min(100%,580px);margin:0 auto;padding:calc(22px + env(safe-area-inset-top,0px)) 18px calc(110px + env(safe-area-inset-bottom,0px))}
-.header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:8px 8px 24px}
-.logo{width:132px;max-width:38%;height:36px;object-fit:contain;object-position:left center}
-.head-actions{display:flex;align-items:center;gap:10px}
-.bell,.session{height:43px;border:1px solid rgba(59,206,230,.28);background:rgba(11,30,37,.7);color:#d8f9ff;backdrop-filter:blur(13px);-webkit-backdrop-filter:blur(13px)}
-.bell{width:45px;border-radius:50%;display:grid;place-items:center}
-.bell svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.session{border-radius:25px;padding:0 16px;font-weight:700;font-size:12px}
-.nav{min-height:75px;border-radius:28px;border:1px solid rgba(197,206,255,.1);background:rgba(12,14,26,.64);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);display:grid;grid-template-columns:2.1fr .75fr .75fr;gap:6px;align-items:center;padding:9px;margin-bottom:40px}
-.nav button{height:53px;min-width:0;border-radius:23px;border:1px solid transparent;background:transparent;color:#a9b5c7;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap}
-.nav button.active{border-color:rgba(48,225,237,.68);color:#fff;background:linear-gradient(115deg,rgba(14,33,43,.88),rgba(17,19,34,.82))}
-.nav svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.nav .active svg{color:#53dce8}
-.nav .nav-only{display:none}
+/* Navegación superior GOXION: estilos aislados en adaptive-top-nav.css. */
 /* Saludo ligado al hero. Reserva dos líneas y ancla el texto abajo para evitar huecos. */
 .greeting{height:clamp(88px,23vw,102px);min-height:0;display:flex;align-items:flex-end;padding:0 9px 17px;overflow:hidden}
 .greeting h1{margin:0;height:2.32em;flex:0 0 100%;display:flex;align-items:center;font-weight:700;font-size:clamp(28px,7vw,35px);letter-spacing:-.045em;line-height:1.16;max-width:100%;overflow:clip}
@@ -486,24 +474,68 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 }
 
 </style>
+<link rel="stylesheet" href="./adaptive-top-nav.css?v=289b585" />
 </head>
 <body>
 <div class="ambient bg" aria-hidden="true"><canvas class="gx-wave-canvas" id="gx-wave-canvas"></canvas></div>
 <main class="shell">
-<header class="header">
-<img class="logo" src="../../logo2.PNG" alt="GOXION">
-<div class="head-actions">
-<button class="bell" id="bell" type="button" aria-label="Notificaciones de ejemplo">
-<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
-</button>
-<button type="button" class="session" id="session">Mi Espacio</button>
+<!-- Adaptive Top Capsule LAB · one DOM navigation, no official handlers duplicated -->
+<div class="gxn-stage" id="gxn-stage">
+ <div class="gxn-top" id="gxn-top" data-docked="false" data-size="expanded">
+  <div class="gxn-header">
+   <span class="gxn-brand" aria-label="GOXION">
+    <img class="gxn-wordmark" src="../../logo2.PNG" alt="GOXION">
+    <img class="gxn-brand-mark" src="../../Logo individual.png" alt="" aria-hidden="true">
+   </span>
+   <div class="gxn-actions">
+    <button class="gxn-bell" id="gxn-bell" type="button" aria-label="Notificaciones de demostración" aria-expanded="false" aria-controls="gxn-notice-menu">
+     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>
+    </button>
+    <button class="gxn-profile-trigger" id="gxn-profile-trigger" type="button" aria-label="Abrir menú de perfil, avatar Goxy" aria-expanded="false" aria-controls="gxn-profile-menu">
+     <span class="gxn-avatar" id="gxn-avatar" aria-hidden="true">
+      <span class="gxn-goxy-fallback">
+       <svg viewBox="0 0 52 52" focusable="false" aria-hidden="true">
+        <defs><linearGradient id="gxn-robot-case" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#5873cc"/><stop offset="1" stop-color="#233e85"/></linearGradient></defs>
+        <rect x="5.5" y="9" width="41" height="35" rx="12" fill="url(#gxn-robot-case)" stroke="#a9bce5" stroke-width="1.5"/>
+        <rect x="10.5" y="14.5" width="31" height="25" rx="8" fill="#eaf8ff"/>
+        <rect x="16.5" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
+        <rect x="28" y="24" width="7.5" height="6.5" rx="3.1" fill="#2c438c"/>
+        <path d="M21 34q5 3 10 0" fill="none" stroke="#8ca9d9" stroke-width="1.8" stroke-linecap="round"/>
+       </svg>
+      </span>
+      <span class="gxn-goxy-real"><span class="gxai-avatar"><span id="gxn-goxy-slot" class="gxai-canvas-slot" data-mood="idle"></span></span></span>
+      <img class="gxn-avatar-photo" id="gxn-avatar-photo" alt="" hidden>
+     </span>
+    </button>
+   </div>
+  </div>
+  <nav class="gxn-nav" id="gxn-nav" aria-label="Navegación principal · laboratorio">
+   <button type="button" class="gxn-tab" data-gxn-target="space" aria-label="Mi Espacio" aria-current="page"><span class="gxn-emoji" aria-hidden="true">👤</span><span class="gxn-tab-label">Mi Espacio</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="catalog" aria-label="Catálogo"><span class="gxn-emoji" aria-hidden="true">🛒</span><span class="gxn-tab-label">Catálogo</span></button>
+   <button type="button" class="gxn-tab" data-gxn-target="support" aria-label="Soporte"><span class="gxn-emoji" aria-hidden="true">🛠️</span><span class="gxn-tab-label">Soporte</span></button>
+  </nav>
+  <div class="gxn-menu gxn-profile-menu" id="gxn-profile-menu" hidden>
+   <div class="gxn-menu-head"><strong>Mario · Mi Espacio</strong><small>Perfil ilustrativo del laboratorio</small></div>
+   <button type="button" id="gxn-profile-open"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c0-4 3-6.5 7-6.5s7 2.5 7 6.5"/></svg>Mi perfil</button>
+   <div class="gxn-profile-editor" id="gxn-profile-editor" hidden>
+    <p>Foto de perfil · Prueba local, sin guardarla en GOXION.</p>
+    <button type="button" id="gxn-profile-choose">Elegir foto</button>
+    <button type="button" id="gxn-profile-reset" hidden>Volver a Goxy</button>
+   </div>
+   <div class="gxn-menu-rule"></div>
+   <button type="button" class="gxn-logout" id="gxn-logout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4H5v16h4M12 12h9m-4-4 4 4-4 4"/></svg>Salir</button>
+  </div>
+  <div class="gxn-menu gxn-notice-menu" id="gxn-notice-menu" hidden>
+   <div class="gxn-menu-head"><strong>Notificaciones</strong><small>La campana oficial conservará su conexión.</small></div>
+   <p class="gxn-note-copy">En el laboratorio no se consultan mensajes de clientes reales.</p>
+   <button type="button" id="gxn-notice-close">Cerrar</button>
+  </div>
+ </div>
 </div>
-</header>
-<nav class="nav" aria-label="Navegación de ejemplo">
-<button type="button" class="active" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3-7 8-7s8 3 8 7"/></svg>Mi Espacio</button>
-<button type="button" class="local-only" aria-label="Catálogo de ejemplo"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1"/><circle cx="19" cy="20" r="1"/><path d="M2 3h2l2.8 12h13l2-9H5"/></svg></button>
-<button type="button" class="local-only" aria-label="Soporte de ejemplo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5a5 5 0 0 0-6 6L2 17l5 5 6-6a5 5 0 0 0 6-6l-4 3-3-3z"/></svg></button>
-</nav>
+<input class="gxn-avatar-input" id="gxn-avatar-input" type="file" accept="image/png,image/jpeg,image/webp" aria-label="Elegir foto de perfil de prueba" hidden>
+<dialog class="gxn-dialog" id="gxn-support-dialog"><h2>Soporte</h2><p>En la versión oficial se abrirá la vista conectada de Soporte. Aquí solo puedes comprobar cómo cambia la cápsula entre destinos.</p><button type="button" class="gxn-dialog-close" data-gxn-close-dialog>Volver</button></dialog>
+<dialog class="gxn-dialog" id="gxn-logout-dialog"><h2>Salir de GOXION</h2><p>Este es un laboratorio sin sesión. En la integración oficial, «Salir» llamará a la función de cierre seguro existente.</p><button type="button" class="gxn-dialog-close" data-gxn-close-dialog>Entendido</button></dialog>
+<output class="gxn-toast" id="gxn-toast" role="status" aria-live="polite" hidden></output>
 <section aria-label="Resumen contextual de cliente">
 <div class="greeting"><h1 id="greeting" aria-label="Hola, Mario"><span class="greeting-line">Hola, <span class="name">Mario</span></span></h1></div>
 <div class="glass-stage" id="glass-stage">
@@ -1689,6 +1721,7 @@ import('https://esm.sh/morphicons@2.0.2/dom?bundle').then(mod=>{
 })();
 </script>
 
+<script src="./adaptive-top-nav.js?v=lab-nav-v1"></script>
 <script id="goxion-wave-background" src="../../assets/js/ayuda/06-wave-background.js"></script>
 </body>
 </html>
