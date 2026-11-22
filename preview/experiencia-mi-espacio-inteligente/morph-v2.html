@@ -368,10 +368,10 @@ html.gx-demo-open,html.gx-demo-open body{overflow:hidden}
 .gxs-name{font-size:14px;font-weight:700;letter-spacing:-.014em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gxs-status{display:inline-flex;align-items:center;gap:7px;color:#bccedf;font-size:10.5px;font-weight:500;line-height:1.4}
 /* Semántica GOXION: acentos discretos, sin tintar la tarjeta. */
-.gxs-card{--gxs-state-color:#65d3a2;--gxs-state-surface:rgba(42,131,94,.11)}
-.gxs-card[data-tone="pending"],.gxs-card[data-tone="notice"]{--gxs-state-color:#e7c66a;--gxs-state-surface:rgba(160,129,45,.12)}
-.gxs-card[data-tone="caution"]{--gxs-state-color:#ecab70;--gxs-state-surface:rgba(180,103,52,.13)}
-.gxs-card[data-tone="danger"]{--gxs-state-color:#ef858b;--gxs-state-surface:rgba(167,57,69,.14)}
+.gxs-card{--gxs-state-color:#65d3a2}
+.gxs-card[data-tone="pending"],.gxs-card[data-tone="notice"]{--gxs-state-color:#e7c66a}
+.gxs-card[data-tone="caution"]{--gxs-state-color:#ecab70}
+.gxs-card[data-tone="danger"]{--gxs-state-color:#ef858b}
 .gxs-status{color:var(--gxs-state-color);font-weight:600}
 .gxs-status:before{content:"";width:6px;height:6px;flex:0 0 6px;border-radius:50%;background:var(--gxs-state-color)}
 .gxs-icon{position:relative;display:grid;place-items:center;width:44px;height:44px;justify-self:end;border-radius:50%;color:#b3c9d9;transition:color .25s}
